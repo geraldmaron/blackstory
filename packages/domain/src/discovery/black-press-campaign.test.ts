@@ -4,7 +4,8 @@
  * Covers: campaign yields private candidates; news-index leads classify WEAK
  * (leadOnly → relevance_review); obscurity attached to every ranked lead;
  * authority follow-ups harvested from cited primary sources; and the
- * cannot-publish invariant (ADR-009) holds — including disabled-by-default
+ * cannot-publish invariant (`docs/decisions-carryover.md`, "Research and discovery
+ * cannot publish") holds — including disabled-by-default
  * durable registration.
  */
 import assert from 'node:assert/strict';

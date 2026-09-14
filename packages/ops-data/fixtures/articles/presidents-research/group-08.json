@@ -579,9 +579,10 @@
     {
       "number": 45,
       "name": "Donald Trump",
-      "termLabel": "2017–2021",
-      "summary": "Trump signed the First Step Act on December 21, 2018 and the FUTURE Act, which made permanent mandatory funding for historically Black colleges and other minority-serving institutions, on December 19, 2019. He also signed Executive Order 13950 restricting certain diversity training by federal contractors and Executive Order 13958 creating the 1776 Commission, and his Justice Department imposed new restrictions on civil consent decrees with state and local governments.",
-      "paragraph": "Four documented acts anchor this term. On December 21, 2018 Trump signed Public Law 115-391, the First Step Act of 2018, a federal sentencing and prison law whose Title I covers recidivism reduction. On December 19, 2019 he signed Public Law 116-91, the FUTURE Act, which amended the Higher Education Act to provide mandatory minority-serving-institution funding \"for fiscal year 2020 and each fiscal year thereafter,\" replacing a program that had expired. On September 22, 2020 he issued Executive Order 13950, \"Combating Race and Sex Stereotyping,\" applying to federal contractors, and on November 2, 2020 Executive Order 13958 established the President's Advisory 1776 Commission. Separately, Attorney General Jeff Sessions issued a November 7, 2018 memorandum setting limits on when consent decrees with state or local governments are appropriate and requiring senior-leadership approval; the Federal Register later records both that memorandum and the December 2020 rule implementing it, and their 2021-22 rescission.",
+      "termLabel": "2017–2021, 2025–",
+      "ordinalLabel": "45th and 47th president",
+      "summary": "Trump is the second president elected to non-consecutive terms. In the first he signed the First Step Act and the FUTURE Act, which made mandatory funding for historically Black colleges permanent, along with executive orders restricting diversity training by federal contractors and creating the 1776 Commission. The second revoked Executive Order 11246, the 1965 equal employment opportunity order for federal contractors, ended federal DEI programs, and made it United States policy to eliminate disparate-impact liability.",
+      "paragraph": "This entry covers two presidencies. Trump was elected in 2016 and again in 2024, and the White House lists him as the 45th and 47th president. Four documented acts anchor the first term. On December 21, 2018 Trump signed Public Law 115-391, the First Step Act of 2018, a federal sentencing and prison law whose Title I covers recidivism reduction. On December 19, 2019 he signed Public Law 116-91, the FUTURE Act, which amended the Higher Education Act to provide mandatory minority-serving-institution funding \"for fiscal year 2020 and each fiscal year thereafter,\" replacing a program that had expired. On September 22, 2020 he issued Executive Order 13950, \"Combating Race and Sex Stereotyping,\" applying to federal contractors, and on November 2, 2020 Executive Order 13958 established the President's Advisory 1776 Commission. Separately, Attorney General Jeff Sessions issued a November 7, 2018 memorandum setting limits on when consent decrees with state or local governments are appropriate and requiring senior-leadership approval; the Federal Register later records both that memorandum and the December 2020 rule implementing it, and their 2021-22 rescission. The second term returned to the same subject on its first day. Executive Order 14151 ordered every agency to terminate its DEI and DEIA offices, positions and equity action plans within sixty days. Executive Order 14173, signed the next day, revoked Executive Order 11246 of September 24, 1965, the equal employment opportunity order that had required federal contractors to take affirmative action, and told the Office of Federal Contract Compliance Programs to stop holding contractors responsible for it. Executive Order 14238 cut the Minority Business Development Agency to the minimum the law requires. Executive Order 14253 directed the Vice President to work through the Smithsonian Board of Regents to remove \"improper ideology\" from its museums, and its findings single out the National Museum of African American History and Culture. Executive Order 14281 made it United States policy \"to eliminate the use of disparate-impact liability in all contexts,\" and a companion order the same day, Executive Order 14280, aimed the same reversal at school discipline, where the guidance it targets was written around racial disparities in suspensions and expulsions. On May 21, 2025 the Justice Department began dismissing the Louisville and Minneapolis police lawsuits. Executive Order 14398 of March 26, 2026 then required federal contracts to carry a clause barring \"racially discriminatory DEI activities.\"",
       "callouts": [
         {
           "text": "Dec. 21, 2018: signed the First Step Act of 2018, Public Law 115-391 (132 Stat. 5194), covering federal risk-and-needs assessment, prison programming and sentencing changes.",
@@ -657,6 +658,102 @@
               "quote": "Approval of Civil Consent Decrees With State and Local Governmental Entities"
             }
           ]
+        },
+        {
+          "text": "Jan. 20, 2025: issued Executive Order 14151 (90 FR 8339), ordering every agency to terminate its DEI, DEIA and \"environmental justice\" offices, positions and equity action plans within sixty days.",
+          "sources": [
+            {
+              "id": "eo-14151-ending-federal-dei",
+              "label": "Federal Register, Executive Order 14151 of January 20, 2025",
+              "url": "https://www.federalregister.gov/documents/2025/01/29/2025-01953/ending-radical-and-wasteful-government-dei-programs-and-preferencing",
+              "quote": "Executive Order 14151 of January 20, 2025 Ending Radical and Wasteful Government DEI Programs and Preferencing"
+            },
+            {
+              "id": "fr-text-90-fr-8339",
+              "label": "Federal Register full text, 90 FR 8339",
+              "url": "https://www.federalregister.gov/documents/full_text/text/2025/01/29/2025-01953.txt",
+              "quote": "terminate, to the maximum extent allowed by law, all DEI, DEIA, and ``environmental justice'' offices and positions (including but not limited to ``Chief Diversity Officer'' positions); all ``equity action plans,'' ``equity'' actions, initiatives, or programs"
+            }
+          ]
+        },
+        {
+          "text": "Jan. 21, 2025: issued Executive Order 14173 (90 FR 8633), revoking Executive Order 11246 of September 24, 1965 (Equal Employment Opportunity) and directing the Office of Federal Contract Compliance Programs to stop holding federal contractors responsible for taking affirmative action.",
+          "sources": [
+            {
+              "id": "eo-14173-ending-illegal-discrimination",
+              "label": "Federal Register, Executive Order 14173 of January 21, 2025",
+              "url": "https://www.federalregister.gov/documents/2025/01/31/2025-02097/ending-illegal-discrimination-and-restoring-merit-based-opportunity",
+              "quote": "Executive Order 11246 of September 24, 1965 (Equal Employment Opportunity), is hereby revoked. For 90 days from the date of this order, Federal contractors may continue to comply with the regulatory scheme in effect on January 20, 2025."
+            },
+            {
+              "id": "fr-text-90-fr-8633",
+              "label": "Federal Register full text, 90 FR 8633",
+              "url": "https://www.federalregister.gov/documents/full_text/text/2025/01/31/2025-02097.txt",
+              "quote": "The Office of Federal Contract Compliance Programs within the Department of Labor shall immediately cease: (A) Promoting ``diversity''; (B) Holding Federal contractors and subcontractors responsible for taking ``affirmative action''"
+            }
+          ]
+        },
+        {
+          "text": "Mar. 14, 2025: issued Executive Order 14238 (90 FR 13043), ordering the non-statutory components of the Minority Business Development Agency and the Community Development Financial Institutions Fund eliminated to the maximum extent consistent with law.",
+          "sources": [
+            {
+              "id": "eo-14238-reduce-federal-bureaucracy",
+              "label": "Federal Register, Executive Order 14238 of March 14, 2025",
+              "url": "https://www.federalregister.gov/documents/2025/03/20/2025-04868/continuing-the-reduction-of-the-federal-bureaucracy",
+              "quote": "the non-statutory components and functions of the following governmental entities shall be eliminated to the maximum extent consistent with applicable law ... (vi) the Community Development Financial Institutions Fund; and (vii) the Minority Business Development Agency."
+            },
+            {
+              "id": "fr-text-90-fr-13043",
+              "label": "Federal Register full text, 90 FR 13043",
+              "url": "https://www.federalregister.gov/documents/full_text/text/2025/03/20/2025-04868.txt",
+              "quote": "such entities shall reduce the performance of their statutory functions and associated personnel to the minimum presence and function required by law"
+            }
+          ]
+        },
+        {
+          "text": "Mar. 27, 2025: issued Executive Order 14253 (90 FR 14563), directing the Vice President to work through the Smithsonian Board of Regents to remove \"improper ideology\" from its museums; the order's findings name the National Museum of African American History and Culture.",
+          "sources": [
+            {
+              "id": "eo-14253-restoring-truth-american-history",
+              "label": "Federal Register, Executive Order 14253 of March 27, 2025",
+              "url": "https://www.federalregister.gov/documents/2025/04/03/2025-05838/restoring-truth-and-sanity-to-american-history",
+              "quote": "The National Museum of African American History and Culture has proclaimed that ``hard work,'' ``individualism,'' and ``the nuclear family'' are aspects of ``White culture.''"
+            },
+            {
+              "id": "fr-text-90-fr-14563",
+              "label": "Federal Register full text, 90 FR 14563",
+              "url": "https://www.federalregister.gov/documents/full_text/text/2025/04/03/2025-05838.txt",
+              "quote": "including by seeking to remove improper ideology from such properties"
+            }
+          ]
+        },
+        {
+          "text": "Apr. 23, 2025: issued Executive Order 14281 (90 FR 17537), making it United States policy \"to eliminate the use of disparate-impact liability in all contexts,\" revoking the 1966 and 1973 presidential approvals of the Justice Department's Title VI regulations and directing agencies to deprioritize enforcement of statutes and rules that carry disparate-impact liability.",
+          "sources": [
+            {
+              "id": "eo-14281-restoring-equality-meritocracy",
+              "label": "Federal Register, Executive Order 14281 of April 23, 2025",
+              "url": "https://www.federalregister.gov/documents/2025/04/28/2025-07378/restoring-equality-of-opportunity-and-meritocracy",
+              "quote": "It is the policy of the United States to eliminate the use of disparate-impact liability in all contexts to the maximum degree possible to avoid violating the Constitution, Federal civil rights laws, and basic American ideals."
+            },
+            {
+              "id": "fr-text-90-fr-17537",
+              "label": "Federal Register full text, 90 FR 17537",
+              "url": "https://www.federalregister.gov/documents/full_text/text/2025/04/28/2025-07378.txt",
+              "quote": "all agencies shall deprioritize enforcement of all statutes and regulations to the extent they include disparate-impact liability"
+            }
+          ]
+        },
+        {
+          "text": "May 21, 2025: the Justice Department's Civil Rights Division began dismissing the Louisville and Minneapolis police lawsuits with prejudice, closing those investigations and retracting the findings of constitutional violations, and closed and retracted findings for six more departments, among them Phoenix, Memphis and the Louisiana State Police.",
+          "sources": [
+            {
+              "id": "doj-opa-2025-consent-decree-dismissals",
+              "label": "U.S. Department of Justice, Office of Public Affairs, press release 25-534 (May 21, 2025)",
+              "url": "https://www.justice.gov/opa/pr/us-department-justices-civil-rights-division-dismisses-biden-era-police-investigations-and",
+              "quote": "The Civil Rights Division will be taking all necessary steps to dismiss the Louisville and Minneapolis lawsuits with prejudice, to close the underlying investigations into the Louisville and Minneapolis police departments, and to retract the Biden administration's findings of constitutional violations."
+            }
+          ]
         }
       ],
       "personalRecord": "",
@@ -702,17 +799,52 @@
           "label": "Revisions to Approval of Civil Consent Decrees With State and Local Governmental Entities, 87 FR 12402 (Mar. 4, 2022)",
           "url": "https://www.federalregister.gov/documents/2022/03/04/2022-04509/revisions-to-approval-of-civil-consent-decrees-with-state-and-local-governmental-entities",
           "quote": "The November 2018 Memorandum set forth principles to guide the development of consent decrees with State or local governmental entities, including limitations"
+        },
+        {
+          "id": "whitehouse-trump-45th-and-47th",
+          "label": "The White House, \"President Donald J. Trump\" (Administration)",
+          "url": "https://www.whitehouse.gov/administration/donald-j-trump/",
+          "quote": "Donald J. Trump 45th & 47th President of the United States"
+        },
+        {
+          "id": "nara-electoral-college-2016",
+          "label": "U.S. National Archives, Office of the Federal Register — 2016 Electoral College Results",
+          "url": "https://www.archives.gov/electoral-college/2016",
+          "quote": "2016 Electoral College Results ... President Donald J. Trump [R] ... Main Opponent Hillary Clinton [D]"
+        },
+        {
+          "id": "nara-electoral-college-2024",
+          "label": "U.S. National Archives, Office of the Federal Register — 2024 Electoral College Results",
+          "url": "https://www.archives.gov/electoral-college/2024",
+          "quote": "2024 Electoral College Results ... President Donald J. Trump [R] ... Electoral Vote Winner: 312"
+        },
+        {
+          "id": "eo-14280-school-discipline",
+          "label": "Executive Order 14280, 90 FR 17533 (signed Apr. 23, 2025; published Apr. 28, 2025), Federal Register",
+          "url": "https://www.federalregister.gov/documents/2025/04/28/2025-07377/reinstating-commonsense-school-discipline-policies",
+          "quote": "schools could be found to violate Title VI of the Civil Rights Act of 1964 ... if their disciplinary decisions ran afoul of a newly imposed disparate-impact framework"
+        },
+        {
+          "id": "eo-14398-contractor-dei-clause",
+          "label": "Executive Order 14398, 91 FR 16147 (signed Mar. 26, 2026; published Mar. 31, 2026), Federal Register",
+          "url": "https://www.federalregister.gov/documents/2026/03/31/2026-06286/addressing-dei-discrimination-by-federal-contractors",
+          "quote": "The contractor will not engage in any racially discriminatory DEI activities, as defined in section 2 of the Executive Order of March 26, 2026"
         }
       ],
       "disputes": [
         "The scope of the First Step Act is contested: supporters describe it as the largest federal sentencing reform in a generation, while critics note it applies only to the federal system, which holds a minority of U.S. prisoners. Both characterizations circulate; this file records the statute only.",
         "Executive Order 13950's effect is disputed, with the administration framing it as combating stereotyping in federal contracting and civil rights organizations framing it as suppressing discussion of racism; both framings are recorded here without resolution.",
-        "Whether the November 2018 consent-decree memorandum amounted to a retreat from pattern-or-practice police oversight is a characterization; the fetched Federal Register text documents the restrictions and the later rescission, not the motive."
+        "Whether the November 2018 consent-decree memorandum amounted to a retreat from pattern-or-practice police oversight is a characterization; the fetched Federal Register text documents the restrictions and the later rescission, not the motive.",
+        "The second-term orders are recorded here as issued. What they changed is a separate question this entry does not answer: an executive order is an instruction to agencies, and how each was implemented, how courts treated it, and what followed for Black Americans are not established by the orders' own text."
       ],
       "unverified": [
         "The Justice Department's own November 2018 press release on the Sessions memorandum could not be retrieved (justice.gov returned a bot-check page), so the memorandum is documented only through the later Federal Register descriptions.",
         "Claims about the number of new pattern-or-practice investigations opened between 2017 and 2021 were not verified and are omitted.",
-        "The 1776 Commission's report content was not fetched and is not summarized."
+        "The 1776 Commission's report content was not fetched and is not summarized.",
+        "Litigation over the second-term executive orders was not tracked for this entry. Where a court has enjoined, stayed or narrowed any of them, that is not reflected here.",
+        "The number of federal DEI offices, positions, grants and contracts actually terminated under Executive Order 14151 was not verified and is omitted.",
+        "Whether the Minority Business Development Agency's statutory functions continued after Executive Order 14238, and at what staffing, was not verified.",
+        "The dockets for the Louisville and Minneapolis dismissals were not fetched; the May 21, 2025 action is documented through the Justice Department's own announcement only."
       ]
     },
     {

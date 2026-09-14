@@ -37,12 +37,17 @@ export default async function LawDetailPage({ params }: LawDetailPageProps) {
     notFound();
   }
 
-  const { snapshot, explainer } = view;
+  const { snapshot, explainer, previous, next } = view;
 
   return (
     <Room>
       <LawDetailIntro snapshot={snapshot} />
-      <LawDetailSections snapshot={snapshot} {...(explainer ? { explainer } : {})} />
+      <LawDetailSections
+        snapshot={snapshot}
+        {...(explainer ? { explainer } : {})}
+        {...(previous ? { previous } : {})}
+        {...(next ? { next } : {})}
+      />
     </Room>
   );
 }

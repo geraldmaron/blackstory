@@ -61,12 +61,14 @@ function main(): void {
 
   const answers: string[] = [];
   const refusals: unknown[] = [];
+  const defers: unknown[] = [];
   const missing: string[] = [];
 
   for (const [index, subject] of subjects.entries()) {
     const lineNo = index + 1;
     const draftPath = join(DRAFTS, `draft-${lineNo}.json`);
     const refusePath = join(DRAFTS, `refuse-${lineNo}.json`);
+    const deferPath = join(DRAFTS, `defer-${lineNo}.json`);
 
     if (existsSync(draftPath)) {
       // Passed through as the raw string, not re-serialized: the validator anchors citation
@@ -78,6 +80,12 @@ function main(): void {
     } else if (existsSync(refusePath)) {
       const parsed = JSON.parse(readFileSync(refusePath, 'utf8')) as Record<string, unknown>;
       refusals.push({ line: lineNo, entityId: subject.entityId, ...parsed });
+    } else if (existsSync(deferPath)) {
+      // A reason string is enough (repo-w5zo) — unlike a refusal this is not terminal, the
+      // row stays 'pending' and is re-offered on the next pass, so it is reported as its own
+      // category rather than folded into "NO OUTPUT AT ALL", which means a drafter died.
+      const reason = JSON.parse(readFileSync(deferPath, 'utf8')) as unknown;
+      defers.push({ line: lineNo, entityId: subject.entityId, reason });
     } else {
       missing.push(`${lineNo} (${subject.entityId} — ${subject.displayName})`);
     }
@@ -90,6 +98,7 @@ function main(): void {
   console.log(`Subjects: ${subjects.length}`);
   console.log(`Drafts collected: ${answers.length} -> ${OUT}`);
   console.log(`Refused: ${refusals.length} -> ${refusalsOut}`);
+  console.log(`Deferred: ${defers.length}`);
   // Loudly, because a silently missing draft is a subagent that died, and the subject would
   // otherwise just look like it was never in the batch.
   if (missing.length > 0) {

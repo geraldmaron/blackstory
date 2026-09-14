@@ -137,7 +137,9 @@ function validateJurisdictionRow(row, index) {
   validatePolygonGeometry(row.metadata.geometry, context);
   const expectedId = `us-${row.state_fips}`;
   if (row.id !== expectedId) {
-    throw new Error(`${context}: id must be "${expectedId}" (ADR-016)`);
+    throw new Error(
+      `${context}: id must be "${expectedId}" (docs/decisions-carryover.md, "Jurisdiction reference data")`,
+    );
   }
   return {
     id: row.id,

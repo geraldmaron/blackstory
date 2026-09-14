@@ -3,7 +3,10 @@
  * (cancellation, race guard, cursor/release-stamp guard, cache fallback) lives in
  * `search-controller.ts`, which this hook merely subscribes to. Owns:
  *   - the raw draft text (component-local state; never persisted, dies with the screen per
- *     ADR-022 §2's "the raw text stays in memory ... and dies with the process"),
+ *     ADR-023 §2's "the raw text stays in memory ... and dies with the process"; that
+ *     document is gone, see `docs/decisions-carryover.md`, "Mobile cache and OTA release".
+ *     Note this covers the DRAFT text only: a submitted term may enter the recent-searches
+ *     list below, which does persist),
  *   - normalization + debounce (`query-normalization.ts` / `debounce.ts`) before the controller
  *     ever sees a query,
  *   - the recent-searches list (SecureStore-backed; `recent-searches.ts`).
@@ -18,6 +21,8 @@ import type { RecentSearchEntry } from './recent-searches';
 export interface UseSearchOptions {
   readonly initialQuery?: string;
   readonly initialKind?: string;
+  /** Decade-bucket label (e.g. `1950s`) a `/history`/`/records` deep link carries. */
+  readonly initialEra?: string;
   /** Test-only injection point -- production code always omits this and gets the lazily-built
    * real runtime from `getSearchRuntime()`. */
   readonly runtime?: SearchRuntime;
@@ -28,6 +33,8 @@ export interface UseSearchResult {
   readonly setDraft: (value: string) => void;
   readonly filterKind: string | undefined;
   readonly setFilterKind: (kind: string | undefined) => void;
+  readonly filterEra: string | undefined;
+  readonly setFilterEra: (era: string | undefined) => void;
   readonly state: SearchControllerState;
   readonly loadMore: () => void;
   readonly retry: () => void;
@@ -40,6 +47,7 @@ export interface UseSearchResult {
 export function useSearch(options: UseSearchOptions = {}): UseSearchResult {
   const [draft, setDraft] = useState(() => normalizeSearchQuery(options.initialQuery ?? ''));
   const [filterKind, setFilterKind] = useState<string | undefined>(options.initialKind);
+  const [filterEra, setFilterEra] = useState<string | undefined>(options.initialEra);
   const [state, setState] = useState<SearchControllerState>({ kind: 'browse' });
   const [recentSearches, setRecentSearches] = useState<readonly RecentSearchEntry[]>([]);
 
@@ -97,8 +105,8 @@ export function useSearch(options: UseSearchOptions = {}): UseSearchResult {
         },
       );
     }
-    controllerRef.current.setQuery(debouncedQuery, filterKind);
-  }, [runtime, debouncedQuery, filterKind]);
+    controllerRef.current.setQuery(debouncedQuery, filterKind, filterEra);
+  }, [runtime, debouncedQuery, filterKind, filterEra]);
 
   const loadMore = useCallback(() => controllerRef.current?.loadMore(), []);
   const retry = useCallback(() => controllerRef.current?.retry(), []);
@@ -130,6 +138,8 @@ export function useSearch(options: UseSearchOptions = {}): UseSearchResult {
       setDraft,
       filterKind,
       setFilterKind,
+      filterEra,
+      setFilterEra,
       state,
       loadMore,
       retry,
@@ -138,7 +148,18 @@ export function useSearch(options: UseSearchOptions = {}): UseSearchResult {
       removeRecentSearch,
       clearRecentSearches,
     }),
-    [draft, filterKind, state, loadMore, retry, recentSearches, selectRecentSearch, removeRecentSearch, clearRecentSearches],
+    [
+      draft,
+      filterKind,
+      filterEra,
+      state,
+      loadMore,
+      retry,
+      recentSearches,
+      selectRecentSearch,
+      removeRecentSearch,
+      clearRecentSearches,
+    ],
   );
 }
 

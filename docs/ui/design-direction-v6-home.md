@@ -1,4 +1,4 @@
-> **SUPERSEDED.** This document is superseded by the v9 Atlas (design-direction-v9-atlas.md). Route today: / is the Atlas. It is kept as the provenance record; do not build from it. See the supersession table in docs/ui/README.md.
+> **SUPERSEDED.** This document is superseded by v10 (design-direction-v10.md), via the v9 Atlas (design-direction-v9-atlas.md). Route today: / is the Door, not a live cockpit. It is kept as the provenance record; do not build from it. See the supersession table in docs/ui/README.md.
 
 # BlackStory design direction v6 — home edition
 
@@ -126,7 +126,7 @@ The hero is **one Surface card** containing copy and map. It is **not** a full-v
 - Map column is a transparent pass-through (`pointer-events: none`); MapStage plate receives pin/state hits in the readout band.
 - **Copy column owns hits** (`pointer-events: auto`, `touch-action: pan-y`) so mobile swipe scrolls the page, not the map under the words. Never set copy (or its text stack) to `pointer-events: none` while the live plate sits underneath — that is the “map steals scroll until you hit a CTA” failure mode.
 - Camera: after inset apply, national `fitBounds` uses `heroNationalCameraPadding` (left ≈ 22% copy width on desktop; top ≈ 35% copy height when stacked) so western states sit under the words while CONUS framing stays mostly in the map readout. Bounds padding is applied once in `cameraForBounds` only.
-- `engage()` clears the hero geometry before routing to `/explore` (ADR-017 handoff).
+- `engage()` clears the hero geometry before routing to `/explore` (`../decisions-carryover.md`, "Persistent map canvas", ADR-017 handoff).
 
 **Cross-browser (Safari, Chrome, Firefox; mobile WebKit):** Hero inset uses viewport-fixed geometry from `hero-map-inset.ts`, not `clip-path` (Safari WebGL compositing). Inset resyncs on scroll, resize, and `orientationchange`; MapStage calls `resize()` after each apply and reframes national when panel size changes. See [`patterns-map-canvas.md`](./patterns-map-canvas.md).
 

@@ -10,7 +10,7 @@
  *
  * If independent operational control over semantic search (as opposed to text search) is later
  * needed, adding a dedicated `vector-search` core switch id is a small, additive change to
- * packages/config (documented as a gap in ADR-014).
+ * packages/config (recorded as a gap in `docs/decisions-carryover.md`, "Vector search").
  */
 import { evaluateKillSwitch, type KillSwitchDecision, type KillSwitchSnapshot } from '@repo/config';
 

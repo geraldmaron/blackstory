@@ -1,8 +1,28 @@
 /**
  * Beat 08: connected records and optional continue-learning nested block.
+ *
+ * Every link row carries the evidence meter. Before it did, a reader could see how well evidenced
+ * the record in front of them was and then follow a link with no idea whether they were stepping
+ * onto a corroborated record or a single-source one — the assessment stopped at the edge of the
+ * page. The tier is DERIVED here, from inputs the row carries, through the same
+ * `confidenceTierFromEvidenceInputs` the record's own beats reach; the wire never hands this row
+ * a letter to print (see `../types.ts`'s `EvidenceInputs`).
  */
-import { View } from 'react-native';
-import { ListRow, NavIcon, navIconForEntityKind, Text, space } from '@/ui';
+import { StyleSheet, View } from 'react-native';
+import {
+  confidenceTierFromEvidenceInputs,
+  evidenceMeterLabel,
+} from '@repo/public-contracts/evidence';
+import { Ionicons } from '@expo/vector-icons';
+import {
+  ListRow,
+  NavIcon,
+  navIconForEntityKind,
+  RecordMeter,
+  Text,
+  space,
+  useThemeColors,
+} from '@/ui';
 import { EntityEditionPanel } from '../EntityEditionPanel';
 import { RecordGapNotice } from '../RecordGapNotice';
 import { SECTION_HEADINGS } from '../copy';
@@ -19,20 +39,60 @@ function NeighborRow({
   readonly onPress?: () => void;
   readonly showDivider?: boolean;
 }) {
+  const theme = useThemeColors();
+  // No inputs means the server could not read this neighbor's claims. That is "unknown", not
+  // "unrated", so the row shows no meter at all rather than an assessment nobody made.
+  const tier =
+    neighbor.evidenceInputs !== undefined
+      ? confidenceTierFromEvidenceInputs(neighbor.evidenceInputs)
+      : undefined;
+  // Kind · relation only — the full summary is often a paragraph, which blows out the row on one
+  // unbounded line. The record it links to carries the summary.
+  const subtitle = `${humanizeToken(neighbor.kind)} · ${humanizeToken(neighbor.relationType)}`;
+
   return (
     <ListRow
       density="compact"
       title={neighbor.displayName}
-      // Kind · relation only — the full summary is often a paragraph, which blows out the row on
-      // one unbounded line. The record it links to carries the summary.
-      subtitle={`${humanizeToken(neighbor.kind)} · ${humanizeToken(neighbor.relationType)}`}
+      subtitle={subtitle}
       leading={<NavIcon name={navIconForEntityKind(neighbor.kind)} size={20} />}
+      // The row speaks as one element, so the meter is decorative and its sentence rides in this
+      // label — nesting a second accessible node there would drop the sentence, not add it.
+      accessibilityLabel={
+        tier
+          ? `${neighbor.displayName}, ${subtitle}. Evidence: ${evidenceMeterLabel(tier)}.`
+          : `${neighbor.displayName}, ${subtitle}`
+      }
+      // Passing `trailing` replaces ListRow's own chevron, so the row draws both: the meter
+      // sits beside the affordance rather than instead of it.
+      trailing={
+        tier ? (
+          <View style={styles.trailing}>
+            {/* The letter rides beside the bars — color is never the only cue at this density. */}
+            <RecordMeter tier={tier} decorative testID={`entity-related-meter-${neighbor.id}`} />
+            <Ionicons
+              name="chevron-forward"
+              size={18}
+              color={theme.inkMuted}
+              accessibilityElementsHidden
+            />
+          </View>
+        ) : undefined
+      }
       showChevron
       onPress={onPress}
       showDivider={showDivider}
     />
   );
 }
+
+const styles = StyleSheet.create({
+  trailing: {
+    alignItems: 'center',
+    flexDirection: 'row',
+    gap: space['2'],
+  },
+});
 
 export type RelatedSectionProps = {
   readonly relatedNeighbors: readonly RelatedNeighbor[];

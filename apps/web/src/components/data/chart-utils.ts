@@ -27,7 +27,7 @@ export function formatChartCount(value: number): string {
 
 export function formatSharePct(blackPopulation: number, totalPopulation: number): string {
   if (totalPopulation <= 0) {
-    return '—';
+    return 'N/A';
   }
   return `${((blackPopulation / totalPopulation) * 100).toFixed(1)}%`;
 }
@@ -72,9 +72,13 @@ export function formatMonths(value: number): string {
   return `${value.toLocaleString('en-US')} mo.`;
 }
 
+export function formatRatio(value: number): string {
+  return `${value.toLocaleString('en-US', { maximumFractionDigits: 1 })}×`;
+}
+
 export function formatDataPageValue(
   value: number,
-  unit: 'usd' | 'percent' | 'per_100k' | 'months',
+  unit: 'usd' | 'percent' | 'per_100k' | 'months' | 'ratio',
 ): string {
   switch (unit) {
     case 'usd':
@@ -85,6 +89,8 @@ export function formatDataPageValue(
       return formatPer100k(value);
     case 'months':
       return formatMonths(value);
+    case 'ratio':
+      return formatRatio(value);
     default:
       return formatChartCount(value);
   }

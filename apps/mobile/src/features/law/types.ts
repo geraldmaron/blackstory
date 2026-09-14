@@ -8,12 +8,7 @@ export type LawSnapshotKind =
   | 'landmark-case'
   | 'state-statute';
 
-export type LawStatus =
-  | 'in_force'
-  | 'amended'
-  | 'repealed'
-  | 'struck_down'
-  | 'enjoined';
+export type LawStatus = 'in_force' | 'amended' | 'repealed' | 'struck_down' | 'enjoined';
 
 export type LawTopic =
   | 'voting'

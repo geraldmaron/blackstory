@@ -37,19 +37,7 @@ const nextConfig = {
   outputFileTracingRoot: monorepoRoot,
   outputFileTracingIncludes: {
     // Globs resolve relative to the app dir (apps/web), so monorepo files need ../../.
-    '/*': [
-      './packages/schemas/constitution/**/*',
-      '../../packages/schemas/constitution/**/*',
-      // Mention overrides: these two globs may no longer be needed. The comment here used to say
-      // @repo/domain reads the JSON at runtime via fs, and that is no longer true —
-      // packages/domain/src/graph/mention-resolver.ts imports it statically
-      // (`import ... with { type: 'json' }`), so the bundler carries it without help.
-      // Left in place deliberately rather than removed on that reasoning alone: if the inference
-      // is wrong, every dynamic route 500s with ENOENT in production. Removal is being evaluated
-      // under repo-01si, which wants a real production build to confirm before deleting.
-      '../../packages/domain/dist/graph/data/**/*',
-      '../../packages/domain/src/graph/data/**/*',
-    ],
+    '/*': ['./packages/schemas/constitution/**/*', '../../packages/schemas/constitution/**/*'],
   },
   webpack: (config, { isServer }) => {
     // NodeNext packages emit `.js` specifiers that map to `.ts`/`.tsx` sources.

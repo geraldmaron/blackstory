@@ -58,6 +58,7 @@ import { evaluateFactPublishGate } from '../facts/publish-gate.js';
 import type { FactCitation } from '../facts/citation.js';
 import { isValidTopicId } from '../taxonomy/topics.js';
 import { buildGeoPointFields, type GeoPointFields } from '../geography/geohash.js';
+import { recordEvidenceInputs, type RecordEvidenceInputs } from '../evidence-inputs.js';
 import { publicVisitForTier, type PublicVisit } from '../geography/visit.js';
 import {
   evaluateGeoIntegrityPublishGate,
@@ -145,6 +146,27 @@ export type ReleaseClaimProjection = {
 
 export type ReleaseResearchCoverage = 'minimal' | 'partial' | 'substantial';
 
+/**
+ * A location supplied by the caller that wins over the source entry's own
+ * `lat`/`lng`/`locationPrecision`/`locationLabel`, plus the `matchMethod` the entry has no field
+ * for. One production caller supplies it today: the incremental publisher, inheriting the location
+ * an already-live record publishes, for a republish whose landscape row never carried coordinates
+ * (repo-lai8y). The field predates that and was written for a canonical EntityLocation
+ * (Census-validated) source, which nothing supplies yet — the doc on `ReleaseBuildContext` still
+ * describes that intent.
+ *
+ * `precision` travels with the point on purpose. A precision tier describes a POINT, so a caller
+ * that overrides the coordinates and leaves the tier to be re-derived elsewhere is describing
+ * someone else's point.
+ */
+export type ReleaseLocationOverride = {
+  readonly lat: number;
+  readonly lng: number;
+  readonly precision?: string;
+  readonly matchMethod?: string;
+  readonly locationLabel?: string;
+};
+
 export type ReleaseBuildContext = {
   readonly releaseId: string;
   /** ISO instant this release build ran at. Legitimately real: a fresh publish IS being
@@ -161,13 +183,7 @@ export type ReleaseBuildContext = {
    * Preferred coordinates from a canonical EntityLocation (Census-validated). When present,
    * these win over catalog fixture lat/lng (`manual_research` fallback).
    */
-  readonly locationOverride?: {
-    readonly lat: number;
-    readonly lng: number;
-    readonly precision?: string;
-    readonly matchMethod?: string;
-    readonly locationLabel?: string;
-  };
+  readonly locationOverride?: ReleaseLocationOverride;
   /**
    * Canonical visit-contact input (`bb_canonical.entity_visit` joined with
    * `entity_locations.street`/`postal_code`), when the caller looked one up. Wins over
@@ -274,111 +290,25 @@ export type ReleaseEntityProjectionFields = {
   readonly recordUpdatedAt: string;
 };
 
-/** Highest accepted-claim confidence on a record. Letter grades derive at read time; never invent grade from claim count. */
-export type ReleaseConfidenceTier = 'high' | 'medium' | 'low' | 'unrated';
-
 /**
- * The lineage a citation belongs to, for corroboration counting. One publisher spelled several
- * ways (`wikipedia_api`, `en.wikipedia.org`) is one lineage, not several.
+ * Record grading no longer happens in this package.
+ *
+ * `highestClaimConfidenceTier` used to live here and write a finished `confidenceTier` onto the
+ * search index for `/records` to read back — one rule with two implementations, which stranded
+ * `/records` for a day when the rule changed (repo-ngojq, repo-6qjv0). The builder now projects
+ * the grading INPUTS instead, and every surface applies the single rule at read time. See
+ * `../evidence-inputs.js` for why the split falls where it does.
  */
-const WIKIPEDIA_LINEAGE_KEY = 'wikipedia';
+export {
+  CLAIM_ROLE_RECORD_INDEX,
+  recordEvidenceInputs,
+  type EvidenceClaimLevel,
+  type EvidenceInputClaim,
+  type RecordEvidenceInputs,
+} from '../evidence-inputs.js';
 
 /** Whether a claim is the record's own index row or evidence about its subject. */
 export type ClaimRole = 'record_index' | 'evidence';
-
-export const CLAIM_ROLE_RECORD_INDEX: ClaimRole = 'record_index';
-
-/**
- * Bridge for claims published before `claimRole` existed. Mirrors
- * `RECORD_PROVENANCE_PREDICATES` in `@repo/public-contracts/evidence`, and comes out with it
- * once no published claim is missing the role (repo-8dmey).
- */
-const RECORD_PROVENANCE_PREDICATES: ReadonlySet<string> = new Set([
-  'listing',
-  'significant for',
-  'documented_site',
-]);
-
-/**
- * The role a claim published before `claimRole` existed would have been given.
- *
- * Exported so the one-off migration that stamps the field onto already-published claims uses
- * this rule rather than restating it in SQL, which is how the tier rule ended up with three
- * copies in the first place.
- */
-export function claimRoleForPredicate(predicate: string | undefined): ClaimRole {
-  return RECORD_PROVENANCE_PREDICATES.has((predicate ?? '').trim().toLowerCase())
-    ? 'record_index'
-    : 'evidence';
-}
-
-function isRecordIndexClaim(claim: {
-  readonly predicate?: string;
-  readonly claimRole?: string;
-}): boolean {
-  const role = (claim.claimRole ?? '').trim().toLowerCase();
-  if (role.length > 0) return role === CLAIM_ROLE_RECORD_INDEX;
-  return claimRoleForPredicate(claim.predicate) === CLAIM_ROLE_RECORD_INDEX;
-}
-
-function claimLineageKey(citationSource: string | undefined): string | null {
-  const raw = (citationSource ?? '').trim().toLowerCase();
-  if (raw.length === 0) return null;
-  if (raw.includes('wikipedia') || raw.includes('wikidata')) return WIKIPEDIA_LINEAGE_KEY;
-  return raw.replace(/^(?:www|en|en\.m|m)\./u, '');
-}
-
-/**
- * Record confidence for the search_index facet that Records reads its evidence floors from.
- *
- * The strongest claim on the record, capped by corroboration: a record cited to a single lineage
- * cannot reach the top tier, however authoritative that lineage is. It used to be the bare
- * maximum, which published 4,152 of 4,167 records at the top grade and made the reader-facing
- * meter meaningless.
- *
- * Two citations do not count toward corroboration, because neither is a second opinion: Wikipedia
- * (which may carry a claim but never corroborate one) and the record's own index row. Counting
- * them held grade A at 1,807 records; excluding them lands it at 572 (repo-goyut, repo-6jizv).
- *
- * This deliberately restates `recordConfidenceTier` from `@repo/public-contracts/evidence`
- * rather than importing it: `@repo/domain` takes no dependency on the public contracts package,
- * the same client/server boundary `mobile-bootstrap.ts` documents. The two must agree — the
- * facet written here and the tier computed at read time grade the same records, and Records
- * prefers this facet when the search index carries it, so a drift between them shows up as
- * Records and Explore disagreeing about the same record.
- */
-export function highestClaimConfidenceTier(
-  claims: readonly {
-    readonly confidenceLevel?: string;
-    readonly citationSource?: string;
-    readonly predicate?: string;
-    readonly claimRole?: string;
-  }[],
-): ReleaseConfidenceTier {
-  const strongest: ReleaseConfidenceTier = claims.some((claim) => claim.confidenceLevel === 'high')
-    ? 'high'
-    : claims.some((claim) => claim.confidenceLevel === 'medium')
-      ? 'medium'
-      : claims.some((claim) => claim.confidenceLevel === 'low')
-        ? 'low'
-        : 'unrated';
-  if (strongest === 'unrated') return 'unrated';
-  // Cited answers "was this assessed"; corroborating answers "is it supported". A record holding
-  // only Wikipedia or only its own index row is graded low, never reported unassessed.
-  const cited = new Set<string>();
-  const corroborating = new Set<string>();
-  for (const claim of claims) {
-    const key = claimLineageKey(claim.citationSource);
-    if (key === null) continue;
-    cited.add(key);
-    if (key === WIKIPEDIA_LINEAGE_KEY) continue;
-    if (isRecordIndexClaim(claim)) continue;
-    corroborating.add(key);
-  }
-  if (cited.size === 0) return 'unrated';
-  if (corroborating.size > 1) return strongest;
-  return strongest === 'high' ? 'medium' : 'low';
-}
 
 export type ReleaseSearchIndexFields = {
   readonly id: string;
@@ -402,8 +332,11 @@ export type ReleaseSearchIndexFields = {
   readonly researchCoverage: ReleaseResearchCoverage;
   readonly relatedCount: number;
   readonly claimCount: number;
-  /** Highest claim confidence — evidence floor input for Records slim; not a public ranking score. */
-  readonly confidenceTier: ReleaseConfidenceTier;
+  /**
+   * The grading inputs `/records` reads its evidence floors from, so the slim index carries the
+   * ingredients rather than a conclusion a rule change can strand. Never a ranking score.
+   */
+  readonly evidenceInputs: RecordEvidenceInputs;
 };
 
 export type ReleaseBuildFailureReason =
@@ -867,22 +800,361 @@ export function isNotabilityCriterion(value: string): value is NotabilityCriteri
 
 /**
  * Turns a claim predicate + object into one inclusion-evidence sentence.
- * Predicates are snake_case catalog keys (`served_as`, `bombed_on`); objects are usually
- * lowercase continuations authored to follow those keys. Sentence-case the predicate and join
- * without a colon so public copy reads as prose, not a field dump. Source names belong in the
- * citation list (evidenceIds), not inline in the note.
+ * Predicates are snake_case catalog keys (`served_as`, `bombed_on`); objects are EITHER a
+ * lowercase continuation authored to follow such a key, or a sentence the enrichment lane wrote
+ * that already stands on its own. Only the first of those may be joined to the predicate;
+ * joining the second is what produced "Founded in Washington and a small group opened …". When
+ * the two are joined, the predicate is sentence-cased and joined without a colon so public copy
+ * reads as prose, not a field dump. Source names belong in the citation list (evidenceIds), not
+ * inline in the note.
  */
+/**
+ * Function words carry no verb meaning, so a predicate and an object sharing one is not a repeat.
+ * Kept deliberately small: it exists only to find the VERB position at the front of a snake_case
+ * predicate key (`was_literate` -> `literate`), not to parse English.
+ */
+const PREDICATE_FUNCTION_WORDS = new Set([
+  'a',
+  'an',
+  'and',
+  'are',
+  'as',
+  'at',
+  'be',
+  'been',
+  'by',
+  'for',
+  'from',
+  'in',
+  'into',
+  'is',
+  'it',
+  'of',
+  'on',
+  'or',
+  'the',
+  'their',
+  'this',
+  'to',
+  'was',
+  'were',
+  'with',
+]);
+
+/** The predicate's first meaning-bearing word — the verb slot these catalog keys open with. */
+function predicateLeadWord(lead: string): string {
+  for (const word of lead.toLowerCase().split(/[^a-z']+/u)) {
+    if (word.length > 0 && !PREDICATE_FUNCTION_WORDS.has(word)) return word;
+  }
+  return '';
+}
+
+/**
+ * Verb forms a claim object opens or carries when it is a sentence of its own. Regular forms are
+ * caught by the `-ed` test in `isObjectVerbForm`; this set exists for the irregulars that test
+ * cannot see ("won", "led", "became", "known"). Like `PREDICATE_FUNCTION_WORDS` it is kept small
+ * on purpose and is not an attempt to parse English — it only has to separate "Young was elected
+ * to the U.S. House" from "National Register of Historic Places".
+ */
+const OBJECT_VERB_FORMS = new Set([
+  'are',
+  'began',
+  'begun',
+  'beat',
+  'became',
+  'become',
+  'bore',
+  'born',
+  'bought',
+  'broke',
+  'brought',
+  'built',
+  'came',
+  'can',
+  'caught',
+  'chose',
+  'chosen',
+  'could',
+  'cut',
+  'did',
+  'do',
+  'does',
+  'drew',
+  'driven',
+  'drove',
+  'fell',
+  'felt',
+  'fought',
+  'found',
+  'gave',
+  'given',
+  'got',
+  'grew',
+  'grown',
+  'had',
+  'has',
+  'have',
+  'held',
+  'hit',
+  'is',
+  'kept',
+  'knew',
+  'known',
+  'led',
+  'left',
+  'lost',
+  'made',
+  'may',
+  'met',
+  'might',
+  'must',
+  'paid',
+  'put',
+  'ran',
+  'read',
+  'rose',
+  'said',
+  'sang',
+  'sat',
+  'saw',
+  'seen',
+  'sent',
+  'set',
+  'shall',
+  'shot',
+  'should',
+  'shown',
+  'sold',
+  'spoke',
+  'stood',
+  'struck',
+  'swore',
+  'taken',
+  'taught',
+  'threw',
+  'told',
+  'took',
+  'was',
+  'went',
+  'were',
+  'will',
+  'won',
+  'wore',
+  'would',
+  'wrote',
+  'written',
+]);
+
+/** Month names. An object opening with one ("April 4, 1968, shot on the balcony …") is a date
+ * continuation of the predicate, not a sentence, even though it opens with a capital. */
+const OBJECT_DATE_LEAD_WORDS = new Set([
+  'january',
+  'february',
+  'march',
+  'april',
+  'may',
+  'june',
+  'july',
+  'august',
+  'september',
+  'october',
+  'november',
+  'december',
+]);
+
+/** Abbreviations whose trailing period ends a word, not a sentence — "Killed Daniel L. Simmons
+ * Sr." and "Location Washington, D.C." are names, and both need their predicate kept. */
+const OBJECT_TRAILING_ABBREVIATIONS = new Set([
+  'co.',
+  'dr.',
+  'inc.',
+  'jr.',
+  'mr.',
+  'mrs.',
+  'ms.',
+  'no.',
+  'sr.',
+  'st.',
+  'v.',
+  'vs.',
+]);
+
+function sentenceCase(text: string): string {
+  return `${text.charAt(0).toUpperCase()}${text.slice(1)}`;
+}
+
+function asSentence(text: string): string {
+  return /[.!?]$/.test(text) ? text : `${text}.`;
+}
+
+/** A lowercase token that carries tense — the signal that an object has a verb of its own. */
+function isObjectVerbForm(word: string): boolean {
+  return OBJECT_VERB_FORMS.has(word) || /^[a-z]{2,}ed$/u.test(word);
+}
+
+/** "April 4, 1968, shot on the balcony of the Lorraine Motel" — a date, so a continuation. */
+function objectOpensWithADate(body: string): boolean {
+  const [first] = body.split(/[\s,]+/u);
+  return (
+    first !== undefined &&
+    OBJECT_DATE_LEAD_WORDS.has(first.toLowerCase()) &&
+    /^\w+\s+\d/u.test(body)
+  );
+}
+
+/** Terminal punctuation that is not an abbreviation's period. */
+function objectEndsASentence(body: string): boolean {
+  if (/[!?]$/u.test(body)) return true;
+  if (!/\.$/u.test(body)) return false;
+  const last = body.split(/\s+/u).at(-1) ?? '';
+  if (OBJECT_TRAILING_ABBREVIATIONS.has(last.toLowerCase())) return false;
+  // "U.S.", "D.C.", "L." — initials, whose period belongs to the name.
+  return !/^(?:[A-Za-z]\.)+$/u.test(last);
+}
+
+/** "Became the first Black president …", "Inducted into the Rock and Roll Hall of Fame …" — the
+ * object's own verb is its first word. The lowercase second word is what separates those from
+ * the proper-noun phrases "United States Supreme Court Building" and "Marked Tree, Arkansas". */
+function objectOpensWithItsOwnVerb(body: string): boolean {
+  const [first, second] = body.split(/\s+/u);
+  if (first === undefined || second === undefined) return false;
+  return (
+    isObjectVerbForm(trimEdges(first, isAsciiLetter, 'end').toLowerCase()) && /^[a-z]/u.test(second)
+  );
+}
+
+const isAsciiLetter = (code: number): boolean =>
+  (code >= 65 && code <= 90) || (code >= 97 && code <= 122);
+const isAsciiLetterOrHyphen = (code: number): boolean => isAsciiLetter(code) || code === 45;
+
+/**
+ * Strips characters that fail `keep` from one or both ends, in one linear pass per end.
+ *
+ * This replaces `replace(/[^A-Za-z]+$/u, '')`-style trims, which backtrack quadratically on a long
+ * run of non-letters followed by a letter ("@@@…@a"): the engine retries the run from every start
+ * position before the `$` fails. Release text is input to this builder, so the trim has to be
+ * linear whatever the token holds.
+ */
+function trimEdges(
+  token: string,
+  keep: (code: number) => boolean,
+  ends: 'start' | 'end' | 'both',
+): string {
+  let start = 0;
+  let end = token.length;
+  if (ends !== 'end') while (start < end && !keep(token.charCodeAt(start))) start += 1;
+  if (ends !== 'start') while (end > start && !keep(token.charCodeAt(end - 1))) end -= 1;
+  return token.slice(start, end);
+}
+
+/**
+ * A lowercase verb anywhere in the object — "Foster hurled complete game shutouts …".
+ *
+ * An `-ed` word does NOT count when it ends the object or is followed by "by", because those are
+ * the two positions where it is a passive participle modifying the noun in front of it rather
+ * than that noun's verb: "Africans freed BY Royal Navy" and "Between 62 and 153 Black men killed"
+ * are noun phrases and still need their predicate. Auxiliaries carry tense wherever they sit and
+ * are not subject to that test. Hyphenated tokens are skipped because "Black-owned" is an
+ * adjective, not a verb.
+ */
+function objectCarriesItsOwnVerb(body: string): boolean {
+  const tokens = body
+    .split(/\s+/u)
+    .map((raw) => trimEdges(raw, isAsciiLetterOrHyphen, 'both'))
+    .filter((token) => token.length > 0);
+  for (const [index, token] of tokens.entries()) {
+    if (token.includes('-') || token !== token.toLowerCase()) continue;
+    if (OBJECT_VERB_FORMS.has(token)) return true;
+    if (!/^[a-z]{2,}ed$/u.test(token)) continue;
+    const next = tokens[index + 1];
+    if (next !== undefined && next.toLowerCase() !== 'by') return true;
+  }
+  return false;
+}
+
+/**
+ * True when the object is a sentence in its own right, so the predicate must NOT be joined onto
+ * the front of it. An object that opens lowercase or with a digit is a continuation by
+ * construction and never reaches the tests below.
+ */
+function objectIsSelfStanding(body: string): boolean {
+  if (!/^\p{Lu}/u.test(body)) return false;
+  if (objectOpensWithADate(body)) return false;
+  return (
+    objectEndsASentence(body) || objectOpensWithItsOwnVerb(body) || objectCarriesItsOwnVerb(body)
+  );
+}
+
 export function formatClaimInclusionNote(predicate: string, object: string): string {
   const lead = predicate.replaceAll('_', ' ').trim();
   const body = object.trim();
   if (lead.length === 0) {
     if (body.length === 0) return '';
-    return /[.!?]$/.test(body) ? body : `${body}.`;
+    return asSentence(body);
   }
-  const sentenceLead = `${lead.charAt(0).toUpperCase()}${lead.slice(1)}`;
+  const sentenceLead = sentenceCase(lead);
   if (body.length === 0) return `${sentenceLead}.`;
-  const sentence = `${sentenceLead} ${body}`;
-  return /[.!?]$/.test(sentence) ? sentence : `${sentence}.`;
+
+  /*
+   * repo-15slz. An earlier spelling of this function assumed objects are "lowercase continuations
+   * authored to follow those keys" and said "for most of the corpus they are". Measured over the
+   * active release that was false: of 12,137 claim objects, 5,533 (45.6%) open lowercase, 6,175
+   * (50.9%) open with a capital and 404 with a digit. The designed shape is a MINORITY, and 3,885
+   * of the capital-initial objects are long enough to be whole clauses. Two defects followed.
+   *
+   * (a) DOUBLED VERB — the object opens by repeating the predicate's own verb, so joining the two
+   * stutters:
+   *
+   *   born_in            + "Born into slavery on April 5, 1856, ..."  -> "Born in Born into slavery ..."
+   *   delivered          + "Delivered the 'Atlanta Compromise' ..."   -> "Delivered Delivered the ..."
+   *   pulitzer_prizes    + "Pulitzer Prize for Drama for 'Fences' ..."-> "Pulitzer prizes Pulitzer Prize ..."
+   *
+   * When that happens the two sides are saying one thing twice, so keep the fuller of them and
+   * drop the other. Nothing is lost from the RECORD by choosing: the claim keeps both its
+   * predicate and its object and still renders in full under "what the sources say". Only this
+   * note — a one-sentence summary of why the record is in the catalog — stops repeating itself.
+   *
+   * Which side is fuller has to be measured, not assumed, because the repeat runs both ways.
+   * Usually the object is the prose and the predicate a short key. But sometimes the predicate is
+   * the whole statement and the object a stub restating it — "was the third Black man elected as
+   * alderman in Annapolis" + "third Black alderman" — and there, dropping the predicate would
+   * throw away the election and the town.
+   *
+   * Matching is on the predicate's FIRST meaning-bearing word only. Matching any shared word
+   * destroys real prose: "was first African American to hit a home run in" + "American League"
+   * shares "American", and collapsing that pair leaves the note reading "American League".
+   */
+  const objectLeadWord = body.match(/^[A-Za-z']+/u)?.[0]?.toLowerCase() ?? '';
+  if (objectLeadWord.length > 0 && predicateLeadWord(lead) === objectLeadWord) {
+    return asSentence(body.length >= lead.length ? sentenceCase(body) : sentenceLead);
+  }
+
+  /*
+   * (b) PREFIX RUN INTO A COMPLETE SENTENCE — the bulk of the defect, and the one shape (a) does
+   * not reach because the object's verb is not the predicate's:
+   *
+   *   first_to  + "In 1977, President Carter appointed Young U.S. Ambassador …"
+   *              -> "First to In 1977, President Carter appointed Young …"
+   *   founded_in + "Washington and a small group opened the Tuskegee Normal …"
+   *              -> "Founded in Washington and a small group opened the Tuskegee Normal …"
+   *
+   * The well-formed notes in this catalog already work by letting the object speak, so that is
+   * the rule: when the object is a sentence of its own, drop the predicate and publish the
+   * sentence. The predicate is not lost from the RECORD — the claim still renders in full under
+   * "what the sources say"; it is lost only from this one-sentence summary, which the object
+   * already states.
+   *
+   * `objectIsSelfStanding` is the whole guard, and it is deliberately asymmetric: it fires only
+   * on positive evidence of a verb or a sentence ending, so an object with neither — "National
+   * Register of Historic Places", "President John F. Kennedy", "Black heritage and education" —
+   * keeps its predicate and still reads as a sentence. Measured on the active release, of the
+   * 2,383 capital-initial objects reaching a published basis record it drops the predicate on
+   * 1,455 and keeps it on 928, and it keeps it on 559 of the 561 objects of 30 characters or
+   * less, which is where the bare noun phrases live.
+   */
+  if (objectIsSelfStanding(body)) return asSentence(body);
+
+  return asSentence(`${sentenceLead} ${body}`);
 }
 
 /**
@@ -917,9 +1189,8 @@ export function buildNotabilityBasisNote(
 /**
  * Builds a REAL, evidence-backed `notabilityBasis` from an entry's own claims: one basis record
  * per distinct claim predicate, `evidenceIds` set to the ids of that predicate's claims that
- * carry a non-empty `citationSource`. This replaces the single hardcoded placeholder basis record
- * the fixture publish path used before this bead — every basis record here traces back to an
- * actual claim the entry declared, never a fabricated inclusion reason.
+ * carry a non-empty `citationSource`. Every basis record traces back to an actual claim the
+ * entry declared, never a placeholder or a fabricated inclusion reason.
  */
 export function buildReleaseNotabilityBasis(
   entry: ReleaseSourceEntity,
@@ -965,10 +1236,35 @@ export function buildReleaseNotabilityBasis(
    */
   const racialKillingRecord = !racialTerrorRecord && isRacialKillingRecord(entry, claims);
 
+  /*
+   * repo-oyxgh. "States the killing" has to mean it in the vocabulary the record actually uses.
+   * `isKillingPredicate` is the police-killing cohort's test (killed | shot | died | victim of)
+   * and matches none of a lynching record's predicates: Ell Persons's claims read `was lynched`,
+   * `was burned alive and dismembered`, `was subjected to`, `was captured by`. So the `.some()`
+   * below was false for him, M1 fell through to "keep everything", and a recompute promoted
+   * "Was subjected to brutal interrogation leading to a forced confession" and "Was captured by a
+   * lynch mob while in transit to stand trial" into this catalog's stated reasons for naming him.
+   * Those are things done TO him on the way to his murder, not why he is here.
+   *
+   * Measured on the active release 2026-09-12: 20 of the 32 `lynching_*` records had no claim
+   * matching `isKillingPredicate`, and all 20 are covered by the union below — none is left
+   * falling through.
+   *
+   * A union, not a replacement, and the two tests stay separate: `isRacialTerrorKillingPredicate`
+   * is deliberately the stricter one (it is what decides `documented_racial_terror` at all, where
+   * "was killed in action" is Doris Miller and a hanging can be a judicial execution), while
+   * `isKillingPredicate` is deliberately the broader one (Eric Garner's and Jordan Neely's claims
+   * say only `died`). Neither is a superset of the other, and this line needs both. It is applied
+   * ONLY here, not to `isRacialKillingRecord`'s classification, so nothing about which records
+   * count as racial-terror or racial-killing changes.
+   */
+  const statesTheKilling = (claim: ReleaseClaimProjection): boolean =>
+    isKillingPredicate(claim.predicate) || isRacialTerrorKillingPredicate(claim.predicate);
+
   const basisClaims =
     racialTerrorRecord || racialKillingRecord
-      ? claims.some((claim) => isKillingPredicate(claim.predicate))
-        ? claims.filter((claim) => isKillingPredicate(claim.predicate) || identifies(claim))
+      ? claims.some(statesTheKilling)
+        ? claims.filter((claim) => statesTheKilling(claim) || identifies(claim))
         : claims
       : (() => {
           const identified = claims.filter(identifies);
@@ -1623,7 +1919,7 @@ export function buildReleaseEntityArtifacts(
     researchCoverage,
     relatedCount: related.length,
     claimCount: claims.length,
-    confidenceTier: highestClaimConfidenceTier(claims),
+    evidenceInputs: recordEvidenceInputs(claims),
   };
 
   return { ok: true, projection, searchIndex };

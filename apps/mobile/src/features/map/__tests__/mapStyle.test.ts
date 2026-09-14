@@ -1,7 +1,4 @@
-import {
-  DEFAULT_MAP_GLYPHS_URL,
-  DEFAULT_OPENFREEMAP_TILE_SOURCE_URL,
-} from '../mapConfig';
+import { DEFAULT_MAP_GLYPHS_URL, DEFAULT_OPENFREEMAP_TILE_SOURCE_URL } from '../mapConfig';
 import {
   assertNoHeatmapRegister,
   buildBasemapStyle,
@@ -111,8 +108,12 @@ describe('buildBasemapStyle', () => {
   });
 
   it('falls back to the default glyphs URL when glyphsUrl is blank or scheme-less', () => {
-    expect(buildBasemapStyle({ pmtilesUrl: null, glyphsUrl: '' }).glyphs).toBe(DEFAULT_MAP_GLYPHS_URL);
-    expect(buildBasemapStyle({ pmtilesUrl: null, glyphsUrl: '   ' }).glyphs).toBe(DEFAULT_MAP_GLYPHS_URL);
+    expect(buildBasemapStyle({ pmtilesUrl: null, glyphsUrl: '' }).glyphs).toBe(
+      DEFAULT_MAP_GLYPHS_URL,
+    );
+    expect(buildBasemapStyle({ pmtilesUrl: null, glyphsUrl: '   ' }).glyphs).toBe(
+      DEFAULT_MAP_GLYPHS_URL,
+    );
     expect(buildBasemapStyle({ pmtilesUrl: null, glyphsUrl: 'mapbox://fonts/...' }).glyphs).toBe(
       DEFAULT_MAP_GLYPHS_URL,
     );
@@ -191,12 +192,16 @@ describe('dignity invariant (no crime-heatmap register)', () => {
   it('assertNoHeatmapRegister throws on a heatmap layer', () => {
     const style = buildBasemapStyle({ basemapEnabled: false });
     const withHeat = { ...style, layers: [...style.layers, { id: 'h', type: 'heatmap' }] };
-    expect(() => assertNoHeatmapRegister(withHeat, { ...ENTITY_POINT_LAYER_STYLE })).toThrow(/heatmap/i);
+    expect(() => assertNoHeatmapRegister(withHeat, { ...ENTITY_POINT_LAYER_STYLE })).toThrow(
+      /heatmap/i,
+    );
   });
 
   it('assertNoHeatmapRegister throws on a data-driven point color ramp', () => {
     const style = buildBasemapStyle({ basemapEnabled: false });
-    const ramp = { circleColor: ['interpolate', ['linear'], ['get', 'count'], 0, '#000', 100, '#f00'] };
+    const ramp = {
+      circleColor: ['interpolate', ['linear'], ['get', 'count'], 0, '#000', 100, '#f00'],
+    };
     expect(() => assertNoHeatmapRegister(style, ramp)).toThrow(/density-keyed ramp/i);
   });
 });

@@ -37,6 +37,8 @@ agent that touches git destroys the others' work.
 Rules for any file-editing subagent:
 
 - Give it `isolation: "worktree"`, or run it alone.
+- Worktrees are cut from `main`, not the working branch (170+ commits behind `staging` today). Make
+  the agent's first command `git reset --hard <staging tip sha>` or its whole analysis runs on stale code.
 - Tell it explicitly not to run `git add`, `commit`, `push`, `stash`, `checkout`, or `restore` —
   the orchestrator owns version control.
 - Tell it not to run `bd` — the orchestrator owns issue bookkeeping, and concurrent writers churn
@@ -88,6 +90,15 @@ assume. A one-line regex widening in that run would have rendered "pre-Columbian
 - NEVER stop before pushing - that leaves work stranded locally
 - NEVER say "ready to push when you are" - YOU must push
 - If push fails, resolve and retry until it succeeds
+
+**Before opening a staging → main PR**, run `fnm exec --using=22 -- ./scripts/ci-local.sh`.
+`pnpm test` is not equivalent: CI decides which lanes run from the changed paths, and two of
+those predicates are easy to miss by inspection — touching `packages/public-contracts` fires
+the whole mobile lane (it is the mobile token source), and touching `packages/research-kernel`
+fires the Python lane (no `.py` file required). `scripts/ci-local.sh` mirrors
+`.github/workflows/ci.yml` lane-for-lane instead of guessing. The script requires Node 22
+(the repo's `.nvmrc`) because `node:test`'s reporter output format differs between Node 22 and
+24 — running it on 24 can pass locally and still not match what CI reports.
 <!-- END BEADS INTEGRATION -->
 
 
@@ -104,6 +115,25 @@ to merge). This is enforced server-side, not just a convention.
   intended for release. Do this only when asked, not automatically at session end.
 - If you're unsure whether a change belongs on `staging` alone or should also go to `main`,
   default to `staging` and ask.
+
+## Republishing the CDN catalog after a bb_public write
+
+A direct write to `bb_public.release_entities` / `bb_public.search_index` leaves the published
+`entities.json` / `search-index.json` stale — the read-side guard only compares `releaseId`, which
+an in-place correction does not change. Rebuild the graph, then republish **locally**:
+
+```bash
+cd apps/web && set -a && . ./.env.local && set +a && node --conditions development --import tsx ../../packages/ops-data/scripts/publish-release-catalog-artifacts.ts
+```
+
+**Then stop. Do not run `gh workflow run publish-release-catalog-artifacts.yml` afterwards.** The
+workflow runs that same script against the same watermark
+(`bb_public.release_catalog_publish_watermark`), so once the local run has consumed it the
+dispatch reports `up to date — skipping`: CI minutes spent to reach a no-op. On 2026-09-12 there
+were eight such dispatches in one day, several of them no-ops.
+
+The workflow is the right entry point only when there is no local environment to run it from. Its
+daily cron is forgetting-insurance, a ~24h worst-case bound, not the freshness mechanism.
 
 ## BlackStory research skills
 
@@ -130,6 +160,17 @@ prints "Ready", and is then killed by the first instance's lock. The port was ne
 
 The server is Postgres-backed (`dev-web.sh` loads `apps/web/.env.local` and sets
 `PUBLIC_DATA_SOURCE=postgres`), so a preview reflects live `bb_public` data, not seed.
+
+**A running server does not see a record you RENAME under it.** Entity routes resolve through
+`record-first-paint.tsx`'s slug path, which reads process-cached shared sources, so after an
+in-place `display_name` change the record's own page returns "Place not found" until the server
+restarts — even with the column, `projection.displayName`, `projection.nameLower` and
+`search_index.name` all correct and `parseEntityProjection` accepting the row. On 2026-09-12 that
+cost a long diagnosis before a restart proved the data had been right the whole time
+(repo-iejg8). Other edits do not behave this way: a republish through the incremental publisher,
+and a direct summary or topic write, were all picked up live in the same session. So a 404 on a
+just-renamed record is the cache, not your write — verify the row, then restart before hunting
+further.
 
 To run a one-off script against the same data, source the env and use the dev export condition —
 without `--conditions development` the workspace packages fail to resolve:

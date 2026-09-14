@@ -18,6 +18,11 @@
  * Instead the canonical link is recorded the same way the ad hoc script already did on the
  * entity side (`entities.identifiers: [{scheme: 'research_case', value: caseId}]`) and on the
  * case side via a `case_history_events` row (same state in/out, reason_code carries the fact).
+ *
+ * The Postgres seam is injectable (`PromoteCaseDependencies`, same shape as
+ * `canonical-write.ts`'s `CanonicalWriteDependencies`) so `promote-case.test.ts` can exercise the
+ * real transactional write path — gate rejection, validation rejection, and a happy-path commit —
+ * against a fake client instead of only the pure gate/validation functions.
  */
 import { randomUUID, createHash } from 'node:crypto';
 import type pg from 'pg';
@@ -28,6 +33,7 @@ import {
 } from '@repo/domain';
 import { withPostgresTransaction } from '@/admin/lib/canonical-postgres-client';
 import { getAdminResearchCaseDetail } from './research-case-store';
+import type { AdminCaseDetail } from './research-case-types';
 
 export type PromoteCaseInput = {
   readonly caseId: string;
@@ -53,6 +59,16 @@ export class CasePromotionRejected extends Error {
     this.name = 'CasePromotionRejected';
   }
 }
+
+export type PromoteCaseDependencies = {
+  readonly getCaseDetail: (caseId: string) => Promise<AdminCaseDetail | null>;
+  readonly runTransaction: <T>(operation: (client: pg.PoolClient) => Promise<T>) => Promise<T>;
+};
+
+const defaultDependencies: PromoteCaseDependencies = {
+  getCaseDetail: getAdminResearchCaseDetail,
+  runTransaction: withPostgresTransaction,
+};
 
 function shortHash(value: string, length = 24): string {
   return createHash('sha256').update(value).digest('hex').slice(0, length);
@@ -395,8 +411,13 @@ async function recordCaseHistoryAndAudit(
  * `CasePromotionRejected` (gate/validation failure, no writes) or a plain `Error` (case not
  * found, live duplicate). All writes happen in one transaction.
  */
-export async function promoteCaseToCanonical(input: PromoteCaseInput): Promise<PromoteCaseResult> {
-  const detail = await getAdminResearchCaseDetail(input.caseId);
+export async function promoteCaseToCanonical(
+  input: PromoteCaseInput,
+  dependencies: Partial<PromoteCaseDependencies> = {},
+): Promise<PromoteCaseResult> {
+  const deps = { ...defaultDependencies, ...dependencies };
+
+  const detail = await deps.getCaseDetail(input.caseId);
   if (!detail) throw new Error(`Research case not found: ${input.caseId}`);
 
   const gate = evaluateCasePromotionGate({
@@ -410,7 +431,7 @@ export async function promoteCaseToCanonical(input: PromoteCaseInput): Promise<P
   if (!validation.valid) throw new CasePromotionRejected(validation.reasons);
 
   const nowIso = new Date().toISOString();
-  return withPostgresTransaction(async (client) => {
+  return deps.runTransaction(async (client) => {
     await ensureNoCatalogDuplicate(client, input.record);
     const inserted = await insertCanonicalRecord(client, input, nowIso);
     const auditEventId = await recordCaseHistoryAndAudit(

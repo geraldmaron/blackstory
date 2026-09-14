@@ -16,8 +16,11 @@
  * the wiring and the regression test that proves the invariant against the
  * real security package.
  *
- * Not wired live: see docs/adr/ADR-013-map-stack.md ("Release-coupled build") and
- * workers/publication/MAP_SOURCE_INTEGRATION.md. On release activation, the release
+ * Not wired live: see `docs/decisions-carryover.md` ("Map stack": release-coupled build) and
+ * workers/publication/MAP_SOURCE_INTEGRATION.md. The pipeline this describes is now built in
+ * `../publication/release-activation.ts` (`generateReleaseArtifacts`), but nothing outside that
+ * package's tests calls it, so the release map artifacts still have no live producer. On
+ * release activation, the release
  * pipeline should call `buildMapSource` with every active public projection that
  * carries a location, using `redactLocationForPublic` (or `toPublicEntityProjection`'s
  * location step) from `@repo/security` as the `redactLocation` port, then
@@ -47,7 +50,10 @@ export type MapSourceRawLocation = {
    * Optional county hint resolved upstream from the entity's jurisdiction
    * records (see `@repo/domain` geography `Jurisdiction`). This module
    * never derives a county from coordinates real county attribution needs
-   * polygon boundary data this repo does not vendor (see ADR-013). Without a
+   * polygon boundary data this module does not carry (`docs/decisions-carryover.md`,
+   * "Map stack": known gaps). County polygons are vendored for web rendering
+   * (`apps/web/public/geo/us-counties-20m.geojson`) but no code attributes a point
+   * to a county from them. Without a
    * hint, the entity's point still contributes to the state aggregate; it is
    * simply absent from the county aggregate.
    */

@@ -16,7 +16,6 @@ import '../components/patterns/browse-mode.css';
 import '../components/patterns/edition-fact-icon.css';
 import '../components/patterns/record-anatomy.css';
 import './explore/explore.css';
-import './explore/explore-edition.css';
 import './explore/explore-map-underlay.css';
 import './first-paint-pin-plate.css';
 

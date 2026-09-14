@@ -47,10 +47,13 @@ const VIEWPORT_POLICY_DROPPED = new Set<string>(EXPLORE_VIEWPORT_POLICY_DROPPED_
  * allowlisted the moment it is added, and a key removed from the parser stops being allowlisted.
  * Drift tests in `query-normalization.test.ts` fail in both directions.
  *
- * Viewport policy (ADR-017): `lat`, `lng` and `zoom` are excluded here on purpose. A shareable
- * URL restores what the reader was looking at, never where the camera was. That exclusion is the
+ * Viewport policy: `lat`, `lng` and `zoom` are excluded here on purpose. A shareable URL
+ * restores what the reader was looking at, never where the camera was. That exclusion is the
  * named `EXPLORE_VIEWPORT_POLICY_DROPPED_KEYS` list in map-experience/url-state.ts, not a gap in
- * this file, and the reasoning lives with it.
+ * this file, and the reasoning lives with it (`docs/decisions-carryover.md`, "Persistent map
+ * canvas": viewport policy). This allowlist is where the policy is actually enforced:
+ * `normalizeQueryString` filters the bag through it before the explore parse/build round trip,
+ * so a viewport key never reaches the serializer, which can otherwise write all three.
  */
 export const EXPLORE_PAGE_PARAM_ALLOWLIST: readonly ExploreUrlParamKey[] =
   EXPLORE_URL_PARAM_KEYS.filter((key) => !VIEWPORT_POLICY_DROPPED.has(key));

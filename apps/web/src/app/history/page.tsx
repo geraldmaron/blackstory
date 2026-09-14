@@ -1,10 +1,7 @@
 /**
- * `/history` no longer renders. The decade stepper is the Explore Time panel, the kind composition
- * graph belongs to `/data`, and the record list is `/records`, so this route survives only to
- * keep every `/history` bookmark and cached 308 resolving — `decade` mapped to `era`, in one hop.
- *
- * It can never be deleted: it is the destination of permanent redirects that are already cached
- * in browsers and search indexes.
+ * `/history` is a redirect endpoint. This route keeps every `/history` bookmark and cached 308
+ * resolving — `decade` mapped to `era`, in one hop. It can never be deleted: it is the
+ * destination of permanent redirects that are already cached in browsers and search indexes.
  */
 import { permanentRedirect } from 'next/navigation';
 import { mapHistoryQueryToRecordsHref } from '../../lib/redirects/history-href';

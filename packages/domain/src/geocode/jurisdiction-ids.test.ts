@@ -1,7 +1,7 @@
 /**
  * Tests for jurisdiction-id resolution proves the id scheme matches
  * `packages/ops-data/src/jurisdictions/schema.ts` exactly (`us`, `us-{state}`,
- * `us-{state}-{county}`) and that place/city resolution stays on-demand-only (ADR-016).
+ * `us-{state}-{county}`) and that place/city resolution stays on-demand-only.
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';

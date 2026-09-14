@@ -85,7 +85,7 @@ test('rejects a claims array beyond the bound (adversarial: maliciously large DT
   assert.throws(() => entityV1Schema.parse(oversized));
 });
 
-test('locationPrecision is closed to the four public tiers — cannot express "address"/"exact" (ADR-021 §3)', () => {
+test('locationPrecision is closed to the four public tiers — cannot express "address"/"exact"', () => {
   const fixture = loadFixture<Record<string, unknown>>('entity.v1.legacy.json');
   assert.throws(() => entityV1Schema.parse({ ...fixture, locationPrecision: 'address' }));
   assert.throws(() => entityV1Schema.parse({ ...fixture, locationPrecision: 'exact' }));

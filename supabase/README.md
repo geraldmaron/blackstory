@@ -1,4 +1,4 @@
-# Supabase local/CLI notes for BlackStory (ADR-020)
+# Supabase local/CLI notes for BlackStory (ADR-020, removed 2026-07-24, recovered in `../docs/decisions-carryover.md`, "Firestore as system of record, reversed")
 #
 # Project: blackstory-app (twykhihqkcldpreuovay)
 # URL: https://twykhihqkcldpreuovay.supabase.co

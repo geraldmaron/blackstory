@@ -7,11 +7,7 @@ import { ExpandableSection } from '../sections/ExpandableSection';
 
 describe('ExpandableSection', () => {
   it('shows only the preview count until expanded', async () => {
-    const items = [
-      <Text key="1">One</Text>,
-      <Text key="2">Two</Text>,
-      <Text key="3">Three</Text>,
-    ];
+    const items = [<Text key="1">One</Text>, <Text key="2">Two</Text>, <Text key="3">Three</Text>];
     const screen = await render(
       <ExpandableSection previewCount={2} items={items} itemLabel="claims" />,
     );

@@ -78,7 +78,10 @@ function assertNotCausal(reason: string): void {
 /**
  * Builds an Explore deep link plus the mandatory reason string the results header renders. The
  * href always goes through `buildExploreHref`, so it can never emit a param outside
- * `EXPLORE_URL_PARAM_KEYS` and can never carry a viewport key (ADR-017).
+ * `EXPLORE_URL_PARAM_KEYS`, and it carries no viewport key because the view state built below
+ * sets no `viewport`. Note that `buildExploreSearchParams` does write lat/lng/zoom when one is
+ * present, so this is a property of this builder, not of `buildExploreHref`
+ * (`docs/decisions-carryover.md`, "Persistent map canvas": viewport policy).
  */
 export function buildLensHandoff(subject: LensHandoffSubject, reason: string): LensHandoff {
   assertNotCausal(reason);

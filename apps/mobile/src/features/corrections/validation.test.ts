@@ -42,7 +42,14 @@ describe('validateCorrectionForm — mirrors web correction-intake rules', () =>
 
   it('requires target type, category, record id, statement, privacy consent, and a source URL', () => {
     expect(issueFields(EMPTY_CORRECTION_FORM).sort()).toEqual(
-      ['category', 'privacyConsent', 'sourceUrl', 'statement', 'targetRecordId', 'targetType'].sort(),
+      [
+        'category',
+        'privacyConsent',
+        'sourceUrl',
+        'statement',
+        'targetRecordId',
+        'targetType',
+      ].sort(),
     );
   });
 
@@ -56,26 +63,36 @@ describe('validateCorrectionForm — mirrors web correction-intake rules', () =>
   });
 
   it('requires affirmative contact consent when a contact is provided', () => {
-    expect(issueFields({ ...validForm, contact: 'me@example.org', contactConsent: false })).toContain(
-      'contactConsent',
-    );
-    const ok = validateCorrectionForm({ ...validForm, contact: 'me@example.org', contactConsent: true });
+    expect(
+      issueFields({ ...validForm, contact: 'me@example.org', contactConsent: false }),
+    ).toContain('contactConsent');
+    const ok = validateCorrectionForm({
+      ...validForm,
+      contact: 'me@example.org',
+      contactConsent: true,
+    });
     expect(ok.valid).toBe(true);
     if (ok.valid) expect(ok.payload.contact).toBe('me@example.org');
   });
 
   describe('adversarial — spam / giant payload length caps (mirror server limits)', () => {
     it('rejects an over-long statement', () => {
-      expect(issueFields({ ...validForm, statement: 'a'.repeat(MAX_FIELD_LENGTH + 1) })).toContain('statement');
+      expect(issueFields({ ...validForm, statement: 'a'.repeat(MAX_FIELD_LENGTH + 1) })).toContain(
+        'statement',
+      );
     });
     it('rejects an over-long record id', () => {
-      expect(issueFields({ ...validForm, targetRecordId: 'a'.repeat(MAX_TARGET_ID_LENGTH + 1) })).toContain(
-        'targetRecordId',
-      );
+      expect(
+        issueFields({ ...validForm, targetRecordId: 'a'.repeat(MAX_TARGET_ID_LENGTH + 1) }),
+      ).toContain('targetRecordId');
     });
     it('rejects an over-long contact', () => {
       expect(
-        issueFields({ ...validForm, contact: `${'a'.repeat(MAX_CONTACT_LENGTH + 1)}@x`, contactConsent: true }),
+        issueFields({
+          ...validForm,
+          contact: `${'a'.repeat(MAX_CONTACT_LENGTH + 1)}@x`,
+          contactConsent: true,
+        }),
       ).toContain('contact');
     });
   });
@@ -107,6 +124,8 @@ describe('safeEvidenceUrl — scheme allowlist (adversarial malicious URLs)', ()
     'https://',
   ])('rejects unsafe/non-https URL %p', (bad) => {
     expect(safeEvidenceUrl(bad)).toBeNull();
-    expect(validateCorrectionForm({ ...validForm, sourceUrl: bad })).toMatchObject({ valid: false });
+    expect(validateCorrectionForm({ ...validForm, sourceUrl: bad })).toMatchObject({
+      valid: false,
+    });
   });
 });

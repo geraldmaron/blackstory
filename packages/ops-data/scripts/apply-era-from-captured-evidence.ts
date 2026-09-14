@@ -61,6 +61,7 @@
 import { readFileSync, readdirSync } from 'node:fs';
 import { join } from 'node:path';
 import pg from 'pg';
+import { remindToRepublishCatalogArtifacts } from './lib/catalog-republish-reminder.ts';
 import { normalizePgConnectionString } from './lib/pg-connection.ts';
 
 const DRY_RUN = process.env.DRY_RUN !== '0';
@@ -263,6 +264,7 @@ async function main(): Promise<void> {
     }
     console.log(`\nApplied: release_entities projections updated = ${written}`);
     console.log('Now run backfill-search-facets-era.ts to sync the search facet.');
+    remindToRepublishCatalogArtifacts(written);
   } finally {
     await client.end();
   }

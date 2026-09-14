@@ -4,7 +4,7 @@
   layering catalog-relative obscurity scoring on top of theme-impact Q4 (place
   narrative) and routing survivors to the story research pipeline.
 
-  Research-discovery methodology only. Nothing here publishes (ADR-009).
+  Research-discovery methodology only. Nothing here publishes (`docs/decisions-carryover.md`, "Research and discovery cannot publish").
 -->
 
 # Story-Specific Discovery
@@ -36,7 +36,7 @@ story pipeline when it is simultaneously:
 
 ## 2. Invariants (non-negotiable)
 
-- **Research workers cannot publish (ADR-009).** This module PROPOSES candidates
+- **Research workers cannot publish** (`docs/decisions-carryover.md`, "Research and discovery cannot publish"). This module PROPOSES candidates
   and staged briefs only. It never writes to public projections / release tables
   and never promotes. The directive loop it hands off to can only
   `stage_for_review`, `hold`, or `reject`.
@@ -186,7 +186,8 @@ Add the test file to the `test` script in `packages/operator-cli/package.json`:
 **No new migration is required.** Story-Specific Discovery is a pure
 in-memory scoring/routing methodology that reuses the existing research-case
 quarantine pipeline and produces no durable public table (consistent with
-ADR-009 — research workers cannot create release/projection tables). If a future
+`docs/decisions-carryover.md`, "Research and discovery cannot publish" — research
+workers cannot create release/projection tables). If a future
 bead persists story-worthiness assessments to a private research lane, it must
 use the reserved migration timestamp prefix **`20260724000009`** to avoid
 collisions.

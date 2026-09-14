@@ -3,16 +3,16 @@
  *
  * It lives with the content machinery rather than with Stories because it routes into BOTH — the
  * narrative surface and the supporting reference pages read the same catalog through it. Filing
- * it under Stories would have made the supporting pages depend on the narrative feature, which is
- * the shape of the boundary this split existed to remove.
+ * it under Stories would make the supporting pages depend on the narrative feature, which is the
+ * boundary this split exists to keep.
  *
- * It used to hold four "Learn" rows (History, Topics, Myths, Methodology) and five "More" rows
- * (About, Quick facts, Legal, Privacy, Errata), which is nine destinations for what is really
- * two things: one narrative publication surface, and a handful of reference pages a reader opens
- * once. History was an era facet, Topics was a tag, Myths was a format, Quick facts duplicated
- * the Records tab, and "Legal" meant product policy while `/law` meant historical statute.
- *
- * What is left: Stories is one section, and each supporting page is addressed by its own route.
+ * The registry is deliberately small: Stories is one section, and each supporting page is
+ * addressed by its own route. A "Learn" tree of History / Topics / Myths beside a "More" list of
+ * About / Quick facts / Legal / Privacy / Errata is nine destinations for what is really two
+ * things — one narrative publication surface, and a handful of reference pages a reader opens
+ * once — because History is an era facet, Topics is a tag and Myths is a format. "Quick facts" is
+ * what the Records tab already is, and "Legal" would mean product policy while `/law` means
+ * historical statute.
  */
 import type { CatalogSectionId } from './content-catalog';
 
@@ -55,6 +55,13 @@ export const SUPPORTING_SECTIONS: readonly SectionRow[] = [
     directSlug: 'about',
   },
   {
+    routeId: 'faq',
+    title: 'Questions',
+    subtitle: 'Plain answers about how this archive works',
+    catalogSection: 'faq',
+    directSlug: 'faq',
+  },
+  {
     routeId: 'methodology',
     title: 'Methodology',
     subtitle: 'How a record gets in, and what a grade means',
@@ -81,6 +88,13 @@ export const SUPPORTING_SECTIONS: readonly SectionRow[] = [
     subtitle: 'The terms this app is offered under',
     catalogSection: 'terms',
     directSlug: 'terms',
+  },
+  {
+    routeId: 'support',
+    title: 'Support',
+    subtitle: 'How to get an answer, and how long it takes',
+    catalogSection: 'support',
+    directSlug: 'support',
   },
 ];
 

@@ -1,6 +1,7 @@
 /**
  * The load-bearing assertion here is negative: no share link may ever carry camera state
- * (ADR-017). The round-trip tests exist so that rule cannot be satisfied by emitting nothing.
+ * (`docs/decisions-carryover.md`, "Persistent map canvas": viewport policy). The round-trip
+ * tests exist so that rule cannot be satisfied by emitting nothing.
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';

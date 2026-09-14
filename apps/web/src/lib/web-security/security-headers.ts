@@ -39,11 +39,27 @@ export const PERMISSIONS_POLICY = [
   'xr-spatial-tracking=()',
 ].join(', ');
 
+export type GlobalSecurityHeaderOptions = {
+  /**
+   * Per-request CSP nonce (see CSP_NONCE_HEADER). Pass this through from `proxy.ts` so
+   * script-src uses `'nonce-<value>' 'strict-dynamic'` instead of `'unsafe-inline'`. Omitting
+   * it is only correct for the static, nonce-less `next.config.mjs` header list — see
+   * `securityHeadersForNextConfig` in `next-config-headers.mjs`, which drops CSP entirely
+   * rather than emit a nonce-less one.
+   */
+  nonce?: string;
+};
+
 /** Build global security headers applied to all public routes.  */
-export function buildGlobalSecurityHeaders(): SecurityHeader[] {
+export function buildGlobalSecurityHeaders(
+  options: GlobalSecurityHeaderOptions = {},
+): SecurityHeader[] {
   const csp = buildContentSecurityPolicy({
     allowInlineStyles: true,
     enforceTrustedTypes: false,
+    // Spread-conditional rather than `nonce: options.nonce`: with `exactOptionalPropertyTypes`,
+    // an explicit `nonce: undefined` is a different thing from the key being absent.
+    ...(options.nonce ? { nonce: options.nonce } : {}),
   });
 
   return [
@@ -64,8 +80,11 @@ export function securityHeadersForNextConfig(): SecurityHeader[] {
 }
 
 /** Apply security headers onto an existing Headers instance.  */
-export function applySecurityHeaders(headers: Headers): void {
-  for (const { key, value } of buildGlobalSecurityHeaders()) {
+export function applySecurityHeaders(
+  headers: Headers,
+  options: GlobalSecurityHeaderOptions = {},
+): void {
+  for (const { key, value } of buildGlobalSecurityHeaders(options)) {
     headers.set(key, value);
   }
 }

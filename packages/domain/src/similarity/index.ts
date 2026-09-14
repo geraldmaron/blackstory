@@ -4,7 +4,7 @@
  * `@repo/ops-data`'s embedding pipeline.
  *
  * Not wired live: wiring these functions into the live discovery workflow (`workers/research/`)
- * is documented in `docs/adr/ADR-014-vector-search.md`.
+ * is recorded in `docs/decisions-carryover.md` ("Vector search") as still undone.
  */
 export {
   InvalidEmbeddingVectorError,

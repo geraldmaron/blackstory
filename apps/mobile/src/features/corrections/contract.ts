@@ -6,16 +6,17 @@
  *   - submit:  POST  → `{ accepted: true, receiptCode, statusHref }` (202)
  *   - status:  by opaque receipt code → coarse public phase only.
  *
- * Per ADR-021 §3 the production home for these writes is the tightly
- * rate-limited **submissions** surface (`apps/api-submissions`, quarantine-only,
- * cannot publish), not `apps/api-public`. Today `apps/api-submissions` exposes
- * the quarantine *primitives* (`createSubmissionQuarantineService`) but no wired
- * HTTP route; the identical JSON contract below is the one the web Next.js route
- * already serves. Wiring the api-submissions HTTP route (which would lift
- * `correction-intake`/`receipt-code` into `@repo/public-contracts`) is a
- * server-side follow-up — this client is written against the stable wire shape
- * so it needs no change when that route lands. The response *shapes* mirror
- * `apps/web/src/app/corrections/public-status.ts` and `.../api/handler.ts`.
+ * The production home for these writes is the tightly rate-limited
+ * **submissions** surface (`apps/api-submissions`, quarantine-only, cannot
+ * publish), not `apps/api-public` — see `docs/decisions-carryover.md`,
+ * "ADR-021's two invariants": the submissions surface. That route is wired
+ * now: `apps/api-submissions/src/http/router.ts` serves `POST /v1/corrections`
+ * and `POST /v1/corrections/status` through `src/http/handlers.ts`, and every
+ * write goes through `createSubmissionQuarantineService().intake()`. It serves
+ * the same JSON contract the web Next.js route does, which is the contract
+ * below, so this client needed no change when the route landed. The response
+ * *shapes* mirror `apps/web/src/app/corrections/public-status.ts` and
+ * `.../api/handler.ts`.
  *
  * Nothing here encodes correction content or the receipt code into a URL:
  * the submit payload rides the POST body, and status lookup sends the receipt
@@ -29,7 +30,8 @@ import type { CorrectionCategory, CorrectionTargetType } from './categories';
 /** `/vN` major this build targets — mirrors bootstrap.ts's API_MAJOR. */
 export const CORRECTIONS_API_MAJOR = 1;
 
-/** Submissions-surface paths (ADR-021 §3). Relative to the submissions base URL. */
+/** Submissions-surface paths, matching `apps/api-submissions/src/http/handlers.ts`'s
+ * `CORRECTION_SUBMIT_PATH`/`CORRECTION_STATUS_PATH`. Relative to the submissions base URL. */
 export const CORRECTION_SUBMIT_PATH = '/v1/corrections';
 export const CORRECTION_STATUS_PATH = '/v1/corrections/status';
 

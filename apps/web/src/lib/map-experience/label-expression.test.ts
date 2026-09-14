@@ -12,6 +12,7 @@ test('label expression coalesces localised names down to the raw name', () => {
   assert.deepEqual(MAP_LABEL_NAME_FIELD, [
     'coalesce',
     ['get', 'name:en'],
+    ['get', 'name_en'],
     ['get', 'name:latin'],
     ['get', 'name'],
   ]);
@@ -22,7 +23,7 @@ test('fallback order runs most specific to least specific', () => {
   assert.equal(operator, 'coalesce');
   assert.deepEqual(
     fallbacks.map((entry) => (entry as [string, string])[1]),
-    ['name:en', 'name:latin', 'name'],
+    ['name:en', 'name_en', 'name:latin', 'name'],
   );
 });
 

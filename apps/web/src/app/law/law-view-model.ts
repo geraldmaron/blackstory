@@ -61,12 +61,22 @@ export type LawBrowseViewModel = {
   readonly sortOptions: readonly { readonly value: string; readonly label: string }[];
 };
 
+/** One end of the detail page's session prev/next, in the browse page's own default order. */
+export type LawNavTarget = {
+  readonly slug: string;
+  readonly title: string;
+};
+
 export type LawDetailViewModel =
   | { readonly kind: 'not_found' }
   | {
       readonly kind: 'ok';
       readonly snapshot: LegalSnapshotDocument;
       readonly explainer?: ReturnType<LegalCatalogSource['explainerFor']>;
+      /** The law immediately before/after this one in the unfiltered chronological order —
+       * the same order `/law` shows by default — or undefined at either end of the catalog. */
+      readonly previous?: LawNavTarget;
+      readonly next?: LawNavTarget;
     };
 
 function cleanSelectParam(raw: string | undefined): string {
@@ -194,10 +204,20 @@ export function buildLawDetailViewModel(
 
   const explainer = source.explainerFor(snapshot.id);
 
+  // Reuses the browse view's own unfiltered chronological order rather than re-deriving a
+  // second comparator here, so a reader stepping prev/next off the detail page walks the exact
+  // sequence `/law` shows by default.
+  const order = buildLawBrowseViewModel({}, source).items;
+  const index = order.findIndex((item) => item.id === snapshot.id);
+  const previous = index > 0 ? order[index - 1] : undefined;
+  const next = index >= 0 && index < order.length - 1 ? order[index + 1] : undefined;
+
   return {
     kind: 'ok',
     snapshot,
     ...(explainer ? { explainer } : {}),
+    ...(previous ? { previous: { slug: previous.slug, title: previous.title } } : {}),
+    ...(next ? { next: { slug: next.slug, title: next.title } } : {}),
   };
 }
 

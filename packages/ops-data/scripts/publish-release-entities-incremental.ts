@@ -26,29 +26,49 @@
  * Apply (requires explicit flag):
  *   DRY_RUN=0 INCREMENTAL_PUBLISH_APPLY=1 node --conditions development --import tsx \
  *     packages/ops-data/scripts/publish-release-entities-incremental.ts --from-landscape-pending
+ *
+ * WITHDRAWN RECORDS (repo-vj7cs): this is the only path that inserts into
+ * `bb_public.release_entities` / `bb_public.search_index`, which makes it the only place a
+ * record withdrawn from the catalog can come back. It reads the standing
+ * `bb_ops.catalog_decisions` verdict for every id it evaluates and skips anything carrying an
+ * open `flag_for_retraction` — reported as its own `catalog_decision_retracted` skip reason and
+ * listed in full under `retractedIds` in the run report. Withdrawing a record is therefore two
+ * steps that both matter: delete its published rows, and record the decision. The decision is
+ * what makes the deletion stick across the next rebuild.
  */
 import { mkdirSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import pg from 'pg';
+import type { PublicVisit, ReleaseSourceEntity } from '@repo/domain';
 import { normalizePgConnectionString } from './lib/pg-connection.ts';
 import {
   assessLandscapeDepth,
   buildArtifactsForEntry,
   buildLiveDepthEntry,
   canonicalUpsertParamsFromLandscape,
+  carryLiveClaims,
+  catalogDecisionFromRow,
+  claimCountRegressed,
   gateLandscapePublishCandidate,
   incrementalPublishProvenancePatch,
+  liveClaimConfidence,
+  liveLocationFromRow,
   parseCanonicalStatusSnapshot,
+  visitOverrideFromCanonicalRow,
   type CanonicalEntityPublishRow,
+  type CanonicalVisitRow,
+  type CatalogDecisionRow,
   type LandscapePublishRow,
   type LivePublishedRow,
+  type PublishCatalogDecision,
   type PublishGateSkipReason,
   type PublishStatusLintReport,
   type ReleaseEntityUpsertRow,
   type SearchIndexUpsertRow,
 } from './lib/incremental-publish.ts';
 import { mergePublishStatusLintReports } from './lib/publish-status-linter.ts';
+import { remindToRepublishCatalogArtifacts } from './lib/catalog-republish-reminder.ts';
 import {
   formatReleaseGraphAuditLog,
   rebuildReleaseGraphForRelease,
@@ -57,6 +77,7 @@ import {
   publishRegressionFailureMessage,
   runPublishRegressionGates,
 } from './lib/publish-regression-gates.ts';
+import { assertNoProjectionDivergence } from './lib/projection-divergence.ts';
 import { applyReleaseTaxonomySync, planReleaseTaxonomySync } from './lib/release-taxonomy-sync.ts';
 import { applyReleaseRelatedSync, planReleaseRelatedSync } from './lib/release-related-sync.ts';
 
@@ -112,7 +133,19 @@ SELECT
       AND lower(re.display_name) = lower(lc.display_name)
       AND re.entity_id <> lc.id
       AND re.entity_id <> lc.source_item_id
-  ) AS name_overlap
+  ) AS name_overlap,
+  -- repo-63ka: a newer WS4 draft that has not been staged onto this row yet (the bridge,
+  -- apply-enrichment-to-landscape.ts, is a hand-run step — see that script's own header). Read
+  -- by assessLandscapeDepth so a 'template_only' verdict can say WHICH of the two identical-
+  -- looking cases it is: no draft was ever written, or one was written but never staged.
+  EXISTS (
+    SELECT 1
+    FROM bb_research.entity_enrichment ee
+    WHERE ee.entity_id = lc.id
+      AND ee.status = 'enriched'
+      AND (ee.notes->'draft'->>'summary') IS NOT NULL
+      AND (ee.notes->'draft'->>'summary') IS DISTINCT FROM lc.summary
+  ) AS enrichment_draft_unstaged
 FROM bb_research.landscape_candidates lc
 WHERE lc.status = 'pending'
   -- repo-n7p6.15: never publish an entity that has been merged away. An absorbed record is not a
@@ -158,7 +191,19 @@ SELECT
       AND lower(re.display_name) = lower(lc.display_name)
       AND re.entity_id <> lc.id
       AND re.entity_id <> lc.source_item_id
-  ) AS name_overlap
+  ) AS name_overlap,
+  -- repo-63ka: a newer WS4 draft that has not been staged onto this row yet (the bridge,
+  -- apply-enrichment-to-landscape.ts, is a hand-run step — see that script's own header). Read
+  -- by assessLandscapeDepth so a 'template_only' verdict can say WHICH of the two identical-
+  -- looking cases it is: no draft was ever written, or one was written but never staged.
+  EXISTS (
+    SELECT 1
+    FROM bb_research.entity_enrichment ee
+    WHERE ee.entity_id = lc.id
+      AND ee.status = 'enriched'
+      AND (ee.notes->'draft'->>'summary') IS NOT NULL
+      AND (ee.notes->'draft'->>'summary') IS DISTINCT FROM lc.summary
+  ) AS enrichment_draft_unstaged
 FROM bb_research.landscape_candidates lc
 WHERE lc.id = ANY($1::text[])
 ORDER BY lc.id
@@ -199,7 +244,19 @@ SELECT
       AND lower(re.display_name) = lower(lc.display_name)
       AND re.entity_id <> lc.id
       AND re.entity_id <> lc.source_item_id
-  ) AS name_overlap
+  ) AS name_overlap,
+  -- repo-63ka: a newer WS4 draft that has not been staged onto this row yet (the bridge,
+  -- apply-enrichment-to-landscape.ts, is a hand-run step — see that script's own header). Read
+  -- by assessLandscapeDepth so a 'template_only' verdict can say WHICH of the two identical-
+  -- looking cases it is: no draft was ever written, or one was written but never staged.
+  EXISTS (
+    SELECT 1
+    FROM bb_research.entity_enrichment ee
+    WHERE ee.entity_id = lc.id
+      AND ee.status = 'enriched'
+      AND (ee.notes->'draft'->>'summary') IS NOT NULL
+      AND (ee.notes->'draft'->>'summary') IS DISTINCT FROM lc.summary
+  ) AS enrichment_draft_unstaged
 FROM bb_research.landscape_candidates lc
 WHERE lc.lane = $1
 ORDER BY lc.id
@@ -215,6 +272,64 @@ const CANONICAL_STATUS_BY_IDS_SQL = `
 SELECT id AS entity_id, living_status, status_history, kind_detail
 FROM bb_canonical.entities
 WHERE id = ANY($1::text[])
+`;
+
+/**
+ * Canonical visit-contact input for every entity this run is about to (re)build,
+ * so a lane republish stops silently dropping the phone/website/hours/street a backfill wrote
+ * onto `bb_canonical.entity_visit` / `entity_locations` — data the landscape row this run
+ * rebuilds `ReleaseSourceEntity` from never carries at all.
+ *
+ * Mirrors the join in sync-visit-to-projection.ts (the one-off script that, until now, was the
+ * only path that ever wrote `projection.visit`), anchored on the id list this run is evaluating
+ * rather than on already-published `bb_public.release_entities` rows — a republish candidate may
+ * not have one yet. `entity_locations` is joined LATERAL to take the most recently updated row
+ * per entity, same as that script.
+ */
+const CANONICAL_VISIT_BY_IDS_SQL = `
+SELECT ids.entity_id,
+       v.phone_e164, v.phone_display, v.website, v.hours, v.visitability, v.source_ids,
+       l.street, l.postal_code
+  FROM UNNEST($1::text[]) AS ids(entity_id)
+  LEFT JOIN bb_canonical.entity_visit v ON v.entity_id = ids.entity_id
+  LEFT JOIN LATERAL (
+    SELECT street, postal_code
+      FROM bb_canonical.entity_locations el
+     WHERE el.entity_id = ids.entity_id
+       AND (el.street IS NOT NULL OR el.postal_code IS NOT NULL)
+     ORDER BY el.updated_at DESC
+     LIMIT 1
+  ) l ON true
+ WHERE v.entity_id IS NOT NULL OR l.street IS NOT NULL OR l.postal_code IS NOT NULL
+`;
+
+/**
+ * repo-vj7cs: the standing admin decision on each entity this run is about to (re)build.
+ *
+ * `bb_ops.catalog_decisions` is where a withdrawal ruling is recorded, and until this query
+ * existed nothing on any publish path read it. Withdrawing a record meant deleting its
+ * `bb_public.release_entities` + `search_index` rows, which this script rebuilds from
+ * `bb_research.landscape_candidates` — so the withdrawal survived exactly until the next lane
+ * republish, and the three records withdrawn on 2026-09-13 would have come back without anyone
+ * deciding to bring them back.
+ *
+ * Keyed on both `lc.id` and `lc.source_item_id` for the same reason the release-membership
+ * subqueries above are: the two ids name one record, and a ruling recorded against either of
+ * them is a ruling against the record. `entity_id` is the table's primary key, so this returns
+ * at most one standing verdict per id and a later `clear_flag` has already replaced the
+ * retraction it lifts.
+ *
+ * Deliberately its own lookup rather than a NOT EXISTS bolted onto the three LANDSCAPE_* queries,
+ * which is how the absorbed-entity filter (repo-n7p6.15) was written. That filter sits in
+ * LANDSCAPE_PENDING_SQL alone, so it covers a pending publish and not a `--lane` or `--ids`
+ * republish. Loading the verdict once and gating every candidate the run evaluates cannot go out
+ * of sync that way, and it can say WHY a record was skipped instead of making it vanish from the
+ * result set.
+ */
+const CATALOG_DECISIONS_BY_IDS_SQL = `
+SELECT entity_id, decision, reason
+FROM bb_ops.catalog_decisions
+WHERE entity_id = ANY($1::text[])
 `;
 
 /**
@@ -292,41 +407,38 @@ type PreparedPublish = {
   readonly fromLandscape: boolean;
   readonly landscapeRow: LandscapePublishRow | null;
   readonly lintReport: PublishStatusLintReport;
+  /**
+   * repo-lai8y: this record's coordinates came from what it already publishes, not from its
+   * landscape row. Reported per id so a coordinate with no visible lineage on the landscape row
+   * is never silent — the one real objection to inheriting a location is that an auditor later
+   * cannot tell where the point came from.
+   */
+  readonly locationInherited?: boolean;
 };
 
+/** Reads one string field out of a stored projection, whose static type is `unknown` jsonb. */
+function projectionString(projection: unknown, key: string): string | undefined {
+  if (projection === null || typeof projection !== 'object') return undefined;
+  const value = (projection as Record<string, unknown>)[key];
+  return typeof value === 'string' ? value : undefined;
+}
+
+/**
+ * Writes the projection and nothing else.
+ *
+ * The eleven columns this statement used to carry — display_name, kind, summary, location,
+ * geohash, lat, lng, claims, taxonomy, related, primary_image — are GENERATED ALWAYS from
+ * `projection` in the database. Postgres rejects a write that supplies a value for a generated
+ * column, so naming any of them here is an error, not a redundancy.
+ */
 async function upsertEntity(client: pg.PoolClient, row: ReleaseEntityUpsertRow): Promise<void> {
   await client.query(
     `INSERT INTO bb_public.release_entities
-      (release_id, entity_id, display_name, kind, summary, location, geohash, lat, lng,
-       claims, taxonomy, related, projection, created_at)
-     VALUES ($1,$2,$3,$4,$5,$6::jsonb,$7,$8,$9,$10::jsonb,$11::jsonb,$12::jsonb,$13::jsonb,now())
+      (release_id, entity_id, projection, created_at)
+     VALUES ($1,$2,$3::jsonb,now())
      ON CONFLICT (release_id, entity_id) DO UPDATE SET
-       display_name = EXCLUDED.display_name,
-       kind = EXCLUDED.kind,
-       summary = EXCLUDED.summary,
-       location = EXCLUDED.location,
-       geohash = EXCLUDED.geohash,
-       lat = EXCLUDED.lat,
-       lng = EXCLUDED.lng,
-       claims = EXCLUDED.claims,
-       taxonomy = EXCLUDED.taxonomy,
-       related = EXCLUDED.related,
        projection = EXCLUDED.projection`,
-    [
-      row.release_id,
-      row.entity_id,
-      row.display_name,
-      row.kind,
-      row.summary,
-      JSON.stringify(row.location),
-      row.geohash,
-      row.lat,
-      row.lng,
-      JSON.stringify(row.claims),
-      JSON.stringify(row.taxonomy),
-      JSON.stringify(row.related),
-      JSON.stringify(row.projection),
-    ],
+    [row.release_id, row.entity_id, JSON.stringify(row.projection)],
   );
 }
 
@@ -413,6 +525,10 @@ function preparePublish(input: {
   readonly allowRepublish?: boolean;
   /** The active-release row for this entity, when it is already live (repo-b4ad). */
   readonly livePublished?: LivePublishedRow;
+  /** Raw canonical visit-contact input for this entity, when one exists. */
+  readonly visitOverride?: PublicVisit;
+  /** The standing `bb_ops.catalog_decisions` verdict for this entity, when one exists. */
+  readonly catalogDecision?: PublishCatalogDecision;
 }): PreparedPublish | SkippedRow {
   if (input.fromLandscape && input.row) {
     // Computed here rather than in the batch load because the verdict needs the candidate row's
@@ -422,22 +538,51 @@ function preparePublish(input: {
       input.livePublished === undefined
         ? undefined
         : assessLandscapeDepth(buildLiveDepthEntry(input.livePublished), input.row);
+    const liveConfidence =
+      input.livePublished === undefined ? undefined : liveClaimConfidence(input.livePublished);
+    // repo-lai8y: the location this record already publishes, for the gate's regression clause on
+    // a landscape row that never carried coordinates. Read off the same live row as the depth and
+    // confidence verdicts above.
+    const liveLocation =
+      input.livePublished === undefined ? undefined : liveLocationFromRow(input.livePublished);
     const gate = gateLandscapePublishCandidate({
       row: input.row,
       releaseId: input.releaseId,
       generatedAt: input.generatedAt,
       allowRepublish: input.allowRepublish ?? false,
       ...(liveDepth !== undefined ? { liveDepth } : {}),
+      ...(liveConfidence !== undefined ? { liveConfidence } : {}),
+      ...(liveLocation !== undefined ? { liveLocation } : {}),
       ...(input.canonicalStatus !== undefined ? { canonicalStatus: input.canonicalStatus } : {}),
+      ...(input.visitOverride !== undefined ? { visitOverride: input.visitOverride } : {}),
+      ...(input.catalogDecision !== undefined ? { catalogDecision: input.catalogDecision } : {}),
     });
     if (!gate.eligible) {
       return { id: input.entityId, reason: gate.reason, detail: gate.detail };
     }
+    // A landscape row proves what a candidate can prove today, not what the record has
+    // accumulated, so building claims from it alone drops every separately-cited fact the record
+    // already publishes. The union keeps both; the regression check below is its control, not a
+    // second implementation (repo-cjlkp).
+    const carry = carryLiveClaims(gate.entry.claims ?? [], input.livePublished);
+    const entry: ReleaseSourceEntity = { ...gate.entry, claims: carry.claims };
+    if (claimCountRegressed(carry.claims, input.livePublished)) {
+      return {
+        id: input.entityId,
+        reason: 'claim_count_regression',
+        detail: `republish would publish ${carry.claims.length} claims where ${carry.liveCount} are live`,
+      };
+    }
     const built = buildArtifactsForEntry({
-      entry: gate.entry,
+      entry,
       releaseId: input.releaseId,
       generatedAt: input.generatedAt,
       ...(input.canonicalStatus !== undefined ? { canonicalStatus: input.canonicalStatus } : {}),
+      ...(input.visitOverride !== undefined ? { visitOverride: input.visitOverride } : {}),
+      ...(input.catalogDecision !== undefined ? { catalogDecision: input.catalogDecision } : {}),
+      // Forwarded, not re-derived: the gate already decided this record's location and this build
+      // must produce the row the gate approved (`matchMethod` lives only here).
+      ...(gate.locationOverride !== undefined ? { locationOverride: gate.locationOverride } : {}),
     });
     if (!built.ok) {
       return {
@@ -454,6 +599,7 @@ function preparePublish(input: {
       fromLandscape: true,
       landscapeRow: input.row,
       lintReport: built.lintReport,
+      ...(gate.locationOverride !== undefined ? { locationInherited: true } : {}),
     };
   }
 
@@ -554,11 +700,37 @@ async function main(): Promise<void> {
       canonicalRes.rows.map((row) => [row.entity_id, parseCanonicalStatusSnapshot(row)]),
     );
 
+    const canonicalVisitRes = await client.query<{ entity_id: string } & CanonicalVisitRow>(
+      CANONICAL_VISIT_BY_IDS_SQL,
+      [sliced.map((item) => item.entityId)],
+    );
+    const canonicalVisitById = new Map(canonicalVisitRes.rows.map((row) => [row.entity_id, row]));
+
     const liveRes = await client.query<LivePublishedRow & { readonly entity_id: string }>(
       LIVE_PUBLISHED_BY_IDS_SQL,
       [sliced.map((item) => item.entityId)],
     );
     const livePublishedById = new Map(liveRes.rows.map((row) => [row.entity_id, row]));
+
+    // Both ids per candidate, not just the one this run would publish under: see
+    // CATALOG_DECISIONS_BY_IDS_SQL. A `source_item_id` is null on plenty of rows and would
+    // otherwise widen the array with nulls that match nothing.
+    const decisionLookupIds = [
+      ...new Set(
+        sliced.flatMap((item) =>
+          [item.entityId, item.row?.source_item_id].filter(
+            (id): id is string => typeof id === 'string' && id.length > 0,
+          ),
+        ),
+      ),
+    ];
+    const catalogDecisionRes = await client.query<CatalogDecisionRow>(
+      CATALOG_DECISIONS_BY_IDS_SQL,
+      [decisionLookupIds],
+    );
+    const catalogDecisionById = new Map(
+      catalogDecisionRes.rows.map((row) => [row.entity_id, catalogDecisionFromRow(row)]),
+    );
 
     const prepared: PreparedPublish[] = [];
     const skipped: SkippedRow[] = [];
@@ -566,6 +738,22 @@ async function main(): Promise<void> {
     const lintReports: PublishStatusLintReport[] = [];
 
     for (const item of sliced) {
+      const canonicalVisitRow = canonicalVisitById.get(item.entityId);
+      const visitOverride =
+        item.row && canonicalVisitRow
+          ? visitOverrideFromCanonicalRow(item.row, canonicalVisitRow)
+          : undefined;
+      const livePublished = livePublishedById.get(item.entityId);
+      const canonicalStatus = canonicalById.get(item.entityId);
+      // A ruling recorded against either id withdraws the record, so take the retraction when
+      // either row carries one rather than letting id order decide which verdict is seen.
+      const decisionsForItem = [
+        catalogDecisionById.get(item.entityId),
+        item.row?.source_item_id ? catalogDecisionById.get(item.row.source_item_id) : undefined,
+      ].filter((decision): decision is PublishCatalogDecision => decision !== undefined);
+      const catalogDecision =
+        decisionsForItem.find((decision) => decision.action === 'flag_for_retraction') ??
+        decisionsForItem[0];
       const result = preparePublish({
         row: item.row,
         releaseId,
@@ -573,12 +761,10 @@ async function main(): Promise<void> {
         entityId: item.entityId,
         fromLandscape: item.fromLandscape,
         allowRepublish,
-        ...(livePublishedById.get(item.entityId) !== undefined
-          ? { livePublished: livePublishedById.get(item.entityId) }
-          : {}),
-        ...(canonicalById.get(item.entityId) !== undefined
-          ? { canonicalStatus: canonicalById.get(item.entityId) }
-          : {}),
+        ...(livePublished !== undefined ? { livePublished } : {}),
+        ...(canonicalStatus !== undefined ? { canonicalStatus } : {}),
+        ...(visitOverride !== undefined ? { visitOverride } : {}),
+        ...(catalogDecision !== undefined ? { catalogDecision } : {}),
       });
       if ('reason' in result) {
         skipped.push(result);
@@ -593,11 +779,15 @@ async function main(): Promise<void> {
 
     const regressionGates = runPublishRegressionGates({
       statusLintReports: lintReports,
-      projectionStatuses: prepared.map((row) => ({
-        entityId: row.entityRow.entity_id,
-        status: row.entityRow.projection.status as string | undefined,
-        livingStatus: row.entityRow.projection.livingStatus as string | undefined,
-      })),
+      projectionStatuses: prepared.map((row) => {
+        const status = projectionString(row.entityRow.projection, 'status');
+        const livingStatus = projectionString(row.entityRow.projection, 'livingStatus');
+        return {
+          entityId: row.entityRow.entity_id,
+          ...(status !== undefined ? { status } : {}),
+          ...(livingStatus !== undefined ? { livingStatus } : {}),
+        };
+      }),
     });
     if (regressionGates.hasErrors) {
       throw new Error(publishRegressionFailureMessage(regressionGates));
@@ -614,6 +804,15 @@ async function main(): Promise<void> {
       skipped: skipped.length,
       skipCounts: Object.fromEntries(skipCounts),
       publishedIds: prepared.map((row) => row.id),
+      // Full list, not a sample: see `PreparedPublish.locationInherited`.
+      locationInheritedIds: prepared.filter((row) => row.locationInherited).map((row) => row.id),
+      // Full list for the same reason, and a stronger one: this names every record a withdrawal
+      // ruling held back on this run (repo-vj7cs). A withdrawal that quietly stopped applying is
+      // the failure mode the gate exists to prevent, so it has to be legible in the report, not
+      // just possibly inside the first 20 skips.
+      retractedIds: skipped
+        .filter((row) => row.reason === 'catalog_decision_retracted')
+        .map((row) => row.id),
       skippedSample: skipped.slice(0, 20),
       // Recorded so an accepted coverage floor is auditable after the fact, not just a flag
       // someone typed once.
@@ -743,6 +942,42 @@ async function main(): Promise<void> {
       for (const line of formatReleaseGraphAuditLog(graphRebuild.audit)) {
         console.log(`  graph: ${line}`);
       }
+
+      // Everything above this line wrote derived copies — the release_entities columns, the
+      // search_index row, the two post-commit re-syncs — of facts readers only ever get from
+      // `projection`. Measure the rows this run touched against it rather than assuming.
+      //
+      // FATAL since repo-ttlce. This reported instead of throwing for one stated reason:
+      // `applyReleaseTaxonomySync` wrote the taxonomy column without the projection or the search
+      // index, so a throw would have aborted every publish that touches topics over a defect the
+      // run did not introduce. That write path now updates all three in one statement, so a
+      // divergence reported here is this run's own — and every previous time these stores drifted
+      // it was silent, which is the whole argument for failing loudly instead.
+      //
+      // It examines only the ids this run prepared (`PROJECTION_DIVERGENCE_SQL` filters on them),
+      // so the 1,729 rows repo-p1m1y is still repairing cannot trip it.
+      //
+      // The upserts are ALREADY COMMITTED when this runs — the commit is what makes the derived
+      // copies readable to compare. So this does not undo the publish and the message must not
+      // imply it did; it stops the run before the artifact-republish reminder, which is the next
+      // thing an operator would act on, and exits non-zero.
+      try {
+        await assertNoProjectionDivergence(
+          client,
+          prepared.map((row) => row.entityRow.entity_id),
+          { releaseId },
+        );
+      } catch (error) {
+        const detail = error instanceof Error ? error.message : String(error);
+        throw new Error(
+          `${detail}\n\n` +
+            `The ${prepared.length} upserts above ARE COMMITTED — this check runs after COMMIT, ` +
+            'because the derived copies have to be readable to be compared. Nothing was rolled ' +
+            'back. Repair the diverged rows (see backfill-search-facets-projection.ts) before ' +
+            'republishing the catalog artifacts, or readers will serve the diverged copy.',
+          { cause: error },
+        );
+      }
     }
 
     const pendingAfter = Number(
@@ -754,6 +989,7 @@ async function main(): Promise<void> {
     console.log(
       `INCREMENTAL PUBLISH | committed: pending | published: ${prepared.length} | left_pending: ${pendingAfter}`,
     );
+    remindToRepublishCatalogArtifacts(prepared.length);
   } catch (error) {
     try {
       await client.query('ROLLBACK');

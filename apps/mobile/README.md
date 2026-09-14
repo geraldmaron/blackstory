@@ -13,22 +13,33 @@ Bare scaffold only (`black-book-mobile-006` / MOB-006): Expo + Expo Router + Typ
 strict + `expo-dev-client`, dev/preview/prod identity, EAS build profiles. MapLibre Native,
 SQLite, and other native modules land via CNG plugins — always run a **dev client** build
 (`expo run:ios` / `expo run:android`), never Expo Go. See
-the mobile-stack ADR for the framework/version-pinning rationale — that document was removed in
-the 2026-07-24 `docs/adr/` purge and its rationale was not carried over to
-`docs/decisions-carryover.md`; see `git log -- docs/adr/` for the original text.
+the mobile-stack decision for the framework/version-pinning rationale. That document (ADR-021 under
+the final numbering, ADR-020 in the citations below) was removed in the 2026-07-24 `docs/adr/`
+purge, and was recovered from the code on 2026-09-13 into `docs/decisions-carryover.md`,
+"Mobile stack". `git log -- docs/adr/` still has the original text.
+
+**About the "ADR-020" citations in this file.** They name the mobile-stack decision, which was
+ADR-020 when this README was written and became **ADR-021** when the mobile ADRs were all shifted up
+by one (commit `3b365d44`). Read them as ADR-021 and its `§N`; the recovered "Mobile stack" section
+keeps those section attributions, so `§5` and `§7` below resolve by searching it. ADR-020 today is
+the unrelated Supabase Postgres system-of-record decision, which this file never means.
 
 ## Version matrix (as actually installed — read from `package.json` / `node_modules`, not guessed)
 
 | Layer | Version | Notes |
 |---|---|---|
-| Expo SDK | **56.0.16** | Deliberately pinned to the **N-1** SDK line (57 was 19 days old at scaffold time; ADR-020 SS5 says wait for ecosystem/patch maturity before adopting a brand-new SDK). Exact pin, no `^`/`~` range, per ADR-020 SS5. |
-| React Native | **0.85.3** | Whatever SDK 56 bundles — never bumped independently of the Expo SDK pin. |
+| Expo SDK | **57.0.20** resolved, declared `^57.0.0` | The original scaffold pinned the N-1 line (56.0.16) exactly, because ADR-020 §5 says wait for ecosystem and patch maturity before adopting a brand-new SDK, and requires an exact pin with no `^`/`~` range. Neither half holds now: the app is on the current major, and `package.json` declares a caret range. That move landed without a decision record; `docs/decisions-carryover.md`, "Mobile stack" flags the same drift. |
+| React Native | **0.86.3** | Whatever the pinned Expo SDK bundles — never bumped independently of the Expo SDK version. |
 | React | **19.2.3** | Bundled by the SDK. |
-| Expo Router | **~56.2.15** | File-based routing, `experiments.typedRoutes: true`. |
-| Node | **>=22** (repo root `engines`) | This worktree's Node is v25.9 — satisfies the floor. Inherited from the monorepo root; apps/mobile declares no conflicting `engines` (ADR-020 SS5). |
+| Expo Router | **57.0.19** resolved, declared `~57.0.19` | File-based routing, `experiments.typedRoutes: true`. |
+| TypeScript | **6.0.3** resolved, declared `~6.0.3` | Strict mode; `npm run typecheck` from this directory. |
+| Node | **>=22** (repo root `engines`) | Inherited from the monorepo root; apps/mobile declares no `engines` of its own (ADR-020 §5). |
 | pnpm | **9.12.3** (root `packageManager`) | apps/mobile does **not** use pnpm for its own deps — see "pnpm workspace resolution" below. |
 | iOS floor | **16.4** | Raised from ADR-020's proposed 16.0 — see "OS floor re-verification" below. |
-| Android floor | **API 26 (Android 8.0)** | Matches ADR-020 SS7's proposed floor; enforced via `expo-build-properties`' `android.minSdkVersion`. |
+| Android floor | **API 26 (Android 8.0)** | Matches ADR-020 §7's proposed floor; enforced via `expo-build-properties`' `android.minSdkVersion`. |
+
+Read the version cells out of `package.json` and `package-lock.json`, not out of memory. This table
+has gone stale before.
 
 ## Fresh-clone runbook
 
@@ -41,7 +52,7 @@ npm install                  # apps/mobile manages its own isolated node_modules
 npx expo install @expo/vector-icons
 
 # iOS — always use the custom native binary (dev client), never Expo Go
-npx expo prebuild --platform ios     # generates ios/ (gitignored, CNG — see ADR-020 SS6)
+npx expo prebuild --platform ios     # generates ios/ (gitignored, CNG — see ADR-020 §6)
 cd ios && pod install && cd ..
 npx expo run:ios                     # builds + launches BlackStory (Dev) in the Simulator
 
@@ -50,7 +61,7 @@ npx expo prebuild --platform android # generates android/ (gitignored, CNG)
 npx expo run:android                 # requires Android SDK + a working `java`
 ```
 
-`ios/` and `android/` are **not committed** (ADR-020 SS6): they are pure `expo prebuild`
+`ios/` and `android/` are **not committed** (ADR-020 §6): they are pure `expo prebuild`
 build output from `app.config.ts` + config plugins. Delete and regenerate them any time; a
 stale native directory is never a source of truth.
 
@@ -122,6 +133,25 @@ apps/mobile/package-lock.json` and never touch the root `pnpm-lock.yaml` — `pn
 --frozen-lockfile` in the root `validate` job is unaffected. `.github/dependabot.yml` has a
 matching `npm` entry scoped to `/apps/mobile` for its isolated lockfile.
 
+### Jest 30, and why the hold on it was wrong
+
+`jest-expo` does not constrain Jest. 57.0.5 declares no `jest` peer dependency at all: its peers
+are `expo`, `react-native`, `@react-native/jest-preset` and `react-server-dom-webpack`. Its own
+internals are pinned at `^29.2.1`, and every published `jest-expo` through 58.0.0 still pins them
+there. So "held until `jest-expo` ships a Jest 30 build" is a wait that never ends, and it was
+never the reason the Dependabot Jest 30 PRs (#77, #79, #100) failed.
+
+The one real blocker is `jest-watch-typeahead`. `jest-expo` pins it at exactly `2.2.1`, and that
+version peers on `jest: ^27 || ^28 || ^29`. Left alone, npm resolves the conflict by nesting a
+whole second Jest 29, runtime and CLI included, under `node_modules/jest-expo/`. That installs and
+the suite passes, but it leaves two copies of Jest on disk for a watch-mode plugin this project
+never loads: `jest.config.js` sets `preset: 'jest-expo'` and never calls `withWatchPlugins` from
+`jest-expo/config`. The `jest-expo` entry in `package.json`'s `overrides` lifts that plugin to
+`^3.0.1`, the line that peers on `jest: ^30`, so the installed graph carries one Jest.
+
+Measured on the bump (Node 22, `npm ci`): 155 suites, 1102 tests, all green on Jest 30.5.1, with
+`format:check`, `lint` and `typecheck` clean.
+
 **Verified baseline (2026-07-22, `feat/mobile-launch`):** Mobile Typecheck and Mobile Unit
 Tests are green locally and in CI shape — **646/646** Jest tests; `tsc` clean for both
 `tsconfig.json` and `tsconfig.tooling.json` once the gitignored `expo-env.d.ts` shim is
@@ -138,20 +168,25 @@ scripts today; none of them run in GitHub Actions yet.
 
 ## pnpm workspace resolution — verified NOT clean (real finding, not a guess)
 
-`pnpm-workspace.yaml`'s `apps/*` glob technically covers `apps/mobile`, and ADR-020 SS5 asked
+**Resolved since this was written.** `pnpm-workspace.yaml` now carries `'!apps/mobile'` (option 1
+below), and CI's mobile lane installs with `npm ci` against `apps/mobile/package-lock.json`
+(`.github/workflows/ci.yml`). The root frozen-lockfile failure described here no longer reproduces.
+The MOB-006 evidence below is kept as written, because it is the reason the exclusion exists.
+
+`pnpm-workspace.yaml`'s `apps/*` glob technically covered `apps/mobile`, and ADR-020 §5 asked
 MOB-006 to verify whether that "just works." **It does not, without further changes.**
 Empirical evidence from this scaffold:
 
 - `npx expo install <pkg>` (no flags) auto-detects the root `pnpm-lock.yaml` and shells out to
   `pnpm add`, which modified the **root** `pnpm-lock.yaml` (thousands of lines) the moment it
   ran — reverted immediately (`git checkout -- pnpm-lock.yaml`) once caught. This is exactly
-  the risk ADR-020 SS5 flagged.
+  the risk ADR-020 §5 flagged.
 - With `apps/mobile/package.json` present under the `apps/*` glob, `pnpm install
   --frozen-lockfile` at the repo root now fails immediately with
   `ERR_PNPM_OUTDATED_LOCKFILE` ("specifiers in the lockfile ({}) don't match specs in
   package.json"), because pnpm treats apps/mobile as a workspace member the lockfile has never
   seen. This reproduces on a clean checkout, not just in this session.
-- ADR-020 SS5's own resolution path — excluding `apps/mobile` from `pnpm-workspace.yaml` via a
+- ADR-020 §5's own resolution path — excluding `apps/mobile` from `pnpm-workspace.yaml` via a
   negation entry, or isolating it with its own nested lockfile — was the tested fix, but
   **editing `pnpm-workspace.yaml` was out of scope for this scaffolding session** (explicit
   session boundary: do not modify it if the existing glob already "covers" apps/mobile,
@@ -168,9 +203,8 @@ works today for local development and `expo prebuild`/`pod install`, but **`pnpm
 2. runs one coordinated root `pnpm install` that adds apps/mobile's deps to the lockfile
    (bigger diff, couples apps/mobile onto the shared pnpm store).
 
-This is real, reproducible MOB-006 evidence for ADR-020 SS5's open risk, not a
-theoretical concern — flag it before merging this scaffold, ideally as its own immediate
-follow-up bead so CI's frozen-lockfile install doesn't start failing on `main`.
+This was real, reproducible MOB-006 evidence for ADR-020 §5's open risk, not a theoretical
+concern. It was flagged before the scaffold merged, and closed by taking option 1.
 
 ## Lint — isolated from the root ESLint config (also verified, not assumed)
 
@@ -184,21 +218,25 @@ the nearest config walking up from a file, so this local config governs everythi
 `eslint.config.mjs`. Run `npm run lint` from `apps/mobile`, not the root aggregate, until/unless
 a follow-up wires an explicit ignore for `apps/mobile/**` into the root config.
 
-## OS floor re-verification (ADR-020 SS7 — required at MOB-006 scaffold time)
+## OS floor re-verification (ADR-020 §7 — required at MOB-006 scaffold time)
 
 ADR-020 proposed iOS 16 / Android API 26, above Expo SDK 54's then-current platform floor
 (~iOS 15.1). At this scaffold's actual pinned SDK (56), `pod install` failed until the iOS
 floor was raised to **16.4** — several Expo-bundled pods (`expo`, `expo-asset`,
-`expo-modules-core`, etc.) now require iOS 16.4 outright. Per ADR-020 SS7 ("whichever SDK
+`expo-modules-core`, etc.) now require iOS 16.4 outright. Per ADR-020 §7 ("whichever SDK
 MOB-006 actually pins governs"), the **platform floor now governs**: `app.config.ts` sets
-`ios.deploymentTarget: '16.4'`, not the originally-proposed 16.0. Android's API 26 floor is
+`ios.deploymentTarget: '16.4'`, not the originally-proposed 16.0. **The 16.4 number was verified
+against Expo SDK 56 and the app now runs SDK 57; nobody re-ran the check at that upgrade.** The
+"re-verify at every SDK bump" half of §7 is a habit, not a gate: no test, schema check or CI job
+reads either floor. Android's API 26 floor is
 unaffected and is enforced via the `expo-build-properties` plugin
 (`android.minSdkVersion: 26`), confirmed present in the generated
 `android/gradle.properties` (`android.minSdkVersion=26`) after `expo prebuild`.
 
 ## Public data path (why Dev may not “hit Supabase”)
 
-Mobile never talks to Supabase/Postgres directly (ADR-022). The only network
+Mobile never talks to Supabase/Postgres directly (`docs/decisions-carryover.md`, "Mobile data
+boundary"). The only network
 origin is `extra.apiBaseUrl` → `apps/api-public` over HTTPS (or LAN HTTP in
 Dev). That service reads `bb_public.*` when
 `PUBLIC_DATA_SOURCE=postgres` + `DATABASE_URL` / `APP_DATABASE_URL` are set.
@@ -410,26 +448,26 @@ for the full template and `eas.json` for the committed non-secret per-profile
 ## EAS Update / OTA (MOB-019, repo-ovn7)
 
 `expo-updates` is installed and `runtimeVersion: { policy: 'appVersion' }` is
-wired in `app.config.ts` (ADR-023 §2's OTA/rebuild fence). `extra.eas.projectId`
+wired in `app.config.ts` (ADR-024 §2's OTA/rebuild fence). `extra.eas.projectId`
 defaults to the provisioned project (`@gerald-maron/blackstory`) so local
 `eas device:*` / CLI stay linked. **OTA itself is off for
 `APP_VARIANT=development`** (`updates.enabled: false`,
 `checkAutomatically: 'NEVER'`) so BlackStory (Dev) + Metro own the JS bundle —
 leaving the updater on with a live `updates.url` previously fought Metro /
 Expo codesigning and looked like continuous refresh. Preview/production keep
-`updates.url` + `ON_LOAD` against their `eas.json` channels (ADR-023 §1:
+`updates.url` + `ON_LOAD` against their `eas.json` channels (ADR-024 §1:
 OTA never crosses an environment boundary).
 
-**Code-signing decision (ADR-023's 2026-07-20 adversarial-review amendment,
+**Code-signing decision (ADR-024's 2026-07-20 adversarial-review amendment,
 threat-model T6):** EAS Update end-to-end code signing is a **paid EAS
 Production/Enterprise-plan feature**, not merely an SDK-support question. To
-keep the free-tier-first posture (ADR-023 §7), OTA ships **without** code
+keep the free-tier-first posture (ADR-024 §7), OTA ships **without** code
 signing on the free tier; the blast-radius controls are phishing-resistant MFA
 custody of the EAS org, a scoped/revocable CI-only publish token, staged
 channel rollout, and immutable-update rollback. This is **accepted risk by
 design**, with code signing recorded as a cost-gated upgrade trigger, not a
 silent gap. See `src/updates/README.md` for the full decision record, the
-activation steps, and the OTA rollback runbook (ADR-023 §6).
+activation steps, and the OTA rollback runbook (ADR-024 §6).
 
 ### If Dev Client keeps refreshing
 

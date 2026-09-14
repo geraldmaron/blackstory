@@ -43,7 +43,9 @@ Flaky tests belong in `packages/testing/quarantine.json` with `owner`, `deadline
 - Role isolation unit tests still run in `@repo/data-access`; runtime isolation via
   `pnpm test:db:integration` is **optional**.
 - CI job **Integration Postgres** is **skipped by default** (set repo variable
-  `ENABLE_POSTGRES_CI=true` to enable). Not a required status check (ADR-011).
+  `ENABLE_POSTGRES_CI=true` to enable). Not a required status check: it exercises the parked
+  Cloud SQL foundation under `infra/database/`, not `supabase/migrations/`. See
+  `docs/decisions-carryover.md`, "Firestore as system of record, reversed".
 
 ### Leftover Firebase emulators (not product SoR)
 

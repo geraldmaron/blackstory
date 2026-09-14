@@ -12,7 +12,10 @@ import {
   normalizeReleaseRelated,
   normalizePublicPrecision,
   type CanonicalStatusSnapshot,
+  type PublicVisit,
+  type ReleaseBuildContext,
   type ReleaseEntityProjectionFields,
+  type ReleaseLocationOverride,
   type ReleaseSearchIndexFields,
   type ReleaseSourceClaim,
   type ReleaseSourceEntity,
@@ -23,6 +26,8 @@ import {
 import { SUMMARY_MIN_CHARS, SUMMARY_MAX_CHARS } from './entity-enrichment-llm.ts';
 import { computeClaimConfidence, confidenceLevelForSource } from '../lib/confidence.ts';
 import { lintPublishStatus, type PublishStatusLintReport } from './publish-status-linter.ts';
+import { searchTopicsFromProjection } from './projection-divergence.ts';
+import { cityStateFromJurisdictionLabel } from './evidence-collectors/subject-identity.ts';
 import { buildNrhpListingFactObject, buildNrhpSignificanceObject } from './nrhp-area-labels.ts';
 
 export const INCREMENTAL_PUBLISH_CONFIDENCE_FLOOR = 0.75;
@@ -50,6 +55,15 @@ export type LandscapePublishRow = {
   readonly payload: Readonly<Record<string, unknown>>;
   readonly exact_in_release?: boolean;
   readonly name_overlap?: boolean;
+  /**
+   * repo-63ka: a `bb_research.entity_enrichment` row for this entity is `status='enriched'` with
+   * a draft summary that differs from `summary` above — i.e. a draft exists but
+   * apply-enrichment-to-landscape.ts (the WS5 bridge) has not staged it onto this row yet.
+   * Populated by the publisher's own query; a caller that doesn't join entity_enrichment (e.g.
+   * the unit tests, or a script with no reason to look) leaves this undefined, and
+   * `assessLandscapeDepth` reads that as "unknown", not "no draft" — see its use below.
+   */
+  readonly enrichment_draft_unstaged?: boolean;
 };
 
 export type PublishGateSkipReason =
@@ -63,25 +77,49 @@ export type PublishGateSkipReason =
   | 'summary_too_short'
   | 'template_only'
   | 'build_failed'
-  | 'confidence_below_floor';
+  | 'confidence_below_floor'
+  /** A republish would publish fewer claims than the record already carries (repo-cjlkp). */
+  | 'claim_count_regression'
+  /**
+   * An open `flag_for_retraction` decision stands against this entity (repo-vj7cs). Named as its
+   * own skip reason rather than folded into `build_failed` so a run report says out loud that a
+   * withdrawal held, instead of burying it in a detail string nobody reads.
+   */
+  | 'catalog_decision_retracted';
 
 export type PublishGateResult =
-  | { readonly eligible: true; readonly entry: ReleaseSourceEntity; readonly confidence: number }
+  | {
+      readonly eligible: true;
+      readonly entry: ReleaseSourceEntity;
+      readonly confidence: number;
+      /**
+       * Set only when this candidate inherited an already-live record's location (repo-lai8y).
+       * The caller MUST forward it to `buildArtifactsForEntry`: the gate's own build is a probe,
+       * and the row it writes is built a second time by the caller. `matchMethod` exists nowhere
+       * on `ReleaseSourceEntity`, so an override dropped here republishes the point as
+       * `manual_research` regardless of how it was actually matched.
+       */
+      readonly locationOverride?: ReleaseLocationOverride;
+    }
   | { readonly eligible: false; readonly reason: PublishGateSkipReason; readonly detail: string };
 
+/**
+ * Three columns, not fourteen.
+ *
+ * `display_name`, `kind`, `summary`, `location`, `geohash`, `lat`, `lng`, `claims`, `taxonomy`,
+ * `related` and `primary_image` are now GENERATED ALWAYS from `projection` in the database
+ * (supabase/migrations/..._release_entities_generated_from_projection.sql). Postgres refuses any
+ * INSERT or UPDATE that supplies a value for a generated column, so writing them here is not
+ * merely redundant, it fails.
+ *
+ * That is the point. Those eleven columns had drifted from the projection on 2,418 of 4,195 live
+ * rows, always in the same direction — the copy behind, never ahead — because a write could land
+ * on one store and not the other. Deriving them removes the possibility rather than scheduling
+ * another repair.
+ */
 export type ReleaseEntityUpsertRow = {
   readonly release_id: string;
   readonly entity_id: string;
-  readonly display_name: string;
-  readonly kind: string;
-  readonly summary: string | null;
-  readonly location: unknown;
-  readonly geohash: string | null;
-  readonly lat: number;
-  readonly lng: number;
-  readonly claims: unknown;
-  readonly taxonomy: unknown;
-  readonly related: unknown;
   readonly projection: unknown;
 };
 
@@ -140,11 +178,17 @@ function buildContext(input: {
   readonly releaseId: string;
   readonly generatedAt: string;
   readonly canonicalStatus?: CanonicalStatusSnapshot;
+  readonly visitOverride?: PublicVisit;
+  readonly locationOverride?: ReleaseLocationOverride;
+  readonly catalogDecision?: PublishCatalogDecision;
 }) {
   return {
     releaseId: input.releaseId,
     generatedAt: input.generatedAt,
     ...(input.canonicalStatus !== undefined ? { canonicalStatus: input.canonicalStatus } : {}),
+    ...(input.visitOverride !== undefined ? { visitOverride: input.visitOverride } : {}),
+    ...(input.locationOverride !== undefined ? { locationOverride: input.locationOverride } : {}),
+    ...(input.catalogDecision !== undefined ? { catalogDecision: input.catalogDecision } : {}),
   };
 }
 
@@ -233,6 +277,46 @@ export function parseCanonicalStatusSnapshot(
     ...(livingStatus !== undefined ? { livingStatus } : {}),
     ...(statusHistory.length > 0 ? { statusHistory } : {}),
   };
+}
+
+/**
+ * The retraction verdict the release builder's own gate reads, narrowed off `ReleaseBuildContext`
+ * rather than restated here so the three action values cannot drift apart from the domain's.
+ */
+export type PublishCatalogDecision = NonNullable<ReleaseBuildContext['catalogDecision']>;
+
+/** One `bb_ops.catalog_decisions` row, as the publisher's lookup selects it. */
+export type CatalogDecisionRow = {
+  readonly entity_id: string;
+  readonly decision: string;
+  readonly reason: string | null;
+};
+
+/**
+ * Parses the standing `bb_ops.catalog_decisions` row for one entity into build context.
+ *
+ * repo-vj7cs: the table has held the owner's withdrawal rulings since 2026-09-13 and nothing on
+ * the publish path had ever read it, so a withdrawal survived only until the next rebuild of
+ * `bb_public.release_entities`. `buildReleaseEntityArtifacts` has carried the gate the whole
+ * time (`ReleaseBuildContext.catalogDecision` -> `catalog_decision_retracted`); what was missing
+ * was a caller that loaded the row. This is that loader's parse half.
+ *
+ * `entity_id` is the table's primary key, so there is exactly one standing decision per entity
+ * and a later `clear_flag` has already overwritten the retraction it lifts. That is why this
+ * reads the row as-is instead of folding a decision history: the row IS the current verdict.
+ * An unrecognized `decision` returns undefined rather than guessing at what it meant, which
+ * leaves the entity ungated. That is the same shape as the other optional context loaders here,
+ * and the column's CHECK constraint is what keeps the branch unreachable in practice.
+ */
+export function catalogDecisionFromRow(
+  row: CatalogDecisionRow | null | undefined,
+): PublishCatalogDecision | undefined {
+  if (!row) return undefined;
+  const action = row.decision.trim();
+  if (action !== 'flag_for_retraction' && action !== 'needs_review' && action !== 'clear_flag') {
+    return undefined;
+  }
+  return { action, reason: row.reason?.trim() ?? '' };
 }
 
 export function canonicalUpsertParamsFromLandscape(
@@ -353,6 +437,100 @@ export function jurisdictionFromProvenance(provenance: Readonly<Record<string, u
       ? { state: readTrimmedString(provenance.sourceState) }
       : {}),
   });
+}
+
+/**
+ * The canonical contact/address columns a republish candidate joins against
+ * (`bb_canonical.entity_visit` + the first non-empty `bb_canonical.entity_locations` row for the
+ * entity, by `updated_at`), keyed by entity id by the caller.
+ */
+export type CanonicalVisitRow = {
+  readonly phone_e164: string | null;
+  readonly phone_display: string | null;
+  readonly website: string | null;
+  readonly hours: string | null;
+  readonly visitability: string | null;
+  readonly source_ids: readonly string[] | null;
+  readonly street: string | null;
+  readonly postal_code: string | null;
+};
+
+/**
+ * "Washington, DC" -> { city: 'Washington', state: 'DC' }; anything else stays unsplit.
+ *
+ * Mirrors `cityStateFromJurisdiction` in sync-visit-to-projection.ts. That script parses this out
+ * of an already-published projection's `jurisdictionLabel`; this republish path has no published
+ * projection to read yet, so it is given the label `jurisdictionFromPlace` is about to derive for
+ * the same row instead (see `visitOverrideFromCanonicalRow` below).
+ *
+ * The parse itself now lives in `lib/evidence-collectors/subject-identity.ts` (repo-f85hp), which
+ * has no imports of its own and so can hold it for both the publisher and the evidence sweep
+ * without dragging this file's dependencies along.
+ */
+/**
+ * E.164 from whatever the source stored. Mirrors `phoneFromRow` in sync-visit-to-projection.ts:
+ * Wikidata P1329 values arrive as display strings such as "+1-212-491-2200"; anything without a
+ * leading + is left out rather than guessed.
+ */
+function phoneFromCanonicalVisitRow(row: CanonicalVisitRow): {
+  readonly phone?: { readonly e164: string; readonly display: string };
+} {
+  const display = row.phone_display?.trim();
+  if (!display) return {};
+  const e164 =
+    row.phone_e164?.trim() || (display.startsWith('+') ? display.replace(/[^\d+]/g, '') : '');
+  if (!/^\+\d{8,15}$/.test(e164)) return {};
+  return { phone: { e164, display } };
+}
+
+/**
+ * Raw (pre-gating) `PublicVisit` for a republish candidate, composed from canonical
+ * `entity_visit` + `entity_locations.street`/`postal_code`.
+ *
+ * Before this, the republish path built `ReleaseSourceEntity` from
+ * `bb_research.landscape_candidates` alone, which carries no visit data at all — `entry.visit`
+ * was always undefined, so a whole-object rebuild on `--republish` silently dropped the
+ * phone/website/hours/street a backfill had written straight onto the published projection (the
+ * only path that had ever populated it, sync-visit-to-projection.ts). This function is the
+ * republish path's equivalent of that script's `rawVisitFromRow`, given as
+ * `ReleaseBuildContext.visitOverride` (release-builder.ts), which wins over `entry.visit` and is
+ * gated through `publicVisitForTier` before it reaches the projection exactly as before.
+ *
+ * City/state come from `jurisdictionFromPlace(placeFieldsFromLandscape(row))` — the same
+ * derivation `buildReleaseSourceFromLandscape` uses for `entry.jurisdictionLabel` — rather than
+ * from a published projection, since a republish candidate may not have one yet.
+ */
+export function visitOverrideFromCanonicalRow(
+  row: LandscapePublishRow,
+  canonicalVisit: CanonicalVisitRow,
+): PublicVisit | undefined {
+  const jurisdictionLabel = jurisdictionFromPlace({
+    ...placeFieldsFromLandscape(row),
+    lat: row.lat,
+    lng: row.lng,
+  });
+  const address = {
+    ...(canonicalVisit.street ? { street: canonicalVisit.street } : {}),
+    ...cityStateFromJurisdictionLabel(jurisdictionLabel),
+    ...(canonicalVisit.postal_code ? { postalCode: canonicalVisit.postal_code } : {}),
+  };
+  const hasAddress = Boolean(canonicalVisit.street || canonicalVisit.postal_code);
+  const visit: PublicVisit = {
+    ...(hasAddress ? { address } : {}),
+    ...phoneFromCanonicalVisitRow(canonicalVisit),
+    ...(canonicalVisit.website ? { website: canonicalVisit.website } : {}),
+    ...(canonicalVisit.hours ? { hours: canonicalVisit.hours } : {}),
+    ...(canonicalVisit.visitability &&
+    ['open_to_public', 'exterior_only', 'private', 'demolished', 'unknown'].includes(
+      canonicalVisit.visitability,
+    )
+      ? { visitability: canonicalVisit.visitability as NonNullable<PublicVisit['visitability']> }
+      : {}),
+    ...(canonicalVisit.source_ids && canonicalVisit.source_ids.length > 0
+      ? { sources: canonicalVisit.source_ids }
+      : {}),
+  };
+  return Object.keys(visit).length > 0 ? visit : undefined;
 }
 
 /**
@@ -519,7 +697,22 @@ export function buildReleaseSourceFromLandscape(
   const displayName = row.display_name.trim();
   const summary = (row.summary ?? '').trim();
   const canonicalUrl = row.canonical_url?.trim() ?? '';
-  if (displayName.length === 0 || summary.length === 0 || canonicalUrl.length === 0) return null;
+  // A registry index row is one way for a record to have a source, not the only one: a curated
+  // record has no index entry and therefore no canonical_url, while still carrying the evidence
+  // citations its prose was drafted from. So a row with no canonical_url builds PROVIDED it
+  // carries at least one usable evidence citation (a source url AND a quote). With neither it
+  // returns null and the gate reports `missing_canonical_url` — the gate fails closed on "no
+  // source at all", not on "no index row". See also the claim guard below: a record with no index
+  // row publishes no index claim, because there is no index row to cite.
+  const hasCitableEvidence = asRecordArray(row.payload.evidenceCitations).some(
+    (raw) =>
+      typeof raw.sourceUrl === 'string' &&
+      raw.sourceUrl.trim().length > 0 &&
+      typeof raw.quote === 'string' &&
+      raw.quote.trim().length > 0,
+  );
+  if (displayName.length === 0 || summary.length === 0) return null;
+  if (canonicalUrl.length === 0 && !hasCitableEvidence) return null;
   if (row.lat === null || row.lng === null) return null;
 
   let hostname = 'source';
@@ -564,62 +757,70 @@ export function buildReleaseSourceFromLandscape(
   // triggers always sorts after the "documented_site" default the significance claim gets, so
   // the significance note lands at notabilityBasis[0]). Every other lane keeps the prior
   // single-claim behavior unchanged.
+  //
+  // repo-fz6k0: no canonical_url means no registry index entry, and a record cannot cite an
+  // index row it does not have. Rather than promote some evidence document into the slot — which
+  // would make the publisher assert that document "states" the whole summary, an attribution the
+  // record cannot back — such a record publishes no record_index claim at all and stands on its
+  // evidence claims below. Every row that HAS a canonical_url is unaffected.
   const claims: ReleaseSourceClaim[] =
-    row.lane === 'nrhp-black-heritage'
-      ? [
-          {
-            predicate: 'listing',
-            object: buildNrhpListingFactObject({
-              refnum: typeof row.payload.refnum === 'string' ? row.payload.refnum : undefined,
-              listedDateSerial:
-                typeof row.payload.listedDateSerial === 'string' ||
-                row.payload.listedDateSerial === null
-                  ? (row.payload.listedDateSerial as string | null)
-                  : undefined,
-            }),
-            confidenceLevel: confidenceLevelForSource(canonicalUrl),
-            citationSource: hostname,
-            citationHref: canonicalUrl,
-            citationLabel: hostname,
-            claimRole: 'record_index',
-          },
-          {
-            predicate: 'significant for',
-            object: buildNrhpSignificanceObject({
-              areaOfSignificance:
-                typeof row.payload.areaOfSignificance === 'string'
-                  ? row.payload.areaOfSignificance
-                  : undefined,
-            }),
-            confidenceLevel: confidenceLevelForSource(canonicalUrl),
-            citationSource: hostname,
-            citationHref: canonicalUrl,
-            citationLabel: hostname,
-            claimRole: 'record_index',
-          },
-        ]
-      : [
-          {
-            // M3 (repo-teb1z). This predicate used to be the CRITERION NAME — `documented_site`,
-            // or `documented_contribution` on an invention — which closed a loop: the publisher
-            // wrote the word, `buildNotabilityBasisNote` led the inclusion note with it
-            // ("Documented site <summary>."), and `inferNotabilityCriterionFromClaim` read the
-            // same word back as the criterion it was supposed to determine. 238 basis records in
-            // the active release began literally "Documented site", including on people.
-            //
-            // A predicate describes what the claim says. This claim says the source states the
-            // summary, so that is what it says. The criterion is now decided by the inference and
-            // the kind, where it belongs, and a record whose only claim is this index row keeps a
-            // basis rather than a self-assertion — the honest residual that repo-o6k0c measures.
-            predicate: 'source states',
-            object: summary,
-            confidenceLevel: confidenceLevelForSource(canonicalUrl),
-            citationSource: hostname,
-            citationHref: canonicalUrl,
-            citationLabel: hostname,
-            claimRole: 'record_index',
-          },
-        ];
+    canonicalUrl.length === 0
+      ? []
+      : row.lane === 'nrhp-black-heritage'
+        ? [
+            {
+              predicate: 'listing',
+              object: buildNrhpListingFactObject({
+                refnum: typeof row.payload.refnum === 'string' ? row.payload.refnum : undefined,
+                listedDateSerial:
+                  typeof row.payload.listedDateSerial === 'string' ||
+                  row.payload.listedDateSerial === null
+                    ? (row.payload.listedDateSerial as string | null)
+                    : undefined,
+              }),
+              confidenceLevel: confidenceLevelForSource(canonicalUrl),
+              citationSource: hostname,
+              citationHref: canonicalUrl,
+              citationLabel: hostname,
+              claimRole: 'record_index',
+            },
+            {
+              predicate: 'significant for',
+              object: buildNrhpSignificanceObject({
+                areaOfSignificance:
+                  typeof row.payload.areaOfSignificance === 'string'
+                    ? row.payload.areaOfSignificance
+                    : undefined,
+              }),
+              confidenceLevel: confidenceLevelForSource(canonicalUrl),
+              citationSource: hostname,
+              citationHref: canonicalUrl,
+              citationLabel: hostname,
+              claimRole: 'record_index',
+            },
+          ]
+        : [
+            {
+              // M3 (repo-teb1z). This predicate used to be the CRITERION NAME — `documented_site`,
+              // or `documented_contribution` on an invention — which closed a loop: the publisher
+              // wrote the word, `buildNotabilityBasisNote` led the inclusion note with it
+              // ("Documented site <summary>."), and `inferNotabilityCriterionFromClaim` read the
+              // same word back as the criterion it was supposed to determine. 238 basis records in
+              // the active release began literally "Documented site", including on people.
+              //
+              // A predicate describes what the claim says. This claim says the source states the
+              // summary, so that is what it says. The criterion is now decided by the inference and
+              // the kind, where it belongs, and a record whose only claim is this index row keeps a
+              // basis rather than a self-assertion — the honest residual that repo-o6k0c measures.
+              predicate: 'source states',
+              object: summary,
+              confidenceLevel: confidenceLevelForSource(canonicalUrl),
+              citationSource: hostname,
+              citationHref: canonicalUrl,
+              citationLabel: hostname,
+              claimRole: 'record_index',
+            },
+          ];
 
   // repo-fbjr: the documents the enrichment sweep actually READ, as claims that cite them.
   //
@@ -703,6 +904,13 @@ export function buildReleaseSourceFromLandscape(
     });
   }
   claims.push(...evidenceClaims);
+
+  // repo-fz6k0: fail closed. `hasCitableEvidence` above is a cheap pre-check on the raw payload;
+  // this is the real one, after unparseable urls and same-document merges have been applied. A
+  // record with no canonical_url whose every evidence citation dropped out would otherwise
+  // publish with an empty claims array — a record asserting nothing, citing nothing. Returning
+  // null here routes it back to the same `missing_canonical_url` skip it gets today.
+  if (claims.length === 0) return null;
 
   // Enrichment writes its long-form prose back onto the landscape row; without this passthrough
   // the builder would rebuild the entity from index fields alone and silently drop it, so a
@@ -817,6 +1025,269 @@ export function buildLiveDepthEntry(row: LivePublishedRow): ReleaseSourceEntity 
 }
 
 /**
+ * The same claim-confidence measure the gate applies to a candidate (`minClaimConfidence`),
+ * applied instead to what is CURRENTLY published for this entity (repo-2t04.17). Reuses
+ * `buildLiveDepthEntry`'s reconstruction rather than inventing a second one, so a depth verdict
+ * and a confidence verdict on the same live row are always built from the same claims array. No
+ * `row` argument (and so no corroborating-source lookup): a `LivePublishedRow` has no
+ * landscape-candidate provenance to corroborate from, only the claims it already carries.
+ */
+export function liveClaimConfidence(row: LivePublishedRow): number {
+  return minClaimConfidence(buildLiveDepthEntry(row));
+}
+
+/**
+ * The claims an already-published row carries, read back as source claims.
+ *
+ * A published claim is stored in the same shape it was built from — `predicate`, `object`,
+ * `confidenceLevel`, the three citation fields and `claimRole` — so a live row round-trips into
+ * `ReleaseSourceClaim` without reconstruction. The `id` rides along because
+ * `resolveReleaseClaimId` prefers a claim's own id over a positional one, which is what keeps a
+ * carried claim's id stable across a republish.
+ */
+export function liveSourceClaims(row: LivePublishedRow): readonly ReleaseSourceClaim[] {
+  return asRecordArray(row.claims)
+    .filter(
+      (claim) =>
+        typeof claim.predicate === 'string' &&
+        claim.predicate.trim().length > 0 &&
+        typeof claim.object === 'string' &&
+        claim.object.trim().length > 0,
+    )
+    .map((claim) => {
+      const level = claim.confidenceLevel;
+      return {
+        ...(typeof claim.id === 'string' && claim.id.length > 0 ? { id: claim.id } : {}),
+        predicate: String(claim.predicate),
+        object: String(claim.object),
+        confidenceLevel:
+          level === 'high' || level === 'medium' || level === 'low' ? level : ('low' as const),
+        citationSource: typeof claim.citationSource === 'string' ? claim.citationSource : 'source',
+        ...(typeof claim.citationHref === 'string' && claim.citationHref.length > 0
+          ? { citationHref: claim.citationHref }
+          : {}),
+        citationLabel:
+          typeof claim.citationLabel === 'string' && claim.citationLabel.length > 0
+            ? claim.citationLabel
+            : typeof claim.citationSource === 'string'
+              ? claim.citationSource
+              : 'source',
+        ...(claim.claimRole === 'record_index' || claim.claimRole === 'evidence'
+          ? { claimRole: claim.claimRole }
+          : {}),
+      } satisfies ReleaseSourceClaim;
+    });
+}
+
+/** Identity of a claim as a reader meets it: what it says, about what. */
+function claimIdentity(claim: ReleaseSourceClaim): string {
+  // ASCII Unit Separator, not NUL. Both are unambiguous here because neither can appear in a
+  // predicate or an object, but a NUL anywhere in a file makes every tool that sniffs for binary
+  // content skip it SILENTLY - `file` calls it data, and plain `grep` finds nothing in a
+  // 1,700-line module. That has already cost this repo once: eight ADR citations were invisible
+  // to the inventory that scoped repo-gtm2y. The identity is in-memory only (a Set, below), never
+  // hashed or stored, so the separator is free to change.
+  return `${claim.predicate.trim().toLowerCase()}\u001f${claim.object.trim().toLowerCase()}`;
+}
+
+export type ClaimCarryResult = {
+  readonly claims: readonly ReleaseSourceClaim[];
+  /** Live claims the rebuild did not reproduce, kept rather than dropped. */
+  readonly carried: number;
+  readonly rebuilt: number;
+  readonly liveCount: number;
+};
+
+/**
+ * Union of what a republish rebuilds with what the record already publishes.
+ *
+ * A landscape row is a candidate's worth of evidence, not the record's history. Rebuilding claims
+ * from it alone republishes only what that row can currently prove, so a record that accumulated
+ * fine-grained, separately-cited facts (`founded | 1883`, `motive | Anti-Black racism`) loses them
+ * and keeps one coarse claim whose object is the whole summary. That trades evidence a reader can
+ * check for prose they cannot, which is the opposite of what the depth and confidence apparatus
+ * exists to protect — measured across the 26 curated gap_* candidates, a republish took 106
+ * published claims down to 27.
+ *
+ * So a rebuilt claim wins where both describe the same fact, and every live claim the rebuild did
+ * not reproduce is carried forward. Identity is the pair a reader actually reads — predicate and
+ * object, trimmed and case-folded — not the claim id, because the same fact re-cited from a fresh
+ * sweep is a new id for an old statement.
+ *
+ * The union never shrinks a record. `claimCountRegressed` is the control that says so out loud.
+ */
+export function carryLiveClaims(
+  rebuilt: readonly ReleaseSourceClaim[],
+  live: LivePublishedRow | undefined,
+): ClaimCarryResult {
+  const liveClaims = live === undefined ? [] : liveSourceClaims(live);
+  if (liveClaims.length === 0) {
+    return { claims: rebuilt, carried: 0, rebuilt: rebuilt.length, liveCount: 0 };
+  }
+
+  const seen = new Set(rebuilt.map(claimIdentity));
+  const carried: ReleaseSourceClaim[] = [];
+  for (const claim of liveClaims) {
+    const identity = claimIdentity(claim);
+    if (seen.has(identity)) continue;
+    seen.add(identity);
+    carried.push(claim);
+  }
+
+  return {
+    claims: [...rebuilt, ...carried],
+    carried: carried.length,
+    rebuilt: rebuilt.length,
+    liveCount: liveClaims.length,
+  };
+}
+
+/**
+ * Whether a republish would publish fewer claims than the record already carries.
+ *
+ * With `carryLiveClaims` applied this cannot happen, which is the point: it is a control on the
+ * carry rather than a second implementation of it. A true here means the union did not run, ran
+ * against the wrong live row, or a future change reintroduced the rebuild-only path — and the
+ * publisher refuses the record instead of quietly shipping the smaller set, because a claim that
+ * disappears leaves no trace on the page that it was ever there.
+ */
+export function claimCountRegressed(
+  published: readonly ReleaseSourceClaim[],
+  live: LivePublishedRow | undefined,
+): boolean {
+  if (live === undefined) return false;
+  return published.length < liveSourceClaims(live).length;
+}
+
+/**
+ * The location an already-live record publishes today, in the shape a republish needs to keep it.
+ * `ReleaseLocationOverride` covers the point; `jurisdictionLabel` rides along because the release
+ * builder takes that one from the source entry, not from the override.
+ */
+export type LiveLocationInheritance = ReleaseLocationOverride & {
+  readonly jurisdictionLabel?: string;
+};
+
+/**
+ * Reads the live projection's own published location off a `LivePublishedRow` (repo-lai8y), the
+ * third member of the `buildLiveDepthEntry` / `liveClaimConfidence` family: one reader per thing
+ * the gate wants to know about what is CURRENTLY public, so an audit and a publish cannot read
+ * the same live row differently.
+ *
+ * Returns undefined unless the projection carries a finite lat AND lng — the caller's fallback
+ * then has nothing to offer and the location gate fails closed exactly as before.
+ */
+export function liveLocationFromRow(row: LivePublishedRow): LiveLocationInheritance | undefined {
+  const projection = row.projection ?? {};
+  const location = asRecord(projection.location);
+  const lat = location.lat;
+  const lng = location.lng;
+  if (typeof lat !== 'number' || !Number.isFinite(lat)) return undefined;
+  if (typeof lng !== 'number' || !Number.isFinite(lng)) return undefined;
+  /*
+   * A live tier that was REDUCED (living residence, restricted site, withheld on request) cannot
+   * be inherited faithfully. `reducePublicPrecision` is the publish path's one engine for that
+   * decision and it re-derives from kind/livingStatus/sensitivityClass — inputs a landscape row
+   * does not carry (`buildReleaseSourceFromLandscape` never sets `sensitivityClass`). Feeding the
+   * already-reduced tier back in makes the rule a no-op, so the record would republish at the
+   * right tier with its `precisionReductionReason` silently dropped, breaking the standard's §4
+   * control that a location is published either at its source precision or with a reason code.
+   *
+   * So: fail closed. The record skips as `missing_location` and keeps its stale summary, which is
+   * the honest outcome for a record whose location we cannot reproduce. Zero of the 57 rows this
+   * was written for carry a reason code. If this ever does fire, the fix is to carry the
+   * sensitivity INPUTS onto the candidate, not to copy the engine's output past the engine.
+   */
+  if (readTrimmedString(location.precisionReductionReason).length > 0) return undefined;
+  const precision = readTrimmedString(location.precision);
+  const matchMethod = readTrimmedString(location.matchMethod);
+  const locationLabel = readTrimmedString(projection.locationLabel);
+  const jurisdictionLabel = readTrimmedString(projection.jurisdictionLabel);
+  return {
+    lat,
+    lng,
+    ...(precision.length > 0 ? { precision } : {}),
+    ...(matchMethod.length > 0 ? { matchMethod } : {}),
+    ...(locationLabel.length > 0 ? { locationLabel } : {}),
+    ...(jurisdictionLabel.length > 0 ? { jurisdictionLabel } : {}),
+  };
+}
+
+/**
+ * Applies an already-live record's location to a republish candidate whose landscape row carries
+ * no coordinates (repo-lai8y). Splits the decision the way the data splits:
+ *
+ *   POINT METADATA (lat/lng, precision, matchMethod) always comes from the live projection. A
+ *   precision tier and a match method describe a POINT, and the point here is the live one, so
+ *   re-deriving them from a row that has no coordinates describes someone else's point. Measured
+ *   on the 57 rows this was written for, every landscape row carries no geocode, no street
+ *   address and no city/state at all, so `buildReleaseSourceFromLandscape`'s derivation returns
+ *   'city' for all of them while their live records publish at neighborhood (4), campus (6),
+ *   institution (16), site (3), address (4) and country (1) — 34 rows whose published precision
+ *   a bare lat/lng inheritance would coarsen or sharpen against the point it describes.
+ *
+ *   PLACE PROSE (locationLabel, jurisdictionLabel) comes from the landscape row whenever that row
+ *   supplies a place field that derivation can actually use, and from the live projection
+ *   otherwise (see the per-field reasoning at the branch). A row that says where the record is stays the source
+ *   of truth for what a reader is told; a row that says nothing must not overwrite what the
+ *   record's own page already prints. On those same 57 rows nothing is supplied, so
+ *   'Boston, Massachusetts' would otherwise degrade to 'Massachusetts' (`jurisdictionFromPlace`
+ *   falling through to `findUsStateForPoint`) and '46 Joy Street, Beacon Hill, Boston' to the
+ *   record's own display name (`locationLabelFromProvenance`'s last resort).
+ *
+ * The same values are written onto BOTH the entry and the override rather than only the override.
+ * The release builder reads `locationOverride?.x ?? entry.x` for precision and label, so the two
+ * cannot disagree — and a caller that forgets to forward the override still republishes the right
+ * tier and label instead of a silently re-derived one.
+ */
+function inheritLiveLocation(input: {
+  readonly entry: ReleaseSourceEntity;
+  readonly row: LandscapePublishRow;
+  readonly live: LiveLocationInheritance;
+}): {
+  readonly entry: ReleaseSourceEntity;
+  readonly locationOverride: ReleaseLocationOverride;
+} {
+  const place = placeFieldsFromLandscape(input.row);
+  /*
+   * Decided per field, on what each derivation can actually produce from THIS row — not on one
+   * "does the row have place data" flag, which would let a row naming only a state overwrite a
+   * city-precise live label with the bare state name. Naming a state does not contradict
+   * 'Boston, Massachusetts'; it just says less, and a fallback that loses information is not a
+   * fallback.
+   *
+   *   jurisdiction: `jurisdictionFromPlace` returns 'City, State' only when the row names a city.
+   *     Without one it returns the state alone, or falls through to `findUsStateForPoint` — both
+   *     strictly less than what the live record already prints.
+   *
+   *   label: `locationLabelFromProvenance` returns the record's own display name when the row
+   *     gave it nothing to work with. Comparing against that is the tell, rather than guessing
+   *     which provenance fields it consulted for this kind.
+   */
+  const rowNamesJurisdiction = place.city.length > 0;
+  const rowNamesLocation = input.entry.locationLabel !== input.row.display_name.trim();
+  const locationLabel = rowNamesLocation ? undefined : input.live.locationLabel;
+  const jurisdictionLabel = rowNamesJurisdiction ? undefined : input.live.jurisdictionLabel;
+  return {
+    entry: {
+      ...input.entry,
+      lat: input.live.lat,
+      lng: input.live.lng,
+      ...(input.live.precision !== undefined ? { locationPrecision: input.live.precision } : {}),
+      ...(locationLabel !== undefined ? { locationLabel } : {}),
+      ...(jurisdictionLabel !== undefined ? { jurisdictionLabel } : {}),
+    },
+    locationOverride: {
+      lat: input.live.lat,
+      lng: input.live.lng,
+      ...(input.live.precision !== undefined ? { precision: input.live.precision } : {}),
+      ...(input.live.matchMethod !== undefined ? { matchMethod: input.live.matchMethod } : {}),
+      ...(locationLabel !== undefined ? { locationLabel } : {}),
+    },
+  };
+}
+
+/**
  * Rejects rows that carry nothing a reader could not get from the registry index entry itself.
  *
  * The lane importers publish prose generated from index fields — category, city, state, area of
@@ -845,6 +1316,15 @@ export function assessLandscapeDepth(
   const context = entry.historicalContext?.trim() ?? '';
   if (context.length > 0) return { deep: true };
 
+  // Read off the ROW, not the entry: this is the registry index document the record was found
+  // through, and a claim that merely cites it back is not evidence of anything beyond the listing.
+  //
+  // repo-fz6k0: for a curated row with no canonical_url this is null, so every claim carrying a
+  // parseable url counts as independent and the record passes. That is the correct reading, not a
+  // hole to plug — such a record has no "own registry index entry" to exclude, and (since that
+  // same bead) publishes no record_index claim either, so the only claims it can offer here are
+  // the evidence documents the draft actually read. Do not "fix" this by falling back to some
+  // evidence url as the registry document; that would exclude the record's own real evidence.
   const registryDocument = documentKey(row.canonical_url);
   const claims = entry.claims ?? [];
   const hasIndependentSource = claims.some((claim) => {
@@ -853,12 +1333,24 @@ export function assessLandscapeDepth(
   });
   if (hasIndependentSource) return { deep: true };
 
+  // repo-63ka: every `deep: false` verdict below reads as "no draft was ever written for this
+  // record" unless it says otherwise. That reading is wrong whenever a WS4 draft sits in
+  // `bb_research.entity_enrichment` newer than what is staged here — the drafter ran, the draft
+  // is real, and it is simply unstaged (apply-enrichment-to-landscape.ts, the WS5 bridge, is a
+  // hand-run step, not something session-enrich-apply.ts does for you). Distinguishing the two
+  // in the message is the cheaper of the bead's two fixes and keeps the bridge's deliberate
+  // review step intact — it does not change which rows are eligible, only what an operator is
+  // told about why one is not.
+  const staleDraftSuffix = row.enrichment_draft_unstaged
+    ? ' — an enrichment draft exists for this record but has not been staged onto it; run apply-enrichment-to-landscape.ts'
+    : '';
+
   const summary = entry.summary;
   const signature = findTemplateSummarySignature(summary);
   if (signature !== null) {
     return {
       deep: false,
-      detail: `summary carries a generated-template signature ("${signature.slice(0, 48)}…")`,
+      detail: `summary carries a generated-template signature ("${signature.slice(0, 48)}…")${staleDraftSuffix}`,
     };
   }
 
@@ -867,13 +1359,13 @@ export function assessLandscapeDepth(
   if (echoed.length === claims.length && claims.length > 0) {
     return {
       deep: false,
-      detail: 'every claim restates the summary verbatim — no fact beyond the registry listing',
+      detail: `every claim restates the summary verbatim — no fact beyond the registry listing${staleDraftSuffix}`,
     };
   }
 
   return {
     deep: false,
-    detail: `no evidence beyond the registry index row (${registryDocument ?? 'unknown source'})`,
+    detail: `no evidence beyond the registry index row (${registryDocument ?? 'unknown source'})${staleDraftSuffix}`,
   };
 }
 
@@ -901,9 +1393,71 @@ export function gateLandscapePublishCandidate(input: {
    * caller that has not loaded live state cannot accidentally relax anything.
    */
   readonly liveDepth?: DepthAssessment;
+  /**
+   * repo-2t04.17: the confidence score of what is CURRENTLY published for this entity, from
+   * `liveClaimConfidence(liveRow)`. Mirrors `liveDepth` exactly — same ADMISSION vs REGRESSION
+   * reasoning, applied to confidence instead of depth. Omitting it leaves the strict admission
+   * test in force.
+   */
+  readonly liveConfidence?: number;
+  /**
+   * repo-lai8y: the location of what is CURRENTLY published for this entity, from
+   * `liveLocationFromRow(liveRow)`. Read ONLY when the landscape row carries no coordinates and
+   * this is a republish of that live row; see the location gate below. Omitting it leaves the
+   * gate failing closed on a coordinate-less row, which is what every non-republish caller
+   * (e.g. enrich-landscape-pending-corroboration.ts, which has no live state at all) wants.
+   */
+  readonly liveLocation?: LiveLocationInheritance;
+  /**
+   * Raw (pre-gating) visit-contact input from `bb_canonical.entity_visit` +
+   * `entity_locations.street`/`postal_code`, when the caller looked one up for this entity
+   * (`visitOverrideFromCanonicalRow`). Wins over whatever `buildReleaseSourceFromLandscape`
+   * derived from the landscape row (normally nothing — the landscape payload carries no visit
+   * data) and is gated through `publicVisitForTier` inside `buildReleaseEntityArtifacts`, same
+   * precedence as `canonicalStatus` above. Omitting it leaves that empty derivation in force,
+   * which is how a republish silently dropped a backfilled phone/website/street before this was
+   * wired in.
+   */
+  readonly visitOverride?: PublicVisit;
+  /**
+   * repo-vj7cs: the standing `bb_ops.catalog_decisions` row for this entity
+   * (`catalogDecisionFromRow`), when the caller looked one up. A `flag_for_retraction` decision
+   * is the owner's withdrawal ruling, and it must outlive the deletion of the entity's
+   * `bb_public.release_entities` row — otherwise the withdrawal holds only until the next lane
+   * republish rebuilds that row from `bb_research.landscape_candidates`, which is exactly what
+   * happened to the three records withdrawn on 2026-09-13.
+   *
+   * `buildReleaseEntityArtifacts` owns the rule; this gate answers it first (see the
+   * short-circuit at the top) so the skip is reported as the ruling rather than as whichever
+   * editorial check happened to fire, and forwards the decision into the build so the authority
+   * still refuses on its own. Omitting it leaves the entity ungated, same as every other optional
+   * context field — which is why the publisher loads it for every id it evaluates rather than
+   * only for republish candidates.
+   */
+  readonly catalogDecision?: PublishCatalogDecision;
 }): PublishGateResult {
   const floor = input.confidenceFloor ?? INCREMENTAL_PUBLISH_CONFIDENCE_FLOOR;
   const row = input.row;
+
+  /*
+   * Answered first, ahead of every editorial check below.
+   *
+   * `buildReleaseEntityArtifacts` is still the authority on this rule and refuses the record on
+   * its own at the bottom of this function — this is a short-circuit for ORDER, not a second
+   * implementation, and if the two ever disagree the build's verdict is the one that decides
+   * whether a row gets written. Order matters for two reasons. A withdrawn record that also has,
+   * say, a short summary would otherwise be reported as `summary_too_short`, which reads as "fix
+   * the summary and it publishes" when the truth is that it must not publish at any summary
+   * length. And the run report's `retractedIds` would undercount, so the one line that says which
+   * withdrawals held on this run could not be trusted.
+   */
+  if (input.catalogDecision?.action === 'flag_for_retraction') {
+    return {
+      eligible: false,
+      reason: 'catalog_decision_retracted',
+      detail: `withdrawn by catalog decision: ${input.catalogDecision.reason}`,
+    };
+  }
 
   const reviewed = personReviewApproved(row.payload);
   if (row.kind === 'person' && !reviewed) {
@@ -927,7 +1481,44 @@ export function gateLandscapePublishCandidate(input: {
       detail: 'Green Book lane requires living/residence review',
     };
   }
-  if (row.lat === null || row.lng === null) {
+  // Declared here, above the first of the four checks that ask the ADMISSION vs REGRESSION
+  // question: location, depth, confidence, and the name-collision hold that now runs last.
+  const republishingLiveRow = input.allowRepublish === true && row.exact_in_release === true;
+
+  /*
+   * ADMISSION vs REGRESSION (repo-lai8y), the third gate to draw this distinction after depth
+   * (repo-b4ad) and confidence (repo-2t04.17).
+   *
+   *   new record   -> ADMISSION. Unchanged: no coordinates, no publish. The check exists for
+   *                   buildability, not editorial policy — `ReleaseEntityUpsertRow.lat/lng` are
+   *                   non-nullable and `buildGeoPointFields` THROWS on a non-finite lat/lng, so
+   *                   this gate is what turns that throw into an honest skip.
+   *
+   *   already live -> REGRESSION. The record already holds a place, and its own page prints it.
+   *                   This pass is correcting the record's PROSE, not its location, and a
+   *                   landscape row that never carried coordinates is not evidence that the
+   *                   place is gone — it is evidence that this lane never geocoded. Rejecting it
+   *                   here does not un-place anything; it only keeps the stale summary public.
+   *                   Same principle as commit 26a2d036, one layer earlier: a republished record
+   *                   keeps the place its own page prints.
+   *
+   * Measured 2026-09-12: 56 of the 661 staged republish candidates were skipped as
+   * missing_location, all 57 coordinate-less rows in that set are live, and all 57 live records
+   * carry a real projection.location — including the 24 gap_* drafts of repo-2t04.9, which had
+   * been blocked here since 2026-08-17.
+   *
+   * The fallback is deliberately narrow: it needs an explicit `--republish`, a row already live
+   * under its own id, and a live projection that actually carries a finite point. A caller that
+   * loads no live state cannot relax anything by accident, and a row WITH coordinates is
+   * untouched by this branch — the 477 candidates that already republished are unaffected.
+   */
+  const inheritedLocation =
+    (row.lat === null || row.lng === null) && republishingLiveRow ? input.liveLocation : undefined;
+  const locatedRow =
+    inheritedLocation === undefined
+      ? row
+      : { ...row, lat: inheritedLocation.lat, lng: inheritedLocation.lng };
+  if (locatedRow.lat === null || locatedRow.lng === null) {
     return { eligible: false, reason: 'missing_location', detail: 'missing lat/lng' };
   }
   if (row.exact_in_release && !input.allowRepublish) {
@@ -937,41 +1528,26 @@ export function gateLandscapePublishCandidate(input: {
       detail: 'entity id already in active release',
     };
   }
-  // repo-8dlu: the same ADMISSION vs REGRESSION distinction the depth gate makes below.
-  //
-  // For a NEW candidate this check is right and unchanged: do not admit a second
-  // "Mount Zion Missionary Baptist Church" whose name collides with one already public, because
-  // readers cannot tell two identically-named records apart.
-  //
-  // For a row ALREADY LIVE under its own entity id it asks the wrong question. The record is not
-  // competing for a name — it already holds one, and this is an in-place correction of the text
-  // under that name. Blocking it changes nothing about the collision and only keeps the stale
-  // prose public. It fires hardest on exactly the names that repeat by nature (AME churches,
-  // Mount Zion Baptist, Lincoln School), which is why it was pinning 99 live summaries that still
-  // print the raw NPS code `ethnic heritage (Black)` while their corrected, researched prose sat
-  // in bb_research at status='accepted'.
-  //
-  // The SQL behind `name_overlap` already excludes the row's own ids (LANDSCAPE_BY_LANE_SQL:
-  // `re.entity_id <> lc.id AND re.entity_id <> lc.source_item_id`), so a genuine collision with a
-  // DIFFERENT live entity still sets the flag. Skipping it here is a decision about what to do
-  // with that flag on a republish, not a loosening of how it is computed.
-  const republishingLiveRow = input.allowRepublish === true && row.exact_in_release === true;
-  if (row.name_overlap && !republishingLiveRow) {
-    return {
-      eligible: false,
-      reason: 'name_overlap',
-      detail: 'display_name overlaps existing release entity',
-    };
-  }
 
-  const entry = buildReleaseSourceFromLandscape(row);
-  if (!entry) {
+  // `locatedRow` only ever differs from `row` in lat/lng, and only on the inheritance branch
+  // above. It is used HERE rather than for every later `row` read because this is the one call
+  // that reads the row's location: `assessLandscapeDepth` and the confidence engine below read
+  // canonical_url, payload and provenance, where the two rows are identical by construction.
+  const builtEntry = buildReleaseSourceFromLandscape(locatedRow);
+  if (!builtEntry) {
     return {
       eligible: false,
       reason: 'missing_canonical_url',
-      detail: 'insufficient landscape fields to build release source',
+      detail:
+        'insufficient landscape fields to build release source (no canonical_url AND no citable evidence citation, or no usable location)',
     };
   }
+  const inherited =
+    inheritedLocation === undefined
+      ? undefined
+      : inheritLiveLocation({ entry: builtEntry, row, live: inheritedLocation });
+  const entry = inherited?.entry ?? builtEntry;
+  const locationOverride = inherited?.locationOverride;
   // Enrichment and landscape staging require summaries within the current editorial band
   // (repo-2t04.1: 400-900, was 220-400). Best-effort short drafts are validated and
   // ledger-flagged at draft time (entity-enrichment-llm.ts); this coarse length gate does not
@@ -1025,11 +1601,32 @@ export function gateLandscapePublishCandidate(input: {
   const claimConfidence = minClaimConfidence(entry, row);
   const confidence = payloadConfidence ?? claimConfidence;
   if (confidence < floor) {
-    return {
-      eligible: false,
-      reason: 'confidence_below_floor',
-      detail: `confidence ${confidence.toFixed(3)} < floor ${floor}`,
-    };
+    // ADMISSION vs REGRESSION for confidence (repo-2t04.17), same shape as the depth clause
+    // above. The floor was written to keep an unresearched record from reaching the public
+    // corpus for the first time; it was never asked whether a correction to an ALREADY-LIVE
+    // record should have to out-score a bar the live text itself may not clear. A legitimate
+    // institutional citation (e.g. a reputable_secondary .edu source) can score under 0.75 on
+    // the blended measure without being wrong — `CLASSIFICATION_AUTHORITY.reputable_secondary`
+    // alone is 0.75; it is the directness/entity-match defaults that pull a shallow-evidenced
+    // claim on it below the floor. Reclassifying such a host as `primary_archival` to clear the
+    // floor would be dishonest score-gaming, not a fix — this clause lets the actual comparison
+    // that matters (candidate vs. what readers see today) decide instead.
+    //
+    // A live-low-confidence record cannot be made worse by a replacement that scores no lower
+    // than it: allow only when this is a republish of that same live row, a live confidence
+    // score was supplied, that live score is itself below the floor, and the candidate does not
+    // score below it. A live record that already clears the floor still cannot be overwritten
+    // by a weaker candidate — that transition stays forbidden.
+    const liveConfidenceBelowFloor =
+      input.liveConfidence !== undefined && input.liveConfidence < floor;
+    const notARegression = input.liveConfidence !== undefined && confidence >= input.liveConfidence;
+    if (!republishingLiveRow || !liveConfidenceBelowFloor || !notARegression) {
+      return {
+        eligible: false,
+        reason: 'confidence_below_floor',
+        detail: `confidence ${confidence.toFixed(3)} < floor ${floor}`,
+      };
+    }
   }
 
   const build = buildReleaseEntityArtifacts(
@@ -1038,9 +1635,18 @@ export function gateLandscapePublishCandidate(input: {
       releaseId: input.releaseId,
       generatedAt: input.generatedAt,
       ...(input.canonicalStatus !== undefined ? { canonicalStatus: input.canonicalStatus } : {}),
+      ...(input.visitOverride !== undefined ? { visitOverride: input.visitOverride } : {}),
+      ...(locationOverride !== undefined ? { locationOverride } : {}),
+      ...(input.catalogDecision !== undefined ? { catalogDecision: input.catalogDecision } : {}),
     }),
   );
   if (!build.ok) {
+    // The withdrawal ruling gets its own skip reason instead of the generic `build_failed`, so
+    // a run report counts it separately and an operator can see at a glance that a retraction
+    // held. The rule that produced it still lives in one place, the release builder.
+    if (build.reason === 'catalog_decision_retracted') {
+      return { eligible: false, reason: 'catalog_decision_retracted', detail: build.message };
+    }
     return {
       eligible: false,
       reason: 'build_failed',
@@ -1048,35 +1654,80 @@ export function gateLandscapePublishCandidate(input: {
     };
   }
 
-  return { eligible: true, entry, confidence };
+  /*
+   * LAST, deliberately: every other check runs first (repo-n7p6.10).
+   *
+   * repo-8dlu: the same ADMISSION vs REGRESSION distinction the depth gate makes above.
+   *
+   * For a NEW candidate this check is right and unchanged: do not admit a second
+   * "Mount Zion Missionary Baptist Church" whose name collides with one already public, because
+   * readers cannot tell two identically-named records apart.
+   *
+   * For a row ALREADY LIVE under its own entity id it asks the wrong question. The record is not
+   * competing for a name — it already holds one, and this is an in-place correction of the text
+   * under that name. Blocking it changes nothing about the collision and only keeps the stale
+   * prose public. It fires hardest on exactly the names that repeat by nature (AME churches,
+   * Mount Zion Baptist, Lincoln School), which is why it was pinning 99 live summaries that still
+   * printed the raw NPS code `ethnic heritage (Black)` while their corrected, researched prose
+   * sat in bb_research at status='accepted'.
+   *
+   * The SQL behind `name_overlap` already excludes the row's own ids (LANDSCAPE_BY_LANE_SQL:
+   * `re.entity_id <> lc.id AND re.entity_id <> lc.source_item_id`), so a genuine collision with a
+   * DIFFERENT live entity still sets the flag. Skipping it on a republish is a decision about
+   * what to do with that flag, not a loosening of how it is computed.
+   *
+   * WHY LAST. Eligibility is a conjunction, so position cannot change WHETHER a row publishes.
+   * It changes only which reason the skip report prints, and this is the one reason whose remedy
+   * is a person rather than more research. Ranked ahead of the content gates it masked them:
+   * measured 2026-09-13, 76 held candidates reported `name_overlap`, and with the flag ignored 70
+   * of them still failed a content check. `summary_too_short` took 32 of those, including all 18
+   * nrhp-black-heritage rows (319-392 chars against the 400 floor); the rest fell to
+   * missing_location, greenbook_lane or person_kind. That misattribution is what repo-n7p6.10 was
+   * filed on: "each of the 99 needs a human look", when adjudicating any of them would have
+   * changed nothing. Run last, the `name_overlap` bucket means what a review queue needs it to
+   * mean: this row is publish-ready in every other respect, and only the name collision is left
+   * to settle.
+   *
+   * The cost is building the entry for a row that will be skipped anyway. That is pure CPU on a
+   * row the publisher was already going to read, and buying an honest skip reason with it is the
+   * trade this gate wants.
+   */
+  if (row.name_overlap && !republishingLiveRow) {
+    return {
+      eligible: false,
+      reason: 'name_overlap',
+      detail: 'display_name overlaps existing release entity',
+    };
+  }
+
+  return {
+    eligible: true,
+    entry,
+    confidence,
+    ...(locationOverride !== undefined ? { locationOverride } : {}),
+  };
 }
 
 export function toReleaseEntityRow(
   projection: ReleaseEntityProjectionFields,
 ): ReleaseEntityUpsertRow {
+  /*
+   * The normalizers now run INTO the projection rather than beside it, and that is a correctness
+   * change rather than a tidy-up.
+   *
+   * They used to produce the `claims` and `related` COLUMNS while the projection kept whatever
+   * shape it arrived with. So `normalizeReleaseClaims`, which exists because four seed rows once
+   * reached bb_public with `claims: {}` and broke every jsonb_array_length consumer
+   * (repo-n7p6.14), was guarding the copy nobody reads and not the projection every reader
+   * serves. With the columns generated from the projection, normalizing here is the only place
+   * that guard can live — and it now protects the right store.
+   */
   const related = normalizeReleaseRelated(projection.related);
   const claims = normalizeReleaseClaims(projection.claims);
   return {
     release_id: projection.releaseId,
     entity_id: projection.id,
-    display_name: projection.displayName,
-    kind: projection.kind,
-    summary: projection.summary,
-    location: projection.location,
-    geohash: projection.location.geohash,
-    lat: projection.location.lat,
-    lng: projection.location.lng,
-    claims,
-    taxonomy: {
-      topicTags: projection.topicTags,
-      topicIds: projection.topicIds,
-      notabilityLabels: projection.notabilityLabels,
-    },
-    related,
-    projection: {
-      ...projection,
-      ...(projection.related === undefined && related.length === 0 ? { related: [] } : {}),
-    },
+    projection: { ...projection, claims, related },
   };
 }
 
@@ -1093,7 +1744,15 @@ export function toSearchIndexRow(
     name: searchIndex.displayName,
     name_lower: searchIndex.nameLower,
     aliases: searchIndex.aliases ?? [],
-    topics: searchIndex.topicTags ?? searchIndex.topicIds ?? [],
+    /*
+     * repo-ttlce: NON-EMPTY tags, else ids — not `??`, which falls through only on nullish. Every
+     * lane whose topics are ids without display tags builds `topicTags: []`, so the nullish form
+     * wrote an EMPTY topics column over real topics on 2,141 live rows (repo-p1m1y, measured
+     * 2026-09-12), taking every incrementally published record out of topic browse and topic
+     * filters while its projection still looked correct. Shared with the divergence audit and the realigner so the rule cannot
+     * drift a fourth time.
+     */
+    topics: [...searchTopicsFromProjection(searchIndex)],
     kind: searchIndex.kind,
     status: searchIndex.status ?? null,
     geohash,
@@ -1133,7 +1792,7 @@ export function toSearchIndexRow(
       keywords: searchIndex.keywords ?? [],
       researchCoverage: searchIndex.researchCoverage,
       recordMaturity: searchIndex.recordMaturity,
-      confidenceTier: searchIndex.confidenceTier,
+      evidenceInputs: searchIndex.evidenceInputs,
       topicIds: searchIndex.topicIds ?? [],
       mentionedEntityIds: searchIndex.mentionedEntityIds ?? [],
       notabilityBasis: searchIndex.notabilityBasis ?? [],
@@ -1159,6 +1818,17 @@ export function buildArtifactsForEntry(input: {
   readonly releaseId: string;
   readonly generatedAt: string;
   readonly canonicalStatus?: CanonicalStatusSnapshot;
+  /** See the matching field on `gateLandscapePublishCandidate`'s input. */
+  readonly visitOverride?: PublicVisit;
+  /** `gateLandscapePublishCandidate`'s `locationOverride` result, forwarded verbatim. */
+  readonly locationOverride?: ReleaseLocationOverride;
+  /**
+   * See the matching field on `gateLandscapePublishCandidate`'s input. Forwarded here as well
+   * because this, not the gate, is the call that produces the rows the publisher upserts: the
+   * gate's build is a probe, and a caller that reached this function by some other route must
+   * still not be able to write a withdrawn record back into the release.
+   */
+  readonly catalogDecision?: PublishCatalogDecision;
 }): PublishArtifactsResult {
   const build = buildReleaseEntityArtifacts(
     input.entry,
@@ -1166,6 +1836,9 @@ export function buildArtifactsForEntry(input: {
       releaseId: input.releaseId,
       generatedAt: input.generatedAt,
       ...(input.canonicalStatus !== undefined ? { canonicalStatus: input.canonicalStatus } : {}),
+      ...(input.visitOverride !== undefined ? { visitOverride: input.visitOverride } : {}),
+      ...(input.locationOverride !== undefined ? { locationOverride: input.locationOverride } : {}),
+      ...(input.catalogDecision !== undefined ? { catalogDecision: input.catalogDecision } : {}),
     }),
   );
   if (!build.ok) {

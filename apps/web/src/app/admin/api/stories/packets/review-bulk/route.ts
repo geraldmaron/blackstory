@@ -2,10 +2,7 @@
  * API: bulk approve / reject / needs_evidence for staged story packets.
  * Cap 50. Does not publish — approve only records reviews (+ seed handoffs).
  */
-import {
-  authorizeAdminRequest,
-  authErrorResponse,
-} from '../../../../../../admin/auth/request-auth';
+import { authorizeAdminRoute, authErrorResponse } from '../../../../../../admin/auth/request-auth';
 import {
   assertStoryBulkSelection,
   STORY_REVIEW_BULK_LIMIT,
@@ -25,7 +22,7 @@ type Body = {
 
 export async function POST(request: Request): Promise<Response> {
   try {
-    const caller = await authorizeAdminRequest(request.headers);
+    const caller = await authorizeAdminRoute(request);
     const body = (await request.json()) as Body;
     const decision = body.decision;
     if (!decision || !DECISIONS.has(decision as StoryPacketReviewDecision)) {

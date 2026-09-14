@@ -9,9 +9,17 @@
  * flush already landed.
  */
 import { fireEvent, render, waitFor } from '@testing-library/react-native';
+import { StyleSheet } from 'react-native';
 import { TransportError } from '@/data';
+import { MIN_TOUCH_TARGET } from '@/ui';
 import { SearchScreen } from '../SearchScreen';
-import { buildRuntime, fakeReleaseCache, flushMicrotasks, makeControllableTransport, page } from '../test-support';
+import {
+  buildRuntime,
+  fakeReleaseCache,
+  flushMicrotasks,
+  makeControllableTransport,
+  page,
+} from '../test-support';
 
 jest.mock('expo-router', () => ({
   router: { push: jest.fn(), setParams: jest.fn() },
@@ -59,12 +67,16 @@ describe('SearchScreen — deep-link round trip (MOB-013 item 7)', () => {
     const releaseCache = fakeReleaseCache('r1');
     const { runtime } = buildRuntime(transport, releaseCache);
 
-    await render(<SearchScreen initialQuery="harriet tubman" initialKind="person" runtime={runtime} />);
+    await render(
+      <SearchScreen initialQuery="harriet tubman" initialKind="person" runtime={runtime} />,
+    );
     await flushMicrotasks(10);
     resolveNext(page());
 
     await waitFor(() =>
-      expect(router.setParams).toHaveBeenCalledWith(expect.objectContaining({ q: 'harriet tubman', kind: 'person' })),
+      expect(router.setParams).toHaveBeenCalledWith(
+        expect.objectContaining({ q: 'harriet tubman', kind: 'person' }),
+      ),
     );
   });
 
@@ -102,11 +114,38 @@ describe('SearchScreen — result rendering', () => {
     const releaseCache = fakeReleaseCache('r1');
     const { runtime } = buildRuntime(transport, releaseCache);
 
-    const { getByText } = await render(<SearchScreen initialQuery="tubman" runtime={runtime} />);
+    const { getByText, getByTestId, getByLabelText } = await render(
+      <SearchScreen initialQuery="tubman" runtime={runtime} />,
+    );
     await flushMicrotasks(10);
     resolveNext(page());
 
     await waitFor(() => expect(getByText('Harriet Tubman')).toBeTruthy());
+    expect(getByTestId('search-results-list').props.accessibilityRole).toBe('list');
+    expect(getByLabelText(/^Harriet Tubman\./).props.accessibilityLabel).toMatch(/ 1 of 1\.$/);
+  });
+
+  // Found on the iOS simulator: the kind chips were 37pt tall, and iOS got the native
+  // clearButtonMode glyph, a 14pt target, instead of the screen's own clear button.
+  it('keeps the kind chips and the clear control at the platform touch-target floor', async () => {
+    const { transport, resolveNext } = makeControllableTransport({ cooperative: true });
+    const releaseCache = fakeReleaseCache('r1');
+    const { runtime } = buildRuntime(transport, releaseCache);
+
+    const { getByLabelText } = await render(
+      <SearchScreen initialQuery="tubman" runtime={runtime} />,
+    );
+    fireEvent.changeText(getByLabelText('Search'), 'tubman');
+    await flushMicrotasks(10);
+    resolveNext(page());
+
+    const chip = await waitFor(() => getByLabelText('People'));
+    const chipStyle = StyleSheet.flatten(chip.props.style);
+    expect(chipStyle.minHeight).toBe(MIN_TOUCH_TARGET);
+    // The label-only "All" chip was 31pt wide on the simulator.
+    expect(chipStyle.minWidth).toBe(MIN_TOUCH_TARGET);
+    // jest-expo runs as iOS, where this control used to be hidden in favor of the native glyph.
+    expect(getByLabelText('Clear search')).toBeTruthy();
   });
 
   it('wires Show on map to Explore with selected id and kind', async () => {
@@ -114,7 +153,9 @@ describe('SearchScreen — result rendering', () => {
     const releaseCache = fakeReleaseCache('r1');
     const { runtime } = buildRuntime(transport, releaseCache);
 
-    const { getByLabelText } = await render(<SearchScreen initialQuery="tubman" runtime={runtime} />);
+    const { getByLabelText } = await render(
+      <SearchScreen initialQuery="tubman" runtime={runtime} />,
+    );
     await flushMicrotasks(10);
     resolveNext(page());
 
@@ -134,7 +175,9 @@ describe('SearchScreen — offline states reach the actual rendered UI (never a 
     const releaseCache = fakeReleaseCache(undefined);
     const { runtime } = buildRuntime(transport, releaseCache);
 
-    const { getByText } = await render(<SearchScreen initialQuery="nobody searched this yet" runtime={runtime} />);
+    const { getByText } = await render(
+      <SearchScreen initialQuery="nobody searched this yet" runtime={runtime} />,
+    );
     await flushMicrotasks(10);
     rejectNext(new TransportError('offline', { kind: 'network', attempts: 4 }));
 

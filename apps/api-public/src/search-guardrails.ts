@@ -10,6 +10,7 @@ import {
   type QueryGuardrailDecisionDenied,
   type SearchQueryInput,
 } from '@repo/security';
+import { decadeParamToEra } from '@repo/public-contracts/discovery';
 
 export type PublicSearchHttpQuery = {
   readonly q?: string;
@@ -17,6 +18,7 @@ export type PublicSearchHttpQuery = {
   readonly state?: string;
   readonly precision?: string;
   readonly releaseId?: string;
+  readonly era?: string;
   readonly sort?: string;
   readonly pageSize?: string;
   readonly cursor?: string;
@@ -75,6 +77,17 @@ export function parsePublicSearchQuery(raw: PublicSearchHttpQuery): SearchQueryI
   }
   if (raw.releaseId !== undefined) {
     filters.releaseId = raw.releaseId;
+  }
+  if (raw.era !== undefined) {
+    // Normalized through the shared discovery vocabulary (`@repo/public-contracts/discovery`) —
+    // the same transform web's `/history` redirect and the mobile app's deep-link handling use, so
+    // `era=1950` and `era=1950s` are equivalent here too. A value that isn't a decade bucket drops
+    // out rather than denying the whole request, mirroring `decadeParamToEra`'s own documented
+    // behavior: a junk decade should never become a filter that matches no record.
+    const era = decadeParamToEra(raw.era);
+    if (era !== undefined) {
+      filters.era = era;
+    }
   }
 
   const pageSize = raw.pageSize !== undefined ? parseOptionalInt(raw.pageSize) : undefined;

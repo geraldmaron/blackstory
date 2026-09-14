@@ -17,7 +17,6 @@ type SearchPageProps = {
 
 export default async function SearchPage({ searchParams }: SearchPageProps) {
   const params = await searchParams;
-  // Permanent, so this resolves as a 308 like every config rule in the table. A 307 would tell
-  // crawlers to keep indexing `/search` as the canonical home of a surface that no longer exists.
+  // Permanent (308) redirect, like every config rule in the table, so crawlers index `/records` as canonical.
   permanentRedirect(mapSearchQueryToRecordsHref(params));
 }

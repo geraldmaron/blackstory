@@ -109,7 +109,8 @@ export async function handleLocateRequest(
       if (!addressParam.trim()) {
         return jsonError(400, 'invalid_locate_query', { reason: 'empty_address' });
       }
-      // `camera=1` opts into retaining lat/lng for a one-shot explore map fly-to (ADR-008
+      // `camera=1` opts into retaining lat/lng for a one-shot explore map fly-to (see
+      // `docs/decisions-carryover.md`, "Search and geocoding"
       // decision 5: coordinates kept only while needed for the current response). Ordinary
       // `/locate` UI never sets this flag.
       const retainExactCoordinates = url.searchParams.get('camera') === '1';

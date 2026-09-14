@@ -1,5 +1,7 @@
 /**
- * Firestore collection path constants for BlackStory (ADR-011 018).
+ * Collection path constants for BlackStory. Firestore-era names, still used as the shared
+ * vocabulary over Supabase Postgres. See docs/decisions-carryover.md, "Firestore as system of
+ * record, reversed".
  * Paths always use even segment counts (collection/doc[/collection/doc...]).
  */
 export const FIRESTORE_ROOT = {
@@ -104,9 +106,6 @@ export const firestorePaths = {
     `${FIRESTORE_ROOT.publicMeta}/historicalStatePopulationCoverage`,
   publicEntity: (releaseId: string, entityId: string) =>
     `${FIRESTORE_ROOT.publicReleases}/${releaseId}/entities/${entityId}`,
-  /** Longform editorial stories for `/stories` (Admin SDK / release artifact reads). */
-  publicStory: (releaseId: string, slug: string) =>
-    `${FIRESTORE_ROOT.publicReleases}/${releaseId}/stories/${slug}`,
   publicSearchIndex: (docId: string) => `${FIRESTORE_ROOT.publicSearchIndex}/${docId}`,
   submissionInbox: (submissionId: string) => `${FIRESTORE_ROOT.submissionInbox}/${submissionId}`,
   auditEvent: (eventId: string) => `${FIRESTORE_ROOT.auditEvents}/${eventId}`,

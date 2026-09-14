@@ -4,9 +4,11 @@
  * `generateMetadata` and the page both need the same `buildRecordsIndex` result. Without a
  * cache, one `/records` request built the full catalog index twice.
  *
- * Prefers the search_index slim when active-release docs carry projected `confidenceTier`
- * (release-builder + `backfill-search-facets-confidence.ts`). Falls back to full entities so
- * evidence floors stay honest before the backfill lands.
+ * Prefers the search_index slim when active-release docs carry projected `evidenceInputs`
+ * (release-builder + `backfill-search-facets-evidence-inputs.ts`). The slim path caches the
+ * grading INPUTS and applies the shared tier rule at read time, so it is not a second opinion
+ * about a record's grade — see `build-records-index.ts`. Falls back to full entities so evidence
+ * floors stay honest before the backfill lands.
  */
 import { cache } from 'react';
 import { getSharedPublicEntities } from '../../lib/map-experience/shared-map-data';

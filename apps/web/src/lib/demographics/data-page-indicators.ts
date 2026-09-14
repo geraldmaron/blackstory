@@ -9,7 +9,7 @@ import {
   type DataPageIndicatorBundle,
   type DataPageObservationRow,
 } from '@repo/domain/statistics/data-page-series';
-import { fetchMaterializedSnapshot } from '../public-data/public-readers';
+import { fetchMaterializedSnapshot } from '../public-data/materialized-snapshots';
 import { queryPostgres, resolvePostgresConnectionString } from '../public-data/postgres-client';
 
 const DATA_PAGE_METRIC_IDS = [
@@ -19,12 +19,19 @@ const DATA_PAGE_METRIC_IDS = [
   'imprisonment-rate-white-state',
   'nhgis-homeownership-rate-black-county',
   'nhgis-homeownership-rate-white-county',
+  'acs-homeownership-rate-black-county',
+  'acs-homeownership-rate-white_nh-county',
   'hmda-denial-rate-black-county',
   'hmda-denial-rate-white-county',
   'ussc-average-sentence-months-crack-nation',
   'ussc-average-sentence-months-powder-nation',
   'hud-chas-cost-burden-black-county',
   'hud-chas-cost-burden-white-county',
+  'dkks-wealth-ratio-white-black-nation',
+  'census-decennial-homeownership-black-nation',
+  'census-decennial-homeownership-white_nh-nation',
+  'acs-homeownership-rate-black-nation',
+  'acs-homeownership-rate-white_nh-nation',
 ] as const;
 
 type ObservationQueryRow = {

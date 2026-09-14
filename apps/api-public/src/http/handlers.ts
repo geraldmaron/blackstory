@@ -10,7 +10,8 @@
  * that fails its contract is a server bug and becomes an `INTERNAL` error, never a malformed
  * payload on the wire.
  *
- * Client attestation posture (Threat model T1/T2; ADR-010 / ADR-020):
+ * Client attestation posture (Threat model T1/T2; docs/decisions-carryover.md,
+ * "Security and abuse assumptions" and "entity source-of-truth precedence"):
  *   - `X-BlackStory-Client` is an abuse-trust signal for direct API callers (mobile), not
  *     authorization. A missing header NEVER hard-denies a read — it feeds rate limits as the
  *     lowest-trust anonymous subject (fail-open for static reads; expensive reads need the header
@@ -40,7 +41,13 @@ import type { createPublicSearchGuard } from '../search-guardrails.js';
 import { type PublicSearchHttpQuery } from '../search-guardrails.js';
 import { buildMapSourceV1 } from './build-map-source-v1.js';
 import type { PublicDataAccess } from './data-access.js';
-import { CACHE_CONTROL, errorResponse, jsonRead, type ApiResponse } from './responses.js';
+import {
+  CACHE_CONTROL,
+  errorResponse,
+  jsonRead,
+  permanentRedirectResponse,
+  type ApiResponse,
+} from './responses.js';
 import type { FindNearestEndpoint } from '../vector-search-endpoint.js';
 import type { VectorSearchHttpQuery } from '../vector-search-guardrails.js';
 
@@ -71,13 +78,15 @@ export type HandlerDeps = {
 const ENTITY_ID_PATTERN = /^[A-Za-z0-9_-]{1,200}$/;
 
 // ---------------------------------------------------------------------------
-// Client-version floor (ADR-021 §2)
+// Client-version floor (`docs/decisions-carryover.md`, "ADR-021's two invariants":
+// app/API compatibility)
 // ---------------------------------------------------------------------------
 
 /** Parses `X-BlackStory-Client: <platform>/<semver>; api=<n>` into a normalized `v<n>` api major.
  * Absent/unparseable header → `undefined` (unknown), which is treated as "not below floor": the
- * floor is a UX affordance for HONEST clients (ADR-021 red-team resolution #2), never a security
- * gate, so we never fail-closed on a missing header. */
+ * floor is a UX affordance for HONEST clients, never a security gate, so we never fail-closed on
+ * a missing header (`docs/decisions-carryover.md`, "ADR-021's two invariants": the floor fails
+ * open). */
 export function parseClientApiVersion(headerValue: string | undefined): string | undefined {
   if (!headerValue) return undefined;
   const apiMatch = /(?:^|;|\s)api=(\d{1,5})\b/i.exec(headerValue);
@@ -145,8 +154,11 @@ export function handleCompatibility(request: ApiRequest): ApiResponse {
     );
   }
 
-  // A supported-but-not-current client gets a soft `Deprecation` signal (ADR-021 red-team
-  // resolution #1) so the client can surface an "update available" nudge before the hard floor.
+  // A supported-but-not-current client gets a soft `Deprecation` signal so it can surface an
+  // "update available" nudge before the hard floor (`docs/decisions-carryover.md`, "ADR-021's
+  // two invariants": the deprecation window). Dormant today: `API_VERSION` and
+  // `MIN_SUPPORTED_API_VERSION` are both `v1`, so `softDeprecated` is never true, and this header
+  // is only ever sent on `/v1/compatibility` — never on an ordinary read.
   const extraHeaders = compat.softDeprecated ? { Deprecation: 'true' } : undefined;
   return {
     status: 200,
@@ -235,8 +247,36 @@ export async function handleEntity(
     }
 
     const entity = await deps.dataAccess.getEntity(pointer.activeRelease.releaseId, entityId);
-    // IDENTICAL 404 for nonexistent AND unpublished — a client must not distinguish them (T3).
     if (!entity) {
+      // A merged-away id is not a miss — it is an address that moved. repo-n7p6.15 correctly
+      // stopped publishing absorbed records; without this the ids they used to answer on became
+      // indistinguishable 404s (repo-n7p6.29).
+      //
+      // The redirect lookup runs on EVERY miss, not only on ids we expect to forward, so the
+      // backend call sequence is identical for nonexistent, unpublished and absorbed ids — the
+      // T3 property the enumeration tests pin. What a 308 reveals is only what
+      // bb_public.release_entity_redirects publishes on purpose: an already-public id and the
+      // published survivor it folded into.
+      const redirectTo = await deps.dataAccess.getEntityRedirect(
+        pointer.activeRelease.releaseId,
+        entityId,
+      );
+      // The target is re-validated against the same id grammar the request had to pass: a
+      // Location header is a value this surface emits, and it is built from a database row.
+      if (redirectTo !== undefined && ENTITY_ID_PATTERN.test(redirectTo)) {
+        // Confirm the survivor is actually published before pointing anyone at it; a redirect to
+        // another 404 is worse than the 404 the reader already had.
+        const survivor = await deps.dataAccess.getEntity(
+          pointer.activeRelease.releaseId,
+          redirectTo,
+        );
+        if (survivor) {
+          return permanentRedirectResponse(`/v1/entity/${redirectTo}`, {
+            requestId: request.requestId,
+          });
+        }
+      }
+      // IDENTICAL 404 for nonexistent AND unpublished — a client must not distinguish them (T3).
       return notFoundEntity(request);
     }
 
@@ -266,7 +306,10 @@ function notFoundEntity(request: ApiRequest): ApiResponse {
 // GET /v1/map
 // ---------------------------------------------------------------------------
 
-/** Release-coupled redacted GeoJSON FeatureCollection for Explore (ADR-025 / MapSourceV1). */
+/**
+ * Release-coupled redacted GeoJSON FeatureCollection for Explore (`docs/decisions-carryover.md`,
+ * "Explore basemap and live map source").
+ */
 export async function handleMap(request: ApiRequest, deps: HandlerDeps): Promise<ApiResponse> {
   const floor = enforceClientFloor(request);
   if (floor) return floor;
@@ -386,6 +429,7 @@ const SEARCH_QUERY_KEYS = [
   'state',
   'precision',
   'releaseId',
+  'era',
   'sort',
   'pageSize',
   'cursor',

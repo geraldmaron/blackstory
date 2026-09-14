@@ -39,25 +39,37 @@ describe('no-query-log guarantee: this feature never calls console.* anywhere', 
   const files = listSourceFiles(FEATURE_DIR);
 
   it('found at least the expected source files (sanity check that the scan is not vacuously empty)', () => {
-    expect(files.length).toBeGreaterThan (5);
+    expect(files.length).toBeGreaterThan(5);
   });
 
-  it.each(files.map((f) => [f.replace(FEATURE_DIR, ''), f] as const))('%s never references `console`', (_label, file) => {
-    const contents = readFileSync(file, 'utf8');
-    const hasCall = CONSOLE_CALL_PATTERN.test(contents);
-    const hasReference = CONSOLE_REFERENCE_PATTERN.test(contents);
-    expect({ file: _label, hasCall, hasReference }).toEqual({ file: _label, hasCall: false, hasReference: false });
-  });
+  it.each(files.map((f) => [f.replace(FEATURE_DIR, ''), f] as const))(
+    '%s never references `console`',
+    (_label, file) => {
+      const contents = readFileSync(file, 'utf8');
+      const hasCall = CONSOLE_CALL_PATTERN.test(contents);
+      const hasReference = CONSOLE_REFERENCE_PATTERN.test(contents);
+      expect({ file: _label, hasCall, hasReference }).toEqual({
+        file: _label,
+        hasCall: false,
+        hasReference: false,
+      });
+    },
+  );
 });
 
 describe('no-query-log guarantee: no analytics-shaped call site in this feature', () => {
   const files = listSourceFiles(FEATURE_DIR);
-  // program invariant 7 / ADR-020 §3: no analytics SDK is even a dependency, but scan for the
-  // SHAPE of an analytics call too (defense in depth against a future accidental import).
+  // program invariant 7 / `docs/decisions-carryover.md`, "Mobile stack" (no Firebase or analytics
+  // SDK): no analytics SDK is even a dependency — `src/observability/no-raw-sdk-imports.test.ts`
+  // is the repo-wide gate — but scan for the SHAPE of an analytics call too (defense in depth
+  // against a future accidental import).
   const ANALYTICS_PATTERN = /\b(analytics|logEvent|trackEvent|Sentry\.captureMessage)\s*\(/i;
 
-  it.each(files.map((f) => [f.replace(FEATURE_DIR, ''), f] as const))('%s has no analytics-shaped call', (_label, file) => {
-    const contents = readFileSync(file, 'utf8');
-    expect(ANALYTICS_PATTERN.test(contents)).toBe(false);
-  });
+  it.each(files.map((f) => [f.replace(FEATURE_DIR, ''), f] as const))(
+    '%s has no analytics-shaped call',
+    (_label, file) => {
+      const contents = readFileSync(file, 'utf8');
+      expect(ANALYTICS_PATTERN.test(contents)).toBe(false);
+    },
+  );
 });

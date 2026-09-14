@@ -1,6 +1,6 @@
 /**
- * Log scrubbing (MOB-010; privacy invariant 7, ADR-020 §3, threat-model
- * T1/privacy).
+ * Log scrubbing (MOB-010; privacy invariant 7, threat-model T1/privacy; see
+ * `docs/decisions-carryover.md`, "Mobile stack": no Firebase or analytics SDK).
  *
  * The mobile app must NEVER emit — to console, crash reports, or any log
  * sink — any of these sensitive categories:
@@ -10,7 +10,9 @@
  *   - precise location                 (device lat/lng, fine coordinates)
  *   - citation / source URLs           (which specific evidence was viewed)
  *   - sensitive entity classifications (e.g. protected-status / era labels)
- *   - raw App Check tokens             (attestation JWTs — ADR-010, never log)
+ *   - raw attestation credentials      (JWT-shaped values — never log; see
+ *     docs/decisions-carryover.md, "Security and abuse assumptions", for why
+ *     this predates the retired App Check mechanism)
  *
  * `redactForLog` takes an arbitrary log payload (string or object/error) and
  * returns a structurally-similar value with every sensitive field/value
@@ -90,11 +92,7 @@ export function redactedLogLine(payload: unknown): string {
   }
 }
 
-function redactValue(
-  value: unknown,
-  depth: number,
-  seen: WeakSet<object>,
-): unknown {
+function redactValue(value: unknown, depth: number, seen: WeakSet<object>): unknown {
   if (depth > MAX_DEPTH) {
     return REDACTED;
   }

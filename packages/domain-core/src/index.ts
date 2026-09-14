@@ -1,7 +1,7 @@
 /**
  * Barrel for @repo/domain-core: security-independent domain primitives shared by @repo/domain
- * and @repo/security. See package.json's description for why this package exists (breaking the
- * domain <-> security circular dependency).
+ * and @repo/security. This package depends on @repo/schemas only, so @repo/security can read
+ * these primitives without importing @repo/domain (which imports @repo/security).
  */
 export * from './living.js';
 export * from './era.js';

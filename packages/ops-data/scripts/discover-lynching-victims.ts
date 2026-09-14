@@ -161,7 +161,9 @@ function parseCell(raw: string): { rowspan: number; value: string } {
   let cell = raw.trim();
   if (cell.startsWith('|')) cell = cell.slice(1).trim();
   const rowspanMatch = /^rowspan\s*=\s*"?(\d+)"?\s*\|([\s\S]*)$/u.exec(cell);
-  if (rowspanMatch) return { rowspan: Number(rowspanMatch[1]), value: rowspanMatch[2].trim() };
+  if (rowspanMatch) {
+    return { rowspan: Number(rowspanMatch[1]), value: (rowspanMatch[2] ?? '').trim() };
+  }
   return { rowspan: 1, value: cell };
 }
 

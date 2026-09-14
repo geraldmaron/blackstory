@@ -7,7 +7,7 @@
 
 **Purpose:** Define read-only tool shapes for an **operator / research** MCP that wraps PostgREST or internal readers over `bb_reference` statistical tables and published entities. This is **not** the public Black-history MCP ([public-mcp-unlock-criteria.md](public-mcp-unlock-criteria.md)).
 
-**Depends on:** Phase 1 indicator catalog + `statistical_series` / `statistical_observations` tables; ADR-026 published views for entity reads; [juxtaposition-not-causation.md](../methodology/juxtaposition-not-causation.md).
+**Depends on:** Phase 1 indicator catalog + `statistical_series` / `statistical_observations` tables; the published-views decision for entity reads (`../decisions-carryover.md`, "Small recovered decisions", ADR-026 entry); [juxtaposition-not-causation.md](../methodology/juxtaposition-not-causation.md).
 
 **Hard rules:** No research-write paths. No service-role credentials shared with a public MCP. Every numeric field returns provenance. Never invent causal impact language.
 

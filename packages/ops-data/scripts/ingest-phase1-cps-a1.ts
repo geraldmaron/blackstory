@@ -1,8 +1,10 @@
 /**
  * Census CPS A-1 Historical Reported Voting Rates ingest for Phase 1 observations
- * into bb_reference.statistical_observations. Extends existing turnout metrics
- * (1992-2020) with missing presidential years 1964-1988 and adds new registration
- * metrics for Black and White populations.
+ * into bb_reference.statistical_observations. Extends the Black turnout metric back
+ * to 1964 and adds new Black + White non-Hispanic registration metrics (repo-zxjz.8).
+ * White turnout stays at 1980-2020: the source table has no "White non-Hispanic"
+ * breakout at all before 1980 (see the fixture CSV's header comment), so extending
+ * it further back would mean quietly swapping in a different race definition.
  *
  * Usage (repo root):
  *   # Dry-run (default)
@@ -41,6 +43,45 @@ const CPS_A1_URL =
 const CPS_A1_RETRIEVED = '2026-07-24T05:02:00.000Z';
 const NATION_JURISDICTION = 'nation:US';
 
+/**
+ * THE SEAM. CPS Table A-1 publishes a citizen-population rate only from 1980 on. For 1964-1976
+ * the sheet's citizen columns (D/F/H/J/L/N) are literally the string "NA" and only the
+ * total-voting-age-population columns (C/E/G/I/K/M) carry a figure. The derived fixture already
+ * falls back to the total-population column for those years — correctly, since the alternative
+ * is no pre-1980 history at all — but nothing recorded that it had done so, and every
+ * observation went to Postgres with `metadata = {}`. A reader comparing 1976 to 1980 was
+ * comparing two different denominators with no way to know it.
+ *
+ * Census says so itself, in Table A-1's own footnote, quoted verbatim in the fixture header:
+ * estimates before 1996 "should be interpreted with caution, as they are not directly comparable
+ * to estimates from 1996 and after."
+ *
+ * So each observation now carries the universe it was actually computed on. repo-zxjz.8's second
+ * acceptance clause asks for exactly this ("record which years use which").
+ */
+const POPULATION_UNIVERSE_SEAM_YEAR = 1980;
+
+function populationUniverseFor(year: number): 'citizen' | 'total-voting-age' {
+  return year >= POPULATION_UNIVERSE_SEAM_YEAR ? 'citizen' : 'total-voting-age';
+}
+
+function observationMetadata(
+  year: number,
+  raceDefinition: string,
+  sourceColumn: string,
+): Record<string, unknown> {
+  return {
+    populationUniverse: populationUniverseFor(year),
+    raceDefinition,
+    sourceTable: 'Census CPS Table A-1',
+    sourceColumn,
+    comparabilityCaution:
+      year < 1996
+        ? 'Census: pre-1996 citizenship was not collected uniformly; not directly comparable to 1996+.'
+        : null,
+  };
+}
+
 interface CpsObservationDraft {
   readonly id: string;
   readonly metricId: string;
@@ -54,6 +95,12 @@ interface CpsObservationDraft {
   readonly sourceUrl: string;
   readonly retrievedAt: string;
   readonly contentHash: string;
+  /**
+   * Per-observation universe. NOT decoration: CPS Table A-1 changes what it counts partway
+   * through its own history, and without this the change is invisible to anyone reading the
+   * numbers back. See POPULATION_UNIVERSE_SEAM_YEAR.
+   */
+  readonly metadata: Record<string, unknown>;
 }
 
 interface CpsSeriesDraft {
@@ -113,20 +160,29 @@ function fetchCpsA1Observations(options: {
   const rejected: string[] = [];
 
   const lines = fixtureCsvText.split('\n').filter((l) => l.trim() && !l.startsWith('#'));
-  if (lines.length === 0) {
+  const headerLine = lines[0];
+  if (headerLine === undefined) {
     throw new Error('CSV has no data rows');
   }
 
-  const headers = lines[0].split(',').map((h) => h.trim());
+  const headers = headerLine.split(',').map((h) => h.trim());
   const expectedHeaders = [
     'year',
     'white_non_hispanic_citizen_pct',
     'black_citizen_pct',
     'asian_citizen_pct',
     'hispanic_citizen_pct',
+    'black_registered_citizen_pct',
+    'white_non_hispanic_registered_citizen_pct',
+    'white_incl_hispanic_pct',
   ];
 
-  if (!headers.every((h, i) => h === expectedHeaders[i])) {
+  // Exact, positional, and length-checked: a column appended, removed or reordered upstream
+  // must fail here rather than shift every value one column to the left.
+  if (
+    headers.length !== expectedHeaders.length ||
+    !headers.every((h, i) => h === expectedHeaders[i])
+  ) {
     throw new Error(
       `CSV headers mismatch. Expected ${expectedHeaders.join(', ')}, got ${headers.join(', ')}`,
     );
@@ -139,7 +195,11 @@ function fetchCpsA1Observations(options: {
       metricDefinition:
         'Black citizen voter turnout (presidential elections, reported voting rate)',
       universe:
-        'Black citizen voting-age population (Universe varies by year: VAP pre-1990, CVP 1990+)',
+        'Black voting-age population; citizen voting-age population where the Census table ' +
+        'publishes one (1980+), total voting-age population for years it does not (1964-1976). ' +
+        'Per Census Table A-1: "Prior to 1996, the CPS did not collect information on ' +
+        'citizenship in a uniform way. Estimates for the citizenship population presented in ' +
+        'this table prior to 1996 should be interpreted with caution."',
       unit: 'percent',
       sourceDataset: 'Census CPS Historical Reported Voting Rates',
       sourceTable: 'Table A-1',
@@ -167,6 +227,31 @@ function fetchCpsA1Observations(options: {
       externalDataSourceId: 'us-census-cps',
       theme: 'voting-rights',
       raceEthnicitySlice: 'white-non-hispanic',
+    },
+    /**
+     * The pre-1980 White arc, on the universe Census actually published for those years.
+     * Deliberately a SEPARATE metric from cps-a1-turnout-white-nation, not four extra points
+     * on it: this one counts White Hispanics and is a total-voting-age rate, the other
+     * excludes White Hispanics and is a citizen rate. Charting them as one line would draw a
+     * trend out of a definition change. Overlap is zero by construction — Table A-1 publishes
+     * the non-Hispanic split only from 1980 and the aggregate-only years only through 1976.
+     */
+    'cps-a1-turnout-white-incl-hispanic-nation': {
+      metricId: 'cps-a1-turnout-white-incl-hispanic-nation',
+      metricDefinition:
+        'White (including Hispanic White) voter turnout, 1964-1976 (presidential elections, reported voting rate)',
+      universe:
+        'White total voting-age population, Hispanic White included. Table A-1 column E. Published only for years where the White non-Hispanic citizen columns (G/H) are NA, i.e. 1964-1976.',
+      unit: 'percent',
+      sourceDataset: 'Census CPS Historical Reported Voting Rates',
+      sourceTable: 'Table A-1',
+      sourceVariable: 'White reported voting rate, total population',
+      geographyType: 'nation',
+      estimateType: 'percentage',
+      periodType: 'custom-range',
+      externalDataSourceId: 'us-census-cps',
+      theme: 'voting-rights',
+      raceEthnicitySlice: 'white',
     },
     'cps-a1-turnout-hispanic-nation': {
       metricId: 'cps-a1-turnout-hispanic-nation',
@@ -204,20 +289,66 @@ function fetchCpsA1Observations(options: {
     },
   };
 
+  const registrationSeries: Record<string, CpsSeriesDraft> = {
+    'cps-a1-registration-black-nation': {
+      metricId: 'cps-a1-registration-black-nation',
+      metricDefinition:
+        'Black voter registration rate (presidential elections, reported registration rate)',
+      universe:
+        'Black voting-age population; citizen voting-age population where the Census table ' +
+        'publishes one (1980+), total voting-age population for years it does not ' +
+        '(1968-1976). No 1964 figure: the Census table does not publish a 1964 ' +
+        'registration rate for any race.',
+      unit: 'percent',
+      sourceDataset: 'Census CPS Historical Reported Voting Rates',
+      sourceTable: 'Table A-1',
+      sourceVariable: 'Black reported registration rate',
+      geographyType: 'nation',
+      estimateType: 'percentage',
+      periodType: 'custom-range',
+      externalDataSourceId: 'us-census-cps',
+      theme: 'voting-rights',
+      raceEthnicitySlice: 'black',
+    },
+    'cps-a1-registration-white-nation': {
+      metricId: 'cps-a1-registration-white-nation',
+      metricDefinition:
+        'White non-Hispanic voter registration rate (presidential elections, reported ' +
+        'registration rate)',
+      universe:
+        'White non-Hispanic citizen voting-age population. The Census table has no ' +
+        '"White non-Hispanic" column at all before 1980 (only an aggregate "White" figure ' +
+        'that includes White Hispanics), so this series starts in 1980 rather than take on ' +
+        'that race-definition change.',
+      unit: 'percent',
+      sourceDataset: 'Census CPS Historical Reported Voting Rates',
+      sourceTable: 'Table A-1',
+      sourceVariable: 'White non-Hispanic reported registration rate',
+      geographyType: 'nation',
+      estimateType: 'percentage',
+      periodType: 'custom-range',
+      externalDataSourceId: 'us-census-cps',
+      theme: 'voting-rights',
+      raceEthnicitySlice: 'white-non-hispanic',
+    },
+  };
+
   // Add all series
   Object.values(turnoutSeries).forEach((s) => series.push(s));
+  Object.values(registrationSeries).forEach((s) => series.push(s));
 
   // Parse CSV data rows
   for (let i = 1; i < lines.length; i++) {
     const line = lines[i];
-    if (!line.trim()) continue;
+    if (!line?.trim()) continue;
 
     try {
       const row = parseCsvLine(line, headers);
-      const year = parseInt(row.year, 10);
+      const yearRaw = row.year ?? '';
+      const year = parseInt(yearRaw, 10);
 
       if (isNaN(year)) {
-        rejected.push(`Row ${i + 1}: invalid year: ${row.year}`);
+        rejected.push(`Row ${i + 1}: invalid year: ${yearRaw}`);
         continue;
       }
 
@@ -241,6 +372,11 @@ function fetchCpsA1Observations(options: {
           sourceUrl: CPS_A1_URL,
           retrievedAt: CPS_A1_RETRIEVED,
           contentHash: contentHash,
+          metadata: observationMetadata(
+            year,
+            'black',
+            'I (total population) pre-1980, J (citizen population) 1980+',
+          ),
         });
       }
 
@@ -263,6 +399,38 @@ function fetchCpsA1Observations(options: {
           sourceUrl: CPS_A1_URL,
           retrievedAt: CPS_A1_RETRIEVED,
           contentHash: contentHash,
+          metadata: observationMetadata(
+            year,
+            'white-non-hispanic',
+            'H (White non-Hispanic, citizen population)',
+          ),
+        });
+      }
+
+      // White including Hispanic White, 1964-1976 only (see the series comment above).
+      const whiteInclHispanic = row.white_incl_hispanic_pct
+        ? parseFloat(row.white_incl_hispanic_pct)
+        : null;
+      if (whiteInclHispanic !== null && !isNaN(whiteInclHispanic)) {
+        const obsId = `obs:cps-a1-turnout-white-incl-hispanic-nation:${NATION_JURISDICTION}:${period}`;
+        observations.push({
+          id: obsId,
+          metricId: 'cps-a1-turnout-white-incl-hispanic-nation',
+          jurisdictionId: NATION_JURISDICTION,
+          boundaryVersion: 'national',
+          referencePeriod: period,
+          datasetVintage: '2026-07-24',
+          estimate: whiteInclHispanic,
+          raceEthnicitySlice: 'white',
+          source: 'us-census-cps',
+          sourceUrl: CPS_A1_URL,
+          retrievedAt: CPS_A1_RETRIEVED,
+          contentHash: contentHash,
+          metadata: observationMetadata(
+            year,
+            'white-incl-hispanic',
+            'E (White, total voting-age population)',
+          ),
         });
       }
 
@@ -285,6 +453,11 @@ function fetchCpsA1Observations(options: {
           sourceUrl: CPS_A1_URL,
           retrievedAt: CPS_A1_RETRIEVED,
           contentHash: contentHash,
+          metadata: observationMetadata(
+            year,
+            'hispanic',
+            'N (Hispanic of any race, citizen population)',
+          ),
         });
       }
 
@@ -305,6 +478,61 @@ function fetchCpsA1Observations(options: {
           sourceUrl: CPS_A1_URL,
           retrievedAt: CPS_A1_RETRIEVED,
           contentHash: contentHash,
+          metadata: observationMetadata(year, 'asian', 'L (Asian, citizen population)'),
+        });
+      }
+
+      // Black registration
+      const blackRegistered = row.black_registered_citizen_pct
+        ? parseFloat(row.black_registered_citizen_pct)
+        : null;
+      if (blackRegistered !== null && !isNaN(blackRegistered)) {
+        const obsId = `obs:cps-a1-registration-black-nation:${NATION_JURISDICTION}:${period}`;
+        observations.push({
+          id: obsId,
+          metricId: 'cps-a1-registration-black-nation',
+          jurisdictionId: NATION_JURISDICTION,
+          boundaryVersion: 'national',
+          referencePeriod: period,
+          datasetVintage: '2026-07-24',
+          estimate: blackRegistered,
+          raceEthnicitySlice: 'black',
+          source: 'us-census-cps',
+          sourceUrl: CPS_A1_URL,
+          retrievedAt: CPS_A1_RETRIEVED,
+          contentHash: contentHash,
+          metadata: observationMetadata(
+            year,
+            'black',
+            'Black registration; citizen column where published, total population otherwise',
+          ),
+        });
+      }
+
+      // White non-Hispanic registration
+      const whiteRegistered = row.white_non_hispanic_registered_citizen_pct
+        ? parseFloat(row.white_non_hispanic_registered_citizen_pct)
+        : null;
+      if (whiteRegistered !== null && !isNaN(whiteRegistered)) {
+        const obsId = `obs:cps-a1-registration-white-nation:${NATION_JURISDICTION}:${period}`;
+        observations.push({
+          id: obsId,
+          metricId: 'cps-a1-registration-white-nation',
+          jurisdictionId: NATION_JURISDICTION,
+          boundaryVersion: 'national',
+          referencePeriod: period,
+          datasetVintage: '2026-07-24',
+          estimate: whiteRegistered,
+          raceEthnicitySlice: 'white-non-hispanic',
+          source: 'us-census-cps',
+          sourceUrl: CPS_A1_URL,
+          retrievedAt: CPS_A1_RETRIEVED,
+          contentHash: contentHash,
+          metadata: observationMetadata(
+            year,
+            'white-non-hispanic',
+            'White non-Hispanic registration, citizen population',
+          ),
         });
       }
     } catch (error) {
@@ -388,6 +616,7 @@ async function applyObservations(
            period_type = EXCLUDED.period_type,
            external_data_source_id = EXCLUDED.external_data_source_id,
            theme = EXCLUDED.theme,
+           metadata = EXCLUDED.metadata,
            updated_at = now()`,
         [
           s.metricId,
@@ -437,7 +666,7 @@ async function applyObservations(
           obs.sourceUrl,
           obs.retrievedAt,
           obs.contentHash,
-          JSON.stringify({}),
+          JSON.stringify(obs.metadata),
         ],
       );
       written += 1;

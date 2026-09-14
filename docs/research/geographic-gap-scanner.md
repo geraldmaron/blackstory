@@ -68,7 +68,7 @@ Same honesty posture as the obscurity methodology
 
 ## Invariants
 
-- **Research cannot publish (ADR-009).** Nothing in this methodology writes to `bb_public`
+- **Research cannot publish** (`docs/decisions-carryover.md`, "Research and discovery cannot publish"). Nothing in this methodology writes to `bb_public`
   or `bb_publication`. The view is read-only; the domain functions are pure; the directive
   decision vocabulary has no publish action.
 - **Staff-only surface.** `bb_ops.coverage_gap_by_county_decade` carries an in-view

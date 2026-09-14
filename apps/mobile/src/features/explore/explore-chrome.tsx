@@ -4,7 +4,9 @@
  * for instruments/sheet bodies — not stacked bordered cards.
  *
  * ExploreListChrome is sheet-body chrome only. Map plate stays dark-archive
- * per ADR-013; floating controls use fixed map-overlay ink on the dark plate.
+ * (`docs/decisions-carryover.md`, "Map stack": dark archive register, which the
+ * native plate still holds literally); floating controls use fixed map-overlay
+ * ink on the dark plate.
  */
 import type { ReactNode } from 'react';
 import { StyleSheet, View, type StyleProp, type ViewStyle } from 'react-native';
@@ -28,11 +30,7 @@ export const exploreContentInset = screenScrollInsets.paddingHorizontal;
  * (MapAttribution, the zoom controls) can reach them without importing upward from
  * `features/explore/`. Re-exported here so existing Explore imports keep working.
  */
-export {
-  withAlpha,
-  MAP_GHOST_PRESSED,
-  MAP_GHOST_BORDER,
-} from '@/features/map/map-plate-ink';
+export { withAlpha, MAP_GHOST_PRESSED, MAP_GHOST_BORDER } from '@/features/map/map-plate-ink';
 
 export type ExploreChromeColors = ReturnType<typeof useExploreChromeColors>;
 
@@ -97,10 +95,7 @@ export function ExploreListChrome({
   const theme = useThemeColors();
 
   return (
-    <View
-      style={[styles.listChrome, { backgroundColor: theme.surface }, style]}
-      testID={testID}
-    >
+    <View style={[styles.listChrome, { backgroundColor: theme.surface }, style]} testID={testID}>
       {children}
     </View>
   );

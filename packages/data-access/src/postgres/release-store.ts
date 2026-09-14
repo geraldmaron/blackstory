@@ -1,5 +1,6 @@
 /**
- * Postgres-backed mobile release store for MOB-005 (ADR-020 SoR cutover).
+ * Postgres-backed mobile release store for MOB-005 (the Postgres SoR cutover —
+ * `docs/decisions-carryover.md`, "entity source-of-truth precedence").
  *
  * Persists immutable release artifacts, release registry rows, and the compare-and-set
  * mobile release pointer in `bb_public.materialized_snapshots` — the same table Firestore

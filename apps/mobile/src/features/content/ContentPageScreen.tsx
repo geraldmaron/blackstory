@@ -3,7 +3,7 @@
  * article body (no indexed Surface stack, no nested card around prose).
  */
 import { useNavigation } from 'expo-router';
-import { useLayoutEffect } from 'react';
+import { useEffect, useLayoutEffect } from 'react';
 import { ScrollView, StyleSheet, View } from 'react-native';
 import {
   EditionBrandHeader,
@@ -15,6 +15,7 @@ import {
   space,
   useThemeColors,
 } from '@/ui';
+import { markPerf } from '@/lib/perf-marks';
 import { normalizeTypedContentPage } from './content-blocks';
 import type { CatalogSectionId } from './content-catalog';
 import { ContentRenderer } from './ContentRenderer';
@@ -36,7 +37,12 @@ function ContentPageSkeleton() {
     <View
       style={[
         styles.skeletonBar,
-        { backgroundColor: theme.surfaceRaised, borderColor: theme.border, width: `${widthPct}%`, height },
+        {
+          backgroundColor: theme.surfaceRaised,
+          borderColor: theme.border,
+          width: `${widthPct}%`,
+          height,
+        },
         extra,
       ]}
       accessibilityElementsHidden
@@ -73,7 +79,7 @@ export function ContentPageScreen({
 
   const resolvedTitle =
     state.status === 'ok'
-      ? normalizeTypedContentPage(state.value.page).page?.title ?? fallbackTitle
+      ? (normalizeTypedContentPage(state.value.page).page?.title ?? fallbackTitle)
       : fallbackTitle;
 
   useLayoutEffect(() => {
@@ -85,6 +91,12 @@ export function ContentPageScreen({
       headerBackButtonDisplayMode: 'minimal',
     });
   }, [navigation, resolvedTitle]);
+
+  // This screen renders every catalog section (stories, law, themes, books, ...); the Wave 9
+  // baseline names "story loaded" specifically, so the mark only fires for that section.
+  useEffect(() => {
+    if (section === 'stories' && state.status === 'ok') markPerf('story_loaded');
+  }, [section, state.status]);
 
   return (
     <ScreenCanvas edges={['left', 'right', 'bottom']}>
@@ -113,10 +125,15 @@ export function ContentPageScreen({
             if (!page) {
               return <ErrorState title="This page could not be displayed" />;
             }
-            const versionStale = isContentVersionStale(state.value.contentVersion, currentContentVersion);
+            const versionStale = isContentVersionStale(
+              state.value.contentVersion,
+              currentContentVersion,
+            );
             const facts = [
               ...(page.eraLabel ? [{ key: 'era', label: 'Era', value: page.eraLabel }] : []),
-              ...(page.placeLabel ? [{ key: 'where', label: 'Where', value: page.placeLabel }] : []),
+              ...(page.placeLabel
+                ? [{ key: 'where', label: 'Where', value: page.placeLabel }]
+                : []),
             ];
 
             return (
@@ -130,13 +147,7 @@ export function ContentPageScreen({
                     dense
                   />
                 ) : (
-                  <ScreenHeader
-                    kicker="Document"
-                    title={page.title}
-                    dek={page.dek}
-                    compact
-                    dense
-                  />
+                  <ScreenHeader kicker="Document" title={page.title} dek={page.dek} compact dense />
                 )}
                 <ContentRenderer
                   page={page}

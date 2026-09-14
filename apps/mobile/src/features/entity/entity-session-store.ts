@@ -4,10 +4,7 @@
  * this is UI preference, not a secret).
  */
 
-import {
-  createSessionStack,
-  type SessionStack,
-} from './entity-session-nav';
+import { createSessionStack, type SessionStack } from './entity-session-nav';
 
 let sessionStack: SessionStack = createSessionStack();
 let randomEnabled = false;

@@ -5,11 +5,13 @@
  * feature is selected.
  */
 import { fireEvent, render } from '@testing-library/react-native';
-import { AccessibilityInfo } from 'react-native';
+import { AccessibilityInfo, StyleSheet } from 'react-native';
 import { EntityPreviewSheet } from '../EntityPreviewSheet';
 import type { ExploreFeature } from '@/features/explore/explore-feature';
 
-const sendEvent = jest.spyOn(AccessibilityInfo, 'sendAccessibilityEvent').mockImplementation(() => {});
+const sendEvent = jest
+  .spyOn(AccessibilityInfo, 'sendAccessibilityEvent')
+  .mockImplementation(() => {});
 
 beforeEach(() => {
   sendEvent.mockClear();
@@ -43,7 +45,11 @@ describe('EntityPreviewSheet — focus movement (MOB-017)', () => {
 
   it('moves assistive-tech focus onto the sheet when a feature is first selected', async () => {
     await render(
-      <EntityPreviewSheet feature={feature('ent_a', 'Bethel AME Church')} onOpenEntity={jest.fn()} onClose={jest.fn()} />,
+      <EntityPreviewSheet
+        feature={feature('ent_a', 'Bethel AME Church')}
+        onOpenEntity={jest.fn()}
+        onClose={jest.fn()}
+      />,
     );
     expect(sendEvent).toHaveBeenCalledTimes(1);
     expect(sendEvent.mock.calls[0]![1]).toBe('focus');
@@ -51,19 +57,31 @@ describe('EntityPreviewSheet — focus movement (MOB-017)', () => {
 
   it('moves focus again when the selection changes to a DIFFERENT feature, but not on an unrelated re-render of the same feature', async () => {
     const { rerender } = await render(
-      <EntityPreviewSheet feature={feature('ent_a', 'Bethel AME Church')} onOpenEntity={jest.fn()} onClose={jest.fn()} />,
+      <EntityPreviewSheet
+        feature={feature('ent_a', 'Bethel AME Church')}
+        onOpenEntity={jest.fn()}
+        onClose={jest.fn()}
+      />,
     );
     expect(sendEvent).toHaveBeenCalledTimes(1);
 
     // Same entity id, re-rendered (e.g. a parent re-render with no real selection change).
     await rerender(
-      <EntityPreviewSheet feature={feature('ent_a', 'Bethel AME Church')} onOpenEntity={jest.fn()} onClose={jest.fn()} />,
+      <EntityPreviewSheet
+        feature={feature('ent_a', 'Bethel AME Church')}
+        onOpenEntity={jest.fn()}
+        onClose={jest.fn()}
+      />,
     );
     expect(sendEvent).toHaveBeenCalledTimes(1);
 
     // A genuinely new selection.
     await rerender(
-      <EntityPreviewSheet feature={feature('ent_b', 'Greenwood District')} onOpenEntity={jest.fn()} onClose={jest.fn()} />,
+      <EntityPreviewSheet
+        feature={feature('ent_b', 'Greenwood District')}
+        onOpenEntity={jest.fn()}
+        onClose={jest.fn()}
+      />,
     );
     expect(sendEvent).toHaveBeenCalledTimes(2);
   });
@@ -119,7 +137,87 @@ describe('EntityPreviewSheet — focus movement (MOB-017)', () => {
     // "4 claims", neither of which named a grade.
     expect(summary.props.accessibilityLabel).toMatch(/Evidence: Grade A · 4 sources/);
     expect(summary.props.accessibilityLabel).not.toMatch(/claims/);
-    expect(getByTestId('entity-preview-evidence-meter', { includeHiddenElements: true })).toBeTruthy();
+    expect(
+      getByTestId('entity-preview-evidence-meter', { includeHiddenElements: true }),
+    ).toBeTruthy();
     expect(getByTestId('entity-preview-linked')).toHaveTextContent(/education · faith/);
+  });
+});
+
+describe('EntityPreviewSheet — where the browse stepper sits', () => {
+  const browseProps = {
+    onBrowsePrevious: () => {},
+    onBrowseNext: () => {},
+    browsePosition: { index: 3, total: 3892 },
+  };
+
+  it('keeps the stepper in the header row on a phone sheet', async () => {
+    const { getByLabelText, getByText } = await render(
+      <EntityPreviewSheet
+        feature={feature('ent_a', 'Sixteenth Street Viaduct')}
+        onOpenEntity={() => {}}
+        onClose={() => {}}
+        {...browseProps}
+      />,
+    );
+
+    expect(getByLabelText('Previous place nearby')).toBeTruthy();
+    expect(getByText('4/3892')).toBeTruthy();
+    expect(getByText('Pinned here')).toBeTruthy();
+  });
+
+  it('offers the same stepper once, and only once, in the rail layout', async () => {
+    const { getAllByLabelText, getByText } = await render(
+      <EntityPreviewSheet
+        layout="rail"
+        feature={feature('ent_a', 'Sixteenth Street Viaduct')}
+        onOpenEntity={() => {}}
+        onClose={() => {}}
+        {...browseProps}
+      />,
+    );
+
+    // Moved, not duplicated — the header version and the row version are the same nodes
+    // rendered in one place or the other.
+    expect(getAllByLabelText('Previous place nearby')).toHaveLength(1);
+    expect(getAllByLabelText('Next place nearby')).toHaveLength(1);
+    expect(getByText('4/3892')).toBeTruthy();
+    // The kicker is what the header was squeezing out at 300pt; it is present either way,
+    // and in the rail it is no longer competing with the stepper for the same line.
+    expect(getByText('Pinned here')).toBeTruthy();
+  });
+
+  it('shows no stepper row when there is nothing to browse', async () => {
+    const { queryByLabelText } = await render(
+      <EntityPreviewSheet
+        layout="rail"
+        feature={feature('ent_a', 'Sixteenth Street Viaduct')}
+        onOpenEntity={() => {}}
+        onClose={() => {}}
+      />,
+    );
+
+    expect(queryByLabelText('Previous place nearby')).toBeNull();
+  });
+
+  it('draws each stepper button at least 44pt wide and tall, not a 32pt column behind a hitSlop', async () => {
+    const { getByLabelText } = await render(
+      <EntityPreviewSheet
+        feature={feature('ent_a', 'Sixteenth Street Viaduct')}
+        onOpenEntity={() => {}}
+        onClose={() => {}}
+        {...browseProps}
+      />,
+    );
+    for (const label of ['Previous place nearby', 'Next place nearby']) {
+      const button = getByLabelText(label);
+      const style = StyleSheet.flatten(
+        typeof button.props.style === 'function'
+          ? button.props.style({ pressed: false })
+          : button.props.style,
+      );
+      expect(style.minWidth).toBeGreaterThanOrEqual(44);
+      expect(style.minHeight).toBeGreaterThanOrEqual(44);
+    }
   });
 });

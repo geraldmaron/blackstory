@@ -1,6 +1,6 @@
 /**
  * Clustering: two-interaction resolution + the de-redaction privacy invariant
- * (MOB-012, ADR-024 §9/§10).
+ * (MOB-012; `docs/decisions-carryover.md`, "Native map render layer" §9/§10).
  */
 import type { LngLat } from '@/features/map/mapCamera';
 import {
@@ -53,7 +53,9 @@ describe('two-interaction resolution', () => {
         const reNodes = clusterFeatures(pending.members, currentZoom);
         // After the zoom, every node is an individual point (names revealed).
         names.push(
-          ...reNodes.filter((n) => n.kind === 'point').map((n) => (n as { feature: { label: string } }).feature.label),
+          ...reNodes
+            .filter((n) => n.kind === 'point')
+            .map((n) => (n as { feature: { label: string } }).feature.label),
         );
         pending = reNodes.find((n): n is Cluster => n.kind === 'cluster');
       }

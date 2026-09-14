@@ -25,7 +25,9 @@ export function NotPublicState({ onBackToExplore }: NotPublicStateProps) {
     <EmptyState
       title={NOT_PUBLIC_COPY.title}
       description={NOT_PUBLIC_COPY.body}
-      action={onBackToExplore ? { label: NOT_PUBLIC_COPY.action, onPress: onBackToExplore } : undefined}
+      action={
+        onBackToExplore ? { label: NOT_PUBLIC_COPY.action, onPress: onBackToExplore } : undefined
+      }
     />
   );
 }

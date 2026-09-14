@@ -1,9 +1,11 @@
 /**
  * @repo/data-access server-only data access helpers.
  *
- * Primary path (ADR-011 D-014): Firestore collection maps and publish guards.
- * Deferred path: Postgres roles, pool, SQL Connect allowlists
- * see DEFERRED.md and infra/database/README.md. Do not provision Cloud SQL.
+ * Primary path: Supabase Postgres, exported from `./postgres/`. The Firestore collection maps
+ * and publish guards below are leftover: nothing outside this package's own test imports them.
+ * Parked path: Cloud SQL roles, session, pool, SQL Connect allowlists. See DEFERRED.md and
+ * infra/database/README.md. Do not provision Cloud SQL.
+ * Background: docs/decisions-carryover.md, "Firestore as system of record, reversed".
  */
 export { DATA_ACCESS_PACKAGE } from './package-id.js';
 export { assertServerOnly } from './server-only.js';
@@ -16,7 +18,7 @@ export {
 } from './firestore/access.js';
 export type { FirestoreCollectionId, StaffClaims } from './firestore/access.js';
 
-/** @deprecated Parked Postgres helpers not the production path (ADR-011).  */
+/** @deprecated Cloud SQL role foundation; unused. See DEFERRED.md.  */
 export {
   APPLICATION_SCHEMAS,
   DATABASE_ROLES,
@@ -25,28 +27,32 @@ export {
   isDatabaseRole,
   roleMayAccess,
 } from './roles.js';
-/** @deprecated Parked Postgres helpers not the production path (ADR-011).  */
+/** @deprecated Cloud SQL role foundation; unused. See DEFERRED.md.  */
 export type { ApplicationSchema, DatabaseRole, RolePrivilege } from './roles.js';
-/** @deprecated Parked Postgres helpers not the production path (ADR-011).  */
+/**
+ * @deprecated `parseDatabaseConfig` and `resolveConnectionString` are Cloud SQL era (they
+ * require APP_DB_ROLE from `./roles.js`). `assertNoBrowserDatabaseCredentials` is NOT: it has
+ * been hand-copied into four other files because this marker reads as a ban. Prefer reusing it.
+ */
 export {
   assertNoBrowserDatabaseCredentials,
   parseDatabaseConfig,
   resolveConnectionString,
 } from './config.js';
-/** @deprecated Parked Postgres helpers not the production path (ADR-011).  */
+/** @deprecated Cloud SQL era config shape; unused. See DEFERRED.md.  */
 export type { DatabaseConfig } from './config.js';
-/** @deprecated Parked Postgres helpers not the production path (ADR-011).  */
+/** @deprecated Cloud SQL session setup; unused. See DEFERRED.md.  */
 export {
   allowedSearchPath,
   assertReadAllowed,
   assertWriteAllowed,
   buildSessionSetupSql,
 } from './session.js';
-/** @deprecated Parked Postgres helpers not the production path (ADR-011).  */
+/** @deprecated Cloud SQL era pool; the live pool is `./postgres/`. See DEFERRED.md.  */
 export { ConnectionPool, PoolExhaustedError, simulateConnectionExhaustion } from './pool.js';
-/** @deprecated Parked Postgres helpers not the production path (ADR-011).  */
+/** @deprecated Cloud SQL era pool types; the live pool is `./postgres/`. See DEFERRED.md.  */
 export type { ClientFactory, ConnectionPoolOptions, PooledClient } from './pool.js';
-/** @deprecated Parked SQL Connect helpers not the production path (ADR-011).  */
+/** @deprecated Firebase SQL Connect; never provisioned, unused. See DEFERRED.md.  */
 export {
   SQL_CONNECT_AUTH_LEVELS,
   SQL_CONNECT_CONNECTORS,
@@ -55,13 +61,13 @@ export {
   getSqlConnectOperation,
   listSqlConnectOperations,
 } from './sql-connect/operations.js';
-/** @deprecated Parked SQL Connect helpers not the production path (ADR-011).  */
+/** @deprecated Firebase SQL Connect; never provisioned, unused. See DEFERRED.md.  */
 export type {
   SqlConnectAuthLevel,
   SqlConnectConnectorId,
   SqlConnectOperation,
 } from './sql-connect/operations.js';
-/** @deprecated Parked SQL Connect helpers not the production path (ADR-011).  */
+/** @deprecated Firebase SQL Connect; never provisioned, unused. See DEFERRED.md.  */
 export { SQL_CONNECT_SDK_STATUS, loadGeneratedAdminSdk } from './sql-connect/generated-stub.js';
 
 export {

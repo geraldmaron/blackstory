@@ -97,7 +97,7 @@ is_python() {
   [[ "$1" =~ \.py$ ]] && return 0
   [[ "$1" =~ (^|/)python/ ]] && return 0
   [[ "$1" =~ ^workers/(research|security|publication)/ ]] && return 0
-  [[ "$1" =~ ^packages/(research-kernel|constitution)/ ]] && return 0
+  [[ "$1" =~ ^packages/(research-kernel|constitution)/(.*/)?(pyproject\.toml|uv\.lock|uv\.toml)$ ]] && return 0
   return 1
 }
 is_security_extra() {
@@ -183,9 +183,13 @@ run_lane() {
     mobile)
       # apps/mobile is outside the pnpm workspace and owns an npm lockfile; expo-env.d.ts is
       # gitignored, so a clean checkout (and CI) must recreate it before tsc can resolve expo/types.
+      # format:check is part of CI's Mobile Checks and covers files the root prettier run does
+      # not: apps/mobile carries its own .prettierignore, so drift here is invisible from the
+      # repo root and only a PR surfaces it.
       ( cd apps/mobile \
         && npm ci --no-audit --no-fund \
         && printf '/// <reference types="expo/types" />\n' > expo-env.d.ts \
+        && npm run format:check \
         && npm run typecheck \
         && npm run lint \
         && npm test -- --ci ) ;;

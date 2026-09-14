@@ -12,7 +12,8 @@
  * story. Selected candidates are routed to the story research pipeline through
  * the shared research-directive loop.
  *
- * INVARIANTS (ADR-009 and constitution):
+ * INVARIANTS (`docs/decisions-carryover.md`, "Research and discovery cannot publish";
+ * and the product constitution):
  * - This module is a research-discovery methodology. It PROPOSES candidates and
  *   staged briefs only. It NEVER publishes, promotes, or writes to public
  *   projections / release tables.

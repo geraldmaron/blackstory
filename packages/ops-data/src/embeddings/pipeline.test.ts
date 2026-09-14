@@ -1,6 +1,6 @@
 /**
  * Tests for embedding pipeline orchestration, using the deterministic mock provider
- * no network access or API key required. See ADR-014 for what a real recall number needs.
+ * no network access or API key required. See `docs/decisions-carryover.md` ("Vector search") for what a real recall number needs.
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';

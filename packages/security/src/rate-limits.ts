@@ -5,7 +5,8 @@
  * state. Layered controls: subject quotas, endpoint classes, rolling/daily windows,
  * concurrency caps, and distributed risk-signal aggregation. No external store dependency.
  *
- * App Check outage carve-out (repo-uqmm; ADR-020 §3, threat-model T2).
+ * App Check outage carve-out (repo-uqmm; threat-model T2; `docs/decisions-carryover.md`,
+ * "Security and abuse assumptions").
  * App Check is attestation, never authorization: it only shapes abuse cost. During
  * NORMAL operation an unattested `anonymous` caller is hard-denied `app_check_required`
  * on `expensive_read`/`mutation` tiers — this is the enumeration/abuse defense and it

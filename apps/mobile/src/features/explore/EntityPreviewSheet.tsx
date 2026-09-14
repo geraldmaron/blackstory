@@ -6,6 +6,11 @@
  * Evidence is the shared meter plus the shared label, not a "High confidence" chip beside a
  * "3 claims" chip. The card is `accessible` with one composed label, so the meter is decorative
  * here and the sentence rides in `factsSummary`.
+ *
+ * "Cited in" mirrors web's `RecordSheet` group of the same name, including its rule: it renders
+ * only when a story actually cites this record. Most of the catalog has no long-form written
+ * about it yet, and a permanent empty heading would read as a gap in the archive rather than as
+ * the ordinary state of a record no story has reached.
  */
 import { useEffect } from 'react';
 import { Pressable, StyleSheet, View, type StyleProp, type ViewStyle } from 'react-native';
@@ -27,6 +32,7 @@ import { exploreRecordFacts } from './explore-preview-facts';
 import { exploreStoryMeta } from './explore-story-meta';
 import { featureMetaLine, type PreviewMetaFeature } from './explore-meta';
 import { kindFamilyEncodingFor, isKnownMapKindFamily } from '@/features/map/kind-encoding';
+import type { MapFeatureStoryCitation } from '@/features/map/demoMapSource';
 import { recordKindLabel } from '@/features/record-facts/record-facts';
 import { openExternalMaps } from '@/features/entity/maps-handoff';
 
@@ -43,16 +49,32 @@ export type EntityPreviewPreviewFeature = PreviewMetaFeature & {
     readonly topicTags?: readonly string[];
     readonly topicIds?: readonly string[];
     readonly status?: string;
+    readonly citingStories?: readonly MapFeatureStoryCitation[];
   };
 };
 
 export type EntityPreviewSheetProps = {
   readonly feature: EntityPreviewPreviewFeature | null;
   readonly onOpenEntity: (entityId: string) => void;
+  /** Opens a published story by slug. Omitted, the "Cited in" list reads rather than navigates. */
+  readonly onOpenStory?: (slug: string) => void;
   readonly onClose: () => void;
   readonly onBrowsePrevious?: () => void;
   readonly onBrowseNext?: () => void;
   readonly browsePosition?: { readonly index: number; readonly total: number };
+  /**
+   * Where this preview is mounted.
+   *
+   * `'sheet'` is the phone: a full-width bottom sheet, where the header row has room for the
+   * kicker, the browse stepper and the close button side by side.
+   *
+   * `'rail'` is the wide layout's side pane, which is 300-400pt. There, those three do not fit
+   * on one line: the stepper and the close button are both fixed-width, so the kicker is what
+   * gives, and "Pinned here" / "Place · Active" collapsed to "Pi…" / "Pla…" on an iPad. In
+   * `'rail'` the stepper moves to its own row under the header and the kicker gets its width
+   * back.
+   */
+  readonly layout?: 'sheet' | 'rail';
   readonly style?: StyleProp<ViewStyle>;
 };
 
@@ -76,7 +98,11 @@ function MetaChip({
   readonly color: string;
 }) {
   return (
-    <View style={styles.metaChip} accessibilityElementsHidden importantForAccessibility="no-hide-descendants">
+    <View
+      style={styles.metaChip}
+      accessibilityElementsHidden
+      importantForAccessibility="no-hide-descendants"
+    >
       <Ionicons name={icon} size={14} color={color} />
       <Text variant="caption" colorRole="inkMuted" numberOfLines={1} style={styles.metaChipLabel}>
         {label}
@@ -88,10 +114,12 @@ function MetaChip({
 export function EntityPreviewSheet({
   feature,
   onOpenEntity,
+  onOpenStory,
   onClose,
   onBrowsePrevious,
   onBrowseNext,
   browsePosition,
+  layout = 'sheet',
   style,
 }: EntityPreviewSheetProps) {
   const theme = useThemeColors();
@@ -110,14 +138,42 @@ export function EntityPreviewSheet({
   const dek = selected.properties.oneLineStory?.trim();
   const storyMeta = exploreStoryMeta(selected);
   const facts = exploreRecordFacts(selected);
-  const factsSummary = [`Kind: ${kindLabel}`, ...facts.map((fact) => `${fact.label}: ${fact.value}`)].join(
-    '. ',
-  );
+  const factsSummary = [
+    `Kind: ${kindLabel}`,
+    ...facts.map((fact) => `${fact.label}: ${fact.value}`),
+  ].join('. ');
   const canBrowse =
     browsePosition !== undefined &&
     browsePosition.total > 1 &&
     onBrowsePrevious !== undefined &&
     onBrowseNext !== undefined;
+  // Same stepper, two places. See the `layout` prop for why the rail cannot host it inline.
+  const browseStepper =
+    canBrowse && browsePosition ? (
+      <>
+        <Pressable
+          accessibilityRole="button"
+          accessibilityLabel="Previous place nearby"
+          onPress={onBrowsePrevious}
+          hitSlop={8}
+          style={({ pressed }) => [styles.browseButton, { opacity: pressed ? 0.75 : 1 }]}
+        >
+          <Ionicons name="chevron-back" size={18} color={theme.accent} />
+        </Pressable>
+        <Text variant="code" colorRole="inkMuted">
+          {browsePosition.index + 1}/{browsePosition.total}
+        </Text>
+        <Pressable
+          accessibilityRole="button"
+          accessibilityLabel="Next place nearby"
+          onPress={onBrowseNext}
+          hitSlop={8}
+          style={({ pressed }) => [styles.browseButton, { opacity: pressed ? 0.75 : 1 }]}
+        >
+          <Ionicons name="chevron-forward" size={18} color={theme.accent} />
+        </Pressable>
+      </>
+    ) : null;
   const mapCoords = selected.coordinates;
   const hasPublicCoords =
     Array.isArray(mapCoords) &&
@@ -128,6 +184,7 @@ export function EntityPreviewSheet({
     storyMeta.where || storyMeta.era || storyMeta.evidence || storyMeta.status,
   );
   const linkedThemes = storyMeta.themes;
+  const citingStories = selected.properties.citingStories ?? [];
 
   async function handleOpenInMaps() {
     if (!hasPublicCoords || !mapCoords) return;
@@ -158,7 +215,12 @@ export function EntityPreviewSheet({
           style={styles.card}
         >
           <View style={styles.headerRow}>
-            <View style={[styles.kindGlyph, { borderColor: theme.border, backgroundColor: theme.surfaceRaised }]}>
+            <View
+              style={[
+                styles.kindGlyph,
+                { borderColor: theme.border, backgroundColor: theme.surfaceRaised },
+              ]}
+            >
               <NavIcon name={navIconForEntityKind(feature.kind)} size={20} selected />
             </View>
             <View style={styles.headerText}>
@@ -170,30 +232,8 @@ export function EntityPreviewSheet({
                 {storyMeta.status ? ` · ${storyMeta.status}` : ''}
               </Text>
             </View>
-            {canBrowse ? (
-              <View style={styles.browseCluster}>
-                <Pressable
-                  accessibilityRole="button"
-                  accessibilityLabel="Previous place nearby"
-                  onPress={onBrowsePrevious}
-                  hitSlop={8}
-                  style={({ pressed }) => [styles.browseButton, { opacity: pressed ? 0.75 : 1 }]}
-                >
-                  <Ionicons name="chevron-back" size={18} color={theme.accent} />
-                </Pressable>
-                <Text variant="code" colorRole="inkMuted">
-                  {browsePosition.index + 1}/{browsePosition.total}
-                </Text>
-                <Pressable
-                  accessibilityRole="button"
-                  accessibilityLabel="Next place nearby"
-                  onPress={onBrowseNext}
-                  hitSlop={8}
-                  style={({ pressed }) => [styles.browseButton, { opacity: pressed ? 0.75 : 1 }]}
-                >
-                  <Ionicons name="chevron-forward" size={18} color={theme.accent} />
-                </Pressable>
-              </View>
+            {layout === 'sheet' && browseStepper ? (
+              <View style={styles.browseCluster}>{browseStepper}</View>
             ) : null}
             <Pressable
               accessibilityRole="button"
@@ -209,6 +249,10 @@ export function EntityPreviewSheet({
               <Ionicons name="close" size={20} color={theme.inkMuted} />
             </Pressable>
           </View>
+
+          {layout === 'rail' && browseStepper ? (
+            <View style={[styles.browseRow, { borderColor: theme.border }]}>{browseStepper}</View>
+          ) : null}
 
           <Pressable
             accessibilityRole="button"
@@ -277,6 +321,37 @@ export function EntityPreviewSheet({
             </View>
           ) : null}
 
+          {citingStories.length > 0 ? (
+            <View style={styles.citedRow} testID="entity-preview-cited-in">
+              <Text variant="code" colorRole="inkMuted" style={styles.linkedKicker}>
+                Cited in
+              </Text>
+              <View style={styles.citedList}>
+                {citingStories.map((story) => (
+                  <Pressable
+                    key={story.slug}
+                    accessibilityRole={onOpenStory ? 'button' : 'text'}
+                    accessibilityLabel={`${story.title}, ${story.relation} this record`}
+                    {...(onOpenStory
+                      ? {
+                          accessibilityHint: 'Opens the story',
+                          onPress: () => onOpenStory(story.slug),
+                        }
+                      : {})}
+                    style={({ pressed }) => [styles.citedItem, { opacity: pressed ? 0.75 : 1 }]}
+                  >
+                    <Text variant="caption" colorRole="ink" numberOfLines={1}>
+                      {story.title}
+                    </Text>
+                    <Text variant="caption" colorRole="inkMuted" numberOfLines={1}>
+                      {story.relation}
+                    </Text>
+                  </Pressable>
+                ))}
+              </View>
+            </View>
+          ) : null}
+
           <Button
             label="Open place"
             variant="accent"
@@ -338,9 +413,18 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: space['1'],
   },
+  // The rail's stepper: its own row, centered, with a rule under it so it reads as a control
+  // strip for the card rather than as part of the title block.
+  browseRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: space['1'],
+    borderBottomWidth: StyleSheet.hairlineWidth,
+  },
   browseButton: {
     minHeight: MIN_TOUCH,
-    minWidth: 32,
+    minWidth: MIN_TOUCH,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -388,6 +472,19 @@ const styles = StyleSheet.create({
   },
   linkedThemes: {
     flexShrink: 1,
+  },
+  citedRow: {
+    gap: space['1'],
+  },
+  citedList: {
+    gap: 2,
+  },
+  citedItem: {
+    flexDirection: 'row',
+    alignItems: 'baseline',
+    gap: space['2'],
+    justifyContent: 'space-between',
+    minHeight: MIN_TOUCH,
   },
   close: {
     minHeight: MIN_TOUCH,

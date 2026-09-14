@@ -3,11 +3,9 @@
  * collapses whitespace, trims stray punctuation, and upper-cases a small set of common street
  * abbreviations so visually-equivalent inputs ("123 Main St." vs "123 main street") produce the
  * same Census Geocoder query and the same geocode-cache key. This is intentionally a different,
- * address-shaped normalizer from `@repo/security`'s `normalizeSearchText` (free-
- * text search normalizer) `@repo/domain` cannot depend on `@repo/security` at
- * runtime (see `./jurisdiction-ids.ts`'s module doc for the same circular-dependency rule), and
- * address normalization has different goals (preserve number/street-suffix structure for the
- * geocoder) than search-query normalization (fold for fuzzy matching).
+ * address-shaped normalizer from `@repo/security`'s `normalizeSearchText` (a free-text search
+ * normalizer), because address normalization has different goals: preserve number and
+ * street-suffix structure for the geocoder, rather than fold for fuzzy matching.
  */
 
 const STREET_SUFFIX_EXPANSIONS: Readonly<Record<string, string>> = {

@@ -1,5 +1,6 @@
 /**
- * Cache diagnostics + manual clear (MOB-009 §8; ADR-022 §2/§6).
+ * Cache diagnostics + manual clear (MOB-009 §8; `docs/decisions-carryover.md`, "Mobile cache
+ * and OTA release").
  *
  * A real, callable `clearCache()` (Settings → "Clear cached data") and a
  * read-only `cacheDiagnostics()` for a diagnostics screen / MOB-018 budgets.
@@ -45,9 +46,9 @@ export async function cacheDiagnostics(store: CacheStore): Promise<CacheDiagnost
 
 /**
  * Wipe all cached data and reset the release markers. The schema is recreated
- * empty (drop-and-rebuild, ADR-022 §5), so the next launch/sync repopulates from
- * the network exactly like a first launch — degrading honestly (§3), never
- * crashing.
+ * empty (drop-and-rebuild — `docs/decisions-carryover.md`, "Mobile cache and OTA release"),
+ * so the next launch/sync repopulates from the network exactly like a first launch —
+ * degrading honestly, never crashing.
  */
 export async function clearCache(store: CacheStore): Promise<void> {
   await store.dropAll();

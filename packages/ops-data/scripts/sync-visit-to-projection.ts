@@ -26,6 +26,7 @@
  */
 import pg from 'pg';
 import { publicVisitForTier, type PublicVisit } from '@repo/domain';
+import { remindToRepublishCatalogArtifacts } from './lib/catalog-republish-reminder.ts';
 import { normalizePgConnectionString } from './lib/pg-connection.ts';
 
 const DRY_RUN = process.env.DRY_RUN !== '0';
@@ -101,7 +102,7 @@ export function rawVisitFromRow(row: Row): PublicVisit | undefined {
     ['open_to_public', 'exterior_only', 'private', 'demolished', 'unknown'].includes(
       row.visitability,
     )
-      ? { visitability: row.visitability as PublicVisit['visitability'] }
+      ? { visitability: row.visitability as NonNullable<PublicVisit['visitability']> }
       : {}),
     ...(row.source_ids && row.source_ids.length > 0 ? { sources: row.source_ids } : {}),
   };
@@ -190,6 +191,7 @@ async function main(): Promise<void> {
     applied += 1;
   }
   console.log(`Applied projection.visit on ${applied} entities.`);
+  remindToRepublishCatalogArtifacts(applied);
   await pool.end();
 }
 

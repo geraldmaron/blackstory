@@ -12,6 +12,7 @@ import {
   coParticipationNeighborsForEntity,
   type EventParticipationRow,
 } from '../../domain/src/graph/co-participation.ts';
+import { remindToRepublishCatalogArtifacts } from './lib/catalog-republish-reminder.ts';
 import { normalizePgConnectionString } from './lib/pg-connection.ts';
 
 const DRY_RUN = process.env.DRY_RUN !== '0';
@@ -146,10 +147,9 @@ async function main(): Promise<void> {
       const nextProjection = { ...row.projection, related: merged };
       const result = await client.query(
         `UPDATE bb_public.release_entities
-         SET related = $3::jsonb,
-             projection = $4::jsonb
+         SET projection = $3::jsonb
          WHERE release_id = $1 AND entity_id = $2`,
-        [row.release_id, row.entity_id, JSON.stringify(merged), JSON.stringify(nextProjection)],
+        [row.release_id, row.entity_id, JSON.stringify(nextProjection)],
       );
       updated += result.rowCount ?? 0;
     }
@@ -161,6 +161,7 @@ async function main(): Promise<void> {
     }
 
     console.log(`\nApplied: updated ${updated} release entities.`);
+    remindToRepublishCatalogArtifacts(updated);
   } finally {
     await client.end();
   }

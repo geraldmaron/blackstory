@@ -24,6 +24,8 @@ const ADMIN_PATHS = [
   '/admin/stories/review',
   '/admin/stories/articles',
   '/admin/stories/articles/before-the-battle-cry',
+  '/admin/submissions',
+  '/admin/submissions/abc-123',
   '/admin/switches',
 ];
 

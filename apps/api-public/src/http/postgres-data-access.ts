@@ -1,11 +1,17 @@
 /**
- * Live Postgres `bb_public` bindings for `PublicDataAccess` (MOB-004 / ADR-020 SoR cutover).
+ * Live Postgres `bb_public` bindings for `PublicDataAccess` (MOB-004; the Postgres SoR cutover,
+ * `docs/decisions-carryover.md`, "entity source-of-truth precedence").
  *
  * Reads the same Supabase Postgres projections as `apps/web/src/lib/public-data/postgres-readers.ts`
  * and maps them onto `@repo/public-contracts` DTOs via the shared projection mapper in
  * `./projection-mapping.ts` (storage-neutral mapping — Postgres is the only live read path).
  */
 import type { NotabilityBasisRecord, PublicSearchIndexDoc } from '@repo/domain';
+import {
+  buildCitesEdge,
+  storiesCiting,
+  type CitesEdgeIndex,
+} from '@repo/domain/publication/cites-edge';
 import type { PublicSearchProjectionDoc } from '@repo/schemas';
 import type { CanonicalSearchQuery } from '@repo/security';
 import { entityV1Schema, type EntityV1 } from '@repo/public-contracts/v1/entity';
@@ -15,7 +21,9 @@ import { mapProjectionToEntityV1, MAX_LIVE_SEARCH_SCAN } from './projection-mapp
 import {
   fetchActiveRelease,
   fetchPublicEntityProjection,
+  fetchPublicEntityRedirect,
   listPublicEntityProjections,
+  listPublicReleaseArticles,
   listPublicSearchIndexDocs,
   type PostgresQueryFn,
 } from './postgres-readers.js';
@@ -56,7 +64,7 @@ export function mapPublicSearchProjection(doc: PublicSearchProjectionDoc): Publi
     researchCoverage: doc.researchCoverage,
     relatedCount: doc.relatedCount,
     claimCount: doc.claimCount,
-    ...(doc.confidenceTier !== undefined ? { confidenceTier: doc.confidenceTier } : {}),
+    ...(doc.evidenceInputs !== undefined ? { evidenceInputs: doc.evidenceInputs } : {}),
     ...(doc.geohash !== undefined ? { geohash: doc.geohash } : {}),
   };
 }
@@ -82,18 +90,24 @@ const MAX_CACHED_RELEASES = 4;
 /** Active-release pointer reads were per-request; a short window keeps activation prompt. */
 const ACTIVE_RELEASE_POINTER_TTL_MS = 30_000;
 
-/** True when enough search docs carry confidenceTier (post-backfill / republished artifact). */
+/** True when enough search docs carry evidenceInputs (post-backfill / republished artifact). */
 function searchIndexHasConfidenceCoverage(
   docs: readonly PublicSearchProjectionDoc[],
   minCoverage = 0.95,
 ): boolean {
   if (docs.length === 0) return false;
-  let withTier = 0;
+  let withInputs = 0;
   for (const doc of docs) {
-    if (doc.confidenceTier !== undefined) withTier += 1;
+    if (doc.evidenceInputs !== undefined) withInputs += 1;
   }
-  return withTier / docs.length >= minCoverage;
+  return withInputs / docs.length >= minCoverage;
 }
+
+/**
+ * Cap on stories advertised per record, matching the wire contract's own bound. A record the
+ * archive has written about many times still links to a readable list, not a wall.
+ */
+const MAX_CITING_STORIES_PER_RECORD = 25;
 
 type EntityProjectionsList = Awaited<ReturnType<typeof listPublicEntityProjections>>;
 type SearchIndexList = Awaited<ReturnType<typeof listPublicSearchIndexDocs>>;
@@ -132,6 +146,17 @@ export function createPostgresDataAccessReaders(
   const searchIndexCache = new Map<
     string,
     { readonly value: SearchIndexList; readonly expiresAtMs: number }
+  >();
+  /*
+   * The story-cites-record edge is a fold over EVERY article in the release. Recomputing it per
+   * request would make each record open cost a full article scan, which is exactly the shape of
+   * read this cache exists to stop — so it is memoized on the same release key, TTL and
+   * single-flight as the entity catalog above. `apps/web` reaches the same conclusion with
+   * `cache()` over its release-scoped article cache.
+   */
+  const citesEdgeCache = new Map<
+    string,
+    { readonly value: CitesEdgeIndex; readonly expiresAtMs: number }
   >();
   let activeReleaseMemo:
     { readonly value: ActiveReleaseResult; readonly expiresAtMs: number } | undefined;
@@ -188,7 +213,7 @@ export function createPostgresDataAccessReaders(
       }
       if (fromArtifact && fromArtifact.length > 0) {
         console.warn(
-          `[api-public] search-index artifact missing confidenceTier coverage; preferring Postgres for ${releaseId}`,
+          `[api-public] search-index artifact missing evidenceInputs coverage; preferring Postgres for ${releaseId}`,
         );
       }
 
@@ -197,6 +222,39 @@ export function createPostgresDataAccessReaders(
       writeReleaseCache(searchIndexCache, releaseId, value);
       return value;
     });
+  }
+
+  /**
+   * The cites edge for a release. Degrades to an empty index rather than throwing: a record
+   * missing its story links is worse than ideal, a record that 500s because the article table is
+   * unreachable is unacceptable — the same posture web's `resolveCitesEdgeIndex` takes.
+   */
+  async function citesEdgeCached(releaseId: string): Promise<CitesEdgeIndex> {
+    const hit = readReleaseCache(citesEdgeCache, releaseId);
+    if (hit) return hit;
+    return singleFlight(`cites-edge:${releaseId}`, async () => {
+      const raced = readReleaseCache(citesEdgeCache, releaseId);
+      if (raced) return raced;
+      let value: CitesEdgeIndex = {};
+      try {
+        value = buildCitesEdge(await listPublicReleaseArticles(releaseId, runQuery));
+      } catch (error) {
+        const message = error instanceof Error ? error.message : String(error);
+        console.warn(
+          `[api-public] article read failed for ${releaseId}; serving records without story links: ${message}`,
+        );
+        return value;
+      }
+      writeReleaseCache(citesEdgeCache, releaseId, value);
+      return value;
+    });
+  }
+
+  /** Attaches the stories citing this record. Absent, never empty — see `entityV1Schema`. */
+  function withCitingStories(entity: EntityV1, citesEdge: CitesEdgeIndex): EntityV1 {
+    const citing = storiesCiting(citesEdge, entity.id);
+    if (citing.length === 0) return entity;
+    return { ...entity, citingStories: citing.slice(0, MAX_CITING_STORIES_PER_RECORD) };
   }
 
   async function fetchActiveReleaseMemoized(): Promise<ActiveReleaseResult> {
@@ -223,15 +281,24 @@ export function createPostgresDataAccessReaders(
       if (!projection) return undefined;
       const mapped = mapProjectionToEntityV1(projection);
       if (!mapped) return undefined;
-      return hydrateEntityV1Neighbors(mapped, releaseId, runQuery);
+      const hydrated = await hydrateEntityV1Neighbors(mapped, releaseId, runQuery);
+      return withCitingStories(hydrated, await citesEdgeCached(releaseId));
+    },
+
+    async readEntityRedirect(releaseId, entityId): Promise<string | undefined> {
+      // Uncached on purpose: it only runs on a miss, it is a primary-key point-get against a
+      // table with one row per merge (16 on 2026-09-13), and caching it would hold a stale
+      // forwarding address after a merge is reversed.
+      return fetchPublicEntityRedirect(releaseId, entityId, runQuery);
     },
 
     async readEntities(releaseId): Promise<readonly EntityV1[]> {
       const projections = await listPublicEntityProjectionsCached(releaseId);
+      const citesEdge = await citesEdgeCached(releaseId);
       const entities: EntityV1[] = [];
       for (const projection of projections) {
         const mapped = mapProjectionToEntityV1(projection);
-        if (mapped) entities.push(entityV1Schema.parse(mapped));
+        if (mapped) entities.push(entityV1Schema.parse(withCitingStories(mapped, citesEdge)));
       }
       return entities;
     },

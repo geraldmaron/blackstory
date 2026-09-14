@@ -25,7 +25,9 @@ function NeverFocuses() {
 // mock in this preset — re-spying per test (or relying on `mockRestore`) leaves prior tests'
 // call history visible to later ones, so a single spy is created once and explicitly cleared
 // (not restored) before every test instead.
-const sendEvent = jest.spyOn(AccessibilityInfo, 'sendAccessibilityEvent').mockImplementation(() => {});
+const sendEvent = jest
+  .spyOn(AccessibilityInfo, 'sendAccessibilityEvent')
+  .mockImplementation(() => {});
 
 beforeEach(() => {
   sendEvent.mockClear();

@@ -52,6 +52,10 @@ jest.mock('react-native-safe-area-context', () => {
   const React = require('react');
   const { View } = require('react-native');
   return {
+    // Spread the real module so `SafeAreaInsetsContext` survives: `useLayoutSize` reads that
+    // context object directly, and a mock that omits it makes `useContext` throw on a value
+    // that is `undefined` rather than a context.
+    ...jest.requireActual('react-native-safe-area-context'),
     SafeAreaView: ({ children, style }: { children?: unknown; style?: unknown }) =>
       React.createElement(View, { style }, children as never),
     SafeAreaProvider: ({ children }: { children?: unknown }) => children,
@@ -84,11 +88,7 @@ jest.mock('@gorhom/bottom-sheet', () => {
         { testID: 'explore-bottom-sheet-host' },
         // Surface the controlled index so tests can assert what the derived
         // value settled on after a simulated gesture (no snap-back).
-        React.createElement(
-          Text,
-          { testID: 'sheet-controlled-index' },
-          String(index),
-        ),
+        React.createElement(Text, { testID: 'sheet-controlled-index' }, String(index)),
         // Simulated drag-settle triggers — fire the sheet's onChange the way the
         // gorhom sheet would when the user lifts their finger on a detent.
         React.createElement(Pressable, {
@@ -109,13 +109,8 @@ jest.mock('@gorhom/bottom-sheet', () => {
   );
   BottomSheet.displayName = 'BottomSheet';
 
-  const Passthrough = ({
-    children,
-    testID,
-  }: {
-    children?: unknown;
-    testID?: string;
-  }) => React.createElement(View, { testID }, children as never);
+  const Passthrough = ({ children, testID }: { children?: unknown; testID?: string }) =>
+    React.createElement(View, { testID }, children as never);
 
   const BottomSheetFlatList = (props: {
     testID?: string;
@@ -195,23 +190,45 @@ jest.mock('react-native-reanimated', () => {
 });
 
 // eslint-disable-next-line import/first
-import { ExploreView } from '../ExploreView';
+import {
+  EXPLORE_MAP_ACCESSIBILITY_LABEL,
+  ExploreView,
+  exploreMapAccessibilityHint,
+} from '../ExploreView';
 // eslint-disable-next-line import/first
 import { DEMO_MAP_SOURCE, type MapFeatureCollection } from '@/features/map';
+// eslint-disable-next-line import/first
+import { resetTestWindowSize, setTestWindowSize } from '@/ui/layout/testing';
 
 const noop = () => {};
+
+/**
+ * iPhone 16 Pro in portrait, in points.
+ *
+ * Declared rather than inherited, because jest-expo seeds the window with 750x1334 — iPhone 8's
+ * PIXEL dimensions read as points. No shipping phone is 750pt wide, and Explore reads 750pt as a
+ * tablet and gives it the two-pane layout. Every assertion below is about the phone posture, so
+ * the phone window is stated.
+ */
+const PHONE_WINDOW = { width: 402, height: 874 } as const;
+
+/** iPad Pro 11" in portrait, in points — the two-pane posture. */
+const TABLET_WINDOW = { width: 834, height: 1194 } as const;
+
+beforeEach(() => {
+  setTestWindowSize(PHONE_WINDOW);
+});
 
 afterEach(async () => {
   await act(async () => {
     await Promise.resolve();
   });
+  resetTestWindowSize();
 });
 
 describe('ExploreView — records rail', () => {
   it('renders the records rail at peek with count header', async () => {
-    const { getByTestId } = await render(
-      <ExploreView onOpenEntity={noop} reduceMotion />,
-    );
+    const { getByTestId } = await render(<ExploreView onOpenEntity={noop} reduceMotion />);
     expect(getByTestId('explore-records-rail')).toBeTruthy();
     expect(getByTestId('explore-mast-count').props.accessibilityLabel).toBe('All pinned, 3 pinned');
     expect(getByTestId('map-attribution')).toBeTruthy();
@@ -219,11 +236,7 @@ describe('ExploreView — records rail', () => {
 
   it('hides map attribution when a selection expands the sheet', async () => {
     const { queryByTestId, findByTestId } = await render(
-      <ExploreView
-        selectedParam="ent_fixture_place_dc"
-        onOpenEntity={noop}
-        reduceMotion
-      />,
+      <ExploreView selectedParam="ent_fixture_place_dc" onOpenEntity={noop} reduceMotion />,
     );
     expect(await findByTestId('entity-preview-sheet')).toBeTruthy();
     expect(queryByTestId('map-attribution')).toBeNull();
@@ -239,9 +252,7 @@ describe('ExploreView — records rail', () => {
   });
 
   it('mast count matches the records rail header before viewport is reported', async () => {
-    const { getByTestId } = await render(
-      <ExploreView onOpenEntity={noop} reduceMotion />,
-    );
+    const { getByTestId } = await render(<ExploreView onOpenEntity={noop} reduceMotion />);
     const mast = getByTestId('explore-mast-count');
     const railHeader = within(getByTestId('explore-records-rail')).getByRole('header');
     expect(mast.props.accessibilityLabel).toBe('All pinned, 3 pinned');
@@ -249,9 +260,7 @@ describe('ExploreView — records rail', () => {
   });
 
   it('keeps the sheet where the gesture left it — no snap-back when dragged full → half', async () => {
-    const { getByTestId } = await render(
-      <ExploreView onOpenEntity={noop} reduceMotion />,
-    );
+    const { getByTestId } = await render(<ExploreView onOpenEntity={noop} reduceMotion />);
     // Expand the rail to full browse from the mast control.
     await act(async () => {
       fireEvent.press(getByTestId('explore-chip-records'));
@@ -275,11 +284,7 @@ describe('ExploreView — records rail', () => {
 
   it('dragging a selection preview below half dismisses the selection instead of snapping back', async () => {
     const { getByTestId, queryByTestId, findByTestId } = await render(
-      <ExploreView
-        selectedParam="ent_fixture_place_dc"
-        onOpenEntity={noop}
-        reduceMotion
-      />,
+      <ExploreView selectedParam="ent_fixture_place_dc" onOpenEntity={noop} reduceMotion />,
     );
     expect(await findByTestId('entity-preview-sheet')).toBeTruthy();
     // A selection floors the sheet at half.
@@ -411,14 +416,255 @@ describe('ExploreView — map posture (browse <-> immersive)', () => {
     });
     expect(await findByTestId('entity-preview-sheet')).toBeTruthy();
   });
+
+  it('selects a different pin while the sheet sits at half — the map stays live above peek', async () => {
+    const { getByTestId, findByText } = await render(
+      <ExploreView onOpenEntity={noop} reduceMotion />,
+    );
+
+    await act(async () => {
+      fireEvent(getByTestId('maplibre-geojson-source'), 'press', {
+        nativeEvent: {
+          features: [
+            {
+              type: 'Feature',
+              geometry: { type: 'Point', coordinates: [-77.0369, 38.9072] },
+              properties: { entityId: 'ent_fixture_place_dc' },
+            },
+          ],
+          lngLat: [-77.0369, 38.9072],
+        },
+      });
+    });
+    expect(await findByText('Seed Historical Place (D.C.)')).toBeTruthy();
+    // A selection floors the sheet at half — confirms the press below is exercised with the
+    // sheet already above peek, where a scrim over the map would otherwise sit.
+    expect(getByTestId('sheet-controlled-index').props.children).toBe('1');
+
+    await act(async () => {
+      fireEvent(getByTestId('maplibre-geojson-source'), 'press', {
+        nativeEvent: {
+          features: [
+            {
+              type: 'Feature',
+              geometry: { type: 'Point', coordinates: [-73.7949, 40.7282] },
+              properties: { entityId: 'ent_fixture_place_harlem_ny' },
+            },
+          ],
+          lngLat: [-73.7949, 40.7282],
+        },
+      });
+    });
+    // The second pin press still reaches the map's handler and swaps the selection — nothing
+    // about sitting at half gated it behind the (touch-transparent) sheet dim.
+    expect(await findByText('Seed Cultural Institution (Queens, NY)')).toBeTruthy();
+  });
+});
+
+describe('ExploreView — wide window (map + persistent records rail)', () => {
+  it('replaces the bottom sheet with a side rail on a tablet-sized window', async () => {
+    setTestWindowSize(TABLET_WINDOW);
+    const { getByTestId, queryByTestId } = await render(
+      <ExploreView onOpenEntity={noop} reduceMotion />,
+    );
+
+    expect(getByTestId('explore-side-rail')).toBeTruthy();
+    expect(getByTestId('explore-records-rail')).toBeTruthy();
+    expect(queryByTestId('explore-bottom-sheet-host')).toBeNull();
+  });
+
+  it('keeps the list while a record is selected — the reason the wide layout exists', async () => {
+    setTestWindowSize(TABLET_WINDOW);
+    const { findByTestId, getByTestId } = await render(
+      <ExploreView selectedParam="ent_fixture_place_dc" onOpenEntity={noop} reduceMotion />,
+    );
+
+    expect(await findByTestId('entity-preview-sheet')).toBeTruthy();
+    // On a phone the preview REPLACES the list. Here both are mounted at once, so a reader
+    // stepping through a county keeps their place.
+    expect(getByTestId('explore-side-rail-inspector')).toBeTruthy();
+    expect(getByTestId('explore-records-rail')).toBeTruthy();
+  });
+
+  it('gives the rail a header that says what it is showing, not a pull-up invitation', async () => {
+    setTestWindowSize(TABLET_WINDOW);
+    const { getByTestId, queryByText } = await render(
+      <ExploreView onOpenEntity={noop} reduceMotion />,
+    );
+
+    const rail = within(getByTestId('explore-side-rail'));
+    // The count is visible text here. In the sheet it is an invisible a11y-only node, because
+    // the floating mast over the map carries it; a pane reader should not have to look across
+    // the window for the size of the list beside them.
+    expect(rail.getByText('All pinned')).toBeTruthy();
+    expect(rail.getByText('3 pinned')).toBeTruthy();
+    // A pane does not pull up.
+    expect(queryByText('Pull up for places')).toBeNull();
+    // Expanding survives, demoted to a ghost square beside the header.
+    expect(getByTestId('explore-map-expand')).toBeTruthy();
+  });
+
+  it('keeps the whole list after a rail pick, because the camera does not fly', async () => {
+    setTestWindowSize(TABLET_WINDOW);
+    const { getByTestId, findByTestId } = await render(
+      <ExploreView onOpenEntity={noop} reduceMotion />,
+    );
+
+    const rail = () => within(getByTestId('explore-records-rail'));
+    expect(rail().getAllByRole('button').length).toBeGreaterThanOrEqual(3);
+
+    await act(async () => {
+      fireEvent.press(rail().getByText('Seed Historical Place (D.C.)'));
+    });
+    expect(await findByTestId('entity-preview-sheet')).toBeTruthy();
+
+    // `point` is the ceiling zoom. Had the selection flown there, the viewport-scoped list
+    // would now hold one row — the record the reader just asked about, and nothing else.
+    // That is the cost the wide layout exists to avoid, so all three are still here.
+    expect(rail().getByText('Seed Historical Place (D.C.)')).toBeTruthy();
+    expect(rail().getByText('Seed Cultural Institution (Queens, NY)')).toBeTruthy();
+    expect(rail().getByText('Seed Living Person (Houston, TX)')).toBeTruthy();
+    expect(getByTestId('explore-side-rail-inspector')).toBeTruthy();
+  });
+
+  it('ignores the route echoing the selection back as ?selected=', async () => {
+    setTestWindowSize(TABLET_WINDOW);
+    const onSelectionChange = jest.fn();
+    const { getByTestId, rerender, findByTestId } = await render(
+      <ExploreView onOpenEntity={noop} onSelectionChange={onSelectionChange} reduceMotion />,
+    );
+
+    const rail = () => within(getByTestId('explore-records-rail'));
+    await act(async () => {
+      fireEvent.press(rail().getByText('Seed Historical Place (D.C.)'));
+    });
+    expect(await findByTestId('entity-preview-sheet')).toBeTruthy();
+    expect(onSelectionChange).toHaveBeenCalledWith('ent_fixture_place_dc');
+
+    // What the real route does next: write the id into the URL, which comes straight back in
+    // as `selectedParam` a frame later. Acting on that echo re-ran the restore path and fired
+    // a camera command the tap had deliberately not asked for.
+    await act(async () => {
+      rerender(
+        <ExploreView
+          onOpenEntity={noop}
+          onSelectionChange={onSelectionChange}
+          selectedParam="ent_fixture_place_dc"
+          reduceMotion
+        />,
+      );
+    });
+
+    expect(rail().getByText('Seed Cultural Institution (Queens, NY)')).toBeTruthy();
+    expect(rail().getByText('Seed Living Person (Houston, TX)')).toBeTruthy();
+  });
+
+  it('drops the records toggle from the mast, because the rail no longer toggles', async () => {
+    setTestWindowSize(TABLET_WINDOW);
+    const { queryByTestId, getByTestId } = await render(
+      <ExploreView onOpenEntity={noop} reduceMotion />,
+    );
+
+    expect(getByTestId('explore-floating-chrome')).toBeTruthy();
+    expect(queryByTestId('explore-chip-records')).toBeNull();
+    // The instruments chip is untouched — filters still apply in both postures.
+    expect(getByTestId('explore-chip-instruments')).toBeTruthy();
+  });
+
+  it('keeps the attribution pill visible — nothing covers the map pane', async () => {
+    setTestWindowSize(TABLET_WINDOW);
+    const { findByTestId, getByTestId } = await render(
+      <ExploreView selectedParam="ent_fixture_place_dc" onOpenEntity={noop} reduceMotion />,
+    );
+
+    expect(await findByTestId('entity-preview-sheet')).toBeTruthy();
+    // The phone hides it because the half-height sheet lands on top of it. Here it does not.
+    expect(getByTestId('map-attribution')).toBeTruthy();
+  });
+
+  it('hides the rail in the immersive posture and brings it back on collapse', async () => {
+    setTestWindowSize(TABLET_WINDOW);
+    const { getByTestId, queryByTestId } = await render(
+      <ExploreView onOpenEntity={noop} reduceMotion />,
+    );
+
+    await act(async () => {
+      fireEvent.press(getByTestId('explore-map-expand'));
+    });
+    expect(queryByTestId('explore-side-rail')).toBeNull();
+    expect(getByTestId('explore-map-collapse')).toBeTruthy();
+
+    await act(async () => {
+      fireEvent.press(getByTestId('explore-map-collapse'));
+    });
+    expect(getByTestId('explore-side-rail')).toBeTruthy();
+  });
+
+  it('opens the full record from the rail preview', async () => {
+    setTestWindowSize(TABLET_WINDOW);
+    const onOpenEntity = jest.fn();
+    const { findByTestId, getByTestId } = await render(
+      <ExploreView selectedParam="ent_fixture_place_dc" onOpenEntity={onOpenEntity} reduceMotion />,
+    );
+
+    expect(await findByTestId('entity-preview-sheet')).toBeTruthy();
+    await act(async () => {
+      fireEvent.press(within(getByTestId('explore-side-rail-inspector')).getByText('Open place'));
+    });
+    expect(onOpenEntity).toHaveBeenCalledWith('ent_fixture_place_dc');
+  });
+
+  it('swaps postures live when the window is resized, as a split-view drag does', async () => {
+    setTestWindowSize(TABLET_WINDOW);
+    const { getByTestId, queryByTestId } = await render(
+      <ExploreView onOpenEntity={noop} reduceMotion />,
+    );
+    expect(getByTestId('explore-side-rail')).toBeTruthy();
+
+    // Drag the divider down to a Slide Over column.
+    await act(async () => {
+      setTestWindowSize({ width: 320, height: 1194 });
+    });
+    expect(queryByTestId('explore-side-rail')).toBeNull();
+    expect(getByTestId('explore-bottom-sheet-host')).toBeTruthy();
+
+    // And back out again.
+    await act(async () => {
+      setTestWindowSize(TABLET_WINDOW);
+    });
+    expect(getByTestId('explore-side-rail')).toBeTruthy();
+    expect(queryByTestId('explore-bottom-sheet-host')).toBeNull();
+  });
+
+  it('leaves a landscape phone on the sheet — wide is not the same as roomy', async () => {
+    setTestWindowSize({ width: 874, height: 402 });
+    const { getByTestId, queryByTestId } = await render(
+      <ExploreView onOpenEntity={noop} reduceMotion />,
+    );
+
+    expect(queryByTestId('explore-side-rail')).toBeNull();
+    expect(getByTestId('explore-bottom-sheet-host')).toBeTruthy();
+  });
+
+  it('keeps the records usable in the wide layout when the map fails', async () => {
+    setTestWindowSize(TABLET_WINDOW);
+    const { getByTestId } = await render(
+      <ExploreView
+        onOpenEntity={noop}
+        reduceMotion
+        loadState={{ kind: 'error', mode: 'provider-outage' }}
+      />,
+    );
+
+    expect(getByTestId('explore-side-rail')).toBeTruthy();
+    expect(getByTestId('explore-records-rail')).toBeTruthy();
+  });
 });
 
 describe('ExploreView — entity preview sheet', () => {
   it('opens the preview sheet from the records rail and links to the full entity route', async () => {
     const onOpenEntity = jest.fn();
-    const utils = await render(
-      <ExploreView onOpenEntity={onOpenEntity} reduceMotion />,
-    );
+    const utils = await render(<ExploreView onOpenEntity={onOpenEntity} reduceMotion />);
     fireEvent.press(utils.getByLabelText(/Seed Historical Place/));
     expect(await utils.findByTestId('entity-preview-sheet')).toBeTruthy();
     fireEvent.press(await utils.findByLabelText(/Open place for/));
@@ -427,11 +673,7 @@ describe('ExploreView — entity preview sheet', () => {
 
   it('opens the preview sheet when a deep-linked selection is restored', async () => {
     const { findByTestId } = await render(
-      <ExploreView
-        selectedParam="ent_fixture_place_dc"
-        onOpenEntity={noop}
-        reduceMotion
-      />,
+      <ExploreView selectedParam="ent_fixture_place_dc" onOpenEntity={noop} reduceMotion />,
     );
     expect(await findByTestId('entity-preview-sheet')).toBeTruthy();
   });
@@ -484,9 +726,7 @@ describe('ExploreView — empty + adversarial', () => {
         },
       ],
     };
-    const utils = await render(
-      <ExploreView source={hostile} onOpenEntity={noop} reduceMotion />,
-    );
+    const utils = await render(<ExploreView source={hostile} onOpenEntity={noop} reduceMotion />);
     expect(utils.getByTestId('explore-records-rail')).toBeTruthy();
   });
 });
@@ -512,9 +752,7 @@ describe('ExploreView — repeated mount/unmount (leak check)', () => {
 
     const CYCLES = 25;
     for (let i = 0; i < CYCLES; i += 1) {
-      const view = await render(
-        <ExploreView source={DEMO_MAP_SOURCE} onOpenEntity={noop} />,
-      );
+      const view = await render(<ExploreView source={DEMO_MAP_SOURCE} onOpenEntity={noop} />);
       await act(async () => {
         view.unmount();
       });
@@ -523,5 +761,77 @@ describe('ExploreView — repeated mount/unmount (leak check)', () => {
     expect(remove.mock.calls.length).toBeGreaterThanOrEqual(CYCLES);
     expect(addSpy.mock.calls.length - remove.mock.calls.length).toBeLessThanOrEqual(10);
     addSpy.mockRestore();
+  });
+});
+
+describe('ExploreView — screen reader map equivalent and focus return', () => {
+  it('names the records sheet as the map’s text equivalent on a phone, and keeps gestures live', async () => {
+    const { getByTestId } = await render(<ExploreView onOpenEntity={noop} reduceMotion />);
+    const summary = getByTestId('map-accessibility-summary');
+    expect(summary.props.accessibilityLabel).toBe(EXPLORE_MAP_ACCESSIBILITY_LABEL);
+    expect(summary.props.accessibilityHint).toBe(exploreMapAccessibilityHint('sheet'));
+    expect(summary.props.accessibilityHint).toMatch(/records sheet/);
+    expect(getByTestId('maplibre-map').props.dragPan).toBe(true);
+  });
+
+  it('names the side pane in the wide layout', async () => {
+    setTestWindowSize(TABLET_WINDOW);
+    const { getByTestId } = await render(<ExploreView onOpenEntity={noop} reduceMotion />);
+    expect(getByTestId('map-accessibility-summary').props.accessibilityHint).toMatch(
+      /records pane/,
+    );
+  });
+
+  it('returns focus to the map when the record preview is closed', async () => {
+    const sendEvent = jest
+      .spyOn(AccessibilityInfo, 'sendAccessibilityEvent')
+      .mockImplementation(() => {});
+    const utils = await render(<ExploreView onOpenEntity={noop} reduceMotion />);
+    fireEvent.press(utils.getByLabelText(/Seed Historical Place/));
+    await utils.findByTestId('entity-preview-sheet');
+    sendEvent.mockClear();
+
+    await act(async () => {
+      fireEvent.press(utils.getByLabelText('Close preview'));
+    });
+
+    expect(utils.queryByTestId('entity-preview-sheet')).toBeNull();
+    expect(sendEvent).toHaveBeenCalledTimes(1);
+    const [handle, eventType] = sendEvent.mock.calls[0]!;
+    expect(eventType).toBe('focus');
+    expect((handle as unknown as { props?: { testID?: string } }).props?.testID).toBe(
+      'map-accessibility-summary',
+    );
+    sendEvent.mockRestore();
+  });
+
+  it('moves focus into the instruments panel on open and back to the mast toggle on Hide', async () => {
+    const sendEvent = jest
+      .spyOn(AccessibilityInfo, 'sendAccessibilityEvent')
+      .mockImplementation(() => {});
+    const { getByTestId, queryByTestId } = await render(
+      <ExploreView onOpenEntity={noop} reduceMotion />,
+    );
+    sendEvent.mockClear();
+
+    await act(async () => {
+      fireEvent.press(getByTestId('explore-chip-instruments'));
+    });
+    expect(getByTestId('explore-instruments-panel')).toBeTruthy();
+    const testIdOf = (call: unknown[]) =>
+      (call[0] as { props?: { testID?: string } }).props?.testID;
+    expect(sendEvent.mock.calls.map(testIdOf)).toEqual(['explore-panel-header-title']);
+
+    sendEvent.mockClear();
+    await act(async () => {
+      // The open mast toggle shares this label; the panel's own Hide button is the one that
+      // disappears with the panel, which is why focus has to be handed back.
+      fireEvent.press(
+        within(getByTestId('explore-instruments-panel')).getByLabelText('Hide map instruments'),
+      );
+    });
+    expect(queryByTestId('explore-instruments-panel')).toBeNull();
+    expect(sendEvent.mock.calls.map(testIdOf)).toEqual(['explore-chip-instruments']);
+    sendEvent.mockRestore();
   });
 });

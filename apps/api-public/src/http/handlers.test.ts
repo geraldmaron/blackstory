@@ -13,9 +13,11 @@ import { searchResponseV1Schema } from '@repo/public-contracts/v1/search';
 import { publicApiErrorEnvelopeSchema } from '@repo/public-contracts/errors';
 import { createPublicRateLimitGuard } from '../rate-limits.js';
 import { createPublicSearchGuard } from '../search-guardrails.js';
-import { createInMemoryPublicDataAccess } from './data-access.js';
+import { createInMemoryPublicDataAccess, EMPTY_FACETS } from './data-access.js';
 import { dispatch } from './router.js';
 import type { ApiRequest, HandlerDeps } from './handlers.js';
+import type { CanonicalSearchQuery } from '@repo/security';
+import type { PublicDataAccess, SearchPage } from './data-access.js';
 import { makeEntity, SAMPLE_POINTER } from './entity-fixture.js';
 
 const FIXED_NOW = 1_800_000_000_000;
@@ -81,6 +83,21 @@ test('GET /v1/compatibility: below-floor client gets 426 CLIENT_VERSION_UNSUPPOR
   assert.equal(res.status, 426);
   const envelope = publicApiErrorEnvelopeSchema.parse(res.body);
   assert.equal(envelope.error.code, 'CLIENT_VERSION_UNSUPPORTED');
+});
+
+test('GET /v1/entity/:id 308s a merged-away id to its survivor, cacheably', async () => {
+  const deps = makeDeps({
+    dataAccess: createInMemoryPublicDataAccess({
+      pointer: SAMPLE_POINTER,
+      entities: [makeEntity()],
+      redirects: { ent_sclc_001: 'ent_dunbar_school_001' },
+    }),
+  });
+  const res = await dispatch(makeRequest('/v1/entity/ent_sclc_001'), deps);
+  assert.equal(res.status, 308);
+  assert.equal(res.headers['Location'], '/v1/entity/ent_dunbar_school_001');
+  assert.equal(res.headers['Cache-Control'], 'public, max-age=60, stale-while-revalidate=300');
+  assert.equal(res.body, null, 'a redirect carries no body');
 });
 
 test('GET /v1/bootstrap validates against bootstrapResponseV1Schema and carries an ETag', async () => {
@@ -200,6 +217,35 @@ test('GET /v1/search mints an opaque nextCursor when more results exist', async 
   const parsed = searchResponseV1Schema.parse(res.body);
   assert.equal(parsed.hasMore, true);
   assert.ok(parsed.nextCursor && parsed.nextCursor.length > 0, 'cursor must be present and opaque');
+});
+
+test('GET /v1/search carries an `era` deep-link param through to the data-access canonical query', async () => {
+  let seenCanonical: CanonicalSearchQuery | undefined;
+  const spyDataAccess: PublicDataAccess = {
+    async getReleasePointer() {
+      return SAMPLE_POINTER;
+    },
+    async getEntity() {
+      return undefined;
+    },
+    async listEntities() {
+      return [];
+    },
+    async search(canonical): Promise<SearchPage> {
+      seenCanonical = canonical;
+      return { results: [], facets: EMPTY_FACETS, totalMatched: 0, hasMore: false };
+    },
+  };
+  const res = await dispatch(
+    makeRequest('/v1/search', { query: 'q=school&era=1950s', headers: CLIENT_HEADER }),
+    makeDeps({ dataAccess: spyDataAccess }),
+  );
+  assert.equal(res.status, 200);
+  assert.deepEqual(
+    [...(seenCanonical?.filters ?? [])],
+    [{ field: 'era', value: '1950s' }],
+    'era must reach the canonical query the same way kind/state already do',
+  );
 });
 
 test('ADVERSARIAL: SQL-injection-shaped query param is denied 400 by the shared guardrail', async () => {

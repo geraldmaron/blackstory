@@ -43,10 +43,13 @@ test('splitNominationSections handles vintage A headers with varied spacing and 
   `);
   const sections = splitNominationSections(text);
   assert.equal(sections.length, 2);
-  assert.equal(sections[0].section, '7');
-  assert.equal(sections[1].section, '8');
-  assert.ok(sections[0].text.includes('Description'));
-  assert.ok(sections[1].text.includes('Statement'));
+  const [section7, section8] = sections;
+  assert.ok(section7);
+  assert.ok(section8);
+  assert.equal(section7.section, '7');
+  assert.equal(section8.section, '8');
+  assert.ok(section7.text.includes('Description'));
+  assert.ok(section8.text.includes('Statement'));
 });
 
 test('splitNominationSections handles vintage B headers for sections 7 and 8', () => {
@@ -59,10 +62,13 @@ test('splitNominationSections handles vintage B headers for sections 7 and 8', (
   `);
   const sections = splitNominationSections(text);
   assert.equal(sections.length, 2);
-  assert.equal(sections[0].section, '7');
-  assert.equal(sections[1].section, '8');
-  assert.ok(sections[0].text.includes('constructed'));
-  assert.ok(sections[1].text.includes('historically'));
+  const [section7, section8] = sections;
+  assert.ok(section7);
+  assert.ok(section8);
+  assert.equal(section7.section, '7');
+  assert.equal(section8.section, '8');
+  assert.ok(section7.text.includes('constructed'));
+  assert.ok(section8.text.includes('historically'));
 });
 
 test('splitNominationSections with vintage B only still yields sections (regression for refnum 00000071)', () => {
@@ -93,14 +99,16 @@ test('splitNominationSections concatenates multiple pages of the same section in
   `);
   const sections = splitNominationSections(text);
   assert.equal(sections.length, 1);
-  assert.equal(sections[0].section, '8');
+  const [section8] = sections;
+  assert.ok(section8);
+  assert.equal(section8.section, '8');
   // All three pages should be concatenated with double-newline separators
-  assert.ok(sections[0].text.includes('First paragraph'));
-  assert.ok(sections[0].text.includes('Second paragraph'));
-  assert.ok(sections[0].text.includes('Third paragraph'));
-  const firstIdx = sections[0].text.indexOf('First');
-  const secondIdx = sections[0].text.indexOf('Second');
-  const thirdIdx = sections[0].text.indexOf('Third');
+  assert.ok(section8.text.includes('First paragraph'));
+  assert.ok(section8.text.includes('Second paragraph'));
+  assert.ok(section8.text.includes('Third paragraph'));
+  const firstIdx = section8.text.indexOf('First');
+  const secondIdx = section8.text.indexOf('Second');
+  const thirdIdx = section8.text.indexOf('Third');
   assert.ok(
     firstIdx < secondIdx && secondIdx < thirdIdx,
     'paragraphs should remain in document order',
@@ -115,8 +123,10 @@ test('splitNominationSections ignores bare digits in running prose', () => {
   `);
   const sections = splitNominationSections(text);
   assert.equal(sections.length, 1);
-  assert.equal(sections[0].section, '7');
-  assert.ok(!sections[0].text.includes('rooms'), 'prose before header should not be captured');
+  const [section7] = sections;
+  assert.ok(section7);
+  assert.equal(section7.section, '7');
+  assert.ok(!section7.text.includes('rooms'), 'prose before header should not be captured');
 });
 
 test('splitNominationSections strips boilerplate from section text', () => {
@@ -131,11 +141,13 @@ test('splitNominationSections strips boilerplate from section text', () => {
   `);
   const sections = splitNominationSections(text);
   assert.equal(sections.length, 1);
-  assert.ok(sections[0].text.includes('Actual description'));
-  assert.ok(!sections[0].text.includes('NPS Form'));
-  assert.ok(!sections[0].text.includes('OMB'));
-  assert.ok(!sections[0].text.includes('United States Department'));
-  assert.ok(!sections[0].text.includes('CONTINUATION SHEET'));
+  const [section7] = sections;
+  assert.ok(section7);
+  assert.ok(section7.text.includes('Actual description'));
+  assert.ok(!section7.text.includes('NPS Form'));
+  assert.ok(!section7.text.includes('OMB'));
+  assert.ok(!section7.text.includes('United States Department'));
+  assert.ok(!section7.text.includes('CONTINUATION SHEET'));
 });
 
 test('dropRepeatedPropertyHeader removes the property name from text', () => {
@@ -358,10 +370,13 @@ test('splitByNarrativeHeadings segments on 7. DESCRIPTION and 8. STATEMENT OF SI
   `);
   const sections = splitByNarrativeHeadings(text);
   assert.equal(sections.length, 2);
-  assert.equal(sections[0].section, '7');
-  assert.equal(sections[1].section, '8');
-  assert.ok(sections[0].text.includes('Romanesque'), 'section 7 should include description text');
-  assert.ok(sections[1].text.includes('Governor'), 'section 8 should include significance text');
+  const [section7, section8] = sections;
+  assert.ok(section7);
+  assert.ok(section8);
+  assert.equal(section7.section, '7');
+  assert.equal(section8.section, '8');
+  assert.ok(section7.text.includes('Romanesque'), 'section 7 should include description text');
+  assert.ok(section8.text.includes('Governor'), 'section 8 should include significance text');
 });
 
 test('splitByNarrativeHeadings section 8 ends at following 9. MAJOR BIBLIOGRAPHICAL REFERENCES heading', () => {
@@ -494,11 +509,14 @@ test('splitByNarrativeHeadings recognizes NARRATIVE DESCRIPTION and NARRATIVE ST
   `);
   const sections = splitByNarrativeHeadings(text);
   assert.equal(sections.length, 2);
-  assert.equal(sections[0].section, '7');
-  assert.equal(sections[1].section, '8');
-  assert.ok(sections[0].text.includes('timber'), 'NARRATIVE DESCRIPTION variant should work');
+  const [section7, section8] = sections;
+  assert.ok(section7);
+  assert.ok(section8);
+  assert.equal(section7.section, '7');
+  assert.equal(section8.section, '8');
+  assert.ok(section7.text.includes('timber'), 'NARRATIVE DESCRIPTION variant should work');
   assert.ok(
-    sections[1].text.includes('significance'),
+    section8.text.includes('significance'),
     'NARRATIVE STATEMENT OF SIGNIFICANCE variant should work',
   );
 });
@@ -809,6 +827,108 @@ test('a bare "Section 8" in running prose does not open a section', () => {
   );
 });
 
+// --- repo-oyhy: OCR-damaged "Statement of Significance" headings ---------------------------
+//
+// 24 of 25 nominations flagged as missing section 8 turned out to have it: OCR corrupted the
+// heading text itself, not just the section-number table these fixtures already cover. These
+// pin the fuzzy heading match against the damage categories that bug named — spacing,
+// character substitution, digit/letter confusion on the section number, and a heading split
+// across a line wrap — plus a clean heading and a false-positive candidate that must still be
+// rejected.
+
+test('splitByNarrativeHeadings matches a section 8 heading with letters pulled apart by OCR spacing', () => {
+  const prose = `The property is significant for its role in the civil rights movement of the 1960s. ${'Documented association with local organizers. '.repeat(30)}`;
+  const text = normalizeExtractedText(`
+    8 .  S T A T E M E N T   O F   S I G N I F I C A N C E
+    ${prose}
+  `);
+  const section8 = splitByNarrativeHeadings(text).find((s) => s.section === '8');
+  assert.ok(section8, 'letter-spaced heading must still open section 8');
+  assert.ok(section8!.text.includes('civil rights movement'));
+});
+
+test('splitByNarrativeHeadings matches a section 8 heading with OCR character substitutions', () => {
+  // 5/S, 0/O and 1/I are the substitutions actually observed on these scans.
+  const prose = `The building served as a meeting hall for the local congregation from 1910 onward. ${'Community history documented in county records. '.repeat(30)}`;
+  const text = normalizeExtractedText(`
+    8. 5TATEMENT 0F SIGN1F1CANCE
+    ${prose}
+  `);
+  const section8 = splitByNarrativeHeadings(text).find((s) => s.section === '8');
+  assert.ok(section8, 'character-substituted heading must still open section 8');
+  assert.ok(section8!.text.includes('meeting hall'));
+});
+
+test('splitByNarrativeHeadings matches a section 8 heading whose digit "8" OCR\'d as the letter "B"', () => {
+  const prose = `The property is historically significant for its association with an early Black-owned business. ${'Founded by a local entrepreneur in the postwar era. '.repeat(30)}`;
+  const text = normalizeExtractedText(`
+    B. STATEMENT OF SIGNIFICANCE
+    ${prose}
+  `);
+  const section8 = splitByNarrativeHeadings(text).find((s) => s.section === '8');
+  assert.ok(section8, "a section digit OCR'd as a letter must still open section 8");
+  assert.ok(section8!.text.includes('Black-owned business'));
+});
+
+test('splitByNarrativeHeadings matches a section 8 heading split across a line-wrap hyphen', () => {
+  const prose = `The school operated as one of the county's few institutions serving Black students before integration. ${'Enrollment records survive from the 1940s forward. '.repeat(30)}`;
+  const text = normalizeExtractedText(`
+    8. STATEMENT OF SIGNIF-
+    ICANCE
+    ${prose}
+  `);
+  const section8 = splitByNarrativeHeadings(text).find((s) => s.section === '8');
+  assert.ok(section8, 'a heading split by a line-wrap hyphen must still open section 8');
+  assert.ok(section8!.text.includes('Black students'));
+});
+
+test('splitByNarrativeHeadings matches a clean, undamaged section 8 heading', () => {
+  const prose = `The property gained significance as the home of a prominent civic leader active from 1920 to 1955. ${'Local newspapers document the family’s civic involvement. '.repeat(30)}`;
+  const text = normalizeExtractedText(`
+    8. STATEMENT OF SIGNIFICANCE
+    ${prose}
+  `);
+  const section8 = splitByNarrativeHeadings(text).find((s) => s.section === '8');
+  assert.ok(section8, 'an undamaged heading must still open section 8');
+  assert.ok(section8!.text.includes('civic leader'));
+});
+
+test('splitByNarrativeHeadings does not open section 8 on a mid-sentence mention of the phrase', () => {
+  // The false-positive candidate: "statement of significance" appears verbatim, but as a
+  // clause inside running prose rather than as a heading at the start of its own line. Long
+  // enough to clear MIN_FALLBACK_SECTION_CHARS if the anchor did not reject it.
+  const prose = `The building's physical description is set out above. As discussed in the statement of significance filed with the original nomination, the property retains architectural integrity. ${'Physical fabric described in section 7 above. '.repeat(30)}`;
+  const text = normalizeExtractedText(`
+    7. DESCRIPTION
+    ${prose}
+  `);
+  const sections = splitByNarrativeHeadings(text);
+  assert.equal(
+    sections.find((s) => s.section === '8'),
+    undefined,
+    'a mid-sentence mention of the phrase must not be treated as the section 8 heading',
+  );
+});
+
+test('parseNomination recovers hasSignificance for a heading with combined spacing and character-substitution damage', () => {
+  const prose = `The congregation organized in 1889 and the building served as a center of community life for Black residents. ${'The sanctuary retains its original character. '.repeat(30)}`;
+  const text = `
+    7. DESCRIPTION
+    ${'The frame structure has a gable roof. '.repeat(30)}
+
+    8 .  5 T A T E M E N T  0 F  S I G N I F I C A N C E
+    ${prose}
+  `;
+  const result = parseNomination(text, 'Test Church');
+  assert.equal(
+    result.hasSignificance,
+    true,
+    'a badly OCR-damaged heading must still be recognized',
+  );
+  assert.equal(result.segmentation, 'narrative-headings');
+  assert.ok(result.narrative.includes('community life'));
+});
+
 test('parseNomination reports the sections it actually captured, not the winning strategy', () => {
   // `sections` feeds `sectionsFound` in the evidence row's provenance, which a later pass reads
   // to decide whether a record still needs re-sweeping. It used to be all-or-nothing — the whole
@@ -832,4 +952,111 @@ test('parseNomination reports the sections it actually captured, not the winning
     'both captured sections must be reported',
   );
   assert.ok(parsed.hasSignificance);
+});
+
+// repo-4lhnk: Form 10-300 (Rev. 6-72/1969), the pre-10-900 Inventory-Nomination Form. Its
+// continuation sheets label the narrative "N.   SIGNIFICANCE" — the digit-and-period lead-in of
+// every other digit-anchored heading, but without "STATEMENT OF". Measured against refnums
+// 73001560 (101 Ranch Historic District) and 74000680 (Atlanta University): both had 12k-18k
+// characters of real form text and no section 7/8 the parser recognized before this.
+test('splitByNarrativeHeadings matches Form 10-300\'s bare "N. SIGNIFICANCE" continuation heading', () => {
+  const prose = `Built about 1912, this stuccoed structure once served the ranch as its dairy barn. ${'Local ranch hands recall its use through the 1940s. '.repeat(30)}`;
+  const text = normalizeExtractedText(`
+    (Continuation Sheet)
+    8.   SIGNIFICANCE - page 2
+    ${prose}
+  `);
+  const section8 = splitByNarrativeHeadings(text).find((s) => s.section === '8');
+  assert.ok(section8, 'the bare "N. SIGNIFICANCE" heading must open section 8');
+  assert.ok(section8!.text.includes('dairy barn'));
+});
+
+test('splitByNarrativeHeadings does not treat "AREAS OF SIGNIFICANCE" as the bare heading', () => {
+  // The checkbox caption on the front form ("AREAS OF SIGNIFICANCE (Check One or More...)")
+  // starts its line with "AREAS", not a digit, so it must never satisfy the new alternative.
+  const text = normalizeExtractedText(`
+    AREAS OF SIGNIFICANCE (Check One or More as Appropriate)
+    ${'Agriculture Architecture Commerce '.repeat(20)}
+  `);
+  assert.equal(
+    splitByNarrativeHeadings(text).find((s) => s.section === '8'),
+    undefined,
+  );
+});
+
+test("parseNomination recovers hasSignificance for Form 10-300's bare significance heading", () => {
+  const prose = `The 101 Ranch is significant for its association with early Black cowboys, among them Bill Pickett. ${'Newspapers of the period documented his rodeo career. '.repeat(30)}`;
+  const text = `
+    DESCRIBE THE PRESENT AND ORIGINAL PHYSICAL APPEARANCE
+    ${'The White House is built of reinforced concrete. '.repeat(30)}
+
+    (Continuation Sheet)
+    8.   SIGNIFICANCE - page 2
+    ${prose}
+  `;
+  const result = parseNomination(text, '101 Ranch Historic District');
+  assert.equal(result.hasSignificance, true, "Form 10-300's bare heading must still be recognized");
+  assert.equal(result.segmentation, 'narrative-headings');
+  assert.ok(result.narrative.includes('Bill Pickett'));
+});
+
+// repo-4lhnk: the South Carolina "Inventory Form for Historic Districts and Individual Properties
+// in a Multiple Property Submission" — used in place of the federal form for SC multiple-resource
+// nominations. It carries no section numbers at all: a bare "SIGNIFICANCE" line introduces AREA
+// OF SIGNIFICANCE and LEVEL OF SIGNIFICANCE checkboxes, and the real narrative follows under its
+// own "SUMMARY OF SIGNIFICANCE" heading. Measured against refnums 86000539 (St. Thomas' Episcopal
+// Church), 86003218 (Hutchinson House), 85002346 (Lowman Hall) and 86000528 (Goodwill Plantation).
+test('splitByNarrativeHeadings matches the South Carolina inventory form\'s "SUMMARY OF SIGNIFICANCE" heading', () => {
+  const prose = `This house is significant as the oldest identified intact house on the island associated with the Black community. ${'It was built by a formerly enslaved craftsman around 1885. '.repeat(20)}`;
+  const text = normalizeExtractedText(`
+    SIGNIFICANCE
+    AREA OF SIGNIFICANCE: Architecture/Black History
+    LEVEL OF SIGNIFICANCE: L (FOR OFFICE USE ONLY)
+    SUMMARY OF SIGNIFICANCE
+    ${prose}
+  `);
+  const section8 = splitByNarrativeHeadings(text).find((s) => s.section === '8');
+  assert.ok(section8, '"SUMMARY OF SIGNIFICANCE" must open section 8');
+  assert.ok(section8!.text.includes('formerly enslaved craftsman'));
+  assert.ok(
+    !section8!.text.includes('LEVEL OF SIGNIFICANCE'),
+    'the checkbox lines above the heading must not leak into the captured narrative',
+  );
+});
+
+test('splitByNarrativeHeadings does not open section 8 on the bare "SIGNIFICANCE" checkbox caption alone', () => {
+  // Without the "SUMMARY OF" lead-in this would be indistinguishable from the checkbox caption
+  // that always precedes it on this form, which is exactly what "SUMMARY OF" is required to rule
+  // out.
+  const text = normalizeExtractedText(`
+    SIGNIFICANCE
+    AREA OF SIGNIFICANCE: Architecture
+    LEVEL OF SIGNIFICANCE: S (for office use only)
+    ${'ACREAGE: 2 acres VERBAL BOUNDARY DESCRIPTION: shown on the accompanying tax map. '.repeat(10)}
+  `);
+  assert.equal(
+    splitByNarrativeHeadings(text).find((s) => s.section === '8'),
+    undefined,
+  );
+});
+
+test('parseNomination recovers hasSignificance for the South Carolina inventory form', () => {
+  const prose = `Lowman Hall is significant as one of the first designs by a pioneer Black architect on the campus. ${'It set standards other Black students later aspired to. '.repeat(20)}`;
+  const text = `
+    DESCRIPTION
+    ${'The three-story brick building has a hipped roof and exposed rafter tails. '.repeat(20)}
+    SIGNIFICANCE
+    AREAS OF SIGNIFICANCE: Black History
+    LEVEL OF SIGNIFICANCE: S (for office use only)
+    SUMMARY OF SIGNIFICANCE
+    ${prose}
+  `;
+  const result = parseNomination(text, 'Lowman Hall');
+  assert.equal(
+    result.hasSignificance,
+    true,
+    'the South Carolina inventory form heading must still be recognized',
+  );
+  assert.equal(result.segmentation, 'narrative-headings');
+  assert.ok(result.narrative.includes('pioneer Black architect'));
 });

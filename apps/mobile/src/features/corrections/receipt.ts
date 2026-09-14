@@ -41,8 +41,7 @@ export async function readStoredReceiptCode(secrets: SecretStore): Promise<strin
   return stored && isReceiptCodeShape(stored) ? stored : undefined;
 }
 
-/** Clear the stored receipt (explicit user "forget this code" action —
- * ADR-022 clear-deletion posture). */
+/** Clear the stored receipt (explicit user "forget this code" action). */
 export async function clearStoredReceiptCode(secrets: SecretStore): Promise<void> {
   await secrets.delete(SECRET_KEYS.correctionReceipt);
 }

@@ -57,6 +57,7 @@ import {
   createCommonsMediaClient,
   sanitizePrimaryImageForRelease,
 } from '@repo/domain';
+import { remindToRepublishCatalogArtifacts } from './lib/catalog-republish-reminder.ts';
 import { buildEntityMediaRow, buildPrimaryImageForRelease } from './lib/entity-media-row.ts';
 import { normalizePgConnectionString } from './lib/pg-connection.ts';
 import {
@@ -166,8 +167,9 @@ async function main(): Promise<void> {
   const applyRequested = flag('apply');
   const dryRun = !applyRequested;
   const allowPlaces = flag('allow-places');
-  const fromPaths = args('from');
-  if (fromPaths.length === 0) fromPaths.push('.cache/commons-qid-leftover-dry-run.json');
+  const fromArgs = args('from');
+  const fromPaths =
+    fromArgs.length === 0 ? ['.cache/commons-qid-leftover-dry-run.json'] : [...fromArgs];
   const outPath = resolve(arg('out') ?? '.cache/commons-pin-plan.json');
   const sha1CachePath = arg('sha1-cache');
   const releaseIdArg = arg('release-id');
@@ -312,10 +314,10 @@ async function main(): Promise<void> {
       rejectedByGate += 1;
       continue;
     }
-    const primaryImage = sanitizePrimaryImageForRelease(
-      buildPrimaryImageForRelease(row, rightsStatus, pinnedAt),
-    );
-    if (!primaryImage) {
+    // The sanitizer is the publication gate; it returns its input unchanged, so the Commons-typed
+    // value is what gets written once the gate passes.
+    const primaryImage = buildPrimaryImageForRelease(row, rightsStatus, pinnedAt);
+    if (!sanitizePrimaryImageForRelease(primaryImage)) {
       rejectedByGate += 1;
       continue;
     }
@@ -373,6 +375,7 @@ async function main(): Promise<void> {
   console.log(
     `Applied: promoted=${promoted} skippedExisting=${skippedExisting} rejectedByGate=${rejectedByGate}`,
   );
+  remindToRepublishCatalogArtifacts(promoted);
   await pool.end();
 }
 

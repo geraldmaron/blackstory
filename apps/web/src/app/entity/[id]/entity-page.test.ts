@@ -25,11 +25,28 @@ const mediaSource = readFileSync(
 );
 
 test('standable records 308 to /place; non-standable records still render here', () => {
-  assert.match(pageSource, /permanentRedirect\(publicRecordHref/);
+  // The address itself is computed by `publicAddressOf`, shared with the merge-redirect path.
+  assert.match(pageSource, /return publicRecordHref\(entity, collisions\)/);
+  assert.match(pageSource, /permanentRedirect\(address\)/);
   assert.match(pageSource, /canStandHere/);
   assert.match(roomSource, /<Room/);
   assert.doesNotMatch(pageSource, /getSharedPublicEntities|listPublicEntityViews\(/);
   assert.doesNotMatch(roomSource, /getSharedPublicEntities|listPublicEntityViews\(/);
+});
+
+test('a merged-away id forwards to its survivor instead of 404ing', () => {
+  // repo-n7p6.29: unpublishing an absorbed record was right; killing its URL was not. The route
+  // must consult the published absorbed->survivor map before it renders a miss.
+  assert.match(pageSource, /resolvePublicEntityRedirect/);
+  // The redirect lookup belongs on the miss path only — a hit must not pay for it.
+  const miss = /if \(!entity\) \{[\s\S]*?\n {2}\}/.exec(pageSource)?.[0] ?? '';
+  assert.ok(miss.length > 0, 'the miss branch should exist');
+  assert.match(miss, /resolvePublicEntityRedirect\(id\)/);
+  assert.match(miss, /permanentRedirect\(/);
+  // A survivor that is itself unpublished, and every non-merge miss (a withdrawal, a typo),
+  // still ends at notFound() — a real 404, not a forward onto a dead address.
+  assert.match(miss, /notFound\(\);\n {2}\}/);
+  assert.match(miss, /if \(survivor\.data\)/);
 });
 
 test('a beat renders only when the record has that content', () => {

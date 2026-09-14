@@ -8,7 +8,8 @@
  * direction to import from) could not reach them and reached for `theme.surface` instead. That
  * put one opaque light block among translucent ghosts on a dark plate.
  *
- * The plate stays on the dark register regardless of device theme (ADR-013), so these are token
+ * The plate stays on the dark register regardless of device theme
+ * (`docs/decisions-carryover.md`, "Map stack": dark archive register), so these are token
  * references at fixed alpha — never hand-copied rgba triples that drift from the palette.
  */
 import { brandCore, themeColors } from '@/ui/tokens';

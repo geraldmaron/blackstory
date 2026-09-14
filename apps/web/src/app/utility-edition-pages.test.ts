@@ -16,12 +16,14 @@ const appDir = dirname(fileURLToPath(import.meta.url));
 
 /**
  * Still on the v6 utility shell. Each one is a room-kit conversion still owed.
- * `/locate` is deliberately last out: SP-14 folds it into the Lens Where group rather than
- * restyling it in place, so converting it here would be work thrown away.
+ *
+ * `/locate` left this list in SP-14: it did not convert to the room kit, it folded into the
+ * Atlas Lens's Where group (wide) and a dedicated place sheet (narrow) instead, per
+ * `docs/ui/design-direction-v9-surfaces.md`'s `/locate` row. The standalone page and
+ * `LocateExperience` are deleted; `/locate` now 308s to `/explore?find=place`
+ * (`next-config-redirects.mjs`), and `/locate/api` is unchanged.
  */
-const UTILITY_PAGES = [
-  { route: 'locate', file: 'locate/page.tsx', seed: 'locate-edition-v6' },
-] as const;
+const UTILITY_PAGES: ReadonlyArray<{ readonly route: string; readonly file: string }> = [];
 
 /** Converted to the shared room kit. */
 const ROOM_KIT_PAGES = [

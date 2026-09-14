@@ -67,7 +67,9 @@ function bucketsFromEraText(era: string): readonly string[] {
   }
   const yearMatches = era.match(/\b(1[0-9]{3}|20[0-9]{2})\b/g);
   if (yearMatches && yearMatches.length > 0) {
-    const decades = yearMatches.map((year) => `${Math.floor(Number.parseInt(year, 10) / 10) * 10}s`);
+    const decades = yearMatches.map(
+      (year) => `${Math.floor(Number.parseInt(year, 10) / 10) * 10}s`,
+    );
     return [...new Set(decades)];
   }
   return [];
@@ -75,7 +77,10 @@ function bucketsFromEraText(era: string): readonly string[] {
 
 /** Replace unicode dashes with plain " to " for user-facing copy. */
 export function plainRangeText(value: string): string {
-  return value.replace(/\u2013|\u2014/g, ' to ').replace(/\s+/g, ' ').trim();
+  return value
+    .replace(/\u2013|\u2014/g, ' to ')
+    .replace(/\s+/g, ' ')
+    .trim();
 }
 
 export function resolveEraBuckets(input: RecordEraInput): readonly string[] {

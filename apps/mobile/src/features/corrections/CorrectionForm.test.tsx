@@ -48,7 +48,9 @@ describe('CorrectionForm — touch targets and control semantics (MOB-017)', () 
   });
 
   it('scrolls to the first invalid field when a shell scroll ref is provided', async () => {
-    const announce = jest.spyOn(AccessibilityInfo, 'announceForAccessibility').mockImplementation(() => {});
+    const announce = jest
+      .spyOn(AccessibilityInfo, 'announceForAccessibility')
+      .mockImplementation(() => {});
     const measureLayout = jest
       .spyOn(View.prototype, 'measureLayout')
       .mockImplementation((_relativeToNativeNode, onSuccess) => {

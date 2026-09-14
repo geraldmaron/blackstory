@@ -27,7 +27,7 @@ cross-checked. The stitcher surfaces exactly those overlaps:
 2. **Raise review-readiness, never auto-promote.** The corroboration is evidence a human
    reviewer can act on to lift a record off the 0.72 floor. The module itself only sets
    the candidate to `merged` / `candidate_only`; the confidence engine and human approval
-   still own promotion (ADR-009).
+   still own promotion (`docs/decisions-carryover.md`, "Research and discovery cannot publish").
 
 The effect is a recall lane for the single-source backlog: instead of 521 records sitting
 alone, the ones with genuine cross-source support are stitched together and routed to
@@ -61,7 +61,7 @@ have.
 
 ## Invariants honored
 
-- **Research cannot publish (ADR-009).** Output is a **private** `DiscoveryCandidateRecord`
+- **Research cannot publish** (`docs/decisions-carryover.md`, "Research and discovery cannot publish"). Output is a **private** `DiscoveryCandidateRecord`
   only — `schemaVersion: discovery-candidate.v1`, `signals.outcome: candidate_only`. No
   public projection, release row, or canonical entity is ever written. Corroboration
   raises review-readiness; it never auto-promotes.

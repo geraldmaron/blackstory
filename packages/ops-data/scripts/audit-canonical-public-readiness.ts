@@ -26,6 +26,13 @@ type KindRow = { readonly kind: string; readonly n: number };
 type WeedRow = { readonly skip_reason: string; readonly n: number };
 type EntityRow = { readonly id: string; readonly display_name: string; readonly kind: string };
 
+/** `bb_public.release_entities` names the entity `entity_id`, not `id`. */
+type ReleaseEntityRow = {
+  readonly entity_id: string;
+  readonly display_name: string;
+  readonly kind: string;
+};
+
 const AUDIT_SQL = `
 WITH active AS (
   SELECT release_id FROM bb_public.active_release LIMIT 1
@@ -129,7 +136,7 @@ async function main(): Promise<void> {
       pool.query<WeedRow>(AUDIT_SQL),
       pool.query<KindRow>(KINDS_CANONICAL_SQL),
       pool.query<KindRow>(PUBLIC_ONLY_KINDS_SQL),
-      pool.query<EntityRow>(EMPTY_CLAIMS_PUBLIC_SQL),
+      pool.query<ReleaseEntityRow>(EMPTY_CLAIMS_PUBLIC_SQL),
     ]);
 
     const summary = summaryRes.rows[0] as {

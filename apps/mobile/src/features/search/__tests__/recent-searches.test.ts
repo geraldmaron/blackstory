@@ -75,7 +75,9 @@ describe('removeRecentSearch — pure reducer', () => {
       { term: 'Harriet Tubman', savedAt: 1 },
       { term: 'Frederick Douglass', savedAt: 2 },
     ];
-    expect(removeRecentSearch(list, 'HARRIET TUBMAN')).toEqual([{ term: 'Frederick Douglass', savedAt: 2 }]);
+    expect(removeRecentSearch(list, 'HARRIET TUBMAN')).toEqual([
+      { term: 'Frederick Douglass', savedAt: 2 },
+    ]);
   });
 
   it('is a no-op for a term not in the list', () => {
@@ -105,7 +107,10 @@ describe('parseRecentSearches — defensive parsing', () => {
   });
 
   it('caps at MAX_RECENT_ITEMS even if the stored payload somehow carries more', () => {
-    const oversized = Array.from({ length: MAX_RECENT_ITEMS + 10 }, (_, i) => ({ t: `term-${i}`, s: i }));
+    const oversized = Array.from({ length: MAX_RECENT_ITEMS + 10 }, (_, i) => ({
+      t: `term-${i}`,
+      s: i,
+    }));
     const serialized = JSON.stringify(oversized);
     expect(parseRecentSearches(serialized)).toHaveLength(MAX_RECENT_ITEMS);
   });

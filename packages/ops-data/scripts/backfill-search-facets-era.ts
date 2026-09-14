@@ -1,13 +1,18 @@
 /**
- * repo-bx4d — realign `bb_public.search_index.facets->'eraBuckets'` with the release projection.
+ * Realign `bb_public.search_index.facets->'eraBuckets'` with the release projection.
+ *
+ * A thin wrapper over `lib/search-facet-realign.ts`, configured for the `eraBuckets` key: this is
+ * a plain array facet, so it runs through that shared engine's `array-facet` mode directly. Kept
+ * as its own script, rather than dropped in favor of calling the shared engine directly, because
+ * `apply-era-from-captured-evidence.ts` names it by file and tells the operator to run it next.
  *
  * 1,134 entities in the active release carry a non-empty `eraBuckets` in
  * `bb_public.release_entities.projection` but an empty one in the matching `search_index` row.
  * They render an era on their entity page and are simultaneously invisible to era filtering,
  * era facet counts, and era sort in search.
  *
- * These rows predate repo-1sq5, which made release-builder derive `eraBuckets` once and write the
- * same value to both artifacts. Republishing the affected lanes would fix them, but the incremental
+ * These rows predate the release-builder change that made it derive `eraBuckets` once and write
+ * the same value to both artifacts. Republishing the affected lanes would fix them, but the incremental
  * path cannot reach this population: 918 of them are absent from `bb_research.landscape_candidates`
  * and ~192 more fail the publish gate. Copying the already-correct projection onto the search doc
  * needs no builder run and touches nothing else.
@@ -17,7 +22,9 @@
  * used to blank an existing facet. Measured before this script ran, that asymmetry is safe to rely
  * on — across the active release there were 0 rows where the facet carried an era the projection
  * lacked, and 0 where both were set but disagreed. The drift is entirely one-directional, so this
- * pass is purely additive. Both conditions are re-checked and reported on every run.
+ * pass is purely additive. Both conditions are re-checked and reported on every run
+ * (`OVERWRITE_CONFLICTS=1` resolves a disagreement toward the projection, same as every other
+ * array/scalar target in the shared engine).
  *
  * Usage (from repo root):
  *   set -a && source apps/web/.env.local && set +a && export DATABASE_SSL=1
@@ -30,9 +37,11 @@
  */
 import pg from 'pg';
 import { normalizePgConnectionString } from './lib/pg-connection.ts';
+import { applySearchFacetRealign, planSearchFacetRealign } from './lib/search-facet-realign.ts';
 
 const DRY_RUN = process.env.DRY_RUN !== '0';
 const APPLY = process.env.BACKFILL_SEARCH_FACETS_ERA_APPLY === '1';
+const OVERWRITE_CONFLICTS = process.env.OVERWRITE_CONFLICTS === '1';
 
 function connectionString(): string {
   const value =
@@ -43,38 +52,6 @@ function connectionString(): string {
   return value;
 }
 
-/** `jsonb_array_length` errors on a non-array, so every read of either side is type-guarded. */
-const PROJ_ERA_LEN = `coalesce(jsonb_array_length(
-  case when jsonb_typeof(re.projection->'eraBuckets') = 'array' then re.projection->'eraBuckets' end
-), 0)`;
-const FACET_ERA_LEN = `coalesce(jsonb_array_length(
-  case when jsonb_typeof(si.facets->'eraBuckets') = 'array' then si.facets->'eraBuckets' end
-), 0)`;
-
-/**
- * Rows where the record's own projection states an era and the served search doc does not.
- * Deliberately one-directional: an empty projection era never blanks a populated facet.
- */
-const STALE_PREDICATE = `
-  si.release_id = r.release_id
-  AND jsonb_typeof(si.facets) = 'object'
-  AND ${PROJ_ERA_LEN} > 0
-  AND ${FACET_ERA_LEN} = 0
-`;
-
-const JOIN = `
-     FROM bb_public.search_index si
-     JOIN bb_public.v_active_release_id r ON r.release_id = si.release_id
-     JOIN bb_public.release_entities re
-       ON re.release_id = si.release_id AND re.entity_id = si.entity_id`;
-
-async function countStale(client: pg.Client): Promise<number> {
-  const { rows } = await client.query<{ n: number }>(
-    `SELECT count(*)::int AS n ${JOIN} WHERE ${STALE_PREDICATE}`,
-  );
-  return rows[0]?.n ?? 0;
-}
-
 async function main(): Promise<void> {
   const { connectionString: cs, ssl } = normalizePgConnectionString(connectionString());
   const client = new pg.Client({ connectionString: cs, ssl });
@@ -83,45 +60,21 @@ async function main(): Promise<void> {
   try {
     console.log('=== Backfill search_index.facets.eraBuckets from release projection ===');
 
-    const total = await countStale(client);
-    console.log(`Stale rows (projection has era, search facet empty): ${total}`);
+    const plan = await planSearchFacetRealign(client, {
+      keys: ['eraBuckets'],
+      resolveConflicts: OVERWRITE_CONFLICTS,
+    });
+    const report = plan.targets[0];
+    if (!report) throw new Error('planSearchFacetRealign returned no report for eraBuckets');
 
-    const { rows: byKind } = await client.query<{ kind: string; n: number }>(
-      `SELECT si.kind, count(*)::int AS n ${JOIN} WHERE ${STALE_PREDICATE}
-        GROUP BY 1 ORDER BY n DESC`,
-    );
-    for (const row of byKind) console.log(`  ${row.n}\t${row.kind}`);
-
-    const { rows: sample } = await client.query<{
-      entity_id: string;
-      name: string;
-      proj_era: string[];
-    }>(
-      `SELECT si.entity_id, si.name, re.projection->'eraBuckets' AS proj_era
-       ${JOIN} WHERE ${STALE_PREDICATE} ORDER BY si.name LIMIT 5`,
-    );
-    console.log('Sample:');
-    for (const row of sample) {
-      console.log(`  ${row.name} (${row.entity_id}) → ${JSON.stringify(row.proj_era)}`);
-    }
-
-    // Guardrails. Neither is written by this script; a non-zero count means the drift is no longer
-    // one-directional and the projection-as-authority assumption needs re-examination first.
-    const { rows: guard } = await client.query<{ facet_only: number; both_differ: number }>(
-      `SELECT
-         count(*) FILTER (WHERE ${PROJ_ERA_LEN} = 0 AND ${FACET_ERA_LEN} > 0)::int AS facet_only,
-         count(*) FILTER (WHERE ${PROJ_ERA_LEN} > 0 AND ${FACET_ERA_LEN} > 0
-                            AND re.projection->'eraBuckets'
-                                IS DISTINCT FROM si.facets->'eraBuckets')::int AS both_differ
-       ${JOIN} WHERE si.release_id = r.release_id`,
-    );
-    const facetOnly = guard[0]?.facet_only ?? 0;
-    const bothDiffer = guard[0]?.both_differ ?? 0;
+    console.log(`Stale rows (projection has era, search facet empty): ${report.filled}`);
     console.log(
-      `\nLeft untouched — facet has era but projection does not: ${facetOnly}` +
-        `\nLeft untouched — both set and disagreeing: ${bothDiffer}`,
+      `\nLeft untouched — facet has era but projection does not: ${report.facetOnly}` +
+        `\n${report.resolved > 0 ? 'Resolved' : 'Left untouched'} — both set and disagreeing: ${
+          report.resolved > 0 ? report.resolved : report.leftConflicts
+        }`,
     );
-    if (facetOnly > 0 || bothDiffer > 0) {
+    if (report.leftConflicts > 0) {
       console.log('  ^ neither case is repaired here; investigate before assuming a clean sync.');
     }
 
@@ -130,17 +83,8 @@ async function main(): Promise<void> {
       return;
     }
 
-    const updated = await client.query(
-      `UPDATE bb_public.search_index si
-          SET facets = jsonb_set(si.facets, '{eraBuckets}', re.projection->'eraBuckets', true)
-         FROM bb_public.v_active_release_id r,
-              bb_public.release_entities re
-        WHERE re.release_id = si.release_id
-          AND re.entity_id = si.entity_id
-          AND ${STALE_PREDICATE}`,
-    );
-    console.log(`\nApplied: search_index rows updated = ${updated.rowCount ?? 0}`);
-    console.log(`Remaining stale: ${await countStale(client)}`);
+    const updated = await applySearchFacetRealign(client, plan);
+    console.log(`\nApplied: search_index rows updated = ${updated}`);
   } finally {
     await client.end();
   }

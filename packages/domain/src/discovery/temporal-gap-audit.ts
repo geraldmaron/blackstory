@@ -6,7 +6,8 @@
  * (see `../query-packs/temporal-era/index.js`).
  *
  * A thin decade is a catalog-conditioned signal only. It never claims historical
- * underrepresentation as fact and never authorizes publication (ADR-009: research
+ * underrepresentation as fact and never authorizes publication (`docs/decisions-carryover.md`,
+ * "Research and discovery cannot publish": research
  * workers cannot publish — this module performs no I/O and no writes).
  *
  * Core factor per decade d over the supplied count map:

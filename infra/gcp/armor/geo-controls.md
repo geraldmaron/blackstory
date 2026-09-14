@@ -1,5 +1,11 @@
 # Geographic controls — default OFF (BB-023)
 
+> **Leftover/archived — describes a GCP Cloud Armor architecture that was never applied.**
+> Public APIs run on Vercel, not behind this GCP load balancer/Armor design (see
+> [`../../docs/runbooks/api-public-vercel.md`](../../docs/runbooks/api-public-vercel.md) and
+> [`../../docs/data/firebase-wind-down.md`](../../docs/data/firebase-wind-down.md)). There is
+> no live policy for this control to toggle.
+
 **Policy:** Geographic IP restrictions are **disabled by default**. Enable only when
 abuse telemetry or incident evidence justifies blocking specific regions or countries.
 

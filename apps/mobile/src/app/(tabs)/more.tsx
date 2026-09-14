@@ -5,7 +5,13 @@
 import { Linking, StyleSheet, View } from 'react-native';
 import { router } from 'expo-router';
 
-import { BrowseScreenShell, LedgerRow, LedgerSectionLabel, NavIcon } from '@/ui';
+import {
+  BrowseScreenShell,
+  EXTERNAL_LINK_HINT,
+  LedgerRow,
+  LedgerSectionLabel,
+  NavIcon,
+} from '@/ui';
 import { MOBILE_MORE_SECTIONS, type MobileMoreRow } from '@/shell/mobile-nav';
 
 function openMoreRow(row: MobileMoreRow) {
@@ -26,7 +32,7 @@ export default function MoreScreen() {
       {MOBILE_MORE_SECTIONS.map((section, sectionIndex) => (
         <View key={section.id} style={styles.section}>
           <LedgerSectionLabel ruleAbove={sectionIndex > 0}>{section.title}</LedgerSectionLabel>
-          <View>
+          <View accessibilityRole="list">
             {section.rows.map((row, index) => (
               <LedgerRow
                 key={row.id}
@@ -35,6 +41,9 @@ export default function MoreScreen() {
                 leading={<NavIcon name={row.icon} size={20} />}
                 showChevron
                 onPress={() => openMoreRow(row)}
+                {...(row.destination.kind === 'web'
+                  ? { accessibilityHint: EXTERNAL_LINK_HINT }
+                  : {})}
                 showDivider={index < section.rows.length - 1}
               />
             ))}

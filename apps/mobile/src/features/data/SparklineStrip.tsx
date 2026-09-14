@@ -57,12 +57,13 @@ export function SparklineStrip({ series }: SparklineStripProps) {
           const comparisonH = Math.max(4, (comparison / maxValue) * 48);
           return (
             <View key={point.period} style={styles.period}>
-              <View style={styles.bars} accessibilityElementsHidden importantForAccessibility="no-hide-descendants">
+              <View
+                style={styles.bars}
+                accessibilityElementsHidden
+                importantForAccessibility="no-hide-descendants"
+              >
                 <View
-                  style={[
-                    styles.bar,
-                    { height: primaryH, backgroundColor: theme.accentGraphic },
-                  ]}
+                  style={[styles.bar, { height: primaryH, backgroundColor: theme.accentGraphic }]}
                 />
                 <View
                   style={[styles.bar, { height: comparisonH, backgroundColor: theme.border }]}

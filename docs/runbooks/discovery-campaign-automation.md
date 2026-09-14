@@ -75,9 +75,9 @@ OpenRouter and Ollama variables are documented in
 ## Operations
 
 ```bash
-systemctl --user start blackstory-overnight-enrichment.service
-systemctl --user status blackstory-overnight-enrichment.service --no-pager
-journalctl --user -u blackstory-overnight-enrichment.service -n 200 --no-pager
+systemctl --user start blackstory-discovery-web-search.service
+systemctl --user status blackstory-discovery-web-search.service --no-pager
+journalctl --user -u blackstory-discovery-web-search.service -n 200 --no-pager
 ```
 
 Keep the timer stopped after any preflight failure. Do not restore a legacy backend selector to
@@ -85,7 +85,11 @@ work around an unavailable Postgres ledger.
 
 ## Ledger parity
 
-Overnight and SearXNG discovery runs share the same canonical ledger preflight. After each
-production-equivalent window, follow the parity checklist in
-[`overnight-hybrid-enrichment.md`](./overnight-hybrid-enrichment.md#ledger-parity-cycles-human-observation).
-Both cycles remain **PENDING** until a human marks them passed.
+The overnight OpenRouter/Ollama hybrid lane this section used to cross-reference
+(`scripts/run-overnight-hybrid-enrichment.sh` and its systemd unit) was removed as dead weight in
+repo-w5lyf: `packages/firebase/scripts/discover-candidates.ts` it depended on no longer exists,
+its candidate pool was empty, and repo-6nr7 records the OpenRouter/Ollama enrichment strategy
+itself as superseded by the $0 session-subagent path. SearXNG discovery shares the same ledger
+preflight but has no overnight parity counterpart to compare against anymore; see
+[`overnight-hybrid-enrichment.md`](./overnight-hybrid-enrichment.md) for the retired lane's history
+and repo-atya for the open question of what (if anything) replaces its parity-cycle tracking.

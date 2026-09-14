@@ -19,11 +19,7 @@ import {
 } from '@/ui';
 import { CensusModelFrame } from './CensusModelFrame';
 import { CoveragePulse } from './CoveragePulse';
-import {
-  DATA_INTRO,
-  DATA_ORIENTATION_BEATS,
-  DATA_SECTION_COPY,
-} from './data-copy';
+import { DATA_INTRO, DATA_ORIENTATION_BEATS, DATA_SECTION_COPY } from './data-copy';
 import { formatCount } from './format';
 import { getDataPageModel } from './indicator-snapshot';
 import { GroupedSeriesMetric } from './GroupedSeriesMetric';

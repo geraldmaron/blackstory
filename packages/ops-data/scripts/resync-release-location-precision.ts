@@ -33,6 +33,7 @@
 import pg from 'pg';
 import { buildGeoPointFields, type GeoPointFields } from '@repo/domain/geography/geohash';
 import { reducePublicPrecision, redactLocationForPublic } from '@repo/security/redaction';
+import { remindToRepublishCatalogArtifacts } from './lib/catalog-republish-reminder.ts';
 import { normalizePgConnectionString } from './lib/pg-connection.ts';
 
 const DRY_RUN = process.env.DRY_RUN !== '0';
@@ -65,9 +66,7 @@ ORDER BY re.entity_id
 
 const UPDATE_SQL = `
 UPDATE bb_public.release_entities
-SET location = $3::jsonb,
-    lat = $4, lng = $5, geohash = $6,
-    projection = jsonb_set(projection, '{location}', $3::jsonb, true)
+SET projection = jsonb_set(projection, '{location}', $3::jsonb, true)
 WHERE release_id = $1 AND entity_id = $2
 `;
 
@@ -251,17 +250,11 @@ async function main(): Promise<void> {
     }
     await client.query('BEGIN');
     for (const { row, next } of changes) {
-      await client.query(UPDATE_SQL, [
-        RELEASE_ID,
-        row.entity_id,
-        JSON.stringify(next),
-        next['lat'],
-        next['lng'],
-        next['geohash'],
-      ]);
+      await client.query(UPDATE_SQL, [RELEASE_ID, row.entity_id, JSON.stringify(next)]);
     }
     await client.query('COMMIT');
-    console.log(`\nAPPLIED: rewrote ${changes.length} rows in both stores.`);
+    console.log(`\nAPPLIED: rewrote ${changes.length} rows.`);
+    remindToRepublishCatalogArtifacts(changes.length);
   } finally {
     await client.end();
   }

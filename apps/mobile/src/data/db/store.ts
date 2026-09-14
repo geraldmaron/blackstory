@@ -5,12 +5,13 @@
  * invalidation and TanStack-Query persister are all written against. Two
  * implementations back it:
  *
- *   - `sqlite-store.ts` — the real expo-sqlite (ADR-020) implementation.
+ *   - `sqlite-store.ts` — the real expo-sqlite implementation (the engine
+ *     chosen in `docs/decisions-carryover.md`, "Mobile stack").
  *   - `memory-store.ts` — an in-memory implementation used by the unit tests
  *     AND as the degraded, memory-only fallback when the on-disk DB cannot be
  *     opened (corrupt/locked) — the app still works online, just without
- *     cross-launch offline read (ADR-022 rollback-considerations: "Disabling
- *     the persistent cache degrades to online-only fetching").
+ *     cross-launch offline read (`docs/decisions-carryover.md`, "Mobile cache and OTA
+ *     release": disabling the persistent cache degrades to online-only fetching).
  *
  * Modeling the port at THIS level (rows + meta, not raw SQL) is deliberate:
  * all the safety-critical policy logic (drop-and-rebuild migration, LRU, stamp
@@ -21,11 +22,7 @@
  */
 
 /** Logical partitions of the cache. Each is release-coupled EXCEPT `meta`. */
-export type CacheNamespace =
-  | 'entity'
-  | 'search'
-  | 'map'
-  | 'artifact';
+export type CacheNamespace = 'entity' | 'search' | 'map' | 'artifact';
 
 export const RELEASE_COUPLED_NAMESPACES: readonly CacheNamespace[] = [
   'entity',
@@ -42,7 +39,8 @@ export interface StoredEntry {
   readonly key: string;
   /** Serialized payload (JSON text). Its byte length is counted for the ceiling. */
   readonly value: string;
-  /** Release stamp under which this row was fetched (ADR-022 §4). */
+  /** Release stamp under which this row was fetched (the single global stamp —
+   * `docs/decisions-carryover.md`, "Mobile cache and OTA release"). */
   readonly releaseStamp: string;
   /** Strong ETag last seen, for conditional revalidation. */
   readonly etag?: string;
@@ -72,7 +70,8 @@ export interface CacheStore {
   entriesByAccessAsc(): Promise<StoredEntry[]>;
 
   /** Delete every release-coupled row whose stamp != `activeStamp`. Returns the
-   * number of rows removed. This is the ADR-022 §4 global invalidation. */
+   * number of rows removed. This is the global release-stamp invalidation
+   * (`docs/decisions-carryover.md`, "Mobile cache and OTA release"). */
   deleteReleaseCoupledExcept(activeStamp: string): Promise<number>;
 
   // --- migration lifecycle ---

@@ -8,9 +8,9 @@ import { isValidTopicId } from '@repo/domain';
 const PUBLIC_SUMMARY_MAX = 400;
 
 export type EnrichmentDraftFields = {
-  readonly publicSummary?: string;
-  readonly eraBuckets?: readonly string[];
-  readonly topicIds?: readonly string[];
+  readonly publicSummary?: string | undefined;
+  readonly eraBuckets?: readonly string[] | undefined;
+  readonly topicIds?: readonly string[] | undefined;
 };
 
 /** Trims publicSummary to ≤400 chars, preferring a sentence boundary when possible. */
@@ -87,7 +87,7 @@ export function filterRegisteredTopicIds(topicIds: readonly string[]): readonly 
 
 /** Applies all draft normalizers in place for promote/rejudge packet handling. */
 export function normalizeEnrichmentDrafts<T extends EnrichmentDraftFields>(drafts: T): T {
-  const normalized: EnrichmentDraftFields = {};
+  const normalized: { -readonly [K in keyof EnrichmentDraftFields]: EnrichmentDraftFields[K] } = {};
 
   if (drafts.publicSummary !== undefined) {
     normalized.publicSummary = trimPublicSummary(drafts.publicSummary);

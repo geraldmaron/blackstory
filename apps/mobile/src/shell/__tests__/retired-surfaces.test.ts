@@ -55,7 +55,11 @@ describe('retired native surfaces', () => {
     const retiredRoutes = ['/learn', '/topics', '/myths', '/facts', '/legal', '/chapters'];
     for (const file of FILES) {
       // The legacy catch-all and the normalization tables exist precisely to name these.
-      if (file.includes('legacy') || file.endsWith('mobile-nav.ts') || file.endsWith('sections.ts')) {
+      if (
+        file.includes('legacy') ||
+        file.endsWith('mobile-nav.ts') ||
+        file.endsWith('sections.ts')
+      ) {
         continue;
       }
       const source = code(file);

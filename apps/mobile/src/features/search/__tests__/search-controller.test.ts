@@ -5,9 +5,18 @@
  */
 import { createSearchController, type SearchControllerState } from '../search-controller';
 import { TransportError } from '@/data';
-import { buildRuntime, fakeReleaseCache, flushMicrotasks, makeControllableTransport, page } from '../test-support';
+import {
+  buildRuntime,
+  fakeReleaseCache,
+  flushMicrotasks,
+  makeControllableTransport,
+  page,
+} from '../test-support';
 
-function collectStates(): { states: SearchControllerState[]; onChange: (s: SearchControllerState) => void } {
+function collectStates(): {
+  states: SearchControllerState[];
+  onChange: (s: SearchControllerState) => void;
+} {
   const states: SearchControllerState[] = [];
   return { states, onChange: (s) => states.push(s) };
 }
@@ -93,13 +102,22 @@ describe('stale-page race guard (MOB-013 item 8: a slow earlier response cannot 
     controller.setQuery('second query', undefined); // generation 2, call[1]
     await flushMicrotasks();
 
-    expect(calls).toEqual(['/v1/search?q=first+query&pageSize=20', '/v1/search?q=second+query&pageSize=20']);
+    expect(calls).toEqual([
+      '/v1/search?q=first+query&pageSize=20',
+      '/v1/search?q=second+query&pageSize=20',
+    ]);
 
     // Resolve OUT OF ORDER: the newer request (call[1]) finishes first...
-    resolveCallAt(1, page({ results: [{ ...page().results[0], id: 'ent_second', displayName: 'Second Result' }] }));
+    resolveCallAt(
+      1,
+      page({ results: [{ ...page().results[0], id: 'ent_second', displayName: 'Second Result' }] }),
+    );
     await flushMicrotasks();
     // ...then the STALE first request (call[0]) resolves late.
-    resolveCallAt(0, page({ results: [{ ...page().results[0], id: 'ent_first', displayName: 'First Result' }] }));
+    resolveCallAt(
+      0,
+      page({ results: [{ ...page().results[0], id: 'ent_first', displayName: 'First Result' }] }),
+    );
     await flushMicrotasks();
 
     const final = states[states.length - 1];
@@ -180,7 +198,7 @@ describe('cursor reuse across a release change (MOB-013 item 8, threat-model T5)
   });
 });
 
-describe('offline / cached-compatible-release fallback (ADR-022 §3, threat-model T7)', () => {
+describe('offline / cached-compatible-release fallback (carryover: "Mobile cache and OTA release"; threat-model T7)', () => {
   it('serves a cached page, labeled degraded, when the network fails and a compatible cache entry exists', async () => {
     const { transport, resolveNext, rejectNext } = makeControllableTransport({ cooperative: true });
     const releaseCache = fakeReleaseCache('r1');
@@ -263,6 +281,61 @@ describe('recent-search recording', () => {
 
     expect(states[states.length - 1].kind).toBe('empty');
     expect(recentAdds).toEqual([]);
+    controller.dispose();
+  });
+});
+
+describe('era filter (repo-vlf0w: the deep-linked era Records used to drop)', () => {
+  it('sends the era filter on the /v1/search request, the same way filterKind already does', async () => {
+    const { transport, calls, resolveNext } = makeControllableTransport({ cooperative: true });
+    const releaseCache = fakeReleaseCache('r1');
+    const { runtime } = buildRuntime(transport, releaseCache);
+    const { onChange } = collectStates();
+    const controller = createSearchController(runtime, onChange);
+
+    controller.setQuery('school', undefined, '1950s');
+    await flushMicrotasks();
+
+    expect(calls).toHaveLength(1);
+    expect(calls[0]).toContain('era=1950s');
+    resolveNext(page());
+    await flushMicrotasks();
+    controller.dispose();
+  });
+
+  it('an era filter on its own (no typed query) still issues a request, not browse mode', async () => {
+    const { transport, calls, resolveNext } = makeControllableTransport({ cooperative: true });
+    const releaseCache = fakeReleaseCache('r1');
+    const { runtime } = buildRuntime(transport, releaseCache);
+    const { states, onChange } = collectStates();
+    const controller = createSearchController(runtime, onChange);
+
+    controller.setQuery('', undefined, '1950s');
+    await flushMicrotasks();
+
+    expect(calls).toHaveLength(1);
+    expect(calls[0]).toContain('era=1950s');
+    expect(states.some((s) => s.kind === 'loading')).toBe(true);
+    resolveNext(page());
+    await flushMicrotasks();
+    controller.dispose();
+  });
+
+  it('carries the settled era filter into the results state so a caller can echo it back', async () => {
+    const { transport, resolveNext } = makeControllableTransport({ cooperative: true });
+    const releaseCache = fakeReleaseCache('r1');
+    const { runtime } = buildRuntime(transport, releaseCache);
+    const { states, onChange } = collectStates();
+    const controller = createSearchController(runtime, onChange);
+
+    controller.setQuery('school', undefined, '1950s');
+    await flushMicrotasks();
+    resolveNext(page());
+    await flushMicrotasks();
+
+    const final = states[states.length - 1];
+    expect(final.kind).toBe('results');
+    expect('filterEra' in final && final.filterEra).toBe('1950s');
     controller.dispose();
   });
 });

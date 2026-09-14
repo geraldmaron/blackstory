@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import {
   buildPinPlanRow,
+  depictionHoldFor,
   dignityHoldFor,
   evaluatePinGate,
   mergeCandidatePayloads,
@@ -162,4 +163,126 @@ test('mergeCandidatePayloads dedupes by entityId, first payload wins', () => {
 
 test('mergeCandidatePayloads on no payloads returns an empty list', () => {
   assert.deepEqual(mergeCandidatePayloads([]), []);
+});
+
+/*
+ * The depiction gate (repo-n7p6.7.1).
+ *
+ * Every string below is a REAL file title or Commons ImageDescription that was live on a
+ * BlackStory person record on 2026-09-13, fetched from the Commons API. They are here verbatim
+ * because the failure was not a hypothetical: the entity gate passed all of them, since there was
+ * never anything wrong with the entity.
+ */
+test('a group photograph is refused even when the file title is just the subject name', () => {
+  // The worst live case. Two of the four children murdered in the 16th Street Baptist Church
+  // bombing carried this one photograph of all four as their solo portrait.
+  assert.equal(
+    depictionHoldFor(
+      { fileTitle: 'File:Cynthia Wesley (cropped).jpg', kind: 'person' },
+      'The four girls killed during the 16th Street Baptist Church bombing. From left: Denise McNair (11), Carole Robertson (14), Addie Mae Collins (14), Cynthia Wesley, (14)',
+    ),
+    'depicts_a_group',
+    '"(cropped)" is not evidence the crop isolated the subject — here it did not',
+  );
+});
+
+test('a class photograph is refused on its title alone, before any description is fetched', () => {
+  assert.equal(
+    depictionHoldFor(
+      {
+        fileTitle:
+          'File:Charles C. Dawson and class at the School of the Art Institute of Chicago.jpg',
+        kind: 'person',
+      },
+      undefined,
+    ),
+    'depicts_a_group',
+    'the gate has to work with no description, because that is the cheap path',
+  );
+});
+
+test('a photograph of the subject with family is refused', () => {
+  assert.equal(
+    depictionHoldFor(
+      {
+        fileTitle: 'File:Jill Brown and parents alongside a T-34B Mentor training aircraft.jpg',
+        kind: 'person',
+      },
+      'Aviation Officer Candidate Jill Brown and her parents, Mr. and Mrs. Gilbert Brown stand alongside a T-34B Mentor training aircraft.',
+    ),
+    'depicts_a_group',
+  );
+});
+
+test('a file whose own title opens on someone else is refused', () => {
+  assert.equal(
+    depictionHoldFor(
+      {
+        fileTitle:
+          'File:Unidentified man, New Orleans Mayor Ernest N. "Dutch" Morial, Mayor Raymond L. Flynn and Mayor Coleman Young at the U.S. Conference of Mayors.jpg',
+        kind: 'person',
+      },
+      undefined,
+    ),
+    'depicts_a_group',
+  );
+});
+
+test('a statue, a mural and a headstone are refused: an object of someone is not a photograph of them', () => {
+  for (const title of [
+    'File:Daisy Bates Statue (cropped).jpg',
+    'File:Rebecca Howard mural in Olympia, WA.jpg',
+    'File:Headstone of Example Person.jpg',
+  ]) {
+    assert.equal(
+      depictionHoldFor({ fileTitle: title, kind: 'person' }, undefined),
+      'depicts_an_object',
+      title,
+    );
+  }
+});
+
+test('an ordinary solo portrait passes, including a legitimate crop', () => {
+  for (const title of [
+    'File:Booker T. Washington by Francis Benjamin Johnston, c. 1895.jpg',
+    'File:W.E.B. Du Bois by James E. Purdy, 1907 (cropped).jpg',
+    'File:Harriet Tubman (circa 1885).jpg',
+    'File:Stokely Carmichael HS Yearbook.jpg',
+  ]) {
+    assert.equal(
+      depictionHoldFor({ fileTitle: title, kind: 'person' }, undefined),
+      undefined,
+      title,
+    );
+  }
+});
+
+test("a place's photograph of its own marker is not held: the rule is about person records", () => {
+  assert.equal(
+    depictionHoldFor(
+      { fileTitle: 'File:Historical marker at the Example Site.jpg', kind: 'place' },
+      'Historical marker erected at the site.',
+    ),
+    undefined,
+  );
+});
+
+test('the gate reports depiction_hold, so the operator report can say which rule fired', () => {
+  const result = evaluatePinGate(
+    {
+      entityId: 'ent_example_001',
+      displayName: 'Example',
+      outcome: 'auto_propose',
+      kind: 'person',
+      fileTitle: 'File:Example and class.jpg',
+      alt: 'alt',
+      credit: 'credit',
+      rightsStatus: 'public_domain',
+    },
+    { allowPlaces: false },
+  );
+  assert.equal(result.ok, false);
+  if (result.ok) return;
+  assert.equal(result.reason, 'depiction_hold');
+  assert.equal(result.detail, 'depicts_a_group');
 });

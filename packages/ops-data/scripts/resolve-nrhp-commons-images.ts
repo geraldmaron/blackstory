@@ -15,9 +15,9 @@
  *      the existing @repo/domain commons-media client, and decide
  *      auto_propose vs. a license-hold outcome via the same
  *      evaluateCommonsMediaPropose the dry-run-commons-qid-leftover.ts /
- *      promote-commons-auto-propose.ts pair already trusts.
+ *      pin-commons-primary-images.ts pair already trusts.
  *   4. Write a plan file shaped as `{ proposes: [...] }` — a drop-in --from
- *      input for promote-commons-auto-propose.ts — plus a counts summary.
+ *      input for pin-commons-primary-images.ts — plus a counts summary.
  *
  * Never writes to the database or to Storage. DATABASE_URL is used for a
  * single SELECT.

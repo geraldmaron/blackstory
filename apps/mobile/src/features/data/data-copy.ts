@@ -6,8 +6,7 @@
 
 export const DATA_INTRO = {
   kicker: 'Numbers',
-  lede:
-    'National Census context plus curated indicators for wealth, housing, credit, and justice. Every chart names its source.',
+  lede: 'National Census context plus curated indicators for wealth, housing, credit, and justice. Every chart names its source.',
 } as const;
 
 export const DATA_ORIENTATION_BEATS = [

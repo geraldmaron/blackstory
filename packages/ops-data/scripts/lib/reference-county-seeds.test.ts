@@ -27,3 +27,17 @@ test('buildReferenceCountySeeds uses Postgres id hierarchy and excludes territor
   assert.equal(montgomery!.countyFips, '031');
   assert.equal(montgomery!.kind, 'county');
 });
+
+test('buildReferenceCountySeeds carries an approximate bbox centered on the Gazetteer centroid', async () => {
+  const text = await readFile(FIXTURE_PATH, 'utf-8');
+  const { rows } = parseGazetteerCountyFile(text);
+  const { seeds } = buildReferenceCountySeeds(rows);
+
+  const cook = seeds.find((seed) => seed.id === 'county:17031');
+  assert.ok(cook);
+  const [west, south, east, north] = cook!.bbox;
+  assert.ok(west < east, 'bbox west edge must be strictly west of the east edge');
+  assert.ok(south < north, 'bbox south edge must be strictly south of the north edge');
+  assert.ok(west < -87.816 && east > -87.816, 'bbox must contain the county centroid longitude');
+  assert.ok(south < 41.841 && north > 41.841, 'bbox must contain the county centroid latitude');
+});

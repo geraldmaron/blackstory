@@ -1,5 +1,9 @@
 import { fireEvent, render } from '@testing-library/react-native';
-import { SearchResultCard, toSearchResultCardProps, type SearchResultCardProps } from '../SearchResultCard';
+import {
+  SearchResultCard,
+  toSearchResultCardProps,
+  type SearchResultCardProps,
+} from '../SearchResultCard';
 import type { SearchResultV1 } from '../search-contracts';
 
 function baseResult(overrides: Partial<SearchResultV1> = {}): SearchResultV1 {
@@ -33,7 +37,9 @@ describe('toSearchResultCardProps — allow-list mapping negative test (MOB-013 
     expect(props).not.toHaveProperty('rank');
     expect(props).not.toHaveProperty('claimCount');
     expect(props).not.toHaveProperty('score');
-    expect(Object.keys(props).sort()).toEqual(['displayName', 'eraBuckets', 'explanation', 'id', 'kind'].sort());
+    expect(Object.keys(props).sort()).toEqual(
+      ['displayName', 'eraBuckets', 'explanation', 'id', 'kind'].sort(),
+    );
   });
 
   it('is a fixed, exhaustive allow-list mapping -- never `{...result}`', () => {
@@ -60,7 +66,9 @@ describe('toSearchResultCardProps — allow-list mapping negative test (MOB-013 
 describe('SearchResultCard — adversarial rendering (MOB-013 item 8: malicious snippets render inert)', () => {
   it('renders an XSS/HTML/script-shaped displayName as plain, inert text', async () => {
     const hostileName = '<script>alert(1)</script><img src=x onerror=alert(2)>';
-    const props = toSearchResultCardProps(baseResult({ displayName: hostileName, explanation: 'why' }));
+    const props = toSearchResultCardProps(
+      baseResult({ displayName: hostileName, explanation: 'why' }),
+    );
     const { getByText } = await render(<SearchResultCard {...props} />);
     // The exact hostile string appears as literal TEXT content -- React Native's <Text> never
     // interprets markup, and there is no dangerouslySetInnerHTML/WebView anywhere in this
@@ -78,7 +86,13 @@ describe('SearchResultCard — adversarial rendering (MOB-013 item 8: malicious 
   });
 
   it('never throws when rendering an empty or maximally long displayName', () => {
-    expect(() => render(<SearchResultCard {...toSearchResultCardProps(baseResult({ displayName: 'x'.repeat(300) }))} />)).not.toThrow();
+    expect(() =>
+      render(
+        <SearchResultCard
+          {...toSearchResultCardProps(baseResult({ displayName: 'x'.repeat(300) }))}
+        />,
+      ),
+    ).not.toThrow();
   });
 });
 
@@ -112,5 +126,76 @@ describe('SearchResultCard — interaction', () => {
     fireEvent.press(getByLabelText('Show Harriet Tubman on map'));
     expect(onShowOnMap).toHaveBeenCalledWith('ent_42', 'person');
     expect(onPress).not.toHaveBeenCalled();
+  });
+});
+
+describe('SearchResultCard — evidence meter (a tier is an assessment, not a ranking signal)', () => {
+  it('carries a graded confidenceTier through the allow-list mapper', () => {
+    const props = toSearchResultCardProps(baseResult({ confidenceTier: 'high' }));
+    expect(props.confidenceTier).toBe('high');
+  });
+
+  it('leaves confidenceTier off the props when the result carries no grade', () => {
+    const props = toSearchResultCardProps(baseResult());
+    expect(props).not.toHaveProperty('confidenceTier');
+  });
+
+  it('draws the shared meter and speaks the grade in the row label', async () => {
+    const props = toSearchResultCardProps(baseResult({ confidenceTier: 'high' }), {
+      onPress: jest.fn(),
+    });
+    const { getByTestId, getByLabelText } = await render(<SearchResultCard {...props} />);
+    expect(
+      getByTestId('search-result-evidence-meter', { includeHiddenElements: true }),
+    ).toBeTruthy();
+    // Color is never the only cue: the grade letter renders beside the bars and the sentence
+    // rides in the row's own accessibility label.
+    expect(getByLabelText(/Evidence grade A/i)).toBeTruthy();
+  });
+
+  it('renders the grade letter as visible text, not color alone', async () => {
+    const props = toSearchResultCardProps(baseResult({ confidenceTier: 'medium' }));
+    const { getByText } = await render(<SearchResultCard {...props} />);
+    expect(getByText('B', { includeHiddenElements: true })).toBeTruthy();
+  });
+
+  it('draws no meter at all when the server could not grade the record', async () => {
+    const props = toSearchResultCardProps(baseResult());
+    const { queryByTestId } = await render(<SearchResultCard {...props} />);
+    expect(
+      queryByTestId('search-result-evidence-meter', { includeHiddenElements: true }),
+    ).toBeNull();
+  });
+
+  it('never turns an evidence count into a rendered prop, tier or not', () => {
+    const hostile = {
+      ...baseResult({ confidenceTier: 'low' }),
+      evidenceCount: 12,
+    } as SearchResultV1 & { evidenceCount: number };
+    const props = toSearchResultCardProps(hostile);
+    expect(props).not.toHaveProperty('evidenceCount');
+    expect(props.confidenceTier).toBe('low');
+  });
+});
+
+describe('SearchResultCard — position in the results', () => {
+  it('ends the row label with its place in the list', async () => {
+    const { getByRole } = await render(
+      <SearchResultCard
+        {...toSearchResultCardProps(baseResult(), { onPress: () => {} })}
+        position={{ index: 2, total: 20 }}
+      />,
+    );
+    expect(getByRole('button').props.accessibilityLabel).toMatch(/ 3 of 20\.$/);
+  });
+
+  it('says the total is only what has loaded when more results can load', async () => {
+    const { getByRole } = await render(
+      <SearchResultCard
+        {...toSearchResultCardProps(baseResult(), { onPress: () => {} })}
+        position={{ index: 0, total: 20, partial: true }}
+      />,
+    );
+    expect(getByRole('button').props.accessibilityLabel).toMatch(/ 1 of 20 loaded\.$/);
   });
 });

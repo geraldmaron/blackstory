@@ -1,5 +1,6 @@
 /**
- * Content read-and-cache orchestration (MOB-015 requirement #8; ADR-022).
+ * Content read-and-cache orchestration (MOB-015 requirement #8; `docs/decisions-carryover.md`,
+ * "Mobile cache and OTA release").
  *
  * Wires the bundled catalog (content-catalog.ts — today's stand-in for a live `/v1/content/{slug}`
  * endpoint, see that file's header) through the REAL MOB-009 cache primitives exported from
@@ -32,12 +33,14 @@ export type ContentReadResult =
       readonly value: CachedContentValue;
       readonly source: 'network' | 'cache';
       readonly fetchedAt: number;
-      /** True when served from cache while offline/degraded — the UI must label it (ADR-022 §3). */
+      /** True when served from cache while offline/degraded — the UI must label it
+       * (`docs/decisions-carryover.md`, "Mobile cache and OTA release"). */
       readonly degraded: boolean;
     }
   | { readonly status: 'not-found' }
   /** Offline AND nothing usable is cached yet — an explicit state, never a hung spinner or an
-   * empty state that reads as "this page doesn't exist" (ADR-022 §3 "no silent failures"). */
+   * empty state that reads as "this page doesn't exist" (the no-silent-failures rule —
+   * `docs/decisions-carryover.md`, "Mobile cache and OTA release"). */
   | { readonly status: 'offline-miss' };
 
 /** The minimal slice of `@/data`'s `ReleaseCache` this module needs — kept as a narrow structural

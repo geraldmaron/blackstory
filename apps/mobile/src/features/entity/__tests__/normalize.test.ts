@@ -20,32 +20,38 @@ import {
 } from '@repo/public-contracts/evidence';
 
 describe('normalizeEntity — fixture matrix', () => {
-  it.each(ALL_KINDS)('normalizes a FULL fixture for kind=%s without dropping required content', (kind) => {
-    const entity = normalizeEntity(fullEntityFixture(kind));
-    expect(entity).not.toBeNull();
-    expect(entity!.kind).toBe(kind);
-    expect(entity!.claims.length).toBeGreaterThan(0);
-    expect(entity!.timeline.length).toBeGreaterThan(0);
-    expect(entity!.relatedNeighbors?.length).toBeGreaterThan(0);
-    expect(entity!.continueLearning?.length).toBeGreaterThan(0);
-    expect(entity!.primaryImage).toBeDefined();
-    expect(entity!.sensitivity).toBeDefined();
-  });
+  it.each(ALL_KINDS)(
+    'normalizes a FULL fixture for kind=%s without dropping required content',
+    (kind) => {
+      const entity = normalizeEntity(fullEntityFixture(kind));
+      expect(entity).not.toBeNull();
+      expect(entity!.kind).toBe(kind);
+      expect(entity!.claims.length).toBeGreaterThan(0);
+      expect(entity!.timeline.length).toBeGreaterThan(0);
+      expect(entity!.relatedNeighbors?.length).toBeGreaterThan(0);
+      expect(entity!.continueLearning?.length).toBeGreaterThan(0);
+      expect(entity!.primaryImage).toBeDefined();
+      expect(entity!.sensitivity).toBeDefined();
+    },
+  );
 
-  it.each(ALL_KINDS)('normalizes a MINIMAL fixture for kind=%s (every optional field absent) without crashing', (kind) => {
-    const entity = normalizeEntity(minimalEntityFixture(kind));
-    expect(entity).not.toBeNull();
-    expect(entity!.claims).toEqual([]);
-    expect(entity!.timeline).toEqual([]);
-    expect(entity!.primaryImage).toBeUndefined();
-    expect(entity!.sensitivity).toBeUndefined();
-    expect(entity!.statusHistory).toBeUndefined();
-    expect(entity!.eventWindow).toBeUndefined();
-    expect(entity!.extendedNarrative).toBeUndefined();
-    expect(entity!.relatedNeighbors).toBeUndefined();
-    expect(entity!.continueLearning).toBeUndefined();
-    expect(entity!.geoAnchor).toBeUndefined();
-  });
+  it.each(ALL_KINDS)(
+    'normalizes a MINIMAL fixture for kind=%s (every optional field absent) without crashing',
+    (kind) => {
+      const entity = normalizeEntity(minimalEntityFixture(kind));
+      expect(entity).not.toBeNull();
+      expect(entity!.claims).toEqual([]);
+      expect(entity!.timeline).toEqual([]);
+      expect(entity!.primaryImage).toBeUndefined();
+      expect(entity!.sensitivity).toBeUndefined();
+      expect(entity!.statusHistory).toBeUndefined();
+      expect(entity!.eventWindow).toBeUndefined();
+      expect(entity!.extendedNarrative).toBeUndefined();
+      expect(entity!.relatedNeighbors).toBeUndefined();
+      expect(entity!.continueLearning).toBeUndefined();
+      expect(entity!.geoAnchor).toBeUndefined();
+    },
+  );
 });
 
 describe('normalizeEntity — adversarial cases', () => {
@@ -61,13 +67,19 @@ describe('normalizeEntity — adversarial cases', () => {
   });
 
   it('drops a malformed citation href (javascript: scheme) rather than surfacing it as a link', () => {
-    const entity = normalizeEntity({ ...fullEntityFixture('place'), claims: [claimWithMalformedCitationUrl()] });
+    const entity = normalizeEntity({
+      ...fullEntityFixture('place'),
+      claims: [claimWithMalformedCitationUrl()],
+    });
     expect(entity!.claims[0]!.citation?.href).toBeUndefined();
     expect(entity!.claims[0]!.citation?.source).toBe('Hostile source');
   });
 
   it('tolerates a claim with no citation at all', () => {
-    const entity = normalizeEntity({ ...fullEntityFixture('place'), claims: [claimWithNoCitation()] });
+    const entity = normalizeEntity({
+      ...fullEntityFixture('place'),
+      claims: [claimWithNoCitation()],
+    });
     expect(entity!.claims).toHaveLength(1);
     expect(entity!.claims[0]!.citation).toBeUndefined();
   });
@@ -212,5 +224,48 @@ describe('normalizeClaim — claimRole', () => {
     // rather than reaching `high` on two citations that are really one source plus its own
     // index row.
     expect(recordConfidenceTier(entity!.claims)).toBe('medium');
+  });
+});
+describe('normalizeEntity — evidence inputs and citing stories', () => {
+  it('keeps a connected record’s evidence inputs, and never invents a tier field', () => {
+    const entity = normalizeEntity(fullEntityFixture('place'))!;
+    const neighbor = entity.relatedNeighbors![0]!;
+    expect(neighbor.evidenceInputs).toEqual({
+      strongestClaimLevel: 'high',
+      citedLineageKeys: ['loc.gov', 'nps.gov'],
+      evidenceLineageKeys: ['loc.gov', 'nps.gov'],
+    });
+    expect(Object.keys(neighbor)).not.toContain('confidenceTier');
+  });
+
+  it('drops evidence inputs whose claim level is not a tier the contract defines', () => {
+    // A malformed level must leave the row with NO assessment rather than a defaulted one: a
+    // floor substituted here would print a grade nobody derived.
+    const raw = fullEntityFixture('place');
+    const neighbors = (raw.relatedNeighbors as Record<string, unknown>[]).map((n) => ({
+      ...n,
+      evidenceInputs: { strongestClaimLevel: 'excellent', citedLineageKeys: ['loc.gov'] },
+    }));
+    const entity = normalizeEntity({ ...raw, relatedNeighbors: neighbors })!;
+    expect(entity.relatedNeighbors![0]!.evidenceInputs).toBeUndefined();
+  });
+
+  it('keeps citing stories, and drops a citation with no slug or no title', () => {
+    const raw = fullEntityFixture('place');
+    const entity = normalizeEntity({
+      ...raw,
+      citingStories: [
+        ...(raw.citingStories as unknown[]),
+        { title: 'No slug', relation: 'referenced in', href: '/stories/x' },
+        { slug: 'no-title', relation: 'referenced in', href: '/stories/no-title' },
+      ],
+    })!;
+    expect(entity.citingStories!.map((story) => story.slug)).toEqual(['blockbusting', 'zoning']);
+  });
+
+  it('omits citingStories entirely when nothing cites the record', () => {
+    const raw = fullEntityFixture('place');
+    delete raw.citingStories;
+    expect(normalizeEntity(raw)!.citingStories).toBeUndefined();
   });
 });

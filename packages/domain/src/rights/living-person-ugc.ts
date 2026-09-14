@@ -107,9 +107,7 @@ export type DeanonymizationAttempt = {
  * pseudonymous/anonymous UGC subject is rejected outright.
  *
  * Mirrors the fail-closed assertion pattern used by `assertPublicProjectionSafe`
- * (packages/security/src/serialize.ts). This module cannot import packages/security that
- * package depends on @repo/domain, so the reverse import would be circular so the
- * pattern is reproduced here rather than shared.
+ * (packages/security/src/serialize.ts); the pattern is reproduced here rather than shared.
  */
 export function assertNoDeanonymization(
   attempt: DeanonymizationAttempt,

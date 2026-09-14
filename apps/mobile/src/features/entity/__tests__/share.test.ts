@@ -27,7 +27,9 @@ describe('shareEntity', () => {
   });
 
   it('shares the canonical https URL, never a blackstory:// deep link', async () => {
-    const spy = jest.spyOn(Share, 'share').mockResolvedValue({ action: Share.sharedAction } as never);
+    const spy = jest
+      .spyOn(Share, 'share')
+      .mockResolvedValue({ action: Share.sharedAction } as never);
     const result = await shareEntity('ent_valid_001', 'Valid Entity');
     expect(result).toBe('shared');
     const [payload] = spy.mock.calls[0]!;
@@ -37,7 +39,9 @@ describe('shareEntity', () => {
   });
 
   it('reports invalid-id without calling Share.share for an unvalidatable id', async () => {
-    const spy = jest.spyOn(Share, 'share').mockResolvedValue({ action: Share.sharedAction } as never);
+    const spy = jest
+      .spyOn(Share, 'share')
+      .mockResolvedValue({ action: Share.sharedAction } as never);
     const result = await shareEntity('../bad', 'Bad');
     expect(result).toBe('invalid-id');
     expect(spy).not.toHaveBeenCalled();

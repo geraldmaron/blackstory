@@ -1,7 +1,10 @@
 /**
  * Firestore data model (BB-013 foundation through BB-018 audit/outbox)
  *
- * Foundation for Black Book structured data under ADR-011 / D-014. Privileged writes use the Admin SDK from Cloud Run / workers with distinct service accounts. Browser clients only read public projections and create quarantine submissions.
+ * Foundation for Black Book structured data under ADR-011 / D-014 (removed 2026-07-24, and since
+ * reversed — Postgres is the live system of record; see ../../docs/decisions-carryover.md,
+ * "Firestore as system of record, reversed" — this file is leftover/history reference only, per
+ * docs/data/firebase-wind-down.md). Privileged writes use the Admin SDK from Cloud Run / workers with distinct service accounts. Browser clients only read public projections and create quarantine submissions.
  *
  * Document paths always use even segment counts (`collection/doc` or `collection/doc/collection/doc`).
  */
@@ -84,7 +87,7 @@ Typed domain models live in `@repo/domain`. Firestore Zod converters live in `@r
 - Store Firestore-friendly geometries: `Point`, `Polygon`, or `BBox` on location docs.
 - Public projection and search-index documents may include `lat`, `lng`, `geohash`, optional `geohashPrefixes`, plus `precision` and `matchMethod`.
 - `@repo/domain` provides `encodeGeohash` / `buildGeoPointFields` / `haversineMeters`.
-- `api-public` performs approved geohash-bounded queries plus server-side radius filtering (ADR-008 / ADR-011).
+- `api-public` performs approved geohash-bounded queries plus server-side radius filtering (ADR-008, "Search and geocoding", and ADR-011, "Firestore as system of record, reversed" — both in `../../docs/decisions-carryover.md`).
 - **ZIP** is `modern_input` / `modern_lookup` only — never a permanent historical boundary.
 - Historical and current `locations` subdocs may coexist on the same entity.
 - Geographic matches record `method` + constitution-aligned `precision`.

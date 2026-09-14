@@ -25,7 +25,8 @@ import { useMemo, useRef, useState } from 'react';
 import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet } from 'react-native';
 
 import { parseEntityId, parseReturnTo } from '@/lib/route-params';
-import { CorrectionForm,
+import {
+  CorrectionForm,
   CorrectionReceipt,
   createCorrectionClientDeps,
   submitCorrection,
@@ -37,7 +38,10 @@ import { UtilityScreenShell } from '@/ui';
 import { useEditionStackBack } from '@/shell/use-edition-stack-back';
 
 export default function CorrectionsSubmitSheet() {
-  const params = useLocalSearchParams<{ entityId?: string | string[]; returnTo?: string | string[] }>();
+  const params = useLocalSearchParams<{
+    entityId?: string | string[];
+    returnTo?: string | string[];
+  }>();
   const entityId = parseEntityId(params.entityId);
   const safeReturnTo = parseReturnTo(params.returnTo) ?? '/more';
 

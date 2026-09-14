@@ -1,6 +1,8 @@
 /**
  * Tests for the mobile bootstrap manifest generator (MOB-005): determinism, the release-stamp
- * contract (ADR-022 §4 staleness), the client-version floor (ADR-021 §2), and the `/v1/bootstrap`
+ * contract (ADR-023 §4 staleness; ADR-023 was removed in the 2026-07-24 purge and is restated
+ * in `docs/decisions-carryover.md`, "Mobile cache and OTA release"), the client-version floor
+ * (`docs/decisions-carryover.md`, "Mobile data boundary"), and the `/v1/bootstrap`
  * pointer-shape projection that keeps this manifest compatible with the already-built endpoint.
  */
 import assert from 'node:assert/strict';
@@ -78,7 +80,7 @@ test('stamp ignores wall-clock skew: identical content generated at the same gen
   assert.equal(first.releaseStamp, second.releaseStamp);
 });
 
-test('ADR-022 staleness: a client stamp mismatch (or absence) is stale, a match is fresh', () => {
+test('release-stamp staleness: a client stamp mismatch (or absence) is stale, a match is fresh', () => {
   const a = buildMobileBootstrapManifest(sampleInput({ releaseId: 'rel_a' }));
   const b = buildMobileBootstrapManifest(sampleInput({ releaseId: 'rel_b' }));
   assert.equal(isReleaseStampStale(undefined, a.releaseStamp), true);
@@ -115,7 +117,7 @@ test('optional pointer fields are omitted (not null) when absent', () => {
   assert.deepEqual(Object.keys(pointer), ['activeRelease']);
 });
 
-test('ADR-021 client floor: below min app build or wrong api version is incompatible', () => {
+test('client floor: below min app build or wrong api version is incompatible', () => {
   const manifest = buildMobileBootstrapManifest(sampleInput());
   assert.deepEqual(evaluateClientCompatibility(manifest, { appBuild: 999, apiVersion: 'v1' }), {
     ok: false,

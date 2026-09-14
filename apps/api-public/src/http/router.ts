@@ -19,8 +19,11 @@ import { errorResponse, type ApiResponse } from './responses.js';
 const ENTITY_PATH = /^\/v1\/entity\/([^/]+)$/;
 
 export async function dispatch(request: ApiRequest, deps: HandlerDeps): Promise<ApiResponse> {
-  // Only GET/HEAD are served — this is a read surface (ADR-005); anything else is a 404-shaped
-  // rejection (we do not advertise the route table via a 405 that distinguishes "wrong method").
+  // Only GET/HEAD are served — this is a read surface (docs/decisions-carryover.md, "Service
+  // surface separation"; ADR-005 does not exist). This hardcoded check is the actual live gate —
+  // the typed guardReadOperation/guardMutationAttempt helpers in ./posture.ts are defined but never
+  // called from this dispatch path. Anything else is a 404-shaped rejection (we do not advertise
+  // the route table via a 405 that distinguishes "wrong method").
   if (request.method !== 'GET' && request.method !== 'HEAD') {
     return notFound(request);
   }

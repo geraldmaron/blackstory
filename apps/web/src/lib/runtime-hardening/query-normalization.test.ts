@@ -194,7 +194,7 @@ test('normalizeQueryString keeps the filter params the earlier hand-written allo
   );
 });
 
-test('ADR-017: lat/lng/zoom never survive normalization on the map surface', () => {
+test('viewport policy: lat/lng/zoom never survive normalization on the map surface', () => {
   assert.equal(
     normalizeQueryString('/explore', {
       lat: '38.9072',
@@ -275,7 +275,8 @@ test('drift: the map-surface allowlist covers every key the URL parser reads', (
   // ...and nothing is allowlisted that the parser cannot read.
   assert.deepEqual([...allowed].filter((key) => !readByParser.includes(key)).sort(), []);
 
-  // The ADR-017 exclusion is a decision about keys the parser genuinely reads, not a leftover.
+  // The viewport-policy exclusion is a decision about keys the parser genuinely reads, not a
+  // leftover (`docs/decisions-carryover.md`, "Persistent map canvas": viewport policy).
   for (const key of droppedByPolicy) {
     assert.ok(readByParser.includes(key), `${key} is dropped by policy but never parsed`);
   }
@@ -292,6 +293,17 @@ test('drift: buildExploreSearchParams writes no key the allowlist lacks', () => 
     [],
   );
   assert.ok(!written.includes('panels'), 'panel chrome must not be serialized into a shared URL');
+});
+
+test("normalizeQueryString survives /explore?find=place, PlaceFinder's deep-link contract", () => {
+  // The exact regression this bead's redirect (`/locate` -> `/explore?find=place`,
+  // `next-config-redirects.mjs`) depends on: without `find` in `EXPLORE_URL_PARAM_KEYS`, the edge
+  // 308s a second time to strip it before `PlaceFinder` ever sees the query string.
+  assert.equal(normalizeQueryString('/explore', { find: 'place' }), 'find=place');
+  assert.equal(
+    needsQueryNormalizationRedirect(new URL('https://example.com/explore?find=place')),
+    false,
+  );
 });
 
 test('normalizeQueryString preserves /explore?state= revisit links', () => {

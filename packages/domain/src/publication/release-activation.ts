@@ -1,7 +1,10 @@
 /**
- * Release-activation state machine (MOB-005 — completes the release-activation integration that
- * ADR-013 ("Release-coupled build"), `workers/publication/MAP_SOURCE_INTEGRATION.md`, and ADR-004
- * describe as designed-but-not-wired).
+ * Release-activation state machine (MOB-005): the release-activation integration that
+ * `docs/decisions-carryover.md` ("Map stack": release-coupled build; "Public projection and
+ * immutable publication snapshots") and `workers/publication/MAP_SOURCE_INTEGRATION.md` describe
+ * as designed but not wired. It is implemented and tested here, and still not wired: nothing
+ * outside this package's own tests calls `activateRelease`, `rollbackTo` or `collectGarbage`, and
+ * the live publish path upserts `bb_public` under the unchanged active release id instead.
  *
  * Responsibilities, all fail-closed:
  *  - GENERATE every release-coupled aggregate artifact deterministically from one release's inputs:

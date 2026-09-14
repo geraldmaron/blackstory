@@ -3,7 +3,9 @@
  *
  * Wraps the App Check-attaching `ApiClient` from `src/security/api-client.ts`
  * (MOB-010) — it does NOT reimplement token attachment. On top of that thin
- * security wrapper this adds the read-path concerns ADR-022/threat-model need:
+ * security wrapper this adds the read-path concerns the cache decision and the threat model
+ * need (`docs/decisions-carryover.md`, "Mobile cache and OTA release";
+ * `docs/mobile/security/threat-model.md`):
  *
  *   - Cancellation via AbortController; a superseding request cancels the
  *     in-flight one it replaces (e.g. a new keystroke supersedes a search).
@@ -13,7 +15,7 @@
  *   - `Retry-After` header respect on 429/503.
  *   - ETag / `If-None-Match` conditional requests with 304 handling: a 304
  *     returns `notModified: true` and no body, so the caller keeps its cached
- *     copy (backs ADR-022 TTL revalidation without re-sending the payload).
+ *     copy (backs TTL revalidation without re-sending the payload).
  *   - A hard response-size cap enforced BEFORE JSON parsing (threat-model:
  *     maliciously large payload must not be parsed/cached).
  *
@@ -84,10 +86,7 @@ function defaultSleep(ms: number): Promise<void> {
 }
 
 function isAbortError(err: unknown): boolean {
-  return (
-    err instanceof Error &&
-    (err.name === 'AbortError' || /abort/i.test(err.message))
-  );
+  return err instanceof Error && (err.name === 'AbortError' || /abort/i.test(err.message));
 }
 
 export interface Transport {
@@ -151,7 +150,10 @@ export function createTransport(deps: TransportDeps): Transport {
 
     for (let attempt = 1; attempt <= policy.maxAttempts; attempt++) {
       if (options.signal?.aborted) {
-        throw new TransportError('request aborted before send', { kind: 'aborted', attempts: attempt - 1 });
+        throw new TransportError('request aborted before send', {
+          kind: 'aborted',
+          attempts: attempt - 1,
+        });
       }
       let response: Response;
       try {
@@ -173,11 +175,20 @@ export function createTransport(deps: TransportDeps): Transport {
       }
 
       if (response.status === 304) {
-        return { kind: 'not-modified', status: 304, etag: response.headers.get('etag') ?? options.etag };
+        return {
+          kind: 'not-modified',
+          status: 304,
+          etag: response.headers.get('etag') ?? options.etag,
+        };
       }
       if (response.status >= 200 && response.status < 300) {
         const data = await enforceSizeAndParse<T>(response);
-        return { kind: 'ok', status: response.status, data, etag: response.headers.get('etag') ?? undefined };
+        return {
+          kind: 'ok',
+          status: response.status,
+          data,
+          etag: response.headers.get('etag') ?? undefined,
+        };
       }
 
       // Non-2xx.
@@ -201,8 +212,9 @@ export function createTransport(deps: TransportDeps): Transport {
 
   async function mutate(path: string, options: ApiRequestOptions): Promise<Response> {
     // NO retry, NO size-cap-parse: mutations are single-shot and their bodies
-    // are never cached to disk (ADR-022 §2 never-cache list covers correction
-    // content). The caller owns interpretation.
+    // are never cached to disk (the never-cache list covers correction content —
+    // `docs/decisions-carryover.md`, "Mobile cache and OTA release"). The caller
+    // owns interpretation.
     return deps.apiClient.request(path, options);
   }
 
@@ -210,7 +222,10 @@ export function createTransport(deps: TransportDeps): Transport {
 }
 
 /** Parses `Retry-After` (delta-seconds or an HTTP-date) into ms, or undefined. */
-export function parseRetryAfter(value: string | null, now: number = Date.now()): number | undefined {
+export function parseRetryAfter(
+  value: string | null,
+  now: number = Date.now(),
+): number | undefined {
   if (!value) return undefined;
   const seconds = Number(value);
   if (Number.isFinite(seconds)) {
@@ -226,7 +241,7 @@ export function parseRetryAfter(value: string | null, now: number = Date.now()):
 /**
  * A single-slot superseding fetcher: each call aborts the previous in-flight
  * call before starting a new one. This is how a new search keystroke cancels
- * the prior request (ADR-022 request de-dup / cancellation). The returned
+ * the prior request (request de-dup / cancellation). The returned
  * function threads a fresh AbortSignal into `run`.
  */
 export function createSupersedingRunner() {

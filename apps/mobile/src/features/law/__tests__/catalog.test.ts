@@ -15,7 +15,9 @@ describe('law catalog', () => {
   it('loads seeded entries with explainers', () => {
     const snapshot = loadLawCatalog();
     expect(snapshot.entries.length).toBeGreaterThanOrEqual(10);
-    expect(getLawBySlug('civil-rights-act-1964')?.explainer?.whatItSays).toMatch(/Civil Rights Act/i);
+    expect(getLawBySlug('civil-rights-act-1964')?.explainer?.whatItSays).toMatch(
+      /Civil Rights Act/i,
+    );
     expect(catalogPulse(snapshot).explainerCount).toBeGreaterThan(0);
   });
 
@@ -40,9 +42,7 @@ describe('law catalog', () => {
     const cra = getLawBySlug('civil-rights-act-1964');
     expect(cra?.canonicalEntityId).toBe('ent_law_civil_rights_act_1964');
     expect(
-      loadLawCatalog().entries.every(
-        (entry) => !entry.canonicalEntityId?.startsWith('ent_seed_'),
-      ),
+      loadLawCatalog().entries.every((entry) => !entry.canonicalEntityId?.startsWith('ent_seed_')),
     ).toBe(true);
   });
 });

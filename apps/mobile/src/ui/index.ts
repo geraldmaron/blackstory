@@ -3,9 +3,19 @@
  */
 export * from './tokens';
 export * from './fonts';
+export {
+  classifyLayoutSize,
+  layoutHeightBreakpoints,
+  layoutWidthBreakpoints,
+  useLayoutSize,
+  type LayoutOrientation,
+  type LayoutSize,
+  type LayoutSizeClass,
+  type LayoutWindow,
+} from './layout';
 export { Text, type TextProps, type TextRole } from './Text';
 export { Button, type ButtonProps, type ButtonVariant, type ButtonDensity } from './Button';
-export { Link, type LinkProps } from './Link';
+export { EXTERNAL_LINK_HINT, externalLinkHint, Link, type LinkProps } from './Link';
 export { Surface, type SurfaceProps } from './Surface';
 export { Notice, type NoticeProps, type NoticeTone } from './Notice';
 export { Badge, type BadgeProps } from './Badge';
@@ -13,7 +23,12 @@ export { Divider, type DividerProps } from './Divider';
 export { EmptyState, type EmptyStateProps } from './EmptyState';
 export { ErrorState, type ErrorStateProps } from './ErrorState';
 export { Image, type ImageProps } from './Image';
-export { EntityMark, type EntityMarkProps, type EntityMarkShape, type EntityMarkReason } from './EntityMark';
+export {
+  EntityMark,
+  type EntityMarkProps,
+  type EntityMarkShape,
+  type EntityMarkReason,
+} from './EntityMark';
 export { Logo, logoClearSpaceDp, type LogoProps } from './Logo';
 export { LiftedSurface, type LiftedSurfaceProps } from './LiftedSurface';
 export { ListRow, type ListRowProps, type ListRowDensity } from './ListRow';
@@ -36,7 +51,11 @@ export { EditionSurfaceStack, type EditionSurfaceStackProps } from './EditionSur
 export { LedgerRow, type LedgerRowProps } from './LedgerRow';
 export { LedgerSectionLabel, type LedgerSectionLabelProps } from './LedgerSectionLabel';
 export { EditionFactCell, type EditionFactCellProps } from './EditionFactCell';
-export { RecordFactStrip, type RecordFactStripItem, type RecordFactStripProps } from './RecordFactStrip';
+export {
+  RecordFactStrip,
+  type RecordFactStripItem,
+  type RecordFactStripProps,
+} from './RecordFactStrip';
 export { RecordMeter, type RecordMeterProps } from './RecordMeter';
 export {
   UtilityScreenShell,

@@ -4,18 +4,10 @@
  * `native-bridge.ts` directly, mirroring `src/observability/index.ts` and
  * `src/security/index.ts`'s barrel convention.
  */
-export {
-  resolveUpdatesPosture,
-  updatesPostureToAttributes,
-  CODE_SIGNING_POSTURE,
-} from './config';
+export { resolveUpdatesPosture, updatesPostureToAttributes, CODE_SIGNING_POSTURE } from './config';
 export type { UpdatesPosture, ResolveUpdatesPostureInput } from './config';
 
-export {
-  getUpdatesPosture,
-  checkForUpdate,
-  fetchAndApplyUpdate,
-} from './bootstrap';
+export { getUpdatesPosture, checkForUpdate, fetchAndApplyUpdate } from './bootstrap';
 export type { CheckForUpdateResult, ApplyUpdateResult } from './bootstrap';
 
 export { loadNativeUpdates } from './native-bridge';

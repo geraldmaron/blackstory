@@ -11,10 +11,14 @@ import {
   assertRelationshipHasEvidence,
   assertRelationshipRoleValidForType,
   assertRelationshipTemporalRequirement,
+  BOUNDED_CONTRIBUTION_RELATIONSHIP_TYPES,
   CAUSAL_ASSERTION_RELATIONSHIP_TYPES,
   CAUSAL_HISTORICAL_RELATIONSHIP_TYPES,
+  compareRelationshipCausalWeight,
   evaluateCausalEdgeGuardrail,
   isCausalAssertionRelationshipType,
+  RELATIONSHIP_CAUSAL_WEIGHT,
+  RELATIONSHIP_CAUSAL_WEIGHT_TIERS,
   RELATIONSHIP_ROLES,
   RELATIONSHIP_TYPE_SEMANTICS,
   RELATIONSHIP_TYPES,
@@ -67,6 +71,84 @@ test('every RelationshipType has a documented direction and temporal-semantics e
     assert.ok(semantics.temporalSemantics.length > 0);
     assert.equal(typeof semantics.requiresTemporalContext, 'boolean');
   }
+});
+
+// ---------------------------------------------------------------------------
+// causal-weight ranking (repo-q16vc, 2026-09-12 owner ruling).
+// ---------------------------------------------------------------------------
+
+test('RELATIONSHIP_CAUSAL_WEIGHT_TIERS partitions every RelationshipType exactly once', () => {
+  const seen = new Map<string, number>();
+  RELATIONSHIP_CAUSAL_WEIGHT_TIERS.forEach((tier, tierIndex) => {
+    for (const type of tier) {
+      assert.ok(
+        !seen.has(type),
+        `"${type}" appears in more than one tier (${seen.get(type)} and ${tierIndex})`,
+      );
+      seen.set(type, tierIndex);
+    }
+  });
+  for (const type of RELATIONSHIP_TYPES) {
+    assert.ok(seen.has(type), `"${type}" is missing from RELATIONSHIP_CAUSAL_WEIGHT_TIERS`);
+  }
+  assert.equal(seen.size, RELATIONSHIP_TYPES.length, 'no stray entries beyond the real vocabulary');
+});
+
+test('RELATIONSHIP_CAUSAL_WEIGHT mirrors RELATIONSHIP_CAUSAL_WEIGHT_TIERS for every type', () => {
+  RELATIONSHIP_CAUSAL_WEIGHT_TIERS.forEach((tier, tierIndex) => {
+    for (const type of tier) {
+      assert.equal(RELATIONSHIP_CAUSAL_WEIGHT[type], tierIndex);
+    }
+  });
+});
+
+test('bounded-contribution tier is identical to BOUNDED_CONTRIBUTION_RELATIONSHIP_TYPES', () => {
+  const boundedTierIndex = RELATIONSHIP_CAUSAL_WEIGHT.improved;
+  for (const type of BOUNDED_CONTRIBUTION_RELATIONSHIP_TYPES) {
+    assert.equal(RELATIONSHIP_CAUSAL_WEIGHT[type], boundedTierIndex);
+  }
+});
+
+test('related_to always carries the weakest (highest) causal weight', () => {
+  const maxWeight = Math.max(...Object.values(RELATIONSHIP_CAUSAL_WEIGHT));
+  assert.equal(RELATIONSHIP_CAUSAL_WEIGHT.related_to, maxWeight);
+  for (const type of RELATIONSHIP_TYPES) {
+    if (type === 'related_to') continue;
+    assert.ok(
+      RELATIONSHIP_CAUSAL_WEIGHT[type] < RELATIONSHIP_CAUSAL_WEIGHT.related_to,
+      `"${type}" must outrank related_to`,
+    );
+  }
+});
+
+test('the owner-ruling exemplar: participated_in outranks attended', () => {
+  // Amelia Boynton Robinson's edges to the Selma to Montgomery marches, and Bayard Rustin's edges
+  // to the March on Washington, each carry both `attended` and `participated_in`. Plain
+  // alphabetical order rendered `attended` for both, understating two organizers as attendees.
+  // Causal weight must not: RELATIONSHIP_TYPE_SEMANTICS documents participated_in as "broader
+  // involvement than a single event attendance", so specificity (narrowest wins) would have kept
+  // the same wrong word — this is why the ruling picked causal weight instead.
+  assert.ok(
+    compareRelationshipCausalWeight('participated_in', 'attended') < 0,
+    'participated_in must beat attended',
+  );
+  assert.ok(RELATIONSHIP_CAUSAL_WEIGHT.participated_in < RELATIONSHIP_CAUSAL_WEIGHT.attended);
+});
+
+test('compareRelationshipCausalWeight falls back to alphabetical within a tier', () => {
+  // employed_by and member_of are both organizational/attendance edges; the ruling ratifies the
+  // tier, not an order inside it.
+  assert.equal(RELATIONSHIP_CAUSAL_WEIGHT.employed_by, RELATIONSHIP_CAUSAL_WEIGHT.member_of);
+  assert.ok(compareRelationshipCausalWeight('employed_by', 'member_of') < 0);
+  assert.ok(compareRelationshipCausalWeight('member_of', 'employed_by') > 0);
+  assert.equal(compareRelationshipCausalWeight('attended', 'attended'), 0);
+});
+
+test('commemorates ranks as contextual, not causal, despite sitting in the historical-causation comment block', () => {
+  // RELATIONSHIP_TYPE_SEMANTICS.commemorates says "never a causal claim" — the tier follows that
+  // documented semantics, not the type's place in the RELATIONSHIP_TYPES source list.
+  assert.match(RELATIONSHIP_TYPE_SEMANTICS.commemorates.direction, /never a causal claim/);
+  assert.ok(RELATIONSHIP_CAUSAL_WEIGHT.commemorates > RELATIONSHIP_CAUSAL_WEIGHT.participated_in);
 });
 
 test('authored is documented as distinct from founded (creation attribution vs org/institution founding)', () => {

@@ -77,8 +77,8 @@ Decision tree, in order:
    `internet-archive/shared/http-port.ts`). API keys are caller-supplied, stored in Secret
    Manager + `.env.local`, never read inside the adapter.
 2. **Bulk file exists** (TIGER, LODES, Opportunity Atlas, HOLC GeoJSON, CRDC ZIPs) → direct
-   download + checksum + stream-parse in a `packages/firebase/scripts/ingest-*.ts` script
-   (pattern: `ingest-opportunity-atlas.ts` streams 2.6GB/7,897 columns without buffering).
+   download + checksum + stream-parse in a `packages/ops-data/scripts/ingest-*.ts` script
+   (stream and screen row by row; never buffer a multi-gigabyte CSV in memory).
    Prefer bulk over API pagination whenever both exist — reproducible, checksummable, one
    retrieval event.
 3. **Neither** (HTML-only sources) → the existing adapter framework still applies
@@ -121,9 +121,7 @@ and the admin console. The bar for a researched entity is unchanged:
 | --- | --- |
 | API adapter, fail-closed dictionary assertion | `packages/domain/src/adapters/census-demographics/` |
 | Per-state fan-out with retry + batched writes | `packages/firebase/src/demographics/acs-load-cli.ts` |
-| Bulk CSV stream-ingest with reliability screening | `packages/firebase/scripts/ingest-opportunity-atlas.ts` |
-| Bulk GeoJSON with geometry-in-Storage reference | `packages/firebase/scripts/ingest-holc-areas.ts` |
-| Signed-URL bulk source + deterministic geo crosswalk + coverage denominator | `packages/firebase/scripts/ingest-hate-crime.ts` |
+| Bulk/API ingest into the typed statistical model | `packages/ops-data/scripts/ingest-phase1-*.ts`, `ingest-phase2-*.ts` (write `bb_reference.statistical_series` / `statistical_observations`) |
 | Idempotent doc loader (compare-then-set) | `packages/firebase/src/demographics/load-cli.ts` |
 | THE batch upsert + writer contract (use this, never re-implement) | `packages/firebase/src/external/batch-upsert.ts` |
 | THE acquisition capture chain (evidenceSources→…→sourceCaptures) | `packages/firebase/src/external/capture.ts` |

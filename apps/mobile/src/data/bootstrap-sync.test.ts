@@ -9,7 +9,11 @@ function bootstrap(releaseId: string): BootstrapResponseV1 {
     apiVersion: 'v1',
     minSupportedApiVersion: 'v1',
     deprecationWindowDays: 30,
-    activeRelease: { releaseId, generatedAt: '2026-07-19T00:00:00Z', recordUpdatedAt: '2026-07-19T00:00:00Z' },
+    activeRelease: {
+      releaseId,
+      generatedAt: '2026-07-19T00:00:00Z',
+      recordUpdatedAt: '2026-07-19T00:00:00Z',
+    },
   };
 }
 

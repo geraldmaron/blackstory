@@ -9,9 +9,12 @@
  *
  * Provenance note: every observation references a live bb_reference.statistical_observations
  * row (id, metric_id, estimate, reference_period, source, source_url, content_hash verified
- * against the warehouse on 2026-07-25). Every quoted passage references a live
- * bb_evidence.evidence_records / bb_canonical.claims row. National spine series
- * (spine-homeownership-black-us / -white-us) anchor the closing chart.
+ * against the warehouse on 2026-07-25; the 1950 and 1960 homeownership figures and the 1900/1940
+ * closing-chart endpoints were re-verified against primary decennial volumes and corrected on
+ * 2026-09-13, repo-uf6q — see packages/ops-data/fixtures/reference-indicators/
+ * census-national-homeownership-by-race-1900-2000.csv for the per-decade citation trail). Every
+ * quoted passage references a live bb_evidence.evidence_records / bb_canonical.claims row.
+ * National spine series (spine-homeownership-black-us / -white-us) anchor the closing chart.
  *
  * method_stance: gated_causal_claim. Only the 1938 HOLC/FHA -> credit-access sentence
  * uses causal language, gated to Aaronson, Hartley & Mazumder (2021) via the artifact
@@ -29,8 +32,14 @@ const NOW = '2026-07-25T00:00:00.000Z';
 const RETRIEVED = '2026-07-25T00:00:00.000Z';
 
 const CENSUS_HOUSING_SOURCE = 'Census Bureau Historical Census of Housing Tables';
+// The original URL (census.gov/topics/housing/homeownership/data/historical.html) 404s and never
+// carried a race breakout anyway (repo-uf6q, 2026-09-13). This is the closest live, on-topic
+// census.gov page still standing -- it has the TOTAL rate per decade but not a race breakout;
+// only used below for the 1980 figures, which remain UNVERIFIED against a primary race-tabulated
+// table this pass. The 1940/1950/1960 observations below cite the specific decennial volume each
+// figure was actually read from.
 const CENSUS_HOUSING_URL =
-  'https://www.census.gov/topics/housing/homeownership/data/historical.html';
+  'https://www2.census.gov/programs-surveys/decennial/tables/time-series/census-housing-tables/owner.pdf';
 const ACS_SOURCE = 'ACS 1-Year Detailed Tables';
 const ACS_2023_URL = 'https://api.census.gov/data/2023/acs/acs1/subject?get=S2503_C03_001E';
 const CENSUS_INCOME_SOURCE = 'U.S. Census Bureau';
@@ -98,7 +107,8 @@ const OBSERVATIONS: Observation[] = [
     referencePeriod: '1940',
     label: 'Black homeownership rate, United States, 1940',
     source: CENSUS_HOUSING_SOURCE,
-    sourceUrl: CENSUS_HOUSING_URL,
+    sourceUrl:
+      'https://www2.census.gov/library/publications/decennial/1940/housing-volume-2/housing-v2p1-ch2.pdf',
     contentHash: '8cd9ead98ab26e4c3e57ab424467223ece2fa8b2a59ba64cbd92e3e1976de46b',
     humanCitation:
       'U.S. Census Bureau, 1940 Census of Housing, Vol. II, Table 1 ("Negro" occupied units, owner-occupied share), United States, 1940.',
@@ -111,7 +121,8 @@ const OBSERVATIONS: Observation[] = [
     referencePeriod: '1940',
     label: 'White homeownership rate, United States, 1940',
     source: CENSUS_HOUSING_SOURCE,
-    sourceUrl: CENSUS_HOUSING_URL,
+    sourceUrl:
+      'https://www2.census.gov/library/publications/decennial/1940/housing-volume-2/housing-v2p1-ch2.pdf',
     contentHash: '30ab716c1b33a463fe680786837148812eca5abf08c210ef6ea2356bded74dd8',
     humanCitation:
       'U.S. Census Bureau, 1940 Census of Housing, Vol. II, Table 1 (white occupied units, owner-occupied share), United States, 1940.',
@@ -120,28 +131,30 @@ const OBSERVATIONS: Observation[] = [
   obs({
     observationId: 'obs:census-decennial-homeownership-black-nation:nation:US:1950',
     metricId: 'census-decennial-homeownership-black-nation',
-    estimate: 34.9,
+    estimate: 34.5,
     unit: 'percent',
     referencePeriod: '1950',
     label: 'Black homeownership rate, United States, 1950',
     source: CENSUS_HOUSING_SOURCE,
-    sourceUrl: CENSUS_HOUSING_URL,
-    contentHash: '7c5152601505fee5551dca8a260fd644d8c31e58328f11f494a1bcb99b54f785',
+    sourceUrl:
+      'https://www2.census.gov/library/publications/decennial/1950/housing-volume-1/36965082v1p1ch1.pdf',
+    contentHash: 'b9f645452f174e9b9c9a114de7d89897189a883193e5501d65ba7cd4e7c21306',
     humanCitation:
-      'U.S. Census Bureau, Historical Census of Housing Tables, Black household homeownership rate, United States, 1950.',
+      '1950 Census of Housing, Vol. I, Part 1, Table 2 ("Occupancy, Tenure, and Race of Occupants"): Negro owner-occupied share of Negro-occupied dwelling units, United States, 1950 (34.5%; corrected 2026-09-13 from 34.9%, which was the broader "Nonwhite" rate, not Negro).',
   }),
   obs({
     observationId: 'obs:census-decennial-homeownership-white_nh-nation:nation:US:1950',
     metricId: 'census-decennial-homeownership-white_nh-nation',
-    estimate: 55.1,
+    estimate: 57.0,
     unit: 'percent',
     referencePeriod: '1950',
     label: 'White homeownership rate, United States, 1950',
     source: CENSUS_HOUSING_SOURCE,
-    sourceUrl: CENSUS_HOUSING_URL,
-    contentHash: 'cb0e0f34baae1c2dab3751b75543c18ac6c45ddb3286581805139d53044530b1',
+    sourceUrl:
+      'https://www2.census.gov/library/publications/decennial/1950/housing-volume-1/36965082v1p1ch1.pdf',
+    contentHash: '2f83133e2dec5d7b44155d971dcc9a62d9d39ece7bab4455e196442f11d2d64e',
     humanCitation:
-      'U.S. Census Bureau, Historical Census of Housing Tables, White household homeownership rate, United States, 1950.',
+      '1950 Census of Housing, Vol. I, Part 1, Table 2 ("Occupancy, Tenure, and Race of Occupants"): White owner-occupied share of White-occupied dwelling units, United States, 1950 (57.0%; corrected 2026-09-13 from 55.1%, which did not match this or any other primary 1950 table found).',
   }),
   obs({
     observationId: 'obs:census-decennial-homeownership-black-nation:nation:US:1960',
@@ -150,24 +163,31 @@ const OBSERVATIONS: Observation[] = [
     unit: 'percent',
     referencePeriod: '1960',
     label: 'Black homeownership rate, United States, 1960',
+    // UNVERIFIED (repo-uf6q, 2026-09-13): the 1960 volume's Table H gives a "Nonwhite" rate of
+    // 38.4% for 1960 (which this figure matches), but the summary chapter does not break tenure
+    // out by Negro specifically the way the 1940/1950 volumes do -- so this may overstate the
+    // true Negro-specific rate slightly, by the same kind of margin the 1940/1950 Negro-vs-
+    // Nonwhite gap showed (0.4-0.8 points). Left unchanged pending a follow-up.
     source: CENSUS_HOUSING_SOURCE,
-    sourceUrl: CENSUS_HOUSING_URL,
+    sourceUrl:
+      'https://www2.census.gov/library/publications/decennial/1960/housing-volume-1/41962442v1p1ch01.pdf',
     contentHash: '080210a13281150a7f4eff94318310b81091f0736dd2b0098612bb63a867ba79',
     humanCitation:
-      'U.S. Census Bureau, Historical Census of Housing Tables, Black household homeownership rate, United States, 1960.',
+      '1960 Census of Housing, Vol. I, Part 1, Table H ("Owner Occupancy and Nonwhite Occupancy: 1890 to 1960"): Nonwhite owner-occupied share, United States, 1960 (38.4%) -- UNVERIFIED as Negro-specific; no 1960 table breaking Negro out from the broader Nonwhite category was located this pass.',
   }),
   obs({
     observationId: 'obs:census-decennial-homeownership-white_nh-nation:nation:US:1960',
     metricId: 'census-decennial-homeownership-white_nh-nation',
-    estimate: 64.9,
+    estimate: 64.4,
     unit: 'percent',
     referencePeriod: '1960',
     label: 'White homeownership rate, United States, 1960',
     source: CENSUS_HOUSING_SOURCE,
-    sourceUrl: CENSUS_HOUSING_URL,
-    contentHash: 'c8993cc7d9834b606b360851fb67bfcdab512234b36f465c102c8674c3fdc0b3',
+    sourceUrl:
+      'https://www2.census.gov/library/publications/decennial/1960/housing-volume-1/41962442v1p1ch01.pdf',
+    contentHash: '9b0b73c93fda448a2913fffe6ba276660ef596925cba744d7704712d7ebf4a24',
     humanCitation:
-      'U.S. Census Bureau, Historical Census of Housing Tables, White household homeownership rate, United States, 1960.',
+      '1960 Census of Housing, Vol. I, Part 1, Table G ("Color of Household Head and Tenure of Unit"): White owner-occupied share of White-occupied units, United States, 1960 (64.4%; corrected 2026-09-13 from 64.9%, which did not match this or any other primary 1960 table found).',
   }),
   obs({
     observationId: 'obs:dkks-wealth-ratio-white-black-nation:nation:US:1959',
@@ -190,11 +210,13 @@ const OBSERVATIONS: Observation[] = [
     unit: 'percent',
     referencePeriod: '1980',
     label: 'Black homeownership rate, United States, 1980',
+    // UNVERIFIED (repo-uf6q, 2026-09-13): no primary 1980 Census of Housing race-tenure table
+    // was located this pass. Left unchanged.
     source: CENSUS_HOUSING_SOURCE,
     sourceUrl: CENSUS_HOUSING_URL,
     contentHash: 'b8ce1edee93e4d0737aaf87eac2912fcdaca5f441b583cd32ebc4b33fd5948d1',
     humanCitation:
-      'U.S. Census Bureau, Historical Census of Housing Tables, Black household homeownership rate, United States, 1980.',
+      'U.S. Census Bureau, Historical Census of Housing Tables (owner.pdf) gives the 1980 total rate (64.4%) but not a race breakout; the Black-specific 1980 figure here is UNVERIFIED against a primary table this pass.',
   }),
   obs({
     observationId: 'obs:census-decennial-homeownership-white_nh-nation:nation:US:1980',
@@ -203,11 +225,12 @@ const OBSERVATIONS: Observation[] = [
     unit: 'percent',
     referencePeriod: '1980',
     label: 'White homeownership rate, United States, 1980',
+    // UNVERIFIED (repo-uf6q, 2026-09-13) -- see the Black 1980 observation above.
     source: CENSUS_HOUSING_SOURCE,
     sourceUrl: CENSUS_HOUSING_URL,
     contentHash: '610bc8d477835448d454dd99daf3faa9acefa8c3262bc7cd024f31db97504a00',
     humanCitation:
-      'U.S. Census Bureau, Historical Census of Housing Tables, White household homeownership rate, United States, 1980.',
+      'U.S. Census Bureau, Historical Census of Housing Tables (owner.pdf) gives the 1980 total rate (64.4%) but not a race breakout; the White-specific 1980 figure here is UNVERIFIED against a primary table this pass.',
   }),
   obs({
     observationId: 'census-h5-median-hh-income-black-nation:nation:US:1985',
@@ -564,7 +587,7 @@ const ARTIFACTS = [
     sourceUrl: CENSUS_HOUSING_URL,
     dated: '1900-2024',
     summary:
-      'Closing visual anchor: Black and White homeownership rates run together from 1900 to 2024 with the gap shaded. Spine ids: spine-homeownership-black-us, spine-homeownership-white-us. Endpoints: 1900 21.3 vs 48.5; 1940 23.6 vs 53.0; 2024 45.4 vs 74.0 (percent).',
+      'Closing visual anchor: Black and White homeownership rates run together from 1900 to 2024 with the gap shaded. Spine ids: spine-homeownership-black-us, spine-homeownership-white-us. Endpoints: 1900 21.7 vs 49.8; 1940 22.8 vs 45.7; 2024 45.4 vs 74.0 (percent).',
     provenance: {
       source: 'blackstory-spine-series',
       sourceUrl: CENSUS_HOUSING_URL,
@@ -577,9 +600,9 @@ const ARTIFACTS = [
 ] as const;
 
 const SUMMARY = [
-  'You are filling out a loan application in 1938. The federal underwriting manual open on the desk sets the terms: it instructs the appraiser to weigh, as an adverse influence, "the infiltration of business and industrial uses, lower class occupancy, and inharmonious racial groups." Your block has already been surveyed. On the government’s own security map the Near North Side reads, in the appraiser’s hand, "Negro population is largely concentrated south of Division St., and west of Wells St., but a continued infiltration of this race has caused an overflow north of that point." The grade travels with the address, not the borrower. If you are Black, you own a home at about 24 in 100. If you are white, closer to 53 in 100. On the boundaries those maps drew, the later credit-access difference is documented rather than assumed: the 1930s HOLC grade lines produced measurably different mortgage access on either side of the line (Aaronson, Hartley, and Mazumder, 2021).',
+  'You are filling out a loan application in 1938. The federal underwriting manual open on the desk sets the terms: it instructs the appraiser to weigh, as an adverse influence, "the infiltration of business and industrial uses, lower class occupancy, and inharmonious racial groups." Your block has already been surveyed. On the government’s own security map the Near North Side reads, in the appraiser’s hand, "Negro population is largely concentrated south of Division St., and west of Wells St., but a continued infiltration of this race has caused an overflow north of that point." The grade travels with the address, not the borrower. If you are Black, you own a home at about 23 in 100. If you are white, closer to 46 in 100. On the boundaries those maps drew, the later credit-access difference is documented rather than assumed: the 1930s HOLC grade lines produced measurably different mortgage access on either side of the line (Aaronson, Hartley, and Mazumder, 2021).',
   'Seventeen years pass. Your daughter signs for a house in 1955.',
-  'The deed carries a clause the map never needed to say aloud: the lot may not "be, for said term of Fifty-years, occupied by any person not of the Caucasian race." A court will enforce it until 1948, and habit enforces it after. Alongside that language, the ownership numbers barely move: about 35 in 100 Black households own in 1950, against 55 in 100 white households; by 1960 it is 38 in 100 against 65 in 100. The wealth stacked behind those two doors is further apart still, roughly eight times as much for a white family as a Black one at the end of the decade.',
+  'The deed carries a clause the map never needed to say aloud: the lot may not "be, for said term of Fifty-years, occupied by any person not of the Caucasian race." A court will enforce it until 1948, and habit enforces it after. Alongside that language, the ownership numbers barely move: about 35 in 100 Black households own in 1950, against 57 in 100 white households; by 1960 it is 38 in 100 against 64 in 100. The wealth stacked behind those two doors is further apart still, roughly eight times as much for a white family as a Black one at the end of the decade.',
   'A generation passes. Your grandson gets a mortgage in 1985.',
   'The covenant is void, the manual language struck, the Fair Housing Act (1968) seventeen years on the books. The gap holds its shape: about 44 in 100 Black households own their home, against 68 in 100 white households. In the same year, a Black household’s median income sits at $38,630 against $66,390 for a white one.',
   'You apply online in 2023. No clause, no grade, no covenant: you upload documents to an underwriting system. It turns you down at about 1 in 8 if you are a Black applicant, and about 1 in 16 if you are white, roughly twice as likely to be denied. Homeownership stands at about 46 in 100 Black households against 74 in 100 white households, close to the spread the 1938 map opened with. The wealth behind the two applications is $44,900 against $285,000, about six to one.',

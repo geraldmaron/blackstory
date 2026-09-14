@@ -1,0 +1,108 @@
+/**
+ * PlaceFinder — the merged `/locate` experience mounted in the Lens's Where group.
+ * See `PlaceFinder.tsx`'s doc comment for the two-posture contract.
+ */
+
+.ds-place-finder {
+  display: grid;
+  gap: var(--ds-space-3);
+}
+
+.ds-place-finder__form {
+  display: grid;
+  gap: var(--ds-space-2);
+}
+
+.ds-place-finder__geo-status {
+  margin: 0;
+  min-height: 1.15rem;
+  font-size: 0.75rem;
+  line-height: 1.35;
+  color: var(--ds-ink-muted);
+}
+
+.ds-place-finder__trigger {
+  /* Overrides `.ds-lens__link`'s `margin-left: auto`, which only makes sense next to a group
+     label it shares a row with; this trigger sits alone as the Where group's sole narrow-width
+     control. */
+  margin-left: 0;
+}
+
+/* ---- narrow sheet ---------------------------------------------------------
+ * A dedicated, full-width, single-column overlay (design-direction-v9-surfaces.md §"`/locate`")
+ * standing in for the inline Where-group form below the Lens breakpoint, where there is no room
+ * for the address field, radius chips, and privacy notice to sit inline. Every interactive
+ * control inside it is at least 44px (WCAG 2.5.5) — the shared `.ds-button` and
+ * `.ds-explore-place__*` recipes stop at 40px/44px respectively for the wide inline posture,
+ * which already sits inside the Lens's own smaller-target chip rows; the sheet has no such
+ * excuse, since it owns the whole viewport.
+ */
+.ds-place-sheet {
+  position: fixed;
+  inset: 0;
+  z-index: var(--ds-z-modal-sheet);
+  display: grid;
+}
+
+.ds-place-sheet__dialog {
+  position: relative;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  width: 100%;
+  height: 100%;
+  background: var(--ds-surface);
+  overflow: hidden;
+}
+
+.ds-place-sheet__head {
+  display: flex;
+  align-items: center;
+  gap: var(--ds-space-3);
+  padding: var(--ds-space-3) var(--ds-space-4);
+  border-bottom: var(--ds-border-width) solid var(--ds-rule);
+}
+
+.ds-place-sheet__title {
+  margin: 0;
+  margin-right: auto;
+  font-family: var(--ds-font-display);
+  font-size: 1.0625rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--ds-ink);
+}
+
+.ds-place-sheet__close {
+  display: inline-grid;
+  place-items: center;
+  min-width: 44px;
+  min-height: 44px;
+  border: 0;
+  border-radius: var(--ds-radius-sm);
+  background: transparent;
+  color: var(--ds-ink-muted);
+  cursor: pointer;
+}
+
+.ds-place-sheet__close:hover {
+  color: var(--ds-ink);
+  background: var(--ds-canvas);
+}
+
+.ds-place-sheet__body {
+  overflow-y: auto;
+  padding: var(--ds-space-4);
+}
+
+.ds-place-sheet .ds-button,
+.ds-place-sheet .ds-explore-place__input,
+.ds-place-sheet .ds-explore-place__chip,
+.ds-place-sheet .ds-explore-place__rec-btn {
+  min-height: 44px;
+}
+
+.ds-place-sheet .ds-explore-place__form {
+  /* Single column: the address field and the Go button stack rather than sit side by side, so
+     neither control shrinks below a comfortable tap width on a narrow sheet. */
+  grid-template-columns: minmax(0, 1fr);
+}

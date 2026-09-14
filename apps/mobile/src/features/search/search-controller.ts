@@ -50,17 +50,24 @@ export interface SearchFreshness {
   readonly source: 'network' | 'cache';
   readonly fetchedAt: number;
   /** True when served from cache while offline/degraded -- the UI MUST label this, never present
-   * it as live (ADR-022 §3/§6, threat-model T7). */
+   * it as live (`docs/decisions-carryover.md`, "Mobile cache and OTA release"; threat-model
+   * T7). */
   readonly degraded: boolean;
 }
 
 export type SearchControllerState =
   | { readonly kind: 'browse' }
-  | { readonly kind: 'loading'; readonly query: string; readonly filterKind?: string }
+  | {
+      readonly kind: 'loading';
+      readonly query: string;
+      readonly filterKind?: string;
+      readonly filterEra?: string;
+    }
   | {
       readonly kind: 'results';
       readonly query: string;
       readonly filterKind?: string;
+      readonly filterEra?: string;
       readonly results: readonly SearchResultV1[];
       readonly facets: SearchFacetCountsV1;
       readonly totalMatched: number;
@@ -71,14 +78,33 @@ export type SearchControllerState =
       readonly loadingMore: boolean;
       readonly loadMoreError?: string;
     }
-  | { readonly kind: 'empty'; readonly query: string; readonly filterKind?: string; readonly degraded: boolean }
-  | { readonly kind: 'error'; readonly query: string; readonly filterKind?: string; readonly message: string }
-  | { readonly kind: 'offline-empty'; readonly query: string; readonly filterKind?: string };
+  | {
+      readonly kind: 'empty';
+      readonly query: string;
+      readonly filterKind?: string;
+      readonly filterEra?: string;
+      readonly degraded: boolean;
+    }
+  | {
+      readonly kind: 'error';
+      readonly query: string;
+      readonly filterKind?: string;
+      readonly filterEra?: string;
+      readonly message: string;
+    }
+  | {
+      readonly kind: 'offline-empty';
+      readonly query: string;
+      readonly filterKind?: string;
+      readonly filterEra?: string;
+    };
 
 export interface SearchController {
   getState(): SearchControllerState;
-  /** `query` MUST already be normalized + debounced by the caller (useSearch.ts owns that). */
-  setQuery(query: string, filterKind: string | undefined): void;
+  /** `query` MUST already be normalized + debounced by the caller (useSearch.ts owns that).
+   * `filterEra` is the decade-bucket label (e.g. `1950s`) a `/history`/`/records` deep link
+   * carries -- optional, like `filterKind`. */
+  setQuery(query: string, filterKind: string | undefined, filterEra?: string | undefined): void;
   loadMore(): void;
   retry(): void;
   dispose(): void;
@@ -97,8 +123,9 @@ function isSupersededAbort(err: unknown): boolean {
 
 /** Network transport failures AND exhausted-retry HTTP failures both degrade to "try the cache" --
  * from the user's perspective, "can't get fresh results right now" reads the same either way, and
- * ADR-004's degraded-snapshot posture ("entity pages must remain serveable if live APIs are
- * disabled") applies identically to a live outage as to a true offline device. */
+ * the degraded-snapshot posture ("entity pages must remain serveable if live APIs are disabled";
+ * `docs/decisions-carryover.md`, "Public projection and immutable publication snapshots") applies
+ * identically to a live outage as to a true offline device. */
 function isConnectivityLikeFailure(err: unknown): boolean {
   return err instanceof TransportError && (err.info.kind === 'network' || err.info.kind === 'http');
 }
@@ -172,19 +199,27 @@ async function readCachedPage(
  */
 async function fetchPage(
   runtime: SearchRuntime,
-  params: { readonly query: string; readonly kind?: string; readonly cursor?: string },
+  params: {
+    readonly query: string;
+    readonly kind?: string;
+    readonly era?: string;
+    readonly cursor?: string;
+  },
 ): Promise<FetchedPage> {
-  const shapeKey = buildQueryShapeKey({ query: params.query, kind: params.kind });
+  const shapeKey = buildQueryShapeKey({ query: params.query, kind: params.kind, era: params.era });
   const cacheKey = `${runtime.hashQueryShape(shapeKey)}${params.cursor ? `:p:${params.cursor}` : ''}`;
   const path = buildSearchRequestPath({
     query: params.query,
     kind: params.kind,
+    era: params.era,
     cursor: params.cursor,
     pageSize: DEFAULT_SEARCH_PAGE_SIZE,
   });
 
   try {
-    const result = await runtime.run((signal) => runtime.transport.readJson<SearchResponseV1>(path, { signal }));
+    const result = await runtime.run((signal) =>
+      runtime.transport.readJson<SearchResponseV1>(path, { signal }),
+    );
     if (result.kind !== 'ok') {
       // We never send an `If-None-Match` for search requests, so a 304 is not expected on this
       // path; treat it the same as "no fresh data" rather than assuming a shape we didn't ask for.
@@ -210,7 +245,11 @@ async function fetchPage(
       // an offline copy of this particular page.
     }
 
-    return toFetchedPage(result.data, activeStamp, { source: 'network', fetchedAt, degraded: false });
+    return toFetchedPage(result.data, activeStamp, {
+      source: 'network',
+      fetchedAt,
+      degraded: false,
+    });
   } catch (err) {
     if (isSupersededAbort(err)) throw err;
     if (err instanceof RankingSignalLeakError) throw err;
@@ -249,18 +288,30 @@ export function createSearchController(
     return !disposed && gen === generation;
   }
 
-  async function runFreshQuery(query: string, filterKind: string | undefined, gen: number): Promise<void> {
+  async function runFreshQuery(
+    query: string,
+    filterKind: string | undefined,
+    filterEra: string | undefined,
+    gen: number,
+  ): Promise<void> {
     try {
-      const page = await fetchPage(runtime, { query, kind: filterKind });
+      const page = await fetchPage(runtime, { query, kind: filterKind, era: filterEra });
       if (!isCurrent(gen)) return; // superseded by a newer call -- discard even a "successful" result
       if (page.results.length === 0) {
-        setState({ kind: 'empty', query, filterKind, degraded: page.freshness.degraded });
+        setState({
+          kind: 'empty',
+          query,
+          filterKind,
+          filterEra,
+          degraded: page.freshness.degraded,
+        });
         return;
       }
       setState({
         kind: 'results',
         query,
         filterKind,
+        filterEra,
         results: page.results,
         facets: page.facets,
         totalMatched: page.totalMatched,
@@ -283,21 +334,25 @@ export function createSearchController(
       if (!isCurrent(gen)) return;
       if (isSupersededAbort(err)) return; // intentional supersession, not a user-facing failure
       if (err instanceof OfflineNoCacheError) {
-        setState({ kind: 'offline-empty', query, filterKind });
+        setState({ kind: 'offline-empty', query, filterKind, filterEra });
       } else {
-        setState({ kind: 'error', query, filterKind, message: describeError(err) });
+        setState({ kind: 'error', query, filterKind, filterEra, message: describeError(err) });
       }
     }
   }
 
-  function setQuery(query: string, filterKind: string | undefined): void {
+  function setQuery(
+    query: string,
+    filterKind: string | undefined,
+    filterEra: string | undefined = undefined,
+  ): void {
     const gen = bumpGeneration(); // always bump: cancels whatever (search or load-more) was in flight
-    if (getSearchMode(query, filterKind) === 'browse') {
+    if (getSearchMode(query, filterKind, filterEra) === 'browse') {
       setState({ kind: 'browse' });
       return;
     }
-    setState({ kind: 'loading', query, filterKind });
-    void runFreshQuery(query, filterKind, gen);
+    setState({ kind: 'loading', query, filterKind, filterEra });
+    void runFreshQuery(query, filterKind, filterEra, gen);
   }
 
   function loadMore(): void {
@@ -314,13 +369,14 @@ export function createSearchController(
         if (!currentStamp || currentStamp !== current.cursorStamp) {
           // T5: the release advanced (or we never had a stamp) since this cursor was minted.
           // Never send it -- reset to a fresh page 1 for the same query/filter instead.
-          await runFreshQuery(current.query, current.filterKind, gen);
+          await runFreshQuery(current.query, current.filterKind, current.filterEra, gen);
           return;
         }
 
         const page = await fetchPage(runtime, {
           query: current.query,
           kind: current.filterKind,
+          era: current.filterEra,
           cursor: current.cursor,
         });
         if (!isCurrent(gen)) return;
@@ -328,6 +384,7 @@ export function createSearchController(
           kind: 'results',
           query: current.query,
           filterKind: current.filterKind,
+          filterEra: current.filterEra,
           results: [...current.results, ...page.results],
           facets: page.facets,
           totalMatched: page.totalMatched,
@@ -349,7 +406,7 @@ export function createSearchController(
 
   function retry(): void {
     if (state.kind === 'error' || state.kind === 'offline-empty' || state.kind === 'empty') {
-      setQuery(state.query, state.filterKind);
+      setQuery(state.query, state.filterKind, state.filterEra);
     } else if (state.kind === 'results' && state.loadMoreError) {
       loadMore();
     }

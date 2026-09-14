@@ -2,7 +2,7 @@
 
 **Status: proposed (2026-07-30), binding when [`design-direction-v9-surfaces.md`](./design-direction-v9-surfaces.md) is.** Law extracted from [`design-direction-v9-surfaces.md`](./design-direction-v9-surfaces.md) sections 2 and 3, and demonstrated in the runnable reference build [`.design-mocks/blackstory-atlas-v9.html`](../../.design-mocks/blackstory-atlas-v9.html) (`setPlate`, `frameMoment`, `pickMoment`, `lockGestures`).
 
-Builds on, and does not replace: [`patterns-map-canvas.md`](./patterns-map-canvas.md) (single mount, WebGL lifecycle, ADR-017), [`patterns-atlas-instrument.md`](./patterns-atlas-instrument.md) (the Live posture in full), [`brand.md`](./brand.md) (map dignity, precision honesty).
+Builds on, and does not replace: [`patterns-map-canvas.md`](./patterns-map-canvas.md) (single mount, WebGL lifecycle, `../decisions-carryover.md`, "Persistent map canvas", ADR-017), [`patterns-atlas-instrument.md`](./patterns-atlas-instrument.md) (the Live posture in full), [`brand.md`](./brand.md) (map dignity, precision honesty).
 
 ---
 

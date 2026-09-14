@@ -27,6 +27,7 @@ const CHART_TAGS = [
   'StatePopulationShiftChart',
   'RacePairComparisonChart',
   'GroupedBarIndicatorChart',
+  'TrendLineChart',
   'DeltaFigure',
 ];
 
@@ -35,17 +36,21 @@ test('every figure on the page is numbered and carries a reading', () => {
     (sum, tag) => sum + countOccurrences(sectionsSource, new RegExp(`<${tag}\\b`, 'g')),
     0,
   );
-  // 4 population, 2 wealth, 3 housing, 2 justice.
-  assert.equal(figureCount, 11);
+  // 4 population, 3 wealth, 4 housing, 2 justice.
+  assert.equal(figureCount, 13);
   assert.equal(countOccurrences(sectionsSource, /figureLabel="Figure \d+"/g), figureCount);
   // DeltaFigure writes its own reading; every chart is handed one.
   assert.equal(countOccurrences(sectionsSource, /reading=\{/g), figureCount);
 });
 
-test('figure labels run 1 to 11 in document order', () => {
+// The name used to say "1 to 11" and the assertion never checked a count, so adding figures 12
+// and 13 left the name wrong and the test still green. It now asserts the count too, which is the
+// part that would have caught it.
+test('figure labels are a gapless 1..N in document order', () => {
   const labels = [...sectionsSource.matchAll(/figureLabel="Figure (\d+)"/g)].map((match) =>
     Number(match[1]),
   );
+  assert.ok(labels.length > 0, 'no figure labels found — the regex or the markup changed');
   assert.deepEqual(
     labels,
     labels.map((_, index) => index + 1),
@@ -72,6 +77,24 @@ test('the frame renders the anatomy in order: label, title, reading, graphic, ca
   }
   // The numbers are a native disclosure, so they open with JavaScript off.
   assert.match(body, /<details className="ds-datafig__numbers">/);
+});
+
+// A 1,200px table opened at 375px widened the whole figure past the viewport, and the shell's
+// overflow clip hid the overflow instead of letting it scroll. Two halves keep it fixed: the figure
+// track cannot grow to the table's min-content, and the table's scroller is reachable by keyboard.
+test('an open numbers table scrolls inside the figure instead of widening it', () => {
+  const chartsCss = readFileSync(
+    join(here, '..', '..', 'components', 'data', 'data-charts.css'),
+    'utf8',
+  );
+  const figureRule = chartsCss.match(/\.ds-datafig \{[^}]*\}/)?.[0] ?? '';
+  assert.match(figureRule, /grid-template-columns:\s*minmax\(0,\s*1fr\)/);
+  assert.match(chartsCss, /\.ds-datafig__numbers-body \{[^}]*overflow-x:\s*auto/);
+  const scroller =
+    frameSource.match(/<div\s+className="ds-datafig__numbers-body"[^>]*>/)?.[0] ?? '';
+  assert.match(scroller, /role="region"/);
+  assert.match(scroller, /aria-label=\{`Numbers for \$\{title\}`\}/);
+  assert.match(scroller, /tabIndex=\{0\}/);
 });
 
 test('every section states its as-of date once, in its head', () => {

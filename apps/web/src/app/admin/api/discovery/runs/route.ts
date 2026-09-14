@@ -1,12 +1,12 @@
 /**
  * GET /api/discovery/runs — list private discovery campaign run records.
  */
-import { authorizeAdminRequest, authErrorResponse } from '../../../../../admin/auth/request-auth';
+import { authorizeAdminRoute, authErrorResponse } from '../../../../../admin/auth/request-auth';
 import { listDiscoveryCampaignRuns } from '../../../../../admin/ops/discovery-ops-store';
 
 export async function GET(request: Request): Promise<Response> {
   try {
-    await authorizeAdminRequest(request.headers);
+    await authorizeAdminRoute(request);
     const url = new URL(request.url);
     const limit = Number(url.searchParams.get('limit') ?? '50');
     const items = await listDiscoveryCampaignRuns(limit);

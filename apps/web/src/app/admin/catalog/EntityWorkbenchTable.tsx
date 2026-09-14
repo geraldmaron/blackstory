@@ -129,7 +129,7 @@ export function EntityWorkbenchTable({
     try {
       const token = await getIdToken(true);
       if (!token) throw new Error('Sign in required');
-      const response = await fetch('/api/catalog/bulk-decision', {
+      const response = await fetch('/admin/api/catalog/bulk-decision', {
         method: 'POST',
         headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
         body: JSON.stringify({ action, entityIds, reason: reason.trim() }),

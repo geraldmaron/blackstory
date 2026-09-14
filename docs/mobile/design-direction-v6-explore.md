@@ -69,4 +69,4 @@ Kind facet uses five **family** slugs (`people`, `places`, …). Legacy micro-ki
 
 ## Supersession
 
-For mobile Explore, this doc supersedes v5 "fixed ink-glass cockpit" language in `explore-chrome.tsx` comments and ADR-024 spike notes that described a single flat copper pin layer.
+For mobile Explore, this doc supersedes v5 "fixed ink-glass cockpit" language in `explore-chrome.tsx` comments and the map-data spike notes that described a single flat copper pin layer. Those notes were cited here as "ADR-024", which was never their number: the mobile map-data decision shipped as ADR-025 while ADR-024 already held mobile build/release. It was deleted in the 2026-07-24 `docs/adr/` purge and is restated in [`docs/decisions-carryover.md`](../decisions-carryover.md), "Explore basemap and live map source" and "Native map render layer".

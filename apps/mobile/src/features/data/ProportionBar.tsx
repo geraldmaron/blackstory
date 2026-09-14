@@ -51,7 +51,10 @@ export function ProportionBar({ rows, accessibilityLabel }: ProportionBarProps) 
               </Text>
             </View>
             <View
-              style={[styles.track, { backgroundColor: theme.surfaceRaised, borderColor: theme.border }]}
+              style={[
+                styles.track,
+                { backgroundColor: theme.surfaceRaised, borderColor: theme.border },
+              ]}
               accessibilityElementsHidden
               importantForAccessibility="no-hide-descendants"
             >

@@ -1,57 +1,32 @@
 /**
  * Discovery campaign runs posture for operators.
+ *
+ * Server component (repo-gyq6.9): run history is read in the request instead of after a hydrate
+ * and a token refresh. `/admin/api/discovery/runs` stays for callers outside this page, and the
+ * Refresh button went with the client state — a server-rendered page IS the refresh.
  */
-'use client';
-
+import type { Metadata } from 'next';
 import Link from 'next/link';
-import { useCallback, useEffect, useState } from 'react';
-import { useAdminAuth } from '../../../admin/auth/AdminAuthProvider';
-import {
-  formatSurvivorCount,
-  shouldShowSurvivorsColumn,
-  type DiscoveryRunRow,
-} from './discovery-runs-view';
+import { readPostgresOrDegrade } from '../../../admin/lib/canonical-postgres-client';
+import { listDiscoveryCampaignRuns } from '../../../admin/ops/discovery-ops-store';
+import { formatSurvivorCount, shouldShowSurvivorsColumn } from './discovery-runs-view';
 
-type DiscoveryRun = DiscoveryRunRow & {
-  readonly id: string;
-  readonly status?: string;
-  readonly startedAt?: string;
-  readonly completedAt?: string;
-  readonly jobId?: string;
+export const metadata: Metadata = {
+  title: 'Discovery runs',
+  description: 'Recent discovery campaign runs.',
 };
 
-export default function DiscoveryRunsPage() {
-  const { getIdToken, user } = useAdminAuth();
-  const [rows, setRows] = useState<readonly DiscoveryRun[]>([]);
-  const [error, setError] = useState<string | null>(null);
-  const [loading, setLoading] = useState(false);
+/** Operational state is read at request time, never served from a cache. */
+export const dynamic = 'force-dynamic';
+
+export default async function DiscoveryRunsPage() {
+  const outcome = await readPostgresOrDegrade(
+    () => listDiscoveryCampaignRuns(50),
+    'discovery runs',
+  );
+  const rows = outcome.status === 'ok' ? outcome.value : [];
+  const degradedReason = outcome.status === 'degraded' ? outcome.reason : undefined;
   const showSurvivorsColumn = shouldShowSurvivorsColumn(rows);
-
-  const load = useCallback(async () => {
-    setLoading(true);
-    setError(null);
-    try {
-      const token = await getIdToken();
-      if (!token) {
-        setRows([]);
-        return;
-      }
-      const response = await fetch('/api/discovery/runs?limit=50', {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      const body = (await response.json()) as { items?: DiscoveryRun[]; error?: string };
-      if (!response.ok) throw new Error(body.error ?? `Load failed (${response.status})`);
-      setRows(body.items ?? []);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : String(err));
-    } finally {
-      setLoading(false);
-    }
-  }, [getIdToken]);
-
-  useEffect(() => {
-    if (user) void load();
-  }, [user, load]);
 
   return (
     <main className="ds-container ds-page" id="main">
@@ -66,25 +41,18 @@ export default function DiscoveryRunsPage() {
         {' · '}
         <Link href="/admin/graylist">Review graylist</Link>
       </p>
-      <button type="button" className="ds-button ds-button--secondary" onClick={() => void load()}>
-        {loading ? 'Refreshing…' : 'Refresh'}
-      </button>
-      {error ? (
+      {degradedReason ? (
         <p className="acq__alert" role="alert">
-          {error}
+          Discovery runs are unavailable — the operational database did not answer, so this page
+          shows nothing rather than a partial run history. Reload to retry.{' '}
+          <span className="ds-mono">{degradedReason}</span>
         </p>
       ) : null}
       {rows.length === 0 ? (
         <p className="ds-sans">
-          {loading ? (
-            'Loading…'
-          ) : (
-            <>
-              No discovery campaign runs found. When survivors arrive, triage them in{' '}
-              <Link href="/admin/inbox">Inbox</Link> or review parked candidates in{' '}
-              <Link href="/admin/graylist">Graylist</Link>.
-            </>
-          )}
+          No discovery campaign runs found. When survivors arrive, triage them in{' '}
+          <Link href="/admin/inbox">Inbox</Link> or review parked candidates in{' '}
+          <Link href="/admin/graylist">Graylist</Link>.
         </p>
       ) : (
         <div className="story-review__table-wrap">

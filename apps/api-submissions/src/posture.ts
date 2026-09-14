@@ -1,5 +1,7 @@
 /**
- * Quarantine-write-only posture helpers for the submissions API (ADR-005).
+ * Quarantine-write-only posture helpers for the submissions API (see docs/decisions-carryover.md,
+ * "Service surface separation" — ADR-005 does not exist). This surface's guards are called for
+ * real from quarantine.ts, unlike the equivalent helpers in apps/api-public.
  */
 import {
   assertOperationAllowed,

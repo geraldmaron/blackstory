@@ -2,7 +2,8 @@
  * Maps a `/locate/api?camera=1` resolution onto an explore camera target.
  *
  * Prefers retained lat/lng at locality zoom (neighborhood/campus framing — never street-level
- * rooftop implication; see `CAMERA_COUNTY_ZOOM` / ADR-008). When coordinates were not retained,
+ * rooftop implication; see `CAMERA_COUNTY_ZOOM` and `docs/decisions-carryover.md`, "Search and
+ * geocoding"). When coordinates were not retained,
  * falls back to the state's shareable viewport (`viewportForState`) from the jurisdiction id.
  * Pure and Node-testable — no MapLibre import.
  */

@@ -1,22 +1,47 @@
 # Census CPS Historical Reported Voting Rates, Table A-1.
-# Citizen voting rates (%) for presidential years by race/ethnicity.
+# Citizen voting/registration rates (%) for presidential years by race/ethnicity.
 # White = White non-Hispanic citizen population; Black/Asian/Hispanic = citizen population.
 # Source xlsx: https://www2.census.gov/programs-surveys/cps/tables/time-series/voting-historical-time-series/a1.xlsx
 # Fetched 2026-07-24; SHA-256 of xlsx: b38d248dfa9e13e41fed0dce1fe3255068bbfc57a379b317f43e709221541d70
 # Table title covers November 1964 to 2020 (2024 not published in this file).
-year,white_non_hispanic_citizen_pct,black_citizen_pct,asian_citizen_pct,hispanic_citizen_pct
-2020,70.9,62.6,59.7,53.7
-2016,65.3,59.4,49.0,47.6
-2012,64.1,66.2,47.3,48.0
-2008,66.1,64.7,47.6,49.9
-2004,67.2,60.0,44.2,47.2
-2000,61.8,56.8,43.3,45.1
-1996,60.7,53.0,45.0,44.0
-1992,70.2,59.2,53.9,51.6
-1988,64.2,55.0,,48.0
-1984,66.4,60.6,,50.0
-1980,66.2,53.9,,46.0
-1976,,,,
-1972,,,,
-1968,,,,
-1964,,,,
+#
+# 1964-1976 (repo-zxjz.8 backfill): Table A-1's "Black" column has no Hispanic-origin
+# split in any year, so black_citizen_pct/black_registered_citizen_pct for these years
+# come straight off the sheet with no race-definition change -- only the population
+# universe changes (see below). Values: sheet1 rows 30/32/34/36 (Voted, column I) and
+# 63/65/67 (Registered, column I); 1964 Registered (row 69) is blank in the source
+# itself (Census did not publish a 1964 registration figure), not a gap this fixture
+# can fill.
+# white_non_hispanic_citizen_pct / white_non_hispanic_registered_citizen_pct stay blank
+# for 1964-1976 and always will: the source table has no "White non-Hispanic" column at
+# all for those years (sheet1 columns G/H are the literal string "NA"), only an
+# aggregate "White" column that includes White Hispanics (column E, e.g. 1964 = 70.7).
+# Writing that aggregate into a series named non-Hispanic would change what the series
+# measures partway through its own history, which is the defect this fixture exists to
+# avoid. The aggregate is published instead as its own column and its own metric,
+# white_incl_hispanic_pct / cps-a1-turnout-white-incl-hispanic-nation, so the pre-1980
+# arc is available to a reader who wants it and the break is impossible to miss.
+# The two are NOT interchangeable and must never be charted as one line.
+# Universe note (Census Table A-1 footnote, verbatim): "Prior to 1996, the CPS did not
+# collect information on citizenship in a uniform way. Estimates for the citizenship
+# population presented in this table prior to 1996 should be interpreted with
+# caution, as they are not directly comparable to estimates from 1996 and after."
+# Registration columns use the citizen-population figure where the sheet publishes
+# one, falling back to the total-population figure for years without a citizen count
+# (1968-1976 Black; all of 1964), matching the existing turnout columns' convention.
+year,white_non_hispanic_citizen_pct,black_citizen_pct,asian_citizen_pct,hispanic_citizen_pct,black_registered_citizen_pct,white_non_hispanic_registered_citizen_pct,white_incl_hispanic_pct
+2020,70.9,62.6,59.7,53.7,69.0,76.5,
+2016,65.3,59.4,49.0,47.6,69.4,73.9,
+2012,64.1,66.2,47.3,48.0,73.1,73.7,
+2008,66.1,64.7,47.6,49.9,69.7,73.5,
+2004,67.2,60.0,44.2,47.2,68.7,75.1,
+2000,61.8,56.8,43.3,45.1,67.5,71.6,
+1996,60.7,53.0,45.0,44.0,66.4,73.0,
+1992,70.2,59.2,53.9,51.6,70.0,77.1,
+1988,64.2,55.0,,48.0,68.8,73.6,
+1984,66.4,60.6,,50.0,72.0,75.1,
+1980,66.2,53.9,,46.0,64.1,74.1,
+1976,,48.7,,,58.5,,60.9
+1972,,52.1,,,65.5,,64.5
+1968,,57.6,,,66.2,,69.1
+1964,,58.5,,,,,70.7

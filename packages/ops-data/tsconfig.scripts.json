@@ -1,0 +1,25 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "rootDir": "../..",
+    "noEmit": true,
+    "allowImportingTsExtensions": true,
+    "customConditions": ["development"]
+  },
+  "include": [
+    "scripts/**/*.ts",
+    "scripts/**/*.mts",
+    "fixtures/**/*.ts",
+    "../domain/src/temporal/edtf-shim.d.ts"
+  ],
+  "exclude": [
+    "scripts/load-banned-books-to-supabase.ts",
+    "scripts/load-legal-snapshots-to-supabase.ts",
+    "scripts/lib/legal-snapshot-entity-links.test.ts"
+  ],
+  "excludeReasons": {
+    "scripts/load-banned-books-to-supabase.ts": "imports apps/web seed sources by relative path; apps/web is a CommonJS package, so its ESM exports cannot typecheck here — @repo/web checks them",
+    "scripts/load-legal-snapshots-to-supabase.ts": "imports apps/web seed sources by relative path; apps/web is a CommonJS package, so its ESM exports cannot typecheck here — @repo/web checks them",
+    "scripts/lib/legal-snapshot-entity-links.test.ts": "same reason as the loader it guards: it reads the apps/web legal seed to assert every snapshot slug has been ruled on, and apps/web is a CommonJS package. The module under test (scripts/lib/legal-snapshot-entity-links.ts) imports nothing and stays in the program; only this test is excluded, and `npm test` still runs it"
+  }
+}

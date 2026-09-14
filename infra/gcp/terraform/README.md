@@ -1,7 +1,11 @@
 # Terraform single-project isolation stubs (BB-005)
 
 These unapplied stubs target only the existing production project `black-book-efaaf`
-(`blackbook-prod` under ADR-012, removed 2026-07-24 — see `docs/security/environment-isolation.md`).
+(`blackbook-prod` under ADR-012, whose document was removed 2026-07-24 and whose decision is
+recovered in `../../../docs/decisions-carryover.md`, "Small recovered decisions" — see also
+`docs/security/environment-isolation.md`). That recovery records the part this README depends on:
+the three-project topology is still an UNAPPLIED design target, `black-book-efaaf` is the only
+live project, and the two new projects were since renamed `repo-staging`/`repo-internal`.
 They model seven per-surface SAs, three buckets with UBLA/PAP posture, and bucket-scoped IAM. The
 four ADR-012-relocated identities (`admin`, `publication`, `security`, `research`) and the
 `private-evidence` bucket are intentionally absent here — they live in

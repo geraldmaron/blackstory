@@ -2,12 +2,19 @@
  * Public correction status page. Shows coarse phases only never spam scores, campaign
  * flags, duplicate lists, or other moderation-sensitive metadata.
  */
+import React from 'react';
 import { EmptyState } from '@repo/ui';
 import Link from 'next/link';
 import type { PublicCorrectionStatus } from './public-status';
 import { AppealForm } from './AppealForm';
 import { AbuseReportForm } from './AbuseReportForm';
 import { ReceiptBlock } from './ReceiptBlock';
+
+// `React` is otherwise unused under this app's own automatic JSX runtime, but keeping it
+// imported makes this file safe to cross-transpile from a consumer whose own tsconfig uses a
+// classic JSX transform, where the JSX below compiles to `React.createElement(...)` calls that
+// need `React` in scope (see `ReceiptBlock.tsx` and `@repo/ui`'s `Notice.tsx` for the same note).
+void React;
 
 export function CorrectionStatusPanel({ status }: { readonly status: PublicCorrectionStatus }) {
   return (
@@ -18,6 +25,10 @@ export function CorrectionStatusPanel({ status }: { readonly status: PublicCorre
         submittedAt={status.submittedAt}
         updatedAt={status.updatedAt}
       />
+
+      {status.phase === 'closed' && status.outcomeReason ? (
+        <p className="ds-room-field__hint">Declined: {status.outcomeReason}</p>
+      ) : null}
 
       <p className="ds-room-field__hint">
         Nothing you sent is public. If your correction is declined, you get the reason. Volume of

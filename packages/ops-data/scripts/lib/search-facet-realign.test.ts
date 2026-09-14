@@ -1,0 +1,414 @@
+/**
+ * Unit tests for the shared search-facet realign engine. A fake client stands in for Postgres:
+ * it answers the one `SELECT` this module issues with canned rows and records every `UPDATE` it
+ * is given, so every target mode is exercised without a database.
+ */
+import assert from 'node:assert/strict';
+import { test } from 'node:test';
+import {
+  applySearchFacetRealign,
+  planSearchFacetRealign,
+  type SearchFacetRealignClient,
+} from './search-facet-realign.ts';
+
+type Row = {
+  entity_id: string;
+  kind: string;
+  facets: Record<string, unknown>;
+  status: string | null;
+  topics: string[] | null;
+  projection: Record<string, unknown>;
+};
+
+function fakeClient(rows: readonly Row[]) {
+  const updates: Array<{ sql: string; params: readonly unknown[] }> = [];
+  const client: SearchFacetRealignClient & { readonly updates: typeof updates } = {
+    updates,
+    query: async <T extends Record<string, unknown> = Record<string, unknown>>(
+      sql: string,
+      params?: readonly unknown[],
+    ): Promise<{ readonly rows: T[]; readonly rowCount?: number | null }> => {
+      if (sql.includes('SELECT')) {
+        return { rows: rows as unknown as T[] };
+      }
+      updates.push({ sql, params: params ?? [] });
+      return { rows: [], rowCount: 1 };
+    },
+  };
+  return client;
+}
+
+test('array-facet: fills an empty facet from a non-empty projection array', async () => {
+  const client = fakeClient([
+    {
+      entity_id: 'ent_a',
+      kind: 'person',
+      facets: {},
+      status: null,
+      topics: null,
+      projection: { eraBuckets: ['reconstruction'] },
+    },
+  ]);
+  const plan = await planSearchFacetRealign(client, { keys: ['eraBuckets'] });
+  assert.equal(plan.targets[0]?.filled, 1);
+  assert.equal(plan.targets[0]?.facetOnly, 0);
+  assert.equal(plan.changes.length, 1);
+  assert.deepEqual(plan.changes[0]?.facetsPatch, { eraBuckets: ['reconstruction'] });
+});
+
+test('array-facet: never blanks a facet the projection lacks (facet-only, left alone)', async () => {
+  const client = fakeClient([
+    {
+      entity_id: 'ent_b',
+      kind: 'person',
+      facets: { eraBuckets: ['jim_crow'] },
+      status: null,
+      topics: null,
+      projection: {},
+    },
+  ]);
+  const plan = await planSearchFacetRealign(client, { keys: ['eraBuckets'] });
+  assert.equal(plan.targets[0]?.facetOnly, 1);
+  assert.equal(plan.changes.length, 0);
+});
+
+test('array-facet: a disagreement is reported but not written unless resolveConflicts is set', async () => {
+  const rows: Row[] = [
+    {
+      entity_id: 'ent_c',
+      kind: 'person',
+      facets: { eraBuckets: ['jim_crow'] },
+      status: null,
+      topics: null,
+      projection: { eraBuckets: ['reconstruction'] },
+    },
+  ];
+  const withoutResolve = await planSearchFacetRealign(fakeClient(rows), { keys: ['eraBuckets'] });
+  assert.equal(withoutResolve.targets[0]?.leftConflicts, 1);
+  assert.equal(withoutResolve.changes.length, 0);
+
+  const withResolve = await planSearchFacetRealign(fakeClient(rows), {
+    keys: ['eraBuckets'],
+    resolveConflicts: true,
+  });
+  assert.equal(withResolve.targets[0]?.resolved, 1);
+  assert.deepEqual(withResolve.changes[0]?.facetsPatch, { eraBuckets: ['reconstruction'] });
+});
+
+test('scalar-facet: jurisdiction reads a different projection key than it writes, and trims whitespace-only as empty', async () => {
+  const client = fakeClient([
+    {
+      entity_id: 'ent_d',
+      kind: 'place',
+      facets: { jurisdictionState: '   ' },
+      status: null,
+      topics: null,
+      projection: { jurisdictionLabel: 'Kendleton, Texas' },
+    },
+  ]);
+  const plan = await planSearchFacetRealign(client, { keys: ['jurisdictionState'] });
+  assert.equal(plan.targets[0]?.filled, 1);
+  assert.deepEqual(plan.changes[0]?.facetsPatch, { jurisdictionState: 'Kendleton, Texas' });
+});
+
+test('scalar-facet: summary copies projection.summary into facets.summary', async () => {
+  const client = fakeClient([
+    {
+      entity_id: 'ent_e',
+      kind: 'person',
+      facets: {},
+      status: null,
+      topics: null,
+      projection: { summary: 'A long biographical summary.' },
+    },
+  ]);
+  const plan = await planSearchFacetRealign(client, { keys: ['summary'] });
+  assert.equal(plan.targets[0]?.filled, 1);
+  assert.deepEqual(plan.changes[0]?.facetsPatch, { summary: 'A long biographical summary.' });
+});
+
+test('topics-column: fills the topics COLUMN (not a facets key) from projection.topicIds', async () => {
+  const client = fakeClient([
+    {
+      entity_id: 'ent_marjorie_joyner_001',
+      kind: 'invention',
+      facets: { topicIds: ['invention', 'business'] },
+      status: null,
+      topics: [],
+      projection: { topicIds: ['invention', 'business', 'women', 'community'] },
+    },
+  ]);
+  const plan = await planSearchFacetRealign(client, { keys: ['topics'] });
+  assert.equal(plan.targets[0]?.filled, 1);
+  assert.deepEqual(plan.changes[0]?.topicsColumn, ['invention', 'business', 'women', 'community']);
+  // Never touches facets — mapPostgresSearchIndexRow reads the column first.
+  assert.deepEqual(plan.changes[0]?.facetsPatch, {});
+});
+
+test('topics-column: an empty projection.topicIds never blanks an existing topics column', async () => {
+  const client = fakeClient([
+    {
+      entity_id: 'ent_f',
+      kind: 'person',
+      facets: {},
+      status: null,
+      topics: ['music'],
+      projection: {},
+    },
+  ]);
+  const plan = await planSearchFacetRealign(client, { keys: ['topics'] });
+  assert.equal(plan.targets[0]?.facetOnly, 1);
+  assert.equal(plan.changes.length, 0);
+});
+
+test('status-column: reads the status COLUMN before facets.status, and always resolves a mismatch (no OVERWRITE_CONFLICTS needed)', async () => {
+  const client = fakeClient([
+    {
+      entity_id: 'ent_g',
+      kind: 'person',
+      facets: { status: 'living' },
+      status: 'living',
+      topics: null,
+      projection: { status: 'deceased' },
+    },
+  ]);
+  const plan = await planSearchFacetRealign(client, { keys: ['status'] });
+  assert.equal(plan.targets[0]?.resolved, 1);
+  assert.equal(plan.targets[0]?.leftConflicts, 0);
+  assert.deepEqual(plan.changes[0]?.facetsPatch, { status: 'deceased' });
+  assert.equal(plan.changes[0]?.statusColumn, 'deceased');
+});
+
+test('status-column: a facet-only status (column null, facets set) is still read via the coalesce precedence', async () => {
+  const client = fakeClient([
+    {
+      entity_id: 'ent_h',
+      kind: 'person',
+      facets: { status: 'unknown' },
+      status: null,
+      topics: null,
+      projection: { status: 'deceased' },
+    },
+  ]);
+  const plan = await planSearchFacetRealign(client, { keys: ['status'] });
+  assert.equal(plan.targets[0]?.resolved, 1);
+  assert.deepEqual(plan.changes[0]?.facetsPatch, { status: 'deceased' });
+});
+
+test('evidence-inputs: a stale cached projection is corrected toward the release claims', async () => {
+  const client = fakeClient([
+    {
+      entity_id: 'ent_i',
+      kind: 'person',
+      facets: {
+        evidenceInputs: {
+          strongestClaimLevel: 'medium',
+          citedLineageKeys: ['loc.gov'],
+          evidenceLineageKeys: ['loc.gov'],
+        },
+      },
+      status: null,
+      topics: null,
+      projection: {
+        claims: [{ confidenceLevel: 'high', citationSource: 'loc.gov', claimRole: 'evidence' }],
+      },
+    },
+  ]);
+  const plan = await planSearchFacetRealign(client, { keys: ['evidenceInputs'] });
+  assert.equal(plan.targets[0]?.resolved, 1);
+  assert.deepEqual(plan.changes[0]?.facetsPatch, {
+    evidenceInputs: {
+      strongestClaimLevel: 'high',
+      citedLineageKeys: ['loc.gov'],
+      evidenceLineageKeys: ['loc.gov'],
+    },
+  });
+});
+
+test('evidence-inputs: writes the lineage keys, never a graded tier', async () => {
+  const client = fakeClient([
+    {
+      entity_id: 'ent_j',
+      kind: 'person',
+      facets: {},
+      status: null,
+      topics: null,
+      projection: {
+        claims: [
+          { confidenceLevel: 'high', citationSource: 'loc.gov', claimRole: 'evidence' },
+          { confidenceLevel: 'high', citationSource: 'nps.gov', claimRole: 'evidence' },
+        ],
+      },
+    },
+  ]);
+  const plan = await planSearchFacetRealign(client, { keys: ['evidenceInputs'] });
+  assert.equal(plan.targets[0]?.filled, 1);
+  assert.deepEqual(plan.changes[0]?.facetsPatch, {
+    evidenceInputs: {
+      strongestClaimLevel: 'high',
+      citedLineageKeys: ['loc.gov', 'nps.gov'],
+      evidenceLineageKeys: ['loc.gov', 'nps.gov'],
+    },
+  });
+  // The whole point of the cutover: a grade never reaches the row, so a rule change cannot
+  // strand it (repo-6qjv0).
+  assert.equal('confidenceTier' in (plan.changes[0]?.facetsPatch ?? {}), false);
+});
+
+test('evidence-inputs: keeps the claimRole-only lineage rule — a record_index claim is not evidence', async () => {
+  const client = fakeClient([
+    {
+      entity_id: 'ent_k',
+      kind: 'place',
+      facets: {},
+      status: null,
+      topics: null,
+      projection: {
+        claims: [
+          { confidenceLevel: 'high', citationSource: 'nara.gov', claimRole: 'evidence' },
+          // The record's own index row: cited, never evidence.
+          { confidenceLevel: 'high', citationSource: 'nps.gov', claimRole: 'record_index' },
+        ],
+      },
+    },
+  ]);
+  const plan = await planSearchFacetRealign(client, { keys: ['evidenceInputs'] });
+  assert.deepEqual(plan.changes[0]?.facetsPatch, {
+    evidenceInputs: {
+      strongestClaimLevel: 'high',
+      citedLineageKeys: ['nara.gov', 'nps.gov'],
+      evidenceLineageKeys: ['nara.gov'],
+    },
+  });
+});
+
+test('evidence-inputs: Wikipedia is recorded as cited, and the read-time rule decides what it is worth', async () => {
+  const client = fakeClient([
+    {
+      entity_id: 'ent_l',
+      kind: 'person',
+      facets: {},
+      status: null,
+      topics: null,
+      projection: {
+        claims: [
+          { confidenceLevel: 'high', citationSource: 'en.wikipedia.org', claimRole: 'evidence' },
+        ],
+      },
+    },
+  ]);
+  const plan = await planSearchFacetRealign(client, { keys: ['evidenceInputs'] });
+  assert.deepEqual(plan.changes[0]?.facetsPatch, {
+    evidenceInputs: {
+      strongestClaimLevel: 'high',
+      citedLineageKeys: ['wikipedia'],
+      evidenceLineageKeys: ['wikipedia'],
+    },
+  });
+});
+
+test('evidence-inputs: no claims at all projects empty lineages, and an absent facet is filled with it', async () => {
+  const client = fakeClient([
+    {
+      entity_id: 'ent_m',
+      kind: 'person',
+      facets: {},
+      status: null,
+      topics: null,
+      projection: { claims: [] },
+    },
+  ]);
+  const plan = await planSearchFacetRealign(client, { keys: ['evidenceInputs'] });
+  // The projection is a total function, so an absent facet is filled with the explicit empty
+  // projection rather than left alone — which is what lets the reader tell a row that has been
+  // projected (and grades unrated) from a row that has not been projected yet.
+  assert.equal(plan.targets[0]?.filled, 1);
+  assert.deepEqual(plan.changes[0]?.facetsPatch, {
+    evidenceInputs: {
+      strongestClaimLevel: 'unrated',
+      citedLineageKeys: [],
+      evidenceLineageKeys: [],
+    },
+  });
+});
+
+test('evidence-inputs: an already-correct projection is left unchanged', async () => {
+  const client = fakeClient([
+    {
+      entity_id: 'ent_m2',
+      kind: 'person',
+      facets: {
+        evidenceInputs: {
+          strongestClaimLevel: 'unrated',
+          citedLineageKeys: [],
+          evidenceLineageKeys: [],
+        },
+      },
+      status: null,
+      topics: null,
+      projection: { claims: [] },
+    },
+  ]);
+  const plan = await planSearchFacetRealign(client, { keys: ['evidenceInputs'] });
+  assert.equal(plan.targets[0]?.filled, 0);
+  assert.equal(plan.targets[0]?.resolved, 0);
+  assert.equal(plan.changes.length, 0);
+});
+
+test('multiple targets in one pass merge into a single change per row', async () => {
+  const client = fakeClient([
+    {
+      entity_id: 'ent_marjorie_joyner_001',
+      kind: 'invention',
+      facets: {},
+      status: null,
+      topics: [],
+      projection: { summary: 'An inventor and entrepreneur.', topicIds: ['invention', 'business'] },
+    },
+  ]);
+  const plan = await planSearchFacetRealign(client, { keys: ['summary', 'topics'] });
+  assert.equal(plan.changes.length, 1);
+  assert.deepEqual(plan.changes[0]?.facetsPatch, { summary: 'An inventor and entrepreneur.' });
+  assert.deepEqual(plan.changes[0]?.topicsColumn, ['invention', 'business']);
+});
+
+test('an unknown key is rejected before any query runs', async () => {
+  const client = fakeClient([]);
+  await assert.rejects(
+    () => planSearchFacetRealign(client, { keys: ['notARealFacet'] }),
+    /Unknown search-facet realign key/,
+  );
+});
+
+test('applySearchFacetRealign issues one UPDATE per changed row and reports rows updated', async () => {
+  const client = fakeClient([
+    {
+      entity_id: 'ent_n',
+      kind: 'person',
+      facets: {},
+      status: null,
+      topics: null,
+      projection: { eraBuckets: ['reconstruction'] },
+    },
+  ]);
+  const plan = await planSearchFacetRealign(client, { keys: ['eraBuckets'] });
+  const updated = await applySearchFacetRealign(client, plan);
+  assert.equal(updated, 1);
+  assert.equal(client.updates.length, 1);
+  assert.match(client.updates[0]?.sql ?? '', /UPDATE bb_public\.search_index/);
+});
+
+test('planSearchFacetRealign never writes — a plan-only call issues no UPDATE', async () => {
+  const client = fakeClient([
+    {
+      entity_id: 'ent_o',
+      kind: 'person',
+      facets: {},
+      status: null,
+      topics: null,
+      projection: { eraBuckets: ['reconstruction'] },
+    },
+  ]);
+  await planSearchFacetRealign(client, { keys: ['eraBuckets'] });
+  assert.equal(client.updates.length, 0);
+});

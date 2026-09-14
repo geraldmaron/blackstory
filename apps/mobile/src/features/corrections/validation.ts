@@ -86,12 +86,10 @@ export function safeEvidenceUrl(raw: string): string | null {
   return trimmed;
 }
 
-function tooLong(
-  value: string,
-  field: string,
-  max: number,
-): CorrectionFieldIssue | undefined {
-  return value.length > max ? { field, message: `${field} must be ${max} characters or fewer.` } : undefined;
+function tooLong(value: string, field: string, max: number): CorrectionFieldIssue | undefined {
+  return value.length > max
+    ? { field, message: `${field} must be ${max} characters or fewer.` }
+    : undefined;
 }
 
 /**
@@ -108,7 +106,10 @@ export function validateCorrectionForm(state: CorrectionFormState): CorrectionVa
     issues.push({ field: 'category', message: 'Choose a correction category.' });
   }
   if (!state.targetRecordId.trim()) {
-    issues.push({ field: 'targetRecordId', message: 'Provide the record identifier you are correcting.' });
+    issues.push({
+      field: 'targetRecordId',
+      message: 'Provide the record identifier you are correcting.',
+    });
   }
   if (state.statement.trim().length < MIN_STATEMENT_LENGTH) {
     issues.push({
@@ -117,12 +118,18 @@ export function validateCorrectionForm(state: CorrectionFormState): CorrectionVa
     });
   }
   if (!state.privacyConsent) {
-    issues.push({ field: 'privacyConsent', message: 'You must confirm the privacy notice before submitting.' });
+    issues.push({
+      field: 'privacyConsent',
+      message: 'You must confirm the privacy notice before submitting.',
+    });
   }
 
   const trimmedUrl = state.sourceUrl.trim();
   if (!trimmedUrl) {
-    issues.push({ field: 'sourceUrl', message: 'Provide at least one supporting HTTPS source URL.' });
+    issues.push({
+      field: 'sourceUrl',
+      message: 'Provide at least one supporting HTTPS source URL.',
+    });
   } else if (safeEvidenceUrl(trimmedUrl) === null) {
     issues.push({ field: 'sourceUrl', message: 'Enter a valid HTTPS link (https://…).' });
   }

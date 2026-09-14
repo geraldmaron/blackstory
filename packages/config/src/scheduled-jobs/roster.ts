@@ -369,7 +369,8 @@ export const DEFAULT_SCHEDULED_JOBS: readonly ScheduledJobDefinition[] = [
 
   // --- REAL: backup verification. Wired to scripts/backup-restore/
   // verify-restore.mjs via ./jobs/backup-verification.ts.
-  // Disclosed ADR-007 gap: ADR-007 says worker code lives only in research/publication/
+  // Disclosed worker-package gap (see docs/decisions-carryover.md, "scheduled-job worker
+  // packages"): that entry says worker code lives only in research/publication/
   // security. scripts/backup-restore/ predates that decision and lives outside all three
   // worker packages. targetWorker.package below is 'security' (closest fit ops/ops-adjacent
   // concerns already live there) as the *container* this job runs in; the script itself has not

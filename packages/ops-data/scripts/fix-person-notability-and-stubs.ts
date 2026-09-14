@@ -38,6 +38,7 @@
 import { readFileSync } from 'node:fs';
 import pg from 'pg';
 import { NOTABILITY_CRITERIA, NOTABILITY_RUBRIC } from '@repo/domain';
+import { remindToRepublishCatalogArtifacts } from './lib/catalog-republish-reminder.ts';
 import { normalizePgConnectionString } from './lib/pg-connection.ts';
 
 const DRY_RUN = process.env.DRY_RUN !== '0';
@@ -288,9 +289,7 @@ async function main(): Promise<void> {
         );
         await client.query(
           `UPDATE bb_public.release_entities
-           SET summary = $3,
-               claims = $4::jsonb,
-               projection = jsonb_set(
+           SET projection = jsonb_set(
                  jsonb_set(
                    jsonb_set(projection, '{summary}', to_jsonb($3::text), true),
                    '{claims}', $4::jsonb, true
@@ -314,6 +313,7 @@ async function main(): Promise<void> {
         `\nApplied. Notability rewritten on ${verifiedNotability.length}, ` +
           `content rewritten on ${contentReady.length}.`,
       );
+      remindToRepublishCatalogArtifacts(verifiedNotability.length + contentReady.length);
     } catch (error) {
       await client.query('ROLLBACK');
       throw error;

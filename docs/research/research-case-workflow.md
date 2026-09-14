@@ -1,8 +1,10 @@
 # Research-case and publication workflow
 
  turns discovery candidates into reviewable research cases while preserving an
-append-only decision history. Under ADR-011, canonical case records, assignments, backfill
-jobs, and release references belong in Firestore. Public clients read only active release
+append-only decision history. Canonical case records, assignments, backfill
+jobs, and release references belong in Postgres (`bb_canonical`/`bb_research`) — ADR-011's
+Firestore design was reversed (`../decisions-carryover.md`, "Firestore as system of record,
+reversed"). Public clients read only active release
 projections; they never write workflow state.
 
 ## States and transitions

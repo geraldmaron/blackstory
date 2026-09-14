@@ -73,3 +73,37 @@ test('law browse lede preserved without em dashes', () => {
   assert.match(browsePageSource, /LAW_EDITION_BROWSE_LEDE/);
   assert.doesNotMatch(LAW_EDITION_BROWSE_LEDE, /—/);
 });
+
+// SP-12c (repo-92n2.12.3): the connected-records hand-off, camera dignity, prev/next, and the
+// deliberate absence of a jurisdiction plate. `law-detail-sections.test.tsx` exercises the real
+// seed data through the real `buildLensHandoff` guard; these pin the source-level contract.
+
+test('the connected-records heading reads exactly "Records in this jurisdiction and era"', () => {
+  assert.match(detailSectionsSource, /title="Records in this jurisdiction and era"/);
+  // Not a hand written href: the link is built through the one typed handoff builder so it can
+  // never drift from the Explore URL allowlist (docs/ui/patterns-lens-handoff.md §1).
+  assert.match(detailSectionsSource, /buildLensHandoff/);
+  assert.doesNotMatch(detailSectionsSource, /href=\{?['"`]\/explore/);
+});
+
+test('no camera move is reachable on the law detail room: no shared map plate is imported', () => {
+  // The dignity gate's spirit applies to abstractions too: a law has no camera at all, because
+  // it has no plate at all (see the jurisdiction-plate comment in LawDetailSections.tsx).
+  for (const src of [detailPageSource, detailSectionsSource]) {
+    assert.doesNotMatch(src, /MapMoment/);
+    assert.doesNotMatch(src, /flyTo|pushIn|orbit/i);
+  }
+});
+
+test('the jurisdiction plate is deliberately absent, not faked with a placeholder', () => {
+  // No plate component, and no placeholder standing in for one — see the comment in
+  // LawDetailIntro explaining that the state-code-to-polygon join does not exist yet.
+  assert.doesNotMatch(detailSectionsSource, /JurisdictionPlate|ds-law-plate|ds-jurisdiction-plate/);
+  assert.match(detailSectionsSource, /state-code-to-polygon join/);
+});
+
+test('law detail page carries prev/next through the view model into RecordNav', () => {
+  assert.match(detailSectionsSource, /RecordNav/);
+  assert.match(detailPageSource, /previous/);
+  assert.match(detailPageSource, /\bnext\b/);
+});

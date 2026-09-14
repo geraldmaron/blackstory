@@ -33,6 +33,30 @@ test('removes a bare id left in the middle of a sentence', () => {
   );
 });
 
+test('strips an evidence/claim parenthetical, keeping the verbatim quote', () => {
+  const shipped =
+    'Rule in force, 1938. Verbatim: "Usually the protection from adverse influences afforded by ' +
+    'these means includes prevention of the infiltration of business and industrial uses, lower ' +
+    'class occupancy, and inharmonious racial groups." (evidence ev_fha_1938_para935 / ' +
+    'claim_fha1938_para935; public domain).';
+  assert.equal(
+    stripInternalIds(shipped),
+    'Rule in force, 1938. Verbatim: "Usually the protection from adverse influences afforded by ' +
+      'these means includes prevention of the infiltration of business and industrial uses, ' +
+      'lower class occupancy, and inharmonious racial groups.".',
+  );
+});
+
+test('strips a mid-sentence evidence parenthetical and keeps the sentence after it', () => {
+  const shipped =
+    '(evidence ev_shelley_covenant_st_louis / claim_shelley_covenant_stlouis; public domain). ' +
+    'Judicial enforcement of such covenants was held unconstitutional in Shelley v. Kraemer (1948).';
+  assert.equal(
+    stripInternalIds(shipped),
+    '. Judicial enforcement of such covenants was held unconstitutional in Shelley v. Kraemer (1948).',
+  );
+});
+
 test('recognizes an id, a bare id label, and neither', () => {
   assert.equal(containsInternalId('Basis: ent_greenwood_district_001_claim_0.'), true);
   assert.equal(containsInternalId('plantation_arlington_antebellum_home_gardens'), true);

@@ -1,8 +1,17 @@
 # `apps/api-public` — bounded public read API v1 (MOB-004)
 
-Real HTTP entrypoint for the single public read surface (ADR-005). Adds an explicit, versioned
-`/v1` contract (ADR-021) on top of the guard/rate-limit/App-Check/search primitives already in
-`apps/api-public/src`. No new deployable; no new microservice.
+Real HTTP entrypoint for the single public read surface
+(`../../../../docs/decisions-carryover.md`, "Service surface separation", ADR-005). Adds an
+explicit, versioned `/v1` contract (`../../../../docs/decisions-carryover.md`, "Addendum,
+2026-09-12 (repo-316nh)" and its "Extension, 2026-09-13 (repo-gtm2y)", ADR-021) on top of the
+guard/rate-limit/App-Check/search primitives already in `apps/api-public/src`. No new deployable;
+no new microservice.
+
+Read the ADR numbers here with one caveat. The "ADR-021" those carryover sections recover is the
+number this repo's CODE cites for the mobile data boundary decision, which is ADR-022 under the
+final numbering. Neither document exists any more — both went in the 2026-07-24 `docs/adr/` purge
+— but the carryover keeps the original section and red-team-resolution numbers, so the references
+below still resolve against it.
 
 ## Framework choice — native `node:http` + a tiny switch router
 
@@ -27,7 +36,7 @@ Every dependency (data access, App Check guard, rate limiter, search guard) is *
 | Route | Purpose | Contract schema | App Check | Rate-limit class | Cache-Control |
 |-------|---------|-----------------|-----------|------------------|---------------|
 | `GET /v1/health` | Surface posture (`health()`) | — (surface-health shape) | no | none | `no-store` |
-| `GET /v1/compatibility` | Client-version floor check (ADR-021 §2) | `CompatibilityCheckV1` | no | none | `no-store` |
+| `GET /v1/compatibility` | Client-version floor check (`../../../../docs/decisions-carryover.md`, "Addendum, 2026-09-12 (repo-316nh)", ADR-021 §2) | `CompatibilityCheckV1` | no | none | `no-store` |
 | `GET /v1/bootstrap` | Active release + version floor | `bootstrapResponseV1Schema` | signal (fail-open) | none | `max-age=30, swr=120` |
 | `GET /v1/entity/:id` | One published entity | `entityV1Schema` | signal (fail-open, `static_read`) | `entityRetrieval` | `max-age=60, swr=300` |
 | `GET /v1/map` | Release-coupled redacted Explore GeoJSON | `mapSourceV1Schema` | signal (fail-open, `static_read`) | `entityRetrieval` | `max-age=60, swr=300` |
@@ -35,7 +44,7 @@ Every dependency (data access, App Check guard, rate limiter, search guard) is *
 
 Every `200` body is validated against its `@repo/public-contracts` zod schema before it is written.
 
-## App Check posture (threat model T1/T2, ADR-010)
+## App Check posture (threat model T1/T2, `../../../../docs/decisions-carryover.md`, "Security and abuse assumptions", ADR-010)
 
 App Check is an **abuse signal, never an authorization gate** for reads. Implications, encoded in
 `handlers.ts`:
@@ -49,7 +58,8 @@ App Check is an **abuse signal, never an authorization gate** for reads. Implica
   bucket differs. This satisfies T2 for the corpus reads.
 - **`search` is an `expensive_read` and the rate-limiter REQUIRES App Check for anonymous callers.**
   `DEFAULT_ENDPOINT_QUOTA_MATRIX` denies `app_check_required` (surfaced as `429 RATE_LIMITED`) when
-  an anonymous caller hits an `expensive_read`/`mutation` tier without a verified token (ADR-010:
+  an anonymous caller hits an `expensive_read`/`mutation` tier without a verified token
+  (`../../../../docs/decisions-carryover.md`, "Security and abuse assumptions", ADR-010:
   App Check gates expensive reads). A real mobile client always attests, so this is transparent to
   it. This hard-deny is the **enumeration/abuse defense during normal operation** — relaxing it
   unconditionally would make expensive search free enumeration for any tokenless caller.
@@ -69,18 +79,20 @@ App Check is an **abuse signal, never an authorization gate** for reads. Implica
 - **`health` and `compatibility` do NOT invoke the guard** — trivial operational / version-math
   endpoints with no corpus data and no meaningful cost.
 - **`bootstrap` is an intentionally-unauthenticated immutable artifact** (the active-release
-  pointer, ADR-004). It invokes the guard as a courtesy signal but is servable without any token.
+  pointer, `../../../../docs/decisions-carryover.md`, "Public projection and immutable publication snapshots", ADR-004). It invokes the guard as a courtesy signal but is servable without any token.
 
 The version floor (`X-BlackStory-Client` → `CLIENT_VERSION_UNSUPPORTED` / `426`) is **orthogonal**
-to App Check and is a UX affordance for honest clients, not a security control (ADR-021 red-team
-resolution #2): a valid attestation on a below-floor client still gets `426`, and a spoofed version
+to App Check and is a UX affordance for honest clients, not a security control
+(`../../../../docs/decisions-carryover.md`, "Extension, 2026-09-13 (repo-gtm2y)" red-team
+resolution #2, ADR-021): a valid attestation on a below-floor client still gets `426`, and a spoofed version
 gains nothing because every parameter is re-validated server-side and there is no write path.
 
 ## Data access
 
 Handlers depend on the `PublicDataAccess` port (`data-access.ts`). Two adapters ship:
 
-- `createInMemoryPublicDataAccess` — real, fully tested; also usable as the ADR-004
+- `createInMemoryPublicDataAccess` — real, fully tested; also usable as the
+  `../../../../docs/decisions-carryover.md`, "Public projection and immutable publication snapshots" (ADR-004)
   degraded/immutable-snapshot source. Used when `./live-policy.ts`'s gate is false (emulators,
   missing `DATABASE_URL`, explicit `PUBLIC_DATA_SOURCE=fixtures|seed`, or `PUBLIC_READ_API_DISABLED`).
 - `createPostgresDataAccessReaders` + `createPublicDataAccessFromReaders` — **the only live
@@ -91,7 +103,7 @@ Handlers depend on the `PublicDataAccess` port (`data-access.ts`). Two adapters 
 The legacy Firestore read path (`firestore-data-access.ts`, `firestore-read-budget.ts`,
 `emulator-harness.ts`, and the `PUBLIC_DATA_SOURCE=firestore` branch) was removed in repo-348e.3
 once repo-348e.1 confirmed no production deploy path ever set it; Postgres has been the sole SoR
-since ADR-020 and there is no Firestore fallback, silent or explicit.
+since ADR-020 (`../../../../docs/decisions-carryover.md`, "Firestore as system of record, reversed") and there is no Firestore fallback, silent or explicit.
 
 **Live wiring gap (honest):** timeline hydration — the projection has no timeline field (always
 `[]` until the release builder adds one).

@@ -1,14 +1,28 @@
 /**
  * Publication release browser — manifests plus the active public release pointer.
+ *
+ * Server component (repo-gyq6.9). The manifest list and the active pointer are read in the request
+ * and arrive in the first byte; an operator deciding whether to stage an activation no longer
+ * waits on a hydrate and a token refresh to see which release is live.
+ *
+ * Unlike the other surfaces in this pass, this one has a genuine mutation, so it splits rather
+ * than converts: the read is here, and {@link ReleasesDesk} keeps the client boundary for row
+ * selection, the decision reason and the stage POST. `/admin/api/releases/stage` therefore stays a
+ * real client API — which is the distinction the bead draws — while `/admin/api/releases` is no
+ * longer called by this page.
  */
-'use client';
+import type { Metadata } from 'next';
+import { readPostgresOrDegrade } from '../../../admin/lib/canonical-postgres-client';
+import { listPublicationReleases } from '../../../admin/releases/releases-store';
+import { ReleasesDesk } from './ReleasesDesk';
 
-import { useCallback, useEffect, useState } from 'react';
-import { useAdminAuth } from '../../../admin/auth/AdminAuthProvider';
-import type {
-  ActiveReleasePointer,
-  PublicationReleaseListItem,
-} from '../../../admin/releases/releases-store';
+export const metadata: Metadata = {
+  title: 'Releases',
+  description: 'Signed release manifests and the live public release pointer.',
+};
+
+/** Which release is live is never a cached answer. */
+export const dynamic = 'force-dynamic';
 
 const RELEASE_STAGE_STEPS = [
   'Select a release — click a row in the table or paste a release id.',
@@ -29,87 +43,11 @@ function formatWhen(iso: string): string {
   });
 }
 
-export default function ReleasesPage() {
-  const { getIdToken, user } = useAdminAuth();
-  const [rows, setRows] = useState<readonly PublicationReleaseListItem[]>([]);
-  const [activeRelease, setActiveRelease] = useState<ActiveReleasePointer | null>(null);
-  const [error, setError] = useState<string | null>(null);
-  const [status, setStatus] = useState<string | null>(null);
-  const [loading, setLoading] = useState(false);
-  const [busy, setBusy] = useState(false);
-  const [selectedId, setSelectedId] = useState<string | null>(null);
-  const [reason, setReason] = useState('');
-
-  const load = useCallback(async () => {
-    setLoading(true);
-    setError(null);
-    try {
-      const token = await getIdToken();
-      if (!token) {
-        setRows([]);
-        setActiveRelease(null);
-        return;
-      }
-      const response = await fetch('/api/releases?limit=50', {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      const body = (await response.json()) as {
-        items?: PublicationReleaseListItem[];
-        activeRelease?: ActiveReleasePointer | null;
-        error?: string;
-      };
-      if (!response.ok) {
-        throw new Error(body.error ?? `Load failed (${response.status})`);
-      }
-      setRows(body.items ?? []);
-      setActiveRelease(body.activeRelease ?? null);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : String(err));
-    } finally {
-      setLoading(false);
-    }
-  }, [getIdToken]);
-
-  useEffect(() => {
-    if (user) void load();
-  }, [user, load]);
-
-  async function stage(mode: 'activate' | 'rollback') {
-    if (!selectedId || !reason.trim()) {
-      setError('Select a release and add a decision reason.');
-      return;
-    }
-    setBusy(true);
-    setError(null);
-    setStatus(null);
-    try {
-      const token = await getIdToken(true);
-      if (!token) {
-        setError('Sign in required');
-        return;
-      }
-      const response = await fetch('/api/releases/stage', {
-        method: 'POST',
-        headers: {
-          Authorization: `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          releaseId: selectedId,
-          mode,
-          reason: reason.trim(),
-        }),
-      });
-      const body = (await response.json()) as { error?: string; note?: string };
-      if (!response.ok) throw new Error(body.error ?? `Stage failed (${response.status})`);
-      setStatus(body.note ?? 'Staged for review — public pointer unchanged');
-      setReason('');
-    } catch (err) {
-      setError(err instanceof Error ? err.message : String(err));
-    } finally {
-      setBusy(false);
-    }
-  }
+export default async function ReleasesPage() {
+  const outcome = await readPostgresOrDegrade(() => listPublicationReleases(50), 'releases');
+  const rows = outcome.status === 'ok' ? outcome.value.items : [];
+  const activeRelease = outcome.status === 'ok' ? (outcome.value.activeRelease ?? null) : null;
+  const degradedReason = outcome.status === 'degraded' ? outcome.reason : undefined;
 
   return (
     <main className="story-review ds-container ds-page" id="main">
@@ -128,17 +66,16 @@ export default function ReleasesPage() {
             ))}
           </ol>
         </div>
-        <button
-          type="button"
-          className="ds-button ds-button--secondary"
-          onClick={() => void load()}
-          disabled={loading || busy}
-        >
-          {loading ? 'Refreshing…' : 'Refresh'}
-        </button>
       </header>
 
-      {activeRelease ? (
+      {degradedReason ? (
+        <p className="story-review__alert" role="alert">
+          Releases are unavailable — the operational database did not answer. Nothing is shown
+          rather than a partial manifest list, because a release decision made against a partial
+          list is the decision this desk exists to prevent. Reload to retry.{' '}
+          <span className="ds-mono">{degradedReason}</span>
+        </p>
+      ) : activeRelease ? (
         <section className="story-review__notice" aria-label="Active release">
           <p className="ds-sans">
             Active release <span className="ds-mono">{activeRelease.releaseId}</span> · activated{' '}
@@ -153,106 +90,7 @@ export default function ReleasesPage() {
         </p>
       )}
 
-      {error ? (
-        <p className="story-review__alert" role="alert">
-          {error}
-        </p>
-      ) : null}
-      {status ? (
-        <p className="story-review__notice" role="status">
-          {status}
-        </p>
-      ) : null}
-
-      <section className="story-review__bulk" aria-label="Stage release action">
-        <label className="story-review__field">
-          <span>Selected release</span>
-          <input
-            type="text"
-            value={selectedId ?? ''}
-            onChange={(event) => setSelectedId(event.target.value || null)}
-            placeholder="Click a row or paste release id"
-          />
-        </label>
-        <label className="story-review__field">
-          <span>Decision reason (required)</span>
-          <input
-            type="text"
-            value={reason}
-            onChange={(event) => setReason(event.target.value)}
-            placeholder="Example: Manifest digest verified against catalog diff"
-            aria-describedby="release-stage-steps"
-          />
-        </label>
-        <div className="story-review__bulk-actions">
-          <button
-            type="button"
-            className="ds-button ds-button--primary"
-            disabled={busy}
-            onClick={() => void stage('activate')}
-          >
-            Stage activate
-          </button>
-          <button
-            type="button"
-            className="ds-button ds-button--secondary"
-            disabled={busy}
-            onClick={() => void stage('rollback')}
-          >
-            Stage rollback
-          </button>
-        </div>
-      </section>
-
-      <section className="story-review__queue" aria-label="Publication releases">
-        {loading && rows.length === 0 ? (
-          <p className="ds-mono">Loading releases…</p>
-        ) : rows.length === 0 ? (
-          <p className="ds-sans">No publication releases found.</p>
-        ) : (
-          <div className="story-review__table-wrap">
-            <table className="story-review__table">
-              <thead>
-                <tr>
-                  <th scope="col">Release</th>
-                  <th scope="col">Status</th>
-                  <th scope="col">Search index</th>
-                  <th scope="col">Created</th>
-                </tr>
-              </thead>
-              <tbody>
-                {rows.map((row) => {
-                  const isActive = activeRelease?.releaseId === row.id;
-                  const isSelected = selectedId === row.id;
-                  return (
-                    <tr
-                      key={row.id}
-                      className={isSelected || isActive ? 'is-selected' : undefined}
-                      onClick={() => setSelectedId(row.id)}
-                    >
-                      <td>
-                        <span className="story-review__row-title">{row.id}</span>
-                        <p className="story-review__row-meta ds-mono">
-                          by {row.createdBy}
-                          {isActive ? ' · active pointer' : ''}
-                        </p>
-                      </td>
-                      <td>
-                        <span className={`story-review__badge story-review__badge--${row.status}`}>
-                          {row.status}
-                        </span>
-                      </td>
-                      <td className="ds-mono">{row.searchIndexVersion}</td>
-                      <td className="ds-mono">{formatWhen(row.createdAt)}</td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-            <p className="story-review__queue-foot ds-mono">{rows.length} releases</p>
-          </div>
-        )}
-      </section>
+      {degradedReason ? null : <ReleasesDesk rows={rows} activeRelease={activeRelease} />}
     </main>
   );
 }

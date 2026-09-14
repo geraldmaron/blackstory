@@ -2,21 +2,19 @@
  * Budget guard for web-search adapters, wired into cost-control evaluator rather than a
  * new one (deliverable 4: per-campaign query budgets, monthly spend caps, alerts).
  *
- * `@repo/domain` cannot depend on `@repo/security` at runtime -- `@repo/security`
- * already depends on `@repo/domain` (see ../internet-archive/shared/http-port.ts's doc
- * comment for the full circular-dependency reasoning; the same rule applies here). So this module
- * defines a `DailyBudgetEvaluator` port whose call shape mirrors real
+ * This module defines a `DailyBudgetEvaluator` port rather than calling `@repo/security`
+ * directly, so the adapter stays pure and the budget math has exactly one implementation (the
+ * same port pattern as ../internet-archive/shared/http-port.ts). The port's call shape mirrors
  * `evaluateDailyBudget` (packages/security/src/resource-controls.ts) closely enough that a thin,
  * one-line reference wrapper can back the port with the REAL evaluator -- all threshold/percent/
  * alert math still happens inside the real function; the wrapper only forwards
  * arguments/return values (the `category` field is a specific literal union on the real function,
  * `string` here, so a direct 1:1 reassignment does not typecheck -- a wrapper is required, not
- * just useful). This is proved in web-search.test.ts, which imports the real function as a
- * devDependency only for that one test, mirroring
- * ./internet-archive/shared/http-port.test.ts's `buildRealSafeHttpClient` pattern.
- * Production wiring (outside this package, in the apps/workers layer that already depends on both
- * `@repo/domain` and `@repo/security`) is expected to back this port with
- * `evaluateDailyBudget` from `@repo/security` — the same way.
+ * just useful). This is proved in web-search.test.ts, which imports the real function for that
+ * one test, mirroring ./internet-archive/shared/http-port.test.ts's `buildRealSafeHttpClient`
+ * pattern. Production wiring lives outside this package, in a layer that depends on both
+ * `@repo/domain` and `@repo/security` (for example `packages/config`'s scheduled jobs), and is
+ * expected to back this port with `evaluateDailyBudget` from `@repo/security`.
  *
  * The per-campaign query cap below is genuinely new bookkeeping this asks for (has no
  * per-campaign query concept) it is deliberately simple local arithmetic, not a re-implementation

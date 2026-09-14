@@ -51,14 +51,14 @@ function decadeBucketInputs(
 /**
  * Identity of a catalog, for memo lookup only.
  *
- * This used to map every id, sort them with `localeCompare` and join them into one string: at
- * 4,081 entities that is a collator-driven sort plus a ~100KB allocation, paid on EVERY request
- * to `/`, the highest-traffic route, purely to look up a Map entry that was almost always
- * already there.
+ * The key must be order-insensitive, and it must be cheap: it is computed on EVERY request to
+ * `/`, the highest-traffic route, purely to look up a Map entry that is almost always already
+ * there. Mapping every id, sorting with `localeCompare` and joining into one string costs a
+ * collator-driven sort plus a ~100KB allocation at 4,081 entities, which is far more than the
+ * lookup it guards.
  *
- * The cheap key is order-insensitive without sorting: count plus an XOR-fold of a per-id hash.
- * XOR is commutative, so two orderings of the same id set agree, which is the property the sort
- * was there to provide.
+ * So the key is count plus an XOR-fold of a per-id hash. XOR is commutative, so two orderings of
+ * the same id set agree, which is the order-insensitivity a sort would buy.
  *
  * Collision risk is acceptable *here* specifically because this key never crosses a release
  * boundary on its own: the caller prefixes it with the releaseId, and within one release the

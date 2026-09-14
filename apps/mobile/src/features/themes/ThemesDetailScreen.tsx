@@ -16,17 +16,8 @@ import {
   screenScrollInsets,
   space,
 } from '@/ui';
-import {
-  THEMES_DETAIL,
-  THEMES_GAP_COPY,
-  THEMES_METHOD_STANCE,
-} from './themes-copy';
-import {
-  getThemeById,
-  listPacketsForTheme,
-  plainDashCopy,
-  toCatalogRow,
-} from './catalog';
+import { THEMES_DETAIL, THEMES_GAP_COPY, THEMES_METHOD_STANCE } from './themes-copy';
+import { getThemeById, listPacketsForTheme, plainDashCopy, toCatalogRow } from './catalog';
 import type { ThemePacketView } from './types';
 
 export type ThemesDetailScreenProps = {
@@ -34,8 +25,7 @@ export type ThemesDetailScreenProps = {
 };
 
 function PacketBlock({ packet }: { readonly packet: ThemePacketView }) {
-  const stance =
-    THEMES_METHOD_STANCE[packet.methodStance] ?? THEMES_METHOD_STANCE.juxtaposition;
+  const stance = THEMES_METHOD_STANCE[packet.methodStance] ?? THEMES_METHOD_STANCE.juxtaposition;
   const eras =
     packet.policyEras.length > 0
       ? packet.policyEras.map((era) => era.label).join(', ')

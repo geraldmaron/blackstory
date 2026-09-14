@@ -4,10 +4,16 @@
  * appeal form for rejected corrections or disputed classifications. Posts to
  * `/corrections/appeal/api` and never exposes moderation-sensitive details.
  */
-import { useId, useState, type FormEvent } from 'react';
+import React, { useId, useState, type FormEvent } from 'react';
 import { Button, Notice } from '@repo/ui';
 import { APPEAL_ELIGIBILITY_NOTICE, CORRECTION_PRIVACY_NOTICE } from './copy';
 import { getRequestIntegrityHeaders } from '../../lib/request-integrity/client';
+
+// `React` is otherwise unused under this app's own automatic JSX runtime, but keeping it
+// imported makes this file safe to cross-transpile from a consumer whose own tsconfig uses a
+// classic JSX transform, where the JSX below compiles to `React.createElement(...)` calls that
+// need `React` in scope (see `ReceiptBlock.tsx` and `@repo/ui`'s `Notice.tsx` for the same note).
+void React;
 
 type AppealState =
   | { readonly status: 'idle' }

@@ -249,6 +249,27 @@ html:has([data-surface='instrument']) {
   margin: 0;
 }
 
+/* Direct child of the grid meta-row, like the staff link below: without justify-self it
+   stretches the full card width and the two policy links drift apart to the card edges. */
+.ds-shell-footer__policy {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--ds-space-4);
+  justify-self: start;
+  font-size: 0.75rem;
+}
+
+.ds-shell-footer__policy a {
+  color: var(--ds-ink-muted);
+  text-decoration: none;
+}
+
+.ds-shell-footer__policy a:hover,
+.ds-shell-footer__policy a:focus-visible {
+  color: var(--ds-ink);
+  text-decoration: underline;
+}
+
 .ds-shell-footer__operator {
   color: var(--ds-ink-muted);
   text-decoration: none;
@@ -1212,6 +1233,15 @@ html:has([data-surface='instrument']) {
   display: inline-flex;
   align-items: center;
   gap: var(--ds-space-2);
+  /*
+   * A native `<select>` takes its intrinsic width from its LONGEST option, and this one is
+   * filled from the data — on `/books` the author list reaches past a 320pt phone, so the
+   * control ran off the right edge where only the body's clip stopped it. Capping here and on
+   * the control keeps it inside its row; the browser truncates the shown option itself, and
+   * the full list is still whatever the picker shows when it opens.
+   */
+  max-width: 100%;
+  min-width: 0;
 }
 
 .ds-pill-select__label {
@@ -1225,6 +1255,8 @@ html:has([data-surface='instrument']) {
 
 .ds-pill-select__control {
   min-height: 2.75rem;
+  max-width: 100%;
+  min-width: 0;
   padding: 0 var(--ds-space-4);
   border: var(--ds-border-width) solid var(--ds-border-strong);
   border-radius: var(--ds-radius-full);
@@ -1857,7 +1889,8 @@ html:has([data-surface='instrument']) {
 
 /* —— The persistent map plate ——————————————————————————————————————————————————————
    `.ds-map-stage` is `MapStage.tsx`'s sole canvas mount: one fixed, full-viewport plate that
-   outlives navigation (ADR-017). It used to be styled from the `(map)` route group's sheet,
+   outlives navigation (`docs/decisions-carryover.md`, "Persistent map canvas"). It used to be
+   styled from the `(map)` route group's sheet,
    which stopped reaching it the moment the provider was hoisted to the root shell — the plate
    renders as a sibling of `.ds-shell`, not a descendant of the group's `.ds-map-surface`, so
    every descendant rule and every inherited `--ds-explore-*` custom property silently stopped
@@ -1912,9 +1945,10 @@ html:has([data-surface='instrument']) {
    It only reproduces after visiting Explore first: on a cold load of a reading room GL was
    never constructed, so the plate showed its flat paper fallback and the bug stayed invisible.
 
-   Covering the plate rather than hiding it keeps the persistence contract in ADR-017 — the
-   MapLibre instance is never touched, so returning to the Instrument does not rebuild it, and
-   no resize observer fires against a hidden container. */
+   Covering the plate rather than hiding it keeps the persistence contract
+   (`docs/decisions-carryover.md`, "Persistent map canvas"): the MapLibre instance is never
+   touched, so returning to the Instrument does not rebuild it, and no resize observer fires
+   against a hidden container. */
 /* —— Framed ————————————————————————————————————————————————————————————————————
    The plate, borrowed into a bounded in-flow slot published by a MapMoment. MapStage writes the
    four custom properties from the slot's clamped viewport rect on each scroll frame; the plate

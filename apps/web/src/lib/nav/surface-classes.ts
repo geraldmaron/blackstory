@@ -62,8 +62,8 @@ const SURFACE_CLASS_BY_PATH: ReadonlyMap<string, SurfaceClass> = new Map([
   ['/submit', 'utility'],
   ['/support', 'utility'],
   ['/privacy', 'utility'],
+  ['/terms', 'utility'],
   ['/design-system', 'utility'],
-  ['/locate', 'utility'],
 ]);
 
 /**

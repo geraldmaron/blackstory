@@ -6,7 +6,7 @@
  * Theme resolution follows the web bootstrap: explicit OS light/dark when
  * available; Archive Paper (light) when the scheme is null or unspecified.
  */
-import { useColorScheme, type ColorSchemeName, type ViewStyle } from 'react-native';
+import { Platform, useColorScheme, type ColorSchemeName, type ViewStyle } from 'react-native';
 import {
   brandCore,
   confidenceColors,
@@ -19,11 +19,7 @@ import {
 } from './generated/colors.generated';
 import { radius, type RadiusKey } from './generated/radius.generated';
 import { space, type SpaceKey } from './generated/spacing.generated';
-import {
-  duration,
-  easingStandardBezier,
-  easingStandardCss,
-} from './generated/motion.generated';
+import { duration, easingStandardBezier, easingStandardCss } from './generated/motion.generated';
 import {
   fontFamilies,
   typeScale,
@@ -61,10 +57,13 @@ export type {
 };
 
 /**
- * Minimum interactive target size in dp (Apple HIG 44pt / Material 48dp floor).
+ * Minimum interactive target size in dp: Android's Material guidance sets a 48dp floor, while
+ * iOS designs around a 44pt one. Resolved once, here, rather than scattered across call sites —
+ * an invisible hit slop does not excuse a visibly unusable control, so this is the actual box
+ * size, not padding tacked on to reach it.
  * Single source of truth — do not re-declare `MIN_TOUCH` / `MIN_ROW_HEIGHT` locally.
  */
-export const MIN_TOUCH_TARGET = 44;
+export const MIN_TOUCH_TARGET: number = Platform.select({ android: 48, default: 44 });
 
 /**
  * Shared stacking order for map-adjacent overlays. Keeps sheet/chrome/attribution
@@ -80,7 +79,9 @@ export const Z_LAYER = {
 /**
  * Resolves theme from an OS color scheme value. Matches web bootstrap:
  * explicit `light` / `dark` when set; Archive Paper (light) when null or
- * unspecified — no v5 dark-cockpit default outside the map plate (ADR-013).
+ * unspecified — no v5 dark-cockpit default outside the map plate
+ * (`docs/decisions-carryover.md`, "Map stack": the fixed dark register is
+ * scoped to the map plate).
  */
 export function resolveThemeName(scheme: ColorSchemeName | null | undefined): ThemeName {
   if (scheme === 'dark') return 'dark';

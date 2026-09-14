@@ -8,9 +8,14 @@
  * server-internal record/index-doc shapes ... and are explicitly NEVER carried into the
  * client-facing `SearchResultView`." This schema has no field for either — see `search.test.ts`'s
  * negative-snapshot case for the proof that a fixture carrying them gets stripped on parse.
+ *
+ * `confidenceTier` on the result below does not weaken that: it is a graded assessment, already
+ * public on `/v1/map`, not a number anyone can rank by. The line the exclusion draws is
+ * count-versus-assessment, not evidence-versus-silence.
  */
 import { z } from 'zod';
 import { boundedArray, idString, nonEmptyText } from '../internal/primitives.js';
+import { confidenceTierSchema } from './map.js';
 import { cursorPageRequestSchema } from './pagination.js';
 
 export const SEARCH_MATCH_FIELDS = ['displayName', 'alias', 'summary', 'topicTags'] as const;
@@ -59,6 +64,13 @@ export type SearchRequestV1 = z.infer<typeof searchRequestV1Schema>;
  * A single client-facing search result. Deliberately carries NO numeric relevance score, NO
  * evidence/connection count — results indicate WHY they match in words (`explanation`), not a
  * number.
+ *
+ * `confidenceTier` is the one exception, and it is not a counter-example: a tier is an
+ * ASSESSMENT of how well a record is supported, the same four-value vocabulary `/v1/map` already
+ * publishes on every feature. What is banned here is a per-record NUMBER a reader could sort or
+ * rank by — `relatedCount`, `claimCount`, a relevance score, `evidenceCount`. A grade lets the
+ * phone draw the same three-segment meter the site draws without handing anyone a ranking key,
+ * so the archive stops asking readers to judge a result with no idea how well it is sourced.
  */
 export const searchResultV1Schema = z.object({
   id: idString(200),
@@ -72,6 +84,16 @@ export const searchResultV1Schema = z.object({
   eraBuckets: boundedArray(z.string().max(20), 200),
   notabilityLabels: boundedArray(z.string().max(300), 100),
   sensitivityClass: z.string().max(100).optional(),
+  /**
+   * How well the record is supported — the shared `ConfidenceTier` vocabulary, never a count.
+   *
+   * Optional so a payload minted before this field existed (a cached page on a phone, an older
+   * deployment behind the same client) still parses instead of failing the whole response; a
+   * reader that gets `undefined` knows the grade is unavailable, which is not the same claim as
+   * `unrated`. Producers derive it at read time — it is never cached as a graded conclusion on
+   * the search index (see `packages/domain/src/search/types.ts`'s `evidenceInputs`).
+   */
+  confidenceTier: confidenceTierSchema.optional(),
 });
 
 export type SearchResultV1 = z.infer<typeof searchResultV1Schema>;

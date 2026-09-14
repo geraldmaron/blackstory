@@ -20,8 +20,12 @@ import {
   assessLandscapeDepth,
   buildArtifactsForEntry,
   buildLiveDepthEntry,
+  catalogDecisionFromRow,
   gateLandscapePublishCandidate,
+  liveClaimConfidence,
+  liveLocationFromRow,
   parseCanonicalStatusSnapshot,
+  type CatalogDecisionRow,
   type LandscapePublishRow,
   type LivePublishedRow,
 } from './lib/incremental-publish.ts';
@@ -90,6 +94,18 @@ try {
       )
     ).rows.map((row) => [row.entity_id as string, parseCanonicalStatusSnapshot(row)]),
   );
+  // repo-vj7cs: the withdrawal rulings the publisher now gates on. Loaded here for the same
+  // reason liveDepth, liveConfidence and liveLocation are below: a preview that withholds an
+  // input the publisher supplies reports a republish the publisher would refuse to make.
+  const catalogDecisionById = new Map(
+    (
+      await client.query<CatalogDecisionRow>(
+        `SELECT entity_id, decision, reason
+           FROM bb_ops.catalog_decisions WHERE entity_id = ANY($1::text[])`,
+        [ids],
+      )
+    ).rows.map((row) => [row.entity_id, catalogDecisionFromRow(row)]),
+  );
   const liveById = new Map(
     (
       await client.query<LivePublishedRow & { readonly entity_id: string }>(
@@ -118,13 +134,21 @@ try {
     }
     const canonicalStatus = canonicalById.get(row.id);
     const liveDepth = assessLandscapeDepth(buildLiveDepthEntry(live), row);
+    const liveConfidence = liveClaimConfidence(live);
+    // Passed for the same reason liveDepth and liveConfidence are: a preview that withholds an
+    // input the publisher supplies reports rejections the publisher would not make (repo-lai8y).
+    const liveLocation = liveLocationFromRow(live);
+    const catalogDecision = catalogDecisionById.get(row.id);
     const gate = gateLandscapePublishCandidate({
       row,
       releaseId,
       generatedAt,
       allowRepublish: true,
       liveDepth,
+      liveConfidence,
+      ...(liveLocation !== undefined ? { liveLocation } : {}),
       ...(canonicalStatus !== undefined ? { canonicalStatus } : {}),
+      ...(catalogDecision !== undefined ? { catalogDecision } : {}),
     });
     if (!gate.eligible) {
       tally(gateRejects, gate.reason);
@@ -135,6 +159,8 @@ try {
       releaseId,
       generatedAt,
       ...(canonicalStatus !== undefined ? { canonicalStatus } : {}),
+      ...(gate.locationOverride !== undefined ? { locationOverride: gate.locationOverride } : {}),
+      ...(catalogDecision !== undefined ? { catalogDecision } : {}),
     });
     if (!result.ok) {
       tally(gateRejects, `build:${result.reason}`);

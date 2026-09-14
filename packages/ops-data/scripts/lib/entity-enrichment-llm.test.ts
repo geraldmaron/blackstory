@@ -165,6 +165,56 @@ test('rejects a citation quote that does not appear verbatim in the named eviden
   }
 });
 
+test('rejects a citation quote that spans an evidence excerpt elision marker', () => {
+  const attempt = validateEnrichmentResponse(
+    baseSubject({
+      evidence: [
+        {
+          id: 'ev_1',
+          sourceTier: 'tier1',
+          title: 'Nomination',
+          text: 'John Doe operated a business at this site starting in 1925.\n\n[…]\n\nIt closed in 1958.',
+        },
+      ],
+    }),
+    ['business'],
+    validResponse({
+      summaryCitations: [
+        {
+          evidenceId: 'ev_1',
+          quote: 'starting in 1925.\n\n[…]\n\nIt closed in 1958.',
+        },
+      ],
+    }),
+  );
+  assert.equal(attempt.validation.ok, false);
+  if (!attempt.validation.ok) {
+    assert.ok(attempt.validation.errors.some((error) => error.includes('elision marker')));
+  }
+});
+
+test('accepts a citation quote taken from one side of an evidence excerpt elision marker', () => {
+  const attempt = validateEnrichmentResponse(
+    baseSubject({
+      evidence: [
+        {
+          id: 'ev_1',
+          sourceTier: 'tier1',
+          title: 'Nomination',
+          text: 'John Doe operated a business at this site starting in 1925.\n\n[…]\n\nIt closed in 1958.',
+        },
+      ],
+    }),
+    ['business'],
+    validResponse({
+      summaryCitations: [
+        { evidenceId: 'ev_1', quote: 'operated a business at this site starting in 1925' },
+      ],
+    }),
+  );
+  assert.equal(attempt.validation.ok, true);
+});
+
 test('rejects a citation that names an evidence id not offered to the model', () => {
   const attempt = validateEnrichmentResponse(
     baseSubject(),

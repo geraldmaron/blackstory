@@ -5,16 +5,22 @@
 > Hosting row below is historical. Firebase App Hosting backends for web and admin are
 > deleted.
 
-> **Design target: three-project topology**, per [ADR-012](../adr/ADR-012-production-environment-resplit.md)
->, superseding the single-project design D-013 recorded here on 2026-07-16.
-> **Live reality is unchanged by this document alone** — the actual migration (creating
+> **Design target: three-project topology**, per ADR-012, superseding the single-project design
+> D-013 recorded here on 2026-07-16. `docs/adr/ADR-012-production-environment-resplit.md` does not
+> exist — it was removed in the 2026-07-24 docs purge and recovered in
+> `docs/decisions-carryover.md`, "Small recovered decisions": every bare "ADR-012" in this document
+> below refers to that recovery, not to a file. **Live reality is unchanged by this document
+> alone** — the actual migration (creating
 > `blackbook-staging`/`blackbook-internal`, moving workloads, applying IAM) is , not yet
 > executed. Until  applies it, the "Historical: single-project design" section below still
 > describes what is live. This document itself only changes what the *target* is; see the "Verified
 > live vs. designed" table for exactly what is true today.
 
 **Date:** 2026-07-17 (re-split); originally 2026-07-16
-**Depends on:** ADR-005, ADR-006, ADR-009, ADR-011, ADR-012,
+**Depends on** (all removed 2026-07-24; recovered in `../decisions-carryover.md` under the
+sections named): ADR-005 ("Service surface separation"), ADR-006 ("Small recovered decisions"),
+ADR-009 ("Research and discovery cannot publish"), ADR-011 ("Firestore as system of record,
+reversed"), ADR-012 ("Small recovered decisions"),
 **Implements toward:** –012, –027, ,
 
 ## Verified live vs. designed
@@ -49,7 +55,7 @@ Source of truth:
 - [`../../infra/firebase/.firebaserc.example`](../../infra/firebase/.firebaserc.example) — example
   aliases for the target three-project topology.
 - [`../../apphosting.admin.yaml`](../../apphosting.admin.yaml) — live admin App Hosting config
-  (`black-book-admin-production`). Public web host is Vercel (ADR-027); retired `apps/web/apphosting*.yaml`
+  (`black-book-admin-production`). Public web host is Vercel (`../decisions-carryover.md`, "Small recovered decisions", ADR-027 entry); retired `apps/web/apphosting*.yaml`
   files are not in-repo.
 
 ## Target topology (ADR-012): three projects
@@ -82,8 +88,10 @@ Consequences).
 
 ### One-way promotion IAM asymmetry
 
-See [ADR-012](../adr/ADR-012-production-environment-resplit.md#one-way-promotion-iam-asymmetry) for
-the full table. Summary: `promotion@blackbook-internal` is the only identity anywhere — including any
+ADR-012's own "one-way promotion IAM asymmetry" table does not survive in
+`../decisions-carryover.md`'s "Small recovered decisions" entry (that recovery covers the
+topology and its still-design-target status, not this sub-table) — the table below is this
+document's own restatement. Summary: `promotion@blackbook-internal` is the only identity anywhere — including any
 `blackbook-prod`-native identity — that can write `blackbook-prod`'s public projections;
 `security@blackbook-internal` promotes scanned uploads into prod's `public-media`/`quarantine`
 buckets; `submissions-puller@blackbook-internal` reads prod's create-only `submissions` collection.
@@ -197,12 +205,12 @@ every lower layer:
    `black-book-efaaf-private-evidence`, `black-book-efaaf-exports`, and
    `black-book-efaaf-quarantine`. All use UBLA; every bucket except the deliberate public-media
    delivery path enforces Public Access Prevention.
-4. **Firestore rules + Auth claims ( / ADR-011):** public clients read only `public/**`;
+4. **Firestore rules + Auth claims ( / ADR-011, "Firestore as system of record, reversed"):** public clients read only `public/**`;
    canonical/evidence/publication/audit writes are Admin SDK only; submissions stay quarantined;
    research claims cannot publish. Parked Postgres roles under `infra/database/` are not the
    production control plane.
 5. **Distinct execution/network paths:** public, submissions, internal, admin, research,
-   publication, and security surfaces remain separate deployables per ADR-005.
+   publication, and security surfaces remain separate deployables per ADR-005, "Service surface separation".
 6. **Per-secret IAM:** Secret Manager access is granted on named secrets only. No values or service
    account keys belong in the repository.
 
@@ -272,7 +280,8 @@ in the migration runbook.**
    need enablement; Auth providers not enabled (awaiting human choice).
 7. **App Check** — Scaffold/docs only; enforcement is .
 8. **Secrets and deployment** — App Hosting YAML uses Secret Manager names only; WIF design is  (`infra/gcp/wif/`, declarative; not applied until remote + numeric IDs).
-9. **Database boundary handoff** — **Firestore is the system of record (ADR-011 / D-014).**
+9. **Database boundary handoff** — **Firestore was the system of record (ADR-011 / D-014) — now
+   reversed; Postgres is (`../decisions-carryover.md`, "Firestore as system of record, reversed").**
    PostGIS/SQL Connect artifacts are parked under `infra/database/`; do not provision Cloud SQL.
    Domain depth continues in +.
 
@@ -298,7 +307,7 @@ Terraform is a plan scaffold only; do not apply it blindly to the live project.
 3. **Create App Hosting backends**
    - Create `black-book-admin-production` in `black-book-efaaf` for `apps/admin` (interim host;
      config: root `apphosting.admin.yaml`). Disable unreviewed automatic production rollouts.
-   - **Do not** create `black-book-web-*` backends — public web is Vercel only (ADR-027).
+   - **Do not** create `black-book-web-*` backends — public web is Vercel only (`../decisions-carryover.md`, "Small recovered decisions", ADR-027 entry).
    - Attach `admin-runtime@black-book-efaaf.iam.gserviceaccount.com` (or the reviewed admin runtime SA).
 4. **Create service accounts**
    - Create the eleven identities listed above.

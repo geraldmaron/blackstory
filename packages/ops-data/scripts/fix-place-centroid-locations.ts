@@ -31,6 +31,7 @@
  */
 import pg from 'pg';
 import { encodeGeohash, geohashPrefixes } from '@repo/domain/geography/geohash';
+import { remindToRepublishCatalogArtifacts } from './lib/catalog-republish-reminder.ts';
 import { normalizePgConnectionString } from './lib/pg-connection.ts';
 
 const DRY_RUN = process.env.DRY_RUN !== '0';
@@ -122,7 +123,7 @@ function metersBetween(a: { lat: number; lng: number }, b: { lat: number; lng: n
 async function main(): Promise<void> {
   const connectionString = process.env.DATABASE_URL ?? process.env.APP_DATABASE_URL;
   if (!connectionString) throw new Error('DATABASE_URL is required');
-  const client = new pg.Client(normalizePgConnectionString(connectionString, process.env));
+  const client = new pg.Client(normalizePgConnectionString(connectionString));
   await client.connect();
 
   const placesByState = new Map<string, GazetteerPlace[]>();
@@ -251,19 +252,26 @@ async function main(): Promise<void> {
             [row.id, place.lat, place.lng, geohash, prefixes, MATCH_METHOD],
           );
           // The published release carries its own copy: the site reads bb_public, so a canonical
-          // fix alone would leave the wrong pin live until the next full republish.
+          // fix alone would leave the wrong pin live until the next full republish. That copy is
+          // `projection`; location/lat/lng/geohash are GENERATED from it. This wrote the columns
+          // until repo-qqy04, which is why the pin stayed wrong on the live site anyway.
           await client.query(
             `UPDATE bb_public.release_entities
-                SET lat = $2, lng = $3,
-                    location = jsonb_set(
+                SET projection = jsonb_set(
+                      projection, '{location}',
                       jsonb_set(
                         jsonb_set(
                           jsonb_set(
-                            jsonb_set(location, '{lat}', to_jsonb($2::double precision)),
-                            '{lng}', to_jsonb($3::double precision)),
-                          '{geohash}', to_jsonb($4::text)),
-                        '{geohashPrefixes}', to_jsonb($5::text[])),
-                      '{matchMethod}', to_jsonb($6::text))
+                            jsonb_set(
+                              jsonb_set(
+                                COALESCE(projection -> 'location', '{}'::jsonb),
+                                '{lat}', to_jsonb($2::double precision)),
+                              '{lng}', to_jsonb($3::double precision)),
+                            '{geohash}', to_jsonb($4::text)),
+                          '{geohashPrefixes}', to_jsonb($5::text[])),
+                        '{matchMethod}', to_jsonb($6::text)),
+                      true
+                    )
               WHERE entity_id = $1
                 AND release_id = (SELECT release_id FROM bb_public.v_active_release_id)`,
             [fix.entityId, place.lat, place.lng, geohash, prefixes, MATCH_METHOD],
@@ -287,6 +295,7 @@ async function main(): Promise<void> {
   if (DRY_RUN || !APPLY) {
     console.log('Set DRY_RUN=0 PLACE_CENTROID_FIX_APPLY=1 to write.');
   }
+  remindToRepublishCatalogArtifacts(applied);
 }
 
 await main();

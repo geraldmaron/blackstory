@@ -3,7 +3,7 @@
  * compact title/dek, and copper read affordance on a continuous panel surface.
  */
 import { Pressable, StyleSheet, View } from 'react-native';
-import { RecordFactStrip, Text, space, useThemeColors } from '@/ui';
+import { MIN_TOUCH_TARGET, RecordFactStrip, Text, space, useThemeColors } from '@/ui';
 import { plainRangeText } from '../record-facts/record-facts';
 import type { ContentEntry } from '@/features/content';
 
@@ -16,9 +16,7 @@ export function FeaturedStoryCard({ entry, onPress }: FeaturedStoryCardProps) {
   const { page } = entry;
   const theme = useThemeColors();
   const facts = [
-    ...(page.eraLabel
-      ? [{ key: 'era', label: 'Era', value: plainRangeText(page.eraLabel) }]
-      : []),
+    ...(page.eraLabel ? [{ key: 'era', label: 'Era', value: plainRangeText(page.eraLabel) }] : []),
     ...(page.placeLabel ? [{ key: 'where', label: 'Where', value: page.placeLabel }] : []),
   ];
 
@@ -28,7 +26,10 @@ export function FeaturedStoryCard({ entry, onPress }: FeaturedStoryCardProps) {
       accessibilityLabel={`Featured story: ${page.title}`}
       onPress={onPress}
       android_ripple={{ color: theme.border }}
-      style={({ pressed }) => [styles.pressable, { backgroundColor: pressed ? theme.surfacePressed : 'transparent' }]}
+      style={({ pressed }) => [
+        styles.pressable,
+        { backgroundColor: pressed ? theme.surfacePressed : 'transparent' },
+      ]}
     >
       <View style={styles.inner}>
         {facts.length > 0 ? <RecordFactStrip facts={facts} valueVariant="bodySmall" /> : null}
@@ -50,7 +51,7 @@ export function FeaturedStoryCard({ entry, onPress }: FeaturedStoryCardProps) {
 
 const styles = StyleSheet.create({
   pressable: {
-    minHeight: 44,
+    minHeight: MIN_TOUCH_TARGET,
     justifyContent: 'center',
     paddingHorizontal: space['3'],
   },

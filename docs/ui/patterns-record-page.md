@@ -10,7 +10,7 @@ Builds on, and does not replace: [`patterns-record-anatomy.md`](./patterns-recor
 
 ## 1. What it is
 
-One catalogd thing with a place, an era and evidence: an entity, a banned book, a law. **The map record sheet, unfolded into a durable, crawlable, citable page.**
+One cataloged thing with a place, an era and evidence: an entity, a banned book, a law. **The map record sheet, unfolded into a durable, crawlable, citable page.**
 
 **Same anatomy component as the sheet, never a fork.** The sheet and the page render one `RecordAnatomyPanel`, and their citation strings are byte identical because both call `lib/citation/format`. A citation a reader copies from a pin and a citation they copy from the page must be the same string, or the archive has two answers to the same question.
 

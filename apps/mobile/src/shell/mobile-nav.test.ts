@@ -101,7 +101,7 @@ describe('MOBILE_MORE_SECTIONS', () => {
       'Corrections',
       'Support',
     ]);
-    expect(MOBILE_MORE_SECTIONS[3]?.rows.map((row) => row.title)).toEqual(['Privacy']);
+    expect(MOBILE_MORE_SECTIONS[3]?.rows.map((row) => row.title)).toEqual(['Privacy', 'Terms']);
   });
 
   it('never duplicates a primary tab inside More', () => {
@@ -126,8 +126,26 @@ describe('MOBILE_MORE_SECTIONS', () => {
     expect(law?.destination).toEqual({ kind: 'native', route: '/law' });
   });
 
+  it('reaches Terms as a native screen, never a web fallback to a page that does not exist', () => {
+    // `/terms` has no web route. A row with no `route` opens the web surface (see
+    // `moreRow`/`WEB_ORIGIN` above), so an unset route here would send a reader to a dead link
+    // instead of the bundled native screen this row exists to surface.
+    const terms = allRows.find((row) => row.id === 'terms');
+    expect(terms?.destination).toEqual({ kind: 'native', route: '/terms' });
+    expect(terms?.title).toBe('Terms');
+  });
+
   it('does not list Quick facts: it duplicated the Records tab', () => {
     expect(allRows.some((row) => row.id === 'facts')).toBe(false);
+  });
+
+  it('gives FAQ and Support a native screen instead of opening the web', () => {
+    // These two used to be the whole remaining native gap in More: every other row already had a
+    // real screen, and tapping either of these left the app for Safari.
+    const faq = allRows.find((row) => row.id === 'faq');
+    const support = allRows.find((row) => row.id === 'support');
+    expect(faq?.destination).toEqual({ kind: 'native', route: '/faq' });
+    expect(support?.destination).toEqual({ kind: 'native', route: '/support' });
   });
 
   it('never names a web route at the reader', () => {

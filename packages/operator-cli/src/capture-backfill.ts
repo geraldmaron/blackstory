@@ -8,7 +8,15 @@
  * persists rows. --wayback optionally POSTs each successful local capture to Wayback
  * SPN2 and stores the snapshot URL on storage_object; missing keys skip SPN.
  * All I/O (DB, fetch, Wayback) is injected so the lane is unit-testable.
+ *
+ * Wayback is consulted read-first. A URL our safe-fetch cannot read (a PDF, a robots block,
+ * a host that no longer answers) is exactly the URL most likely to already have a snapshot,
+ * so a local failure triggers an availability lookup and the pointer lands on the failure
+ * event instead of the event being a dead end. And with --wayback on, a lookup that finds an
+ * existing snapshot spares a new SPN2 job: the archive has already done that work.
+ * A lookup that finds nothing is recorded and stepped past, never raised.
  */
+import type { WaybackLookupResult } from '@repo/domain';
 import {
   buildCaptureInventory,
   captureCitedUrl,
@@ -20,6 +28,7 @@ import {
   type RetrievalEventRow,
 } from './source-capture.js';
 import { attachWaybackMetadata } from './wayback-anchor.js';
+import { attachWaybackLookup } from './wayback-lookup.js';
 
 /** Minimal query surface — the real pg.Pool satisfies it; tests inject a fake. */
 export type CaptureDb = {
@@ -116,6 +125,18 @@ export type WaybackBackfillReport = {
   readonly attempted: number;
   readonly anchored: number;
   readonly failed: number;
+  /** Existing snapshots that made a new SPN2 job unnecessary. Counted here, not in `attempted`. */
+  readonly reusedExistingSnapshot: number;
+};
+
+export type WaybackLookupBackfillReport = {
+  /** Whether a lookup port was injected at all. No credentials are involved, unlike SPN. */
+  readonly available: boolean;
+  readonly attempted: number;
+  readonly found: number;
+  readonly missed: number;
+  /** Lookups that recovered a pointer for a URL our own fetch could not read. */
+  readonly recoveredAfterFetchFailure: number;
 };
 
 export type BackfillReport = {
@@ -132,6 +153,7 @@ export type BackfillReport = {
   readonly captureRate: number | null;
   readonly perSurface: Record<CaptureSurface, { attempted: number; captured: number }>;
   readonly wayback: WaybackBackfillReport;
+  readonly waybackLookup: WaybackLookupBackfillReport;
   readonly plannedEntities?: number;
 };
 
@@ -201,6 +223,7 @@ function resolveWaybackReport(input: {
   readonly attempted: number;
   readonly anchored: number;
   readonly failed: number;
+  readonly reusedExistingSnapshot: number;
 }): WaybackBackfillReport {
   let status: WaybackBackfillReport['status'] = 'off';
   if (input.requested && !input.credentialsPresent) {
@@ -217,6 +240,7 @@ function resolveWaybackReport(input: {
     attempted: input.attempted,
     anchored: input.anchored,
     failed: input.failed,
+    reusedExistingSnapshot: input.reusedExistingSnapshot,
   };
 }
 
@@ -237,6 +261,7 @@ export async function runCaptureBackfill(
   const planned = target.length;
   const waybackRequested = options.wayback === true;
   const credentialsPresent = captureDeps.waybackAnchor !== undefined;
+  const lookupAvailable = captureDeps.waybackLookup !== undefined;
 
   const perSurface: Record<CaptureSurface, { attempted: number; captured: number }> = {
     entity: { attempted: 0, captured: 0 },
@@ -264,7 +289,15 @@ export async function runCaptureBackfill(
         attempted: 0,
         anchored: 0,
         failed: 0,
+        reusedExistingSnapshot: 0,
       }),
+      waybackLookup: {
+        available: lookupAvailable,
+        attempted: 0,
+        found: 0,
+        missed: 0,
+        recoveredAfterFetchFailure: 0,
+      },
       ...(batch.entityCount !== undefined ? { plannedEntities: batch.entityCount } : {}),
     };
   }
@@ -275,26 +308,69 @@ export async function runCaptureBackfill(
   let waybackAttempted = 0;
   let waybackAnchored = 0;
   let waybackFailed = 0;
+  let waybackReused = 0;
+  let lookupAttempted = 0;
+  let lookupFound = 0;
+  let lookupMissed = 0;
+  let lookupRecovered = 0;
   const waybackAnchor = waybackRequested ? captureDeps.waybackAnchor : undefined;
+  const waybackLookup = captureDeps.waybackLookup;
 
   for (const ref of target) {
     perSurface[ref.surface].attempted += 1;
     const outcome = await captureCitedUrl(ref, captureDeps);
     let capture = outcome.capture;
-    if (waybackAnchor && capture) {
-      waybackAttempted += 1;
-      const attempt = await waybackAnchor.captureUrl(ref.url);
-      if (attempt.status === 'anchored') {
-        waybackAnchored += 1;
+    let retrievalEvent = outcome.retrievalEvent;
+
+    // Two moments deserve a lookup, and only these two. A local failure, where an existing
+    // snapshot is the only pointer we will get. And the moment before minting an SPN2 job,
+    // where an existing snapshot makes that job redundant. A successful local capture with
+    // --wayback off needs neither, so it costs no request.
+    const lookupWarranted = outcome.status === 'failure' || waybackAnchor !== undefined;
+    let existing: WaybackLookupResult | undefined;
+    if (waybackLookup !== undefined && lookupWarranted) {
+      lookupAttempted += 1;
+      existing = await waybackLookup.findSnapshot(ref.url);
+      if (existing.status === 'found') {
+        lookupFound += 1;
+        if (outcome.status === 'failure') lookupRecovered += 1;
       } else {
-        waybackFailed += 1;
+        lookupMissed += 1;
       }
-      capture = {
-        ...capture,
-        storageObject: attachWaybackMetadata(capture.storageObject, attempt),
+      // The pointer, or the miss with its reason, goes on both jsonb bags this capture writes.
+      // The retrieval event is the audit trail for what the lane did with this URL; the capture
+      // row is where anyone reading the evidence later looks, and "we checked and found
+      // nothing" is worth as much there as the pointer itself.
+      retrievalEvent = {
+        ...retrievalEvent,
+        detail: attachWaybackLookup(retrievalEvent.detail, existing),
       };
+      if (capture) {
+        capture = {
+          ...capture,
+          storageObject: attachWaybackLookup(capture.storageObject, existing),
+        };
+      }
     }
-    const { deduped: wasDup } = await persistCapture(db, capture, outcome.retrievalEvent);
+
+    if (waybackAnchor && capture) {
+      if (existing?.status === 'found') {
+        waybackReused += 1;
+      } else {
+        waybackAttempted += 1;
+        const attempt = await waybackAnchor.captureUrl(ref.url);
+        if (attempt.status === 'anchored') {
+          waybackAnchored += 1;
+        } else {
+          waybackFailed += 1;
+        }
+        capture = {
+          ...capture,
+          storageObject: attachWaybackMetadata(capture.storageObject, attempt),
+        };
+      }
+    }
+    const { deduped: wasDup } = await persistCapture(db, capture, retrievalEvent);
     if (outcome.status === 'failure') {
       failed += 1;
     } else if (wasDup) {
@@ -325,7 +401,15 @@ export async function runCaptureBackfill(
       attempted: waybackAttempted,
       anchored: waybackAnchored,
       failed: waybackFailed,
+      reusedExistingSnapshot: waybackReused,
     }),
+    waybackLookup: {
+      available: lookupAvailable,
+      attempted: lookupAttempted,
+      found: lookupFound,
+      missed: lookupMissed,
+      recoveredAfterFetchFailure: lookupRecovered,
+    },
     ...(batch.entityCount !== undefined ? { plannedEntities: batch.entityCount } : {}),
   };
 }

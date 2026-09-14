@@ -3,15 +3,14 @@
  * classification of a re-verification fetch into alive redirected drifted dead, plus a
  * retry-before-declaring-dead state machine across scheduled sweeps.
  *
- * `@repo/domain` cannot import `@repo/security` (security depends on domain; the
- * reverse edge would be a circular workspace dependency) see
- * packages/domain/src/rights/takedown.ts and packages/domain/src/map/map-source.ts for the same
- * port pattern used here. `LinkCheckFetchResult` below is structurally compatible with (a
- * superset of) `SafeFetchResult` from `@repo/security`'s url-safety fetch policy
- * (`executeSafeFetch`). The real wiring calling `executeSafeFetch` and adapting its result
- * into this port lives in
- * packages/config/src/scheduled-jobs/jobs/citation-link-health-sweep.ts, the one layer allowed
- * to depend on both packages. This module never performs network I/O itself.
+ * This module takes its fetch as an injected port rather than calling `@repo/security`
+ * directly, so it stays pure and testable without a transport: it never performs network I/O
+ * itself. `LinkCheckFetchResult` below is structurally compatible with (a superset of)
+ * `SafeFetchResult` from `@repo/security`'s url-safety fetch policy (`executeSafeFetch`). The
+ * wiring that calls `executeSafeFetch` and adapts its result into this port lives in
+ * packages/config/src/scheduled-jobs/jobs/citation-link-health-sweep.ts. The same port pattern
+ * is used in packages/domain/src/map/map-source.ts and
+ * packages/domain/src/adapters/internet-archive/shared/http-port.ts.
  *
  * Disclosed gap: `executeSafeFetch`'s success branch does not surface the numeric HTTP status
  * of the final response (any non-redirect status it accepts is treated as fetchable content),

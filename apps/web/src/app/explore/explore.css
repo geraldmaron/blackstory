@@ -710,41 +710,6 @@
    MapLibre pan/zoom only where chrome intentionally passes hits through (the gaps between
    Surface panels). Never set `pointer-events: none` on a text column that sits over the
    live plate — that routes swipe to the map instead of the document. —— */
-/* —— Hero dissolve (ADR-017 "Transition contract") — token-driven, opacity/translate only, no
-   layout thrash. Reduced motion still applies this class (React state is unconditional) but the
-   duration collapses to an instant cut via the media query below. ——  */
-
-/* —— Explore enter (Agent B / ADR-017): panels fade in after hero dissolve — opacity/translate
-   only, compositor-friendly; reduced motion is an instant cut. —— */
-@keyframes ds-explore-panel-enter {
-  from {
-    opacity: 0;
-    transform: translateY(0.5rem);
-  }
-
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-.ds-explore-stage--entering .ds-explore-stage__instruments,
-.ds-explore-stage--entering .ds-explore-stage__results {
-  animation: ds-explore-panel-enter var(--ds-duration-base) var(--ds-easing) both;
-}
-
-.ds-explore-stage--entering .ds-explore-stage__results {
-  animation-delay: 60ms;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .ds-explore-stage--entering .ds-explore-stage__instruments,
-  .ds-explore-stage--entering .ds-explore-stage__results {
-    animation: none;
-    opacity: 1;
-    transform: none;
-  }
-}
 
 /* —— Explore stage: floating chrome over the shared canvas ——
  * One left instrument chassis (Filters | Color key tabs) + optional records rail/sheet.

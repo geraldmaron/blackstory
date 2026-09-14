@@ -1,6 +1,13 @@
 /**
- * DNS-pinned SafeHttpClient for Wayback SPN2 (POST /save and GET /save/status).
- * Host allowlist is web.archive.org only. Mirrors census-http.ts with POST + body.
+ * DNS-pinned SafeHttpClient for Internet Archive capture traffic: SPN2 (POST /save,
+ * GET /save/status on web.archive.org) and the availability lookup
+ * (GET /wayback/available on archive.org). Mirrors census-http.ts with POST + body.
+ *
+ * The allowlist is `archive.org`, and evaluateExternalUrl matches domains by suffix, so that
+ * one entry covers `web.archive.org` and the bare apex both. It also admits any other
+ * `*.archive.org` host. That is the honest cost of reaching two IA services from one client,
+ * and it is bounded to one organization's namespace; there is no way to pin an exact host
+ * through allowedDomains, which always suffix-matches.
  */
 import { lookup } from 'node:dns/promises';
 import { request as httpRequest } from 'node:http';
@@ -15,7 +22,8 @@ import { evaluateExternalUrl, resolveAndPinDestination } from '@repo/security/ur
 
 const REQUEST_TIMEOUT_MS = 30_000;
 const MAX_RESPONSE_BYTES = 2 * 1024 * 1024;
-const WAYBACK_HOSTS = ['web.archive.org'] as const;
+/** Exported so the allowlist test binds to the real value instead of restating the literal. */
+export const WAYBACK_HOSTS = ['archive.org'] as const;
 
 async function resolveHost(hostname: string) {
   const answers = await lookup(hostname, { all: true, verbatim: true });
@@ -83,7 +91,7 @@ function performPinnedRequest(input: {
   });
 }
 
-/** Production SafeHttpClient for web.archive.org SPN2 only. */
+/** Production SafeHttpClient for Internet Archive capture endpoints only. */
 export const waybackSafeHttpClient: SafeHttpClient = async (
   request: SafeHttpRequest,
 ): Promise<SafeHttpResponse> => {

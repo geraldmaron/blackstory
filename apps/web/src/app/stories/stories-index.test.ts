@@ -23,6 +23,7 @@ import {
   filterItems,
   hasActiveNarrowing,
   nextInCollection,
+  prevInCollection,
   paginateStories,
   parseStoriesQuery,
   pickLeadStory,
@@ -435,6 +436,26 @@ describe('/stories · shelves, the uncollected remainder and collection navigati
 
   it('returns undefined at the end of a collection', () => {
     assert.equal(nextInCollection(items, 'presidents', 3), undefined);
+  });
+
+  it('finds the previous member of a collection before the given position', () => {
+    const previous = prevInCollection(items, 'presidents', 3);
+    assert.equal(previous?.slug, 'adams');
+  });
+
+  it('steps back across a gap in position numbers rather than skipping the member', () => {
+    // The mirror of the forward gap case. The presidents series leaves position 24 vacant
+    // because Cleveland holds one entry for two terms, so "previous" cannot mean position - 1.
+    const previous = prevInCollection(items, 'presidents', 2);
+    assert.equal(previous?.slug, 'washington');
+  });
+
+  it('returns undefined at the start of a collection', () => {
+    assert.equal(prevInCollection(items, 'presidents', 1), undefined);
+  });
+
+  it('returns undefined for a collection that does not exist, stepping back', () => {
+    assert.equal(prevInCollection(items, 'nope', 5), undefined);
   });
 
   it('returns undefined for a collection that does not exist', () => {

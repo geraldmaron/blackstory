@@ -16,8 +16,8 @@ describe('ProvenanceSection', () => {
 
     expect(getByTestId('entity-provenance-maturity')).toBeTruthy();
     expect(getByTestId('entity-provenance-coverage')).toBeTruthy();
-    // The beat used to explain its own vocabulary to the reader. That sentence addressed the
-    // archive, not anyone reading the record.
+    // The beat does not explain its own vocabulary to the reader: a sentence about the product
+    // constitution addresses the archive, not anyone reading the record.
     expect(queryByText(/product constitution vocabulary/i)).toBeNull();
     expect(queryByText(/^Maturity: /)).toBeNull();
   });

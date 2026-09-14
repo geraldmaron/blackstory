@@ -1,5 +1,5 @@
 -- 0012_advisor_remediation: search_path, RLS initplan, bb_ops deny policies, FK indexes.
--- Applied to blackstory-app after initial DDL (ADR-020).
+-- Applied to blackstory-app after initial DDL (docs/data/postgres-schema.md).
 
 CREATE OR REPLACE FUNCTION bb_auth.current_role()
 RETURNS text

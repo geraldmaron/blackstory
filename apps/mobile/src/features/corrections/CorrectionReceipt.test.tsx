@@ -18,8 +18,12 @@ jest.mock('expo-clipboard', () => ({
   setStringAsync: jest.fn(() => Promise.resolve(true)),
 }));
 
-const sendEvent = jest.spyOn(AccessibilityInfo, 'sendAccessibilityEvent').mockImplementation(() => {});
-const announce = jest.spyOn(AccessibilityInfo, 'announceForAccessibility').mockImplementation(() => {});
+const sendEvent = jest
+  .spyOn(AccessibilityInfo, 'sendAccessibilityEvent')
+  .mockImplementation(() => {});
+const announce = jest
+  .spyOn(AccessibilityInfo, 'announceForAccessibility')
+  .mockImplementation(() => {});
 
 beforeEach(() => {
   sendEvent.mockClear();
@@ -40,7 +44,9 @@ describe('CorrectionReceipt renders untrusted strings inertly', () => {
 
 describe('CorrectionReceipt — focus movement (MOB-017)', () => {
   it('moves assistive-tech focus onto the confirmation notice on mount', async () => {
-    await render(<CorrectionReceipt receiptCode="RC-TEST-0001" onCheckStatus={() => {}} onDone={() => {}} />);
+    await render(
+      <CorrectionReceipt receiptCode="RC-TEST-0001" onCheckStatus={() => {}} onDone={() => {}} />,
+    );
     expect(sendEvent).toHaveBeenCalledTimes(1);
     expect(sendEvent.mock.calls[0]![1]).toBe('focus');
   });

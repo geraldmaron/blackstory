@@ -104,4 +104,4 @@ ALTER TABLE bb_canonical.entity_relationships
   ));
 
 COMMENT ON CONSTRAINT entity_relationships_relationship_type_check ON bb_canonical.entity_relationships IS
-  'The single relationship vocabulary. Mirrors RELATIONSHIP_TYPES in packages/domain-core/src/relationship.ts; supersedes entity_relationships_typed_predicate, which was dropped here so a new value needs one edit rather than two.';
+  'The single relationship vocabulary. A superset of RELATIONSHIP_TYPES in packages/domain-core/src/relationship.ts: it also retains served_as, succeeded, challenged_law, funded_by and published from entity_relationships_typed_predicate for backward compatibility. Supersedes entity_relationships_typed_predicate, which was dropped here so a new value needs one edit rather than two.';

@@ -1,21 +1,12 @@
 /**
  * Exposes server-side administrator authorization and role-mutation composition helpers.
  */
-export {
-  AUTHORIZATION_HEADER,
-  IAP_ASSERTION_HEADER,
-  ServerAdminAuthorizationError,
-  createServerAdminAuthorizer,
-} from './server-authorization';
+export { AUTHORIZATION_HEADER, ServerAdminAuthorizationError } from './server-authorization';
 export type {
-  AdminAuthorizationPolicy,
   AdminPermission,
   AdminRequestHeaders,
   AuthorizedAdminRequest,
-  AdminTokenVerifier,
-  IapAssertionVerifier,
   PrivilegedAdminAction,
-  ServerAdminAuthorizationOptions,
   VerifiedAdminIdentity,
   VerifiedIapPrincipal,
 } from './server-authorization';
@@ -31,6 +22,14 @@ export {
   permissionsForStaffRole,
   staffRoleHasPermission,
 } from './staff-permissions';
+export {
+  ADMIN_ROUTE_RULES,
+  AdminRouteUndeclaredError,
+  STAFF_READ,
+  findAdminRouteAccess,
+  type AdminRouteAccess,
+  type AdminRouteRule,
+} from './route-permissions';
 export { resolveAdminAuthMode, resolveClientAdminAuthMode, type AdminAuthMode } from './mode';
 export {
   SupabaseSessionAuthorizationError,
@@ -44,4 +43,11 @@ export type {
   VerifiedSupabaseAdminIdentity,
 } from './supabase-session-authorizer';
 export type { AdminSessionUser } from './session-user';
-export { authorizeAdminRequest, authErrorResponse, type ResolvedAdminCaller } from './request-auth';
+export {
+  authorizeAdminRequest,
+  authorizeAdminRoute,
+  authErrorResponse,
+  createAdminRouteAuthorizer,
+  isAdminAuthorizationError,
+  type ResolvedAdminCaller,
+} from './request-auth';

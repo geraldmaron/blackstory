@@ -52,6 +52,7 @@
  *     packages/ops-data/scripts/fix-civil-rights-leaders-uncorroborated.ts
  */
 import pg from 'pg';
+import { remindToRepublishCatalogArtifacts } from './lib/catalog-republish-reminder.ts';
 import { normalizePgConnectionString } from './lib/pg-connection.ts';
 
 const DRY_RUN = process.env.DRY_RUN !== '0';
@@ -306,9 +307,7 @@ async function main(): Promise<void> {
         const claimIdsJson = JSON.stringify(item.claims.map((claim) => claim.id));
         await client.query(
           `UPDATE bb_public.release_entities
-           SET summary = $3,
-               claims = $4::jsonb,
-               projection = jsonb_set(
+           SET projection = jsonb_set(
                  jsonb_set(
                    jsonb_set(projection, '{summary}', to_jsonb($3::text), true),
                    '{claims}', $4::jsonb, true
@@ -335,6 +334,7 @@ async function main(): Promise<void> {
       }
       await client.query('COMMIT');
       console.log('Applied.');
+      remindToRepublishCatalogArtifacts(plan.length);
     } catch (error) {
       await client.query('ROLLBACK');
       throw error;

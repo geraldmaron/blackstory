@@ -4,10 +4,9 @@
  * never lets a precise living-person residential coordinate reach the
  * generated map source at full precision.
  *
- * `@repo/security` is a devDependency of this package for this test
- * only (see package.json) it is never imported by map-source.ts itself,
- * so there is no runtime circular dependency (security already depends on
- * domain at runtime; domain's shipped code has zero dependency on security).
+ * `map-source.ts` itself does not import `@repo/security`: redaction is applied by the caller,
+ * and this test supplies the real `redactLocationForPublic` so the wiring is proved end to end
+ * rather than stubbed.
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';

@@ -15,7 +15,7 @@
  * denominator. Per-record structural discipline (archivedUrl present) and corpus-level capture
  * evidence (valid Wayback pointer or content hash) are intentionally separate axes.
  *
- * Not wired live: the projection-build pipeline (`workers/publication/`, per ADR-007) is
+ * Not wired live: the projection-build pipeline (`workers/publication/`, per docs/decisions-carryover.md, "scheduled-job worker packages") is
  * the intended caller. Call `assertFactMayPublish` immediately before including a fact in a
  * release/projection build and do not proceed if it throws.
  *

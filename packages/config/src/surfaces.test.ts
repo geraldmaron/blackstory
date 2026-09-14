@@ -1,5 +1,7 @@
 /**
- * Acceptance tests for ADR-005 surface capability matrix.
+ * Acceptance tests for the surface capability matrix (see docs/decisions-carryover.md, "Service
+ * surface separation" — ADR-005 does not exist). This tests the typed matrix in ./surfaces.ts only;
+ * see that section for what network isolation is and isn't actually deployed.
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';

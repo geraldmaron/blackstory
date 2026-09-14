@@ -15,6 +15,7 @@
  * instead of an empty field.
  */
 
+import type { Metadata } from 'next';
 import Link from 'next/link';
 import { EmptyState } from '@repo/ui';
 import { PaletteSeed } from '../components/shell/PaletteSeed';
@@ -22,6 +23,19 @@ import { Room } from '../components/room/Room';
 import { RoomHeader } from '../components/room/RoomHeader';
 import { loadWalkBackPlace } from './walk-back-place';
 import './utility.css';
+
+/**
+ * A route that calls `notFound()` renders THIS component, and its own `generateMetadata` result
+ * is discarded — so without this the tab on a missed record read `BlackStory`, the layout
+ * default, and a reader with several tabs open could not tell the miss from the home page
+ * (repo-n7p6.29). The status was already a real 404; only the title was lying.
+ *
+ * Only the title. Next already emits `<meta name="robots" content="noindex">` for this boundary
+ * on its own; declaring it here too just prints the tag twice.
+ */
+export const metadata: Metadata = {
+  title: 'Not found',
+};
 
 export default async function NotFound() {
   const back = await loadWalkBackPlace();

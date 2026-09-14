@@ -1,6 +1,6 @@
 # County Archive Ladder
 
-A place-connected research-discovery methodology that harvests Black-history micro-records from **county and state historical-society finding aids** (EAD/XML + OAI-PMH). Local archives hold micro-histories — local NAACP founders, neighborhood business owners, church leaders, county-level school-desegregation plaintiffs — that are absent from federal aggregator databases. Discovery produces **private research candidates only** — never public entities (ADR-009).
+A place-connected research-discovery methodology that harvests Black-history micro-records from **county and state historical-society finding aids** (EAD/XML + OAI-PMH). Local archives hold micro-histories — local NAACP founders, neighborhood business owners, church leaders, county-level school-desegregation plaintiffs — that are absent from federal aggregator databases. Discovery produces **private research candidates only** — never public entities (`docs/decisions-carryover.md`, "Research and discovery cannot publish").
 
 ## Purpose
 
@@ -58,7 +58,7 @@ Reuses `discovery/obscurity.ts` (`obscurity.v1`) unchanged. Each survivor gets a
 
 ## Invariants
 
-- **No publish path.** Research workers cannot publish (ADR-009). No writes to public projections, release tables, or `bb_public` / `bb_canonical`. `assertCampaignCannotPublish()` / `assertDiscoveryCannotPublish` guard the boundary.
+- **No publish path.** Research workers cannot publish (`docs/decisions-carryover.md`, "Research and discovery cannot publish"). No writes to public projections, release tables, or `bb_public` / `bb_canonical`. `assertCampaignCannotPublish()` / `assertDiscoveryCannotPublish` guard the boundary.
 - **Anonymous clients never write canonical history.**
 - **Safe-fetch only.** Live harvesting uses `@repo/security` safe-fetch; this module is fixture-first and performs no network I/O itself.
 - **Evidence before assertion; no completeness overclaims.** Metadata + pointers + capped snippets only; no bulk OCR / full text.

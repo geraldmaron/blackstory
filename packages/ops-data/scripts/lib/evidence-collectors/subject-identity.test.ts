@@ -1,6 +1,7 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import {
+  placeExpectationFromProjection,
   checkPlaceIdentity,
   checkSubjectIdentity,
   containsWholeWord,
@@ -513,5 +514,144 @@ describe('checkSubjectIdentity rejects the measured repo-u84y mismatches', () =>
       { title: 'Okmulgee Colored Hospital' },
     );
     assert.equal(identity.corroborated, true);
+  });
+});
+
+/**
+ * A place entity's Wikipedia search can return an article about a numbered highway rather than
+ * the place itself. The highway legitimately runs through, and therefore names, the very state
+ * and county the place row expects — so the ordinary place-agreement check corroborates it for
+ * free, and only a document-kind check catches it.
+ */
+describe('checkSubjectIdentity rejects a linear transport route for a place-kind row', () => {
+  it('rejects a highway article carrying its own state and county for free', () => {
+    const identity = checkSubjectIdentity(
+      'U.S. Route 43 (US 43) is a north-south United States Numbered Highway running through ' +
+        'the states of Michigan, Ohio, Kentucky, Tennessee, and Alabama, passing near Northport ' +
+        'in Tuscaloosa County, Alabama.',
+      {
+        displayName: 'East Northport Historic District',
+        city: 'Northport',
+        county: 'Tuscaloosa',
+        state: 'Alabama',
+        kind: 'place',
+      },
+      { title: 'U.S. Route 43' },
+    );
+    assert.equal(identity.documentKind, 'route');
+    assert.equal(identity.corroborated, false);
+    assert.match(identity.reason ?? '', /highway\/route/u);
+  });
+
+  it('still accepts a museum article as evidence for a place', () => {
+    const identity = checkSubjectIdentity(
+      'The Booker T. Washington Heritage Museum is a museum in Hale County, Alabama, devoted to ' +
+        'the history of Black educators across the Alabama Black Belt. The museum opened to the ' +
+        'public in Hale County in 1998.',
+      {
+        displayName: 'Booker T. Washington Heritage Museum',
+        county: 'Hale',
+        state: 'Alabama',
+        kind: 'place',
+      },
+      { title: 'Booker T. Washington Heritage Museum' },
+    );
+    assert.equal(identity.documentKind, 'subject');
+    assert.equal(identity.corroborated, true);
+  });
+});
+
+/**
+ * "Lincoln University" (the Missouri HBCU) and "University of Lincoln" (Lincoln, England) both
+ * reduce to the single distinctive token "lincoln" once the generic word "University" is
+ * stripped, and a real 2026 sweep captured the England article as evidence for the Missouri row
+ * — a roster row in this lane carries no city/state at all, so there was no place to check
+ * against and the gate fell back to name and focus alone, which the wrong article satisfies just
+ * as well as the right one.
+ */
+describe('checkSubjectIdentity requires a geography match for a common institution name', () => {
+  it('rejects the University of Lincoln (England) as evidence for Lincoln University (Missouri)', () => {
+    const identity = checkSubjectIdentity(
+      'The University of Lincoln is a public university in the city of Lincoln, England. It ' +
+        'traces its origins to the Lincolnshire College of Art and Design and moved to its ' +
+        'Brayford Pool campus in the 1990s. Queen Elizabeth II opened the new campus building ' +
+        'in 1996.',
+      { displayName: 'Lincoln University' },
+      { title: 'University of Lincoln' },
+    );
+    assert.equal(identity.corroborated, false);
+    assert.match(identity.reason ?? '', /geography/u);
+  });
+
+  it('accepts the correct Lincoln University (Missouri) extract', () => {
+    const identity = checkSubjectIdentity(
+      'Lincoln University is a public historically black university in Jefferson City, ' +
+        'Missouri. It was founded in 1866 by soldiers of the 62nd and 65th United States ' +
+        'Colored Infantry, and Lincoln University has served Missouri students for more than a ' +
+        'century.',
+      { displayName: 'Lincoln University' },
+      { title: 'Lincoln University' },
+    );
+    assert.equal(identity.corroborated, true);
+  });
+});
+
+describe('placeExpectationFromProjection (repo-f85hp)', () => {
+  /*
+   * repo-f85hp. The curated records (lynching_*, gap_*, recon_*) have no landscape_candidates row,
+   * so the sweep builds a synthetic candidate from the published projection. It used to split
+   * `locationLabel` on the comma, which is prose about where a thing stands rather than an
+   * administrative place.
+   */
+  it('the place expectation comes from the jurisdiction, not from location prose', () => {
+    // Alma Howze's real projection shape: the row this bead was found on.
+    assert.deepEqual(
+      placeExpectationFromProjection({
+        jurisdictionLabel: 'Shubuta, Mississippi',
+        locationLabel: 'Hanging Bridge, Clarke County',
+      }),
+      { city: 'Shubuta', county: 'Clarke', state: 'Mississippi' },
+      'splitting locationLabel gave city "Hanging Bridge" and state "Clarke County", and the ' +
+        'identity gate then rejected a correct marker page with "identity not corroborated by place"',
+    );
+  });
+
+  it('a county is read out of location prose, which is where it actually appears', () => {
+    assert.deepEqual(
+      placeExpectationFromProjection({
+        jurisdictionLabel: 'Chaves County, New Mexico',
+        locationLabel: 'Blackdom Townsite historical marker, near Hagerman, Chaves County',
+      }),
+      { city: 'Chaves County', county: 'Chaves', state: 'New Mexico' },
+    );
+  });
+
+  it('an unqualified jurisdiction is a state, not a city', () => {
+    assert.deepEqual(placeExpectationFromProjection({ jurisdictionLabel: 'Massachusetts' }), {
+      state: 'Massachusetts',
+    });
+  });
+
+  it('location prose is the last resort, not the first', () => {
+    assert.deepEqual(
+      placeExpectationFromProjection({ jurisdictionLabel: null, locationLabel: 'Selma, Alabama' }),
+      { city: 'Selma', state: 'Alabama' },
+    );
+    assert.deepEqual(placeExpectationFromProjection({}), {});
+    assert.deepEqual(
+      placeExpectationFromProjection({ jurisdictionLabel: '  ', locationLabel: '  ' }),
+      {},
+    );
+  });
+
+  it('a multi-part jurisdiction keeps everything before the state as the city', () => {
+    assert.deepEqual(
+      placeExpectationFromProjection({ jurisdictionLabel: 'Washington, District of Columbia' }),
+      { city: 'Washington', state: 'District of Columbia' },
+    );
+    assert.deepEqual(
+      placeExpectationFromProjection({ jurisdictionLabel: 'Beacon Hill, Boston, Massachusetts' }),
+      { city: 'Beacon Hill, Boston', state: 'Massachusetts' },
+    );
   });
 });

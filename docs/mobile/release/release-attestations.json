@@ -1,0 +1,34 @@
+{
+  "schemaVersion": 1,
+  "_unsigned": "SCAFFOLD — not a valid bundle until every attestedBy and attestedAt below is filled in. Empty strings are deliberate: loadHumanAttestationBundle() rejects them with a named error, so this file fails closed. Placeholders are enforced against as well — attestedBy cannot be todo/tbd/pending/n-a/x/fixme, and attestedAt must be a real ISO-8601 date that is not in the future. The notes below record what was measured on 2026-09-13 and what nobody has measured at all. They are evidence for your decision, not the decision. Nine machine gates are answered by the collector and are not listed here; run `node scripts/release/mobile-release-gate.mjs collect` then `evaluate --attestations <this file>`. ota-code-signing is absent on purpose: it is a machine gate, and it is OPTIONAL because the store account checklist accepts the unsigned-OTA risk while the project is on the EAS free tier.",
+  "attestations": [
+    {
+      "gateId": "e2e-release-build",
+      "attestedBy": "",
+      "attestedAt": "",
+      "evidenceRef": "",
+      "notes": "NOT MACHINE-CHECKED, and largely not done. No end-to-end suite runs against a release binary. `pnpm mobile:ios:verify` checks that api-public answers and the Release app launches on the Simulator; that is a smoke, not the critical journeys. Wave 8 did produce real Release-build device evidence, but only for Explore: iPad Pro 11\" two-pane portrait and landscape, selection, expand/collapse, and iPhone 17 unchanged, against live api-public with 3,892 of 3,898 records. Records, Stories, search, entity detail and corrections have no equivalent. Do not sign this on the Explore evidence alone."
+    },
+    {
+      "gateId": "accessibility-evidence",
+      "attestedBy": "",
+      "attestedAt": "",
+      "evidenceRef": "",
+      "notes": "PARTLY MEASURED. Done and verified on device: Dynamic Type, which was broken app-wide — React Native scales fontSize and leaves a numeric lineHeight alone, so at iOS's largest accessibility size every line of text was cropped to the tops of its letters (fixed in the Text primitive, commit 7904e6b1, re-verified at accessibility-extra-extra-extra-large); and the Explore rail row that truncated to about four characters at that size (commit 00c9bfad). Web responsive was swept at 320, 430, 768 and 1440 with two real overflows fixed (commit cc491fd4). NOT STARTED: VoiceOver and TalkBack passes (repo-1z1a, deferred as hardware-gated), focus order, modal and sheet focus containment, headings, list semantics, selected-state announcements, map alternatives, error and retry states, external-link descriptions, text equivalents for relationship visuals, the 44pt / 48dp touch-target audit, and Android font scaling, which was not checked at all. Web hover-only function and clipped tables were not measured, and 1024 and 1920 were not swept."
+    },
+    {
+      "gateId": "rollback-rehearsed",
+      "attestedBy": "",
+      "attestedAt": "",
+      "evidenceRef": "",
+      "notes": "NOT DONE for mobile. `infra/github/release-pipeline/rollback-dry-run.sh` is the WEB rollback and is not evidence about an OTA update. `apps/mobile/src/updates/README.md` documents the runbook and names the drill itself as outstanding: it needs a real EAS project and a real device to produce runtime evidence. Note also that with no code-signing certificate configured (repo-3en3s) a rollback bundle is as unsigned as the update it replaces, so the rollback path inherits that accepted risk."
+    },
+    {
+      "gateId": "store-and-signing-identity",
+      "attestedBy": "",
+      "attestedAt": "",
+      "evidenceRef": "docs/mobile/release/store-account-checklist.md",
+      "notes": "PARTLY DONE. As of 2026-09-13 the checklist has 11 boxes checked and 31 unchecked. What exists: the Expo account and linked EAS project, the Apple Team ID 4Q2XU7D33G, the individual-vs-org decision, the spend ceiling, name-collision searches on both stores, and the legal-entity and support-contact values. What does not: the App Store Connect and Play Console records themselves, and an Android release signing identity — the release APK this gate inspects is debug-signed, and ANDROID_APP_LINKS_SHA256_FINGERPRINTS cannot be set on Vercel until a real one exists (repo-1etxc), which means Android App Links will not verify. Bundle-id availability for app.blackstory.mobile is still unconfirmed (repo-fsxq, deferred). Store ids are permanent once created; do not sign this to unblock a dry run."
+    }
+  ]
+}

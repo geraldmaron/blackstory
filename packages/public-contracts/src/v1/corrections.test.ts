@@ -44,3 +44,30 @@ test('drops moderation-internal fields (spamScore/campaignId/duplicateOf/moderat
     assert.ok(!(forbiddenKey in parsed), `${forbiddenKey} must not survive parsing`);
   }
 });
+
+test('keeps outcomeReason as a public field when a correction was declined', () => {
+  const fixture = loadFixture<Record<string, unknown>>('correction-status.v1.sensitive-leak.json');
+  const parsed = correctionStatusV1Schema.parse({
+    ...fixture,
+    phase: 'closed',
+    outcomeReason: 'The record was not changed after review.',
+  });
+  assert.equal(parsed.outcomeReason, 'The record was not changed after review.');
+});
+
+test('omits outcomeReason when absent (open or accepted corrections carry no decline reason)', () => {
+  const fixture = loadFixture<Record<string, unknown>>('correction-status.v1.sensitive-leak.json');
+  const parsed = correctionStatusV1Schema.parse(fixture);
+  assert.equal('outcomeReason' in parsed, false);
+});
+
+test('rejects an outcomeReason over the length bound (adversarial: oversized string)', () => {
+  const fixture = loadFixture<Record<string, unknown>>('correction-status.v1.sensitive-leak.json');
+  assert.throws(() =>
+    correctionStatusV1Schema.parse({
+      ...fixture,
+      phase: 'closed',
+      outcomeReason: 'x'.repeat(501),
+    }),
+  );
+});

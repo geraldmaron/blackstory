@@ -1,10 +1,11 @@
 /**
- * TypeScript bridge to the Trafilatura extraction CLI (ADR-019 decision item
- * 5: Trafilatura is the standard main-text/metadata extractor for HTML
- * captures). Fetching/SSRF-safety stays in TS (safe-fetch.ts, per ADR-019
- * item 7); this only improves what happens to already-fetched HTML, replacing
- * the crude regex tag-strip with real main-content extraction (drops nav/
- * boilerplate/ads that the regex approach can't distinguish from content).
+ * TypeScript bridge to the Trafilatura extraction CLI (Trafilatura is the
+ * standard main-text/metadata extractor for HTML captures, and fetching/
+ * SSRF-safety stays in TS via safe-fetch.ts — see docs/decisions-carryover.md,
+ * "Acquisition crawler runtime", recovered from the former ADR-019); this
+ * only improves what happens to already-fetched HTML, replacing the crude
+ * regex tag-strip with real main-content extraction (drops nav/boilerplate/
+ * ads that the regex approach can't distinguish from content).
  *
  * Best-effort: if the Python worker isn't available or errors, callers fall
  * back to the regex-extracted text already returned by safe-fetch.ts — this

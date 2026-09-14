@@ -1,11 +1,14 @@
 # Cloud SQL production design (BB-012) — DEFERRED / DO NOT PROVISION
 #
-> **ADR-011 / D-014:** Firestore is the system of record. Do not create this instance
-> for the current phase. Keep this doc only as a parked design if Postgres is
-> reconsidered under ADR-011 migration triggers.
+> **Superseded, not just deferred.** ADR-011 ("Firestore is the system of record") was removed
+> 2026-07-24 and has since been reversed: Postgres is the live system of record, but on
+> **Supabase** (`docs/data/postgres-schema.md`), not this Cloud SQL design — see
+> `../../../docs/decisions-carryover.md`, "Firestore as system of record, reversed". The
+> "reconsider Postgres" trigger this doc waited for already fired, and landed on a different
+> Postgres than the one designed here. Do not create this instance.
 #
-# Historical note: Do not create this instance until: Blaze/billing confirmed,
-# `gcloud auth login` (or ADC) works, ADR-011 triggers are met, and a human approves cost/size.
+# Historical note: this design predates the Supabase decision and is kept only as a parked
+# reference, not an active provisioning path.
 
 ## Target instance (parked design)
 

@@ -1,5 +1,6 @@
 /**
- * expo-sqlite handle (MOB-009 §3 / ADR-020 chose expo-sqlite).
+ * expo-sqlite handle (MOB-009 §3; `docs/decisions-carryover.md`, "Mobile
+ * stack" chose expo-sqlite).
  *
  * `SqliteDatabase` is the minimal subset of `expo-sqlite`'s `SQLiteDatabase`
  * the store adapter uses. Isolating it here keeps `sqlite-store.ts` free of a

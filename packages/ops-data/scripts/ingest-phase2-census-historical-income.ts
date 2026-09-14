@@ -124,16 +124,20 @@ function parseCensusIncomeCsv(csvText: string): {
 
   // Skip header
   for (let i = 1; i < lines.length; i++) {
-    const line = lines[i].trim();
+    const line = lines[i]?.trim();
     if (!line) continue;
 
-    const parts = line.split(',');
-    if (parts.length < 4) {
+    const [yearStr, race, metricId, medianIncomeStr] = line.split(',').map((p) => p.trim());
+    if (
+      yearStr === undefined ||
+      race === undefined ||
+      metricId === undefined ||
+      medianIncomeStr === undefined
+    ) {
       rejected.push(`Row ${i + 1}: insufficient columns`);
       continue;
     }
 
-    const [yearStr, race, metricId, medianIncomeStr] = parts.map((p) => p.trim());
     const year = parseInt(yearStr, 10);
     const estimate = parseFloat(medianIncomeStr);
 
@@ -189,16 +193,20 @@ function parseCensusPovertyCsv(csvText: string): {
 
   // Skip header
   for (let i = 1; i < lines.length; i++) {
-    const line = lines[i].trim();
+    const line = lines[i]?.trim();
     if (!line) continue;
 
-    const parts = line.split(',');
-    if (parts.length < 4) {
+    const [yearStr, race, metricId, povertyRateStr] = line.split(',').map((p) => p.trim());
+    if (
+      yearStr === undefined ||
+      race === undefined ||
+      metricId === undefined ||
+      povertyRateStr === undefined
+    ) {
       rejected.push(`Row ${i + 1}: insufficient columns`);
       continue;
     }
 
-    const [yearStr, race, metricId, povertyRateStr] = parts.map((p) => p.trim());
     const year = parseInt(yearStr, 10);
     const estimate = parseFloat(povertyRateStr);
 

@@ -1,7 +1,8 @@
 /**
- * Cache migration orchestration (MOB-009 §3 / ADR-022 §5).
+ * Cache migration orchestration (MOB-009 §3; `docs/decisions-carryover.md`, "Mobile cache and
+ * OTA release").
  *
- * ADR-022 §5 mandates DESTRUCTIVE drop-and-rebuild migrations: the cache is not
+ * That decision mandates DESTRUCTIVE drop-and-rebuild migrations: the cache is not
  * a system of record, so any schema change wipes it and it repopulates lazily
  * from the network. The hard requirement (threat-model adjacent, bead §3) is
  * that a migration interrupted MID-FLIGHT (app killed, I/O error) must, on the

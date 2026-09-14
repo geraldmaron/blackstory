@@ -1,5 +1,7 @@
 /**
- * Live Explore map source client (ADR-025 / ADR-022).
+ * Live Explore map source client (`docs/decisions-carryover.md`, "Explore basemap and live map
+ * source" and "Mobile data boundary" — map reads go over HTTP through `apps/api-public`, never a
+ * client database).
  *
  * Fetches release-coupled `MapSourceV1` from `GET /v1/map` through the shared
  * transport stack (same attestation + ETag path as search/entity). Projects the
@@ -61,9 +63,7 @@ export function mapSourceV1ToFeatureCollection(source: MapSourceV1): MapFeatureC
       ...(feature.properties.eraBuckets.length > 0
         ? { eraBuckets: feature.properties.eraBuckets }
         : {}),
-      ...(feature.properties.oneLineStory
-        ? { oneLineStory: feature.properties.oneLineStory }
-        : {}),
+      ...(feature.properties.oneLineStory ? { oneLineStory: feature.properties.oneLineStory } : {}),
       ...(feature.properties.topicTags.length > 0
         ? { topicTags: feature.properties.topicTags }
         : {}),
@@ -71,6 +71,11 @@ export function mapSourceV1ToFeatureCollection(source: MapSourceV1): MapFeatureC
         ? { topicIds: feature.properties.topicIds }
         : {}),
       ...(feature.properties.status ? { status: feature.properties.status } : {}),
+      // Carried through verbatim: the server derived which stories cite this record from the
+      // release's own article projection, and the sheet renders the relation phrase as words.
+      ...(feature.properties.citingStories && feature.properties.citingStories.length > 0
+        ? { citingStories: feature.properties.citingStories }
+        : {}),
     },
   }));
   return { type: 'FeatureCollection', features };
@@ -88,9 +93,7 @@ export async function fetchMapSource(deps: MapSourceDeps): Promise<MapSourceFetc
   const now = deps.now ?? Date.now;
   const isOnline = deps.connectivity.isOnline();
 
-  const readCache = async (
-    degraded: boolean,
-  ): Promise<MapSourceFetchResult | undefined> => {
+  const readCache = async (degraded: boolean): Promise<MapSourceFetchResult | undefined> => {
     const activeStamp = (await deps.releaseCache.getActiveStamp()) ?? '';
     const cached = await deps.releaseCache.read<unknown>(MAP_NAMESPACE, MAP_CACHE_KEY, {
       activeStamp,

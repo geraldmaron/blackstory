@@ -1,6 +1,9 @@
 /**
- * Geohash encode/prefix helpers for Firestore nearby queries without PostGIS (ADR-011).
- * Writers store lat/lng + geohash (+ optional prefixes); api-public filters by radius server-side.
+ * Geohash encode/prefix helpers for radius queries without PostGIS.
+ * Writers store lat/lng + geohash (+ optional prefixes) in bb_canonical.entity_locations;
+ * radius filtering is haversine in application code, never a PostGIS query. The shape outlived
+ * the Firestore store it was designed for, deliberately: see docs/decisions-carryover.md,
+ * "Firestore as system of record, reversed".
  */
 const BASE32 = '0123456789bcdefghjkmnpqrstuvwxyz';
 

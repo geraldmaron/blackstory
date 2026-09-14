@@ -2,7 +2,11 @@
  * POST /api/research-cases/bulk-transition — bounded bulk case transitions (max 50).
  */
 import type { ResearchCaseReasonCode } from '@repo/domain';
-import { authorizeAdminRequest, authErrorResponse } from '../../../../../admin/auth/request-auth';
+import {
+  authorizeAdminRoute,
+  authErrorResponse,
+  isAdminAuthorizationError,
+} from '../../../../../admin/auth/request-auth';
 import { bulkTransitionAdminResearchCases } from '../../../../../admin/cases/research-case-store';
 import type {
   AdminCaseTransitionAction,
@@ -27,7 +31,7 @@ type Body = {
 
 export async function POST(request: Request): Promise<Response> {
   try {
-    const caller = await authorizeAdminRequest(request.headers);
+    const caller = await authorizeAdminRoute(request);
     const body = (await request.json()) as Body;
     if (!body.caseIds || !Array.isArray(body.caseIds)) {
       return Response.json({ error: 'caseIds array is required' }, { status: 400 });
@@ -55,6 +59,11 @@ export async function POST(request: Request): Promise<Response> {
 
     return Response.json({ ok: true, ...result, published: false });
   } catch (error) {
+    // Asked before the domain mappings below: an authorization failure is a 401 or 403, and
+    // falling through to the generic handler would answer it with 400.
+    if (isAdminAuthorizationError(error)) {
+      return authErrorResponse(error);
+    }
     if (error instanceof Error) {
       return Response.json({ error: error.message }, { status: 400 });
     }

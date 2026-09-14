@@ -1,8 +1,9 @@
 /**
- * Tests for the Wayback SPN2 capture layer. Fixture-driven; every HTTP call goes
- * through a mock SafeHttpClient injected by the test, never a real fetch. Proves the ordering
- * invariant from a candidate can only become "review eligible" after a
- * successful capture is awaited and validated.
+ * Tests for the Wayback capture layer, both directions: SPN2 submits, availability reads.
+ * Fixture-driven; every HTTP call goes through a mock SafeHttpClient injected by the test,
+ * never a real fetch, so CI never touches archive.org. Proves the ordering invariant from a
+ * candidate can only become "review eligible" after a successful capture is awaited and
+ * validated, and proves the lookup side is total: it reports a miss instead of throwing.
  */
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
@@ -17,12 +18,16 @@ import {
   assertReviewEligible,
   buildWaybackCaptureUrl,
   captureUrlToEvidencePointer,
+  lookupWaybackSnapshot,
   parseSpnStatusResponse,
+  parseWaybackAvailabilityResponse,
   pollSpnStatus,
   requireCaptureBeforeReview,
   requireCaptureForAllCandidates,
   submitSpnCapture,
+  waybackAvailabilityUrl,
   waybackSpnStatusUrl,
+  WAYBACK_AVAILABILITY_URL,
   WAYBACK_SPN_SUBMIT_URL,
   type SpnCredentials,
 } from './index.js';
@@ -359,4 +364,140 @@ test('requireCaptureForAllCandidates fails the whole batch closed if any single 
     /did not succeed/,
   );
   assert.equal(submitCalls, 2, 'both candidates should have been attempted, not short-circuited');
+});
+
+// ---- availability lookup ----
+
+test('waybackAvailabilityUrl encodes the target and only sets timestamp when given', () => {
+  assert.equal(
+    waybackAvailabilityUrl('https://example.org/a b?x=1'),
+    `${WAYBACK_AVAILABILITY_URL}?url=https%3A%2F%2Fexample.org%2Fa+b%3Fx%3D1`,
+  );
+  assert.equal(
+    waybackAvailabilityUrl('https://example.org/a', '20260214093311'),
+    `${WAYBACK_AVAILABILITY_URL}?url=https%3A%2F%2Fexample.org%2Fa&timestamp=20260214093311`,
+  );
+  assert.equal(
+    waybackAvailabilityUrl('https://example.org/a', '   '),
+    `${WAYBACK_AVAILABILITY_URL}?url=https%3A%2F%2Fexample.org%2Fa`,
+    'a blank timestamp must not become an empty query parameter',
+  );
+});
+
+test('lookupWaybackSnapshot returns the pointer the API named, upgraded to https', async () => {
+  const requests: SafeHttpRequest[] = [];
+  const client = async (request: SafeHttpRequest): Promise<SafeHttpResponse> => {
+    requests.push(request);
+    return jsonResponse(loadFixture('availability-hit.json'));
+  };
+
+  const result = await lookupWaybackSnapshot(
+    client,
+    'https://www.piedmonthistoricalsociety.example.org/news/freedmens-bureau-correspondence',
+  );
+  assert.equal(result.status, 'found');
+  assert.equal(requests.length, 1);
+  assert.equal(requests[0]?.method, 'GET');
+  assert.ok(requests[0]?.url.startsWith(WAYBACK_AVAILABILITY_URL));
+  if (result.status !== 'found') return;
+  // The fixture answers in http, as the live API does; the stored pointer must be https.
+  assert.equal(
+    result.snapshot.url,
+    'https://web.archive.org/web/20260214093311/https://www.piedmonthistoricalsociety.example.org/news/freedmens-bureau-correspondence',
+  );
+  assert.equal(result.snapshot.timestamp, '20260214093311');
+  assert.equal(result.snapshot.httpStatus, '200');
+});
+
+test('lookupWaybackSnapshot reports an empty archived_snapshots as a plain no_snapshot miss', async () => {
+  const client = async (): Promise<SafeHttpResponse> =>
+    jsonResponse(loadFixture('availability-miss.json'));
+  const result = await lookupWaybackSnapshot(client, 'https://gazette.example.org/1948/inquest');
+  assert.equal(result.status, 'miss');
+  if (result.status !== 'miss') return;
+  assert.equal(result.reason, 'no_snapshot');
+});
+
+test('lookupWaybackSnapshot turns an archive 5xx into a miss rather than a throw', async () => {
+  let calls = 0;
+  const client = async (): Promise<SafeHttpResponse> => {
+    calls += 1;
+    return {
+      status: 503,
+      headers: { 'content-type': 'application/json' },
+      bodyText: '',
+      finalUrl: '',
+    };
+  };
+  const result = await lookupWaybackSnapshot(client, 'https://example.org/a', {
+    retries: 1,
+    sleep: async () => {},
+  });
+  assert.equal(calls, 2, '503 is retried once before the miss is reported');
+  assert.equal(result.status, 'miss');
+  if (result.status !== 'miss') return;
+  assert.equal(result.reason, 'http_error');
+  assert.equal(result.detail, 'status_503');
+});
+
+test('lookupWaybackSnapshot turns a transport failure into a miss rather than a throw', async () => {
+  const client = async (): Promise<SafeHttpResponse> => {
+    throw new Error('URL rejected by safe-fetch DNS pinning: private_address');
+  };
+  const result = await lookupWaybackSnapshot(client, 'https://example.org/a', {
+    retries: 0,
+    sleep: async () => {},
+  });
+  assert.equal(result.status, 'miss');
+  if (result.status !== 'miss') return;
+  assert.equal(result.reason, 'transport_error');
+  assert.match(result.detail ?? '', /private_address/);
+});
+
+test('lookupWaybackSnapshot rejects a non-JSON body instead of parsing it', async () => {
+  const client = async (): Promise<SafeHttpResponse> => ({
+    status: 200,
+    headers: { 'content-type': 'text/html' },
+    bodyText: '<html>rate limited</html>',
+    finalUrl: '',
+  });
+  const result = await lookupWaybackSnapshot(client, 'https://example.org/a');
+  assert.equal(result.status, 'miss');
+  if (result.status !== 'miss') return;
+  assert.equal(result.reason, 'malformed_response');
+  assert.equal(result.detail, 'content_type_not_allowed');
+});
+
+test('parseWaybackAvailabilityResponse never invents a pointer', () => {
+  // available:false, a missing timestamp, and a pointer that is not on an archive.org host must
+  // all fail closed. The last one is the one that matters: it is how a surprising response would
+  // otherwise smuggle an arbitrary URL into an evidence row.
+  const notAvailable = parseWaybackAvailabilityResponse({
+    archived_snapshots: {
+      closest: { available: false, url: 'https://web.archive.org/web/1/x', timestamp: '1' },
+    },
+  });
+  assert.equal(notAvailable.status, 'miss');
+
+  const noTimestamp = parseWaybackAvailabilityResponse({
+    archived_snapshots: { closest: { available: true, url: 'https://web.archive.org/web/1/x' } },
+  });
+  assert.equal(noTimestamp.status, 'miss');
+
+  const offArchive = parseWaybackAvailabilityResponse({
+    archived_snapshots: {
+      closest: {
+        available: true,
+        url: 'https://evil.example.com/web/1/x',
+        timestamp: '20260101000000',
+      },
+    },
+  });
+  assert.equal(offArchive.status, 'miss');
+  if (offArchive.status !== 'miss') return;
+  assert.equal(offArchive.reason, 'malformed_response');
+  assert.equal(offArchive.detail, 'closest_url_not_an_archive_pointer');
+
+  assert.equal(parseWaybackAvailabilityResponse(null).status, 'miss');
+  assert.equal(parseWaybackAvailabilityResponse({}).status, 'miss');
 });

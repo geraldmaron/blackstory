@@ -21,21 +21,21 @@ export const DIGNITY_CLASSES = new Set([
 export type CommonsAutoProposeRow = {
   readonly entityId: string;
   readonly displayName: string;
-  readonly kind?: string;
+  readonly kind?: string | undefined;
   readonly outcome: string;
-  readonly fileTitle?: string;
-  readonly commonsPageUrl?: string;
-  readonly sourceImageUrl?: string;
-  readonly alt?: string;
-  readonly credit?: string;
-  readonly rightsStatus?: 'public_domain' | 'licensed' | 'fair_use';
-  readonly licenseShortName?: string;
-  readonly wikidataId?: string;
-  readonly dignityHold?: string;
-  readonly sensitivity?: readonly { readonly class?: string }[];
+  readonly fileTitle?: string | undefined;
+  readonly commonsPageUrl?: string | undefined;
+  readonly sourceImageUrl?: string | undefined;
+  readonly alt?: string | undefined;
+  readonly credit?: string | undefined;
+  readonly rightsStatus?: 'public_domain' | 'licensed' | 'fair_use' | undefined;
+  readonly licenseShortName?: string | undefined;
+  readonly wikidataId?: string | undefined;
+  readonly dignityHold?: string | undefined;
+  readonly sensitivity?: readonly { readonly class?: string | undefined }[] | undefined;
   /** Set when the source plan already fetched Commons imageinfo sha1 (e.g. the NRHP /
    * QID-leftover lanes' evaluateCommonsMediaPropose output) — see buildPinPlanRow. */
-  readonly sha1?: string;
+  readonly sha1?: string | undefined;
 };
 
 /** One `--from` file's parsed JSON — matches dry-run-commons-qid-leftover.ts's
@@ -77,7 +77,65 @@ export function mergeCandidatePayloads(
 
 export type PinGateResult =
   | { readonly ok: true }
-  | { readonly ok: false; readonly reason: 'dignity_hold' | 'place_kind' | 'incomplete_row' };
+  | {
+      readonly ok: false;
+      readonly reason: 'dignity_hold' | 'place_kind' | 'incomplete_row' | 'depiction_hold';
+      /** For `depiction_hold`: which rule fired, for the operator report. */
+      readonly detail?: string;
+    };
+
+/**
+ * Refuse an image because of WHAT IT DEPICTS, which is the check this gate did not have.
+ *
+ * `dignityHoldFor` reads the ENTITY: its sensitivity classes and its id prefix. Nothing read the
+ * IMAGE. So a bulk pin on 2026-09-02 put a statue on Daisy Bates, a wall mural on Rebecca G.
+ * Howard, and — the case this exists for — a group photograph of the four children murdered in
+ * the 16th Street Baptist Church bombing onto two of those children's own records, as their solo
+ * portrait. Every one of those rows passed the entity gate, because there was never anything
+ * wrong with the entity.
+ *
+ * Two families of refusal, and they fail for different reasons:
+ *
+ *  - AN OBJECT, not the person. A statue, bust, mural, plaque, headstone or postage stamp OF
+ *    someone is not a photograph of them, and presenting it as one tells the reader the archive
+ *    has a likeness it does not have.
+ *  - MORE THAN ONE PERSON. A class photograph, a family photograph, a line-up captioned "from
+ *    left", or a file whose own title opens "Unidentified man" is not this subject's portrait.
+ *    Cropping does not fix it: "Cynthia Wesley (cropped).jpg" carries the description "The four
+ *    girls killed during the 16th Street Baptist Church bombing", so the crop was of the group
+ *    and not to the individual. Treat `(cropped)` as no evidence either way and judge the
+ *    description.
+ *
+ * FAILS CLOSED BY DESIGN. It reads the file title and whatever description text the caller has,
+ * so a row with no description is judged on its title alone and an ambiguous one is refused. A
+ * refused photo costs the reader a portrait; an accepted one can put four murdered children on a
+ * page as though each were the subject. Those are not symmetric, which is why the doubt resolves
+ * this way. A human can always pin a specific file deliberately.
+ */
+const DEPICTS_AN_OBJECT =
+  /\b(statue|statues|sculpture|sculptural|bust of|monument|memorial to|mural|plaque|historical marker|headstone|gravestone|grave of|tombstone|postage stamp|commemorative stamp|banknote|mosaic|stained[- ]glass)\b/i;
+
+const DEPICTS_A_GROUP =
+  /\b(and class|and his class|and her class|and students|with her students|with his students|and parents|and her parents|and his parents|and family|group (?:photo|portrait|of)|from left|left to right|l-?r:|unidentified (?:man|woman|person)|others|crowd|the four girls|team photo)\b/i;
+
+/**
+ * Hold reason for a row whose image does not depict the subject alone, or `undefined` to allow.
+ *
+ * `description` is the Commons `ImageDescription`, which is where the real evidence lives — the
+ * title is frequently just the subject's name even when the photograph is of a group.
+ */
+export function depictionHoldFor(
+  row: Pick<CommonsAutoProposeRow, 'fileTitle' | 'alt' | 'kind'>,
+  description?: string,
+): string | undefined {
+  // Only person records carry the "must be a portrait of the subject" expectation. A place's
+  // photograph of its own historical marker is the correct image for that place.
+  if (row.kind !== undefined && row.kind !== 'person') return undefined;
+  const haystack = [row.fileTitle ?? '', row.alt ?? '', description ?? ''].join(' ');
+  if (DEPICTS_AN_OBJECT.test(haystack)) return 'depicts_an_object';
+  if (DEPICTS_A_GROUP.test(haystack)) return 'depicts_a_group';
+  return undefined;
+}
 
 /**
  * Re-derive the dignity hold from a row's own fields (not just its precomputed
@@ -93,13 +151,19 @@ export function dignityHoldFor(row: CommonsAutoProposeRow): string | undefined {
 /** Gate a single dry-run row for the pin plan. Places are held unless `allowPlaces`. */
 export function evaluatePinGate(
   row: CommonsAutoProposeRow,
-  options: { readonly allowPlaces: boolean } = { allowPlaces: false },
+  options: { readonly allowPlaces: boolean; readonly description?: string } = {
+    allowPlaces: false,
+  },
 ): PinGateResult {
   if (row.outcome !== 'auto_propose') {
     return { ok: false, reason: 'incomplete_row' };
   }
   if (dignityHoldFor(row)) {
     return { ok: false, reason: 'dignity_hold' };
+  }
+  const depiction = depictionHoldFor(row, options.description);
+  if (depiction) {
+    return { ok: false, reason: 'depiction_hold', detail: depiction };
   }
   if (row.kind === 'place' && !options.allowPlaces) {
     return { ok: false, reason: 'place_kind' };
@@ -115,8 +179,8 @@ export type PinPlanRow = {
   readonly entityId: string;
   readonly url: string;
   readonly fileTitle: string;
-  readonly sha1?: string;
-  readonly license?: string;
+  readonly sha1?: string | undefined;
+  readonly license?: string | undefined;
   readonly credit: string;
   readonly sourcePageUrl: string;
   readonly alt: string;

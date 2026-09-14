@@ -109,7 +109,10 @@ plan.md
 # `.claude/skills/blackstory/` carve-out. Do not re-ignore `.claude/` here;
 # a later `.claude/` rule would hide the committed research skills.
 .construct/
-inbox/
+# Anchored to the repo root on purpose. As a bare `inbox/` this rule matched EVERY directory
+# named inbox at any depth, which silently kept `apps/web/src/app/admin/inbox/` — a real admin
+# route — out of the repo entirely. Leading slash means "the top-level inbox/ only".
+/inbox/
 .vercel
 
 # Entity/content data lives only in Supabase — never commit it (repo-8xcc).

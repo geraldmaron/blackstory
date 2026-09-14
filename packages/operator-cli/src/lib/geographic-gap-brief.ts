@@ -7,7 +7,8 @@
  * research-directive.ts is not modified.
  *
  * Invariants:
- *   * Research cannot publish (ADR-009). Decisions here are stage_for_review /
+ *   * Research cannot publish (`docs/decisions-carryover.md`, "Research and discovery
+ *     cannot publish"). Decisions here are stage_for_review /
  *     hold / reject only — never a write to public projections or release tables.
  *   * Gathering uses the shared safe-fetch path (defaultDirectiveGather →
  *     @repo/security DNS-pinned fetch). No bare fetch().
@@ -125,7 +126,8 @@ export function createGeographicGapBriefHandlers(): ResearchDirectiveHandlers<
     },
     decide: async ({ plan, gathered, extracted }, context) => {
       const baseDecision = await base.decide({ plan, gathered, extracted }, context);
-      // Stage/hold/reject only — research workers never publish (ADR-009).
+      // Stage/hold/reject only — research workers never publish
+      // (`docs/decisions-carryover.md`, "Research and discovery cannot publish").
       return {
         ...baseDecision,
         fips5: plan.subject.fips5,

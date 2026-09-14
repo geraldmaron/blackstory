@@ -52,7 +52,7 @@ principalSet://iam.googleapis.com/projects/332234323945/locations/global/workloa
 Combined with the provider condition, only tokens that already cleared the CEL filter and carry
 `environment=production` may impersonate the deploy SA.
 
-### Per-project deploy identities (ADR-012)
+### Per-project deploy identities (ADR-012, removed 2026-07-24, recovered in `../../../docs/decisions-carryover.md`, "Small recovered decisions" — still only a design target, never provisioned)
 
 The pool and provider stay hosted in `blackbook-prod` (a WIF pool is a project-scoped resource), but
 the principal sets it mints are granted IAM in whichever project each deploy SA actually lives in:
@@ -67,7 +67,8 @@ A token minted with `environment=staging` satisfies only the `staging` principal
 therefore only impersonate `github-deploy-staging`, which itself can only `ActAs` runtime SAs inside
 `blackbook-staging` (see `deploy-roles.md`). It has no path to `blackbook-prod` or
 `blackbook-internal` credentials. Same isolation applies to `internal`. This is the concrete
-mechanism behind ADR-012's "cross-environment deploys fail at IAM, not convention."
+mechanism behind the "cross-environment deploys fail at IAM, not convention" clause of ADR-012
+(`../../../docs/decisions-carryover.md`, "Small recovered decisions").
 
 ## Short-lived credentials
 

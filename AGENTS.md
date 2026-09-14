@@ -89,7 +89,7 @@ All commands: `node --conditions development --import tsx packages/operator-cli/
 | story-research-run | Draft/recommend longform `/stories` articles via citation-gated story packets | `story-research-run --topics <topics.json> --provider mock --operator-id "$USER" --session-id "<id>"` |
 | harness-run | Run a thematic study (redlining, urban renewal) and draft ThemeImpactPackets | `harness-run --theme <theme> --metro <metro> --connectors dpla,nps-network-to-freedom,shpo --output <out.json>` |
 | locate | Census-geocode a sourced address to lat/lng (no LLM). Finding the place is `blackstory-entity-verify`. | `locate --entity-id <id> --address "<address>" --precision institution --operator-id "$USER" --session-id "<id>"` |
-| capture-backfill | Snapshot cited URLs into `source_captures`; `--wayback` secondary-anchors at Save Page Now | `capture-backfill [--commit] [--wayback] [--max-captures 25]` |
+| capture-backfill | Snapshot cited URLs into `source_captures`; looks up existing Wayback captures when a fetch fails, and `--wayback` secondary-anchors the rest at Save Page Now | `capture-backfill [--commit] [--wayback] [--max-captures 25]` |
 | case-drafting (`attach-evidence`) | Check if a research case is review-ready; fill missing evidence | `attach-evidence --case-id "<id>" --description "<what this fills>" --source-url "<url>" --operator-id "$USER" --session-id "<id>"` |
 | triage-graylist (`graylist-read`, `attach-evidence`) | Walk parked/weak-signal candidates; corroborate or recommend | `graylist-read --limit 20` (Postgres only — see doc); `attach-evidence` to corroborate |
 | expand | Traverse Wikidata from a seed entity's QID; stage neighbors as review candidates | `expand --entity-id <id> --depth 1 [--commit]` |
@@ -216,7 +216,7 @@ The base image ships an older `/exec-daemon/node` (v22.14.0) that lacks `module.
 `/corrections` and `/submit` use an in-memory store (`apps/web/src/app/corrections/store.ts`), so a submission succeeds and returns a receipt code with no DB. The `/corrections/status/<receipt>` lookup will report "Receipt not found" in dev because the in-memory store is not shared across route handlers/process boundaries (production persists via the `submissionInbox` backing). This is expected locally, not a bug.
 
 ### Optional services (not needed for core web dev)
-Docker is not installed, so the parked local PostGIS (`pnpm db:up`) does not run here; it is optional per ADR-011. Firebase emulators need a Java runtime and are optional. `apps/mobile` (Expo iOS) cannot run on this Linux VM (requires macOS/Xcode) and is excluded from the pnpm workspace (its own `package-lock.json`).
+Docker is not installed, so the parked local PostGIS (`pnpm db:up`) does not run here; it is a dev-only convenience, unrelated to system-of-record status (`docs/decisions-carryover.md`, "Firestore as system of record, reversed"). Firebase emulators need a Java runtime and are optional. `apps/mobile` (Expo iOS) cannot run on this Linux VM (requires macOS/Xcode) and is excluded from the pnpm workspace (its own `package-lock.json`).
 
 <!-- BEGIN BEADS INTEGRATION v:1 profile:minimal hash:ca08a54f -->
 ## Beads Issue Tracker
@@ -262,4 +262,13 @@ bd close <id>         # Complete work
 - NEVER stop before pushing - that leaves work stranded locally
 - NEVER say "ready to push when you are" - YOU must push
 - If push fails, resolve and retry until it succeeds
+
+**Before opening a staging → main PR**, run `fnm exec --using=22 -- ./scripts/ci-local.sh`.
+`pnpm test` is not equivalent: CI decides which lanes run from the changed paths, and two of
+those predicates are easy to miss by inspection — touching `packages/public-contracts` fires
+the whole mobile lane (it is the mobile token source), and touching `packages/research-kernel`
+fires the Python lane (no `.py` file required). `scripts/ci-local.sh` mirrors
+`.github/workflows/ci.yml` lane-for-lane instead of guessing. The script requires Node 22
+(the repo's `.nvmrc`) because `node:test`'s reporter output format differs between Node 22 and
+24 — running it on 24 can pass locally and still not match what CI reports.
 <!-- END BEADS INTEGRATION -->

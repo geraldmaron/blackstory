@@ -32,9 +32,9 @@ describe('books catalog', () => {
     const rows = listCatalogRows();
     const morrison = filterCatalogRows(rows, 'morrison');
     expect(morrison.length).toBeGreaterThan(0);
-    expect(morrison.every((row) => /morrison/i.test(row.authorNames) || /morrison/i.test(row.title))).toBe(
-      true,
-    );
+    expect(
+      morrison.every((row) => /morrison/i.test(row.authorNames) || /morrison/i.test(row.title)),
+    ).toBe(true);
     expect(filterCatalogRows(rows, 'zzzz-no-match').length).toBe(0);
   });
 

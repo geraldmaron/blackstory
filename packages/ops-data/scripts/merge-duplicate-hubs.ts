@@ -3,6 +3,14 @@
  *
  * Default pair set: ent_sncc_001→ent_sncc_org_001, ent_sclc_001→ent_sclc_org_001.
  *
+ * The relationship/participation cleanup deletes are scoped to the rows this merge's own
+ * endpoint rewrite just touched (see the `RETURNING id` capture in `rewriteRelationshipsForPair`
+ * and `rewriteEventParticipationForPair`). That mirrors the admin console's merge path
+ * (`applyEntityMerge` in apps/web/src/admin/lib/entity-merge.ts), which only ever acts on rows
+ * connected to the entities being merged and otherwise leaves the table alone — a self-loop or
+ * duplicate edge that predates the merge, or belongs to an unrelated pair of entities, is never a
+ * deletion candidate here.
+ *
  * Usage (from repo root):
  *   set -a && source apps/web/.env.local && set +a
  *   export DATABASE_SSL=1
@@ -13,6 +21,7 @@
  *   DRY_RUN=0 MERGE_DUPLICATE_HUBS_APPLY=1 node --conditions development --import tsx \
  *     packages/ops-data/scripts/merge-duplicate-hubs.ts
  */
+import { fileURLToPath } from 'node:url';
 import pg from 'pg';
 import {
   buildMergeStatePayload,
@@ -31,6 +40,53 @@ import {
 const DRY_RUN = process.env.DRY_RUN !== '0';
 const APPLY = process.env.MERGE_DUPLICATE_HUBS_APPLY === '1';
 const ACTOR_ID = process.env.OPERATOR_ID?.trim() || 'ops-data/merge-duplicate-hubs';
+
+/**
+ * Pairs to merge. Defaults to the WS4 hub set this script was written for; `MERGE_PAIRS` supplies
+ * others as one `absorbed>survivor[>reason]` entry PER LINE.
+ *
+ * One per line, not comma-separated: a merge reason is a sentence and sentences contain commas.
+ * The first version of this split on commas too and choked on its own first real reason.
+ *
+ * This exists because the script's safety properties are general but its pair list was not: after
+ * the cleanup deletes were scoped to the merge's own rows (02630381, repo-iypc) the machinery is
+ * safe for any pair, and the alternative was hand-written SQL per duplicate, which is how an
+ * unscoped delete gets written in the first place.
+ */
+function resolveMergePairs(): readonly HubMergePair[] {
+  const raw = process.env.MERGE_PAIRS?.trim();
+  if (!raw) return DEFAULT_HUB_MERGE_PAIRS;
+  const pairs = raw
+    .split(/\r?\n/u)
+    .map((entry) => entry.trim())
+    .filter(Boolean)
+    .map((entry) => {
+      const [absorbedId, survivorId, reason] = entry.split('>').map((part) => part.trim());
+      if (!absorbedId || !survivorId) {
+        throw new Error(`MERGE_PAIRS entry "${entry}" is not "absorbed>survivor[>reason]"`);
+      }
+      if (absorbedId === survivorId) {
+        throw new Error(`MERGE_PAIRS entry "${entry}" merges an entity into itself`);
+      }
+      return {
+        absorbedId,
+        survivorId,
+        reason:
+          reason && reason.length > 0 ? reason : `Duplicate record merged into ${survivorId}.`,
+      };
+    });
+  const absorbed = new Set(pairs.map((pair) => pair.absorbedId));
+  if (absorbed.size !== pairs.length) throw new Error('MERGE_PAIRS repeats an absorbed id');
+  for (const pair of pairs) {
+    if (absorbed.has(pair.survivorId)) {
+      throw new Error(
+        `MERGE_PAIRS makes ${pair.survivorId} both a survivor and an absorbed record; ` +
+          'chain those as separate runs so each is auditable on its own.',
+      );
+    }
+  }
+  return pairs;
+}
 
 function connectionString(): string {
   const value =
@@ -115,7 +171,7 @@ async function loadEdgeCoverage(client: pg.PoolClient): Promise<EdgeCoverageSnap
   };
 }
 
-async function rewriteRelationshipsForPair(
+export async function rewriteRelationshipsForPair(
   client: pg.PoolClient,
   pair: HubMergePair,
 ): Promise<{
@@ -124,29 +180,39 @@ async function rewriteRelationshipsForPair(
   readonly deletedSelfLoops: number;
   readonly deletedDuplicates: number;
 }> {
-  const updatedFrom =
-    (
-      await client.query(
-        `UPDATE bb_canonical.entity_relationships
+  const touchedIds = new Set<string>();
+
+  const fromUpdate = await client.query<{ id: string }>(
+    `UPDATE bb_canonical.entity_relationships
        SET from_entity_id = $2, updated_at = now()
-       WHERE from_entity_id = $1`,
-        [pair.absorbedId, pair.survivorId],
-      )
-    ).rowCount ?? 0;
-  const updatedTo =
-    (
-      await client.query(
-        `UPDATE bb_canonical.entity_relationships
+       WHERE from_entity_id = $1
+       RETURNING id`,
+    [pair.absorbedId, pair.survivorId],
+  );
+  for (const row of fromUpdate.rows) touchedIds.add(row.id);
+  const updatedFrom = fromUpdate.rowCount ?? 0;
+
+  const toUpdate = await client.query<{ id: string }>(
+    `UPDATE bb_canonical.entity_relationships
        SET to_entity_id = $2, updated_at = now()
-       WHERE to_entity_id = $1`,
-        [pair.absorbedId, pair.survivorId],
-      )
-    ).rowCount ?? 0;
+       WHERE to_entity_id = $1
+       RETURNING id`,
+    [pair.absorbedId, pair.survivorId],
+  );
+  for (const row of toUpdate.rows) touchedIds.add(row.id);
+  const updatedTo = toUpdate.rowCount ?? 0;
+
+  // Only rows this merge's own endpoint rewrite just touched (an endpoint that used to be the
+  // absorbed entity) are eligible for cleanup. A self-loop or duplicate edge anywhere else in the
+  // table is left alone, same as the admin console's merge path would leave it.
+  const touched = [...touchedIds];
   const deletedSelfLoops =
     (
       await client.query(
         `DELETE FROM bb_canonical.entity_relationships
-       WHERE from_entity_id = to_entity_id`,
+       WHERE from_entity_id = to_entity_id
+         AND id = ANY($1::text[])`,
+        [touched],
       )
     ).rowCount ?? 0;
   const deletedDuplicates =
@@ -157,13 +223,15 @@ async function rewriteRelationshipsForPair(
        WHERE r1.from_entity_id = r2.from_entity_id
          AND r1.to_entity_id = r2.to_entity_id
          AND r1.relationship_type = r2.relationship_type
-         AND r1.id > r2.id`,
+         AND r1.id > r2.id
+         AND (r1.id = ANY($1::text[]) OR r2.id = ANY($1::text[]))`,
+        [touched],
       )
     ).rowCount ?? 0;
   return { updatedFrom, updatedTo, deletedSelfLoops, deletedDuplicates };
 }
 
-async function rewriteEventParticipationForPair(
+export async function rewriteEventParticipationForPair(
   client: pg.PoolClient,
   pair: HubMergePair,
 ): Promise<{
@@ -172,29 +240,39 @@ async function rewriteEventParticipationForPair(
   readonly deletedSelfLoops: number;
   readonly deletedDuplicates: number;
 }> {
-  const updatedParticipant =
-    (
-      await client.query(
-        `UPDATE bb_canonical.event_participation
+  const touchedIds = new Set<string>();
+
+  const participantUpdate = await client.query<{ id: string }>(
+    `UPDATE bb_canonical.event_participation
        SET participant_id = $2, updated_at = now()
-       WHERE participant_id = $1`,
-        [pair.absorbedId, pair.survivorId],
-      )
-    ).rowCount ?? 0;
-  const updatedEvent =
-    (
-      await client.query(
-        `UPDATE bb_canonical.event_participation
+       WHERE participant_id = $1
+       RETURNING id`,
+    [pair.absorbedId, pair.survivorId],
+  );
+  for (const row of participantUpdate.rows) touchedIds.add(row.id);
+  const updatedParticipant = participantUpdate.rowCount ?? 0;
+
+  const eventUpdate = await client.query<{ id: string }>(
+    `UPDATE bb_canonical.event_participation
        SET event_id = $2, updated_at = now()
-       WHERE event_id = $1`,
-        [pair.absorbedId, pair.survivorId],
-      )
-    ).rowCount ?? 0;
+       WHERE event_id = $1
+       RETURNING id`,
+    [pair.absorbedId, pair.survivorId],
+  );
+  for (const row of eventUpdate.rows) touchedIds.add(row.id);
+  const updatedEvent = eventUpdate.rowCount ?? 0;
+
+  // Same scoping as the relationship cleanup above: only rows this merge's own rewrite touched
+  // are eligible for deletion, so a pre-existing self-loop or duplicate elsewhere in the table
+  // survives.
+  const touched = [...touchedIds];
   const deletedSelfLoops =
     (
       await client.query(
         `DELETE FROM bb_canonical.event_participation
-       WHERE event_id = participant_id`,
+       WHERE event_id = participant_id
+         AND id = ANY($1::text[])`,
+        [touched],
       )
     ).rowCount ?? 0;
   const deletedDuplicates =
@@ -205,7 +283,9 @@ async function rewriteEventParticipationForPair(
        WHERE ep1.event_id = ep2.event_id
          AND ep1.participant_id = ep2.participant_id
          AND ep1.role = ep2.role
-         AND ep1.id > ep2.id`,
+         AND ep1.id > ep2.id
+         AND (ep1.id = ANY($1::text[]) OR ep2.id = ANY($1::text[]))`,
+        [touched],
       )
     ).rowCount ?? 0;
   return { updatedParticipant, updatedEvent, deletedSelfLoops, deletedDuplicates };
@@ -360,18 +440,19 @@ async function applyHubMerge(
 }
 
 async function main(): Promise<void> {
+  const PAIRS = resolveMergePairs();
   const { connectionString: cs, ssl } = normalizePgConnectionString(connectionString());
   const pool = new pg.Pool({ connectionString: cs, ssl });
   const client = await pool.connect();
 
   try {
     console.log('=== Hub duplicate merge ===');
-    console.log(`Pairs: ${DEFAULT_HUB_MERGE_PAIRS.length}`);
+    console.log(`Pairs: ${PAIRS.length}`);
     console.log(`Mode: ${DRY_RUN || !APPLY ? 'dry-run' : 'apply'}`);
 
     const coverageBefore = await loadEdgeCoverage(client);
     console.log(`Edge coverage before: ${formatEdgeCoverage(coverageBefore)}`);
-    const degreesBefore = await loadDegreeSnapshots(client, DEFAULT_HUB_MERGE_PAIRS);
+    const degreesBefore = await loadDegreeSnapshots(client, PAIRS);
     console.log(formatDegreeSnapshot('Relationship degree before', degreesBefore));
 
     const plan: Array<{
@@ -379,7 +460,7 @@ async function main(): Promise<void> {
       readonly skipReason?: string;
     }> = [];
 
-    for (const pair of DEFAULT_HUB_MERGE_PAIRS) {
+    for (const pair of PAIRS) {
       const absorbedExists = await entityExists(client, pair.absorbedId);
       const survivorExists = await entityExists(client, pair.survivorId);
       if (!absorbedExists || !survivorExists) {
@@ -446,7 +527,7 @@ async function main(): Promise<void> {
       throw error;
     }
 
-    const degreesAfter = await loadDegreeSnapshots(client, DEFAULT_HUB_MERGE_PAIRS);
+    const degreesAfter = await loadDegreeSnapshots(client, PAIRS);
     console.log(formatDegreeSnapshot('Relationship degree after', degreesAfter));
     const coverageAfter = await loadEdgeCoverage(client);
     console.log(`Edge coverage after: ${formatEdgeCoverage(coverageAfter)}`);
@@ -460,7 +541,10 @@ async function main(): Promise<void> {
   }
 }
 
-main().catch((error) => {
-  console.error(error);
-  process.exit(1);
-});
+const isDirectRun = process.argv[1] === fileURLToPath(import.meta.url);
+if (isDirectRun) {
+  main().catch((error) => {
+    console.error(error);
+    process.exit(1);
+  });
+}

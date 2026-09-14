@@ -1,24 +1,26 @@
 'use client';
 
 /**
- * The persistent map canvas (ADR-017 "Persistent map canvas — one MapLibre instance
- * across hero and explore"). `MapStageProvider` mounts once in the root shell
- * (`components/SiteShell.tsx`), above every route, so it never remounts on navigation — only
- * the page tree beneath it swaps. That means this component's mount effect below runs exactly
- * once per page load: the WebGL context, loaded tiles, and camera all survive route changes by
- * construction, not by choreography.
+ * The persistent map canvas (`docs/decisions-carryover.md`, "Persistent map canvas").
+ * `MapStageProvider` mounts once in the root shell (`components/SiteShell.tsx`), above every
+ * route, so it never remounts on navigation: only the page tree beneath it swaps. That means
+ * this component's mount effect below runs exactly once per page load, and the WebGL context,
+ * loaded tiles, and camera all survive route changes by construction, not by choreography.
+ * The decision's own wording ("across hero and explore") predates the root-shell hoist: the
+ * canvas now outlives navigation to every route, not just the two map surfaces.
  *
- * Refactored from the former `apps/web/src/app/map/ExploreMapCanvas.tsx` (deleted — its
- * instance-lifecycle code lives here now). Every mutation helper below (`applyGeographyStyle`,
- * `setSelectedStateFilter`, `setHistoryEdgeData`, `syncCircularMarkers`, …) is a straight port;
- * what changed is the OUTER shape: instead of a props-driven component that a page mounts and
- * unmounts, this is a long-lived provider whose imperative API (`patchData` / `applyViewState` /
- * `flyPreset` / `subscribe`) pages call through `useMapStage()`. Dignity redaction flow, cluster
- * config, and `activateOnBackgroundClick`-equivalent semantics are all unchanged in substance —
- * see this module's exports' own doc comments for what moved where.
+ * The outer shape is a long-lived provider, not a props-driven component a page mounts and
+ * unmounts: pages drive it through the imperative API (`patchData` / `applyViewState` /
+ * `flyPreset` / `subscribe`) that `useMapStage()` returns. The instance-lifecycle code and every
+ * mutation helper below (`applyGeographyStyle`, `setSelectedStateFilter`, `setHistoryEdgeData`,
+ * `syncCircularMarkers`, …) sit behind that API; each export's own doc comment states its
+ * contract.
  *
- * `maplibre-gl` (and its CSS) are only ever dynamically imported here — the app's ONE such
- * import (ADR-017 consequence).
+ * `maplibre-gl`'s runtime is only ever dynamically imported here, and this is the only module
+ * that constructs a map. `map-libre-lifecycle.test.ts` greps `apps/web/src` for
+ * `new maplibregl.Map` and fails if a second mount appears; every other module takes
+ * `import type` only (`docs/decisions-carryover.md`, "Persistent map canvas": one instance).
+ * The stylesheet is a plain static import below, not a dynamic one.
  */
 import {
   createContext,
@@ -34,7 +36,6 @@ import {
 import type {
   GeoJSONSource,
   Map as MapLibreMap,
-  MapLayerMouseEvent,
   MapMouseEvent,
   Marker,
   StyleSpecification,
@@ -48,8 +49,6 @@ import {
   EXPLORE_ENTITIES_INCOMING_SOURCE_ID,
   EXPLORE_ENTITIES_SOURCE_ID,
   EXPLORE_HISTORY_EDGES_INCOMING_SOURCE_ID,
-  EXPLORE_HISTORY_EDGES_LAYER_ID,
-  EXPLORE_HISTORY_EDGES_SELECTED_LAYER_ID,
   EXPLORE_SELECTED_POINT_LAYER_ID,
   EXPLORE_STATE_DENSITY_LAYER_ID,
   EXPLORE_UNCLUSTERED_POINT_INCOMING_LAYER_ID,
@@ -67,7 +66,11 @@ import {
 import { markerRadiusPlusExpression } from '../../lib/map-experience/marker-size';
 import {
   applyDensityBlendProgress,
+  applyDecadeHoldFeatureState,
+  buildDecadeHoldSet,
   buildDensityColorMorphStates,
+  clearDecadeHoldFeatureState,
+  entityIdsInCollection,
   clearDensityMorphFeatureState,
   DECADE_LAYER_FADE_MS,
   runDecadeMorphAnimation,
@@ -169,6 +172,7 @@ import {
   type CameraFlyTarget,
   type MapStageFlyOptions,
 } from './camera';
+import { bindPlateCameraListeners, bindPlateClickListeners } from './event-wiring';
 import { usePathname } from 'next/navigation';
 import { surfaceClassFor, type SurfaceClass } from '../../lib/nav/surface-classes';
 import { useSurfaceClass } from '../../lib/nav/use-surface-class';
@@ -266,7 +270,9 @@ export type MapStageHandle = {
   /** Patches the selected-state / selected-edge highlight filters (and the state-label
    * selection color) without touching source data or the style. */
   readonly applyViewState: (patch: MapStageViewPatch) => void;
-  /** The only sanctioned way to move the camera (ADR-017: "raw flyTo defaults are banned").
+  /** The sanctioned route for preset framing. Raw library defaults are policy-banned, though
+   * this file's own MapMoment framing effect is a confirmed live exception
+   * (`docs/decisions-carryover.md`, "Persistent map canvas": camera grammar).
    * Resolves `target` (an explicit center+zoom, or a bounding box via `cameraForBounds`), then
    * flies/eases/jumps according to `name`'s preset and the current reduced-motion state. */
   readonly flyPreset: (
@@ -294,8 +300,11 @@ export type MapStageHandle = {
    *
    * Deliberately narrow: `camera-moves.ts` drives the plate through a structural `MapLike`, and
    * this is how that library reaches the one persistent canvas. It is not an invitation to call
-   * `flyTo` directly — ADR-017's ban on raw camera calls still holds, and `flyPreset` remains the
-   * route for preset framing.
+   * `flyTo` with library defaults through THIS handle. A caller that reaches past `flyPreset`
+   * owes the move its own authored duration, curve and easing, the way `camera-moves.ts` does
+   * (`docs/decisions-carryover.md`, "Persistent map canvas": camera grammar). This file's own
+   * MapMoment framing effect reaches the map directly, not through this handle, and is a
+   * confirmed exception to that norm today. `flyPreset` remains the route for preset framing.
    */
   readonly getMap: () => AtlasCameraTarget | null;
 };
@@ -609,6 +618,16 @@ export function MapStageProvider({
   const settledDensityFillByFipsRef = useRef<Map<string, string>>(new Map());
   /** Last in-flight density morph states — cleared on promote. */
   const activeDensityMorphRef = useRef<readonly DensityColorMorphState[]>([]);
+  /*
+   * The record ids on the plate BEFORE the config patch that triggered this morph, and the set
+   * currently held still by it (repo-o56o).
+   *
+   * `previousEntityIdsRef` is captured in the patch rather than at promote because by the time a
+   * morph starts, `configRef.current.featureCollection` is already the incoming decade — the patch
+   * is the only moment both sides exist.
+   */
+  const previousEntityIdsRef = useRef<readonly string[]>([]);
+  const activeDecadeHoldRef = useRef<ReadonlySet<string>>(new Set());
   /**
    * Latches true on MapLibre `load`. Do NOT gate decade morphs on `isStyleLoaded()` —
    * GeoJSON setData / tile fetches flip that false and force the snap path (full refresh).
@@ -886,6 +905,7 @@ export function MapStageProvider({
         satellite,
         colorScheme: readDocumentColorScheme(),
       });
+      previousEntityIdsRef.current = entityIdsInCollection(configRef.current.featureCollection);
       configRef.current = {
         ...configRef.current,
         style,
@@ -989,6 +1009,10 @@ export function MapStageProvider({
     async (map: MapLibreMap, generation: number): Promise<void> => {
       const cfg = configRef.current;
       setDecadeCrossfadeTransitions(map, 0);
+      // Release the held records before the buffers swap. A mark left behind would pin them at
+      // rest through the NEXT decade's dissolve — the same shimmer inverted.
+      clearDecadeHoldFeatureState(map, activeDecadeHoldRef.current);
+      activeDecadeHoldRef.current = new Set();
       const entities = map.getSource(EXPLORE_ENTITIES_SOURCE_ID) as GeoJSONSource | undefined;
       if (entities) {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any -- GeoJSON ambient namespace unavailable
@@ -1029,6 +1053,14 @@ export function MapStageProvider({
           );
           activeDensityMorphRef.current = morphStates;
           applyDensityBlendProgress(map, morphStates, 0);
+          // Both buffers now hold data, so the marks can be written to each.
+          const held = buildDecadeHoldSet(
+            previousEntityIdsRef.current,
+            entityIdsInCollection(cfg.featureCollection),
+          );
+          clearDecadeHoldFeatureState(map, activeDecadeHoldRef.current);
+          applyDecadeHoldFeatureState(map, held);
+          activeDecadeHoldRef.current = held;
         } catch (error) {
           console.error('[MapStage] incoming decade buffer stage failed', error);
           if (generation !== decadeFadeGenerationRef.current) return;
@@ -1043,6 +1075,7 @@ export function MapStageProvider({
           durationMs,
           isCurrent: () => generation === decadeFadeGenerationRef.current,
           onProgress: (eased) => applyDensityBlendProgress(map, morphStates, eased),
+          holdPersistingRecords: activeDecadeHoldRef.current.size > 0,
         });
         decadeMorphAnimationRef.current = animation;
         await animation.done;
@@ -1447,36 +1480,6 @@ export function MapStageProvider({
         handleEntityPointerHit(hit);
       }
 
-      function handleStateClick(event: MapLayerMouseEvent) {
-        if (pointerHitAt(event.point)) return;
-        const postal = event.features?.[0]?.properties?.postalCode;
-        if (typeof postal === 'string' && postal.length > 0) {
-          notify(listenersRef.current, 'stateSelect', postal);
-        }
-      }
-
-      function handleEdgeClick(event: MapLayerMouseEvent) {
-        if (pointerHitAt(event.point)) return;
-        const edgeId = event.features?.[0]?.properties?.edgeId;
-        if (typeof edgeId === 'string' && edgeId.length > 0) {
-          notify(listenersRef.current, 'edgeSelect', edgeId);
-        }
-      }
-
-      function handleBackgroundClick(event: MapMouseEvent) {
-        if (pointerHitAt(event.point)) return;
-        const hitLayers = [
-          EXPLORE_STATE_DENSITY_LAYER_ID,
-          EXPLORE_HISTORY_EDGES_LAYER_ID,
-          EXPLORE_HISTORY_EDGES_SELECTED_LAYER_ID,
-        ].filter((id) => activeMap.getLayer(id));
-        const hits = hitLayers.length
-          ? activeMap.queryRenderedFeatures(event.point, { layers: hitLayers })
-          : [];
-        if (hits.length > 0) return;
-        notify(listenersRef.current, 'activate', readViewport(activeMap));
-      }
-
       activeMap.once('load', () => {
         mapStyleReadyRef.current = true;
         applyStyleAndData();
@@ -1494,26 +1497,13 @@ export function MapStageProvider({
             if (!canceledRef.current) activeMap.resize();
           },
         );
-        if (activeMap.getLayer(EXPLORE_STATE_DENSITY_LAYER_ID)) {
-          activeMap.on('click', EXPLORE_STATE_DENSITY_LAYER_ID, handleStateClick);
-          activeMap.on('mouseenter', EXPLORE_STATE_DENSITY_LAYER_ID, () => {
-            activeMap.getCanvas().style.cursor = 'pointer';
-          });
-          activeMap.on('mouseleave', EXPLORE_STATE_DENSITY_LAYER_ID, () => {
-            activeMap.getCanvas().style.cursor = '';
-          });
-        }
-        if (activeMap.getLayer(EXPLORE_HISTORY_EDGES_LAYER_ID)) {
-          activeMap.on('click', EXPLORE_HISTORY_EDGES_LAYER_ID, handleEdgeClick);
-          activeMap.on('mouseenter', EXPLORE_HISTORY_EDGES_LAYER_ID, () => {
-            activeMap.getCanvas().style.cursor = 'pointer';
-          });
-          activeMap.on('mouseleave', EXPLORE_HISTORY_EDGES_LAYER_ID, () => {
-            activeMap.getCanvas().style.cursor = '';
-          });
-        }
-        activeMap.on('click', handleEntityPointerClick);
-        activeMap.on('click', handleBackgroundClick);
+        bindPlateClickListeners(activeMap, {
+          pointerHitAt,
+          onEntityPointerClick: handleEntityPointerClick,
+          onStateSelect: (postalCode) => notify(listenersRef.current, 'stateSelect', postalCode),
+          onEdgeSelect: (edgeId) => notify(listenersRef.current, 'edgeSelect', edgeId),
+          onActivate: (viewport) => notify(listenersRef.current, 'activate', viewport),
+        });
         activeMap.resize();
         // Flush camera requested while the canvas was still constructing (e.g. locate → explore
         // deep link with radius bounds). Prefer the pending flight over the constructor CONUS frame.
@@ -1524,10 +1514,17 @@ export function MapStageProvider({
         }
       });
 
-      activeMap.on('moveend', () => {
-        lastViewportRef.current = readViewport(activeMap);
-        notify(listenersRef.current, 'viewport', lastViewportRef.current);
-        updateStateLabelOpacity(activeMap.getZoom());
+      bindPlateCameraListeners(activeMap, {
+        publishViewport: (viewport) => {
+          lastViewportRef.current = viewport;
+          notify(listenersRef.current, 'viewport', viewport);
+        },
+        applyZoomOpacity: updateStateLabelOpacity,
+        onZoomSettled: () => {
+          syncEntityMarkers();
+          requestCountyPolygonLoad(activeMap, configRef.current);
+        },
+        publishBearing: (bearing) => notify(listenersRef.current, 'rotate', bearing),
       });
       activeMap.on('zoom', () => {
         updateStateLabelOpacity(activeMap.getZoom());
@@ -1541,15 +1538,6 @@ export function MapStageProvider({
         ) {
           clearMarkers(markersRef.current);
         }
-      });
-      activeMap.on('zoomend', () => {
-        syncEntityMarkers();
-        requestCountyPolygonLoad(activeMap, configRef.current);
-      });
-      // Every rotate frame, not just `moveend` — the compass needle (`CameraConsole`) tracks a
-      // live drag/twist, and `viewport` only fires once the gesture settles.
-      activeMap.on('rotate', () => {
-        notify(listenersRef.current, 'rotate', activeMap.getBearing());
       });
 
       // Cursor affordance uses the same padded hit as selection so a near-miss still
@@ -1837,8 +1825,10 @@ export function MapStageProvider({
 
   return (
     <MapStageContext.Provider value={handle}>
-      {/* The sole persistent canvas element (ADR-017). `.ds-map-stage` is a fixed full-viewport
-          plate behind page chrome (map-surfaces.css); `maplibregl.Map`'s `container` must be a
+      {/* The sole persistent canvas element (`docs/decisions-carryover.md`, "Persistent map
+          canvas"). `.ds-map-stage` is a fixed full-viewport plate behind page chrome, styled
+          from `app/shell.css` (the sheet the root layout loads on every route) since the
+          provider was hoisted out of the map route group; `maplibregl.Map`'s `container` must be a
           separate inner div, never the plate itself — MapLibre stamps its own `maplibregl-map`
           class onto whatever container it's given, and maplibre-gl.css hard-codes
           `position: relative` on that class, which would silently clobber the plate's

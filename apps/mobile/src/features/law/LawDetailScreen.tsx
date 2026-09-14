@@ -17,6 +17,7 @@ import {
   Text,
   screenScrollInsets,
   space,
+  EXTERNAL_LINK_HINT,
 } from '@/ui';
 import { openExternalLink } from '@/features/entity/linking';
 import { LAW_DETAIL, LAW_DISCLAIMER } from './law-copy';
@@ -95,9 +96,7 @@ export function LawDetailScreen({ slug }: LawDetailScreenProps) {
                 key: 'topics',
                 label: 'Topics',
                 value:
-                  entry.topics.length > 0
-                    ? entry.topics.map(topicLabel).join(', ')
-                    : 'None listed',
+                  entry.topics.length > 0 ? entry.topics.map(topicLabel).join(', ') : 'None listed',
               },
             ]}
           />
@@ -141,6 +140,7 @@ export function LawDetailScreen({ slug }: LawDetailScreenProps) {
                   showDivider={index < explainer.rightsToday.length - 1}
                   onPress={() => void openHref(link.agencyUrl, link.label)}
                   accessibilityLabel={`${link.label}. Opens agency link.`}
+                  accessibilityHint={EXTERNAL_LINK_HINT}
                 />
               ))}
             </View>
@@ -157,6 +157,7 @@ export function LawDetailScreen({ slug }: LawDetailScreenProps) {
                   showDivider={index < explainer.primarySources.length - 1}
                   onPress={() => void openHref(source.url, source.label)}
                   accessibilityLabel={`${source.label}. Opens primary source.`}
+                  accessibilityHint={EXTERNAL_LINK_HINT}
                 />
               ))}
             </View>
@@ -173,6 +174,7 @@ export function LawDetailScreen({ slug }: LawDetailScreenProps) {
                     showDivider={index < (explainer.termOfArtLinks?.length ?? 0) - 1}
                     onPress={() => void openHref(term.wexUrl, term.term)}
                     accessibilityLabel={`${term.term}. Opens definition.`}
+                    accessibilityHint={EXTERNAL_LINK_HINT}
                   />
                 ))}
               </View>
@@ -191,8 +193,8 @@ export function LawDetailScreen({ slug }: LawDetailScreenProps) {
         <View style={styles.section}>
           <LedgerSectionLabel ruleAbove>{LAW_DETAIL.provenanceTitle}</LedgerSectionLabel>
           <Text variant="caption" colorRole="inkMuted">
-            Citation: {plainDashCopy(entry.citation)}. Retrieved{' '}
-            {entry.retrievedAt.slice(0, 10)}. License: {entry.licenseTag}.
+            Citation: {plainDashCopy(entry.citation)}. Retrieved {entry.retrievedAt.slice(0, 10)}.
+            License: {entry.licenseTag}.
           </Text>
           <View style={styles.actions}>
             <Button
@@ -200,12 +202,14 @@ export function LawDetailScreen({ slug }: LawDetailScreenProps) {
               variant="accent"
               density="compact"
               onPress={() => void openHref(entry.officialUrl, 'official source')}
+              accessibilityHint={EXTERNAL_LINK_HINT}
             />
             <Button
               label={LAW_DETAIL.archiveCta}
               variant="secondary"
               density="compact"
               onPress={() => void openHref(entry.archivedCaptureUrl, 'archived capture')}
+              accessibilityHint={EXTERNAL_LINK_HINT}
             />
           </View>
         </View>

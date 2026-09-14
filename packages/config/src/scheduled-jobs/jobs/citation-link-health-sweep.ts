@@ -5,12 +5,10 @@
  * (packages/domain/src/citations/*.test.ts). This file is the thin adapter layer that:
  *
  * (a) performs the SSRF-safe re-verification fetch through
- * `@repo/security`'s `executeSafeFetch`, since `@repo/domain` cannot depend on
- * `@repo/security` (security depends on domain; the reverse edge would be a circular
- * workspace dependency; see packages/domain/src/citations/link-health.ts's module doc for
- * the same constraint). `packages/config` has no such constraint, so
- * this is the one place real network wiring happens. The Node DNS/HTTP transport
- * below intentionally mirrors `packages/operator-cli/src/fetch.ts`'s
+ * `@repo/security`'s `executeSafeFetch`. The domain layer takes its fetch as an injected port
+ * and performs no network I/O itself (see packages/domain/src/citations/link-health.ts's
+ * module doc), so this adapter is where the real network wiring happens. The Node DNS/HTTP
+ * transport below intentionally mirrors `packages/operator-cli/src/fetch.ts`'s
  * `nodeResolveHost`/`nodePinnedTransport` (the only other real Node transport in
  * this repo) rather than inventing a third shape `packages/config` does not depend on
  * `@repo/operator-cli` (that dependency direction would be backwards: a CLI package

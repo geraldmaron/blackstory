@@ -8,7 +8,7 @@
 **Status:** Binding research for `repo-on9p` (2026-07-23)  
 **Source:** Mahzarin R. Banaji, Susan T. Fiske, and Douglas S. Massey, “Systemic racism: individuals and interactions, institutions and society,” *Cognitive Research: Principles and Implications* 6:82 (2021), doi:10.1186/s41235-021-00349-3, [PMC8688641](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC8688641/).  
 **License note:** CC BY 4.0 (Springer/PMC). Cite; do not treat the tutorial as a primary archival source for map polygons or loan microdata.  
-**Companions:** [theme-impact-canonical-questions.md](./theme-impact-canonical-questions.md), [juxtaposition-not-causation.md](../methodology/juxtaposition-not-causation.md), ADR-029.
+**Companions:** [theme-impact-canonical-questions.md](./theme-impact-canonical-questions.md), [juxtaposition-not-causation.md](../methodology/juxtaposition-not-causation.md), `../decisions-carryover.md`, "Small recovered decisions" (ADR-029 entry).
 
 ## 1. Product decisions (locked)
 

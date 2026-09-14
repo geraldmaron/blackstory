@@ -85,8 +85,9 @@ export function useCommandContext({
         if (selectedFeature) copy(citationFor(selectedFeature), 'Citation copied.');
       },
       copyShareLink: () => {
-        // ADR-017: the link carries the lens, never the live pan/zoom. `buildShareHref` is the
-        // only builder allowed to produce it, and its own test proves no viewport key survives.
+        // The link carries the lens, never the live pan/zoom (`docs/decisions-carryover.md`,
+        // "Persistent map canvas": viewport policy). `buildShareHref` is the only builder
+        // allowed to produce it, and its own test proves no viewport key survives.
         const href = buildShareHref(
           {
             ...(selectedId ? { record: selectedId } : {}),

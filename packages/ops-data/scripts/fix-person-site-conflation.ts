@@ -34,6 +34,7 @@
  *   node --conditions development --import tsx packages/ops-data/scripts/rebuild-release-graph.ts
  */
 import pg from 'pg';
+import { remindToRepublishCatalogArtifacts } from './lib/catalog-republish-reminder.ts';
 import { normalizePgConnectionString } from './lib/pg-connection.ts';
 
 const DRY_RUN = process.env.DRY_RUN !== '0';
@@ -288,11 +289,6 @@ async function applyTubmanSplit(client: pg.Client, releaseId: string): Promise<v
   await client.query(
     `UPDATE bb_public.release_entities
      SET
-       summary = $3,
-       claims = $4::jsonb,
-       location = $8::jsonb,
-       lat = ($8::jsonb ->> 'lat')::double precision,
-       lng = ($8::jsonb ->> 'lng')::double precision,
        projection = jsonb_set(
          jsonb_set(
            jsonb_set(
@@ -448,6 +444,7 @@ async function main(): Promise<void> {
       const washingtonFixed = await applyWashingtonCanonicalDrift(client, releaseId);
       await client.query('COMMIT');
       console.log('\nApplied. Washington canonical drift repaired:', washingtonFixed);
+      remindToRepublishCatalogArtifacts(1);
     } catch (error) {
       await client.query('ROLLBACK');
       throw error;

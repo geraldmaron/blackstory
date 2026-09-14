@@ -40,7 +40,11 @@ type RecordMeterSubject =
    * supported. Same three bars, deliberately not the confidence palette: reading a full coverage
    * meter as "grade A" would turn "we have looked at all of this" into "all of this is proven".
    */
-  | { readonly coverage: ResearchCoverageLevel; readonly tier?: never; readonly sourceCount?: never };
+  | {
+      readonly coverage: ResearchCoverageLevel;
+      readonly tier?: never;
+      readonly sourceCount?: never;
+    };
 
 export type RecordMeterProps = RecordMeterSubject & {
   /** Hide the letter only where a titled Evidence field already carries it. Coverage has none. */
@@ -71,7 +75,11 @@ export function RecordMeter({
   const level = isCoverage ? meterLevelForCoverage(coverage) : meterLevelForTier(tier ?? 'unrated');
   const grade = isCoverage ? null : gradeForConfidence(tier ?? 'unrated');
   const filledKey = FILLED_BORDER_BY_TIER[tier as keyof typeof FILLED_BORDER_BY_TIER];
-  const filled = isCoverage ? theme.accentGraphic : filledKey ? confidence[filledKey].border : theme.inkMuted;
+  const filled = isCoverage
+    ? theme.accentGraphic
+    : filledKey
+      ? confidence[filledKey].border
+      : theme.inkMuted;
   const label = isCoverage
     ? `Research coverage: ${coverage}`
     : evidenceMeterLabel(tier ?? 'unrated', sourceCount);
@@ -90,10 +98,7 @@ export function RecordMeter({
         {Array.from({ length: EVIDENCE_METER_SEGMENTS }, (_, index) => (
           <View
             key={index}
-            style={[
-              styles.segment,
-              { backgroundColor: index < level ? filled : theme.border },
-            ]}
+            style={[styles.segment, { backgroundColor: index < level ? filled : theme.border }]}
           />
         ))}
       </View>

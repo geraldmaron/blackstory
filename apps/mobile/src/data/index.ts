@@ -1,5 +1,6 @@
 /**
- * Mobile data layer (MOB-009 / ADR-022).
+ * Mobile data layer (MOB-009; `docs/decisions-carryover.md`, "Mobile data boundary" for the
+ * transport half and "Mobile cache and OTA release" for the cache half).
  *
  * Public surface: typed transport, SQLite cache, release-stamp invalidation,
  * bootstrap sync, artifact verification, offline signal, secure-store, and the
@@ -14,10 +15,22 @@ import { openCache, type OpenCacheResult } from './open-cache';
 import { createSqliteStore } from './db/sqlite-store';
 import { openMobileDatabase, deleteMobileDatabase } from './db/sqlite-database';
 
-export { createTransport, createSupersedingRunner, TransportError, MAX_RESPONSE_BYTES, DEFAULT_RETRY_POLICY, parseRetryAfter } from './transport';
+export {
+  createTransport,
+  createSupersedingRunner,
+  TransportError,
+  MAX_RESPONSE_BYTES,
+  DEFAULT_RETRY_POLICY,
+  parseRetryAfter,
+} from './transport';
 export type { Transport, ReadResult, ReadOptions, TransportRetryPolicy } from './transport';
 
-export { createReleaseCache, ArtifactVerificationError, PayloadTooLargeError, hashSearchKey } from './release-cache';
+export {
+  createReleaseCache,
+  ArtifactVerificationError,
+  PayloadTooLargeError,
+  hashSearchKey,
+} from './release-cache';
 export type { ReleaseCache, FreshnessSignal, CachedRead } from './release-cache';
 
 export { isReleaseStampStale, isEntryServable } from './release';
@@ -50,12 +63,28 @@ export type { CacheStore, StoredEntry, CacheNamespace } from './db/store';
 export { createManualConnectivity, createNetInfoConnectivity } from './offline';
 export type { Connectivity, ConnectivityState } from './offline';
 
-export { createSecretStore, assertSmallSecret, SECRET_KEYS, MAX_SECRET_BYTES, SecretTooLargeError } from './secure-store';
+export {
+  createSecretStore,
+  assertSmallSecret,
+  SECRET_KEYS,
+  MAX_SECRET_BYTES,
+  SecretTooLargeError,
+} from './secure-store';
 export type { SecretStore, SecretKey, SecretBackend } from './secure-store';
 
-export { createMobileQueryClient, createSqlitePersister, shouldPersistQuery, mobileDehydrateOptions } from './query-client';
+export {
+  createMobileQueryClient,
+  createSqlitePersister,
+  shouldPersistQuery,
+  mobileDehydrateOptions,
+} from './query-client';
 
-export type { BootstrapResponseV1, EntityV1, ReleaseManifestView, ManifestArtifactHashRef } from './contracts';
+export type {
+  BootstrapResponseV1,
+  EntityV1,
+  ReleaseManifestView,
+  ManifestArtifactHashRef,
+} from './contracts';
 
 /**
  * Opens the real on-disk cache with the full degradation ladder (open-cache.ts).

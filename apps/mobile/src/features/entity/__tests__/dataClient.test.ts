@@ -48,8 +48,16 @@ describe('fetchEntityDetail — network path', () => {
       expect(result.freshness.source).toBe('network');
       expect(result.freshness.degraded).toBe(false);
     }
-    expect(deps.releaseCache.applyReleaseStamp).toHaveBeenCalledWith('rel_2026_07_19_01', expect.any(Number));
-    expect(deps.releaseCache.write).toHaveBeenCalledWith('entity', 'ent_place_full_001', raw, expect.objectContaining({ releaseStamp: 'rel_2026_07_19_01' }));
+    expect(deps.releaseCache.applyReleaseStamp).toHaveBeenCalledWith(
+      'rel_2026_07_19_01',
+      expect.any(Number),
+    );
+    expect(deps.releaseCache.write).toHaveBeenCalledWith(
+      'entity',
+      'ent_place_full_001',
+      raw,
+      expect.objectContaining({ releaseStamp: 'rel_2026_07_19_01' }),
+    );
   });
 
   it('treats an unreadable response body as a rendering error, not a crash', async () => {
@@ -81,7 +89,11 @@ describe('fetchEntityDetail — 404 (withdrawn or never existed, indistinguishab
   it('returns not-found and evicts any lingering cached copy', async () => {
     const deps = makeDeps({
       transport: {
-        readJson: jest.fn().mockRejectedValue(new TransportError('HTTP 404', { kind: 'http', status: 404, attempts: 1 })),
+        readJson: jest
+          .fn()
+          .mockRejectedValue(
+            new TransportError('HTTP 404', { kind: 'http', status: 404, attempts: 1 }),
+          ),
       },
     });
     const result = await fetchEntityDetail('ent_withdrawn_999', deps);
@@ -94,7 +106,11 @@ describe('fetchEntityDetail — network failure with a cache fallback', () => {
   it('serves a degraded cached copy on a non-404 transport failure when one exists', async () => {
     const raw = fullEntityFixture('place');
     const deps = makeDeps({
-      transport: { readJson: jest.fn().mockRejectedValue(new TransportError('network down', { kind: 'network', attempts: 4 })) },
+      transport: {
+        readJson: jest
+          .fn()
+          .mockRejectedValue(new TransportError('network down', { kind: 'network', attempts: 4 })),
+      },
       releaseCache: {
         getActiveStamp: jest.fn().mockResolvedValue('rel_2026_07_19_01'),
         applyReleaseStamp: jest.fn(),
@@ -102,7 +118,12 @@ describe('fetchEntityDetail — network failure with a cache fallback', () => {
         verifyAndWriteArtifact: jest.fn(),
         read: jest.fn().mockResolvedValue({
           value: raw,
-          freshness: { source: 'cache', fetchedAt: 1_752_000_000_000, releaseStamp: 'rel_2026_07_19_01', degraded: true },
+          freshness: {
+            source: 'cache',
+            fetchedAt: 1_752_000_000_000,
+            releaseStamp: 'rel_2026_07_19_01',
+            degraded: true,
+          },
         }),
       },
     });
@@ -117,7 +138,13 @@ describe('fetchEntityDetail — network failure with a cache fallback', () => {
 
   it('returns a generic error (never a crash) on a non-404 failure with no cache to fall back to', async () => {
     const deps = makeDeps({
-      transport: { readJson: jest.fn().mockRejectedValue(new TransportError('server error', { kind: 'http', status: 500, attempts: 1 })) },
+      transport: {
+        readJson: jest
+          .fn()
+          .mockRejectedValue(
+            new TransportError('server error', { kind: 'http', status: 500, attempts: 1 }),
+          ),
+      },
     });
     const result = await fetchEntityDetail('ent_place_full_001', deps);
     expect(result.status).toBe('error');
@@ -138,7 +165,12 @@ describe('fetchEntityDetail — offline', () => {
         verifyAndWriteArtifact: jest.fn(),
         read: jest.fn().mockResolvedValue({
           value: raw,
-          freshness: { source: 'cache', fetchedAt: 1_752_000_000_000, releaseStamp: 'rel_2026_07_19_01', degraded: true },
+          freshness: {
+            source: 'cache',
+            fetchedAt: 1_752_000_000_000,
+            releaseStamp: 'rel_2026_07_19_01',
+            degraded: true,
+          },
         }),
       },
     });

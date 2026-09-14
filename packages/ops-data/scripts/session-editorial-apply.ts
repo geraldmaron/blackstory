@@ -5,7 +5,7 @@
  * rules. Never writes anywhere: this lane is brand-new candidates (not yet in the catalog),
  * so the output is a review packet file for a human to read before anything is promoted to
  * landscape_candidates — a materially bigger, more sensitive step than the entity-enrichment
- * lane's session-enrich-apply.ts (which only fills fields on already-catalogd entities).
+ * lane's session-enrich-apply.ts (which only fills fields on already-cataloged entities).
  *
  * Usage:
  *   node --conditions development --import tsx \
@@ -78,35 +78,27 @@ function extractAllowedHrefs(sourceSnippets: readonly string[] | undefined): rea
 
 function parseDrafts(raw: Record<string, unknown> | undefined): EditorialFieldDraft {
   if (!raw) return {};
+  const publicSummary = toSafeString(raw.publicSummary);
+  const historicalContext = toSafeString(raw.historicalContext);
+  const identityLabel = toSafeString(raw.identityLabel);
+  const relevanceNote = toSafeString(raw.relevanceNote);
+  const relatedEntityIds = toSafeStringArray(raw.relatedEntityIds);
+  const proposedRelationshipNotes = toSafeString(raw.proposedRelationshipNotes);
+  const claims = parseClaims(raw.claims);
+  const topicIds = toSafeStringArray(raw.topicIds);
+  const eraBuckets = toSafeStringArray(raw.eraBuckets);
+  const keywords = toSafeStringArray(raw.keywords);
   return {
-    ...(toSafeString(raw.publicSummary) !== undefined
-      ? { publicSummary: toSafeString(raw.publicSummary) }
-      : {}),
-    ...(toSafeString(raw.historicalContext) !== undefined
-      ? { historicalContext: toSafeString(raw.historicalContext) }
-      : {}),
-    ...(toSafeString(raw.identityLabel) !== undefined
-      ? { identityLabel: toSafeString(raw.identityLabel) }
-      : {}),
-    ...(toSafeString(raw.relevanceNote) !== undefined
-      ? { relevanceNote: toSafeString(raw.relevanceNote) }
-      : {}),
-    ...(toSafeStringArray(raw.relatedEntityIds) !== undefined
-      ? { relatedEntityIds: toSafeStringArray(raw.relatedEntityIds) }
-      : {}),
-    ...(toSafeString(raw.proposedRelationshipNotes) !== undefined
-      ? { proposedRelationshipNotes: toSafeString(raw.proposedRelationshipNotes) }
-      : {}),
-    ...(parseClaims(raw.claims) !== undefined ? { claims: parseClaims(raw.claims) } : {}),
-    ...(toSafeStringArray(raw.topicIds) !== undefined
-      ? { topicIds: toSafeStringArray(raw.topicIds) }
-      : {}),
-    ...(toSafeStringArray(raw.eraBuckets) !== undefined
-      ? { eraBuckets: toSafeStringArray(raw.eraBuckets) }
-      : {}),
-    ...(toSafeStringArray(raw.keywords) !== undefined
-      ? { keywords: toSafeStringArray(raw.keywords) }
-      : {}),
+    ...(publicSummary !== undefined ? { publicSummary } : {}),
+    ...(historicalContext !== undefined ? { historicalContext } : {}),
+    ...(identityLabel !== undefined ? { identityLabel } : {}),
+    ...(relevanceNote !== undefined ? { relevanceNote } : {}),
+    ...(relatedEntityIds !== undefined ? { relatedEntityIds } : {}),
+    ...(proposedRelationshipNotes !== undefined ? { proposedRelationshipNotes } : {}),
+    ...(claims !== undefined ? { claims } : {}),
+    ...(topicIds !== undefined ? { topicIds } : {}),
+    ...(eraBuckets !== undefined ? { eraBuckets } : {}),
+    ...(keywords !== undefined ? { keywords } : {}),
   };
 }
 
@@ -145,7 +137,7 @@ function main(): void {
       packets.push(
         buildEditorialPacket({
           subjectId: answer.subjectId,
-          subjectTitle: subject?.title,
+          ...(subject?.title !== undefined ? { subjectTitle: subject.title } : {}),
           decision: 'needs_evidence',
           rationale: `Unparseable model output: ${(error as Error).message}`,
           confidence: 0,
@@ -167,7 +159,7 @@ function main(): void {
     packets.push(
       buildEditorialPacket({
         subjectId: answer.subjectId,
-        subjectTitle: subject?.title,
+        ...(subject?.title !== undefined ? { subjectTitle: subject.title } : {}),
         decision,
         rationale: toSafeString(model.rationale) ?? '',
         confidence: typeof model.confidence === 'number' ? model.confidence : 0,

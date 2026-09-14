@@ -15,7 +15,8 @@
   ],
   "scripts": {
     "build": "tsc -p tsconfig.json",
-    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "typecheck": "tsc -p tsconfig.json --noEmit && tsc -p tsconfig.scripts.json",
+    "typecheck:scripts": "tsc -p tsconfig.scripts.json",
     "test": "node --conditions development --import tsx --test 'src/**/*.test.ts' 'scripts/**/*.test.ts' 'fixtures/**/*.test.ts'",
     "lint": "echo 'lint: use root pnpm lint'"
   },

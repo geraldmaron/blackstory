@@ -15,6 +15,7 @@
 import { createHash } from 'node:crypto';
 import type { SafeFetchResult } from '@repo/security/url-safety';
 import type { WaybackAnchor } from './wayback-anchor.js';
+import type { WaybackLookup } from './wayback-lookup.js';
 
 /** The three cited-URL surfaces the backfill walks. */
 export type CaptureSurface = 'entity' | 'packet' | 'article';
@@ -166,6 +167,11 @@ export type CaptureDeps = {
   readonly now: () => string;
   /** Optional SPN2 secondary anchor; absent means --wayback skipped (no keys or not requested). */
   readonly waybackAnchor?: WaybackAnchor;
+  /**
+   * Optional read-existing-captures lookup. Unlike the anchor this needs no credentials, so
+   * production wires it unconditionally; absent means the lane simply has no fallback.
+   */
+  readonly waybackLookup?: WaybackLookup;
 };
 
 export type CaptureOutcome = {

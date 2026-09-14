@@ -41,10 +41,7 @@ export function EditionPanelHeader({
   const tight = compact || dense;
 
   return (
-    <View
-      style={[styles.header, tight ? styles.compact : undefined]}
-      accessibilityRole="header"
-    >
+    <View style={[styles.header, tight ? styles.compact : undefined]} accessibilityRole="header">
       {index ? (
         <Text
           variant="code"

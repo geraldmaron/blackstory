@@ -60,6 +60,9 @@ export {
   lookupUsCityCentroid,
   type UsCityCentroid,
   type LookupUsCityCentroid,
+  lookupNonUsCityCentroid,
+  type NonUsCityCentroid,
+  type LookupNonUsCityCentroid,
 } from './city-centroid.js';
 
 export {

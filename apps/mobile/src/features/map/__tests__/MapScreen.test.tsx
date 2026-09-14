@@ -6,12 +6,12 @@
  * plain RN Views. What they prove is that the screen COMPONENT mounts without
  * crashing, wires the redacted GeoJSON into a source, keeps attribution visible,
  * and shows the correct degraded ErrorState per failure mode instead of throwing.
- * Real on-device tile rendering / memory traces are deferred (see ADR-024).
+ * Real on-device tile rendering / memory traces are deferred
+ * (`docs/decisions-carryover.md`, "Native map render layer").
  */
 import { act, fireEvent, render } from '@testing-library/react-native';
 import { StyleSheet } from 'react-native';
 
- 
 import { MapScreen } from '../MapScreen';
 import { DEFAULT_MAP_GLYPHS_URL, MAP_LABEL_TEXT_FONT } from '../mapConfig';
 import { CLUSTER_CAMERA_ZOOM_STEP } from '../clusterCamera';
@@ -112,7 +112,10 @@ jest.mock('@maplibre/maplibre-react-native', () => {
         children as never,
       ),
     Layer: ({ style }: { style?: unknown }) =>
-      React.createElement(View, { testID: 'maplibre-layer', accessibilityLabel: JSON.stringify(style) }),
+      React.createElement(View, {
+        testID: 'maplibre-layer',
+        accessibilityLabel: JSON.stringify(style),
+      }),
   };
 });
 
@@ -184,7 +187,9 @@ describe('MapScreen — ready state', () => {
 
   it('clamps the camera to CONUS maxBounds with a national minZoom floor', async () => {
     const { getByTestId } = await render(<MapScreen />);
-    const camera = JSON.parse(getByTestId('maplibre-camera').props.accessibilityLabel as string) as {
+    const camera = JSON.parse(
+      getByTestId('maplibre-camera').props.accessibilityLabel as string,
+    ) as {
       minZoom?: number;
       maxZoom?: number;
       maxBounds?: number[];
@@ -200,7 +205,10 @@ describe('MapScreen — ready state', () => {
     const { getAllByTestId } = await render(<MapScreen selectedEntityId="ent_selected" />);
     const layers = getAllByTestId('maplibre-layer');
     const strokes = layers
-      .map((node) => JSON.parse(node.props.accessibilityLabel as string) as { circleStrokeColor?: string })
+      .map(
+        (node) =>
+          JSON.parse(node.props.accessibilityLabel as string) as { circleStrokeColor?: string },
+      )
       .map((style) => style.circleStrokeColor)
       .filter((color): color is string => typeof color === 'string');
     expect(strokes).toContain(DIGNITY_PALETTE.selectedAccent);
@@ -211,7 +219,10 @@ describe('MapScreen — ready state', () => {
     const { getAllByTestId } = await render(<MapScreen />);
     const layers = getAllByTestId('maplibre-layer');
     const strokes = layers
-      .map((node) => JSON.parse(node.props.accessibilityLabel as string) as { circleStrokeColor?: string })
+      .map(
+        (node) =>
+          JSON.parse(node.props.accessibilityLabel as string) as { circleStrokeColor?: string },
+      )
       .map((style) => style.circleStrokeColor)
       .filter((color): color is string => typeof color === 'string');
     // The pulse ring is always mounted (never conditionally added), same
@@ -226,11 +237,14 @@ describe('MapScreen — ready state', () => {
     );
     const layers = getAllByTestId('maplibre-layer');
     const pulse = layers
-      .map((node) => JSON.parse(node.props.accessibilityLabel as string) as {
-        circleStrokeColor?: string;
-        circleStrokeOpacity?: number;
-        circleColor?: string;
-      })
+      .map(
+        (node) =>
+          JSON.parse(node.props.accessibilityLabel as string) as {
+            circleStrokeColor?: string;
+            circleStrokeOpacity?: number;
+            circleColor?: string;
+          },
+      )
       .find(
         (style) =>
           style.circleColor === 'transparent' &&
@@ -470,5 +484,38 @@ describe('MapScreen — feature / cluster press', () => {
       }),
     );
     expect(mockFlyTo).not.toHaveBeenCalled();
+  });
+});
+
+describe('MapScreen — screen reader stand-in', () => {
+  it('renders nothing extra when no accessibility label is given', async () => {
+    const { queryByTestId } = await render(<MapScreen />);
+    expect(queryByTestId('map-accessibility-summary')).toBeNull();
+  });
+
+  it('names the map and its list equivalent without taking touches or covering the canvas', async () => {
+    const { getByTestId } = await render(
+      <MapScreen
+        accessibilityLabel="Map of pinned places"
+        accessibilityHint="The same places are listed in the records sheet."
+      />,
+    );
+    const summary = getByTestId('map-accessibility-summary');
+    expect(summary.props.accessible).toBe(true);
+    expect(summary.props.accessibilityLabel).toBe('Map of pinned places');
+    expect(summary.props.accessibilityHint).toBe(
+      'The same places are listed in the records sheet.',
+    );
+    expect(summary.props.pointerEvents).toBe('none');
+    // The canvas stays mounted and exposed, and the stand-in sits before it so it paints beneath.
+    const map = getByTestId('maplibre-map');
+    expect(map.props.accessibilityElementsHidden).toBeUndefined();
+    expect(map.props.importantForAccessibility).toBeUndefined();
+    const siblings = summary.parent?.children ?? [];
+    const mapIndex = siblings.findIndex(
+      (child) => typeof child !== 'string' && child.props.testID === 'maplibre-map',
+    );
+    expect(mapIndex).toBeGreaterThan(-1);
+    expect(siblings.indexOf(summary)).toBeLessThan(mapIndex);
   });
 });

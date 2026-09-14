@@ -31,6 +31,7 @@ import {
   allSemanticDestinations,
   normalizeDestinationPath,
   primaryAxes,
+  semanticDestinationsInFamily,
   type DestinationFamily,
   type SemanticDestination,
 } from '@repo/public-contracts/destinations';
@@ -226,8 +227,17 @@ const WEB_PRESENTATION: Readonly<Record<string, WebPresentation>> = Object.freez
   // Product policy. Reachable from the footer's policy row and from More on native; not a Rooms
   // card, because a privacy notice is not a room a reader browses into.
   privacy: { crawl: { changeFrequency: 'monthly', priority: 0.3 } },
+  // `terms` carried no `crawl` while `/terms` existed only as a bundled native screen: giving it
+  // one would have advertised a web route that 404s. The web page is built, so it is sitemapped
+  // on the same footing as the privacy notice.
+  terms: { crawl: { changeFrequency: 'monthly', priority: 0.3 } },
 
-  locate: { crawl: { changeFrequency: 'monthly', priority: 0.7 } },
+  // `locate` is deliberately ABSENT, not merely uncrawled. SP-14 folded it into the Lens Where
+  // group and /locate now 308s to /?find=place, so there is no page for the registry to describe
+  // — the same exit /story took when its route was deprecated. A `crawl`-less entry would have
+  // left it in `allDestinations()` and read as an unexplained sitemap omission. `/locate/api` is
+  // unaffected: it is the geocode endpoint the PlaceFinder calls, and it lives in
+  // surface-classes.ts's API list, not here.
   'mosaic-credits': { crawl: { changeFrequency: 'monthly', priority: 0.2 } },
   // No `crawl`: a fixture gallery is not a page a reader should arrive at from a search result,
   // and its content is component names rather than archive material. `noIndex` says so in the
@@ -396,6 +406,25 @@ export function footerColumns(): readonly FooterColumn[] {
     column(GROUP_HEADINGS.check ?? 'How it decides', ['check']),
     column(GROUP_HEADINGS['take-part'] ?? 'Add to it', ['take-part']),
   ];
+}
+
+/**
+ * Privacy and Terms, for the footer's fine-print row.
+ *
+ * They are deliberately not a fifth footer column. A policy page is not a place a reader browses
+ * to, which is why both carry `browsable: false` and sit in the `policy` family rather than in a
+ * navigable group -- putting them beside Law and Data would advertise them as reading. But they
+ * were reachable from no chrome at all: `/privacy` was linked only from prose on `/support`, and
+ * `/terms` from nothing, which is how a policy page ends up written and then never read.
+ *
+ * Read from the catalog rather than hardcoded, so a policy destination cannot exist without
+ * appearing here and cannot be renamed in one place only.
+ */
+export function policyLinks(): readonly { readonly href: string; readonly label: string }[] {
+  return semanticDestinationsInFamily('policy').map((destination) => ({
+    href: destination.path,
+    label: destination.label,
+  }));
 }
 
 /**

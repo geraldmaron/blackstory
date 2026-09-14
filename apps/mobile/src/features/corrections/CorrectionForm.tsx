@@ -20,6 +20,7 @@ import { Ionicons } from '@expo/vector-icons';
 import {
   Button,
   CorrectionTextField,
+  MIN_TOUCH_TARGET,
   Notice,
   Text,
   radius,
@@ -52,12 +53,6 @@ import {
   type CorrectionFieldIssue,
   type CorrectionFormState,
 } from './validation';
-
-/** Apple HIG / Material minimum touch target (dp), mirrored from `@/ui/Button.tsx`'s own
- * constant — this form's hand-rolled `ChipRow`/`Checkbox` controls are not built on `Button`
- * (they need radio/checkbox semantics `Button` doesn't expose), so they enforce the same 44pt
- * floor directly rather than silently falling short of it (MOB-017). */
-const MIN_TOUCH_TARGET = 44;
 
 /** Glyph size (dp) for the checkbox tick — sized off the token scale, not font fallback. */
 const CHECKBOX_GLYPH = 22;
@@ -212,9 +207,17 @@ export function CorrectionForm({ entityId, scrollRef, onSubmit, onAccepted }: Co
 
   return (
     <View style={{ gap: space['3'] }}>
-      <Notice tone="info" title={CORRECTION_PRIVACY_NOTICE.title} description={CORRECTION_PRIVACY_NOTICE.body} />
+      <Notice
+        tone="info"
+        title={CORRECTION_PRIVACY_NOTICE.title}
+        description={CORRECTION_PRIVACY_NOTICE.body}
+      />
 
-      <Field ref={targetTypeRef} label="What are you correcting?" error={issueFor(issues, 'targetType')}>
+      <Field
+        ref={targetTypeRef}
+        label="What are you correcting?"
+        error={issueFor(issues, 'targetType')}
+      >
         <ChipRow<CorrectionTargetType>
           values={Object.keys(CORRECTION_TARGET_LABELS) as CorrectionTargetType[]}
           selected={state.targetType || undefined}
@@ -232,7 +235,11 @@ export function CorrectionForm({ entityId, scrollRef, onSubmit, onAccepted }: Co
         />
       </Field>
 
-      <Field ref={targetRecordIdRef} label="Record identifier" error={issueFor(issues, 'targetRecordId')}>
+      <Field
+        ref={targetRecordIdRef}
+        label="Record identifier"
+        error={issueFor(issues, 'targetRecordId')}
+      >
         <CorrectionTextField
           value={state.targetRecordId}
           onChangeText={(t) => patch({ targetRecordId: t })}
@@ -248,7 +255,11 @@ export function CorrectionForm({ entityId, scrollRef, onSubmit, onAccepted }: Co
         />
       </Field>
 
-      <Field ref={statementRef} label="Describe the correction" error={issueFor(issues, 'statement')}>
+      <Field
+        ref={statementRef}
+        label="Describe the correction"
+        error={issueFor(issues, 'statement')}
+      >
         <CorrectionTextField
           value={state.statement}
           onChangeText={(t) => patch({ statement: t })}
@@ -262,7 +273,11 @@ export function CorrectionForm({ entityId, scrollRef, onSubmit, onAccepted }: Co
         />
       </Field>
 
-      <Field ref={sourceUrlRef} label="Supporting HTTPS source URL" error={issueFor(issues, 'sourceUrl')}>
+      <Field
+        ref={sourceUrlRef}
+        label="Supporting HTTPS source URL"
+        error={issueFor(issues, 'sourceUrl')}
+      >
         <CorrectionTextField
           ref={urlRef}
           value={state.sourceUrl}
@@ -317,7 +332,9 @@ export function CorrectionForm({ entityId, scrollRef, onSubmit, onAccepted }: Co
         />
       </View>
 
-      {banner ? <Notice tone={banner.tone} title="Not submitted" description={banner.text} /> : null}
+      {banner ? (
+        <Notice tone={banner.tone} title="Not submitted" description={banner.text} />
+      ) : null}
 
       <Button label="Submit correction" variant="primary" loading={busy} onPress={handleSubmit} />
     </View>

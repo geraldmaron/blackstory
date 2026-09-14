@@ -1,6 +1,6 @@
 # Cinematic Map Backdrop
 
-**Status: Binding — reusable, cross-surface.** Supersedes the home-only "map behind hero" treatment in [`design-direction-v6-home.md`](./design-direction-v6-home.md) by generalizing it into one pattern every map-bearing surface shares. Builds on (does not replace) [`patterns-map-canvas.md`](./patterns-map-canvas.md) (persistent `MapStage`, ADR-017) and [`patterns-map-entity-encoding.md`](./patterns-map-entity-encoding.md) (pin color/shape). Governed by [`brand.md`](./brand.md) (flat matte, copper discipline, dignity) and [`story.md`](./story.md) (voice).
+**Status: Binding — reusable, cross-surface.** Supersedes the home-only "map behind hero" treatment in [`design-direction-v6-home.md`](./design-direction-v6-home.md) by generalizing it into one pattern every map-bearing surface shares. Builds on (does not replace) [`patterns-map-canvas.md`](./patterns-map-canvas.md) (persistent `MapStage`, `../decisions-carryover.md`, "Persistent map canvas", ADR-017) and [`patterns-map-entity-encoding.md`](./patterns-map-entity-encoding.md) (pin color/shape). Governed by [`brand.md`](./brand.md) (flat matte, copper discipline, dignity) and [`story.md`](./story.md) (voice).
 
 Token contract: `--ds-easing: cubic-bezier(0.16, 1, 0.3, 1)`, `--ds-duration-fast 160ms` / `--ds-duration-base 280ms` / `--ds-duration-slow 480ms` (`packages/ui/src/styles/tokens.css`, `packages/ui/src/tokens/foundation.ts`, mobile `apps/mobile/src/ui/tokens/generated/motion.generated.ts`). Camera timings from `apps/web/src/lib/map-experience/camera-presets.ts` and mobile `apps/mobile/src/features/map/mapCamera.ts`.
 
@@ -74,7 +74,7 @@ Read platform preference: web `@media (prefers-reduced-motion: reduce)` (already
 Extends the contract in `apps/web/src/app/explore/explore.css`.
 
 ```
-z 0   .ds-map-stage        persistent MapLibre canvas (ADR-017), fixed plate
+z 0   .ds-map-stage        persistent MapLibre canvas (`../decisions-carryover.md`, "Persistent map canvas", ADR-017), fixed plate
 z 1   .ds-map-scrim        gradient legibility scrim; opacity 1 (Rest) → 0 (Engaged)
 z 2   .ds-cinematic-content page content / beats; pointer-events pass through to scroll
 z 3   .ds-cinematic-rail    Explore-the-map control (sticky), Close (Engaged only)

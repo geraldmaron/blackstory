@@ -21,12 +21,7 @@ import {
 import type { ContentEntry } from '@/features/content';
 import { FeaturedStoryCard } from './FeaturedStoryCard';
 import { StoryCompactRow } from './StoryCompactRow';
-import {
-  listStoriesOfFormat,
-  listStoryEntries,
-  pickFeaturedStory,
-  storyHref,
-} from './story-index';
+import { listStoriesOfFormat, listStoryEntries, pickFeaturedStory, storyHref } from './story-index';
 
 function countLabel(entries: readonly ContentEntry[]): string {
   return entries.length === 1 ? '1 story' : `${entries.length} stories`;

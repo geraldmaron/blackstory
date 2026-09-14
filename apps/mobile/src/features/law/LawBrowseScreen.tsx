@@ -68,7 +68,11 @@ export function LawBrowseScreen() {
               { key: 'entries', label: 'Entries', value: String(pulse.entryCount) },
               { key: 'explainers', label: 'Explainers', value: String(pulse.explainerCount) },
               { key: 'kinds', label: 'Kinds', value: String(pulse.kindCount) },
-              { key: 'snapshot', label: 'Snapshot', value: pulse.version.replace('legal-seed-', '') },
+              {
+                key: 'snapshot',
+                label: 'Snapshot',
+                value: pulse.version.replace('legal-seed-', ''),
+              },
             ]}
           />
           <Text variant="caption" colorRole="inkMuted">

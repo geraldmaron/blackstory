@@ -18,7 +18,8 @@
  * Gold fixture: `./fixtures/temporal-era-terms.v1.json` (decade → term classes),
  * validated against the in-code era table by `temporal-era.test.ts`.
  *
- * Research-only surface (ADR-009): this module produces query packs for private
+ * Research-only surface (`docs/decisions-carryover.md`, "Research and discovery cannot
+ * publish"): this module produces query packs for private
  * research candidates only — no publish/projection writes, no I/O.
  */
 import { buildQueryPack } from '../pack.js';

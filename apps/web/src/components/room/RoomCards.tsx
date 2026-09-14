@@ -26,11 +26,7 @@ export type CardGridProps = {
   readonly children: ReactNode;
   /**
    * `'index'` (default): one column, each RoomCard a hairline row. `'hub'`: three fixed columns.
-   *
-   * `/rooms` used the hub shape and no longer does. Three columns of five destinations reads
-   * as a card wall, and a hub's reader is choosing a room rather than scanning a catalog of
-   * like things; one column of five reads as a table of contents, which is what a hub is. The
-   * variant stays on the surface because a genuinely wide, flat set may still want it.
+   * The variant stays on the surface because a genuinely wide, flat set may want it.
    */
   readonly variant?: 'index' | 'hub';
   readonly className?: string;
@@ -65,9 +61,7 @@ export type RoomCardMedia = {
 export type RoomCardProps = {
   readonly href: string;
   /**
-   * What sort of thing this is. Ink direction: no longer rendered as a kind tag — kind is
-   * implied by the group the card sits in — but kept on the type so the existing callers do
-   * not have to change in the same commit.
+   * What sort of thing this is. Kind is implied by the group the card sits in.
    */
   readonly kind: string;
   readonly title: ReactNode;

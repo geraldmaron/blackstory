@@ -9,6 +9,7 @@
  * that adjacency `evidenceCount` is an internal ordering key only, never a public payload field.
  */
 import type { NotabilityBasisRecord } from '../entity-status.js';
+import type { RecordEvidenceInputs } from '../evidence-inputs.js';
 
 /**
  * The domain-layer input record the search index is built FROM.
@@ -73,10 +74,17 @@ export type SearchableEntityRecord = {
   /** Server-internal supporting-claim count. Same policy as `relatedCount`: never client-facing. */
   readonly claimCount: number;
   /**
-   * Highest accepted-claim confidence. Used for Records evidence floors when slimmed onto
-   * search_index. Not a numeric ranking score and not shown as a count.
+   * The grading inputs `/records` derives its evidence floors from, cached on the slim index so
+   * the room does not have to hydrate 18MB of full entities to draw a meter.
+   *
+   * Deliberately the INPUTS and not the graded tier: a cached conclusion goes stale the moment
+   * the rule changes, which is exactly what stranded `/records` for a day (repo-6qjv0). The
+   * reader hands this straight to `confidenceTierFromEvidenceInputs`
+   * (`@repo/public-contracts/evidence`), the same rule Explore applies. Optional because rows
+   * published before the field existed do not carry it, and a reader must be able to detect that
+   * rather than grade an absent projection as `unrated`.
    */
-  readonly confidenceTier?: 'high' | 'medium' | 'low' | 'unrated';
+  readonly evidenceInputs?: RecordEvidenceInputs;
   /** Public geohash when the search row is mappable; absent for ungeocoded records. */
   readonly geohash?: string;
 };

@@ -9,7 +9,9 @@
  */
 import {
   publicSearchProjectionSchema,
+  recordEvidenceInputsSchema,
   type PublicSearchProjectionDoc,
+  type RecordEvidenceInputsDoc,
 } from './public-projections.js';
 
 export type PublicSearchIndexRow = {
@@ -43,6 +45,19 @@ function asStringArray(value: unknown): readonly string[] {
   return Array.isArray(value)
     ? value.filter((item): item is string => typeof item === 'string')
     : [];
+}
+
+/**
+ * The cached grading inputs, or `undefined` when the row predates the field.
+ *
+ * Never substituted with an empty projection: an empty one grades `unrated`, while absent means
+ * "not projected yet", and `/records` decides whether it can serve from the slim index on exactly
+ * that distinction. Legacy rows carrying only the old derived `facets.confidenceTier` read as
+ * absent here on purpose — a cached conclusion is the thing this field replaced (repo-6qjv0).
+ */
+function evidenceInputs(value: unknown): RecordEvidenceInputsDoc | undefined {
+  const parsed = recordEvidenceInputsSchema.safeParse(value);
+  return parsed.success ? parsed.data : undefined;
 }
 
 function toIso(value: unknown): string | undefined {
@@ -105,6 +120,8 @@ export function mapPostgresSearchIndexRow(
       : undefined) ??
     row.id;
 
+  const cachedEvidenceInputs = evidenceInputs(facets.evidenceInputs);
+
   const doc: Record<string, unknown> = {
     // Public docs key by entity id. The SQL primary key may be `releaseId:entityId`.
     id: entityId,
@@ -132,12 +149,7 @@ export function mapPostgresSearchIndexRow(
     relatedCount:
       row.related_count ?? (typeof facets.relatedCount === 'number' ? facets.relatedCount : 0),
     claimCount: row.claim_count ?? (typeof facets.claimCount === 'number' ? facets.claimCount : 0),
-    ...(facets.confidenceTier === 'high' ||
-    facets.confidenceTier === 'medium' ||
-    facets.confidenceTier === 'low' ||
-    facets.confidenceTier === 'unrated'
-      ? { confidenceTier: facets.confidenceTier }
-      : {}),
+    ...(cachedEvidenceInputs !== undefined ? { evidenceInputs: cachedEvidenceInputs } : {}),
     ...(typeof facets.summary === 'string' ? { summary: facets.summary } : {}),
     ...(typeof row.status === 'string'
       ? { status: row.status }

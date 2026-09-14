@@ -103,8 +103,7 @@ export function recordSectionIndex({
     sections.push({ id: 'timeline-heading', label: 'Timeline', count: entity.timeline.length });
   }
   // One beat when the record has a graph, two when it falls back to the flat lists. The tree
-  // already contains everything "Worth investigating next" used to list separately (those were
-  // the records one step further out), so shipping both would restore the duplication it removes.
+  // contains everything "Worth investigating next" shows, so shipping both would restore duplication.
   const graph = treeGraphFor(entity);
   if (graph) {
     sections.push({

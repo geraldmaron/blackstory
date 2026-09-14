@@ -29,7 +29,10 @@ product. This app adds **no** general analytics SDK, ad SDK, or attribution SDK.
 ## Release/build metadata tagging
 
 `report-context.ts`'s `buildReportContext()` centralizes every field every
-report carries: app version, EAS Update runtime version (ADR-023 §2),
+report carries: app version, EAS Update runtime version (ADR-024 §2 —
+the build/release/OTA decision, restated in `docs/decisions-carryover.md`,
+"Mobile cache and OTA release"; this line cited "ADR-023" before the mobile
+ADRs were renumbered),
 release ID (the server release stamp this client last synced against — MOB-005
 bootstrap / `data/release-cache.ts`), local cache schema version
 (`data/db/schema.ts`'s `CACHE_SCHEMA_VERSION`), platform/OS version, app

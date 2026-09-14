@@ -8,7 +8,11 @@ import {
   resolveMapTone,
   type MapEntityGlyph,
 } from './kind-encoding';
-import type { MapFeatureCollection, MapPointFeature, MapPointFeatureProperties } from './demoMapSource';
+import type {
+  MapFeatureCollection,
+  MapPointFeature,
+  MapPointFeatureProperties,
+} from './demoMapSource';
 
 export type EncodedMapPointProperties = MapPointFeatureProperties & {
   readonly shade?: string;
@@ -46,7 +50,9 @@ function enrichProperties(properties: MapPointFeatureProperties): EncodedMapPoin
       ? properties.confidenceTier
       : 'unrated';
   const shade =
-    'shade' in properties && typeof properties.shade === 'string' ? properties.shade : encoding.shade;
+    'shade' in properties && typeof properties.shade === 'string'
+      ? properties.shade
+      : encoding.shade;
   const glyph =
     'glyph' in properties && typeof properties.glyph === 'string'
       ? (properties.glyph as MapEntityGlyph)

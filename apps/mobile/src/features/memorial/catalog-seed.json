@@ -1,6 +1,6 @@
 {
   "version": "memorial-seed-2026-07-24",
-  "generatedAt": "2026-08-03T23:44:07.204Z",
+  "generatedAt": "2026-09-13T20:17:41.615Z",
   "incompleteByDesign": true,
   "names": [
     {
@@ -443,9 +443,9 @@
       "entityId": "lynching_ben_pettigrew_decaturville_tennessee",
       "locationLabel": "site of lynching",
       "placeLabel": "Decaturville, Tennessee",
-      "lat": 35.615,
-      "lng": -87.04444444,
-      "locationPrecision": "site"
+      "lat": 35.5585,
+      "lng": -88.1334,
+      "locationPrecision": "city"
     },
     {
       "name": "Benjamin Brown"
@@ -733,7 +733,13 @@
       "name": "Charles Atkins"
     },
     {
-      "name": "Charles Brown"
+      "name": "Charles Brown",
+      "entityId": "ent_charles_brown_1957_001",
+      "locationLabel": "Benton, MS",
+      "placeLabel": "Benton, Mississippi",
+      "lat": 32.8324,
+      "lng": -90.2612,
+      "locationPrecision": "city"
     },
     {
       "name": "Charles Craven"
@@ -1319,9 +1325,9 @@
       "entityId": "lynching_demon_lowman_aiken_vicinity_south_carolina",
       "locationLabel": "outskirts of Aiken",
       "placeLabel": "Aiken, South Carolina",
-      "lat": 34.17833333,
-      "lng": -82.37055556,
-      "locationPrecision": "site"
+      "lat": 33.553,
+      "lng": -81.7194,
+      "locationPrecision": "city"
     },
     {
       "name": "Demouria Hogg"
@@ -2023,10 +2029,13 @@
       "name": "George Buddington"
     },
     {
-      "name": "George Bush III"
-    },
-    {
-      "name": "George Carter"
+      "name": "George Carter",
+      "entityId": "ent_research_case_20260902_george-carter-usct-mount-vernon",
+      "locationLabel": "Mount Vernon, NY",
+      "placeLabel": "Mount Vernon, New York",
+      "lat": 40.89278,
+      "lng": -73.82583,
+      "locationPrecision": "site"
     },
     {
       "name": "George Floyd"
@@ -2504,9 +2513,9 @@
       "entityId": "lynching_james_dillard_sullivan_indiana",
       "locationLabel": "Site of lynching near telegraph pole",
       "placeLabel": "Oaktown, Indiana",
-      "lat": 31.4417,
-      "lng": -109.9159,
-      "locationPrecision": "site"
+      "lat": 38.8579,
+      "lng": -87.3879,
+      "locationPrecision": "city"
     },
     {
       "name": "James Earl Chaney"
@@ -2573,9 +2582,9 @@
       "entityId": "ent_james_west_001",
       "locationLabel": "Johns Hopkins University, Baltimore, Maryland",
       "placeLabel": "Baltimore, Maryland",
-      "lat": 39.3302,
-      "lng": -76.6219,
-      "locationPrecision": "campus"
+      "lat": 39.33,
+      "lng": -76.62,
+      "locationPrecision": "city"
     },
     {
       "name": "James Wilborn"
@@ -3518,9 +3527,9 @@
       "entityId": "lynching_mack_charles_parker_bridge_over_pearl_river_between_mississippi_and_louisiana_mississippi",
       "locationLabel": "Pearl River, near bridge between Mississippi and Louisiana",
       "placeLabel": "Poplarville, Mississippi",
-      "lat": 29.15111111,
-      "lng": -89.25333333,
-      "locationPrecision": "site"
+      "lat": 30.8524,
+      "lng": -89.5648,
+      "locationPrecision": "city"
     },
     {
       "name": "Mack Long"
@@ -3718,7 +3727,7 @@
       "name": "Mary Turner"
     },
     {
-      "name": "Matthew Johnson#Shooting_of_Matthew_Johnson)"
+      "name": "Matthew Johnson"
     },
     {
       "name": "Matthew Tucker"
@@ -4079,8 +4088,8 @@
       "entityId": "lynching_pearl_pettigrew_decaturville_tennessee",
       "locationLabel": "Site of lynching",
       "placeLabel": "Decaturville, Tennessee",
-      "lat": 35.615,
-      "lng": -87.04444444,
+      "lat": 35.5585,
+      "lng": -88.1334,
       "locationPrecision": "city"
     },
     {
@@ -4357,7 +4366,13 @@
       "name": "Robert Henson Hilliard"
     },
     {
-      "name": "Robert Johnson"
+      "name": "Robert Johnson",
+      "entityId": "ent_robert_johnson_1934_001",
+      "locationLabel": "Tampa, FL",
+      "placeLabel": "Tampa, Florida",
+      "lat": 27.9506,
+      "lng": -82.4572,
+      "locationPrecision": "city"
     },
     {
       "name": "Robert Jones"

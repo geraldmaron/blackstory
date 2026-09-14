@@ -698,6 +698,52 @@
   color: color-mix(in srgb, var(--ds-ink) 88%, var(--ds-canvas));
 }
 /* ----------------------------------------------------------------------------
+ * "The records behind this chapter" — the story side of the story-cites-record
+ * edge, rendered in the apparatus under the numbered sources (repo-92n2.11.2).
+ * Matches the notes column's type scale: this is apparatus, not body prose.
+ * ------------------------------------------------------------------------- */
+.ds-article-appx__records {
+  margin-top: var(--ds-space-5);
+}
+
+.ds-article-appx__records h3 {
+  margin: 0 0 var(--ds-space-2);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ds-ink-muted);
+}
+
+.ds-article-appx__records p {
+  margin: 0 0 var(--ds-space-3);
+  font-size: 13.5px;
+  line-height: 1.55;
+  color: color-mix(in srgb, var(--ds-ink) 88%, var(--ds-canvas));
+}
+
+/* Names, one per line. A record is a destination, not a chip in a row: the list
+   reads as the chapter's evidence rather than as a filter bar. */
+.ds-article-appx__record-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: var(--ds-space-2);
+}
+
+.ds-article-appx__record-list a {
+  font-size: 14px;
+  line-height: 1.45;
+  color: var(--ds-ink);
+  text-decoration-color: color-mix(in srgb, var(--ds-ink) 35%, transparent);
+  text-underline-offset: 3px;
+}
+
+.ds-article-appx__record-list a:hover {
+  text-decoration-color: currentColor;
+}
+
+/* ----------------------------------------------------------------------------
  * Sticky evidence rail — Ink direction. "In this chapter" and "Records cited" are
  * RailGroup, styled by room-kit.css; only the wrapper's stickiness and the one-off
  * "Next in this collection" block belong to this sheet.

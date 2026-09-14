@@ -2,7 +2,8 @@
  * Public-media object path helpers for entity primary images.
  * Object keys live under `public/entities/{entityId}/…`. Bytes are dual-served:
  * GCS (`black-book-efaaf-public-media`) for Admin SDK uploads / rollback, and
- * Supabase Storage `public-media` for public HTTPS URLs (ADR-020 blob cutover).
+ * Supabase Storage `public-media` for public HTTPS URLs (blob cutover —
+ * `docs/data/supabase-storage-cutover.md`).
  */
 import { supabasePublicMediaUrl } from '@repo/domain';
 

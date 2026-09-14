@@ -31,12 +31,7 @@ import {
   MIN_TOUCH_TARGET,
 } from '@/ui';
 import { openExternalMaps } from '@/features/entity/maps-handoff';
-import {
-  MEMORIAL_ACTIONS,
-  MEMORIAL_BODY,
-  MEMORIAL_INTRO,
-  MEMORIAL_LIST,
-} from './memorial-copy';
+import { MEMORIAL_ACTIONS, MEMORIAL_BODY, MEMORIAL_INTRO, MEMORIAL_LIST } from './memorial-copy';
 import {
   filterMemorialNames,
   listMemorialNames,
@@ -60,9 +55,7 @@ export function MemorialScreen() {
     const result = await openExternalMaps({
       lat: row.lat,
       lng: row.lng,
-      ...(row.locationLabel || row.name
-        ? { label: row.locationLabel ?? row.name }
-        : {}),
+      ...(row.locationLabel || row.name ? { label: row.locationLabel ?? row.name } : {}),
     });
     if (result !== 'opened') {
       setMapsNotice('Could not open Maps. Check that a maps app is available and try again.');
@@ -183,9 +176,7 @@ export function MemorialScreen() {
                     showChevron={hasEntity}
                     showDivider={false}
                     onPress={
-                      hasEntity
-                        ? () => router.push(`/entity/${row.entityId}` as never)
-                        : undefined
+                      hasEntity ? () => router.push(`/entity/${row.entityId}` as never) : undefined
                     }
                     accessibilityLabel={
                       hasEntity

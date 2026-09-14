@@ -2,7 +2,8 @@
  * Embedding pipeline and Firestore vector-search constants.
  *
  * Model choice, dimensionality, and distance measure are locked here rather than left to
- * caller defaults so the "control over model, dims, retries" rationale in ADR-014 stays true
+ * caller defaults so the "control over model, dims, retries" rationale recorded in
+ * `docs/decisions-carryover.md` ("Vector search") stays true
  * in code, not just prose this is the deliberate alternative to the pre-GA
  * `firestore-vector-search` extension.
  */
@@ -19,7 +20,7 @@ export const FIRESTORE_VECTOR_DIM_CAP = 2048 as const;
 /** Firestore findNearest platform ceiling app-level caps must stay well under this. */
 export const PLATFORM_MAX_NEIGHBORS = 1000 as const;
 
-/** Sibling collection holding one embedding document per canonical entity (see ADR-014). */
+/** Sibling collection holding one embedding document per canonical entity. */
 export const ENTITY_EMBEDDINGS_COLLECTION = 'entityEmbeddings' as const;
 
 /** Firestore vector field name inside each entityEmbeddings document. */
@@ -32,7 +33,8 @@ export const DISTANCE_MEASURE = 'DOT_PRODUCT' as const;
  * Firestore doubles the normal per-1000-entries read metering to 1 read per 100 vector index
  * entries scanned, on top of 1 read per document returned. Pre-filtering (kind/state/eraBucket)
  * is the lever that keeps scanned-entry counts and therefore cost small. Recorded in
- * ADR-014. Detailed budget/cost docs live under docs/security/.
+ * `docs/decisions-carryover.md` ("Vector search"). Detailed budget/cost docs live under
+ * docs/security/.
  */
 export const VECTOR_INDEX_READ_METERING_DIVISOR = 100 as const;
 export const STANDARD_INDEX_READ_METERING_DIVISOR = 1_000 as const;

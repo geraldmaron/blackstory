@@ -11,7 +11,7 @@ This document is the editorial and engineering contract for that surface.
 |-------|-----------|------|----------------|
 | `summary` | **Yes** at release | Catalog lede, card one-liner, SEO description, search blurb | Editorial band **400–900** characters (Floor v2). Schema still parses from **120** so thin live rows do not 404 mid-campaign. Factual who/what/where/when. Not marketing fluff. Not assembled from claims. Sub-400 only with an explicit best-effort exception after evidence is exhausted. |
 | `topicTags` | Strongly preferred (≥1) | Discovery chips → search/explore theme filters | Controlled strings aligned with search theme facets. Empty only with gap honesty. |
-| `eraBuckets` / `notabilityLabels` | When present | Secondary chips (ADR-015) | Never numeric scores. |
+| `eraBuckets` / `notabilityLabels` | When present | Secondary chips (docs/decisions-carryover.md, "Entity ontology") | Never numeric scores. |
 | `historicalContext` | Strongly preferred | Framing in Black-history place | Not new unsourced facts about this record (those live in `claims`). |
 | `extendedNarrative` | Optional | Multi-paragraph further reading | Omit UI section when absent. Never replaces Accepted claims. |
 | `primaryImage` | Optional | Hero/aside photo | Requires publishable rights (`public_domain` \| `licensed` \| `fair_use`) and `display_media`. Alt + credit required (WCAG). When missing, UI shows a kind-derived record mark (book/pin/arch), not a stock portrait or mosaic. |
@@ -24,7 +24,7 @@ This document is the editorial and engineering contract for that surface.
 Public pages show thin **release provenance** (`releaseId`, `generatedAt`,
 `recordUpdatedAt`) and lifecycle **`statusHistory`** where applicable — not a
 Wikipedia-style field edit log. Corrections ship as **new immutable releases**
-(ADR-004). Internal `auditEvents` can reconstruct publication/correction/
+(`../decisions-carryover.md`, "Public projection and immutable publication snapshots", ADR-004). Internal `auditEvents` can reconstruct publication/correction/
 retraction history for operators; that trail is not the learning-index UI.
 
 ## UI sparsity (honesty over fake richness)
@@ -57,34 +57,35 @@ the rights gate fails rather than publishing unclear media.
 > **Current media path (2026-08-28):** Supabase Storage on `blackstory-app`. The GCS /
 > Firestore projection notes below are leftover dual-serve history.
 
-Entity photos are **not** Firebase Storage default-bucket objects. Historical cutover promoted
-cleared images into the GCP `black-book-efaaf-public-media` bucket and referenced them from a
-Firestore public entity projection:
+Entity photos are **not** Firebase Storage objects. The Firestore-era promote/clear scripts
+that uploaded bytes to the GCP `black-book-efaaf-public-media` bucket and patched a Firestore
+projection have been retired with the Firestore wind-down
+(`docs/data/firebase-wind-down.md`). The live path is Postgres-only:
 
 | Concern | Convention |
 |---------|------------|
-| Object path | `public/entities/{entityId}/primary.png` (helper: `entityPrimaryImageObjectPath`) |
+| Object path | `public/entities/{entityId}/primary.png` (helper: `entityPrimaryImageObjectPath`), for stored objects in the Supabase `public-media` bucket |
 | Projection fields | `primaryImage.url`, `alt`, `credit`, `rightsStatus`, optional `objectPath` / dimensions |
-| Write gate | `preparePublicEntityProjectionForWrite` / converter drops incomplete images; requires learning-index `summary` |
-| Bootstrap | `packages/firebase/scripts/bootstrap-public-seed.ts` merges learning-index seed projections |
-| Promote file | `packages/firebase/scripts/promote-entity-primary-image.ts` uploads a local file then patches the projection |
+| Write gate | `preparePublicEntityProjectionForWrite` / `sanitizePrimaryImageForRelease` drop incomplete images; requires learning-index `summary` |
+| Assign an image | `packages/ops-data/scripts/pin-commons-primary-images.ts` turns a Commons auto-propose plan into `bb_public.release_entities.projection` + `bb_canonical.entity_media` rows |
+| Plan inputs | `dry-run-commons-qid-leftover.ts` (people/institutions), `resolve-nrhp-commons-images.ts` (NRHP places) |
 
 ```bash
-cd packages/firebase
-APP_FIREBASE_ALLOW_PRODUCTION=1 \
-  node --conditions development --import tsx scripts/bootstrap-public-seed.ts
+# Dry-run the pin plan (default), then apply with the double guard.
+node --conditions development --import tsx \
+  packages/ops-data/scripts/pin-commons-primary-images.ts \
+  --from=.cache/commons-qid-leftover-dry-run.json \
+  --out=.cache/commons-pin-plan.json
 
-APP_FIREBASE_ALLOW_PRODUCTION=1 \
-  node --conditions development --import tsx scripts/promote-entity-primary-image.ts \
-    --entity-id=ent_seed_school_001 \
-    --file=../../brand/symbols/dark/blap-book-pin-symbol-dark-transparent.png \
-    --alt="Schematic mark for Seed Freedmen School" \
-    --credit="BlackStory brand kit seed fixture" \
-    --rights=public_domain
+set -a && . apps/web/.env.local && set +a
+DRY_RUN=0 PIN_COMMONS_APPLY=1 node --conditions development --import tsx \
+  packages/ops-data/scripts/pin-commons-primary-images.ts \
+  --from=.cache/commons-pin-plan.json --apply --release-id=rel_xxx
 ```
 
-Direct `storage.googleapis.com` URLs only work when the object is publicly readable or
-fronted by CDN. Until CDN is applied, `makePublic` is best-effort after upload.
+Commons pins are 960px `Special:FilePath` thumbnail URLs the reader's browser fetches from
+Wikimedia at view time; no original bytes are copied. Stored objects served from Supabase
+Storage need the object to be publicly readable in the `public-media` bucket.
 
 ## Source map
 

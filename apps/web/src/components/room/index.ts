@@ -21,6 +21,7 @@ export {
   type RoomCardProps,
 } from './RoomCards';
 export { Prose, RecordRef, type ProseProps, type RecordRefProps } from './Prose';
+export { ReadingProgress, type ReadingProgressProps } from './ReadingProgress';
 export {
   SourceList,
   Connections,

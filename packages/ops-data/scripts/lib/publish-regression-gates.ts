@@ -45,7 +45,11 @@ export const MCGHIE_CLASS_FIXTURE = {
 } as const;
 
 export function runMcGhieClassRegression(): PublishRegressionFinding[] {
-  const derived = deriveCatalogEntityStatus(MCGHIE_CLASS_FIXTURE);
+  const derived = deriveCatalogEntityStatus({
+    id: MCGHIE_CLASS_FIXTURE.entityId,
+    kind: MCGHIE_CLASS_FIXTURE.kind,
+    summary: MCGHIE_CLASS_FIXTURE.summary,
+  });
   if (derived.livingStatus !== 'deceased' || derived.status !== 'deceased') {
     return [
       {

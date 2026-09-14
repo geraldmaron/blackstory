@@ -9,7 +9,7 @@
 import type { ReactNode } from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
 
-import { Text, space } from '@/ui';
+import { MIN_TOUCH_TARGET, Text, space } from '@/ui';
 
 /** Exported for layout contract tests — inline icon + label + value on one row. */
 export const recordBeatRowStyle = {
@@ -70,7 +70,11 @@ export function RecordBeatRow({
           {...(accessibilityLabel ? { accessibilityLabel } : {})}
           hitSlop={8}
           onPress={onPress}
-          style={({ pressed }) => [valueStyle, styles.pressableValue, pressed ? styles.pressed : null]}
+          style={({ pressed }) => [
+            valueStyle,
+            styles.pressableValue,
+            pressed ? styles.pressed : null,
+          ]}
         >
           {body}
         </Pressable>
@@ -114,7 +118,7 @@ const styles = StyleSheet.create({
     minWidth: 0,
   },
   pressableValue: {
-    minHeight: 44,
+    minHeight: MIN_TOUCH_TARGET,
     justifyContent: 'center',
   },
   pressed: {

@@ -3,50 +3,25 @@
   "compilerOptions": {
     "strict": true,
     "paths": {
-      "@/*": [
-        "./src/*"
-      ],
-      "@/assets/*": [
-        "./assets/*"
-      ],
-      "@repo/public-contracts/version": [
-        "../../packages/public-contracts/src/version.ts"
-      ],
-      "@repo/public-contracts/errors": [
-        "../../packages/public-contracts/src/errors.ts"
-      ],
+      "@/*": ["./src/*"],
+      "@/assets/*": ["./assets/*"],
+      "@repo/public-contracts/version": ["../../packages/public-contracts/src/version.ts"],
+      "@repo/public-contracts/errors": ["../../packages/public-contracts/src/errors.ts"],
       "@repo/public-contracts/destinations": [
         "../../packages/public-contracts/src/destinations.ts"
       ],
-      "@repo/public-contracts/evidence": [
-        "../../packages/public-contracts/src/evidence.ts"
-      ],
+      "@repo/public-contracts/evidence": ["../../packages/public-contracts/src/evidence.ts"],
       "@repo/public-contracts/narrative-text": [
         "../../packages/public-contracts/src/narrative-text.ts"
       ],
-      "@repo/public-contracts/discovery": [
-        "../../packages/public-contracts/src/discovery.ts"
-      ],
-      "@repo/public-contracts/v1/*": [
-        "../../packages/public-contracts/src/v1/*"
-      ],
-      "@repo/domain/era": [
-        "../../packages/domain/src/era.ts"
-      ],
-      "@repo/domain-core/era": [
-        "../../packages/domain-core/src/era.ts"
-      ],
-      "zod": [
-        "./node_modules/zod"
-      ]
+      "@repo/public-contracts/discovery": ["../../packages/public-contracts/src/discovery.ts"],
+      "@repo/public-contracts/v1/*": ["../../packages/public-contracts/src/v1/*"],
+      "@repo/domain/era": ["../../packages/domain/src/era.ts"],
+      "@repo/domain-core/era": ["../../packages/domain-core/src/era.ts"],
+      "zod": ["./node_modules/zod"]
     }
   },
-  "include": [
-    "**/*.ts",
-    "**/*.tsx",
-    ".expo/types/**/*.ts",
-    "expo-env.d.ts"
-  ],
+  "include": ["**/*.ts", "**/*.tsx", ".expo/types/**/*.ts", "expo-env.d.ts"],
   "exclude": [
     "node_modules",
     "app.config.ts",

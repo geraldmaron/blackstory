@@ -4,7 +4,8 @@
  *
  * Mirrors `apps/web/src/lib/public-data/live-policy.ts` vocabulary (`PUBLIC_DATA_SOURCE`,
  * `DATABASE_URL`, `PUBLIC_READ_API_DISABLED`) so operators configure web and api-public with one
- * convention. Postgres is the only production SoR path (ADR-020) — the legacy Firestore read
+ * convention. Postgres is the only production SoR path (`docs/decisions-carryover.md`, "entity
+ * source-of-truth precedence") — the legacy Firestore read
  * branch was removed (repo-348e.3); there is no fallback to Firestore, silent or explicit.
  */
 import { hasEmulatorSignals, type EnvironmentLike } from '@repo/ops-data';

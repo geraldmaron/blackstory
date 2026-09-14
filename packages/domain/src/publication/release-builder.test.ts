@@ -8,12 +8,15 @@ import {
   buildNotabilityBasisNote,
   buildReleaseEntityArtifacts,
   buildReleaseNotabilityBasis,
+  isKillingPredicate,
+  inferNotabilityCriterionFromClaim,
+  isRacialTerrorKillingPredicate,
   isAccusationPredicate,
   isRacialTerrorClaim,
   isRacialTerrorRecord,
   computeReleaseResearchCoverage,
   formatClaimInclusionNote,
-  highestClaimConfidenceTier,
+  recordEvidenceInputs,
   inferNotabilityCriterionFromClaim,
   resolveReleaseClaimId,
   resolveReleaseEntityReferences,
@@ -1014,9 +1017,13 @@ test('buildReleaseEntityArtifacts produces a full projection + search doc for a 
   assert.ok(result.projection.notabilityBasis[0]!.evidenceIds.length > 0);
   assert.equal(result.projection.researchCoverage, 'minimal');
   assert.equal(result.searchIndex.claimCount, 1);
-  // One claim is one lineage, so this record is uncorroborated and cannot publish at the top
-  // tier even though its only claim is graded high. See `highestClaimConfidenceTier`.
-  assert.equal(result.searchIndex.confidenceTier, 'medium');
+  // The index carries the grading INPUTS, never a grade: one claim is one lineage, and what a
+  // reader does with that is `confidenceTierFromEvidenceInputs`'s business, not this package's.
+  assert.deepEqual(result.searchIndex.evidenceInputs, {
+    strongestClaimLevel: 'high',
+    citedLineageKeys: ['example source'],
+    evidenceLineageKeys: ['example source'],
+  });
   assert.deepEqual(result.searchIndex.notabilityBasis, result.projection.notabilityBasis);
   assert.equal(result.searchIndex.researchCoverage, result.projection.researchCoverage);
 });
@@ -1043,8 +1050,13 @@ test('buildReleaseEntityArtifacts caps an uncorroborated record below its strong
   const result = buildReleaseEntityArtifacts(entry, CONTEXT);
   assert.equal(result.ok, true);
   if (!result.ok) return;
-  // Both claims cite src_example: one lineage, so the medium strongest claim steps down to low.
-  assert.equal(result.searchIndex.confidenceTier, 'low');
+  // Both claims cite src_example: one lineage, recorded once. The step-down that follows from
+  // it is the read-time rule's, and is asserted in `@repo/public-contracts`' evidence suite.
+  assert.deepEqual(result.searchIndex.evidenceInputs, {
+    strongestClaimLevel: 'medium',
+    citedLineageKeys: ['src_example'],
+    evidenceLineageKeys: ['src_example'],
+  });
   assert.equal(result.searchIndex.claimCount, 2);
 });
 
@@ -1070,90 +1082,172 @@ test('buildReleaseEntityArtifacts publishes the top tier once a second lineage c
   const result = buildReleaseEntityArtifacts(entry, CONTEXT);
   assert.equal(result.ok, true);
   if (!result.ok) return;
-  assert.equal(result.searchIndex.confidenceTier, 'high');
+  assert.deepEqual(result.searchIndex.evidenceInputs, {
+    strongestClaimLevel: 'high',
+    citedLineageKeys: ['npgallery.nps.gov', 'catalog.archives.gov'],
+    evidenceLineageKeys: ['npgallery.nps.gov', 'catalog.archives.gov'],
+  });
 });
 
-test('highestClaimConfidenceTier does not let one publisher corroborate itself', () => {
-  // The facet written here must agree with `recordConfidenceTier` in
-  // `@repo/public-contracts/evidence`, which cannot be imported across the client/server
-  // boundary — so the shared cases are asserted on both sides.
-  assert.equal(
-    highestClaimConfidenceTier([
+test('recordEvidenceInputs collapses one publisher spelled several ways to one lineage', () => {
+  // This package projects grading inputs and never grades. What the rule then makes of these
+  // inputs is asserted in `@repo/public-contracts/src/evidence.test.ts`, and that the two
+  // projections agree is asserted in `apps/web/src/lib/evidence/confidence-rule-parity.test.ts`.
+  assert.deepEqual(
+    recordEvidenceInputs([
       { confidenceLevel: 'high', citationSource: 'wikipedia_api' },
       { confidenceLevel: 'high', citationSource: 'en.wikipedia.org' },
     ]),
-    'medium',
+    {
+      strongestClaimLevel: 'high',
+      citedLineageKeys: ['wikipedia'],
+      evidenceLineageKeys: ['wikipedia'],
+    },
   );
-  assert.equal(
-    highestClaimConfidenceTier([
+  assert.deepEqual(
+    recordEvidenceInputs([
       { confidenceLevel: 'high', citationSource: 'www.nps.gov' },
       { confidenceLevel: 'high', citationSource: 'nps.gov' },
     ]),
-    'medium',
+    {
+      strongestClaimLevel: 'high',
+      citedLineageKeys: ['nps.gov'],
+      evidenceLineageKeys: ['nps.gov'],
+    },
   );
-  assert.equal(highestClaimConfidenceTier([]), 'unrated');
-  assert.equal(highestClaimConfidenceTier([{ confidenceLevel: 'high' }]), 'unrated');
+  // No claims, and a claim with no citation: an empty lineage list either way, which is what
+  // lets the rule tell "nobody assessed this" apart from "assessed and poorly supported".
+  assert.deepEqual(recordEvidenceInputs([]), {
+    strongestClaimLevel: 'unrated',
+    citedLineageKeys: [],
+    evidenceLineageKeys: [],
+  });
+  assert.deepEqual(recordEvidenceInputs([{ confidenceLevel: 'high' }]), {
+    strongestClaimLevel: 'high',
+    citedLineageKeys: [],
+    evidenceLineageKeys: [],
+  });
 });
 
-test("highestClaimConfidenceTier excludes Wikipedia and the record's own index row", () => {
-  // Wikipedia carries a claim and never corroborates one (repo-goyut).
-  assert.equal(
-    highestClaimConfidenceTier([
+test("recordEvidenceInputs keeps the record's own index row out of the evidence lineages", () => {
+  // Wikipedia stays in BOTH lists on purpose. It carries a claim and never corroborates one
+  // (repo-goyut), but that is a policy about one publisher and policy is the rule's, so the
+  // projection records it and `confidenceTierFromEvidenceInputs` discounts it.
+  assert.deepEqual(
+    recordEvidenceInputs([
       { confidenceLevel: 'high', citationSource: 'npgallery.nps.gov' },
       { confidenceLevel: 'medium', citationSource: 'en.wikipedia.org' },
     ]),
-    'medium',
+    {
+      strongestClaimLevel: 'high',
+      citedLineageKeys: ['npgallery.nps.gov', 'wikipedia'],
+      evidenceLineageKeys: ['npgallery.nps.gov', 'wikipedia'],
+    },
   );
   // nrhp-black-heritage-00000006: the listing claims are the NARA row the record was seeded
-  // from, so the nomination form is the only document corroborating anything (repo-6jizv).
-  assert.equal(
-    highestClaimConfidenceTier([
+  // from, so the nomination form is the only document evidencing anything (repo-6jizv). Every
+  // claim states its role explicitly, matching what the publisher writes post-migration.
+  assert.deepEqual(
+    recordEvidenceInputs([
+      {
+        confidenceLevel: 'high',
+        claimRole: 'record_index',
+        citationSource: 'catalog.archives.gov',
+      },
+      {
+        confidenceLevel: 'high',
+        claimRole: 'record_index',
+        citationSource: 'catalog.archives.gov',
+      },
+      {
+        confidenceLevel: 'high',
+        claimRole: 'evidence',
+        citationSource: 'npgallery.nps.gov',
+      },
+    ]),
+    {
+      strongestClaimLevel: 'high',
+      citedLineageKeys: ['catalog.archives.gov', 'npgallery.nps.gov'],
+      evidenceLineageKeys: ['npgallery.nps.gov'],
+    },
+  );
+  // Two documents read, neither the index row.
+  assert.deepEqual(
+    recordEvidenceInputs([
+      {
+        confidenceLevel: 'high',
+        claimRole: 'record_index',
+        citationSource: 'catalog.archives.gov',
+      },
+      {
+        confidenceLevel: 'high',
+        claimRole: 'evidence',
+        citationSource: 'npgallery.nps.gov',
+      },
+      {
+        confidenceLevel: 'high',
+        claimRole: 'evidence',
+        citationSource: 'blackpast.org',
+      },
+    ]),
+    {
+      strongestClaimLevel: 'high',
+      citedLineageKeys: ['catalog.archives.gov', 'npgallery.nps.gov', 'blackpast.org'],
+      evidenceLineageKeys: ['npgallery.nps.gov', 'blackpast.org'],
+    },
+  );
+  // A lineage cited by both an index-row claim and an evidence claim is still evidence: the
+  // partition is per lineage, not per claim.
+  assert.deepEqual(
+    recordEvidenceInputs([
+      {
+        confidenceLevel: 'high',
+        claimRole: 'record_index',
+        citationSource: 'catalog.archives.gov',
+      },
+      {
+        confidenceLevel: 'high',
+        claimRole: 'evidence',
+        citationSource: 'catalog.archives.gov',
+      },
+    ]),
+    {
+      strongestClaimLevel: 'high',
+      citedLineageKeys: ['catalog.archives.gov'],
+      evidenceLineageKeys: ['catalog.archives.gov'],
+    },
+  );
+});
+
+test('recordEvidenceInputs treats a claim missing claimRole as evidence, never inferred from its predicate', () => {
+  // The predicate bridge is gone: every published claim now carries `claimRole`, so a claim
+  // without it is not read as the record's own index row just because its predicate used to
+  // describe one under the old bridge vocabulary. It counts as evidence like any other claim —
+  // the explicit default the current schema demands, not an inference.
+  assert.deepEqual(
+    recordEvidenceInputs([
       { confidenceLevel: 'high', predicate: 'listing', citationSource: 'catalog.archives.gov' },
       {
         confidenceLevel: 'high',
         predicate: 'significant for',
         citationSource: 'catalog.archives.gov',
       },
-      { confidenceLevel: 'high', predicate: 'source states', citationSource: 'npgallery.nps.gov' },
-    ]),
-    'medium',
-  );
-  // Two documents read, neither the index row.
-  assert.equal(
-    highestClaimConfidenceTier([
-      { confidenceLevel: 'high', predicate: 'listing', citationSource: 'catalog.archives.gov' },
-      { confidenceLevel: 'high', predicate: 'source states', citationSource: 'npgallery.nps.gov' },
-      { confidenceLevel: 'high', predicate: 'source states', citationSource: 'blackpast.org' },
-    ]),
-    'high',
-  );
-  // Wikipedia alone is an assessment, so it grades rather than reporting unrated.
-  assert.equal(
-    highestClaimConfidenceTier([{ confidenceLevel: 'medium', citationSource: 'wikipedia_api' }]),
-    'low',
-  );
-});
-
-test('highestClaimConfidenceTier believes claimRole over the predicate bridge', () => {
-  assert.equal(
-    highestClaimConfidenceTier([
-      {
-        confidenceLevel: 'high',
-        predicate: 'listing',
-        claimRole: 'evidence',
-        citationSource: 'catalog.archives.gov',
-      },
       {
         confidenceLevel: 'high',
         predicate: 'source states',
-        claimRole: 'evidence',
         citationSource: 'npgallery.nps.gov',
       },
     ]),
-    'high',
+    {
+      strongestClaimLevel: 'high',
+      citedLineageKeys: ['catalog.archives.gov', 'npgallery.nps.gov'],
+      evidenceLineageKeys: ['catalog.archives.gov', 'npgallery.nps.gov'],
+    },
   );
-  assert.equal(
-    highestClaimConfidenceTier([
+  // Stating the role explicitly still excludes the index row, and a predicate outside the old
+  // bridge vocabulary is no obstacle to being named the index row.
+  assert.deepEqual(
+    recordEvidenceInputs([
       {
         confidenceLevel: 'high',
         predicate: 'source states',
@@ -1167,7 +1261,11 @@ test('highestClaimConfidenceTier believes claimRole over the predicate bridge', 
         citationSource: 'npgallery.nps.gov',
       },
     ]),
-    'medium',
+    {
+      strongestClaimLevel: 'high',
+      citedLineageKeys: ['catalog.archives.gov', 'npgallery.nps.gov'],
+      evidenceLineageKeys: ['npgallery.nps.gov'],
+    },
   );
 });
 
@@ -1553,4 +1651,300 @@ test('buildReleaseEntityArtifacts omits projection.visit entirely when nothing s
   assert.equal(result.ok, true);
   if (!result.ok) return;
   assert.equal(result.projection.visit, undefined);
+});
+
+/*
+ * repo-oyxgh. Ell Persons's real claim set from the active release, verbatim. `isKillingPredicate`
+ * is the police-killing cohort's vocabulary (killed | shot | died | victim of) and matches NONE of
+ * these, so M1's "does this record state its killing" test was false and the filter fell through
+ * to keeping every claim — which promoted what was done to him on the way to his murder into this
+ * catalog's stated reasons for naming him.
+ *
+ * Measured on the active release 2026-09-12: 20 of the 32 `lynching_*` records were in this state.
+ */
+const ellPersonsClaims = [
+  {
+    predicate: 'was lynched',
+    object: 'on May 22, 1917, in Memphis, Tennessee',
+    confidenceLevel: 'high' as const,
+    citationSource: 'https://lynchinginamerica.eji.org/',
+    citationLabel: 'Lynching in America',
+  },
+  {
+    predicate: 'was accused of',
+    object: 'raping and murdering 15-year-old Antoinette Rappel',
+    confidenceLevel: 'high' as const,
+    citationSource: 'https://example.org/accusation',
+    citationLabel: 'Contemporary press',
+  },
+  {
+    predicate: 'was subjected to',
+    object: 'brutal interrogation leading to a forced confession',
+    confidenceLevel: 'high' as const,
+    citationSource: 'https://example.org/interrogation',
+    citationLabel: 'Historical account',
+  },
+  {
+    predicate: 'was captured by',
+    object: 'a lynch mob while in transit to stand trial',
+    confidenceLevel: 'high' as const,
+    citationSource: 'https://example.org/capture',
+    citationLabel: 'Historical account',
+  },
+  {
+    predicate: 'was burned alive and dismembered',
+    object: 'in a public spectacle attended by a large crowd',
+    confidenceLevel: 'high' as const,
+    citationSource: 'https://example.org/spectacle',
+    citationLabel: 'Historical account',
+  },
+  {
+    predicate: 'was followed by',
+    object:
+      'the NAACP investigation of his lynching by field secretary James Weldon Johnson and the ' +
+      'chartering of the Memphis branch',
+    confidenceLevel: 'high' as const,
+    citationSource: 'https://example.org/naacp',
+    citationLabel: 'NAACP records',
+  },
+];
+
+test('a lynching record does not publish its own capture and interrogation as reasons it is in the catalog', () => {
+  const entry = baseEntry({
+    id: 'lynching_ell_persons_memphis_tennessee',
+    kind: 'person',
+    displayName: 'Ell Persons',
+    summary:
+      'Ell Persons was lynched near Memphis, Tennessee on May 22, 1917, burned alive before a ' +
+      'crowd of thousands after being taken from custody while in transit to stand trial.',
+    claims: ellPersonsClaims,
+  });
+  const basis = buildReleaseNotabilityBasis(entry);
+  const notes = basis.map((record) => record.note);
+
+  assert.ok(
+    !notes.some((note) => /subjected to/iu.test(note)),
+    `"was subjected to" must not be an inclusion reason — got ${JSON.stringify(notes)}`,
+  );
+  assert.ok(
+    !notes.some((note) => /captured by/iu.test(note)),
+    `"was captured by" must not be an inclusion reason — got ${JSON.stringify(notes)}`,
+  );
+  assert.ok(
+    !notes.some((note) => /accused of/iu.test(note)),
+    'the mob’s own pretext is never why this catalog names someone',
+  );
+
+  // What SHOULD survive: the killing itself, stated in the record's own vocabulary.
+  assert.ok(
+    notes.some((note) => /lynched/iu.test(note)),
+    `the lynching itself must remain a reason — got ${JSON.stringify(notes)}`,
+  );
+  assert.deepEqual(
+    basis.map((record) => record.criterion),
+    ['documented_racial_terror', 'documented_racial_terror'],
+    'the two killing claims, and nothing else',
+  );
+
+  /*
+   * The published record also carries a `movement_significance` basis for the NAACP investigation
+   * that followed (repo-9u3di). A RECOMPUTE does not produce it: `was followed by`
+   * infers `documented_site`, so `identifies()` is false for it.
+   *
+   * That basis comes from `apply-notability-rubric-ruling.ts`'s MERGE, which is why the bead calls
+   * the merge safe and a straight recompute (fix-racial-terror-notability-basis.ts,
+   * fix-missing-killing-claims.ts) unsafe for this cohort. Asserted here so the next person
+   * comparing a recompute against what is live does not read the difference as a regression.
+   */
+  assert.equal(
+    inferNotabilityCriterionFromClaim('was followed by', ellPersonsClaims[5]!.object, 'person'),
+    'documented_site',
+  );
+});
+
+test('the racial-terror killing vocabulary counts as stating the killing', () => {
+  for (const predicate of [
+    'was lynched',
+    'was burned alive and dismembered',
+    'was hanged',
+    'was beaten to death',
+  ]) {
+    assert.equal(
+      isKillingPredicate(predicate) || isRacialTerrorKillingPredicate(predicate),
+      true,
+      `${predicate} must count as stating the killing`,
+    );
+  }
+  // Unchanged: the two tests stay separate, and this is why the fix is a union at the M1 filter
+  // rather than a widening of either one.
+  assert.equal(isKillingPredicate('was lynched'), false);
+  assert.equal(isRacialTerrorKillingPredicate('died'), false);
+});
+
+/*
+ * repo-15slz. Inclusion notes are built by joining a sentence-cased predicate to its claim object.
+ * That is right only when the object is the lowercase continuation the format was designed for,
+ * and the measurement says that shape is a minority: over rel_20260723_authority_net_001, 5,533 of
+ * 12,137 claim objects (45.6%) open lowercase and 6,175 (50.9%) open with a capital. Two defects
+ * followed, and both reached the public "why this appears" surface. Shape (a), below, is prose
+ * that opens by repeating the predicate's own verb — "Born in Born into slavery on April 5, 1856".
+ * Shape (b), further down, is prose that is already a sentence of its own.
+ *
+ * Every pair below is real, taken from the active release.
+ */
+test('an object that repeats the predicate verb does not stutter', () => {
+  for (const [predicate, object, expected] of [
+    [
+      'born_in',
+      'Born into slavery on April 5, 1856, in Hale’s Ford, Franklin County, Virginia.',
+      'Born into slavery on April 5, 1856, in Hale’s Ford, Franklin County, Virginia.',
+    ],
+    ['renamed', 'Renamed Livingstone College in 1887', 'Renamed Livingstone College in 1887.'],
+    [
+      'pulitzer_prizes',
+      "Pulitzer Prize for Drama for 'Fences' (1987) and 'The Piano Lesson' (1990)",
+      "Pulitzer Prize for Drama for 'Fences' (1987) and 'The Piano Lesson' (1990).",
+    ],
+    [
+      'developed_treatment',
+      'Developed the Ball Method for injectable chaulmoogra oil',
+      'Developed the Ball Method for injectable chaulmoogra oil.',
+    ],
+    [
+      'first_in_nation',
+      'First medical school for African Americans in the South',
+      'First medical school for African Americans in the South.',
+    ],
+  ] as const) {
+    assert.equal(formatClaimInclusionNote(predicate, object), expected);
+  }
+});
+
+test('when the predicate is the fuller statement, the stub object is dropped instead', () => {
+  // Collapsing toward the object here would throw away the election and the town.
+  assert.equal(
+    formatClaimInclusionNote(
+      'was the third Black man elected as alderman in Annapolis',
+      'third Black alderman',
+    ),
+    'Was the third Black man elected as alderman in Annapolis.',
+  );
+  assert.equal(
+    formatClaimInclusionNote('was born into slavery in North Carolina', 'born into slavery'),
+    'Was born into slavery in North Carolina.',
+  );
+  assert.equal(
+    formatClaimInclusionNote('was a rice plantation during the mid-1800s', 'rice plantation'),
+    'Was a rice plantation during the mid-1800s.',
+  );
+});
+
+test('a shared word that is not the predicate verb still joins normally', () => {
+  // "American" appears in both. Collapsing this pair would leave the note reading "American
+  // League", which is why matching is on the predicate's first meaning-bearing word alone.
+  assert.equal(
+    formatClaimInclusionNote('was first African American to hit a home run in', 'American League'),
+    'Was first African American to hit a home run in American League.',
+  );
+  assert.equal(
+    formatClaimInclusionNote(
+      'resettled liberated Africans after 1807',
+      'Africans freed by Royal Navy',
+    ),
+    'Resettled liberated Africans after 1807 Africans freed by Royal Navy.',
+  );
+});
+
+/*
+ * repo-15slz shape (b), the bulk of the defect: the object is not a continuation at all but a
+ * sentence of its own, so joining the predicate onto its front leaves a dangling fragment in
+ * front of a complete sentence — "First to In 1977, President Carter appointed Young …". Measured
+ * over rel_20260723_authority_net_001 on 2026-09-13: 2,365 of the 6,105 published basis records
+ * were composed this way. Every pair below is real, taken from that release.
+ */
+test('a predicate is not joined onto an object that is already a sentence', () => {
+  for (const [predicate, object, expected] of [
+    [
+      'founded_in',
+      'Washington and a small group opened the Tuskegee Normal and Industrial School on July 4, 1881, in Tuskegee, Alabama, with no initial buildings or land.',
+      'Washington and a small group opened the Tuskegee Normal and Industrial School on July 4, 1881, in Tuskegee, Alabama, with no initial buildings or land.',
+    ],
+    [
+      'first_to',
+      'In 1977, President Carter appointed Young U.S. Ambassador to the United Nations, the first African American to hold the post.',
+      'In 1977, President Carter appointed Young U.S. Ambassador to the United Nations, the first African American to hold the post.',
+    ],
+    [
+      'elected_on',
+      'Young was elected to the U.S. House of Representatives from Georgia in 1972, becoming the first Black congressman from Georgia since Reconstruction.',
+      'Young was elected to the U.S. House of Representatives from Georgia in 1972, becoming the first Black congressman from Georgia since Reconstruction.',
+    ],
+    [
+      'organized',
+      'SNCC organized 1961 Freedom Rides to test desegregation of interstate travel, launched Southern voter registration campaigns from 1962 onward, and led the 1964 Mississippi Freedom Summer project.',
+      'SNCC organized 1961 Freedom Rides to test desegregation of interstate travel, launched Southern voter registration campaigns from 1962 onward, and led the 1964 Mississippi Freedom Summer project.',
+    ],
+    // The object opens with its own verb rather than a subject. No period ends it, so the
+    // trailing-punctuation signal cannot be what catches these two.
+    [
+      'hall_of_fame_inducted',
+      'Inducted into the Rock and Roll Hall of Fame in 2006 in the Performer category',
+      'Inducted into the Rock and Roll Hall of Fame in 2006 in the Performer category.',
+    ],
+    [
+      'received_honor_year',
+      'Presidential Medal of Freedom, awarded in 2009',
+      'Presidential Medal of Freedom, awarded in 2009.',
+    ],
+  ] as const) {
+    assert.equal(formatClaimInclusionNote(predicate, object), expected);
+  }
+});
+
+test('a capital-initial object that is only a noun phrase keeps its predicate', () => {
+  // The other half of shape (b): dropping the predicate here would publish a bare label. These
+  // are the shapes the rule must NOT touch, and all six are real pairs from the same release.
+  for (const [predicate, object, expected] of [
+    [
+      'included_in',
+      'National Register of Historic Places',
+      'Included in National Register of Historic Places.',
+    ],
+    ['issued_by', 'President John F. Kennedy', 'Issued by President John F. Kennedy.'],
+    [
+      'significant for',
+      'Black heritage, education, and architecture',
+      'Significant for Black heritage, education, and architecture.',
+    ],
+    [
+      'forbade',
+      'African Americans from visiting the post office or railroad station',
+      'Forbade African Americans from visiting the post office or railroad station.',
+    ],
+    // A trailing period that belongs to an abbreviation is not a sentence ending.
+    ['killed', 'Daniel L. Simmons Sr.', 'Killed Daniel L. Simmons Sr.'],
+    ['location', 'Washington, D.C.', 'Location Washington, D.C.'],
+    // A capital-initial DATE is a continuation of the predicate, not a sentence, even when a
+    // clause follows it.
+    [
+      'decided_on',
+      'April 1, 1935, 294 U.S. 587, in an 8-0 decision written by Chief Justice Charles Evans Hughes',
+      'Decided on April 1, 1935, 294 U.S. 587, in an 8-0 decision written by Chief Justice Charles Evans Hughes.',
+    ],
+  ] as const) {
+    assert.equal(formatClaimInclusionNote(predicate, object), expected);
+  }
+});
+
+test('the continuation shape the format was designed for is unchanged', () => {
+  assert.equal(formatClaimInclusionNote('founded_year', '1900'), 'Founded year 1900.');
+  assert.equal(
+    formatClaimInclusionNote('listed_on', 'the National Register of Historic Places'),
+    'Listed on the National Register of Historic Places.',
+  );
+  assert.equal(formatClaimInclusionNote('served_as', ''), 'Served as.');
+  assert.equal(
+    formatClaimInclusionNote('', 'A bare object stands alone'),
+    'A bare object stands alone.',
+  );
 });

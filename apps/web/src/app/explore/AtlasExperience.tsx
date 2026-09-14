@@ -7,22 +7,17 @@
  * separate surface is WP-25, irreversible, its own approval).
  *
  * The camera reaches the plate through `MapStage.getMap()`, narrow on purpose: preset framing
- * still goes through `flyPreset` (ADR-017), and this handle is only what `camera-moves.ts` needs.
+ * still goes through `flyPreset`, and this handle is only what `camera-moves.ts` needs. Every
+ * move on either path carries an authored duration and easing, never library defaults
+ * (`docs/decisions-carryover.md`, "Persistent map canvas": camera grammar).
  *
  * This file is the orchestrator (WP-23): render plus wiring. Every piece of state and behavior
  * lives in a hook under `explore/hooks/` — the lens, the camera, the selection, the saved
- * collection, the story runner, the palette index, the command context.
+ * collection, the palette index, the command context.
  */
 'use client';
 
-import React, {
-  useCallback,
-  useEffect,
-  useMemo,
-  useState,
-  type Dispatch,
-  type SetStateAction,
-} from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Notice } from '@repo/ui';
 import { focusLandmark } from '../../lib/keyboard/use-focus-trap';
 import { CommandBar } from '../../components/shell/CommandBar';
@@ -45,8 +40,6 @@ import {
 import { TimePanel } from '../../components/map-experience/TimePanel';
 import { MIGRATION_CORRIDORS } from '../../lib/map-experience/migration-corridors';
 import { nationalFieldPatch } from '../../lib/map-experience/national-field';
-import { prefersReducedMotion } from '../../lib/map-experience/camera-presets';
-import { StoryMode } from '../../components/story/StoryMode';
 import { clearCollection, unsaveRecord } from '../../lib/collections/store';
 import { useMapStage } from '../../components/map-stage/MapStage';
 import {
@@ -58,12 +51,12 @@ import { usePanelVisibility, type PanelVisibility } from './hooks/use-panel-visi
 import { useSavedCollection } from './hooks/use-saved-collection';
 import { useLensFilters } from './hooks/use-lens-filters';
 import { useMapSync } from './hooks/use-map-sync';
+import { usePopulationChoropleth } from './hooks/use-population-choropleth';
 import { useAtlasCamera } from './hooks/use-atlas-camera';
 import { useRecordSelection } from './hooks/use-record-selection';
 import { usePaletteData } from './hooks/use-palette-data';
 import { useReaderActions } from './hooks/use-reader-actions';
 import { useCommandContext } from './hooks/use-command-context';
-import { useStoryRunner } from './hooks/use-story-runner';
 import { useExploreUrlSync } from './hooks/use-explore-url-sync';
 import { atlasWalkHref } from '../../lib/place/public-place-path';
 import { placeArrivalQuery } from '../../lib/discovery/discovery-arrival';
@@ -164,56 +157,14 @@ export function AtlasExperience({ initial }: AtlasExperienceProps) {
   }, [focusAfterPanels]);
 
   /**
-   * The selection, and whether the reader asked for it.
+   * The selection.
    *
    * Owned here, not inside the selection hook: the camera's padding needs to know whether the
    * sheet is open without depending on the camera it drives, so the id has to sit above both.
-   *
-   * `ambient` is the story's own selection. A chapter that is about one record rings that record's
-   * pin on the plate, and it rings it by selecting it — but a reader scrolling into a chapter has
-   * not asked to open anything, and the record sheet is a reader-opened panel. Without this flag
-   * the sheet flew open by itself partway down the journey, over a chapter card already printing
-   * that same record's name, place, era and source count. The flag separates the two: the ring
-   * still lands, and the sheet stays shut until someone opens a record themselves.
    */
-  const [selection, setSelection] = useState<{
-    readonly id: string | undefined;
-    readonly ambient: boolean;
-  }>(() => ({ id: initial.viewState.selected, ambient: false }));
-  const selectedId = selection.id;
-
-  const setSelectionWithOrigin = useCallback(
-    (next: SetStateAction<string | undefined>, ambient: boolean) => {
-      setSelection((current) => ({
-        id: typeof next === 'function' ? next(current.id) : next,
-        ambient,
-      }));
-    },
-    [],
+  const [selectedId, setSelectedId] = useState<string | undefined>(
+    () => initial.viewState.selected,
   );
-
-  /** Every reader-initiated path — pin click, rail row, palette, keyboard step, sheet close. */
-  const setSelectedId = useCallback<Dispatch<SetStateAction<string | undefined>>>(
-    (next) => setSelectionWithOrigin(next, false),
-    [setSelectionWithOrigin],
-  );
-
-  /** The story runner's setter. Rings the pin; does not open the sheet. */
-  const setAmbientSelectedId = useCallback<Dispatch<SetStateAction<string | undefined>>>(
-    (next) => setSelectionWithOrigin(next, true),
-    [setSelectionWithOrigin],
-  );
-
-  /**
-   * Leaving the story must not strand its selection either. An ambient selection that survived
-   * into Explore would ring a pin with no sheet attached, and no sheet means no close control —
-   * a highlight the reader cannot dismiss. Scoped to ambient selections so a `?selected=` URL,
-   * which arrives with `ambient: false`, is never cleared by a mode change.
-   */
-  useEffect(() => {
-    if (mode === 'story') return;
-    setSelection((current) => (current.ambient ? { id: undefined, ambient: false } : current));
-  }, [mode]);
 
   const { collection, persist, toggleSave, savedSet } = useSavedCollection(toasts);
   const {
@@ -226,12 +177,13 @@ export function AtlasExperience({ initial }: AtlasExperienceProps) {
     decade,
     setDecade,
     sweepDecade,
-    setSweepDecade,
     topicId,
     setTopicId,
+    activeTopicLabel,
     status,
     layerMode,
     setLayerMode,
+    areaFillPermitted,
     layers,
     setLayers,
     sort,
@@ -271,6 +223,7 @@ export function AtlasExperience({ initial }: AtlasExperienceProps) {
     status,
     layerMode,
     satellite: layers.satellite,
+    lines: layers.routes,
     selectedId,
   });
   /**
@@ -283,6 +236,11 @@ export function AtlasExperience({ initial }: AtlasExperienceProps) {
   const sweepClearingPlate =
     sweepDecade !== null && (decadeBars[0] === undefined || sweepDecade < decadeBars[0].decade);
 
+  // Black-population choropleth tiers for the Lens's own `layerMode` (not the URL-seeded
+  // `view.viewState.layerMode` — see the effect below). Empty (and no fetch) whenever the layer
+  // model is `off` / `presence`; loads the compact state or county index lazily on first ask.
+  const populationLevels = usePopulationChoropleth(layerMode, view.viewState);
+
   useMapSync(
     stage,
     view,
@@ -292,6 +250,7 @@ export function AtlasExperience({ initial }: AtlasExperienceProps) {
     selectedId,
     stateCode,
     sweepClearingPlate,
+    populationLevels,
   );
 
   // The Lens's own population-layer choice overrides the URL-seeded `view.viewState.layerMode`
@@ -308,7 +267,9 @@ export function AtlasExperience({ initial }: AtlasExperienceProps) {
           clusteringEnabled: view.viewState.group,
           satellite: layers.satellite,
           historyEdgeCollection: view.edgeLineCollection,
-          ...(view.viewState.popGeo ? { popGeo: view.viewState.popGeo } : {}),
+          stateChoroplethLevels: populationLevels.stateChoroplethLevels,
+          countyChoroplethLevels: populationLevels.countyChoroplethLevels,
+          ...(populationLevels.popGeo ? { popGeo: populationLevels.popGeo } : {}),
         },
       ),
     );
@@ -321,7 +282,7 @@ export function AtlasExperience({ initial }: AtlasExperienceProps) {
     view.densityLevels,
     view.edgeLineCollection,
     view.viewState.group,
-    view.viewState.popGeo,
+    populationLevels,
   ]);
 
   // "Place labels" (§5.2): the map plate's own basemap label layers. Reapplied on every
@@ -378,12 +339,12 @@ export function AtlasExperience({ initial }: AtlasExperienceProps) {
   }, [atlasHoverTarget, selectedId]);
 
   const [legendOpen, setLegendOpen] = useState(false);
-  const { camera, readout, spotlight, setSpotlight, runMove, bearing } = useAtlasCamera(
+  const { camera, readout, spotlight, runMove, bearing } = useAtlasCamera(
     stage,
     panels,
     chromeHidden,
-    // The padding is for the panel, not the highlight: an ambient story selection opens no sheet.
-    selectedId !== undefined && !selection.ambient,
+    // The padding is for the panel: the camera reserves room whenever something is selected.
+    selectedId !== undefined,
     setLayers,
   );
   const { selectedFeature, selectedIndex, select, selectById, stepRecord, sheetRecord } =
@@ -402,18 +363,6 @@ export function AtlasExperience({ initial }: AtlasExperienceProps) {
   const { paletteRecords, destinations, paletteStates, featureById } = usePaletteData(
     view,
     stateOptions,
-  );
-  const { storyRecord, storyOrder, runChapter } = useStoryRunner(
-    view.allFeatures,
-    camera,
-    decadeBars,
-    featureById,
-    stage,
-    setAmbientSelectedId,
-    setLayers,
-    setSpotlight,
-    setSweepDecade,
-    mode,
   );
   const commandContext = useCommandContext({
     camera,
@@ -441,8 +390,7 @@ export function AtlasExperience({ initial }: AtlasExperienceProps) {
     setSavedOpen,
   });
 
-  /** The sheet is open only for a selection the reader made. See `selection.ambient` above. */
-  const sheetOpen = sheetRecord !== null && !selection.ambient;
+  const sheetOpen = sheetRecord !== null;
   /* The sheet's mast reads the same photo index the pin hover card does, fetched once, lazily,
      the first time a sheet opens. See `use-photo-index.ts`. */
   /*
@@ -507,18 +455,6 @@ export function AtlasExperience({ initial }: AtlasExperienceProps) {
         visible={layers.routes}
       />
 
-      <StoryMode
-        active={mode === 'story'}
-        onChapter={runChapter}
-        onOpenAtlas={() => setMode('atlas')}
-        onNearMe={nearMe}
-        reducedMotion={prefersReducedMotion()}
-        recordSpotlight={storyRecord ?? undefined}
-        chapters={storyOrder.chapters}
-        factByChapterId={storyOrder.factByChapterId}
-        sheetOpen={sheetOpen}
-      />
-
       {spotlight ? (
         <div
           className="ds-atlas__spotlight"
@@ -555,6 +491,7 @@ export function AtlasExperience({ initial }: AtlasExperienceProps) {
           }
           layerMode={layerMode}
           onLayerModeChange={setLayerMode}
+          areaFillPermitted={areaFillPermitted}
           presence={presence}
           onShowLegend={() => setLegendOpen(true)}
           onReset={resetLens}
@@ -615,6 +552,7 @@ export function AtlasExperience({ initial }: AtlasExperienceProps) {
               bearing={bearing}
               onResetBearing={() => camera.resetBearing({ trigger: 'reader' })}
               activeRecord={selectedFeature?.properties ?? null}
+              lens={{ topicId, topicLabel: activeTopicLabel }}
               spotlit={camera.isSpotlit()}
             />
           ) : null}
@@ -667,7 +605,7 @@ export function AtlasExperience({ initial }: AtlasExperienceProps) {
         <div className="ds-atlas__legend-overlay" role="dialog" aria-label="Legend">
           <MapExperienceLegend
             layerMode={layerMode}
-            {...(view.viewState.popGeo ? { popGeo: view.viewState.popGeo } : {})}
+            {...(populationLevels.popGeo ? { popGeo: populationLevels.popGeo } : {})}
             onHide={() => setLegendOpen(false)}
           />
         </div>
@@ -727,6 +665,7 @@ export function AtlasExperience({ initial }: AtlasExperienceProps) {
             displayName: record.name,
             entityId: record.id,
             ...(record.kind !== undefined ? { kind: record.kind } : {}),
+            ...(record.summary !== undefined ? { summary: record.summary } : {}),
           });
           if (walk) window.location.assign(walk);
         }}
@@ -755,6 +694,8 @@ export function AtlasExperience({ initial }: AtlasExperienceProps) {
             return;
           }
           // Same as the palette: a saved record whose pin is not in this projection still opens.
+          // `SavedRecord` does not persist a summary, so this fallback still relies on the
+          // `PLACE_PAGE_STAND_IDS` shortcut for a place-kind save with no other signal.
           const walk = atlasWalkHref({
             displayName: record.name,
             kind: record.kind,

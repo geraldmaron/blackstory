@@ -8,9 +8,12 @@
  * citation, the archive capture, or the plain-language explainer.
  *
  * Entity linkage: the seed used its own `ent_seed_law_*` id namespace, which
- * exists nowhere in Supabase. Each mapping below was verified against
- * bb_public.release_entities in the active release. Three seed rows have no
- * canonical entity yet and load unlinked rather than inventing ids.
+ * exists nowhere in Supabase. The mapping now lives in
+ * lib/legal-snapshot-entity-links.ts, next to the ruling for each row that has
+ * no entity — this file connects to Postgres on import, so nothing could assert
+ * anything about the map while it lived here. Two rows still load unlinked, by
+ * decision rather than by omission; the check below is what keeps a wrong id
+ * from landing quietly.
  *
  * Usage (repo root):
  *   set -a && source apps/web/.env.local && set +a
@@ -28,28 +31,10 @@ import {
   getLegalCatalogEntry,
 } from '../../../apps/web/src/data/legal-seed.ts';
 import { normalizePgConnectionString } from './lib/pg-connection.ts';
+import { resolveCanonicalEntityId } from './lib/legal-snapshot-entity-links.ts';
 
 const dryRun = process.env.DRY_RUN !== '0';
 const applyFlag = process.env.LOAD_LEGAL_SNAPSHOTS_APPLY === '1';
-
-/**
- * seed slug -> canonical entity id, each verified present in the active release.
- * `null` means no canonical entity exists yet (publishing those is a separate call).
- */
-const CANONICAL_ENTITY_BY_SLUG: Record<string, string | null> = {
-  'civil-rights-act-1964': 'ent_law_civil_rights_act_1964',
-  'voting-rights-act-1965': 'ent_law_voting_rights_act_1965',
-  'fair-housing-act-1968': 'ent_law_fair_housing_act_1968',
-  'brown-v-board-of-education': 'ent_case_brown_v_board_of_education_1954',
-  'shelby-county-v-holder': 'ent_case_shelby_county_v_holder_2013',
-  'students-for-fair-admissions-v-harvard': 'ent_case_sffa_v_harvard_2023',
-  'thirteenth-amendment': 'ent_law_13th_amendment_1865',
-  'fourteenth-amendment': 'ent_law_14th_amendment_1868',
-  'fifteenth-amendment': 'ent_law_15th_amendment_1870',
-  '42-usc-1983': null,
-  'title-vii-cfr-part-1604': null,
-  'georgia-sb202-2021': null,
-};
 
 function contentHash(payload: unknown): string {
   return createHash('sha256').update(JSON.stringify(payload)).digest('hex');
@@ -58,11 +43,9 @@ function contentHash(payload: unknown): string {
 const snapshots = listLegalSnapshots();
 const rows = snapshots.map((snapshot) => {
   const catalog = getLegalCatalogEntry(snapshot.id);
-  if (!(snapshot.slug in CANONICAL_ENTITY_BY_SLUG)) {
-    throw new Error(
-      `slug ${snapshot.slug} has no entry in CANONICAL_ENTITY_BY_SLUG — add a verified mapping (or null) before loading`,
-    );
-  }
+  // Throws on a slug nobody has ruled on, rather than defaulting it to "no entity" — an
+  // unconsidered snapshot would otherwise be indistinguishable from a deliberate blank.
+  const canonicalEntityId = resolveCanonicalEntityId(snapshot.slug);
   const payload = {
     id: snapshot.id,
     slug: snapshot.slug,
@@ -75,11 +58,9 @@ const rows = snapshots.map((snapshot) => {
     ...(catalog?.explainer ? { explainer: catalog.explainer } : {}),
     ...(snapshot.factId ? { factId: snapshot.factId } : {}),
     ...(snapshot.effectiveYear ? { effectiveYear: snapshot.effectiveYear } : {}),
-    ...(CANONICAL_ENTITY_BY_SLUG[snapshot.slug]
-      ? { canonicalEntityId: CANONICAL_ENTITY_BY_SLUG[snapshot.slug] }
-      : {}),
+    ...(canonicalEntityId ? { canonicalEntityId } : {}),
   };
-  return { snapshot, catalog, payload, canonicalEntityId: CANONICAL_ENTITY_BY_SLUG[snapshot.slug] };
+  return { snapshot, catalog, payload, canonicalEntityId };
 });
 
 const linked = rows.filter((row) => row.canonicalEntityId).length;
@@ -88,7 +69,9 @@ console.log(
   `Corpus: release ${LEGAL_SEED_RELEASE_ID}, ${rows.length} snapshots, ${linked} entity-linked, ${withExplainer} with explainers`,
 );
 for (const row of rows.filter((r) => !r.canonicalEntityId)) {
-  console.log(`  unlinked (no canonical entity yet): ${row.snapshot.slug}`);
+  console.log(
+    `  unlinked (see the ruling in lib/legal-snapshot-entity-links.ts): ${row.snapshot.slug}`,
+  );
 }
 
 if (dryRun || !applyFlag) {

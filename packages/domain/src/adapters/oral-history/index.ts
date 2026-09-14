@@ -10,7 +10,8 @@
  * canonical interview URLs, and person/place/event mention snippets* into private discovery
  * candidates.
  *
- * Invariants (ADR-009 + constitution):
+ * Invariants (`docs/decisions-carryover.md`, "Research and discovery cannot publish";
+ * and the product constitution):
  * - Self-contained module. Does NOT edit any barrel; parent wires the export lines from the doc.
  * - Registers DISABLED. `assertAdapterMayRun` / `approveSourcePolicy` gate any real run.
  * - Mention snippets + interview pointers only — never full transcripts, audio, or media bytes.

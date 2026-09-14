@@ -11,6 +11,7 @@ import type {
   NationalPopulationTimelineRow,
   OpportunityAtlasCoverageSummary,
 } from '@repo/domain/statistics/public-data-summaries';
+import { formatSharePct } from './chart-utils';
 import { HateCrimeCompositionChart } from './HateCrimeCompositionChart';
 import { HateCrimeYearSeriesChart } from './HateCrimeYearSeriesChart';
 import {
@@ -21,6 +22,7 @@ import { PopulationByDecadeChart } from './PopulationByDecadeChart';
 import { RacePairComparisonChart } from './RacePairComparisonChart';
 import { GroupedBarIndicatorChart } from './GroupedBarIndicatorChart';
 import { StatePopulationShiftChart } from './StatePopulationShiftChart';
+import { TrendLineChart } from './TrendLineChart';
 import { DATA_PAGE_INDICATOR_FIXTURE_BUNDLE } from '@repo/domain/statistics/data-page-series';
 
 function timelineRow(
@@ -116,6 +118,20 @@ test('PopulationByDecadeChart returns nothing when rows are empty', () => {
   assert.doesNotMatch(html, />0</);
 });
 
+test('PopulationByDecadeChart shows N/A instead of an em dash for decades with no free/enslaved split', () => {
+  const html = renderToStaticMarkup(
+    createElement(PopulationByDecadeChart, { rows: SAMPLE_TIMELINE, sources: SAMPLE_SOURCES }),
+  );
+  // 2000, 2010, and 2020 rows carry no free/enslaved split (post-1860 total only).
+  assert.match(html, /N\/A/);
+  assert.doesNotMatch(html, /—/);
+});
+
+test('formatSharePct returns N/A instead of an em dash when total population is zero', () => {
+  assert.equal(formatSharePct(0, 0), 'N/A');
+  assert.doesNotMatch(formatSharePct(0, 0), /—/);
+});
+
 test('HateCrimeCompositionChart labels both composition series and participation', () => {
   const summary: HateCrimeYearSummary = {
     year: '2024',
@@ -175,6 +191,22 @@ test('HateCrimeYearSeriesChart renders per-year share and participation labels',
   assert.match(html, /Agencies participating nationally/);
   assert.match(html, /2020/);
   assert.match(html, /2024/);
+});
+
+test('HateCrimeYearSeriesChart shows N/A instead of an em dash for a year with no incidents or participation data', () => {
+  const summaries: readonly HateCrimeYearSummary[] = [
+    {
+      year: '2019',
+      incidents: 0,
+      antiBlackIncidents: 0,
+      reportingCountyYears: 0,
+      source: 'FBI Crime Data Explorer',
+      sourceUrl: 'https://ucr.fbi.gov/hate-crime',
+    },
+  ];
+  const html = renderToStaticMarkup(createElement(HateCrimeYearSeriesChart, { summaries }));
+  assert.match(html, /N\/A/);
+  assert.doesNotMatch(html, /—/);
 });
 
 test('StatePopulationShiftChart labels Puerto Rico instead of State 72', () => {
@@ -278,6 +310,38 @@ test('GroupedBarIndicatorChart returns nothing when points are empty', () => {
   const html = renderToStaticMarkup(
     createElement(GroupedBarIndicatorChart, {
       series: { ...DATA_PAGE_INDICATOR_FIXTURE_BUNDLE.hmdaDenialRates, points: [] },
+    }),
+  );
+  assert.equal(html, '');
+});
+
+test('TrendLineChart renders the DKKS wealth ratio benchmark years back to 1860', () => {
+  const series = DATA_PAGE_INDICATOR_FIXTURE_BUNDLE.wealthRatioLongArc;
+  if (series === undefined) throw new Error('wealthRatioLongArc fixture missing');
+  const html = renderToStaticMarkup(createElement(TrendLineChart, { series }));
+  assert.match(html, /White-to-Black per-capita wealth ratio/);
+  assert.match(html, /1860/);
+  assert.match(html, /2019/);
+  assert.match(html, /6\.6×/); // 2019 ratio in the accessible table
+  assert.doesNotMatch(html, /1929/); // no white-side estimate that year: point is skipped
+});
+
+test('TrendLineChart renders the national homeownership long arc with two named series', () => {
+  const series = DATA_PAGE_INDICATOR_FIXTURE_BUNDLE.nationalHomeownershipLongArc;
+  if (series === undefined) throw new Error('nationalHomeownershipLongArc fixture missing');
+  const html = renderToStaticMarkup(createElement(TrendLineChart, { series }));
+  assert.match(html, /Homeownership by householder race, United States/);
+  assert.match(html, /Black householder/);
+  assert.match(html, /White Non-Hispanic householder/);
+  assert.match(html, /1900/);
+  assert.match(html, /2024/);
+  assert.doesNotMatch(html, />2020</); // no standard ACS 1-year release that year
+});
+
+test('TrendLineChart returns nothing when points are empty', () => {
+  const html = renderToStaticMarkup(
+    createElement(TrendLineChart, {
+      series: { ...DATA_PAGE_INDICATOR_FIXTURE_BUNDLE.cookHomeownership, points: [] },
     }),
   );
   assert.equal(html, '');

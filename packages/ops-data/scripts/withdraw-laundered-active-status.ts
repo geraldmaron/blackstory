@@ -141,13 +141,23 @@ try {
       id: row.id,
       kind: row.kind,
       displayName: row.display_name,
-      summary: projection.summary as string | undefined,
-      historicalContext: projection.historicalContext as string | undefined,
-      eraBuckets: projection.eraBuckets as readonly string[] | undefined,
-      researchCoverage: projection.researchCoverage as string | undefined,
+      ...(projection.summary !== undefined ? { summary: projection.summary as string } : {}),
+      ...(projection.historicalContext !== undefined
+        ? { historicalContext: projection.historicalContext as string }
+        : {}),
+      ...(projection.eraBuckets !== undefined
+        ? { eraBuckets: projection.eraBuckets as readonly string[] }
+        : {}),
+      ...(projection.researchCoverage !== undefined
+        ? { researchCoverage: projection.researchCoverage as string }
+        : {}),
       claims: (
         (projection.claims as { id?: string; predicate?: string; object?: string }[]) ?? []
-      ).map((claim) => ({ id: claim.id, predicate: claim.predicate, object: claim.object })),
+      ).map((claim) => ({
+        ...(claim.id !== undefined ? { id: claim.id } : {}),
+        ...(claim.predicate !== undefined ? { predicate: claim.predicate } : {}),
+        ...(claim.object !== undefined ? { object: claim.object } : {}),
+      })),
     });
     if (derived.status !== 'unknown') {
       reject(`corrected derivation still says ${derived.status ?? '(none)'}`);

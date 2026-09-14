@@ -11,7 +11,15 @@ import type { SearchRuntime } from './search-runtime';
 import type { SearchResponseV1 } from './search-contracts';
 
 export function emptyFacets() {
-  return { kind: {}, status: {}, era: {}, theme: {}, state: {}, recordMaturity: {}, researchCoverage: {} };
+  return {
+    kind: {},
+    status: {},
+    era: {},
+    theme: {},
+    state: {},
+    recordMaturity: {},
+    researchCoverage: {},
+  };
 }
 
 export function page(overrides: Partial<SearchResponseV1> = {}): SearchResponseV1 {
@@ -35,7 +43,9 @@ export function page(overrides: Partial<SearchResponseV1> = {}): SearchResponseV
   };
 }
 
-export function fakeReleaseCache(initialStamp: string | undefined): ReleaseCache & { setStamp(s: string | undefined): void } {
+export function fakeReleaseCache(
+  initialStamp: string | undefined,
+): ReleaseCache & { setStamp(s: string | undefined): void } {
   let stamp = initialStamp;
   const rows = new Map<string, { value: unknown; releaseStamp: string; fetchedAt: number }>();
   return {
@@ -47,12 +57,20 @@ export function fakeReleaseCache(initialStamp: string | undefined): ReleaseCache
       return 0;
     },
     async write(namespace, key, value, meta) {
-      rows.set(`${namespace}:${key}`, { value, releaseStamp: meta.releaseStamp, fetchedAt: meta.fetchedAt });
+      rows.set(`${namespace}:${key}`, {
+        value,
+        releaseStamp: meta.releaseStamp,
+        fetchedAt: meta.fetchedAt,
+      });
     },
     async verifyAndWriteArtifact() {
       throw new Error('not used in these tests');
     },
-    async read<T>(namespace: string, key: string, opts: { activeStamp: string; degraded: boolean; now: number }) {
+    async read<T>(
+      namespace: string,
+      key: string,
+      opts: { activeStamp: string; degraded: boolean; now: number },
+    ) {
       const row = rows.get(`${namespace}:${key}`);
       if (!row) return undefined;
       if (row.releaseStamp !== opts.activeStamp) {
@@ -61,7 +79,12 @@ export function fakeReleaseCache(initialStamp: string | undefined): ReleaseCache
       }
       return {
         value: row.value as T,
-        freshness: { source: 'cache' as const, fetchedAt: row.fetchedAt, releaseStamp: row.releaseStamp, degraded: opts.degraded },
+        freshness: {
+          source: 'cache' as const,
+          fetchedAt: row.fetchedAt,
+          releaseStamp: row.releaseStamp,
+          degraded: opts.degraded,
+        },
       };
     },
     setStamp(next) {
@@ -90,19 +113,21 @@ export function makeControllableTransport(opts: { cooperative: boolean }): {
   const pendingSet = new Set<PendingCall>();
 
   const transport: Transport = {
-    readJson: <T,>(path: string, readOpts?: { signal?: AbortSignal }) => {
+    readJson: <T>(path: string, readOpts?: { signal?: AbortSignal }) => {
       calls.push(path);
-      return new Promise<{ kind: 'ok'; status: number; data: T; etag?: string }>((resolve, reject) => {
-        const entry: PendingCall = { path, resolve: resolve as (v: unknown) => void, reject };
-        byIndex.push(entry);
-        pendingSet.add(entry);
-        if (opts.cooperative && readOpts?.signal) {
-          readOpts.signal.addEventListener('abort', () => {
-            pendingSet.delete(entry);
-            reject(new TransportError('aborted', { kind: 'aborted', attempts: 1 }));
-          });
-        }
-      });
+      return new Promise<{ kind: 'ok'; status: number; data: T; etag?: string }>(
+        (resolve, reject) => {
+          const entry: PendingCall = { path, resolve: resolve as (v: unknown) => void, reject };
+          byIndex.push(entry);
+          pendingSet.add(entry);
+          if (opts.cooperative && readOpts?.signal) {
+            readOpts.signal.addEventListener('abort', () => {
+              pendingSet.delete(entry);
+              reject(new TransportError('aborted', { kind: 'aborted', attempts: 1 }));
+            });
+          }
+        },
+      );
     },
     mutate: async () => {
       throw new Error('mutate is not used by search');

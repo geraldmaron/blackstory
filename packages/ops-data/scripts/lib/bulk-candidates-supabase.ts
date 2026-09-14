@@ -30,12 +30,12 @@ export type BulkFixtureCandidate = {
   readonly kind: string;
   readonly displayName: string;
   readonly summary: string;
-  readonly canonicalUrl?: string;
-  readonly lat?: number;
-  readonly lng?: number;
+  readonly canonicalUrl?: string | undefined;
+  readonly lat?: number | undefined;
+  readonly lng?: number | undefined;
   readonly discoveredAt: string;
-  readonly researchLaneOnly?: boolean;
-  readonly provenance?: Readonly<Record<string, unknown>>;
+  readonly researchLaneOnly?: boolean | undefined;
+  readonly provenance?: Readonly<Record<string, unknown>> | undefined;
 };
 
 export type BulkFixtureFile = {

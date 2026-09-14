@@ -123,6 +123,86 @@ test('disconnect removes the subscription', () => {
   }
 });
 
+test('subscribe notifies on a change, after matches() already reflects it', () => {
+  // useSyncExternalStore's contract: the callback fires, and getSnapshot (matches()) must already
+  // return the new value by the time it does — not a stale read the consumer has to double-check.
+  const fake = withFakeMatchMedia(false);
+  try {
+    const listener = createReducedMotionListener();
+    let notified = 0;
+    let matchesAtNotify: boolean | undefined;
+    listener.subscribe(() => {
+      notified += 1;
+      matchesAtNotify = listener.matches();
+    });
+    for (const handler of fake.query.handlers) handler({ matches: true });
+    assert.equal(notified, 1);
+    assert.equal(matchesAtNotify, true);
+    listener.disconnect();
+  } finally {
+    fake.restore();
+  }
+});
+
+test('subscribe supports more than one subscriber off the one underlying query', () => {
+  // The whole point: every React consumer of use-reduced-motion.ts shares this one listener
+  // instance rather than each opening its own matchMedia subscription.
+  const fake = withFakeMatchMedia(false);
+  try {
+    const listener = createReducedMotionListener();
+    let a = 0;
+    let b = 0;
+    const unsubscribeA = listener.subscribe(() => {
+      a += 1;
+    });
+    listener.subscribe(() => {
+      b += 1;
+    });
+    for (const handler of fake.query.handlers) handler({ matches: true });
+    assert.equal(a, 1);
+    assert.equal(b, 1);
+    unsubscribeA();
+    for (const handler of fake.query.handlers) handler({ matches: false });
+    assert.equal(a, 1, 'unsubscribed callback must not fire again');
+    assert.equal(b, 2);
+    listener.disconnect();
+  } finally {
+    fake.restore();
+  }
+});
+
+test('disconnect clears subscribers too', () => {
+  const fake = withFakeMatchMedia(false);
+  try {
+    const listener = createReducedMotionListener();
+    let calls = 0;
+    listener.subscribe(() => {
+      calls += 1;
+    });
+    listener.disconnect();
+    // The query itself is gone from the listener's perspective; nothing left to notify.
+    assert.equal(calls, 0);
+  } finally {
+    fake.restore();
+  }
+});
+
+test('subscribe on the unavailable-matchMedia listener is a harmless no-op', () => {
+  const globalScope = globalThis as unknown as { window?: unknown };
+  const previous = globalScope.window;
+  delete globalScope.window;
+  try {
+    const listener = createReducedMotionListener();
+    const unsubscribe = listener.subscribe(() => {
+      throw new Error('must never be called: matchMedia never changes here');
+    });
+    unsubscribe();
+    listener.disconnect();
+  } finally {
+    if (previous !== undefined) globalScope.window = previous;
+  }
+});
+
 test('matches() reads the latched value rather than re-querying', () => {
   // The Framed camera path calls this inside a requestAnimationFrame callback, so it must cost a
   // property read. Mutating the query's own `matches` without dispatching a change proves the

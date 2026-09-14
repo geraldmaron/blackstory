@@ -1,6 +1,7 @@
 /**
  * Negative redaction snapshots — proving specific sensitive/internal fields are ABSENT from real
- * `/v1` response payloads (ADR-021 §3). Mirrors the sensitive-field negative-snapshot style of
+ * `/v1` response payloads (`docs/decisions-carryover.md`, "ADR-021's two invariants":
+ * public-response redaction). Mirrors the sensitive-field negative-snapshot style of
  * `packages/public-contracts/src/v1/entity.test.ts`: a fixture that carries forbidden keys must not
  * see them survive onto the wire.
  */
@@ -152,4 +153,39 @@ test('served media URLs are http(s) pass-through only — no gs:// bucket ARNs o
   );
   assert.equal(image.objectPath, 'entities/ent_dunbar_school_001/primary.jpg');
   assert.ok(!('gsUri' in image), 'internal gs:// references must not appear on the wire');
+});
+
+test('search result carries a confidence TIER (an assessment) but still no evidence COUNT', async () => {
+  // Two independent, non-Wikipedia lineages, neither of them the record's own index row: the one
+  // rule in `@repo/public-contracts/evidence` grades that `high`.
+  const entity = makeEntity({
+    claims: [
+      {
+        ...VALID_CLAIM,
+        id: 'claim_tier_001',
+        claimRole: 'evidence',
+        citation: { source: 'loc.gov', label: 'Library of Congress' },
+      },
+      {
+        ...VALID_CLAIM,
+        id: 'claim_tier_002',
+        claimRole: 'evidence',
+        citation: { source: 'catalog.archives.example', label: 'National Archives catalog' },
+      },
+    ] as never,
+  });
+  const res = await dispatch(makeRequest('/v1/search', 'q=dunbar'), makeDeps(entity));
+  assert.equal(res.status, 200);
+  const result = (res.body as { results: Record<string, unknown>[] }).results[0] ?? {};
+  assert.equal(result.confidenceTier, 'high');
+  for (const forbidden of ['evidenceCount', 'connectionCount', 'claimCount', 'relatedCount']) {
+    assert.ok(!(forbidden in result), `${forbidden} must not appear alongside the tier`);
+  }
+});
+
+test('a record with no claims is served `unrated`, never a low grade', async () => {
+  const res = await dispatch(makeRequest('/v1/search', 'q=dunbar'), makeDeps(makeEntity()));
+  assert.equal(res.status, 200);
+  const result = (res.body as { results: Record<string, unknown>[] }).results[0] ?? {};
+  assert.equal(result.confidenceTier, 'unrated');
 });

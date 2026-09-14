@@ -173,3 +173,47 @@ test('copy carries no em dash', () => {
   const html = renderToStaticMarkup(createElement(LensPanel, lensProps()));
   assert.equal(html.includes('—'), false);
 });
+
+/**
+ * Isolated to the Population layer group's own markup, not the whole panel: `PlaceFinder` (in
+ * the Where group, well before this text in document order) starts its own "Go" button disabled
+ * until the reader types something, which is correct there and would otherwise fool a page-wide
+ * `disabled=""` count into looking like a population-layer regression.
+ */
+function populationLayerGroupHtml(html: string): string {
+  const start = html.indexOf('Population layer');
+  assert.ok(start >= 0, 'Population layer group not found');
+  const end = html.indexOf('</details>', start);
+  return html.slice(start, end === -1 ? undefined : end);
+}
+
+test('a violence-constrained lens disables the density/choropleth chips, not "off"', () => {
+  const html = renderToStaticMarkup(
+    createElement(LensPanel, lensProps({ areaFillPermitted: false, layerMode: 'off' })),
+  );
+  // "Off" stays enabled: the gate refuses a fill, never the ability to turn one off.
+  assert.doesNotMatch(html, /"Off"[^]*?disabled=""/);
+  const disabledCount = (populationLayerGroupHtml(html).match(/disabled=""/g) ?? []).length;
+  assert.equal(disabledCount, 2, 'blackShare and blackChange must both be disabled');
+});
+
+test('a permitted lens leaves every population-layer chip enabled', () => {
+  const html = renderToStaticMarkup(
+    createElement(LensPanel, lensProps({ areaFillPermitted: true })),
+  );
+  assert.equal(populationLayerGroupHtml(html).includes('disabled=""'), false);
+});
+
+test('the refusal reason renders as a visible paragraph, not only a title attribute', () => {
+  const html = renderToStaticMarkup(
+    createElement(LensPanel, lensProps({ areaFillPermitted: false })),
+  );
+  assert.match(html, /class="ds-lens__note"[^>]*>Not available while a topic/);
+});
+
+test('the ordinary Census comparability note gives way to the refusal note under the gate', () => {
+  const html = renderToStaticMarkup(
+    createElement(LensPanel, lensProps({ areaFillPermitted: false, layerMode: 'blackShare' })),
+  );
+  assert.doesNotMatch(html, /Published Census decennial counts/);
+});

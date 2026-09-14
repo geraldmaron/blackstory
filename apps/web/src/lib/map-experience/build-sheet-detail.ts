@@ -2,12 +2,11 @@
  * The record sheet's sources and connections, derived on the client from data the map already
  * holds.
  *
- * The sheet used to hardcode `sources: []` and `connections: []`, so it always fell through to
- * "no sources are published for this record yet" — on records whose own anatomy line, three rows
- * above, read "Grade A · 1 source". The fix is not a new fetch. The explore view model already
- * ships the history-graph edge catalog to the client for the line layer, and every edge carries
- * its relationship type and its citations. Both halves of the sheet's apparatus are already in
- * the browser; they were simply never read.
+ * No new fetch. The explore view model already ships the history-graph edge catalog to the client
+ * for the line layer, and every edge carries its relationship type and its citations. A sheet that
+ * returned `sources: []` and `connections: []` would fall through to "no sources are published for
+ * this record yet" on a record whose own anatomy line, three rows above, reads "Grade A · 1
+ * source".
  *
  * The ALL-TIME slice is the right input, not the active decade slice. The decade rail filters
  * what the map draws; it must not filter what a record is documented by. A reader who has

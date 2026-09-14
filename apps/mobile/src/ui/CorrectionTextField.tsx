@@ -26,11 +26,7 @@ export const CorrectionTextField = forwardRef<TextInput, CorrectionTextFieldProp
     const status = useStatusColors();
     const [focused, setFocused] = useState(false);
 
-    const borderColor = invalid
-      ? status.error.border
-      : focused
-        ? theme.accent
-        : theme.border;
+    const borderColor = invalid ? status.error.border : focused ? theme.accent : theme.border;
 
     return (
       <TextInput

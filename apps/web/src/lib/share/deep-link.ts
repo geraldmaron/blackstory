@@ -1,10 +1,12 @@
 /**
  * Share deep links for archive records.
  *
- * ADR-017: a shared URL restores *what* the reader was looking at, never *where the camera was*.
- * Live pan/zoom is deliberately absent. The camera is a property of one reader's session, and
- * pinning it would hand the recipient a framing they did not choose and cannot tell from data.
- * `assertNoViewportKeys` enforces that at runtime so the rule survives future edits.
+ * Viewport policy (`docs/decisions-carryover.md`, "Persistent map canvas"): a shared URL
+ * restores *what* the reader was looking at, never *where the camera was*. Live pan/zoom is
+ * deliberately absent. The camera is a property of one reader's session, and pinning it would
+ * hand the recipient a framing they did not choose and cannot tell from data.
+ * `assertNoViewportKeys` enforces that at runtime so the rule survives future edits, over a
+ * forbidden-key list deliberately wider than the three keys the edge allowlist drops.
  *
  * Param naming: this module's input fields use the share vocabulary (`record`, `grade`) while the
  * emitted query string uses the params `/explore` already parses (`selected`, `confidence`) — see
@@ -48,7 +50,7 @@ const SHARE_FIELDS = Object.keys(WIRE_KEYS) as ReadonlyArray<keyof ShareDeepLink
 function assertNoViewportKeys(params: URLSearchParams): void {
   for (const forbidden of FORBIDDEN_VIEWPORT_KEYS) {
     if (params.has(forbidden)) {
-      throw new Error(`Share links must not carry viewport state (ADR-017): ${forbidden}`);
+      throw new Error(`Share links must not carry viewport state: ${forbidden}`);
     }
   }
 }

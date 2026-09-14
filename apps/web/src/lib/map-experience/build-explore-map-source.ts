@@ -37,11 +37,19 @@ export type { ConfidenceTier };
  * A transparency affordance about how strongly evidenced a record is, never a numeric score
  * (ranking-signal ban).
  *
- * This used to be a local bare-maximum over claim levels. It is now the shared rule, which also
- * accounts for corroboration — see `recordConfidenceTier`. Re-exported here because Explore,
- * Records and the record page all reached for it under this name.
+ * The tier is the shared rule in `@repo/public-contracts/evidence`, not a local bare-maximum
+ * over claim levels: it also accounts for corroboration — see `recordConfidenceTier`.
+ * Re-exported here because Explore, Records and the record page all reach for it under this name.
+ *
+ * `confidenceTierFromEvidenceInputs` is that same rule reached from the other end. A surface
+ * holding live claims calls `recordConfidenceTier`; `/records`, which holds the slim index's
+ * cached grading inputs instead of claims, calls this. Both land in one function, which is what
+ * stops the two rooms grading the same record differently after a rule change.
  */
-export { recordConfidenceTier } from '@repo/public-contracts/evidence';
+export {
+  confidenceTierFromEvidenceInputs,
+  recordConfidenceTier,
+} from '@repo/public-contracts/evidence';
 
 export type ExploreMapFeatureProperties = {
   readonly entityId: string;
@@ -147,7 +155,8 @@ export type JurisdictionAreaFeature = {
 };
 
 /** Pure polygon builder for jurisdiction-scoped area records. Coarse (bbox-cornered) polygon
- * geometry only, matching this repo's existing state-bbox-not-survey-grade posture (ADR-013).
+ * geometry only, matching this repo's existing state-bbox-not-survey-grade posture
+ * (`docs/decisions-carryover.md`, "Map stack": known gaps).
  * Callers supply live area records when projection data is available. */
 export function buildJurisdictionAreaFeatures(
   records: readonly AreaRecordInput[],
@@ -261,6 +270,8 @@ function enrichFeature(
     displayName: entity.displayName,
     kind: entity.kind,
     entityId: entity.id,
+    summary: entity.summary,
+    locationPrecision: entity.locationPrecision,
   });
   const holdingWalk = walkHref !== undefined && walkHref === href;
   const visitClaims = visitContactClaimsForMap(entity.claims);

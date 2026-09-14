@@ -103,8 +103,14 @@
   position: sticky;
   top: 64px;
   z-index: var(--ds-z-content, 1);
-  margin: var(--ds-space-8) calc(var(--ds-gutter) * -1) 0;
-  padding: 0 var(--ds-gutter);
+  /*
+   * Full bleed: pull out by exactly the column's own inline padding, whatever it currently is,
+   * and put it back as padding. `--ds-gutter` is not that below 560px, where the room column
+   * narrows to `--ds-space-3` — the nav used to run 4px past each viewport edge on a 320pt
+   * phone, hidden only by the body's clip.
+   */
+  margin: var(--ds-space-8) calc(var(--room-doc-pad, var(--ds-gutter)) * -1) 0;
+  padding: 0 var(--room-doc-pad, var(--ds-gutter));
   background: color-mix(in srgb, var(--ds-canvas) 92%, transparent);
   -webkit-backdrop-filter: blur(10px);
   backdrop-filter: blur(10px);

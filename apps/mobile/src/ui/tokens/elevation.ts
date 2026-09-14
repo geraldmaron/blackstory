@@ -2,7 +2,10 @@
  * Mobile elevation tokens — flat matte per web `--ds-elevation-*: none`.
  *
  * Browse and shell surfaces use hairline borders only. Map floating instruments
- * may opt into `sm` shadow via ADR-013 explore chrome; default is always flat.
+ * may opt into `sm` shadow under the narrow exception in
+ * `docs/ui/design-direction-v6-mobile.md`; default is always flat, and no caller
+ * takes the exception today. This was never an ADR-013 rule; see
+ * `docs/decisions-carryover.md`, "Map stack" (ADR-013 does not exist).
  */
 import { Platform, type ViewStyle } from 'react-native';
 

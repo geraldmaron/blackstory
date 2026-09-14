@@ -1,8 +1,9 @@
 """BB-084: schedulable entry points for the research worker.
 
-Historical Cloud Scheduler dispatch targeted Cloud Run Jobs (ADR-007). Scheduled discovery and
-overnight enrichment now run on Corsair/systemd against the Postgres research ledger; this module
-retains the source-drift run-health job shape for adapter evaluation only.
+Historical Cloud Scheduler dispatch targeted Cloud Run Jobs (docs/decisions-carryover.md,
+"Scheduled-job worker packages"). Scheduled discovery and overnight enrichment now run on
+Corsair/systemd against the Postgres research ledger; this module retains the source-drift
+run-health job shape for adapter evaluation only.
 """
 
 from __future__ import annotations

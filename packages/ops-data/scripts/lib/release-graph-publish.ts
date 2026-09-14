@@ -11,11 +11,13 @@ import {
   serializeGraphAllTimeView,
   serializeGraphDecadeView,
   extractCatalogRelationships,
+  RELATIONSHIP_TYPES,
   type DecadeBucketEntityInput,
   type EntityRelationship,
   type GraphPublishAuditReport,
   type GraphReleaseArtifact,
   type RelationshipType,
+  type TemporalContext,
 } from '@repo/domain';
 import { decadeStartYearFromLabel } from '@repo/domain/era';
 import type { StatusHistoryEntry } from '@repo/domain';
@@ -129,7 +131,13 @@ function parseStatusHistory(value: unknown): readonly StatusHistoryEntry<string>
   return entries.length > 0 ? entries : undefined;
 }
 
-function temporalFromRelationship(row: CanonicalRelationshipRow): EntityRelationship['temporal'] {
+/**
+ * Relationship temporal context as the graph rows carry it: the standard `TemporalContext` fields
+ * plus the fixed `datePrecision` the published row has always included.
+ */
+type RelationshipTemporal = TemporalContext & { readonly datePrecision: 'year' };
+
+function temporalFromRelationship(row: CanonicalRelationshipRow): RelationshipTemporal | undefined {
   const validFrom = row.valid_from_edtf ?? row.valid_from ?? undefined;
   const validTo = row.valid_to_edtf ?? row.valid_to ?? undefined;
   if (!validFrom && !validTo) return undefined;
@@ -140,17 +148,21 @@ function temporalFromRelationship(row: CanonicalRelationshipRow): EntityRelation
   };
 }
 
+function isRelationshipType(value: unknown): value is RelationshipType {
+  return typeof value === 'string' && (RELATIONSHIP_TYPES as readonly string[]).includes(value);
+}
+
 function relatedFromProjection(
   projection: Readonly<Record<string, unknown>>,
-): readonly { id: string; type: string; direction: 'outgoing' | 'incoming' }[] {
+): readonly { id: string; type: RelationshipType; direction: 'outgoing' | 'incoming' }[] {
   const related = projection.related;
   if (!Array.isArray(related)) return [];
   return related.filter(
-    (entry): entry is { id: string; type: string; direction: 'outgoing' | 'incoming' } =>
+    (entry): entry is { id: string; type: RelationshipType; direction: 'outgoing' | 'incoming' } =>
       !!entry &&
       typeof entry === 'object' &&
       typeof (entry as Record<string, unknown>).id === 'string' &&
-      typeof (entry as Record<string, unknown>).type === 'string' &&
+      isRelationshipType((entry as Record<string, unknown>).type) &&
       ((entry as Record<string, unknown>).direction === 'outgoing' ||
         (entry as Record<string, unknown>).direction === 'incoming'),
   );
@@ -183,13 +195,14 @@ function mergeRelationships(
 
 export function mapCanonicalRelationshipRow(row: CanonicalRelationshipRow): EntityRelationship {
   const now = new Date().toISOString();
+  const temporal = temporalFromRelationship(row);
   return {
     id: row.id,
     fromEntityId: row.from_entity_id,
     toEntityId: row.to_entity_id,
     type: row.relationship_type as RelationshipType,
     evidenceIds: [...row.evidence_ids],
-    ...(temporalFromRelationship(row) ? { temporal: temporalFromRelationship(row) } : {}),
+    ...(temporal ? { temporal } : {}),
     createdAt: now,
     updatedAt: now,
   };
@@ -203,16 +216,21 @@ export function buildDecadeEntitiesForGraph(input: {
   for (const row of input.releaseRows) {
     const projection = asRecord(row.projection) ?? {};
     const canonical = input.canonicalById.get(row.entity_id);
+    const statusHistory =
+      parseStatusHistory(projection.statusHistory) ?? parseStatusHistory(canonical?.status_history);
+    const kindDetail = asRecord(canonical?.kind_detail);
     const bucketInput = deriveGraphDecadeBucketInput({
       entityId: row.entity_id,
       kind: row.kind,
       eraBuckets: asStringArray(projection.eraBuckets),
-      statusHistory:
-        parseStatusHistory(projection.statusHistory) ??
-        parseStatusHistory(canonical?.status_history),
-      kindDetail: asRecord(canonical?.kind_detail),
-      locationValidFromEdtf: canonical?.valid_from_edtf,
-      locationValidToEdtf: canonical?.valid_to_edtf,
+      ...(statusHistory !== undefined ? { statusHistory } : {}),
+      ...(kindDetail !== undefined ? { kindDetail } : {}),
+      ...(canonical?.valid_from_edtf !== undefined
+        ? { locationValidFromEdtf: canonical.valid_from_edtf }
+        : {}),
+      ...(canonical?.valid_to_edtf !== undefined
+        ? { locationValidToEdtf: canonical.valid_to_edtf }
+        : {}),
       ...(typeof projection.eventWindow === 'object' && projection.eventWindow
         ? {
             eventWindow: {

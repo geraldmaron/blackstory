@@ -1,7 +1,10 @@
 /**
- * Re-export shim: implementation moved to @repo/domain-core/living to break the
- * @repo/domain <-> @repo/security circular dependency (this module has no security-specific
- * logic and @repo/security needs it directly). Keep this file so every existing relative import
- * of './living.js' inside @repo/domain keeps working unchanged.
+ * Re-export shim: the implementation lives in @repo/domain-core/living.
+ *
+ * That package holds the domain primitives `@repo/security` needs. `@repo/security` must not
+ * import `@repo/domain` — `@repo/domain` imports `@repo/security`, so the reverse edge would be a
+ * cycle — and `@repo/domain-core` depends on neither, so both can read it.
+ *
+ * Keep this file so relative imports of './living.js' inside @repo/domain resolve.
  */
 export * from '@repo/domain-core/living';

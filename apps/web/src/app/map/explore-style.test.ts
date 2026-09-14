@@ -31,6 +31,7 @@ import {
   ENTITY_CLUSTER_OPACITY,
   ENTITY_HALO_OPACITY,
   ENTITY_POINT_FILL_OPACITY,
+  ENTITY_PRECISION_RADIUS_OPACITY,
   ENTITY_SELECTED_PULSE_OPACITY_FROM,
   ENTITY_SELECTED_PULSE_OPACITY_TO,
   ENTITY_SELECTED_PULSE_SCALE_FROM,
@@ -49,6 +50,7 @@ import {
   EXPLORE_HISTORY_EDGES_LAYER_ID,
   EXPLORE_HISTORY_EDGES_SELECTED_LAYER_ID,
   EXPLORE_JURISDICTION_AREA_LAYER_ID,
+  EXPLORE_PRECISION_RADIUS_LAYER_ID,
   EXPLORE_SELECTED_POINT_LAYER_ID,
   EXPLORE_STATE_DENSITY_LAYER_ID,
   EXPLORE_UNCLUSTERED_EVENT_GLYPH_LAYER_ID,
@@ -171,6 +173,7 @@ test('unclustered point fill and halo use first-paint opacity nationally, kind o
 test('GL entity discs hide once HTML first-paint markers mount above cluster max zoom', () => {
   const style = buildStyleFixture('presence');
   for (const layerId of [
+    EXPLORE_PRECISION_RADIUS_LAYER_ID,
     EXPLORE_UNCLUSTERED_HALO_LAYER_ID,
     EXPLORE_UNCLUSTERED_POINT_LAYER_ID,
     EXPLORE_UNCLUSTERED_EVENT_GLYPH_LAYER_ID,
@@ -255,6 +258,7 @@ test('selection touches only the dedicated ring layer — main entity layers nev
     EXPLORE_UNCLUSTERED_HALO_LAYER_ID,
     EXPLORE_UNCLUSTERED_EVENT_GLYPH_LAYER_ID,
     EXPLORE_CLUSTER_LAYER_ID,
+    EXPLORE_PRECISION_RADIUS_LAYER_ID,
   ];
   for (const id of neighborLayerIds) {
     const layer = layerById(style, id) as LayerLike & { filter?: unknown };
@@ -437,6 +441,44 @@ test('OpenFreeMap street layers are present for casing, fill, and labels', () =>
   assert.ok(style.layers.some((layer) => layer.id === 'explore-street-casing'));
   assert.ok(style.layers.some((layer) => layer.id === 'explore-street-fill'));
   assert.ok(style.layers.some((layer) => layer.id === 'explore-street-label'));
+});
+
+test('plate-road paints the design-law `road` role and hands off to the local street layers at z8', () => {
+  // repo-rnlh: `plate.road` (design-direction-v9-atlas.md's "Motorway/trunk/primary, minzoom: 6")
+  // had zero consumers: the local street layers use their own, separately-tuned `streetCasing`/
+  // `street` literals (repo-ktwh's class-hierarchy work), not this token.
+  const source = buildExploreMapSource(listPublicEntities());
+  for (const colorScheme of ['light', 'dark'] as const) {
+    const style = buildExploreMapStyle({
+      featureCollection: source.featureCollection,
+      jurisdictionAreaFeatures: source.jurisdictionAreaFeatures,
+      layerMode: 'off',
+      colorScheme,
+    });
+    const roadLayer = layerById(style, 'plate-road') as {
+      type?: string;
+      source?: string;
+      'source-layer'?: string;
+      minzoom?: number;
+      maxzoom?: number;
+      filter?: unknown;
+      paint?: { 'line-color'?: unknown };
+    };
+    assert.equal(roadLayer.type, 'line');
+    assert.equal(roadLayer.source, 'openfreemap');
+    assert.equal(roadLayer['source-layer'], 'transportation');
+    assert.equal(roadLayer.minzoom, 6);
+    // Must not overlap explore-street-casing/-fill's own minzoom: 8, or the same roads paint twice.
+    assert.equal(roadLayer.maxzoom, 8);
+    assert.deepEqual(roadLayer.filter, [
+      'match',
+      ['get', 'class'],
+      ['motorway', 'trunk', 'primary'],
+      true,
+      false,
+    ]);
+    assert.equal(roadLayer.paint?.['line-color'], mapPalettes[colorScheme].road);
+  }
 });
 
 /** Pull the class→width match expression nested at a zoom stop inside a street line-width interpolate. */
@@ -909,6 +951,71 @@ test('point and halo radii blend first-paint sizes nationally with marker-size.t
   );
 });
 
+test('precision-radius layer paints under the halo, gated to features with a resolved radius', () => {
+  const style = buildStyleFixture('presence');
+  const layerIndex = style.layers.findIndex(
+    (layer) => layer.id === EXPLORE_PRECISION_RADIUS_LAYER_ID,
+  );
+  const haloIndex = style.layers.findIndex(
+    (layer) => layer.id === EXPLORE_UNCLUSTERED_HALO_LAYER_ID,
+  );
+  const pointIndex = style.layers.findIndex(
+    (layer) => layer.id === EXPLORE_UNCLUSTERED_POINT_LAYER_ID,
+  );
+  assert.ok(layerIndex >= 0, 'expected a precision-radius layer');
+  assert.ok(
+    layerIndex < haloIndex && layerIndex < pointIndex,
+    'the radius affordance must paint under the halo/point, as ground the marker sits on',
+  );
+
+  const layerSpec = style.layers.find(
+    (layer) => layer.id === EXPLORE_PRECISION_RADIUS_LAYER_ID,
+  ) as { filter?: unknown; maxzoom?: number };
+  // Clusters carry no per-feature radiusMeters, and a precision-tier that failed closed
+  // (`resolveDisplayRadiusMeters`'s `ok: false`) must draw no ring at all, never a guessed one.
+  assert.deepEqual(layerSpec.filter, [
+    'all',
+    ['!', ['has', 'point_count']],
+    ['has', 'radiusMeters'],
+  ]);
+  assert.equal(layerSpec.maxzoom, EXPLORE_GL_ENTITY_MAX_ZOOM);
+});
+
+test('precision-radius fill shares kind shade with the point, and fades in past national zoom like the halo', () => {
+  const style = buildStyleFixture('presence');
+  const pointLayer = layerById(style, EXPLORE_UNCLUSTERED_POINT_LAYER_ID);
+  const precisionLayer = layerById(style, EXPLORE_PRECISION_RADIUS_LAYER_ID);
+  assert.deepEqual(
+    precisionLayer.paint?.['circle-color'],
+    pointLayer.paint?.['circle-color'],
+    'the radius affordance must share kind shade with the point (not a flat sand wash)',
+  );
+  const opacity = precisionLayer.paint?.['circle-opacity'] as unknown[];
+  assert.equal(opacity[0], 'interpolate');
+  assert.deepEqual(opacity[4], ['literal', 0]);
+  assert.deepEqual(opacity[6], ['literal', ENTITY_PRECISION_RADIUS_OPACITY]);
+});
+
+test("precision-radius circle-radius is a single top-level exponential(2) zoom interpolate reading the feature's own radiusMeters", () => {
+  const style = buildStyleFixture('presence');
+  const precisionLayer = layerById(style, EXPLORE_PRECISION_RADIUS_LAYER_ID);
+  const radius = precisionLayer.paint?.['circle-radius'] as unknown[];
+  // Zoom may only ever be the direct input of a top-level step/interpolate (MapLibre style
+  // spec) — this is the two-stop base-2 exponential-interpolate idiom that reproduces
+  // `radiusMeters * 2^zoom / metersPerPixelAtZoom0` without nesting `['zoom']` inside
+  // arithmetic (`explore-style-spec.test.ts` proves this against the real validator/evaluator).
+  assert.equal(radius[0], 'interpolate');
+  assert.deepEqual(radius[1], ['exponential', 2]);
+  assert.deepEqual(radius[2], ['zoom']);
+  assert.equal(radius[3], 0);
+  assert.equal(radius[4], 0);
+  const atReferenceZoom = radius[6] as unknown[];
+  assert.deepEqual(atReferenceZoom[0], '/');
+  const numerator = atReferenceZoom[1] as unknown[];
+  assert.deepEqual(numerator[0], '*');
+  assert.deepEqual(numerator[1], ['coalesce', ['get', 'radiusMeters'], 0]);
+});
+
 test('clusters inherit dominant kind-family shade instead of Page Sand / copper chrome', () => {
   const style = buildStyleFixture('presence');
   const clusterLayer = layerById(style, EXPLORE_CLUSTER_LAYER_ID);
@@ -932,4 +1039,25 @@ test('clusters use zoom-scaled count-step radii from CLUSTER_RADIUS_BY_COUNT', (
   const nationalStep = (radius[4] as unknown[])[1] as unknown[];
   assert.equal(nationalStep[0], 'step');
   assert.deepEqual(nationalStep.slice(2), [10, 10, 14, 50, 18, 200, 22]);
+});
+
+test('both entity buffers promote entityId, so the decade morph can address records by id', () => {
+  /*
+   * repo-o56o. `setFeatureState` addresses a feature by its id, and a GeoJSON source has none
+   * unless one is promoted from the properties. Both buffers need it, because the hold marks are
+   * written to each: rest on the current buffer, zero on the incoming one.
+   *
+   * Safe alongside clustering, and this is the part worth stating rather than assuming. MapLibre's
+   * own `getId` (maplibre-gl 5.24, GeoJSONSource) reads the promoted property first and falls back
+   * to `cluster_id` only when that property is absent — which is exactly the cluster case, since a
+   * cluster carries no `entityId`. So leaves are addressable by record id and clusters keep their
+   * generated ids and go on animating, which is correct: a cluster is a different shape in each
+   * decade.
+   */
+  const style = buildStyleFixture('presence');
+  for (const sourceId of ['explore-entities', 'explore-entities-incoming']) {
+    const source = style.sources[sourceId] as { promoteId?: string; cluster?: boolean };
+    assert.equal(source.promoteId, 'entityId', `${sourceId} must promote entityId`);
+    assert.equal(source.cluster, true, `${sourceId} still clusters`);
+  }
 });

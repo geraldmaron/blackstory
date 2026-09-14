@@ -3,11 +3,13 @@
  * `apps/web/src/lib/public-data/map-projection.ts`) onto the public-contracts `EntityV1` wire DTO.
  *
  * This mapping used to live in `./firestore-data-access.ts` alongside the Firestore-specific client
- * plumbing; it moved here when the Firestore read path was removed (repo-348e.3 / ADR-020 cutover)
+ * plumbing; it moved here when the Firestore read path was removed (repo-348e.3; the Postgres
+ * cutover, `docs/decisions-carryover.md`, "entity source-of-truth precedence")
  * because `./postgres-data-access.ts` — the only remaining live adapter — depends on it too.
  *
  * Mapping a projection onto `EntityV1` is lossy by design, honestly:
- * - `kind` must be in the full public ontology (`ENTITY_KINDS` / ADR-015). A projection whose
+ * - `kind` must be in the full public ontology (`ENTITY_KINDS` / docs/decisions-carryover.md,
+ *   "Entity ontology"). A projection whose
  *   `kind` falls outside that set maps to `undefined`, which — same as an unpublished or
  *   nonexistent id — the handler cannot distinguish from a 404 (T3).
  * - Inline `claims` on the projection map through when present; bootstrap-window stubs that carry

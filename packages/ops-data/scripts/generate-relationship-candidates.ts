@@ -115,10 +115,12 @@ function toCandidateEntity(row: EntityRow): RelationshipCandidateEntity {
     ? (row.status_history as readonly StatusHistoryEntry<string>[])
     : [];
 
+  const label = jurisdictionLabel(row);
+
   return {
     id: row.id,
     kind: row.kind,
-    jurisdictionLabel: jurisdictionLabel(row),
+    ...(label !== undefined ? { jurisdictionLabel: label } : {}),
     ...(row.geohash ? { geohash: row.geohash } : {}),
     ...(row.location_precision ? { locationPrecision: row.location_precision } : {}),
     mentionedEntityIds: asStringArray(row.mentioned_entity_ids),
@@ -126,9 +128,9 @@ function toCandidateEntity(row: EntityRow): RelationshipCandidateEntity {
       kind: row.kind,
       eraBuckets: asStringArray(row.era_buckets),
       statusHistory,
-      kindDetail,
-      locationValidFromEdtf: row.valid_from_edtf,
-      locationValidToEdtf: row.valid_to_edtf,
+      ...(kindDetail !== undefined ? { kindDetail } : {}),
+      ...(row.valid_from_edtf !== undefined ? { locationValidFromEdtf: row.valid_from_edtf } : {}),
+      ...(row.valid_to_edtf !== undefined ? { locationValidToEdtf: row.valid_to_edtf } : {}),
     }),
   };
 }

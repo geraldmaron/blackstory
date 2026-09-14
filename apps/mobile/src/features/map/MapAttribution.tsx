@@ -1,5 +1,8 @@
 /**
- * Persistent, visible map attribution (MOB-011 / ADR-024).
+ * Map attribution (MOB-011; `docs/decisions-carryover.md`, "Native map render
+ * layer" §8). Not persistent today: it starts collapsed to an info toggle, and
+ * Explore passes `visible={false}` above the peek snap — see that section for what
+ * the license obligation does and does not currently guarantee.
  *
  * OpenStreetMap data is ODbL: attribution is a LICENSE OBLIGATION, so this must
  * stay on-screen whenever the basemap is shown — MapLibre's built-in attribution
@@ -24,10 +27,7 @@ import { Ionicons } from '@expo/vector-icons';
 import Animated, { FadeIn, FadeOut } from 'react-native-reanimated';
 import { duration, MIN_TOUCH_TARGET, radius, space, Text } from '@/ui';
 import { MAP_GHOST_BG, MAP_GHOST_BORDER, MAP_GHOST_PRESSED, MAP_INK_MUTED } from './map-plate-ink';
-import {
-  MAP_ATTRIBUTION_LINES,
-  MAP_ATTRIBUTION_LINES_COMPACT,
-} from './mapConfig';
+import { MAP_ATTRIBUTION_LINES, MAP_ATTRIBUTION_LINES_COMPACT } from './mapConfig';
 
 /**
  * Default bottom offset when Explore is not hosting the map (standalone MapScreen).

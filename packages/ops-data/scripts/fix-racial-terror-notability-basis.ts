@@ -68,6 +68,7 @@ import {
   type ReleaseClaimProjection,
   type ReleaseSourceEntity,
 } from '@repo/domain';
+import { remindToRepublishCatalogArtifacts } from './lib/catalog-republish-reminder.ts';
 import { normalizePgConnectionString } from './lib/pg-connection.ts';
 
 const DRY_RUN = process.env.DRY_RUN !== '0';
@@ -227,11 +228,7 @@ async function main(): Promise<void> {
         await client.query(
           `UPDATE bb_public.release_entities
              SET projection = COALESCE(projection, '{}'::jsonb)
-                   || jsonb_build_object('notabilityBasis', $1::jsonb, 'notabilityLabels', $2::jsonb),
-                 taxonomy = CASE
-                   WHEN taxonomy ? 'notabilityLabels'
-                     THEN taxonomy || jsonb_build_object('notabilityLabels', $2::jsonb)
-                   ELSE taxonomy END
+                   || jsonb_build_object('notabilityBasis', $1::jsonb, 'notabilityLabels', $2::jsonb)
            WHERE release_id = $3 AND entity_id = $4`,
           [JSON.stringify(change.after), JSON.stringify(labels), releaseId, change.row.entity_id],
         );
@@ -242,6 +239,7 @@ async function main(): Promise<void> {
       throw error;
     }
     console.log(`\nApplied: ${changes.length} record(s) repaired.`);
+    remindToRepublishCatalogArtifacts(changes.length);
   } finally {
     await client.end();
   }

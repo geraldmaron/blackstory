@@ -2,14 +2,10 @@
  * The Explore catalog: the release-wide, reader-independent half of the Explore view model, served
  * by `GET /atlas/catalog` and fetched once by the client.
  *
- * Why this exists (Vercel bill, 2026-08-22). `/` used to render the whole thing into its own HTML
- * as the `initial` prop of `AtlasExperience`: 4,101 features plus the history edge catalog, ~15 MB
- * of RSC payload, ~4 s of CPU, on every request, and `/` is dynamic (it reads `searchParams`), so
- * none of it was cacheable by the CDN. That one route was the month's Fast Origin Transfer and
- * Fluid Active CPU. Nothing in this payload depends on the request: it is the same bytes for
- * every reader until the release changes. So it lives behind a route handler that sets its own
- * `Cache-Control` (route handlers keep theirs; dynamic pages have it overwritten with no-store)
- * and the page ships only the request-scoped shell (`AtlasShellModel`).
+ * The catalog is separate from the shell because nothing in this payload depends on the request:
+ * it is the same bytes for every reader until the release changes. It lives behind a route handler
+ * that sets its own `Cache-Control` (route handlers keep theirs; dynamic pages have it overwritten
+ * with no-store), and the page ships only the request-scoped shell (`AtlasShellModel`).
  *
  * Server-only: reaches the history graph seed (`node:crypto`) and the articles read. The
  * client-safe assembly of shell + catalog into a view model is in `explore-view-model-wire.ts`.

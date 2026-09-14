@@ -1,6 +1,7 @@
 /**
- * Tests for v6 Explore records rail — hairline rows, copper selection rule, fact strips.
- * BottomSheetFlatList is mocked as a passthrough FlatList host for RNTL.
+ * Tests for v6 Explore records rail — hairline rows, copper selection rule plus a
+ * non-color checkmark mark, fact strips. BottomSheetFlatList is mocked as a
+ * passthrough FlatList host for RNTL.
  */
 import { fireEvent, render } from '@testing-library/react-native';
 
@@ -12,9 +13,7 @@ jest.mock('@gorhom/bottom-sheet', () => {
     BottomSheetFlatList: (props: Record<string, unknown>) => {
       const { ListHeaderComponent, ListEmptyComponent, ...rest } = props;
       const header =
-        typeof ListHeaderComponent === 'function'
-          ? ListHeaderComponent()
-          : ListHeaderComponent;
+        typeof ListHeaderComponent === 'function' ? ListHeaderComponent() : ListHeaderComponent;
       const data = rest.data as unknown[] | undefined;
       const empty =
         (!data || data.length === 0) && ListEmptyComponent
@@ -37,6 +36,8 @@ jest.mock('@gorhom/bottom-sheet', () => {
 import { ExploreRecordsRail } from '../ExploreRecordsRail';
 // eslint-disable-next-line import/first
 import type { ExploreFeature } from '@/features/explore/explore-feature';
+// eslint-disable-next-line import/first
+import { resetTestWindowSize, setTestWindowSize } from '@/ui/layout/testing';
 
 function feature(entityId: string, label: string): ExploreFeature {
   return {
@@ -93,10 +94,7 @@ describe('ExploreRecordsRail', () => {
   it('calls onSelect when a row is pressed', async () => {
     const onSelect = jest.fn();
     const { getByLabelText } = await render(
-      <ExploreRecordsRail
-        features={[feature('ent_a', 'Howard Theatre')]}
-        onSelect={onSelect}
-      />,
+      <ExploreRecordsRail features={[feature('ent_a', 'Howard Theatre')]} onSelect={onSelect} />,
     );
     fireEvent.press(getByLabelText(/Howard Theatre/));
     expect(onSelect).toHaveBeenCalledWith(expect.objectContaining({ entityId: 'ent_a' }));
@@ -108,5 +106,92 @@ describe('ExploreRecordsRail', () => {
     );
     expect(getByTestId('explore-records-empty')).toBeTruthy();
     expect(getByText('No places nearby')).toBeTruthy();
+  });
+
+  it('marks the selected row with a non-color checkmark, not the copper rule alone', async () => {
+    const { getByLabelText, queryByTestId } = await render(
+      <ExploreRecordsRail
+        features={[feature('ent_a', 'Howard Theatre')]}
+        selectedId="ent_a"
+        onSelect={() => undefined}
+      />,
+    );
+    // A shape/presence cue survives even if the reader cannot distinguish the copper rule by hue.
+    // The mark is decorative (accessibilityElementsHidden), so it must be looked up explicitly
+    // including hidden elements — the row's own accessibilityState/Label carry the a11y signal.
+    expect(
+      queryByTestId('explore-record-selected-mark', { includeHiddenElements: true }),
+    ).toBeTruthy();
+    const row = getByLabelText(/Howard Theatre/);
+    expect(row.props.accessibilityState).toEqual(expect.objectContaining({ selected: true }));
+    expect(row.props.accessibilityLabel).toMatch(/Selected\. 1 of 1$/);
+  });
+
+  it('marks the list container and says where each row sits, since neither screen reader does', async () => {
+    const { getByTestId, getByLabelText } = await render(
+      <ExploreRecordsRail
+        features={[feature('ent_a', 'Howard Theatre'), feature('ent_b', 'Lincoln Theatre')]}
+        onSelect={() => undefined}
+      />,
+    );
+    expect(getByTestId('explore-records-rail').props.accessibilityRole).toBe('list');
+    expect(getByLabelText(/Howard Theatre/).props.accessibilityLabel).toMatch(/1 of 2$/);
+    expect(getByLabelText(/Lincoln Theatre/).props.accessibilityLabel).toMatch(/2 of 2$/);
+  });
+
+  it('does not show the selection checkmark on an unselected row', async () => {
+    const { getByLabelText, queryByTestId } = await render(
+      <ExploreRecordsRail
+        features={[feature('ent_a', 'Howard Theatre')]}
+        onSelect={() => undefined}
+      />,
+    );
+    expect(
+      queryByTestId('explore-record-selected-mark', { includeHiddenElements: true }),
+    ).toBeNull();
+    const row = getByLabelText(/Howard Theatre/);
+    expect(row.props.accessibilityState).toEqual(expect.objectContaining({ selected: false }));
+  });
+});
+
+describe('ExploreRecordsRail — row titles at accessibility text sizes', () => {
+  afterEach(resetTestWindowSize);
+
+  it('keeps one line at ordinary text sizes', async () => {
+    setTestWindowSize({ width: 402, height: 874, fontScale: 1 });
+    const { getByText } = await render(
+      <ExploreRecordsRail
+        features={[feature('ent_a', '100 Block North Greenwood Avenue')]}
+        onSelect={() => undefined}
+      />,
+    );
+    expect(getByText('100 Block North Greenwood Avenue').props.numberOfLines).toBe(1);
+  });
+
+  it('lets the title wrap once one line stops holding a recognizable name', async () => {
+    // iOS accessibility-extra-extra-extra-large. At this size a title in the 300-400pt side
+    // rail had room for about four characters, so "100 Block North Greenwood Avenue", "10th
+    // U.S. Cavalry" and "1967 Detroit riot" all rendered as four characters and an ellipsis.
+    setTestWindowSize({ width: 834, height: 1194, fontScale: 3.1 });
+    const { getByText } = await render(
+      <ExploreRecordsRail
+        features={[feature('ent_a', '100 Block North Greenwood Avenue')]}
+        onSelect={() => undefined}
+      />,
+    );
+    expect(getByText('100 Block North Greenwood Avenue').props.numberOfLines).toBe(3);
+  });
+
+  it('still composes the whole name into the row label, at every size', async () => {
+    setTestWindowSize({ width: 402, height: 874, fontScale: 3.1 });
+    const { getByLabelText } = await render(
+      <ExploreRecordsRail
+        features={[feature('ent_a', '100 Block North Greenwood Avenue')]}
+        onSelect={() => undefined}
+      />,
+    );
+    // The screen reader was never affected by the clamp, which is why this was easy to miss:
+    // it is a sighted-large-type bug.
+    expect(getByLabelText(/100 Block North Greenwood Avenue/)).toBeTruthy();
   });
 });

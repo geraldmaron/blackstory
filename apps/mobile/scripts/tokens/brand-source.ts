@@ -95,7 +95,10 @@ export type BrandTokens = {
   core: BrandCoreColors;
   typography: BrandTypographyFamilies;
   themes: { light: ThemeRole; dark: ThemeRole };
-  status: { light: Record<'warning' | 'dispute' | 'error', StatusRole>; dark: Record<'warning' | 'dispute' | 'error', StatusRole> };
+  status: {
+    light: Record<'warning' | 'dispute' | 'error', StatusRole>;
+    dark: Record<'warning' | 'dispute' | 'error', StatusRole>;
+  };
   confidence: { light: ConfidenceRole; dark: ConfidenceRole };
 };
 
@@ -202,7 +205,12 @@ export function buildBrandTokens(): BrandTokens {
     copperTextLight,
     copperPin,
   });
-  const lightAccentGraphic = ensureContrast(copperPin, archivePaper, MIN_GRAPHIC_CONTRAST, blackInk);
+  const lightAccentGraphic = ensureContrast(
+    copperPin,
+    archivePaper,
+    MIN_GRAPHIC_CONTRAST,
+    blackInk,
+  );
 
   // Light surface ladder (Archive Paper → Surface → raised near-white). Surface is already
   // lighter than canvas; "raised" continues upward via a warm white mix, not a duplicate of

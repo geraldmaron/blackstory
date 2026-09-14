@@ -1,4 +1,5 @@
--- Supabase Storage buckets for product media (ADR-020 blob cutover).
+-- Supabase Storage buckets for product media
+-- (blob cutover; docs/data/supabase-storage-cutover.md).
 -- public-media: public read for vetted entity/release objects.
 -- raw-sources: private; service_role / signed URL only.
 -- Mirrors live apply; keep in sync with remote.

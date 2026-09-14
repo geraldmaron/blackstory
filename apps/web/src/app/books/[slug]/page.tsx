@@ -28,6 +28,7 @@ import {
   listBooksStaticParams,
 } from '../books-view-model';
 import { BooksDetailSections } from '../BooksDetailSections';
+import { BooksAffiliateNotice } from '../BooksAffiliateNotice';
 import { BooksAnatomyStrip } from '../BooksAnatomyStrip';
 import { BooksCoverArt } from '../BooksCoverArt';
 import { coverIsbnForBook } from '../books-cover';
@@ -152,7 +153,6 @@ export default async function BooksDetailPage({ params }: BooksDetailPageProps) 
           title={book.title}
           {...(coverIsbn ? { isbn: coverIsbn } : {})}
           size="L"
-          decorative={false}
           className="ds-books-edition__intro-cover"
         />
         <div>
@@ -175,18 +175,6 @@ export default async function BooksDetailPage({ params }: BooksDetailPageProps) 
               ))}
             </div>
           ) : null}
-          {bookshop ? (
-            <p className="ds-books-edition__actions">
-              <a
-                className="ds-cta ds-cta--copper"
-                href={bookshop.href}
-                rel="noopener noreferrer sponsored"
-                target="_blank"
-              >
-                Buy on Bookshop
-              </a>
-            </p>
-          ) : null}
           <BooksAnatomyStrip
             authorLine={authorLine}
             publishedDate={book.publishedDate}
@@ -199,6 +187,8 @@ export default async function BooksDetailPage({ params }: BooksDetailPageProps) 
       </div>
 
       <BooksDetailSections view={view} relatedItems={relatedItems} placePanel={entityPlacePanel} />
+
+      {bookshop ? <BooksAffiliateNotice href={bookshop.href} /> : null}
 
       <WalkOffRamp>
         This title is in the national list. It does not invent a join to a place.

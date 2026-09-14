@@ -7,14 +7,7 @@
  */
 import { QueryClientProvider } from '@tanstack/react-query';
 import { PersistQueryClientProvider } from '@tanstack/react-query-persist-client';
-import {
-  createContext,
-  useCallback,
-  useContext,
-  useEffect,
-  useState,
-  type ReactNode,
-} from 'react';
+import { createContext, useCallback, useContext, useEffect, useState, type ReactNode } from 'react';
 import { AppState, type AppStateStatus } from 'react-native';
 
 import { createMobileQueryClient, mobileDehydrateOptions } from '@/data';
@@ -159,10 +152,16 @@ export function AppProviders({ children, runtime: injected }: AppProvidersProps)
         try {
           const fallback = await getAppRuntime();
           if (!canceled) {
-            setLoadedRuntime({ ...fallback, lastBootstrapSync: { status: 'offline', stamp: undefined } });
+            setLoadedRuntime({
+              ...fallback,
+              lastBootstrapSync: { status: 'offline', stamp: undefined },
+            });
           }
         } catch (fallbackErr) {
-          console.warn('[blackstory] runtime unavailable; features run without shared providers', fallbackErr);
+          console.warn(
+            '[blackstory] runtime unavailable; features run without shared providers',
+            fallbackErr,
+          );
           if (!canceled) setLoadedRuntime(null);
         }
       }
@@ -193,15 +192,15 @@ export function AppProviders({ children, runtime: injected }: AppProvidersProps)
   return (
     <AppRuntimeContext.Provider value={runtime}>
       <BootstrapRefreshContext.Provider value={refreshBootstrapSyncNow}>
-      <PersistQueryClientProvider
-        client={runtime.queryClient}
-        persistOptions={{
-          persister: runtime.persister,
-          dehydrateOptions: mobileDehydrateOptions,
-        }}
-      >
-        {children}
-      </PersistQueryClientProvider>
+        <PersistQueryClientProvider
+          client={runtime.queryClient}
+          persistOptions={{
+            persister: runtime.persister,
+            dehydrateOptions: mobileDehydrateOptions,
+          }}
+        >
+          {children}
+        </PersistQueryClientProvider>
       </BootstrapRefreshContext.Provider>
     </AppRuntimeContext.Provider>
   );

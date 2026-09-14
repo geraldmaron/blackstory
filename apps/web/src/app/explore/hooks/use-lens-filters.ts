@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { findUsStateByPostalCode } from '@repo/domain/map/geography';
 import type { UseToasts } from '../../../components/patterns/Toast';
 import type { LensLayers } from '../../../components/map-experience/LensPanel';
@@ -15,6 +15,7 @@ import {
   effectiveTopicIds,
   type TopicCount,
 } from '../../../lib/map-experience/filters';
+import { lensPermitsAreaFill } from '../../../lib/map-experience/lens-composition';
 import {
   isKnownMapKind,
   isKnownMapKindFamily,
@@ -119,6 +120,30 @@ export function useLensFilters(view: ExploreViewModel, toasts: UseToasts) {
     () => buildTopicCounts(view.allFeatures),
     [view.allFeatures],
   );
+
+  /** The active topic's display label, when one is selected — the composition gate below and
+   * `CameraConsole`'s lens-level move refusal both need it, since a topic slug does not always
+   * spell out the violence term its own label does. */
+  const activeTopicLabel = useMemo(
+    () => (topicId ? (topicCounts.find((entry) => entry.id === topicId)?.label ?? null) : null),
+    [topicId, topicCounts],
+  );
+
+  /** Composition dignity gate (repo-92n2.18, design-direction-v9-surfaces.md): whether the active
+   * topic constraint permits a density/choropleth area fill to paint. */
+  const areaFillPermitted = useMemo(
+    () => lensPermitsAreaFill({ topicId, topicLabel: activeTopicLabel }),
+    [topicId, activeTopicLabel],
+  );
+
+  // The gate is not only a chip-disable: a reader who already had a density/choropleth layer on
+  // and then applies a violence-adjacent topic must not keep seeing it paint. Force back to the
+  // discrete-points default the moment the constraint becomes violence-adjacent.
+  useEffect(() => {
+    if (!areaFillPermitted && (layerMode === 'blackShare' || layerMode === 'blackChange')) {
+      setLayerMode('off');
+    }
+  }, [areaFillPermitted, layerMode]);
 
   const constraints = useMemo<readonly LensConstraint[]>(() => {
     const rows: LensConstraint[] = [];
@@ -256,10 +281,12 @@ export function useLensFilters(view: ExploreViewModel, toasts: UseToasts) {
     setSweepDecade,
     topicId,
     setTopicId,
+    activeTopicLabel,
     status,
     setStatus,
     layerMode,
     setLayerMode,
+    areaFillPermitted,
     layers,
     setLayers,
     sort,

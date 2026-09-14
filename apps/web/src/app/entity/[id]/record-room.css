@@ -399,6 +399,29 @@
   }
 }
 
+/* —— loading skeleton ——————————————————————————————————————————————————————————
+   `loading.tsx`'s shimmer blocks. `.ds-sk` (`components/patterns/skeleton.css`) supplies the
+   shimmer treatment and its own generic sizes; these three sit on top of it only where the
+   generic sizes would leave the block far shorter than the record's own type actually renders
+   at — the masthead title and lede run at `--rec-title`/`--rec-lede`, both well past `.ds-sk`'s
+   generic `--title` (1.125rem). `em`-based multiples of `line-height` rather than a literal
+   value: a block that is the height of one real line, at the font-size it inherits from the
+   `<h1>`/`<p>` it sits inside, so a size change to that scale moves the shimmer with it. */
+.ds-rec-skel--title {
+  height: calc(var(--rec-title) * 1.02);
+}
+
+.ds-rec-skel--lede {
+  height: calc(var(--rec-lede) * 1.5);
+}
+
+/* The kicker pill's own height is fixed by `.ds-rec-pill` regardless of what is inside it; this
+   only sizes the shimmer bar riding inside that fixed box. */
+.ds-rec-skel--kicker {
+  width: 4.5rem;
+  height: 0.65rem;
+}
+
 /* —— topic tags: the same pill, dashed for eras ————————————————————————————————— */
 .ds-room .ds-entity-tags {
   gap: var(--ds-space-2);

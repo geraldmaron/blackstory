@@ -23,6 +23,8 @@ export type LedgerRowProps = {
   readonly trailing?: ReactNode;
   readonly onPress?: (event: GestureResponderEvent) => void;
   readonly accessibilityLabel?: string;
+  /** Spoken after the label, e.g. that the row leaves the app for the browser. */
+  readonly accessibilityHint?: string;
   readonly showDivider?: boolean;
   readonly showChevron?: boolean;
   /** Secondary trailing action (e.g. Show on map). */
@@ -38,6 +40,7 @@ export function LedgerRow({
   trailing,
   onPress,
   accessibilityLabel,
+  accessibilityHint,
   showDivider = true,
   showChevron = false,
   secondaryAction,
@@ -50,7 +53,12 @@ export function LedgerRow({
   const trailingContent =
     trailing ??
     (showChevron && onPress ? (
-      <Ionicons name="chevron-forward" size={18} color={theme.inkMuted} accessibilityElementsHidden />
+      <Ionicons
+        name="chevron-forward"
+        size={18}
+        color={theme.inkMuted}
+        accessibilityElementsHidden
+      />
     ) : null);
 
   const content = (
@@ -92,6 +100,7 @@ export function LedgerRow({
         <Pressable
           accessibilityRole="button"
           accessibilityLabel={label}
+          {...(accessibilityHint ? { accessibilityHint } : {})}
           onPress={onPress}
           android_ripple={{ color: theme.border }}
           style={({ pressed }) => [

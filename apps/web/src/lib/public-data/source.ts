@@ -29,6 +29,7 @@ import {
   fetchActiveRelease,
   fetchPublicEntityProjection,
   fetchPublicEntityProjectionsByIds,
+  fetchPublicEntityRedirect,
   listPublicEntityProjections,
   listPublicSearchIndexDocs,
   parseEntityProjection,
@@ -45,10 +46,7 @@ import {
   collectTwoHopNeighborIds,
 } from './neighbor-ids';
 import { searchIndexReadyForRecords } from '../records/build-records-index';
-import {
-  fetchReleaseEntitiesListArtifact,
-  fetchReleaseSearchIndexArtifact,
-} from './release-artifacts';
+import { fetchReleaseEntitiesListArtifact, fetchReleaseSearchIndexArtifact } from '@repo/domain';
 
 /**
  * Cross-request cache window for release catalog / search index (seconds).
@@ -293,8 +291,8 @@ async function loadLiveEntitiesForRelease(
         `[public-data] entities artifact had ${artifact.entities.length} entries but none parsed; falling back to Postgres`,
       );
     }
-    // Every arrival here is a full multi-MB catalog pull. release-artifacts.ts has already
-    // logged the specific reason; this line marks the cost that reason caused.
+    // Every arrival here is a full multi-MB catalog pull. The shared release-artifact fetcher
+    // has already logged the specific reason; this line marks the cost that reason caused.
     console.warn(
       `[public-data] full Postgres entity catalog pull for ${releaseId} (artifact unusable)`,
     );
@@ -313,7 +311,7 @@ async function loadLiveSearchIndexForRelease(
     const artifact = await fetchReleaseSearchIndexArtifact(releaseId);
     if (artifact && artifact.docs.length > 0) {
       const mapped = searchDocsFromArtifact(artifact.docs);
-      // Prefer an artifact that already carries confidenceTier (Records slim). After a
+      // Prefer an artifact that already carries evidenceInputs (Records slim). After a
       // facets-only SQL backfill the CDN blob can lag; falling through to Postgres avoids a
       // full release_entities hydrate while still serving search from the slim index.
       if (mapped.length > 0 && searchIndexReadyForRecords(mapped)) {
@@ -322,7 +320,7 @@ async function loadLiveSearchIndexForRelease(
       if (mapped.length > 0) {
         artifactMapped = mapped;
         console.warn(
-          `[public-data] search-index artifact missing confidenceTier coverage; preferring Postgres for ${releaseId}`,
+          `[public-data] search-index artifact missing evidenceInputs coverage; preferring Postgres for ${releaseId}`,
         );
       }
     } else {
@@ -453,6 +451,29 @@ export const resolvePublicEntityView = cache(async function resolvePublicEntityV
 ): Promise<PublicReadResult<PublicEntityView>> {
   const live = await loadLiveEntity(entityId);
   return live !== undefined ? { data: live, source: 'live' } : { data: undefined, source: 'none' };
+});
+
+/**
+ * The survivor a merged-away entity id forwards to (repo-n7p6.29).
+ *
+ * Only ever called on a miss, so the common path pays nothing. A read failure resolves to
+ * `undefined` rather than throwing: the caller is already about to render a 404, and a redirect
+ * lookup that cannot answer must degrade to that 404 instead of turning a missing record into a
+ * 500.
+ */
+export const resolvePublicEntityRedirect = cache(async function resolvePublicEntityRedirect(
+  entityId: string,
+): Promise<string | undefined> {
+  if (!shouldUseLivePublicProjections()) return undefined;
+  try {
+    const active = await getCachedActiveRelease();
+    if (!active) return undefined;
+    return await fetchPublicEntityRedirect(active.releaseId, entityId);
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error);
+    console.warn(`[public-data] redirect lookup failed for ${entityId}: ${message}`);
+    return undefined;
+  }
 });
 
 /**

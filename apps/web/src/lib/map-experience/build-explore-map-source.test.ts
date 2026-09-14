@@ -68,24 +68,43 @@ test('visitClaims on map features carry only website, phone, and hours predicate
   assert.equal(dunbar.properties.visitClaims[0]?.predicate, 'visitorPhone');
 });
 
-test('holdingWalk marks only allowlisted Explore walks, not every /place/ href', () => {
+test('holdingWalk marks every place the live kind/summary rule admits, allowlisted or not', () => {
   const base = listPublicEntities()[0]!;
-  const nonWalkPlace: PublicEntityView = {
+  // Not in either fixture allowlist, but its own kind and summary hold: a live-catalog record
+  // like this (Fort Frederik is the real one) must walk on its own facts, not membership.
+  const liveCatalogPlace: PublicEntityView = {
     ...base,
     id: 'ent_test_archie_edwards',
     kind: 'place',
     displayName: 'Archie Edwards Alpha Tonsorial Palace',
     summary: 'A documented barbershop and gathering place in Washington, D.C.',
   };
-  const source = buildExploreMapSource([nonWalkPlace], {
+  const source = buildExploreMapSource([liveCatalogPlace], {
     geoAnchorFor: (id) =>
-      id === nonWalkPlace.id
+      id === liveCatalogPlace.id
         ? { lat: 38.91, lng: -77.03, geohash: 'dqcj', matchMethod: 'geocode_other' }
         : geoAnchorFor(id),
   });
   const feature = source.featureCollection.features[0]!;
   assert.match(feature.properties.href, /^\/place\//);
-  assert.notEqual(feature.properties.holdingWalk, true);
+  assert.equal(feature.properties.holdingWalk, true);
+
+  // A record with no summary still gets a `/place/` href (`instrumentRecordHref` falls back to
+  // the display name), but does not hold as a walk: the strict rule refuses to invent one.
+  const thinPlace: PublicEntityView = {
+    ...base,
+    id: 'ent_test_thin_stub',
+    kind: 'place',
+    displayName: 'A Thin Stub Record',
+    summary: '',
+  };
+  const thinSource = buildExploreMapSource([thinPlace], {
+    geoAnchorFor: (id) =>
+      id === thinPlace.id
+        ? { lat: 38.9, lng: -77.0, geohash: 'dqcj', matchMethod: 'geocode_other' }
+        : geoAnchorFor(id),
+  });
+  assert.notEqual(thinSource.featureCollection.features[0]!.properties.holdingWalk, true);
 
   const entities = listPublicEntities();
   const catalog = buildExploreMapSource(entities);
@@ -98,6 +117,8 @@ test('holdingWalk marks only allowlisted Explore walks, not every /place/ href',
         displayName: entity!.displayName,
         kind: entity!.kind,
         entityId: entity!.id,
+        summary: entity!.summary,
+        locationPrecision: entity!.locationPrecision,
       }),
       entry.properties.href,
     );

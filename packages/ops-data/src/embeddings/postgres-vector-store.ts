@@ -1,6 +1,7 @@
 /**
  * Postgres/pgvector-backed storage for entity embeddings replaces the Firestore-backed
- * `createAdminVectorIndexStore` (`vector-store.ts`) after the Postgres cutover (ADR-020).
+ * `createAdminVectorIndexStore` (`vector-store.ts`) after the Postgres cutover
+ * (`docs/decisions-carryover.md`, "entity source-of-truth precedence").
  *
  * Targets `bb_canonical.entity_embeddings` (entity_id text pk, kind/state/era_bucket text,
  * embedding vector, dims int, model text, source_text_hash text, updated_at timestamptz), which

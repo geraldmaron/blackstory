@@ -1,13 +1,24 @@
 /**
  * Discovery graylist browser — candidates parked below the relevance threshold.
+ *
+ * Server component (repo-gyq6.9): the hold list is read in the request instead of after a hydrate and a token refresh.
+ *
+ * The matching /admin/api route stays for callers outside this page. The Refresh button went
+ * with the client state: a server-rendered page IS the refresh.
  */
-'use client';
-
+import type { Metadata } from 'next';
 import Link from 'next/link';
-import { useCallback, useEffect, useState } from 'react';
-import { useAdminAuth } from '../../../admin/auth/AdminAuthProvider';
-import type { GraylistListItem } from '../../../admin/ops/graylist-store';
+import { readPostgresOrDegrade } from '../../../admin/lib/canonical-postgres-client';
+import { listDiscoveryGraylist } from '../../../admin/ops/graylist-store';
 import { formatGraylistDisposition, formatGraylistStatus } from './graylist-labels';
+
+export const metadata: Metadata = {
+  title: 'Graylist',
+  description: 'Discovery sources held back from automated promotion.',
+};
+
+/** Operational state is read at request time, never served from a cache. */
+export const dynamic = 'force-dynamic';
 
 function formatWhen(iso: string): string {
   if (!iso) return '—';
@@ -22,43 +33,10 @@ function formatWhen(iso: string): string {
   });
 }
 
-export default function GraylistPage() {
-  const { getIdToken, user } = useAdminAuth();
-  const [rows, setRows] = useState<readonly GraylistListItem[]>([]);
-  const [error, setError] = useState<string | null>(null);
-  const [loading, setLoading] = useState(false);
-
-  const load = useCallback(async () => {
-    setLoading(true);
-    setError(null);
-    try {
-      const token = await getIdToken();
-      if (!token) {
-        setRows([]);
-        return;
-      }
-      const response = await fetch('/api/graylist?limit=100', {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      const body = (await response.json()) as {
-        items?: GraylistListItem[];
-        error?: string;
-      };
-      if (!response.ok) {
-        throw new Error(body.error ?? `Load failed (${response.status})`);
-      }
-      setRows(body.items ?? []);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : String(err));
-    } finally {
-      setLoading(false);
-    }
-  }, [getIdToken]);
-
-  useEffect(() => {
-    if (user) void load();
-  }, [user, load]);
-
+export default async function GraylistPage() {
+  const outcome = await readPostgresOrDegrade(() => listDiscoveryGraylist(100), 'graylist entries');
+  const rows = outcome.status === 'ok' ? outcome.value : [];
+  const degradedReason = outcome.status === 'degraded' ? outcome.reason : undefined;
   const parkedCount = rows.filter((row) => row.status === 'parked').length;
 
   return (
@@ -78,30 +56,22 @@ export default function GraylistPage() {
             <Link href="/admin/discovery">Campaign runs</Link>
           </p>
         </div>
-        <button
-          type="button"
-          className="ds-button ds-button--secondary"
-          onClick={() => void load()}
-          disabled={loading}
-        >
-          {loading ? 'Refreshing…' : 'Refresh'}
-        </button>
       </header>
 
       <p className="story-review__notice" role="status">
         {parkedCount} parked · {rows.length} total entries
       </p>
 
-      {error ? (
+      {degradedReason ? (
         <p className="story-review__alert" role="alert">
-          {error}
+          The graylist is unavailable — the operational database did not answer, so this page shows
+          nothing rather than a partial hold list. Reload to retry.{' '}
+          <span className="ds-mono">{degradedReason}</span>
         </p>
       ) : null}
 
       <section className="story-review__queue" aria-label="Graylist entries">
-        {loading && rows.length === 0 ? (
-          <p className="ds-mono">Loading graylist…</p>
-        ) : rows.length === 0 ? (
+        {rows.length === 0 && !degradedReason ? (
           <p className="ds-sans">
             No graylist entries found. When discovery runs produce below-threshold candidates, they
             appear here — check <Link href="/admin/discovery">campaign runs</Link> or triage

@@ -11,7 +11,10 @@ These files describe runtime controls only. **Nothing here has been applied to l
 
 ## Runtime design
 
-Server workloads read `killSwitches/{switchId}` from Firestore (ADR-011). Public clients may consume a mirrored Remote Config value for fast static-mode changes. If either source says a switch is engaged, engaged wins. Optional workload flags fail closed when missing, stale, malformed, or unavailable. The immutable public corpus remains available unless an operator explicitly enters static mode.
+Server workloads read `killSwitches/{switchId}` from Firestore, as designed under ADR-011 (removed
+2026-07-24, and since reversed — see `../../../docs/decisions-carryover.md`, "Firestore as system
+of record, reversed"; Firestore has no live database left, so this design is not the live path).
+Public clients may consume a mirrored Remote Config value for fast static-mode changes. If either source says a switch is engaged, engaged wins. Optional workload flags fail closed when missing, stale, malformed, or unavailable. The immutable public corpus remains available unless an operator explicitly enters static mode.
 
 Every service must cache only briefly, subscribe or poll for updates, and emit a BB-018 audit event containing the operator, reason, incident id, old value, and new value. Do not expose operator identity or incident details in public responses.
 

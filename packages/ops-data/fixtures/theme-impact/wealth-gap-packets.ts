@@ -24,8 +24,12 @@ const SCF_HUMAN =
   'Federal Reserve Board, Survey of Consumer Finances: median household net worth by race/ethnicity.';
 
 const CENSUS_HOMEOWN_SOURCE = 'Census Bureau Historical Census of Housing Tables';
+// The original URL (census.gov/topics/housing/homeownership/data/historical.html) 404s and never
+// carried a race breakout anyway (repo-uf6q, 2026-09-13). This is the closest live, on-topic
+// census.gov page -- it has the 1970 TOTAL rate (62.9%) but not race-specific figures; see the
+// UNVERIFIED notes on homeownBlack1970 / homeownWhite1970 below.
 const CENSUS_HOMEOWN_URL =
-  'https://www.census.gov/topics/housing/homeownership/data/historical.html';
+  'https://www2.census.gov/programs-surveys/decennial/tables/time-series/census-housing-tables/owner.pdf';
 
 const CENSUS_INCOME_SOURCE = 'U.S. Census Bureau';
 const CENSUS_INCOME_URL =
@@ -330,13 +334,18 @@ const OBS = {
     unit: 'percent',
     referencePeriod: '1970',
     label: 'Black homeownership rate (1970 decennial)',
+    // UNVERIFIED (repo-uf6q, 2026-09-13): flagged by ringer review -- 1970 white_nh is not a
+    // real 1970 census race category, and secondary compilations commonly give ~41.6/65.2-65.4
+    // against 42.0/65.3 here. No primary 1970 Census of Housing table could be located this pass
+    // (the volume's PDFs at census.gov are scanned images with no text layer). Left unchanged
+    // pending a follow-up that can read the actual 1970 race-tenure table.
     provenance: {
       source: CENSUS_HOMEOWN_SOURCE,
       sourceUrl: CENSUS_HOMEOWN_URL,
       retrievedAt: NOW,
       contentHash: '26f5415a3722dbc0ee681dacbeba9aa6cc399d4657be92835d9071d1b7d1855e',
       humanCitation:
-        'U.S. Census Bureau, Historical Census of Housing Tables, homeownership by race, Black householders, 1970.',
+        'U.S. Census Bureau, Historical Census of Housing Tables (owner.pdf) gives the 1970 total rate (62.9%) but not a race breakout; the Black-specific 1970 figure here is UNVERIFIED against a primary table this pass.',
     },
   },
   homeownWhite1970: {
@@ -347,13 +356,14 @@ const OBS = {
     unit: 'percent',
     referencePeriod: '1970',
     label: 'White homeownership rate (1970 decennial)',
+    // UNVERIFIED (repo-uf6q, 2026-09-13) -- see homeownBlack1970 above; same caveat applies.
     provenance: {
       source: CENSUS_HOMEOWN_SOURCE,
       sourceUrl: CENSUS_HOMEOWN_URL,
       retrievedAt: NOW,
       contentHash: '041766ac41853d97eda300ec7cee104fb28edda1a07dbaa4a5bc5f37f42b91c1',
       humanCitation:
-        'U.S. Census Bureau, Historical Census of Housing Tables, homeownership by race, White householders, 1970.',
+        'U.S. Census Bureau, Historical Census of Housing Tables (owner.pdf) gives the 1970 total rate (62.9%) but not a race breakout; the White-specific 1970 figure here is UNVERIFIED against a primary table this pass.',
     },
   },
   incomeBlack1972: {

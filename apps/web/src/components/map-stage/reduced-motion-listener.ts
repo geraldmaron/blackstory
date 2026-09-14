@@ -16,6 +16,12 @@
  * is the React-facing API for components and must be a wrapper OVER this listener rather than a
  * second subscription to the same media query: two independent subscriptions to one query is
  * exactly the duplicate-variant pattern the repo rules forbid.
+ *
+ * `subscribe` (repo-92n2.18) exists for exactly that wrapper: `useSyncExternalStore` needs to be
+ * told when the snapshot may have changed, and this listener's own `change` handler is the one
+ * place that already knows. Adding a notify-on-change hook here, rather than a second
+ * `matchMedia(...).addEventListener('change', ...)` in `use-reduced-motion.ts`, keeps this the
+ * single real subscription to the query — every consumer, imperative or React, relays off it.
  */
 
 const REDUCED_MOTION_QUERY = '(prefers-reduced-motion: reduce)';
@@ -27,6 +33,8 @@ export type ReducedMotionListener = {
    */
   readonly matches: () => boolean;
   readonly disconnect: () => void;
+  /** Notified after `matches()`'s latched value has already been updated. Returns an unsubscribe function. */
+  readonly subscribe: (callback: () => void) => () => void;
 };
 
 /**
@@ -40,13 +48,15 @@ export type ReducedMotionListener = {
  */
 export function createReducedMotionListener(): ReducedMotionListener {
   if (typeof window === 'undefined' || typeof window.matchMedia !== 'function') {
-    return { matches: () => false, disconnect: () => {} };
+    return { matches: () => false, disconnect: () => {}, subscribe: () => () => {} };
   }
 
   const query = window.matchMedia(REDUCED_MOTION_QUERY);
   let latched = query.matches;
+  const subscribers = new Set<() => void>();
   const onChange = (event: MediaQueryListEvent): void => {
     latched = event.matches;
+    for (const callback of subscribers) callback();
   };
 
   query.addEventListener('change', onChange);
@@ -55,6 +65,13 @@ export function createReducedMotionListener(): ReducedMotionListener {
     matches: () => latched,
     disconnect: () => {
       query.removeEventListener('change', onChange);
+      subscribers.clear();
+    },
+    subscribe: (callback) => {
+      subscribers.add(callback);
+      return () => {
+        subscribers.delete(callback);
+      };
     },
   };
 }

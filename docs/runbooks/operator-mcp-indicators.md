@@ -75,7 +75,7 @@ Add to your MCP settings (example — adjust paths):
 | `lookup_series` | List/fetch metric definitions (`metricId`, `theme`, `geographyType` filters) |
 | `get_observations` | As-reported observations for a `metricId` (+ optional jurisdiction/period); requires provenance |
 | `get_entity_context` | Curated entity↔indicator bindings + `juxtapositionDisclaimer` |
-| `get_law_timeline` | **Stub** — returns empty timeline until ADR-026 heritage reads are wired |
+| `get_law_timeline` | **Stub** — returns empty timeline until the published-read-surface heritage reads are wired (`../decisions-carryover.md`, "Small recovered decisions", ADR-026 entry) |
 
 Every observation payload includes provenance (`source`, `sourceUrl`, `retrievedAt`, `contentHash`). Juxtaposition responses always include `juxtapositionDisclaimer`.
 

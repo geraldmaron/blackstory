@@ -106,6 +106,16 @@ export type ExploreViewState = {
    * ungraded). Distinct from `filters.confidence`, which is an exact tier match.
    */
   readonly floor?: EvidenceGrade;
+  /**
+   * A focus instruction, not a filter — the same class as `selected` (repo-92n2.14 / SP-14):
+   * `find=place` opens `PlaceFinder`'s place sheet once on arrival (`/locate` 308s here carrying
+   * it). It narrows nothing in `filtered`/`sorted`, so unlike every key above it never renders as
+   * a clearable Lens constraint chip. The only value read today is `'place'`; typed as a bare
+   * `string` rather than a literal union so an unrecognized value round-trips instead of being
+   * silently dropped by `parseExploreSearchParams`/`buildExploreSearchParams`, which would read
+   * as the edge stripping an unrecognized query key.
+   */
+  readonly find?: string;
 };
 
 export type RawExploreSearchParams = Readonly<
@@ -150,13 +160,14 @@ export const EXPLORE_URL_PARAM_KEYS = [
   'near',
   'hidePanels',
   'panels',
+  'find',
 ] as const;
 
 export type ExploreUrlParamKey = (typeof EXPLORE_URL_PARAM_KEYS)[number];
 
 /**
- * Viewport policy, ADR-017: a shareable URL restores *what* the reader was looking at, never
- * *where the camera was*.
+ * Viewport policy (`docs/decisions-carryover.md`, "Persistent map canvas"): a shareable URL
+ * restores *what* the reader was looking at, never *where the camera was*.
  *
  * These three keys are parsed, and deliberately excluded from the edge allowlist, so they cannot
  * reach a bookmarked, shared or crawled address. Pinning a camera hands the recipient a framing
@@ -321,6 +332,7 @@ export function parseExploreSearchParams(raw: RawExploreSearchParams): ExploreVi
   const popToRaw = firstValue(raw.popTo)?.trim();
   const radiusRaw = firstValue(raw.radius)?.trim();
   const nearRaw = firstValue(raw.near)?.trim();
+  const findRaw = firstValue(raw.find)?.trim();
 
   const groupOn =
     groupRaw === '0' || groupRaw === 'false'
@@ -387,6 +399,7 @@ export function parseExploreSearchParams(raw: RawExploreSearchParams): ExploreVi
     ...(radius ? { radius } : {}),
     ...(near ? { near } : {}),
     ...(floor ? { floor } : {}),
+    ...(findRaw ? { find: findRaw } : {}),
   };
 }
 
@@ -449,6 +462,7 @@ export function buildExploreSearchParams(state: ExploreViewState): string {
   if (state.radius && state.radius !== 'all') params.set('radius', state.radius);
   if (state.near) params.set('near', state.near);
   if (state.floor) params.set('floor', state.floor);
+  if (state.find) params.set('find', state.find);
   return params.toString();
 }
 
@@ -474,10 +488,11 @@ export function defaultExploreOverlayState(): Pick<
 
 /**
  * The `state`-tier camera target for a US postal code: the state's bounding-box midpoint (see
- * `@repo/domain`'s `US_STATES`, the same coarse bbox posture used everywhere else this
- * codebase attributes a point to a state — ADR-013 "known gaps") at a zoom close enough to read
- * individual pins. Alaska/Hawaii pull back to a wider zoom so their bbox — which spans far more
- * longitude than the Lower 48 states — doesn't clip at the map's `minZoom`.
+ * `@repo/domain`'s `US_STATES`, the same coarse bbox posture used everywhere else this codebase
+ * attributes a point to a state; `docs/decisions-carryover.md`, "Map stack": known gaps) at a
+ * zoom close enough to read individual pins. Alaska/Hawaii pull back to a wider zoom so their
+ * bbox — which spans far more longitude than the Lower 48 states — doesn't clip at the map's
+ * `minZoom`.
  *
  * Shared by the homepage hero (: flies here before/while pushing to `/explore?state=…`)
  * and `/explore` itself (state-shape clicks, deep links), so both surfaces fly to the exact same

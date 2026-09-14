@@ -6,10 +6,10 @@
  * shell bar's own composition of that table — which axes are always visible, what the overflow
  * disclosure holds, and how the footer columns group.
  *
- * WHY IT IS NO LONGER A LIST. It used to be one, hand-kept, and it drifted: it went on emitting
- * `/chapters` and `/library` for months after both became permanent redirects, so the top nav on
- * every page of the site pointed into a 308. A hand-kept list cannot notice that a route it names
- * has stopped existing. A derived one cannot name a route that does not exist.
+ * WHY IT IS DERIVED AND NOT A LIST. A hand-kept list cannot notice that a route it names has
+ * stopped existing: one went on emitting `/chapters` and `/library` for months after both became
+ * permanent redirects, pointing the top nav on every page of the site into a 308. A derived list
+ * cannot name a route that does not exist.
  *
  * Admin reads `PRIMARY_NAV` for its cross-app chrome; the public web app derives its own nav from
  * the same catalog through `apps/web/src/lib/nav/destination-registry.ts`, which adds the web-only

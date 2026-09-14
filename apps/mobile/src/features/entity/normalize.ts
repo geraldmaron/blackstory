@@ -55,6 +55,9 @@ import {
   RELATION_DIRECTIONS,
   REVISION_CHANGE_KINDS,
   CLAIM_ROLES,
+  CONFIDENCE_TIERS,
+  MAX_CITING_STORIES,
+  MAX_EVIDENCE_LINEAGE_KEYS,
   type Claim,
   type ClaimDispute,
   type ClaimDisputeAlternate,
@@ -72,8 +75,10 @@ import {
   type NotabilityBasisEntry,
   type RelatedEntry,
   type RelatedNeighbor,
+  type EvidenceInputs,
   type RelationTimespan,
   type RevisionMetadata,
+  type StoryCitation,
   type StatusHistoryEntry,
   type TimelineEvent,
 } from './types';
@@ -116,7 +121,9 @@ function boundedStrArray(value: unknown, maxItems: number, maxLength: number): r
 }
 
 function enumOr<T extends string>(value: unknown, allowed: readonly T[], fallback: T): T {
-  return typeof value === 'string' && (allowed as readonly string[]).includes(value) ? (value as T) : fallback;
+  return typeof value === 'string' && (allowed as readonly string[]).includes(value)
+    ? (value as T)
+    : fallback;
 }
 
 function datePrecisionOr(value: unknown, fallback: DatePrecision = 'circa'): DatePrecision {
@@ -147,7 +154,12 @@ export function normalizeCitation(value: unknown): Citation | undefined {
   // client's own allowlist rejects, even if it slipped through as a string.
   const href = rawHref && isSafeExternalUrl(rawHref) ? rawHref : undefined;
   const withheldReason = optionalStr(value.withheldReason, 500);
-  return { source, label, ...(href ? { href } : {}), ...(withheldReason ? { withheldReason } : {}) };
+  return {
+    source,
+    label,
+    ...(href ? { href } : {}),
+    ...(withheldReason ? { withheldReason } : {}),
+  };
 }
 
 function normalizeDisputeAlternate(value: unknown): ClaimDisputeAlternate | null {
@@ -192,7 +204,9 @@ function normalizeRevisionEntry(value: unknown): ClaimRevisionEntry | null {
     changedAt: str(value.changedAt, 64),
     changeKind: enumOr(value.changeKind, REVISION_CHANGE_KINDS, 'revised'),
     summary,
-    ...(optionalStr(value.policyVersion, 100) ? { policyVersion: optionalStr(value.policyVersion, 100) } : {}),
+    ...(optionalStr(value.policyVersion, 100)
+      ? { policyVersion: optionalStr(value.policyVersion, 100) }
+      : {}),
   };
 }
 
@@ -239,10 +253,14 @@ export function normalizeClaim(value: unknown): Claim | null {
     confidenceScore,
     confidenceLevel,
     ...(normalizeCitation(value.citation) ? { citation: normalizeCitation(value.citation) } : {}),
-    ...(lineageCount !== undefined ? { independentLineageCount: Math.max(0, Math.trunc(lineageCount)) } : {}),
+    ...(lineageCount !== undefined
+      ? { independentLineageCount: Math.max(0, Math.trunc(lineageCount)) }
+      : {}),
     ...(normalizeDispute(value.dispute) ? { dispute: normalizeDispute(value.dispute) } : {}),
     ...(revisionHistory.length > 0 ? { revisionHistory } : {}),
-    ...(normalizeRetraction(value.retraction) ? { retraction: normalizeRetraction(value.retraction) } : {}),
+    ...(normalizeRetraction(value.retraction)
+      ? { retraction: normalizeRetraction(value.retraction) }
+      : {}),
     // Load-bearing for the record tier (see `recordConfidenceTier`): carried through only when
     // it is a role the wire contract defines, never coerced — an out-of-vocabulary value falls
     // back to the predicate heuristic instead of being fabricated into a valid-looking role.
@@ -302,7 +320,9 @@ export function normalizeMedia(value: unknown): Media | undefined {
   if (!isObject(value)) return undefined;
   const url = optionalStr(value.url, 2000);
   const rightsStatusRaw = value.rightsStatus;
-  const rightsStatusValid = typeof rightsStatusRaw === 'string' && (MEDIA_RIGHTS_STATUSES as readonly string[]).includes(rightsStatusRaw);
+  const rightsStatusValid =
+    typeof rightsStatusRaw === 'string' &&
+    (MEDIA_RIGHTS_STATUSES as readonly string[]).includes(rightsStatusRaw);
   if (!url || !isSafeExternalUrl(url) || !rightsStatusValid) return undefined;
 
   const alt = optionalStr(value.alt, 500) ?? 'Untitled image';
@@ -352,6 +372,42 @@ export function normalizeRelatedEntry(value: unknown): RelatedEntry | null {
 }
 
 /**
+ * Evidence INPUTS off the wire. Returns `undefined` for anything malformed rather than
+ * substituting a floor: "we could not read this record's evidence" must render as no meter, not
+ * as `unrated`, and certainly not as a grade. The rule that turns these facts into a letter lives
+ * in `@repo/public-contracts/evidence`; nothing here decides a grade.
+ */
+export function normalizeEvidenceInputs(value: unknown): EvidenceInputs | undefined {
+  if (!isObject(value)) return undefined;
+  const level = value.strongestClaimLevel;
+  if (typeof level !== 'string') return undefined;
+  if (!(CONFIDENCE_TIERS as readonly string[]).includes(level)) return undefined;
+  return {
+    strongestClaimLevel: level as EvidenceInputs['strongestClaimLevel'],
+    citedLineageKeys: boundedStrArray(value.citedLineageKeys, MAX_EVIDENCE_LINEAGE_KEYS, 200),
+    evidenceLineageKeys: boundedStrArray(value.evidenceLineageKeys, MAX_EVIDENCE_LINEAGE_KEYS, 200),
+  };
+}
+
+/**
+ * One story that cites this record. `slug` and `title` are the only load-bearing fields — the app
+ * routes on the slug and never follows `href`, which is the site's own path. A citation missing
+ * either is dropped rather than rendered as an untappable row.
+ */
+export function normalizeStoryCitation(value: unknown): StoryCitation | null {
+  if (!isObject(value)) return null;
+  const slug = optionalStr(value.slug, 200);
+  const title = optionalStr(value.title, MAX_SHORT_TEXT);
+  if (!slug || !title) return null;
+  return {
+    slug,
+    title,
+    relation: str(value.relation, 40, 'referenced in'),
+    href: str(value.href, 500, `/stories/${slug}`),
+  };
+}
+
+/**
  * `id` is the only thing required; a self-referencing neighbor (its own id) or a neighbor that
  * repeats a sibling's id is still normalized and rendered flatly — this function performs no
  * graph traversal or de-duplication across neighbors of ITS OWN, so there is structurally no
@@ -363,6 +419,7 @@ export function normalizeRelatedNeighbor(value: unknown): RelatedNeighbor | null
   if (!isObject(value)) return null;
   const id = optionalStr(value.id, 200);
   if (!id) return null;
+  const evidenceInputs = normalizeEvidenceInputs(value.evidenceInputs);
   return {
     id,
     displayName: str(value.displayName, MAX_SHORT_TEXT, id),
@@ -371,6 +428,7 @@ export function normalizeRelatedNeighbor(value: unknown): RelatedNeighbor | null
     relationType: str(value.relationType, 100, 'related'),
     direction: enumOr(value.direction, RELATION_DIRECTIONS, 'outgoing'),
     ...(normalizeTimespan(value.timespan) ? { timespan: normalizeTimespan(value.timespan) } : {}),
+    ...(evidenceInputs !== undefined ? { evidenceInputs } : {}),
   };
 }
 
@@ -384,8 +442,12 @@ function normalizeStatusHistoryEntry(value: unknown): StatusHistoryEntry | null 
   if (!status) return null;
   return {
     status,
-    ...(optionalStr(value.validFrom, 64) !== undefined ? { validFrom: optionalStr(value.validFrom, 64) } : {}),
-    ...(optionalStrOrNull(value.validTo, 64) !== undefined ? { validTo: optionalStrOrNull(value.validTo, 64) } : {}),
+    ...(optionalStr(value.validFrom, 64) !== undefined
+      ? { validFrom: optionalStr(value.validFrom, 64) }
+      : {}),
+    ...(optionalStrOrNull(value.validTo, 64) !== undefined
+      ? { validTo: optionalStrOrNull(value.validTo, 64) }
+      : {}),
     datePrecision: datePrecisionOr(value.datePrecision),
     basisClaimIds: boundedStrArray(value.basisClaimIds, MAX_BASIS_CLAIM_IDS, 200),
   };
@@ -394,10 +456,16 @@ function normalizeStatusHistoryEntry(value: unknown): StatusHistoryEntry | null 
 function normalizeEventWindow(value: unknown): EventWindow | undefined {
   if (!isObject(value)) return undefined;
   return {
-    ...(optionalStr(value.startAt, 64) !== undefined ? { startAt: optionalStr(value.startAt, 64) } : {}),
-    ...(optionalStrOrNull(value.endAt, 64) !== undefined ? { endAt: optionalStrOrNull(value.endAt, 64) } : {}),
+    ...(optionalStr(value.startAt, 64) !== undefined
+      ? { startAt: optionalStr(value.startAt, 64) }
+      : {}),
+    ...(optionalStrOrNull(value.endAt, 64) !== undefined
+      ? { endAt: optionalStrOrNull(value.endAt, 64) }
+      : {}),
     datePrecision: datePrecisionOr(value.datePrecision),
-    ...(optionalStr(value.eventType, 100) !== undefined ? { eventType: optionalStr(value.eventType, 100) } : {}),
+    ...(optionalStr(value.eventType, 100) !== undefined
+      ? { eventType: optionalStr(value.eventType, 100) }
+      : {}),
   };
 }
 
@@ -406,7 +474,11 @@ function normalizeSensitivity(value: unknown): EntitySensitivity | undefined {
   const cls = optionalStr(value.class, 100);
   const note = optionalStr(value.note, 2000);
   if (!cls || !note) return undefined;
-  return { class: cls, note, basisClaimIds: boundedStrArray(value.basisClaimIds, MAX_BASIS_CLAIM_IDS, 200) };
+  return {
+    class: cls,
+    note,
+    basisClaimIds: boundedStrArray(value.basisClaimIds, MAX_BASIS_CLAIM_IDS, 200),
+  };
 }
 
 function normalizeNotabilityBasisEntry(value: unknown): NotabilityBasisEntry | null {
@@ -414,15 +486,25 @@ function normalizeNotabilityBasisEntry(value: unknown): NotabilityBasisEntry | n
   const criterion = optionalStr(value.criterion, 100);
   const note = optionalStr(value.note, 2000);
   if (!criterion || !note) return null;
-  return { criterion, note, evidenceIds: boundedStrArray(value.evidenceIds, MAX_BASIS_CLAIM_IDS, 200) };
+  return {
+    criterion,
+    note,
+    evidenceIds: boundedStrArray(value.evidenceIds, MAX_BASIS_CLAIM_IDS, 200),
+  };
 }
 
 function normalizeGeoAnchor(value: unknown): GeoAnchor | undefined {
   if (!isObject(value)) return undefined;
   const lat = num(value.lat);
   const lng = num(value.lng);
-  if (lat === undefined || lng === undefined || lat < -90 || lat > 90 || lng < -180 || lng > 180) return undefined;
-  return { lat, lng, geohash: str(value.geohash, 20, ''), matchMethod: str(value.matchMethod, 100, '') };
+  if (lat === undefined || lng === undefined || lat < -90 || lat > 90 || lng < -180 || lng > 180)
+    return undefined;
+  return {
+    lat,
+    lng,
+    geohash: str(value.geohash, 20, ''),
+    matchMethod: str(value.matchMethod, 100, ''),
+  };
 }
 
 // ---------------------------------------------------------------------------
@@ -503,6 +585,15 @@ export function normalizeEntity(value: unknown): Entity | null {
     }
   }
 
+  const citingStories: StoryCitation[] = [];
+  if (Array.isArray(value.citingStories)) {
+    for (const raw of value.citingStories) {
+      if (citingStories.length >= MAX_CITING_STORIES) break;
+      const citation = normalizeStoryCitation(raw);
+      if (citation) citingStories.push(citation);
+    }
+  }
+
   const rawNarrative = optionalStr(value.extendedNarrative, MAX_EXTENDED_NARRATIVE_CHARS);
 
   const media = normalizeMedia(value.primaryImage);
@@ -516,7 +607,9 @@ export function normalizeEntity(value: unknown): Entity | null {
       : undefined;
   const locationPrecision =
     typeof value.locationPrecision === 'string' &&
-    (['city', 'neighborhood', 'campus', 'institution'] as readonly string[]).includes(value.locationPrecision)
+    (['city', 'neighborhood', 'campus', 'institution'] as readonly string[]).includes(
+      value.locationPrecision,
+    )
       ? (value.locationPrecision as Entity['locationPrecision'])
       : undefined;
 
@@ -531,7 +624,9 @@ export function normalizeEntity(value: unknown): Entity | null {
     eraBuckets: boundedStrArray(value.eraBuckets, MAX_ERA_BUCKETS, 20),
     notabilityLabels: boundedStrArray(value.notabilityLabels, MAX_NOTABILITY_LABELS, 300),
     ...(notabilityBasis.length > 0 ? { notabilityBasis } : {}),
-    ...(optionalStr(value.sensitivityClass, 100) ? { sensitivityClass: optionalStr(value.sensitivityClass, 100) } : {}),
+    ...(optionalStr(value.sensitivityClass, 100)
+      ? { sensitivityClass: optionalStr(value.sensitivityClass, 100) }
+      : {}),
     ...(sensitivity ? { sensitivity } : {}),
     topicTags: boundedStrArray(value.topicTags, MAX_TOPIC_TAGS, 100),
     topicIds: boundedStrArray(value.topicIds, MAX_TOPIC_IDS, 100),
@@ -551,5 +646,6 @@ export function normalizeEntity(value: unknown): Entity | null {
     ...(related.length > 0 ? { related } : {}),
     ...(relatedNeighbors.length > 0 ? { relatedNeighbors } : {}),
     ...(continueLearning.length > 0 ? { continueLearning } : {}),
+    ...(citingStories.length > 0 ? { citingStories } : {}),
   };
 }

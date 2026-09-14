@@ -5,10 +5,23 @@
  * bead. The default `onPress` opens `href` via `Linking.openURL` (works for
  * both https:// and custom-scheme URLs); pass `onPress` to override with a
  * router-aware handler once MOB-008 lands.
+ *
+ * A link that leaves the app says so. When the Link opens an http(s) `href` itself, it carries an
+ * "Opens in your browser" hint, so a screen reader user is not surprised to land in Safari or
+ * Chrome. A caller-supplied `onPress` decides the destination, so no hint is derived for it; pass
+ * `accessibilityHint` to state one, or to override the derived one.
  */
 import { Linking, Pressable, StyleSheet, type PressableProps } from 'react-native';
 import { Text, type TextProps } from './Text';
-import { radius, useThemeColors } from './tokens';
+import { MIN_TOUCH_TARGET, radius, useThemeColors } from './tokens';
+
+/** Spoken hint for any control that hands the reader off to the system browser. */
+export const EXTERNAL_LINK_HINT = 'Opens in your browser';
+
+/** The browser hint for a web `href`; undefined for anything that is not http(s). */
+export function externalLinkHint(href: string): string | undefined {
+  return /^https?:\/\//i.test(href.trim()) ? EXTERNAL_LINK_HINT : undefined;
+}
 
 export type LinkProps = Omit<PressableProps, 'children' | 'style' | 'onPress'> & {
   href: string;
@@ -16,10 +29,20 @@ export type LinkProps = Omit<PressableProps, 'children' | 'style' | 'onPress'> &
   onPress?: () => void;
   textRole?: TextProps['variant'];
   accessibilityLabel?: string;
+  accessibilityHint?: string;
 };
 
-export function Link({ href, children, onPress, textRole = 'body', accessibilityLabel, ...rest }: LinkProps) {
+export function Link({
+  href,
+  children,
+  onPress,
+  textRole = 'body',
+  accessibilityLabel,
+  accessibilityHint,
+  ...rest
+}: LinkProps) {
   const theme = useThemeColors();
+  const hint = accessibilityHint ?? (onPress ? undefined : externalLinkHint(href));
 
   const handlePress = () => {
     if (onPress) {
@@ -37,11 +60,12 @@ export function Link({ href, children, onPress, textRole = 'body', accessibility
     <Pressable
       accessibilityRole="link"
       accessibilityLabel={accessibilityLabel ?? children}
-      hitSlop={{ top: 12, bottom: 12, left: 8, right: 8 }}
+      {...(hint ? { accessibilityHint: hint } : {})}
+      hitSlop={{ left: 8, right: 8 }}
       onPress={handlePress}
       android_ripple={{ color: theme.border }}
-      // Links had no press feedback at all. Tint only — no padding/alignment change —
-      // so adding this cannot reflow any existing caller's layout.
+      // Tint on press. The box itself is at least 44pt tall, so the visible target clears the
+      // floor without leaning on an invisible vertical hitSlop; the text stays centered in it.
       style={({ pressed }) => [
         styles.pressable,
         pressed ? { backgroundColor: theme.border } : null,
@@ -58,5 +82,7 @@ export function Link({ href, children, onPress, textRole = 'body', accessibility
 const styles = StyleSheet.create({
   pressable: {
     borderRadius: radius.sm,
+    minHeight: MIN_TOUCH_TARGET,
+    justifyContent: 'center',
   },
 });

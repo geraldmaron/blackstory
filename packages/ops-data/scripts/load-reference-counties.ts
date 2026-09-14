@@ -22,9 +22,11 @@ import { createHash } from 'node:crypto';
 import { execFileSync } from 'node:child_process';
 import { mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
-import { join } from 'node:path';
+import { join, resolve } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { assertPublishedStatisticProvenance } from '@repo/domain';
 import pg from 'pg';
+import type { PoolClient } from 'pg';
 import { parseGazetteerCountyFile } from '../src/jurisdictions/tiger-gazetteer.js';
 import { normalizePgConnectionString } from './lib/pg-connection.js';
 import {
@@ -149,6 +151,101 @@ function buildCountyMetadata(
   };
 }
 
+export type CountyUpsertClient = Pick<PoolClient, 'query'>;
+
+/**
+ * Builds and runs the batched county upsert, including `location` — a bbox envelope (see
+ * reference-county-seeds.ts's ReferenceCountySeed.bbox) derived from each seed's Gazetteer
+ * centroid + area. `bb_reference.jurisdictions.location` is declared
+ * `geography(Polygon, 4326)` (supabase/migrations/20260721180100_jurisdictions_geography.sql),
+ * so this writes a `ST_MakeEnvelope(...)::geography` polygon, not a bare point — a Point value
+ * would fail that column's type check. A degenerate zero-area bbox (west==east or south==north,
+ * which only a zero-recorded-area row could produce) is left NULL rather than handed to
+ * ST_MakeEnvelope, matching the "no geometry available" behavior for any other unresolvable row.
+ *
+ * Exported (rather than inlined in upsertCounties) so the exact SQL and parameters are
+ * unit-testable against a fake client with no live database — see load-reference-counties.test.ts.
+ */
+export async function upsertCountyBatch(
+  client: CountyUpsertClient,
+  batch: readonly ReferenceCountySeed[],
+  provenance: GazetteerProvenance,
+): Promise<void> {
+  const ids: string[] = [];
+  const kinds: string[] = [];
+  const names: string[] = [];
+  const stateFips: string[] = [];
+  const countyFips: string[] = [];
+  const parentIds: string[] = [];
+  const metadata: string[] = [];
+  const bboxWest: number[] = [];
+  const bboxSouth: number[] = [];
+  const bboxEast: number[] = [];
+  const bboxNorth: number[] = [];
+  for (const seed of batch) {
+    ids.push(seed.id);
+    kinds.push(seed.kind);
+    names.push(seed.name);
+    stateFips.push(seed.stateFips);
+    countyFips.push(seed.countyFips);
+    parentIds.push(seed.parentId);
+    metadata.push(JSON.stringify(buildCountyMetadata(seed, provenance)));
+    const [west, south, east, north] = seed.bbox;
+    bboxWest.push(west);
+    bboxSouth.push(south);
+    bboxEast.push(east);
+    bboxNorth.push(north);
+  }
+  await client.query(
+    `INSERT INTO bb_reference.jurisdictions
+      (id, kind, name, state_fips, county_fips, parent_id, metadata, location)
+     SELECT
+       id, kind, name, state_fips, county_fips, parent_id, metadata,
+       CASE
+         WHEN bbox_west < bbox_east AND bbox_south < bbox_north
+           THEN ST_MakeEnvelope(bbox_west, bbox_south, bbox_east, bbox_north, 4326)::geography
+         ELSE NULL
+       END AS location
+     FROM unnest(
+       $1::text[],
+       $2::text[],
+       $3::text[],
+       $4::text[],
+       $5::text[],
+       $6::text[],
+       $7::jsonb[],
+       $8::float8[],
+       $9::float8[],
+       $10::float8[],
+       $11::float8[]
+     ) AS t(
+       id, kind, name, state_fips, county_fips, parent_id, metadata,
+       bbox_west, bbox_south, bbox_east, bbox_north
+     )
+     ON CONFLICT (id) DO UPDATE SET
+       name = EXCLUDED.name,
+       state_fips = EXCLUDED.state_fips,
+       county_fips = EXCLUDED.county_fips,
+       parent_id = EXCLUDED.parent_id,
+       metadata = EXCLUDED.metadata,
+       location = EXCLUDED.location,
+       updated_at = now()`,
+    [
+      ids,
+      kinds,
+      names,
+      stateFips,
+      countyFips,
+      parentIds,
+      metadata,
+      bboxWest,
+      bboxSouth,
+      bboxEast,
+      bboxNorth,
+    ],
+  );
+}
+
 async function upsertCounties(
   seeds: readonly ReferenceCountySeed[],
   provenance: GazetteerProvenance,
@@ -165,44 +262,7 @@ async function upsertCounties(
     await client.query('BEGIN');
     for (let offset = 0; offset < seeds.length; offset += batchSize) {
       const batch = seeds.slice(offset, offset + batchSize);
-      const ids: string[] = [];
-      const kinds: string[] = [];
-      const names: string[] = [];
-      const stateFips: string[] = [];
-      const countyFips: string[] = [];
-      const parentIds: string[] = [];
-      const metadata: string[] = [];
-      for (const seed of batch) {
-        ids.push(seed.id);
-        kinds.push(seed.kind);
-        names.push(seed.name);
-        stateFips.push(seed.stateFips);
-        countyFips.push(seed.countyFips);
-        parentIds.push(seed.parentId);
-        metadata.push(JSON.stringify(buildCountyMetadata(seed, provenance)));
-      }
-      await client.query(
-        `INSERT INTO bb_reference.jurisdictions
-          (id, kind, name, state_fips, county_fips, parent_id, metadata)
-         SELECT *
-         FROM unnest(
-           $1::text[],
-           $2::text[],
-           $3::text[],
-           $4::text[],
-           $5::text[],
-           $6::text[],
-           $7::jsonb[]
-         )
-         ON CONFLICT (id) DO UPDATE SET
-           name = EXCLUDED.name,
-           state_fips = EXCLUDED.state_fips,
-           county_fips = EXCLUDED.county_fips,
-           parent_id = EXCLUDED.parent_id,
-           metadata = EXCLUDED.metadata,
-           updated_at = now()`,
-        [ids, kinds, names, stateFips, countyFips, parentIds, metadata],
-      );
+      await upsertCountyBatch(client, batch, provenance);
     }
     const verify = await client.query<{ count: string }>(
       `SELECT count(*)::text AS count FROM bb_reference.jurisdictions WHERE kind = 'county'`,
@@ -284,7 +344,12 @@ async function main(): Promise<void> {
   );
 }
 
-main().catch((error) => {
-  console.error(error instanceof Error ? error.message : error);
-  process.exitCode = 1;
-});
+// Only run when invoked directly; tests import this module for its pure/exported functions
+// (upsertCountyBatch in particular) without triggering a live Gazetteer download.
+const invokedPath = process.argv[1];
+if (invokedPath !== undefined && resolve(invokedPath) === fileURLToPath(import.meta.url)) {
+  main().catch((error) => {
+    console.error(error instanceof Error ? error.message : error);
+    process.exitCode = 1;
+  });
+}

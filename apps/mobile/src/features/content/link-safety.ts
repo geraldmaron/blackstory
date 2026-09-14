@@ -44,7 +44,11 @@ function isTrackingParamName(name: string): boolean {
  * regex-only approach; RN/Hermes' `URL` support varies by SDK/polyfill and this check is simple
  * enough not to need it).
  */
-function splitQuery(url: string): { readonly base: string; readonly query: string; readonly hash: string } {
+function splitQuery(url: string): {
+  readonly base: string;
+  readonly query: string;
+  readonly hash: string;
+} {
   const hashIndex = url.indexOf('#');
   const withoutHash = hashIndex === -1 ? url : url.slice(0, hashIndex);
   const hash = hashIndex === -1 ? '' : url.slice(hashIndex);

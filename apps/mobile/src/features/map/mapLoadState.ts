@@ -1,5 +1,6 @@
 /**
- * Map tile-load state model and the failure classifier (MOB-011 / ADR-024).
+ * Map tile-load state model and the failure classifier (MOB-011;
+ * `docs/decisions-carryover.md`, "Native map render layer" §7).
  *
  * MapLibre Native surfaces tile problems as native events (onDidFailLoadingMap)
  * and HTTP outcomes that a JS test runner cannot fire. So the failure handling is
@@ -9,13 +10,18 @@
  * (MOB-007) instead of crashing. The three modes are the adversarial cases the
  * bead calls out: provider/CDN outage, corrupt/unsupported range-request
  * response, and offline cold start with no cached tiles yet.
+ *
+ * WIRING, as of 2026-09-13: `classifyMapError` has no caller outside its own test.
+ * `MAP_FAILURE_COPY` and the `MapLoadState` union are live — `MapScreen` renders
+ * from them — but the live modes are assigned literally in
+ * `features/explore/useExploreMapSource.ts` from the `GET /v1/map` fetch outcome
+ * (`offline-no-cache` -> `offline-cold-start`, anything else -> `provider-outage`),
+ * and `MapScreen`'s `onDidFailLoadingMap` goes straight to `map-canvas-unavailable`
+ * without consulting the classifier. `corrupt-tiles` is unreachable at runtime today.
  */
 
 export type MapFailureMode =
-  | 'provider-outage'
-  | 'corrupt-tiles'
-  | 'offline-cold-start'
-  | 'map-canvas-unavailable';
+  'provider-outage' | 'corrupt-tiles' | 'offline-cold-start' | 'map-canvas-unavailable';
 
 export type MapLoadState =
   | { readonly kind: 'loading' }
@@ -32,7 +38,8 @@ export type MapFailureCopy = {
 /**
  * User-facing copy per failure mode. Deliberately non-alarming and dignity-safe:
  * a map outage is framed as "the rest of the app still works", never as an error
- * that strands the reader (ADR-020 fail-safe-toward-reads posture).
+ * that strands the reader (`docs/decisions-carryover.md`, "Mobile stack":
+ * fail-safe toward reads).
  */
 export const MAP_FAILURE_COPY: Record<MapFailureMode, MapFailureCopy> = {
   'provider-outage': {
@@ -43,8 +50,7 @@ export const MAP_FAILURE_COPY: Record<MapFailureMode, MapFailureCopy> = {
   },
   'corrupt-tiles': {
     title: 'The map could not be loaded',
-    description:
-      'The map received an unexpected or incomplete response. Try again in a moment.',
+    description: 'The map received an unexpected or incomplete response. Try again in a moment.',
     retryable: true,
   },
   'offline-cold-start': {

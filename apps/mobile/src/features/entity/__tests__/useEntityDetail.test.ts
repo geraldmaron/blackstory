@@ -35,7 +35,9 @@ describe('useEntityDetail', () => {
     const readJson = jest.fn().mockResolvedValue({ kind: 'ok', data: fullEntityFixture('place') });
     // Deliberately construct a fresh `EntityDataDeps` object inline on every render, the exact
     // mistake an undisciplined call site could make.
-    const { result, rerender } = await renderHook(() => useEntityDetail('ent_place_full_001', depsResolvingTo(readJson)));
+    const { result, rerender } = await renderHook(() =>
+      useEntityDetail('ent_place_full_001', depsResolvingTo(readJson)),
+    );
     await waitFor(() => expect(result.current.state.kind).toBe('ready'));
     // The hook-invoking callback ignores its argument (it closes over the same fixed id/deps
     // on every call), so `rerender` is driven with `undefined` purely to satisfy its typed

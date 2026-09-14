@@ -6,5 +6,13 @@
     "jsBundleBytes": 3413393,
     "totalExportBytes": 17019894,
     "assetCount": 86
+  },
+  "android": {
+    "platform": "android",
+    "measuredAt": "2026-09-14T15:32:02.706Z",
+    "expoSdk": "~57.0.22",
+    "jsBundleBytes": 6213893,
+    "totalExportBytes": 18386869,
+    "assetCount": 115
   }
 }

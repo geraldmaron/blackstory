@@ -110,18 +110,12 @@ export function RecordsIndexRoom({ model, releaseLabel }: RecordsIndexProps) {
       />
 
       {/*
-        One control line: the find field and every facet, side by side. The filters used to be a
-        panel of six labeled chip rows, which cost most of a screen before the first record —
-        on a 1440 canvas the index opened on its own controls. Each facet is now a native
-        `<details>`, so the vocabulary is one click away rather than gone, and the whole thing
-        still works with JavaScript off: a disclosure is markup, and every chip inside it is a
-        GET link.
+        One control line: the find field and every facet, side by side. Each facet is a native
+        `<details>`, so the vocabulary is one click away, and the whole thing still works with
+        JavaScript off: a disclosure is markup, and every chip inside it is a GET link.
 
-        The shared `name` makes them an exclusive accordion. That is the fix for what this row
-        looked like before: six independent disclosures, each opening a panel anchored to its own
-        narrow pill, all able to be open at once. They overlapped, clipped their own labels, and
-        the reader could not tell whose vocabulary was on screen. One at a time is also the
-        honest model, since the facets narrow one set together rather than side by side.
+        The shared `name` makes them an exclusive accordion: only one at a time, since the
+        facets narrow one set together rather than side by side.
       */}
       <div className="ds-records-controls">
         <form className="ds-records-find" action="/records" method="get" role="search">
@@ -216,8 +210,6 @@ export function RecordsIndexRoom({ model, releaseLabel }: RecordsIndexProps) {
           ),
           /*
            * The same evidence meter the Explore rail, the record sheet and the record page draw.
-           * This index used to own a third grade treatment whose A was copper, which read as the
-           * accent rather than as the confidence scale and matched nothing else in the product.
            */
           grade: (
             <span className="ds-records-grade" title={row.gradeDescription}>

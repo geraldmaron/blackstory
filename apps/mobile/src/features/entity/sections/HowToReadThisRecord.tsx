@@ -1,11 +1,9 @@
 /**
  * Trust off-ramp for the record page: what the record rests on, then a way to read the method.
  *
- * The copy used to be one sentence cut across three Text nodes — "How this record is built" /
- * "read the methodology" / "for source hierarchy, confidence, and verification steps." — laid out
- * in a wrapping row. On a phone that resolves to three ragged lines that do not read as a
- * sentence, with the link stranded in the middle of one. The sentence is now a sentence, and the
- * link is a control on its own line with a real touch target.
+ * The sentence is one Text node and the link is a control on its own line with a real touch
+ * target. One sentence cut across three Text nodes in a wrapping row resolves on a phone to three
+ * ragged lines that do not read as a sentence, with the link stranded in the middle of one.
  */
 import { StyleSheet, View } from 'react-native';
 import { Link, Text, space } from '@/ui';

@@ -201,6 +201,10 @@ test('Case I: a patent supports the technical claim and never the community-iden
 
   // The technical claim itself is fine: a patent is authoritative for what it records.
   assert.equal(codes(result.evidenceDeficits).includes('claim_source_unfit_for_claim'), false);
+  assert.equal(
+    codes(result.evidenceDeficits).includes('invention_claim_without_technical_receipt'),
+    false,
+  );
   // And the relevance gate is shut.
   assert.ok(codes(result.evidenceDeficits).includes('missing_identity_receipt'));
   assert.ok(codes(result.evidenceDeficits).includes('patent_used_as_racial_identity_evidence'));

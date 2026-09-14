@@ -51,7 +51,10 @@ const livePayload: MapSourceV1 = {
 function makeDeps(overrides: Partial<MapSourceDeps> = {}): MapSourceDeps {
   return {
     transport: {
-      readJson: jest.fn(async () => ({ kind: 'ok' as const, data: livePayload })) as MapSourceDeps['transport']['readJson'],
+      readJson: jest.fn(async () => ({
+        kind: 'ok' as const,
+        data: livePayload,
+      })) as MapSourceDeps['transport']['readJson'],
     },
     releaseCache: {
       getActiveStamp: jest.fn(async () => 'rel_hook'),

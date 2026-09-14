@@ -1,10 +1,10 @@
 import { createMemoryStore, createManualConnectivity, META_KEYS } from '../data';
+import { initializeObservability, resolveReportContext, refreshReportContext } from './bootstrap';
 import {
-  initializeObservability,
-  resolveReportContext,
-  refreshReportContext,
-} from './bootstrap';
-import { getActiveReportContext, getObservabilityConfig, __resetObservabilityForTests } from './crash-reporter';
+  getActiveReportContext,
+  getObservabilityConfig,
+  __resetObservabilityForTests,
+} from './crash-reporter';
 
 /**
  * Integration-style smoke tests for the runtime wiring layer. Unlike

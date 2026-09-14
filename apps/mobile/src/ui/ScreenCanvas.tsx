@@ -60,10 +60,7 @@ export function ScreenCanvas({
   const theme = useThemeColors();
 
   return (
-    <SafeAreaView
-      style={[styles.root, { backgroundColor: theme.canvas }, style]}
-      edges={edges}
-    >
+    <SafeAreaView style={[styles.root, { backgroundColor: theme.canvas }, style]} edges={edges}>
       {children}
     </SafeAreaView>
   );

@@ -7,6 +7,7 @@
  *     packages/ops-data/scripts/flip-release-living-to-unknown.ts
  */
 import pg from 'pg';
+import { remindToRepublishCatalogArtifacts } from './lib/catalog-republish-reminder.ts';
 import { normalizePgConnectionString } from './lib/pg-connection.ts';
 
 const DRY_RUN = process.env.DRY_RUN !== '0';
@@ -61,6 +62,7 @@ async function main(): Promise<void> {
        GROUP BY 1 ORDER BY n DESC`,
     );
     console.log(after.rows);
+    remindToRepublishCatalogArtifacts(ent.rowCount ?? 0);
   } finally {
     await client.end();
   }

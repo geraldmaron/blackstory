@@ -1,11 +1,10 @@
 /**
  * The single source of truth for the decades the population platform covers, 1790–2020.
  *
- * Before this module the decade list `['2000','2010','2020']` was duplicated across at least
- * nine sites (the county Firestore schema regex, the national-stats aggregation loops, the
- * census url-builder, the static county index JSON, and the `CENSUS_POPULATION_DECADES` map
- * constant). Adding a decade meant editing every copy. This registry replaces that: every
- * consumer derives its decade domain from here.
+ * One list, one place: the decades, and the metadata that goes with each, live here, so a
+ * consumer takes its decade domain from `POPULATION_DECADES` (or `MODERN_COUNTY_DECADES` /
+ * `HISTORICAL_NATIONAL_DECADES`) instead of repeating the literal and having to be found again
+ * when a decade is added.
  *
  * IMPORTANT — this module holds decade METADATA only (source lane, comparability band,
  * whether the Black count carries a free/enslaved split, whether the decade opens a

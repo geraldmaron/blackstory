@@ -68,11 +68,7 @@ function ThemeRows({
           leading={<NavIcon name="collection" size={20} />}
           showChevron={row.available}
           showDivider={index < rows.length - 1}
-          onPress={
-            row.available
-              ? () => router.push(`/themes/${row.id}` as never)
-              : undefined
-          }
+          onPress={row.available ? () => router.push(`/themes/${row.id}` as never) : undefined}
           accessibilityLabel={`${row.title}. ${row.priorityLabel}. ${row.statusLabel}.`}
         />
       ))}
@@ -101,11 +97,7 @@ export function ThemesBrowseScreen() {
           dense
         />
 
-        <Notice
-          tone="info"
-          title={THEMES_METHOD.title}
-          description={THEMES_METHOD.body}
-        />
+        <Notice tone="info" title={THEMES_METHOD.title} description={THEMES_METHOD.body} />
         <View style={{ alignItems: 'flex-start' }}>
           <Button
             label={THEMES_METHOD.methodologyCta}

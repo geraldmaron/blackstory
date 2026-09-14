@@ -72,7 +72,7 @@ describe('content repository — offline cache behavior', () => {
     expect(result.status).toBe('offline-miss');
   });
 
-  it('drops a cached row written under a superseded release stamp (ADR-022 §4 global invalidation), reporting offline-miss rather than stale content', async () => {
+  it('drops a cached row written under a superseded release stamp (global release-stamp invalidation), reporting offline-miss rather than stale content', async () => {
     const { repo, setOnline, setStamp } = makeRepo({ online: true, stamp: STAMP_A });
     await repo.getPage('privacy', 'privacy'); // cached under STAMP_A
 

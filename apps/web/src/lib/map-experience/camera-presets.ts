@@ -1,6 +1,6 @@
 /**
- * Cinematic camera grammar for the persistent map stage (ADR-017
- * "Persistent map canvas — one MapLibre instance across hero and explore").
+ * Cinematic camera grammar for the persistent map stage
+ * (`docs/decisions-carryover.md`, "Persistent map canvas": camera grammar).
  *
  * Named presets — never raw `flyTo`/`easeTo` defaults — describe each tier of the map's
  * national -> state -> locality -> point descent as motion tokens: `duration`, `curve`,
@@ -87,8 +87,8 @@ const IDENTITY_EASING: CameraEasing = (t) => t;
 /**
  * Authored camera grammar. Duration shortens and curve/speed sharpen as the descent gets more
  * specific (national's long establishing arc down to point's quick, tight landing) mirroring
- * the Johnny Harris/Vox register ADR-017 names as the reference: a continuous camera descending
- * into place, never a jump cut.
+ * the Johnny Harris/Vox register the map decision names as its reference: a continuous camera
+ * descending into place, never a jump cut.
  */
 export const CAMERA_PRESETS: Readonly<Record<CameraPresetName, CameraPreset>> = {
   national: {

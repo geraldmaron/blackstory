@@ -14,14 +14,22 @@ describe('resolveObservabilityConfig — kill switch (MOB-018 item 7)', () => {
   });
 
   it('only an explicit false disables observability — any other falsy/garbage value stays on', () => {
-    expect(resolveObservabilityConfig({ observabilityEnabled: false }).observabilityEnabled).toBe(false);
+    expect(resolveObservabilityConfig({ observabilityEnabled: false }).observabilityEnabled).toBe(
+      false,
+    );
     expect(resolveObservabilityConfig({ observabilityEnabled: 0 }).observabilityEnabled).toBe(true);
-    expect(resolveObservabilityConfig({ observabilityEnabled: 'no' }).observabilityEnabled).toBe(true);
-    expect(resolveObservabilityConfig({ observabilityEnabled: null }).observabilityEnabled).toBe(true);
+    expect(resolveObservabilityConfig({ observabilityEnabled: 'no' }).observabilityEnabled).toBe(
+      true,
+    );
+    expect(resolveObservabilityConfig({ observabilityEnabled: null }).observabilityEnabled).toBe(
+      true,
+    );
   });
 
   it('accepts an explicit true', () => {
-    expect(resolveObservabilityConfig({ observabilityEnabled: true }).observabilityEnabled).toBe(true);
+    expect(resolveObservabilityConfig({ observabilityEnabled: true }).observabilityEnabled).toBe(
+      true,
+    );
   });
 
   it('never throws on a malformed extra value', () => {
@@ -38,16 +46,18 @@ describe('resolveObservabilityConfig — kill switch (MOB-018 item 7)', () => {
     expect(resolveObservabilityConfig({ performanceSampleRate: -0.1 }).performanceSampleRate).toBe(
       DEFAULT_PERFORMANCE_SAMPLE_RATE,
     );
-    expect(resolveObservabilityConfig({ performanceSampleRate: 'half' }).performanceSampleRate).toBe(
-      DEFAULT_PERFORMANCE_SAMPLE_RATE,
-    );
-    expect(resolveObservabilityConfig({ performanceSampleRate: Number.NaN }).performanceSampleRate).toBe(
-      DEFAULT_PERFORMANCE_SAMPLE_RATE,
-    );
+    expect(
+      resolveObservabilityConfig({ performanceSampleRate: 'half' }).performanceSampleRate,
+    ).toBe(DEFAULT_PERFORMANCE_SAMPLE_RATE);
+    expect(
+      resolveObservabilityConfig({ performanceSampleRate: Number.NaN }).performanceSampleRate,
+    ).toBe(DEFAULT_PERFORMANCE_SAMPLE_RATE);
   });
 
   it('accepts a valid custom sample rate in [0, 1]', () => {
-    expect(resolveObservabilityConfig({ performanceSampleRate: 0.5 }).performanceSampleRate).toBe(0.5);
+    expect(resolveObservabilityConfig({ performanceSampleRate: 0.5 }).performanceSampleRate).toBe(
+      0.5,
+    );
     expect(resolveObservabilityConfig({ performanceSampleRate: 0 }).performanceSampleRate).toBe(0);
     expect(resolveObservabilityConfig({ performanceSampleRate: 1 }).performanceSampleRate).toBe(1);
   });

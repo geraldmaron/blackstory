@@ -28,11 +28,7 @@ function mapsQuery(lat: number, lng: number, label?: string): string {
 }
 
 /** Builds the candidate URI list for a public-precision pin — geo first, then web fallbacks. */
-export function buildMapsHandoffUris(
-  lat: number,
-  lng: number,
-  label?: string,
-): readonly string[] {
+export function buildMapsHandoffUris(lat: number, lng: number, label?: string): readonly string[] {
   if (!isFiniteCoord(lat) || !isFiniteCoord(lng)) return [];
   const query = mapsQuery(lat, lng, label);
   const geoUri =

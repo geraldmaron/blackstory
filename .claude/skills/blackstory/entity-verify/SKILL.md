@@ -51,8 +51,22 @@ Source an address or named place from a custodian, then run `locate`. Source lad
 3. Period map, directory, or finding aid that names the site in the relevant years
 4. Wikidata P625 only as enrichment, never as publish-time truth
 
-Pin kind is part of the fact. Default to the *site of the history*, not a birthplace, grave,
-or modern HQ, unless the record is about that other anchor.
+Pin kind is part of the fact, and which anchor is correct depends on what kind of record this
+is:
+
+- **Place, event, or any other non-person record:** default to the *site of the history* —
+  not a birthplace, grave, or modern HQ — unless the record is specifically about that other
+  anchor.
+- **`kind:person` record:** default to *birthplace* instead. repo-i55t found dozens of
+  people labeled for one life event (induction, burial, a legislative seat) but pinned at
+  another (birth), or the reverse; the ruling taken there (carried out in repo-x8j6 and
+  repo-a2snv, 2026-09-12) is that jurisdictionLabel and the pin must read from the same
+  anchor. When no birthplace can be sourced to a specific place, keep the pin at the next
+  most specific anchor that *is* sourced (a documented residence or workplace) rather than
+  leaving label and pin disagreeing.
+
+Whichever anchor applies, never invent one to fill the gap — an unsourced anchor is a missing
+pin, not a guessed one.
 
 Precision (from the locate verb; no LLM, ever):
 
@@ -65,7 +79,8 @@ Precision (from the locate verb; no LLM, ever):
 
 Dignity: no residential precision on living people; a coarsened point is never labeled as an
 exact address; parent-site snaps cap at 15km, otherwise keep the pin and downgrade precision.
-Never snap to a US state or city centroid.
+Never snap to a US state or city centroid — for a site-of-the-history anchor or a birthplace
+anchor alike.
 
 When you have a sourced address, use [`blackstory-locate`](../locate/SKILL.md). Batch audits:
 `packages/firebase/scripts/audit-entity-locations.ts`,

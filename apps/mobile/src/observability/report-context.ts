@@ -23,10 +23,16 @@ const UNKNOWN = 'unknown';
 export interface ReportContext {
   /** User-facing semantic app version (`Constants.expoConfig.version`). */
   readonly appVersion: string;
-  /** Store build number / version code (CI-derived, ADR-023 §3). */
+  /**
+   * Store build number / version code (CI-derived, ADR-024 §3; restated in
+   * `docs/decisions-carryover.md`, "Mobile cache and OTA release"). Cited here
+   * as "ADR-023" before the 2026-07-22 mobile renumbering.
+   */
   readonly buildNumber: string;
   /**
-   * EAS Update runtime version (ADR-023 §2): bumped only when the native
+   * EAS Update runtime version (ADR-024 §2; restated in
+   * `docs/decisions-carryover.md`, "Mobile cache and OTA release"): bumped
+   * only when the native
    * layer changes, so it tells us whether an OTA-shipped JS bundle matches
    * the binary it is running on. See `resolveRuntimeVersion` for the
    * resolution/fallback rule.
@@ -34,7 +40,8 @@ export interface ReportContext {
   readonly runtimeVersion: string;
   /**
    * The server release stamp this client last synced against (MOB-005
-   * bootstrap / `data/release-cache.ts` `getActiveStamp`; ADR-022 §4). This
+   * bootstrap / `data/release-cache.ts` `getActiveStamp`; the global release stamp in
+   * `docs/decisions-carryover.md`, "Mobile cache and OTA release"). This
    * is a release identifier, never a content field — safe to log.
    */
   readonly releaseId: string;

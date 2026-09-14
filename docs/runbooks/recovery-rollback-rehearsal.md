@@ -12,7 +12,9 @@
 > pass and may target retired GCP/Firestore surfaces.
 
 **Scope:** Quarterly dry-run proving recovery procedures under pressure without live GCP restore.
-**System of record:** Firestore (ADR-011). **Not in scope:** live production import, Cloud SQL restore.
+**System of record:** ~~Firestore (ADR-011)~~ — stale, see the correction above; the live system of
+record is Supabase Postgres (`docs/decisions-carryover.md`, "Firestore as system of record,
+reversed"). **Not in scope:** live production import, Cloud SQL restore.
 
 ## When to run
 

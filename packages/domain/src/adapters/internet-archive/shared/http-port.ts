@@ -2,17 +2,14 @@
  * Safe outbound HTTP port shared by the community discovery adapters
  * (RSS/Atom, Internet Archive, DPLA v2, Wayback SPN).
  *
- * `@repo/domain` cannot import `@repo/security` in shipped (non-test) code
- * `@repo/security` already depends on `@repo/domain` at runtime, so the reverse
- * edge would be a circular workspace dependency (the same rule documented in
- * `../../../rights/takedown.ts` and `../../../map/map-source.ts`). `@repo/security` is
- * listed only as a devDependency of this package for tests.
+ * These adapters take outbound HTTP as an injected port rather than calling `@repo/security`
+ * directly, so every adapter stays pure: it can be exercised with no transport, and the SSRF
+ * policy has exactly one implementation instead of one per adapter.
  *
- * So this module defines a dependency-injected **port** instead of calling directly.
  * Every adapter in rss/, internet-archive/, and dpla/ takes a `SafeHttpClient` as an argument
- * and never performs a bare `fetch`. Production wiring (outside this package, in the
- * apps/workers layer that already depends on both `@repo/domain` and
- * `@repo/security`) MUST implement `SafeHttpClient` by:
+ * and never performs a bare `fetch`. Production wiring lives outside this package, in a layer
+ * that depends on both `@repo/domain` and `@repo/security` (for example `packages/config`'s
+ * scheduled jobs), and MUST implement `SafeHttpClient` by:
  * 1. Calling `evaluateExternalUrl` from `@repo/security`'s url-safety module
  * to reject disallowed schemes/ports/userinfo/domains before any I/O.
  * 2. Calling `resolveAndPinDestination` to resolve DNS once, reject private/loopback/
@@ -24,10 +21,9 @@
  * unpinned or unchecked request.
  *
  * See `http-port.test.ts` in this directory for a test that wires the REAL `@repo/security`
- * primitives end-to-end (imported only there, as a devDependency) and proves an SSRF-targeted
- * URL is rejected before any adapter fetch would proceed the same pattern
- * `map-source.redaction.test.ts` uses to regression-test `@repo/security` wiring without
- * creating a shipped runtime dependency.
+ * primitives end-to-end and proves an SSRF-targeted URL is rejected before any adapter fetch
+ * would proceed, the same pattern `map-source.redaction.test.ts` uses to regression-test
+ * `@repo/security` wiring against the real implementation rather than a stub.
  */
 
 export type SafeHttpMethod = 'GET' | 'POST';

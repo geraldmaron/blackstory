@@ -27,6 +27,7 @@ export const NOTABILITY_CRITERION_LABELS: Readonly<Record<NotabilityCriterion, s
   enacted_law: 'Enacted law',
   elected_or_appointed_office: 'Elected or appointed office',
   black_press_or_archive: 'Black press or archive',
+  documented_military_service: 'Documented military service',
 };
 
 export type PublicNotabilityBasisItem = {

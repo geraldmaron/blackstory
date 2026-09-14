@@ -38,10 +38,7 @@ export type UtilityScreenShellProps = {
 };
 
 export const UtilityScreenShell = forwardRef<ScrollView, UtilityScreenShellProps>(
-  function UtilityScreenShell(
-    { kicker, title, dek, edges, scrollProps, children },
-    ref,
-  ) {
+  function UtilityScreenShell({ kicker, title, dek, edges, scrollProps, children }, ref) {
     return (
       <ScreenCanvas {...(edges ? { edges } : {})}>
         <ScrollView

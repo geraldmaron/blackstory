@@ -116,8 +116,8 @@ jobs:
   # own npm-based dependency graph, so it cannot run through `pnpm -r --filter './apps/**'`
   # above. These three jobs are its dedicated npm-based lane; `npm ci` here never touches the
   # root pnpm-lock.yaml, so `pnpm install --frozen-lockfile` in `validate` above is unaffected.
-  # One job, not three: typecheck, lint and Jest each paid their own `npm ci` against the
-  # same isolated lockfile. Ordered cheapest first so a lint error does not wait on Jest.
+  # One job, not three: format, typecheck, lint and Jest each paid their own `npm ci` against
+  # the same isolated lockfile. Ordered cheapest first so a lint error does not wait on Jest.
   mobile-checks:
     name: Mobile Checks
     needs: changes
@@ -143,12 +143,32 @@ jobs:
         # intentionally gitignored (apps/mobile/.gitignore) so every clean checkout —
         # including CI — must recreate it before `tsc` can resolve `expo/types`.
         run: printf '/// <reference types="expo/types" />\n' > expo-env.d.ts
+      - name: Prettier (format:check)
+        run: npm run format:check
       - name: ESLint (eslint-config-expo, warnings fail)
         run: npm run lint
       - name: Typecheck (app + test/tooling project)
         run: npm run typecheck
       - name: Jest (jest-expo preset)
         run: npm test -- --ci
+      # The two gates the release program names that nothing here was running. Doctor is the
+      # only check that looks at the PROJECT rather than the source -- config plugins, native
+      # directories against app.config.ts, the SDK's own peer expectations -- and it is exactly
+      # the class of drift that does not show up until a store build. `--check` is its
+      # dependency half, run separately so a version mismatch reads as a version mismatch
+      # rather than as one of Doctor's twenty-one checks.
+      #
+      # Both are pinned to the SDK's own CLI rather than `@latest`: a gate whose definition of
+      # passing can change without a commit is not a gate.
+      - name: Expo Doctor (project health against the installed SDK)
+        # `expo-doctor` is a pinned devDependency, not `npx expo-doctor@latest`: a gate whose
+        # definition of passing can change without a commit is not a gate, and `--no-install`
+        # would silently resolve from a warm npx cache locally and fail on a clean runner.
+        run: npm run doctor
+      - name: Expo dependency alignment
+        # Deliberate deviations are declared in package.json `expo.install.exclude`, with the
+        # reason beside them. Anything not declared there is drift and fails here.
+        run: npm run deps:check
 
   unit-py:
     name: Unit Tests (Python)
@@ -185,7 +205,10 @@ jobs:
       - name: Run pytest
         run: uv run pytest
 
-  # ADR-011 / D-014: Postgres is parked — job kept for optional revisit, not required.
+  # Off by default because this job exercises the PARKED Cloud SQL foundation under
+  # infra/database/ (apply-init.sh / verify-isolation.sh), not supabase/migrations/. Postgres
+  # itself is the system of record. See docs/decisions-carryover.md, "Firestore as system of
+  # record, reversed". Enabling this would gate PRs on non-production schema.
   integration-postgres:
     name: Integration Postgres
     needs: changes

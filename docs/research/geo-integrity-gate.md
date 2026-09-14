@@ -47,7 +47,7 @@ node scripts/load-state-jurisdictions.mjs --emit-sql --output jurisdictions-stat
 
 The default fixture matches the conceptual shape of `bb_reference.jurisdictions` rows:
 
-- `id`: `us-{stateFips}` (ADR-016)
+- `id`: `us-{stateFips}` (`../decisions-carryover.md`, "Jurisdiction reference data")
 - `kind`: `state`
 - `parent_id`: `us`
 - `metadata.geometry`: GeoJSON `Polygon` (coarse bbox rectangle)

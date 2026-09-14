@@ -125,6 +125,11 @@ export function sourceClassForCitation(
   return 'modern_reputable_secondary';
 }
 
+/** Whether a source class is one of the patent record classes — a technical, not a racial, record. */
+function isPatentSourceClass(sourceClass: SourceClass): boolean {
+  return sourceClass.startsWith('patent_');
+}
+
 /** Record verbs whose object is a fact about a document rather than an interpretation. */
 const RECORD_PREDICATES = new Set([
   'patented',
@@ -213,6 +218,14 @@ export function snapshotForReleasedEntity(entity: ReleasedEntity): RecordSnapsho
     };
   });
 
+  // Technical identity and Black-history relevance are two separate evidence requirements
+  // (repo-93p35.16). An invention record's technical claim needs a technical receipt; a person
+  // record whose only cited evidence is a patent needs an independent identity receipt, because
+  // the Patent Office never recorded inventor race and a patent cannot answer that question.
+  const citesPatentSource = claims.some((claim) =>
+    claim.evidence.some((item) => isPatentSourceClass(item.sourceClass)),
+  );
+
   return {
     entityId: entity.entityId,
     entityKind: entity.kind,
@@ -222,6 +235,8 @@ export function snapshotForReleasedEntity(entity: ReleasedEntity): RecordSnapsho
     priorArtSearchRun: false,
     placeReceipt: undefined,
     relationshipsWithoutEvidence: 0,
+    requiresTechnicalReceipt: entity.kind === 'invention',
+    requiresCommunityIdentityReceipt: entity.kind === 'person' && citesPatentSource,
     released: true,
   };
 }
@@ -380,4 +395,26 @@ export function auditReleasedEntities(
     },
     ...(options.includeEntities === true ? { entities: rows } : {}),
   };
+}
+
+/**
+ * Bound and prioritize a deficit cohort.
+ *
+ * A caller narrowing by --deficit wants the next N entities carrying that deficit, not the
+ * deficit-matching subset of the first N entities by id -- so this filters first, orders by
+ * priority (P0 before P1 before P2 before P3, which sorts correctly as plain strings because
+ * they are equal length), and only then applies the limit. Callers must audit the full
+ * candidate set (no SQL-level LIMIT) before this runs, or the cohort is bounded by the wrong
+ * thing again.
+ */
+export function selectDeficitCohort(
+  entities: readonly EntityAuditRow[],
+  deficit: ResearchDeficitCode,
+  limit?: number,
+): readonly EntityAuditRow[] {
+  const matching = entities
+    .filter((entity) => entity.deficits.includes(deficit))
+    .slice()
+    .sort((a, b) => a.priority.localeCompare(b.priority));
+  return limit === undefined ? matching : matching.slice(0, limit);
 }

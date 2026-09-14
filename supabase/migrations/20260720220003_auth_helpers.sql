@@ -1,4 +1,5 @@
--- 0003_auth_helpers: read bb_role from JWT app_metadata only (ADR-020).
+-- 0003_auth_helpers: read bb_role from JWT app_metadata only (docs/data/postgres-schema.md,
+-- principle 6; never user_metadata).
 
 CREATE OR REPLACE FUNCTION bb_auth.current_role()
 RETURNS text

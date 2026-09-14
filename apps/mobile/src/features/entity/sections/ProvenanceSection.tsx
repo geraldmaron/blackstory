@@ -55,7 +55,11 @@ export function ProvenanceSection({ entity, index }: ProvenanceSectionProps) {
           {...(coverage
             ? {
                 trailing: (
-                  <RecordMeter coverage={coverage} decorative testID="entity-provenance-coverage-meter" />
+                  <RecordMeter
+                    coverage={coverage}
+                    decorative
+                    testID="entity-provenance-coverage-meter"
+                  />
                 ),
               }
             : {})}

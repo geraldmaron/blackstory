@@ -68,6 +68,17 @@ Optional inputs on `runDiscoveryCampaign`:
 - `catalog` — pass `ResolutionProfile[]` to attach `catalogMatch` on accepted/merged survivors and emit `reviewQueueItems` for ambiguous matches. Uses `resolveEntityCandidate` / `resolutionCandidateFromDiscovery`; never merges into a public entity.
 - `authorityHarvest: { enabled: true }` — for low-authority classifications (`community_oral` / `self_published` / `news_reportage`), harvest HTTPS URLs on curated authority hosts (NPS, NMAAHC, LOC, NARA, Wikidata, …) into `authorityFollowUps`. RSS items also carry capped `outboundLinkHints` extracted from feed HTML without storing full article bodies.
 
+Harvesting a `DiscoveryCampaignResult.authorityFollowUps` lead does not, by itself, put it in front of a
+researcher — `community-obscurity-run.ts`'s operator summary only ever counted the array
+(`authorityFollowUpTotal`). `packages/operator-cli/src/authority-followup-intake.ts` closes that gap: the
+`authority-followup-intake` CLI verb (`node --conditions development --import tsx
+packages/operator-cli/src/bin.ts authority-followup-intake --leads-file <path> [--max-leads N]
+[--commit] ...`) reads a `DiscoveryCampaignResult` (or a bare `AuthorityFollowUpLead[]`) from
+`--leads-file` and runs the existing single-URL `research-intake` path — `runResearchIntake`'s SSRF-safe
+fetch, citation prefill, and `prepareLeadIntake` draft-case creation — once per lead, titled from
+`lead.host` with a description noting the harvest reason and the parent candidate. It is safe by default
+like every other verb here: without `--commit` nothing is written, and no full lead text is republished.
+
 ## Curated community feeds (extra care)
 
 `packages/domain/src/adapters/rss/curated-feeds.ts` seeds vetted community feeds (currently **The American Blackstory**). Extra-care policy flags require authority harvest, prefer catalog propose-match, snippet-only storage, and `cannotPublishAlone`. Feeds register into the RSS feed registry via `seedCuratedCommunityFeeds` but do **not** auto-approve the RSS adapter policy.
@@ -97,7 +108,7 @@ Disclaimer: `OBSCURITY_METHODOLOGY_DISCLAIMER` — relative heuristic only; neve
 
 ## Periodic schedule + operator dry-run
 
-Roster job `community-obscurity-discovery` (`packages/config/src/scheduled-jobs/`) runs weekly (Sundays 10:00 UTC), kill switch `research-campaigns`, `publicEffect: none`, `rosterStatus: real`. **Production trigger (ADR-018):** prefer Firebase Functions v2 `onSchedule` calling `dispatchDiscoveryCampaign` (research SA). Cloud Run Jobs remain for runs that may exceed ~30 minutes. GHA weekly fixture smoke + `workflow_dispatch` are CI/operator paths. The Cloud Scheduler / Jobs mirror in `infra/gcp/scheduler/scheduled-jobs.json` stays `"status": design` until a human apply for the Jobs path.
+Roster job `community-obscurity-discovery` (`packages/config/src/scheduled-jobs/`) runs weekly (Sundays 10:00 UTC), kill switch `research-campaigns`, `publicEffect: none`, `rosterStatus: real`. **Production trigger:** ADR-018 (Firebase Functions v2 `onSchedule` calling `dispatchDiscoveryCampaign`) is dead — the Cloud Functions package was deleted (`repo-348e.8`) and `.github/workflows/discovery-campaigns.yml` is the live production scheduler (`../decisions-carryover.md`, "Small recovered decisions", ADR-018 entry). Cloud Run Jobs remain for runs that may exceed ~30 minutes. GHA weekly fixture smoke + `workflow_dispatch` are CI/operator paths. The Cloud Scheduler / Jobs mirror in `infra/gcp/scheduler/scheduled-jobs.json` stays `"status": design` until a human apply for the Jobs path.
 
 On-demand (no network; pass a downloaded feed file):
 
@@ -108,6 +119,12 @@ node --conditions development --import tsx packages/operator-cli/src/bin.ts comm
 ```
 
 ## Editorial enrichment (LLM stage-only)
+
+This stage is prose-only: it drafts from evidence already gathered by discovery and never
+searches or fetches on its own, and it does not change an entity's `ResearchMaturity`. For the
+evidence-directed planner that turns maturity deficits into research leads (`enrich-entity`), and
+for the full deep-vs-prose-only distinction, see the "enrich-entity (deep research planner)"
+section of [`research-operations.md`](./research-operations.md).
 
 After discovery/obscurity yields pending leads, run the editorial judge (`mock` /
 `openrouter` / `ollama` / `hybrid`). It weeds keep|reject|needs_evidence, drafts

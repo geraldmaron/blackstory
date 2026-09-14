@@ -74,10 +74,7 @@ export function EditionTabIcon({ name, focused, size = 20 }: EditionTabIconProps
   return <NavIcon name={name} size={size} selected={focused} />;
 }
 
-export type EditionTabIconRenderer = (props: {
-  focused: boolean;
-  size: number;
-}) => ReactNode;
+export type EditionTabIconRenderer = (props: { focused: boolean; size: number }) => ReactNode;
 
 /**
  * Fallback tab icon row height excluding safe area (Expo default) when the

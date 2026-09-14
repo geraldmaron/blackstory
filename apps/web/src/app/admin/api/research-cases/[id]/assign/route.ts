@@ -2,8 +2,9 @@
  * POST /api/research-cases/[id]/assign — assign a research case to a reviewer.
  */
 import {
-  authorizeAdminRequest,
+  authorizeAdminRoute,
   authErrorResponse,
+  isAdminAuthorizationError,
 } from '../../../../../../admin/auth/request-auth';
 import { assignAdminResearchCase } from '../../../../../../admin/cases/research-case-store';
 import type { ReviewPriority } from '@repo/domain';
@@ -19,7 +20,7 @@ export async function POST(
   context: { params: Promise<{ id: string }> },
 ): Promise<Response> {
   try {
-    const caller = await authorizeAdminRequest(request.headers);
+    const caller = await authorizeAdminRoute(request);
     const { id } = await context.params;
     const body = (await request.json()) as Body;
     const reviewerId = body.reviewerId?.trim() || caller.uid;
@@ -40,6 +41,11 @@ export async function POST(
       auditEventId: result.auditEventId,
     });
   } catch (error) {
+    // Asked before the domain mappings below: an authorization failure is a 401 or 403, and
+    // falling through to the generic handler would answer it with 400.
+    if (isAdminAuthorizationError(error)) {
+      return authErrorResponse(error);
+    }
     if (error instanceof Error && /not found/i.test(error.message)) {
       return Response.json({ error: error.message }, { status: 404 });
     }

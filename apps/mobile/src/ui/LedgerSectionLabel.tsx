@@ -16,11 +16,7 @@ export type LedgerSectionLabelProps = {
   readonly ruleAbove?: boolean;
 };
 
-export function LedgerSectionLabel({
-  children,
-  meta,
-  ruleAbove = false,
-}: LedgerSectionLabelProps) {
+export function LedgerSectionLabel({ children, meta, ruleAbove = false }: LedgerSectionLabelProps) {
   return (
     <View
       style={styles.wrap}

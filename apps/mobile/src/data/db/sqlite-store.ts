@@ -19,7 +19,12 @@ import {
   ENTRIES_TABLE,
   META_TABLE,
 } from './schema';
-import { RELEASE_COUPLED_NAMESPACES, type CacheNamespace, type CacheStore, type StoredEntry } from './store';
+import {
+  RELEASE_COUPLED_NAMESPACES,
+  type CacheNamespace,
+  type CacheStore,
+  type StoredEntry,
+} from './store';
 
 interface EntryRow {
   namespace: CacheNamespace;
@@ -100,7 +105,10 @@ export function createSqliteStore(db: SqliteDatabase): CacheStore {
       );
     },
     async delete(namespace, key) {
-      await db.runAsync(`DELETE FROM ${ENTRIES_TABLE} WHERE namespace = ? AND key = ?`, [namespace, key]);
+      await db.runAsync(`DELETE FROM ${ENTRIES_TABLE} WHERE namespace = ? AND key = ?`, [
+        namespace,
+        key,
+      ]);
     },
 
     async totalBytes() {
@@ -140,7 +148,10 @@ export function createSqliteStore(db: SqliteDatabase): CacheStore {
       try {
         // `PRAGMA integrity_check` returns 'ok' on a healthy DB. A corrupt file
         // throws or returns a non-'ok' row.
-        const row = await db.getFirstAsync<{ integrity_check: string }>('PRAGMA integrity_check', []);
+        const row = await db.getFirstAsync<{ integrity_check: string }>(
+          'PRAGMA integrity_check',
+          [],
+        );
         const value = row ? Object.values(row)[0] : undefined;
         if (value !== undefined && value !== 'ok') return false;
         // Also confirm our tables exist (a truncated file may pass integrity but

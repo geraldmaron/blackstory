@@ -1,13 +1,17 @@
 /**
- * App Router remount boundary for shell page enter transitions.
+ * App Router remount boundary for the shell page wrapper.
  *
- * Next.js re-instantiates this template on client navigations so a short enter
- * animation can run without touching persistent chrome (header/footer in layout.tsx).
- * The Explore instrument (`/explore`) emits `data-surface="instrument"`; shell.css disables
- * the transition there so the shared MapLibre canvas is never crossfaded (ADR-017).
- * `/` is the reading Door, not the instrument. Opacity fades (exit or enter) were removed:
- * they blanked loading UI before slow RSC/compile finished (story ↔ entity navigations
- * looked broken).
+ * Next.js re-instantiates this template on client navigations, so a per-page wrapper can
+ * remount without touching persistent chrome (header/footer in layout.tsx). There is no enter
+ * animation left to run: opacity fades blanked loading UI before slow RSC/compile finished
+ * (story to entity navigations looked broken), and the transform-based one made this wrapper
+ * the containing block for the fixed map plate (`ShellPageTransition.tsx` states that in full).
+ *
+ * Nothing here crossfades the shared MapLibre canvas, and not because a rule suppresses it:
+ * `MapStageProvider` wraps `.ds-shell`, so `.ds-map-stage` is a sibling of the shell and sits
+ * outside this template's subtree entirely (`docs/decisions-carryover.md`, "Persistent map
+ * canvas": the root shell owns the canvas). `/explore` emits `data-surface="instrument"`;
+ * `/` is the reading Door, not the instrument.
  */
 import type { ReactNode } from 'react';
 import { ShellPageTransition } from '../components/ShellPageTransition';

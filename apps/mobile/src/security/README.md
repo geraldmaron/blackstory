@@ -6,7 +6,8 @@ server-side with a stateless format check
 (`packages/security/src/client-attestation.ts`) — not Firebase App Check, and
 not a database lookup: no client registry exists on the server. **Client
 headers are attestation signals, not authorization**
-(invariant 6, ADR-010): nothing here gates data access. The server
+(invariant 6; `../../../../docs/decisions-carryover.md`, "Security and abuse assumptions",
+ADR-010): nothing here gates data access. The server
 (`apps/api-public` + `@repo/security`) stays authoritative.
 
 ## Modules

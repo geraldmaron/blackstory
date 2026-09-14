@@ -1,6 +1,9 @@
 /**
- * Typed surface identity and capability matrix for BlackStory deployables (ADR-005).
- * Fail-closed operation and auth checks mirror infra/gcp/surfaces/surface-matrix.json.
+ * Typed surface identity and capability matrix for BlackStory deployables (see
+ * docs/decisions-carryover.md, "Service surface separation" — ADR-005 does not exist). This matrix
+ * is real and tested, but is a code-level contract only: the Cloud Run/IAP network isolation that
+ * infra/gcp/surfaces/surface-matrix.json describes has never been deployed (see that section for
+ * the evidence) — do not assume this mirror reflects live infrastructure.
  */
 
 export const SURFACE_IDS = [

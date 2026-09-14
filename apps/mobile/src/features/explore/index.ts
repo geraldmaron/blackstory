@@ -48,6 +48,16 @@ export {
 } from './ExploreFiltersPanel';
 export { MapColorKey, type MapColorKeyProps } from './MapColorKey';
 export { ExploreRecordsRail, type ExploreRecordsRailProps } from './ExploreRecordsRail';
+export { ExploreSideRail, type ExploreSideRailProps } from './ExploreSideRail';
+export { linesForFontScale, LARGE_TYPE_THRESHOLD } from './large-type';
+export {
+  explorePaneLayout,
+  EXPLORE_MAP_MIN_WIDTH,
+  EXPLORE_RAIL_MAX_WIDTH,
+  EXPLORE_RAIL_MIN_WIDTH,
+  EXPLORE_RAIL_WIDTH_FRACTION,
+  type ExplorePaneLayout,
+} from './explore-pane-layout';
 export {
   ExploreInstrumentsPanel,
   type ExploreInstrumentsPanelProps,
@@ -84,11 +94,7 @@ export {
   type ExploreAction,
   type CameraCommand,
 } from './explore-controller';
-export {
-  applyFilters,
-  matchesFilters,
-  countMatches,
-} from './explore-filter';
+export { applyFilters, matchesFilters, countMatches } from './explore-filter';
 export {
   clusterFeatures,
   resolveCluster,
@@ -110,8 +116,4 @@ export {
   type ExploreFeature,
   type ExploreFeatureProperties,
 } from './explore-feature';
-export {
-  parseRestoredSelection,
-  reconcileSelection,
-  type RestoredSelection,
-} from './selection';
+export { parseRestoredSelection, reconcileSelection, type RestoredSelection } from './selection';

@@ -1,4 +1,5 @@
-import { Linking } from 'react-native';
+import { Linking, StyleSheet } from 'react-native';
+import { EXTERNAL_LINK_HINT } from '@/ui';
 import { fireEvent, render, waitFor } from '@testing-library/react-native';
 import { CitationLink } from '../CitationLink';
 import type { Citation } from '../types';
@@ -16,7 +17,9 @@ describe('CitationLink', () => {
   };
 
   it('shows the source label visibly, not a bare URL', async () => {
-    const { getByText, queryByText } = await render(<CitationLink citation={safeCitation} isOnline />);
+    const { getByText, queryByText } = await render(
+      <CitationLink citation={safeCitation} isOnline />,
+    );
     expect(getByText('Read the register entry')).toBeTruthy();
     expect(getByText('County historical register')).toBeTruthy();
     expect(queryByText('https://example.org/register')).toBeNull();
@@ -31,23 +34,40 @@ describe('CitationLink', () => {
 
   it('shows an offline message and never calls Linking when tapped while offline', async () => {
     const spy = jest.spyOn(Linking, 'openURL').mockResolvedValue(true as never);
-    const { getByRole, findByText } = await render(<CitationLink citation={safeCitation} isOnline={false} />);
+    const { getByRole, findByText } = await render(
+      <CitationLink citation={safeCitation} isOnline={false} />,
+    );
     fireEvent.press(getByRole('link'));
     await findByText(/connect to the internet/i);
     expect(spy).not.toHaveBeenCalled();
   });
 
   it('never renders an unsafe href as a live link', async () => {
-    const unsafe: Citation = { source: 'Hostile', label: 'Click here', href: 'javascript:alert(1)' as never };
+    const unsafe: Citation = {
+      source: 'Hostile',
+      label: 'Click here',
+      href: 'javascript:alert(1)' as never,
+    };
     const { queryByRole, getByText } = await render(<CitationLink citation={unsafe} isOnline />);
     expect(queryByRole('link')).toBeNull();
     expect(getByText('Click here')).toBeTruthy();
   });
 
   it('renders a withheldReason as explanatory text with no link', async () => {
-    const withheld: Citation = { source: 'Protected source', label: 'Redacted', withheldReason: 'Source link withheld — protects a living person.' };
+    const withheld: Citation = {
+      source: 'Protected source',
+      label: 'Redacted',
+      withheldReason: 'Source link withheld — protects a living person.',
+    };
     const { queryByRole, getByText } = await render(<CitationLink citation={withheld} isOnline />);
     expect(queryByRole('link')).toBeNull();
     expect(getByText(/protects a living person/)).toBeTruthy();
+  });
+
+  it('says the citation opens in the browser and draws a 44pt target', async () => {
+    const { getByRole } = await render(<CitationLink citation={safeCitation} isOnline />);
+    const link = getByRole('link');
+    expect(link.props.accessibilityHint).toBe(EXTERNAL_LINK_HINT);
+    expect(StyleSheet.flatten(link.props.style).minHeight).toBeGreaterThanOrEqual(44);
   });
 });

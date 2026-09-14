@@ -49,7 +49,10 @@ import {
   parseNomination,
 } from './lib/evidence-collectors/nrhp-nomination.ts';
 import { redactStreetAddresses } from './lib/evidence-collectors/redact-address.ts';
-import { checkSubjectIdentity } from './lib/evidence-collectors/subject-identity.ts';
+import {
+  checkSubjectIdentity,
+  placeExpectationFromProjection,
+} from './lib/evidence-collectors/subject-identity.ts';
 import { assessText, stripUnstorableCharacters } from './lib/evidence-collectors/text-quality.ts';
 import {
   WIKIPEDIA_LICENSE,
@@ -339,6 +342,7 @@ async function collectWikipedia(row: CandidateRow): Promise<EvidenceRow | null> 
     city: row.payload.city,
     county: row.payload.county,
     state: row.payload.state,
+    kind: row.payload.kind,
   });
   if (article === null) {
     throw new SkipReason('no enwiki article clearing the identity gate (place, name, focus)');
@@ -362,7 +366,7 @@ async function collectWikipedia(row: CandidateRow): Promise<EvidenceRow | null> 
     status: quality.usable ? 'captured' : 'quarantined',
     provenance: {
       pageId: article.pageId,
-      licence: WIKIPEDIA_LICENSE,
+      license: WIKIPEDIA_LICENSE,
       publisher: 'Wikipedia contributors',
       attributionRequired: true,
       identity: article.identity,
@@ -372,15 +376,56 @@ async function collectWikipedia(row: CandidateRow): Promise<EvidenceRow | null> 
 }
 
 /**
+ * repo-n7p6.22: the DC HPO import's canonicalUrl falls back to this dataset landing page — not
+ * a per-item historicsites.dcpreservation.org URL — for rows whose ArcGIS source record has no
+ * Hyperlink value. Confirmed directly against AAHT_Source_Data for all 7 affected rows: URL_Status
+ * there reads "*Not Currently Available*" or is unset, i.e. this is DC HPO's own admission that no
+ * item page exists yet, not an import bug that dropped a real link. Every affected row gets this
+ * identical URL, so it can never BE a row's identity the way a real per-item URL is (see the
+ * collector's doc comment below) — capturing it as evidence would silently store the dataset's
+ * generic dcat:Dataset description as if it were about that one site. Shared with the same literal
+ * string in landscape-intake-weed.ts ('fallback_catalog_url') and incremental-publish.ts.
+ */
+const DC_HPO_FALLBACK_URL = 'https://catalog.data.gov/dataset/black-history-sites-washington';
+
+/**
  * DC HPO's own inventory page for the site (dcpreservation.org, tier2 by tier1-sources policy).
  * Unlike the NRHP/Wikipedia paths there is no search step here: the row's canonicalUrl was
  * assigned at import time straight from the DC Historic Preservation Office's own ArcGIS feature
  * for this exact record, so the URL already IS the identity — nothing to corroborate against.
+ * That does not hold for DC_HPO_FALLBACK_URL, which is shared by every row the import could not
+ * find a per-item Hyperlink for; those are quarantined below without a fetch.
  */
 async function collectDcHpo(row: CandidateRow): Promise<EvidenceRow | null> {
   if (row.lane !== 'dc-sites') throw new SkipReason('not a dc-sites row');
   const url = row.payload.canonicalUrl;
   if (url === undefined) throw new SkipReason('dc-sites row has no canonicalUrl');
+
+  if (url === DC_HPO_FALLBACK_URL) {
+    // Written (not skipped) so a re-sweep overwrites any earlier run's mistaken 'captured' status
+    // for this exact (entity_id, collector, source_url) key — see repo-n7p6.22.
+    return {
+      id: evidenceId(row.id, 'dc-hpo', url),
+      entityId: row.id,
+      lane: row.lane,
+      collector: 'dc-hpo',
+      sourceUrl: url,
+      sourceTier: 'tier2',
+      title: row.display_name,
+      contentText: '',
+      contentHash: hashContent(''),
+      charCount: 0,
+      qualityScore: 0,
+      status: 'quarantined',
+      provenance: {
+        publisher: 'DC Office of Planning, Historic Preservation Office',
+        licence: 'CC BY 4.0',
+        quarantineReason:
+          'canonicalUrl is the dataset landing page fallback, not a per-item source — DC HPO ' +
+          'ArcGIS source record has no per-item Hyperlink for this site (repo-n7p6.22)',
+      },
+    };
+  }
 
   const page = await safeFetchPage(url, { allowedContentTypes: ['text/html'] });
   if (page === undefined)
@@ -405,7 +450,7 @@ async function collectDcHpo(row: CandidateRow): Promise<EvidenceRow | null> {
     status: quality.usable ? 'captured' : 'quarantined',
     provenance: {
       publisher: 'DC Office of Planning, Historic Preservation Office',
-      licence: 'CC BY 4.0',
+      license: 'CC BY 4.0',
       quarantineReason: quality.usable ? undefined : quality.reason,
     },
   };
@@ -600,7 +645,7 @@ async function collectPersonWikipedia(row: CandidateRow): Promise<EvidenceRow | 
     qualityScore: quality.score,
     status: quality.usable ? 'captured' : 'quarantined',
     provenance: {
-      licence: WIKIPEDIA_LICENSE,
+      license: WIKIPEDIA_LICENSE,
       publisher: 'Wikipedia contributors',
       attributionRequired: true,
       identityAnchor: 'canonicalUrl (assigned from Wikidata QID at discovery)',
@@ -984,7 +1029,9 @@ async function main(): Promise<void> {
     const fallback = await pool.query<{
       id: string;
       display_name: string;
-      payload: CandidateRow['payload'];
+      kind: string | null;
+      jurisdiction_label: string | null;
+      location_label: string | null;
       publicClaimCitationUrls: readonly string[];
     }>(
       `WITH active AS (
@@ -992,11 +1039,9 @@ async function main(): Promise<void> {
        )
        SELECT re.entity_id AS id,
               re.projection->>'displayName' AS display_name,
-              jsonb_build_object(
-                'kind', re.projection->>'kind',
-                'city', split_part(re.projection->>'locationLabel', ', ', 1),
-                'state', split_part(re.projection->>'locationLabel', ', ', 2)
-              ) AS payload,
+              re.projection->>'kind' AS kind,
+              re.projection->>'jurisdictionLabel' AS jurisdiction_label,
+              re.projection->>'locationLabel' AS location_label,
               COALESCE(citations.urls, ARRAY[]::text[]) AS "publicClaimCitationUrls"
          FROM bb_public.release_entities re
          JOIN active a ON re.release_id = a.release_id
@@ -1018,7 +1063,18 @@ async function main(): Promise<void> {
         // exactly as they would for any other non-dc-sites row.
         lane: row.id.split(/[_-]/u)[0] ?? 'curated',
         display_name: row.display_name,
-        payload: row.payload,
+        // repo-f85hp: derived in TS, not by splitting one label in SQL. `locationLabel` is prose
+        // about where a thing stands ("Hanging Bridge, Clarke County"), not an administrative
+        // place, and splitting it on the comma gave `checkSubjectIdentity` city "Hanging Bridge"
+        // and state "Clarke County" — which is why a correct marker page for Alma Howze was
+        // rejected with "identity not corroborated by place".
+        payload: {
+          kind: row.kind ?? undefined,
+          ...placeExpectationFromProjection({
+            jurisdictionLabel: row.jurisdiction_label,
+            locationLabel: row.location_label,
+          }),
+        } as CandidateRow['payload'],
         publicClaimCitationUrls: row.publicClaimCitationUrls,
       });
       resolvedIds.add(row.id);

@@ -7,12 +7,14 @@
  * (clustering, filters, list sync) layers on TOP of these in `features/explore/`,
  * so the dependency direction is explore -> map and never the reverse.
  *
- * PRIVACY INVARIANT (inherited from ADR-024 §9/§10 and MOB-011's redaction proof):
- * nothing in this module ever synthesizes a coordinate more precise than the
- * already-redacted input it was handed. `cameraForPreset` clamps every zoom to
- * `MAP_MAX_ZOOM` so no interaction can imply a precision the redacted artifact
- * does not carry, and `boundsForFeatures` only ever returns the min/max envelope
- * of coordinates it is given — it never interpolates a new point. See
+ * PRIVACY INVARIANT (inherited from `docs/decisions-carryover.md`, "Native map
+ * render layer" §9/§10, and MOB-011's redaction proof): nothing in this module ever
+ * synthesizes a coordinate more precise than the already-redacted input it was
+ * handed. `boundsForCoordinates` only ever returns the min/max envelope of the
+ * coordinates it is given — it never interpolates a new point. The zoom ceiling is
+ * enforced in two places, not one: `cameraForPreset` clamps the `center` targets it
+ * returns to `MAP_MAX_ZOOM`, and its `bounds` targets carry no zoom at all, so those
+ * rely on `<Camera maxZoom={MAP_MAX_ZOOM}>` in `MapScreen.tsx`. See
  * `coordinateDecimals`/`isNoMorePreciseThan` for the checkable form of this.
  */
 import { duration, easingStandardBezier } from '@/ui';
@@ -208,7 +210,10 @@ export type CameraForPresetInput = {
  * ceiling zoom. Every returned zoom is clamped to `MAP_MAX_ZOOM` — the privacy
  * ceiling holds no matter what a caller asks for.
  */
-export function cameraForPreset(preset: CameraPreset, input: CameraForPresetInput = {}): CameraTarget {
+export function cameraForPreset(
+  preset: CameraPreset,
+  input: CameraForPresetInput = {},
+): CameraTarget {
   switch (preset) {
     case 'national':
       return { kind: 'bounds', bounds: US_BOUNDS };
@@ -245,8 +250,10 @@ export type CameraMotion = {
  * Motion for a camera move, driven by the shared duration tokens (MOB-007) so the
  * map cannot drift from the rest of the design system's timing. When
  * `reduceMotion` is true the duration collapses to 0 — the camera JUMPS rather
- * than animating, satisfying the reduced-motion contract (ADR-022 / accessibility
- * gate) without disabling the camera move itself.
+ * than animating, satisfying the reduced-motion contract without disabling the camera
+ * move itself. That contract is this repo's own (`src/ui/useReduceMotion.ts` reads the OS
+ * setting; `__tests__/mapCamera.test.ts` asserts the collapse to zero) — no removed mobile
+ * ADR ever mentioned reduced motion or accessibility.
  */
 export function cameraMotion(preset: CameraPreset, reduceMotion: boolean): CameraMotion {
   if (reduceMotion) return { durationMs: duration.durationInstant, easing: easingStandardBezier };

@@ -96,6 +96,14 @@
   }
 }
 
+/* repo-92n2.18: the reader's own "Hold the wall still" toggle, mirroring the reduced-motion
+   rule above exactly. Per-name opacity is a CSS animation, not React state, so it cannot see
+   `held` any other way; MemorialWallAtmosphere sets `data-held` on this element's own root. */
+.ds-memorial-wall[data-held='true'] .ds-memorial-wall__name {
+  animation: none;
+  opacity: 0.28;
+}
+
 /* "Held in the Wall" message: assembles clause by clause from the wall's own
    handwriting mechanic, then rests as one paragraph, permanently. Does not
    fade with scroll (unlike ambient names — no --memorial-wall-fade here). */

@@ -8,31 +8,43 @@
  * The wrapper is server-rendered, so the attribute is in the first painted HTML and shell CSS
  * can read it before hydration.
  *
- * There is no enter animation. The transform-based one that used to live here set
- * `animation-fill-mode: both`, which leaves a permanently non-`none` computed transform and
- * makes this element the containing block for the fixed map plate — the plate then scrolls with
- * the document instead of holding the viewport. A `:has()` escape hatch keyed on a marker
- * attribute a route happened to set was the only thing preventing that, and a 0.2rem translate
- * was never worth a rule that silently stops applying when the markup changes.
+ * There is no enter animation: animations on this element interfere with the fixed map plate's
+ * containing block behavior, making the plate scroll with the document instead of holding the
+ * viewport.
+ *
+ * THERE IS NO SUSPENSE BOUNDARY HERE, and there must not be one that wraps `children`
+ * (repo-bko39). This rendered `<Suspense fallback={<FrameFromPath>{children}</FrameFromPath>}>`
+ * around `<FrameFromSearch>{children}</FrameFromSearch>`, handing the entire page to both halves,
+ * so React streamed the whole document twice: every shipped page carried two `<main>` landmarks,
+ * two `<h1>`s and a duplicate of every id, and the duplicate was about a quarter of the bytes.
+ * It was invisible — the retained fallback frame measures 0x0 — so no screenshot or functional
+ * check would ever have shown it.
+ *
+ * The boundary was also unnecessary. Its two branches were the same function: `useSurfaceClass()`
+ * reads `usePathname()` and nothing else, so despite the name nothing here ever read search
+ * params and nothing ever suspended. If a future surface genuinely needs `useSearchParams()`,
+ * wrap THAT component, never this one's children.
+ *
+ * `<ReadingProgress>` is mounted here too (SP-27, repo-92n2.34), not inside any individual room:
+ * this is the one place `surface` is already resolved for every route, so it is also the one
+ * place the progress rule can be class-wide rather than something each Reading screen has to
+ * remember to render. The component itself decides whether that renders anything; see its own
+ * doc comment.
  */
 'use client';
 
-import { Suspense, type ReactNode } from 'react';
-import { usePathname } from 'next/navigation';
-import { surfaceClassFor } from '../lib/nav/surface-classes';
+import { type ReactNode } from 'react';
+import type { SurfaceClass } from '../lib/nav/surface-classes';
 import { useSurfaceClass } from '../lib/nav/use-surface-class';
 import { PageField, usePageFieldSelection } from './PageField';
+import { ReadingProgress } from './room/ReadingProgress';
 
 export type ShellPageTransitionProps = {
   readonly children: ReactNode;
 };
 
 export function ShellPageTransition({ children }: ShellPageTransitionProps) {
-  return (
-    <Suspense fallback={<ShellPageFrameFromPath>{children}</ShellPageFrameFromPath>}>
-      <ShellPageFrameFromSearch>{children}</ShellPageFrameFromSearch>
-    </Suspense>
-  );
+  return <ShellPageChrome surface={useSurfaceClass()}>{children}</ShellPageChrome>;
 }
 
 function ShellPageChrome({
@@ -40,7 +52,7 @@ function ShellPageChrome({
   surface,
 }: {
   readonly children: ReactNode;
-  readonly surface: ReturnType<typeof surfaceClassFor>;
+  readonly surface: SurfaceClass | null;
 }) {
   const pageField = usePageFieldSelection();
 
@@ -50,17 +62,9 @@ function ShellPageChrome({
       {...(surface ? { 'data-surface': surface } : {})}
       data-page-field={pageField?.motifId ?? 'none'}
     >
+      <ReadingProgress surface={surface} />
       {pageField ? <PageField selection={pageField} /> : null}
       <div className="ds-shell-page-transition__content">{children}</div>
     </div>
   );
-}
-
-function ShellPageFrameFromPath({ children }: { readonly children: ReactNode }) {
-  const pathname = usePathname() || '/';
-  return <ShellPageChrome surface={surfaceClassFor(pathname)}>{children}</ShellPageChrome>;
-}
-
-function ShellPageFrameFromSearch({ children }: { readonly children: ReactNode }) {
-  return <ShellPageChrome surface={useSurfaceClass()}>{children}</ShellPageChrome>;
 }

@@ -16,8 +16,7 @@ import type { PublicCorrectionPhase } from './contract';
 
 export const CORRECTION_PRIVACY_NOTICE = {
   title: 'Privacy and review',
-  body:
-    'Corrections are never published as submitted. Every submission enters a restricted quarantine queue for human review. We do not show your contact details publicly. Moderators may reach out using optional contact information you provide. Do not include anyone’s home address or other sensitive personal details about a living person unless strictly necessary for the correction.',
+  body: 'Corrections are never published as submitted. Every submission enters a restricted quarantine queue for human review. We do not show your contact details publicly. Moderators may reach out using optional contact information you provide. Do not include anyone’s home address or other sensitive personal details about a living person unless strictly necessary for the correction.',
 } as const;
 
 export const CORRECTION_FORM_INTRO =
@@ -44,7 +43,8 @@ export const RATE_LIMITED_MESSAGE =
   'Too many attempts right now. Please wait a little while and try again.';
 
 /** Client is offline. Corrections do NOT queue-and-retry silently
- * (ADR-022 §3 / threat-model corrections resolution; requirement #6/#7). */
+ * (`docs/decisions-carryover.md`, "Mobile cache and OTA release": write-shaped actions degrade
+ * honestly; threat-model corrections resolution; requirement #6/#7). */
 export const OFFLINE_MESSAGE =
   'You’re offline. Corrections need a connection to submit. Try again once you’re back online.';
 

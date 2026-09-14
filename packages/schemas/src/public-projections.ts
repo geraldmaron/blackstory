@@ -6,6 +6,7 @@
  * validate the same wire shape without importing Firebase or a database client.
  */
 import { z } from 'zod';
+import { relationshipTypeSchema } from './relationship-vocabulary.js';
 
 /**
  * Mirrors ThemeImpactThemeId / THEME_IMPACT_THEME_IDS from
@@ -121,6 +122,7 @@ const notabilityBasisRecordSchema = z.object({
     'enacted_law',
     'elected_or_appointed_office',
     'black_press_or_archive',
+    'documented_military_service',
   ]),
   note: z.string().min(1),
   evidenceIds: z.array(z.string().min(1)).default([]),
@@ -132,75 +134,6 @@ const sensitivityClassSchema = z.enum([
   'violence_associated',
   'enslaver_or_segregationist',
 ]);
-
-/**
- * The read side of the relationship vocabulary. Mirrors RELATIONSHIP_TYPES in
- * `packages/domain-core/src/relationship.ts` and the `entity_relationships_relationship_type_check`
- * constraint; @repo/schemas deliberately depends on nothing but zod, so the list is restated here
- * rather than imported.
- *
- * `.catch('other')` is the important part, and it is here because this schema deleted 24 live
- * records on 2026-09-09. Migration 20260908120000 widened the database constraint to admit the
- * invention contribution predicates; this enum still held the 20 values it shipped with. The
- * moment `invented` edges were written, `parseEntityProjection` failed for every entity that had
- * one — Latimer, Morgan, Banneker and 21 others — and a record that fails to parse does not
- * degrade, it 404s. Same class of bug as the summary ceiling documented below: a read-side check
- * that unpublishes a record instead of flagging it.
- *
- * An unknown relationship type is now a display problem (`relationPhrase` falls back to generic
- * wording), not a missing page. Adding a value here upgrades the wording; forgetting to costs
- * nothing.
- */
-const relationshipTypeSchema = z
-  .enum([
-    // Structural and biographical.
-    'located_at',
-    'occurred_at',
-    'attended',
-    'founded',
-    'employed_by',
-    'member_of',
-    'related_to',
-    'depicts',
-    'cites',
-    'governed_by',
-    'part_of',
-    'successor_of',
-    'served_as',
-    'succeeded',
-    'challenged_law',
-    'funded_by',
-    'published',
-    // Historical causation.
-    'caused',
-    'enabled',
-    'influenced',
-    'participated_in',
-    'overturned',
-    'commemorates',
-    'authored',
-    // Invention contribution.
-    'invented',
-    'co_invented',
-    'improved',
-    'developed',
-    'designed',
-    'led_development_of',
-    'built_on',
-    // Commercial and institutional context.
-    'commercialized',
-    'assigned_to',
-    'licensed_to',
-    'manufactured_by',
-    'demonstrated_at',
-    // The human network around the work.
-    'collaborated_with',
-    'mentored_by',
-    'litigated_with',
-    'documented_by',
-    'other',
-  ])
-  .catch('other');
 
 export const publicActiveReleaseSchema = z.object({
   releaseId: z.string().min(1),
@@ -260,7 +193,21 @@ export const publicEntityProjectionSchema = z.object({
   locationLabel: z.string().min(1).optional(),
   status: z.string().min(1).optional(),
   statusHistory: z.array(statusHistoryEntrySchema).optional(),
-  livingStatus: z.enum(['living', 'deceased', 'unknown']).optional(),
+  /**
+   * Four tokens, not three. `presumed_deceased` is the WP:BDP plausibility answer
+   * `deriveLivingStatus` (packages/domain-core/src/living.ts) returns for a person born beyond
+   * MAX_PLAUSIBLE_HUMAN_AGE_YEARS with no death year, `deriveCatalogEntityStatus` emits it, the
+   * `entities_living_status_check` constraint accepts it, and the web UI already has an icon
+   * (status-icons.ts), help copy (metadata-help.ts) and an admin label for it.
+   *
+   * Only this parser rejected it, which made it a loaded gun rather than a gap: the first record
+   * anyone ever set to `presumed_deceased` would not have degraded, it would have 404'd — the
+   * same shape as the 2026-09-09 incident this file documents two fields below, where a
+   * vocabulary widened in the database and not here took 39 live records off the site. It had
+   * never fired only because 0 of 483 live person records used the token. Ellen Eglin
+   * (repo-2wdg item 9) is the first, so the gun is now unloaded rather than pointed.
+   */
+  livingStatus: z.enum(['living', 'deceased', 'presumed_deceased', 'unknown']).optional(),
   statusProvenance: z.enum(['canonical', 'derived_heuristic']).optional(),
   eraBuckets: z.array(z.string().min(1)).optional(),
   notabilityLabels: z.array(z.string().min(1)).optional(),
@@ -391,6 +338,21 @@ export const publicStoryThemeBindingSchema = z.object({
 });
 export type PublicStoryThemeBindingDoc = z.infer<typeof publicStoryThemeBindingSchema>;
 
+/**
+ * Longform story shape. `bb_public.release_stories` was dropped on 2026-07-29
+ * (supabase/migrations/20260729190000_drop_release_stories.sql) and `/stories` now reads
+ * articles, so nothing publishes against this schema any more.
+ *
+ * It is still load-bearing as a TYPE, not as a parser: `PublicStoryProjectionDoc` types the
+ * five-story fixture in `packages/domain/src/publication/public-story-seed.ts`, which backs the
+ * admin cover-package workflow (`/admin/stories/articles`, `/admin/stories/review`) through
+ * `apps/web/src/admin/stories/cover-article-catalog.ts`. repo-zcnr (2026-09-12) decided that
+ * fixture stays until the admin workflow gets a real-article source, so this schema stays with
+ * it. Retire them together, not separately.
+ *
+ * The companion list-item projection was deleted with repo-vn1z: it existed only to keep
+ * `/stories` list reads small, and that route is gone.
+ */
 export const publicStoryProjectionSchema = z.object({
   id: z.string().min(1),
   releaseId: z.string().min(1),
@@ -410,12 +372,17 @@ export const publicStoryProjectionSchema = z.object({
 });
 export type PublicStoryProjectionDoc = z.infer<typeof publicStoryProjectionSchema>;
 
-export const publicStoryListItemSchema = publicStoryProjectionSchema.omit({
-  body: true,
-  relatedEntityIds: true,
-  sources: true,
+/**
+ * The cached grading inputs, mirroring `RecordEvidenceInputs` in
+ * `@repo/public-contracts/evidence` and `@repo/domain`'s projection. The reader hands a parsed
+ * value straight to `confidenceTierFromEvidenceInputs`, so the field names here are load-bearing.
+ */
+export const recordEvidenceInputsSchema = z.object({
+  strongestClaimLevel: z.enum(['high', 'medium', 'low', 'unrated']),
+  citedLineageKeys: z.array(z.string().min(1)).default([]),
+  evidenceLineageKeys: z.array(z.string().min(1)).default([]),
 });
-export type PublicStoryListItemDoc = z.infer<typeof publicStoryListItemSchema>;
+export type RecordEvidenceInputsDoc = z.infer<typeof recordEvidenceInputsSchema>;
 
 export const publicSearchProjectionSchema = z.object({
   id: z.string().min(1),
@@ -441,10 +408,16 @@ export const publicSearchProjectionSchema = z.object({
   relatedCount: z.number().int().min(0),
   claimCount: z.number().int().min(0),
   /**
-   * Highest accepted-claim confidence. Absent on rows published before the field existed;
-   * do not invent `unrated` at parse time — Records slim needs to detect coverage.
+   * The grading inputs `/records` derives evidence floors from — the strongest claim level and
+   * the distinct lineage keys, never the graded tier itself. Caching the conclusion is what let
+   * `/records` serve a day-old answer after the rule changed (repo-6qjv0); caching the inputs
+   * lets it call the one read-time rule over cheap slim data.
+   *
+   * Absent on rows published before the field existed; do not invent an empty projection at parse
+   * time — an empty one grades `unrated`, while absent means "not projected yet" and Records slim
+   * needs to tell those apart to decide whether it can leave the full-entity hydrate.
    */
-  confidenceTier: z.enum(['high', 'medium', 'low', 'unrated']).optional(),
+  evidenceInputs: recordEvidenceInputsSchema.optional(),
   /** Present when the search row carries a public geohash (mappable signal for Records). */
   geohash: z.string().min(1).optional(),
 });

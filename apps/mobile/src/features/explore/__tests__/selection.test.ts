@@ -10,7 +10,9 @@ describe('parseRestoredSelection', () => {
   });
 
   it('falls back gracefully when the entity was withdrawn/released-out', () => {
-    expect(parseRestoredSelection('deleted_entity_001', SEPARATED)).toEqual({ reason: 'withdrawn' });
+    expect(parseRestoredSelection('deleted_entity_001', SEPARATED)).toEqual({
+      reason: 'withdrawn',
+    });
   });
 
   it('rejects a malformed / hostile id without crashing', () => {

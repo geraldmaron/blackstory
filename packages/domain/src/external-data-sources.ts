@@ -66,6 +66,19 @@ export type ExternalDataSource = {
   readonly cadence: 'static' | 'annual' | 'quarterly' | 'monthly' | 'weekly' | 'irregular';
   /** sha256 of the acquired artifact — filled at first successful download. */
   readonly checksumSha256?: string;
+  /**
+   * For an artifact too large to keep an owned/hosted copy of (cite-only by necessity, not
+   * choice): a cheap, re-checkable fingerprint of the header row and column count, taken
+   * without downloading the body. Re-fetch via an HTTP range request for the first line and
+   * compare — a changed `columnCount` or `headerRowSha256` means the upstream schema moved
+   * and dependent parsers/derived tables need review before their next refresh.
+   */
+  readonly schemaSnapshot?: {
+    readonly columnCount: number;
+    readonly headerRowSha256: string;
+    /** Date this snapshot was taken or last reverified against the live upstream file. */
+    readonly verifiedAt: string;
+  };
   /** Always 'disabled' at registration; ingestion beads move state via the adapter registry. */
   readonly registryState: 'disabled';
   readonly notes: string;
@@ -87,11 +100,21 @@ export const EXTERNAL_DATA_SOURCES: readonly ExternalDataSource[] = [
     geographies: ['tract'],
     cadence: 'static',
     checksumSha256: 'ec4d9ee5bcf0282261762f454226e0b7bc5513bc81644583647028da4305d6df',
+    schemaSnapshot: {
+      columnCount: 7897,
+      headerRowSha256: '3c8036b7ef339f83ee72f353a535980c945b6b59cca781a01210288ec63a8b03',
+      verifiedAt: '2026-09-12',
+    },
     registryState: 'disabled',
     notes:
       'Child income rank / incarceration outcomes by race, sex, and parental income percentile. ' +
-      '73,278 tracts × 7,897 columns; curated starter subset lives in opportunityAtlasTracts ' +
-      '(tractVintage 2010 — crosswalk needed against 2020-tract collections).',
+      '73,278 tracts × 7,897 columns; curated starter subset (72,014 tracts × 11 outcome fields) ' +
+      'lives in bb_reference.opportunity_atlas_tracts (tractVintage 2010 — crosswalk needed ' +
+      'against 2020-tract collections). Owner ruling 2026-09-12 (repo-7w972): the 2.47 GiB raw ' +
+      'file is cite-only — BlackStory does not host a copy anywhere (not GCS, not Supabase ' +
+      'Storage); dataUrl above is the public Opportunity Insights artifact and checksumSha256 / ' +
+      'schemaSnapshot are re-verifiable against it (HEAD request + first-line range fetch) ' +
+      'without downloading the body, so a silent upstream change is still detectable.',
   },
   {
     id: 'mapping-inequality-holc',

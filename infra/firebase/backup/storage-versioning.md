@@ -1,7 +1,9 @@
 # GCS storage versioning (BB-020)
 
-Versioning protects **blob** recovery; Firestore exports protect **metadata**. Both are required for
-ADR-011.
+Versioning protects **blob** recovery; Firestore exports protect **metadata**, as designed under
+ADR-011 (removed 2026-07-24, since reversed — Postgres is the live system of record; see
+`../../../docs/decisions-carryover.md`, "Firestore as system of record, reversed"; this page
+describes leftover Firestore-era design, not the live metadata path).
 
 ## Buckets
 
@@ -15,7 +17,7 @@ ADR-011.
 
 ## Public release snapshots
 
-Path layout (BB-019 / ADR-004):
+Path layout (BB-019 / `../../../docs/decisions-carryover.md`, "Public projection and immutable publication snapshots", ADR-004):
 
 ```text
 gs://black-book-efaaf-public-media/public/releases/{releaseId}/entities/{entityId}.json

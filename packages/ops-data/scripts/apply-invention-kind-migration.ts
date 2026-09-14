@@ -9,7 +9,11 @@ import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import pg from 'pg';
+import { DB_RELATIONSHIP_TYPES } from '@repo/schemas/relationship-vocabulary';
 import { normalizePgConnectionString } from './lib/pg-connection.ts';
+
+/** The constraint's value list, rendered from the shared vocabulary rather than restated here. */
+const RELATIONSHIP_TYPE_SQL_LIST = DB_RELATIONSHIP_TYPES.map((type) => `'${type}'`).join(', ');
 
 const APPLY = process.env.APPLY === '1' && process.env.DRY_RUN === '0';
 const SQL_PATH = join(
@@ -64,17 +68,7 @@ async function main(): Promise<void> {
     await client.query(`
       ALTER TABLE bb_canonical.entity_relationships
         ADD CONSTRAINT entity_relationships_relationship_type_check
-        CHECK (relationship_type IN (
-          'located_at', 'occurred_at', 'attended', 'founded', 'employed_by', 'member_of',
-          'related_to', 'depicts', 'cites', 'governed_by', 'part_of', 'successor_of',
-          'served_as', 'succeeded', 'challenged_law', 'funded_by', 'published',
-          'caused', 'enabled', 'influenced', 'participated_in', 'overturned',
-          'commemorates', 'authored',
-          'invented', 'co_invented', 'improved', 'developed', 'designed',
-          'led_development_of', 'built_on',
-          'commercialized', 'assigned_to', 'licensed_to', 'manufactured_by', 'demonstrated_at',
-          'collaborated_with', 'mentored_by', 'litigated_with', 'documented_by', 'other'
-        ))
+        CHECK (relationship_type IN (${RELATIONSHIP_TYPE_SQL_LIST}))
     `);
     await client.query(
       `INSERT INTO supabase_migrations.schema_migrations (version)

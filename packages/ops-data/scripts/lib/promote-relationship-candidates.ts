@@ -62,7 +62,7 @@ export type PromoteDecision =
       readonly action: 'skip';
       readonly candidateId: string;
       readonly reason: PromoteSkipReason;
-      readonly detail?: string;
+      readonly detail?: string | undefined;
     };
 
 export function inferredRelationshipId(

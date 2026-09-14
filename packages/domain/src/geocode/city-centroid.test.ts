@@ -1,9 +1,10 @@
 /**
- * Tests for USPS city centroid lookup (zipcodes dataset).
+ * Tests for USPS city centroid lookup (zipcodes dataset) and the curated non-US city
+ * centroid table (repo-9rkh, 2026-09-12 OWNER RULING).
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { lookupUsCityCentroid } from './city-centroid.js';
+import { lookupNonUsCityCentroid, lookupUsCityCentroid } from './city-centroid.js';
 
 test('lookupUsCityCentroid returns a finite centroid for Montgomery, AL', () => {
   const hit = lookupUsCityCentroid('Montgomery', 'AL');
@@ -42,4 +43,40 @@ test('lookupUsCityCentroid resolves conversational names for New York City', () 
   assert.ok(bare);
   assert.deepEqual(lookupUsCityCentroid('New York City', 'NY'), bare);
   assert.deepEqual(lookupUsCityCentroid('NYC', 'NY'), bare);
+});
+
+test('lookupNonUsCityCentroid resolves a curated Cuban city', () => {
+  const hit = lookupNonUsCityCentroid('Cárdenas', 'CU');
+  assert.ok(hit);
+  assert.equal(hit!.countryCode, 'CU');
+  assert.ok(Number.isFinite(hit!.lat));
+  assert.ok(Number.isFinite(hit!.lng));
+  // Cárdenas sits on Cuba's northern coast, in Matanzas province.
+  assert.ok(hit!.lat > 22 && hit!.lat < 24);
+  assert.ok(hit!.lng > -82 && hit!.lng < -80);
+});
+
+test('lookupNonUsCityCentroid is accent- and case-insensitive', () => {
+  const accented = lookupNonUsCityCentroid('Cárdenas', 'CU');
+  assert.deepEqual(lookupNonUsCityCentroid('cardenas', 'cu'), accented);
+  assert.deepEqual(lookupNonUsCityCentroid('CARDENAS', 'CU'), accented);
+});
+
+test('lookupNonUsCityCentroid resolves every documented repo-9rkh birthplace', () => {
+  assert.ok(lookupNonUsCityCentroid('Matanzas', 'CU'), 'Matanzas, CU should resolve');
+  assert.ok(lookupNonUsCityCentroid('Cienfuegos', 'CU'), 'Cienfuegos, CU should resolve');
+});
+
+test('lookupNonUsCityCentroid returns undefined for a city not yet in the table', () => {
+  // Honest gap, not an invented pin — Havana has no documented birthplace in this catalog yet.
+  assert.equal(lookupNonUsCityCentroid('Havana', 'CU'), undefined);
+});
+
+test('lookupNonUsCityCentroid returns undefined for an unrecognized country code', () => {
+  assert.equal(lookupNonUsCityCentroid('Cárdenas', 'XX'), undefined);
+});
+
+test('lookupNonUsCityCentroid rejects malformed input the same way lookupUsCityCentroid does', () => {
+  assert.equal(lookupNonUsCityCentroid('', 'CU'), undefined);
+  assert.equal(lookupNonUsCityCentroid('Cárdenas', 'CUB'), undefined);
 });

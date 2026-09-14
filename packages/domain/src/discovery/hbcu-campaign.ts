@@ -8,7 +8,8 @@
  *   production) lists finding aids per seeded institution and extracts candidate components.
  *
  * Candidates gather, classify, dedupe, and score obscurity — private research candidates
- * only, never a publish path (ADR-009). Federal fixture adapter `dpla-items-v1` is excluded.
+ * only, never a publish path (`docs/decisions-carryover.md`, "Research and discovery cannot
+ * publish"). Federal fixture adapter `dpla-items-v1` is excluded.
  * Self-contained: does NOT import from `county-archive-campaign.ts` or `finding-aid`.
  */
 import {

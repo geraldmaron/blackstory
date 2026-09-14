@@ -8,7 +8,11 @@ import {
   type KindFamily,
   hasActiveFilters,
 } from '@/lib/route-params';
-import { kindFamilyEncodingFor, isKnownMapKindFamily, kindEncodingFor } from '@/features/map/kind-encoding';
+import {
+  kindFamilyEncodingFor,
+  isKnownMapKindFamily,
+  kindEncodingFor,
+} from '@/features/map/kind-encoding';
 import type { ExploreFacetOptions } from '@/features/explore/explore-filter';
 import type { NavIconName } from '@/ui';
 

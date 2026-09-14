@@ -1,6 +1,6 @@
 /**
- * ZIP-to-place translate-then-discard (; ADR-016 "ZIPs: never
- * stored as reference data"). A user-entered ZIP is used ONLY to ask what place/state/county it
+ * ZIP-to-place translate-then-discard (`docs/decisions-carryover.md`, "Jurisdiction reference
+ * data": ZIPs are never stored as reference data). A user-entered ZIP is used ONLY to ask what place/state/county it
  * falls within — the raw ZIP is never returned by this function. Census Geocoder's forward
  * `onelineaddress` endpoint does not match bare ZIP codes, so this module resolves the ZIP to an
  * approximate centroid (open-source `zipcodes` dataset) and reverse-geocodes those coordinates

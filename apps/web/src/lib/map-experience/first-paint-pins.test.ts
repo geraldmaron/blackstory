@@ -196,10 +196,13 @@ test('fail 2: only holding /place/ pins are links; the rest of the plate is not 
   const source = buildExploreMapSource(listPublicEntities());
   const pins = toFirstPaintPins([
     ...source.featureCollection.features,
+    // A typed `/place/` href alone is not enough to hold: this stand-in carries no summary,
+    // so the live kind/summary rule refuses to invent a walk for it.
     leakyFeature({
       displayName: 'Dillard University',
       href: '/place/dillard-university',
       entityId: 'nrhp-not-a-walk',
+      oneLineStory: '',
     }),
     leakyFeature({
       displayName: 'A named neighbor',

@@ -42,7 +42,12 @@ export function DevMenuHeaderButton() {
         },
       ]}
     >
-      <Ionicons name="options-outline" size={ICON_SIZE} color={theme.inkMuted} accessibilityElementsHidden />
+      <Ionicons
+        name="options-outline"
+        size={ICON_SIZE}
+        color={theme.inkMuted}
+        accessibilityElementsHidden
+      />
     </Pressable>
   );
 }

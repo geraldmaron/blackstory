@@ -53,6 +53,7 @@ test('data page preserves census and indicator chart wiring', () => {
   assert.match(sectionsSource, /RacePairComparisonChart/);
   assert.match(sectionsSource, /GroupedBarIndicatorChart/);
   assert.match(sectionsSource, /StatePopulationShiftChart/);
+  assert.match(sectionsSource, /TrendLineChart/);
 });
 
 test('data page keeps section anchors for the section rail', () => {
@@ -104,8 +105,10 @@ test('the indicator fixture captions the figures print verbatim keep the same vo
   const series = [
     bundle.wealthComparison,
     bundle.wealthTrend,
+    bundle.wealthRatioLongArc,
     bundle.imprisonmentComparison,
     bundle.cookHomeownership,
+    bundle.nationalHomeownershipLongArc,
     bundle.hmdaDenialRates,
     bundle.federalDrugSentences,
     bundle.costBurdenComparison,

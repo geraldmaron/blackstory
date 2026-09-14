@@ -12,7 +12,7 @@
  * `promotion-boundary.test.ts`.
  */
 import { appendFileSync, readFileSync, writeFileSync } from 'node:fs';
-import type { RelationshipRole, RelationshipType } from '@repo/domain';
+import type { AuthorityFollowUpLead, RelationshipRole, RelationshipType } from '@repo/domain';
 import { getOpsPostgresPool, type AtomicStore } from '@repo/data-access';
 import type { SafeFetchDependencies } from '@repo/security/url-safety';
 import {
@@ -23,6 +23,7 @@ import {
 } from './bulk-import.js';
 import { commitOperatorIntake } from './commit.js';
 import { prepareDiscoverySurvivorIntake } from './discovery-survivor-intake.js';
+import { runAuthorityFollowUpIntake } from './authority-followup-intake.js';
 import type { DiscoveryRunBatch } from './discovery-run.js';
 import { runBoundedDiscoveryCampaign } from './discovery-run.js';
 import { runCommunityObscurityOperatorCampaign } from './community-obscurity-run.js';
@@ -30,6 +31,7 @@ import { runRssOperatorCampaign } from './rss-campaign-run.js';
 import { dispatchDiscoveryCampaign } from '@repo/config/scheduled-jobs';
 import { mergeJsonCatalogOverCanonical } from './editorial-catalog.js';
 import { loadEditorialCatalogFromPostgres } from './editorial-catalog-postgres.js';
+import { loadDiscoveryCatalogProfilesFromPostgres } from './discovery-catalog-postgres.js';
 import {
   runEditorialJudge,
   type EditorialCatalogEntity,
@@ -45,6 +47,7 @@ import {
 import { runEnrichmentJudge } from './enrichment-run.js';
 import {
   auditReleasedEntities,
+  selectDeficitCohort,
   snapshotForReleasedEntity,
   type ReleasedClaim,
 } from './research-quality-audit.js';
@@ -82,6 +85,7 @@ import { createSupabaseStorage, supabaseStorageConfigFromEnv } from './supabase-
 import { runCaptureBackfill, persistCapture } from './capture-backfill.js';
 import { waybackCredentialsFromEnv } from './wayback-credentials.js';
 import { createWaybackAnchor } from './wayback-anchor.js';
+import { createWaybackLookup } from './wayback-lookup.js';
 import { waybackSafeHttpClient } from './wayback-http.js';
 
 /**
@@ -558,6 +562,71 @@ export async function runCli(argv: readonly string[], deps: CliDependencies = {}
         );
         return 0;
       }
+      case 'authority-followup-intake': {
+        // Reads a DiscoveryCampaignResult (or a bare AuthorityFollowUpLead[]) from
+        // --leads-file and runs the existing single-URL research-intake path once per lead,
+        // reusing the exact SSRF-safe fetch / citation-prefill / draft-case plumbing above —
+        // no new fetch or commit logic. See authority-followup-intake.ts for why this exists.
+        const leadsFilePath = requireFlag(flags, '--leads-file');
+        const parsed: unknown = JSON.parse(readFile(leadsFilePath));
+        const leads: readonly AuthorityFollowUpLead[] = Array.isArray(parsed)
+          ? (parsed as readonly AuthorityFollowUpLead[])
+          : ((parsed as { readonly authorityFollowUps?: readonly AuthorityFollowUpLead[] })
+              .authorityFollowUps ?? []);
+        const maxLeadsRaw = optionalFlag(flags, '--max-leads');
+        const fetchDependencies = deps.fetchDependencies ?? createNodeSafeFetchDependencies();
+        // Same commit gating as `research-intake`: only persist an evidence capture per fetch
+        // when --commit is passed, otherwise this stays a dry preview (no DB write).
+        let researchCaptureSink: ResearchCaptureSink | undefined;
+        if (flags.booleans.has('--commit')) {
+          const pool = getOpsPostgresPool(process.env);
+          researchCaptureSink = {
+            storage: captureStorageFromEnv(process.env),
+            newId: (prefix, seed) =>
+              `${prefix}_${createHash('sha1').update(seed).digest('hex').slice(0, 16)}`,
+            persist: async (capture, event) => {
+              await persistCapture(pool, capture, event);
+            },
+          };
+        }
+        const result = await runAuthorityFollowUpIntake({
+          leads,
+          context: buildContext(flags, deps),
+          dependencies: fetchDependencies,
+          ...(researchCaptureSink ? { captureSink: researchCaptureSink } : {}),
+          ...(maxLeadsRaw !== undefined ? { maxLeads: Number(maxLeadsRaw) } : {}),
+        });
+        const items: Record<string, unknown>[] = [];
+        for (const item of result.items) {
+          const intakeSummary = item.outcome.intake
+            ? await finish(item.outcome.intake, flags, deps)
+            : undefined;
+          items.push({
+            leadUrl: item.leadUrl,
+            host: item.host,
+            parentCandidateId: item.parentCandidateId,
+            parentStableIdentifier: item.parentStableIdentifier,
+            fetch: item.outcome.fetch.ok
+              ? {
+                  ok: true,
+                  finalUrl: item.outcome.fetch.finalUrl,
+                  contentHash: item.outcome.fetch.contentHash,
+                }
+              : { ok: false, reason: item.outcome.fetch.reason },
+            citation: item.outcome.citation,
+            capture: item.outcome.capture,
+            intake: intakeSummary,
+          });
+        }
+        stdout(
+          JSON.stringify(
+            { version: result.version, considered: result.considered, items },
+            null,
+            2,
+          ),
+        );
+        return 0;
+      }
       case 'register-source': {
         const notes = optionalFlag(flags, '--notes');
         const classification = optionalFlag(flags, '--classification');
@@ -775,6 +844,21 @@ export async function runCli(argv: readonly string[], deps: CliDependencies = {}
         const maxCandidatesRaw = optionalFlag(flags, '--max-candidates');
         const queueSurvivors = flags.booleans.has('--queue-survivors');
         const maxSurvivorsRaw = optionalFlag(flags, '--max-survivors');
+        // Real catalog match needs a live Postgres with bb_public.search_index populated
+        // (this repo's CI foundation does not provision it — see db:init). Soft match only:
+        // a load failure never blocks dispatch, it just runs without match enrichment, same
+        // as the empty-catalog case `attachCatalogMatch` already treats as normal.
+        let catalogProfiles:
+          Awaited<ReturnType<typeof loadDiscoveryCatalogProfilesFromPostgres>> | undefined;
+        if (modeRaw === 'live' && killRaw !== 'engaged') {
+          try {
+            catalogProfiles = await loadDiscoveryCatalogProfilesFromPostgres({ nowIso });
+          } catch (err) {
+            stderr(
+              `Warning: discovery catalog load failed (running without match): ${String(err)}\n`,
+            );
+          }
+        }
         const result = await dispatchDiscoveryCampaign({
           jobId,
           mode: modeRaw,
@@ -783,6 +867,7 @@ export async function runCli(argv: readonly string[], deps: CliDependencies = {}
           includeCampaign: queueSurvivors,
           ...(jobRunId !== undefined ? { jobRunId } : {}),
           ...(maxCandidatesRaw !== undefined ? { maxCandidates: Number(maxCandidatesRaw) } : {}),
+          ...(catalogProfiles !== undefined ? { catalogProfiles } : {}),
         });
 
         let queueSummary: Record<string, unknown> | undefined;
@@ -864,6 +949,8 @@ export async function runCli(argv: readonly string[], deps: CliDependencies = {}
         // Anti-rot/anti-spoof: snapshot every cited URL. Safe by default (dry-run
         // inventory + coverage report); --commit performs SSRF-safe fetches + writes.
         // --wayback POSTs successful captures to SPN2 when IA keys are present.
+        // The availability lookup is wired unconditionally: it needs no credentials, and it
+        // only fires under --commit, after a local fetch fails or before SPN mints a capture.
         const pool = getOpsPostgresPool(process.env);
         const commit = flags.booleans.has('--commit');
         const wayback = flags.booleans.has('--wayback');
@@ -887,6 +974,7 @@ export async function runCli(argv: readonly string[], deps: CliDependencies = {}
           newId: (prefix, seed) =>
             `${prefix}_${createHash('sha1').update(seed).digest('hex').slice(0, 16)}`,
           now: () => new Date().toISOString(),
+          waybackLookup: createWaybackLookup({ client: waybackSafeHttpClient }),
           ...(waybackCredentials
             ? {
                 waybackAnchor: createWaybackAnchor({
@@ -1938,7 +2026,11 @@ ntf-3,Providence Hospital,"First African American owned and operated hospital in
              FROM bb_public.release_entities
             WHERE ${conditions.join(' AND ')}
             ORDER BY entity_id`;
-        if (limit !== undefined) {
+        // A bounded --deficit cohort has to be picked from the WHOLE matching set, not from a
+        // pre-filter slice of it -- so --limit is applied at the SQL level only when there is
+        // no --deficit to filter by. With --deficit, the audit below runs over every row and
+        // selectDeficitCohort applies the limit after filtering and prioritizing.
+        if (limit !== undefined && deficitFilter === undefined) {
           params.push(limit);
           sql += ` LIMIT $${params.length}`;
         }
@@ -1959,9 +2051,7 @@ ntf-3,Providence Hospital,"First African American owned and operated hospital in
           deficitFilter !== undefined && report.entities !== undefined
             ? {
                 ...report,
-                entities: report.entities.filter((entity) =>
-                  entity.deficits.includes(deficitFilter as never),
-                ),
+                entities: selectDeficitCohort(report.entities, deficitFilter as never, limit),
               }
             : report;
         stdout(JSON.stringify(filtered, null, 2));
@@ -1977,7 +2067,7 @@ ntf-3,Providence Hospital,"First African American owned and operated hospital in
             'For capture-backfill: [--commit] [--wayback] [--max-captures N] [--max-entities N]\n' +
             'For expand: --entity-id <id> [--depth N] [--commit] — live Wikidata traversal; stages landscape_candidates, never bb_canonical\n' +
             'For enrich-entity: --entity-id <id> [--target-maturity seeded|grounded|corroborated|contextualized|deep_research|reference] — PLANS research; it does not execute, and has no --commit\n' +
-            'For research-quality-audit: [--release-id <id>] [--kind <kind>] [--entity-id <id>] [--deficit <code>] [--limit N] — read-only; narrow the query to get per-entity rows\n' +
+            'For research-quality-audit: [--release-id <id>] [--kind <kind>] [--entity-id <id>] [--deficit <code>] [--limit N] — read-only; narrow the query to get per-entity rows; --deficit with --limit returns the next N matching entities in priority order, not a deficit filter over the first N by id\n' +
             'For graylist-read: [--limit N] — Postgres quarantine only, see docs/research/research-operations.md\n',
         );
         return command ? 1 : 0;

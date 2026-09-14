@@ -148,7 +148,7 @@ function evaluatePromoteEligible(
         : 'medium',
     citationSource:
       claim.citationSource ?? new URL(claim.citationHref ?? 'https://unknown').hostname,
-    citationHref: claim.citationHref,
+    ...(claim.citationHref !== undefined ? { citationHref: claim.citationHref } : {}),
     citationLabel: claim.citationLabel ?? claim.citationSource ?? 'Source',
   }));
   const entry: ReleaseSourceEntity = {

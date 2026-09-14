@@ -1,5 +1,6 @@
 /**
- * Unit tests for Firestore access guards (ADR-011 primary path).
+ * Unit tests for the leftover Firestore access guards. They are not the primary path and have
+ * no caller; see docs/decisions-carryover.md, "Firestore as system of record, reversed".
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';

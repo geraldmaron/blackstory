@@ -130,14 +130,53 @@ test('a patent mirror search page, listing, or home page is not a government rec
   assert.notEqual(classifySourceForConfidence('https://patents.google.com/'), 'government_record');
 });
 
-test('historicsites.dcpreservation.org alone scores 0.72 — below standardPublish', () => {
+test('historicsites.dcpreservation.org alone scores 0.7067 — below standardPublish', () => {
+  // Below the 0.72 this used to pin: temporalProximity and extractionQuality carry no document
+  // date or extraction selector here, so they are unassessed and drop out of the weighted score
+  // (renormalized over the remaining components) instead of contributing their old placeholder
+  // 0.7/0.8 as though those were measurements.
   const result = computeClaimConfidence('claim-dc-only', [
     { url: DC_PRESERVATION, textContainsSubjectName: true },
   ]);
-  assert.equal(result.score, 0.72);
+  assert.equal(result.score, 0.7067);
   assert.equal(result.passesPublishThreshold, false);
   assert.equal(result.threshold, 0.75);
   assert.equal(result.independentLineageCount, 1);
+});
+
+test('a record with no document date does not receive a temporalProximity contribution', () => {
+  const withoutDate = computeClaimConfidence('claim-no-document-date', [
+    { url: DC_PRESERVATION, textContainsSubjectName: true },
+  ]);
+  // Unassessed: no measurement was averaged in — the component reports 0, and the weighted
+  // score renormalizes around the dimensions that were assessed, rather than treating this as
+  // a real (if middling) 0.7 the way the old constant did.
+  assert.equal(withoutDate.components.temporalProximity, 0);
+  assert.equal(withoutDate.score, 0.7067);
+
+  const withDate = computeClaimConfidence('claim-with-document-date', [
+    { url: DC_PRESERVATION, textContainsSubjectName: true, documentDate: '1925-04-01' },
+  ]);
+  // Assessed: the real value is averaged in and its weight re-enters the score. Whether that
+  // moves the score up or down depends on whether 0.7 sits above or below the rest of the
+  // claim's weighted average, not on presence alone — here it pulls the score down slightly,
+  // which is the correct behavior for a renormalized mean, not a sign the wiring is backwards.
+  assert.equal(withDate.components.temporalProximity, 0.7);
+  assert.notEqual(withDate.score, withoutDate.score);
+});
+
+test('a record with no extraction selector does not receive an extractionQuality contribution', () => {
+  const withoutSelector = computeClaimConfidence('claim-no-extraction-selector', [
+    { url: DC_PRESERVATION, textContainsSubjectName: true },
+  ]);
+  assert.equal(withoutSelector.components.extractionQuality, 0);
+  assert.equal(withoutSelector.score, 0.7067);
+
+  const withSelector = computeClaimConfidence('claim-with-extraction-selector', [
+    { url: DC_PRESERVATION, textContainsSubjectName: true, extractionSelector: '.infobox .built' },
+  ]);
+  assert.equal(withSelector.components.extractionQuality, 0.8);
+  assert.equal(withSelector.score, 0.7222);
 });
 
 test('dcpreservation + nps.gov clears standardPublish via corroboration', () => {
@@ -161,14 +200,14 @@ test('dcpreservation + hmdb.org clears standardPublish via tier-2 corroboration'
 });
 
 test('wikipedia-only scores below a real single source, not level with one', () => {
-  // 0.66, where a lone reputable_secondary host scores 0.72. Those two used to be the same
-  // number, which was the tell: a bridge and a heritage-inventory record are not equally good
+  // 0.6267, below a lone reputable_secondary host's 0.7067. Those two used to be level (0.66 vs
+  // 0.72), which was the tell: a bridge and a heritage-inventory record are not equally good
   // evidence, and the old rule could not say so because it counted a hostname as a lineage.
   // A bridge contributes no corroborating lineage at all, so lineageIndependence is 0 here.
   const result = computeClaimConfidence('claim-wiki-only', [
     { url: WIKIPEDIA, textContainsSubjectName: true },
   ]);
-  assert.equal(result.score, 0.66);
+  assert.equal(result.score, 0.6267);
   assert.equal(result.independentLineageCount, 0);
   assert.equal(result.passesPublishThreshold, false);
 });

@@ -29,6 +29,10 @@ import {
 } from '../patterns/command-palette/command-registry';
 import { allowedMovesFor, type RecordLike } from '../../lib/map-experience/camera-dignity';
 import type { CameraMove } from '../../lib/map-experience/camera-moves';
+import {
+  lensPermitsUnselectedMove,
+  type LensSubject,
+} from '../../lib/map-experience/lens-composition';
 import './camera-console.css';
 
 void React;
@@ -102,6 +106,13 @@ export type CameraConsoleProps = {
   readonly onResetBearing: () => void;
   /** The record the camera is acting on, if any. Drives the dignity gate. */
   readonly activeRecord?: RecordLike | null;
+  /**
+   * The lens's own active topic constraint (repo-92n2.18). `allowedMovesFor` already refuses
+   * spotlight/trace for a violence-adjacent SELECTED record; a violence-constrained lens must
+   * refuse the same two moves even with nothing selected, since they would isolate or draw a
+   * route across the very set of records the constraint names.
+   */
+  readonly lens?: LensSubject;
   readonly spotlit?: boolean;
   readonly className?: string;
 };
@@ -281,6 +292,7 @@ export function CameraConsole({
   bearing,
   onResetBearing,
   activeRecord,
+  lens,
   spotlit = false,
   className,
 }: CameraConsoleProps) {
@@ -322,9 +334,13 @@ export function CameraConsole({
   );
 
   // With no record selected the camera is acting on geography, and a wide shot is not about
-  // anyone. An empty record is the ungated case, which `allowedMovesFor` already models.
-  const allowed = allowedMovesFor(activeRecord ?? {});
-  const anyRefused = KEYED_CAMERA_MOVES.some((move) => !allowed.has(move));
+  // anyone. An empty record is the ungated case, which `allowedMovesFor` already models. The
+  // lens-level check adds the one thing the record-level gate cannot see: a violence-constrained
+  // lens refuses spotlight/trace even here, with nothing selected.
+  const recordAllowed = allowedMovesFor(activeRecord ?? {});
+  const isAllowed = (move: CameraMove): boolean =>
+    recordAllowed.has(move) && lensPermitsUnselectedMove(move, lens ?? {});
+  const anyRefused = KEYED_CAMERA_MOVES.some((move) => !isAllowed(move));
 
   return (
     <section ref={consoleRef} className={cx('ds-camera', className)} aria-label="Camera">
@@ -357,7 +373,7 @@ export function CameraConsole({
       <div className="ds-camera__grid">
         {KEYED_CAMERA_MOVES.map((move) => {
           const command = commandFor(move);
-          const refused = !allowed.has(move);
+          const refused = !isAllowed(move);
           const pressed = move === 'spotlight' ? spotlit : undefined;
 
           return (

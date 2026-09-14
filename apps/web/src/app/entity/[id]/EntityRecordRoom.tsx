@@ -40,6 +40,7 @@ import { Breadcrumb, Room, SourceList, type RoomSource } from '../../../componen
 import { MapsExternalLink } from '../../../components/map-experience/MapsExternalLink';
 import {
   RECORD_GAP_COPY,
+  SINGLE_SOURCE_COPY,
   THIN_RECORD_COPY,
   type RecordGapKind,
 } from '../../../components/entity/copy';
@@ -65,9 +66,15 @@ import { resolveEntityCrossReferences } from '../../../lib/theme-impact/source';
 import { resolveCitesEdgeIndex } from '../../../lib/articles/source';
 import { storiesCiting } from '../../../lib/release/build-cites-edge';
 import { isDisplayableJurisdictionLabel } from '../../../lib/public-data/map-projection';
-import { toEvidenceClaimInputs, withoutSummaryEchoClaims } from './adapters';
+import { WhyThisAppears } from '../../../components/why-appears';
+import {
+  buildWhyThisAppearsForEntity,
+  toEvidenceClaimInputs,
+  whyAppearsEvidenceById,
+  withoutSummaryEchoClaims,
+} from './adapters';
 import { buildEntityAnatomyInputs, whereTileLabel } from './entity-anatomy-facts';
-import { deriveRecordStanding, isThinRecord } from './entity-view-model';
+import { deriveRecordStanding, isSingleSourceRecord, isThinRecord } from './entity-view-model';
 import { EntityRoomSections, recordSectionIndex } from './EntityRoomSections';
 import { EntitySessionNavClient } from './entity-session-nav-client';
 import '../../record-page.css';
@@ -246,10 +253,21 @@ export async function EntityRecordRoom({ entity }: { readonly entity: PublicEnti
         })
       : undefined;
   const sources = toRoomSources(entity.claims);
-  // Rubric sentences, whole. They used to be truncated into chips next to the title.
+  /*
+   * The record's own evidenced reason for being in the catalog, and the rubric fallback.
+   *
+   * `notabilityLabels` is the rubric sentence — every record sharing a criterion prints it
+   * verbatim, so the block said the same thing on thousands of pages. `notabilityBasis` carries
+   * this record's own reviewed note and the claim ids it rests on, which is what the composed
+   * payload renders. When the composer refuses a record (see `buildWhyThisAppearsForEntity`),
+   * the labels are still shown rather than an empty block.
+   */
+  const whyThisAppears = buildWhyThisAppearsForEntity(entity);
+  // Rubric sentences, whole.
   const inclusionBasis = entity.notabilityLabels ?? [];
   const gaps = resolveRecordGaps(entity, [...displayClaims]);
   const thinRecord = isThinRecord(entity);
+  const singleSourceRecord = isSingleSourceRecord(entity);
   const sectionsOnThisRecord = recordSectionIndex({
     entity,
     evidenceClaims,
@@ -354,26 +372,34 @@ export async function EntityRecordRoom({ entity }: { readonly entity: PublicEnti
           </section>
         ) : null}
 
-        {inclusionBasis.length > 0 ? (
+        {whyThisAppears !== undefined || inclusionBasis.length > 0 ? (
           <section aria-labelledby="why-heading">
             <RecordSmallTitle id="why-heading" icon="why" className="ds-record-appx__title">
               Why this is here
             </RecordSmallTitle>
-            <ul className="ds-record-rail-block__reasons">
-              {inclusionBasis.map((reason) => (
-                <li key={reason}>{reason}</li>
-              ))}
-            </ul>
+            {whyThisAppears !== undefined ? (
+              <WhyThisAppears
+                result={whyThisAppears}
+                evidenceById={whyAppearsEvidenceById(entity)}
+              />
+            ) : (
+              <ul className="ds-record-rail-block__reasons">
+                {inclusionBasis.map((reason) => (
+                  <li key={reason}>{reason}</li>
+                ))}
+              </ul>
+            )}
           </section>
         ) : null}
 
         <div className="ds-record-appx__notes">
-          {thinRecord || gaps.length > 0 ? (
+          {thinRecord || singleSourceRecord || gaps.length > 0 ? (
             <section aria-labelledby="gaps-heading">
               <RecordSmallTitle id="gaps-heading" icon="gaps" className="ds-record-appx__title">
                 Still researching
               </RecordSmallTitle>
               {thinRecord ? <p>{THIN_RECORD_COPY.body}</p> : null}
+              {singleSourceRecord ? <p>{SINGLE_SOURCE_COPY.body}</p> : null}
               {gaps.length > 0 ? (
                 <ul className="ds-rec-gaps">
                   {gaps.map((gap) => (
@@ -631,9 +657,7 @@ export async function EntityRecordRoom({ entity }: { readonly entity: PublicEnti
         <EntitySessionNavClient currentId={entity.id} orderedIds={orderedIds} />
         {/*
           The topic and era chips are ways onward, not facts about this record, so they sit with
-          the other ways onward. They used to open the document column, a strip of unlabeled
-          chips between the actions and the first beat, restating an era the masthead pill had
-          already stated and delaying the record's own first sentence.
+          the other ways onward.
         */}
         <EntityTopicTags entity={entity} />
       </section>

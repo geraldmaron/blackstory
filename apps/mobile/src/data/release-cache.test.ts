@@ -28,13 +28,21 @@ describe('release-coupled read/write servability (§4, T5)', () => {
     const cache = createReleaseCache(store);
     await cache.write('entity', 'e1', { id: 'e1' }, { releaseStamp: 'rel-1', fetchedAt: 1000 });
     // Server is now on rel-2 (roll-forward) — the rel-1 row must not be served.
-    const r = await cache.read('entity', 'e1', { activeStamp: 'rel-2', degraded: false, now: 2000 });
+    const r = await cache.read('entity', 'e1', {
+      activeStamp: 'rel-2',
+      degraded: false,
+      now: 2000,
+    });
     expect(r).toBeUndefined();
     expect(await store.get('entity', 'e1')).toBeUndefined(); // dropped, not lingering
 
     // Rollback to an OLDER stamp must also miss (equality, not ordering).
     await cache.write('entity', 'e2', { id: 'e2' }, { releaseStamp: 'rel-5', fetchedAt: 1000 });
-    const back = await cache.read('entity', 'e2', { activeStamp: 'rel-3', degraded: false, now: 2000 });
+    const back = await cache.read('entity', 'e2', {
+      activeStamp: 'rel-3',
+      degraded: false,
+      now: 2000,
+    });
     expect(back).toBeUndefined();
   });
 
@@ -88,9 +96,9 @@ describe('artifact verification (§5)', () => {
     await cache.verifyAndWriteArtifact('a', good, declared, META); // last-known-good
 
     const tampered = JSON.stringify({ artifact: 'evil' });
-    await expect(cache.verifyAndWriteArtifact('a', tampered, declared, META)).rejects.toBeInstanceOf(
-      ArtifactVerificationError,
-    );
+    await expect(
+      cache.verifyAndWriteArtifact('a', tampered, declared, META),
+    ).rejects.toBeInstanceOf(ArtifactVerificationError);
     // The good copy must survive the rejected write.
     const r = await cache.read<{ artifact: string }>('artifact', 'a', {
       activeStamp: 'rel-1',
@@ -106,7 +114,9 @@ describe('oversized payload guard', () => {
     const store = createMemoryStore();
     const cache = createReleaseCache(store);
     const huge = { blob: 'a'.repeat(5 * 1024 * 1024) };
-    await expect(cache.write('entity', 'big', huge, META)).rejects.toBeInstanceOf(PayloadTooLargeError);
+    await expect(cache.write('entity', 'big', huge, META)).rejects.toBeInstanceOf(
+      PayloadTooLargeError,
+    );
     expect(await store.get('entity', 'big')).toBeUndefined();
   });
 });

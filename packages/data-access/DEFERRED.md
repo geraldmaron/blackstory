@@ -1,4 +1,4 @@
-# Deferred: Cloud SQL / SQL Connect / parked PostGIS (historical ADR-011)
+# Deferred: Cloud SQL / SQL Connect / parked PostGIS (historical ADR-011, removed 2026-07-24, recovered in `../../docs/decisions-carryover.md`, "Firestore as system of record, reversed")
 
 > **Leftover package note.** Current production path (2026-08-28): Supabase Postgres on
 > `blackstory-app` via `@repo/data-access` Postgres modules. Firestore is not the SoR.

@@ -14,7 +14,7 @@
  * (see `packages/ops-data/src/jurisdictions/resolver.ts`,
  * `createFirestoreJurisdictionResolver`), immediately before the release manifest is built
  * (`buildReleaseManifest` in `packages/domain/src/publication/index.ts`, or its Python
- * equivalent in `workers/publication/` per ADR-007). Do not proceed to build/activate the
+ * equivalent in `workers/publication/` per docs/decisions-carryover.md, "scheduled-job worker packages"). Do not proceed to build/activate the
  * release if it throws. The gate fails closed (throws rather than returning a boolean), so
  * wiring is a single guarded call.
  */

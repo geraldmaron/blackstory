@@ -42,6 +42,7 @@ import React, {
   type ReactNode,
 } from 'react';
 import { cx } from '@repo/ui';
+import { resolveMomentPlain, type MomentSubject } from '../../lib/map-experience/moment-dignity';
 
 void React;
 
@@ -401,9 +402,18 @@ export type MapMomentProps = {
    */
   readonly note: string;
   /**
+   * The record or era this moment frames. When present, `plain` (see below) is derived from its
+   * violence-adjacency via `moment-dignity.ts`'s `resolveMomentPlain` rather than left to the call
+   * site. Omit for a moment with no single subject — a region-wide establishing shot, say; the
+   * absence of a subject is never itself read as violence-adjacent.
+   */
+  readonly subject?: MomentSubject | null;
+  /**
    * A violence-adjacent subject. The camera cuts instead of flying, holds locality precision, and
-   * the tag reads STILL rather than LIVE. SP-26 derives this from the subject rather than leaving
-   * it to each author, so a moment about violence cannot be dramatised by omission.
+   * the tag reads STILL rather than LIVE. Derived from `subject` by default (SP-26) so a moment
+   * about violence cannot be dramatised by an author forgetting to set this; pass it explicitly
+   * only to override that derivation for a documented reason (a subject-less shot that still
+   * needs to be still, or a specimen demonstrating both states).
    */
   readonly plain?: boolean;
   /** Where "Open this view in Explore" goes. Omit to render no control. */
@@ -427,11 +437,13 @@ export type MapMomentProps = {
 export function MapMoment({
   camera,
   note,
-  plain = false,
+  subject = null,
+  plain,
   atlasHref,
   idle,
   className,
 }: MapMomentProps) {
+  const stillMoment = resolveMomentPlain(subject, plain);
   const stage = useContext(MapMomentStageContext);
   const slotRef = useRef<HTMLDivElement>(null);
   const reactId = useId();
@@ -440,8 +452,8 @@ export function MapMoment({
   useEffect(() => {
     const element = slotRef.current;
     if (!element || !register) return;
-    return register(reactId, { element, camera, plain });
-  }, [register, reactId, camera, plain]);
+    return register(reactId, { element, camera, plain: stillMoment });
+  }, [register, reactId, camera, stillMoment]);
 
   // No stage mounted means no plate can be borrowed. That is the §10 degrade, not an error state:
   // the slot keeps its caption and says plainly that the map is not there.
@@ -456,11 +468,11 @@ export function MapMoment({
     <figure
       className={cx('ds-mapmoment', className)}
       data-live={live ? '1' : '0'}
-      data-plain={plain ? '1' : undefined}
+      data-plain={stillMoment ? '1' : undefined}
     >
       <div className="ds-mapmoment__plate" ref={slotRef}>
         <span className="ds-mapmoment__tag" aria-hidden="true">
-          {plain ? 'Plate · Still' : 'Plate · Live'}
+          {stillMoment ? 'Plate · Still' : 'Plate · Live'}
         </span>
         <div className="ds-mapmoment__idle">
           <span>

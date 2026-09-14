@@ -176,6 +176,14 @@ export const chicagoRedliningPilotPackets = [
           'Federal HOLC residential security maps (NARA holdings); overview via Mapping Inequality (University of Richmond DSL).',
         sourceUrl: 'https://dsl.richmond.edu/panorama/redlining/',
         uncertaintyLabel: 'Program history is national; local sheet dates vary by city.',
+        provenance: {
+          source: 'mapping-inequality-holc',
+          sourceUrl: 'https://dsl.richmond.edu/panorama/redlining/',
+          retrievedAt: '2026-09-12T16:39:05.000Z',
+          contentHash: '5e49d1be99f1985792f367a31019b0a2c633c7cce1e0ea4f452a1daf7b0494ef',
+          humanCitation:
+            'Nelson, Winling, et al., Mapping Inequality: Redlining in New Deal America. University of Richmond DSL — overview of federal HOLC residential security maps (1935–1940 program).',
+        },
       },
       {
         artifactId: 'art_fha_underwriting',
@@ -184,8 +192,19 @@ export const chicagoRedliningPilotPackets = [
         dated: '1938',
         citation:
           'Federal Housing Administration Underwriting Manual (period editions); cited in secondary historical syntheses of mortgage redlining.',
+        sourceUrl:
+          'https://fraser.stlouisfed.org/files/docs/publications/fha/1938feb_fha_underwritingmanual.pdf',
         uncertaintyLabel:
           'Manual editions changed; quote from a specific edition when advancing a claim.',
+        provenance: {
+          source: 'federal-housing-administration',
+          sourceUrl:
+            'https://fraser.stlouisfed.org/files/docs/publications/fha/1938feb_fha_underwritingmanual.pdf',
+          retrievedAt: '2026-09-12T16:39:19.000Z',
+          contentHash: '3ffb72303fbb14414a1dd62e3962b0a43168431eda96ef2e609628a6c1f2d6f2',
+          humanCitation:
+            'FHA Underwriting Manual (1938 edition), digitized by FRASER, Federal Reserve Bank of St. Louis.',
+        },
       },
       {
         artifactId: 'art_fair_housing_1968',
@@ -195,6 +214,14 @@ export const chicagoRedliningPilotPackets = [
         citation:
           'Civil Rights Act of 1968, Title VIII — Fair Housing Act, 42 U.S.C. §§ 3601 et seq.',
         sourceUrl: 'https://www.justice.gov/crt/fair-housing-act-1',
+        provenance: {
+          source: 'department-of-justice',
+          sourceUrl: 'https://www.justice.gov/crt/fair-housing-act-1',
+          retrievedAt: '2026-09-12T16:39:07.000Z',
+          contentHash: '83f82872c6d9f7094334329645785ea9221cb736ea7a50b6c3c772b9fedeb2e0',
+          humanCitation:
+            'Civil Rights Act of 1968, Title VIII (Fair Housing Act), 42 U.S.C. §§ 3601 et seq.; U.S. Department of Justice overview.',
+        },
       },
     ],
     gap_states: [],
@@ -233,6 +260,14 @@ export const chicagoRedliningPilotPackets = [
           'Staff inventory of Chicago-tagged HOLC areas: A 48, B 160, C 326, D 147 (703 total). Inventory counts only — not a public polygon product.',
         uncertaintyLabel:
           'Vector derivatives are CC BY-NC-SA 4.0. Public commercial surfaces cite only; polygon map product awaits rights review.',
+        provenance: {
+          source: 'mapping-inequality-holc',
+          sourceUrl: 'https://dsl.richmond.edu/panorama/redlining/',
+          retrievedAt: '2026-09-12T16:39:05.000Z',
+          contentHash: '5e49d1be99f1985792f367a31019b0a2c633c7cce1e0ea4f452a1daf7b0494ef',
+          humanCitation:
+            'Nelson, Winling, et al., Mapping Inequality: Redlining in New Deal America. University of Richmond DSL.',
+        },
       },
     ],
     gap_states: ['insufficient_evidence'],
@@ -323,6 +358,14 @@ export const chicagoRedliningPilotPackets = [
         sourceUrl: 'https://dsl.richmond.edu/panorama/redlining/',
         uncertaintyLabel:
           'Cite-only on public surfaces pending NC rights review for polygon product.',
+        provenance: {
+          source: 'mapping-inequality-holc',
+          sourceUrl: 'https://dsl.richmond.edu/panorama/redlining/',
+          retrievedAt: '2026-09-12T16:39:05.000Z',
+          contentHash: '5e49d1be99f1985792f367a31019b0a2c633c7cce1e0ea4f452a1daf7b0494ef',
+          humanCitation:
+            'Nelson, Winling, et al., Mapping Inequality: Redlining in New Deal America. University of Richmond DSL.',
+        },
       },
     ],
     gap_states: ['insufficient_evidence'],

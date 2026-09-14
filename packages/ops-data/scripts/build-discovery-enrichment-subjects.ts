@@ -87,7 +87,11 @@ async function main(): Promise<void> {
         candidate.displayName ?? candidate.id,
         {
           ...(originalPage
-            ? { html: originalPage.html, url: candidate.canonicalUrl, text: originalPage.text }
+            ? {
+                html: originalPage.html,
+                ...(candidate.canonicalUrl !== undefined ? { url: candidate.canonicalUrl } : {}),
+                text: originalPage.text,
+              }
             : candidate.canonicalUrl
               ? { url: candidate.canonicalUrl }
               : {}),

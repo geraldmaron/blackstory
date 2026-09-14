@@ -8,7 +8,7 @@ Live Atlas instrument scope is `/explore` only. Product thesis amended: relation
 **Source mockup:** [`.design-mocks/blackstory-atlas-v9.html`](../../.design-mocks/blackstory-atlas-v9.html). Runnable, MapLibre-backed, owner-reviewed. The same build now carries the room layer for the four non-instrument surface classes.
 **Companion:** [`design-direction-v9-surfaces.md`](./design-direction-v9-surfaces.md) — also superseded by v10 for route membership.
 **Supersedes:** `design-direction-v6-home.md` (all), `design-direction-v6-explore.md` (all), `design-direction-v6-search.md` (already a redirect stub). Every other v6 surface doc is superseded by the companion, not by this one. None is deleted: they stay in `docs/ui/` as the provenance record, and [`README.md`](./README.md) marks each one superseded in the pattern index.
-**Unchanged and still binding:** [`brand.md`](./brand.md) tokens, palette, type, dignity law; [`patterns-map-entity-encoding.md`](./patterns-map-entity-encoding.md); [`patterns-map-canvas.md`](./patterns-map-canvas.md); ADR-017 map handoff; WCAG AA floor.
+**Unchanged and still binding:** [`brand.md`](./brand.md) tokens, palette, type, dignity law; [`patterns-map-entity-encoding.md`](./patterns-map-entity-encoding.md); [`patterns-map-canvas.md`](./patterns-map-canvas.md); `../decisions-carryover.md`, "Persistent map canvas", ADR-017 map handoff; WCAG AA floor.
 
 ---
 
@@ -57,7 +57,7 @@ One canvas, two modes, no page-to-page reload of the map plate.
 
 | Layer | z | Rule |
 |---|---|---|
-| Map plate | 0 | Fixed full-viewport MapLibre. Single mount, persists across mode changes (ADR-017). |
+| Map plate | 0 | Fixed full-viewport MapLibre. Single mount, persists across mode changes (`../decisions-carryover.md`, "Persistent map canvas", ADR-017). |
 | Annotation overlay | 5 | SVG, `pointer-events: none`. Migration arcs, leader lines, callouts. Reprojected on `move`. |
 | Spotlight | 6 | Radial CSS mask over a canvas-colored plate. Dims everything outside the focus radius. |
 | Grain | 7 | Archive texture, `mix-blend-mode: overlay`, opacity ≤ .3. Carried from v6 atmosphere. |
@@ -99,9 +99,9 @@ The current dark plate is not readable as a map. v9 sets minimum separation betw
 
 **Label field expression:** always
 ```js
-['coalesce', ['get', 'name:en'], ['get', 'name:latin'], ['get', 'name']]
+['coalesce', ['get', 'name:en'], ['get', 'name_en'], ['get', 'name:latin'], ['get', 'name']]
 ```
-OpenMapTiles ships localised name fields inconsistently across planet releases; pinning `name:en` silently drops roughly half the labels.
+OpenMapTiles ships localised name fields inconsistently across planet releases — some builds use the colon-delimited `name:en`, others the underscore `name_en` — so pinning only one silently drops a large share of the labels.
 
 ---
 
@@ -297,7 +297,7 @@ All of these ship in v1. They are the difference between a site and a tool.
 | Save / collect | `S`, row bookmark | Badge count in bar, undo toast |
 | Collections drawer | Saved button | List + `Copy all citations` + `Copy as GeoJSON` + `Clear` |
 | Cite | `C` | `"{name}." BlackStory Archive, {place}, {era}. Evidence grade {g}, {n} sources. Accessed {ISO date}. {url}` |
-| Share deep link | `⌘L` | URL carries `record`, `state`, `era`, `grade`, `kind`. Never live pan/zoom (ADR-017). |
+| Share deep link | `⌘L` | URL carries `record`, `state`, `era`, `grade`, `kind`. Never live pan/zoom (`../decisions-carryover.md`, "Persistent map canvas", ADR-017). |
 | Step records | `J` / `K` | Wraps within the current lens |
 | Near me | `N` | Geolocate, fly, spotlight, select nearest, report distance |
 | Theme | `D` | Light / dark, restyles the map plate and re-syncs sources |
@@ -375,7 +375,7 @@ Not allowed: mono and serif in the same line; three families inside one card com
 | Save / cite / share | Absent | First-class, keyboard-driven |
 | Legend | Color key tab | Palette + sheet, at point of use |
 
-**Carried forward unchanged:** brand tokens, type registers, 44px targets, dignity and precision rules, cognitive-accessibility labeled-facts law, record anatomy, reduced-motion respect, WCAG AA floor, official brand artwork paths, ADR-017 handoff, shareable-URL-without-viewport rule.
+**Carried forward unchanged:** brand tokens, type registers, 44px targets, dignity and precision rules, cognitive-accessibility labeled-facts law, record anatomy, reduced-motion respect, WCAG AA floor, official brand artwork paths, `../decisions-carryover.md`, "Persistent map canvas", ADR-017 handoff, shareable-URL-without-viewport rule.
 
 ---
 

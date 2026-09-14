@@ -6,7 +6,8 @@
  * WHAT MOB-012 ADDS on top of the spike (all backward-compatible, all optional
  * props so the MOB-011 tests keep passing unchanged):
  *  - Native clustering on the GeoJSON source ("aggregates render before points",
- *    ADR-024) — cluster bubbles + an unclustered point layer + a selection
+ *    `docs/decisions-carryover.md`, "Native map render layer") — cluster bubbles +
+ *    an unclustered point layer + a selection
  *    highlight layer. The cluster register stays dignity-safe: a single flat
  *    Copper Pin color, size (not color) varying with count, and NO heatmap layer.
  *  - Named-preset camera control driven imperatively by a one-shot `cameraCommand`
@@ -22,9 +23,11 @@
  * Rendering, attribution, and the three degraded failure states are unchanged
  * from MOB-011 (see the failure block below and MapAttribution / mapLoadState).
  * A JS test runner still cannot mount the native GL view, so tile rendering,
- * live clustering, and camera motion remain device/Maestro evidence (ADR-024).
+ * live clustering, and camera motion remain device evidence
+ * (`docs/decisions-carryover.md`, "Native map render layer"). There is no Maestro
+ * suite in this repo, so that evidence is a human running the app.
  */
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState, type Ref } from 'react';
 import { Pressable, StyleSheet, View, type NativeSyntheticEvent } from 'react-native';
 import {
   Camera,
@@ -37,12 +40,7 @@ import {
 } from '@maplibre/maplibre-react-native';
 import { ErrorState, duration, MIN_TOUCH_TARGET, radius, space } from '@/ui';
 import { Ionicons } from '@expo/vector-icons';
-import {
-  MAP_GHOST_BG,
-  MAP_GHOST_BORDER,
-  MAP_GHOST_PRESSED,
-  MAP_INK,
-} from './map-plate-ink';
+import { MAP_GHOST_BG, MAP_GHOST_BORDER, MAP_GHOST_PRESSED, MAP_INK } from './map-plate-ink';
 import { MapAttribution } from './MapAttribution';
 import {
   buildBasemapStyle,
@@ -69,6 +67,7 @@ import {
   MAP_VECTOR_TILE_URL,
 } from './mapConfig';
 import { MAP_FAILURE_COPY, type MapFailureMode, type MapLoadState } from './mapLoadState';
+import { markPerf } from '@/lib/perf-marks';
 import { DEMO_MAP_SOURCE, type MapFeatureCollection } from './demoMapSource';
 import {
   EXPLORE_MAP_VIEW_PADDING,
@@ -182,13 +181,12 @@ export type MapScreenProps = {
   /**
    * Pan / zoom / rotate / pitch. Default true, and Explore never turns it off.
    *
-   * This used to be a posture lock: at Rest the map disabled every gesture, swallowed pin
-   * presses, and hid itself from assistive tech until the reader pressed a dedicated button.
-   * A reader's first deliberate pan got no response at all, which is indistinguishable from a
-   * map that has failed. Chrome posture and gesture availability are two different things, and
-   * only the first belongs to the reader's explicit control (see `ExploreView`).
+   * This is not a posture lock. Chrome posture and gesture availability are two different
+   * things, and only the first belongs to the reader's explicit control (see `ExploreView`): a
+   * map that disables every gesture until a dedicated button is pressed gives a reader's first
+   * deliberate pan no response at all, which is indistinguishable from a map that has failed.
    *
-   * The prop stays so a surface that genuinely must present a still plate — a story's map
+   * The prop exists so a surface that genuinely must present a still plate — a story's map
    * moment, a printed-frame preview — can say so, rather than inheriting a gesture surface it
    * has no chrome for.
    */
@@ -207,9 +205,22 @@ export type MapScreenProps = {
   readonly showZoomControls?: boolean;
   /**
    * When the native map fails to load (WebGL / style / tile engine), surfaces a
-   * degraded state. List/metrics chrome stays mounted in Explore (ADR-024 §7).
+   * degraded state. List/metrics chrome stays mounted in Explore
+   * (`docs/decisions-carryover.md`, "Native map render layer" §7).
    */
   readonly onMapEngineFailure?: () => void;
+  /**
+   * What the map is, for a screen reader, and where its content can be read instead.
+   *
+   * Pins are native style layers, so neither VoiceOver nor TalkBack can reach them one by one.
+   * When set, a text stand-in spans the map: it names the map and, through `accessibilityHint`,
+   * the list that carries the same places. It sits behind the canvas and takes no touches, so the
+   * map stays exposed to assistive tech and every gesture still reaches it.
+   */
+  readonly accessibilityLabel?: string;
+  readonly accessibilityHint?: string;
+  /** Ref to the stand-in, so a host can return focus to the map. */
+  readonly accessibilitySummaryRef?: Ref<View>;
 };
 
 function boundsFromEvent(event: NativeSyntheticEvent<ViewStateChangeEvent>): Bbox | null {
@@ -232,7 +243,12 @@ function lngLatFromPress(
   if (Array.isArray(lngLat) && lngLat.length >= 2) {
     const lng = lngLat[0];
     const lat = lngLat[1];
-    if (typeof lng === 'number' && typeof lat === 'number' && Number.isFinite(lng) && Number.isFinite(lat)) {
+    if (
+      typeof lng === 'number' &&
+      typeof lat === 'number' &&
+      Number.isFinite(lng) &&
+      Number.isFinite(lat)
+    ) {
       return [lng, lat];
     }
   }
@@ -258,6 +274,9 @@ export function MapScreen({
   showAttribution = true,
   showZoomControls,
   onMapEngineFailure,
+  accessibilityLabel,
+  accessibilityHint,
+  accessibilitySummaryRef,
 }: MapScreenProps) {
   const cameraRef = useRef<CameraRef>(null);
   const sourceRef = useRef<GeoJSONSourceRef>(null);
@@ -474,10 +493,19 @@ export function MapScreen({
   }
 
   return (
-    <View
-      style={styles.container}
-      testID="map-screen"
-    >
+    <View style={styles.container} testID="map-screen">
+      {accessibilityLabel ? (
+        // Rendered before the map so it paints beneath it and never covers the zoom controls.
+        <View
+          ref={accessibilitySummaryRef}
+          style={StyleSheet.absoluteFill}
+          pointerEvents="none"
+          accessible
+          accessibilityLabel={accessibilityLabel}
+          {...(accessibilityHint ? { accessibilityHint } : {})}
+          testID="map-accessibility-summary"
+        />
+      ) : null}
       <Map
         style={StyleSheet.absoluteFill}
         mapStyle={JSON.stringify(style)}
@@ -489,6 +517,7 @@ export function MapScreen({
           setEngineFailed(true);
           onMapEngineFailure?.();
         }}
+        onDidFinishRenderingMapFully={() => markPerf('first_map_render')}
         dragPan={gesturesEnabled}
         touchZoom={gesturesEnabled}
         doubleTapZoom={gesturesEnabled}
@@ -537,17 +566,7 @@ export function MapScreen({
               style={{
                 textField: ['get', 'point_count_abbreviated'],
                 textFont: [...MAP_LABEL_TEXT_FONT],
-                textSize: [
-                  'interpolate',
-                  ['linear'],
-                  ['zoom'],
-                  3,
-                  10,
-                  6,
-                  11,
-                  9,
-                  12,
-                ],
+                textSize: ['interpolate', ['linear'], ['zoom'], 3, 10, 6, 11, 9, 12],
                 textColor: DIGNITY_PALETTE.clusterText,
                 // Counts sit on copper discs; must not suppress basemap state labels
                 // (California near west-coast clusters at national framing).
@@ -611,14 +630,9 @@ export function MapScreen({
           {...(gesturesEnabled ? {} : { bottom: space['1'] })}
         />
       ) : null}
-      {showZoomControls ?? gesturesEnabled ? (
+      {(showZoomControls ?? gesturesEnabled) ? (
         <View style={styles.zoomControls} pointerEvents="box-none">
-          <MapZoomButton
-            icon="add"
-            label="Zoom in"
-            onPress={() => zoomBy(1)}
-            position="top"
-          />
+          <MapZoomButton icon="add" label="Zoom in" onPress={() => zoomBy(1)} position="top" />
           <MapZoomButton
             icon="remove"
             label="Zoom out"

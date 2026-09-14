@@ -1,5 +1,6 @@
 -- Evidence-first research kernel: normalized research semantics and scoped worker RPCs.
--- Existing source/entity/claim/release tables remain the canonical roots from ADR-020.
+-- Existing source/entity/claim/release tables remain the canonical roots from the Postgres
+-- SoR cutover (docs/decisions-carryover.md, "entity source-of-truth precedence").
 
 -- ---------------------------------------------------------------------------
 -- Versioned profiles and claim-relative source policy

@@ -1,4 +1,5 @@
 import { fireEvent, render } from '@testing-library/react-native';
+import { StyleSheet } from 'react-native';
 import { Button } from '../Button';
 
 describe('Button', () => {
@@ -31,5 +32,18 @@ describe('Button', () => {
     expect(button.props.accessibilityState.busy).toBe(true);
     fireEvent.press(button);
     expect(onPress).not.toHaveBeenCalled();
+  });
+
+  it('keeps a compact button at least 44pt tall, so density never shrinks the visible target', async () => {
+    const { getByRole } = await render(
+      <Button label="Show on map" density="compact" onPress={jest.fn()} />,
+    );
+    const button = getByRole('button');
+    const style = StyleSheet.flatten(
+      typeof button.props.style === 'function'
+        ? button.props.style({ pressed: false })
+        : button.props.style,
+    );
+    expect(style.minHeight).toBeGreaterThanOrEqual(44);
   });
 });

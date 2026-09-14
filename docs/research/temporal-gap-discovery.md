@@ -5,7 +5,7 @@ relative to its own average density, then launches era-specific discovery using
 period-appropriate query terms. Contract layer only in this bead: pure audit functions +
 era-keyed query packs. No persistence, no adapters, no publish surface.
 
-**Invariants honored:** research workers cannot publish (ADR-009) — nothing here touches
+**Invariants honored:** research workers cannot publish (`docs/decisions-carryover.md`, "Research and discovery cannot publish") — nothing here touches
 public projections or release tables; all functions are pure (no I/O, so no fetch at all —
 any future adapter work must go through `@repo/security` safe-fetch); offensive period
 record-language is `researchOnlyOffensive` and never default public language; a thin

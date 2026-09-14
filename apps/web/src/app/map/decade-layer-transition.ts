@@ -5,6 +5,18 @@
  * driven by requestAnimationFrame — not a dual-buffer opacity wipe. Pins, clusters, and
  * relationship lines keep a true out/in opacity crossfade on incoming buffers.
  *
+ * PER-ENTITY MORPH (repo-o56o). A record documented in both the outgoing and incoming decade no
+ * longer dissolves and reappears. The dual buffer stays — it is what lets arriving and departing
+ * pins overlap — but a record present on both sides is HELD: full opacity on the current buffer,
+ * zero on the incoming one, for the whole morph. Only records that actually enter or leave the
+ * decade animate.
+ *
+ * The old behavior was not merely redundant, it was visible. The two buffers each carried the
+ * same pin at `rest * (1 - t)` and `rest * t`, which sums to `rest` arithmetically but does not
+ * composite that way: two 50% circles stack to 75%, not 100%. So every persisting pin dipped and
+ * its stroke double-drew through the middle of the dissolve, which read as the whole field
+ * shimmering when the decade advanced rather than as history moving past records that stay put.
+ *
  * MapLibre paint transitions stay at 0; the rAF loop owns the clock so decade advances
  * never snap. Reduced motion collapses to a cut.
  */
@@ -13,6 +25,7 @@ import {
   ENTITY_CLUSTER_OPACITY,
   ENTITY_HALO_OPACITY,
   ENTITY_POINT_FILL_OPACITY,
+  ENTITY_PRECISION_RADIUS_OPACITY,
 } from './explore-style';
 import {
   EXPLORE_CLUSTER_COUNT_INCOMING_LAYER_ID,
@@ -22,6 +35,9 @@ import {
   EXPLORE_HISTORY_EDGES_INCOMING_LAYER_ID,
   EXPLORE_HISTORY_EDGES_LAYER_ID,
   EXPLORE_HISTORY_EDGES_SELECTED_LAYER_ID,
+  EXPLORE_PRECISION_RADIUS_LAYER_ID,
+  EXPLORE_ENTITIES_INCOMING_SOURCE_ID,
+  EXPLORE_ENTITIES_SOURCE_ID,
   EXPLORE_STATE_DENSITY_SOURCE_ID,
   EXPLORE_UNCLUSTERED_EVENT_GLYPH_INCOMING_LAYER_ID,
   EXPLORE_UNCLUSTERED_EVENT_GLYPH_LAYER_ID,
@@ -52,6 +68,16 @@ export type DecadeCrossfadePaintTarget = {
 export const DECADE_CROSSFADE_OUT_TARGETS: readonly DecadeCrossfadePaintTarget[] = [
   { layerId: EXPLORE_HISTORY_EDGES_LAYER_ID, paintKey: 'line-opacity', restOpacity: 0.9 },
   { layerId: EXPLORE_HISTORY_EDGES_SELECTED_LAYER_ID, paintKey: 'line-opacity', restOpacity: 1 },
+  // No `EXPLORE_PRECISION_RADIUS_*_INCOMING` counterpart exists (unlike halo/point/glyph below):
+  // the radius affordance has no dual-buffer partner to crossfade into. Listing it here still
+  // fades it out smoothly with everything else rather than leaving a static ring visible while
+  // its neighbors dissolve, and `restoreDecadeFadePaintFromStyle` snaps it back to the rebuilt
+  // style's (already new-decade) expression at promote, same as every other out-only channel.
+  {
+    layerId: EXPLORE_PRECISION_RADIUS_LAYER_ID,
+    paintKey: 'circle-opacity',
+    restOpacity: ENTITY_PRECISION_RADIUS_OPACITY,
+  },
   {
     layerId: EXPLORE_UNCLUSTERED_HALO_LAYER_ID,
     paintKey: 'circle-opacity',
@@ -171,6 +197,62 @@ export function decadeCrossfadeOpacities(
     outOpacity: restOpacity * (1 - t),
     inOpacity: restOpacity * t,
   };
+}
+
+/**
+ * Entity ids documented in BOTH decades — the records that must not move while the decade does.
+ *
+ * Pure and set-based rather than a diff of the feature arrays: order changes between decades for
+ * reasons that have nothing to do with membership (the source is rebuilt per decade), so a
+ * positional comparison would report churn that is not there.
+ */
+export function buildDecadeHoldSet(
+  currentEntityIds: Iterable<string>,
+  nextEntityIds: Iterable<string>,
+): ReadonlySet<string> {
+  const next = new Set<string>();
+  for (const id of nextEntityIds) {
+    const trimmed = id.trim();
+    if (trimmed) next.add(trimmed);
+  }
+  const held = new Set<string>();
+  for (const id of currentEntityIds) {
+    const trimmed = id.trim();
+    if (trimmed && next.has(trimmed)) held.add(trimmed);
+  }
+  return held;
+}
+
+/** Entity ids carried by a feature collection, in document order, skipping anything unkeyed. */
+export function entityIdsInCollection(collection: {
+  readonly features: readonly { readonly properties?: { readonly entityId?: unknown } }[];
+}): readonly string[] {
+  const ids: string[] = [];
+  for (const feature of collection.features) {
+    const id = feature.properties?.entityId;
+    if (typeof id === 'string' && id.trim()) ids.push(id.trim());
+  }
+  return ids;
+}
+
+/**
+ * Opacity paint for one morph channel: held features sit at `heldOpacity`, everything else takes
+ * the animated value.
+ *
+ * A `case` expression rather than per-feature `setFeatureState` on every frame. Feature-state is
+ * what density uses, but density is 51 polygons; this runs over the whole pin field, and writing
+ * a blend value per pin per frame would be thousands of calls at 60fps. Here the feature-state is
+ * written ONCE per transition (a boolean, `hold`) and only the scalar inside the expression moves,
+ * so a frame costs one `setPaintProperty` per channel exactly as it did before.
+ *
+ * `['boolean', ..., false]` supplies the default: a cluster has no `entityId` to promote and so no
+ * `hold` state, which is correct — a cluster is a different shape in each decade and should animate.
+ */
+export function decadeHoldOpacityExpression(
+  heldOpacity: number,
+  animatedOpacity: number,
+): readonly unknown[] {
+  return ['case', ['boolean', ['feature-state', 'hold'], false], heldOpacity, animatedOpacity];
 }
 
 /** Smoothstep easing for ambient decade morphs. */
@@ -311,16 +393,90 @@ export function setDecadeCrossfadeIdleOpacities(map: MapLibreMap): void {
   }
 }
 
-/** Apply dual-buffer pin/edge morph opacities at eased progress ∈ [0, 1]. */
-export function setDecadeMorphProgress(map: MapLibreMap, progress: number): void {
+/** The two entity buffers feature-state addresses; edges carry no `entityId` to hold by. */
+const DECADE_HOLD_SOURCE_IDS = [
+  EXPLORE_ENTITIES_SOURCE_ID,
+  EXPLORE_ENTITIES_INCOMING_SOURCE_ID,
+] as const;
+
+/**
+ * Mark the records present in both decades, once, before the morph starts.
+ *
+ * Written to BOTH buffers because both consult it: the current buffer holds these at rest while
+ * everything else fades out, and the incoming buffer holds them at zero so the same record is
+ * never drawn twice.
+ */
+export function applyDecadeHoldFeatureState(
+  map: MapLibreMap,
+  heldEntityIds: ReadonlySet<string>,
+): void {
+  for (const sourceId of DECADE_HOLD_SOURCE_IDS) {
+    if (!map.getSource(sourceId)) continue;
+    for (const id of heldEntityIds) {
+      try {
+        map.setFeatureState({ source: sourceId, id }, { hold: true });
+      } catch (error) {
+        console.error(`[decade-hold] setFeatureState ${sourceId}/${id} failed`, error);
+      }
+    }
+  }
+}
+
+/**
+ * Drop the hold marks after promote, or when a morph is superseded.
+ *
+ * Must run on every exit, not just the happy one: a stranded `hold` would pin those records at
+ * rest through the NEXT decade's dissolve, which is the same shimmer inverted — records that
+ * should leave staying lit.
+ */
+export function clearDecadeHoldFeatureState(
+  map: MapLibreMap,
+  heldEntityIds: ReadonlySet<string>,
+): void {
+  for (const sourceId of DECADE_HOLD_SOURCE_IDS) {
+    if (!map.getSource(sourceId)) continue;
+    for (const id of heldEntityIds) {
+      try {
+        map.removeFeatureState({ source: sourceId, id }, 'hold');
+      } catch (error) {
+        console.error(`[decade-hold] removeFeatureState ${sourceId}/${id} failed`, error);
+      }
+    }
+  }
+}
+
+/**
+ * Apply dual-buffer pin/edge morph opacities at eased progress ∈ [0, 1].
+ *
+ * With `holdPersistingRecords`, each channel becomes a `case` expression so a record documented in
+ * both decades sits still — rest on the current buffer, zero on the incoming one — while records
+ * entering and leaving animate around it. Without it the channels stay plain numbers, which is
+ * what a first paint, a reduced-motion cut, and every non-decade caller want.
+ */
+export function setDecadeMorphProgress(
+  map: MapLibreMap,
+  progress: number,
+  options: { readonly holdPersistingRecords?: boolean } = {},
+): void {
   const t = Math.min(1, Math.max(0, progress));
+  const hold = options.holdPersistingRecords === true;
   for (const target of DECADE_CROSSFADE_OUT_TARGETS) {
     const { outOpacity } = decadeCrossfadeOpacities(t, target.restOpacity);
-    setPaintSafe(map, target.layerId, target.paintKey, outOpacity);
+    setPaintSafe(
+      map,
+      target.layerId,
+      target.paintKey,
+      hold ? decadeHoldOpacityExpression(target.restOpacity, outOpacity) : outOpacity,
+    );
   }
   for (const target of DECADE_CROSSFADE_IN_TARGETS) {
     const { inOpacity } = decadeCrossfadeOpacities(t, target.restOpacity);
-    setPaintSafe(map, target.layerId, target.paintKey, inOpacity);
+    setPaintSafe(
+      map,
+      target.layerId,
+      target.paintKey,
+      hold ? decadeHoldOpacityExpression(0, inOpacity) : inOpacity,
+    );
   }
 }
 
@@ -338,7 +494,10 @@ export function runDecadeMorphAnimation(options: {
   readonly durationMs: number;
   readonly isCurrent: () => boolean;
   readonly onProgress?: (easedProgress: number) => void;
+  /** Hold records documented in both decades still for the whole morph (repo-o56o). */
+  readonly holdPersistingRecords?: boolean;
 }): DecadeMorphAnimationHandle {
+  const morphOptions = { holdPersistingRecords: options.holdPersistingRecords === true };
   let rafId = 0;
   let canceled = false;
   let settle: (() => void) | undefined;
@@ -355,7 +514,7 @@ export function runDecadeMorphAnimation(options: {
   };
 
   setDecadeCrossfadeTransitions(options.map, 0);
-  setDecadeMorphProgress(options.map, 0);
+  setDecadeMorphProgress(options.map, 0, morphOptions);
   options.onProgress?.(0);
 
   const start = performance.now();
@@ -366,7 +525,7 @@ export function runDecadeMorphAnimation(options: {
     }
     const linear = Math.min(1, (now - start) / Math.max(1, options.durationMs));
     const eased = easeInOutCubic(linear);
-    setDecadeMorphProgress(options.map, eased);
+    setDecadeMorphProgress(options.map, eased, morphOptions);
     options.onProgress?.(eased);
     if (linear < 1) {
       rafId = window.requestAnimationFrame(tick);

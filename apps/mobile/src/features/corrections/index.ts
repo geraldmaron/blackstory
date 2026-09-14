@@ -2,24 +2,17 @@
  * Corrections feature barrel (MOB-016). Quarantine-only correction submission
  * and opaque receipt-status lookup for the native reader.
  *
- * Boundary: the client reaches the server over HTTP only (ADR-021 §4) and the
- * only client write is this quarantine intake — no canonical write path exists.
+ * Boundary: the client reaches the server over HTTP only and the only client
+ * write is this quarantine intake — no canonical write path exists
+ * (`docs/decisions-carryover.md`, "ADR-021's two invariants": the client/server
+ * boundary).
  * Correction content, contact details, and the receipt code never reach logs,
  * the general SQLite cache, crash breadcrumbs, or a URL/route param
  * (invariant 7).
  */
-export {
-  CorrectionForm,
-  type CorrectionFormProps,
-} from './CorrectionForm';
-export {
-  CorrectionReceipt,
-  type CorrectionReceiptProps,
-} from './CorrectionReceipt';
-export {
-  CorrectionStatusView,
-  type CorrectionStatusViewProps,
-} from './CorrectionStatusView';
+export { CorrectionForm, type CorrectionFormProps } from './CorrectionForm';
+export { CorrectionReceipt, type CorrectionReceiptProps } from './CorrectionReceipt';
+export { CorrectionStatusView, type CorrectionStatusViewProps } from './CorrectionStatusView';
 export {
   submitCorrection,
   lookupCorrectionStatus,

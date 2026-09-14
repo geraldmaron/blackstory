@@ -17,6 +17,18 @@
  * `@repo/security` redactor) and is not weakened or bypassed here.
  */
 
+/**
+ * One story that cites a mapped record, as `/v1/map` carries it. Mirrors
+ * `storyCitationV1Schema`; `relation` is a phrase for a reader ("mapped in"), never a token the
+ * client branches on.
+ */
+export type MapFeatureStoryCitation = {
+  readonly slug: string;
+  readonly title: string;
+  readonly relation: string;
+  readonly href: string;
+};
+
 export type MapPointFeatureProperties = {
   readonly entityId: string;
   readonly kind: string;
@@ -40,6 +52,12 @@ export type MapPointFeatureProperties = {
   readonly topicIds?: readonly string[];
   /** Derived lifecycle status on live MapSourceV1 features. */
   readonly status?: string;
+  /**
+   * Published stories that cite this record, denormalized onto the feature so the Explore
+   * preview can name them without a second round trip. Absent on features no story cites, which
+   * is most of them — and absent on demo fixtures, which state no editorial edge at all.
+   */
+  readonly citingStories?: readonly MapFeatureStoryCitation[];
 };
 
 export type MapPointFeature = {

@@ -1,10 +1,12 @@
 /**
- * Request-scoped shared data (ADR-017 "Route-group layout owns the canvas"): any server
- * component that needs the active release's entities reads through the same
- * `React.cache()`-memoized `getSharedPublicEntities`, so a single request never hits the public
- * data source twice even when multiple independent server components (e.g. `/` and `/records`)
- * each need it. `loadMapStageBase` additionally builds the base feature collection + MapLibre
- * style ONCE for a surface that wants a plate — see `MapStage.tsx` for why the root shell itself
+ * Request-scoped shared data. The map decision's "one fetch for both map surfaces" survives as
+ * `React.cache()` memoization rather than as a route-group layout fetch, because that group no
+ * longer exists (`docs/decisions-carryover.md`, "Persistent map canvas": the root shell owns
+ * the canvas). Any server component that needs the active release's entities reads through the
+ * same memoized `getSharedPublicEntities`, so a single request never hits the public data
+ * source twice even when multiple independent server components (e.g. `/` and `/records`) each
+ * need it. `loadMapStageBase` additionally builds the base feature collection plus MapLibre
+ * style ONCE for a surface that wants a plate: see `MapStage.tsx` for why the root shell itself
  * never calls it.
  */
 import { cache } from 'react';

@@ -93,7 +93,10 @@ describe('normalizeContentPage — malicious block corpus', () => {
   });
 
   it('caps an oversized paragraphs array within a single section', () => {
-    const manyParagraphs = Array.from({ length: MAX_PARAGRAPHS_PER_SECTION + 1000 }, (_, i) => `p${i}`);
+    const manyParagraphs = Array.from(
+      { length: MAX_PARAGRAPHS_PER_SECTION + 1000 },
+      (_, i) => `p${i}`,
+    );
     const result = normalizeContentPage({ ...VALID_BASE, body: [{ paragraphs: manyParagraphs }] });
     expect(result.blocks.length).toBe(MAX_PARAGRAPHS_PER_SECTION);
   });

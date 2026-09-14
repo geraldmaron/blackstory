@@ -1,3 +1,7 @@
+import {
+  compareRelationshipCausalWeight,
+  RELATIONSHIP_CAUSAL_WEIGHT,
+} from '@repo/domain-core/relationship';
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import type { PoolClient } from 'pg';
@@ -13,9 +17,12 @@ type PublishedRow = { entity_id: string; related: unknown };
 
 function fakeClient(derived: readonly DerivedRow[], published: readonly PublishedRow[]) {
   const updates: Array<{ related: string; releaseId: string; entityId: string }> = [];
+  const queries: string[] = [];
   return {
     updates,
+    queries,
     query: async (sql: string, params?: readonly unknown[]) => {
+      queries.push(sql);
       if (sql.includes('entity_relationships')) return { rows: derived };
       if (sql.trimStart().startsWith('SELECT entity_id, related')) return { rows: published };
       const [related, releaseId, entityId] = params as [string, string, string];
@@ -23,7 +30,10 @@ function fakeClient(derived: readonly DerivedRow[], published: readonly Publishe
       return { rows: [] };
     },
     // biome-ignore lint: test double, cast to the shape the module expects
-  } as unknown as PoolClient & { readonly updates: typeof updates };
+  } as unknown as PoolClient & {
+    readonly updates: typeof updates;
+    readonly queries: typeof queries;
+  };
 }
 
 test('planReleaseRelatedSync repairs a row whose related[] was wiped by a republish', async () => {
@@ -147,17 +157,74 @@ test('planReleaseRelatedSync emits one entry per neighbor when several edges joi
   ]);
 });
 
-test('DERIVE_SQL orders the generic related_to last so a specific type wins the pair', async () => {
+test('DERIVE_SQL ranks by RELATIONSHIP_CAUSAL_WEIGHT, then alphabetically, with related_to always last', async () => {
   // The ordering itself is SQL, so this pins the contract the dedup depends on: whatever the
-  // query yields first for a pair is what renders. Postgres sorts false before true, so
-  // `(relationship_type = 'related_to')` puts every specific type ahead of the fallback.
-  const { readFileSync } = await import('node:fs');
-  const source = readFileSync(new URL('./release-related-sync.ts', import.meta.url), 'utf8');
+  // query yields first for a pair is what renders. Capture the actual runtime SQL text (not the
+  // .ts source, which only holds the template that generates it) so a drift between the SQL and
+  // RELATIONSHIP_CAUSAL_WEIGHT (packages/domain-core/src/relationship.ts) fails here.
+  const client = fakeClient([], [{ entity_id: 'ent_a', related: [] }]);
+  await planReleaseRelatedSync(client, 'rel_1');
+  const deriveSql = client.queries.find((sql) => sql.includes('entity_relationships'));
+  assert.ok(deriveSql, 'expected the edges-deriving query to have run');
+
   assert.match(
-    source,
-    /ORDER BY e\.eid, e\.other_id, \(e\.relationship_type = 'related_to'\), e\.relationship_type/,
-    'related_to must sort after specific types, then ties break alphabetically',
+    deriveSql,
+    /ORDER BY e\.eid, e\.other_id, CASE e\.relationship_type[\s\S]*END, e\.relationship_type/,
+    'must order by the generated causal-weight CASE, then alphabetically as the tie-break',
   );
+
+  for (const [type, weight] of Object.entries(RELATIONSHIP_CAUSAL_WEIGHT)) {
+    assert.match(
+      deriveSql,
+      new RegExp(`WHEN '${type}' THEN ${weight}\\b`),
+      `expected the generated CASE to rank "${type}" at weight ${weight}`,
+    );
+  }
+
+  const maxWeight = Math.max(...Object.values(RELATIONSHIP_CAUSAL_WEIGHT));
+  assert.equal(
+    RELATIONSHIP_CAUSAL_WEIGHT.related_to,
+    maxWeight,
+    'related_to must carry the highest (weakest) weight so it always sorts last',
+  );
+});
+
+test('the owner-ruling exemplar end to end: sorted by the real causal-weight comparator, the dedup keeps participated_in over attended', async () => {
+  // Real shape (rel_20260723_authority_net_001): Amelia Boynton Robinson's edge to the Selma to
+  // Montgomery marches carries both `attended` and `participated_in`. This composes the actual
+  // domain-core comparator DERIVE_SQL's CASE reproduces with the sync module's own dedup rule
+  // ("first edge for the pair wins") to prove the two together resolve the pair to
+  // participated_in — not by hand-picking a row order, but by sorting with the same ranking
+  // function DERIVE_SQL is generated from, starting from the alphabetical order (attended before
+  // participated_in) that used to win.
+  const orderedTypes = (['attended', 'participated_in'] as const)
+    .slice()
+    .sort(compareRelationshipCausalWeight);
+  assert.deepEqual(
+    orderedTypes,
+    ['participated_in', 'attended'],
+    'sanity: the comparator flips it',
+  );
+
+  const client = fakeClient(
+    orderedTypes.map((relationship_type) => ({
+      entity_id: 'ent_amelia_boynton_robinson_001',
+      other_id: 'ent_selma_to_montgomery_marches_001',
+      relationship_type,
+      direction: 'outgoing' as const,
+    })),
+    [{ entity_id: 'ent_amelia_boynton_robinson_001', related: [] }],
+  );
+
+  const plan = await planReleaseRelatedSync(client, 'rel_1');
+
+  assert.deepEqual(plan.changed[0]?.after, [
+    {
+      id: 'ent_selma_to_montgomery_marches_001',
+      type: 'participated_in',
+      direction: 'outgoing',
+    },
+  ]);
 });
 
 test('planReleaseRelatedSync ignores a legacy non-array related value instead of throwing', async () => {

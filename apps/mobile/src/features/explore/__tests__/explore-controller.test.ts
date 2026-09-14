@@ -20,7 +20,10 @@ const base = (): ExploreState => initialExploreState();
 
 describe('no focus theft', () => {
   it('listScrolled is a pure no-op: no camera command, no viewport change', () => {
-    const start: ExploreState = { ...base(), viewport: { west: -100, south: 30, east: -80, north: 40 } };
+    const start: ExploreState = {
+      ...base(),
+      viewport: { west: -100, south: 30, east: -80, north: 40 },
+    };
     const next = exploreReducer(start, { type: 'listScrolled' });
     expect(next).toBe(start); // identical reference — nothing changed
     expect(next.cameraCommand).toBeUndefined();
@@ -63,7 +66,11 @@ describe('explicit intents move the camera', () => {
 
   it('camera command tokens strictly increase so each move fires once', () => {
     const s1 = exploreReducer(base(), { type: 'presetRequested', preset: 'national' });
-    const s2 = exploreReducer(s1, { type: 'entitySelected', entityId: 'b', point: [-95.37, 29.76] });
+    const s2 = exploreReducer(s1, {
+      type: 'entitySelected',
+      entityId: 'b',
+      point: [-95.37, 29.76],
+    });
     expect((s2.cameraCommand?.token ?? 0) > (s1.cameraCommand?.token ?? 0)).toBe(true);
   });
 });
@@ -97,8 +104,46 @@ describe('withdrawn selection after a release change', () => {
   });
 
   it('keeps a selection that still exists', () => {
-    let s = exploreReducer(base(), { type: 'entitySelected', entityId: 'a', point: [-77.04, 38.9] });
+    let s = exploreReducer(base(), {
+      type: 'entitySelected',
+      entityId: 'a',
+      point: [-77.04, 38.9],
+    });
     s = exploreReducer(s, { type: 'availableReconciled', available: SEPARATED });
     expect(s.selectedId).toBe('a');
+  });
+});
+
+describe('selecting with and without intent to travel', () => {
+  it('entitySelected frames the record — the phone tap that means "take me there"', () => {
+    const s = exploreReducer(base(), {
+      type: 'entitySelected',
+      entityId: 'a',
+      point: [-77.04, 38.9],
+    });
+    expect(s.selectedId).toBe('a');
+    expect(s.cameraCommand).toMatchObject({ kind: 'center', center: [-77.04, 38.9] });
+  });
+
+  it('entitySelectedInPlace selects and leaves the camera alone', () => {
+    const s = exploreReducer(base(), { type: 'entitySelectedInPlace', entityId: 'a' });
+    expect(s.selectedId).toBe('a');
+    expect(s.cameraCommand).toBeUndefined();
+  });
+
+  it('entitySelectedInPlace does not disturb a camera command already in flight', () => {
+    const flying = exploreReducer(base(), { type: 'presetRequested', preset: 'national' });
+    const token = flying.cameraCommand?.token;
+    expect(token).toBeDefined();
+
+    const s = exploreReducer(flying, { type: 'entitySelectedInPlace', entityId: 'a' });
+    expect(s.cameraCommand?.token).toBe(token);
+  });
+
+  it('re-selecting the same record in place is a no-op, by reference', () => {
+    const selected = exploreReducer(base(), { type: 'entitySelectedInPlace', entityId: 'a' });
+    expect(exploreReducer(selected, { type: 'entitySelectedInPlace', entityId: 'a' })).toBe(
+      selected,
+    );
   });
 });

@@ -7,7 +7,8 @@
  * → fitness `leadOnly`: every survivor is a LEAD routed to relevance review.
  *
  * Enforced here:
- * - `assertCampaignCannotPublish` at entry; discovery never publishes (ADR-009).
+ * - `assertCampaignCannotPublish` at entry; discovery never publishes
+ *   (`docs/decisions-carryover.md`, "Research and discovery cannot publish").
  * - Theme query packs use only historical/geographic term classes, so black-press
  *   signals classify WEAK (`candidate_only`) — an OCR keyword hit never promotes.
  * - Obscurity (`obscurity.v1`) is attached to every research-eligible lead.

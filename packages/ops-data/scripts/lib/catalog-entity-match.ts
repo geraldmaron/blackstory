@@ -135,7 +135,7 @@ export function loadCatalogEntitiesFromFixtures(catalogDir: string): CatalogEnti
         id,
         displayName,
         aliases: Array.isArray(entry.aliases)
-          ? entry.aliases.filter((a): a is string => typeof a === 'string')
+          ? entry.aliases.filter((a: unknown): a is string => typeof a === 'string')
           : [],
         ...(typeof entry.kind === 'string' ? { kind: entry.kind } : {}),
       });

@@ -13,10 +13,7 @@ import { Button, duration, space } from '@/ui';
 import { useReduceMotion } from '@/features/explore/useReduceMotion';
 
 // Android opts out of LayoutAnimation by default; enable it once at module load. iOS ignores this.
-if (
-  Platform.OS === 'android' &&
-  UIManager.setLayoutAnimationEnabledExperimental
-) {
+if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
   UIManager.setLayoutAnimationEnabledExperimental(true);
 }
 

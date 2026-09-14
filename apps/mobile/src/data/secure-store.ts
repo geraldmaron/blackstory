@@ -1,14 +1,20 @@
 /**
- * SecureStore usage, strictly bounded (MOB-009 §7; ADR-022 §2).
+ * SecureStore usage, strictly bounded (MOB-009 §7; `docs/decisions-carryover.md`, "Mobile data
+ * boundary" for the guard analysis, "Mobile cache and OTA release" for the never-cache list).
  *
  * SecureStore (Keychain / Keystore) is for SMALL OPAQUE SECRETS ONLY — e.g. a
  * correction receipt code (MOB-016) or the per-install search-key salt
  * (cache-policy.hashSearchKey). Bulk cached CONTENT must never go here; it goes
- * in SQLite (ADR-020/ADR-022). Two guards enforce that:
- *   - A hard byte cap (`MAX_SECRET_BYTES`). expo-secure-store itself warns above
- *     ~2 KB on Android; we cap well under it and REJECT rather than truncate.
- *   - A closed allow-list of secret keys (`SecretKey`) — there is no API to
- *     stash arbitrary blobs under arbitrary keys.
+ * in SQLite (`docs/decisions-carryover.md`, "Mobile stack": SQLite is the cache engine, and
+ * "Mobile cache and OTA release"). Two guards are named here, and only the first is a runtime
+ * control:
+ *   - A hard byte cap (`MAX_SECRET_BYTES`), enforced by `assertSmallSecret` before any write
+ *     reaches the backend. expo-secure-store itself warns above ~2 KB on Android; we cap well
+ *     under it and REJECT rather than truncate.
+ *   - A closed allow-list of secret keys (`SecretKey`). This constrains THIS module's API and
+ *     nothing else: `features/search/recent-searches.ts` writes its own key straight to the
+ *     `SecretBackend` port under the carve-out recorded in `docs/decisions-carryover.md`,
+ *     "Addendum, 2026-09-12 (repo-30k6)". It is not a guarantee about what reaches the keychain.
  *
  * The size guard is a pure function so it is unit-tested with no native module.
  */

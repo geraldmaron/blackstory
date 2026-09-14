@@ -18,7 +18,9 @@ describe('shouldPersistQuery (never-cache allow-list at the persist boundary)', 
   });
 
   it('honors an explicit meta.persist === false opt-out', () => {
-    expect(shouldPersistQuery({ queryKey: ['entity', 'e1'], meta: { persist: false } })).toBe(false);
+    expect(shouldPersistQuery({ queryKey: ['entity', 'e1'], meta: { persist: false } })).toBe(
+      false,
+    );
   });
 });
 
@@ -28,7 +30,10 @@ describe('SQLite persister', () => {
   it('round-trips a persisted client through the store', async () => {
     const store = createMemoryStore();
     const persister = createSqlitePersister(store);
-    const snapshot = client({ mutations: [], queries: [{ queryKey: ['entity', 'e1'], state: {} }] });
+    const snapshot = client({
+      mutations: [],
+      queries: [{ queryKey: ['entity', 'e1'], state: {} }],
+    });
     await persister.persistClient(snapshot);
     expect(await store.getMeta(PERSISTED_CLIENT_META_KEY)).toBeTruthy();
     const restored = await persister.restoreClient();

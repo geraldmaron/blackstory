@@ -71,13 +71,7 @@ function LegendGlyph({
   );
 }
 
-function LegendRow({
-  label,
-  children,
-}: {
-  readonly label: string;
-  readonly children: ReactNode;
-}) {
+function LegendRow({ label, children }: { readonly label: string; readonly children: ReactNode }) {
   const theme = useThemeColors();
   return (
     <View style={styles.row}>

@@ -3,8 +3,8 @@
 **Status:** Design + runtime contracts implemented in-repo. Cloud ingress, IAP, and per-surface deploy
 jobs remain human provisioning steps (see [`infra/gcp/surfaces/README.md`](../../infra/gcp/surfaces/README.md)).
 
-**ADR:** [ADR-005](../adr/ADR-005-service-surface-separation.md)
-**Data store:** Firestore system of record ([ADR-011](../adr/ADR-011-firestore-system-of-record.md))
+**Decision:** ADR-005, removed 2026-07-24, recovered in [`../decisions-carryover.md`](../decisions-carryover.md), "Service surface separation"
+**Data store:** ~~Firestore system of record (ADR-011)~~ — reversed; Postgres is now the system of record ([`../decisions-carryover.md`](../decisions-carryover.md), "Firestore as system of record, reversed")
 
 ## Threat model summary
 
@@ -28,7 +28,7 @@ enforced by `apps/web/src/admin/canonical-write-boundary.test.ts`.
 
 ### Public web (`apps/web`)
 
-- **Hosting:** Vercel (project `blackstory`, Root Directory `apps/web`) — ADR-027
+- **Hosting:** Vercel (project `blackstory`, Root Directory `apps/web`) — `../decisions-carryover.md`, "Small recovered decisions", ADR-027 entry
 - **Posture:** `public-cdn` — serves released public projections only
 - **Contract:** [`apps/web/SURFACE.md`](../../apps/web/SURFACE.md)
 

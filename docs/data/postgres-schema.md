@@ -16,7 +16,8 @@ are out of scope here.
 2. **Natural text PKs** where Firestore used semantic IDs; UUIDs where the domain already used them.
 3. **Normalize** arrays-of-maps that are queried or audited (`case_history_events`, checklist items);
    keep truly schemaless bags as `jsonb` with CHECKs.
-4. **ADR-004** — immutable release projections; one active release pointer; no in-place public edits.
+4. **Immutable release projections; one active release pointer; no in-place public edits**
+   (`decisions-carryover.md`, "Public projection and immutable publication snapshots").
 5. **Research cannot publish** — RLS/grants enforce this.
 6. **Authz in `app_metadata.bb_role` only** (Supabase Auth).
 7. **Provenance quartet** on published statistics: `source`, `source_url`, `retrieved_at`, `content_hash`.
@@ -72,7 +73,7 @@ erDiagram
 | `outboxMessages` | `bb_ops.outbox_messages` | `pending`/`processed`/`dead_letter` |
 | `idempotencyKeys` | `bb_ops.idempotency_keys` | PK = key text |
 | `outboxConsumerReceipts` | `bb_ops.outbox_consumer_receipts` | |
-| `catalogDecisions` | `bb_ops.catalog_decisions` | Does not mutate live release |
+| `catalogDecisions` | `bb_ops.catalog_decisions` | Does not mutate live release; an open `flag_for_retraction` blocks republish (repo-vj7cs) |
 | `adminStoryPacketReviews` | `bb_ops.story_packet_reviews` | Live-only; was missing from FIRESTORE_ROOT |
 
 ### Research

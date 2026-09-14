@@ -2,9 +2,8 @@
  * Door Journey focus: the frame the shared plate holds for a chapter.
  *
  * A chapter, its rotating fact, or the visit's spotlight record resolve to one MapLibre camera
- * spec, the record the plate rings, and the place name the live region announces. There is no
- * second target any more: the static Albers board this module used to layout-zoom is gone
- * (repo-18ma2) and the live plate is the only map on `/`, so a frame is a camera and nothing else.
+ * spec, the record the plate rings, and the place name the live region announces. A frame is a
+ * camera and nothing else.
  */
 import type { StoryChapter } from '../lib/story/chapters';
 import type { StoryRecordSpotlight } from '../lib/story/pick-story-record';

@@ -1,8 +1,8 @@
 {
-  "count": 1673,
+  "count": 1672,
   "yearSpan": [1831, 2024],
   "categories": {
-    "police_violence": 1097,
+    "police_violence": 1096,
     "racial_terror": 575,
     "state_execution": 1
   },
@@ -19,5 +19,49 @@
     "https://www.washingtonpost.com/graphics/investigations/police-shootings-database/",
     "https://www.splcenter.org/civil-rights-martyrs/",
     "https://en.wikipedia.org/wiki/List_of_lynching_victims_in_the_United_States"
-  ]
+  ],
+  "namesAwaitingEntityRecords": {
+    "why": "Two names on this wall were mislinked to a namesake by the memorial seed exporter before it switched from fuzzy to exact matching (repo-5jxh). They are unlinked now, which is correct, and they stay unlinked until each has an entity record of their own. The research below was done so that creating those records is a sourced step and not a fresh search. Once a record exists, apps/mobile/scripts/export-memorial-seed.mjs takes the pairing in VERIFIED_ENTITY_ALIASES, and only after reading the new record's summary to confirm it describes the victim.",
+    "victims": [
+      {
+        "name": "Charles Brown",
+        "year": 1957,
+        "place": "Benton, Mississippi (Yazoo County)",
+        "previouslyMislinkedTo": {
+          "entityId": "divine-nine-person-pbs-charles-i-brown",
+          "displayName": "Charles I. Brown",
+          "who": "a 1914 founder of Phi Beta Sigma at Howard, a different man entirely"
+        },
+        "record": "A 20-year-old airman with the U.S. Air Force, home on leave in Yazoo County. On 18 June 1957 he was eating at the dining table of a white neighbor he had known for years when her 50-year-old brother, the farmer Raiford Walton, left the room for a shotgun and shot him in the heart at close range. Walton said Brown had been too friendly with his sister. Walton admitted the shooting and a local grand jury refused to indict him. The FBI reopened the case in 2008 under the Emmett Till Unsolved Civil Rights Crime Act and the Civil Rights Division closed the file on 16 April 2010, finding no prosecutable federal violation because Walton was by then long dead.",
+        "sources": [
+          "https://www.justice.gov/crt/case/charles-brown",
+          "https://www.justice.gov/d9/175_41_214_c_brown.pdf",
+          "https://www.pbs.org/wgbh/frontline/interactive/unresolved/cases/charles-brown/",
+          "https://www.splcenter.org/forgotten/"
+        ],
+        "placeCorrection": "The racial-terror roll and the shared archive both carried \"Yazoo City, Mississippi\", the county seat. The Justice Department's Notice to Close File names Benton, and PBS Frontline's case page names Yazoo County, which contains Benton. The two agree and Benton is the more exact, so both rolls now say Benton."
+      },
+      {
+        "name": "Robert Johnson",
+        "year": 1934,
+        "place": "Tampa, Florida",
+        "previouslyMislinkedTo": {
+          "entityId": "ent_robert_l_johnson_001",
+          "displayName": "Robert L. Johnson",
+          "who": "the founder of BET, living, a different man entirely"
+        },
+        "record": "A 40-year-old Black man, arrested on 28 January 1934 by a Hillsborough County constable after a white woman reported an assault. Tampa officers established the next day that he had nothing to do with it. Instead of releasing him, officials handed him over in the middle of the night to an armed white man with no legal authority, the constable's brother, who was falsely calling himself a deputy constable. Johnson was found shot dead hours later. A coroner's jury named nobody, and nobody was ever held to account. The Tampa-Hillsborough Community Remembrance Project and the Equal Justice Initiative put up a marker for him in 2022.",
+        "sources": [
+          "https://sites.lib.jmu.edu/lynchingmarkers/fl1934013001/",
+          "https://www.hmdb.org/m.asp?m=206382",
+          "https://digitalcommons.usf.edu/tampabayhistory/vol6/iss2/3/",
+          "https://www.tampabay.com/life-culture/history/2022/08/29/hillsborough-countys-memorial-to-lynching-victims-is-unveiled/"
+        ]
+      }
+    ],
+    "notAVictim": {
+      "name": "George Bush III",
+      "note": "The third mislinked name is off this wall entirely as of 2026-09-13, not awaiting a record. See intentionally_excluded_examples in police-violence-memorial-names.sources.json."
+    }
+  }
 }

@@ -1,15 +1,22 @@
 /**
- * Entity detail screen (MOB-014) — Ledger Line flat section stacks on canvas
- * matching web `design-direction-v6-entity.md`: intro, anatomy, trust off-ramp,
- * narrative beats, claims, timeline, connected records, provenance, maps hand-off,
- * and optional session navigation footer.
+ * Entity detail screen (MOB-014) — Ledger Line flat section stacks on canvas.
+ *
+ * Section order aligns to web's canonical `recordSectionIndex`
+ * (`apps/web/src/app/entity/[id]/EntityRoomSections.tsx`) for the beats the two platforms
+ * share: intro, anatomy and trust off-ramp (layout-only on this screen — web renders the same
+ * material in its masthead and fact strip, not as a numbered beat), narrative beats, claims,
+ * status, timeline, connected records, cited-in (web's "Where this record is written about"),
+ * provenance (layout-only, same reasoning as intro/anatomy), maps hand-off, and optional
+ * session navigation footer.
  */
-import type { ReactNode } from 'react';
+import { useEffect, type ReactNode } from 'react';
 import { ActivityIndicator, ScrollView, View } from 'react-native';
 import { ErrorState, screenScrollInsets, space, useThemeColors } from '@/ui';
+import { markPerf } from '@/lib/perf-marks';
 import type { EntityDetailState } from './useEntityDetail';
 import { entityBeatIndices } from './entity-beat-indices';
 import { GENERIC_ERROR_COPY, OFFLINE_NO_CACHE_COPY } from './copy';
+import { CitedInSection } from './sections/CitedInSection';
 import { ClaimsSection } from './sections/ClaimsSection';
 import { AnatomySection } from './sections/AnatomySection';
 import { IntroSection } from './sections/IntroSection';
@@ -30,6 +37,8 @@ export type EntityDetailScreenProps = {
   readonly onBackToExplore?: () => void;
   readonly onBackToMap?: (entityId: string) => void;
   readonly onOpenEntity?: (entityId: string) => void;
+  /** Opens a published story by slug — the record's "Cited in" beat is the only caller. */
+  readonly onOpenStory?: (slug: string) => void;
   readonly onMethodologyPress?: () => void;
   /** Optional session Previous / Next / Random footer (web EntitySessionNav parity). */
   readonly sessionNav?: ReactNode;
@@ -42,6 +51,7 @@ export function EntityDetailScreen({
   onBackToExplore,
   onBackToMap,
   onOpenEntity,
+  onOpenStory,
   onMethodologyPress,
   sessionNav,
 }: EntityDetailScreenProps) {
@@ -53,6 +63,18 @@ export function EntityDetailScreen({
     canvasStyle,
     { alignItems: 'center' as const, justifyContent: 'center' as const, padding: space['8'] },
   ];
+
+  // Hooks run unconditionally, ahead of the early returns below, per the rules of hooks. `ready`
+  // is every state that falls through to the real record render (i.e. neither loading nor one of
+  // the three terminal non-record states).
+  const ready =
+    state.kind !== 'loading' &&
+    state.kind !== 'not-found' &&
+    state.kind !== 'offline-no-cache' &&
+    state.kind !== 'error';
+  useEffect(() => {
+    if (ready) markPerf('entity_detail_loaded');
+  }, [ready]);
 
   if (state.kind === 'loading') {
     return (
@@ -134,8 +156,8 @@ export function EntityDetailScreen({
       <HowToReadThisRecord {...(onMethodologyPress ? { onMethodologyPress } : {})} />
 
       <NarrativeSections entity={entity} beats={beats} />
-      <StatusSection entity={entity} index={beats.status} />
       <ClaimsSection claims={entity.claims} isOnline={isOnline} index={beats.claims} />
+      <StatusSection entity={entity} index={beats.status} />
       {beats.timeline ? (
         <TimelineSection timeline={entity.timeline} index={beats.timeline} />
       ) : null}
@@ -145,6 +167,13 @@ export function EntityDetailScreen({
         index={beats.connected}
         {...(onOpenEntity ? { onOpenEntity } : {})}
       />
+      {beats.citedIn ? (
+        <CitedInSection
+          citingStories={entity.citingStories ?? []}
+          index={beats.citedIn}
+          {...(onOpenStory ? { onOpenStory } : {})}
+        />
+      ) : null}
       <ProvenanceSection entity={entity} index={beats.provenance} />
       {sessionNav ?? null}
     </ScrollView>

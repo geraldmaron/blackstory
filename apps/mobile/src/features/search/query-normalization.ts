@@ -121,11 +121,15 @@ export type SearchMode = 'browse' | 'query';
 export function getSearchMode(
   normalizedQuery: string,
   filterKind?: string | undefined,
+  filterEra?: string | undefined,
 ): SearchMode {
   if (normalizedQuery.length >= MIN_QUERY_LENGTH) return 'query';
-  // A kind on its own is a constraint, so it is a query. Treating it as browse is what sent a
-  // reader who tapped "Places" out to the Explore map: Records had no way to list a kind without
-  // typing, so the only thing a category row could do was leave the tab (repo-awboi). The server
-  // has always answered `q=&kind=place`; only the client refused to ask.
-  return filterKind !== undefined && filterKind.trim().length > 0 ? 'query' : 'browse';
+  // A kind (or an era) on its own is a constraint, so it is a query. Treating it as browse is what
+  // sent a reader who tapped "Places" out to the Explore map: Records had no way to list a kind
+  // without typing, so the only thing a category row could do was leave the tab (repo-awboi). The
+  // server has always answered `q=&kind=place`; only the client refused to ask. A reader who
+  // arrives via `/history?decade=1950s` with no typed query is the same shape of link: an era
+  // filter with nothing else is still a real, answerable request, not an empty one.
+  if (filterKind !== undefined && filterKind.trim().length > 0) return 'query';
+  return filterEra !== undefined && filterEra.trim().length > 0 ? 'query' : 'browse';
 }

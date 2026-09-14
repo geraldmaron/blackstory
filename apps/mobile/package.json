@@ -3,6 +3,17 @@
   "main": "expo-router/entry",
   "version": "0.0.0",
   "private": true,
+  "expo": {
+    "install": {
+      "exclude": [
+        "jest",
+        "@types/jest",
+        "react-native-safe-area-context",
+        "react-native-screens"
+      ],
+      "_why": "Held AHEAD of the versions Expo SDK 57 pins, not behind them, so `expo install --check` must not drag them back down. jest/@types/jest are on 30 because this project runs jest 30 with jest-expo (see the overrides above, which exist for exactly that combination); react-native-safe-area-context and react-native-screens are maintained Dependabot bumps inside their own major. Excluding them is what lets the Expo Doctor gate in CI be green and therefore mean something. Re-check each at the next SDK upgrade (repo-w2unm)."
+    }
+  },
   "overrides": {
     "xcode": {
       "uuid": "^11.1.1"
@@ -12,6 +23,9 @@
     "decode-uri-component": "^0.5.0",
     "@expo/plist": {
       "@xmldom/xmldom": "^0.8.15"
+    },
+    "jest-expo": {
+      "jest-watch-typeahead": "^3.0.1"
     }
   },
   "dependencies": {
@@ -19,7 +33,7 @@
     "@expo-google-fonts/geist-mono": "^0.4.3",
     "@expo-google-fonts/newsreader": "^0.4.1",
     "@expo-google-fonts/schibsted-grotesk": "^0.4.2",
-    "@expo/ui": "~57.0.16",
+    "@expo/ui": "~57.0.18",
     "@expo/vector-icons": "^15.0.2",
     "@gorhom/bottom-sheet": "^5.2.14",
     "@maplibre/maplibre-react-native": "^11.3.6",
@@ -29,26 +43,26 @@
     "@repo/public-contracts": "file:../../packages/public-contracts",
     "@tanstack/react-query": "^5.101.2",
     "@tanstack/react-query-persist-client": "^5.101.4",
-    "expo": "^57.0.0",
+    "expo": "~57.0.22",
     "expo-build-properties": "~57.0.17",
-    "expo-clipboard": "~57.0.1",
+    "expo-clipboard": "~57.0.2",
     "expo-constants": "~57.0.17",
-    "expo-dev-client": "~57.0.18",
-    "expo-device": "~57.0.1",
+    "expo-dev-client": "~57.0.19",
+    "expo-device": "~57.0.2",
     "expo-font": "~57.0.1",
-    "expo-glass-effect": "~57.0.1",
-    "expo-image": "~57.0.4",
-    "expo-linear-gradient": "~57.0.1",
-    "expo-linking": "~57.0.9",
-    "expo-router": "~57.0.19",
-    "expo-secure-store": "~57.0.3",
-    "expo-splash-screen": "~57.0.8",
-    "expo-sqlite": "~57.0.2",
+    "expo-glass-effect": "~57.0.3",
+    "expo-image": "~57.0.5",
+    "expo-linear-gradient": "~57.0.2",
+    "expo-linking": "~57.0.10",
+    "expo-router": "~57.0.21",
+    "expo-secure-store": "~57.0.4",
+    "expo-splash-screen": "~57.0.9",
+    "expo-sqlite": "~57.0.3",
     "expo-status-bar": "~57.0.1",
-    "expo-symbols": "~57.0.2",
-    "expo-system-ui": "~57.0.3",
-    "expo-updates": "~57.0.21",
-    "expo-web-browser": "~57.0.2",
+    "expo-symbols": "~57.0.3",
+    "expo-system-ui": "~57.0.4",
+    "expo-updates": "~57.0.22",
+    "expo-web-browser": "~57.0.3",
     "react": "19.2.3",
     "react-dom": "19.2.3",
     "react-native": "0.86.3",
@@ -62,14 +76,16 @@
   },
   "devDependencies": {
     "@testing-library/react-native": "^14.0.1",
-    "@types/jest": "^29.5.14",
+    "@types/jest": "^30.0.0",
     "@types/node": "^22.20.1",
     "@types/react": "~19.2.2",
     "eslint": "^9.39.0",
     "eslint-config-expo": "~57.0.0",
     "eslint-import-resolver-typescript": "^3.10.1",
-    "jest": "^29.7.0",
+    "expo-doctor": "^1.20.4",
+    "jest": "^30.5.1",
     "jest-expo": "~57.0.5",
+    "prettier": "^3.9.6",
     "react-test-renderer": "19.2.3",
     "tsx": "^4.23.1",
     "typescript": "~6.0.3"
@@ -88,6 +104,10 @@
     "lint": "expo lint --max-warnings 0",
     "typecheck": "tsc -p tsconfig.json --noEmit && tsc -p tsconfig.tooling.json --noEmit",
     "test": "jest",
+    "doctor": "expo-doctor",
+    "deps:check": "expo install --check",
+    "format": "prettier --config ../../.prettierrc.json --ignore-path .prettierignore --write .",
+    "format:check": "prettier --config ../../.prettierrc.json --ignore-path .prettierignore --check .",
     "seeds:generate": "node --conditions=development --import tsx scripts/generate-seeds.mjs",
     "seeds:check": "node --conditions=development --import tsx scripts/generate-seeds.mjs --check",
     "tokens:generate": "node --import tsx scripts/generate-brand-tokens.ts",

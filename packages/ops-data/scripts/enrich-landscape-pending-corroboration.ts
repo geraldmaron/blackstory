@@ -207,10 +207,10 @@ async function main(): Promise<void> {
     const updates: Array<{
       readonly id: string;
       readonly displayName: string;
-      readonly beforeConfidence?: number;
-      readonly afterConfidence?: number;
-      readonly corroboratingUrl?: string;
-      readonly method?: string;
+      readonly beforeConfidence?: number | undefined;
+      readonly afterConfidence?: number | undefined;
+      readonly corroboratingUrl?: string | undefined;
+      readonly method?: string | undefined;
       readonly status: 'updated' | 'unchanged' | 'already_had' | 'clears_gate';
     }> = [];
 

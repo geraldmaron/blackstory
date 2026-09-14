@@ -68,3 +68,68 @@ test('drops relatedCount/claimCount/relevanceScore/rankingSignal on parse (sensi
     );
   }
 });
+
+test('accepts a graded confidenceTier on a result and keeps the value intact', () => {
+  const parsed = searchResultV1Schema.parse({
+    id: 'ent_1',
+    kind: 'place',
+    displayName: 'Dunbar High School',
+    matchedOn: 'displayName',
+    matchedText: 'Dunbar High School',
+    explanation: 'Matched on name.',
+    eraBuckets: [],
+    notabilityLabels: [],
+    confidenceTier: 'high',
+  });
+  assert.equal(parsed.confidenceTier, 'high');
+});
+
+test('leaves confidenceTier absent — not "unrated" — when a payload predates the field', () => {
+  const parsed = searchResultV1Schema.parse({
+    id: 'ent_1',
+    kind: 'place',
+    displayName: 'Dunbar High School',
+    matchedOn: 'displayName',
+    matchedText: 'Dunbar High School',
+    explanation: 'Matched on name.',
+    eraBuckets: [],
+    notabilityLabels: [],
+  });
+  assert.ok(!('confidenceTier' in parsed), 'an ungraded payload must not be graded on parse');
+});
+
+test('rejects a confidenceTier outside the shared four-value vocabulary', () => {
+  assert.throws(() =>
+    searchResultV1Schema.parse({
+      id: 'ent_1',
+      kind: 'place',
+      displayName: 'Dunbar High School',
+      matchedOn: 'displayName',
+      matchedText: 'Dunbar High School',
+      explanation: 'Matched on name.',
+      eraBuckets: [],
+      notabilityLabels: [],
+      confidenceTier: 'A',
+    }),
+  );
+});
+
+test('a TIER is admitted while an evidence COUNT is still stripped (assessment vs ranking signal)', () => {
+  const parsed = searchResultV1Schema.parse({
+    id: 'ent_1',
+    kind: 'place',
+    displayName: 'Dunbar High School',
+    matchedOn: 'displayName',
+    matchedText: 'Dunbar High School',
+    explanation: 'Matched on name.',
+    eraBuckets: [],
+    notabilityLabels: [],
+    confidenceTier: 'medium',
+    evidenceCount: 7,
+    connectionCount: 3,
+  });
+  assert.equal(parsed.confidenceTier, 'medium');
+  for (const forbiddenKey of ['evidenceCount', 'connectionCount']) {
+    assert.ok(!(forbiddenKey in parsed), `${forbiddenKey} must not survive parsing`);
+  }
+});

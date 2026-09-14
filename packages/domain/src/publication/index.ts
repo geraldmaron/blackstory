@@ -166,6 +166,17 @@ export {
   PUBLIC_MEDIA_DEFAULTS,
 } from './public-media-urls.js';
 export type { PublicMediaUrlOptions } from './public-media-urls.js';
+export {
+  fetchReleaseEntitiesListArtifact,
+  fetchReleaseSearchIndexArtifact,
+} from './release-artifact-fetch.js';
+export type {
+  ArtifactFetchImpl,
+  ArtifactFetchInit,
+  FetchReleaseArtifactOptions,
+  ReleaseEntitiesListArtifact,
+  ReleaseSearchIndexArtifact,
+} from './release-artifact-fetch.js';
 
 function manifestToJson(manifest: ReleaseManifest): JsonValue {
   return {

@@ -18,7 +18,7 @@ Operating docs for the BlackStory monorepo: architecture, decisions, security, t
 | [`research/`](./research/) | Discovery, adapters, query packs, relevance, confidence, research cases |
 | [`admin/research-console.md`](./admin/research-console.md) | Administration and research console |
 | [`../infra/github/README.md`](../infra/github/README.md) | GitHub governance and OIDC/WIF operator docs |
-| [`../infra/database/README.md`](../infra/database/README.md) | Parked PostGIS / SQL Connect (Cloud SQL deferred; see ADR-011) |
+| [`../infra/database/README.md`](../infra/database/README.md) | Parked PostGIS / SQL Connect (Cloud SQL deferred; see [`decisions-carryover.md`](./decisions-carryover.md), "Firestore as system of record, reversed") |
 | [`../infra/firebase/FIRESTORE_MODEL.md`](../infra/firebase/FIRESTORE_MODEL.md) | Leftover Firestore collection map (not current SoR) |
 | [`../SECURITY.md`](../SECURITY.md) | Security policy and private vulnerability reporting |
 | [`../README.md`](../README.md) | Project overview and developer commands |

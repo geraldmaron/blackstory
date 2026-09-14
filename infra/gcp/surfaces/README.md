@@ -15,7 +15,7 @@ Companion isolation design (SAs, buckets, WIF): [`../isolation-matrix.json`](../
 
 | Surface | App | Runtime | Network posture | Service account |
 |---------|-----|---------|-----------------|-----------------|
-| Public web | `apps/web` | **Vercel** (ADR-027) | Public CDN | Vercel + runtime secrets (Postgres SoR) |
+| Public web | `apps/web` | **Vercel** (`../../../docs/decisions-carryover.md`, "Small recovered decisions", ADR-027 entry) | Public CDN | Vercel + runtime secrets (Postgres SoR) |
 | Public read API | `apps/api-public` | Cloud Run | Public read (Armor) | `api-public@…` |
 | Submissions API | `apps/api-submissions` | Cloud Run | Public, rate-limited | `api-submissions@…` |
 | Internal publication API | `apps/api-internal` | Cloud Run | **Private** (no public ingress) | `api-internal@…` |
@@ -28,7 +28,7 @@ Admin SDK SA boundaries**, and **network posture** (private ingress / IAP).
 ## Public web binding
 
 - Source: `apps/web`
-- Host: **Vercel** git integration from `apps/web` (ADR-027) — explicit Production promote
+- Host: **Vercel** git integration from `apps/web` (`../../../docs/decisions-carryover.md`, "Small recovered decisions", ADR-027 entry) — explicit Production promote
 - Contract doc: `apps/web/SURFACE.md`
 - Retired in-repo: `apps/web/apphosting*.yaml`, `black-book-web-*` App Hosting backends
 - Runtime: Vercel env + Postgres SoR — no quarantine/evidence access, no publish permission
@@ -41,7 +41,7 @@ identity; surface jobs will impersonate only the target runtime SA.
 
 | Job (planned) | Target | Impersonated SA | Notes |
 |---------------|--------|-----------------|-------|
-| `record-vercel-production` | Vercel Production | n/a (git + dashboard promote) | ADR-027; no App Hosting promote |
+| `record-vercel-production` | Vercel Production | n/a (git + dashboard promote) | `../../../docs/decisions-carryover.md`, "Small recovered decisions", ADR-027 entry; no App Hosting promote |
 | `deploy-api-public` | Cloud Run `black-book-api-public` | `api-public` | `--ingress=all` + Armor |
 | `deploy-api-submissions` | Cloud Run `black-book-api-submissions` | `api-submissions` | Strict rate limits |
 | `deploy-api-internal` | Cloud Run `black-book-api-internal` | `api-internal` | **`--ingress=internal-and-cloud-load-balancing`** |

@@ -56,9 +56,6 @@ function parseVerdicts(text: string): Verdict[] {
   const out: Verdict[] = [];
   for (const line of lines) {
     const parts = line.split('\t');
-    if (parts.length < 8) {
-      throw new Error(`Malformed verdict line (need 8+ columns): ${line.slice(0, 120)}`);
-    }
     const [
       entityId,
       displayName,
@@ -69,6 +66,18 @@ function parseVerdicts(text: string): Verdict[] {
       confidenceRaw,
       ...reasonParts
     ] = parts;
+    if (
+      parts.length < 8 ||
+      entityId === undefined ||
+      displayName === undefined ||
+      minedYearRaw === undefined ||
+      minedSignal === undefined ||
+      verdictRaw === undefined ||
+      trueDeathYearRaw === undefined ||
+      confidenceRaw === undefined
+    ) {
+      throw new Error(`Malformed verdict line (need 8+ columns): ${line.slice(0, 120)}`);
+    }
     const verdict = verdictRaw === 'approve' || verdictRaw === 'reject' ? verdictRaw : null;
     const confidence =
       confidenceRaw === 'high' || confidenceRaw === 'medium' || confidenceRaw === 'low'

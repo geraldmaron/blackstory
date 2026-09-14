@@ -22,6 +22,7 @@ describe('exploreHrefFromLens', () => {
       status: null,
       layerMode: 'presence',
       satellite: false,
+      lines: false,
       selectedId: undefined,
     });
     assert.equal(href.includes('floor=B'), true);
@@ -36,6 +37,7 @@ describe('exploreHrefFromLens', () => {
       status: null,
       layerMode: 'presence',
       satellite: false,
+      lines: false,
       selectedId: 'ent_dunbar_school_001',
     });
     assert.equal(href.includes('floor='), false);
@@ -44,5 +46,41 @@ describe('exploreHrefFromLens', () => {
     assert.equal(href.includes('theme=abolition'), true);
     assert.equal(href.includes('selected=ent_dunbar_school_001'), true);
     assert.equal(href.includes('lat='), false);
+  });
+
+  it('writes the live routes toggle to lines=1, not the static base value (repo-i2n5)', () => {
+    const href = exploreHrefFromLens(
+      { ...base, lines: false },
+      {
+        stateCode: '',
+        kindFamily: null,
+        evidenceFloor: 'any',
+        topicId: null,
+        status: null,
+        layerMode: 'presence',
+        satellite: false,
+        lines: true,
+        selectedId: undefined,
+      },
+    );
+    assert.equal(href.includes('lines=1'), true);
+  });
+
+  it('drops lines from the URL when the live routes toggle is off, even if base had it on', () => {
+    const href = exploreHrefFromLens(
+      { ...base, lines: true },
+      {
+        stateCode: '',
+        kindFamily: null,
+        evidenceFloor: 'any',
+        topicId: null,
+        status: null,
+        layerMode: 'presence',
+        satellite: false,
+        lines: false,
+        selectedId: undefined,
+      },
+    );
+    assert.equal(href.includes('lines=1'), false);
   });
 });

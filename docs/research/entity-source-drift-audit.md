@@ -81,7 +81,7 @@ Checked directly against Supabase (`twykhihqkcldpreuovay` project):
 - Checked for **real** duplicates within a release: `(release_id, entity_id)` on
   `release_entities` and `(release_id, slug)` on `release_stories` both have **zero** groups with
   count > 1. The apparent "doubling" is fully explained by two immutable per-release snapshots
-  (ADR-004 pattern), not hidden duplicate rows.
+  (`../decisions-carryover.md`, "Public projection and immutable publication snapshots" pattern), not hidden duplicate rows.
 
 **Uniqueness constraints added** (applied via `apply_migration`, both succeeded cleanly against
 live data — no pre-existing violations, which is itself confirmation there are no real dupes
@@ -110,8 +110,8 @@ alter table bb_public.release_stories
 - **SearXNG query roster** (`packages/config/src/scheduled-jobs/data/corsair-web-search-queries.json`)
   was **already** a runtime-loaded JSON data file, not code — it already carries `schemaVersion`,
   `updatedAt`, and a `purpose`/`safeties` block, and is read by
-  `scripts/run-scheduled-searxng-discovery.sh` and `packages/firebase/scripts/triage-corsair-candidates.ts`
-  at runtime. No change needed; it already satisfies the "curation edits don't require a code
+  `scripts/run-scheduled-searxng-discovery.sh` at runtime (the Firestore-era
+  `triage-corsair-candidates.ts` reader has since been retired). No change needed; it already satisfies the "curation edits don't require a code
   deploy" goal.
 - **Full DB migration** (moving these into a `bb_ops`/`bb_reference` table) was judged too heavy
   for this pass and is a follow-up, not done here — flagging as a candidate for `repo-atya` or a

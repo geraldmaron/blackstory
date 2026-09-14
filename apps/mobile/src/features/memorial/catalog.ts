@@ -6,7 +6,11 @@ import type { MemorialCatalogSnapshot, MemorialNameEntry } from './types';
 
 /** Replace em/en dashes in display strings (brand: no em dashes in UI copy). */
 export function plainDashCopy(value: string): string {
-  return value.replace(/\u2014/g, ' - ').replace(/\u2013/g, ' to ').replace(/\s{2,}/g, ' ').trim();
+  return value
+    .replace(/\u2014/g, ' - ')
+    .replace(/\u2013/g, ' to ')
+    .replace(/\s{2,}/g, ' ')
+    .trim();
 }
 
 function isFiniteCoord(value: unknown): value is number {
@@ -37,9 +41,7 @@ function normalizeEntry(raw: MemorialNameEntry): MemorialNameEntry {
     ...(typeof raw.placeLabel === 'string' && raw.placeLabel.trim()
       ? { placeLabel: plainDashCopy(raw.placeLabel) }
       : {}),
-    ...(isFiniteCoord(raw.lat) && isFiniteCoord(raw.lng)
-      ? { lat: raw.lat, lng: raw.lng }
-      : {}),
+    ...(isFiniteCoord(raw.lat) && isFiniteCoord(raw.lng) ? { lat: raw.lat, lng: raw.lng } : {}),
     ...(typeof raw.locationPrecision === 'string' && raw.locationPrecision.trim()
       ? { locationPrecision: raw.locationPrecision }
       : {}),

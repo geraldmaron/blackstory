@@ -11,19 +11,13 @@ import { humanizeToken } from '../../../components/entity/format';
  * Present standing of the SUBJECT, for the mast's glance line.
  *
  * Standing and era are different axes and must not be phrased as if they compete. A church
- * built in the 1890s that still holds services spans the 1890s AND is active; the mast used to
- * answer this slot with "Present-day record", which reads as a claim about *when* the record
- * belongs and sat directly beside the era saying something else.
+ * built in the 1890s that still holds services spans the 1890s AND is active.
  *
- * It was also wrong for two whole vocabularies. The old rule was `status === 'active'`, but only
- * place-like kinds ever take that value: laws are `in_force`, people are `living`. Measured on
- * the active release, that mislabeled 66 in-force laws and cases as "Historical record", and no
- * living person could ever have come out as present-day.
- *
- * So this returns the record's own status vocabulary (the same terms `StatusMark` renders) and
- * nothing else. `undefined` means the slot is dropped rather than filled with a default:
- * `event` kinds are statusless by design — their when-span is authoritative — and `unknown` is
- * a real answer that must not harden into "Historical record" for the 112 people carrying it.
+ * This returns the record's own status vocabulary (the same terms `StatusMark` renders) and
+ * nothing else. Each kind has its own status values: place-like kinds use `active`, laws are
+ * `in_force`, people are `living`. `undefined` means the slot is dropped rather than filled
+ * with a default: `event` kinds are statusless by design — their when-span is authoritative —
+ * and `unknown` is a real answer that must render as itself.
  */
 export function deriveRecordStanding(entity: PublicEntityView): string | undefined {
   if (entity.kind === 'event') return undefined;
@@ -61,10 +55,26 @@ export function isSparseRecord(entity: PublicEntityView): boolean {
  *    prevent.
  *
  * So the notice requires the absence of narrative context too. Single-sourced-but-researched
- * records need a corroboration disclosure instead — a different sentence, deliberately not
- * invented here (repo-ol8v).
+ * records need a corroboration disclosure instead — a different sentence, see
+ * isSingleSourceRecord below (repo-ol8v).
  */
 export function isThinRecord(entity: PublicEntityView): boolean {
   if (entity.researchCoverage !== 'minimal') return false;
   return (entity.historicalContext ?? '').trim().length === 0;
+}
+
+/**
+ * True when a record has been researched — real narrative context exists — but that research
+ * still traces to a single source document. The reader needs a different fact than isThinRecord
+ * conveys: not "the research has not happened yet" but "the research has happened, and it has
+ * not yet been checked against a second source."
+ *
+ * The inverse of isThinRecord's second condition, on the same researchCoverage === 'minimal'
+ * gate: isThinRecord fires when historicalContext is empty, this fires when it is not. The two
+ * are mutually exclusive by construction, so at most one of their notices ever renders for a
+ * given record (repo-ol8v).
+ */
+export function isSingleSourceRecord(entity: PublicEntityView): boolean {
+  if (entity.researchCoverage !== 'minimal') return false;
+  return (entity.historicalContext ?? '').trim().length > 0;
 }

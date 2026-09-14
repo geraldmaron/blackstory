@@ -131,7 +131,7 @@ export function roleMayAccess(
   return privilege === 'write';
 }
 
-/** Invariants from product constitution ADR-003 expressed as matrix assertions.  */
+/** Historical Cloud SQL role-isolation matrix assertions from the parked GCP design (see packages/data-access/DEFERRED.md); checked only against this file's own hardcoded matrix in a unit test, not against the live Supabase database, which is isolated by RLS policies instead.  */
 export function assertRoleIsolationInvariants(): void {
   if (roleMayAccess('role_research', 'bb_public', 'write')) {
     throw new Error('role_research must not write bb_public');

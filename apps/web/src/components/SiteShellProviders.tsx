@@ -13,9 +13,10 @@
  *
  * The actual MapLibre instance stays client-only by construction, not by this boundary:
  * `MapStage.tsx` dynamically `import()`s `maplibre-gl` itself, inside a mount effect, which is
- * the one and only place the library's runtime is ever loaded (ADR-017). Removing `ssr: false`
- * here does not pull WebGL into the server bundle — it only lets the surrounding markup (the
- * plate's own inert `<div>`, the header, the footer) render up front.
+ * the one and only place the library's runtime is ever loaded, and the only module allowed to
+ * construct a map (`docs/decisions-carryover.md`, "Persistent map canvas": one instance).
+ * Removing `ssr: false` here does not pull WebGL into the server bundle. It only lets the
+ * surrounding markup (the plate's own inert `<div>`, the header, the footer) render up front.
  */
 
 import type { ReactNode } from 'react';

@@ -1,22 +1,37 @@
 /**
  * Pure grid clustering + a two-interaction resolution model (MOB-012).
  *
- * On device the map draws clusters with MapLibre Native's built-in
- * supercluster (`cluster` on the GeoJSON source). That engine cannot run in a JS
- * unit test, so this module is the pure, testable model of the SAME contract the
- * bead requires — "clusters resolve to individual names within two interactions"
- * — and it is what the accessible list-alternative and the tap handler use.
+ * On device the map draws clusters with MapLibre Native's built-in supercluster
+ * (`cluster` on the GeoJSON source in `features/map/MapScreen.tsx`). That engine
+ * cannot run in a JS unit test, so this module is the pure, testable model of the
+ * SAME contract the bead requires — "clusters resolve to individual names within two
+ * interactions". NOTE: it models that contract, it does not serve it.
+ * `clusterFeatures`, `resolveCluster` and `assertClusterPrecisionSafe` have no caller
+ * outside `__tests__/clustering.test.ts` and the `features/explore` barrel; the
+ * records rail reads `ExploreFeature[]` straight from `explore-controller.ts`, and the
+ * tap handler reads the native cluster feature. Treat this as an executable spec.
  *
  * PRIVACY INVARIANT ("no hidden exact location through zoom or radius",
- * ADR-024 §9/§10): clustering is aggregation only. It NEVER interpolates or
- * reverse-geocodes an entity coordinate. Every member returned from a resolution
- * carries its ORIGINAL redacted coordinate, unchanged. The only derived point is
- * a cluster's display marker, and that marker is explicitly COARSENED to the
- * least-precise member's precision (`coarsenTo`), so an aggregate can never read
- * as more precise than the data it summarizes. `assertClusterPrecisionSafe`
- * encodes this as a checkable guard, exercised by clustering.test.ts.
+ * `docs/decisions-carryover.md`, "Native map render layer" §9/§10): clustering HERE is
+ * aggregation only. It NEVER interpolates or reverse-geocodes an entity coordinate.
+ * Every member returned from a resolution carries its ORIGINAL redacted coordinate,
+ * unchanged, and the one derived point — a cluster's display marker — is COARSENED to
+ * the least-precise member (`coarsenTo`). `assertClusterPrecisionSafe` encodes that as
+ * a checkable guard, exercised by clustering.test.ts.
+ *
+ * What renders on device does NOT go through that coarsening: supercluster positions a
+ * bubble at the mean of its members, which can carry more decimals than any of them.
+ * Nothing coarsens it. That mean is never shown as a number and is only read back as a
+ * camera center clamped to `MAP_MAX_ZOOM` (`clusterCamera.ts`), and averaging
+ * already-coarsened coordinates cannot recover a finer one — so it is not a
+ * de-redaction, but it is not this module's coarsened marker either.
  */
-import { coarsenTo, coarsestDecimals, isNoMorePreciseThan, type LngLat } from '@/features/map/mapCamera';
+import {
+  coarsenTo,
+  coarsestDecimals,
+  isNoMorePreciseThan,
+  type LngLat,
+} from '@/features/map/mapCamera';
 import type { ExploreFeature } from './explore-feature';
 
 export type Cluster = {

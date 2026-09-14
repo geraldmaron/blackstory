@@ -48,7 +48,7 @@ a child bead explicitly changes scope through measured evidence (governed by MOB
 | `black-book-mobile-002` | MOB-002 | Architecture, threat model, contract boundary ADRs | L | P0 |
 | `black-book-mobile-003` | MOB-003 | Versioned public contracts package (`packages/public-contracts`) | XL | P0 |
 | `black-book-mobile-004` | MOB-004 | Bounded public API v1 in `apps/api-public` | XL | P0 |
-| `black-book-mobile-005` | MOB-005 | Release-coupled bootstrap and map/content artifacts (completes ADR-013 activation) | XL | P0 |
+| `black-book-mobile-005` | MOB-005 | Release-coupled bootstrap and map/content artifacts (completes the activation in [`decisions-carryover.md`](../decisions-carryover.md), "Map stack" §5, ADR-013) | XL | P0 |
 | `black-book-mobile-006` | MOB-006 | Expo monorepo scaffold (`apps/mobile`) and native build foundation | L | P0 |
 | `black-book-mobile-007` | MOB-007 | Brand tokens, assets, accessible UI primitives (from `brand/` source) | L | P1 |
 | `black-book-mobile-008` | MOB-008 | Navigation, deep links, state restoration | L | P1 |

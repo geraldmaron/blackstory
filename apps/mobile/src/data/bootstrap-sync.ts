@@ -2,7 +2,8 @@
  * Bootstrap synchronization (MOB-009 §4; threat-model T5/T7).
  *
  * On launch (and on foreground / periodically) fetch `/v1/bootstrap`, compare
- * the server's active release stamp to the locally cached one (ADR-022 §4), and
+ * the server's active release stamp to the locally cached one (`docs/decisions-carryover.md`,
+ * "Mobile cache and OTA release"), and
  * invalidate the stale release-coupled cache.
  *
  * STAMP SOURCE — important nuance, honestly documented. The `/v1/bootstrap`
@@ -20,7 +21,7 @@
  *
  * CONCURRENCY — duplicate/concurrent sync attempts must not double-invalidate or
  * race. `createBootstrapSynchronizer` single-flights: overlapping calls share
- * the one in-flight promise (request de-dup, ADR-022 §1).
+ * the one in-flight promise (request de-dup).
  */
 import type { BootstrapResponseV1 } from './contracts';
 import { isReleaseStampStale } from './release';

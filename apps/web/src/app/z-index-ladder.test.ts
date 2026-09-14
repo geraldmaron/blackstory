@@ -1,11 +1,10 @@
 /**
  * z-index token ladder (repo-92n2.7): guards the one `--ds-z-*` ladder in
  * `packages/ui/src/styles/tokens.css` against reintroduced raw literals and against silent
- * reordering. This is a pure, value-preserving refactor of what used to be ~60 raw numeric
- * `z-index` literals converged on by convention — the ladder must stay declared exactly once,
- * in non-decreasing order, and every stylesheet must reference it by name rather than by number
- * except the allowlisted local-ordering literals, each of which carries an inline
- * `/* local: ... *\/` comment explaining why it is not a global tier.
+ * reordering. The ladder must stay declared exactly once, in non-decreasing order, and every
+ * stylesheet must reference it by name rather than by number except the allowlisted
+ * local-ordering literals, each of which carries an inline `/* local: ... *\/` comment
+ * explaining why it is not a global tier.
  */
 import assert from 'node:assert/strict';
 import { readdirSync, readFileSync, statSync } from 'node:fs';

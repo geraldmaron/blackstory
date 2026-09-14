@@ -34,6 +34,8 @@ import {
   resolveMomentCamera,
   resolveMomentVisibility,
 } from './MapMoment';
+import { ReadingProgress } from './ReadingProgress';
+import { CLASSIFIED_PATHS, surfaceClassFor } from '../../lib/nav/surface-classes';
 
 void React;
 
@@ -46,16 +48,18 @@ const APP_DIR = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../.
  * and the test fails in both directions — a file here that no longer exists is a stale
  * exemption, a file on disk that is not here is the v6 system growing back.
  *
- * One entry outlives the three surface packages by design: `explore-*` belongs to Explore
- * until SP-16 closes. The `history-*` pair left with repo-92n2.27, which deleted the orphaned
- * render components now that /history is a redirect endpoint.
+ * The `history-*` pair left once /history became a redirect endpoint and its orphaned render
+ * components were deleted. The `explore-*` pair left once the one live dependency — a direct
+ * stylesheet import on the Explore surface — was broken: the v9 atlas instruments (TimePanel,
+ * CameraConsole, LensPanel, ResultsRail) had already replaced everything the two files styled.
+ *
+ * The list is now EMPTY, and that is the end state, not a gap: `memorial/memorial-edition.css`
+ * and `memorial/memorial-panel-chrome.ts` were the last two, retired in repo-92n2.30 when
+ * /memorial moved onto the Reading room class. The ratchet still runs in both directions, so
+ * it now reads simply as "no route may grow a per-route stylesheet or panel-chrome module
+ * under app/ again".
  */
-const LEGACY_EDITION_CHROME: readonly string[] = [
-  'explore/explore-edition.css',
-  'explore/explore-panel-chrome.ts',
-  'memorial/memorial-edition.css',
-  'memorial/memorial-panel-chrome.ts',
-];
+const LEGACY_EDITION_CHROME: readonly string[] = [];
 
 function walk(dir: string, out: string[] = []): string[] {
   for (const entry of readdirSync(dir)) {
@@ -143,8 +147,8 @@ describe('room kit · the trail is computed, never hand-written', () => {
   });
 
   it("an entity's parent is Records — the catalog that lists it", () => {
-    // It used to be the site root, from the Atlas generation where the map was the one way in
-    // (a720e176). That left a reader on a record page with no step up into the archive at all.
+    // Not the site root: a reader on a record page needs a step up into the archive, and
+    // Records is the catalog that lists the record.
     assert.deepEqual(resolveTrail('/entity/abc', 'Isaac McGhie'), [
       { label: 'Records', href: '/records' },
       { label: 'Isaac McGhie', href: null },
@@ -537,6 +541,51 @@ describe('room kit · map moment', () => {
     assert.doesNotMatch(html, /Plate · Live/);
   });
 
+  it('derives STILL from a violence-adjacent subject with no plain prop at all (SP-26)', () => {
+    // The gap this closes: an author who forgets to set `plain` on a moment about violence used
+    // to get LIVE by default. Passing the subject instead means there is nothing to forget.
+    const html = renderToStaticMarkup(
+      <MapMoment
+        camera={{ center: [-92.1, 46.78] }}
+        note="Duluth, 1920."
+        subject={{ topicTags: ['Lynching'] }}
+      />,
+    );
+    assert.match(html, /data-plain="1"/);
+    assert.match(html, /Plate · Still/);
+  });
+
+  it('a non-violent subject stays LIVE, and an explicit plain still overrides a subject either way', () => {
+    const ordinary = renderToStaticMarkup(
+      <MapMoment
+        camera={{ center: [-87.6, 41.9] }}
+        note="A neighborhood."
+        subject={{ topicTags: ['neighborhood'] }}
+      />,
+    );
+    assert.match(ordinary, /Plate · Live/);
+
+    const forcedStill = renderToStaticMarkup(
+      <MapMoment
+        camera={{ center: [-87.6, 41.9] }}
+        note="A neighborhood, held still for a documented reason."
+        subject={{ topicTags: ['neighborhood'] }}
+        plain
+      />,
+    );
+    assert.match(forcedStill, /Plate · Still/);
+
+    const forcedLive = renderToStaticMarkup(
+      <MapMoment
+        camera={{ center: [-92.1, 46.78] }}
+        note="Overridden live for a documented reason."
+        subject={{ topicTags: ['Lynching'] }}
+        plain={false}
+      />,
+    );
+    assert.match(forcedLive, /Plate · Live/);
+  });
+
   it('the Explore hand-off renders only when a destination is given', () => {
     const without = renderToStaticMarkup(
       <MapMoment camera={{ center: [-90, 35] }} note="A place." />,
@@ -719,6 +768,56 @@ describe('room kit · a live moment is a window onto the borrowed plate', () => 
   });
 });
 
+describe('room kit · a live plate never sits behind a prose column', () => {
+  /*
+   * repo-92n2.11.2. The bead's rule is "never full bleed behind prose, enforced in CSS rather
+   * than left to authors", and the enforcement is a two-part invariant rather than one rule:
+   *
+   *   1. the ladder — the plate is fixed at `--ds-z-map-plate` and document content sits at
+   *      `--ds-z-content`, so the plate paints UNDER the page and an opaque ground hides it;
+   *   2. the one window — the only selector that makes a box transparent over that plate is the
+   *      live map-moment slot, which is bounded, in flow, and released on scroll out.
+   *
+   * Either half alone is not the rule. Raise the plate above content, or let some other
+   * container go transparent, and a live map reads straight through body text.
+   */
+  const tokens = readFileSync(
+    path.resolve(
+      path.dirname(fileURLToPath(import.meta.url)),
+      '../../../../../packages/ui/src/styles/tokens.css',
+    ),
+    'utf8',
+  );
+
+  it('the plate token sits below the content token, so the plate paints under the page', () => {
+    const plate = /--ds-z-map-plate:\s*(-?\d+)/.exec(tokens);
+    const content = /--ds-z-content:\s*(-?\d+)/.exec(tokens);
+    assert.ok(plate && content, 'both z tokens must be defined');
+    assert.ok(
+      Number(plate[1]) < Number(content[1]),
+      `plate (${plate[1]}) must sit below content (${content[1]})`,
+    );
+  });
+
+  it('the live map-moment slot is the only box that opens a window onto the plate', () => {
+    // Any rule that drops a background to transparent inside the room kit is a candidate
+    // window. Exactly one is legitimate: the live moment slot.
+    const css = readFileSync(
+      path.resolve(path.dirname(fileURLToPath(import.meta.url)), 'room-kit.css'),
+      'utf8',
+    );
+    const windows = [...css.matchAll(/([^{}]+)\{([^}]*background:\s*transparent[^}]*)\}/g)].map(
+      (match) => match[1]!.trim().split('\n').pop()!.trim(),
+    );
+    assert.equal(
+      windows.length,
+      1,
+      `expected exactly one plate window, found ${windows.length}: ${windows.join(' | ')}`,
+    );
+    assert.match(windows[0]!, /\.ds-mapmoment\[data-live='1'\]\s+\.ds-mapmoment__plate/);
+  });
+});
+
 describe('room kit · no room invents its own map moment', () => {
   it('no route defines moment markup outside the kit', () => {
     // The gap this package closed: the mock renders a moment in seven rooms and the kit had no
@@ -728,5 +827,76 @@ describe('room kit · no room invents its own map moment', () => {
       .filter((file) => /ds-mapmoment__plate|mm-plate/.test(readFileSync(file, 'utf8')))
       .map((file) => path.relative(APP_DIR, file));
     assert.deepEqual(offenders, [], 'map moment markup belongs to components/room/MapMoment.tsx');
+  });
+});
+
+describe('room kit · the reading progress rule is class-wide', () => {
+  // SP-27 (repo-92n2.34). The gap the ticket named: the rule appeared once, prose-only, inside
+  // SP-11's umbrella body, so /memorial and /records — Reading rooms filed outside SP-11 —
+  // and every other room had no reason to know it applied to them too. Driven from the surface
+  // registry rather than a hand-written route list, so a route added to it later is covered
+  // without anyone remembering to update this file.
+  it('renders on every route the registry resolves to Reading, and only those', () => {
+    for (const routePath of CLASSIFIED_PATHS) {
+      const surface = surfaceClassFor(routePath);
+      const html = renderToStaticMarkup(<ReadingProgress surface={surface} />);
+      if (surface === 'reading') {
+        assert.match(
+          html,
+          /class="ds-reading-progress"/,
+          `${routePath} resolves to Reading and must render the gauge`,
+        );
+      } else {
+        assert.equal(
+          html,
+          '',
+          `${routePath} resolves to ${String(surface)}, not Reading, and must not render the gauge`,
+        );
+      }
+    }
+  });
+
+  it('covers /memorial and /records, the two Reading rooms filed outside SP-11', () => {
+    // Named explicitly in the bead because a hand-written route list is exactly what missed
+    // them the first time; the registry-driven test above already covers both, this just pins
+    // the two routes the gap named so a future edit to the registry cannot quietly drop them.
+    assert.equal(surfaceClassFor('/memorial'), 'reading');
+    assert.equal(surfaceClassFor('/records'), 'reading');
+  });
+
+  it('no screen defines its own progress element', () => {
+    const offenders = walk(APP_DIR)
+      .filter((file) => /\.(tsx|ts|css)$/.test(file))
+      .filter((file) => path.relative(APP_DIR, file) !== 'reading-room.css')
+      .filter((file) => /ds-reading-progress|docprog/.test(readFileSync(file, 'utf8')))
+      .map((file) => path.relative(APP_DIR, file));
+    assert.deepEqual(
+      offenders,
+      [],
+      'the reading progress rule belongs to components/room/ReadingProgress.tsx and reading-room.css alone',
+    );
+  });
+
+  it('the visibility rule is scoped to the Reading surface class in reading-room.css', () => {
+    const css = readFileSync(path.join(APP_DIR, 'reading-room.css'), 'utf8');
+    assert.match(
+      css,
+      /\[data-surface='reading'\]\s+\.ds-reading-progress\s*\{\s*display:\s*block;\s*\}/,
+    );
+  });
+
+  it('the width transition reads a duration token, so reduced motion updates it without animation', () => {
+    // packages/ui/src/styles/tokens.css collapses every --ds-duration-* token to 0.01ms under
+    // prefers-reduced-motion: reduce, so the gauge needs no reduced-motion handling of its own —
+    // only a duration that actually comes from a token rather than a literal millisecond value.
+    const css = readFileSync(path.join(APP_DIR, 'reading-room.css'), 'utf8');
+    const rule = /\.ds-reading-progress\s*\{([^}]*)\}/.exec(css);
+    assert.ok(rule, 'the base .ds-reading-progress rule must exist');
+    assert.match(rule[1]!, /transition:\s*width\s+var\(--ds-duration-\w+\)/);
+    assert.doesNotMatch(
+      rule[1]!,
+      /transition:\s*width\s+\d/,
+      'the duration must come from a token, not a literal value the reduced-motion media query cannot reach',
+    );
   });
 });

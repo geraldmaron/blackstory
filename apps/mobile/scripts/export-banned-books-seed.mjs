@@ -16,9 +16,7 @@ import { normalizePgConnectionString } from '../../../packages/ops-data/scripts/
 
 const here = dirname(fileURLToPath(import.meta.url));
 // `pg` is a dependency of ops-data, not the mobile app — resolve it from there.
-const requireFromOpsData = createRequire(
-  resolve(here, '../../../packages/ops-data/package.json'),
-);
+const requireFromOpsData = createRequire(resolve(here, '../../../packages/ops-data/package.json'));
 const pg = requireFromOpsData('pg');
 const outPath = resolve(here, '../src/features/books/catalog-seed.json');
 
@@ -46,6 +44,4 @@ if (!snapshot || !Array.isArray(snapshot.books) || snapshot.books.length === 0) 
 
 mkdirSync(dirname(outPath), { recursive: true });
 writeFileSync(outPath, `${JSON.stringify(snapshot, null, 2)}\n`);
-console.log(
-  `Wrote ${outPath} (${snapshot.books.length} books, version ${snapshot.version})`,
-);
+console.log(`Wrote ${outPath} (${snapshot.books.length} books, version ${snapshot.version})`);

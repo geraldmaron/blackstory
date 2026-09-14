@@ -95,15 +95,19 @@ const MORE_PRESENTATION: Readonly<Record<string, MoreRowPresentation>> = Object.
   memorial: { line: 'Names, held quietly', route: '/memorial' },
 
   about: { line: 'What this is for, and what it refuses to do', route: '/about' },
-  faq: { line: 'Plain answers about how this archive works' },
+  faq: { line: 'Plain answers about how this archive works', route: '/faq' },
   methodology: { line: 'How a record gets in, and what a grade means', route: '/methodology' },
   errata: { line: 'Mistakes the archive found and published', route: '/errata' },
 
   submit: { line: 'Point the archive at something it has missed', route: '/submit' },
-  corrections: { line: 'Tell the archive it is wrong; you get a receipt', route: '/corrections/submit' },
-  support: { line: 'How to get an answer, and how long it takes' },
+  corrections: {
+    line: 'Tell the archive it is wrong; you get a receipt',
+    route: '/corrections/submit',
+  },
+  support: { line: 'How to get an answer, and how long it takes', route: '/support' },
 
   privacy: { line: 'What this app collects, and what it does not', route: '/privacy' },
+  terms: { line: 'What using this app means, in plain language', route: '/terms' },
 });
 
 /** The public web origin a row falls back to when the phone has no screen for a destination. */

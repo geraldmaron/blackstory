@@ -9,20 +9,26 @@
  *
  * Two adapters ship here:
  * 1. `createInMemoryPublicDataAccess` — a REAL, fully-tested implementation used by the handler
- *    tests and legitimately usable as the ADR-004 degraded/immutable-snapshot source (it reads a
- *    fixed set of already-released, already-redacted public projections held in memory).
+ *    tests and usable as a degraded/immutable-snapshot source (it reads a fixed set of
+ *    already-released, already-redacted public projections held in memory). It is not one today:
+ *    `./compose.ts` builds it with `{ entities: [] }` when the live-Postgres gate fails, so an
+ *    unconfigured deployment returns `UPSTREAM_UNAVAILABLE` rather than serving a snapshot. See
+ *    `docs/decisions-carryover.md`, "Public projection and immutable publication snapshots".
  * 2. `createPublicDataAccessFromReaders` — binds the port to injected public projection readers + a
  *    projection→DTO mapper. The readers are injected, not invented here, so this module never
  *    imports a server-only storage shape it would have to redact; the concrete live binding (real
  *    Postgres `bb_public` reads + the projection→`EntityV1` mapper) lives in
  *    `./postgres-data-access.ts` and `./projection-mapping.ts`, and is selected at runtime by
- *    `./compose.ts` per `./live-policy.ts`'s live/fixture gate (ADR-020 SoR cutover; Postgres is
+ *    `./compose.ts` per `./live-policy.ts`'s live/fixture gate (the Postgres SoR cutover —
+ *    `docs/decisions-carryover.md`, "entity source-of-truth precedence"; Postgres is
  *    the only live path — see that file's header for what remains a documented gap, e.g. `related`
  *    hydration and index-backed search).
  *
  * All entity data returned by any adapter is validated against the shared `entityV1Schema` before
- * it leaves this module, so the response-redaction guarantee (no internal/ranking/precise-geo
- * fields — ADR-021 §3) holds regardless of adapter: the zod parse strips any unknown field.
+ * it leaves this module, so the response-redaction guarantee (no internal/ranking field, and no
+ * precision tier finer than `institution` — `docs/decisions-carryover.md`, "ADR-021's two
+ * invariants": public-response redaction) holds regardless of adapter: the zod parse strips any
+ * unknown field.
  */
 import {
   runPublicSearch,
@@ -32,6 +38,11 @@ import {
 import type { CanonicalSearchQuery } from '@repo/security';
 import { normalizeSearchText } from '@repo/security';
 import { entityV1Schema, type EntityV1 } from '@repo/public-contracts/v1/entity';
+import {
+  confidenceTierFromEvidenceInputs,
+  recordConfidenceTier,
+  type ConfidenceTier,
+} from '@repo/public-contracts/evidence';
 import { type SearchFacetCountsV1, type SearchResultV1 } from '@repo/public-contracts/v1/search';
 import type { RevisionMetadataV1 } from '@repo/public-contracts/v1/revision';
 
@@ -52,8 +63,9 @@ export type SearchPage = {
 };
 
 export interface PublicDataAccess {
-  /** The active release pointer + optional index/content versions (ADR-004 active-release
-   * pointer). `undefined` signals no released data is available yet (pre-release bootstrap). */
+  /** The active release pointer + optional index/content versions. Exactly one release is active
+   * at a time (`bb_public.active_release` is a single row). `undefined` signals no released data
+   * is available yet (pre-release bootstrap). */
   getReleasePointer(): Promise<ReleasePointer | undefined>;
   /**
    * A single published entity. Returns `undefined` for BOTH a nonexistent id AND an id that exists
@@ -62,6 +74,18 @@ export interface PublicDataAccess {
    * boundary.
    */
   getEntity(releaseId: string, entityId: string): Promise<EntityV1 | undefined>;
+  /**
+   * The survivor id a merged-away entity id forwards to, or `undefined` (repo-n7p6.29).
+   *
+   * This is the ONE distinction the T3 indistinguishability rule above deliberately allows, and
+   * only because the data behind it is published on purpose: `bb_public.release_entity_redirects`
+   * holds nothing but absorbed ids that were already publicly resolvable, mapped to survivors
+   * that are published now. It says nothing about any unpublished record — a withdrawn id and a
+   * never-existed id both miss this lookup exactly the way they miss `getEntity`, so the
+   * enumeration surface is unchanged. The handler calls it on EVERY miss, so the backend call
+   * sequence stays identical across nonexistent, unpublished, and absorbed ids.
+   */
+  getEntityRedirect(releaseId: string, entityId: string): Promise<string | undefined>;
   /**
    * All published entities for a release (map FeatureCollection input). Bounded upstream by
    * adapter scan ceilings; callers must still validate the map payload against MapSourceV1.
@@ -85,13 +109,13 @@ export const EMPTY_FACETS: SearchFacetCountsV1 = {
 };
 
 // ---------------------------------------------------------------------------
-// In-memory adapter (real, tested; also the ADR-004 degraded-snapshot source)
+// In-memory adapter (real, tested; the degraded-snapshot shape, unpopulated in production)
 // ---------------------------------------------------------------------------
 
 export type InMemoryPublicDataOptions = {
   /**
    * Omit when no active release is configured — `getReleasePointer` then honestly reports
-   * `undefined` (ADR-004 pre-release bootstrap) instead of fabricating one. This is the default
+   * `undefined` (pre-release bootstrap) instead of fabricating one. This is the default
    * fallback `./compose.ts` uses when the runtime environment does not satisfy the live-Postgres
    * gate (`./live-policy.ts`): an unconfigured deployment returns `UPSTREAM_UNAVAILABLE` rather
    * than silently serving stale/fake sample data as if it were a real release.
@@ -105,6 +129,12 @@ export type InMemoryPublicDataOptions = {
    * test can assert that an unpublished id and a nonexistent id produce byte-identical 404s.
    */
   readonly unpublishedIds?: readonly string[];
+  /**
+   * Published absorbed→survivor redirects for this release, as `{ [absorbedId]: survivorId }`.
+   * Mirrors `bb_public.release_entity_redirects`; values are already terminal survivors, so a
+   * chain is never walked here either.
+   */
+  readonly redirects?: Readonly<Record<string, string>>;
 };
 
 export function createInMemoryPublicDataAccess(
@@ -124,6 +154,10 @@ export function createInMemoryPublicDataAccess(
     async getEntity(_releaseId, entityId) {
       // Both unpublished and nonexistent collapse to `undefined` — no distinguishing signal.
       return byId.get(entityId);
+    },
+
+    async getEntityRedirect(_releaseId, entityId) {
+      return options.redirects?.[entityId];
     },
 
     async listEntities(_releaseId) {
@@ -187,10 +221,46 @@ export function searchOverIndex(
     },
     index,
   );
-  return mapSearchExecutionToPage(execution);
+  return mapSearchExecutionToPage(execution, tierReader(index));
 }
 
-function mapSearchExecutionToPage(execution: SearchExecutionResult): SearchPage {
+/**
+ * Grades a record from the INPUTS the index carries, at read time and only for the rows a page
+ * actually returns.
+ *
+ * The index deliberately stores `evidenceInputs` and not a finished tier: a cached grade goes
+ * stale the moment the rule changes, which is exactly what stranded `/records` on the web for a
+ * day. Every surface — Explore, `/records`, the record page, and now a search row on the phone —
+ * ends at the one `confidenceTierFromEvidenceInputs`, so a rule change reaches all of them in the
+ * same deploy. A tier is never read out of the index; only the facts behind it are.
+ *
+ * Grading is deferred per result rather than swept over the whole index up front: a page returns
+ * tens of rows out of thousands of docs, and the rule is not so cheap that running it on every
+ * record to serve twenty is free. Building the id map is pointer work; running the rule is not.
+ *
+ * A doc published before `evidenceInputs` existed grades to `undefined`, so its result carries no
+ * tier rather than a fabricated `unrated` — "we could not grade this" and "nobody assessed this"
+ * are different claims.
+ */
+function tierReader(
+  index: readonly PublicSearchIndexDoc[],
+): (id: string) => ConfidenceTier | undefined {
+  const byId = new Map(index.map((doc) => [doc.id, doc]));
+  return (id) => {
+    const inputs = byId.get(id)?.evidenceInputs;
+    return inputs === undefined ? undefined : confidenceTierFromEvidenceInputs(inputs);
+  };
+}
+
+/** Omits the key entirely when the record could not be graded, rather than emitting `undefined`. */
+function tierField(tier: ConfidenceTier | undefined): { confidenceTier?: ConfidenceTier } {
+  return tier === undefined ? {} : { confidenceTier: tier };
+}
+
+function mapSearchExecutionToPage(
+  execution: SearchExecutionResult,
+  readTier: (id: string) => ConfidenceTier | undefined = () => undefined,
+): SearchPage {
   const results: SearchResultV1[] = execution.results.map((result) => ({
     id: result.id,
     kind: result.kind,
@@ -203,6 +273,7 @@ function mapSearchExecutionToPage(execution: SearchExecutionResult): SearchPage 
     eraBuckets: [...result.eraBuckets],
     notabilityLabels: [...result.notabilityLabels],
     ...(result.sensitivityClass !== undefined ? { sensitivityClass: result.sensitivityClass } : {}),
+    ...tierField(readTier(result.id)),
   }));
 
   return {
@@ -214,8 +285,10 @@ function mapSearchExecutionToPage(execution: SearchExecutionResult): SearchPage 
 }
 
 /** Projects a published `EntityV1` into a `SearchResultV1`. Deliberately carries NO numeric
- * relevance/evidence score — results explain WHY they match in words, never a number (ADR-021 §3;
- * mirrors `search.ts`'s own exclusion). */
+ * relevance/evidence score — results explain WHY they match in words, never a number
+ * (`docs/decisions-carryover.md`, "ADR-021's two invariants": public-response redaction; mirrors
+ * `search.ts`'s own exclusion, and asserted by `redaction.test.ts`). The graded `confidenceTier`
+ * below is an assessment, not a count, and is the one evidence signal this shape carries. */
 function toSearchResult(entity: EntityV1, needle: string): SearchResultV1 {
   const matchedInName = needle.length === 0 || entity.displayName.toLowerCase().includes(needle);
   return {
@@ -230,6 +303,9 @@ function toSearchResult(entity: EntityV1, needle: string): SearchResultV1 {
     eraBuckets: entity.eraBuckets ?? [],
     notabilityLabels: entity.notabilityLabels ?? [],
     ...(entity.sensitivityClass ? { sensitivityClass: entity.sensitivityClass } : {}),
+    // A TIER, not a count. The claims are in hand on this path, so the same one rule
+    // `/v1/map` and the record page apply grades the row here too.
+    confidenceTier: recordConfidenceTier(entity.claims),
   };
 }
 
@@ -250,6 +326,8 @@ export type PublicDataAccessReaders = {
   readonly readReleasePointer: () => Promise<ReleasePointer | undefined>;
   /** MUST already collapse unpublished/nonexistent to `undefined` (T3). */
   readonly readEntity: (releaseId: string, entityId: string) => Promise<EntityV1 | undefined>;
+  /** The published absorbed→survivor forward for this id, if any (repo-n7p6.29). */
+  readonly readEntityRedirect: (releaseId: string, entityId: string) => Promise<string | undefined>;
   /** All published entities for map FeatureCollection construction. */
   readonly readEntities: (releaseId: string) => Promise<readonly EntityV1[]>;
   readonly readSearchPage: (
@@ -270,6 +348,9 @@ export function createPublicDataAccessFromReaders(
       // Re-validate at the boundary: even a live projection reader's output is parsed before it can
       // leave this module, so an accidental internal field can never reach a client.
       return entity ? entityV1Schema.parse(entity) : undefined;
+    },
+    async getEntityRedirect(releaseId, entityId) {
+      return readers.readEntityRedirect(releaseId, entityId);
     },
     async listEntities(releaseId) {
       const entities = await readers.readEntities(releaseId);

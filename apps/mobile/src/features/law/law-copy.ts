@@ -4,14 +4,12 @@
 export const LAW_INTRO = {
   kicker: 'Reference',
   title: 'Law',
-  lede:
-    'Landmark federal statutes, regulations, and court decisions that shape civil rights, explained in plain language with links to official sources.',
+  lede: 'Landmark federal statutes, regulations, and court decisions that shape civil rights, explained in plain language with links to official sources.',
 } as const;
 
 export const LAW_DISCLAIMER = {
   title: 'Not legal advice',
-  body:
-    'BlackStory explains public laws and court decisions in plain language. This is general information, not legal advice. For advice about your specific situation, consult a licensed attorney or a qualified legal aid organization.',
+  body: 'BlackStory explains public laws and court decisions in plain language. This is general information, not legal advice. For advice about your specific situation, consult a licensed attorney or a qualified legal aid organization.',
 } as const;
 
 export const LAW_CATALOG = {
@@ -26,8 +24,7 @@ export const LAW_CATALOG = {
 
 export const LAW_ABOUT = {
   title: 'How to read this room',
-  lede:
-    'Entries cite official sources and archived captures. Status labels describe the current legal standing of the instrument, not a prediction of future outcomes.',
+  lede: 'Entries cite official sources and archived captures. Status labels describe the current legal standing of the instrument, not a prediction of future outcomes.',
 } as const;
 
 export const LAW_DETAIL = {

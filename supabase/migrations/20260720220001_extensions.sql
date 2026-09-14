@@ -1,4 +1,4 @@
--- 0001_extensions: PostGIS, pgvector, trigram, crypto helpers (ADR-020).
+-- 0001_extensions: PostGIS, pgvector, trigram, crypto helpers (docs/data/postgres-schema.md).
 -- Target: blackstory-app. Safe to re-run (IF NOT EXISTS / CREATE EXTENSION).
 
 CREATE EXTENSION IF NOT EXISTS postgis WITH SCHEMA extensions;

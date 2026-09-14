@@ -15,10 +15,8 @@ import {
   type StatusName,
 } from './tokens';
 
-export type BadgeProps = Omit<ViewProps, 'children'> & (
-  | { kind: 'status'; status: StatusName }
-  | { kind: 'confidence'; level: ConfidenceLevel }
-);
+export type BadgeProps = Omit<ViewProps, 'children'> &
+  ({ kind: 'status'; status: StatusName } | { kind: 'confidence'; level: ConfidenceLevel });
 
 export function Badge(props: BadgeProps) {
   const status = useStatusColors();
@@ -30,10 +28,7 @@ export function Badge(props: BadgeProps) {
       accessible
       accessibilityRole="text"
       accessibilityLabel={pair.cue}
-      style={[
-        styles.base,
-        { backgroundColor: pair.bg, borderColor: pair.border },
-      ]}
+      style={[styles.base, { backgroundColor: pair.bg, borderColor: pair.border }]}
     >
       <Text variant="caption" style={{ color: pair.fg }}>
         {pair.cue}

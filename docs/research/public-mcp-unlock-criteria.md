@@ -9,7 +9,7 @@
 
 **Date:** 2026-07-21  
 **Branch:** `research/data-landscape-capitalization`  
-**Depends on:** [ADR-026](../adr/ADR-026-postgrest-published-read-surface.md) (PostgREST published-read surface)
+**Depends on:** the PostgREST published-read surface decision (ADR-026, removed 2026-07-24, recovered in [`../decisions-carryover.md`](../decisions-carryover.md), "Small recovered decisions")
 
 ---
 
@@ -23,7 +23,7 @@ Language models already answer Black history questions from training data withou
 |---|---|---|
 | 1 | **Geo integrity** | Publish path uses geo-integrity containment (or equivalent PostGIS check); mismatch audit of existing corpus reviewed or queued |
 | 2 | **Capture completeness** | Ops bar (`CAPTURE_COMPLETENESS_BAR_RATIO`) measured on published web citations; remediation plan if below bar |
-| 3 | **PostgREST published views** | ADR-026 views live with RLS; anon cannot read drafts/canonical/research |
+| 3 | **PostgREST published views** | Views live with RLS; anon cannot read drafts/canonical/research (`../decisions-carryover.md`, "Small recovered decisions", ADR-026 entry) |
 | 4 | **Docs + license** | Developer docs for the published read surface; attribution / share-alike (or chosen license) stated |
 | 5 | **Abuse bounds** | Rate limits / spend caps / soft-shutdown verified for query surface under projected traffic |
 | 6 | **Operator MCP ≠ public MCP** | Public server must not share service-role credentials or research-write paths with operator tooling |
@@ -36,4 +36,4 @@ Language models already answer Black history questions from training data withou
 
 ## When unlocked
 
-File a new implementation bead that depends on this criteria doc and ADR-026. Prefer a thin MCP wrapping the published PostgREST/API surface — not a second data path.
+File a new implementation bead that depends on this criteria doc and the published-read surface decision (`../decisions-carryover.md`, "Small recovered decisions", ADR-026 entry). Prefer a thin MCP wrapping the published PostgREST/API surface — not a second data path.

@@ -1,4 +1,5 @@
--- 0010_rls_policies: enable RLS + policies. Research cannot publish (ADR-020).
+-- 0010_rls_policies: enable RLS + policies. Research cannot publish
+-- (docs/decisions-carryover.md, "Research and discovery cannot publish").
 
 -- ---------------------------------------------------------------------------
 -- Enable RLS on all application tables

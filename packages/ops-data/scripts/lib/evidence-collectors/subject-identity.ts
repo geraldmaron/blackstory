@@ -336,11 +336,126 @@ export function mentionsState(documentText: string, state: string): boolean {
   return false;
 }
 
+/**
+ * A generic institutional word ("University", "College") that `significantNameTokens` already
+ * strips as noise can leave a common given-name-shaped word as a row's ONLY distinctive token —
+ * "Lincoln University" and "University of Lincoln" both reduce to the bare token "lincoln". A
+ * name that thin cannot do the identifying work the name/focus gates below rely on it to do, so
+ * it needs geography to corroborate it even when the roster supplies none directly (see
+ * `hasUsLocationSignal`).
+ */
+const AMBIGUOUS_INSTITUTION_NAME = /\b(?:university|college)\b/iu;
+
+/**
+ * Any signal that the document describes somewhere in the United States: a state named by full
+ * name or conventional abbreviation, or the country's own name. Every entity in this corpus is
+ * American, so for a name as thin as `AMBIGUOUS_INSTITUTION_NAME` flags, this is the cheapest
+ * test that tells a same-named foreign institution's article apart from the real one on a row
+ * that supplies no city/state/county at all to check the ordinary place gate against.
+ */
+function hasUsLocationSignal(documentText: string): boolean {
+  if (/\bunited states\b/iu.test(documentText)) return true;
+  for (const state of STATE_ALIASES.keys()) {
+    if (mentionsState(documentText, state)) return true;
+  }
+  return false;
+}
+
+/**
+ * "Shubuta, Mississippi" -> { city: 'Shubuta', state: 'Mississippi' }; a label with no comma stays
+ * unsplit as a city, which is what the visit path wants from it.
+ *
+ * Moved here from `lib/incremental-publish.ts` (repo-f85hp) so the publisher and the evidence
+ * sweep share one parse. This module has no imports, so it can be the shared home without
+ * dragging the publisher's dependencies into every collector. `cityStateFromJurisdiction` in
+ * sync-visit-to-projection.ts is still a third copy; that file runs `main()` at import, so
+ * folding it in is a separate change.
+ */
+export function cityStateFromJurisdictionLabel(label: string): {
+  readonly city?: string;
+  readonly state?: string;
+} {
+  const parts = label
+    .split(',')
+    .map((part) => part.trim())
+    .filter(Boolean);
+  if (parts.length >= 2) {
+    const state = parts[parts.length - 1];
+    const city = parts.slice(0, -1).join(', ');
+    return { city, ...(state ? { state } : {}) };
+  }
+  return parts[0] ? { city: parts[0] } : {};
+}
+
+const COUNTY_IN_LABEL = /\b([A-Z][\w'.-]*(?:\s+[A-Z][\w'.-]*)*)\s+County\b/u;
+
+/**
+ * The place half of a `SubjectExpectation`, derived from an already-published projection, for the
+ * curated records (`lynching_*`, `gap_*`, `recon_*`) that have no landscape_candidates row and so
+ * have no authored city/state for the sweep to use.
+ *
+ * repo-f85hp: the sweep used to split `locationLabel` on the comma. That field is PROSE about
+ * where a thing stands, not an administrative place — Alma Howze's reads "Hanging Bridge, Clarke
+ * County", which produced city "Hanging Bridge", state "Clarke County", and
+ * `checkSubjectIdentity` then rejected a correct James Madison University marker page with
+ * "identity not corroborated by place". `jurisdictionLabel` is the field that carries the
+ * administrative place, and hers reads "Shubuta, Mississippi". Verified against the real gate on
+ * the fetched page: corroborated=false from the old derivation, true with city Shubuta / county
+ * Clarke / state Mississippi.
+ *
+ * `locationLabel` is still read, but only for what it is actually good at: it is where a county
+ * name tends to appear ("Hanging Bridge, Clarke County", "Blackdom Townsite historical marker,
+ * near Hagerman, Chaves County"), and the county is a real signal for the place gate. It is also
+ * the last-resort source for city/state when there is no jurisdictionLabel at all.
+ *
+ * A single-part jurisdiction ("Massachusetts") is read as a STATE here, unlike
+ * `cityStateFromJurisdictionLabel`'s city-biased default: an unqualified jurisdiction label is a
+ * state, and calling it a city would have the place gate hunting for a town of that name.
+ */
+export function placeExpectationFromProjection(projection: {
+  readonly jurisdictionLabel?: string | null;
+  readonly locationLabel?: string | null;
+}): { readonly city?: string; readonly county?: string; readonly state?: string } {
+  const jurisdiction = (projection.jurisdictionLabel ?? '').trim();
+  const location = (projection.locationLabel ?? '').trim();
+
+  const split = jurisdiction.length > 0 ? cityStateFromJurisdictionLabel(jurisdiction) : undefined;
+  const fromJurisdiction =
+    split === undefined
+      ? {}
+      : split.state === undefined && split.city !== undefined
+        ? { state: split.city }
+        : split;
+
+  const fallback =
+    fromJurisdiction.city === undefined &&
+    fromJurisdiction.state === undefined &&
+    location.length > 0
+      ? cityStateFromJurisdictionLabel(location)
+      : {};
+
+  const county = COUNTY_IN_LABEL.exec(location)?.[1] ?? COUNTY_IN_LABEL.exec(jurisdiction)?.[1];
+
+  const city = fromJurisdiction.city ?? fallback.city;
+  const state = fromJurisdiction.state ?? fallback.state;
+  return {
+    ...(city !== undefined && city.length > 0 ? { city } : {}),
+    ...(county !== undefined && county.length > 0 ? { county } : {}),
+    ...(state !== undefined && state.length > 0 ? { state } : {}),
+  };
+}
+
 export type SubjectExpectation = {
   readonly displayName: string;
   readonly state?: string | undefined;
   readonly county?: string | undefined;
   readonly city?: string | undefined;
+  /**
+   * The roster's own classification of what this row is ("place", "person", "institution", ...).
+   * Optional — every caller that omits it keeps exactly the behavior it had before this field
+   * existed. Only the route check below consults it.
+   */
+  readonly kind?: string | undefined;
 };
 
 export type PlaceIdentity = {
@@ -404,7 +519,7 @@ export function checkPlaceIdentity(
   };
 }
 
-export type DocumentKind = 'subject' | 'disambiguation' | 'index';
+export type DocumentKind = 'subject' | 'disambiguation' | 'index' | 'route';
 
 /**
  * True for a MediaWiki disambiguation page ("Maplewood may refer to: ..."). These pass a place
@@ -443,6 +558,25 @@ export function isIndexDocument(title: string | null | undefined, text: string):
   );
 }
 
+/**
+ * True for an article about a numbered highway rather than a place — "U.S. Route 61", "State
+ * Route 9", "Interstate 20". A highway legitimately runs through, and therefore names, the very
+ * state and county a place-kind row expects, so the place-agreement check above corroborates one
+ * for free. Measured: 4 of 1,708 captured rows in one lane carried a highway article as evidence
+ * for a historic district, because the highway happens to pass through the district's own county.
+ *
+ * Checked by title first — MediaWiki's naming convention for these articles is regular enough to
+ * match directly — and by the article's own opening sentence as a fallback for titles that do not
+ * follow it ("... is a ... highway ...").
+ */
+export function isLinearRouteDocument(title: string | null | undefined, text: string): boolean {
+  const head = (title ?? '').trim();
+  const routeTitle =
+    /^(?:interstate\s+\d+[a-z]?\b|(?:u\.?s\.?|state|county)\s+(?:route|highway)\s+\d+[a-z]?\b)/iu;
+  if (routeTitle.test(head)) return true;
+  return /\bis\s+an?\s+(?:\S+\s+){0,4}highway\b/iu.test(text.slice(0, 400));
+}
+
 export type SubjectIdentity = PlaceIdentity & {
   readonly documentKind: DocumentKind;
   readonly nameTokens: readonly string[];
@@ -456,7 +590,7 @@ export type SubjectIdentity = PlaceIdentity & {
   /** All gates passed; safe to store as evidence for this entity. */
   readonly corroborated: boolean;
   /** Why it failed, for the evidence row's quarantineReason. Undefined when corroborated. */
-  readonly reason?: string;
+  readonly reason?: string | undefined;
 };
 
 /**
@@ -477,7 +611,9 @@ export function checkSubjectIdentity(
     ? 'disambiguation'
     : isIndexDocument(options.title, documentText)
       ? 'index'
-      : 'subject';
+      : expected.kind === 'place' && isLinearRouteDocument(options.title, documentText)
+        ? 'route'
+        : 'subject';
 
   const nameTokens = significantNameTokens(expected.displayName);
   const nameHits = nameTokens.filter((token) => containsWholeWord(haystack, token)).length;
@@ -498,6 +634,16 @@ export function checkSubjectIdentity(
       .flatMap((value) => foldPunctuation(value).split(' ')),
   );
   const distinctiveTokens = nameTokens.filter((token) => !placeWords.has(token));
+
+  // A common institutional name is not, by itself, a source of identity (see
+  // AMBIGUOUS_INSTITUTION_NAME above). When the roster row supplies a state/city/county, the
+  // place gate above already requires it to agree — this only adds a requirement for the row that
+  // supplies none at all, which is exactly the shape that let a same-named foreign institution's
+  // article through on name and focus alone.
+  const isAmbiguousInstitutionName =
+    distinctiveTokens.length === 1 && AMBIGUOUS_INSTITUTION_NAME.test(expected.displayName);
+  const geographyHintSatisfied =
+    place.placeKnown || !isAmbiguousInstitutionName || hasUsLocationSignal(documentText);
 
   // Focus is measured on the token most specific to this subject — the longest DISTINCTIVE one —
   // rather than on any token, so that neither a place word nor a common surname carried by an
@@ -523,21 +669,25 @@ export function checkSubjectIdentity(
   // That is weaker, and it is also the only signal that exists — refusing every such document
   // would not make the corpus more honest, it would empty it.
   const reason =
-    documentKind !== 'subject'
-      ? `document is a ${documentKind} page, not a source about the subject`
-      : place.placeKnown && !place.placeCorroborated
-        ? 'identity not corroborated by place (state and locality must both agree)'
-        : !nameCorroborated
-          ? `identity not corroborated by name (${nameHits}/${nameTokens.length} distinctive tokens)`
-          : distinctiveTokens.length === 0
-            ? 'name carries no identity independent of its place'
-            : !nameAppearsAsAName
-              ? // Distinct from the focus failure below, and the more useful message: it says the
-                // document never writes the name at all, only scatters its words.
-                "document contains the name's words separately but never together as a name"
-              : !focusCorroborated
-                ? 'document mentions the subject but is not about it'
-                : undefined;
+    documentKind === 'route'
+      ? 'document is a highway/route article, not a source about this place'
+      : documentKind !== 'subject'
+        ? `document is a ${documentKind} page, not a source about the subject`
+        : place.placeKnown && !place.placeCorroborated
+          ? 'identity not corroborated by place (state and locality must both agree)'
+          : !geographyHintSatisfied
+            ? 'identity not corroborated by geography (a common institutional name needs a US location signal)'
+            : !nameCorroborated
+              ? `identity not corroborated by name (${nameHits}/${nameTokens.length} distinctive tokens)`
+              : distinctiveTokens.length === 0
+                ? 'name carries no identity independent of its place'
+                : !nameAppearsAsAName
+                  ? // Distinct from the focus failure below, and the more useful message: it says
+                    // the document never writes the name at all, only scatters its words.
+                    "document contains the name's words separately but never together as a name"
+                  : !focusCorroborated
+                    ? 'document mentions the subject but is not about it'
+                    : undefined;
 
   return {
     ...place,

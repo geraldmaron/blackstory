@@ -14,9 +14,7 @@ import { normalizePgConnectionString } from '../../../packages/ops-data/scripts/
 
 const here = dirname(fileURLToPath(import.meta.url));
 // `pg` is a dependency of ops-data, not the mobile app — resolve it from there.
-const requireFromOpsData = createRequire(
-  resolve(here, '../../../packages/ops-data/package.json'),
-);
+const requireFromOpsData = createRequire(resolve(here, '../../../packages/ops-data/package.json'));
 const pg = requireFromOpsData('pg');
 const outPath = resolve(here, '../src/features/memorial/catalog-seed.json');
 
@@ -44,6 +42,19 @@ function normalizeName(value) {
  * Common Black surnames make near-miss collisions routine rather than exceptional, and no
  * entity field separates a memorial victim from anyone else: Charles I. Brown carries
  * status `deceased` exactly as the real victims do.
+ *
+ * Where those three stand now (repo-5jxh):
+ *   - Charles Brown and Robert Johnson are real victims and stay UNLINKED. Neither has an
+ *     entity record; the active release holds only the namesakes above. The research that a
+ *     record would be built from, with its sources, is in
+ *     docs/research/memorial-names-wall.sources.json under `namesAwaitingEntityRecords`. Add
+ *     the alias here only after a record exists and its summary describes the victim.
+ *   - George Bush III is no longer a memorial name at all. He had been carried as a 2016
+ *     St. Louis police killing; the contemporaneous record is that he shot a police sergeant
+ *     twice in the head and was killed the next morning firing on the officers who found him.
+ *     He is off the roll, so there is nothing here left to link. See
+ *     `intentionally_excluded_examples` in
+ *     docs/research/police-violence-memorial-names.sources.json.
  */
 const VERIFIED_ENTITY_ALIASES = new Map([
   // Emanuel AME Church, Charleston, June 17 2015.
@@ -57,6 +68,14 @@ const VERIFIED_ENTITY_ALIASES = new Map([
   ['delano herman middleton', 'gap_delano_middleton'],
   // NAACP chapter president, killed by Klan arson in Hattiesburg, January 1966.
   ['vernon ferdinand dahmer', 'ent_vernon_dahmer_001'],
+  // repo-5jxh. Both of these are why exact matching replaced fuzzy matching here: "Charles Brown"
+  // had been matched to a 1914 Phi Beta Sigma founder and "Robert Johnson" to the living founder
+  // of BET, both different men entirely. They are aliased explicitly, to records created for them
+  // (packages/ops-data/scripts/data/memorial-victim-cohort.ts), rather than matched by name —
+  // because a common name is exactly what went wrong before, and an alias states which man is
+  // meant.
+  ['charles brown', 'ent_charles_brown_1957_001'],
+  ['robert johnson', 'ent_robert_johnson_1934_001'],
 ]);
 
 const names = [...MEMORIAL_NAMES];

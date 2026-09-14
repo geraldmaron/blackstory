@@ -213,15 +213,39 @@ export function whyAppearsEvidenceById(
   return map;
 }
 
-/** Builds the public why-this-appears payload from an entity view.  */
-export function buildWhyThisAppearsForEntity(entity: PublicEntityView): PublicWhyThisAppears {
-  return buildPublicWhyThisAppears({
-    explanation: entity.relevanceExplanation,
-    evidence: relevanceEvidenceForEntity(entity),
-    notabilityBasis: notabilityBasisFor(entity),
-    storyTexts: [
-      entity.historicalContext,
-      ...entity.claims.map((c) => `${c.predicate} ${c.object}`),
-    ],
-  });
+/**
+ * Builds the public why-this-appears payload from an entity view, or `undefined` when the
+ * domain composer refuses this record.
+ *
+ * `buildPublicWhyThisAppears` fails closed — it throws when the explanation is too short, when
+ * no accepted (non-gate) evidence backs it, when no basis record survives, and when its editorial
+ * sweeps catch a passive euphemism or a score-shaped word anywhere in the composed payload. Those
+ * are publish-time guards. On a server-rendered record page an uncaught one is not a collapsed
+ * block, it is a page that does not render at all: the exact trade `packages/schemas`'
+ * `public-projections.ts` documents on `notabilityBasis` and deliberately decided the other way
+ * ("showing no inclusion reason is recoverable and visible; showing the page not at all is
+ * neither"). It is not hypothetical — the score sweep fires on 15 live records whose own notes
+ * read "ranking fourth highest" or "slugging percentage" (counted against `bb_public` on
+ * 2026-09-12), and the euphemism sweep on one more.
+ *
+ * So the refusal is returned rather than thrown, and the caller falls back to the record's rubric
+ * labels. Nothing is swallowed silently in the sense that matters: the reader still sees an
+ * inclusion reason, just the generic one.
+ */
+export function buildWhyThisAppearsForEntity(
+  entity: PublicEntityView,
+): PublicWhyThisAppears | undefined {
+  try {
+    return buildPublicWhyThisAppears({
+      explanation: entity.relevanceExplanation,
+      evidence: relevanceEvidenceForEntity(entity),
+      notabilityBasis: notabilityBasisFor(entity),
+      storyTexts: [
+        entity.historicalContext,
+        ...entity.claims.map((c) => `${c.predicate} ${c.object}`),
+      ],
+    });
+  } catch {
+    return undefined;
+  }
 }

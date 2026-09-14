@@ -8,11 +8,7 @@ import {
 import type { ApiClient } from '../security/api-client';
 
 /** Minimal Response-shaped double (transport only uses status/headers.get/text). */
-function res(
-  status: number,
-  body: unknown,
-  headers: Record<string, string> = {},
-): Response {
+function res(status: number, body: unknown, headers: Record<string, string> = {}): Response {
   const lower: Record<string, string> = {};
   for (const [k, v] of Object.entries(headers)) lower[k.toLowerCase()] = v;
   return {
@@ -91,7 +87,9 @@ describe('transport reads', () => {
 
   it('does NOT retry a non-retryable 404', async () => {
     const { transport, calls } = build(async () => res(404, { error: {} }));
-    await expect(transport.readJson('/v1/entity/x')).rejects.toMatchObject({ info: { status: 404 } });
+    await expect(transport.readJson('/v1/entity/x')).rejects.toMatchObject({
+      info: { status: 404 },
+    });
     expect(calls).toHaveLength(1);
   });
 

@@ -1,6 +1,6 @@
 import { fireEvent, render } from '@testing-library/react-native';
-import { Linking } from 'react-native';
-import { Link } from '../Link';
+import { Linking, StyleSheet } from 'react-native';
+import { EXTERNAL_LINK_HINT, externalLinkHint, Link } from '../Link';
 
 describe('Link', () => {
   it('exposes accessibilityRole="link" and the visible text as the default label', async () => {
@@ -29,5 +29,41 @@ describe('Link', () => {
     expect(onPress).toHaveBeenCalledTimes(1);
     expect(spy).not.toHaveBeenCalled();
     spy.mockRestore();
+  });
+
+  it('tells a screen reader that a web href leaves the app', async () => {
+    const { getByRole } = await render(<Link href="https://blackstory.app">blackstory.app</Link>);
+    expect(getByRole('link').props.accessibilityHint).toBe(EXTERNAL_LINK_HINT);
+  });
+
+  it('derives no browser hint when the caller decides the destination, or for a non-web href', async () => {
+    const withPress = await render(
+      <Link href="https://blackstory.app/methodology" onPress={() => {}}>
+        Methodology
+      </Link>,
+    );
+    expect(withPress.getByRole('link').props.accessibilityHint).toBeUndefined();
+    expect(externalLinkHint('blackstory://entity/1')).toBeUndefined();
+    expect(externalLinkHint(' HTTP://example.org ')).toBe(EXTERNAL_LINK_HINT);
+  });
+
+  it('lets the caller override the derived hint', async () => {
+    const { getByRole } = await render(
+      <Link href="https://example.org" accessibilityHint="Opens the county register">
+        Register
+      </Link>,
+    );
+    expect(getByRole('link').props.accessibilityHint).toBe('Opens the county register');
+  });
+
+  it('draws a box at least 44pt tall rather than relying on an invisible hitSlop', async () => {
+    const { getByRole } = await render(<Link href="https://blackstory.app">blackstory.app</Link>);
+    const link = getByRole('link');
+    const style = StyleSheet.flatten(
+      typeof link.props.style === 'function'
+        ? link.props.style({ pressed: false })
+        : link.props.style,
+    );
+    expect(style.minHeight).toBeGreaterThanOrEqual(44);
   });
 });

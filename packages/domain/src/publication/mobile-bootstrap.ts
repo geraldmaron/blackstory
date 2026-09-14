@@ -1,6 +1,7 @@
 /**
- * Mobile cold-start bootstrap manifest (MOB-005 — completes the release-activation integration
- * ADR-013 describes but does not implement).
+ * Mobile cold-start bootstrap manifest (MOB-005 — implements the release-activation integration
+ * that was designed but left unwired; see `docs/decisions-carryover.md`, "Map stack":
+ * release-coupled build, which also records that nothing calls it outside tests yet).
  *
  * This is the SERVER-SIDE artifact that becomes an immutable, release-scoped, content-addressed
  * part of a publication release (see `./release-activation.ts`). The `/v1/bootstrap` handler in
@@ -23,8 +24,8 @@ import { canonicalJson, sha256Bytes, type JsonValue, type Sha256Hash } from './i
 
 /**
  * `apps/api-public`'s `RevisionMetadataV1` / `ReleasePointer.activeRelease` shape, restated
- * structurally so `@repo/domain` takes no dependency on `@repo/public-contracts` (the client/server
- * boundary of ADR-021 runs the other way). Kept field-for-field identical to
+ * structurally so `@repo/domain` takes no dependency on `@repo/public-contracts` (the dependency
+ * direction in `docs/decisions-carryover.md` runs the other way). Kept field-for-field identical to
  * `revisionMetadataV1Schema`; `release-activation` tests assert compatibility.
  */
 export type ReleaseRevisionMetadata = {
@@ -40,7 +41,7 @@ export type MobileSchemaRange = {
 };
 
 /**
- * App/API compatibility policy (ADR-021 §2). `minSupportedApiVersion`/`apiVersion` mirror the
+ * App/API compatibility policy (`docs/decisions-carryover.md`, "app/API compatibility"). `minSupportedApiVersion`/`apiVersion` mirror the
  * URL-prefix major version and are the values the `/v1/bootstrap` response echoes;
  * `minSupportedAppBuild` is the app-version floor — the numeric store build below which a client
  * must force-update (the operational policy the `X-BlackStory-Client` header floor enforces).
@@ -79,7 +80,8 @@ export type MobileBootstrapManifest = {
   readonly schemaVersion: 1;
   /**
    * The one value the client compares against its cached stamp to decide global cache
-   * invalidation (ADR-022 §4). Content-derived (`releaseId@<manifestHashPrefix>`), never
+   * invalidation (`docs/decisions-carryover.md`, "Mobile cache and OTA release").
+   * Content-derived (`releaseId@<manifestHashPrefix>`), never
    * clock-derived, so an identical stamp is a strong "identical content" guarantee and a
    * mismatch is the authoritative freshness signal regardless of TTL or clock skew.
    */
@@ -224,7 +226,7 @@ export function bootstrapManifestToJson(manifest: MobileBootstrapManifest): Json
 // Projections + client-facing predicates
 // ---------------------------------------------------------------------------
 
-/** The exact `ReleasePointer` shape `apps/api-public`'s bootstrap handler consumes (ADR-021/004). */
+/** The exact `ReleasePointer` shape `apps/api-public`'s bootstrap handler consumes; see `docs/decisions-carryover.md`. */
 export type BootstrapReleasePointer = {
   readonly activeRelease: ReleaseRevisionMetadata;
   readonly searchIndexVersion?: string;
@@ -248,7 +250,8 @@ export function toReleasePointer(manifest: MobileBootstrapManifest): BootstrapRe
 }
 
 /**
- * ADR-022 §4 staleness check. Returns true when the client's last-seen stamp differs from the
+ * Release-stamp staleness check (`docs/decisions-carryover.md`, "Mobile cache and OTA
+ * release"). Returns true when the client's last-seen stamp differs from the
  * server's current stamp — the client MUST then treat all release-coupled cache (entities,
  * evidence, search results, map GeoJSON) as invalid. An absent client stamp (first launch) is
  * treated as stale so nothing stale-by-default is ever trusted.
@@ -262,7 +265,7 @@ export type ClientCompatibility =
   | { readonly ok: false; readonly reason: 'app_build_below_floor' | 'api_version_unsupported' };
 
 /**
- * ADR-021 §2 client-version floor evaluation. A client is incompatible when its app build is
+ * Client-version floor evaluation (`docs/decisions-carryover.md`, "app/API compatibility"). A client is incompatible when its app build is
  * below the manifest's `minSupportedAppBuild` floor, or when it speaks an API major version the
  * manifest no longer supports. Mirrors what the server enforces via the `X-BlackStory-Client`
  * header + `CLIENT_VERSION_UNSUPPORTED`; provided here so the release owner can reason about the

@@ -64,6 +64,10 @@ Live instrument chrome belongs on `/explore`. See [`v10/design-doc-reconciliatio
 
 None of these is deleted. They record why v9 exists and what was rejected. Do not build from them.
 
+The WP-series work package epic (repo-dbtn) is itself superseded by the SP-series epic
+(repo-92n2); WP-21/22 landed as code before SP-10 took over the route. SP-series beads are
+the live, actively-tracked implementation wave referenced throughout this file.
+
 | Doc | Superseded by | Route today |
 |---|---|---|
 | [`design-direction-v5.md`](./design-direction-v5.md) | v6, then v9 | Historical |

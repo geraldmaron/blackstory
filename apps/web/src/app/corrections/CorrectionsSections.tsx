@@ -1,11 +1,8 @@
 /**
  * The correction room's body: what happens to a submission, the intake form, and the way out.
  *
- * Rewritten onto the v9 room kit. This surface used to carry its own chrome — a page nav, three
- * numbered `ds-section` blocks with mono-caps kickers, a beat grid and a bordered callout — and
- * put roughly a screen and a half of explanation in front of the one control a person came here
- * to use. The explanation is not gone; it is stated as the three steps a correction actually
- * goes through, above the form, in one strip.
+ * The explanation is stated as the three steps a correction actually goes through, above the form,
+ * in one strip.
  */
 import React, { Suspense } from 'react';
 import Link from 'next/link';

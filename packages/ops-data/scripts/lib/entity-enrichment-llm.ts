@@ -370,17 +370,48 @@ function parseStringArray(raw: unknown, errors: string[], fieldLabel: string): s
  * carries zero factual risk either direction, unlike whitespace collapsing (already handled)
  * or actual paraphrase (still caught: this only folds a fixed, small character set).
  */
+function normalizeQuoteText(value: string): string {
+  return value
+    .replace(/[‘’ʼ]/gu, "'")
+    .replace(/[“”]/gu, '"')
+    .replace(/[–—]/gu, '-')
+    .replace(/\s+/gu, ' ')
+    .trim();
+}
+
 function quoteAppearsIn(quote: string, text: string): boolean {
   if (quote.length === 0) return false;
   if (text.includes(quote)) return true;
-  const normalize = (value: string) =>
-    value
-      .replace(/[‘’ʼ]/gu, "'")
-      .replace(/[“”]/gu, '"')
-      .replace(/[–—]/gu, '-')
-      .replace(/\s+/gu, ' ')
-      .trim();
-  return normalize(text).includes(normalize(quote));
+  return normalizeQuoteText(text).includes(normalizeQuoteText(quote));
+}
+
+/**
+ * repo-otll — true when the matched span for `quote` inside `text` crosses an elision marker
+ * ("[…]", see ELISION_MARKER in evidence-excerpt.ts).
+ *
+ * quoteAppearsIn() only confirms the quote's characters occur as a contiguous substring of
+ * evidence.text; a quote can satisfy that check while actually splicing two sides of an excerpt
+ * gap into one "verbatim" sentence, fabricating continuity the source never asserted. The prompt
+ * already tells the model a quote must come from one side of "[…]", never span it
+ * (buildEnrichmentUserPrompt), but nothing enforced that rule — this closes the gap by locating
+ * the same span quoteAppearsIn() matched (raw, or normalized when only the normalized form
+ * matched) and checking it for the ellipsis character.
+ */
+function quoteSpansGapMarker(quote: string, text: string): boolean {
+  if (quote.length === 0) return false;
+  const rawIndex = text.indexOf(quote);
+  if (rawIndex !== -1) {
+    return text.slice(rawIndex, rawIndex + quote.length).includes('…');
+  }
+  const normalizedText = normalizeQuoteText(text);
+  const normalizedQuote = normalizeQuoteText(quote);
+  const normalizedIndex = normalizedText.indexOf(normalizedQuote);
+  if (normalizedIndex !== -1) {
+    return normalizedText
+      .slice(normalizedIndex, normalizedIndex + normalizedQuote.length)
+      .includes('…');
+  }
+  return false;
 }
 
 function validateCitationsAnchor(
@@ -398,6 +429,11 @@ function validateCitationsAnchor(
     if (!quoteAppearsIn(citation.quote, evidence.text)) {
       errors.push(
         `${fieldLabel}: citation quote does not appear verbatim in evidence "${citation.evidenceId}"`,
+      );
+    } else if (quoteSpansGapMarker(citation.quote, evidence.text)) {
+      errors.push(
+        `${fieldLabel}: citation quote spans an elision marker ("[…]") in evidence ` +
+          `"${citation.evidenceId}" — a quote must come from one side of an excerpt gap, never across it`,
       );
     }
   }

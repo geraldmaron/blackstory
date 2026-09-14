@@ -1,5 +1,12 @@
 # Cloud Armor and protected public API ingress (BB-023)
 
+> **Leftover/archived — describes a GCP Cloud Armor architecture that was never applied.**
+> `api-public` and `api-submissions` run on Vercel (Cloudflare in front), not behind a GCP
+> load balancer; this directory's design "fronts nothing here" in production (see
+> [`../../docs/runbooks/api-public-vercel.md`](../../docs/runbooks/api-public-vercel.md)).
+> Retained as a historical design record, not an actionable plan. Current stack:
+> [`../../docs/data/firebase-wind-down.md`](../../docs/data/firebase-wind-down.md).
+
 Design stubs for a **global external HTTP(S) load balancer**, **serverless NEGs**, **Cloud
 Armor**, and **Cloud CDN** protecting `api-public` and `api-submissions`. Nothing in this
 directory is applied to GCP by default.

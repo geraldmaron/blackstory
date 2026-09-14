@@ -2,7 +2,10 @@
 
 Declarative Cloud Scheduler mirror of the scheduled-job registry. **Not applied** to live GCP —
 apply via Terraform or `gcloud scheduler jobs create` after human review, per ADR-007 (background
-workflow model: Cloud Scheduler -> Cloud Tasks -> Cloud Run Jobs/workers; removed 2026-07-24).
+workflow model: Cloud Scheduler -> Cloud Tasks -> Cloud Run Jobs/workers; removed 2026-07-24,
+recovered in `../../../docs/decisions-carryover.md`, "Scheduled-job worker packages" — the
+mechanism it picked has never been applied to live GCP; Corsair/systemd and GitHub Actions
+dispatch jobs today instead).
 
 | Artifact | Role |
 |----------|------|
@@ -28,13 +31,17 @@ owns building it.
 
 ## Invariants this file cannot violate
 
-- No job's `targetWorker.package` is outside `research` / `publication` / `security` (ADR-007:
-  worker code lives only in those three packages).
+- No job's `targetWorker.package` is outside `research` / `publication` / `security`
+  (`../../../docs/decisions-carryover.md`, "Scheduled-job worker packages", ADR-007: worker code
+  lives only in those three packages — though the label records ownership, not runtime, since
+  most job bodies are TypeScript run by Corsair/GitHub Actions/CLI, not the Python worker ADR-007
+  named).
 - Only `citation-link-health-sweep` (BB-083) and `release-coupled-rebuild` (BB-070) declare any
   `publicEffect` other than `"none"` — the only two automatic public-facing effects this whole
   framework allows, both mechanical and reversible, each with its own kill switch.
-- `environment` is always `blackbook-internal` (the BB-078/ADR-012 project name), never a numeric
-  GCP project id.
+- `environment` is always `blackbook-internal` (the BB-078/ADR-012 project name, still only a
+  design target — `../../../docs/decisions-carryover.md`, "Small recovered decisions", ADR-012
+  entry), never a numeric GCP project id.
 
 ## Validate
 

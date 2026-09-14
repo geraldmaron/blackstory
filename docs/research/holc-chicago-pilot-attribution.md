@@ -7,7 +7,7 @@
 
 **Status:** Locked for pilot (2026-07-22)  
 **Pilot scope:** Theme impact packets `Q1`–`Q4`, theme `redlining`  
-**Companion:** [theme-impact-packet-system.md](./theme-impact-packet-system.md) §8 gate 2, [context-data-source-matrix.md](./context-data-source-matrix.md), [ADR-029](../adr/ADR-029-theme-impact-packets.md)
+**Companion:** [theme-impact-packet-system.md](./theme-impact-packet-system.md) §8 gate 2, [context-data-source-matrix.md](./context-data-source-matrix.md), `../decisions-carryover.md`, "Small recovered decisions" (ADR-029, theme impact packets, removed 2026-07-24)
 
 ## 1. Pilot geography
 

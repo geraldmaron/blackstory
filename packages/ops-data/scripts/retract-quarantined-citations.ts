@@ -36,6 +36,7 @@ import {
   type ReleaseResearchCoverage,
 } from '@repo/domain';
 import pg from 'pg';
+import { remindToRepublishCatalogArtifacts } from './lib/catalog-republish-reminder.ts';
 import { normalizePgConnectionString } from './lib/pg-connection.ts';
 
 const DRY_RUN = process.env.DRY_RUN !== '0';
@@ -193,8 +194,7 @@ async function main(): Promise<void> {
     for (const item of retractions) {
       await client.query(
         `UPDATE bb_public.release_entities
-            SET claims = $2::jsonb,
-                projection = jsonb_set(
+            SET projection = jsonb_set(
                   jsonb_set(projection, '{claims}', $2::jsonb, true),
                   '{researchCoverage}', to_jsonb($3::text), true)
           WHERE entity_id = $1`,
@@ -211,6 +211,7 @@ async function main(): Promise<void> {
     }
     await client.query('COMMIT');
     console.log(`\nApplied: ${retractions.length} record(s) had a quarantined citation retracted.`);
+    remindToRepublishCatalogArtifacts(retractions.length);
   } catch (error) {
     await client.query('ROLLBACK').catch(() => {});
     throw error;

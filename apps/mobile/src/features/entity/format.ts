@@ -98,8 +98,9 @@ export function datePrecisionCaption(precision: DatePrecision): string {
 
 /**
  * Formats an epoch-ms timestamp as a deterministic, locale-independent "YYYY-MM-DD HH:MM UTC"
- * string for the offline/cached-content "last updated" banner (ADR-022 §3: "every cached
- * surface is explicitly labeled 'last updated <relative time>'"). An absolute UTC stamp (rather
+ * string for the offline/cached-content "last updated" banner (`docs/decisions-carryover.md`,
+ * "Mobile cache and OTA release": every cached surface is explicitly labeled with when it was
+ * last updated, and stale content is never presented as live). An absolute UTC stamp (rather
  * than a relative "3 hours ago" computation) is used deliberately: it needs no injected clock to
  * test deterministically, never goes stale mid-session the way a relative string would while a
  * screen stays mounted, and avoids depending on `Intl`/locale behavior in the Hermes runtime.

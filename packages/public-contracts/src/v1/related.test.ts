@@ -1,5 +1,6 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
+import { confidenceTierFromEvidenceInputs } from '../evidence.js';
 import { relatedEntryV1Schema, relatedNeighborV1Schema } from './related.js';
 
 test('round-trips a related entry with an open-ended timespan (validTo: null)', () => {
@@ -39,10 +40,47 @@ test('related entry / neighbor schemas are not recursive (no field of their own 
   assert.deepEqual(Object.keys(neighborShape).sort(), [
     'direction',
     'displayName',
+    'evidenceInputs',
     'id',
     'kind',
     'relationType',
     'summary',
     'timespan',
   ]);
+});
+
+test('a neighbor carries evidence inputs, and the grade is derived from them, not read off', () => {
+  const parsed = relatedNeighborV1Schema.parse({
+    id: 'ent_15th_st_church_001',
+    displayName: 'Fifteenth Street Presbyterian Church',
+    kind: 'institution',
+    summary: 'Hosted the founding class.',
+    relationType: 'founded_in',
+    direction: 'incoming' as const,
+    evidenceInputs: {
+      strongestClaimLevel: 'high',
+      citedLineageKeys: ['loc.gov', 'nps.gov'],
+      evidenceLineageKeys: ['loc.gov', 'nps.gov'],
+    },
+  });
+  // No field named for a grade exists on the wire; the letter comes from the one rule.
+  assert.equal(Object.keys(parsed).includes('confidenceTier'), false);
+  assert.equal(confidenceTierFromEvidenceInputs(parsed.evidenceInputs!), 'high');
+});
+
+test('one corroborating lineage steps a neighbor down — the rule, not the payload, decides', () => {
+  const parsed = relatedNeighborV1Schema.parse({
+    id: 'ent_x',
+    displayName: 'Single-source record',
+    kind: 'place',
+    summary: 'Cited once.',
+    relationType: 'related',
+    direction: 'outgoing' as const,
+    evidenceInputs: {
+      strongestClaimLevel: 'high',
+      citedLineageKeys: ['loc.gov'],
+      evidenceLineageKeys: ['loc.gov'],
+    },
+  });
+  assert.equal(confidenceTierFromEvidenceInputs(parsed.evidenceInputs!), 'medium');
 });

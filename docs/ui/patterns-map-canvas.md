@@ -8,7 +8,7 @@ Binding for every MapLibre mount in the web app. Target browsers: **Safari, Chro
 
 | Surface | Module | Notes |
 |---|---|---|
-| Home + Explore plate | `MapStage` (ADR-017 persistent canvas) | Full viewport; hero uses viewport-fixed inset |
+| Home + Explore plate | `MapStage` (`../decisions-carryover.md`, "Persistent map canvas", ADR-017 persistent canvas) | Full viewport; hero uses viewport-fixed inset |
 | Entity detail | `EntityLocationMap` | Compact streets preview |
 | Record anatomy | `RecordPlacePreview` → `EntityLocationMap` | Explicit `7.5rem` frame height |
 
