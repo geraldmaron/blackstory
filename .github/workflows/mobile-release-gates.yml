@@ -72,18 +72,34 @@ jobs:
       # `-q` still prints the properties task's own output; it suppresses Gradle's progress
       # lines, which is what makes this parseable.
       - name: Read target SDK from Gradle
-        run: ./gradlew :app:properties --console=plain -q > "$GITHUB_WORKSPACE/gradle-properties.txt"
+        run: ./gradlew :app:properties --console=plain -q -Dorg.gradle.jvmargs="$GRADLE_JVMARGS" --no-parallel > "$GITHUB_WORKSPACE/gradle-properties.txt"
         working-directory: apps/mobile/android
+        env:
+          GRADLE_JVMARGS: -Xmx6g -XX:MaxMetaspaceSize=2g
+      # Prebuild writes -Xmx2048m -XX:MaxMetaspaceSize=512m into gradle.properties, and a release
+      # build of this app runs out of Metaspace under it; every local release build needed this
+      # override. ubuntu-latest has 16 GB, so 6 GB of heap leaves room for the Kotlin daemon.
       - name: Build the release artifact
-        run: ./gradlew assembleRelease --console=plain
+        run: ./gradlew assembleRelease --console=plain -Dorg.gradle.jvmargs="$GRADLE_JVMARGS" --no-parallel
         working-directory: apps/mobile/android
+        env:
+          GRADLE_JVMARGS: -Xmx6g -XX:MaxMetaspaceSize=2g
       # The artifact is the point: the program does not accept the build configuration as proof
       # of what the built thing targets.
       - name: Read target SDK back off the artifact
         working-directory: apps/mobile/android
         run: |
           set -euo pipefail
-          AAPT2="$(find "${ANDROID_SDK_ROOT:-$ANDROID_HOME}/build-tools" -name aapt2 -type f | sort -V | tail -1)"
+          SDK="${ANDROID_SDK_ROOT:-${ANDROID_HOME:-}}"
+          if [[ -z "$SDK" || ! -d "$SDK/build-tools" ]]; then
+            echo "::error::No Android SDK build-tools on this runner (ANDROID_SDK_ROOT/ANDROID_HOME unset or missing build-tools)."
+            exit 1
+          fi
+          AAPT2="$(find "$SDK/build-tools" -name aapt2 -type f | sort -V | tail -1)"
+          if [[ -z "$AAPT2" ]]; then
+            echo "::error::No aapt2 under $SDK/build-tools; the release APK's target SDK cannot be read."
+            exit 1
+          fi
           echo "Using $AAPT2"
           "$AAPT2" dump badging app/build/outputs/apk/release/app-release.apk > "$GITHUB_WORKSPACE/aapt-badging.txt"
       - name: Upload Android evidence
