@@ -267,6 +267,30 @@ const config: ExpoConfig = {
           ? { NSAllowsArbitraryLoads: false, NSAllowsLocalNetworking: false }
           : { NSAllowsLocalNetworking: true },
     },
+    // App-level privacy manifest (PrivacyInfo.xcprivacy), declared here so `expo prebuild` writes it.
+    // Without this key the file only appeared as a side effect of pod install's privacy-manifest
+    // aggregation, so a `prebuild --no-install` produced none and App Store Connect would reject the
+    // upload; the mobile release gate's second CI dispatch caught it. The required-reason entries
+    // mirror what that aggregation produced for this app's pods: UserDefaults (CA92.1), system boot
+    // time (35F9.1) and file timestamps (C617.1). No data is collected and nothing tracks.
+    privacyManifests: {
+      NSPrivacyAccessedAPITypes: [
+        {
+          NSPrivacyAccessedAPIType: 'NSPrivacyAccessedAPICategoryUserDefaults',
+          NSPrivacyAccessedAPITypeReasons: ['CA92.1'],
+        },
+        {
+          NSPrivacyAccessedAPIType: 'NSPrivacyAccessedAPICategorySystemBootTime',
+          NSPrivacyAccessedAPITypeReasons: ['35F9.1'],
+        },
+        {
+          NSPrivacyAccessedAPIType: 'NSPrivacyAccessedAPICategoryFileTimestamp',
+          NSPrivacyAccessedAPITypeReasons: ['C617.1'],
+        },
+      ],
+      NSPrivacyCollectedDataTypes: [],
+      NSPrivacyTracking: false,
+    },
     //
     // Universal Links (MOB-008): production-only. Omit the key entirely for
     // development/preview — an empty `associatedDomains: []` still makes Expo

@@ -137,9 +137,11 @@ jobs:
         with:
           name: android-evidence-${{ inputs.variant }}
           path: ${{ runner.temp }}/android-evidence
-      # `--no-install` skips npm and CocoaPods. Neither writes the files this gate reads: the
-      # pbxproj, the plists, the entitlements and the privacy manifest are all written by
-      # prebuild and its config plugins, minutes before pod install would start.
+      # `--no-install` skips npm and CocoaPods. The pbxproj, the plists and the entitlements come
+      # from prebuild and its config plugins. The app-level privacy manifest does too, but only
+      # because app.config.ts declares ios.privacyManifests: without that, the file only ever
+      # appeared as a side effect of pod install's privacy-manifest aggregation, and the second
+      # dispatch of this workflow failed ios-store-compliance on its absence.
       - name: Prebuild the iOS project
         env:
           APP_VARIANT: ${{ inputs.variant }}
