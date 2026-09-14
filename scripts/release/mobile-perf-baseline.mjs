@@ -56,13 +56,19 @@ const DEFAULT_APP_ID = 'app.blackstory.mobile';
 const DEFAULT_ACTIVITY = '.MainActivity';
 /** The Records tab route (`apps/mobile/src/app/(tabs)/records.tsx`) under the app's `blackstory` scheme. */
 const RECORDS_DEEP_LINK = 'blackstory://records';
-const MARK_WAIT_TIMEOUT_MS = 20_000;
+const MARK_WAIT_TIMEOUT_MS = 30_000;
 const MARK_POLL_INTERVAL_MS = 250;
 const BUNDLE_SIZE_BASELINE_PATH = join(repoRoot, 'apps/mobile/scripts/bundle-size-baseline.json');
 
 // The five marks `apps/mobile/src/lib/perf-marks.ts` can emit, and the program metric each one
 // answers. Everything else in `PROGRAM_METRICS` below has no in-app mark and is measured (or
 // left unmeasured) some other way.
+/**
+ * The marks a bare launch can produce. Search, story and entity marks need navigation this harness
+ * does not perform, so waiting for them after a launch only ever burns the full timeout.
+ */
+const LAUNCH_MARKS = ['first_useful_content', 'first_map_render'];
+
 const MARK_TO_METRIC = {
   first_useful_content: 'first_useful_content',
   first_map_render: 'first_map_render',
@@ -303,7 +309,7 @@ async function runIosScenario(bundleId, { cold }) {
   let marks = [];
   while (Date.now() < deadline) {
     marks = parseIosNdjsonLog(logChunks.join('\n'));
-    if (Object.keys(MARK_TO_METRIC).every((name) => marks.some((m) => m.mark === name))) break;
+    if (LAUNCH_MARKS.every((name) => marks.some((m) => m.mark === name))) break;
     await sleep(MARK_POLL_INTERVAL_MS);
   }
 
@@ -428,10 +434,15 @@ async function runAndroidLaunch(pkg, activity, { cold }) {
     stdout = sh(ADB, ['shell', 'am', 'start', '-W', '-n', target]);
   }
   const launch = parseAndroidAmStart(stdout);
-  // Give the app a moment to run past its first render and flush marks to logcat.
-  await sleep(2000);
-  const logcat = shSafe(ADB, ['logcat', '-d', '-s', 'ReactNativeJS']);
-  const marks = parseAndroidLogcatPerfMarks(logcat);
+  // Poll, as the iOS path does. A single read 2 s after launch missed first_useful_content, which
+  // arrived ~16 s in on the emulator with live data, and reported it as never logged.
+  const deadline = Date.now() + MARK_WAIT_TIMEOUT_MS;
+  let marks = [];
+  while (Date.now() < deadline) {
+    marks = parseAndroidLogcatPerfMarks(shSafe(ADB, ['logcat', '-d', '-s', 'ReactNativeJS']));
+    if (!cold || LAUNCH_MARKS.every((name) => marks.some((m) => m.mark === name))) break;
+    await sleep(MARK_POLL_INTERVAL_MS);
+  }
   return { launch, marks };
 }
 
