@@ -1,0 +1,174 @@
+# Mobile store release gates (Wave 9).
+#
+# NOT a PR gate. PR gates live in ci.yml's "Mobile Checks" and answer "is this change sound".
+# These answer a different question — "may this commit go to a store" — and the honest answer
+# involves generating the native projects, running Gradle for real, building a release artifact,
+# and asking a person to attest to the things no machine here can see. That belongs on a
+# deliberate dispatch, not on every push.
+#
+# The decision itself is packages/testing/src/release-gates/mobile. This file only arranges for
+# the artifacts to exist on a runner that can read them: Android facts come off a Linux runner
+# with the preinstalled SDK, iOS facts off macOS, and the Linux job hands over its Gradle and
+# aapt2 STDOUT rather than a 167MB APK.
+#
+# Expect NO_GO until the four human gates are attested and repo-3en3s lands. That is the gate
+# working, not the workflow failing.
+
+name: Mobile Release Gates
+
+on:
+  workflow_dispatch:
+    inputs:
+      variant:
+        description: Build variant to gate
+        required: true
+        default: production
+        type: choice
+        options:
+          - production
+          - preview
+      attestations:
+        description: Repo-relative path to a human attestation bundle (omit to see the machine gates alone)
+        required: false
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: mobile-release-gates-${{ github.ref }}-${{ inputs.variant }}
+  cancel-in-progress: false
+
+jobs:
+  android-evidence:
+    name: Android Evidence
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    defaults:
+      run:
+        working-directory: apps/mobile
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Setup Node.js
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+          cache-dependency-path: apps/mobile/package-lock.json
+      - name: Setup JDK 17
+        uses: actions/setup-java@de7274f081f381c8f8158605e0321c36c376e2e6 # v6.0.1
+        with:
+          distribution: temurin
+          java-version: '17'
+      - name: Install mobile dependencies (npm, isolated lockfile)
+        run: npm ci --no-audit --no-fund
+      - name: Generate expo-env.d.ts (gitignored Expo type-reference shim)
+        run: printf '/// <reference types="expo/types" />\n' > expo-env.d.ts
+      - name: Prebuild the Android project
+        env:
+          APP_VARIANT: ${{ inputs.variant }}
+        run: npx expo prebuild --platform android --no-install --clean
+      # `-q` still prints the properties task's own output; it suppresses Gradle's progress
+      # lines, which is what makes this parseable.
+      - name: Read target SDK from Gradle
+        run: ./gradlew :app:properties --console=plain -q > "$GITHUB_WORKSPACE/gradle-properties.txt"
+        working-directory: apps/mobile/android
+      - name: Build the release artifact
+        run: ./gradlew assembleRelease --console=plain
+        working-directory: apps/mobile/android
+      # The artifact is the point: the program does not accept the build configuration as proof
+      # of what the built thing targets.
+      - name: Read target SDK back off the artifact
+        working-directory: apps/mobile/android
+        run: |
+          set -euo pipefail
+          AAPT2="$(find "${ANDROID_SDK_ROOT:-$ANDROID_HOME}/build-tools" -name aapt2 -type f | sort -V | tail -1)"
+          echo "Using $AAPT2"
+          "$AAPT2" dump badging app/build/outputs/apk/release/app-release.apk > "$GITHUB_WORKSPACE/aapt-badging.txt"
+      - name: Upload Android evidence
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: android-evidence-${{ inputs.variant }}
+          path: |
+            gradle-properties.txt
+            aapt-badging.txt
+          if-no-files-found: error
+          retention-days: 30
+
+  gate:
+    name: Mobile Release Gate
+    needs: android-evidence
+    runs-on: macos-latest
+    timeout-minutes: 60
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      # The gate itself is TypeScript in the pnpm workspace; apps/mobile is deliberately outside
+      # it and has its own npm lockfile, so this job installs both graphs.
+      - name: Setup Node and pnpm
+        uses: ./.github/actions/setup-node-pnpm
+      - name: Install mobile dependencies (npm, isolated lockfile)
+        run: npm ci --no-audit --no-fund
+        working-directory: apps/mobile
+      - name: Generate expo-env.d.ts (gitignored Expo type-reference shim)
+        run: printf '/// <reference types="expo/types" />\n' > expo-env.d.ts
+        working-directory: apps/mobile
+      - name: Download Android evidence
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          name: android-evidence-${{ inputs.variant }}
+          path: android-evidence
+      # `--no-install` skips npm and CocoaPods. Neither writes the files this gate reads: the
+      # pbxproj, the plists, the entitlements and the privacy manifest are all written by
+      # prebuild and its config plugins, minutes before pod install would start.
+      - name: Prebuild the iOS project
+        env:
+          APP_VARIANT: ${{ inputs.variant }}
+        run: npx expo prebuild --platform ios --no-install --clean
+        working-directory: apps/mobile
+      - name: Collect release evidence
+        run: |
+          node scripts/release/mobile-release-gate.mjs collect \
+            --variant "${{ inputs.variant }}" \
+            --collected-by "github-actions@${{ github.run_id }}" \
+            --gradle-output android-evidence/gradle-properties.txt \
+            --aapt-output android-evidence/aapt-badging.txt \
+            --apk apps/mobile/android/app/build/outputs/apk/release/app-release.apk \
+            --output artifacts/mobile-release/evidence.json
+      - name: Evaluate release gates
+        id: evaluate
+        run: |
+          node scripts/release/mobile-release-gate.mjs evaluate \
+            --evidence artifacts/mobile-release/evidence.json \
+            --evaluator "github-actions@${{ github.run_id }}" \
+            ${{ inputs.attestations && format('--attestations {0}', inputs.attestations) || '' }} \
+            --output artifacts/mobile-release/decision.json
+      - name: Summarize the decision
+        if: always()
+        run: |
+          set -euo pipefail
+          DECISION="artifacts/mobile-release/decision.json"
+          if [[ ! -f "$DECISION" ]]; then
+            echo "No decision artifact was produced." >> "$GITHUB_STEP_SUMMARY"
+            exit 0
+          fi
+          node -e '
+            const report = require("./artifacts/mobile-release/decision.json");
+            const rows = report.gates
+              .map((gate) => `| ${gate.status === "pass" ? "PASS" : "FAIL"} | ${gate.id} | ${gate.kind} | ${gate.message.replace(/\|/g, "\\|")} |`)
+              .join("\n");
+            console.log(`## Mobile release gate: ${report.decision}\n`);
+            console.log(`\`${report.variant}\` at \`${report.commitSha}\` — ${report.requiredPassed} required passed, ${report.requiredFailed} failed.\n`);
+            console.log("| Result | Gate | Kind | Detail |");
+            console.log("| --- | --- | --- | --- |");
+            console.log(rows);
+          ' >> "$GITHUB_STEP_SUMMARY"
+      - name: Upload the decision
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: mobile-release-decision-${{ inputs.variant }}
+          path: artifacts/mobile-release/
+          if-no-files-found: error
+          retention-days: 90
