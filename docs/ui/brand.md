@@ -124,7 +124,11 @@ and technical labels. All open-source; no licensed fonts.
 
 ## Shape
 
-Radii 8/16/28px (sm/md/lg). Flat matte fills only.
+Radii 8/16/28px (sm/md/lg). The archive is material, not glass: depth comes from
+stacking, occlusion, crop and value (four surface steps per theme), never from
+synthetic light. Decorative gradients, glows, neon, bevels, glass and 3D stay
+banned. One low-opacity contact shadow (`--ds-contact-*`) is allowed only where
+a layer genuinely overlaps another.
 
 ## Imagery and people
 

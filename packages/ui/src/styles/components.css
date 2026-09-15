@@ -1,10 +1,9 @@
 /**
  * Component-level styles for BlackStory design-system primitives (brand pack
- * v3). Radius language 8/16/28, Rule hairlines carry all separation, no
- * shadows anywhere (--ds-elevation-* tokens resolve to `none` by design —
- * this file doesn't reference them at all rather than imply they're load
- * bearing). Metadata registers (card meta, citations, filter labels, time
- * stamps) use IBM Plex Mono per the v3 data register.
+ * v3). Radius language 8/14/28, Rule hairlines carry all separation, depth from
+ * `--ds-contact-*` contact shadows only where layers overlap (never a generic
+ * elevation stack). Metadata registers (card meta, citations, filter labels, time
+ * stamps) use Geist Mono per the data register.
  */
 
 .ds-card {

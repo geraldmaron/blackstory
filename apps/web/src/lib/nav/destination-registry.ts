@@ -75,11 +75,11 @@ export const ROOMS_GROUP_COPY: Readonly<
   find: { heading: null, standfirst: null },
   read: {
     heading: 'Rooms for reading',
-    standfirst: 'Law, data, banned books, and the memorial wall.',
+    standfirst: 'The memorial wall.',
   },
   check: {
     heading: 'How a record gets in',
-    standfirst: 'Methods, origin, plain answers, and the log of what we corrected.',
+    standfirst: 'How the archive works, plain answers, and the log of what we corrected.',
   },
   'take-part': {
     heading: 'Add what is missing',
@@ -161,18 +161,27 @@ const WEB_PRESENTATION: Readonly<Record<string, WebPresentation>> = Object.freez
     kind: 'REFERENCE',
     modifier: 'PLAIN LANGUAGE',
     menuLine: 'Statutes and rulings',
-    crawl: { changeFrequency: 'weekly', priority: 0.7 },
+    crawl: { changeFrequency: 'weekly', priority: 0.5 },
   },
   data: {
     kind: 'INDICATORS',
     modifier: 'TABULAR',
     menuLine: 'National series',
-    crawl: { changeFrequency: 'weekly', priority: 0.6 },
+    crawl: { changeFrequency: 'weekly', priority: 0.5 },
   },
   books: {
     kind: 'CATALOG',
     menuLine: 'Documented challenges',
-    crawl: { changeFrequency: 'weekly', priority: 0.6 },
+    crawl: { changeFrequency: 'weekly', priority: 0.5 },
+  },
+  'law-browse': {
+    kind: 'BROWSE',
+    menuLine: 'Filter the law catalog',
+    // Escape hatch: reachable from apparatus, not Rooms cards.
+  },
+  'books-browse': {
+    kind: 'BROWSE',
+    menuLine: 'Filter challenged titles',
   },
   memorial: {
     kind: 'NAMES',
@@ -185,6 +194,11 @@ const WEB_PRESENTATION: Readonly<Record<string, WebPresentation>> = Object.freez
     kind: 'FRAMING',
     menuLine: 'What this refuses to do',
     crawl: { changeFrequency: 'monthly', priority: 0.5 },
+  },
+  apparatus: {
+    kind: 'APPARATUS',
+    menuLine: 'How the archive works',
+    crawl: { changeFrequency: 'monthly', priority: 0.7 },
   },
   faq: {
     kind: 'ANSWERS',
@@ -300,8 +314,8 @@ export const DYNAMIC_PARENTS: readonly (readonly [string, string])[] = [
   ['/place/', '/records'],
   ['/invention/', '/records'],
   ['/entity/', '/records'],
-  ['/books/', '/books'],
-  ['/law/', '/law'],
+  ['/books/', '/books/browse'],
+  ['/law/', '/law/browse'],
 ];
 
 /**

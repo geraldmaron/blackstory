@@ -14,7 +14,7 @@ import {
   cardTitleFor,
   destinationsInGroup,
 } from '../../lib/nav/destination-registry';
-import { CardGrid, GroupHeading, Room, RoomCard, RoomHeader } from '../../components/room';
+import { CardGrid, GroupHeading, Room, RoomCard, ReadingEntry } from '../../components/room';
 import { WalkOffRamp } from '../walk-off-ramp';
 import '../reading-room.css';
 import './rooms.css';
@@ -31,12 +31,11 @@ export const metadata: Metadata = buildStaticPageMetadata({
 export default function RoomsPage() {
   return (
     <Room>
-      <RoomHeader
+      <ReadingEntry
         pathname="/rooms"
-        kicker="Beyond the map"
         title="Rooms"
         lede="What kinds of knowledge live beyond the map. Each room below is a different way into the archive."
-        showPath={false}
+        showCrumb={false}
       />
 
       {ROOMS_CARD_GROUPS.map((group) => {

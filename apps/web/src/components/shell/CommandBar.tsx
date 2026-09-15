@@ -11,7 +11,7 @@
  */
 'use client';
 
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { BRAND_ASSETS } from '@repo/config';
@@ -19,6 +19,11 @@ import { cx, ShellWordmark } from '@repo/ui';
 import { CommandBarSearch } from './CommandBarSearch';
 import { RoomsMenu } from './RoomsMenu';
 import { primaryNavDestinations } from '../../lib/nav/destination-registry';
+import {
+  exitMapBrowse,
+  MAP_BROWSE_ENTERED_EVENT,
+  MAP_BROWSE_EXITED_EVENT,
+} from '../../lib/nav/map-browse';
 import './command-bar.css';
 
 void React;
@@ -31,6 +36,25 @@ void React;
  * Computed once at module scope: the registry is static data and this bar mounts on every route.
  */
 const AXES = primaryNavDestinations().filter((axis) => axis.path !== '/rooms');
+
+/** Phone Find nav folds Stories/Records into Rooms on map surfaces (overflowFind). */
+const PHONE_FIND_BREAKPOINT = 820;
+
+/** Axes that leave the phone Find pill on map surfaces and reappear inside Rooms. */
+const PHONE_OVERFLOW_AXIS_PATHS = new Set(['/stories', '/records']);
+
+function pathIsMapSurface(pathname: string): boolean {
+  return pathname === '/' || pathname.startsWith('/explore');
+}
+
+/**
+ * Browse is a posture of Map, not a fifth Find item. Detected from the Door dataset (morph via
+ * pushState) or a cold `/explore` load. Enter/exit live on the journey CTAs and "Back to journey",
+ * never as a redundant Browse chip beside Map.
+ */
+function pathIsBrowsing(pathname: string, doorBrowse: boolean): boolean {
+  return doorBrowse || pathname === '/explore' || pathname.startsWith('/explore/');
+}
 
 /** Writes measured command-bar clearance to the document root for Door/room layout tokens. */
 export function syncCommandBarClearance(bar: HTMLElement): void {
@@ -114,6 +138,40 @@ export function CommandBar({
   const quiet = commandBarIsQuiet(pathname);
   const onAtlas = Boolean(mode && onModeChange);
   const barRef = useRef<HTMLElement>(null);
+  const [phoneFind, setPhoneFind] = useState(false);
+  const [doorBrowse, setDoorBrowse] = useState(false);
+
+  useEffect(() => {
+    const query = window.matchMedia(`(max-width: ${PHONE_FIND_BREAKPOINT - 1}px)`);
+    const sync = () => setPhoneFind(query.matches);
+    sync();
+    query.addEventListener('change', sync);
+    return () => query.removeEventListener('change', sync);
+  }, []);
+
+  useEffect(() => {
+    const syncBrowse = () => {
+      setDoorBrowse(document.documentElement.dataset.doorBrowse === '1');
+    };
+    syncBrowse();
+    const onEntered = () => setDoorBrowse(true);
+    const onExited = () => setDoorBrowse(false);
+    window.addEventListener(MAP_BROWSE_ENTERED_EVENT, onEntered);
+    window.addEventListener(MAP_BROWSE_EXITED_EVENT, onExited);
+    return () => {
+      window.removeEventListener(MAP_BROWSE_ENTERED_EVENT, onEntered);
+      window.removeEventListener(MAP_BROWSE_EXITED_EVENT, onExited);
+    };
+  }, []);
+
+  /**
+   * On ~375px map surfaces, Map + Stories + Records + Rooms is four crowded chips. Fold Stories
+   * and Records into the Rooms disclosure (overflowFind) so Find stays Map + Rooms.
+   */
+  const overflowFind = phoneFind && pathIsMapSurface(pathname);
+  const findAxes = overflowFind
+    ? AXES.filter((axis) => !PHONE_OVERFLOW_AXIS_PATHS.has(axis.path))
+    : AXES;
 
   useEffect(() => {
     const bar = barRef.current;
@@ -128,10 +186,10 @@ export function CommandBar({
     return () => {
       observer.disconnect();
     };
-  }, [onAtlas, onOpenPalette]);
+  }, [onAtlas, onOpenPalette, overflowFind]);
 
   return (
-    <header ref={barRef} className={cx('ds-bar', className)}>
+    <header ref={barRef} className={cx('ds-bar', className)} data-browse-chrome="true">
       <Link className="ds-bar__brand ds-shell-wordmark" href="/" aria-label="BlackStory · home">
         <ShellWordmark lockup={BRAND_ASSETS.lockup} symbol={BRAND_ASSETS.symbol} />
       </Link>
@@ -162,27 +220,53 @@ export function CommandBar({
       <div className="ds-bar__tools">
         {quiet ? null : (
           <nav className="ds-bar__modes" aria-label="Find">
-            {AXES.map((axis) => {
+            {findAxes.map((axis) => {
+              const mapAxis = axis.path === '/explore';
+              const browsing = pathIsBrowsing(pathname, doorBrowse);
+              if (mapAxis) {
+                // Map is one destination with two postures. Off the map surface it is a link home.
+                // On the journey it is current. While browsing, pressing Map restores the journey
+                // (pushState left Next on `/`, so a Link to `/` was a no-op).
+                if (!pathIsMapSurface(pathname)) {
+                  return (
+                    <Link key={axis.path} className="ds-bar__mode-link" href="/" prefetch={false}>
+                      {axis.label}
+                    </Link>
+                  );
+                }
+                if (browsing) {
+                  return (
+                    <button
+                      key={axis.path}
+                      type="button"
+                      className="ds-bar__mode-link"
+                      aria-current="page"
+                      onClick={() => exitMapBrowse()}
+                      aria-label="Back to the map journey"
+                    >
+                      {axis.label}
+                    </button>
+                  );
+                }
+                return (
+                  <span key={axis.path} className="ds-bar__mode-link" aria-current="page">
+                    {axis.label}
+                  </span>
+                );
+              }
               const current = pathIsCurrent(pathname, axis.path);
-              // On the Explore instrument the bar names the surface the reader is standing on
-              // rather than offering it as a link back to itself.
-              return current && axis.path === '/explore' ? (
-                <span key={axis.path} className="ds-bar__mode-link" aria-current="page">
-                  {axis.label}
-                </span>
-              ) : (
+              return (
                 <Link
                   key={axis.path}
                   className="ds-bar__mode-link"
                   href={axis.path}
-                  {...(axis.path === '/explore' ? { prefetch: false } : {})}
                   aria-current={current ? 'page' : undefined}
                 >
                   {axis.label}
                 </Link>
               );
             })}
-            <RoomsMenu />
+            <RoomsMenu overflowFind={overflowFind} />
           </nav>
         )}
 

@@ -20,20 +20,19 @@ import { listPublicArticleListItems } from '../../lib/articles/source';
 import { RECORDS_PAGE_SIZE } from '../../lib/records/build-records-index';
 import {
   CardGrid,
+  DocumentColophon,
   GroupHeading,
   Note,
-  RailGroup,
+  OrientationInstrument,
+  ReadingEntry,
   Room,
   RoomCard,
-  RoomHeader,
 } from '../../components/room';
 import {
   buildCollectionGroups,
   buildCollectionShelves,
   buildEraGroups,
   buildKindChips,
-  buildPlaceGroups,
-  buildTagGroups,
   computeStoriesFacts,
   filterItems,
   hasActiveNarrowing,
@@ -74,12 +73,11 @@ const LEAD_FLAG = 'Start here';
 export default async function StoriesIndexPage({ searchParams }: StoriesPageProps) {
   const query = parseStoriesQuery(await searchParams);
   const { items, source } = await listPublicArticleListItems();
-  const { publishedCount, eraSpanLabel, placeCount } = computeStoriesFacts(items);
+  const { publishedCount, eraSpanLabel, placeLabel } = computeStoriesFacts(items);
   const filtered = sortItems(filterItems(items, query), query.sort);
   const notice = storiesNotice(source, items.length, filtered.length);
   const kindChips = buildKindChips(items, query);
   const collectionGroups = buildCollectionGroups(items);
-  const tagGroups = buildTagGroups(items);
 
   // The shelves layout only ever renders in the page's default, unnarrowed browse state (see
   // `showsShelves`); everything else — a search, a filter, a non-default sort — falls back to
@@ -98,31 +96,61 @@ export default async function StoriesIndexPage({ searchParams }: StoriesPageProp
   const meta = [
     `${publishedCount.toLocaleString('en-US')} published`,
     ...(eraSpanLabel === undefined ? [] : [eraSpanLabel]),
-    `${placeCount.toLocaleString('en-US')} places`,
+    placeLabel,
   ];
 
+  const leadCollection = collectionGroups[0];
+  const leadEra = buildEraGroups(items)[0];
   const rail =
     source === 'live' && items.length > 0 ? (
-      <>
-        {collectionGroups.length > 0 ? (
-          <RailGroup title="Collections" entries={collectionGroups} limit={12} />
-        ) : null}
-        {tagGroups.length > 0 ? <RailGroup title="By era" entries={tagGroups} limit={12} /> : null}
-        <RailGroup title="By period" entries={buildEraGroups(items)} limit={12} />
-        <RailGroup title="By place" entries={buildPlaceGroups(items)} limit={12} />
-      </>
+      <OrientationInstrument
+        where="Writing built from the record"
+        {...(query.era.length > 0
+          ? { eraBand: query.era }
+          : leadEra
+            ? { eraBand: leadEra.label }
+            : {})}
+        moves={[
+          ...(leadCollection
+            ? [
+                {
+                  label: leadCollection.label,
+                  href: leadCollection.href,
+                  ...(leadCollection.count !== undefined
+                    ? { note: `${leadCollection.count.toLocaleString('en-US')} stories` }
+                    : {}),
+                },
+              ]
+            : []),
+          ...(leadEra
+            ? [
+                {
+                  label: `Period: ${leadEra.label}`,
+                  href: leadEra.href,
+                  ...(leadEra.count !== undefined
+                    ? { note: `${leadEra.count.toLocaleString('en-US')} stories` }
+                    : {}),
+                },
+              ]
+            : []),
+          {
+            label: 'Open the memorial',
+            href: '/memorial',
+            note: 'Names at full scale',
+          },
+        ].slice(0, 3)}
+      />
     ) : undefined;
 
   return (
     <Room rail={rail}>
-      <RoomHeader
+      <ReadingEntry
         pathname="/stories"
-        kicker="Writing built out of the record"
         title="Stories"
-        lede="Long-form chapters that walk from a named year and place through the rules in force, and shorter entries that set out what a given administration actually did. Every story names the records it stands on, and every record links back to the stories about it."
-        meta={meta}
-        showPath={false}
+        lede="Long-form chapters that walk from a named year and place through the rules in force, and shorter entries that set out what a given administration actually did. Every story names the records it stands on."
+        showCrumb={false}
       />
+      <DocumentColophon facts={meta} />
 
       {source === 'live' && items.length > 0 ? (
         <div className="ds-stories-controls">

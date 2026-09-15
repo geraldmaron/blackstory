@@ -6,11 +6,16 @@
  * and quietly undo the change, so the absence is asserted rather than assumed.
  */
 import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
+import { dirname, join } from 'node:path';
 import { createElement } from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
 import { test } from 'node:test';
+import { fileURLToPath } from 'node:url';
 import { LensPanel, type LensPanelProps } from './LensPanel';
 import { MAP_KIND_FAMILY_ENCODING } from '../../lib/map-experience/kind-encoding';
+
+const here = dirname(fileURLToPath(import.meta.url));
 
 function lensProps(overrides: Partial<LensPanelProps> = {}): LensPanelProps {
   return {
@@ -172,6 +177,26 @@ test('Near me only renders when the surface can actually geolocate', () => {
 test('copy carries no em dash', () => {
   const html = renderToStaticMarkup(createElement(LensPanel, lensProps()));
   assert.equal(html.includes('—'), false);
+});
+
+test('modal posture keeps browse chrome exempt from inert', () => {
+  const source = readFileSync(join(here, 'LensPanel.tsx'), 'utf8');
+  assert.match(source, /inertExempt:\s*'\[data-browse-chrome\]'/);
+});
+
+test('modal posture is an aria-modal dialog labelled by Filters', () => {
+  const closed = renderToStaticMarkup(createElement(LensPanel, lensProps({ onHide: () => {} })));
+  assert.doesNotMatch(closed, /role="dialog"/);
+  assert.doesNotMatch(closed, /aria-modal/);
+
+  const open = renderToStaticMarkup(
+    createElement(LensPanel, lensProps({ onHide: () => {}, modal: true })),
+  );
+  assert.match(open, /role="dialog"/);
+  assert.match(open, /aria-modal="true"/);
+  assert.match(open, /aria-labelledby="/);
+  assert.match(open, /data-modal="true"/);
+  assert.match(open, /Filters/);
 });
 
 /**

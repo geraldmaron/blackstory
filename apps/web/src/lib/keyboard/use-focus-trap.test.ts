@@ -7,7 +7,9 @@
  * so it is pinned here.
  */
 import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
 import { test } from 'node:test';
+import { fileURLToPath } from 'node:url';
 
 import { nextTrapIndex } from './use-focus-trap';
 
@@ -39,4 +41,14 @@ test('an empty dialog reports nowhere to go rather than wrapping onto nothing', 
 test('a single focusable control holds focus on itself', () => {
   assert.equal(nextTrapIndex(1, 0, false), 0);
   assert.equal(nextTrapIndex(1, 0, true), 0);
+});
+
+test('inertOutside accepts an exempt selector for browse chrome', () => {
+  const source = readFileSync(
+    fileURLToPath(new URL('./use-focus-trap.ts', import.meta.url)),
+    'utf8',
+  );
+  assert.match(source, /exemptSelector/);
+  assert.match(source, /inertExempt/);
+  assert.match(source, /sibling\.matches\(exemptSelector\)/);
 });

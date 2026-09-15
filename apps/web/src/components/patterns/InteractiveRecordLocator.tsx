@@ -6,9 +6,11 @@
  */
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { locatorPinPercent } from '../../lib/map-experience/albers-usa';
+import { savePinContinuity } from '../../lib/discovery/pin-continuity';
 import {
   defaultLocatorView,
   locatorCanvasTransform,
+  neighborhoodLocatorView,
   panLocatorView,
   wheelFactorForDelta,
   zoomLocatorViewAt,
@@ -22,17 +24,32 @@ export type InteractiveRecordLocatorProps = {
   readonly lng: number;
   readonly label: string;
   readonly accessibleName?: string;
-  /** Hand off to the live Explore instrument for street-level exploration. */
+  /** Catalog entity id for pin continuity when handing off to the live map. */
+  readonly entityId?: string;
+  /** Hand off to the live map instrument for street-level exploration. */
   readonly atlasHref?: string;
+  /**
+   * Open already zoomed onto the pin (place hero). National overview stays the default for
+   * smaller stand slots.
+   */
+  readonly neighborhood?: boolean;
   readonly className?: string;
 };
 
-function locatorAriaLabel(label: string, accessibleName: string | undefined): string {
+function locatorAriaLabel(
+  label: string,
+  accessibleName: string | undefined,
+  neighborhood: boolean,
+): string {
   const place = accessibleName?.trim() || label.trim();
   const base =
     place.length > 0
-      ? `Locator map of the United States with ${place} marked.`
-      : 'Locator map of the United States.';
+      ? neighborhood
+        ? `Neighborhood locator with ${place} marked.`
+        : `Locator map of the United States with ${place} marked.`
+      : neighborhood
+        ? 'Neighborhood locator map.'
+        : 'Locator map of the United States.';
   return `${base} Drag to pan. Scroll or pinch to zoom. Plus and minus keys zoom. Escape resets the view.`;
 }
 
@@ -41,18 +58,28 @@ export function InteractiveRecordLocator({
   lng,
   label,
   accessibleName,
+  entityId,
   atlasHref,
+  neighborhood = false,
   className,
 }: InteractiveRecordLocatorProps) {
   const pin = useMemo(() => locatorPinPercent(lng, lat), [lng, lat]);
   const rootRef = useRef<HTMLDivElement>(null);
   const dragRef = useRef<{ pointerId: number; lastX: number; lastY: number } | null>(null);
-  const [view, setView] = useState<LocatorViewState>(defaultLocatorView);
+  const initialView = useMemo((): LocatorViewState => {
+    if (!neighborhood || !pin) return defaultLocatorView();
+    return neighborhoodLocatorView(pin.x, pin.y);
+  }, [neighborhood, pin]);
+  const [view, setView] = useState<LocatorViewState>(initialView);
   const [dragging, setDragging] = useState(false);
 
+  useEffect(() => {
+    setView(initialView);
+  }, [initialView]);
+
   const resetView = useCallback(() => {
-    setView(defaultLocatorView());
-  }, []);
+    setView(initialView);
+  }, [initialView]);
 
   const zoomAtCenter = useCallback((factor: number) => {
     const root = rootRef.current;
@@ -165,7 +192,7 @@ export function InteractiveRecordLocator({
       ref={rootRef}
       className={rootClass}
       role="application"
-      aria-label={locatorAriaLabel(label, accessibleName)}
+      aria-label={locatorAriaLabel(label, accessibleName, neighborhood)}
       tabIndex={0}
       onPointerDown={onPointerDown}
       onPointerMove={onPointerMove}
@@ -184,19 +211,36 @@ export function InteractiveRecordLocator({
           <a
             className="ds-locator__pin ds-locator__pin--link"
             href={atlasHref}
-            aria-label={`Open ${label} in Explore`}
+            aria-label={`See ${label} on the map`}
             style={pinStyle}
+            onClick={() => {
+              savePinContinuity({
+                entityId: entityId ?? label,
+                lng,
+                lat,
+                zoom: 11,
+                ...(accessibleName ? { label: accessibleName } : { label }),
+              });
+            }}
+            onKeyDown={(event) => {
+              if (event.key === 'Enter' || event.key === ' ') {
+                savePinContinuity({
+                  entityId: entityId ?? label,
+                  lng,
+                  lat,
+                  zoom: 11,
+                  ...(accessibleName ? { label: accessibleName } : { label }),
+                });
+              }
+            }}
           />
         ) : (
           <span className="ds-locator__pin" style={pinStyle} />
         )}
       </div>
       <div className="ds-locator__chrome">
-        {atlasHref ? (
-          <a className="ds-locator__atlas" href={atlasHref}>
-            See in Explore
-          </a>
-        ) : null}
+        {/* One map handoff only: the pin carries the atlas link when present. A second
+            "See in Explore" chrome link was the surplus affordance the audit named. */}
         <button type="button" className="ds-locator__reset" onClick={resetView}>
           Reset view
         </button>

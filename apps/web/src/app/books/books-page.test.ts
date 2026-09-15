@@ -9,29 +9,30 @@ import { fileURLToPath } from 'node:url';
 import { BOOKS_ABOUT, BOOKS_CATALOG, BOOKS_INTRO } from './books-copy';
 
 const here = dirname(fileURLToPath(import.meta.url));
-const browseSource = readFileSync(join(here, 'page.tsx'), 'utf8');
+const browseSource = readFileSync(join(here, 'browse', 'page.tsx'), 'utf8');
+const indexSource = readFileSync(join(here, 'page.tsx'), 'utf8');
 const detailSource = readFileSync(join(here, '[slug]', 'page.tsx'), 'utf8');
 const browseSectionsSource = readFileSync(join(here, 'BooksBrowseSections.tsx'), 'utf8');
 const ripRowSource = readFileSync(join(here, 'BooksRipRow.tsx'), 'utf8');
 const copySource = readFileSync(join(here, 'books-copy.ts'), 'utf8');
+const apparatusSource = readFileSync(join(here, '../apparatus/page.tsx'), 'utf8');
 
-test('books browse page renders through the room kit, with the catalog pulse kept', () => {
+test('books index 308s into apparatus; browse tools keep the room kit', () => {
+  assert.match(indexSource, /permanentRedirect\('\/apparatus\?s=books'\)/);
+  assert.match(apparatusSource, /BooksApparatusSections/);
   assert.doesNotMatch(browseSource, /EditionAtmosphereMosaic/);
   assert.doesNotMatch(browseSource, /BOOKS_EDITION_MOSAIC_SEED/);
-  // The v6 edition root and its `data-books-edition` marker are gone: the room is drawn by the
-  // shared kit now, and a second per-route chrome is what the kit exists to retire.
   assert.doesNotMatch(browseSource, /booksEditionRootClassName/);
   assert.doesNotMatch(browseSource, /data-books-edition="v6"/);
-  assert.match(browseSource, /from '\.\.\/\.\.\/components\/room'/);
+  assert.match(browseSource, /from '\.\.\/\.\.\/\.\.\/components\/room'/);
   assert.match(browseSource, /<Room>/);
-  assert.match(browseSource, /<RoomHeader/);
-  // The pulse is this room's own content, not chrome, so the conversion must not have dropped it.
+  assert.match(browseSource, /<ReadingEntry/);
   assert.match(browseSource, /BooksCatalogPulse/);
 });
 
 test('books browse holds the door without shipping a finished Banned books walk room', () => {
   assert.match(browseSource, /WalkOffRamp/);
-  assert.match(browseSource, /showPath=\{false\}/);
+  assert.match(browseSource, /showCrumb=\{false\}/);
   assert.doesNotMatch(browseSource, /Open the Atlas|ATLAS_INSTRUMENT|label: 'The place'/);
   assert.doesNotMatch(browseSource, /['"`]\/banned-books/);
   assert.doesNotMatch(browseSource, /Archive texture|Mosaic credits|ATMOSPHERE_ATTRIBUTION/);
@@ -57,7 +58,7 @@ test('books detail page renders through the room kit, with no edition chrome lef
   assert.doesNotMatch(detailSource, /data-books-edition="v6"/);
   assert.match(detailSource, /from '\.\.\/\.\.\/\.\.\/components\/room'/);
   assert.match(detailSource, /<Room>/);
-  assert.match(detailSource, /<RoomHeader/);
+  assert.match(detailSource, /<ReadingEntry/);
   assert.doesNotMatch(detailSectionsSource, /books-panel-chrome/);
   // The route-owned box wrapper (`ds-books-edition__panel--<variant>`) is gone; the element
   // labels it left behind (`__panel-title`, `__panel-heading`) are content, not chrome, and stay.
@@ -83,7 +84,7 @@ test('books browse facet chips use the room kit chip vocabulary', () => {
 
 test('books browse preserves GET filter and sort URL contract', () => {
   assert.match(browseSectionsSource, /method="get"/);
-  assert.match(browseSectionsSource, /action="\/books"/);
+  assert.match(browseSectionsSource, /action="\/books\/browse"/);
   assert.match(browseSectionsSource, /BooksSearchTypeahead/);
   assert.match(browseSectionsSource, /name="state"/);
   assert.match(browseSectionsSource, /name="author"/);

@@ -14,7 +14,7 @@ import {
 import { listErrataEntries } from '../../lib/trust/errata-seed';
 import { TRUST_PATHS } from '../../lib/trust/site-identity';
 import { ErrataSections } from './ErrataSections';
-import { Room, RoomHeader } from '../../components/room';
+import { Room, ReadingEntry } from '../../components/room';
 import { WalkOffRamp } from '../walk-off-ramp';
 import '../reading-room.css';
 
@@ -32,9 +32,8 @@ export default function ErrataPage() {
     <Room>
       <TrustSiteJsonLdScript />
       <PublishingPrinciplesJsonLdScript pagePath={TRUST_PATHS.errata} pageTitle="Errata" />
-      <RoomHeader
+      <ReadingEntry
         pathname="/errata"
-        kicker="Corrections"
         title="Errata log"
         lede="Every correction to a published record lands here, with the date it was made and what it changed. Nothing on this site is edited quietly."
       />

@@ -171,15 +171,17 @@ test('`/` is the door; a place page never mounts the catalog boot or camera cock
   );
   assert.match(commandBar, /Search records, places, eras/);
   assert.doesNotMatch(commandBar, /toLocaleString/);
-  const atlasHome = readFileSync(
-    fileURLToPath(new URL('./atlas-home.tsx', import.meta.url)),
+  const explorePage = readFileSync(
+    fileURLToPath(new URL('./explore/page.tsx', import.meta.url)),
     'utf8',
   );
-  assert.match(atlasHome, /toFirstPaintPins/);
-  assert.match(atlasHome, /FirstPaintPinPlate/);
-  assert.match(atlasHome, /ExploreMapUnderlay/);
-  assert.doesNotMatch(atlasHome, /Opening the map/);
-  assert.doesNotMatch(atlasHome, /ds-explore__walks/);
+  const doorHome = readFileSync(fileURLToPath(new URL('./door-home.tsx', import.meta.url)), 'utf8');
+  assert.match(explorePage, /DoorHome/);
+  assert.match(explorePage, /initialBrowse/);
+  assert.doesNotMatch(explorePage, /AtlasHome/);
+  assert.match(doorHome, /buildAtlasShell/);
+  assert.doesNotMatch(doorHome, /Opening the map/);
+  assert.doesNotMatch(doorHome, /ds-explore__walks/);
 });
 
 test('first paint is the record, not a manifesto or a schema card', () => {
@@ -187,10 +189,10 @@ test('first paint is the record, not a manifesto or a schema card', () => {
   assert.match(paint, /EntityRoomSections|ds-record-mast/);
   assert.match(paint, /toEvidenceClaimInputs/);
   assert.match(paint, /Can I trust this|id="trust"/);
-  assert.match(paint, /placeDiscoveryReturn|See this place on Explore|mapLabel/);
+  assert.match(paint, /placeDiscoveryReturn|See this place on the map|mapLabel/);
   assert.doesNotMatch(paint, /ABOUT_LINE|ABOUT_WALK_PAST|ABOUT_ON_THE_GROUND|ABOUT_PILLARS/);
   assert.doesNotMatch(paint, /RecordAnatomyPanel|buildEntityAnatomy|evidenceLabel|RoomHeader/);
-  assert.doesNotMatch(paint, /ds-record-strip|Grade A|radius affordance|Shown at locality/);
+  assert.doesNotMatch(paint, /ds-record-strip|Shown at locality/);
   const dunbar = getPublicEntity('ent_dunbar_school_001');
   assert.ok(dunbar);
   const greenwoodShaped = {
@@ -264,7 +266,8 @@ test('first paint is the record, not a manifesto or a schema card', () => {
   assert.doesNotMatch(html, /Active|Current status|In effect from|Status and history/);
   assert.doesNotMatch(html, /walk past documented Black history/);
   assert.doesNotMatch(html, /place-connected archive of Black history/);
-  assert.doesNotMatch(html, /Grade A|Grade B|Grade C/);
+  assert.match(html, /ds-record-evidence-strip/);
+  assert.match(html, /Grade A|Grade B|Grade C|Unrated/);
   assert.doesNotMatch(html, />Kind<|>Where<|>Era<|>Evidence</);
   assert.doesNotMatch(html, /radius affordance|Shown at locality/i);
   assert.doesNotMatch(html, /Journey|42Cb1758|4,101|Orbit|Tilt|Trace/);
@@ -325,7 +328,7 @@ test('seed Dunbar place record shows sourced claims without catalog chrome', () 
   assert.match(html, /The history here/);
   assert.match(html, /What the sources say/);
   assert.match(html, /Can I trust this/);
-  assert.match(html, /See this place on Explore|Browse the record list/);
+  assert.match(html, /Browse the record list/);
   assert.match(html, /href="\/place\/fifteenth-street-presbyterian-church"/);
   assert.match(html, /href="\/place\/dunbar-alumni-federation"/);
   assert.match(html, /href="\/data"/);

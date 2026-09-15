@@ -18,10 +18,7 @@ import {
 const css = readFileSync(new URL('./explore-map-underlay.css', import.meta.url), 'utf8');
 const source = readFileSync(new URL('./explore-map-underlay.tsx', import.meta.url), 'utf8');
 const gestures = readFileSync(new URL('./explore-map-gestures.tsx', import.meta.url), 'utf8');
-const atlasHome = readFileSync(
-  fileURLToPath(new URL('../atlas-home.tsx', import.meta.url)),
-  'utf8',
-);
+const explorePage = readFileSync(fileURLToPath(new URL('./page.tsx', import.meta.url)), 'utf8');
 const pinPlate = readFileSync(
   fileURLToPath(new URL('../first-paint-pin-plate.tsx', import.meta.url)),
   'utf8',
@@ -137,11 +134,11 @@ describe('explore map underlay', () => {
     assert.doesNotMatch(atlasCamera, /stage\.mapAvailable\]\)/);
   });
 
-  it('wraps the Explore pin plate so first HTML has geography', () => {
-    assert.match(atlasHome, /ExploreMapUnderlay/);
-    assert.match(
-      atlasHome,
-      /<ExploreMapUnderlay>[\s\S]*FirstPaintPinPlate[\s\S]*<\/ExploreMapUnderlay>/,
-    );
+  it('is unused by cold /explore, which mounts Door browse instead', () => {
+    assert.match(explorePage, /DoorHome/);
+    assert.match(explorePage, /initialBrowse/);
+    assert.doesNotMatch(explorePage, /ExploreMapUnderlay|AtlasHome/);
+    assert.match(source, /ExploreMapUnderlay/);
+    assert.match(source, /ExploreMapGestures/);
   });
 });

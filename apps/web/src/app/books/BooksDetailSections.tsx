@@ -57,7 +57,7 @@ export function BooksDetailSections({ view, relatedItems, placePanel }: BooksDet
               <Link
                 key={state.code}
                 className="ds-books-edition__tag"
-                href={`/books?state=${encodeURIComponent(state.code)}`}
+                href={`/books/browse?state=${encodeURIComponent(state.code)}`}
               >
                 {state.name} · {state.code}
               </Link>
@@ -236,7 +236,7 @@ export function BooksDetailSections({ view, relatedItems, placePanel }: BooksDet
           {BOOKS_DETAIL.connectedTitle}
         </h2>
         <p className="ds-books-edition__actions">
-          <Link className="ds-cta ds-cta--ink" href="/books">
+          <Link className="ds-cta ds-cta--ink" href="/books/browse">
             All challenged titles
           </Link>
           <Link className="ds-cta ds-cta--quiet" href="/methodology">

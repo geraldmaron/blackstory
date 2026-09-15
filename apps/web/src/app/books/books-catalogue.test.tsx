@@ -1,10 +1,7 @@
 /**
- * SP-11c acceptance: `/books` catalog index on the v9 room kit.
+ * SP-11c acceptance: banned-books catalog browse on the v9 room kit.
  *
- * Renders the pieces that can be rendered in isolation (`HairlineIndex` wired the way
- * `BooksBrowseSections` wires it, and `BooksCoverArt`) and reads the page source for the parts
- * that need real data plumbing (Postgres-backed snapshot loading), matching the pattern the
- * kit's own tests use.
+ * Browse tools live at `/books/browse`; the `/books` index 308s into apparatus.
  */
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
@@ -19,7 +16,8 @@ import { BooksCoverArt } from './BooksCoverArt';
 void React;
 
 const here = dirname(fileURLToPath(import.meta.url));
-const pageSource = readFileSync(join(here, 'page.tsx'), 'utf8');
+const indexSource = readFileSync(join(here, 'page.tsx'), 'utf8');
+const browsePageSource = readFileSync(join(here, 'browse', 'page.tsx'), 'utf8');
 const sectionsSource = readFileSync(join(here, 'BooksBrowseSections.tsx'), 'utf8');
 
 test('cover art is aria-hidden by default and carries no competing accessible name', () => {
@@ -52,14 +50,14 @@ test('facet chips render in the shared room-kit chip vocabulary, not a bespoke o
     <HairlineIndex
       countLabel="3 titles"
       filters={[
-        { id: 'all', label: 'All states', count: 3, href: '/books' },
-        { id: 'TX', label: 'Texas (TX)', count: 2, href: '/books?state=TX' },
+        { id: 'all', label: 'All states', count: 3, href: '/books/browse' },
+        { id: 'TX', label: 'Texas (TX)', count: 2, href: '/books/browse?state=TX' },
       ]}
       activeFilterId="all"
       rows={[]}
     />,
   );
-  assert.match(html, /<a class="ds-room-chip" href="\/books\?state=TX"/);
+  assert.match(html, /<a class="ds-room-chip" href="\/books\/browse\?state=TX"/);
   assert.match(html, /ds-room-num/);
   assert.doesNotMatch(html, /ds-books-edition__filter-chip/, 'the v6 chip class must not return');
 });
@@ -71,7 +69,7 @@ test('the browse sections build the shared HairlineIndex filters, not a bespoke 
 });
 
 test('no link on the catalog page points at /history or another redirect endpoint', () => {
-  for (const source of [pageSource, sectionsSource]) {
+  for (const source of [browsePageSource, sectionsSource]) {
     assert.doesNotMatch(source, /href=["'`]\/history/);
     assert.doesNotMatch(source, /href=["'`]\/explore/);
     assert.doesNotMatch(source, /href=["'`]\/locate/);
@@ -81,17 +79,16 @@ test('no link on the catalog page points at /history or another redirect endpoin
 });
 
 test('the unavailable-snapshot notice and the no-results empty state carry different copy', () => {
-  assert.match(pageSource, /Notice/);
-  assert.match(pageSource, /snapshot is unavailable/);
-  assert.doesNotMatch(pageSource, /No titles matched/);
-  // The narrowed-to-nothing copy lives in BooksBrowseSections/books-copy, not in the page's
-  // unavailable branch, so the two states cannot share a string by accident.
+  assert.match(indexSource, /permanentRedirect\('\/apparatus\?s=books'\)/);
+  assert.match(browsePageSource, /Notice/);
+  assert.match(browsePageSource, /snapshot is unavailable/);
+  assert.doesNotMatch(browsePageSource, /No titles matched/);
   assert.match(sectionsSource, /BOOKS_CATALOG\.emptyTitle/);
 });
 
 test('books-edition.css and books-panel-chrome.ts are gone', () => {
-  assert.doesNotMatch(pageSource, /books-edition\.css/);
-  assert.doesNotMatch(pageSource, /books-panel-chrome/);
+  assert.doesNotMatch(browsePageSource, /books-edition\.css/);
+  assert.doesNotMatch(browsePageSource, /books-panel-chrome/);
   assert.doesNotMatch(sectionsSource, /books-edition\.css/);
   assert.doesNotMatch(sectionsSource, /books-panel-chrome/);
 });

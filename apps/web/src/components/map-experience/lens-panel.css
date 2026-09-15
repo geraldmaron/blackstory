@@ -66,6 +66,17 @@
   background: var(--ds-canvas);
 }
 
+.ds-lens__hide:focus-visible {
+  outline: 2px solid var(--ds-accent-graphic);
+  outline-offset: 2px;
+}
+
+/* Modal sheet: focus lands on the dialog root; keep the ring visible without looking ornamental. */
+.ds-lens[data-modal='true']:focus-visible {
+  outline: 2px solid var(--ds-accent-graphic);
+  outline-offset: 2px;
+}
+
 /* ---- body ---------------------------------------------------------------- */
 
 .ds-lens__body {
@@ -444,7 +455,9 @@
     right: var(--ds-space-2);
     bottom: calc(var(--ds-space-2) + 66px);
     width: auto;
-    max-height: min(46dvh, 360px);
+    /* Full-width sheet: thumb-reachable, tall enough to operate filters without dual rails. */
+    max-height: min(70dvh, 520px);
+    border-radius: var(--ds-radius-md) var(--ds-radius-md) 0 0;
   }
 }
 

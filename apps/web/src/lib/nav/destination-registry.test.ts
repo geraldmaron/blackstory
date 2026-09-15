@@ -105,8 +105,8 @@ describe('destination registry · coverage', () => {
     // way back to a map selection is return state, not hierarchy.
     assert.equal(parentPathFor('/entity/tulsa-greenwood'), '/records');
     assert.equal(parentPathFor('/place/paul-laurence-dunbar-high-school'), '/records');
-    assert.equal(parentPathFor('/books/beloved'), '/books');
-    assert.equal(parentPathFor('/law/plessy'), '/law');
+    assert.equal(parentPathFor('/books/beloved'), '/books/browse');
+    assert.equal(parentPathFor('/law/plessy'), '/law/browse');
     assert.equal(parentPathFor('/stories/redlining'), '/stories');
     assert.equal(parentPathFor('/corrections/status/ABC123'), '/corrections');
   });
@@ -175,11 +175,11 @@ describe('destination registry · the footer is derived, not authored', () => {
     // what made Records read as a supporting page.
     assert.deepEqual(
       destinationsInGroup('read').map((destination) => destination.path),
-      ['/law', '/data', '/books', '/memorial'],
+      ['/memorial'],
     );
     assert.deepEqual(
       destinationsInGroup('check').map((destination) => destination.path),
-      ['/about', '/faq', '/methodology', '/errata'],
+      ['/apparatus', '/faq', '/errata'],
     );
     assert.deepEqual(
       destinationsInGroup('take-part').map((destination) => destination.path),
@@ -199,7 +199,7 @@ describe('destination registry · the footer is derived, not authored', () => {
     const hrefs = columns.flatMap((column) => column.items.map((item) => item.href));
     const palette = browsableDestinations().map((destination) => destination.path);
     assert.ok(hrefs.includes('/stories'));
-    assert.ok(hrefs.includes('/about'));
+    assert.ok(hrefs.includes('/apparatus'));
     assert.ok(hrefs.includes('/submit'));
     assert.ok(hrefs.includes('/explore'));
     assert.ok(hrefs.includes('/records'));
@@ -219,17 +219,16 @@ describe('destination registry · the footer is derived, not authored', () => {
     assert.equal(home.description, undefined);
     assert.equal(home.menuLine, undefined);
     const explore = destinationFor('/explore');
-    assert.equal(explore?.label, 'Explore');
+    assert.equal(explore?.label, 'Map');
     assert.equal(explore?.description, 'The map.');
   });
 
-  it('ships /books as a reading room, and never lists /banned-books', () => {
-    // `/books` was held off the walk in ab4c1231 while the room was unfinished. It has shipped
-    // since — it is in the shell bar, the sitemap and the Rooms menu — so holding it out of the
-    // room groups only meant two registries disagreed about the same route.
-    assert.equal(destinationFor('/books')?.group, 'read');
+  it('ships banned-books deep links without listing /banned-books', () => {
+    // `/books` 308s into the apparatus; browse tools live at `/books/browse`.
+    assert.equal(destinationFor('/books')?.browsable, false);
+    assert.equal(destinationFor('/books/browse')?.path, '/books/browse');
     const hrefs = footerColumns().flatMap((column) => column.items.map((item) => item.href));
-    assert.ok(hrefs.includes('/books'));
+    assert.ok(!hrefs.includes('/books'));
     assert.ok(!hrefs.includes('/banned-books'));
     assert.equal(destinationFor('/banned-books'), undefined);
   });

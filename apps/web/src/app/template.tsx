@@ -10,8 +10,8 @@
  * Nothing here crossfades the shared MapLibre canvas, and not because a rule suppresses it:
  * `MapStageProvider` wraps `.ds-shell`, so `.ds-map-stage` is a sibling of the shell and sits
  * outside this template's subtree entirely (`docs/decisions-carryover.md`, "Persistent map
- * canvas": the root shell owns the canvas). `/explore` emits `data-surface="instrument"`;
- * `/` is the reading Door, not the instrument.
+ * canvas": the root shell owns the canvas). `/` and `/explore` both emit `data-surface="door"`;
+ * browse is a Door posture, not a separate instrument surface class.
  */
 import type { ReactNode } from 'react';
 import { ShellPageTransition } from '../components/ShellPageTransition';

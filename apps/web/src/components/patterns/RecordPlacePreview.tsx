@@ -42,8 +42,12 @@ export type RecordPlacePreviewProps = {
   readonly accessibleName?: string;
   /** Place-page stand: pan/zoom the national locator. Rail and sheet slots stay static. */
   readonly interactive?: boolean;
-  /** Live Explore handoff when the locator is interactive. */
+  /** Open zoomed onto the pin (place hero), not the continental thumbnail. */
+  readonly neighborhood?: boolean;
+  /** Live map handoff when the locator is interactive. */
   readonly atlasHref?: string;
+  /** Catalog entity id for pin continuity across the map handoff. */
+  readonly entityId?: string;
 };
 
 export function RecordPlacePreview({
@@ -52,7 +56,9 @@ export function RecordPlacePreview({
   label,
   accessibleName,
   interactive = false,
+  neighborhood = false,
   atlasHref,
+  entityId,
 }: RecordPlacePreviewProps) {
   const sharedProps = {
     lat,
@@ -66,7 +72,9 @@ export function RecordPlacePreview({
       {interactive ? (
         <InteractiveRecordLocator
           {...sharedProps}
+          neighborhood={neighborhood}
           {...(atlasHref !== undefined ? { atlasHref } : {})}
+          {...(entityId !== undefined ? { entityId } : {})}
         />
       ) : (
         <RecordLocator {...sharedProps} />

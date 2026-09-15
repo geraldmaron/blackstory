@@ -82,7 +82,7 @@ export function BooksBrowseSections({ view, suggestCorpus, snapshot }: BooksBrow
 
   return (
     <div className="ds-room-idx" id="browse">
-      <form action="/books" method="get" role="search" className="ds-room-idx__bar">
+      <form action="/books/browse" method="get" role="search" className="ds-room-idx__bar">
         <BooksSearchTypeahead defaultValue={view.q} corpus={suggestCorpus} />
         <AutoSubmitSelect
           id="author"
@@ -94,7 +94,7 @@ export function BooksBrowseSections({ view, suggestCorpus, snapshot }: BooksBrow
         <input type="hidden" name="state" value={view.state} />
         <input type="hidden" name="sort" value={view.sort} />
         <input type="hidden" name="dir" value={view.dir} />
-        <Link className="ds-cta-link" href="/books">
+        <Link className="ds-cta-link" href="/books/browse">
           Clear
         </Link>
       </form>
@@ -129,7 +129,7 @@ export function BooksBrowseSections({ view, suggestCorpus, snapshot }: BooksBrow
           activeWords.length > 0 ? (
             <EmptyList title={BOOKS_CATALOG.emptyTitle}>
               Nothing in the catalog matches {activeWords.join(', ')}.{' '}
-              <Link href="/books">Clear every facet</Link> to see all {snapshot.books.length}{' '}
+              <Link href="/books/browse">Clear every facet</Link> to see all {snapshot.books.length}{' '}
               titles, or <Link href="/submit">tell us about a title we are missing</Link>.
             </EmptyList>
           ) : (

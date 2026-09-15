@@ -20,6 +20,7 @@ import {
   type MapSemanticTone,
 } from './kind-encoding';
 import type { ExploreMapBounds } from './url-state';
+import { isInternalRecordLabel } from '../place/public-place-path';
 
 /**
  * Resolves the effective controlled-taxonomy topic ids for a feature (the related workstream): prefers
@@ -320,9 +321,21 @@ export function sortFeaturesForList(
   features: readonly ExploreMapFeature[],
 ): readonly ExploreMapFeature[] {
   return [...features].sort((a, b) => {
+    const internalA = isInternalRecordLabel(a.properties.displayName) ? 1 : 0;
+    const internalB = isInternalRecordLabel(b.properties.displayName) ? 1 : 0;
+    if (internalA !== internalB) return internalA - internalB;
     const eraA = earliestEraYear(a);
     const eraB = earliestEraYear(b);
     if (eraA !== eraB) return eraA - eraB;
     return a.properties.displayName.localeCompare(b.properties.displayName);
   });
+}
+
+/** Public rail rows: opaque site codes stay off the leading discovery list. */
+export function publicFeaturesForList(
+  features: readonly ExploreMapFeature[],
+): readonly ExploreMapFeature[] {
+  return sortFeaturesForList(
+    features.filter((feature) => !isInternalRecordLabel(feature.properties.displayName)),
+  );
 }

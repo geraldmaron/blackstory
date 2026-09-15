@@ -14,7 +14,7 @@ import {
   LegalStatusBadge,
   humanizeLegalKind,
 } from '../../components/legal';
-import { GroupHeading, OffRamp, RecordNav, RoomHeader } from '../../components/room';
+import { GroupHeading, OffRamp, RecordNav, ReadingEntry } from '../../components/room';
 import type { RecordNavTarget } from '../../components/room';
 import { buildLensHandoff } from '../../lib/map-experience/lens-handoff';
 import { LawAnatomyStrip } from './LawAnatomyStrip';
@@ -167,7 +167,7 @@ export function LawDetailSections({ snapshot, explainer, previous, next }: LawDe
         title="Records in this jurisdiction and era"
         actions={[
           { label: 'See these records', href: recordsHandoff.href, emphasis: 'copper' },
-          { label: 'Methodology', href: '/methodology' },
+          { label: 'Methodology', href: '/apparatus?s=methodology' },
         ]}
       >
         {recordsHandoff.reason}
@@ -199,12 +199,11 @@ export function LawDetailIntro({ snapshot }: LawDetailIntroProps) {
        * without the plate rather than with a fabricated one." So there is no plate here, and
        * no placeholder rectangle standing in for one, until that join exists.
        */}
-      <RoomHeader
+      <ReadingEntry
         pathname={`/law/${snapshot.id}`}
         crumbLabel={snapshot.title}
-        kicker="Reference"
         title={snapshot.title}
-        showPath={false}
+        showCrumb={false}
       />
       <LawAnatomyStrip
         kind={snapshot.kind}

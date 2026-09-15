@@ -108,7 +108,7 @@
    handwriting mechanic, then rests as one paragraph, permanently. Does not
    fade with scroll (unlike ambient names — no --memorial-wall-fade here). */
 .ds-memorial-wall__message-field {
-  /* Anchored a fixed gap below the RoomHeader (see --memorial-message-top,
+  /* Anchored a fixed gap below the reading entry (see --memorial-message-top,
      set in MemorialWallAtmosphere.tsx) rather than centered at 50% of the
      viewport height: a viewport-percentage position drifts the message
      toward mid-screen on a tall monitor, opening a dead gap under the title.

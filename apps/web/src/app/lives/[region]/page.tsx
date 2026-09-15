@@ -15,7 +15,7 @@ import { loadLivesAreaBundle } from '../../../lib/lives/lives-source';
 import { LivesAreaNav } from '../../../components/lives/LivesAreaNav';
 import { LivesTimeline } from '../../../components/lives/LivesTimeline';
 import { LivesTimelineStatic } from '../../../components/lives/LivesTimelineStatic';
-import { Room, RoomHeader } from '../../../components/room';
+import { Room, ReadingEntry } from '../../../components/room';
 import '../../reading-room.css';
 import '../lives.css';
 
@@ -50,15 +50,13 @@ export default async function LivesAreaPage({ params }: LivesAreaPageProps) {
 
   return (
     <Room>
-      <RoomHeader
+      <ReadingEntry
         pathname={`/lives/${slug}`}
-        kicker="Lives across the decades"
         title={bundle.areaName}
         lede={
           area?.summary ??
           'Choose a group to emphasize and a class tier, then move through the decades.'
         }
-        meta={['1870s to 2020s', 'Published census tables', 'Laws from the catalog']}
       />
       <LivesAreaNav currentSlug={slug} />
       <Suspense fallback={<LivesTimelineStatic bundle={bundle} areaSlug={slug} />}>

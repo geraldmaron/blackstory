@@ -306,6 +306,11 @@ export type MapStageHandle = {
   /** Re-read container layout after external geometry changes (hero inset, panel open). */
   readonly resize: () => void;
   /**
+   * Door browse morph: force Live posture (reader-steered gestures) while the journey surface
+   * stays mounted on `/`. Clears back to the surface-class default when browse ends.
+   */
+  readonly setDoorBrowseLive: (live: boolean) => void;
+  /**
    * The live MapLibre map, or null before it starts and after it fails.
    *
    * Deliberately narrow: `camera-moves.ts` drives the plate through a structural `MapLike`, and
@@ -566,6 +571,14 @@ export function MapStageProvider({
   const [posture, setPosture] = useState<PlatePosture>(() =>
     defaultPostureFor(surfaceClassFor(pathname ?? '/')),
   );
+  /** Door in-place browse: Live gestures without leaving the Door route tree. */
+  const [doorBrowseLive, setDoorBrowseLiveState] = useState(false);
+  const doorBrowseLiveRef = useRef(false);
+  doorBrowseLiveRef.current = doorBrowseLive;
+  const setDoorBrowseLive = useCallback((live: boolean) => {
+    doorBrowseLiveRef.current = live;
+    setDoorBrowseLiveState(live);
+  }, []);
   /** The posture as of the last render, readable from the async mount path below. */
   const postureRef = useRef<PlatePosture>(posture);
   postureRef.current = posture;
@@ -1666,8 +1679,20 @@ export function MapStageProvider({
       heldSlotRef.current = null;
     }
     lastFramedMomentRef.current = null;
+    if (doorBrowseLiveRef.current) {
+      setPosture('live');
+      return;
+    }
     setPosture(defaultPostureFor(surfaceClass));
   }, [surfaceClass]);
+
+  useEffect(() => {
+    if (doorBrowseLive) {
+      setPosture('live');
+      return;
+    }
+    setPosture(defaultPostureFor(surfaceClass));
+  }, [doorBrowseLive, surfaceClass]);
 
   /**
    * Posture changes reach the gesture handlers directly. The Framed path below does the same
@@ -1840,6 +1865,7 @@ export function MapStageProvider({
         ensureMap();
         resize();
       },
+      setDoorBrowseLive,
       getMap: () => {
         ensureMap();
         return getMap();
@@ -1855,6 +1881,7 @@ export function MapStageProvider({
       setSearchCenterMarker,
       clearSearchCenterMarker,
       resize,
+      setDoorBrowseLive,
       getMap,
     ],
   );

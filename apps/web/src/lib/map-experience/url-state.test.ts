@@ -12,7 +12,7 @@ import {
   viewportForState,
 } from './url-state';
 
-test('an empty explore state links to /explore, which still mounts the instrument', () => {
+test('an empty explore state links to /explore, the Door browse deep link', () => {
   assert.equal(
     buildExploreHref({
       filters: {

@@ -117,25 +117,22 @@ Relative imports from `apps/web/src` use the paths above without the `@/` alias 
 
 | Surface | Patterns used |
 |---|---|
-| `/` home edition | `CinematicMapProvider`, `useCinematicMap`, `ExploreMapControl`, `CinematicScrim`, `MapIntroBeat` (Rest → Invite → Engaged); `RecordBrowseControls`, `EditionFactIcon`, `RecordAnatomyPanel`, `home-featured-set`, `browse-mode` helpers |
-| `HomeFeaturedRecord` | `RecordBrowseControls`, `RecordAnatomyPanel` |
-| `HomeAbout` | `EditionFactIcon` (entry steps) |
-| `/explore` spotlight + instruments | `RecordBrowseControls`, `BrowseModeToggle`, `EditionFactIcon`, edition segmented tabs (`explore-edition.css`), decade stepper rail |
-| `/explore` `NarrativeCard` | `RecordAnatomyPanel`, `RecordBrowseControls` browse toolbar |
-| `/explore` shell | Footer omitted by design; other routes use [`patterns-site-footer.md`](./patterns-site-footer.md) |
-| `/history` find-in-time | Explore decade scrubber classes, `HistoryRipRow`, `EditionFactIcon`, edition Surface panels |
-| `/chapters`, `/chapters/[slug]` | `ArticleBody`, `ArticleProse`, `ArticleReferences`, `MapInsetMoment`, `EraTimeline`, `DisputeBlock`, theme-impact charts, `articles-edition.css` |
-| `/chapters/mosaic-credits` | v6 stories edition chrome, local to that folder (`stories-edition.css`, `stories-panel-chrome.ts`) |
-| `/about` product thesis | edition Surface panels (`about-edition.css`) |
-| `/books` challenged titles | `BooksRipRow`, `EditionFactIcon`, `BooksCoverArt`, `RecordAnatomyPanel` (detail place), `books-edition.css` |
-| `/law`, `/data`, `/methodology`, `/memorial` | edition Surface panels |
-| `/entity/[id]` record detail | `RecordAnatomyPanel`, `EditionFactIcon`, `EntityMastMedia` fail-closed, session nav; `CinematicMapProvider`, `useCinematicMap`, `ExploreMapControl`, `CinematicMapClose`, `CinematicScrim` around the place-context locator map (`EntityLocationCinematicMap`, Rest → Engaged, no Invite) |
-| `/locate`, `/submit`, `/corrections`, `/corrections/status/[receiptCode]`, 404, error | `UtilityEditionShell`, `UtilityEditionIntro`, `UtilityEditionBodyPanel`, `UtilityEditionErrorView` |
-| `/search` | Redirect only, to `/history`, per the `next.config.mjs` rule |
+| `/` Door journey | Door immersive chapters + pin plate; Field posture. **Browse** morphs in place to filters on the same MapStage. |
+| `/explore` | Browse posture deep link (`/explore?…`). Cold load lands armed. `/explore/api` stays. |
+| `/records` | Sequenced discovery list + OrientationInstrument |
+| `/stories`, `/stories/[slug]` | Reading posture; long-form chapters and short entries |
+| `/place/*`, `/invention/*` | Record posture: photo or neighborhood-zoom map hero; evidence at display scale |
+| `/apparatus` | Single apparatus room: About + Methodology inlined; Data/Law/Books chapters deep-link to browse URLs |
+| `/about`, `/methodology` | 308 into `/apparatus?s=…` |
+| `/data`, `/law`, `/books` | Interactive browse surfaces; also chapters of `/apparatus` |
+| `/memorial` | Immutable memorial wall (P-01); ReadingEntry over the wall |
+| `/privacy`, `/terms`, `/corrections`, `/submit`, `/support`, `/locate`, `/errata` | Quiet supporting cast; Reading posture |
+| `/search`, `/history`, `/facts` | Redirect into `/records` (query mapped) |
+| `/chapters`, `/library`, `/themes`, `/map` | Permanent redirects (`/stories`, `/rooms`, `/stories`, `/`) — not live surfaces |
 
-`app/stories` and `app/themes` no longer exist. Both folded into `app/chapters`, and their design docs are provenance only. See [`design-direction-v9-chapters.md`](./design-direction-v9-chapters.md).
+`app/stories` and `app/themes` both exist: `/stories` is the live long-form index; `/themes` is a redirect into it. Do not cite `app/chapters` as the publication surface.
 
-**Cinematic map backdrop** adoption status: `/` home shipped (Rest → Invite → Engaged); mobile Explore tab shipped (Rest → Engaged, reference implementation); `/explore` shipped (Rest → Engaged, dense surface); `/entity/[id]` place-context locator shipped (Rest → Engaged, supplementary-surface shape, no auto-engage or Invite because the map sits inside other record content rather than being the page's point). See [`patterns-cinematic-map.md`](./patterns-cinematic-map.md) §1.
+**Cinematic map backdrop** adoption status: `/` home shipped (Rest → Invite → Engaged); mobile Explore tab shipped (Rest → Engaged, reference implementation); `/explore` shipped as map-focus posture (Rest → Engaged, dense surface); `/entity/[id]` place-context locator shipped (Rest → Engaged, supplementary-surface shape, no auto-engage or Invite because the map sits inside other record content rather than being the page's point). See [`patterns-cinematic-map.md`](./patterns-cinematic-map.md) §1.
 
 **On web this pattern is being replaced.** v9 gives every non-instrument surface a Framed or Parked plate borrowed from the single persistent `MapStage`, which removes the second MapLibre instance the backdrop mounts on `/entity/[id]` and inside chapter map moments. The mobile adoption is unaffected. See [`patterns-plate-posture.md`](./patterns-plate-posture.md).
 

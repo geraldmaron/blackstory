@@ -5,7 +5,7 @@
  */
 import type { Metadata } from 'next';
 import { buildStaticPageMetadata } from '../../lib/seo/metadata-builders';
-import { Room, RoomHeader } from '../../components/room';
+import { Room, ReadingEntry } from '../../components/room';
 import { WalkOffRamp } from '../walk-off-ramp';
 import '../utility.css';
 import { TermsSections } from './TermsSections';
@@ -20,9 +20,8 @@ export const metadata: Metadata = buildStaticPageMetadata({
 export default function TermsPage() {
   return (
     <Room>
-      <RoomHeader
+      <ReadingEntry
         pathname="/terms"
-        kicker="Trust"
         title="Terms"
         lede="A notice, not a contract. Reading BlackStory asks nothing of you, so nothing here is written as a bargain: it states what the archive publishes, what you may do with it, and what happens when it gets something wrong."
       />

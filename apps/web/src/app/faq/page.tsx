@@ -2,7 +2,7 @@
  * `/faq` — the questions a stranger asks before deciding whether to trust this.
  *
  * Rendered through the v9 room kit on the reading-room surface, the same build as `/about` and
- * `/methodology`: `Room` for the column, `RoomHeader` for the mast, `GroupHeading` per section,
+ * `/methodology`: `Room` for the column, `ReadingEntry` for the mast, `GroupHeading` per section,
  * `Prose` for the answers, `WalkOffRamp` at the foot. No page-local stylesheet: the questions are
  * `h3` and the answers are paragraphs, both of which `room-kit.css` already styles inside `Prose`,
  * and a new `faq.css` would only restyle what the kit hands over.
@@ -21,7 +21,7 @@ import React from 'react';
 import Link from 'next/link';
 import { buildStaticPageMetadata } from '../../lib/seo/metadata-builders';
 import { WalkOffRamp } from '../walk-off-ramp';
-import { GroupHeading, Prose, Room, RoomHeader } from '../../components/room';
+import { GroupHeading, Prose, Room, ReadingEntry } from '../../components/room';
 import { FAQ_LEDE, FAQ_SECTIONS } from './faq-copy';
 import '../reading-room.css';
 
@@ -43,16 +43,15 @@ function FaqLinkRow({ href, label }: { readonly href: string; readonly label: st
 export default function FaqPage() {
   return (
     <Room>
-      <RoomHeader
+      <ReadingEntry
         pathname="/faq"
-        kicker="Questions"
         title={
           <>
             The questions people actually <em>ask</em>.
           </>
         }
         lede={FAQ_LEDE}
-        showPath={false}
+        showCrumb={false}
       />
 
       <nav aria-labelledby="faq-contents-title">

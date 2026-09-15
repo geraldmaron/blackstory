@@ -19,7 +19,7 @@ import {
 const plain: ToastSpec = { id: 'saved', message: 'Saved to your list.' };
 const actionable: ToastSpec = {
   id: 'lens-reset',
-  message: 'Lens reset.',
+  message: 'Filters reset.',
   action: { label: 'Undo', run: () => {} },
 };
 

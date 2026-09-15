@@ -62,7 +62,9 @@ export function usePanelVisibility() {
     lens: true,
     results: true,
     decade: true,
-    camera: true,
+    // Camera console stays behind an explicit restore; landing with every copper instrument
+    // open made Explore feel like a second cockpit (plan.md decision 3).
+    camera: false,
   });
   const [narrow, setNarrow] = useState(false);
   const [bothColumns, setBothColumns] = useState(false);
@@ -75,12 +77,13 @@ export function usePanelVisibility() {
       const isNarrow = query.matches;
       setNarrow(isNarrow);
       setBothColumns(wideQuery.matches);
-      setPanels({
+      setPanels((current) => ({
         lens: true,
         results: !isNarrow,
         decade: !isNarrow,
-        camera: !isNarrow,
-      });
+        // Preserve an explicit reader open; otherwise stay closed at rest.
+        camera: isNarrow ? false : current.camera,
+      }));
     };
     sync();
     query.addEventListener('change', sync);

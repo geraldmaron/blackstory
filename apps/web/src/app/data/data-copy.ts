@@ -77,6 +77,6 @@ export const DATA_READING_RULES = [
 
 /** Where the reading rules send a reader who wants the full argument. */
 export const DATA_READING_LINKS = [
-  { href: '/methodology', label: 'Methodology' },
+  { href: '/apparatus?s=methodology', label: 'Methodology' },
   { href: '/stories', label: 'Stories that use these numbers' },
 ] as const;

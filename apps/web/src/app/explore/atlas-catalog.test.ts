@@ -77,7 +77,8 @@ test('the Explore page never puts the catalog back in the initial prop', async (
   const { readFileSync } = await import('node:fs');
   const pageSource = readFileSync(new URL('../page.tsx', import.meta.url), 'utf8');
   const explorePage = readFileSync(new URL('./page.tsx', import.meta.url), 'utf8');
-  const atlasHome = readFileSync(new URL('../atlas-home.tsx', import.meta.url), 'utf8');
+  const doorHome = readFileSync(new URL('../door-home.tsx', import.meta.url), 'utf8');
+  const immersive = readFileSync(new URL('../door-immersive.tsx', import.meta.url), 'utf8');
   const pageImports = pageSource
     .split('\n')
     .filter((line) => line.startsWith('import '))
@@ -88,14 +89,14 @@ test('the Explore page never puts the catalog back in the initial prop', async (
   assert.match(pageImports, /DoorHome/);
   assert.match(pageSource, /DoorHome/);
   assert.doesNotMatch(pageSource, /AtlasHome/);
-  assert.match(explorePage, /AtlasHome/);
-  assert.match(atlasHome, /AtlasLoader/);
-  assert.match(atlasHome, /toFirstPaintPins/);
-  assert.match(atlasHome, /FirstPaintPinPlate/);
-  assert.match(atlasHome, /ExploreMapUnderlay/);
-  assert.doesNotMatch(atlasHome, /Opening the map/);
-  assert.doesNotMatch(atlasHome, /ds-explore__walks/);
-  assert.doesNotMatch(atlasHome, /pins=\{\{ type: 'FeatureCollection'/);
+  assert.match(explorePage, /DoorHome/);
+  assert.match(explorePage, /initialBrowse/);
+  assert.doesNotMatch(explorePage, /AtlasHome/);
+  assert.match(doorHome, /buildAtlasShell/);
+  assert.match(immersive, /AtlasLoader/);
+  assert.match(immersive, /embedded/);
+  assert.doesNotMatch(doorHome, /Opening the map/);
+  assert.doesNotMatch(doorHome, /ds-explore__walks/);
 });
 
 test('first-paint catalog is the pin collection, not the history edge catalog', () => {

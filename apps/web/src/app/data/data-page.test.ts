@@ -1,6 +1,6 @@
 /**
- * `/data` wiring: the room kit draws the room, every chart still renders, every section keeps
- * its anchor, and the copy stays in the archive's voice.
+ * `/data` wiring: the ledger now lives in `/apparatus#data`. This route 308s there; chart
+ * sections and copy stay covered here so the apparatus composition cannot lose them.
  */
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
@@ -21,6 +21,8 @@ const here = dirname(fileURLToPath(import.meta.url));
 const pageSource = readFileSync(join(here, 'page.tsx'), 'utf8');
 const sectionsSource = readFileSync(join(here, 'DataSections.tsx'), 'utf8');
 const copySource = readFileSync(join(here, 'data-copy.ts'), 'utf8');
+const apparatusSource = readFileSync(join(here, '../apparatus/page.tsx'), 'utf8');
+const loaderSource = readFileSync(join(here, 'load-data-page-model.ts'), 'utf8');
 
 const allCopy = [
   DATA_PAGE_DESCRIPTION,
@@ -36,24 +38,24 @@ const allCopy = [
   ...DATA_PAGE_SECTIONS.map((section) => section.label),
 ];
 
-test('data page renders through the room kit, with no edition chrome left', () => {
-  assert.doesNotMatch(pageSource, /EditionAtmosphereMosaic|DATA_EDITION_MOSAIC_SEED/);
-  assert.doesNotMatch(pageSource, /dataEditionRootClassName/);
-  assert.match(pageSource, /from '\.\.\/\.\.\/components\/room'/);
-  assert.match(pageSource, /<Room>/);
-  assert.match(pageSource, /<RoomHeader/);
-  assert.doesNotMatch(pageSource, /ds-page__title/);
-  // The section panels are gone. A figure is framed by a rule, not a box inside a box.
-  assert.doesNotMatch(sectionsSource, /UtilityCard|ds-data-edition/);
+test('data index 308s into the apparatus Data section', () => {
+  assert.match(pageSource, /permanentRedirect\('\/apparatus\?s=data'\)/);
 });
 
-test('data page preserves census and indicator chart wiring', () => {
+test('apparatus inlines DataSections through the shared loader', () => {
+  assert.match(apparatusSource, /loadDataPageModel/);
+  assert.match(apparatusSource, /<DataSections/);
+  assert.match(loaderSource, /export async function loadDataPageModel/);
+});
+
+test('data sections keep census and indicator chart wiring', () => {
   assert.match(sectionsSource, /PopulationByDecadeChart/);
   assert.match(sectionsSource, /BlackPopulationShareChart/);
   assert.match(sectionsSource, /RacePairComparisonChart/);
   assert.match(sectionsSource, /GroupedBarIndicatorChart/);
   assert.match(sectionsSource, /StatePopulationShiftChart/);
   assert.match(sectionsSource, /TrendLineChart/);
+  assert.doesNotMatch(sectionsSource, /UtilityCard|ds-data-edition/);
 });
 
 test('data page keeps section anchors for the section rail', () => {
@@ -70,7 +72,7 @@ test('the headline band links into the figures it summarizes', () => {
     '#housing-ownership',
     '#justice-imprisonment',
   ]) {
-    assert.match(pageSource, new RegExp(anchor));
+    assert.match(loaderSource, new RegExp(anchor));
     const id = anchor.slice(1);
     assert.match(sectionsSource, new RegExp(`id="${id}"`), `no figure carries ${anchor}`);
   }
@@ -83,8 +85,6 @@ test('data user-facing copy does not leak internal vocabulary', () => {
   for (const source of [copySource, pageSource, sectionsSource]) {
     assert.doesNotMatch(source, /Phase 1|warehouse|fixture-backed/i);
   }
-  // The counted breakdown of the archive is not a figure here, and the page does not send a
-  // reader to the record list to find one.
   assert.doesNotMatch(sectionsSource, /href="\/explore"|href="\/records"/);
   assert.doesNotMatch(sectionsSource, /Mosaic credits|ATMOSPHERE_ATTRIBUTION|mosaic-credits/);
 });

@@ -9,32 +9,35 @@ import { fileURLToPath } from 'node:url';
 import { LAW_EDITION_BROWSE_LEDE } from './law-copy';
 
 const here = dirname(fileURLToPath(import.meta.url));
-const browsePageSource = readFileSync(join(here, 'page.tsx'), 'utf8');
+const browsePageSource = readFileSync(join(here, 'browse', 'page.tsx'), 'utf8');
+const indexPageSource = readFileSync(join(here, 'page.tsx'), 'utf8');
 const browseSectionsSource = readFileSync(join(here, 'LawBrowseSections.tsx'), 'utf8');
 const detailPageSource = readFileSync(join(here, '[slug]', 'page.tsx'), 'utf8');
 const detailSectionsSource = readFileSync(join(here, 'LawDetailSections.tsx'), 'utf8');
 const anatomySource = readFileSync(join(here, 'LawAnatomyStrip.tsx'), 'utf8');
+const apparatusSource = readFileSync(join(here, '../apparatus/page.tsx'), 'utf8');
 
-test('law browse page renders through the room kit, with no edition chrome left', () => {
+test('law index 308s into apparatus; browse tools keep the room kit', () => {
+  assert.match(indexPageSource, /permanentRedirect\('\/apparatus\?s=law'\)/);
+  assert.match(apparatusSource, /LawApparatusSections/);
   assert.doesNotMatch(browsePageSource, /EditionAtmosphereMosaic/);
   assert.doesNotMatch(browsePageSource, /LAW_EDITION_MOSAIC_SEED/);
-  // `data-law-edition="v6"` marked the per-route chrome the shared kit replaces.
   assert.doesNotMatch(browsePageSource, /data-law-edition="v6"/);
-  assert.match(browsePageSource, /from '\.\.\/\.\.\/components\/room'/);
+  assert.match(browsePageSource, /from '\.\.\/\.\.\/\.\.\/components\/room'/);
   assert.match(browsePageSource, /<Room>/);
   assert.doesNotMatch(browsePageSource, /\/explore/);
-  assert.match(browsePageSource, /<RoomHeader/);
+  assert.match(browsePageSource, /<ReadingEntry/);
   assert.doesNotMatch(browsePageSource, /ds-page__title/);
 });
 
-test('law browse preserves GET URL contract', () => {
+test('law browse preserves GET URL contract at /law/browse', () => {
   assert.match(browseSectionsSource, /method="get"/);
-  assert.match(browseSectionsSource, /action="\/law"/);
+  assert.match(browseSectionsSource, /action="\/law\/browse"/);
   assert.match(browseSectionsSource, /name="q"/);
   assert.match(browseSectionsSource, /name="kind"/);
   assert.match(browseSectionsSource, /name="topic"/);
   assert.match(browseSectionsSource, /name="sort"/);
-  assert.match(browseSectionsSource, /href="\/law"/);
+  assert.match(browseSectionsSource, /href="\/law\/browse"/);
 });
 
 test('every rendered browse control is in the edge param allowlist', async () => {
@@ -85,7 +88,7 @@ test('law detail page renders through the room kit, with no edition chrome left'
   assert.match(detailPageSource, /<Room>/);
   assert.doesNotMatch(detailSectionsSource, /law-panel-chrome/);
   assert.doesNotMatch(detailSectionsSource, /ds-law-edition__panel/);
-  assert.match(detailSectionsSource, /<RoomHeader/);
+  assert.match(detailSectionsSource, /<ReadingEntry/);
 });
 
 test('law browse lede preserved without em dashes', () => {

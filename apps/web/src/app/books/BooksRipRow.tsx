@@ -59,7 +59,7 @@ function stateFactValue(
           {index > 0 ? ' ' : null}
           <Link
             className="ds-books-edition__rip-fact-link"
-            href={`/books?state=${encodeURIComponent(state.code)}&sort=${sort}&dir=${dir}`}
+            href={`/books/browse?state=${encodeURIComponent(state.code)}&sort=${sort}&dir=${dir}`}
             title={state.name}
           >
             <span className="ds-visually-hidden">{state.name} </span>

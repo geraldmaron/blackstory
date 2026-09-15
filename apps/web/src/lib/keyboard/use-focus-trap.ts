@@ -79,6 +79,11 @@ export type FocusTrapOptions = {
    * behind it. See `inertOutside` for why "outside" cannot mean "my siblings".
    */
   readonly overlayRef?: RefObject<HTMLElement | null>;
+  /**
+   * Elements that must stay operable while the dialog is open (instrument docks, command bar,
+   * browse exit). Matched with `Element.matches`. Defaults to none.
+   */
+  readonly inertExempt?: string;
 };
 
 /**
@@ -93,14 +98,21 @@ export type FocusTrapOptions = {
  *
  * Elements already inert are left out of the returned list, so an inner overlay closing cannot
  * un-inert the stage an outer one is still covering.
+ *
+ * `exemptSelector` keeps map-browse chrome clickable: the Filters sheet used to inert its own
+ * dock chip and the Door's "Back to journey" control, so both painted and did nothing.
  */
-export function inertOutside(overlay: HTMLElement): readonly HTMLElement[] {
+export function inertOutside(
+  overlay: HTMLElement,
+  exemptSelector?: string,
+): readonly HTMLElement[] {
   const changed: HTMLElement[] = [];
   let node: HTMLElement = overlay;
   while (node.parentElement && node !== document.body) {
     for (const sibling of node.parentElement.children) {
       if (sibling === node) continue;
       if (!(sibling instanceof HTMLElement) || sibling.inert) continue;
+      if (exemptSelector && sibling.matches(exemptSelector)) continue;
       sibling.inert = true;
       changed.push(sibling);
     }
@@ -121,7 +133,7 @@ export function useFocusTrap(
   active: boolean,
   options: FocusTrapOptions = {},
 ): void {
-  const { overlayRef } = options;
+  const { overlayRef, inertExempt } = options;
 
   useEffect(() => {
     if (!active) return;
@@ -129,7 +141,7 @@ export function useFocusTrap(
     if (!container) return;
 
     const overlay = overlayRef?.current ?? null;
-    const inerted = overlay ? inertOutside(overlay) : [];
+    const inerted = overlay ? inertOutside(overlay, inertExempt) : [];
 
     const onKeyDown = (event: KeyboardEvent) => {
       if (event.key !== 'Tab') return;
@@ -148,5 +160,5 @@ export function useFocusTrap(
       document.removeEventListener('keydown', onKeyDown, true);
       for (const element of inerted) element.inert = false;
     };
-  }, [active, containerRef, overlayRef]);
+  }, [active, containerRef, overlayRef, inertExempt]);
 }

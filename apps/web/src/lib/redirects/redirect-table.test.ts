@@ -127,7 +127,7 @@ test('every folded path reaches its surface in exactly one hop', () => {
     ['/myths', '/stories'],
     ['/myths/anything', '/stories'],
     ['/legal', '/law'],
-    ['/map', '/explore'],
+    ['/map', '/'],
     ['/locate', '/explore'],
   ] as const;
 
@@ -152,13 +152,13 @@ test('/locate folds into the Atlas place finder, carrying the focus-instruction 
   assert.equal(rule?.permanent, true);
 });
 
-test('/map lands on the Explore instrument; /explore renders it', () => {
+test('/map lands on the Door journey; /explore stays the map-focus instrument', () => {
   const map = RULES.find((entry) => entry.source === '/map');
   const explore = RULES.find((entry) => entry.source === '/explore');
   assert.ok(map, '/map must have a config rule');
-  assert.equal(map?.destination, '/explore');
+  assert.equal(map?.destination, '/');
   assert.equal(map?.permanent, true);
-  assert.equal(explore, undefined, '/explore is the instrument, not a redirect');
+  assert.equal(explore, undefined, '/explore must not 308 (Chrome RSC cache hazard)');
 });
 
 test('the /explore rule is the exact path, so /explore/api keeps answering', () => {

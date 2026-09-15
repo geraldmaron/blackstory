@@ -8,7 +8,16 @@
  */
 
 export { Room, type RoomProps } from './Room';
-export { RoomHeader, type RoomHeaderProps } from './RoomHeader';
+export {
+  ReadingEntry,
+  DocumentColophon,
+  OrientationInstrument,
+  type EntryPosture,
+  type ReadingEntryProps,
+  type DocumentColophonProps,
+  type OrientationInstrumentProps,
+  type OrientationMove,
+} from './EntryPosture';
 export { RailGroup, type RailGroupProps, type RailEntry } from './RoomRail';
 export { Breadcrumb, type BreadcrumbProps } from './Breadcrumb';
 export { resolveTrail, roomLabelFor, type RoomCrumb } from './room-trail';

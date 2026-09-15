@@ -42,7 +42,7 @@ export function AdminPageFooter({ signedIn = false }: AdminPageFooterProps) {
               </>
             ) : null}
             <li>
-              <Link href="/explore">Explore</Link>
+              <Link href="/">Map</Link>
             </li>
             <li>
               <Link href="/stories">Public stories</Link>

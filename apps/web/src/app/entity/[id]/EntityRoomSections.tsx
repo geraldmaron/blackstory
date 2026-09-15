@@ -313,20 +313,11 @@ export function EntityRoomSections({
     ? firstPaintRelatedHeading(entity.relatedNeighbors ?? [])
     : 'Records this one touches';
 
-  // Running index over the beats that actually render, in document order.
-  let beat = 0;
-  const nextIndex = (): string => String(++beat).padStart(2, '0');
-
   return (
     <>
       {hasContext ? (
         <section className="ds-record-beat" aria-labelledby="context-heading">
-          <RecordBeatHead
-            id="context-heading"
-            index={nextIndex()}
-            icon="context"
-            title="The history here"
-          />
+          <RecordBeatHead id="context-heading" icon="context" title="The history here" />
           <div className="ds-room-prose">
             {entity.historicalContext
               .split(/\n\s*\n/)
@@ -358,12 +349,7 @@ export function EntityRoomSections({
       */}
       {entity.impactStatement ? (
         <section className="ds-record-beat" aria-labelledby="impact-heading">
-          <RecordBeatHead
-            id="impact-heading"
-            index={nextIndex()}
-            icon="context"
-            title="What it changed"
-          />
+          <RecordBeatHead id="impact-heading" icon="context" title="What it changed" />
           <div className="ds-room-prose">
             {entity.impactStatement
               .split(/\n\s*\n/)
@@ -382,12 +368,7 @@ export function EntityRoomSections({
 
       {entity.extendedNarrative ? (
         <section className="ds-record-beat" aria-labelledby="further-heading">
-          <RecordBeatHead
-            id="further-heading"
-            index={nextIndex()}
-            icon="further"
-            title="Further reading"
-          />
+          <RecordBeatHead id="further-heading" icon="further" title="Further reading" />
           <div className="ds-room-prose">
             <p>{entity.extendedNarrative}</p>
           </div>
@@ -398,7 +379,6 @@ export function EntityRoomSections({
         <section className="ds-record-beat" id="accepted-claims" aria-labelledby="claims-heading">
           <RecordBeatHead
             id="claims-heading"
-            index={nextIndex()}
             icon="claims"
             title="What the sources say"
             count={evidenceClaims.length}
@@ -422,7 +402,6 @@ export function EntityRoomSections({
         <section className="ds-record-beat" aria-labelledby="status-heading">
           <RecordBeatHead
             id="status-heading"
-            index={nextIndex()}
             icon="status"
             title={entity.kind === 'event' ? 'When this happened' : 'Status and history'}
           />
@@ -434,7 +413,6 @@ export function EntityRoomSections({
         <section className="ds-record-beat" aria-labelledby="timeline-heading">
           <RecordBeatHead
             id="timeline-heading"
-            index={nextIndex()}
             icon="timeline"
             title="Timeline"
             count={entity.timeline.length}
@@ -447,7 +425,6 @@ export function EntityRoomSections({
         <section className="ds-record-beat" aria-labelledby="related-heading">
           <RecordBeatHead
             id="related-heading"
-            index={nextIndex()}
             icon="related"
             title={firstPaint ? 'How this place connects' : 'How this record connects'}
             count={treeGraph.nodes.length}
@@ -464,7 +441,6 @@ export function EntityRoomSections({
             <section className="ds-record-beat" aria-labelledby="related-heading">
               <RecordBeatHead
                 id="related-heading"
-                index={nextIndex()}
                 icon="related"
                 title={relatedHeading}
                 count={connections.length}
@@ -478,7 +454,6 @@ export function EntityRoomSections({
             <section className="ds-record-beat" aria-labelledby="continue-heading">
               <RecordBeatHead
                 id="continue-heading"
-                index={nextIndex()}
                 icon="continue"
                 title="Worth investigating next"
                 count={continueLearning.length}
@@ -494,7 +469,6 @@ export function EntityRoomSections({
         <section className="ds-record-beat" aria-labelledby="appears-in-heading">
           <RecordBeatHead
             id="appears-in-heading"
-            index={nextIndex()}
             icon="appears"
             title="Where this record is written about"
             count={crossReferences.length}

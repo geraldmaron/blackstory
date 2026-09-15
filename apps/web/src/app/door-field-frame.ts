@@ -68,6 +68,7 @@ export function doorFramePadding(
   window: DoorFrameBox,
   plate: DoorFrameBox,
   chrome: DoorFrameBox | null = null,
+  bottomChrome: DoorFrameBox | null = null,
 ): DoorFramePadding | null {
   if (!isPaintable(window) || !isPaintable(plate)) return null;
   const margin = doorFrameMargin(window);
@@ -75,11 +76,19 @@ export function doorFramePadding(
     chrome !== null && isPaintable(chrome)
       ? Math.max(0, chrome.top + chrome.height - window.top)
       : 0;
+  // Opening masthead (and any future bottom sheet) occupies the lower window; fit CONUS above it.
+  const bottomBand =
+    bottomChrome !== null && isPaintable(bottomChrome)
+      ? Math.max(0, window.top + window.height - bottomChrome.top)
+      : 0;
   const padding = {
     top: Math.max(0, window.top - plate.top + chromeBand + margin),
     left: Math.max(0, window.left - plate.left + margin),
     right: Math.max(0, plate.left + plate.width - (window.left + window.width) + margin),
-    bottom: Math.max(0, plate.top + plate.height - (window.top + window.height) + margin),
+    bottom: Math.max(
+      0,
+      plate.top + plate.height - (window.top + window.height) + bottomBand + margin,
+    ),
   };
   if (
     plate.width - padding.left - padding.right < DOOR_FRAME_MIN_BOX_PX ||

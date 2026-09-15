@@ -10,7 +10,7 @@ import type { Metadata } from 'next';
 import React from 'react';
 import Link from 'next/link';
 import { buildStaticPageMetadata } from '../../lib/seo/metadata-builders';
-import { Room, RoomHeader, Prose, CardGrid, RoomCard, UtilityCard } from '../../components/room';
+import { Room, ReadingEntry, Prose, CardGrid, RoomCard, UtilityCard } from '../../components/room';
 import { WalkOffRamp } from '../walk-off-ramp';
 import { SUPPORT_CONTACT } from '../../lib/config/contact';
 import '../utility.css';
@@ -48,12 +48,11 @@ const SUPPORT_PATHS = [
 export default function SupportPage() {
   return (
     <Room>
-      <RoomHeader
+      <ReadingEntry
         pathname="/support"
-        kicker="Help"
         title="Support"
         lede="BlackStory is one person's archive of Black history, tied to the places it happened. If something in a record is wrong, corrections is the fastest way in: it is moderated, it gives you a receipt code, and nothing is published as submitted."
-        showPath={false}
+        showCrumb={false}
       />
 
       <UtilityCard className="ds-support__section-paths">

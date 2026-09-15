@@ -272,7 +272,112 @@
   color: var(--room-ink-3);
 }
 
-/* —— RoomHeader: every room in every class starts with this and nothing else —— */
+/* —— Entry postures (Field / Record / Reading). Reading is the kit masthead below. —— */
+.ds-entry--reading {
+  margin-bottom: var(--ds-section-sm);
+}
+
+.ds-entry__title {
+  font-family: var(--ds-font-display);
+  font-weight: 600;
+  font-size: var(--ds-text-display-1);
+  line-height: var(--ds-leading-display);
+  letter-spacing: var(--ds-tracking-display);
+  min-width: 0;
+  overflow-wrap: break-word;
+}
+
+.ds-entry__title em {
+  font-family: var(--ds-font-editorial);
+  font-style: italic;
+  font-weight: 400;
+  color: var(--ds-accent);
+}
+
+.ds-entry__lede {
+  margin-top: var(--ds-space-4);
+  max-width: 38rem;
+  font-family: var(--ds-font-editorial);
+  font-size: var(--ds-text-editorial-lede);
+  line-height: var(--ds-leading-editorial);
+  color: var(--ds-ink-muted);
+}
+
+.ds-entry-colophon {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--ds-space-2) var(--ds-space-4);
+  margin-top: var(--ds-section-sm);
+  padding-top: var(--ds-space-4);
+  border-top: var(--ds-border-width) solid var(--ds-rule);
+  font-family: var(--ds-font-mono);
+  font-size: var(--ds-text-micro);
+  letter-spacing: var(--ds-tracking-mono);
+  color: var(--ds-ink-muted);
+}
+
+.ds-orientation {
+  padding: var(--ds-space-4) 0;
+}
+
+.ds-orientation__where {
+  margin: 0 0 var(--ds-space-2);
+  font-family: var(--ds-font-display);
+  font-size: var(--ds-text-title);
+  line-height: var(--ds-leading-title);
+  letter-spacing: var(--ds-tracking-title);
+}
+
+.ds-orientation__era {
+  margin: 0 0 var(--ds-space-4);
+  font-family: var(--ds-font-mono);
+  font-size: var(--ds-text-caption);
+  letter-spacing: var(--ds-tracking-mono);
+  color: var(--ds-ink-muted);
+}
+
+.ds-orientation__moves {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--ds-space-3);
+}
+
+.ds-orientation__link {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  text-decoration: none;
+  color: inherit;
+}
+
+.ds-orientation__link:hover .ds-orientation__label,
+.ds-orientation__link:focus-visible .ds-orientation__label {
+  color: var(--ds-accent);
+}
+
+.ds-orientation__link:focus-visible {
+  outline: var(--ds-focus-width) solid var(--ds-focus-ring);
+  outline-offset: var(--ds-focus-offset);
+}
+
+.ds-orientation__label {
+  font-family: var(--ds-font-sans);
+  font-size: var(--ds-text-body-sm);
+  font-weight: 500;
+}
+
+.ds-orientation__note {
+  font-family: var(--ds-font-mono);
+  font-size: var(--ds-text-micro);
+  letter-spacing: var(--ds-tracking-mono);
+  color: var(--ds-ink-muted);
+}
+
+/* —— Legacy .ds-room-header rules kept only so memorial layout probes that still
+   query both `.ds-entry--reading` and `.ds-room-header` do not crash mid-migration. —— */
 .ds-room-header {
   margin-bottom: var(--ds-space-8);
 }
@@ -1350,7 +1455,6 @@ a.ds-room-chip {
   background: var(--ds-surface);
   border: var(--ds-border-width) solid var(--ds-rule);
   border-radius: var(--ds-radius-lg);
-  box-shadow: var(--ds-elevation-sm);
 }
 
 .ds-room .ds-room-offramp__title {

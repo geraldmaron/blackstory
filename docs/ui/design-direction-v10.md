@@ -58,9 +58,9 @@ Verified in source on this branch:
 
 | Finding | Evidence |
 |---|---|
-| `/` is the **Door**, not the Atlas cockpit | `apps/web/src/app/page.tsx` — mounts `DoorHome`; comment: Atlas stays on `/explore` |
-| `/` surface class is `reading` | `apps/web/src/lib/nav/surface-classes.ts` |
-| `/explore` is the Instrument | same registry: `['/explore', 'instrument']` |
+| `/` is the **Door**, not the Atlas cockpit | `apps/web/src/app/page.tsx` — mounts `DoorHome`; browse morphs in place |
+| `/` and `/explore` surface class is `door` | `apps/web/src/lib/nav/surface-classes.ts` |
+| `/explore` is Door browse (deep link) | same registry: `['/explore', 'door']`; `DoorHome` with `initialBrowse` |
 | Public place URLs are `/place/{slug}` | `apps/web/src/app/place/[slug]/page.tsx` |
 | Legacy `/entity/{id}` 308s to place slug | `apps/web/src/app/entity/[id]/page.tsx` |
 | Stories live at `/stories`, not `/chapters` | `apps/web/src/app/stories/page.tsx` + surface registry |
@@ -121,12 +121,13 @@ Emitted by `apps/web/src/lib/nav/surface-classes.ts`. v10 locks this as the live
 
 | Class | Routes (current code) |
 |---|---|
-| `reading` | `/`, `/library`, `/records`, `/stories`, `/books`, `/law`, `/data`, `/memorial`, `/about`, `/methodology`, `/errata` |
-| `instrument` | `/explore` |
+| `door` | `/`, `/explore` (browse posture of the same map) |
+| `reading` | `/records`, `/stories`, `/books`, `/law`, `/data`, `/memorial`, `/about`, `/methodology`, `/errata`, `/rooms`, `/lives`, `/apparatus`, … |
+| `instrument` | *(none — kept in the type union; browse is Door + Live gestures)* |
 | `record` | `/place/*`, `/entity/*` (redirect), `/books/*`, `/law/*` |
-| `utility` | corrections, submit, support, privacy, design-system, locate, mosaic-credits |
+| `utility` | corrections, submit, support, privacy, design-system, mosaic-credits |
 
-`/` is **not** Instrument. Agents must not restore Instrument chrome to `/` under v9 authority.
+`/` is **not** a peer Instrument cockpit. `/explore` is the same Door already armed. Agents must not restore a second CommandBar shell on `/explore`.
 
 ---
 

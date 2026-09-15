@@ -4,7 +4,7 @@
  * Names stay names. This is the national memorial, not a join from this
  * place's record, and wall names do not follow `/entity/ent_…`.
  *
- * Converted to the v9 room kit (SP-22). Renders through Room, RoomHeader and
+ * Converted to the v9 room kit (SP-22). Renders through Room, ReadingEntry and
  * OffRamp with the standard reading-room design language. The
  * MemorialWallAtmosphere (handwritten names canvas) is the background layer;
  * MemorialSections renders the accessible list.
@@ -21,7 +21,7 @@ import type { Metadata } from 'next';
 import React from 'react';
 import { buildStaticPageMetadata } from '../../lib/seo/metadata-builders';
 import { MemorialWallSection } from '../../components/patterns/memorial-wall/MemorialWallAtmosphere';
-import { Room, RoomHeader } from '../../components/room';
+import { Room, ReadingEntry } from '../../components/room';
 import { WalkOffRamp } from '../walk-off-ramp';
 import { MemorialSections } from './MemorialSections';
 import { MemorialScrollCue } from './MemorialScrollCue';
@@ -68,12 +68,11 @@ export default function MemorialPage() {
       />
       <Room>
         <div className="ds-memorial__opening">
-          <RoomHeader
+          <ReadingEntry
             pathname="/memorial"
-            kicker={MEMORIAL_KICKER}
             title={MEMORIAL_PAGE_TITLE}
             lede={MEMORIAL_PAGE_LEDE}
-            showPath={false}
+            showCrumb={false}
           />
         </div>
 

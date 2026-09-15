@@ -30,7 +30,8 @@ import {
   Prose,
   RecordNav,
   RoomCard,
-  RoomHeader,
+  ReadingEntry,
+  DocumentColophon,
   SourceList,
   TrustBlock,
   UtilityCard,
@@ -67,12 +68,13 @@ export function RoomKitGallery() {
     <section className="ds-gallery-section" aria-labelledby="room-kit-heading">
       <h2 id="room-kit-heading">Room kit (v9 surfaces)</h2>
       <p>
-        The shared vocabulary for every Reading, Record and Utility room. A room renders{' '}
-        <code className="ds-mono">RoomHeader</code> and nothing else as a header, and imports
-        exactly one of <code className="ds-mono">reading-room.css</code>,{' '}
+        The shared vocabulary for every Reading, Record and Utility room. A room opens in one of
+        three postures (Field, Record, Reading) and imports exactly one of{' '}
+        <code className="ds-mono">reading-room.css</code>,{' '}
         <code className="ds-mono">record-page.css</code> or{' '}
         <code className="ds-mono">utility.css</code>. Design law:{' '}
-        <code className="ds-mono">docs/ui/design-direction-v9-surfaces.md</code> §2 and §4.
+        <code className="ds-mono">docs/ui/design-direction-v9-surfaces.md</code> §2 and §4, amended
+        by plan.md entry postures.
       </p>
 
       <Specimen name="Breadcrumb" tokens={['--ds-accent', '--ds-ink-subtle', '--ds-font-mono']}>
@@ -80,20 +82,20 @@ export function RoomKitGallery() {
       </Specimen>
 
       <Specimen
-        name="RoomHeader"
+        name="ReadingEntry"
         tokens={['--ds-font-display', '--ds-font-editorial', '--ds-accent', '--ds-rule']}
       >
-        <RoomHeader
+        <ReadingEntry
           pathname="/books"
-          kicker="Catalog"
           title={
             <>
               Banned <em>books</em>
             </>
           }
           lede="Every title removed from a public shelf, with the order that removed it and the district that signed it."
-          meta={['1,204 titles', '1963 to 2024']}
+          showCrumb={false}
         />
+        <DocumentColophon facts={['1,204 titles', '1963 to 2024']} />
       </Specimen>
 
       <Specimen
@@ -272,7 +274,7 @@ export function RoomKitGallery() {
 
       <Specimen
         name="OffRamp · RecordNav"
-        tokens={['--ds-surface', '--ds-elevation-sm', '--ds-rule']}
+        tokens={['--ds-surface', '--ds-contact-overlap', '--ds-rule']}
       >
         <OffRamp
           title="No reading room is a dead end"

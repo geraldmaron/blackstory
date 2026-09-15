@@ -1,7 +1,6 @@
 /**
- * `/` is the door: existing about framing above the existing HTML pin plate.
- * People need to know what they are walking into, then walk into a place.
- * The Explore instrument stays on `/explore`. This page does not mount it.
+ * `/` is the door: cinematic journey over the shared map plate. Browse morphs in place;
+ * `/explore` remains the deep-link / share URL for the armed posture.
  */
 import type { Metadata } from 'next';
 import { absolutePublicUrl } from '../lib/seo/metadata-builders';

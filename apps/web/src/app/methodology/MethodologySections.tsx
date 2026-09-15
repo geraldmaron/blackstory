@@ -8,7 +8,7 @@ import { FACT_CONFIDENCE_GRADES, type FactConfidenceGrade } from '@repo/domain/f
 import { humanizeToken, mapConfidenceToUiLevel } from '../../components/facts/format';
 import { TrustSiteDisclaimer } from '../../components/trust/TrustSiteDisclaimer';
 import { formatCitation } from '../../lib/citation/format';
-import { GroupHeading, Note, Prose, RoomHeader } from '../../components/room';
+import { GroupHeading, Note, Prose, ReadingEntry } from '../../components/room';
 import { WalkOffRamp } from '../walk-off-ramp';
 import {
   EvidenceConvergenceDiagram,
@@ -43,22 +43,23 @@ const EXAMPLE_CITATION = formatCitation({
   accessed: new Date('2026-01-01T00:00:00Z'),
 });
 
-export function MethodologySections() {
+export function MethodologySections({ omitEntry = false }: { readonly omitEntry?: boolean }) {
   const grades = FACT_CONFIDENCE_GRADES as readonly FactConfidenceGrade[];
 
   return (
     <>
-      <RoomHeader
-        pathname="/methodology"
-        kicker="Receipt"
-        title={
-          <>
-            How the archive <em>works</em>.
-          </>
-        }
-        lede={METHODOLOGY_INTRO_LEDE}
-        showPath={false}
-      />
+      {omitEntry ? null : (
+        <ReadingEntry
+          pathname="/methodology"
+          title={
+            <>
+              How the archive <em>works</em>.
+            </>
+          }
+          lede={METHODOLOGY_INTRO_LEDE}
+          showCrumb={false}
+        />
+      )}
 
       <Prose>
         <TrustSiteDisclaimer />

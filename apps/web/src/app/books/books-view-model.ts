@@ -231,7 +231,7 @@ export function buildBooksBrowseHref(params: {
   if (params.dir !== 'asc') search.set('dir', params.dir);
   if (params.page !== undefined && params.page > 1) search.set('page', String(params.page));
   const query = search.toString();
-  return query ? `/books?${query}` : '/books';
+  return query ? `/books/browse?${query}` : '/books/browse';
 }
 
 function buildSortOptions(params: {

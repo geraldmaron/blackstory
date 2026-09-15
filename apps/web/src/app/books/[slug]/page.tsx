@@ -33,7 +33,7 @@ import { BooksAnatomyStrip } from '../BooksAnatomyStrip';
 import { BooksCoverArt } from '../BooksCoverArt';
 import { coverIsbnForBook } from '../books-cover';
 import { BOOKS_DETAIL } from '../books-copy';
-import { Room, RoomHeader } from '../../../components/room';
+import { Room, ReadingEntry } from '../../../components/room';
 import { WalkOffRamp } from '../../walk-off-ramp';
 import '../../reading-room.css';
 import '../../../components/patterns/record-anatomy.css';
@@ -140,12 +140,11 @@ export default async function BooksDetailPage({ params }: BooksDetailPageProps) 
 
   return (
     <Room>
-      <RoomHeader
+      <ReadingEntry
         pathname={`/books/${book.slug}`}
         crumbLabel={book.title}
-        kicker={BOOKS_DETAIL.introKicker}
         title={book.title}
-        showPath={false}
+        showCrumb={false}
       />
 
       <div className="ds-books-edition__intro-grid">
@@ -166,7 +165,7 @@ export default async function BooksDetailPage({ params }: BooksDetailPageProps) 
                 <Link
                   key={state.code}
                   className="ds-books-edition__tag"
-                  href={`/books?state=${encodeURIComponent(state.code)}`}
+                  href={`/books/browse?state=${encodeURIComponent(state.code)}`}
                   title={state.name}
                 >
                   <span className="ds-visually-hidden">{state.name} </span>

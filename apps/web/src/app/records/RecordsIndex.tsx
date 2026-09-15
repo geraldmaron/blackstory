@@ -13,9 +13,10 @@ import {
   EmptyList,
   HairlineIndex,
   OffRamp,
-  RailGroup,
+  OrientationInstrument,
+  ReadingEntry,
+  DocumentColophon,
   Room,
-  RoomHeader,
 } from '../../components/room';
 import { meterLevelForTier, RecordMeter } from '../../components/entity/RecordChrome';
 import { KindGlyph } from '../../components/map-experience/KindGlyph';
@@ -78,46 +79,44 @@ export function RecordsIndexRoom({ model, releaseLabel }: RecordsIndexProps) {
   } = model;
 
   const rail = (
-    <>
-      <RailGroup
-        title="By era"
-        entries={eraGroups.map((group) => ({
-          label: group.label,
-          href: group.href,
-          count: group.count,
-        }))}
-        limit={12}
-      />
-      <RailGroup
-        title="By state"
-        entries={stateGroups.map((group) => ({
-          label: group.label,
-          href: group.href,
-          count: group.count,
-        }))}
-        limit={12}
-      />
-    </>
+    <OrientationInstrument
+      where={`${countLabel} in the list`}
+      {...(query.era.length > 0 ? { eraBand: query.era } : {})}
+      moves={[
+        {
+          label: 'Open the map',
+          href: atlasHref,
+          note: atlasReason,
+        },
+        ...(eraGroups[0]
+          ? [
+              {
+                label: `Browse ${eraGroups[0].label}`,
+                href: eraGroups[0].href,
+                note: `${eraGroups[0].count.toLocaleString('en-US')} records`,
+              },
+            ]
+          : []),
+        ...(stateGroups[0]
+          ? [
+              {
+                label: `Browse ${stateGroups[0].label}`,
+                href: stateGroups[0].href,
+                note: `${stateGroups[0].count.toLocaleString('en-US')} records`,
+              },
+            ]
+          : []),
+      ].slice(0, 3)}
+    />
   );
 
   return (
     <Room rail={rail}>
-      <RoomHeader
+      <ReadingEntry
         pathname="/records"
-        kicker="The whole archive, as a list"
         title="Records"
-        lede={
-          <>
-            Every record in the release as a list. The map shows where a record sits. This list
-            shows what the archive holds.
-          </>
-        }
-        meta={[
-          `${totalAll.toLocaleString('en-US')} records`,
-          releaseLabel,
-          'Readable without the map',
-        ]}
-        showPath={false}
+        lede="The map shows where a record sits. This list shows what the archive holds."
+        showCrumb={false}
       />
 
       {/*
@@ -311,6 +310,14 @@ export function RecordsIndexRoom({ model, releaseLabel }: RecordsIndexProps) {
         </nav>
       ) : null}
 
+      <DocumentColophon
+        facts={[
+          `${totalAll.toLocaleString('en-US')} records`,
+          releaseLabel,
+          'Readable without the map',
+        ]}
+      />
+
       <OffRamp
         title={
           <>
@@ -318,14 +325,14 @@ export function RecordsIndexRoom({ model, releaseLabel }: RecordsIndexProps) {
           </>
         }
         actions={[
-          { href: atlasHref, label: 'Open this selection in Explore', emphasis: 'copper' },
+          { href: atlasHref, label: 'Open this selection on the map', emphasis: 'copper' },
           { href: '/methodology', label: 'How a record gets in' },
           { href: '/submit', label: 'Submit a record the archive is missing' },
         ]}
       >
         {atlasReason}
         {query.q.length > 0 ? (
-          <> Explore has no text search, so that part of this narrowing stays here.</>
+          <> The map has no text search, so that part of this narrowing stays here.</>
         ) : null}
       </OffRamp>
     </Room>

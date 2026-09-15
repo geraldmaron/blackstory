@@ -57,8 +57,11 @@ export function redirectsForNextConfig() {
     { source: '/legal', destination: '/law', permanent: true },
     { source: '/legal/:path*', destination: '/law/:path*', permanent: true },
 
-    // `/map` is the old name for Explore. `/` is the map door; `/explore` still renders it.
-    { source: '/map', destination: '/explore', permanent: true },
+    // `/map` folds into the Door journey. `/explore` stays the map-focus instrument URL —
+    // a permanent 308 from `/explore` → `/` is deliberately rejected: Chrome caches RSC
+    // navigations (`/explore?_rsc=…`) and a prior fold left the instrument unreachable
+    // (redirect-table.test.ts). Nav and CTAs point at `/`; deep links keep `/explore?…`.
+    { source: '/map', destination: '/', permanent: true },
 
     // repo-92n2.14 (SP-14): the standalone `/locate` page and `LocateExperience` are deleted —
     // the address/ZIP field, radius presets, catalog typeahead, and opt-in geolocation are one

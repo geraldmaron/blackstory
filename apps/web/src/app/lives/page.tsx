@@ -8,7 +8,7 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { LIVES_AREAS } from '@repo/domain/statistics/lives';
 import { buildStaticPageMetadata } from '../../lib/seo/metadata-builders';
-import { Room, RoomHeader } from '../../components/room';
+import { Room, ReadingEntry } from '../../components/room';
 import '../reading-room.css';
 import './lives.css';
 
@@ -25,12 +25,10 @@ export const metadata: Metadata = buildStaticPageMetadata({
 export default function LivesIndexPage() {
   return (
     <Room>
-      <RoomHeader
+      <ReadingEntry
         pathname="/lives"
-        kicker="Lives across the decades"
         title="Lives across the decades"
         lede="The same decade was lived very differently depending on race and region. Start with the whole country or pick a region to see how Black, white and Hispanic Americans were spread across class, what their lives measured, and which laws were in force, from the 1870s to today."
-        meta={['1870s to 2020s', 'Published census tables', 'Laws from the catalog']}
       />
       <ul className="lives-regions">
         {LIVES_AREAS.map((area) => (

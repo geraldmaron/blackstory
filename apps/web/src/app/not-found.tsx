@@ -19,8 +19,7 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { EmptyState } from '@repo/ui';
 import { PaletteSeed } from '../components/shell/PaletteSeed';
-import { Room } from '../components/room/Room';
-import { RoomHeader } from '../components/room/RoomHeader';
+import { Room, ReadingEntry } from '../components/room';
 import { loadWalkBackPlace } from './walk-back-place';
 import './utility.css';
 
@@ -42,16 +41,15 @@ export default async function NotFound() {
   return (
     <Room>
       <PaletteSeed />
-      <RoomHeader
+      <ReadingEntry
         pathname="/not-found"
-        kicker="Nothing at this address"
         title="That page is not here"
         lede="Either the address has a typo in it, or it names a record the archive has not published."
         /* Every other room prints its own route as a mono fact because readers cite URLs. This
            room's route is not the reader's route — they are standing on the address that failed,
            and `/not-found` is a path that does not resolve. Printing it twice, once as a crumb
            and once as a fact, tells a lost reader where they are not. */
-        showPath={false}
+        showCrumb={false}
       />
 
       <EmptyState

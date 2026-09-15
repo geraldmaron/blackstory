@@ -50,7 +50,7 @@ function buildLawHref(params: {
   if (params.topic !== 'all') search.set('topic', params.topic);
   if (params.sort !== 'chronological') search.set('sort', params.sort);
   const query = search.toString();
-  return query.length > 0 ? `/law?${query}` : '/law';
+  return query.length > 0 ? `/law/browse?${query}` : '/law/browse';
 }
 
 function countBy(values: readonly string[]): Map<string, number> {
@@ -112,7 +112,7 @@ export function LawBrowseSections({ view, catalog }: LawBrowseSectionsProps) {
       <form
         className="ds-records-find"
         method="get"
-        action="/law"
+        action="/law/browse"
         role="search"
         aria-labelledby="law-browse-heading"
       >
@@ -158,7 +158,7 @@ export function LawBrowseSections({ view, catalog }: LawBrowseSectionsProps) {
               <span className="ds-visually-hidden"> — remove this filter</span>
             </Link>
           ))}
-          <Link className="ds-records-active__clear" href="/law">
+          <Link className="ds-records-active__clear" href="/law/browse">
             Clear all
           </Link>
         </div>
@@ -229,8 +229,8 @@ export function LawBrowseSections({ view, catalog }: LawBrowseSectionsProps) {
           {activeChips.length > 0 ? (
             <>
               Nothing matches {activeChips.map((chip) => chip.label).join(', ')}.{' '}
-              <Link href="/law">Clear every filter</Link> to see all {view.totalAvailable} law
-              entries.
+              <Link href="/law/browse">Clear every filter</Link> to see all {view.totalAvailable}{' '}
+              law entries.
             </>
           ) : (
             <>The catalog is empty. This is a fault on our side, not an absence of law.</>
@@ -269,7 +269,8 @@ export function LawBrowseSections({ view, catalog }: LawBrowseSectionsProps) {
           legal aid organization.
         </p>
         <p>
-          <Link href="/methodology">Methodology</Link> · <Link href="/about">About</Link>
+          <Link href="/apparatus?s=methodology">Methodology</Link> ·{' '}
+          <Link href="/apparatus?s=about">About</Link>
         </p>
       </Prose>
     </>

@@ -41,6 +41,12 @@
   pointer-events: auto;
 }
 
+/* Door browse morph keeps the room CommandBar; re-enable hits the shell zeroed above. */
+.ds-shell:has(.ds-atlas--embedded) > .ds-bar,
+.ds-shell:has(.ds-atlas--embedded) .ds-bar {
+  pointer-events: auto;
+}
+
 .ds-atlas {
   position: relative;
   z-index: var(--ds-z-content);
@@ -201,6 +207,28 @@
   border-color: var(--ds-border-strong);
 }
 
+.ds-atlas__dock button:focus-visible {
+  outline: var(--ds-focus-width) solid var(--ds-focus-ring);
+  outline-offset: var(--ds-focus-offset);
+}
+
+/*
+ * A chip whose instrument is on screen. Every dock chip is a toggle now, so the wide layout needs
+ * the same pressed reading the narrow switcher has: without it the Filters chip looked identical
+ * open and shut and the reader could not tell which way pressing it would go. Copper is doing
+ * navigational work here (which instrument am I holding), which is what it is for.
+ */
+.ds-atlas__dock:not([data-switcher]) button[aria-pressed='true'] {
+  background: var(--ds-accent);
+  border-color: var(--ds-accent);
+  color: var(--ds-canvas);
+}
+
+.ds-atlas__dock:not([data-switcher]) button[aria-pressed='true'] .ds-atlas__dock-detail {
+  color: inherit;
+  opacity: 0.75;
+}
+
 .ds-atlas__dock-label {
   line-height: 1;
 }
@@ -234,7 +262,7 @@
   min-width: 0;
   padding: 0 var(--ds-space-2);
   border: 0;
-  border-radius: 10px;
+  border-radius: calc(var(--ds-radius-md) - 4px);
   background: transparent;
   color: var(--ds-ink-muted);
 }
@@ -258,11 +286,18 @@
     bottom: calc(var(--ds-space-2) + 96px);
   }
 
-  /* The dock is the narrow layout's instrument switcher, so it takes the bottom edge itself. */
+  /* The dock is the narrow layout's instrument switcher, so it takes the bottom edge itself —
+     but still clears the basemap attribution (compact "i"/"N" control) so that control cannot
+     sit on top of Filters and steal the tap. */
   .ds-atlas__dock {
     left: var(--ds-space-2);
     right: var(--ds-space-2);
-    bottom: var(--ds-space-2);
+    bottom: calc(var(--ds-space-2) + 28px);
+  }
+
+  html[data-door-browse='1'] .ds-map-stage .maplibregl-ctrl-bottom-left {
+    bottom: 0.35rem;
+    z-index: var(--ds-z-content);
   }
 }
 

@@ -271,8 +271,8 @@ export function placeDiscoveryReturn(
     mapHref,
     listHref: listHrefFromDiscovery(arrival),
     mapLabel: hasListNarrowing
-      ? 'Return to Explore with this narrowing'
-      : 'See this place on Explore',
+      ? 'Return to the map with this narrowing'
+      : 'See this place on the map',
     listLabel: hasListNarrowing
       ? 'Return to the record list with this narrowing'
       : 'Browse the record list',

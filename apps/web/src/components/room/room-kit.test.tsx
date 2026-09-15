@@ -17,7 +17,7 @@ import React from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
 
 import { Room } from './Room';
-import { RoomHeader } from './RoomHeader';
+import { ReadingEntry, DocumentColophon } from './EntryPosture';
 import { Breadcrumb } from './Breadcrumb';
 import { resolveTrail } from './room-trail';
 import { CardGrid, GroupHeading, RoomCard } from './RoomCards';
@@ -71,9 +71,8 @@ function walk(dir: string, out: string[] = []): string[] {
 }
 
 describe('room kit · a title is JSX, never a string of markup', () => {
-  // `RoomHeader`'s title is a ReactNode so `<em>` renders in the editorial accent. Passed as a
-  // string attribute instead, React escapes it and the reader sees the literal tags: /law shipped
-  // reading "Civil rights <em>law</em>" and /about "History, pinned to <em>place</em>.".
+  // ReadingEntry title is a ReactNode so `<em>` renders in the editorial accent. Passed as a
+  // string attribute instead, React escapes it and the reader sees the literal tags.
   it('no room passes markup inside a quoted title attribute', () => {
     const offenders = walk(APP_DIR)
       .filter((file) => file.endsWith('.tsx'))
@@ -230,42 +229,31 @@ describe('room kit · the trail is computed, never hand-written', () => {
   });
 });
 
-describe('room kit · RoomHeader is the only header a room renders', () => {
-  it('renders breadcrumb, sentence-case kicker, title, lede and mono meta in one block', () => {
+describe('room kit · ReadingEntry is the Reading posture mast', () => {
+  it('renders title and lede without a kicker or mono meta row', () => {
     const html = renderToStaticMarkup(
-      <RoomHeader
+      <ReadingEntry
         pathname="/books"
-        kicker="Catalog"
         title="Banned books"
         lede="Every title removed from a public shelf, with the order that removed it."
-        meta={['1,204 titles', '1963 to 2024']}
+        showCrumb={false}
       />,
     );
 
-    assert.match(html, /ds-room-crumb/);
-    // The kicker renders again, above the title and in sentence case. It was muted while the
-    // register was mono-caps, which shouted over the title; the register changed, so the line
-    // came back rather than the prop staying dead on twelve callers.
-    assert.match(html, /<p class="ds-room-header__kicker">Catalog<\/p>/);
-    assert.match(html, /<h1 class="ds-room-header__title">Banned books<\/h1>/);
-    assert.match(html, /ds-room-header__lede/);
-    assert.match(html, /1,204 titles/);
-
-    // The path leads the meta row, ahead of every count. Mock: `#docmeta`, path then meta.
-    assert.match(
-      html,
-      /ds-room-header__meta"><span class="ds-room-header__path">\/books<\/span><span>1,204 titles<\/span>/,
-    );
-
+    assert.match(html, /data-posture="reading"/);
+    assert.match(html, /<h1 class="ds-entry__title">Banned books<\/h1>/);
+    assert.match(html, /ds-entry__lede/);
+    assert.doesNotMatch(html, /kicker|ds-room-header/);
     assert.equal(html.match(/<h1/g)?.length, 1, 'a room renders exactly one h1');
     assert.equal(html.match(/<header/g)?.length, 1, 'a room renders exactly one header');
   });
 
-  it('omits the meta row entirely when there are no facts and no path', () => {
+  it('DocumentColophon carries mono citation facts at the foot', () => {
     const html = renderToStaticMarkup(
-      <RoomHeader pathname="/privacy" title="Privacy" showPath={false} />,
+      <DocumentColophon facts={['1,204 titles', '1963 to 2024']} />,
     );
-    assert.doesNotMatch(html, /ds-room-header__meta/);
+    assert.match(html, /data-posture-colophon/);
+    assert.match(html, /1,204 titles/);
   });
 
   it('the breadcrumb marks the current step and does not link it', () => {

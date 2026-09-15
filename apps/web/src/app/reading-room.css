@@ -1288,7 +1288,7 @@ a.ds-errata__row-id {
 }
 
 /* No copper accent on this surface — italic alone carries the emphasis this em would
-   otherwise take from the room kit's RoomHeader convention. */
+   otherwise take from the room kit's ReadingEntry convention. */
 .ds-memorial__title em {
   font-family: var(--ds-font-editorial);
   font-style: italic;

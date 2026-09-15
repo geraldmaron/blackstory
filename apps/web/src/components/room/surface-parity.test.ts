@@ -137,3 +137,38 @@ describe('surface parity · the page body is rendered once', () => {
     );
   });
 });
+
+describe('surface parity · three entry postures only', () => {
+  it('does not invent a fourth page-header posture beyond Field, Record and Reading', () => {
+    const allowed = new Set([
+      'ReadingEntry',
+      'DocumentColophon',
+      'OrientationInstrument',
+      'EntryPosture',
+      'SiteShellHeader', // site chrome, not a room entry posture
+    ]);
+    const offenders: string[] = [];
+    for (const file of SOURCES) {
+      if (!/\.(tsx|ts)$/.test(file)) continue;
+      const text = readFileSync(file, 'utf8');
+      for (const match of text.matchAll(
+        /\b(?:export\s+function|function)\s+([A-Z][A-Za-z0-9]*(?:Entry|Header|Masthead|Posture))\b/g,
+      )) {
+        const name = match[1]!;
+        if (allowed.has(name)) continue;
+        if (name === 'UtilityEditionIntro') continue;
+        offenders.push(`${path.relative(SRC_DIR, file)}:${name}`);
+      }
+    }
+    assert.deepEqual(
+      offenders,
+      [],
+      `fourth entry posture invented: ${offenders.join(', ') || '(none)'}`,
+    );
+  });
+
+  it('EntryPosture module declares the three legal postures', () => {
+    const source = readFileSync(path.join(SRC_DIR, 'components/room/EntryPosture.tsx'), 'utf8');
+    assert.match(source, /export type EntryPosture = 'field' \| 'record' \| 'reading'/);
+  });
+});

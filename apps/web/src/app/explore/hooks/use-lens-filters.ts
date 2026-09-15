@@ -26,6 +26,7 @@ import {
 import type { ExploreLayerMode } from '../../../lib/map-experience/url-state';
 import type { ExploreViewModel } from '../explore-view-model';
 import { decadeStartYear, eraBucketFor, eraFor } from './atlas-feature-helpers';
+import { isInternalRecordLabel } from '../../../lib/place/public-place-path';
 
 /** Presence rows shown in the lens. Ten is what fits without the panel becoming a table. */
 const PRESENCE_ROWS = 10;
@@ -187,7 +188,9 @@ export function useLensFilters(view: ExploreViewModel, toasts: UseToasts) {
   }, [decade, evidenceFloor, kindFamily, stateCode, status, topicCounts, topicId]);
 
   const sorted = useMemo(() => {
-    const rows = [...filtered];
+    const rows = filtered.filter(
+      (feature) => !isInternalRecordLabel(feature.properties.displayName),
+    );
     rows.sort((a, b) => {
       const left = decadeStartYear(eraFor(a));
       const right = decadeStartYear(eraFor(b));
@@ -253,7 +256,7 @@ export function useLensFilters(view: ExploreViewModel, toasts: UseToasts) {
     setStatus(null);
     toasts.show({
       id: `reset-${Date.now()}`,
-      message: 'Lens reset.',
+      message: 'Filters reset.',
       action: {
         label: 'Undo',
         run: () => {

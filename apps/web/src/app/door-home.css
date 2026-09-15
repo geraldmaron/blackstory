@@ -13,6 +13,11 @@
  * Scroll model: the document scrolls. The plate is position:fixed full-bleed. Door chrome is
  * pointer-events:none except cards so the wheel and marker hits work over the map.
  * Snap uses proximity; Begin uses scrollIntoView({ behavior: 'smooth' }).
+ *
+ * Two different objects live here. `.ds-door-open` is the opening: a denser masthead sheet
+ * clamped into the frame's left edge (headline, invite, spotlight, kind ledger, count, actions),
+ * bleeding off that edge. `.ds-door-journey__card` is every chapter after it: a reading card that
+ * alternates sides as the camera flies.
  */
 
 .ds-door {
@@ -51,12 +56,13 @@
 }
 
 .ds-door__field-chrome {
-  position: absolute;
-  top: var(--ds-space-4);
+  /* Fixed above the journey stack so Browse / captions stay hittable (field itself is z-0). */
+  position: fixed;
+  top: calc(var(--ds-island-clearance) + var(--ds-space-4));
   right: var(--ds-space-5);
   bottom: auto;
   left: var(--ds-space-5);
-  z-index: 1; /* local: field chrome over the plate, inside the door field */
+  z-index: 4;
   display: flex;
   flex-wrap: wrap;
   align-items: center;
@@ -80,6 +86,170 @@
   letter-spacing: 0.03em;
   line-height: 1.4;
   color: var(--ds-ink-muted);
+  pointer-events: auto;
+}
+
+/*
+ * Opens browse posture on this same plate (morph, not a second product).
+ * Always shown, including on phones where the captions hide.
+ */
+.ds-door__filters {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  margin-left: auto;
+  padding: var(--ds-space-2) var(--ds-space-4);
+  border: var(--ds-border-width) solid var(--ds-border);
+  border-radius: var(--ds-radius-full);
+  background: var(--ds-surface);
+  color: var(--ds-ink);
+  font-family: var(--ds-font-ui);
+  font-size: 0.875rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  line-height: 1;
+  text-decoration: none;
+  cursor: pointer;
+  pointer-events: auto;
+}
+
+.ds-door__filters:hover {
+  border-color: var(--ds-border-strong);
+  color: var(--ds-ink);
+}
+
+.ds-door__filters:focus-visible {
+  outline: 2px solid var(--ds-focus-ring);
+  outline-offset: 2px;
+}
+
+/* Phone Find already exposes Browse in the command bar; the field chip collides with Rooms. */
+@media (max-width: 819px) {
+  .ds-door__filters {
+    display: none;
+  }
+}
+
+/* Browse morph: journey recedes; instruments take the field. */
+:root {
+  --ds-door-browse-ms: 320ms;
+}
+
+.ds-door-journey {
+  position: relative;
+  z-index: 2; /* local: scroll chapters over the fixed pin field */
+  pointer-events: none;
+  transition:
+    opacity var(--ds-door-browse-ms) var(--ds-ease-cinematic),
+    transform var(--ds-door-browse-ms) var(--ds-ease-cinematic);
+}
+
+.ds-door-journey--browse {
+  opacity: 0;
+  transform: translateY(0.75rem);
+  pointer-events: none;
+  visibility: hidden;
+  /* Collapse so embedded atlas is not pushed below chapter stack height. */
+  position: absolute;
+  inset: 0 auto auto 0;
+  width: 100%;
+  height: 0;
+  min-height: 0;
+  overflow: hidden;
+  transition:
+    opacity var(--ds-door-browse-ms) var(--ds-ease-exit),
+    transform var(--ds-door-browse-ms) var(--ds-ease-exit),
+    visibility 0s linear var(--ds-door-browse-ms);
+}
+
+.ds-door__browse {
+  position: relative;
+  z-index: 3;
+  min-height: calc(100dvh - var(--ds-island-clearance));
+  pointer-events: none;
+  animation: ds-door-browse-in var(--ds-door-browse-ms) var(--ds-ease-entrance) both;
+}
+
+/*
+ * Exit must live outside `.ds-door__browse` / `.ds-atlas` (both pointer-events: none). Nested
+ * `pointer-events: auto` on a fixed child was still losing hits under the Door field chrome and
+ * shell pass-through stack — the button painted, clicks did nothing.
+ */
+.ds-door__browse-exit {
+  position: fixed;
+  top: calc(var(--ds-island-clearance) + var(--ds-space-3));
+  left: var(--ds-space-4);
+  /* Above atlas instruments; below the command bar and its overlays. */
+  z-index: calc(var(--ds-z-command-bar) - 5);
+  pointer-events: auto;
+}
+
+.ds-door__browse-exit-btn {
+  min-height: 44px;
+  padding: var(--ds-space-2) var(--ds-space-4);
+  border: var(--ds-border-width) solid var(--ds-border-strong);
+  border-radius: var(--ds-radius-full);
+  background: var(--ds-surface-raised);
+  color: var(--ds-ink);
+  font-family: var(--ds-font-ui);
+  font-size: 0.875rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  cursor: pointer;
+  box-shadow: var(--ds-contact-hairline);
+}
+
+.ds-door__browse-exit-btn:hover {
+  border-color: var(--ds-border-strong);
+}
+
+.ds-door__browse-exit-btn:focus-visible {
+  outline: 2px solid var(--ds-focus-ring);
+  outline-offset: 2px;
+}
+
+/* Cold `/explore`: already armed — no entrance fade (same end state as morph). */
+.ds-door__browse[data-cold='true'] {
+  animation: none;
+}
+
+/* Embedded atlas paints as the field instruments; keep it in the first viewport. */
+.ds-door__browse .ds-atlas--embedded {
+  min-height: calc(100dvh - var(--ds-island-clearance));
+}
+
+@keyframes ds-door-browse-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+html[data-door-browse='1'] {
+  overflow: hidden;
+  scroll-snap-type: none;
+}
+
+html[data-door-browse='1'] .ds-door {
+  min-height: calc(100dvh - var(--ds-island-clearance));
+  max-height: calc(100dvh - var(--ds-island-clearance));
+  overflow: hidden;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ds-door-journey,
+  .ds-door-journey--browse,
+  .ds-door__browse {
+    transition: none;
+    animation: none;
+  }
+
+  .ds-door-journey--browse {
+    transform: none;
+  }
 }
 
 /*
@@ -159,12 +329,6 @@ html:has(.ds-door) {
   scroll-snap-type: y proximity;
 }
 
-.ds-door-journey {
-  position: relative;
-  z-index: 2; /* local: scroll chapters over the fixed pin field */
-  pointer-events: none;
-}
-
 .ds-door-journey__chapter {
   display: grid;
   align-content: center;
@@ -190,13 +354,222 @@ html:has(.ds-door) {
   text-align: center;
 }
 
+/*
+ * The opening. Not a chapter card and not a dialog.
+ *
+ * The reader's first screen used to be a 34rem rounded plate parked in the middle of the viewport
+ * with the country behind it, which read as a modal over wallpaper: the map was decoration and the
+ * type was polite. The opening is now a masthead sheet clamped into the frame's left edge and
+ * anchored low, bleeding off that edge (square corners, no left border) so it reads as printed on
+ * the field rather than floating above it. The plate keeps the whole frame; the sheet crops a
+ * corner of it.
+ *
+ * Depth is the value step between sheet and plate plus that crop. No shadow, no glow, no gradient,
+ * no blur (Archive material law). Copper appears three times only: the top rule, the place pin,
+ * and Begin.
+ *
+ * The bottom is held clear of the basemap attribution, which is a license obligation and must stay
+ * legible; the offset matches the one atlas.css gives its dock for the same reason.
+ */
 .ds-door-journey__chapter--rest {
-  padding-top: var(--ds-space-5);
-  padding-bottom: var(--ds-space-6);
+  align-content: end;
+  justify-items: start;
+  padding: var(--ds-space-6) var(--ds-space-6) calc(var(--ds-space-5) + 34px) 0;
 }
 
-.ds-door-journey__chapter--center.ds-door-journey__chapter--rest {
-  align-content: center;
+.ds-door-open {
+  box-sizing: border-box;
+  width: min(54rem, 90vw);
+  max-width: 100%;
+  min-width: 0;
+  padding: var(--ds-space-5) var(--ds-space-6) var(--ds-space-5) var(--ds-space-6);
+  background: var(--ds-surface);
+  color: var(--ds-ink);
+  border: var(--ds-border-width) solid var(--ds-rule);
+  border-left: 0;
+  border-top: 3px solid var(--ds-accent-graphic);
+  border-radius: 0 var(--ds-radius-sm) var(--ds-radius-sm) 0;
+  /* Block type is set to overrun its measure; the sheet edge is what cuts it. */
+  overflow: clip;
+  pointer-events: auto;
+}
+
+/*
+ * Clipped block type. One statement, stacked, at poster scale: the subject line runs the width of
+ * the sheet and the second tier steps down under it, leading locked so the two lines read as one
+ * block rather than two sentences. `overflow: clip` on each line trims the face's own leading, and
+ * the negative block margin takes back the space the trim needs, which is what makes the stack
+ * close up instead of just getting bigger.
+ */
+.ds-door-open__headline {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  margin: 0;
+  font-family: var(--ds-font-display);
+  font-weight: 600;
+  font-size: clamp(2.5rem, 7.4vw, 5.5rem);
+  letter-spacing: -0.055em;
+  line-height: 0.84;
+  color: var(--ds-ink);
+  text-wrap: nowrap;
+}
+
+/* Second tier. Smaller, tracked tighter to the line above, so the block steps rather than repeats. */
+.ds-door-open__headline .ds-hero-headline-morph__trailer {
+  display: block;
+  max-width: 100%;
+  margin-top: 0.06em;
+  font-size: 0.42em;
+  letter-spacing: -0.03em;
+  line-height: 1;
+  color: var(--ds-ink);
+}
+
+.ds-door-open__headline em {
+  font-family: var(--ds-font-editorial);
+  font-style: italic;
+  font-weight: 400;
+  letter-spacing: -0.01em;
+  color: var(--ds-accent-text);
+}
+
+/* Short invite under the headline: what the field holds, and how to start. */
+.ds-door-open__invite {
+  max-width: 38rem;
+  margin: var(--ds-space-4) 0 0;
+  font-family: var(--ds-font-ui);
+  font-size: 0.9375rem;
+  font-weight: 400;
+  letter-spacing: 0;
+  line-height: 1.45;
+  color: var(--ds-ink-muted);
+  text-wrap: pretty;
+}
+
+/*
+ * Spotlight strip: pin, record, locality. Count and ledger sit below so the welcome answers
+ * "what is here" without stacking four place claims in one line.
+ */
+.ds-door-open__strip {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--ds-space-2) var(--ds-space-4);
+  margin: var(--ds-space-4) 0 0;
+  padding-top: var(--ds-space-3);
+  border-top: var(--ds-border-width) solid var(--ds-rule);
+  font-family: var(--ds-font-mono);
+  font-size: 0.75rem;
+  letter-spacing: 0.04em;
+  line-height: 1.4;
+  color: var(--ds-ink-muted);
+}
+
+.ds-door-open__where {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--ds-space-2);
+  min-width: 0;
+}
+
+.ds-door-open__pin {
+  align-self: center;
+  flex: 0 0 auto;
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: var(--ds-radius-full);
+  background: var(--ds-accent-graphic);
+  outline: var(--ds-border-width) solid var(--ds-accent-graphic);
+  outline-offset: 3px;
+  margin-right: 2px;
+}
+
+.ds-door-open__place {
+  font-family: var(--ds-font-ui);
+  font-size: 0.9375rem;
+  font-weight: 550;
+  letter-spacing: 0;
+  color: var(--ds-ink);
+  text-decoration: none;
+  overflow-wrap: anywhere;
+}
+
+a.ds-door-open__place:hover,
+a.ds-door-open__place:focus-visible {
+  color: var(--ds-accent-text);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+a.ds-door-open__place:focus-visible {
+  outline: 2px solid var(--ds-focus-ring);
+  outline-offset: 2px;
+}
+
+.ds-door-open__locality {
+  text-transform: uppercase;
+}
+
+/*
+ * Kind-family ledger: compact census of what is on the plate. Hairline rules, mono counts,
+ * UI labels. Copper stays on the spotlight pin only.
+ */
+.ds-door-open__ledger {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(6.5rem, 1fr));
+  gap: var(--ds-space-2) var(--ds-space-4);
+  margin: var(--ds-space-4) 0 0;
+  padding: var(--ds-space-3) 0;
+  border-top: var(--ds-border-width) solid var(--ds-rule);
+  border-bottom: var(--ds-border-width) solid var(--ds-rule);
+}
+
+.ds-door-open__ledger-row {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  min-width: 0;
+  margin: 0;
+}
+
+.ds-door-open__ledger-label {
+  margin: 0;
+  font-family: var(--ds-font-ui);
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+  line-height: 1.3;
+  color: var(--ds-ink-muted);
+}
+
+.ds-door-open__ledger-count {
+  margin: 0;
+  font-family: var(--ds-font-mono);
+  font-size: 1rem;
+  font-weight: 550;
+  letter-spacing: 0.02em;
+  line-height: 1.2;
+  color: var(--ds-ink);
+  font-variant-numeric: tabular-nums;
+}
+
+.ds-door-open__count {
+  margin: var(--ds-space-3) 0 0;
+  font-family: var(--ds-font-mono);
+  font-size: 0.75rem;
+  letter-spacing: 0.04em;
+  line-height: 1.4;
+  color: var(--ds-ink-muted);
+  text-transform: uppercase;
+}
+
+.ds-door-open__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--ds-space-3);
+  margin-top: var(--ds-space-5);
 }
 
 .ds-door-journey__card {
@@ -204,15 +577,16 @@ html:has(.ds-door) {
   width: min(28rem, 100%);
   max-height: calc(100dvh - var(--ds-island-clearance) - var(--ds-space-7));
   min-width: 0;
-  padding: var(--ds-space-6);
+  padding: var(--ds-space-5) var(--ds-space-5) var(--ds-space-6);
   overflow-x: hidden;
   overflow-y: auto;
   overscroll-behavior: contain;
-  background: var(--ds-surface);
+  background: var(--ds-surface-raised, var(--ds-surface));
   color: var(--ds-ink);
   border: var(--ds-border-width) solid var(--ds-rule);
-  border-radius: var(--ds-radius-md);
-  border-left: 3px solid var(--ds-accent-graphic);
+  border-radius: var(--ds-radius-sm);
+  border-left: 4px solid var(--ds-accent-graphic);
+  box-shadow: var(--ds-contact-hairline);
   pointer-events: auto;
 }
 
@@ -222,258 +596,13 @@ html:has(.ds-door) {
   border-left-color: var(--ds-rule);
 }
 
-/*
- * Opening invitation card: compact copy; count/cite live on field chrome on desktop.
- */
-.ds-door-journey__chapter--rest .ds-door-journey__card {
-  display: flex;
-  flex-direction: column;
-  width: min(30rem, 100%);
-  max-height: min(31rem, calc(100dvh - var(--ds-island-clearance) - var(--ds-space-6)));
-  padding: var(--ds-space-6);
-  overflow: hidden;
-}
-
-/* The centered `--center` rule above trades this card's side accent for a plain thin rule so a
-   centered box reads symmetric — which is right for it, but left the reader's first card with no
-   accent at all, just a flat panel. A top rule reads as a masthead on a centered box the way a
-   side rule reads on a left/right one, so it gets its presence back without breaking symmetry or
-   reaching for the shadow/glow/gradient the flat-matte law above rules out. */
-.ds-door-journey__chapter--center.ds-door-journey__chapter--rest .ds-door-journey__card {
-  border-top: 3px solid var(--ds-accent-graphic);
-}
-
-/* Gap owns the rhythm between eyebrow / brand / support / heading / prose;
-   each child's own margin is zeroed below so the two never stack. */
-.ds-door-journey__chapter--rest .ds-door-journey__copy {
-  display: flex;
-  flex-direction: column;
-  gap: var(--ds-space-4);
-  min-height: 0;
-  overflow-x: hidden;
-  overflow-y: auto;
-  overscroll-behavior: contain;
-}
-
-.ds-door-journey__chapter--rest .ds-door-journey__eyebrow,
-.ds-door-journey__chapter--rest .ds-door-journey__support,
-.ds-door-journey__chapter--rest .ds-door-journey__prose {
-  margin: 0;
-}
-
-.ds-door-journey__chapter--rest .ds-door-journey__lockup {
-  max-width: min(100%, 13.5rem);
-}
-
-.ds-door-journey__chapter--rest .ds-door-journey__cold {
-  margin: 0;
-  font-size: clamp(1.5rem, 2.6vw, 2rem);
-}
-
-.ds-door-journey__chapter--rest .ds-door-journey__pillars,
-.ds-door-journey__chapter--rest .ds-door-journey__cite {
-  display: none;
-}
-
-.ds-door-journey__chapter--rest .ds-door-journey__actions {
-  flex-shrink: 0;
-  margin-top: var(--ds-space-6);
-}
-
-@media (min-width: 900px) {
-  .ds-door-journey__chapter--rest .ds-door-journey__presence {
-    display: none;
-  }
-}
-
-.ds-door-journey__eyebrow {
-  margin: 0 0 var(--ds-space-3);
-  font-family: var(--ds-font-mono);
-  font-size: 0.75rem;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  color: var(--ds-accent-text);
-}
-
-.ds-door-journey__brand {
-  margin: 0;
-  line-height: 0;
-}
-
-.ds-door-journey__brand-sr {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  padding: 0;
-  margin: -1px;
-  overflow: hidden;
-  clip: rect(0, 0, 0, 0);
-  white-space: nowrap;
-  border: 0;
-}
-
-.ds-door-journey__lockup {
-  display: block;
-  max-width: min(100%, 18rem);
-  margin-inline: auto;
-}
-
-.ds-door-journey__lockup-img {
-  display: block;
-  width: 100%;
-  height: auto;
-}
-
-.ds-door-journey__lockup-img--light {
-  display: block;
-}
-
-.ds-door-journey__lockup-img--dark {
-  display: none;
-}
-
-[data-theme='dark'] .ds-door-journey__lockup-img--light {
-  display: none;
-}
-
-[data-theme='dark'] .ds-door-journey__lockup-img--dark {
-  display: block;
-}
-
-.ds-door-journey__support {
-  margin: var(--ds-space-3) 0 0;
-  font-family: var(--ds-font-editorial);
-  font-size: clamp(1.25rem, 2vw, 1.5rem);
-  line-height: 1.3;
-  color: var(--ds-accent-text);
-}
-
-.ds-door-journey__pillars {
-  margin: var(--ds-space-2) 0 0;
-  font-family: var(--ds-font-mono);
-  font-size: 0.8125rem;
-  letter-spacing: 0.02em;
-  color: var(--ds-ink-muted);
-}
-
-.ds-door-journey__presence {
-  margin: var(--ds-space-4) 0 0;
-  font-family: var(--ds-font-ui);
-  font-size: 0.9375rem;
-  color: var(--ds-ink);
-}
-
-.ds-door-journey__presence-n {
-  font-family: var(--ds-font-mono);
-  font-size: 1.125rem;
-  font-weight: 500;
-  color: var(--ds-accent-text);
-}
-
-.ds-door-journey__cold {
-  margin: var(--ds-space-5) 0 0;
-  font-family: var(--ds-font-display);
-  font-weight: 600;
-  font-size: clamp(1.875rem, 4vw, 2.75rem);
-  letter-spacing: -0.03em;
-  line-height: 1.1;
-  color: var(--ds-ink);
-}
-
-/* "here." takes the editorial accent every chapter heading's <em> already carries. */
-.ds-door-journey__cold em {
-  font-family: var(--ds-font-editorial);
-  font-style: italic;
-  font-weight: 400;
-  color: var(--ds-accent-text);
-}
-
-/*
- * The headline says "happened here"; this line says where. It names the visit's spotlight record
- * (the same one chapter 02 flies to) and links its public place page, so the promise is kept on
- * the first screen rather than asserted. The dot and its offset ring are the plate's selection
- * mark, drawn flat: an outline, not a shadow.
- */
-.ds-door-journey__here {
-  display: grid;
-  grid-template-columns: auto minmax(0, 1fr);
-  column-gap: var(--ds-space-3);
-  margin: var(--ds-space-4) 0 0;
-  padding-top: var(--ds-space-3);
-  border-top: var(--ds-border-width) solid var(--ds-rule);
-  text-align: left;
-}
-
-.ds-door-journey__here-pin {
-  grid-row: 1 / span 3;
-  align-self: start;
-  width: 0.5rem;
-  height: 0.5rem;
-  margin: 0.3rem 0.25rem 0;
-  border-radius: var(--ds-radius-full);
-  background: var(--ds-accent-graphic);
-  outline: var(--ds-border-width) solid var(--ds-accent-graphic);
-  outline-offset: 3px;
-}
-
-.ds-door-journey__here-label {
-  grid-column: 2;
-  font-family: var(--ds-font-mono);
-  font-size: 0.6875rem;
-  letter-spacing: 0.12em;
-  line-height: 1.4;
-  text-transform: uppercase;
-  color: var(--ds-accent-text);
-}
-
-.ds-door-journey__here-name {
-  grid-column: 2;
-  margin-top: 2px;
-  font-family: var(--ds-font-ui);
-  font-size: 0.9375rem;
-  font-weight: 550;
-  line-height: 1.3;
-  color: var(--ds-ink);
-  text-decoration: none;
-  overflow-wrap: anywhere;
-}
-
-a.ds-door-journey__here-name:hover,
-a.ds-door-journey__here-name:focus-visible {
-  color: var(--ds-accent-text);
-  text-decoration: underline;
-  text-underline-offset: 3px;
-}
-
-a.ds-door-journey__here-name:focus-visible {
-  outline: 2px solid var(--ds-accent-graphic);
-  outline-offset: 2px;
-}
-
-.ds-door-journey__here-place {
-  grid-column: 2;
-  margin-top: 2px;
-  font-family: var(--ds-font-mono);
-  font-size: 0.75rem;
-  line-height: 1.4;
-  color: var(--ds-ink-muted);
-}
-
-/* Phone and tablet only. The desktop opening card is height-capped and already carries the
-   field caption and the cold-open prose; the extra line pushed it into an inner scroller. */
-@media (min-width: 900px) {
-  .ds-door-journey__chapter--rest .ds-door-journey__here {
-    display: none;
-  }
-}
-
 /* Cold-open subject morph — History → His Story → … → Black Story.
    Flat matte only: opacity, width and a short vertical roll. No scale on the S (keeps the
    baseline stable). The outgoing prefix rolls up and out while the incoming one rolls in from
    below, inside a clipped slot, so the two words never sit on top of each other mid-change.
    Split easing is gentler than the global snap ease so the letter does not jump. */
 .ds-hero-headline-morph {
-  --ds-hero-morph-ease: cubic-bezier(0.33, 0, 0.2, 1);
+  --ds-hero-morph-ease: var(--ds-ease-cinematic);
   --ds-hero-roll-pad: 0.14em;
   display: inline-flex;
   align-items: baseline;
@@ -597,15 +726,6 @@ a.ds-door-journey__here-name:focus-visible {
   }
 }
 
-.ds-door-journey__index {
-  display: block;
-  margin: 0 0 var(--ds-space-2);
-  font-family: var(--ds-font-mono);
-  font-size: 1.25rem;
-  font-weight: 500;
-  color: var(--ds-accent-graphic);
-}
-
 .ds-door-journey__kicker {
   margin: 0 0 var(--ds-space-2);
   font-family: var(--ds-font-mono);
@@ -619,17 +739,33 @@ a.ds-door-journey__here-name:focus-visible {
   margin: 0 0 var(--ds-space-4);
   font-family: var(--ds-font-display);
   font-weight: 600;
-  font-size: clamp(1.5rem, 3vw, 2rem);
-  letter-spacing: -0.03em;
-  line-height: 1.12;
+  font-size: clamp(1.875rem, 4.5vw, 2.75rem);
+  letter-spacing: -0.045em;
+  line-height: 0.98;
   color: var(--ds-ink);
+  overflow: hidden;
+  max-width: 18ch;
 }
 
 .ds-door-journey__heading em {
+  display: inline;
   font-family: var(--ds-font-editorial);
   font-style: italic;
   font-weight: 400;
   color: var(--ds-accent-text);
+}
+
+.ds-door-journey__index {
+  display: block;
+  margin: 0 0 var(--ds-space-2);
+  font-family: var(--ds-font-display);
+  font-weight: 600;
+  font-size: clamp(2.5rem, 8vw, 4.5rem);
+  letter-spacing: -0.06em;
+  line-height: 0.85;
+  color: color-mix(in srgb, var(--ds-ink) 14%, transparent);
+  overflow: hidden;
+  user-select: none;
 }
 
 .ds-door-journey__prose {
@@ -704,8 +840,9 @@ a.ds-door-journey__here-name:focus-visible {
 }
 
 /*
- * Short landscape / laptop chrome: the rest card used to overflow the island and bury the
- * field. Compact type and drop duplicate lines (count lives on the field chrome).
+ * Short landscape / laptop chrome. The sheet is a block of type with nothing to scroll, so a short
+ * viewport is a type-scale problem rather than a height cap: the display size takes its ceiling
+ * from the viewport height as well as its width, and the rhythm tightens.
  */
 @media (max-height: 52rem) {
   .ds-door-journey__chapter {
@@ -713,31 +850,37 @@ a.ds-door-journey__here-name:focus-visible {
   }
 
   .ds-door-journey__chapter--rest {
-    padding-bottom: var(--ds-space-4);
+    padding-top: var(--ds-space-4);
   }
 
-  .ds-door-journey__chapter--rest .ds-door-journey__card {
-    padding: var(--ds-space-5);
-    max-height: min(32rem, calc(100dvh - var(--ds-island-clearance) - var(--ds-space-5)));
+  .ds-door-open {
+    padding-block: var(--ds-space-4);
   }
 
-  .ds-door-journey__lockup {
-    max-width: min(100%, 14rem);
+  .ds-door-open__headline {
+    font-size: clamp(2.25rem, min(7.4vw, 9.5vh), 4.25rem);
   }
 
-  .ds-door-journey__cold {
+  .ds-door-open__invite {
     margin-top: var(--ds-space-3);
-    font-size: clamp(1.5rem, 3.5vh, 2rem);
+    font-size: 0.875rem;
+  }
+
+  .ds-door-open__strip,
+  .ds-door-open__ledger {
+    margin-top: var(--ds-space-3);
+  }
+
+  .ds-door-open__ledger {
+    padding-block: var(--ds-space-2);
+  }
+
+  .ds-door-open__actions {
+    margin-top: var(--ds-space-4);
   }
 
   .ds-door-journey__actions {
     margin-top: var(--ds-space-4);
-  }
-}
-
-@media (max-height: 42rem) and (min-width: 900px) {
-  .ds-door-journey__chapter--rest .ds-door-journey__prose {
-    display: none;
   }
 }
 
@@ -774,6 +917,73 @@ body:has(.ds-map-stage[data-plate-ready]) .ds-door__field[data-plate='live'] {
   line-height: 1.4;
   color: var(--ds-ink);
   pointer-events: auto;
+}
+
+.ds-door__field-fallback {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ds-space-4);
+  max-width: 28rem;
+  padding: var(--ds-space-4);
+  pointer-events: auto;
+}
+
+.ds-door__field-fallback-card {
+  padding: var(--ds-space-5);
+  background: var(--ds-surface);
+  border: var(--ds-border-width) solid var(--ds-rule);
+  border-radius: var(--ds-radius-md);
+  box-shadow: var(--ds-contact-overlap);
+}
+
+.ds-door__field-fallback-kicker {
+  margin: 0 0 var(--ds-space-2);
+  font-family: var(--ds-font-mono);
+  font-size: var(--ds-text-micro);
+  letter-spacing: var(--ds-tracking-mono);
+  color: var(--ds-ink-muted);
+}
+
+.ds-door__field-fallback-name {
+  margin: 0;
+  font-family: var(--ds-font-display);
+  font-weight: 600;
+  font-size: clamp(1.5rem, 4vw, 2.25rem);
+  letter-spacing: -0.04em;
+  line-height: 1;
+}
+
+.ds-door__field-fallback-place {
+  margin: var(--ds-space-2) 0 0;
+  font-family: var(--ds-font-editorial);
+  color: var(--ds-ink-muted);
+}
+
+.ds-door__field-fallback-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--ds-space-3);
+  margin: var(--ds-space-4) 0 0;
+}
+
+.ds-door__field-fallback-actions a,
+.ds-door__field-fallback-actions button {
+  font-family: var(--ds-font-ui);
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: var(--ds-accent-text);
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 0.15em;
+}
+
+.ds-door__field-fallback-actions a:focus-visible,
+.ds-door__field-fallback-actions button:focus-visible {
+  outline: var(--ds-focus-width) solid var(--ds-focus-ring);
+  outline-offset: var(--ds-focus-offset);
 }
 
 .ds-door__field-note a,
@@ -853,14 +1063,20 @@ body:has(.ds-door) .ds-door-journey {
     height: var(--ds-door-band);
   }
 
-  /* Empty on a phone (the captions are desktop chrome), so it must not push the frame down. */
+  /* Captions are desktop chrome; Filters stays — phones need a path into the instrument. */
   .ds-door__field-chrome {
-    top: 0;
+    top: var(--ds-space-2);
+    left: var(--ds-space-2);
+    right: var(--ds-space-2);
+    justify-content: flex-end;
   }
 
-  /* The captions are desktop chrome; the no-plate note still shows where the map would be. */
   .ds-door__field-caption {
     display: none;
+  }
+
+  .ds-door__filters {
+    margin-left: 0;
   }
 
   .ds-door-journey {
@@ -883,42 +1099,49 @@ body:has(.ds-door) .ds-door-journey {
     align-content: start;
   }
 
+  /*
+   * The opening sheet on a phone or tablet. Same object as the desktop one, cut to the screen: it
+   * rises over the band's bottom margin and bleeds off both side edges, so the map band above it
+   * and the sheet below read as one composition rather than a card sitting in a margin.
+   */
   .ds-door-journey__chapter--rest {
-    padding-top: calc(var(--ds-door-band) - var(--ds-door-overlap));
+    padding: calc(var(--ds-door-band) - var(--ds-door-overlap)) 0 var(--ds-space-6);
   }
 
-  /* The desktop cold-open copy tells the reader to click pins and move the field by hand, which
-     the plate does not take below 900px; the headline and the Here line carry the opening. */
-  .ds-door-journey__chapter--rest .ds-door-journey__eyebrow,
-  .ds-door-journey__chapter--rest .ds-door-journey__prose {
-    display: none;
-  }
-
-  .ds-door-journey__card,
-  .ds-door-journey__chapter--rest .ds-door-journey__card {
+  .ds-door-journey__card {
     width: min(36rem, 100%);
     max-height: none;
     overflow: visible;
   }
 
-  .ds-door-journey__lockup {
-    margin-inline: 0;
-    max-width: min(100%, 12.5rem);
+  .ds-door-open {
+    width: 100%;
+    padding-inline: var(--ds-gutter);
+    border-right: 0;
+    border-radius: 0;
   }
 
-  .ds-door-journey__support {
-    font-size: clamp(1.0625rem, 3.5vw, 1.25rem);
+  .ds-door-open__headline {
+    font-size: clamp(2.25rem, 13vw, 4rem);
+    letter-spacing: -0.045em;
+    line-height: 0.9;
   }
 
-  .ds-door-journey__cold {
-    font-size: clamp(1.375rem, 5.5vw, 1.75rem);
-    letter-spacing: -0.025em;
-    line-height: 1.14;
+  .ds-door-open__headline .ds-hero-headline-morph__trailer {
+    font-size: 0.5em;
   }
 
-  .ds-door-journey__presence {
-    margin-top: var(--ds-space-3);
-    font-size: 0.875rem;
+  .ds-door-open__invite {
+    max-width: none;
+  }
+
+  .ds-door-open__ledger {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--ds-space-2) var(--ds-space-3);
+  }
+
+  .ds-door-open__actions > * {
+    flex: 1 1 0;
   }
 
   .ds-door-journey__chapter--center {
@@ -928,57 +1151,6 @@ body:has(.ds-door) .ds-door-journey {
   .ds-door-journey__chapter--center .ds-door-journey__actions {
     justify-content: flex-start;
   }
-
-  .ds-door-journey__chapter--rest .ds-door-journey__card {
-    max-height: none;
-    overflow: visible;
-    padding: var(--ds-space-4);
-  }
-
-  .ds-door-journey__chapter--rest .ds-door-journey__copy {
-    overflow: visible;
-  }
-
-  .ds-door-journey__chapter--rest .ds-door-journey__lockup {
-    max-width: min(100%, 11.5rem);
-  }
-
-  /*
-   * The opening card on a phone or tablet. The headline is the thesis, so it is the largest type
-   * on the screen and sets on two lines: the subject, then where. The tagline would repeat what
-   * the headline says; the "Here" line under it names the place, and the count follows as a
-   * quiet line aligned with it. The two actions share the row evenly.
-   */
-  .ds-door-journey__chapter--rest .ds-door-journey__cold {
-    font-size: clamp(2rem, 9.6vw, 2.75rem);
-    letter-spacing: -0.035em;
-    line-height: 1.04;
-  }
-
-  .ds-door-journey__chapter--rest .ds-hero-headline-morph__trailer {
-    display: block;
-  }
-
-  .ds-door-journey__chapter--rest .ds-door-journey__support {
-    display: none;
-  }
-
-  .ds-door-journey__chapter--rest .ds-door-journey__presence {
-    margin-top: var(--ds-space-2);
-    padding-left: calc(1rem + var(--ds-space-3));
-    font-family: var(--ds-font-mono);
-    font-size: 0.75rem;
-    color: var(--ds-ink-muted);
-  }
-
-  .ds-door-journey__chapter--rest .ds-door-journey__presence-n {
-    font-size: inherit;
-    color: var(--ds-ink);
-  }
-
-  .ds-door-journey__chapter--rest .ds-door-journey__actions > * {
-    flex: 1 1 0;
-  }
 }
 
 @media (max-width: 559px) {
@@ -987,22 +1159,12 @@ body:has(.ds-door) .ds-door-journey {
     padding-bottom: calc(var(--ds-space-8) + env(safe-area-inset-bottom, 0px));
   }
 
-  .ds-door-journey__lockup {
-    max-width: min(100%, 11rem);
-  }
-
   .ds-door-journey__card {
     padding: var(--ds-space-4) var(--ds-space-4) var(--ds-space-5);
   }
 
-  .ds-door-journey__cold {
-    font-size: clamp(1.25rem, 6vw, 1.5rem);
-    margin-top: var(--ds-space-4);
-  }
-
   .ds-door-journey__prose,
-  .ds-door-journey__cite,
-  .ds-door-journey__pillars {
+  .ds-door-journey__cite {
     overflow-wrap: break-word;
     min-width: 0;
   }
@@ -1011,46 +1173,23 @@ body:has(.ds-door) .ds-door-journey {
     margin-top: var(--ds-space-4);
   }
 
+  /* The sheet keeps the frame's own edges; the chapter's phone gutter is not its gutter. */
   .ds-door-journey__chapter--rest {
-    padding-bottom: var(--ds-space-4);
+    padding-inline: 0;
+    padding-bottom: calc(var(--ds-space-5) + env(safe-area-inset-bottom, 0px));
   }
 
-  .ds-door-journey__chapter--rest .ds-door-journey__eyebrow,
-  .ds-door-journey__chapter--rest .ds-door-journey__prose {
-    display: none;
+  .ds-door-open {
+    padding-block: var(--ds-space-4) var(--ds-space-5);
   }
 
-  .ds-door-journey__chapter--rest .ds-door-journey__lockup {
-    max-width: min(100%, 7rem);
+  .ds-door-open__strip,
+  .ds-door-open__ledger {
+    margin-top: var(--ds-space-3);
   }
 
-  /* One rhythm on a small screen: masthead, then the headline close under it, then the place. */
-  .ds-door-journey__chapter--rest .ds-door-journey__copy {
-    gap: var(--ds-space-3);
-  }
-
-  .ds-door-journey__chapter--rest .ds-door-journey__cold {
-    margin-top: var(--ds-space-2);
-  }
-
-  .ds-door-journey__chapter--rest .ds-door-journey__here {
-    margin-top: var(--ds-space-1);
-  }
-
-  .ds-door-journey__chapter--rest .ds-door-journey__actions {
-    margin-top: var(--ds-space-4);
-  }
-
-  /* No inner scroller. The card is in document flow and the page scrolls; capping its height put
-     the headline inside a clipped box on a 320x568 screen, where the reader never saw it. */
-  .ds-door-journey__chapter--rest .ds-door-journey__card {
-    max-height: none;
-    overflow: visible;
-    padding: var(--ds-space-5) var(--ds-space-4);
-  }
-
-  .ds-door-journey__chapter--rest .ds-door-journey__copy {
-    overflow: visible;
+  .ds-door-open__ledger {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 
@@ -1066,18 +1205,24 @@ body:has(.ds-door) .ds-door-journey {
     --ds-door-band: min(45dvh, 12rem);
   }
 
-  .ds-door-journey__chapter--rest .ds-door-journey__prose,
-  .ds-door-journey__chapter--rest .ds-door-journey__eyebrow {
-    display: none;
+  /* Landscape phone: the band takes most of the height, so the block type steps down to fit
+     beside it rather than the sheet growing a scroller of its own. */
+  .ds-door-open__headline {
+    font-size: clamp(1.75rem, min(9vw, 11vh), 2.75rem);
   }
 
-  .ds-door-journey__chapter--rest .ds-door-journey__card {
-    max-height: calc(100dvh - var(--ds-island-clearance) - var(--ds-door-band) - var(--ds-space-4));
-    overflow: hidden;
+  .ds-door-open__invite {
+    margin-top: var(--ds-space-2);
+    font-size: 0.8125rem;
   }
 
-  .ds-door-journey__chapter--rest .ds-door-journey__copy {
-    overflow-y: auto;
+  .ds-door-open__strip,
+  .ds-door-open__ledger {
+    margin-top: var(--ds-space-2);
+  }
+
+  .ds-door-open__actions {
+    margin-top: var(--ds-space-3);
   }
 }
 

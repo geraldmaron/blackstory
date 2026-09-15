@@ -40,7 +40,8 @@ export type ProductAxis = (typeof PRODUCT_AXES)[number];
  * question, not the CMS's taxonomy.
  *
  * - `axis` — a top-level product axis (the five above).
- * - `read` — another way to read the archive: law, data, books, the memorial wall.
+ * - `read` — another way to read the archive: the memorial wall (law, data, and books live
+ *   inside the apparatus room).
  * - `trust` — how the archive decides, and what it got wrong.
  * - `participate` — how a reader adds to it or corrects it.
  * - `policy` — BlackStory's own product policy. Never historical Law; see `/law` versus
@@ -162,7 +163,7 @@ const DESTINATIONS: readonly SemanticDestination[] = [
   },
   {
     id: 'explore',
-    label: 'Explore',
+    label: 'Map',
     path: '/explore',
     parent: '/',
     family: 'axis',
@@ -216,35 +217,55 @@ const DESTINATIONS: readonly SemanticDestination[] = [
     label: 'Law',
     path: '/law',
     parent: '/rooms',
-    family: 'read',
+    family: 'trust',
     icon: 'law',
     isPublic: true,
-    browsable: true,
-    description:
-      'The statutes and rulings that shaped what could be built, owned, attended and voted for.',
+    browsable: false,
+    description: 'Deep link into the apparatus Law section.',
   },
   {
     id: 'data',
     label: 'Data',
     path: '/data',
     parent: '/rooms',
-    family: 'read',
+    family: 'trust',
     icon: 'data',
     isPublic: true,
-    browsable: true,
-    description:
-      'National series with their sources attached, and a plain account of what each one cannot tell you.',
+    browsable: false,
+    description: 'Deep link into the apparatus Data section.',
   },
   {
     id: 'books',
     label: 'Banned books',
     path: '/books',
     parent: '/rooms',
-    family: 'read',
+    family: 'trust',
     icon: 'books',
     isPublic: true,
-    browsable: true,
-    description: 'Documented challenges to titles, recorded as challenges rather than as verdicts.',
+    browsable: false,
+    description: 'Deep link into the apparatus Banned books section.',
+  },
+  {
+    id: 'law-browse',
+    label: 'Browse law',
+    path: '/law/browse',
+    parent: '/rooms',
+    family: 'utility',
+    icon: 'law',
+    isPublic: true,
+    browsable: false,
+    description: 'Search and filter the civil-rights law catalog.',
+  },
+  {
+    id: 'books-browse',
+    label: 'Browse banned books',
+    path: '/books/browse',
+    parent: '/rooms',
+    family: 'utility',
+    icon: 'books',
+    isPublic: true,
+    browsable: false,
+    description: 'Search and filter documented title challenges.',
   },
   {
     id: 'memorial',
@@ -260,6 +281,18 @@ const DESTINATIONS: readonly SemanticDestination[] = [
 
   /* ---------- understand / trust ---------- */
   {
+    id: 'apparatus',
+    label: 'How it works',
+    path: '/apparatus',
+    parent: '/rooms',
+    family: 'trust',
+    icon: 'about',
+    isPublic: true,
+    browsable: true,
+    description:
+      'About, methodology, data, law, and banned books as one apparatus room for how the archive works.',
+  },
+  {
     id: 'about',
     label: 'About',
     path: '/about',
@@ -267,8 +300,8 @@ const DESTINATIONS: readonly SemanticDestination[] = [
     family: 'trust',
     icon: 'about',
     isPublic: true,
-    browsable: true,
-    description: 'What this is for, who it is for, and what it refuses to do.',
+    browsable: false,
+    description: 'Deep link into the apparatus About section.',
   },
   {
     id: 'faq',
@@ -290,9 +323,8 @@ const DESTINATIONS: readonly SemanticDestination[] = [
     family: 'trust',
     icon: 'methodology',
     isPublic: true,
-    browsable: true,
-    description:
-      'How a record gets in, what the evidence grades mean, and why a point is never drawn sharper than its source.',
+    browsable: false,
+    description: 'Deep link into the apparatus Methodology section.',
   },
   {
     id: 'errata',
@@ -473,8 +505,9 @@ export const LEGACY_ALIASES: readonly {
   },
   {
     from: '/map',
-    to: '/explore',
-    because: 'Map was the old name for the Explore instrument.',
+    to: '/',
+    because:
+      'Map is the Door journey. Filter deep links still use /explore?… as map-focus posture.',
     subtree: false,
   },
   {
