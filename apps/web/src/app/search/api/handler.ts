@@ -217,7 +217,9 @@ export async function handleSearchRequest(
     return NextResponse.json(
       {
         results,
-        facets: result.facets,
+        // `facets=0` is the typeahead's request: it renders names only, and the facet counts were
+        // most of every suggestion response. Omitted, the response is unchanged.
+        ...(url.searchParams.get('facets') === '0' ? {} : { facets: result.facets }),
         totalMatched: result.totalMatched,
         hasMore: result.hasMore,
         ...(nextCursor !== undefined ? { nextCursor } : {}),

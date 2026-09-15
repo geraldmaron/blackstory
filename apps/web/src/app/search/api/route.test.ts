@@ -178,3 +178,19 @@ test('cursor round-trip returns the next page, not the same page', async () => {
     'Dunbar school should appear in top pages',
   );
 });
+
+test('facets=0 leaves the facet counts out of the response, and omitting it keeps them', async () => {
+  // The bar's typeahead renders names only; the facet counts were most of every suggestion
+  // response. Every other caller omits the flag and gets the response it always got.
+  const deps = await buildDeps();
+  const lean = (await (
+    await handleSearchRequest(searchRequest('?q=dunbar&pageSize=1&facets=0'), deps)
+  ).json()) as Record<string, unknown>;
+  assert.equal('facets' in lean, false);
+  assert.ok(Array.isArray(lean.results));
+
+  const full = (await (
+    await handleSearchRequest(searchRequest('?q=dunbar&pageSize=1'), deps)
+  ).json()) as Record<string, unknown>;
+  assert.equal('facets' in full, true);
+});

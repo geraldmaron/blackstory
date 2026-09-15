@@ -195,3 +195,22 @@
 .ds-records-pager__spacer {
   flex: 0 0 1px;
 }
+
+/* A long facet's tray holds one native select across the tray: every value, one picker. */
+.ds-records-facet__form {
+  display: flex;
+  flex: 1 1 100%;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--ds-space-2);
+  margin: 0;
+}
+
+.ds-records-facet__form .ds-pill-select {
+  flex: 1 1 16rem;
+}
+
+.ds-records-facet__form .ds-pill-select__control {
+  flex: 1 1 auto;
+  width: 100%;
+}

@@ -68,6 +68,14 @@ describe('bar search', () => {
     assert.doesNotMatch(source, /if \(!response\.ok\) \{\s*return \[\];/);
   });
 
+  it('asks for suggestions, not a results page', () => {
+    const source = code('components/shell/CommandBarSearch.tsx');
+    // Twenty rows and the full facet counts were about 66KB per pause in typing; the list shows
+    // eight names. The results page owns the full set.
+    assert.match(source, /pageSize=\$\{SUGGESTION_PAGE_SIZE\}/);
+    assert.match(source, /&facets=0/);
+  });
+
   it('hands the abort signal to fetch so a superseded lookup is canceled', () => {
     const source = code('components/shell/CommandBarSearch.tsx');
     // The endpoint caps concurrent in-flight requests per caller. A lookup the reader has already

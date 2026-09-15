@@ -72,6 +72,24 @@ describe('a failed lookup is not an empty one', () => {
     );
   });
 
+  it('says it is searching while a lookup is outstanding, instead of saying nothing', () => {
+    // A cold server can take seconds to answer the first lookup, and an empty field in the
+    // meantime reads as a search that does not work.
+    assert.match(code, /const SEARCHING_NOTE = 'Searching…'/);
+    const start = code.indexOf('const statusMessage');
+    const status = code.slice(start, code.indexOf(';', code.indexOf('available`', start)));
+    assert.ok(
+      status.indexOf('showSearching') >= 0 &&
+        status.indexOf('showSearching') < status.indexOf('No matching suggestions'),
+      'a pending lookup must not be announced as no matches',
+    );
+    // The live region announces it; the visible note must not announce it a second time.
+    assert.match(
+      code,
+      /showSearching && open \? \(\s*<p className="ds-typeahead__note" aria-hidden="true">/,
+    );
+  });
+
   it('keeps the note out of the listbox', () => {
     // A note is not an option: inside `role="listbox"` it would be arrowable and would announce
     // itself as one available suggestion.

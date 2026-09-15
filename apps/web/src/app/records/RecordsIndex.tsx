@@ -19,28 +19,39 @@ import {
 } from '../../components/room';
 import { meterLevelForTier, RecordMeter } from '../../components/entity/RecordChrome';
 import { KindGlyph } from '../../components/map-experience/KindGlyph';
+import { AutoSubmitSelect } from '../../components/forms/AutoSubmitSelect';
 import type { RecordsIndex as RecordsIndexModel } from '../../lib/records/build-records-index';
 import { RECORDS_FILTER_KEYS } from '../../lib/records/build-records-index';
 
 void React;
 
-const FILTER_GROUP_LABELS: Readonly<Record<(typeof RECORDS_FILTER_KEYS)[number], string>> =
-  Object.freeze({
-    kind: 'Kind',
-    era: 'Era',
-    state: 'State',
-    topic: 'Topic',
-    status: 'Status',
-    evidence: 'Grade',
-  });
+type FilterKey = (typeof RECORDS_FILTER_KEYS)[number];
+
+const FILTER_GROUP_LABELS: Readonly<Record<FilterKey, string>> = Object.freeze({
+  kind: 'Kind',
+  era: 'Era',
+  state: 'State',
+  topic: 'Topic',
+  status: 'Status',
+  evidence: 'Grade',
+});
+
+/** The first option of a long facet's select: the narrowing lifted. */
+const FILTER_ALL_LABELS: Readonly<Record<FilterKey, string>> = Object.freeze({
+  kind: 'All kinds',
+  era: 'All eras',
+  state: 'All states',
+  topic: 'All topics',
+  status: 'All statuses',
+  evidence: 'Any grade',
+});
 
 /**
- * The chip bar shows the vocabulary a reader can act on without drowning the surface. Six, not
- * eight: at eight most groups wrapped to a second line, which doubled the panel's height and put
- * the first record below the fold. The rail carries the long tail of era and state, and the tail
- * of every group stays reachable through search.
+ * A facet with more values than this opens as a native select holding every value; a shorter one
+ * stays a row of chips. The tray used to show the first six chips and drop the rest, so most
+ * states, eras and topics could not be picked from the facet at all.
  */
-const CHIPS_PER_GROUP = 6;
+const CHIP_FACET_MAX = 8;
 
 export type RecordsIndexProps = {
   readonly model: RecordsIndexModel;
@@ -161,16 +172,52 @@ export function RecordsIndexRoom({ model, releaseLabel }: RecordsIndexProps) {
                 role="group"
                 aria-label={FILTER_GROUP_LABELS[key]}
               >
-                {options.slice(0, CHIPS_PER_GROUP).map((option) => (
-                  <a
-                    className="ds-room-chip"
-                    href={option.href}
-                    key={option.id}
-                    aria-current={option.id === query[key] ? true : undefined}
-                  >
-                    {option.label} <span className="ds-room-num">{option.count}</span>
-                  </a>
-                ))}
+                {options.length > CHIP_FACET_MAX ? (
+                  /*
+                    A long vocabulary (every state, every era, every topic) is a list to pick
+                    from, not a wall of chips to scan. A native select gives the whole list with
+                    the platform's own picker on a phone, applies on change, and without
+                    JavaScript the form still submits through its fallback button. The other
+                    narrowings ride along as hidden fields, as in the find form above.
+                  */
+                  <form className="ds-records-facet__form" action="/records" method="get">
+                    {query.q.length > 0 ? <input type="hidden" name="q" value={query.q} /> : null}
+                    {RECORDS_FILTER_KEYS.filter(
+                      (other) => other !== key && query[other].length > 0,
+                    ).map((other) => (
+                      <input key={other} type="hidden" name={other} value={query[other]} />
+                    ))}
+                    <AutoSubmitSelect
+                      id={`records-facet-${key}`}
+                      name={key}
+                      label={FILTER_GROUP_LABELS[key]}
+                      defaultValue={active ? active.id : ''}
+                      options={[
+                        { value: '', label: FILTER_ALL_LABELS[key] },
+                        ...options.map((option) => ({
+                          value: option.id,
+                          label: `${option.label} (${option.count.toLocaleString('en-US')})`,
+                        })),
+                      ]}
+                    />
+                    <noscript>
+                      <button className="ds-records-find__go" type="submit">
+                        Show
+                      </button>
+                    </noscript>
+                  </form>
+                ) : (
+                  options.map((option) => (
+                    <a
+                      className="ds-room-chip"
+                      href={option.href}
+                      key={option.id}
+                      aria-current={option.id === query[key] ? true : undefined}
+                    >
+                      {option.label} <span className="ds-room-num">{option.count}</span>
+                    </a>
+                  ))
+                )}
               </div>
             </details>
           );
