@@ -3,10 +3,9 @@
 import React, { useEffect, useState } from 'react';
 import { usePathname, useSearchParams } from 'next/navigation';
 import {
-  LIVES_GROUP_DEFINITIONS,
-  LIVES_GROUP_LABELS,
-  LIVES_GROUP_SLICES,
-  type LivesRegionBundle,
+  LIVES_LENSES,
+  LIVES_LENS_LABELS,
+  type LivesAreaBundle,
 } from '@repo/domain/statistics/lives';
 import {
   LIVES_TIER_PARAMS,
@@ -31,7 +30,7 @@ function sameView(a: LivesViewState, b: LivesViewState): boolean {
 }
 
 export type LivesTimelineProps = {
-  readonly bundle: LivesRegionBundle;
+  readonly bundle: LivesAreaBundle;
 };
 
 /**
@@ -73,17 +72,16 @@ export function LivesTimeline({ bundle }: LivesTimelineProps) {
       <div className="lives-controls">
         <fieldset className="lives-controls__group">
           <legend>Emphasize</legend>
-          {LIVES_GROUP_SLICES.map((slice) => (
-            <label key={slice} className="lives-controls__option">
+          {LIVES_LENSES.map((lens) => (
+            <label key={lens} className="lives-controls__option">
               <input
                 type="radio"
                 name="lives-race"
-                value={slice}
-                checked={view.race === slice}
-                onChange={() => update({ race: slice })}
+                value={lens}
+                checked={view.race === lens}
+                onChange={() => update({ race: lens })}
               />
-              <span>{LIVES_GROUP_LABELS[slice]}</span>
-              <span className="lives-sr-only"> ({LIVES_GROUP_DEFINITIONS[slice]})</span>
+              <span>{LIVES_LENS_LABELS[lens]}</span>
             </label>
           ))}
         </fieldset>

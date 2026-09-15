@@ -3,53 +3,86 @@ import { test } from 'node:test';
 import {
   edtfYear,
   mapApplicabilityRow,
-  mapDefinitionRow,
+  mapCountNoteRow,
+  mapCoverageRow,
   mapObservationRow,
   recordHrefForEntity,
 } from './lives-source';
 
-test('definition rows default missing counties and coverage to empty', () => {
-  const mapped = mapDefinitionRow({
-    region_id: 'region:chicago-il',
-    decade: 1960,
-    reference_period: '1960',
-    boundary_version: 'region-chicago-il-1960',
-    measurement_regime: 'constructed_household_income',
-    comparability_note: 'Cook and DuPage counties.',
-    member_county_fips: null,
-    coverage: null,
+test('numeric columns returned as strings become numbers and count margins carry through', () => {
+  const mapped = mapObservationRow({
+    metric_id: 'lives-homeownership',
+    jurisdiction_id: 'state:48',
+    reference_period: '2019-2023',
+    race_ethnicity_slice: 'hispanic',
+    estimate: '58.1',
+    numerator: '1200',
+    denominator: '2065',
+    source: 'ACS 2019-2023 B25003I',
+    source_url: 'https://api.census.gov/data/2023/acs/acs5',
+    metadata: { numeratorMoe: '40', denominatorMoe: 51, note: 'x' },
   });
-  assert.deepEqual(mapped.memberCountyFips, []);
-  assert.deepEqual(mapped.coverage, {});
-  assert.equal(mapped.decade, 1960);
+  assert.equal(mapped.estimate, 58.1);
+  assert.equal(mapped.numerator, 1200);
+  assert.equal(mapped.denominator, 2065);
+  assert.deepEqual(mapped.metadata, { numeratorMoe: 40, denominatorMoe: 51 });
 });
 
-test('numeric columns returned as strings become numbers', () => {
+test('rows without margins or counts map to nulls', () => {
   const mapped = mapObservationRow({
-    metric_id: 'ipums-lives-class-share-lower',
-    boundary_version: 'region-chicago-il-1960',
-    race_ethnicity_slice: 'black_nh',
-    estimate: '41.2',
-    margin_of_error: '3.1',
-    source: 'IPUMS USA',
-    source_url: 'https://usa.ipums.org/',
-    metadata: { unweightedN: 812, cellState: 'published' },
+    metric_id: 'lives-literacy',
+    jurisdiction_id: 'state:28',
+    reference_period: '1900',
+    race_ethnicity_slice: 'negro',
+    estimate: 52,
+    numerator: null,
+    denominator: null,
+    source: 'Census 1900',
+    source_url: 'https://www.census.gov/',
+    metadata: null,
   });
-  assert.equal(mapped.estimate, 41.2);
-  assert.equal(mapped.marginOfError, 3.1);
-  assert.equal(
-    mapObservationRow({
-      metric_id: 'm',
-      boundary_version: 'b',
-      race_ethnicity_slice: null,
-      estimate: 1,
-      margin_of_error: null,
-      source: 's',
-      source_url: 'https://x.gov',
-      metadata: null,
-    }).marginOfError,
-    null,
-  );
+  assert.equal(mapped.numerator, null);
+  assert.equal(mapped.metadata, null);
+});
+
+test('a count note needs at least one citation with a web address', () => {
+  const row = {
+    id: 'note-1930-mexican',
+    decade: 1930,
+    applies_to: ['hispanic', 'bogus'],
+    area_ids: null,
+    heading: 'Counted as a race, once',
+    body: 'In 1930 the census listed Mexican as a race.',
+    citations: [{ label: 'National Archives', url: 'https://www.archives.gov/' }, { label: 'bad' }],
+  };
+  const mapped = mapCountNoteRow(row);
+  assert.deepEqual(mapped?.appliesTo, ['hispanic']);
+  assert.deepEqual(mapped?.areaIds, []);
+  assert.equal(mapped?.citations.length, 1);
+  assert.equal(mapCountNoteRow({ ...row, citations: [{ label: 'x', url: 'ftp://x' }] }), null);
+  assert.equal(mapCountNoteRow({ ...row, citations: null }), null);
+});
+
+test('coverage overrides skip malformed entries', () => {
+  const entries = mapCoverageRow({
+    decade: 1950,
+    coverage: [
+      { key: 'homeownership', lens: 'hispanic', state: 'not_measured', reason: 'Not tabulated.' },
+      { key: 'urban', lens: 'black_nh', state: 'suppressed', reason: 'old slice' },
+      { key: 'urban', lens: 'all', state: 'pending', reason: 'bad state' },
+      'nonsense',
+    ],
+  });
+  assert.deepEqual(entries, [
+    {
+      decade: 1950,
+      key: 'homeownership',
+      lens: 'hispanic',
+      state: 'not_measured',
+      reason: 'Not tabulated.',
+    },
+  ]);
+  assert.deepEqual(mapCoverageRow({ decade: 1950, coverage: {} }), []);
 });
 
 test('applicability rows read in-force years from EDTF and keep the href', () => {

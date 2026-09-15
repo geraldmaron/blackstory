@@ -9,7 +9,7 @@ import {
 
 test('empty params open the default view', () => {
   assert.deepEqual(parseLivesSearchParams({}), DEFAULT_LIVES_VIEW);
-  assert.equal(buildLivesHref('chicago', DEFAULT_LIVES_VIEW), '/lives/chicago');
+  assert.equal(buildLivesHref('deep-south', DEFAULT_LIVES_VIEW), '/lives/deep-south');
 });
 
 test('valid params round-trip through the query string', () => {
@@ -26,16 +26,14 @@ test('a decade label with a trailing s is accepted', () => {
   assert.equal(parseLivesSearchParams({ decade: '1960s' }).decade, 1960);
 });
 
-test('malformed or out-of-range values fall back to defaults', () => {
-  const state = parseLivesSearchParams({
-    race: 'black_alone',
-    tier: 'rich',
-    decade: '1955',
-  });
-  assert.deepEqual(state, DEFAULT_LIVES_VIEW);
+test('old slice ids, unknown tiers and off-grid decades fall back to defaults', () => {
+  assert.deepEqual(
+    parseLivesSearchParams({ race: 'black_nh', tier: 'rich', decade: '1955' }),
+    DEFAULT_LIVES_VIEW,
+  );
   assert.equal(parseLivesSearchParams({ decade: '2030' }).decade, DEFAULT_LIVES_VIEW.decade);
 });
 
 test('the first value of a repeated param wins', () => {
-  assert.equal(parseLivesSearchParams({ race: ['white_nh', 'hispanic'] }).race, 'white_nh');
+  assert.equal(parseLivesSearchParams({ race: ['white', 'hispanic'] }).race, 'white');
 });

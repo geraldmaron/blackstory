@@ -9,7 +9,7 @@
  * Method: docs/methodology/lives-across-decades.md.
  */
 
-export const LIVES_APPLICABILITY_SLICES = ['black_nh', 'white_nh', 'hispanic', 'all'] as const;
+export const LIVES_APPLICABILITY_SLICES = ['black', 'white', 'hispanic', 'all'] as const;
 
 export const LIVES_LIFE_DOMAINS = [
   'housing',

@@ -1,46 +1,65 @@
 /**
- * Builds the per-region bundle behind /lives/[region]: for every decade 1870–2020, class shares
- * and conditions for all three groups, the rules in force that applied to that place, and the
- * decade's narrative frame. Pure: loaders pass rows in, surfaces render what comes out.
+ * Builds the bundle behind /lives/[area]: for every decade 1870–2020, what the count could see, class
+ * shares and conditions for all three lenses, the rules in force, and the decade's frame. Pure: the
+ * snapshot build passes rows in, surfaces render what comes out.
+ *
+ * Figures arrive at state and national level as published. A region's figure is derived here by summing
+ * its member states; the national baseline uses a published national figure when one exists. Each
+ * figure reaches a lens through the definition its era published, and carries that definition's label.
  *
  * Guarantees, each covered by tests:
- * - Every group is always present; a missing value is a cell with a state, never an omission.
- * - Suppressed and unmeasured cells carry their reason and no estimate.
- * - The 1890 gap and every measurement-regime boundary are flagged.
- * - No change between decades is computed across a regime boundary.
- * - Rules resolve over the region, its ancestors and its member counties, by in-force overlap.
+ * - Every lens is present in every decade; a missing value is a cell with a state and a reason.
+ * - Hispanic figures appear only where the census counted Hispanic origin or a named proxy.
+ * - A region figure published for too little of its population, or on too small a base, is withheld.
+ * - No change between decades is computed across a measurement boundary.
+ * - Rules resolve to federal law and the area's member states, each labeled with its jurisdiction.
  *
  * Method: docs/methodology/lives-across-decades.md. Copy: juxtaposition-not-causation.md.
  */
 import { JUXTAPOSITION_DISCLAIMER } from '../juxtaposition.js';
 import {
+  aggregateDistribution,
+  aggregateRate,
+  coverageShare,
+  estimateBandShares,
+  estimateMedian,
+  sumBrackets,
+  type IncomeBracket,
+  type StateCount,
+} from './lives-aggregate.js';
+import {
   LIVES_CLASS_BUCKETS,
-  LIVES_CLASS_SHARE_METRIC,
-  LIVES_CONDITION_METRICS,
-  LIVES_TIER_KEYS,
-  livesMetricId,
-  livesMetricLabel,
+  LIVES_CONDITIONS,
+  LIVES_SERIES,
+  livesConditionLabel,
+  livesConditionPublishedIn,
+  livesDecadeForReferencePeriod,
+  parseIncomeBracketSeriesId,
+  workClassSeriesId,
   type LivesClassBucket,
-  type LivesMetricDefinition,
-  type LivesMetricKey,
-  type LivesMetricUnit,
-  type LivesTierKey,
+  type LivesConditionKey,
 } from './lives-metrics.js';
 import {
   LIVES_DECADES,
   LIVES_REGIME_DESCRIPTIONS,
   crossesLivesRegimeBoundary,
-  livesHispanicOriginImputed,
+  livesHispanicCounting,
   livesRegimeForDecade,
   livesRegimesShareIncomeFooting,
   type LivesDecade,
+  type LivesHispanicCounting,
   type LivesMeasurementRegime,
   type LivesRegimeDescription,
 } from './lives-regimes.js';
+import { livesStateJurisdictionId, type LivesAreaConfig } from './lives-regions.js';
 import {
-  LIVES_GROUP_SLICES,
+  LIVES_LENSES,
+  RACE_ETHNICITY_DEFINITION_LABELS,
+  lensForDefinition,
   normalizeRaceEthnicitySlice,
-  type LivesGroupSlice,
+  preferredDefinition,
+  type CanonicalRaceEthnicitySlice,
+  type LivesLens,
 } from './race-ethnicity-slices.js';
 
 export type LivesCellState =
@@ -53,45 +72,61 @@ export type LivesSourceRef = {
 
 export type LivesCell = {
   readonly state: LivesCellState;
+  /** Percentage, 0–100. */
   readonly estimate?: number;
   readonly marginOfError?: number;
-  readonly unweightedN?: number;
   readonly reason?: string;
-  readonly source?: LivesSourceRef;
+  readonly definitionLabel?: string;
+  /** Share of the area's group population the figure covers, 0–100, when below 100. */
+  readonly coveragePct?: number;
+  /** Jurisdictions a region-limited definition (Spanish surname, Puerto Rican birth) was counted in. */
+  readonly countedIn?: readonly string[];
+  /** True when the figure was summed or estimated rather than printed. */
+  readonly derived?: boolean;
+  /** The count note that explains a missing or limited figure. */
+  readonly noteId?: string;
+  readonly sources?: readonly LivesSourceRef[];
 };
 
 export type LivesJurisdictionInput = {
   readonly id: string;
   readonly name: string;
-  readonly parentId: string | null;
-};
-
-export type LivesRegionDecadeDefinitionInput = {
-  readonly regionId: string;
-  readonly decade: number;
-  readonly referencePeriod: string;
-  readonly boundaryVersion: string;
-  readonly measurementRegime: LivesMeasurementRegime;
-  readonly comparabilityNote: string;
-  readonly memberCountyFips: readonly string[];
-  /** Keyed `${metricId}|${slice}`. Only non-published states are recorded here. */
-  readonly coverage: Readonly<
-    Record<string, { readonly state: 'suppressed' | 'not_measured'; readonly reason: string }>
-  >;
 };
 
 export type LivesObservationInput = {
   readonly metricId: string;
-  readonly boundaryVersion: string;
+  readonly jurisdictionId: string;
+  readonly referencePeriod: string;
   readonly raceEthnicitySlice: string | null;
   readonly estimate: number;
-  readonly marginOfError?: number | null;
+  readonly numerator?: number | null;
+  readonly denominator?: number | null;
   readonly source: string;
   readonly sourceUrl: string;
   readonly metadata?: {
-    readonly unweightedN?: number;
-    readonly cellState?: 'published' | 'wide_margin';
+    /** ACS 90% margins on the counts, when published. */
+    readonly numeratorMoe?: number;
+    readonly denominatorMoe?: number;
   } | null;
+};
+
+export type LivesCoverageInput = {
+  readonly decade: number;
+  readonly key: LivesConditionKey | 'class_share';
+  readonly lens: LivesLens | 'all';
+  readonly state: 'not_measured' | 'suppressed';
+  readonly reason: string;
+};
+
+export type LivesCountNoteInput = {
+  readonly id: string;
+  readonly decade: number;
+  readonly appliesTo: readonly (LivesLens | 'all')[];
+  /** Areas the note is limited to; empty means every area. */
+  readonly areaIds: readonly string[];
+  readonly heading: string;
+  readonly body: string;
+  readonly citations: readonly LivesSourceRef[];
 };
 
 export type LivesApplicabilityInput = {
@@ -104,7 +139,7 @@ export type LivesApplicabilityInput = {
   readonly inForceFromYear: number;
   readonly inForceToYear: number | null;
   readonly groupsNamed: readonly string[];
-  readonly appliesToSlices: readonly (LivesGroupSlice | 'all')[];
+  readonly appliesToSlices: readonly (LivesLens | 'all')[];
   readonly lifeDomains: readonly string[];
   readonly textPosture: 'exclusionary' | 'protective' | 'facially_neutral';
   readonly disputed: boolean;
@@ -117,15 +152,25 @@ export type LivesFrameInput = {
   readonly paragraphs: readonly string[];
 };
 
+export type LivesCountNote = {
+  readonly id: string;
+  readonly heading: string;
+  readonly body: string;
+  readonly appliesTo: readonly (LivesLens | 'all')[];
+  readonly citations: readonly LivesSourceRef[];
+};
+
 export type LivesRule = {
   readonly id: string;
   readonly entityId: string;
   readonly name: string;
   readonly href: string | null;
   readonly scopeLevel: 'federal' | 'state' | 'local';
+  /** "Federal", or the state's name. */
+  readonly jurisdictionLabel: string;
   readonly inForceFromYear: number;
   readonly inForceToYear: number | null;
-  readonly appliesTo: readonly LivesGroupSlice[];
+  readonly appliesTo: readonly LivesLens[];
   readonly groupsNamed: readonly string[];
   readonly lifeDomains: readonly string[];
   readonly textPosture: 'exclusionary' | 'protective' | 'facially_neutral';
@@ -134,18 +179,14 @@ export type LivesRule = {
 };
 
 export type LivesConditionBundle = {
-  readonly key: LivesMetricKey;
+  readonly key: LivesConditionKey;
   readonly label: string;
-  readonly unit: LivesMetricUnit;
-  readonly kind: 'share' | 'level';
-  readonly cells: Readonly<Record<LivesGroupSlice, Readonly<Record<LivesTierKey, LivesCell>>>>;
+  readonly universe: string;
+  readonly cells: Readonly<Record<LivesLens, LivesCell>>;
 };
 
-/**
- * How the decade relates to the one before it: same measure, a method note on the same income
- * footing, a different measure altogether, or the 1890 gap.
- */
-export type LivesBoundaryKind = 'none' | 'method_note' | 'different_measure' | 'gap';
+/** How a decade relates to the one before it: same measure, a same-unit method change, or a new measure. */
+export type LivesBoundaryKind = 'none' | 'method_note' | 'different_measure';
 
 export type LivesDecadeBundle = {
   readonly decade: LivesDecade;
@@ -153,96 +194,437 @@ export type LivesDecadeBundle = {
   readonly regime: LivesMeasurementRegime;
   readonly regimeDescription: LivesRegimeDescription;
   readonly boundaryFromPrevious: LivesBoundaryKind;
-  readonly hispanicOriginImputed: boolean;
-  readonly referencePeriod: string | null;
-  readonly comparabilityNote: string | null;
+  readonly hispanicCounting: LivesHispanicCounting;
   readonly classLabel: string;
-  readonly classShares: Readonly<
-    Record<LivesGroupSlice, Readonly<Record<LivesClassBucket, LivesCell>>>
-  >;
+  readonly countNotes: readonly LivesCountNote[];
+  readonly classShares: Readonly<Record<LivesLens, Readonly<Record<LivesClassBucket, LivesCell>>>>;
   readonly conditions: readonly LivesConditionBundle[];
   readonly rulesInForce: readonly LivesRule[];
   readonly frame: { readonly heading: string; readonly paragraphs: readonly string[] } | null;
 };
 
-export type LivesRegionBundle = {
-  readonly regionId: string;
-  readonly regionName: string;
+export type LivesAreaBundle = {
+  readonly areaId: string;
+  readonly areaSlug: string;
+  readonly areaName: string;
+  readonly areaKind: 'nation' | 'region';
   readonly decades: readonly LivesDecadeBundle[];
   readonly disclaimer: string;
 };
 
-export type BuildLivesRegionBundleInput = {
-  readonly region: LivesJurisdictionInput;
+export type BuildLivesAreaBundleInput = {
+  readonly area: LivesAreaConfig;
   readonly jurisdictions: readonly LivesJurisdictionInput[];
-  readonly definitions: readonly LivesRegionDecadeDefinitionInput[];
   readonly observations: readonly LivesObservationInput[];
+  readonly coverage: readonly LivesCoverageInput[];
+  readonly countNotes: readonly LivesCountNoteInput[];
   readonly applicability: readonly LivesApplicabilityInput[];
   readonly frames: readonly LivesFrameInput[];
 };
 
+/** A region figure on a smaller base than this many counted people or households is withheld. */
+export const LIVES_MIN_BASE = 500;
+/** A region figure covering less than this share of the area's group population is withheld. */
+export const LIVES_MIN_COVERAGE = 0.8;
+const Z_90 = 1.645;
+const NATION_ID = 'nation:US';
+const OWN_SCOPE_DEFINITIONS: readonly CanonicalRaceEthnicitySlice[] = [
+  'spanish_surname',
+  'puerto_rican',
+  'mexican',
+];
 const SCOPE_ORDER = { federal: 0, state: 1, local: 2 } as const;
 
-export function buildLivesRegionBundle(input: BuildLivesRegionBundleInput): LivesRegionBundle {
-  const definitionsByDecade = new Map<number, LivesRegionDecadeDefinitionInput>();
-  for (const definition of input.definitions) {
-    if (definition.regionId !== input.region.id) continue;
-    const expected = livesRegimeForDecadeOrThrow(definition.decade);
-    if (definition.measurementRegime !== expected) {
-      throw new Error(
-        `${definition.regionId} ${definition.decade}s is stored as ${definition.measurementRegime}, but the method binds ${expected}`,
-      );
-    }
-    definitionsByDecade.set(definition.decade, definition);
-  }
+type IndexedRow = LivesObservationInput & {
+  readonly definition: CanonicalRaceEthnicitySlice;
+  readonly lens: LivesLens | null;
+};
 
-  const observationIndex = new Map<string, LivesObservationInput>();
+export function buildLivesAreaBundle(input: BuildLivesAreaBundleInput): LivesAreaBundle {
+  const area = input.area;
+  const names = new Map(input.jurisdictions.map((row) => [row.id, row.name]));
+  const memberIds = area.memberStateFips.map(livesStateJurisdictionId);
+
+  const byMetricDecade = new Map<string, IndexedRow[]>();
   for (const observation of input.observations) {
-    const slice = normalizeRaceEthnicitySlice(observation.raceEthnicitySlice);
-    if (slice === null) continue;
-    observationIndex.set(
-      observationKey(observation.metricId, observation.boundaryVersion, slice),
-      observation,
-    );
+    const decade = livesDecadeForReferencePeriod(observation.referencePeriod);
+    const definition = normalizeRaceEthnicitySlice(observation.raceEthnicitySlice);
+    if (decade === null || definition === null) continue;
+    const key = `${observation.metricId}|${decade}`;
+    const rows = byMetricDecade.get(key) ?? [];
+    rows.push({ ...observation, definition, lens: lensForDefinition(definition) });
+    byMetricDecade.set(key, rows);
   }
+  const rowsFor = (metricId: string, decade: LivesDecade) =>
+    byMetricDecade.get(`${metricId}|${decade}`) ?? [];
 
-  const ancestorIds = ancestorsOf(input.region.id, input.jurisdictions);
+  const coverageIndex = new Map(
+    input.coverage.map((entry) => [`${entry.decade}|${entry.key}|${entry.lens}`, entry]),
+  );
   const framesByDecade = new Map(input.frames.map((frame) => [frame.decade, frame]));
 
   const decades = LIVES_DECADES.map((decade, index): LivesDecadeBundle => {
     const regime = livesRegimeForDecade(decade);
-    const definition = definitionsByDecade.get(decade) ?? null;
     const previous = index > 0 ? LIVES_DECADES[index - 1]! : null;
-    const readCell = (
-      metric: LivesMetricDefinition,
-      bucket: LivesTierKey | LivesClassBucket,
-      slice: LivesGroupSlice,
-    ) => resolveCell({ metric, bucket, slice, decade, regime, definition, observationIndex });
+    const hispanicCounting = livesHispanicCounting(decade);
+    const notes = input.countNotes.filter(
+      (note) =>
+        note.decade === decade && (note.areaIds.length === 0 || note.areaIds.includes(area.id)),
+    );
+    const noteFor = (lens: LivesLens) =>
+      notes.find((note) => note.appliesTo.includes(lens) || note.appliesTo.includes('all'))?.id;
 
-    const classShares = mapGroups((slice) =>
-      mapKeys(LIVES_CLASS_BUCKETS, (bucket) =>
-        bucket === 'unclassified' && regime !== 'occupational_strata'
-          ? notMeasured('Income tiers place every household, so none are unclassified.')
-          : readCell(LIVES_CLASS_SHARE_METRIC, bucket, slice),
-      ),
+    const withNote = (cell: LivesCell, lens: LivesLens): LivesCell => {
+      if (cell.state !== 'not_measured' && cell.state !== 'suppressed') return cell;
+      const noteId = noteFor(lens);
+      return noteId ? { ...cell, noteId } : cell;
+    };
+
+    const overrideFor = (key: LivesConditionKey | 'class_share', lens: LivesLens) =>
+      coverageIndex.get(`${decade}|${key}|${lens}`) ?? coverageIndex.get(`${decade}|${key}|all`);
+
+    const hispanicUncounted = (lens: LivesLens): LivesCell | null =>
+      lens === 'hispanic' && hispanicCounting === 'not_counted'
+        ? {
+            state: 'not_measured',
+            reason: `The census did not count Hispanic Americans as a group in the ${decade}s.`,
+          }
+        : null;
+
+    const scope = (rows: readonly IndexedRow[]) => {
+      const nationRows = rows.filter((row) => row.jurisdictionId === NATION_ID);
+      if (area.kind === 'nation' && nationRows.length > 0) {
+        return { rows: nationRows, expected: [NATION_ID], derived: false };
+      }
+      return {
+        rows: rows.filter((row) => memberIds.includes(row.jurisdictionId)),
+        expected: memberIds,
+        derived: true,
+      };
+    };
+
+    const coverageCheck = (
+      definition: CanonicalRaceEthnicitySlice,
+      covered: readonly string[],
+      expected: readonly string[],
+    ): LivesCell | { readonly coveragePct?: number; readonly countedIn?: readonly string[] } => {
+      if (OWN_SCOPE_DEFINITIONS.includes(definition)) {
+        return { countedIn: covered.map((id) => names.get(id) ?? id) };
+      }
+      if (covered.length >= expected.length) return {};
+      const population = new Map<string, number>();
+      for (const row of rowsFor(LIVES_SERIES.population, decade)) {
+        if (row.definition === definition && typeof row.numerator === 'number') {
+          population.set(row.jurisdictionId, row.numerator);
+        }
+      }
+      const share = coverageShare(covered, population, expected);
+      if (share === null) {
+        return {
+          state: 'suppressed',
+          reason:
+            'Published for only some of the area’s states, and their share of the group is not known.',
+        };
+      }
+      if (share < LIVES_MIN_COVERAGE) {
+        return {
+          state: 'suppressed',
+          reason: `Published for only ${Math.round(share * 100)}% of the area’s group.`,
+        };
+      }
+      return { coveragePct: share * 100 };
+    };
+
+    const sourcesOf = (rows: readonly IndexedRow[]): LivesSourceRef[] => {
+      const seen = new Map<string, LivesSourceRef>();
+      for (const row of rows) seen.set(row.sourceUrl, { label: row.source, url: row.sourceUrl });
+      return [...seen.values()];
+    };
+
+    const pickDefinition = (rows: readonly IndexedRow[], lens: LivesLens) => {
+      const lensRows = rows.filter((row) => row.lens === lens);
+      const definition = preferredDefinition(
+        lens,
+        lensRows.map((row) => row.definition),
+      );
+      return definition === null
+        ? null
+        : { definition, rows: lensRows.filter((row) => row.definition === definition) };
+    };
+
+    const rateCell = (seriesId: string, key: LivesConditionKey, lens: LivesLens): LivesCell => {
+      const uncounted = hispanicUncounted(lens);
+      if (uncounted) return uncounted;
+      const override = overrideFor(key, lens);
+      if (override) return { state: override.state, reason: override.reason };
+      const picked = pickDefinition(rowsFor(seriesId, decade), lens);
+      if (!picked) return { state: 'pending', reason: 'Not yet loaded for this area and decade.' };
+      const { rows, expected, derived } = scope(picked.rows);
+      const counts: StateCount[] = rows
+        .filter((row) => typeof row.numerator === 'number' && typeof row.denominator === 'number')
+        .map((row) => ({
+          jurisdictionId: row.jurisdictionId,
+          numerator: row.numerator as number,
+          denominator: row.denominator as number,
+        }));
+      const aggregate = aggregateRate(counts, expected);
+      if (!aggregate)
+        return { state: 'pending', reason: 'Not yet loaded for this area and decade.' };
+      const definitionLabel = RACE_ETHNICITY_DEFINITION_LABELS[picked.definition];
+      const coverage = coverageCheck(picked.definition, aggregate.jurisdictionsCovered, expected);
+      if ('state' in coverage) return { ...coverage, definitionLabel };
+      if (aggregate.denominator < LIVES_MIN_BASE) {
+        return { state: 'suppressed', reason: 'Too few counted to say.', definitionLabel };
+      }
+      const margin = proportionMargin(rows, aggregate.numerator, aggregate.denominator);
+      const p = aggregate.ratePct / 100;
+      const cv = margin !== null && p > 0 ? margin / 100 / Z_90 / p : null;
+      if (cv !== null && cv > 0.3) {
+        return {
+          state: 'suppressed',
+          reason: 'The survey margin is too wide to say.',
+          definitionLabel,
+        };
+      }
+      return {
+        state: cv !== null && cv > 0.15 ? 'wide_margin' : 'published',
+        estimate: aggregate.ratePct,
+        ...(margin !== null ? { marginOfError: margin } : {}),
+        definitionLabel,
+        ...coverage,
+        derived,
+        sources: sourcesOf(rows),
+      };
+    };
+
+    const incomeBrackets = (lens: LivesLens) => {
+      const bracketRows: IndexedRow[] = [];
+      for (const [key, rows] of byMetricDecade) {
+        const [metricId, rowDecade] = key.split('|');
+        if (Number(rowDecade) !== decade || !parseIncomeBracketSeriesId(metricId!)) continue;
+        bracketRows.push(...rows);
+      }
+      const picked = pickDefinition(bracketRows, lens);
+      if (!picked) return null;
+      const { rows, expected, derived } = scope(picked.rows);
+      const byJurisdiction = new Map<string, IncomeBracket[]>();
+      for (const row of rows) {
+        const edges = parseIncomeBracketSeriesId(row.metricId);
+        if (!edges || typeof row.numerator !== 'number') continue;
+        const list = byJurisdiction.get(row.jurisdictionId) ?? [];
+        list.push({ lower: edges.lower, upper: edges.upper, count: row.numerator });
+        byJurisdiction.set(row.jurisdictionId, list);
+      }
+      const sets = [...byJurisdiction.values()].map((list) =>
+        [...list].sort((a, b) => a.lower - b.lower),
+      );
+      return {
+        definition: picked.definition,
+        rows,
+        expected,
+        derived,
+        covered: [...byJurisdiction.keys()],
+        sets,
+      };
+    };
+
+    const nationalMedian = rowsFor(LIVES_SERIES.incomeMedian, decade).find(
+      (row) => row.jurisdictionId === NATION_ID && row.definition === 'all',
     );
 
-    const conditions = LIVES_CONDITION_METRICS.map((metric): LivesConditionBundle => ({
-      key: metric.key,
-      label: livesMetricLabel(metric.key, regime),
-      unit: metric.unit,
-      kind: metric.kind,
-      cells: mapGroups((slice) =>
-        mapKeys(LIVES_TIER_KEYS, (tier) => readCell(metric, tier, slice)),
-      ),
+    const classShares = mapLenses((lens) => {
+      const unclassifiedIncome: LivesCell = {
+        state: 'not_measured',
+        reason: 'Income bands place every family or household in a band.',
+      };
+      const fill = (cell: LivesCell): Record<LivesClassBucket, LivesCell> => ({
+        lower: cell,
+        middle: cell,
+        upper: cell,
+        unclassified: regime === 'work_based' ? cell : unclassifiedIncome,
+      });
+      const uncounted = hispanicUncounted(lens);
+      if (uncounted) return fill(withNote(uncounted, lens));
+      const override = overrideFor('class_share', lens);
+      if (override) return fill(withNote({ state: override.state, reason: override.reason }, lens));
+      const pending: LivesCell = {
+        state: 'pending',
+        reason: 'Not yet loaded for this area and decade.',
+      };
+
+      if (regime === 'work_based') {
+        const allRows = LIVES_CLASS_BUCKETS.flatMap((bucket) =>
+          rowsFor(workClassSeriesId(bucket), decade),
+        );
+        const picked = pickDefinition(allRows, lens);
+        if (!picked) return fill(pending);
+        const { rows, expected, derived } = scope(picked.rows);
+        const countsByBucket = mapBuckets((bucket) =>
+          rows
+            .filter((row) => row.metricId === workClassSeriesId(bucket))
+            .map((row) => ({
+              jurisdictionId: row.jurisdictionId,
+              numerator: row.numerator ?? 0,
+              denominator: 0,
+            })),
+        );
+        const distribution = aggregateDistribution(countsByBucket, expected);
+        if (!distribution) return fill(pending);
+        const definitionLabel = RACE_ETHNICITY_DEFINITION_LABELS[picked.definition];
+        const covered = [...new Set(rows.map((row) => row.jurisdictionId))];
+        const coverage = coverageCheck(picked.definition, covered, expected);
+        if ('state' in coverage) return fill(withNote({ ...coverage, definitionLabel }, lens));
+        if (distribution.total < LIVES_MIN_BASE) {
+          return fill(
+            withNote(
+              { state: 'suppressed', reason: 'Too few counted to say.', definitionLabel },
+              lens,
+            ),
+          );
+        }
+        const sources = sourcesOf(rows);
+        return mapBuckets((bucket): LivesCell => ({
+          state: 'published',
+          estimate: distribution.sharesPct[bucket],
+          definitionLabel,
+          ...coverage,
+          derived: true,
+          sources,
+        }));
+      }
+
+      const brackets = incomeBrackets(lens);
+      if (!brackets) return fill(pending);
+      if (!nationalMedian) {
+        return fill({
+          state: 'pending',
+          reason: 'The national median for this decade is not yet loaded.',
+        });
+      }
+      const definitionLabel = RACE_ETHNICITY_DEFINITION_LABELS[brackets.definition];
+      const coverage = coverageCheck(brackets.definition, brackets.covered, brackets.expected);
+      if ('state' in coverage) return fill(withNote({ ...coverage, definitionLabel }, lens));
+      let summed: IncomeBracket[];
+      try {
+        summed = sumBrackets(brackets.sets);
+      } catch {
+        return fill({
+          state: 'suppressed',
+          reason: 'States published this in different bracket layouts, so they cannot be combined.',
+          definitionLabel,
+        });
+      }
+      const total = summed.reduce((sum, bracket) => sum + bracket.count, 0);
+      if (total < LIVES_MIN_BASE) {
+        return fill(
+          withNote(
+            { state: 'suppressed', reason: 'Too few counted to say.', definitionLabel },
+            lens,
+          ),
+        );
+      }
+      const bands = estimateBandShares(summed, nationalMedian.estimate);
+      if (!bands) {
+        return fill({
+          state: 'suppressed',
+          reason: 'The published brackets are too coarse to place the band thresholds.',
+          definitionLabel,
+        });
+      }
+      const sources = sourcesOf([...brackets.rows, nationalMedian]);
+      const band = (estimate: number): LivesCell => ({
+        state: 'published',
+        estimate,
+        definitionLabel,
+        ...coverage,
+        derived: true,
+        sources,
+      });
+      return {
+        lower: band(bands.lowerPct),
+        middle: band(bands.middlePct),
+        upper: band(bands.upperPct),
+        unclassified: unclassifiedIncome,
+      };
+    });
+
+    const conditions = LIVES_CONDITIONS.map((condition): LivesConditionBundle => ({
+      key: condition.key,
+      label: livesConditionLabel(condition.key, regime),
+      universe: condition.universe,
+      cells: mapLenses((lens) => {
+        if (!livesConditionPublishedIn(condition, decade)) {
+          return withNote(
+            {
+              state: 'not_measured',
+              reason: `The census did not publish this by race in the ${decade}s.`,
+            },
+            lens,
+          );
+        }
+        if (condition.seriesId !== null) {
+          return withNote(rateCell(condition.seriesId, condition.key, lens), lens);
+        }
+        const uncounted = hispanicUncounted(lens);
+        if (uncounted) return withNote(uncounted, lens);
+        const brackets = incomeBrackets(lens);
+        if (!brackets || !nationalMedian) {
+          return { state: 'pending', reason: 'Not yet loaded for this area and decade.' };
+        }
+        let summed: IncomeBracket[];
+        try {
+          summed = sumBrackets(brackets.sets);
+        } catch {
+          return { state: 'suppressed', reason: 'States published different bracket layouts.' };
+        }
+        const median = estimateMedian(summed);
+        const definitionLabel = RACE_ETHNICITY_DEFINITION_LABELS[brackets.definition];
+        if (median === null) {
+          return {
+            state: 'suppressed',
+            reason: 'The published brackets are too coarse to estimate a median.',
+            definitionLabel,
+          };
+        }
+        return {
+          state: 'published',
+          estimate: (100 * median) / nationalMedian.estimate,
+          definitionLabel,
+          derived: true,
+          sources: sourcesOf([...brackets.rows, nationalMedian]),
+        };
+      }),
     }));
 
-    const memberCountyIds = (definition?.memberCountyFips ?? []).map((fips) => `county:${fips}`);
-    const applicableJurisdictions = new Set([...ancestorIds, ...memberCountyIds]);
+    const allowed = new Set(area.kind === 'nation' ? [NATION_ID] : [NATION_ID, ...memberIds]);
     const rulesInForce = input.applicability
-      .filter((row) => applicableJurisdictions.has(row.jurisdictionId))
-      .filter((row) => overlapsDecade(row.inForceFromYear, row.inForceToYear, decade))
-      .map((row) => toRule(row))
+      .filter((row) => allowed.has(row.jurisdictionId))
+      .filter(
+        (row) =>
+          row.inForceFromYear <= decade + 9 &&
+          (row.inForceToYear === null || row.inForceToYear >= decade),
+      )
+      .map((row): LivesRule => ({
+        id: row.id,
+        entityId: row.entityId,
+        name: row.entityName,
+        href: row.entityHref,
+        scopeLevel: row.scopeLevel,
+        jurisdictionLabel:
+          row.jurisdictionId === NATION_ID
+            ? 'Federal'
+            : (names.get(row.jurisdictionId) ?? row.jurisdictionId),
+        inForceFromYear: row.inForceFromYear,
+        inForceToYear: row.inForceToYear,
+        appliesTo: row.appliesToSlices.includes('all')
+          ? [...LIVES_LENSES]
+          : LIVES_LENSES.filter((lens) => row.appliesToSlices.includes(lens)),
+        groupsNamed: row.groupsNamed,
+        lifeDomains: row.lifeDomains,
+        textPosture: row.textPosture,
+        disputed: row.disputed,
+        summary: row.summary,
+      }))
       .filter((rule) => rule.appliesTo.length > 0)
       .sort(
         (a, b) =>
@@ -259,10 +641,15 @@ export function buildLivesRegionBundle(input: BuildLivesRegionBundleInput): Live
       regime,
       regimeDescription: LIVES_REGIME_DESCRIPTIONS[regime],
       boundaryFromPrevious: previous === null ? 'none' : boundaryKind(previous, decade),
-      hispanicOriginImputed: livesHispanicOriginImputed(decade),
-      referencePeriod: definition?.referencePeriod ?? null,
-      comparabilityNote: definition?.comparabilityNote ?? null,
+      hispanicCounting,
       classLabel: LIVES_REGIME_DESCRIPTIONS[regime].classLabel,
+      countNotes: notes.map(({ id, heading, body, appliesTo, citations }) => ({
+        id,
+        heading,
+        body,
+        appliesTo,
+        citations,
+      })),
       classShares,
       conditions,
       rulesInForce,
@@ -271,8 +658,10 @@ export function buildLivesRegionBundle(input: BuildLivesRegionBundleInput): Live
   });
 
   return {
-    regionId: input.region.id,
-    regionName: input.region.name,
+    areaId: area.id,
+    areaSlug: area.slug,
+    areaName: area.name,
+    areaKind: area.kind,
     decades,
     disclaimer: JUXTAPOSITION_DISCLAIMER,
   };
@@ -280,7 +669,7 @@ export function buildLivesRegionBundle(input: BuildLivesRegionBundleInput): Live
 
 /**
  * The change in a published value between two decades, or null when the comparison would cross a
- * measurement boundary or either value is not published.
+ * measurement boundary or either value is missing.
  */
 export function livesComparableChange(
   earlier: { readonly decade: LivesDecade; readonly cell: LivesCell },
@@ -293,116 +682,47 @@ export function livesComparableChange(
   return later.cell.estimate! - earlier.cell.estimate!;
 }
 
-function livesRegimeForDecadeOrThrow(decade: number): LivesMeasurementRegime {
-  if (!(LIVES_DECADES as readonly number[]).includes(decade)) {
-    throw new Error(`${decade} is not a Lives decade`);
+/**
+ * 90% margin, in percentage points, of a proportion summed from published ACS counts, using the Census
+ * Bureau's formula for derived proportions. Null unless every row carries both count margins.
+ */
+function proportionMargin(
+  rows: readonly LivesObservationInput[],
+  numerator: number,
+  denominator: number,
+): number | null {
+  if (rows.length === 0 || denominator <= 0) return null;
+  let numeratorVariance = 0;
+  let denominatorVariance = 0;
+  for (const row of rows) {
+    const numeratorMoe = row.metadata?.numeratorMoe;
+    const denominatorMoe = row.metadata?.denominatorMoe;
+    if (typeof numeratorMoe !== 'number' || typeof denominatorMoe !== 'number') return null;
+    numeratorVariance += numeratorMoe ** 2;
+    denominatorVariance += denominatorMoe ** 2;
   }
-  return livesRegimeForDecade(decade as LivesDecade);
+  const p = numerator / denominator;
+  let radicand = numeratorVariance - p ** 2 * denominatorVariance;
+  if (radicand < 0) radicand = numeratorVariance + p ** 2 * denominatorVariance;
+  return (100 * Math.sqrt(radicand)) / denominator;
 }
 
 function boundaryKind(previous: LivesDecade, current: LivesDecade): LivesBoundaryKind {
   const a = livesRegimeForDecade(previous);
   const b = livesRegimeForDecade(current);
-  if (a === 'no_microdata' || b === 'no_microdata') return 'gap';
   if (a === b) return 'none';
   return livesRegimesShareIncomeFooting(a, b) ? 'method_note' : 'different_measure';
 }
 
-function resolveCell(args: {
-  readonly metric: LivesMetricDefinition;
-  readonly bucket: LivesTierKey | LivesClassBucket;
-  readonly slice: LivesGroupSlice;
-  readonly decade: LivesDecade;
-  readonly regime: LivesMeasurementRegime;
-  readonly definition: LivesRegionDecadeDefinitionInput | null;
-  readonly observationIndex: ReadonlyMap<string, LivesObservationInput>;
-}): LivesCell {
-  if (args.regime === 'no_microdata') {
-    return notMeasured(LIVES_REGIME_DESCRIPTIONS.no_microdata.readerNote);
-  }
-  if (!args.metric.measuredIn(args.decade)) {
-    return notMeasured(`The census did not record this in the ${args.decade}s.`);
-  }
-  if (args.definition === null) {
-    return { state: 'pending', reason: 'Not yet tabulated for this region and decade.' };
-  }
-  const metricId = livesMetricId(args.metric, args.bucket);
-  const observation = args.observationIndex.get(
-    observationKey(metricId, args.definition.boundaryVersion, args.slice),
-  );
-  if (observation) {
-    return {
-      state: observation.metadata?.cellState ?? 'published',
-      estimate: observation.estimate,
-      ...(observation.marginOfError == null ? {} : { marginOfError: observation.marginOfError }),
-      ...(observation.metadata?.unweightedN === undefined
-        ? {}
-        : { unweightedN: observation.metadata.unweightedN }),
-      source: { label: observation.source, url: observation.sourceUrl },
-    };
-  }
-  const recorded = args.definition.coverage[`${metricId}|${args.slice}`];
-  if (recorded) return { state: recorded.state, reason: recorded.reason };
-  return { state: 'pending', reason: 'Not yet tabulated for this region and decade.' };
+function mapLenses<T>(build: (lens: LivesLens) => T): Readonly<Record<LivesLens, T>> {
+  return { black: build('black'), white: build('white'), hispanic: build('hispanic') };
 }
 
-function notMeasured(reason: string): LivesCell {
-  return { state: 'not_measured', reason };
-}
-
-function observationKey(metricId: string, boundaryVersion: string, slice: string): string {
-  return `${metricId}|${boundaryVersion}|${slice}`;
-}
-
-function ancestorsOf(id: string, jurisdictions: readonly LivesJurisdictionInput[]): Set<string> {
-  const byId = new Map(jurisdictions.map((row) => [row.id, row]));
-  const seen = new Set<string>();
-  let current: string | null = id;
-  while (current !== null && !seen.has(current)) {
-    seen.add(current);
-    current = byId.get(current)?.parentId ?? null;
-  }
-  return seen;
-}
-
-function overlapsDecade(fromYear: number, toYear: number | null, decade: LivesDecade): boolean {
-  return fromYear <= decade + 9 && (toYear === null || toYear >= decade);
-}
-
-function toRule(row: LivesApplicabilityInput): LivesRule {
-  const appliesTo = row.appliesToSlices.includes('all')
-    ? [...LIVES_GROUP_SLICES]
-    : LIVES_GROUP_SLICES.filter((slice) => row.appliesToSlices.includes(slice));
+function mapBuckets<T>(build: (bucket: LivesClassBucket) => T): Record<LivesClassBucket, T> {
   return {
-    id: row.id,
-    entityId: row.entityId,
-    name: row.entityName,
-    href: row.entityHref,
-    scopeLevel: row.scopeLevel,
-    inForceFromYear: row.inForceFromYear,
-    inForceToYear: row.inForceToYear,
-    appliesTo,
-    groupsNamed: row.groupsNamed,
-    lifeDomains: row.lifeDomains,
-    textPosture: row.textPosture,
-    disputed: row.disputed,
-    summary: row.summary,
+    lower: build('lower'),
+    middle: build('middle'),
+    upper: build('upper'),
+    unclassified: build('unclassified'),
   };
-}
-
-function mapGroups<T>(build: (slice: LivesGroupSlice) => T): Readonly<Record<LivesGroupSlice, T>> {
-  return {
-    black_nh: build('black_nh'),
-    white_nh: build('white_nh'),
-    hispanic: build('hispanic'),
-  };
-}
-
-function mapKeys<K extends string, T>(
-  keys: readonly K[],
-  build: (key: K) => T,
-): Readonly<Record<K, T>> {
-  const out = {} as Record<K, T>;
-  for (const key of keys) out[key] = build(key);
-  return out;
 }

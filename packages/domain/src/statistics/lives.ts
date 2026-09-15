@@ -1,21 +1,24 @@
 /**
  * Browser-safe entry point for Lives Across the Decades.
  *
- * `@repo/domain/statistics` re-exports modules that read files with `node:fs`, so a client
- * component importing from it breaks the browser bundle. Everything here is pure: import Lives
- * code from `@repo/domain/statistics/lives` in web and mobile, never from the statistics barrel.
+ * `@repo/domain/statistics` re-exports modules that read files with `node:fs`, so a client component
+ * importing from it breaks the browser bundle. Everything here is pure: import Lives code from
+ * `@repo/domain/statistics/lives` in web and mobile, never from the statistics barrel.
  */
 export { JUXTAPOSITION_DISCLAIMER } from '../juxtaposition.js';
 
 export {
   CANONICAL_RACE_ETHNICITY_SLICES,
-  LIVES_GROUP_DEFINITIONS,
-  LIVES_GROUP_LABELS,
-  LIVES_GROUP_SLICES,
-  isLivesGroupSlice,
+  LIVES_LENSES,
+  LIVES_LENS_DEFINITIONS,
+  LIVES_LENS_LABELS,
+  RACE_ETHNICITY_DEFINITION_LABELS,
+  isLivesLens,
+  lensForDefinition,
   normalizeRaceEthnicitySlice,
+  preferredDefinition,
 } from './race-ethnicity-slices.js';
-export type { CanonicalRaceEthnicitySlice, LivesGroupSlice } from './race-ethnicity-slices.js';
+export type { CanonicalRaceEthnicitySlice, LivesLens } from './race-ethnicity-slices.js';
 
 export {
   LIVES_DECADES,
@@ -23,50 +26,81 @@ export {
   LIVES_REGIME_DESCRIPTIONS,
   crossesLivesRegimeBoundary,
   isLivesDecade,
-  livesHispanicOriginImputed,
+  livesAcsVintage,
+  livesHispanicCounting,
   livesIncomeReferenceYear,
   livesRegimeForDecade,
   livesRegimesShareIncomeFooting,
 } from './lives-regimes.js';
 export type {
   LivesDecade,
+  LivesHispanicCounting,
   LivesMeasurementRegime,
   LivesRegimeDescription,
 } from './lives-regimes.js';
 
 export {
   LIVES_CLASS_BUCKETS,
-  LIVES_CLASS_SHARE_METRIC,
-  LIVES_CONDITION_METRICS,
+  LIVES_CONDITIONS,
+  LIVES_SERIES,
   LIVES_TIER_KEYS,
-  livesMetricId,
-  livesMetricLabel,
+  incomeBracketSeriesId,
+  livesConditionLabel,
+  livesConditionPublishedIn,
+  livesDecadeForReferencePeriod,
+  parseIncomeBracketSeriesId,
+  workClassSeriesId,
 } from './lives-metrics.js';
 export type {
   LivesClassBucket,
-  LivesMetricDefinition,
-  LivesMetricKey,
-  LivesMetricUnit,
+  LivesConditionDefinition,
+  LivesConditionKey,
   LivesTierKey,
 } from './lives-metrics.js';
 
-export { LIVES_REGIONS, livesRegionById, livesRegionBySlug } from './lives-regions.js';
-export type { LivesRegionConfig } from './lives-regions.js';
+export {
+  LIVES_AREAS,
+  LIVES_NATIONAL,
+  LIVES_REGIONS,
+  livesAreaById,
+  livesAreaBySlug,
+  livesRegionForState,
+  livesStateJurisdictionId,
+} from './lives-regions.js';
+export type { LivesAreaConfig } from './lives-regions.js';
 
-export { buildLivesRegionBundle, livesComparableChange } from './lives-timeline.js';
+export {
+  aggregateDistribution,
+  aggregateRate,
+  coverageShare,
+  estimateBandShares,
+  estimateCountBelow,
+  estimateMedian,
+  sumBrackets,
+} from './lives-aggregate.js';
+export type { AggregatedRate, BandShares, IncomeBracket, StateCount } from './lives-aggregate.js';
+
+export {
+  LIVES_MIN_BASE,
+  LIVES_MIN_COVERAGE,
+  buildLivesAreaBundle,
+  livesComparableChange,
+} from './lives-timeline.js';
 export type {
-  BuildLivesRegionBundleInput,
+  BuildLivesAreaBundleInput,
   LivesApplicabilityInput,
+  LivesAreaBundle,
   LivesBoundaryKind,
   LivesCell,
   LivesCellState,
   LivesConditionBundle,
+  LivesCountNote,
+  LivesCountNoteInput,
+  LivesCoverageInput,
   LivesDecadeBundle,
   LivesFrameInput,
   LivesJurisdictionInput,
   LivesObservationInput,
-  LivesRegionBundle,
-  LivesRegionDecadeDefinitionInput,
   LivesRule,
   LivesSourceRef,
 } from './lives-timeline.js';

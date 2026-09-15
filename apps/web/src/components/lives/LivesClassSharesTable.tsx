@@ -1,10 +1,10 @@
 import React from 'react';
 import {
-  LIVES_GROUP_LABELS,
-  LIVES_GROUP_SLICES,
+  LIVES_LENSES,
+  LIVES_LENS_LABELS,
   type LivesClassBucket,
   type LivesDecadeBundle,
-  type LivesGroupSlice,
+  type LivesLens,
 } from '@repo/domain/statistics/lives';
 import { LivesCellValue } from './LivesCellValue';
 
@@ -19,13 +19,13 @@ const BUCKET_LABELS: Readonly<Record<LivesClassBucket, string>> = {
 
 export type LivesClassSharesTableProps = {
   readonly decade: LivesDecadeBundle;
-  readonly emphasis: LivesGroupSlice;
+  readonly emphasis: LivesLens;
   readonly selectedTier: 'all' | 'lower' | 'middle' | 'upper';
 };
 
 /**
- * Share of each group in each class tier. All three groups are always shown; the lens only
- * emphasizes a row, and the chosen tier emphasizes a column.
+ * Share of each group in each class band. All three groups are always shown; the lens emphasizes a row,
+ * the chosen tier a column, and each row names the definition its figures used.
  */
 export function LivesClassSharesTable({
   decade,
@@ -33,13 +33,13 @@ export function LivesClassSharesTable({
   selectedTier,
 }: LivesClassSharesTableProps) {
   const buckets: readonly LivesClassBucket[] =
-    decade.regime === 'occupational_strata'
+    decade.regime === 'work_based'
       ? ['lower', 'middle', 'upper', 'unclassified']
       : ['lower', 'middle', 'upper'];
   return (
     <table className="lives-table lives-table--shares">
       <caption>
-        {decade.classLabel}: share of adults in each group, {decade.label}
+        {decade.classLabel}: share of each group, {decade.label}
       </caption>
       <thead>
         <tr>
@@ -56,19 +56,25 @@ export function LivesClassSharesTable({
         </tr>
       </thead>
       <tbody>
-        {LIVES_GROUP_SLICES.map((slice) => (
-          <tr key={slice} data-emphasis={slice === emphasis ? 'true' : undefined}>
-            <th scope="row">
-              {LIVES_GROUP_LABELS[slice]}
-              {slice === emphasis ? <span className="lives-sr-only"> (selected)</span> : null}
-            </th>
-            {buckets.map((bucket) => (
-              <td key={bucket} data-emphasis={bucket === selectedTier ? 'true' : undefined}>
-                <LivesCellValue cell={decade.classShares[slice][bucket]} unit="percent" />
-              </td>
-            ))}
-          </tr>
-        ))}
+        {LIVES_LENSES.map((lens) => {
+          const definition = buckets
+            .map((bucket) => decade.classShares[lens][bucket].definitionLabel)
+            .find(Boolean);
+          return (
+            <tr key={lens} data-emphasis={lens === emphasis ? 'true' : undefined}>
+              <th scope="row">
+                {LIVES_LENS_LABELS[lens]}
+                {lens === emphasis ? <span className="lives-sr-only"> (selected)</span> : null}
+                {definition ? <span className="lives-cell__definition">{definition}</span> : null}
+              </th>
+              {buckets.map((bucket) => (
+                <td key={bucket} data-emphasis={bucket === selectedTier ? 'true' : undefined}>
+                  <LivesCellValue cell={decade.classShares[lens][bucket]} />
+                </td>
+              ))}
+            </tr>
+          );
+        })}
       </tbody>
     </table>
   );

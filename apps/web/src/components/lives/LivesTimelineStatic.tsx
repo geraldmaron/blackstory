@@ -1,14 +1,14 @@
 import Link from 'next/link';
 import React from 'react';
-import type { LivesRegionBundle } from '@repo/domain/statistics/lives';
+import type { LivesAreaBundle } from '@repo/domain/statistics/lives';
 import { DEFAULT_LIVES_VIEW, buildLivesHref } from '../../lib/lives/lives-url-state';
 import { LivesDecadePanel } from './LivesDecadePanel';
 
 void React;
 
 export type LivesTimelineStaticProps = {
-  readonly bundle: LivesRegionBundle;
-  readonly regionSlug: string;
+  readonly bundle: LivesAreaBundle;
+  readonly areaSlug: string;
 };
 
 /**
@@ -16,7 +16,7 @@ export type LivesTimelineStaticProps = {
  * panel. It is what a reader without JavaScript, and a crawler, receives; the interactive timeline
  * replaces it after hydration.
  */
-export function LivesTimelineStatic({ bundle, regionSlug }: LivesTimelineStaticProps) {
+export function LivesTimelineStatic({ bundle, areaSlug }: LivesTimelineStaticProps) {
   const decade =
     bundle.decades.find((entry) => entry.decade === DEFAULT_LIVES_VIEW.decade) ?? bundle.decades[0];
   if (!decade) return null;
@@ -27,7 +27,7 @@ export function LivesTimelineStatic({ bundle, regionSlug }: LivesTimelineStaticP
           <Link
             key={entry.decade}
             className="lives-rail__tab"
-            href={buildLivesHref(regionSlug, { ...DEFAULT_LIVES_VIEW, decade: entry.decade })}
+            href={buildLivesHref(areaSlug, { ...DEFAULT_LIVES_VIEW, decade: entry.decade })}
             aria-current={entry.decade === decade.decade ? 'page' : undefined}
             data-boundary={entry.boundaryFromPrevious}
           >
