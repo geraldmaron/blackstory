@@ -42,6 +42,7 @@ import { chapterInViewFromRects, useChapterObserver } from '../lib/story/use-cha
 import type { StoryRecordSpotlight } from '../lib/story/pick-story-record';
 import type { StoryFact } from '../lib/story/story-facts';
 import { copyFor, headingParts } from '../components/story/story-copy';
+import { hereLocality } from './door-here';
 import { HeroHeadlineMorph } from '../components/story/HeroHeadlineMorph';
 import {
   PinPhotoLayer,
@@ -170,6 +171,27 @@ function openDoorPin(href: string, push: (href: string) => void): void {
     return;
   }
   push(href);
+}
+
+/** A link to a Door pin's record, by the same rule `openDoorPin` follows for a marker click. */
+function DoorRecordLink({
+  href,
+  className,
+  children,
+}: {
+  readonly href: string;
+  readonly className?: string;
+  readonly children: React.ReactNode;
+}) {
+  return href.startsWith('/door/pin/') ? (
+    <a className={className} href={href}>
+      {children}
+    </a>
+  ) : (
+    <Link className={className} href={href}>
+      {children}
+    </Link>
+  );
 }
 
 /** What the field reports about the plate: nothing yet, this mount's frame landed, or no plate. */
@@ -620,9 +642,16 @@ export function DoorImmersive({
           const isOpen = chapter.index === 0;
           const isClose = chapter.index === chapters.length - 1;
           const side = chapter.centered ? 'center' : chapter.index % 2 === 0 ? 'end' : 'start';
+          // The spotlight's public place URL, from the same pin table a marker click opens. The
+          // entity path is only the fallback for a spotlight the plate carries no pin for.
+          const spotlightPublicHref =
+            spotlight && spotlightPinId ? (hrefByPinId.get(spotlightPinId) ?? null) : null;
+          const spotlightLocality = spotlight
+            ? hereLocality(spotlight.name, spotlight.place)
+            : null;
           const spotlightHref =
             chapter.id === RECORD_CHAPTER_ID && spotlight
-              ? `/entity/${encodeURIComponent(spotlight.entityId)}`
+              ? (spotlightPublicHref ?? `/entity/${encodeURIComponent(spotlight.entityId)}`)
               : null;
 
           return (
@@ -664,14 +693,33 @@ export function DoorImmersive({
                       </h1>
                       <p className="ds-door-journey__support">History, pinned to place.</p>
                       <p className="ds-door-journey__pillars">{ABOUT_SUPPORT_LINE}</p>
-                      <p className="ds-door-journey__presence">
-                        <span className="ds-door-journey__presence-n">{placeCount}</span> places on
-                        the field
-                      </p>
                       <HeroHeadlineMorph
                         className="ds-door-journey__cold"
                         id={`door-journey-heading-${chapter.id}`}
                       />
+                      {spotlight ? (
+                        <p className="ds-door-journey__here">
+                          <span className="ds-door-journey__here-pin" aria-hidden="true" />
+                          <span className="ds-door-journey__here-label">Here</span>
+                          {spotlightPublicHref ? (
+                            <DoorRecordLink
+                              className="ds-door-journey__here-name"
+                              href={spotlightPublicHref}
+                            >
+                              {spotlight.name}
+                            </DoorRecordLink>
+                          ) : (
+                            <span className="ds-door-journey__here-name">{spotlight.name}</span>
+                          )}
+                          {spotlightLocality ? (
+                            <span className="ds-door-journey__here-place">{spotlightLocality}</span>
+                          ) : null}
+                        </p>
+                      ) : null}
+                      <p className="ds-door-journey__presence">
+                        <span className="ds-door-journey__presence-n">{placeCount}</span> places on
+                        the field
+                      </p>
                     </>
                   ) : (
                     <>
@@ -711,7 +759,7 @@ export function DoorImmersive({
 
                   {spotlightHref ? (
                     <p className="ds-door-journey__record">
-                      <Link href={spotlightHref}>Open this record</Link>
+                      <DoorRecordLink href={spotlightHref}>Open this record</DoorRecordLink>
                     </p>
                   ) : null}
                 </div>

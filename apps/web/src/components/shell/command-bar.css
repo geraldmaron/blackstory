@@ -497,8 +497,22 @@ span.ds-bar__mode-link {
 
   .ds-bar__modes button,
   .ds-bar__mode-link {
-    padding: 0 0.5rem;
-    font-size: 0.6875rem;
+    padding: 0 0.4375rem;
+    font-size: 0.75rem;
+  }
+
+  /*
+   * The field keeps a 16px computed size, because iOS zooms the whole page on focus for anything
+   * smaller. At 16px its placeholder was the largest type in the bar, louder than the nav it sits
+   * under, so it renders scaled to 13px: the flex basis and negative margin give back the width
+   * the scale takes away, so the caret still reaches the right edge of the pill.
+   */
+  .ds-bar__search--live .ds-bar__search-input {
+    flex: 0 0 calc(100% / 0.8125);
+    margin-right: calc(100% - 100% / 0.8125);
+    font-size: 16px;
+    transform: scale(0.8125);
+    transform-origin: 0 50%;
   }
 }
 

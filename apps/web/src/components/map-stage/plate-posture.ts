@@ -86,3 +86,19 @@ export function framedClaimAllowed(surface: SurfaceClass | null): boolean {
   // The Door's plate is already painted full-bleed; a moment has nothing to borrow it into.
   return surface === 'reading' || surface === 'record';
 }
+
+/**
+ * Below this zoom the ambient Door holds its cluster markers off the plate.
+ *
+ * The Door fits the whole country into its window, which sinks a phone's zoom to about 1.7. At
+ * that scale a cluster folds a region into one disc at a centroid that is not a place: the West
+ * Coast became a "202" over Nevada. A map pinned to place should not draw that. The state presence
+ * tint already says where the record is thick at national scale, and the clusters come back as
+ * soon as a chapter flies in to state scale. The Instrument keeps them at every zoom.
+ */
+export const AMBIENT_CLUSTER_MIN_ZOOM = 3;
+
+/** Whether cluster markers belong on the plate in this posture at this zoom. */
+export function clusterMarkersVisible(posture: PlatePosture, zoom: number): boolean {
+  return posture !== 'ambient' || zoom >= AMBIENT_CLUSTER_MIN_ZOOM;
+}

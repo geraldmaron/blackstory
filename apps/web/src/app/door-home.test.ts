@@ -185,6 +185,22 @@ test('door-home CSS switches mobile typography and gutters', () => {
   assert.match(css, /var\(--ds-gutter\)/);
 });
 
+test('the phone opening card never scrolls inside itself', () => {
+  // A capped height with an inner scroller clipped the headline on a 320x568 screen.
+  const start = css.indexOf('@media (max-width: 559px) {');
+  assert.ok(start >= 0, 'the phone block exists');
+  const next = css.indexOf('@media', start + 1);
+  const phone = css.slice(start, next === -1 ? undefined : next);
+  assert.doesNotMatch(phone, /overflow-y:\s*auto/);
+  assert.doesNotMatch(phone, /max-height:\s*calc\(100dvh/);
+});
+
+test('the opening card says where "here" is, through the public pin href', () => {
+  assert.match(immersive, /ds-door-journey__here/);
+  // The same pin table a marker click opens, so the link is the canonical place URL.
+  assert.match(immersive, /hrefByPinId\.get\(spotlightPinId\)/);
+});
+
 test('DoorImmersive hands every record to the plate', () => {
   assert.match(immersive, /spotlightPinId/);
   assert.doesNotMatch(immersive, /catalogFeatures/);

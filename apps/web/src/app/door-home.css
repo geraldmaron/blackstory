@@ -380,11 +380,101 @@ html:has(.ds-door) {
   color: var(--ds-ink);
 }
 
+/* "here." takes the editorial accent every chapter heading's <em> already carries. */
+.ds-door-journey__cold em {
+  font-family: var(--ds-font-editorial);
+  font-style: italic;
+  font-weight: 400;
+  color: var(--ds-accent-text);
+}
+
+/*
+ * The headline says "happened here"; this line says where. It names the visit's spotlight record
+ * (the same one chapter 02 flies to) and links its public place page, so the promise is kept on
+ * the first screen rather than asserted. The dot and its offset ring are the plate's selection
+ * mark, drawn flat: an outline, not a shadow.
+ */
+.ds-door-journey__here {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  column-gap: var(--ds-space-3);
+  margin: var(--ds-space-4) 0 0;
+  padding-top: var(--ds-space-3);
+  border-top: var(--ds-border-width) solid var(--ds-rule);
+  text-align: left;
+}
+
+.ds-door-journey__here-pin {
+  grid-row: 1 / span 3;
+  align-self: start;
+  width: 0.5rem;
+  height: 0.5rem;
+  margin: 0.3rem 0.25rem 0;
+  border-radius: var(--ds-radius-full);
+  background: var(--ds-accent-graphic);
+  outline: var(--ds-border-width) solid var(--ds-accent-graphic);
+  outline-offset: 3px;
+}
+
+.ds-door-journey__here-label {
+  grid-column: 2;
+  font-family: var(--ds-font-mono);
+  font-size: 0.6875rem;
+  letter-spacing: 0.12em;
+  line-height: 1.4;
+  text-transform: uppercase;
+  color: var(--ds-accent-text);
+}
+
+.ds-door-journey__here-name {
+  grid-column: 2;
+  margin-top: 2px;
+  font-family: var(--ds-font-ui);
+  font-size: 0.9375rem;
+  font-weight: 550;
+  line-height: 1.3;
+  color: var(--ds-ink);
+  text-decoration: none;
+  overflow-wrap: anywhere;
+}
+
+a.ds-door-journey__here-name:hover,
+a.ds-door-journey__here-name:focus-visible {
+  color: var(--ds-accent-text);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+a.ds-door-journey__here-name:focus-visible {
+  outline: 2px solid var(--ds-accent-graphic);
+  outline-offset: 2px;
+}
+
+.ds-door-journey__here-place {
+  grid-column: 2;
+  margin-top: 2px;
+  font-family: var(--ds-font-mono);
+  font-size: 0.75rem;
+  line-height: 1.4;
+  color: var(--ds-ink-muted);
+}
+
+/* Phone and tablet only. The desktop opening card is height-capped and already carries the
+   field caption and the cold-open prose; the extra line pushed it into an inner scroller. */
+@media (min-width: 900px) {
+  .ds-door-journey__chapter--rest .ds-door-journey__here {
+    display: none;
+  }
+}
+
 /* Cold-open subject morph — History → His Story → … → Black Story.
-   Flat matte only: opacity + width. No scale on the S (keeps the baseline stable).
+   Flat matte only: opacity, width and a short vertical roll. No scale on the S (keeps the
+   baseline stable). The outgoing prefix rolls up and out while the incoming one rolls in from
+   below, inside a clipped slot, so the two words never sit on top of each other mid-change.
    Split easing is gentler than the global snap ease so the letter does not jump. */
 .ds-hero-headline-morph {
   --ds-hero-morph-ease: cubic-bezier(0.33, 0, 0.2, 1);
+  --ds-hero-roll-pad: 0.14em;
   display: inline-flex;
   align-items: baseline;
   flex-wrap: nowrap;
@@ -395,11 +485,15 @@ html:has(.ds-door) {
   display: inline-flex;
   align-items: baseline;
   min-width: max-content;
+  overflow: clip;
+  padding-block: var(--ds-hero-roll-pad);
+  margin-block: calc(var(--ds-hero-roll-pad) * -1);
 }
 
 .ds-hero-headline-morph__prefix-out {
   position: absolute;
-  inset: 0 auto auto 0;
+  top: var(--ds-hero-roll-pad);
+  left: 0;
   white-space: nowrap;
   animation: ds-hero-prefix-out var(--ds-duration-slow) var(--ds-hero-morph-ease) both;
 }
@@ -423,18 +517,20 @@ html:has(.ds-door) {
   width: 0.28em;
 }
 
-/* Clip-slot opens; the S glyph itself never scales or reflows off the baseline. */
+/* Clip-slot opens; the S glyph itself never scales or reflows off the baseline. The slot opens
+   by max-width and sizes to the glyph, not to a fixed width: a fixed 0.72em was wider than the S
+   in the display face and left a visible gap, "S tory", after the split had settled. */
 .ds-hero-headline-morph__s-slot {
   display: inline-block;
   overflow: hidden;
-  width: 0;
+  max-width: 0;
   flex: 0 0 auto;
   vertical-align: baseline;
-  transition: width var(--ds-hero-split-ms, 1200ms) var(--ds-hero-morph-ease);
+  transition: max-width var(--ds-hero-split-ms, 1200ms) var(--ds-hero-morph-ease);
 }
 
 .ds-hero-headline-morph[data-split='true'] .ds-hero-headline-morph__s-slot {
-  width: 0.72em;
+  max-width: 1em;
 }
 
 .ds-hero-headline-morph__s {
@@ -833,8 +929,41 @@ body:has(.ds-door) .ds-door-journey {
     max-width: min(100%, 11.5rem);
   }
 
+  /*
+   * The opening card on a phone or tablet. The headline is the thesis, so it is the largest type
+   * on the screen and sets on two lines: the subject, then where. The tagline would repeat what
+   * the headline says; the "Here" line under it names the place, and the count follows as a
+   * quiet line aligned with it. The two actions share the row evenly.
+   */
   .ds-door-journey__chapter--rest .ds-door-journey__cold {
-    font-size: clamp(1.25rem, 5.5vw, 1.5rem);
+    font-size: clamp(2rem, 9.6vw, 2.75rem);
+    letter-spacing: -0.035em;
+    line-height: 1.04;
+  }
+
+  .ds-door-journey__chapter--rest .ds-hero-headline-morph__trailer {
+    display: block;
+  }
+
+  .ds-door-journey__chapter--rest .ds-door-journey__support {
+    display: none;
+  }
+
+  .ds-door-journey__chapter--rest .ds-door-journey__presence {
+    margin-top: var(--ds-space-2);
+    padding-left: calc(1rem + var(--ds-space-3));
+    font-family: var(--ds-font-mono);
+    font-size: 0.75rem;
+    color: var(--ds-ink-muted);
+  }
+
+  .ds-door-journey__chapter--rest .ds-door-journey__presence-n {
+    font-size: inherit;
+    color: var(--ds-ink);
+  }
+
+  .ds-door-journey__chapter--rest .ds-door-journey__actions > * {
+    flex: 1 1 0;
   }
 }
 
@@ -884,29 +1013,49 @@ body:has(.ds-door) .ds-door-journey {
     padding-bottom: var(--ds-space-4);
   }
 
-  .ds-door-journey__chapter--rest .ds-door-journey__eyebrow {
-    display: none;
-  }
-
+  .ds-door-journey__chapter--rest .ds-door-journey__eyebrow,
   .ds-door-journey__chapter--rest .ds-door-journey__prose {
     display: none;
   }
 
   .ds-door-journey__chapter--rest .ds-door-journey__lockup {
-    max-width: min(100%, 9.5rem);
+    max-width: min(100%, 7rem);
+  }
+
+  /* One rhythm on a small screen: masthead, then the headline close under it, then the place. */
+  .ds-door-journey__chapter--rest .ds-door-journey__copy {
+    gap: var(--ds-space-3);
   }
 
   .ds-door-journey__chapter--rest .ds-door-journey__cold {
-    margin-top: var(--ds-space-3);
+    margin-top: var(--ds-space-2);
   }
 
+  .ds-door-journey__chapter--rest .ds-door-journey__here {
+    margin-top: var(--ds-space-1);
+  }
+
+  .ds-door-journey__chapter--rest .ds-door-journey__actions {
+    margin-top: var(--ds-space-4);
+  }
+
+  /* No inner scroller. The card is in document flow and the page scrolls; capping its height put
+     the headline inside a clipped box on a 320x568 screen, where the reader never saw it. */
   .ds-door-journey__chapter--rest .ds-door-journey__card {
-    max-height: calc(100dvh - var(--ds-island-clearance) - min(32dvh, 13.5rem) - var(--ds-space-4));
-    overflow: hidden;
+    max-height: none;
+    overflow: visible;
+    padding: var(--ds-space-5) var(--ds-space-4);
   }
 
   .ds-door-journey__chapter--rest .ds-door-journey__copy {
-    overflow-y: auto;
+    overflow: visible;
+  }
+}
+
+/* A short phone gives the card the room: the strip still frames the whole country, smaller. */
+@media (max-width: 559px) and (max-height: 42rem) {
+  .ds-door__field {
+    height: min(26dvh, 10rem);
   }
 }
 

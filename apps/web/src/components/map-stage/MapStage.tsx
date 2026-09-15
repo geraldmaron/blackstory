@@ -46,6 +46,10 @@ import 'maplibre-gl/dist/maplibre-gl.css';
 import '../../app/first-paint-pin-plate.css';
 import { US_CONUS_BOUNDS } from '@repo/domain/map/geography';
 import {
+  EXPLORE_CLUSTER_COUNT_INCOMING_LAYER_ID,
+  EXPLORE_CLUSTER_COUNT_LAYER_ID,
+  EXPLORE_CLUSTER_INCOMING_LAYER_ID,
+  EXPLORE_CLUSTER_LAYER_ID,
   EXPLORE_ENTITIES_INCOMING_SOURCE_ID,
   EXPLORE_ENTITIES_SOURCE_ID,
   EXPLORE_HISTORY_EDGES_INCOMING_SOURCE_ID,
@@ -176,7 +180,13 @@ import { bindPlateCameraListeners, bindPlateClickListeners } from './event-wirin
 import { usePathname } from 'next/navigation';
 import { surfaceClassFor, type SurfaceClass } from '../../lib/nav/surface-classes';
 import { useSurfaceClass } from '../../lib/nav/use-surface-class';
-import { defaultPostureFor, framedClaimAllowed, type PlatePosture } from './plate-posture';
+import {
+  AMBIENT_CLUSTER_MIN_ZOOM,
+  clusterMarkersVisible,
+  defaultPostureFor,
+  framedClaimAllowed,
+  type PlatePosture,
+} from './plate-posture';
 import { createFramedSlotRegistry } from './framed-slot-registry';
 import { boxIsPaintable, plateBoxForSlot, resolvePlatePosture, type PlateBox } from './plate-frame';
 import { applyGesturesForPosture, lockGestures, rotateGestureAllowed } from './gesture-lock';
@@ -331,6 +341,29 @@ export function useMapStage(): MapStageHandle {
     throw new Error('useMapStage() must be called within a MapStageProvider');
   }
   return ctx;
+}
+
+/** The cluster discs and their counts, in the primary buffer and the decade crossfade's incoming one. */
+const CLUSTER_LAYER_IDS = [
+  EXPLORE_CLUSTER_LAYER_ID,
+  EXPLORE_CLUSTER_COUNT_LAYER_ID,
+  EXPLORE_CLUSTER_INCOMING_LAYER_ID,
+  EXPLORE_CLUSTER_COUNT_INCOMING_LAYER_ID,
+] as const;
+
+/**
+ * Holds the cluster layers off the plate below state scale in the ambient posture
+ * (`clusterMarkersVisible`) and gives them every zoom back in any other posture. A zoom range
+ * rather than a visibility flip, so a Door chapter flying in to state scale brings them back with
+ * no zoom listener. Each layer keeps its own max zoom. Re-applied wherever the entity layers can
+ * be rebuilt, because a rebuilt layer takes its range from the style again.
+ */
+function syncClusterZoomRange(map: MapLibreMap, posture: PlatePosture): void {
+  const minZoom = clusterMarkersVisible(posture, 0) ? 0 : AMBIENT_CLUSTER_MIN_ZOOM;
+  for (const id of CLUSTER_LAYER_IDS) {
+    const layer = map.getLayer(id);
+    if (layer) map.setLayerZoomRange(id, minZoom, layer.maxzoom ?? 24);
+  }
 }
 
 /**
@@ -827,6 +860,7 @@ export function MapStageProvider({
           ...(options?.preserveDecadeFadeOpacities ? { preserveDecadeFadeOpacities: true } : {}),
           ...(options?.deferPrimaryDecadeData ? { deferPrimaryDecadeData: true } : {}),
         });
+        syncClusterZoomRange(map, postureRef.current);
         setSelectedStateFilter(map, configRef.current.selectedState);
         if (!options?.deferPrimaryDecadeData) {
           setHistoryEdgeData(map, configRef.current.historyEdgeCollection);
@@ -1422,6 +1456,7 @@ export function MapStageProvider({
       // must still scroll the document that asked for it.
       applyGesturesForPosture(activeMap, postureRef.current, { pointerFine: prefersFinePointer() });
       syncRotateGestures(activeMap, postureRef.current, prefersFinePointer());
+      syncClusterZoomRange(activeMap, postureRef.current);
 
       syncEntityMarkers();
       lastViewportRef.current = readViewport(activeMap);
@@ -1645,6 +1680,7 @@ export function MapStageProvider({
     if (!map) return;
     applyGesturesForPosture(map, posture, { pointerFine: prefersFinePointer() });
     syncRotateGestures(map, posture, prefersFinePointer());
+    syncClusterZoomRange(map, posture);
     // The Door's phone strip may have sunk the zoom floor below the Instrument's national floor
     // (camera.ts, `zoomFloor: 'fit'`); every other posture gets the floor back.
     if (posture !== 'ambient') map.setMinZoom(MAP_MIN_ZOOM);
