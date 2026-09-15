@@ -124,6 +124,17 @@ describe('room kit · the v6 edition system stays retired', () => {
       );
     }
   });
+
+  it('the kit styles an unclassed content link at zero specificity', () => {
+    // A byline "Neo" and an anatomy "3 sources" rendered in the browser default link color
+    // because only `.ds-room-prose a` had a rule. The base rule must stay inside `:where()` so
+    // it never outranks a classed link or a block-level `.x a` rule.
+    const kitCss = readFileSync(path.join(APP_DIR, '../components/room/room-kit.css'), 'utf8');
+    assert.match(
+      kitCss,
+      /:where\(\.ds-room\) :where\(a:not\(\[class\]\)\) \{\s*color: var\(--ds-accent\);/,
+    );
+  });
 });
 
 describe('room kit · a catalog block a second room renders is styled by the kit', () => {

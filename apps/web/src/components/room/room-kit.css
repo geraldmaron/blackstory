@@ -37,6 +37,22 @@
   color: var(--ds-ink);
 }
 
+/* The base content link. An unclassed anchor anywhere in a room (a byline, an anatomy value,
+   a count that opens its sources) otherwise falls to the browser default, which is #0000EE in
+   light and a dark-scheme lavender in dark. Zero specificity on purpose: every classed link and
+   every block-level `.x a` rule still wins, so this only catches what nothing else styles.
+   Focus is the global `:focus-visible` ring from @repo/ui base.css. */
+:where(.ds-room) :where(a:not([class])) {
+  color: var(--ds-accent);
+  text-decoration-line: underline;
+  text-decoration-thickness: var(--ds-border-width);
+  text-underline-offset: 3px;
+}
+
+:where(.ds-room) :where(a:not([class])):hover {
+  text-decoration-thickness: 2px;
+}
+
 /* —— the column ——————————————————————————————————————————————————————————————
    One measure, set by the surface class. Reading rooms read at the widest measure the
    editorial face supports; record pages are narrower because they are scanned, not read;
