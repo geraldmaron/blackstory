@@ -825,7 +825,7 @@ export const statisticalObservationSchema = z.object({
   denominator: z.number().optional(),
   sourceItemId: z.string().min(1),
   retrievedAt: z.string().datetime(),
-  status: z.literal('observed'),
+  status: z.enum(['observed', 'tabulated']),
 });
 
 export type StatisticalObservationDoc = z.infer<typeof statisticalObservationSchema>;

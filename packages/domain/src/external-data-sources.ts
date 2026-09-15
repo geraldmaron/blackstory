@@ -42,6 +42,7 @@ export const EXTERNAL_SOURCE_GEOGRAPHIES = [
   'facility',
   'state',
   'nation',
+  'region',
 ] as const;
 
 export type ExternalSourceGeography = (typeof EXTERNAL_SOURCE_GEOGRAPHIES)[number];

@@ -89,20 +89,28 @@ so. Regional Price Parities only exist from 2008, and a partial adjustment would
 ### Work-based class (1870s–1930s)
 
 Before 1940 the census did not ask about income. Class comes from the observed occupation of the
-household head, grouped by `OCC1950`:
+household head, grouped by `OCC1950`. When the head reports no occupation (keeping house, retired,
+at school), the household takes the occupation of its first adult member who reports one, in
+enumeration order.
 
 | Stratum | OCC1950 groups |
 |---|---|
-| Lower | Laborers, farm laborers, private household and service workers |
-| Middle | Operatives, craftsmen, clerical and sales workers, farm tenants |
-| Upper | Professionals, managers, officials and proprietors, farm owners |
+| Lower | Farm laborers, non-farm laborers, private household workers, service workers, and **tenant farmers** |
+| Middle | Operatives, craftsmen, clerical and sales workers, farm managers, and **farm owners** |
+| Upper | Professional and technical workers; managers, officials and proprietors (not farm) |
+| Unclassified | No occupation reported by any adult, or a farmer whose tenure the census did not record |
+
+Tenant farmers are ranked lower because the census counted sharecroppers as tenant farm operators.
+Ranking tenants with skilled workers would overstate the standing of rural Black and Hispanic
+households in the South and Southwest. Tenure (`OWNERSHP`) is recorded from 1900. In 1870 and 1880
+a farmer cannot be split into owner and tenant, so farmer-headed households in those decades are
+**unclassified**, and the unclassified share is shown beside the three strata rather than hidden.
 
 These are **not income classes** and are never labeled as income. We do not use `OCCSCORE`. It gives
 every worker in an occupation that occupation's 1950 median income, which erases pay gaps between
 races doing the same work and would overstate Black workers' standing.
 
-Farm owners and farm tenants are separated using `OWNERSHP` where the decade records it. The exact
-code lists live in `packages/ops-data/src/lives/strata.ts` and its tests.
+The exact code lists live in `packages/ops-data/src/lives/strata.ts` and its tests.
 
 ## Universe, weights and dollars
 
@@ -132,10 +140,15 @@ Every published cell carries its unweighted count, a standard error, and a 90% m
 - **Earlier decades:** a household-cluster bootstrap with 200 replicates and a fixed seed, so reruns
   reproduce the same margins.
 
+Shares (a percentage of a group) and levels (a median income, an average household size) use different
+rules. A relative standard error is meaningless for a share near zero, where a real 0% or 2% would
+otherwise always suppress.
+
 | Condition | Cell state | Surface |
 |---|---|---|
-| Unweighted n < 50, or relative standard error > 30% | `suppressed` | "Too few records in the census sample to say." |
-| RSE 15–30% | `wide_margin` | Value shown with a wide-margin marker |
+| Unweighted n < 50 | `suppressed` | "Too few records in the census sample to say." |
+| Share with a 90% margin above ±20 percentage points, or level with RSE above 30% | `suppressed` | Same |
+| Share with a 90% margin above ±10 points, or level with RSE of 15–30% | `wide_margin` | Value shown with a wide-margin marker |
 | Not asked in that decade | `not_measured` | "The census did not ask this in the 1920s." |
 | Otherwise | `published` | Value, n and margin |
 

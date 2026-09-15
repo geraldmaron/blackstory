@@ -185,3 +185,30 @@ export {
   listThemeImpactLinkedStatutesForQuestion,
 } from './theme-impact-linked-statutes.js';
 export type { ThemeImpactLinkedStatuteView } from './theme-impact-linked-statutes.js';
+
+export {
+  CANONICAL_RACE_ETHNICITY_SLICES,
+  LIVES_GROUP_DEFINITIONS,
+  LIVES_GROUP_LABELS,
+  LIVES_GROUP_SLICES,
+  isLivesGroupSlice,
+  normalizeRaceEthnicitySlice,
+} from './race-ethnicity-slices.js';
+export type { CanonicalRaceEthnicitySlice, LivesGroupSlice } from './race-ethnicity-slices.js';
+
+export {
+  LIVES_DECADES,
+  LIVES_MEASUREMENT_REGIMES,
+  LIVES_REGIME_DESCRIPTIONS,
+  crossesLivesRegimeBoundary,
+  isLivesDecade,
+  livesHispanicOriginImputed,
+  livesIncomeReferenceYear,
+  livesRegimeForDecade,
+  livesRegimesShareIncomeFooting,
+} from './lives-regimes.js';
+export type {
+  LivesDecade,
+  LivesMeasurementRegime,
+  LivesRegimeDescription,
+} from './lives-regimes.js';

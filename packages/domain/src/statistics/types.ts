@@ -13,7 +13,8 @@
  *  - `StatisticalSeries` — the metric definition (what is measured, in what units, from which
  *    source variable, at what geography/estimate/period type). One series, many observations.
  *  - `StatisticalObservation` — a single as-reported estimate for a series at a jurisdiction and
- *    period, always `status: 'observed'`. `boundaryVersion` is the vintage/crosswalk key: bd
+ *    period, `status: 'observed'` for as-reported figures or `'tabulated'` for BlackStory's own
+ *    weighted counts from licensed microdata. `boundaryVersion` is the vintage/crosswalk key: bd
  *    memory records "Tract-keyed collections must carry explicit tractVintage: ACS 2020s
  *    releases use 2020 tracts, Opportunity Atlas uses 2010 tracts — never join without a
  *    crosswalk," and `boundaryVersion` generalizes that constraint to every geography type (not
@@ -70,6 +71,8 @@ export const STATISTICAL_GEOGRAPHY_TYPES = [
   'facility',
   'state',
   'nation',
+  /** A modeled multi-county region whose extent is defined per decade (Lives Across the Decades). */
+  'region',
 ] as const;
 
 export type StatisticalGeographyType = (typeof STATISTICAL_GEOGRAPHY_TYPES)[number];
@@ -136,8 +139,10 @@ export type StatisticalSeries = {
 
 /**
  * A single as-reported estimate for a series at one jurisdiction and reference period.
- * Always `status: 'observed'` — an observation is never derived or modeled, it is a
- * transcription of what the source dataset reported.
+ * `status: 'observed'` is a transcription of what the source dataset reported. `'tabulated'`
+ * is BlackStory's own weighted count from licensed microdata (IPUMS USA), which the source never
+ * published and which must never be presented as if it had. Neither is derived or modeled.
+ * See docs/methodology/lives-across-decades.md.
  *
  * `boundaryVersion` is the vintage/crosswalk key (generalizes the tractVintage constraint —
  * see module doc). Two observations may only be safely combined when their `boundaryVersion`
@@ -162,7 +167,7 @@ export type StatisticalObservation = {
   readonly sourceItemId: string;
   /** ISO 8601 timestamp of when this reading was captured. */
   readonly retrievedAt: string;
-  readonly status: 'observed';
+  readonly status: 'observed' | 'tabulated';
 };
 
 /**
