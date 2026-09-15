@@ -126,6 +126,37 @@ describe('room kit · the v6 edition system stays retired', () => {
   });
 });
 
+describe('room kit · a catalog block a second room renders is styled by the kit', () => {
+  // /law reused the Records find field while its rules shipped only in the Records stylesheet,
+  // which /law never loads, so the search rendered as bare browser controls. Any `ds-records-*`
+  // class used outside app/records must be defined in room-kit.css, which every room loads.
+  it('every ds-records-* class used outside app/records is defined in room-kit.css', () => {
+    const kitCss = readFileSync(path.join(APP_DIR, '../components/room/room-kit.css'), 'utf8');
+    const recordsDir = path.join(APP_DIR, 'records') + path.sep;
+    const missing = new Set<string>();
+
+    for (const file of walk(APP_DIR)) {
+      if (!file.endsWith('.tsx') || file.endsWith('.test.tsx') || file.startsWith(recordsDir)) {
+        continue;
+      }
+      const source = readFileSync(file, 'utf8')
+        .replace(/\/\*[\s\S]*?\*\//g, '')
+        .replace(/^\s*\/\/.*$/gm, '');
+      for (const [className] of source.matchAll(/\bds-records-[a-z0-9_-]+/g)) {
+        if (!new RegExp(`\\.${className}(?![a-z0-9_-])`).test(kitCss)) {
+          missing.add(`${path.relative(APP_DIR, file)}: ${className}`);
+        }
+      }
+    }
+
+    assert.deepEqual(
+      [...missing].sort(),
+      [],
+      'move the block into components/room/room-kit.css rather than importing a route stylesheet',
+    );
+  });
+});
+
 describe('room kit · the trail is computed, never hand-written', () => {
   // SP-21 (repo-92n2.29) shipped /rooms, so a reading room's parent is Rooms rather than
   // the site root — matching `SURF_PARENT` in the mock, where Rooms is the default up-link. These

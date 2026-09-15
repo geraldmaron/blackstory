@@ -930,6 +930,102 @@ a.ds-room-chip {
   }
 }
 
+/* —— Find field and active constraints: shared by every catalog room ——————————
+   Records and Law both render the GET find field and the row of active constraints. These rules
+   lived in the Records stylesheet alone, which /law never loads, so its search rendered as bare
+   browser controls. A catalog block a second room renders belongs here. */
+.ds-records-find {
+  flex: 1 1 16rem;
+  min-width: 0;
+  margin: 0;
+}
+
+.ds-records-find__row {
+  display: flex;
+  gap: var(--ds-space-2);
+}
+
+.ds-records-find__input {
+  flex: 1 1 auto;
+  min-width: 0;
+  height: 40px;
+  padding: 0 var(--ds-space-4);
+  background: var(--ds-surface);
+  border: var(--ds-border-width) solid var(--ds-rule);
+  border-radius: var(--ds-radius-full);
+  color: var(--ds-ink);
+  font-family: var(--ds-font-ui);
+  font-size: 13px;
+}
+
+.ds-records-find__input:focus-visible {
+  outline: 2px solid var(--ds-accent);
+  outline-offset: 1px;
+}
+
+/* Paints the room's own ground rather than going transparent: inside the kit, a transparent box
+   is reserved for the live map-moment window onto the plate. */
+.ds-records-find__go {
+  height: 40px;
+  padding: 0 var(--ds-space-4);
+  background: var(--ds-canvas);
+  border: var(--ds-border-width) solid var(--ds-border-strong);
+  border-radius: var(--ds-radius-full);
+  color: var(--ds-ink);
+  font-family: var(--ds-font-ui);
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.ds-records-find__go:hover {
+  border-color: var(--ds-accent-graphic);
+  color: var(--ds-accent);
+}
+
+/* These are not the facet chips. A facet chip adds a constraint; these say what is currently
+   true of the set and remove it. The design law requires the second thing to be visible on any
+   surface a URL can arrive at pre-filtered. */
+.ds-records-active {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  margin: var(--ds-space-4) 0 var(--ds-space-2);
+}
+
+.ds-records-active__chip {
+  display: inline-flex;
+  align-items: center;
+  height: 26px;
+  padding: 0 10px;
+  background: var(--room-copper-wash);
+  border: var(--ds-border-width) solid var(--ds-accent-graphic);
+  border-radius: var(--ds-radius-full);
+  color: var(--ds-accent);
+  font-size: 12px;
+  font-weight: 500;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.ds-records-active__x {
+  margin-left: 6px;
+  font-size: 10px;
+}
+
+.ds-records-active__chip:hover {
+  background: var(--ds-accent);
+  color: var(--ds-canvas);
+}
+
+.ds-records-active__clear {
+  font-family: var(--ds-font-mono);
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--room-ink-4);
+}
+
 /* —— DataTable: scrolls inside its own container, never the page ——————————— */
 .ds-room-tblwrap {
   overflow-x: auto;
