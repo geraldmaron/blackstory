@@ -246,3 +246,6 @@ export type {
   LivesRule,
   LivesSourceRef,
 } from './lives-timeline.js';
+
+export { LIVES_REGIONS, livesRegionById, livesRegionBySlug } from './lives-regions.js';
+export type { LivesRegionConfig } from './lives-regions.js';
