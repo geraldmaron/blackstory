@@ -1,8 +1,14 @@
 /**
  * Loads authored law_applicability rows for Lives Across the Decades from a JSON file, validating
- * each against the live catalog before anything is written: the entity must be published, every
- * basis claim must be a published canonical claim, and every in-force year must appear in the text
- * of a basis claim. Rows are data, so the JSON lives outside git (session scratch or .cache).
+ * each against the active release before anything is written: the entity must be published, every
+ * basis claim must be a cited claim on a published record, and every in-force year must appear in
+ * the text of a basis claim. Rows are data, so the JSON lives outside git (session scratch or
+ * .cache).
+ *
+ * Canonical coverage is reported, not required. The incremental publisher writes bb_public
+ * directly, and backfill-canonical-claims-from-release.ts only reaches entities with no canonical
+ * claims at all, so a sourced claim added to an already-traced record can be public before it
+ * has a canonical row. Missing rows are listed so the trace gap stays visible.
  *
  * Usage (repo root):
  *   set -a && . apps/web/.env.local && set +a
@@ -49,8 +55,10 @@ async function main(): Promise<void> {
 
     const [entities, jurisdictions, canonical, texts] = await Promise.all([
       pool.query<{ id: string }>(
-        `SELECT DISTINCT projection->>'id' AS id FROM bb_public.release_entities
-         WHERE projection->>'id' = ANY($1::text[])`,
+        `SELECT DISTINCT e.projection->>'id' AS id
+         FROM bb_public.release_entities e
+         JOIN bb_public.active_release a ON a.release_id = e.release_id
+         WHERE e.projection->>'id' = ANY($1::text[])`,
         [entityIds],
       ),
       pool.query<{ id: string }>(
@@ -65,17 +73,23 @@ async function main(): Promise<void> {
       pool.query<{ id: string; text: string }>(
         `SELECT DISTINCT claim->>'id' AS id,
                 concat_ws(' ', claim->>'object', claim->>'citationLabel') AS text
-         FROM bb_public.release_entities e,
+         FROM bb_public.release_entities e
+         JOIN bb_public.active_release a ON a.release_id = e.release_id,
               jsonb_array_elements(e.projection->'claims') AS claim
-         WHERE claim->>'id' = ANY($1::text[])`,
+         WHERE claim->>'id' = ANY($1::text[])
+           AND coalesce(claim->>'citationHref', '') <> ''`,
         [claimIds],
       ),
     ]);
 
-    const published = new Set(canonical.rows.map((row) => row.id));
-    const claimText = new Map(
-      texts.rows.filter((row) => published.has(row.id)).map((row) => [row.id, row.text]),
-    );
+    const canonicalIds = new Set(canonical.rows.map((row) => row.id));
+    const claimText = new Map(texts.rows.map((row) => [row.id, row.text]));
+    const untraced = [...claimText.keys()].filter((id) => !canonicalIds.has(id));
+    if (untraced.length > 0) {
+      console.log(
+        `warning: ${untraced.length} basis claim(s) have no canonical row yet: ${untraced.join(', ')}`,
+      );
+    }
     const context = {
       entityIds: new Set(entities.rows.map((row) => row.id)),
       jurisdictionIds: new Set(jurisdictions.rows.map((row) => row.id)),

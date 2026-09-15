@@ -4,7 +4,8 @@
  * A row says a law or ruling was in force for a jurisdiction and certain groups over a window.
  * The window must come from the record's own cited claims, never from entity `statusHistory`
  * (lifecycle only, and known to carry wrong years). So every in-force year has to appear in the
- * text of at least one basis claim, and every basis claim must be a published canonical claim.
+ * text of at least one basis claim, and every basis claim must be a cited claim on a record in the
+ * active release.
  * Method: docs/methodology/lives-across-decades.md.
  */
 
