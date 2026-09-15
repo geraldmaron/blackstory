@@ -5,7 +5,7 @@
  *
  * The map is the shared MapLibre plate (shell.css `.ds-map-stage`, posture `ambient`) and it is
  * the only map on this surface (repo-18ma2). `.ds-door__field` is the part of it the reader sees:
- * full-bleed below the bar on a desktop, a sticky strip above the chapters on a phone. Its
+ * full-bleed below the bar at every width; on a phone the camera frames a band under the bar. Its
  * `.ds-door__window` is measured by door-immersive.tsx to frame the camera (door-field-frame.ts);
  * nothing is drawn in it. Until this mount has framed the plate and the plate has painted, the
  * field and the page keep the canvas color over it, then fade to let it through.
@@ -832,30 +832,28 @@ body:has(.ds-door) .ds-door-journey {
     scroll-snap-type: none;
   }
 
-  .ds-door__field {
-    position: sticky;
-    top: var(--ds-island-clearance);
-    right: auto;
-    bottom: auto;
-    left: auto;
-    z-index: 1; /* local: sticky mobile field above document chapters */
-    height: min(34dvh, 15rem);
-    padding: var(--ds-space-3) var(--ds-gutter);
-    background: var(--ds-canvas);
-    border-bottom: var(--ds-border-width) solid var(--ds-rule);
+  /*
+   * A phone reads the Door as a story told over the map, not a map stacked above text. The field
+   * stays the fixed full-bleed plate it is on a desktop, and the camera frames the country into a
+   * band under the bar, sized to the country at the screen's width so no Gulf or Mexico pads it.
+   * The opening card rises over the band's bottom margin like a sheet; every later chapter opens
+   * with a band-high gap, so the map, already flown to that chapter, is seen before its card
+   * slides over it. The map takes no touches on a phone: the chapters own the scroll, and Explore
+   * is where the map is handled.
+   */
+  .ds-door {
+    --ds-door-band: min(calc((100vw - 24px) * 0.5 + 24px), 20rem);
+    --ds-door-overlap: var(--ds-space-3);
   }
 
-  /* With the plate live the sticky field is a window onto the full-bleed map, not a panel. */
-  body:has(.ds-map-stage[data-plate-ready]) .ds-door__field[data-plate='live'] {
-    border-bottom-color: transparent;
-  }
-
-  /* The window is the strip's content box: the camera frames the country inside the padding. */
   .ds-door__window {
-    position: relative;
-    inset: auto;
-    width: 100%;
-    height: 100%;
+    bottom: auto;
+    height: var(--ds-door-band);
+  }
+
+  /* Empty on a phone (the captions are desktop chrome), so it must not push the frame down. */
+  .ds-door__field-chrome {
+    top: 0;
   }
 
   /* The captions are desktop chrome; the no-plate note still shows where the map would be. */
@@ -869,7 +867,7 @@ body:has(.ds-door) .ds-door-journey {
 
   .ds-door-journey__chapter {
     min-height: 0;
-    padding: var(--ds-space-5) var(--ds-gutter) var(--ds-space-6);
+    padding: var(--ds-door-band) var(--ds-gutter) var(--ds-space-6);
     scroll-snap-align: none;
     pointer-events: auto;
   }
@@ -879,6 +877,10 @@ body:has(.ds-door) .ds-door-journey {
   .ds-door-journey__chapter--center {
     justify-items: stretch;
     align-content: start;
+  }
+
+  .ds-door-journey__chapter--rest {
+    padding-top: calc(var(--ds-door-band) - var(--ds-door-overlap));
   }
 
   .ds-door-journey__card {
@@ -967,18 +969,7 @@ body:has(.ds-door) .ds-door-journey {
   }
 }
 
-@media (min-width: 600px) and (max-width: 899px) {
-  .ds-door__field {
-    height: min(40dvh, 22rem);
-  }
-}
-
 @media (max-width: 559px) {
-  .ds-door__field {
-    height: min(32dvh, 13.5rem);
-    padding-inline: var(--ds-space-4);
-  }
-
   .ds-door-journey__chapter {
     padding-inline: var(--ds-space-4);
     padding-bottom: calc(var(--ds-space-8) + env(safe-area-inset-bottom, 0px));
@@ -1009,7 +1000,6 @@ body:has(.ds-door) .ds-door-journey {
   }
 
   .ds-door-journey__chapter--rest {
-    padding-top: var(--ds-space-3);
     padding-bottom: var(--ds-space-4);
   }
 
@@ -1052,16 +1042,16 @@ body:has(.ds-door) .ds-door-journey {
   }
 }
 
-/* A short phone gives the card the room: the strip still frames the whole country, smaller. */
+/* A short phone gives the card the room: the band still frames the whole country, smaller. */
 @media (max-width: 559px) and (max-height: 42rem) {
-  .ds-door__field {
-    height: min(26dvh, 10rem);
+  .ds-door {
+    --ds-door-band: min(calc((100vw - 24px) * 0.42 + 24px), 11rem);
   }
 }
 
 @media (max-width: 899px) and (max-height: 30rem) {
-  .ds-door__field {
-    height: min(48dvh, 16rem);
+  .ds-door {
+    --ds-door-band: min(45dvh, 12rem);
   }
 
   .ds-door-journey__chapter--rest .ds-door-journey__prose,
@@ -1070,7 +1060,7 @@ body:has(.ds-door) .ds-door-journey {
   }
 
   .ds-door-journey__chapter--rest .ds-door-journey__card {
-    max-height: calc(100dvh - var(--ds-island-clearance) - min(48dvh, 16rem) - var(--ds-space-4));
+    max-height: calc(100dvh - var(--ds-island-clearance) - var(--ds-door-band) - var(--ds-space-4));
     overflow: hidden;
   }
 

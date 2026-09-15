@@ -173,10 +173,19 @@ test('immersive CSS uses document snap over a fixed full-bleed plate', () => {
   );
   // Mobile chapters are in document flow; nested card scroll would steal the page wheel.
   assert.match(css, /@media \(max-width: 899px\)[\s\S]*max-height:\s*none/);
-  // On a phone the strip is the window; the camera frames the country inside its padding.
+  // On a phone the window is a band under the bar, sized to the country, that the chapters
+  // scroll over; the plate stays fixed full-bleed rather than a sticky strip cards cover.
   assert.match(
     css,
-    /@media \(max-width: 899px\)[\s\S]*\.ds-door__window\s*\{[^}]*position:\s*relative/,
+    /@media \(max-width: 899px\)[\s\S]*\.ds-door__window\s*\{[^}]*height:\s*var\(--ds-door-band\)/,
+  );
+  assert.doesNotMatch(css, /position:\s*sticky/);
+  // Every later chapter opens with a band-high gap, so the flown map is seen before its card.
+  assert.match(css, /\.ds-door-journey__chapter\s*\{[^}]*padding:\s*var\(--ds-door-band\)/);
+  // The opening card rises over the band's bottom margin like a sheet.
+  assert.match(
+    css,
+    /\.ds-door-journey__chapter--rest\s*\{[^}]*padding-top:\s*calc\(var\(--ds-door-band\) - var\(--ds-door-overlap\)\)/,
   );
 });
 

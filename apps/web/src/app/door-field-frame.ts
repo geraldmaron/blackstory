@@ -2,8 +2,8 @@
  * The Door's map window: the box on screen the live plate frames its camera against.
  *
  * The plate is one fixed, full-viewport canvas shared with Explore (MapStage.tsx), but on `/` the
- * reader only ever sees part of it: below the bar on a desktop, and inside the sticky strip above
- * the chapters on a phone. A national frame fitted to the whole canvas put the 49th parallel under
+ * reader only ever sees part of it: below the bar on a desktop, and inside a band under the bar,
+ * which the chapters scroll over, on a phone. A national frame fitted to the whole canvas put the 49th parallel under
  * the bar and, on a phone, the country behind the cards; and because it was fitted once, for the
  * viewport the plate happened to be built in, a window resized afterwards kept the old zoom and
  * lost a coast or two (repo-18ma2).

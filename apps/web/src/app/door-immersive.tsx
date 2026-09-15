@@ -12,7 +12,7 @@
  * own ground until the plate has painted, and then it is the plate.
  *
  * The camera is framed against the Door's map window (`.ds-door__window`: below the bar on a
- * desktop, the sticky strip on a phone), not against the whole canvas, and re-framed whenever that
+ * desktop, a band under the bar on a phone), not against the whole canvas, and re-framed whenever that
  * window changes — a resize moves the map the way it moves the layout (door-field-frame.ts).
  *
  * Pins with public hrefs stay clickable: a marker or cluster on the live plate goes through the
@@ -435,7 +435,7 @@ export function DoorImmersive({
    *
    * A national chapter fits CONUS inside the window through the Atlas's own national preset,
    * with the window's insets as the fit's padding (`doorFramePadding`), so the country sits
-   * below the bar and the field chrome on a desktop and inside the strip on a phone rather than
+   * below the bar and the field chrome on a desktop and inside the top band on a phone rather than
    * centered on a canvas the reader only partly sees. The strip is shorter than the country at the Instrument's
    * national zoom floor, so the fit may sink the floor to what it needs (`zoomFloor: 'fit'`,
    * camera.ts). Pitch and bearing are passed even though a national chapter
