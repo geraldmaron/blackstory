@@ -58,6 +58,25 @@ test('law detail page uses anatomy strip without gutter mosaic', () => {
   assert.match(anatomySource, /EditionFactIcon/);
 });
 
+test('the anatomy strip names topics by label, the way the browse chips do', async () => {
+  // The detail page printed "constitutional · criminal-justice" while /law chips said
+  // "Constitutional" and "Criminal justice".
+  const React = await import('react');
+  const { renderToStaticMarkup } = await import('react-dom/server');
+  const { LawAnatomyStrip } = await import('./LawAnatomyStrip');
+  const markup = renderToStaticMarkup(
+    React.createElement(LawAnatomyStrip, {
+      kind: 'constitutional-amendment',
+      lawStatus: 'in_force',
+      jurisdictionId: 'federal',
+      citation: 'U.S. Const. amend. XIII',
+      topics: ['constitutional', 'criminal-justice'],
+    }),
+  );
+  assert.match(markup, /Constitutional · Criminal justice/);
+  assert.doesNotMatch(markup, /criminal-justice/);
+});
+
 test('law detail page renders through the room kit, with no edition chrome left', () => {
   assert.doesNotMatch(detailPageSource, /law-panel-chrome/);
   assert.doesNotMatch(detailPageSource, /law-edition\.css/);
