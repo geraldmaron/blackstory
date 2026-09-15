@@ -1,194 +1,185 @@
 <!--
-  Methodology: how "Lives Across the Decades" turns IPUMS USA microdata into published
-  region x decade x group x class-tier cells, and what the surface is allowed to say about them.
-  Binds packages/ops-data/src/lives/, packages/domain/src/statistics/lives-timeline.ts, and the
-  /lives surface. Companion to juxtaposition-not-causation.md.
+  Methodology: how "Lives Across the Decades" turns published census tables into region x decade x
+  group figures, and what the surface is allowed to say about them. Binds
+  packages/domain/src/statistics/lives-*.ts, packages/ops-data ingest for Lives, and the /lives
+  surface. Companion to juxtaposition-not-causation.md. Plan of record:
+  docs/research/lives-regions-and-sources.md.
 -->
 
 # Lives Across the Decades: method
 
 **Status:** Binding product methodology
-**Date:** 2026-09-14
+**Date:** 2026-09-15 (revised from the 2026-09-14 microdata method)
 **Related:** [juxtaposition-not-causation.md](./juxtaposition-not-causation.md),
 [national-black-population-timeline.md](./national-black-population-timeline.md),
-[scholarship-principles.md](./scholarship-principles.md)
+[scholarship-principles.md](./scholarship-principles.md),
+[lives-regions-and-sources.md](../research/lives-regions-and-sources.md)
 
 ## What the surface shows
 
-A reader chooses a region, a lens (Black, white or Hispanic) and a class tier, then moves through
-the decades from the 1870s to the 2020s. Each decade shows four things:
+A reader chooses a region, a lens (Black, white or Hispanic) and a class tier, then moves through the
+decades from the 1870s to the 2020s. Each decade shows:
 
-1. The share of each of the three groups in each class tier.
-2. Measured conditions for the chosen group and tier, with the other two groups beside them.
-3. The laws and court rulings in force that applied to that place and group.
-4. A short narrative frame that states only what the first three already show.
+1. **What the count could see:** who the census counted, how, what is missing, and what that meant.
+2. **The share of each group in each class tier.**
+3. **Measured conditions for each group:** homeownership, schooling, work, city living and more.
+4. **The laws and court rulings in force** for that region and group.
+5. **A short narrative frame** that states only what the rest of the decade already shows.
 
-All three groups are always on screen. The lens changes which one is emphasized, never which ones
-are visible. The surface describes the conditions people in a group lived under. It never invents
-a person, assigns a fate, or invites a reader to "become" a race.
+All three groups are always on screen. The lens changes which one is emphasized, never which ones are
+visible. The surface describes the conditions people in a group lived under. It never invents a person,
+assigns a fate, or invites a reader to "become" a race.
 
-## Source
+## Regions
 
-Every cell is **tabulated** by BlackStory from IPUMS USA microdata (Ruggles et al., IPUMS USA,
-University of Minnesota). Tabulated means our own weighted count from licensed microdata. It is not
-a figure the Census Bureau published, and the UI says so with the status `tabulated`. The cell's
-status is never `observed`.
+Six regions, each a union of whole states, plus a national baseline:
 
-Microdata stays in the gitignored `.cache/ipums/` directory and is never committed, uploaded or
-served. Only aggregates reach `bb_reference`. Extract *definitions* (samples, variables, case
-selections) are configuration and are committed, so any cell can be rebuilt.
+| Region | States |
+|---|---|
+| Deep South | AL, AR, FL, GA, LA, MS, SC |
+| Upper South & the Capital | DE, DC, KY, MD, NC, TN, VA, WV |
+| Texas & Oklahoma | TX, OK |
+| The West | AK, AZ, CA, CO, HI, ID, MT, NV, NM, OR, UT, WA, WY |
+| Midwest | IL, IN, IA, KS, MI, MN, MO, NE, ND, OH, SD, WI |
+| Northeast | CT, ME, MA, NH, NJ, NY, PA, RI, VT |
 
-## Groups
+Every state belongs to exactly one region, so the regions sum to the nation. Territories are included
+wherever the census enumerated them before statehood, and the decade's note says so. Place anchors
+(catalog places such as Harlem or the Delta) illustrate a region and never carry figures of their own.
 
-Groups do not overlap:
+## Source and status
 
-| Group | Definition | Slice |
-|---|---|---|
-| Black | Race Black, not Hispanic | `black_nh` |
-| White | Race white, not Hispanic | `white_nh` |
-| Hispanic | Hispanic origin, any race | `hispanic` |
+Every figure comes from a published Census Bureau table: a printed volume, a subject report, a summary
+file, or an American Community Survey table. Census publications are public domain and are the cited
+source. NHGIS is used to extract and cross-check, and its table code is kept in provenance.
 
-This follows the Pew Research Center convention. The existing national spine series use `black_alone`,
-which includes Hispanic Black people, so the national context rows on the surface keep their own
-label and are never merged with these cells.
+- **`observed`:** a figure transcribed exactly as a table published it, stored at state or national level.
+- **`derived`:** a region figure summed or divided from state figures, or an income band estimated
+  within published brackets. The formula and every input row are recorded.
 
-**Hispanic origin before 1970 is imputed.** The census first asked about Hispanic origin in 1970, on
-the 5% long form, and asked everyone from 1980. For 1870 through 1960, IPUMS `HISPAN` is assigned
-from birthplace, parents' birthplace and, in five southwestern states in 1960, Spanish surname
-(Gratton and Gutmann). Cells from those decades carry the regime label "Hispanic origin imputed by
-IPUMS."
+The status `tabulated` (a weighted count from licensed microdata) remains in the schema but this
+feature does not use it.
 
-## Class tiers and measurement regimes
+## Groups, as each era defined them
 
-Class is measured differently as the census changed what it asked. Each decade belongs to exactly one
-regime. The surface marks every boundary, and **no change is ever computed across a boundary.**
+The census's categories changed, and the surface never hides that.
+
+| Era | Black | White | Hispanic |
+|---|---|---|---|
+| 1870–1960 | "Negro" (with "Mulatto" where the census used it), recorded by enumerators | "White," which included people later counted as Hispanic | Not counted as a group. 1930: "Mexican" as a race. 1950–1960: Spanish surname (five states) and Puerto Rican birth or parentage |
+| 1970 | "Negro" | "White," which included Hispanic white people | Sample question on Spanish origin, with known misclassification |
+| 1980–1990 | "Black," Hispanic Black people included unless a table excludes them | White, non-Hispanic where a table publishes it, otherwise "White" | Spanish or Hispanic origin, asked of everyone |
+| 2000–2020 | "Black or African American alone" | "White alone, not Hispanic" | "Hispanic or Latino," of any race |
+
+A figure is labeled with the definition its table used. A change is never computed across two
+definitions without saying so.
+
+## Class tiers by era
 
 | Decades | Regime | Measure | Label |
 |---|---|---|---|
-| 1870s–1930s | `occupational_strata` | Household head's `OCC1950` group | Work-based class |
-| 1890s | none | No surviving microdata (1890 schedules destroyed) | Gap |
-| 1940s | `earnings` | Household earnings from `INCWAGE` (wages only, top-coded $5,001) | Earnings tier |
-| 1950s | `sample_line_income` | `INCTOT`, asked only of sample-line persons | Income tier, sample-line note |
-| 1960s–1970s | `constructed_household_income` | Household income summed from members' `INCTOT` | Income tier, method note |
-| 1980s–2000s | `household_income` | `HHINCOME` | Income tier |
-| 2010s–2020s | `acs_household_income` | `HHINCOME`, ACS 5-year files | Income tier |
+| 1870s–1930s | `work_based` | Published occupation groups by race (laboring, farm and domestic work; skilled, clerical and sales work; professional, managerial and proprietor work), with farm operators split by tenure where published | Work-based class |
+| 1940s | `wage_income` | Wage and salary income by race, where published | Earnings bands |
+| 1950s–1980s | `family_income` | Family income brackets by race | Family income bands |
+| 1990s–2000s | `household_income` | Household income brackets by race of householder | Household income bands |
+| 2010s–2020s | `acs_household_income` | ACS five-year household income brackets by race of householder | Household income bands |
 
-### Income tiers (1940s onward)
+1890 is a regular decade. Its individual schedules burned in 1921, but its published tables survived.
 
-We use the Pew Research Center method:
+### Income bands (1940s onward)
 
-1. Size-adjusted income = household income ÷ √(number of persons in the household).
-2. The national median of size-adjusted income is computed from that year's nationwide sample,
-   weighted by household.
-3. **Lower:** below two-thirds of the national median. **Middle:** two-thirds to double. **Upper:**
-   above double.
+1. The threshold is the national median of the same measure (wages, family income or household income)
+   in the same year, from the same publication.
+2. **Lower:** below two-thirds of that median. **Middle:** two-thirds to double. **Upper:** above double.
+3. A share is estimated within the published bracket that contains a threshold: linear within a closed
+   bracket, and Pareto interpolation within the open top bracket, the Census Bureau's own method for
+   medians. Every band is `derived` and says it is estimated.
 
-Thresholds are national, not regional, and are not adjusted for local cost of living. The surface says
-so. Regional Price Parities only exist from 2008, and a partial adjustment would create a false break.
+Bands follow Pew Research Center's cutoffs but are not size-adjusted, because published tables do not
+allow it. The surface says so. Thresholds are national, not adjusted for regional prices.
 
 ### Work-based class (1870s–1930s)
 
-Before 1940 the census did not ask about income. Class comes from the observed occupation of the
-household head, grouped by `OCC1950`. When the head reports no occupation (keeping house, retired,
-at school), the household takes the occupation of its first adult member who reports one, in
-enumeration order.
+Before 1940 the census did not ask about income. Class comes from published occupation groups by race.
+Tenant farmers are grouped with laboring work, because the census counted sharecroppers as tenant farm
+operators, and ranking tenants with skilled workers would overstate the standing of rural Black and
+Hispanic families. These are not income classes and are never labeled as income.
 
-| Stratum | OCC1950 groups |
+## Conditions
+
+Conditions are shown for each group, not within a class tier: published tables do not cross income with
+other measures by race. When a reader chooses a tier, the class shares respond and the conditions say
+why they do not.
+
+Conditions are shown only where a decade published them by race, for example literacy (1870–1930),
+school attendance, educational attainment (1940 on), homeownership, living in a city, employment and
+unemployment, farm tenure, and median income.
+
+## What the count could see
+
+Every decade carries sourced notes on how the census counted each group, what it could not see, and
+what that meant: the 1921 fire, one-drop and "Mulatto" instructions, the 1930 "Mexican" category and
+its removal, Spanish surname and Puerto Rican proxies, the 1970 sample question, and the measured
+undercount of Black Americans from 1940 on. Notes follow the claim rules: a Tier-1 or scholarly source,
+opened and quoted.
+
+A missing figure links to the note that explains it. A missing number never stands in for missing
+people.
+
+## Suppression and coverage
+
+- A published figure is shown as published. Values are never interpolated between decades or borrowed
+  from another geography.
+- **ACS:** figures carry the published margin of error. Levels with a coefficient of variation above
+  30% are withheld, and those between 15% and 30% are flagged.
+- **Decennial sample tables:** published without margins. A region figure whose base is below 500
+  counted persons or households is withheld.
+- **Partial coverage:** when a table covers only some of a region's states (for example 1950 nonwhite
+  detail, published only for areas with 50,000+ nonwhite residents), the region figure states the share
+  of the region's group population it covers. Below 80% it is withheld.
+
+| Cell state | Surface |
 |---|---|
-| Lower | Farm laborers, non-farm laborers, private household workers, service workers, and **tenant farmers** |
-| Middle | Operatives, craftsmen, clerical and sales workers, farm managers, and **farm owners** |
-| Upper | Professional and technical workers; managers, officials and proprietors (not farm) |
-| Unclassified | No occupation reported by any adult, or a farmer whose tenure the census did not record |
+| `published` | Value, with margin or coverage where known |
+| `wide_margin` | Value with a wide-margin marker |
+| `suppressed` | "Too few counted to say," linked to the reason |
+| `not_measured` | "The census did not publish this," linked to the decade's count note |
+| `pending` | "Not yet counted" (build not complete) |
 
-Tenant farmers are ranked lower because the census counted sharecroppers as tenant farm operators.
-Ranking tenants with skilled workers would overstate the standing of rural Black and Hispanic
-households in the South and Southwest. Tenure (`OWNERSHP`) is recorded from 1900. In 1870 and 1880
-a farmer cannot be split into owner and tenant, so farmer-headed households in those decades are
-**unclassified**, and the unclassified share is shown beside the three strata rather than hidden.
+## Build
 
-These are **not income classes** and are never labeled as income. We do not use `OCCSCORE`. It gives
-every worker in an occupation that occupation's 1950 median income, which erases pay gaps between
-races doing the same work and would overstate Black workers' standing.
-
-The exact code lists live in `packages/ops-data/src/lives/strata.ts` and its tests.
-
-## Universe, weights and dollars
-
-- **Universe:** adults age 18 and over living in households (group quarters excluded).
-- **Weights:** `PERWT` for person shares, `HHWT` for household measures.
-- **Dollars:** 2024 dollars. CPI-U-RS from 1978 onward, chained to CPI-U for 1913–1977. The deflator
-  series is stored as its own statistical series so any conversion can be reproduced.
-
-## Geography
-
-IPUMS identifies places differently by decade:
-- `METAREA` covers 1850–1950 and the 1960 5% sample.
-- Metro identification in 1970–2000 is partial and has population thresholds.
-- `MET2013` and PUMA are needed from 2012.
-- `CITY` is absent in 1970.
-
-Each region and decade has a row in `bb_reference.region_decade_definitions` recording the exact
-geography rule, the member counties where they are known, a `boundary_version`, and a required
-`comparability_note`. A region is a jurisdiction such as `region:chicago-il`. When the geography
-rule changes between decades, the comparability note says what changed, and the surface shows it.
-
-## Uncertainty and suppression
-
-Every published cell carries its unweighted count, a standard error, and a 90% margin of error.
-
-- **ACS decades:** variance from the published replicate weights.
-- **Earlier decades:** a household-cluster bootstrap with 200 replicates and a fixed seed, so reruns
-  reproduce the same margins.
-
-Shares (a percentage of a group) and levels (a median income, an average household size) use different
-rules. A relative standard error is meaningless for a share near zero, where a real 0% or 2% would
-otherwise always suppress.
-
-| Condition | Cell state | Surface |
-|---|---|---|
-| Unweighted n < 50 | `suppressed` | "Too few records in the census sample to say." |
-| Share with a 90% margin above ±20 percentage points, or level with RSE above 30% | `suppressed` | Same |
-| Share with a 90% margin above ±10 points, or level with RSE of 15–30% | `wide_margin` | Value shown with a wide-margin marker |
-| Not asked in that decade | `not_measured` | "The census did not ask this in the 1920s." |
-| Otherwise | `published` | Value, n and margin |
-
-Suppressed and unmeasured cells are never interpolated, estimated from neighbors, or borrowed from
-another geography.
+The data is a static, versioned build, not a live feed. Tables are acquired, validated and loaded into
+`bb_reference`, then frozen into one snapshot per region. Pages render from the snapshot. A rebuild
+happens only when a source vintage changes or a correction lands.
 
 ## Rules in force
 
-Laws and rulings come from the catalog. Their applicability lives in
-`bb_reference.law_applicability`:
-- the jurisdiction they applied to
-- the in-force window, taken from cited claims, never from entity `statusHistory`
-- the groups the rule named, in its own words
-- the life domains it touched
-- whether its text was exclusionary, protective or facially neutral
+Laws and rulings come from the catalog. Their applicability lives in `bb_reference.law_applicability`:
+the jurisdiction (the nation or a state), the in-force window taken from cited claims (never from
+entity `statusHistory`), the groups the rule named in its own words, the life domains it touched, and
+whether its text was exclusionary, protective or facially neutral. Federal rules appear in every region.
+A state rule appears in its region with the state's name.
 
-A rule shows in a decade when its window overlaps that decade and its jurisdiction is the region,
-one of its counties, or an ancestor.
-
-A facially neutral rule whose racial effect is disputed by scholars renders as a dispute, not as a
-settled effect. Examples are the agricultural and domestic worker exclusions in the Social Security
-Act of 1935 and the Fair Labor Standards Act of 1938.
+A facially neutral rule whose racial effect is a live scholarly dispute (for example the agricultural and
+domestic worker exclusions of the Social Security Act of 1935) renders as a dispute.
 
 ## What the surface may say
 
-The surface follows [juxtaposition-not-causation.md](./juxtaposition-not-causation.md). Every rules
-panel carries the fixed disclaimer:
+The surface follows [juxtaposition-not-causation.md](./juxtaposition-not-causation.md). Every rules panel
+carries the fixed disclaimer:
 
 > Context indicators are published measurements from named custodians. Showing them with a law or
 > place does not establish that the law caused the indicator values. Causal statements require
 > separately evidenced claims.
 
 Allowed:
-- "In 1950, about N in 100 Black adults in the Chicago area lived in lower-income households."
+- "In 1960, about N in 100 nonwhite families in the Deep South had incomes below two-thirds of the
+  national median."
 - "The Fair Housing Act was in force."
-- "In the same decade, homeownership among white adults was M%."
 
 Not allowed:
 - "Because of redlining, Black families earned less."
 - "You would have been poor."
 
-A causal sentence needs a gated claim citing peer-reviewed work. Narrative frames are validated so
-that every number in them matches a published cell.
+A causal sentence needs a gated claim citing peer-reviewed work. Narrative frames are validated so every
+number in them matches a published or derived figure.
