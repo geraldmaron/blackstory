@@ -182,6 +182,23 @@ test('immersive CSS uses document snap over a fixed full-bleed plate', () => {
   assert.doesNotMatch(css, /position:\s*sticky/);
   // Every later chapter opens with a band-high gap, so the flown map is seen before its card.
   assert.match(css, /\.ds-door-journey__chapter\s*\{[^}]*padding:\s*var\(--ds-door-band\)/);
+  // Below 900px every card is one centered column at a reading width: full width on a phone,
+  // centered under the country on a tablet rather than a 480px card against the left edge.
+  assert.match(
+    css,
+    /@media \(max-width: 899px\)[\s\S]*\.ds-door-journey__chapter--center\s*\{\s*justify-items:\s*center/,
+  );
+  assert.match(
+    css,
+    /\.ds-door-journey__card,\s*\.ds-door-journey__chapter--rest \.ds-door-journey__card\s*\{\s*width:\s*min\(36rem, 100%\)/,
+  );
+  // The desktop cold-open copy describes pin clicks the plate does not take below 900px.
+  assert.match(
+    css,
+    /@media \(max-width: 899px\)[\s\S]*\.ds-door-journey__chapter--rest \.ds-door-journey__eyebrow,\s*\.ds-door-journey__chapter--rest \.ds-door-journey__prose\s*\{\s*display:\s*none/,
+  );
+  // The morph slot must not floor its width at max-content, or Story jumps mid-change.
+  assert.doesNotMatch(css, /\.ds-hero-headline-morph__prefix\s*\{[^}]*min-width:\s*max-content/);
   // The opening card rises over the band's bottom margin like a sheet.
   assert.match(
     css,

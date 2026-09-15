@@ -484,7 +484,9 @@ a.ds-door-journey__here-name:focus-visible {
   position: relative;
   display: inline-flex;
   align-items: baseline;
-  min-width: max-content;
+  /* No min-width: the slot width is what MorphingPrefix interpolates between the two words. A
+     max-content floor snapped it to the incoming word before that word had rolled in, which left
+     a gap ("Her    Story") mid-change. The clip hides the word while the slot catches up. */
   overflow: clip;
   padding-block: var(--ds-hero-roll-pad);
   margin-block: calc(var(--ds-hero-roll-pad) * -1);
@@ -872,10 +874,12 @@ body:has(.ds-door) .ds-door-journey {
     pointer-events: auto;
   }
 
+  /* One column, centered. On a phone the card is the full width anyway; on a tablet it centers
+     under the country at a reading width instead of hugging the left edge of a wide screen. */
   .ds-door-journey__chapter--start,
   .ds-door-journey__chapter--end,
   .ds-door-journey__chapter--center {
-    justify-items: stretch;
+    justify-items: center;
     align-content: start;
   }
 
@@ -883,8 +887,16 @@ body:has(.ds-door) .ds-door-journey {
     padding-top: calc(var(--ds-door-band) - var(--ds-door-overlap));
   }
 
-  .ds-door-journey__card {
-    width: 100%;
+  /* The desktop cold-open copy tells the reader to click pins and move the field by hand, which
+     the plate does not take below 900px; the headline and the Here line carry the opening. */
+  .ds-door-journey__chapter--rest .ds-door-journey__eyebrow,
+  .ds-door-journey__chapter--rest .ds-door-journey__prose {
+    display: none;
+  }
+
+  .ds-door-journey__card,
+  .ds-door-journey__chapter--rest .ds-door-journey__card {
+    width: min(36rem, 100%);
     max-height: none;
     overflow: visible;
   }
