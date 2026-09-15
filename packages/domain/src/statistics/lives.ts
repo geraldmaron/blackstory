@@ -104,3 +104,10 @@ export type {
   LivesRule,
   LivesSourceRef,
 } from './lives-timeline.js';
+
+export {
+  LIVES_SNAPSHOT_VERSION,
+  isLivesAreaSnapshot,
+  livesSnapshotName,
+} from './lives-snapshot.js';
+export type { LivesAreaSnapshot, LivesRuleEntityRef } from './lives-snapshot.js';

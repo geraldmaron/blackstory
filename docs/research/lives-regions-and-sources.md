@@ -78,7 +78,7 @@ figures (`derived`, with their inputs recorded).
 | 1970 | PC(2)-1B *Negro Population*; PC(2)-1C *Persons of Spanish Origin*; state PC(1)-C reports | NHGIS Count 4 county tables (race, Spanish indicator, housing for Negro and Spanish American households); transcription for income | Reports and NHGIS tables verified |
 | 1980, 1990 | Summary Tape Files 1, 3 and 4 | NHGIS | Verified: family income, poverty, labor force, school enrollment and tenure by race (1980); household income, education and employment by race (1990); Spanish-origin tables (1980 STF4) |
 | 2000 | Summary File 3 | Census API (`dec/sf3`) or NHGIS | Verified: household income by race of householder (P151B) and 342 race and Hispanic county tables |
-| 2010s, 2020s | ACS five-year detailed tables, 2008–2012 and 2019–2023 | Census API (`acs/acs5`) | Verified: B19001B/H/I household income, B25003B/I tenure, C15002B education, C23002B employment, B17001I poverty |
+| 2010s, 2020s | ACS five-year detailed tables, 2008–2012 and 2019–2023 | NHGIS extract (datasets `*_ACS5a` and `*_ACS5b`); the Census API data endpoint now requires a key (checked 2026-09-15) | Verified: B03002 population, B19001B/H/I household income, B19013 national median, B25003B/H/I tenure, C15002B/H/I education, C23002B/H/I employment, for both vintages at nation and state level |
 
 **Source of record.** Census Bureau publications and API tables are public domain (17 U.S.C. §105).
 They are the cited source for every figure. NHGIS is used to extract and cross-check. Its terms
