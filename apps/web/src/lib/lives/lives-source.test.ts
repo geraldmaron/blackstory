@@ -1,6 +1,12 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { edtfYear, mapApplicabilityRow, mapDefinitionRow, mapObservationRow } from './lives-source';
+import {
+  edtfYear,
+  mapApplicabilityRow,
+  mapDefinitionRow,
+  mapObservationRow,
+  recordHrefForEntity,
+} from './lives-source';
 
 test('definition rows default missing counties and coverage to empty', () => {
   const mapped = mapDefinitionRow({
@@ -72,4 +78,11 @@ test('applicability rows read in-force years from EDTF and keep the href', () =>
   assert.deepEqual(mapped.groupsNamed, []);
   assert.equal(edtfYear('1896'), 1896);
   assert.throws(() => edtfYear('abcd'));
+});
+
+test('a rule without a law snapshot links to its record page', () => {
+  assert.equal(
+    recordHrefForEntity('ent_case_shelley_v_kraemer_1948'),
+    '/entity/ent_case_shelley_v_kraemer_1948',
+  );
 });

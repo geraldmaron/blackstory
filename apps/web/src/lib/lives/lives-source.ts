@@ -131,6 +131,14 @@ export function mapObservationRow(row: ObservationRow): LivesObservationInput {
   };
 }
 
+/**
+ * The record page for a rule whose law or case has no `/law/{slug}` snapshot. Every published
+ * entity renders at `/entity/{id}`, so a rule always links to the record it rests on.
+ */
+export function recordHrefForEntity(entityId: string): string {
+  return `/entity/${encodeURIComponent(entityId)}`;
+}
+
 /** Year of an EDTF date string (YYYY, YYYY-MM or YYYY-MM-DD). */
 export function edtfYear(edtf: string): number {
   const year = Number(edtf.slice(0, 4));
@@ -201,7 +209,8 @@ export const loadLivesRegionBundle = cache(
       applicabilityRows.map(async (row) =>
         mapApplicabilityRow(
           row,
-          (await resolveLawCaseHref({ kind: row.kind, displayName: row.display_name })) ?? null,
+          (await resolveLawCaseHref({ kind: row.kind, displayName: row.display_name })) ??
+            recordHrefForEntity(row.entity_id),
         ),
       ),
     );
