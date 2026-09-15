@@ -11,7 +11,7 @@
  *     packages/ops-data/scripts/lives-upsert-regions.ts
  */
 import pg from 'pg';
-import { LIVES_REGIONS } from '@repo/domain/statistics';
+import { LIVES_REGIONS } from '@repo/domain/statistics/lives';
 import { normalizePgConnectionString } from './lib/pg-connection.ts';
 
 const apply = process.env.DRY_RUN === '0' && process.env.LIVES_UPSERT_REGIONS_APPLY === '1';

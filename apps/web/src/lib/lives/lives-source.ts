@@ -16,7 +16,7 @@ import {
   type LivesObservationInput,
   type LivesRegionBundle,
   type LivesRegionDecadeDefinitionInput,
-} from '@repo/domain/statistics';
+} from '@repo/domain/statistics/lives';
 import { queryPostgres, resolvePostgresConnectionString } from '../public-data/postgres-client';
 import { resolveLawCaseHref } from '../search/law-case-href';
 

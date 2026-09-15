@@ -392,6 +392,18 @@ const DESTINATIONS: readonly SemanticDestination[] = [
     isPublic: false,
     browsable: false,
   },
+  {
+    // Lives Across the Decades. Unadvertised until IPUMS confirms public-web use of the
+    // tabulations (repo-0clax.2); launch moves it to the `read` family.
+    id: 'lives',
+    label: 'Lives across the decades',
+    path: '/lives',
+    parent: '/rooms',
+    family: 'utility',
+    icon: 'data',
+    isPublic: false,
+    browsable: false,
+  },
 ];
 
 /**

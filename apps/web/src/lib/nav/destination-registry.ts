@@ -244,6 +244,7 @@ const WEB_PRESENTATION: Readonly<Record<string, WebPresentation>> = Object.freez
   // page's own head, where a crawler will actually read it. See the `noIndex` doc above for why
   // this is NOT paired with a robots.txt Disallow.
   'design-system': { noIndex: true },
+  lives: { noIndex: true },
 });
 
 export type Destination = SemanticDestination &

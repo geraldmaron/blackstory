@@ -1,0 +1,303 @@
+/**
+ * `/lives` — Lives Across the Decades layout over the room kit. Flat, hairline-ruled tables in the
+ * data ledger's idiom; emphasis is weight and a copper rule, never color alone.
+ */
+
+.lives-sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.lives-regions {
+  display: grid;
+  gap: var(--ds-space-4);
+  margin: var(--ds-space-8) 0 0;
+  padding: 0;
+  list-style: none;
+  border-top: var(--ds-border-width) solid var(--ds-ink);
+}
+
+.lives-regions__item {
+  padding: var(--ds-space-4) 0;
+  border-bottom: var(--ds-border-width) solid var(--ds-rule);
+}
+
+.lives-regions__name {
+  font-family: var(--ds-font-display);
+  font-size: 1.25rem;
+}
+
+.lives-timeline {
+  margin-top: var(--ds-space-8);
+}
+
+.lives-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--ds-space-4) var(--ds-space-8);
+  margin-bottom: var(--ds-space-5);
+}
+
+.lives-controls__group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--ds-space-2) var(--ds-space-4);
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.lives-controls__group legend {
+  width: 100%;
+  margin-bottom: var(--ds-space-2);
+  font-family: var(--ds-font-mono);
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--ds-ink-muted);
+}
+
+.lives-controls__option {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--ds-space-2);
+  font-family: var(--ds-font-sans);
+}
+
+.lives-rail {
+  display: flex;
+  gap: var(--ds-space-1);
+  overflow-x: auto;
+  padding-bottom: var(--ds-space-2);
+  border-bottom: var(--ds-border-width) solid var(--ds-ink);
+  scrollbar-width: thin;
+}
+
+.lives-rail__tab {
+  flex: 0 0 auto;
+  position: relative;
+  padding: var(--ds-space-2) var(--ds-space-3);
+  font-family: var(--ds-font-mono);
+  font-size: 0.875rem;
+  color: var(--ds-ink-muted);
+  background: none;
+  border: var(--ds-border-width) solid transparent;
+  border-radius: var(--ds-radius-sm);
+  text-decoration: none;
+  cursor: pointer;
+  transition: color var(--ds-duration-fast) var(--ds-easing);
+}
+
+.lives-rail__tab:hover {
+  color: var(--ds-ink);
+}
+
+.lives-rail__tab[aria-selected='true'],
+.lives-rail__tab[aria-current='page'] {
+  color: var(--ds-ink);
+  font-weight: 600;
+  border-color: var(--ds-ink);
+}
+
+.lives-rail__tab:focus-visible {
+  outline: var(--ds-focus-width) solid var(--ds-focus-ring);
+  outline-offset: 2px;
+}
+
+/* A regime boundary is a short rule before the tab: the break is visible before a reader compares
+   across it. The 1890 gap is dashed. */
+.lives-rail__tab[data-boundary='different_measure']::before,
+.lives-rail__tab[data-boundary='method_note']::before,
+.lives-rail__tab[data-boundary='gap']::before {
+  content: '';
+  position: absolute;
+  top: 20%;
+  bottom: 20%;
+  left: calc(-1 * var(--ds-space-1));
+  border-left: var(--ds-border-width) solid var(--ds-accent);
+}
+
+.lives-rail__tab[data-boundary='method_note']::before {
+  border-left-color: var(--ds-rule);
+}
+
+.lives-rail__tab[data-boundary='gap']::before {
+  border-left-style: dashed;
+}
+
+.lives-panel {
+  margin-top: var(--ds-space-6);
+}
+
+.lives-panel__title {
+  font-family: var(--ds-font-display);
+  font-size: 1.75rem;
+  margin: 0 0 var(--ds-space-4);
+}
+
+.lives-regime {
+  margin: 0 0 var(--ds-space-6);
+  padding: var(--ds-space-4) var(--ds-space-5);
+  font-family: var(--ds-font-sans);
+  background: var(--ds-surface-raised);
+  border-left: var(--ds-border-width) solid var(--ds-accent);
+}
+
+.lives-regime p {
+  margin: 0 0 var(--ds-space-2);
+}
+
+.lives-regime p:last-child {
+  margin-bottom: 0;
+}
+
+.lives-regime__label {
+  font-family: var(--ds-font-mono);
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--ds-ink-muted);
+}
+
+.lives-regime__boundary {
+  font-weight: 600;
+}
+
+.lives-regime__note {
+  color: var(--ds-ink-muted);
+}
+
+.lives-frame {
+  margin: 0 0 var(--ds-space-6);
+  font-family: var(--ds-font-editorial);
+}
+
+.lives-table-scroll {
+  margin: 0 0 var(--ds-space-6);
+  overflow-x: auto;
+}
+
+.lives-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: var(--ds-font-sans);
+}
+
+.lives-table caption {
+  margin-bottom: var(--ds-space-3);
+  font-family: var(--ds-font-mono);
+  font-size: 0.8125rem;
+  text-align: left;
+  color: var(--ds-ink-muted);
+}
+
+.lives-table th,
+.lives-table td {
+  padding: var(--ds-space-3) var(--ds-space-3) var(--ds-space-3) 0;
+  text-align: left;
+  vertical-align: top;
+  border-bottom: var(--ds-border-width) solid var(--ds-rule);
+}
+
+.lives-table thead th {
+  font-family: var(--ds-font-mono);
+  font-size: 0.75rem;
+  font-weight: 400;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--ds-ink-muted);
+  border-bottom-color: var(--ds-ink);
+}
+
+.lives-table [data-emphasis='true'] {
+  font-weight: 600;
+}
+
+.lives-table tbody tr[data-emphasis='true'] th {
+  box-shadow: inset var(--ds-border-width) 0 0 var(--ds-accent);
+  padding-left: var(--ds-space-3);
+}
+
+.lives-cell {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ds-space-1);
+}
+
+.lives-cell__value {
+  font-family: var(--ds-font-mono);
+  font-size: 1rem;
+}
+
+.lives-cell__detail {
+  font-size: 0.75rem;
+  font-weight: 400;
+  color: var(--ds-ink-muted);
+}
+
+.lives-cell--muted .lives-cell__value {
+  font-family: var(--ds-font-sans);
+  font-size: 0.875rem;
+  color: var(--ds-ink-muted);
+}
+
+.lives-cell--wide .lives-cell__value::after {
+  content: ' ~';
+  color: var(--ds-ink-muted);
+}
+
+.lives-rules {
+  margin: var(--ds-space-8) 0 0;
+  padding-top: var(--ds-space-5);
+  border-top: var(--ds-border-width) solid var(--ds-ink);
+}
+
+.lives-rules__list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.lives-rule {
+  padding: var(--ds-space-4) 0;
+  border-bottom: var(--ds-border-width) solid var(--ds-rule);
+}
+
+.lives-rule[data-applies='false'] {
+  color: var(--ds-ink-muted);
+}
+
+.lives-rule p {
+  margin: 0 0 var(--ds-space-1);
+}
+
+.lives-rule__name {
+  font-family: var(--ds-font-display);
+  font-size: 1.125rem;
+}
+
+.lives-rule__meta,
+.lives-rule__named {
+  font-family: var(--ds-font-mono);
+  font-size: 0.8125rem;
+  color: var(--ds-ink-muted);
+}
+
+.lives-rule__dispute {
+  font-weight: 600;
+}
+
+.lives-rules__disclaimer,
+.lives-rules__empty,
+.lives-method {
+  margin-top: var(--ds-space-5);
+  font-size: 0.875rem;
+  color: var(--ds-ink-muted);
+}

@@ -95,11 +95,13 @@ test('a destination is left out of the sitemap only on purpose', () => {
   // `/terms` on the phone) with no web page behind it, and `crawl` would have advertised a route
   // that 404s. The web page exists now, so /terms came off the list and into the sitemap.
   // /story left this list by leaving the registry entirely when the route was deprecated.
+  // /lives is held out on purpose: it stays unadvertised and noindex until IPUMS confirms
+  // public-web use of the Lives Across the Decades tabulations (repo-0clax.2).
   // Any further omission is an oversight until someone records why.
   const omitted = allDestinations()
     .filter((destination) => destination.crawl === undefined)
     .map((destination) => destination.path);
-  assert.deepEqual(omitted.sort(), ['/design-system']);
+  assert.deepEqual(omitted.sort(), ['/design-system', '/lives']);
 });
 
 test('the sitemap is the registry, not a second list of the same routes', () => {

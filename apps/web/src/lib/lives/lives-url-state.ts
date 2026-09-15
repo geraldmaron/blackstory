@@ -6,8 +6,8 @@
  * Every group is always on screen; `race` only changes emphasis. Unknown or malformed values fall
  * back to the defaults instead of erroring, so an old or hand-edited link still opens.
  */
-import { isLivesDecade, LIVES_DECADES, type LivesDecade } from '@repo/domain/statistics';
-import { isLivesGroupSlice, type LivesGroupSlice } from '@repo/domain/statistics';
+import { isLivesDecade, LIVES_DECADES, type LivesDecade } from '@repo/domain/statistics/lives';
+import { isLivesGroupSlice, type LivesGroupSlice } from '@repo/domain/statistics/lives';
 
 export const LIVES_TIER_PARAMS = ['all', 'lower', 'middle', 'upper'] as const;
 
@@ -59,6 +59,3 @@ export function buildLivesHref(regionSlug: string, state: LivesViewState): strin
   const query = buildLivesSearchParams(state);
   return query ? `/lives/${regionSlug}?${query}` : `/lives/${regionSlug}`;
 }
-
-/** The query keys `/lives/*` accepts; everything else is dropped by the proxy normalizer. */
-export const LIVES_QUERY_ALLOWLIST: readonly string[] = ['race', 'tier', 'decade'];
