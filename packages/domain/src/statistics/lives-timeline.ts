@@ -271,8 +271,8 @@ export function buildLivesAreaBundle(input: BuildLivesAreaBundleInput): LivesAre
       (note) =>
         note.decade === decade && (note.areaIds.length === 0 || note.areaIds.includes(area.id)),
     );
-    const noteFor = (lens: LivesLens) =>
-      notes.find((note) => note.appliesTo.includes(lens) || note.appliesTo.includes('all'))?.id;
+    // Only a note written for this group explains its missing figure; a note for everyone never does.
+    const noteFor = (lens: LivesLens) => notes.find((note) => note.appliesTo.includes(lens))?.id;
 
     const withNote = (cell: LivesCell, lens: LivesLens): LivesCell => {
       if (cell.state !== 'not_measured' && cell.state !== 'suppressed') return cell;
@@ -354,9 +354,9 @@ export function buildLivesAreaBundle(input: BuildLivesAreaBundleInput): LivesAre
 
     const rateCell = (seriesId: string, key: LivesConditionKey, lens: LivesLens): LivesCell => {
       const uncounted = hispanicUncounted(lens);
-      if (uncounted) return uncounted;
+      if (uncounted) return withNote(uncounted, lens);
       const override = overrideFor(key, lens);
-      if (override) return { state: override.state, reason: override.reason };
+      if (override) return withNote({ state: override.state, reason: override.reason }, lens);
       const picked = pickDefinition(rowsFor(seriesId, decade), lens);
       if (!picked) return { state: 'pending', reason: 'Not yet loaded for this area and decade.' };
       const { rows, expected, derived } = scope(picked.rows);
@@ -473,14 +473,9 @@ export function buildLivesAreaBundle(input: BuildLivesAreaBundleInput): LivesAre
         const definitionLabel = RACE_ETHNICITY_DEFINITION_LABELS[picked.definition];
         const covered = [...new Set(rows.map((row) => row.jurisdictionId))];
         const coverage = coverageCheck(picked.definition, covered, expected);
-        if ('state' in coverage) return fill(withNote({ ...coverage, definitionLabel }, lens));
+        if ('state' in coverage) return fill({ ...coverage, definitionLabel });
         if (distribution.total < LIVES_MIN_BASE) {
-          return fill(
-            withNote(
-              { state: 'suppressed', reason: 'Too few counted to say.', definitionLabel },
-              lens,
-            ),
-          );
+          return fill({ state: 'suppressed', reason: 'Too few counted to say.', definitionLabel });
         }
         const sources = sourcesOf(rows);
         return mapBuckets((bucket): LivesCell => ({
@@ -503,7 +498,7 @@ export function buildLivesAreaBundle(input: BuildLivesAreaBundleInput): LivesAre
       }
       const definitionLabel = RACE_ETHNICITY_DEFINITION_LABELS[brackets.definition];
       const coverage = coverageCheck(brackets.definition, brackets.covered, brackets.expected);
-      if ('state' in coverage) return fill(withNote({ ...coverage, definitionLabel }, lens));
+      if ('state' in coverage) return fill({ ...coverage, definitionLabel });
       let summed: IncomeBracket[];
       try {
         summed = sumBrackets(brackets.sets);
@@ -516,12 +511,7 @@ export function buildLivesAreaBundle(input: BuildLivesAreaBundleInput): LivesAre
       }
       const total = summed.reduce((sum, bracket) => sum + bracket.count, 0);
       if (total < LIVES_MIN_BASE) {
-        return fill(
-          withNote(
-            { state: 'suppressed', reason: 'Too few counted to say.', definitionLabel },
-            lens,
-          ),
-        );
+        return fill({ state: 'suppressed', reason: 'Too few counted to say.', definitionLabel });
       }
       const bands = estimateBandShares(summed, nationalMedian.estimate);
       if (!bands) {
@@ -554,16 +544,13 @@ export function buildLivesAreaBundle(input: BuildLivesAreaBundleInput): LivesAre
       universe: condition.universe,
       cells: mapLenses((lens) => {
         if (!livesConditionPublishedIn(condition, decade)) {
-          return withNote(
-            {
-              state: 'not_measured',
-              reason: `The census did not publish this by race in the ${decade}s.`,
-            },
-            lens,
-          );
+          return {
+            state: 'not_measured',
+            reason: `The census did not publish this by race in the ${decade}s.`,
+          };
         }
         if (condition.seriesId !== null) {
-          return withNote(rateCell(condition.seriesId, condition.key, lens), lens);
+          return rateCell(condition.seriesId, condition.key, lens);
         }
         const uncounted = hispanicUncounted(lens);
         if (uncounted) return withNote(uncounted, lens);

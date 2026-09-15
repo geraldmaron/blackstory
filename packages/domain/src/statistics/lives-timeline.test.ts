@@ -415,3 +415,43 @@ test('changes are never computed across a measurement boundary', () => {
     null,
   );
 });
+
+test('only a note written for the group links from a missing figure the census never counted', () => {
+  const citations = [{ label: 'Census', url: 'https://www.census.gov/' }];
+  const bundle = build({
+    countNotes: [
+      {
+        id: 'everyone-1950',
+        decade: 1950,
+        appliesTo: ['all'],
+        areaIds: [],
+        heading: 'h',
+        body: 'b',
+        citations,
+      },
+      {
+        id: 'black-1950',
+        decade: 1950,
+        appliesTo: ['black'],
+        areaIds: [],
+        heading: 'h',
+        body: 'b',
+        citations,
+      },
+      {
+        id: 'hispanic-1920',
+        decade: 1920,
+        appliesTo: ['all'],
+        areaIds: [],
+        heading: 'h',
+        body: 'b',
+        citations,
+      },
+    ],
+  });
+  const literacy1950 = condition(bundle, 1950, 'literacy').cells.black;
+  assert.equal(literacy1950.state, 'not_measured');
+  assert.equal(literacy1950.noteId, undefined);
+  assert.equal(condition(bundle, 1920, 'literacy').cells.hispanic.noteId, undefined);
+  assert.equal(decadeOf(bundle, 1950).countNotes.length, 2);
+});
