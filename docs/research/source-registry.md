@@ -103,6 +103,13 @@ with it.
 Add a domain row for a subdomain only when it is a different publisher or collection from its
 parent. `npgallery.nps.gov` is the National Register, not a park page, so it has its own row.
 
+A row for a broad parent domain catches every subdomain that lacks its own row. State portals are
+the sharp case: `nc.gov`, `ri.gov`, `wa.gov` and `nv.gov` have rows because records cite those
+hosts directly, so a new citation from a state agency on one of those domains resolves to the
+state portal instead of appearing in `source_library_unmapped_hosts`. When you add a record citing
+a state agency, check that its host has its own row. The same applies to multi-tenant platforms
+(`wordpress.com`, `archive.org` mirrors): give each distinct publisher its own row.
+
 ### Relevance by evidence use
 
 `bb_evidence.source_policies.organization_id` ties a policy to a publisher. Its
