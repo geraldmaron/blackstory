@@ -119,6 +119,8 @@ SELECT; see `supabase/migrations/20260902130000_entity_media.sql`).
 | `evidenceRecords` | `bb_evidence.evidence_records` |
 | `evidenceLineage` | `bb_evidence.evidence_lineage` |
 
+The source library (see [source-registry.md](../research/source-registry.md#source-library)) makes `bb_evidence.source_organizations` the publisher record, with profile columns (`publisher_kind`, `tier`, `summary`, `relevance`, `limitations`, `profile_sources`, review fields) and a non-destructive `merged_into_organization_id`. Citation hosts resolve to publishers through `bb_evidence.source_domains` by longest domain suffix. Staff-only views `published_citations`, `source_library`, `source_library_unmapped_hosts` and `source_library_fitness` compute every count from the active release at read time. See `supabase/migrations/20260914120000_source_library.sql` and `20260914130000_source_library_set_based_host_resolution.sql`.
+
 ### Publication / public
 
 | Firestore | Postgres |
