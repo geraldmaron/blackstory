@@ -15,6 +15,7 @@ import {
   incomeBracketSeriesId,
   livesStateJurisdictionId,
 } from '@repo/domain/statistics/lives';
+import type { LivesPublishedObservation } from './published-observation.js';
 
 export type LivesAcsVintage = {
   readonly year: number;
@@ -155,29 +156,31 @@ export function parseIncomeBracketLabel(
   return null;
 }
 
-export type LivesAcsObservation = {
-  readonly id: string;
-  readonly metricId: string;
-  readonly jurisdictionId: string;
-  readonly boundaryVersion: string;
-  readonly referencePeriod: string;
-  readonly datasetVintage: string;
-  readonly estimate: number;
-  readonly marginOfError: number | null;
-  readonly numerator: number | null;
-  readonly denominator: number | null;
-  readonly raceEthnicitySlice: string;
-  readonly source: string;
-  readonly sourceUrl: string;
-  readonly contentHash: string;
-  readonly metadata: {
-    readonly table: string;
-    /** NHGIS table code the figures were extracted under. */
-    readonly nhgisTable?: string;
-    readonly numeratorMoe?: number;
-    readonly denominatorMoe?: number;
-  };
-};
+/**
+ * Income brackets in order, checked to run from zero to an open top with no gap or overlap, so a table
+ * whose layout changed fails loudly instead of loading shifted shares. Entries that are not brackets
+ * (a total, a median) are ignored.
+ */
+export function contiguousIncomeBrackets<K>(
+  entries: readonly { readonly key: K; readonly label: string }[],
+  table: string,
+): { readonly key: K; readonly lower: number; readonly upper: number | null }[] {
+  const brackets = entries
+    .flatMap((entry) => {
+      const edges = parseIncomeBracketLabel(entry.label);
+      return edges ? [{ key: entry.key, lower: edges.lower, upper: edges.upper }] : [];
+    })
+    .sort((a, b) => a.lower - b.lower);
+  if (brackets.length < 2 || brackets[0]!.lower !== 0 || brackets.at(-1)!.upper !== null) {
+    throw new Error(`${table}: income brackets do not run from zero to an open top`);
+  }
+  for (let index = 1; index < brackets.length; index += 1) {
+    if (brackets[index - 1]!.upper !== brackets[index]!.lower) {
+      throw new Error(`${table}: income brackets are not contiguous`);
+    }
+  }
+  return brackets;
+}
 
 /** The Census Bureau's page documenting a table's variables for a vintage. */
 export function acsTableUrl(year: number, group: string): string {
@@ -203,9 +206,11 @@ export type BuildAcsObservationsInput = {
 };
 
 /** Observations for one table, vintage and geography level. Rows with a zero or unreadable base are skipped. */
-export function buildAcsObservations(input: BuildAcsObservationsInput): LivesAcsObservation[] {
+export function buildAcsObservations(
+  input: BuildAcsObservationsInput,
+): LivesPublishedObservation[] {
   const { table, vintage, labels } = input;
-  const observations: LivesAcsObservation[] = [];
+  const observations: LivesPublishedObservation[] = [];
 
   const push = (
     row: AcsRow,
@@ -348,31 +353,16 @@ export function buildAcsObservations(input: BuildAcsObservationsInput): LivesAcs
       }
       case 'income': {
         const total = readMeasure(row, labelVariable(labels, 'Total', table.group));
-        const brackets = [...labels]
-          .map(([name, label]) => ({ name, edges: parseIncomeBracketLabel(label) }))
-          .filter(
-            (entry): entry is { name: string; edges: { lower: number; upper: number | null } } =>
-              entry.edges !== null,
-          )
-          .sort((a, b) => a.edges.lower - b.edges.lower);
-        if (
-          brackets.length < 2 ||
-          brackets[0]!.edges.lower !== 0 ||
-          brackets.at(-1)!.edges.upper !== null
-        ) {
-          throw new Error(`${table.group}: income brackets do not run from zero to an open top`);
-        }
-        for (let index = 1; index < brackets.length; index += 1) {
-          if (brackets[index - 1]!.edges.upper !== brackets[index]!.edges.lower) {
-            throw new Error(`${table.group}: income brackets are not contiguous`);
-          }
-        }
+        const brackets = contiguousIncomeBrackets(
+          [...labels].map(([name, label]) => ({ key: name, label })),
+          table.group,
+        );
         for (const bracket of brackets) {
           share(
             row,
-            incomeBracketSeriesId(bracket.edges.lower, bracket.edges.upper),
+            incomeBracketSeriesId(bracket.lower, bracket.upper),
             table.slice!,
-            readMeasure(row, bracket.name),
+            readMeasure(row, bracket.key),
             total,
           );
         }
