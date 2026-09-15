@@ -458,7 +458,7 @@ export function buildLivesAreaBundle(input: BuildLivesAreaBundleInput): LivesAre
         );
         const picked = pickDefinition(allRows, lens);
         if (!picked) return fill(pending);
-        const { rows, expected, derived } = scope(picked.rows);
+        const { rows, expected } = scope(picked.rows);
         const countsByBucket = mapBuckets((bucket) =>
           rows
             .filter((row) => row.metricId === workClassSeriesId(bucket))
