@@ -77,6 +77,24 @@ export class ArtifactUploadError extends Error {
   }
 }
 
+/**
+ * `fetch failed` alone names nothing: undici puts the real reason (a reset socket, a timeout, a
+ * TLS failure) on `error.cause`. Surfacing its code is what separates a stale keep-alive socket
+ * from a rejected body without re-running the whole publish under a debugger.
+ */
+export function describeFetchFailure(error: unknown): string {
+  const message = error instanceof Error ? error.message : String(error);
+  const cause =
+    error instanceof Error && typeof error.cause === 'object' && error.cause !== null
+      ? (error.cause as { readonly code?: unknown; readonly message?: unknown })
+      : undefined;
+  if (!cause) return message;
+  const code = typeof cause.code === 'string' ? cause.code : undefined;
+  const detail = typeof cause.message === 'string' ? cause.message : undefined;
+  if (!code && !detail) return message;
+  return `${message} (${[code, detail].filter(Boolean).join(': ')})`;
+}
+
 export type UploadArtifactConfig = {
   readonly supabaseUrl: string;
   readonly secretKey: string;
@@ -113,9 +131,8 @@ export async function uploadArtifactJson(
       body,
     });
   } catch (error) {
-    const cause = error instanceof Error ? error.message : String(error);
     throw new ArtifactUploadError(
-      `upload failed for ${objectPath} at ${url}: ${cause}`,
+      `upload failed for ${objectPath} at ${url}: ${describeFetchFailure(error)}`,
       { objectPath, url },
       { cause: error },
     );
