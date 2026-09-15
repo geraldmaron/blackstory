@@ -101,12 +101,13 @@ test('unknown entities, claims, slices and domains are rejected', () => {
   }
 });
 
-test('a facially neutral rule must be marked disputed', () => {
-  const result = validateApplicability(authored({ textPosture: 'facially_neutral' }), context);
-  assert.equal(result.ok, false);
+test('a facially neutral rule publishes with or without a disputed flag', () => {
+  const plain = validateApplicability(authored({ textPosture: 'facially_neutral' }), context);
+  assert.equal(plain.ok, true);
   const disputed = validateApplicability(
     authored({ textPosture: 'facially_neutral', disputed: true }),
     context,
   );
   assert.equal(disputed.ok, true);
+  if (disputed.ok) assert.equal(disputed.row.disputed, true);
 });

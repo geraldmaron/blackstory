@@ -187,11 +187,6 @@ export function validateApplicability(
   if (from && to && to.latest < from.earliest) {
     errors.push(`in-force end ${input.inForceToEdtf} is before start ${input.inForceFromEdtf}`);
   }
-  if (input.textPosture === 'facially_neutral' && input.disputed !== true) {
-    errors.push(
-      'a facially neutral rule is shown only when its disputed effect is marked disputed',
-    );
-  }
 
   if (errors.length > 0 || !from) return { ok: false, id: input.id, errors };
 
