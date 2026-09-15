@@ -212,3 +212,37 @@ export type {
   LivesMeasurementRegime,
   LivesRegimeDescription,
 } from './lives-regimes.js';
+
+export {
+  LIVES_CLASS_BUCKETS,
+  LIVES_CLASS_SHARE_METRIC,
+  LIVES_CONDITION_METRICS,
+  LIVES_TIER_KEYS,
+  livesMetricId,
+  livesMetricLabel,
+} from './lives-metrics.js';
+export type {
+  LivesClassBucket,
+  LivesMetricDefinition,
+  LivesMetricKey,
+  LivesMetricUnit,
+  LivesTierKey,
+} from './lives-metrics.js';
+
+export { buildLivesRegionBundle, livesComparableChange } from './lives-timeline.js';
+export type {
+  BuildLivesRegionBundleInput,
+  LivesApplicabilityInput,
+  LivesBoundaryKind,
+  LivesCell,
+  LivesCellState,
+  LivesConditionBundle,
+  LivesDecadeBundle,
+  LivesFrameInput,
+  LivesJurisdictionInput,
+  LivesObservationInput,
+  LivesRegionBundle,
+  LivesRegionDecadeDefinitionInput,
+  LivesRule,
+  LivesSourceRef,
+} from './lives-timeline.js';

@@ -144,6 +144,16 @@
       "types": "./dist/statistics/data-page-series.d.ts",
       "import": "./dist/statistics/data-page-series.js"
     },
+    "./statistics/lives-timeline": {
+      "development": "./src/statistics/lives-timeline.ts",
+      "types": "./dist/statistics/lives-timeline.d.ts",
+      "import": "./dist/statistics/lives-timeline.js"
+    },
+    "./juxtaposition": {
+      "development": "./src/juxtaposition.ts",
+      "types": "./dist/juxtaposition.d.ts",
+      "import": "./dist/juxtaposition.js"
+    },
     "./temporal": {
       "development": "./src/temporal/index.ts",
       "types": "./dist/temporal/index.d.ts",
