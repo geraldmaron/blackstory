@@ -49,9 +49,25 @@ wherever the census enumerated them before statehood, and the decade's note says
 
 ## Source and status
 
-Every figure comes from a published Census Bureau table: a printed volume, a subject report, a summary
-file, or an American Community Survey table. Census publications are public domain and are the cited
-source. NHGIS is used to extract and cross-check, and its table code is kept in provenance.
+Every figure comes from a published **federal statistical table**: a printed volume, a subject report,
+a summary file, or an American Community Survey table. Most are Census Bureau publications, which are
+public domain and are the cited source. NHGIS is used to extract and cross-check, and its table code is
+kept in provenance.
+
+**Widened from "Census Bureau" to "federal statistical" on 2026-09-15, by owner decision.** The census
+is not the only federal agency that counted these people by race and state. The Bureau and Office of
+Education published school enrollment and attendance by race and state for decades the census did not,
+and those bulletins are public domain, state level, printed counts, and checkable in exactly the way a
+census volume is. Refusing them was costing the timeline real figures for no gain in rigor. The bar is
+the same one the census clears: an identified federal agency, a published table, a count rather than an
+estimate, and a page a reader can open. Cite the issuing agency's own publication, never a later work
+that reprints it — a scholarly book may be the finding aid that led to a bulletin, but the bulletin is
+the source.
+
+This widens **which publisher** counts. It does not widen what counts as a figure. A scholar's
+reconstruction from microdata or interpolation is not a published count, however reputable its author,
+and does not become one by being cited. Those remain outside, for the reasons in
+[lives-source-authority.md](../research/lives-source-authority.md).
 
 - **`observed`:** a figure transcribed exactly as a table published it, stored at state or national level.
 - **`derived`:** a region figure summed or divided from state figures, or an income band estimated
