@@ -38,7 +38,7 @@
   color: var(--ds-ink);
 }
 
-.ds-roomsmenu[open] > .ds-roomsmenu__trigger svg {
+.ds-roomsmenu[open] > .ds-roomsmenu__trigger .ds-roomsmenu__chevron {
   transform: rotate(180deg);
 }
 
@@ -86,9 +86,10 @@
 }
 
 .ds-roomsmenu__item {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  column-gap: 0.55rem;
+  align-items: start;
   padding-block: 9px;
   border-top: var(--ds-border-width) solid color-mix(in srgb, var(--ds-rule) 72%, transparent);
   color: var(--ds-ink);
@@ -96,6 +97,17 @@
   text-decoration: none;
   overflow-wrap: break-word;
   white-space: normal;
+}
+
+.ds-roomsmenu__item .ds-destination-icon {
+  margin-top: 0.35em;
+}
+
+.ds-roomsmenu__copy {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
 }
 
 .ds-roomsmenu__item:hover {
@@ -108,7 +120,9 @@
 }
 
 .ds-roomsmenu__hub {
-  display: block;
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
   margin-top: var(--ds-space-5);
   padding-top: var(--ds-space-4);
   border-top: var(--ds-border-width) solid color-mix(in srgb, var(--ds-rule) 72%, transparent);
@@ -166,14 +180,14 @@
   .ds-roomsmenu__trigger {
     padding: 0 var(--ds-space-2);
     font-size: 0.75rem;
-    gap: 0;
+    gap: 0.3rem;
   }
 
   .ds-roomsmenu:not([open]) > .ds-roomsmenu__trigger {
     border-color: transparent;
   }
 
-  .ds-roomsmenu__trigger svg {
+  .ds-roomsmenu__trigger .ds-roomsmenu__chevron {
     display: none;
   }
 

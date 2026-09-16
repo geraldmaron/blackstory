@@ -21,6 +21,7 @@ import {
   destinationsInGroup,
   primaryNavDestinations,
 } from '../../lib/nav/destination-registry';
+import { DestinationIcon } from '../patterns/DestinationIcon';
 import './rooms-menu.css';
 
 void React;
@@ -56,8 +57,16 @@ export function RoomsMenu({ overflowFind = false }: RoomsMenuProps) {
   return (
     <details className="ds-roomsmenu" ref={detailsRef}>
       <summary className="ds-roomsmenu__trigger">
+        <DestinationIcon id="rooms" />
         Rooms
-        <svg width="9" height="9" viewBox="0 0 12 12" fill="none" aria-hidden="true">
+        <svg
+          className="ds-roomsmenu__chevron"
+          width="9"
+          height="9"
+          viewBox="0 0 12 12"
+          fill="none"
+          aria-hidden="true"
+        >
           <path
             d="M2.5 4.5 6 8l3.5-3.5"
             stroke="currentColor"
@@ -82,7 +91,8 @@ export function RoomsMenu({ overflowFind = false }: RoomsMenuProps) {
                     prefetch={false}
                     onClick={closeMenu}
                   >
-                    {axis.label}
+                    <DestinationIcon id={axis.icon} />
+                    <span className="ds-roomsmenu__copy">{axis.label}</span>
                   </Link>
                 ))}
               </div>
@@ -100,8 +110,11 @@ export function RoomsMenu({ overflowFind = false }: RoomsMenuProps) {
                     prefetch={false}
                     onClick={closeMenu}
                   >
-                    {destination.label}
-                    {destination.menuLine ? <small>{destination.menuLine}</small> : null}
+                    <DestinationIcon id={destination.icon} />
+                    <span className="ds-roomsmenu__copy">
+                      {destination.label}
+                      {destination.menuLine ? <small>{destination.menuLine}</small> : null}
+                    </span>
                   </Link>
                 ))}
               </div>
@@ -111,6 +124,7 @@ export function RoomsMenu({ overflowFind = false }: RoomsMenuProps) {
         {/* The hub itself. Without it `/rooms` was reachable from the footer and the breadcrumb
             chain but from nothing in the bar, even though the control is named after it. */}
         <Link className="ds-roomsmenu__hub" href="/rooms" prefetch={false} onClick={closeMenu}>
+          <DestinationIcon id="rooms" />
           All rooms
         </Link>
       </div>

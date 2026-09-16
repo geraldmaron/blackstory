@@ -35,6 +35,7 @@ test('the bar renders the product axes and never a hand-written list', () => {
   assert.match(source, /primaryNavDestinations/);
   assert.match(source, /aria-label="Find"/);
   assert.match(source, /<RoomsMenu overflowFind=\{overflowFind\} \/>/);
+  assert.match(source, /DestinationIcon/);
   // Home is the brand lockup, not a nav item beside Explore.
   assert.match(source, /ds-bar__brand[\s\S]*href="\/"/);
   assert.doesNotMatch(source, /\n\s*Door\n/);

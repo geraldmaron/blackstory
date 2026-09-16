@@ -45,6 +45,7 @@ import {
   type DataPageSectionId,
 } from './data-copy';
 import { DataPageNav } from './DataPageNav';
+import { DestinationIcon } from '../../components/patterns/DestinationIcon';
 import { LivesAreaNav } from '../../components/lives/LivesAreaNav';
 import { LivesTimeline } from '../../components/lives/LivesTimeline';
 import { LivesTimelineStatic } from '../../components/lives/LivesTimelineStatic';
@@ -474,6 +475,7 @@ export function DataSections({
               className={index === 0 ? 'ds-cta ds-cta--copper' : 'ds-cta ds-cta--quiet'}
               href={link.href}
             >
+              <DestinationIcon id={link.icon} />
               {link.label}
             </Link>
           ))}

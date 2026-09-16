@@ -23,6 +23,7 @@ These carry no folder of their own. They are law about how routes, the shell and
 | Browse mode | [`patterns-browse-mode.md`](./patterns-browse-mode.md) | `browse-mode.ts`, `BrowseModeToggle.tsx`, `RecordBrowseControls.tsx`, `browse-mode.css` | `BrowseMode`, `stepIndex`, `pickRandomIndex`, `formatBrowsePosition`, `initialBrowseIndex`, `browseModeLabel`, `BrowseModeToggle`, `RecordBrowseControls` |
 | Relationship constellation | [`patterns-relationship-constellation.md`](./patterns-relationship-constellation.md) | `RelationshipConstellation.tsx`, `relationship-constellation.css` | `RelationshipConstellation`, `ConstellationEdge` |
 | Edition fact icon + record anatomy | [`patterns-edition-fact-icon.md`](./patterns-edition-fact-icon.md), [`patterns-record-anatomy.md`](./patterns-record-anatomy.md) | `edition-fact-icon.ts`, `EditionFactIcon.tsx`, `edition-fact-icon.css`, `RecordAnatomyPanel.tsx`, `RecordPlacePreview.tsx`, `record-anatomy.css` | `EditionFactIcon`, `RecordAnatomyPanel`, `RecordPlacePreview`, icon helpers |
+| Destination icon | [`patterns-destination-icon.md`](./patterns-destination-icon.md) | `DestinationIcon.tsx`, `destination-icon.css`; resolver `lib/nav/destination-icons.ts` | `DestinationIcon`, `destinationGlyphFor` |
 | Visit handoff + public address | [`patterns-visit-handoff.md`](./patterns-visit-handoff.md) | `lib/geography/{public-address,visit-handoff,public-visit-contact,visit-advisory,external-maps-url}.ts`, `RecordVisitBlock.tsx`, `record-visit.css` | `RecordVisitBlock`, `resolvePublicAddressLine`, `buildVisitHandoff`, `resolvePublicVisitContact` |
 | Internet Archive handoff | [`patterns-internet-archive-handoff.md`](./patterns-internet-archive-handoff.md) | `lib/geography/internet-archive-sources.ts`, `RecordArchiveSources.tsx`, `RecordArchiveContribution.tsx`, `record-archive.css` | `RecordArchiveSources`, `resolveInternetArchiveSources`, `RecordArchiveContribution` |
 | Edition atmosphere (grain + grid canvas) | [`design-direction-v6-home.md`](./design-direction-v6-home.md) §2 (superseded, kept for provenance) | `edition-atmosphere/*` | `editionAtmosphereCanvasClassName` only. The gutter mosaic (`EditionAtmosphereMosaic`, `computeScatteredMosaicLayout`, `edition-atmosphere-config`) was retired; page tests assert it is absent. |
@@ -56,6 +57,9 @@ import { EditionFactIcon } from '@/components/patterns/EditionFactIcon';
 import { RecordAnatomyPanel } from '@/components/patterns/RecordAnatomyPanel';
 import '@/components/patterns/edition-fact-icon.css';
 import '@/components/patterns/record-anatomy.css';
+
+// Destination wayfinding (CSS is imported by the component)
+import { DestinationIcon } from '@/components/patterns/DestinationIcon';
 
 // Record page: the place frame and the citation formatter the sheet also uses
 import { RecordPlacePreview } from '@/components/patterns/RecordPlacePreview';
@@ -145,6 +149,7 @@ Shared fail-closed patterns. Never render broken decorative or record media.
 | Entity mast photo | `EntityMastMedia.tsx` | URL candidate chain, then `EntityRecordMark` on exhaustion; Save-Data prefers the mark |
 | Story/atmosphere mosaic | `AtmospherePlane.tsx`, `LivingAtmosphereMosaic.tsx` | `onError` hides the mosaic; the geometric plate remains |
 | Kind / confidence badges | `KindBadge.tsx`, `ConfidenceMark.tsx`, `EditionFactIcon.tsx` | `iconWithFallback()` to `faCircle`; label text always visible (WCAG 1.4.1) |
+| Destination wayfinding | `DestinationIcon.tsx` | `iconWithFallback()` to `faCircle`; label text always visible beside the glyph |
 | Bare embeds | `EntityPrimaryImage.tsx` | No fallback; callers must use `EntityMastMedia` or own the policy |
 | Framed map plate | see [`patterns-plate-posture.md`](./patterns-plate-posture.md) §6 | A slot with no plate keeps its caption and states that the map is unavailable; never a blank rectangle |
 
@@ -156,6 +161,7 @@ Helper: `apps/web/src/lib/map-experience/icon-fallback.ts` (`iconWithFallback`).
 |---|---|
 | Browse mode helpers + controls | `apps/web/src/components/patterns/browse-mode.test.tsx` |
 | Record anatomy panel | `apps/web/src/components/patterns/record-anatomy.test.ts` |
+| Destination icons | `apps/web/src/lib/nav/destination-icons.test.ts`, `apps/web/src/components/patterns/DestinationIcon.test.ts` |
 | Citation formatter | `apps/web/src/lib/citation/format.test.ts` |
 | Share deep link (no viewport key) | `apps/web/src/lib/share/deep-link.test.ts` |
 | Atlas URL state | `apps/web/src/lib/map-experience/url-state.test.ts` |

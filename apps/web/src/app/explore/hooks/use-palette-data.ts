@@ -41,6 +41,7 @@ export function usePaletteData(
       browsableDestinations().map((destination) => ({
         href: destination.path,
         label: destination.label,
+        icon: destination.icon,
       })),
     [],
   );

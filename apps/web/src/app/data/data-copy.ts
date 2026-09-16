@@ -6,6 +6,7 @@
  * Every sentence about a number is a sentence about a published series, never about the
  * archive's own catalog: the counted breakdown of records is not a figure on this page.
  */
+import type { DestinationIconId } from '@repo/public-contracts/destinations';
 
 export const DATA_PAGE_DESCRIPTION =
   'Census counts of the Black population by decade, 1790 to 2020, published wealth, housing, credit and justice indicators, and how class and conditions compared across race from the 1870s. Every figure names the series behind it and shows the numbers.';
@@ -82,7 +83,11 @@ export const DATA_READING_RULES = [
 ] as const;
 
 /** Where the reading rules send a reader who wants the full argument. */
-export const DATA_READING_LINKS = [
-  { href: '/apparatus?s=methodology', label: 'Methodology' },
-  { href: '/stories', label: 'Stories that use these numbers' },
-] as const;
+export const DATA_READING_LINKS: readonly {
+  readonly href: string;
+  readonly label: string;
+  readonly icon: DestinationIconId;
+}[] = [
+  { href: '/apparatus?s=methodology', label: 'Methodology', icon: 'methodology' },
+  { href: '/stories', label: 'Stories that use these numbers', icon: 'stories' },
+];

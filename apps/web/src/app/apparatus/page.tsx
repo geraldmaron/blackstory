@@ -24,6 +24,8 @@ import { BooksApparatusSections } from '../books/BooksApparatusSections';
 import { loadBannedBooksListing } from '../../lib/banned-books/public-source.js';
 import { emptyLivesAreaBundle, loadLivesAreaBundle } from '../../lib/lives/lives-source';
 import { parseLivesAreaSlug } from '../../lib/lives/lives-url-state';
+import { destinationById } from '../../lib/nav/destination-registry';
+import { DestinationIcon } from '../../components/patterns/DestinationIcon';
 import { ApparatusSectionFocus } from './ApparatusSectionFocus';
 import './apparatus.css';
 import '../reading-room.css';
@@ -40,13 +42,13 @@ export const metadata: Metadata = buildStaticPageMetadata({
     'About BlackStory, methodology, data figures, civil-rights law, and the banned-books catalog in one apparatus room.',
 });
 
-const TOC = [
-  { id: 'about', title: 'About' },
-  { id: 'methodology', title: 'Methodology' },
-  { id: 'data', title: 'Data' },
-  { id: 'law', title: 'Law' },
-  { id: 'books', title: 'Banned books' },
-] as const;
+const TOC_IDS = ['about', 'methodology', 'data', 'law', 'books'] as const;
+
+const TOC = TOC_IDS.map((id) => {
+  const destination = destinationById(id);
+  if (!destination) throw new Error(`apparatus TOC: ${id} is not in the destination catalog`);
+  return { id, title: destination.label, icon: destination.icon };
+});
 
 export default async function ApparatusPage({
   searchParams,
@@ -85,7 +87,10 @@ export default async function ApparatusPage({
         <ul>
           {TOC.map((section) => (
             <li key={section.id}>
-              <a href={`#${section.id}`}>{section.title}</a>
+              <a href={`#${section.id}`}>
+                <DestinationIcon id={section.icon} />
+                {section.title}
+              </a>
             </li>
           ))}
         </ul>
@@ -93,6 +98,7 @@ export default async function ApparatusPage({
 
       <section id="about" className="ds-apparatus-section" aria-labelledby="apparatus-about-title">
         <GroupHeading>
+          <DestinationIcon id="about" size="md" />
           <span id="apparatus-about-title">About</span>
         </GroupHeading>
         <Prose>
@@ -107,6 +113,7 @@ export default async function ApparatusPage({
         aria-labelledby="apparatus-methodology-title"
       >
         <GroupHeading>
+          <DestinationIcon id="methodology" size="md" />
           <span id="apparatus-methodology-title">Methodology</span>
         </GroupHeading>
         <Prose>
@@ -117,6 +124,7 @@ export default async function ApparatusPage({
 
       <section id="data" className="ds-apparatus-section" aria-labelledby="apparatus-data-title">
         <GroupHeading>
+          <DestinationIcon id="data" size="md" />
           <span id="apparatus-data-title">Data</span>
         </GroupHeading>
         <Prose>
@@ -127,6 +135,7 @@ export default async function ApparatusPage({
 
       <section id="law" className="ds-apparatus-section" aria-labelledby="apparatus-law-title">
         <GroupHeading>
+          <DestinationIcon id="law" size="md" />
           <span id="apparatus-law-title">Law</span>
         </GroupHeading>
         <LawApparatusSections source={legalSource} />
@@ -134,6 +143,7 @@ export default async function ApparatusPage({
 
       <section id="books" className="ds-apparatus-section" aria-labelledby="apparatus-books-title">
         <GroupHeading>
+          <DestinationIcon id="books" size="md" />
           <span id="apparatus-books-title">Banned books</span>
         </GroupHeading>
         <BooksApparatusSections snapshot={booksSnapshot} />

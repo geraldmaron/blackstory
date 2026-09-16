@@ -55,6 +55,7 @@ test('the page states what the archive refuses to do', () => {
 test('destinations are generated from the registry, never hardcoded', () => {
   assert.match(sectionsSource, /destinationsInGroup/);
   assert.match(sectionsSource, /cardTitleFor/);
+  assert.match(sectionsSource, /DestinationIcon/);
   // The old page hardcoded six links, two of them into `/history`, which is a redirect endpoint.
   assert.doesNotMatch(sectionsSource, /href="\/history"/);
   assert.doesNotMatch(sectionsSource, /ABOUT_DESTINATIONS/);

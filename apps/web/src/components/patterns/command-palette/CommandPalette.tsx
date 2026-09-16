@@ -24,6 +24,8 @@ import { cx } from '@repo/ui';
 import { isTypingTarget, matchesPaletteOpen } from '../../../lib/keyboard/bindings';
 import { normalizeTypeaheadQuery, typeaheadMatchTier } from '../../../lib/typeahead/match';
 import { COMMANDS, type Command, type CommandContext } from './command-registry';
+import type { DestinationIconId } from '@repo/public-contracts/destinations';
+import { DestinationIcon } from '../DestinationIcon';
 import './command-palette.css';
 
 void React;
@@ -76,6 +78,7 @@ export type PaletteState = {
 export type PaletteDestination = {
   readonly href: string;
   readonly label: string;
+  readonly icon: DestinationIconId;
 };
 
 export type CommandPaletteProps = {
@@ -467,6 +470,7 @@ export function CommandPalette({
                   {row.kind === 'destination' ? (
                     <>
                       <span className="ds-palette__title">
+                        <DestinationIcon id={row.destination.icon} />
                         <Highlighted text={row.destination.label} query={query} />
                       </span>
                       <span className="ds-palette__meta">{row.destination.href}</span>

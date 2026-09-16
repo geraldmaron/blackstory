@@ -16,6 +16,7 @@ import {
   browsableDestinations,
   cardTitleFor,
   classLabelFor,
+  destinationById,
   destinationFor,
   destinationsInGroup,
   footerColumns,
@@ -244,5 +245,24 @@ describe('destination registry · the footer is derived, not authored', () => {
         );
       }
     }
+  });
+
+  it('carries the catalog icon on every footer item', () => {
+    for (const column of footerColumns()) {
+      for (const item of column.items) {
+        const destination = destinationFor(item.href);
+        assert.ok(destination, `${item.href} must be a catalog destination`);
+        assert.equal(item.icon, destination.icon);
+      }
+    }
+  });
+});
+
+describe('destination registry · id lookup', () => {
+  it('resolves apparatus sections by catalog id', () => {
+    assert.equal(destinationById('about')?.label, 'About');
+    assert.equal(destinationById('methodology')?.icon, 'methodology');
+    assert.equal(destinationById('books')?.label, 'Banned books');
+    assert.equal(destinationById('nope'), undefined);
   });
 });

@@ -19,6 +19,7 @@ import { cx, ShellWordmark } from '@repo/ui';
 import { CommandBarSearch } from './CommandBarSearch';
 import { RoomsMenu } from './RoomsMenu';
 import { primaryNavDestinations } from '../../lib/nav/destination-registry';
+import { DestinationIcon } from '../patterns/DestinationIcon';
 import {
   exitMapBrowse,
   MAP_BROWSE_ENTERED_EVENT,
@@ -65,6 +66,21 @@ export function syncCommandBarClearance(bar: HTMLElement): void {
   document.documentElement.style.setProperty(
     '--ds-island-clearance',
     `calc(${bottomPx}px + var(--ds-island-gap))`,
+  );
+}
+
+function AxisMark({
+  icon,
+  label,
+}: {
+  readonly icon: (typeof AXES)[number]['icon'];
+  readonly label: string;
+}) {
+  return (
+    <>
+      <DestinationIcon id={icon} />
+      {label}
+    </>
   );
 }
 
@@ -230,7 +246,7 @@ export function CommandBar({
                 if (!pathIsMapSurface(pathname)) {
                   return (
                     <Link key={axis.path} className="ds-bar__mode-link" href="/" prefetch={false}>
-                      {axis.label}
+                      <AxisMark icon={axis.icon} label={axis.label} />
                     </Link>
                   );
                 }
@@ -244,13 +260,13 @@ export function CommandBar({
                       onClick={() => exitMapBrowse()}
                       aria-label="Back to the map journey"
                     >
-                      {axis.label}
+                      <AxisMark icon={axis.icon} label={axis.label} />
                     </button>
                   );
                 }
                 return (
                   <span key={axis.path} className="ds-bar__mode-link" aria-current="page">
-                    {axis.label}
+                    <AxisMark icon={axis.icon} label={axis.label} />
                   </span>
                 );
               }
@@ -262,7 +278,7 @@ export function CommandBar({
                   href={axis.path}
                   aria-current={current ? 'page' : undefined}
                 >
-                  {axis.label}
+                  <AxisMark icon={axis.icon} label={axis.label} />
                 </Link>
               );
             })}

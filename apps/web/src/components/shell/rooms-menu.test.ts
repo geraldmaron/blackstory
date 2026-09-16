@@ -16,6 +16,7 @@ test('the room menu is the locked about groups, not a second board', () => {
   // reachable from the footer and the breadcrumb chain but from nothing in the bar.
   assert.match(source, /href="\/rooms"/);
   assert.match(source, /All rooms/);
+  assert.match(source, /DestinationIcon/);
   assert.doesNotMatch(source, /Straight to the records/);
   assert.doesNotMatch(source, /The Atlas answers where and when/);
   assert.doesNotMatch(source, /The whole archive as a list/);

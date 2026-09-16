@@ -15,6 +15,7 @@ import {
   destinationsInGroup,
 } from '../../lib/nav/destination-registry';
 import { CardGrid, GroupHeading, Room, RoomCard, ReadingEntry } from '../../components/room';
+import { DestinationIcon } from '../../components/patterns/DestinationIcon';
 import { WalkOffRamp } from '../walk-off-ramp';
 import '../reading-room.css';
 import './rooms.css';
@@ -54,7 +55,12 @@ export default function RoomsPage() {
                   key={destination.path}
                   href={destination.path}
                   kind={destination.kind ?? ''}
-                  title={cardTitleFor(destination)}
+                  title={
+                    <>
+                      <DestinationIcon id={destination.icon} size="md" />
+                      {cardTitleFor(destination)}
+                    </>
+                  }
                   description={destination.description}
                 />
               ))}

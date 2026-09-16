@@ -52,6 +52,8 @@ import {
   selectDoorRooms,
   walkOnPlaces,
 } from './home-first-paint-surface';
+import { destinationById } from '../lib/nav/destination-registry';
+import { DestinationIcon } from '../components/patterns/DestinationIcon';
 import '../components/entity/entity-page.css';
 import './record-page.css';
 import './entity/[id]/record-room.css';
@@ -80,15 +82,19 @@ function DoorRooms({ rooms }: { readonly rooms: ReturnType<typeof selectDoorRoom
   if (rooms.length === 0) return null;
   return (
     <nav className="ds-home-door-rooms" aria-label="Archive">
-      {rooms.map((room) => (
-        <Link
-          key={room.id}
-          className={room.id === 'stories' ? 'ds-cta ds-cta--copper' : 'ds-cta ds-cta--quiet'}
-          href={room.href}
-        >
-          {room.label}
-        </Link>
-      ))}
+      {rooms.map((room) => {
+        const icon = destinationById(room.id)?.icon;
+        return (
+          <Link
+            key={room.id}
+            className={room.id === 'stories' ? 'ds-cta ds-cta--copper' : 'ds-cta ds-cta--quiet'}
+            href={room.href}
+          >
+            {icon ? <DestinationIcon id={icon} /> : null}
+            {room.label}
+          </Link>
+        );
+      })}
     </nav>
   );
 }

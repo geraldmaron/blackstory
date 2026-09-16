@@ -20,6 +20,7 @@ import {
 } from './about-copy';
 import { SUPPORT_CONTACT } from '../../lib/config/contact';
 import { CardGrid, GroupHeading, MapMoment, Prose, RoomCard } from '../../components/room';
+import { DestinationIcon } from '../../components/patterns/DestinationIcon';
 import './about-page.css';
 
 void React;
@@ -30,7 +31,12 @@ function destinationCard(destination: Destination) {
       key={destination.path}
       href={destination.path}
       kind={destination.kind ?? 'ROOM'}
-      title={cardTitleFor(destination)}
+      title={
+        <>
+          <DestinationIcon id={destination.icon} size="md" />
+          {cardTitleFor(destination)}
+        </>
+      }
       {...(destination.description === undefined ? {} : { description: destination.description })}
     />
   );

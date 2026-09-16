@@ -301,6 +301,7 @@ span.ds-bar__mode-link {
 .ds-bar__mode-link {
   display: inline-flex;
   align-items: center;
+  gap: 0.35rem;
   margin-left: 2px;
   text-decoration: none;
   transition:

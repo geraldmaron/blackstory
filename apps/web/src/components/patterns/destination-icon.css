@@ -1,0 +1,34 @@
+/**
+ * Destination wayfinding glyphs. Color inherits from the label so hover, current,
+ * and copper states stay on the text, not a second accent wash.
+ */
+.ds-destination-icon {
+  width: 0.8125rem;
+  height: 0.8125rem;
+  flex-shrink: 0;
+  color: currentColor;
+}
+
+.ds-destination-icon--md {
+  width: 1rem;
+  height: 1rem;
+}
+
+.ds-destination-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45em;
+}
+
+.ds-room .ds-room-grouphd:has(.ds-destination-icon),
+.ds-room .ds-room-card__title:has(.ds-destination-icon) {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+}
+
+.ds-palette__title:has(.ds-destination-icon) {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45em;
+}
