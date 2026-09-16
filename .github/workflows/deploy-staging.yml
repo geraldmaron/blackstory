@@ -125,10 +125,21 @@ jobs:
       # E2E_BASE_URL to turn it on, and CI_REQUIRE_E2E=1 to make a skip fail closed.
       - name: Warn when the post-deploy smoke has nothing to hit
         if: ${{ vars.E2E_BASE_URL == '' }}
-        run: echo "::warning title=Staging smoke did not run::vars.E2E_BASE_URL is unset, so the post-deploy smoke skipped. This job's green does NOT mean staging was verified."
+        run: |
+          echo "::warning title=Staging smoke did not run::vars.E2E_BASE_URL is unset, so the post-deploy smoke skipped. This job's green does NOT mean staging was verified."
+          if [[ "${{ vars.CI_REQUIRE_E2E }}" == "1" ]]; then
+            echo "::error::CI_REQUIRE_E2E=1 but E2E_BASE_URL is unset"
+            exit 1
+          fi
 
+      # pnpm install is only for test:e2e. With E2E_BASE_URL unset (the current repo
+      # state) the smoke script exited 0 after the install — hundreds of staging
+      # pushes paid a full workspace install to skip. Restore these two steps by
+      # setting vars.E2E_BASE_URL.
       - name: Setup Node and pnpm
+        if: ${{ vars.E2E_BASE_URL != '' }}
         uses: ./.github/actions/setup-node-pnpm
 
-      - name: Post-deploy smoke (skip without E2E_BASE_URL; fail-closed when CI_REQUIRE_E2E=1)
+      - name: Post-deploy smoke
+        if: ${{ vars.E2E_BASE_URL != '' }}
         run: node scripts/release/smoke-post-deploy.mjs

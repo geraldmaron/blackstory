@@ -48,17 +48,20 @@ Human steps that agents **cannot** apply:
 ## Canonical convergence monitoring (repo-8yk8)
 
 `.github/workflows/canonical-convergence-monitor.yml` dry-runs `backfill-canonical.ts --json`
-on a timer and fails (alerting watchers) if any hard-fail verification counter is nonzero, or
-warns if a convergence backlog (`missing_planned_claims`/`missing_planned_relationships`) is
-building up unapplied. It does **not** run `--apply` itself — every hosted write against
-`bb_canonical` should go through a human-reviewed dry-run first.
+and fails (alerting watchers) if any hard-fail verification counter is nonzero, or warns if a
+convergence backlog (`missing_planned_claims`/`missing_planned_relationships`) is building up
+unapplied. It does **not** run `--apply` itself — every hosted write against `bb_canonical`
+should go through a human-reviewed dry-run first.
 
 Activated 2026-08-04: `HOSTED_DATABASE_URL` repo secret set (Settings → Secrets and variables →
 Actions) to the same connection string `apps/web/.env.local` uses locally — read access to
-`bb_public`/`bb_canonical` is sufficient, this workflow never writes. Runs twice daily
-(`0 6,18 * * *`). If the secret is ever rotated or removed, the job fails closed with a clear
-message rather than reporting a false green, and `workflow_dispatch` still works for a manual
-check.
+`bb_public`/`bb_canonical` is sufficient, this workflow never writes. The twice-daily schedule
+(`0 6,18 * * *`) was turned off on 2026-09-16 after it sat red on
+`claims_without_evidence_link=5` (with a 2599-claim unapplied backlog) and emailed watchers
+without anyone running `--apply`. Re-enable the cron only after a human `--apply` has cleared
+the hard-fail counters. Until then: `gh workflow enable "Canonical Convergence Monitor"` and
+`workflow_dispatch`, or run the CLI locally. If the secret is ever rotated or removed, the job
+fails closed with a clear message rather than reporting a false green.
 
 ## Rollback drill
 

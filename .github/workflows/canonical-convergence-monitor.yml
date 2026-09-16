@@ -3,8 +3,8 @@
 # drift — measured 2026-08-04, the last successful apply was five days stale and
 # missing_planned_claims had grown from 399 to 2449 with no signal anywhere.
 #
-# This is the "minimum" fix the bead calls for: a dry-run on a timer that fails (and so alerts,
-# since GitHub notifies watchers of scheduled-workflow failures by default) when any hard-fail
+# This is the "minimum" fix the bead calls for: a dry-run that fails (and so alerts, since
+# GitHub notifies watchers of scheduled-workflow failures by default) when any hard-fail
 # verification counter is nonzero. It deliberately does NOT run --apply automatically — every
 # hosted write against bb_canonical this session went through a human-reviewed dry-run first,
 # and CI silently promoting drift into a write is a bigger risk than the drift itself. A human
@@ -15,13 +15,18 @@
 # 2026-08-04). No other workflow in this repo touches the hosted database — every other scheduled
 # job runs against an ephemeral local Postgres service. If the secret is ever removed, this job
 # fails closed with a clear message rather than silently reporting green.
+#
+# Schedule is off (2026-09-16). The twice-daily cron sat red on
+# claims_without_evidence_link=5 with a 2599-claim backlog nobody was applying, so it burned a
+# full pnpm install twice a day and emailed watchers without changing anything. Re-enable the
+# cron only after a human --apply has cleared the hard-fail counters; until then use dispatch.
 
 name: Canonical Convergence Monitor
 
 on:
-  # HOSTED_DATABASE_URL set 2026-08-04 (repo secret). Twice daily, per repo-8yk8.
-  schedule:
-    - cron: '0 6,18 * * *'
+  # HOSTED_DATABASE_URL set 2026-08-04 (repo secret). Was twice daily (`0 6,18 * * *`).
+  # schedule:
+  #   - cron: '0 6,18 * * *'
   workflow_dispatch: {}
 
 permissions:
