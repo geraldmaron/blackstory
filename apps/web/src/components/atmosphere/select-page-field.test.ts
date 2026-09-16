@@ -60,11 +60,13 @@ test('about uses bands; legal and submit use pins', () => {
   assert.equal(submit.motifId, 'pins');
 });
 
-test('entity uses rules; locate uses pins; unknown defaults to rules', () => {
-  const entity = selectPageField('/entity/ent_example');
-  assert.ok(entity);
-  assert.equal(entity.motifId, 'rules');
+test('place and entity records skip the page-field grid', () => {
+  assert.equal(selectPageField('/place/ame-church-of-new-haven'), null);
+  assert.equal(selectPageField('/entity/ent_example'), null);
+  assert.equal(selectPageField('/invention/some-invention'), null);
+});
 
+test('locate uses pins; unknown defaults to rules', () => {
   const locate = selectPageField('/locate');
   assert.ok(locate);
   assert.equal(locate.motifId, 'pins');

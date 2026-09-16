@@ -348,12 +348,16 @@ describe('room kit · evidence blocks', () => {
     assert.doesNotMatch(html, /[→←]/);
   });
 
-  it('Precision always says what the coordinate does not claim', () => {
+  it('Precision states the resolution, and an optional caveat when given', () => {
     const html = renderToStaticMarkup(
       <Precision resolution="county centroid" caveat="This is not the address of the event." />,
     );
     assert.match(html, /Located to county centroid\./);
     assert.match(html, /This is not the address of the event\./);
+
+    const bare = renderToStaticMarkup(<Precision resolution="site precision" />);
+    assert.match(bare, /Located to site precision\./);
+    assert.doesNotMatch(bare, /never draws a point sharper/);
   });
 
   it('TrustBlock and Anatomy render label/value pairs in a labeled group', () => {

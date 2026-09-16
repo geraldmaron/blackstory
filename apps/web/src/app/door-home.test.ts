@@ -73,6 +73,7 @@ test('Door browse morphs in place rather than hard-linking Filter CTAs to /explo
   assert.match(immersive, /Back to journey/);
   assert.match(immersive, /data-browse-chrome/);
   assert.match(css, /\.ds-door__browse-exit/);
+  assert.match(css, /z-index:\s*calc\(var\(--ds-z-atlas-instruments\) - 1\)/);
 });
 
 test('cold `/explore` mounts the same Door browse shell, not a second instrument', () => {

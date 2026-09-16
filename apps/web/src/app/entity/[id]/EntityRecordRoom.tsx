@@ -21,7 +21,7 @@ import type { PublicEntityView } from '../../../data/public-seed';
 import { EntitySensitivityBanner } from '../../../components/entity/EntitySensitivityBanner';
 import { RecordVisitBlock } from '../../../components/patterns/RecordVisitBlock';
 import '../../../components/entity/entity-page.css';
-import { EntityMastMedia } from '../../../components/entity/EntityMastMedia';
+import { EntityMastMedia, RecordPhotoCredit } from '../../../components/entity/EntityMastMedia';
 import { LinkedProse, type EntityLinkCatalogEntry } from '../../../components/entity/LinkedProse';
 import { EntityTopicTags } from '../../../components/entity/EntityTopicTags';
 import {
@@ -472,6 +472,7 @@ export async function EntityRecordRoom({ entity }: { readonly entity: PublicEnti
               kind={entity.kind}
               {...(jurisdictionLabel !== undefined ? { jurisdictionLabel } : {})}
               {...(entity.primaryImage !== undefined ? { primaryImage: entity.primaryImage } : {})}
+              hideCredit
               priority
             />
             <figcaption className="ds-record-mast__over">
@@ -505,6 +506,13 @@ export async function EntityRecordRoom({ entity }: { readonly entity: PublicEnti
                   catalog={entityLinkCatalog}
                 />
               </p>
+              {entity.primaryImage !== undefined ? (
+                <RecordPhotoCredit
+                  entityId={entity.id}
+                  image={entity.primaryImage}
+                  className="ds-record-mast__credit"
+                />
+              ) : null}
             </figcaption>
           </figure>
 

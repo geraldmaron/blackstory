@@ -148,8 +148,8 @@ export function Anatomy({ cells, label = 'Record anatomy', className }: AnatomyP
 export type PrecisionProps = {
   /** What the coordinate resolves to: "county centroid", "street address", "block". */
   readonly resolution: string;
-  /** What it does not claim. Required: an unqualified pin is the failure this block exists for. */
-  readonly caveat: string;
+  /** What it does not claim. Omit when the resolution line is enough on this surface. */
+  readonly caveat?: string;
   readonly className?: string;
 };
 
@@ -161,7 +161,7 @@ export function Precision({ resolution, caveat, className }: PrecisionProps) {
         <circle cx="6" cy="6" r="1.5" fill="currentColor" />
       </svg>
       <span>
-        Located to {resolution}. {caveat}
+        Located to {resolution}.{caveat ? ` ${caveat}` : ''}
       </span>
     </p>
   );

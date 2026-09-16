@@ -1,6 +1,6 @@
 /**
- * `/data` body: the headline band, the section rail, four sections of figures, and the reading
- * rules.
+ * `/data` body: the headline band, the section rail, figures, Lives across the decades, and the
+ * reading rules.
  *
  * Every figure renders through `DataChartFrame`, which is the Data Figure anatomy: label, title,
  * reading, graphic, caption, source, numbers. This file decides which figures a section holds,
@@ -11,7 +11,7 @@
  * two figures in one section can come from two agencies and a source line that names both under
  * each is a source line that names neither.
  */
-import React, { type ReactNode } from 'react';
+import React, { Suspense, type ReactNode } from 'react';
 import Link from 'next/link';
 import type {
   NationalPopulationTimelineRow,
@@ -22,6 +22,7 @@ import type {
   DataPageIndicatorBundle,
   DataPageRacePairSeries,
 } from '@repo/domain/statistics/data-page-series';
+import type { LivesAreaBundle } from '@repo/domain/statistics/lives';
 import { BlackPopulationShareChart } from '../../components/data/BlackPopulationShareChart';
 import { DataChartFrame } from '../../components/data/DataChartFrame';
 import { GroupedBarIndicatorChart } from '../../components/data/GroupedBarIndicatorChart';
@@ -44,6 +45,10 @@ import {
   type DataPageSectionId,
 } from './data-copy';
 import { DataPageNav } from './DataPageNav';
+import { LivesAreaNav } from '../../components/lives/LivesAreaNav';
+import { LivesTimeline } from '../../components/lives/LivesTimeline';
+import { LivesTimelineStatic } from '../../components/lives/LivesTimelineStatic';
+import '../lives/lives.css';
 
 void React;
 
@@ -76,6 +81,8 @@ export type DataSectionsProps = {
   readonly indicators: DataPageIndicatorBundle;
   readonly populationAsOf: string;
   readonly indicatorsAsOf: string;
+  readonly livesBundle: LivesAreaBundle;
+  readonly livesAreaSlug: string;
 };
 
 /* —— readings: one sentence per figure, written from the data ————————————— */
@@ -312,6 +319,8 @@ export function DataSections({
   indicators,
   populationAsOf,
   indicatorsAsOf,
+  livesBundle,
+  livesAreaSlug,
 }: DataSectionsProps) {
   const hasPopulation = timelineRows.length > 0;
   const indicatorMeta = [`As of ${indicatorsAsOf}`];
@@ -440,6 +449,13 @@ export function DataSections({
             reading={groupedReading(indicators.federalDrugSentences)}
           />
         </div>
+      </Section>
+
+      <Section id="lives" meta={[livesBundle.areaName, '1870s to 2020s']}>
+        <LivesAreaNav currentSlug={livesAreaSlug} />
+        <Suspense fallback={<LivesTimelineStatic bundle={livesBundle} areaSlug={livesAreaSlug} />}>
+          <LivesTimeline bundle={livesBundle} areaSlug={livesAreaSlug} />
+        </Suspense>
       </Section>
 
       <Section id="reading" meta={[]}>

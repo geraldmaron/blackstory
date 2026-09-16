@@ -6,10 +6,16 @@ import { test } from 'node:test';
 import {
   defaultLocatorView,
   locatorCanvasTransform,
+  neighborhoodLocatorView,
   panLocatorView,
   wheelFactorForDelta,
   zoomLocatorViewAt,
 } from './record-locator-view';
+
+test('neighborhood opening scale is a region, not a town lot', () => {
+  const view = neighborhoodLocatorView(40, 50, 720, 420);
+  assert.equal(view.scale, 2.15);
+});
 
 test('default view is identity scale at origin', () => {
   assert.deepEqual(defaultLocatorView(), { scale: 1, panX: 0, panY: 0 });

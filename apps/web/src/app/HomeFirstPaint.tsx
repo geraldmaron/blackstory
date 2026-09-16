@@ -11,7 +11,9 @@
  */
 import React from 'react';
 import Link from 'next/link';
-import { EntityMastMedia } from '../components/entity/EntityMastMedia';
+import { faMapLocationDot } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { EntityMastMedia, RecordPhotoCredit } from '../components/entity/EntityMastMedia';
 import { EntitySensitivityBanner } from '../components/entity/EntitySensitivityBanner';
 import { LinkedProse, type EntityLinkCatalogEntry } from '../components/entity/LinkedProse';
 import { RecordPlacePreview } from '../components/patterns/RecordPlacePreview';
@@ -26,12 +28,15 @@ import { placeDiscoveryReturn } from '../lib/discovery/discovery-state';
 import type { PublicEntityView } from '../data/public-seed';
 import {
   RecordBeatHead,
+  RecordFactTile,
   RecordSmallTitle,
   RecordKindPill,
   RecordPill,
   RecordGradePill,
   recordSectionIcon,
 } from '../components/entity/RecordChrome';
+import { humanizeToken } from '../components/entity/format';
+import { confidenceIconFor } from '../lib/map-experience/confidence-icons';
 import { EntityRoomSections } from './entity/[id]/EntityRoomSections';
 import { toEvidenceClaimInputs, withoutSummaryEchoClaims } from './entity/[id]/adapters';
 import { placeHref } from '../lib/place/public-place-path';
@@ -168,38 +173,60 @@ export function HomeFirstPaint({
     const confidenceTier = recordConfidenceTier(lead.claims);
     const gradeWord = evidenceGradeWord(confidenceTier);
     const precisionTier = geoPrecisionTierForPublicPrecision(lead.locationPrecision);
-    const precisionLine =
+    const precisionValue =
       lead.locationPrecision && lead.locationPrecision.trim().length > 0
-        ? `${lead.locationPrecision.replace(/[_-]+/g, ' ')} precision`
+        ? humanizeToken(lead.locationPrecision)
         : precisionTier
-          ? `${precisionTier.replace(/[_-]+/g, ' ')} precision`
-          : 'Precision not recorded';
+          ? humanizeToken(precisionTier)
+          : 'Not recorded';
     const hasPhoto = lead.primaryImage !== undefined;
     const returns =
       discovery ??
       placeDiscoveryReturn(lead.id, {}, geo ? { lat: geo.lat, lng: geo.lng } : undefined);
 
     const evidenceStrip = (
-      <dl className="ds-record-evidence-strip" aria-label="Evidence at a glance">
-        <div className="ds-record-evidence-strip__item">
-          <dt>Confidence</dt>
-          <dd>
-            <RecordGradePill tier={confidenceTier}>{gradeWord}</RecordGradePill>
-          </dd>
+      <div className="ds-rec-facts ds-record-evidence-strip">
+        <dl
+          className="ds-rec-facts__tiles ds-rec-facts__tiles--glance"
+          aria-label="Evidence at a glance"
+        >
+          <RecordFactTile
+            className={`ds-rec-tile--evidence ds-rec-tile--evidence-${confidenceTier}`}
+            icon={confidenceIconFor(confidenceTier)}
+            label="Confidence"
+            value={<RecordGradePill tier={confidenceTier}>{gradeWord}</RecordGradePill>}
+            support={gradeWord === 'Unrated' ? 'Not graded on this page' : 'Evidence grade'}
+          />
+          <RecordFactTile
+            icon={recordSectionIcon('where')}
+            label="Precision"
+            value={precisionValue}
+            support="How sharp the pin is"
+          />
+          <RecordFactTile
+            icon={recordSectionIcon('claims')}
+            label="Sources"
+            value={sourceCount === 0 ? 'None' : sourceCount.toLocaleString('en-US')}
+            support={
+              sourceCount === 0
+                ? 'Not linked on this page'
+                : sourceCount === 1
+                  ? 'cited source'
+                  : 'cited sources'
+            }
+          />
+        </dl>
+        <div className="ds-rec-facts__actions">
+          <Link className="ds-cta ds-cta--copper" href={returns.mapHref} scroll={false}>
+            <FontAwesomeIcon
+              icon={faMapLocationDot}
+              className="ds-rec-inline-icon"
+              aria-hidden="true"
+            />
+            See it on the map
+          </Link>
         </div>
-        <div className="ds-record-evidence-strip__item">
-          <dt>Precision</dt>
-          <dd>{precisionLine}</dd>
-        </div>
-        <div className="ds-record-evidence-strip__item">
-          <dt>Sources</dt>
-          <dd>
-            {sourceCount === 0
-              ? 'None linked on this page'
-              : `${sourceCount.toLocaleString('en-US')} ${sourceCount === 1 ? 'source' : 'sources'}`}
-          </dd>
-        </div>
-      </dl>
+      </div>
     );
 
     const mastMedia = hasPhoto ? (
@@ -207,7 +234,7 @@ export function HomeFirstPaint({
         entityId={lead.id}
         entityName={lead.displayName}
         {...(lead.primaryImage !== undefined ? { primaryImage: lead.primaryImage } : {})}
-        hideCredit={false}
+        hideCredit
         priority
       />
     ) : geo && locatorName ? (
@@ -231,55 +258,68 @@ export function HomeFirstPaint({
       <Room
         className="ds-home-first-paint"
         masthead={
-          <figure className="ds-record-mast" data-media={hasPhoto ? 'photo' : geo ? 'map' : 'mark'}>
-            {mastMedia}
-            <figcaption className="ds-record-mast__over">
-              <div className="ds-rec-pills" aria-label="Place at a glance">
-                <RecordKindPill kind={lead.kind} />
-                {eraLine ? (
-                  <RecordPill tone="era" icon={recordSectionIcon('era')}>
-                    {eraLine}
-                  </RecordPill>
+          <>
+            <figure
+              className="ds-record-mast"
+              data-media={hasPhoto ? 'photo' : geo ? 'map' : 'mark'}
+            >
+              {mastMedia}
+              <figcaption className="ds-record-mast__over">
+                <div className="ds-rec-pills" aria-label="Place at a glance">
+                  <RecordKindPill kind={lead.kind} />
+                  {eraLine ? (
+                    <RecordPill tone="era" icon={recordSectionIcon('era')}>
+                      {eraLine}
+                    </RecordPill>
+                  ) : null}
+                </div>
+                <h1 className="ds-record-mast__title">{lead.displayName}</h1>
+                <p className="ds-record-mast__lede">
+                  <LinkedProse
+                    as="span"
+                    text={lead.summary}
+                    skipEntityIds={[lead.id]}
+                    catalog={catalog}
+                    hrefFor={(entry) => {
+                      const neighbor = [
+                        ...(lead.relatedNeighbors ?? []),
+                        ...(lead.continueLearning ?? []),
+                      ].find((item) => item.id === entry.entityId);
+                      if (neighbor) {
+                        return (
+                          instrumentRecordHref(
+                            {
+                              id: neighbor.id,
+                              displayName: neighbor.displayName,
+                              kind: neighbor.kind,
+                              summary: neighbor.summary,
+                            },
+                            collisions,
+                          ) || placeHref(entry.label)
+                        );
+                      }
+                      return placeHref(entry.label);
+                    }}
+                  />
+                </p>
+                {lead.primaryImage !== undefined ? (
+                  <RecordPhotoCredit
+                    entityId={lead.id}
+                    image={lead.primaryImage}
+                    className="ds-record-mast__credit"
+                  />
                 ) : null}
-              </div>
-              <h1 className="ds-record-mast__title">{lead.displayName}</h1>
-              <p className="ds-record-mast__lede">
-                <LinkedProse
-                  as="span"
-                  text={lead.summary}
-                  skipEntityIds={[lead.id]}
-                  catalog={catalog}
-                  hrefFor={(entry) => {
-                    const neighbor = [
-                      ...(lead.relatedNeighbors ?? []),
-                      ...(lead.continueLearning ?? []),
-                    ].find((item) => item.id === entry.entityId);
-                    if (neighbor) {
-                      return (
-                        instrumentRecordHref(
-                          {
-                            id: neighbor.id,
-                            displayName: neighbor.displayName,
-                            kind: neighbor.kind,
-                            summary: neighbor.summary,
-                          },
-                          collisions,
-                        ) || placeHref(entry.label)
-                      );
-                    }
-                    return placeHref(entry.label);
-                  }}
-                />
-              </p>
-              {evidenceStrip}
-            </figcaption>
-          </figure>
+              </figcaption>
+            </figure>
+            {evidenceStrip}
+          </>
         }
       >
         {/* Visit / maps handoff only when there is something to visit. The mast already
             carries the one map affordance (pin → atlas). */}
         {shouldShowVisitBlock(visitInput) ? (
           <RecordVisitBlock
+            className="ds-record-beat"
             {...(locatorName !== undefined ? { locatorLabel: locatorName } : {})}
             {...visitInput}
           />

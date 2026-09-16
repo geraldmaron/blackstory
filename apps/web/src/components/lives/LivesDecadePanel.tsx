@@ -1,8 +1,8 @@
 import React from 'react';
 import type { LivesDecadeBundle, LivesLens } from '@repo/domain/statistics/lives';
-import { LivesClassSharesTable } from './LivesClassSharesTable';
-import { LivesConditionsTable } from './LivesConditionsTable';
-import { LivesCountNotes } from './LivesCountNotes';
+import { LivesClassSharesChart } from './LivesClassSharesChart';
+import { LivesConditionsChart } from './LivesConditionsChart';
+import { LivesCountSight } from './LivesCountSight';
 import { LivesRegimeNotice } from './LivesRegimeNotice';
 import { LivesRulesInForce } from './LivesRulesInForce';
 
@@ -19,8 +19,9 @@ export type LivesDecadePanelProps = {
 };
 
 /**
- * One decade: what the count could see, what class means, the frame, class shares, conditions and the
- * rules in force. Server-safe, so the static render and the interactive timeline draw the same panel.
+ * One decade: a diagram of what the count could see, the class-share stacks, condition bars, the
+ * frame, and the rules in force. Numbers stay behind every chart. Server-safe, so the static
+ * render and the interactive timeline draw the same panel.
  */
 export function LivesDecadePanel({
   decade,
@@ -37,7 +38,7 @@ export function LivesDecadePanel({
       className="lives-panel"
     >
       <h2 className="lives-panel__title">The {decade.label}</h2>
-      <LivesCountNotes notes={decade.countNotes} decadeLabel={decade.label} />
+      <LivesCountSight decade={decade} />
       <LivesRegimeNotice decade={decade} />
       {decade.frame ? (
         <div className="lives-frame">
@@ -47,12 +48,8 @@ export function LivesDecadePanel({
           ))}
         </div>
       ) : null}
-      <div className="lives-table-scroll">
-        <LivesClassSharesTable decade={decade} emphasis={emphasis} selectedTier={tier} />
-      </div>
-      <div className="lives-table-scroll">
-        <LivesConditionsTable decade={decade} emphasis={emphasis} tierSelected={tier !== 'all'} />
-      </div>
+      <LivesClassSharesChart decade={decade} emphasis={emphasis} selectedTier={tier} />
+      <LivesConditionsChart decade={decade} emphasis={emphasis} tierSelected={tier !== 'all'} />
       <LivesRulesInForce decade={decade} emphasis={emphasis} disclaimer={disclaimer} />
     </section>
   );

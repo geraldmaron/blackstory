@@ -1,15 +1,16 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { usePathname, useSearchParams } from 'next/navigation';
 import {
   LIVES_LENSES,
   LIVES_LENS_LABELS,
+  LIVES_NATIONAL,
   type LivesAreaBundle,
 } from '@repo/domain/statistics/lives';
 import {
+  DEFAULT_LIVES_VIEW,
   LIVES_TIER_PARAMS,
-  buildLivesSearchParams,
   parseLivesSearchParams,
   type LivesViewState,
 } from '../../lib/lives/lives-url-state';
@@ -31,6 +32,7 @@ function sameView(a: LivesViewState, b: LivesViewState): boolean {
 
 export type LivesTimelineProps = {
   readonly bundle: LivesAreaBundle;
+  readonly areaSlug: string;
 };
 
 /**
@@ -39,12 +41,13 @@ export type LivesTimelineProps = {
  * `useSearchParams`) so a copied link reopens the same decade, lens and tier without a server
  * round trip. Back and forward resync the state from the URL.
  */
-export function LivesTimeline({ bundle }: LivesTimelineProps) {
+export function LivesTimeline({ bundle, areaSlug }: LivesTimelineProps) {
   const searchParams = useSearchParams();
   const pathname = usePathname();
   const [view, setView] = useState<LivesViewState>(() =>
     parseLivesSearchParams(Object.fromEntries(searchParams.entries())),
   );
+  const touched = useRef(false);
 
   useEffect(() => {
     const fromUrl = parseLivesSearchParams(Object.fromEntries(searchParams.entries()));
@@ -52,14 +55,25 @@ export function LivesTimeline({ bundle }: LivesTimelineProps) {
   }, [searchParams]);
 
   useEffect(() => {
-    const query = buildLivesSearchParams(view);
+    const params = new URLSearchParams(window.location.search);
+    if (touched.current) params.set('s', 'lives');
+    if (areaSlug === LIVES_NATIONAL.slug) params.delete('area');
+    else params.set('area', areaSlug);
+    if (view.race !== DEFAULT_LIVES_VIEW.race) params.set('race', view.race);
+    else params.delete('race');
+    if (view.tier !== DEFAULT_LIVES_VIEW.tier) params.set('tier', view.tier);
+    else params.delete('tier');
+    if (view.decade !== DEFAULT_LIVES_VIEW.decade) params.set('decade', String(view.decade));
+    else params.delete('decade');
+    const query = params.toString();
     const target = query ? `${pathname}?${query}` : pathname;
     if (`${window.location.pathname}${window.location.search}` !== target) {
       window.history.replaceState(window.history.state, '', target);
     }
-  }, [view, pathname]);
+  }, [view, pathname, areaSlug]);
 
   function update(patch: Partial<LivesViewState>) {
+    touched.current = true;
     setView((current) => ({ ...current, ...patch }));
   }
 

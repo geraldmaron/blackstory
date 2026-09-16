@@ -227,12 +227,9 @@ function positionScrollCue(
 }
 
 /**
- * Left and bottom edges of the page's ReadingEntry (title/breadcrumb),
- * in the wall's local coordinate space (the wall's own left edge is flush
- * with `.ds-memorial`'s, only its top is offset, so `left` here is
- * also directly usable by the scroll cue — see rebuild()). The header
- * renders outside this component's own tree as a sibling under the shared
- * `.ds-memorial` root.
+ * Left and bottom edges of a page header, when one exists, in the wall's local
+ * coordinate space. The memorial opening no longer renders a title over the
+ * wall; this returns null there and rebuild() falls back to a viewport guess.
  */
 function getHeaderBox(root: HTMLElement): { left: number; bottom: number } | null {
   const header = root.parentElement?.querySelector('.ds-entry--reading, .ds-room-header');

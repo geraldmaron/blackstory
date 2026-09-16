@@ -267,6 +267,11 @@ test('first paint is the record, not a manifesto or a schema card', () => {
   assert.doesNotMatch(html, /walk past documented Black history/);
   assert.doesNotMatch(html, /place-connected archive of Black history/);
   assert.match(html, /ds-record-evidence-strip/);
+  assert.match(html, /ds-rec-facts__tiles--glance/);
+  assert.match(html, /See it on the map/);
+  assert.match(html, />Confidence</);
+  assert.match(html, />Precision</);
+  assert.match(html, />Sources</);
   assert.match(html, /Grade A|Grade B|Grade C|Unrated/);
   assert.doesNotMatch(html, />Kind<|>Where<|>Era<|>Evidence</);
   assert.doesNotMatch(html, /radius affordance|Shown at locality/i);
@@ -507,4 +512,32 @@ test('a place with no place neighbors walks on to another published stand', () =
   );
   assert.match(withNeighbor, /href="\/place\/fifteenth-street-presbyterian-church"/);
   assert.match(withNeighbor, /href="\/place\/dillard-high-school-old"/);
+});
+
+test('place mast puts photo credit under the lede, not over the photograph', () => {
+  const dunbar = getPublicEntity('ent_dunbar_school_001');
+  assert.ok(dunbar);
+  const lead = {
+    ...dunbar,
+    primaryImage: {
+      url: 'https://commons.wikimedia.org/wiki/Special:FilePath/File:Rosa_Parks.jpg?width=960',
+      alt: 'Fixture photograph.',
+      credit: 'Jim Roberts',
+      rightsStatus: 'licensed' as const,
+      sourceSystem: 'wikimedia_commons',
+      sourcePageUrl: 'https://commons.wikimedia.org/wiki/File:Rosa_Parks.jpg',
+      license: 'CC-BY-SA-4.0',
+    },
+  };
+  const html = renderToStaticMarkup(
+    createElement(HomeFirstPaint, {
+      model: { lead, also: [], story: undefined, citing: [], source: 'seed' },
+    }),
+  );
+  assert.match(html, /ds-record-mast__credit/);
+  assert.match(html, /Jim Roberts/);
+  assert.doesNotMatch(html, /<figcaption[^>]*ds-entity-photo__credit/);
+  const ledeAt = html.indexOf('ds-record-mast__lede');
+  const creditAt = html.indexOf('ds-record-mast__credit');
+  assert.ok(ledeAt >= 0 && creditAt > ledeAt);
 });

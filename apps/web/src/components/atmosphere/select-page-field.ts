@@ -1,6 +1,6 @@
 /**
  * Pathname-based selection of transparent page-field atmosphere motifs for shell pages.
- * Map and home explore surfaces receive null so `--ds-canvas` stays unobstructed.
+ * Map, home explore, and record surfaces receive null so `--ds-canvas` stays unobstructed.
  */
 import { pageFieldMotifById, type PageFieldMotifId } from './geometric-fallbacks';
 
@@ -17,7 +17,7 @@ export type PageFieldSelection = {
 export function selectPageField(pathname: string): PageFieldSelection {
   const path = normalizePathname(pathname);
 
-  if (isMapSurface(path)) {
+  if (isMapSurface(path) || isRecordSurface(path)) {
     return null;
   }
 
@@ -42,16 +42,20 @@ function isMapSurface(path: string): boolean {
   return path === '/' || path === '/explore' || path.startsWith('/explore/');
 }
 
+function isRecordSurface(path: string): boolean {
+  return (
+    matchesRoutePrefix(path, '/place') ||
+    matchesRoutePrefix(path, '/entity') ||
+    matchesRoutePrefix(path, '/invention')
+  );
+}
+
 function resolveMotifId(path: string): PageFieldMotifId {
   if (matchesRoutePrefix(path, '/data')) {
     return 'ledger';
   }
 
-  if (
-    matchesRoutePrefix(path, '/history') ||
-    matchesRoutePrefix(path, '/search') ||
-    matchesRoutePrefix(path, '/entity')
-  ) {
+  if (matchesRoutePrefix(path, '/history') || matchesRoutePrefix(path, '/search')) {
     return 'rules';
   }
 

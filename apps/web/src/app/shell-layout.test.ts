@@ -268,6 +268,13 @@ describe('the plate is styled globally, not from the route group', () => {
     );
   });
 
+  it('hides MapLibre controls on covered plates so a compass cannot sit on a record', () => {
+    assert.match(
+      shellCss,
+      /body:not\(:has\(\[data-surface='instrument'\]\)\):not\(:has\(\[data-surface='door'\]\)\)\s+\.ds-map-stage:not\(\[data-plate-slot\]\)\s+\.maplibregl-ctrl\s*\{[^}]*display:\s*none/s,
+    );
+  });
+
   it('never covers a plate that is holding a MapMoment slot', () => {
     // Regression: a plate holding a slot was uncovered by a SECOND rule setting `content: none`,
     // and that rule lost. Both selectors computed to (0,3,2) — `:not(:has([data-surface='…']))`

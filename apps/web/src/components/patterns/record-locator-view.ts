@@ -11,6 +11,8 @@ export type LocatorViewState = {
 
 export const LOCATOR_MIN_SCALE = 1;
 export const LOCATOR_MAX_SCALE = 8;
+/** Opening scale for a place hero: a region, not a town lot. Pin size is inverse-scaled in CSS. */
+export const LOCATOR_NEIGHBORHOOD_SCALE = 2.15;
 
 export function defaultLocatorView(): LocatorViewState {
   return { scale: 1, panX: 0, panY: 0 };
@@ -25,7 +27,7 @@ export function neighborhoodLocatorView(
   pinPercentY: number,
   width = 720,
   height = 420,
-  scale = 3.6,
+  scale = LOCATOR_NEIGHBORHOOD_SCALE,
 ): LocatorViewState {
   const nextScale = clampScale(scale);
   const pinX = (pinPercentX / 100) * width;

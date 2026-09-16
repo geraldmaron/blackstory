@@ -1,7 +1,7 @@
 /**
- * Memorial edition list section. The opening screen is the wall plus the room
- * header (see page.tsx); this renders the full alphabetical list, which starts
- * below the fold and is the accessible, readable record of the same names.
+ * Memorial edition list section. The opening screen is the wall (see page.tsx);
+ * this renders the full alphabetical list below the fold, the accessible record
+ * of the same names.
  */
 import React from 'react';
 import Link from 'next/link';
@@ -58,9 +58,9 @@ export function MemorialSections({ entityLinksByName = {} }: MemorialSectionsPro
         tabIndex={-1}
       >
         <header className="ds-memorial__header">
-          <h2 className="ds-memorial__title" id="memorial-names-heading">
+          <h1 className="ds-memorial__title" id="memorial-names-heading">
             Every name on this memorial
-          </h2>
+          </h1>
           <p className="ds-memorial__count">{total.toLocaleString('en-US')} names, alphabetical</p>
           {anyLinked ? (
             <p className="ds-memorial__link-note">
@@ -92,11 +92,11 @@ export function MemorialSections({ entityLinksByName = {} }: MemorialSectionsPro
             key={group.letter}
             aria-labelledby={`${groupId(group.letter)}-heading`}
           >
-            <h3 className="ds-memorial__group-letter" id={`${groupId(group.letter)}-heading`}>
+            <h2 className="ds-memorial__group-letter" id={`${groupId(group.letter)}-heading`}>
               <span id={groupId(group.letter)} className="ds-memorial__group-anchor" />
               {group.letter}
               <span className="ds-memorial__group-count">{group.names.length}</span>
-            </h3>
+            </h2>
             <ul className="ds-memorial__name-list">
               {group.names.map((name) => {
                 const year = memorialNameYear(name);

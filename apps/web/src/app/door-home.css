@@ -62,7 +62,7 @@
   right: var(--ds-space-5);
   bottom: auto;
   left: var(--ds-space-5);
-  z-index: 4;
+  z-index: 4; /* local: above the journey stack so Browse / captions stay hittable */
   display: flex;
   flex-wrap: wrap;
   align-items: center;
@@ -165,7 +165,7 @@
 
 .ds-door__browse {
   position: relative;
-  z-index: 3;
+  z-index: 3; /* local: browse overlay above the journey copy, below field chrome */
   min-height: calc(100dvh - var(--ds-island-clearance));
   pointer-events: none;
   animation: ds-door-browse-in var(--ds-door-browse-ms) var(--ds-ease-entrance) both;
@@ -180,9 +180,15 @@
   position: fixed;
   top: calc(var(--ds-island-clearance) + var(--ds-space-3));
   left: var(--ds-space-4);
-  /* Above atlas instruments; below the command bar and its overlays. */
-  z-index: calc(var(--ds-z-command-bar) - 5);
+  /* Map band only: below instruments and the record sheet so titles/filters paint in front. */
+  z-index: calc(var(--ds-z-atlas-instruments) - 1);
   pointer-events: auto;
+}
+
+@media (min-width: 820px) {
+  .ds-door__browse-exit {
+    left: calc(var(--ds-space-4) + var(--ds-rail-w) + var(--ds-space-3));
+  }
 }
 
 .ds-door__browse-exit-btn {

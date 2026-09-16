@@ -51,7 +51,8 @@ const SURFACE_CLASS_BY_PATH: ReadonlyMap<string, SurfaceClass> = new Map([
   ['/law', 'reading'],
   ['/law/browse', 'reading'],
   ['/data', 'reading'],
-  // Lives Across the Decades: a region index and one timeline column per region.
+  // Lives Across the Decades: a 308 into the apparatus Data section, still classified so
+  // inbound bookmarks keep reading-room chrome for the instant before the redirect.
   ['/lives', 'reading'],
   ['/memorial', 'reading'],
   ['/about', 'reading'],

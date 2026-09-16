@@ -13,9 +13,9 @@
  * This panel is a view over the existing explore view model — kind families, evidence floor and
  * `?state=` all already exist there. It adds no state of its own beyond the scroll fade.
  *
- * On narrow viewports the Door browse surface mounts it with `modal`: focus trap + Escape, but
- * the instrument dock / command bar / "Back to journey" stay exempt from `inert` so they remain
- * the way out. Wide left-rail stays non-modal.
+ * The map is the product, same as RecordSheet: this panel is never `aria-modal`. Inerting the
+ * plate made the visible geography decorative. Escape still hides the panel; pan/pinch/pin hits
+ * on the map around it stay live.
  */
 'use client';
 
@@ -34,7 +34,6 @@ import {
 import { AREA_FILL_REFUSAL_NOTE } from '../../lib/map-experience/lens-composition';
 import type { ExploreLayerMode } from '../../lib/map-experience/url-state';
 import type { ExploreMapFeature } from '../../lib/map-experience/build-explore-map-source';
-import { useFocusTrap } from '../../lib/keyboard/use-focus-trap';
 import { GradeDot } from './GradeDot';
 import { KindFamilyGlyph } from './KindGlyph';
 import { PlaceFinder, type PlaceFinderResolvedPayload } from './PlaceFinder';
@@ -129,12 +128,8 @@ export type LensPanelProps = {
 
   readonly onReset: () => void;
   readonly onHide?: () => void;
-  /**
-   * Narrow sheet posture: treat the panel as an `aria-modal` dialog (focus trap, Escape dismiss,
-   * labelled title). Wide left-rail posture stays a non-modal instrument so the map stays operable.
-   * Same trap + Escape contract as `ShortcutSheet` / `CollectionsDrawer`.
-   */
-  readonly modal?: boolean;
+  /** Narrow overlay: Escape hides the panel. Does not trap focus or inert the map. */
+  readonly escapeDismiss?: boolean;
   readonly className?: string;
 };
 
@@ -171,42 +166,29 @@ export function LensPanel({
   onShowLegend,
   onReset,
   onHide,
-  modal = false,
+  escapeDismiss = false,
   className,
 }: LensPanelProps) {
   const panelRef = useRef<HTMLElement | null>(null);
   const bodyRef = useRef<HTMLDivElement | null>(null);
   const [overflowing, setOverflowing] = useState(false);
   const titleId = useId();
-  const modalActive = modal && Boolean(onHide);
-
-  // Same trap as ShortcutSheet, but do not inert the dock / command bar / browse exit — those
-  // are how the reader dismisses Filters and returns to the journey. Inerting them made both
-  // "Back to journey" and the Filters chip paint while doing nothing.
-  useFocusTrap(panelRef, modalActive, {
-    overlayRef: panelRef,
-    inertExempt: '[data-browse-chrome]',
-  });
 
   const hideRef = useRef(onHide);
   hideRef.current = onHide;
 
   useEffect(() => {
-    if (!modalActive) return;
-    // Do not steal focus on land: narrow Explore opens Filters at rest. Dock restore already
-    // moves focus into `.ds-lens__head` via AtlasExperience; Escape always works from capture.
-
+    if (!onHide || !escapeDismiss) return;
     const onKeyDown = (event: KeyboardEvent) => {
       if (event.key === 'Escape' || event.key === 'Esc') {
         event.preventDefault();
-        // Capture phase so Explore's layered Escape (record sheet, palette) does not also fire.
         event.stopImmediatePropagation();
         hideRef.current?.();
       }
     };
     window.addEventListener('keydown', onKeyDown, true);
     return () => window.removeEventListener('keydown', onKeyDown, true);
-  }, [modalActive]);
+  }, [onHide, escapeDismiss]);
 
   /**
    * The bottom fade is an affordance, not decoration: without it a panel that scrolls looks
@@ -235,16 +217,8 @@ export function LensPanel({
     <section
       ref={panelRef}
       className={cx('ds-lens', className)}
-      {...(modalActive
-        ? {
-            role: 'dialog' as const,
-            'aria-modal': true as const,
-            'aria-labelledby': titleId,
-            tabIndex: -1,
-          }
-        : { 'aria-label': 'Filters: what you are looking at' })}
+      aria-labelledby={titleId}
       data-overflowing={overflowing ? 'true' : undefined}
-      data-modal={modalActive ? 'true' : undefined}
     >
       <header className="ds-lens__head">
         <h2 className="ds-lens__title" id={titleId}>

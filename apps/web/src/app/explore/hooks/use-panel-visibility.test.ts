@@ -28,16 +28,19 @@ function mountSeed(): string {
 
 /** The body of the `sync` effect's `setPanels({ ... })` call. */
 function viewportSync(): string {
-  const match = hook.match(/const sync = \(\) => \{[\s\S]*?setPanels\(\{([\s\S]*?)\}\);/);
+  const match = hook.match(
+    /const sync = \(\) => \{[\s\S]*?setPanels\(\(current\) => \(\{([\s\S]*?)\}\)\);/,
+  );
   assert.ok(match, 'viewport sync setPanels not found');
   return match[1] ?? '';
 }
 
-test('every instrument is open at mount (server render is the wide layout)', () => {
+test('Lens, Results, and Time seed open; Camera stays restored-on-demand', () => {
   const seed = mountSeed();
-  for (const panel of ['lens', 'results', 'decade', 'camera']) {
+  for (const panel of ['lens', 'results', 'decade']) {
     assert.match(seed, new RegExp(`${panel}: true,`), `${panel} must seed open`);
   }
+  assert.match(seed, /camera: false/);
 });
 
 test('the viewport sync keeps the Lens open at every width', () => {
@@ -47,12 +50,12 @@ test('the viewport sync keeps the Lens open at every width', () => {
   assert.doesNotMatch(sync, /lens: false/);
 });
 
-test('the viewport sync opens the other three instruments on a wide viewport', () => {
+test('the viewport sync opens Results and Time on a wide viewport', () => {
   const sync = viewportSync();
-  for (const panel of ['results', 'decade', 'camera']) {
+  for (const panel of ['results', 'decade']) {
     assert.match(sync, new RegExp(`${panel}: !isNarrow,`), `${panel} must open when wide`);
-    assert.doesNotMatch(sync, new RegExp(`${panel}: false`));
   }
+  assert.match(sync, /camera: isNarrow \? false : current\.camera/);
 });
 
 test('the Lens is gated only on its panel flag, hidden chrome, and Atlas mode', () => {
@@ -61,4 +64,9 @@ test('the Lens is gated only on its panel flag, hidden chrome, and Atlas mode', 
 
 test('mode starts as atlas so the Lens can show', () => {
   assert.match(hook, /useState<AtlasMode>\('atlas'\)/);
+});
+
+test('narrow Filters is not a modal: the visible map stays operable', () => {
+  assert.doesNotMatch(experience, /modal=\{narrow\}/);
+  assert.match(experience, /escapeDismiss=\{narrow\}/);
 });

@@ -425,8 +425,9 @@ const DESTINATIONS: readonly SemanticDestination[] = [
     browsable: false,
   },
   {
-    // Lives Across the Decades. Unadvertised until IPUMS confirms public-web use of the
-    // tabulations (repo-0clax.2); launch moves it to the `read` family.
+    // Lives Across the Decades. Unadvertised as its own room; the figures live in Data.
+    // `/lives` 308s into `/apparatus?s=lives`. Held out of crawl until verification
+    // (repo-0clax.14) and the public method page (repo-0clax.17).
     id: 'lives',
     label: 'Lives across the decades',
     path: '/lives',
@@ -435,6 +436,8 @@ const DESTINATIONS: readonly SemanticDestination[] = [
     icon: 'data',
     isPublic: false,
     browsable: false,
+    description:
+      'Deep link into the apparatus Data section: class and conditions by race, decade by decade.',
   },
 ];
 

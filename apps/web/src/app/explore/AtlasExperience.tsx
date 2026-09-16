@@ -534,7 +534,7 @@ export function AtlasExperience({ initial, embedded = false }: AtlasExperiencePr
           onShowLegend={() => setLegendOpen(true)}
           onReset={resetLens}
           onHide={() => hidePanel('lens')}
-          modal={narrow}
+          escapeDismiss={narrow}
         />
       ) : null}
 

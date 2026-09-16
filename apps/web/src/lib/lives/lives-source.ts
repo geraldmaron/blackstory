@@ -1,7 +1,8 @@
 /**
- * Server-side reader for `/lives/[area]`. Reads the area's static snapshot, built by
+ * Server-side reader for Lives Across the Decades. Reads the area's static snapshot, built by
  * packages/ops-data/scripts/build-lives-snapshots.ts, and upgrades each rule's record link to its law
- * or case page when one exists. No reference-table queries run at request time.
+ * or case page when one exists. No reference-table queries run at request time. The public surface
+ * is `/apparatus?s=lives`; `/lives/[area]` 308s there.
  *
  * Reads skip the release-scoped snapshot cache on purpose: the page is ISR, so reads are already rare,
  * and a rebuilt snapshot should appear at the next revalidation rather than the next release. Without

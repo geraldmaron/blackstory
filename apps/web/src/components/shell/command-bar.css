@@ -285,11 +285,12 @@
   cursor: pointer;
 }
 
-/* Active Find link mirrors the Explore mode copper ink (flat matte, no shadow). */
+/* Active Find segment: inset in the track, copper as ink/border, not a filled sticker. */
 .ds-bar__mode-link[aria-current='page'],
 .ds-bar__mode-link[aria-current='true'] {
-  background: var(--ds-accent-graphic);
-  color: var(--ds-fixed-ink);
+  background: var(--ds-surface);
+  color: var(--ds-accent);
+  box-shadow: inset 0 0 0 var(--ds-border-width) var(--ds-accent-graphic);
 }
 
 span.ds-bar__mode-link {
@@ -329,12 +330,19 @@ span.ds-bar__mode-link {
   color: var(--ds-ink);
 }
 
-/* Ink direction: the active mode is copper on ink, not a surface swap with a shadow — the
-   accent does the one piece of work it should be doing in this composition. */
+.ds-bar__mode-link[aria-current='page']:hover,
+.ds-bar__mode-link[aria-current='page']:focus-visible,
+.ds-bar__mode-link[aria-current='true']:hover,
+.ds-bar__mode-link[aria-current='true']:focus-visible {
+  background: var(--ds-surface);
+  color: var(--ds-accent);
+}
+
+/* Active Find segment stays inset copper, including while hovered. */
 .ds-bar__modes button[aria-current='true'] {
-  background: var(--ds-accent-graphic);
-  color: var(--ds-fixed-ink);
-  box-shadow: none;
+  background: var(--ds-surface);
+  color: var(--ds-accent);
+  box-shadow: inset 0 0 0 var(--ds-border-width) var(--ds-accent-graphic);
 }
 
 .ds-bar__tool {

@@ -32,6 +32,9 @@ test('the memorial root is the wall atmosphere on the room class, not a photo mo
   // The route carries the class stylesheet and no per-route stylesheet of its own.
   assert.match(pageSource, /import '\.\.\/reading-room\.css'/);
   assert.doesNotMatch(pageSource, /memorial-edition\.css/);
+  assert.doesNotMatch(pageSource, /<ReadingEntry/);
+  assert.doesNotMatch(pageSource, /Every name the archive has been given/);
+  assert.doesNotMatch(pageSource, /Written by hand, one at a time/);
 });
 
 test('the memorial list is not drawn as a panel', () => {
@@ -97,6 +100,8 @@ test('memorial sections render full list anchor and no em dashes in copy', () =>
   assert.match(sections, /memorialNamesByInitial/);
   assert.doesNotMatch(copy, /\u2014/);
   assert.doesNotMatch(sections, /\u2014/);
+  assert.doesNotMatch(copy, /Every name the archive has been given/);
+  assert.doesNotMatch(copy, /Written by hand, one at a time/);
 });
 
 test('memorial scroll cue does not auto-scroll on load', () => {

@@ -9,12 +9,13 @@ import { renderToStaticMarkup } from 'react-dom/server';
 import { test } from 'node:test';
 import { LocationPrivacyNotice } from './LocationPrivacyNotice';
 
-test('renders a status/warning notice explaining explicit consent and no stored history', () => {
+test('renders a collapsed disclosure explaining explicit consent and no stored history', () => {
   const html = renderToStaticMarkup(createElement(LocationPrivacyNotice));
-  assert.match(html, /role="status"/);
+  assert.match(html, /<details class="ds-location-privacy-notice">/);
   assert.match(html, /press the button below/);
   assert.match(html, /discarded immediately/);
   assert.match(html, /stored history of your searches/);
+  assert.doesNotMatch(html, /ds-notice--warning/);
 });
 
 test('mentions the 50-states-+-D.C. scope and the manual search fallback', () => {

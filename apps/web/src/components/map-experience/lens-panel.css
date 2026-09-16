@@ -71,12 +71,6 @@
   outline-offset: 2px;
 }
 
-/* Modal sheet: focus lands on the dialog root; keep the ring visible without looking ornamental. */
-.ds-lens[data-modal='true']:focus-visible {
-  outline: 2px solid var(--ds-accent-graphic);
-  outline-offset: 2px;
-}
-
 /* ---- body ---------------------------------------------------------------- */
 
 .ds-lens__body {
@@ -453,10 +447,10 @@
     top: auto;
     left: var(--ds-space-2);
     right: var(--ds-space-2);
-    bottom: calc(var(--ds-space-2) + 66px);
+    bottom: var(--ds-atlas-dock-clearance);
     width: auto;
-    /* Full-width sheet: thumb-reachable, tall enough to operate filters without dual rails. */
-    max-height: min(70dvh, 520px);
+    /* Peek: the map stays the majority of the viewport and remains hittable above the sheet. */
+    max-height: var(--ds-atlas-sheet-peek);
     border-radius: var(--ds-radius-md) var(--ds-radius-md) 0 0;
   }
 }

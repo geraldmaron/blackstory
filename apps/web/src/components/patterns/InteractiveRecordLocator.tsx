@@ -17,6 +17,8 @@ import {
   type LocatorViewState,
 } from './record-locator-view';
 
+const DEFAULT_LOCATOR_SIZE = { width: 720, height: 420 };
+
 void React;
 
 export type InteractiveRecordLocatorProps = {
@@ -66,12 +68,30 @@ export function InteractiveRecordLocator({
   const pin = useMemo(() => locatorPinPercent(lng, lat), [lng, lat]);
   const rootRef = useRef<HTMLDivElement>(null);
   const dragRef = useRef<{ pointerId: number; lastX: number; lastY: number } | null>(null);
+  const [size, setSize] = useState(DEFAULT_LOCATOR_SIZE);
   const initialView = useMemo((): LocatorViewState => {
     if (!neighborhood || !pin) return defaultLocatorView();
-    return neighborhoodLocatorView(pin.x, pin.y);
-  }, [neighborhood, pin]);
+    return neighborhoodLocatorView(pin.x, pin.y, size.width, size.height);
+  }, [neighborhood, pin, size]);
   const [view, setView] = useState<LocatorViewState>(initialView);
   const [dragging, setDragging] = useState(false);
+
+  useEffect(() => {
+    const root = rootRef.current;
+    if (!root || typeof ResizeObserver === 'undefined') return;
+    const observer = new ResizeObserver((entries) => {
+      const box = entries[0]?.contentRect;
+      if (!box || box.width < 1 || box.height < 1) return;
+      setSize((current) => {
+        if (Math.abs(current.width - box.width) < 1 && Math.abs(current.height - box.height) < 1) {
+          return current;
+        }
+        return { width: box.width, height: box.height };
+      });
+    });
+    observer.observe(root);
+    return () => observer.disconnect();
+  }, []);
 
   useEffect(() => {
     setView(initialView);
@@ -194,6 +214,7 @@ export function InteractiveRecordLocator({
       role="application"
       aria-label={locatorAriaLabel(label, accessibleName, neighborhood)}
       tabIndex={0}
+      style={{ ['--locator-scale' as string]: String(view.scale) }}
       onPointerDown={onPointerDown}
       onPointerMove={onPointerMove}
       onPointerUp={endDrag}

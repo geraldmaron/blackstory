@@ -397,15 +397,12 @@ export function RecordSheet({
         ) : null}
 
         {/*
-         * The archive's one precision sentence (`components/room`'s `Precision`), boxed for a
-         * small card. Not optional and not editorial: it renders for every record, including ones
-         * with a well-known address, because it states what THIS pin means, not how well-known the
-         * place is.
+         * States what THIS pin means. The longer caveat lived on every visit block and crowded
+         * the sheet; the resolution line is the claim.
          */}
         <Precision
           className="ds-room-precision--boxed"
           resolution={precisionResolutionLabel(record.precision)}
-          caveat="The archive never draws a point sharper than the source supports."
         />
 
         <div className="ds-sheet__actions">

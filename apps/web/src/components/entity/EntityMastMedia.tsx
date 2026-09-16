@@ -29,9 +29,64 @@ export type EntityMastMediaProps = {
   readonly primaryImage?: PublicEntityPrimaryImageView;
   /** When true (default), load the photo eagerly for above-the-fold mast placement. */
   readonly priority?: boolean;
-  /** First paint: no rights-clearance or missing-photo caption. The mast is the place. */
+  /**
+   * Omit the in-photo caption. Record masts pass this and render `RecordPhotoCredit` in the
+   * overlay instead, so rights text never sits on top of the lede.
+   */
   readonly hideCredit?: boolean;
 };
+
+function photoCreditId(entityId: string): string {
+  return `entity-photo-credit-${entityId.replace(/[^a-zA-Z0-9]/g, '').slice(-8) || 'x'}`;
+}
+
+/** Rights line for a pinned photograph. Record masts place this under the lede, in flow. */
+export function RecordPhotoCredit({
+  entityId,
+  image,
+  as: Tag = 'p',
+  className,
+}: {
+  readonly entityId: string;
+  readonly image: PublicEntityPrimaryImageView;
+  readonly as?: 'p' | 'figcaption';
+  readonly className?: string;
+}) {
+  const creditId = photoCreditId(entityId);
+  const caption = primaryImageCreditCaption({
+    credit: image.credit,
+    rightsStatus: image.rightsStatus,
+  });
+  const sourceLine = primaryImageSourceLine({
+    ...(image.sourceSystem !== undefined ? { sourceSystem: image.sourceSystem } : {}),
+    ...(image.sourcePageUrl !== undefined ? { sourcePageUrl: image.sourcePageUrl } : {}),
+    ...(image.license !== undefined ? { license: image.license } : {}),
+  });
+  const classes = ['ds-entity-photo__credit', 'ds-sans', className].filter(Boolean).join(' ');
+
+  return (
+    <Tag id={creditId} className={classes}>
+      {caption.creditText}
+      {caption.showRightsLabel ? (
+        <span className="ds-mono">
+          {caption.creditText ? ' · ' : ''}
+          {caption.rightsLabel}
+        </span>
+      ) : null}
+      {sourceLine ? (
+        <a
+          href={sourceLine.url}
+          className="ds-entity-photo__source-link ds-mono"
+          target="_blank"
+          rel="noopener noreferrer nofollow"
+        >
+          {caption.creditText || caption.showRightsLabel ? ' · ' : ''}
+          {sourceLine.label}
+        </a>
+      ) : null}
+    </Tag>
+  );
+}
 
 type MastPhase =
   | { readonly kind: 'mark'; readonly reason: RecordMarkReason }
@@ -112,16 +167,7 @@ export function EntityMastMedia({
   const image = primaryImage!;
   const src = phase.urls[phase.urlIndex]!;
   const alt = entityPrimaryImageAlt(image.alt, entityName);
-  const creditId = `entity-photo-credit-${entityId.replace(/[^a-zA-Z0-9]/g, '').slice(-8) || 'x'}`;
-  const caption = primaryImageCreditCaption({
-    credit: image.credit,
-    rightsStatus: image.rightsStatus,
-  });
-  const sourceLine = primaryImageSourceLine({
-    ...(image.sourceSystem !== undefined ? { sourceSystem: image.sourceSystem } : {}),
-    ...(image.sourcePageUrl !== undefined ? { sourcePageUrl: image.sourcePageUrl } : {}),
-    ...(image.license !== undefined ? { license: image.license } : {}),
-  });
+  const creditId = photoCreditId(entityId);
   const focalClass = primaryImageFocalClass(kind);
   const orientationClass = portrait ? ' ds-entity-photo--portrait' : '';
 
@@ -172,28 +218,7 @@ export function EntityMastMedia({
           });
         }}
       />
-      {hideCredit ? null : (
-        <figcaption id={creditId} className="ds-entity-photo__credit ds-sans">
-          {caption.creditText}
-          {caption.showRightsLabel ? (
-            <span className="ds-mono">
-              {caption.creditText ? ' · ' : ''}
-              {caption.rightsLabel}
-            </span>
-          ) : null}
-          {sourceLine ? (
-            <a
-              href={sourceLine.url}
-              className="ds-entity-photo__source-link ds-mono"
-              target="_blank"
-              rel="noopener noreferrer nofollow"
-            >
-              {caption.creditText || caption.showRightsLabel ? ' · ' : ''}
-              {sourceLine.label}
-            </a>
-          ) : null}
-        </figcaption>
-      )}
+      {hideCredit ? null : <RecordPhotoCredit entityId={entityId} image={image} as="figcaption" />}
     </figure>
   );
 }

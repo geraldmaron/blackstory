@@ -4,12 +4,17 @@ import {
   DEFAULT_LIVES_VIEW,
   buildLivesHref,
   buildLivesSearchParams,
+  parseLivesAreaSlug,
   parseLivesSearchParams,
 } from './lives-url-state';
 
 test('empty params open the default view', () => {
   assert.deepEqual(parseLivesSearchParams({}), DEFAULT_LIVES_VIEW);
-  assert.equal(buildLivesHref('deep-south', DEFAULT_LIVES_VIEW), '/lives/deep-south');
+  assert.equal(
+    buildLivesHref('deep-south', DEFAULT_LIVES_VIEW),
+    '/apparatus?s=lives&area=deep-south',
+  );
+  assert.equal(buildLivesHref('united-states', DEFAULT_LIVES_VIEW), '/apparatus?s=lives');
 });
 
 test('valid params round-trip through the query string', () => {
@@ -36,4 +41,10 @@ test('old slice ids, unknown tiers and off-grid decades fall back to defaults', 
 
 test('the first value of a repeated param wins', () => {
   assert.equal(parseLivesSearchParams({ race: ['white', 'hispanic'] }).race, 'white');
+});
+
+test('area query falls back to the national baseline', () => {
+  assert.equal(parseLivesAreaSlug({}), 'united-states');
+  assert.equal(parseLivesAreaSlug({ area: 'midwest' }), 'midwest');
+  assert.equal(parseLivesAreaSlug({ area: 'not-a-region' }), 'united-states');
 });

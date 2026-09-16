@@ -3,10 +3,11 @@
  *
  * About, Methodology, Data, Law and Banned books are sections of this document. Old index URLs
  * 308 into `?s=` section focus. Interactive law and books browse tools keep thin escape-hatch
- * routes at `/law/browse` and `/books/browse`.
+ * routes at `/law/browse` and `/books/browse`. Lives across the decades is a Data subsection.
  */
 import type { Metadata } from 'next';
 import React, { Suspense } from 'react';
+import { LIVES_NATIONAL, livesAreaBySlug } from '@repo/domain/statistics/lives';
 import { buildStaticPageMetadata } from '../../lib/seo/metadata-builders';
 import { DocumentColophon, GroupHeading, Prose, ReadingEntry, Room } from '../../components/room';
 import { WalkOffRamp } from '../walk-off-ramp';
@@ -21,6 +22,8 @@ import { LawApparatusSections } from '../law/LawApparatusSections';
 import { loadLegalCatalog } from '../../lib/legal/public-source';
 import { BooksApparatusSections } from '../books/BooksApparatusSections';
 import { loadBannedBooksListing } from '../../lib/banned-books/public-source.js';
+import { emptyLivesAreaBundle, loadLivesAreaBundle } from '../../lib/lives/lives-source';
+import { parseLivesAreaSlug } from '../../lib/lives/lives-url-state';
 import { ApparatusSectionFocus } from './ApparatusSectionFocus';
 import './apparatus.css';
 import '../reading-room.css';
@@ -45,12 +48,21 @@ const TOC = [
   { id: 'books', title: 'Banned books' },
 ] as const;
 
-export default async function ApparatusPage() {
-  const [dataModel, legalSource, booksSnapshot] = await Promise.all([
+export default async function ApparatusPage({
+  searchParams,
+}: {
+  readonly searchParams: Promise<Readonly<Record<string, string | string[] | undefined>>>;
+}) {
+  const raw = await searchParams;
+  const livesAreaSlug = parseLivesAreaSlug(raw);
+  const [dataModel, legalSource, booksSnapshot, livesBundle] = await Promise.all([
     loadDataPageModel(),
     loadLegalCatalog(),
     loadBannedBooksListing(),
+    loadLivesAreaBundle(livesAreaSlug),
   ]);
+  const lives =
+    livesBundle ?? emptyLivesAreaBundle(livesAreaBySlug(livesAreaSlug) ?? LIVES_NATIONAL);
 
   return (
     <Room>
@@ -110,7 +122,7 @@ export default async function ApparatusPage() {
         <Prose>
           <p>{DATA_INTRO.lede}</p>
         </Prose>
-        <DataSections {...dataModel.sections} />
+        <DataSections {...dataModel.sections} livesBundle={lives} livesAreaSlug={lives.areaSlug} />
       </section>
 
       <section id="law" className="ds-apparatus-section" aria-labelledby="apparatus-law-title">

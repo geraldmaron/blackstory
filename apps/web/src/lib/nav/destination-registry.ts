@@ -259,6 +259,9 @@ const WEB_PRESENTATION: Readonly<Record<string, WebPresentation>> = Object.freez
   // this is NOT paired with a robots.txt Disallow.
   'design-system': { noIndex: true },
   lives: { noIndex: true },
+  // `/lives` 308s into `/apparatus?s=lives`. Stay out of the sitemap: the figures are
+  // already reachable from the crawled Data section. noIndex on the redirect pages
+  // keeps inbound links from resurrecting the old address.
 });
 
 export type Destination = SemanticDestination &

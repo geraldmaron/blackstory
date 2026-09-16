@@ -51,6 +51,15 @@
   pointer-events: none;
 }
 
+/*
+ * Place-hero locators park chrome at the top so Reset / zoom never sit in the mast overlay
+ * where the lede, era pills and pin already compete.
+ */
+.ds-record-mast .ds-locator__chrome {
+  top: var(--ds-space-3);
+  bottom: auto;
+}
+
 .ds-locator__atlas,
 .ds-locator__reset,
 .ds-locator__zoom {
@@ -133,6 +142,12 @@
   background: color-mix(in srgb, var(--ds-accent-graphic) 28%, transparent);
   outline: 2px solid var(--ds-canvas);
   outline-offset: 0;
+  /*
+   * The pin lives on the scaled canvas. Inverse-scale so a neighborhood zoom marks a point
+   * instead of painting a county-sized disc.
+   */
+  transform: scale(calc(1 / var(--locator-scale, 1)));
+  transform-origin: center center;
 }
 
 /*

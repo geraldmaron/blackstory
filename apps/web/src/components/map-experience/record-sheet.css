@@ -504,11 +504,12 @@
 
 @media (max-width: 819px) {
   .ds-sheet {
-    top: calc(56px + var(--ds-space-2));
+    top: auto;
     left: var(--ds-space-2);
     right: var(--ds-space-2);
-    bottom: var(--ds-space-2);
+    bottom: var(--ds-atlas-dock-clearance);
     width: auto;
+    max-height: var(--ds-atlas-sheet-peek);
   }
 
   .ds-sheet__mast {

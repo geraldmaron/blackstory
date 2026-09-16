@@ -42,8 +42,16 @@ test('data index 308s into the apparatus Data section', () => {
   assert.match(pageSource, /permanentRedirect\('\/apparatus\?s=data'\)/);
 });
 
+test('lives index and region pages 308 into the apparatus Lives figures', () => {
+  const livesIndex = readFileSync(join(here, '../lives/page.tsx'), 'utf8');
+  const livesRegion = readFileSync(join(here, '../lives/[region]/page.tsx'), 'utf8');
+  assert.match(livesIndex, /permanentRedirect\('\/apparatus\?s=lives'\)/);
+  assert.match(livesRegion, /permanentRedirect\(buildLivesHref/);
+});
+
 test('apparatus inlines DataSections through the shared loader', () => {
   assert.match(apparatusSource, /loadDataPageModel/);
+  assert.match(apparatusSource, /loadLivesAreaBundle/);
   assert.match(apparatusSource, /<DataSections/);
   assert.match(loaderSource, /export async function loadDataPageModel/);
 });
@@ -55,6 +63,8 @@ test('data sections keep census and indicator chart wiring', () => {
   assert.match(sectionsSource, /GroupedBarIndicatorChart/);
   assert.match(sectionsSource, /StatePopulationShiftChart/);
   assert.match(sectionsSource, /TrendLineChart/);
+  assert.match(sectionsSource, /LivesClassSharesChart|LivesTimeline/);
+  assert.match(sectionsSource, /id="lives"/);
   assert.doesNotMatch(sectionsSource, /UtilityCard|ds-data-edition/);
 });
 

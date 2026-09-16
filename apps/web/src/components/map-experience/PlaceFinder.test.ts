@@ -16,7 +16,7 @@ test('renders the full form inline, privacy notice first, before any permission 
   );
   // Privacy notice content (`LocationPrivacyNotice`), ahead of the consent button in source
   // order — full length, not the collapsed one-line summary a reader would have to expand.
-  const privacyIndex = html.indexOf('How this lookup uses your location');
+  const privacyIndex = html.indexOf('Location is opt-in');
   const consentIndex = html.indexOf('Use my current location');
   assert.ok(privacyIndex >= 0, 'privacy notice not found');
   assert.ok(consentIndex >= 0, 'consent button not found');

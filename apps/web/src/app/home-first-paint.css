@@ -1,28 +1,58 @@
 /**
  * Place-page spacing and mast presence over the record room.
  * Archive material law: depth from occlusion and value, not elevation stacks.
- * Evidence strip at display scale; typed relation chips distinct from site-nav CTAs.
+ * Evidence glance uses the record fact band; typed relation chips stay distinct from site-nav CTAs.
  */
 
+.ds-home-first-paint .ds-room__mast {
+  background: var(--ds-canvas);
+}
+
+/*
+ * Place first-paint has no rail. The record shell otherwise adds the rail track, so on a wide
+ * viewport the mast and the glance band started ~140px left of Visit and the reading column.
+ */
+[data-surface='record'] .ds-home-first-paint {
+  --record-shell-w: calc(var(--room-doc-w) - 2 * var(--ds-gutter));
+}
+
 .ds-home-first-paint .ds-record-mast {
-  min-height: clamp(18rem, 48vh, 32rem);
+  min-height: clamp(18rem, 42vh, 30rem);
 }
 
 .ds-home-first-paint .ds-record-mast[data-media='map'] {
   /* Neighborhood locator is the hero image when no photograph exists. */
-  min-height: clamp(20rem, 52vh, 34rem);
+  min-height: clamp(20rem, 48vh, 32rem);
 }
 
 .ds-home-first-paint .ds-record-mast__map {
   position: absolute;
   inset: 0;
+  overflow: hidden;
 }
 
-.ds-home-first-paint .ds-record-mast__map .ds-record-anatomy__place,
-.ds-home-first-paint .ds-record-mast__map .ds-locator {
+.ds-home-first-paint .ds-record-mast__map .ds-record-anatomy__place {
+  position: absolute;
+  inset: 0;
   height: 100%;
-  min-height: inherit;
   margin: 0;
+}
+
+/*
+ * Crop the 960/500 locator into the tall mast. Stretching it made the pin a percentage of a
+ * distorted canvas, which is why neighborhood zoom painted a comic-sized ring over the lede.
+ */
+.ds-home-first-paint .ds-record-mast__map .ds-locator {
+  position: absolute;
+  left: 0;
+  width: 100%;
+  height: auto;
+  min-height: 0;
+  aspect-ratio: 960 / 500;
+  top: 50%;
+  transform: translateY(-50%);
+  margin: 0;
+  border: 0;
   border-radius: 0;
 }
 
@@ -30,46 +60,10 @@
   display: none;
 }
 
-.ds-home-first-paint .ds-record-mast__title {
-  font-size: var(--ds-text-display-1);
-  letter-spacing: var(--ds-tracking-display);
-  line-height: var(--ds-leading-display);
-}
-
-.ds-record-evidence-strip {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: var(--ds-space-4);
-  margin: var(--ds-space-6) 0 0;
-  padding: var(--ds-space-4) 0 0;
-  border-top: var(--ds-border-width) solid color-mix(in srgb, var(--ds-ink) 18%, transparent);
-}
-
-.ds-record-evidence-strip__item {
-  min-width: 0;
-}
-
-.ds-record-evidence-strip__item dt {
-  margin: 0 0 var(--ds-space-2);
-  font-family: var(--ds-font-mono);
-  font-size: var(--ds-text-micro);
-  letter-spacing: var(--ds-tracking-mono);
-  text-transform: uppercase;
-  color: color-mix(in srgb, var(--ds-ink) 72%, transparent);
-}
-
-.ds-record-evidence-strip__item dd {
-  margin: 0;
-  font-family: var(--ds-font-display);
-  font-size: var(--ds-text-display-3);
-  line-height: var(--ds-leading-title);
-  letter-spacing: var(--ds-tracking-title);
-}
-
-@media (max-width: 40rem) {
-  .ds-record-evidence-strip {
-    grid-template-columns: 1fr;
-  }
+.ds-home-first-paint .ds-record-beat {
+  margin-bottom: var(--ds-space-10);
+  padding-bottom: var(--ds-space-7);
+  border-bottom: var(--ds-border-width) solid var(--ds-rule);
 }
 
 .ds-record-evidence-gap {

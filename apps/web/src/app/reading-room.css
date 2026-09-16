@@ -1116,18 +1116,14 @@ a.ds-errata__row-id {
   z-index: var(--ds-z-content);
 }
 
-/* First screen reads as wall plus title only: the opening block reserves the
-   whole opening field so the full list starts well below the fold and is
-   reached by scrolling. 125svh matches the wall's own height
-   (MEMORIAL_OPENING_SCREENS) so the names have room past the fold; the 7rem
-   subtraction is the room's offset from the top of the viewport, which keeps
-   the list's top edge landing at the end of the field rather than past it. */
+/* First screen is the wall: the opening block reserves the field so the full
+   list starts well below the fold. 125svh matches the wall's own height
+   (MEMORIAL_OPENING_SCREENS); the 7rem subtraction is the room's offset from
+   the top of the viewport. */
 .ds-memorial__opening {
-  /* The scroll cue used to live here and get pushed to the foot of the
-     screen via `justify-content: space-between`; it now renders as a sibling
-     of the wall, positioned to the message's actual bottom edge (see
-     page.tsx and MemorialWallAtmosphere.tsx), so this block just needs to
-     reserve the opening viewport for the header. */
+  /* The scroll cue renders as a sibling of the wall (see page.tsx and
+     MemorialWallAtmosphere.tsx). This block only reserves the opening
+     viewport. */
   min-block-size: calc(100vh - 7rem);
   min-block-size: calc(100svh - 7rem);
   /* The remaining quarter screen of wall (MEMORIAL_OPENING_SCREENS = 1.25):

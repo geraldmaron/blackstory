@@ -6,17 +6,24 @@ void React;
 export type LivesCountNotesProps = {
   readonly notes: readonly LivesCountNote[];
   readonly decadeLabel: string;
+  /** When the parent already titled this block (the sight diagram). */
+  readonly omitHeading?: boolean;
 };
 
 /**
  * What the count could see: who the census counted in this decade, how, what it could not see, and what
  * that meant. Missing figures elsewhere on the page link here.
  */
-export function LivesCountNotes({ notes, decadeLabel }: LivesCountNotesProps) {
+export function LivesCountNotes({ notes, decadeLabel, omitHeading = false }: LivesCountNotesProps) {
   if (notes.length === 0) return null;
   return (
-    <section className="lives-count" aria-labelledby="lives-count-heading">
-      <h3 id="lives-count-heading">What the count could see in the {decadeLabel}</h3>
+    <section
+      className="lives-count"
+      {...(omitHeading ? {} : { 'aria-labelledby': 'lives-count-heading' })}
+    >
+      {omitHeading ? null : (
+        <h3 id="lives-count-heading">What the count could see in the {decadeLabel}</h3>
+      )}
       <ul className="lives-count__list">
         {notes.map((note) => (
           <li key={note.id} id={`lives-note-${note.id}`} className="lives-count__note">

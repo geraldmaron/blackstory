@@ -598,26 +598,18 @@
   font-size: 0.9375rem;
 }
 
-/* Collapsed-by-default disclosure wrapper (e.g. locate's privacy notice): the summary line is
-   styled to read as its own compact warning chip so the full `.ds-notice` only costs its real
-   height once a visitor opens it. */
+/* Collapsed-by-default locate disclosure: quiet summary, not a warning card. */
 .ds-location-privacy-notice {
-  border-radius: var(--ds-radius-md);
-}
-
-.ds-location-privacy-notice > .ds-notice {
-  margin-top: var(--ds-space-2);
+  border-radius: var(--ds-radius-sm);
 }
 
 .ds-location-privacy-notice__summary {
   cursor: pointer;
   list-style: none;
-  padding: var(--ds-space-3) var(--ds-space-4);
-  border: var(--ds-border-width) solid var(--ds-warning-border);
-  border-radius: var(--ds-radius-md);
-  color: var(--ds-warning-fg);
-  background: var(--ds-warning-bg);
-  font-size: 0.875rem;
+  padding: 0;
+  color: var(--ds-ink-muted);
+  font-size: 0.8125rem;
+  line-height: 1.4;
 }
 
 .ds-location-privacy-notice__summary::-webkit-details-marker {
@@ -626,10 +618,20 @@
 
 .ds-location-privacy-notice__summary::before {
   content: '▸ ';
+  color: var(--ds-ink-subtle);
 }
 
 .ds-location-privacy-notice[open] > .ds-location-privacy-notice__summary::before {
   content: '▾ ';
+}
+
+.ds-location-privacy-notice__body {
+  margin-top: var(--ds-space-2);
+  padding: var(--ds-space-3) 0 0;
+  border-top: var(--ds-border-width) solid var(--ds-rule);
+  color: var(--ds-ink-muted);
+  font-size: 0.8125rem;
+  line-height: 1.45;
 }
 
 .ds-empty {

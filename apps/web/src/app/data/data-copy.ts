@@ -8,11 +8,11 @@
  */
 
 export const DATA_PAGE_DESCRIPTION =
-  'Census counts of the Black population by decade, 1790 to 2020, alongside published wealth, housing, credit and justice indicators. Every figure names the series behind it and shows the numbers.';
+  'Census counts of the Black population by decade, 1790 to 2020, published wealth, housing, credit and justice indicators, and how class and conditions compared across race from the 1870s. Every figure names the series behind it and shows the numbers.';
 
 export const DATA_INTRO = {
   kicker: 'Reference ledger',
-  lede: 'Census counts by decade, and published indicator series for wealth, housing, credit and justice. Every figure names its source, states its limits, and shows the numbers behind it.',
+  lede: 'Census counts by decade, published indicator series for wealth, housing, credit and justice, and how Black, white and Hispanic Americans were spread across class from the 1870s. Every figure names its source, states its limits, and shows the numbers behind it.',
 } as const;
 
 /**
@@ -24,6 +24,7 @@ export const DATA_PAGE_SECTIONS = [
   { id: 'wealth', label: 'Wealth' },
   { id: 'housing', label: 'Housing and credit' },
   { id: 'justice', label: 'Justice' },
+  { id: 'lives', label: 'Lives across the decades' },
   { id: 'reading', label: 'How to read' },
 ] as const;
 
@@ -49,6 +50,11 @@ export const DATA_SECTION_COPY = {
     kicker: 'Bureau of Justice Statistics and U.S. Sentencing Commission',
     title: 'Imprisonment and federal drug sentences',
     lede: 'State imprisonment rates by race, and average federal sentence lengths for crack and powder cocaine, as each agency published them.',
+  },
+  lives: {
+    kicker: 'Published census tables, 1870s to 2020s',
+    title: 'Lives across the decades',
+    lede: 'How Black, white and Hispanic Americans were spread across class, what their lives measured, and which laws were in force. Diagrams and bars come first; the numbers sit behind every chart. Laws sit beside the figures, not as their cause.',
   },
   reading: {
     kicker: 'Limits',

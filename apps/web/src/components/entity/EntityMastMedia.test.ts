@@ -6,7 +6,7 @@ import assert from 'node:assert/strict';
 import { createElement } from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
 import { test } from 'node:test';
-import { EntityMastMedia } from './EntityMastMedia.js';
+import { EntityMastMedia, RecordPhotoCredit } from './EntityMastMedia.js';
 import type { PublicEntityPrimaryImageView } from '../../data/public-seed.js';
 
 const PINNED_IMAGE: PublicEntityPrimaryImageView = {
@@ -100,4 +100,33 @@ test('EntityMastMedia omits the source link for a legacy image with no pin field
   );
   assert.match(html, /<img/);
   assert.doesNotMatch(html, /Source:/);
+});
+
+test('EntityMastMedia hideCredit omits the in-photo caption', () => {
+  const html = renderToStaticMarkup(
+    createElement(EntityMastMedia, {
+      entityId: 'ent_rosa_parks',
+      entityName: 'Rosa Parks',
+      kind: 'person',
+      primaryImage: PINNED_IMAGE,
+      hideCredit: true,
+    }),
+  );
+  assert.match(html, /<img[^>]*src="https:\/\/commons\.wikimedia\.org\/wiki\/Special:FilePath/);
+  assert.doesNotMatch(html, /ds-entity-photo__credit/);
+  assert.doesNotMatch(html, /Source: Wikimedia Commons/);
+});
+
+test('RecordPhotoCredit keeps the rights line in flow', () => {
+  const html = renderToStaticMarkup(
+    createElement(RecordPhotoCredit, {
+      entityId: 'ent_rosa_parks',
+      image: PINNED_IMAGE,
+      className: 'ds-record-mast__credit',
+    }),
+  );
+  assert.match(html, /ds-record-mast__credit/);
+  assert.match(html, /Wikimedia Commons/);
+  assert.match(html, /Source: Wikimedia Commons · CC-BY-SA-4\.0/);
+  assert.doesNotMatch(html, /<figcaption/);
 });

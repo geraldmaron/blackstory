@@ -290,6 +290,9 @@
    * `--ds-island-clearance`.
    */
   --ds-atlas-bottom-right: 246px;
+  /* Narrow instrument sheets sit above the dock; visible map above them stays hittable. */
+  --ds-atlas-dock-clearance: calc(var(--ds-space-2) + 66px);
+  --ds-atlas-sheet-peek: min(42dvh, 22.5rem);
 
   /* Fixed instrument-panel widths (map-experience lens-panel/results-rail/pin-photo-card).
      Named to match the design mock's --rail-w/--results-w; the photo card has no mock
