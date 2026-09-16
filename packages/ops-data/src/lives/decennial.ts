@@ -24,7 +24,7 @@ import {
 import { contiguousIncomeBrackets } from './acs.js';
 import type { LivesPublishedObservation } from './published-observation.js';
 
-export type LivesCensusYear = 1980 | 1990 | 2000;
+export type LivesCensusYear = 1980 | 1990 | 2000 | 2010 | 2020;
 export type LivesGeographyLevel = 'nation' | 'state';
 
 export type LivesDecennialKind =
@@ -123,6 +123,19 @@ export const LIVES_DECENNIAL_DATASETS: Readonly<Record<string, LivesDecennialDat
     sourceUrl: 'https://www.census.gov/data/datasets/2000/dec/summary-file-3.html',
     breakdownValues: ['bs21.ge00'],
   },
+  // The 2010s and 2020s take every other figure from the ACS, which has no urban/rural question.
+  // Urban residence is only ever a decennial count, so these two datasets are read for that alone
+  // (bead repo-0clax.29), each for the whole area and again for its urban geographic component.
+  '2010_SF1a': {
+    name: '2010 Census Summary File 1 (100-percent data)',
+    sourceUrl: 'https://www.census.gov/data/datasets/2010/dec/summary-file-1.html',
+    breakdownValues: ['bs32.ge00', 'bs32.ge01'],
+  },
+  '2020_DHCa': {
+    name: '2020 Census Demographic and Housing Characteristics File',
+    sourceUrl: 'https://www.census.gov/data/datasets/2020/dec/2020-census-dhc.html',
+    breakdownValues: ['bs32.ge00', 'bs32.ge01'],
+  },
 };
 
 const NATION_AND_STATE: readonly LivesGeographyLevel[] = ['nation', 'state'];
@@ -154,6 +167,19 @@ const CONDITIONS_1990: readonly LivesDecennialGroup[] = [
   { slice: 'white_nh', breakdown: WHITE_NOT_HISPANIC_1990 },
   { slice: 'hispanic', breakdown: HISPANIC_1990 },
 ];
+const ONE_RACE_2010 = 'Not Hispanic or Latino: Population of one race';
+
+/**
+ * 2010 and 2020 P9 carries its own totals ("Hispanic or Latino") alongside the detail rows and
+ * separates the path with colons, so every slice here matches exactly one cell rather than summing a
+ * ' >> ' prefix the way the 2000 table does.
+ */
+const POPULATION_2010: readonly LivesDecennialGroup[] = [
+  { slice: 'black_nh', cells: `${ONE_RACE_2010}: Black or African American alone` },
+  { slice: 'white_nh', cells: `${ONE_RACE_2010}: White alone` },
+  { slice: 'hispanic', cells: 'Hispanic or Latino' },
+];
+
 const POPULATION_2000: readonly LivesDecennialGroup[] = [
   { slice: 'black_nh', cells: `Not Hispanic or Latino >> ${BLACK_ALONE_2000}` },
   { slice: 'white_nh', cells: 'Not Hispanic or Latino >> White alone' },
@@ -490,6 +516,26 @@ export const LIVES_DECENNIAL_TABLES: readonly LivesDecennialTable[] = [
     groups: [{ slice: 'hispanic' }],
     levels: NATION_AND_STATE,
   },
+  {
+    census: 2010,
+    dataset: '2010_SF1a',
+    table: 'P9',
+    code: 'H73',
+    title: 'Hispanic or Latino, and Not Hispanic or Latino by Race (total population)',
+    kind: 'urban',
+    groups: POPULATION_2010,
+    levels: NATION_AND_STATE,
+  },
+  {
+    census: 2020,
+    dataset: '2020_DHCa',
+    table: 'P9',
+    code: 'U7P',
+    title: 'Hispanic or Latino, and Not Hispanic or Latino by Race (total population)',
+    kind: 'urban',
+    groups: POPULATION_2010,
+    levels: NATION_AND_STATE,
+  },
 ];
 
 /** The IPUMS extract request for every decennial table, at the geography levels each needs. */
@@ -514,7 +560,7 @@ export function livesDecennialExtractDefinition(): Record<string, unknown> {
     datasets,
     dataFormat: 'csv_header',
     breakdownAndDataTypeLayout: 'single_file',
-    description: 'BlackStory Lives 1980-2000 census tables by race, states and nation',
+    description: 'BlackStory Lives 1980-2020 census tables by race, states and nation',
   };
 }
 
@@ -522,7 +568,7 @@ export function livesDecennialExtractDefinition(): Record<string, unknown> {
 export function readDecennialFileName(
   name: string,
 ): { readonly census: LivesCensusYear; readonly level: LivesGeographyLevel } | null {
-  const match = /_(1980|1990|2000)_(nation|state)\.csv$/.exec(name);
+  const match = /_(1980|1990|2000|2010|2020)_(nation|state)\.csv$/.exec(name);
   if (!match) return null;
   return { census: Number(match[1]) as LivesCensusYear, level: match[2] as LivesGeographyLevel };
 }
