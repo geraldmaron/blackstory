@@ -60,10 +60,10 @@ Work outward from the data. Stop at the first layer that is wrong.
    then serves prebuilt `entities.json` / `search-index.json` from the CDN instead of the
    database. The staleness guard only checks that the artifact's `releaseId` matches the live
    active-release pointer — and an in-place backfill does not change the release id, so a stale
-   artifact passes that check and keeps serving. **Any ops-data backfill must be followed by
-   `gh workflow run publish-release-catalog-artifacts.yml --ref main`.** Otherwise the daily
-   09:17 UTC tick is the only thing that will republish it, and prod serves yesterday's catalog
-   until then. Verify the artifact itself, not just the database:
+   artifact passes that check and keeps serving. **Any ops-data backfill must be followed by a
+   local run of `publish-release-catalog-artifacts.ts` (see CLAUDE.md). Do not dispatch the
+   workflow afterwards, and do not wait for a daily tick — that schedule is off as of
+   2026-09-16.** Verify the artifact itself, not just the database:
    `…/storage/v1/object/public/public-media/public/releases/{releaseId}/search-index.json`.
 6. **Is the page just stale?** Only after the artifact is confirmed current. `release-scoped-cache.ts`
    holds release-wide reads for 30 minutes and does not watch the database, so a correct fix shows

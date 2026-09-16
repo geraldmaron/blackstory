@@ -18,7 +18,9 @@
 # The upload is idempotent (x-upsert) and derived-only — it republishes a read-through cache
 # artifact, never bb_public itself — so unlike canonical-convergence-monitor.yml (which
 # deliberately stays dry-run-only ahead of a human-reviewed --apply) this is safe to run
-# unattended on every tick.
+# unattended. The daily tick is off (2026-09-16); a forgotten mutation no longer self-heals at
+# 09:17 UTC. Republish locally after a bb_public write (see CLAUDE.md). Dispatch remains if
+# there is no local environment to run it from.
 #
 # Requires HOSTED_DATABASE_URL (already set, see canonical-convergence-monitor.yml) plus
 # SUPABASE_URL and SUPABASE_SECRET_KEY (or SUPABASE_SERVICE_ROLE_KEY) repo secrets with
@@ -28,13 +30,12 @@
 name: Publish Release Catalog Artifacts
 
 on:
-  # Release data only changes when an operator runs an ops-data script by hand, so the primary
-  # trigger is a manual dispatch right after such a run. The daily tick is forgetting-insurance:
-  # it bounds worst-case artifact staleness after an unpublished mutation to ~24h instead of
-  # indefinitely. (Was */5 polling — 288 runs/day to detect a human-initiated action; see
-  # 2026-08-08 session.)
-  schedule:
-    - cron: '17 9 * * *'
+  # Release data only changes when an operator runs an ops-data script by hand, so the
+  # trigger is a manual dispatch or a local run of the same script. The daily tick
+  # ('17 9 * * *') was forgetting-insurance; it is commented out to stop the install-to-no-op
+  # spend. (Was */5 polling — 288 runs/day; slowed to daily 2026-08-08; schedule off 2026-09-16.)
+  # schedule:
+  #   - cron: '17 9 * * *'
   workflow_dispatch:
     inputs:
       force:

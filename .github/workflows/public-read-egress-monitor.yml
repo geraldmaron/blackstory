@@ -18,14 +18,17 @@
 # a return to the incident's order of magnitude, not a performance regression detector. A monitor
 # tuned tight enough to fire on ordinary cold-start variance gets muted, and a muted monitor is
 # worse than none because it still looks like coverage.
+#
+# Schedule is off (2026-09-16). The daily tick installed the monorepo to run one SQL delta
+# check. Run the script locally or dispatch this workflow when you want the alarm.
 
 name: Public Read Egress Monitor
 
 on:
   # Daily. The incident took twenty days to notice; a day's exposure is a large improvement and
   # keeps the delta window wide enough that ordinary cold-start noise does not dominate it.
-  schedule:
-    - cron: '0 7 * * *'
+  # schedule:
+  #   - cron: '0 7 * * *'
   workflow_dispatch: {}
 
 permissions:

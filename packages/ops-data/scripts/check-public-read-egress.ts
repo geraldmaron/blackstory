@@ -28,7 +28,8 @@
  *   node --conditions development --import tsx \
  *     packages/ops-data/scripts/check-public-read-egress.ts
  *
- * Scheduled run: .github/workflows/public-read-egress-monitor.yml (daily).
+ * Scheduled run: off as of 2026-09-16. `.github/workflows/public-read-egress-monitor.yml`
+ * is dispatch-only; run this script locally when you want the alarm.
  *
  * Env: DATABASE_URL (or APP_DATABASE_URL). DRY_RUN=1 reports without writing the watermark,
  * so a manual look never disturbs the scheduled baseline.
