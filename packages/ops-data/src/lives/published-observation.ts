@@ -22,6 +22,10 @@ export type LivesPublishedObservation = {
     readonly table: string;
     /** NHGIS table code the figures were extracted under. */
     readonly nhgisTable?: string;
+    /** The universe the published table counted, when it is not the series' usual one. */
+    readonly universe?: string;
+    /** What a reader has to know about this figure: a changed unit, a wider or narrower universe. */
+    readonly note?: string;
     readonly numeratorMoe?: number;
     readonly denominatorMoe?: number;
   };
