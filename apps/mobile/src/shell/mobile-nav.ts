@@ -89,14 +89,13 @@ type MoreRowPresentation = {
 };
 
 const MORE_PRESENTATION: Readonly<Record<string, MoreRowPresentation>> = Object.freeze({
-  law: { line: 'Statutes and rulings, in plain language', route: '/law', icon: 'law' },
-  data: { line: 'National series with their sources attached', route: '/data' },
-  books: { line: 'Documented challenges, with the reports cited', route: '/books' },
   memorial: { line: 'Names, held quietly', route: '/memorial' },
 
-  about: { line: 'What this is for, and what it refuses to do', route: '/about' },
+  'how-it-works': {
+    line: 'About, method, data, law, and banned books',
+    icon: 'about',
+  },
   faq: { line: 'Plain answers about how this archive works', route: '/faq' },
-  methodology: { line: 'How a record gets in, and what a grade means', route: '/methodology' },
   errata: { line: 'Mistakes the archive found and published', route: '/errata' },
 
   submit: { line: 'Point the archive at something it has missed', route: '/submit' },
@@ -138,7 +137,7 @@ const section = (
   title,
   meta,
   rows: semanticDestinationsInFamily(family)
-    .filter((destination) => destination.isPublic)
+    .filter((destination) => destination.isPublic && MORE_PRESENTATION[destination.id] !== undefined)
     .map(moreRow),
 });
 

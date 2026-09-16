@@ -1,5 +1,5 @@
 /**
- * Methodology wiring: body lives in MethodologySections; `/methodology` redirects into apparatus.
+ * Methodology wiring: body lives in MethodologySections; `/methodology` redirects into How it works.
  */
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
@@ -20,8 +20,8 @@ const pageSource = readFileSync(join(here, 'page.tsx'), 'utf8');
 const sectionsSource = readFileSync(join(here, 'MethodologySections.tsx'), 'utf8');
 const copySource = readFileSync(join(here, 'methodology-copy.ts'), 'utf8');
 
-test('methodology page redirects into the apparatus room', () => {
-  assert.match(pageSource, /permanentRedirect\('\/apparatus\?s=methodology'\)/);
+test('methodology page redirects into How it works', () => {
+  assert.match(pageSource, /permanentRedirect\('\/how-it-works\?s=methodology'\)/);
   assert.doesNotMatch(pageSource, /EditionAtmosphereMosaic|METHODOLOGY_EDITION_MOSAIC_SEED/);
 });
 

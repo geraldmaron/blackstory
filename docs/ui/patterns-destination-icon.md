@@ -1,7 +1,7 @@
 # Destination icon pattern
 
 **Status:** reusable site pattern (2026-09-15).
-**Scope:** wayfinding labels for catalog destinations (command bar, Rooms, footer, apparatus TOC, palette Go rows, room cards). Not record anatomy facts.
+**Scope:** wayfinding labels for catalog destinations (command bar, Rooms, footer, How it works TOC, palette Go rows, room cards). Not record anatomy facts.
 
 ---
 
@@ -35,7 +35,7 @@ Import happens from `DestinationIcon.tsx`. The command bar mounts it on every ro
 
 ## Adopters
 
-Command bar Find axes, Rooms menu, site footer, `/rooms` cards, About destination cards, apparatus TOC and section heads, Door archive chips, command palette Go rows, Data reading CTAs.
+Command bar Find axes, Rooms menu, site footer, `/rooms` cards, About destination cards, How it works TOC and section heads, Door archive chips, command palette Go rows, Data reading CTAs.
 
 ---
 

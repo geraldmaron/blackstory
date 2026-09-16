@@ -1,5 +1,5 @@
 /**
- * `/lives`: 308 into the apparatus Data section. Bookmarks and inbound links keep resolving.
+ * `/lives`: 308 into the how-it-works Data section. Bookmarks and inbound links keep resolving.
  */
 import type { Metadata } from 'next';
 import { permanentRedirect } from 'next/navigation';
@@ -16,5 +16,5 @@ export const metadata: Metadata = buildStaticPageMetadata({
 });
 
 export default function LivesIndexPage() {
-  permanentRedirect('/apparatus?s=lives');
+  permanentRedirect('/how-it-works?s=lives');
 }

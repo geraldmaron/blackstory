@@ -42,7 +42,9 @@
   display: flex;
   flex-wrap: wrap;
   gap: var(--ds-space-4) var(--ds-space-8);
-  margin-bottom: var(--ds-space-5);
+  margin: var(--ds-space-6) 0 var(--ds-space-5);
+  padding: var(--ds-space-4) 0;
+  border-block: var(--ds-border-width) solid var(--ds-rule);
 }
 
 .lives-controls__group {

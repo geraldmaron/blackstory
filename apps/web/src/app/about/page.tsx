@@ -1,5 +1,5 @@
 /**
- * `/about` — crawlable deep link into the apparatus About section.
+ * `/about` — crawlable deep link into the how-it-works About section.
  */
 import type { Metadata } from 'next';
 import { permanentRedirect } from 'next/navigation';
@@ -13,5 +13,5 @@ export const metadata: Metadata = buildStaticPageMetadata({
 });
 
 export default function AboutPage() {
-  permanentRedirect('/apparatus?s=about');
+  permanentRedirect('/how-it-works?s=about');
 }

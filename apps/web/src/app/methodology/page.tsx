@@ -1,5 +1,5 @@
 /**
- * `/methodology` — crawlable deep link into the apparatus Methodology section.
+ * `/methodology` — crawlable deep link into the how-it-works Methodology section.
  */
 import type { Metadata } from 'next';
 import { permanentRedirect } from 'next/navigation';
@@ -13,5 +13,5 @@ export const metadata: Metadata = buildStaticPageMetadata({
 });
 
 export default function MethodologyPage() {
-  permanentRedirect('/apparatus?s=methodology');
+  permanentRedirect('/how-it-works?s=methodology');
 }

@@ -15,11 +15,11 @@ const browseSectionsSource = readFileSync(join(here, 'LawBrowseSections.tsx'), '
 const detailPageSource = readFileSync(join(here, '[slug]', 'page.tsx'), 'utf8');
 const detailSectionsSource = readFileSync(join(here, 'LawDetailSections.tsx'), 'utf8');
 const anatomySource = readFileSync(join(here, 'LawAnatomyStrip.tsx'), 'utf8');
-const apparatusSource = readFileSync(join(here, '../apparatus/page.tsx'), 'utf8');
+const apparatusSource = readFileSync(join(here, '../how-it-works/page.tsx'), 'utf8');
 
-test('law index 308s into apparatus; browse tools keep the room kit', () => {
-  assert.match(indexPageSource, /permanentRedirect\('\/apparatus\?s=law'\)/);
-  assert.match(apparatusSource, /LawApparatusSections/);
+test('law index 308s into how-it-works; browse tools keep the room kit', () => {
+  assert.match(indexPageSource, /permanentRedirect\('\/how-it-works\?s=law'\)/);
+  assert.match(apparatusSource, /LawHubSections/);
   assert.doesNotMatch(browsePageSource, /EditionAtmosphereMosaic/);
   assert.doesNotMatch(browsePageSource, /LAW_EDITION_MOSAIC_SEED/);
   assert.doesNotMatch(browsePageSource, /data-law-edition="v6"/);

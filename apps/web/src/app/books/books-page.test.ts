@@ -15,11 +15,11 @@ const detailSource = readFileSync(join(here, '[slug]', 'page.tsx'), 'utf8');
 const browseSectionsSource = readFileSync(join(here, 'BooksBrowseSections.tsx'), 'utf8');
 const ripRowSource = readFileSync(join(here, 'BooksRipRow.tsx'), 'utf8');
 const copySource = readFileSync(join(here, 'books-copy.ts'), 'utf8');
-const apparatusSource = readFileSync(join(here, '../apparatus/page.tsx'), 'utf8');
+const apparatusSource = readFileSync(join(here, '../how-it-works/page.tsx'), 'utf8');
 
-test('books index 308s into apparatus; browse tools keep the room kit', () => {
-  assert.match(indexSource, /permanentRedirect\('\/apparatus\?s=books'\)/);
-  assert.match(apparatusSource, /BooksApparatusSections/);
+test('books index 308s into how-it-works; browse tools keep the room kit', () => {
+  assert.match(indexSource, /permanentRedirect\('\/how-it-works\?s=books'\)/);
+  assert.match(apparatusSource, /BooksHubSections/);
   assert.doesNotMatch(browseSource, /EditionAtmosphereMosaic/);
   assert.doesNotMatch(browseSource, /BOOKS_EDITION_MOSAIC_SEED/);
   assert.doesNotMatch(browseSource, /booksEditionRootClassName/);

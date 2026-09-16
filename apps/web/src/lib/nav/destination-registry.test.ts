@@ -180,7 +180,7 @@ describe('destination registry · the footer is derived, not authored', () => {
     );
     assert.deepEqual(
       destinationsInGroup('check').map((destination) => destination.path),
-      ['/apparatus', '/faq', '/errata'],
+      ['/how-it-works', '/faq', '/errata'],
     );
     assert.deepEqual(
       destinationsInGroup('take-part').map((destination) => destination.path),
@@ -200,7 +200,7 @@ describe('destination registry · the footer is derived, not authored', () => {
     const hrefs = columns.flatMap((column) => column.items.map((item) => item.href));
     const palette = browsableDestinations().map((destination) => destination.path);
     assert.ok(hrefs.includes('/stories'));
-    assert.ok(hrefs.includes('/apparatus'));
+    assert.ok(hrefs.includes('/how-it-works'));
     assert.ok(hrefs.includes('/submit'));
     assert.ok(hrefs.includes('/explore'));
     assert.ok(hrefs.includes('/records'));
@@ -225,7 +225,7 @@ describe('destination registry · the footer is derived, not authored', () => {
   });
 
   it('ships banned-books deep links without listing /banned-books', () => {
-    // `/books` 308s into the apparatus; browse tools live at `/books/browse`.
+    // `/books` 308s into How it works; browse tools live at `/books/browse`.
     assert.equal(destinationFor('/books')?.browsable, false);
     assert.equal(destinationFor('/books/browse')?.path, '/books/browse');
     const hrefs = footerColumns().flatMap((column) => column.items.map((item) => item.href));
@@ -259,7 +259,8 @@ describe('destination registry · the footer is derived, not authored', () => {
 });
 
 describe('destination registry · id lookup', () => {
-  it('resolves apparatus sections by catalog id', () => {
+  it('resolves how-it-works sections by catalog id', () => {
+    assert.equal(destinationById('how-it-works')?.path, '/how-it-works');
     assert.equal(destinationById('about')?.label, 'About');
     assert.equal(destinationById('methodology')?.icon, 'methodology');
     assert.equal(destinationById('books')?.label, 'Banned books');

@@ -29,7 +29,7 @@ const allRows = MOBILE_MORE_SECTIONS.flatMap((section) => section.rows);
 describe('MOBILE_PRIMARY_TABS', () => {
   it('is the three product axes a phone navigates between, plus More', () => {
     expect(MOBILE_PRIMARY_TABS.map((tab) => tab.label)).toEqual([
-      'Explore',
+      'Map',
       'Stories',
       'Records',
       'More',
@@ -84,16 +84,10 @@ describe('MOBILE_MORE_SECTIONS', () => {
       'Take part',
       'Policies',
     ]);
-    expect(MOBILE_MORE_SECTIONS[0]?.rows.map((row) => row.title)).toEqual([
-      'Law',
-      'Data',
-      'Banned books',
-      'Memorial',
-    ]);
+    expect(MOBILE_MORE_SECTIONS[0]?.rows.map((row) => row.title)).toEqual(['Memorial']);
     expect(MOBILE_MORE_SECTIONS[1]?.rows.map((row) => row.title)).toEqual([
-      'About',
+      'How it works',
       'Questions',
-      'Methodology',
       'Errata',
     ]);
     expect(MOBILE_MORE_SECTIONS[2]?.rows.map((row) => row.title)).toEqual([
@@ -122,8 +116,17 @@ describe('MOBILE_MORE_SECTIONS', () => {
     expect(allRows.some((row) => row.title === 'Legal')).toBe(false);
     const privacy = allRows.find((row) => row.id === 'privacy');
     expect(privacy?.destination).toEqual({ kind: 'native', route: '/privacy' });
-    const law = allRows.find((row) => row.id === 'law');
-    expect(law?.destination).toEqual({ kind: 'native', route: '/law' });
+    expect(allRows.some((row) => row.id === 'law')).toBe(false);
+    expect(allRows.some((row) => row.id === 'data')).toBe(false);
+    expect(allRows.some((row) => row.id === 'about')).toBe(false);
+  });
+
+  it('opens How it works on the web hub (no native peer screens for its chapters)', () => {
+    const hub = allRows.find((row) => row.id === 'how-it-works');
+    expect(hub?.destination).toEqual({
+      kind: 'web',
+      href: 'https://blackstory.app/how-it-works',
+    });
   });
 
   it('reaches Terms as a native screen, never a web fallback to a page that does not exist', () => {

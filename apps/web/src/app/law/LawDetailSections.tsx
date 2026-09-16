@@ -167,7 +167,7 @@ export function LawDetailSections({ snapshot, explainer, previous, next }: LawDe
         title="Records in this jurisdiction and era"
         actions={[
           { label: 'See these records', href: recordsHandoff.href, emphasis: 'copper' },
-          { label: 'Methodology', href: '/apparatus?s=methodology' },
+          { label: 'Methodology', href: '/how-it-works?s=methodology' },
         ]}
       >
         {recordsHandoff.reason}

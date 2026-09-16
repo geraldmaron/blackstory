@@ -1,5 +1,5 @@
 /**
- * Law catalog browse tools at `/law/browse`. The apparatus Law section is the default
+ * Law catalog browse tools at `/law/browse`. The how-it-works Law section is the default
  * visitor journey; this route keeps filters, search, and the full index.
  */
 import type { Metadata } from 'next';

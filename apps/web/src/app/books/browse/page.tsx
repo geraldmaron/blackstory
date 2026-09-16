@@ -1,5 +1,5 @@
 /**
- * Banned-books catalog browse tools at `/books/browse`. The apparatus Banned books section is
+ * Banned-books catalog browse tools at `/books/browse`. The how-it-works Banned books section is
  * the default visitor journey; this route keeps search, facets, and the full index.
  */
 import type { Metadata } from 'next';
@@ -51,7 +51,7 @@ export default async function BooksBrowsePage({ searchParams }: BooksBrowsePageP
         <Notice tone="warning" title="The catalog snapshot is unavailable">
           We could not load the challenged-books catalog just now. Nothing documented here is lost;
           this is a fault on our side. Please check back shortly, or read the{' '}
-          <Link href="/apparatus?s=methodology">methodology</Link> for how this catalog is built.
+          <Link href="/how-it-works?s=methodology">methodology</Link> for how this catalog is built.
         </Notice>
         <WalkOffRamp>This list is national. It does not invent a join to a place.</WalkOffRamp>
       </Room>
@@ -87,7 +87,7 @@ export default async function BooksBrowsePage({ searchParams }: BooksBrowsePageP
       where="Challenged titles, cited from public reports"
       moves={[
         ...topStates,
-        { label: 'How this catalog is built', href: '/apparatus?s=methodology' },
+        { label: 'How this catalog is built', href: '/how-it-works?s=methodology' },
       ].slice(0, 3)}
     />
   );

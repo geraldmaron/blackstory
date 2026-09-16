@@ -178,7 +178,7 @@ const WEB_PRESENTATION: Readonly<Record<string, WebPresentation>> = Object.freez
   'law-browse': {
     kind: 'BROWSE',
     menuLine: 'Filter the law catalog',
-    // Escape hatch: reachable from apparatus, not Rooms cards.
+    // Escape hatch: reachable from how-it-works, not Rooms cards.
   },
   'books-browse': {
     kind: 'BROWSE',
@@ -196,8 +196,8 @@ const WEB_PRESENTATION: Readonly<Record<string, WebPresentation>> = Object.freez
     menuLine: 'What this refuses to do',
     crawl: { changeFrequency: 'monthly', priority: 0.5 },
   },
-  apparatus: {
-    kind: 'APPARATUS',
+  'how-it-works': {
+    kind: 'TRUST',
     menuLine: 'How the archive works',
     crawl: { changeFrequency: 'monthly', priority: 0.7 },
   },
@@ -260,7 +260,7 @@ const WEB_PRESENTATION: Readonly<Record<string, WebPresentation>> = Object.freez
   // this is NOT paired with a robots.txt Disallow.
   'design-system': { noIndex: true },
   lives: { noIndex: true },
-  // `/lives` 308s into `/apparatus?s=lives`. Stay out of the sitemap: the figures are
+  // `/lives` 308s into `/how-it-works?s=lives`. Stay out of the sitemap: the figures are
   // already reachable from the crawled Data section. noIndex on the redirect pages
   // keeps inbound links from resurrecting the old address.
 });

@@ -44,7 +44,7 @@ This **amends** v9’s “The map is the product. Everything else floats over it
 |---|---|
 | Relationship graph | Meaning: typed edges among place, person, event, institution, story, claim, evidence, source, law, data |
 | Atlas / map | Spatial spine for discovering and situating those relationships |
-| Evidence apparatus | Trust: what is known, how, and with what precision |
+| Evidence apparatus | Trust layer (product concept): what is known, how, and with what precision. Not a route name; the public hub is `/how-it-works`. |
 | Stories | Narrative traversal of selected edges and places |
 | Records / Library | Non-spatial and reference traversal of the same archive |
 
@@ -122,7 +122,7 @@ Emitted by `apps/web/src/lib/nav/surface-classes.ts`. v10 locks this as the live
 | Class | Routes (current code) |
 |---|---|
 | `door` | `/`, `/explore` (browse posture of the same map) |
-| `reading` | `/records`, `/stories`, `/books`, `/law`, `/data`, `/memorial`, `/about`, `/methodology`, `/errata`, `/rooms`, `/lives`, `/apparatus`, … |
+| `reading` | `/records`, `/stories`, `/books`, `/law`, `/data`, `/memorial`, `/about`, `/methodology`, `/errata`, `/rooms`, `/lives`, `/how-it-works`, … |
 | `instrument` | *(none — kept in the type union; browse is Door + Live gestures)* |
 | `record` | `/place/*`, `/entity/*` (redirect), `/books/*`, `/law/*` |
 | `utility` | corrections, submit, support, privacy, design-system, mosaic-credits |

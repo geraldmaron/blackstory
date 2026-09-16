@@ -1,5 +1,5 @@
 /**
- * Shareable URL state for Lives Across the Decades, now a Data section on `/apparatus`.
+ * Shareable URL state for Lives Across the Decades, now a Data section on `/how-it-works`.
  * Pure parse/serialize so the server page and the client timeline read and write the same shape,
  * and a copied link reopens the same view.
  *
@@ -32,7 +32,7 @@ export const DEFAULT_LIVES_VIEW: LivesViewState = {
   decade: LIVES_DECADES[0],
 };
 
-export const LIVES_CANONICAL_PATH = '/apparatus';
+export const LIVES_CANONICAL_PATH = '/how-it-works';
 
 export type RawLivesSearchParams = Readonly<Record<string, string | readonly string[] | undefined>>;
 

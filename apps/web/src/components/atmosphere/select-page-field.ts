@@ -51,7 +51,7 @@ function isRecordSurface(path: string): boolean {
 }
 
 function resolveMotifId(path: string): PageFieldMotifId {
-  if (matchesRoutePrefix(path, '/data')) {
+  if (matchesRoutePrefix(path, '/data') || matchesRoutePrefix(path, '/how-it-works')) {
     return 'ledger';
   }
 

@@ -1,13 +1,15 @@
 /**
- * Apparatus room layout: section TOC and chapter rhythm for `/apparatus`.
+ * How it works hub: chapter TOC and section rhythm shared by About, Methodology, Data, Law,
+ * and Banned books.
  */
-.ds-apparatus-toc {
+
+.ds-hub-toc {
   margin: var(--ds-space-5) 0 var(--ds-space-7);
   padding: var(--ds-space-4) 0;
   border-block: var(--ds-border-width) solid var(--ds-rule);
 }
 
-.ds-apparatus-toc ul {
+.ds-hub-toc ul {
   list-style: none;
   margin: 0;
   padding: 0;
@@ -16,7 +18,7 @@
   gap: var(--ds-space-3) var(--ds-space-5);
 }
 
-.ds-apparatus-toc a {
+.ds-hub-toc a {
   display: inline-flex;
   align-items: center;
   gap: 0.4em;
@@ -26,23 +28,41 @@
   letter-spacing: 0.02em;
 }
 
-.ds-apparatus-toc a:hover,
-.ds-apparatus-toc a:focus-visible {
+.ds-hub-toc a:hover,
+.ds-hub-toc a:focus-visible {
   color: var(--ds-accent-text, var(--ds-accent));
 }
 
-.ds-apparatus-toc a:focus-visible {
+.ds-hub-toc a:focus-visible {
   outline: 2px solid var(--ds-focus-ring, var(--ds-accent-graphic));
   outline-offset: 2px;
 }
 
-.ds-apparatus-section {
+.ds-hub-section {
   margin-block-start: var(--ds-space-section-md, var(--ds-space-8));
   padding-block-start: var(--ds-space-6);
   border-top: var(--ds-border-width) solid var(--ds-rule);
   scroll-margin-top: var(--ds-island-clearance, 5rem);
 }
 
-.ds-apparatus-section:first-of-type {
+.ds-hub-section:first-of-type {
   margin-block-start: var(--ds-space-6);
+}
+
+.ds-hub-section__act {
+  display: inline-block;
+  margin: 0 0 var(--ds-space-2);
+  font-family: var(--ds-font-mono);
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ds-accent-text, var(--ds-accent));
+}
+
+.ds-hub-section__head {
+  margin-bottom: var(--ds-space-5);
+}
+
+.ds-hub-section__head .ds-room-grouphd {
+  margin-bottom: var(--ds-space-3);
 }

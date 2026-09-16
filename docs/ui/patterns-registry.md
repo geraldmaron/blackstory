@@ -126,9 +126,9 @@ Relative imports from `apps/web/src` use the paths above without the `@/` alias 
 | `/records` | Sequenced discovery list + OrientationInstrument |
 | `/stories`, `/stories/[slug]` | Reading posture; long-form chapters and short entries |
 | `/place/*`, `/invention/*` | Record posture: photo or neighborhood-zoom map hero; evidence at display scale |
-| `/apparatus` | Single apparatus room: About + Methodology inlined; Data/Law/Books chapters deep-link to browse URLs |
-| `/about`, `/methodology` | 308 into `/apparatus?s=…` |
-| `/data`, `/law`, `/books` | Interactive browse surfaces; also chapters of `/apparatus` |
+| `/how-it-works` | Single How it works room: About + Methodology inlined; Data (Counted → Lived → Measured gaps); Law/Books chapters deep-link to browse URLs |
+| `/about`, `/methodology` | 308 into `/how-it-works?s=…` |
+| `/data`, `/law`, `/books` | Deep links into How it works; Law/Books browse tools at `/law/browse`, `/books/browse` |
 | `/memorial` | Immutable memorial wall (P-01); ReadingEntry over the wall |
 | `/privacy`, `/terms`, `/corrections`, `/submit`, `/support`, `/locate`, `/errata` | Quiet supporting cast; Reading posture |
 | `/search`, `/history`, `/facts` | Redirect into `/records` (query mapped) |

@@ -1,6 +1,6 @@
 /**
- * `/data` wiring: the ledger now lives in `/apparatus#data`. This route 308s there; chart
- * sections and copy stay covered here so the apparatus composition cannot lose them.
+ * `/data` wiring: the ledger now lives in `/how-it-works#data`. This route 308s there; chart
+ * sections and copy stay covered here so the how-it-works composition cannot lose them.
  */
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
@@ -21,7 +21,7 @@ const here = dirname(fileURLToPath(import.meta.url));
 const pageSource = readFileSync(join(here, 'page.tsx'), 'utf8');
 const sectionsSource = readFileSync(join(here, 'DataSections.tsx'), 'utf8');
 const copySource = readFileSync(join(here, 'data-copy.ts'), 'utf8');
-const apparatusSource = readFileSync(join(here, '../apparatus/page.tsx'), 'utf8');
+const apparatusSource = readFileSync(join(here, '../how-it-works/page.tsx'), 'utf8');
 const loaderSource = readFileSync(join(here, 'load-data-page-model.ts'), 'utf8');
 
 const allCopy = [
@@ -38,18 +38,18 @@ const allCopy = [
   ...DATA_PAGE_SECTIONS.map((section) => section.label),
 ];
 
-test('data index 308s into the apparatus Data section', () => {
-  assert.match(pageSource, /permanentRedirect\('\/apparatus\?s=data'\)/);
+test('data index 308s into the how-it-works Data section', () => {
+  assert.match(pageSource, /permanentRedirect\('\/how-it-works\?s=data'\)/);
 });
 
-test('lives index and region pages 308 into the apparatus Lives figures', () => {
+test('lives index and region pages 308 into the how-it-works Lives figures', () => {
   const livesIndex = readFileSync(join(here, '../lives/page.tsx'), 'utf8');
   const livesRegion = readFileSync(join(here, '../lives/[region]/page.tsx'), 'utf8');
-  assert.match(livesIndex, /permanentRedirect\('\/apparatus\?s=lives'\)/);
+  assert.match(livesIndex, /permanentRedirect\('\/how-it-works\?s=lives'\)/);
   assert.match(livesRegion, /permanentRedirect\(buildLivesHref/);
 });
 
-test('apparatus inlines DataSections through the shared loader', () => {
+test('how-it-works inlines DataSections through the shared loader', () => {
   assert.match(apparatusSource, /loadDataPageModel/);
   assert.match(apparatusSource, /loadLivesAreaBundle/);
   assert.match(apparatusSource, /<DataSections/);
@@ -57,14 +57,18 @@ test('apparatus inlines DataSections through the shared loader', () => {
 });
 
 test('data sections keep census and indicator chart wiring', () => {
+  assert.match(sectionsSource, /PopulationDecadeSpine/);
   assert.match(sectionsSource, /PopulationByDecadeChart/);
   assert.match(sectionsSource, /BlackPopulationShareChart/);
+  assert.match(sectionsSource, /GapMagnitudeSight/);
   assert.match(sectionsSource, /RacePairComparisonChart/);
   assert.match(sectionsSource, /GroupedBarIndicatorChart/);
   assert.match(sectionsSource, /StatePopulationShiftChart/);
   assert.match(sectionsSource, /TrendLineChart/);
   assert.match(sectionsSource, /LivesClassSharesChart|LivesTimeline/);
+  assert.match(sectionsSource, /id="counted"/);
   assert.match(sectionsSource, /id="lives"/);
+  assert.match(sectionsSource, /id="gaps"/);
   assert.doesNotMatch(sectionsSource, /UtilityCard|ds-data-edition/);
 });
 

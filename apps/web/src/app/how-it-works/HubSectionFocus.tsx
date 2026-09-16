@@ -1,13 +1,13 @@
 /**
- * Client scroll helper: `/apparatus?s=about|methodology|data|law|books` lands on the matching
- * section after paint.
+ * Client scroll helper: `/how-it-works?s=about|methodology|data|law|books|lives` lands on the
+ * matching section after paint.
  */
 'use client';
 
 import { useEffect } from 'react';
 import { useSearchParams } from 'next/navigation';
 
-export function ApparatusSectionFocus() {
+export function HubSectionFocus() {
   const params = useSearchParams();
   useEffect(() => {
     const section = params.get('s');

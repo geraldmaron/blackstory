@@ -1,15 +1,9 @@
 /**
- * `/data` body: the headline band, the section rail, figures, Lives across the decades, and the
- * reading rules.
+ * Data chapter body: Counted → Lived → Measured gaps → How to read.
  *
- * Every figure renders through `DataChartFrame`, which is the Data Figure anatomy: label, title,
- * reading, graphic, caption, source, numbers. This file decides which figures a section holds,
- * writes each figure's reading sentence from the data it was given, and places the figures in a
- * one- or two-column grid. It draws no chart of its own.
- *
- * The section carries the as-of date once, in its head. The figure carries the source, because
- * two figures in one section can come from two agencies and a source line that names both under
- * each is a source line that names neither.
+ * Every figure renders through `DataChartFrame` (DataFigure anatomy) except Lives panels, which
+ * use `LivesFigure`. This file decides order, readings, and placement. It draws no chart of its
+ * own.
  */
 import React, { Suspense, type ReactNode } from 'react';
 import Link from 'next/link';
@@ -25,8 +19,10 @@ import type {
 import type { LivesAreaBundle } from '@repo/domain/statistics/lives';
 import { BlackPopulationShareChart } from '../../components/data/BlackPopulationShareChart';
 import { DataChartFrame } from '../../components/data/DataChartFrame';
+import { GapMagnitudeSight } from '../../components/data/GapMagnitudeSight';
 import { GroupedBarIndicatorChart } from '../../components/data/GroupedBarIndicatorChart';
 import { PopulationByDecadeChart } from '../../components/data/PopulationByDecadeChart';
+import { PopulationDecadeSpine } from '../../components/data/PopulationDecadeSpine';
 import {
   isRatioLabel,
   RacePairComparisonChart,
@@ -55,13 +51,10 @@ void React;
 
 export type DataHeadline = {
   readonly id: string;
-  /** The number, already formatted. */
   readonly value: string;
-  /** A short unit or qualifier printed small beside the value: "%", "×", "million". */
   readonly unit?: string;
   readonly label: string;
   readonly source: string;
-  /** Anchor of the figure or section that carries this number. */
   readonly href: string;
 };
 
@@ -85,8 +78,6 @@ export type DataSectionsProps = {
   readonly livesBundle: LivesAreaBundle;
   readonly livesAreaSlug: string;
 };
-
-/* —— readings: one sentence per figure, written from the data ————————————— */
 
 function formatMillions(value: number): string {
   return `${(value / 1_000_000).toLocaleString('en-US', { maximumFractionDigits: 1 })} million`;
@@ -193,12 +184,10 @@ function groupedReading(series: DataPageGroupedBarSeries): ReactNode {
   );
 }
 
-/* —— blocks ————————————————————————————————————————————————————————————————— */
-
-function Headlines({ items }: { readonly items: readonly DataHeadline[] }) {
+function OpeningBeat({ items }: { readonly items: readonly DataHeadline[] }) {
   if (items.length === 0) return null;
   return (
-    <ol className="ds-data-headlines" aria-label="Headline figures">
+    <ol className="ds-data-headlines" aria-label="Opening figures">
       {items.map((item) => (
         <li key={item.id}>
           <a className="ds-data-headline" href={item.href}>
@@ -247,7 +236,6 @@ function Section({
   );
 }
 
-/** The change ledger: recent decade deltas as a figure body, so it carries the same anatomy. */
 function DeltaFigure({
   items,
   sources,
@@ -308,8 +296,6 @@ function DeltaFigure({
   );
 }
 
-/* —— the page body —————————————————————————————————————————————————————————— */
-
 export function DataSections({
   headlines,
   timelineRows,
@@ -328,32 +314,39 @@ export function DataSections({
 
   return (
     <>
-      <Headlines items={headlines} />
+      <OpeningBeat items={headlines} />
       <DataPageNav sections={DATA_PAGE_SECTIONS} />
 
-      <Section id="population" meta={[`As of ${populationAsOf}`, '1790 to 2020, every census']}>
+      <Section id="counted" meta={[`As of ${populationAsOf}`, '1790 to 2020, every census']}>
         {hasPopulation ? (
           <div className="ds-data-section__figures">
+            <PopulationDecadeSpine
+              id="population-spine"
+              figureLabel="Figure 1"
+              rows={timelineRows}
+              sources={chartSources}
+              reading={shareReading(timelineRows)}
+            />
             <PopulationByDecadeChart
               id="population-count"
-              figureLabel="Figure 1"
+              figureLabel="Figure 2"
               rows={timelineRows}
               sources={chartSources}
               reading={populationReading(timelineRows)}
             />
             <BlackPopulationShareChart
               id="population-share"
-              figureLabel="Figure 2"
+              figureLabel="Figure 3"
               span="half"
               rows={timelineRows}
               sources={chartSources}
               reading={shareReading(timelineRows)}
             />
-            <DeltaFigure items={deltaItems} sources={chartSources} figureLabel="Figure 3" />
+            <DeltaFigure items={deltaItems} sources={chartSources} figureLabel="Figure 4" />
             {stateChanges.length > 0 ? (
               <StatePopulationShiftChart
                 id="population-states"
-                figureLabel="Figure 4"
+                figureLabel="Figure 5"
                 fromDecade="2010"
                 toDecade="2020"
                 changes={stateChanges}
@@ -365,17 +358,30 @@ export function DataSections({
           </div>
         ) : (
           <p className="ds-data-empty">
-            Census population figures are not available on this release. The indicator sections
-            below are unaffected.
+            Census population figures are not available on this release. The acts below are
+            unaffected.
           </p>
         )}
       </Section>
 
-      <Section id="wealth" meta={indicatorMeta}>
+      <Section id="lives" meta={[livesBundle.areaName, '1870s to 2020s']}>
+        <LivesAreaNav currentSlug={livesAreaSlug} />
+        <Suspense fallback={<LivesTimelineStatic bundle={livesBundle} areaSlug={livesAreaSlug} />}>
+          <LivesTimeline bundle={livesBundle} areaSlug={livesAreaSlug} />
+        </Suspense>
+      </Section>
+
+      <Section id="gaps" meta={indicatorMeta}>
         <div className="ds-data-section__figures">
+          <GapMagnitudeSight
+            id="wealth-ratio-sight"
+            figureLabel="Figure 6"
+            series={indicators.wealthComparison}
+            reading={pairReading(indicators.wealthComparison, 'held a median')}
+          />
           <RacePairComparisonChart
             id="wealth-gap"
-            figureLabel="Figure 5"
+            figureLabel="Figure 7"
             span="half"
             series={indicators.wealthComparison}
             reading={pairReading(indicators.wealthComparison, 'held a median')}
@@ -383,7 +389,7 @@ export function DataSections({
           {indicators.wealthTrend ? (
             <GroupedBarIndicatorChart
               id="wealth-trend"
-              figureLabel="Figure 6"
+              figureLabel="Figure 8"
               span="half"
               series={indicators.wealthTrend}
               reading={groupedReading(indicators.wealthTrend)}
@@ -392,26 +398,21 @@ export function DataSections({
           {indicators.wealthRatioLongArc ? (
             <TrendLineChart
               id="wealth-ratio-long-arc"
-              figureLabel="Figure 7"
+              figureLabel="Figure 9"
               series={indicators.wealthRatioLongArc}
               reading={groupedReading(indicators.wealthRatioLongArc)}
             />
           ) : null}
-        </div>
-      </Section>
-
-      <Section id="housing" meta={indicatorMeta}>
-        <div className="ds-data-section__figures">
           <GroupedBarIndicatorChart
             id="housing-ownership"
-            figureLabel="Figure 8"
+            figureLabel="Figure 10"
             span="half"
             series={indicators.cookHomeownership}
             reading={groupedReading(indicators.cookHomeownership)}
           />
           <GroupedBarIndicatorChart
             id="housing-denials"
-            figureLabel="Figure 9"
+            figureLabel="Figure 11"
             span="half"
             series={indicators.hmdaDenialRates}
             reading={groupedReading(indicators.hmdaDenialRates)}
@@ -419,44 +420,38 @@ export function DataSections({
           {indicators.nationalHomeownershipLongArc ? (
             <TrendLineChart
               id="housing-ownership-long-arc"
-              figureLabel="Figure 10"
+              figureLabel="Figure 12"
               series={indicators.nationalHomeownershipLongArc}
               reading={groupedReading(indicators.nationalHomeownershipLongArc)}
             />
           ) : null}
           <RacePairComparisonChart
             id="housing-cost-burden"
-            figureLabel="Figure 11"
+            figureLabel="Figure 13"
             series={indicators.costBurdenComparison}
             reading={pairReading(indicators.costBurdenComparison, 'cost-burdened at')}
           />
-        </div>
-      </Section>
-
-      <Section id="justice" meta={indicatorMeta}>
-        <div className="ds-data-section__figures">
+          <GapMagnitudeSight
+            id="justice-ratio-sight"
+            figureLabel="Figure 14"
+            series={indicators.imprisonmentComparison}
+            reading={pairReading(indicators.imprisonmentComparison, 'imprisoned at')}
+          />
           <RacePairComparisonChart
             id="justice-imprisonment"
-            figureLabel="Figure 12"
+            figureLabel="Figure 15"
             span="half"
             series={indicators.imprisonmentComparison}
             reading={pairReading(indicators.imprisonmentComparison, 'imprisoned at')}
           />
           <GroupedBarIndicatorChart
             id="justice-sentences"
-            figureLabel="Figure 13"
+            figureLabel="Figure 16"
             span="half"
             series={indicators.federalDrugSentences}
             reading={groupedReading(indicators.federalDrugSentences)}
           />
         </div>
-      </Section>
-
-      <Section id="lives" meta={[livesBundle.areaName, '1870s to 2020s']}>
-        <LivesAreaNav currentSlug={livesAreaSlug} />
-        <Suspense fallback={<LivesTimelineStatic bundle={livesBundle} areaSlug={livesAreaSlug} />}>
-          <LivesTimeline bundle={livesBundle} areaSlug={livesAreaSlug} />
-        </Suspense>
       </Section>
 
       <Section id="reading" meta={[]}>

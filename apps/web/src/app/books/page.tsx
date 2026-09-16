@@ -1,5 +1,5 @@
 /**
- * `/books` — crawlable deep link into the apparatus Banned books section.
+ * `/books` — crawlable deep link into the how-it-works Banned books section.
  *
  * Query-bearing arrivals (legacy browse bookmarks) forward to `/books/browse` with the same
  * params so filters are not lost.
@@ -44,5 +44,5 @@ export default async function BooksPage({ searchParams }: BooksPageProps) {
     const query = search.toString();
     redirect(query.length > 0 ? `/books/browse?${query}` : '/books/browse');
   }
-  permanentRedirect('/apparatus?s=books');
+  permanentRedirect('/how-it-works?s=books');
 }

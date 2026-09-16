@@ -1,7 +1,7 @@
 /**
  * SP-11c acceptance: banned-books catalog browse on the v9 room kit.
  *
- * Browse tools live at `/books/browse`; the `/books` index 308s into apparatus.
+ * Browse tools live at `/books/browse`; the `/books` index 308s into How it works.
  */
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
@@ -79,7 +79,7 @@ test('no link on the catalog page points at /history or another redirect endpoin
 });
 
 test('the unavailable-snapshot notice and the no-results empty state carry different copy', () => {
-  assert.match(indexSource, /permanentRedirect\('\/apparatus\?s=books'\)/);
+  assert.match(indexSource, /permanentRedirect\('\/how-it-works\?s=books'\)/);
   assert.match(browsePageSource, /Notice/);
   assert.match(browsePageSource, /snapshot is unavailable/);
   assert.doesNotMatch(browsePageSource, /No titles matched/);

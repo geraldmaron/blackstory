@@ -269,8 +269,8 @@ export function LawBrowseSections({ view, catalog }: LawBrowseSectionsProps) {
           legal aid organization.
         </p>
         <p>
-          <Link href="/apparatus?s=methodology">Methodology</Link> ·{' '}
-          <Link href="/apparatus?s=about">About</Link>
+          <Link href="/how-it-works?s=methodology">Methodology</Link> ·{' '}
+          <Link href="/how-it-works?s=about">About</Link>
         </p>
       </Prose>
     </>

@@ -1,5 +1,5 @@
 /**
- * Shared loader for the Data ledger figures. Used by `/apparatus#data` (canonical) and kept
+ * Shared loader for the Data ledger figures. Used by `/how-it-works#data` (canonical) and kept
  * colocated with the DataSections props so headline math stays in one place.
  */
 import { US_STATES } from '@repo/domain/map/geography';
@@ -35,7 +35,7 @@ function formatAsOf(value: string | undefined): string {
 
 /**
  * The Data section's own content. The Lives bundle is NOT part of it: /lives folded into the
- * apparatus room, and the apparatus page loads the reader's chosen area alongside this model and
+ * how-it-works room, and the how-it-works page loads the reader's chosen area alongside this model and
  * passes it to `DataSections` itself. Typing `sections` as the full props would claim this loader
  * supplies an area bundle it never reads.
  */

@@ -1,5 +1,5 @@
 /**
- * `/lives/[region]`: 308 into the apparatus Lives figures, carrying the area and view query.
+ * `/lives/[region]`: 308 into the how-it-works Lives figures, carrying the area and view query.
  */
 import type { Metadata } from 'next';
 import { notFound, permanentRedirect } from 'next/navigation';

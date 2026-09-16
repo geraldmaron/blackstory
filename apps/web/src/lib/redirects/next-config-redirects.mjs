@@ -78,6 +78,10 @@ export function redirectsForNextConfig() {
     // `/library` is the old name for Rooms.
     { source: '/library', destination: '/rooms', permanent: true },
 
+    // `/apparatus` was the jargon slug for How it works. Query (`?s=`, Lives params) is preserved
+    // by Next on permanent redirects that omit their own query string.
+    { source: '/apparatus', destination: '/how-it-works', permanent: true },
+
     // The inventions index is the Records kind filter, not a second catalog.
     { source: '/inventions', destination: '/records?kind=inventions', permanent: true },
 

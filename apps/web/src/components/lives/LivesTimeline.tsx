@@ -14,6 +14,7 @@ import {
   parseLivesSearchParams,
   type LivesViewState,
 } from '../../lib/lives/lives-url-state';
+import { LivesClassArcChart } from './LivesClassArcChart';
 import { LivesDecadePanel } from './LivesDecadePanel';
 import { LivesDecadeRail } from './LivesDecadeRail';
 
@@ -83,6 +84,15 @@ export function LivesTimeline({ bundle, areaSlug }: LivesTimelineProps) {
 
   return (
     <div className="lives-timeline">
+      <LivesClassArcChart
+        id="lives-class-arc"
+        figureLabel="Figure L1"
+        bundle={bundle}
+        emphasis={view.race}
+        selectedDecade={decade.decade}
+        onSelectDecade={(next) => update({ decade: next as LivesViewState['decade'] })}
+      />
+
       <div className="lives-controls">
         <fieldset className="lives-controls__group">
           <legend>Emphasize</legend>

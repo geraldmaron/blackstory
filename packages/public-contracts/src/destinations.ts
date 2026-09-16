@@ -41,7 +41,7 @@ export type ProductAxis = (typeof PRODUCT_AXES)[number];
  *
  * - `axis` — a top-level product axis (the five above).
  * - `read` — another way to read the archive: the memorial wall (law, data, and books live
- *   inside the apparatus room).
+ *   inside the How it works hub).
  * - `trust` — how the archive decides, and what it got wrong.
  * - `participate` — how a reader adds to it or corrects it.
  * - `policy` — BlackStory's own product policy. Never historical Law; see `/law` versus
@@ -221,7 +221,7 @@ const DESTINATIONS: readonly SemanticDestination[] = [
     icon: 'law',
     isPublic: true,
     browsable: false,
-    description: 'Deep link into the apparatus Law section.',
+    description: 'Deep link into the How it works Law section.',
   },
   {
     id: 'data',
@@ -232,7 +232,7 @@ const DESTINATIONS: readonly SemanticDestination[] = [
     icon: 'data',
     isPublic: true,
     browsable: false,
-    description: 'Deep link into the apparatus Data section.',
+    description: 'Deep link into the How it works Data section.',
   },
   {
     id: 'books',
@@ -243,7 +243,7 @@ const DESTINATIONS: readonly SemanticDestination[] = [
     icon: 'books',
     isPublic: true,
     browsable: false,
-    description: 'Deep link into the apparatus Banned books section.',
+    description: 'Deep link into the How it works Banned books section.',
   },
   {
     id: 'law-browse',
@@ -281,16 +281,16 @@ const DESTINATIONS: readonly SemanticDestination[] = [
 
   /* ---------- understand / trust ---------- */
   {
-    id: 'apparatus',
+    id: 'how-it-works',
     label: 'How it works',
-    path: '/apparatus',
+    path: '/how-it-works',
     parent: '/rooms',
     family: 'trust',
     icon: 'about',
     isPublic: true,
     browsable: true,
     description:
-      'About, methodology, data, law, and banned books as one apparatus room for how the archive works.',
+      'About, methodology, data, law, and banned books in one room for how the archive works.',
   },
   {
     id: 'about',
@@ -301,7 +301,7 @@ const DESTINATIONS: readonly SemanticDestination[] = [
     icon: 'about',
     isPublic: true,
     browsable: false,
-    description: 'Deep link into the apparatus About section.',
+    description: 'Deep link into the How it works About section.',
   },
   {
     id: 'faq',
@@ -324,7 +324,7 @@ const DESTINATIONS: readonly SemanticDestination[] = [
     icon: 'methodology',
     isPublic: true,
     browsable: false,
-    description: 'Deep link into the apparatus Methodology section.',
+    description: 'Deep link into the How it works Methodology section.',
   },
   {
     id: 'errata',
@@ -426,7 +426,7 @@ const DESTINATIONS: readonly SemanticDestination[] = [
   },
   {
     // Lives Across the Decades. Unadvertised as its own room; the figures live in Data.
-    // `/lives` 308s into `/apparatus?s=lives`. Held out of crawl until verification
+    // `/lives` 308s into `/how-it-works?s=lives`. Held out of crawl until verification
     // (repo-0clax.14) and the public method page (repo-0clax.17).
     id: 'lives',
     label: 'Lives across the decades',
@@ -437,7 +437,7 @@ const DESTINATIONS: readonly SemanticDestination[] = [
     isPublic: false,
     browsable: false,
     description:
-      'Deep link into the apparatus Data section: class and conditions by race, decade by decade.',
+      'Deep link into the How it works Data section: class and conditions by race, decade by decade.',
   },
 ];
 
@@ -533,6 +533,13 @@ export const LEGACY_ALIASES: readonly {
     because:
       'The old `/legal` tree was historical legal reference, which is Law. Product policy was never under it; `/privacy` has always been its own address and must never be routed here.',
     subtree: true,
+  },
+  {
+    from: '/apparatus',
+    to: '/how-it-works',
+    because:
+      'Apparatus was an internal name for the How it works hub. The public label and path are How it works.',
+    subtree: false,
   },
 ];
 

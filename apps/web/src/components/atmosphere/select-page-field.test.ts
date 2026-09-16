@@ -16,13 +16,15 @@ test('map paths return null', () => {
   assert.equal(selectPageField('/explore/district'), null);
 });
 
-test('/data selects ledger with page-field asset paths', () => {
-  const selection = selectPageField('/data');
-  assert.ok(selection);
-  assert.equal(selection.motifId, 'ledger');
-  assert.equal(selection.lightPath, `${PAGE_FIELD_BASE}/ledger-light.svg`);
-  assert.equal(selection.darkPath, `${PAGE_FIELD_BASE}/ledger-dark.svg`);
-  assert.equal(selection.label, 'Horizontal ledger lines');
+test('/how-it-works and /data select ledger with page-field asset paths', () => {
+  for (const path of ['/data', '/how-it-works'] as const) {
+    const selection = selectPageField(path);
+    assert.ok(selection);
+    assert.equal(selection.motifId, 'ledger');
+    assert.equal(selection.lightPath, `${PAGE_FIELD_BASE}/ledger-light.svg`);
+    assert.equal(selection.darkPath, `${PAGE_FIELD_BASE}/ledger-dark.svg`);
+    assert.equal(selection.label, 'Horizontal ledger lines');
+  }
 });
 
 test('/history selects rules with page-field asset paths', () => {

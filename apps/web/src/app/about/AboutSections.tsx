@@ -1,5 +1,5 @@
 /**
- * About body sections — composed into `/apparatus#about` and formerly the `/about` room.
+ * About body sections — composed into `/how-it-works#about` and formerly the `/about` room.
  * No ReadingEntry here; the parent room owns the mast.
  */
 import React from 'react';
@@ -45,7 +45,7 @@ function destinationCard(destination: Destination) {
 export function AboutSections() {
   const readRooms = destinationsInGroup('read');
   const checkRooms = destinationsInGroup('check').filter(
-    (destination) => destination.path !== '/about' && destination.path !== '/apparatus',
+    (destination) => destination.path !== '/about' && destination.path !== '/how-it-works',
   );
   const takePartRooms = destinationsInGroup('take-part');
 
@@ -112,7 +112,7 @@ export function AboutSections() {
         <Prose>
           <p>
             How each of those is decided, and what the evidence grades mean, is set out in{' '}
-            <Link href="/apparatus?s=methodology">methodology</Link>. Everything the archive has
+            <Link href="/how-it-works?s=methodology">methodology</Link>. Everything the archive has
             already gotten wrong and fixed is in the <Link href="/errata">errata</Link>.
           </p>
         </Prose>

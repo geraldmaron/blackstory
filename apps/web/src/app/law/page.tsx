@@ -1,5 +1,5 @@
 /**
- * `/law` — crawlable deep link into the apparatus Law section.
+ * `/law` — crawlable deep link into the how-it-works Law section.
  *
  * Query-bearing arrivals (legacy browse bookmarks) forward to `/law/browse` with the same
  * params so filters are not lost.
@@ -42,5 +42,5 @@ export default async function LawPage({ searchParams }: LawPageProps) {
     const query = search.toString();
     redirect(query.length > 0 ? `/law/browse?${query}` : '/law/browse');
   }
-  permanentRedirect('/apparatus?s=law');
+  permanentRedirect('/how-it-works?s=law');
 }

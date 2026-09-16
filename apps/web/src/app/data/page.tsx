@@ -1,5 +1,5 @@
 /**
- * `/data` — crawlable deep link into the apparatus Data section.
+ * `/data` — crawlable deep link into the how-it-works Data section.
  */
 import type { Metadata } from 'next';
 import { permanentRedirect } from 'next/navigation';
@@ -13,5 +13,5 @@ export const metadata: Metadata = buildStaticPageMetadata({
 });
 
 export default function DataPage() {
-  permanentRedirect('/apparatus?s=data');
+  permanentRedirect('/how-it-works?s=data');
 }

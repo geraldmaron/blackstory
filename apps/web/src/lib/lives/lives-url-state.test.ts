@@ -12,9 +12,9 @@ test('empty params open the default view', () => {
   assert.deepEqual(parseLivesSearchParams({}), DEFAULT_LIVES_VIEW);
   assert.equal(
     buildLivesHref('deep-south', DEFAULT_LIVES_VIEW),
-    '/apparatus?s=lives&area=deep-south',
+    '/how-it-works?s=lives&area=deep-south',
   );
-  assert.equal(buildLivesHref('united-states', DEFAULT_LIVES_VIEW), '/apparatus?s=lives');
+  assert.equal(buildLivesHref('united-states', DEFAULT_LIVES_VIEW), '/how-it-works?s=lives');
 });
 
 test('valid params round-trip through the query string', () => {
