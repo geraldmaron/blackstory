@@ -42,7 +42,11 @@ or published, but not in a form crossed by race at this geography.
 
 ## The gaps that matter most
 
-**Work-based class, 1870 through 1930.** This is the largest single hole. Class for those seven
+**Work-based class, 1870 through 1930.** This is the largest single hole. NOTE, corrected
+2026-09-15: the line below that 1890 has no occupation table is true of NHGIS and FALSE of the
+census. 1890 published a 127-page occupations report that prints `Total white`, `Total colored` and
+`Persons of negro descent` side by side by state, and five of these seven decades turn out to have a
+state-level published table. See lives-published-sources.md. Class for those seven
 decades is supposed to come from the kinds of work the census published by race. NHGIS carries the
 full occupational classification for 1870, 1880, 1900, 1910, 1920 and 1930 — and every one of those
 tables crosses occupation by sex, age or place of birth, never by race. 1890 has no occupation table
@@ -100,6 +104,31 @@ what 1970 published.
 Count 4 tables rest on different bases by subject; the origin-or-descent question behind the
 Spanish-origin tabulations was a 5-percent item. NHGIS exposes no per-table sample-base field, so it
 must be read from the 1970 Census Users' Guide and recorded in provenance.
+
+## Transcribing these scans: what the 1913 face does to digits
+
+Verified the hard way on Table 42, by four independent passes over the same pages.
+
+**`6` and `0` are not distinguishable by eye at any magnification.** The scans are 300 dpi bitonal,
+and in this bold face the scan closes the `6`'s upper aperture, so a `6` and a `0` render as the same
+plain oval. Rendering above 300 dpi does not help and actively hurts: it interpolates, and a `9`
+up-sampled reads as `0`. Two passes disagreed on exactly one cell in 504 - Virginia's 1890 rural
+Negro count - and no amount of zoom settled it.
+
+**Arithmetic settles what the eye cannot.** That cell resolved to 518,346 because two independent
+sums land on it: Virginia's own printed row total, and the South Atlantic division line. At 518,340
+both fail by exactly 6. Any `0`/`6` disagreement should be resolved this way, never by looking
+harder.
+
+**So every transcription pass must run its own sum checks before reporting**, not spot checks:
+race rows against the geography's total, states against their division, divisions against the
+nation. These caught three wrong readings in one pass and confirmed the corrections in another.
+A pass that reports no checks has not been verified.
+
+**An OCR text layer is not a shortcut.** The 1950 Census of Agriculture volumes carry one, and it
+is unusable for figures: `?46 ?15` for 746,715, `681,'790`, `10;0` for 1950, and the state rows are
+column-scrambled. Extracting those mechanically would publish wrong numbers. Treat every one of
+these volumes as visual transcription regardless of whether text comes out of it.
 
 ## What needs transcription rather than NHGIS
 
