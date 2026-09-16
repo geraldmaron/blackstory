@@ -33,8 +33,14 @@ function formatAsOf(value: string | undefined): string {
   return date.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
 }
 
+/**
+ * The Data section's own content. The Lives bundle is NOT part of it: /lives folded into the
+ * apparatus room, and the apparatus page loads the reader's chosen area alongside this model and
+ * passes it to `DataSections` itself. Typing `sections` as the full props would claim this loader
+ * supplies an area bundle it never reads.
+ */
 export type DataPageModel = {
-  readonly sections: DataSectionsProps;
+  readonly sections: Omit<DataSectionsProps, 'livesBundle' | 'livesAreaSlug'>;
   readonly colophonFacts: readonly string[];
 };
 

@@ -524,7 +524,7 @@ test('place mast puts photo credit under the lede, not over the photograph', () 
       alt: 'Fixture photograph.',
       credit: 'Jim Roberts',
       rightsStatus: 'licensed' as const,
-      sourceSystem: 'wikimedia_commons',
+      sourceSystem: 'wikimedia_commons' as const,
       sourcePageUrl: 'https://commons.wikimedia.org/wiki/File:Rosa_Parks.jpg',
       license: 'CC-BY-SA-4.0',
     },
@@ -540,4 +540,14 @@ test('place mast puts photo credit under the lede, not over the photograph', () 
   const ledeAt = html.indexOf('ds-record-mast__lede');
   const creditAt = html.indexOf('ds-record-mast__credit');
   assert.ok(ledeAt >= 0 && creditAt > ledeAt);
+});
+
+test('archive door rooms carry destination glyphs beside the labels', () => {
+  const source = readFileSync(
+    fileURLToPath(new URL('./HomeFirstPaint.tsx', import.meta.url)),
+    'utf8',
+  );
+  assert.match(source, /function DoorRooms/);
+  assert.match(source, /DestinationIcon/);
+  assert.match(source, /destinationById\(room\.id\)/);
 });
