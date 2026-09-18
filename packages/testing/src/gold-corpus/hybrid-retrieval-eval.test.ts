@@ -2,6 +2,8 @@
  * Tests for hybrid retrieval eval harness (precision/recall/MRR gates).
  */
 import assert from 'node:assert/strict';
+import { createHash } from 'node:crypto';
+import { readFileSync } from 'node:fs';
 import { test } from 'node:test';
 import {
   DEFAULT_HYBRID_RETRIEVAL_THRESHOLDS,
@@ -20,6 +22,7 @@ const MINI_QUERY_SET: HybridRetrievalQuerySet = {
       text: 'alpha',
       category: 'name_lookup',
       relevantEntityIds: ['a', 'b'],
+      forbiddenResultIds: ['wrong-alpha'],
     },
     {
       id: 'q2',
@@ -104,4 +107,108 @@ test('duplicate results cannot inflate recall and missing result slots reduce pr
   );
   assert.equal(result.meanRecallAt5, 0.5);
   assert.equal(result.meanPrecisionAt5, 0.2);
+});
+
+test('reports forbidden retrieval results without calling other irrelevant hits identity merges', async () => {
+  const result = await runHybridRetrievalEval(MINI_QUERY_SET, ({ normalizedQuery }) =>
+    normalizedQuery === 'alpha' ? ['wrong-alpha', 'x', 'a'] : ['d', 'c'],
+  );
+  assert.equal(result.forbiddenResultRateAt5, 0.5);
+  assert.equal(result.perQuery[0]?.forbiddenResultCount, 1);
+  assert.equal(result.perQuery[1]?.forbiddenResultCount, 0);
+  assert.equal(result.byCategory.name_lookup?.forbiddenResultRateAt5, 1);
+  assert.equal(result.byCategory.place_query?.forbiddenResultRateAt5, 0);
+});
+
+test('rejects duplicated or contradictory forbidden document labels', async () => {
+  await assert.rejects(
+    runHybridRetrievalEval(
+      {
+        ...MINI_QUERY_SET,
+        queries: [{ ...MINI_QUERY_SET.queries[0]!, forbiddenResultIds: ['wrong', 'wrong'] }],
+      },
+      () => [],
+    ),
+    /Every query/,
+  );
+  await assert.rejects(
+    runHybridRetrievalEval(
+      {
+        ...MINI_QUERY_SET,
+        queries: [{ ...MINI_QUERY_SET.queries[0]!, forbiddenResultIds: ['a'] }],
+      },
+      () => [],
+    ),
+    /Every query/,
+  );
+});
+
+test('tracked held-out corpus stays blind and aligned with provisional labels and frozen predictions', () => {
+  const fixture = (name: string) =>
+    readFileSync(new URL(`./fixtures/${name}`, import.meta.url), 'utf8');
+  const blindRaw = fixture('heldout-evidence-retrieval-corpus.v1.json');
+  const predictionRaw = fixture('heldout-entailment-predictions.v1.json');
+  const blind = JSON.parse(blindRaw) as {
+    version: string;
+    documents: readonly { id: string }[];
+    retrievalCases: readonly { id: string }[];
+    entailmentCases: readonly { id: string }[];
+  };
+  const gold = JSON.parse(fixture('heldout-evidence-retrieval-gold.v1.json')) as {
+    benchmarkVersion: string;
+    labelStatus: string;
+    retrievalCases: readonly {
+      id: string;
+      relevantDocumentIds: readonly string[];
+      forbiddenDocumentIds: readonly string[];
+    }[];
+    entailmentCases: readonly { id: string }[];
+    limitations: readonly string[];
+  };
+  const predictions = JSON.parse(predictionRaw) as {
+    benchmarkVersion: string;
+    predictions: readonly { id: string }[];
+  };
+
+  assert.equal(blind.version, gold.benchmarkVersion);
+  assert.equal(blind.version, predictions.benchmarkVersion);
+  assert.equal(blind.documents.length, 6);
+  assert.equal(blind.retrievalCases.length, 20);
+  assert.equal(blind.entailmentCases.length, 14);
+  assert.deepEqual(
+    blind.retrievalCases.map(({ id }) => id),
+    gold.retrievalCases.map(({ id }) => id),
+  );
+  assert.deepEqual(
+    blind.entailmentCases.map(({ id }) => id),
+    gold.entailmentCases.map(({ id }) => id),
+  );
+  assert.deepEqual(
+    blind.entailmentCases.map(({ id }) => id),
+    predictions.predictions.map(({ id }) => id),
+  );
+  assert.ok(
+    gold.retrievalCases.every(({ relevantDocumentIds, forbiddenDocumentIds }) =>
+      forbiddenDocumentIds.every((id) => !relevantDocumentIds.includes(id)),
+    ),
+  );
+  assert.match(gold.labelStatus, /provisional/i);
+  assert.ok(gold.limitations.some((limitation) => /HNSW planner/i.test(limitation)));
+  assert.ok(gold.limitations.some((limitation) => /probability calibration/i.test(limitation)));
+  assert.ok(
+    gold.limitations.some((limitation) =>
+      /false-merge behavior remains unmeasured/i.test(limitation),
+    ),
+  );
+  assert.equal(blindRaw.includes('relevantDocumentIds'), false);
+  assert.equal(blindRaw.includes('forbiddenDocumentIds'), false);
+  assert.equal(blindRaw.includes('"expected"'), false);
+  assert.equal(
+    createHash('sha256').update(predictionRaw).digest('hex'),
+    '3c64a1c3ac5587bb8917655a24b21ba510a8bf5942f3aa2dcf94ecb02c4b99bc',
+  );
+  assert.equal(
+    createHash('sha256').update(JSON.stringify(predictions)).digest('hex'),
+    'fff08c8b8c96732bbebbad56b2ccfe5e9af1ada9557a5fe8c3faa18255afc00a',
+  );
 });

@@ -13,13 +13,24 @@ export type FusionWeights = {
 
 export const HYBRID_RETRIEVAL_QUERY_SCHEMA_VERSION = 'hybrid-retrieval-queries.v1' as const;
 
-export type HybridQueryCategory = 'name_lookup' | 'misspelling' | 'descriptive' | 'place_query';
+export type HybridQueryCategory =
+  | 'name_lookup'
+  | 'alias'
+  | 'ocr'
+  | 'misspelling'
+  | 'descriptive'
+  | 'missed_entity'
+  | 'place_query'
+  | 'relationship'
+  | 'path';
 
 export type HybridRetrievalLabeledQuery = {
   readonly id: string;
   readonly text: string;
   readonly category: HybridQueryCategory;
   readonly relevantEntityIds: readonly string[];
+  /** Adjudicated confusable result IDs that must not appear in top-k for this query. */
+  readonly forbiddenResultIds?: readonly string[];
   readonly placeAnchored?: boolean;
   readonly stateFilter?: string;
   readonly eraFilter?: string;
@@ -50,7 +61,16 @@ export type HybridRetrievalQueryResult = {
   readonly precisionAt5: number;
   readonly recallAt5: number;
   readonly reciprocalRank: number;
+  readonly forbiddenResultCount: number;
   readonly topIds: readonly string[];
+};
+
+export type HybridRetrievalCategoryMetrics = {
+  readonly queryCount: number;
+  readonly meanPrecisionAt5: number;
+  readonly meanRecallAt5: number;
+  readonly meanReciprocalRank: number;
+  readonly forbiddenResultRateAt5: number;
 };
 
 export type HybridRetrievalEvalResult = {
@@ -61,6 +81,11 @@ export type HybridRetrievalEvalResult = {
   readonly meanPrecisionAt5: number;
   readonly meanRecallAt5: number;
   readonly meanReciprocalRank: number;
+  /** Share of queries whose top-k contained an adjudicated confusable/forbidden result. */
+  readonly forbiddenResultRateAt5: number;
+  readonly byCategory: Readonly<
+    Partial<Record<HybridQueryCategory, HybridRetrievalCategoryMetrics>>
+  >;
   readonly passed: boolean;
   readonly failures: readonly string[];
   readonly perQuery: readonly HybridRetrievalQueryResult[];
@@ -94,6 +119,14 @@ function reciprocalRank(retrieved: readonly string[], relevant: ReadonlySet<stri
   const index = retrieved.findIndex((id) => relevant.has(id));
   return index >= 0 ? 1 / (index + 1) : 0;
 }
+
+type MutableCategoryAccumulator = {
+  queryCount: number;
+  precision: number;
+  recall: number;
+  reciprocalRank: number;
+  forbiddenResultQueries: number;
+};
 
 function buildFilters(
   query: HybridRetrievalLabeledQuery,
@@ -131,7 +164,9 @@ export async function runHybridRetrievalEval(
       (q) =>
         !q.text.trim() ||
         !q.relevantEntityIds.length ||
-        new Set(q.relevantEntityIds).size !== q.relevantEntityIds.length,
+        new Set(q.relevantEntityIds).size !== q.relevantEntityIds.length ||
+        new Set(q.forbiddenResultIds ?? []).size !== (q.forbiddenResultIds ?? []).length ||
+        (q.forbiddenResultIds ?? []).some((id) => q.relevantEntityIds.includes(id)),
     )
   )
     throw new Error('Every query requires text and distinct relevance labels');
@@ -142,9 +177,12 @@ export async function runHybridRetrievalEval(
   let precisionSum = 0;
   let recallSum = 0;
   let mrrSum = 0;
+  let forbiddenResultQueries = 0;
+  const categorySums = new Map<HybridQueryCategory, MutableCategoryAccumulator>();
 
   for (const query of querySet.queries) {
     const relevant = new Set(query.relevantEntityIds);
+    const forbidden = new Set(query.forbiddenResultIds ?? []);
     const normalizedQuery = query.text.trim().toLowerCase();
     const retrieved = await runner({
       normalizedQuery,
@@ -156,10 +194,26 @@ export async function runHybridRetrievalEval(
     const pAtK = precisionAtK(topIds, relevant, k);
     const rAtK = recallAtK(topIds, relevant, k);
     const rr = reciprocalRank(topIds, relevant);
+    const forbiddenResultCount = topIds.filter((id) => forbidden.has(id)).length;
 
     precisionSum += pAtK;
     recallSum += rAtK;
     mrrSum += rr;
+    if (forbiddenResultCount > 0) forbiddenResultQueries += 1;
+
+    const category = categorySums.get(query.category) ?? {
+      queryCount: 0,
+      precision: 0,
+      recall: 0,
+      reciprocalRank: 0,
+      forbiddenResultQueries: 0,
+    };
+    category.queryCount += 1;
+    category.precision += pAtK;
+    category.recall += rAtK;
+    category.reciprocalRank += rr;
+    if (forbiddenResultCount > 0) category.forbiddenResultQueries += 1;
+    categorySums.set(query.category, category);
 
     perQuery.push({
       queryId: query.id,
@@ -167,6 +221,7 @@ export async function runHybridRetrievalEval(
       precisionAt5: pAtK,
       recallAt5: rAtK,
       reciprocalRank: rr,
+      forbiddenResultCount,
       topIds,
     });
   }
@@ -175,6 +230,19 @@ export async function runHybridRetrievalEval(
   const meanPrecisionAt5 = precisionSum / queryCount;
   const meanRecallAt5 = recallSum / queryCount;
   const meanReciprocalRank = mrrSum / queryCount;
+  const forbiddenResultRateAt5 = forbiddenResultQueries / queryCount;
+  const byCategory = Object.fromEntries(
+    [...categorySums.entries()].map(([category, sums]) => [
+      category,
+      {
+        queryCount: sums.queryCount,
+        meanPrecisionAt5: sums.precision / sums.queryCount,
+        meanRecallAt5: sums.recall / sums.queryCount,
+        meanReciprocalRank: sums.reciprocalRank / sums.queryCount,
+        forbiddenResultRateAt5: sums.forbiddenResultQueries / sums.queryCount,
+      },
+    ]),
+  ) as Partial<Record<HybridQueryCategory, HybridRetrievalCategoryMetrics>>;
 
   const failures: string[] = [];
   if (meanPrecisionAt5 < thresholds.minimumPrecisionAt5) {
@@ -201,6 +269,8 @@ export async function runHybridRetrievalEval(
     meanPrecisionAt5,
     meanRecallAt5,
     meanReciprocalRank,
+    forbiddenResultRateAt5,
+    byCategory,
     passed: failures.length === 0,
     failures,
     perQuery,

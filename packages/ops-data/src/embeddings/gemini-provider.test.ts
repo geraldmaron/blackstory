@@ -13,6 +13,7 @@ test('createGeminiEmbeddingProvider requests the configured model and outputDime
     models: {
       async embedContent(params) {
         capturedParams = params;
+        assert.ok(Array.isArray(params.contents));
         return { embeddings: params.contents.map(() => ({ values: [1, 2, 3] })) };
       },
     },
@@ -34,6 +35,31 @@ test('createGeminiEmbeddingProvider requests the configured model and outputDime
     contents: ['a', 'b'],
     config: { outputDimensionality: 768, taskType: 'SEMANTIC_SIMILARITY' },
   });
+});
+
+test('gemini-embedding-2 keeps multiple texts separate when the SDK would return one combined embedding', async () => {
+  const capturedContents: Array<string | readonly string[]> = [];
+  const client: GeminiEmbedContentClient = {
+    models: {
+      async embedContent(params) {
+        capturedContents.push(params.contents);
+        if (Array.isArray(params.contents)) {
+          return { embeddings: [{ values: [999] }] };
+        }
+        return { embeddings: [{ values: [capturedContents.length] }] };
+      },
+    },
+  };
+  const provider = createGeminiEmbeddingProvider({
+    environment: { GEMINI_API_KEY: 'test-key' },
+    model: 'gemini-embedding-2',
+    clientFactory: () => client,
+  });
+
+  const result = await provider.embed(['first query', 'second query']);
+
+  assert.deepEqual(result, [[1], [2]]);
+  assert.deepEqual(capturedContents, ['first query', 'second query']);
 });
 
 test('createGeminiEmbeddingProvider throws a clear error when no API key is configured', async () => {
