@@ -126,3 +126,10 @@ packages/ops-data/fixtures/discovery-candidates/bulk-*.json
 
 # Built at deploy time: the OpenAPI spec copied out for static serving.
 apps/api-public/public/
+
+# Local transcription and verification scratch (page scans, probe output)
+.tmp-transcribe/
+.tmp-lives-verify/
+.tmp-lives-batch4-pages/
+apps/web/.tmp-lives-verify/
+:memory:.ses
