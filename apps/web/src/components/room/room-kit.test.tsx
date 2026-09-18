@@ -372,8 +372,12 @@ describe('room kit · evidence blocks', () => {
     );
     assert.match(html, /Archived copy/);
     assert.match(html, /Original source/);
-    assert.match(html, /web\.archive\.org/);
-    assert.match(html, /https:\/\/example\.gov\/record\/1/);
+    assert.ok(
+      html.includes(
+        'href="https://web.archive.org/web/20260901000000/https://example.gov/record/1"',
+      ),
+    );
+    assert.ok(html.includes('href="https://example.gov/record/1"'));
     assert.match(html, /2026-09-01/);
   });
 

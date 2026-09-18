@@ -193,7 +193,10 @@ describe('public citation archive selection', () => {
       },
       archives,
     ) as { claims: { id: string; archivedUrl?: string }[] };
-    assert.match(projected.claims[0]?.archivedUrl ?? '', /^https:\/\/web\.archive\.org/u);
+    assert.equal(
+      projected.claims[0]?.archivedUrl,
+      'https://web.archive.org/web/20260901000000/https://example.gov/record/1',
+    );
     assert.equal(projected.claims[1]?.archivedUrl, undefined);
   });
 

@@ -303,6 +303,15 @@ Command: RESEARCH_TEST_DATABASE_URL=postgresql://postgres:postgres@127.0.0.1:553
 Result: pass
 Observed: controlled HNSW preflight executed; source-filtered plans used the origin index. The current hash-bound artifact records zero remaining rows in all six temporary tables. Earlier intermediate CLI failure incorrectly required HNSW on the source-filtered plan; that assertion was corrected, not counted as a passing run.
 
+Check: Exact archived-link assertions
+Command: fnm exec --using=22 -- pnpm --filter @repo/web exec node --conditions development --import tsx --import ./test/css-stub.mjs --test src/components/room/room-kit.test.tsx
+Result: pass
+Observed: 73 tests passed; rendered archive/original links are checked against exact expected hrefs.
+
+Command: fnm exec --using=22 -- node --conditions development --import tsx --test packages/ops-data/scripts/lib/citation-archive-publication.test.ts
+Result: pass
+Observed: 12 archive selection tests passed, including exact expected pointer comparison. These replace loose URL regular-expression assertions flagged by CodeQL; no security rule was disabled.
+
 Outcome: Restored records remain readable and staff controls require a staff session.
 Surface: Chrome /records, /entity/ent_martin_luther_king_jr_001 and /admin/switches.
 Data: Restored 4,210-record active release and a synthetic local Supabase administrator.
