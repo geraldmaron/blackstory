@@ -1,11 +1,10 @@
 /**
- * Data chapter body: Counted → Lived → Measured gaps → How to read.
+ * Data chapter body: Counted → Lived (door into the Lives room) → Measured gaps → How to read.
  *
- * Every figure renders through `DataChartFrame` (DataFigure anatomy) except Lives panels, which
- * use `LivesFigure`. This file decides order, readings, and placement. It draws no chart of its
- * own.
+ * Every figure renders through `DataChartFrame` (DataFigure anatomy). This file decides order,
+ * readings, and placement. It draws no chart of its own.
  */
-import React, { Suspense, type ReactNode } from 'react';
+import React, { type ReactNode } from 'react';
 import Link from 'next/link';
 import type {
   NationalPopulationTimelineRow,
@@ -16,7 +15,6 @@ import type {
   DataPageIndicatorBundle,
   DataPageRacePairSeries,
 } from '@repo/domain/statistics/data-page-series';
-import type { LivesAreaBundle } from '@repo/domain/statistics/lives';
 import { BlackPopulationShareChart } from '../../components/data/BlackPopulationShareChart';
 import { DataChartFrame } from '../../components/data/DataChartFrame';
 import { GapMagnitudeSight } from '../../components/data/GapMagnitudeSight';
@@ -38,14 +36,13 @@ import {
   DATA_READING_LINKS,
   DATA_READING_RULES,
   DATA_SECTION_COPY,
+  DATA_SOURCE_LIBRARY_HANDOFF,
   type DataPageSectionId,
 } from './data-copy';
+import { LIVES_NATIONAL } from '@repo/domain/statistics/lives';
 import { DataPageNav } from './DataPageNav';
 import { DestinationIcon } from '../../components/patterns/DestinationIcon';
-import { LivesAreaNav } from '../../components/lives/LivesAreaNav';
-import { LivesTimeline } from '../../components/lives/LivesTimeline';
-import { LivesTimelineStatic } from '../../components/lives/LivesTimelineStatic';
-import '../lives/lives.css';
+import { buildLivesHref, DEFAULT_LIVES_VIEW } from '../../lib/lives/lives-url-state';
 
 void React;
 
@@ -75,8 +72,6 @@ export type DataSectionsProps = {
   readonly indicators: DataPageIndicatorBundle;
   readonly populationAsOf: string;
   readonly indicatorsAsOf: string;
-  readonly livesBundle: LivesAreaBundle;
-  readonly livesAreaSlug: string;
 };
 
 function formatMillions(value: number): string {
@@ -214,11 +209,17 @@ function Section({
   readonly children: ReactNode;
 }) {
   const copy = DATA_SECTION_COPY[id];
+  const sectionMeta = DATA_PAGE_SECTIONS.find((entry) => entry.id === id);
   const headingId = `${id}-heading`;
   return (
     <section className="ds-data-section" id={id} aria-labelledby={headingId}>
       <header className="ds-data-section__head">
-        <p className="ds-data-section__kicker">{copy.kicker}</p>
+        <p className="ds-data-section__kicker">
+          {sectionMeta ? (
+            <DestinationIcon id={sectionMeta.icon} className="ds-kicker-glyph" />
+          ) : null}
+          {copy.kicker}
+        </p>
         <h2 className="ds-data-section__title" id={headingId}>
           {copy.title}
         </h2>
@@ -306,8 +307,6 @@ export function DataSections({
   indicators,
   populationAsOf,
   indicatorsAsOf,
-  livesBundle,
-  livesAreaSlug,
 }: DataSectionsProps) {
   const hasPopulation = timelineRows.length > 0;
   const indicatorMeta = [`As of ${indicatorsAsOf}`];
@@ -364,11 +363,17 @@ export function DataSections({
         )}
       </Section>
 
-      <Section id="lives" meta={[livesBundle.areaName, '1870s to 2020s']}>
-        <LivesAreaNav currentSlug={livesAreaSlug} />
-        <Suspense fallback={<LivesTimelineStatic bundle={livesBundle} areaSlug={livesAreaSlug} />}>
-          <LivesTimeline bundle={livesBundle} areaSlug={livesAreaSlug} />
-        </Suspense>
+      <Section id="lives" meta={['1870s to 2020s']}>
+        <p className="ds-data-lives-entry">
+          Class shares, measured conditions, and laws in force live in their own room. The decade
+          rail continues this census spine there, with a street hatched from published tables.
+        </p>
+        <p className="ds-data-lives-entry__cta">
+          <Link href={buildLivesHref(LIVES_NATIONAL.slug, DEFAULT_LIVES_VIEW)}>
+            <DestinationIcon id="person" className="ds-kicker-glyph" />
+            Open Lives
+          </Link>
+        </p>
       </Section>
 
       <Section id="gaps" meta={indicatorMeta}>
@@ -458,11 +463,20 @@ export function DataSections({
         <ul className="ds-data-rules" aria-label="Rules for reading these figures">
           {DATA_READING_RULES.map((rule) => (
             <li key={rule.kicker} className="ds-data-rule">
-              <h3 className="ds-data-rule__kicker">{rule.kicker}</h3>
+              <h3 className="ds-data-rule__kicker">
+                <DestinationIcon id={rule.icon} className="ds-kicker-glyph" />
+                {rule.kicker}
+              </h3>
               <p className="ds-data-rule__body">{rule.body}</p>
             </li>
           ))}
         </ul>
+        <p className="ds-data-reading__handoff">
+          <Link className="ds-cta ds-cta--copper" href={DATA_SOURCE_LIBRARY_HANDOFF.href}>
+            <DestinationIcon id="source" />
+            {DATA_SOURCE_LIBRARY_HANDOFF.label}
+          </Link>
+        </p>
         <p className="ds-data-reading__links">
           {DATA_READING_LINKS.map((link, index) => (
             <Link

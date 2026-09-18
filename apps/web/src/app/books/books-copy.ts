@@ -1,16 +1,25 @@
 /**
- * User-facing copy constants for the Books v6 edition routes. Centralizes strings
- * for tests (em-dash guard) and keeps page/section JSX readable.
+ * User-facing copy for the banned-books catalog and detail rooms.
+ * Tests pin the strings that must stay checkable (census limit, affiliate, no statewide claim).
  */
 
 export const BOOKS_PAGE_DESCRIPTION =
   'Challenged and restricted titles relevant to Black history, with reported school and library challenges cited from public sources. Not a complete national census.';
+
+export const BOOKS_INDEX_LEDE =
+  'Documented removal requests against titles in schools and libraries, cited from public reports. Not a list of controversial books, and not a complete national census.';
 
 export const BOOKS_INTRO = {
   kicker: 'Reference',
   titleWarm: 'books',
   lede: 'Challenged and restricted titles tied to Black history and related reading. Each entry carries cited challenge reports and a path to buy or look up the book. Not a complete national census; status can change.',
 } as const;
+
+export const BOOKS_JUMP = [
+  { id: 'read', label: 'How to read this', icon: 'books' as const },
+  { id: 'browse', label: 'The catalog', icon: 'publication' as const },
+  { id: 'related', label: 'Keep going', icon: 'rooms' as const },
+] as const;
 
 export const BOOKS_CATALOG = {
   kicker: 'Catalog',
@@ -22,9 +31,32 @@ export const BOOKS_CATALOG = {
 } as const;
 
 export const BOOKS_ABOUT = {
-  kicker: 'About',
+  kicker: 'Limits',
   title: 'How to read this list',
-  lede: 'A title counts as currently banned or restricted here only while a cited challenge remains in reported, unknown, banned, or restricted status in that jurisdiction; challenges resolved as rescinded or retained are excluded. State codes are validated USPS abbreviations from those reports, not a claim of statewide removal. Bookshop.org links are paid affiliate links: BlackStory earns a commission on purchases made through them, and Bookshop.org supports independent bookstores.',
+  lede: 'A title is on this list while a cited challenge remains reported, unknown, banned, or restricted in that jurisdiction. Challenges that ended as rescinded or retained are not counted. State codes come from those reports. They are not a claim that a book was pulled from every school in the state.',
+} as const;
+
+export const BOOKS_READ_FACTS = [
+  {
+    title: 'Not a census',
+    body: 'This is not every challenged title in the country, and status can change after the report an entry cites.',
+    icon: 'errata' as const,
+  },
+  {
+    title: 'Cited reports',
+    body: 'Each entry names the public reports it rests on. The report is the authority; this page is the finding aid.',
+    icon: 'evidence' as const,
+  },
+  {
+    title: 'Bookshop links',
+    body: 'Some titles link to Bookshop.org through an affiliate program. A purchase through one of those links pays BlackStory a commission. That relationship never decides which titles appear.',
+    icon: 'books' as const,
+  },
+] as const;
+
+export const BOOKS_RELATED = {
+  kicker: 'Next',
+  title: 'Keep going',
 } as const;
 
 export const BOOKS_DETAIL = {

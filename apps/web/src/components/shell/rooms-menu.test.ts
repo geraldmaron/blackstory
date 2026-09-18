@@ -30,7 +30,10 @@ test('the Rooms menu rooms come from the same registry groups the hub renders', 
   assert.match(source, /ROOMS_CARD_GROUPS/);
   assert.match(source, /destinationsInGroup/);
   assert.ok(destinationsInGroup('read').some((destination) => destination.path === '/memorial'));
-  assert.ok(!destinationsInGroup('read').some((destination) => destination.path === '/books'));
+  // Banned books is a way to read the archive: it sits in the read group beside law, data, lives, memorial.
+  assert.ok(destinationsInGroup('read').some((destination) => destination.path === '/books'));
+  assert.ok(destinationsInGroup('read').some((destination) => destination.path === '/lives'));
+  assert.ok(destinationsInGroup('check').some((destination) => destination.path === '/sources'));
   // Default panel lists rooms, never the product axes — those stay in the Find pill on wide.
   // Phone map overflow may add Stories/Records via overflowFind; that is gated, not the groups.
   for (const axis of ['/explore', '/stories', '/records', '/rooms']) {

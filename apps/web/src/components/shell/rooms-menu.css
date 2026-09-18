@@ -1,6 +1,7 @@
 /**
- * The Rooms menu's panel. Sits under the bar's right end, at the overlay tier: it is a
- * reader-summoned list over whatever the surface is showing, not part of the surface.
+ * The Rooms menu's panel. Sits under the bar's right end, at the command-overlay
+ * tier: it is a reader-summoned list over whatever the surface is showing, including
+ * the memorial wall, not part of the surface.
  */
 
 .ds-roomsmenu {
@@ -44,7 +45,7 @@
 
 .ds-roomsmenu__panel {
   position: absolute;
-  z-index: var(--ds-z-modal-sheet);
+  z-index: var(--ds-z-command-overlay);
   top: calc(100% + 10px);
   right: 0;
   width: min(440px, calc(100vw - var(--ds-space-4) * 2));

@@ -165,7 +165,7 @@ export default async function BooksDetailPage({ params }: BooksDetailPageProps) 
                 <Link
                   key={state.code}
                   className="ds-books-edition__tag"
-                  href={`/books/browse?state=${encodeURIComponent(state.code)}`}
+                  href={`/books?state=${encodeURIComponent(state.code)}`}
                   title={state.name}
                 >
                   <span className="ds-visually-hidden">{state.name} </span>

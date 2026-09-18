@@ -12,6 +12,7 @@ import {
   radiusAffordanceLabel,
 } from '../../../lib/map-experience/geo-precision';
 import { resolvePublicAddressLine } from '../../../lib/geography/public-address';
+import { livedDecadeHrefForEra } from '../../../components/evidence/editorial-links';
 import type { ConfidenceTierKey } from '../../../lib/map-experience/confidence-icons';
 
 const CONFIDENCE_GRADE: Record<ConfidenceTierKey, string> = {
@@ -74,13 +75,15 @@ export function buildEntityAnatomyInputs(
   mapTone: string | undefined,
 ): EntityAnatomyInputs {
   const kindLabel = displayEncodingFor(entity.kind, mapTone).label;
-  const era = entityEraFact({
+  const eraInput = {
     ...(entity.eraBuckets !== undefined ? { eraBuckets: entity.eraBuckets } : {}),
     ...(entity.era !== undefined ? { era: entity.era } : {}),
     ...(entity.eventWindow !== undefined ? { eventWindow: entity.eventWindow } : {}),
     ...(entity.statusHistory !== undefined ? { statusHistory: entity.statusHistory } : {}),
     claims: entity.claims,
-  });
+  };
+  const era = entityEraFact(eraInput);
+  const livedDecadeHref = livedDecadeHrefForEra(eraInput);
   const evidenceTier = recordConfidenceTier(entity.claims);
   const claimCount = entity.claims.length;
   const grade = CONFIDENCE_GRADE[evidenceTier];
@@ -93,7 +96,11 @@ export function buildEntityAnatomyInputs(
     ...(mapTone !== undefined ? { mapTone } : {}),
     whereLabel: whereLabelFor(entity),
     eraLabel: era.label,
-    ...(era.href !== undefined ? { eraHref: era.href } : {}),
+    ...(livedDecadeHref !== undefined
+      ? { eraHref: livedDecadeHref }
+      : era.href !== undefined
+        ? { eraHref: era.href }
+        : {}),
     evidenceLabel,
     evidenceTier,
     confidenceTier: evidenceTier,

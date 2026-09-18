@@ -76,11 +76,12 @@ export const ROOMS_GROUP_COPY: Readonly<
   find: { heading: null, standfirst: null },
   read: {
     heading: 'Rooms for reading',
-    standfirst: 'The memorial wall.',
+    standfirst: 'Law, data, lives across the decades, banned books, and the memorial wall.',
   },
   check: {
     heading: 'How a record gets in',
-    standfirst: 'How the archive works, plain answers, and the log of what we corrected.',
+    standfirst:
+      'Origin, methods, the source library, plain answers, and the log of what was corrected.',
   },
   'take-part': {
     heading: 'Add what is missing',
@@ -162,27 +163,24 @@ const WEB_PRESENTATION: Readonly<Record<string, WebPresentation>> = Object.freez
     kind: 'REFERENCE',
     modifier: 'PLAIN LANGUAGE',
     menuLine: 'Statutes and rulings',
-    crawl: { changeFrequency: 'weekly', priority: 0.5 },
+    crawl: { changeFrequency: 'weekly', priority: 0.7 },
   },
   data: {
     kind: 'INDICATORS',
     modifier: 'TABULAR',
     menuLine: 'National series',
-    crawl: { changeFrequency: 'weekly', priority: 0.5 },
+    crawl: { changeFrequency: 'weekly', priority: 0.6 },
+  },
+  lives: {
+    kind: 'TIMELINE',
+    modifier: 'IMMERSIVE',
+    menuLine: 'Class, decade by decade',
+    crawl: { changeFrequency: 'monthly', priority: 0.6 },
   },
   books: {
     kind: 'CATALOG',
     menuLine: 'Documented challenges',
-    crawl: { changeFrequency: 'weekly', priority: 0.5 },
-  },
-  'law-browse': {
-    kind: 'BROWSE',
-    menuLine: 'Filter the law catalog',
-    // Escape hatch: reachable from how-it-works, not Rooms cards.
-  },
-  'books-browse': {
-    kind: 'BROWSE',
-    menuLine: 'Filter challenged titles',
+    crawl: { changeFrequency: 'weekly', priority: 0.6 },
   },
   memorial: {
     kind: 'NAMES',
@@ -196,11 +194,6 @@ const WEB_PRESENTATION: Readonly<Record<string, WebPresentation>> = Object.freez
     menuLine: 'What this refuses to do',
     crawl: { changeFrequency: 'monthly', priority: 0.5 },
   },
-  'how-it-works': {
-    kind: 'TRUST',
-    menuLine: 'How the archive works',
-    crawl: { changeFrequency: 'monthly', priority: 0.7 },
-  },
   faq: {
     kind: 'ANSWERS',
     menuLine: 'Plain answers',
@@ -210,6 +203,11 @@ const WEB_PRESENTATION: Readonly<Record<string, WebPresentation>> = Object.freez
     kind: 'TRANSPARENCY',
     modifier: 'RECEIPT',
     menuLine: 'How a record gets in',
+    crawl: { changeFrequency: 'monthly', priority: 0.5 },
+  },
+  sources: {
+    kind: 'PUBLISHERS',
+    menuLine: 'Where evidence comes from',
     crawl: { changeFrequency: 'monthly', priority: 0.5 },
   },
   errata: {
@@ -259,10 +257,6 @@ const WEB_PRESENTATION: Readonly<Record<string, WebPresentation>> = Object.freez
   // page's own head, where a crawler will actually read it. See the `noIndex` doc above for why
   // this is NOT paired with a robots.txt Disallow.
   'design-system': { noIndex: true },
-  lives: { noIndex: true },
-  // `/lives` 308s into `/how-it-works?s=lives`. Stay out of the sitemap: the figures are
-  // already reachable from the crawled Data section. noIndex on the redirect pages
-  // keeps inbound links from resurrecting the old address.
 });
 
 export type Destination = SemanticDestination &
@@ -322,8 +316,9 @@ export const DYNAMIC_PARENTS: readonly (readonly [string, string])[] = [
   ['/place/', '/records'],
   ['/invention/', '/records'],
   ['/entity/', '/records'],
-  ['/books/', '/books/browse'],
-  ['/law/', '/law/browse'],
+  ['/books/', '/books'],
+  ['/law/', '/law'],
+  ['/lives/', '/lives'],
 ];
 
 /**
@@ -355,8 +350,9 @@ export function destinationsInGroup(group: DestinationGroup): readonly Destinati
 }
 
 /**
- * The one room list: the same three groups as `/about`, Rooms, and the editorial footer columns.
- * Explore, Records, and Rooms itself stay off this list; Find chrome lists them separately.
+ * The one room list: the same three groups as `/rooms` and the editorial footer columns.
+ * About hands off here rather than re-listing every room. Explore, Records, and Rooms itself
+ * stay off this list; Find chrome lists them separately.
  */
 export function browsableDestinations(): readonly Destination[] {
   return ROOMS_CARD_GROUPS.flatMap((group) => destinationsInGroup(group));

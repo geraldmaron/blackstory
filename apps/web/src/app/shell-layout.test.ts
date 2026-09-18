@@ -326,4 +326,17 @@ describe('the plate is styled globally, not from the route group', () => {
       }
     }
   });
+
+  it('anchors the slotted plate in document space via a positioned body', () => {
+    // Without this, `plateBoxForSlot`'s stable document offsets resolve against the viewport
+    // and the map drifts from its MapMoment frame while the reader scrolls.
+    assert.match(shellCss, /body\s*\{[^}]*position:\s*relative/s);
+  });
+
+  it('clips the slotted plate to the same radius as the MapMoment frame', () => {
+    assert.match(
+      shellCss,
+      /\.ds-map-stage\[data-plate-slot\]\s*\{[^}]*border-radius:\s*var\(--ds-radius-md\)/s,
+    );
+  });
 });

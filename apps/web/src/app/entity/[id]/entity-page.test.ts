@@ -154,3 +154,11 @@ test('entity user-facing copy avoids em dashes on touched surfaces', () => {
     assert.doesNotMatch(source, /—/);
   }
 });
+
+test('entity record room links evidence chrome to Methodology anchors', () => {
+  assert.match(roomSource, /methodology#evidence-grades/);
+  assert.match(roomSource, /methodology#how-it-holds-together/);
+  assert.match(roomSource, /METHODOLOGY_SOURCE_LIBRARY_HREF/);
+  assert.match(roomSource, /METHODOLOGY_HOW_RECORD_GETS_IN_HREF/);
+  assert.match(sectionsSource, /METHODOLOGY_EVIDENCE_GRADES_HREF/);
+});

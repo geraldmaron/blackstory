@@ -1,9 +1,19 @@
 /**
- * `/methodology` — crawlable deep link into the how-it-works Methodology section.
+ * `/methodology` — how a record gets in. See `MethodologySections.tsx` for grade and citation
+ * components drawn from the live record-page kit.
  */
 import type { Metadata } from 'next';
-import { permanentRedirect } from 'next/navigation';
+import {
+  PublishingPrinciplesJsonLdScript,
+  TrustSiteJsonLdScript,
+} from '../../components/trust/index';
+import { TRUST_PATHS } from '../../lib/trust/site-identity';
 import { buildStaticPageMetadata } from '../../lib/seo/metadata-builders';
+import { MethodologySections } from './MethodologySections';
+import { Room } from '../../components/room';
+import '../reading-room.css';
+
+export const revalidate = 3600;
 
 export const metadata: Metadata = buildStaticPageMetadata({
   path: '/methodology',
@@ -13,5 +23,14 @@ export const metadata: Metadata = buildStaticPageMetadata({
 });
 
 export default function MethodologyPage() {
-  permanentRedirect('/how-it-works?s=methodology');
+  return (
+    <Room>
+      <TrustSiteJsonLdScript />
+      <PublishingPrinciplesJsonLdScript
+        pagePath={TRUST_PATHS.methodology}
+        pageTitle="Methodology"
+      />
+      <MethodologySections />
+    </Room>
+  );
 }

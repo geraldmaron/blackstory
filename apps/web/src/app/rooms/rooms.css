@@ -1,20 +1,27 @@
 /**
- * Rooms Hub layout. Keeps the destination list as a one-column table of contents;
- * group standfirsts name the kind of knowledge without turning the page into a settings menu.
+ * Rooms Hub layout. Destination glyphs on cards; chapter bands and jump nav come from the
+ * shared room kit so this page does not invent a second table of contents.
  */
-.ds-rooms-group {
-  margin-block: var(--ds-space-8) 0;
+
+.ds-rooms-band__standfirst {
+  margin: 0 0 var(--ds-space-5);
+  max-width: 44rem;
+  font-family: var(--ds-font-editorial);
+  font-size: var(--ds-text-body, 1rem);
+  line-height: 1.5;
+  color: var(--ds-ink-muted);
 }
 
-.ds-rooms-group__standfirst {
-  margin: 0;
-  max-width: 40rem;
-  font-family: var(--ds-font-sans);
-  font-size: var(--ds-text-sm);
-  line-height: 1.45;
-  color: var(--ds-ink-muted, var(--ds-stone, #6d675f));
+.ds-rooms-card__glyph {
+  width: 0.9em;
+  height: 0.9em;
+  margin-right: 0.5em;
+  vertical-align: -0.05em;
+  color: var(--ds-ink-subtle, var(--ds-ink-muted));
+  transition: color var(--ds-duration-fast) var(--ds-easing);
 }
 
-.ds-rooms-group .ds-room-cards {
-  margin-top: var(--ds-space-3);
+.ds-room-card:hover .ds-rooms-card__glyph,
+.ds-room-card:focus-visible .ds-rooms-card__glyph {
+  color: var(--ds-accent);
 }

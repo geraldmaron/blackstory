@@ -51,6 +51,9 @@ test('renders the measurement legend distinguishing all four dimensions (AC2)', 
   assert.match(html, /Relevance/);
   assert.match(html, /Connection strength/);
   assert.match(html, /Research coverage/);
+  assert.match(html, /href="\/methodology#evidence-grades"/);
+  assert.match(html, /href="\/methodology#how-a-record-gets-in"/);
+  assert.match(html, /href="\/methodology#where-the-evidence-comes-from"/);
 });
 
 test('leads with claim cards before the collapsed measurement legend', () => {

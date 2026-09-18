@@ -12,7 +12,9 @@
 
 import React from 'react';
 import type { ReactNode } from 'react';
+import type { DestinationIconId } from '@repo/public-contracts/destinations';
 import { cx } from '@repo/ui';
+import { DestinationIcon } from '../patterns/DestinationIcon';
 import { Breadcrumb } from './Breadcrumb';
 
 void React;
@@ -72,6 +74,7 @@ export type OrientationMove = {
   readonly label: string;
   readonly href: string;
   readonly note?: string;
+  readonly icon?: DestinationIconId;
 };
 
 export type OrientationInstrumentProps = {
@@ -111,7 +114,12 @@ export function OrientationInstrument({
           {moves.map((move) => (
             <li key={move.href}>
               <a className="ds-orientation__link" href={move.href}>
-                <span className="ds-orientation__label">{move.label}</span>
+                <span className="ds-orientation__label">
+                  {move.icon ? (
+                    <DestinationIcon id={move.icon} className="ds-kicker-glyph" />
+                  ) : null}
+                  {move.label}
+                </span>
                 {move.note ? <span className="ds-orientation__note">{move.note}</span> : null}
               </a>
             </li>

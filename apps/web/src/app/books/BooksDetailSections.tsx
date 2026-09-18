@@ -18,6 +18,14 @@ const CHALLENGE_STATUS_LABEL: Record<string, string> = {
   restricted: 'restricted',
 };
 
+const DETAIL_SECTIONS = [
+  { id: 'description', label: 'About this title' },
+  { id: 'challenges', label: 'Challenge lists' },
+  { id: 'citations', label: 'Citations' },
+  { id: 'purchase-heading', label: 'Purchase and lookup' },
+  { id: 'related', label: 'Related titles' },
+] as const;
+
 export type BooksDetailSectionsProps = {
   readonly view: Extract<BooksDetailViewModel, { readonly kind: 'ok' }>;
   readonly relatedItems: readonly BooksBrowseItem[];
@@ -29,8 +37,27 @@ export function BooksDetailSections({ view, relatedItems, placePanel }: BooksDet
   const otherPurchase = book.purchaseLinks.filter((link) => link.retailer !== 'bookshop');
   const activeChallenges = activeBookChallenges(book);
 
+  const tocSections = DETAIL_SECTIONS.filter(
+    (section) => section.id !== 'related' || relatedItems.length > 0 || book.canonicalEntityId,
+  );
+
   return (
     <>
+      <nav className="ds-law-toc" aria-labelledby="books-detail-toc-title">
+        <p className="ds-room-grouphd" id="books-detail-toc-title">
+          On this page
+        </p>
+        <ul className="ds-law-toc__list">
+          {tocSections.map((section) => (
+            <li key={section.id}>
+              <a className="ds-law-toc__link" href={`#${section.id}`}>
+                {section.label}
+              </a>
+            </li>
+          ))}
+        </ul>
+      </nav>
+
       <section className="ds-room-section" aria-labelledby="description-heading" id="description">
         <p className="ds-books-edition__panel-title">{BOOKS_DETAIL.contextKicker}</p>
         <h2 className="ds-books-edition__panel-heading" id="description-heading">
@@ -57,7 +84,7 @@ export function BooksDetailSections({ view, relatedItems, placePanel }: BooksDet
               <Link
                 key={state.code}
                 className="ds-books-edition__tag"
-                href={`/books/browse?state=${encodeURIComponent(state.code)}`}
+                href={`/books?state=${encodeURIComponent(state.code)}`}
               >
                 {state.name} · {state.code}
               </Link>
@@ -236,7 +263,7 @@ export function BooksDetailSections({ view, relatedItems, placePanel }: BooksDet
           {BOOKS_DETAIL.connectedTitle}
         </h2>
         <p className="ds-books-edition__actions">
-          <Link className="ds-cta ds-cta--ink" href="/books/browse">
+          <Link className="ds-cta ds-cta--ink" href="/books">
             All challenged titles
           </Link>
           <Link className="ds-cta ds-cta--quiet" href="/methodology">

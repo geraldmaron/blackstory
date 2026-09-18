@@ -4,6 +4,7 @@
  * rights-clearance captions, and "from their record" never print here.
  */
 import type { PublicEntityView, RelatedNeighborView } from '../data/public-seed';
+import { livedDecadeHrefForEra } from '../components/evidence/editorial-links';
 import { ERA_NOT_DOCUMENTED_LABEL, entityEraFact } from '../lib/map-experience/entity-era-facts';
 import {
   isTulsaPlace,
@@ -158,19 +159,33 @@ export function firstPaintTimeline(
  * One English when-line from real era fields. Not Active, not "in effect from",
  * not a status strip. Omit when the archive has nothing honest to say.
  */
-export function firstPaintEraLine(entity: PublicEntityView): string | undefined {
-  const era = entityEraFact({
+function eraInputFor(entity: PublicEntityView) {
+  return {
     ...(entity.eraBuckets !== undefined ? { eraBuckets: entity.eraBuckets } : {}),
     ...(entity.era !== undefined ? { era: entity.era } : {}),
     ...(entity.eventWindow !== undefined ? { eventWindow: entity.eventWindow } : {}),
     ...(entity.statusHistory !== undefined ? { statusHistory: entity.statusHistory } : {}),
     claims: entity.claims,
-  });
+  };
+}
+
+export function firstPaintEraLine(entity: PublicEntityView): string | undefined {
+  const era = entityEraFact(eraInputFor(entity));
   const label = era.label.trim();
   if (label.length === 0 || label === ERA_NOT_DOCUMENTED_LABEL) return undefined;
   if (containsInternalId(label) || isStatusChrome(label)) return undefined;
   if (/^undated$|^unknown$/i.test(label)) return undefined;
   return label;
+}
+
+/** Era label plus an optional Lived-decade href when Data carries that decade. */
+export function firstPaintEraLink(
+  entity: PublicEntityView,
+): { readonly label: string; readonly href?: string } | undefined {
+  const label = firstPaintEraLine(entity);
+  if (label === undefined) return undefined;
+  const livedHref = livedDecadeHrefForEra(eraInputFor(entity));
+  return livedHref !== undefined ? { label, href: livedHref } : { label };
 }
 
 function neighborKindGroup(kind: string): 'people' | 'places' | 'events' | 'other' {

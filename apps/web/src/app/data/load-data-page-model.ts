@@ -1,5 +1,5 @@
 /**
- * Shared loader for the Data ledger figures. Used by `/how-it-works#data` (canonical) and kept
+ * Shared loader for the Data ledger figures. Used by `/data` (canonical) and kept
  * colocated with the DataSections props so headline math stays in one place.
  */
 import { US_STATES } from '@repo/domain/map/geography';

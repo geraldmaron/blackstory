@@ -17,7 +17,11 @@ import {
   ABOUT_ORIGIN,
   ABOUT_PILLARS,
   ABOUT_REFUSALS,
+  ABOUT_ROOMS_HANDOFF,
+  ABOUT_SOURCE_LIBRARY_HANDOFF,
+  ABOUT_STANCE,
 } from './about-copy';
+import { MAKER } from '@repo/config';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const sectionsSource = readFileSync(join(here, 'AboutSections.tsx'), 'utf8');
@@ -34,9 +38,12 @@ test('the page explains the project in the maker voice before it states any rule
   // The origin section is the reason this room exists; a reader meets the person before the policy.
   assert.ok(ABOUT_ORIGIN.length >= 3, 'the origin section is more than a strapline');
   assert.match(sectionsSource, /ABOUT_ORIGIN/);
-  const originAt = sectionsSource.indexOf('ABOUT_ORIGIN');
-  const pillarsAt = sectionsSource.indexOf('ABOUT_PILLARS');
-  assert.ok(originAt < pillarsAt, 'the first person section precedes the rules');
+  const body = sectionsSource.slice(sectionsSource.indexOf('export function AboutSections'));
+  assert.ok(body.indexOf('ABOUT_ORIGIN') < body.indexOf('ABOUT_STANCE'), 'origin precedes stance');
+  assert.ok(
+    body.indexOf('ABOUT_STANCE') < body.indexOf('ABOUT_PILLARS'),
+    'stance precedes the rules',
+  );
 });
 
 test('the page invites contribution, not only reading', () => {
@@ -52,10 +59,13 @@ test('the page states what the archive refuses to do', () => {
   assert.match(sectionsSource, /ABOUT_REFUSALS/);
 });
 
-test('destinations are generated from the registry, never hardcoded', () => {
-  assert.match(sectionsSource, /destinationsInGroup/);
+test('contribution cards come from the registry; the room catalogue hands off to /rooms', () => {
+  assert.match(sectionsSource, /destinationsInGroup\('take-part'\)/);
   assert.match(sectionsSource, /cardTitleFor/);
   assert.match(sectionsSource, /DestinationIcon/);
+  assert.match(sectionsSource, /ABOUT_ROOMS_HANDOFF/);
+  assert.equal(ABOUT_ROOMS_HANDOFF.href, '/rooms');
+  assert.doesNotMatch(sectionsSource, /readRooms|checkRooms|\[\.\.\.readRooms/);
   // The old page hardcoded six links, two of them into `/history`, which is a redirect endpoint.
   assert.doesNotMatch(sectionsSource, /href="\/history"/);
   assert.doesNotMatch(sectionsSource, /ABOUT_DESTINATIONS/);
@@ -70,6 +80,32 @@ test('every multi-column rule is inside a min-width query', () => {
   // Guards the defect this rewrite fixed: three columns of prose held down to 375px.
   const beforeFirstQuery = cssSource.split('@media')[0] ?? '';
   assert.doesNotMatch(beforeFirstQuery, /grid-template-columns:\s*repeat\(/);
+});
+
+test('about links to the source library room', () => {
+  assert.match(sectionsSource, /ABOUT_SOURCE_LIBRARY_HANDOFF/);
+  assert.equal(ABOUT_SOURCE_LIBRARY_HANDOFF.href, '/sources');
+  assert.equal(ABOUT_SOURCE_LIBRARY_HANDOFF.label, 'Where the evidence comes from');
+  assert.doesNotMatch(sectionsSource, /href="\/methodology#where-the-evidence-comes-from"/);
+});
+
+test('about sections are deep-linkable through a jump nav', () => {
+  assert.match(sectionsSource, /RoomJump/);
+  assert.match(sectionsSource, /id: 'stance'/);
+  assert.match(sectionsSource, /id: 'pillars'/);
+  assert.match(sectionsSource, /id: 'refusals'/);
+  assert.match(sectionsSource, /id="origin"/);
+  assert.match(sectionsSource, /id="stance"/);
+  assert.match(sectionsSource, /RoomSection/);
+});
+
+test('about pillars and jump nav carry orientation glyphs', () => {
+  for (const pillar of ABOUT_PILLARS) {
+    assert.ok(pillar.icon, `${pillar.kicker} carries a pillar glyph`);
+  }
+  assert.match(sectionsSource, /RoomFactList/);
+  assert.match(sectionsSource, /RoomJump/);
+  assert.match(sectionsSource, /icon="source"/);
 });
 
 test('about is a room on the walk, not the old board', () => {
@@ -104,11 +140,29 @@ test('the page discloses how the long-form writing is made, including the AI use
   );
 });
 
+test('the stance names how the archive is meant, and does not hide who assembled it', () => {
+  assert.match(sectionsSource, /ABOUT_STANCE/);
+  assert.equal(ABOUT_STANCE.maker.href, MAKER.url);
+  const stance = [
+    ...ABOUT_STANCE.paragraphs,
+    ABOUT_STANCE.maker.lead,
+    ABOUT_STANCE.maker.label,
+  ].join(' ');
+  assert.match(stance, /anti-white/);
+  assert.doesNotMatch(stance, /anti-Black/);
+  assert.match(stance, /opinion/);
+  assert.match(stance, /product manager/);
+  assert.match(stance, /geralddagher\.com/);
+});
+
 test('nothing on this page speaks as an institutional "we"', () => {
   // One person runs this. A first-person plural on the about page is the one lie a reader can
   // catch immediately, and it was there in the off-ramp ("an identity with us").
   const strings = [
     ...ABOUT_ORIGIN,
+    ...ABOUT_STANCE.paragraphs,
+    ABOUT_STANCE.maker.lead,
+    ABOUT_STANCE.maker.label,
     ...ABOUT_REFUSALS,
     ...ABOUT_NEO.rules,
     ...ABOUT_NEO.human,
@@ -116,6 +170,8 @@ test('nothing on this page speaks as an institutional "we"', () => {
     ABOUT_CONTRIBUTE.lede,
     ABOUT_CONTRIBUTE.terms,
     ABOUT_CONTRIBUTE.direct,
+    ABOUT_ROOMS_HANDOFF.lede,
+    ABOUT_ROOMS_HANDOFF.label,
     ...ABOUT_PILLARS.map((pillar) => pillar.body),
   ];
   for (const value of strings) {
@@ -135,6 +191,12 @@ test('user-facing copy avoids em dashes', () => {
     ABOUT_CONTRIBUTE.lede,
     ABOUT_CONTRIBUTE.terms,
     ABOUT_CONTRIBUTE.direct,
+    ABOUT_ROOMS_HANDOFF.lede,
+    ABOUT_ROOMS_HANDOFF.label,
+    ABOUT_STANCE.heading,
+    ...ABOUT_STANCE.paragraphs,
+    ABOUT_STANCE.maker.lead,
+    ABOUT_STANCE.maker.label,
     ...ABOUT_PILLARS.flatMap((pillar) => [pillar.kicker, pillar.title, pillar.body]),
   ];
   for (const value of strings) {

@@ -526,6 +526,107 @@ export function RecordDataModelDiagram() {
   );
 }
 
+/** How a cited URL travels from discovery to a reader-facing record bibliography. */
+export function SourceLineageDiagram() {
+  const titleId = 'methodology-lineage-sketch-title';
+  const descId = 'methodology-lineage-sketch-desc';
+  const boxY = 26;
+  const boxH = 122;
+  const boxW = 148;
+  const gap = 20;
+  const stride = boxW + gap;
+  const xAt = (index: number) => 8 + index * stride;
+  const stages = [
+    {
+      step: '01',
+      title: 'Research run',
+      body: ['A bounded pass', 'finds a claim'],
+      seed: 701,
+    },
+    {
+      step: '02',
+      title: 'Capture',
+      body: ['URL fetched or', 'Wayback anchored'],
+      seed: 713,
+    },
+    {
+      step: '03',
+      title: 'Citation',
+      body: ['Publisher, URL,', 'and excerpt kept'],
+      seed: 727,
+    },
+    {
+      step: '04',
+      title: 'Record',
+      body: ['Bibliography and', 'grade on the page'],
+      seed: 741,
+    },
+  ] as const;
+
+  return (
+    <figure className="ds-mdiag" aria-labelledby={titleId} aria-describedby={descId}>
+      <figcaption className="ds-mdiag__figcaption" id={titleId}>
+        From research run to record
+      </figcaption>
+      <p className="ds-visually-hidden" id={descId}>
+        A research run finds a candidate claim, the cited URL is captured or archived, the claim
+        keeps publisher and excerpt as a citation, and the citation reaches a public record with an
+        evidence grade and bibliography.
+      </p>
+      <div className="ds-mdiag__frame">
+        <svg
+          className="ds-mdiag__svg"
+          viewBox="0 0 680 176"
+          role="img"
+          aria-hidden="true"
+          focusable="false"
+          preserveAspectRatio="xMidYMid meet"
+        >
+          <style>{SKETCH_STYLE}</style>
+          <title>Sketch: research run to capture to citation to record</title>
+          {stages.map((stage, index) => {
+            const x = xAt(index);
+            return (
+              <React.Fragment key={stage.step}>
+                <path
+                  className={index === 3 ? 'ds-mdiag__box ds-mdiag__box--accent' : 'ds-mdiag__box'}
+                  d={sketchRect(x, boxY, boxW, boxH, stage.seed)}
+                />
+                <text className="ds-mdiag__step" x={x + 14} y={boxY + 20}>
+                  {stage.step}
+                </text>
+                <text className="ds-mdiag__title" x={x + 14} y={boxY + 42}>
+                  {stage.title}
+                </text>
+                <TextLines
+                  x={x + 14}
+                  y={boxY + 62}
+                  lines={stage.body}
+                  className="ds-mdiag__body"
+                  lineHeight={18}
+                />
+              </React.Fragment>
+            );
+          })}
+          {[0, 1, 2].map((index) => (
+            <SketchArrow
+              key={index}
+              x1={xAt(index) + boxW}
+              y1={boxY + boxH / 2}
+              x2={xAt(index + 1)}
+              y2={boxY + boxH / 2}
+              seed={751 + index}
+            />
+          ))}
+          <text className="ds-mdiag__note" x={8} y={168}>
+            Every public citation keeps the publisher someone can open
+          </text>
+        </svg>
+      </div>
+    </figure>
+  );
+}
+
 /** The same catalog read three ways: a browsable list, a map, and a single record's own page. */
 export function SiteStructureDiagram() {
   const titleId = 'methodology-site-structure-sketch-title';

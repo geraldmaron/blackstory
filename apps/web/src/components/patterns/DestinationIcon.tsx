@@ -15,14 +15,19 @@ void React;
 export type DestinationIconProps = {
   readonly id: DestinationIconId;
   readonly className?: string;
-  readonly size?: 'sm' | 'md';
+  readonly size?: 'sm' | 'md' | 'lg';
 };
 
 export function DestinationIcon({ id, className, size = 'sm' }: DestinationIconProps) {
   return (
     <FontAwesomeIcon
       icon={iconWithFallback(destinationGlyphFor(id))}
-      className={cx('ds-destination-icon', size === 'md' && 'ds-destination-icon--md', className)}
+      className={cx(
+        'ds-destination-icon',
+        size === 'md' && 'ds-destination-icon--md',
+        size === 'lg' && 'ds-destination-icon--lg',
+        className,
+      )}
       aria-hidden="true"
     />
   );

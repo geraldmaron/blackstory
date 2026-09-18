@@ -1,9 +1,11 @@
 /**
- * `/rooms` — knowledge hub beyond the map (v10 Rooms Hub).
+ * `/rooms` — the archive's wayfinding hub: the ways in that are not the map.
  *
- * Cards come from `lib/nav/destination-registry.ts`, never hand-written.
- * One column of destinations reads as a table of contents, not a settings menu.
- * The way back is the same walk off-ramp every other room uses.
+ * Rooms is orientation, not immersion. It names the kinds of knowledge beyond the map and links
+ * out to each room; it is never a second period-immersion surface (that is Data) or a second
+ * record index (that is Records). Cards, groups, copy and the surface-class line all derive from
+ * the destination registry, so no route can be hand-linked or go missing. Each group is a
+ * deep-linkable band: `/rooms#read`, `/rooms#check`, `/rooms#take-part`.
  */
 import type { Metadata } from 'next';
 import React from 'react';
@@ -12,11 +14,22 @@ import {
   ROOMS_CARD_GROUPS,
   ROOMS_GROUP_COPY,
   cardTitleFor,
+  classLabelFor,
   destinationsInGroup,
+  type DestinationGroup,
 } from '../../lib/nav/destination-registry';
-import { CardGrid, GroupHeading, Room, RoomCard, ReadingEntry } from '../../components/room';
+import {
+  CardGrid,
+  Room,
+  RoomCard,
+  ReadingEntry,
+  RoomJump,
+  RoomSection,
+  roomSectionTone,
+} from '../../components/room';
 import { DestinationIcon } from '../../components/patterns/DestinationIcon';
 import { WalkOffRamp } from '../walk-off-ramp';
+import type { DestinationIconId } from '@repo/public-contracts/destinations';
 import '../reading-room.css';
 import './rooms.css';
 
@@ -26,28 +39,58 @@ export const metadata: Metadata = buildStaticPageMetadata({
   path: '/rooms',
   title: 'Rooms',
   description:
-    'What kinds of knowledge live beyond the map: stories, law, data, memorial, and the methods that keep records honest.',
+    'What kinds of knowledge live beyond the map: law, data, lives across the decades, banned books, the memorial wall, the source library, the methods that keep records honest, and the ways to add to it.',
 });
 
+const GROUP_KICKER: Readonly<Record<DestinationGroup, string>> = {
+  find: 'Find',
+  read: 'Read the archive',
+  check: 'How it decides',
+  'take-part': 'Add to it',
+};
+
+const GROUP_ICON: Readonly<Record<DestinationGroup, DestinationIconId>> = {
+  find: 'explore',
+  read: 'collection',
+  check: 'methodology',
+  'take-part': 'submit',
+};
+
 export default function RoomsPage() {
+  const jump = ROOMS_CARD_GROUPS.map((group) => ({
+    id: group,
+    label: ROOMS_GROUP_COPY[group].heading ?? GROUP_KICKER[group],
+    icon: GROUP_ICON[group],
+  }));
+
   return (
     <Room>
       <ReadingEntry
         pathname="/rooms"
-        title="Rooms"
-        lede="What kinds of knowledge live beyond the map. Each room below is a different way into the archive."
+        title={
+          <>
+            The ways in that are not the <em>map</em>.
+          </>
+        }
+        lede="Rooms is how you read the archive without the map. Each one is a different kind of knowledge: how to read it, how it decides what to trust, and how to add to what is missing."
         showCrumb={false}
       />
 
-      {ROOMS_CARD_GROUPS.map((group) => {
+      <RoomJump sections={jump} label="The rooms on this page" />
+
+      {ROOMS_CARD_GROUPS.map((group, index) => {
         const copy = ROOMS_GROUP_COPY[group];
         return (
-          <section key={group} className="ds-rooms-group" aria-labelledby={`rooms-`}>
-            <GroupHeading>
-              <span id={`rooms-`}>{copy.heading}</span>
-            </GroupHeading>
+          <RoomSection
+            key={group}
+            id={group}
+            icon={GROUP_ICON[group]}
+            kicker={GROUP_KICKER[group]}
+            title={copy.heading ?? GROUP_KICKER[group]}
+            tone={roomSectionTone(index)}
+          >
             {copy.standfirst ? (
-              <p className="ds-rooms-group__standfirst">{copy.standfirst}</p>
+              <p className="ds-rooms-band__standfirst">{copy.standfirst}</p>
             ) : null}
             <CardGrid>
               {destinationsInGroup(group).map((destination) => (
@@ -57,20 +100,21 @@ export default function RoomsPage() {
                   kind={destination.kind ?? ''}
                   title={
                     <>
-                      <DestinationIcon id={destination.icon} size="md" />
+                      <DestinationIcon id={destination.icon} className="ds-rooms-card__glyph" />
                       {cardTitleFor(destination)}
                     </>
                   }
                   description={destination.description}
+                  tag={classLabelFor(destination)}
                 />
               ))}
             </CardGrid>
-          </section>
+          </RoomSection>
         );
       })}
 
       <WalkOffRamp>
-        These rooms are the archive's. They do not invent a join to one place.
+        These rooms are the archive&apos;s. They do not invent a join to one place.
       </WalkOffRamp>
     </Room>
   );

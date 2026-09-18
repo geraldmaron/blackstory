@@ -37,6 +37,10 @@ import {
 } from '../components/entity/RecordChrome';
 import { humanizeToken } from '../components/entity/format';
 import { confidenceIconFor } from '../lib/map-experience/confidence-icons';
+import {
+  METHODOLOGY_EVIDENCE_GRADES_HREF,
+  METHODOLOGY_HOW_RECORD_GETS_IN_HREF,
+} from '../components/evidence/editorial-links';
 import { EntityRoomSections } from './entity/[id]/EntityRoomSections';
 import { toEvidenceClaimInputs, withoutSummaryEchoClaims } from './entity/[id]/adapters';
 import { placeHref } from '../lib/place/public-place-path';
@@ -45,7 +49,7 @@ import { isInternalRecordLabel, type HomeFirstPaintModel } from './home-first-pa
 import { MAP_BACK } from './walk-back-place';
 import { WalkOffRampView } from './walk-off-ramp';
 import {
-  firstPaintEraLine,
+  firstPaintEraLink,
   firstPaintLocatorName,
   firstPaintRecord,
   publishableCitingStories,
@@ -154,7 +158,7 @@ export function HomeFirstPaint({
     const geo = lead.geoAnchor ?? geoAnchorFor(lead.id);
     const citing = publishableCitingStories(model.citing);
     const rooms = selectDoorRooms(lead, citing);
-    const eraLine = firstPaintEraLine(lead);
+    const eraLink = firstPaintEraLink(lead);
     const nextPlaces = walkOnPlaces(lead, model.also);
     const collisions = placeSlugCollisionCounts([lead, ...model.also]);
     const locatorName = firstPaintLocatorName(lead);
@@ -273,9 +277,13 @@ export function HomeFirstPaint({
               <figcaption className="ds-record-mast__over">
                 <div className="ds-rec-pills" aria-label="Place at a glance">
                   <RecordKindPill kind={lead.kind} />
-                  {eraLine ? (
-                    <RecordPill tone="era" icon={recordSectionIcon('era')}>
-                      {eraLine}
+                  {eraLink ? (
+                    <RecordPill
+                      tone="era"
+                      icon={recordSectionIcon('era')}
+                      {...(eraLink.href ? { href: eraLink.href } : {})}
+                    >
+                      {eraLink.label}
                     </RecordPill>
                   ) : null}
                 </div>
@@ -406,7 +414,7 @@ export function HomeFirstPaint({
               {
                 label: 'How a record gets in',
                 value: (
-                  <Link href="/methodology" prefetch={false}>
+                  <Link href={METHODOLOGY_HOW_RECORD_GETS_IN_HREF} prefetch={false}>
                     Methodology
                   </Link>
                 ),
@@ -446,7 +454,7 @@ export function HomeFirstPaint({
               ? [{ href: returns.nextHref, label: returns.nextLabel }]
               : []),
             { href: returns.listHref, label: returns.listLabel },
-            { href: '/methodology', label: 'How a record gets in' },
+            { href: METHODOLOGY_HOW_RECORD_GETS_IN_HREF, label: 'How a record gets in' },
           ]}
         >
           {returns.positionLabel

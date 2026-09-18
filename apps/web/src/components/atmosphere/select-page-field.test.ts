@@ -16,8 +16,8 @@ test('map paths return null', () => {
   assert.equal(selectPageField('/explore/district'), null);
 });
 
-test('/how-it-works and /data select ledger with page-field asset paths', () => {
-  for (const path of ['/data', '/how-it-works'] as const) {
+test('/data and /lives select ledger with page-field asset paths', () => {
+  for (const path of ['/data', '/lives'] as const) {
     const selection = selectPageField(path);
     assert.ok(selection);
     assert.equal(selection.motifId, 'ledger');
@@ -60,6 +60,10 @@ test('about uses bands; legal and submit use pins', () => {
   const submit = selectPageField('/submit');
   assert.ok(submit);
   assert.equal(submit.motifId, 'pins');
+
+  const sources = selectPageField('/sources');
+  assert.ok(sources);
+  assert.equal(sources.motifId, 'pins');
 });
 
 test('place and entity records skip the page-field grid', () => {

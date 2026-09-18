@@ -8,13 +8,16 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
+import type { DestinationIconId } from '@repo/public-contracts/destinations';
 import { cx } from '@repo/ui';
+import { DestinationIcon } from '../../components/patterns/DestinationIcon';
 
 void React;
 
 export type DataPageNavSection = {
   readonly id: string;
   readonly label: string;
+  readonly icon: DestinationIconId;
 };
 
 export type DataPageNavProps = {
@@ -66,6 +69,7 @@ export function DataPageNav({ sections, className }: DataPageNavProps) {
               href={`#${section.id}`}
               aria-current={current === section.id ? 'location' : undefined}
             >
+              <DestinationIcon id={section.icon} className="ds-kicker-glyph" />
               {section.label}
             </a>
           </li>

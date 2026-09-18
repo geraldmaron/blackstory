@@ -1,14 +1,23 @@
 /**
- * `/books` — crawlable deep link into the how-it-works Banned books section.
- *
- * Query-bearing arrivals (legacy browse bookmarks) forward to `/books/browse` with the same
- * params so filters are not lost.
+ * Banned-books catalog at `/books`: a reading room with a how-to-read chapter, a searchable
+ * catalog, and named handoffs. The list is national. It does not invent a join to a place.
  */
 import type { Metadata } from 'next';
-import { permanentRedirect, redirect } from 'next/navigation';
+import React from 'react';
+import Link from 'next/link';
 import { buildStaticPageMetadata } from '../../lib/seo/metadata-builders';
-import { BOOKS_PAGE_DESCRIPTION } from './books-copy';
-import type { RawBooksBrowseParams } from './books-view-model';
+import { Notice } from '@repo/ui';
+import { bannedBookToSuggestCorpusItem } from '../../lib/banned-books/suggest-books.js';
+import { loadBannedBooksListing } from '../../lib/banned-books/public-source.js';
+import { buildBooksBrowseViewModel, type RawBooksBrowseParams } from './books-view-model';
+import { BooksBrowseSections } from './BooksBrowseSections';
+import { booksCatalogPulseMeta } from './BooksCatalogPulse';
+import { BOOKS_INDEX_LEDE, BOOKS_PAGE_DESCRIPTION } from './books-copy';
+import { DocumentColophon, ReadingEntry, Room } from '../../components/room';
+import { WalkOffRamp } from '../walk-off-ramp';
+import '../reading-room.css';
+
+void React;
 
 export const metadata: Metadata = buildStaticPageMetadata({
   path: '/books',
@@ -20,29 +29,40 @@ type BooksPageProps = {
   readonly searchParams: Promise<RawBooksBrowseParams>;
 };
 
-function hasBrowseParams(params: RawBooksBrowseParams): boolean {
-  return Boolean(
-    (params.q && params.q.trim()) ||
-    (params.state && params.state !== 'all') ||
-    (params.author && params.author !== 'all') ||
-    (params.sort && params.sort !== 'title') ||
-    (params.dir && params.dir !== 'asc') ||
-    (params.page && params.page !== '1'),
-  );
-}
-
 export default async function BooksPage({ searchParams }: BooksPageProps) {
   const params = await searchParams;
-  if (hasBrowseParams(params)) {
-    const search = new URLSearchParams();
-    if (params.q?.trim()) search.set('q', params.q.trim());
-    if (params.state && params.state !== 'all') search.set('state', params.state);
-    if (params.author && params.author !== 'all') search.set('author', params.author);
-    if (params.sort && params.sort !== 'title') search.set('sort', params.sort);
-    if (params.dir && params.dir !== 'asc') search.set('dir', params.dir);
-    if (params.page && params.page !== '1') search.set('page', params.page);
-    const query = search.toString();
-    redirect(query.length > 0 ? `/books/browse?${query}` : '/books/browse');
+  const snapshot = await loadBannedBooksListing();
+
+  if (snapshot.books.length === 0) {
+    return (
+      <Room>
+        <ReadingEntry pathname="/books" title="Banned books" showCrumb={false} />
+        <Notice tone="warning" title="The catalog snapshot is unavailable">
+          The challenged-books catalog did not load. Nothing documented here is lost. Check back
+          shortly, or read the <Link href="/methodology">methodology</Link> for how this catalog is
+          built.
+        </Notice>
+        <WalkOffRamp>This list is national. It does not invent a join to a place.</WalkOffRamp>
+      </Room>
+    );
   }
-  permanentRedirect('/how-it-works?s=books');
+
+  const view = buildBooksBrowseViewModel(snapshot, params);
+  const suggestCorpus = snapshot.books.map(bannedBookToSuggestCorpusItem);
+
+  return (
+    <Room>
+      <ReadingEntry
+        pathname="/books"
+        title="Banned books"
+        lede={BOOKS_INDEX_LEDE}
+        showCrumb={false}
+      />
+      <DocumentColophon facts={booksCatalogPulseMeta(snapshot)} />
+
+      <BooksBrowseSections view={view} suggestCorpus={suggestCorpus} snapshot={snapshot} />
+
+      <WalkOffRamp>This list is national. It does not invent a join to a place.</WalkOffRamp>
+    </Room>
+  );
 }

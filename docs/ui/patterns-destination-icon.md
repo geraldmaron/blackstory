@@ -1,7 +1,7 @@
 # Destination icon pattern
 
 **Status:** reusable site pattern (2026-09-15).
-**Scope:** wayfinding labels for catalog destinations (command bar, Rooms, footer, How it works TOC, palette Go rows, room cards). Not record anatomy facts.
+**Scope:** wayfinding labels for catalog destinations (command bar, Rooms, footer, room chapter plates, jump nav, palette Go rows, room cards). Not record anatomy facts.
 
 ---
 
@@ -27,7 +27,8 @@ Import happens from `DestinationIcon.tsx`. The command bar mounts it on every ro
 
 - Pair every glyph with a visible label. Color and shape never replace the word (WCAG 1.4.1).
 - Icons inherit `currentColor` so hover, current-page copper, and muted idle stay on the label.
-- Do not icon inline prose links or OffRamp place names. This pattern is for destination lists and destination CTAs.
+- Sizes: `sm` (default, inline labels), `md` (cards and headings), `lg` (chapter plates and handoffs). Do not invent a fourth size in a page stylesheet.
+- Do not icon inline prose links or OffRamp place names. This pattern is for destination lists, destination CTAs, and chapter plates.
 - Entity-kind ids (`person`, `law`, `place`, …) reuse the same glyphs as `kind-icons.ts` so a law destination and a law record do not disagree.
 - Native maps the same ids in `apps/mobile/src/ui/NavIcon.tsx`. Changing meaning requires both adapters.
 
@@ -35,7 +36,7 @@ Import happens from `DestinationIcon.tsx`. The command bar mounts it on every ro
 
 ## Adopters
 
-Command bar Find axes, Rooms menu, site footer, `/rooms` cards, About destination cards, How it works TOC and section heads, Door archive chips, command palette Go rows, Data reading CTAs.
+Command bar Find axes, Rooms menu, site footer, `/rooms` cards, About destination cards, standalone-room jump nav and chapter plates (`RoomSection`, `RoomJump`, `RoomHandoff`), Door archive chips, command palette Go rows, Data reading CTAs.
 
 ---
 

@@ -1,9 +1,16 @@
 /**
- * `/about` — crawlable deep link into the how-it-works About section.
+ * `/about` — what this is, who made it, and how to take part.
  */
 import type { Metadata } from 'next';
-import { permanentRedirect } from 'next/navigation';
+import React from 'react';
 import { buildStaticPageMetadata } from '../../lib/seo/metadata-builders';
+import { ReadingEntry, Room } from '../../components/room';
+import { ABOUT_LEDE } from './about-copy';
+import { AboutSections } from './AboutSections';
+import '../reading-room.css';
+import './about-page.css';
+
+void React;
 
 export const metadata: Metadata = buildStaticPageMetadata({
   path: '/about',
@@ -13,5 +20,19 @@ export const metadata: Metadata = buildStaticPageMetadata({
 });
 
 export default function AboutPage() {
-  permanentRedirect('/how-it-works?s=about');
+  return (
+    <Room>
+      <ReadingEntry
+        pathname="/about"
+        title={
+          <>
+            Doing my part, and making room for <em>yours</em>.
+          </>
+        }
+        lede={ABOUT_LEDE}
+        showCrumb={false}
+      />
+      <AboutSections />
+    </Room>
+  );
 }

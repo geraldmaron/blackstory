@@ -105,10 +105,21 @@ describe('CommandBar destinations', () => {
     assert.match(source, /syncCommandBarClearance/);
     assert.match(source, /ds-bar__brand[\s\S]*href="\/"/);
     assert.match(source, /aria-label="Find"/);
-    assert.match(source, /<RoomsMenu \/>/);
+    assert.match(source, /<RoomsMenu\b/);
     assert.doesNotMatch(source, />\s*Journey\s*</);
     assert.doesNotMatch(source, /\n\s*Door\n/);
     assert.doesNotMatch(source, /onModeChange!\('story'\)/);
+  });
+
+  it('renders Find and Rooms on every route, including /memorial', () => {
+    const source = code('components/shell/CommandBar.tsx');
+    // v9 parked a "quiet bar" on the memorial: brand, search, theme, no Find. That made the
+    // rest of the menu unreachable on the one surface a reader most needs a way out of. The wall
+    // stays quiet; the shell does not.
+    assert.doesNotMatch(source, /QUIET_BAR_PATHS|commandBarIsQuiet/);
+    assert.doesNotMatch(source, /pathname === ['"]\/memorial['"]/);
+    assert.match(source, /aria-label="Find"/);
+    assert.match(source, /<RoomsMenu\b/);
   });
 
   it('does not greet with the catalog count', () => {

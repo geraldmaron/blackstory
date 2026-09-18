@@ -22,13 +22,15 @@ function countOccurrences(source: string, pattern: RegExp): number {
 }
 
 const CHART_TAGS = [
+  'PopulationDecadeSpine',
   'PopulationByDecadeChart',
   'BlackPopulationShareChart',
   'StatePopulationShiftChart',
+  'DeltaFigure',
+  'GapMagnitudeSight',
   'RacePairComparisonChart',
   'GroupedBarIndicatorChart',
   'TrendLineChart',
-  'DeltaFigure',
 ];
 
 test('every figure on the page is numbered and carries a reading', () => {
@@ -36,8 +38,8 @@ test('every figure on the page is numbered and carries a reading', () => {
     (sum, tag) => sum + countOccurrences(sectionsSource, new RegExp(`<${tag}\\b`, 'g')),
     0,
   );
-  // 4 population, 3 wealth, 4 housing, 2 justice.
-  assert.equal(figureCount, 13);
+  // Counted spine + 5 population figures, then the measured-gaps figures: wealth, housing, justice.
+  assert.equal(figureCount, 16);
   assert.equal(countOccurrences(sectionsSource, /figureLabel="Figure \d+"/g), figureCount);
   // DeltaFigure writes its own reading; every chart is handed one.
   assert.equal(countOccurrences(sectionsSource, /reading=\{/g), figureCount);
@@ -98,11 +100,10 @@ test('an open numbers table scrolls inside the figure instead of widening it', (
 });
 
 test('every section states its as-of date once, in its head', () => {
+  // Counted carries the census as-of; the measured-gaps act carries the indicator as-of once.
   assert.match(sectionsSource, /`As of \$\{populationAsOf\}`/);
   assert.match(sectionsSource, /const indicatorMeta = \[`As of \$\{indicatorsAsOf\}`\]/);
-  for (const id of ['wealth', 'housing', 'justice']) {
-    assert.match(sectionsSource, new RegExp(`<Section id="${id}" meta=\\{indicatorMeta\\}>`));
-  }
+  assert.match(sectionsSource, /<Section id="gaps" meta=\{indicatorMeta\}>/);
 });
 
 test('the page off-ramp stays on the walk, not a fabricated Explore population handoff', () => {

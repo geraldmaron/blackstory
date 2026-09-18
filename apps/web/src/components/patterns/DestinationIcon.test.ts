@@ -18,3 +18,8 @@ test('the medium size is opt-in for headings and cards', () => {
   const html = renderToStaticMarkup(createElement(DestinationIcon, { id: 'data', size: 'md' }));
   assert.match(html, /ds-destination-icon--md/);
 });
+
+test('the large size is opt-in for chapter plates', () => {
+  const html = renderToStaticMarkup(createElement(DestinationIcon, { id: 'source', size: 'lg' }));
+  assert.match(html, /ds-destination-icon--lg/);
+});

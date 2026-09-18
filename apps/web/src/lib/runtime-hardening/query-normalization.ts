@@ -58,7 +58,7 @@ export function getAllowedQueryParamsForPath(pathname: string): readonly string[
   }
   // No `/history` branch: the route is not in the middleware matcher and must not be. See the
   // note where HISTORY_PAGE_PARAM_ALLOWLIST used to live in `constants.ts`.
-  if (path === '/law' || path === '/law/browse') {
+  if (path === '/law') {
     return LAW_PAGE_PARAM_ALLOWLIST;
   }
   if (path === '/stories') {

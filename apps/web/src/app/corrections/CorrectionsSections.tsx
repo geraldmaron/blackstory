@@ -8,7 +8,7 @@ import React, { Suspense } from 'react';
 import Link from 'next/link';
 import { CorrectionForm } from './CorrectionForm';
 import { CORRECTION_PRIVACY_NOTICE } from './copy';
-import { Disclosure, UtilityStep } from '../../components/room';
+import { Disclosure, RoomSection, UtilityStep } from '../../components/room';
 import { WalkOffRamp } from '../walk-off-ramp';
 import './corrections.css';
 
@@ -22,36 +22,44 @@ const INTAKE_STEPS = [
 export function CorrectionsSections() {
   return (
     <div className="ds-corrections">
-      <ol className="ds-corrections__lifecycle" aria-label="What happens to a correction">
-        {INTAKE_STEPS.map((step, index) => (
-          <li key={step.title}>
-            <UtilityStep index={index + 1} title={step.title} detail={step.detail} />
-          </li>
-        ))}
-      </ol>
+      <RoomSection
+        id="file"
+        icon="correction"
+        kicker="File"
+        title="What happens to a correction"
+        tone="sunk"
+      >
+        <ol className="ds-corrections__lifecycle" aria-label="What happens to a correction">
+          {INTAKE_STEPS.map((step, index) => (
+            <li key={step.title}>
+              <UtilityStep index={index + 1} title={step.title} detail={step.detail} />
+            </li>
+          ))}
+        </ol>
 
-      <Suspense fallback={<p className="ds-room-field__hint">Loading the correction form…</p>}>
-        <CorrectionForm />
-      </Suspense>
+        <Suspense fallback={<p className="ds-room-field__hint">Loading the correction form…</p>}>
+          <CorrectionForm />
+        </Suspense>
 
-      {/*
-       * The privacy terms stay on the page and stay readable, but collapsed: they are the thing a
-       * reader consults once and a bordered warning banner above the form made every correction
-       * feel like an accusation being logged. A drawer's job is to not be in the way.
-       */}
-      <Disclosure summary="What happens to what you send">
-        <p>
-          Corrections enter a restricted quarantine queue. Nothing you submit changes the public
-          record until it passes independent review and promotion controls.{' '}
-          {CORRECTION_PRIVACY_NOTICE.body}
-        </p>
-        <p>
-          Save your receipt code. It is the only credential for a status lookup, and a submission
-          cannot be found without it. If a correction is closed and you believe the outcome was
-          wrong, one appeal is available against the same code. Every correction is read by a
-          person, and coordinated volume never alters confidence or publication.
-        </p>
-      </Disclosure>
+        {/*
+         * The privacy terms stay on the page and stay readable, but collapsed: they are the thing a
+         * reader consults once and a bordered warning banner above the form made every correction
+         * feel like an accusation being logged. A drawer's job is to not be in the way.
+         */}
+        <Disclosure summary="What happens to what you send">
+          <p>
+            Corrections enter a restricted quarantine queue. Nothing you submit changes the public
+            record until it passes independent review and promotion controls.{' '}
+            {CORRECTION_PRIVACY_NOTICE.body}
+          </p>
+          <p>
+            Save your receipt code. It is the only credential for a status lookup, and a submission
+            cannot be found without it. If a correction is closed and you believe the outcome was
+            wrong, one appeal is available against the same code. Every correction is read by a
+            person, and coordinated volume never alters confidence or publication.
+          </p>
+        </Disclosure>
+      </RoomSection>
 
       <WalkOffRamp
         title={

@@ -86,20 +86,6 @@ function AxisMark({
 
 export type AtlasMode = 'atlas' | 'story';
 
-/**
- * The one route that takes the bar in its quietest form: brand, search, theme, nothing else
- * (docs/ui/design-direction-v9-surfaces.md §4, /memorial). A wall of the names of murdered
- * people is not a surface to offer a mode switcher, a saved-records count and a shortcut sheet
- * over. Kept as data with a predicate beside it, rather than an inline `pathname === ` in the
- * markup, so a test can assert the quiet form reaches this route and no other.
- */
-const QUIET_BAR_PATHS: readonly string[] = ['/memorial'];
-
-/** Whether the bar renders in its quiet form on `pathname`. Exact match: `/memorial/x` is not it. */
-export function commandBarIsQuiet(pathname: string): boolean {
-  return QUIET_BAR_PATHS.includes(pathname);
-}
-
 function SearchGlyph() {
   return (
     <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true">
@@ -151,7 +137,6 @@ export function CommandBar({
   className,
 }: CommandBarProps) {
   const pathname = usePathname() || '/';
-  const quiet = commandBarIsQuiet(pathname);
   const onAtlas = Boolean(mode && onModeChange);
   const barRef = useRef<HTMLElement>(null);
   const [phoneFind, setPhoneFind] = useState(false);
@@ -234,59 +219,57 @@ export function CommandBar({
       )}
 
       <div className="ds-bar__tools">
-        {quiet ? null : (
-          <nav className="ds-bar__modes" aria-label="Find">
-            {findAxes.map((axis) => {
-              const mapAxis = axis.path === '/explore';
-              const browsing = pathIsBrowsing(pathname, doorBrowse);
-              if (mapAxis) {
-                // Map is one destination with two postures. Off the map surface it is a link home.
-                // On the journey it is current. While browsing, pressing Map restores the journey
-                // (pushState left Next on `/`, so a Link to `/` was a no-op).
-                if (!pathIsMapSurface(pathname)) {
-                  return (
-                    <Link key={axis.path} className="ds-bar__mode-link" href="/" prefetch={false}>
-                      <AxisMark icon={axis.icon} label={axis.label} />
-                    </Link>
-                  );
-                }
-                if (browsing) {
-                  return (
-                    <button
-                      key={axis.path}
-                      type="button"
-                      className="ds-bar__mode-link"
-                      aria-current="page"
-                      onClick={() => exitMapBrowse()}
-                      aria-label="Back to the map journey"
-                    >
-                      <AxisMark icon={axis.icon} label={axis.label} />
-                    </button>
-                  );
-                }
+        <nav className="ds-bar__modes" aria-label="Find">
+          {findAxes.map((axis) => {
+            const mapAxis = axis.path === '/explore';
+            const browsing = pathIsBrowsing(pathname, doorBrowse);
+            if (mapAxis) {
+              // Map is one destination with two postures. Off the map surface it is a link home.
+              // On the journey it is current. While browsing, pressing Map restores the journey
+              // (pushState left Next on `/`, so a Link to `/` was a no-op).
+              if (!pathIsMapSurface(pathname)) {
                 return (
-                  <span key={axis.path} className="ds-bar__mode-link" aria-current="page">
+                  <Link key={axis.path} className="ds-bar__mode-link" href="/" prefetch={false}>
                     <AxisMark icon={axis.icon} label={axis.label} />
-                  </span>
+                  </Link>
                 );
               }
-              const current = pathIsCurrent(pathname, axis.path);
+              if (browsing) {
+                return (
+                  <button
+                    key={axis.path}
+                    type="button"
+                    className="ds-bar__mode-link"
+                    aria-current="page"
+                    onClick={() => exitMapBrowse()}
+                    aria-label="Back to the map journey"
+                  >
+                    <AxisMark icon={axis.icon} label={axis.label} />
+                  </button>
+                );
+              }
               return (
-                <Link
-                  key={axis.path}
-                  className="ds-bar__mode-link"
-                  href={axis.path}
-                  aria-current={current ? 'page' : undefined}
-                >
+                <span key={axis.path} className="ds-bar__mode-link" aria-current="page">
                   <AxisMark icon={axis.icon} label={axis.label} />
-                </Link>
+                </span>
               );
-            })}
-            <RoomsMenu overflowFind={overflowFind} />
-          </nav>
-        )}
+            }
+            const current = pathIsCurrent(pathname, axis.path);
+            return (
+              <Link
+                key={axis.path}
+                className="ds-bar__mode-link"
+                href={axis.path}
+                aria-current={current ? 'page' : undefined}
+              >
+                <AxisMark icon={axis.icon} label={axis.label} />
+              </Link>
+            );
+          })}
+          <RoomsMenu overflowFind={overflowFind} />
+        </nav>
 
-        {onOpenSaved && !quiet ? (
+        {onOpenSaved ? (
           <button
             type="button"
             className="ds-bar__tool"
@@ -309,7 +292,7 @@ export function CommandBar({
           </button>
         ) : null}
 
-        {onOpenShortcuts && !quiet ? (
+        {onOpenShortcuts ? (
           <button
             type="button"
             className="ds-bar__tool"

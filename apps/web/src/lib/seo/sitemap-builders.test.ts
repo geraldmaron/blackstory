@@ -95,14 +95,12 @@ test('a destination is left out of the sitemap only on purpose', () => {
   // `/terms` on the phone) with no web page behind it, and `crawl` would have advertised a route
   // that 404s. The web page exists now, so /terms came off the list and into the sitemap.
   // /story left this list by leaving the registry entirely when the route was deprecated.
-  // /lives is held out on purpose: it 308s into `/how-it-works?s=lives` and stays noindex
-  // until verification (repo-0clax.14) and the public method page (repo-0clax.17). The
-  // figures themselves live in the crawled Data section.
+  // /lives is now a public immersive room (crawl monthly). Only /design-system stays out.
   // Any further omission is an oversight until someone records why.
   const omitted = allDestinations()
     .filter((destination) => destination.crawl === undefined)
     .map((destination) => destination.path);
-  assert.deepEqual(omitted.sort(), ['/design-system', '/lives']);
+  assert.deepEqual(omitted.sort(), ['/design-system']);
 });
 
 test('the sitemap is the registry, not a second list of the same routes', () => {

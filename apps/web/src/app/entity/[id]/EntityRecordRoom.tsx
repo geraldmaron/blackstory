@@ -35,6 +35,10 @@ import {
   RecordSmallTitle,
   RecordStatusPill,
 } from '../../../components/entity/RecordChrome';
+import {
+  METHODOLOGY_HOW_RECORD_GETS_IN_HREF,
+  METHODOLOGY_SOURCE_LIBRARY_HREF,
+} from '../../../components/evidence/editorial-links';
 import { HowToReadThisRecord } from '../../../components/trust';
 import { Breadcrumb, Room, SourceList, type RoomSource } from '../../../components/room';
 import { MapsExternalLink } from '../../../components/map-experience/MapsExternalLink';
@@ -369,6 +373,21 @@ export async function EntityRecordRoom({ entity }: { readonly entity: PublicEnti
               <span className="ds-rec-count">{sources.length}</span>
             </RecordSmallTitle>
             <SourceList sources={sources} />
+            <p className="ds-record-appx__note ds-sans">
+              Source hierarchy and verification live in{' '}
+              <Link href="/methodology#evidence-grades" prefetch={false}>
+                evidence grades
+              </Link>
+              ,{' '}
+              <Link href={METHODOLOGY_SOURCE_LIBRARY_HREF} prefetch={false}>
+                where the evidence comes from
+              </Link>
+              , and{' '}
+              <Link href="/methodology#how-it-holds-together" prefetch={false}>
+                how citations hold together
+              </Link>
+              .
+            </p>
           </section>
         ) : null}
 
@@ -439,7 +458,10 @@ export async function EntityRecordRoom({ entity }: { readonly entity: PublicEnti
             </section>
           ) : null}
 
-          <HowToReadThisRecord variant="compact" />
+          <HowToReadThisRecord
+            variant="compact"
+            methodologyHref={METHODOLOGY_HOW_RECORD_GETS_IN_HREF}
+          />
         </div>
       </div>
     </div>

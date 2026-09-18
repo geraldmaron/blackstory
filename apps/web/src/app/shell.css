@@ -21,6 +21,15 @@
  * header and hero typography follow [data-theme] with ordinary --ds-* tokens.
  */
 
+/* The slotted plate is `position: absolute` with document-space offsets from
+   `plateBoxForSlot`. Without a positioned ancestor those offsets resolve against
+   the viewport (initial containing block), so the map stays pinned while the
+   slot scrolls and the copper frame flashes along every edge. `position: relative`
+   here does not trap `position: fixed` — only transform/filter/perspective do. */
+body {
+  position: relative;
+}
+
 .ds-shell {
   display: flex;
   flex-direction: column;
@@ -1978,7 +1987,8 @@ html:has([data-surface='instrument']) {
   left: var(--ds-plate-frame-left);
   width: var(--ds-plate-frame-width);
   height: var(--ds-plate-frame-height);
-  border-radius: var(--ds-radius-2, 2px);
+  /* Match `.ds-mapmoment__plate` so WebGL clips to the same copper frame. */
+  border-radius: var(--ds-radius-md);
   overflow: hidden;
 }
 

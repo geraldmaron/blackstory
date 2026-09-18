@@ -1082,7 +1082,7 @@ export function DoorImmersive({
                     <Link className="ds-cta ds-cta--ink" href="/records">
                       Record index
                     </Link>
-                    <Link className="ds-cta ds-cta--quiet" href="/how-it-works">
+                    <Link className="ds-cta ds-cta--quiet" href="/about">
                       How this archive works
                     </Link>
                     <button

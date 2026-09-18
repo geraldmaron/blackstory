@@ -5,6 +5,7 @@
  * Speaker: the archive states rules the software enforces. The one first-person sentence on the
  * page lives in `MethodologySections.tsx`, where a person is genuinely making a commitment.
  */
+import type { DestinationIconId } from '@repo/public-contracts/destinations';
 
 export const METHODOLOGY_INTRO_LEDE =
   'This page is the receipt for everything else on the site: how a record gets in, what an evidence grade means, why a map point is never drawn sharper than the source behind it, and what happens when a record touches someone still living. It is written out in full so a reader can hold any page here to it.';
@@ -39,14 +40,133 @@ export const METHODOLOGY_PUBLISH_RULES = [
 export const METHODOLOGY_DIGNITY_LINE =
   'People are named, and named with the role, place and time the sources give them. Nobody here is background texture for a map.';
 
-export const METHODOLOGY_PAGE_SECTIONS = [
-  { id: 'how-a-record-gets-in', label: 'How a record gets in' },
-  { id: 'evidence-grades', label: 'Evidence grades' },
-  { id: 'editorial-standards', label: 'Editorial standards' },
-  { id: 'how-a-point-is-drawn', label: 'How a point is drawn' },
-  { id: 'how-it-holds-together', label: 'How it holds together' },
-  { id: 'living-person-protection', label: 'Living person protection' },
-  { id: 'see-it-applied', label: 'See it applied' },
+export const METHODOLOGY_PAGE_SECTIONS: readonly {
+  readonly id: string;
+  readonly label: string;
+  readonly icon: DestinationIconId;
+}[] = [
+  { id: 'how-a-record-gets-in', label: 'How a record gets in', icon: 'records' },
+  { id: 'evidence-grades', label: 'Evidence grades', icon: 'evidence' },
+  { id: 'editorial-standards', label: 'Editorial standards', icon: 'publication' },
+  { id: 'how-a-point-is-drawn', label: 'How a point is drawn', icon: 'precision' },
+  { id: 'how-it-holds-together', label: 'How it holds together', icon: 'collection' },
+  { id: 'lives-across-decades', label: 'Lives across the decades', icon: 'person' },
+  { id: 'where-the-evidence-comes-from', label: 'Where the evidence comes from', icon: 'source' },
+  { id: 'living-person-protection', label: 'Living person protection', icon: 'privacy' },
+  { id: 'internet-archive', label: 'Internet Archive', icon: 'collection' },
+  { id: 'see-it-applied', label: 'See it applied', icon: 'explore' },
+] as const;
+
+/** Canonical public source-library room. Methodology keeps a hash handoff for old links. */
+export const METHODOLOGY_SOURCE_LIBRARY_HREF = '/sources';
+
+export const LIVES_METHOD_LEDE =
+  'Lives Across the Decades is a region, a lens, a decade, and a named unit. The street hatches from published federal statistical tables. Feeling is quoted from a named speaker. Impact is juxtaposition or a gated claim. CPI restates published income into comparison-year dollars from 1913 on; it does not invent a historical sticker price for a modern good.';
+
+export const LIVES_METHOD_RULES = [
+  {
+    title: 'Unit of analysis',
+    body: 'Household, child, or woman. Copy names the unit. It never says "you would have been." Tenure and household income stay household measures even when the woman unit is selected.',
+  },
+  {
+    title: 'Published, derived, modeled',
+    body: 'Observed cells come from agency tables. Derived income uses chained CPI-U-RS. Modeled affordance compares same-year rent or home value to same-year income and is labeled modeled. Work-based class never enters an affordance model.',
+  },
+  {
+    title: 'World beats and gaps',
+    body: 'Housing, school, policy, justice, testimony, and war open as sourced beats or honest gap cards. Broader series on Data and theme-impact are off-ramps, not Lives region cells. Crime heat is forbidden.',
+  },
+] as const;
+
+export const SOURCE_LIBRARY_LEDE =
+  'Every public claim on BlackStory traces to a publisher someone can open. This section names the kinds of publishers the archive cites, shows how a URL becomes a citation on a record, and points to where each surface lists its sources. Counts and publisher profiles stay tied to the active release; nothing here is invented.';
+
+/** The evidence chain from discovery to a reader-facing citation. */
+export const SOURCE_LINEAGE_STAGES = [
+  {
+    step: '01',
+    title: 'Research run',
+    body: 'A bounded discovery pass finds a candidate claim and the URL that carried it.',
+    icon: 'records' as const,
+  },
+  {
+    step: '02',
+    title: 'Capture',
+    body: 'The cited URL is fetched or anchored in the Wayback Machine so link rot does not erase the reading.',
+    icon: 'source' as const,
+  },
+  {
+    step: '03',
+    title: 'Citation',
+    body: 'The claim keeps the publisher, the URL, and the excerpt the drafter was handed.',
+    icon: 'evidence' as const,
+  },
+  {
+    step: '04',
+    title: 'Record',
+    body: 'The citation reaches a public page with an evidence grade and a bibliography you can open.',
+    icon: 'publication' as const,
+  },
+] as const;
+
+/**
+ * Publisher kinds the source registry recognizes. Examples name real agencies and archives
+ * already cited on Data and record pages; no usage counts are shown on this public surface.
+ */
+export const SOURCE_PUBLISHER_KINDS = [
+  {
+    kind: 'Government archive',
+    body: 'Federal and state archives, registers, and custody systems that hold primary records.',
+    examples: 'National Archives, Library of Congress, NPS National Register of Historic Places',
+  },
+  {
+    kind: 'Government agency',
+    body: 'Statistical and regulatory series published by a public agency on its own site.',
+    examples:
+      'U.S. Census Bureau, Bureau of Justice Statistics, HUD, Federal Reserve Board, United States Sentencing Commission',
+  },
+  {
+    kind: 'Court / legal',
+    body: 'Opinions, dockets, and legal repositories where a claim rests on a filed record.',
+    examples: 'State supreme courts, federal district archives',
+  },
+  {
+    kind: 'Academic library or archive',
+    body: 'University presses, digital libraries, and curated finding aids.',
+    examples: 'IPUMS NHGIS, state historical society collections',
+  },
+  {
+    kind: 'Museum and heritage nonprofit',
+    body: 'Institutions and nonprofits that steward place-based history with documented custody.',
+    examples: 'Smithsonian-affiliated collections, state heritage trusts',
+  },
+  {
+    kind: 'News and reference',
+    body: 'Contemporary reporting and reference works that may carry a claim into review but never corroborate alone.',
+    examples: 'Regional newspapers, encyclopedias, NPR',
+  },
+] as const;
+
+/** Where a reader already sees sources on the public site. */
+export const SOURCE_LIBRARY_SURFACES = [
+  {
+    title: 'Data figures',
+    body: 'Every chart on Data names the agency series beneath it. Those are published statistics, not claims drawn from the record catalog.',
+    href: '/data#reading',
+    icon: 'data' as const,
+  },
+  {
+    title: 'Record pages',
+    body: 'Each place, person, and event page lists the citations behind its claims, with archived copies when the Internet Archive holds them.',
+    href: '/records',
+    icon: 'records' as const,
+  },
+  {
+    title: 'Internet Archive handoff',
+    body: 'When a citation points to archive.org or the Wayback Machine, the record page lists those preserved copies beside the bibliography.',
+    href: '/methodology#internet-archive',
+    icon: 'collection' as const,
+  },
 ] as const;
 
 /** Defensibility rails: what a hostile reader can hold any public record to. */

@@ -83,10 +83,12 @@ describe('destination registry · coverage', () => {
       '/books',
       '/law',
       '/data',
+      '/lives',
       '/memorial',
       '/about',
       '/faq',
       '/methodology',
+      '/sources',
       '/errata',
       '/submit',
       '/corrections',
@@ -106,8 +108,8 @@ describe('destination registry · coverage', () => {
     // way back to a map selection is return state, not hierarchy.
     assert.equal(parentPathFor('/entity/tulsa-greenwood'), '/records');
     assert.equal(parentPathFor('/place/paul-laurence-dunbar-high-school'), '/records');
-    assert.equal(parentPathFor('/books/beloved'), '/books/browse');
-    assert.equal(parentPathFor('/law/plessy'), '/law/browse');
+    assert.equal(parentPathFor('/books/beloved'), '/books');
+    assert.equal(parentPathFor('/law/plessy'), '/law');
     assert.equal(parentPathFor('/stories/redlining'), '/stories');
     assert.equal(parentPathFor('/corrections/status/ABC123'), '/corrections');
   });
@@ -176,11 +178,11 @@ describe('destination registry · the footer is derived, not authored', () => {
     // what made Records read as a supporting page.
     assert.deepEqual(
       destinationsInGroup('read').map((destination) => destination.path),
-      ['/memorial'],
+      ['/law', '/data', '/lives', '/books', '/memorial'],
     );
     assert.deepEqual(
       destinationsInGroup('check').map((destination) => destination.path),
-      ['/how-it-works', '/faq', '/errata'],
+      ['/about', '/faq', '/methodology', '/sources', '/errata'],
     );
     assert.deepEqual(
       destinationsInGroup('take-part').map((destination) => destination.path),
@@ -200,12 +202,16 @@ describe('destination registry · the footer is derived, not authored', () => {
     const hrefs = columns.flatMap((column) => column.items.map((item) => item.href));
     const palette = browsableDestinations().map((destination) => destination.path);
     assert.ok(hrefs.includes('/stories'));
-    assert.ok(hrefs.includes('/how-it-works'));
+    assert.ok(hrefs.includes('/about'));
+    assert.ok(hrefs.includes('/data'));
+    assert.ok(hrefs.includes('/lives'));
+    assert.ok(hrefs.includes('/sources'));
     assert.ok(hrefs.includes('/submit'));
     assert.ok(hrefs.includes('/explore'));
     assert.ok(hrefs.includes('/records'));
     assert.ok(!hrefs.includes('/history'));
     assert.ok(!hrefs.includes('/banned-books'));
+    assert.ok(!hrefs.includes('/how-it-works'));
     assert.ok(!palette.includes('/explore'));
     assert.ok(!palette.includes('/records'));
     assert.ok(!palette.includes('/rooms'));
@@ -224,12 +230,11 @@ describe('destination registry · the footer is derived, not authored', () => {
     assert.equal(explore?.description, 'The map.');
   });
 
-  it('ships banned-books deep links without listing /banned-books', () => {
-    // `/books` 308s into How it works; browse tools live at `/books/browse`.
-    assert.equal(destinationFor('/books')?.browsable, false);
-    assert.equal(destinationFor('/books/browse')?.path, '/books/browse');
+  it('ships banned books as a browsable room without listing /banned-books', () => {
+    assert.equal(destinationFor('/books')?.browsable, true);
+    assert.equal(destinationFor('/books')?.path, '/books');
     const hrefs = footerColumns().flatMap((column) => column.items.map((item) => item.href));
-    assert.ok(!hrefs.includes('/books'));
+    assert.ok(hrefs.includes('/books'));
     assert.ok(!hrefs.includes('/banned-books'));
     assert.equal(destinationFor('/banned-books'), undefined);
   });
@@ -259,11 +264,16 @@ describe('destination registry · the footer is derived, not authored', () => {
 });
 
 describe('destination registry · id lookup', () => {
-  it('resolves how-it-works sections by catalog id', () => {
-    assert.equal(destinationById('how-it-works')?.path, '/how-it-works');
-    assert.equal(destinationById('about')?.label, 'About');
+  it('resolves trust and read rooms by catalog id', () => {
+    assert.equal(destinationById('how-it-works'), undefined);
+    assert.equal(destinationById('about')?.path, '/about');
     assert.equal(destinationById('methodology')?.icon, 'methodology');
     assert.equal(destinationById('books')?.label, 'Banned books');
+    assert.equal(destinationById('data')?.browsable, true);
+    assert.equal(destinationById('lives')?.path, '/lives');
+    assert.equal(destinationById('lives')?.family, 'read');
+    assert.equal(destinationById('sources')?.path, '/sources');
+    assert.equal(destinationById('sources')?.family, 'trust');
     assert.equal(destinationById('nope'), undefined);
   });
 });

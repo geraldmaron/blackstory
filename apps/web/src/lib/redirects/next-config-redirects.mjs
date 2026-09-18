@@ -78,9 +78,10 @@ export function redirectsForNextConfig() {
     // `/library` is the old name for Rooms.
     { source: '/library', destination: '/rooms', permanent: true },
 
-    // `/apparatus` was the jargon slug for How it works. Query (`?s=`, Lives params) is preserved
-    // by Next on permanent redirects that omit their own query string.
-    { source: '/apparatus', destination: '/how-it-works', permanent: true },
+    // Retired hub escape hatches. Query strings are preserved by Next when the destination
+    // omits its own query, so `/law/browse?q=voting` lands on `/law?q=voting`.
+    { source: '/law/browse', destination: '/law', permanent: true },
+    { source: '/books/browse', destination: '/books', permanent: true },
 
     // The inventions index is the Records kind filter, not a second catalog.
     { source: '/inventions', destination: '/records?kind=inventions', permanent: true },

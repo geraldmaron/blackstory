@@ -50,7 +50,7 @@ function buildLawHref(params: {
   if (params.topic !== 'all') search.set('topic', params.topic);
   if (params.sort !== 'chronological') search.set('sort', params.sort);
   const query = search.toString();
-  return query.length > 0 ? `/law/browse?${query}` : '/law/browse';
+  return query.length > 0 ? `/law?${query}#browse` : '/law#browse';
 }
 
 function countBy(values: readonly string[]): Map<string, number> {
@@ -109,158 +109,178 @@ export function LawBrowseSections({ view, catalog }: LawBrowseSectionsProps) {
 
       <LegalDisclaimer />
 
-      <form
-        className="ds-records-find"
-        method="get"
-        action="/law/browse"
-        role="search"
-        aria-labelledby="law-browse-heading"
-      >
-        <h2 id="law-browse-heading" className="ds-room-grouphd">
-          Browse landmark statutes and decisions
-        </h2>
-        {/* `ds-records-find__label` was never defined in any stylesheet, so this rendered as
+      <section id="browse" className="ds-law-browse" aria-labelledby="law-browse-heading">
+        <form
+          className="ds-records-find"
+          method="get"
+          action="/law#browse"
+          role="search"
+          aria-labelledby="law-browse-heading"
+        >
+          <h2 id="law-browse-heading" className="ds-room-grouphd">
+            Browse statutes and decisions
+          </h2>
+          {/* `ds-records-find__label` was never defined in any stylesheet, so this rendered as
             unstyled stray body text above the field. The identical control in `RecordsIndex`
             hides its label and lets the placeholder carry the visible prompt; matching it keeps
             the accessible name without the orphaned class or the duplicated visible text. */}
-        <label className="ds-visually-hidden" htmlFor="law-q">
-          Title, citation or topic
-        </label>
-        <div className="ds-records-find__row">
-          <input
-            className="ds-records-find__input"
-            id="law-q"
-            name="q"
-            type="search"
-            defaultValue={view.q}
-            placeholder="Brown v. Board, voting, 42 U.S.C…"
-            autoComplete="off"
-          />
-          <button className="ds-records-find__go" type="submit">
-            Search
-          </button>
-        </div>
-        {view.kind !== 'all' ? <input type="hidden" name="kind" value={view.kind} /> : null}
-        {view.topic !== 'all' ? <input type="hidden" name="topic" value={view.topic} /> : null}
-        {view.sort !== 'chronological' ? (
-          <input type="hidden" name="sort" value={view.sort} />
+          <label className="ds-visually-hidden" htmlFor="law-q">
+            Title, citation or topic
+          </label>
+          <div className="ds-records-find__row">
+            <input
+              className="ds-records-find__input"
+              id="law-q"
+              name="q"
+              type="search"
+              defaultValue={view.q}
+              placeholder="Brown v. Board, voting, 42 U.S.C…"
+              autoComplete="off"
+            />
+            <button className="ds-records-find__go" type="submit">
+              Search
+            </button>
+          </div>
+          {view.kind !== 'all' ? <input type="hidden" name="kind" value={view.kind} /> : null}
+          {view.topic !== 'all' ? <input type="hidden" name="topic" value={view.topic} /> : null}
+          {view.sort !== 'chronological' ? (
+            <input type="hidden" name="sort" value={view.sort} />
+          ) : null}
+        </form>
+
+        {activeChips.length > 0 ? (
+          <div className="ds-records-active" role="group" aria-label="Active filters">
+            {activeChips.map((chip) => (
+              <Link className="ds-records-active__chip" href={chip.href} key={chip.key}>
+                {chip.label}
+                <span className="ds-records-active__x" aria-hidden="true">
+                  ✕
+                </span>
+                <span className="ds-visually-hidden"> — remove this filter</span>
+              </Link>
+            ))}
+            <Link className="ds-records-active__clear" href="/law">
+              Clear all
+            </Link>
+          </div>
         ) : null}
-      </form>
 
-      {activeChips.length > 0 ? (
-        <div className="ds-records-active" role="group" aria-label="Active filters">
-          {activeChips.map((chip) => (
-            <Link className="ds-records-active__chip" href={chip.href} key={chip.key}>
-              {chip.label}
-              <span className="ds-records-active__x" aria-hidden="true">
-                ✕
-              </span>
-              <span className="ds-visually-hidden"> — remove this filter</span>
-            </Link>
-          ))}
-          <Link className="ds-records-active__clear" href="/law/browse">
-            Clear all
+        <div className="ds-room-idx__bar" role="group" aria-label="Filter by kind">
+          <Link
+            className="ds-room-chip"
+            href={buildLawHref({ q: view.q, kind: 'all', topic: view.topic, sort: view.sort })}
+            aria-current={view.kind === 'all' ? true : undefined}
+          >
+            All kinds <span className="ds-room-num">{catalog.length}</span>
           </Link>
+          {view.kindOptions
+            .filter((option) => option.value !== 'all')
+            .map((option) => (
+              <Link
+                key={option.value}
+                className="ds-room-chip"
+                href={buildLawHref({
+                  q: view.q,
+                  kind: option.value,
+                  topic: view.topic,
+                  sort: view.sort,
+                })}
+                aria-current={view.kind === option.value ? true : undefined}
+              >
+                {humanizeLegalKind(option.value)}{' '}
+                <span className="ds-room-num">{kindCounts.get(option.value) ?? 0}</span>
+              </Link>
+            ))}
         </div>
-      ) : null}
 
-      <div className="ds-room-idx__bar" role="group" aria-label="Filter by kind">
-        <Link
-          className="ds-room-chip"
-          href={buildLawHref({ q: view.q, kind: 'all', topic: view.topic, sort: view.sort })}
-          aria-current={view.kind === 'all' ? true : undefined}
-        >
-          All kinds <span className="ds-room-num">{catalog.length}</span>
-        </Link>
-        {view.kindOptions
-          .filter((option) => option.value !== 'all')
-          .map((option) => (
-            <Link
-              key={option.value}
-              className="ds-room-chip"
-              href={buildLawHref({
-                q: view.q,
-                kind: option.value,
-                topic: view.topic,
-                sort: view.sort,
-              })}
-              aria-current={view.kind === option.value ? true : undefined}
-            >
-              {humanizeLegalKind(option.value)}{' '}
-              <span className="ds-room-num">{kindCounts.get(option.value) ?? 0}</span>
-            </Link>
-          ))}
-      </div>
+        <div className="ds-room-idx__bar" role="group" aria-label="Filter by topic">
+          <Link
+            className="ds-room-chip"
+            href={buildLawHref({ q: view.q, kind: view.kind, topic: 'all', sort: view.sort })}
+            aria-current={view.topic === 'all' ? true : undefined}
+          >
+            All topics
+          </Link>
+          {view.topicOptions
+            .filter((option) => option.value !== 'all')
+            .map((option) => (
+              <Link
+                key={option.value}
+                className="ds-room-chip"
+                href={buildLawHref({
+                  q: view.q,
+                  kind: view.kind,
+                  topic: option.value,
+                  sort: view.sort,
+                })}
+                aria-current={view.topic === option.value ? true : undefined}
+              >
+                {humanizeLegalTopic(option.value)}{' '}
+                <span className="ds-room-num">{topicCounts.get(option.value) ?? 0}</span>
+              </Link>
+            ))}
+        </div>
 
-      <div className="ds-room-idx__bar" role="group" aria-label="Filter by topic">
-        <Link
-          className="ds-room-chip"
-          href={buildLawHref({ q: view.q, kind: view.kind, topic: 'all', sort: view.sort })}
-          aria-current={view.topic === 'all' ? true : undefined}
-        >
-          All topics
-        </Link>
-        {view.topicOptions
-          .filter((option) => option.value !== 'all')
-          .map((option) => (
+        <nav className="ds-room-idx__bar" aria-label="Sort order">
+          {view.sortOptions.map((option) => (
             <Link
               key={option.value}
               className="ds-room-chip"
               href={buildLawHref({
                 q: view.q,
                 kind: view.kind,
-                topic: option.value,
-                sort: view.sort,
+                topic: view.topic,
+                sort: option.value,
               })}
-              aria-current={view.topic === option.value ? true : undefined}
+              aria-current={view.sort === option.value ? true : undefined}
             >
-              {humanizeLegalTopic(option.value)}{' '}
-              <span className="ds-room-num">{topicCounts.get(option.value) ?? 0}</span>
+              {option.label}
             </Link>
           ))}
-      </div>
+        </nav>
 
-      <p className="ds-room-idx__count" id="law-results-heading">
-        {countLabel}
-      </p>
+        <p className="ds-room-idx__count" id="law-results-heading">
+          {countLabel}
+        </p>
 
-      {view.items.length === 0 ? (
-        <EmptyList title="No law entries matched">
-          {activeChips.length > 0 ? (
-            <>
-              Nothing matches {activeChips.map((chip) => chip.label).join(', ')}.{' '}
-              <Link href="/law/browse">Clear every filter</Link> to see all {view.totalAvailable}{' '}
-              law entries.
-            </>
-          ) : (
-            <>The catalog is empty. This is a fault on our side, not an absence of law.</>
-          )}
-        </EmptyList>
-      ) : (
-        <div className="ds-law-idx ds-room-idx__list" aria-labelledby="law-results-heading">
-          {view.items.map((item) => {
-            const jurisdiction = jurisdictionById.get(item.id) ?? 'Unknown jurisdiction';
-            const year = item.effectiveYear ? String(item.effectiveYear) : 'Year unknown';
-            const gloss = item.summary ?? 'No plain-language summary yet.';
-            return (
-              <Link className="ds-room-idx__row" href={`/law/${item.slug}`} key={item.id}>
-                <span className="ds-room-idx__glyph" aria-hidden="true">
-                  §
-                </span>
-                <span className="ds-room-idx__name">{item.title}</span>
-                <span className="ds-room-idx__place" title={jurisdiction}>
-                  {jurisdiction}
-                </span>
-                <span className="ds-room-idx__era">{year}</span>
-                <span className="ds-law-idx__citation" title={item.citation}>
-                  {item.citation}
-                </span>
-                <span className="ds-law-idx__gloss">{gloss}</span>
-              </Link>
-            );
-          })}
-        </div>
-      )}
+        {view.items.length === 0 ? (
+          <EmptyList title="No law entries matched">
+            {activeChips.length > 0 ? (
+              <>
+                Nothing matches {activeChips.map((chip) => chip.label).join(', ')}.{' '}
+                <Link href="/law">Clear every filter</Link> to see all {view.totalAvailable} law
+                entries.
+              </>
+            ) : (
+              <>The catalog is empty. This is a fault on our side, not an absence of law.</>
+            )}
+          </EmptyList>
+        ) : (
+          <div className="ds-law-idx ds-room-idx__list" aria-labelledby="law-results-heading">
+            {view.items.map((item) => {
+              const jurisdiction = jurisdictionById.get(item.id) ?? 'Unknown jurisdiction';
+              const year = item.effectiveYear ? String(item.effectiveYear) : 'Year unknown';
+              const gloss = item.summary ?? 'No plain-language summary yet.';
+              return (
+                <Link className="ds-room-idx__row" href={`/law/${item.slug}`} key={item.id}>
+                  <span className="ds-room-idx__glyph" aria-hidden="true">
+                    §
+                  </span>
+                  <span className="ds-room-idx__name">{item.title}</span>
+                  <span className="ds-room-idx__place" title={jurisdiction}>
+                    {jurisdiction}
+                  </span>
+                  <span className="ds-room-idx__era">{year}</span>
+                  <span className="ds-law-idx__citation" title={item.citation}>
+                    {item.citation}
+                  </span>
+                  <span className="ds-law-idx__gloss">{gloss}</span>
+                </Link>
+              );
+            })}
+          </div>
+        )}
+      </section>
 
       <Prose>
         <p>
@@ -269,8 +289,7 @@ export function LawBrowseSections({ view, catalog }: LawBrowseSectionsProps) {
           legal aid organization.
         </p>
         <p>
-          <Link href="/how-it-works?s=methodology">Methodology</Link> ·{' '}
-          <Link href="/how-it-works?s=about">About</Link>
+          <Link href="/methodology">Methodology</Link> · <Link href="/about">About</Link>
         </p>
       </Prose>
     </>

@@ -1,6 +1,5 @@
 /**
- * `/data` wiring: the ledger now lives in `/how-it-works#data`. This route 308s there; chart
- * sections and copy stay covered here so the how-it-works composition cannot lose them.
+ * `/data` wiring: the ledger room owns census, Lives, and indicator figures.
  */
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
@@ -14,6 +13,7 @@ import {
   DATA_READING_LINKS,
   DATA_READING_RULES,
   DATA_SECTION_COPY,
+  DATA_SOURCE_LIBRARY_HANDOFF,
 } from './data-copy';
 import { DATA_PAGE_INDICATOR_FIXTURE_BUNDLE } from '@repo/domain/statistics/data-page-series';
 
@@ -21,7 +21,6 @@ const here = dirname(fileURLToPath(import.meta.url));
 const pageSource = readFileSync(join(here, 'page.tsx'), 'utf8');
 const sectionsSource = readFileSync(join(here, 'DataSections.tsx'), 'utf8');
 const copySource = readFileSync(join(here, 'data-copy.ts'), 'utf8');
-const apparatusSource = readFileSync(join(here, '../how-it-works/page.tsx'), 'utf8');
 const loaderSource = readFileSync(join(here, 'load-data-page-model.ts'), 'utf8');
 
 const allCopy = [
@@ -30,6 +29,7 @@ const allCopy = [
   DATA_INTRO.lede,
   ...DATA_READING_RULES.flatMap((rule) => [rule.kicker, rule.body]),
   ...DATA_READING_LINKS.map((link) => link.label),
+  DATA_SOURCE_LIBRARY_HANDOFF.label,
   ...Object.values(DATA_SECTION_COPY).flatMap((section) => [
     section.kicker,
     section.title,
@@ -38,22 +38,30 @@ const allCopy = [
   ...DATA_PAGE_SECTIONS.map((section) => section.label),
 ];
 
-test('data index 308s into the how-it-works Data section', () => {
-  assert.match(pageSource, /permanentRedirect\('\/how-it-works\?s=data'\)/);
+test('data index is the ledger room, not a redirect into a merged hub', () => {
+  assert.match(pageSource, /loadDataPageModel/);
+  assert.doesNotMatch(pageSource, /loadLivesAreaBundle/);
+  assert.match(pageSource, /<DataSections/);
+  assert.doesNotMatch(pageSource, /how-it-works/);
+  assert.doesNotMatch(pageSource, /SectionFocus/);
+  assert.match(loaderSource, /export async function loadDataPageModel/);
 });
 
-test('lives index and region pages 308 into the how-it-works Lives figures', () => {
+test('lives is an immersive room; Data Act II is a compact door into it', () => {
   const livesIndex = readFileSync(join(here, '../lives/page.tsx'), 'utf8');
   const livesRegion = readFileSync(join(here, '../lives/[region]/page.tsx'), 'utf8');
-  assert.match(livesIndex, /permanentRedirect\('\/how-it-works\?s=lives'\)/);
-  assert.match(livesRegion, /permanentRedirect\(buildLivesHref/);
+  assert.match(livesIndex, /LivesTimeline/);
+  assert.doesNotMatch(livesIndex, /permanentRedirect/);
+  assert.match(livesRegion, /LivesTimeline/);
+  assert.doesNotMatch(livesRegion, /permanentRedirect/);
+  assert.match(sectionsSource, /buildLivesHref/);
+  assert.match(sectionsSource, /Open Lives/);
+  assert.doesNotMatch(sectionsSource, /LivesAreaNav/);
 });
 
-test('how-it-works inlines DataSections through the shared loader', () => {
-  assert.match(apparatusSource, /loadDataPageModel/);
-  assert.match(apparatusSource, /loadLivesAreaBundle/);
-  assert.match(apparatusSource, /<DataSections/);
-  assert.match(loaderSource, /export async function loadDataPageModel/);
+test('legacy \\?s=lives on /data rewrites to the hash deep link', () => {
+  assert.match(pageSource, /firstValue\(raw\.s\)/);
+  assert.match(pageSource, /buildLivesHref/);
 });
 
 test('data sections keep census and indicator chart wiring', () => {
@@ -65,7 +73,7 @@ test('data sections keep census and indicator chart wiring', () => {
   assert.match(sectionsSource, /GroupedBarIndicatorChart/);
   assert.match(sectionsSource, /StatePopulationShiftChart/);
   assert.match(sectionsSource, /TrendLineChart/);
-  assert.match(sectionsSource, /LivesClassSharesChart|LivesTimeline/);
+  assert.match(sectionsSource, /buildLivesHref/);
   assert.match(sectionsSource, /id="counted"/);
   assert.match(sectionsSource, /id="lives"/);
   assert.match(sectionsSource, /id="gaps"/);
@@ -75,9 +83,18 @@ test('data sections keep census and indicator chart wiring', () => {
 test('data page keeps section anchors for the section rail', () => {
   for (const section of DATA_PAGE_SECTIONS) {
     assert.match(sectionsSource, new RegExp(`id="${section.id}"`));
+    assert.ok(section.icon, `${section.id} carries a section glyph`);
   }
   assert.match(sectionsSource, /DataPageNav sections=\{DATA_PAGE_SECTIONS\}/);
   assert.match(sectionsSource, /DestinationIcon/);
+  assert.match(sectionsSource, /ds-kicker-glyph/);
+});
+
+test('reading rules carry orientation glyphs', () => {
+  for (const rule of DATA_READING_RULES) {
+    assert.ok(rule.icon, `${rule.kicker} carries a rule glyph`);
+  }
+  assert.match(sectionsSource, /rule\.icon/);
 });
 
 test('the headline band links into the figures it summarizes', () => {
@@ -113,6 +130,13 @@ test('data user-facing copy avoids em dashes', () => {
 
 test('the reading rules are not numbered: they hold at once', () => {
   assert.doesNotMatch(sectionsSource, /DATA_READING_RULES\.map\([\s\S]{0,400}index \+ 1/);
+});
+
+test('data reading section links to the source library room', () => {
+  assert.equal(DATA_SOURCE_LIBRARY_HANDOFF.href, '/sources');
+  assert.match(sectionsSource, /DATA_SOURCE_LIBRARY_HANDOFF/);
+  assert.match(sectionsSource, /ds-data-reading__handoff/);
+  assert.equal(DATA_SOURCE_LIBRARY_HANDOFF.label, 'Where these figures come from');
 });
 
 test('the indicator fixture captions the figures print verbatim keep the same voice', () => {

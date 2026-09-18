@@ -21,6 +21,8 @@ import { ReadingEntry, DocumentColophon } from './EntryPosture';
 import { Breadcrumb } from './Breadcrumb';
 import { resolveTrail } from './room-trail';
 import { CardGrid, GroupHeading, RoomCard } from './RoomCards';
+import { RoomSection, RoomHandoff } from './RoomSection';
+import { RoomJump } from './RoomJump';
 import { Prose, RecordRef } from './Prose';
 import { Anatomy, Connections, Note, Precision, SourceList, TrustBlock } from './Evidence';
 import { HairlineIndex } from './HairlineIndex';
@@ -79,11 +81,7 @@ describe('room kit · a title is JSX, never a string of markup', () => {
       .filter((file) => /title="[^"]*<[a-z]/i.test(readFileSync(file, 'utf8')))
       .map((file) => path.relative(APP_DIR, file));
 
-    assert.deepEqual(
-      offenders,
-      [],
-      'pass the title as JSX: title={<>Civil rights <em>law</em></>}',
-    );
+    assert.deepEqual(offenders, [], 'pass the title as JSX: title={<>Banned <em>books</em></>}');
   });
 });
 
@@ -297,6 +295,43 @@ describe('room kit · catalog blocks', () => {
   it('a GroupHeading is an h2, so the room has a real outline', () => {
     const html = renderToStaticMarkup(<GroupHeading>By decade</GroupHeading>);
     assert.match(html, /<h2 class="ds-room-grouphd">By decade<\/h2>/);
+  });
+
+  it('RoomSection is a labelled chapter with a destination plate', () => {
+    const html = renderToStaticMarkup(
+      <RoomSection
+        id="grades"
+        icon="evidence"
+        kicker="Grades"
+        title="What the grades mean"
+        tone="sunk"
+      >
+        <p>A grade is never a color on its own.</p>
+      </RoomSection>,
+    );
+    assert.match(html, /id="grades"/);
+    assert.match(html, /ds-room-section--sunk/);
+    assert.match(html, /ds-room-section__plate/);
+    assert.match(html, /id="grades-heading"/);
+    assert.match(html, /ds-destination-icon--lg/);
+  });
+
+  it('RoomHandoff is a link with a plate, never a buried paragraph', () => {
+    const html = renderToStaticMarkup(
+      <RoomHandoff href="/sources" icon="source" title="Source library" line="Publisher kinds." />,
+    );
+    assert.match(html, /href="\/sources"/);
+    assert.match(html, /ds-room-handoff/);
+    assert.match(html, /Source library/);
+  });
+
+  it('RoomJump is a list of hash links that work without JavaScript', () => {
+    const html = renderToStaticMarkup(
+      <RoomJump sections={[{ id: 'origin', label: 'Why this exists', icon: 'about' }]} />,
+    );
+    assert.match(html, /href="#origin"/);
+    assert.match(html, /ds-room-jump/);
+    assert.doesNotMatch(html, /aria-current/);
   });
 });
 
@@ -798,6 +833,11 @@ describe('room kit · a live moment is a window onto the borrowed plate', () => 
       liveRule[1]!,
       /background:\s*transparent/,
       'a live slot must drop its background so the borrowed plate shows through',
+    );
+    assert.match(
+      liveRule[1]!,
+      /pointer-events:\s*none/,
+      'a live slot must not intercept hover over the aligned map layer',
     );
   });
 });

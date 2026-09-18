@@ -364,6 +364,9 @@
 }
 
 .ds-orientation__label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45em;
   font-family: var(--ds-font-sans);
   font-size: var(--ds-text-body-sm);
   font-weight: 500;
@@ -1547,8 +1550,14 @@ a.ds-room-chip {
    * an empty box. Dropping the ground here lets the plate show through without touching the
    * z-order that protects the rest of the page. The tag and the Explore control sit at local
    * `z-index: 2`, so they stay above the map.
+   *
+   * `pointer-events: none` keeps this transparent shell from intercepting hover/mousemove over
+   * the aligned map; interactive chrome re-enables hits below. No border transition while live:
+   * animating the frame edge repaints over the WebGL layer on every hover crossing.
    */
   background: transparent;
+  pointer-events: none;
+  transition: none;
 }
 
 .ds-mapmoment__idle {
@@ -1593,6 +1602,7 @@ a.ds-room-chip {
 
 .ds-mapmoment[data-live='1'] .ds-mapmoment__tag {
   opacity: 1;
+  pointer-events: auto;
 }
 
 /* The Explore hand-off. Hidden until the moment is live, because a control that opens "this view"
@@ -1622,6 +1632,7 @@ a.ds-room-chip {
 .ds-mapmoment[data-live='1'] .ds-mapmoment__open {
   opacity: 1;
   visibility: visible;
+  pointer-events: auto;
 }
 
 .ds-mapmoment__open:hover,
@@ -1655,6 +1666,274 @@ a.ds-room-chip {
 
   .ds-mapmoment__tag {
     display: none;
+  }
+}
+
+/* —— standalone room chapters ——————————————————————————————————————————————
+   v9 kept long rooms as one hairline column with 0.72em muted kickers. That made
+   Methodology, About, FAQ and Sources scan as the same stack, and left source
+   library content with no visual weight. These blocks keep the prose measure and
+   add the chapter identity the column was missing: a 44px icon plate, a heading,
+   and an optional full-bleed sunk band. Not cards: no radius lift, no copper fill. */
+
+.ds-room-jump {
+  position: sticky;
+  top: var(--ds-island-clearance, 64px);
+  z-index: var(--ds-z-content, 1);
+  margin: var(--ds-space-6) calc(var(--room-doc-pad, var(--ds-gutter)) * -1) 0;
+  padding: 0 var(--room-doc-pad, var(--ds-gutter));
+  background: color-mix(in srgb, var(--ds-canvas) 92%, transparent);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+  border-bottom: var(--ds-border-width) solid var(--ds-rule);
+}
+
+.ds-room-jump__list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--ds-space-2) var(--ds-space-4);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ds-room-jump__link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45em;
+  min-height: 2.75rem;
+  padding: 0.35rem 0;
+  border-bottom: 2px solid transparent;
+  font-family: var(--ds-font-mono);
+  font-size: 0.6875rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  color: var(--ds-ink-muted);
+  text-decoration: none;
+  transition:
+    color var(--ds-duration-fast) var(--ds-easing),
+    border-color var(--ds-duration-fast) var(--ds-easing);
+}
+
+.ds-room-jump__link:hover {
+  color: var(--ds-ink);
+}
+
+.ds-room-jump__link[aria-current='location'] {
+  color: var(--ds-ink);
+  border-bottom-color: var(--ds-accent-graphic);
+}
+
+.ds-room-jump__link:focus-visible {
+  outline: var(--ds-focus-width, 2px) solid var(--ds-focus-ring, var(--ds-accent));
+  outline-offset: 2px;
+  border-radius: var(--ds-radius-sm);
+}
+
+.ds-room-section {
+  margin-inline: calc(var(--room-doc-pad, var(--ds-gutter)) * -1);
+  padding-inline: var(--room-doc-pad, var(--ds-gutter));
+  padding-block: var(--ds-space-8);
+  scroll-margin-top: calc(var(--ds-island-clearance, 64px) + 3.5rem);
+}
+
+.ds-room-section--sunk {
+  background: var(--room-sunk);
+  border-block: var(--ds-border-width) solid var(--ds-rule);
+}
+
+.ds-room-section__head {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--ds-space-4);
+  max-width: 62ch;
+  margin-bottom: var(--ds-space-5);
+}
+
+.ds-room-section__plate {
+  box-sizing: border-box;
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  border: var(--ds-border-width) solid var(--ds-rule);
+  background: var(--ds-canvas);
+  color: var(--ds-accent);
+}
+
+.ds-room-section__titles {
+  min-width: 0;
+  padding-top: 0.2rem;
+}
+
+.ds-room-section__kicker {
+  margin: 0 0 var(--ds-space-1);
+  font-family: var(--ds-font-mono);
+  font-size: 0.6875rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ds-accent);
+}
+
+.ds-room .ds-room-section__title {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  font-family: var(--ds-font-display);
+  font-size: clamp(1.375rem, 1.15rem + 0.9vw, 1.875rem);
+  font-weight: 600;
+  line-height: 1.15;
+  letter-spacing: -0.03em;
+  color: var(--ds-ink);
+}
+
+.ds-room-section__body > .ds-stack,
+.ds-room-section__body > .ds-room-prose,
+.ds-room-section__body > .ds-room-facts,
+.ds-room-section__body > .ds-room-handoff,
+.ds-room-section__body > .ds-room-handoffs {
+  margin-top: var(--ds-space-4);
+}
+
+.ds-room-section__body > .ds-empty {
+  margin-top: var(--ds-space-8);
+}
+
+.ds-room-section__body > :first-child {
+  margin-top: 0;
+}
+
+.ds-room-facts {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.ds-room-fact {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--ds-space-4);
+  padding-block: var(--ds-space-4);
+  border-top: var(--ds-border-width) solid var(--ds-rule);
+}
+
+.ds-room-fact:last-child {
+  border-bottom: var(--ds-border-width) solid var(--ds-rule);
+}
+
+.ds-room-fact__copy {
+  min-width: 0;
+}
+
+.ds-room-fact__kicker {
+  margin: 0 0 var(--ds-space-1);
+  font-family: var(--ds-font-mono);
+  font-size: 0.6875rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ds-accent);
+}
+
+.ds-room-fact__title {
+  margin: 0;
+  font-family: var(--ds-font-display);
+  font-size: 1.0625rem;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  line-height: 1.25;
+  color: var(--ds-ink);
+}
+
+.ds-room-fact__body {
+  margin: var(--ds-space-2) 0 0;
+  font-family: var(--ds-font-sans);
+  font-size: 0.9375rem;
+  line-height: 1.55;
+  color: var(--ds-ink-muted);
+}
+
+.ds-room-fact__body p {
+  margin: 0;
+}
+
+.ds-room-handoffs {
+  display: grid;
+  gap: 0;
+  margin-top: var(--ds-space-5);
+}
+
+.ds-room-handoff {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--ds-space-4);
+  padding-block: var(--ds-space-4);
+  border-top: var(--ds-border-width) solid var(--ds-rule);
+  text-decoration: none;
+  color: inherit;
+  min-height: 2.75rem;
+}
+
+.ds-room-handoffs .ds-room-handoff:last-child,
+.ds-room-section__body > .ds-room-handoff {
+  border-bottom: var(--ds-border-width) solid var(--ds-rule);
+}
+
+.ds-room-handoff:hover .ds-room-section__plate,
+.ds-room-handoff:focus-visible .ds-room-section__plate {
+  border-color: var(--ds-accent-graphic);
+  color: var(--ds-accent);
+}
+
+.ds-room-handoff:focus-visible {
+  outline: var(--ds-focus-width, 2px) solid var(--ds-focus-ring, var(--ds-accent));
+  outline-offset: 4px;
+}
+
+.ds-room-handoff__copy {
+  min-width: 0;
+  padding-top: 0.15rem;
+}
+
+.ds-room-handoff__copy strong {
+  display: block;
+  font-family: var(--ds-font-display);
+  font-size: 1.0625rem;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  color: var(--ds-ink);
+}
+
+.ds-room-handoff__copy small {
+  display: block;
+  margin-top: var(--ds-space-1);
+  font-family: var(--ds-font-sans);
+  font-size: 0.875rem;
+  line-height: 1.5;
+  color: var(--ds-ink-muted);
+}
+
+@media (max-width: 640px) {
+  .ds-room-jump__list {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+
+  .ds-room-jump__list::-webkit-scrollbar {
+    display: none;
+  }
+
+  .ds-room-jump__link {
+    flex: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ds-room-jump__link,
+  .ds-room-handoff .ds-room-section__plate {
+    transition: none;
   }
 }
 

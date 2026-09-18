@@ -47,18 +47,15 @@ const SURFACE_CLASS_BY_PATH: ReadonlyMap<string, SurfaceClass> = new Map([
   ['/records', 'reading'],
   ['/stories', 'reading'],
   ['/books', 'reading'],
-  ['/books/browse', 'reading'],
   ['/law', 'reading'],
-  ['/law/browse', 'reading'],
   ['/data', 'reading'],
-  // Lives Across the Decades: a 308 into the how-it-works Data section, still classified so
-  // inbound bookmarks keep reading-room chrome for the instant before the redirect.
+  // Lives Across the Decades: immersive cited decade world on /lives.
   ['/lives', 'reading'],
   ['/memorial', 'reading'],
   ['/about', 'reading'],
   ['/faq', 'reading'],
-  ['/how-it-works', 'reading'],
   ['/methodology', 'reading'],
+  ['/sources', 'reading'],
   ['/errata', 'reading'],
 
   // Utility — task surfaces, finished and left.
@@ -115,6 +112,11 @@ export const ENDPOINT_ROUTES: readonly string[] = [
   '/.well-known/security.txt',
   '/robots.txt',
   '/sitemap.xml',
+  // Retired merged trust hub and its escape hatches. Thin redirect routes only.
+  '/how-it-works',
+  '/apparatus',
+  '/law/browse',
+  '/books/browse',
 ];
 
 const ENDPOINT_ROUTE_SET = new Set(ENDPOINT_ROUTES);

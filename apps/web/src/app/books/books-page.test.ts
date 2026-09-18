@@ -9,35 +9,29 @@ import { fileURLToPath } from 'node:url';
 import { BOOKS_ABOUT, BOOKS_CATALOG, BOOKS_INTRO } from './books-copy';
 
 const here = dirname(fileURLToPath(import.meta.url));
-const browseSource = readFileSync(join(here, 'browse', 'page.tsx'), 'utf8');
 const indexSource = readFileSync(join(here, 'page.tsx'), 'utf8');
 const detailSource = readFileSync(join(here, '[slug]', 'page.tsx'), 'utf8');
 const browseSectionsSource = readFileSync(join(here, 'BooksBrowseSections.tsx'), 'utf8');
 const ripRowSource = readFileSync(join(here, 'BooksRipRow.tsx'), 'utf8');
 const copySource = readFileSync(join(here, 'books-copy.ts'), 'utf8');
-const apparatusSource = readFileSync(join(here, '../how-it-works/page.tsx'), 'utf8');
 
-test('books index 308s into how-it-works; browse tools keep the room kit', () => {
-  assert.match(indexSource, /permanentRedirect\('\/how-it-works\?s=books'\)/);
-  assert.match(apparatusSource, /BooksHubSections/);
-  assert.doesNotMatch(browseSource, /EditionAtmosphereMosaic/);
-  assert.doesNotMatch(browseSource, /BOOKS_EDITION_MOSAIC_SEED/);
-  assert.doesNotMatch(browseSource, /booksEditionRootClassName/);
-  assert.doesNotMatch(browseSource, /data-books-edition="v6"/);
-  assert.match(browseSource, /from '\.\.\/\.\.\/\.\.\/components\/room'/);
-  assert.match(browseSource, /<Room>/);
-  assert.match(browseSource, /<ReadingEntry/);
-  assert.match(browseSource, /BooksCatalogPulse/);
+test('books index is the catalog room; /books/browse is a config redirect only', () => {
+  assert.match(indexSource, /BooksBrowseSections/);
+  assert.match(indexSource, /<ReadingEntry/);
+  assert.match(indexSource, /BooksCatalogPulse/);
+  assert.doesNotMatch(indexSource, /OrientationInstrument/);
+  assert.doesNotMatch(indexSource, /how-it-works|BooksHubSections/);
+  assert.doesNotMatch(indexSource, /EditionAtmosphereMosaic|BOOKS_EDITION_MOSAIC_SEED/);
 });
 
 test('books browse holds the door without shipping a finished Banned books walk room', () => {
-  assert.match(browseSource, /WalkOffRamp/);
-  assert.match(browseSource, /showCrumb=\{false\}/);
-  assert.doesNotMatch(browseSource, /Open the Atlas|ATLAS_INSTRUMENT|label: 'The place'/);
-  assert.doesNotMatch(browseSource, /['"`]\/banned-books/);
-  assert.doesNotMatch(browseSource, /Archive texture|Mosaic credits|ATMOSPHERE_ATTRIBUTION/);
-  assert.doesNotMatch(browseSource, /Straight to the records|The Atlas answers where and when/);
-  assert.doesNotMatch(browseSource, /\/explore/);
+  assert.match(indexSource, /WalkOffRamp/);
+  assert.match(indexSource, /showCrumb=\{false\}/);
+  assert.doesNotMatch(indexSource, /Open the Atlas|ATLAS_INSTRUMENT|label: 'The place'/);
+  assert.doesNotMatch(indexSource, /['"`]\/banned-books/);
+  assert.doesNotMatch(indexSource, /Archive texture|Mosaic credits|ATMOSPHERE_ATTRIBUTION/);
+  assert.doesNotMatch(indexSource, /Straight to the records|The Atlas answers where and when/);
+  assert.doesNotMatch(indexSource, /\/explore/);
   assert.match(detailSource, /WalkOffRamp/);
   assert.doesNotMatch(detailSource, /Open the Atlas|ATLAS_INSTRUMENT|label: 'The place'/);
 });
@@ -65,13 +59,15 @@ test('books detail page renders through the room kit, with no edition chrome lef
   assert.doesNotMatch(detailSectionsSource, /ds-books-edition__panel--/);
 });
 
-test('books browse renders its rows through the shared index, not a bespoke row', () => {
-  // SP-11c moved the browse list onto `HairlineIndex`, the same block `/records` renders, so the
-  // rows and the facet chips carry one vocabulary instead of two. `BooksRipRow` survives because
-  // `/books/[slug]` still renders it for related titles; it is the BROWSE page that stopped.
-  assert.match(browseSectionsSource, /HairlineIndex/);
-  assert.doesNotMatch(browseSectionsSource, /BooksRipRow/);
+test('books browse renders cover-led kit rows, not the retired rip row or HairlineIndex', () => {
+  // Catalog indexes share `ds-room-idx` slots. Books cannot use HairlineIndex: that block's
+  // glyph track is a 16px icon and its name clips to one line, which is how this catalog
+  // read as a pin list. Related titles on the detail page still use BooksRipRow.
+  assert.match(browseSectionsSource, /ds-books-idx/);
   assert.match(browseSectionsSource, /BooksCoverArt/);
+  assert.match(browseSectionsSource, /ds-books-idx__gloss/);
+  assert.doesNotMatch(browseSectionsSource, /HairlineIndex/);
+  assert.doesNotMatch(browseSectionsSource, /BooksRipRow/);
   assert.match(ripRowSource, /BooksCoverArt/);
 });
 
@@ -84,20 +80,35 @@ test('books browse facet chips use the room kit chip vocabulary', () => {
 
 test('books browse preserves GET filter and sort URL contract', () => {
   assert.match(browseSectionsSource, /method="get"/);
-  assert.match(browseSectionsSource, /action="\/books\/browse"/);
+  assert.match(browseSectionsSource, /action="\/books#browse"/);
+  assert.match(browseSectionsSource, /id="browse"/);
   assert.match(browseSectionsSource, /BooksSearchTypeahead/);
   assert.match(browseSectionsSource, /name="state"/);
   assert.match(browseSectionsSource, /name="author"/);
   assert.match(browseSectionsSource, /name="sort"/);
   assert.match(browseSectionsSource, /name="dir"/);
+  assert.match(browseSectionsSource, /aria-label="Sort order"/);
+  assert.match(browseSectionsSource, /sortOptions\.map/);
+  assert.match(browseSectionsSource, /ds-records-active/);
 });
 
 test('books user-facing copy avoids em dashes on touched surfaces', () => {
-  const sources = [browseSource, detailSource, browseSectionsSource, copySource];
+  const sources = [indexSource, detailSource, browseSectionsSource, copySource];
   for (const source of sources) {
     assert.doesNotMatch(source, /—/);
   }
   assert.equal(BOOKS_INTRO.kicker, 'Reference');
   assert.equal(BOOKS_CATALOG.title, 'Challenged titles');
   assert.equal(BOOKS_ABOUT.title, 'How to read this list');
+});
+
+test('the catalog room states the census limit and does not speak as an institution', () => {
+  assert.match(indexSource, /BOOKS_INDEX_LEDE/);
+  assert.doesNotMatch(indexSource, /\bWe could not\b/);
+  assert.doesNotMatch(indexSource, /\bour side\b/);
+  assert.match(browseSectionsSource, /BOOKS_ABOUT/);
+  assert.match(browseSectionsSource, /RoomJump/);
+  assert.match(browseSectionsSource, /id="read"/);
+  assert.match(browseSectionsSource, /id="browse"/);
+  assert.match(browseSectionsSource, /name="state"/);
 });

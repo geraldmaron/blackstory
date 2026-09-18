@@ -20,7 +20,7 @@ export const BOOKS_BROWSE_SORT_KEYS = [
   'states',
 ] as const satisfies readonly BooksBrowseSortKey[];
 
-/** Titles per browse page (card grid: 1 / 2 / 3 columns). */
+/** Titles per catalog page. */
 export const BOOKS_BROWSE_PAGE_SIZE = 12;
 
 export type RawBooksBrowseParams = {
@@ -231,7 +231,7 @@ export function buildBooksBrowseHref(params: {
   if (params.dir !== 'asc') search.set('dir', params.dir);
   if (params.page !== undefined && params.page > 1) search.set('page', String(params.page));
   const query = search.toString();
-  return query ? `/books/browse?${query}` : '/books/browse';
+  return query ? `/books?${query}` : '/books';
 }
 
 function buildSortOptions(params: {

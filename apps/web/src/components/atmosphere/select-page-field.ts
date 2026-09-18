@@ -51,7 +51,7 @@ function isRecordSurface(path: string): boolean {
 }
 
 function resolveMotifId(path: string): PageFieldMotifId {
-  if (matchesRoutePrefix(path, '/data') || matchesRoutePrefix(path, '/how-it-works')) {
+  if (matchesRoutePrefix(path, '/data') || matchesRoutePrefix(path, '/lives')) {
     return 'ledger';
   }
 
@@ -65,6 +65,7 @@ function resolveMotifId(path: string): PageFieldMotifId {
 
   if (
     matchesRoutePrefix(path, '/methodology') ||
+    matchesRoutePrefix(path, '/sources') ||
     matchesRoutePrefix(path, '/law') ||
     matchesRoutePrefix(path, '/legal') ||
     matchesRoutePrefix(path, '/corrections') ||

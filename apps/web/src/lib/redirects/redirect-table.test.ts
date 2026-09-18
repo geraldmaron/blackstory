@@ -278,9 +278,10 @@ test('every legacy alias in the semantic catalog is honored by the redirect tabl
     if (hops === 0) {
       // `/history` and `/search` deliberately have no config rule: both carry a query value a
       // config rule cannot read (`decade` becomes `era`, and `q` has to survive), so the
-      // filesystem route runs and does the transform. The catalog annotates both.
+      // filesystem route runs and does the transform. `/how-it-works` and `/apparatus` are the
+      // same shape: `?s=` must map to different rooms, which a static rule cannot do.
       assert.ok(
-        ['/history', '/search'].includes(alias.from),
+        ['/history', '/search', '/how-it-works', '/apparatus'].includes(alias.from),
         `${alias.from} is a catalog alias with no redirect rule`,
       );
       continue;

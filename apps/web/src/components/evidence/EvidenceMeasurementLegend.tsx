@@ -7,7 +7,12 @@
  */
 
 import React from 'react';
+import Link from 'next/link';
 import { EVIDENCE_DIMENSION_COPY } from '../../lib/evidence';
+import {
+  METHODOLOGY_EVIDENCE_GRADES_HREF,
+  METHODOLOGY_HOW_RECORD_GETS_IN_HREF,
+} from './editorial-links';
 
 export function EvidenceMeasurementLegend() {
   return (
@@ -23,6 +28,15 @@ export function EvidenceMeasurementLegend() {
           </React.Fragment>
         ))}
       </dl>
+      <p className="ds-evidence-legend__offramp ds-sans">
+        <Link href={METHODOLOGY_EVIDENCE_GRADES_HREF} prefetch={false}>
+          Evidence grade definitions
+        </Link>
+        {' · '}
+        <Link href={METHODOLOGY_HOW_RECORD_GETS_IN_HREF} prefetch={false}>
+          How a record gets in
+        </Link>
+      </p>
     </details>
   );
 }

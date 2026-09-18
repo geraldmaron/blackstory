@@ -31,6 +31,7 @@ import {
   type EntityCrossReferenceSurface,
 } from '../../../lib/theme-impact/source';
 import { EntityEvidencePanel } from '../../../components/evidence';
+import { METHODOLOGY_EVIDENCE_GRADES_HREF } from '../../../components/evidence/editorial-links';
 import { EntityStatusPanel } from '../../../components/entity/EntityStatusPanel';
 import { LinkedProse, type EntityLinkCatalogEntry } from '../../../components/entity/LinkedProse';
 import { RecordBeatHead } from '../../../components/entity/RecordChrome';
@@ -382,7 +383,16 @@ export function EntityRoomSections({
             icon="claims"
             title="What the sources say"
             count={evidenceClaims.length}
-            standfirst="Each statement below is one accepted claim, shown with the source it was taken from and how strongly that source carries it."
+            standfirst={
+              <>
+                Each statement below is one accepted claim, shown with the source it was taken from
+                and how strongly that source carries it.{' '}
+                <Link href={METHODOLOGY_EVIDENCE_GRADES_HREF} prefetch={false}>
+                  Read the grade definitions
+                </Link>
+                .
+              </>
+            }
           />
           <EntityEvidencePanel
             labelledBy="claims-heading"

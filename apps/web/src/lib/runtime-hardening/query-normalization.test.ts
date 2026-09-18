@@ -367,13 +367,13 @@ test('buildNormalizedUrl issues canonical Explore URLs on /explore', () => {
   assert.equal(normalized.search, '?state=VA&lines=1');
 });
 
-test('/law and /law/browse keep the GET browse contract (q, kind, topic)', () => {
+test('/law and /law keep the GET browse contract (q, kind, topic)', () => {
   assert.equal(
     normalizeQueryString('/law', { q: ' voting ', kind: 'statute', topic: 'voting_rights' }),
     'kind=statute&q=voting&topic=voting_rights',
   );
   assert.equal(
-    normalizeQueryString('/law/browse', {
+    normalizeQueryString('/law', {
       q: ' voting ',
       kind: 'statute',
       topic: 'voting_rights',
@@ -386,9 +386,7 @@ test('/law and /law/browse keep the GET browse contract (q, kind, topic)', () =>
     false,
   );
   assert.equal(
-    needsQueryNormalizationRedirect(
-      new URL('https://example.com/law/browse?q=voting&kind=statute'),
-    ),
+    needsQueryNormalizationRedirect(new URL('https://example.com/law?q=voting&kind=statute')),
     false,
   );
   assert.deepEqual(
