@@ -1,15 +1,14 @@
 /**
- * World beats and gap cards for one Lives decade: sourced discovery beside the scene.
+ * Sourced world beats for one Lives decade. Incomplete domains stay out of the public surface;
+ * explicit historical absences belong in authored milestone panels, not generic gap cards.
  */
 import React from 'react';
 import Link from 'next/link';
 import {
-  LIVES_WORLD_CORE_DOMAINS,
   LIVES_WORLD_DOMAIN_LABELS,
   selectLivesWorldBeats,
   type LivesDecade,
   type LivesLens,
-  type LivesUnit,
   type LivesWorldBeat,
 } from '@repo/domain/statistics/lives';
 import { JUXTAPOSITION_DISCLAIMER } from '@repo/domain/statistics/lives';
@@ -20,17 +19,17 @@ export type LivesWorldBeatsProps = {
   readonly decade: LivesDecade;
   readonly beats: readonly LivesWorldBeat[];
   readonly emphasis: LivesLens;
-  readonly unit: LivesUnit;
 };
 
-export function LivesWorldBeats({ decade, beats, emphasis, unit }: LivesWorldBeatsProps) {
-  const { beats: matched, gaps } = selectLivesWorldBeats({
+export function LivesWorldBeats({ decade, beats, emphasis }: LivesWorldBeatsProps) {
+  const { beats: matched } = selectLivesWorldBeats({
     beats,
     decade,
-    unit,
+    unit: 'all',
     emphasis,
-    domains: LIVES_WORLD_CORE_DOMAINS,
   });
+
+  if (matched.length === 0) return null;
 
   return (
     <section className="lives-world" aria-label="Decade world">
@@ -87,13 +86,6 @@ export function LivesWorldBeats({ decade, beats, emphasis, unit }: LivesWorldBea
                   ))}
               </ul>
             ) : null}
-          </li>
-        ))}
-        {gaps.map((gap) => (
-          <li key={gap.domain} className="lives-world__gap">
-            <p className="lives-world__domain">{LIVES_WORLD_DOMAIN_LABELS[gap.domain]}</p>
-            <h4 className="lives-world__heading">{gap.heading}</h4>
-            <p className="lives-world__body">{gap.body}</p>
           </li>
         ))}
       </ul>

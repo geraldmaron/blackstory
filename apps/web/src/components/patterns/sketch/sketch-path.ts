@@ -12,6 +12,18 @@ export function sketchJitter(seed: number, amp: number): number {
   return (sketchHash(seed) - 0.5) * 2 * amp;
 }
 
+/**
+ * Keep generated coordinates stable across server and browser math implementations.
+ * Three decimal places are well below the visible resolution of these illustrations.
+ */
+export function sketchCoordinate(value: number): number {
+  return Math.round(value * 1_000) / 1_000;
+}
+
+function sketchPathNumber(value: number): string {
+  return sketchCoordinate(value).toString();
+}
+
 /** A rounded rectangle redrawn as four bowed, slightly-off-true edges. */
 export function sketchRect(
   x: number,
@@ -30,12 +42,13 @@ export function sketchRect(
   const y2 = y + h + j(6);
   const x3 = x + j(7);
   const y3 = y + h + j(8);
+  const n = sketchPathNumber;
   return (
-    `M ${x0} ${y0} ` +
-    `C ${x0 + (x1 - x0) * 0.3} ${y0 + j(9)}, ${x0 + (x1 - x0) * 0.7} ${y0 + j(10)}, ${x1} ${y1} ` +
-    `C ${x1 + j(11)} ${y1 + (y2 - y1) * 0.3}, ${x1 + j(12)} ${y1 + (y2 - y1) * 0.7}, ${x2} ${y2} ` +
-    `C ${x2 - (x2 - x3) * 0.3} ${y2 + j(13)}, ${x2 - (x2 - x3) * 0.7} ${y2 + j(14)}, ${x3} ${y3} ` +
-    `C ${x3 + j(15)} ${y3 - (y3 - y0) * 0.3}, ${x3 + j(16)} ${y3 - (y3 - y0) * 0.7}, ${x0} ${y0} Z`
+    `M ${n(x0)} ${n(y0)} ` +
+    `C ${n(x0 + (x1 - x0) * 0.3)} ${n(y0 + j(9))}, ${n(x0 + (x1 - x0) * 0.7)} ${n(y0 + j(10))}, ${n(x1)} ${n(y1)} ` +
+    `C ${n(x1 + j(11))} ${n(y1 + (y2 - y1) * 0.3)}, ${n(x1 + j(12))} ${n(y1 + (y2 - y1) * 0.7)}, ${n(x2)} ${n(y2)} ` +
+    `C ${n(x2 - (x2 - x3) * 0.3)} ${n(y2 + j(13))}, ${n(x2 - (x2 - x3) * 0.7)} ${n(y2 + j(14))}, ${n(x3)} ${n(y3)} ` +
+    `C ${n(x3 + j(15))} ${n(y3 - (y3 - y0) * 0.3)}, ${n(x3 + j(16))} ${n(y3 - (y3 - y0) * 0.7)}, ${n(x0)} ${n(y0)} Z`
   );
 }
 
@@ -63,7 +76,12 @@ export function sketchHatchLines(
     const y1 = y + h * t;
     const x2 = x + w + offset;
     const y2 = y + h * t - w * 0.35;
-    lines.push({ x1, y1, x2: x2, y2 });
+    lines.push({
+      x1: sketchCoordinate(x1),
+      y1: sketchCoordinate(y1),
+      x2: sketchCoordinate(x2),
+      y2: sketchCoordinate(y2),
+    });
   }
   return lines;
 }
@@ -72,7 +90,7 @@ export function sketchHatchLines(
 export function sketchHousePath(x: number, y: number, w: number, h: number, seed: number): string {
   const body = sketchRect(x, y + h * 0.35, w, h * 0.65, seed, 1.6);
   const j = (i: number) => sketchJitter(seed + 40 + i, 1.4);
-  const roof = `M ${x + j(1)} ${y + h * 0.4} L ${x + w / 2 + j(2)} ${y + j(3)} L ${x + w + j(4)} ${y + h * 0.4}`;
+  const roof = `M ${sketchPathNumber(x + j(1))} ${sketchPathNumber(y + h * 0.4)} L ${sketchPathNumber(x + w / 2 + j(2))} ${sketchPathNumber(y + j(3))} L ${sketchPathNumber(x + w + j(4))} ${sketchPathNumber(y + h * 0.4)}`;
   return `${body} ${roof}`;
 }
 

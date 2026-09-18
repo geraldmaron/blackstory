@@ -326,7 +326,7 @@ export function livesWorldGapCard(
 export function selectLivesWorldBeats(input: {
   readonly beats: readonly LivesWorldBeat[];
   readonly decade: LivesDecade;
-  readonly unit: LivesUnit;
+  readonly unit: LivesUnit | 'all';
   readonly emphasis: LivesLens;
   readonly domains?: readonly LivesWorldDomain[];
 }): {
@@ -335,7 +335,7 @@ export function selectLivesWorldBeats(input: {
 } {
   const domains = input.domains ?? LIVES_WORLD_DOMAINS;
   const matched = input.beats.filter((beat) => {
-    if (beat.unit !== 'all' && beat.unit !== input.unit) return false;
+    if (input.unit !== 'all' && beat.unit !== 'all' && beat.unit !== input.unit) return false;
     if (!beat.appliesTo.includes('all') && !beat.appliesTo.includes(input.emphasis)) {
       return false;
     }

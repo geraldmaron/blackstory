@@ -1,5 +1,5 @@
 /**
- * Interactive Lives timeline: scene, unit/lens/tier controls, decade rail, panel, world beats.
+ * Interactive Lives timeline: scene, lens control, decade rail, panel, and sourced world beats.
  * URL state stays shareable without a full navigation on each control change.
  */
 'use client';
@@ -10,14 +10,10 @@ import {
   LIVES_LENSES,
   LIVES_LENS_LABELS,
   LIVES_NATIONAL,
-  LIVES_UNITS,
-  LIVES_UNIT_KICKERS,
-  LIVES_UNIT_LABELS,
   type LivesAreaBundle,
 } from '@repo/domain/statistics/lives';
 import {
   DEFAULT_LIVES_VIEW,
-  LIVES_TIER_PARAMS,
   parseLivesSearchParams,
   type LivesViewState,
 } from '../../lib/lives/lives-url-state';
@@ -34,15 +30,8 @@ import { LivesWorldBeats } from './LivesWorldBeats';
 
 void React;
 
-const TIER_LABELS = {
-  all: 'Everyone',
-  lower: 'Lower',
-  middle: 'Middle',
-  upper: 'Upper',
-} as const;
-
 function sameView(a: LivesViewState, b: LivesViewState): boolean {
-  return a.race === b.race && a.tier === b.tier && a.decade === b.decade && a.unit === b.unit;
+  return a.race === b.race && a.decade === b.decade;
 }
 
 export type LivesTimelineProps = {
@@ -73,12 +62,10 @@ export function LivesTimeline({ bundle, areaSlug, hideAreaNav = false }: LivesTi
     else params.set('area', areaSlug);
     if (view.race !== DEFAULT_LIVES_VIEW.race) params.set('race', view.race);
     else params.delete('race');
-    if (view.tier !== DEFAULT_LIVES_VIEW.tier) params.set('tier', view.tier);
-    else params.delete('tier');
+    params.delete('tier');
     if (view.decade !== DEFAULT_LIVES_VIEW.decade) params.set('decade', String(view.decade));
     else params.delete('decade');
-    if (view.unit !== DEFAULT_LIVES_VIEW.unit) params.set('unit', view.unit);
-    else params.delete('unit');
+    params.delete('unit');
     const query = params.toString();
     const hash =
       !onLivesRoom && (touched.current || window.location.hash === '#lives') ? '#lives' : '';
@@ -100,7 +87,7 @@ export function LivesTimeline({ bundle, areaSlug, hideAreaNav = false }: LivesTi
   const money = resolveLivesDecadeMoneyModel({
     decade,
     emphasis: view.race,
-    unit: view.unit,
+    unit: 'household',
     observations: LIVES_NATIONAL_DOLLAR_FIXTURES,
   });
 
@@ -109,7 +96,7 @@ export function LivesTimeline({ bundle, areaSlug, hideAreaNav = false }: LivesTi
       <LivesScene
         decade={decade}
         emphasis={view.race}
-        unit={view.unit}
+        unit="household"
         areaSlug={areaSlug}
         {...(money.affordance
           ? {
@@ -124,8 +111,6 @@ export function LivesTimeline({ bundle, areaSlug, hideAreaNav = false }: LivesTi
           {money.derivedIncome.caption}
         </p>
       ) : null}
-
-      <p className="lives-unit-kicker">{LIVES_UNIT_KICKERS[view.unit]}</p>
 
       {hideAreaNav ? null : <LivesAreaNav currentSlug={areaSlug} view={view} />}
 
@@ -159,42 +144,6 @@ export function LivesTimeline({ bundle, areaSlug, hideAreaNav = false }: LivesTi
             </label>
           ))}
         </fieldset>
-        <fieldset className="lives-controls__group">
-          <legend className="lives-controls__legend">
-            <DestinationIcon id="person" className="ds-kicker-glyph" />
-            Unit
-          </legend>
-          {LIVES_UNITS.map((unit) => (
-            <label key={unit} className="lives-controls__option">
-              <input
-                type="radio"
-                name="lives-unit"
-                value={unit}
-                checked={view.unit === unit}
-                onChange={() => update({ unit })}
-              />
-              <span>{LIVES_UNIT_LABELS[unit]}</span>
-            </label>
-          ))}
-        </fieldset>
-        <fieldset className="lives-controls__group">
-          <legend className="lives-controls__legend">
-            <DestinationIcon id="collection" className="ds-kicker-glyph" />
-            Class tier
-          </legend>
-          {LIVES_TIER_PARAMS.map((tier) => (
-            <label key={tier} className="lives-controls__option">
-              <input
-                type="radio"
-                name="lives-tier"
-                value={tier}
-                checked={view.tier === tier}
-                onChange={() => update({ tier })}
-              />
-              <span>{TIER_LABELS[tier]}</span>
-            </label>
-          ))}
-        </fieldset>
       </div>
 
       <LivesDecadeRail
@@ -205,7 +154,7 @@ export function LivesTimeline({ bundle, areaSlug, hideAreaNav = false }: LivesTi
       />
 
       <p className="lives-sr-only lives-announcer" aria-live="polite">
-        Showing the {decade.label}, {LIVES_UNIT_LABELS[view.unit]} unit
+        Showing the {decade.label}, with {LIVES_LENS_LABELS[view.race]} figures emphasized
       </p>
 
       <LivesDecadePanel
@@ -213,17 +162,10 @@ export function LivesTimeline({ bundle, areaSlug, hideAreaNav = false }: LivesTi
         labelledBy={`lives-decade-${decade.decade}`}
         decade={decade}
         emphasis={view.race}
-        tier={view.tier}
-        unit={view.unit}
         disclaimer={bundle.disclaimer}
       />
 
-      <LivesWorldBeats
-        decade={decade.decade}
-        beats={decade.worldBeats}
-        emphasis={view.race}
-        unit={view.unit}
-      />
+      <LivesWorldBeats decade={decade.decade} beats={decade.worldBeats} emphasis={view.race} />
     </div>
   );
 }

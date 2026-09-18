@@ -38,7 +38,6 @@ export function LivesTimelineStatic({ bundle, areaSlug }: LivesTimelineStaticPro
       <LivesDecadePanel
         decade={decade}
         emphasis={DEFAULT_LIVES_VIEW.race}
-        tier={DEFAULT_LIVES_VIEW.tier}
         disclaimer={bundle.disclaimer}
       />
     </div>

@@ -38,7 +38,7 @@ function pickDollar(
   observations: readonly LivesObservationInput[],
   metricId: string,
   decade: LivesDecade,
-  lens: LivesLens,
+  lens: LivesLens | 'all',
 ): LivesObservationInput | undefined {
   const forDecade = decadeRows(observations, metricId, decade);
   const preferSlices =
@@ -83,7 +83,7 @@ function pickPriceMatchingIncome(
  */
 export function resolveLivesDecadeMoneyModel(input: {
   readonly decade: LivesDecadeBundle;
-  readonly emphasis: LivesLens;
+  readonly emphasis: LivesLens | 'all';
   readonly unit: LivesUnit;
   readonly observations: readonly LivesObservationInput[];
 }): LivesDecadeMoneyModel {

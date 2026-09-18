@@ -1,22 +1,18 @@
 /**
  * `/lives/[region]`: keep regional bookmarks resolving. Renders the immersive room with `?area=`
- * rather than 308ing away, so the street and unit controls stay on this URL.
+ * rather than 308ing away, so the timeline stays on this URL.
  */
 import type { Metadata } from 'next';
 import React, { Suspense } from 'react';
 import { notFound } from 'next/navigation';
-import { LIVES_AREAS, LIVES_UNIT_KICKERS, livesAreaBySlug } from '@repo/domain/statistics/lives';
+import { LIVES_AREAS, livesAreaBySlug } from '@repo/domain/statistics/lives';
 import { buildStaticPageMetadata } from '../../../lib/seo/metadata-builders';
 import { DocumentColophon, ReadingEntry, Room } from '../../../components/room';
 import { WalkOffRamp } from '../../walk-off-ramp';
 import { emptyLivesAreaBundle, loadLivesAreaBundle } from '../../../lib/lives/lives-source';
-import {
-  parseLivesSearchParams,
-  type RawLivesSearchParams,
-} from '../../../lib/lives/lives-url-state';
+import type { RawLivesSearchParams } from '../../../lib/lives/lives-url-state';
 import { LivesTimeline } from '../../../components/lives/LivesTimeline';
 import { LivesTimelineStatic } from '../../../components/lives/LivesTimelineStatic';
-import { DestinationIcon } from '../../../components/patterns/DestinationIcon';
 import '../../reading-room.css';
 import '../lives.css';
 
@@ -44,12 +40,10 @@ export async function generateMetadata({ params }: LivesAreaPageProps): Promise<
   });
 }
 
-export default async function LivesAreaPage({ params, searchParams }: LivesAreaPageProps) {
+export default async function LivesAreaPage({ params }: LivesAreaPageProps) {
   const { region: slug } = await params;
   const area = livesAreaBySlug(slug);
   if (!area || area.kind !== 'region') notFound();
-  const raw = await searchParams;
-  const view = parseLivesSearchParams(raw);
   const loaded = await loadLivesAreaBundle(area.slug);
   const bundle = loaded ?? emptyLivesAreaBundle(area);
 
@@ -61,13 +55,7 @@ export default async function LivesAreaPage({ params, searchParams }: LivesAreaP
         lede={area.summary}
         showCrumb={false}
       />
-      <DocumentColophon
-        facts={[`Area · ${bundle.areaName}`, 'Span · 1870s to 2020s', `Unit · ${view.unit}`]}
-      />
-      <p className="lives-room__kicker">
-        <DestinationIcon id="data" className="ds-kicker-glyph" />
-        {LIVES_UNIT_KICKERS[view.unit]}
-      </p>
+      <DocumentColophon facts={[`Area · ${bundle.areaName}`, 'Span · 1870s to 2020s']} />
       <Suspense fallback={<LivesTimelineStatic bundle={bundle} areaSlug={area.slug} />}>
         <LivesTimeline bundle={bundle} areaSlug={area.slug} />
       </Suspense>

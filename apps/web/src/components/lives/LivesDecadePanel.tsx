@@ -3,7 +3,7 @@
  * World beats render beside this panel in the timeline.
  */
 import React from 'react';
-import type { LivesDecadeBundle, LivesLens, LivesUnit } from '@repo/domain/statistics/lives';
+import type { LivesDecadeBundle, LivesLens } from '@repo/domain/statistics/lives';
 import { LivesClassSharesChart } from './LivesClassSharesChart';
 import { LivesConditionsChart } from './LivesConditionsChart';
 import { LivesCountSight } from './LivesCountSight';
@@ -15,8 +15,6 @@ void React;
 export type LivesDecadePanelProps = {
   readonly decade: LivesDecadeBundle;
   readonly emphasis: LivesLens;
-  readonly tier: 'all' | 'lower' | 'middle' | 'upper';
-  readonly unit?: LivesUnit;
   readonly disclaimer: string;
   readonly labelledBy?: string;
   readonly id?: string;
@@ -25,8 +23,6 @@ export type LivesDecadePanelProps = {
 export function LivesDecadePanel({
   decade,
   emphasis,
-  tier,
-  unit = 'household',
   disclaimer,
   labelledBy,
   id,
@@ -36,7 +32,6 @@ export function LivesDecadePanel({
       {...(id ? { id } : {})}
       {...(labelledBy ? { role: 'tabpanel', 'aria-labelledby': labelledBy } : {})}
       className="lives-panel"
-      data-unit={unit}
     >
       <h2 className="lives-panel__title">The {decade.label}</h2>
       <LivesCountSight decade={decade} />
@@ -49,20 +44,17 @@ export function LivesDecadePanel({
           ))}
         </div>
       ) : null}
-      {unit === 'child' ? (
-        <p className="lives-panel__unit-note">
-          Class and income bands are household or worker measures. They are shown as context for the
-          child unit, not as a child&apos;s wage.
-        </p>
+      {decade.decade >= 2010 ? (
+        <aside className="lives-panel__definition-note" aria-label="How these groups overlap">
+          <strong>These are not three slices of one population.</strong> Homeownership counts Black
+          or African American alone, including Black Hispanic households. The Hispanic figure
+          includes people of any race. The white figure excludes Hispanic households. These figures
+          overlap and do not add to 100. Population share on this panel uses a separate table whose
+          displayed groups do partition.
+        </aside>
       ) : null}
-      {unit === 'woman' ? (
-        <p className="lives-panel__unit-note">
-          Homeownership and household income are household measures. They are not labeled as her
-          ownership or wage. Work and schooling layers carry the woman unit.
-        </p>
-      ) : null}
-      <LivesClassSharesChart decade={decade} emphasis={emphasis} selectedTier={tier} />
-      <LivesConditionsChart decade={decade} emphasis={emphasis} tierSelected={tier !== 'all'} />
+      <LivesClassSharesChart decade={decade} emphasis={emphasis} />
+      <LivesConditionsChart decade={decade} emphasis={emphasis} />
       <LivesRulesInForce decade={decade} emphasis={emphasis} disclaimer={disclaimer} />
     </section>
   );

@@ -113,3 +113,34 @@ test('selectLivesWorldBeats fills gap cards for missing core domains', () => {
   assert.equal(gaps.length, 2);
   assert.ok(gaps.some((gap) => gap.domain === 'justice'));
 });
+
+test('selectLivesWorldBeats can query every authored unit without a reader unit control', () => {
+  const base: LivesWorldBeat = {
+    id: 'household',
+    domain: 'housing',
+    claimType: 'factual',
+    heading: 'Housing',
+    body: 'A sourced housing beat.',
+    citations: [{ label: 'Census', url: 'https://www.census.gov/' }],
+    appliesTo: ['all'],
+    unit: 'household',
+    entities: [],
+  };
+  const records: LivesWorldBeat[] = [
+    base,
+    { ...base, id: 'child', unit: 'child', domain: 'schooling' },
+    { ...base, id: 'woman', unit: 'woman', domain: 'work' },
+  ];
+
+  const selected = selectLivesWorldBeats({
+    beats: records,
+    decade: 1930,
+    unit: 'all',
+    emphasis: 'black',
+  });
+
+  assert.deepEqual(
+    selected.beats.map((entry) => entry.id),
+    ['household', 'child', 'woman'],
+  );
+});

@@ -238,7 +238,7 @@ export function MethodologySections({ omitEntry = false }: { readonly omitEntry?
             href="/lives"
             icon="person"
             title="Open Lives"
-            line="The immersive room: a region, a lens, a decade, and a named unit."
+            line="Published counts beside sourced voices, places, laws, and records."
           />
           <RoomHandoff
             href="/data#lives"

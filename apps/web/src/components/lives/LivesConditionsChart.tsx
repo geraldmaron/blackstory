@@ -17,7 +17,6 @@ void React;
 export type LivesConditionsChartProps = {
   readonly decade: LivesDecadeBundle;
   readonly emphasis: LivesLens;
-  readonly tierSelected: boolean;
 };
 
 function barWidth(estimate: number | undefined): number {
@@ -25,13 +24,15 @@ function barWidth(estimate: number | undefined): number {
   return Math.min(100, estimate);
 }
 
-export function LivesConditionsChart({
-  decade,
-  emphasis,
-  tierSelected,
-}: LivesConditionsChartProps) {
-  if (decade.conditions.length === 0) return null;
-  const first = decade.conditions[0];
+export function LivesConditionsChart({ decade, emphasis }: LivesConditionsChartProps) {
+  const visibleConditions = decade.conditions.filter((condition) =>
+    LIVES_LENSES.some((lens) => {
+      const cell = condition.cells[lens];
+      return cell.state === 'published' || cell.state === 'wide_margin';
+    }),
+  );
+  if (visibleConditions.length === 0) return null;
+  const first = visibleConditions[0];
   const firstCell = first?.cells[emphasis];
   const firstDisplay = firstCell ? describeLivesCell(firstCell) : null;
   const reading =
@@ -43,18 +44,12 @@ export function LivesConditionsChart({
     <LivesFigure
       title={`Conditions, ${decade.label}`}
       reading={reading}
-      caption={
-        tierSelected
-          ? 'The census did not publish these by class, so they describe the whole group even when a tier is selected.'
-          : 'Each row is one published measure. Bars are percentages; a missing bar means the census did not publish that cell.'
-      }
+      caption="Each row is one published measure. Bars are percentages; a missing bar means the census did not publish that cell."
       ariaLabel={`Living conditions for Black, white and Hispanic Americans in the ${decade.label}`}
-      textAlternative={
-        <LivesConditionsTable decade={decade} emphasis={emphasis} tierSelected={tierSelected} />
-      }
+      textAlternative={<LivesConditionsTable decade={decade} emphasis={emphasis} />}
     >
       <div className="lives-conditions" role="img" aria-hidden="true">
-        {decade.conditions.map((condition) => (
+        {visibleConditions.map((condition) => (
           <div key={condition.key} className="lives-condition">
             <p className="lives-condition__label">
               {condition.label}

@@ -20,18 +20,13 @@ const BUCKET_LABELS: Readonly<Record<LivesClassBucket, string>> = {
 export type LivesClassSharesTableProps = {
   readonly decade: LivesDecadeBundle;
   readonly emphasis: LivesLens;
-  readonly selectedTier: 'all' | 'lower' | 'middle' | 'upper';
 };
 
 /**
  * Share of each group in each class band. All three groups are always shown; the lens emphasizes a row,
- * the chosen tier a column, and each row names the definition its figures used.
+ * and each row names the definition its figures used.
  */
-export function LivesClassSharesTable({
-  decade,
-  emphasis,
-  selectedTier,
-}: LivesClassSharesTableProps) {
+export function LivesClassSharesTable({ decade, emphasis }: LivesClassSharesTableProps) {
   const buckets: readonly LivesClassBucket[] =
     decade.regime === 'work_based'
       ? ['lower', 'middle', 'upper', 'unclassified']
@@ -45,11 +40,7 @@ export function LivesClassSharesTable({
         <tr>
           <th scope="col">Group</th>
           {buckets.map((bucket) => (
-            <th
-              key={bucket}
-              scope="col"
-              data-emphasis={bucket === selectedTier ? 'true' : undefined}
-            >
+            <th key={bucket} scope="col">
               {BUCKET_LABELS[bucket]}
             </th>
           ))}
@@ -68,7 +59,7 @@ export function LivesClassSharesTable({
                 {definition ? <span className="lives-cell__definition">{definition}</span> : null}
               </th>
               {buckets.map((bucket) => (
-                <td key={bucket} data-emphasis={bucket === selectedTier ? 'true' : undefined}>
+                <td key={bucket}>
                   <LivesCellValue cell={decade.classShares[lens][bucket]} />
                 </td>
               ))}

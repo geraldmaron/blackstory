@@ -12,29 +12,22 @@ void React;
 export type LivesConditionsTableProps = {
   readonly decade: LivesDecadeBundle;
   readonly emphasis: LivesLens;
-  readonly tierSelected: boolean;
 };
 
 /**
  * Measured conditions for each group. Published tables do not cross income with other measures by race,
- * so conditions describe whole groups; when a tier is chosen the caption says why they do not change.
+ * so conditions describe whole groups.
  */
-export function LivesConditionsTable({
-  decade,
-  emphasis,
-  tierSelected,
-}: LivesConditionsTableProps) {
+export function LivesConditionsTable({ decade, emphasis }: LivesConditionsTableProps) {
+  const visibleConditions = decade.conditions.filter((condition) =>
+    LIVES_LENSES.some((lens) => {
+      const cell = condition.cells[lens];
+      return cell.state === 'published' || cell.state === 'wide_margin';
+    }),
+  );
   return (
     <table className="lives-table lives-table--conditions">
-      <caption>
-        Conditions for each group, {decade.label}
-        {tierSelected ? (
-          <span className="lives-table__note">
-            {' '}
-            The census did not publish these by class, so they describe the whole group.
-          </span>
-        ) : null}
-      </caption>
+      <caption>Conditions for each group, {decade.label}</caption>
       <thead>
         <tr>
           <th scope="col">Measure</th>
@@ -46,7 +39,7 @@ export function LivesConditionsTable({
         </tr>
       </thead>
       <tbody>
-        {decade.conditions.map((condition) => (
+        {visibleConditions.map((condition) => (
           <tr key={condition.key}>
             <th scope="row">
               {condition.label}

@@ -25,7 +25,6 @@ const BUCKET_LABELS: Readonly<Record<LivesClassBucket, string>> = {
 export type LivesClassSharesChartProps = {
   readonly decade: LivesDecadeBundle;
   readonly emphasis: LivesLens;
-  readonly selectedTier: 'all' | 'lower' | 'middle' | 'upper';
 };
 
 function bucketsFor(decade: LivesDecadeBundle): readonly LivesClassBucket[] {
@@ -44,21 +43,22 @@ function readingFor(decade: LivesDecadeBundle, emphasis: LivesLens): string {
   return `${label} middle-band share for the ${decade.label}: ${display.text}.`;
 }
 
-export function LivesClassSharesChart({
-  decade,
-  emphasis,
-  selectedTier,
-}: LivesClassSharesChartProps) {
+export function LivesClassSharesChart({ decade, emphasis }: LivesClassSharesChartProps) {
   const buckets = bucketsFor(decade);
+  const hasPublishedShare = LIVES_LENSES.some((lens) =>
+    buckets.some((bucket) => {
+      const cell = decade.classShares[lens][bucket];
+      return cell.state === 'published' || cell.state === 'wide_margin';
+    }),
+  );
+  if (!hasPublishedShare) return null;
   return (
     <LivesFigure
       title={`${decade.classLabel}, ${decade.label}`}
       reading={readingFor(decade, emphasis)}
       caption="Each bar is one group. Segments are class bands from the table the census published that decade, not a comparison of incomes across regimes."
       ariaLabel={`${decade.classLabel} shares for Black, white and Hispanic Americans in the ${decade.label}`}
-      textAlternative={
-        <LivesClassSharesTable decade={decade} emphasis={emphasis} selectedTier={selectedTier} />
-      }
+      textAlternative={<LivesClassSharesTable decade={decade} emphasis={emphasis} />}
     >
       <div className="lives-stacks" role="img" aria-hidden="true">
         {LIVES_LENSES.map((lens) => {
@@ -92,7 +92,6 @@ export function LivesClassSharesChart({
                         key={bucket}
                         className="lives-stack__fill"
                         data-bucket={bucket}
-                        data-selected={bucket === selectedTier ? 'true' : undefined}
                         style={{ flexGrow: value, flexBasis: 0 }}
                         title={`${BUCKET_LABELS[bucket]}: ${formatLivesPercent(value)}`}
                       >

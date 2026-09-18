@@ -1,10 +1,11 @@
 /**
- * Lives scene layer model: empty cells stay empty; unit notes refuse mislabeling.
+ * Lives scene layer model: only evidence-backed layers render; household measures refuse
+ * person-level mislabeling.
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import type { LivesDecadeBundle } from '@repo/domain/statistics/lives';
-import { buildLivesSceneLayers } from './lives-scene-model';
+import { buildLivesSceneLayers, selectRenderableLivesSceneLayers } from './lives-scene-model';
 
 function stubDecade(overrides: Partial<LivesDecadeBundle> = {}): LivesDecadeBundle {
   return {
@@ -80,6 +81,7 @@ test('scene layers caption published homeownership and empty hispanic cells', ()
   assert.equal(houses.status, 'published');
   assert.ok(houses.density > 0);
   assert.match(houses.caption, /38 percent/);
+  assert.doesNotMatch(houses.caption, /Unit:/);
 });
 
 test('woman unit refuses to claim household tenure as her ownership', () => {
@@ -103,4 +105,19 @@ test('vehicles stay costume, not ownership', () => {
   assert.ok(vehicles);
   assert.equal(vehicles.status, 'costume');
   assert.match(vehicles.caption, /not a published ownership rate/);
+});
+
+test('the visible scene omits pending, absent, suppressed, and not-measured layers', () => {
+  const layers = buildLivesSceneLayers({
+    decade: stubDecade(),
+    emphasis: 'hispanic',
+    unit: 'household',
+  });
+
+  const visible = selectRenderableLivesSceneLayers(layers);
+
+  assert.deepEqual(
+    visible.map((layer) => layer.id),
+    ['vehicles'],
+  );
 });

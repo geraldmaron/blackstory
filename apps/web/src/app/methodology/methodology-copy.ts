@@ -61,20 +61,20 @@ export const METHODOLOGY_PAGE_SECTIONS: readonly {
 export const METHODOLOGY_SOURCE_LIBRARY_HREF = '/sources';
 
 export const LIVES_METHOD_LEDE =
-  'Lives Across the Decades is a region, a lens, a decade, and a named unit. The street hatches from published federal statistical tables. Feeling is quoted from a named speaker. Impact is juxtaposition or a gated claim. CPI restates published income into comparison-year dollars from 1913 on; it does not invent a historical sticker price for a modern good.';
+  'Lives Across the Decades places published federal statistics beside sourced voices, places, laws, and records. A reader chooses a region, decade, and visual emphasis. Every figure names its universe. Feeling is quoted from a named speaker. Impact is juxtaposition or a gated claim. CPI restates published income into comparison-year dollars from 1913 on; it does not invent a historical sticker price for a modern good.';
 
 export const LIVES_METHOD_RULES = [
   {
-    title: 'Unit of analysis',
-    body: 'Household, child, or woman. Copy names the unit. It never says "you would have been." Tenure and household income stay household measures even when the woman unit is selected.',
+    title: 'Universe before interpretation',
+    body: 'Every measure prints the people or households it describes. Tenure and household income remain household measures. Schooling names its age range. The page never says "you would have been."',
   },
   {
     title: 'Published, derived, modeled',
     body: 'Observed cells come from agency tables. Derived income uses chained CPI-U-RS. Modeled affordance compares same-year rent or home value to same-year income and is labeled modeled. Work-based class never enters an affordance model.',
   },
   {
-    title: 'World beats and gaps',
-    body: 'Housing, school, policy, justice, testimony, and war open as sourced beats or honest gap cards. Broader series on Data and theme-impact are off-ramps, not Lives region cells. Crime heat is forbidden.',
+    title: 'Sourced material appears additively',
+    body: 'Housing, school, policy, justice, testimony, and war appear only when a sourced beat is ready. Unfinished domain placeholders stay out of the public surface. Authored historical absences name what was searched. Broader series on Data and theme-impact are off-ramps, not Lives region cells. Crime heat is forbidden.',
   },
 ] as const;
 

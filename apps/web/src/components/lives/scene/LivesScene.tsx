@@ -5,7 +5,12 @@
 'use client';
 
 import React, { useMemo } from 'react';
-import type { LivesDecadeBundle, LivesLens, LivesUnit } from '@repo/domain/statistics/lives';
+import type {
+  LivesDecade,
+  LivesDecadeBundle,
+  LivesLens,
+  LivesUnit,
+} from '@repo/domain/statistics/lives';
 import {
   sketchHatchLines,
   sketchHousePath,
@@ -13,7 +18,12 @@ import {
   sketchSchoolPath,
   sketchVehiclePath,
 } from '../../patterns/sketch/sketch-path';
-import { buildLivesSceneLayers, livesSceneSeed, type LivesSceneLayer } from './lives-scene-model';
+import {
+  buildLivesSceneLayers,
+  livesSceneSeed,
+  selectRenderableLivesSceneLayers,
+  type LivesSceneLayer,
+} from './lives-scene-model';
 
 void React;
 
@@ -41,7 +51,7 @@ function LayerGlyph({
   readonly w: number;
   readonly h: number;
   readonly seed: number;
-  readonly decade: number;
+  readonly decade: LivesDecade;
 }) {
   const empty = layer.density <= 0 && layer.status !== 'costume';
   const strokeClass = empty
@@ -63,7 +73,7 @@ function LayerGlyph({
   }
   const hatch = empty
     ? []
-    : sketchHatchLines(x, y, w, h, layer.id === 'costume' ? 0.3 : layer.density, seed + 20);
+    : sketchHatchLines(x, y, w, h, layer.status === 'costume' ? 0.3 : layer.density, seed + 20);
   return (
     <g className={layer.emphasized ? 'lives-scene__layer--emphasis' : undefined}>
       <path className={strokeClass} d={path} fill="none" />
@@ -101,7 +111,7 @@ export function LivesScene({
     [decade, emphasis, unit, affordanceShare, affordanceCaption],
   );
   const seed = livesSceneSeed(decade.decade, areaSlug, emphasis);
-  const drawn = layers.filter((layer) => layer.id !== 'affordance' || layer.status === 'modeled');
+  const visibleLayers = selectRenderableLivesSceneLayers(layers);
 
   return (
     <figure className="lives-scene">
@@ -117,7 +127,7 @@ export function LivesScene({
           d={sketchRect(12, 150, 616, 8, seed + 1, 1.2)}
           fill="none"
         />
-        {drawn.map((layer, index) => {
+        {visibleLayers.map((layer, index) => {
           const slot = index % 5;
           const x = 40 + slot * 115;
           const y = layer.id === 'ground' ? 130 : 40 + (index % 2) * 20;
@@ -140,7 +150,7 @@ export function LivesScene({
       <figcaption className="lives-scene__captions">
         <p className="lives-scene__kicker">{decade.label} street</p>
         <ul className="lives-scene__caption-list">
-          {layers.map((layer) => (
+          {visibleLayers.map((layer) => (
             <li
               key={layer.id}
               data-status={layer.status}

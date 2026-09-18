@@ -1,6 +1,6 @@
 /**
  * Lives scene layer model: maps published cells (and optional modeled affordance) onto
- * hand-drawn street layers. Captions name universe, unit, and cell status.
+ * hand-drawn street layers. Captions name universe and cell status.
  */
 import type {
   LivesCell,
@@ -45,7 +45,6 @@ function conditionCell(
 function statusCaption(
   label: string,
   universe: string,
-  unit: LivesUnit,
   cell: LivesCell | undefined,
   fallback: string,
 ): {
@@ -56,25 +55,24 @@ function statusCaption(
   if (!cell) {
     return { status: 'absent', caption: `${label}. ${fallback}`, density: 0 };
   }
-  const unitNote = `Unit: ${unit}.`;
   if (cell.state === 'pending') {
     return {
       status: 'pending',
-      caption: `${label}. ${universe}. ${unitNote} Not yet counted for this area.`,
+      caption: `${label}. ${universe}. Not yet counted for this area.`,
       density: 0,
     };
   }
   if (cell.state === 'not_measured') {
     return {
       status: 'not_measured',
-      caption: `${label}. ${universe}. ${unitNote} ${cell.reason ?? 'The census did not publish this.'}`,
+      caption: `${label}. ${universe}. ${cell.reason ?? 'The census did not publish this.'}`,
       density: 0,
     };
   }
   if (cell.state === 'suppressed') {
     return {
       status: 'suppressed',
-      caption: `${label}. ${universe}. ${unitNote} ${cell.reason ?? 'Too few counted to say.'}`,
+      caption: `${label}. ${universe}. ${cell.reason ?? 'Too few counted to say.'}`,
       density: 0,
     };
   }
@@ -82,7 +80,7 @@ function statusCaption(
     typeof cell.estimate === 'number' ? `${cell.estimate.toFixed(0)} percent` : 'a published share';
   return {
     status: cell.state,
-    caption: `${label}. ${universe}. ${unitNote} Published: ${pct}.`,
+    caption: `${label}. ${universe}. Published: ${pct}.`,
     density: cellDensity(cell),
   };
 }
@@ -111,28 +109,24 @@ export function buildLivesSceneLayers(input: BuildLivesSceneInput): readonly Liv
   const urbanMeta = statusCaption(
     'Ground: city or countryside',
     'Everyone in the group',
-    unit,
     urban,
     'Urban share not yet loaded.',
   );
   const homeMeta = statusCaption(
     'Houses: owning versus renting',
     'Occupied homes, by the race of the household head',
-    unit,
     home,
     'Homeownership not yet loaded.',
   );
   const schoolMeta = statusCaption(
     decade.decade <= 1930 ? 'School: children attending' : 'School: finished high school',
     decade.decade <= 1930 ? 'School-age children' : 'Adults 25 and older',
-    unit,
     schoolCell,
     'Schooling measure not published for this decade.',
   );
   const workMeta = statusCaption(
     'Work and farm tenure',
     'Farm operators or the labor force, as published',
-    unit,
     farm,
     'Farm tenure not published for this decade.',
   );
@@ -222,8 +216,21 @@ export function buildLivesSceneLayers(input: BuildLivesSceneInput): readonly Liv
   return layers;
 }
 
+/** Layers with enough evidence to appear in the scene and its accessible caption list. */
+export function selectRenderableLivesSceneLayers(
+  layers: readonly LivesSceneLayer[],
+): readonly LivesSceneLayer[] {
+  return layers.filter(
+    (layer) =>
+      layer.status === 'published' ||
+      layer.status === 'wide_margin' ||
+      layer.status === 'modeled' ||
+      layer.status === 'costume',
+  );
+}
+
 export function livesSceneSeed(decade: LivesDecade, areaSlug: string, lens: LivesLens): number {
-  let hash = decade;
+  let hash: number = decade;
   for (const ch of areaSlug) hash = (hash * 31 + ch.charCodeAt(0)) | 0;
   for (const ch of lens) hash = (hash * 17 + ch.charCodeAt(0)) | 0;
   return Math.abs(hash);

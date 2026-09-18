@@ -23,19 +23,23 @@ export type LivesRulesInForceProps = {
 };
 
 /**
- * Laws and rulings in force for this area and decade: federal law, and each member state's own rules
- * labeled with the state. Shown beside the measured conditions, never as their cause; the fixed
- * disclaimer always renders, even when no rule is listed.
+ * Laws and rulings that began in this decade: federal law, and each member state's own rules
+ * labeled with the state. The shorter list keeps the reader oriented to change without implying
+ * that a rule caused the measured conditions beside it.
  */
 export function LivesRulesInForce({ decade, emphasis, disclaimer }: LivesRulesInForceProps) {
-  const applying = decade.rulesInForce.filter((rule) => rule.appliesTo.includes(emphasis));
-  const others = decade.rulesInForce.filter((rule) => !rule.appliesTo.includes(emphasis));
+  const began = decade.rulesInForce.filter(
+    (rule) => rule.inForceFromYear >= decade.decade && rule.inForceFromYear <= decade.decade + 9,
+  );
+  const applying = began.filter((rule) => rule.appliesTo.includes(emphasis));
+  const others = began.filter((rule) => !rule.appliesTo.includes(emphasis));
   return (
     <section className="lives-rules" aria-labelledby="lives-rules-heading">
-      <h3 id="lives-rules-heading">Rules in force in the {decade.label}</h3>
-      {decade.rulesInForce.length === 0 ? (
+      <h3 id="lives-rules-heading">Rules that began in the {decade.label}</h3>
+      {began.length === 0 ? (
         <p className="lives-rules__empty">
-          No sourced rules are recorded for this area and decade yet.
+          No sourced rule in this catalog began in this area during the {decade.label}. Rules from
+          earlier decades may still have been in force.
         </p>
       ) : (
         <ul className="lives-rules__list">
