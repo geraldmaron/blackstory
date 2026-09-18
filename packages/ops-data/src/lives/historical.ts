@@ -65,9 +65,10 @@ export type LivesHistoricalRef = {
 /**
  * How a measure's two sides become a figure. `share` divides; `complement` reads a published count of
  * the people a condition left out (the illiterate) and stores the rest; `income` turns each numerator
- * cell into its own published income bracket over the sum of them all.
+ * cell into its own published income bracket over the sum of them all; `median` stores a published
+ * dollar median as printed (never summed across states).
  */
-export type LivesHistoricalKind = 'share' | 'complement' | 'income';
+export type LivesHistoricalKind = 'share' | 'complement' | 'income' | 'median';
 
 export type LivesHistoricalMeasure = {
   readonly census: LivesHistoricalCensus;
@@ -1460,6 +1461,94 @@ export const LIVES_HISTORICAL_MEASURES: readonly LivesHistoricalMeasure[] = [
   },
   {
     census: 1930,
+    series: LIVES_SERIES.medianHomeValue,
+    slice: 'black',
+    kind: 'median',
+    numerator: {
+      dataset: '1930_cFH',
+      table: 'NT17',
+      code: 'BFX',
+      variables: [{ code: 'BFX003', text: 'Median value of non-farm homes >> Negro' }],
+    },
+    denominator: {
+      dataset: '1930_cFH',
+      table: 'NT17',
+      code: 'BFX',
+      variables: [{ code: 'BFX003', text: 'Median value of non-farm homes >> Negro' }],
+    },
+    title: 'Median Value of Non-Farm Homes by Race/Nativity of Owner (1930_cFH NT17)',
+    universe: 'Non-Farm Homes',
+    note: 'Published median, not a count. Do not sum states into a region. NHGIS labels the universe Non-Farm Homes; the all-race companion is owned nonfarm homes. White native-born and foreign-born medians are not averaged into a white figure.',
+    levels: NATION_AND_STATE,
+  },
+  {
+    census: 1930,
+    series: LIVES_SERIES.medianHomeValue,
+    slice: 'all',
+    kind: 'median',
+    numerator: {
+      dataset: '1930_cFH',
+      table: 'NT16',
+      code: 'BFW',
+      variables: [{ code: 'BFW001', text: 'Median value of non-farm homes' }],
+    },
+    denominator: {
+      dataset: '1930_cFH',
+      table: 'NT16',
+      code: 'BFW',
+      variables: [{ code: 'BFW001', text: 'Median value of non-farm homes' }],
+    },
+    title: 'Median Value of All Owned Non-Farm Homes (1930_cFH NT16)',
+    universe: 'Owned Non-Farm Homes',
+    note: 'Published median, not a count. Do not sum states into a region. All-race owned nonfarm homes; not a white figure.',
+    levels: NATION_AND_STATE,
+  },
+  {
+    census: 1930,
+    series: LIVES_SERIES.medianRent,
+    slice: 'black',
+    kind: 'median',
+    numerator: {
+      dataset: '1930_cFH',
+      table: 'NT22',
+      code: 'BF1',
+      variables: [{ code: 'BF1003', text: 'Median monthly rent >> Negro' }],
+    },
+    denominator: {
+      dataset: '1930_cFH',
+      table: 'NT22',
+      code: 'BF1',
+      variables: [{ code: 'BF1003', text: 'Median monthly rent >> Negro' }],
+    },
+    title: 'Median Monthly Rent of Non-Farm Homes by Race/Nativity of Tenant (1930_cFH NT22)',
+    universe: 'Occupied Non-Farm Homes',
+    note: 'Published median monthly contract rent, not a count. Do not sum states into a region. NHGIS labels the universe Occupied Non-Farm Homes; the all-race companion is rented nonfarm homes. White native-born and foreign-born medians are not averaged into a white figure.',
+    levels: NATION_AND_STATE,
+  },
+  {
+    census: 1930,
+    series: LIVES_SERIES.medianRent,
+    slice: 'all',
+    kind: 'median',
+    numerator: {
+      dataset: '1930_cFH',
+      table: 'NT21',
+      code: 'BF0',
+      variables: [{ code: 'BF0001', text: 'Median monthly rent' }],
+    },
+    denominator: {
+      dataset: '1930_cFH',
+      table: 'NT21',
+      code: 'BF0',
+      variables: [{ code: 'BF0001', text: 'Median monthly rent' }],
+    },
+    title: 'Median Monthly Rent of All Tenants in Rented Non-Farm Homes (1930_cFH NT21)',
+    universe: 'Rented Non-Farm Homes',
+    note: 'Published median, not a count. Do not sum states into a region. All-race rented nonfarm homes; not a white figure.',
+    levels: NATION_AND_STATE,
+  },
+  {
+    census: 1930,
     series: LIVES_SERIES.literacy,
     slice: 'black',
     kind: 'complement',
@@ -2310,6 +2399,31 @@ export function buildHistoricalObservations(
       };
 
       for (const [jurisdictionId, values] of group.places) {
+        if (measure.kind === 'median') {
+          const value = readCount(values, numerator[0]!);
+          if (value === null || value <= 0) continue;
+          observations.push({
+            id: `obs:${measure.series}:${jurisdictionId}:${group.census}:${measure.slice}`,
+            metricId: measure.series!,
+            jurisdictionId,
+            boundaryVersion: `${group.level}-${group.census}`,
+            referencePeriod: String(group.census),
+            datasetVintage: names.join(' and '),
+            estimate: value,
+            marginOfError: null,
+            numerator: value,
+            denominator: null,
+            raceEthnicitySlice: measure.slice,
+            source: `Census Bureau, ${names.join(' and ')}, table "${measure.title}", via IPUMS NHGIS`,
+            sourceUrl: dataset.sourceUrl,
+            contentHash: createHash('sha256')
+              .update(JSON.stringify([value, metadata]))
+              .digest('hex'),
+            metadata,
+          });
+          continue;
+        }
+
         const base = sumColumns(values, denominator);
         if (base === null || base <= 0) continue;
 

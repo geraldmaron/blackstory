@@ -59,9 +59,16 @@ before 1959), and the region's comparability note says so.
 | **Midwest** | IL, IN, IA, KS, MI, MN, MO, NE, ND, OH, SD, WI | Great Migration destination, auto and steel, Mexican Chicago, deindustrialization | Black and white strong. Hispanic mostly from 1970 |
 | **Northeast** | CT, ME, MA, NH, NJ, NY, PA, RI, VT | Harlem and Philadelphia, Puerto Rican migration | Black and white strong. Puerto Rican through the 1950–1960 reports |
 
-**Place anchors.** Each region names two or three catalog places (for example Harlem, Bronzeville, the
-Delta, East Los Angeles) with sourced local laws and stories. Anchors illustrate a region. Their
-figures are the region's, never the city's.
+**Place anchors.** Each region names **two or three** catalog places (for example Harlem,
+Bronzeville, and Philadelphia for the Northeast; the Delta, Birmingham, and Miami for the Deep
+South). Anchors illustrate a region’s internal contrast. Their figures are the region’s, never the
+city’s. A single metro per region is refused: it softens the regional story into a city postcard.
+Implementation: `livesPlaceAnchorsForArea` in `packages/domain/src/statistics/lives-place-anchors.ts`.
+
+**Sourcing when cells are empty.** Prefer finishing published-table ingest over modeling from
+scholarship. Peer-reviewed reconstructions are finding aids; they do not become `observed` cells.
+See [lives-gap-and-sourcing.md](./lives-gap-and-sourcing.md) and
+[lives-source-scholarship-assessment.md](./lives-source-scholarship-assessment.md).
 
 ## Where the figures come from
 

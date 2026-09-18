@@ -69,6 +69,24 @@ export function livesSeriesRow(metricId: string): LivesSeriesRow | null {
       estimateType: 'median',
     };
   }
+  if (metricId === LIVES_SERIES.medianRent) {
+    return {
+      metricId,
+      metricDefinition: 'Median monthly contract rent of rented nonfarm homes',
+      universe: 'rented nonfarm homes',
+      unit: 'dollars',
+      estimateType: 'median',
+    };
+  }
+  if (metricId === LIVES_SERIES.medianHomeValue) {
+    return {
+      metricId,
+      metricDefinition: 'Median value of owned nonfarm homes',
+      universe: 'owned nonfarm homes',
+      unit: 'dollars',
+      estimateType: 'median',
+    };
+  }
   const rate = RATE_SERIES[metricId];
   if (rate) return { metricId, ...rate, unit: 'percent', estimateType: 'percentage' };
   const bracket = parseIncomeBracketSeriesId(metricId);

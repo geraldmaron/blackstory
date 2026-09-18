@@ -1,41 +1,88 @@
 /**
- * Server-side reader for Lives Across the Decades. Reads the area's static snapshot, built by
- * packages/ops-data/scripts/build-lives-snapshots.ts, and upgrades each rule's record link to its law
- * or case page when one exists. No reference-table queries run at request time. The public surface
- * is `/how-it-works?s=lives`; `/lives/[area]` 308s there.
- *
- * Reads skip the release-scoped snapshot cache on purpose: the page is ISR, so reads are already rare,
- * and a rebuilt snapshot should appear at the next revalidation rather than the next release. Without
- * a snapshot the page still renders, with every figure marked not yet counted.
+ * Server-side reader for Lives Across the Decades. Reads the area's static snapshot and merges
+ * authored world beats. Upgrades each rule's record link to its law or case page when one exists.
+ * Canonical immersive surface is `/lives`.
  */
 import { cache } from 'react';
 import {
   buildLivesAreaBundle,
   isLivesAreaSnapshot,
   livesAreaBySlug,
+  livesSpeakerPlaceMismatch,
   livesSnapshotName,
   type LivesAreaBundle,
   type LivesAreaConfig,
   type LivesAreaSnapshot,
   type LivesRuleEntityRef,
+  type LivesWorldBeat,
 } from '@repo/domain/statistics/lives';
 import { resolvePostgresConnectionString } from '../public-data/postgres-client';
 import { fetchMaterializedSnapshot } from '../public-data/public-readers';
 import { resolveLawCaseHref } from '../search/law-case-href';
+import { LIVES_WORLD_BEAT_FIXTURES } from './world-beat-fixtures';
 
 export type LawHrefResolver = (entity: LivesRuleEntityRef) => Promise<string | undefined>;
 
+function worldBeatsForArea(area: LivesAreaConfig): Map<number, LivesWorldBeat[]> {
+  const byDecade = new Map<number, LivesWorldBeat[]>();
+  for (const beat of LIVES_WORLD_BEAT_FIXTURES) {
+    if (beat.areaIds.length > 0 && !beat.areaIds.includes(area.id)) continue;
+    const list = byDecade.get(beat.decade) ?? [];
+    list.push({
+      id: beat.id,
+      domain: beat.domain,
+      claimType: beat.claimType,
+      heading: beat.heading,
+      body: beat.body,
+      citations: beat.citations,
+      appliesTo: beat.lenses,
+      unit: beat.unit,
+      entities: beat.entityIds.map((id) => ({
+        id,
+        href: `/entity/${id}`,
+        label: id.replace(/^ent_(?:law|case)_/, '').replace(/_/g, ' '),
+      })),
+      ...(beat.uncertaintyLabel ? { uncertaintyLabel: beat.uncertaintyLabel } : {}),
+      ...(beat.gapState ? { gapState: beat.gapState } : {}),
+      ...(beat.speaker
+        ? {
+            speaker: beat.speaker,
+            ...(livesSpeakerPlaceMismatch(beat.speaker.place, area)
+              ? { speakerPlaceMismatch: true as const }
+              : {}),
+          }
+        : {}),
+    });
+    byDecade.set(beat.decade, list);
+  }
+  return byDecade;
+}
+
+function mergeWorldBeats(bundle: LivesAreaBundle, area: LivesAreaConfig): LivesAreaBundle {
+  const byDecade = worldBeatsForArea(area);
+  return {
+    ...bundle,
+    decades: bundle.decades.map((decade) => ({
+      ...decade,
+      worldBeats: byDecade.get(decade.decade) ?? [],
+    })),
+  };
+}
+
 /** Every decade with every figure pending, for an area whose snapshot has not been built. */
 export function emptyLivesAreaBundle(area: LivesAreaConfig): LivesAreaBundle {
-  return buildLivesAreaBundle({
+  return mergeWorldBeats(
+    buildLivesAreaBundle({
+      area,
+      jurisdictions: [],
+      observations: [],
+      coverage: [],
+      countNotes: [],
+      applicability: [],
+      frames: [],
+    }),
     area,
-    jurisdictions: [],
-    observations: [],
-    coverage: [],
-    countNotes: [],
-    applicability: [],
-    frames: [],
-  });
+  );
 }
 
 /** The snapshot's bundle with each rule linked to its law or case page where one exists. */
@@ -50,17 +97,21 @@ export async function linkLivesRules(
       if (href) hrefs.set(entityId, href);
     }),
   );
-  if (hrefs.size === 0) return snapshot.bundle;
-  return {
-    ...snapshot.bundle,
-    decades: snapshot.bundle.decades.map((decade) => ({
-      ...decade,
-      rulesInForce: decade.rulesInForce.map((rule) => {
-        const href = hrefs.get(rule.entityId);
-        return href ? { ...rule, href } : rule;
-      }),
-    })),
-  };
+  const withRules =
+    hrefs.size === 0
+      ? snapshot.bundle
+      : {
+          ...snapshot.bundle,
+          decades: snapshot.bundle.decades.map((decade) => ({
+            ...decade,
+            rulesInForce: decade.rulesInForce.map((rule) => {
+              const href = hrefs.get(rule.entityId);
+              return href ? { ...rule, href } : rule;
+            }),
+          })),
+        };
+  const area = livesAreaBySlug(snapshot.areaSlug);
+  return area ? mergeWorldBeats(withRules, area) : withRules;
 }
 
 /** The area's bundle, or null when the slug is not the national baseline or a modeled region. */

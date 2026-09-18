@@ -1,0 +1,109 @@
+{
+  "source": "U.S. Bureau of the Census, U.S. Census of Population: 1960, Vol. I, Characteristics of the Population, Part 27, Missouri, Chapter C, General Social and Economic Characteristics",
+  "sourceUrl": "https://www2.census.gov/library/publications/decennial/1960/population-volume-1/37895059v1p27ch4.pdf",
+  "table": "Table 53",
+  "page": "27-197",
+  "boundaryVersion": "us-states-1960",
+  "datasetVintage": "1963 printed volume",
+  "figures": [
+    {
+      "metricId": "lives-unemployed",
+      "jurisdictionId": "state:29",
+      "referencePeriod": "1960",
+      "raceEthnicitySlice": "all",
+      "estimate": 4.1,
+      "numerator": 67527,
+      "denominator": 1639427,
+      "universe": "Civilian labor force; persons 14 years old and over; both sexes",
+      "note": "Second pass agrees."
+    },
+    {
+      "metricId": "lives-unemployed",
+      "jurisdictionId": "state:29",
+      "referencePeriod": "1960",
+      "raceEthnicitySlice": "white",
+      "estimate": 3.7,
+      "numerator": 55528,
+      "denominator": 1499889,
+      "universe": "Civilian labor force; WHITE; both sexes",
+      "note": "Second pass agrees."
+    },
+    {
+      "metricId": "lives-unemployed",
+      "jurisdictionId": "state:29",
+      "referencePeriod": "1960",
+      "raceEthnicitySlice": "nonwhite",
+      "estimate": 8.6,
+      "numerator": 11999,
+      "denominator": 139538,
+      "universe": "Civilian labor force; NONWHITE; both sexes",
+      "note": "Second pass agrees."
+    },
+    {
+      "metricId": "lives-unemployed",
+      "jurisdictionId": "state:29",
+      "referencePeriod": "1950",
+      "raceEthnicitySlice": "all",
+      "estimate": 3.3,
+      "numerator": 52350,
+      "denominator": 1574167,
+      "universe": "Civilian labor force; both sexes",
+      "note": "Second pass agrees."
+    },
+    {
+      "metricId": "lives-unemployed",
+      "jurisdictionId": "state:29",
+      "referencePeriod": "1950",
+      "raceEthnicitySlice": "white",
+      "estimate": 2.8,
+      "numerator": 40995,
+      "denominator": 1453693,
+      "universe": "Civilian labor force; WHITE; both sexes",
+      "note": "Second pass agrees."
+    },
+    {
+      "metricId": "lives-unemployed",
+      "jurisdictionId": "state:29",
+      "referencePeriod": "1950",
+      "raceEthnicitySlice": "nonwhite",
+      "estimate": 9.4,
+      "numerator": 11355,
+      "denominator": 120474,
+      "universe": "Civilian labor force; NONWHITE; both sexes",
+      "note": "Second pass agrees."
+    },
+    {
+      "metricId": "lives-unemployed",
+      "jurisdictionId": "state:29",
+      "referencePeriod": "1940",
+      "raceEthnicitySlice": "all",
+      "estimate": 14.7,
+      "numerator": 223992,
+      "denominator": 1519986,
+      "universe": "Civilian labor force; both sexes",
+      "note": "Second pass agrees."
+    },
+    {
+      "metricId": "lives-unemployed",
+      "jurisdictionId": "state:29",
+      "referencePeriod": "1940",
+      "raceEthnicitySlice": "white",
+      "estimate": 13.7,
+      "numerator": 192977,
+      "denominator": 1409236,
+      "universe": "Civilian labor force; WHITE; both sexes",
+      "note": "Second pass agrees."
+    },
+    {
+      "metricId": "lives-unemployed",
+      "jurisdictionId": "state:29",
+      "referencePeriod": "1940",
+      "raceEthnicitySlice": "nonwhite",
+      "estimate": 28.0,
+      "numerator": 31015,
+      "denominator": 110750,
+      "universe": "Civilian labor force; NONWHITE; both sexes",
+      "note": "Second pass agrees."
+    }
+  ]
+}

@@ -96,6 +96,8 @@ test('the extract asks each published volume for its tables, breakdowns and geog
   assert.deepEqual(definition.datasets['1970_Cnt4Pb']!.geogLevels, ['state']);
   assert.deepEqual(definition.datasets['1930_cAg']!.geogLevels, ['state']);
   assert.deepEqual(definition.datasets['1970_Cnt1']!.geogLevels, ['nation', 'state']);
+  assert.ok(definition.datasets['1930_cFH']!.dataTables.includes('NT22'));
+  assert.ok(definition.datasets['1930_cFH']!.dataTables.includes('NT17'));
 });
 
 test('file names give the census year and geography level, and skip years this loader does not read', () => {
@@ -415,6 +417,8 @@ test('every measure has a coverage key the run can check, and every slice is one
   const expected = new Set(expectedHistoricalCoverage());
   assert.equal(expected.size, LIVES_HISTORICAL_MEASURES.length);
   assert.ok(expected.has('1930 1930_cFH NT8 (BGV) lives-homeownership black'));
+  assert.ok(expected.has('1930 1930_cFH NT22 (BF1) lives-median-rent black'));
+  assert.ok(expected.has('1930 1930_cFH NT16 (BFW) lives-median-home-value all'));
   assert.ok(expected.has('1970 1970_Cnt4Pb NT75 (C3T) lives-income-bracket-* spanish_origin'));
   for (const observation of buildHistoricalObservations([
     historicalFile(1870, 'state', RACE_1870),
@@ -422,5 +426,24 @@ test('every measure has a coverage key the run can check, and every slice is one
     assert.ok(expected.has(historicalCoverageKey(observation)));
   }
   const slices = new Set(LIVES_HISTORICAL_MEASURES.map((measure) => measure.slice));
-  assert.deepEqual([...slices].sort(), ['black', 'nonwhite', 'spanish_origin', 'white']);
+  assert.deepEqual([...slices].sort(), ['all', 'black', 'nonwhite', 'spanish_origin', 'white']);
+});
+
+test('1930 median rent and value are stored as printed dollars, never as a share', () => {
+  const file = historicalFile(1930, 'nation', [
+    ['BFX003', 'Median value of non-farm homes >> Negro', '2088'],
+    ['BFW001', 'Median value of non-farm homes', '4778'],
+    ['BF1003', 'Median monthly rent >> Negro', '13.22'],
+    ['BF0001', 'Median monthly rent', '27.15'],
+  ]);
+  const observations = buildHistoricalObservations([file]);
+  assert.deepEqual(
+    observations.map((o) => [o.metricId, o.raceEthnicitySlice, o.estimate, o.denominator]),
+    [
+      ['lives-median-home-value', 'black', 2088, null],
+      ['lives-median-home-value', 'all', 4778, null],
+      ['lives-median-rent', 'black', 13.22, null],
+      ['lives-median-rent', 'all', 27.15, null],
+    ],
+  );
 });

@@ -1,0 +1,37 @@
+{
+  "source": "U.S. Bureau of the Census, U.S. Census of Population: 1960, Vol. I, Characteristics of the Population, Part 15, Illinois, Chapter C, General Social and Economic Characteristics",
+  "sourceUrl": "https://www2.census.gov/library/publications/decennial/1960/population-volume-1/vol-01-15-j.pdf",
+  "boundaryVersion": "us-states-1960",
+  "datasetVintage": "1963 printed volume",
+  "table": "Table 65",
+  "page": "15-265",
+  "figures": [
+    {
+      "metricId": "lives-income-median",
+      "jurisdictionId": "state:17",
+      "referencePeriod": "1960",
+      "raceEthnicitySlice": "all",
+      "estimate": 6566,
+      "universe": "Families; income in 1959 dollars; THE STATE",
+      "note": "Families block median, not families and unrelated individuals. Family count THE STATE=2592326. Table begins on 15-265; Families THE STATE medians on that page. Second pass agrees."
+    },
+    {
+      "metricId": "lives-income-median",
+      "jurisdictionId": "state:17",
+      "referencePeriod": "1960",
+      "raceEthnicitySlice": "white",
+      "estimate": 6757,
+      "universe": "Families; WHITE; income in 1959 dollars; THE STATE",
+      "note": "Family count WHITE THE STATE=2360815. Second pass agrees."
+    },
+    {
+      "metricId": "lives-income-median",
+      "jurisdictionId": "state:17",
+      "referencePeriod": "1960",
+      "raceEthnicitySlice": "nonwhite",
+      "estimate": 4590,
+      "universe": "Families; NONWHITE; income in 1959 dollars; THE STATE",
+      "note": "Family count NONWHITE THE STATE=231511. Second pass agrees."
+    }
+  ]
+}

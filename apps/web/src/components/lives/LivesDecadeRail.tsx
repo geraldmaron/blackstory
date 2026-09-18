@@ -30,13 +30,17 @@ export function LivesDecadeRail({ decades, selected, onSelect, panelId }: LivesD
     decades.findIndex((decade) => decade.decade === selected),
   );
 
-  // Keep the selected decade visible on a narrow rail. `block: 'nearest'` scrolls the row only,
-  // never the page, and reduced-motion readers get an instant jump.
+  // Keep the selected decade visible inside the horizontal rail only. Never call
+  // `scrollIntoView` here: with the rail below the fold it scrolls the document and lands a
+  // reader who opened `/data` mid-page on the Lived act.
   useEffect(() => {
+    const tab = refs.current[selectedIndex];
+    const scroller = tab?.closest('.lives-rail');
+    if (!tab || !(scroller instanceof HTMLElement)) return;
     const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    refs.current[selectedIndex]?.scrollIntoView({
-      block: 'nearest',
-      inline: 'center',
+    const left = tab.offsetLeft - (scroller.clientWidth - tab.offsetWidth) / 2;
+    scroller.scrollTo({
+      left: Math.max(0, left),
       behavior: reduce ? 'auto' : 'smooth',
     });
   }, [selectedIndex]);

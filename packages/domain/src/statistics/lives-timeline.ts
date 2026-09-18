@@ -61,6 +61,7 @@ import {
   type CanonicalRaceEthnicitySlice,
   type LivesLens,
 } from './race-ethnicity-slices.js';
+import type { LivesWorldBeat, LivesWorldBeatInput } from './lives-world.js';
 
 export type LivesCellState =
   'published' | 'wide_margin' | 'suppressed' | 'not_measured' | 'pending';
@@ -68,6 +69,8 @@ export type LivesCellState =
 export type LivesSourceRef = {
   readonly label: string;
   readonly url: string;
+  /** Wayback availability pointer when a lookup already found a capture. Never invent. */
+  readonly archiveUrl?: string;
 };
 
 export type LivesCell = {
@@ -201,6 +204,7 @@ export type LivesDecadeBundle = {
   readonly conditions: readonly LivesConditionBundle[];
   readonly rulesInForce: readonly LivesRule[];
   readonly frame: { readonly heading: string; readonly paragraphs: readonly string[] } | null;
+  readonly worldBeats: readonly LivesWorldBeat[];
 };
 
 export type LivesAreaBundle = {
@@ -220,6 +224,13 @@ export type BuildLivesAreaBundleInput = {
   readonly countNotes: readonly LivesCountNoteInput[];
   readonly applicability: readonly LivesApplicabilityInput[];
   readonly frames: readonly LivesFrameInput[];
+  /** Authored world beats; entity hrefs resolved by the snapshot build when available. */
+  readonly worldBeats?: readonly LivesWorldBeatInput[];
+  /** Optional pre-resolved beats already scoped to this area (snapshot / tests). */
+  readonly resolvedWorldBeats?: readonly {
+    readonly decade: LivesDecade;
+    readonly beat: LivesWorldBeat;
+  }[];
 };
 
 /** A region figure on a smaller base than this many counted people or households is withheld. */
@@ -262,6 +273,31 @@ export function buildLivesAreaBundle(input: BuildLivesAreaBundleInput): LivesAre
     input.coverage.map((entry) => [`${entry.decade}|${entry.key}|${entry.lens}`, entry]),
   );
   const framesByDecade = new Map(input.frames.map((frame) => [frame.decade, frame]));
+  const worldByDecade = new Map<LivesDecade, LivesWorldBeat[]>();
+  for (const beat of input.worldBeats ?? []) {
+    if (beat.areaIds.length > 0 && !beat.areaIds.includes(area.id)) continue;
+    const list = worldByDecade.get(beat.decade) ?? [];
+    list.push({
+      id: beat.id,
+      domain: beat.domain,
+      claimType: beat.claimType,
+      heading: beat.heading,
+      body: beat.body,
+      citations: beat.citations,
+      appliesTo: beat.lenses,
+      unit: beat.unit,
+      entities: beat.entityIds.map((id) => ({ id, href: null, label: id })),
+      ...(beat.uncertaintyLabel ? { uncertaintyLabel: beat.uncertaintyLabel } : {}),
+      ...(beat.gapState ? { gapState: beat.gapState } : {}),
+      ...(beat.speaker ? { speaker: beat.speaker } : {}),
+    });
+    worldByDecade.set(beat.decade, list);
+  }
+  for (const entry of input.resolvedWorldBeats ?? []) {
+    const list = worldByDecade.get(entry.decade) ?? [];
+    list.push(entry.beat);
+    worldByDecade.set(entry.decade, list);
+  }
 
   const decades = LIVES_DECADES.map((decade, index): LivesDecadeBundle => {
     const regime = livesRegimeForDecade(decade);
@@ -641,6 +677,7 @@ export function buildLivesAreaBundle(input: BuildLivesAreaBundleInput): LivesAre
       conditions,
       rulesInForce,
       frame: frame ? { heading: frame.heading, paragraphs: frame.paragraphs } : null,
+      worldBeats: worldByDecade.get(decade) ?? [],
     };
   });
 

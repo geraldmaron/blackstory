@@ -1,0 +1,37 @@
+{
+  "source": "U.S. Bureau of the Census, U.S. Census of Population: 1960, Vol. I, Characteristics of the Population, Part 6, California, Chapter C, General Social and Economic Characteristics",
+  "sourceUrl": "https://www2.census.gov/library/publications/decennial/1960/population-volume-1/vol-01-06-f.pdf",
+  "table": "Table 65",
+  "page": "6-250",
+  "boundaryVersion": "us-states-1960",
+  "datasetVintage": "1963 printed volume",
+  "figures": [
+    {
+      "metricId": "lives-income-median",
+      "jurisdictionId": "state:06",
+      "referencePeriod": "1960",
+      "raceEthnicitySlice": "all",
+      "estimate": 6726,
+      "universe": "Families; income in 1959 dollars; THE STATE",
+      "note": "Families block median, not families and unrelated individuals. Family count THE STATE=3991500."
+    },
+    {
+      "metricId": "lives-income-median",
+      "jurisdictionId": "state:06",
+      "referencePeriod": "1960",
+      "raceEthnicitySlice": "white",
+      "estimate": 6857,
+      "universe": "Families; WHITE; income in 1959 dollars; THE STATE",
+      "note": "Family count WHITE THE STATE=3715033."
+    },
+    {
+      "metricId": "lives-income-median",
+      "jurisdictionId": "state:06",
+      "referencePeriod": "1960",
+      "raceEthnicitySlice": "nonwhite",
+      "estimate": 4971,
+      "universe": "Families; NONWHITE; income in 1959 dollars; THE STATE",
+      "note": "Family count NONWHITE THE STATE=276467."
+    }
+  ]
+}

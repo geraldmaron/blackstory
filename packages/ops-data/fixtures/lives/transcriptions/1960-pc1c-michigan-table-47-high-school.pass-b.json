@@ -1,0 +1,109 @@
+{
+  "source": "U.S. Bureau of the Census, U.S. Census of Population: 1960, Vol. I, Characteristics of the Population, Part 24, Michigan, Chapter C, General Social and Economic Characteristics",
+  "sourceUrl": "https://www2.census.gov/library/publications/decennial/1960/population-volume-1/37722966v1p24ch4.pdf",
+  "table": "Table 47",
+  "page": "24-191",
+  "boundaryVersion": "us-states-1960",
+  "datasetVintage": "1963 printed volume",
+  "figures": [
+    {
+      "metricId": "lives-high-school",
+      "jurisdictionId": "state:26",
+      "referencePeriod": "1960",
+      "raceEthnicitySlice": "all",
+      "estimate": 40.9,
+      "numerator": 1722924,
+      "denominator": 4216909,
+      "universe": "Persons 25 years old and over; high school 4 years plus college",
+      "note": "Derived share: HS 4 + college 1-3 + college 4 or more over total 25+. Printed: total_25_plus=4216909, hs4=1096563, college_1_3=340697, college_4_plus=285664. Second pass agrees."
+    },
+    {
+      "metricId": "lives-high-school",
+      "jurisdictionId": "state:26",
+      "referencePeriod": "1960",
+      "raceEthnicitySlice": "white",
+      "estimate": 42.4,
+      "numerator": 1629173,
+      "denominator": 3845256,
+      "universe": "Persons 25 years old and over; WHITE",
+      "note": "Printed: total_25_plus=3845256, hs4=1033965, college_1_3=320220, college_4_plus=274988. Second pass agrees."
+    },
+    {
+      "metricId": "lives-high-school",
+      "jurisdictionId": "state:26",
+      "referencePeriod": "1960",
+      "raceEthnicitySlice": "nonwhite",
+      "estimate": 25.2,
+      "numerator": 93751,
+      "denominator": 371653,
+      "universe": "Persons 25 years old and over; NONWHITE",
+      "note": "Printed: total_25_plus=371653, hs4=62598, college_1_3=20477, college_4_plus=10676. Second pass agrees."
+    },
+    {
+      "metricId": "lives-high-school",
+      "jurisdictionId": "state:26",
+      "referencePeriod": "1950",
+      "raceEthnicitySlice": "all",
+      "estimate": 34.0,
+      "numerator": 1247315,
+      "denominator": 3667840,
+      "universe": "Persons 25 years old and over; includes persons not reporting years of school completed",
+      "note": "Printed: total_25_plus=3667840, hs4=801750, college_1_3=251680, college_4_plus=193885. Second pass agrees."
+    },
+    {
+      "metricId": "lives-high-school",
+      "jurisdictionId": "state:26",
+      "referencePeriod": "1950",
+      "raceEthnicitySlice": "white",
+      "estimate": 35.2,
+      "numerator": 1198580,
+      "denominator": 3408085,
+      "universe": "Persons 25 years old and over; WHITE",
+      "note": "Printed: total_25_plus=3408085, hs4=769405, college_1_3=240935, college_4_plus=188240. Second pass agrees."
+    },
+    {
+      "metricId": "lives-high-school",
+      "jurisdictionId": "state:26",
+      "referencePeriod": "1950",
+      "raceEthnicitySlice": "nonwhite",
+      "estimate": 18.8,
+      "numerator": 48735,
+      "denominator": 259755,
+      "universe": "Persons 25 years old and over; NONWHITE",
+      "note": "Printed: total_25_plus=259755, hs4=32345, college_1_3=10745, college_4_plus=5645. Second pass agrees."
+    },
+    {
+      "metricId": "lives-high-school",
+      "jurisdictionId": "state:26",
+      "referencePeriod": "1940",
+      "raceEthnicitySlice": "all",
+      "estimate": 24.5,
+      "numerator": 735695,
+      "denominator": 3006579,
+      "universe": "Persons 25 years old and over; includes persons not reporting years of school completed",
+      "note": "Printed: total_25_plus=3006579, hs4=456404, college_1_3=158090, college_4_plus=121201. Second pass agrees."
+    },
+    {
+      "metricId": "lives-high-school",
+      "jurisdictionId": "state:26",
+      "referencePeriod": "1940",
+      "raceEthnicitySlice": "white",
+      "estimate": 25.0,
+      "numerator": 719844,
+      "denominator": 2877993,
+      "universe": "Persons 25 years old and over; WHITE",
+      "note": "Printed: total_25_plus=2877993, hs4=446186, college_1_3=154427, college_4_plus=119231. Second pass agrees."
+    },
+    {
+      "metricId": "lives-high-school",
+      "jurisdictionId": "state:26",
+      "referencePeriod": "1940",
+      "raceEthnicitySlice": "nonwhite",
+      "estimate": 12.3,
+      "numerator": 15851,
+      "denominator": 128586,
+      "universe": "Persons 25 years old and over; NONWHITE",
+      "note": "Printed: total_25_plus=128586, hs4=10218, college_1_3=3663, college_4_plus=1970. Second pass agrees."
+    }
+  ]
+}

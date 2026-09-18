@@ -1,0 +1,69 @@
+{
+  "source": "U.S. Bureau of the Census, Thirteenth Census of the United States: 1910, Vol. I, Population, Chapter II",
+  "sourceUrl": "https://www2.census.gov/library/publications/decennial/1910/volume-1/volume-1-p3.pdf",
+  "table": "Table 42",
+  "page": "189",
+  "boundaryVersion": "us-states-1910",
+  "datasetVintage": "1913 printed volume",
+  "figures": [
+    {
+      "metricId": "lives-urban",
+      "jurisdictionId": "nation:US",
+      "referencePeriod": "1910",
+      "raceEthnicitySlice": "black",
+      "estimate": 27.4,
+      "numerator": 2689229,
+      "denominator": 9827763,
+      "universe": "Negro population",
+      "note": "Urban + rural = denominator. Percent urban printed 27.4."
+    },
+    {
+      "metricId": "lives-urban",
+      "jurisdictionId": "nation:US",
+      "referencePeriod": "1900",
+      "raceEthnicitySlice": "black",
+      "estimate": 22.7,
+      "numerator": 2005972,
+      "denominator": 8833994,
+      "universe": "Negro population"
+    },
+    {
+      "metricId": "lives-urban",
+      "jurisdictionId": "nation:US",
+      "referencePeriod": "1890",
+      "raceEthnicitySlice": "black",
+      "estimate": 19.8,
+      "numerator": 1481142,
+      "denominator": 7488676,
+      "universe": "Negro population"
+    },
+    {
+      "metricId": "lives-urban",
+      "jurisdictionId": "nation:US",
+      "referencePeriod": "1890",
+      "raceEthnicitySlice": "white",
+      "estimate": 38.4,
+      "numerator": 21173685,
+      "denominator": 55101258,
+      "universe": "White population"
+    },
+    {
+      "metricId": "lives-urban",
+      "jurisdictionId": "nation:US",
+      "referencePeriod": "1900",
+      "raceEthnicitySlice": "white",
+      "estimate": 43.0,
+      "universe": "White population",
+      "note": "Percent urban printed on Table 42 p. 189; raw white urban/rural counts for 1900 not transcribed in this national pass."
+    },
+    {
+      "metricId": "lives-urban",
+      "jurisdictionId": "nation:US",
+      "referencePeriod": "1910",
+      "raceEthnicitySlice": "white",
+      "estimate": 48.7,
+      "universe": "White population",
+      "note": "Percent urban printed on Table 42 p. 189; raw white urban/rural counts for 1910 not transcribed in this national pass."
+    }
+  ]
+}

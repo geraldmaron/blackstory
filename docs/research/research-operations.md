@@ -9,7 +9,7 @@ Agent skills live under `.claude/skills/blackstory/`:
   `case-drafting`, `story-craft`, `theme-study`, `triage-graylist`) exist for skill-matching
   UX. They point here and carry no command detail of their own.
 - **Judgment playbooks** (`entity-verify`, `claim-corroborate`, `entity-complete`,
-  `coverage-target`, `publish-preview`) are not verbs. Their decision order lives in the
+  `coverage-target`, `publish-preview`, `intake-review`) are not verbs. Their decision order lives in the
   skill file. They call verbs from this document when a command is needed.
 
 See `AGENTS.md` for the one-line index of every verb with its exact command.
@@ -599,3 +599,4 @@ a sourced address, evidence attachment, or campaign is actually ready.
 | `.claude/skills/blackstory/entity-complete` | Blank public fields (image, related, historicalContext) |
 | `.claude/skills/blackstory/coverage-target` | Where research should look next |
 | `.claude/skills/blackstory/publish-preview` | Release preview only; never activate |
+| `.claude/skills/blackstory/intake-review` | Screen incoming leads, corrections, and mail before they are ordinary work |

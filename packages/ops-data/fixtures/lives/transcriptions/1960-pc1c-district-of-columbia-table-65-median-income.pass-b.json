@@ -1,0 +1,35 @@
+{
+  "source": "U.S. Bureau of the Census, U.S. Census of Population: 1960, Vol. I, Characteristics of the Population, Part 10, District of Columbia, Chapter C, General Social and Economic Characteristics",
+  "sourceUrl": "https://www2.census.gov/library/publications/decennial/1960/population-volume-1/vol-01-10-e.pdf",
+  "table": "Table 65",
+  "page": "10-45",
+  "boundaryVersion": "us-states-1960",
+  "datasetVintage": "1963 printed volume",
+  "figures": [
+    {
+      "metricId": "lives-income-median",
+      "jurisdictionId": "state:11",
+      "referencePeriod": "1960",
+      "raceEthnicitySlice": "all",
+      "estimate": 5993,
+      "universe": "Families; income in 1959 dollars; THE DISTRICT",
+      "note": "Families block median, not families and unrelated individuals."
+    },
+    {
+      "metricId": "lives-income-median",
+      "jurisdictionId": "state:11",
+      "referencePeriod": "1960",
+      "raceEthnicitySlice": "white",
+      "estimate": 7692,
+      "universe": "Families; WHITE; income in 1959 dollars; THE DISTRICT"
+    },
+    {
+      "metricId": "lives-income-median",
+      "jurisdictionId": "state:11",
+      "referencePeriod": "1960",
+      "raceEthnicitySlice": "nonwhite",
+      "estimate": 4800,
+      "universe": "Families; NONWHITE; income in 1959 dollars; THE DISTRICT"
+    }
+  ]
+}

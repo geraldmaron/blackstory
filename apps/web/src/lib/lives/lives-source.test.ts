@@ -61,12 +61,16 @@ test('rules link to their law page when one resolves and keep the record link ot
   assert.equal(rules.find((r) => r.entityId === 'ent_other')!.href, '/entity/ent_other');
 });
 
-test('nothing resolving returns the snapshot bundle unchanged', async () => {
-  assert.equal(await linkLivesRules(snapshot, async () => undefined), snapshot.bundle);
+test('nothing resolving still merges world beats onto the snapshot bundle', async () => {
+  const bundle = await linkLivesRules(snapshot, async () => undefined);
+  assert.ok(bundle.decades.some((decade) => decade.worldBeats.length > 0));
+  const rules = bundle.decades.find((decade) => decade.decade === 1960)!.rulesInForce;
+  assert.equal(rules.find((r) => r.entityId === 'ent_brown')!.href, '/entity/ent_brown');
 });
 
 test('an area without a snapshot still renders every decade as not yet counted', () => {
   const bundle = emptyLivesAreaBundle(area);
   assert.equal(bundle.decades.length, 16);
   assert.equal(bundle.decades[0]!.conditions[0]!.cells.black.state, 'pending');
+  assert.ok(bundle.decades.some((decade) => decade.worldBeats.length > 0));
 });

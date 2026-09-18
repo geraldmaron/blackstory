@@ -1,0 +1,100 @@
+{
+  "source": "U.S. Bureau of the Census, U.S. Census of Population: 1960, Vol. I, Characteristics of the Population, Part 50, West Virginia, Chapter C, General Social and Economic Characteristics",
+  "sourceUrl": "https://www2.census.gov/library/publications/decennial/1960/population-volume-1/09768054v1p50ch4.pdf",
+  "table": "Table 53",
+  "page": "50-106",
+  "boundaryVersion": "us-states-1960",
+  "datasetVintage": "1963 printed volume",
+  "figures": [
+    {
+      "metricId": "lives-unemployed",
+      "jurisdictionId": "state:54",
+      "referencePeriod": "1960",
+      "raceEthnicitySlice": "all",
+      "estimate": 8.3,
+      "numerator": 49018,
+      "denominator": 587232,
+      "universe": "Civilian labor force; persons 14 years old and over; both sexes"
+    },
+    {
+      "metricId": "lives-unemployed",
+      "jurisdictionId": "state:54",
+      "referencePeriod": "1960",
+      "raceEthnicitySlice": "white",
+      "estimate": 8.2,
+      "numerator": 46195,
+      "denominator": 562367,
+      "universe": "Civilian labor force; WHITE; both sexes"
+    },
+    {
+      "metricId": "lives-unemployed",
+      "jurisdictionId": "state:54",
+      "referencePeriod": "1960",
+      "raceEthnicitySlice": "nonwhite",
+      "estimate": 11.4,
+      "numerator": 2823,
+      "denominator": 24865,
+      "universe": "Civilian labor force; NONWHITE; both sexes"
+    },
+    {
+      "metricId": "lives-unemployed",
+      "jurisdictionId": "state:54",
+      "referencePeriod": "1950",
+      "raceEthnicitySlice": "all",
+      "estimate": 4.8,
+      "numerator": 31456,
+      "denominator": 659613,
+      "universe": "Civilian labor force; persons 14 years old and over; both sexes"
+    },
+    {
+      "metricId": "lives-unemployed",
+      "jurisdictionId": "state:54",
+      "referencePeriod": "1950",
+      "raceEthnicitySlice": "white",
+      "estimate": 4.7,
+      "numerator": 28966,
+      "denominator": 621348,
+      "universe": "Civilian labor force; WHITE; both sexes"
+    },
+    {
+      "metricId": "lives-unemployed",
+      "jurisdictionId": "state:54",
+      "referencePeriod": "1950",
+      "raceEthnicitySlice": "nonwhite",
+      "estimate": 6.5,
+      "numerator": 2490,
+      "denominator": 38265,
+      "universe": "Civilian labor force; NONWHITE; both sexes"
+    },
+    {
+      "metricId": "lives-unemployed",
+      "jurisdictionId": "state:54",
+      "referencePeriod": "1940",
+      "raceEthnicitySlice": "all",
+      "estimate": 18.3,
+      "numerator": 115863,
+      "denominator": 634757,
+      "universe": "Civilian labor force; persons 14 years old and over; both sexes"
+    },
+    {
+      "metricId": "lives-unemployed",
+      "jurisdictionId": "state:54",
+      "referencePeriod": "1940",
+      "raceEthnicitySlice": "white",
+      "estimate": 18.4,
+      "numerator": 108624,
+      "denominator": 590716,
+      "universe": "Civilian labor force; WHITE; both sexes"
+    },
+    {
+      "metricId": "lives-unemployed",
+      "jurisdictionId": "state:54",
+      "referencePeriod": "1940",
+      "raceEthnicitySlice": "nonwhite",
+      "estimate": 16.4,
+      "numerator": 7239,
+      "denominator": 44041,
+      "universe": "Civilian labor force; NONWHITE; both sexes"
+    }
+  ]
+}

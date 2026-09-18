@@ -1,0 +1,28 @@
+{
+  "source": "U.S. Bureau of the Census, Census of Housing: 1970, Vol. I, Housing Characteristics for States, Cities, and Counties, Part 1, United States Summary, Chapter A, General Housing Characteristics",
+  "sourceUrl": "https://www2.census.gov/library/publications/decennial/1970/housing-volume-1/13276827v1p1ch01.pdf",
+  "table": "Table 6",
+  "page": "1-34",
+  "boundaryVersion": "us-states-1970",
+  "datasetVintage": "1972 printed volume",
+  "figures": [
+    {
+      "metricId": "lives-median-rent",
+      "jurisdictionId": "nation:US",
+      "referencePeriod": "1970",
+      "raceEthnicitySlice": "black",
+      "estimate": 71,
+      "universe": "Housing units with Negro head of household; specified renter-occupied; median monthly contract rent, dollars",
+      "note": "Second pass: Negro head United States median contract rent $71."
+    },
+    {
+      "metricId": "lives-median-home-value",
+      "jurisdictionId": "nation:US",
+      "referencePeriod": "1970",
+      "raceEthnicitySlice": "black",
+      "estimate": 10600,
+      "universe": "Housing units with Negro head of household; specified owner-occupied; median value, dollars",
+      "note": "Second pass: Negro head United States median value $10,600."
+    }
+  ]
+}

@@ -38,6 +38,73 @@
   margin-top: var(--ds-space-8);
 }
 
+.lives-anchors {
+  margin: var(--ds-space-6) 0;
+  padding: var(--ds-space-4) 0;
+  border-top: var(--ds-border-width) solid var(--ds-rule);
+  border-bottom: var(--ds-border-width) solid var(--ds-rule);
+}
+
+.lives-anchors__kicker {
+  margin: 0 0 var(--ds-space-2);
+  font-family: var(--ds-font-mono);
+  font-size: var(--ds-type-caption-size);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--ds-ink-muted);
+}
+
+.lives-anchors__note {
+  margin: 0 0 var(--ds-space-3);
+  max-width: 42rem;
+  font-size: var(--ds-type-body-sm-size);
+  color: var(--ds-ink-muted);
+}
+
+.lives-anchors__list {
+  display: grid;
+  gap: var(--ds-space-3);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+@media (min-width: 40rem) {
+  .lives-anchors__list {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+.lives-anchors__chip {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ds-space-1);
+  min-height: 100%;
+  padding: 0;
+  color: inherit;
+  text-decoration: none;
+}
+
+.lives-anchors__chip:hover .lives-anchors__name,
+.lives-anchors__chip:focus-visible .lives-anchors__name {
+  color: var(--ds-copper-text);
+}
+
+.lives-anchors__chip:focus-visible {
+  outline: var(--ds-focus-ring);
+  outline-offset: 2px;
+}
+
+.lives-anchors__name {
+  font-family: var(--ds-font-display);
+  font-size: 1.05rem;
+}
+
+.lives-anchors__role {
+  font-size: var(--ds-type-body-sm-size);
+  color: var(--ds-ink-muted);
+}
+
 .lives-controls {
   display: flex;
   flex-wrap: wrap;
@@ -56,7 +123,10 @@
   border: 0;
 }
 
-.lives-controls__group legend {
+.lives-controls__legend {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4em;
   width: 100%;
   margin-bottom: var(--ds-space-2);
   font-family: var(--ds-font-mono);
@@ -712,5 +782,230 @@
 
   .lives-condition__value {
     text-align: left;
+  }
+}
+
+/* Immersive room */
+.lives-room__kicker {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4em;
+  margin: var(--ds-space-4) 0 0;
+  font-family: var(--ds-font-mono);
+  font-size: 0.8125rem;
+  letter-spacing: 0.04em;
+  color: var(--ds-ink-muted);
+}
+
+.lives-unit-kicker {
+  margin: var(--ds-space-4) 0 var(--ds-space-2);
+  font-family: var(--ds-font-editorial);
+  font-size: 1.05rem;
+  color: var(--ds-ink);
+}
+
+.lives-money__derived {
+  margin: var(--ds-space-2) 0 0;
+  padding: var(--ds-space-3);
+  font-family: var(--ds-font-mono);
+  font-size: 0.8125rem;
+  line-height: 1.45;
+  color: var(--ds-ink-muted);
+  border-left: 3px solid var(--ds-rule);
+  background: var(--room-sunk);
+}
+
+.lives-money__derived[data-status='derived']::before {
+  content: 'Derived · ';
+  color: var(--ds-accent-text);
+  font-weight: 600;
+}
+
+.lives-panel__unit-note {
+  margin: 0 0 var(--ds-space-4);
+  padding: var(--ds-space-3);
+  font-family: var(--ds-font-sans);
+  font-size: 0.9375rem;
+  color: var(--ds-ink-muted);
+  border-left: 3px solid var(--ds-accent-graphic);
+  background: var(--room-sunk);
+}
+
+/* Hand-drawn scene */
+.lives-scene {
+  margin: var(--ds-space-6) 0 var(--ds-space-5);
+  padding: var(--ds-space-4);
+  background: var(--ds-surface);
+  border: var(--ds-border-width) solid var(--ds-rule);
+  border-radius: var(--ds-radius-md);
+}
+
+.lives-scene__svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-height: 14rem;
+}
+
+.lives-scene__stroke {
+  stroke: var(--ds-ink);
+  stroke-width: 1.6;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+}
+
+.lives-scene__stroke--empty {
+  stroke: var(--ds-ink-muted);
+  stroke-dasharray: 4 5;
+}
+
+.lives-scene__stroke--emphasis {
+  stroke: var(--ds-accent-graphic);
+  stroke-width: 2;
+}
+
+.lives-scene__hatch {
+  stroke: var(--ds-ink-muted);
+  stroke-width: 1;
+  opacity: 0.55;
+}
+
+.lives-scene__horizon {
+  stroke: var(--ds-rule);
+  stroke-width: 1.2;
+}
+
+.lives-scene__captions {
+  margin-top: var(--ds-space-4);
+}
+
+.lives-scene__kicker {
+  margin: 0 0 var(--ds-space-2);
+  font-family: var(--ds-font-mono);
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--ds-ink-muted);
+}
+
+.lives-scene__caption-list {
+  display: grid;
+  gap: var(--ds-space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.lives-scene__caption-list li {
+  display: grid;
+  gap: 0.15rem;
+  padding: var(--ds-space-2) 0;
+  border-bottom: var(--ds-border-width) solid var(--ds-rule);
+  font-size: 0.875rem;
+}
+
+.lives-scene__caption-list li[data-emphasis] {
+  box-shadow: inset 3px 0 0 var(--ds-accent-graphic);
+  padding-left: var(--ds-space-3);
+}
+
+.lives-scene__caption-list strong {
+  font-family: var(--ds-font-display);
+  font-weight: 600;
+}
+
+.lives-scene__caption-list span {
+  color: var(--ds-ink-muted);
+}
+
+/* World beats */
+.lives-world {
+  margin-top: var(--ds-space-8);
+  padding-top: var(--ds-space-6);
+  border-top: var(--ds-border-width) solid var(--ds-ink);
+}
+
+.lives-world__title {
+  margin: 0 0 var(--ds-space-2);
+  font-family: var(--ds-font-display);
+  font-size: 1.35rem;
+}
+
+.lives-world__disclaimer {
+  margin: 0 0 var(--ds-space-5);
+  font-size: 0.875rem;
+  color: var(--ds-ink-muted);
+}
+
+.lives-world__list {
+  display: grid;
+  gap: var(--ds-space-4);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.lives-world__beat,
+.lives-world__gap {
+  padding: var(--ds-space-4);
+  background: var(--ds-surface);
+  border: var(--ds-border-width) solid var(--ds-rule);
+  border-radius: var(--ds-radius-sm);
+}
+
+.lives-world__gap {
+  border-style: dashed;
+}
+
+.lives-world__domain {
+  margin: 0 0 var(--ds-space-1);
+  font-family: var(--ds-font-mono);
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--ds-accent);
+}
+
+.lives-world__heading {
+  margin: 0 0 var(--ds-space-2);
+  font-family: var(--ds-font-display);
+  font-size: 1.1rem;
+}
+
+.lives-world__speaker,
+.lives-world__uncertainty,
+.lives-world__gap-state {
+  margin: 0 0 var(--ds-space-2);
+  font-family: var(--ds-font-mono);
+  font-size: 0.75rem;
+  color: var(--ds-ink-muted);
+}
+
+.lives-world__body {
+  margin: 0 0 var(--ds-space-3);
+  font-family: var(--ds-font-editorial);
+  font-size: 1rem;
+  line-height: 1.55;
+}
+
+.lives-world__citations,
+.lives-world__entities {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--ds-space-2) var(--ds-space-4);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: 0.8125rem;
+}
+
+.lives-world__citations a,
+.lives-world__entities a {
+  color: var(--ds-accent-text);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lives-scene__svg {
+    transition: none;
   }
 }

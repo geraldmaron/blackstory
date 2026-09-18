@@ -69,6 +69,11 @@ export {
 } from './lives-regions.js';
 export type { LivesAreaConfig } from './lives-regions.js';
 
+export { livesPlaceAnchorsForArea } from './lives-place-anchors.js';
+export type { LivesPlaceAnchor } from './lives-place-anchors.js';
+
+export { livesFipsMentionedInPlace, livesSpeakerPlaceMismatch } from './lives-speaker-place.js';
+
 export {
   aggregateDistribution,
   aggregateRate,
@@ -111,3 +116,54 @@ export {
   livesSnapshotName,
 } from './lives-snapshot.js';
 export type { LivesAreaSnapshot, LivesRuleEntityRef } from './lives-snapshot.js';
+
+export {
+  LIVES_UNITS,
+  LIVES_UNIT_LABELS,
+  LIVES_UNIT_KICKERS,
+  isLivesUnit,
+  livesUnitEmphasis,
+} from './lives-units.js';
+export type { LivesUnit } from './lives-units.js';
+
+export {
+  LIVES_WORLD_DOMAINS,
+  LIVES_WORLD_DOMAIN_LABELS,
+  LIVES_WORLD_CLAIM_TYPES,
+  LIVES_WORLD_GAP_STATES,
+  LIVES_WORLD_CORE_DOMAINS,
+  isLivesWorldDomain,
+  isLivesWorldClaimType,
+  validateLivesWorldBeats,
+  livesWorldGapCard,
+  selectLivesWorldBeats,
+} from './lives-world.js';
+export type {
+  LivesWorldDomain,
+  LivesWorldClaimType,
+  LivesWorldGapState,
+  LivesWorldSpeaker,
+  LivesWorldBeatInput,
+  LivesWorldBeat,
+  LivesWorldGapCard,
+} from './lives-world.js';
+
+export { computeLivesAffordance } from './lives-affordance.js';
+export type {
+  LivesAffordanceKind,
+  LivesAffordanceInput,
+  LivesAffordanceResult,
+} from './lives-affordance.js';
+
+export { chainCpiUrs, toYearDollars, CPI_U_RS_LINK_YEAR } from './lives-cpi-math.js';
+export type { AnnualIndex } from './lives-cpi-math.js';
+
+export {
+  LIVES_CPI_U,
+  LIVES_CPI_U_RS,
+  LIVES_CPI_COMPARISON_YEAR,
+  LIVES_CPI_FIRST_YEAR,
+} from './lives-cpi-annual.js';
+
+export { deriveLivesRealIncome, LIVES_CPI_CHAINED_INDEX } from './lives-derived-income.js';
+export type { LivesDerivedIncome } from './lives-derived-income.js';

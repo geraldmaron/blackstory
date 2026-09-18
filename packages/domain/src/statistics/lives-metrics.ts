@@ -33,6 +33,10 @@ export const LIVES_SERIES = {
   farmTenancy: 'lives-farm-tenancy',
   /** National median of the decade's income unit, slice `all`, at `nation:US`. */
   incomeMedian: 'lives-income-median',
+  /** Median monthly contract rent for rented nonfarm homes, dollars. */
+  medianRent: 'lives-median-rent',
+  /** Median value of owned nonfarm homes, dollars. */
+  medianHomeValue: 'lives-median-home-value',
 } as const;
 
 const WORK_CLASS_PREFIX = 'lives-class-work-';

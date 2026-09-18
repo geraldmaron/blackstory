@@ -1,0 +1,36 @@
+[
+  {
+    "id": "lives-us-national-labor-relations-act-1935",
+    "entityId": "ent_law_national_labor_relations_act_1935",
+    "jurisdictionId": "nation:US",
+    "scopeLevel": "federal",
+    "inForceFromEdtf": "1935-07-05",
+    "inForceToEdtf": null,
+    "lifeDomains": ["work"],
+    "textPosture": "facially_neutral",
+    "appliesToSlices": ["all"],
+    "disputed": true,
+    "basisClaimIds": [
+      "claim_law_national_labor_relations_act_1935_01",
+      "claim_law_national_labor_relations_act_1935_02"
+    ],
+    "notes": "Agricultural and domestic exclusion never repealed; disparate effect on Black workers is a dispute to render, not a finding."
+  },
+  {
+    "id": "lives-us-fair-labor-standards-act-1938",
+    "entityId": "ent_law_fair_labor_standards_act_1938",
+    "jurisdictionId": "nation:US",
+    "scopeLevel": "federal",
+    "inForceFromEdtf": "1938-10-24",
+    "inForceToEdtf": null,
+    "lifeDomains": ["work", "income_support"],
+    "textPosture": "facially_neutral",
+    "appliesToSlices": ["all"],
+    "disputed": true,
+    "basisClaimIds": [
+      "claim_law_fair_labor_standards_act_1938_01",
+      "claim_law_fair_labor_standards_act_1938_02"
+    ],
+    "notes": "Domestic coverage effective May 1, 1974; agricultural coverage broadened earlier."
+  }
+]

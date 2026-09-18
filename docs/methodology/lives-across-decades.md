@@ -17,18 +17,42 @@
 
 ## What the surface shows
 
-A reader chooses a region, a lens (Black, white or Hispanic) and a class tier, then moves through the
-decades from the 1870s to the 2020s. Each decade shows:
+A reader chooses a region, a lens (Black, white or Hispanic), a **unit of analysis**
+(household, child, or woman), and a class tier, then moves through the decades from the 1870s
+to the 2020s. Each decade shows:
 
-1. **What the count could see:** who the census counted, how, what is missing, and what that meant.
-2. **The share of each group in each class tier.**
-3. **Measured conditions for each group:** homeownership, schooling, work, city living and more.
-4. **The laws and court rulings in force** for that region and group.
-5. **A short narrative frame** that states only what the rest of the decade already shows.
+1. **A hand-drawn street** whose layers hatch from published cells (and optional modeled affordance).
+2. **What the count could see:** who the census counted, how, what is missing, and what that meant.
+3. **The share of each group in each class tier.**
+4. **Measured conditions for each group:** homeownership, schooling, work, city living and more.
+5. **The laws and court rulings in force** for that region and group.
+6. **World beats or gap cards** for housing, school, policy, justice, testimony, war, and related domains.
+7. **A short narrative frame** that states only what the rest of the decade already shows.
 
 All three groups are always on screen. The lens changes which one is emphasized, never which ones are
-visible. The surface describes the conditions people in a group lived under. It never invents a person,
-assigns a fate, or invites a reader to "become" a race.
+visible. The unit names the subject. The surface never invents a person, assigns a fate, or invites a
+reader to "become" a race.
+
+### Unit of analysis
+
+| Unit | Carries | Refuses |
+|---|---|---|
+| Household (default) | Tenure, urban, farm, income bands, modeled rent burden | Treating the house as a child's life |
+| Child | School attendance, literacy, child-labor laws | Income bands as the child's wage |
+| Woman | Sex-crossed occupation where ingested; suffrage and property as laws | Household income labeled as her wage |
+
+### Derived income and modeled affordance
+
+**Derived income.** From 1913 on, published income may be restated into comparison-year dollars with
+chained CPI-U-RS (`lives-cpi-math`, annual averages from BLS). Status `derived`. Not available before
+1913.
+
+**Modeled affordance.** Same-year published rent or home value against same-year income. The ratio uses
+original-year dollars. CPI may restate both sides for a caption only. Status `modeled`. Work-based class
+never enters. National price against regional income must say so.
+
+**Forbidden:** CPI-deflating a modern sticker price into a historical decade and calling that what people
+could not buy.
 
 ## Regions
 
@@ -45,7 +69,10 @@ Six regions, each a union of whole states, plus a national baseline:
 
 Every state belongs to exactly one region, so the regions sum to the nation. Territories are included
 wherever the census enumerated them before statehood, and the decade's note says so. Place anchors
-(catalog places such as Harlem or the Delta) illustrate a region and never carry figures of their own.
+(catalog places such as Harlem, Bronzeville, and the Delta) illustrate a region and never carry
+figures of their own. Each region shows two or three anchors so the story is not collapsed into one
+metro. Gap inventory and sourcing ladder:
+[lives-gap-and-sourcing.md](../research/lives-gap-and-sourcing.md).
 
 ## Source and status
 

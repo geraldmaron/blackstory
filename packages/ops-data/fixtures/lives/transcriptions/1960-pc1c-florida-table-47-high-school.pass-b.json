@@ -1,0 +1,109 @@
+{
+  "source": "U.S. Bureau of the Census, U.S. Census of Population: 1960, Vol. I, Characteristics of the Population, Part 11, Florida, Chapter C, General Social and Economic Characteristics",
+  "sourceUrl": "https://www2.census.gov/library/publications/decennial/1960/population-volume-1/vol-01-11-e.pdf",
+  "table": "Table 47",
+  "page": "11-139",
+  "boundaryVersion": "us-states-1960",
+  "datasetVintage": "1963 printed volume",
+  "figures": [
+    {
+      "metricId": "lives-high-school",
+      "jurisdictionId": "state:12",
+      "referencePeriod": "1960",
+      "raceEthnicitySlice": "all",
+      "estimate": 42.6,
+      "numerator": 1210958,
+      "denominator": 2845445,
+      "universe": "Persons 25 years old and over; high school 4 years plus college",
+      "note": "Derived share: HS 4 + college 1-3 + college 4 or more over total 25+. Second pass agrees."
+    },
+    {
+      "metricId": "lives-high-school",
+      "jurisdictionId": "state:12",
+      "referencePeriod": "1960",
+      "raceEthnicitySlice": "white",
+      "estimate": 47.4,
+      "numerator": 1150299,
+      "denominator": 2427073,
+      "universe": "Persons 25 years old and over; WHITE",
+      "note": "Second pass agrees."
+    },
+    {
+      "metricId": "lives-high-school",
+      "jurisdictionId": "state:12",
+      "referencePeriod": "1960",
+      "raceEthnicitySlice": "nonwhite",
+      "estimate": 14.5,
+      "numerator": 60659,
+      "denominator": 418372,
+      "universe": "Persons 25 years old and over; NONWHITE",
+      "note": "Second pass agrees."
+    },
+    {
+      "metricId": "lives-high-school",
+      "jurisdictionId": "state:12",
+      "referencePeriod": "1950",
+      "raceEthnicitySlice": "all",
+      "estimate": 34.8,
+      "numerator": 569215,
+      "denominator": 1637240,
+      "universe": "Persons 25 years old and over; includes persons not reporting years of school completed",
+      "note": "Second pass agrees."
+    },
+    {
+      "metricId": "lives-high-school",
+      "jurisdictionId": "state:12",
+      "referencePeriod": "1950",
+      "raceEthnicitySlice": "white",
+      "estimate": 41.3,
+      "numerator": 543030,
+      "denominator": 1313410,
+      "universe": "Persons 25 years old and over; WHITE",
+      "note": "Second pass agrees."
+    },
+    {
+      "metricId": "lives-high-school",
+      "jurisdictionId": "state:12",
+      "referencePeriod": "1950",
+      "raceEthnicitySlice": "nonwhite",
+      "estimate": 8.1,
+      "numerator": 26185,
+      "denominator": 323830,
+      "universe": "Persons 25 years old and over; NONWHITE",
+      "note": "Second pass agrees."
+    },
+    {
+      "metricId": "lives-high-school",
+      "jurisdictionId": "state:12",
+      "referencePeriod": "1940",
+      "raceEthnicitySlice": "all",
+      "estimate": 26.2,
+      "numerator": 283268,
+      "denominator": 1082389,
+      "universe": "Persons 25 years old and over; includes persons not reporting years of school completed",
+      "note": "Second pass agrees."
+    },
+    {
+      "metricId": "lives-high-school",
+      "jurisdictionId": "state:12",
+      "referencePeriod": "1940",
+      "raceEthnicitySlice": "white",
+      "estimate": 33.6,
+      "numerator": 270871,
+      "denominator": 806890,
+      "universe": "Persons 25 years old and over; WHITE",
+      "note": "Second pass agrees."
+    },
+    {
+      "metricId": "lives-high-school",
+      "jurisdictionId": "state:12",
+      "referencePeriod": "1940",
+      "raceEthnicitySlice": "nonwhite",
+      "estimate": 4.5,
+      "numerator": 12397,
+      "denominator": 275499,
+      "universe": "Persons 25 years old and over; NONWHITE",
+      "note": "Second pass agrees."
+    }
+  ]
+}
