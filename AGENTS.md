@@ -67,7 +67,7 @@ Two skill kinds live under `.claude/skills/blackstory/`:
   duplicate command flags.
 - **Judgment playbooks** (`entity-verify`, `claim-corroborate`, `entity-complete`,
   `entity-relate`, `coverage-target`, `publish-preview`, `neo-voice`, `prose-review`,
-  `ringer-review`, `surface-triage`) carry decision order, source ladders, and Do/Never. They
+  `ringer-review`, `surface-triage`, `intake-review`) carry decision order, source ladders, and Do/Never. They
   have no operator-cli verb of their own.
 
 `blackstory-locate` Census-geocodes a sourced address (no LLM). Finding the place, confirming

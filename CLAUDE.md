@@ -133,14 +133,14 @@ dispatch reports `up to date — skipping`: CI minutes spent to reach a no-op. O
 were eight such dispatches in one day, several of them no-ops.
 
 The workflow is the right entry point only when there is no local environment to run it from. Its
-daily cron is forgetting-insurance, a ~24h worst-case bound, not the freshness mechanism.
+daily cron is off as of 2026-09-16; a forgotten mutation no longer self-heals.
 
 ## BlackStory research skills
 
 Research playbooks live in `.claude/skills/blackstory/`. CLI pointers load a verb from
 `docs/research/research-operations.md`. Judgment playbooks (`entity-verify`,
 `claim-corroborate`, `entity-complete`, `entity-relate`, `coverage-target`, `publish-preview`,
-`neo-voice`, `prose-review`, `ringer-review`, `surface-triage`) have unique content. See `AGENTS.md` for the
+`neo-voice`, `prose-review`, `ringer-review`, `surface-triage`, `intake-review`) have unique content. See `AGENTS.md` for the
 lane index.
 
 ## Web local QA (agents)
