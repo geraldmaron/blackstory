@@ -64,8 +64,8 @@ The configured production source was read without mutation. It held ten `bb_*` n
 133 application tables and 412,140 exact rows on Postgres 17.6. A consistent application snapshot
 was exported to a private local dump (90,198,939 bytes). The isolated restore matched all table
 counts and stable row hashes, with 467 constraints, 342 indexes, 18 functions and no invalid
-constraints. Production authentication data was not copied; a synthetic staff account exercises
-role migration and authorization. Object recovery is a separate check.
+constraints. That application-only rehearsal used a synthetic staff account for role migration and
+authorization. The separately authorized Auth/Storage recovery below uses a later private snapshot.
 
 The migration ledger contains 61 deployed versions. Each now has exactly one local version-matched
 file. All 38 stored SQL bodies match under a SQL-aware lexical comparison; 23 history rows have
@@ -112,10 +112,48 @@ and one activation audit event was recorded. Source release hashes remained unch
 release retained 4,210 entities and search rows, 12,180 citations, and Dunbar’s four claims and one
 related record. No production signature, upload, cache purge or activation occurred; this verifies
 the correction mechanism, not live delivery. Production signing configuration and a complete timed
-Auth/database/object recovery remain cutover prerequisites. A prepared complete logical recovery
-runner has not exported production Auth or Storage metadata: automatic approval review requires
-explicit permission for the sensitive Auth records. The existing application and object checks
-remain component proofs, not a matched-cutoff full recovery.
+Auth/database/object recovery remain cutover prerequisites.
+
+The authorized private Auth/Storage database drill restored a consistent table/Auth/Storage metadata snapshot into a dedicated
+loopback-only container with fresh local database credentials. All **170 tables and 421,166 rows**
+matched their source counts and hashes, including one staff Auth user, 301 Storage metadata rows and the
+61-version migration ledger. All 3,442 queried table/routine grants, 130 policies, RLS flags,
+queried role capabilities and 21 role memberships matched. Anonymous public reads succeeded;
+anonymous public writes and Auth-user reads were denied. The authenticated database role without
+staff claims saw no canonical rows and could not write. No production mutation occurred.
+
+The rehearsal exposed prerequisites that an application-only dump concealed: extension versions
+and owners, extension grants, and membership in built-in Postgres roles must be supplied explicitly
+when restoring a schema-filtered dump. Source `extra_float_digits=0` also had to be used for the
+JSON row-hash comparison; the fresh server's value of `1` caused four apparent mismatches that
+vanished with equal serialization settings. Extension and full-role metadata were inventoried
+after the data snapshot. They are supplemental component evidence, not a freeze-time manifest.
+
+The dump, configuration, manifests and logs remain outside Git in owner-only storage. Verification
+ran with `node --conditions=development --import tsx
+.cache/research-reconciliation/preproduction-recovery-drill.mts
+.cache/research-reconciliation/blackstory_preprod_recovery_20260918222337-source.json --verify-only`.
+The report is `.cache/research-reconciliation/preproduction-recovery-drill.json`, with result
+`component-pass-recovery-gate-open` and `completeRecoveryProven: false`. Its 4.162-second timing
+covers final verification only, not recovery time. Restoration and permission corrections preceded
+that comparison; no launch-ready recovery artifact was generated.
+
+A separate Auth API proof used the source's observed GoTrue `v2.197.0`, the restored
+`supabase_auth_admin` role, its observed `search_path=auth`, and fresh local credentials. From the
+isolated Docker network, health, link generation, token verification and authenticated `/user`
+returned HTTP 200. The restored staff identity and `bb_role=admin` matched. Logout returned 204;
+refresh-token reuse returned 400. No email was sent. The command was
+`node --conditions=development --import tsx
+.cache/research-reconciliation/preproduction-auth-service-proof.mts --go-ahead`; its private report
+records `auth-service-proof-pass`. Temporary credentials, service/network and the disposable
+recovery database were removed after verification; the protected dump and reports are retained.
+This proves the local Auth API flow, not the original password, email delivery, a browser sign-in
+page, production JWT reuse or a restored Storage service. The host HTTP route was not verified.
+
+This comparison does not independently establish all ownership, schema/default/sequence ACLs,
+role settings, or full-surface object references. The retained 286-object byte proofs predate this
+snapshot. A matched-cutoff Storage service restore, matching old application builds and approved
+RPO/RTO remain required for complete recovery.
 
 Preservation coverage is materially incomplete. The production snapshot has 12,180 cited claims
 across 7,566 distinct entity URLs; packets contribute 202 references
@@ -381,7 +419,8 @@ Opened during this work; technical references inform decisions without proving c
 - [Wikidata statements](https://www.wikidata.org/wiki/Help:Statements): ranks, qualifiers and references.
 - [Wayback availability](https://archive.org/help/wayback_api.php): a historical pointer does not create a capture.
 - [NARA reuse policy](https://www.archives.gov/global-pages/privacy.html), [NPS disclaimer](https://www.nps.gov/aboutus/disclaimer.htm), [Freedmen’s Bureau guide](https://www.archives.gov/research/african-americans/freedmens-bureau) and [St. Louis 1860 schedule explanation](https://www.nps.gov/articles/000/united-states-census-slave-schedule-for-st-louis-county-1860.htm): exact-source preservation review and local capture pilot.
-- [Supabase Storage](https://supabase.com/docs/guides/storage/schema/design.md): metadata inventory is separate from object operations.
+- [Supabase Auth link generation](https://supabase.com/docs/reference/javascript/auth-admin-generatelink) and [GoTrue v2.197.0 verification contract](https://github.com/supabase/auth/blob/v2.197.0/internal/api/verify.go): generated links do not send email; hash verification accepts only the hash and type.
+- [Supabase Storage](https://supabase.com/docs/guides/storage/schema/design.md) and [backup/restore](https://supabase.com/docs/guides/platform/migrating-within-supabase/backup-restore.md): metadata inventory is separate from object operations; role credentials, provider configuration and extension prerequisites need separate recovery treatment.
 - [OpenRouter usage accounting](https://openrouter.ai/docs/guides/guides/usage-accounting.md) and [provider routing](https://openrouter.ai/docs/guides/routing/provider-selection.md): price caps and receipt limitations.
 - [IPUMS NHGIS](https://developer.ipums.org/docs/v2/workflows/create_extracts/nhgis_data/): documented authenticated download destination.
 - [Expo SDK 57](https://github.com/expo/expo/blob/sdk-57/packages/expo/CHANGELOG.md) and [Next.js connection](https://nextjs.org/docs/app/api-reference/functions/connection): dependency and rendering behavior.
@@ -395,5 +434,7 @@ Opened during this work; technical references inform decisions without proving c
 - Outcome observed: restored record and staff reads proven locally; unsupported relationship removal and a sourced positive two-hop chain proven in Chrome; actual Archive completion remains unproven.
 - Surface inspected: both admin and graph themes, restored records, citations and staff redirect observed in Chrome.
 - Diff reviewed: targeted independent review and migration equivalence completed; full raw-line review is not claimed.
+- Recovery verification: exact private commands and scope appear above; `fnm exec --using=22 -- ./scripts/ci-local.sh --base HEAD` passed the governance lane for the documentation-only update. Code lanes were correctly gated off.
+- Root-cause debugging: the row-hash comparison failed with local `extra_float_digits=1` and passed with the observed source setting `0`; no row data was changed to make hashes match.
 - Residual risk: production cutover, approved recovery targets, production delivery of the rehearsed Dunbar correction, Archive completion and representative-scale quality evidence remain explicit.
 - Commit-and-PR: scoped signed commits on `codex/research-framework-reconciliation`, one authorized draft PR into staging, reviewed index and staged-file secret scan. No merge or production release follows from local checks. Ordinary remote checks are reported in the PR delivery record.

@@ -25,8 +25,13 @@ Two isolated database paths have been exercised with the final migration files:
 
 This proves the checked-in clean and restored-data migration paths locally. The application dump
 did not contain Auth, Storage metadata, provider Auth settings or database roles, so it is not a
-complete recovery set. It also does not prove provider recovery time, full object recovery,
-production credentials, PostgREST cache convergence or a production cutover.
+complete recovery set. A later authorized private Auth/Storage snapshot was also restored:
+170 tables and 421,166 rows matched, including one staff Auth identity, 301 Storage metadata rows and
+61 migrations. Queried grants, RLS/policies and role memberships matched, and five access probes
+passed. A matching-version local Auth API also verified the restored staff identity/role, token
+issuance, authenticated user lookup and session revocation. See the [audit evidence](../research/framework-audit.md) for exact scope and commands.
+These component proofs do not establish a matched-cutoff Storage/application restore, approved
+recovery time, production credentials, PostgREST cache convergence or a production cutover.
 
 ## Release prerequisites
 
