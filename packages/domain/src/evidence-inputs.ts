@@ -3,17 +3,13 @@
  *
  * `@repo/domain` must not depend on `@repo/public-contracts` (workspace dependency direction,
  * `docs/decisions-carryover.md`), so this package cannot call the reader-facing tier rule. It
- * used to answer that by restating the rule — `highestClaimConfidenceTier` graded records here
- * and wrote the finished tier onto `search_index.facets` for `/records` to read back. That was
- * one rule with two implementations, and it cost a day: when the rule changed on 2026-09-07 every
- * surface that derives updated instantly while `/records` kept serving the cached CONCLUSION
- * until a backfill ran (repo-ngojq, repo-6qjv0).
+ * therefore stores the inputs to that rule instead of a derived tier in `search_index.facets`.
  *
  * So this module does not grade anything. It projects the FACTS grading needs — which levels are
  * present, which lineages are cited, which of those carry a claim that is not the record's own
  * index row — and `confidenceTierFromEvidenceInputs` in `@repo/public-contracts/evidence` turns
  * them into a tier at read time, on every surface including `/records`. One rule, one
- * implementation, and a cached row that a rule change cannot strand.
+ * implementation, with no cached tier that a rule change can strand.
  *
  * What remains duplicated across the boundary is the lineage-key normalization below, which
  * mirrors `citationLineageKey`. That is identity normalization, not grading: it decides which
@@ -71,10 +67,8 @@ function claimLineageKey(claim: EvidenceInputClaim): string | null {
 /**
  * True when a claim is the record's own index row rather than evidence about its subject.
  *
- * Every published claim carries `claimRole` as of the 2026-09-09 migration. A claim missing it is
- * treated as evidence rather than inferred from its predicate — predicate inference was a bridge
- * for claims published before the field existed and it is gone from both sides now that none are
- * left.
+ * Published claims carry `claimRole`. A claim missing it is treated as evidence rather than
+ * inferred from its predicate, so this projection cannot silently classify a claim by wording.
  */
 function isRecordIndexClaim(claim: EvidenceInputClaim): boolean {
   return (claim.claimRole ?? '').trim().toLowerCase() === CLAIM_ROLE_RECORD_INDEX;

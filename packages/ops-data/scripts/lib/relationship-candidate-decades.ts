@@ -1,5 +1,5 @@
 /**
- * Derive inclusive decade buckets for WS4 relationship inference from release projection,
+ * Derive inclusive decade buckets for relationship-candidate inference from release projections,
  * status history, kind_detail EDTF, and location EDTF spans.
  */
 import { currentStatus, type StatusHistoryEntry } from '../../../domain/src/entity-status.ts';

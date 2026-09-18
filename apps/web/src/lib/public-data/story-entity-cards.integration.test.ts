@@ -24,7 +24,7 @@ type EntityIdRow = { readonly entity_id: string };
 
 test('listPublicEntityViewsByIds preserves request order and dedupes repeated ids over live rows', async (t) => {
   if (!shouldUseLivePublicProjections()) {
-    t.skip('requires PUBLIC_DATA_SOURCE=postgres + DATABASE_URL/APP_DATABASE_URL (see repo-ihsw)');
+    t.skip('requires live Postgres public projections');
     return;
   }
 

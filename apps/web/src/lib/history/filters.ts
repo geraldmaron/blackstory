@@ -55,7 +55,7 @@ export const HISTORY_FILTER_GROUPS = {
 } as const;
 
 /**
- * Consolidated record-type taxonomy (repo-k1t9). Related canonical kinds roll up into a
+ * Consolidated record-type taxonomy. Related canonical kinds roll up into a
  * small set of high-level categories; the raw kinds stay reachable via an advanced disclosure.
  *
  * Data basis (active release, 1375 records, 2026-07-24):

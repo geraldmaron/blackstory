@@ -7,11 +7,10 @@
  * served — `blackstory.app` is `apps/web`, so this module is the authoritative copy and the
  * routes below it are what iOS and Android actually fetch.
  *
- * The Apple Team ID is real (set 2026-07-22) and the iOS side is publishable as-is. The Android
- * release signing certificate does not exist yet, so `ANDROID_APP_LINKS_SHA256_FINGERPRINTS` is
- * unset in every environment and the assetlinks route fails closed rather than publishing a
- * placeholder. A wrong fingerprint is worse than an absent file: Android caches a failed
- * verification, so the app stops being a candidate handler until the cache expires.
+ * The configured Apple Team ID is the published iOS association. When no Android release signing
+ * certificate fingerprint is configured, the assetlinks route fails closed rather than
+ * publishing a placeholder. Android caches failed verification, so a wrong fingerprint can keep
+ * the app from being offered as a handler until that cache expires.
  *
  * Every value stays env-overridable so a signing identity or a bundle rename lands as
  * configuration, not as a code change.

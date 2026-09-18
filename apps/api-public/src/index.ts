@@ -51,7 +51,7 @@ export {
 } from './vector-search-kill-switch.js';
 export { createFindNearestEndpoint } from './vector-search-endpoint.js';
 
-// --- Bounded public read API v1 (MOB-004) ---
+// --- Bounded public read API v1 ---
 export {
   createPublicApiServer,
   DEFAULT_LIMITS,

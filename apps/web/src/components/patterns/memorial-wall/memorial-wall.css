@@ -96,7 +96,7 @@
   }
 }
 
-/* repo-92n2.18: the reader's own "Hold the wall still" toggle, mirroring the reduced-motion
+/* The reader's own "Hold the wall still" toggle mirrors the reduced-motion
    rule above exactly. Per-name opacity is a CSS animation, not React state, so it cannot see
    `held` any other way; MemorialWallAtmosphere sets `data-held` on this element's own root. */
 .ds-memorial-wall[data-held='true'] .ds-memorial-wall__name {

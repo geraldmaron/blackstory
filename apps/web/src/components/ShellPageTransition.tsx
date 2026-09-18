@@ -12,20 +12,16 @@
  * containing block behavior, making the plate scroll with the document instead of holding the
  * viewport.
  *
- * THERE IS NO SUSPENSE BOUNDARY HERE, and there must not be one that wraps `children`
- * (repo-bko39). This rendered `<Suspense fallback={<FrameFromPath>{children}</FrameFromPath>}>`
- * around `<FrameFromSearch>{children}</FrameFromSearch>`, handing the entire page to both halves,
- * so React streamed the whole document twice: every shipped page carried two `<main>` landmarks,
- * two `<h1>`s and a duplicate of every id, and the duplicate was about a quarter of the bytes.
- * It was invisible — the retained fallback frame measures 0x0 — so no screenshot or functional
- * check would ever have shown it.
+ * THERE IS NO SUSPENSE BOUNDARY HERE, and there must not be one that wraps `children`.
+ * A page-root Suspense fallback would render `<FrameFromPath>{children}</FrameFromPath>`
+ * around `<FrameFromSearch>{children}</FrameFromSearch>`, handing the entire page to both halves.
+ * React would then stream duplicate landmarks, headings, and ids while the fallback remains
+ * visually hidden at 0x0.
  *
- * The boundary was also unnecessary. Its two branches were the same function: `useSurfaceClass()`
- * reads `usePathname()` and nothing else, so despite the name nothing here ever read search
- * params and nothing ever suspended. If a future surface genuinely needs `useSearchParams()`,
- * wrap THAT component, never this one's children.
+ * `useSurfaceClass()` reads `usePathname()` and does not suspend. A component that genuinely uses
+ * `useSearchParams()` must own a local boundary rather than wrapping this component's children.
  *
- * `<ReadingProgress>` is mounted here too (SP-27, repo-92n2.34), not inside any individual room:
+ * `<ReadingProgress>` is mounted here too, not inside any individual room:
  * this is the one place `surface` is already resolved for every route, so it is also the one
  * place the progress rule can be class-wide rather than something each Reading screen has to
  * remember to render. The component itself decides whether that renders anything; see its own

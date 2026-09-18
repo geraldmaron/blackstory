@@ -1,10 +1,8 @@
 /**
- * repo-n7p6.6 item 2 — the precision/ISO behavior the public timeline contract depends on.
+ * Precision and ISO behavior required by the public timeline contract.
  *
- * The chronological-ordering and sentence-composition behavior this builder inherited from
- * `apps/web/src/data/entity-graph-seed.ts` is still covered by that module's own test, which
- * imports through the re-export. These tests cover what is new here: date precision and the rule
- * that `at` is never fabricated.
+ * Chronological ordering and sentence composition are covered through the web module's
+ * re-export. These tests cover date precision and the rule that `at` is never fabricated.
  */
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';

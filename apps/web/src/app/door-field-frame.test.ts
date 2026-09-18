@@ -1,5 +1,5 @@
 /**
- * The Door's map window → plate camera arithmetic (repo-18ma2). Rects in, padding and offset
+ * The Door's map window → plate camera arithmetic. Rects in, padding and offset
  * out; no DOM, no MapLibre.
  */
 import assert from 'node:assert/strict';

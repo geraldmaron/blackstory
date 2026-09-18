@@ -1,5 +1,5 @@
 /**
- * Long-lived listener for `apps/api-public` (MOB-004 live wiring). Boots the real `node:http`
+ * Long-lived listener for `apps/api-public`. Boots the real `node:http`
  * server on `PORT` with production `HandlerDeps` — Postgres `published` reads when
  * `PUBLIC_DATA_SOURCE=postgres` + `DATABASE_URL`; see `http/README.md`.
  *

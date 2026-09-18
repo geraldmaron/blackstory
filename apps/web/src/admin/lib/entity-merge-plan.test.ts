@@ -1,5 +1,5 @@
 /**
- * Rules a merge has to obey before any SQL runs (repo-gyq6.5).
+ * Rules a merge has to obey before any SQL runs.
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';

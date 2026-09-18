@@ -47,7 +47,7 @@ test('countDistinctSources counts genuinely independent publishers separately', 
 });
 
 test('countDistinctSources treats a non-array claims value as zero sources', () => {
-  // Four released entities store claims as a jsonb object rather than an array (repo-n7p6.14).
+  // Four released entities store claims as a jsonb object rather than an array.
   assert.equal(countDistinctSources({}), 0);
   assert.equal(countDistinctSources(undefined), 0);
 });

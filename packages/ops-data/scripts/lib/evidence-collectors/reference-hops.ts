@@ -1,5 +1,5 @@
 /**
- * repo-n7p6.17 (WS3 PATH 2) — reference traversal.
+ * Reference traversal after primary evidence acquisition.
  *
  * The collectors fetch a page and stop. But the sources that actually tell a place's history are
  * usually one link away from the page that names it: a Wikipedia article's reference list, a

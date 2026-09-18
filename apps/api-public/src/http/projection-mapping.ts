@@ -16,7 +16,7 @@ import type { ClaimV1 } from '@repo/public-contracts/v1/claim';
 import type { PublicClaimProjectionDoc, PublicEntityProjectionDoc } from '@repo/ops-data';
 
 /** Bounds entity-collection fallback reads when no `publicSearchIndex` rows exist for the active
- * release (MOB-004 safety net — not the primary search path). Index-backed search uses the
+ * release (a safety net, not the primary search path). Index-backed search uses the
  * release-scoped query in `./postgres-readers.ts`'s `listPublicSearchIndexDocs`. */
 export const MAX_LIVE_SEARCH_SCAN = 500;
 

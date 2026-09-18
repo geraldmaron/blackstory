@@ -84,7 +84,7 @@ export function selectEvidenceForModel(
   rows: readonly EvidenceRow[],
 ): EnrichmentSubject['evidence'] {
   const usable = rows.filter((row) => row.content_text !== null && row.content_text.length > 0);
-  // tier1 first (richest, most authoritative), then by length — matches WS3's own preference.
+  // Prefer tier1 evidence, then longer text, matching the acquisition pipeline's ordering.
   const ordered = [...usable].sort((a, b) => {
     if (a.source_tier !== b.source_tier) return a.source_tier === 'tier1' ? -1 : 1;
     return (b.content_text?.length ?? 0) - (a.content_text?.length ?? 0);
@@ -122,7 +122,7 @@ export function selectEvidenceForModel(
   return evidence;
 }
 
-/** Same digest formula sweep-entity-evidence.ts uses, so "unchanged since WS3" is comparable. */
+/** Same digest formula used by sweep-entity-evidence.ts, so unchanged evidence compares equally. */
 export function evidenceDigestFor(
   rows: readonly { readonly content_hash: string | null }[],
 ): string | null {

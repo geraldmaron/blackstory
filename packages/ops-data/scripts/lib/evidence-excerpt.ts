@@ -1,18 +1,17 @@
 /**
- * repo-z57b — relevance-aware excerpting for the evidence read window.
+ * Relevance-aware excerpting for the evidence read window.
  *
- * The window used to be a head slice: the first `cap` characters of the document, and nothing
- * else. That works whenever the significance narrative happens to sit at the front, which after
- * repo-a3wx (significance ordered first) is most of the time. It fails on exactly the documents
- * where it costs the most — very large district nominations, where the captured section 8 opens
+ * A head-only window takes the first `cap` characters of the document. It works when the
+ * significance narrative sits at the front, but fails on very large district nominations where
+ * the captured section 8 opens
  * on criteria checkboxes, UTM points, boundary justification and pages of owner names, and the
  * Black-history narrative begins well past the cap.
  *
- * Measured on the three entities that ended wave 5 unfinished:
+ * Measured on three unfinished entities:
  *
- *   Big Sink Rural HD (93001523)   289,945 chars   first lane term at  13,532   dense from  79,550
- *   Charles Town, Old (00001308)   231,565 chars   dense from  13,676
- *   Redd Road Rural HD (91000153)   49,283 chars   dense from  12,183
+ *   Big Sink Rural HD (93001523)   289,945 chars   first lane term at 13,532   dense from 79,550
+ *   Charles Town, Old (00001308)   231,565 chars   dense from 13,676
+ *   Redd Road Rural HD (91000153)   49,283 chars   dense from 12,183
  *
  * All three have `hasSignificance: true` and section 8 captured. Nothing was missing from the
  * capture; the head slice simply landed in front of the history. Raising the cap does not fix

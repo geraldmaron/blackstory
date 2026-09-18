@@ -6,8 +6,8 @@
  * fail closed when none is recorded, the same rule the beta launch gate uses.
  *
  * Two gates are EXPECTED TO FAIL on the current tree and are here deliberately rather than
- * omitted: `ota-code-signing` (repo-3en3s — EAS Update ships unsigned) and, until an owner records
- * it, `store-and-signing-identity` (repo-arlr / repo-1etxc). A gate that is missing because it
+ * omitted: `ota-code-signing` ( — EAS Update ships unsigned) and, until an owner records
+ * it, `store-and-signing-identity`. A gate that is missing because it
  * would be red reads, later, like one nobody thought of.
  */
 import type { MobileReleaseGateDefinition } from './types.js';
@@ -104,7 +104,7 @@ export const MOBILE_RELEASE_GATES: readonly MobileReleaseGateDefinition[] = [
      * already settled trains people to ignore the gate.
      *
      * It stays in the inventory, and it stays red: every decision artifact reports it as an
-     * optional failure naming repo-3en3s, so the accepted risk is restated on every release
+     * optional failure naming, so the accepted risk is restated on every release
      * rather than forgotten. The required half of this concern is `store-and-signing-identity`,
      * which a person has to sign. Make this required again the day the plan is paid for.
      */

@@ -1,6 +1,5 @@
 /**
- * repo-vn1z filed `publicStoryProjectionSchema` in `@repo/schemas` as orphaned and scheduled it
- * for deletion. It is not orphaned: this fixture is typed by it, and `/admin/stories/articles`
+ * `publicStoryProjectionSchema` is active: this fixture is typed by it, and `/admin/stories/articles`
  * and `/admin/stories/review` read the fixture through
  * `apps/web/src/admin/stories/cover-article-catalog.ts`.
  *

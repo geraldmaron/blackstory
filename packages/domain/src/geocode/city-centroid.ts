@@ -1,9 +1,7 @@
 /**
  * Local USPS city/state centroid lookup for locality geocode fallback, plus a small curated
- * non-US city centroid table (2026-09-12 OWNER RULING, repo-9rkh: "the Atlas supports non-US
- * birthplaces" — Black American history has origins outside the US by definition, and a
- * missing centroid path was silently dropping documented Caribbean/West African birthplace
- * pins rather than leaving them wrong).
+ * non-US city centroid table for documented birthplaces outside the United States. Unknown
+ * places remain unpinned rather than receiving an invented location.
  *
  * Census `onelineaddress` does not match bare city/state strings. This module averages ZIP
  * centroids from the open-source `zipcodes` dataset for a city+state pair, then callers
@@ -131,8 +129,8 @@ export type LookupNonUsCityCentroid = (
  * pin is honest) rather than fall back to somewhere the person was never documented.
  */
 const NON_US_CITY_CENTROIDS: readonly NonUsCityCentroid[] = [
-  // Cuba (repo-9rkh: Negro Leagues Hall of Famers born before the color line ever crossed into
-  // the majors — José Méndez, Martín Dihigo, Cristóbal Torriente).
+  // Cuba: birthplaces of Negro Leagues Hall of Famers José Méndez, Martín Dihigo, and
+  // Cristóbal Torriente.
   { city: 'Cárdenas', countryCode: 'CU', lat: 23.04278, lng: -81.20361 },
   { city: 'Matanzas', countryCode: 'CU', lat: 23.05111, lng: -81.57528 },
   { city: 'Cienfuegos', countryCode: 'CU', lat: 22.14556, lng: -80.43639 },

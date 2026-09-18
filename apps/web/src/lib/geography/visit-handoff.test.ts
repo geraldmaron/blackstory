@@ -97,7 +97,7 @@ describe('buildVisitHandoff', () => {
   });
 });
 
-describe('buildVisitHandoff: projection.visit preference order (repo-el9p WS3)', () => {
+describe('buildVisitHandoff: projection.visit preference order', () => {
   it('prefers visit.address.line over the label-composed address', () => {
     const visit = buildVisitHandoff({
       displayName: 'Bethel A.M.E. Church',

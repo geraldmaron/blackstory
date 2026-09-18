@@ -2,7 +2,7 @@
  * First-paint pin plate. Explore's server-rendered national field and the live plate's HTML
  * entity markers share Page Sand majority discs; copper marks walks, active, and focus.
  *
- * The board's discs are sized to the plate's at the opening frame (repo-27uao): a single is
+ * The board's discs are sized to the plate at the opening frame: a single disc is
  * `markerRadius(0, 'unrated') × markerZoomScale(zoom)` (marker-size.ts) and a count disc is
  * `CLUSTER_RADIUS_BY_COUNT × the national shrink` (explore-style.ts), each taken at the middle of
  * the tile-zoom band the viewport is in — 3.5 for the band the constructor fit lands in on a

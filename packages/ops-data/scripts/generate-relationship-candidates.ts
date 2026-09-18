@@ -1,5 +1,5 @@
 /**
- * Deterministic WS4 relationship candidate sweep from canonical signals.
+ * Deterministic relationship-candidate sweep from canonical signals.
  * Feeds proposeRelationshipCandidates (geohash, jurisdiction, mentions, decade overlap),
  * ranks with explainable score components, and stages to landscape_candidates — never
  * writes canonical.entity_relationships.

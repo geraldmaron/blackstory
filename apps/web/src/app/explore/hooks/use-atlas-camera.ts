@@ -47,7 +47,7 @@ export function useAtlasCamera(
   };
 
   /**
-   * Live for the session (repo-92n2.18): a preference flip mid-session must change camera
+   * Live for the session: a preference flip mid-session must change camera
    * behaviour without a reload. `camera` below is a stable `useMemo` (deps `[stage, setLayers]`,
    * not rebuilt on every render), so its `reducedMotion` callback reads this ref rather than
    * closing over the hook's own render-time boolean directly — the same pattern `paddingRef`
@@ -114,8 +114,8 @@ export function useAtlasCamera(
    * revealed, not once the canvas has size. The first-paint board is drawn at the plate's opening
    * frame (explore-map-underlay.css), so the handoff is two identical pictures crossfading; a
    * shot that started before the reveal was seen mid-flight through that fade, and on a cold load
-   * the old 400ms-after-mount timer fired before MapLibre existed and the shot never ran at all
-   * (repo-27uao). `ready` replays for a plate revealed on an earlier page, so arriving from the
+   * a mount-timed shot can fire before MapLibre exists and never run. `ready` replays for a plate
+   * revealed on an earlier page, so arriving from the
    * Door still gets the shot. Under reduced motion the shot is a cut and takes no beat.
    */
   const framed = useRef(false);

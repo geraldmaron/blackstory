@@ -88,7 +88,7 @@ test('cold `/explore` mounts the same Door browse shell, not a second instrument
   // Cold browse never runs journey framing; still flip `framed` so the field canvas clears.
   assert.match(immersive, /if \(browseModeRef\.current\) \{[\s\S]*?setFramed\(true\)/);
 });
-test('the Door has one map: no static board, no layout zoom, no pin plate (repo-18ma2)', () => {
+test('the Door has one map: no static board, no layout zoom, no pin plate', () => {
   assert.doesNotMatch(immersive, /FirstPaintPinPlate|usePinPhotoHoverAnchor|locatorPinPercent/);
   assert.doesNotMatch(immersive, /ds-door__board|ds-door__ground|focus\.scale|is-zoomed/);
   assert.doesNotMatch(css, /ds-door__board|ds-door__ground|us-locator\.svg|ds-first-paint/);

@@ -9,8 +9,8 @@ export const EDITORIAL_PACKET_KIND = 'editorial.packet.v1' as const;
 export type EditorialDecision = 'keep' | 'reject' | 'needs_evidence';
 
 /**
- * Optional scholarly-citation metadata for a claim whose source is a peer-reviewed paper
- * (repo-k2q3 crit 2 / repo-yj2q). When present, `doi` is checked against Crossref/OpenAlex
+ * Optional scholarly-citation metadata for a claim whose source is a peer-reviewed paper.
+ * When present, `doi` is checked against Crossref/OpenAlex
  * at judge time (gated behind CHECK_DOIS=1 — see checkDoiCitation in @repo/domain and the
  * gate in operator-cli/editorial-run.ts) so a claim can't cite a paper under a fabricated or
  * drifted DOI. Mirrors `ArticleScholarlyCitationDoc` in @repo/schemas — same shape, kept

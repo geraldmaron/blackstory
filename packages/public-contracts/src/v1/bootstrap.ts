@@ -10,7 +10,7 @@
  * matching `./revision.ts`'s `RevisionMetadataV1`; see `docs/decisions-carryover.md`, "Public
  * projection and immutable publication snapshots") and
  * the version-floor constants in `./version.ts` (`docs/decisions-carryover.md`, "ADR-021's two
- * invariants": app/API compatibility). It is what `apps/mobile` (MOB-009) reads once at launch to
+ * invariants": app/API compatibility). It is what `apps/mobile` (mobile client) reads once at launch to
  * know which release is active and what its own client version must satisfy.
  */
 import { z } from 'zod';

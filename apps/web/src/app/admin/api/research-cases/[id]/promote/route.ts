@@ -1,6 +1,6 @@
 /**
  * POST /api/research-cases/[id]/promote — promote a research case's proposed record to a
- * canonical entity (repo-k2kb). Gated on `publication:publish`, which the role table grants to
+ * canonical entity. Gated on `publication:publish`, which the role table grants to
  * `admin` and `publication` only; `research` proposes and cannot approve its own proposal (see
  * promote-case.ts's header).
  */

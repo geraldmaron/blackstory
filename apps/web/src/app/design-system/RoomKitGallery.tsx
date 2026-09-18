@@ -1,9 +1,9 @@
 /**
- * Fixture gallery for the v9 room kit (SP-22, repo-92n2.28).
+ * Fixture gallery for the v9 room kit.
  *
  * Every block in `components/room` renders here with the design tokens it reads printed in
  * mono beside it, so a reviewer can check the kit in light and dark without opening twenty-one
- * routes. This is the fixture surface the per-screen parity gate (repo-92n2.31) checks against
+ * routes. This is the fixture surface the per-screen parity gate checks against
  * the mock rooms in `.design-mocks/blackstory-atlas-v9.html`.
  *
  * The gallery wraps each specimen in `.ds-room` because the kit's ink and wash aliases are
@@ -317,7 +317,8 @@ export function RoomKitGallery() {
             Reading or Record surface.
 
             The Duluth specimen passes `subject` rather than a hand-set `plain` (SP-26,
-            repo-92n2.33): STILL follows from the topic being violence-adjacent, the same way it
+            the composition dignity rule): STILL follows from the topic being violence-adjacent,
+            the same way it
             would for a real chapter's moment, not from this call site's own judgement. */}
         <MapMoment
           camera={{ center: [-87.635, 41.901], zoom: 12.8, pitch: 36, bearing: -12 }}

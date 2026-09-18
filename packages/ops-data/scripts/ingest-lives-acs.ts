@@ -1,7 +1,7 @@
 /**
- * Loads American Community Survey five-year tables by race for Lives Across the Decades (bead
- * repo-0clax.22): 2008–2012 for the 2010s and 2019–2023 for the 2020s, for every state, DC and the
- * nation. Figures keep the published counts and margins; regions are summed later by the builder.
+ * Loads American Community Survey five-year tables by race for Lives Across the Decades:
+ * 2008–2012 for the 2010s and 2019–2023 for the 2020s, for every state, D.C., and the nation.
+ * Figures keep the published counts and margins; regions are summed later by the builder.
  *
  * The Census API data endpoint needs a key, so figures come from an IPUMS NHGIS extract of the same
  * tables (NHGIS_API_KEY). Point LIVES_NHGIS_EXTRACT_DIR at an unzipped extract to reuse one; otherwise

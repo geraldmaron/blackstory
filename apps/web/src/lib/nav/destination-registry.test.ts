@@ -1,5 +1,5 @@
 /**
- * Destination registry tests (SP-15, repo-92n2.15 · SP-21, repo-92n2.29).
+ * Destination registry coverage and room-parent tests.
  *
  * The coverage suite is the acceptance criterion "a registry test fails when a public route is
  * absent" and "a registry test fails when a public reading room, record class or utility route

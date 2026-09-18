@@ -3,7 +3,7 @@
  * the live plate stamps `data-plate-ready`, and the field a reader without JavaScript or WebGL
  * keeps.
  *
- * It is the plate's own picture (repo-27uao). Pins are projected in Web Mercator onto the CONUS
+ * It is the plate's own picture. Pins are projected in Web Mercator onto the CONUS
  * board the plate opens on (`conus-mercator.ts`) and grouped with MapLibre's own clustering
  * (`first-paint-clusters.ts`) for each tile zoom the opening frame can land in; the stylesheet
  * shows one pattern or the other from the viewport size, the way the plate picks its tile zoom.

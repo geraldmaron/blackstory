@@ -1,5 +1,5 @@
 /**
- * Server-only lazy Postgres pool for ops AtomicStore writes/reads against bb_* schemas.
+ * Server-only lazy Postgres pool for ops AtomicStore writes and reads against responsibility-based schemas.
  * Never accepts NEXT_PUBLIC_* database credentials.
  *
  * Supabase (and other managed) URLs often include `sslmode=require`. Recent node-pg treats

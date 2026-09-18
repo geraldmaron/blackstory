@@ -1,5 +1,5 @@
 /**
- * Rules a bulk edit obeys before any SQL runs (repo-gyq6.6).
+ * Rules a bulk edit obeys before any SQL runs.
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';

@@ -1,5 +1,5 @@
 /**
- * `/entity/{id}`'s loading skeleton (repo-92n2.12.4), against `EntityRecordRoom.tsx`'s own
+ * `/entity/{id}`'s loading skeleton, against `EntityRecordRoom.tsx`'s own
  * source rather than a hand-typed guess of its geometry — the acceptance bar is "measured, not
  * eyeballed". Each class the skeleton renders is checked against the file that actually owns it
  * (`EntityRecordRoom.tsx`, `RecordChrome.tsx`, `record-room.css`), and the tile count comes from

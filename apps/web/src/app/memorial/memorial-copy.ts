@@ -34,6 +34,6 @@ export const MEMORIAL_QUIET_LIST_LINK_A11Y_LABEL = 'Read every name held here';
  * Deterministic seed for the wall's handwriting layout. The value still reads `v6` and is
  * deliberately unchanged: it is a seed, not a label, and rewriting the string would reshuffle
  * every name's position, size and ink on a memorial wall. It moved here from the route's
- * `memorial-panel-chrome.ts` when that last v6 chrome module was retired (repo-92n2.30).
+ * Reading-room styles own the memorial entry label.
  */
 export const MEMORIAL_WALL_SEED = 'memorial-edition-v6';

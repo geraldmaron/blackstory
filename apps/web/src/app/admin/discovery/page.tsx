@@ -1,9 +1,9 @@
 /**
  * Discovery campaign runs posture for operators.
  *
- * Server component (repo-gyq6.9): run history is read in the request instead of after a hydrate
- * and a token refresh. `/admin/api/discovery/runs` stays for callers outside this page, and the
- * Refresh button went with the client state — a server-rendered page IS the refresh.
+ * This server component reads run history in the request, so the first response contains the
+ * current rows. Reloading the page repeats that server read. `/admin/api/discovery/runs` remains
+ * available to other callers.
  */
 import type { Metadata } from 'next';
 import Link from 'next/link';

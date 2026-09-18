@@ -107,7 +107,7 @@ export type ExploreViewState = {
    */
   readonly floor?: EvidenceGrade;
   /**
-   * A focus instruction, not a filter — the same class as `selected` (repo-92n2.14 / SP-14):
+   * A focus instruction, not a filter — the same class as `selected`:
    * `find=place` opens `PlaceFinder`'s place sheet once on arrival (`/locate` 308s here carrying
    * it). It narrows nothing in `filtered`/`sorted`, so unlike every key above it never renders as
    * a clearable Lens constraint chip. The only value read today is `'place'`; typed as a bare

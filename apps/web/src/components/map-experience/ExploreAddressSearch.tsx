@@ -7,7 +7,7 @@
  * for camera framing. Parent owns ranking. Place lookups are U.S.-only and server-side —
  * never a browser geocoder key.
  *
- * Mounted by `./PlaceFinder.tsx` (repo-92n2.14 / SP-14), which wraps this with
+ * Mounted by `./PlaceFinder.tsx`, which wraps this with
  * `LocationPrivacyNotice` and opt-in geolocation and owns the two-posture Lens/sheet layout. This
  * file's own contract is unchanged; the `radiusId`/`onRadiusChange` props below exist so
  * `PlaceFinder` can clear the radius from outside on a state-select disagreement.
@@ -55,7 +55,7 @@ export type ExploreAddressSearchProps = {
    * Controlled radius selection. Omit both this and `onRadiusChange` for the original
    * uncontrolled behavior (internal state, defaulting to `all`) every existing caller and test
    * relies on. `PlaceFinder.tsx` passes both so it can clear the radius from outside when the
-   * sibling state select wins a disagreement (repo-92n2.14's "most recent action wins, the other
+   * sibling state select wins a disagreement ("most recent action wins, the other
    * control is visibly cleared" rule) — a change this component cannot make on its own since it
    * has no reference to that select.
    */

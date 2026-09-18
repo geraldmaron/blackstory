@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# repo-qauh / repo-n7p6.4 — run the WS4 drafting harness over the nrhp-black-heritage backlog in
+# Run the drafting harness over the nrhp-black-heritage backlog in
 # committing chunks, the same shape as scripts/sweep-nrhp-evidence-loop.sh.
 #
 # enrich-entities-llm.ts advances the ledger itself (pending -> enriched|quarantined), so repeated
@@ -15,7 +15,7 @@
 # PER-INVOCATION ceiling, so a loop of N chunks can spend up to N x ceiling. Set the ceiling for
 # the chunk size you are running, not for the whole night.
 #
-# This never writes to published. Publishing an accepted draft is WS5 and stays a separate,
+# This never writes to published. Publishing an accepted draft stays a separate,
 # reviewed step.
 #
 # Usage (from repo root):

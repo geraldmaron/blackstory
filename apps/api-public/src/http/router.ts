@@ -1,7 +1,7 @@
 /**
  * `/v1` route table + dispatch. Pure over `ApiRequest` → `ApiResponse`; the `node:http` adapter is
  * in `./server.ts`. Kept deliberately tiny (a switch over an enumerated table, not a framework):
- * per the bead, the API framework choice stays minimal and documented — see `./README.md`.
+ * The API framework choice stays minimal and documented; see `./README.md`.
  */
 import {
   handleBootstrap,
@@ -20,7 +20,7 @@ const ENTITY_PATH = /^\/v1\/entity\/([^/]+)$/;
 
 export async function dispatch(request: ApiRequest, deps: HandlerDeps): Promise<ApiResponse> {
   // Only GET/HEAD are served — this is a read surface (docs/decisions-carryover.md, "Service
-  // surface separation"; ADR-005 does not exist). This hardcoded check is the actual live gate —
+  // surface separation"). This hardcoded check is the actual live gate —
   // the typed guardReadOperation/guardMutationAttempt helpers in ./posture.ts are defined but never
   // called from this dispatch path. Anything else is a 404-shaped rejection (we do not advertise
   // the route table via a 405 that distinguishes "wrong method").

@@ -98,7 +98,7 @@
 }
 
 /*
- * Cinematic Map Backdrop adoption (bead repo-4v3a.6). `cinematic-map.css`'s scrim/rail/lock
+ * Cinematic Map Backdrop adoption. `cinematic-map.css`'s scrim/rail/lock
  * rules are authored for `MapStage`'s full-viewport persistent plate (`position: fixed` scrim,
  * `.ds-map-surface`/`.ds-map-stage` ancestor-descendant lock selector). This locator map is a
  * small contained-in-flow figure instead, so these overrides re-scope the same mechanics —
@@ -124,7 +124,7 @@
    * surface never collapses to 0 while the lazy MapLibre chunk / MapFrame placeholder is still
    * resolving. Without this the absolutely-positioned `.ds-cinematic-rail` button lands at y≈0
    * over the page header and real pointer clicks miss it, so "View interactive map" appears dead
-   * even though the engage wiring is correct (bead repo-gsl7). */
+  * even though the engage wiring is correct. */
   min-height: 14rem;
   /* The base rule (`shell.css`) sets `height: 100dvh` and a `#080606` "pre-style-load
    * flash" background for MapStage's full-viewport persistent plate. Neither is overridden by

@@ -49,8 +49,7 @@ export function exploreHrefFromLens(base: ExploreViewState, lens: ExploreUrlSync
     ...defaultExploreOverlayState(),
     layerMode: lens.layerMode,
     sat: lens.satellite,
-    // `group` stays base-only: GroupingToggle isn't rendered in production yet, so there is no
-    // live toggle to sync from (repo-i2n5). Revisit when it ships.
+    // `group` stays base-only because no rendered control can change it in this view.
     group: base.group,
     lines: lens.lines,
     ...(lens.stateCode ? { state: lens.stateCode } : {}),

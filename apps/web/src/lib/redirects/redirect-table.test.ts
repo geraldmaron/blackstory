@@ -247,12 +247,8 @@ test('decadeParamToEra rejects anything that is not a decade boundary', () => {
 });
 
 /**
- * A permanent redirect off a route that later comes back is remembered by every browser that
- * ever followed it. f9f9fcc8 (2026-07-30) sent `/explore` to `/` with a 308; ca3f5274
- * (2026-08-28) brought `/explore` back as the Atlas. Chrome kept the 308 for the exact URL the
- * app router fetches on a nav click (`/explore?_rsc=<stable hash>`), so every later "fix" of
- * Explore verified clean in a fresh browser and failed in the developer's own, for five weeks
- * (2026-09-02). A rule may only redirect a path that has no page behind it.
+ * Browsers cache permanent redirects, including app-router requests with stable query values.
+ * A redirect rule may therefore target only a path with no live page behind it.
  */
 test('no rule redirects away from a route that still has a page', () => {
   const appDir = fileURLToPath(new URL('../../app/', import.meta.url));

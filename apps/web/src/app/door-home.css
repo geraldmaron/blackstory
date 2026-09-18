@@ -4,7 +4,7 @@
  * decorative gradients); centered chapters use an opaque surface plate instead.
  *
  * The map is the shared MapLibre plate (shell.css `.ds-map-stage`, posture `ambient`) and it is
- * the only map on this surface (repo-18ma2). `.ds-door__field` is the part of it the reader sees:
+ * the only map on this surface. `.ds-door__field` is the part of it the reader sees:
  * full-bleed below the bar at every width; on a phone the camera frames a band under the bar. Its
  * `.ds-door__window` is measured by door-immersive.tsx to frame the camera (door-field-frame.ts);
  * nothing is drawn in it. Until this mount has framed the plate and the plate has painted, the

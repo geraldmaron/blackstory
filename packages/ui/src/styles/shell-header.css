@@ -71,13 +71,12 @@ html {
 
 /*
  * Compact utility-nav sizing: capped by HEIGHT (not width) so the lockup fits
- * a slim ~56px bar without inflating .ds-shell-header. brand.md's "≥168px
+ * a slim ~56px bar without inflating.ds-shell-header. brand.md's "≥168px
  * digital minimum" is a marketing/standalone-placement floor; brand.md
  * itself directs squeezed nav contexts to "switch to the symbol alone"
  * rather than render an undersized lockup, and this height cap renders the
- * lockup narrower than 168px (~64px) to keep the header compact. Flagged
- * in repo-bsvx as a documented brand-minimum exception for this nav
- * placement — see bead notes before changing this value.
+ * lockup narrower than 168px (~64px) to keep the header compact. This nav exception intentionally renders the lockup at about 64px; review the brand minimum
+ * before changing this value.
  */
 .ds-shell-wordmark__img {
   display: none;

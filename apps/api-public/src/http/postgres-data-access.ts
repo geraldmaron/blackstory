@@ -1,5 +1,5 @@
 /**
- * Live Postgres `published` bindings for `PublicDataAccess` (MOB-004; the Postgres SoR cutover,
+ * Live Postgres `published` bindings for `PublicDataAccess` (the Postgres source-of-record cutover,
  * `docs/decisions-carryover.md`, "entity source-of-truth precedence").
  *
  * Reads the same Supabase Postgres projections as `apps/web/src/lib/public-data/postgres-readers.ts`

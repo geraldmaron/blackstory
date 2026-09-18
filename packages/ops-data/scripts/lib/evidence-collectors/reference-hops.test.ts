@@ -1,5 +1,5 @@
 /**
- * Unit tests for reference-hop traversal policy (repo-n7p6.17). All pure — no network.
+ * Unit tests for reference-hop traversal policy. All pure — no network.
  */
 import assert from 'node:assert/strict';
 import test from 'node:test';

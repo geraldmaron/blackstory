@@ -27,9 +27,8 @@ function anchor(lat: number, lng: number, matchMethod = 'manual_research'): Enti
 }
 
 /**
- * Washington, D.C. Dunbar-lineage seed anchors only. Church and school pins are
- * honest neighborhood/campus estimates (research brief, verified 2026-07-17) —
- * never rooftop geocodes. Alumni federation is city-level only.
+ * Washington, D.C. Dunbar-lineage seed anchors only. Church and school pins are neighborhood or
+ * campus estimates, never rooftop geocodes. Alumni federation is city-level only.
  */
 export const ENTITY_GEO_ANCHORS: Readonly<Record<string, EntityGeoAnchor>> = {
   // Fifteenth Street Presbyterian Church — Dupont/Sixteenth Street Historic District area.

@@ -44,7 +44,7 @@ export interface PublicDataAccess {
   /**
    * A single published entity. Returns `undefined` for BOTH a nonexistent id AND an id that exists
    * canonically but is not published in this release — the caller must not be able to distinguish
-   * the two (T3 enumeration; bead adversarial requirement). The distinction never crosses this
+   * the two (T3 enumeration). The distinction never crosses this
    * boundary.
    */
   getEntity(releaseId: string, entityId: string): Promise<EntityV1 | undefined>;

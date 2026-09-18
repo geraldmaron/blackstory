@@ -20,7 +20,7 @@
   margin-bottom: var(--ds-space-8);
 }
 
-/* SP-27 (repo-92n2.34) — reading progress: a hairline that fills as the reader scrolls the
+/* Reading progress: a hairline that fills as the reader scrolls the
    document. One rule for the whole Reading class, not a per-screen decision. Design law:
    docs/ui/patterns-reading-room.md, design-direction-v9-surfaces.md §4; reference build
    .design-mocks/blackstory-atlas-v9.html #docprog (line 965).
@@ -1091,12 +1091,9 @@ a.ds-errata__row-id {
 
 /* ===========================================================================
    /memorial — the reading room whose canvas is the handwritten wall.
-   Moved here from the route's own memorial-edition.css (repo-92n2.30), which
-   was the last of the twelve v6 per-route stylesheets. The rules are the same
-   rules; only the `-edition` half of the class name is gone, because the room
-   is not an edition of anything. `.ds-memorial` stays the positioned root so
-   the wall (absolute, z-index 0) cannot paint over the room content that
-   follows it in the document.
+   Shared reading-room styles own this rule. `.ds-memorial` is the positioned
+   root so the wall (absolute, z-index 0) cannot paint over the room content
+   that follows it in the document.
    =========================================================================== */
 
 .ds-memorial {
@@ -1182,7 +1179,7 @@ a.ds-errata__row-id {
   outline-offset: 2px;
 }
 
-/* "Hold the wall still" (repo-92n2.18). Fixed to the viewport rather than positioned within the
+/* "Hold the wall still." Fixed to the viewport rather than positioned within the
    wall's own document flow: the packer's avoid-boxes only know about the header, the held
    message and the scroll cue, and a name drawn through this control is exactly the "canvas
    packed around real chrome" defect those boxes exist to prevent. Fixed positioning keeps it out

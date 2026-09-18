@@ -1,5 +1,5 @@
 /**
- * `/records` — the crawlable, non-spatial record index (SP-09, repo-92n2.9).
+ * `/records` — the crawlable, non-spatial record index.
  *
  * The epic's first binding correction: a map answers "what happened near here" well and "what is
  * documented about X" badly, so the archive keeps a browsable index at its own URL rather than

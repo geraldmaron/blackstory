@@ -85,7 +85,7 @@ export type MemorialWallAtmosphereProps = {
   /** Memorial name -> public entity id, for the small subset with a real entity page. */
   readonly entityLinksByName?: Readonly<Record<string, string>>;
   /**
-   * The reader's own "Hold the wall still" choice (repo-92n2.18), ORed with the live
+   * The reader's own "Hold the wall still" choice, ORed with the live
    * `prefers-reduced-motion` read below to decide whether the reveal clock and the subset
    * rotation actually run. `MemorialWallSection` (bottom of this file) owns this state and
    * renders the real, keyboard-reachable control — this component's own root stays

@@ -5,11 +5,9 @@
  * lists to render its selects; importing them from the query layer would pull `pg` into the
  * browser bundle.
  *
- * `kind` and `entity_class` are not independent: every one of the 4,097 live rows follows the
- * mapping below exactly (verified against the database 2026-08-04 — `kind`/`entity_class` pairs
- * are 1:1 with no exceptions). Letting an operator set `kind` without moving `entity_class` with
- * it would create the first inconsistent row in the table, and every class facet in the workbench
- * reads `entity_class`, so the row would then be filed under its old class forever.
+ * `kind` and `entity_class` are not independent. The canonical mapping below must move both fields
+ * together because workbench facets read `entity_class`; updating only `kind` would file the row
+ * under the wrong class.
  *
  * Shared with bulk kind reassignment (B4), which has to apply the same derivation across a set.
  */

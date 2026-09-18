@@ -130,7 +130,7 @@ export function useLensFilters(view: ExploreViewModel, toasts: UseToasts) {
     [topicId, topicCounts],
   );
 
-  /** Composition dignity gate (repo-92n2.18, design-direction-v9-surfaces.md): whether the active
+  /** Composition dignity gate: whether the active
    * topic constraint permits a density/choropleth area fill to paint. */
   const areaFillPermitted = useMemo(
     () => lensPermitsAreaFill({ topicId, topicLabel: activeTopicLabel }),

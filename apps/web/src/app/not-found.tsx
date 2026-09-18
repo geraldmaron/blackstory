@@ -27,7 +27,7 @@ import './utility.css';
  * A route that calls `notFound()` renders THIS component, and its own `generateMetadata` result
  * is discarded — so without this the tab on a missed record read `BlackStory`, the layout
  * default, and a reader with several tabs open could not tell the miss from the home page
- * (repo-n7p6.29). The status was already a real 404; only the title was lying.
+ * The response is a real 404 and its title must say so.
  *
  * Only the title. Next already emits `<meta name="robots" content="noindex">` for this boundary
  * on its own; declaring it here too just prints the tag twice.

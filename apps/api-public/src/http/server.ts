@@ -1,15 +1,14 @@
 /**
- * `node:http` adapter — the real HTTP server entrypoint for `apps/api-public` (MOB-004).
+ * `node:http` adapter — the real HTTP server entrypoint for `apps/api-public`.
  *
- * Framework choice (bead: "keep API framework choice minimal and documented; do not adopt a
- * framework solely for aesthetics"): the native Node `http` module + a tiny switch router
+ * Framework: the native Node `http` module and a small switch router
  * (`./router.ts`). Rationale in `./README.md` — no other `apps/*` in this repo pulls in Express/
  * Fastify/etc., the surface is five bounded GET routes, and every guard/rate-limit/redaction
  * concern already lives in reusable helpers, so a framework would add a dependency and a supply-
  * chain surface (threat model T8) without buying anything.
  *
- * This adapter is where the untrusted socket meets bounded parsing (threat model T3/adversarial
- * bead cases): URL length, request-body byte size, and JSON nesting depth are all capped BEFORE any
+ * This adapter is where the untrusted socket meets bounded parsing (threat model T3): URL length,
+ * request-body byte size, and JSON nesting depth are all capped BEFORE any
  * handler runs, and any unexpected throw becomes a stack-free `INTERNAL` 500.
  */
 import { createServer, type IncomingMessage, type Server, type ServerResponse } from 'node:http';
@@ -42,7 +41,7 @@ export type PublicApiServerOptions = {
  * Parses JSON while rejecting excessive nesting depth BEFORE building the object graph, so a
  * `[[[[...]]]]` / `{"a":{"a":{...}}}` depth bomb cannot exhaust the stack. Read endpoints have no
  * body today; this guards any body-bearing request the server drains and is the wired,
- * unit-tested defense for the bead's "JSON body exceeding a defined depth" adversarial case.
+ * unit-tested defense for JSON bodies exceeding the defined depth.
  */
 export function parseJsonWithDepthLimit(text: string, maxDepth: number): unknown {
   let depth = 0;

@@ -1,5 +1,5 @@
 /**
- * DOM entity marker keying (repo-pgzr): closing a record card must not mass-unmount and
+ * DOM entity marker keying: closing a record card must not mass-unmount and
  * recreate the marker collection — only genuinely new/stale entity ids may mount/unmount,
  * and the zoom gate must unmount discs the moment a camera ease crosses it.
  */

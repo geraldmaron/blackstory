@@ -2,8 +2,7 @@
  * Tests for history graph helpers: decade scrubber labels, release-artifact decade axes, and
  * point-in-time status. Explore's edge rendering reads decade status through this module
  * (explore-view-model, explore-edge-catalog, build-history-edge-lines), which is why the
- * point-in-time assertion below lives here rather than in the now-deleted /history/api's
- * view-model chain (repo-92n2.36).
+ * point-in-time assertion belongs with these helpers.
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';

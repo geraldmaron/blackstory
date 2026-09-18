@@ -1,5 +1,5 @@
 /**
- * Unit tests for the evidence-window arithmetic (repo-de8i). This is what decides which text a
+ * Unit tests for the evidence-window arithmetic. This is what decides which text a
  * drafter or a model actually reads, and its failure mode is silent: a source that gets zero
  * characters is dropped from the bundle, and the record simply comes out thinner with no error.
  */

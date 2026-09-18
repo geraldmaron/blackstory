@@ -6,16 +6,14 @@
  * These lived next to their generator (`ops-data/scripts/lib/nrhp-area-labels.ts`) when the depth
  * gate was their only other reader. They are here now because a THIRD reader needs them and sits
  * underneath both: `computeReleaseResearchCoverage` in `release-builder.ts`, which must refuse to
- * publish templated prose above 'minimal' no matter which build path produced it (repo-vymq).
+ * publish templated prose above 'minimal' no matter which build path produced it.
  * `@repo/domain` is the only layer all three can import, and a second copy of these strings is
  * exactly the drift the original co-location argument was written to prevent — so the generator
  * now re-exports these rather than owning them.
  *
- * repo-z1pw is the failure this guards against. The nrhp-black-heritage lane synthesizes two
- * claims — a listing fact and a significance fact — from one spreadsheet line, and 2,436 live
- * records published as 'partial' on that basis. `isThinRecord()` (apps/web) keys strictly on
- * 'minimal', so the registry-listing disclosure never fired for the population it was written for
- * and readers saw an uncaveated description of a history nobody had researched.
+ * The nrhp-black-heritage lane synthesizes a listing fact and a significance fact from one
+ * spreadsheet row. These fingerprints keep that index-derived prose at 'minimal' coverage so
+ * `isThinRecord` in the web app continues to show the registry-listing disclosure.
  *
  * A match here is proof of a template, not evidence of one: the strings are emitted verbatim by a
  * generator, so a substring hit cannot be a coincidence of ordinary prose.

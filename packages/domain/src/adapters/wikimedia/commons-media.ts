@@ -33,7 +33,7 @@ export type CommonsImageMetadata = {
   readonly thumbUrl?: string;
   readonly fullUrl?: string;
   /** Wikimedia imageinfo sha1 (hex) of the current file revision — used to pin an exact
-   * upstream version and detect drift on the weekly re-check (repo-n7p6.7.1). */
+   * upstream version and detect drift on the weekly re-check. */
   readonly sha1?: string;
   readonly licenseShortName?: string;
   readonly artist?: string;
@@ -69,7 +69,7 @@ export type CommonsMediaPropose = {
   readonly licenseShortName?: string;
   /** Wikimedia imageinfo sha1 (hex) of the current file revision, carried through from the
    * fetched CommonsImageMetadata on an auto_propose row — see CommonsImageMetadata.sha1.
-   * Downstream pin plans (repo-4vuf) use this to skip a redundant metadata re-fetch. */
+   * Downstream pin plans use this to skip a redundant metadata re-fetch. */
   readonly sha1?: string;
   /** Non-image resource links discovered during enrichment (Wikipedia / Commons). */
   readonly resourceLinks?: readonly EntityResourceLinkPropose[];
@@ -419,13 +419,13 @@ export function commonsFilePageUrl(fileTitle: string): string {
   return `https://commons.wikimedia.org/wiki/${encodeURIComponent(title.replace(/ /g, '_'))}`;
 }
 
-/** Default thumbnail width (px) used by the pin-and-serve mast display (repo-4vuf). */
+/** Default thumbnail width (px) used by the pin-and-serve mast display. */
 export const COMMONS_PIN_THUMBNAIL_WIDTH = 960;
 
 /**
  * Build the Commons `Special:FilePath` thumbnail URL for a pinned file title.
  *
- * This is the pin-and-serve display URL (repo-4vuf): the reader's browser fetches the
+ * This is the pin-and-serve display URL: the reader's browser fetches the
  * thumbnail bytes directly from Wikimedia at view time — BlackStory never stores the
  * original. `Special:FilePath/<File title>?width=<n>` 302-redirects to a
  * `upload.wikimedia.org/.../thumb/...` URL; both hosts must be allowed in img-src (see

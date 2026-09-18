@@ -417,8 +417,8 @@ export const RELATIONSHIP_TYPE_SEMANTICS: Readonly<
 };
 
 /**
- * Causal-weight ranking over RELATIONSHIP_TYPES, ratified by the 2026-09-12 owner ruling
- * (repo-q16vc) for deciding which relationship word wins when several accepted+published edges
+ * Causal-weight ranking over RELATIONSHIP_TYPES, ratified by the relationship ranking policy
+ * for deciding which relationship word wins when several accepted+published edges
  * join the same entity pair and only one can be rendered — the tie-break `ORDER BY` in
  * `DERIVE_SQL`, `packages/ops-data/scripts/lib/release-related-sync.ts`.
  *
@@ -432,17 +432,17 @@ export const RELATIONSHIP_TYPE_SEMANTICS: Readonly<
  * carries more historical weight instead of the narrower one.
  *
  * Five tiers, strongest to weakest:
- *   1. causation and origination — fromEntity caused, enabled, or influenced toEntity, brought it
- *      into being, or undertook the historically decisive involvement in it.
- *   2. bounded contribution — a real but non-originating contribution. Identical to
- *      `BOUNDED_CONTRIBUTION_RELATIONSHIP_TYPES` above, reused rather than restated.
- *   3. organizational and attendance — institutional affiliation, membership, employment,
- *      governance, commercial/production affiliation, or event attendance, with no causal or
- *      originating claim of its own.
- *   4. contextual — place, time, documentary, or descriptive edges asserting no causal or
- *      affiliation claim at all.
- *   5. related_to — the vocabulary's own documented fallback ("symmetric/loose association with
- *      no stronger typed fit", see `related_to` above), so it always sorts last, unconditionally.
+ * 1. causation and origination — fromEntity caused, enabled, or influenced toEntity, brought it
+ * into being, or undertook the historically decisive involvement in it.
+ * 2. bounded contribution — a real but non-originating contribution. Identical to
+ * `BOUNDED_CONTRIBUTION_RELATIONSHIP_TYPES` above, reused rather than restated.
+ * 3. organizational and attendance — institutional affiliation, membership, employment,
+ * governance, commercial/production affiliation, or event attendance, with no causal or
+ * originating claim of its own.
+ * 4. contextual — place, time, documentary, or descriptive edges asserting no causal or
+ * affiliation claim at all.
+ * 5. related_to — the vocabulary's own documented fallback ("symmetric/loose association with
+ * no stronger typed fit", see `related_to` above), so it always sorts last, unconditionally.
  *
  * A type's tier follows its documented semantics, not its place in the `RELATIONSHIP_TYPES`
  * source list: `commemorates` sits in that file's "historical-causation edges" comment block

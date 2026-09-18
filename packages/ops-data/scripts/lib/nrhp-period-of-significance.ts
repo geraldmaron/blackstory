@@ -1,24 +1,21 @@
 /**
- * repo-8zvt — read a National Register nomination's PERIOD OF SIGNIFICANCE.
+ * Read a National Register nomination's PERIOD OF SIGNIFICANCE.
  *
- * NRHP records are the catalog's largest population and its least dated: their only date is the
- * day the property was listed, which is a fact about paperwork, not about history. The nomination
- * form carries the real answer in a field the roster spreadsheet does not export.
+ * Roster listing dates describe registration, not the historical period of significance. The
+ * nomination form carries that period in a field the roster spreadsheet does not export.
  *
  * Three readings, most authoritative first, and the winner is reported so a reviewer can tell
  * which one produced a given era:
  *
- *   'field'        NPS Form 10-900 item 9, "Period of Significance 1929-1950". A transcribed form
- *                  field — the registered answer, and the one to trust.
- *   'justification' the Section 8 continuation prose, "the period of significance is the years
- *                  1910-1955" or "begins in 1906". Present when the form field OCR'd badly.
- *   'context'      a year sitting next to a period-of-significance heading that matched neither
- *                  shape above — OCR routinely mangles the form's layout. Weaker than the two
- *                  above but still period evidence, and worth 94 records that would otherwise go
- *                  undated.
- *   'construction'  "built in 1888" / "constructed c. 1902". NOT an era, and OFF BY DEFAULT.
- *                  It dates the fabric, not the significance, and measurement showed those are
- *                  usually different facts — see `allowConstructionFallback`.
+ *   'field'         NPS Form 10-900 item 9, "Period of Significance 1929-1950". A transcribed
+ *                   form field — the registered answer, and the one to trust.
+ *   'justification' Section 8 continuation prose, "the period of significance is the years
+ *                   1910-1955" or "begins in 1906". Present when the form field OCR'd badly.
+ *   'context'       A year next to a period-of-significance heading that matched neither shape
+ *                   above. OCR routinely mangles the form's layout. This weaker evidence still
+ *                   can supply a period when stronger field and justification cues are absent.
+ *   'construction' "built in 1888" / "constructed c. 1902". NOT an era, and OFF BY DEFAULT.
+ *                   It dates the fabric, not the significance; see `allowConstructionFallback`.
  *
  * THE LISTING DATE MUST NEVER BE READ AS ERA. That confusion is the whole reason this exists, so
  * matching is confined to a window after a period-of-significance cue rather than run over the

@@ -1,9 +1,6 @@
 /**
- * Explore opens with its instruments on screen. This contract has flipped three times
- * (2026-08-29 twice, 2026-09-01, 2026-09-02): "first paint is the map" commits keep collapsing
- * every panel at mount, and the reader lands on a bare plate with no filters — the complaint
- * recorded in the hook's own comment. The defaults live in two places (the `useState` seed and
- * the viewport `sync` effect that overwrites it after mount), so both are pinned here.
+ * Explore opens with its instruments on screen. The defaults live in both the `useState` seed and
+ * the viewport `sync` effect that runs after mount, so this test pins both sources of truth.
  */
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';

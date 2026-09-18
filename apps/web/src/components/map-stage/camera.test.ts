@@ -1,5 +1,5 @@
 /**
- * The camera attitude half of `runFlyPreset` (repo-lk7p8).
+ * The camera attitude half of `runFlyPreset`.
  *
  * The defect these lock down is a one-way scroll: the Door's tilted chapters set pitch and
  * bearing through `flyTo`, but its flat national chapters frame CONUS through the `national`
@@ -63,7 +63,7 @@ test('an omitted attitude is left alone, so a hand-turned plate keeps its own be
   assert.equal('bearing' in (calls[0]?.options ?? {}), false);
 });
 
-test('a cut lands the preset frame in one step, with its attitude (repo-18ma2)', () => {
+test('a cut lands the preset frame in one step, with its attitude', () => {
   const { calls, map } = fakeMap();
   assert.equal(
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -78,7 +78,7 @@ test('a cut lands the preset frame in one step, with its attitude (repo-18ma2)',
   assert.deepEqual(calls[0]?.options.padding, { top: 0, bottom: 0, left: 0, right: 0 });
 });
 
-test('a fit may sink the zoom floor to what the frame needs, and only that far (repo-18ma2)', () => {
+test('a fit may sink the zoom floor to what the frame needs, and only that far', () => {
   const below = fakeMap(2.2);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   runFlyPreset(below.map as any, 'national', { bounds: CONUS }, { mode: 'cut', zoomFloor: 'fit' });

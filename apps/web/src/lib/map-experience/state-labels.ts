@@ -76,7 +76,7 @@ export const STATE_LABEL_FADE_END_ZOOM = 6.2;
 /**
  * The band's lower edge. Below the Instrument's national floor (`MAP_MIN_ZOOM`) the plate is at
  * continental scale — the Door's phone strip fits the whole country into a couple of hundred
- * pixels (repo-27uao) — and two-letter labels overlap each other across the Northeast. No mature
+ * pixels — and two-letter labels overlap each other across the Northeast. No mature
  * map draws region names at that scale, so the labels fade out under the floor and are gone by
  * `STATE_LABEL_APPEAR_START_ZOOM`.
  */
@@ -138,7 +138,7 @@ export function resolveStateLabelColorScheme(colorScheme?: MapColorScheme): MapC
 /**
  * Theme-aware ink for HTML state abbreviation markers (testable without DOM).
  *
- * `default` is `mapPalettes[scheme].label`: design law's own "State labels" role (repo-rnlh),
+ * `default` is `mapPalettes[scheme].label`: design law's own "State labels" role,
  * ΔL*-contrast-held against `land` by `map-contrast.test.ts`, the same token symbol-layer text
  * would use for `text-color` if this label set were ever a `text-field` layer instead of a DOM
  * marker (see the module doc comment above). `selected` stays the brand accent: it is an
@@ -187,7 +187,7 @@ export function stateLabelColorsForScheme(colorScheme: MapColorScheme): {
  * markers' DOM nodes below the entity/cluster marker layer (e.g. a lower z-index or insertion
  * order) as a further belt-and-suspenders measure.
  *
- * Residual risk this policy does NOT cover (repo-8lg3): `plate-place-city` (`explore-style.ts`)
+ * Residual risk this policy does NOT cover: `plate-place-city` (`explore-style.ts`)
  * draws city/town symbol labels from `minzoom: 4.2`, inside this label's own visible band
  * (<= 6.2, `STATE_LABEL_FADE_END_ZOOM`). In that shared 4.2-6.2 window a state marker and a city
  * label can occupy overlapping screen space: MapLibre's placement engine keeps city labels from

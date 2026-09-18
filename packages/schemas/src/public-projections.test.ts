@@ -1,6 +1,6 @@
 /**
  * Tests for public story projection Zod schemas: theme-chapter binding and
- * per-section data-moment / dispute anchors (repo-cqey.2).
+ * per-section data-moment / dispute anchors.
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
@@ -112,7 +112,7 @@ test('moment refId is required', () => {
 });
 
 /**
- * repo-n7p6.26 — a read-side length check must never unpublish a record.
+ * A read-side length check must never unpublish a record.
  *
  * `summary` was capped at 400 here while the wire contract (`entityV1Schema`) allows 5000. The
  * result was not a truncated summary: `parseEntityProjection` returned undefined and the record
@@ -177,7 +177,7 @@ test('entity projection rejects an invalid visit visitability value', () => {
 });
 
 /**
- * repo-2wdg item 9 — the vocabulary this parser accepts must not be narrower than the one the
+ * the vocabulary this parser accepts must not be narrower than the one the
  * database, the deriver and the UI already use. `presumed_deceased` was legal everywhere else
  * and rejected here, so the first record set to it would have 404'd rather than degraded.
  */

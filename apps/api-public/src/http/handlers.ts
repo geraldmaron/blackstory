@@ -1,5 +1,5 @@
 /**
- * `/v1` public read handlers (MOB-004).
+ * `/v1` public read handlers.
  *
  * Each handler is a pure async function over an already-parsed `ApiRequest` + injected `HandlerDeps`
  * — no `node:http` types leak in here, so handlers are unit-testable without a socket. The

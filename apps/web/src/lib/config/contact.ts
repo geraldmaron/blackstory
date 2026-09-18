@@ -6,12 +6,8 @@
  * exists to remove: changing one and forgetting the other publishes two different answers to
  * "who do I tell", and the one that rots is the one nobody reads.
  *
- * `me@geralddagher.com` is the published address by the owner's decision (2026-08-04), not a
- * placeholder waiting on a role mailbox. It is a personal address, and that trade was made
- * knowingly: these two surfaces are the ones a hostile reader reaches for, and an alias would put
- * a name between them and the operator's inbox while delivering to the same place. If that trade
- * is ever revisited, both values stay env-overridable — set `SUPPORT_CONTACT` and
- * `SECURITY_TXT_CONTACT` in the deployed environment and no code changes.
+ * `me@geralddagher.com` is the published default, not a placeholder. Both values remain
+ * environment-overridable through `SUPPORT_CONTACT` and `SECURITY_TXT_CONTACT`.
  */
 
 /** General support, privacy and accessibility contact. Published on /support and /privacy. */

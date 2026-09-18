@@ -35,7 +35,7 @@ test('standable records 308 to /place; non-standable records still render here',
 });
 
 test('a merged-away id forwards to its survivor instead of 404ing', () => {
-  // repo-n7p6.29: unpublishing an absorbed record was right; killing its URL was not. The route
+  // Unpublishing an absorbed record is correct, but its URL must redirect to the survivor. The route
   // must consult the published absorbed->survivor map before it renders a miss.
   assert.match(pageSource, /resolvePublicEntityRedirect/);
   // The redirect lookup belongs on the miss path only — a hit must not pay for it.

@@ -18,13 +18,13 @@ export type MapStageFlyOptions = {
    * unrequested flight rather than a restored view. `'cut'`: no motion at all — the preset frame
    * lands in one step, motion preference aside. For a frame the reader must not see arrive: the
    * Door's first frame after mount, and a window resize, where the plate has to follow the
-   * layout the way the layout itself moves (repo-18ma2). */
+   * layout the way the layout itself moves. */
   readonly mode?: 'fly' | 'ease' | 'cut';
   /**
    * `'fit'`: a bounds fit may sink the plate's zoom floor to the fitted zoom. The Door's phone
    * strip is shorter than the country at the Instrument's national floor (`MAP_MIN_ZOOM`), and a
    * zoom the transform clamps under a center computed for the unclamped zoom lands the country
-   * outside the strip (repo-18ma2). The floor goes back to `MAP_MIN_ZOOM` as soon as a fit no
+   * outside the strip. The floor goes back to `MAP_MIN_ZOOM` as soon as a fit no
    * longer needs less, and whenever the plate leaves the Door's ambient posture (MapStage.tsx);
    * reader-driven zoom is locked on the strip anyway.
    */
@@ -37,7 +37,7 @@ export type MapStageFlyOptions = {
    * any surface whose frames are authored. The Door's chapters author all four numbers, so a
    * scroll back up to a flat national chapter has to be able to say "flat", or the tilt and
    * rotation of the tilted chapter it came from survive the move and the field stays contorted
-   * at the top of the page (repo-lk7p8).
+   * at the top of the page.
    */
   readonly pitch?: number;
   readonly bearing?: number;

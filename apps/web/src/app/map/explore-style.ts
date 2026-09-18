@@ -734,8 +734,8 @@ export function buildExploreMapStyle(input: BuildExploreMapStyleInput): StyleSpe
       },
       [EXPLORE_ENTITIES_SOURCE_ID]: {
         type: 'geojson',
-        // Address features by their own record id so the decade morph can hold the records that
-        // survive a decade change still (repo-o56o). Safe alongside clustering: MapLibre promotes
+        // Address features by their record id so the decade morph can hold records that appear in
+        // both decades. This is safe alongside clustering: MapLibre promotes
         // the property when it is there and keeps its generated id for a cluster, which has none.
         promoteId: 'entityId',
         // eslint-disable-next-line @typescript-eslint/no-explicit-any -- GeoJSON ambient namespace unavailable
@@ -859,7 +859,7 @@ export function buildExploreMapStyle(input: BuildExploreMapStyleInput): StyleSpe
            (`explore-street-casing`/`-fill` below, minzoom 8). `maxzoom` hands off exactly where
            that local layer picks the same classes back up at their own tuned widths, so the two
            never double-paint the same geometry. `plate.road` had no consumer until this layer;
-           see repo-rnlh. */
+           see the shared palette role. */
         id: 'plate-road',
         type: 'line',
         source: OPENFREEMAP_SOURCE_ID,

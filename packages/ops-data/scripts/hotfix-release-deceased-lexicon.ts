@@ -1,9 +1,9 @@
 /**
- * WS0 hotfix: flip release_entities (+ search_index) person rows whose summary
+ * Release hotfix: flip release_entities (+ search_index) person rows whose summary
  * matches the extended deceased lexicon but still project status='living'.
  *
- * Does NOT write canonical.living_status from regex (that is WS3). Display
- * and release projections only — McGhie-class falsehoods.
+ * Does NOT write canonical.living_status from regex; evidence-backed acquisition owns that
+ * canonical field. This changes display and release projections only.
  *
  * Usage (from repo root):
  *   set -a && source apps/web/.env.local && set +a

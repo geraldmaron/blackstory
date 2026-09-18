@@ -444,9 +444,9 @@ test('OpenFreeMap street layers are present for casing, fill, and labels', () =>
 });
 
 test('plate-road paints the design-law `road` role and hands off to the local street layers at z8', () => {
-  // repo-rnlh: `plate.road` (design-direction-v9-atlas.md's "Motorway/trunk/primary, minzoom: 6")
+  // `plate.road` (design-direction-v9-atlas.md's "Motorway/trunk/primary, minzoom: 6")
   // had zero consumers: the local street layers use their own, separately-tuned `streetCasing`/
-  // `street` literals (repo-ktwh's class-hierarchy work), not this token.
+  // `street` literals, not this token.
   const source = buildExploreMapSource(listPublicEntities());
   for (const colorScheme of ['light', 'dark'] as const) {
     const style = buildExploreMapStyle({
@@ -1043,7 +1043,7 @@ test('clusters use zoom-scaled count-step radii from CLUSTER_RADIUS_BY_COUNT', (
 
 test('both entity buffers promote entityId, so the decade morph can address records by id', () => {
   /*
-   * repo-o56o. `setFeatureState` addresses a feature by its id, and a GeoJSON source has none
+   * `setFeatureState` addresses a feature by its id, and a GeoJSON source has none
    * unless one is promoted from the properties. Both buffers need it, because the hold marks are
    * written to each: rest on the current buffer, zero on the incoming one.
    *

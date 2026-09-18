@@ -1,5 +1,5 @@
 /**
- * `/records` index tests (SP-09, repo-92n2.9).
+ * `/records` index tests.
  *
  * The drift suite at the bottom is the acceptance criterion "the filter vocabulary is generated
  * from the same source as the Lens, with a test that fails on drift". It does not compare two
@@ -439,7 +439,7 @@ describe('/records · place hrefs and map continuity', () => {
     const { evidenceInputs: _evidenceInputs, ...withoutEvidenceInputs } = docs[0]!;
     assert.equal(searchIndexReadyForRecords([withoutEvidenceInputs]), false);
     // A row carrying only the retired derived tier is NOT coverage: `/records` must fall back to
-    // full entities rather than serve a cached conclusion (repo-6qjv0).
+    // full entities rather than serve a cached conclusion.
     assert.equal(
       searchIndexReadyForRecords([{ ...withoutEvidenceInputs, confidenceTier: 'high' } as never]),
       false,

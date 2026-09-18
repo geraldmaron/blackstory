@@ -372,8 +372,8 @@ function syncClusterZoomRange(map: MapLibreMap, posture: PlatePosture): void {
 }
 
 /**
- * Keyed sync of the DOM hit-target markers — the single-feature invariant (repo-4v3a.1 /
- * repo-mrmh / repo-pgzr) extended to the DOM path: markers are keyed by `entityId` and reused
+ * Keyed sync extends the map's single-feature invariant to DOM hit-target markers. Markers are
+ * keyed by `entityId` and reused
  * in place, so a selection change or `zoomend` resync never mass-unmounts and recreates the
  * whole collection (which read as "all entities light up"). Only genuinely new ids mount and
  * only stale ids unmount.
@@ -605,7 +605,7 @@ export function MapStageProvider({
   const [mapAvailable, setMapAvailable] = useState(true);
   const mapAvailableRef = useRef(true);
   // Published to every MapMoment through MapMomentStage, so a moment refuses LIVE rather than
-  // going transparent under a tag that says the map is there — see repo-kz9z.
+  // going transparent under a tag that says the map is there.
   useReportMapAvailability(mapAvailable);
   /**
    * GL lifecycle, held in refs rather than closure locals because construction no longer happens
@@ -666,7 +666,7 @@ export function MapStageProvider({
   const activeDensityMorphRef = useRef<readonly DensityColorMorphState[]>([]);
   /*
    * The record ids on the plate BEFORE the config patch that triggered this morph, and the set
-   * currently held still by it (repo-o56o).
+   * currently held still by it.
    *
    * `previousEntityIdsRef` is captured in the patch rather than at promote because by the time a
    * morph starts, `configRef.current.featureCollection` is already the incoming decade — the patch
@@ -752,8 +752,7 @@ export function MapStageProvider({
     for (const [, entry] of stateLabelMarkersRef.current) {
       // Through the marker, never `element.style.opacity`: a MapLibre marker owns its element's
       // inline opacity and rewrites it on every map update (terrain occlusion), so a value written
-      // straight to the element held for one frame and the fade never happened at any zoom
-      // (repo-27uao).
+      // straight to the element would survive for one frame and prevent the fade at every zoom.
       entry.marker.setOpacity(opacity);
     }
   }, []);
@@ -1579,7 +1578,7 @@ export function MapStageProvider({
         // DOM hit-target discs are fixed-pixel; a camera ease that crosses the cluster gate
         // (closing a record card flies point zoom -> national) must unmount them at the
         // crossing, not at `zoomend` — otherwise every disc rides the whole flight oversized
-        // and the map reads as "all entities light up" (repo-pgzr).
+        // and the map reads as "all entities light up".
         if (
           !shouldMountEntityMarkers(activeMap.getZoom(), EXPLORE_CLUSTER_CONFIG.clusterMaxZoom) &&
           markersRef.current.length > 0

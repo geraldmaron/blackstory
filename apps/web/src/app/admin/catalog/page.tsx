@@ -74,7 +74,7 @@ export default async function CatalogPage({
 
   // Rows and facet counts in parallel — both filtered, both resolved before first paint.
   // Both degrade rather than hang: this page blocks first byte on Postgres, so an unreachable
-  // database has to cost a banner in seconds, not a render that never returns (repo-7pqy).
+  // database has to cost a banner in seconds, not a render that never returns.
   const [identity, pageOutcome, facetsOutcome] = await Promise.all([
     readVerifiedAdminIdentity(),
     readPostgresOrDegrade(() => queryEntityPage(query), 'catalog entities'),

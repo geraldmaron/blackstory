@@ -4,7 +4,7 @@
  *
  * Deliberately NOT recursive: a `RelatedEntryV1`/`RelatedNeighborV1` never embeds another full
  * entity or another related-entry list — only ids, labels, and a direction/timespan. This is a
- * by-construction defense against the "recursive graph payloads" adversarial case (MOB-003
+ * by-construction defense against the "recursive graph payloads" adversarial case (public contract
  * adversarial review): there is no self-referential schema anywhere in this package, so a client
  * parser can never be forced into unbounded recursion by a crafted response.
  */

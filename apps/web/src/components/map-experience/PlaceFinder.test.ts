@@ -1,7 +1,7 @@
 /**
  * PlaceFinder: SSR markup smoke test for the wide (default, pre-mount) posture, plus unit tests
  * for the radius/state disagreement rule those two are pure functions specifically so this file
- * does not need a DOM to pin the acceptance criterion (repo-92n2.14): "Radius and state select
+ * does not need a DOM to pin the acceptance criterion: "Radius and state select
  * disagreement resolves to the most recent action with the other control visibly cleared."
  */
 import assert from 'node:assert/strict';

@@ -1,5 +1,5 @@
 /**
- * CSP nonce pipeline (repo-77nk): `proxy.ts` must issue a fresh per-request nonce, forward it to
+ * CSP nonce pipeline: `proxy.ts` must issue a fresh per-request nonce, forward it to
  * the app as the `x-nonce` request header, and set a nonce-based `Content-Security-Policy` on
  * every response it returns — not only the narrower `isSecurityNormalizedPath` set.
  *

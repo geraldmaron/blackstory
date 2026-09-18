@@ -389,7 +389,7 @@ test('rejects an address-shaped keyword for a person entity', () => {
 });
 
 /**
- * repo-lm6h. The live failure this reproduces: nrhp-black-heritage-14000104 (Monte Verdi
+ * Published defect reproduced here: nrhp-black-heritage-14000104 (Monte Verdi
  * Plantation) published with '...recognized under ethnic heritage (black) as well as agriculture.'
  * The phrase is a real substring of the NPS source, so the citation anchored and every other check
  * passed. Note the subject/evidence below make the quote genuinely verifiable — the point is that a

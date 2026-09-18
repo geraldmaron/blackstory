@@ -11,7 +11,7 @@
  *
  * The research behind each is recorded in `docs/research/memorial-names-wall.sources.json` under
  * `namesAwaitingEntityRecords`, so this file is a transcription of a sourced finding rather than a
- * fresh search (repo-5jxh).
+ * fresh search.
  *
  * BOTH ARE LONG DECEASED, which is what `reviewBasis` records for the person-review gate — a named
  * death date and where it is published, not a bare "reviewed". There is no living-person privacy

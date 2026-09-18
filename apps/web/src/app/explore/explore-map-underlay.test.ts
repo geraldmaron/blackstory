@@ -1,6 +1,6 @@
 /**
  * Explore first-paint map: the plate's own picture, at the plate's own frame, handed off as a
- * crossfade (repo-27uao). Every number in the stylesheet is pinned here against the modules it
+ * crossfade. Every number in the stylesheet is pinned here against the modules it
  * mirrors, so the board cannot drift away from the plate without this failing.
  */
 import assert from 'node:assert/strict';

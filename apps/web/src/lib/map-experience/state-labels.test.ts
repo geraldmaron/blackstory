@@ -112,8 +112,7 @@ test('buildStateLabelMarkers position/text are identical regardless of selection
 });
 
 test('stateLabelColors default ink comes from the design-law `label` plate role, not a local literal', () => {
-  // repo-rnlh: this used to be brandPalette.stone / darkTheme.inkMuted, ad hoc literals that
-  // happened to coincide with (light) or drift from (dark) the ΔL*-contrast-held plate token.
+  // The shared label token keeps both themes aligned with the contrast-tested plate palette.
   const light = stateLabelColors('light');
   assert.equal(light.default, mapPalettes.light.label);
   assert.equal(light.selected, brandPalette.copperTextLight);
@@ -124,7 +123,7 @@ test('stateLabelColors default ink comes from the design-law `label` plate role,
 });
 
 test('labels fade out under the national floor, where the plate is at continental scale', () => {
-  // repo-27uao: the Door's phone strip fits the whole country into a strip; abbreviations
+  // The Door's phone strip fits the whole country into a strip; abbreviations
   // overlap there, and no mature map draws region names at that scale.
   assert.equal(STATE_LABEL_APPEAR_END_ZOOM, 3);
   assert.equal(stateLabelOpacityForZoom(0), 0);
@@ -142,7 +141,7 @@ test('MapStage applies the fade through the marker, which owns its element’s i
     'utf8',
   );
   assert.match(mapStage, /entry\.marker\.setOpacity\(opacity\)/);
-  // A MapLibre marker rewrites `element.style.opacity` on every update; writing it directly
-  // held for one frame and no label ever faded (repo-27uao).
+  // A MapLibre marker rewrites `element.style.opacity` on every update, so writing it directly
+  // would survive for one frame and prevent the label from fading.
   assert.doesNotMatch(mapStage, /entry\.element\.style\.opacity/);
 });

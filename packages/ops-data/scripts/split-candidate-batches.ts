@@ -1,8 +1,7 @@
 /**
- * WS3 stage-2 prep: turn the flat candidate-pair artifact into EGO-GROUPED batches for
- * cheap-LLM typed-edge proposal. Each ego record = one entity + its candidate neighbors (with
- * context + the signal that surfaced each). Grouping by ego lets the proposer reason about an
- * entity holistically and repeats each entity's context once instead of per-pair.
+ * Turn the flat candidate-pair artifact into ego-grouped batches for typed-edge proposals. Each
+ * ego record contains one entity, its candidate neighbors, their context, and the signal that
+ * surfaced each pair. Grouping by ego repeats the entity context once instead of once per pair.
  *
  * Pure node builtins (no deps). Run from anywhere with node+tsx:
  *   node --conditions development --import tsx split-candidate-batches.ts \

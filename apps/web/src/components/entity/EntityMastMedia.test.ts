@@ -1,5 +1,5 @@
 /**
- * SSR markup smoke tests for the entity mast photo chain (repo-4vuf, pin-and-serve).
+ * SSR markup smoke tests for the entity mast photo chain and pin-and-serve path.
  * Mirrors the render-to-static-markup pattern used by RecordGapNotice.test.ts.
  */
 import assert from 'node:assert/strict';

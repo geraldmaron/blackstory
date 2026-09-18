@@ -1,5 +1,5 @@
 /**
- * Proves the role/permission table is a real gate, not a declaration nothing reads (repo-qv9h).
+ * Proves the role/permission table is a real gate, not a declaration nothing reads.
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
