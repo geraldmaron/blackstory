@@ -1,18 +1,19 @@
-# Cloud Armor and protected public API ingress (BB-023)
+# Optional Cloud Armor and protected public API ingress design
 
-> **Leftover/archived — describes a GCP Cloud Armor architecture that was never applied.**
-> `api-public` and `api-submissions` run on Vercel (Cloudflare in front), not behind a GCP
-> load balancer; this directory's design "fronts nothing here" in production (see
-> [`../../docs/runbooks/api-public-vercel.md`](../../docs/runbooks/api-public-vercel.md)).
-> Retained as a historical design record, not an actionable plan. Current stack:
-> [`../../docs/data/firebase-wind-down.md`](../../docs/data/firebase-wind-down.md).
+> **Optional design record — no live GCP edge is established.**
+> `api-public` is deployed as a Vercel function, with Cloudflare in front of the public web.
+> This directory's load balancer, Cloud Armor, Cloud CDN, and Cloud Run controls are not
+> evidence of deployment. See [`../../../docs/architecture.md`](../../../docs/architecture.md) and
+> [`packages/config/src/surfaces.ts`](../../../packages/config/src/surfaces.ts) for current
+> product and typed capability boundaries.
 
+The remaining files are conditional GCP design artifacts, not a current ingress configuration.
 Design stubs for a **global external HTTP(S) load balancer**, **serverless NEGs**, **Cloud
 Armor**, and **Cloud CDN** protecting `api-public` and `api-submissions`. Nothing in this
 directory is applied to GCP by default.
 
-**Security narrative:** [`../../docs/security/ingress-armor.md`](../../docs/security/ingress-armor.md)  
-**Surface matrix (BB-021):** [`../surfaces/surface-matrix.json`](../surfaces/surface-matrix.json)
+**Security narrative:** [`../../../docs/security/ingress-armor.md`](../../../docs/security/ingress-armor.md)
+**Typed surface capabilities:** [`packages/config/src/surfaces.ts`](../../../packages/config/src/surfaces.ts)
 
 ## Artifacts
 
@@ -30,18 +31,17 @@ directory is applied to GCP by default.
 | [`emergency-deny-runbook.md`](./emergency-deny-runbook.md) | Activate deny without code deploy |
 | [`metrics-alerts-checklist.md`](./metrics-alerts-checklist.md) | Monitoring and alert stubs |
 | [`load-test-plan.md`](./load-test-plan.md) | Rate-limit and ingress negative tests (not live) |
-| [`../../docs/security/rate-limits.md`](../../docs/security/rate-limits.md) | Application quota matrix and guard stubs (BB-025) |
+| [`../../../docs/security/rate-limits.md`](../../../docs/security/rate-limits.md) | Application quota matrix and guard stubs (BB-025) |
 
 ## Application quotas (BB-025)
 
-Edge Armor policies (above) provide coarse per-IP throttles. **Application-layer quotas** live in
-`@repo/security` and are wired through `createPublicRateLimitGuard` /
-`createSubmissionsRateLimitGuard` in the API apps. See
-[`docs/security/rate-limits.md`](../../docs/security/rate-limits.md) for the policy matrix,
+Edge Armor policies in this optional design would provide coarse per-IP throttles. Application-layer quota policy lives in @repo/security; guard wiring and provider edge enforcement require separate deployment verification.
+[`docs/security/rate-limits.md`](../../../docs/security/rate-limits.md) for the policy matrix,
 risk-signal aggregation, and remaining shared-store / middleware work.
 
 ## Design invariants
 
+These are proposed invariants for a future GCP deployment. They are not current production assertions.
 1. **LB-only internet path** — `internetTrafficOnlyThroughLb: true`
 2. **No direct run.app** — Cloud Run ingress `internal-and-cloud-load-balancing` on both public APIs
 3. **Armor at edge** — WAF preconfigured rules + per-IP rate-based bans (429)
@@ -70,6 +70,7 @@ node --test armor-policy.test.mjs
 
 ## Human apply steps (summary)
 
+Only perform these steps after a separate deployment decision and verification of the GCP project and resources.
 1. Create Armor policies from `policies/*.json`.
 2. Create serverless NEGs + backend services (CDN on `api-public` only).
 3. Create global external HTTPS load balancer + DNS.
@@ -77,7 +78,7 @@ node --test armor-policy.test.mjs
 5. Verify direct `run.app` fails and LB hostnames succeed ([`load-test-plan.md`](./load-test-plan.md)).
 6. Wire alerts per [`metrics-alerts-checklist.md`](./metrics-alerts-checklist.md).
 
-Deploy identity remains WIF-only (`infra/gcp/wif/`). No secrets in this directory.
+No deployment identity is established by this optional design. Keep secrets out of this directory and verify the actual provider workflow before applying any future GCP resources.
 
 ## Acceptance (artifact evidence)
 

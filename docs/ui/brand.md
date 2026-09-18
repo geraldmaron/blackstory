@@ -50,10 +50,13 @@ Recorded so nobody “fixes” the codebase back to a retired rule:
 4. **Lockup rendering.** Official artwork PNGs at `apps/web/public/brand/` —
    never type the wordmark next to a bare symbol in React.
 5. **Copper text.** Use `#8E4F2A` on light / `#D07A32` on dark
-   (`--ds-copper-text`), not raw Copper Pin for body text on light canvas.
-6. **Home layout.** The `/` page layout pattern (beats, hero, footer) lives in
-   [`design-direction-v6-home.md`](./design-direction-v6-home.md); tokens and
-   palette rules in this file still govern home.
+   (`--ds-accent`), not raw Copper Pin for body text on light canvas.
+   Inline links in operational notices use that theme-aware token, an underline, and a
+   visible focus outline; browser-default blue does not provide dark-theme contrast.
+6. **Home layout.** The `/` surface follows
+   [design direction v10](./design-direction-v10.md) and its
+   [reconciliation](./v10/design-doc-reconciliation.md); tokens and palette rules in this file
+   govern the shared brand.
 
 ## The signature
 

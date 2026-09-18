@@ -1,9 +1,11 @@
 # Service surface separation
 
-**Status:** Design + runtime contracts implemented in-repo. Cloud ingress, IAP, and per-surface deploy
-jobs remain human provisioning steps (see [`infra/gcp/surfaces/README.md`](../../infra/gcp/surfaces/README.md)).
+**Status:** Runtime capability and authorization contracts are implemented in-repo. The optional
+GCP ingress and job manifests are not evidence of live deployment. The current product uses Vercel,
+Cloudflare, Supabase Auth, Supabase Postgres, and Supabase Storage (see
+[`infra/gcp/README.md`](../../infra/gcp/README.md)).
 
-**Decision:** ADR-005, removed 2026-07-24, recovered in [`../decisions-carryover.md`](../decisions-carryover.md), "Service surface separation"
+**Authority:** [Architecture](../architecture.md) and the typed capability matrix below.
 **Data store:** Supabase Postgres; see [architecture](../architecture.md).
 
 ## Threat model summary
@@ -34,37 +36,51 @@ enforced by `apps/web/src/admin/canonical-write-boundary.test.ts`.
 
 ### Public read API (`apps/api-public`)
 
-- **Hosting:** Cloud Run, public ingress with Armor
+- **Hosting:** Vercel function deployment (`apps/api-public/vercel.json`); any Cloud Run posture in
+  optional GCP files is a design target, not a live-resource assertion
 - **Posture:** `public-read` — read/search/location only
 - **Runtime guards:** `apps/api-public/src/posture.ts`
 - **Health contract:** `health()` returns `surface`, `networkPosture`, `allowedOperations`
 
 ### Submissions API (`apps/api-submissions`)
 
-- **Hosting:** Cloud Run, public ingress with strict rate limits
+- **Hosting:** Public submission surface; current provider deployment must be verified separately.
+  The repository enforces the quarantine-only capability contract and rate-limit policy; optional
+  Cloud Run/Armor files are not live deployment evidence.
 - **Posture:** `public-rate-limited` — quarantine writes + submission metadata only
 - **Invariant:** cannot call `publish:projection` or `promote:release` (typed deny)
 - **Runtime guards:** `apps/api-submissions/src/posture.ts`
 
 ### Internal publication API (`apps/api-internal`)
 
-- **Hosting:** Cloud Run, **no public internet ingress**
-- **Posture:** `private-network` — publication and promotion
+- **Hosting:** No live deployment or private-network isolation is asserted by this repository. The
+  code contract accepts service identity only; optional node-service/Cloud Run manifests describe a
+  possible deployment and must not be treated as provisioned.
+- **Posture:** `service-authenticated` — publication and promotion
 - **Auth:** `service-identity` only; **rejects** `end-user-token` and `anonymous`
 - **Runtime guards:** `apps/api-internal/src/posture.ts`
 
 ### Admin console (`/admin` inside `apps/web`)
 
 - **Hosting:** Vercel, shared `apps/web` deployment. Credential scope and server authorization separate public reads from staff writes.
-- **Posture:** staff-gated route group — `apps/web/src/proxy.ts` matches only `/admin/:path*` and requires a valid Supabase session with `app_metadata.app_role` set (`apps/web/src/admin/admin-auth-gate.ts`). `/admin/api/**` authenticates by bearer token instead (`apps/web/src/admin/auth/request-auth.ts`).
+- **Posture:** staff-gated route group — `apps/web/src/proxy.ts` matches only `/admin/:path*` and
+  requires a valid Supabase session with trusted `app_metadata.app_role`
+  (`apps/web/src/admin/admin-auth-gate.ts`). `/admin/api/**` authenticates by bearer token
+  (`apps/web/src/admin/auth/request-auth.ts`). There is no Firebase or IAP requirement in the
+  current route authorizer; MFA and recent reauthentication are also not enforced.
 - **Invariant:** only `apps/web/src/admin/**` may import the write-capable `canonical-postgres-client.ts` / `canonical-write.ts` (see `apps/web/src/admin/canonical-write-boundary.test.ts`). The old "no imports from apps/web" invariant is retired — admin routes are now part of apps/web by design.
 
 ## Typed capability matrix
 
-Source of truth:
+Source of truth for logical capability checks:
 
 - **Runtime TypeScript:** `packages/config/src/surfaces.ts`
-- **Infra JSON:** `infra/gcp/surfaces/surface-matrix.json`
+- **Infra JSON:** `infra/gcp/surfaces/surface-matrix.json` (optional deployment stub; not live state)
+
+The active contract uses `staff-session` / `staff-authenticated` for administration and
+`service-identity` / `service-authenticated` for internal operations. Neither value asserts
+network isolation. Admin session verification and trusted role checks are described in
+[admin identity](./admin-identity.md).
 
 Each API `health()` response includes:
 

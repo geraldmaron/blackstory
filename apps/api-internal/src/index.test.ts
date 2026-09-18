@@ -7,10 +7,10 @@ import { SurfaceCapabilityError } from '@repo/config';
 import { health } from './index.ts';
 import { guardIncomingAuth, guardPublicationOperation, rejectEndUserToken } from './posture.ts';
 
-test('health reports api-internal private-network posture', () => {
+test('health reports api-internal service-authenticated posture', () => {
   const payload = health();
   assert.equal(payload.surface, 'api-internal');
-  assert.equal(payload.networkPosture, 'private-network');
+  assert.equal(payload.networkPosture, 'service-authenticated');
   assert.ok(payload.allowedOperations.includes('publish:projection'));
 });
 

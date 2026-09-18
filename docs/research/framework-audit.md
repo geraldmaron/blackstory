@@ -1,542 +1,268 @@
 # Research framework audit evidence
 
-Working engineering record. Scope: methodology, framework, skills, relationships, preservation,
-providers, persistence, scheduling and operational authority. Observation date: 2026-09-18 UTC.
-This records findings and challenge outcomes; [Research framework](./README.md) is the maintained
-method, [Architecture](../architecture.md) governs changes, and Beads owns execution status.
+Engineering verification record, observed 2026-09-18. The maintained method is
+[Research framework](README.md); [Architecture](../architecture.md) owns authority and the challenge
+procedure. Beads epic `repo-91sqj` owns execution status. This record replaces superseded intermediate
+results rather than accumulating competing completion claims.
 
-## Recommendation
+## Outcome and release boundary
 
-Finish and measure the existing evidence-first kernel and ledger before buying more model work
-or introducing a graph database, vector service, orchestration framework, or another generic
-research package. Black history remains a domain profile; prove reuse with a second domain.
-Remove retired host launchers and contradictory instructions. Treat prefix removal as an atomic
-migration and deployment operation, with no compatibility views or dual writes.
+The reusable kernel, durable execution ledger, source capture, passage retrieval, relationship
+proposals, review gates and manual worker entry points are implemented. Black history is a domain
+profile; the same loop has acquired EPA wetland sources. Research cannot publish. No Firebase,
+Firestore or Corsair runtime is required, and no research timer is enabled in the inspected accounts.
 
-## Observed implementation and live state
+This remains a draft release candidate. The database and application changes are incompatible with
+the currently deployed schema names. Production still uses `bb_*`; no production mutation, merge or
+cutover has occurred. Native iOS Release verification is deferred by the operator. A passing build
+or preview does not prove production migration, reviewed graph coverage or research quality.
 
-A read-only transaction against the configured Supabase database returned:
+## Decisions challenged
 
-| Observation | Result | Interpretation |
-|---|---:|---|
-| `bb_canonical.entities` | 4,232 | Canonical entity count, not released count |
-| `bb_canonical.entity_embeddings` | 646 | Embedding rows; not a measured distinct-entity coverage ratio |
-| `bb_evidence.source_captures` | 69 | Capture rows; not a citation coverage or full-page preservation ratio |
-| `bb_research.model_invocations` | 0 | The canonical model ledger has no recorded invocations |
-| `bb_research.frontier_tasks` | 0 | The canonical durable frontier is unused |
-
-`information_schema.tables` exposed tables/views in nine `bb_*` namespaces (auth functions live
-in another schema). These prefixes belong to schemas, not every table's name. A source search
-found 526 files with `bb_*` references, including docs and migrations. Renaming only table names
-or changing a SQL search path cannot reconcile this system.
-
-The aggregate query was `SELECT count(*)` from the five tables above inside `BEGIN READ ONLY`,
-with a ten-second statement timeout. No records or credentials were exported. Counts describe
-that observation, not a permanent property. No production data was changed by this audit.
-
-An isolated local Supabase/Postgres 17 rehearsal initially exposed duplicate migration version
-`20260729200000`. The living-status constraint now has a unique migration version. The full
-chain applied locally, and SQL ledger/authorization tests and claim-review integration tests passed.
-The responsibility-schema cutover preserved 130 tables, 461 constraints, and 334 indexes in that
-rehearsal. Production migration history and cutover remain unverified; no production migration
-was applied. Checked-in schedule state cannot establish external account state. No Corsair
-connection or new schedule was attempted.
-
-## Findings and disposition
-
-| Area | Evidence and strongest failure mode | Action / remaining limit |
+| Choice | Strongest failure and alternative | Disposition |
 |---|---|---|
-| Fabricated harness inputs | CLI embedded NPS/DPLA example rows and invented URLs in ordinary runs | Removed. Explicit source files, source URL, or connector required |
-| Structured extraction | Bridge stripped fences/comments, coerced fields and invented defaults | Strict kernel schemas and untouched invalid payloads; exact quote/URL checks |
-| Confidence | Staging admitted edges above a model self-score threshold | Model edges remain quarantined regardless of score; no calibrated-probability claim |
-| Identity | Harness matched catalog name prefixes, including ambiguous names | Removed automatic name resolution; explicit evidence/identifier resolution remains separate |
-| Relationship loss | Wikidata deduplication kept the first predicate for each target QID | Distinct predicates and paths preserved |
-| Chain corruption | Second hop lost its seed path; summaries could assert a direct seed→target relation | Intermediate endpoint, path and source predicate provenance retained |
-| Lifespan contamination | Staging copied seed birth/death onto neighboring candidate fields | Removed; seed dates remain explicitly seed metadata |
-| Unbounded traversal | Candidate cap applied after fetching a neighborhood | Request cap, cache, per-step limits, no redirects, timeouts and cycle rejection |
-| CSV evidence loss | Separate simplistic parser split quoted archival descriptions at newlines | Reused one CSV parser across harness and bulk intake; escaped quotes preserved |
-| Contradiction stop | Missing contradiction needs could vacuously satisfy the stop test | Required contradiction search cannot be met by omission |
-| Host/scheduling drift | Host env sample, systemd/launchd scripts, broken gap-fill and overnight parity path | Removed. Manual dispatch/job capability retained; external timer state unproven |
-| Duplicate schedule config | Cloud Scheduler mirror independently described different real/stub jobs | Removed mirror; TypeScript registry remains authoritative |
-| Documentary authority | 2,500-line carryover mixed recovery history, stale routes and decisions | Replaced by concise current contract; architecture and research entry point own challenge procedure |
-| Durable execution | Live audit found unused ledger tables | Implemented immutable manifests, leases, dependencies, cost reservation, proposal validation and invocation accounting. Built-in search/acquisition/synthesis and external-worker handoff resume across processes |
-| Vectors | Entity vectors alone could not return exact supporting passages | Added authorized capture passage index, text/vector RRF and model/hash isolation. Real model recall and coverage remain unmeasured |
-| Preservation | Shared bytes could erase source origin; SPN response loss could cause duplicate saves | Origin mapping, exact-source pointer checks, durable jobs, explicit rights decisions and retention disposal implemented. Actual archive-save completion remains unproven; run/proposal payload erasure and private Storage deletion verified locally |
-| Publication confidence | Source-name and entity-wide heuristics could approve unsupported claims | Removed; each claim requires an exact current claim version, evidence selectors, confidence assessment, and independent review. Calibration quality still requires evaluation |
-| Python parity | Generated types omitted schema constraints and root pytest skipped their tests | Models validate the shared schema before coercion; 24 shared fixtures plus nonfinite checks, included in root pytest |
-| Portable profiles | Generic profile/schema, but Black history model roster and source rules dominate execution | Generic input proven; profile-bound durable execution and a second-domain source-review CLI run work; broad domain quality evaluation remains |
-| MCP | Server exposes indicator/context read tools | Does not expose the complete research lifecycle; CLI is the actual headless front door |
-| Wikidata semantics | “educated at” was rewritten as membership and reverse edges cited the wrong item | Preserve source predicates, ranks, qualifiers, references, exact statement endpoints and paths; deprecated statements excluded, uncertain years withheld |
-| Source truncation | Direct harness URL input keeps a bounded excerpt, with full length/truncation metadata | Evidence chunk retrieval and missing-context recall must be evaluated |
+| Extend the existing kernel | Product coupling can make reuse superficial. Alternative: replace the engine | Accepted with controls: explicit profiles, shared TS/Python schema and second-domain execution; no second framework |
+| Postgres graph and vectors | Filters can reduce approximate recall; graph expansion can exhaust a budget. Alternative: separate graph/vector services | Accepted pending representative-scale measurements; exact baseline, query plans, bounded traversal and model/hash isolation |
+| Semantic candidate discovery | Similar names or topics can invent identity and relationships. Alternative: lexical-only retrieval | Accepted with controls: similarity proposes; exact source selectors and independent review establish assertions |
+| Institutional source preference | Custody does not remove exclusion, copying or archival silence. Alternative: equal source weights | Claim-relative fitness, lineage checks, community/oral/Black press discovery and explicit negative-case searches |
+| Prefix removal | Old clients, SQL function bodies and JWT claims can fail together. Alternative: compatibility aliases | One coordinated schema/auth/client cutover; no alias views or dual writes; restored-data rehearsal before release |
+| Public relationship shortcuts | A stored connection can borrow unrelated evidence. Alternative: leave old edges visible | Require the exact directed predicate, target and cited claim throughout public graphs and record chains |
+| Preservation | Metadata or an old Wayback snapshot can masquerade as saved bytes. Alternative: URL-only citations | Distinct raw/extracted hashes, explicit rights decisions, historical availability pointers and revision-keyed resumable saves |
+| Automated continuity | Timers create unbounded work and cost. Alternative: scheduled campaigns | Durable leases and headless workers retained; scheduling capability exists without active timers |
 
-Comment cleanup rewrote 452 identified comments across research, product and operator code.
-Both batches preserved the comment-free TypeScript syntax trees before other code changes.
-Descriptions retain failure modes and evidence limitations. Retired provider telemetry now uses
-the actual client-header contract, without claiming authentication or replay protection. Removed
-the duplicate person living-status field, unused theme allowlist and hardcoded Audre Lorde pilot
-launchers; the parameterized expansion command owns that capability. Historical operational
-memories that prescribed Firebase, Corsair or automatic runs were reconciled with current authority.
+## Reconciled implementation
 
-## Challenges resolved
+- Removed fabricated ordinary harness inputs, permissive extraction repair, model-score promotion,
+  name-prefix identity resolution, copied seed lifespans, lost predicates and lost intermediate hops.
+- Immutable manifests, bounded attempts, dependencies, reservations, terminal reasons and proposal
+  artifacts survive separate CLI processes. Built-in workers and external model workers share the ledger.
+- Evidence selectors bind a source item to an observed capture origin. Byte deduplication cannot
+  change source attribution. Reviewed inputs and membership are immutable.
+- Passage retrieval combines full text and model-pinned vectors through reciprocal rank fusion.
+  Expired, withdrawn, mismatched-model and changed-text passages cannot be used.
+- Retention erases captured text and dependent research payloads. Storage deletion uses the API and
+  checks both origin references and older capture-row references at inventory and deletion time.
+  Malformed references block deletion. Native file bytes are not inferred from a database hash.
+- Save Page Now jobs identify URL plus fetched content revision. Historical availability never
+  satisfies a request to save the current page. Uncertain submissions require reconciliation;
+  known job IDs resume without another POST. Completion is not proof of byte equality with a
+  source that may have changed between the local fetch and the Archive fetch.
+- The shared Gemini adapter preserves one vector per input for embedding-2. An array of texts is
+  one multimodal input for that API; sequential per-text calls preserve order and bound concurrency.
+- Runtime/auth contracts describe Vercel public/admin surfaces and Supabase staff sessions. Optional
+  GCP manifests no longer claim deployed IAP, Armor, WIF, queues or private service identities.
+  The security catalog points to existing implementation and architecture files rather than
+  retired tracker codes; its validator rejects missing repository references.
+- Broken recovery commands and simulated passing recovery evidence were removed. Launch recovery
+  requires an executed restore and a verifiable log. The launch decision remains `NO_GO`.
+- Literal NUL source characters were replaced by equivalent string escapes. Active scripts use the
+  responsibility schemas. Rewritten comments describe behavior and constraints rather than session history.
 
-**Replace the engine outright. Rejected.** The strongest argument is that partial integrations
-and product coupling make reuse expensive. The alternative is to connect existing contracts,
-source clients, ledger and provider ports and remove duplicate adapters. This has lower migration
-risk and provides observable progress. Reconsider if a second-domain run still requires editing
-BlackStory rules inside the generic kernel.
+## Database and storage evidence
 
-**Add a separate graph/vector platform. Needs validation.** Multi-hop retrieval can be expensive,
-but no measured Postgres bottleneck or held-out retrieval baseline exists. First test normalized
-edges, bounded traversal, text/trigram/identifier retrieval and pgvector with query plans and
-recall measurements. Reconsider only with observed failure under representative load.
+The configured production source was read without mutation. It held ten `bb_*` namespaces,
+133 application tables and 412,140 exact rows on Postgres 17.6. A consistent application snapshot
+was exported to a private local dump (90,198,939 bytes). The isolated restore matched all table
+counts and stable row hashes, with 467 constraints, 342 indexes, 18 functions and no invalid
+constraints. Production authentication data was not copied; a synthetic staff account exercises
+role migration and authorization. Object recovery is a separate check.
 
-**Use semantic proximity to piece facts together. Accepted with controls.** It is useful for
-recall. The failure is plausible but unsupported relationships, especially across same-name
-people. Retrieval emits hypotheses; evidence entails edges; identity and each intermediate node
-remain explicit. No automatic causal shortcut or score-based promotion.
+The migration ledger contains 61 deployed versions. Each now has exactly one local version-matched
+file. All 38 stored SQL bodies match under a SQL-aware lexical comparison; 23 history rows have
+no stored SQL body, so byte-equivalence cannot be established. Seven live-only files were recovered.
+The deployed NULL name for version `20260908120000` cannot be represented by a normal descriptive
+filename; its version matches. No migration-history repair was used.
 
-**Institution-first evidence ranking. Accepted with controls.** Institutional records often have
-stable custody and useful identifiers. They can also reproduce exclusion, misclassification,
-copying and silence. Fitness is claim-relative; include community/oral/Black press sources and
-record evidence-production context. Search and evaluation must sample the gaps institutions miss.
+An explicit bootstrap supplies prerequisites for the historically misordered first eight rows.
+It is a no-op on complete existing installations and refuses partial/mixed namespaces. The actual
+CLI dry run rejects this earlier version by default; upgrades must explicitly use `--include-all`
+and inspect the plan. Both complete 75-file clean installation and the 61-to-75-version upgrade
+from the original production dump passed with `supabase db push --include-all`. All 133 original
+table counts remained unchanged; all 132 comparable common-column hashes matched. The remaining
+original table, `research.model_invocations`, was empty before and after its intentional column
+change. Six tables were added, including 14 evidence-linked `capture_origins` rows; no origins were
+inferred for the 55 captures without a source-item link. Both databases passed
+`supabase/tests/research-kernel.sql` and a final `db push --dry-run --include-all` reported up to date.
+Final state: ten current schemas, zero old schemas, eleven generated projection columns and no
+invalid constraints. Unrecorded generated-column and redirect changes are reconciled by forward
+migration `20260918154322`, which validates existing expressions and refuses mixed column states.
+Do not edit applied history to introduce new behavior.
 
-**Remove schema prefixes immediately. Accepted with controls.** Cleaner names benefit reuse.
-The strongest failure mode is breaking function bodies, RLS/auth role lookup or PostgREST while
-clients are already deployed. Rehearse schema/function/auth/client changes on a restored database,
-compare constraints/counts, verify denied operations, and coordinate deployment. Applied migration
-history remains history; new compatibility views and dual-write periods are rejected.
+Storage inventory found 58 distinct referenced raw objects, all present, totaling 16,595,885 bytes.
+All were downloaded to a private backup, restored to an isolated private bucket, and read back with
+matching downloaded-byte hashes. All 116 anonymous access probes were denied; temporary restored
+objects were removed after verification. Fifty-five extracted-text objects do not share the raw
+source digest stored in their capture row. Historical writer `575e1efd` confirms that safe-fetch
+hashed raw response bytes while the Storage sink uploaded extracted text under that raw hash.
+The original raw bytes cannot be reconstructed from those text snapshots.
+The public-media bucket contains 242 objects (509,384,251 bytes). Scanning 85 projection/artifact
+JSON and text columns found 229 legacy GCS media references: 228 map to existing Supabase objects (457,165,770 bytes), one does not.
+All 228 available referenced media objects were downloaded, restored into a private local bucket
+and read back with identical hashes and sizes; 456 anonymous access probes were denied, and the
+temporary bucket was removed. The missing object is the Dunbar school primary image; its original
+GCS URL returns HTTP 403. This is an unresolved source/object gap, not a successfully recovered
+229th object. The private backups are retained outside Git. Recovery targets and production failover have not
+been established by these local timings.
 
-**Schedule for continuity. Rejected for current operation.** Durable state and explicit headless
-execution provide continuity without an active schedule. Keep job definitions and resume semantics.
-No new timer, model bill, or personal-host dependency is necessary to finish the engine.
+Active-release coverage is materially incomplete: 12,180 cited claims use 7,566 distinct URLs,
+while the 69 capture rows cover 14 source-item URLs with no overlap against those release citations.
+No production capture or retrieval row currently has a Wayback pointer. Implemented preservation
+capability is not completed preservation of the published corpus.
 
-## Execution order and cost controls
+## Research evaluation
 
-Execution is tracked in epic `repo-91sqj`. Its evidence-integrity and operating-authority children
-cover this change. Reuse `repo-atya` for portable ledger execution, `repo-93p35.9` for executing
-research needs, and `repo-e9yj` for causal/counter-literature assessment.
+The reusable [held-out corpus](../../packages/testing/src/gold-corpus/fixtures/heldout-evidence-retrieval.v1.md)
+contains six opened primary pages, 20 retrieval questions and 14 entailment cases. It includes
+rare people, aliases, synthetic OCR perturbations, indirect questions, a two-hop chain, conflicting
+fields, missing evidence and a second domain. A separate agent authored provisional gold labels;
+root predictions were frozen before reading those labels. This is not a human-adjudicated benchmark.
 
-The next load-bearing gates are recorded in `repo-91sqj.3` (schema cutover), `.4` (hybrid retrieval
-and ledger integration), `.5` (preservation), and `.6` (contract/calibration evaluation). They carry
-acceptance criteria rather than repeating a roadmap here. Schema cutover can be rehearsed in
-parallel with evaluation, but application changes must not deploy against the wrong schema.
+The actual lexical SQL baseline measured precision@5 **0.09**, recall@5 **0.45** and MRR **0.425**.
+Exact-name and alias recall was 1.0; OCR, semantic, missed-entity and path categories were 0.
+Forbidden-document retrieval occurred in 0.10 of queries. That is a candidate false-positive rate,
+not an identity-merge rate. The frozen entailment pass matched 12/14 provisional labels and made
+no false-support decisions; two disagreements concern boundary-sensitive labels.
 
-Use one bounded proving cohort before broad acquisition: aliases/same-name records, two distinct
-predicates, a multi-hop path, a copied source, a contradictory source, missing/OCRed evidence, a
-community/oral source, a dead URL, and a second-domain case. Use deterministic checks first. Persist
-query, fetch, token, retry and dollar counts before expanding the cohort. Compare cost per closed
-need and accepted assertion, not output volume. Do not regenerate all embeddings or run paid
-campaigns merely because a migration or prompt changed. Bulk work starts only when the bounded
-pilot demonstrates the intended result. No paid model or archival-save request was made here.
+The real [embedding pilot](../../packages/testing/src/gold-corpus/artifacts/evidence-retrieval-pilot-2026-09-18.json)
+used OpenRouter `openai/text-embedding-3-small`, returning `text-embedding-3-small`, at 768
+dimensions. The explicit normalized model mapping is allowlisted; arbitrary model substitutions
+are rejected. Seven passages and 20 queries used 2,392 reported tokens and $0.00004784 in
+provider-reported credit charges. Including two earlier failed-contract attempts at their full
+reserved upper bounds, cumulative reservation was **$0.00255264**, below the authorized $0.25.
+The earlier charges are not independently known; failed credential reads made no provider calls.
 
-## Primary research consulted
+Hybrid SQL retrieval measured precision@5 **0.23**, recall@5 **1.0** and MRR **0.975**. It also
+retrieved a forbidden document on **0.55** of queries, versus **0.10** lexically. This is a useful
+recall signal and a strong reason to retain strict identity, entailment and edge review. It does
+not justify automatic assertion admission. Exact and approximate modes returned identical results,
+but both actual plans used sequential scans: this tiny corpus provides **no HNSW recall evidence**.
+The artifact includes input hashes, query-level outcomes, SQL plans and cleanup counts; all six
+classes of temporary evaluation rows were removed. The successful OpenRouter pilot does not
+verify the corrected Gemini adapter against its live service. The reusable runner accepts prior
+spend and call counts as inputs; historical attempt details belong to the recorded artifact.
+Entailment inputs are validated before any provider call.
 
-Opened during this audit; these are technical and methodological references, not claims that the
-implementation already conforms to them.
+Entailment predictions are frozen agent decisions, not a paid model comparison. The retrieval path
+category measures retrieval of supporting documents, not end-to-end relationship extraction.
+Measurement-only reports use `qualityAdmission: not_evaluated`; zero measurement thresholds
+cannot produce a misleading quality-pass flag. No probability calibration, resolver false-merge
+rate, human-adjudicated quality threshold or population-level quality claim is supported.
 
-- [W3C PROV overview](https://www.w3.org/TR/prov-overview/): entities, activities and agents provide
-  interoperable provenance. Supports using existing run/activity/derivation contracts.
-- [W3C Web Annotation](https://www.w3.org/TR/annotation-model/): quote/position selectors and source
-  state. Supports exact evidence attachment to a captured revision rather than a bare URL.
-- [Internet Archive availability API](https://archive.org/help/wayback_api.php): closest snapshot,
-  timestamp, availability and status. An availability result does not create a new capture.
-- [pgvector documentation](https://github.com/pgvector/pgvector/blob/master/README.md), retrieved
-  through Context7: hybrid full-text/vector retrieval, iterative scans for filtered HNSW recall,
-  and exact-search comparison. Supports measurement before buying a separate search service.
-- [NARA catalog search tips](https://www.archives.gov/research/catalog/help/search-tips): phrase,
-  wildcard and optional query expansion; increased recall can reduce precision. Supports multiple
-  explicit retrieval strategies and recording search scope.
-- [FAIR principles](https://www.go-fair.org/fair-principles/): reusable data needs identifiers,
-  metadata, provenance and usage conditions. FAIR does not mean every source is publicly shareable.
-- [Oral History Association best practices](https://oralhistory.org/best-practices/): consent,
-  context, documentation, preservation and access. Oral testimony is situated evidence, not
-  anonymous decoration or a source class to discard by default.
-- [Wikidata statements](https://www.wikidata.org/wiki/Help:Statements): qualifiers, references and
-  ranks are part of a statement. A simplified property→entity link is incomplete provenance.
+## Scheduling and provider inventory
 
-## Additional challenge outcomes
+Authenticated read-only checks found:
 
-**Source attribution under deduplication. Accepted with controls.** Identical bytes can have
-several origins. Evidence selectors now require the exact capture/source-item pair; publication
-loads that origin rather than guessing from a capture's single-source field. A foreign key rejects
-unobserved pairs. The migration backfills only existing explicit source relationships and refuses
-unresolved selectors. This is another precondition for production migration review.
+- Four historical GitHub scheduled workflows are `disabled_manually`.
+- Vercel `blackstory` and `blackstory-api` have empty cron lists.
+- GCP `black-book-efaaf` has no Cloud Scheduler jobs across the queried regions.
+- The configured Supabase database has no `pg_cron` extension.
+- The connected Cloudflare account has no Worker scripts, hence no Worker cron triggers.
 
-**Capture disposal. Accepted with controls.** Source/capture/origin/passages/retrieval events commit
-in one transaction. Withdrawal erases capture text and vectors and queues private object deletion.
-Shared references defer removal; disposal tombstones prevent reuse of a deleted object key.
-Uploading bytes still precedes database persistence, so interrupted or rejected acquisitions can
-leave orphaned private objects. Explicit orphan reconciliation inventories objects older than 24 hours
-and queues deletion through the Storage API. Withdrawals erase affected run manifests, task inputs,
-proposal payloads, model responses and quarantine payloads under a run lock. Retention bounds the
-execution deadline. Canonical reviewed claims, provider logs, exports, backups and public archives
-still require separate withdrawal procedures; automatic acquisition refuses restricted content.
+This is an inventory of those accounts, not every machine or third-party account. No Corsair
+connection, workflow dispatch or new schedule was made. Unrelated provider resources were not deleted.
 
-**Runtime homepage. Accepted with controls.** Next.js `connection()` defers catalog reads until
-requests; a failed live read no longer silently substitutes seed pins. This adds request-time
-rendering compute. A static release-artifact shell is the alternative and needs freshness evidence.
+## Verification
 
-**Recovery. Accepted with controls.** Launch gating requires an executed Postgres restore report
-with measured RPO/RTO, integrity, authorization, projection and storage checks and a hashed log.
-A passing simulation fixture no longer proves recovery. A consistent-snapshot local dump/restore
-matched 136 application tables, 183 rows and every table hash, with no unvalidated constraints;
-authorization passed on the restored database. This is local rehearsal, not production recovery proof.
+```text
+Check: Local CI mirror, Node 22
+Command: RESEARCH_TEST_DATABASE_URL=postgresql://postgres:postgres@127.0.0.1:55322/postgres fnm exec --using=22 -- ./scripts/ci-local.sh --base origin/staging --skip mobile
+Result: fail, followed by affected-lane rerun
+Observed: install, packages, Python, contract/security/a11y, coverage, build/typecheck, E2E harness, governance and security-policy passed. Formatting and one HTTP app test failed. Fixture formatting was corrected; the HTTP case passed after workspace build.
 
-**Cost controls. Accepted with controls.** Embedding backfill now requires valid CLI item and cost
-caps and retains estimated reservations after failed calls. Estimates remain distinct from actual
-charges. Official Supabase billing documentation corrects the old three-Micro estimate to about
-$45/month before usage/add-ons, identifies egress quotas as organization-wide, and confirms pooler
-and Storage CDN egress are metered. No new service or paid work was provisioned.
-
-## Validation evidence
-
-The full local CI mirror ran with `fnm exec --using=22 -- ./scripts/ci-local.sh --base origin/staging`.
-Its package lane exposed a malformed assertion introduced while removing seed-claim recovery.
-The assertion was fixed; `--lane validate --lane unit-js-packages` passed on rerun. All other full-run
-lanes passed. Later affected-lane checks are recorded below; a green fixture is not production evidence.
-
-Check: Local CI after cost-cap and workflow corrections
-Command: fnm exec --using=22 -- ./scripts/ci-local.sh --base origin/staging --lane validate --lane unit-js-packages --lane build-typecheck --lane governance
+Check: Failed local lanes after corrections
+Command: RESEARCH_TEST_DATABASE_URL=postgresql://postgres:postgres@127.0.0.1:55322/postgres fnm exec --using=22 -- ./scripts/ci-local.sh --base origin/staging --lane validate --lane unit-js-apps
 Result: pass
-Observed: all four selected lanes passed; the subsequent selector-origin change has additional checks below.
+Observed: both lanes passed; web reported 2,575 passes and one intentional skip.
 
-Check: Comment-only rewrite equivalence
-Command: node /tmp/blackstory-apply-comments.cjs; node /tmp/blackstory-apply-extra-comments.cjs
+Check: Mobile static and unit gates
+Command: cd apps/mobile && fnm exec --using=22 -- npm run format:check && fnm exec --using=22 -- npm run typecheck && fnm exec --using=22 -- npm run lint && fnm exec --using=22 -- npm test -- --ci
 Result: pass
-Observed: 350 and 102 comments rewritten; TypeScript printer output with removeComments:true was identical before and after each batch, including type declarations.
+Observed: format, both type projects, lint and 167 suites / 1,275 tests passed. Native Release proof remains deferred because the installed Xcode license is unaccepted.
 
-Check: Final cleanup static and mobile lanes
-Command: fnm exec --using=22 -- ./scripts/ci-local.sh --base origin/staging --lane validate --lane unit-js-packages --lane build-typecheck --lane mobile --lane security-static
-Result: fail
-Observed: validate and mobile passed. The sandbox denied localhost binds in package tests and font downloads during build; those lanes were rerun with the required permissions. security-static is not a lane name; the actual security-policy lane was run below.
-
-Check: Final cleanup package and security lanes
-Command: fnm exec --using=22 -- ./scripts/ci-local.sh --base origin/staging --lane unit-js-packages --lane security-policy
+Check: Real HTTP entry points against the production-shaped restore
+Command: E2E_BASE_URL=http://127.0.0.1:3048 CI_REQUIRE_E2E=1 fnm exec --using=22 -- pnpm test:e2e
 Result: pass
-Observed: both selected lanes passed, including updated client-header telemetry, record schemas and production guards.
+Observed: root and cold Explore HTTP checks passed; the absent-URL behavior test skipped as designed.
 
-Check: Final cleanup build and typecheck
-Command: fnm exec --using=22 -- ./scripts/ci-local.sh --base origin/staging --lane build-typecheck
+Check: Escaped source semantics
+Command: inline TypeScript AST comparison against HEAD, then tracked text-file NUL scan
 Result: pass
-Observed: the complete selected build/typecheck lane passed after allowing existing font downloads.
+Observed: six mechanical source edits were AST-equivalent; the final 4,532 tracked text-file scan found no literal NUL characters.
 
-Check: Selector-origin contract parity
-Command: fnm exec --using=22 -- ./scripts/ci-local.sh --base origin/staging --lane validate --lane unit-py --lane build-typecheck
+Check: Final package and app lanes after preservation, retrieval and graph changes
+Command: RESEARCH_TEST_DATABASE_URL=postgresql://postgres:postgres@127.0.0.1:55322/postgres fnm exec --using=22 -- ./scripts/ci-local.sh --base origin/staging --lane unit-js-packages --lane unit-js-apps
 Result: pass
-Observed: all three lanes passed after the exact selector-origin change, before the subsequent comment/provider cleanup.
+Observed: both lanes passed with local network permission. The sandboxed run had listen EPERM errors; it was not treated as a pass. The coverage lane passed separately at 93.62% lines.
 
-Check: Final domain and record fixtures
-Command: fnm exec --using=22 -- pnpm --filter @repo/domain test
+Check: Final build and type checks
+Command: RESEARCH_TEST_DATABASE_URL=postgresql://postgres:postgres@127.0.0.1:55322/postgres fnm exec --using=22 -- ./scripts/ci-local.sh --base origin/staging --lane build-typecheck
 Result: pass
-Observed: 1,838 tests passed with no failures or skips after removing obsolete nested living-status fixture fields.
+Observed: all workspace builds and type checks passed in the final selected lane.
 
-Check: Final operator-data fixtures with local Postgres
-Command: RESEARCH_TEST_DATABASE_URL=postgresql://postgres:postgres@127.0.0.1:55322/postgres fnm exec --using=22 -- pnpm --filter @repo/ops-data test
+Check: Evaluation provider contract
+Command: fnm exec --using=22 -- node --conditions development --import tsx --test scripts/gold-corpus/openrouter-evaluation-embedding-provider.test.ts
 Result: pass
-Observed: 1,131 tests passed with no failures or skips after the final fixture cleanup.
+Observed: four mocked-boundary cases passed for ordering, dimensions, model identity and usage validation; no additional paid call was made.
 
-Check: Web package
-Command: fnm exec --using=22 -- pnpm --filter @repo/web test
+Check: Final delivery validation after comment cleanup
+Command: RESEARCH_TEST_DATABASE_URL=postgresql://postgres:postgres@127.0.0.1:55322/postgres fnm exec --using=22 -- ./scripts/ci-local.sh --base origin/staging --lane validate --lane unit-js-packages --lane unit-js-apps
 Result: pass
-Observed: 2,572 tests passed, zero failures.
+Observed: validate, package tests and app tests all passed. The final comment pass also preserved comment-free syntax across 250 TypeScript/CSS files; ten additional web test files changed diagnostic text only. Six source-escape edits preserve decoded string values.
 
-Check: Operator CLI with real local Postgres
-Command: RESEARCH_TEST_DATABASE_URL=postgresql://postgres:postgres@127.0.0.1:55322/postgres fnm exec --using=22 -- pnpm --filter @repo/operator-cli test
+Check: Standalone evaluation utility types
+Command: fnm exec --using=22 -- pnpm exec tsc --noEmit --allowImportingTsExtensions --skipLibCheck --module nodenext --moduleResolution nodenext --target es2022 --strict scripts/gold-corpus/evidence-retrieval-pilot.ts scripts/gold-corpus/openrouter-evaluation-embedding-provider.ts
 Result: pass
-Observed: 295 tests passed, zero failures/skips, including capture/disposal transactions and resumable execution.
+Observed: corrected callback receipt typing; standalone strict compilation passed. Duplicate entailment IDs and an occupied output path were also rejected before database/provider access in local CLI probes.
 
-Check: Operator data with exact-origin reviewed citations
-Command: RESEARCH_TEST_DATABASE_URL=postgresql://postgres:postgres@127.0.0.1:55322/postgres fnm exec --using=22 -- pnpm --filter @repo/ops-data test
+Check: Current security authority
+Command: fnm exec --using=22 -- pnpm --filter @repo/testing test; fnm exec --using=22 -- pnpm --filter @repo/testing typecheck
 Result: pass
-Observed: 1,131 tests passed, zero failures/skips. Review selected the explicit origin even when the capture's older source field named a different copy; an unobserved pair was rejected.
+Observed: 123 tests passed, four were skipped, zero failed; typecheck passed. Ajv 2020 validated corpus v2 against the strict JSON schema, and the missing-reference negative case passed.
 
-Check: Kernel contracts
-Command: fnm exec --using=22 -- pnpm --filter @repo/research-kernel test
+Check: Staged delivery secrets and whitespace
+Command: gitleaks dir /tmp/blackstory-staged-secret-scan --config gitleaks.toml --redact --no-banner; git diff --cached --check
 Result: pass
-Observed: 34 tests passed, including the shared selector-origin validation cases.
+Observed: the index export includes only reviewed delivery paths; no secret or whitespace findings. Private database dumps, object backups, credentials and scratch files remain outside the index.
 
-Check: Isolated migration chain
-Command: fnm exec --using=22 -- pnpm exec supabase db reset --local --workdir /tmp/blackstory-research-rehearsal
+Check: Final static validation
+Command: fnm exec --using=22 -- pnpm validate; fnm exec --using=22 -- pnpm typecheck; fnm exec --using=22 -- pnpm format:check
 Result: pass
-Observed: the entire fresh migration chain through 20260918070610 applied on local Postgres 17, including the exact selector/source-origin foreign key.
+Observed: boundaries, entity visibility, lint, local governance, workspace types and formatting passed. Remote governance was skipped by the command's default policy.
 
-Check: SQL authorization
-Command: docker exec -i supabase_db_blackstory-research-rehearsal psql -U postgres -d postgres -v ON_ERROR_STOP=1 < supabase/tests/research-kernel.sql
-Result: pass
-Observed: authorization and research-worker publication/approval denial checks completed again after the final fresh migration chain.
+Outcome: Restored records remain readable and staff controls require a staff session.
+Surface: Chrome /records, /entity/ent_martin_luther_king_jr_001 and /admin/switches.
+Data: Restored 4,210-record active release and a synthetic local Supabase administrator.
+Observed: records and real bibliography links rendered; unsigned staff access redirected to login; signed staff access showed the stored switch row. Notices were inspected in light/dark themes and keyboard focus was visible.
+Verdict: proven locally for these reads and unsupported-edge removal. After the shared evidence gate was applied, the same MLK record retained its two claims and bibliography and withheld the previous 30 unsupported connections and chains, reporting “No linked records yet”. A temporary NPS-cited Mat Bransford → Nick Bransford → Mammoth Cave fixture rendered the exact two-hop chain in light and dark themes, with no invented dates or map precision. The fixture was removed. Positive outgoing, incoming and two-hop paths also pass the public-data regression tests.
+```
 
-Check: Live web E2E
-Command: E2E_BASE_URL=http://127.0.0.1:3148 CI_REQUIRE_E2E=1 fnm exec --using=22 -- pnpm test:e2e
-Result: pass
-Observed: the live check passed; its complementary absent-URL behavior test skipped by design.
+The independent review used fixed head `f208a03f` against `a1b5ddb1`: all migration diffs and
+repository-wide retired-reference/deletion scans, plus targeted implementation groups. It did not
+read every line of every changed product/generated file. Subsequent fixes require their own
+validation. Do not convert targeted review coverage into a claim of exhaustive line review.
 
-Check: Generated documentation
-Command: fnm exec --using=22 -- pnpm docs:publish
-Result: pass
-Observed: GitHub Pages output rebuilt from apps/docs.
+## Primary sources consulted
 
-Check: Staged file secret scan
-Command: gitleaks dir /tmp/blackstory-final-staged-scan --redact --config gitleaks.toml --no-banner
-Result: pass
-Observed: 1,023 staged file snapshots scanned, no leaks. A raw diff scan also sees removed public client keys and loses the existing path-scoped Beads allowlist; it is not the staged-tree result.
+Opened during this work; technical references inform decisions without proving conformance:
 
-## Observed outcomes
-
-Outcome: A worker can resume another domain's task across processes without conversational memory.
-Surface: operator-cli research-run, research-claim, research-complete, research-status
-Data: EPA “Why are Wetlands Important?” and a wetland-ecology profile; one exact paragraph, zero model budget.
-Observed: separate CLI processes created, claimed and completed a local task; status retained its proposal, an open mandatory evidence need and publicationAuthorized:false.
-Verdict: proven for the bounded external-worker protocol; broad research quality remains unmeasured.
-
-Outcome: Readers see source links and honest evidence/location labels.
-Surface: Local production-build homepage, records and place detail; light/dark themes.
-Data: Three local records including a clearly labeled EPA verification record with no coordinates.
-Observed: original EPA link, “Evidence grade: low”, no manufactured 0.40 score or independent-source count, no fabricated pin, and a correct missing-location label. Homepage used the local catalog. No horizontal overflow. Missing-record behavior was observed. Two console errors came from the locally absent Vercel analytics script.
-Verdict: proven on the local browser surface; production remains unverified.
-
-Outcome: Authorized staff can enter the workbench through Supabase Auth.
-Surface: Local development browser /admin/login → /admin.
-Data: Disposable local Supabase account.
-Observed: corrected CSP allowed the configured development Auth origin and login succeeded. Production requires HTTPS and does not grant that origin allowance to public routes.
-Verdict: proven locally; production credential rollout and JWT refresh remain deployment gates.
-
-## Built-in execution and completion checks
-
-`research-work` connects existing search, safe-fetch, capture/index and model ports to the same
-immutable ledger used by external workers. It reserves every fetch and model attempt, applies
-source-specific public-text decisions, and preserves unknown charges. OpenRouter requests bound
-prompt/completion prices and disallow request/image charges, hidden provider fallback and data
-collection. Deterministic runs produce a source inventory, never historical conclusions. Mixed
-runs return an external lease to the caller and resume after `research-complete`. Enrichment
-compiles deficits into this protocol; unfunded needs remain explicitly open.
-
-Removed the unused unique-name entity reconciliation implementation, old mention overrides and
-legacy tag splitting. Public mention edges require exact existing catalog IDs and a stable cited
-claim naming the relationship predicate and target. Unrelated entity claims cannot stand in for
-edge evidence. Opposite directed assertions remain distinct. The history graph no longer restores
-seed relationships when proof is absent; release materialization requires explicit published and
-accepted canonical edges with relationship evidence. This can reduce displayed edges until stored
-records are reconciled during cutover. Unknown sites
-are unknown sources; DOI, archive and JSTOR hostnames do not establish document type or peer review.
-Evaluation rejects nonfinite scores and malformed labels, deduplicates results and counts missing
-precision-at-k slots. These checks do not establish calibrated probabilities or measured recall.
-
-Check: Full local CI mirror after worker integration
-Command: fnm exec --using=22 -- ./scripts/ci-local.sh --base origin/staging
-Result: fail
-Observed: every applicable lane passed except validate, which identified five inline type-import style errors; these were corrected.
-
-Check: Affected CI lanes after type-import corrections
-Command: RESEARCH_TEST_DATABASE_URL=postgresql://postgres:postgres@127.0.0.1:55322/postgres fnm exec --using=22 -- ./scripts/ci-local.sh --base origin/staging --lane validate --lane unit-js-packages --lane build-typecheck
-Result: pass
-Observed: validate, package tests and build/typecheck all passed; final retention/workflow changes have an additional rerun below.
-
-Check: Complete final migration chain
-Command: fnm exec --using=22 -- pnpm exec supabase db reset --local --workdir /tmp/blackstory-research-rehearsal --yes
-Result: pass
-Observed: the dedicated disposable local stack applied every migration through 20260918132658, including run payload deadlines and orphan disposal.
-
-Check: Final SQL authorization
-Command: docker exec -i supabase_db_blackstory-research-rehearsal psql -U postgres -d postgres -v ON_ERROR_STOP=1 < supabase/tests/research-kernel.sql
-Result: pass
-Observed: authorization and research-worker publication/approval denial checks passed on the fresh final schema.
-
-Check: Worker and retention regressions against local Postgres
-Command: RESEARCH_TEST_DATABASE_URL=postgresql://postgres:postgres@127.0.0.1:55322/postgres fnm exec --using=22 -- node --conditions development --import tsx --test packages/operator-cli/src/research-worker.test.ts
-Result: pass
-Observed: five tests passed with no skips, including mixed external handoff, withdrawn payloads and an expired abandoned manifest without artifacts. Database leasing also refused the expired run.
-
-Check: Consistent-snapshot local restore
-Command: fnm exec --using=22 -- node --conditions development --import tsx .cache/research-reconciliation/compare-restore.mts
-Result: pass
-Observed: a read-only repeatable-read transaction exported the pg_dump snapshot and source hashes; isolated restore matched 136 tables and 183 rows, with zero unvalidated constraints. Restore took 5.871 seconds locally; this is not a production RTO.
-
-Check: Restored database authorization
-Command: docker exec -i supabase_db_blackstory-research-rehearsal psql -U postgres -d blackstory_research_restore_20260918 -v ON_ERROR_STOP=1 < supabase/tests/research-kernel.sql
-Result: pass
-Observed: the restored local database retained the expected grants and publication denials.
-
-Check: Actual local private-object deletion
-Command: fnm exec --using=22 -- node --conditions development --import tsx .cache/research-reconciliation/storage-disposal-verification.mts
-Result: pass
-Observed: a temporary private Storage object was queued and deleted through the Storage API; a subsequent read returned not_found. The temporary bucket was removed.
-
-Outcome: A headless worker acquires and indexes real evidence in two domains and resumes by run ID.
-Surface: research-run, research-work, research-status and research-retrieve CLI commands.
-Data: NPS Mary Ann Shadd Cary and EPA What is a Wetland, with explicit public-text decisions and zero model budget.
-Observed: the Black history run resumed under a second worker identity; each run captured one real source, kept its mandatory need open and returned publicationAuthorized:false. Text retrieval returned NPS passages with source/capture IDs, offsets and hashes. Unconfigured contradiction search remained a limitation.
-Verdict: proven for acquisition, resumption and exact-source retrieval; paid synthesis, semantic vector recall and independent historical conclusions remain unproven.
-
-The temporary rehearsal programs and logs are local working evidence, not operational product tools.
-Repeatable product tests live beside the worker; deployment recovery still requires production-shaped
-inputs and the recovery report contract. No paid model, embedding campaign, Internet Archive save,
-schedule or GitHub Actions dispatch was initiated.
-
-Check: Local CI after final retention and workflow cleanup
-Command: RESEARCH_TEST_DATABASE_URL=postgresql://postgres:postgres@127.0.0.1:55322/postgres fnm exec --using=22 -- ./scripts/ci-local.sh --base origin/staging --lane validate --lane unit-js-packages --lane build-typecheck --lane governance
-Result: pass
-Observed: all four selected lanes passed. Subsequent relationship-proof changes are checked separately.
-
-Check: Graph evidence gates and full affected CI
-Command: RESEARCH_TEST_DATABASE_URL=postgresql://postgres:postgres@127.0.0.1:55322/postgres fnm exec --using=22 -- ./scripts/ci-local.sh --base origin/staging --lane validate --lane unit-js-packages --lane unit-js-apps --lane build-typecheck
-Result: fail
-Observed: validate, packages and build/typecheck passed, including a real-database query that excluded unpublished, unreviewed and unsupported edges. Two app fixtures still expected seed edges and were corrected to carry exact cited relationship claims.
-
-Check: Full app lane after fixture correction
-Command: fnm exec --using=22 -- ./scripts/ci-local.sh --base origin/staging --lane unit-js-apps
-Result: pass
-Observed: all app tests passed, including positive map-line projection and negative missing-evidence cases.
-
-Check: Final public documentation generation
-Command: fnm exec --using=22 -- pnpm docs:publish
-Result: pass
-Observed: generated static documentation rebuilt successfully with access to the required font downloads. An initial sandboxed attempt failed to fetch fonts.
-
-Outcome: Map relationship lines do not borrow unrelated citations or restore seed edges.
-Surface: Explore view-model regression and local /explore?lines=1 browser attempt.
-Data: Exact cited relationship fixtures plus a missing-proof case; three local public projection records.
-Observed: full app tests verify both positive lines and empty missing-proof lines. Local HTTP returned 200, but the in-app browser rendered only the map shell without a populated map; no console error was reported.
-Verdict: not proven visually for the final graph change; its database and application contracts passed. Recheck map rendering on the deployment candidate with a reviewed release dataset.
-
-Check: Final fixture typecheck
-Command: fnm exec --using=22 -- pnpm --filter @repo/web typecheck
-Result: pass
-Observed: TypeScript completed after the final graph test fixture corrections.
-
-Check: Final staged-tree secret scan
-Command: gitleaks dir /tmp/blackstory-delivery-staged-scan-l06wxuxv --redact --config gitleaks.toml --no-banner
-Result: pass
-Observed: 1,038 staged snapshots (8.78 MB) scanned with no leaks. The final tree has 1,290 changed paths; classification found 459 comment/mechanical-equivalent code files, 246 code/type changes, 252 deletions and 333 other files. Classification is not a complete raw line-by-line review.
-
-## Delivery checks and acquisition hardening
-
-The initial draft PR's Workspace Checks, Workspace Tests, Python, governance, dependency review,
-secret scan, policy/API security and SBOM jobs passed. CodeQL reported six annotations: a cache
-check/use race, unsafe NHGIS temporary-file/download handling and three hostname substring
-assertions. Mobile's Expo Doctor also required six SDK 57 patch updates. No check was disabled.
-
-The Wikidata cache now reads directly and atomically renames complete private temporary files.
-NHGIS downloads restrict credential use to the documented IPUMS origin/path, reject redirects,
-bound streamed bytes and validate every ZIP entry before writing CSV/text into a private random
-directory. Path traversal, links/devices, duplicate paths, unsupported formats and expansion bombs
-are rejected; failed extraction removes partial output. Tests assert parsed hostnames. The
-standard-library extractor avoids adding a ZIP dependency. Repository security/ops utilities,
-sibling workflow tooling and installed utilities were searched; no reusable safe extractor existed.
-The runbook records limits and the trust boundary for operator-supplied local directories.
-
-**Archive extraction choice. Accepted with controls.** The strongest failure is credential leakage
-or arbitrary file writes through an upstream URL or archive. The alternative is manual extraction
-for every run, which does not serve unattended execution. Use a fixed authenticated endpoint,
-private directories, bounded input/output, isolated Python execution and exclusive file creation.
-This protects the automated table path; an authenticated real NHGIS download was not attempted.
-
-Check: Acquisition, cache parsing and citation URL regression cases
-Command: fnm exec --using=22 -- node --conditions development --import tsx --test packages/ops-data/scripts/lib/lives-nhgis-ingest.test.ts packages/ops-data/scripts/backfill-visit-from-wikidata.test.ts packages/ops-data/src/demographics/acs-loader.test.ts packages/ops-data/src/demographics/loader.test.ts packages/ops-data/src/demographics/nhgis-loader.test.ts
-Result: pass
-Observed: 27 tests passed, including real Python extraction of valid and hostile ZIP fixtures, credential destination checks, byte-preserving output, private permissions and cleanup. The network boundary is mocked.
-
-Check: Full affected local CI lanes after acquisition fixes
-Command: RESEARCH_TEST_DATABASE_URL=postgresql://postgres:postgres@127.0.0.1:55322/postgres fnm exec --using=22 -- ./scripts/ci-local.sh --base origin/staging --lane validate --lane unit-js-packages --lane unit-py
-Result: pass
-Observed: all three selected lanes passed; 137 Python tests passed. The Node package lane actually invokes the new Python extractor.
-
-Check: Operator script types and extractor style
-Command: fnm exec --using=22 -- pnpm --filter @repo/ops-data typecheck; .venv/bin/ruff check packages/ops-data/scripts/lib/extract-nhgis-tables.py; .venv/bin/ruff format --check packages/ops-data/scripts/lib/extract-nhgis-tables.py
-Result: pass
-Observed: both ops-data TypeScript projects and both Python style checks passed.
-
-Check: Mobile CI parity after Expo patch alignment
-Command: fnm exec --using=22 -- ./scripts/ci-local.sh --base origin/staging --lane mobile
-Result: fail
-Observed: clean npm install, format, typecheck, lint and 167 suites / 1,275 tests passed. Expo Doctor passed 20/21 checks; CocoaPods cannot run because this Mac's Xcode license has not been accepted. No license was accepted or native check bypassed. The local mirror now includes Doctor and dependency alignment, matching GitHub.
-
-Check: Mobile dependency alignment after the native-tooling stop
-Command: cd apps/mobile && fnm exec --using=22 -- npm run deps:check
-Result: pass
-Observed: Expo reports dependencies up to date. Existing exclusions were unchanged. Native Release rebuild remains unproven on this host until its Xcode license is resolved by the owner.
-
-All automatically triggered GitHub Actions checks on `d6b7bb75` passed, including both CodeQL
-languages, the combined CodeQL check, mobile, workspace checks/tests, Python and security gates.
-The API preview repeated the same missing `supports-color` target after restoring the old cache.
-A normal frozen install retained stale package links; forcing installation also retained the hoist
-and left missing targets. An isolated missing-target reproduction contained 56 broken hoisted
-links. The shared Vercel installer discards only broken root/workspace dependency directories,
-then reinstalls the frozen graph. It checks before and after installation, preserves healthy
-caches and the download store, and fails if links remain broken. The exact command repaired the
-isolated graph in 2.8 seconds with 479 reused packages and no downloads. Remote preview success
-still requires the updated head's automatic build.
-
-**Dependency cache repair. Accepted with controls.** The alternative is a cold install on every
-build or restoring retired dependencies. Both waste resources or compromise the intended graph.
-Only observed broken hoisted links trigger cleanup; source and package-manager download caches
-are preserved. Filesystem regression tests verify the warm path, broken path, source preservation
-and repeated invocation. The new helper was added after searching repository Vercel/install
-scripts and the installed pnpm/Vercel tooling; no existing repair helper was available.
-
-Check: Reader fallback and build gates
-Command: fnm exec --using=22 -- ./scripts/ci-local.sh --base origin/staging --lane validate --lane unit-js-apps --lane build-typecheck
-Result: pass
-Observed: all three lanes passed. After capping the final serialized fallback at 20 records, fnm exec --using=22 -- pnpm --filter @repo/web build and fnm exec --using=22 -- pnpm --filter @repo/web typecheck also passed; the restarted build passed the HTTP regression again.
-
-Check: Cache-repair validation and package suite
-Command: RESEARCH_TEST_DATABASE_URL=postgresql://postgres:postgres@127.0.0.1:55322/postgres fnm exec --using=22 -- ./scripts/ci-local.sh --base origin/staging --lane validate --lane unit-js-packages
-Result: pass
-Observed: both lanes passed, including real filesystem cache regression cases. The testing package typecheck also passed separately.
-
-Check: Real HTTP fallback regression
-Command: E2E_BASE_URL=http://127.0.0.1:3148 fnm exec --using=22 -- pnpm test:e2e
-Result: pass
-Observed: the root and cold Explore HTML checks passed. The test asserting an unset E2E URL correctly skipped because a real local URL was supplied.
-
-Outcome: Cold map browse hydrates while its no-JavaScript filters and record links remain in HTML.
-Surface: Chrome, /explore, using the isolated local public-record fixtures.
-Data: Two browsable Washington, D.C. records from the local rehearsal.
-Observed: before the fix, five React placeholders were trapped inside noscript text, React threw parentNode-null errors, and no map canvas appeared. Owning the entire fallback in one SSR client boundary removed those placeholders. Chrome rendered one canvas, filters and both records in light/dark themes; no new stream errors appeared. Selecting Dunbar opened its record sheet, preserved block precision and honestly displayed the fixture’s zero published sources. Existing filter/list components and styling are reused.
-Verdict: proven for map rendering and hydration. Positive relationship-line display on an independently reviewed release dataset remains a deployment acceptance check.
-
-Opened primary references for these fixes:
-
-- [IPUMS NHGIS data workflow](https://developer.ipums.org/docs/v2/workflows/create_extracts/nhgis_data/): authenticated table downloads use `https://api.ipums.org/downloads/nhgis/`.
-- [Expo SDK 57 changelog](https://github.com/expo/expo/blob/sdk-57/packages/expo/CHANGELOG.md) and the SDK-57 package changelogs for UI, build-properties, constants, router and updates: required patch alignment; no opt-in scene lifecycle change was enabled.
-
-## Remaining gates
-
-- Verify deployed migration history, reconcile any unassigned frontier tasks or unresolved selectors,
-  execute an isolated production-shaped restore, compare data/constraints and coordinate clients,
-  schema and staff JWTs. No production mutation or restore was performed.
-- Evaluate obscure/OCR/alias/undated recall, false merges, entailment, edge/path recovery and calibration
-  on independently reviewed held-out data. Synthetic vectors establish mechanics only.
-- Observe a rights-cleared Internet Archive save through completion. No save was submitted here.
-- Apply the implemented orphan/retention sweep to an authorized deployed inventory and verify
-  withdrawal handling for canonical reviewed claims, external exports, backups and provider logs.
-- Remote schedule inventory and provider-account deletion were not performed. No checked-in
-  Actions cron remains; research host launchers are removed. Four remotely inspected discovery,
-  convergence, egress and release-artifact workflows were disabled manually; the canary was manual
-  only. Repository cleanup cannot establish other provider/host state. Stored non-ID mentions need
-  explicit identity reconciliation during cutover; name/alias/tag-based edge guessing was removed.
-  Reconcile edge-specific claims before comparing graph coverage; missing proof now removes an edge
-  rather than borrowing unrelated citations or restoring seed edges.
+- [W3C PROV](https://www.w3.org/TR/prov-overview/) and [Web Annotation](https://www.w3.org/TR/annotation-model/): source identity, derivation and exact selectors.
+- [pgvector](https://github.com/pgvector/pgvector/blob/master/README.md): hybrid retrieval, filtered approximate search and exact baselines.
+- [NARA search guidance](https://www.archives.gov/research/catalog/help/search-tips), [FAIR](https://www.go-fair.org/fair-principles/) and [Oral History Association](https://oralhistory.org/best-practices/): retrieval tradeoffs, reuse, consent and context.
+- [Wikidata statements](https://www.wikidata.org/wiki/Help:Statements): ranks, qualifiers and references.
+- [Wayback availability](https://archive.org/help/wayback_api.php): a historical pointer does not create a capture.
+- [Supabase Storage](https://supabase.com/docs/guides/storage/schema/design.md): metadata inventory is separate from object operations.
+- [OpenRouter usage accounting](https://openrouter.ai/docs/guides/guides/usage-accounting.md) and [provider routing](https://openrouter.ai/docs/guides/routing/provider-selection.md): price caps and receipt limitations.
+- [IPUMS NHGIS](https://developer.ipums.org/docs/v2/workflows/create_extracts/nhgis_data/): documented authenticated download destination.
+- [Expo SDK 57](https://github.com/expo/expo/blob/sdk-57/packages/expo/CHANGELOG.md) and [Next.js connection](https://nextjs.org/docs/app/api-reference/functions/connection): dependency and rendering behavior.
+- [EPA wetlands](https://www.epa.gov/wetlands/why-are-wetlands-important) and the corpus provenance file: opened source pages for portability and evaluation.
 
 ## Verification record
 
-- Project inspected: answered: architecture and findings above identify “kernel and ledger”, provider retirement, public projections, auth and schema dependencies.
-- Reuse checked: answered: existing kernel, source clients, capture sink, pgvector and scheduled-job registry were extended. Repository, sibling workflow configuration and installed skill catalogs were searched; no second research engine was added.
-- Validation path run: answered: “all four selected lanes passed”, with full-run and real-database evidence above.
-- Outcome observed: answered: “separate CLI processes” and local reader/login observations above; semantic research quality is not proven.
-- Surface inspected: answered: “light/dark themes”, source links, no-coordinate and missing-record behavior; production not inspected.
-- Diff reviewed: partial: high-risk contracts, SQL, authorization, accounting, capture disposal, semantic runtime changes, authority documents and workflow commands reviewed. Mechanical schema/path changes were classified separately and comment batches checked for syntax-tree equivalence. The entire raw diff, including generated output and retired files, has not received line-by-line review; this remains a draft.
-- Residual risk: listed in “Remaining gates”, with the evidence each requires.
-- Root-cause-debugging: remote annotations and mobile failures reproduced/read; malicious-input regressions pass. The cache failure class and noscript stream failure were reproduced and repaired locally; remote cache repair awaits its automatic preview, and the Xcode license blocks native proof.
-- Commit-and-PR: draft consolidation; staged-tree secret scan passed; branch targets staging. No merge or deployment is authorized by local checks.
-
-Additional opened primary sources:
-
-- [OpenRouter usage accounting](https://openrouter.ai/docs/guides/guides/usage-accounting.md) and [FAQ](https://openrouter.ai/docs/faq.md).
-- [Next.js connection](https://nextjs.org/docs/app/api-reference/functions/connection).
-- [EPA wetlands functions](https://www.epa.gov/wetlands/why-are-wetlands-important).
-- [Supabase billing](https://supabase.com/docs/guides/platform/billing-on-supabase), [compute](https://supabase.com/docs/guides/platform/manage-your-usage/compute) and [egress](https://supabase.com/docs/guides/platform/manage-your-usage/egress), opened 2026-09-18.
-
-- [Supabase Storage schema](https://supabase.com/docs/guides/storage/schema/design.md): metadata may be queried; object deletion must use the Storage API.
-- [OpenRouter provider routing](https://openrouter.ai/docs/guides/routing/provider-selection.md): explicit price caps and parameter support.
-- [NPS Mary Ann Shadd Cary](https://www.nps.gov/people/mary-ann-shadd-cary.htm) and [disclaimer](https://www.nps.gov/aboutus/disclaimer.htm).
-- [EPA What is a Wetland](https://www.epa.gov/wetlands/what-wetland) and [disclaimers](https://www.epa.gov/web-policies-and-procedures/epa-disclaimers).
+- Project inspected: schema, evidence, auth, projections and durable execution are scoped in “Reconciled implementation”.
+- Reuse checked: existing kernel, source clients, capture sink, pgvector and job registry extended; repository, sibling utilities and installed tooling were searched before additions.
+- Validation path run: exact commands and observed exceptions are recorded above; final-tree checks and their limits are recorded in “Verification”.
+- Outcome observed: restored record and staff reads proven locally; unsupported relationship removal and a sourced positive two-hop chain proven in Chrome; actual Archive completion remains unproven.
+- Surface inspected: both admin and graph themes, restored records, citations and staff redirect observed in Chrome.
+- Diff reviewed: targeted independent review and migration equivalence completed; full raw-line review is not claimed.
+- Residual risk: production cutover, approved recovery targets, the missing Dunbar media object, Archive completion and representative-scale quality evidence remain explicit.
+- Commit-and-PR: scoped signed commits on `codex/research-framework-reconciliation`, one authorized draft PR into staging, reviewed index and staged-file secret scan. No merge or production release follows from local checks. Ordinary remote checks are reported in the PR delivery record.

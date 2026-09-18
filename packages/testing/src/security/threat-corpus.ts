@@ -1,9 +1,9 @@
 /**
- * threat corpus loader and validators for security test scaffolds.
- * Reads docs/security/threat-corpus.json and asserts acceptance criteria.
+ * Threat corpus loader and validator.
+ * Reads docs/security/threat-corpus.json and verifies its structural and repository references.
  */
-import { readFileSync } from 'node:fs';
-import { dirname, join } from 'node:path';
+import { existsSync, readFileSync } from 'node:fs';
+import { dirname, isAbsolute, join, resolve, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const CONTROL_QUADRANTS = ['preventive', 'detective', 'containment', 'recovery'] as const;
@@ -22,7 +22,7 @@ export interface ThreatRecord {
   name: string;
   priority: 'P0';
   abuseCaseIds: string[];
-  implementationBeads: string[];
+  implementationRefs: string[];
   controls: ThreatControls;
   residualRisk: string;
   assets?: string[];
@@ -31,11 +31,13 @@ export interface ThreatRecord {
 
 export interface ThreatCorpus {
   version: string;
-  bead: '';
+  updatedAt: string;
+  assumptionsRef: string;
+  architectureRefs: string[];
   threats: ThreatRecord[];
 }
 
-/** Expected threat IDs from the execution PDF (order fixed). */
+/** Stable threat IDs, in corpus order. */
 export const REQUIRED_THREAT_IDS = [
   'T-01',
   'T-02',
@@ -101,15 +103,47 @@ export interface CorpusValidationIssue {
   message: string;
 }
 
-/** Validate corpus shape: quadrants, P0→, residual risk, 1:1 abuse ids. */
-export function validateThreatCorpus(corpus: ThreatCorpus): CorpusValidationIssue[] {
+function validateRepositoryRef(
+  owner: string,
+  repositoryRef: string,
+  root: string,
+  issues: CorpusValidationIssue[],
+): void {
+  const rootPath = resolve(root);
+  const resolvedRef = resolve(rootPath, repositoryRef);
+  const escapesRoot = resolvedRef !== rootPath && !resolvedRef.startsWith(`${rootPath}${sep}`);
+  if (!repositoryRef.trim() || isAbsolute(repositoryRef) || escapesRoot) {
+    issues.push({
+      code: 'reference-path',
+      message: `${owner} has invalid repository reference ${repositoryRef}`,
+    });
+    return;
+  }
+  if (!existsSync(resolvedRef)) {
+    issues.push({
+      code: 'missing-reference',
+      message: `${owner} references missing path ${repositoryRef}`,
+    });
+  }
+}
+
+/** Validate quadrants, priority, repository references, residual risk, and 1:1 abuse IDs. */
+export function validateThreatCorpus(
+  corpus: ThreatCorpus,
+  root = repoRootFromHere(),
+): CorpusValidationIssue[] {
   const issues: CorpusValidationIssue[] = [];
 
-  if (corpus.bead !== '') {
+  validateRepositoryRef('assumptionsRef', corpus.assumptionsRef, root, issues);
+  if (!corpus.architectureRefs?.length) {
     issues.push({
-      code: 'bead',
-      message: `expected bead, got ${String(corpus.bead)}`,
+      code: 'architecture-refs',
+      message: 'corpus must list one or more architectureRefs',
     });
+  } else {
+    for (const architectureRef of corpus.architectureRefs) {
+      validateRepositoryRef('architectureRefs', architectureRef, root, issues);
+    }
   }
 
   if (corpus.threats.length !== REQUIRED_THREAT_IDS.length) {
@@ -154,19 +188,14 @@ export function validateThreatCorpus(corpus: ThreatCorpus): CorpusValidationIssu
       });
     }
 
-    if (!threat.implementationBeads?.length) {
+    if (!threat.implementationRefs?.length) {
       issues.push({
-        code: 'beads',
-        message: `${threat.id} must map to one or more implementation beads`,
+        code: 'implementation-refs',
+        message: `${threat.id} must map to one or more implementationRefs`,
       });
     } else {
-      for (const bead of threat.implementationBeads) {
-        if (!/^BB-\d{3}$/.test(bead)) {
-          issues.push({
-            code: 'bead-format',
-            message: `${threat.id} has invalid bead id ${bead}`,
-          });
-        }
+      for (const implementationRef of threat.implementationRefs) {
+        validateRepositoryRef(threat.id, implementationRef, root, issues);
       }
     }
 

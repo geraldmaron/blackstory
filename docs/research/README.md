@@ -20,8 +20,8 @@ within explicit bounds. It does not mean searching forever or producing more flu
 | Claim/edge extraction | Strict schemas, exact quote and cited-record attachment | Attachment is not entailment; model confidence is uncalibrated; review remains required |
 | Graph discovery | `expand`, catalog traversal, cross-reference/shared-source/adjacency candidate generators | Wikidata statement ranks, qualifiers and references survive staging; cross-source resolution and graph evaluation need work |
 | Research planning | `enrich-entity`, maturity deficits, kernel needs/frontier policy | Plans and executes bounded acquisition; reviewed evidence alone can raise maturity |
-| Preservation | `capture-backfill`, safe fetch, Supabase capture sink, Wayback lookup and resumable SPN2 jobs, explicit retention/disposal | Local metadata is not a full archived page; coverage and public pointer delivery need separate measurement |
-| Evidence retrieval | Private capture passages, full text + pgvector/RRF, exact selectors, model/text revision checks | 768 dimensions; real semantic recall and archive coverage remain unmeasured |
+| Preservation | `capture-backfill`, safe fetch, Supabase capture sink, Wayback lookup and resumable SPN2 jobs, explicit retention/disposal | Local metadata is not a full archived page; current release citations have no measured capture overlap or production Wayback pointers |
+| Evidence retrieval | Private capture passages, full text + pgvector/RRF, exact selectors, model/text revision checks | 768 dimensions; small live pilot measured retrieval recall with substantial false positives; representative-scale quality remains unproven |
 | Headless use | Immutable run manifests, scoped leases, dependencies, attempt reservations, accounting and proposal artifacts | Built-in acquisition/model execution and external lease handoff; automatic model admission requires independent evaluation |
 | Scheduling | Job registry, worker entry points, manual Actions dispatch | No research schedule should be active; no Corsair dependency |
 
@@ -146,9 +146,12 @@ persists; `--wayback` additionally requests preservation where an exact source d
 sensitivity before sending a URL to an external archive. Never submit private/signed URLs,
 credentials, or unpublished sensitive material. Respect retention and source policies. Run the explicit `capture-retention` sweep to erase
 expired or withdrawn source text and passages; retry queued storage disposal until acknowledged.
-This sweep covers captures and their retrieval index, not every derived research artifact or an
-external archive takedown. Sensitive downstream artifacts need a separately reviewed retention plan. Hash-only
-or excerpt-only rows do not prove full-page recoverability, and archiving does not establish truth.
+The sweep also disposes tracked research-run payloads, including dependent artifacts, raw model
+outputs, quarantined responses, task inputs and execution plans. Copies outside that tracked run,
+published material and external archive takedowns require their own reviewed disposition. Older
+captures without an origin link need a custody review; their storage references prevent accidental
+orphan deletion. Hash-only or excerpt-only rows do not prove full-page recoverability, and
+archiving does not establish truth.
 
 ## Skills and comments
 

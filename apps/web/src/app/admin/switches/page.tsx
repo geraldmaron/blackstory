@@ -16,7 +16,7 @@ export const metadata: Metadata = {
 export const dynamic = 'force-dynamic';
 
 function formatWhen(iso: string): string {
-  if (!iso) return '—';
+  if (!iso) return 'Unknown';
   const date = new Date(iso);
   if (Number.isNaN(date.getTime())) return iso;
   return date.toLocaleString(undefined, {
@@ -42,22 +42,22 @@ export default async function SwitchesPage() {
           <h1 className="ds-page__title">Kill switches</h1>
           <p className="ds-page__lede">
             Operational circuit breakers for discovery campaigns, source adapters, and public
-            surfaces. Engaged switches halt automated work — they are not a publication or catalog
-            editing desk.
+            surfaces. Engaged switches halt the work controlled by each switch.
           </p>
           <p className="story-review__notice">
-            Read-only mirror — no toggles here. A human platform administrator engages or disengages
-            switches in Postgres <span className="ds-mono">ops.kill_switches</span> rows
-            (IAP-protected ops path) with a durable reason; each change is recorded in{' '}
-            <Link href="/admin/audit">Audit</Link>. See{' '}
-            <span className="ds-mono">infra/gcp/kill-switches/</span> for the matrix and runbooks.
+            This page displays switch state. Platform administrators change{' '}
+            <span className="ds-mono">ops.kill_switches</span> through the privileged operations
+            database. Record a reason and an audit event for each change. Review{' '}
+            <Link href="/admin/audit">Audit</Link> and{' '}
+            <span className="ds-mono">docs/runbooks/incident-response.md</span> for the response
+            procedure.
           </p>
         </div>
       </header>
 
       {degradedReason ? (
         <p className="story-review__alert" role="alert">
-          Switch state is unavailable — the operational database did not answer, so this page is
+          Switch state is unavailable. The operational database did not answer, so this page is
           showing nothing rather than a stale or partial matrix. Reload to retry.{' '}
           <span className="ds-mono">{degradedReason}</span>
         </p>
@@ -70,8 +70,8 @@ export default async function SwitchesPage() {
       <section className="story-review__queue" aria-label="Kill switches">
         {rows.length === 0 && !degradedReason ? (
           <p className="ds-sans">
-            No kill switches found in this project. When configured, their state appears here —
-            return to <Link href="/admin">Operations</Link> or review changes in{' '}
+            No kill switches found in this project. When configured, their state appears here.
+            Return to <Link href="/admin">Operations</Link> or review changes in{' '}
             <Link href="/admin/audit">Audit</Link>.
           </p>
         ) : rows.length > 0 ? (
@@ -101,7 +101,7 @@ export default async function SwitchesPage() {
                         {row.enabled ? 'engaged' : 'disengaged'}
                       </span>
                     </td>
-                    <td className="ds-sans">{row.reason ?? '—'}</td>
+                    <td className="ds-sans">{row.reason ?? 'Not recorded'}</td>
                     <td className="ds-mono">{formatWhen(row.updatedAt)}</td>
                   </tr>
                 ))}

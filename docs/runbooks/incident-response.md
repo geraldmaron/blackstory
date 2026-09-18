@@ -13,10 +13,10 @@ Do not place secrets, sensitive personal data, raw malicious payloads, or access
 ## Control map
 
 - Runtime switches: `packages/config/src/kill-switches.ts`
-- Optional provider controls: `infra/gcp/kill-switches/README.md`
+- Stored switch state: `ops.kill_switches`; `/admin/switches` provides a staff-authorized read-only view. Privileged database changes require a reason and a corresponding audit event.
 - Release rollback:  immutable release pointer and paired search-index version
 - Canonical recovery: [`backup-restore.md`](./backup-restore.md) only when release rollback is insufficient
-- Audit trail:  audit/outbox
+- Audit trail: `audit` records and the transactional outbox. A direct SQL switch update does not automatically create an audit event.
 
 Engage switches in this order unless evidence requires faster isolation: research campaigns, LLM, geocoding/nearby, uploads/exports, affected adapters, submissions/search, queues, publication, then public static mode. Static mode keeps the signed immutable public corpus online while all mutations and dynamic features stop.
 

@@ -1,7 +1,7 @@
 # Cost and resource exhaustion controls
 
-**Status:** Policy matrix + evaluators in-repo; GCP billing budgets and live queue/job provisioning are follow-on work (, ).
-**Depends on:** admin App Hosting hardening (retired 2026-09-11 — `apps/admin` folded into `apps/web`, see `docs/decisions-carryover.md`), Vercel public web hosting (ADR-027 — the record was purged from the repo 2026-07-24; no link target survives), [ingress / Cloud Armor](./ingress-armor.md), [rate limits](./rate-limits.md)
+**Status:** Policy matrices and evaluators are in-repo. Vercel/Cloudflare/Supabase provider limits and billing controls require provider verification; optional GCP budgets, queues, and jobs are not provisioned by this repository.
+**Depends on:** the shared Vercel `apps/web` deployment, [optional ingress / Cloud Armor design](./ingress-armor.md), and [rate limits](./rate-limits.md)
 **Threats:** [T-01](./threat-model.md#t-01-volumetric-and-application-layer-denial-of-service), [T-13](./threat-model.md#t-13-database-exhaustion-and-connection-starvation), [T-14](./threat-model.md#t-14-cloud-bill-exhaustion)
 
 ## Objective
@@ -12,9 +12,9 @@ Ensure a traffic spike, retry storm, or budget burn cannot scale every service w
 
 | Layer | Scope | Implementation |
 |-------|-------|----------------|
-| App Hosting / Cloud Run scaling | Per-service maxInstances, concurrency | Admin `apphosting.admin.yaml` + `DEFAULT_SERVICE_SCALING_LIMITS`; public web caps on Vercel |
-| Cloud Tasks | Rate, concurrency, depth, retries | `DEFAULT_CLOUD_TASKS_POLICIES` |
-| Cloud Run Jobs | CPU, memory, duration, retries | `DEFAULT_CLOUD_RUN_JOB_POLICIES` |
+| Application runtime scaling | Provider and service concurrency limits | `DEFAULT_SERVICE_SCALING_LIMITS` is a policy evaluator; Vercel limits require provider configuration and are not asserted here |
+| Optional GCP queues | Rate, concurrency, depth, retries | `DEFAULT_CLOUD_TASKS_POLICIES`; no live Cloud Tasks deployment is asserted |
+| Optional GCP jobs | CPU, memory, duration, retries | `DEFAULT_CLOUD_RUN_JOB_POLICIES`; no live Cloud Run Jobs deployment is asserted |
 | Database | Connections, statement/lock timeouts | `DEFAULT_DATABASE_LIMITS` |
 | Daily budgets | Geocoder, model, OCR, source fetch, research | `DEFAULT_DAILY_BUDGETS` |
 | Billing alerts | Threshold → automated response | `DEFAULT_BILLING_ALERTS` |
@@ -42,8 +42,8 @@ spike; it scales with commit velocity, and this repo ran 437 commits in Aug 2026
 **Control:** [`scripts/vercel-ignore-build.sh`](../../scripts/vercel-ignore-build.sh), wired as
 `ignoreCommand` in `apps/web/vercel.json` and `apps/api-public/vercel.json`. It skips a build when
 no changed file can reach that project's deployed bundle. (Historically also wired in
-`apps/admin/vercel.json`, before admin folded into `apps/web` on 2026-09-11 — see
-`docs/decisions-carryover.md`.)
+the retired separate admin Vercel project before the shared `/admin` surface folded into
+`apps/web` on 2026-09-11.)
 
 ### Team-wide cost attribution (corrected, 2026-09-12)
 
@@ -216,7 +216,7 @@ Audit them on their own terms before copying this posture across.
 
 ## Platform spend backstop
 
-The GCP billing budgets above do not cover Vercel or Supabase, which is where the Aug 2026 spend
+Optional GCP billing budgets do not cover Vercel or Supabase, where the Aug 2026 spend
 actually landed. Two gaps remain **operator-only** (dashboard, not code):
 
 | Gap | Control | Issue |
@@ -235,12 +235,12 @@ was found by hand after the bill.
 |------|------|
 | [`packages/security/src/resource-controls.ts`](../../packages/security/src/resource-controls.ts) | Policy matrices, evaluators, abusive-traffic simulation |
 | [`packages/security/src/resource-controls.test.ts`](../../packages/security/src/resource-controls.test.ts) | Unit tests |
-| [`infra/gcp/cost-controls/`](../../infra/gcp/cost-controls/) | Declarative GCP stubs + hard-stop runbook |
+| [`infra/gcp/cost-controls/`](../../infra/gcp/cost-controls/) | Optional declarative GCP stubs + conditional hard-stop runbook |
 
-## References to other beads (not rewritten)
+## Related controls
 
-- **:** Admin App Hosting `maxInstances=2`, `concurrency=20`, `minInstances=0` in `apphosting.admin.yaml` — validated via `BB022_APP_HOSTING_LIMITS` mirror
-- **:** Endpoint quotas — referenced via `BB025_POLICY_REF`; rate-limit math unchanged
+- **Shared `/admin` runtime:** staff authorization is in the Vercel-hosted `apps/web` deployment; any provider scaling or spend cap must be checked in Vercel, not inferred from the optional GCP policy matrix.
+- **Endpoint quotas:** [Rate limits](./rate-limits.md) describes the policy math and remaining deployment checks.
 
 ## Retry policy
 
@@ -265,7 +265,7 @@ delay = min(initialBackoffMs × multiplier^(attempt-1), maxBackoffMs)
 
 ## Manual hard-stop
 
-Operator procedure: [`infra/gcp/cost-controls/hard-stop-runbook.md`](../../infra/gcp/cost-controls/hard-stop-runbook.md)
+Conditional GCP procedure, only if those resources are actually provisioned: [`infra/gcp/cost-controls/hard-stop-runbook.md`](../../infra/gcp/cost-controls/hard-stop-runbook.md). Current Vercel/Cloudflare/Supabase incidents require provider-specific controls.
 
 ## Validation
 

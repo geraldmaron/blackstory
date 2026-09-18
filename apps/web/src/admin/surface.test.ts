@@ -1,21 +1,13 @@
-/**
- * Admin surface identity acceptance tests.
- *
- * The "admin does not import apps/web handlers" check that used to live here is gone: admin
- * routes now live inside apps/web's own app router by design, so that assertion no longer tests
- * anything meaningful. What actually has to hold — that code outside `apps/web/src/admin/**`
- * cannot reach the write-capable canonical Postgres credential — is checked by
- * `canonical-write-boundary.test.ts` instead.
- */
+/** Admin surface capabilities share the web runtime and require staff authorization. */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import { getSurfaceDefinition } from '@repo/config';
-import { health } from './surface';
+import { guardAdminAuth, health } from './surface';
 
-test('admin health reports iap-protected posture', () => {
+test('admin health reports staff-authenticated posture', () => {
   const payload = health();
   assert.equal(payload.surface, 'admin');
-  assert.equal(payload.networkPosture, 'iap-protected');
+  assert.equal(payload.networkPosture, 'staff-authenticated');
 });
 
 test('admin is a distinct logical surface from web, scoped to its own module namespace', () => {
@@ -23,5 +15,12 @@ test('admin is a distinct logical surface from web, scoped to its own module nam
   const web = getSurfaceDefinition('web');
   assert.equal(admin.appPath, 'apps/web/src/admin');
   assert.notEqual(admin.appPath, web.appPath);
-  assert.notEqual(admin.serviceAccountId, web.serviceAccountId);
+  assert.notEqual(admin.credentialScope, web.credentialScope);
+});
+
+test('admin rejects anonymous, ordinary user and service credentials', () => {
+  for (const mode of ['anonymous', 'end-user-token', 'service-identity'] as const) {
+    assert.throws(() => guardAdminAuth(mode));
+  }
+  assert.doesNotThrow(() => guardAdminAuth('staff-session'));
 });
