@@ -84,10 +84,18 @@ describe('MOBILE_MORE_SECTIONS', () => {
       'Take part',
       'Policies',
     ]);
-    expect(MOBILE_MORE_SECTIONS[0]?.rows.map((row) => row.title)).toEqual(['Memorial']);
+    expect(MOBILE_MORE_SECTIONS[0]?.rows.map((row) => row.title)).toEqual([
+      'Law',
+      'Data',
+      'Lives',
+      'Banned books',
+      'Memorial',
+    ]);
     expect(MOBILE_MORE_SECTIONS[1]?.rows.map((row) => row.title)).toEqual([
-      'How it works',
+      'About',
       'Questions',
+      'Methodology',
+      'Source library',
       'Errata',
     ]);
     expect(MOBILE_MORE_SECTIONS[2]?.rows.map((row) => row.title)).toEqual([
@@ -116,16 +124,24 @@ describe('MOBILE_MORE_SECTIONS', () => {
     expect(allRows.some((row) => row.title === 'Legal')).toBe(false);
     const privacy = allRows.find((row) => row.id === 'privacy');
     expect(privacy?.destination).toEqual({ kind: 'native', route: '/privacy' });
-    expect(allRows.some((row) => row.id === 'law')).toBe(false);
-    expect(allRows.some((row) => row.id === 'data')).toBe(false);
-    expect(allRows.some((row) => row.id === 'about')).toBe(false);
+    expect(allRows.some((row) => row.id === 'law')).toBe(true);
+    expect(allRows.some((row) => row.id === 'data')).toBe(true);
+    expect(allRows.some((row) => row.id === 'about')).toBe(true);
   });
 
-  it('opens How it works on the web hub (no native peer screens for its chapters)', () => {
-    const hub = allRows.find((row) => row.id === 'how-it-works');
-    expect(hub?.destination).toEqual({
-      kind: 'web',
-      href: 'https://blackstory.app/how-it-works',
+  it('opens Law, Data, and About as native rooms again', () => {
+    expect(allRows.find((row) => row.id === 'how-it-works')).toBeUndefined();
+    expect(allRows.find((row) => row.id === 'law')?.destination).toEqual({
+      kind: 'native',
+      route: '/law',
+    });
+    expect(allRows.find((row) => row.id === 'data')?.destination).toEqual({
+      kind: 'native',
+      route: '/data',
+    });
+    expect(allRows.find((row) => row.id === 'about')?.destination).toEqual({
+      kind: 'native',
+      route: '/about',
     });
   });
 

@@ -76,11 +76,13 @@ test('overflow holds the supporting rooms, grouped read then trust then take par
     [
       '/law',
       '/data',
+      '/lives',
       '/books',
       '/memorial',
       '/about',
       '/faq',
       '/methodology',
+      '/sources',
       '/errata',
       '/submit',
       '/corrections',
@@ -109,7 +111,7 @@ test('footer columns lead with Find and carry the three room families', () => {
   );
   assert.deepEqual(
     FOOTER_NAV_COLUMNS[2]?.items.map((item) => item.href),
-    ['/about', '/faq', '/methodology', '/errata'],
+    ['/about', '/faq', '/methodology', '/sources', '/errata'],
   );
 });
 

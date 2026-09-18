@@ -135,8 +135,8 @@ test('product policy is never routed into historical Law', () => {
   assert.equal(terms.family, 'policy');
   const law = semanticDestinationByPath('/law');
   assert.ok(law);
-  assert.equal(law.family, 'trust');
-  assert.equal(law.browsable, false);
+  assert.equal(law.family, 'read');
+  assert.equal(law.browsable, true);
   // `/legal` meant historical legal reference. If a policy address were ever added to the alias
   // table pointing at Law, this fails.
   for (const alias of LEGACY_ALIASES) {
@@ -188,11 +188,11 @@ test('an axis destination carries an axis, and a non-axis destination does not',
 test('the Rooms families each hold the destinations Rooms groups them under', () => {
   assert.deepEqual(
     semanticDestinationsInFamily('read').map((destination) => destination.label),
-    ['Memorial'],
+    ['Law', 'Data', 'Lives', 'Banned books', 'Memorial'],
   );
   assert.deepEqual(
     semanticDestinationsInFamily('trust').map((destination) => destination.label),
-    ['Law', 'Data', 'Banned books', 'How it works', 'About', 'Questions', 'Methodology', 'Errata'],
+    ['About', 'Questions', 'Methodology', 'Source library', 'Errata'],
   );
   assert.deepEqual(
     semanticDestinationsInFamily('participate').map((destination) => destination.label),
@@ -202,7 +202,7 @@ test('the Rooms families each hold the destinations Rooms groups them under', ()
     semanticDestinationsInFamily('utility')
       .filter((destination) => destination.id.endsWith('-browse'))
       .map((destination) => destination.path),
-    ['/law/browse', '/books/browse'],
+    [],
   );
 });
 
@@ -229,6 +229,16 @@ test('Rooms does not list the primary axes as ordinary rooms', () => {
   );
   for (const axis of primaryAxes()) {
     assert.ok(!roomPaths.includes(axis.path), `${axis.path} is an axis, not a room card`);
+  }
+});
+
+test('utility destinations are never browsable', () => {
+  for (const destination of semanticDestinationsInFamily('utility')) {
+    assert.equal(
+      destination.browsable,
+      false,
+      `${destination.id} is utility and must not appear in Rooms`,
+    );
   }
 });
 

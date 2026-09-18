@@ -40,9 +40,8 @@ export type ProductAxis = (typeof PRODUCT_AXES)[number];
  * question, not the CMS's taxonomy.
  *
  * - `axis` — a top-level product axis (the five above).
- * - `read` — another way to read the archive: the memorial wall (law, data, and books live
- *   inside the How it works hub).
- * - `trust` — how the archive decides, and what it got wrong.
+ * - `read` — another way to read the archive: law, data, lives, banned books, and the memorial wall.
+ * - `trust` — how the archive decides, the source library, and what it got wrong.
  * - `participate` — how a reader adds to it or corrects it.
  * - `policy` — BlackStory's own product policy. Never historical Law; see `/law` versus
  *   `/privacy` in `LEGACY_ALIASES`, and the note on `legal` there.
@@ -217,55 +216,47 @@ const DESTINATIONS: readonly SemanticDestination[] = [
     label: 'Law',
     path: '/law',
     parent: '/rooms',
-    family: 'trust',
+    family: 'read',
     icon: 'law',
     isPublic: true,
-    browsable: false,
-    description: 'Deep link into the How it works Law section.',
+    browsable: true,
+    description:
+      'The statutes and rulings that shaped what could be built, owned, attended and voted for.',
   },
   {
     id: 'data',
     label: 'Data',
     path: '/data',
     parent: '/rooms',
-    family: 'trust',
+    family: 'read',
     icon: 'data',
     isPublic: true,
-    browsable: false,
-    description: 'Deep link into the How it works Data section.',
+    browsable: true,
+    description:
+      'National series with their sources attached, and a plain account of what each one cannot tell you.',
+  },
+  {
+    id: 'lives',
+    label: 'Lives',
+    path: '/lives',
+    parent: '/rooms',
+    family: 'read',
+    icon: 'person',
+    isPublic: true,
+    browsable: true,
+    description:
+      'Class and conditions by race, decade by decade, bound to published census tables.',
   },
   {
     id: 'books',
     label: 'Banned books',
     path: '/books',
     parent: '/rooms',
-    family: 'trust',
+    family: 'read',
     icon: 'books',
     isPublic: true,
-    browsable: false,
-    description: 'Deep link into the How it works Banned books section.',
-  },
-  {
-    id: 'law-browse',
-    label: 'Browse law',
-    path: '/law/browse',
-    parent: '/rooms',
-    family: 'utility',
-    icon: 'law',
-    isPublic: true,
-    browsable: false,
-    description: 'Search and filter the civil-rights law catalog.',
-  },
-  {
-    id: 'books-browse',
-    label: 'Browse banned books',
-    path: '/books/browse',
-    parent: '/rooms',
-    family: 'utility',
-    icon: 'books',
-    isPublic: true,
-    browsable: false,
-    description: 'Search and filter documented title challenges.',
+    browsable: true,
+    description: 'Documented challenges to titles, recorded as challenges rather than as verdicts.',
   },
   {
     id: 'memorial',
@@ -281,18 +272,6 @@ const DESTINATIONS: readonly SemanticDestination[] = [
 
   /* ---------- understand / trust ---------- */
   {
-    id: 'how-it-works',
-    label: 'How it works',
-    path: '/how-it-works',
-    parent: '/rooms',
-    family: 'trust',
-    icon: 'about',
-    isPublic: true,
-    browsable: true,
-    description:
-      'About, methodology, data, law, and banned books in one room for how the archive works.',
-  },
-  {
     id: 'about',
     label: 'About',
     path: '/about',
@@ -300,8 +279,8 @@ const DESTINATIONS: readonly SemanticDestination[] = [
     family: 'trust',
     icon: 'about',
     isPublic: true,
-    browsable: false,
-    description: 'Deep link into the How it works About section.',
+    browsable: true,
+    description: 'What this is for, who it is for, and what it refuses to do.',
   },
   {
     id: 'faq',
@@ -323,8 +302,21 @@ const DESTINATIONS: readonly SemanticDestination[] = [
     family: 'trust',
     icon: 'methodology',
     isPublic: true,
-    browsable: false,
-    description: 'Deep link into the How it works Methodology section.',
+    browsable: true,
+    description:
+      'How a record gets in, what the evidence grades mean, and why a point is never drawn sharper than its source.',
+  },
+  {
+    id: 'sources',
+    label: 'Source library',
+    path: '/sources',
+    parent: '/rooms',
+    family: 'trust',
+    icon: 'source',
+    isPublic: true,
+    browsable: true,
+    description:
+      'The publishers a public claim traces to, and how a URL becomes a citation on a record.',
   },
   {
     id: 'errata',
@@ -424,21 +416,6 @@ const DESTINATIONS: readonly SemanticDestination[] = [
     isPublic: false,
     browsable: false,
   },
-  {
-    // Lives Across the Decades. Unadvertised as its own room; the figures live in Data.
-    // `/lives` 308s into `/how-it-works?s=lives`. Held out of crawl until verification
-    // (repo-0clax.14) and the public method page (repo-0clax.17).
-    id: 'lives',
-    label: 'Lives across the decades',
-    path: '/lives',
-    parent: '/rooms',
-    family: 'utility',
-    icon: 'data',
-    isPublic: false,
-    browsable: false,
-    description:
-      'Deep link into the How it works Data section: class and conditions by race, decade by decade.',
-  },
 ];
 
 /**
@@ -536,9 +513,30 @@ export const LEGACY_ALIASES: readonly {
   },
   {
     from: '/apparatus',
-    to: '/how-it-works',
+    to: '/about',
     because:
-      'Apparatus was an internal name for the How it works hub. The public label and path are How it works.',
+      'Apparatus was an internal jargon slug for a merged trust hub. Trust is back to individual rooms; About is the honest default landing. Query-aware hops (`?s=data|law|…`) are handled by the thin `/apparatus` and `/how-it-works` redirect routes.',
+    subtree: false,
+  },
+  {
+    from: '/how-it-works',
+    to: '/about',
+    because:
+      'How it works was a single-room merge of About, Methodology, Data, Law and Banned books. Those are individual rooms again. Bare `/how-it-works` lands on About; `?s=` section focus is handled by the thin redirect route.',
+    subtree: false,
+  },
+  {
+    from: '/law/browse',
+    to: '/law',
+    because:
+      'Law browse tools live on `/law` itself; `/law/browse` was an escape hatch from the merged hub.',
+    subtree: false,
+  },
+  {
+    from: '/books/browse',
+    to: '/books',
+    because:
+      'Banned-books browse tools live on `/books` itself; `/books/browse` was an escape hatch from the merged hub.',
     subtree: false,
   },
 ];

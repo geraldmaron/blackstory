@@ -4,7 +4,7 @@
 export const LAW_INTRO = {
   kicker: 'Reference',
   title: 'Law',
-  lede: 'Landmark federal statutes, regulations, and court decisions that shape civil rights, explained in plain language with links to official sources.',
+  lede: 'Statutes, regulations, and court decisions that shaped what could be built, owned, attended and voted for, in plain language, with links to official sources.',
 } as const;
 
 export const LAW_DISCLAIMER = {
