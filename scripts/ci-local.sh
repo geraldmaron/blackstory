@@ -194,7 +194,9 @@ run_lane() {
         && npm run format:check \
         && npm run typecheck \
         && npm run lint \
-        && npm test -- --ci ) ;;
+        && npm test -- --ci \
+        && npm run doctor \
+        && npm run deps:check ) ;;
     unit-py)
       command -v uv >/dev/null || { echo "uv not installed — CI installs it; see ci.yml unit-py" >&2; return 127; }
       uv sync --all-packages --frozen && pnpm test:preflight && uv run pytest ;;

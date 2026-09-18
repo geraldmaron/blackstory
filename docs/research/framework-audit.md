@@ -408,6 +408,66 @@ Command: gitleaks dir /tmp/blackstory-delivery-staged-scan-l06wxuxv --redact --c
 Result: pass
 Observed: 1,038 staged snapshots (8.78 MB) scanned with no leaks. The final tree has 1,290 changed paths; classification found 459 comment/mechanical-equivalent code files, 246 code/type changes, 252 deletions and 333 other files. Classification is not a complete raw line-by-line review.
 
+## Delivery checks and acquisition hardening
+
+The initial draft PR's Workspace Checks, Workspace Tests, Python, governance, dependency review,
+secret scan, policy/API security and SBOM jobs passed. CodeQL reported six annotations: a cache
+check/use race, unsafe NHGIS temporary-file/download handling and three hostname substring
+assertions. Mobile's Expo Doctor also required six SDK 57 patch updates. No check was disabled.
+
+The Wikidata cache now reads directly and atomically renames complete private temporary files.
+NHGIS downloads restrict credential use to the documented IPUMS origin/path, reject redirects,
+bound streamed bytes and validate every ZIP entry before writing CSV/text into a private random
+directory. Path traversal, links/devices, duplicate paths, unsupported formats and expansion bombs
+are rejected; failed extraction removes partial output. Tests assert parsed hostnames. The
+standard-library extractor avoids adding a ZIP dependency. Repository security/ops utilities,
+sibling workflow tooling and installed utilities were searched; no reusable safe extractor existed.
+The runbook records limits and the trust boundary for operator-supplied local directories.
+
+**Archive extraction choice. Accepted with controls.** The strongest failure is credential leakage
+or arbitrary file writes through an upstream URL or archive. The alternative is manual extraction
+for every run, which does not serve unattended execution. Use a fixed authenticated endpoint,
+private directories, bounded input/output, isolated Python execution and exclusive file creation.
+This protects the automated table path; an authenticated real NHGIS download was not attempted.
+
+Check: Acquisition, cache parsing and citation URL regression cases
+Command: fnm exec --using=22 -- node --conditions development --import tsx --test packages/ops-data/scripts/lib/lives-nhgis-ingest.test.ts packages/ops-data/scripts/backfill-visit-from-wikidata.test.ts packages/ops-data/src/demographics/acs-loader.test.ts packages/ops-data/src/demographics/loader.test.ts packages/ops-data/src/demographics/nhgis-loader.test.ts
+Result: pass
+Observed: 27 tests passed, including real Python extraction of valid and hostile ZIP fixtures, credential destination checks, byte-preserving output, private permissions and cleanup. The network boundary is mocked.
+
+Check: Full affected local CI lanes after acquisition fixes
+Command: RESEARCH_TEST_DATABASE_URL=postgresql://postgres:postgres@127.0.0.1:55322/postgres fnm exec --using=22 -- ./scripts/ci-local.sh --base origin/staging --lane validate --lane unit-js-packages --lane unit-py
+Result: pass
+Observed: all three selected lanes passed; 137 Python tests passed. The Node package lane actually invokes the new Python extractor.
+
+Check: Operator script types and extractor style
+Command: fnm exec --using=22 -- pnpm --filter @repo/ops-data typecheck; .venv/bin/ruff check packages/ops-data/scripts/lib/extract-nhgis-tables.py; .venv/bin/ruff format --check packages/ops-data/scripts/lib/extract-nhgis-tables.py
+Result: pass
+Observed: both ops-data TypeScript projects and both Python style checks passed.
+
+Check: Mobile CI parity after Expo patch alignment
+Command: fnm exec --using=22 -- ./scripts/ci-local.sh --base origin/staging --lane mobile
+Result: fail
+Observed: clean npm install, format, typecheck, lint and 167 suites / 1,275 tests passed. Expo Doctor passed 20/21 checks; CocoaPods cannot run because this Mac's Xcode license has not been accepted. No license was accepted or native check bypassed. The local mirror now includes Doctor and dependency alignment, matching GitHub.
+
+Check: Mobile dependency alignment after the native-tooling stop
+Command: cd apps/mobile && fnm exec --using=22 -- npm run deps:check
+Result: pass
+Observed: Expo reports dependencies up to date. Existing exclusions were unchanged. Native Release rebuild remains unproven on this host until its Xcode license is resolved by the owner.
+
+The API's automatic preview compiled, then failed while tracing a missing `supports-color@7.2.0`
+path after restoring an older cache. A clean local trace of the compiled API traversed 1,114 files
+without that filesystem error (optional-module/type-declaration warnings remain). A normal frozen
+install over an isolated old dependency graph retained the old package; it did not reproduce the
+remote missing target. A stale cache is a hypothesis, not an established diagnosis. No dependency
+was reintroduced, build gate bypassed, manual deployment or workflow retry started. The next normal
+PR checks must verify the security/mobile changes and establish whether the preview failure persists.
+
+Opened primary references for these fixes:
+
+- [IPUMS NHGIS data workflow](https://developer.ipums.org/docs/v2/workflows/create_extracts/nhgis_data/): authenticated table downloads use `https://api.ipums.org/downloads/nhgis/`.
+- [Expo SDK 57 changelog](https://github.com/expo/expo/blob/sdk-57/packages/expo/CHANGELOG.md) and the SDK-57 package changelogs for UI, build-properties, constants, router and updates: required patch alignment; no opt-in scene lifecycle change was enabled.
+
 ## Remaining gates
 
 - Verify deployed migration history, reconcile any unassigned frontier tasks or unresolved selectors,
@@ -435,6 +495,7 @@ Observed: 1,038 staged snapshots (8.78 MB) scanned with no leaks. The final tree
 - Surface inspected: answered: “light/dark themes”, source links, no-coordinate and missing-record behavior; production not inspected.
 - Diff reviewed: partial: high-risk contracts, SQL, authorization, accounting, capture disposal, semantic runtime changes, authority documents and workflow commands reviewed. Mechanical schema/path changes were classified separately and comment batches checked for syntax-tree equivalence. The entire raw diff, including generated output and retired files, has not received line-by-line review; this remains a draft.
 - Residual risk: listed in “Remaining gates”, with the evidence each requires.
+- Root-cause-debugging: remote annotations and mobile failures reproduced/read; malicious-input regressions pass. The API cache hypothesis remains inconclusive, and the Xcode license blocks native proof.
 - Commit-and-PR: draft consolidation; staged-tree secret scan passed; branch targets staging. No merge or deployment is authorized by local checks.
 
 Additional opened primary sources:
