@@ -16,7 +16,7 @@ import {
   mapProjectionToPublicEntityView,
   resolveJurisdictionLabel,
 } from './map-projection';
-import { hydrateEntityLearningLinks } from './source';
+import { hydrateEntityLearningLinks, retainCitedRelationshipViews } from './source';
 test('shouldUseLivePublicProjections is off by default in development', () => {
   assert.equal(
     shouldUseLivePublicProjections({
@@ -495,6 +495,115 @@ test('hydrateEntityLearningLinks builds a timeline from status history and dated
   assert.ok(hydrated.timeline.some((item) => item.time === '1900'));
   assert.ok(hydrated.timeline.some((item) => item.time === '1910'));
 });
+
+test('public relationship hydration rejects unsupported candidates and retains cited direction', () => {
+  const root = mapProjectionToPublicEntityView({
+    ...relationshipProjection('root', 'Root record'),
+    claims: [relationshipClaim('root-outgoing', 'founded', 'outgoing')],
+    related: [
+      { id: 'outgoing', type: 'founded', direction: 'outgoing' },
+      { id: 'incoming', type: 'employed_by', direction: 'incoming' },
+      { id: 'unsupported', type: 'related_to', direction: 'outgoing' },
+    ],
+  });
+  const outgoing = mapProjectionToPublicEntityView(
+    relationshipProjection('outgoing', 'Outgoing target'),
+  );
+  const incoming = mapProjectionToPublicEntityView({
+    ...relationshipProjection('incoming', 'Incoming source'),
+    claims: [relationshipClaim('incoming-root', 'employed_by', 'root')],
+  });
+  const unsupported = mapProjectionToPublicEntityView(
+    relationshipProjection('unsupported', 'Unsupported target'),
+  );
+
+  const gated = retainCitedRelationshipViews([root, outgoing, incoming, unsupported]);
+  const byId = new Map(gated.map((entity) => [entity.id, entity]));
+
+  assert.deepEqual(byId.get('root')?.related, [
+    { id: 'incoming', type: 'employed_by', direction: 'incoming' },
+    { id: 'outgoing', type: 'founded', direction: 'outgoing' },
+  ]);
+  assert.deepEqual(byId.get('root')?.relatedIds, ['incoming', 'outgoing']);
+  assert.deepEqual(byId.get('outgoing')?.related, [
+    { id: 'root', type: 'founded', direction: 'incoming' },
+  ]);
+  assert.deepEqual(byId.get('incoming')?.related, [
+    { id: 'root', type: 'employed_by', direction: 'outgoing' },
+  ]);
+  assert.deepEqual(byId.get('unsupported')?.related, []);
+});
+
+test('each relationship hop needs its own exact cited claim before hydration can traverse it', () => {
+  const root = mapProjectionToPublicEntityView({
+    ...relationshipProjection('root', 'Root record'),
+    related: [{ id: 'first', type: 'employed_by', direction: 'incoming' }],
+  });
+  const firstWithoutProof = mapProjectionToPublicEntityView({
+    ...relationshipProjection('first', 'First hop'),
+    claims: [relationshipClaim('first-root', 'employed_by', 'root')],
+    related: [{ id: 'second', type: 'related_to', direction: 'incoming' }],
+  });
+  const second = mapProjectionToPublicEntityView(relationshipProjection('second', 'Second hop'));
+
+  const rejectedCatalog = retainCitedRelationshipViews([root, firstWithoutProof, second]);
+  const rejectedRoot = rejectedCatalog.find((entity) => entity.id === 'root');
+  assert.ok(rejectedRoot);
+  const rejectedHydration = hydrateEntityLearningLinks(rejectedRoot, rejectedCatalog);
+  assert.deepEqual(
+    rejectedHydration.relatedNeighbors?.map((entity) => entity.id),
+    ['first'],
+  );
+  assert.equal(rejectedHydration.continueLearning, undefined);
+  assert.deepEqual(
+    rejectedHydration.relationshipGraph?.nodes.map((node) => node.id),
+    ['first'],
+  );
+
+  const secondWithProof = mapProjectionToPublicEntityView({
+    ...relationshipProjection('second', 'Second hop'),
+    claims: [relationshipClaim('second-first', 'related_to', 'first')],
+  });
+  const acceptedCatalog = retainCitedRelationshipViews([root, firstWithoutProof, secondWithProof]);
+  const acceptedRoot = acceptedCatalog.find((entity) => entity.id === 'root');
+  assert.ok(acceptedRoot);
+  const acceptedHydration = hydrateEntityLearningLinks(acceptedRoot, acceptedCatalog);
+  assert.deepEqual(
+    acceptedHydration.continueLearning?.map((entity) => entity.id),
+    ['second'],
+  );
+  assert.deepEqual(
+    acceptedHydration.relationshipGraph?.nodes.map((node) => [node.id, node.hop]),
+    [
+      ['first', 1],
+      ['second', 2],
+    ],
+  );
+});
+
+function relationshipProjection(id: string, displayName: string) {
+  return {
+    id,
+    releaseId: 'rel_relationship_gate',
+    kind: 'place',
+    displayName,
+    nameLower: displayName.toLowerCase(),
+    summary: `${displayName} is a projection fixture for evidence-gated public relationships.`,
+    claimIds: [],
+  } as const;
+}
+
+function relationshipClaim(id: string, predicate: string, object: string) {
+  return {
+    id,
+    predicate,
+    object,
+    confidenceLevel: 'high' as const,
+    citationSource: 'Archive',
+    citationLabel: 'Cited relationship record',
+    citationHref: `https://archive.example.org/${id}`,
+  };
+}
 
 test('projection grades do not invent scores and missing or unrecognized precision never creates a pin', () => {
   const projection = {

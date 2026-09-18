@@ -17,6 +17,7 @@
 import { cache } from 'react';
 import type { PublicSearchIndexDoc } from '@repo/domain/search';
 import type { PublicEntityProjectionDoc } from '@repo/schemas';
+import { relatedEntriesFromRelationships } from '@repo/domain';
 import {
   buildRelatedNeighborStubs,
   buildRelationshipGraph,
@@ -40,6 +41,7 @@ import { isPostgresPublicDataMisconfigured, shouldPreferReleaseArtifacts } from 
 import { createReleaseScopedCache } from './release-scoped-cache';
 import { mapProjectionToPublicEntityView, type PublicProjectionInput } from './map-projection';
 import { mapPublicSearchProjection } from './map-search-index';
+import { resolveHistoryRelationships } from '../history/resolve-history-relationships';
 import {
   collectOneHopNeighborIds,
   collectThreeHopNeighborIds,
@@ -51,22 +53,15 @@ import { fetchReleaseEntitiesListArtifact, fetchReleaseSearchIndexArtifact } fro
 /**
  * Cross-request cache window for release catalog / search index (seconds).
  *
- * Correction: the cache key includes `releaseId + activatedAt`, but
- * those do NOT change when content is corrected in place — dozens of `packages/ops-data/scripts`
- * fix/backfill scripts upsert `published.release_entities` under the *same* release id and
- * `active_release.activated_at` is not bumped by them. So this TTL is a real freshness bound
- * on editorial corrections, not just a memory bound as originally assumed when it was raised
- * from 300s to 6h. 30 minutes bounds a correction's visible staleness to roughly
- * TTL + the artifact-republish cron interval (`publish-release-catalog-artifacts.yml`) while
- * keeping Postgres pulls far below the pre-fix rate (~48 calls/day/instance vs one per request).
+ * The cache key includes `releaseId + activatedAt`, which remain stable when a published record
+ * is corrected in place. This TTL therefore bounds correction staleness in one process while
+ * avoiding a catalog read per request.
  */
 const RELEASE_CATALOG_REVALIDATE_SECONDS = 1_800; // 30m
 
 /**
- * How long a fetched active-release pointer may serve across requests. The pointer
- * was previously read from Postgres on every request (~625k reads per billing
- * period); a short window keeps release activation near-immediate while collapsing
- * that to ~2 reads/min/instance.
+ * Share the active-release pointer briefly across requests without materially delaying a newly
+ * activated release.
  */
 const ACTIVE_RELEASE_POINTER_TTL_MS = 30_000;
 
@@ -154,11 +149,8 @@ function asRelatedNeighborViews(
 }
 
 /**
- * Prebuilt per-catalog lookups. Building these is O(catalog); doing it inside
- * `hydrateEntityLearningLinks` made whole-catalog hydration O(catalog²) — for the ~4.1k national
- * release that was ~33M Map insertions and 8k Map allocations per cold start, burned on every
- * instance on both the artifact and Postgres paths. Built once by `mapProjectionsToHydratedViews`
- * and shared across every entity in the pass.
+ * Prebuilt per-catalog lookups keep whole-catalog hydration linear. They are created once by
+ * `mapProjectionsToHydratedViews` and shared across every entity in the pass.
  */
 type CatalogLookups = {
   readonly neighborsById: Map<string, RelationshipGraphLookup>;
@@ -173,6 +165,37 @@ function buildCatalogLookups(catalog: readonly PublicEntityView[]): CatalogLooku
     displayNameById.set(item.id, { displayName: item.displayName });
   }
   return { neighborsById, displayNameById };
+}
+
+/**
+ * Replace authored relationship candidates with adjacency backed by an exact cited claim.
+ *
+ * Release projections can still contain legacy `related[]` candidates. They are useful for
+ * bounded neighbor reads, but they are not publication authority. The history graph adapter
+ * owns conversion to the domain relationship extractor, so every public surface applies the
+ * same predicate, target, citation and direction gate.
+ */
+export function retainCitedRelationshipViews(
+  entities: readonly PublicEntityView[],
+): readonly PublicEntityView[] {
+  const relationships = resolveHistoryRelationships(
+    entities,
+    entities.find((entity) => entity.revision.generatedAt.length > 0)?.revision.generatedAt ??
+      '1970-01-01T00:00:00.000Z',
+  );
+  const relatedByEntityId = relatedEntriesFromRelationships(
+    entities.map((entity) => entity.id),
+    relationships,
+  );
+
+  return entities.map((entity) => {
+    const related = relatedByEntityId.get(entity.id) ?? [];
+    return {
+      ...entity,
+      related,
+      relatedIds: related.map((entry) => entry.id),
+    };
+  });
 }
 
 /** Attach 1-hop stubs + capped 2-hop continue-learning using a neighbor catalog.
@@ -248,8 +271,10 @@ export function hydrateEntityLearningLinks(
 function mapProjectionsToHydratedViews(
   projections: readonly PublicEntityProjectionDoc[],
 ): readonly PublicEntityView[] {
-  const mapped = projections.map((projection) =>
-    mapProjectionToPublicEntityView(projection as PublicProjectionInput),
+  const mapped = retainCitedRelationshipViews(
+    projections.map((projection) =>
+      mapProjectionToPublicEntityView(projection as PublicProjectionInput),
+    ),
   );
   const lookups = buildCatalogLookups(mapped);
   return mapped.map((entity) => hydrateEntityLearningLinks(entity, mapped, lookups));
@@ -291,8 +316,8 @@ async function loadLiveEntitiesForRelease(
         `[public-data] entities artifact had ${artifact.entities.length} entries but none parsed; falling back to Postgres`,
       );
     }
-    // Every arrival here is a full multi-MB catalog pull. The shared release-artifact fetcher
-    // has already logged the specific reason; this line marks the cost that reason caused.
+    // This fallback reads the full catalog. The shared artifact fetcher has already logged why
+    // the configured artifact could not be used.
     console.warn(
       `[public-data] full Postgres entity catalog pull for ${releaseId} (artifact unusable)`,
     );
@@ -363,9 +388,9 @@ async function loadLiveEntities(): Promise<readonly PublicEntityView[] | undefin
 }
 
 /**
- * Live single-entity path: point-get the entity + bounded related/2-hop neighbors.
- * Must not full-scan `publicReleases/{id}/entities` (that was ~N reads per entity page).
- * Entity pages only — story/list cards use `listPublicEntityViewsByIds` instead.
+ * Live single-entity path: point-read the entity and bounded relationship candidates without
+ * loading the full release catalog. Entity pages use this path; story/list cards use
+ * `listPublicEntityViewsByIds` instead.
  */
 async function loadLiveEntity(entityId: string): Promise<PublicEntityView | undefined> {
   if (!shouldUseLivePublicProjections()) return undefined;
@@ -373,49 +398,77 @@ async function loadLiveEntity(entityId: string): Promise<PublicEntityView | unde
   if (!active) return undefined;
   const projection = await fetchPublicEntityProjection(active.releaseId, entityId);
   if (!projection) return undefined;
-  const entity = mapProjectionToPublicEntityView(projection as PublicProjectionInput);
+  const rawEntity = mapProjectionToPublicEntityView(projection as PublicProjectionInput);
 
   try {
-    const oneHopIds = collectOneHopNeighborIds(entity);
+    // Candidate edges bound the point reads. Only exact cited edges from each completed batch
+    // are allowed to select the next ring.
+    const oneHopCandidateIds = collectOneHopNeighborIds(rawEntity);
     const oneHopProjections =
-      oneHopIds.length > 0
-        ? await fetchPublicEntityProjectionsByIds(active.releaseId, oneHopIds)
+      oneHopCandidateIds.length > 0
+        ? await fetchPublicEntityProjectionsByIds(active.releaseId, oneHopCandidateIds)
         : [];
-    const oneHopViews = oneHopProjections.map((item) =>
+    let projections = [projection, ...oneHopProjections];
+    let rawViews = projections.map((item) =>
       mapProjectionToPublicEntityView(item as PublicProjectionInput),
     );
-    const twoHopIds = collectTwoHopNeighborIds(entityId, oneHopIds, oneHopViews);
+    let citedViews = retainCitedRelationshipViews(rawViews);
+    let citedById = new Map(citedViews.map((item) => [item.id, item]));
+    const oneHopIds = collectOneHopNeighborIds(citedById.get(entityId) ?? rawEntity);
+    const rawById = new Map(rawViews.map((item) => [item.id, item]));
+    const oneHopRawViews = oneHopIds.flatMap((id) => {
+      const item = rawById.get(id);
+      return item ? [item] : [];
+    });
+    const twoHopCandidateIds = collectTwoHopNeighborIds(entityId, oneHopIds, oneHopRawViews);
     const twoHopProjections =
-      twoHopIds.length > 0
-        ? await fetchPublicEntityProjectionsByIds(active.releaseId, twoHopIds)
+      twoHopCandidateIds.length > 0
+        ? await fetchPublicEntityProjectionsByIds(active.releaseId, twoHopCandidateIds)
         : [];
-    const twoHopViews = twoHopProjections.map((item) =>
+    projections = [...projections, ...twoHopProjections];
+    rawViews = projections.map((item) =>
       mapProjectionToPublicEntityView(item as PublicProjectionInput),
     );
-    // Third ring, for the relationship map only. One extra batched `getAll`, hard-capped by
-    // `collectThreeHopNeighborIds`; a failure here is caught with the rest and degrades the map
-    // to two rings rather than failing the page.
-    const threeHopIds = collectThreeHopNeighborIds(
-      [entityId, ...oneHopIds, ...twoHopIds],
-      twoHopViews,
+    citedViews = retainCitedRelationshipViews(rawViews);
+    citedById = new Map(citedViews.map((item) => [item.id, item]));
+    const citedEntity = citedById.get(entityId);
+    const validatedOneHopIds = citedEntity ? collectOneHopNeighborIds(citedEntity) : [];
+    const validatedOneHopViews = validatedOneHopIds.flatMap((id) => {
+      const item = citedById.get(id);
+      return item ? [item] : [];
+    });
+    const twoHopIds = collectTwoHopNeighborIds(entityId, validatedOneHopIds, validatedOneHopViews);
+    const expandedRawById = new Map(rawViews.map((item) => [item.id, item]));
+    const twoHopRawViews = twoHopIds.flatMap((id) => {
+      const item = expandedRawById.get(id);
+      return item ? [item] : [];
+    });
+    // Third-ring candidates come only from independently evidenced second-hop nodes. This is
+    // one bounded batch for the relationship map, never a release-catalog scan.
+    const threeHopCandidateIds = collectThreeHopNeighborIds(
+      [entityId, ...validatedOneHopIds, ...twoHopIds],
+      twoHopRawViews,
     );
     const threeHopProjections =
-      threeHopIds.length > 0
-        ? await fetchPublicEntityProjectionsByIds(active.releaseId, threeHopIds)
+      threeHopCandidateIds.length > 0
+        ? await fetchPublicEntityProjectionsByIds(active.releaseId, threeHopCandidateIds)
         : [];
-    const threeHopViews = threeHopProjections.map((item) =>
-      mapProjectionToPublicEntityView(item as PublicProjectionInput),
-    );
-
-    const catalog = [entity, ...oneHopViews, ...twoHopViews, ...threeHopViews];
-    return hydrateEntityLearningLinks(entity, catalog);
+    const catalog = retainCitedRelationshipViews([
+      ...rawViews,
+      ...threeHopProjections.map((item) =>
+        mapProjectionToPublicEntityView(item as PublicProjectionInput),
+      ),
+    ]);
+    const entity = catalog.find((item) => item.id === entityId);
+    return entity ? hydrateEntityLearningLinks(entity, catalog) : undefined;
   } catch (error) {
-    // Never mix Dunbar seed neighbors into a live entity — hydrate with the entity alone.
+    // Never expose an unverified candidate or mix bundled seed neighbors into a live entity.
     const message = error instanceof Error ? error.message : String(error);
     console.warn(
       `[public-data] neighbor batch failed for ${entityId}; hydrating without seed catalog: ${message}`,
     );
-    return hydrateEntityLearningLinks(entity, [entity]);
+    const [entity] = retainCitedRelationshipViews([rawEntity]);
+    return entity ? hydrateEntityLearningLinks(entity, [entity]) : undefined;
   }
 }
 
@@ -431,7 +484,9 @@ async function loadLiveEntitiesByIdsThin(
   if (!active) return undefined;
   const projections = await fetchPublicEntityProjectionsByIds(active.releaseId, entityIds);
   if (projections.length === 0) return undefined;
-  return projections.map((item) => mapProjectionToPublicEntityView(item as PublicProjectionInput));
+  return retainCitedRelationshipViews(
+    projections.map((item) => mapProjectionToPublicEntityView(item as PublicProjectionInput)),
+  );
 }
 
 /** Source of a public read result. `'none'` means a genuine miss (not-found), never a degraded fallback. */

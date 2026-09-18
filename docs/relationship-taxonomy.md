@@ -1,7 +1,9 @@
 # Relationship Taxonomy & Authoring Contract
 
-**Audience:** every downstream candidate-generation subagent, and human authors editing catalog
-fixtures under `packages/ops-data/fixtures/national-catalog/`.
+**Audience:** candidate generators and operators authoring released entity projections and
+relationship proposals. The current checked-in seed examples are in
+`packages/ops-data/fixtures/records.ts`; active releases are assembled from reviewed projections,
+not from an obsolete catalog fixture path.
 
 **Status:** normative. Field names, enum values, and semantics below are quoted verbatim from the
 source files cited in each section. If code and this document ever disagree, the code wins — file
@@ -10,9 +12,13 @@ an issue and fix this doc.
 **Authoritative sources** (read these, not a paraphrase, when in doubt):
 
 - `packages/schemas/src/relationship-vocabulary.ts` — `RELATIONSHIP_TYPES` (the vocabulary itself), `LEGACY_DB_RELATIONSHIP_TYPES`, `DB_RELATIONSHIP_TYPES`, and `relationshipTypeSchema` (the read-side gate). Every other module re-exports these; nothing restates them.
-- `packages/domain/src/relationship.ts` — `RelationshipType`, `RelationshipRole`, `EntityRelationship`, direction/temporal semantics (`RELATIONSHIP_TYPE_SEMANTICS`), evidence/role/temporal guardrails, causal-edge guardrail.
+- `packages/domain-core/src/relationship.ts` — `RelationshipType`, `RelationshipRole`,
+  `EntityRelationship`, direction/temporal semantics (`RELATIONSHIP_TYPE_SEMANTICS`), evidence/
+  role/temporal guardrails, and the causal-edge guardrail. `packages/domain/src/relationship.ts`
+  is a re-export shim.
 - `packages/domain/src/entity-kinds.ts` — `EntityKind` vocabulary.
-- `packages/domain/src/graph/catalog-related.ts` — `CatalogRelatedEntry` (the authoring shape), dedup/canonical-direction logic, evidence-resolution/skip behavior.
+- `packages/domain/src/graph/catalog-related.ts` — `CatalogRelatedEntry` (the authoring shape),
+  directed-key deduplication, exact claim matching, mention resolution, and skip behavior.
 
 ---
 
@@ -93,48 +99,50 @@ this:
 the person/org it commemorates uses `direction: 'outgoing'`; the commemorated entity linking back
 uses `direction: 'incoming'`.
 
-### 1.4 Evidence requirement — enforced at extraction, not just documented
+### 1.4 Evidence requirement — exact relationship claim on the from entity
 
 Every canonical `EntityRelationship` requires at least one evidence id
 (`assertRelationshipHasEvidence` in `relationship.ts`; `evidenceIds: z.array(...).min(1)` in
 `entityRelationshipSchema`). This is enforced concretely in
 `extractCatalogRelationships` (`packages/domain/src/graph/catalog-related.ts`):
 
-- `resolveEvidenceIds` pulls claim ids off **both** endpoint entities (`fromEntity.claims`,
-  `toEntity.claims`, via `resolveReleaseClaimId`), preferring the `from` entity's claim ids and
-  falling back to the `to` entity's.
-- If **neither endpoint has a resolvable claim**, the edge is dropped:
-  `skipped.push(\`${from} -> ${to} (${type}): no resolvable claim evidence\`)`.
+- `resolveEvidenceIds` examines only the resolved **from** entity. It accepts a claim only when
+  `claim.predicate === relationship.type`, `claim.object === relationship.toEntityId`, the
+  claim has a stable id, and `citationHref` is HTTP(S).
+- Claims on the to entity, unrelated claims on the from entity, matching names/aliases, and
+  co-mention do not establish the edge. Without an exact cited relationship claim, extraction
+  skips the edge with `no exact cited relationship claim`.
 - An unsupported `type` (not in `RELATIONSHIP_TYPES`) is also skipped:
   `\`${entity.id} -> ${entry.id}: unsupported relationship type "${entry.type}"\``.
 - A `related[]` entry pointing at an entity id absent from the input set is also skipped.
+- An exact `mentionedEntityIds` token can add a `related_to` candidate only when the from entity
+  carries its own cited `related_to` claim naming that resolved target. Mentions never borrow
+  another predicate or resolve an alias into an edge by themselves.
 
-**Practical consequence for authors/generators:** an edge you propose is worthless unless at least
-one of its two endpoint entities carries a `claims[]` entry — the edge rides on that entity's
-existing sourced claims, it does not carry its own citation on the authoring shape. If you are
-proposing a relationship between two entities that currently have no claims at all, add (or point
-to) a claim first, or the edge silently vanishes at publish with no build failure — only an entry
-in `skipped[]`.
+**Practical consequence for authors/generators:** before proposing `related[]`, write down the
+exact from entity, type, target id, and cited claim supporting that sentence. A generic claim on
+either endpoint is insufficient. If the exact claim is absent or uncited, extraction drops the
+edge and reports it in `skipped[]`.
 
 ### 1.5 Dedup and canonical direction
 
-`extractCatalogRelationships` dedupes bidirectional fixture pairs (e.g. entity A lists `{id: B,
-type: X, direction: outgoing}` and entity B separately lists `{id: A, type: X, direction:
-incoming}`) into a **single** `EntityRelationship`:
+`extractCatalogRelationships` dedupes reciprocal fixture entries that resolve to the same directed
+pair (e.g. entity A lists `{id: B, type: X, direction: outgoing}` and entity B separately lists
+`{id: A, type: X, direction: incoming}`) into a **single** `EntityRelationship`:
 
-- `dedupKey(entityA, entityB, type)` sorts the two entity ids lexicographically and joins them with
-  the type — order-independent, so both sides of a bidirectional pair collide on the same key.
-- **Canonical direction preference: the first-seen `outgoing` edge wins.** If an `outgoing` entry
-  is seen for a key, it (over)writes any prior `incoming` entry for the same key. An `incoming`
-  entry only sets the canonical record if no entry exists yet for that key.
-- Entities are processed in id-sorted order (`sortedEntities`), so "first-seen" is deterministic
-  across rebuilds, not insertion-order-of-the-JSON-file dependent.
+- `dedupKey(fromEntity, toEntity, type)` preserves the ordered endpoints and joins them with the
+  type. It is directed; lexicographic sorting is not used to canonicalize relationship direction.
+- **Canonical direction preference: the `outgoing` entry wins for a shared directed key.** If an
+  `outgoing` entry is seen for a key, it overwrites any prior `incoming` entry for that key. An
+  `incoming` entry only sets the canonical record if no entry exists yet for that key.
+- Entities are processed in id-sorted order (`sortedEntities`), so replacement of an incoming
+  entry by an outgoing entry for the same directed key is deterministic.
 - `timespan` is carried through from whichever entry became canonical.
 
-**Practical consequence:** you do not need to author both sides of a pair — one side authoring
-`outgoing` (or the other authoring `incoming`) is sufficient to produce one edge. If you *do*
-author both sides (common for readability when scanning a single entity's fixture record), make
-sure the `type` and (if used) `timespan` agree, since only one side's data survives.
+**Practical consequence:** one side authoring `outgoing` (or the other authoring `incoming`) is
+sufficient for one directed edge. Opposite directed assertions and distinct predicates remain
+separate edges. If reciprocal entries describe the same directed edge, keep the `type` and
+`timespan` aligned because only one record survives that directed key.
 
 ### 1.6 `role` — only on `attended`
 
@@ -186,9 +194,8 @@ artifact, movement, other
 ```
 
 For each pair below: **expected `type`(s)**, **canonical direction** (which kind is `from`), a
-one-line rationale, and a concrete Black-history example (drawn from real catalog fixture entities
-under `packages/ops-data/fixtures/national-catalog/` where they exist; noted as illustrative
-otherwise).
+one-line rationale, and a concrete Black-history example. Examples are drawn from
+`packages/ops-data/fixtures/records.ts` where they exist and are marked illustrative otherwise.
 
 | Kind pair | Type(s) | Direction (from → to) | Rationale | Example |
 |---|---|---|---|---|
@@ -289,14 +296,13 @@ silently skips unsupported types (§1.4), so a made-up type does not fail loudly
 
 ### 3.4 Every proposed edge must cite its backing evidence
 
-Because `extractCatalogRelationships` resolves `evidenceIds` purely from the two endpoint
-entities' own `claims[]` (§1.4), a candidate generator must, for every proposed `related[]` entry:
+Because `extractCatalogRelationships` resolves `evidenceIds` from the resolved from entity's
+exact relationship claim (§1.4), a candidate generator must, for every proposed `related[]` entry:
 
-- Identify **which claim** (on either endpoint) the edge rides on, and confirm that claim actually
-  exists (or will exist) in that entity's `claims[]` array with a real `citationSource`/
-  `citationHref`. An edge with no backing claim on either endpoint is silently dropped at
-  extraction (`skipped[]`) — there is no build failure to catch this, so generators must
-  self-verify rather than rely on the pipeline to flag it.
+- Identify the **from entity**, exact predicate, exact target id, and claim that supports the
+  directed sentence. Confirm that claim exists (or will exist) in the from entity's `claims[]`
+  array with a real `citationSource`/`citationHref`. An edge with no exact cited relationship
+  claim on the from entity is dropped at extraction (`skipped[]`), so generators must self-verify.
 - For `caused`/`enabled` specifically, also supply the `CausalEdgeReview.scope` and (if
   `systemic_consensus`) the `consensusBasis` string identifying the secondary-source consensus —
   this is a structural intake requirement, not optional metadata.
@@ -305,36 +311,14 @@ entities' own `claims[]` (§1.4), a candidate generator must, for every proposed
 
 ---
 
-## Appendix: types with no natural kind-pair home (flag for attention)
+## Appendix: coverage note
 
-While auditing the matrix, a few types stood out as having thin or purely-illustrative homes
-today — worth tracking, not necessarily deprecating:
+The checked-in seed record fixture at `packages/ops-data/fixtures/records.ts` exercises only a
+small subset of the relationship vocabulary, including `occurred_at` and `commemorates`.
+The matrix above describes the domain semantics and authoring choices; it is not a census of
+active release coverage. Treat examples without a cited record or release fixture as
+illustrative until a reviewed projection and exact relationship claim exist.
 
-- **`successor_of`** — real-world semantics are clear (modern successor → superseded predecessor,
-  documented in code down to a "predecessor's statusHistory must never be read as the successor's
-  current status" acceptance criterion in `graph/succession.ts`), but **zero fixture entities
-  currently use it**. No org/place pair in the current catalog is authored as a succession. Likely
-  fine as-is (place annexation and org mergers are real, just not yet cataloged) but flagged since
-  it has no live example to point to.
-- **`authored`** — likewise well-specified (distinct from `founded`, reserved for
-  publication/artifact creation) but **zero fixture usage** despite 21 `publication` entities and
-  several attributable authors (Frederick Douglass/The North Star, etc.) existing in the catalog.
-  This looks like an authoring gap in the existing fixtures rather than a taxonomy problem.
-- **`depicts`** — zero fixture usage. Natural home is publication/artifact → person/place/event,
-  but no fixture exercises it, so its exact "what counts as depiction vs. authorship" boundary is
-  untested against real data.
-- **`artifact` (EntityKind)** — zero entities of this kind exist in
-  `packages/ops-data/fixtures/national-catalog/` today (see kind distribution: person 262, place
-  150, case 45, event 44, institution 38, school 34, law 23, publication 21, organization 17,
-  movement 12 — no `artifact`, no `other`). Every artifact-kind-pair example in §2 above is
-  therefore illustrative, not fixture-grounded. This is worth flagging to whoever owns catalog
-  content: either populate some `artifact` entities or reconsider its priority in the near term.
-- **`governed_by`, `employed_by`, `member_of`, `founded`, `participated_in`, `influenced`,
-  `caused`, `enabled`, `overturned`, `cites`** — none of these appear in the current fixture set
-  either (only `located_at`, `occurred_at`, `related_to`, and `commemorates` were found via direct
-  grep across `packages/ops-data/fixtures/national-catalog/*.json`). This means the *large
-  majority* of the 20-value enum is currently unexercised by real authored data — the matrix above
-  is grounded in the documented semantics and real entity names, but not in existing `related[]`
-  usage, since almost none exists yet beyond the four types just named. This is the single most
-  important finding for whoever is driving candidate generation: the taxonomy is far ahead of the
-  data.
+Types with no natural kind-pair home should use `related_to` only when the from entity has an
+exact cited `related_to` claim naming the target. Do not add a generic edge to compensate for
+missing evidence or an absent entity kind.
