@@ -93,6 +93,28 @@ test(
 );
 
 test(
+  'cold map browse emits complete no-JavaScript HTML without inert stream placeholders',
+  { skip: !baseUrl && !requireE2E },
+  async () => {
+    assert.ok(baseUrl && isAllowedBaseUrl(baseUrl), 'a permitted E2E_BASE_URL is required');
+    const bypass = process.env.VERCEL_AUTOMATION_BYPASS_SECRET;
+    const response = await fetch(new URL('/explore', baseUrl), {
+      redirect: 'manual',
+      headers: bypass ? { 'x-vercel-protection-bypass': bypass } : {},
+    });
+    assert.equal(response.status, 200);
+    const body = await response.text();
+    const fallbacks = [...body.matchAll(/<noscript\b[^>]*>([\s\S]*?)<\/noscript>/gi)].map(
+      (match) => match[1] ?? '',
+    );
+    assert.ok(fallbacks.some((html) => html.includes('Filter documented records')));
+    for (const html of fallbacks) {
+      assert.doesNotMatch(html, /<template\b[^>]*\bid=["'][PSB]:/i);
+    }
+  },
+);
+
+test(
   'e2e harness documents skip behavior when no base URL is configured',
   {
     skip: Boolean(baseUrl),

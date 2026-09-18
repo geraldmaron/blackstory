@@ -303,9 +303,14 @@ test('a reader without a plate is told so, where the map would be, and sent to t
     immersive,
     /plateUnavailable \? \([\s\S]*ds-door__field-note[\s\S]*href="\/records"/,
   );
-  // No JavaScript: the server component says so above the chapters.
+  // The server-rendered fallback remains useful when JavaScript is unavailable.
+  assert.match(door, /<DoorNoscript view=\{noscriptView\}/);
+  const noscript = readFileSync(
+    fileURLToPath(new URL('./door-noscript.tsx', import.meta.url)),
+    'utf8',
+  );
   assert.match(
-    door,
+    noscript,
     /<noscript>[\s\S]*ds-door__noscript[\s\S]*href="\/records"[\s\S]*<\/noscript>/,
   );
   assert.match(css, /\.ds-door__field-note,\s*\.ds-door__noscript\s*\{/);
