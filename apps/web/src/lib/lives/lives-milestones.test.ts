@@ -11,7 +11,9 @@ import {
   LIVES_MILESTONES,
   buildLivesMilestonePanels,
   parseLivesMilestone,
+  livesMilestonePeriod,
 } from './lives-milestones';
+import { RACE_ETHNICITY_DEFINITION_LABELS } from '@repo/domain/statistics/lives';
 
 function cell(estimate?: number, withSource = true): LivesCell {
   return estimate === undefined
@@ -106,4 +108,64 @@ test('uncited values are not publishable on the guided surface', () => {
     ],
   };
   assert.deepEqual(buildLivesMilestonePanels(bundle([withoutSources]), LIVES_MILESTONES[0]!), []);
+});
+
+test('distinct tables at one source URL survive deduplication', () => {
+  const source = decade(2020, 'homeownership', { black: 44, white: 73 });
+  const condition = source.conditions[0]!;
+  const panels = buildLivesMilestonePanels(
+    bundle([
+      {
+        ...source,
+        conditions: [
+          {
+            ...condition,
+            cells: {
+              ...condition.cells,
+              white: {
+                ...condition.cells.white,
+                sources: [{ label: 'White household table', url: 'https://www.census.gov/table' }],
+              },
+            },
+          },
+        ],
+      },
+    ]),
+    LIVES_MILESTONES[0]!,
+  );
+  assert.equal(panels[0]?.sources.length, 2);
+});
+
+test('survey vintages are not mislabeled as a single census year', () => {
+  const home = buildLivesMilestonePanels(
+    bundle([decade(2020, 'homeownership', { black: 44, white: 73 })]),
+    LIVES_MILESTONES[0]!,
+  )[0]!;
+  assert.equal(livesMilestonePeriod(home), '2019–2023 · ACS five-year estimate');
+  const place = buildLivesMilestonePanels(
+    bundle([decade(2020, 'urban', { black: 90, white: 73 })]),
+    LIVES_MILESTONES[1]!,
+  )[0]!;
+  assert.equal(livesMilestonePeriod(place), '2020 · Census snapshot');
+});
+
+test('a nonwhite historical proxy cannot be presented as a Black-specific comparison', () => {
+  const source = decade(1890, 'school_attendance', { black: 42, white: 59 });
+  const condition = source.conditions[0]!;
+  const proxy = {
+    ...source,
+    conditions: [
+      {
+        ...condition,
+        cells: {
+          ...condition.cells,
+          black: {
+            ...condition.cells.black,
+            definitionLabel: RACE_ETHNICITY_DEFINITION_LABELS.nonwhite,
+          },
+        },
+      },
+    ],
+  };
+  assert.deepEqual(buildLivesMilestonePanels(bundle([proxy]), LIVES_MILESTONES[2]!), []);
 });

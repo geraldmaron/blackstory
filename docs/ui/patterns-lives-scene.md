@@ -9,6 +9,8 @@ An appendix reader choosing region, decade, and emphasis sees housing, school, w
 
 The public `/lives` entry uses the milestone reader in `LivesMilestoneExperience`. It has one question control, no decade rail, no area grid, and no scene. An era panel exists only when it can show a cited Black figure beside at least one cited comparison figure. Missing eras are omitted rather than rendered as blank or production-state cards. Each visible panel prints the measure universe, definition labels, source links, matched archive context when available, and no more than two relevant rules that began in the era.
 
+The public reader now starts each question with an inspected historical object: full-frame image, large date, place, credited source, rights, verbal reading, scope and a close-reading prompt. Named accounts are dated separately from photographs. Shared `ArchiveFigure` and `RoomHandoff` carry evidence and destinations; no bespoke icon library. A compact year index links only to rendered comparisons, never the full decade inventory. Era headings describe a period, not the same repeated metric. Dates remain accessible text. Modern ACS measures print their five-year vintage and category-overlap warning. Source deduplication preserves different table titles at one URL.
+
 ## Components
 
 | Module | Role |
@@ -35,6 +37,7 @@ The public `/lives` entry uses the milestone reader in `LivesMilestoneExperience
 - Controls and decade links keep a 44px minimum target, a visible focus ring, and a text label beside every icon.
 - The public reader never renders `pending`, `suppressed`, `not_measured`, or uncited values.
 - A visible public panel requires the Black figure and at least one comparison figure.
+- Historical “nonwhite” proxies cannot satisfy the Black-specific gate. They remain in the evidence appendix with their original definition.
 - Era panels are not joined by a line. Definition and regime changes remain explicit boundaries.
 
 ## Related

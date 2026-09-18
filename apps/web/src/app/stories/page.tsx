@@ -285,12 +285,12 @@ export default async function StoriesIndexPage({ searchParams }: StoriesPageProp
                     className="ds-stories-shelf__entry"
                     href={`/stories/${item.slug}`}
                   >
-                    <span className="ds-stories-shelf__plate">
-                      {item.heroImage ? (
-                        // eslint-disable-next-line @next/next/no-img-element
+                    {item.heroImage ? (
+                      <span className="ds-stories-shelf__plate">
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
                         <img src={item.heroImage.url} alt={item.heroImage.alt} loading="lazy" />
-                      ) : null}
-                    </span>
+                      </span>
+                    ) : null}
                     {/* The entry's own number, not its position in this row: a shelf shows
                         four of nine, and a row index is a fraction of the row rather than of the
                         collection the reader is being offered. */}
@@ -315,6 +315,10 @@ export default async function StoriesIndexPage({ searchParams }: StoriesPageProp
                     key={item.slug}
                     href={`/stories/${item.slug}`}
                     kind={KIND_LABELS[item.kind ?? 'chapter'] ?? 'Story'}
+                    icon="stories"
+                    {...(item.heroImage
+                      ? { media: { ...item.heroImage, fit: 'contain' as const } }
+                      : {})}
                     title={item.title}
                     description={item.summary}
                     meta={`${item.eraLabel} · ${item.placeLabel}`}
@@ -335,6 +339,8 @@ export default async function StoriesIndexPage({ searchParams }: StoriesPageProp
               key={item.slug}
               href={`/stories/${item.slug}`}
               kind={KIND_LABELS[item.kind ?? 'chapter'] ?? 'Story'}
+              icon="stories"
+              {...(item.heroImage ? { media: { ...item.heroImage, fit: 'contain' as const } } : {})}
               title={item.title}
               description={item.summary}
               meta={`${item.eraLabel} · ${item.placeLabel}`}

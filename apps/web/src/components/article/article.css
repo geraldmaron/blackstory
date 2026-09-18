@@ -182,8 +182,8 @@
 }
 
 /* ----------------------------------------------------------------------------
- * Collapsed evidence drawers. Native <details>; charts are never wrapped here.
- * Begins closed so prose reads as prose; the reader opens the receipt on demand.
+ * Evidence drawers. Primary documents begin open; other context remains collapsible.
+ * Native <details>; charts are never wrapped here.
  * ------------------------------------------------------------------------- */
 /* Ink direction: a drawer is a hairline row, not a box — the border/radius/background come
    off, same move RoomCard makes. A live map moment inside still needs a transparent ground
@@ -381,24 +381,6 @@
   border-radius: var(--ds-radius-md);
   background: var(--ds-surface-raised);
   padding: var(--ds-space-4);
-}
-
-.ds-article__document-head {
-  display: flex;
-  gap: var(--ds-space-3);
-  align-items: baseline;
-  flex-wrap: wrap;
-}
-
-.ds-article__document-date {
-  color: var(--ds-accent);
-  font-size: 0.8rem;
-}
-
-.ds-article__document-title {
-  font-family: var(--ds-font-sans);
-  font-weight: 600;
-  color: var(--ds-ink);
 }
 
 .ds-article__document-quote {

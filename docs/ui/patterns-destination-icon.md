@@ -38,6 +38,8 @@ Import happens from `DestinationIcon.tsx`. The command bar mounts it on every ro
 
 Command bar Find axes, Rooms menu, site footer, `/rooms` cards, About destination cards, standalone-room jump nav and chapter plates (`RoomSection`, `RoomJump`, `RoomHandoff`), Door archive chips, command palette Go rows, Data reading CTAs.
 
+Lives question choices, archive/object labels, dated comparison jumps and related-record handoffs; Stories catalog links and primary-document drawers; Records orientation links (map, era, place). Icons remain navigational labels, not invented illustrations of historical conditions.
+
 ---
 
 ## Accessibility

@@ -1,5 +1,7 @@
 import {
   LIVES_LENSES,
+  RACE_ETHNICITY_DEFINITION_LABELS,
+  livesAcsVintage,
   type LivesAreaBundle,
   type LivesCell,
   type LivesConditionBundle,
@@ -151,6 +153,9 @@ function conditionFor(
 
 function comparableValues(condition: LivesConditionBundle): readonly LivesMilestoneValue[] {
   if (!isPublished(condition.cells.black)) return [];
+  // A broad historical proxy is not a Black-specific comparison. Keep it in the appendix.
+  if (condition.cells.black.definitionLabel === RACE_ETHNICITY_DEFINITION_LABELS.nonwhite)
+    return [];
   const values = LIVES_LENSES.flatMap((lens) => {
     const cell = condition.cells[lens];
     return isPublished(cell) ? [{ lens, cell }] : [];
@@ -161,7 +166,8 @@ function comparableValues(condition: LivesConditionBundle): readonly LivesMilest
 function uniqueSources(values: readonly LivesMilestoneValue[]): readonly LivesSourceRef[] {
   const sources = new Map<string, LivesSourceRef>();
   for (const value of values) {
-    for (const source of value.cell.sources ?? []) sources.set(source.url, source);
+    for (const source of value.cell.sources ?? [])
+      sources.set(`${source.url}|${source.label}`, source);
   }
   return [...sources.values()];
 }
@@ -173,6 +179,7 @@ function matchingContext(
   const beat = decade.worldBeats.find(
     (candidate) =>
       milestone.domains.includes(candidate.domain) &&
+      candidate.domain !== 'testimony' &&
       (candidate.appliesTo.includes('all') || candidate.appliesTo.includes('black')),
   );
   if (beat) return { kind: 'beat', beat };
@@ -188,6 +195,16 @@ function matchingContext(
         citations: note.citations,
       }
     : null;
+}
+
+/** The current condition adapters use ACS only for these modern measures. */
+export function livesMilestonePeriod(panel: LivesMilestonePanel): string {
+  const acs = ['homeownership', 'high_school', 'unemployed'].includes(panel.condition.key)
+    ? livesAcsVintage(panel.decade.decade)
+    : null;
+  return acs
+    ? `${acs.replace('-', '–')} · ACS five-year estimate`
+    : `${panel.decade.decade} · Census snapshot`;
 }
 
 function rulesBeginningInEra(

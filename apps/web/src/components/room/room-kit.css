@@ -527,6 +527,22 @@
   color: var(--ds-ink);
   border-bottom: var(--ds-border-width) solid var(--room-rule-2);
   transition: background-color var(--ds-duration-fast) var(--ds-easing);
+  min-width: 0;
+  text-decoration: none;
+}
+
+.ds-room-card:focus-visible {
+  outline: var(--ds-focus-width) solid var(--ds-focus-ring);
+  outline-offset: 3px;
+}
+.ds-room-card__title {
+  margin: 0;
+}
+.ds-room-card__title > .ds-destination-icon {
+  margin-right: var(--ds-space-2);
+}
+.ds-room-card__desc {
+  margin: 0;
 }
 
 .ds-room-cards--hub .ds-room-card {
@@ -536,14 +552,26 @@
   padding-block: var(--ds-space-5);
 }
 
-/* An index card is a three-column row grid (title, description, tag/meta) sized for plain
-   text; a hero image dropped into that grid lands in an arbitrary cell instead of sitting
-   above the title. A card carrying media stacks like a hub card so the image renders as a
-   block above the text regardless of which grid it's cataloguing in. */
+/* Media sits beside a desktop catalog row and above its text on phones.
+   Hub cards retain their existing vertical composition. */
 .ds-room-card--media {
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-columns: minmax(7rem, 0.6fr) minmax(0, 2fr);
+  align-items: start;
   gap: var(--ds-space-2);
+}
+
+.ds-room-card--media > .ds-room-card__media {
+  grid-column: 1;
+  grid-row: 1 / 5;
+  width: 100%;
+  margin: 0;
+}
+.ds-room-card--media > :not(.ds-room-card__media) {
+  grid-column: 2;
+}
+.ds-room-cards--hub .ds-room-card--media > .ds-room-card__media {
+  grid-row: auto;
 }
 
 /* Rows and index entries take a copper wash on hover; cards no longer lift. */
@@ -606,10 +634,16 @@
 .ds-room-card__meta,
 .ds-room-card__tag {
   font-family: var(--ds-font-mono);
-  font-size: 10px;
+  font-size: 12px;
   letter-spacing: 0.06em;
-  color: var(--room-ink-4);
-  white-space: nowrap;
+  color: var(--room-ink-3);
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+
+.ds-room-card__meta {
+  border-left: 2px solid var(--ds-rule);
+  padding-left: var(--ds-space-3);
 }
 
 /*
@@ -641,6 +675,54 @@
     grid-column: 1;
     white-space: normal;
   }
+
+  .ds-room-card--media > .ds-room-card__media {
+    grid-row: auto;
+  }
+  .ds-room-card--media > :not(.ds-room-card__media) {
+    grid-column: 1;
+  }
+}
+
+/* Shared documentary object: preserve the frame, pair the image with evidence in words. */
+.ds-archive-figure {
+  min-width: 0;
+  margin: 0;
+  align-self: start;
+}
+.ds-archive-figure > img {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-height: 42rem;
+  object-fit: contain;
+}
+.ds-archive-figure figcaption {
+  border-top: 1px solid var(--ds-rule);
+  margin-top: var(--ds-space-3);
+  padding-top: var(--ds-space-3);
+  font-size: 0.85rem;
+  line-height: 1.55;
+}
+.ds-archive-figure figcaption p {
+  margin: 0 0 var(--ds-space-2);
+}
+.ds-archive-figure__credit {
+  font-family: var(--ds-font-mono);
+  font-size: 0.75rem;
+  color: var(--ds-ink-muted);
+}
+.ds-archive-figure__source {
+  display: inline-flex;
+  gap: var(--ds-space-2);
+  align-items: center;
+  min-height: 44px;
+  color: var(--ds-accent);
+  text-underline-offset: 0.2em;
+}
+.ds-archive-figure__source:focus-visible {
+  outline: var(--ds-focus-width) solid var(--ds-focus-ring);
+  outline-offset: 3px;
 }
 
 /* —— Prose ————————————————————————————————————————————————————————————————— */

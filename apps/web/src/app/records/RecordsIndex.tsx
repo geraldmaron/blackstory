@@ -85,6 +85,7 @@ export function RecordsIndexRoom({ model, releaseLabel }: RecordsIndexProps) {
       moves={[
         {
           label: 'Open the map',
+          icon: 'explore' as const,
           href: atlasHref,
           note: atlasReason,
         },
@@ -92,6 +93,7 @@ export function RecordsIndexRoom({ model, releaseLabel }: RecordsIndexProps) {
           ? [
               {
                 label: `Browse ${eraGroups[0].label}`,
+                icon: 'time' as const,
                 href: eraGroups[0].href,
                 note: `${eraGroups[0].count.toLocaleString('en-US')} records`,
               },
@@ -101,6 +103,7 @@ export function RecordsIndexRoom({ model, releaseLabel }: RecordsIndexProps) {
           ? [
               {
                 label: `Browse ${stateGroups[0].label}`,
+                icon: 'place' as const,
                 href: stateGroups[0].href,
                 note: `${stateGroups[0].count.toLocaleString('en-US')} records`,
               },

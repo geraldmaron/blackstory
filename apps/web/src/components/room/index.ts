@@ -43,6 +43,7 @@ export { RoomJump, type RoomJumpProps, type RoomJumpSection } from './RoomJump';
 export { Prose, RecordRef, type ProseProps, type RecordRefProps } from './Prose';
 export { ReadingProgress, type ReadingProgressProps } from './ReadingProgress';
 export {
+  ArchiveFigure,
   SourceList,
   Connections,
   TrustBlock,

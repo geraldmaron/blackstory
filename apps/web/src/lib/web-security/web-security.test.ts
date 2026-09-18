@@ -81,6 +81,23 @@ test('THEME_BOOTSTRAP_SCRIPT_SHA256 matches the live theme-bootstrap script cont
   assert.equal(THEME_BOOTSTRAP_SCRIPT_SHA256, `'sha256-${digest}'`);
 });
 
+test('documentary archive hosts are permitted only as images, without broadening script or connect sources', () => {
+  const directives = new Map(
+    buildContentSecurityPolicy({ isDev: false, nonce: TEST_NONCE })
+      .split(';')
+      .map((directive) => {
+        const [name, ...values] = directive.trim().split(/\s+/u);
+        return [name, new Set(values)] as const;
+      }),
+  );
+  for (const host of ['https://tile.loc.gov', 'https://www.archives.gov']) {
+    assert.ok(directives.get('img-src')?.has(host));
+    assert.equal(directives.get('script-src')?.has(host), false);
+    assert.equal(directives.get('connect-src')?.has(host), false);
+  }
+  assert.equal(directives.get('img-src')?.has('https:'), false);
+});
+
 test('production script-src allows the theme-bootstrap script by hash, with a nonce for everything else', () => {
   const csp = buildContentSecurityPolicy({ isDev: false, nonce: TEST_NONCE });
   const sources = new Set(csp.split(/[\s;]+/u).filter(Boolean));

@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import React from 'react';
+import type { DestinationIconId } from '@repo/public-contracts/destinations';
 import {
   JUXTAPOSITION_DISCLAIMER,
   LIVES_LENS_LABELS,
@@ -11,20 +12,103 @@ import {
   DEFAULT_LIVES_MILESTONE,
   LIVES_MILESTONES,
   buildLivesMilestonePanels,
+  livesMilestonePeriod,
   type LivesMilestone,
   type LivesMilestoneContext,
   type LivesMilestonePanel,
 } from '../../lib/lives/lives-milestones';
 import { describeLivesCell } from '../../lib/lives/lives-format';
+import { LIVES_ARCHIVE_READINGS } from '../../lib/lives/lives-archive';
+import { ArchiveFigure, RoomHandoff } from '../room';
+import { DestinationIcon } from '../patterns/DestinationIcon';
 
 void React;
+
+const MILESTONE_ICONS: Record<LivesMilestone['key'], DestinationIconId> = {
+  home: 'home',
+  place: 'place',
+  school: 'school',
+  education: 'publication',
+  work: 'institution',
+  count: 'data',
+};
+const ERA_TITLES: Record<string, string> = {
+  '1870-1890': 'The first generations after emancipation',
+  '1900-1930': 'A new century, unequal possibilities',
+  '1940-1960': 'War, work, and the struggle over rights',
+  '1970-1980': 'Reading the figures after civil rights legislation',
+  '1990-2000': 'At the turn of another century',
+  '2010-2020': 'The recent record',
+};
+
+function ArchiveReading({ milestone }: { readonly milestone: LivesMilestone }) {
+  const reading = LIVES_ARCHIVE_READINGS[milestone.key];
+  return (
+    <section className="lives-archive" aria-labelledby="lives-archive-title">
+      <header className="lives-archive__head">
+        <p className="lives-milestone__kicker">
+          <DestinationIcon id="artifact" /> Encounter the evidence
+        </p>
+        <p className="lives-archive__date">{reading.date}</p>
+        <p className="lives-archive__place">{reading.place}</p>
+        <h3 id="lives-archive-title">{reading.title}</h3>
+      </header>
+      <ArchiveFigure
+        image={reading.image}
+        caption={reading.caption}
+        href={reading.source.url}
+        rights={reading.rights}
+      >
+        <details className="lives-archive__transcript">
+          <summary>Read the image in words</summary>
+          <p>{reading.transcription}</p>
+        </details>
+      </ArchiveFigure>
+      <div className="lives-archive__reading">
+        {reading.paragraphs.map((paragraph) => (
+          <p key={paragraph}>{paragraph}</p>
+        ))}
+        <p className="lives-archive__notice">
+          <strong>Scope of this evidence.</strong> {reading.notice}
+        </p>
+        <a className="lives-archive__citation" href={reading.source.url}>
+          {reading.source.label}
+        </a>
+        <aside className="lives-archive__question">
+          <DestinationIcon id="questions" />
+          <p>{reading.question}</p>
+        </aside>
+        <nav aria-label="Follow this historical example">
+          {reading.connections.map((connection) => (
+            <RoomHandoff key={connection.href} {...connection} />
+          ))}
+        </nav>
+      </div>
+      {reading.companion ? (
+        <section className="lives-archive__account" aria-labelledby="lives-account-title">
+          <p className="lives-milestone__kicker">
+            <DestinationIcon id={reading.companion.quote ? 'person' : 'place'} />{' '}
+            {reading.companion.date}
+          </p>
+          <h4 id="lives-account-title">{reading.companion.title}</h4>
+          {reading.companion.quote ? <blockquote>“{reading.companion.quote}”</blockquote> : null}
+          <p>{reading.companion.body}</p>
+          <p className="lives-archive__account-scope">{reading.companion.scope}</p>
+          <a className="lives-archive__citation" href={reading.companion.source.url}>
+            {reading.companion.source.label}
+          </a>
+        </section>
+      ) : null}
+    </section>
+  );
+}
 
 function SourceLinks({ sources }: { readonly sources: readonly LivesSourceRef[] }) {
   if (sources.length === 0) return null;
   return (
     <ul className="lives-milestone__sources" aria-label="Sources">
       {sources.map((source) => (
-        <li key={source.url}>
+        <li key={`${source.url}|${source.label}`}>
           <a href={source.url} rel="noopener noreferrer">
             {source.label}
           </a>
@@ -59,7 +143,7 @@ function ContextBlock({ context }: { readonly context: LivesMilestoneContext }) 
   return (
     <aside className="lives-milestone__context" aria-label="From the archive">
       <p className="lives-milestone__context-kicker">
-        {LIVES_WORLD_DOMAIN_LABELS[beat.domain]} · {beat.claimType}
+        {LIVES_WORLD_DOMAIN_LABELS[beat.domain]} · From the record
       </p>
       <h4>{beat.heading}</h4>
       {beat.speaker ? (
@@ -70,6 +154,17 @@ function ContextBlock({ context }: { readonly context: LivesMilestoneContext }) 
       ) : null}
       <p>{beat.body}</p>
       <SourceLinks sources={beat.citations} />
+      {beat.entities.some((entity) => entity.href) ? (
+        <nav className="lives-milestone__connections" aria-label="Related records">
+          {beat.entities
+            .filter((entity) => entity.href)
+            .map((entity) => (
+              <Link key={entity.id} href={entity.href!}>
+                <DestinationIcon id="records" /> {entity.label}
+              </Link>
+            ))}
+        </nav>
+      ) : null}
     </aside>
   );
 }
@@ -77,49 +172,65 @@ function ContextBlock({ context }: { readonly context: LivesMilestoneContext }) 
 function EraPanel({ panel }: { readonly panel: LivesMilestonePanel }) {
   const titleId = `lives-era-${panel.era.id}`;
   return (
-    <article className="lives-era" aria-labelledby={titleId}>
+    <article className="lives-era" id={`era-${panel.era.id}`} aria-labelledby={titleId}>
       <header className="lives-era__header">
-        <p className="lives-era__number" aria-hidden="true">
-          {panel.era.label}
+        <p className="lives-era__number">
+          <span>{panel.era.start}</span>
+          <span>–{panel.era.end}</span>
         </p>
         <div>
-          <p className="lives-era__eyebrow">Counted in {panel.decade.decade}</p>
-          <h3 id={titleId}>{panel.condition.label}</h3>
+          <p className="lives-era__eyebrow">United States · {livesMilestonePeriod(panel)}</p>
+          <h3 id={titleId}>{ERA_TITLES[panel.era.id]}</h3>
           <p className="lives-era__universe">
             Who this figure describes: {panel.condition.universe}.
           </p>
         </div>
       </header>
 
-      <dl className="lives-era__values">
-        {panel.values.map(({ lens, cell }) => {
-          const display = describeLivesCell(cell);
-          return (
-            <div key={lens} className="lives-era__value" data-lens={lens}>
-              <dt>
-                <span>{LIVES_LENS_LABELS[lens]}</span>
-                <small>{cell.definitionLabel}</small>
-              </dt>
-              <dd>
-                <span className="lives-era__estimate">{display.text}</span>
-                {display.detail ? <small>{display.detail}</small> : null}
-              </dd>
-              <span
-                className="lives-era__bar"
-                style={
-                  {
-                    '--lives-value': `${Math.max(0, Math.min(cell.estimate ?? 0, 100))}%`,
-                  } as React.CSSProperties
-                }
-                aria-hidden="true"
-              />
-            </div>
-          );
-        })}
-      </dl>
+      <section className="lives-era__comparison" aria-label={panel.condition.label}>
+        <h4 className="lives-era__measure">
+          <DestinationIcon id="data" /> {panel.condition.label}
+        </h4>
+        <dl className="lives-era__values">
+          {panel.values.map(({ lens, cell }) => {
+            const display = describeLivesCell(cell);
+            return (
+              <div key={lens} className="lives-era__value" data-lens={lens}>
+                <dt>
+                  <span>{LIVES_LENS_LABELS[lens]}</span>
+                  <small>{cell.definitionLabel}</small>
+                </dt>
+                <dd>
+                  <span className="lives-era__estimate">{display.text}</span>
+                  {display.detail ? <small>{display.detail}</small> : null}
+                </dd>
+                <span
+                  className="lives-era__bar"
+                  style={
+                    {
+                      '--lives-value': `${Math.max(0, Math.min(cell.estimate ?? 0, 100))}%`,
+                    } as React.CSSProperties
+                  }
+                  aria-hidden="true"
+                />
+              </div>
+            );
+          })}
+        </dl>
+        {panel.decade.decade >= 2010 &&
+        ['homeownership', 'high_school', 'unemployed'].includes(panel.condition.key) ? (
+          <p className="lives-era__definition">
+            In this measure, Black includes Hispanic origin; white excludes Hispanic origin.
+            Hispanic includes people of any race. These categories overlap. Each percentage uses the
+            group’s own denominator, not a share of one combined total.
+          </p>
+        ) : null}
+      </section>
 
       <div className="lives-era__evidence">
-        <p className="lives-era__source-label">Figure sources</p>
+        <p className="lives-era__source-label">
+          <DestinationIcon id="source" /> Figure sources
+        </p>
         <SourceLinks sources={panel.sources} />
       </div>
 
@@ -127,7 +238,9 @@ function EraPanel({ panel }: { readonly panel: LivesMilestonePanel }) {
 
       {panel.rules.length > 0 ? (
         <section className="lives-era__rules" aria-label={`Rules beginning in ${panel.era.label}`}>
-          <p className="lives-era__source-label">Rules that began in this stretch</p>
+          <p className="lives-era__source-label">
+            <DestinationIcon id="law" /> Rules that began in this stretch
+          </p>
           <ul>
             {panel.rules.map((rule) => (
               <li key={rule.id}>
@@ -165,8 +278,8 @@ export function LivesMilestoneExperience({
             }
             aria-current={choice.key === milestone.key ? 'page' : undefined}
           >
-            <span>{choice.shortLabel}</span>
-            <small>{choice.title}</small>
+            <DestinationIcon id={MILESTONE_ICONS[choice.key]} size="md" />
+            <span>{choice.title}</span>
           </Link>
         ))}
       </nav>
@@ -176,13 +289,30 @@ export function LivesMilestoneExperience({
         <h2>{milestone.title}</h2>
         <p>{milestone.question}</p>
         <p className="lives-milestone__orientation">
-          Each panel uses one documented year from its stretch. The lines stop at every panel
-          because definitions changed. This is comparison, not a claim of cause.
+          Start with an original historical object, then follow the national evidence across time.
+          Local examples keep their own dates and places. They do not represent every family or
+          explain a national rate.
         </p>
       </header>
 
+      <ArchiveReading milestone={milestone} />
+
       {panels.length > 0 ? (
         <div className="lives-milestone__eras">
+          <div className="lives-milestone__timeline-head">
+            <h3>Across the years</h3>
+            <p>
+              Each stop contains a sourced national comparison. Years without a publishable
+              comparison are not shown. Definitions and survey periods remain separate.
+            </p>
+            <nav className="lives-milestone__year-links" aria-label="Jump to a documented era">
+              {panels.map((panel) => (
+                <a key={panel.era.id} href={`#era-${panel.era.id}`}>
+                  <DestinationIcon id="time" /> {panel.era.label}
+                </a>
+              ))}
+            </nav>
+          </div>
           {panels.map((panel) => (
             <EraPanel key={panel.era.id} panel={panel} />
           ))}

@@ -73,6 +73,12 @@ Only chorded bindings are live on this class. `A` and `ESC` are the exceptions t
 
 ## 6. Content law
 
+### Documentary reading amendment, 18 September 2026
+
+Primary documents in Stories start open. Their date, quotation and source are part of the argument, not hidden receipts. Other contextual drawers remain reader-controlled. `ArchiveFigure` in the Room evidence kit is shared by article image blocks and Lives: preserve the complete frame, retain alt text, credit and caption, link to the source when supplied, and keep provenance readable if the image fails. Rights must be verified before authoring a new image. Existing article image contracts are unchanged; no rights claims are invented for legacy material.
+
+Catalog entries use the existing optional `DestinationIcon` for typed wayfinding. Metadata is readable 12px mono with wrapping, not clipped 10px decoration. Source-authored Stories images appear beside desktop rows and above phone rows; entries without images do not reserve a blank frame. The Memorial wall is excluded from these composition changes.
+
 - **Cards are real links in document order**, never divs with click handlers.
 - **Any index that can reach fifty rows adopts the Results rail windowing law.** `/history` currently renders 4,078 anchors in one document. Do not repeat that.
 - **Filters are GET links.** On `/records`, every filter is a link, every row is a link, every page step is an anchor: nothing on that surface requires JS.

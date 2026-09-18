@@ -78,6 +78,9 @@ const ARTICLE_MEDIA_IMG_SRC = [
   'https://upload.wikimedia.org',
   'https://commons.wikimedia.org',
   'https://thumb.wikimedia.org',
+  // Inspected documentary scans; image access only, never script/connect permissions.
+  'https://tile.loc.gov',
+  'https://www.archives.gov',
 ];
 
 /**
