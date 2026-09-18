@@ -113,14 +113,14 @@ test(
         passageId: school.id,
         bodyHash: school.bodyHash,
         model: 'fixture-space-v1',
-        vector: vector(1, 0),
+        vector: vector(0.8, 0.6),
       });
       await assert.rejects(
         attachPassageEmbedding(pool, {
           passageId: school.id,
           bodyHash: '0'.repeat(64),
           model: 'fixture-space-v1',
-          vector: vector(1, 0),
+          vector: vector(0.8, 0.6),
         }),
         /changed/,
       );
@@ -140,6 +140,42 @@ test(
           })
         ).hits.length,
         0,
+      );
+      const river = (
+        await retrieveEvidence(pool, { query: 'drainage permit', sourceItemIds: [itemIds[1]!] })
+      ).hits[0]!;
+      await attachPassageEmbedding(pool, {
+        passageId: river.id,
+        bodyHash: river.bodyHash,
+        model: 'fixture-space-v1',
+        vector: vector(1, 0),
+      });
+      const sourceFiltered = await retrieveEvidence(pool, {
+        query: 'unmatched',
+        sourceItemIds: [itemIds[0]!],
+        vector: { model: 'fixture-space-v1', values: vector(1, 0) },
+      });
+      assert.equal(sourceFiltered.hits.length, 1);
+      assert.equal(sourceFiltered.hits[0]?.sourceItemId, itemIds[0]);
+      assert.equal(
+        sourceFiltered.hits.some((hit) => hit.sourceItemId === itemIds[1]),
+        false,
+        'A closer vector from an unauthorized source item cannot enter the candidate set',
+      );
+      await pool.query(
+        "UPDATE evidence.retrieval_passages SET retention_expires_at='2000-01-01T00:00:00Z' WHERE id=$1",
+        [river.id],
+      );
+      assert.equal(
+        (
+          await retrieveEvidence(pool, {
+            query: 'unmatched',
+            sourceItemIds: [itemIds[1]!],
+            vector: { model: 'fixture-space-v1', values: vector(1, 0) },
+          })
+        ).hits.length,
+        0,
+        'Expired passages cannot enter exact vector candidates',
       );
       await assert.rejects(
         indexCaptureText(pool, {
@@ -305,4 +341,51 @@ test('query vectors reject coercion, malformed dimensions and unknown fields', (
     parseEvidenceQueryVector({ model: 'space-v1', values: vector(1, 0) }).model,
     'space-v1',
   );
+});
+
+test('approximate retrieval keeps every eligibility predicate inside the bounded ANN candidate query', async () => {
+  const queries: string[] = [];
+  const db = {
+    async query(text: string) {
+      queries.push(text);
+      if (text.includes('approximate_candidates')) return { rows: [{ id: 'p1' }] };
+      if (text.includes('SELECT passage.*')) {
+        return {
+          rows: [
+            {
+              id: 'p1',
+              capture_id: 'capture-1',
+              source_item_id: 'authorized-source',
+              source_url: 'https://example.test/source',
+              body: 'held-out passage',
+              start_offset: 0,
+              end_offset: 16,
+              body_hash: 'a'.repeat(64),
+              document_text_hash: 'b'.repeat(64),
+              parser_version: 'fixture-v1',
+            },
+          ],
+        };
+      }
+      return { rows: [] };
+    },
+  };
+  const result = await retrieveEvidence(db, {
+    query: 'held-out query',
+    sourceItemIds: ['authorized-source'],
+    vector: { model: 'held-out-model', values: vector(1, 0) },
+    approximate: true,
+  });
+  const semantic = queries.find((query) => query.includes('approximate_candidates'))!;
+  assert.match(semantic, /WITH approximate_candidates AS MATERIALIZED/);
+  assert.match(
+    semantic,
+    /withdrawn_at IS NULL AND retention_expires_at>clock_timestamp\(\).*source_item_id=ANY.*embedding_model=\$4 AND embedding_text_hash=body_hash/s,
+  );
+  assert.match(
+    semantic,
+    /ORDER BY embedding OPERATOR\(extensions\.<=>\) \$1::extensions\.vector LIMIT \$3\s*\) SELECT id FROM approximate_candidates ORDER BY distance,id/,
+  );
+  assert.equal(result.vectorMode, 'approximate');
+  assert.ok(result.limitations.some((limitation) => /ANN limit boundary/.test(limitation)));
 });

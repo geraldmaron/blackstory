@@ -60,6 +60,10 @@ tmp/
 .tmp/
 .local/
 artifacts/
+!packages/testing/src/gold-corpus/artifacts/
+packages/testing/src/gold-corpus/artifacts/*
+!packages/testing/src/gold-corpus/artifacts/evidence-retrieval-pilot-2026-09-18.json
+!packages/testing/src/gold-corpus/artifacts/evidence-retrieval-index-mechanics.json
 
 # scripts/dev-web.sh output (dev-web.log, dev-web.pid) — local-only, not *.log
 # scoped (directory name, not a file extension match).

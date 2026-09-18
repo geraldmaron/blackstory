@@ -200,8 +200,11 @@ export async function retrieveEvidence(
     const vector = vectorLiteral(input.vector.values);
     // A materialized candidate set provides the exact baseline without the HNSW planner path.
     const sql = input.approximate
-      ? `SELECT id FROM evidence.retrieval_passages WHERE ${where} AND embedding_model=$4 AND embedding_text_hash=body_hash
-          ORDER BY embedding OPERATOR(extensions.<=>) $1::extensions.vector,id LIMIT $3`
+      ? `WITH approximate_candidates AS MATERIALIZED (
+          SELECT id,embedding OPERATOR(extensions.<=>) $1::extensions.vector AS distance
+          FROM evidence.retrieval_passages WHERE ${where} AND embedding_model=$4 AND embedding_text_hash=body_hash
+          ORDER BY embedding OPERATOR(extensions.<=>) $1::extensions.vector LIMIT $3
+        ) SELECT id FROM approximate_candidates ORDER BY distance,id`
       : `WITH eligible AS MATERIALIZED (SELECT id,embedding FROM evidence.retrieval_passages WHERE ${where}
           AND embedding_model=$4 AND embedding_text_hash=body_hash)
           SELECT id FROM eligible ORDER BY embedding OPERATOR(extensions.<=>) $1::extensions.vector,id LIMIT $3`;
@@ -267,6 +270,7 @@ export async function retrieveEvidence(
       ...(input.approximate
         ? [
             'Filtered HNSW retrieval can miss neighbors; compare with exact mode on a held-out corpus.',
+            'Equal-distance candidates at the ANN limit boundary are not guaranteed to remain identical across runs.',
           ]
         : []),
     ],

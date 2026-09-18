@@ -17,24 +17,35 @@ import {
 import { sourceIdForUrl } from '../../packages/operator-cli/src/source-capture.ts';
 import type { QueryablePool } from '../../packages/operator-cli/src/model-invocation-log.ts';
 import {
+  compareHybridRetrievalTopK,
   runHybridRetrievalEval,
   type HybridQueryCategory,
   type HybridRetrievalEvalResult,
   type HybridRetrievalQuerySet,
 } from '../../packages/testing/src/gold-corpus/hybrid-retrieval-eval.ts';
 import {
+  evaluateHeldoutIdentityAndEdges,
+  verifyHeldoutQualityArtifacts,
+} from '../../packages/testing/src/gold-corpus/heldout-quality-eval.ts';
+import { evaluateEvidencePilotReceiptBudget } from '../../packages/testing/src/gold-corpus/evidence-retrieval-cost.ts';
+import { createDeterministicMockEvalProvider } from '../../packages/testing/src/gold-corpus/retrieval-embedding.ts';
+import {
   createOpenRouterEvaluationEmbeddingProvider,
   type OpenRouterEmbeddingUsage,
 } from './openrouter-evaluation-embedding-provider.ts';
 
 const PROVIDER = 'openrouter';
+const LOCAL_PROVIDER = 'deterministic-evaluation';
 const MODEL = 'openai/text-embedding-3-small';
+const LOCAL_MODEL = 'mock-deterministic-embedding';
 const DIMENSIONS = 768;
 const PRICE_USD_PER_MILLION_TEXT_TOKENS = 0.02;
 const PRICE_SOURCE = 'https://openrouter.ai/api/v1/embeddings/models';
 const PRICE_RETRIEVED_AT = '2026-09-18';
 const MAX_ALLOWED_COST_USD = 0.25;
 const EVALUATION_K = 5;
+const MIN_HNSW_PADDING_ROWS_PER_PARTITION = 1_000;
+const MAX_HNSW_PADDING_ROWS_PER_PARTITION = 25_000;
 
 type BlindDocument = {
   readonly id: string;
@@ -92,6 +103,13 @@ type IndexedPassage = {
   readonly body_hash: string;
 };
 
+type TemporarySource = {
+  readonly itemId: string;
+  readonly captureId: string;
+  readonly eventId: string;
+  readonly sourceId: string;
+};
+
 type SemanticExplainMode = 'exact' | 'approximate';
 
 type SemanticExplainPlan = {
@@ -146,6 +164,12 @@ function planDetails(plan: unknown): {
   };
 }
 
+function controlledQueryVector(): string {
+  return `[${Array.from({ length: DIMENSIONS }, (_, index) =>
+    Math.sin((index + 1) * 1.41421356237),
+  ).join(',')}]`;
+}
+
 function explainRecordingPool(
   pool: QueryablePool,
   plans: Map<SemanticExplainMode, SemanticExplainPlan>,
@@ -196,6 +220,137 @@ function readJson<T>(path: string): T {
 
 function readGold(path: string): GoldCorpus {
   return readJson<GoldCorpus>(path);
+}
+
+function optionalQualityEvaluation(args: readonly string[]): Record<string, unknown> {
+  const casesPath = option(args, '--quality-cases');
+  const predictionsPath = option(args, '--quality-predictions');
+  const goldPath = option(args, '--quality-gold');
+  const manifestPath = option(args, '--quality-freeze-manifest');
+  if (!casesPath && !predictionsPath && !goldPath && !manifestPath) {
+    return { status: 'not_run', reason: 'No held-out identity/edge artifacts were supplied.' };
+  }
+  if (!casesPath || !predictionsPath || !goldPath || !manifestPath) {
+    throw new Error(
+      '--quality-cases, --quality-predictions, --quality-gold, and --quality-freeze-manifest must be supplied together',
+    );
+  }
+  const verified = verifyHeldoutQualityArtifacts({
+    casesRaw: readFileSync(casesPath, 'utf8'),
+    predictionsRaw: readFileSync(predictionsPath, 'utf8'),
+    goldRaw: readFileSync(goldPath, 'utf8'),
+    manifest: readJson<unknown>(manifestPath),
+  });
+  return {
+    ...evaluateHeldoutIdentityAndEdges(verified),
+    integrity: verified.integrity,
+  };
+}
+
+async function persistTemporarySource(
+  pool: Parameters<typeof persistCapture>[0] & QueryablePool,
+  input: {
+    readonly prefix: string;
+    readonly documentId: string;
+    readonly publicSourceUrl: string;
+    readonly text: string;
+    readonly capturedAt: string;
+    readonly reviewedBy: string;
+  },
+): Promise<TemporarySource> {
+  const evaluationUrl = `https://${input.prefix}.example/${encodeURIComponent(input.documentId)}`;
+  const source = sourceIdForUrl(evaluationUrl);
+  if (!source) throw new Error(`Could not derive evaluation source for ${input.documentId}`);
+  const itemId = `src_item_${hash(evaluationUrl)}`;
+  const captureId = `${input.prefix}-${input.documentId}`;
+  const eventId = `${input.prefix}-event-${input.documentId}`;
+  const decision = {
+    sourceUrl: evaluationUrl,
+    allowTextRetention: true,
+    allowArchive: false,
+    sensitivity: 'public' as const,
+    reviewedBy: input.reviewedBy,
+    reviewedAt: new Date().toISOString(),
+    expiresAt: '2099-01-01T00:00:00.000Z',
+    basis: `Temporary local evaluation of public text from ${input.publicSourceUrl}`,
+  };
+  await persistCapture(
+    pool,
+    {
+      id: captureId,
+      sourceItemId: null,
+      contentHashAlgorithm: 'sha256',
+      contentHashDigest: hash(`${input.prefix}|${input.text}`),
+      parserVersion: 'heldout-public-text-v1',
+      snapshotMode: 'selective',
+      dedupOfCaptureId: null,
+      capturedAt: input.capturedAt,
+      extractedText: input.text,
+      storageObject: {
+        stored: 'inline-evaluation',
+        sourceUrl: evaluationUrl,
+        evaluationSourceUrl: input.publicSourceUrl,
+        preservationDecision: decision,
+        extractedTextHash: hash(input.text),
+      },
+    },
+    {
+      id: eventId,
+      sourceId: source.id,
+      adapterId: input.reviewedBy,
+      status: 'success',
+      httpStatus: 200,
+      detail: {
+        url: evaluationUrl,
+        finalUrl: evaluationUrl,
+        publicSourceUrl: input.publicSourceUrl,
+      },
+      occurredAt: input.capturedAt,
+    },
+  );
+  return { itemId, captureId, eventId, sourceId: source.id };
+}
+
+async function insertControlledHnswPadding(
+  pool: QueryablePool,
+  input: {
+    readonly captureId: string;
+    readonly sourceItemId: string;
+    readonly partition: 'included' | 'excluded';
+    readonly rowCount: number;
+    readonly embeddingModel: string;
+  },
+): Promise<void> {
+  await pool.query('DELETE FROM evidence.retrieval_passages WHERE source_item_id=$1', [
+    input.sourceItemId,
+  ]);
+  await pool.query(
+    `INSERT INTO evidence.retrieval_passages(
+       id,capture_id,source_item_id,parser_version,document_text_hash,ordinal,start_offset,end_offset,
+       body,body_hash,retention_decision,retention_expires_at,embedding,embedding_model,embedding_text_hash
+     )
+     SELECT
+       $1 || '-passage-' || row_number,$2,$3,'controlled-hnsw-padding-v1',md5($1),row_number-1,0,
+       char_length(body),body,md5($1 || ':' || row_number),
+       jsonb_build_object('evaluationOnly',true,'partition',$4::text),
+       '2099-01-01T00:00:00.000Z'::timestamptz,
+       ('[' || array_to_string(ARRAY(
+         SELECT sin(row_number * 0.61803398875 + dimension * 1.41421356237)::text
+         FROM generate_series(1,768) dimension
+       ),',') || ']')::extensions.vector,
+       $5,md5($1 || ':' || row_number)
+     FROM generate_series(1,$6) row_number
+     CROSS JOIN LATERAL (SELECT $7::text || ' ' || row_number AS body) text_value`,
+    [
+      `${input.captureId}-${input.partition}`,
+      input.captureId,
+      input.sourceItemId,
+      input.partition,
+      input.embeddingModel,
+      input.rowCount,
+      `controlled ${input.partition} HNSW padding`,
+    ],
+  );
 }
 
 function category(value: string): HybridQueryCategory {
@@ -401,25 +556,81 @@ function measuredMetrics(result: HybridRetrievalEvalResult | null) {
   };
 }
 
-function exactApproximateComparison(
-  exact: HybridRetrievalEvalResult,
-  approximate: HybridRetrievalEvalResult,
-): { meanRecallAgainstExact: number; identicalTopKRate: number } {
-  const approximateById = new Map(approximate.perQuery.map((result) => [result.queryId, result]));
-  let recall = 0;
-  let identical = 0;
-  for (const result of exact.perQuery) {
-    const other = approximateById.get(result.queryId);
-    if (!other) continue;
-    const expected = new Set(result.topIds);
-    const hits = other.topIds.filter((id) => expected.has(id)).length;
-    recall += hits / Math.max(1, expected.size);
-    if (JSON.stringify(result.topIds) === JSON.stringify(other.topIds)) identical += 1;
-  }
-  return {
-    meanRecallAgainstExact: recall / exact.queryCount,
-    identicalTopKRate: identical / exact.queryCount,
+async function cleanupTemporaryEvaluation(
+  pool: ReturnType<typeof getOpsPostgresPool>,
+  itemIds: readonly string[],
+  captureIds: readonly string[],
+  eventIds: readonly string[],
+  sourceIds: readonly string[],
+) {
+  const deletedPassages = await pool.query(
+    'DELETE FROM evidence.retrieval_passages WHERE source_item_id=ANY($1)',
+    [itemIds],
+  );
+  const deletedOrigins = await pool.query(
+    'DELETE FROM evidence.capture_origins WHERE source_item_id=ANY($1)',
+    [itemIds],
+  );
+  const deletedCaptures = await pool.query(
+    'DELETE FROM evidence.source_captures WHERE id=ANY($1)',
+    [captureIds],
+  );
+  const deletedEvents = await pool.query('DELETE FROM evidence.retrieval_events WHERE id=ANY($1)', [
+    eventIds,
+  ]);
+  const deletedItems = await pool.query('DELETE FROM evidence.source_items WHERE id=ANY($1)', [
+    itemIds,
+  ]);
+  const deletedSources = await pool.query(
+    'DELETE FROM evidence.evidence_sources WHERE id=ANY($1) AND NOT EXISTS (SELECT 1 FROM evidence.source_items item WHERE item.source_id=evidence.evidence_sources.id)',
+    [sourceIds],
+  );
+  // Remove synthetic rows from planner statistics as well as from the table.
+  await pool.query('ANALYZE evidence.retrieval_passages');
+  const remaining = await pool.query<{
+    remaining_passages: number;
+    remaining_origins: number;
+    remaining_captures: number;
+    remaining_events: number;
+    remaining_items: number;
+    remaining_sources: number;
+  }>(
+    `SELECT
+       (SELECT count(*)::int FROM evidence.retrieval_passages WHERE source_item_id=ANY($1)) AS remaining_passages,
+       (SELECT count(*)::int FROM evidence.capture_origins WHERE source_item_id=ANY($1)) AS remaining_origins,
+       (SELECT count(*)::int FROM evidence.source_captures WHERE id=ANY($2)) AS remaining_captures,
+       (SELECT count(*)::int FROM evidence.retrieval_events WHERE id=ANY($3)) AS remaining_events,
+       (SELECT count(*)::int FROM evidence.source_items WHERE id=ANY($1)) AS remaining_items,
+       (SELECT count(*)::int FROM evidence.evidence_sources WHERE id=ANY($4)) AS remaining_sources`,
+    [itemIds, captureIds, eventIds, sourceIds],
+  );
+  const remainingRows = remaining.rows[0];
+  if (!remainingRows) throw new Error('Cleanup verification returned no row');
+  const remainingTotal = Object.values(remainingRows).reduce((total, count) => total + count, 0);
+  const cleanup = {
+    status: remainingTotal === 0 ? 'completed' : 'failed_rows_remain',
+    plannerStatisticsRefreshed: true,
+    deletedRows: {
+      retrievalPassages: deletedPassages.rowCount ?? 0,
+      captureOrigins: deletedOrigins.rowCount ?? 0,
+      sourceCaptures: deletedCaptures.rowCount ?? 0,
+      retrievalEvents: deletedEvents.rowCount ?? 0,
+      sourceItems: deletedItems.rowCount ?? 0,
+      evidenceSources: deletedSources.rowCount ?? 0,
+    },
+    remainingRows: {
+      retrievalPassages: remainingRows.remaining_passages,
+      captureOrigins: remainingRows.remaining_origins,
+      sourceCaptures: remainingRows.remaining_captures,
+      retrievalEvents: remainingRows.remaining_events,
+      sourceItems: remainingRows.remaining_items,
+      evidenceSources: remainingRows.remaining_sources,
+    },
   };
+  if (remainingTotal !== 0) {
+    throw new Error(`Retrieval pilot cleanup left ${remainingTotal} temporary rows`);
+  }
+  return cleanup;
 }
 
 async function main(): Promise<void> {
@@ -427,6 +638,10 @@ async function main(): Promise<void> {
   const blindPath = requiredOption(args, '--blind');
   const goldPath = requiredOption(args, '--gold');
   const entailmentPredictionsPath = option(args, '--entailment-predictions');
+  const qualityCasesPath = option(args, '--quality-cases');
+  const qualityPredictionsPath = option(args, '--quality-predictions');
+  const qualityGoldPath = option(args, '--quality-gold');
+  const qualityFreezeManifestPath = option(args, '--quality-freeze-manifest');
   const outPath = option(args, '--out');
   if (outPath && existsSync(outPath)) throw new Error('The evaluation output path already exists');
   const embeddingProvider = requiredOption(args, '--embedding-provider');
@@ -434,18 +649,34 @@ async function main(): Promise<void> {
   const maxCostUsd = Number(requiredOption(args, '--max-cost-usd'));
   const priorReservedCostUsd = Number(option(args, '--prior-reserved-cost-usd') ?? '0');
   const priorProviderCalls = Number(option(args, '--prior-provider-calls') ?? '0');
+  const hnswPaddingRowsPerPartition = Number(
+    requiredOption(args, '--hnsw-padding-rows-per-partition'),
+  );
   if (!Number.isFinite(maxCostUsd) || maxCostUsd <= 0 || maxCostUsd > MAX_ALLOWED_COST_USD)
     throw new Error(`--max-cost-usd must be greater than zero and at most ${MAX_ALLOWED_COST_USD}`);
   if (!Number.isFinite(priorReservedCostUsd) || priorReservedCostUsd < 0)
     throw new Error('--prior-reserved-cost-usd must be a finite nonnegative number');
   if (!Number.isSafeInteger(priorProviderCalls) || priorProviderCalls < 0)
     throw new Error('--prior-provider-calls must be a nonnegative integer');
+  if (
+    !Number.isSafeInteger(hnswPaddingRowsPerPartition) ||
+    hnswPaddingRowsPerPartition < MIN_HNSW_PADDING_ROWS_PER_PARTITION ||
+    hnswPaddingRowsPerPartition > MAX_HNSW_PADDING_ROWS_PER_PARTITION
+  )
+    throw new Error(
+      `--hnsw-padding-rows-per-partition must be an integer from ${MIN_HNSW_PADDING_ROWS_PER_PARTITION} to ${MAX_HNSW_PADDING_ROWS_PER_PARTITION}`,
+    );
   if (priorReservedCostUsd > maxCostUsd)
     throw new Error('Prior embedding reservation already exceeds the total cost cap');
-  if (embeddingProvider !== PROVIDER)
-    throw new Error(`--embedding-provider must be ${PROVIDER} for this evaluation`);
-  if (embeddingModel !== MODEL)
-    throw new Error(`--embedding-model must be the evaluated model ${MODEL}`);
+  if (![PROVIDER, LOCAL_PROVIDER].includes(embeddingProvider))
+    throw new Error(`--embedding-provider must be ${PROVIDER} or ${LOCAL_PROVIDER}`);
+  if (
+    (embeddingProvider === PROVIDER && embeddingModel !== MODEL) ||
+    (embeddingProvider === LOCAL_PROVIDER && embeddingModel !== LOCAL_MODEL)
+  )
+    throw new Error(
+      `--embedding-model must match the selected provider (${MODEL} or ${LOCAL_MODEL})`,
+    );
   const connectionString = process.env.RESEARCH_TEST_DATABASE_URL;
   if (!connectionString) throw new Error('RESEARCH_TEST_DATABASE_URL is required');
   const databaseUrl = new URL(connectionString);
@@ -465,8 +696,15 @@ async function main(): Promise<void> {
         status: 'not_run',
         reason: 'No independently frozen --entailment-predictions artifact was supplied.',
       };
+  const heldoutQuality = optionalQualityEvaluation(args);
+  const excludedPaddingRows = Math.max(100, Math.ceil(hnswPaddingRowsPerPartition / 10));
 
   const prefix = `retrieval-pilot-${randomUUID()}`;
+  const deterministicPaddingModel = `${LOCAL_MODEL}:hnsw-padding:${prefix}`;
+  const semanticEmbeddingModel =
+    embeddingProvider === LOCAL_PROVIDER
+      ? deterministicPaddingModel
+      : `${embeddingModel}:heldout:${prefix}`;
   const pool = getOpsPostgresPool({ DATABASE_URL: connectionString });
   const semanticPlans = new Map<SemanticExplainMode, SemanticExplainPlan>();
   const retrievalPool = explainRecordingPool(pool, semanticPlans);
@@ -476,164 +714,242 @@ async function main(): Promise<void> {
   const sourceIds: string[] = [];
   const documentIdBySourceItemId = new Map<string, string>();
   let output: Record<string, unknown> | undefined;
+  let budgetGateFailed = false;
+  const failures: unknown[] = [];
   try {
     for (const document of blind.documents) {
-      const evaluationUrl = `https://${prefix}.example/${encodeURIComponent(document.id)}`;
-      const source = sourceIdForUrl(evaluationUrl);
-      if (!source) throw new Error(`Could not derive evaluation source for ${document.id}`);
-      const itemId = `src_item_${hash(evaluationUrl)}`;
-      const captureId = `${prefix}-${document.id}`;
-      const eventId = `${prefix}-event-${document.id}`;
-      const decision = {
-        sourceUrl: evaluationUrl,
-        allowTextRetention: true,
-        allowArchive: false,
-        sensitivity: 'public' as const,
+      const temporary = await persistTemporarySource(pool, {
+        prefix,
+        documentId: document.id,
+        publicSourceUrl: document.sourceUrl,
+        text: document.text,
+        capturedAt: blind.retrievedAt,
         reviewedBy: 'heldout-retrieval-pilot',
-        reviewedAt: new Date().toISOString(),
-        expiresAt: '2099-01-01T00:00:00.000Z',
-        basis: `Temporary local evaluation of public text from ${document.sourceUrl}`,
-      };
-      await persistCapture(
-        pool,
-        {
-          id: captureId,
-          sourceItemId: null,
-          contentHashAlgorithm: 'sha256',
-          contentHashDigest: hash(`${prefix}|${document.text}`),
-          parserVersion: 'heldout-public-text-v1',
-          snapshotMode: 'selective',
-          dedupOfCaptureId: null,
-          capturedAt: blind.retrievedAt,
-          extractedText: document.text,
-          storageObject: {
-            stored: 'inline-evaluation',
-            sourceUrl: evaluationUrl,
-            evaluationSourceUrl: document.sourceUrl,
-            preservationDecision: decision,
-            extractedTextHash: hash(document.text),
-          },
-        },
-        {
-          id: eventId,
-          sourceId: source.id,
-          adapterId: 'heldout-retrieval-pilot',
-          status: 'success',
-          httpStatus: 200,
-          detail: {
-            url: evaluationUrl,
-            finalUrl: evaluationUrl,
-            publicSourceUrl: document.sourceUrl,
-          },
-          occurredAt: blind.retrievedAt,
-        },
-      );
-      itemIds.push(itemId);
-      captureIds.push(captureId);
-      eventIds.push(eventId);
-      sourceIds.push(source.id);
-      documentIdBySourceItemId.set(itemId, document.id);
+      });
+      itemIds.push(temporary.itemId);
+      captureIds.push(temporary.captureId);
+      eventIds.push(temporary.eventId);
+      sourceIds.push(temporary.sourceId);
+      documentIdBySourceItemId.set(temporary.itemId, document.id);
     }
+    const documentItemIds = [...itemIds];
 
     const lexical = await evaluateMode(set, async (_queryId, query) => {
       const result = await retrieveEvidence(retrievalPool, {
         query,
         limit: EVALUATION_K,
-        sourceItemIds: itemIds,
+        sourceItemIds: documentItemIds,
       });
       return uniqueDocumentIds(result.hits, documentIdBySourceItemId);
     });
 
-    const apiKey = process.env.OPENROUTER_API_KEY?.trim();
-    if (!apiKey) throw new Error('OPENROUTER_API_KEY is required');
     let exact: HybridRetrievalEvalResult | null = null;
     let approximate: HybridRetrievalEvalResult | null = null;
-    let comparison: ReturnType<typeof exactApproximateComparison> | null = null;
+    let comparison: ReturnType<typeof compareHybridRetrievalTopK> | null = null;
     const passages = (
       await pool.query<IndexedPassage>(
         `SELECT id,source_item_id,body,body_hash FROM evidence.retrieval_passages
            WHERE source_item_id=ANY($1::text[]) ORDER BY source_item_id,ordinal`,
-        [itemIds],
+        [documentItemIds],
       )
     ).rows;
+    const paddingSources: TemporarySource[] = [];
+    for (const partition of ['included', 'excluded'] as const) {
+      const source = await persistTemporarySource(pool, {
+        prefix,
+        documentId: `hnsw-padding-${partition}`,
+        publicSourceUrl: 'https://example.invalid/controlled-hnsw-padding',
+        text: `Controlled ${partition} HNSW padding seed.`,
+        capturedAt: blind.retrievedAt,
+        reviewedBy: 'controlled-hnsw-index-mechanics',
+      });
+      itemIds.push(source.itemId);
+      captureIds.push(source.captureId);
+      eventIds.push(source.eventId);
+      sourceIds.push(source.sourceId);
+      paddingSources.push(source);
+    }
+    const includedPaddingSource = paddingSources[0]!;
+    const excludedPaddingSource = paddingSources[1]!;
+    await insertControlledHnswPadding(pool, {
+      captureId: includedPaddingSource.captureId,
+      sourceItemId: includedPaddingSource.itemId,
+      partition: 'included',
+      rowCount: hnswPaddingRowsPerPartition,
+      embeddingModel: deterministicPaddingModel,
+    });
+    await insertControlledHnswPadding(pool, {
+      captureId: excludedPaddingSource.captureId,
+      sourceItemId: excludedPaddingSource.itemId,
+      partition: 'excluded',
+      rowCount: excludedPaddingRows,
+      embeddingModel: `${deterministicPaddingModel}:excluded`,
+    });
+    await pool.query('ANALYZE evidence.retrieval_passages');
+    const preflightExplain = await pool.query<Record<string, unknown>>(
+      `EXPLAIN (ANALYZE, BUFFERS, FORMAT JSON)
+       WITH approximate_candidates AS MATERIALIZED (
+         SELECT id,embedding OPERATOR(extensions.<=>) $1::extensions.vector AS distance
+         FROM evidence.retrieval_passages
+         WHERE withdrawn_at IS NULL AND retention_expires_at>clock_timestamp()
+           AND ($2::text[] IS NULL OR source_item_id=ANY($2))
+           AND embedding_model=$4 AND embedding_text_hash=body_hash
+         ORDER BY embedding OPERATOR(extensions.<=>) $1::extensions.vector LIMIT $3
+       ) SELECT id FROM approximate_candidates ORDER BY distance,id`,
+      [controlledQueryVector(), null, EVALUATION_K * 4, deterministicPaddingModel],
+    );
+    const preflightPlan = preflightExplain.rows[0]?.['QUERY PLAN'];
+    if (!preflightPlan) throw new Error('Postgres returned no controlled HNSW preflight plan');
+    const naturalPreflightPlanDetails = planDetails(preflightPlan);
+    const forcedClient = await pool.connect();
+    let forcedPreflightPlan: unknown;
+    try {
+      await forcedClient.query('BEGIN');
+      await forcedClient.query('SET LOCAL enable_seqscan=off');
+      await forcedClient.query('SET LOCAL enable_bitmapscan=off');
+      const forcedExplain = await forcedClient.query<Record<string, unknown>>(
+        `EXPLAIN (ANALYZE, BUFFERS, FORMAT JSON)
+         WITH approximate_candidates AS MATERIALIZED (
+           SELECT id,embedding OPERATOR(extensions.<=>) $1::extensions.vector AS distance
+           FROM evidence.retrieval_passages
+           WHERE withdrawn_at IS NULL AND retention_expires_at>clock_timestamp()
+             AND ($2::text[] IS NULL OR source_item_id=ANY($2))
+             AND embedding_model=$4 AND embedding_text_hash=body_hash
+           ORDER BY embedding OPERATOR(extensions.<=>) $1::extensions.vector LIMIT $3
+         ) SELECT id FROM approximate_candidates ORDER BY distance,id`,
+        [controlledQueryVector(), null, EVALUATION_K * 4, deterministicPaddingModel],
+      );
+      forcedPreflightPlan = forcedExplain.rows[0]?.['QUERY PLAN'];
+    } finally {
+      await forcedClient.query('ROLLBACK').catch(() => undefined);
+      forcedClient.release();
+    }
+    if (!forcedPreflightPlan)
+      throw new Error('Postgres returned no forced controlled HNSW preflight plan');
+    const forcedPreflightPlanDetails = planDetails(forcedPreflightPlan);
+    if (!forcedPreflightPlanDetails.hnswIndexUsed) {
+      throw new Error(
+        `Controlled forced HNSW preflight did not execute retrieval_passages_vector_idx; nodes=${forcedPreflightPlanDetails.nodeTypes.join(',')} indexes=${forcedPreflightPlanDetails.indexNames.join(',')}`,
+      );
+    }
     const queryTexts = blind.retrievalCases.map((query) => query.query);
     const inputs = [...passages.map((passage) => passage.body), ...queryTexts];
-    // UTF-8 bytes are a conservative upper bound on text tokens, so this reservation is made
-    // before the provider call and cannot understate the listed per-token charge.
-    const reservedUpperBoundTokens = inputs.reduce(
+    // The UTF-8 byte count supplies a conservative pre-call expected-rate estimate at the listed
+    // text-token price. It does not cap or predict the provider's authoritative receipt.
+    const inputUtf8Bytes = inputs.reduce(
       (total, input) => total + Buffer.byteLength(input, 'utf8'),
       0,
     );
-    const currentRunReservedCostUsd =
-      (reservedUpperBoundTokens / 1_000_000) * PRICE_USD_PER_MILLION_TEXT_TOKENS;
-    const cumulativeReservedCostUsd = priorReservedCostUsd + currentRunReservedCostUsd;
-    if (cumulativeReservedCostUsd > maxCostUsd)
+    const expectedRateEstimateTokens = embeddingProvider === PROVIDER ? inputUtf8Bytes : 0;
+    const currentRunExpectedRateEstimateUsd =
+      embeddingProvider === PROVIDER
+        ? (expectedRateEstimateTokens / 1_000_000) * PRICE_USD_PER_MILLION_TEXT_TOKENS
+        : 0;
+    const cumulativePreCallBudgetedCostUsd =
+      priorReservedCostUsd + currentRunExpectedRateEstimateUsd;
+    if (cumulativePreCallBudgetedCostUsd > maxCostUsd)
       throw new Error(
-        `Cumulative embedding reservation $${cumulativeReservedCostUsd.toFixed(6)} exceeds cap $${maxCostUsd.toFixed(6)}`,
+        `Cumulative pre-call expected-rate estimate $${cumulativePreCallBudgetedCostUsd.toFixed(6)} exceeds budget $${maxCostUsd.toFixed(6)}`,
       );
 
     const providerUsage: { value: OpenRouterEmbeddingUsage | null } = { value: null };
-    const provider = createOpenRouterEvaluationEmbeddingProvider({
-      apiKey,
-      model: embeddingModel,
-      dimensions: DIMENSIONS,
-      onUsage: (usage) => {
-        providerUsage.value = usage;
-      },
-    });
+    const provider =
+      embeddingProvider === PROVIDER
+        ? createOpenRouterEvaluationEmbeddingProvider({
+            apiKey:
+              process.env.OPENROUTER_API_KEY?.trim() ||
+              (() => {
+                throw new Error('OPENROUTER_API_KEY is required after HNSW preflight');
+              })(),
+            model: embeddingModel,
+            dimensions: DIMENSIONS,
+            onUsage: (usage) => {
+              providerUsage.value = usage;
+            },
+          })
+        : createDeterministicMockEvalProvider(DIMENSIONS);
     const vectors = await provider.embed(inputs);
+    const providerReportedCostUsd = providerUsage.value?.costUsd ?? null;
+    const budgetGate = evaluateEvidencePilotReceiptBudget({
+      priorReservedCostUsd,
+      providerReportedCostUsd,
+      totalCostCapUsd: maxCostUsd,
+    });
+    budgetGateFailed = !budgetGate.passed;
     for (let index = 0; index < passages.length; index += 1) {
       const passage = passages[index]!;
       await attachPassageEmbedding(pool, {
         passageId: passage.id,
         bodyHash: passage.body_hash,
-        model: embeddingModel,
+        model: semanticEmbeddingModel,
         vector: vectors[index]!,
       });
     }
     const queryVectorById = new Map(
       blind.retrievalCases.map((query, index) => [query.id, vectors[passages.length + index]!]),
     );
-    const runVectorMode = (approximateMode: boolean) =>
-      evaluateMode(set, async (queryId, query) => {
-        const result = await retrieveEvidence(retrievalPool, {
-          query,
-          limit: EVALUATION_K,
-          sourceItemIds: itemIds,
-          vector: { model: embeddingModel, values: queryVectorById.get(queryId)! },
-          approximate: approximateMode,
+    const semanticSourceItemIds =
+      embeddingProvider === LOCAL_PROVIDER
+        ? [...documentItemIds, includedPaddingSource.itemId]
+        : documentItemIds;
+    const forcedEvaluationClient = await pool.connect();
+    try {
+      await forcedEvaluationClient.query('BEGIN');
+      await forcedEvaluationClient.query('SET LOCAL enable_seqscan=off');
+      await forcedEvaluationClient.query('SET LOCAL enable_bitmapscan=off');
+      const forcedRetrievalPool = explainRecordingPool(forcedEvaluationClient, semanticPlans);
+      const runVectorMode = (approximateMode: boolean) =>
+        evaluateMode(set, async (queryId, query) => {
+          const result = await retrieveEvidence(forcedRetrievalPool, {
+            query,
+            limit: EVALUATION_K,
+            sourceItemIds: semanticSourceItemIds,
+            vector: { model: semanticEmbeddingModel, values: queryVectorById.get(queryId)! },
+            approximate: approximateMode,
+          });
+          return uniqueDocumentIds(result.hits, documentIdBySourceItemId);
         });
-        return uniqueDocumentIds(result.hits, documentIdBySourceItemId);
-      });
-    exact = await runVectorMode(false);
-    approximate = await runVectorMode(true);
-    comparison = exactApproximateComparison(exact, approximate);
+      exact = await runVectorMode(false);
+      approximate = await runVectorMode(true);
+    } finally {
+      await forcedEvaluationClient.query('ROLLBACK').catch(() => undefined);
+      forcedEvaluationClient.release();
+    }
+    comparison = compareHybridRetrievalTopK(exact, approximate);
     const embedding: Record<string, unknown> = {
-      status: 'completed',
+      status: budgetGateFailed ? `failed_${budgetGate.failureReason}` : 'completed',
       provider: embeddingProvider,
       requestedModel: embeddingModel,
-      responseModel: providerUsage.value?.responseModel ?? null,
+      responseModel:
+        embeddingProvider === PROVIDER ? (providerUsage.value?.responseModel ?? null) : LOCAL_MODEL,
       dimensions: DIMENSIONS,
-      providerCalls: 1,
+      providerCalls: embeddingProvider === PROVIDER ? 1 : 0,
       priorProviderCalls,
-      totalProviderCalls: priorProviderCalls + 1,
+      totalProviderCalls: priorProviderCalls + (embeddingProvider === PROVIDER ? 1 : 0),
       embeddedPassageCount: passages.length,
       embeddedQueryCount: queryTexts.length,
-      reservedUpperBoundTokens,
-      currentRunReservedCostUsd,
+      inputUtf8Bytes,
+      expectedRateEstimateTokens,
+      currentRunExpectedRateEstimateUsd,
       priorRunReservedCostUsd: priorReservedCostUsd,
-      cumulativeReservedCostUsd,
+      cumulativePreCallBudgetedCostUsd,
+      preCallEstimateLimitation:
+        'UTF-8 bytes priced at the listed text-token rate are a pre-call expected-rate budget estimate, not an external billing cap. The provider receipt is authoritative when available.',
       totalCostCapUsd: maxCostUsd,
       providerReportedPromptTokens: providerUsage.value?.promptTokens ?? null,
       providerReportedTotalTokens: providerUsage.value?.totalTokens ?? null,
-      providerReportedCostUsd: providerUsage.value?.costUsd ?? null,
+      providerReportedCostUsd,
+      budgetGate,
       accountingLimitation:
-        providerUsage.value?.costUsd === null
-          ? 'OpenRouter did not return usage.cost; actual provider charge is unknown.'
-          : 'OpenRouter usage.cost is a provider-reported USD-denominated credit charge.',
-      priceUsdPerMillionTextTokens: PRICE_USD_PER_MILLION_TEXT_TOKENS,
-      priceSource: PRICE_SOURCE,
-      priceRetrievedAt: PRICE_RETRIEVED_AT,
+        embeddingProvider === LOCAL_PROVIDER
+          ? 'Local deterministic evaluation provider made no network call and incurred no provider charge.'
+          : providerUsage.value?.costUsd === null
+            ? 'OpenRouter did not return usage.cost; actual provider charge is unknown.'
+            : 'OpenRouter usage.cost is a provider-reported USD-denominated credit charge.',
+      priceUsdPerMillionTextTokens:
+        embeddingProvider === PROVIDER ? PRICE_USD_PER_MILLION_TEXT_TOKENS : null,
+      priceSource: embeddingProvider === PROVIDER ? PRICE_SOURCE : null,
+      priceRetrievedAt: embeddingProvider === PROVIDER ? PRICE_RETRIEVED_AT : null,
     };
 
     output = {
@@ -650,6 +966,27 @@ async function main(): Promise<void> {
               canonicalJsonSha256: hash(JSON.stringify(entailmentPredictions)),
             }
           : null,
+        heldoutIdentityAndEdges:
+          qualityCasesPath && qualityPredictionsPath && qualityGoldPath && qualityFreezeManifestPath
+            ? {
+                cases: {
+                  path: qualityCasesPath,
+                  fileByteSha256: hash(readFileSync(qualityCasesPath, 'utf8')),
+                },
+                predictions: {
+                  path: qualityPredictionsPath,
+                  fileByteSha256: hash(readFileSync(qualityPredictionsPath, 'utf8')),
+                },
+                gold: {
+                  path: qualityGoldPath,
+                  fileByteSha256: hash(readFileSync(qualityGoldPath, 'utf8')),
+                },
+                freezeManifest: {
+                  path: qualityFreezeManifestPath,
+                  fileByteSha256: hash(readFileSync(qualityFreezeManifestPath, 'utf8')),
+                },
+              }
+            : null,
       },
       corpus: {
         documentCount: blind.documents.length,
@@ -661,6 +998,34 @@ async function main(): Promise<void> {
         database: 'local temporary evidence rows',
         k: EVALUATION_K,
         lexicalVectorFusion: 'reciprocal rank fusion',
+        controlledHnswMechanics: {
+          status: 'completed',
+          includedPaddingRows: hnswPaddingRowsPerPartition,
+          excludedPaddingRows,
+          filter:
+            'A run-unique deterministic mechanics namespace includes only the intended padding partition and excludes existing/private rows and the wrong-model partition; semantic retrieval also uses an explicit held-out source-item allowlist.',
+          interpretation:
+            'The natural padding preflight records the default plan, and the forced padding preflight proves HNSW execution mechanics. The filtered semantic query records its separate plan under transaction-local controls and may use the source-item B-tree instead; synthetic rows do not represent natural distractors or production-scale research quality.',
+          embeddingInterpretation:
+            embeddingProvider === LOCAL_PROVIDER
+              ? 'Deterministic document and included-padding vectors share a mechanics-only namespace and are not semantically meaningful.'
+              : 'Provider vectors are isolated to held-out documents; the deterministic padding namespace is used only for the separate mechanics preflight.',
+          semanticSourceScope:
+            embeddingProvider === LOCAL_PROVIDER
+              ? 'Held-out document source items plus the intentionally included deterministic padding source.'
+              : 'Held-out document source items only.',
+          naturalPlannerPreflight: {
+            statement: 'EXPLAIN (ANALYZE, BUFFERS, FORMAT JSON)',
+            setting: 'default local planner settings',
+            ...naturalPreflightPlanDetails,
+          },
+          forcedIndexMechanicsPreflight: {
+            statement: 'EXPLAIN (ANALYZE, BUFFERS, FORMAT JSON)',
+            setting:
+              'SET LOCAL enable_seqscan=off; SET LOCAL enable_bitmapscan=off in an isolated rolled-back transaction',
+            ...forcedPreflightPlanDetails,
+          },
+        },
       },
       cost: embedding,
       lexical: measuredMetrics(lexical),
@@ -668,10 +1033,15 @@ async function main(): Promise<void> {
       approximateVector: measuredMetrics(approximate),
       approximateAgainstExact: comparison,
       semanticQueryPlans: {
+        setting:
+          'SET LOCAL enable_seqscan=off; SET LOCAL enable_bitmapscan=off in an isolated rolled-back transaction',
+        interpretation:
+          'These are the plans PostgreSQL chose for source-filtered semantic retrieval under the recorded transaction-local controls. HNSW is not required here because the source-item B-tree remains eligible; HNSW execution is asserted only by the separate forced padding preflight.',
         exact: semanticPlans.get('exact') ?? null,
         approximate: semanticPlans.get('approximate') ?? null,
       },
       entailment,
+      heldoutIdentityAndEdges: heldoutQuality,
       uncertainty: {
         calibrationStatus: 'unavailable',
         probabilityClaimSupported: false,
@@ -680,37 +1050,56 @@ async function main(): Promise<void> {
       },
       limitations: [
         'This is a bounded held-out pilot; its sample size does not support population-level quality claims.',
-        'Temporary local rows exercise production SQL and fusion code but do not reproduce the live corpus size, HNSW planner choice, or production filters.',
-        'EXPLAIN ANALYZE records planner execution for this tiny temporary corpus only; it cannot prove that the live corpus selects or exercises HNSW.',
+        'Temporary local rows exercise production SQL and isolation filters but do not reproduce production corpus composition or natural distractors; source-item filtering is covered separately by the integration regression.',
+        'Controlled deterministic padding proves HNSW selection and execution only in the separate forced mechanics preflight. A source-filtered semantic query may legitimately use the source-item B-tree, and neither plan is representative-scale retrieval-quality evidence.',
         'Retrieval relevance does not establish identity, entailment, relationship truth, or source independence.',
-        'Forbidden retrieval results are candidate-level false positives, not measured identity merges; resolver false-merge behavior remains unmeasured.',
+        'Forbidden retrieval results remain candidate-level false positives; false merges and unsupported edge assertions are measured separately on categorical held-out cases when their independent gold file is supplied.',
         'Entailment labels are curated provisional judgments rather than consensus or human-adjudicated gold labels.',
       ],
     };
+  } catch (error) {
+    failures.push(error);
   } finally {
-    await pool.query('DELETE FROM evidence.retrieval_passages WHERE source_item_id=ANY($1)', [
-      itemIds,
-    ]);
-    await pool.query('DELETE FROM evidence.capture_origins WHERE source_item_id=ANY($1)', [
-      itemIds,
-    ]);
-    await pool.query('DELETE FROM evidence.source_captures WHERE id=ANY($1)', [captureIds]);
-    await pool.query('DELETE FROM evidence.retrieval_events WHERE id=ANY($1)', [eventIds]);
-    await pool.query('DELETE FROM evidence.source_items WHERE id=ANY($1)', [itemIds]);
-    await pool.query(
-      'DELETE FROM evidence.evidence_sources WHERE id=ANY($1) AND NOT EXISTS (SELECT 1 FROM evidence.source_items item WHERE item.source_id=evidence.evidence_sources.id)',
-      [sourceIds],
+    try {
+      const cleanup = await cleanupTemporaryEvaluation(
+        pool,
+        itemIds,
+        captureIds,
+        eventIds,
+        sourceIds,
+      );
+      if (output) output['cleanup'] = cleanup;
+    } catch (error) {
+      failures.push(error);
+    }
+    try {
+      await pool.end();
+    } catch (error) {
+      failures.push(error);
+    }
+  }
+  if (failures.length === 1) throw failures[0];
+  if (failures.length > 1) {
+    throw new AggregateError(
+      failures,
+      'Evaluation and cleanup failed; inspect each recorded cause',
     );
-    await pool.end();
   }
 
   if (!output) throw new Error('Retrieval pilot produced no evaluation artifact');
   const serialized = `${JSON.stringify(output, null, 2)}\n`;
   if (outPath) writeFileSync(outPath, serialized, { encoding: 'utf8', flag: 'wx' });
   else process.stdout.write(serialized);
+  if (budgetGateFailed) {
+    console.error('The evidence-pilot budget gate failed; the reason is recorded in the output.');
+    process.exitCode = 1;
+  }
 }
 
 main().catch((error: unknown) => {
-  console.error(error instanceof Error ? error.message : String(error));
+  const causes: readonly unknown[] = error instanceof AggregateError ? error.errors : [error];
+  for (const cause of causes) {
+    console.error(cause instanceof Error ? cause.message : String(cause));
+  }
   process.exitCode = 1;
 });

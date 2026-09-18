@@ -1,0 +1,1686 @@
+{
+  "schemaVersion": "evidence-retrieval-pilot.v1",
+  "benchmarkVersion": "heldout-research-eval-v1-blind:heldout-research-eval-v1-curated",
+  "evaluatedAt": "2026-09-18T21:27:48.047Z",
+  "inputProvenance": {
+    "blind": {
+      "path": "packages/testing/src/gold-corpus/fixtures/heldout-evidence-retrieval-corpus.v1.json",
+      "fileByteSha256": "6a193e805e0713db4575bff8738879a66e7b4c8128a88c36386a302de1c34970"
+    },
+    "gold": {
+      "path": "packages/testing/src/gold-corpus/fixtures/heldout-evidence-retrieval-gold.v1.json",
+      "fileByteSha256": "085c4a5120d47daa9fb0a640e8e6ef6ce0d772833fd3f50a564403e7dee8b723"
+    },
+    "entailmentPredictions": {
+      "path": "packages/testing/src/gold-corpus/fixtures/heldout-entailment-predictions.v1.json",
+      "fileByteSha256": "3c64a1c3ac5587bb8917655a24b21ba510a8bf5942f3aa2dcf94ecb02c4b99bc",
+      "canonicalJsonSha256": "fff08c8b8c96732bbebbad56b2ccfe5e9af1ada9557a5fe8c3faa18255afc00a"
+    },
+    "heldoutIdentityAndEdges": {
+      "cases": {
+        "path": "packages/testing/src/gold-corpus/fixtures/heldout-identity-edge-corpus.v1.json",
+        "fileByteSha256": "8581645419a2eaad1c5312916f6ab02a851ef10197fa05c0369dcbc572e33d3e"
+      },
+      "predictions": {
+        "path": "packages/testing/src/gold-corpus/fixtures/heldout-identity-edge-predictions.v1.json",
+        "fileByteSha256": "a1a3c029d44309a35ebb6b05f72ed356b323e181d95dfe7cb0dd19eb091f0bfb"
+      },
+      "gold": {
+        "path": "packages/testing/src/gold-corpus/fixtures/heldout-identity-edge-gold.v1.json",
+        "fileByteSha256": "53dffe4d12f3c893f2b7feed7757f26ace75b891bae6cd1730bce879aed4ddae"
+      },
+      "freezeManifest": {
+        "path": "packages/testing/src/gold-corpus/fixtures/heldout-identity-edge-freeze.v1.json",
+        "fileByteSha256": "b818d4b073bf3cb5dd340a05841580d23550ad01c9c3a44f57f23e6b000189f1"
+      }
+    }
+  },
+  "corpus": {
+    "documentCount": 6,
+    "queryCount": 20,
+    "sourceUrls": [
+      "https://www.nps.gov/people/mary-fields.htm",
+      "https://www.nps.gov/people/will-garvin.htm",
+      "https://www.nps.gov/people/nick-bransford.htm",
+      "https://www.nps.gov/people/mat-bransford.htm",
+      "https://www.epa.gov/wetlands/what-wetland",
+      "https://www.epa.gov/wetlands/how-do-wetlands-function-and-why-are-they-valuable"
+    ]
+  },
+  "execution": {
+    "implementation": "packages/operator-cli/src/evidence-retrieval.ts#retrieveEvidence",
+    "database": "local temporary evidence rows",
+    "k": 5,
+    "lexicalVectorFusion": "reciprocal rank fusion",
+    "controlledHnswMechanics": {
+      "status": "completed",
+      "includedPaddingRows": 1000,
+      "excludedPaddingRows": 100,
+      "filter": "A run-unique deterministic mechanics namespace includes only the intended padding partition and excludes existing/private rows and the wrong-model partition; semantic retrieval also uses an explicit held-out source-item allowlist.",
+      "interpretation": "The natural padding preflight records the default plan, and the forced padding preflight proves HNSW execution mechanics. The filtered semantic query records its separate plan under transaction-local controls and may use the source-item B-tree instead; synthetic rows do not represent natural distractors or production-scale research quality.",
+      "embeddingInterpretation": "Deterministic document and included-padding vectors share a mechanics-only namespace and are not semantically meaningful.",
+      "semanticSourceScope": "Held-out document source items plus the intentionally included deterministic padding source.",
+      "naturalPlannerPreflight": {
+        "statement": "EXPLAIN (ANALYZE, BUFFERS, FORMAT JSON)",
+        "setting": "default local planner settings",
+        "hnswIndexSelected": false,
+        "hnswIndexUsed": false,
+        "hnswActualLoops": 0,
+        "nodeTypes": [
+          "Incremental Sort",
+          "Limit",
+          "Sort",
+          "Seq Scan",
+          "CTE Scan"
+        ],
+        "indexNames": []
+      },
+      "forcedIndexMechanicsPreflight": {
+        "statement": "EXPLAIN (ANALYZE, BUFFERS, FORMAT JSON)",
+        "setting": "SET LOCAL enable_seqscan=off; SET LOCAL enable_bitmapscan=off in an isolated rolled-back transaction",
+        "hnswIndexSelected": true,
+        "hnswIndexUsed": true,
+        "hnswActualLoops": 1,
+        "nodeTypes": [
+          "Incremental Sort",
+          "Limit",
+          "Index Scan",
+          "CTE Scan"
+        ],
+        "indexNames": [
+          "retrieval_passages_vector_idx"
+        ]
+      }
+    }
+  },
+  "cost": {
+    "status": "completed",
+    "provider": "deterministic-evaluation",
+    "requestedModel": "mock-deterministic-embedding",
+    "responseModel": "mock-deterministic-embedding",
+    "dimensions": 768,
+    "providerCalls": 0,
+    "priorProviderCalls": 3,
+    "totalProviderCalls": 3,
+    "embeddedPassageCount": 7,
+    "embeddedQueryCount": 20,
+    "inputUtf8Bytes": 10636,
+    "expectedRateEstimateTokens": 0,
+    "currentRunExpectedRateEstimateUsd": 0,
+    "priorRunReservedCostUsd": 0.00255264,
+    "cumulativePreCallBudgetedCostUsd": 0.00255264,
+    "preCallEstimateLimitation": "UTF-8 bytes priced at the listed text-token rate are a pre-call expected-rate budget estimate, not an external billing cap. The provider receipt is authoritative when available.",
+    "totalCostCapUsd": 0.25,
+    "providerReportedPromptTokens": null,
+    "providerReportedTotalTokens": null,
+    "providerReportedCostUsd": null,
+    "budgetGate": {
+      "passed": true,
+      "reservationPassed": true,
+      "providerReceiptAvailable": false,
+      "cumulativeProviderReportedCostUsd": null,
+      "failureReason": null
+    },
+    "accountingLimitation": "Local deterministic evaluation provider made no network call and incurred no provider charge.",
+    "priceUsdPerMillionTextTokens": null,
+    "priceSource": null,
+    "priceRetrievedAt": null
+  },
+  "lexical": {
+    "querySetVersion": "heldout-research-eval-v1-blind:heldout-research-eval-v1-curated",
+    "fusionWeightsVersion": "production-evidence-rrf-v1",
+    "fusionWeights": {
+      "structured": 1,
+      "vector": 1
+    },
+    "queryCount": 20,
+    "meanPrecisionAt5": 0.09,
+    "meanRecallAt5": 0.45,
+    "meanReciprocalRank": 0.425,
+    "forbiddenResultRateAt5": 0.1,
+    "byCategory": {
+      "name_lookup": {
+        "queryCount": 4,
+        "meanPrecisionAt5": 0.2,
+        "meanRecallAt5": 1,
+        "meanReciprocalRank": 0.875,
+        "forbiddenResultRateAt5": 0.5
+      },
+      "alias": {
+        "queryCount": 4,
+        "meanPrecisionAt5": 0.2,
+        "meanRecallAt5": 1,
+        "meanReciprocalRank": 1,
+        "forbiddenResultRateAt5": 0
+      },
+      "ocr": {
+        "queryCount": 2,
+        "meanPrecisionAt5": 0,
+        "meanRecallAt5": 0,
+        "meanReciprocalRank": 0,
+        "forbiddenResultRateAt5": 0
+      },
+      "descriptive": {
+        "queryCount": 3,
+        "meanPrecisionAt5": 0,
+        "meanRecallAt5": 0,
+        "meanReciprocalRank": 0,
+        "forbiddenResultRateAt5": 0
+      },
+      "missed_entity": {
+        "queryCount": 3,
+        "meanPrecisionAt5": 0,
+        "meanRecallAt5": 0,
+        "meanReciprocalRank": 0,
+        "forbiddenResultRateAt5": 0
+      },
+      "relationship": {
+        "queryCount": 3,
+        "meanPrecisionAt5": 0.06666666666666667,
+        "meanRecallAt5": 0.3333333333333333,
+        "meanReciprocalRank": 0.3333333333333333,
+        "forbiddenResultRateAt5": 0
+      },
+      "path": {
+        "queryCount": 1,
+        "meanPrecisionAt5": 0,
+        "meanRecallAt5": 0,
+        "meanReciprocalRank": 0,
+        "forbiddenResultRateAt5": 0
+      }
+    },
+    "perQuery": [
+      {
+        "queryId": "r01",
+        "category": "name_lookup",
+        "precisionAt5": 0.2,
+        "recallAt5": 1,
+        "reciprocalRank": 1,
+        "forbiddenResultCount": 0,
+        "topIds": [
+          "nps-mary-fields"
+        ]
+      },
+      {
+        "queryId": "r02",
+        "category": "name_lookup",
+        "precisionAt5": 0.2,
+        "recallAt5": 1,
+        "reciprocalRank": 1,
+        "forbiddenResultCount": 0,
+        "topIds": [
+          "nps-will-garvin",
+          "nps-nick-bransford"
+        ]
+      },
+      {
+        "queryId": "r03",
+        "category": "name_lookup",
+        "precisionAt5": 0.2,
+        "recallAt5": 1,
+        "reciprocalRank": 0.5,
+        "forbiddenResultCount": 1,
+        "topIds": [
+          "nps-will-garvin",
+          "nps-nick-bransford",
+          "nps-mat-bransford"
+        ]
+      },
+      {
+        "queryId": "r04",
+        "category": "name_lookup",
+        "precisionAt5": 0.2,
+        "recallAt5": 1,
+        "reciprocalRank": 1,
+        "forbiddenResultCount": 1,
+        "topIds": [
+          "nps-mat-bransford",
+          "nps-nick-bransford"
+        ]
+      },
+      {
+        "queryId": "r05",
+        "category": "alias",
+        "precisionAt5": 0.2,
+        "recallAt5": 1,
+        "reciprocalRank": 1,
+        "forbiddenResultCount": 0,
+        "topIds": [
+          "nps-nick-bransford"
+        ]
+      },
+      {
+        "queryId": "r06",
+        "category": "alias",
+        "precisionAt5": 0.2,
+        "recallAt5": 1,
+        "reciprocalRank": 1,
+        "forbiddenResultCount": 0,
+        "topIds": [
+          "nps-mat-bransford"
+        ]
+      },
+      {
+        "queryId": "r07",
+        "category": "alias",
+        "precisionAt5": 0.2,
+        "recallAt5": 1,
+        "reciprocalRank": 1,
+        "forbiddenResultCount": 0,
+        "topIds": [
+          "nps-will-garvin"
+        ]
+      },
+      {
+        "queryId": "r08",
+        "category": "alias",
+        "precisionAt5": 0.2,
+        "recallAt5": 1,
+        "reciprocalRank": 1,
+        "forbiddenResultCount": 0,
+        "topIds": [
+          "nps-mary-fields"
+        ]
+      },
+      {
+        "queryId": "r09",
+        "category": "ocr",
+        "precisionAt5": 0,
+        "recallAt5": 0,
+        "reciprocalRank": 0,
+        "forbiddenResultCount": 0,
+        "topIds": []
+      },
+      {
+        "queryId": "r10",
+        "category": "ocr",
+        "precisionAt5": 0,
+        "recallAt5": 0,
+        "reciprocalRank": 0,
+        "forbiddenResultCount": 0,
+        "topIds": []
+      },
+      {
+        "queryId": "r11",
+        "category": "descriptive",
+        "precisionAt5": 0,
+        "recallAt5": 0,
+        "reciprocalRank": 0,
+        "forbiddenResultCount": 0,
+        "topIds": []
+      },
+      {
+        "queryId": "r12",
+        "category": "missed_entity",
+        "precisionAt5": 0,
+        "recallAt5": 0,
+        "reciprocalRank": 0,
+        "forbiddenResultCount": 0,
+        "topIds": []
+      },
+      {
+        "queryId": "r13",
+        "category": "missed_entity",
+        "precisionAt5": 0,
+        "recallAt5": 0,
+        "reciprocalRank": 0,
+        "forbiddenResultCount": 0,
+        "topIds": []
+      },
+      {
+        "queryId": "r14",
+        "category": "relationship",
+        "precisionAt5": 0.2,
+        "recallAt5": 1,
+        "reciprocalRank": 1,
+        "forbiddenResultCount": 0,
+        "topIds": [
+          "nps-mat-bransford"
+        ]
+      },
+      {
+        "queryId": "r15",
+        "category": "relationship",
+        "precisionAt5": 0,
+        "recallAt5": 0,
+        "reciprocalRank": 0,
+        "forbiddenResultCount": 0,
+        "topIds": []
+      },
+      {
+        "queryId": "r16",
+        "category": "relationship",
+        "precisionAt5": 0,
+        "recallAt5": 0,
+        "reciprocalRank": 0,
+        "forbiddenResultCount": 0,
+        "topIds": []
+      },
+      {
+        "queryId": "r17",
+        "category": "path",
+        "precisionAt5": 0,
+        "recallAt5": 0,
+        "reciprocalRank": 0,
+        "forbiddenResultCount": 0,
+        "topIds": []
+      },
+      {
+        "queryId": "r18",
+        "category": "descriptive",
+        "precisionAt5": 0,
+        "recallAt5": 0,
+        "reciprocalRank": 0,
+        "forbiddenResultCount": 0,
+        "topIds": []
+      },
+      {
+        "queryId": "r19",
+        "category": "descriptive",
+        "precisionAt5": 0,
+        "recallAt5": 0,
+        "reciprocalRank": 0,
+        "forbiddenResultCount": 0,
+        "topIds": []
+      },
+      {
+        "queryId": "r20",
+        "category": "missed_entity",
+        "precisionAt5": 0,
+        "recallAt5": 0,
+        "reciprocalRank": 0,
+        "forbiddenResultCount": 0,
+        "topIds": []
+      }
+    ],
+    "qualityAdmission": "not_evaluated"
+  },
+  "exactVector": {
+    "querySetVersion": "heldout-research-eval-v1-blind:heldout-research-eval-v1-curated",
+    "fusionWeightsVersion": "production-evidence-rrf-v1",
+    "fusionWeights": {
+      "structured": 1,
+      "vector": 1
+    },
+    "queryCount": 20,
+    "meanPrecisionAt5": 0.10999999999999999,
+    "meanRecallAt5": 0.55,
+    "meanReciprocalRank": 0.525,
+    "forbiddenResultRateAt5": 0.15,
+    "byCategory": {
+      "name_lookup": {
+        "queryCount": 4,
+        "meanPrecisionAt5": 0.2,
+        "meanRecallAt5": 1,
+        "meanReciprocalRank": 0.875,
+        "forbiddenResultRateAt5": 0.5
+      },
+      "alias": {
+        "queryCount": 4,
+        "meanPrecisionAt5": 0.2,
+        "meanRecallAt5": 1,
+        "meanReciprocalRank": 1,
+        "forbiddenResultRateAt5": 0
+      },
+      "ocr": {
+        "queryCount": 2,
+        "meanPrecisionAt5": 0,
+        "meanRecallAt5": 0,
+        "meanReciprocalRank": 0,
+        "forbiddenResultRateAt5": 0.5
+      },
+      "descriptive": {
+        "queryCount": 3,
+        "meanPrecisionAt5": 0,
+        "meanRecallAt5": 0,
+        "meanReciprocalRank": 0,
+        "forbiddenResultRateAt5": 0
+      },
+      "missed_entity": {
+        "queryCount": 3,
+        "meanPrecisionAt5": 0.06666666666666667,
+        "meanRecallAt5": 0.3333333333333333,
+        "meanReciprocalRank": 0.3333333333333333,
+        "forbiddenResultRateAt5": 0
+      },
+      "relationship": {
+        "queryCount": 3,
+        "meanPrecisionAt5": 0.13333333333333333,
+        "meanRecallAt5": 0.6666666666666666,
+        "meanReciprocalRank": 0.6666666666666666,
+        "forbiddenResultRateAt5": 0
+      },
+      "path": {
+        "queryCount": 1,
+        "meanPrecisionAt5": 0,
+        "meanRecallAt5": 0,
+        "meanReciprocalRank": 0,
+        "forbiddenResultRateAt5": 0
+      }
+    },
+    "perQuery": [
+      {
+        "queryId": "r01",
+        "category": "name_lookup",
+        "precisionAt5": 0.2,
+        "recallAt5": 1,
+        "reciprocalRank": 1,
+        "forbiddenResultCount": 0,
+        "topIds": [
+          "nps-mary-fields"
+        ]
+      },
+      {
+        "queryId": "r02",
+        "category": "name_lookup",
+        "precisionAt5": 0.2,
+        "recallAt5": 1,
+        "reciprocalRank": 1,
+        "forbiddenResultCount": 0,
+        "topIds": [
+          "nps-will-garvin",
+          "nps-nick-bransford"
+        ]
+      },
+      {
+        "queryId": "r03",
+        "category": "name_lookup",
+        "precisionAt5": 0.2,
+        "recallAt5": 1,
+        "reciprocalRank": 0.5,
+        "forbiddenResultCount": 1,
+        "topIds": [
+          "nps-will-garvin",
+          "nps-nick-bransford",
+          "nps-mat-bransford"
+        ]
+      },
+      {
+        "queryId": "r04",
+        "category": "name_lookup",
+        "precisionAt5": 0.2,
+        "recallAt5": 1,
+        "reciprocalRank": 1,
+        "forbiddenResultCount": 1,
+        "topIds": [
+          "nps-mat-bransford",
+          "nps-mary-fields",
+          "nps-nick-bransford"
+        ]
+      },
+      {
+        "queryId": "r05",
+        "category": "alias",
+        "precisionAt5": 0.2,
+        "recallAt5": 1,
+        "reciprocalRank": 1,
+        "forbiddenResultCount": 0,
+        "topIds": [
+          "nps-nick-bransford",
+          "epa-wetland-functions"
+        ]
+      },
+      {
+        "queryId": "r06",
+        "category": "alias",
+        "precisionAt5": 0.2,
+        "recallAt5": 1,
+        "reciprocalRank": 1,
+        "forbiddenResultCount": 0,
+        "topIds": [
+          "nps-mat-bransford"
+        ]
+      },
+      {
+        "queryId": "r07",
+        "category": "alias",
+        "precisionAt5": 0.2,
+        "recallAt5": 1,
+        "reciprocalRank": 1,
+        "forbiddenResultCount": 0,
+        "topIds": [
+          "nps-will-garvin"
+        ]
+      },
+      {
+        "queryId": "r08",
+        "category": "alias",
+        "precisionAt5": 0.2,
+        "recallAt5": 1,
+        "reciprocalRank": 1,
+        "forbiddenResultCount": 0,
+        "topIds": [
+          "nps-mary-fields"
+        ]
+      },
+      {
+        "queryId": "r09",
+        "category": "ocr",
+        "precisionAt5": 0,
+        "recallAt5": 0,
+        "reciprocalRank": 0,
+        "forbiddenResultCount": 1,
+        "topIds": [
+          "nps-nick-bransford"
+        ]
+      },
+      {
+        "queryId": "r10",
+        "category": "ocr",
+        "precisionAt5": 0,
+        "recallAt5": 0,
+        "reciprocalRank": 0,
+        "forbiddenResultCount": 0,
+        "topIds": []
+      },
+      {
+        "queryId": "r11",
+        "category": "descriptive",
+        "precisionAt5": 0,
+        "recallAt5": 0,
+        "reciprocalRank": 0,
+        "forbiddenResultCount": 0,
+        "topIds": [
+          "epa-wetland-definition"
+        ]
+      },
+      {
+        "queryId": "r12",
+        "category": "missed_entity",
+        "precisionAt5": 0,
+        "recallAt5": 0,
+        "reciprocalRank": 0,
+        "forbiddenResultCount": 0,
+        "topIds": []
+      },
+      {
+        "queryId": "r13",
+        "category": "missed_entity",
+        "precisionAt5": 0.2,
+        "recallAt5": 1,
+        "reciprocalRank": 1,
+        "forbiddenResultCount": 0,
+        "topIds": [
+          "nps-nick-bransford",
+          "nps-will-garvin"
+        ]
+      },
+      {
+        "queryId": "r14",
+        "category": "relationship",
+        "precisionAt5": 0.2,
+        "recallAt5": 1,
+        "reciprocalRank": 1,
+        "forbiddenResultCount": 0,
+        "topIds": [
+          "nps-mat-bransford",
+          "epa-wetland-functions"
+        ]
+      },
+      {
+        "queryId": "r15",
+        "category": "relationship",
+        "precisionAt5": 0,
+        "recallAt5": 0,
+        "reciprocalRank": 0,
+        "forbiddenResultCount": 0,
+        "topIds": []
+      },
+      {
+        "queryId": "r16",
+        "category": "relationship",
+        "precisionAt5": 0.2,
+        "recallAt5": 1,
+        "reciprocalRank": 1,
+        "forbiddenResultCount": 0,
+        "topIds": [
+          "nps-mary-fields",
+          "epa-wetland-definition"
+        ]
+      },
+      {
+        "queryId": "r17",
+        "category": "path",
+        "precisionAt5": 0,
+        "recallAt5": 0,
+        "reciprocalRank": 0,
+        "forbiddenResultCount": 0,
+        "topIds": []
+      },
+      {
+        "queryId": "r18",
+        "category": "descriptive",
+        "precisionAt5": 0,
+        "recallAt5": 0,
+        "reciprocalRank": 0,
+        "forbiddenResultCount": 0,
+        "topIds": [
+          "nps-mary-fields",
+          "nps-will-garvin"
+        ]
+      },
+      {
+        "queryId": "r19",
+        "category": "descriptive",
+        "precisionAt5": 0,
+        "recallAt5": 0,
+        "reciprocalRank": 0,
+        "forbiddenResultCount": 0,
+        "topIds": []
+      },
+      {
+        "queryId": "r20",
+        "category": "missed_entity",
+        "precisionAt5": 0,
+        "recallAt5": 0,
+        "reciprocalRank": 0,
+        "forbiddenResultCount": 0,
+        "topIds": []
+      }
+    ],
+    "qualityAdmission": "not_evaluated"
+  },
+  "approximateVector": {
+    "querySetVersion": "heldout-research-eval-v1-blind:heldout-research-eval-v1-curated",
+    "fusionWeightsVersion": "production-evidence-rrf-v1",
+    "fusionWeights": {
+      "structured": 1,
+      "vector": 1
+    },
+    "queryCount": 20,
+    "meanPrecisionAt5": 0.10999999999999999,
+    "meanRecallAt5": 0.55,
+    "meanReciprocalRank": 0.525,
+    "forbiddenResultRateAt5": 0.15,
+    "byCategory": {
+      "name_lookup": {
+        "queryCount": 4,
+        "meanPrecisionAt5": 0.2,
+        "meanRecallAt5": 1,
+        "meanReciprocalRank": 0.875,
+        "forbiddenResultRateAt5": 0.5
+      },
+      "alias": {
+        "queryCount": 4,
+        "meanPrecisionAt5": 0.2,
+        "meanRecallAt5": 1,
+        "meanReciprocalRank": 1,
+        "forbiddenResultRateAt5": 0
+      },
+      "ocr": {
+        "queryCount": 2,
+        "meanPrecisionAt5": 0,
+        "meanRecallAt5": 0,
+        "meanReciprocalRank": 0,
+        "forbiddenResultRateAt5": 0.5
+      },
+      "descriptive": {
+        "queryCount": 3,
+        "meanPrecisionAt5": 0,
+        "meanRecallAt5": 0,
+        "meanReciprocalRank": 0,
+        "forbiddenResultRateAt5": 0
+      },
+      "missed_entity": {
+        "queryCount": 3,
+        "meanPrecisionAt5": 0.06666666666666667,
+        "meanRecallAt5": 0.3333333333333333,
+        "meanReciprocalRank": 0.3333333333333333,
+        "forbiddenResultRateAt5": 0
+      },
+      "relationship": {
+        "queryCount": 3,
+        "meanPrecisionAt5": 0.13333333333333333,
+        "meanRecallAt5": 0.6666666666666666,
+        "meanReciprocalRank": 0.6666666666666666,
+        "forbiddenResultRateAt5": 0
+      },
+      "path": {
+        "queryCount": 1,
+        "meanPrecisionAt5": 0,
+        "meanRecallAt5": 0,
+        "meanReciprocalRank": 0,
+        "forbiddenResultRateAt5": 0
+      }
+    },
+    "perQuery": [
+      {
+        "queryId": "r01",
+        "category": "name_lookup",
+        "precisionAt5": 0.2,
+        "recallAt5": 1,
+        "reciprocalRank": 1,
+        "forbiddenResultCount": 0,
+        "topIds": [
+          "nps-mary-fields"
+        ]
+      },
+      {
+        "queryId": "r02",
+        "category": "name_lookup",
+        "precisionAt5": 0.2,
+        "recallAt5": 1,
+        "reciprocalRank": 1,
+        "forbiddenResultCount": 0,
+        "topIds": [
+          "nps-will-garvin",
+          "nps-nick-bransford"
+        ]
+      },
+      {
+        "queryId": "r03",
+        "category": "name_lookup",
+        "precisionAt5": 0.2,
+        "recallAt5": 1,
+        "reciprocalRank": 0.5,
+        "forbiddenResultCount": 1,
+        "topIds": [
+          "nps-will-garvin",
+          "nps-nick-bransford",
+          "nps-mat-bransford"
+        ]
+      },
+      {
+        "queryId": "r04",
+        "category": "name_lookup",
+        "precisionAt5": 0.2,
+        "recallAt5": 1,
+        "reciprocalRank": 1,
+        "forbiddenResultCount": 1,
+        "topIds": [
+          "nps-mat-bransford",
+          "nps-mary-fields",
+          "nps-nick-bransford"
+        ]
+      },
+      {
+        "queryId": "r05",
+        "category": "alias",
+        "precisionAt5": 0.2,
+        "recallAt5": 1,
+        "reciprocalRank": 1,
+        "forbiddenResultCount": 0,
+        "topIds": [
+          "nps-nick-bransford",
+          "epa-wetland-functions"
+        ]
+      },
+      {
+        "queryId": "r06",
+        "category": "alias",
+        "precisionAt5": 0.2,
+        "recallAt5": 1,
+        "reciprocalRank": 1,
+        "forbiddenResultCount": 0,
+        "topIds": [
+          "nps-mat-bransford"
+        ]
+      },
+      {
+        "queryId": "r07",
+        "category": "alias",
+        "precisionAt5": 0.2,
+        "recallAt5": 1,
+        "reciprocalRank": 1,
+        "forbiddenResultCount": 0,
+        "topIds": [
+          "nps-will-garvin"
+        ]
+      },
+      {
+        "queryId": "r08",
+        "category": "alias",
+        "precisionAt5": 0.2,
+        "recallAt5": 1,
+        "reciprocalRank": 1,
+        "forbiddenResultCount": 0,
+        "topIds": [
+          "nps-mary-fields"
+        ]
+      },
+      {
+        "queryId": "r09",
+        "category": "ocr",
+        "precisionAt5": 0,
+        "recallAt5": 0,
+        "reciprocalRank": 0,
+        "forbiddenResultCount": 1,
+        "topIds": [
+          "nps-nick-bransford"
+        ]
+      },
+      {
+        "queryId": "r10",
+        "category": "ocr",
+        "precisionAt5": 0,
+        "recallAt5": 0,
+        "reciprocalRank": 0,
+        "forbiddenResultCount": 0,
+        "topIds": []
+      },
+      {
+        "queryId": "r11",
+        "category": "descriptive",
+        "precisionAt5": 0,
+        "recallAt5": 0,
+        "reciprocalRank": 0,
+        "forbiddenResultCount": 0,
+        "topIds": [
+          "epa-wetland-definition"
+        ]
+      },
+      {
+        "queryId": "r12",
+        "category": "missed_entity",
+        "precisionAt5": 0,
+        "recallAt5": 0,
+        "reciprocalRank": 0,
+        "forbiddenResultCount": 0,
+        "topIds": []
+      },
+      {
+        "queryId": "r13",
+        "category": "missed_entity",
+        "precisionAt5": 0.2,
+        "recallAt5": 1,
+        "reciprocalRank": 1,
+        "forbiddenResultCount": 0,
+        "topIds": [
+          "nps-nick-bransford",
+          "nps-will-garvin"
+        ]
+      },
+      {
+        "queryId": "r14",
+        "category": "relationship",
+        "precisionAt5": 0.2,
+        "recallAt5": 1,
+        "reciprocalRank": 1,
+        "forbiddenResultCount": 0,
+        "topIds": [
+          "nps-mat-bransford",
+          "epa-wetland-functions"
+        ]
+      },
+      {
+        "queryId": "r15",
+        "category": "relationship",
+        "precisionAt5": 0,
+        "recallAt5": 0,
+        "reciprocalRank": 0,
+        "forbiddenResultCount": 0,
+        "topIds": []
+      },
+      {
+        "queryId": "r16",
+        "category": "relationship",
+        "precisionAt5": 0.2,
+        "recallAt5": 1,
+        "reciprocalRank": 1,
+        "forbiddenResultCount": 0,
+        "topIds": [
+          "nps-mary-fields",
+          "epa-wetland-definition"
+        ]
+      },
+      {
+        "queryId": "r17",
+        "category": "path",
+        "precisionAt5": 0,
+        "recallAt5": 0,
+        "reciprocalRank": 0,
+        "forbiddenResultCount": 0,
+        "topIds": []
+      },
+      {
+        "queryId": "r18",
+        "category": "descriptive",
+        "precisionAt5": 0,
+        "recallAt5": 0,
+        "reciprocalRank": 0,
+        "forbiddenResultCount": 0,
+        "topIds": [
+          "nps-mary-fields",
+          "nps-will-garvin"
+        ]
+      },
+      {
+        "queryId": "r19",
+        "category": "descriptive",
+        "precisionAt5": 0,
+        "recallAt5": 0,
+        "reciprocalRank": 0,
+        "forbiddenResultCount": 0,
+        "topIds": []
+      },
+      {
+        "queryId": "r20",
+        "category": "missed_entity",
+        "precisionAt5": 0,
+        "recallAt5": 0,
+        "reciprocalRank": 0,
+        "forbiddenResultCount": 0,
+        "topIds": []
+      }
+    ],
+    "qualityAdmission": "not_evaluated"
+  },
+  "approximateAgainstExact": {
+    "meanSourceDocumentTopKOverlapAgainstExactFusion": 1,
+    "nonemptyBaselineQueryCount": 14,
+    "emptyBaselineQueryCount": 6,
+    "identicalSourceDocumentTopKRateAfterFusion": 1
+  },
+  "semanticQueryPlans": {
+    "setting": "SET LOCAL enable_seqscan=off; SET LOCAL enable_bitmapscan=off in an isolated rolled-back transaction",
+    "interpretation": "These are the plans PostgreSQL chose for source-filtered semantic retrieval under the recorded transaction-local controls. HNSW is not required here because the source-item B-tree remains eligible; HNSW execution is asserted only by the separate forced padding preflight.",
+    "exact": {
+      "mode": "exact",
+      "statement": "EXPLAIN (ANALYZE, BUFFERS, FORMAT JSON)",
+      "hnswIndexSelected": false,
+      "hnswIndexUsed": false,
+      "hnswActualLoops": 0,
+      "nodeTypes": [
+        "Limit",
+        "Index Scan",
+        "Sort",
+        "CTE Scan"
+      ],
+      "indexNames": [
+        "retrieval_passages_origin_idx"
+      ],
+      "plan": [
+        {
+          "Plan": {
+            "Node Type": "Limit",
+            "Parallel Aware": false,
+            "Async Capable": false,
+            "Startup Cost": 541.85,
+            "Total Cost": 541.85,
+            "Plan Rows": 2,
+            "Plan Width": 40,
+            "Actual Startup Time": 1.371,
+            "Actual Total Time": 1.373,
+            "Actual Rows": 20,
+            "Actual Loops": 1,
+            "Shared Hit Blocks": 3125,
+            "Shared Read Blocks": 0,
+            "Shared Dirtied Blocks": 0,
+            "Shared Written Blocks": 0,
+            "Local Hit Blocks": 0,
+            "Local Read Blocks": 0,
+            "Local Dirtied Blocks": 0,
+            "Local Written Blocks": 0,
+            "Temp Read Blocks": 0,
+            "Temp Written Blocks": 0,
+            "Plans": [
+              {
+                "Node Type": "Index Scan",
+                "Parent Relationship": "InitPlan",
+                "Subplan Name": "CTE eligible",
+                "Parallel Aware": false,
+                "Async Capable": false,
+                "Scan Direction": "Forward",
+                "Index Name": "retrieval_passages_origin_idx",
+                "Relation Name": "retrieval_passages",
+                "Alias": "retrieval_passages",
+                "Startup Cost": 0.28,
+                "Total Cost": 541.79,
+                "Plan Rows": 2,
+                "Plan Width": 113,
+                "Actual Startup Time": 0.004,
+                "Actual Total Time": 0.134,
+                "Actual Rows": 1007,
+                "Actual Loops": 1,
+                "Index Cond": "(source_item_id = ANY ('{src_item_ee61d9f3c14fe0b910ea1a5a5630047883927f8990aef6283719bf9b25e3d1e2,src_item_b738a09e6d1f51f662cda19be1d2f48568a9fefff0f91d6aeedd3c5a7ebaa202,src_item_89e9bb1bb80f83e5b8c03e78073c7762e635c03cf56e40b14277a4b4cc30ca1a,src_item_59e1b3cfe3ce61b53c70f69b0daa8912e880ec518c6440d534a38f98c1958970,src_item_cb589b5a1d6daf80d15ffe8823fc7aff7ae6ff22e97dafe7753eff84baebd6aa,src_item_01d9478cf61b33dc27589ec46df0040971ae7240949f0d14b479fc38c3b3f026,src_item_dde1bd1140d78cbe8649fab76be71c4cfe9b17e02c7b053fb693f4851d77c476}'::text[]))",
+                "Rows Removed by Index Recheck": 0,
+                "Filter": "((withdrawn_at IS NULL) AND (embedding_model = 'mock-deterministic-embedding:hnsw-padding:retrieval-pilot-6b3982ca-5fa5-44cb-9463-38ef3c4d85b4'::text) AND (embedding_text_hash = body_hash) AND (retention_expires_at > clock_timestamp()))",
+                "Rows Removed by Filter": 0,
+                "Shared Hit Blocks": 102,
+                "Shared Read Blocks": 0,
+                "Shared Dirtied Blocks": 0,
+                "Shared Written Blocks": 0,
+                "Local Hit Blocks": 0,
+                "Local Read Blocks": 0,
+                "Local Dirtied Blocks": 0,
+                "Local Written Blocks": 0,
+                "Temp Read Blocks": 0,
+                "Temp Written Blocks": 0
+              },
+              {
+                "Node Type": "Sort",
+                "Parent Relationship": "Outer",
+                "Parallel Aware": false,
+                "Async Capable": false,
+                "Startup Cost": 0.06,
+                "Total Cost": 0.06,
+                "Plan Rows": 2,
+                "Plan Width": 40,
+                "Actual Startup Time": 1.371,
+                "Actual Total Time": 1.371,
+                "Actual Rows": 20,
+                "Actual Loops": 1,
+                "Sort Key": [
+                  "((eligible.embedding <=> '[-0.60397196,-0.0816209,0.27030623,-0.38456765,0.33981302,0.7667242,-0.60828435,0.9206894,0.879209,-0.1016384,0.12840287,-0.18082064,-0.36190107,-0.7032665,0.04137758,-0.6955064,-0.31121024,-0.7974729,-0.91369647,0.8725349,-0.7981777,0.5730388,0.2480929,-0.25008205,-0.57123774,-0.20464586,0.38977715,0.6614995,0.6338359,0.8073732,-0.91945004,-0.03978833,0.9695398,0.53910685,0.03184647,-0.30370438,0.25015178,0.71264845,0.9717365,-0.5481318,0.21035792,-0.12945668,0.8024807,-0.9526728,-0.31004518,0.2320616,-0.15743032,-0.121277295,0.38710198,-0.66081834,-0.56283313,-0.5140223,-0.05208738,-0.56156504,-0.21986187,-0.6363365,-0.07689059,-0.07390714,-0.5539805,-0.31458545,-0.107385956,0.33557722,0.4152737,-0.6942706,-0.8177135,0.88101023,0.37691057,-0.93194216,0.3060638,0.04236957,0.66801476,-0.3563013,-0.3155936,-0.097785465,-0.088657446,-0.45089498,0.80051374,-0.74965036,0.2230989,0.7004675,-0.27473295,-0.4702553,-0.27424696,0.064305305,-0.09110616,0.2713376,-0.37049076,-0.59589154,-0.5955119,0.09733935,0.55487984,0.6875289,-0.87664497,0.63396335,0.16014928,0.9278242,0.41761467,-0.9854753,0.02376328,-0.9643263,-0.30090103,0.4402401,0.3730299,-0.09430645,0.3001731,0.2802449,-0.033881985,-0.5975283,-0.99924177,-0.043412358,0.5037042,-0.18926346,0.046221487,-0.5173543,-0.54358584,-0.8569789,0.033919822,-0.8642399,-0.071845226,-0.89426976,0.84117275,0.73441046,0.2266569,-0.9927468,-0.80201954,-0.15284622,-0.59933287,-0.4482187,0.23824039,-0.7466967,-0.35194564,0.2901191,-0.6323695,-0.88813746,0.9422297,-0.29077086,-0.826171,0.5297448,0.70007145,-0.3146475,-0.86395556,0.23635478,-0.5938162,0.28827944,0.3607606,-0.2849524,-0.4291965,-0.6031962,0.96410686,-0.94776785,-0.9296391,-0.47192895,0.18827915,0.4075969,-0.5284861,0.27946755,-0.5691117,-0.2761243,0.77494174,0.04767554,0.87224966,-0.6960644,-0.22493073,-0.41928157,-0.10145096,0.9473015,-0.49315116,0.76191276,-0.08890667,0.77027506,0.5324421,0.23536207,-0.6130593,0.9860007,0.052381773,-0.821091,0.9057607,0.36106375,0.71090657,0.34109896,-0.024572778,0.09606462,-0.75019526,0.4116966,0.089986615,0.68050146,0.6127079,-0.026801502,0.5384427,0.86523986,0.034659278,-0.7260392,0.89447826,-0.059056997,-0.7177467,-0.5167215,-0.4699691,-0.8818901,0.6074465,-0.33276567,0.44225168,-0.8979852,-0.61538416,-0.6674477,-0.8242572,0.96336114,0.6568641,0.3412166,0.3845292,0.23039109,-0.38793904,0.06990541,-0.19020514,-0.8224825,-0.37799954,0.64511836,-0.83856475,-0.75509715,-0.9042313,-0.30671194,-0.27496907,-0.5032186,-0.51065445,-0.5740022,-0.18942659,0.98877585,0.9886761,-0.89691645,0.61919093,0.034774117,0.09816197,-0.4534043,-0.4687353,-0.6892455,-0.61902153,0.6245,0.41022667,-0.31512633,-0.2650782,-0.89727986,0.37326494,-0.69565225,-0.84002936,-0.8969815,0.07120643,-0.6819834,0.43730795,0.33050555,-0.70127887,0.16172814,-0.042793382,-0.23676912,-0.3383727,-0.9129628,0.58198303,0.7984904,-0.9870137,-0.70112157,-0.39546227,-0.5714674,-0.5707588,-0.46868837,0.18296658,0.74897784,0.88480985,-0.5295767,-0.603158,0.970917,0.15618743,0.24016102,0.19290182,0.31509808,0.1234758,0.121133275,-0.058577858,-0.14809483,-0.47827289,-0.59101754,0.34117362,0.7786896,-0.021109864,-0.4217468,-0.4891663,0.606152,-0.52120805,0.10169386,0.15235063,-0.98071116,-0.074080855,-0.71527463,-0.8458702,-0.64241034,0.5320599,-0.61652255,0.017980384,0.6849034,0.6937063,0.7283566,-0.91095185,-0.14579743,-0.76680034,-0.058913212,0.8077773,-0.31773195,-0.8703381,-0.8706455,-0.8163379,-0.3306053,0.63956136,0.69444567,0.6718066,0.6674714,-0.48440412,0.37785846,0.30546045,-0.5105081,0.38694453,0.9191318,0.88241065,0.80718946,0.51850426,-0.73738664,0.95469254,0.26933295,0.7262311,-0.1758902,-0.026930114,-0.15811892,-0.48094004,-0.71821386,0.6471194,-0.66705656,-0.4160125,-0.05208585,0.9623713,0.34668383,0.36539486,0.6775491,0.09100588,-0.12948705,0.5271775,0.591823,0.5256621,-0.72222143,-0.18694606,0.41015,0.86797947,0.99280626,0.10077828,0.87193424,-0.46466047,-0.8600342,0.93181664,0.414747,-0.142978,-0.8605545,-0.21223028,0.55797714,-0.01972894,0.9090856,-0.43606624,-0.0020201316,-0.9524703,0.29238465,0.7660874,0.7191907,-0.31671166,0.9864162,0.7997343,-0.2642268,-0.20552021,0.8585212,0.5492814,0.48429272,0.22890739,0.93479925,0.8936177,0.4870716,-0.90390605,-0.70249015,-0.43701932,0.38031992,-0.7155425,0.77929384,0.8866369,-0.6100348,0.53309333,-0.33748797,0.3571606,-0.5916172,0.08795454,0.50644666,-0.44347197,-0.81946677,-0.30501837,-0.49165404,0.3121478,-0.9863275,-0.64145756,0.693722,-0.54326206,-0.5838026,0.93746704,-0.037280396,0.5443778,-0.95528644,-0.70218,0.8067827,-0.96301734,0.0937567,0.842317,0.22491547,-0.29446942,0.032421086,0.406429,0.9588563,0.76262885,-0.7364335,0.43231013,-0.72316295,-0.5928251,-0.46811336,-0.6518929,-0.022072177,0.46645805,0.5519904,0.22748813,0.30764368,-0.68696034,0.27865574,-0.0017483172,0.0776085,-0.78630936,0.8303384,0.3547944,0.26177958,-0.32207668,0.091080755,0.59863937,0.039838675,0.43562937,0.57388926,0.115324005,0.40703753,-0.5634578,0.36634824,-0.9796821,-0.1070816,0.54940903,-0.38971445,-0.12678856,0.3275567,0.46010306,0.6423735,0.13607919,0.88552696,-0.8971713,-0.11142861,-0.9629566,-0.09482581,-0.23084635,0.70444447,-0.9281932,0.8553128,0.11492582,-0.17121053,0.062476285,-0.038710937,-0.012943466,-0.576334,-0.7853321,0.55845183,-0.70360976,0.86340296,0.39183038,0.8068466,-0.6895501,-0.99340725,-0.96620196,-0.81043625,-0.77921516,-0.06384209,-0.78933525,0.7994539,0.45162445,-0.9307668,-0.8796913,-0.6159576,-0.63635993,0.124154024,0.7989152,-0.780861,0.88701534,-0.8139132,-0.81207234,0.66213256,-0.27169394,-0.29982173,-0.4387266,-0.009765589,0.31219798,0.9049815,0.9970298,-0.070699856,0.9671411,0.9339775,0.74818814,-0.5677152,-0.8720659,0.09230331,0.028219638,0.34023404,-0.21366407,0.46821228,0.11998514,0.25754055,-0.9397527,0.11738829,0.8450444,0.025339494,-0.22769925,-0.23855697,-0.39813378,-0.7721092,0.6372536,0.5759645,-0.92323697,-0.72059417,-0.23605311,-0.08823864,-0.8490369,-0.6804434,-0.5004883,0.5151062,-0.7777426,-0.056937136,0.045459732,-0.09841945,-0.5690041,0.9102533,0.4280713,-0.69114846,-0.8576798,0.17976639,-0.10191104,0.8597188,-0.31311226,-0.17980872,0.8373975,-0.67430305,0.35789937,-0.08575209,-0.28937283,0.8466023,-0.85626537,-0.088812605,0.9904496,0.88494533,0.83779186,-0.79281276,0.19076897,0.114074185,0.09636425,-0.84345275,-0.31578845,0.69178784,-0.2944842,0.05563057,-0.71681714,-0.765434,-0.8666966,-0.17337012,0.4402618,-0.9705955,-0.8147187,-0.6951674,-0.28897747,-0.44884324,-0.6793017,-0.88386667,0.3727686,-0.97041833,-0.9732077,-0.21611711,-0.50583065,-0.8955738,-0.4464375,-0.1048927,0.9706947,-0.16678259,0.23011668,-0.19007285,-0.7367349,0.8462691,-0.79925334,-0.67329335,-0.59003747,-0.84073025,-0.9107057,-0.71044004,0.48201126,-0.08800497,-0.18729234,0.051004622,0.9633623,0.36192903,0.632036,-0.7058756,-0.3454743,-0.5542891,0.11358526,0.44958276,-0.49435398,-0.008229724,0.45696008,0.8480564,0.36897743,0.004803618,0.2611697,-0.45618686,-0.63512164,-0.7123311,0.26113692,0.35741004,0.21398984,-0.21819143,0.19914885,0.6730667,0.519894,-0.22629663,0.59434396,0.9525528,-0.15114005,0.65504706,0.86533445,-0.47603464,-0.5569439,0.3462686,-0.16284218,-0.97300667,0.8691217,-0.24221599,0.6954608,-0.8586667,-0.22001544,0.8353093,-0.09602069,0.6736892,0.416633,-0.10143672,0.8512055,0.6059982,-0.6029412,-0.03251181,-0.42743602,-0.4814394,0.6107642,0.3665844,-0.9399483,-0.7708293,0.51746935,0.42056966,-0.37590748,0.9236364,0.6998301,-0.40676475,-0.2966331,-0.3454437,-0.546803,-0.2581736,0.37174326,0.6744328,-0.69260305,0.9105296,-0.8562066,0.8526815,-0.12123986,0.5077476,-0.80163985,-0.5605098,0.6092541,0.7171021,0.77392554,0.08404219,-0.019500082,0.9443044,0.77728873,0.028712442,-0.93213457,0.29294437,-0.7292766,0.67223847,0.6124859,-0.99376094,-0.339477,-0.34026316,0.16371109,-0.08173308,0.82035744,-0.9777605,0.41048247,0.39326918,0.43849102,-0.3131345,-0.7941385,0.58034086,0.75655895,0.17249058,-0.013388396,0.45063907,-0.06879784,-0.73148584,-0.8471878,0.87018967,-0.56953114,0.11027416,-0.5488438,-0.8513332,0.11368715,0.54274565,0.4769523,0.15363124,-0.24981605,0.47318992,0.905165,0.6011433,-0.81454426,-0.38510296,0.6185875,0.8619596,-0.07075371,0.39756492,-0.7294101,0.761846,0.9513658,-0.23688246,0.45253983,-0.34766936,0.07289246,-0.7934837,-0.6073314,0.94490564,-0.7575947,0.13145657,0.49026823,-0.58227843,0.98691386,0.15966137,0.51676136,0.6544919,0.8185551,0.16452822,0.6756172,-0.5848815,0.31494868,-0.3600591,-0.9139829,-0.32971597,0.86998475,0.6447368,0.2883577,0.46602428,0.30081904,0.2708189,-0.09035798,0.03441776,0.54182583,-0.89461166]'::vector))",
+                  "eligible.id"
+                ],
+                "Sort Method": "top-N heapsort",
+                "Sort Space Used": 29,
+                "Sort Space Type": "Memory",
+                "Shared Hit Blocks": 3125,
+                "Shared Read Blocks": 0,
+                "Shared Dirtied Blocks": 0,
+                "Shared Written Blocks": 0,
+                "Local Hit Blocks": 0,
+                "Local Read Blocks": 0,
+                "Local Dirtied Blocks": 0,
+                "Local Written Blocks": 0,
+                "Temp Read Blocks": 0,
+                "Temp Written Blocks": 0,
+                "Plans": [
+                  {
+                    "Node Type": "CTE Scan",
+                    "Parent Relationship": "Outer",
+                    "Parallel Aware": false,
+                    "Async Capable": false,
+                    "CTE Name": "eligible",
+                    "Alias": "eligible",
+                    "Startup Cost": 0,
+                    "Total Cost": 0.04,
+                    "Plan Rows": 2,
+                    "Plan Width": 40,
+                    "Actual Startup Time": 0.007,
+                    "Actual Total Time": 1.334,
+                    "Actual Rows": 1007,
+                    "Actual Loops": 1,
+                    "Shared Hit Blocks": 3125,
+                    "Shared Read Blocks": 0,
+                    "Shared Dirtied Blocks": 0,
+                    "Shared Written Blocks": 0,
+                    "Local Hit Blocks": 0,
+                    "Local Read Blocks": 0,
+                    "Local Dirtied Blocks": 0,
+                    "Local Written Blocks": 0,
+                    "Temp Read Blocks": 0,
+                    "Temp Written Blocks": 0
+                  }
+                ]
+              }
+            ]
+          },
+          "Planning": {
+            "Shared Hit Blocks": 0,
+            "Shared Read Blocks": 0,
+            "Shared Dirtied Blocks": 0,
+            "Shared Written Blocks": 0,
+            "Local Hit Blocks": 0,
+            "Local Read Blocks": 0,
+            "Local Dirtied Blocks": 0,
+            "Local Written Blocks": 0,
+            "Temp Read Blocks": 0,
+            "Temp Written Blocks": 0
+          },
+          "Planning Time": 0.03,
+          "Triggers": [],
+          "Execution Time": 1.383
+        }
+      ]
+    },
+    "approximate": {
+      "mode": "approximate",
+      "statement": "EXPLAIN (ANALYZE, BUFFERS, FORMAT JSON)",
+      "hnswIndexSelected": false,
+      "hnswIndexUsed": false,
+      "hnswActualLoops": 0,
+      "nodeTypes": [
+        "Incremental Sort",
+        "Limit",
+        "Sort",
+        "Index Scan",
+        "CTE Scan"
+      ],
+      "indexNames": [
+        "retrieval_passages_origin_idx"
+      ],
+      "plan": [
+        {
+          "Plan": {
+            "Node Type": "Incremental Sort",
+            "Parallel Aware": false,
+            "Async Capable": false,
+            "Startup Cost": 541.84,
+            "Total Cost": 541.94,
+            "Plan Rows": 2,
+            "Plan Width": 40,
+            "Actual Startup Time": 0.988,
+            "Actual Total Time": 0.989,
+            "Actual Rows": 20,
+            "Actual Loops": 1,
+            "Sort Key": [
+              "approximate_candidates.distance",
+              "approximate_candidates.id"
+            ],
+            "Presorted Key": [
+              "approximate_candidates.distance"
+            ],
+            "Full-sort Groups": {
+              "Group Count": 1,
+              "Sort Methods Used": [
+                "quicksort"
+              ],
+              "Sort Space Memory": {
+                "Average Sort Space Used": 27,
+                "Peak Sort Space Used": 27
+              }
+            },
+            "Shared Hit Blocks": 3125,
+            "Shared Read Blocks": 0,
+            "Shared Dirtied Blocks": 0,
+            "Shared Written Blocks": 0,
+            "Local Hit Blocks": 0,
+            "Local Read Blocks": 0,
+            "Local Dirtied Blocks": 0,
+            "Local Written Blocks": 0,
+            "Temp Read Blocks": 0,
+            "Temp Written Blocks": 0,
+            "Plans": [
+              {
+                "Node Type": "Limit",
+                "Parent Relationship": "InitPlan",
+                "Subplan Name": "CTE approximate_candidates",
+                "Parallel Aware": false,
+                "Async Capable": false,
+                "Startup Cost": 541.81,
+                "Total Cost": 541.81,
+                "Plan Rows": 2,
+                "Plan Width": 103,
+                "Actual Startup Time": 0.983,
+                "Actual Total Time": 0.984,
+                "Actual Rows": 20,
+                "Actual Loops": 1,
+                "Shared Hit Blocks": 3125,
+                "Shared Read Blocks": 0,
+                "Shared Dirtied Blocks": 0,
+                "Shared Written Blocks": 0,
+                "Local Hit Blocks": 0,
+                "Local Read Blocks": 0,
+                "Local Dirtied Blocks": 0,
+                "Local Written Blocks": 0,
+                "Temp Read Blocks": 0,
+                "Temp Written Blocks": 0,
+                "Plans": [
+                  {
+                    "Node Type": "Sort",
+                    "Parent Relationship": "Outer",
+                    "Parallel Aware": false,
+                    "Async Capable": false,
+                    "Startup Cost": 541.81,
+                    "Total Cost": 541.81,
+                    "Plan Rows": 2,
+                    "Plan Width": 103,
+                    "Actual Startup Time": 0.983,
+                    "Actual Total Time": 0.983,
+                    "Actual Rows": 20,
+                    "Actual Loops": 1,
+                    "Sort Key": [
+                      "((retrieval_passages.embedding <=> '[-0.60397196,-0.0816209,0.27030623,-0.38456765,0.33981302,0.7667242,-0.60828435,0.9206894,0.879209,-0.1016384,0.12840287,-0.18082064,-0.36190107,-0.7032665,0.04137758,-0.6955064,-0.31121024,-0.7974729,-0.91369647,0.8725349,-0.7981777,0.5730388,0.2480929,-0.25008205,-0.57123774,-0.20464586,0.38977715,0.6614995,0.6338359,0.8073732,-0.91945004,-0.03978833,0.9695398,0.53910685,0.03184647,-0.30370438,0.25015178,0.71264845,0.9717365,-0.5481318,0.21035792,-0.12945668,0.8024807,-0.9526728,-0.31004518,0.2320616,-0.15743032,-0.121277295,0.38710198,-0.66081834,-0.56283313,-0.5140223,-0.05208738,-0.56156504,-0.21986187,-0.6363365,-0.07689059,-0.07390714,-0.5539805,-0.31458545,-0.107385956,0.33557722,0.4152737,-0.6942706,-0.8177135,0.88101023,0.37691057,-0.93194216,0.3060638,0.04236957,0.66801476,-0.3563013,-0.3155936,-0.097785465,-0.088657446,-0.45089498,0.80051374,-0.74965036,0.2230989,0.7004675,-0.27473295,-0.4702553,-0.27424696,0.064305305,-0.09110616,0.2713376,-0.37049076,-0.59589154,-0.5955119,0.09733935,0.55487984,0.6875289,-0.87664497,0.63396335,0.16014928,0.9278242,0.41761467,-0.9854753,0.02376328,-0.9643263,-0.30090103,0.4402401,0.3730299,-0.09430645,0.3001731,0.2802449,-0.033881985,-0.5975283,-0.99924177,-0.043412358,0.5037042,-0.18926346,0.046221487,-0.5173543,-0.54358584,-0.8569789,0.033919822,-0.8642399,-0.071845226,-0.89426976,0.84117275,0.73441046,0.2266569,-0.9927468,-0.80201954,-0.15284622,-0.59933287,-0.4482187,0.23824039,-0.7466967,-0.35194564,0.2901191,-0.6323695,-0.88813746,0.9422297,-0.29077086,-0.826171,0.5297448,0.70007145,-0.3146475,-0.86395556,0.23635478,-0.5938162,0.28827944,0.3607606,-0.2849524,-0.4291965,-0.6031962,0.96410686,-0.94776785,-0.9296391,-0.47192895,0.18827915,0.4075969,-0.5284861,0.27946755,-0.5691117,-0.2761243,0.77494174,0.04767554,0.87224966,-0.6960644,-0.22493073,-0.41928157,-0.10145096,0.9473015,-0.49315116,0.76191276,-0.08890667,0.77027506,0.5324421,0.23536207,-0.6130593,0.9860007,0.052381773,-0.821091,0.9057607,0.36106375,0.71090657,0.34109896,-0.024572778,0.09606462,-0.75019526,0.4116966,0.089986615,0.68050146,0.6127079,-0.026801502,0.5384427,0.86523986,0.034659278,-0.7260392,0.89447826,-0.059056997,-0.7177467,-0.5167215,-0.4699691,-0.8818901,0.6074465,-0.33276567,0.44225168,-0.8979852,-0.61538416,-0.6674477,-0.8242572,0.96336114,0.6568641,0.3412166,0.3845292,0.23039109,-0.38793904,0.06990541,-0.19020514,-0.8224825,-0.37799954,0.64511836,-0.83856475,-0.75509715,-0.9042313,-0.30671194,-0.27496907,-0.5032186,-0.51065445,-0.5740022,-0.18942659,0.98877585,0.9886761,-0.89691645,0.61919093,0.034774117,0.09816197,-0.4534043,-0.4687353,-0.6892455,-0.61902153,0.6245,0.41022667,-0.31512633,-0.2650782,-0.89727986,0.37326494,-0.69565225,-0.84002936,-0.8969815,0.07120643,-0.6819834,0.43730795,0.33050555,-0.70127887,0.16172814,-0.042793382,-0.23676912,-0.3383727,-0.9129628,0.58198303,0.7984904,-0.9870137,-0.70112157,-0.39546227,-0.5714674,-0.5707588,-0.46868837,0.18296658,0.74897784,0.88480985,-0.5295767,-0.603158,0.970917,0.15618743,0.24016102,0.19290182,0.31509808,0.1234758,0.121133275,-0.058577858,-0.14809483,-0.47827289,-0.59101754,0.34117362,0.7786896,-0.021109864,-0.4217468,-0.4891663,0.606152,-0.52120805,0.10169386,0.15235063,-0.98071116,-0.074080855,-0.71527463,-0.8458702,-0.64241034,0.5320599,-0.61652255,0.017980384,0.6849034,0.6937063,0.7283566,-0.91095185,-0.14579743,-0.76680034,-0.058913212,0.8077773,-0.31773195,-0.8703381,-0.8706455,-0.8163379,-0.3306053,0.63956136,0.69444567,0.6718066,0.6674714,-0.48440412,0.37785846,0.30546045,-0.5105081,0.38694453,0.9191318,0.88241065,0.80718946,0.51850426,-0.73738664,0.95469254,0.26933295,0.7262311,-0.1758902,-0.026930114,-0.15811892,-0.48094004,-0.71821386,0.6471194,-0.66705656,-0.4160125,-0.05208585,0.9623713,0.34668383,0.36539486,0.6775491,0.09100588,-0.12948705,0.5271775,0.591823,0.5256621,-0.72222143,-0.18694606,0.41015,0.86797947,0.99280626,0.10077828,0.87193424,-0.46466047,-0.8600342,0.93181664,0.414747,-0.142978,-0.8605545,-0.21223028,0.55797714,-0.01972894,0.9090856,-0.43606624,-0.0020201316,-0.9524703,0.29238465,0.7660874,0.7191907,-0.31671166,0.9864162,0.7997343,-0.2642268,-0.20552021,0.8585212,0.5492814,0.48429272,0.22890739,0.93479925,0.8936177,0.4870716,-0.90390605,-0.70249015,-0.43701932,0.38031992,-0.7155425,0.77929384,0.8866369,-0.6100348,0.53309333,-0.33748797,0.3571606,-0.5916172,0.08795454,0.50644666,-0.44347197,-0.81946677,-0.30501837,-0.49165404,0.3121478,-0.9863275,-0.64145756,0.693722,-0.54326206,-0.5838026,0.93746704,-0.037280396,0.5443778,-0.95528644,-0.70218,0.8067827,-0.96301734,0.0937567,0.842317,0.22491547,-0.29446942,0.032421086,0.406429,0.9588563,0.76262885,-0.7364335,0.43231013,-0.72316295,-0.5928251,-0.46811336,-0.6518929,-0.022072177,0.46645805,0.5519904,0.22748813,0.30764368,-0.68696034,0.27865574,-0.0017483172,0.0776085,-0.78630936,0.8303384,0.3547944,0.26177958,-0.32207668,0.091080755,0.59863937,0.039838675,0.43562937,0.57388926,0.115324005,0.40703753,-0.5634578,0.36634824,-0.9796821,-0.1070816,0.54940903,-0.38971445,-0.12678856,0.3275567,0.46010306,0.6423735,0.13607919,0.88552696,-0.8971713,-0.11142861,-0.9629566,-0.09482581,-0.23084635,0.70444447,-0.9281932,0.8553128,0.11492582,-0.17121053,0.062476285,-0.038710937,-0.012943466,-0.576334,-0.7853321,0.55845183,-0.70360976,0.86340296,0.39183038,0.8068466,-0.6895501,-0.99340725,-0.96620196,-0.81043625,-0.77921516,-0.06384209,-0.78933525,0.7994539,0.45162445,-0.9307668,-0.8796913,-0.6159576,-0.63635993,0.124154024,0.7989152,-0.780861,0.88701534,-0.8139132,-0.81207234,0.66213256,-0.27169394,-0.29982173,-0.4387266,-0.009765589,0.31219798,0.9049815,0.9970298,-0.070699856,0.9671411,0.9339775,0.74818814,-0.5677152,-0.8720659,0.09230331,0.028219638,0.34023404,-0.21366407,0.46821228,0.11998514,0.25754055,-0.9397527,0.11738829,0.8450444,0.025339494,-0.22769925,-0.23855697,-0.39813378,-0.7721092,0.6372536,0.5759645,-0.92323697,-0.72059417,-0.23605311,-0.08823864,-0.8490369,-0.6804434,-0.5004883,0.5151062,-0.7777426,-0.056937136,0.045459732,-0.09841945,-0.5690041,0.9102533,0.4280713,-0.69114846,-0.8576798,0.17976639,-0.10191104,0.8597188,-0.31311226,-0.17980872,0.8373975,-0.67430305,0.35789937,-0.08575209,-0.28937283,0.8466023,-0.85626537,-0.088812605,0.9904496,0.88494533,0.83779186,-0.79281276,0.19076897,0.114074185,0.09636425,-0.84345275,-0.31578845,0.69178784,-0.2944842,0.05563057,-0.71681714,-0.765434,-0.8666966,-0.17337012,0.4402618,-0.9705955,-0.8147187,-0.6951674,-0.28897747,-0.44884324,-0.6793017,-0.88386667,0.3727686,-0.97041833,-0.9732077,-0.21611711,-0.50583065,-0.8955738,-0.4464375,-0.1048927,0.9706947,-0.16678259,0.23011668,-0.19007285,-0.7367349,0.8462691,-0.79925334,-0.67329335,-0.59003747,-0.84073025,-0.9107057,-0.71044004,0.48201126,-0.08800497,-0.18729234,0.051004622,0.9633623,0.36192903,0.632036,-0.7058756,-0.3454743,-0.5542891,0.11358526,0.44958276,-0.49435398,-0.008229724,0.45696008,0.8480564,0.36897743,0.004803618,0.2611697,-0.45618686,-0.63512164,-0.7123311,0.26113692,0.35741004,0.21398984,-0.21819143,0.19914885,0.6730667,0.519894,-0.22629663,0.59434396,0.9525528,-0.15114005,0.65504706,0.86533445,-0.47603464,-0.5569439,0.3462686,-0.16284218,-0.97300667,0.8691217,-0.24221599,0.6954608,-0.8586667,-0.22001544,0.8353093,-0.09602069,0.6736892,0.416633,-0.10143672,0.8512055,0.6059982,-0.6029412,-0.03251181,-0.42743602,-0.4814394,0.6107642,0.3665844,-0.9399483,-0.7708293,0.51746935,0.42056966,-0.37590748,0.9236364,0.6998301,-0.40676475,-0.2966331,-0.3454437,-0.546803,-0.2581736,0.37174326,0.6744328,-0.69260305,0.9105296,-0.8562066,0.8526815,-0.12123986,0.5077476,-0.80163985,-0.5605098,0.6092541,0.7171021,0.77392554,0.08404219,-0.019500082,0.9443044,0.77728873,0.028712442,-0.93213457,0.29294437,-0.7292766,0.67223847,0.6124859,-0.99376094,-0.339477,-0.34026316,0.16371109,-0.08173308,0.82035744,-0.9777605,0.41048247,0.39326918,0.43849102,-0.3131345,-0.7941385,0.58034086,0.75655895,0.17249058,-0.013388396,0.45063907,-0.06879784,-0.73148584,-0.8471878,0.87018967,-0.56953114,0.11027416,-0.5488438,-0.8513332,0.11368715,0.54274565,0.4769523,0.15363124,-0.24981605,0.47318992,0.905165,0.6011433,-0.81454426,-0.38510296,0.6185875,0.8619596,-0.07075371,0.39756492,-0.7294101,0.761846,0.9513658,-0.23688246,0.45253983,-0.34766936,0.07289246,-0.7934837,-0.6073314,0.94490564,-0.7575947,0.13145657,0.49026823,-0.58227843,0.98691386,0.15966137,0.51676136,0.6544919,0.8185551,0.16452822,0.6756172,-0.5848815,0.31494868,-0.3600591,-0.9139829,-0.32971597,0.86998475,0.6447368,0.2883577,0.46602428,0.30081904,0.2708189,-0.09035798,0.03441776,0.54182583,-0.89461166]'::vector))"
+                    ],
+                    "Sort Method": "top-N heapsort",
+                    "Sort Space Used": 29,
+                    "Sort Space Type": "Memory",
+                    "Shared Hit Blocks": 3125,
+                    "Shared Read Blocks": 0,
+                    "Shared Dirtied Blocks": 0,
+                    "Shared Written Blocks": 0,
+                    "Local Hit Blocks": 0,
+                    "Local Read Blocks": 0,
+                    "Local Dirtied Blocks": 0,
+                    "Local Written Blocks": 0,
+                    "Temp Read Blocks": 0,
+                    "Temp Written Blocks": 0,
+                    "Plans": [
+                      {
+                        "Node Type": "Index Scan",
+                        "Parent Relationship": "Outer",
+                        "Parallel Aware": false,
+                        "Async Capable": false,
+                        "Scan Direction": "Forward",
+                        "Index Name": "retrieval_passages_origin_idx",
+                        "Relation Name": "retrieval_passages",
+                        "Alias": "retrieval_passages",
+                        "Startup Cost": 0.28,
+                        "Total Cost": 541.8,
+                        "Plan Rows": 2,
+                        "Plan Width": 103,
+                        "Actual Startup Time": 0.006,
+                        "Actual Total Time": 0.95,
+                        "Actual Rows": 1007,
+                        "Actual Loops": 1,
+                        "Index Cond": "(source_item_id = ANY ('{src_item_ee61d9f3c14fe0b910ea1a5a5630047883927f8990aef6283719bf9b25e3d1e2,src_item_b738a09e6d1f51f662cda19be1d2f48568a9fefff0f91d6aeedd3c5a7ebaa202,src_item_89e9bb1bb80f83e5b8c03e78073c7762e635c03cf56e40b14277a4b4cc30ca1a,src_item_59e1b3cfe3ce61b53c70f69b0daa8912e880ec518c6440d534a38f98c1958970,src_item_cb589b5a1d6daf80d15ffe8823fc7aff7ae6ff22e97dafe7753eff84baebd6aa,src_item_01d9478cf61b33dc27589ec46df0040971ae7240949f0d14b479fc38c3b3f026,src_item_dde1bd1140d78cbe8649fab76be71c4cfe9b17e02c7b053fb693f4851d77c476}'::text[]))",
+                        "Rows Removed by Index Recheck": 0,
+                        "Filter": "((withdrawn_at IS NULL) AND (embedding_model = 'mock-deterministic-embedding:hnsw-padding:retrieval-pilot-6b3982ca-5fa5-44cb-9463-38ef3c4d85b4'::text) AND (embedding_text_hash = body_hash) AND (retention_expires_at > clock_timestamp()))",
+                        "Rows Removed by Filter": 0,
+                        "Shared Hit Blocks": 3125,
+                        "Shared Read Blocks": 0,
+                        "Shared Dirtied Blocks": 0,
+                        "Shared Written Blocks": 0,
+                        "Local Hit Blocks": 0,
+                        "Local Read Blocks": 0,
+                        "Local Dirtied Blocks": 0,
+                        "Local Written Blocks": 0,
+                        "Temp Read Blocks": 0,
+                        "Temp Written Blocks": 0
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "Node Type": "CTE Scan",
+                "Parent Relationship": "Outer",
+                "Parallel Aware": false,
+                "Async Capable": false,
+                "CTE Name": "approximate_candidates",
+                "Alias": "approximate_candidates",
+                "Startup Cost": 0,
+                "Total Cost": 0.04,
+                "Plan Rows": 2,
+                "Plan Width": 40,
+                "Actual Startup Time": 0.984,
+                "Actual Total Time": 0.985,
+                "Actual Rows": 20,
+                "Actual Loops": 1,
+                "Shared Hit Blocks": 3125,
+                "Shared Read Blocks": 0,
+                "Shared Dirtied Blocks": 0,
+                "Shared Written Blocks": 0,
+                "Local Hit Blocks": 0,
+                "Local Read Blocks": 0,
+                "Local Dirtied Blocks": 0,
+                "Local Written Blocks": 0,
+                "Temp Read Blocks": 0,
+                "Temp Written Blocks": 0
+              }
+            ]
+          },
+          "Planning": {
+            "Shared Hit Blocks": 1,
+            "Shared Read Blocks": 0,
+            "Shared Dirtied Blocks": 0,
+            "Shared Written Blocks": 0,
+            "Local Hit Blocks": 0,
+            "Local Read Blocks": 0,
+            "Local Dirtied Blocks": 0,
+            "Local Written Blocks": 0,
+            "Temp Read Blocks": 0,
+            "Temp Written Blocks": 0
+          },
+          "Planning Time": 0.027,
+          "Triggers": [],
+          "Execution Time": 0.996
+        }
+      ]
+    }
+  },
+  "entailment": {
+    "predictor": "root-gpt-6-astra-session",
+    "generatedAt": "2026-09-18T15:35:12.267921+00:00",
+    "labelStatus": "Curated provisional labels from an independent corpus author; no consensus or human adjudication.",
+    "caseCount": 14,
+    "exactAccuracy": 0.8571428571428571,
+    "falseSupportRate": 0,
+    "confusion": {
+      "supported": {
+        "supported": 8,
+        "contradicted": 0,
+        "insufficient": 0
+      },
+      "contradicted": {
+        "supported": 0,
+        "contradicted": 2,
+        "insufficient": 1
+      },
+      "insufficient": {
+        "supported": 0,
+        "contradicted": 1,
+        "insufficient": 2
+      }
+    },
+    "perCase": [
+      {
+        "id": "e01",
+        "expected": "supported",
+        "predicted": "supported",
+        "correct": true
+      },
+      {
+        "id": "e02",
+        "expected": "supported",
+        "predicted": "supported",
+        "correct": true
+      },
+      {
+        "id": "e03",
+        "expected": "insufficient",
+        "predicted": "insufficient",
+        "correct": true
+      },
+      {
+        "id": "e04",
+        "expected": "supported",
+        "predicted": "supported",
+        "correct": true
+      },
+      {
+        "id": "e05",
+        "expected": "contradicted",
+        "predicted": "insufficient",
+        "correct": false
+      },
+      {
+        "id": "e06",
+        "expected": "supported",
+        "predicted": "supported",
+        "correct": true
+      },
+      {
+        "id": "e07",
+        "expected": "supported",
+        "predicted": "supported",
+        "correct": true
+      },
+      {
+        "id": "e08",
+        "expected": "contradicted",
+        "predicted": "contradicted",
+        "correct": true
+      },
+      {
+        "id": "e09",
+        "expected": "supported",
+        "predicted": "supported",
+        "correct": true
+      },
+      {
+        "id": "e10",
+        "expected": "insufficient",
+        "predicted": "insufficient",
+        "correct": true
+      },
+      {
+        "id": "e11",
+        "expected": "supported",
+        "predicted": "supported",
+        "correct": true
+      },
+      {
+        "id": "e12",
+        "expected": "contradicted",
+        "predicted": "contradicted",
+        "correct": true
+      },
+      {
+        "id": "e13",
+        "expected": "supported",
+        "predicted": "supported",
+        "correct": true
+      },
+      {
+        "id": "e14",
+        "expected": "insufficient",
+        "predicted": "contradicted",
+        "correct": false
+      }
+    ],
+    "probabilityCalibration": {
+      "status": "unavailable",
+      "probabilityClaimSupported": false,
+      "reason": "The predictor emitted categorical labels and no probabilities."
+    }
+  },
+  "heldoutIdentityAndEdges": {
+    "predictor": "quality-completion-gpt-5-categorical",
+    "generatedAt": "2026-09-18T20:00:00.000Z",
+    "labelStatus": "independent-agent-authored-provisional",
+    "limitations": [
+      "Not human-adjudicated; the labels are provisional and challengeable.",
+      "A small purposive case set is not a representative population estimate or probability calibration.",
+      "Repeated alias pairs overlap; counts must not be described as independent historical discoveries.",
+      "Identity is resolved only within the supplied sources and context; unknown namesakes outside this sample remain possible.",
+      "Case g09 tests direct-evidence admission policy rather than denying the logical kinship inference.",
+      "The blind file contains shortened summaries and local paragraph selectors, not source-native text-quote selectors or preserved page bytes."
+    ],
+    "identity": {
+      "caseCount": 12,
+      "distinctCaseCount": 4,
+      "predictedMergeCount": 8,
+      "accuracy": 1,
+      "falseMergeCount": 0,
+      "falseMergeRate": 0,
+      "falseMergeCoverage": "available",
+      "missedMergeCount": 0,
+      "perCase": [
+        {
+          "id": "i01",
+          "predicted": "merge",
+          "expected": "same",
+          "correct": true
+        },
+        {
+          "id": "i02",
+          "predicted": "merge",
+          "expected": "same",
+          "correct": true
+        },
+        {
+          "id": "i03",
+          "predicted": "merge",
+          "expected": "same",
+          "correct": true
+        },
+        {
+          "id": "i04",
+          "predicted": "distinct",
+          "expected": "distinct",
+          "correct": true
+        },
+        {
+          "id": "i05",
+          "predicted": "distinct",
+          "expected": "distinct",
+          "correct": true
+        },
+        {
+          "id": "i06",
+          "predicted": "distinct",
+          "expected": "distinct",
+          "correct": true
+        },
+        {
+          "id": "i07",
+          "predicted": "distinct",
+          "expected": "distinct",
+          "correct": true
+        },
+        {
+          "id": "i08",
+          "predicted": "merge",
+          "expected": "same",
+          "correct": true
+        },
+        {
+          "id": "i09",
+          "predicted": "merge",
+          "expected": "same",
+          "correct": true
+        },
+        {
+          "id": "i10",
+          "predicted": "merge",
+          "expected": "same",
+          "correct": true
+        },
+        {
+          "id": "i11",
+          "predicted": "merge",
+          "expected": "same",
+          "correct": true
+        },
+        {
+          "id": "i12",
+          "predicted": "merge",
+          "expected": "same",
+          "correct": true
+        }
+      ]
+    },
+    "edges": {
+      "caseCount": 14,
+      "unsupportedCaseCount": 5,
+      "assertedEdgeCount": 8,
+      "accuracy": 0.9285714285714286,
+      "unsupportedAssertionCount": 0,
+      "unsupportedEdgeRate": 0,
+      "unsupportedEdgeCoverage": "available",
+      "assertedEdgeFalseDiscoveryRate": 0,
+      "assertedEdgeFalseDiscoveryCoverage": "available",
+      "missedSupportedEdgeCount": 1,
+      "perCase": [
+        {
+          "id": "g01",
+          "predicted": "withhold",
+          "expected": "supported",
+          "correct": false
+        },
+        {
+          "id": "g02",
+          "predicted": "assert",
+          "expected": "supported",
+          "correct": true
+        },
+        {
+          "id": "g03",
+          "predicted": "assert",
+          "expected": "supported",
+          "correct": true
+        },
+        {
+          "id": "g04",
+          "predicted": "assert",
+          "expected": "supported",
+          "correct": true
+        },
+        {
+          "id": "g05",
+          "predicted": "assert",
+          "expected": "supported",
+          "correct": true
+        },
+        {
+          "id": "g06",
+          "predicted": "assert",
+          "expected": "supported",
+          "correct": true
+        },
+        {
+          "id": "g07",
+          "predicted": "assert",
+          "expected": "supported",
+          "correct": true
+        },
+        {
+          "id": "g08",
+          "predicted": "assert",
+          "expected": "supported",
+          "correct": true
+        },
+        {
+          "id": "g09",
+          "predicted": "withhold",
+          "expected": "unsupported",
+          "correct": true
+        },
+        {
+          "id": "g10",
+          "predicted": "withhold",
+          "expected": "unsupported",
+          "correct": true
+        },
+        {
+          "id": "g11",
+          "predicted": "withhold",
+          "expected": "unsupported",
+          "correct": true
+        },
+        {
+          "id": "g12",
+          "predicted": "withhold",
+          "expected": "unsupported",
+          "correct": true
+        },
+        {
+          "id": "g13",
+          "predicted": "withhold",
+          "expected": "unsupported",
+          "correct": true
+        },
+        {
+          "id": "g14",
+          "predicted": "assert",
+          "expected": "supported",
+          "correct": true
+        }
+      ]
+    },
+    "probabilityCalibration": {
+      "status": "unavailable",
+      "probabilityClaimSupported": false,
+      "reason": "The frozen predictor emitted categorical decisions and no probabilities."
+    },
+    "integrity": {
+      "schemaVersion": "heldout-identity-edge-freeze.v1",
+      "benchmarkVersion": "heldout-identity-edge-v1-blind",
+      "recordedAt": "2026-09-18T20:45:00.000Z",
+      "bindingStatus": "posthoc-integrity-record",
+      "originalBlindFileByteSha256": "7386f335cdf81a05a8379ba64f0a6763def6bad448cce0abfc297522b2a3617b",
+      "currentBlindFileByteSha256": "8581645419a2eaad1c5312916f6ab02a851ef10197fa05c0369dcbc572e33d3e",
+      "blindCanonicalJsonSha256": "4548bb1ea187bc81d0217e45cdaf72fde62fa6b9b49c7d4dd1ae40a4a6c1fa5e",
+      "frozenPredictionsFileByteSha256": "a1a3c029d44309a35ebb6b05f72ed356b323e181d95dfe7cb0dd19eb091f0bfb",
+      "independentGoldFileByteSha256": "53dffe4d12f3c893f2b7feed7757f26ace75b891bae6cd1730bce879aed4ddae",
+      "limitation": "This manifest was created after the frozen predictions and independent gold. The blind corpus was subsequently reformatted without changing parsed JSON; the original byte hash remains recorded, while the current byte and canonical JSON hashes enforce future integrity. This post-hoc record does not establish preregistration."
+    }
+  },
+  "uncertainty": {
+    "calibrationStatus": "unavailable",
+    "probabilityClaimSupported": false,
+    "reason": "Retrieval ranks are not probabilities, and this bounded corpus does not supply probabilistic predictions for held-out calibration."
+  },
+  "limitations": [
+    "This is a bounded held-out pilot; its sample size does not support population-level quality claims.",
+    "Temporary local rows exercise production SQL and isolation filters but do not reproduce production corpus composition or natural distractors; source-item filtering is covered separately by the integration regression.",
+    "Controlled deterministic padding proves HNSW selection and execution only in the separate forced mechanics preflight. A source-filtered semantic query may legitimately use the source-item B-tree, and neither plan is representative-scale retrieval-quality evidence.",
+    "Retrieval relevance does not establish identity, entailment, relationship truth, or source independence.",
+    "Forbidden retrieval results remain candidate-level false positives; false merges and unsupported edge assertions are measured separately on categorical held-out cases when their independent gold file is supplied.",
+    "Entailment labels are curated provisional judgments rather than consensus or human-adjudicated gold labels."
+  ],
+  "cleanup": {
+    "status": "completed",
+    "plannerStatisticsRefreshed": true,
+    "deletedRows": {
+      "retrievalPassages": 1107,
+      "captureOrigins": 8,
+      "sourceCaptures": 8,
+      "retrievalEvents": 8,
+      "sourceItems": 8,
+      "evidenceSources": 1
+    },
+    "remainingRows": {
+      "retrievalPassages": 0,
+      "captureOrigins": 0,
+      "sourceCaptures": 0,
+      "retrievalEvents": 0,
+      "sourceItems": 0,
+      "evidenceSources": 0
+    }
+  }
+}

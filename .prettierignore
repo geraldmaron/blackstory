@@ -44,6 +44,9 @@ apps/mobile
 docs/ui/mobile-polish-mockups.html
 docs/ui/prototypes
 
+# Raw evaluation receipts are hash-bound evidence; preserve the exact emitted bytes.
+packages/testing/src/gold-corpus/artifacts
+
 # Generated geometry fixture — reformatting rewrites every coordinate line.
 scripts/fixtures
 

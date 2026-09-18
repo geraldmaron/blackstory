@@ -5,6 +5,12 @@ Tracked files:
 - `heldout-evidence-retrieval-corpus.v1.json`: blind public-source text and prompts.
 - `heldout-evidence-retrieval-gold.v1.json`: provisional curated retrieval and entailment judgments.
 - `heldout-entailment-predictions.v1.json`: independently frozen categorical predictions.
+- `heldout-identity-edge-corpus.v1.json`: blind public-source identity pairs and edge proposals.
+- `heldout-identity-edge-predictions.v1.json`: categorical predictions frozen before independent labels were opened.
+- `heldout-identity-edge-gold.v1.json`: independent-agent-authored provisional labels.
+- `heldout-identity-edge-freeze.v1.json`: post-hoc byte and canonical-JSON integrity record. It does not claim preregistration.
+- `heldout-quality-measurement.v1.json`: compact measured HNSW, identity, edge, cost, and limitation record.
+- `../artifacts/evidence-retrieval-index-mechanics.json`: current raw controlled-run output, including cleanup receipts.
 
 Frozen prediction hashes are recorded in two distinct forms:
 
@@ -25,20 +31,87 @@ node --conditions development --import tsx scripts/gold-corpus/evidence-retrieva
   --blind packages/testing/src/gold-corpus/fixtures/heldout-evidence-retrieval-corpus.v1.json \
   --gold packages/testing/src/gold-corpus/fixtures/heldout-evidence-retrieval-gold.v1.json \
   --entailment-predictions packages/testing/src/gold-corpus/fixtures/heldout-entailment-predictions.v1.json \
+  --quality-cases packages/testing/src/gold-corpus/fixtures/heldout-identity-edge-corpus.v1.json \
+  --quality-predictions packages/testing/src/gold-corpus/fixtures/heldout-identity-edge-predictions.v1.json \
+  --quality-gold packages/testing/src/gold-corpus/fixtures/heldout-identity-edge-gold.v1.json \
+  --quality-freeze-manifest packages/testing/src/gold-corpus/fixtures/heldout-identity-edge-freeze.v1.json \
   --embedding-provider openrouter \
   --embedding-model openai/text-embedding-3-small \
   --max-cost-usd 0.25 \
   --prior-reserved-cost-usd 0 \
   --prior-provider-calls 0 \
+  --hnsw-padding-rows-per-partition 1000 \
   --out /tmp/evidence-retrieval-pilot.json
 ```
 
 `RESEARCH_TEST_DATABASE_URL` must point to local Postgres and `OPENROUTER_API_KEY` must be set.
-Use an unused output path. Replace zero prior spend/calls with the cumulative reservation and call
-count for the authorized experiment, including failed calls with unknown charges. The command does
-not persist a cross-process budget ledger. Reconfirm the dated provider price before a new paid run;
+Use an unused output path. Replace zero prior spend/calls with the cumulative pre-call expected-rate
+budget estimate and call count for the authorized experiment, including failed calls with unknown
+charges. The UTF-8 byte estimate is a conservative input to that pre-call budget check, not an
+external billing cap; the provider receipt is authoritative when available. The command does not
+persist a cross-process budget ledger. Reconfirm the dated provider price before a new paid run;
 the fixed model/price configuration is an evaluation constraint, not a production routing policy.
 Scores are measurements with `qualityAdmission: not_evaluated`, never assertion approval.
+
+When no provider credential is available, `--embedding-provider deterministic-evaluation` with
+`--embedding-model mock-deterministic-embedding` runs the same SQL and plan checks without a
+network call. Its vectors are not semantic, so its retrieval scores can establish only index
+mechanics. They do not replace the real-provider retrieval pilot.
+
+The persisted controlled artifact was produced with this zero-provider-call command shape (choose
+another unused output path before rerunning):
+
+```sh
+node --conditions development --import tsx scripts/gold-corpus/evidence-retrieval-pilot.ts \
+  --blind packages/testing/src/gold-corpus/fixtures/heldout-evidence-retrieval-corpus.v1.json \
+  --gold packages/testing/src/gold-corpus/fixtures/heldout-evidence-retrieval-gold.v1.json \
+  --entailment-predictions packages/testing/src/gold-corpus/fixtures/heldout-entailment-predictions.v1.json \
+  --quality-cases packages/testing/src/gold-corpus/fixtures/heldout-identity-edge-corpus.v1.json \
+  --quality-predictions packages/testing/src/gold-corpus/fixtures/heldout-identity-edge-predictions.v1.json \
+  --quality-gold packages/testing/src/gold-corpus/fixtures/heldout-identity-edge-gold.v1.json \
+  --quality-freeze-manifest packages/testing/src/gold-corpus/fixtures/heldout-identity-edge-freeze.v1.json \
+  --embedding-provider deterministic-evaluation \
+  --embedding-model mock-deterministic-embedding \
+  --max-cost-usd 0.25 \
+  --prior-reserved-cost-usd 0.00255264 \
+  --prior-provider-calls 3 \
+  --hnsw-padding-rows-per-partition 1000 \
+  --out /tmp/evidence-retrieval-hnsw-controlled-rerun.json
+```
+
+The original blind-file byte hash is preserved in the freeze manifest. A later formatting-only
+rewrite changed the file-byte hash while leaving the parsed JSON canonical hash unchanged. The
+manifest was created after predictions and gold, and the runtime now verifies the current bytes,
+canonical JSON, frozen prediction bytes and gold bytes before evaluating. This is an integrity
+check against future drift, not evidence that the manifest existed before authorship.
+
+## Controlled HNSW and categorical quality measurement
+
+The compact record `heldout-quality-measurement.v1.json` binds the current raw artifact by path
+and SHA-256. The run made zero provider calls and used 1,000 included deterministic padding rows
+plus 100 wrong-model rows. Default planner settings selected a sequential scan in the padding
+preflight. A separate rolled-back transaction with sequential and bitmap scans disabled selected
+and executed `retrieval_passages_vector_idx`.
+
+Both source-filtered exact and approximate queries selected `retrieval_passages_origin_idx`,
+not HNSW. Their fused source-document top-k results were identical on all 20 queries. Mean overlap
+was 1.0 across the 14 nonempty exact baselines; the six empty baselines are counted separately.
+This demonstrates bounded query and index mechanics, not raw ANN recall or semantic quality.
+Deterministic vectors cannot support a semantic-quality claim. The runner isolates provider
+vectors from deterministic padding and restricts lexical/vector fusion to the intended sources.
+The cleanup receipt reports 1,107 passages and all associated temporary rows deleted, with zero
+remaining rows in all six checked tables.
+
+The independently labeled categorical slice measured 0 false merges across 4 distinct-identity
+cases and 0 unsupported assertions across 5 unsupported-edge cases. It missed 1 of 9 supported
+edges. The 12 identity pairs and 14 edge cases are a small purposive set. Repeated alias pairs
+overlap and are not independent historical observations. Labels are independent-agent-authored
+and provisional, not human-adjudicated.
+
+The blind file's `sourceExcerpts.excerpt` values are shortened or paraphrased summaries with local
+paragraph selectors. They are not source-native exact quote selectors or preserved page bytes.
+The categorical predictor emitted no probabilities, so probability calibration is unavailable
+and no probability claim is supported by this measurement.
 
 ## Provenance and review notes
 
@@ -110,4 +183,4 @@ The expected labels are claim-relative. insufficient means the quoted evidence i
 - The Nick/Will family material is deliberately a two-hop chain. The source supports Nick to Hannah and Hannah to Will, but no direct son-in-law edge is staged.
 - r09 and r10 are synthetic query OCR perturbations. They are not observations that either source page has OCR defects.
 - The EPA pages are a small second-domain portability slice, not evidence that the full research profile generalizes to environmental history.
-- No measured model output, human adjudication, calibrated probability, or broad recall/precision claim is included in this artifact.
+- The categorical measurements use independent-agent-authored provisional labels, not human adjudication, calibrated probabilities, or a population-quality sample.

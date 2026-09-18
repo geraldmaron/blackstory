@@ -1,0 +1,36 @@
+{
+  "schemaVersion": "heldout-identity-edge-predictions.v1",
+  "benchmarkVersion": "heldout-identity-edge-v1-blind",
+  "predictor": "quality-completion-gpt-5-categorical",
+  "generatedAt": "2026-09-18T20:00:00.000Z",
+  "identityPredictions": [
+    { "id": "i01", "decision": "merge" },
+    { "id": "i02", "decision": "merge" },
+    { "id": "i03", "decision": "merge" },
+    { "id": "i04", "decision": "distinct" },
+    { "id": "i05", "decision": "distinct" },
+    { "id": "i06", "decision": "distinct" },
+    { "id": "i07", "decision": "distinct" },
+    { "id": "i08", "decision": "merge" },
+    { "id": "i09", "decision": "merge" },
+    { "id": "i10", "decision": "merge" },
+    { "id": "i11", "decision": "merge" },
+    { "id": "i12", "decision": "merge" }
+  ],
+  "edgePredictions": [
+    { "id": "g01", "decision": "withhold" },
+    { "id": "g02", "decision": "assert" },
+    { "id": "g03", "decision": "assert" },
+    { "id": "g04", "decision": "assert" },
+    { "id": "g05", "decision": "assert" },
+    { "id": "g06", "decision": "assert" },
+    { "id": "g07", "decision": "assert" },
+    { "id": "g08", "decision": "assert" },
+    { "id": "g09", "decision": "withhold" },
+    { "id": "g10", "decision": "withhold" },
+    { "id": "g11", "decision": "withhold" },
+    { "id": "g12", "decision": "withhold" },
+    { "id": "g13", "decision": "withhold" },
+    { "id": "g14", "decision": "assert" }
+  ]
+}

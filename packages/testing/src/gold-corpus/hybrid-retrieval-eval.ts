@@ -91,6 +91,46 @@ export type HybridRetrievalEvalResult = {
   readonly perQuery: readonly HybridRetrievalQueryResult[];
 };
 
+export type HybridRetrievalTopKComparison = {
+  readonly meanSourceDocumentTopKOverlapAgainstExactFusion: number | null;
+  readonly nonemptyBaselineQueryCount: number;
+  readonly emptyBaselineQueryCount: number;
+  readonly identicalSourceDocumentTopKRateAfterFusion: number;
+};
+
+/** Compares fused source-document results without treating an empty exact baseline as zero recall. */
+export function compareHybridRetrievalTopK(
+  exact: HybridRetrievalEvalResult,
+  approximate: HybridRetrievalEvalResult,
+): HybridRetrievalTopKComparison {
+  const approximateById = new Map(
+    approximate.perQuery.map((result) => [result.queryId, result.topIds]),
+  );
+  let overlap = 0;
+  let nonemptyBaselineQueryCount = 0;
+  let emptyBaselineQueryCount = 0;
+  let identical = 0;
+  for (const result of exact.perQuery) {
+    const otherTopIds = approximateById.get(result.queryId) ?? [];
+    if (result.topIds.length === 0) {
+      emptyBaselineQueryCount += 1;
+    } else {
+      nonemptyBaselineQueryCount += 1;
+      const expected = new Set(result.topIds);
+      const hits = otherTopIds.filter((id) => expected.has(id)).length;
+      overlap += hits / expected.size;
+    }
+    if (JSON.stringify(result.topIds) === JSON.stringify(otherTopIds)) identical += 1;
+  }
+  return {
+    meanSourceDocumentTopKOverlapAgainstExactFusion:
+      nonemptyBaselineQueryCount === 0 ? null : overlap / nonemptyBaselineQueryCount,
+    nonemptyBaselineQueryCount,
+    emptyBaselineQueryCount,
+    identicalSourceDocumentTopKRateAfterFusion: identical / exact.queryCount,
+  };
+}
+
 export type HybridRetrievalRunner = (input: {
   readonly normalizedQuery: string;
   readonly filters: readonly { readonly field: 'state' | 'era'; readonly value: string }[];
