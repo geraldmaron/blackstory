@@ -22,8 +22,20 @@ decade submit an extract for its `dataset`/`dataTable` at `geogLevels: ['county'
 IPUMS web UI. Poll until `completed`, then **download and unzip** each into one directory, e.g.
 `./nhgis-data/`. Each file is named `..._<decade>_county.csv`.
 
-> NHGIS CSVs carry two header rows (codes, then descriptions); the parser handles that. Nothing
-> in this repo depends on a zip library — the operator unzips.
+NHGIS CSVs carry two header rows (codes, then descriptions); the parser handles that.
+
+The Lives ingestion scripts share `scripts/lib/lives-nhgis-ingest.ts` under `packages/ops-data`.
+Their automated download path requires Python 3.9+ for standard-library ZIP validation and accepts
+only the authenticated HTTPS `api.ipums.org/downloads/nhgis/` endpoint, without redirects. Extracts
+use random private cache directories. Limits are 128 MiB compressed, 512 MiB per entry, 1 GiB total
+expanded data, 10,000 entries and a two-minute download/extraction timeout each. Only CSV tables
+and text codebooks are accepted; path traversal, links, device files, encrypted entries, duplicate
+paths and executable formats fail closed. Original file bytes are preserved for legacy encodings.
+Failed extraction removes partial output. Request smaller extracts when these limits are exceeded.
+
+An explicitly supplied extract directory is operator-provided local input; its origin and safe
+extraction must be checked by the operator. The documented IPUMS download contract is in
+[NHGIS data workflows](https://developer.ipums.org/docs/v2/workflows/create_extracts/nhgis_data/).
 
 ## Parsing and persistence
 

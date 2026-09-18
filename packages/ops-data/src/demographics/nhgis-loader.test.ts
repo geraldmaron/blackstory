@@ -61,7 +61,7 @@ test('loads 1860 county docs with the free/slave split and full provenance', asy
   assert.equal(autauga.blackFree, 14);
   assert.equal(autauga.blackEnslaved, 9607);
   assert.equal(autauga.boundaryVersion, 'nhgis-1860');
-  assert.match(autauga.sourceUrl, /nhgis\.org/);
+  assert.equal(new URL(autauga.sourceUrl).hostname, 'www.nhgis.org');
   assert.ok(autauga.license.length > 0);
   assert.match(autauga.contentHash, /^[a-f0-9]{64}$/);
 });

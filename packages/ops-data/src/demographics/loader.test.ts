@@ -106,8 +106,12 @@ test('loads one vintage into county-decade docs with full provenance', async () 
     'https://www.census.gov/data/datasets/2020/dec/pl-94171.html',
     'sourceUrl must be the Census dataset landing page, not an API query',
   );
-  assert.ok(!doc.sourceUrl.includes('api.census.gov'));
-  assert.ok(!doc.sourceUrl.includes('key='), 'sourceUrl must never embed an API key');
+  assert.notEqual(new URL(doc.sourceUrl).hostname, 'api.census.gov');
+  assert.equal(
+    new URL(doc.sourceUrl).searchParams.has('key'),
+    false,
+    'sourceUrl must never embed an API key',
+  );
 });
 
 test('re-running unchanged data reports all-unchanged and writes nothing', async () => {

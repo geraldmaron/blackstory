@@ -126,9 +126,9 @@ test('county load parses estimates, tracks states seen, and writes schema-valid 
   acsCountyProfileSchema.parse(doc);
   assert.equal(doc.estimates.medianHouseholdIncome, 78304);
   assert.equal(doc.suppressed.length, 0);
-  assert.ok(!doc.sourceUrl.includes('key='));
+  assert.equal(new URL(doc.sourceUrl).searchParams.has('key'), false);
   assert.equal(doc.sourceUrl, 'https://www.census.gov/programs-surveys/acs');
-  assert.ok(!doc.sourceUrl.includes('api.census.gov'));
+  assert.notEqual(new URL(doc.sourceUrl).hostname, 'api.census.gov');
 });
 
 test('negative ACS sentinels land in suppressed, never in estimates', async () => {

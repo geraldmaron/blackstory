@@ -3,8 +3,9 @@
  * observations with series rows in one transaction. Downloads remain outside the repository.
  */
 import { execFileSync } from 'node:child_process';
-import { mkdir, writeFile } from 'node:fs/promises';
+import { mkdir, mkdtemp, rm } from 'node:fs/promises';
 import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import type { Pool } from 'pg';
 import { getNhgisExtractStatus, submitNhgisExtract, type NhgisFetchLike } from '@repo/domain';
 import type { LivesPublishedObservation } from '../../src/lives/published-observation.ts';
@@ -13,6 +14,78 @@ import { livesSeriesColumns, livesSeriesRow } from '../../src/lives/series.ts';
 const POLL_MS = 20_000;
 const MAX_POLLS = 135;
 const BATCH = 400;
+const MAX_DOWNLOAD_BYTES = 128 * 1024 * 1024;
+const EXTRACTOR = fileURLToPath(new URL('./extract-nhgis-tables.py', import.meta.url));
+
+/** Download an authenticated IPUMS table extract into an isolated, validated data directory. */
+export async function downloadNhgisExtract(options: {
+  readonly url: string;
+  readonly apiKey: string;
+  readonly cacheDir: string;
+  readonly fetchImpl?: typeof fetch;
+}): Promise<string> {
+  const url = new URL(options.url);
+  if (
+    url.origin !== 'https://api.ipums.org' ||
+    url.username ||
+    url.password ||
+    url.hash ||
+    url.search ||
+    !/^\/downloads\/nhgis\/[a-zA-Z0-9_./-]+\.zip$/.test(url.pathname)
+  ) {
+    throw new Error('NHGIS download must use the official IPUMS table endpoint');
+  }
+  const response = await (options.fetchImpl ?? fetch)(url.href, {
+    headers: { Authorization: options.apiKey },
+    redirect: 'error',
+    signal: AbortSignal.timeout(120_000),
+  });
+  if (!response.ok || response.redirected) {
+    await response.body?.cancel();
+    throw new Error(`NHGIS download failed: HTTP ${response.status}`);
+  }
+  const declaredLength = response.headers.get('content-length');
+  if (
+    declaredLength !== null &&
+    (!/^\d+$/.test(declaredLength) || Number(declaredLength) > MAX_DOWNLOAD_BYTES)
+  ) {
+    await response.body?.cancel();
+    throw new Error('NHGIS download exceeds the compressed byte limit');
+  }
+  if (!response.body) throw new Error('NHGIS download has no body');
+  const reader = response.body.getReader();
+  const chunks: Uint8Array[] = [];
+  let bytes = 0;
+  try {
+    for (;;) {
+      const result = await reader.read();
+      if (result.done) break;
+      bytes += result.value.byteLength;
+      if (bytes > MAX_DOWNLOAD_BYTES) {
+        throw new Error('NHGIS download exceeds the compressed byte limit');
+      }
+      chunks.push(result.value);
+    }
+  } finally {
+    await reader.cancel();
+    reader.releaseLock();
+  }
+  await mkdir(options.cacheDir, { recursive: true, mode: 0o700 });
+  const directory = await mkdtemp(path.join(options.cacheDir, 'nhgis-extract-'));
+  try {
+    // Only validated CSV/text entries are written; the downloaded archive is never executed.
+    execFileSync('python3', ['-I', EXTRACTOR, directory], {
+      input: Buffer.concat(chunks, bytes),
+      timeout: 120_000,
+      maxBuffer: 1024 * 1024,
+      stdio: ['pipe', 'pipe', 'pipe'],
+    });
+    return directory;
+  } catch (error) {
+    await rm(directory, { recursive: true, force: true });
+    throw new Error('NHGIS archive rejected or extraction failed', { cause: error });
+  }
+}
 
 /**
  * An unzipped extract: `givenDirectory` when set, otherwise a new extract of `definition`, awaited and
@@ -37,13 +110,7 @@ export async function nhgisExtractDirectory(options: {
       throw new Error(`NHGIS extract ${handle.number} ${status.status}`);
     }
     if (status.status !== 'completed' || !status.tableDataUrl) continue;
-    const response = await fetch(status.tableDataUrl, { headers: { Authorization: apiKey } });
-    if (!response.ok) throw new Error(`NHGIS download failed: HTTP ${response.status}`);
-    const directory = path.join(cacheDir, `nhgis-extract-${handle.number}`);
-    await mkdir(directory, { recursive: true });
-    const zipPath = path.join(directory, 'table-data.zip');
-    await writeFile(zipPath, Buffer.from(await response.arrayBuffer()));
-    execFileSync('unzip', ['-o', '-q', zipPath, '-d', directory]);
+    const directory = await downloadNhgisExtract({ url: status.tableDataUrl, apiKey, cacheDir });
     console.log(`Downloaded extract ${handle.number} to ${directory}`);
     return directory;
   }

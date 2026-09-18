@@ -5,7 +5,7 @@
  * Default dry-run; writes require DRY_RUN=0 and BACKFILL_VISIT_FROM_WIKIDATA_APPLY=1.
  */
 import { createHash } from 'node:crypto';
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { mkdirSync, mkdtempSync, readFileSync, renameSync, rmSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import pg from 'pg';
@@ -113,12 +113,16 @@ function buildSparqlQuery(qids: readonly string[]): string {
 }`;
 }
 
-async function fetchSparqlBatch(qids: readonly string[]): Promise<readonly SparqlBinding[]> {
+async function fetchSparqlBatch(
+  qids: readonly string[],
+): Promise<{ bindings: readonly SparqlBinding[]; cacheHit: boolean }> {
   mkdirSync(CACHE_DIR, { recursive: true });
   const cachePath = join(CACHE_DIR, `batch-${batchCacheKey(qids)}.json`);
-  if (existsSync(cachePath)) {
+  try {
     const cached = JSON.parse(readFileSync(cachePath, 'utf8')) as SparqlResponse;
-    return cached.results.bindings;
+    return { bindings: cached.results.bindings, cacheHit: true };
+  } catch (error) {
+    if ((error as NodeJS.ErrnoException).code !== 'ENOENT') throw error;
   }
 
   const query = buildSparqlQuery(qids);
@@ -136,8 +140,16 @@ async function fetchSparqlBatch(qids: readonly string[]): Promise<readonly Sparq
     throw new Error(`Wikidata SPARQL request failed: ${res?.status ?? 'no response'}`);
   }
   const data = (await res.json()) as SparqlResponse;
-  writeFileSync(cachePath, JSON.stringify(data, null, 2));
-  return data.results.bindings;
+  const temporaryDirectory = mkdtempSync(join(CACHE_DIR, '.batch-'));
+  try {
+    const temporaryPath = join(temporaryDirectory, 'response.json');
+    writeFileSync(temporaryPath, JSON.stringify(data, null, 2), { flag: 'wx', mode: 0o600 });
+    // Publish a complete response atomically so another process cannot read a partial cache entry.
+    renameSync(temporaryPath, cachePath);
+  } finally {
+    rmSync(temporaryDirectory, { recursive: true, force: true });
+  }
+  return { bindings: data.results.bindings, cacheHit: false };
 }
 
 function qidFromItemUri(uri: string): string {
@@ -219,10 +231,8 @@ async function main(): Promise<void> {
 
     for (const [index, group] of batches.entries()) {
       const qids = group.map((row) => row.qid);
-      const cachePath = join(CACHE_DIR, `batch-${batchCacheKey(qids)}.json`);
-      const wasCached = existsSync(cachePath);
-      const bindings = await fetchSparqlBatch(qids);
-      if (!wasCached) {
+      const { bindings, cacheHit } = await fetchSparqlBatch(qids);
+      if (!cacheHit) {
         console.log(`Batch ${index + 1}/${batches.length}: fetched ${qids.length} QIDs`);
         await sleep(FETCH_DELAY_MS);
       }
