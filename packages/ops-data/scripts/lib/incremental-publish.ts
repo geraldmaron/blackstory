@@ -34,8 +34,6 @@ import { searchTopicsFromProjection } from './projection-divergence.ts';
 import { cityStateFromJurisdictionLabel } from './evidence-collectors/subject-identity.ts';
 import { buildNrhpListingFactObject, buildNrhpSignificanceObject } from './nrhp-area-labels.ts';
 
-export const INCREMENTAL_PUBLISH_CONFIDENCE_FLOOR = 0.75;
-
 /**
  * Ceiling on one claim's merged quotations from a single document.
  *
@@ -77,7 +75,6 @@ export type PublishGateSkipReason =
   | 'summary_too_short'
   | 'template_only'
   | 'build_failed'
-  | 'confidence_below_floor'
   | 'claim_assessment_required'
   /**
    * Republishing would reduce the existing claim set.
@@ -92,7 +89,7 @@ export type PublishGateResult =
   | {
       readonly eligible: true;
       readonly entry: ReleaseSourceEntity;
-      readonly confidence: number;
+      readonly reviewBasis: 'independent_review';
       /**
        * Location inherited from the public record. Forward the complete override to the final
        * build so matchMethod and precision remain attached to the correct point.
@@ -1157,7 +1154,6 @@ export function gateLandscapePublishCandidate(input: {
   readonly row: LandscapePublishRow;
   readonly releaseId: string;
   readonly generatedAt: string;
-  readonly confidenceFloor?: number;
   readonly canonicalStatus?: CanonicalStatusSnapshot;
   /**
    * Allows rebuilding an already-published entity id instead of treating it as duplicate
@@ -1194,7 +1190,6 @@ export function gateLandscapePublishCandidate(input: {
    */
   readonly catalogDecision?: PublishCatalogDecision;
 }): PublishGateResult {
-  const floor = input.confidenceFloor ?? INCREMENTAL_PUBLISH_CONFIDENCE_FLOOR;
   const row = input.row;
 
   /*
@@ -1311,14 +1306,6 @@ export function gateLandscapePublishCandidate(input: {
   if (!assessment.ok) {
     return { eligible: false, reason: 'claim_assessment_required', detail: assessment.detail };
   }
-  const confidence = assessment.score;
-  if (confidence < floor) {
-    return {
-      eligible: false,
-      reason: 'confidence_below_floor',
-      detail: `reviewed confidence lower bound ${confidence.toFixed(3)} < floor ${floor}`,
-    };
-  }
   entry = { ...entry, claims: assessment.claims };
 
   const build = buildReleaseEntityArtifacts(
@@ -1362,7 +1349,7 @@ export function gateLandscapePublishCandidate(input: {
   return {
     eligible: true,
     entry,
-    confidence,
+    reviewBasis: assessment.reviewBasis,
     ...(locationOverride !== undefined ? { locationOverride } : {}),
   };
 }

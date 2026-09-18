@@ -6,7 +6,7 @@ Every module named below lives in `@repo/domain-core` and is re-exported by `@re
 
 ## Deterministic score
 
-The engine scores source authority, evidence directness, lineage independence, temporal proximity, geographic precision, entity-match quality, and extraction quality. Credible contradictory lineages subtract a bounded penalty. Publication thresholds come from the versioned product constitution.
+The engine scores source authority, evidence directness, lineage independence, temporal proximity, geographic precision, entity-match quality, and extraction quality. Credible contradictory lineages subtract a bounded penalty. The versioned product constitution supplies thresholds for evaluating this deterministic score. Those thresholds do not make the score a calibrated probability and do not authorize incremental publication.
 
 Callers must supply `calculatedAt` when they need byte-stable records. The score itself is deterministic regardless of evidence input order.
 
@@ -35,7 +35,13 @@ Wikipedia and Wikidata may carry a claim (see [citation-standard.md](citation-st
 - When real evidence is present, bridges drop out of the quality aggregates entirely. Averaging a bridge's authority into a government record's used to make a claim score *lower* for having cited an extra source, which is how "more research made the record less publishable" happened.
 - When a bridge is all there is, it stays in the aggregates. A bridge-carried claim is worth more than no claim, and scoring it zero would misrepresent it as unevidenced rather than as thinly evidenced.
 
-The numbers, from `packages/ops-data/scripts/lib/confidence.test.ts`: a Wikipedia-only claim scores **0.66** with `independentLineageCount: 0`, where a lone reputable-secondary host (historicsites.dcpreservation.org) scores **0.72** with one lineage. Both sit under the 0.75 `standardPublish` threshold, and neither publishes alone. Those two used to be the same number, which was the tell: a bridge and a heritage-inventory record are not equally good evidence, and the old rule could not say so because it counted a hostname as a lineage. Adding a bridge alongside a real source now leaves the score exactly where it was.
+Bridge handling is an input rule for the deterministic confidence engine. It is not a publication shortcut. The incremental publisher requires each public assertion to match exactly one accepted canonical claim version, the claim's reviewed supporting evidence and citation, and an approved research artifact whose reviewer differs from its producer. A Wikipedia or Wikidata bridge can carry a cited assertion, but it contributes no independent corroborating lineage and cannot replace those review records.
+
+## Publication boundary
+
+`packages/ops-data/scripts/lib/confidence.ts` loads review state from the canonical, evidence, and research ledgers. Publication is admitted on the qualitative basis `independent_review` only when every assertion matches the entity, claim id when present, predicate, object, and one accepted cited source. A changed claim version, newer evidence assignment, tombstone, absent citation, duplicate match, or non-independent artifact review holds publication.
+
+`ConfidenceAssessment.calibrationVersion` is a free-form ledger label. No registry currently binds that label to an approved held-out corpus, frozen predictions, evaluated outcomes, or the active profile's maximum expected calibration error of `0.03`. Therefore the incremental publisher neither compares `intervalLow` with a publication floor nor returns or prints a numerical confidence. Plausible labels such as `held-out-v1` remain inert. Numerical admission stays unavailable until a reviewed calibration-evidence artifact and loader establish that binding.
 
 ## Evidence fitness is claim-relative
 
@@ -90,7 +96,7 @@ Persist the complete result beside the claim version. A source reclassification,
 
 ## Calibration export
 
-`exportConfidenceCalibrationDataset` emits stable claim ordering and preserves score inputs, components, versions, thresholds, lineage counts, and optional reviewed outcomes. The contract is:
+`exportConfidenceCalibrationDataset` emits stable claim ordering and preserves score inputs, components, versions, thresholds, lineage counts, and optional reviewed outcomes. It is an export for later calibration work, not proof that calibration occurred and not an admission record. The contract is:
 
 `packages/schemas/confidence-engine/confidence-calibration-dataset.v1.schema.json`
 

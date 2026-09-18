@@ -17,7 +17,7 @@
  * The script touches `summary`, `payload.historicalContext` and `payload.evidenceCitations`,
  * stamps the provenance with who appended what and when, and leaves `status` alone: the
  * incremental publisher re-derives the record on the next `--lane <lane> --republish`, and that
- * is where the confidence floor and the depth gate are applied.
+ * is where the independent-review and depth gates are applied.
  *
  * Dry-run unless DRY_RUN=0 and APPLY=1. APPENDED_BY names who stands behind the review.
  *

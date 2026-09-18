@@ -49,7 +49,6 @@ import {
   type LandscapePublishRow,
   type PublishGateResult,
 } from './lib/incremental-publish.ts';
-import { classifySourceForConfidence } from './lib/confidence.ts';
 import { normalizePgConnectionString } from './lib/pg-connection.ts';
 
 const apply = process.env.DRY_RUN === '0' && process.env.LOAD_LAW_ENTITIES_APPLY === '1';
@@ -113,7 +112,7 @@ function printReport(report: Report): void {
       ? 'federal'
       : `${record.scope.level} ${record.scope.jurisdictionName}`;
   const verdict = gate.eligible
-    ? `gate PASS  confidence ${gate.confidence.toFixed(3)}`
+    ? `gate PASS  basis ${gate.reviewBasis}`
     : `gate SKIP  ${gate.reason}: ${gate.detail}`;
   console.log(`\n${record.id}`);
   console.log(`  ${record.displayName} — ${scope} (${record.applicability.jurisdictionId})`);
@@ -154,14 +153,6 @@ function printReport(report: Report): void {
   console.log(
     `  evidence: ${record.evidence.length} citation(s), ${verbatim} verbatim, ${record.evidence.length - verbatim} sourced statement(s)`,
   );
-  // The confidence floor is a per-source authority question, so when the gate refuses on it, name
-  // the sources and how the engine grades them rather than leaving an operator to guess which one
-  // is short. `classifySourceForConfidence` is the engine's own classifier, not a copy of it.
-  if (!gate.eligible && gate.reason === 'confidence_below_floor') {
-    for (const url of [record.canonicalSource.url, ...record.evidence.map((c) => c.sourceUrl)]) {
-      console.log(`  source:   ${classifySourceForConfidence(url)}  ${url}`);
-    }
-  }
   for (const gap of record.gaps ?? []) console.log(`  gap:      ${gap}`);
   for (const warning of report.warnings) console.log(`  warn:     ${warning}`);
 }
@@ -300,7 +291,7 @@ async function main(): Promise<void> {
      * says a rejected row is not discarded: it stays in the lane, where the enrichment sweep picks
      * it up, and the record surfaces its honest state instead of publishing as though the work
      * were done. Refusing to stage a validated, bindable record because it is one corroborating
-     * source short of the confidence floor would strand it outside the lane that exists to finish
+     * source short of independent review would strand it outside the lane that exists to finish
      * it. So the skips are reported by name and the rows are written; nothing is published either
      * way, because this script does not publish.
      */

@@ -18,7 +18,6 @@ import {
 import { normalizePgConnectionString } from './lib/pg-connection.ts';
 import {
   assessLandscapeDepth,
-  INCREMENTAL_PUBLISH_CONFIDENCE_FLOOR,
   buildArtifactsForEntry,
   buildLiveDepthEntry,
   canonicalUpsertParamsFromLandscape,
@@ -344,7 +343,7 @@ type SkippedRow = {
 
 type PreparedPublish = {
   readonly id: string;
-  readonly confidence: number;
+  readonly reviewBasis: 'independent_review';
   readonly entityRow: ReleaseEntityUpsertRow;
   readonly searchRow: SearchIndexUpsertRow;
   readonly fromLandscape: boolean;
@@ -509,13 +508,6 @@ function preparePublish(input: {
     if (!combined.ok) {
       return { id: input.entityId, reason: 'claim_assessment_required', detail: combined.detail };
     }
-    if (combined.score < INCREMENTAL_PUBLISH_CONFIDENCE_FLOOR) {
-      return {
-        id: input.entityId,
-        reason: 'confidence_below_floor',
-        detail: 'Carried claims do not clear the reviewed confidence floor',
-      };
-    }
     const entry: ReleaseSourceEntity = { ...gate.entry, claims: combined.claims };
     if (claimCountRegressed(carry.claims, input.livePublished)) {
       return {
@@ -544,7 +536,7 @@ function preparePublish(input: {
     }
     return {
       id: input.entityId,
-      confidence: combined.score,
+      reviewBasis: combined.reviewBasis,
       entityRow: built.entityRow,
       searchRow: built.searchRow,
       fromLandscape: true,
@@ -798,7 +790,7 @@ async function main(): Promise<void> {
       console.log('');
       console.log('Eligible IDs:');
       for (const row of prepared) {
-        console.log(`  ${row.id} (conf=${row.confidence.toFixed(3)})`);
+        console.log(`  ${row.id} (basis=${row.reviewBasis})`);
       }
     }
     if (skipped.length > 0) {

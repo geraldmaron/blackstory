@@ -182,20 +182,24 @@ function validReviewedAssessment(row: ReviewedClaimAssessment): boolean {
     row.reviewDecisionId &&
     typeof row.object === 'string' &&
     row.citationHrefs.length > 0 &&
-    assessment.calibrationVersion.trim() &&
-    !/uncalibrated|placeholder|unknown/i.test(assessment.calibrationVersion) &&
     assessment.intervalLow <= assessment.acceptanceProbability &&
     assessment.acceptanceProbability <= assessment.intervalHigh,
   );
 }
 
 export type PublicationClaimAssessment =
-  | { readonly ok: true; readonly score: number; readonly claims: readonly ReleaseSourceClaim[] }
+  | {
+      readonly ok: true;
+      readonly reviewBasis: 'independent_review';
+      readonly claims: readonly ReleaseSourceClaim[];
+    }
   | { readonly ok: false; readonly detail: string };
 
 /**
- * Every public assertion must match one reviewed version, including its cited source.
- * The conservative interval bound is a release gate, not a model self-score or host heuristic.
+ * Every public assertion must match one reviewed version, including its cited source. A reviewed
+ * assessment remains qualitative evidence until its calibration version is bound to an approved,
+ * held-out calibration artifact. The ledger currently stores only a free-form version label, so
+ * this gate can admit independently reviewed claims but cannot return a numerical probability.
  */
 export function assessPublicationClaims(
   entry: Pick<ReleaseSourceEntity, 'id' | 'claims'>,
@@ -203,7 +207,6 @@ export function assessPublicationClaims(
 ): PublicationClaimAssessment {
   if (!entry.claims?.length) return { ok: false, detail: 'No assessed claims' };
   const claims: ReleaseSourceClaim[] = [];
-  let score = 1;
   for (const claim of entry.claims) {
     const matches = reviewed.filter(
       (row) =>
@@ -221,11 +224,9 @@ export function assessPublicationClaims(
         detail: `Claim requires an exact, independently reviewed assessment: ${claim.predicate}`,
       };
     }
-    const match = matches[0]!;
-    score = Math.min(score, match.assessment.intervalLow);
-    claims.push({ ...claim, id: match.claimId });
+    claims.push({ ...claim, id: matches[0]!.claimId });
   }
-  return { ok: true, score, claims };
+  return { ok: true, reviewBasis: 'independent_review', claims };
 }
 
 export { isTier1Host };

@@ -90,7 +90,8 @@ test(
         reviewed,
       );
       assert.ok(result.ok);
-      assert.equal(result.score, 0.8);
+      assert.equal(result.reviewBasis, 'independent_review');
+      assert.equal('score' in result, false);
       await client.query('SAVEPOINT origin_check');
       await assert.rejects(
         client.query(`INSERT INTO evidence.evidence_selectors

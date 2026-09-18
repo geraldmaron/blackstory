@@ -1,5 +1,5 @@
 /**
- * One bounded corroboration pass for pending landscape intake below the 0.75 publish gate.
+ * One bounded corroboration pass for pending landscape intake below the publication gate.
  * Fetches each row's canonical_url, finds an independent Tier-1/Tier-2 source via
  * lib/corroborate-source.ts, and writes provenance.sourceUrl on the landscape row.
  * Never publishes — run publish-release-entities-incremental.ts after review.
@@ -207,8 +207,7 @@ async function main(): Promise<void> {
     const updates: Array<{
       readonly id: string;
       readonly displayName: string;
-      readonly beforeConfidence?: number | undefined;
-      readonly afterConfidence?: number | undefined;
+      readonly reviewBasis?: 'independent_review' | undefined;
       readonly corroboratingUrl?: string | undefined;
       readonly method?: string | undefined;
       readonly status: 'updated' | 'unchanged' | 'already_had' | 'clears_gate';
@@ -228,7 +227,7 @@ async function main(): Promise<void> {
           updates.push({
             id: row.id,
             displayName: row.display_name,
-            afterConfidence: beforeGate.confidence,
+            reviewBasis: beforeGate.reviewBasis,
             status: 'clears_gate',
           });
           return;
@@ -296,7 +295,7 @@ async function main(): Promise<void> {
           releaseId,
           generatedAt,
         });
-        const afterConfidence = afterGate.eligible ? afterGate.confidence : undefined;
+        const reviewBasis = afterGate.eligible ? afterGate.reviewBasis : undefined;
         const clearsGate = afterGate.eligible;
         if (clearsGate) wouldClearGate += 1;
 
@@ -313,7 +312,7 @@ async function main(): Promise<void> {
         updates.push({
           id: row.id,
           displayName: row.display_name,
-          afterConfidence,
+          reviewBasis,
           corroboratingUrl: corroborationUrl,
           method: corroboration.method,
           status: clearsGate ? 'clears_gate' : 'updated',
@@ -361,7 +360,7 @@ async function main(): Promise<void> {
     console.log(`Corroborated: ${corroborated}`);
     console.log(`Already clears gate: ${alreadyClearsGate}`);
     console.log(`Unchanged (no corroboration found): ${unchanged}`);
-    console.log(`Would clear 0.75 gate: ${wouldClearGate}`);
+    console.log(`Would clear publication gate: ${wouldClearGate}`);
     console.log(`Report: ${REPORT_PATH}`);
     if (DRY_RUN || !APPLY) {
       console.log(

@@ -2248,11 +2248,11 @@ test('independent review of every exact claim permits publication and keeps cano
     generatedAt: '2026-01-01T00:00:00Z',
   });
   assert.ok(result.eligible);
-  assert.equal(result.confidence, 0.9);
+  assert.equal(result.reviewBasis, 'independent_review');
   assert.equal(result.entry.claims?.[0]?.id, reviewedClaims[0]?.claimId);
 });
 
-test('republishing does not waive the reviewed confidence floor', () => {
+test('an uncalibrated numeric interval neither blocks nor authorizes independently reviewed claims', () => {
   const row = enrichedRow({ exact_in_release: true });
   const result = gateLandscapePublishCandidate({
     row,
@@ -2261,6 +2261,6 @@ test('republishing does not waive the reviewed confidence floor', () => {
     generatedAt: '2026-01-01T00:00:00Z',
     allowRepublish: true,
   });
-  assert.equal(result.eligible, false);
-  if (!result.eligible) assert.equal(result.reason, 'confidence_below_floor');
+  assert.ok(result.eligible);
+  assert.equal(result.reviewBasis, 'independent_review');
 });

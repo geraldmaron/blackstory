@@ -170,11 +170,27 @@ test('a government citation without independent claim assessment cannot authoriz
   assert.equal(assessPublicationClaims(entry, []).ok, false);
 });
 
-test('exact reviewed claim uses conservative bound and preserves canonical identity', () => {
+test('exact reviewed claim is admitted only on its qualitative independent-review basis', () => {
   const result = assessPublicationClaims(entry, [reviewed]);
   assert.ok(result.ok);
-  assert.equal(result.score, 0.8);
+  assert.equal(result.reviewBasis, 'independent_review');
+  assert.equal('score' in result, false);
   assert.equal(result.claims[0]?.id, reviewed.claimId);
+});
+
+test('a plausible calibration label without held-out evidence remains inert', () => {
+  const result = assessPublicationClaims(entry, [
+    {
+      ...reviewed,
+      assessment: {
+        ...reviewed.assessment,
+        calibrationVersion: 'production-held-out-claims-2026-09-v4',
+      },
+    },
+  ]);
+  assert.ok(result.ok);
+  assert.equal(result.reviewBasis, 'independent_review');
+  assert.equal('score' in result, false);
 });
 
 test('a review cannot transfer to another entity, assertion, predicate, id or citation', () => {
@@ -219,7 +235,6 @@ test('ambiguous or malformed assessments remain held', () => {
     { intervalLow: NaN },
     { intervalLow: 0.98 },
     { acceptanceProbability: 1.2 },
-    { calibrationVersion: 'uncalibrated' },
     { calibrationVersion: '' },
   ]) {
     assert.equal(

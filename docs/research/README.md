@@ -108,6 +108,12 @@ contradiction severity, geographic/temporal precision, and claim confidence sepa
 0.9 is not a 90% probability. A weighted score is not a calibrated posterior. An information-value
 score is a scheduling heuristic until calibrated against observed yield.
 
+Incremental publication currently uses the qualitative basis `independent_review`: every assertion
+must match the accepted claim version and reviewed source evidence. A free-form calibration label
+cannot authorize or display a probability. Numerical admission requires a separately reviewed
+held-out calibration artifact and a trusted binding to the predictor, dataset and domain policy;
+that binding is not currently implemented.
+
 Bayesian comparisons can be useful when priors, likelihoods, alternatives and dependence
 assumptions are defensible. Do not multiply dependent source probabilities or edge confidences
 into a chain probability. Syndication, copied biographies, shared archival roots, selection bias,
