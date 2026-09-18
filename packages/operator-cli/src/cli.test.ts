@@ -6,6 +6,7 @@ import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import type { AtomicStore, AtomicTransaction } from '@repo/data-access';
 import { runCli } from './cli.ts';
+import type { ExecutionClient, ExecutionPool } from './research-execution.js';
 
 class MemoryAtomicStore implements AtomicStore {
   readonly writes: string[] = [];
@@ -40,6 +41,27 @@ function capture() {
     stdout: (line: string) => lines.push(line),
     stderr: (line: string) => errors.push(line),
   };
+}
+
+class CaptureRetentionPool implements ExecutionPool {
+  readonly statements: string[] = [];
+  constructor(private readonly orphanPath: string) {}
+
+  async connect(): Promise<ExecutionClient> {
+    return {
+      query: async <Row extends Record<string, unknown>>(text: string) => {
+        this.statements.push(text);
+        let rows: Record<string, unknown>[] = [];
+        if (text.includes('SELECT object.name FROM storage.objects')) {
+          rows = [{ name: this.orphanPath }];
+        } else if (text.includes('AS count')) {
+          rows = [{ count: '0' }];
+        }
+        return { rows: rows as Row[] };
+      },
+      release() {},
+    };
+  }
 }
 
 const BASE_FLAGS = [
@@ -115,6 +137,55 @@ test('a missing required flag fails cleanly with a non-zero exit code and no wri
   assert.equal(code, 1);
   assert.match(out.errors[0] ?? '', /--description/);
   assert.equal(store.writes.length, 0);
+});
+
+test('capture-retention parses --orphans and keeps the default command read-only', async () => {
+  const out = capture();
+  const orphanPath = `captures/${'a'.repeat(64)}.txt`;
+  const postgresPool = new CaptureRetentionPool(orphanPath);
+  const code = await runCli(
+    [
+      'capture-retention',
+      '--orphans',
+      '--bucket',
+      'raw-sources',
+      '--operator-id',
+      'operator-1',
+      '--limit',
+      '100',
+      // All CLI booleans must remain standalone instead of consuming a following value.
+      '--approximate',
+    ],
+    { postgresPool, stdout: out.stdout, stderr: out.stderr },
+  );
+
+  assert.equal(code, 0);
+  assert.deepEqual(JSON.parse(out.lines[0] ?? '{}').orphanObjects, [
+    { bucket: 'raw-sources', path: orphanPath },
+  ]);
+  assert.equal(JSON.parse(out.lines[1] ?? '{}').committed, false);
+  assert.ok(
+    postgresPool.statements.every(
+      (statement) => !/^\s*(DELETE|INSERT|LOCK|UPDATE)\b/i.test(statement),
+    ),
+  );
+});
+
+test('capture-retention parses --delete-storage and refuses it without --commit', async () => {
+  const out = capture();
+  const postgresPool = new CaptureRetentionPool(`captures/${'b'.repeat(64)}.txt`);
+  const code = await runCli(
+    ['capture-retention', '--delete-storage', '--operator-id', 'operator-1', '--limit', '100'],
+    { postgresPool, stdout: out.stdout, stderr: out.stderr },
+  );
+
+  assert.equal(code, 1);
+  assert.match(out.errors[0] ?? '', /--delete-storage requires --commit/);
+  assert.ok(
+    postgresPool.statements.every(
+      (statement) => !/^\s*(DELETE|INSERT|LOCK|UPDATE)\b/i.test(statement),
+    ),
+  );
 });
 
 test('research-intake fetches through an injected transport, then opens a draft case', async () => {

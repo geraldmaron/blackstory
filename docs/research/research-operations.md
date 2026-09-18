@@ -295,13 +295,15 @@ still do not mint SPN jobs.
 `archive.org/wayback/available` what Internet Archive already holds at two points: after a local
 safe-fetch fails, and, with `--wayback` on, before minting a new SPN2 capture. A URL we cannot
 read ourselves (a PDF, a robots block, a dead host) is the likeliest to already have a snapshot,
-and an existing snapshot makes a new SPN job redundant. The pointer is recorded verbatim as
-`waybackCaptureUrl` on `retrieval_events.detail`, and on `source_captures.storage_object` when a
-capture row exists, tagged `waybackCaptureSource: availability-lookup`. It needs no credentials,
-so it runs whether or not SPN keys are set. A miss is a recorded skip, never a failure: the row
-carries `waybackLookupStatus: miss` with a reason. Counts land in the report under
-`waybackLookup` (`attempted`, `found`, `missed`, `recoveredAfterFetchFailure`) and
-`wayback.reusedExistingSnapshot`. The lane does not apply a `wayback_swap` to public citations;
+but an availability snapshot never satisfies a new content revision's SPN2 anchor. The current
+revision is keyed by its content hash and receives its own anchor attempt. Availability metadata
+is recorded separately as `waybackAvailabilityUrl` on `retrieval_events.detail`, and on
+`source_captures.storage_object` when a capture row exists, tagged
+`waybackAvailabilitySource: availability-lookup`. It needs no credentials, so it runs whether or
+not SPN keys are set. A miss is a recorded skip, never a failure: the row carries
+`waybackLookupStatus: miss` with a reason. Counts land in the report under `waybackLookup`
+(`attempted`, `found`, `missed`, `recoveredAfterFetchFailure`). The lane does not apply a
+`wayback_swap` to public citations;
 `citation-link-health-sweep` owns that for stored pointers.
 
 **Never:** raw `fetch` to archive.org; fabricate a Wayback URL when SPN fails or when a lookup

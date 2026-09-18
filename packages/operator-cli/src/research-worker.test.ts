@@ -10,7 +10,11 @@ import {
 } from '@repo/research-kernel';
 import { runResearchWorker, type ResearchWorkerDependencies } from './research-worker.js';
 import { completeResearchTask, startResearchExecution } from './research-execution.js';
-import { sweepCaptureRetention, reconcileOrphanCaptures } from './capture-retention.js';
+import {
+  drainCaptureDisposals,
+  reconcileOrphanCaptures,
+  sweepCaptureRetention,
+} from './capture-retention.js';
 
 const hash = (text: string) => createHash('sha256').update(text).digest('hex');
 function planFixture(): ResearchExecutionPlan {
@@ -317,6 +321,124 @@ test(
       assert.ok(result.attempts.every((attempt) => attempt.valid));
       assert.equal((result.evidenceNeeds as { status: string }[])[0]?.status, 'open');
     } finally {
+      await __resetOpsPostgresPoolForTests();
+    }
+  },
+);
+
+test(
+  'orphan reconciliation protects legacy capture objects without source-item provenance',
+  { skip: !process.env.RESEARCH_TEST_DATABASE_URL },
+  async () => {
+    const database = process.env.RESEARCH_TEST_DATABASE_URL!;
+    assert.ok(['127.0.0.1', 'localhost', '[::1]'].includes(new URL(database).hostname));
+    const pool = getOpsPostgresPool({ DATABASE_URL: database });
+    const prefix = `legacy-orphan-${randomUUID()}`;
+    const bucket = 'raw-sources';
+    const digests = Array.from({ length: 56 }, (_, index) => hash(`${prefix}-${index}`));
+    const referencedPaths = digests.slice(0, 55).map((digest) => `captures/${digest}.txt`);
+    const orphanPath = `captures/${digests[55]}.txt`;
+    const captureIds = referencedPaths.map((_, index) => `${prefix}-capture-${index}`);
+    const malformedCaptureId = `${prefix}-malformed`;
+    try {
+      await pool.query(
+        `INSERT INTO storage.objects(bucket_id,name,created_at)
+         SELECT $1,path,clock_timestamp()-interval '25 hours'
+         FROM unnest($2::text[]) AS path`,
+        [bucket, [...referencedPaths, orphanPath]],
+      );
+      await pool.query(
+        `INSERT INTO evidence.source_captures
+           (id,source_item_id,content_hash_algorithm,content_hash_digest,parser_version,
+            snapshot_mode,dedup_of_capture_id,storage_object,captured_at)
+         SELECT fixture.id,NULL,'sha256',fixture.digest,'legacy-capture-v1','selective',NULL,
+           jsonb_build_object('stored','supabase-storage','bucket',$4::text,'path',fixture.path,
+             'sha256',fixture.digest),
+           clock_timestamp()-interval '25 hours'
+         FROM unnest($1::text[],$2::text[],$3::text[]) AS fixture(id,digest,path)`,
+        [captureIds, digests.slice(0, 55), referencedPaths, bucket],
+      );
+
+      const result = await reconcileOrphanCaptures(pool, {
+        commit: false,
+        actor: 'rights-reviewer',
+        bucket,
+        limit: 1000,
+      });
+      assert.deepEqual(result.orphanObjects, [{ bucket, path: orphanPath }]);
+
+      await pool.query(
+        `INSERT INTO evidence.capture_orphan_disposals(bucket,object_path,requested_by)
+         VALUES($1,$2,$4),($1,$3,$4)`,
+        [bucket, referencedPaths[0], orphanPath, 'rights-reviewer'],
+      );
+      let deletes = 0;
+      const drained = await drainCaptureDisposals(pool, {
+        url: 'https://storage.example',
+        bucket,
+        secretKey: 'fixture-key',
+        transport: async () => {
+          deletes++;
+          return new Response('[]', { status: 200 });
+        },
+      });
+      assert.deepEqual(drained, { deletedObjects: 1, sharedObjectsDeferred: 1 });
+      assert.equal(deletes, 1, 'The referenced historical object must not reach Storage DELETE');
+
+      await pool.query(
+        `INSERT INTO evidence.source_captures
+           (id,source_item_id,content_hash_algorithm,content_hash_digest,parser_version,
+            snapshot_mode,dedup_of_capture_id,storage_object,captured_at)
+         VALUES($1,NULL,'sha256',$2,'legacy-capture-v1','selective',NULL,
+           jsonb_build_object('stored','supabase-storage','bucket',$3::text),clock_timestamp())`,
+        [malformedCaptureId, hash(malformedCaptureId), bucket],
+      );
+      await pool.query(
+        `UPDATE evidence.capture_orphan_disposals SET deleted_at=NULL
+         WHERE bucket=$1 AND object_path=$2`,
+        [bucket, orphanPath],
+      );
+      await assert.rejects(
+        reconcileOrphanCaptures(pool, {
+          commit: false,
+          actor: 'rights-reviewer',
+          bucket,
+          limit: 1000,
+        }),
+        /malformed storage reference/,
+      );
+      await assert.rejects(
+        drainCaptureDisposals(pool, {
+          url: 'https://storage.example',
+          bucket,
+          secretKey: 'fixture-key',
+          transport: async () => {
+            deletes++;
+            return new Response('[]', { status: 200 });
+          },
+        }),
+        /malformed storage reference/,
+      );
+      assert.equal(deletes, 1, 'Malformed capture references must block Storage DELETE');
+    } finally {
+      await pool.query(
+        'DELETE FROM evidence.capture_orphan_disposals WHERE bucket=$1 AND object_path=ANY($2::text[])',
+        [bucket, [referencedPaths[0], orphanPath]],
+      );
+      await pool.query('DELETE FROM evidence.source_captures WHERE id=ANY($1::text[])', [
+        [...captureIds, malformedCaptureId],
+      ]);
+      const cleanup = await pool.connect();
+      try {
+        await cleanup.query("SET session_replication_role='replica'");
+        await cleanup.query(
+          'DELETE FROM storage.objects WHERE bucket_id=$1 AND name=ANY($2::text[])',
+          [bucket, [...referencedPaths, orphanPath]],
+        );
+      } finally {
+        await cleanup.query("SET session_replication_role='origin'");
+        cleanup.release();
+      }
       await __resetOpsPostgresPoolForTests();
     }
   },

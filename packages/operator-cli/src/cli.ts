@@ -30,6 +30,7 @@ import {
   completeResearchTask,
   heartbeatResearchTask,
   researchExecutionStatus,
+  type ExecutionPool,
   type TaskModelMetadata,
 } from './research-execution.js';
 import type { AuthorityFollowUpLead, RelationshipRole, RelationshipType } from '@repo/domain';
@@ -213,6 +214,8 @@ export type CliDependencies = {
    * a SearXNG instance.
    */
   readonly searchProvider?: ResolvedSearchProvider;
+  /** Injected only for bounded CLI tests; production resolves the configured Postgres pool. */
+  readonly postgresPool?: ExecutionPool;
 };
 
 type Flags = {
@@ -223,12 +226,15 @@ type Flags = {
 
 const REPEATABLE_FLAGS = new Set(['--source-url', '--feed-xml', '--from']);
 const BOOLEAN_FLAGS = new Set([
+  '--approximate',
   '--commit',
   '--continue-on-quarantine',
+  '--delete-storage',
   '--enrich',
   '--full',
   '--include-curated',
   '--omit-raw-model',
+  '--orphans',
   '--queue-survivors',
   '--wayback',
   // Accepted uniformly on every verb: every command already prints JSON by
@@ -518,14 +524,15 @@ export async function runCli(argv: readonly string[], deps: CliDependencies = {}
     const flags = parseFlags(rest);
     switch (command) {
       case 'capture-retention': {
-        assertPostgresOpsDataSource(process.env);
+        if (!deps.postgresPool) assertPostgresOpsDataSource(process.env);
+        const pool = deps.postgresPool ?? getOpsPostgresPool();
         const commit = flags.booleans.has('--commit');
         const sourceItemId = optionalFlag(flags, '--source-item-id');
         const limit = Number(optionalFlag(flags, '--limit') ?? '100');
         if (flags.booleans.has('--orphans'))
           stdout(
             JSON.stringify(
-              await reconcileOrphanCaptures(getOpsPostgresPool(), {
+              await reconcileOrphanCaptures(pool, {
                 commit,
                 actor: requireFlag(flags, '--operator-id'),
                 limit,
@@ -535,7 +542,7 @@ export async function runCli(argv: readonly string[], deps: CliDependencies = {}
               2,
             ),
           );
-        const result = await sweepCaptureRetention(getOpsPostgresPool(), {
+        const result = await sweepCaptureRetention(pool, {
           commit,
           actor: requireFlag(flags, '--operator-id'),
           limit,
@@ -546,13 +553,7 @@ export async function runCli(argv: readonly string[], deps: CliDependencies = {}
           if (!commit) throw new Error('--delete-storage requires --commit');
           const config = supabaseStorageConfigFromEnv(process.env);
           if (!config) throw new Error('Capture storage must be configured for disposal');
-          stdout(
-            JSON.stringify(
-              await drainCaptureDisposals(getOpsPostgresPool(), config, limit),
-              null,
-              2,
-            ),
-          );
+          stdout(JSON.stringify(await drainCaptureDisposals(pool, config, limit), null, 2));
         }
         return 0;
       }

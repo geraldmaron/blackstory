@@ -324,7 +324,7 @@ test('an unreachable URL gets a lookup, and the existing snapshot lands on the f
   const [detail] = retrievalDetails(db.writes);
   assert.equal(detail?.waybackLookupStatus, 'found');
   assert.equal(
-    detail?.waybackCaptureUrl,
+    detail?.waybackAvailabilityUrl,
     'https://web.archive.org/web/20260214093311/https://census.gov/a',
   );
   assert.equal(detail?.url, 'https://census.gov/a', 'the original detail keys survive');
@@ -347,7 +347,7 @@ test('a lookup miss is recorded on the event and does not fail the lane', async 
   assert.equal(details.length, 2);
   assert.equal(details[0]?.waybackLookupStatus, 'miss');
   assert.equal(details[0]?.waybackLookupReason, 'no_snapshot');
-  assert.equal(details[0]?.waybackCaptureUrl, undefined);
+  assert.equal(details[0]?.waybackAvailabilityUrl, undefined);
 });
 
 test('a lookup that throws would fail the lane, so the port must absorb it', async () => {
@@ -371,13 +371,14 @@ test('a lookup that throws would fail the lane, so the port must absorb it', asy
   );
 });
 
-test('--wayback reuses an existing snapshot instead of minting a duplicate SPN capture', async () => {
+test('--wayback preserves the current revision even when availability finds an older snapshot', async () => {
   const db = fakeDb();
   const lookup = fakeLookup(foundSnapshot);
   let spnCalls = 0;
   const waybackAnchor: WaybackAnchor = {
-    async captureUrl() {
+    async captureUrl(_url, contentHashDigest) {
       spnCalls += 1;
+      assert.equal(contentHashDigest, 'f'.repeat(64));
       return { status: 'failed', reason: 'should_not_run' };
     },
   };
@@ -387,9 +388,8 @@ test('--wayback reuses an existing snapshot instead of minting a duplicate SPN c
     { ...deps(async () => ok('f'.repeat(64))), waybackAnchor, waybackLookup: lookup },
   );
 
-  assert.equal(spnCalls, 0, 'an existing snapshot makes a new SPN job redundant');
-  assert.equal(report.wayback.reusedExistingSnapshot, 1);
-  assert.equal(report.wayback.attempted, 0);
+  assert.equal(spnCalls, 1, 'an older snapshot cannot satisfy the current revision');
+  assert.equal(report.wayback.attempted, 1);
   assert.equal(report.captured, 1);
 
   // A local capture row exists here, so the pointer belongs on storage_object as well.
@@ -397,11 +397,11 @@ test('--wayback reuses an existing snapshot instead of minting a duplicate SPN c
   const stored = JSON.parse(String(captureWrite?.params?.[7] ?? '{}')) as Record<string, unknown>;
   assert.equal(stored.waybackLookupStatus, 'found');
   assert.equal(
-    stored.waybackCaptureUrl,
+    stored.waybackAvailabilityUrl,
     'https://web.archive.org/web/20260214093311/https://census.gov/a',
   );
-  assert.equal(stored.waybackCaptureSource, 'availability-lookup');
-  assert.equal(stored.waybackStatus, undefined, 'no SPN outcome, so no SPN key');
+  assert.equal(stored.waybackAvailabilitySource, 'availability-lookup');
+  assert.equal(stored.waybackStatus, 'failed');
   const [detail] = retrievalDetails(db.writes);
   assert.equal(detail?.waybackLookupStatus, 'found');
 });
@@ -426,7 +426,6 @@ test('--wayback falls through to SPN when the lookup finds nothing', async () =>
 
   assert.equal(report.wayback.attempted, 1);
   assert.equal(report.wayback.anchored, 1);
-  assert.equal(report.wayback.reusedExistingSnapshot, 0);
   const captureWrite = db.writes.find((w) => w.sql.includes('source_captures'));
   const stored = JSON.parse(String(captureWrite?.params?.[7] ?? '{}')) as Record<string, unknown>;
   assert.equal(stored.waybackLookupStatus, 'miss');

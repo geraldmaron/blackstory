@@ -18,7 +18,9 @@ export type WaybackAnchorAttempt =
     }
   | { readonly status: 'pending'; readonly jobId: string }
   | { readonly status: 'failed'; readonly reason: string };
-export type WaybackAnchor = { captureUrl(targetUrl: string): Promise<WaybackAnchorAttempt> };
+export type WaybackAnchor = {
+  captureUrl(targetUrl: string, contentHashDigest: string): Promise<WaybackAnchorAttempt>;
+};
 export type WaybackJob = {
   created: boolean;
   state: 'reserved' | 'pending' | 'anchored' | 'failed';
@@ -26,23 +28,32 @@ export type WaybackJob = {
   result: WaybackAnchorAttempt | null;
 };
 export type WaybackJobStore = {
-  reserve(url: string, decision: PreservationDecision): Promise<WaybackJob>;
-  submitted(url: string, jobId: string): Promise<void>;
-  finish(url: string, result: WaybackAnchorAttempt): Promise<void>;
+  reserve(
+    url: string,
+    contentHashDigest: string,
+    decision: PreservationDecision,
+  ): Promise<WaybackJob>;
+  submitted(url: string, contentHashDigest: string, jobId: string): Promise<void>;
+  finish(url: string, contentHashDigest: string, result: WaybackAnchorAttempt): Promise<void>;
 };
+
+const SHA256_DIGEST = /^[a-f0-9]{64}$/;
 
 export function createPostgresWaybackJobStore(db: QueryablePool): WaybackJobStore {
   return {
-    async reserve(url, decision) {
+    async reserve(url, contentHashDigest, decision) {
       const created = await db.query(
-        `INSERT INTO research.preservation_jobs (source_url,state,decision)
-        VALUES ($1,'reserved',$2::jsonb) ON CONFLICT (source_url) DO NOTHING RETURNING source_url`,
-        [url, JSON.stringify(decision)],
+        `INSERT INTO research.preservation_jobs (source_url,content_hash_digest,state,decision)
+        VALUES ($1,$2,'reserved',$3::jsonb)
+        ON CONFLICT (source_url,content_hash_digest) DO NOTHING
+        RETURNING source_url,content_hash_digest`,
+        [url, contentHashDigest, JSON.stringify(decision)],
       );
       const row = (
         await db.query(
-          'SELECT state,job_id,result FROM research.preservation_jobs WHERE source_url=$1',
-          [url],
+          `SELECT state,job_id,result FROM research.preservation_jobs
+           WHERE source_url=$1 AND content_hash_digest=$2`,
+          [url, contentHashDigest],
         )
       ).rows[0];
       if (!row) throw new Error('Preservation reservation is missing');
@@ -53,19 +64,22 @@ export function createPostgresWaybackJobStore(db: QueryablePool): WaybackJobStor
         result: row.result as WaybackAnchorAttempt | null,
       };
     },
-    async submitted(url, jobId) {
+    async submitted(url, contentHashDigest, jobId) {
       await db.query(
-        `UPDATE research.preservation_jobs SET state='pending',job_id=$2,updated_at=clock_timestamp()
-        WHERE source_url=$1 AND state='reserved'`,
-        [url, jobId],
+        `UPDATE research.preservation_jobs
+         SET state='pending',job_id=$3,updated_at=clock_timestamp()
+         WHERE source_url=$1 AND content_hash_digest=$2 AND state='reserved'`,
+        [url, contentHashDigest, jobId],
       );
     },
-    async finish(url, result) {
+    async finish(url, contentHashDigest, result) {
       await db.query(
-        `UPDATE research.preservation_jobs SET state=$2,result=$3::jsonb,updated_at=clock_timestamp()
-        WHERE source_url=$1`,
+        `UPDATE research.preservation_jobs
+         SET state=$3,result=$4::jsonb,updated_at=clock_timestamp()
+         WHERE source_url=$1 AND content_hash_digest=$2`,
         [
           url,
+          contentHashDigest,
           result.status === 'anchored'
             ? 'anchored'
             : result.status === 'pending'
@@ -110,9 +124,11 @@ export type CreateWaybackAnchorInput = {
 
 export function createWaybackAnchor(input: CreateWaybackAnchorInput): WaybackAnchor {
   return {
-    async captureUrl(targetUrl) {
+    async captureUrl(targetUrl, contentHashDigest) {
       let job: WaybackJob | undefined;
       try {
+        if (!SHA256_DIGEST.test(contentHashDigest))
+          return { status: 'failed', reason: 'invalid_content_revision' };
         const decision = validatePreservationDecision(
           input.decisionForUrl(targetUrl),
           targetUrl,
@@ -120,7 +136,7 @@ export function createWaybackAnchor(input: CreateWaybackAnchorInput): WaybackAnc
         );
         if (!decision.allowArchive)
           return { status: 'failed', reason: 'source_policy_disallows_archiving' };
-        job = await input.jobs.reserve(targetUrl, decision);
+        job = await input.jobs.reserve(targetUrl, contentHashDigest, decision);
         if (job.result && job.state !== 'pending') return job.result;
         let jobId = job.jobId;
         if (job.created) {
@@ -129,7 +145,7 @@ export function createWaybackAnchor(input: CreateWaybackAnchorInput): WaybackAnc
             retries: 0,
           });
           jobId = submitted.jobId;
-          await input.jobs.submitted(targetUrl, jobId);
+          await input.jobs.submitted(targetUrl, contentHashDigest, jobId);
         }
         if (!jobId)
           return { status: 'failed', reason: 'submission_outcome_unknown_requires_reconciliation' };
@@ -150,7 +166,7 @@ export function createWaybackAnchor(input: CreateWaybackAnchorInput): WaybackAnc
             waybackCapturedAt: pointer.capturedAt,
           };
         } else result = { status: 'failed', reason: status.message ?? 'archive_capture_failed' };
-        await input.jobs.finish(targetUrl, result);
+        await input.jobs.finish(targetUrl, contentHashDigest, result);
         return result;
       } catch (error) {
         // Retain the job id or uncertain reservation so a later run cannot duplicate submission.

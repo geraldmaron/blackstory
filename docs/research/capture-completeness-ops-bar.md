@@ -125,9 +125,9 @@ explicitly overrides.
 4. **Capture** — route live Save Page Now through `capture-backfill --commit --wayback` (domain
    SPN2 client + operator-cli SafeHttpClient). Persist rows to `evidence.source_captures` and
    attach the snapshot URL on `storage_object`. Never fabricate pointers when SPN fails closed.
-   The lane looks before it saves: an availability lookup that finds an existing capture is
-   reused instead of minting a new SPN job, so the run's `wayback.reusedExistingSnapshot` count
-   is SPN work the budget did not have to pay for.
+   The lane records availability results separately from the current content revision. An older
+   availability snapshot never satisfies a new SPN2 capture, so each successful local revision
+   still receives its own content-hash-keyed anchor attempt.
 5. **Re-measure** — repeat until `meetsBar` or the remaining gaps are documented blockers (robots,
    paywall, 404 at capture time).
 6. **Stop** — when `evaluateDailyBudget` reports `disable_source_fetch`, halt SPN entirely until

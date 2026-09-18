@@ -1,6 +1,28 @@
 /** Explicit retention enforcement for captured text, derived passages, and private storage. */
-import type { ExecutionPool } from './research-execution.js';
+import type { ExecutionClient, ExecutionPool } from './research-execution.js';
 import type { SupabaseStorageConfig } from './supabase-storage.js';
+
+async function assertNoMalformedCaptureStorageReferences(
+  db: ExecutionClient,
+  bucket: string,
+): Promise<void> {
+  const rows = (
+    await db.query(
+      `SELECT id FROM evidence.source_captures
+      WHERE (
+        ((storage_object->>'stored'='supabase-storage' OR storage_object ? 'path')
+          AND nullif(storage_object->>'bucket','') IS NULL)
+        OR (storage_object->>'bucket'=$1 AND nullif(storage_object->>'path','') IS NULL)
+      )
+      ORDER BY id LIMIT 1`,
+      [bucket],
+    )
+  ).rows;
+  if (rows.length)
+    throw new Error(
+      `Cannot reconcile capture storage: malformed storage reference on ${String(rows[0]?.id)}`,
+    );
+}
 
 export type RetentionSweepInput = {
   commit: boolean;
@@ -208,11 +230,19 @@ export async function drainCaptureDisposals(
       await db.query('BEGIN');
       try {
         await db.query("SET LOCAL statement_timeout='30s'");
-        // Prevent a new origin reference from racing the external deletion.
-        await db.query('LOCK TABLE evidence.capture_origins IN SHARE ROW EXCLUSIVE MODE');
+        // Prevent either current or historical capture references from racing the external deletion.
+        await db.query(
+          'LOCK TABLE evidence.capture_origins, evidence.source_captures IN SHARE ROW EXCLUSIVE MODE',
+        );
+        await assertNoMalformedCaptureStorageReferences(db, config.bucket);
         const references = await db.query(
-          `SELECT 1 FROM evidence.capture_origins
-        WHERE storage_object->>'bucket'=$1 AND storage_object->>'path'=$2 LIMIT 1`,
+          `SELECT 1 WHERE EXISTS (
+            SELECT 1 FROM evidence.capture_origins
+            WHERE storage_object->>'bucket'=$1 AND storage_object->>'path'=$2
+          ) OR EXISTS (
+            SELECT 1 FROM evidence.source_captures
+            WHERE storage_object->>'bucket'=$1 AND storage_object->>'path'=$2
+          )`,
           [row.bucket, row.object_path],
         );
         if (references.rows.length) {
@@ -276,7 +306,10 @@ export async function reconcileOrphanCaptures(
     await db.query('BEGIN');
     await db.query("SET LOCAL statement_timeout='30s'");
     if (input.commit)
-      await db.query('LOCK TABLE evidence.capture_origins IN SHARE ROW EXCLUSIVE MODE');
+      await db.query(
+        'LOCK TABLE evidence.capture_origins, evidence.source_captures IN SHARE ROW EXCLUSIVE MODE',
+      );
+    await assertNoMalformedCaptureStorageReferences(db, input.bucket);
     const rows = (
       await db.query(
         `SELECT object.name FROM storage.objects object
@@ -284,6 +317,10 @@ export async function reconcileOrphanCaptures(
         AND object.created_at < clock_timestamp()-interval '24 hours'
         AND NOT EXISTS (SELECT 1 FROM evidence.capture_origins origin
           WHERE origin.storage_object->>'bucket'=$1 AND origin.storage_object->>'path'=object.name)
+        -- Historical captures can predate capture_origins and legitimately lack source_item_id.
+        -- Their storage reference protects custody without inventing an origin relationship.
+        AND NOT EXISTS (SELECT 1 FROM evidence.source_captures capture
+          WHERE capture.storage_object->>'bucket'=$1 AND capture.storage_object->>'path'=object.name)
       ORDER BY object.name LIMIT $2`,
         [input.bucket, input.limit],
       )

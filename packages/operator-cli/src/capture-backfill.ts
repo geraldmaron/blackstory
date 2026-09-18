@@ -133,8 +133,6 @@ export type WaybackBackfillReport = {
   readonly anchored: number;
   readonly failed: number;
   readonly pending: number;
-  /** Existing snapshots that made a new SPN2 job unnecessary. Counted here, not in `attempted`. */
-  readonly reusedExistingSnapshot: number;
 };
 
 export type WaybackLookupBackfillReport = {
@@ -298,7 +296,6 @@ function resolveWaybackReport(input: {
   readonly anchored: number;
   readonly failed: number;
   readonly pending: number;
-  readonly reusedExistingSnapshot: number;
 }): WaybackBackfillReport {
   let status: WaybackBackfillReport['status'] = 'off';
   if (input.requested && !input.credentialsPresent) {
@@ -316,7 +313,6 @@ function resolveWaybackReport(input: {
     anchored: input.anchored,
     failed: input.failed,
     pending: input.pending,
-    reusedExistingSnapshot: input.reusedExistingSnapshot,
   };
 }
 
@@ -372,7 +368,6 @@ export async function runCaptureBackfill(
         anchored: 0,
         failed: 0,
         pending: 0,
-        reusedExistingSnapshot: 0,
       }),
       waybackLookup: {
         available: lookupAvailable,
@@ -393,7 +388,6 @@ export async function runCaptureBackfill(
   let waybackAnchored = 0;
   let waybackFailed = 0;
   let waybackPending = 0;
-  let waybackReused = 0;
   let lookupAttempted = 0;
   let lookupFound = 0;
   let lookupMissed = 0;
@@ -439,23 +433,22 @@ export async function runCaptureBackfill(
     }
 
     if (waybackAnchor && capture) {
-      if (existing?.status === 'found') {
-        waybackReused += 1;
+      // An availability hit is a historical pointer. It does not prove that the bytes we
+      // fetched for this revision were saved, so every successful local capture still submits
+      // (or resumes) its URL + content hash through the durable SPN2 job store.
+      waybackAttempted += 1;
+      const attempt = await waybackAnchor.captureUrl(ref.url, capture.contentHashDigest);
+      if (attempt.status === 'anchored') {
+        waybackAnchored += 1;
+      } else if (attempt.status === 'pending') {
+        waybackPending += 1;
       } else {
-        waybackAttempted += 1;
-        const attempt = await waybackAnchor.captureUrl(ref.url);
-        if (attempt.status === 'anchored') {
-          waybackAnchored += 1;
-        } else if (attempt.status === 'pending') {
-          waybackPending += 1;
-        } else {
-          waybackFailed += 1;
-        }
-        capture = {
-          ...capture,
-          storageObject: attachWaybackMetadata(capture.storageObject, attempt),
-        };
+        waybackFailed += 1;
       }
+      capture = {
+        ...capture,
+        storageObject: attachWaybackMetadata(capture.storageObject, attempt),
+      };
     }
     if (capture?.storageObject.stored === 'metadata-only') representationCounts.metadataOnly += 1;
     if (capture?.storageObject.stored === 'supabase-storage')
@@ -495,7 +488,6 @@ export async function runCaptureBackfill(
       anchored: waybackAnchored,
       failed: waybackFailed,
       pending: waybackPending,
-      reusedExistingSnapshot: waybackReused,
     }),
     waybackLookup: {
       available: lookupAvailable,
