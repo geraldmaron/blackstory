@@ -133,3 +133,6 @@ apps/api-public/public/
 .tmp-lives-batch4-pages/
 apps/web/.tmp-lives-verify/
 :memory:.ses
+.tmp-lives-batch4-crops/
+.tmp-lives-batch4-focus/
+.tmp-lives-batch4-locator/
