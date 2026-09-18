@@ -572,13 +572,13 @@ async function main(): Promise<void> {
         `Cumulative embedding reservation $${cumulativeReservedCostUsd.toFixed(6)} exceeds cap $${maxCostUsd.toFixed(6)}`,
       );
 
-    let providerUsage: OpenRouterEmbeddingUsage | null = null;
+    const providerUsage: { value: OpenRouterEmbeddingUsage | null } = { value: null };
     const provider = createOpenRouterEvaluationEmbeddingProvider({
       apiKey,
       model: embeddingModel,
       dimensions: DIMENSIONS,
       onUsage: (usage) => {
-        providerUsage = usage;
+        providerUsage.value = usage;
       },
     });
     const vectors = await provider.embed(inputs);
@@ -612,7 +612,7 @@ async function main(): Promise<void> {
       status: 'completed',
       provider: embeddingProvider,
       requestedModel: embeddingModel,
-      responseModel: providerUsage?.responseModel ?? null,
+      responseModel: providerUsage.value?.responseModel ?? null,
       dimensions: DIMENSIONS,
       providerCalls: 1,
       priorProviderCalls,
@@ -624,11 +624,11 @@ async function main(): Promise<void> {
       priorRunReservedCostUsd: priorReservedCostUsd,
       cumulativeReservedCostUsd,
       totalCostCapUsd: maxCostUsd,
-      providerReportedPromptTokens: providerUsage?.promptTokens ?? null,
-      providerReportedTotalTokens: providerUsage?.totalTokens ?? null,
-      providerReportedCostUsd: providerUsage?.costUsd ?? null,
+      providerReportedPromptTokens: providerUsage.value?.promptTokens ?? null,
+      providerReportedTotalTokens: providerUsage.value?.totalTokens ?? null,
+      providerReportedCostUsd: providerUsage.value?.costUsd ?? null,
       accountingLimitation:
-        providerUsage?.costUsd === null
+        providerUsage.value?.costUsd === null
           ? 'OpenRouter did not return usage.cost; actual provider charge is unknown.'
           : 'OpenRouter usage.cost is a provider-reported USD-denominated credit charge.',
       priceUsdPerMillionTextTokens: PRICE_USD_PER_MILLION_TEXT_TOKENS,
