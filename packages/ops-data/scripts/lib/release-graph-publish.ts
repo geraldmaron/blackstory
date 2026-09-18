@@ -274,14 +274,17 @@ export async function loadReleaseGraphInputs(
 
 /**
  * Replaces the graph in one transaction so readers see either the complete prior graph or the
- * complete new graph. Failure rolls back the entire replacement.
+ * complete new graph. By default this manages that transaction; a caller already holding the
+ * release lock can own it instead and remains responsible for rollback.
  */
 export async function persistReleaseGraphArtifact(
   client: pg.PoolClient,
   releaseId: string,
   artifact: GraphReleaseArtifact,
+  options: { readonly manageTransaction?: boolean } = {},
 ): Promise<{ readonly adjacencyRows: number; readonly decadeRows: number }> {
-  await client.query('BEGIN');
+  const manageTransaction = options.manageTransaction ?? true;
+  if (manageTransaction) await client.query('BEGIN');
   try {
     // Scope the bulk-rebuild timeout to this transaction; COMMIT or ROLLBACK restores the
     // connection's default.
@@ -333,9 +336,9 @@ export async function persistReleaseGraphArtifact(
       ],
     );
 
-    await client.query('COMMIT');
+    if (manageTransaction) await client.query('COMMIT');
   } catch (error) {
-    await client.query('ROLLBACK');
+    if (manageTransaction) await client.query('ROLLBACK');
     throw error;
   }
 
@@ -410,6 +413,8 @@ export async function rebuildReleaseGraphForRelease(
     readonly minDecadeCoveragePct?: number;
     readonly enforceCoverage?: boolean;
     readonly dryRun?: boolean;
+    /** Set false when the caller already owns the transaction protecting the target release. */
+    readonly manageTransaction?: boolean;
   },
 ): Promise<
   BuildReleaseGraphResult & {
@@ -434,7 +439,11 @@ export async function rebuildReleaseGraphForRelease(
   });
 
   if (!input.dryRun) {
-    const persisted = await persistReleaseGraphArtifact(client, input.releaseId, built.artifact);
+    const persisted = await persistReleaseGraphArtifact(client, input.releaseId, built.artifact, {
+      ...(input.manageTransaction !== undefined
+        ? { manageTransaction: input.manageTransaction }
+        : {}),
+    });
     return { ...built, persisted };
   }
   return built;

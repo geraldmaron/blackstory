@@ -33,6 +33,9 @@ export type PublicClaimView = {
   readonly confidenceLevel: 'high' | 'medium' | 'low';
   readonly citationSource: string;
   readonly citationHref?: string;
+  /** Verified public archive pointer for this exact citationHref. */
+  readonly archivedUrl?: string;
+  readonly archivedAt?: string;
   readonly citationLabel: string;
   readonly independentLineageCount?: number;
   /**

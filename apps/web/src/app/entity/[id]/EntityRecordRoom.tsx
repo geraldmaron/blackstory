@@ -148,7 +148,18 @@ function toRoomSources(claims: PublicEntityView['claims']): readonly RoomSource[
     const href = claim.citationHref;
     const key = href ?? claim.citationSource ?? claim.citationLabel;
     if (!key || seen.has(key)) continue;
-    seen.set(key, { text: sourceLabel(claim), ...(href ? { href } : {}) });
+    seen.set(key, {
+      text: sourceLabel(claim),
+      ...(claim.archivedUrl && claim.archivedAt && href
+        ? {
+            archivedUrl: claim.archivedUrl,
+            archivedAt: claim.archivedAt,
+            originalUrl: href,
+          }
+        : href
+          ? { href }
+          : {}),
+    });
   }
   return [...seen.values()];
 }

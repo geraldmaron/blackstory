@@ -8,7 +8,11 @@
  * protected evidence (e.g. a living-person-sensitive capture, an internal-only source) even when
  * its rights status alone would otherwise permit citation.
  */
-import { canPublishWithRights, type PublicationContentKind } from '@repo/domain';
+import {
+  canPublishWithRights,
+  parseWaybackCaptureUrl,
+  type PublicationContentKind,
+} from '@repo/domain';
 import type {
   EvidenceCitationInput,
   EvidenceCitationView,
@@ -59,14 +63,21 @@ export function resolveCitationForDisplay(input: EvidenceCitationInput): Evidenc
       label: input.label,
       withheldReason:
         input.protectedReason ??
-        'Source link withheld \u2014 this citation resolves to protected or private evidence ' +
+        'Source link withheld. This citation resolves to protected or private evidence ' +
           'that is not shown publicly.',
     };
   }
 
+  const archive =
+    input.href && input.archivedUrl && input.archivedAt
+      ? parseWaybackCaptureUrl(input.archivedUrl, input.href)
+      : null;
   return {
     source: input.source,
     label: input.label,
     ...(input.href ? { href: input.href } : {}),
+    ...(archive !== null && archive.capturedAt === input.archivedAt
+      ? { archivedUrl: archive.url, archivedAt: archive.capturedAt }
+      : {}),
   };
 }

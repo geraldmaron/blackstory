@@ -7,6 +7,7 @@
  */
 import { z } from 'zod';
 import { relationshipTypeSchema } from './relationship-vocabulary.js';
+import { parseWaybackCaptureUrl } from './archive-pointer.js';
 
 /**
  * Mirrors ThemeImpactThemeId / THEME_IMPACT_THEME_IDS from
@@ -142,21 +143,51 @@ export const publicActiveReleaseSchema = z.object({
 });
 export type PublicActiveReleaseDoc = z.infer<typeof publicActiveReleaseSchema>;
 
-export const publicClaimProjectionSchema = z.object({
-  id: z.string().min(1),
-  predicate: z.string().min(1),
-  object: z.string().min(1),
-  confidenceLevel: z.enum(['high', 'medium', 'low']),
-  citationSource: z.string().min(1),
-  citationHref: z.string().url().optional(),
-  citationLabel: z.string().min(1),
-  independentLineageCount: z.number().int().nonnegative().optional(),
-  /**
-   * Whether the claim describes an index row or evidence about its subject. When unspecified,
-   * record-tier classification uses the predicate.
-   */
-  claimRole: z.enum(['record_index', 'evidence']).optional(),
-});
+export const publicClaimProjectionSchema = z
+  .object({
+    id: z.string().min(1),
+    predicate: z.string().min(1),
+    object: z.string().min(1),
+    confidenceLevel: z.enum(['high', 'medium', 'low']),
+    citationSource: z.string().min(1),
+    citationHref: z.string().url().optional(),
+    archivedUrl: z.string().url().optional(),
+    archivedAt: z.string().datetime().optional(),
+    citationLabel: z.string().min(1),
+    independentLineageCount: z.number().int().nonnegative().optional(),
+    /**
+     * Whether the claim describes an index row or evidence about its subject. When unspecified,
+     * record-tier classification uses the predicate.
+     */
+    claimRole: z.enum(['record_index', 'evidence']).optional(),
+  })
+  .superRefine((claim, context) => {
+    if ((claim.archivedUrl === undefined) !== (claim.archivedAt === undefined)) {
+      context.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: 'archivedUrl and archivedAt must be published together',
+      });
+    }
+    if (claim.archivedUrl !== undefined && claim.citationHref === undefined) {
+      context.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: 'an archived citation must retain citationHref as its original source',
+      });
+    }
+    if (
+      claim.archivedUrl !== undefined &&
+      claim.archivedAt !== undefined &&
+      claim.citationHref !== undefined
+    ) {
+      const pointer = parseWaybackCaptureUrl(claim.archivedUrl, claim.citationHref);
+      if (pointer === null || pointer.capturedAt !== claim.archivedAt) {
+        context.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: 'archive pointer must be a timestamp-matched Wayback copy of citationHref',
+        });
+      }
+    }
+  });
 export type PublicClaimProjectionDoc = z.infer<typeof publicClaimProjectionSchema>;
 
 export const publicEntityProjectionSchema = z.object({

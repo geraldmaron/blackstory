@@ -49,6 +49,16 @@ function reviewedClaimsFor(row: LandscapePublishRow, score = 0.9): ReviewedClaim
     predicate: claim.predicate,
     object: claim.object,
     citationHrefs: claim.citationHref ? [claim.citationHref] : [],
+    reviewedEvidenceCaptures: claim.citationHref
+      ? [
+          {
+            sourceUrl: claim.citationHref,
+            sourceItemId: `source-item-${index}`,
+            captureId: `capture-${index}`,
+            contentHashDigest: index.toString(16).padStart(64, '0'),
+          },
+        ]
+      : [],
     assessmentId: `assessment-${index}`,
     reviewDecisionId: `review-${index}`,
     assessment: {

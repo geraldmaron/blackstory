@@ -109,7 +109,7 @@ import {
   type CaptureStorage,
 } from './source-capture.js';
 import { createSupabaseStorage, supabaseStorageConfigFromEnv } from './supabase-storage.js';
-import { runCaptureBackfill, persistCapture } from './capture-backfill.js';
+import { runCaptureBackfill, persistCapture, type CaptureDb } from './capture-backfill.js';
 import { waybackCredentialsFromEnv } from './wayback-credentials.js';
 import {
   createWaybackAnchor,
@@ -216,6 +216,8 @@ export type CliDependencies = {
   readonly searchProvider?: ResolvedSearchProvider;
   /** Injected only for bounded CLI tests; production resolves the configured Postgres pool. */
   readonly postgresPool?: ExecutionPool;
+  /** Capture inventory/persistence boundary for bounded capture-backfill CLI tests. */
+  readonly captureDb?: CaptureDb;
 };
 
 type Flags = {
@@ -1176,20 +1178,22 @@ export async function runCli(argv: readonly string[], deps: CliDependencies = {}
         // --wayback POSTs successful captures to SPN2 when IA keys are present.
         // The availability lookup is wired unconditionally: it needs no credentials, and it
         // only fires under --commit, after a local fetch fails or before SPN mints a capture.
-        const pool = getOpsPostgresPool(process.env);
+        const pool = deps.captureDb ?? getOpsPostgresPool(process.env);
         const commit = flags.booleans.has('--commit');
         const wayback = flags.booleans.has('--wayback');
         const maxRaw = optionalFlag(flags, '--max-captures');
-        const maxCaptures = maxRaw === undefined ? undefined : Number.parseInt(maxRaw, 10);
-        if (maxCaptures !== undefined && (!Number.isFinite(maxCaptures) || maxCaptures < 0)) {
+        const maxCaptures = maxRaw === undefined ? undefined : Number(maxRaw);
+        if (maxCaptures !== undefined && (!Number.isSafeInteger(maxCaptures) || maxCaptures < 0)) {
           throw new Error('--max-captures must be a non-negative integer');
         }
         const maxEntitiesRaw = optionalFlag(flags, '--max-entities');
-        const maxEntities =
-          maxEntitiesRaw === undefined ? undefined : Number.parseInt(maxEntitiesRaw, 10);
-        if (maxEntities !== undefined && (!Number.isFinite(maxEntities) || maxEntities < 0)) {
+        const maxEntities = maxEntitiesRaw === undefined ? undefined : Number(maxEntitiesRaw);
+        if (maxEntities !== undefined && (!Number.isSafeInteger(maxEntities) || maxEntities < 0)) {
           throw new Error('--max-entities must be a non-negative integer');
         }
+        const targetUrl = optionalFlag(flags, '--url');
+        const afterUrl = optionalFlag(flags, '--after-url');
+        const inventoryFingerprint = optionalFlag(flags, '--inventory-fingerprint');
         const decisionsPath = optionalFlag(flags, '--preservation-decisions');
         const values: unknown = decisionsPath ? JSON.parse(readFile(decisionsPath)) : [];
         if (!Array.isArray(values)) throw new Error('--preservation-decisions requires an array');
@@ -1222,6 +1226,9 @@ export async function runCli(argv: readonly string[], deps: CliDependencies = {}
             commit,
             ...(maxCaptures !== undefined ? { maxCaptures } : {}),
             ...(maxEntities !== undefined ? { maxEntities } : {}),
+            ...(targetUrl !== undefined ? { targetUrl } : {}),
+            ...(afterUrl !== undefined ? { afterUrl } : {}),
+            ...(inventoryFingerprint !== undefined ? { inventoryFingerprint } : {}),
             ...(wayback ? { wayback: true } : {}),
           },
           captureDeps,
@@ -2329,7 +2336,7 @@ export async function runCli(argv: readonly string[], deps: CliDependencies = {}
             'For model-report: [--since <ISO date>] [--json]\n' +
             'For harness-run: --theme <theme> [--metro <metro>] [--subjects <source-records.json> | --url <url> | --connectors dpla,nps_network_to_freedom,web_search] [--nps-csv <file>] [--dpla-json <file>] [--max-subjects 25] [--max-relations 25] [--enrich] [--provider openrouter|ollama|mock] [--progress-path <file>]\n' +
             'For backfill-entity/prose-run: --entity-id <id> [--title ...] [--summary ...] [--provider mock|openrouter|ollama|hybrid] [--commit]\n' +
-            'For capture-backfill: [--commit] [--wayback] [--max-captures N] [--max-entities N]\n' +
+            'For capture-backfill: [--commit] [--wayback] [--url CITED_URL | --max-captures N [--after-url URL --inventory-fingerprint SHA256] | --max-entities N]\n' +
             'For expand: --entity-id <id> [--depth N] [--commit] — live Wikidata traversal; stages landscape_candidates, never canonical\n' +
             'For enrich-entity: --entity-id <id> [--target-maturity seeded|grounded|corroborated|contextualized|deep_research|reference] — PLANS research; it does not execute, and has no --commit\n' +
             'For research-quality-audit: [--release-id <id>] [--kind <kind>] [--entity-id <id>] [--deficit <code>] [--limit N] — read-only; narrow the query to get per-entity rows; --deficit with --limit returns the next N matching entities in priority order, not a deficit filter over the first N by id\n' +

@@ -152,6 +152,8 @@ export function toEvidenceClaimInputs(
       source: claim.citationSource,
       label: claim.citationLabel,
       ...(claim.citationHref !== undefined ? { href: claim.citationHref } : {}),
+      ...(claim.archivedUrl !== undefined ? { archivedUrl: claim.archivedUrl } : {}),
+      ...(claim.archivedAt !== undefined ? { archivedAt: claim.archivedAt } : {}),
     };
     const dispute =
       claim.disputed === true || claim.disputeNote !== undefined

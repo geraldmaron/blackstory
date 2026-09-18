@@ -1,7 +1,7 @@
 # Internet Archive handoff
 
 **Status:** binding for record pages (2026-09).  
-**Code:** `apps/web/src/lib/geography/internet-archive-sources.ts`, `RecordArchiveSources.tsx`, `RecordArchiveContribution.tsx`.  
+**Code:** `apps/web/src/lib/geography/internet-archive-sources.ts`, `RecordArchiveSources.tsx`, `RecordArchiveContribution.tsx`, `components/room/Evidence.tsx`, `components/evidence/EvidenceCard.tsx`.
 **Related:** [`patterns-visit-handoff.md`](./patterns-visit-handoff.md), [`../methodology/capture-and-aggregators.md`](../methodology/capture-and-aggregators.md).
 
 ---
@@ -13,6 +13,25 @@ BlackStory preserves cited sources through outbound links and Wayback capture, a
 ---
 
 ## Inbound (Phase D)
+
+Published claim citations keep the original source in `citationHref`. When preservation has a
+completed, exact-source, policy-eligible SPN2 result, publication adds `archivedUrl` and
+`archivedAt`. These are additive fields, not replacements or aliases. The record source list
+labels the archived and original links separately and shows the archive date.
+The same `ArchivedSourceLinks` renderer is used by the room source list and the public claim card,
+so the primary Place record surface and its source-list variants use the same labels and date.
+
+The archive is selected only from the exact capture revisions accepted as supporting evidence for
+that independently reviewed claim. If several reviewed revisions qualify, the newest eligible
+archive timestamp wins. A newer capture of the same URL outside that review cannot supply the
+link. Internet Archive fetches the remote page independently, so the capture date does not prove
+byte equality between its snapshot and the locally reviewed capture.
+
+Archive eligibility is resolved while building a release. Public web reads never join private
+evidence storage and never derive an archive URL. A later revocation or preservation-decision
+expiry removes the pointer on the next reviewed publication or correction. It does not rewrite an
+already-published or signed release dynamically, and the interface must not imply immediate
+deletion from Internet Archive.
 
 `resolveInternetArchiveSources()` scans public claim `citationHref` values for:
 

@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 import pg from 'pg';
 import { loadReviewedClaimAssessments, assessPublicationClaims } from './confidence.ts';
+import { loadPublicCitationArchives } from './citation-archive-publication.ts';
 
 /** Use only an isolated, disposable local database. All fixtures roll back. */
 test(
@@ -73,6 +74,103 @@ test(
       const reviewed = await loadReviewedClaimAssessments(client, ['confidence-entity']);
       assert.equal(reviewed.length, 1);
       assert.deepEqual(reviewed[0]!.citationHrefs, ['https://example.org/record']);
+      assert.deepEqual(reviewed[0]!.reviewedEvidenceCaptures, [
+        {
+          sourceUrl: 'https://example.org/record',
+          sourceItemId: 'confidence-item',
+          captureId: 'confidence-capture',
+          contentHashDigest: 'c'.repeat(64),
+        },
+      ]);
+      const preservationDecision = {
+        sourceUrl: 'https://example.org/record',
+        allowTextRetention: false,
+        allowArchive: true,
+        sensitivity: 'public',
+        reviewedBy: 'reviewer',
+        reviewedAt: '2026-09-01T00:00:00.000Z',
+        expiresAt: '2027-09-01T00:00:00.000Z',
+        basis: 'Public archival record approved for preservation.',
+      };
+      await client.query(
+        `UPDATE evidence.capture_origins
+         SET storage_object=jsonb_build_object('preservationDecision',$1::jsonb)
+         WHERE capture_id='confidence-capture' AND source_item_id='confidence-item'`,
+        [JSON.stringify(preservationDecision)],
+      );
+      await client.query(
+        `INSERT INTO research.preservation_jobs
+          (source_url,content_hash_digest,state,decision,job_id,result)
+         VALUES ($1,$2,'anchored',$3::jsonb,'confidence-job',$4::jsonb)`,
+        [
+          'https://example.org/record',
+          'c'.repeat(64),
+          JSON.stringify(preservationDecision),
+          JSON.stringify({
+            status: 'anchored',
+            waybackCaptureUrl:
+              'https://web.archive.org/web/20260902000000/https://example.org/record',
+            waybackCapturedAt: '2026-09-02T00:00:00.000Z',
+          }),
+        ],
+      );
+      await client.query(
+        `INSERT INTO evidence.source_captures
+          (id,source_item_id,content_hash_algorithm,content_hash_digest)
+         VALUES ('confidence-unreviewed-capture','confidence-item','sha256',repeat('d',64))`,
+      );
+      await client.query(
+        `INSERT INTO evidence.capture_origins
+          (capture_id,source_item_id,source_url,final_url,storage_object,observed_at)
+         VALUES ('confidence-unreviewed-capture','confidence-item',$1,$1,
+           jsonb_build_object('preservationDecision',$2::jsonb),now())`,
+        ['https://example.org/record', JSON.stringify(preservationDecision)],
+      );
+      await client.query(
+        `INSERT INTO research.preservation_jobs
+          (source_url,content_hash_digest,state,decision,job_id,result)
+         VALUES ($1,repeat('d',64),'anchored',$2::jsonb,'confidence-unreviewed-job',$3::jsonb)`,
+        [
+          'https://example.org/record',
+          JSON.stringify(preservationDecision),
+          JSON.stringify({
+            status: 'anchored',
+            waybackCaptureUrl:
+              'https://web.archive.org/web/20260903000000/https://example.org/record',
+            waybackCapturedAt: '2026-09-03T00:00:00.000Z',
+          }),
+        ],
+      );
+      const reviewedCaptures = reviewed.flatMap((claim) =>
+        claim.reviewedEvidenceCaptures.map((capture) => ({
+          claimId: claim.claimId,
+          sourceUrl: capture.sourceUrl,
+          sourceItemId: capture.sourceItemId,
+          captureId: capture.captureId,
+          contentHashDigest: capture.contentHashDigest,
+        })),
+      );
+      const archives = await loadPublicCitationArchives(
+        client,
+        reviewedCaptures,
+        '2026-09-18T12:00:00.000Z',
+      );
+      assert.equal(
+        archives.get('confidence-claim\u001fhttps://example.org/record')?.archivedAt,
+        '2026-09-02T00:00:00.000Z',
+      );
+      await client.query(
+        `UPDATE evidence.capture_origins SET retention_revoked_at=now()
+         WHERE capture_id='confidence-capture' AND source_item_id='confidence-item'`,
+      );
+      assert.equal(
+        (
+          await loadPublicCitationArchives(client, reviewedCaptures, '2026-09-18T12:00:00.000Z', {
+            lock: true,
+          })
+        ).size,
+        0,
+      );
       const result = assessPublicationClaims(
         {
           id: 'confidence-entity',

@@ -68,6 +68,68 @@ test('resolveReleaseClaimId respects an explicit id when present', () => {
   assert.equal(resolveReleaseClaimId(entry, claim, 0), 'claim_custom');
 });
 
+test('buildReleaseEntityArtifacts retains verified archive fields beside the original citation', () => {
+  const citationHref = 'https://example.gov/record/1';
+  const archivedUrl = 'https://web.archive.org/web/20260901000000/https://example.gov/record/1';
+  const result = buildReleaseEntityArtifacts(
+    baseEntry({
+      claims: [
+        {
+          predicate: 'founded_year',
+          object: '1900',
+          confidenceLevel: 'high',
+          citationSource: 'Example Source',
+          citationHref,
+          archivedUrl,
+          archivedAt: '2026-09-01T00:00:00.000Z',
+          citationLabel: 'Example Citation',
+        },
+      ],
+    }),
+    CONTEXT,
+  );
+  assert.equal(result.ok, true);
+  if (!result.ok) return;
+  assert.equal(result.projection.claims[0]?.citationHref, citationHref);
+  assert.equal(result.projection.claims[0]?.archivedUrl, archivedUrl);
+  assert.equal(result.projection.claims[0]?.archivedAt, '2026-09-01T00:00:00.000Z');
+});
+
+test('buildReleaseEntityArtifacts rejects incomplete and wrong-source archive pointers', () => {
+  const claim = {
+    predicate: 'founded_year',
+    object: '1900',
+    confidenceLevel: 'high' as const,
+    citationSource: 'Example Source',
+    citationHref: 'https://example.gov/record/1',
+    citationLabel: 'Example Citation',
+  };
+  assert.throws(
+    () =>
+      buildReleaseEntityArtifacts(
+        baseEntry({ claims: [{ ...claim, archivedAt: '2026-09-01T00:00:00.000Z' }] }),
+        CONTEXT,
+      ),
+    /invalid archive pointer/u,
+  );
+  assert.throws(
+    () =>
+      buildReleaseEntityArtifacts(
+        baseEntry({
+          claims: [
+            {
+              ...claim,
+              archivedUrl: 'https://web.archive.org/web/20260901000000/https://other.gov/record/1',
+              archivedAt: '2026-09-01T00:00:00.000Z',
+            },
+          ],
+        }),
+        CONTEXT,
+      ),
+    /invalid archive pointer/u,
+  );
+});
+
 test('inferNotabilityCriterionFromClaim recognizes a documented "first" claim', () => {
   assert.equal(
     inferNotabilityCriterionFromClaim('recognized_as', 'the first Black woman to do X'),

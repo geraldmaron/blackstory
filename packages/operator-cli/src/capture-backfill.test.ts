@@ -2,6 +2,8 @@ import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import type { SafeFetchResult } from '@repo/security/url-safety';
 import {
+  DEFAULT_COMMIT_CAPTURE_LIMIT,
+  captureInventoryFingerprint,
   runCaptureBackfill,
   selectUrlsForEntityBatch,
   type CaptureDb,
@@ -96,6 +98,132 @@ test('commit fetches + persists, honors --max-captures budget', async () => {
   assert.equal(db.writes.filter((w) => w.sql.includes('retrieval_events')).length, 1);
 });
 
+test('bounded batches resume in stable URL order and reject a changed inventory', async () => {
+  const firstFetched: string[] = [];
+  const first = await runCaptureBackfill(
+    fakeDb(),
+    { commit: true, maxCaptures: 1 },
+    deps(async (url) => {
+      firstFetched.push(url);
+      return ok('1'.repeat(64));
+    }),
+  );
+  assert.deepEqual(firstFetched, ['https://bls.gov/b']);
+  assert.equal(first.totalUnique, 2);
+  assert.equal(first.remaining, 1);
+  assert.equal(first.hasMore, true);
+  assert.equal(first.nextCursor, 'https://bls.gov/b');
+  assert.equal(first.inventoryFingerprint.length, 64);
+
+  const secondFetched: string[] = [];
+  const second = await runCaptureBackfill(
+    fakeDb(),
+    {
+      commit: true,
+      maxCaptures: 1,
+      afterUrl: first.nextCursor,
+      inventoryFingerprint: first.inventoryFingerprint,
+    },
+    deps(async (url) => {
+      secondFetched.push(url);
+      return ok('2'.repeat(64));
+    }),
+  );
+  assert.deepEqual(secondFetched, ['https://census.gov/a']);
+  assert.equal(second.afterUrl, 'https://bls.gov/b');
+  assert.equal(second.remaining, 0);
+  assert.equal(second.hasMore, false);
+  assert.equal(second.nextCursor, undefined);
+
+  await assert.rejects(
+    runCaptureBackfill(
+      fakeDb([{ ref_id: 'ent0', url: 'https://archives.gov/new' }]),
+      {
+        commit: true,
+        maxCaptures: 1,
+        afterUrl: first.nextCursor,
+        inventoryFingerprint: first.inventoryFingerprint,
+      },
+      deps(async () => ok('3'.repeat(64))),
+    ),
+    /Capture inventory changed/,
+  );
+});
+
+test('cursor resume requires the prior inventory fingerprint', async () => {
+  await assert.rejects(
+    runCaptureBackfill(
+      fakeDb(),
+      { commit: false, afterUrl: 'https://bls.gov/b' },
+      deps(async () => ok('a'.repeat(64))),
+    ),
+    /afterUrl requires the prior inventoryFingerprint/,
+  );
+});
+
+test('exact target captures one cited URL and rejects URLs outside the inventory', async () => {
+  const fetched: string[] = [];
+  const report = await runCaptureBackfill(
+    fakeDb(),
+    { commit: true, targetUrl: 'HTTPS://CENSUS.GOV/a#section' },
+    deps(async (url) => {
+      fetched.push(url);
+      return ok('4'.repeat(64));
+    }),
+  );
+  assert.deepEqual(fetched, ['https://census.gov/a']);
+  assert.equal(report.targetUrl, 'https://census.gov/a');
+  assert.equal(report.planned, 1);
+  assert.equal(report.hasMore, false);
+
+  await assert.rejects(
+    runCaptureBackfill(
+      fakeDb(),
+      { commit: true, targetUrl: 'https://not-cited.example/record' },
+      deps(async () => ok('5'.repeat(64))),
+    ),
+    /targetUrl is not present in the cited capture inventory/,
+  );
+  await assert.rejects(
+    runCaptureBackfill(
+      fakeDb(),
+      { commit: true, targetUrl: 'https://census.gov/a', maxCaptures: 1 },
+      deps(async () => ok('6'.repeat(64))),
+    ),
+    /cannot be combined/,
+  );
+});
+
+test('commit defaults to a bounded batch while dry-run can inventory everything', async () => {
+  const rows = Array.from({ length: DEFAULT_COMMIT_CAPTURE_LIMIT + 5 }, (_, index) => ({
+    ref_id: `ent${index}`,
+    url: `https://example.gov/${String(index).padStart(2, '0')}`,
+  }));
+  const committed = await runCaptureBackfill(
+    fakeDb(rows),
+    { commit: true },
+    deps(async () => ok('7'.repeat(64))),
+  );
+  assert.equal(committed.planned, DEFAULT_COMMIT_CAPTURE_LIMIT);
+  assert.equal(committed.hasMore, true);
+
+  const dryRun = await runCaptureBackfill(
+    fakeDb(rows),
+    { commit: false },
+    deps(async () => ok('8'.repeat(64))),
+  );
+  assert.equal(dryRun.planned, dryRun.totalUnique);
+  assert.equal(dryRun.attempted, 0);
+});
+
+test('inventory fingerprints are stable across row order', () => {
+  const urls = [
+    { url: 'https://b.gov/', surface: 'entity' as const, refId: 'b' },
+    { url: 'https://a.gov/', surface: 'article' as const, refId: 'a' },
+  ];
+  assert.equal(captureInventoryFingerprint(urls), captureInventoryFingerprint([...urls].reverse()));
+});
+
 test('commit records failures as retrieval events without a capture row', async () => {
   const db = fakeDb();
   const report = await runCaptureBackfill(
@@ -113,6 +241,7 @@ test('commit records failures as retrieval events without a capture row', async 
   );
   assert.equal(report.captured, 0);
   assert.equal(report.failed, 2); // both unique URLs fail
+  assert.deepEqual(report.failedUrls, ['https://bls.gov/b', 'https://census.gov/a']);
   assert.equal(db.writes.filter((w) => w.sql.includes('source_captures')).length, 0);
   assert.equal(db.writes.filter((w) => w.sql.includes('retrieval_events')).length, 2);
 });
@@ -246,10 +375,10 @@ test('failed local fetches do not call SPN', async () => {
 test('selectUrlsForEntityBatch keeps every URL for the first N entities', () => {
   const batch = selectUrlsForEntityBatch(
     [
+      { url: 'https://c.gov/1', surface: 'entity', refId: 'ent3' },
+      { url: 'https://b.gov/1', surface: 'entity', refId: 'ent2' },
       { url: 'https://a.gov/1', surface: 'entity', refId: 'ent1' },
       { url: 'https://a.gov/2', surface: 'entity', refId: 'ent1' },
-      { url: 'https://b.gov/1', surface: 'entity', refId: 'ent2' },
-      { url: 'https://c.gov/1', surface: 'entity', refId: 'ent3' },
       { url: 'https://pkt.gov/1', surface: 'packet', refId: 'obs' },
     ],
     2,
@@ -317,7 +446,7 @@ test('an unreachable URL gets a lookup, and the existing snapshot lands on the f
   assert.equal(report.waybackLookup.attempted, 1);
   assert.equal(report.waybackLookup.found, 1);
   assert.equal(report.waybackLookup.recoveredAfterFetchFailure, 1);
-  assert.deepEqual(lookup.asked, ['https://census.gov/a']);
+  assert.deepEqual(lookup.asked, ['https://bls.gov/b']);
 
   // No capture row exists for a failed fetch, so the pointer's only home is the event detail.
   assert.equal(db.writes.filter((w) => w.sql.includes('source_captures')).length, 0);
@@ -325,9 +454,9 @@ test('an unreachable URL gets a lookup, and the existing snapshot lands on the f
   assert.equal(detail?.waybackLookupStatus, 'found');
   assert.equal(
     detail?.waybackAvailabilityUrl,
-    'https://web.archive.org/web/20260214093311/https://census.gov/a',
+    'https://web.archive.org/web/20260214093311/https://bls.gov/b',
   );
-  assert.equal(detail?.url, 'https://census.gov/a', 'the original detail keys survive');
+  assert.equal(detail?.url, 'https://bls.gov/b', 'the original detail keys survive');
 });
 
 test('a lookup miss is recorded on the event and does not fail the lane', async () => {
@@ -398,7 +527,7 @@ test('--wayback preserves the current revision even when availability finds an o
   assert.equal(stored.waybackLookupStatus, 'found');
   assert.equal(
     stored.waybackAvailabilityUrl,
-    'https://web.archive.org/web/20260214093311/https://census.gov/a',
+    'https://web.archive.org/web/20260214093311/https://bls.gov/b',
   );
   assert.equal(stored.waybackAvailabilitySource, 'availability-lookup');
   assert.equal(stored.waybackStatus, 'failed');
@@ -432,7 +561,7 @@ test('--wayback falls through to SPN when the lookup finds nothing', async () =>
   assert.equal(stored.waybackStatus, 'anchored');
   assert.equal(
     stored.waybackCaptureUrl,
-    'https://web.archive.org/web/20260901150000/https://census.gov/a',
+    'https://web.archive.org/web/20260901150000/https://bls.gov/b',
   );
 });
 
@@ -499,4 +628,13 @@ test('--max-entities captures only the first N entities and skips packets', asyn
   assert.equal(report.captured, 3);
   assert.deepEqual(fetched, ['https://a.gov/1', 'https://a.gov/2', 'https://b.gov/1']);
   assert.equal(report.perSurface.packet.attempted, 0);
+  assert.equal(report.inventoryFingerprint.length, 64);
+  await assert.rejects(
+    runCaptureBackfill(
+      db,
+      { commit: true, maxEntities: 2, afterUrl: 'https://b.gov/1' },
+      deps(async () => ok('z'.repeat(64))),
+    ),
+    /afterUrl cannot be combined with maxEntities/,
+  );
 });

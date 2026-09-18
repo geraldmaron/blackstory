@@ -1,24 +1,22 @@
 /**
  * Capture-completeness evaluator for published web citations.
  *
- * Measures what share of URL-backed citations carry an archived capture pointer — the ops bar
+ * Measures what share of URL-backed citations carry a completed archive pointer — the ops bar
  * counterpart to fail-closed publish gates in `../citations/completeness-gate.ts` and
  * `../facts/publish-gate.ts`. Those gates enforce per-record discipline at release time; this
  * module aggregates corpus-level readiness so operators know when marketing a queryable surface
- * would outrun evidence posture (production snapshot: four `source_captures` vs 1,103 release
- * entities — see `docs/research/capture-completeness-ops-bar.md`).
+ * would outrun evidence posture. A capture row or content hash alone is identity metadata, not
+ * evidence that source content can be recovered; see `docs/research/capture-completeness-ops-bar.md`.
  *
  * Offline citations (structured archive designations) are excluded from the denominator.
  * Pure measurement — never auto-captures, never mutates citations.
  */
 import type { CitationCapturePointer, CitationLocation } from '../citations/citation.js';
-import type { ContentHash } from '../provenance/hashes.js';
+import { parseWaybackCaptureUrl } from '../adapters/internet-archive/wayback/types.js';
 import {
   CAPTURE_COMPLETENESS_BAR_RATIO,
   CAPTURE_COMPLETENESS_OPS_BAR_VERSION,
 } from './constants.js';
-
-const WAYBACK_HOST_PATTERN = /(^|\.)web\.archive\.org$|(^|\.)archive\.org$/i;
 
 export type CitationForCaptureCompleteness = {
   readonly citationId: string;
@@ -43,29 +41,6 @@ function isNonEmpty(value: string | undefined): value is string {
   return typeof value === 'string' && value.trim().length > 0;
 }
 
-function isHttpsUrl(value: string): boolean {
-  try {
-    return new URL(value).protocol === 'https:';
-  } catch {
-    return false;
-  }
-}
-
-function isWaybackCaptureUrl(value: string): boolean {
-  try {
-    const url = new URL(value);
-    return url.protocol === 'https:' && WAYBACK_HOST_PATTERN.test(url.hostname);
-  } catch {
-    return false;
-  }
-}
-
-function isContentHashPresent(contentHash: ContentHash | undefined): boolean {
-  return (
-    contentHash !== undefined && isNonEmpty(contentHash.algorithm) && isNonEmpty(contentHash.digest)
-  );
-}
-
 /** URL-backed citations count toward the ops bar; offline designations do not. */
 export function isWebCitationForCaptureCompleteness(
   citation: Pick<CitationForCaptureCompleteness, 'location'>,
@@ -74,23 +49,28 @@ export function isWebCitationForCaptureCompleteness(
 }
 
 /**
- * A web citation satisfies capture completeness when it anchors to archived evidence:
- * a valid Wayback/Internet Archive capture URL or a content-addressed stored capture row.
+ * A web citation satisfies archive completeness only when it has a completed Internet Archive
+ * pointer and timestamp. A content hash proves identity, not that recoverable bytes or text exist.
  */
 export function webCitationHasArchivedCapture(
-  citation: Pick<CitationForCaptureCompleteness, 'capture'>,
+  citation: Pick<CitationForCaptureCompleteness, 'capture' | 'location'>,
 ): boolean {
   if (!isNonEmpty(citation.capture.captureId)) {
     return false;
   }
   if (
     isNonEmpty(citation.capture.waybackCaptureUrl) &&
-    isHttpsUrl(citation.capture.waybackCaptureUrl) &&
-    isWaybackCaptureUrl(citation.capture.waybackCaptureUrl)
+    citation.location.kind === 'url' &&
+    isNonEmpty(citation.capture.waybackCapturedAt)
   ) {
-    return true;
+    const parsed = parseWaybackCaptureUrl(
+      citation.capture.waybackCaptureUrl,
+      citation.location.url,
+    );
+    if (!parsed || !Number.isFinite(Date.parse(citation.capture.waybackCapturedAt))) return false;
+    return Date.parse(parsed.capturedAt) === Date.parse(citation.capture.waybackCapturedAt);
   }
-  return isContentHashPresent(citation.capture.contentHash);
+  return false;
 }
 
 /**

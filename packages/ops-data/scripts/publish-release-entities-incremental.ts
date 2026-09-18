@@ -53,6 +53,12 @@ import {
 import { assertNoProjectionDivergence } from './lib/projection-divergence.ts';
 import { applyReleaseTaxonomySync, planReleaseTaxonomySync } from './lib/release-taxonomy-sync.ts';
 import { applyReleaseRelatedSync, planReleaseRelatedSync } from './lib/release-related-sync.ts';
+import {
+  attachPublicCitationArchives,
+  assertArchiveHydrationTargetIsUnsigned,
+  loadPublicCitationArchives,
+  type ReviewedCitationCapture,
+} from './lib/citation-archive-publication.ts';
 
 const SCRIPT_DIR = dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = join(SCRIPT_DIR, '../../..');
@@ -355,6 +361,33 @@ type PreparedPublish = {
    */
   readonly locationInherited?: boolean;
 };
+
+function reviewedCitationCaptures(
+  reviewedClaims: readonly ReviewedClaimAssessment[],
+): readonly ReviewedCitationCapture[] {
+  return reviewedClaims.flatMap((claim) =>
+    claim.reviewedEvidenceCaptures.map((capture) => ({
+      claimId: claim.claimId,
+      sourceUrl: capture.sourceUrl,
+      sourceItemId: capture.sourceItemId,
+      captureId: capture.captureId,
+      contentHashDigest: capture.contentHashDigest,
+    })),
+  );
+}
+
+function hydratePreparedArchives(
+  rows: readonly PreparedPublish[],
+  archives: ReadonlyMap<string, { readonly archivedUrl: string; readonly archivedAt: string }>,
+): readonly { readonly row: PreparedPublish; readonly changed: boolean }[] {
+  return rows.map((row) => {
+    const projection = attachPublicCitationArchives(row.entityRow.projection, archives);
+    return {
+      row: { ...row, entityRow: { ...row.entityRow, projection } },
+      changed: projection !== row.entityRow.projection,
+    };
+  });
+}
 
 /** Reads one string field out of a stored projection, whose static type is `unknown` jsonb. */
 function projectionString(projection: unknown, key: string): string | undefined {
@@ -680,7 +713,7 @@ async function main(): Promise<void> {
       catalogDecisionRes.rows.map((row) => [row.entity_id, catalogDecisionFromRow(row)]),
     );
 
-    const prepared: PreparedPublish[] = [];
+    let prepared: PreparedPublish[] = [];
     const skipped: SkippedRow[] = [];
     const skipCounts = new Map<string, number>();
     const lintReports: PublishStatusLintReport[] = [];
@@ -724,6 +757,19 @@ async function main(): Promise<void> {
       }
     }
 
+    // Hydrate archive pointers only after the final claim set is known. This keeps private
+    // evidence tables out of public reads and ensures a later preservation job changes a release
+    // only through an explicit publication run.
+    const unhydratedPrepared = prepared;
+    const citationArchives = await loadPublicCitationArchives(
+      client,
+      reviewedCitationCaptures(reviewedClaims),
+      generatedAt,
+    );
+    const hydratedPrepared = hydratePreparedArchives(unhydratedPrepared, citationArchives);
+    const archiveProjectionChanges = hydratedPrepared.filter((entry) => entry.changed).length;
+    prepared = hydratedPrepared.map((entry) => entry.row);
+
     const lintSummary = mergePublishStatusLintReports(lintReports);
 
     const regressionGates = runPublishRegressionGates({
@@ -750,6 +796,8 @@ async function main(): Promise<void> {
       pendingBefore,
       scanned: sliced.length,
       eligible: prepared.length,
+      archivePointersSelected: citationArchives.size,
+      archiveProjectionChanges,
       skipped: skipped.length,
       skipCounts: Object.fromEntries(skipCounts),
       publishedIds: prepared.map((row) => row.id),
@@ -829,78 +877,104 @@ async function main(): Promise<void> {
     }
 
     await client.query('BEGIN');
-    for (const row of prepared) {
-      await upsertEntity(client, row.entityRow);
-      await upsertSearchIndex(client, row.searchRow);
-      if (row.fromLandscape && row.landscapeRow) {
-        await markLandscapeAccepted(client, row.id, row.entityRow.entity_id, row.landscapeRow);
-      }
-    }
-    await client.query('COMMIT');
-
-    // Resync taxonomy from canonical kind_detail.classification after publication. Landscape
-    // rows do not carry topic assignments and must not overwrite existing canonical taxonomy
-    // with empty values.
-    if (prepared.length > 0) {
-      const taxonomyPlan = await planReleaseTaxonomySync(client, releaseId);
-      if (taxonomyPlan.changed.length > 0) {
-        await applyReleaseTaxonomySync(client, releaseId, taxonomyPlan);
-        console.log(
-          `Re-synced taxonomy from canonical for ${taxonomyPlan.changed.length} entities.`,
-        );
-      }
-
-      // Resync relationships after commit so both endpoints can be found in the release. Do
-      // this before rebuilding the graph, which reads projection.related; source rows do not
-      // carry canonical edges.
-      const relatedPlan = await planReleaseRelatedSync(client, releaseId);
-      if (relatedPlan.changed.length > 0) {
-        await applyReleaseRelatedSync(client, releaseId, relatedPlan);
-        console.log(
-          `Re-synced related[] from canonical edges for ${relatedPlan.changed.length} entities` +
-            `${relatedPlan.repaired > 0 ? ` (${relatedPlan.repaired} had no connections at all)` : ''}.`,
-        );
-      }
-
-      const enforceCoverage = process.env.ENFORCE_DECADE_COVERAGE !== '0';
-      console.log(
-        enforceCoverage
-          ? `  graph: decade coverage floor ${minDecadeCoverage ?? 90}%` +
-              `${minDecadeCoverage === undefined ? ' (default)' : ' (acknowledged via --min-decade-coverage)'}`
-          : '  graph: decade coverage NOT ENFORCED (ENFORCE_DECADE_COVERAGE=0)',
+    try {
+      const release = await client.query<{ readonly signed_manifest: unknown }>(
+        'SELECT signed_manifest FROM publication.releases WHERE id=$1 FOR UPDATE',
+        [releaseId],
       );
-      const graphRebuild = await rebuildReleaseGraphForRelease(client, {
-        releaseId,
-        generatedAt,
-        dryRun: false,
-        enforceCoverage,
-        ...(minDecadeCoverage !== undefined ? { minDecadeCoveragePct: minDecadeCoverage } : {}),
-      });
-      for (const line of formatReleaseGraphAuditLog(graphRebuild.audit)) {
-        console.log(`  graph: ${line}`);
+      // Every incremental upsert mutates the release, even when archive hydration itself is a
+      // no-op. Missing or malformed release state reaches the guard unchanged and fails closed.
+      assertArchiveHydrationTargetIsUnsigned(release.rows[0]?.signed_manifest, prepared.length);
+
+      if (prepared.length > 0) {
+        const transactionReviewedClaims = await loadReviewedClaimAssessments(
+          client,
+          prepared.map((row) => row.entityRow.entity_id),
+        );
+        const transactionArchives = await loadPublicCitationArchives(
+          client,
+          reviewedCitationCaptures(transactionReviewedClaims),
+          new Date().toISOString(),
+          { lock: true },
+        );
+        const transactionPrepared = hydratePreparedArchives(
+          unhydratedPrepared,
+          transactionArchives,
+        ).map((entry) => entry.row);
+        const hydrationChanged = transactionPrepared.some(
+          (row, index) =>
+            JSON.stringify(row.entityRow.projection) !==
+            JSON.stringify(prepared[index]?.entityRow.projection),
+        );
+        if (hydrationChanged) {
+          throw new Error(
+            'Archive eligibility changed after preflight; retry incremental publication',
+          );
+        }
+        prepared = transactionPrepared;
+      }
+      for (const row of prepared) {
+        await upsertEntity(client, row.entityRow);
+        await upsertSearchIndex(client, row.searchRow);
+        if (row.fromLandscape && row.landscapeRow) {
+          await markLandscapeAccepted(client, row.id, row.entityRow.entity_id, row.landscapeRow);
+        }
       }
 
-      // Check every touched row for divergence between projection and its derived
-      // columns/search document. Failure exits nonzero before the artifact reminder. Writes
-      // have already committed, so this check reports a failed reconciliation and does not roll
-      // publication back.
-      try {
+      // Keep reconciliation under the same release-row lock as the entity upserts. A signer
+      // cannot freeze the release between these derived writes.
+      if (prepared.length > 0) {
+        const taxonomyPlan = await planReleaseTaxonomySync(client, releaseId);
+        if (taxonomyPlan.changed.length > 0) {
+          await applyReleaseTaxonomySync(client, releaseId, taxonomyPlan);
+          console.log(
+            `Re-synced taxonomy from canonical for ${taxonomyPlan.changed.length} entities.`,
+          );
+        }
+
+        // Resync relationships after the entity upserts so both endpoints can be found in the
+        // transaction. Do this before rebuilding the graph, which reads projection.related;
+        // source rows do not carry canonical edges.
+        const relatedPlan = await planReleaseRelatedSync(client, releaseId);
+        if (relatedPlan.changed.length > 0) {
+          await applyReleaseRelatedSync(client, releaseId, relatedPlan);
+          console.log(
+            `Re-synced related[] from canonical edges for ${relatedPlan.changed.length} entities` +
+              `${relatedPlan.repaired > 0 ? ` (${relatedPlan.repaired} had no connections at all)` : ''}.`,
+          );
+        }
+
+        const enforceCoverage = process.env.ENFORCE_DECADE_COVERAGE !== '0';
+        console.log(
+          enforceCoverage
+            ? `  graph: decade coverage floor ${minDecadeCoverage ?? 90}%` +
+                `${minDecadeCoverage === undefined ? ' (default)' : ' (acknowledged via --min-decade-coverage)'}`
+            : '  graph: decade coverage NOT ENFORCED (ENFORCE_DECADE_COVERAGE=0)',
+        );
+        const graphRebuild = await rebuildReleaseGraphForRelease(client, {
+          releaseId,
+          generatedAt,
+          dryRun: false,
+          manageTransaction: false,
+          enforceCoverage,
+          ...(minDecadeCoverage !== undefined ? { minDecadeCoveragePct: minDecadeCoverage } : {}),
+        });
+        for (const line of formatReleaseGraphAuditLog(graphRebuild.audit)) {
+          console.log(`  graph: ${line}`);
+        }
+
+        // The same client can read its uncommitted writes, so divergence validation remains
+        // inside the transaction and any failure rolls the complete incremental update back.
         await assertNoProjectionDivergence(
           client,
           prepared.map((row) => row.entityRow.entity_id),
           { releaseId },
         );
-      } catch (error) {
-        const detail = error instanceof Error ? error.message : String(error);
-        throw new Error(
-          `${detail}\n\n` +
-            `The ${prepared.length} upserts above ARE COMMITTED — this check runs after COMMIT, ` +
-            'because the derived copies have to be readable to be compared. Nothing was rolled ' +
-            'back. Repair the diverged rows (see backfill-search-facets-projection.ts) before ' +
-            'republishing the catalog artifacts, or readers will serve the diverged copy.',
-          { cause: error },
-        );
       }
+      await client.query('COMMIT');
+    } catch (error) {
+      await client.query('ROLLBACK');
+      throw error;
     }
 
     const pendingAfter = Number(

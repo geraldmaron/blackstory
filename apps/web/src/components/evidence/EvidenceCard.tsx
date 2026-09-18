@@ -16,6 +16,7 @@ import React from 'react';
 import { Card, Citation, Confidence, Notice } from '@repo/ui';
 import { sanitizePublicProseText } from '@repo/domain/editorial';
 import { formatIsoDate, humanizeToken, type EvidenceClaimView } from '../../lib/evidence';
+import { ArchivedSourceLinks } from '../room/Evidence';
 
 export type EvidenceCardProps = {
   readonly card: EvidenceClaimView;
@@ -63,8 +64,18 @@ export function EvidenceCard({ card }: EvidenceCardProps) {
         <Citation
           source={card.citation.source}
           label={card.citation.label}
-          {...(card.citation.href ? { href: card.citation.href } : {})}
+          {...(card.citation.href && !card.citation.archivedUrl
+            ? { href: card.citation.href }
+            : {})}
         />
+        {card.citation.archivedUrl && card.citation.archivedAt && card.citation.href ? (
+          <ArchivedSourceLinks
+            archivedUrl={card.citation.archivedUrl}
+            archivedAt={card.citation.archivedAt}
+            originalUrl={card.citation.href}
+            className="ds-evidence-claim__archive-links"
+          />
+        ) : null}
         {card.citation.withheldReason ? (
           <p className="ds-sans ds-evidence-claim__withheld">{card.citation.withheldReason}</p>
         ) : null}

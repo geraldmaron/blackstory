@@ -1,149 +1,166 @@
 # Capture completeness ops bar
 
-BlackStory's publish gates require archived capture pointers on web citations before a fact or
-claim may reach a public release. Production posture (queried 2026-07-21) still lags that
-architecture: **4** rows in `evidence.source_captures` against **1,103** rows in
-`published.release_entities`. This memo defines how operators measure capture completeness, when
-the corpus is ready to market a queryable developer surface, and how to backfill under bounded
-Save Page Now (SPN) budgets.
+Capture completeness measures recoverable evidence for cited web URLs. A capture row or content
+hash alone is not a preserved page. Operators must report the representation that actually exists
+and keep the live URL, historical availability, and current-revision anchor separate.
 
-## Domain evaluator
+## What the evaluator measures
 
-`packages/domain/src/capture-completeness/` exposes:
+`packages/domain/src/capture-completeness/` exposes the policy ratio and
+`evaluateCaptureCompleteness(citations)`. Its denominator is URL-backed citations; structured
+offline designations follow a different custody path. A citation enters the archived numerator
+only when it has all of:
 
-| Export | Role |
-|---|---|
-| `CAPTURE_COMPLETENESS_BAR_RATIO` | Ops threshold — **0.95** (95% of web citations must carry archived capture) |
-| `CAPTURE_COMPLETENESS_OPS_BAR_VERSION` | Wire token for dashboards / preflight logs |
-| `evaluateCaptureCompleteness(citations)` | Returns `{ ratio, meetsBar, missing[] }` |
+- a capture id;
+- a timestamped `web.archive.org/web/…` capture URL naming the exact cited original; and
+- a valid archive completion timestamp matching that URL.
 
-**Denominator:** URL-backed citations only (`location.kind === 'url'`). Offline archive
-designations are excluded — they follow a different evidence path.
+The configured `0.95` ratio is a policy threshold, not a measured preservation rate and not a
+claim that 95 percent of source content is locally recoverable. The evaluator is pure: it never
+submits Save Page Now (SPN) jobs or writes records.
 
-**Numerator:** a web citation counts as captured when its `capture` pointer includes either:
+## Representation tiers
 
-- a valid `waybackCaptureUrl` on an `archive.org` / `web.archive.org` host, or
-- a content-addressed hash (`contentHash`) indicating a row in `evidence.source_captures`.
+Report these tiers independently. Higher rows do not erase the lower-level evidence.
 
-Pure in-memory measurement — the evaluator never triggers SPN or mutates records.
+| Tier | Evidence | What it establishes | What it does not establish |
+|---|---|---|---|
+| cited URL | flat released claim `citationHref` | a public claim depends on this URL | any capture exists |
+| metadata capture | `source_captures` id, response metadata, and raw-response hash | retrieval identity and integrity metadata exist | page text or raw response bytes are recoverable |
+| extracted text | an authorized `supabase-storage` object and retained passage/text records | sanitized extracted text is locally recoverable | original response bytes, layout, images, or attachments are retained |
+| archive available | `waybackAvailabilityUrl` from the availability API | Internet Archive reported a historical snapshot | that snapshot matches the current fetched revision |
+| current revision anchored | completed `waybackCaptureUrl`/timestamp from the URL + content-hash SPN job | the backfill completed an archive job requested for that fetched revision | identical fetched/archived bytes, truth of the claims, or permanent availability |
 
-## Production measurement (SQL sketch)
+The local safe-fetch boundary hashes raw response bytes but does not expose or retain those bytes.
+Neither metadata-only nor extracted-text storage should be described as a raw-page copy.
 
-Run against the active release. Adjust JSON paths if the release manifest citation shape shifts.
+## Active-release inventory and tier query
+
+Released entity claims use flat `citationHref` and `citationSource` fields. `citationHref` is the
+URL denominator; `citationSource` is a label or publisher and must not be treated as a nested
+citation URL. `capture-backfill` is authoritative for normalized, deduplicated URL inventory
+counts. The domain evaluator remains citation-level: if one URL is cited three times, it
+contributes three citations to that ratio. The backfill report always includes `totalUnique` and
+`inventoryFingerprint`, even when a bounded batch is planned. These are separate measures and must
+not be compared as if they shared a denominator.
+
+This SQL inventories entity citations only, using exact URL matches. Compare its URL count with
+`capture-backfill.inventory.entity.unique`, not the all-surface `totalUnique`. Investigate any
+remaining difference as URL-normalization drift. Archive counters below are stored-pointer
+inventories; the publication selector additionally validates the exact original URL, timestamp
+and authoritative completed job before delivering a link.
 
 ```sql
--- Active release id
 WITH active AS (
   SELECT release_id
   FROM published.active_release
   WHERE id = 'active'
 ),
--- Flatten web citations from release entity claims (manifest-dependent JSON shape)
-web_citations AS (
-  SELECT
-    re.entity_id,
-    cite ->> 'id' AS citation_id,
-    cite -> 'location' ->> 'kind' AS location_kind,
-    cite -> 'capture' ->> 'captureId' AS capture_id,
-    cite -> 'capture' ->> 'waybackCaptureUrl' AS wayback_url,
-    cite -> 'capture' -> 'contentHash' ->> 'digest' AS content_hash_digest
+citation_urls AS (
+  SELECT DISTINCT claim->>'citationHref' AS source_url
   FROM published.release_entities re
   CROSS JOIN LATERAL jsonb_array_elements(re.claims) AS claim
-  CROSS JOIN LATERAL jsonb_array_elements(
-    COALESCE(claim -> 'citations', '[]'::jsonb)
-  ) AS cite
   WHERE re.release_id = (SELECT release_id FROM active)
+    AND jsonb_typeof(re.claims) = 'array'
+    AND claim->>'citationHref' ~* '^https?://'
 ),
-web_only AS (
-  SELECT *
-  FROM web_citations
-  WHERE location_kind = 'url'
-),
-captured AS (
-  SELECT wc.*
-  FROM web_only wc
-  WHERE (
-    wayback_url ~* '^https://(web\\.)?archive\\.org/'
-  )
-  OR (
-    content_hash_digest IS NOT NULL
-    AND content_hash_digest <> ''
-  )
-  OR EXISTS (
-    SELECT 1
-    FROM evidence.source_captures sc
-    WHERE sc.id = wc.capture_id
-  )
+url_tiers AS (
+  SELECT
+    cu.source_url,
+    bool_or(co.capture_id IS NOT NULL) AS has_capture_metadata,
+    coalesce(bool_or(
+      co.storage_object->>'stored' = 'supabase-storage'
+      AND co.storage_object->'preservationDecision'->>'sensitivity' = 'public'
+      AND co.storage_object->'preservationDecision'->>'allowTextRetention' = 'true'
+      AND NULLIF(co.storage_object->'preservationDecision'->>'expiresAt', '')::timestamptz > clock_timestamp()
+    ), false)
+      AS has_extracted_text,
+    coalesce(
+      bool_or(co.storage_object->>'waybackAvailabilityUrl' ~* '^https://web\.archive\.org/'),
+      false
+    ) AS has_archive_available,
+    coalesce(
+      bool_or(
+        co.storage_object->>'waybackStatus' = 'anchored'
+        AND co.storage_object->'preservationDecision'->>'sensitivity' = 'public'
+        AND co.storage_object->'preservationDecision'->>'allowArchive' = 'true'
+        AND NULLIF(co.storage_object->'preservationDecision'->>'expiresAt', '')::timestamptz > clock_timestamp()
+        AND co.storage_object->>'waybackCaptureUrl' ~* '^https://web\.archive\.org/'
+        AND co.storage_object->>'waybackCapturedAt' IS NOT NULL
+      ),
+      false
+    ) AS has_current_revision_anchor
+  FROM citation_urls cu
+  LEFT JOIN evidence.capture_origins co
+    ON co.source_url = cu.source_url
+   AND co.retention_revoked_at IS NULL
+  GROUP BY cu.source_url
 )
 SELECT
-  (SELECT count(*) FROM web_only) AS web_citation_total,
-  (SELECT count(*) FROM captured) AS web_citation_captured,
-  CASE
-    WHEN (SELECT count(*) FROM web_only) = 0 THEN 1.0
-    ELSE round(
-      (SELECT count(*)::numeric FROM captured)
-      / (SELECT count(*)::numeric FROM web_only),
-      4
-    )
-  END AS capture_ratio,
-  (SELECT count(*) FROM evidence.source_captures) AS source_captures_rows;
+  count(*) AS distinct_cited_urls,
+  count(*) FILTER (WHERE has_capture_metadata) AS metadata_captures,
+  count(*) FILTER (WHERE has_extracted_text) AS extracted_text_captures,
+  count(*) FILTER (WHERE has_archive_available) AS archive_available,
+  count(*) FILTER (WHERE has_current_revision_anchor) AS current_revision_anchored,
+  count(*) FILTER (WHERE NOT has_current_revision_anchor) AS current_revision_missing
+FROM url_tiers;
 ```
 
-**Interpretation:** compare `capture_ratio` to `CAPTURE_COMPLETENESS_BAR_RATIO` (0.95). Until
-`meetsBar` is true, hold PostgREST / developer-surface marketing (see landscape intake §3–§4).
+## Deterministic bounded backfill
 
-For in-process preflight (TypeScript release builders), map release citations to
-`CitationForCaptureCompleteness` and call `evaluateCaptureCompleteness` directly — same bar,
-same `missing` list for operator queues.
+A commit without an explicit bound stops after 25 URLs. Dry-run remains unbounded and performs no
+fetch or write, so it can report the complete inventory.
 
-## Budgeted SPN backfill guidance
+For an explicitly reviewed citation, target it directly:
 
-Wayback SPN gates already exist in `packages/domain/src/adapters/internet-archive/wayback/`
-(`capture-gate.ts`). **Do not run unbounded SPN fan-out** against production URLs.
+```bash
+node --conditions development --import tsx packages/operator-cli/src/bin.ts capture-backfill \
+  --url "https://example.gov/cited-record" --commit --wayback \
+  --preservation-decisions decisions.json
+```
 
-### Daily budget (`source_fetch`)
+The normalized URL must already exist in the cited inventory. Exact targeting cannot be combined
+with count, entity, or cursor batching.
 
-From `@repo/security` `DEFAULT_DAILY_BUDGETS`:
+For repeatable count batches:
 
-| Threshold | Requests / day |
-|---|---|
-| Soft shutdown (80%) | 1,600 |
-| Hard stop (100%) | 2,000 |
+1. Run `capture-backfill --max-captures 25` and record `inventoryFingerprint` and `nextCursor`.
+2. Commit the reviewed batch with the same count and any required preservation decisions.
+3. Resume with `--after-url <nextCursor> --inventory-fingerprint <inventoryFingerprint>`.
+4. Stop when `hasMore` is false. Failed fetches intentionally advance the traversal cursor; retry
+   each URL listed in `failedUrls` with an explicit `--url` run.
 
-Each SPN job typically consumes **multiple** `source_fetch` units (submit + status polls). Plan
-backfill in **batches of hundreds, not thousands**, and stop at soft shutdown unless an operator
-explicitly overrides.
+`--max-entities` is a first-N entity selection for a bounded, non-resumable pass. It cannot be
+combined with `--after-url`; retry failures from that pass with an explicit `--url`.
 
-### Recommended operator loop
+The URL order is deterministic. A changed inventory fingerprint or a cursor absent from the
+selected inventory fails closed, preventing newly inserted earlier URLs from being silently
+skipped. The fingerprint is traversal integrity, not evidence integrity.
 
-1. **Measure** — run the SQL sketch (or `evaluateCaptureCompleteness` on the release citation
-   batch). Record `ratio`, `missing`, and `CAPTURE_COMPLETENESS_OPS_BAR_VERSION`.
-2. **Prioritize** — rank `missing` citations on published / corrected entities first; defer draft
-   and research-only URLs.
-3. **Budget** — allocate ≤ **1,500** `source_fetch` requests per day for SPN backfill (leaves
-   headroom below soft shutdown for link-health sweeps and discovery adapters).
-4. **Capture** — route live Save Page Now through `capture-backfill --commit --wayback` (domain
-   SPN2 client + operator-cli SafeHttpClient). Persist rows to `evidence.source_captures` and
-   attach the snapshot URL on `storage_object`. Never fabricate pointers when SPN fails closed.
-   The lane records availability results separately from the current content revision. An older
-   availability snapshot never satisfies a new SPN2 capture, so each successful local revision
-   still receives its own content-hash-keyed anchor attempt.
-5. **Re-measure** — repeat until `meetsBar` or the remaining gaps are documented blockers (robots,
-   paywall, 404 at capture time).
-6. **Stop** — when `evaluateDailyBudget` reports `disable_source_fetch`, halt SPN entirely until
-   the next UTC budget window.
+## Cost and policy controls
 
-### Non-goals
+`--wayback` is only a request to use the existing SPN client. It does not create permission to send
+a private, signed, sensitive, or rights-restricted URL to a public archive. Preservation decisions
+remain mandatory where the anchor requires them. Availability lookup is read-only and does not
+replace a current-revision save.
 
-- Live apply / unbounded SPN against the full 1,103-entity corpus in one run
-- Bypassing `packages/security` budget evaluators
-- Treating structural citation completeness (captureId present) as ops-bar completeness without
-  Wayback or stored hash evidence
+The repository defines `source_fetch` budgets, but operators must verify that the live
+capture-backfill request path is charged to that ledger before treating those limits as enforced.
+Until that is demonstrated, use the executable 25-URL bound and the smaller reviewed batch needed
+for the task. Do not infer a daily request rate from URL counts: SPN submission and polling can use
+more than one request per URL.
+
+## Non-goals
+
+- Claiming full-page preservation from a hash, capture row, or excerpt
+- Treating an availability hit as the current content revision
+- Running an unreviewed full-inventory commit or unbounded SPN fan-out
+- Treating archive presence as corroboration of a historical claim
 
 ## Related docs
 
-- `docs/methodology/capture-and-aggregators.md` — Umbra contrast and public narrative
-- `docs/research/black-history-data-landscape-intake.md` — live corpus snapshot and sequencing
-- `docs/security/cost-resource-controls.md` — `source_fetch` automated responses
-- `packages/domain/src/facts/publish-gate.ts` — per-fact fail-closed publish gate
-- `packages/domain/src/citations/completeness-gate.ts` — per-claim projection gate
+- `docs/research/research-operations.md`: executable capture-backfill commands
+- `docs/research/capture-remediation-runbook.md`: citation remediation workflow
+- `docs/methodology/capture-and-aggregators.md`: public narrative and source access
+- `docs/security/cost-resource-controls.md`: configured resource controls
+- `packages/domain/src/facts/publish-gate.ts`: per-fact publication gate

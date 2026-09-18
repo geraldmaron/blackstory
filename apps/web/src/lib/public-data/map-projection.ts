@@ -17,6 +17,7 @@ import { sanitizePublicProseText } from '@repo/domain/editorial';
 import { isDatePrecision, resolveEraBucketsFromEvidence } from '@repo/domain/era';
 import { findUsStateForPoint, isDisplayableJurisdictionLabel } from '@repo/domain/map/geography';
 import { type PublicEntityView, type PublicVisitView } from '../../data/public-seed';
+import { parseWaybackCaptureUrl } from '@repo/domain';
 
 /**
  * Narrow projection shape used by the web mapper so rendering remains storage-independent.
@@ -51,6 +52,8 @@ export type PublicProjectionInput = {
     readonly confidenceLevel: 'high' | 'medium' | 'low';
     readonly citationSource: string;
     readonly citationHref?: string;
+    readonly archivedUrl?: string;
+    readonly archivedAt?: string;
     readonly citationLabel: string;
     readonly independentLineageCount?: number;
     readonly claimRole?: string;
@@ -121,24 +124,32 @@ function locationPrecisionFromProjection(
 }
 
 function mapClaims(claims: PublicProjectionInput['claims']): PublicEntityView['claims'] {
-  return (claims ?? []).map((claim) => ({
-    id: claim.id,
-    predicate: claim.predicate,
-    object: sanitizePublicProseText(claim.object),
-    confidenceLevel: claim.confidenceLevel,
-    citationSource: claim.citationSource,
-    ...(claim.citationHref !== undefined ? { citationHref: claim.citationHref } : {}),
-    citationLabel: claim.citationLabel,
-    ...(claim.independentLineageCount !== undefined
-      ? { independentLineageCount: claim.independentLineageCount }
-      : {}),
-    // Load-bearing for the record tier: dropping it here would silently downgrade the rule to
-    // its predicate fallback on every entity the site renders. The stored value is untrusted
-    // text, so it is checked against the wire vocabulary rather than cast: an out-of-vocabulary
-    // role falls back to the predicate deliberately, which is the same outcome as before but
-    // reached by a decision rather than by a lie about the type.
-    ...(isClaimRoleV1(claim.claimRole) ? { claimRole: claim.claimRole } : {}),
-  }));
+  return (claims ?? []).map((claim) => {
+    const pointer =
+      claim.archivedUrl && claim.archivedAt && claim.citationHref
+        ? parseWaybackCaptureUrl(claim.archivedUrl, claim.citationHref)
+        : null;
+    const archive =
+      pointer !== null && pointer.capturedAt === claim.archivedAt
+        ? { archivedUrl: pointer.url, archivedAt: pointer.capturedAt }
+        : {};
+    return {
+      id: claim.id,
+      predicate: claim.predicate,
+      object: sanitizePublicProseText(claim.object),
+      confidenceLevel: claim.confidenceLevel,
+      citationSource: claim.citationSource,
+      ...(claim.citationHref !== undefined ? { citationHref: claim.citationHref } : {}),
+      ...archive,
+      citationLabel: claim.citationLabel,
+      ...(claim.independentLineageCount !== undefined
+        ? { independentLineageCount: claim.independentLineageCount }
+        : {}),
+      // Validate stored roles against the public vocabulary. Unknown roles use the record
+      // classifier's predicate fallback instead of bypassing its evidence requirements.
+      ...(isClaimRoleV1(claim.claimRole) ? { claimRole: claim.claimRole } : {}),
+    };
+  });
 }
 
 /** True when a stored claim role is one the wire contract actually defines. */

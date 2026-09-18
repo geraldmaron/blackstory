@@ -890,6 +890,12 @@ export function liveSourceClaims(row: LivePublishedRow): readonly ReleaseSourceC
         ...(typeof claim.citationHref === 'string' && claim.citationHref.length > 0
           ? { citationHref: claim.citationHref }
           : {}),
+        ...(typeof claim.archivedUrl === 'string' && claim.archivedUrl.length > 0
+          ? { archivedUrl: claim.archivedUrl }
+          : {}),
+        ...(typeof claim.archivedAt === 'string' && claim.archivedAt.length > 0
+          ? { archivedAt: claim.archivedAt }
+          : {}),
         citationLabel:
           typeof claim.citationLabel === 'string' && claim.citationLabel.length > 0
             ? claim.citationLabel

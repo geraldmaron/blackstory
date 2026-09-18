@@ -9,8 +9,29 @@ import {
   buildDecadeEntitiesForGraph,
   buildReleaseGraphArtifact,
   mapCanonicalRelationshipRow,
+  persistReleaseGraphArtifact,
   CANONICAL_RELATIONSHIPS_SQL,
 } from './release-graph-publish.ts';
+
+test('caller-managed graph persistence leaves rollback to the outer transaction', async () => {
+  const statements: string[] = [];
+  const client = {
+    async query(statement: string) {
+      statements.push(statement);
+      if (statement.startsWith('DELETE')) throw new Error('write failed');
+      return { rows: [] };
+    },
+  };
+  await assert.rejects(
+    persistReleaseGraphArtifact(client as never, 'release-1', {} as never, {
+      manageTransaction: false,
+    }),
+    /write failed/u,
+  );
+  assert.ok(!statements.includes('BEGIN'));
+  assert.ok(!statements.includes('COMMIT'));
+  assert.ok(!statements.includes('ROLLBACK'));
+});
 
 /** A passing audit; individual tests bend the one field they are about. */
 function audit(over: Record<string, unknown> = {}) {

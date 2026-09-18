@@ -42,6 +42,7 @@ test('a published fact whose web citations meet the capture-completeness bar pas
           title: 'Primary chronology',
           URL: 'https://example.gov/record-a',
         },
+        archivedUrl: 'https://web.archive.org/web/20260101000000/https://example.gov/record-a',
       }),
       buildFixtureCitation({
         csl: {
@@ -50,6 +51,7 @@ test('a published fact whose web citations meet the capture-completeness bar pas
           title: 'Corroborating account',
           URL: 'https://example.gov/record-b',
         },
+        archivedUrl: 'https://web.archive.org/web/20260101000000/https://example.gov/record-b',
       }),
     ],
   });

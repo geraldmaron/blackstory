@@ -159,6 +159,9 @@ test('mapProjectionToPublicEntityView renders claims carried by the projection i
         object: '1841',
         confidenceLevel: 'high',
         citationSource: 'nps.gov',
+        citationHref: 'https://example.gov/record/1',
+        archivedUrl: 'https://web.archive.org/web/20260901000000/https://example.gov/record/1',
+        archivedAt: '2026-09-01T00:00:00.000Z',
         citationLabel: 'National Park Service',
       },
     ],
@@ -166,7 +169,37 @@ test('mapProjectionToPublicEntityView renders claims carried by the projection i
   assert.equal(view.id, 'ent_15th_st_church_001');
   assert.equal(view.claims.length, 1);
   assert.equal(view.claims[0]!.object, '1841');
+  assert.equal(view.claims[0]!.citationHref, 'https://example.gov/record/1');
+  assert.equal(view.claims[0]!.archivedAt, '2026-09-01T00:00:00.000Z');
   assert.equal(view.revision.releaseId, 'rel_seed_001');
+});
+
+test('mapProjectionToPublicEntityView drops an unvalidated archive pointer and keeps the original', () => {
+  const view = mapProjectionToPublicEntityView({
+    id: 'ent_archive_invalid_001',
+    releaseId: 'rel_seed_001',
+    kind: 'place',
+    displayName: 'Archive Validation Site',
+    nameLower: 'archive validation site',
+    summary: 'Fixture projection for invalid archive pointer handling.',
+    claimIds: ['claim-1'],
+    claims: [
+      {
+        id: 'claim-1',
+        predicate: 'documented_at',
+        object: 'the cited record',
+        confidenceLevel: 'high',
+        citationSource: 'example.gov',
+        citationHref: 'https://example.gov/record/1',
+        archivedUrl: 'https://web.archive.org/web/20260901000000/https://other.gov/record/1',
+        archivedAt: '2026-09-01T00:00:00.000Z',
+        citationLabel: 'Example record',
+      },
+    ],
+  });
+  assert.equal(view.claims[0]?.citationHref, 'https://example.gov/record/1');
+  assert.equal(view.claims[0]?.archivedUrl, undefined);
+  assert.equal(view.claims[0]?.archivedAt, undefined);
 });
 
 test('mapProjectionToPublicEntityView places MapFrame pins as 0–100 percentages', () => {

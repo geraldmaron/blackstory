@@ -13,6 +13,7 @@
  */
 import { createHash } from 'node:crypto';
 import type { SafeFetchResult } from '@repo/security/url-safety';
+import { normalizeCitationUrl } from '@repo/domain';
 import type { WaybackAnchor } from './wayback-anchor.js';
 import type { WaybackLookup } from './wayback-lookup.js';
 
@@ -49,19 +50,7 @@ export type CitedUrl = {
  * Normalize a URL for dedup: lowercase scheme+host, drop the fragment. Preserve the exact path, including its trailing slash. Query is significant (it selects a table/download) so it is kept.
  * Returns null for anything that is not an http(s) URL.
  */
-export function normalizeCaptureUrl(raw: string): string | null {
-  let parsed: URL;
-  try {
-    parsed = new URL(raw.trim());
-  } catch {
-    return null;
-  }
-  if (parsed.protocol !== 'http:' && parsed.protocol !== 'https:') return null;
-  parsed.hash = '';
-  parsed.hostname = parsed.hostname.toLowerCase();
-  parsed.protocol = parsed.protocol.toLowerCase();
-  return parsed.toString();
-}
+export const normalizeCaptureUrl = normalizeCitationUrl;
 
 export type SurfaceTally = { readonly cited: number; readonly unique: number };
 

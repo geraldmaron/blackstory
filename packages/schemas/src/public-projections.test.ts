@@ -176,6 +176,62 @@ test('entity projection rejects an invalid visit visitability value', () => {
   assert.equal(result.success, false);
 });
 
+test('entity claim archive fields are additive and must be complete', () => {
+  const claim = {
+    id: 'claim-1',
+    predicate: 'founded_year',
+    object: '1900',
+    confidenceLevel: 'high' as const,
+    citationSource: 'Example',
+    citationHref: 'https://example.gov/record/1',
+    citationLabel: 'Example record',
+  };
+  const archived = publicEntityProjectionSchema.safeParse({
+    ...baseEntity,
+    claims: [
+      {
+        ...claim,
+        archivedUrl: 'https://web.archive.org/web/20260901000000/https://example.gov/record/1',
+        archivedAt: '2026-09-01T00:00:00.000Z',
+      },
+    ],
+  });
+  assert.equal(archived.success, true);
+  assert.equal(
+    publicEntityProjectionSchema.safeParse({
+      ...baseEntity,
+      claims: [{ ...claim, archivedUrl: 'https://web.archive.org/web/20260901000000/x' }],
+    }).success,
+    false,
+  );
+  assert.equal(
+    publicEntityProjectionSchema.safeParse({
+      ...baseEntity,
+      claims: [
+        {
+          ...claim,
+          archivedUrl: 'https://web.archive.org/web/20260901000000/https://other.gov/record/1',
+          archivedAt: '2026-09-01T00:00:00.000Z',
+        },
+      ],
+    }).success,
+    false,
+  );
+  assert.equal(
+    publicEntityProjectionSchema.safeParse({
+      ...baseEntity,
+      claims: [
+        {
+          ...claim,
+          archivedUrl: 'javascript:alert(1)',
+          archivedAt: '2026-09-01T00:00:00.000Z',
+        },
+      ],
+    }).success,
+    false,
+  );
+});
+
 /**
  * the vocabulary this parser accepts must not be narrower than the one the
  * database, the deriver and the UI already use. `presumed_deceased` was legal everywhere else

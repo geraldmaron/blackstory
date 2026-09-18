@@ -97,9 +97,18 @@ export type ReviewedClaimAssessment = {
   readonly predicate: string;
   readonly object: string;
   readonly citationHrefs: readonly string[];
+  readonly reviewedEvidenceCaptures: readonly ReviewedEvidenceCapture[];
   readonly assessmentId: string;
   readonly reviewDecisionId: string;
   readonly assessment: ConfidenceAssessment;
+};
+
+/** Exact immutable capture revisions present in accepted evidence assignments for this review. */
+export type ReviewedEvidenceCapture = {
+  readonly sourceUrl: string;
+  readonly sourceItemId: string;
+  readonly captureId: string;
+  readonly contentHashDigest: string;
 };
 
 /**
@@ -129,7 +138,34 @@ SELECT c.entity_id AS "entityId", c.id AS "claimId", v.id AS "claimVersionId",
            AND ea.role = 'supporting' AND ea.fitness IN ('authoritative', 'strong', 'conditional')
            AND nullif(btrim(ea.reviewer_actor_id), '') IS NOT NULL
            AND nullif(btrim(si.url), '') IS NOT NULL
-       ) AS "citationHrefs"
+       ) AS "citationHrefs",
+       COALESCE((
+         SELECT jsonb_agg(
+           jsonb_build_object(
+             'sourceUrl', reviewed.source_url,
+             'sourceItemId', reviewed.source_item_id,
+             'captureId', reviewed.capture_id,
+             'contentHashDigest', reviewed.content_hash_digest
+           ) ORDER BY reviewed.source_url, reviewed.source_item_id,
+                      reviewed.capture_id, reviewed.content_hash_digest
+         )
+         FROM (
+           SELECT DISTINCT si.url AS source_url, si.id AS source_item_id,
+                  es.capture_id, capture.content_hash_digest
+           FROM canonical.evidence_assignments ea
+           JOIN evidence.evidence_selectors es ON es.id = ea.selector_id
+           JOIN evidence.capture_origins origin ON origin.capture_id = es.capture_id
+             AND origin.source_item_id = es.source_item_id
+             AND origin.retention_revoked_at IS NULL
+           JOIN evidence.source_items si ON si.id = origin.source_item_id
+           JOIN evidence.source_captures capture ON capture.id = es.capture_id
+           WHERE ea.claim_version_id = v.id AND ea.status = 'accepted'
+             AND ea.role = 'supporting'
+             AND ea.fitness IN ('authoritative', 'strong', 'conditional')
+             AND nullif(btrim(ea.reviewer_actor_id), '') IS NOT NULL
+             AND nullif(btrim(si.url), '') IS NOT NULL
+         ) reviewed
+       ), '[]'::jsonb) AS "reviewedEvidenceCaptures"
 FROM canonical.claims c
 JOIN canonical.claim_versions v ON v.id = c.current_version_id AND v.claim_id = c.id
 JOIN LATERAL (
@@ -181,9 +217,27 @@ function validReviewedAssessment(row: ReviewedClaimAssessment): boolean {
     row.assessmentId &&
     row.reviewDecisionId &&
     typeof row.object === 'string' &&
+    Array.isArray(row.citationHrefs) &&
     row.citationHrefs.length > 0 &&
+    Array.isArray(row.reviewedEvidenceCaptures) &&
+    row.reviewedEvidenceCaptures.length > 0 &&
+    row.reviewedEvidenceCaptures.every(validReviewedEvidenceCapture) &&
     assessment.intervalLow <= assessment.acceptanceProbability &&
     assessment.acceptanceProbability <= assessment.intervalHigh,
+  );
+}
+
+function validReviewedEvidenceCapture(capture: ReviewedEvidenceCapture): boolean {
+  return Boolean(
+    capture &&
+    typeof capture.sourceUrl === 'string' &&
+    capture.sourceUrl.length > 0 &&
+    typeof capture.sourceItemId === 'string' &&
+    capture.sourceItemId.length > 0 &&
+    typeof capture.captureId === 'string' &&
+    capture.captureId.length > 0 &&
+    typeof capture.contentHashDigest === 'string' &&
+    /^[a-f0-9]{64}$/u.test(capture.contentHashDigest),
   );
 }
 

@@ -37,6 +37,7 @@ import { US_STATES } from '../map/us-geography.js';
 import type { PublicRelatedEntry } from '../graph/adjacency.js';
 import type { RelationshipType, TemporalContext } from '../relationship.js';
 import { RELATIONSHIP_TYPES } from '../relationship.js';
+import { parseWaybackCaptureUrl } from '@repo/schemas';
 
 export type ReleaseSourceClaim = {
   readonly id?: string;
@@ -45,6 +46,10 @@ export type ReleaseSourceClaim = {
   readonly confidenceLevel: 'high' | 'medium' | 'low';
   readonly citationSource: string;
   readonly citationHref?: string;
+  /** Verified public archive pointer for the exact cited URL. */
+  readonly archivedUrl?: string;
+  /** ISO timestamp encoded by archivedUrl. */
+  readonly archivedAt?: string;
   readonly citationLabel: string;
   readonly independentLineageCount?: number;
   /** `record_index` for a claim built from the record's own index row; `evidence` otherwise. */
@@ -106,6 +111,8 @@ export type ReleaseClaimProjection = {
   readonly confidenceLevel: 'high' | 'medium' | 'low';
   readonly citationSource: string;
   readonly citationHref?: string;
+  readonly archivedUrl?: string;
+  readonly archivedAt?: string;
   readonly citationLabel: string;
   readonly independentLineageCount?: number;
   readonly claimRole?: ClaimRole;
@@ -322,21 +329,38 @@ export function resolveReleaseClaimId(
 }
 
 function buildClaimProjections(entry: ReleaseSourceEntity): readonly ReleaseClaimProjection[] {
-  return (entry.claims ?? []).map((claim, index) => ({
-    id: resolveReleaseClaimId(entry, claim, index),
-    predicate: claim.predicate,
-    object: sanitizePublicProseText(claim.object),
-    confidenceLevel: claim.confidenceLevel,
-    citationSource: claim.citationSource,
-    ...(claim.citationHref !== undefined ? { citationHref: claim.citationHref } : {}),
-    citationLabel: claim.citationLabel,
-    // Pass through scored lineage only. Inventing `1` per cited claim overcounts the same
-    // source across claims; the web evidence panel uses unique citation sources as proxy.
-    ...(claim.independentLineageCount !== undefined
-      ? { independentLineageCount: claim.independentLineageCount }
-      : {}),
-    ...(claim.claimRole !== undefined ? { claimRole: claim.claimRole } : {}),
-  }));
+  return (entry.claims ?? []).map((claim, index) => {
+    const hasArchiveField = claim.archivedUrl !== undefined || claim.archivedAt !== undefined;
+    const pointer =
+      claim.archivedUrl !== undefined && claim.citationHref !== undefined
+        ? parseWaybackCaptureUrl(claim.archivedUrl, claim.citationHref)
+        : null;
+    if (
+      hasArchiveField &&
+      (claim.archivedUrl === undefined ||
+        claim.archivedAt === undefined ||
+        claim.citationHref === undefined ||
+        pointer === null ||
+        pointer.capturedAt !== claim.archivedAt)
+    ) {
+      throw new Error(`Claim ${claim.id ?? index} carries an invalid archive pointer`);
+    }
+    return {
+      id: resolveReleaseClaimId(entry, claim, index),
+      predicate: claim.predicate,
+      object: sanitizePublicProseText(claim.object),
+      confidenceLevel: claim.confidenceLevel,
+      citationSource: claim.citationSource,
+      ...(claim.citationHref !== undefined ? { citationHref: claim.citationHref } : {}),
+      ...(claim.archivedUrl !== undefined ? { archivedUrl: claim.archivedUrl } : {}),
+      ...(claim.archivedAt !== undefined ? { archivedAt: claim.archivedAt } : {}),
+      citationLabel: claim.citationLabel,
+      ...(claim.independentLineageCount !== undefined
+        ? { independentLineageCount: claim.independentLineageCount }
+        : {}),
+      ...(claim.claimRole !== undefined ? { claimRole: claim.claimRole } : {}),
+    };
+  });
 }
 
 function claimToFactCitationStandIn(claim: ReleaseSourceClaim): FactCitation {

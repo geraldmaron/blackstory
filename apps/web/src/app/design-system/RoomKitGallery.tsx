@@ -174,6 +174,13 @@ export function RoomKitGallery() {
         <SourceList
           sources={[
             { text: 'Library of Congress, Prints and Photographs Division', year: '1963' },
+            {
+              text: 'Example public record',
+              archivedUrl:
+                'https://web.archive.org/web/20260901000000/https://example.gov/record/1',
+              archivedAt: '2026-09-01T00:00:00.000Z',
+              originalUrl: 'https://example.gov/record/1',
+            },
             { text: 'Birmingham Civil Rights Institute, oral history collection', year: '1998' },
             { text: 'County deed book 14' },
           ]}

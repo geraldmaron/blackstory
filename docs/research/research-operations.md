@@ -276,6 +276,12 @@ node --conditions development --import tsx packages/operator-cli/src/bin.ts capt
   --commit --wayback --max-captures 25
 node --conditions development --import tsx packages/operator-cli/src/bin.ts capture-backfill \
   --commit --wayback --max-entities 20
+node --conditions development --import tsx packages/operator-cli/src/bin.ts capture-backfill \
+  --url "https://example.gov/reviewed-citation" --commit --wayback \
+  --preservation-decisions decisions.json
+node --conditions development --import tsx packages/operator-cli/src/bin.ts capture-backfill \
+  --commit --max-captures 25 --after-url "<nextCursor>" \
+  --inventory-fingerprint "<inventoryFingerprint>"
 ```
 
 Safe by default (inventory + coverage JSON, no fetch, no write). `--commit` fetches through the
@@ -286,10 +292,19 @@ SSRF-safe path and writes capture rows. `--wayback` POSTs each **successful** lo
 `INTERNET_ARCHIVE_ACCESS_KEY` / `INTERNET_ARCHIVE_SECRET_KEY` are unset, SPN is skipped and
 local capture still runs (`wayback.status: skipped_no_credentials`).
 
-Do not run unbounded `--wayback --commit` against the full cited-URL inventory. Use
-`--max-captures`, `--max-entities`, and the daily `source_fetch` budget in
-[`capture-completeness-ops-bar.md`](./capture-completeness-ops-bar.md). Failed local fetches
-still do not mint SPN jobs.
+Every report includes the complete normalized inventory count and fingerprint. URL traversal is
+sorted; bounded reports return `nextCursor` while `hasMore` is true. Pass that cursor as
+`--after-url` and the prior fingerprint as `--inventory-fingerprint` so inventory changes fail
+closed instead of skipping new earlier URLs. `--url` selects one explicitly reviewed cited URL and
+fails if it is absent from the inventory; it cannot be combined with count, entity, or cursor
+batching. A commit with no explicit URL/count/entity bound defaults to 25 captures. Dry-run still
+reports the entire inventory and performs no fetch.
+
+Do not treat the 25-URL commit default as permission to archive unreviewed sources. Prefer an exact
+reviewed `--url` or an explicitly bounded batch. The repository defines a daily `source_fetch`
+policy, but the capture-backfill request path does not currently charge a durable counter to that
+policy; see [`capture-completeness-ops-bar.md`](./capture-completeness-ops-bar.md). Failed local
+fetches still do not mint SPN jobs.
 
 **Availability lookup (read, not save).** Under `--commit`, the lane asks
 `archive.org/wayback/available` what Internet Archive already holds at two points: after a local

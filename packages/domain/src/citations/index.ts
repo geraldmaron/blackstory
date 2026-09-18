@@ -19,6 +19,7 @@ export type {
   LinkHealthStatus,
   Citation,
 } from './citation.js';
+export { normalizeCitationUrl } from '@repo/schemas';
 
 export {
   evaluateClaimCitationCompleteness,

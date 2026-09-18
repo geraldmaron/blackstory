@@ -41,6 +41,8 @@ export type EvidenceCitationInput = {
   readonly source: string;
   readonly label: string;
   readonly href?: string;
+  readonly archivedUrl?: string;
+  readonly archivedAt?: string;
   /**
    * True when this citation resolves to evidence containing private or otherwise protected
    * material (e.g. an internal-only capture, a living-person-sensitive record). The outbound
@@ -55,6 +57,8 @@ export type EvidenceCitationView = {
   readonly source: string;
   readonly label: string;
   readonly href?: string;
+  readonly archivedUrl?: string;
+  readonly archivedAt?: string;
   readonly withheldReason?: string;
 };
 

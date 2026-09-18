@@ -583,6 +583,30 @@
   text-decoration-color: currentColor;
 }
 
+.ds-evidence-claim__archive-links {
+  display: block;
+  margin-top: var(--ds-space-1);
+  font-family: var(--ds-font-mono);
+  font-size: var(--rec-eyebrow, 0.6875rem);
+  line-height: 1.5;
+  color: var(--ds-ink-muted);
+}
+
+.ds-evidence-claim__archive-links a {
+  color: var(--ds-ink-muted);
+  text-decoration-color: color-mix(in srgb, var(--ds-accent) 45%, transparent);
+}
+
+.ds-evidence-claim__archive-links a:hover {
+  color: var(--ds-accent);
+  text-decoration-color: currentColor;
+}
+
+.ds-evidence-claim__archive-links a:focus-visible {
+  outline: 2px solid var(--ds-accent);
+  outline-offset: 2px;
+}
+
 .ds-evidence-claim__withheld,
 .ds-evidence-claim__coverage {
   margin: var(--ds-space-2) 0 0;

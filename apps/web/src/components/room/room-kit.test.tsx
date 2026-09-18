@@ -342,7 +342,7 @@ describe('room kit · prose and inline references', () => {
 });
 
 describe('room kit · evidence blocks', () => {
-  it('SourceList numbers sources and shows an em dash when the year is unknown', () => {
+  it('SourceList numbers sources and identifies an unknown source date', () => {
     const html = renderToStaticMarkup(
       <SourceList
         sources={[
@@ -354,7 +354,27 @@ describe('room kit · evidence blocks', () => {
     assert.match(html, /ds-room-src__i[^>]*>1</);
     assert.match(html, /ds-room-src__i[^>]*>2</);
     assert.match(html, /ds-room-src__y[^>]*>1963</);
-    assert.match(html, /ds-room-src__y[^>]*>—</);
+    assert.match(html, /ds-room-src__y[^>]*>Undated</);
+  });
+
+  it('SourceList keeps archived and original source links independently visible', () => {
+    const html = renderToStaticMarkup(
+      <SourceList
+        sources={[
+          {
+            text: 'National Archives: Record 1',
+            archivedUrl: 'https://web.archive.org/web/20260901000000/https://example.gov/record/1',
+            archivedAt: '2026-09-01T00:00:00.000Z',
+            originalUrl: 'https://example.gov/record/1',
+          },
+        ]}
+      />,
+    );
+    assert.match(html, /Archived copy/);
+    assert.match(html, /Original source/);
+    assert.match(html, /web\.archive\.org/);
+    assert.match(html, /https:\/\/example\.gov\/record\/1/);
+    assert.match(html, /2026-09-01/);
   });
 
   it('a Connection states the relation in words and never a bare arrow', () => {

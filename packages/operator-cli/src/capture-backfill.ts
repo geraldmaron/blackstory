@@ -12,9 +12,9 @@
  * Wayback is consulted read-first. A URL our safe-fetch cannot read (a PDF, a robots block,
  * a host that no longer answers) is exactly the URL most likely to already have a snapshot,
  * so a local failure triggers an availability lookup and the pointer lands on the failure
- * event instead of the event being a dead end. And with --wayback on, a lookup that finds an
- * existing snapshot spares a new SPN2 job: the archive has already done that work.
- * A lookup that finds nothing is recorded and stepped past, never raised.
+ * event instead of the event being a dead end. An availability hit is historical evidence,
+ * not proof that the current content revision was saved: --wayback still submits or resumes
+ * the current URL + content-hash job. A lookup miss is recorded and stepped past, never raised.
  */
 import { indexCaptureText } from './evidence-retrieval.js';
 import { assertContract } from '@repo/research-kernel';
@@ -23,6 +23,7 @@ import type { WaybackLookupResult } from '@repo/domain';
 import {
   buildCaptureInventory,
   captureCitedUrl,
+  normalizeCaptureUrl,
   type CaptureDeps,
   type CaptureSurface,
   type CitedUrl,
@@ -45,6 +46,9 @@ export type CaptureDb = CaptureQuery & {
   connect(): Promise<CaptureQuery & { release(): void }>;
 };
 
+/** Commit runs without an explicit entity/count bound stop after this many cited URLs. */
+export const DEFAULT_COMMIT_CAPTURE_LIMIT = 25;
+
 /** Pull cited URLs from the three surfaces. Entities are scoped to the active release. */
 export async function collectCitedUrls(
   db: CaptureDb,
@@ -59,7 +63,8 @@ export async function collectCitedUrls(
        FROM reference.theme_impact_packets p
        CROSS JOIN LATERAL jsonb_array_elements(p.observations) obs
        WHERE jsonb_typeof(p.observations) = 'array'
-         AND obs->'provenance'->>'sourceUrl' IS NOT NULL`,
+         AND obs->'provenance'->>'sourceUrl' IS NOT NULL
+       ORDER BY url ASC, ref_id ASC`,
     );
     for (const row of packets.rows) {
       refs.push({ url: row.url, surface: 'packet', refId: row.ref_id ?? 'packet' });
@@ -71,7 +76,8 @@ export async function collectCitedUrls(
       `SELECT a.id AS ref_id, ref->>'url' AS url
        FROM reference.articles a
        CROSS JOIN LATERAL jsonb_array_elements(a."references") ref
-       WHERE jsonb_typeof(a."references") = 'array' AND ref->>'url' IS NOT NULL`,
+       WHERE jsonb_typeof(a."references") = 'array' AND ref->>'url' IS NOT NULL
+       ORDER BY url ASC, ref_id ASC`,
     );
     for (const row of articles.rows) {
       refs.push({ url: row.url, surface: 'article', refId: row.ref_id });
@@ -84,8 +90,10 @@ export async function collectCitedUrls(
        FROM published.active_release ar
        JOIN published.release_entities re ON re.release_id = ar.release_id
        CROSS JOIN LATERAL jsonb_array_elements(re.claims) claim
-       CROSS JOIN LATERAL (VALUES (claim->>'citationHref'), (claim->>'citationSource')) AS c(url)
-       WHERE ar.id = 'active' AND jsonb_typeof(re.claims) = 'array' AND c.url IS NOT NULL`,
+       CROSS JOIN LATERAL (VALUES (claim->>'citationHref')) AS c(url)
+       WHERE ar.id = 'active' AND jsonb_typeof(re.claims) = 'array'
+         AND claim->>'citationHref' IS NOT NULL
+       ORDER BY url ASC, ref_id ASC`,
     );
     for (const row of entities.rows) {
       refs.push({ url: row.url, surface: 'entity', refId: row.ref_id });
@@ -95,7 +103,7 @@ export async function collectCitedUrls(
   return refs;
 }
 
-/** All unique cited URLs belonging to the first `maxEntities` entity ids, in inventory order. */
+/** All cited URLs belonging to the first `maxEntities` entity ids in stable id/URL order. */
 export function selectUrlsForEntityBatch(
   urls: readonly CitedUrl[],
   maxEntities: number,
@@ -105,8 +113,13 @@ export function selectUrlsForEntityBatch(
   }
   const selectedIds = new Set<string>();
   const selected: CitedUrl[] = [];
-  for (const url of urls) {
-    if (url.surface !== 'entity') continue;
+  const candidates = urls
+    .filter((url) => url.surface === 'entity')
+    .sort((left, right) => {
+      if (left.refId !== right.refId) return left.refId < right.refId ? -1 : 1;
+      return left.url < right.url ? -1 : left.url > right.url ? 1 : 0;
+    });
+  for (const url of candidates) {
     if (!selectedIds.has(url.refId)) {
       if (selectedIds.size >= maxEntities) continue;
       selectedIds.add(url.refId);
@@ -119,6 +132,12 @@ export function selectUrlsForEntityBatch(
 export type BackfillOptions = {
   readonly commit: boolean;
   readonly maxCaptures?: number;
+  /** Capture one explicitly reviewed URL; it must exist in the cited inventory. */
+  readonly targetUrl?: string;
+  /** Resume strictly after this normalized URL in the deterministic inventory. */
+  readonly afterUrl?: string;
+  /** Required for cursor resume; rejects continuation if the full URL inventory changed. */
+  readonly inventoryFingerprint?: string;
   /** Request SPN2 secondary anchoring. Requires waybackAnchor on CaptureDeps to run. */
   readonly wayback?: boolean;
   /** Capture cited URLs for the first N unique entity ids (entity surface only). */
@@ -150,7 +169,15 @@ export type BackfillReport = {
   readonly storage: string;
   readonly inventory: ReturnType<typeof buildCaptureInventory>['bySurface'];
   readonly totalUnique: number;
+  readonly inventoryFingerprint: string;
+  readonly afterUrl?: string;
+  readonly targetUrl?: string;
   readonly planned: number;
+  readonly remaining: number;
+  readonly hasMore: boolean;
+  readonly nextCursor?: string;
+  /** URLs whose local capture failed; use --url for an explicit retry. */
+  readonly failedUrls: readonly string[];
   readonly attempted: number;
   readonly captured: number;
   readonly deduped: number;
@@ -168,6 +195,17 @@ export type BackfillReport = {
   readonly waybackLookup: WaybackLookupBackfillReport;
   readonly plannedEntities?: number;
 };
+
+function compareUrls(left: CitedUrl, right: CitedUrl): number {
+  return left.url < right.url ? -1 : left.url > right.url ? 1 : 0;
+}
+
+/** Stable fingerprint of the full normalized URL denominator, independent of SQL row order. */
+export function captureInventoryFingerprint(urls: readonly CitedUrl[]): string {
+  return createHash('sha256')
+    .update(JSON.stringify([...urls].sort(compareUrls).map((row) => row.url)))
+    .digest('hex');
+}
 
 /** Atomically persist capture origin, passages and retrieval event; bytes deduplicate by hash. */
 export async function persistCapture(
@@ -321,8 +359,23 @@ export async function runCaptureBackfill(
   options: BackfillOptions,
   captureDeps: CaptureDeps,
 ): Promise<BackfillReport> {
-  const entityBatch = options.maxEntities !== undefined;
-  const refs = await collectCitedUrls(db, entityBatch ? { surfaces: ['entity'] } : {});
+  if (
+    options.targetUrl !== undefined &&
+    (options.afterUrl !== undefined ||
+      options.maxCaptures !== undefined ||
+      options.maxEntities !== undefined)
+  ) {
+    throw new Error('targetUrl cannot be combined with capture batch or cursor options');
+  }
+  if (options.maxEntities !== undefined && options.afterUrl !== undefined) {
+    throw new Error(
+      'afterUrl cannot be combined with maxEntities; entity batches are not resumable',
+    );
+  }
+  if (options.afterUrl !== undefined && options.inventoryFingerprint === undefined) {
+    throw new Error('afterUrl requires the prior inventoryFingerprint');
+  }
+  const refs = await collectCitedUrls(db);
   const inventory = buildCaptureInventory(refs);
   const batch =
     options.maxEntities !== undefined
@@ -333,9 +386,52 @@ export async function runCaptureBackfill(
       throw new Error('Capture limits must be nonnegative integers');
   }
   const uniqueBatch = buildCaptureInventory(batch.urls);
-  const budget = options.maxCaptures ?? uniqueBatch.urls.length;
-  const target = uniqueBatch.urls.slice(0, budget);
+  const sortedInventory = [...inventory.urls].sort(compareUrls);
+  const sortedBatch = [...uniqueBatch.urls].sort(compareUrls);
+  const inventoryFingerprint = captureInventoryFingerprint(sortedInventory);
+  if (
+    options.inventoryFingerprint !== undefined &&
+    options.inventoryFingerprint !== inventoryFingerprint
+  ) {
+    throw new Error(
+      `Capture inventory changed: expected ${options.inventoryFingerprint}, got ${inventoryFingerprint}`,
+    );
+  }
+  let afterUrl: string | undefined;
+  if (options.afterUrl !== undefined) {
+    const normalized = normalizeCaptureUrl(options.afterUrl);
+    if (normalized === null) throw new Error('afterUrl must be an HTTP(S) URL');
+    afterUrl = normalized;
+  }
+  if (afterUrl !== undefined && !sortedInventory.some((row) => row.url === afterUrl)) {
+    throw new Error(`afterUrl is not present in the selected capture inventory: ${afterUrl}`);
+  }
+  let targetUrl: string | undefined;
+  if (options.targetUrl !== undefined) {
+    const normalized = normalizeCaptureUrl(options.targetUrl);
+    if (normalized === null) throw new Error('targetUrl must be an HTTP(S) URL');
+    targetUrl = normalized;
+  }
+  const exactTarget =
+    targetUrl === undefined ? undefined : sortedInventory.find((row) => row.url === targetUrl);
+  if (targetUrl !== undefined && exactTarget === undefined) {
+    throw new Error(`targetUrl is not present in the cited capture inventory: ${targetUrl}`);
+  }
+  const remainingBatch = exactTarget
+    ? [exactTarget]
+    : afterUrl === undefined
+      ? sortedBatch
+      : sortedInventory.filter((row) => row.url > afterUrl);
+  const budget =
+    options.maxCaptures ??
+    (options.commit && options.maxEntities === undefined && targetUrl === undefined
+      ? DEFAULT_COMMIT_CAPTURE_LIMIT
+      : uniqueBatch.urls.length);
+  const target = remainingBatch.slice(0, budget);
   const planned = target.length;
+  const remaining = remainingBatch.length - planned;
+  const hasMore = remaining > 0;
+  const nextCursor = hasMore ? target.at(-1)?.url : undefined;
   const waybackRequested = options.wayback === true;
   const credentialsPresent = captureDeps.waybackAnchor !== undefined;
   const lookupAvailable = captureDeps.waybackLookup !== undefined;
@@ -352,7 +448,14 @@ export async function runCaptureBackfill(
       storage: captureDeps.storage.kind,
       inventory: inventory.bySurface,
       totalUnique: inventory.urls.length,
+      inventoryFingerprint,
+      ...(afterUrl !== undefined ? { afterUrl } : {}),
+      ...(targetUrl !== undefined ? { targetUrl } : {}),
       planned,
+      remaining,
+      hasMore,
+      ...(nextCursor !== undefined ? { nextCursor } : {}),
+      failedUrls: [],
       attempted: 0,
       captured: 0,
       deduped: 0,
@@ -388,6 +491,7 @@ export async function runCaptureBackfill(
   let waybackAnchored = 0;
   let waybackFailed = 0;
   let waybackPending = 0;
+  const failedUrls: string[] = [];
   let lookupAttempted = 0;
   let lookupFound = 0;
   let lookupMissed = 0;
@@ -402,9 +506,9 @@ export async function runCaptureBackfill(
     let retrievalEvent = outcome.retrievalEvent;
 
     // Two moments deserve a lookup, and only these two. A local failure, where an existing
-    // snapshot is the only pointer we will get. And the moment before minting an SPN2 job,
-    // where an existing snapshot makes that job redundant. A successful local capture with
-    // --wayback off needs neither, so it costs no request.
+    // snapshot is the only pointer we will get. And the moment before attempting a current
+    // revision SPN2 anchor, where an existing snapshot is useful historical context.
+    // A successful local capture with --wayback off needs neither, so it costs no request.
     const lookupWarranted = outcome.status === 'failure' || waybackAnchor !== undefined;
     let existing: WaybackLookupResult | undefined;
     if (waybackLookup !== undefined && lookupWarranted) {
@@ -458,6 +562,7 @@ export async function runCaptureBackfill(
     const { deduped: wasDup } = await persistCapture(db, capture, retrievalEvent);
     if (outcome.status === 'failure') {
       failed += 1;
+      failedUrls.push(ref.url);
     } else if (wasDup) {
       deduped += 1;
     } else {
@@ -472,7 +577,14 @@ export async function runCaptureBackfill(
     storage: captureDeps.storage.kind,
     inventory: inventory.bySurface,
     totalUnique: inventory.urls.length,
+    inventoryFingerprint,
+    ...(afterUrl !== undefined ? { afterUrl } : {}),
+    ...(targetUrl !== undefined ? { targetUrl } : {}),
     planned,
+    remaining,
+    hasMore,
+    ...(nextCursor !== undefined ? { nextCursor } : {}),
+    failedUrls,
     attempted,
     captured,
     deduped,

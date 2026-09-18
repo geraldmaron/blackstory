@@ -66,12 +66,43 @@ export type RoomSource = {
   /** Year of the source, not of the event. */
   readonly year?: string;
   readonly href?: string;
+  /** Verified archive pointer and its original source, shown as separate reader choices. */
+  readonly archivedUrl?: string;
+  readonly archivedAt?: string;
+  readonly originalUrl?: string;
 };
 
 export type SourceListProps = {
   readonly sources: readonly RoomSource[];
   readonly className?: string;
 };
+
+export type ArchivedSourceLinksProps = {
+  readonly archivedUrl: string;
+  readonly archivedAt: string;
+  readonly originalUrl: string;
+  readonly className?: string;
+};
+
+/** One shared, explicit handoff for every public claim surface that has a verified archive. */
+export function ArchivedSourceLinks({
+  archivedUrl,
+  archivedAt,
+  originalUrl,
+  className,
+}: ArchivedSourceLinksProps) {
+  return (
+    <span className={className}>
+      <a href={archivedUrl} rel="noreferrer">
+        Archived copy
+      </a>{' '}
+      (captured {archivedAt.slice(0, 10)})<span aria-hidden="true"> · </span>
+      <a href={originalUrl} rel="noreferrer">
+        Original source
+      </a>
+    </span>
+  );
+}
 
 export function SourceList({ sources, className }: SourceListProps) {
   return (
@@ -82,7 +113,17 @@ export function SourceList({ sources, className }: SourceListProps) {
             {index + 1}
           </span>
           <span className="ds-room-src__t">
-            {source.href ? (
+            {source.archivedUrl && source.archivedAt && source.originalUrl ? (
+              <>
+                <span className="ds-room-src__label">{source.text}</span>
+                <ArchivedSourceLinks
+                  archivedUrl={source.archivedUrl}
+                  archivedAt={source.archivedAt}
+                  originalUrl={source.originalUrl}
+                  className="ds-room-src__links"
+                />
+              </>
+            ) : source.href ? (
               <a href={source.href} rel="noreferrer">
                 {source.text}
               </a>
@@ -90,7 +131,7 @@ export function SourceList({ sources, className }: SourceListProps) {
               source.text
             )}
           </span>
-          <span className="ds-room-src__y">{source.year ?? '—'}</span>
+          <span className="ds-room-src__y">{source.year ?? 'Undated'}</span>
         </li>
       ))}
     </ol>

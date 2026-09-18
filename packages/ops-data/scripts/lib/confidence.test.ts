@@ -150,6 +150,14 @@ const reviewed: ReviewedClaimAssessment = {
   predicate: 'founded',
   object: 'Founded in 1920',
   citationHrefs: [NPS_GOV],
+  reviewedEvidenceCaptures: [
+    {
+      sourceUrl: NPS_GOV,
+      sourceItemId: 'source-item-a',
+      captureId: 'capture-a',
+      contentHashDigest: 'a'.repeat(64),
+    },
+  ],
   assessmentId: 'assessment-a',
   reviewDecisionId: 'review-a',
   assessment: {
@@ -231,6 +239,17 @@ test('one assessed claim does not cover another or uncited assertions', () => {
 
 test('ambiguous or malformed assessments remain held', () => {
   assert.equal(assessPublicationClaims(entry, [reviewed, reviewed]).ok, false);
+  assert.equal(
+    assessPublicationClaims(entry, [
+      {
+        ...reviewed,
+        reviewedEvidenceCaptures: [
+          { ...reviewed.reviewedEvidenceCaptures[0]!, contentHashDigest: 'not-a-digest' },
+        ],
+      },
+    ]).ok,
+    false,
+  );
   for (const change of [
     { intervalLow: NaN },
     { intervalLow: 0.98 },

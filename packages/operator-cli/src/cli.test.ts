@@ -6,6 +6,7 @@ import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import type { AtomicStore, AtomicTransaction } from '@repo/data-access';
 import { runCli } from './cli.ts';
+import type { CaptureDb } from './capture-backfill.ts';
 import type { ExecutionClient, ExecutionPool } from './research-execution.js';
 
 class MemoryAtomicStore implements AtomicStore {
@@ -61,6 +62,24 @@ class CaptureRetentionPool implements ExecutionPool {
       },
       release() {},
     };
+  }
+}
+
+class CaptureBackfillDb implements CaptureDb {
+  async connect() {
+    return { query: this.query.bind(this), release() {} };
+  }
+
+  async query<T = Record<string, unknown>>(sql: string): Promise<{ rows: T[] }> {
+    let rows: Record<string, unknown>[] = [];
+    if (sql.includes('theme_impact_packets')) {
+      rows = [{ ref_id: 'obs-1', url: 'https://census.gov/a' }];
+    } else if (sql.includes('reference.articles')) {
+      rows = [{ ref_id: 'article-1', url: 'https://loc.gov/b' }];
+    } else if (sql.includes('release_entities')) {
+      rows = [{ ref_id: 'entity-1', url: 'https://nps.gov/c' }];
+    }
+    return { rows: rows as T[] };
   }
 }
 
@@ -186,6 +205,56 @@ test('capture-retention parses --delete-storage and refuses it without --commit'
       (statement) => !/^\s*(DELETE|INSERT|LOCK|UPDATE)\b/i.test(statement),
     ),
   );
+});
+
+test('capture-backfill CLI wires exact targets and deterministic resume flags', async () => {
+  const captureDb = new CaptureBackfillDb();
+  const firstOut = capture();
+  const firstCode = await runCli(['capture-backfill', '--max-captures', '1'], {
+    captureDb,
+    stdout: firstOut.stdout,
+    stderr: firstOut.stderr,
+  });
+  assert.equal(firstCode, 0, firstOut.errors.join('\n'));
+  const first = JSON.parse(firstOut.lines[0] ?? '{}') as {
+    inventoryFingerprint?: string;
+    nextCursor?: string;
+    totalUnique?: number;
+  };
+  assert.equal(first.totalUnique, 3);
+  assert.equal(first.nextCursor, 'https://census.gov/a');
+  assert.equal(first.inventoryFingerprint?.length, 64);
+
+  const resumedOut = capture();
+  const resumedCode = await runCli(
+    [
+      'capture-backfill',
+      '--max-captures',
+      '1',
+      '--after-url',
+      first.nextCursor!,
+      '--inventory-fingerprint',
+      first.inventoryFingerprint!,
+    ],
+    { captureDb, stdout: resumedOut.stdout, stderr: resumedOut.stderr },
+  );
+  assert.equal(resumedCode, 0);
+  const resumed = JSON.parse(resumedOut.lines[0] ?? '{}') as { afterUrl?: string };
+  assert.equal(resumed.afterUrl, 'https://census.gov/a');
+
+  const targetedOut = capture();
+  const targetedCode = await runCli(['capture-backfill', '--url', 'https://nps.gov/c'], {
+    captureDb,
+    stdout: targetedOut.stdout,
+    stderr: targetedOut.stderr,
+  });
+  assert.equal(targetedCode, 0);
+  const targeted = JSON.parse(targetedOut.lines[0] ?? '{}') as {
+    targetUrl?: string;
+    planned?: number;
+  };
+  assert.equal(targeted.targetUrl, 'https://nps.gov/c');
+  assert.equal(targeted.planned, 1);
 });
 
 test('research-intake fetches through an injected transport, then opens a draft case', async () => {

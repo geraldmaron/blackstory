@@ -40,6 +40,23 @@ test('toEvidenceClaimInputs preserves an explicit zero lineage count', () => {
   assert.deepEqual(mapped!.sourceLineage, { independentLineageCount: 0 });
 });
 
+test('toEvidenceClaimInputs carries verified archive fields beside the original citation', () => {
+  const [mapped] = toEvidenceClaimInputs([
+    {
+      ...BASE_CLAIM,
+      citationHref: 'https://example.gov/source',
+      archivedUrl: 'https://web.archive.org/web/20260918210000/https://example.gov/source',
+      archivedAt: '2026-09-18T21:00:00.000Z',
+    },
+  ]);
+  assert.equal(mapped?.citation.href, 'https://example.gov/source');
+  assert.equal(
+    mapped?.citation.archivedUrl,
+    'https://web.archive.org/web/20260918210000/https://example.gov/source',
+  );
+  assert.equal(mapped?.citation.archivedAt, '2026-09-18T21:00:00.000Z');
+});
+
 const SUMMARY =
   'Bethel Literary and Historical Society met at Metropolitan AME Church, where Black ' +
   'Washingtonians debated the questions of the day for more than forty years.';
