@@ -1,5 +1,5 @@
 /**
- * Maps Census Gazetteer county rows into bb_reference.jurisdictions seed rows
+ * Maps Census Gazetteer county rows into reference.jurisdictions seed rows
  * (Postgres id hierarchy: county:{stateFips}{countyFips3}, parent state:{stateFips}).
  */
 import { US_STATES } from '@repo/domain';
@@ -20,7 +20,7 @@ export type ReferenceCountySeed = {
   /**
    * [west, south, east, north] approximate bbox centered on the Gazetteer centroid, sized to
    * the county's land+water area (see tiger-gazetteer.ts's approximateCountyBBox). Feeds
-   * bb_reference.jurisdictions.location, a geography(Polygon, 4326) column — this is the
+   * reference.jurisdictions.location, a geography(Polygon, 4326) column — this is the
    * envelope upsertCountyBatch turns into that polygon.
    */
   readonly bbox: readonly [number, number, number, number];

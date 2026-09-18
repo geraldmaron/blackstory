@@ -1,6 +1,6 @@
 # Runbook: Operator MCP — Phase 1 indicators
 
-**Scope:** read-only operator/research MCP tools over `bb_reference.statistical_*` and `entity_context_bindings`. This is **not** the public heritage MCP ([public-mcp-unlock-criteria.md](../research/public-mcp-unlock-criteria.md)).
+**Scope:** read-only operator/research MCP tools over `reference.statistical_*` and `entity_context_bindings`. This is **not** the public heritage MCP ([public-mcp-unlock-criteria.md](../research/public-mcp-unlock-criteria.md)).
 
 **Package:** `@repo/operator-mcp` (`packages/operator-mcp`)
 
@@ -16,7 +16,7 @@
    ```bash
    DATABASE_URL="$DATABASE_URL" \
      node --conditions development --import tsx \
-     packages/firebase/scripts/ingest-phase1-indicators.ts
+     packages/ops-data/scripts/ingest-phase1-indicators.ts
    ```
 
 3. **Operator database URL** — use a research/operator role connection string (`DATABASE_URL` or `APP_DATABASE_URL`). Do **not** use Supabase service-role or any `NEXT_PUBLIC_*` database env var with this MCP.
@@ -97,7 +97,7 @@ Tests use an in-memory mock DB reader — no live Postgres required.
 | Code | When |
 |------|------|
 | `unknown_metric` | `metricId` not in DB or Phase 1 catalog |
-| `unknown_jurisdiction` | `jurisdictionId` missing from `bb_reference.jurisdictions` |
+| `unknown_jurisdiction` | `jurisdictionId` missing from `reference.jurisdictions` |
 | `forbidden_causal` | Client asks for automated causal impact |
 | `invalid_input` | Missing required fields or bad limits |
 

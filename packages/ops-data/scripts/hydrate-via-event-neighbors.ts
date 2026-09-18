@@ -77,7 +77,7 @@ async function main(): Promise<void> {
       role: string;
     }>(
       `SELECT event_id, participant_id, role
-       FROM bb_canonical.event_participation
+       FROM canonical.event_participation
        ORDER BY event_id, participant_id`,
     );
     const rows: EventParticipationRow[] = participation.rows.map((row) => ({
@@ -88,7 +88,7 @@ async function main(): Promise<void> {
 
     const eventIds = [...new Set(rows.map((row) => row.eventId))];
     const eventNames = await client.query<{ id: string; display_name: string }>(
-      `SELECT id, display_name FROM bb_canonical.entities WHERE id = ANY($1::text[])`,
+      `SELECT id, display_name FROM canonical.entities WHERE id = ANY($1::text[])`,
       [eventIds],
     );
     const eventNamesById = new Map(eventNames.rows.map((row) => [row.id, row.display_name]));
@@ -101,8 +101,8 @@ async function main(): Promise<void> {
       projection: Record<string, unknown>;
     }>(
       `SELECT re.release_id, re.entity_id, re.related, re.projection
-       FROM bb_public.release_entities re
-       JOIN bb_public.active_release ar ON ar.release_id = re.release_id
+       FROM published.release_entities re
+       JOIN published.active_release ar ON ar.release_id = re.release_id
        WHERE re.entity_id = ANY($1::text[])`,
       [participantIds],
     );
@@ -146,7 +146,7 @@ async function main(): Promise<void> {
 
       const nextProjection = { ...row.projection, related: merged };
       const result = await client.query(
-        `UPDATE bb_public.release_entities
+        `UPDATE published.release_entities
          SET projection = $3::jsonb
          WHERE release_id = $1 AND entity_id = $2`,
         [row.release_id, row.entity_id, JSON.stringify(nextProjection)],

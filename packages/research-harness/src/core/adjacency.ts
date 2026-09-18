@@ -1,9 +1,10 @@
 import { encodeGeohash, haversineMeters } from '@repo/domain/geography/geohash';
 import type { HarnessRawSubject } from './connector.js';
 
-export interface SpatialTemporalOverlap {
+export interface RelationshipCandidatePair {
   readonly subjectA: HarnessRawSubject;
   readonly subjectB: HarnessRawSubject;
+  readonly signals: readonly ('cross_reference' | 'shared_source' | 'spatiotemporal')[];
   readonly distanceMeters?: number | undefined;
   readonly sharedGeohashPrefix?: string | undefined;
   readonly temporalWindows: readonly string[];
@@ -37,14 +38,24 @@ export function extractYearFromText(text: string): number | undefined {
   return match ? parseInt(match[0], 10) : undefined;
 }
 
-/** Computes spatial-temporal co-occurrence overlaps between raw subjects. */
-export function findSpatialTemporalOverlaps(
+/** Finds bounded review leads from explicit mentions, shared citations and time/place overlap.
+ * Signals improve recall; none establishes identity or an edge.
+ */
+export function findRelationshipCandidates(
   subjects: readonly HarnessRawSubject[],
   options: { maxDistanceMeters?: number; geohashPrecision?: number } = {},
-): readonly SpatialTemporalOverlap[] {
-  const maxDist = options.maxDistanceMeters ?? 5000; // default 5km
-  const precision = options.geohashPrecision ?? 5; // default ~5km geohash resolution
-  const overlaps: SpatialTemporalOverlap[] = [];
+): readonly RelationshipCandidatePair[] {
+  const maxDist = options.maxDistanceMeters ?? 5000;
+  const precision = options.geohashPrecision ?? 5;
+  if (
+    !Number.isFinite(maxDist) ||
+    maxDist < 0 ||
+    !Number.isInteger(precision) ||
+    precision < 1 ||
+    precision > 12
+  )
+    throw new Error('Invalid relationship candidate distance or precision');
+  const overlaps: RelationshipCandidatePair[] = [];
 
   for (let i = 0; i < subjects.length; i++) {
     const a = subjects[i];
@@ -59,9 +70,27 @@ export function findSpatialTemporalOverlaps(
       const erasB = yearB !== undefined ? resolveTemporalWindowsForYear(yearB) : [];
 
       const sharedEras = erasA.filter((era) => erasB.includes(era));
-      if (sharedEras.length === 0) continue;
+      if (a.id === b.id) continue;
+      const signals: RelationshipCandidatePair['signals'][number][] = [];
+      const mentions = (text: string, name: string): boolean => {
+        const normalizedName = name.normalize('NFKC').toLowerCase().trim();
+        if (normalizedName.length < 3) return false;
+        const normalizedText = text.normalize('NFKC').toLowerCase();
+        let offset = normalizedText.indexOf(normalizedName);
+        while (offset >= 0) {
+          const before = normalizedText.slice(0, offset).at(-1) ?? '';
+          const after = normalizedText.slice(offset + normalizedName.length)[0] ?? '';
+          if (!/[\p{L}\p{N}]/u.test(before) && !/[\p{L}\p{N}]/u.test(after)) return true;
+          offset = normalizedText.indexOf(normalizedName, offset + 1);
+        }
+        return false;
+      };
+      if (mentions(a.description, b.title) || mentions(b.description, a.title))
+        signals.push('cross_reference');
+      if (a.cites.some((url) => b.cites.includes(url))) signals.push('shared_source');
+      let spatial: Pick<RelationshipCandidatePair, 'distanceMeters' | 'sharedGeohashPrefix'> = {};
 
-      if (a.coordinates && b.coordinates) {
+      if (sharedEras.length > 0 && a.coordinates && b.coordinates) {
         const distance = haversineMeters(
           { lat: a.coordinates.latitude, lng: a.coordinates.longitude },
           { lat: b.coordinates.latitude, lng: b.coordinates.longitude },
@@ -79,17 +108,27 @@ export function findSpatialTemporalOverlaps(
             }
           }
 
-          overlaps.push({
-            subjectA: a,
-            subjectB: b,
+          signals.push('spatiotemporal');
+          spatial = {
             distanceMeters: Math.round(distance),
             ...(sharedPrefix ? { sharedGeohashPrefix: sharedPrefix } : {}),
-            temporalWindows: sharedEras,
-          });
+          };
         }
       }
+      if (signals.length)
+        overlaps.push({
+          subjectA: a,
+          subjectB: b,
+          signals,
+          temporalWindows: sharedEras,
+          ...spatial,
+        });
     }
   }
 
-  return overlaps;
+  // Explicit references are examined before the broader co-occurrence signals.
+  return overlaps.sort(
+    (a, b) =>
+      Number(b.signals.includes('cross_reference')) - Number(a.signals.includes('cross_reference')),
+  );
 }

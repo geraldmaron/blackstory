@@ -1,28 +1,8 @@
 /**
- * repo-el9p (WS3) — write `projection.visit` onto the active release from canonical data.
- *
- * The release builder emits `visit` through `publicVisitForTier`, but the incremental publish
- * path still builds its entries from landscape rows and never reads `bb_canonical.entity_visit`
- * or `entity_locations.street` (tracked as a follow-up bead). Until that lands, this script is
- * the one path that carries the backfilled contact and address data into the public row, using
- * the very same gate so the projection can never say more than the builder would.
- *
- * Inputs, per active-release entity:
- *   - bb_canonical.entity_visit (phone, website, hours, visitability, source_ids)
- *   - bb_canonical.entity_locations (street, postal_code) — the first row per entity
- *   - bb_public.release_entities.projection (kind, livingStatus, location.precision,
- *     jurisdictionLabel for city/state)
- *
- * Output: `UPDATE bb_public.release_entities SET projection = jsonb_set(projection, '{visit}', …)`
- * for entities whose gated visit is non-empty; `visit` is removed where it gates to nothing.
- * The release-catalog watermark trigger marks the artifacts dirty on write.
- *
- * Default is dry-run. Apply requires:
- *   DRY_RUN=0 SYNC_VISIT_APPLY=1
- *
- * Usage (from repo root):
- *   set -a && source apps/web/.env.local && set +a
- *   node --conditions development --import tsx packages/ops-data/scripts/sync-visit-to-projection.ts
+ * Sync canonical visit/contact fields into active-release projections through
+ * publicVisitForTier. Use canonical visit and location data plus published kind, living status
+ * and precision. Remove visit when nothing passes the gate; release watermarks mark changed
+ * artifacts dirty. Default dry-run; writes require DRY_RUN=0 and SYNC_VISIT_APPLY=1.
  */
 import pg from 'pg';
 import { publicVisitForTier, type PublicVisit } from '@repo/domain';
@@ -124,12 +104,12 @@ async function main(): Promise<void> {
             (v.entity_id IS NOT NULL) AS has_visit,
             v.phone_e164, v.phone_display, v.website, v.hours, v.visitability, v.source_ids,
             l.street, l.postal_code
-       FROM bb_public.release_entities re
-       JOIN bb_public.active_release r ON r.id = 'active' AND r.release_id = re.release_id
-       LEFT JOIN bb_canonical.entity_visit v ON v.entity_id = re.entity_id
+       FROM published.release_entities re
+       JOIN published.active_release r ON r.id = 'active' AND r.release_id = re.release_id
+       LEFT JOIN canonical.entity_visit v ON v.entity_id = re.entity_id
        LEFT JOIN LATERAL (
          SELECT street, postal_code
-           FROM bb_canonical.entity_locations el
+           FROM canonical.entity_locations el
           WHERE el.entity_id = re.entity_id
             AND (el.street IS NOT NULL OR el.postal_code IS NOT NULL)
           ORDER BY el.updated_at DESC
@@ -182,10 +162,10 @@ async function main(): Promise<void> {
   let applied = 0;
   for (const item of plan) {
     await pool.query(
-      `UPDATE bb_public.release_entities
+      `UPDATE published.release_entities
           SET projection = jsonb_set(projection, '{visit}', $2::jsonb, true)
         WHERE entity_id = $1
-          AND release_id = (SELECT release_id FROM bb_public.active_release WHERE id = 'active')`,
+          AND release_id = (SELECT release_id FROM published.active_release WHERE id = 'active')`,
       [item.entityId, JSON.stringify(item.visit)],
     );
     applied += 1;

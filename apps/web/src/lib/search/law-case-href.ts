@@ -1,36 +1,7 @@
 /**
- * Resolves a `/law/{slug}` href for a law/case search result, when one can be resolved
- * confidently — repo-skocy.
- *
- * `instrumentRecordHref` (`../place/place-slug.ts`) maps every `law`/`case` entity to the bare
- * string `/law`, which is correct for the map/place pipeline (a statute has no coordinate to
- * stand at) but wrong for search: a reader who searched a specific law, saw it in the results,
- * and clicked it lands on the browse index instead of the record — search found it and then
- * dropped it.
- *
- * There is no id-level join between the two catalogs. The live search index keys a law entity
- * as `ent_law_civil_rights_act_1964`; the legal snapshot catalog (`/law/{slug}`'s own source)
- * keys the same law as `legal-cra-1964`. Different systems, no shared foreign key — confirmed by
- * reading both id spaces directly rather than assumed. Deriving one id from the other by string
- * transform does not work either: `ent_case_brown_v_board_of_education_1954` would naively
- * produce `brown-v-board-of-education-1954`, but the real slug is `brown-v-board-of-education`
- * (no year), and `ent_law_13th_amendment_1865` bears no resemblance at all to its real slug
- * (`thirteenth-amendment`).
- *
- * So this resolves by an EXACT (case-insensitive, trimmed) match on the published title instead.
- * A law's title is a legal document's own name, not free text, so a same-catalog collision is
- * the kind of error this archive's own editorial process should have already caught, not one an
- * exact string match introduces. When nothing matches exactly, this returns `undefined` and the
- * caller keeps today's `/law` fallback — a genuine data-completeness gap (a search-indexable law
- * with no legal-snapshot record at all does exist; roughly half of the sampled law/case corpus
- * had none, live), not a wrong link, so a miss must fail safe to the index rather than guess.
- *
- * Cached in-process with a short TTL rather than `React.cache()`: this is a Route Handler, not
- * an RSC render, and `/search/api` is the most rate-limited, highest-traffic endpoint on the
- * site (`SEARCH_ENDPOINT_CLASS`, `expensive_read`) — every search paying for an uncached
- * `bb_public.release_legal_snapshots` read on top of its own would be the exact cost mistake
- * `atlas-catalog.ts`'s Vercel-bill history already warns against. The catalog changes only when
- * a release does, so a few minutes of staleness costs nothing a reader would notice.
+ * Resolves law and case search results by exact normalized title in the legal catalog. Entity
+ * and legal-snapshot identifiers have no shared foreign key, so string-transformed ids are
+ * unreliable. Unmatched or ambiguous titles remain unresolved.
  */
 import { loadLegalCatalog } from '../legal/public-source';
 

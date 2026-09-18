@@ -1,5 +1,5 @@
 /**
- * Server-side Postgres readers for active-release public projections in `bb_public.*`.
+ * Server-side Postgres readers for active-release public projections in `published.*`.
  * Mirrors `apps/web/src/lib/public-data/postgres-readers.ts` for the mobile `/v1` API surface.
  */
 import {
@@ -39,7 +39,7 @@ export async function fetchActiveRelease(
 ): Promise<ReturnType<typeof parseActiveRelease>> {
   const rows = (await query(
     `SELECT release_id, activated_at, search_index_version, manifest_hash
-     FROM bb_public.active_release
+     FROM published.active_release
      WHERE id = 'active'
      LIMIT 1`,
   )) as ActiveReleaseRow[];
@@ -60,7 +60,7 @@ export async function fetchPublicEntityProjection(
 ): Promise<ReturnType<typeof parseEntityProjection>> {
   const rows = (await query(
     `SELECT projection
-     FROM bb_public.release_entities
+     FROM published.release_entities
      WHERE release_id = $1 AND entity_id = $2
      LIMIT 1`,
     [releaseId, entityId],
@@ -82,7 +82,7 @@ export async function fetchPublicEntityProjectionsByIds(
     const chunk = unique.slice(offset, offset + POSTGRES_ENTITY_BATCH_SIZE);
     const rows = (await query(
       `SELECT projection
-       FROM bb_public.release_entities
+       FROM published.release_entities
        WHERE release_id = $1 AND entity_id = ANY($2::text[])`,
       [releaseId, chunk],
     )) as ProjectionRow[];
@@ -95,12 +95,8 @@ export async function fetchPublicEntityProjectionsByIds(
 }
 
 /**
- * The survivor a merged-away entity id forwards to, or `undefined` (repo-n7p6.29).
- * Mirrors `apps/web/src/lib/public-data/postgres-readers.ts`'s reader of the same name.
- *
- * `to_entity_id` is already the terminal survivor of any merge chain — chains are resolved by
- * `packages/ops-data/scripts/reconcile-absorbed-entities.ts` before the row is written — so this
- * is a point-get, never a walk, and cannot loop.
+ * Returns the terminal published survivor of an absorbed id. reconcile-absorbed-entities.ts
+ * resolves chains before writing redirects, so this reader performs one lookup.
  */
 export async function fetchPublicEntityRedirect(
   releaseId: string,
@@ -109,7 +105,7 @@ export async function fetchPublicEntityRedirect(
 ): Promise<string | undefined> {
   const rows = (await query(
     `SELECT to_entity_id
-     FROM bb_public.release_entity_redirects
+     FROM published.release_entity_redirects
      WHERE release_id = $1 AND from_entity_id = $2
      LIMIT 1`,
     [releaseId, fromEntityId],
@@ -123,7 +119,7 @@ export async function listPublicEntityProjections(
 ): Promise<readonly NonNullable<ReturnType<typeof parseEntityProjection>>[]> {
   const rows = (await query(
     `SELECT projection
-     FROM bb_public.release_entities
+     FROM published.release_entities
      WHERE release_id = $1
      ORDER BY entity_id`,
     [releaseId],
@@ -143,7 +139,7 @@ export async function listPublicSearchIndexDocs(
   const rows = (await query(
     `SELECT id, release_id, entity_id, name, name_lower, aliases, topics, kind, status,
             geohash, related_count, claim_count, facets
-     FROM bb_public.search_index
+     FROM published.search_index
      WHERE release_id = $1
      ORDER BY id`,
     [releaseId],
@@ -174,7 +170,7 @@ export async function listPublicReleaseArticles(
 ): Promise<readonly PublicArticleProjectionDoc[]> {
   const rows = (await query(
     `SELECT payload
-     FROM bb_public.release_articles
+     FROM published.release_articles
      WHERE release_id = $1
      ORDER BY published_at DESC, slug`,
     [releaseId],

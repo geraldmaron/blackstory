@@ -60,7 +60,7 @@
         "defaultTtlSec": 300,
         "maxTtlSec": 3600,
         "cacheablePaths": ["/v1/search", "/v1/entities/*", "/v1/locations/nearby", "/health"],
-        "bypassCacheHeaders": ["Authorization", "X-Black-Book-App-Check"],
+        "bypassCacheHeaders": ["Authorization", "X-BlackStory-Client"],
         "negativeCaching": false
       }
     },

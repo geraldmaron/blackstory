@@ -17,6 +17,8 @@ export type CspBuildOptions = {
   /** Extra host sources for img/connect (e.g. CDN).  */
   imgSrc?: string[];
   connectSrc?: string[];
+  /** Exact configured authentication endpoint, allowed only on staff routes. */
+  authUrl?: string;
   /** Override NODE_ENV detection (tests).  */
   isDev?: boolean;
   /**
@@ -61,19 +63,11 @@ const PUBLIC_MEDIA_IMG_SRC = [
 ];
 
 /**
- * Article hero/inline imagery sourced from public-domain archival collections.
- * Wikimedia Commons serves file bytes from upload.wikimedia.org. Production
- * should re-host these into the Supabase media bucket for durability (see
- * repo issue: re-host article hero images); this host keeps them rendering
- * until that pipeline lands.
- *
- * `commons.wikimedia.org` is here too (repo-4vuf, pin-and-serve): entity mast photos pin a
- * Commons file title and render it via `Special:FilePath/<title>?width=960`, which 302s to
- * `upload.wikimedia.org`. The browser's <img> request starts at commons.wikimedia.org before
- * the redirect, so both hosts must be allowed.
+ * Allows source-hosted archival imagery and the Wikimedia hosts traversed by Commons thumbnail
+ * redirects. Rehosting requires source rights and durable attribution; this allowlist does not
+ * establish either.
  */
-// thumb.wikimedia.org: Commons' Special:Redirect/file now 301s rendered thumbnails to this host
-// (observed 2026-09-02), so it is where a pinned photo's final <img> request lands.
+// Commons thumbnail redirects can terminate on thumb.wikimedia.org.
 const ARTICLE_MEDIA_IMG_SRC = [
   'https://upload.wikimedia.org',
   'https://commons.wikimedia.org',
@@ -118,6 +112,23 @@ const DEFAULT_CONNECT_SRC = [
 ];
 const DEFAULT_FONT_SRC = ["'self'", ...MAP_TILE_SRC];
 
+/** Permit one configured HTTPS auth origin, or loopback HTTP for local development. */
+function authConnectOrigin(raw: string | undefined, isDev: boolean): string | undefined {
+  if (!raw) return undefined;
+  try {
+    const url = new URL(raw);
+    const loopback = ['localhost', '127.0.0.1', '[::1]'].includes(url.hostname);
+    if (url.username || url.password || url.hostname.includes('*') || url.search || url.hash)
+      return undefined;
+    if (url.protocol !== 'https:' && !(isDev && loopback && url.protocol === 'http:'))
+      return undefined;
+    if (!isDev && loopback) return undefined;
+    return url.origin;
+  } catch {
+    return undefined;
+  }
+}
+
 /** Build a semicolon-delimited CSP header value.  */
 export function buildContentSecurityPolicy(options: CspBuildOptions = {}): string {
   const {
@@ -127,6 +138,7 @@ export function buildContentSecurityPolicy(options: CspBuildOptions = {}): strin
     connectSrc = DEFAULT_CONNECT_SRC,
     isDev = process.env.NODE_ENV !== 'production',
     nonce,
+    authUrl,
   } = options;
 
   const styleSrc = allowInlineStyles ? ["'self'", "'unsafe-inline'"] : ["'self'"];
@@ -155,7 +167,12 @@ export function buildContentSecurityPolicy(options: CspBuildOptions = {}): strin
       ? ["'self'", "'unsafe-inline'", "'unsafe-eval'", ...VERCEL_ANALYTICS_SRC]
       : ["'self'", "'unsafe-inline'", ...VERCEL_ANALYTICS_SRC];
   const workerSrc = ["'self'", 'blob:'];
-  const resolvedConnectSrc = isDev ? [...connectSrc, 'ws:', 'wss:'] : connectSrc;
+  const authOrigin = authConnectOrigin(authUrl, isDev);
+  const resolvedConnectSrc = [
+    ...connectSrc,
+    ...(authOrigin ? [authOrigin] : []),
+    ...(isDev ? ['ws:', 'wss:'] : []),
+  ];
 
   const directives: Record<string, string[]> = {
     'default-src': ["'self'"],

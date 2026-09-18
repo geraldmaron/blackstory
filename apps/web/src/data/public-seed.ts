@@ -1,13 +1,4 @@
-/**
- * Public-facing seed catalog for the web UI.
- * Offline snapshot fallback and unit-test fixture only — not the live national catalog.
- * Live Explore/map/entity pages read `bb_public` when `PUBLIC_DATA_SOURCE=postgres`
- * and the connection succeeds; this four-entity
- * Dunbar cluster is used only for `PUBLIC_DATA_SOURCE=seed`, disabled public reads, or
- * live-read failure. Prefer Postgres in local and production; never treat this
- * module as the source of truth for published records.
- * Never includes residential addresses or unpublished high-impact claims.
- */
+/** Test and editorial fixtures. Live catalog readers use published Postgres projections. */
 import {
   buildRelatedNeighborStubs,
   composeContinueLearningStubs,
@@ -38,7 +29,7 @@ export type PublicClaimView = {
   readonly id: string;
   readonly predicate: string;
   readonly object: string;
-  readonly confidenceScore: number;
+  readonly confidenceScore?: number;
   readonly confidenceLevel: 'high' | 'medium' | 'low';
   readonly citationSource: string;
   readonly citationHref?: string;
@@ -133,9 +124,10 @@ export type PublicEntityPrimaryImageView = {
   readonly width?: number;
   readonly height?: number;
   readonly objectPath?: string;
-  /** Pin-and-serve (repo-4vuf): present when the photo is a pinned Wikimedia Commons (or
-   * similar source-system) thumbnail fetched by the reader's browser at view time, rather
-   * than a stored original. `sourcePageUrl`/`license` drive the mast's source-link line. */
+  /**
+   * Source-hosted thumbnail metadata. sourcePageUrl and license provide the attribution link;
+   * the reader fetches the image at view time.
+   */
   readonly sourceSystem?: 'wikimedia_commons' | 'nps' | 'loc' | 'public_media';
   readonly fileTitle?: string;
   readonly sha1?: string;
@@ -246,19 +238,11 @@ export type PublicEntityView = {
   /** Human-readable notability rubric labels (never the raw criterion id alone, never a score),
    * one per notabilityBasis record sourced from @repo/domain's `NOTABILITY_RUBRIC`. */
   readonly notabilityLabels?: readonly string[];
-  /** Structured, auditable inclusion basis backing `notabilityLabels` above (the related workstream).
-   * Live release projections carry this directly (see `@repo/domain`'s
-   * `buildReleaseEntityArtifacts`); this bundled seed catalog predates the release builder and
-   * does not populate it, so two read-path adapters synthesize a basis from `notabilityLabels`
-   * when this is absent: `snapshot-search-index.ts`'s `notabilityBasisFor`, which reaches search
-   * through `hybrid-search.ts`, and `entity/[id]/adapters.ts`'s `notabilityBasisFor`, which
-   * reaches the record room's "Why this is here" block through `buildWhyThisAppearsForEntity`.
-   *
-   * The second half of that was false when written and stayed false until 2026-09-12
-   * (repo-tgfw5): the entity adapter synthesized a basis that no surface mounted, so the block
-   * printed `notabilityLabels` alone. That is what made the repo-81i8 backfill look consumed
-   * when nothing read it. Do not re-add an adapter to this list on the strength of its code
-   * alone — check that something renders what it returns. */
+  /**
+   * Structured inclusion basis produced by the release builder. Where it is absent, read
+   * adapters may derive a display fallback from notabilityLabels; that fallback is not new
+   * research evidence.
+   */
   readonly notabilityBasis?: readonly NotabilityBasisRecord[];
   /** Sensitivity classification label, when the entity carries one. Presentation is via
    * `SensitivityContextBanner`. */
@@ -267,19 +251,18 @@ export type PublicEntityView = {
    * `SensitivityContextBanner` consumes. `sensitivityClass` above stays a plain string for
    * the pre-existing search-index adapter; this is the richer projection the entity page renders. */
   readonly sensitivity?: EntitySensitivity;
-  /** @deprecated Superseded by `topicIds` (the related workstream). Kept for backward compatibility;
-   * the map/list facet builder falls back to this, filtered through `@repo/domain`'s
-   * `TOPIC_REGISTRY`, when `topicIds` is absent. */
+  /**
+   * Uncontrolled search tags. Theme facets use validated topicIds; consumers must not expose
+   * raw tag values as controlled categories.
+   */
   readonly topicTags: readonly string[];
-  /** Controlled historical-theme ids (the related workstream) — the ONLY field the explore-map theme
-   * facet should be built from. Optional: this bundled seed predates the split, so entries
-   * below don't populate it yet and the facet builder falls back to `topicTags`. */
+  /**
+   * Controlled theme identifiers, validated against TOPIC_REGISTRY before faceting.
+   */
   readonly topicIds?: readonly string[];
   readonly jurisdictionLabel: string;
-  /** The controlled public precision tier a location renders at (never `'none'`/`'country'` —
-   * those never carry a map pin, see `locationPrecisionFromProjection`). Derived from the
-   * standard's tier list, not hand-written — see `@repo/domain`'s `PublicPrecisionTier`. */
-  readonly locationPrecision: Exclude<PublicPrecisionTier, 'none' | 'country'>;
+  /** Stored public precision; none means no publicly renderable location. */
+  readonly locationPrecision: PublicPrecisionTier;
   readonly locationLabel: string;
   /** Release-shipped visit contract; see `PublicVisitView` above. Absent on records that predate
    * the release builder wiring this up, or that have nothing publishable once gated. */
@@ -300,9 +283,10 @@ export type PublicEntityView = {
   readonly primaryImage?: PublicEntityPrimaryImageView;
   readonly recordMaturity: string;
   readonly researchCoverage: 'minimal' | 'partial' | 'substantial';
-  /** Public-precision coordinate anchor carried by live release projections. When present the
-   * map source builder uses it directly; `entity-geo.ts`'s repo-side table remains only as the
-   * seed-era fallback for bundled fixtures (that module's own documented retirement path). */
+  /**
+   * Public-precision coordinates from the live release. Bundled fixture coordinates are handled
+   * separately by entity-geo.ts.
+   */
   readonly geoAnchor?: {
     readonly lat: number;
     readonly lng: number;

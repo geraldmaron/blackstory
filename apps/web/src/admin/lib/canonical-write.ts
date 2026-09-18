@@ -1,5 +1,5 @@
 /**
- * The one way anything in this app is allowed to change `bb_canonical`.
+ * The one way anything in this app is allowed to change `canonical`.
  *
  * Every write verb the workbench grows (field edit, merge, bulk kind reassign) goes through
  * `commitCanonicalWrite`. It resolves the caller's verified staff identity from the session
@@ -22,7 +22,7 @@ import { randomUUID } from 'node:crypto';
 import type pg from 'pg';
 import type { AuditActor, DomainAuditEvent, DomainOutboxMessage } from '@repo/domain';
 import type { AdminPermission } from '../auth/server-authorization';
-import type { StaffRole } from '../auth/role-mutation';
+import type { StaffRole } from '../auth/staff-permissions';
 import type { ServerAdminIdentity } from '../auth/supabase-server';
 import { StaffPermissionDeniedError, assertStaffPermission } from '../auth/staff-permissions';
 import { commitWithAuditPostgres, type PostgresCommitInput } from './postgres-commit';
@@ -197,7 +197,7 @@ export async function commitCanonicalWrite(
     subject: {
       type: isBulk ? 'entity_set' : 'entity',
       id: subjectId,
-      path: isBulk ? `bb_canonical.entities?${subjectId}` : `bb_canonical.entities/${subjectId}`,
+      path: isBulk ? `canonical.entities?${subjectId}` : `canonical.entities/${subjectId}`,
     },
     reason,
     requestId: eventId,

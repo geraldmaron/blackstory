@@ -1,6 +1,6 @@
 /**
  * Unit tests for the Postgres embedding backfill source, fully in-memory: no real database, a
- * fake `PostgresQueryExecutor` stands in for `bb_public.release_entities`.
+ * fake `PostgresQueryExecutor` stands in for `published.release_entities`.
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';

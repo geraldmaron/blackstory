@@ -123,16 +123,8 @@ test('applyReleaseTaxonomySync merges topics into existing taxonomy, preserving 
 });
 
 /*
- * repo-ttlce. A shape test, not a behavior test, and worth saying so: a fake client cannot run
- * SQL, so what this pins is that the statement still reaches all three stores. The statement's
- * actual behavior was verified by PREPAREing it against the real schema inside a read-only
- * transaction (it parses and analyzes), and by having Postgres evaluate the topics CASE over the
- * four tag/id combinations — it agreed with `searchTopicsFromProjection` on every one, including
- * the empty-tags-with-real-ids case this bead exists to fix.
- *
- * Writing only the taxonomy column is exactly the regression that made 1,729 rows unfindable by
- * topic while the column an operator would check looked correct, so it is worth a guard even a
- * weak one.
+ * A recording-client test checks that the SQL statement targets all public representations. It
+ * does not execute SQL or prove database behavior.
  */
 test('the taxonomy sync writes the projection and the search index, not the taxonomy column alone', async () => {
   const client = fakeClient([
@@ -147,7 +139,7 @@ test('the taxonomy sync writes the projection and the search index, not the taxo
 
   assert.equal(client.sqls.length, 1, 'one statement, so the three stores cannot part-commit');
   const sql = client.sqls[0] ?? '';
-  assert.match(sql, /UPDATE bb_public\.release_entities/u);
+  assert.match(sql, /UPDATE published\.release_entities/u);
   assert.match(sql, /projection =/u, 'readers serve the projection, never the taxonomy column');
   assert.doesNotMatch(
     sql,
@@ -156,7 +148,7 @@ test('the taxonomy sync writes the projection and the search index, not the taxo
       'Postgres — and writing both is what let the two disagree on 1,117 live rows in the first ' +
       'place',
   );
-  assert.match(sql, /UPDATE bb_public\.search_index/u, 'topic browse reads search_index.topics');
+  assert.match(sql, /UPDATE published\.search_index/u, 'topic browse reads search_index.topics');
   assert.match(sql, /SET topics =/u);
   assert.match(
     sql,

@@ -38,7 +38,7 @@ export type SourceAdapterPolicy = {
 };
 
 /**
- * Registered source adapter (Firestore `evidenceSources`).
+ * Registered source adapter (`evidence.evidence_sources`).
  * `adapterEnabled: false` is the primary kill switch; optional ops killSwitch may also block.
  */
 export type EvidenceSource = {

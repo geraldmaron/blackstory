@@ -157,7 +157,7 @@ importing viral rhetorical costume. Skill reference:
 `.claude/skills/blackstory/story-craft/SKILL.md`. Packets use
 `story.research.packet.v1`; human approval maps an approved packet onto
 `packages/domain/src/publication/public-story-seed.ts` (publication is
-Postgres-backed, not Firestore). Nothing auto-publishes. Every published
+Postgres-backed). Nothing auto-publishes. Every published
 story projection **must** include a non-empty `sources` list (`label` + HTTPS
 `url`); `/stories/[slug]` renders it with `SourceFootnote` under Evidence /
 Sources. Related entities remain claim-level off-ramps — they do not replace

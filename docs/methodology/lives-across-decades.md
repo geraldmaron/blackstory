@@ -192,12 +192,12 @@ people.
 ## Build
 
 The data is a static, versioned build, not a live feed. Tables are acquired, validated and loaded into
-`bb_reference`, then frozen into one snapshot per region. Pages render from the snapshot. A rebuild
+`reference`, then frozen into one snapshot per region. Pages render from the snapshot. A rebuild
 happens only when a source vintage changes or a correction lands.
 
 ## Rules in force
 
-Laws and rulings come from the catalog. Their applicability lives in `bb_reference.law_applicability`:
+Laws and rulings come from the catalog. Their applicability lives in `reference.law_applicability`:
 the jurisdiction (the nation or a state), the in-force window taken from cited claims (never from
 entity `statusHistory`), the groups the rule named in its own words, the life domains it touched, and
 whether its text was exclusionary, protective or facially neutral. Federal rules appear in every region.

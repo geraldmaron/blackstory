@@ -17,7 +17,7 @@ code or Cloud Run revisions. Rule 10 is pre-provisioned in both policies with de
 
 - Active exploitation bypassing WAF and rate limits
 - Coordinated abuse campaign requiring immediate traffic cutover
-- Compromised API key or App Check bypass at scale (until BB-024 rotation completes)
+- Compromised API key or client-header check bypass at scale (until BB-024 rotation completes)
 
 Prefer **scoped blocks** (priority 15, single CIDR) when abuse source is known.
 

@@ -1,17 +1,6 @@
 /**
- * Kill switch browser — operational circuit breakers for adapters and public surfaces.
- *
- * Server component (repo-gyq6.9). This was a client page that mounted, waited for
- * `AdminAuthProvider` to produce a token, then fetched `/admin/api/switches` — three round trips
- * before an operator saw a single row, to render a table that never changes in response to
- * anything the reader does. The rows are now read in the request and arrive in the first byte.
- *
- * `/admin/api/switches` stays: it is a real API for callers outside this page. This page simply
- * no longer needs to be one of them.
- *
- * The Refresh button went with the client state. A server-rendered page IS the refresh — the
- * browser's own reload re-runs the read — and a button that could only re-request what the page
- * had just fetched was chrome standing in for a reload key.
+ * Server-rendered operational kill-switch browser. Reloading the page refreshes the database
+ * read; the matching API also serves external staff callers.
  */
 import type { Metadata } from 'next';
 import Link from 'next/link';
@@ -58,7 +47,7 @@ export default async function SwitchesPage() {
           </p>
           <p className="story-review__notice">
             Read-only mirror — no toggles here. A human platform administrator engages or disengages
-            switches in Postgres <span className="ds-mono">bb_ops.kill_switches</span> rows
+            switches in Postgres <span className="ds-mono">ops.kill_switches</span> rows
             (IAP-protected ops path) with a durable reason; each change is recorded in{' '}
             <Link href="/admin/audit">Audit</Link>. See{' '}
             <span className="ds-mono">infra/gcp/kill-switches/</span> for the matrix and runbooks.

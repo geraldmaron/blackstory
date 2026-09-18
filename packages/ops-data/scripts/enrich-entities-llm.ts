@@ -1,53 +1,9 @@
 /**
- * repo-n7p6.4 (WS4) — cheap-model enrichment harness.
- *
- * Reads entities WS3 (sweep-entity-evidence.ts) already captured evidence for
- * (bb_research.entity_enrichment.status = 'pending'), asks a cheap OpenRouter model to draft a
- * summary/historicalContext/topicIds/eraBuckets/keywords bundle citing ONLY the supplied
- * evidence, and validates every citation deterministically before it is ever trusted:
- *   - length bounds (packages/schemas/src/public-projections.ts: summary 120-400 chars)
- *   - every citation quote must be a verbatim substring of the evidence text it names
- *   - topicIds only from the controlled taxonomy (packages/domain/src/taxonomy/topics.ts)
- *   - eraBuckets only well-formed, non-future decade labels
- *   - restricted-address properties and person entities (living/unknown by policy default) never
- *     get address-shaped tokens in the generated prose, independent of what the source evidence
- *     already redacted — the MODEL's output is what's checked here.
- *
- * A response that fails any check is quarantined (bb_research.entity_enrichment.status =
- * 'quarantined', full validation errors in notes) and NEVER retried automatically — the harness
- * runs each entity once per invocation. This script never writes to bb_public: publishing an
- * accepted draft into the release projection is WS5 (repo-n7p6.5), a separately gated step.
- *
- * Default is dry-run. Production writes require:
- *   DRY_RUN=0 ENRICH_ENTITIES_LLM_APPLY=1 DATABASE_URL=postgresql://...
- *
- * Provider (default mock — no network, no cost):
- *   ENRICH_ENTITIES_LLM_PROVIDER=mock|openrouter|ollama|hybrid|tiered
- *
- * Tiered compute order (repo-n7p6.16 item 2), PROVIDER=tiered — one harness, tiers in order:
- *   0. session answers (--session-answers=answers.jsonl, {entityId, rawContent} per line):
- *      a subject with a session-drafted answer never reaches a model call; cost 0.
- *   1. free OpenRouter roster (OPENROUTER_MODELS), with
- *   2. local Ollama failover (the existing hybrid provider handles 1→2, including the
- *      non-JSON-but-no-error response mode reasoning models produce), and
- *   3. metered paid roster ONLY as a quarantine retry: a subject whose tier-1/2 output failed
- *      deterministic validation gets exactly one retry on the paid roster, gated by the spend
- *      ceiling below. A subject that fails both stays quarantined with both error sets.
- *
- * Spend ceiling (repo-n7p6.16 item 3): once cumulative metered cost for this batch reaches
- * ENRICH_ENTITIES_LLM_SPEND_CEILING_USD (default 3), no further model calls are started —
- * remaining subjects are skipped and reported, not silently dropped.
- *
- * Review sampling (repo-n7p6.16 item 5): ENRICH_REVIEW_SAMPLE_RATE (default 0.05) of PASSING
- * outputs are deterministically sampled (hash of run-date+entityId) and flagged
- * notes.reviewSample in the ledger, so reviewers audit accepted work alongside quarantined
- * work: status='quarantined' OR notes->'reviewSample'->>'selected'='true'.
- *
- * Usage (from repo root):
- *   set -a && source apps/web/.env.local && set +a
- *   export DATABASE_SSL=1
- *   node --conditions development --import tsx \
- *     packages/ops-data/scripts/enrich-entities-llm.ts --lanes=nrhp-black-heritage --limit=20
+ * Drafts entity enrichment from captured evidence and stages validated proposals.
+ * External dispatch requires --max-call-cost-usd covering every internal provider attempt.
+ * Reservations are never released by this batch; unknown billing is reported explicitly.
+ * Production writes require DRY_RUN=0 and ENRICH_ENTITIES_LLM_APPLY=1.
+ * Independent evidence review and publication remain separate operations.
  */
 import { createHash } from 'node:crypto';
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
@@ -83,7 +39,9 @@ const DRY_RUN = process.env.DRY_RUN !== '0';
 const APPLY = process.env.ENRICH_ENTITIES_LLM_APPLY === '1';
 const PROVIDER_NAME = (process.env.ENRICH_ENTITIES_LLM_PROVIDER ?? 'mock') as
   'mock' | 'openrouter' | 'ollama' | 'hybrid' | 'tiered';
-/** repo-n7p6.16 item 5: fraction of PASSING outputs deterministically routed to review. */
+/**
+ * Fraction of deterministically selected passing outputs routed to review.
+ */
 const REVIEW_SAMPLE_RATE = Number.parseFloat(
   process.env.ENRICH_REVIEW_SAMPLE_RATE?.trim() || '0.05',
 );
@@ -91,10 +49,10 @@ const REVIEW_SAMPLE_RATE = Number.parseFloat(
 const SESSION_MODEL_ID =
   process.env.SESSION_ENRICH_MODEL_ID?.trim() || 'claude-haiku-4-5-20251001-session';
 /**
- * bb_research.model_invocations.activity_id is a hard FK to bb_research.agent_activities — this
- * script does not create cases/runs/activities (that ledger-write chain is repo-atya's scope,
- * same boundary extract-claim-date-qualifiers-llm.ts respects). Ad hoc CLI runs with no ledger
- * context skip DB logging; cost/quarantine are still reported to the console and the JSON report.
+ * Invocation logging requires an existing agent activity because activity_id is a foreign key.
+ * This script does not create that execution context; callers without it receive console/JSON
+ * accounting only. Use the durable research worker protocol when resumable run accounting is
+ * required.
  */
 const ACTIVITY_ID = process.env.ENRICH_ENTITIES_LLM_ACTIVITY_ID?.trim() || undefined;
 
@@ -107,14 +65,7 @@ function flag(name: string, fallback: string): string {
   return hit === undefined ? fallback : hit.slice(name.length + 3);
 }
 
-/**
- * repo-n7p6.16 item 3: a hard ceiling on cumulative metered spend for this batch, enforced in
- * code rather than relying on an operator watching the console total. Checked before each call
- * starts, not after, so it can only ever ABORT further calls — it never cancels one in flight.
- * With CONCURRENCY calls able to be in flight when the ceiling is crossed, actual spend can
- * overshoot the ceiling by at most (CONCURRENCY - 1) call costs; that bound is acceptable for a
- * batch of small per-call costs and is logged explicitly when it happens.
- */
+/** Worst-case reservations must fit this batch budget before provider dispatch. */
 const SPEND_CEILING_USD = Number.parseFloat(
   process.env.ENRICH_ENTITIES_LLM_SPEND_CEILING_USD?.trim() || '3',
 );
@@ -215,7 +166,7 @@ async function main(): Promise<void> {
   }
   const ledgerRows = await pool.query<LedgerRow>(
     `SELECT entity_id
-       FROM bb_research.entity_enrichment
+       FROM research.entity_enrichment
       WHERE status = 'pending' ${laneClause} ${idClause}
       ORDER BY entity_id`,
     ledgerParams,
@@ -278,13 +229,33 @@ async function main(): Promise<void> {
   const sampleSalt = new Date().toISOString().slice(0, 10);
 
   let completedCount = 0;
-  let cumulativeCostUsd = 0;
+  let reservedCostUsd = 0;
+  let incompleteCalls = 0;
+  const maxCallCostUsd = Number(flag('max-call-cost-usd', 'NaN'));
+  if (PROVIDER_NAME !== 'mock' && (!Number.isFinite(maxCallCostUsd) || maxCallCostUsd <= 0)) {
+    throw new Error('--max-call-cost-usd must bound all provider retries before dispatch');
+  }
+  if (!Number.isFinite(SPEND_CEILING_USD) || SPEND_CEILING_USD < 0)
+    throw new Error('Invalid spend ceiling');
+  const reserveCall = (): boolean => {
+    if (PROVIDER_NAME === 'mock') return true;
+    if (reservedCostUsd + maxCallCostUsd > SPEND_CEILING_USD) return false;
+    reservedCostUsd += maxCallCostUsd;
+    return true;
+  };
+  const observeCost = (completion: RoutedCompletion): void => {
+    if (completion.accounting?.incomplete !== false) incompleteCalls += 1;
+    if (completion.costUsd !== null && completion.costUsd > maxCallCostUsd) {
+      reservedCostUsd = SPEND_CEILING_USD;
+      console.error(
+        'Reported charge exceeded the declared call bound; further dispatch is stopped.',
+      );
+    }
+  };
   const skippedForCeiling: string[] = [];
   const startedAt = Date.now();
   const results = await mapPool(subjects, CONCURRENCY, async (subject): Promise<Result | null> => {
-    // Tier 0: a session-drafted answer costs nothing and skips the ceiling check entirely. A
-    // failed session answer FALLS THROUGH to the model tiers instead of quarantining — the tier
-    // order is about where compute comes from, not about giving up early.
+    // Supplied drafts do not dispatch a provider call; their original compute cost is unknown.
     const sessionAnswer = sessionAnswers.get(subject.entityId);
     let sessionAttemptErrors: readonly string[] | undefined;
     if (sessionAnswer !== undefined) {
@@ -294,7 +265,7 @@ async function main(): Promise<void> {
         const reviewSample = isReviewSampled(subject.entityId, REVIEW_SAMPLE_RATE, sampleSalt);
         console.log(
           `[${completedCount}/${subjects.length}] ${subject.entityId} (${subject.displayName}) ` +
-            `— accepted — session-drafted ($0)${reviewSample ? ' [review sample]' : ''}`,
+            `— validated proposal — supplied draft (cost unknown)${reviewSample ? ' [review sample]' : ''}`,
         );
         return {
           subject,
@@ -305,7 +276,7 @@ async function main(): Promise<void> {
             provider: 'session',
             lane: 'entity-depth-enrichment',
             tier: 'trusted-session',
-            costUsdEstimate: 0,
+            costUsd: null,
           } as RoutedCompletion,
           servedByTier: 'session',
           reviewSample,
@@ -313,17 +284,7 @@ async function main(): Promise<void> {
       }
       sessionAttemptErrors = attempt.validation.errors;
 
-      // A failed session answer normally falls through to the model tiers — the tier order is
-      // about where compute comes from, not about giving up early. But the mock provider does not
-      // decline to answer: it stitches fragments of the subject's own evidence into a draft that
-      // passes validation, and the run then reports it as "accepted" with nothing but the missing
-      // "session-drafted" marker to distinguish it from real work.
-      //
-      // Measured 2026-08-11: one draft of 38 cited an evidence id withdrawn by an identity audit
-      // between the dump and the run. It fell through, mock manufactured a summary opening with
-      // OCR form furniture ("Dallas County, AL 7. Architectural Classification Late Victo"), and
-      // that was queued for publication as researched history. Falling through to a real model is
-      // a routing decision; falling through to mock is fabrication.
+      // Invalid supplied drafts must never be replaced with synthetic model output.
       if (PROVIDER_NAME === 'mock') {
         completedCount += 1;
         console.log(
@@ -335,27 +296,27 @@ async function main(): Promise<void> {
       }
     }
 
-    if (cumulativeCostUsd >= SPEND_CEILING_USD) {
+    if (!reserveCall()) {
       skippedForCeiling.push(subject.entityId);
       completedCount += 1;
       console.log(
         `[${completedCount}/${subjects.length}] ${subject.entityId} — SKIPPED — ` +
-          `spend ceiling reached ($${cumulativeCostUsd.toFixed(4)} >= $${SPEND_CEILING_USD.toFixed(2)})`,
+          `spend ceiling reached ($${reservedCostUsd.toFixed(4)} >= $${SPEND_CEILING_USD.toFixed(2)})`,
       );
       return null;
     }
     const request = buildEnrichmentRequest(subject, ALLOWED_TOPIC_IDS, model);
     let completion = await routed.complete(request);
-    cumulativeCostUsd += completion.costUsdEstimate;
+    observeCost(completion);
     let attempt = validateEnrichmentResponse(subject, ALLOWED_TOPIC_IDS, completion.content);
     let servedByTier: Result['servedByTier'] =
       PROVIDER_NAME === 'tiered' ? 'free-or-ollama' : 'single-provider';
     let firstAttemptErrors: readonly string[] | undefined = sessionAttemptErrors;
     // Tier 3 (tiered only): one metered retry for a validation failure, ceiling-gated.
-    if (!attempt.validation.ok && meteredRouted !== null && cumulativeCostUsd < SPEND_CEILING_USD) {
+    if (!attempt.validation.ok && meteredRouted !== null && reserveCall()) {
       firstAttemptErrors = [...(firstAttemptErrors ?? []), ...attempt.validation.errors];
       const retryCompletion = await meteredRouted.complete(request);
-      cumulativeCostUsd += retryCompletion.costUsdEstimate;
+      observeCost(retryCompletion);
       const retryAttempt = validateEnrichmentResponse(
         subject,
         ALLOWED_TOPIC_IDS,
@@ -389,7 +350,7 @@ async function main(): Promise<void> {
       attempt.validation.ok && isReviewSampled(subject.entityId, REVIEW_SAMPLE_RATE, sampleSalt);
     const verdict = attempt.validation.ok ? 'accepted' : 'quarantined';
     const detail = attempt.validation.ok
-      ? `$${completion.costUsdEstimate.toFixed(5)}` +
+      ? (completion.costUsd === null ? 'cost unknown' : `$${completion.costUsd.toFixed(5)}`) +
         (servedByTier === 'metered-retry' ? ' (metered retry)' : '') +
         (reviewSample ? ' [review sample]' : '')
       : attempt.validation.errors[0]?.slice(0, 80);
@@ -410,7 +371,7 @@ async function main(): Promise<void> {
   if (skippedForCeiling.length > 0) {
     console.log(
       `\nSpend ceiling reached: skipped ${skippedForCeiling.length}/${subjects.length} ` +
-        `entit(ies) (final cumulative cost $${cumulativeCostUsd.toFixed(4)} vs ` +
+        `entit(ies) (final cumulative cost $${reservedCostUsd.toFixed(4)} vs ` +
         `$${SPEND_CEILING_USD.toFixed(2)} ceiling): ${skippedForCeiling.slice(0, 10).join(', ')}` +
         `${skippedForCeiling.length > 10 ? '…' : ''}`,
     );
@@ -420,7 +381,7 @@ async function main(): Promise<void> {
   const accepted = completedResults.filter((result) => result.attempt.validation.ok);
   const rejected = completedResults.filter((result) => !result.attempt.validation.ok);
   const totalCost = completedResults.reduce(
-    (sum, result) => sum + result.completion.costUsdEstimate,
+    (sum, result) => sum + (result.completion.costUsd ?? 0),
     0,
   );
   const sampled = accepted.filter((result) => result.reviewSample);
@@ -447,7 +408,7 @@ async function main(): Promise<void> {
     console.log(`Quarantine rate: ${rate}%`);
   }
   console.log(
-    `Total cost (this batch): $${totalCost.toFixed(4)} ` +
+    `Known reported cost (this batch): $${totalCost.toFixed(4)}; incomplete calls: ${incompleteCalls} ` +
       `($${(totalCost / Math.max(1, completedResults.length)).toFixed(5)}/entity avg)`,
   );
 
@@ -491,7 +452,7 @@ async function main(): Promise<void> {
           entityId: result.subject.entityId,
           displayName: result.subject.displayName,
           modelId: result.completion.modelId,
-          costUsdEstimate: result.completion.costUsdEstimate,
+          costUsd: result.completion.costUsd,
           servedByTier: result.servedByTier,
           reviewSample: result.reviewSample,
           ...(result.firstAttemptErrors !== undefined
@@ -525,7 +486,7 @@ async function main(): Promise<void> {
         entityId: result.subject.entityId,
         attempt: result.attempt,
         modelId: result.completion.modelId,
-        costUsdEstimate: result.completion.costUsdEstimate,
+        costUsd: result.completion.costUsd,
         reviewSample: result.reviewSample,
       });
     }

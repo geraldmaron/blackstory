@@ -1,6 +1,6 @@
 /**
  * Validation for Lives Across the Decades count notes ("What the count could see") before they load into
- * bb_reference.lives_count_notes. Every note needs a decade on the timeline, the groups it speaks to,
+ * reference.lives_count_notes. Every note needs a decade on the timeline, the groups it speaks to,
  * and at least one opened source with a web address. Method: docs/methodology/lives-across-decades.md.
  */
 import { LIVES_AREAS, LIVES_DECADES, isLivesLens } from '@repo/domain/statistics/lives';

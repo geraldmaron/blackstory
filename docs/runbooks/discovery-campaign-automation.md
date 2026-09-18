@@ -1,95 +1,22 @@
-# Discovery campaign automation
+# Explicit discovery execution
 
-Discovery is scheduled on Corsair and records private proposal, audit, outbox, and research-case
-state in Supabase/Postgres. It never publishes. The former scheduled Cloud Functions package is
-retired; `functions/README.md` is its tombstone.
-
-## Control plane
-
-1. `@repo/config` validates the bounded job roster and dispatch input.
-2. `operator-cli preflight` validates the ledger, policy versions, dependencies, disk, and models.
-3. `bb_ops.kill_switches` is the canonical kill-switch table.
-4. Operator proposal commits write state, audit, outbox, and idempotency rows transactionally.
-5. systemd records terminal process status while the research ledger records durable run state.
-
-## Live SearXNG
+Research job definitions are schedulable, but no research schedules are enabled by this repository.
+Use a manual CLI process or `workflow_dispatch` in `.github/workflows/discovery-campaigns.yml`.
+No personal workstation is a dependency. Do not install timers, cron jobs, or background agents.
 
 ```bash
-# On Corsair, DATABASE_URL is in ~/.config/blackstory/postgres.env (also sourced by
-# the run script and by blackstory-discovery-web-search.service). enrichment.env alone
-# is not enough — that was the 2026-07-21 timer preflight failure.
-SEARXNG_BASE_URL=http://127.0.0.1:8888 \
-DISCOVERY_STORAGE_TERMS_CONFIRMED=true \
-DISCOVERY_KILL_SWITCH=disengaged \
-./scripts/run-scheduled-searxng-discovery.sh
+node --conditions development --import tsx packages/operator-cli/src/bin.ts discovery-dispatch \
+  --job discovery-campaign-web-search --mode fixture
 ```
 
-The script rotates through
-`packages/config/src/scheduled-jobs/data/corsair-web-search-queries.json`. A single query may be
-selected with `DISCOVERY_SEARXNG_QUERY`. Results are leads until their underlying evidence is
-captured and reviewed.
+Fixture mode checks plumbing with labeled test data. A live run requires explicit provider and
+Postgres configuration, source/storage authorization, a bounded campaign, and the existing
+preflight/kill-switch checks. It can stage private records and must not publish.
 
-Required env files on Corsair (same layout as overnight enrichment):
+`packages/config/src/scheduled-jobs/roster.ts` defines budgets, timeouts, cadence metadata and
+worker ownership. Retain that capability without deploying its cadence. Curated optional search
+queries are in `packages/config/src/scheduled-jobs/data/web-search-queries.json`; the manual
+caller selects its queries explicitly.
 
-| File | Purpose |
-|---|---|
-| `~/.config/blackstory/enrichment.env` | OpenRouter / optional pepper |
-| `~/.config/blackstory/postgres.env` | `DATABASE_URL`, research profile versions |
-| `~/.config/blackstory/discovery.env` | Optional discovery-only overrides |
-
-## Where committed survivors go
-
-| Artifact | Postgres destination |
-|---|---|
-| Quarantined proposal | `bb_submissions.intake_items` |
-| Draft research case | `bb_research.cases` plus normalized history/checklist rows |
-| Audit event | `bb_audit.events` |
-| Delivery work | `bb_ops.outbox_messages` |
-| Replay protection | `bb_ops.idempotency_keys` |
-
-`COMMIT_SURVIVORS=1` creates private review work only. It cannot activate a release.
-
-## Required environment
-
-```text
-OPS_DATA_SOURCE=postgres
-RESEARCH_PROFILE_ID=black-history
-RESEARCH_PROFILE_VERSION=1.0.0
-RESEARCH_SCHEMA_VERSION=1.0.0
-DATABASE_URL=<scoped server-only URL>
-DISCOVERY_STORAGE_TERMS_CONFIRMED=true
-```
-
-OpenRouter and Ollama variables are documented in
-[`overnight-hybrid-enrichment.md`](./overnight-hybrid-enrichment.md).
-
-## Safety limits
-
-- Hard query, survivor, round, capture, concurrency, time, and spend caps.
-- `DISCOVERY_KILL_SWITCH=engaged` prevents dispatch.
-- Missing database credentials or ledger tables prevent all live work.
-- Missing kill-switch state fails closed.
-- HTML crawl, gated-source scrape, browser automation, and public publish flags are refused.
-- A commit is proposal-only; independent approval and release activation remain separate.
-
-## Operations
-
-```bash
-systemctl --user start blackstory-discovery-web-search.service
-systemctl --user status blackstory-discovery-web-search.service --no-pager
-journalctl --user -u blackstory-discovery-web-search.service -n 200 --no-pager
-```
-
-Keep the timer stopped after any preflight failure. Do not restore a legacy backend selector to
-work around an unavailable Postgres ledger.
-
-## Ledger parity
-
-The overnight OpenRouter/Ollama hybrid lane this section used to cross-reference
-(`scripts/run-overnight-hybrid-enrichment.sh` and its systemd unit) was removed as dead weight in
-repo-w5lyf: `packages/firebase/scripts/discover-candidates.ts` it depended on no longer exists,
-its candidate pool was empty, and repo-6nr7 records the OpenRouter/Ollama enrichment strategy
-itself as superseded by the $0 session-subagent path. SearXNG discovery shares the same ledger
-preflight but has no overnight parity counterpart to compare against anymore; see
-[`overnight-hybrid-enrichment.md`](./overnight-hybrid-enrichment.md) for the retired lane's history
-and repo-atya for the open question of what (if anything) replaces its parity-cycle tracking.
+See [research framework](../research/README.md) for the method, [operations](../research/research-operations.md)
+for verb details, and [audit](../research/framework-audit.md) for execution and ledger gaps.

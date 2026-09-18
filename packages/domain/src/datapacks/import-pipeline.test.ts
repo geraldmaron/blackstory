@@ -1,7 +1,5 @@
 /**
- * Unit tests for the Data Pack v1 import pipeline (the related workstream): a full valid-pack round trip
- * that passes every stage, and a pack with one bad resource that gets quarantined while the rest
- * of the batch is unaffected. See ./import-pipeline.ts's header for the staged-flow contract.
+ * Data-pack validation tests cover valid imports and resource-scoped quarantine.
  */
 import assert from 'node:assert/strict';
 import { generateKeyPairSync } from 'node:crypto';

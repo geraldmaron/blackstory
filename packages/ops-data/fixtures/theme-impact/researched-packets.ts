@@ -4,7 +4,7 @@
  * Authoring fixture for the published packets, applied and promoted via
  * scripts/theme-packets.ts. The database is the source of truth at runtime;
  * this file records authoring lineage. Observation values are verified snapshots of
- * bb_reference.statistical_observations. Artifact hashes are SHA-256 digests of
+ * reference.statistical_observations. Artifact hashes are SHA-256 digests of
  * bytes fetched directly from the cited source (CPS A-1 and BJS NPS refreshes
  * on 2026-07-24; earlier rows retain their fetch-day hashes).
  */

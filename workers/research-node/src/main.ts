@@ -1,27 +1,6 @@
-/**
- * Cloud Run Job entry for discovery campaign dispatch.
- * Reads DISCOVERY_* environment variables and delegates to dispatchDiscoveryCampaign.
- * Live production dispatch runs on Corsair systemd with Postgres ledger preflight;
- * discovery jobs produce private candidates only and must never publish.
- */
-import { dirname, join } from 'node:path';
-import { fileURLToPath, pathToFileURL } from 'node:url';
-
-type DiscoveryCampaignDispatchMode = 'fixture' | 'live';
-
-type DiscoveryCampaignDispatchResult = {
-  readonly status: 'success' | 'skipped_kill_switch' | 'error';
-  readonly summary: unknown;
-  readonly run?: unknown;
-};
-
-type DispatchDiscoveryCampaign = (input: {
-  readonly jobId: string;
-  readonly mode: DiscoveryCampaignDispatchMode;
-  readonly jobRunId?: string;
-  readonly killSwitchEngaged?: boolean;
-  readonly nowIso?: string;
-}) => Promise<DiscoveryCampaignDispatchResult>;
+/** Dispatches a bounded discovery job from explicit environment configuration. */
+import { pathToFileURL } from 'node:url';
+import { dispatchDiscoveryCampaign, type DiscoveryCampaignDispatchMode } from '@repo/config';
 
 function requiredEnv(
   environment: Readonly<Record<string, string | undefined>>,
@@ -52,32 +31,6 @@ function readKillSwitchEngaged(environment: Readonly<Record<string, string | und
   return raw === 'engaged';
 }
 
-async function loadDispatcher(): Promise<{ dispatchDiscoveryCampaign: DispatchDiscoveryCampaign }> {
-  try {
-    const config = (await import('@repo/config')) as {
-      dispatchDiscoveryCampaign?: DispatchDiscoveryCampaign;
-    };
-    if (typeof config.dispatchDiscoveryCampaign === 'function') {
-      return { dispatchDiscoveryCampaign: config.dispatchDiscoveryCampaign };
-    }
-  } catch {
-    // Fall through to the scheduled-jobs module once the parent lands it.
-  }
-
-  const repoRoot = join(dirname(fileURLToPath(import.meta.url)), '..', '..', '..');
-  const dispatcherPath = join(
-    repoRoot,
-    'packages',
-    'config',
-    'src',
-    'scheduled-jobs',
-    'discovery-dispatcher.ts',
-  );
-  return import(pathToFileURL(dispatcherPath).href) as Promise<{
-    dispatchDiscoveryCampaign: DispatchDiscoveryCampaign;
-  }>;
-}
-
 async function main(): Promise<number> {
   const jobId = requiredEnv(process.env, 'DISCOVERY_JOB_ID');
   const mode = readMode(process.env);
@@ -85,7 +38,6 @@ async function main(): Promise<number> {
   const jobRunId = process.env.DISCOVERY_JOB_RUN_ID?.trim();
   const nowIso = process.env.DISCOVERY_NOW_ISO?.trim();
 
-  const { dispatchDiscoveryCampaign } = await loadDispatcher();
   const result = await dispatchDiscoveryCampaign({
     jobId,
     mode,

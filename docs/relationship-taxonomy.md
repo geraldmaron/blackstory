@@ -1,7 +1,7 @@
 # Relationship Taxonomy & Authoring Contract
 
 **Audience:** every downstream candidate-generation subagent, and human authors editing catalog
-fixtures under `packages/firebase/fixtures/national-catalog/`.
+fixtures under `packages/ops-data/fixtures/national-catalog/`.
 
 **Status:** normative. Field names, enum values, and semantics below are quoted verbatim from the
 source files cited in each section. If code and this document ever disagree, the code wins — file
@@ -187,7 +187,7 @@ artifact, movement, other
 
 For each pair below: **expected `type`(s)**, **canonical direction** (which kind is `from`), a
 one-line rationale, and a concrete Black-history example (drawn from real catalog fixture entities
-under `packages/firebase/fixtures/national-catalog/` where they exist; noted as illustrative
+under `packages/ops-data/fixtures/national-catalog/` where they exist; noted as illustrative
 otherwise).
 
 | Kind pair | Type(s) | Direction (from → to) | Rationale | Example |
@@ -324,7 +324,7 @@ today — worth tracking, not necessarily deprecating:
   but no fixture exercises it, so its exact "what counts as depiction vs. authorship" boundary is
   untested against real data.
 - **`artifact` (EntityKind)** — zero entities of this kind exist in
-  `packages/firebase/fixtures/national-catalog/` today (see kind distribution: person 262, place
+  `packages/ops-data/fixtures/national-catalog/` today (see kind distribution: person 262, place
   150, case 45, event 44, institution 38, school 34, law 23, publication 21, organization 17,
   movement 12 — no `artifact`, no `other`). Every artifact-kind-pair example in §2 above is
   therefore illustrative, not fixture-grounded. This is worth flagging to whoever owns catalog
@@ -332,7 +332,7 @@ today — worth tracking, not necessarily deprecating:
 - **`governed_by`, `employed_by`, `member_of`, `founded`, `participated_in`, `influenced`,
   `caused`, `enabled`, `overturned`, `cites`** — none of these appear in the current fixture set
   either (only `located_at`, `occurred_at`, `related_to`, and `commemorates` were found via direct
-  grep across `packages/firebase/fixtures/national-catalog/*.json`). This means the *large
+  grep across `packages/ops-data/fixtures/national-catalog/*.json`). This means the *large
   majority* of the 20-value enum is currently unexercised by real authored data — the matrix above
   is grounded in the documented semantics and real entity names, but not in existing `related[]`
   usage, since almost none exists yet beyond the four types just named. This is the single most

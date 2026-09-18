@@ -1,11 +1,6 @@
 /**
- * Unit tests for the shared notability-basis resync rule. No database: `planNotabilityBasisResync`
- * is pure, and a fake client records the `UPDATE`s `applyNotabilityBasisResync` issues.
- *
- * Each test is named for the live record whose shape it encodes, so a future change that breaks
- * one says which record it broke. The two that matter most are the Tubman case (a curated sentence
- * survives) and the repo-z1uk case (a curated criterion with no evidence survives) — those are the
- * anti-regressions for the 47 records a strict recompute would strip.
+ * Tests the pure inclusion-basis merge and records SQL write calls without a live database.
+ * Curated sentences and supported non-fallback criteria must survive recomputation.
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
@@ -182,9 +177,8 @@ test('a note differing only by a colon lead and a trailing "Cited from" is refre
   const plan = planNotabilityBasisResync([subject]);
   assert.equal(plan.changes.length, 1);
   assert.equal(plan.changes[0]?.refreshedNotes.length, 1);
-  // repo-15slz: the object is already a sentence, so the builder no longer joins the predicate
-  // onto its front, and S2 recognizes the stored note as that sentence with the old lead still
-  // attached.
+  // Recognizes a stored predicate lead prepended to an object that is already a complete
+  // sentence.
   assert.equal(
     plan.changes[0]?.refreshedNotes[0]?.after,
     "The NAACP's legal campaign culminated in the Supreme Court's 1954 decision in Brown " +
@@ -193,8 +187,7 @@ test('a note differing only by a colon lead and a trailing "Cited from" is refre
 });
 
 test('a stored note that is the builder sentence with the dropped predicate lead is refreshed', () => {
-  // repo-15slz, the shape the composer fix creates: the note is byte-identical to the builder's
-  // apart from the lead the builder now declines to join on. Real pair from the active release.
+  // The stored and recomputed notes differ only by the redundant predicate lead.
   const subject = row({
     entityId: 'ent_andrew_young_001',
     kind: 'person',
@@ -230,11 +223,8 @@ test('a stored note that is the builder sentence with the dropped predicate lead
 });
 
 test('a stored note is refreshed even when the builder now groups that evidence differently', () => {
-  // repo-4qlmt. The published record cites two claims of the predicate; only one carries a
-  // citation, so the builder's record cites that one alone and the evidence SETS differ. Matching
-  // on an exact set found nothing here, kept the record verbatim, and the row then reported as
-  // converged — which is how the pass reported 4,197 of 4,197 correct while
-  // `ent_edward_dudley_001` was live with its pre-repo-15slz spelling.
+  // Shared evidence permits comparison when claim grouping changes and exact evidence sets no
+  // longer match.
   const subject = row({
     entityId: 'ent_edward_dudley_001',
     kind: 'person',
@@ -284,9 +274,8 @@ test('a stored note is refreshed even when the builder now groups that evidence 
 });
 
 test('sharing evidence is not enough on its own — a different sentence still survives', () => {
-  // The safety property that makes the repo-4qlmt fallback sound: it only decides WHICH recomputed
-  // record is compared. `notesAreSameSentence` is unchanged, so a candidate reached only by the
-  // wider match and carrying a different sentence changes nothing, exactly as no candidate would.
+  // Wider evidence matching chooses a candidate note only; the same-sentence check still
+  // prevents replacing unrelated curated prose.
   const subject = row({
     entityId: 'ent_harriet_tubman_001',
     kind: 'person',
@@ -365,7 +354,9 @@ test('a curated note whose evidence resolves but which is a different sentence i
   assert.equal(notabilityBasisIsConverged(subject), true);
 });
 
-/* (d) The repo-z1uk shape — the anti-regression for a strict recompute. */
+/*
+ * Preserve a curated criterion during recomputation.
+ */
 test('a curated criterion unreachable from the claims survives untouched, evidenceIds included', () => {
   const curated = {
     criterion: 'movement_significance',
@@ -408,7 +399,9 @@ test('a record the builder can say nothing about is never rewritten (the Crescen
   assert.deepEqual(plan.wouldEmpty, []);
 });
 
-/* (e) The repo-rm2y / repo-8x306 "wrote one copy" trap, asserted rather than assumed. */
+/*
+ * All stored public representations must be updated together.
+ */
 test('a planned change names the projection, the taxonomy when present, and the search facets', () => {
   const base = {
     claims: [claim({ id: 'claim_x_01', predicate: 'was the first to serve', object: 'as mayor.' })],
@@ -451,7 +444,7 @@ test('applying a plan writes release_entities and search_index for every changed
   assert.equal(result.projectionRows, 1);
   assert.equal(result.searchIndexRows, 1);
   assert.equal(client.updates.length, 2);
-  assert.ok(client.updates[0]?.sql.includes('bb_public.release_entities'));
+  assert.ok(client.updates[0]?.sql.includes('published.release_entities'));
   assert.ok(client.updates[0]?.sql.includes("'notabilityBasis'"));
   assert.ok(client.updates[0]?.sql.includes("'notabilityLabels'"));
   // The taxonomy column is GENERATED from the projection now, so this statement must NOT touch
@@ -459,7 +452,7 @@ test('applying a plan writes release_entities and search_index for every changed
   // 'notabilityLabels'`, i.e. only for rows that already had the key — is why 1,051 of 4,195 live
   // rows had labels in the projection and none in the column.
   assert.ok(!client.updates[0]?.sql.includes('taxonomy'));
-  assert.ok(client.updates[1]?.sql.includes('bb_public.search_index'));
+  assert.ok(client.updates[1]?.sql.includes('published.search_index'));
   // Both stores get the SAME jsonb, which is the point of writing them together.
   assert.equal(client.updates[0]?.params[0], client.updates[1]?.params[0]);
   assert.equal(client.updates[0]?.params[1], client.updates[1]?.params[1]);

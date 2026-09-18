@@ -16,7 +16,7 @@ function assertSafePathSegment(value: string, field: string): void {
 /**
  * Aggregate release catalog for map/list/history/sitemap (`docs/decisions-carryover.md`, "Public
  * projection and immutable publication snapshots"). One JSON object replaces an unbounded
- * Firestore `publicReleases/{id}/entities` collection scan on the public web. This and
+ * released-entity table scan on the public web. This and
  * `search-index.json` are the only two of the eight paths in this file that a live publisher
  * actually writes.
  */
@@ -28,7 +28,7 @@ export function publicReleaseEntitiesListPath(releaseId: string): string {
 /**
  * Aggregate search-index artifact for the public search surface (see
  * `docs/decisions-carryover.md`).
- * Prefer this (or Firestore `publicSearchIndex` reads) over rebuilding the index from entity
+ * Prefer this (or `published.search_index` reads) over rebuilding the index from entity
  * projections at request time.
  */
 export function publicReleaseSearchIndexPath(releaseId: string): string {

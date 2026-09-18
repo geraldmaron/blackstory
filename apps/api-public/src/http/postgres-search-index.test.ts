@@ -1,14 +1,6 @@
 /**
- * repo-n7p6.28 — pins the behavior that let a living-status bug hide for a whole release.
- *
- * `bb_public.search_index` keeps the whole search document in its `facets` jsonb column AND a few
- * denormalized scalar columns beside it (`kind`, `status`, `name`, ...). When the blob is a full
- * document, `mapPostgresSearchIndexRow` returns it verbatim and the scalar columns are never read.
- *
- * Two corrective ops scripts updated only the `status` column and reported success, so nobody
- * noticed the public search API was still serving `status: "living"` for 338 of 469 persons — 212
- * of them already recorded deceased in their own release projection. These tests state the rule
- * out loud: the blob wins, so any script that patches status MUST patch the blob.
+ * Search readers prefer the complete facets document over denormalized scalar columns. A status
+ * correction must update both representations to reach public readers.
  */
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
@@ -67,9 +59,7 @@ describe('mapPostgresSearchIndexRow status provenance', () => {
   });
 
   it('IGNORES the status column when the facets blob is a full document', () => {
-    // The exact shape of the repo-n7p6.28 outage: column corrected to 'deceased', blob left at
-    // 'living'. The reader gets 'living'. If this ever flips, the ops scripts that now patch both
-    // can be simplified — until then, patching the column alone is a no-op for readers.
+    // A corrected scalar column cannot override a stale status in the facets document.
     const doc = mapPostgresSearchIndexRow(
       fullDocRow({ status: 'deceased' }, { status: 'living' }) as never,
     );

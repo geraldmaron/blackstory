@@ -1,36 +1,8 @@
 /**
- * Controlled historical-theme taxonomy (the related workstream).
- *
- * This registry is the ONLY vocabulary that may ever be surfaced as a facet/filter option.
- * It replaces the interim `TOPIC_TAG_ALLOWLIST` (packages/domain/src/search/topic-allowlist.ts,
- * the related workstream) as the source of truth for what counts as a legitimate "theme". The allowlist
- * remains in place for backward compatibility (see that file's updated header) but new code
- * should read from here.
- *
- * Design: a flat, versioned list of `{ id, label }` pairs. `id` is a stable, kebab-case
- * identifier safe to persist (Firestore field values, URL query params); `label` is the
- * human-readable display string. Bump `TOPIC_TAXONOMY_SCHEMA_VERSION` whenever an id is renamed
- * or removed (additions alone don't require a bump — readers should treat unknown ids as
- * "not a taxonomy member" rather than erroring).
- *
- * Seeded 1:1 from the ~195 entries the prior interim allowlist had already vetted as
- * legitimate themes (not person/org/event/law names) MINUS 14 entries this pass reclassifies:
- *
- * - Organization acronyms (`cofo`, `core`, `mfdp`, `naacp`, `sclc`, `sncc`): these name a
- *   specific organization, which is what `mentionedEntityIds` is for, not a theme.
- * - Named single events/campaigns/laws (`birmingham-campaign`, `civil-rights-act-1866`,
- *   `freedom-rides`, `freedom-summer`, `little-rock-nine`, `march-on-washington`,
- *   `montgomery-bus-boycott`, `selma`): each names one specific historical event, group, or
- *   statute rather than a recurring theme — that's `mentionedEntityIds` territory too (an event
- *   or law is a resolvable "thing", not a browsable category). Generic period/policy concepts
- *   that are NOT tied to one dated event (`jim-crow`, `black-codes`, `fugitive-slave-law`,
- *   `great-migration`, `harlem-renaissance`, etc.) stay as themes since they describe a
- *   recurring pattern across many records, not a single occurrence.
- *
- * See `packages/domain/src/taxonomy/split-topic-tags.ts` for the migration logic that routes
- * legacy `topicTags` values into `topicIds` / `mentionedEntityIds` / `keywords` using this
- * registry plus the excluded-tag lists above. Org/event/law-shaped tags resolve to canonical
- * `ent_*` ids via `LEGACY_MENTION_TAG_TO_ENTITY_ID`.
+ * Versioned registry of stable theme ids and display labels. Named organizations, people and
+ * individual events belong in entity references rather than theme facets. Bump the taxonomy
+ * version when removing or renaming ids. Unknown ids are not taxonomy members.
+ * Imported values require explicit classification before publication.
  */
 
 export const TOPIC_TAXONOMY_SCHEMA_VERSION = 1;
@@ -270,60 +242,4 @@ export function isValidTopicId(id: string): boolean {
 /** Display label for a topic id, or undefined when the id isn't in the registry. */
 export function getTopicLabel(id: string): string | undefined {
   return TOPIC_REGISTRY_BY_ID.get(id)?.label;
-}
-
-/**
- * Legacy `topicTags` values that look like an organization acronym rather than a theme.
- * Used by the migration in `split-topic-tags.ts` to route these into `mentionedEntityIds`
- * after resolving through `LEGACY_MENTION_TAG_TO_ENTITY_ID`.
- */
-export const ORGANIZATION_SHAPED_LEGACY_TAGS: ReadonlySet<string> = new Set([
-  'cofo',
-  'core',
-  'mfdp',
-  'naacp',
-  'sclc',
-  'sncc',
-]);
-
-/**
- * Legacy `topicTags` values that name one specific event, campaign, group, or law rather than a
- * recurring theme. Used by the migration in `split-topic-tags.ts` to route these into
- * `mentionedEntityIds` after resolving through `LEGACY_MENTION_TAG_TO_ENTITY_ID`.
- */
-export const EVENT_OR_LAW_SHAPED_LEGACY_TAGS: ReadonlySet<string> = new Set([
-  'birmingham-campaign',
-  'civil-rights-act-1866',
-  'freedom-rides',
-  'freedom-summer',
-  'little-rock-nine',
-  'march-on-washington',
-  'montgomery-bus-boycott',
-  'selma',
-]);
-
-/**
- * Canonical national-catalog entity ids for legacy org/event/law-shaped topic tags.
- * Keep in sync with fixtures under `packages/ops-data/fixtures/national-catalog/`.
- */
-export const LEGACY_MENTION_TAG_TO_ENTITY_ID: Readonly<Record<string, string>> = {
-  cofo: 'ent_cofo_001',
-  core: 'ent_core_001',
-  mfdp: 'ent_mfdp_001',
-  naacp: 'ent_naacp_001',
-  sclc: 'ent_sclc_001',
-  sncc: 'ent_sncc_001',
-  'birmingham-campaign': 'ent_birmingham_campaign_001',
-  'civil-rights-act-1866': 'ent_law_civil_rights_act_1866',
-  'freedom-rides': 'ent_freedom_rides_001',
-  'freedom-summer': 'ent_freedom_summer_001',
-  'little-rock-nine': 'ent_little_rock_nine_001',
-  'march-on-washington': 'ent_march_on_washington_1963_001',
-  'montgomery-bus-boycott': 'ent_montgomery_bus_boycott_001',
-  selma: 'ent_selma_to_montgomery_marches_001',
-};
-
-/** Resolve a legacy mention-shaped tag to its catalog entity id when known. */
-export function resolveLegacyMentionTag(tag: string): string | undefined {
-  return LEGACY_MENTION_TAG_TO_ENTITY_ID[tag];
 }

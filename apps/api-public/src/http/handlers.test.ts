@@ -189,7 +189,7 @@ test('ADVERSARIAL: malformed entity id is rejected 400 before any lookup', async
 });
 
 // Search is an `expensive_read`: anonymous callers MUST present a verified client header or the
-// rate-limiter denies `app_check_required` (quota policy name retained for compatibility).
+// rate-limiter denies `client_header_required` (quota policy name retained for compatibility).
 const CLIENT_HEADER = { 'x-blackstory-client': 'mobile/1.0.0; api=1' };
 
 test('GET /v1/search returns a contract-valid, bounded response', async () => {

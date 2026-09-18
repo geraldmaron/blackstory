@@ -48,7 +48,7 @@ test('dashboard stub covers BB-034 deliverable panels', () => {
   const titles = dashboard.panels.map((panel) => panel.id);
   const required = [
     'armor-throttle-deny',
-    'app-check-failures',
+    'client-header-failures',
     'auth-failures',
     'admin-role-changes',
     'submission-volume',

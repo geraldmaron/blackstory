@@ -3,7 +3,7 @@
  *
  * EDC pattern: model returns { edtf, property, verbatim_quote, char_offsets }; a deterministic
  * validator rejects unanchored or unparseable output. Rejects go to quarantine artifacts
- * (and optionally bb_research.model_output_quarantine when ACTIVITY_ID is set).
+ * (and optionally research.model_output_quarantine when ACTIVITY_ID is set).
  *
  * Default is dry-run. Production writes require:
  *   DRY_RUN=0 EXTRACT_CLAIM_DATE_QUALIFIERS_LLM_APPLY=1 DATABASE_URL=postgresql://...
@@ -99,9 +99,9 @@ async function loadStage2Candidates(client: pg.PoolClient): Promise<readonly Cla
        c.entity_id,
        v.predicate,
        v.object
-     FROM bb_canonical.claims c
-     JOIN bb_canonical.claim_versions v ON v.id = c.current_version_id
-     LEFT JOIN bb_canonical.claim_qualifiers q
+     FROM canonical.claims c
+     JOIN canonical.claim_versions v ON v.id = c.current_version_id
+     LEFT JOIN canonical.claim_qualifiers q
        ON q.claim_version_id = v.id AND q.qualifier_type = 'temporal'
      WHERE c.current_version_id IS NOT NULL
        AND q.id IS NULL`,
@@ -125,7 +125,7 @@ async function loadStage2Candidates(client: pg.PoolClient): Promise<readonly Cla
 
 async function countTemporalQualifiers(client: pg.PoolClient): Promise<number> {
   const result = await client.query<{ count: string }>(
-    `SELECT count(*)::text AS count FROM bb_canonical.claim_qualifiers WHERE qualifier_type = 'temporal'`,
+    `SELECT count(*)::text AS count FROM canonical.claim_qualifiers WHERE qualifier_type = 'temporal'`,
   );
   return Number(result.rows[0]?.count ?? '0');
 }
@@ -156,7 +156,7 @@ async function insertAcceptedQualifier(
   value: Record<string, unknown>,
 ): Promise<number> {
   const result = await client.query(
-    `INSERT INTO bb_canonical.claim_qualifiers (
+    `INSERT INTO canonical.claim_qualifiers (
        id, claim_version_id, qualifier_type, property, value
      ) VALUES ($1, $2, 'temporal', $3, $4::jsonb)
      ON CONFLICT (claim_version_id, qualifier_type, property) DO NOTHING`,
@@ -179,7 +179,7 @@ async function quarantineRejected(
   if (!activityId) return;
   const invocationId = randomUUID();
   await client.query(
-    `INSERT INTO bb_research.model_invocations (
+    `INSERT INTO research.model_invocations (
        id, activity_id, provider, model_id, model_family, provider_route, price_snapshot,
        prompt_hash, output_schema_id, output_schema_version, benchmark_version, raw_response, status
      ) VALUES (
@@ -200,7 +200,7 @@ async function quarantineRejected(
     ],
   );
   await client.query(
-    `INSERT INTO bb_research.model_output_quarantine (
+    `INSERT INTO research.model_output_quarantine (
        id, invocation_id, raw_output, validation_errors, retention_until
      ) VALUES ($1, $2, $3, $4, now() + interval '90 days')`,
     [randomUUID(), invocationId, rawOutput, validationErrors],

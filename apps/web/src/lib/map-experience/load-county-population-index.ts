@@ -1,9 +1,4 @@
-/**
- * Fetches the compact county decennial population index served from `/geo/`. Production
- * data lives in Firestore `censusCountyDecades` (public read); this static bundle is the
- * map client's bounded download — regenerate from Admin SDK export, never full-scan Firestore
- * in the browser (~9k docs × 3 decades).
- */
+/** Loads the bounded county population artifact. The reference database owns the underlying data; the browser never scans demographic tables. */
 import {
   CENSUS_POPULATION_DECADES,
   isCensusPopulationDecade,

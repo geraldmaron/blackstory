@@ -1,10 +1,4 @@
-/**
- * Wayback Machine Save Page Now (SPN2) capture types.
- * This is the first real archival-API integration in this repo every other adapter to date
- * (Wikimedia, federal) only parses fixture/pre-fetched shapes. SPN is authenticated, submits a
- * URL for capture, and returns a job id the caller polls until the capture resolves to a
- * `https://web.archive.org/web/<timestamp>/<url>` pointer.
- */
+/** Internet Archive submission, polling, and exact snapshot pointer contracts. */
 
 export const WAYBACK_SPN_SUBMIT_URL = 'https://web.archive.org/save' as const;
 
@@ -92,3 +86,41 @@ export type WaybackLookupResult =
       /** Free text for the log line: a status code, a parse failure, an error message. */
       readonly detail?: string;
     };
+
+/** Validate a real snapshot path and its archived source, not merely an archive.org hostname. */
+export function parseWaybackCaptureUrl(
+  raw: string,
+  targetUrl?: string,
+): { url: string; timestamp: string; sourceUrl: string; capturedAt: string } | null {
+  try {
+    const url = new URL(raw);
+    if (
+      !['http:', 'https:'].includes(url.protocol) ||
+      url.hostname !== 'web.archive.org' ||
+      url.username ||
+      url.password ||
+      url.port
+    )
+      return null;
+    const match = /^\/web\/(\d{14})(?:id_|if_|im_)?\/(https?:\/\/.+)$/.exec(
+      url.pathname + url.search,
+    );
+    if (!match) return null;
+    const timestamp = match[1]!;
+    const iso = `${timestamp.slice(0, 4)}-${timestamp.slice(4, 6)}-${timestamp.slice(6, 8)}T${timestamp.slice(8, 10)}:${timestamp.slice(10, 12)}:${timestamp.slice(12, 14)}.000Z`;
+    const date = new Date(iso);
+    if (Number.isNaN(date.getTime()) || date.toISOString() !== iso) return null;
+    const source = new URL(match[2]!);
+    if (source.username || source.password) return null;
+    source.hash = '';
+    if (targetUrl !== undefined) {
+      const expected = new URL(targetUrl);
+      expected.hash = '';
+      if (source.toString() !== expected.toString()) return null;
+    }
+    url.protocol = 'https:';
+    return { url: url.toString(), timestamp, sourceUrl: source.toString(), capturedAt: iso };
+  } catch {
+    return null;
+  }
+}

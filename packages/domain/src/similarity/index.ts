@@ -1,6 +1,6 @@
 /**
  * Embedding-vector similarity surface for research-side reuse: candidate recall and
- * near-duplicate detection. Pure math — no Firestore, no I/O. Vectors are computed by
+ * near-duplicate detection. Pure math — no persistence or I/O. Vectors are computed by
  * `@repo/ops-data`'s embedding pipeline.
  *
  * Not wired live: wiring these functions into the live discovery workflow (`workers/research/`)

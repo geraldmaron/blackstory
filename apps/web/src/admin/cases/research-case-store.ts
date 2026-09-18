@@ -1,6 +1,6 @@
 /**
  * Admin reads/writes for research cases used by the management portal.
- * Uses Postgres bb_research exclusively. Mutations remain audited and never touch public projections.
+ * Uses Postgres research exclusively. Mutations remain audited and never touch public projections.
  */
 import { randomUUID } from 'node:crypto';
 import {

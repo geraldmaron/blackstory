@@ -1,5 +1,5 @@
 # Node discovery-campaign worker for Cloud Run Job dispatch.
-# Production should run as the research@ service account with a Firestore-backed kill switch.
+# Runtime credentials must be scoped to the Postgres research boundary.
 # Discovery jobs write private candidates only — never publish.
 FROM node:22-bookworm-slim
 

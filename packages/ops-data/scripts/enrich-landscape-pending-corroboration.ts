@@ -36,7 +36,7 @@ const APPLY = process.env.LANDSCAPE_ENRICH_APPLY === '1';
 
 const PENDING_BELOW_GATE_SQL = `
 WITH active AS (
-  SELECT release_id FROM bb_public.active_release LIMIT 1
+  SELECT release_id FROM published.active_release LIMIT 1
 )
 SELECT
   lc.id,
@@ -53,20 +53,20 @@ SELECT
   EXISTS (
     SELECT 1
     FROM active a
-    JOIN bb_public.release_entities re
+    JOIN published.release_entities re
       ON re.release_id = a.release_id
       AND re.entity_id = ANY(ARRAY[lc.id, lc.source_item_id])
   ) AS exact_in_release,
   EXISTS (
     SELECT 1
     FROM active a
-    JOIN bb_public.release_entities re
+    JOIN published.release_entities re
       ON re.release_id = a.release_id
       AND lower(re.display_name) = lower(lc.display_name)
       AND re.entity_id <> lc.id
       AND re.entity_id <> lc.source_item_id
   ) AS name_overlap
-FROM bb_research.landscape_candidates lc
+FROM research.landscape_candidates lc
 WHERE lc.status = 'pending'
   -- Persons/People stay excluded unless an operator recorded a privacy review
   -- (payload.personReview), mirroring gateLandscapePublishCandidate. The
@@ -177,15 +177,15 @@ async function main(): Promise<void> {
 
   try {
     const pendingBefore = await client.query(
-      `SELECT COUNT(*)::text AS n FROM bb_research.landscape_candidates WHERE status = 'pending'`,
+      `SELECT COUNT(*)::text AS n FROM research.landscape_candidates WHERE status = 'pending'`,
     );
     const releaseBefore = await client.query(
       `SELECT COUNT(*)::text AS n
-       FROM bb_public.release_entities re
-       JOIN bb_public.active_release ar ON ar.release_id = re.release_id`,
+       FROM published.release_entities re
+       JOIN published.active_release ar ON ar.release_id = re.release_id`,
     );
     const activeRelease = await client.query(
-      `SELECT release_id FROM bb_public.active_release LIMIT 1`,
+      `SELECT release_id FROM published.active_release LIMIT 1`,
     );
     const releaseId = activeRelease.rows[0]?.release_id as string | undefined;
     if (!releaseId) {
@@ -302,7 +302,7 @@ async function main(): Promise<void> {
 
         if (APPLY && !DRY_RUN) {
           await client.query(
-            `UPDATE bb_research.landscape_candidates
+            `UPDATE research.landscape_candidates
              SET provenance = provenance || $2::jsonb,
                  payload = payload || $3::jsonb
              WHERE id = $1 AND status = 'pending'`,
@@ -326,15 +326,15 @@ async function main(): Promise<void> {
     const pendingAfter =
       APPLY && !DRY_RUN
         ? await client.query(
-            `SELECT COUNT(*)::text AS n FROM bb_research.landscape_candidates WHERE status = 'pending'`,
+            `SELECT COUNT(*)::text AS n FROM research.landscape_candidates WHERE status = 'pending'`,
           )
         : pendingBefore;
     const releaseAfter =
       APPLY && !DRY_RUN
         ? await client.query(
             `SELECT COUNT(*)::text AS n
-             FROM bb_public.release_entities re
-             JOIN bb_public.active_release ar ON ar.release_id = re.release_id`,
+             FROM published.release_entities re
+             JOIN published.active_release ar ON ar.release_id = re.release_id`,
           )
         : releaseBefore;
 

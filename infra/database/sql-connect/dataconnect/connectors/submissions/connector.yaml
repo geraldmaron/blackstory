@@ -1,6 +1,0 @@
-# Submissions connector — server-only (api-submissions via Admin SDK).
-connectorId: 'submissions'
-generate:
-  adminNodeSdk:
-    outputDir: '../../../../../../packages/data-access/generated/submissions'
-    package: '@repo/sql-connect-submissions'

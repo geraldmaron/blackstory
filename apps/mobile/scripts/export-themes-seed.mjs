@@ -85,8 +85,8 @@ const client = new pg.Client({
 await client.connect();
 const { rows: released } = await client.query(`
   SELECT release_id, packet_id, payload
-  FROM bb_public.release_theme_impact_packets
-  WHERE release_id = (SELECT release_id FROM bb_public.active_release WHERE id = 'active')
+  FROM published.release_theme_impact_packets
+  WHERE release_id = (SELECT release_id FROM published.active_release WHERE id = 'active')
   ORDER BY packet_id
 `);
 await client.end();

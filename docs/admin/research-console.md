@@ -2,9 +2,7 @@
 
 The private admin portal is the `/admin` route group inside `apps/web` (`apps/web/src/admin/**`
 + `apps/web/src/app/admin/**`), staff-gated by `apps/web/src/proxy.ts` — same Vercel deployment
-as the public site, not a separate one. It was a separate `@repo/admin` Vercel project before
-2026-09-11 (Cloud Run + IAP was leftover target text even then, never built). Primary desks are
-ops-first:
+as the public site. Primary desks are:
 
 | Desk | Path | Role |
 |------|------|------|
@@ -29,17 +27,15 @@ projections. Product verbs: Send to relevance, Confirm relevance, Needs evidence
 ## Authorization boundary
 
 All mutation handlers must import the existing server authorizer from
-`apps/web/src/admin/auth/server-authorization.ts` / `request-auth.ts`. Do not reproduce its IAP or
-Firebase checks in client code.
+`apps/web/src/admin/auth/server-authorization.ts` / `request-auth.ts`. Do not reproduce authorization in client code.
 
 1. Every action checks the caller's staff role against the permission it declares. Identity comes
-   from a verified Supabase session and `app_metadata.bb_role` (`ADMIN_AUTH_MODE=supabase` — the
-   only mode actually implemented; `firebase`/`layered` below were never built).
+   from a verified Supabase session and `app_metadata.app_role` (`ADMIN_AUTH_MODE=supabase`).
 2. High-impact release staging requires a durable operator reason; full activation still needs
    signed-manifest verification in this runtime.
 3. The verified actor, reason, and resulting state must be included in the append-only audit event.
 
-Browser state, route visibility, hidden buttons, and IAP alone are not authorization. Research
+Browser state, route visibility and hidden buttons are not authorization. Research
 roles cannot publish or retract. Publication roles cannot mutate research workflow state.
 `useAdminPermissions` is display-only.
 
@@ -67,9 +63,7 @@ outlives its route, or if a handler authenticates without the authority check.
 
 ## Canonical writes
 
-The entity workbench edits `bb_canonical.entities` directly. That reverses the console's earlier
-"admin never mutates canonical" rule for the record itself; see the 2026-08-04 entry in
-[`docs/decisions-carryover.md`](../decisions-carryover.md) for why and what did not change.
+The entity workbench edits `canonical.entities` through permission-checked server operations.
 
 Every canonical write goes through `commitCanonicalWrite`
 (`apps/web/src/admin/lib/canonical-write.ts`) — there is no second path. It resolves the verified
@@ -139,8 +133,8 @@ Merges made before this existed — including the two from
 losing rows — have no reversal record and are shown as not reversible rather than offering a
 button that would fail.
 
-A merge is a canonical decision and does not touch `bb_public.release_entities` or
-`bb_public.search_index`. The next release build reads canonical; the signed manifest is still the
+A merge is a canonical decision and does not touch `published.release_entities` or
+`published.search_index`. The next release build reads canonical; the signed manifest is still the
 only thing that changes what is live.
 
 ## Query timeouts
@@ -161,24 +155,8 @@ Retraction and rollback use release replacement semantics.
 
 Bulk research transitions enforce a 50-item limit and reject duplicates.
 
-## Human enablement remaining
+## Deployment checks
 
-The Cloud Run/IAP/Firebase plan below predates the actual Supabase-based implementation and was
-never built; steps 1-4 do not apply. Kept as historical record, not a live checklist.
-
-1. ~~Deploy `apps/admin` to its private Cloud Run service with the dedicated admin service
-   account.~~
-2. ~~Enable IAP and grant access only to the approved workforce group.~~
-3. ~~Wire layered IAP verification when `ADMIN_AUTH_MODE=layered`.~~
-4. ~~Connect Firebase custom-claims policy for research vs publication roles.~~
-5. Complete signed-manifest verification for live release activation.
-6. Keep Firestore client rules deny-by-default for canonical, publication, audit, and operations
-   collections.
-
-Firestore is no longer the system of record — Postgres is (`docs/decisions-carryover.md`,
-"Firestore as system of record, reversed"); item 6 above is part of the dead historical plan this
-section already disclaims. See the research-case workflow guide for the live publication and
-retraction invariants.
-
-Legacy `/console/<workspace>` fixtures remain for workspaces not yet promoted into first-class
-desks; live triage no longer depends on disabled “Preview action” cards.
+Verify Supabase Auth configuration, staff role grants, scoped database credentials and audit
+writes on the actual deployment. Test unauthorized access as well as successful sign-in. A
+local test or hidden button does not prove production authorization.

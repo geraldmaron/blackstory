@@ -685,3 +685,60 @@ test('harness-run web_search reports an unavailable provider and still exits cle
   const connectorsComplete = progress.find((entry) => entry.stage === 'connectors.complete');
   assert.equal(connectorsComplete?.rawSubjectsCount, 0);
 });
+
+test('harness-run never fills an unspecified connector with example records', async () => {
+  const out = capture();
+  const code = await runCli(['harness-run', '--theme', 'energy systems'], {
+    stdout: out.stdout,
+    stderr: out.stderr,
+  });
+  assert.notEqual(code, 0);
+  assert.match(out.errors.join(''), /example data is never injected/);
+});
+
+test('harness-run accepts another domain without geography, models, or a database', async () => {
+  const out = capture();
+  const source = {
+    id: 'rfc-9110',
+    connectorKind: 'standards',
+    title: 'HTTP Semantics',
+    description: 'HTTP is a stateless application-level protocol.',
+    cites: ['https://www.rfc-editor.org/rfc/rfc9110.html'],
+    rawRecord: { sourceType: 'standard' },
+  };
+  const code = await runCli(
+    [
+      'harness-run',
+      '--theme',
+      'HTTP protocol design',
+      '--subjects',
+      'records.json',
+      '--max-subjects',
+      '1',
+    ],
+    {
+      stdout: out.stdout,
+      stderr: out.stderr,
+      readFile: () => JSON.stringify([source, { ...source, id: 'rfc-9111' }]),
+    },
+  );
+  assert.equal(code, 0);
+  const output = JSON.parse(out.lines.join(''));
+  assert.equal(output.rawSubjects.length, 1);
+  assert.equal(output.deferredSubjects, 1);
+  assert.equal(output.rawSubjects[0].connectorKind, 'standards');
+  assert.equal(output.disposition, 'proposals_require_independent_review');
+});
+
+test('harness-run refuses unsupported connectors and missing explicit adapter input', async () => {
+  for (const connector of ['fictional', 'dpla', 'nps_network_to_freedom']) {
+    const out = capture();
+    assert.notEqual(
+      await runCli(['harness-run', '--theme', 'history', '--connectors', connector], {
+        stdout: out.stdout,
+        stderr: out.stderr,
+      }),
+      0,
+    );
+  }
+});

@@ -102,5 +102,4 @@ These packs feed **wave one** of the curated source portfolio alongside NRHP MPL
 
 - Live Wikidata Query Service HTTP client
 - Discovery pipeline integration (`stampDiscoveryRun` wiring)
-- Firestore persistence for pack effectiveness metrics
 - Registry UI approval for `src_wikidata` portfolio campaigns

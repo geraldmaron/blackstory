@@ -12,7 +12,7 @@ With `MAINTENANCE_MODE` on, `apps/web/src/proxy.ts` answers every request at the
 Next routes it:
 
 - No route is matched, so no serverless function boots.
-- No React tree renders, so no `bb_public` query runs.
+- No React tree renders, so no `published` query runs.
 - The response is a self-contained HTML page — inline CSS, no script, no font request. The only
   other request the browser makes is the brand lockup from `/public/brand`, which Vercel serves
   from static storage.

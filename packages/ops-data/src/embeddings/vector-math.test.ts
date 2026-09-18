@@ -35,7 +35,7 @@ test('truncateVector slices without renormalizing', () => {
   assert.deepEqual(truncated, [1, 2]);
 });
 
-test('truncateVector rejects dims above the Firestore vector cap', () => {
+test('truncateVector rejects dims above the pgvector index dimension limit', () => {
   assert.throws(() => truncateVector(new Array(10).fill(1), 4096), InvalidEmbeddingVectorError);
 });
 

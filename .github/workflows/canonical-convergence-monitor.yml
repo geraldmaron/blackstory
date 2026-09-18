@@ -1,32 +1,8 @@
-# repo-8yk8: bb_canonical is reconciled against bb_public.release_entities only when a human
-# remembers to run backfill-canonical.ts --apply. Nothing scheduled it and nothing alerted on
-# drift — measured 2026-08-04, the last successful apply was five days stale and
-# missing_planned_claims had grown from 399 to 2449 with no signal anywhere.
-#
-# This is the "minimum" fix the bead calls for: a dry-run that fails (and so alerts, since
-# GitHub notifies watchers of scheduled-workflow failures by default) when any hard-fail
-# verification counter is nonzero. It deliberately does NOT run --apply automatically — every
-# hosted write against bb_canonical this session went through a human-reviewed dry-run first,
-# and CI silently promoting drift into a write is a bigger risk than the drift itself. A human
-# still runs the actual --apply, informed by this alert instead of by accident.
-#
-# Requires the HOSTED_DATABASE_URL secret (the real Supabase connection string with read access
-# to bb_public/bb_canonical/bb_audit — see docs/runbooks/release-activation-postgres.md; set
-# 2026-08-04). No other workflow in this repo touches the hosted database — every other scheduled
-# job runs against an ephemeral local Postgres service. If the secret is ever removed, this job
-# fails closed with a clear message rather than silently reporting green.
-#
-# Schedule is off (2026-09-16). The twice-daily cron sat red on
-# claims_without_evidence_link=5 with a 2599-claim backlog nobody was applying, so it burned a
-# full pnpm install twice a day and emailed watchers without changing anything. Re-enable the
-# cron only after a human --apply has cleared the hard-fail counters; until then use dispatch.
-
+# Manual, read-only convergence check against the hosted database. Missing credentials
+# or nonzero integrity counters fail the run. Corrections require a separate reviewed apply.
 name: Canonical Convergence Monitor
 
 on:
-  # HOSTED_DATABASE_URL set 2026-08-04 (repo secret). Was twice daily (`0 6,18 * * *`).
-  # schedule:
-  #   - cron: '0 6,18 * * *'
   workflow_dispatch: {}
 
 permissions:
@@ -72,7 +48,7 @@ jobs:
         run: |
           set -euo pipefail
           node --conditions development --import tsx \
-            packages/migrate-firestore-postgres/src/cli/backfill-canonical.ts --json \
+            packages/ops-data/scripts/backfill-canonical.ts --json \
             > convergence-report.json
           cat convergence-report.json
           # assertVerified's own hard-fail counters (backfill-canonical.ts) — missing_planned_claims

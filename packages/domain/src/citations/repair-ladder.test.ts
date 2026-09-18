@@ -6,8 +6,6 @@ import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import type { Citation } from './citation.js';
 import { decideRepairLadderStep, applyRepairLadder, REPAIR_LADDER_STEPS } from './repair-ladder.js';
-import { buildSpnSaveUrl, interpretSpnFetchResult } from './spn-client.js';
-import type { SpnCaptureOutcome } from './spn-client.js';
 
 function baseCitation(overrides: Partial<Citation> = {}): Citation {
   return {
@@ -223,34 +221,4 @@ test('the full ladder order is exercised end to end as capture availability chan
     'retroactive_spn',
     'dead_mark',
   ]);
-});
-
-test('spn-client: buildSpnSaveUrl builds the archive.org save endpoint for a target URL', () => {
-  assert.equal(
-    buildSpnSaveUrl('https://gazette.example/story/1'),
-    'https://web.archive.org/save/https://gazette.example/story/1',
-  );
-});
-
-test('spn-client: interpretSpnFetchResult only accepts a genuine web.archive.org capture URL', () => {
-  const good: SpnCaptureOutcome = interpretSpnFetchResult(
-    {
-      ok: true,
-      finalUrl: 'https://web.archive.org/web/20260717000000/https://gazette.example/story/1',
-    },
-    '2026-07-17T00:00:00.000Z',
-  );
-  assert.equal(good.ok, true);
-
-  const bad = interpretSpnFetchResult(
-    { ok: true, finalUrl: 'https://gazette.example/story/1' },
-    '2026-07-17T00:00:00.000Z',
-  );
-  assert.equal(bad.ok, false);
-
-  const failed = interpretSpnFetchResult(
-    { ok: false, reason: 'transport_failed' },
-    '2026-07-17T00:00:00.000Z',
-  );
-  assert.equal(failed.ok, false);
 });

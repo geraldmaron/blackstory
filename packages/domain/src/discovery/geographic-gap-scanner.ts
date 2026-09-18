@@ -9,7 +9,7 @@
  * publish").
  *
  * All functions here are PURE: inputs arrive as parameters (staff-only
- * `bb_ops.coverage_gap_by_county_decade` rows, fixtures, or exports). No DB access,
+ * `ops.coverage_gap_by_county_decade` rows, fixtures, or exports). No DB access,
  * no network, no publish side effects.
  */
 import type { GeographicHint } from './types.js';
@@ -35,7 +35,7 @@ export const GAP_SCANNER_METHODOLOGY_DISCLAIMER = {
  */
 export const DEFAULT_MIN_BLACK_POPULATION = 100;
 
-/** One census reference reading (from bb_reference.census_county_decades payload). */
+/** One census reference reading (from reference.census_county_decades payload). */
 export type CountyCensusDecadeRow = {
   /** 5-digit county FIPS (state 2 + county 3), zero-padded. */
   readonly fips5: string;
@@ -48,7 +48,7 @@ export type CountyCensusDecadeRow = {
   readonly stateName?: string;
 };
 
-/** Published entity count per county (from bb_public.release_entities, active release). */
+/** Published entity count per county (from published.release_entities, active release). */
 export type CountyEntityCountRow = {
   readonly fips5: string;
   /** Count of published entities attributed to the county. Read-only input; never written here. */

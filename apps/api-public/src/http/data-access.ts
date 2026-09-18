@@ -1,34 +1,8 @@
 /**
- * `PublicDataAccess` — the read port every `/v1` handler depends on, and its adapters.
- *
- * Why a port (dependency injection) rather than a hard-wired Postgres client here:
- * - It keeps the handlers pure and unit-testable without a live database.
- * - It mirrors the factory-injection style already used by `createFindNearestEndpoint`
- *   (`vector-search-endpoint.ts`), where every dependency (verifier, store, embedding provider) is
- *   injected so the composition — not the I/O — is what's tested.
- *
- * Two adapters ship here:
- * 1. `createInMemoryPublicDataAccess` — a REAL, fully-tested implementation used by the handler
- *    tests and usable as a degraded/immutable-snapshot source (it reads a fixed set of
- *    already-released, already-redacted public projections held in memory). It is not one today:
- *    `./compose.ts` builds it with `{ entities: [] }` when the live-Postgres gate fails, so an
- *    unconfigured deployment returns `UPSTREAM_UNAVAILABLE` rather than serving a snapshot. See
- *    `docs/decisions-carryover.md`, "Public projection and immutable publication snapshots".
- * 2. `createPublicDataAccessFromReaders` — binds the port to injected public projection readers + a
- *    projection→DTO mapper. The readers are injected, not invented here, so this module never
- *    imports a server-only storage shape it would have to redact; the concrete live binding (real
- *    Postgres `bb_public` reads + the projection→`EntityV1` mapper) lives in
- *    `./postgres-data-access.ts` and `./projection-mapping.ts`, and is selected at runtime by
- *    `./compose.ts` per `./live-policy.ts`'s live/fixture gate (the Postgres SoR cutover —
- *    `docs/decisions-carryover.md`, "entity source-of-truth precedence"; Postgres is
- *    the only live path — see that file's header for what remains a documented gap, e.g. `related`
- *    hydration and index-backed search).
- *
- * All entity data returned by any adapter is validated against the shared `entityV1Schema` before
- * it leaves this module, so the response-redaction guarantee (no internal/ranking field, and no
- * precision tier finer than `institution` — `docs/decisions-carryover.md`, "ADR-021's two
- * invariants": public-response redaction) holds regardless of adapter: the zod parse strips any
- * unknown field.
+ * Public read port for /v1 handlers. compose.ts selects Postgres-backed readers; the in-memory
+ * adapter supports tests and explicitly supplied released snapshots. An unconfigured deployment
+ * returns UPSTREAM_UNAVAILABLE. Every response passes entityV1Schema to remove private fields
+ * and enforce public precision.
  */
 import {
   runPublicSearch,
@@ -64,7 +38,7 @@ export type SearchPage = {
 
 export interface PublicDataAccess {
   /** The active release pointer + optional index/content versions. Exactly one release is active
-   * at a time (`bb_public.active_release` is a single row). `undefined` signals no released data
+   * at a time (`published.active_release` is a single row). `undefined` signals no released data
    * is available yet (pre-release bootstrap). */
   getReleasePointer(): Promise<ReleasePointer | undefined>;
   /**
@@ -75,15 +49,9 @@ export interface PublicDataAccess {
    */
   getEntity(releaseId: string, entityId: string): Promise<EntityV1 | undefined>;
   /**
-   * The survivor id a merged-away entity id forwards to, or `undefined` (repo-n7p6.29).
-   *
-   * This is the ONE distinction the T3 indistinguishability rule above deliberately allows, and
-   * only because the data behind it is published on purpose: `bb_public.release_entity_redirects`
-   * holds nothing but absorbed ids that were already publicly resolvable, mapped to survivors
-   * that are published now. It says nothing about any unpublished record — a withdrawn id and a
-   * never-existed id both miss this lookup exactly the way they miss `getEntity`, so the
-   * enumeration surface is unchanged. The handler calls it on EVERY miss, so the backend call
-   * sequence stays identical across nonexistent, unpublished, and absorbed ids.
+   * Returns the published survivor of an absorbed public id, or undefined. Call on every entity
+   * miss so nonexistent and unpublished ids have the same lookup sequence. Only published
+   * redirects may distinguish a merged id.
    */
   getEntityRedirect(releaseId: string, entityId: string): Promise<string | undefined>;
   /**
@@ -131,7 +99,7 @@ export type InMemoryPublicDataOptions = {
   readonly unpublishedIds?: readonly string[];
   /**
    * Published absorbed→survivor redirects for this release, as `{ [absorbedId]: survivorId }`.
-   * Mirrors `bb_public.release_entity_redirects`; values are already terminal survivors, so a
+   * Mirrors `published.release_entity_redirects`; values are already terminal survivors, so a
    * chain is never walked here either.
    */
   readonly redirects?: Readonly<Record<string, string>>;
@@ -284,11 +252,11 @@ function mapSearchExecutionToPage(
   };
 }
 
-/** Projects a published `EntityV1` into a `SearchResultV1`. Deliberately carries NO numeric
- * relevance/evidence score — results explain WHY they match in words, never a number
- * (`docs/decisions-carryover.md`, "ADR-021's two invariants": public-response redaction; mirrors
- * `search.ts`'s own exclusion, and asserted by `redaction.test.ts`). The graded `confidenceTier`
- * below is an assessment, not a count, and is the one evidence signal this shape carries. */
+/**
+ * Projects an EntityV1 into a search result with explanatory match text and a qualitative
+ * confidenceTier. Internal numeric ranking and evidence scores are excluded from this public
+ * shape.
+ */
 function toSearchResult(entity: EntityV1, needle: string): SearchResultV1 {
   const matchedInName = needle.length === 0 || entity.displayName.toLowerCase().includes(needle);
   return {
@@ -326,7 +294,9 @@ export type PublicDataAccessReaders = {
   readonly readReleasePointer: () => Promise<ReleasePointer | undefined>;
   /** MUST already collapse unpublished/nonexistent to `undefined` (T3). */
   readonly readEntity: (releaseId: string, entityId: string) => Promise<EntityV1 | undefined>;
-  /** The published absorbed→survivor forward for this id, if any (repo-n7p6.29). */
+  /**
+   * Returns the published survivor for an absorbed id, if present.
+   */
   readonly readEntityRedirect: (releaseId: string, entityId: string) => Promise<string | undefined>;
   /** All published entities for map FeatureCollection construction. */
   readonly readEntities: (releaseId: string) => Promise<readonly EntityV1[]>;

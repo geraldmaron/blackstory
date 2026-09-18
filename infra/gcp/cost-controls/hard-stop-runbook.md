@@ -31,7 +31,7 @@ Policy source: `packages/security/src/resource-controls.ts` → `DEFAULT_BILLING
 
 ### 1. Confirm scope (2 min)
 
-- Check Cloud Monitoring: Armor denies, App Check failures, queue depth, error rates
+- Check Cloud Monitoring: Armor denies, client-header check failures, queue depth, error rates
 - Identify whether spike is volumetric (T-01) or expensive-endpoint abuse (T-02)
 - Record incident id and active release id
 

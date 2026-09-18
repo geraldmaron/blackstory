@@ -397,3 +397,51 @@ test('hybrid does NOT fail over when openrouter wraps valid JSON in a code fence
   assert.equal(ollamaCalls, 0);
   assert.equal(result.content, '{"decision":"keep","rationale":"ok","confidence":0.8,"drafts":{}}');
 });
+
+test('schema-constrained responses preserve malformed payloads and never use reasoning as data', () => {
+  const raw = '```json\n{"claim":"fabricated repair"}\n```';
+  assert.equal(extractMessageContent({ content: raw }, true), raw);
+  assert.equal(
+    extractMessageContent({ reasoning: '{"claim":"reasoning is not output"}' }, true),
+    '',
+  );
+});
+
+test('provider accounting preserves reported charges and rejects malformed usage', async () => {
+  for (const usage of [
+    undefined,
+    { prompt_tokens: -1, completion_tokens: '50', cost: -2 },
+    { prompt_tokens: 120, completion_tokens: 45, cost: 0 },
+    { prompt_tokens: 120, completion_tokens: 45, cost: 0.00123 },
+  ]) {
+    const provider = createOpenRouterLlmProvider({
+      apiKey: 'fixture',
+      maxAttempts: 1,
+      fetchImpl: async () => Response.json({ choices: [{ message: { content: '{}' } }], usage }),
+    });
+    const result = await provider.complete({ model: 'unlisted-model', messages: [] });
+    const valid = typeof usage?.cost === 'number' && usage.cost >= 0;
+    assert.equal(result.accounting?.costUsd, valid ? usage.cost : null);
+    assert.equal(result.accounting?.promptTokens, valid ? 120 : null);
+    assert.equal(result.accounting?.completionTokens, valid ? 45 : null);
+    assert.equal(result.accounting?.incomplete, !valid);
+  }
+});
+test('successful retry reports the known charge without concealing unaccounted attempts', async () => {
+  let calls = 0;
+  const provider = createOpenRouterLlmProvider({
+    apiKey: 'fixture',
+    maxAttempts: 2,
+    models: ['a', 'b'],
+    fetchImpl: async () =>
+      ++calls === 1
+        ? new Response('uncertain upstream error', { status: 502 })
+        : Response.json({
+            choices: [{ message: { content: '{}' } }],
+            usage: { prompt_tokens: 10, completion_tokens: 3, cost: 0.01 },
+          }),
+  });
+  const result = await provider.complete({ model: '', messages: [] });
+  assert.equal(result.accounting?.costUsd, 0.01);
+  assert.equal(result.accounting?.incomplete, true);
+});

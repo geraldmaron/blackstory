@@ -10,11 +10,8 @@ order: 2
 BlackStory ships as one monorepo so public surfaces, private research tools, and
 shared libraries stay on the same contracts.
 
-Current live stack (verified 2026-08-28): public web on **Vercel**, product data
-and media on **Supabase** `blackstory-app`
-(`https://twykhihqkcldpreuovay.supabase.co`). Firebase App Hosting, Firestore,
-GCS dual-serve, and parked PostGIS are leftover, not the current system of
-record. See [Architecture](./architecture.md).
+The application uses Vercel and Supabase Postgres, Auth and Storage. Research runs are explicit
+CLI or headless worker operations. See [Architecture](./architecture.md) for boundaries and limits.
 
 | Path | Role |
 |------|------|
@@ -27,12 +24,9 @@ record. See [Architecture](./architecture.md).
 | `workers/*` | Python research, publication, and security workers |
 | `packages/*` | Shared TypeScript libraries (`@repo/*`) |
 | `supabase/` | Postgres migrations and Supabase project config for `blackstory-app` |
-| `infra/*` | Leftover Firebase / GCP scaffolding, GitHub, parked PostGIS |
-| `docs/` | Operating docs, historical ADRs, methodology, and runbooks |
+| `infra/*` | GitHub governance and optional service-control configuration |
+| `docs/` | Current authority, methodology and operational runbooks |
 | `brand/` | Brand masters (lockups, symbols, tokens, guide) |
-
-`functions/` (Firebase Cloud Functions schedules) is gone. Do not add it back as
-a current host.
 
 ## Stable code prefixes
 
@@ -54,7 +48,7 @@ This docs site is the orientation layer. Deeper operating notes stay in the
 repository:
 
 - Architecture (current stack): `docs/architecture.md`
-- Historical decisions: `docs/decisions-carryover.md` and `git log -- docs/adr/`
+- Current engineering contract: `docs/decisions-carryover.md`
 - Methodology: `docs/methodology/`
 - Research pipeline: `docs/research/`
 - Security: `docs/security/`

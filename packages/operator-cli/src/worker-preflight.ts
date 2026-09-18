@@ -127,8 +127,8 @@ export async function runWorkerPreflight(
               research_runs: string | null;
             }>(
               `SELECT
-                 to_regclass('bb_research.frontier_tasks')::text AS frontier_tasks,
-                 to_regclass('bb_research.runs')::text AS research_runs`,
+                 to_regclass('research.frontier_tasks')::text AS frontier_tasks,
+                 to_regclass('research.runs')::text AS research_runs`,
             )
           ).rows[0];
       const frontierTasks = row?.frontierTasks ?? row?.frontier_tasks;

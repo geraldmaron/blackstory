@@ -1,7 +1,5 @@
 /**
- * Data Pack v1 contract barrel (the related workstream). See `./manifest.ts`'s header for the full
- * design rationale — this is the contract + local validation pipeline for third-party datasets,
- * not the ops/ingestion infrastructure.
+ * Data-pack manifest, record contracts and local validation exports.
  */
 export * from './manifest.js';
 export * from './records.js';

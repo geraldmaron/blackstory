@@ -1,6 +1,6 @@
 /**
  * Curated legal landscape seed catalog for web surfaces. Fixtures only — stands in for
- * Firestore `legalSnapshots` + published `FactRecord` projections. Fact ids `BB-F-000010`+
+ * legal snapshots + published `FactRecord` projections. Fact ids `BB-F-000010`+
  * are scoped to this legal catalog (distinct from retired public quick-facts seed ranges).
  */
 import {
@@ -69,10 +69,8 @@ function lawFact(
     qualifiers: [],
     counterClaims: [],
     relatedFacts: [],
-    // No CanonicalClaim backs these seed facts yet (they predate `derivedFromClaimIds` /
-    // the related workstream and there is no unambiguous claim id to backfill against) — left empty
-    // rather than guessed. See packages/domain/src/facts/derivation.ts's module doc: an empty
-    // array is a no-op for the derivation-consistency check, not a failure.
+    // No canonical claim ids are assigned to these seed facts. An empty derivation set skips
+    // the consistency comparison; it does not establish that the citations were corroborated.
     derivedFromClaimIds: [],
     derivedFromRelationshipIds: [],
     provenance: {

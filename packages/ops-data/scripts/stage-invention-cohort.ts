@@ -72,7 +72,7 @@ async function main(): Promise<void> {
 
     if (!DRY_RUN && APPLY) {
       await client.query(
-        `INSERT INTO bb_research.source_program_runs
+        `INSERT INTO research.source_program_runs
           (id, lane, source_program_id, source_program_name, retrieved_at, rows_fetched, candidate_count, summary, updated_at)
          VALUES ($1, 'other', $2, $3, now(), $4, $4, $5::jsonb, now())
          ON CONFLICT (id) DO UPDATE SET
@@ -94,7 +94,7 @@ async function main(): Promise<void> {
       console.log(`  ${row.id}  ${row.summary.length}c  ${row.displayName}`);
       if (DRY_RUN || !APPLY) continue;
       await client.query(
-        `INSERT INTO bb_research.landscape_candidates
+        `INSERT INTO research.landscape_candidates
           (id, run_id, lane, source_program_id, source_item_id, display_name, kind, summary,
            lat, lng, canonical_url, research_lane_only, status, provenance, payload, discovered_at, updated_at)
          VALUES ($1,$2,$3,$4,$5,$6,'invention',$7,$8,$9,$10,true,'pending',$11::jsonb,$12::jsonb,now(),now())

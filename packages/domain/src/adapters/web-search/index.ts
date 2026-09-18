@@ -97,8 +97,3 @@ export {
   type SearchLead,
   type SkippedQuery,
 } from './routed-search.js';
-
-export {
-  ingestWebSearchCandidatesThroughPipeline,
-  type IngestWebSearchCandidatesThroughPipelineInput,
-} from './pipeline.js';

@@ -1,9 +1,6 @@
 /**
- * Typed surface identity and capability matrix for BlackStory deployables (see
- * docs/decisions-carryover.md, "Service surface separation" — ADR-005 does not exist). This matrix
- * is real and tested, but is a code-level contract only: the Cloud Run/IAP network isolation that
- * infra/gcp/surfaces/surface-matrix.json describes has never been deployed (see that section for
- * the evidence) — do not assume this mirror reflects live infrastructure.
+ * Typed capabilities for application surfaces. This is a code contract; deployment manifests
+ * and live network isolation require separate verification.
  */
 
 export const SURFACE_IDS = [
@@ -178,7 +175,7 @@ export function deniesPublication(surfaceId: SurfaceId): boolean {
   return ALL_PUBLISH_OPS.every((operation) => !isOperationAllowed(surfaceId, operation));
 }
 
-/** True when the surface cannot write canonical Firestore documents. */
+/** True when the surface cannot write canonical records. */
 export function deniesCanonicalWrite(surfaceId: SurfaceId): boolean {
   return ALL_CANONICAL_WRITES.every((operation) => !isOperationAllowed(surfaceId, operation));
 }

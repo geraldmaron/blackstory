@@ -1,7 +1,6 @@
 /**
- * Steps shared by the Lives Across the Decades loaders that read an IPUMS NHGIS extract (beads
- * repo-0clax.22 and repo-0clax.23): get the extract's files, report what was built, and write the
- * observations with their series rows in one transaction. Nothing downloaded is written to the repo.
+ * Shared NHGIS extract ingestion: acquire files, report derived observations, and persist
+ * observations with series rows in one transaction. Downloads remain outside the repository.
  */
 import { execFileSync } from 'node:child_process';
 import { mkdir, writeFile } from 'node:fs/promises';
@@ -93,14 +92,14 @@ export function livesSeriesForObservations(observations: readonly LivesPublished
   });
 }
 
-/** Throws unless every observation's jurisdiction is already in `bb_reference.jurisdictions`. */
+/** Throws unless every observation's jurisdiction is already in `reference.jurisdictions`. */
 export async function assertLivesJurisdictions(
   pool: Pool,
   observations: readonly LivesPublishedObservation[],
 ): Promise<void> {
   const jurisdictionIds = [...new Set(observations.map((o) => o.jurisdictionId))];
   const known = await pool.query<{ id: string }>(
-    'SELECT id FROM bb_reference.jurisdictions WHERE id = ANY($1::text[])',
+    'SELECT id FROM reference.jurisdictions WHERE id = ANY($1::text[])',
     [jurisdictionIds],
   );
   const existing = new Set(known.rows.map((row) => row.id));
@@ -120,7 +119,7 @@ export async function upsertLivesObservations(
     await client.query('BEGIN');
     for (const s of series) {
       await client.query(
-        `INSERT INTO bb_reference.statistical_series
+        `INSERT INTO reference.statistical_series
           (metric_id, metric_definition, universe, unit, source_dataset, source_table, source_variable,
            geography_type, estimate_type, period_type, external_data_source_id, theme, metadata)
          VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13::jsonb)
@@ -174,7 +173,7 @@ export async function upsertLivesObservations(
         return `(${p(0)},${p(1)},${p(2)},${p(3)},${p(4)},${p(5)},${p(6)},${p(7)},${p(8)},${p(9)},${p(10)},'observed',${p(11)},${p(12)},$1::timestamptz,${p(13)},${p(14)}::jsonb)`;
       });
       await client.query(
-        `INSERT INTO bb_reference.statistical_observations
+        `INSERT INTO reference.statistical_observations
           (id, metric_id, jurisdiction_id, boundary_version, reference_period, dataset_vintage, estimate,
            margin_of_error, numerator, denominator, race_ethnicity_slice, status, source, source_url,
            retrieved_at, content_hash, metadata)

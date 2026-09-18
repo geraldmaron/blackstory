@@ -73,14 +73,8 @@ export type GeographicRelationshipContext = {
   readonly notes?: string;
 };
 
-// ---------------------------------------------------------------------------
-// lifecycle/workflow vocabulary.
-// Naming mirrors `ClaimWorkflowStatus`/`ClaimPublicationStatus` (see `./claims/claim.ts`) for
-// cross-domain consistency, with one deliberate difference: relationships add an explicit
-// `candidate` workflow state so a not-yet-reviewed graph edge (see BB `the related workstream`) can be
-// represented directly on `EntityRelationship` via `workflowStatus: 'candidate'` rather than
-// requiring a separate `CandidateRelationship` type (see note on `createdFromCandidateId` below).
-// ---------------------------------------------------------------------------
+// Relationship workflow includes candidate so an unreviewed edge can exist without being
+// accepted or published.
 
 export const RELATIONSHIP_WORKFLOW_STATUSES = [
   'candidate',
@@ -139,12 +133,8 @@ export type EntityRelationship = {
   readonly notes?: string;
   readonly createdAt: string;
   readonly updatedAt: string;
-  // -------------------------------------------------------------------------
-  // lifecycle/workflow fields (BB the related workstream). All optional so pre-existing relationships
-  // that never went through a candidate -> review -> published pipeline remain valid values
-  // without a backfill migration; `assertRelationshipPublishInvariants`
-  // (see `./relationship-publish.ts`) is where these become required for publication.
-  // -------------------------------------------------------------------------
+  // Optional workflow metadata at the data boundary; publication validators enforce the
+  // required review state.
   /** Candidate -> in_review -> accepted|rejected pipeline state. Absent means legacy data
    * predating this field; treat as equivalent to `'accepted'` for read paths. */
   readonly workflowStatus?: RelationshipWorkflowStatus;

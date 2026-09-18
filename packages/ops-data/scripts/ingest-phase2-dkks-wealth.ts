@@ -1,6 +1,6 @@
 /**
  * DKKS "Wealth of Two Nations" (QJE 2024) national racial wealth-gap ingest
- * for Phase 2 observations into bb_reference.statistical_observations. Uses
+ * for Phase 2 observations into reference.statistical_observations. Uses
  * a curated fixture transcribed from the authors' own "final dataset"
  * workbook — no scraping at run time. Modeled on ingest-phase1-scf-wealth.ts.
  *
@@ -53,7 +53,7 @@ async function loadExistingJurisdictionIds(databaseUrl: string): Promise<Set<str
     ...(conn.ssl ? { ssl: conn.ssl } : {}),
   });
   try {
-    const result = await pool.query<{ id: string }>('SELECT id FROM bb_reference.jurisdictions');
+    const result = await pool.query<{ id: string }>('SELECT id FROM reference.jurisdictions');
     return new Set(result.rows.map((row) => row.id));
   } finally {
     await pool.end();
@@ -92,7 +92,7 @@ async function applyObservations(
 
     for (const series of listPhase2DkksWealthIndicators()) {
       await client.query(
-        `INSERT INTO bb_reference.statistical_series
+        `INSERT INTO reference.statistical_series
           (metric_id, metric_definition, universe, unit, source_dataset, source_table,
            source_variable, geography_type, estimate_type, period_type,
            external_data_source_id, theme, metadata)
@@ -135,7 +135,7 @@ async function applyObservations(
 
     for (const obs of observations) {
       await client.query(
-        `INSERT INTO bb_reference.statistical_observations
+        `INSERT INTO reference.statistical_observations
           (id, metric_id, jurisdiction_id, boundary_version, reference_period, dataset_vintage,
            estimate, margin_of_error, race_ethnicity_slice, status, source, source_url,
            retrieved_at, content_hash, metadata)

@@ -145,43 +145,7 @@ color is never the only signal (confidence stays glyph-encoded); points
 render no sharper than stored precision and a coarsened point is never
 labeled as an exact address.
 
-## Infra naming
+## Infrastructure naming
 
-- GCP / Firebase **project id** `black-book-efaaf` is immutable. Documented
-  as legacy in `@repo/config` (`GCP_PROJECT_ID_PROD`). Display names and
-  labels use BlackStory / `product=blackstory`.
-- New GCP project ids use the stable `repo-` prefix (`repo-staging`,
-  `repo-internal`).
-- Local directory and GitHub repo: `blackstory` (HUMAN rename).
-
-## File naming
-
-Lowercase-kebab file names everywhere, including docs and asset packs —
-no uppercase file names in new work. Public brand filenames are **role-based**
-(`lockup-dark.png`), not product-prefixed.
-
-## Open Graph / social banners
-
-Served copies: `apps/web/public/brand/open-graph-*-1200x630.png` (and the
-docs twin). Masters: `brand/social/*/BlackStory-social-banner-*-1200x630.png`.
-
-These must be **opaque** 1200×630 RGB PNGs — solid Black Ink (`#0A0A0A`) or
-Archive Paper (`#F4EFE5`) canvas with the approved transparent lockup
-composited on top. Do not ship transparent OG assets or grain overlays;
-iMessage and other scrapers flatten alpha poorly and will show RGB noise as
-static. When regenerating, bump the `?v=` query on `BRAND_ASSETS.openGraph`
-(and the docs layout twin) so cached previews refresh.
-
-## Add to Home Screen / install icons
-
-Opaque PNGs for the web app manifest and Android install UI:
-
-| Role path | Source |
-|---|---|
-| `icon-192.png` / `icon-512.png` | `brand/app-icons/light/*-512.png` flattened on Archive Paper |
-| `icon-maskable-512.png` | Same mark, ~80% content safe-zone on Archive Paper |
-
-Manifest: `apps/web/public/manifest.webmanifest`. No service worker is shipped;
-installability is online-first only. (Owner how-to note for iOS Add to Home
-Screen limits was removed 2026-07-24; iOS requires the user to use Safari's
-Share → Add to Home Screen manually — there is no programmatic install prompt.)
+Infrastructure identifiers are configuration, not product copy. Package names use `@repo/*`,
+CSS uses `ds-*` / `--ds-*`, and break-glass environment controls use `APP_*`.

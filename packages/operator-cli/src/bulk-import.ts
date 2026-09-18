@@ -25,6 +25,7 @@ import {
   type SourceRegistryStore,
   type SpotCheckVerdict,
 } from '@repo/domain';
+import { parseCsvRows } from '@repo/research-harness';
 import { buildOperatorAuditEvent, buildOperatorOutboxMessage } from './audit.js';
 import {
   buildLeadSubmission,
@@ -73,49 +74,6 @@ export function parseLeadsFromCsv(csvText: string): LeadInput[] {
         ...(submitterContact ? { submitterContact } : {}),
       } satisfies LeadInput;
     });
-}
-
-/** Minimal RFC4180-ish CSV parser: handles quoted fields, escaped quotes, and CRLF. */
-function parseCsvRows(text: string): string[][] {
-  const rows: string[][] = [];
-  let row: string[] = [];
-  let field = '';
-  let inQuotes = false;
-  const source = text.replace(/\r\n/gu, '\n');
-  for (let index = 0; index < source.length; index += 1) {
-    const char = source[index];
-    if (inQuotes) {
-      if (char === '"') {
-        if (source[index + 1] === '"') {
-          field += '"';
-          index += 1;
-        } else {
-          inQuotes = false;
-        }
-      } else {
-        field += char;
-      }
-      continue;
-    }
-    if (char === '"') {
-      inQuotes = true;
-    } else if (char === ',') {
-      row.push(field);
-      field = '';
-    } else if (char === '\n') {
-      row.push(field);
-      rows.push(row);
-      row = [];
-      field = '';
-    } else {
-      field += char;
-    }
-  }
-  if (field.length > 0 || row.length > 0) {
-    row.push(field);
-    rows.push(row);
-  }
-  return rows.filter((candidate) => !(candidate.length === 1 && candidate[0] === ''));
 }
 
 const MARKDOWN_FIELD_KEYS: Record<string, keyof LeadInput> = {

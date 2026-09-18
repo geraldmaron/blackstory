@@ -60,7 +60,7 @@ if [[ "${PUBLIC_DATA_SOURCE:-}" == "postgres" ]]; then
     exit 1
   fi
   export DATABASE_SSL="${DATABASE_SSL:-1}"
-  echo "dev-web: data plane = postgres (live bb_public; expect ~1100 entities on rel_seed_001)"
+  echo "dev-web: data plane = postgres (live published; expect ~1100 entities on rel_seed_001)"
 elif [[ "${PUBLIC_DATA_SOURCE:-}" == "seed" ]]; then
   echo "dev-web: WARNING — PUBLIC_DATA_SOURCE=seed (4 Dunbar fixtures only; dig will look empty nationally)" >&2
 else

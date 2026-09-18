@@ -49,7 +49,7 @@
       "controls": {
         "preventive": [
           "Normalize and strip cache-busting query params for public reads",
-          "Strict App Check on expensive reads after ",
+          "Client-header format checks on expensive reads (not authentication)",
           "Search query complexity caps, timeouts, result limits",
           "Separate stricter quotas for search/geocode/nearby vs static reads (ADR-010)"
         ],
@@ -74,31 +74,31 @@
       "id": "T-03",
       "name": "Credential stuffing and administrator phishing",
       "priority": "P0",
-      "assets": ["admin console", "Firebase Auth admin users", "IAP-protected surfaces"],
+      "assets": ["admin console", "Supabase Auth staff identities", "staff-authorized routes"],
       "actors": ["credential stuffer", "phisher", "account takeover"],
       "abuseCaseIds": ["AC-03"],
       "implementationBeads": ["BB-005", "BB-011", "BB-021", "BB-027", "BB-034", "BB-035"],
       "controls": {
         "preventive": [
-          "Admin never exposed as public+role-claim-only (ADR-010)",
-          "Firebase Auth + IAP + application RBAC for administrators",
+          "Authorize staff requests in the proxy and every server mutation",
+          "Supabase Auth sessions and app_metadata.app_role authorization",
           "MFA required for admin; phishing-resistant factors preferred",
           "Separate admin identity pool from public end-user auth where feasible"
         ],
         "detective": [
           "Failed login / impossible travel / new-device alerts for admin",
-          "IAP and Auth audit log monitoring",
+          "Auth and application audit log monitoring",
           "Anomalous admin API volume alerts"
         ],
         "containment": [
           "Disable compromised accounts; revoke sessions and refresh tokens",
           "Kill switch for publication and admin mutation paths",
-          "IAP lockdown to break-glass identities only"
+          "Restrict staff mutations to reviewed break-glass identities"
         ],
         "recovery": [
           "Credential rotation and forced re-auth",
           "Audit trail review of actions during compromise window",
-          "Rollback unauthorized releases (, )"
+          "Rollback unauthorized releases"
         ]
       },
       "residualRisk": "Targeted phishing of break-glass operators remains possible; residual mitigated by dual control on publication, not by perfect human immunity."
@@ -155,7 +155,7 @@
       "implementationBeads": ["BB-024", "BB-025", "BB-029", "BB-032", "BB-034", "BB-055"],
       "controls": {
         "preventive": [
-          "App Check + rate limits on corrections/submissions",
+          "client-header check + rate limits on corrections/submissions",
           "Quarantine-first intake; never write canonical history from anonymous clients",
           "Volume \u2260 truth: duplicates do not raise confidence or publish",
           "Cooldown and similarity clustering for near-identical submissions"
@@ -390,7 +390,7 @@
       "id": "T-12",
       "name": "Secret leakage",
       "priority": "P0",
-      "assets": ["API keys", "DB credentials", "App Check secrets", "service accounts"],
+      "assets": ["API keys", "DB credentials", "service tokens", "service accounts"],
       "actors": ["accidental committer", "log scraper", "client bundle inspector"],
       "abuseCaseIds": ["AC-12"],
       "implementationBeads": ["BB-005", "BB-009", "BB-010", "BB-011", "BB-027", "BB-034"],
@@ -399,7 +399,7 @@
           "1Password / Secret Manager; no secrets in source or client bundles",
           "Push protection and secret scanning",
           "Workload identity over static keys; least privilege",
-          "Logging redaction: no raw App Check tokens or protected addresses (ADR-010)"
+          "Logging redaction: no raw client-header check tokens or protected addresses (ADR-010)"
         ],
         "detective": [
           "Secret scanning alerts on push/PR",
@@ -662,7 +662,7 @@
       "implementationBeads": ["BB-023", "BB-024", "BB-025", "BB-026", "BB-034", "BB-049", "BB-059"],
       "controls": {
         "preventive": [
-          "Rate limits, App Check, and bot management on search and list endpoints",
+          "Rate limits, client-header check, and bot management on search and list endpoints",
           "Pagination caps; no unbounded export in v1 public API",
           "robots/ToS; CDN caching without facilitating full dump APIs",
           "Differentiate human page views vs API enumeration patterns"

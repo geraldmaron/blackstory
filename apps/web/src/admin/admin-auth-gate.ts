@@ -12,7 +12,7 @@
  * refreshes the Supabase session cookies, which server components cannot do themselves.
  *
  * /admin/api/* is deliberately excluded: those routes authenticate with an Authorization bearer
- * token (see auth/request-auth.ts) rather than cookies, and already verify bb_role per
+ * token (see auth/request-auth.ts) rather than cookies, and already verify app_role per
  * request. Gating them here on a cookie would break non-browser callers.
  */
 import { createServerClient } from '@supabase/ssr';

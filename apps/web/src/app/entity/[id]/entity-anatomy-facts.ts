@@ -88,7 +88,7 @@ export function buildEntityAnatomyInputs(
   const claimCount = entity.claims.length;
   const grade = CONFIDENCE_GRADE[evidenceTier];
   const evidenceLabel =
-    claimCount === 0 ? grade : `${grade} · ${claimCount} source${claimCount === 1 ? '' : 's'}`;
+    claimCount === 0 ? grade : `${grade} · ${claimCount} claim${claimCount === 1 ? '' : 's'}`;
 
   return {
     kind: entity.kind,

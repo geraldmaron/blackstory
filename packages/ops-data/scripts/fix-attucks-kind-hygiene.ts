@@ -53,7 +53,7 @@ async function loadCatalogForLint(client: pg.Client) {
       e.entity_class,
       e.living_status,
       e.kind_detail -> 'classification' AS classification
-    FROM bb_canonical.entities e
+    FROM canonical.entities e
     ORDER BY e.id
   `);
   return rows;
@@ -68,7 +68,7 @@ async function main(): Promise<void> {
     console.log('=== Attucks kind hygiene + catalog validation ===');
 
     const attucksBefore = await client.query(
-      `SELECT kind, entity_class, kind_detail FROM bb_canonical.entities WHERE id = $1`,
+      `SELECT kind, entity_class, kind_detail FROM canonical.entities WHERE id = $1`,
       [ATTUCKS_ID],
     );
     console.log('Attucks before:', JSON.stringify(attucksBefore.rows[0] ?? null));
@@ -80,7 +80,7 @@ async function main(): Promise<void> {
       await client.query('BEGIN');
       try {
         await client.query(
-          `UPDATE bb_canonical.entities
+          `UPDATE canonical.entities
            SET
              kind = 'person',
              entity_class = 'person',
@@ -102,12 +102,12 @@ async function main(): Promise<void> {
         );
 
         const activeRelease = await client.query<{ release_id: string }>(
-          `SELECT release_id FROM bb_public.active_release LIMIT 1`,
+          `SELECT release_id FROM published.active_release LIMIT 1`,
         );
         const releaseId = activeRelease.rows[0]?.release_id;
         if (releaseId) {
           await client.query(
-            `UPDATE bb_public.release_entities
+            `UPDATE published.release_entities
              SET
                projection = jsonb_set(
                  jsonb_set(
@@ -130,7 +130,7 @@ async function main(): Promise<void> {
           );
 
           await client.query(
-            `UPDATE bb_public.search_index
+            `UPDATE published.search_index
              SET kind = 'person', status = 'deceased'
              WHERE release_id = $1 AND entity_id = $2`,
             [releaseId, ATTUCKS_ID],
@@ -149,7 +149,7 @@ async function main(): Promise<void> {
 
     const attucksAfter = await client.query(
       `SELECT kind, entity_class, living_status, kind_detail->'classification' AS classification
-       FROM bb_canonical.entities WHERE id = $1`,
+       FROM canonical.entities WHERE id = $1`,
       [ATTUCKS_ID],
     );
     console.log('Attucks after:', JSON.stringify(attucksAfter.rows[0] ?? null));

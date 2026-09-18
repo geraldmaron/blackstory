@@ -52,7 +52,7 @@ documents custodian, homepage, and rights posture only.
   **public or commercial** product surfaces without a completed rights review (or
   re-derivation from NARA scans under counsel).
 
-## 3. Staff inventory (`bb_reference.holc_areas`)
+## 3. Staff inventory (`reference.holc_areas`)
 
 Polygons already exist in Postgres for staff research workflows. RLS restricts SELECT to
 authenticated staff roles (`admin`, `research`, `publication`); anon has no access.
@@ -70,7 +70,7 @@ These counts describe **internal reference inventory**, not a published map prod
 use them for crosswalk QA, juxtaposition research, and packet authoring — they do not authorize
 public polygon rendering.
 
-Table shape: `bb_reference.holc_areas` — `id`, `payload` (city, state, grade, category, …),
+Table shape: `reference.holc_areas` — `id`, `payload` (city, state, grade, category, …),
 optional `geometry` / `location`, provenance columns (`source`, `source_url`, `retrieved_at`,
 `content_hash`).
 
@@ -128,7 +128,7 @@ review clears the target surface. Until then, list proposed metrics in `gap_stat
 | Rights reviewed for public surface | **Cite-only** — NC geometry stays staff-only |
 | `mapping-inequality-holc` registry | Remains `disabled`; verdict `noncommercial` |
 | HOLC observations on anon surfaces | **No** — fixtures use citation artifacts only |
-| Staff polygon inventory | Present in `bb_reference.holc_areas` (703 Chicago rows) |
+| Staff polygon inventory | Present in `reference.holc_areas` (703 Chicago rows) |
 | Public homepage link | Required in every HOLC artifact / citation footer |
 | Commercial / revenue-bearing reuse of DSL GeoJSON | Blocked pending separate rights review |
 

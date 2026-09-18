@@ -1,28 +1,8 @@
 /**
- * Content pins for "The presidents on the record".
- *
- * The series indexes PEOPLE, numbered by first presidency, not presidencies. Two people
- * have held non-consecutive presidencies: Cleveland (22nd and 24th) and Trump (45th and
- * 47th). Each gets one entry, at 22 and 45, and 24 and 47 stay vacant, because
- * `series.position` is the collection's ordering key and has to be unique
- * (gateSeriesPositions in ../../scripts/articles.ts, and articles_series_position_unique
- * on bb_reference.articles). Cleveland was authored that way from the start; Trump was
- * not, and the gap went live and stayed live for a year (repo-z8x8).
- *
- * These tests pin what that gap actually broke, not the shape of the fixture:
- *
- *   1. Two published sentences said Cleveland was the *only* president elected to
- *      non-consecutive terms and the *one* president counted twice. Both were true when
- *      written on 2026-08-07 and false from January 20, 2025, which is the trap a series
- *      that indexes people sets for itself: a superlative about the indexing is a fact
- *      about the world, and the world adds presidents.
- *   2. An entry covering two presidencies has to say so on its face, in both `eraLabel`
- *      and `series.positionLabel`. An entry labeled "45th president / 2017–2021" that
- *      carries 2025 call-outs is a record entry disagreeing with its own header.
- *
- * The tests derive the two-presidency set from `eraLabel` rather than hard-coding
- * Cleveland and Trump, so a third non-consecutive presidency added later is held to the
- * same rules instead of slipping past a name check.
+ * The series indexes people by first presidency, not individual terms. Non-consecutive
+ * presidencies share one unique position; era and position labels must disclose both terms.
+ * Tests reject outdated exclusivity claims and derive the multi-term set from the fixture
+ * labels.
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';

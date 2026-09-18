@@ -71,7 +71,7 @@ guidance* and [`../security/cost-resource-controls.md`](../security/cost-resourc
    work unless an operator explicitly overrides.
 4. **Hard stop** — when `disable_source_fetch` is active, halt all SPN until the next UTC budget
    window.
-5. **Re-measure** — after captures are persisted to `bb_evidence.source_captures` and citation
+5. **Re-measure** — after captures are persisted to `evidence.source_captures` and citation
    pointers updated, re-run measurement before marketing a queryable API surface.
 
 Each SPN job typically consumes **multiple** `source_fetch` units (submit + status polls). The

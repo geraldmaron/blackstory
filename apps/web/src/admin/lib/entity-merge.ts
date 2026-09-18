@@ -21,7 +21,7 @@
  * zero (namespace, value) pairs are held by more than one entity, and the database refuses to
  * create one.
  *
- * What this deliberately does not touch: `bb_public.release_entities` and `bb_public.search_index`
+ * What this deliberately does not touch: `published.release_entities` and `published.search_index`
  * are published release surfaces. A merge is a canonical decision; the next release build reads
  * canonical, and the signed manifest is still the only thing that changes what is live.
  */
@@ -77,14 +77,14 @@ export async function readMergeCandidates(
   }>(
     `SELECT
        e.id, e.display_name, e.kind, e.entity_class, e.merge_state, e.updated_at,
-       (SELECT count(*) FROM bb_canonical.claims c WHERE c.entity_id = e.id) AS claim_count,
-       (SELECT count(*) FROM bb_canonical.entity_relationships r
+       (SELECT count(*) FROM canonical.claims c WHERE c.entity_id = e.id) AS claim_count,
+       (SELECT count(*) FROM canonical.entity_relationships r
          WHERE r.from_entity_id = e.id OR r.to_entity_id = e.id) AS relationship_count,
-       (SELECT count(*) FROM bb_canonical.entity_identifiers i WHERE i.entity_id = e.id)
+       (SELECT count(*) FROM canonical.entity_identifiers i WHERE i.entity_id = e.id)
          AS identifier_count,
-       (SELECT count(*) FROM bb_canonical.entity_locations l WHERE l.entity_id = e.id)
+       (SELECT count(*) FROM canonical.entity_locations l WHERE l.entity_id = e.id)
          AS location_count
-     FROM bb_canonical.entities e
+     FROM canonical.entities e
      WHERE e.id = ANY($1::text[])
      ORDER BY claim_count DESC, relationship_count DESC, e.id ASC`,
     [ids],
@@ -139,13 +139,13 @@ async function moveRelationships(
       CASE WHEN from_entity_id = ANY($2::text[]) THEN $1 ELSE from_entity_id END AS new_from,
       CASE WHEN to_entity_id   = ANY($2::text[]) THEN $1 ELSE to_entity_id   END AS new_to,
       from_entity_id AS old_from, to_entity_id AS old_to
-    FROM bb_canonical.entity_relationships
+    FROM canonical.entity_relationships
     WHERE from_entity_id = ANY($2::text[]) OR to_entity_id = ANY($2::text[])`;
 
   const moved = await client.query<{ id: string; old_from: string; old_to: string }>(
     `WITH candidate AS (${candidate}),
      movable AS (SELECT * FROM candidate WHERE new_from <> new_to)
-     UPDATE bb_canonical.entity_relationships r
+     UPDATE canonical.entity_relationships r
      SET from_entity_id = m.new_from, to_entity_id = m.new_to, updated_at = now()
      FROM movable m
      WHERE r.id = m.id
@@ -185,14 +185,14 @@ async function moveEventParticipation(
       CASE WHEN event_id       = ANY($2::text[]) THEN $1 ELSE event_id       END AS new_event,
       CASE WHEN participant_id = ANY($2::text[]) THEN $1 ELSE participant_id END AS new_participant,
       event_id AS old_event, participant_id AS old_participant
-    FROM bb_canonical.event_participation
+    FROM canonical.event_participation
     WHERE event_id = ANY($2::text[]) OR participant_id = ANY($2::text[])`;
   const movable = `
     SELECT DISTINCT ON (c.new_event, c.new_participant, c.role) c.*
     FROM candidate c
     WHERE c.new_event <> c.new_participant
       AND NOT EXISTS (
-        SELECT 1 FROM bb_canonical.event_participation e
+        SELECT 1 FROM canonical.event_participation e
         WHERE e.event_id = c.new_event
           AND e.participant_id = c.new_participant
           AND e.role = c.role
@@ -202,7 +202,7 @@ async function moveEventParticipation(
 
   const moved = await client.query<{ id: string; old_event: string; old_participant: string }>(
     `WITH candidate AS (${candidate}), movable AS (${movable})
-     UPDATE bb_canonical.event_participation p
+     UPDATE canonical.event_participation p
      SET event_id = m.new_event, participant_id = m.new_participant, updated_at = now()
      FROM movable m
      WHERE p.id = m.id
@@ -240,13 +240,13 @@ async function moveSingletonRow(
   absorbedIds: readonly string[],
 ): Promise<MergeTableOutcome> {
   const survivorHasRow = await client.query(
-    `SELECT 1 FROM bb_canonical.${table} WHERE entity_id = $1`,
+    `SELECT 1 FROM canonical.${table} WHERE entity_id = $1`,
     [survivorId],
   );
 
   if ((survivorHasRow.rowCount ?? 0) > 0) {
     const stuck = await client.query<{ entity_id: string }>(
-      `SELECT entity_id FROM bb_canonical.${table} WHERE entity_id = ANY($1::text[])`,
+      `SELECT entity_id FROM canonical.${table} WHERE entity_id = ANY($1::text[])`,
       [absorbedIds],
     );
     return outcome(
@@ -261,10 +261,10 @@ async function moveSingletonRow(
   // No survivor row: the first absorbed record's row moves, the rest stay (one row per entity).
   const moved = await client.query<{ entity_id: string }>(
     `WITH chosen AS (
-       SELECT entity_id FROM bb_canonical.${table}
+       SELECT entity_id FROM canonical.${table}
        WHERE entity_id = ANY($2::text[]) ORDER BY entity_id LIMIT 1
      )
-     UPDATE bb_canonical.${table} t
+     UPDATE canonical.${table} t
      SET entity_id = $1
      FROM chosen c
      WHERE t.entity_id = c.entity_id
@@ -272,7 +272,7 @@ async function moveSingletonRow(
     [survivorId, absorbedIds],
   );
   const stuck = await client.query<{ entity_id: string }>(
-    `SELECT entity_id FROM bb_canonical.${table} WHERE entity_id = ANY($1::text[])`,
+    `SELECT entity_id FROM canonical.${table} WHERE entity_id = ANY($1::text[])`,
     [absorbedIds],
   );
   return outcome(
@@ -305,7 +305,7 @@ export async function applyEntityMerge(
   const { survivorId, absorbedIds, mergeId } = input;
 
   const survivor = await client.query<{ merge_state: unknown }>(
-    `SELECT merge_state FROM bb_canonical.entities WHERE id = $1 FOR UPDATE`,
+    `SELECT merge_state FROM canonical.entities WHERE id = $1 FOR UPDATE`,
     [survivorId],
   );
   if (survivor.rowCount === 0) {
@@ -319,7 +319,7 @@ export async function applyEntityMerge(
   }
 
   const absorbed = await client.query<{ id: string; merge_state: unknown }>(
-    `SELECT id, merge_state FROM bb_canonical.entities WHERE id = ANY($1::text[]) FOR UPDATE`,
+    `SELECT id, merge_state FROM canonical.entities WHERE id = ANY($1::text[]) FOR UPDATE`,
     [absorbedIds],
   );
   if (absorbed.rowCount !== absorbedIds.length) {
@@ -334,12 +334,12 @@ export async function applyEntityMerge(
   }
 
   await client.query(
-    `INSERT INTO bb_canonical.entity_merges (id, survivor_id, status, reason, actor_id)
+    `INSERT INTO canonical.entity_merges (id, survivor_id, status, reason, actor_id)
      VALUES ($1, $2, 'active', $3, $4)`,
     [mergeId, survivorId, input.reason, input.actorId],
   );
   await client.query(
-    `INSERT INTO bb_canonical.entity_merge_absorbed (merge_id, absorbed_id)
+    `INSERT INTO canonical.entity_merge_absorbed (merge_id, absorbed_id)
      SELECT $1, unnest($2::text[])`,
     [mergeId, absorbedIds],
   );
@@ -364,7 +364,7 @@ export async function applyEntityMerge(
     'entity_identifiers',
   ] as const) {
     const before = await client.query<{ id: string; entity_id: string }>(
-      `SELECT id, entity_id FROM bb_canonical.${table} WHERE entity_id = ANY($1::text[])`,
+      `SELECT id, entity_id FROM canonical.${table} WHERE entity_id = ANY($1::text[])`,
       [absorbedIds],
     );
     if (before.rowCount === 0) {
@@ -373,7 +373,7 @@ export async function applyEntityMerge(
     }
     const hasUpdatedAt = table === 'claims' || table === 'entity_locations';
     await client.query(
-      `UPDATE bb_canonical.${table}
+      `UPDATE canonical.${table}
        SET entity_id = $1${hasUpdatedAt ? ', updated_at = now()' : ''}
        WHERE entity_id = ANY($2::text[])`,
       [survivorId, absorbedIds],
@@ -386,7 +386,7 @@ export async function applyEntityMerge(
 
   for (const absorbedId of absorbedIds) {
     await client.query(
-      `UPDATE bb_canonical.entities
+      `UPDATE canonical.entities
        SET merge_state = $2::jsonb, updated_at = now()
        WHERE id = $1`,
       [
@@ -401,7 +401,7 @@ export async function applyEntityMerge(
       ],
     );
   }
-  await client.query(`UPDATE bb_canonical.entities SET updated_at = now() WHERE id = $1`, [
+  await client.query(`UPDATE canonical.entities SET updated_at = now() WHERE id = $1`, [
     survivorId,
   ]);
 
@@ -440,7 +440,7 @@ export async function reverseEntityMerge(
         const firstKey = table === 'entity_relationships' ? 'from' : 'event';
         const secondKey = table === 'entity_relationships' ? 'to' : 'participant';
         const result = await client.query(
-          `UPDATE bb_canonical.${table}
+          `UPDATE canonical.${table}
            SET ${first} = $2, ${second} = $3, updated_at = now()
            WHERE id = $1`,
           [row.id, row.from[firstKey], row.from[secondKey]],
@@ -451,7 +451,7 @@ export async function reverseEntityMerge(
 
       if (table === 'entity_embeddings' || table === 'entity_reconciliation_status') {
         const result = await client.query(
-          `UPDATE bb_canonical.${table} SET entity_id = $2 WHERE entity_id = $1`,
+          `UPDATE canonical.${table} SET entity_id = $2 WHERE entity_id = $1`,
           [record.survivorId, row.from.entity],
         );
         restored += result.rowCount ?? 0;
@@ -462,7 +462,7 @@ export async function reverseEntityMerge(
       const touch =
         table === 'claims' || table === 'entity_locations' ? ', updated_at = now()' : '';
       const result = await client.query(
-        `UPDATE bb_canonical.${table} SET entity_id = $2${touch} WHERE id = $1`,
+        `UPDATE canonical.${table} SET entity_id = $2${touch} WHERE id = $1`,
         [row.id, row.from.entity],
       );
       restored += result.rowCount ?? 0;
@@ -471,18 +471,18 @@ export async function reverseEntityMerge(
 
   for (const absorbedId of record.absorbedIds) {
     await client.query(
-      `UPDATE bb_canonical.entities SET merge_state = '{}'::jsonb, updated_at = now()
+      `UPDATE canonical.entities SET merge_state = '{}'::jsonb, updated_at = now()
        WHERE id = $1`,
       [absorbedId],
     );
   }
   await client.query(
-    `UPDATE bb_canonical.entity_merges
+    `UPDATE canonical.entity_merges
      SET status = 'reversed', reversed_at = now(), reverse_reason = $2, updated_at = now()
      WHERE id = $1 AND status = 'active'`,
     [record.mergeId, reverseReason],
   );
-  await client.query(`UPDATE bb_canonical.entities SET updated_at = now() WHERE id = $1`, [
+  await client.query(`UPDATE canonical.entities SET updated_at = now() WHERE id = $1`, [
     record.survivorId,
   ]);
 
@@ -494,7 +494,7 @@ export async function readMergeReversalRecord(
   mergeId: string,
 ): Promise<MergeReversalRecord | null> {
   const rows = await queryPostgres<{ data: unknown }>(
-    `SELECT data FROM bb_audit.events
+    `SELECT data FROM audit.events
      WHERE data->>'verb' = 'entity.merge' AND data->'reversal'->>'mergeId' = $1
      ORDER BY occurred_at DESC
      LIMIT 1`,
@@ -533,12 +533,12 @@ export async function readActiveMergesFor(survivorId: string): Promise<readonly 
             coalesce(array_agg(DISTINCT a.absorbed_id)
                      FILTER (WHERE a.absorbed_id IS NOT NULL), '{}') AS absorbed_ids,
             (SELECT e.data->'reversal'
-             FROM bb_audit.events e
+             FROM audit.events e
              WHERE e.data->'reversal'->>'mergeId' = m.id
              ORDER BY e.occurred_at DESC
              LIMIT 1) AS reversal
-     FROM bb_canonical.entity_merges m
-     LEFT JOIN bb_canonical.entity_merge_absorbed a ON a.merge_id = m.id
+     FROM canonical.entity_merges m
+     LEFT JOIN canonical.entity_merge_absorbed a ON a.merge_id = m.id
      WHERE m.survivor_id = $1 AND m.status = 'active'
      GROUP BY m.id, m.reason, m.created_at
      ORDER BY m.created_at DESC`,

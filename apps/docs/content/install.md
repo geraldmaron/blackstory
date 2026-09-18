@@ -16,7 +16,7 @@ cloud credentials. If you want the product story first, start with
 - Node.js 22+ (`nvm use` from `.nvmrc`)
 - [pnpm](https://pnpm.io/) 9.x
 - [uv](https://docs.astral.sh/uv/) (Python 3.12+)
-- Docker optional for the parked local PostGIS under `infra/database/` (leftover; product SoR is Supabase)
+- Docker for isolated local Supabase database and migration checks
 
 ## Bootstrap
 
@@ -29,7 +29,7 @@ pnpm bootstrap
 ```
 
 Copy [`.env.example`](https://github.com/geraldmaron/blackstory/blob/main/.env.example)
-for local emulator-oriented placeholders. Do not put production secrets in the
+for documented local configuration. Do not put production secrets in the
 working tree.
 
 ## Validate
@@ -54,16 +54,9 @@ pnpm dev:web
 # http://localhost:3048/explore
 ```
 
-The preferred launcher keeps `PUBLIC_DATA_SOURCE` and `DATABASE_URL` coherent.
-Without a Postgres URL you get the small Dunbar seed catalog. With Postgres
-configured you see the live released catalog.
-
-## Leftover Firebase emulators (optional, not product SoR)
-
-```bash
-pnpm firebase:emulators
-pnpm firebase:test:rules
-```
+Live catalog pages require Postgres and a released catalog. Configure `PUBLIC_DATA_SOURCE=postgres`
+and a local `DATABASE_URL`; they do not silently fall back to sample records. Editorial pages
+such as `/about` and `/methodology` can render without a database.
 
 ## This docs site
 

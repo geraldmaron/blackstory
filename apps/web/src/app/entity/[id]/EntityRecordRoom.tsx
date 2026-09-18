@@ -85,18 +85,9 @@ import '../../record-page.css';
 import './record-room.css';
 
 /**
- * Incrementally regenerated, not force-dynamic.
- *
- * `force-dynamic` here dated from the era when the catalog was an expensive per-request
- * Postgres pull. Its cost was measured on 2026-08-09: every response carried Next's dynamic
- * `cache-control: private, no-cache, no-store`, which overrides the `s-maxage=3600` rule this
- * route already declares in `next.config.mjs`, so `x-vercel-cache` was MISS on 100% of entity
- * requests and every reader hit a function.
- *
- * `revalidate` keeps the original guarantee intact (nothing renders at build, so a build
- * without `DATABASE_URL` can never bake the Dunbar seed into a page) while letting a rendered
- * page be reused. 3600s matches the Cache-Control this route already advertises; visible
- * staleness for an in-place correction is bounded by that plus the 30m catalog TTL.
+ * Caches rendered records with hourly revalidation. In-place corrections can remain stale
+ * through both this page cache and the release-catalog cache; publication must account for both
+ * windows.
  */
 
 function entityLinkCatalogFromNeighbors(
@@ -283,7 +274,9 @@ export async function EntityRecordRoom({ entity }: { readonly entity: PublicEnti
   const decadeCount = entity.eraBuckets?.length ?? 0;
   const evidenceHref = entityEvidenceHref(`/entity/${entity.id}`);
   const correctionsHref = `/corrections?target=${encodeURIComponent(entity.id)}`;
-  const locationPrecisionLabel = `${humanizeToken(entity.locationPrecision)} precision`;
+  const locationPrecisionLabel = geoAnchor
+    ? `${humanizeToken(entity.locationPrecision)} precision`
+    : 'No public map location';
 
   /*
    * The rail: where the record is, what is on the page, and the record's own file. The

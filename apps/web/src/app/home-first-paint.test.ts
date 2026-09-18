@@ -235,7 +235,7 @@ test('first paint is the record, not a manifesto or a schema card', () => {
   delete (greenwoodShaped as { primaryImage?: unknown }).primaryImage;
   assert.equal(
     buildEntityAnatomyInputs(greenwoodShaped, undefined).evidenceLabel,
-    'Grade A · 2 sources',
+    'Grade A · 2 claims',
   );
   const html = renderToStaticMarkup(
     createElement(HomeFirstPaint, {

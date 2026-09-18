@@ -140,7 +140,7 @@ export const urbanRenewalPilotPackets = [
         citation:
           'Renewing Inequality ur_projects.geojson — gated pending NC-SA rights review for commercial polygon surfaces.',
         uncertaintyLabel:
-          'Project-level ur-* metric observations not yet ingested to bb_reference; polygons cite-only.',
+          'Project-level ur-* metric observations not yet ingested to reference; polygons cite-only.',
       },
     ],
     gap_states: ['insufficient_evidence'],

@@ -6,29 +6,19 @@ This repository is the TypeScript and Python monorepo behind the public site, ad
 
 **Product name:** BlackStory. Package scope stays brand-agnostic: `@repo/*` packages, `ds-*` design tokens, and `APP_*` break-glass env vars. Do not rename those prefixes for a product rebrand.
 
-**GitHub About field** still says "Black Book — historical place-connected public research platform" (checked 2026-08-28). A repo admin needs to update that description. This file is the current story.
+## Architecture and research
 
-## Current stack (verified 2026-08-28)
+The supported stack is Vercel for the web app, Cloudflare at the edge, and Supabase Postgres,
+Auth, and Storage for data, identity, and media. Firebase and Firestore runtime paths are removed.
+The repository does not establish the state of old remote accounts or current billing.
 
-Checked against live https://blackstory.app/ headers and CSP, not against a bill.
+Start with [architecture](./docs/architecture.md), the [engineering contract](./docs/decisions-carryover.md),
+and the [research framework](./docs/research/README.md). These are current, challengeable contracts.
+Git and Beads retain investigation history. No ADR or PRD overrides observed behavior without review.
 
-| Layer | Current | Leftover (not SoR) |
-|-------|---------|--------------------|
-| Public web | **Vercel** (`x-vercel-id`, `x-vercel-cache`, `va.vercel-scripts.com`). Cloudflare in front (`server: cloudflare`). | Firebase App Hosting, Cloud Run for `apps/web` |
-| Data / media | **Supabase** project `blackstory-app`, host `https://twykhihqkcldpreuovay.supabase.co`. Postgres `bb_public.*` is the product system of record. Public media is Supabase Storage. | Firestore, Firebase Storage as SoR, parked PostGIS under `infra/database/` |
-| Media CSP | Live `img-src` allows the Supabase host **and** `https://storage.googleapis.com` | GCS dual-serve / rollback objects |
-
-**Live** https://blackstory.app/ (verified 2026-08-28) is still the old catalog filter board (Kind / Tone / Era / Theme / Status / Confidence / Where), about 4,100 released records. That is production today. It does not yet look like the first-run sat below.
-
-**Intended first-run**, sat 2026-08-28 on isolated branch `cursor/first-paint-local-119c` at localhost:3048 (commit `0dfc8f5a`): Greenwood first; header rooms are Explore and Rooms only; no Journey room; no Grade A; no "2 sources"; `/?atlas=1` 308s home. That chrome is not live until that isolated work lands. Do not invent a Journey page here. Do not restyle first paint on this branch.
-
-`/journey` is not a live room. Verified 2026-08-28: `https://blackstory.app/journey` and `https://www.blackstory.app/journey` return HTTP 404 (`x-matched-path: /404`). Do not list Journey as a room. `/about` "Where to begin" already omits unfinished rooms. There is no public Journey source beyond that 404.
-
-`/records/42Cb1758` is not a published record. Verified 2026-08-28: `https://blackstory.app/records/42Cb1758` returns HTTP 404 (`x-matched-path: /404`). Public record pages live at `/entity/<id>`. Live production can still show that id as a list title. Intended first-run does not. Do not invent the page.
-
-This repo's config names **one** Supabase project: `blackstory-app`. Other Dagher-org Supabase Pro projects are not referenced here, so this audit does not call them unused. Aligning docs on Vercel + Supabase does not close overages or standing bills. Cover-package work belongs on administration-app, not this repo.
-
-Historical ADRs and wind-down notes stay in the tree. If they still read as current hosting or SoR, treat them as leftover unless they match this table.
+The research kernel supports domain profiles, a durable task ledger, evidence-attached proposals,
+private passage retrieval, and rights-aware preservation. [Operations](./docs/research/research-operations.md)
+explains headless commands and their verification limits. Scheduling remains available but uninstalled.
 
 ## What we build
 
@@ -53,11 +43,11 @@ Public clients read released projections only. Anonymous clients never write can
 | `workers/*` | Python research, publication, and security workers |
 | `packages/*` | Shared TypeScript libraries |
 | `supabase/` | Postgres migrations and Supabase project config for `blackstory-app` |
-| `infra/*` | Leftover Firebase/GCP scaffolding, GitHub, and parked PostGIS. Not current SoR. |
-| `docs/` | Architecture, historical ADRs, security, testing, and runbooks |
+| `infra/*` | GitHub governance and optional service-control configuration |
+| `docs/` | Current architecture, research, security, testing, and runbooks |
 | `brand/` | Brand masters (lockups, symbols, tokens, guide) |
 
-Architecture overview: [`docs/architecture.md`](./docs/architecture.md). Decisions: formal ADRs removed 2026-07-24, still-binding invariants carried to [`docs/decisions-carryover.md`](./docs/decisions-carryover.md). Brand contract: [`docs/ui/brand.md`](./docs/ui/brand.md). Docs index: [`docs/README.md`](./docs/README.md).
+Brand contract: [`docs/ui/brand.md`](./docs/ui/brand.md). Docs index: [`docs/README.md`](./docs/README.md).
 
 **Docs site:** [geraldmaron.github.io/blackstory](https://geraldmaron.github.io/blackstory/), built from `apps/docs` and published into the repo `docs/` folder on `main`.
 
@@ -73,7 +63,7 @@ GitHub Pages: Deploy from branch `main`, folder `/docs`. That folder also holds 
 - Node.js 22+ (`nvm use` from `.nvmrc`)
 - [pnpm](https://pnpm.io/) 9.x
 - [uv](https://docs.astral.sh/uv/) (Python 3.12+)
-- Docker optional for the parked local PostGIS under `infra/database/` (product system of record is Supabase; see [`docs/decisions-carryover.md`](./docs/decisions-carryover.md), "Firestore as system of record, reversed")
+- Docker optional for an isolated local Supabase rehearsal (`supabase start`).
 
 ## Getting started
 
@@ -83,14 +73,14 @@ GitHub Pages: Deploy from branch `main`, folder `/docs`. That folder also holds 
 # or
 pnpm bootstrap
 
-# Copy local env placeholders (emulator-oriented; no production secrets required)
+# Copy local env placeholders (no production secrets required)
 cp -f .env.example .env.local
 
 # Public web (preferred launcher sets data-source env coherently)
 pnpm dev:web
 # http://localhost:3048/
 # http://localhost:3048/explore   # live catalog (Explore) needs postgres + DATABASE_URL
-# Without those env vars you get the small Dunbar seed catalog
+# Catalog pages require Postgres; editorial pages can render without it.
 
 # Mobile — prod-like local QA (embedded bundle, no Metro; **agent default**)
 pnpm mobile:ios:release      # build/install/launch Release on booted Simulator
@@ -117,13 +107,6 @@ pnpm test:py
 pnpm build
 pnpm build && pnpm typecheck   # typecheck needs built package declarations
 
-# Leftover local Firebase emulators (not product SoR; optional)
-pnpm firebase:emulators
-pnpm firebase:test:rules
-
-# Parked local PostGIS (leftover; not product SoR)
-pnpm db:up && pnpm db:init && pnpm db:verify
-pnpm db:down
 ```
 
 Independent deployable builds:
@@ -143,15 +126,15 @@ Shared TypeScript and ESLint policy lives in `packages/typescript-config` and `p
 
 Product system of record is Supabase Postgres on `blackstory-app` (`https://twykhihqkcldpreuovay.supabase.co`). Schema and migrations: [`docs/data/postgres-schema.md`](./docs/data/postgres-schema.md), [`supabase/migrations/`](./supabase/migrations/). Decision: ADR-020 (removed 2026-07-24, see [`docs/decisions-carryover.md`](./docs/decisions-carryover.md)).
 
-Hosted public web reads `PUBLIC_DATA_SOURCE=postgres` with server-only `DATABASE_URL` on Vercel. The admin console at `/admin` uses `ADMIN_DATA_SOURCE=postgres` with a separate `ADMIN_DATABASE_URL` credential in the same Vercel project — a distinct env var, not a distinct deployment. Public media is Supabase Storage (`public-media`). Live CSP still allows leftover GCS (`storage.googleapis.com`) for dual-serve objects.
+Hosted public web reads `PUBLIC_DATA_SOURCE=postgres` with server-only `DATABASE_URL` on Vercel. The admin console at `/admin` uses `ADMIN_DATA_SOURCE=postgres` with a separate `ADMIN_DATABASE_URL` credential in the same Vercel project — a distinct env var, not a distinct deployment. Public media is Supabase Storage (`public-media`). Storage writers target Supabase; external image sources must satisfy the media policy.
 
-Firestore, Firebase App Hosting, and parked PostGIS are leftover. Historical ETL and wind-down notes: [`packages/migrate-firestore-postgres`](./packages/migrate-firestore-postgres/), [`docs/data/supabase-storage-cutover.md`](./docs/data/supabase-storage-cutover.md), [`docs/data/firebase-wind-down.md`](./docs/data/firebase-wind-down.md). Do not treat those files as the current SoR.
+Firebase, Firestore, and the parked database stack are removed. The [storage contract](./docs/data/supabase-storage-cutover.md) defines the current media and capture boundary.
 
-Context indicators (justice, wealth, housing) live in `bb_reference.statistical_*`. Catalog: [`docs/research/context-data-source-matrix.md`](./docs/research/context-data-source-matrix.md). Juxtaposition rules: [`docs/methodology/juxtaposition-not-causation.md`](./docs/methodology/juxtaposition-not-causation.md).
+Context indicators (justice, wealth, housing) live in `reference.statistical_*`. Catalog: [`docs/research/context-data-source-matrix.md`](./docs/research/context-data-source-matrix.md). Juxtaposition rules: [`docs/methodology/juxtaposition-not-causation.md`](./docs/methodology/juxtaposition-not-causation.md).
 
 Audit and outbox helpers commit state, immutable audit, and pending delivery together, with idempotency, bounded retry, and publication-history reconstruction.
 
-Leftover Firebase/GCP scaffolding: `infra/firebase/`, `@repo/firebase` (App Check helpers only), `infra/gcp/`, [`docs/security/environment-isolation.md`](./docs/security/environment-isolation.md).
+Provider retirement does not imply remote account deletion. See the [retirement boundary](./docs/data/firebase-wind-down.md).
 
 ## Product constitution
 
@@ -176,7 +159,7 @@ Policy is read-only in both packages. Changes ship as a new `policyVersion`, not
 
 ## Operator tooling (local)
 
-Discovery, enrichment, locate, and story-research CLIs live under `packages/operator-cli`. Some leftover utilities remain under `packages/firebase/scripts`. Runbooks: [`docs/runbooks/`](./docs/runbooks/), discovery pipeline: [`docs/research/discovery-pipeline.md`](./docs/research/discovery-pipeline.md). Prefer the documented launchers so env vars stay coherent with the data plane.
+Discovery, enrichment, locate, and story-research CLIs live under `packages/operator-cli`. Operator data utilities live in `packages/ops-data/scripts`. Runbooks: [`docs/runbooks/`](./docs/runbooks/), discovery pipeline: [`docs/research/discovery-pipeline.md`](./docs/research/discovery-pipeline.md). Prefer the documented launchers so env vars stay coherent with the data plane.
 
 ## Invariants
 

@@ -13,7 +13,7 @@ Do not place secrets, sensitive personal data, raw malicious payloads, or access
 ## Control map
 
 - Runtime switches: `packages/config/src/kill-switches.ts`
-- Human GCP/Firebase steps: `infra/gcp/kill-switches/README.md`
+- Optional provider controls: `infra/gcp/kill-switches/README.md`
 - Release rollback:  immutable release pointer and paired search-index version
 - Canonical recovery: [`backup-restore.md`](./backup-restore.md) only when release rollback is insufficient
 - Audit trail:  audit/outbox
@@ -51,7 +51,7 @@ Engage switches in this order unless evidence requires faster isolation: researc
    **Pass:** prior signed release becomes active immediately; no rebuild or canonical mutation occurs.
 4. **00:30 — `api-internal` credential suspected stolen.** Operator removes only that identity/binding and preserves public/web identities.
    **Pass:** internal publication access fails; unrelated public snapshot access remains healthy.
-5. **00:40 — Poisoned tasks are dispatching.** Operator pauses the affected Cloud Tasks queue without purge, records depth/oldest age, and enqueues a synthetic task.
+5. **00:40 — Poisoned tasks are dispatching.** Operator pauses the affected configured task queue without purge, records depth/oldest age, and enqueues a synthetic task.
    **Pass:** dispatch stops, existing and newly accepted tasks remain, and canary resume processes each once.
 6. **00:55 — Recovery.** Team verifies manifest hashes, audit events, alarms, and switch propagation; restores one dependency at a time.
    **Pass:** no switch re-enable occurs without owner approval and observable canary results.

@@ -1014,12 +1014,8 @@ export function buildExploreMapStyle(input: BuildExploreMapStyleInput): StyleSpe
         },
       },
       {
-        // County hairlines (the related workstream): the fainter tier of the same boundary system as
-        // the state bounds line below it in this array — theme-aware ink (stone on light, paper on
-        // dark), thinner and more transparent, fading in from `minzoom` so the national frame stays
-        // clean. Sits BELOW state bounds (so state borders keep reading stronger) and far below the
-        // entity marker stack, whose zoom-scaled radius (marker-size.ts's `markerZoomScaleExpression`)
-        // keeps a circle proportionate to the county polygon behind it at every zoom.
+        // County boundaries use thinner, more transparent theme-aware ink beneath state borders
+        // and entity markers. Their zoom range preserves a clear national frame.
         id: EXPLORE_COUNTY_LINES_LAYER_ID,
         type: 'line',
         source: EXPLORE_COUNTY_LINES_SOURCE_ID,

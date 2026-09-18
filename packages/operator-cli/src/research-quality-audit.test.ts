@@ -78,12 +78,12 @@ test('a patent host is a patent specification', () => {
   );
 });
 
-test('an unrecognized host lands in the middle, not at the bottom', () => {
+test('an unrecognized host requires document review', () => {
   // Calling a state historical society a lead would understate real evidence more often than
   // calling an unknown blog a secondary source overstates it.
   assert.equal(
     sourceClassForCitation('https://www.okhistory.org/publications/enc/entry', undefined),
-    'modern_reputable_secondary',
+    'search_result_lead',
   );
   // But nothing at all is a lead, because it is.
   assert.equal(sourceClassForCitation(undefined, undefined), 'search_result_lead');
@@ -222,8 +222,7 @@ test('the audit never returns a commit or write affordance', () => {
   assert.equal('committed' in report, false);
 });
 
-// -------------------------------------------------------- repo-93p35.16
-
+// --------------------------------------------------------
 test('an invention record requires a technical receipt', () => {
   const snapshot = snapshotForReleasedEntity(
     entity({
@@ -351,4 +350,18 @@ test('a deficit cohort with no --limit returns every matching entity', () => {
   ];
   const cohort = selectDeficitCohort(rows, 'bridge_only_entity' as never);
   assert.equal(cohort.length, 2);
+});
+
+test('host names do not establish scholarly review, manuscript status or technical scope', () => {
+  for (const url of [
+    'https://doi.org/10.1/example',
+    'https://archive.org/details/example',
+    'https://wikipedia.example.com/x',
+    'https://jstor.example.com/x',
+  ])
+    assert.equal(sourceClassForCitation(url, undefined), 'search_result_lead');
+  assert.equal(
+    sourceClassForCitation('https://www.uspto.gov/about-us', undefined),
+    'institutional_biography',
+  );
 });

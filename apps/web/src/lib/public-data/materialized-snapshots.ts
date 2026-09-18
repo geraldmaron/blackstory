@@ -1,15 +1,7 @@
 /**
- * Cross-request cache for `bb_public.materialized_snapshots` point reads, keyed by snapshot
- * name. One raw reader (`fetchMaterializedSnapshot` in postgres-readers.ts) backs several
- * unrelated release-wide snapshots — banned books (`/books`), demographics (`/data`, the
- * homepage data pulse) — each requested by name from a different call site with no
- * cross-request cache of its own: 172,919 calls between 2026-07-20 and 2026-09-12, one per
- * dynamic request.
- *
- * Mirrors the release-scoped pattern already used for the entity catalog / search index in
- * `./source.ts`, keyed additionally on `name` since one release-scoped cache instance cannot
- * distinguish the different snapshots sharing that single table — a separate cache instance
- * is created per name on first use.
+ * Caches materialized snapshots by release and snapshot name across requests. Each name gets
+ * its own cache instance; an entity catalog and a demographic snapshot must not share a cached
+ * value.
  */
 import { cache } from 'react';
 import { fetchMaterializedSnapshot as fetchReleaseMaterializedSnapshot } from './public-readers';

@@ -1,6 +1,6 @@
 # Research operations: verb reference
 
-Canonical, tool-agnostic how-to for every research/operator-cli verb. This is the one place
+Command reference for the [research framework](./README.md), usable by any model or operator. This is the one place
 the actual command shapes, invocation rules, and guardrails live.
 
 Agent skills live under `.claude/skills/blackstory/`:
@@ -23,9 +23,10 @@ node --conditions development --import tsx packages/operator-cli/src/bin.ts <ver
 
 ## Conventions that apply to every verb
 
-- **Safe by default.** Every command only *prepares* an outcome and prints it as JSON; nothing
-  writes until `--commit` is passed. There is no `--publish`/`--approve`/`--promote` flag
-  anywhere in this CLI (see `promotion-boundary.test.ts`).
+- **Effects are verb-specific.** Intake and capture commands require `--commit` for database
+  writes. Acquisition can fetch sources and `--enrich` calls a model. Live discovery dispatch
+  records a run and private proposals. Read the verb before execution; stdout and `--output`
+  also persist data when redirected. No research command publishes or approves.
 - **`--json` is accepted on every verb.** Output is JSON unconditionally (the flag is a no-op
   that makes the contract explicit and machine-discoverable); `model-report` additionally uses
   it to switch from its human-readable summary to raw rows.
@@ -35,13 +36,10 @@ node --conditions development --import tsx packages/operator-cli/src/bin.ts <ver
   `harness-run`) take a JSON file (`--batch`/`--subjects`/`--topics`) because their unit of
   work is a set, not a single id — that's a real shape difference, not an inconsistency to
   paper over.
-- **No personal host/IP.** The variable code actually reads for search is `SEARXNG_BASE_URL`,
-  a full base URL rather than a host. `.env.corsair.example` also defines
-  `RESEARCH_SEARXNG_HOST`, but no code reads it: it is a bare host that
-  `scripts/run-scheduled-searxng-discovery.sh` uses to build `SEARXNG_BASE_URL` when localhost
-  isn't listening. The local-LLM pair works the same way: `RESEARCH_LOCAL_LLM_HOST` is a script
-  input, `OLLAMA_BASE_URL` is what the code reads. Set the base URL, not the alias, and
-  do not hardcode an operator's Tailscale IP or hostname in any command, doc, or example below.
+- **Explicit endpoints.** Set `SEARXNG_BASE_URL` for an operator-controlled search service,
+  or configure Brave through the search router. Set `OLLAMA_BASE_URL` only when intentionally
+  using a local provider. There are no personal-host aliases or Corsair fallback. No research
+  schedule is enabled by invoking these commands.
 - **Reaching a search provider.** Two things are true at once and the split between them is the
   whole design. The operator's SearXNG is *private on purpose* — loopback, or a Tailscale
   `100.64.0.0/10` address — so `executeSafeFetch` refuses it, correctly: every other caller of
@@ -72,18 +70,163 @@ node --conditions development --import tsx packages/operator-cli/src/bin.ts <ver
   the client itself never retries. No web-search query anywhere uses bare `fetch`.
   `packages/operator-cli/src/worker-preflight.ts` also reads `SEARXNG_BASE_URL`, but only to probe
   the instance's health endpoint; it issues no queries.
-- **Ledger logging.** `packages/operator-cli/src/model-routing.ts` (repo-xez5.2) is the one
-  reviewed module for which model tier a lane uses, and
-  `packages/operator-cli/src/model-invocation-log.ts` is the writer for
-  `bb_research.model_invocations`. Both exist today, but no lane below calls them yet (the
-  table has 0 rows) — retrofitting every LLM call site to log through them is repo-xez5.2's
-  remaining scope, not duplicated here. New verbs added by repo-xez5.9 (`backfill-entity`,
-  `prose-run`) reuse the same `runEnrichmentJudge` bridge as `enrichment-run` and inherit
-  whatever logging that bridge eventually gets; do not add a second logging mechanism.
-  `enrich-entity` (below) is a different code path entirely — it never touches this bridge,
-  because it plans research rather than drafting prose.
+- **Ledger logging.** `model-routing.ts` and `model-invocation-log.ts` are the existing model
+  policy and logging modules. Presence is not integration: the audit found no persisted model
+  invocations or frontier tasks in the initial production observation. The durable protocol below
+  now has real local Postgres tests; older verbs do not inherit its guarantees automatically. See [audit](./framework-audit.md).
 
 ---
+
+## Durable research runs
+
+The external-worker protocol works from any model, CLI process, or operator. It persists state
+in the research ledger and installs no schedule. The worker performs source/model calls outside
+database transactions. CLI commands print JSON and return nonzero on failed validation, stale
+leases, rejected completions, or unsuccessful heartbeats.
+
+Start from [`environmental-history-plan.json`](../../packages/research-kernel/examples/environmental-history-plan.json).
+Replace its question, identities, exact model ID and cost bounds. It is an illustrative second-domain
+manifest, not researched historical evidence. A new case/run requires unique identifiers.
+Pin the profile and use `ResearchTaskSpec` / output schemas from `@repo/research-kernel`.
+
+```bash
+node --conditions development --import tsx packages/operator-cli/src/bin.ts research-run --plan plan.json
+node --conditions development --import tsx packages/operator-cli/src/bin.ts research-run --plan plan.json --commit
+node --conditions development --import tsx packages/operator-cli/src/bin.ts research-claim --run-id RUN --worker-id WORKER --output lease.json --commit
+node --conditions development --import tsx packages/operator-cli/src/bin.ts research-heartbeat --lease-path lease.json --commit
+node --conditions development --import tsx packages/operator-cli/src/bin.ts research-complete --lease-path lease.json --result-path result.json --model-record model.json --commit
+node --conditions development --import tsx packages/operator-cli/src/bin.ts research-status --run-id RUN
+```
+
+`OPS_DATA_SOURCE=postgres` and a server-only database identity able to assume `research_worker` are
+required for ledger operations. These credentials must never reach public clients. Provision a login with only the `research_worker` role for unattended work; do not supply an administrator URL.
+Use restricted worker infrastructure if models execute shell commands. The CLI is an operator boundary,
+not an untrusted multi-tenant worker sandbox.
+
+`research-run` without `--commit` validates without database writes or external calls. Replaying
+an identical committed manifest is idempotent; changing a run/profile version in place is rejected.
+Claims are scoped to one run. Dependencies must finish first. Claiming reserves each attempt's
+maximum cost before external work; interrupted or uncertain attempts retain the reservation.
+A task that loses its lease must stop work and obtain a fresh claim. Never complete with another
+worker's lease. The lease token is a private capability and must not be logged publicly.
+
+`model.json` follows `ModelInvocation`, omitting `schemaVersion`, `id`, `activityId`, `rawResponse`,
+`status`, and `repairOfInvocationId`, which the executor supplies. Include actual model family,
+provider route, prompt hash, output schema/version, benchmark identifier, and `accounting`.
+Unknown token counts and charges are `null`, with `source:null` and `incomplete:true`.
+A successful provider response after uncertain retries is still incomplete accounting.
+Reported OpenRouter charges exclude purchase fees and any separate upstream BYOK bill.
+
+The executor validates and retains raw invalid output. Extracted claims, relationship evidence,
+and task-report quotes must match supplied/captured source records exactly. Every relationship
+remains quarantined. Successful execution does not satisfy evidence needs or authorize publication.
+The status response reports those review needs separately. A benchmark-required profile mode
+currently refuses dispatch until a real admission path exists; changing a benchmark label cannot
+make it pass. Trusted external model work remains proposals requiring independent review.
+
+## Built-in worker
+
+`research-work --run-id RUN --worker-id WORKER --max-tasks 3 --commit` executes at most three
+leased attempts. Repeating it in a new process resumes durable state. No schedule is installed.
+`ResearchWorkerInput` describes `search`, `acquire` and `synthesize` operations inside a task's
+`input`; use `executor: "builtin"`. The shared JSON Schema is authoritative in both languages.
+
+Each search reserves candidate capacity before dispatch. Each acquisition reserves every possible
+fetch, validates an exact public-text retention decision, uses safe-fetch, persists capture origin
+and authorized passages, and carries a bounded text window into its result. Redirects require a
+separate final-URL decision. Search blurbs never become source text. Empty acquisition and failed
+counterevidence search do not satisfy an evidence need.
+
+Synthesis with `model: null` produces an evidence inventory. A configured model must be admitted by
+the pinned profile; its input-byte, output-token and provider-price bounds must fit the reserved
+attempt cost. Calls have one attempt, no hidden model/provider fallback, and schema validation.
+OpenRouter receives maximum per-token prices and zero per-request/image charges. Unknown charges
+stay unknown. Profile budgets cover model inference; search-service and infrastructure bills are
+separate. Benchmark-required modes remain unavailable without independently validated admission.
+
+For a task without `executor: "builtin"`, the worker returns an `externalLease` and its source
+artifacts. A model or operator can complete that exact lease using `research-complete`, then resume
+the worker. This is the route for models operating through another API or an agent session.
+Treat lease output as a private capability; keep it out of shared logs. `--output` saves the JSON
+response locally. `research-status` returns metadata, unresolved needs and publication denial.
+
+## Evidence passage retrieval
+
+`capture-backfill` indexes authorized extracted text while preserving original source, capture,
+parser/text revision, and Unicode positions. Metadata-only capture without text permission does
+not create a searchable full-text copy. Existing captures can be indexed only from text matching
+the extraction hash recorded with their source origin.
+
+```bash
+node --conditions development --import tsx packages/operator-cli/src/bin.ts research-index --capture-id CAPTURE --source-item-id ITEM --parser-version PARSER --text-path source.txt --preservation-decision decision.json --commit
+node --conditions development --import tsx packages/operator-cli/src/bin.ts research-retrieve --query "school cartography" --source-item-ids ITEM --limit 10
+node --conditions development --import tsx packages/operator-cli/src/bin.ts research-embed --embedding-file embedding.json --commit
+node --conditions development --import tsx packages/operator-cli/src/bin.ts research-retrieve --query "teaching navigation" --vector-file query-vector.json --limit 10
+```
+
+An embedding file contains `passageId`, `bodyHash`, `model`, and a 768-number `vector`.
+A query vector file contains the same exact `model` revision and `values`. Generation is supplied
+by the configured embedding provider or an external worker; these commands make no model calls.
+Nonfinite, zero, wrong-size, stale-text and expired/withdrawn vectors are rejected.
+
+Text and vector ranks combine using the existing reciprocal-rank fusion helper. Exact vector
+search is the default comparison baseline. `--approximate` enables HNSW and may lose recall under
+filters. Evidence scores are retrieval priorities, not probabilities or proof of historical truth.
+Synthetic integration fixtures verify selectors, retrieval mechanics and isolation, not semantic
+quality of a real model or coverage of archives not indexed.
+
+## Preservation decisions and archive jobs
+
+`capture-backfill --commit --preservation-decisions decisions.json` accepts an array of canonical
+`PreservationDecision` records. Each identifies an exact `sourceUrl`, `allowTextRetention`,
+`allowArchive`, `sensitivity` (`public`, `restricted`, or `unknown`), `reviewedBy`, `reviewedAt`,
+`expiresAt`, and the rights/consent `basis`. No decision means metadata-only storage without an excerpt.
+Private text retention and public archival submission require separate decisions; a source host
+or institutional label is insufficient authorization.
+
+Add `--wayback` and configured Internet Archive credentials to submit eligible sources. The
+availability lookup runs first and does not create a capture. Returned pointers must identify a
+successful snapshot of the exact requested source. An older snapshot is a historical pointer,
+not proof that it preserves the bytes fetched now.
+
+SPN2 jobs persist in `research.preservation_jobs`. A later explicit run polls pending jobs without
+reposting them. A lost submission response leaves an uncertain reservation requiring reconciliation
+with the archive; it is never automatically submitted twice. Reports distinguish metadata records,
+extracted-text copies, pending jobs and archive pointers. None of these counters claims verified
+full-page capture coverage. No archive request or schedule is made by a dry run.
+
+## Capture retention
+
+`capture-retention --operator-id NAME` previews expired or unapproved capture origins. Add
+`--commit` to erase retained text and vectors in the database and record pending storage disposals.
+Use `--source-item-id ITEM` for an explicit withdrawal, even before expiry. The command never
+installs a schedule. Use a trusted operator database identity; research workers cannot erase
+canonical evidence or grant themselves retention permission.
+
+```bash
+node --conditions development --import tsx packages/operator-cli/src/bin.ts capture-retention --operator-id NAME --limit 100
+node --conditions development --import tsx packages/operator-cli/src/bin.ts capture-retention --operator-id NAME --limit 100 --commit --delete-storage
+```
+
+`--delete-storage` requires configured private capture storage. Failed deletion stays pending;
+rerun the command to retry. Shared objects remain while any retained origin references them.
+New capture uploads use a retention-decision namespace, so renewed permission does not reuse an
+object awaiting deletion. Review historical shared paths during cutover. A newer valid decision
+can renew an unwithdrawn index; explicit withdrawal is a tombstone and prevents automatic revival.
+
+The sweep retains source identity, hashes and minimal disposition metadata. It covers capture
+text and the derived passage/vector index. It also erases affected run manifests, task inputs, dependent proposal payloads, raw model responses
+and quarantine payloads while retaining hashes and disposal metadata. Expired failed payloads are
+swept too, including abandoned manifests that produced no artifacts. Execution leases cannot
+outlive the run payload deadline. Canonical reviewed claims, public Internet Archive copies, backups and externally copied
+files require their own withdrawal procedures; the automatic worker refuses restricted content.
+Do not export retained source text into unmanaged logs.
+
+`capture-retention --orphans --bucket raw-sources --operator-id NAME` also inventories unreferenced
+capture objects older than 24 hours using read-only Storage metadata. `--commit` records disposal
+tombstones; `--delete-storage` drains them through the Storage API. Origin insertion rejects a
+tombstoned key, preventing a late writer from reviving a disposed object. Repeating the sweep
+reconciles interrupted uploads and deletion failures. No Storage metadata rows are deleted directly.
 
 ## research-intake
 
@@ -97,7 +240,7 @@ OPERATOR_CLI_PRIVACY_PEPPER=<pepper> node --conditions development --import tsx 
   --description "Optional owner note — omit to use the fetched excerpt" \
   --location "City, State" --era "1960s" \
   --operator-id "<your operator id>" --session-id "<this session's id>" \
-  --identity-source claude_session
+  --identity-source cli
 ```
 
 `runResearchIntake` (`research-intake.ts`) sequences three real, independently tested steps:
@@ -108,8 +251,7 @@ OPERATOR_CLI_PRIVACY_PEPPER=<pepper> node --conditions development --import tsx 
 3. `prepareLeadIntake` (`intake.ts`) — real BB-029 quarantine intake plus a real BB-044 draft
    research case.
 
-Add `--commit` only after the owner reviews the printed result and asks you to write it
-(needs `GOOGLE_APPLICATION_CREDENTIALS`/`FIREBASE_PROJECT_ID`).
+Use `--commit` when staging is authorized; it requires the configured Postgres operator store.
 
 **Do:** read `fetch.reason` and explain a denial (`dns_answer_not_public`, `malware_indicator`)
 instead of retrying around it; use the owner's own words for `--description`; report back
@@ -123,7 +265,7 @@ hand-build a `SubmissionInput`/`ResearchCaseRecord`.
 
 ## capture-backfill
 
-**When to use:** snapshot cited URLs into `bb_evidence.source_captures` (local hash + excerpt),
+**When to use:** snapshot cited URLs into `evidence.source_captures` (source identity, content hash, and any permitted text),
 optionally secondary-anchor them at Wayback via Save Page Now.
 
 ```bash
@@ -219,33 +361,30 @@ node --conditions development --import tsx packages/operator-cli/src/bin.ts pend
 
 Editorial / enrichment (dry-run default). Subjects file: `{ "subjects": [{ "subjectId",
 "title", "existingSummary?" }] }`. Optional catalog JSON `{ "entities": [...] }`, or
-`--catalog-from=firestore`/`--catalog-from=postgres` to join the live catalog.
+`--catalog-from=postgres` to join the live catalog.
 
 ```bash
 OPERATOR_CLI_PRIVACY_PEPPER=dev node --conditions development --import tsx \
   packages/operator-cli/src/bin.ts editorial-run \
   --subjects /tmp/subjects.json --catalog-from=postgres --provider mock \
-  --operator-id "$USER" --session-id "cursor-$(date +%s)" --identity-source cursor_session
+  --operator-id "$USER" --session-id "research-$(date +%s)" --identity-source cli
 ```
 
 Providers: `mock` (default), `openrouter`, `ollama`, `hybrid`. For `ollama`/`hybrid`, point
-`OLLAMA_BASE_URL` at `RESEARCH_LOCAL_LLM_HOST` (see repo-xez5.1 / `.env.corsair.example`) — never
-hardcode a host. `enrichment-run` is the same judge, result kind `enrichment.run.v1`.
+`OLLAMA_BASE_URL` at an explicitly configured endpoint. No personal host is assumed. `enrichment-run` is the same judge, result kind `enrichment.run.v1`.
 
-Add `--commit` only after the owner reviews the JSON — writes quarantine `editorial_packet`
+Use `--commit` when staging is authorized. It writes quarantine `editorial_packet`
 proposals (may open draft research cases). There is no `--publish`/`--promote`.
 
-**Catalog dedupe:** `packages/firebase/scripts/classify-corsair-keeps-against-catalog.ts` was
-deleted with the rest of the fixture-catalog tooling once Supabase became the sole entity
-store (commit f8c81a06); there is no scripted dedupe replacement. Before enriching a keep,
-check the live catalog by hand (`--catalog-from=postgres`) for an existing match.
+**Catalog reconciliation:** load the live catalog with `--catalog-from=postgres`. Name or
+embedding similarity proposes an identity match; it does not authorize a merge.
 
 **Prose links:** summaries use `[[ent_id|Display Name]]` so `LinkedProse` renders `EntityLink`s.
 
 **Never:** call promotion gates or release activation; treat LLM confidence as publication
 authority; skip `validationIssues` — surface them to the owner.
 
-### backfill-entity (new, repo-xez5.9)
+### backfill-entity
 
 **When to use:** re-run enrichment for one specific entity id you already know, without
 building a subjects file.
@@ -260,9 +399,9 @@ OPERATOR_CLI_PRIVACY_PEPPER=dev node --conditions development --import tsx \
 Implemented as a one-subject wrapper over the same `runEnrichmentJudge` bridge as
 `enrichment-run` (`cli.ts`, case `backfill-entity`/`prose-run`) — same providers, same
 `--commit` semantics, same output shape (`enrichment.run.v1`) plus `{ verb, entityId }`. Ledger
-logging: none yet (see "Conventions" above; tracked under repo-xez5.2).
+logging: none yet (see "Conventions" above; tracked in the research execution backlog).
 
-### prose-run (new, repo-xez5.9 — short-form prose)
+### prose-run (short-form prose)
 
 **When to use:** a lighter-weight prose draft for one subject, instead of a full
 `story-research-run` packet (ten research moves, cite map, pattern cases). Reuses the exact
@@ -280,37 +419,24 @@ node --conditions development --import tsx packages/operator-cli/src/bin.ts pros
 
 ---
 
-## enrich-entity (deep research planner) — evidence-directed, not prose
+## enrich-entity
 
-**When to use:** find out what a specific released entity is actually missing, evidence-wise,
-before anyone drafts a sentence. This is the ONLY verb described in this document that is
-evidence-directed rather than prose-only — see the note atop the section above. Read
-`packages/operator-cli/src/enrichment-plan.ts` before touching this verb; its file header states
-the distinction this section summarizes.
+Assess a released entity's evidence deficits before drafting prose. The default reads and plans.
+Supply a unique `--run-id` to compile a bounded manifest, and `--output plan.json` to inspect it.
 
 ```bash
 node --conditions development --import tsx packages/operator-cli/src/bin.ts enrich-entity \
-  --entity-id ent_example_001 --target-maturity corroborated
+  --entity-id ent_example_001 --target-maturity corroborated --run-id unique-run --output plan.json
+node --conditions development --import tsx packages/operator-cli/src/bin.ts enrich-entity \
+  --entity-id ent_example_001 --run-id another-unique-run --preservation-decisions decisions.json \
+  --worker-id researcher --max-tasks 3 --commit
 ```
 
-What it does: reads the released entity, runs `assessResearchMaturity`
-(`packages/domain-core/src/research/maturity.ts`) to get its current `ResearchMaturity` state and
-its `ResearchDeficit`s, then `planEnrichment` (`packages/operator-cli/src/enrichment-plan.ts`)
-turns each deficit CODE (not each occurrence — three claims sharing one deficit are one research
-task) into an `EvidenceNeed` — what is missing and why, `mandatory` or not, whether it needs a
-contradiction search — plus a small number of bounded search queries. A query here is a LEAD, not
-evidence, and is emitted as a query string rather than a result for exactly that reason (see
-"Reaching a search provider" above). Deficits with no searchable remedy (for example
-`missing_creation_or_publication_date` — a schema gap, not something a search can close) come back
-named in `unaddressedDeficits` instead of being silently dropped or handed a query anyway.
-
-What it does NOT do, as of this writing: the search, fetch, capture, selector, and
-claim-extraction stages that would turn one of this plan's queries into evidence are not built.
-`enrich-entity` PLANS deep research; it does not run it. There is no `--commit` for this verb —
-deliberately, per its own code comment: a `--commit` that staged an empty result would tell the
-same lie `enrichment-run` tells by relabelling the editorial judge. The JSON output always carries
-`"executed": false`. Do not read a plan's `queries` as sources, and do not point a drafting pass at
-this verb's output expecting sourced prose back — nothing here has been fetched yet.
+Committed execution uses `research-work` for search, rights-scoped capture, passage indexing and
+an exact-source inventory. It prioritizes a contradiction query and records needs that exceed the
+available budget. It does not upgrade maturity, approve claims or publish. Missing source rights,
+unavailable providers and unfunded questions remain visible. Resume with `research-work --run-id`
+rather than reconstructing the immutable manifest with another `enrich-entity` invocation.
 
 **Which path to use when:**
 
@@ -318,13 +444,12 @@ this verb's output expecting sourced prose back — nothing here has been fetche
   the deficits and gives you leads to chase (resolve and fetch them through the normal safe-fetch
   path — `research-intake` / `attach-evidence` / `register-source` — before treating anything a
   query returns as a source).
-- Evidence is already captured (`bb_research.entity_enrichment.status = 'captured'` — the only
+- Evidence is already captured (`research.entity_enrichment.status = 'captured'` — the only
   status `fetchEnrichmentSubjects` will pull) and the record just needs that evidence turned into
   cited public prose → the prose-only path:
-  either the $0 session-subagent fan-out (`packages/ops-data/scripts/session-enrich-prepare.ts` →
-  fan-out drafting subagents → `session-enrich-collect.ts` → `session-enrich-apply.ts`; full
-  runbook in `packages/ops-data/scripts/README-fanout-drafting.md`), or the metered equivalent
-  (`packages/ops-data/scripts/enrich-entities-llm.ts`), or the operator-cli verbs immediately
+  use `packages/ops-data/scripts/session-enrich-prepare.ts` to prepare inputs and
+  `session-enrich-apply.ts` to validate externally supplied answers, or use the metered
+  `packages/ops-data/scripts/enrich-entities-llm.ts` path or the operator CLI verbs immediately
   above (`enrichment-run` / `backfill-entity` / `prose-run`). All of these read only evidence
   already on hand and validate every citation with `validateEnrichmentResponse`
   (`packages/ops-data/scripts/lib/entity-enrichment-llm.ts`); none of them search or fetch, and
@@ -361,7 +486,7 @@ Topics file: `{ "topics": [{ "topicId", "title", "eraLabel", "placeLabel",
 OPERATOR_CLI_PRIVACY_PEPPER=dev node --conditions development --import tsx \
   packages/operator-cli/src/bin.ts story-research-run \
   --topics /tmp/story-topics.json --provider mock \
-  --operator-id "$USER" --session-id "cursor-$(date +%s)" --identity-source cursor_session
+  --operator-id "$USER" --session-id "research-$(date +%s)" --identity-source cli
 ```
 
 `--commit` stages quarantine `story_packet` proposals only. Human approval:
@@ -378,28 +503,41 @@ proof.
 
 ## theme-study (`harness-run`)
 
-**When to use:** run a thematic study (e.g. redlining, urban renewal) and draft
-`ThemeImpactPacket`s. Full workflow, schema, and curation rules:
+Runs an explicit source batch and optionally extracts evidence-attached proposals. It does not
+create ThemeImpactPackets automatically. Packet assembly and review are described in
 [`theme-impact-packet-system.md`](./theme-impact-packet-system.md).
 
 ```bash
 node --conditions development --import tsx packages/operator-cli/src/bin.ts harness-run \
-  --theme redlining --metro metro:chicago-il --connectors dpla,nps-network-to-freedom,shpo \
-  --output /tmp/chicago-redlining-raw.json
-```
+  --theme 'Evidence provenance standards' --url https://www.w3.org/TR/prov-overview/ \
+  --max-subjects 1 --max-relations 0
 
-Enrich the raw output (point `--model`/`OLLAMA_BASE_URL` at `RESEARCH_LOCAL_LLM_HOST` for a
-local/Corsair model — never hardcode a host):
-
-```bash
 node --conditions development --import tsx packages/operator-cli/src/bin.ts harness-run \
-  --theme redlining --input /tmp/chicago-redlining-raw.json --enrich \
-  --provider openrouter --model google/gemini-2.5-pro:free --commit
+  --theme 'The research question' --subjects /path/to/source-records.json \
+  --enrich --provider openrouter --model '<chosen model>' --max-subjects 10 --max-relations 10
 ```
 
-Hard curation rules: juxtaposition by default (never state automatic causation without a
-cited, gated study); dignity in mapping (no alarm colors for violence, precision matches
-record); no anonymous cites; archive citations must have valid Wayback/content-addressed URLs.
+`--subjects` is an array of `HarnessSourceRecord` objects from the kernel schema. Each has
+`id`, `connectorKind`, `title`, `description`, `cites`, and `rawRecord`; location fields are
+optional. Supply real source text with its URL, never a fabricated receipt. Model memory and
+search blurbs are not source text. Connector labels and the question can describe any domain.
+`--metro` is optional context. This path does not read the catalog or resolve identity by name.
+
+Adapters are explicit: `--connectors nps_network_to_freedom --nps-csv <file>` parses supplied
+CSV; `--connectors dpla --dpla-json <file>` parses supplied DPLA records. Neither makes an API
+request or inserts examples. `--connectors web_search` uses approved routing then independently
+fetches leads; `--query` overrides its query. Missing adapter input fails.
+
+Limits are subjects 1–100 (default 25), relationship model calls 0–100 (default 25). Deferred
+subjects are counted. These bound batch work, not dollars: durable case-wide cost enforcement
+remains incomplete. `--enrich` invokes the chosen provider; a mock is for testing only. The
+harness requires exact schema output and quote/URL attachment. Invalid raw output is returned
+with its failure for quarantine; it is not repaired or replaced with default values.
+
+`--commit` stages successful relationship proposals in quarantine with their evidence.
+It does not commit extracted claims, approve a relation, or publish. Numeric confidence is
+labeled an uncalibrated self-report and cannot admit an edge. Save stdout explicitly when a
+file artifact is wanted. Use `--progress-path` for progress records.
 
 ---
 
@@ -419,24 +557,12 @@ node --conditions development --import tsx packages/operator-cli/src/bin.ts loca
 ```
 
 Add `--commit` only when ready to write Postgres (the live atomic store — there is no
-Firestore path). Precision policy (no LLM, ever): street number → `institution` (≤150m
+alternative persistence path). Precision policy (no LLM, ever): street number → `institution` (≤150m
 drift); named campus/place → `campus` (≤500m); neighborhood/district → `neighborhood`
 (≤1600m); city only → `city`, do not sharpen. See also
 [`docs/security/location-precision-standard.md`](../security/location-precision-standard.md)
 for the full NRHP-derived precision tier standard.
 
-The old fixture-catalog batch scripts (`audit-entity-locations.ts`,
-`enrich-entity-locations.ts`, and `classify-corsair-keeps-against-catalog.ts` under
-`packages/firebase/scripts/`) were deleted along with the rest of `fixtures/national-catalog/`
-once Supabase became the sole entity store (commit f8c81a06). There is no batch-audit
-replacement yet; run `locate` per entity.
-
-**Do:** prefer street addresses; queue bare place names for review; re-publish after locating
-so projections pick up `EntityLocation` overrides.
-
-**Never:** use an LLM to guess coordinates; invent an address so this verb can run; call
-Nominatim from product `/locate`; `--commit` without reviewing `decision.action` when it is
-`review`. Identity, unsourced sites, and era are the `blackstory-entity-verify` skill.
 
 ---
 
@@ -482,22 +608,22 @@ case ready based on your own read of the evidence.
 low-confidence discovery candidates) and decide what to do with each — strengthen with
 corroboration, or recommend rejection. Never executes the decision.
 
-### graylist read path (new, repo-xez5.9)
+### graylist read path
 
 ```bash
 node --conditions development --import tsx packages/operator-cli/src/bin.ts graylist-read \
   --limit 20 --json
 ```
 
-Reads `bb_submissions.intake_items` (Postgres) where `status = 'quarantined'`, newest first,
+Reads `submissions.intake_items` (Postgres) where `status = 'quarantined'`, newest first,
 via `getOpsPostgresPool`. This is a partial read path: it covers quarantined intake items
 only. Low-confidence discovery candidates (the discovery lane writes them to Postgres through
 its own quarantine gates, see `docs/runbooks/data-ingestion-methodology.md`) are not reachable
-from this command yet; triage those in the admin console. The Firestore-era `submissionInbox`
+from this command yet; triage those in the admin console. The retired submission inbox
 and `discoveryCandidates` collections, and the admin console fixtures that described them, no
 longer exist.
 
-### quarantine-triage (LLM-assisted, repo-t2vh)
+### quarantine-triage (LLM-assisted)
 
 ```bash
 node --conditions development --import tsx packages/operator-cli/src/bin.ts \
@@ -505,15 +631,15 @@ node --conditions development --import tsx packages/operator-cli/src/bin.ts \
   --operator-id "$USER" --session-id "$(date +%s)"
 ```
 
-Judges each `bb_submissions.intake_items` row with an LLM (`mock`/`openrouter`/`ollama`/`hybrid`,
+Judges each `submissions.intake_items` row with an LLM (`mock`/`openrouter`/`ollama`/`hybrid`,
 see `llm-provider.ts`) into `case` / `reject` / `spam`, then downgrades anything below
 `--confidence-threshold` (default `0.6`) to `needs_human` and leaves it quarantined untouched.
 This is a lightweight triage pass, not the full editorial/enrichment harness: a `case` decision
-only opens a bare draft research case (`bb_research.cases`, `state: 'candidate'`) so it enters
+only opens a bare draft research case (`research.cases`, `state: 'candidate'`) so it enters
 the normal research pipeline actual sourcing/enrichment still happens later via
 `editorial-run`/`enrichment-run`. Safe by default (prints JSON only); `--commit` is required to
-write. Every decision including `reject`/`spam` is logged to `bb_audit.events` with the
-model's rationale. Never writes `bb_canonical.*` or evaluates a promotion gate see
+write. Every decision including `reject`/`spam` is logged to `audit.events` with the
+model's rationale. Never writes `canonical.*` or evaluates a promotion gate see
 `quarantine-triage.ts`'s header and `promotion-boundary.test.ts`.
 
 Run in batches (`--limit 200`–300), review the `needs_human` items in the output, then repeat
@@ -543,7 +669,7 @@ node --conditions development --import tsx packages/operator-cli/src/bin.ts expa
   --entity-id ent_example_001 --depth 1 --max-candidates 50 --json
 ```
 
-The seed is read from `bb_canonical.entities`. The row's `identifiers` must carry a Wikidata
+The seed is read from `canonical.entities`. The row's `identifiers` must carry a Wikidata
 QID, or the command fails with `Entity <id> has no Wikidata QID in identifiers`
 (`expand-verb.ts`, `loadExpansionSeed`). Traversal is live Wikidata, not a fixture
 (`entity-network-expansion.ts`): forward claims come off the seed's own `Special:EntityData`
@@ -561,11 +687,11 @@ candidates }`. Each candidate carries `qid`, `label`, `hop`, a `hypothesis` (a
 where a Wikidata property has no exact taxonomy type, a `note` explaining the mapping), and
 `provenance` hops naming the source QID, the property, and the Wikidata item URL.
 
-`--commit` opens a transaction, records a `bb_research.source_program_runs` row
-(`wikidata-network-expansion`), and inserts `bb_research.landscape_candidates` rows with
+`--commit` opens a transaction, records a `research.source_program_runs` row
+(`wikidata-network-expansion`), and inserts `research.landscape_candidates` rows with
 `lane = 'wikidata'`, `research_lane_only = true`, `status = 'pending'`. Output becomes
 `{ verb, entityId, depth, status: "staged", candidateCount, stagedCount, seed }`. Nothing
-reaches `bb_canonical.*`: `entity-network-expansion.test.ts` asserts the staging function has
+reaches `canonical.*`: `entity-network-expansion.test.ts` asserts the staging function has
 no code path that could.
 
 **Current limitations.** Both are wiring gaps in the CLI call site, not missing engine work:

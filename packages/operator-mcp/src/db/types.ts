@@ -1,5 +1,5 @@
 /**
- * Read-only Postgres access for bb_reference statistical tables (operator/research).
+ * Read-only Postgres access for reference statistical tables (operator/research).
  */
 
 export type SeriesRow = {

@@ -59,7 +59,7 @@ Residual risk rollup: [Residual risk](#residual-risk).
 
 | Quadrant | Controls |
 |----------|----------|
-| **Preventive** | Normalize/strip cache-busting params; App Check on expensive reads; query complexity/timeouts/result caps; stricter search/geocode quotas |
+| **Preventive** | Normalize/strip cache-busting params; client-header check on expensive reads; query complexity/timeouts/result caps; stricter search/geocode quotas |
 | **Detective** | Cache hit-ratio and unique-query cardinality; per-client cost scoring; slow-query telemetry |
 | **Containment** | Independent search/geocode kill switch; block abusive fingerprints; popular-query-only fallback |
 | **Recovery** | Restore CDN rules; re-enable with tightened quotas after soak |
@@ -92,7 +92,7 @@ Residual risk rollup: [Residual risk](#residual-risk).
 
 | Quadrant | Controls |
 |----------|----------|
-| **Preventive** | App Check + rate limits; quarantine-first; volume ≠ truth; similarity clustering |
+| **Preventive** | client-header check + rate limits; quarantine-first; volume ≠ truth; similarity clustering |
 | **Detective** | Burst/entity-targeted dashboards; campaign heuristics; moderator backlog SLA |
 | **Containment** | Submissions kill switch; auto-quarantine campaigns; elevate review on targeted entities |
 | **Recovery** | Bulk reject; retract mistaken promotions; retune similarity/quotas |
@@ -248,7 +248,7 @@ Residual risk rollup: [Residual risk](#residual-risk).
 
 | Quadrant | Controls |
 |----------|----------|
-| **Preventive** | Rate limits + App Check; pagination caps; no unbounded public export; enumerate-resistant APIs |
+| **Preventive** | Rate limits + client-header check; pagination caps; no unbounded public export; enumerate-resistant APIs |
 | **Detective** | Sequential ID / high unique-entity rates; scraper clusters; atypical API vs web volume |
 | **Containment** | Challenge/throttle; search/list kill switch; Armor ASN/IP blocks |
 | **Recovery** | Retune after ; ToS follow-up; product-approved watermarks only if accepted |
@@ -298,4 +298,4 @@ Every threat records residual risk in the corpus. Cross-cutting residuals:
 
 - Amend corpus + this doc when a new threat class appears; tighten `../decisions-carryover.md`, "Security and abuse assumptions" (ADR-010) if assumptions change.
 -  consumes abuse cases as CI gates; /060/061 validate load, integrity, and recovery.
-- Do not claim Armor/App Check/IAP exist until their beads land and are verified.
+- Do not claim Armor/client-header check/IAP exist until their beads land and are verified.

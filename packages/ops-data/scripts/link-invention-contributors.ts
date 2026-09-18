@@ -1,25 +1,7 @@
 /**
- * Link each invention to the people named on it.
- *
- * Measured against the active release on 2026-09-09, ZERO relationship edges touched any
- * invention: the 20 published records named their inventors only inside prose, so a reader on
- * Latimer's page had no way to reach the carbon process and a reader on the carbon process had
- * no way to reach Latimer. The contribution vocabulary to fix that shipped in
- * `20260908120000_invention_kind_and_contribution_predicates` and had no writer.
- *
- * Direction is person -> invention, so the predicate reads as a sentence: Lewis H. Latimer
- * `invented` the Process of Manufacturing Carbons. `related` is projected on both ends, so one
- * edge lights up both pages.
- *
- * A contributor with no `entityId` is skipped and reported, not invented. Gerhard Sessler and
- * Albert L. Brown stay named on their receipts in prose without this archive fabricating a
- * person record for them.
- *
- * Dry-run unless DRY_RUN=0 and APPLY=1.
- *
- *   set -a && source apps/web/.env.local && set +a && export DATABASE_SSL=1
- *   node --conditions development --import tsx packages/ops-data/scripts/link-invention-contributors.ts
- *   DRY_RUN=0 APPLY=1 node --conditions development --import tsx packages/ops-data/scripts/link-invention-contributors.ts
+ * Creates person-to-invention contribution edges from cited cohort records. Missing entity
+ * identifiers are reported and skipped. Dry-run unless DRY_RUN=0 and APPLY=1; public related
+ * lists must reflect both endpoints after publication.
  */
 import { createHash } from 'node:crypto';
 import pg from 'pg';
@@ -85,7 +67,7 @@ async function main(): Promise<void> {
     // entry that renders as a link to nothing.
     const ids = [...new Set(edges.flatMap((edge) => [edge.fromEntityId, edge.toEntityId]))];
     const present = await client.query<{ id: string }>(
-      'SELECT id FROM bb_canonical.entities WHERE id = ANY($1)',
+      'SELECT id FROM canonical.entities WHERE id = ANY($1)',
       [ids],
     );
     const known = new Set(present.rows.map((row) => row.id));
@@ -103,7 +85,7 @@ async function main(): Promise<void> {
       console.log(`  ${edge.contributorName} --${edge.relationshipType}--> ${edge.inventionName}`);
     }
     if (missing.length > 0) {
-      console.log(`\nskipped, entity not in bb_canonical (${missing.length}):`);
+      console.log(`\nskipped, entity not in canonical (${missing.length}):`);
       for (const edge of missing) {
         const absent = [edge.fromEntityId, edge.toEntityId].filter((id) => !known.has(id));
         console.log(
@@ -122,7 +104,7 @@ async function main(): Promise<void> {
 
     for (const edge of writable) {
       await client.query(
-        `INSERT INTO bb_canonical.entity_relationships
+        `INSERT INTO canonical.entity_relationships
            (id, from_entity_id, to_entity_id, relationship_type, workflow_status,
             publication_status, confidence, created_at, updated_at)
          VALUES ($1,$2,$3,$4,'accepted','published',$5::jsonb, now(), now())

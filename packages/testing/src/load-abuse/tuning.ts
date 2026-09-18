@@ -26,19 +26,19 @@ export function loadAbuseTuningRecommendations(): readonly TuningRecommendation[
       scenarioId: 'search_flood',
       controlLayer: 'rate_limit_rolling_window',
       currentValue: `${searchAnon.windowCap}/min`,
-      recommendedValue: '6/min if Firestore p95 > 800ms during beta soak',
+      recommendedValue: '6/min if database p95 > 800ms during beta soak',
       rationale:
         'Search floods hit rolling window before daily cap; tighten only if expensive reads dominate p95 latency while static reads stay healthy.',
       priority: 'P1',
     },
     {
-      id: 'tune-app-check-search',
+      id: 'tune-client-header-search',
       scenarioId: 'search_flood',
-      controlLayer: 'app_check',
+      controlLayer: 'client_header',
       currentValue: 'required for anonymous expensive_read',
-      recommendedValue: 'keep enforced; monitor missing_app_check risk weight +2',
+      recommendedValue: 'keep enforced; monitor missing_client_header risk weight +2',
       rationale:
-        'App Check denies ~33% of flood steps without backend work; first line of defense before token bucket.',
+        'The simulation rejects missing headers before backend work. Any caller can spoof this header; rate limits and cost caps remain necessary.',
       priority: 'P0',
     },
     {
@@ -95,7 +95,7 @@ export function loadAbuseTuningRecommendations(): readonly TuningRecommendation[
       scenarioId: 'expensive_filter_combinations',
       controlLayer: 'query_guardrails',
       currentValue: `maxEstimatedCost ${DEFAULT_QUERY_GUARDRAIL_LIMITS.maxEstimatedCost}`,
-      recommendedValue: '2200 if text_geo_filters p99 exceeds Firestore budget',
+      recommendedValue: '2200 if text_geo_filters p99 exceeds database budget',
       rationale:
         'Guardrails reject max filter + geo + pageSize combos before rate limiter consumes tokens.',
       priority: 'P1',
@@ -124,7 +124,7 @@ export function loadAbuseTuningRecommendations(): readonly TuningRecommendation[
       scenarioId: 'database_connection_exhaustion',
       controlLayer: 'resource_database_pool',
       currentValue: 'role_public_read maxConnections 10',
-      recommendedValue: '8 if statement_timeout denials >0.1% (Firestore-era pool is deferred)',
+      recommendedValue: '8 if statement_timeout denials >0.1%',
       rationale:
         'Simulated exhaustion fails closed; when SQL paths activate, pool sizing must match guardrail timeouts.',
       priority: 'P2',

@@ -1,35 +1,8 @@
 /**
- * repo-el9p (WS3) — populate bb_canonical.entity_visit from the claim predicates the web
- * read-path has been mining at render time (apps/web/src/lib/geography/public-visit-contact.ts):
- * official_website / visitor_website (-> website), visitor_phone / public_phone (-> phone),
- * public_hours / visitor_hours / hours_note (-> hours). Moving this to a canonical table lets
- * the release builder (`publicVisitForTier`, packages/domain/src/geography/visit.ts) gate the
- * same fields once, at publish time, instead of every web request re-deriving them from claims.
- *
- * Only current claim versions (`claims.current_version_id`) feed the plan. Each field records
- * the source claim id it came from in `entity_visit.source_ids`; a phone/website/hours triple
- * pulled from three different claims keeps all three ids.
- *
- * Website preference: official_website/officialWebsite before visitor_website/visitorWebsite.
- * Phone preference: visitor_phone/visitorPhone before public_phone.
- * Hours preference: public_hours/publicHours before visitor_hours/visitorHours before hours_note.
- * (First predicate in each list that has a non-empty claim object wins; ties broken by claim id
- * for determinism.)
- *
- * Does not set `visitability` — that has no claim-mined source today; the row is written with
- * `visitability` left NULL and an operator or the Wikidata backfill (repo-el9p companion script,
- * backfill-visit-from-wikidata.ts) fills it in later. `publicVisitForTier` already treats a
- * missing/ineligible visitability as "no phone/website", so leaving it NULL here is inert, not
- * an over-broad publish.
- *
- * Default is dry-run. Production writes require:
- *   DRY_RUN=0 BACKFILL_VISIT_FROM_CLAIMS_APPLY=1 DATABASE_URL=postgresql://...
- *
- * Usage (from repo root):
- *   set -a && source apps/web/.env.local && set +a
- *   export DATABASE_SSL=1
- *   node --conditions development --import tsx \
- *     packages/ops-data/scripts/backfill-visit-from-claims.ts
+ * Derives visit contacts from current claim versions and retains every contributing claim id in
+ * source_ids. Official website, visitor phone and public hours predicates take precedence
+ * deterministically. Leaves visitability unset; publication still requires an eligible
+ * visitability decision.
  */
 import { mkdirSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
@@ -103,8 +76,8 @@ async function loadVisitClaims(client: pg.Client): Promise<readonly NormalizedCl
   const allPredicates = [...WEBSITE_PREDICATES, ...PHONE_PREDICATES, ...HOURS_PREDICATES];
   const { rows } = await client.query<ClaimRow>(
     `SELECT c.entity_id, c.id AS claim_id, v.predicate, v.object
-     FROM bb_canonical.claims c
-     JOIN bb_canonical.claim_versions v ON v.id = c.current_version_id
+     FROM canonical.claims c
+     JOIN canonical.claim_versions v ON v.id = c.current_version_id
      WHERE c.current_version_id IS NOT NULL
        AND lower(v.predicate) = ANY($1::text[])`,
     [allPredicates],
@@ -205,16 +178,16 @@ async function main(): Promise<void> {
     try {
       for (const row of plan) {
         await client.query(
-          `INSERT INTO bb_canonical.entity_visit
+          `INSERT INTO canonical.entity_visit
              (entity_id, phone_display, website, hours, source_ids, updated_at)
            VALUES ($1, $2, $3, $4, $5, now())
            ON CONFLICT (entity_id) DO UPDATE SET
-             phone_display = COALESCE(EXCLUDED.phone_display, bb_canonical.entity_visit.phone_display),
-             website = COALESCE(EXCLUDED.website, bb_canonical.entity_visit.website),
-             hours = COALESCE(EXCLUDED.hours, bb_canonical.entity_visit.hours),
+             phone_display = COALESCE(EXCLUDED.phone_display, canonical.entity_visit.phone_display),
+             website = COALESCE(EXCLUDED.website, canonical.entity_visit.website),
+             hours = COALESCE(EXCLUDED.hours, canonical.entity_visit.hours),
              source_ids = (
                SELECT array_agg(DISTINCT id) FROM unnest(
-                 bb_canonical.entity_visit.source_ids || EXCLUDED.source_ids
+                 canonical.entity_visit.source_ids || EXCLUDED.source_ids
                ) AS id
              ),
              updated_at = now()`,

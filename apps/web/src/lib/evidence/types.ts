@@ -1,19 +1,4 @@
-/**
- * View-model types for the evidence, confidence, dispute, and revision interface.
- *
- * These types intentionally sit one layer above `apps/web/src/data/public-seed.ts`'s
- * `PublicClaimView` (a seed-depth placeholder ahead of public projections): every
- * field already on `PublicClaimView` (id, predicate, object, confidenceScore, confidenceLevel,
- * citationSource/citationHref/citationLabel, disputed/disputeNote) has a structurally-compatible
- * counterpart here, so a caller can pass seed claims through with light field renaming and get a
- * working panel today, while the richer optional fields (source lineage, excerpts, research
- * coverage, revision history, retraction notices) are ready to receive real data
- * once projections land, without a breaking shape change.
- *
- * Reuses domain vocabulary directly (`RightsStatus`, `ExcerptKind`,
- * `PublicationPermission`, `ProhibitedUse`, `ContradictionSet`-compatible alternate-value kinds)
- * rather than re-declaring a parallel vocabulary.
- */
+/** Evidence display contracts preserve optional assessments, provenance, disputes and rights. */
 import type { ConfidenceLevel } from '@repo/ui';
 import type { ExcerptKind, ProhibitedUse, PublicationPermission, RightsStatus } from '@repo/domain';
 
@@ -81,8 +66,7 @@ export type EvidenceAlternateValue = {
   readonly kind: EvidenceAlternateValueKind;
 };
 
-/** Seed-depth-compatible dispute input: `disputed`/`disputeNote` mirror `PublicClaimView` exactly;
- * `alternates` is the additive slot for full `ContradictionSet` values once available. */
+/** Disputes retain the primary value and credible alternatives. */
 export type EvidenceDisputeInput = {
   readonly primaryValue: string;
   readonly disputed?: boolean;
@@ -123,7 +107,7 @@ export type EvidenceClaimInput = {
   readonly id: string;
   readonly predicate: string;
   readonly object: string;
-  readonly confidenceScore: number;
+  readonly confidenceScore?: number;
   readonly confidenceLevel: ConfidenceLevel;
   readonly citation: EvidenceCitationInput;
   readonly dispute?: EvidenceDisputeInput;
@@ -147,7 +131,7 @@ export type EvidenceClaimView = {
   readonly object: string;
   readonly confidenceLabel: string;
   readonly confidenceLevel: ConfidenceLevel;
-  readonly confidenceScore: number;
+  readonly confidenceScore?: number;
   readonly citation: EvidenceCitationView;
   readonly excerpt?: EvidenceExcerptView;
   readonly dispute?: EvidenceDisputeView;

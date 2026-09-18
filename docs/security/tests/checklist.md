@@ -23,7 +23,7 @@
 |----|-------|-------|------|
 | A-04a | AC-04 | Public token cannot call `api-internal` publish | ci (`security-gates.test.ts`) |
 | A-04b | AC-04 | Cannot read/modify another actor’s submission by ID | ci (`security-gates.test.ts`, BOLA) |
-| A-03a | AC-03 | End-user Firebase token rejected on admin/publication | ci (`security-gates.test.ts` → Firebase auth gate) |
+| A-03a | AC-03 | End-user token rejected on admin/publication | ci (`security-gates.test.ts` → staff auth gate) |
 | A-16a | AC-16 | Research worker credentials cannot activate release | ci (`security-gates.test.ts`) |
 
 ## Abuse / quotas (–026, , )

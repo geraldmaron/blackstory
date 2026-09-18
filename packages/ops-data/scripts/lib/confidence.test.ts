@@ -1,12 +1,12 @@
 /**
- * Regression tests for corsair confidence wiring: host classification and the
- * multi-source publish threshold used by auto-promote / rejudge gates.
+ * Tests host classification and multi-source confidence heuristics.
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import {
   classifySourceForConfidence,
-  computeClaimConfidence,
+  assessPublicationClaims,
+  type ReviewedClaimAssessment,
   confidenceLevelForSource,
 } from './confidence.ts';
 import { setSourceRegisterForTesting, type SourceRegisterFile } from './source-register.ts';
@@ -130,132 +130,103 @@ test('a patent mirror search page, listing, or home page is not a government rec
   assert.notEqual(classifySourceForConfidence('https://patents.google.com/'), 'government_record');
 });
 
-test('historicsites.dcpreservation.org alone scores 0.7067 — below standardPublish', () => {
-  // Below the 0.72 this used to pin: temporalProximity and extractionQuality carry no document
-  // date or extraction selector here, so they are unassessed and drop out of the weighted score
-  // (renormalized over the remaining components) instead of contributing their old placeholder
-  // 0.7/0.8 as though those were measurements.
-  const result = computeClaimConfidence('claim-dc-only', [
-    { url: DC_PRESERVATION, textContainsSubjectName: true },
-  ]);
-  assert.equal(result.score, 0.7067);
-  assert.equal(result.passesPublishThreshold, false);
-  assert.equal(result.threshold, 0.75);
-  assert.equal(result.independentLineageCount, 1);
-});
-
-test('a record with no document date does not receive a temporalProximity contribution', () => {
-  const withoutDate = computeClaimConfidence('claim-no-document-date', [
-    { url: DC_PRESERVATION, textContainsSubjectName: true },
-  ]);
-  // Unassessed: no measurement was averaged in — the component reports 0, and the weighted
-  // score renormalizes around the dimensions that were assessed, rather than treating this as
-  // a real (if middling) 0.7 the way the old constant did.
-  assert.equal(withoutDate.components.temporalProximity, 0);
-  assert.equal(withoutDate.score, 0.7067);
-
-  const withDate = computeClaimConfidence('claim-with-document-date', [
-    { url: DC_PRESERVATION, textContainsSubjectName: true, documentDate: '1925-04-01' },
-  ]);
-  // Assessed: the real value is averaged in and its weight re-enters the score. Whether that
-  // moves the score up or down depends on whether 0.7 sits above or below the rest of the
-  // claim's weighted average, not on presence alone — here it pulls the score down slightly,
-  // which is the correct behavior for a renormalized mean, not a sign the wiring is backwards.
-  assert.equal(withDate.components.temporalProximity, 0.7);
-  assert.notEqual(withDate.score, withoutDate.score);
-});
-
-test('a record with no extraction selector does not receive an extractionQuality contribution', () => {
-  const withoutSelector = computeClaimConfidence('claim-no-extraction-selector', [
-    { url: DC_PRESERVATION, textContainsSubjectName: true },
-  ]);
-  assert.equal(withoutSelector.components.extractionQuality, 0);
-  assert.equal(withoutSelector.score, 0.7067);
-
-  const withSelector = computeClaimConfidence('claim-with-extraction-selector', [
-    { url: DC_PRESERVATION, textContainsSubjectName: true, extractionSelector: '.infobox .built' },
-  ]);
-  assert.equal(withSelector.components.extractionQuality, 0.8);
-  assert.equal(withSelector.score, 0.7222);
-});
-
-test('dcpreservation + nps.gov clears standardPublish via corroboration', () => {
-  const result = computeClaimConfidence('claim-dc-nps', [
-    { url: DC_PRESERVATION, textContainsSubjectName: true },
-    { url: NPS_GOV, textContainsSubjectName: true },
-  ]);
-  assert.ok(result.score >= 0.75);
-  assert.equal(result.passesPublishThreshold, true);
-  assert.equal(result.independentLineageCount, 2);
-});
-
-test('dcpreservation + hmdb.org clears standardPublish via tier-2 corroboration', () => {
-  const result = computeClaimConfidence('claim-dc-hmdb', [
-    { url: DC_PRESERVATION, textContainsSubjectName: true },
-    { url: 'https://www.hmdb.org/m.asp?m=12345', textContainsSubjectName: true },
-  ]);
-  assert.ok(result.score >= 0.75);
-  assert.equal(result.passesPublishThreshold, true);
-  assert.equal(result.independentLineageCount, 2);
-});
-
-test('wikipedia-only scores below a real single source, not level with one', () => {
-  // 0.6267, below a lone reputable_secondary host's 0.7067. Those two used to be level (0.66 vs
-  // 0.72), which was the tell: a bridge and a heritage-inventory record are not equally good
-  // evidence, and the old rule could not say so because it counted a hostname as a lineage.
-  // A bridge contributes no corroborating lineage at all, so lineageIndependence is 0 here.
-  const result = computeClaimConfidence('claim-wiki-only', [
-    { url: WIKIPEDIA, textContainsSubjectName: true },
-  ]);
-  assert.equal(result.score, 0.6267);
-  assert.equal(result.independentLineageCount, 0);
-  assert.equal(result.passesPublishThreshold, false);
-});
-
-test('adding a bridge to a real source neither lifts nor drags the score', () => {
-  // Both halves matter. A bridge must not be what carries a claim over the publish line, and
-  // citing one must not PENALISE a record either — that is how "more research made the record
-  // less publishable" happened before.
-  const npsAlone = computeClaimConfidence('claim-nps', [
-    { url: NPS_GOV, textContainsSubjectName: true },
-  ]);
-  const npsPlusBridge = computeClaimConfidence('claim-nps-wiki', [
-    { url: NPS_GOV, textContainsSubjectName: true },
-    { url: WIKIPEDIA, textContainsSubjectName: true },
-  ]);
-  assert.equal(npsPlusBridge.score, npsAlone.score);
-  assert.equal(npsPlusBridge.independentLineageCount, 1);
-});
-
-test('one authority under two hostnames is one lineage, not two', () => {
-  // nps.gov and npgallery.nps.gov are the Park Service twice. Under the hostname rule they
-  // corroborated each other.
-  const result = computeClaimConfidence('claim-nps-twice', [
-    { url: NPS_GOV, textContainsSubjectName: true },
+const entry = {
+  id: 'entity-a',
+  claims: [
     {
-      url: 'https://npgallery.nps.gov/NRHP/GetAsset/NRHP/12345_text',
-      textContainsSubjectName: true,
+      predicate: 'founded',
+      object: 'Founded in 1920',
+      citationHref: NPS_GOV,
+      citationSource: 'NPS',
+      citationLabel: 'Record',
+      confidenceLevel: 'high' as const,
     },
-  ]);
-  assert.equal(result.independentLineageCount, 1);
+  ],
+};
+const reviewed: ReviewedClaimAssessment = {
+  entityId: entry.id,
+  claimId: 'claim-a',
+  claimVersionId: 'version-a',
+  predicate: 'founded',
+  object: 'Founded in 1920',
+  citationHrefs: [NPS_GOV],
+  assessmentId: 'assessment-a',
+  reviewDecisionId: 'review-a',
+  assessment: {
+    acceptanceProbability: 0.95,
+    intervalLow: 0.8,
+    intervalHigh: 0.99,
+    sourceReliability: 0.9,
+    entailment: 0.99,
+    independence: 0.8,
+    identityConfidence: 0.99,
+    relevance: 1,
+    researchCompleteness: 0.9,
+    calibrationVersion: 'held-out-claims-v1',
+  },
+};
+
+test('a government citation without independent claim assessment cannot authorize publication', () => {
+  assert.equal(assessPublicationClaims(entry, []).ok, false);
 });
 
-test('one patent read at the Patent Office and at a mirror is one lineage', () => {
-  const result = computeClaimConfidence('claim-patent', [
-    { url: 'https://patents.google.com/patent/US252386A/en', textContainsSubjectName: true },
+test('exact reviewed claim uses conservative bound and preserves canonical identity', () => {
+  const result = assessPublicationClaims(entry, [reviewed]);
+  assert.ok(result.ok);
+  assert.equal(result.score, 0.8);
+  assert.equal(result.claims[0]?.id, reviewed.claimId);
+});
+
+test('a review cannot transfer to another entity, assertion, predicate, id or citation', () => {
+  for (const change of [
+    { entityId: 'entity-b' },
+    { predicate: 'closed' },
+    { object: 'Founded in 1930' },
+    { citationHrefs: [WIKIPEDIA] },
+  ]) {
+    assert.equal(assessPublicationClaims(entry, [{ ...reviewed, ...change }]).ok, false);
+  }
+  assert.equal(
+    assessPublicationClaims(
+      { ...entry, claims: [{ ...entry.claims[0]!, id: 'unrelated-claim' }] },
+      [reviewed],
+    ).ok,
+    false,
+  );
+});
+
+test('one assessed claim does not cover another or uncited assertions', () => {
+  for (const extra of [
+    { ...entry.claims[0]!, object: 'Founded by Jane Doe' },
     {
-      url: 'https://ppubs.uspto.gov/pubwebapp/x?patentNumber=252386',
-      textContainsSubjectName: true,
+      predicate: 'founded',
+      object: 'Founded in 1920',
+      citationSource: 'NPS',
+      citationLabel: 'Record',
+      confidenceLevel: 'high' as const,
     },
-  ]);
-  assert.equal(result.independentLineageCount, 1);
+  ]) {
+    assert.equal(
+      assessPublicationClaims({ ...entry, claims: [...entry.claims, extra] }, [reviewed]).ok,
+      false,
+    );
+  }
 });
 
-test('wikipedia + nps.gov clears standardPublish', () => {
-  const result = computeClaimConfidence('claim-wiki-nps', [
-    { url: WIKIPEDIA, textContainsSubjectName: true },
-    { url: NPS_GOV, textContainsSubjectName: true },
-  ]);
-  assert.ok(result.score >= 0.75);
-  assert.equal(result.passesPublishThreshold, true);
+test('ambiguous or malformed assessments remain held', () => {
+  assert.equal(assessPublicationClaims(entry, [reviewed, reviewed]).ok, false);
+  for (const change of [
+    { intervalLow: NaN },
+    { intervalLow: 0.98 },
+    { acceptanceProbability: 1.2 },
+    { calibrationVersion: 'uncalibrated' },
+    { calibrationVersion: '' },
+  ]) {
+    assert.equal(
+      assessPublicationClaims(entry, [
+        { ...reviewed, assessment: { ...reviewed.assessment, ...change } },
+      ]).ok,
+      false,
+    );
+  }
 });

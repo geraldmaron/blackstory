@@ -164,7 +164,7 @@ async function main(): Promise<void> {
       };
 
       const landscape = await client.query(
-        `UPDATE bb_research.landscape_candidates
+        `UPDATE research.landscape_candidates
          SET status = 'accepted',
              summary = $2,
              payload = jsonb_set(
@@ -194,7 +194,7 @@ async function main(): Promise<void> {
       landscapeUpdated += landscape.rowCount ?? 0;
 
       const canonical = await client.query(
-        `UPDATE bb_canonical.entities
+        `UPDATE canonical.entities
          SET living_status = 'deceased',
              living_status_derived = coalesce(living_status_derived, '{}'::jsonb) || $2::jsonb,
              updated_at = now()
@@ -217,7 +217,7 @@ async function main(): Promise<void> {
 
     for (const v of quarantine) {
       const result = await client.query(
-        `UPDATE bb_research.landscape_candidates
+        `UPDATE research.landscape_candidates
          SET status = 'quarantined',
              summary = $2,
              provenance = coalesce(provenance, '{}'::jsonb) || $3::jsonb,

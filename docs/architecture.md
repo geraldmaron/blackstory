@@ -1,205 +1,98 @@
-# BlackStory architecture
+# Architecture
 
-> Formal ADRs were cleared 2026-07-24 (decision-doc purge). Still-binding invariants live in
-> `docs/decisions-carryover.md`. Historical ADR filenames remain in git (`git log -- docs/adr/`).
+BlackStory publishes evidence-backed Black history connected to people and places. The research
+framework is intended to support other domains through explicit profiles and adapters. That
+portability is partial: the kernel is generic, while several execution paths still depend on
+BlackStory data and policy. [Research](./research/README.md) states the supported paths and gaps.
 
-## Current stack (verified 2026-08-28)
+## Authority and entry points
 
-Checked against live https://blackstory.app/ (`x-vercel-id`, `x-vercel-cache`,
-`va.vercel-scripts.com` / `vitals.vercel-insights.com`, Cloudflare `server` header, CSP
-`img-src` including `https://twykhihqkcldpreuovay.supabase.co` and leftover
-`https://storage.googleapis.com`). This is the current story. Older runbooks that still name
-Firebase App Hosting or Firestore as SoR are leftover.
+Read this map, the [engineering contract](./decisions-carryover.md), and the contract for the
+surface being changed. Then inspect the implementation and tests. These documents describe the
+current system and desired constraints; neither prose nor code is exempt from challenge.
 
-| Layer | Current | Leftover |
-|-------|---------|----------|
-| Public web | Vercel (Cloudflare in front) | Firebase App Hosting, Cloud Run for `apps/web` |
-| Admin | `/admin` route group inside `apps/web`, same Vercel project (since 2026-09-11) | Was a separate Vercel project (`apps/admin/vercel.json`); before that, deleted App Hosting / Cloud Run `black-book-admin-production` |
-| Data | Supabase Postgres `blackstory-app` (`twykhihqkcldpreuovay.supabase.co`) | Firestore, parked PostGIS / Cloud SQL |
-| Media | Supabase Storage `public-media` | GCS dual-serve (`storage.googleapis.com` still in CSP) |
+| Question | Authority |
+|---|---|
+| System shape and how to challenge it | This file |
+| Cross-cutting engineering constraints | [Engineering contract](./decisions-carryover.md) |
+| Research method, portability, execution status | [Research framework](./research/README.md) |
+| Exact operator commands | [Research operations](./research/research-operations.md) |
+| Stored schema and access controls | `supabase/migrations/`, reconciled with the running database |
+| Research wire contracts | `packages/research-kernel/schemas/research-kernel.v1.schema.json` |
+| Product policy | `packages/schemas/constitution/` |
+| UI and brand | `docs/ui/README.md`, `docs/ui/PROTECTED-EXPERIENCES.md`, `brand/` |
+| Work status and next actions | Beads; `bd ready`, `bd show <id>` |
 
-**Live** https://blackstory.app/ (verified 2026-08-28) is still the old catalog filter board
-(Kind / Tone / Era / Theme / Status / Confidence / Where), about 4,100 released records.
-That is production today. It is not yet the first-run sat below.
+Historical ADRs, PRDs, dated audits, and generated public docs are supporting evidence, never a
+second authority. Do not recover an old decision merely because code cites its number. If the
+current rule cannot be found, inspect the behavior, record the uncertainty, and resolve it here
+or in the owning contract. Update existing authoritative prose instead of adding another memo.
 
-**Intended first-run**, sat 2026-08-28 on isolated branch `cursor/first-paint-local-119c` at
-localhost:3048 (commit `0dfc8f5a`): Greenwood first; header rooms are Explore and Rooms only;
-no Journey room; no Grade A; no "2 sources"; `/?atlas=1` 308s home. That chrome is not live
-until that isolated work lands. Do not invent a Journey page. Do not restyle first paint here.
+## Runtime and module map
 
-`/journey` is unfinished. Apex and www return HTTP 404 (verified 2026-08-28). Do not add it
-to nav, about, sitemap, or in-app links. Do not list Journey as a room. There is no public
-Journey source beyond that 404.
+| Surface | Responsibility |
+|---|---|
+| `apps/web` | Next.js public web and staff-gated `/admin` console on Vercel |
+| `apps/api-public` | Released public read/search/location API and mobile data boundary |
+| `apps/api-submissions` | Quarantined contributions and corrections |
+| `apps/api-internal` | Internal publication and control operations |
+| `apps/mobile` | Expo native app, its own npm graph and verification path |
+| `apps/docs` | Public documentation source, exported to GitHub Pages |
+| `packages/research-kernel` | Generic schemas, profiles, validation, priority and stopping rules |
+| `packages/research-harness` | Source adaptation, candidate signals, evidence-attached extraction |
+| `packages/operator-cli` | Explicit research commands, safe retrieval, providers, persistence adapters |
+| `packages/operator-mcp` | Read tools; not a complete research executor |
+| `packages/domain-core`, `packages/domain` | Identity, claims, lineage, discovery and publication rules |
+| `packages/data-access`, `packages/ops-data` | Postgres access and operator data workflows |
+| `workers/*` | Explicit worker adapters for research, publication and security |
+| `supabase/` | Database migrations, RLS, authorization functions and SQL tests |
 
-`/records/42Cb1758` is not a published record (HTTP 404, verified 2026-08-28). Record pages
-are `/entity/<id>`. Live production can still show that id as a list title. Intended
-first-run does not. Do not invent the page.
+Supabase Postgres and Storage hold product data and media. Cloudflare fronts the public web;
+Vercel deploys the web application. Merging into the production branch can deploy through Vercel
+Git integration independently of GitHub Actions. Check the release runbook before landing changes.
+Repository configuration is not proof of live deployment, billing, or enabled schedules.
 
-This repo only configures Supabase project `blackstory-app`. Other org Pro projects are not in
-this config, so unused is not proven here. Docs agreement is not a billing close.
+There is no research dependency on Corsair. No research schedule should be installed. Job
+contracts and manual workflow dispatch remain so scheduling can be explicitly enabled in a
+future authorized change. Remaining optional GCP service-control files describe potential deployments,
+not permission to provision a parallel research platform.
 
-Cover-package work belongs on administration-app, not this repo.
+## Data flow
 
-## System overview
+Source or search lead → independently retrieved evidence → versioned capture and selector →
+atomic claim or relationship proposal → identity/fitness/lineage/contradiction review →
+canonical decision → approved release projection → public readers.
 
-BlackStory is a place-connected Black history research platform. Public surfaces serve only
-released historical projections. Research, evidence, and promotion stay behind private APIs,
-workers, and admin tools.
+Keep the URL, holding institution, underlying work, capture, retrieval outcome, selector, and
+claim assignment distinct. Research proposes; publication authorizes. An excerpt-match proves
+where words came from, not whether the words establish the asserted fact. A graph path preserves
+its edges and uncertainties; it never becomes a shortcut causal claim.
 
-## Surfaces
+## Challenge procedure
 
-```
-apps/web                 Public Next.js on Vercel (live: blackstory.app); private admin/research
-                          console at /admin (apps/web/src/admin/**), staff-gated, same deployment
-apps/api-public          Public read/search/location API (in-repo; Cloud Run deploy unverified)
-apps/api-submissions     Corrections / contribution intake (in-repo; Cloud Run deploy unverified)
-apps/api-internal        Publication / promotion / internal control (in-repo; Cloud Run deploy unverified)
-apps/docs                Public docs site (GitHub Pages static export)
-apps/mobile              Expo mobile (isolated lockfile)
-workers/research         Research compute
-workers/publication      Projection, snapshot, indexing, release
-workers/security         Quarantine, content validation, integrity
-packages/*               Shared TypeScript libraries
-supabase/                Postgres migrations for blackstory-app
-infra/*                  Leftover Firebase/GCP scaffolding, GitHub, parked PostGIS
-```
+Any agent can challenge a load-bearing choice without creating an ADR or PRD:
 
-`functions/` (Firebase Cloud Functions v2 schedules) was deleted. Scheduling moved to
-`.github/workflows/discovery-campaigns.yml`. Do not add deployable microservices beyond this
-set (`docs/decisions-carryover.md`, "Service surface separation"). Historical ADR-005 text is in
-git history: `git log -- docs/adr/`.
+1. State the current claim and the user-visible outcome it serves. Identify the owning module,
+   contract, tests, and any observed live evidence. Label fact, inference, and unknown separately.
+2. State the strongest failure mode and best viable alternative. Include integrity, privacy,
+   cost, operational burden, and the effect of missing or biased source material.
+3. Define the smallest decisive experiment. Use realistic data and the actual interface. For a
+   database or authorization change, include production-shaped migration and denial tests.
+4. Record **accepted**, **accepted with controls**, **needs validation**, or **rejected**, with the
+   evidence and the condition that would change the decision. Put work and dependencies in Beads.
+5. Change the implementation, tests, and owning document together. Remove superseded paths and
+   claims. Do not retain compatibility wrappers unless the user explicitly changes that goal.
+6. Run the applicable project gates and observe the outcome. Report what remains unproven and
+   the exact next check. Close work only when its stated acceptance criteria have been observed.
 
-## At-scale topology
+For routine reversible changes, this can be a short issue note plus the diff. The procedure is
+for resolving uncertainty, not creating approval ceremony. Existing user authorization applies.
+Code comments describe behavior, constraints, and reasons; investigation history belongs in Git.
 
-Request and data-flow topology for the live stack described above (Cloudflare in front of
-Vercel, Supabase as the sole data store, GitHub Actions driving the offline research/publication
-pipeline). No Kubernetes anywhere in this repo — confirmed by repo-wide grep, zero real hits —
-so there is no k8s diagram to pair with this one.
+## Validation
 
-```mermaid
-flowchart TB
-    CF["Cloudflare\nDNS + edge (blackstory.app)"]
-
-    subgraph Vercel["Vercel (git-deployed, separate projects)"]
-        WEB["apps/web\npublic site + /admin console\n(staff-gated, same deployment)"]
-        APIPUB["apps/api-public\nread / search / location API\n(project blackstory-api)"]
-        APISUB["apps/api-submissions\ncorrections / contribution intake"]
-        APIINT["apps/api-internal\npublication / promotion / control"]
-    end
-
-    subgraph CI["GitHub Actions"]
-        DISCO["discovery-campaigns.yml\nscheduled discovery"]
-    end
-
-    subgraph Workers["Offline workers"]
-        WRES["workers/research\nresearch compute"]
-        WPUB["workers/publication\nprojection, snapshot, indexing, release"]
-        WSEC["workers/security\nquarantine, content validation, integrity"]
-    end
-
-    subgraph Supabase["Supabase — project blackstory-app"]
-        PG[("Postgres\ncanonical write + bb_public projections")]
-        STORE[("Storage\npublic-media")]
-        REST["PostgREST\npublished-views read design"]
-    end
-
-    CF --> WEB
-    CF --> APIPUB
-    CF --> APISUB
-
-    WEB -->|"public read: released\nprojections only"| PG
-    APIPUB -->|"public read: released\nprojections only"| PG
-    APISUB -->|"intake write:\nquarantine only"| PG
-    APIINT -->|"promotion gate"| PG
-
-    DISCO --> WRES
-    WRES -->|"research / evidence\n(cannot publish)"| PG
-    WRES --> WPUB
-    WPUB -->|"promote + snapshot"| PG
-    WPUB --> WSEC
-    WSEC -->|"quarantine / validate"| PG
-
-    PG --- REST
-    WEB -.->|media| STORE
-    APIPUB -.->|media| STORE
-```
-
-Boundaries this diagram assumes (see the table below for the full list): canonical writes never
-originate from anonymous or public clients; public read paths (`apps/web`, `apps/api-public`)
-only ever serve released projections/snapshots, never live research state; research and LLM
-work cannot publish directly — `workers/publication` is the only promotion path; submissions
-intake writes to quarantine, not to canonical data.
-
-## Platform (live vs leftover)
-
-- **Data:** Supabase Postgres on `blackstory-app` is the product system of record. Public media
-  is Supabase Storage. GCS dual-serve and Firestore export tools are leftover
-  (`docs/data/firebase-wind-down.md`, `docs/data/supabase-storage-cutover.md`). Parked Cloud SQL
-  / PostGIS under `infra/database/` is leftover, not the production path.
-- **App data access:** Postgres via server `DATABASE_URL` / `@repo/data-access` on Vercel.
-  PostgREST published views remain the developer-read design. `@repo/firebase` keeps App Check
-  helper types only. Do not add Firestore SoR access.
-- **Public web:** Vercel for `apps/web`. Admin is its own Vercel project, and `apps/api-public`
-  is a third (`blackstory-api`, to be served at `api.blackstory.app`). Firebase App Hosting
-  backends for web and admin were deleted. Cloud Run is not a target for anything here
-  (`docs/runbooks/api-public-vercel.md`).
-- **Auth / abuse:** Supabase Auth for admin (`app_metadata.bb_role`); request-integrity / client
-  headers for public mutations. App Check is retired on the public request path.
-- **Jobs / CI:** Discovery on GitHub Actions. WIF apply under `infra/gcp/wif/` is leftover
-  scaffolding. Do not provision Cloud SQL. Do not dual-write canonical truth to Firestore.
-
-## Boundaries
-
-| Concern | Rule |
-|---------|------|
-| Canonical write | Never from anonymous or public clients |
-| Public read | Released projections / immutable snapshots only (`decisions-carryover.md`, "Public projection and immutable publication snapshots") |
-| Promotion | Required before any submission becomes public |
-| Research / LLM | Cannot publish; public render never calls an LLM |
-| Living persons | No public residential addresses; unknown living status treated as living |
-| External URLs | Untrusted; no synchronous fetch in user requests |
-| Credentials | Public API read-only on public projections; research ≠ publication |
-| Product policy | Versioned constitution only; not mutable via public endpoints |
-
-## Product constitution
-
-Single source of truth: `packages/schemas/constitution/policy.v1.json`, validated by
-`product-constitution.schema.json`.
-
-| Consumer | Package | Role |
-|----------|---------|------|
-| TypeScript apps/packages | `@repo/schemas` | Zod-validated loaders + evaluators |
-| Python workers | `black_book_constitution` | jsonschema-validated loaders + evaluators |
-
-Do not hard-code relevance/confidence thresholds, precision rules, or living-person rules in apps.
-Policy changes are version bumps in the shared JSON, never a public write API.
-
-## Security threat model
-
-Hostile-environment design is documented under [`docs/security/`](./security/). Assumptions remain
-binding; see `docs/decisions-carryover.md`, "Security and abuse assumptions" (ADR-010 no longer
-exists as a file).
-
-## Environment isolation
-
-Single-project GCP design (partially applied): [`security/environment-isolation.md`](./security/environment-isolation.md).
-Matrices and Terraform stubs: [`../infra/gcp/`](../infra/gcp/). Root `.firebaserc` was deleted in
-`repo-348e.8` (no Firestore/Firebase Hosting deploy target remains); the production Firebase
-project id (`black-book-efaaf`) that App Check still targets is documented in
-`infra/firebase/registered-apps.json`, not in a `.firebaserc` (the "Cloud Run env" this used to
-reference was leftover even before admin moved to Vercel, then inside `apps/web`).
-
-| Acceptance | Design enforcement |
-|------------|--------------------|
-| Dev credentials cannot access production | Development is local/emulator-oriented; tests fail closed against production identifiers |
-| Research workers cannot publish | Distinct research credentials; no release activation |
-| Public services cannot read private evidence | Bucket/RLS boundaries; no broad storage roles on public SAs |
-| Submissions compromise ≠ publish | Intake writes quarantine only |
-
-## Key decisions
-
-Formal ADRs (public web host, projections/snapshots, service separation, search/geocoding,
-security assumptions, Firestore→Supabase SoR migration, vector search, PostgREST reads, Vercel
-hosting, discovery schedules, etc.) were removed 2026-07-24 as part of a decision-doc purge —
-history is preserved in git (`git log -- docs/adr/`). Still-binding invariants extracted from
-them are captured in [`docs/decisions-carryover.md`](./decisions-carryover.md).
+Run `fnm exec --using=22 -- ./scripts/ci-local.sh` for the real CI lanes. During implementation,
+package tests provide faster feedback but do not replace those lanes. Database migrations need
+SQL tests against the actual Supabase migration chain, not only the parked boundary-stub schema.
+Mobile gates run from `apps/mobile`; root lint does not cover it. A user-visible behavior needs
+an observed API, CLI, browser, or native result with realistic inputs.

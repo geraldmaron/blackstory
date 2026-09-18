@@ -1,8 +1,7 @@
 # Runbook: NHGIS historical county race load (1790–1960)
 
 Loads `censusCountyHistoricalDecades` — Black population by county per decade on each decade's
-**historical** NHGIS boundaries. All acquisition is free (grant-funded IPUMS NHGIS). Writes to
-real Firestore are a deliberate operator step, never CI.
+**historical** NHGIS boundaries. All acquisition is free (grant-funded IPUMS NHGIS). Acquisition and database writes are explicit operator steps, never an automatic CI task.
 
 ## Prerequisites (one-time)
 
@@ -26,26 +25,16 @@ IPUMS web UI. Poll until `completed`, then **download and unzip** each into one 
 > NHGIS CSVs carry two header rows (codes, then descriptions); the parser handles that. Nothing
 > in this repo depends on a zip library — the operator unzips.
 
-## Step 2 — Load into Firestore (idempotent)
+## Parsing and persistence
 
-```bash
-NHGIS_DATA_DIR=./nhgis-data \
-  node --conditions development --import tsx \
-  packages/firebase/src/demographics/nhgis-load-cli.ts
-```
+`packages/ops-data/src/demographics/nhgis-loader.ts` exports `runNhgisCountyLoad`, which takes
+CSV inputs and an explicit writer. It is not a standalone loading command. The existing Postgres
+NHGIS ingestion entry is `packages/ops-data/scripts/ingest-phase1-nhgis.ts`; inspect its dataset
+and metric scope rather than assuming it imports every historical county race table.
 
-Writes one doc per NHGIS county (`gisJoin`) per decade, id `${gisJoin}_${decade}`. `contentHash`
-excludes timestamps → a re-run over unchanged CSVs reports all `unchanged`. A changed count
-reports `updated` and preserves `createdAt`.
-
-## Step 3 — Build the static map artifact
-
-The collection is **client-read CLOSED** (~45k docs). The public map reads a bounded static
-artifact instead. Read the collection (Admin SDK) and pass the docs to
-`buildNhgisCountyDecadeArtifact(docs)` (`nhgis-load-cli.ts`), then write the result to a static
-path (e.g. `apps/web/public/geo/county-historical-race-decades.json`) or Storage. The artifact
-is decade-keyed (`byDecade[decade] → [{gisJoin, black, blackFree?, blackEnslaved?}]`) and carries
-attribution + the boundary-vintage note.
+The pure `buildNhgisCountyDecadeArtifact` builder emits bounded public map data. Readers use
+published artifacts, not direct scans of private source rows. Verify attribution, boundary vintage,
+counts and content hashes before publishing a rebuilt artifact. No refresh is scheduled.
 
 ## Step 4 — Verify
 

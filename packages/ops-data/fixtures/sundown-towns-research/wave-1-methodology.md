@@ -5,7 +5,7 @@ Bead: `the related workstream` (research component of `the related workstream`).
 ## What this is
 
 A citation-backed candidate list of individually documented sundown towns, staged at
-`packages/firebase/fixtures/sundown-towns-research/wave-1-candidates.json`. It is **not** a
+`packages/ops-data/fixtures/sundown-towns-research/wave-1-candidates.json`. It is **not** a
 `SundownTownDesignationRecord` and cannot become one without further work — see "What's still
 needed" below.
 
@@ -83,7 +83,7 @@ requires:
 2. Real area geometry (`Polygon`/`BBox`) at the documentation's actual precision — most of these
    sources document a town or county, not a precise boundary; geometry must be sourced separately
    at the correct precision, not approximated or invented.
-3. A Firestore loader/ingest script wiring the above together, subject to the same citation and
+3. A reviewed Postgres intake adapter wiring the above together, subject to the same citation and
    confidence-label-preservation requirements documented in `source-registry.ts`.
 
 This candidate list intentionally stops short of all three — it is research output only.

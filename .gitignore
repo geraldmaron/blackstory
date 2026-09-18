@@ -34,7 +34,6 @@ coverage/
 .env.*
 !.env.example
 !.env.1password
-!.env.corsair.example
 *.pem
 credentials.json
 service-account*.json
@@ -84,6 +83,7 @@ packages/data-access/generated/*/
 !.claude/skills/
 .claude/skills/*
 !.claude/skills/blackstory/
+!.claude/skills/research-framework/
 .codex/
 .cursor/
 .vscode/
@@ -121,7 +121,7 @@ packages/ops-data/fixtures/person-commemorative-locations.json
 packages/ops-data/fixtures/national-catalog-location-overrides.json
 
 # Bulk discovery fixtures are working space, not source. The loaded candidates live
-# in bb_research.landscape_candidates; `--fetch` repopulates this directory on demand.
+# in research.landscape_candidates; `--fetch` repopulates this directory on demand.
 packages/ops-data/fixtures/discovery-candidates/bulk-*.json
 
 # Built at deploy time: the OpenAPI spec copied out for static serving.
@@ -136,3 +136,8 @@ apps/web/.tmp-lives-verify/
 .tmp-lives-batch4-crops/
 .tmp-lives-batch4-focus/
 .tmp-lives-batch4-locator/
+
+.playwright-mcp/
+
+# Local visual experiments are generated artifacts.
+/.tmp-hero-proof/

@@ -1,19 +1,7 @@
-/**
- * Entity sources for the embedding backfill CLI when `canonicalEntities` is empty or incomplete.
- *
- * Live prod currently publishes searchable text into `publicSearchIndex` (and release
- * projections) before canonical promotion fills `canonicalEntities`. These adapters map
- * search-index docs into `EntityEmbeddingInput` for the shared `runBackfill` loop. Era
- * pre-filters may be omitted: search records carry `eraBuckets` labels but not the
- * kind-specific year fields `deriveEraBucket` reads.
- */
+/** Converts public search-index records into entity-embedding input. */
 import { US_STATES } from '@repo/domain';
-import type { Firestore } from 'firebase-admin/firestore';
-import type { EntityKindDoc } from '../firestore/types.js';
-import type { CanonicalEntitySource } from './backfill-cli.js';
+import type { EntityKindDoc } from '../records/types.js';
 import type { EntityEmbeddingInput } from './pipeline.js';
-
-const PAGE_SIZE = 200;
 
 const STATE_BY_NAME = new Map(
   US_STATES.map((state) => [state.name.toLowerCase(), state.postalCode]),
@@ -67,7 +55,7 @@ function asEntityKind(kind: string | undefined): EntityKindDoc {
 
 /**
  * Maps a publicSearchIndex-shaped record into an embedding input.
- * `docId` is the Firestore document id (preferred entity id).
+ * `docId` is the record identifier (preferred entity id).
  */
 export function mapSearchIndexRecordToEmbeddingInput(
   docId: string,
@@ -115,36 +103,5 @@ export function mapSearchIndexRecordToEmbeddingInput(
           },
         }
       : {}),
-  };
-}
-
-/**
- * Pages `publicSearchIndex` ordered by document id. Skips docs missing displayName.
- */
-export function createFirestorePublicSearchIndexEntitySource(
-  firestore: Firestore,
-  pageSize = PAGE_SIZE,
-): CanonicalEntitySource {
-  return {
-    async listPage(cursor) {
-      let query = firestore.collection('publicSearchIndex').orderBy('__name__').limit(pageSize);
-      if (cursor) {
-        query = query.startAfter(cursor);
-      }
-      const snapshot = await query.get();
-      const items: EntityEmbeddingInput[] = [];
-      for (const doc of snapshot.docs) {
-        const mapped = mapSearchIndexRecordToEmbeddingInput(
-          doc.id,
-          doc.data() as SearchIndexEmbeddingRecord,
-        );
-        if (mapped) items.push(mapped);
-      }
-      const lastDoc = snapshot.docs.at(-1);
-      return {
-        items,
-        ...(lastDoc && snapshot.docs.length === pageSize ? { nextCursor: lastDoc.id } : {}),
-      };
-    },
   };
 }

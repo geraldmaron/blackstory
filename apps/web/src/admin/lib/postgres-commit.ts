@@ -52,7 +52,7 @@ export async function commitWithAuditPostgres(
   return withPostgresTransaction(async (client) => {
     const existing = await client.query<IdempotencyRow>(
       `SELECT event_id, outbox_message_id
-       FROM bb_ops.idempotency_keys
+       FROM ops.idempotency_keys
        WHERE key = $1`,
       [auditEvent.idempotencyKey],
     );
@@ -69,7 +69,7 @@ export async function commitWithAuditPostgres(
     await input.applyState(client);
 
     await client.query(
-      `INSERT INTO bb_audit.events
+      `INSERT INTO audit.events
         (id, action, category, actor, subject, reason, request_id, correlation_id,
          release_id, entity_id, idempotency_key, occurred_at, data)
        VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13)`,
@@ -91,7 +91,7 @@ export async function commitWithAuditPostgres(
     );
 
     await client.query(
-      `INSERT INTO bb_ops.outbox_messages
+      `INSERT INTO ops.outbox_messages
         (id, event_id, topic, aggregate_type, aggregate_id, payload, status, attempts,
          max_attempts, available_at, created_at, correlation_id, idempotency_key)
        VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13)`,
@@ -113,7 +113,7 @@ export async function commitWithAuditPostgres(
     );
 
     await client.query(
-      `INSERT INTO bb_ops.idempotency_keys
+      `INSERT INTO ops.idempotency_keys
         (key, event_id, outbox_message_id, correlation_id, created_at)
        VALUES ($1,$2,$3,$4,$5)`,
       [

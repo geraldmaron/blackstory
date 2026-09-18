@@ -1,38 +1,11 @@
 /**
- * Seed the trustworthy national spine series (repo-zxjz.11).
- *
- * Assembles spine_series / spine_segments rows for the data domains that have
- * passed value-validation:
- *   1. Wealth ratio, mean per-capita   — DKKS 1860-2019 (single authentic backbone)
- *   2. Wealth ratio, median household   — SCF 1989-2022 (computed here as a derived
- *      ratio; kept as a SEPARATE spine, never spliced onto #1, because mean-per-capita
- *      and median-household measure different gaps)
- *   3. Homeownership (Black + White NH) — decennial 1900-2000 + ACS 2005-2024
- *   4. Life expectancy (Black + White)  — NCHS 1900-2021 (single source; race-label
- *      seam nonwhite/colored -> Black at 1980 documented in comparability_note)
- *   5. Turnout (Black + White)          — CPS A-1 1980-2020 (single source)
- *   6. Median household income (Black + White NH) — Census H-5 1967/1972-2024
- *      (real gap: no White NH series before 1972 in the source table)
- *   7. Poverty rate (Black + White NH) — Census Table 2 1959/1973-2024 (real
- *      gaps: Black 1960-1965 unpublished; White NH not published before 1973)
- *   8. Imprisonment rate (Black + White) — BJS 2010-2023 (real gap: 1978-2009
- *      not yet re-sourced after the repo-ypfp fabrication purge, tracked on
- *      repo-77sl; a seam note flags the unreconciled 2012->2013 methodology jump)
- *   9. Admissions share, Black (no white twin — single-race share metric) —
- *      BJS "Race of Prisoners Admitted" 1926-1986 (real gaps in years the NPS
- *      admission series never collected/published)
- *
- * Idempotent: re-running replaces the spine rows and upserts the SCF ratio.
- *
- * Usage (repo root):
- *   # Dry-run (default)
- *   node --conditions development --import tsx \
- *     packages/ops-data/scripts/seed-spine-series-clean.ts
- *
- *   # Apply
- *   DRY_RUN=0 SEED_SPINE_CLEAN_APPLY=1 DATABASE_URL=postgresql://... \
- *     node --conditions development --import tsx \
- *     packages/ops-data/scripts/seed-spine-series-clean.ts
+ * Assemble national spine series with explicit source and denominator boundaries. Keep DKKS
+ * mean per-capita wealth (1860-2019) separate from SCF median-household wealth (1989-2022).
+ * Preserve the decennial/ACS homeownership seam, NCHS race-label change, Census income/poverty
+ * coverage gaps and BJS methodology seam. Imprisonment rates lack resourced 1978-2009 values;
+ * admissions shares have unpublished years and no White comparison series. Reruns replace spine
+ * rows and upsert the SCF ratio. Default dry-run; writes require DRY_RUN=0 and
+ * SEED_SPINE_CLEAN_APPLY=1.
  */
 import { createHash } from 'node:crypto';
 import pg from 'pg';
@@ -72,7 +45,7 @@ function hash(...parts: Array<string | number>): string {
 async function computeScfRatio(pool: pg.Pool) {
   const q = async (metric: string) => {
     const r = await pool.query<{ id: string; reference_period: string; estimate: string }>(
-      `SELECT id, reference_period, estimate FROM bb_reference.statistical_observations
+      `SELECT id, reference_period, estimate FROM reference.statistical_observations
        WHERE metric_id=$1 ORDER BY reference_period`,
       [metric],
     );
@@ -540,7 +513,7 @@ async function main() {
 
     // 1. SCF ratio statistical_series
     await client.query(
-      `INSERT INTO bb_reference.statistical_series
+      `INSERT INTO reference.statistical_series
          (metric_id, metric_definition, universe, unit, source_dataset, source_table, source_variable,
           geography_type, estimate_type, period_type, external_data_source_id, theme, metadata)
        VALUES ($1,$2,$3,'ratio',$4,'SCF bulletin (derived)','median_net_worth_white / median_net_worth_black',
@@ -560,7 +533,7 @@ async function main() {
       const obsId = `obs:${SCF_RATIO_METRIC}:nation:US:${r.year}`;
       const ch = hash(SCF_RATIO_METRIC, r.year, r.whiteVal, r.blackVal);
       await client.query(
-        `INSERT INTO bb_reference.statistical_observations
+        `INSERT INTO reference.statistical_observations
            (id, metric_id, jurisdiction_id, boundary_version, reference_period, dataset_vintage,
             estimate, race_ethnicity_slice, status, source, source_url, retrieved_at, content_hash, metadata)
          VALUES ($1,$2,'nation:US','nation-2022',$3,$4,$5,NULL,'observed',$6,$7,$8,$9,$10::jsonb)
@@ -583,7 +556,7 @@ async function main() {
       );
       const dmId = `dm:${SCF_RATIO_METRIC}:${r.year}`;
       await client.query(
-        `INSERT INTO bb_reference.derived_measurements
+        `INSERT INTO reference.derived_measurements
            (id, method_id, method_version, input_observation_ids, value, formula, assumptions, status,
             generated_at, jurisdiction_id, reference_period, metric_id, source, source_url, content_hash, metadata)
          VALUES ($1,'ratio-of-medians','1',$2,$3,$4,$5,'derived',$6,'nation:US',$7,$8,$9,$10,$11,$12::jsonb)
@@ -607,10 +580,10 @@ async function main() {
 
     // 3. spine_series + spine_segments (replace)
     for (const s of spines) {
-      await client.query(`DELETE FROM bb_reference.spine_segments WHERE spine_id=$1`, [s.spineId]);
-      await client.query(`DELETE FROM bb_reference.spine_series WHERE spine_id=$1`, [s.spineId]);
+      await client.query(`DELETE FROM reference.spine_segments WHERE spine_id=$1`, [s.spineId]);
+      await client.query(`DELETE FROM reference.spine_series WHERE spine_id=$1`, [s.spineId]);
       await client.query(
-        `INSERT INTO bb_reference.spine_series
+        `INSERT INTO reference.spine_series
            (spine_id, title, outcome, race_ethnicity_slice, geography_type, unit, definition, comparability_note, theme, status)
          VALUES ($1,$2,$3,$4,'nation',$5,$6,$7,$8,'review')`,
         [
@@ -627,7 +600,7 @@ async function main() {
       let i = 0;
       for (const seg of s.segments) {
         await client.query(
-          `INSERT INTO bb_reference.spine_segments
+          `INSERT INTO reference.spine_segments
              (id, spine_id, metric_id, period_start, period_end, priority, splice_note, seam_check)
            VALUES ($1,$2,$3,$4,$5,$6,$7,$8::jsonb)`,
           [

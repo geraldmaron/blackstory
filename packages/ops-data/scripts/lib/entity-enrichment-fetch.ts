@@ -1,10 +1,6 @@
 /**
- * repo-n7p6.4 (WS4) — shared DB fetch + subject assembly for every WS4 entry point
- * (enrich-entities-llm.ts calling OpenRouter, session-enrich-prepare.ts for a session/Haiku-
- * driven pass). One place decides what evidence a model sees for a given entity id, so an
- * OpenRouter-drafted answer and a session-drafted answer are judged by
- * validateEnrichmentResponse against exactly the same input — nothing about the trust model
- * changes with who answers.
+ * Shared evidence fetch and subject assembly for provider and externally supplied drafts. Both
+ * are validated against the same captured inputs.
  */
 import type pg from 'pg';
 import { createHash } from 'node:crypto';
@@ -15,15 +11,8 @@ import { type EvidenceExcerpt, excerptForWindow } from './evidence-excerpt.ts';
 export const MAX_CHARS_PER_SOURCE = 4_000;
 
 /**
- * Tier-1 sources get a bigger window. A National Register nomination is the deepest source in the
- * corpus and the only one that carries a statement of significance; a Wikipedia stub is not
- * competing for the same space.
- *
- * Sized from the corpus rather than picked: the median captured nomination runs about 23,000
- * characters, of which the significance statement is a large share. 4,000 was leaving a median of
- * 18,893 characters unread (repo-de8i), and while ordering significance first means the window now
- * lands on the history rather than the cornice profiles, a 4,000-character view of a 23,000
- * character document still stops mid-argument.
+ * Allocates larger excerpt windows to long primary nomination documents. Window size alone does
+ * not establish completeness; retain truncation and excerpt-selection metadata.
  */
 export const MAX_CHARS_PER_TIER1_SOURCE = 12_000;
 
@@ -116,10 +105,8 @@ export function selectEvidenceForModel(
       budget,
       Math.max(budget - reserved, MIN_CHARS_RESERVED_PER_REMAINING_SOURCE),
     );
-    // Relevance-aware rather than a head slice (repo-z57b): on a large district nomination the
-    // first `cap` characters are criteria checkboxes, UTM points and building inventory, and the
-    // history begins past the window. See evidence-excerpt.ts for why raising the cap is not the
-    // fix.
+    // Select relevant passages rather than only the document head, which may contain forms and
+    // building inventories instead of historical context.
     const excerpt = excerptForWindow(row.content_text ?? '', Math.min(perSourceCap, available));
     const text = excerpt.text;
     if (text.length === 0) continue;
@@ -170,7 +157,7 @@ export async function fetchEnrichmentSubjects(
 
   const candidateRows = await pool.query<CandidateRow>(
     `SELECT id, lane, display_name, payload
-       FROM bb_research.landscape_candidates
+       FROM research.landscape_candidates
       WHERE id = ANY($1::text[])`,
     [entityIds],
   );
@@ -178,7 +165,7 @@ export async function fetchEnrichmentSubjects(
 
   const evidenceRows = await pool.query<EvidenceRow>(
     `SELECT entity_id, id, source_tier, title, content_text, content_hash
-       FROM bb_research.entity_evidence
+       FROM research.entity_evidence
       WHERE entity_id = ANY($1::text[]) AND status = 'captured'`,
     [entityIds],
   );

@@ -1,7 +1,5 @@
 /**
- * `fetchEntityDetail` tests with fully injected fakes — no SQLite, no NetInfo, no App Check.
- * Mirrors the dependency-injection style every module in `apps/mobile/src/data/*.test.ts`
- * already uses.
+ * Entity-detail tests with injected storage, connectivity and HTTP dependencies.
  */
 import { TransportError } from '@/data';
 import type { Connectivity } from '@/data';

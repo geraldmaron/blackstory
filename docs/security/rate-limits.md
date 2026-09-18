@@ -2,7 +2,7 @@
 
 **Status:** Policy matrix + in-memory evaluator in-repo. Shared distributed store and live
 middleware wiring are follow-on work (, ).
-**Depends on:** [ ingress / Cloud Armor](./ingress-armor.md), [ App Check](../packages/firebase)
+**Depends on:** [ ingress / Cloud Armor](./ingress-armor.md), [API protocol](../../apps/api-public/src/http/README.md)
 **Threats:** [T-01](./threat-model.md#t-01-volumetric-and-application-layer-denial-of-service), [T-02](./threat-model.md#t-02-cost-exhaustion-via-search-and-geocoding), [T-05](./threat-model.md#t-05-coordinated-correction-brigading)
 
 ## Objective
@@ -15,7 +15,7 @@ device/session risk, and endpoint class — without exposing exact thresholds to
 | Layer | Scope | Implementation |
 |-------|-------|----------------|
 | Cloud Armor | Per-IP edge throttles, WAF, emergency deny | [`infra/gcp/armor/`](../../infra/gcp/armor/) |
-| App Check | Client attestation for expensive/mutation paths | `@repo/firebase` guards |
+| Client header | Platform/version format signal, not authorization | `packages/security/src/client-attestation.ts` |
 | Subject quotas | anonymous < authenticated < admin < service | `@repo/security` policy matrix |
 | Endpoint buckets | search, geocode, nearby, entity, source, … | Token bucket + rolling/daily windows |
 | Risk aggregation | Cross-IP device/session/account signals | `RiskSignal` + `aggregateDistributedRisk` |
@@ -81,7 +81,7 @@ pnpm --filter @repo/api-submissions test
 
 ## Remaining live work
 
-1. Wire guards into Cloud Run request middleware (after App Check).
+1. Wire guards into Cloud Run request middleware (after the client-header protocol check).
 2. Shared Redis/Memorystore backend implementing `RateLimitStore`.
 3. Export quota metrics to  telemetry (`rate_limit_denied`, `risk_score_exceeded`).
 4. Load/abuse validation under  against staging Armor + app quotas.

@@ -31,7 +31,7 @@ export type RunCommonsMediaEnrichmentResult = {
 };
 
 /**
- * Dry-run / propose-only enrichment. Does not upload bytes or write Firestore.
+ * Dry-run / propose-only enrichment. Does not upload bytes or write canonical records.
  */
 export async function runCommonsMediaEnrichment(
   input: RunCommonsMediaEnrichmentInput,

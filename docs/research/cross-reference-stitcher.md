@@ -81,9 +81,9 @@ cross-source stitches map onto the **existing** canonical merge ledger after hum
 
 | Concept | Existing ledger home |
 |---|---|
-| A stitched (survivor) entity | `bb_canonical.entity_merges` (`survivor_id`, `status`, `reason`, `actor_id`) |
-| Absorbed cross-source appearances | `bb_canonical.entity_merge_absorbed` |
-| Supporting evidence for the merge | `bb_canonical.entity_merge_evidence` |
+| A stitched (survivor) entity | `canonical.entity_merges` (`survivor_id`, `status`, `reason`, `actor_id`) |
+| Absorbed cross-source appearances | `canonical.entity_merge_absorbed` |
+| Supporting evidence for the merge | `canonical.entity_merge_evidence` |
 | Pre-review private candidates | discovery candidate store (`discovery-candidate.v1`), unioned via `mergeDuplicateCandidates` |
 
 The reserved migration prefix `20260724000007` is therefore **left unused** for this work —
@@ -94,7 +94,7 @@ no schema change ships.
 `buildCrossReferenceCandidates` output flows into the same private candidate handling as
 the rest of discovery (dedup already applied; `attachCatalogMatch` may still run for
 propose/review/no_match blocking). Confirmed stitches are recorded by a human against
-`bb_canonical.entity_merges` — never by this module.
+`canonical.entity_merges` — never by this module.
 
 The barrel `packages/domain/src/citation-independence/index.ts` is **not edited by this
 change**. The parent agent should add the following exports (values then types):

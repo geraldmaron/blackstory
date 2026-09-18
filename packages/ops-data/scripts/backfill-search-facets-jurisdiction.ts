@@ -1,5 +1,5 @@
 /**
- * Realign `bb_public.search_index.facets->>'jurisdictionState'` with the release projection.
+ * Realign `published.search_index.facets->>'jurisdictionState'` with the release projection.
  *
  * A thin wrapper over `lib/search-facet-realign.ts`, configured for the `jurisdictionState` key:
  * this runs through that shared engine's `scalar-facet` mode, which allows the source and
@@ -8,7 +8,7 @@
  * `lib/incremental-publish.ts` names it by file in a comment explaining the drift it mops up.
  *
  * 4,100 of the 4,107 entities in the active release carry a `jurisdictionLabel` in
- * `bb_public.release_entities.projection` and nothing in the matching `search_index` facet. The
+ * `published.release_entities.projection` and nothing in the matching `search_index` facet. The
  * cost of that gap is visible on two surfaces at once. `/records` reads the search doc, so the
  * place column falls through to the literal "Place not recorded" for a record whose own entity
  * page prints a place, and the State facet offers six states with one or two records each out of

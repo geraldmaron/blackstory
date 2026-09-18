@@ -197,7 +197,7 @@ test('cache key is stable for equivalent normalized input', () => {
 test('timeout policy fails closed', () => {
   const policy = getQueryTimeoutPolicy();
   assert.equal(policy.failClosed, true);
-  assert.ok(policy.queryTimeoutMs >= policy.firestoreStatementTimeoutMs);
+  assert.ok(policy.queryTimeoutMs >= policy.databaseStatementTimeoutMs);
 });
 
 test('slow query log event shape includes failClosed', () => {

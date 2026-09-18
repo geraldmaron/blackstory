@@ -1,26 +1,8 @@
 /**
- * CLI for the repo-z97f audit: `first_to_do_x` / `only_or_oldest` notability-basis rows in the
- * active release whose resolved evidence is Wikipedia and nothing else. See
- * lib/superlative-wikipedia-audit.ts for what counts and why — this file only reads Postgres,
- * shapes the rows into that module's input, and prints/writes the result.
- *
- * docs/research/citation-standard.md: Wikipedia may carry a claim but never corroborates one and
- * is never sufficient for a superlative. William F. Penn's record asserted "First African
- * American to graduate from Yale Medical School (1897)" on Wikipedia's authority alone; Yale says
- * the actual first was Cortlandt Van Rensselaer Creed, MD 1857. That is the failure mode this
- * finds — before a reader finds it first.
- *
- * Read-only. Writes nothing to the database.
- *
- * Usage (from repo root):
- *   cd apps/web && set -a && . ./.env.local && set +a && \
- *     node --conditions development --import tsx \
- *     ../../packages/ops-data/scripts/audit-superlative-wikipedia-only.ts [--json <path>]
- *
- * `--json <path>` additionally writes the full finding list (one object per notability-basis row)
- * to that path, for working the cohort afterward — each entity needs its own judgment call
- * (corroborate institutionally, soften the summary/basis, or withdraw the claim), and that is not
- * something this script decides.
+ * Read-only audit of superlative inclusion claims whose supporting references resolve only to
+ * Wikipedia. Prints findings and optionally writes --json <path>. Each finding needs
+ * independent corroboration or editorial correction; the script does not decide or mutate the
+ * record.
  */
 import { writeFile } from 'node:fs/promises';
 import pg from 'pg';
@@ -67,14 +49,14 @@ async function main(): Promise<void> {
 
   try {
     const active = await client.query<{ release_id: string }>(
-      `SELECT release_id FROM bb_public.v_active_release_id`,
+      `SELECT release_id FROM published.v_active_release_id`,
     );
     const releaseId = active.rows[0]?.release_id;
     if (!releaseId) throw new Error('No active release');
 
     const { rows } = await client.query<Row>(
       `SELECT entity_id, display_name, kind, summary, claims, projection
-         FROM bb_public.release_entities WHERE release_id = $1 ORDER BY kind, display_name`,
+         FROM published.release_entities WHERE release_id = $1 ORDER BY kind, display_name`,
       [releaseId],
     );
 

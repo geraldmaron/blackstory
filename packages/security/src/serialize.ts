@@ -123,7 +123,7 @@ export function assertNoProhibitedPublicPrecision(
 /**
  * Fail-closed structural audit of a payload bound for a public surface.
  * Rejects prohibited precision levels, address-component keys, address-shaped strings,
- * and un-coarsened (exact) coordinates. Firestore public converters call this.
+ * and un-coarsened (exact) coordinates. Public projection builders call this.
  */
 export function assertPublicProjectionSafe(payload: unknown, path = 'public'): void {
   if (payload === null || typeof payload !== 'object') {

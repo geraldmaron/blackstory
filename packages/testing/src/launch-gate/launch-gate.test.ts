@@ -3,10 +3,20 @@
  */
 import assert from 'node:assert/strict';
 import { spawnSync } from 'node:child_process';
-import { mkdtempSync, readFileSync } from 'node:fs';
+import {
+  cpSync,
+  existsSync,
+  mkdirSync,
+  mkdtempSync,
+  readFileSync,
+  rmSync,
+  writeFileSync,
+} from 'node:fs';
+import { createHash } from 'node:crypto';
 import { tmpdir } from 'node:os';
-import { join } from 'node:path';
-import { describe, it, test } from 'node:test';
+import { dirname, join } from 'node:path';
+import { after, describe, it, test } from 'node:test';
+import { checkRestoreRehearsal } from './evidence-checks.js';
 import { fileURLToPath } from 'node:url';
 import { loadHumanAttestationBundle, validateBetaLaunchDecisionArtifact } from './artifact.js';
 import { BETA_LAUNCH_GATES, REQUIRED_HUMAN_GATE_IDS } from './criteria.js';
@@ -20,10 +30,50 @@ const repoRoot = join(fileURLToPath(new URL('.', import.meta.url)), '..', '..', 
 const fixtureDir = join(repoRoot, 'packages', 'testing', 'src', 'launch-gate', 'fixtures');
 const scriptPath = join(repoRoot, 'scripts', 'launch', 'evaluate-beta-gate.mjs');
 
+// Unit fixtures live outside the repository and never attest its operational readiness.
+const fixtureRoot = mkdtempSync(join(tmpdir(), 'launch-evidence-'));
+after(() => rmSync(fixtureRoot, { recursive: true, force: true }));
+for (const ref of new Set([
+  ...BETA_LAUNCH_GATES.flatMap((gate) => gate.evidence.map((item) => item.ref)),
+  'packages/config/src/kill-switches.ts',
+])) {
+  if (existsSync(join(repoRoot, ref))) {
+    mkdirSync(dirname(join(fixtureRoot, ref)), { recursive: true });
+    cpSync(join(repoRoot, ref), join(fixtureRoot, ref), { recursive: true });
+  }
+}
+const log = 'Controlled recovery verification fixture. Not an executed restore.';
+const recoveryReport = {
+  schemaVersion: 1,
+  mode: 'executed',
+  database: 'postgres',
+  backupId: 'fixture-backup',
+  sourceId: 'fixture-source',
+  destinationId: 'fixture-isolated',
+  verifiedBy: 'fixture-reviewer',
+  completedAt: '2026-07-01T00:00:00Z',
+  elapsedSeconds: 2,
+  rtoSeconds: 60,
+  dataLossSeconds: 0,
+  rpoSeconds: 0,
+  checks: {
+    rowCounts: true,
+    contentHashes: true,
+    authorization: true,
+    publicProjection: true,
+    storageObjects: true,
+  },
+  logPath: 'artifacts/recovery/fixture.log',
+  logSha256: createHash('sha256').update(log).digest('hex'),
+};
+mkdirSync(join(fixtureRoot, 'artifacts/recovery'), { recursive: true });
+writeFileSync(join(fixtureRoot, recoveryReport.logPath), log);
+writeFileSync(join(fixtureRoot, 'artifacts/recovery/latest.json'), JSON.stringify(recoveryReport));
+
 describe('evaluateBetaLaunchGate', () => {
   it('returns NO_GO when required human attestations are missing (fail-closed)', () => {
     const report = evaluateBetaLaunchGate({
-      repoRoot,
+      repoRoot: fixtureRoot,
       evaluator: 'test-harness',
       evaluatedAt: '2026-07-17T12:00:00.000Z',
     });
@@ -42,7 +92,7 @@ describe('evaluateBetaLaunchGate', () => {
   it('returns GO when machine checks pass and all human gates are attested', () => {
     const attestations = loadHumanAttestationBundle(join(fixtureDir, 'all-pass-attestations.json'));
     const report = evaluateBetaLaunchGate({
-      repoRoot,
+      repoRoot: fixtureRoot,
       evaluator: 'test-harness',
       evaluatedAt: '2026-07-17T12:00:00.000Z',
       attestations,
@@ -56,9 +106,6 @@ describe('evaluateBetaLaunchGate', () => {
     validateBetaLaunchDecisionArtifact(report);
   });
 
-  // Regression: a bundle signed "TODO" six times produced a full GO with exit code 0 until
-  // 2026-08-25. Empty was rejected at load, but anything non-empty passed the gate, so there was
-  // no state that both loaded and read as unsigned.
   const signedWith = (attestedBy: string, attestedAt: string) => ({
     schemaVersion: 1 as const,
     attestations: REQUIRED_HUMAN_GATE_IDS.map((gateId) => ({ gateId, attestedBy, attestedAt })),
@@ -66,7 +113,7 @@ describe('evaluateBetaLaunchGate', () => {
 
   const decisionFor = (attestations: ReturnType<typeof signedWith>) =>
     evaluateBetaLaunchGate({
-      repoRoot,
+      repoRoot: fixtureRoot,
       evaluator: 'test-harness',
       evaluatedAt: '2026-08-25T00:00:00.000Z',
       attestations,
@@ -114,16 +161,11 @@ test('exitCodeForDecision returns non-zero on NO_GO', () => {
   assert.equal(exitCodeForDecision('NO_GO'), 1);
 });
 
-test('CLI exits non-zero without attestations and zero with all-pass fixture', () => {
+test('CLI cannot claim readiness from a human fixture without recovery evidence', () => {
   const outputDir = mkdtempSync(join(tmpdir(), 'beta-gate-'));
   const outputPath = join(outputDir, 'decision.json');
 
-  // `--output` is REQUIRED on both spawns, not just the second. Without it the CLI writes to its
-  // default path — docs/launch/latest-beta-decision.json, the repo's real launch decision — so
-  // merely running this test suite overwrote the governance artifact with test output. That is why
-  // the committed artifact read `"evaluator": "cli-test"`: it had never been produced by an
-  // operator evaluation at all, and commit d6292b7c ("update beta decision evaluator timestamp")
-  // is that churn being committed by hand. Found 2026-08-25.
+  // CLI tests always write outside the repository and use its actual readiness state.
   const noAttest = spawnSync(
     process.execPath,
     [scriptPath, '--evaluator', 'cli-test', '--output', join(outputDir, 'no-attest.json')],
@@ -143,7 +185,36 @@ test('CLI exits non-zero without attestations and zero with all-pass fixture', (
     ],
     { cwd: repoRoot, encoding: 'utf8' },
   );
-  assert.equal(allPass.status, 0, 'all-pass fixture must yield GO exit code');
+  assert.notEqual(allPass.status, 0, 'human attestations cannot replace missing recovery evidence');
   const artifact = JSON.parse(readFileSync(outputPath, 'utf8')) as { decision: string };
-  assert.equal(artifact.decision, 'GO');
+  assert.equal(artifact.decision, 'NO_GO');
+});
+
+test('recovery gate rejects simulations, target breaches, failed checks, and changed logs', () => {
+  const root = mkdtempSync(join(tmpdir(), 'recovery-evidence-'));
+  try {
+    mkdirSync(join(root, 'artifacts/recovery'), { recursive: true });
+    writeFileSync(join(root, recoveryReport.logPath), log);
+    assert.equal(checkRestoreRehearsal(root).pass, false);
+    for (const patch of [
+      { mode: 'dry-run' },
+      { elapsedSeconds: 61 },
+      { dataLossSeconds: 1 },
+      { sourceId: 'fixture-isolated' },
+      { checks: { ...recoveryReport.checks, authorization: false } },
+      { logSha256: 'incorrect' },
+      { logPath: '../outside.log' },
+      { completedAt: 'invalid' },
+    ]) {
+      writeFileSync(
+        join(root, 'artifacts/recovery/latest.json'),
+        JSON.stringify({ ...recoveryReport, ...patch }),
+      );
+      assert.equal(checkRestoreRehearsal(root).pass, false, JSON.stringify(patch));
+    }
+    writeFileSync(join(root, 'artifacts/recovery/latest.json'), JSON.stringify(recoveryReport));
+    assert.equal(checkRestoreRehearsal(root).pass, true);
+  } finally {
+    rmSync(root, { recursive: true, force: true });
+  }
 });

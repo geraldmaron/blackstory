@@ -2,4 +2,3 @@ packages:
   - 'apps/*'
   - '!apps/mobile'
   - 'packages/*'
-  - 'functions'

@@ -15,7 +15,7 @@
 # PER-INVOCATION ceiling, so a loop of N chunks can spend up to N x ceiling. Set the ceiling for
 # the chunk size you are running, not for the whole night.
 #
-# This never writes to bb_public. Publishing an accepted draft is WS5 and stays a separate,
+# This never writes to published. Publishing an accepted draft is WS5 and stays a separate,
 # reviewed step.
 #
 # Usage (from repo root):

@@ -1,32 +1,12 @@
 /**
- * Shared NRHP (National Register of Historic Places) registry-code -> human-phrase mapping,
- * plus small pure formatters for the listing-fact and significance text derived from the raw
- * fields NPS publishes (`areaOfSignificance`, `listedDateSerial`, `refnum`).
- *
- * repo-n7p6.1: raw NPS area-of-significance codes (e.g. "ETHNIC HERITAGE-BLACK",
- * "HISTORIC - NON-ABORIGINAL", "ENTERTAINMENT/RECREATION") were leaking verbatim into public
- * prose via backfill-nrhp-black-heritage-summaries.ts's summary sentence, and that same summary
- * sentence was then copied verbatim into the release claim's `object` and the notabilityBasis
- * note (see lib/incremental-publish.ts's `buildReleaseSourceFromLandscape`) — one pasted string
- * in three fields. This module is the single place both call sites map a raw code to prose, so
- * the mapping can't drift between the two, and the single place they'd both need updating if NPS
- * adds a new code.
- *
- * `AREA_LABELS` was built from the full distinct set of `areaOfSignificance` values actually
- * present in bb_research.landscape_candidates (lane='nrhp-black-heritage') at the time this was
- * written — see repo-n7p6.1 for the query. A code not in the table falls back to a generic
- * title-cased rendering (and logs a warning) rather than throwing, so an unseen future NPS code
- * degrades to "ugly but not raw-leak" instead of failing the backfill outright.
+ * Shared NPS registry-code labels and deterministic listing/significance formatters. Unknown
+ * codes receive a warning and generic title-cased fallback. Use one mapping for template
+ * generation and publication so raw codes do not leak through divergent paths.
  */
 
 /**
- * The two fixed sentences `backfill-nrhp-black-heritage-summaries.ts` appends to every summary it
- * generates, re-exported so the generator can keep importing them from beside its area labels.
- *
- * They MOVED to `@repo/domain` (publication/template-summary-signatures.ts) for repo-vymq: a third
- * consumer now needs them — `computeReleaseResearchCoverage` — and it sits underneath this package,
- * so it cannot import from here. Domain owns the strings; this file re-exports rather than keeping
- * a second copy, because two copies drifting apart is precisely the hole these constants close.
+ * Re-exports domain-owned template signatures used by both summary generation and coverage
+ * classification.
  */
 export { NRHP_SUMMARY_TRAILER, NRHP_SUMMARY_FILLER, LANE_TEMPLATE_SIGNATURES } from '@repo/domain';
 
@@ -132,21 +112,9 @@ export function humanizeAreas(raw: string | undefined): string {
 }
 
 /**
- * Text that reads as raw NPS registry vocabulary rather than prose, in either of the two ways it
- * can reach public text:
- *
- *   - the TEMPLATE path — a code substituted into a generated summary without going through
- *     `humanizeAreaCode` (repo-n7p6.1, now closed);
- *   - the DRAFTING path — a drafter copying the `areaOfSignificance` field into a sentence
- *     verbatim (repo-lm6h). `humanizeAreaCode` never sees that text, because no code substitution
- *     ever happened: the phrase is genuinely present in the source document, so quote-verification
- *     passes and the draft publishes with "recognized under ethnic heritage (black)" in it.
- *
- * Patterns are deliberately narrow. `ethnic heritage (black)` matches case-insensitively because
- * the parenthesized form only ever comes from the registry field; the bare `ETHNIC HERITAGE`
- * matcher requires upper case so ordinary prose using the words "ethnic heritage" is not flagged.
- * Keep it that way — this list gates draft acceptance, and a pattern that fires on legitimate prose
- * costs a redraft cycle every time.
+ * Detects raw registry vocabulary in both generated and drafted prose. Narrow casing and
+ * parenthesis rules avoid rejecting ordinary historical language. Exact quotation matching
+ * alone cannot catch inappropriate registry jargon.
  */
 export const RAW_REGISTRY_VOCABULARY_PATTERNS: readonly RegExp[] = [
   /ethnic heritage \(black\)/iu,

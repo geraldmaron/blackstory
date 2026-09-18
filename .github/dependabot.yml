@@ -50,7 +50,7 @@ updates:
     ignore:
       - dependency-name: 'typescript'
         update-types: ['version-update:semver-major']
-      # zod 4 changes the method signatures `packages/ops-data/src/firestore/types.ts` is built
+      # zod 4 changes the method signatures `packages/ops-data/src/records/types.ts` is built
       # on (TS2554, "Expected 2-3 arguments, but got 1"), so the major group PR cannot go green
       # until the migration in repo-gvus lands — 32 files against a breaking API. Left ungrouped
       # it rides with maplibre-gl and @types/node and fails the whole group, and each monthly

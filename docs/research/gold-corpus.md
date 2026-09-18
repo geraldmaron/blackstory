@@ -2,7 +2,7 @@
 
  provides a private, versioned evaluation corpus for relevance, publication safety,
 confidence calibration, citation entailment, and entity resolution. It is local-only under
-the rule recovered in `../decisions-carryover.md`, "Firestore as system of record, reversed" (from ADR-011): evaluation does not read or write Firestore and neither CLI applies cloud changes.
+the [engineering contract](../decisions-carryover.md): evaluation uses fixtures and neither CLI applies cloud changes.
 
 ## Corpus
 

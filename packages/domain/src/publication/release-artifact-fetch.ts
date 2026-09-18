@@ -18,7 +18,7 @@
  *   returns `undefined`; this module never decides the fallback, callers do.
  *
  * This module does no filesystem I/O and has no local-fixture fallback — that stays an
- * ops-data-only, opt-in concern (`packages/ops-data/src/firestore/release-artifacts.ts`) layered
+ * ops-data-only, opt-in concern (`packages/ops-data/src/records/release-artifacts.ts`) layered
  * on top of these functions, so a forgotten argument here can never let a fixture slice shadow
  * live data.
  */

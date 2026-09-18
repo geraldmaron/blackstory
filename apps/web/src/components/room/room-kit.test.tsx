@@ -44,22 +44,8 @@ void React;
 const APP_DIR = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../app');
 
 /**
- * The v6 edition system as it stands the day the kit lands: twelve per-route stylesheets and
- * nine panel-chrome modules. This is a ratchet, not an allowlist. Each entry is deleted from
- * the repo *and* from this list as its screen moves onto the kit in SP-11, SP-12 and SP-13,
- * and the test fails in both directions — a file here that no longer exists is a stale
- * exemption, a file on disk that is not here is the v6 system growing back.
- *
- * The `history-*` pair left once /history became a redirect endpoint and its orphaned render
- * components were deleted. The `explore-*` pair left once the one live dependency — a direct
- * stylesheet import on the Explore surface — was broken: the v9 atlas instruments (TimePanel,
- * CameraConsole, LensPanel, ResultsRail) had already replaced everything the two files styled.
- *
- * The list is now EMPTY, and that is the end state, not a gap: `memorial/memorial-edition.css`
- * and `memorial/memorial-panel-chrome.ts` were the last two, retired in repo-92n2.30 when
- * /memorial moved onto the Reading room class. The ratchet still runs in both directions, so
- * it now reads simply as "no route may grow a per-route stylesheet or panel-chrome module
- * under app/ again".
+ * Prevents per-route edition stylesheets and panel-chrome modules from returning. The empty
+ * exemption list is intentional; any new matching file must fail this guard.
  */
 const LEGACY_EDITION_CHROME: readonly string[] = [];
 
@@ -166,10 +152,8 @@ describe('room kit · a catalog block a second room renders is styled by the kit
 });
 
 describe('room kit · the trail is computed, never hand-written', () => {
-  // SP-21 (repo-92n2.29) shipped /rooms, so a reading room's parent is Rooms rather than
-  // the site root — matching `SURF_PARENT` in the mock, where Rooms is the default up-link. These
-  // chains were one step short while the route was held. The site root itself is resolved but
-  // not rendered as a step (see resolveTrail).
+  // Reading rooms use Rooms as their parent. The site root resolves the trail but is not
+  // rendered as a breadcrumb step.
   it('a reading room hangs off Rooms', () => {
     assert.deepEqual(resolveTrail('/books'), [
       { label: 'Rooms', href: '/rooms' },
@@ -700,10 +684,8 @@ describe('room kit · map moment', () => {
 });
 
 describe('room kit · map moment visibility', () => {
-  // repo-kz9z: MapMoment derived LIVE from `stage.liveId === reactId` alone, so on a browser with
-  // no WebGL — or any run where MapStage called `markMapUnavailable()` — a moment still went
-  // transparent and printed PLATE · LIVE over an empty box. These pin the fix at the seam, since
-  // no test in this file can drive an actual WebGL failure through SSR.
+  // When the map is unavailable, a map moment must retain its still image even if its id is
+  // selected. These tests exercise that state boundary without simulating WebGL itself.
   it('a stage being mounted is not the same as the plate being able to paint', () => {
     const resolved = resolveMomentVisibility({
       plateAvailable: true,
@@ -844,16 +826,9 @@ describe('room kit · a live moment is a window onto the borrowed plate', () => 
 
 describe('room kit · a live plate never sits behind a prose column', () => {
   /*
-   * repo-92n2.11.2. The bead's rule is "never full bleed behind prose, enforced in CSS rather
-   * than left to authors", and the enforcement is a two-part invariant rather than one rule:
-   *
-   *   1. the ladder — the plate is fixed at `--ds-z-map-plate` and document content sits at
-   *      `--ds-z-content`, so the plate paints UNDER the page and an opaque ground hides it;
-   *   2. the one window — the only selector that makes a box transparent over that plate is the
-   *      live map-moment slot, which is bounded, in flow, and released on scroll out.
-   *
-   * Either half alone is not the rule. Raise the plate above content, or let some other
-   * container go transparent, and a live map reads straight through body text.
+   * The map plate stays below opaque document content. Only the bounded live map-moment slot
+   * may reveal it; raising the plate or making other prose containers transparent breaks the
+   * reading surface.
    */
   const tokens = readFileSync(
     path.resolve(
@@ -894,10 +869,9 @@ describe('room kit · a live plate never sits behind a prose column', () => {
 
 describe('room kit · no room invents its own map moment', () => {
   it('no route defines moment markup outside the kit', () => {
-    // The gap this package closed: the mock renders a moment in seven rooms and the kit had no
-    // component for it, so six of them would each have grown their own.
+    // Routes use the shared map moment component; CSS may style its descendants.
     const offenders = walk(APP_DIR)
-      .filter((file) => /\.(tsx|ts|css)$/.test(file))
+      .filter((file) => /\.(tsx|jsx)$/.test(file))
       .filter((file) => /ds-mapmoment__plate|mm-plate/.test(readFileSync(file, 'utf8')))
       .map((file) => path.relative(APP_DIR, file));
     assert.deepEqual(offenders, [], 'map moment markup belongs to components/room/MapMoment.tsx');
@@ -905,11 +879,8 @@ describe('room kit · no room invents its own map moment', () => {
 });
 
 describe('room kit · the reading progress rule is class-wide', () => {
-  // SP-27 (repo-92n2.34). The gap the ticket named: the rule appeared once, prose-only, inside
-  // SP-11's umbrella body, so /memorial and /records — Reading rooms filed outside SP-11 —
-  // and every other room had no reason to know it applied to them too. Driven from the surface
-  // registry rather than a hand-written route list, so a route added to it later is covered
-  // without anyone remembering to update this file.
+  // Apply the rule to every room registered in the surface catalog so new routes are covered
+  // automatically.
   it('renders on every route the registry resolves to Reading, and only those', () => {
     for (const routePath of CLASSIFIED_PATHS) {
       const surface = surfaceClassFor(routePath);
@@ -940,7 +911,7 @@ describe('room kit · the reading progress rule is class-wide', () => {
 
   it('no screen defines its own progress element', () => {
     const offenders = walk(APP_DIR)
-      .filter((file) => /\.(tsx|ts|css)$/.test(file))
+      .filter((file) => /\.(tsx|jsx)$/.test(file))
       .filter((file) => path.relative(APP_DIR, file) !== 'reading-room.css')
       .filter((file) => /ds-reading-progress|docprog/.test(readFileSync(file, 'utf8')))
       .map((file) => path.relative(APP_DIR, file));

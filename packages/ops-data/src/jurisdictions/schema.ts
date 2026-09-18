@@ -1,25 +1,4 @@
-/**
- * Firestore document schema for the `jurisdictions` collection.
- *
- * Instantiates the existing `Jurisdiction` domain type
- * (packages/domain/src/geography/location.ts `id`, `kind`, `name`, `parentId`, `validFrom`,
- * `validTo`) as real storage, extended with the fields the collection actually needs to be
- * useful (FIPS code, bbox, centroid, source dataset provenance). This mirrors the existing
- * convention in packages/ops-data/src/firestore/types.ts of a Firestore doc schema that
- * "aligns with @repo/domain" without being a 1:1 re-export of the domain type (see e.g.
- * `entityKindSchema` there, a local zod enum mirroring domain's `EntityKind`).
- *
- * `jurisdictionKindSchema` mirrors `packages/domain/src/geography/location.ts`'s
- * `JurisdictionKind` values. Kept in sync by hand because importing from the domain barrel
- * would also pull GeoGeometry-adjacent types across the package boundary. If a future pass
- * adds `city`-kind values here (on-demand place docs, see the ADR), update this enum and the
- * domain enum together.
- *
- * This module lives in its own `jurisdictions/` directory rather than being folded into
- * `firestore/types.ts` / `firestore/converters.ts` / `firestore/index.ts`, so the schema,
- * converter, loader, and resolver for this collection stay self-contained. Barrel exports
- * can be wired from those files when ready.
- */
+/** Jurisdiction records with bounded geometry and source provenance. */
 import { z } from 'zod';
 
 /** Mirrors domain `JurisdictionKind`. This loader only ever writes `country|state|county`. */
@@ -108,26 +87,6 @@ export function stateJurisdictionId(stateFips: string): string {
 export function countyJurisdictionId(stateFips: string, countyFips3: string): string {
   return `us-${stateFips}-${countyFips3}`;
 }
-
-/**
- * Minimal Firestore data-converter shape, duplicated locally (not imported from
- * `firestore/converters.ts`'s private `createConverter` helper, which is not exported and
- * whose file this does not own) so this module has no dependency on files outside its
- * own directory.
- */
-export type MinimalFirestoreConverter<T> = {
-  toFirestore(modelObject: T): Record<string, unknown>;
-  fromFirestore(snapshot: { data(): unknown }): T;
-};
-
-export const jurisdictionConverter: MinimalFirestoreConverter<JurisdictionDoc> = {
-  toFirestore(modelObject: JurisdictionDoc) {
-    return jurisdictionSchema.parse(modelObject) as Record<string, unknown>;
-  },
-  fromFirestore(snapshot: { data(): unknown }): JurisdictionDoc {
-    return jurisdictionSchema.parse(snapshot.data());
-  },
-};
 
 export function parseJurisdictionDoc(data: unknown): JurisdictionDoc {
   return jurisdictionSchema.parse(data);

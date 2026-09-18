@@ -1,30 +1,8 @@
 /**
- * repo-n7p6.4 (WS4) — takes back { entityId, rawContent } answers from a session/Haiku-driven
- * pass (paired with session-enrich-prepare.ts) and runs them through the EXACT SAME
- * validateEnrichmentResponse + applyEnrichmentResult path enrich-entities-llm.ts uses. A
- * session-drafted answer gets no special trust: it is re-anchored against the same evidence rows
- * fetchEnrichmentSubjects returns and rejected the same way an OpenRouter answer would be.
- *
- * costUsdEstimate is always 0 for a session-drafted answer — no metered OpenRouter/Anthropic
- * call was made; the cost was this session's own turn.
- *
- * Default is dry-run. Production writes require:
- *   DRY_RUN=0 ENRICH_ENTITIES_LLM_APPLY=1 DATABASE_URL=postgresql://...
- *
- * Usage (from repo root):
- *   set -a && source apps/web/.env.local && set +a
- *   export DATABASE_SSL=1
- *   node --conditions development --import tsx \
- *     packages/ops-data/scripts/session-enrich-apply.ts --answers-file=/path/to/answers.jsonl \
- *       [--refusals-file=/path/to/answers.refusals.json]
- *
- * answers.jsonl: one JSON object per line, { "entityId": "...", "rawContent": "...raw JSON draft..." }
- *
- * repo-n9dq: `--refusals-file` takes the companion file session-enrich-collect.ts already writes
- * and records each refusal as terminal `no-lane-significance` rather than leaving the row
- * `pending`. Both outcomes of a wave belong in one command — a refusal recorded in a separate
- * step is a refusal that gets skipped, and skipping it is what made wave 4's selection consist
- * mostly of wave 3's own refusals.
+ * Validate externally drafted enrichment against stored evidence and apply the shared intake path.
+ * Reads { entityId, rawContent } JSONL from --answers-file and optional --refusals-file JSON.
+ * Unknown provider cost stays null. Default is dry-run; writes require DRY_RUN=0 and
+ * ENRICH_ENTITIES_LLM_APPLY=1. Uses the same review sampling as the model-driven importer.
  */
 import { readFileSync } from 'node:fs';
 import pg from 'pg';
@@ -38,25 +16,13 @@ import {
   isReviewSampled,
 } from './lib/entity-enrichment-apply.ts';
 
-/** repo-n7p6.16 item 5: same review-sampling of passing outputs as enrich-entities-llm.ts. */
 const REVIEW_SAMPLE_RATE = Number.parseFloat(
   process.env.ENRICH_REVIEW_SAMPLE_RATE?.trim() || '0.05',
 );
 
 const DRY_RUN = process.env.DRY_RUN !== '0';
 const APPLY = process.env.ENRICH_ENTITIES_LLM_APPLY === '1';
-/**
- * Records who actually drafted this — never a metered API model id, so cost stays honest.
- *
- * The DEFAULT deliberately names no model. It used to hard-code the one model that happened to
- * run the first session wave, which meant every later wave silently claimed to be that model
- * whoever actually drafted it. A provenance field exists to answer "which model wrote this", and
- * a confidently wrong answer is worse than an honest "not recorded" — set
- * SESSION_ENRICH_MODEL_ID per wave to get a real one.
- *
- * This value lands in bb_research.entity_enrichment, which is NOT a published surface. Model
- * identity belongs there and nowhere public — see repo-wzz3.
- */
+/** Private drafting provenance; an unspecified model is never replaced with a guessed identity. */
 const SESSION_MODEL_ID =
   process.env.SESSION_ENRICH_MODEL_ID?.trim() || 'session-drafted-model-unspecified';
 
@@ -155,19 +121,11 @@ async function main(): Promise<void> {
   if (results.length > 0) {
     console.log(`Quarantine rate: ${((rejected.length / results.length) * 100).toFixed(1)}%`);
   }
-  console.log(`Model recorded: ${SESSION_MODEL_ID} (cost_usd=0, session-drafted)`);
+  console.log(`Model recorded: ${SESSION_MODEL_ID} (cost_usd=unknown, externally drafted)`);
 
-  // A refusal is only a judgment about the entity if the evidence was really the entity's. A row
-  // whose evidence has since been quarantined as mis-attached (repo-pjob) has nothing left to have
-  // been judged, so recording it terminal would close a record that was never actually researched.
-  // fetchEnrichmentSubjects reports exactly that condition, so the guard is free.
-  //
-  // The second half of that guard is the drafter's own verdict. A mis-attachment the audits have
-  // not caught yet still has its evidence attached and so passes the check above — repo-nlcq is a
-  // measured example, an entity named after its own county whose county article defeats both
-  // automated layers. The human-in-the-loop drafter that read the document IS the detector in
-  // that case, so an explicit MIS-ATTACHED verdict has to be honored here or the terminal status
-  // silently closes exactly the records it was designed to protect.
+  // A missing or misattached document cannot support a terminal no-significance judgment. Honor
+  // both the subject loader's quarantined-evidence signal and an explicit MIS-ATTACHED drafting
+  // verdict so unresolved entities remain researchable.
   const isMisattachedVerdict = (reason: string): boolean => /^\s*MIS-ATTACHED\b/iu.test(reason);
   const noEvidence = new Set(skippedNoEvidence);
   const blocked = (refusal: Refusal): boolean =>
@@ -214,7 +172,7 @@ async function main(): Promise<void> {
         entityId: result.entityId,
         attempt: result.attempt,
         modelId: SESSION_MODEL_ID,
-        costUsdEstimate: 0,
+        costUsd: null,
         reviewSample: result.reviewSample,
       });
     }

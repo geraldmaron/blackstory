@@ -39,7 +39,7 @@ function excerptFromText(text: string, maxLength = 500): string {
 
 /**
  * Formats one gathered page for LLM prompt consumption (cite-bound, URL-labeled). Tags the
- * source tier (repo-k2q3 crit 4) so the judge sees trust level before drafting claims, using
+ * source tier so the judge sees trust level before drafting claims, using
  * the same registry every surface consults (@repo/domain's lookupSourceTier) — not a parallel
  * enrichment-only classifier.
  */

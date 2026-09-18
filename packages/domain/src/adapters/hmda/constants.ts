@@ -54,8 +54,8 @@ export const PHASE1_HMDA_NATION_YEARS = [2018, 2019, 2020, 2021, 2022, 2023, 202
 /** Aggregate strategy note stored on observations — no loan-level persistence. */
 export const HMDA_AGGREGATE_STRATEGY_NOTE =
   'County denial rates computed from FFIEC Data Browser /view/aggregations counts only; ' +
-  'loan-level HMDA rows are never stored in bb_reference.';
+  'loan-level HMDA rows are never stored in reference.';
 
 export const HMDA_NATION_AGGREGATE_STRATEGY_NOTE =
   'National denial rates computed from FFIEC Data Browser /view/aggregations counts (conventional purchase, ' +
-  'first-lien, owner-occupied, 1–4 unit); loan-level HMDA rows are never stored in bb_reference.';
+  'first-lien, owner-occupied, 1–4 unit); loan-level HMDA rows are never stored in reference.';

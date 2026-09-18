@@ -1,6 +1,6 @@
 /**
  * Fail-closed production service guards for the test suite.
- * Tests must never target production Firebase, Cloud SQL, or GCP projects.
+ * Tests must never target production databases or cloud projects.
  */
 
 export type EnvironmentLike = Readonly<Record<string, string | undefined>>;
@@ -12,7 +12,7 @@ export type ProductionGuardFinding = {
 };
 
 const PRODUCTION_PROJECT_PATTERN =
-  /(^|[-_])(prod|production|live)([-_]|$)|the related workstream|blackbook-prod|^black-book-efaaf$/i;
+  /(^|[-_])(prod|production|live)([-_]|$)|blackbook-prod|^black-book-efaaf$/i;
 
 const CLOUD_SQL_HOST_PATTERN =
   /\.sql\.goog$|cloudsql|\/cloudsql\/|googleapis\.com|neon\.tech|supabase\.co|aws\.com|azure\.com/i;
@@ -24,7 +24,7 @@ const DEMO_PROJECT_PATTERN = /^(demo-|test-|local-|dev-)/i;
 
 /**
  * Explicit override for rare break-glass scenarios. Prefer never setting this.
- * Even with the override, Cloud SQL Firebase production project IDs still fail.
+ * Even with the override, cloud database endpoints and production project IDs still fail.
  */
 export const PRODUCTION_OVERRIDE_ENV = 'APP_ALLOW_PRODUCTION_TESTS';
 
@@ -68,14 +68,13 @@ export function collectProductionGuardFindings(
     'GCLOUD_PROJECT',
     'GOOGLE_CLOUD_PROJECT',
     'GCP_PROJECT',
-    'FIREBASE_PROJECT_ID',
-    'NEXT_PUBLIC_FIREBASE_PROJECT_ID',
+    'APP_PROJECT_ID',
   ] as const) {
     const value = environment[key];
     if (value && looksLikeProductionProjectId(value)) {
       findings.push({
         key,
-        reason: 'Value looks like a production GCP/Firebase project id',
+        reason: 'Value looks like a production cloud project id',
         value,
       });
     }
@@ -101,28 +100,6 @@ export function collectProductionGuardFindings(
     }
   }
 
-  for (const key of ['FIRESTORE_EMULATOR_HOST', 'FIREBASE_AUTH_EMULATOR_HOST'] as const) {
-    const value = environment[key];
-    if (!value) continue;
-    const host = value.includes('://') ? value : `http://${value}`;
-    try {
-      const parsed = new URL(host);
-      if (!LOCAL_HOST_PATTERN.test(parsed.hostname)) {
-        findings.push({
-          key,
-          reason: 'Emulator host must be loopback/local only',
-          value,
-        });
-      }
-    } catch {
-      findings.push({
-        key,
-        reason: 'Emulator host is not a valid host:port value',
-        value,
-      });
-    }
-  }
-
   return findings;
 }
 
@@ -136,7 +113,6 @@ export function assertTestsCannotAccessProduction(
   const hardFindings = findings.filter(
     (finding) =>
       finding.key === 'CLOUD_SQL_CONNECTION_NAME' ||
-      finding.key.startsWith('FIRE') ||
       finding.key.includes('DATABASE') ||
       finding.key.includes('POSTGRES') ||
       finding.key.includes('PROJECT'),
@@ -147,10 +123,13 @@ export function assertTestsCannotAccessProduction(
   }
 
   const details = findings
-    .map((finding) => `- ${finding.key}: ${finding.reason} (${finding.value})`)
+    .map(
+      (finding) =>
+        `- ${finding.key}: ${finding.reason} (${finding.key.includes('URL') ? 'endpoint redacted' : finding.value})`,
+    )
     .join('\n');
   throw new Error(
     `Refusing to run tests that may reach production services:\n${details}\n` +
-      'Use local PostGIS, demo Firebase emulators, or disposable CI services only.',
+      'Use an isolated local Supabase or disposable Postgres test database.',
   );
 }

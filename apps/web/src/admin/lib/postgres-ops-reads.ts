@@ -1,5 +1,5 @@
 /**
- * Postgres reads for bb_ops kill switches, bb_audit events, and discovery campaign runs.
+ * Postgres reads for ops kill switches, audit events, and discovery campaign runs.
  */
 import { queryPostgres } from './canonical-postgres-client.js';
 
@@ -63,7 +63,7 @@ export async function listKillSwitchesPostgres(
   const cappedLimit = Math.min(200, Math.max(1, limit));
   const rows = await queryPostgres<KillSwitchRow>(
     `SELECT id, enabled, reason, updated_at
-     FROM bb_ops.kill_switches
+     FROM ops.kill_switches
      ORDER BY id ASC
      LIMIT $1`,
     [cappedLimit],
@@ -97,7 +97,7 @@ export async function listRecentAuditEventsPostgres(
   const cappedLimit = Math.min(100, Math.max(1, limit));
   const rows = await queryPostgres<AuditRow>(
     `SELECT id, action, category, actor, subject, reason, entity_id, release_id, occurred_at
-     FROM bb_audit.events
+     FROM audit.events
      ORDER BY occurred_at DESC
      LIMIT $1`,
     [cappedLimit],
@@ -152,7 +152,7 @@ export async function listDiscoveryCampaignRunsPostgres(
   const rows = await queryPostgres<DiscoveryRunRow>(
     `SELECT id, job_id, job_run_id, status, mode, started_at, completed_at,
             accepted_count, survivor_count, kind, error_message
-     FROM bb_ops.discovery_campaign_runs
+     FROM ops.discovery_campaign_runs
      ORDER BY coalesce(completed_at, started_at) DESC
      LIMIT $1`,
     [cappedLimit],

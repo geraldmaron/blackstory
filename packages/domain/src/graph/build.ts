@@ -1,27 +1,4 @@
-/**
- * Derived graph-view release-artifact build, following the
- * immutable-release pattern (`../publication/index.ts`): `publicReleases/{releaseId}/graph/...`
- * docs, deterministic content hashing via the same `canonicalJson`/`sha256Json` — the entity
- * projection/snapshot manifest uses, and the same `publicReleases/{releaseId}/...` path shape as
- * `publicEntityProjectionPath`.
- *
- * "Derived-at-publish over request-time traversal": this module never reads
- * Firestore itself it is a pure function over already-loaded entities/relationships, run once
- * per publication-worker release build (mirroring `../map/map-source.ts`'s `buildMapSource`
- * shape) and persisted as part of the release. No graph database, no per-request traversal.
- *
- * Deterministic cycle-safe bounded-depth re-runnable:
- * - Deterministic: every sub-builder (`buildAllEntityAdjacency`, `buildDecadeViews`,
- * `buildAllTimeView`) sorts its own output; this module adds no randomness or wall-clock reads
- * beyond the caller-supplied `generatedAt`, and the resulting `contentHash` proves byte-for-byte
- * reproducibility across runs (`assertGraphReleaseArtifactReproducible` below re-runs the build
- * and compares hashes).
- * - Cycle-safe bounded-depth: adjacency is single-hop (no traversal); the one multi-hop
- * traversal in this subsystem (containment chains) lives in `./containment.ts` and is
- * independently cycle-safe/bounded-depth there.
- * - Re-runnable: pure function, safe to invoke repeatedly against the same or updated inputs
- * during a publication-worker retry.
- */
+/** Builds graph snapshots from supplied entities and typed relationships. Persistence and release selection belong to the caller. */
 import { sha256Json, type JsonValue, type Sha256Hash } from '../publication/index.js';
 import type { EntityRelationship } from '../relationship.js';
 import {

@@ -1,51 +1,10 @@
 /**
- * Lane B / repo-bmmo — deterministic NRHP African American heritage roster.
- *
- * Stages National Register of Historic Places listings whose NPS-assigned
- * "Area of Significance" includes Black / Ethnic Heritage-Black into
- * bb_research.landscape_candidates (lane='nrhp-black-heritage'). No LLM and
- * no search-UI crawling (the bb_research.cases junk came from crawling
- * NPGallery's search UI) — this reads the National Register program's own
- * published dataset:
- *
- *   1. https://www.nps.gov/subjects/nationalregister/data-downloads.htm →
- *      latest national-register-listed_<date>.xlsx (the official full list of
- *      listed properties, with Area of Significance per row).
- *   2. NPS ArcGIS REST layer cultural_resources/nrhp_locations/MapServer/0,
- *      joined by NRIS reference number, for lat/lng (WGS84).
- *
- * The xlsx is parsed with `unzip -p` + streaming-safe regex over the two
- * inner XML parts (no spreadsheet dependency). Rows are keyed by explicit
- * cell references (r="A2" etc.), so blank cells cannot shift columns.
- *
- * Filter: Status = Listed AND Area of Significance matches \bBLACK\b (the
- * NPS vocabulary spells it "ETHNIC HERITAGE-BLACK" or plain "BLACK"; no
- * other vocabulary term contains the word). "(Boundary Increase)" /
- * "(Additional Documentation)" / "(Boundary Decrease)" re-listings of the
- * same property collapse onto the base listing.
- *
- * canonical_url: the row's own External Link (National Archives catalog)
- * when present, else the NPGallery NRIS asset page
- * https://npgallery.nps.gov/AssetDetail/NRIS/<refnum>. Both hosts are
- * federal (.gov). Because the lane is ~2,700 rows, per-row fetch
- * verification is replaced by a sampled reachability check (default 25
- * rows, all must return 200) recorded in the report. CAVEAT (verified
- * 2026-07-28): both target hosts are JS-rendered SPAs, and NPGallery
- * AssetDetail returns 200 even for bogus refnums — so 200 here proves
- * reachability, not content. Content-level identity rests on the refnums /
- * archive links being copied verbatim from NPS's own dataset (never
- * constructed from guesses), on ArcGIS-layer presence for geo-matched rows,
- * and on the promotion path, whose corroboration step fetches each page
- * with name-presence checks before anything can publish.
- *
- * Default is dry-run. Production writes require:
- *   DRY_RUN=0 NRHP_BLACK_HERITAGE_APPLY=1 DATABASE_URL=postgresql://...
- *
- * Usage (from repo root):
- *   set -a && source apps/web/.env.local && set +a
- *   export DATABASE_SSL=1
- *   node --conditions development --import tsx \
- *     packages/ops-data/scripts/scrape-nrhp-black-heritage-roster.ts
+ * Stage listed NRHP properties with the NPS Black heritage significance term. Parse explicit
+ * spreadsheet cell references, collapse supplementary listings and join ArcGIS points by NRIS
+ * reference number. Preserve source archive links or construct the NRIS asset URL from the
+ * supplied identifier. Sampled HTTP 200 checks prove reachability only, since these sites can
+ * return application shells for missing records. Publication requires item-level identity and
+ * evidence review. Default dry-run; writes require DRY_RUN=0 and NRHP_BLACK_HERITAGE_APPLY=1.
  */
 import { execFileSync } from 'node:child_process';
 import { closeSync, mkdirSync, openSync, writeFileSync } from 'node:fs';
@@ -407,10 +366,10 @@ async function main(): Promise<void> {
   // 6. Dedup vs existing landscape candidates (all lanes) and canonical entities.
   const pool = new pg.Pool(normalizePgConnectionString(databaseUrl));
   const existingLandscapeRes = await pool.query<{ display_name: string; lane: string }>(
-    `SELECT display_name, lane FROM bb_research.landscape_candidates`,
+    `SELECT display_name, lane FROM research.landscape_candidates`,
   );
   const existingEntitiesRes = await pool.query<{ display_name: string }>(
-    `SELECT display_name FROM bb_canonical.entities`,
+    `SELECT display_name FROM canonical.entities`,
   );
   const existingLandscapeNames = new Set(
     existingLandscapeRes.rows.map((row) => normalizeNameForDiff(row.display_name)),
@@ -420,7 +379,7 @@ async function main(): Promise<void> {
   );
   console.log(
     `Existing landscape_candidates (all lanes): ${existingLandscapeRes.rows.length}. ` +
-      `bb_canonical.entities total: ${existingEntitiesRes.rows.length}.`,
+      `canonical.entities total: ${existingEntitiesRes.rows.length}.`,
   );
 
   let dedupedOutLandscape = 0;
@@ -534,7 +493,7 @@ async function main(): Promise<void> {
     await client.query('BEGIN');
     const runId = `nrhp-black-heritage-${generatedAt.slice(0, 10)}`;
     await client.query(
-      `INSERT INTO bb_research.source_program_runs
+      `INSERT INTO research.source_program_runs
         (id, lane, source_program_id, source_program_name, canonical_url, retrieved_at,
          rows_fetched, candidate_count, dropped_count, summary, updated_at)
        VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,now())
@@ -559,7 +518,7 @@ async function main(): Promise<void> {
     );
     for (const row of netNewRows) {
       await client.query(
-        `INSERT INTO bb_research.landscape_candidates
+        `INSERT INTO research.landscape_candidates
           (id, run_id, lane, source_program_id, source_item_id, display_name, kind, summary,
            lat, lng, canonical_url, research_lane_only, status, provenance, payload, discovered_at, updated_at)
          VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,true,'pending',$12,$13,$14,now())

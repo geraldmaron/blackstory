@@ -120,8 +120,8 @@ function writeResponse(res: ServerResponse, method: string, response: ApiRespons
 }
 
 /**
- * Builds the public API `node:http` server. All handler dependencies (data access, App Check guard,
- * rate limiter, search guard) are injected — construction touches no socket and no Firestore.
+ * Builds the public API `node:http` server. All handler dependencies (data access, client-header check guard,
+ * rate limiter, search guard) are injected — construction touches no socket or database.
  */
 /**
  * The request handler on its own, separate from any listener.

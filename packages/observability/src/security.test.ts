@@ -4,7 +4,7 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import {
-  adaptAppCheckTelemetry,
+  adaptClientAttestationTelemetry,
   adaptAuditEvent,
   adaptArmorSignal,
   adaptCostAnomaly,
@@ -34,7 +34,7 @@ test('security event vocabulary covers all  deliverable domains', () => {
   const required = [
     'armor.deny',
     'armor.throttle',
-    'app_check.failure',
+    'client_header.failure',
     'authentication.failure',
     'administrator.role_changed',
     'submission.spike',
@@ -74,36 +74,34 @@ test('redaction strips App Check tokens and protected address fields', () => {
   assert.match(String(redacted.note), /\[REDACTED\]/);
 });
 
-test('adaptAppCheckTelemetry ignores verified outcomes and redacts failures', () => {
+test('adaptClientAttestationTelemetry ignores verified outcomes and redacts failures', () => {
   assert.equal(
-    adaptAppCheckTelemetry(
+    adaptClientAttestationTelemetry(
       {
-        event: 'app_check_verification',
+        control: 'client_attestation',
         mode: 'enforce',
         outcome: 'verified',
-        replayProtection: false,
       },
       context,
     ),
     undefined,
   );
 
-  const event = adaptAppCheckTelemetry(
+  const event = adaptClientAttestationTelemetry(
     {
-      event: 'app_check_verification',
+      control: 'client_attestation',
       mode: 'enforce',
-      outcome: 'rejected',
-      reason: 'invalid_token',
-      replayProtection: true,
+      outcome: 'denied',
+      reason: 'malformed_header',
     },
     context,
   );
   assert.ok(event);
   const safe = redactSecurityEvent({
     ...event!,
-    metadata: { appCheckToken: 'must-not-leak', replayProtection: true },
+    metadata: { authorization: 'must-not-leak' },
   });
-  assert.equal(safe.metadata?.appCheckToken, undefined);
+  assert.equal(safe.metadata?.authorization, undefined);
 });
 
 test('adaptAuditEvent maps publication and administrator events with immediate severity', () => {
@@ -178,14 +176,14 @@ test('buildMetricSample produces samples usable in synthetic anomaly tests', () 
     value: 1,
     occurredAt: '2026-07-17T00:00:00.000Z',
     service: 'api-public',
-    dimensions: { policy: 'the related workstream-public-armor' },
+    dimensions: { policy: 'test-public-armor' },
   });
   assert.deepEqual(samples, [
     {
       metric: 'armor_throttles_total',
       value: 1,
       occurredAt: '2026-07-17T00:00:00.000Z',
-      labels: { service: 'api-public', policy: 'the related workstream-public-armor' },
+      labels: { service: 'api-public', policy: 'test-public-armor' },
     },
   ]);
 });
@@ -196,7 +194,7 @@ test('evaluateAnomalyRules triggers on synthetic metric bursts', () => {
     metric: 'armor_throttles_total',
     value: 1,
     occurredAt: new Date(nowMs - index * 1_000).toISOString(),
-    labels: { service: 'api-public', policy: 'the related workstream-public-armor' },
+    labels: { service: 'api-public', policy: 'test-public-armor' },
   }));
 
   const evaluations = evaluateAnomalyRules({ samples, nowMs });
@@ -276,9 +274,9 @@ test('armor and cost adapters produce expected telemetry kinds', () => {
   const armor = adaptArmorSignal(
     {
       action: 'deny',
-      policy: 'the related workstream-public-armor',
+      policy: 'test-public-armor',
       rulePriority: 1000,
-      backendService: 'the related workstream-public-backend',
+      backendService: 'test-public-backend',
     },
     context,
   );

@@ -8,7 +8,7 @@ import { CORE_KILL_SWITCH_IDS } from '../kill-switches.js';
 
 export const BETA_DISABLE_POLICY_VERSION = '1.0.0' as const;
 
-/** Firestore Remote Config kill switch for immutable snapshot serving. */
+/** Postgres operational kill switch for immutable snapshot serving. */
 export const PUBLIC_STATIC_MODE_SWITCH_ID = 'public-static-mode' as const;
 
 /** Workloads stopped immediately when entering static read-only containment. */
@@ -23,7 +23,7 @@ export const BETA_DISABLE_RUNBOOK_RELATIVE_PATH = 'docs/launch/disable-public-be
 
 export interface BetaDisableControl {
   readonly id: string;
-  readonly mechanism: 'vercel-env' | 'firestore-kill-switch';
+  readonly mechanism: 'postgres-kill-switch';
   readonly key: string;
   readonly description: string;
 }
@@ -31,17 +31,16 @@ export interface BetaDisableControl {
 export const BETA_DISABLE_CONTROLS: readonly BetaDisableControl[] = [
   {
     id: 'public-static-mode',
-    mechanism: 'firestore-kill-switch',
+    mechanism: 'postgres-kill-switch',
     key: PUBLIC_STATIC_MODE_SWITCH_ID,
-    description: 'Engage public-static-mode in Firestore/Remote Config for corpus-wide read-only.',
+    description: 'Engage public-static-mode in ops.kill_switches for corpus-wide read-only.',
   },
 ];
 
 /**
  * Asserts the public-static-mode kill switch is registered for Vercel public web.
- * `repoRoot` is retained in the signature for compatibility with existing launch-gate callers.
  */
-export function assertBetaDisableConfigKeys(_repoRoot: string): void {
+export function assertBetaDisableConfigKeys(): void {
   if (!(CORE_KILL_SWITCH_IDS as readonly string[]).includes(PUBLIC_STATIC_MODE_SWITCH_ID)) {
     throw new Error('public-static-mode is not registered in CORE_KILL_SWITCH_IDS.');
   }

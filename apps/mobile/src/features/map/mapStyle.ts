@@ -71,7 +71,7 @@ export type BuildBasemapStyleInput = {
    * Defaults to true.
    */
   readonly basemapEnabled?: boolean;
-  /** PMTiles archive URL (Firebase Hosting/CDN), or null to use vector tiles. */
+  /** PMTiles archive URL (the configured CDN), or null to use vector tiles. */
   readonly pmtilesUrl?: string | null;
   /**
    * OpenFreeMap-compatible vector TileJSON URL. Used when `pmtilesUrl` is null

@@ -1,34 +1,9 @@
 /**
- * One-shot DPLA bulk gap analysis (offline).
- *
- * Compares a sample or full DPLA item export against a BlackStory catalog entity list and
- * reports states and decades where DPLA holds material but the corpus is thin or absent.
- * Designed for fixture-first runs in CI and local dev; real bulk exports are analyzed on
- * disk outside Supabase — never mirrored continuously into Postgres.
- *
- * Usage:
- *   node scripts/dpla-gap-analysis.mjs
- *   node scripts/dpla-gap-analysis.mjs --dpla /path/to/dpla.json --corpus /path/to/corpus.json
- *   node scripts/dpla-gap-analysis.mjs --out docs/research/dpla-gap-sample-report.md --json .cache/dpla-gap/report.json
- *   node scripts/dpla-gap-analysis.mjs --completeness   # also run the live-DB sections (see below)
- *
- * Extended sections (repo-xez5.6b): beyond the DPLA-vs-corpus state x decade gap above, this
- * script also reports three DB-backed sections and one static-catalog section:
- *   1. Per-entity field completeness (bb_public.release_entities blank-field audit — same
- *      methodology as docs/research/entity-completeness-audit.md §1-2).
- *   2. Figure-category coverage vs a Civil Rights Movement leader reference roster.
- *   3. Theme-impact evidence sufficiency (packages/domain/src/statistics/theme-impact-questions.ts).
- *   4. Decade coverage of canonical PERSON entities' claims (bb_canonical.claim_versions, not
- *      just DPLA items/places).
- * Sections 1, 2, and 4 need a live Postgres connection (this script is otherwise fully offline
- * and fixture-driven, per the file header above). By default they render from a dated, cited
- * snapshot (`DB_SNAPSHOT`, generated 2026-07-24 via the Supabase project twykhihqkcldpreuovay
- * MCP `execute_sql` tool — see snapshot queries inline below) so a bare `node
- * scripts/dpla-gap-analysis.mjs` run always completes offline and deterministically. Pass
- * `--completeness` with `DATABASE_URL` (or `APP_DATABASE_URL`) set and the `pg` package
- * resolvable (as in apps/api-public, which already depends on it) to re-run them live instead;
- * on any failure (missing driver, missing env, network) this script logs a warning and falls
- * back to the snapshot rather than crashing.
+ * Compare local DPLA exports with a catalog to report state/decade gaps. Optional completeness
+ * sections cover entity fields, a civil-rights roster, theme evidence and claim decades.
+ * Defaults use dated snapshots and never imply live coverage. --completeness attempts Postgres
+ * reads; failures warn and fall back to snapshots. --dpla, --corpus, --out and --json select
+ * input/output paths. No continuous source mirroring occurs.
  */
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
@@ -547,15 +522,12 @@ function renderMarkdown(report, meta) {
 }
 
 /**
- * Dated snapshot of the four live-DB numbers below, generated 2026-07-24 against the Supabase
- * project `twykhihqkcldpreuovay` via the `execute_sql` MCP tool (no data written; read-only).
- * Serves as the offline default for a fixture-first script; superseded by `--completeness` when
- * a live Postgres connection is available. Re-run the SQL in each section's `sourceQuery` field
- * to refresh.
+ * Read-only database snapshot acquired 2026-07-24. Offline results describe that snapshot, not
+ * current coverage. Refresh with each section's sourceQuery or a successful --completeness run.
  */
 const DB_SNAPSHOT = {
   generatedAt: '2026-07-24',
-  source: 'supabase:twykhihqkcldpreuovay (bb_public.release_entities active release; bb_canonical)',
+  source: 'supabase:twykhihqkcldpreuovay (published.release_entities active release; canonical)',
   entityCompletenessByKind: [
     {
       kind: 'place',
@@ -702,8 +674,8 @@ const DB_SNAPSHOT = {
     },
   ],
   entityCompletenessSourceQuery: `
-    with active as (select release_id from bb_public.active_release limit 1),
-    r as (select re.* from bb_public.release_entities re, active a where re.release_id = a.release_id)
+    with active as (select release_id from published.active_release limit 1),
+    r as (select re.* from published.release_entities re, active a where re.release_id = a.release_id)
     select kind, count(*) n,
       count(*) filter (where coalesce(summary,'')='') blank_summary,
       count(*) filter (where location is null) blank_location,
@@ -763,7 +735,7 @@ const DB_SNAPSHOT = {
   civilRightsRosterSourceQuery: `
     select r.name, e.display_name is not null as present
     from (values ('Martin Luther King Jr.'), ('Rosa Parks'), (...)) as r(name)
-    left join bb_canonical.entities e on lower(e.display_name) like '%' || lower(r.name) || '%';
+    left join canonical.entities e on lower(e.display_name) like '%' || lower(r.name) || '%';
   `.trim(),
   personDecadeCoverage: {
     totalPersonEntities: 394,
@@ -798,13 +770,13 @@ const DB_SNAPSHOT = {
     ],
   },
   personDecadeCoverageSourceQuery: `
-    with active as (select release_id from bb_public.active_release limit 1),
-    persons as (select entity_id from bb_public.release_entities re, active a where re.release_id=a.release_id and re.kind='person'),
+    with active as (select release_id from published.active_release limit 1),
+    persons as (select entity_id from published.release_entities re, active a where re.release_id=a.release_id and re.kind='person'),
     years as (
       select p.entity_id, (substring(cv.object::text from '(1[5-9]\\d{2}|20[0-2]\\d)'))::int as yr
       from persons p
-      join bb_canonical.claims c on c.entity_id = p.entity_id
-      join bb_canonical.claim_versions cv on cv.id = c.current_version_id
+      join canonical.claims c on c.entity_id = p.entity_id
+      join canonical.claim_versions cv on cv.id = c.current_version_id
       where cv.object is not null
     )
     select (floor(yr/10)*10)::text || 's' as decade, count(distinct entity_id) as person_count, count(*) as claim_count
@@ -844,7 +816,7 @@ async function tryLiveQuery(sql) {
 }
 
 /**
- * Section 1: per-entity-kind blank-field completeness audit against `bb_public.release_entities`
+ * Section 1: per-entity-kind blank-field completeness audit against `published.release_entities`
  * (same fields/methodology as docs/research/entity-completeness-audit.md §1-2).
  * @returns {Promise<{ generatedAt: string, live: boolean, byKind: typeof DB_SNAPSHOT.entityCompletenessByKind }>}
  */
@@ -880,14 +852,11 @@ async function buildEntityCompletenessSection() {
 }
 
 /**
- * Section 2: figure-category coverage vs a Civil Rights Movement leader reference roster.
- *
- * Reference source: blackpast.org's category pages returned HTTP 403 to automated fetch (tried
- * https://www.blackpast.org/ and https://www.blackpast.org/category/topics-african-american-history/
- * on 2026-07-24 — the site blocks non-browser clients). Substituted a reasonably-fetchable,
- * citable equivalent roster instead: en.wikipedia.org/wiki/List_of_civil_rights_leaders, filtered
- * to figures central to the American Civil Rights Movement (1950s-60s).
- * @returns {Promise<{ generatedAt: string, live: boolean, referenceUrls: string[], roster: typeof DB_SNAPSHOT.civilRightsRosterPresence, presentCount: number, totalCount: number }>}
+ * Compare coverage with the cited Wikipedia civil-rights leader roster, scoped to the American
+ * Civil Rights Movement of the 1950s-60s. This is a bounded reference cohort, not a
+ * representative measure of all Black history.
+ * @returns {Promise<{ generatedAt: string, live: boolean, referenceUrls: string[], roster:
+ * typeof DB_SNAPSHOT.civilRightsRosterPresence, presentCount: number, totalCount: number }>}
  */
 async function buildFigureCategoryCoverageSection() {
   const referenceUrls = [
@@ -901,7 +870,7 @@ async function buildFigureCategoryCoverageSection() {
     const valuesSql = names.map((n) => `('${n.replace(/'/g, "''")}')`).join(', ');
     const sql = `
       select r.name, exists (
-        select 1 from bb_canonical.entities e
+        select 1 from canonical.entities e
         where e.kind = 'person' and lower(e.display_name) like '%' || lower(r.name) || '%'
       ) as present
       from (values ${valuesSql}) as r(name);
@@ -1035,7 +1004,7 @@ async function buildPersonDecadeCoverageSection() {
 function renderExtendedSectionsMarkdown(sections) {
   const lines = [];
 
-  lines.push('## Per-entity field completeness (bb_public.release_entities)');
+  lines.push('## Per-entity field completeness (published.release_entities)');
   lines.push('');
   lines.push(
     `_${sections.entityCompleteness.live ? 'Live query' : 'Snapshot'} as of ${sections.entityCompleteness.generatedAt}. Methodology: docs/research/entity-completeness-audit.md §1-2._`,
@@ -1062,7 +1031,7 @@ function renderExtendedSectionsMarkdown(sections) {
   for (const url of sections.figureCategoryCoverage.referenceUrls) lines.push(`- ${url}`);
   lines.push('');
   lines.push(
-    `**Civil Rights Movement leaders: ${sections.figureCategoryCoverage.presentCount} of ${sections.figureCategoryCoverage.totalCount} known figures present in bb_canonical (as person entities).**`,
+    `**Civil Rights Movement leaders: ${sections.figureCategoryCoverage.presentCount} of ${sections.figureCategoryCoverage.totalCount} known figures present in canonical (as person entities).**`,
   );
   lines.push('');
   lines.push('| Figure | Present | Note |');

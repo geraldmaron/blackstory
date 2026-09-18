@@ -23,12 +23,12 @@ const apply = process.env.DRY_RUN === '0' && process.env.LIVES_UPSERT_REGIONS_AP
 
 /** Tables whose rows point at a jurisdiction; a stale region is removed only when all are empty. */
 const REFERENCING = [
-  ['bb_reference.jurisdictions', 'parent_id'],
-  ['bb_reference.statistical_observations', 'jurisdiction_id'],
-  ['bb_reference.law_applicability', 'jurisdiction_id'],
-  ['bb_reference.region_decade_definitions', 'region_id'],
-  ['bb_reference.entity_context_bindings', 'jurisdiction_id'],
-  ['bb_reference.derived_measurements', 'jurisdiction_id'],
+  ['reference.jurisdictions', 'parent_id'],
+  ['reference.statistical_observations', 'jurisdiction_id'],
+  ['reference.law_applicability', 'jurisdiction_id'],
+  ['reference.region_decade_definitions', 'region_id'],
+  ['reference.entity_context_bindings', 'jurisdiction_id'],
+  ['reference.derived_measurements', 'jurisdiction_id'],
 ] as const;
 
 async function main(): Promise<void> {
@@ -40,7 +40,7 @@ async function main(): Promise<void> {
       livesStateJurisdictionId,
     );
     const known = await pool.query<{ id: string }>(
-      'SELECT id FROM bb_reference.jurisdictions WHERE id = ANY($1::text[])',
+      'SELECT id FROM reference.jurisdictions WHERE id = ANY($1::text[])',
       [[LIVES_NATIONAL.id, ...stateIds]],
     );
     const existing = new Set(known.rows.map((row) => row.id));
@@ -49,7 +49,7 @@ async function main(): Promise<void> {
 
     const regionIds = new Set(LIVES_REGIONS.map((region) => region.id));
     const current = await pool.query<{ id: string }>(
-      "SELECT id FROM bb_reference.jurisdictions WHERE kind = 'region' ORDER BY id",
+      "SELECT id FROM reference.jurisdictions WHERE kind = 'region' ORDER BY id",
     );
     const stale: { id: string; references: number }[] = [];
     for (const { id } of current.rows.filter((row) => !regionIds.has(row.id))) {
@@ -93,7 +93,7 @@ async function main(): Promise<void> {
       await client.query('BEGIN');
       for (const region of LIVES_REGIONS) {
         await client.query(
-          `INSERT INTO bb_reference.jurisdictions (id, kind, name, state_fips, parent_id, metadata)
+          `INSERT INTO reference.jurisdictions (id, kind, name, state_fips, parent_id, metadata)
            VALUES ($1, 'region', $2, NULL, $3, $4::jsonb)
            ON CONFLICT (id) DO UPDATE SET
              kind = EXCLUDED.kind,
@@ -117,7 +117,7 @@ async function main(): Promise<void> {
       }
       for (const row of stale) {
         await client.query(
-          "DELETE FROM bb_reference.jurisdictions WHERE id = $1 AND kind = 'region'",
+          "DELETE FROM reference.jurisdictions WHERE id = $1 AND kind = 'region'",
           [row.id],
         );
       }

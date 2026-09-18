@@ -68,7 +68,7 @@ review process and BlackStory does not. Three controls stand in for it:
 1. **Named reasons, never silent coarsening.** A location is either at its source precision or it
    carries a reason code from the table above.
 2. **One engine on the publish path.** `reducePublicPrecision` in `@repo/security` runs inside the
-   release builder for every `bb_public.release_entities` projection. The hand-maintained denylists
+   release builder for every `published.release_entities` projection. The hand-maintained denylists
    that used to gate publish (`release-builder.ts`) are removed; a test asserts every published
    precision is a tier from §2.
 3. **A request path.** Withholding on request is a class (`withheld_on_request`) any operator can

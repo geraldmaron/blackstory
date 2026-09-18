@@ -12,7 +12,7 @@ Automated quality layers for BlackStory. Production services are fail-closed; fl
 | Security | `pnpm test:security` | Threat corpus + production guards +  load/abuse scenarios (`docs/testing/load-abuse.md`) +  adversarial integrity (`docs/testing/adversarial-integrity.md`) |
 | Accessibility | `pnpm test:a11y` | HTML landmark/alt smoke fixtures +  journey audits (`docs/testing/a11y-seo-perf-privacy.md`) |
 | Release gates | `pnpm --filter @repo/testing test:release-gates` | Performance budgets + public degraded-mode contracts |
-| Integration | `pnpm test:integration` | Postgres disposable schema + Firebase emulator probes |
+| Integration | `pnpm test:integration` | Isolated Postgres integration checks |
 | Migration | `pnpm test:migration` | Forward-only `schema_migrations` harness on disposable DB |
 | E2E | `pnpm test:e2e` | Harness; live fetch only when `E2E_BASE_URL` is local |
 | Coverage | `pnpm test:coverage` | Node test coverage thresholds for `@repo/testing` |
@@ -28,7 +28,7 @@ Import from `@repo/testing`:
 
 ## Production fail-closed
 
-Tests refuse to run when environment values look like production (project ids, Cloud SQL connection names, non-local `DATABASE_URL`, non-loopback emulator hosts). See `packages/testing/src/guards/production.ts`.
+Tests refuse to run when environment values look like production (project ids, Cloud SQL connection names, non-local `DATABASE_URL`, non-loopback database hosts). See `packages/testing/src/guards/production.ts`.
 
 ## Quarantine
 
@@ -36,21 +36,16 @@ Flaky tests belong in `packages/testing/quarantine.json` with `owner`, `deadline
 
 ## Guarded harnesses (local vs CI)
 
-### PostgreSQL (deferred / optional)
+### PostgreSQL
 
-- Local: `pnpm db:up`, then `pnpm db:init` / `pnpm db:verify` for parked role foundation.
-- Integration: `pnpm test:integration` / `pnpm test:migration` (skips if Docker/Postgres down).
-- Role isolation unit tests still run in `@repo/data-access`; runtime isolation via
-  `pnpm test:db:integration` is **optional**.
-- CI job **Integration Postgres** is **skipped by default** (set repo variable
-  `ENABLE_POSTGRES_CI=true` to enable). Not a required status check: it exercises the parked
-  Cloud SQL foundation under `infra/database/`, not `supabase/migrations/`. See
-  `docs/decisions-carryover.md`, "Firestore as system of record, reversed".
+Use an isolated local Supabase project. Reset its migration chain, run
+`supabase/tests/research-kernel.sql`, then run the operator suite with
+`RESEARCH_TEST_DATABASE_URL` pointing at that loopback database. Without the explicit URL,
+database-dependent checks may skip. Report those skips; unit success does not prove SQL behavior.
 
-### Leftover Firebase emulators (not product SoR)
-
-- Local: Java runtime (Homebrew `openjdk@21` is the default `JAVA_HOME` in `pnpm firebase:emulators`) + `pnpm firebase:emulators`, then `pnpm test:integration` (skips if emulators/Java unavailable).
-- Firestore security rules + converters: `pnpm firebase:test:rules` (or `@repo/firebase` tests); skips locally unless emulators are up; set `CI_REQUIRE_FIREBASE=1` to fail closed.
+A schema reset verifies a fresh installation. The production cutover additionally requires an
+executed isolated restore, upgrade rehearsal and authorization checks. See
+[recovery](../runbooks/backup-restore.md).
 
 ### E2E
 

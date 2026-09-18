@@ -1,39 +1,8 @@
 /**
- * repo-z1uk — repair the notability rubric on person records, and give the
- * Negro Leagues / Divine Nine stubs actual content.
- *
- * Two passes over the same defect family repo-9ki8 uncovered:
- *
- * PASS 1 (notability). 179 person records carried `documented_site` as their only notability
- * criterion. The rubric in packages/domain/src/entity-status.ts defines that criterion as "The
- * entity IS a documented site" — it describes a place. On a person it is the same category
- * error that let Harriet Tubman's record become her visitor center's record.
- *
- * Only records with a criterion demonstrably supported by their OWN existing summary/claims text
- * are rewritten. Each assignment carries an evidence quote that this script re-verifies against
- * the live record before writing — an assignment whose quote cannot be found is dropped, not
- * trusted.
- *
- * Records where no criterion is supported are deliberately LEFT on `documented_site`. Writing an
- * empty notability_basis would be more honest but would fail `hasRequiredNotabilityBasis`
- * (packages/domain/src/relevance/why-public-explanation.ts), which gates the public "Why this
- * appears" payload — it would blank that surface rather than fix it. The rubric gap those records
- * expose is tracked separately; see repo-z1uk's notes.
- *
- * PASS 2 (stub content). 39 Negro Leagues Hall of Fame and Divine Nine founder records were a
- * single boilerplate sentence with one claim. Each now carries claims researched from the
- * institution's own pages (baseballhall.org, apa1906.net, oppf.org, phibetasigma1914.org), every
- * claim carrying the URL it came from and the sentence on that page that supports it.
- *
- * Usage (from repo root):
- *   set -a && source apps/web/.env.local && set +a
- *   export DATABASE_SSL=1
- *   node --conditions development --import tsx \
- *     packages/ops-data/scripts/fix-person-notability-and-stubs.ts
- *
- * Apply:
- *   DRY_RUN=0 FIX_PERSON_NOTABILITY_APPLY=1 node --conditions development --import tsx \
- *     packages/ops-data/scripts/fix-person-notability-and-stubs.ts
+ * Repairs person inclusion criteria only when the record's own evidence quote supports the
+ * assignment, and supplies cited content for the listed stubs. Unsupported criterion cases
+ * remain unresolved. Default dry-run; writes require DRY_RUN=0 and
+ * FIX_PERSON_NOTABILITY_APPLY=1.
  */
 import { readFileSync } from 'node:fs';
 import pg from 'pg';
@@ -121,7 +90,7 @@ async function main(): Promise<void> {
 
   try {
     const activeRelease = await client.query<{ release_id: string }>(
-      `SELECT release_id FROM bb_public.active_release LIMIT 1`,
+      `SELECT release_id FROM published.active_release LIMIT 1`,
     );
     const releaseId = activeRelease.rows[0]?.release_id;
     if (!releaseId) throw new Error('no active release');
@@ -137,8 +106,8 @@ async function main(): Promise<void> {
       `SELECT e.id,
               e.kind_detail -> 'editorial' ->> 'summary' AS summary,
               COALESCE(r.claims, '[]'::jsonb) AS claims
-       FROM bb_canonical.entities e
-       LEFT JOIN bb_public.release_entities r
+       FROM canonical.entities e
+       LEFT JOIN published.release_entities r
          ON r.entity_id = e.id AND r.release_id = $1
        WHERE e.id = ANY($2::text[])`,
       [releaseId, notabilityProposals.map((p) => p.id)],
@@ -242,13 +211,13 @@ async function main(): Promise<void> {
         const basisJson = JSON.stringify(entry.basis);
         const labelsJson = JSON.stringify(entry.labels);
         await client.query(
-          `UPDATE bb_canonical.entities
+          `UPDATE canonical.entities
            SET notability_basis = $2::jsonb, updated_at = now()
            WHERE id = $1`,
           [entry.id, basisJson],
         );
         await client.query(
-          `UPDATE bb_public.release_entities
+          `UPDATE published.release_entities
            SET projection = jsonb_set(
                  jsonb_set(projection, '{notabilityBasis}', $3::jsonb, true),
                  '{notabilityLabels}', $4::jsonb, true
@@ -257,7 +226,7 @@ async function main(): Promise<void> {
           [releaseId, entry.id, basisJson, labelsJson],
         );
         await client.query(
-          `UPDATE bb_public.search_index
+          `UPDATE published.search_index
            SET facets = jsonb_set(
                  jsonb_set(facets, '{notabilityBasis}', $3::jsonb, true),
                  '{notabilityLabels}', $4::jsonb, true
@@ -281,14 +250,14 @@ async function main(): Promise<void> {
         const claimIdsJson = JSON.stringify(claims.map((claim) => claim.id));
 
         await client.query(
-          `UPDATE bb_canonical.entities
+          `UPDATE canonical.entities
            SET kind_detail = jsonb_set(kind_detail, '{editorial,summary}', to_jsonb($2::text), true),
                updated_at = now()
            WHERE id = $1`,
           [proposal.id, proposal.proposed_summary],
         );
         await client.query(
-          `UPDATE bb_public.release_entities
+          `UPDATE published.release_entities
            SET projection = jsonb_set(
                  jsonb_set(
                    jsonb_set(projection, '{summary}', to_jsonb($3::text), true),
@@ -300,7 +269,7 @@ async function main(): Promise<void> {
           [releaseId, proposal.id, proposal.proposed_summary, claimsJson, claimIdsJson],
         );
         await client.query(
-          `UPDATE bb_public.search_index
+          `UPDATE published.search_index
            SET claim_count = $3,
                facets = jsonb_set(facets, '{claimCount}', to_jsonb($3::int), true)
            WHERE release_id = $1 AND entity_id = $2`,
@@ -321,7 +290,7 @@ async function main(): Promise<void> {
 
     const remaining = await client.query<{ n: string }>(
       `SELECT count(*)::int AS n
-       FROM bb_canonical.entities e
+       FROM canonical.entities e
        WHERE e.kind = 'person'
          AND (
            SELECT string_agg(DISTINCT b ->> 'criterion', ',')

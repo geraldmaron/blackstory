@@ -367,64 +367,6 @@ export const DEFAULT_SCHEDULED_JOBS: readonly ScheduledJobDefinition[] = [
     consecutiveMissedRunThreshold: 2,
   },
 
-  // --- REAL: backup verification. Wired to scripts/backup-restore/
-  // verify-restore.mjs via ./jobs/backup-verification.ts.
-  // Disclosed worker-package gap (see docs/decisions-carryover.md, "scheduled-job worker
-  // packages"): that entry says worker code lives only in research/publication/
-  // security. scripts/backup-restore/ predates that decision and lives outside all three
-  // worker packages. targetWorker.package below is 'security' (closest fit ops/ops-adjacent
-  // concerns already live there) as the *container* this job runs in; the script itself has not
-  // moved. Migrating scripts/backup-restore's logic into workers/security is a reasonable
-  // follow-up outside this module.
-  {
-    id: 'backup-verification-daily',
-    owner: 'backup-verification',
-    description:
-      'Daily Firestore export verification (document counts, collection hashes, manifest checks).',
-    cadence: {
-      cronExpression: '0 5 * * *',
-      nominalIntervalMs: DAY_MS,
-      humanReadable: 'daily 05:00 UTC',
-    },
-    budget: { unit: 'exports', maxPerRun: 5 },
-    timeoutSec: 900,
-    idempotencyKeyScheme: 'job:{jobId}:{dayStart}',
-    killSwitchId: scheduledJobKillSwitchId('backup-verification-daily'),
-    targetWorker: { package: 'security', function: 'ops.backup_verification.verify_restore' },
-    environment: 'repo-internal',
-    publicEffect: 'none',
-    rosterStatus: 'real',
-    consecutiveMissedRunThreshold: 2,
-  },
-
-  // --- REAL: restore-drill scheduling. Prompts the quarterly drill runbook
-  // (docs/runbooks/backup-restore.md); scripts/backup-restore/staging-restore.stub.sh is
-  // print-only by design (a human executes the printed gcloud import) that human gate is the
-  // runbook's design, not a missing implementation here.
-  {
-    id: 'restore-drill-quarterly',
-    owner: 'restore-drill',
-    description:
-      'Quarterly restore-drill scheduling; prints the staging-restore command for human execution.',
-    cadence: {
-      cronExpression: '0 6 1 1,4,7,10 *',
-      nominalIntervalMs: QUARTER_MS,
-      humanReadable: 'quarterly, 1st 06:00 UTC',
-    },
-    budget: { unit: 'drills', maxPerRun: 1 },
-    timeoutSec: 600,
-    idempotencyKeyScheme: 'job:{jobId}:{quarterStart}',
-    killSwitchId: scheduledJobKillSwitchId('restore-drill-quarterly'),
-    targetWorker: {
-      package: 'security',
-      function: 'ops.backup_verification.staging_restore_drill',
-    },
-    environment: 'repo-internal',
-    publicEffect: 'none',
-    rosterStatus: 'real',
-    consecutiveMissedRunThreshold: 1,
-  },
-
   // --- Cost/budget report. Stub: real evaluator (evaluateDailyBudget) lives
   // in packages/security/src/resource-controls.ts, not packages/config outside a "cheap to
   // wire" claim without adding @repo/security as a new dependency here, so this stays a
@@ -454,7 +396,7 @@ export const DEFAULT_SCHEDULED_JOBS: readonly ScheduledJobDefinition[] = [
   // --- Release-coupled rebuild. The second pre-approved automatic public-facing
   // exception: rebuilding a derived, regenerable artifact tied to an already-activated release.
   // Primarily release-activation-triggered (event-driven); the cadence below is the safety-net
-  // poll, mirroring infra/firebase/backup/export-schedule.md's firestore-export-on-release entry.
+  // poll when an operator explicitly installs scheduling.
   {
     id: 'release-coupled-rebuild',
     owner: 'map-platform',

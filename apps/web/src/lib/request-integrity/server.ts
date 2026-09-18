@@ -3,7 +3,7 @@
  *
  * A server-minted random token is returned to same-origin JavaScript and mirrored in an
  * HttpOnly, SameSite=Strict cookie. Protected requests must present both values. This provides
- * fail-closed CSRF/request-origin protection without a Firebase runtime dependency; endpoint
+ * fail-closed CSRF/request-origin protection without a database runtime dependency; endpoint
  * rate limits remain the separate abuse-control layer.
  */
 import { CSRF_COOKIE_NAME, CSRF_HEADER_NAME, validateCsrfToken } from '../web-security/csrf';

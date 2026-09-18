@@ -29,7 +29,7 @@ import { createHash } from 'node:crypto';
 import pg from 'pg';
 
 // National-level jurisdiction/boundary/vintage labels for statistical_observations.
-// jurisdiction_id has an FK to bb_reference.jurisdictions(id); the only national row
+// jurisdiction_id has an FK to reference.jurisdictions(id); the only national row
 // there is 'nation:US' (a bare 'nation' literal is not a valid id and would fail the
 // FK check on apply). boundary_version and dataset_vintage are NOT NULL columns with
 // no default, so they need real values, not null — 'national' / a fixed retrieval-date
@@ -91,23 +91,9 @@ function normalizePgConnectionString(connectionString: string): {
 }
 
 /**
- * BLS's own bulk time-series distribution for the `ln` (Labor Force Statistics) survey.
- *
- * WHY A SECOND SOURCE. The public API v2 endpoint is rate-limited per IP to a small daily
- * request budget, and this ingest needs 18 requests (2 series x 9 decades). One exhausted
- * budget — an earlier run on the same day, a shared egress IP — turns every request into
- * `REQUEST_SUCCEEDED: false` with a "daily threshold ... has been reached" message, and the
- * ingest cannot run again until the quota rolls over. That is an unacceptable dependency for a
- * script whose output is published data.
- *
- * `download.bls.gov/pub/time.series/ln/ln.data.1.AllData` is the same agency publishing the same
- * observations with no quota and no key. It is one tab-separated file, `series_id \t year \t
- * period \t value \t footnote_codes`, and it is LARGE (~390 MB) because it carries every `ln`
- * series — so it is streamed and filtered line by line, never buffered. BLS blocks requests
- * without an identifying User-Agent, so one is sent.
- *
- * Values agree with the API to the published precision: Black 1983 annual average 19.50, Black
- * 2019 6.07, White 2019 3.28 (verified 2026-09-13 against both sources).
+ * Streams and filters the BLS bulk Labor Force Statistics file as an alternative to the API's
+ * request quota. Retain series/year/period identifiers and send an identifying User-Agent. Do
+ * not buffer the full distribution in memory.
  */
 const BLS_FLAT_FILE_URL = 'https://download.bls.gov/pub/time.series/ln/ln.data.1.AllData';
 const BLS_FLAT_FILE_USER_AGENT = 'BlackStory research ingest (geraldmarondagher@gmail.com)';
@@ -180,11 +166,9 @@ async function fetchBlsData(seriesIds: readonly string[]): Promise<Map<string, B
       let allData: BlsSeriesData['data'] = [];
       const currentYear = new Date().getFullYear();
 
-      // Fetch in 10-year batches to cover full history from 1950. The unregistered
-      // BLS API v2 endpoint silently truncates any request spanning more than 10
-      // years down to the first 10 years of the requested range while still
-      // returning REQUEST_SUCCEEDED, so a 20-year step here would silently skip
-      // every other decade (verified 2026-09-12: see bead repo-zxjz.4 notes).
+      // Use ten-year API batches because the unregistered BLS endpoint can truncate longer
+      // ranges while still reporting success. Validate year coverage rather than trusting that
+      // status alone.
       for (let startYear = 1950; startYear <= currentYear; startYear += 10) {
         const endYear = Math.min(startYear + 9, currentYear);
 
@@ -389,7 +373,7 @@ async function applyObservations(
 
     for (const series of seriesDefinitions) {
       await client.query(
-        `INSERT INTO bb_reference.statistical_series
+        `INSERT INTO reference.statistical_series
           (metric_id, metric_definition, universe, unit, source_dataset, source_table,
            source_variable, geography_type, estimate_type, period_type,
            external_data_source_id, theme, metadata)
@@ -428,7 +412,7 @@ async function applyObservations(
     // Upsert observations for national level (jurisdiction_id = NATION_JURISDICTION)
     for (const obs of observations) {
       await client.query(
-        `INSERT INTO bb_reference.statistical_observations
+        `INSERT INTO reference.statistical_observations
           (id, metric_id, jurisdiction_id, boundary_version, reference_period, dataset_vintage,
            estimate, margin_of_error, race_ethnicity_slice, status, source, source_url,
            retrieved_at, content_hash, metadata)

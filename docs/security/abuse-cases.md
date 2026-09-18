@@ -40,7 +40,7 @@ Corpus completeness is enforced by `@repo/testing` (`pnpm --filter @repo/testing
 | **Steps** | 1) Append random query params to public URLs. 2) Issue complex FTS/`ILIKE`/nearby queries. 3) Hammer geocode. |
 | **Beads** | , , , , ,  |
 | **Automation** | scaffold → ci (/036); load under  |
-| **Pass criteria** | Cache-bust params ignored for static reads; search complexity rejected/timeout; geocode quota enforced; App Check required for expensive paths |
+| **Pass criteria** | Cache-bust params ignored for static reads; search complexity rejected/timeout; geocode quota enforced; client-header check required for expensive paths |
 
 ## AC-03 — Stuff credentials / phish an administrator
 
@@ -147,7 +147,7 @@ Corpus completeness is enforced by `@repo/testing` (`pnpm --filter @repo/testing
 |--|--|
 | **Threat** | T-12 |
 | **Actor** | Accidental committer / inspector |
-| **Steps** | 1) Commit `.env`. 2) Log App Check token. 3) Bundle service account into web. |
+| **Steps** | 1) Commit `.env`. 2) Log client-header check token. 3) Bundle service account into web. |
 | **Beads** | , , ,  |
 | **Automation** | ci secret scanning + bundle scan stubs |
 | **Pass criteria** | Push blocked or alerted; logs redacted; web bundle contains no server secrets |

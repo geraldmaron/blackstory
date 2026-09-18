@@ -1,7 +1,7 @@
 # Network Traversal Discovery
 
 A catalog-seeded research-discovery methodology for BlackStory. Start from a **known** canonical
-entity, read its relationships from `bb_canonical.entity_relationships`, and for every related
+entity, read its relationships from `canonical.entity_relationships`, and for every related
 entity that is **not already in the catalog** (catalog-match `no_match`), emit a private discovery
 candidate carrying the relationship context that surfaced it.
 
@@ -70,7 +70,7 @@ reachable.
 - **No I/O in the module.** Relationships are supplied by the caller or an injected
   `readRelationships` reader (fixtures in tests; a `@repo/security` safe-fetch / Supabase client in
   production). The pure functions are deterministic and side-effect free. Reads target
-  `bb_canonical.entity_relationships`, which is staff-select-only (see `20260720220010_rls_policies`).
+  `canonical.entity_relationships`, which is staff-select-only (see `20260720220010_rls_policies`).
 - **Evidence before assertion; dignity.** Candidates are leads with the originating predicate as
   provenance; the obscurity score is a relative heuristic carrying
   `OBSCURITY_METHODOLOGY_DISCLAIMER` (never importance, truth, or completeness).
@@ -128,7 +128,7 @@ To run the new test alongside the others, add
 
 ## Migration
 
-No schema change is required. Traversal reads the existing `bb_canonical.entity_relationships`
+No schema change is required. Traversal reads the existing `canonical.entity_relationships`
 table (created in `20260720220006_canonical_entities_claims`, indexed by `from_entity_id` /
 `to_entity_id` in `20260720220011_indexes`) and writes only private discovery candidates. If a
 future pass adds a persisted network-traversal run receipt, reserve migration prefix
@@ -136,8 +136,8 @@ future pass adds a persisted network-traversal run receipt, reserve migration pr
 
 ## Deferred (not this pass)
 
-- Live `bb_canonical.entity_relationships` reader wiring (callers inject `readRelationships` today).
+- Live `canonical.entity_relationships` reader wiring (callers inject `readRelationships` today).
 - Multi-hop traversal (current pass is one hop from the seed; `relationshipHops` budget in
   `black-history.v1` allows 3–4 for a later pass).
-- Firestore/Supabase persistence of network candidates and run receipts.
+- Postgres persistence of network candidates and run receipts.
 - Feeding unknown neighbors into a downstream `runDiscoveryCampaign` for full adapter capture.

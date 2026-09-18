@@ -3,7 +3,6 @@
 /**
  * Run post-deploy E2E smoke harness.
  * Skips when E2E_BASE_URL is unset; fail-closed when CI_REQUIRE_E2E=1 and URL is missing.
- * Clears production Firebase project env so test:preflight does not refuse the run.
  */
 import { spawnSync } from 'node:child_process';
 import path from 'node:path';
@@ -24,16 +23,6 @@ if (!baseUrl) {
 }
 
 const env = { ...process.env, E2E_BASE_URL: baseUrl };
-// Deploy workflows set FIREBASE_PROJECT_ID to the live project for migrate/provenance.
-// Preflight refuses that id; post-deploy smoke only needs a public HTTP base URL.
-if (/black-book-efaaf|production/i.test(env.FIREBASE_PROJECT_ID ?? '')) {
-  delete env.FIREBASE_PROJECT_ID;
-  delete env.GCLOUD_PROJECT;
-  delete env.GOOGLE_CLOUD_PROJECT;
-}
-env.FIREBASE_EMULATOR_MODE = env.FIREBASE_EMULATOR_MODE ?? '1';
-env.FIREBASE_PROJECT_ID = env.FIREBASE_PROJECT_ID ?? 'demo-repo';
-
 const result = spawnSync('pnpm', ['test:e2e'], {
   cwd: ROOT,
   encoding: 'utf8',

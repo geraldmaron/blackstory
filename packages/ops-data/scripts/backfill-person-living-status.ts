@@ -61,9 +61,9 @@ async function loadPersonClaims(client: pg.Client): Promise<Map<string, PersonCl
     object: unknown;
   }>(
     `SELECT c.entity_id, c.id AS claim_id, v.predicate, v.object
-     FROM bb_canonical.claims c
-     JOIN bb_canonical.claim_versions v ON v.id = c.current_version_id
-     JOIN bb_canonical.entities e ON e.id = c.entity_id
+     FROM canonical.claims c
+     JOIN canonical.claim_versions v ON v.id = c.current_version_id
+     JOIN canonical.entities e ON e.id = c.entity_id
      WHERE e.kind = 'person' AND c.current_version_id IS NOT NULL`,
   );
   const map = new Map<string, PersonClaimRow[]>();
@@ -90,10 +90,10 @@ async function loadPersonQualifiers(client: pg.Client): Promise<Map<string, Pers
     value: { edtf?: string };
   }>(
     `SELECT c.entity_id, c.id AS claim_id, v.predicate, q.property, q.value
-     FROM bb_canonical.claim_qualifiers q
-     JOIN bb_canonical.claim_versions v ON v.id = q.claim_version_id
-     JOIN bb_canonical.claims c ON c.id = v.claim_id
-     JOIN bb_canonical.entities e ON e.id = c.entity_id
+     FROM canonical.claim_qualifiers q
+     JOIN canonical.claim_versions v ON v.id = q.claim_version_id
+     JOIN canonical.claims c ON c.id = v.claim_id
+     JOIN canonical.entities e ON e.id = c.entity_id
      WHERE e.kind = 'person' AND q.qualifier_type = 'temporal'`,
   );
   const map = new Map<string, PersonQualifierRow[]>();
@@ -130,18 +130,18 @@ async function main(): Promise<void> {
            WHERE kind = 'person'
              AND living_status NOT IN ('deceased', 'presumed_deceased')
              AND EXISTS (
-               SELECT 1 FROM bb_canonical.claims c
-               JOIN bb_canonical.claim_versions v ON v.id = c.current_version_id
+               SELECT 1 FROM canonical.claims c
+               JOIN canonical.claim_versions v ON v.id = c.current_version_id
                WHERE c.entity_id = e.id
                  AND v.predicate ~* '(lynch|killed|died|death|assassinat|hanged|buried|date_of_death)'
              )
          )::text AS deceased_gap
-       FROM bb_canonical.entities e`,
+       FROM canonical.entities e`,
     );
 
     const persons = await client.query<PersonRow>(
       `SELECT id, display_name, living_status, kind_detail
-       FROM bb_canonical.entities
+       FROM canonical.entities
        WHERE kind = 'person'
        ORDER BY id`,
     );
@@ -197,7 +197,7 @@ async function main(): Promise<void> {
     try {
       for (const plan of plans) {
         await client.query(
-          `UPDATE bb_canonical.entities
+          `UPDATE canonical.entities
            SET living_status_derived = $2::jsonb, updated_at = now()
            WHERE id = $1`,
           [plan.row.id, JSON.stringify(plan.derived)],
@@ -212,7 +212,7 @@ async function main(): Promise<void> {
         }
 
         await client.query(
-          `UPDATE bb_canonical.entities
+          `UPDATE canonical.entities
            SET living_status = $2,
                kind_detail = $3::jsonb,
                updated_at = now()
@@ -236,13 +236,13 @@ async function main(): Promise<void> {
            WHERE kind = 'person'
              AND living_status NOT IN ('deceased', 'presumed_deceased')
              AND EXISTS (
-               SELECT 1 FROM bb_canonical.claims c
-               JOIN bb_canonical.claim_versions v ON v.id = c.current_version_id
+               SELECT 1 FROM canonical.claims c
+               JOIN canonical.claim_versions v ON v.id = c.current_version_id
                WHERE c.entity_id = e.id
                  AND v.predicate ~* '(lynch|killed|died|death|assassinat|hanged|buried|date_of_death)'
              )
          )::text AS deceased_gap
-       FROM bb_canonical.entities e`,
+       FROM canonical.entities e`,
     );
 
     console.log(`\nApplied: living_status_derived on ${derivedWritten}, promoted ${promoted}.`);

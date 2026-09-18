@@ -80,7 +80,7 @@ function precisionAtK(
   const top = retrieved.slice(0, k);
   if (top.length === 0) return 0;
   const hits = top.filter((id) => relevant.has(id)).length;
-  return hits / top.length;
+  return hits / k;
 }
 
 function recallAtK(retrieved: readonly string[], relevant: ReadonlySet<string>, k: number): number {
@@ -119,6 +119,24 @@ export async function runHybridRetrievalEval(
   const thresholds = options.thresholds ?? DEFAULT_HYBRID_RETRIEVAL_THRESHOLDS;
   const fusionWeights = options.fusionWeights ?? { structured: 1, vector: 1 };
   const fusionWeightsVersion = options.fusionWeightsVersion ?? 'hybrid-fusion-weights.v1';
+  if (!Number.isSafeInteger(k) || k < 1 || k > 1000)
+    throw new Error('Retrieval k must be an integer between 1 and 1000');
+  if (
+    !querySet.queries.length ||
+    new Set(querySet.queries.map((q) => q.id)).size !== querySet.queries.length
+  )
+    throw new Error('Evaluation requires distinct, nonempty labeled queries');
+  if (
+    querySet.queries.some(
+      (q) =>
+        !q.text.trim() ||
+        !q.relevantEntityIds.length ||
+        new Set(q.relevantEntityIds).size !== q.relevantEntityIds.length,
+    )
+  )
+    throw new Error('Every query requires text and distinct relevance labels');
+  if (Object.values(thresholds).some((value) => !Number.isFinite(value) || value < 0 || value > 1))
+    throw new Error('Evaluation thresholds must be finite values between zero and one');
 
   const perQuery: HybridRetrievalQueryResult[] = [];
   let precisionSum = 0;
@@ -128,11 +146,12 @@ export async function runHybridRetrievalEval(
   for (const query of querySet.queries) {
     const relevant = new Set(query.relevantEntityIds);
     const normalizedQuery = query.text.trim().toLowerCase();
-    const topIds = await runner({
+    const retrieved = await runner({
       normalizedQuery,
       filters: buildFilters(query),
       limit: k,
     });
+    const topIds = [...new Set(retrieved)].slice(0, k);
 
     const pAtK = precisionAtK(topIds, relevant, k);
     const rAtK = recallAtK(topIds, relevant, k);

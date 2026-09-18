@@ -1,111 +1,49 @@
-# Runbook: Firestore backup and restore
+# Backup and recovery
 
-> **Leftover.** Firestore has no live database, rules, or indexes left
-> (`docs/decisions-carryover.md`, "Firestore as system of record, reversed"; `infra/firebase/`
-> retains this as DR/history reference only, per `docs/data/firebase-wind-down.md`). Nothing below
-> runs against live infrastructure today.
+Supabase Postgres holds canonical records, evidence metadata, research state, permissions and
+publication state. Supabase Storage holds source text and public media. A database backup alone
+does not prove object recovery. Confirm the configured project's actual backup retention and
+point-in-time recovery entitlement; neither is assumed by this repository.
 
-**Scope:** Firestore managed export, PITR, GCS versioning, release verification — as designed under
-the retired ADR-011.
-**Not in scope:** Cloud SQL PITR (deferred — see [`infra/firebase/backup/deferred-cloud-sql.md`](../../infra/firebase/backup/deferred-cloud-sql.md)).
+## Isolated restore
 
-## Prerequisites
+1. Identify the backup, its source project, cutoff time, and required RPO/RTO before starting.
+   Preserve it and its checksums. Use a destination separate from the source; never overwrite the
+   system of record during a rehearsal. Do not copy production application secrets into it.
+2. Restore the database using the supported Supabase recovery/export procedure for that backup.
+   Record commands, tool versions, start/end times and failures in a sanitized execution log.
+   Apply only the migrations needed to reach the intended application revision.
+3. Compare table counts and stable content hashes against the backup baseline. Verify foreign
+   keys, functions, RLS, staff role claims and denied anonymous/research-worker writes. An empty
+   schema reset proves migration mechanics, not recovery of recorded history.
+4. Restore or independently verify the required storage objects. Check their hashes, private
+   access and public delivery paths against database references. Include source text and media.
+5. Exercise public record/source delivery and authorized admin reads against the isolated restore.
+   Verify release pointers and derived projections; record mismatches before rebuilding them.
+6. Record measured recovery time and data loss. Resolve failures before declaring the drill passed.
+   Keep the backup and evidence until the replacement recovery point is verified.
 
-- Production Firestore database enabled with PITR (human step).
-- Bucket `black-book-efaaf-firestore-backups` provisioned per Terraform stub.
-- `backup@black-book-efaaf.iam.gserviceaccount.com` bound per IAM matrix.
-- Staging project or isolated database for drills (**no production Secret Manager exports**).
+## Launch evidence contract
 
-## Daily operations (automated)
+The launch evaluator reads `artifacts/recovery/latest.json`. This is operator-produced evidence
+from an executed restore, never a checked-in passing fixture. It must contain:
 
-1. Cloud Scheduler triggers Firestore export (see [`export-schedule.md`](../../infra/firebase/backup/export-schedule.md)).
-2. `backup@` post-export job writes metadata sidecar to `metadata/{exportId}.json`.
-3. CI or ops cron runs:
+- `schemaVersion: 1`, `mode: "executed"`, `database: "postgres"`.
+- Nonempty `backupId`, `sourceId`, distinct `destinationId`, and `verifiedBy`.
+- An actual ISO `completedAt` timestamp.
+- Nonnegative measured `elapsedSeconds` and `dataLossSeconds`, plus approved `rtoSeconds`
+  (positive) and `rpoSeconds`. Both measured values must meet their targets.
+- `checks` with `rowCounts`, `contentHashes`, `authorization`, `publicProjection`, and
+  `storageObjects`, each true only after verification.
+- `logPath`, relative to the repository, and `logSha256` matching the sanitized execution log.
 
-```bash
-node scripts/backup-restore/verify-restore.mjs \
-  --metadata gs://... # copy sidecar locally first, or mount in job \
-  --baseline-counts path/to/last-known-counts.json \
-  --baseline-hashes path/to/last-known-hashes.json
-```
+The evaluator checks structure, targets, required results and log integrity. It cannot establish
+that an operator's statements are truthful. Review the log and actual restored surfaces. Missing
+or simulated evidence blocks launch; passing unit tests do not supply operational evidence.
 
-On failure: page platform + security; do not delete prior weekly full.
+## Recovery during an incident
 
-## Quarterly restore test
-
-**Goal:** Prove RTO/RPO targets in [`rpo-rto.md`](../../infra/firebase/backup/rpo-rto.md) without exposing production secrets.
-
-### 1. Select export
-
-- Use latest **weekly full** prefix: `exports/weekly/{year}/Week-{ww}/full/`.
-- Record export URI and `completedAt` in drill ticket.
-
-### 2. Staging import (no prod credentials)
-
-```bash
-# Print-only (default)
-bash scripts/backup-restore/staging-restore.stub.sh \
-  gs://black-book-efaaf-firestore-backups/exports/weekly/2026/Week-29/full/ \
-  black-book-staging-restore
-
-# Human executes printed gcloud import with staging-only SA
-```
-
-**Never:** copy production App Hosting secrets, publication signing keys, or `web-runtime` Secret Manager refs into staging.
-
-### 3. Verification checklist
-
-| Step | Command / action | Pass criteria |
-|------|----------------|---------------|
-| Document counts | `verify-restore.mjs --baseline-counts` | All collections match ±0 |
-| Collection hashes | `verify-restore.mjs --baseline-hashes` | All sha256 digests match |
-| Active release | `--active-pointer` + `--release` | Pointer matches signed manifest |
-| Manifest envelope | embedded in metadata `releaseManifestChecks` | `verifyManifestEnvelope` ok |
-| Public snapshot spot-check | Compare one `snapshotHash` to GCS object bytes | sha256 match |
-| IAM deny-delete | `verify-iam-matrix.mjs` + manual 403 test | Runtime SAs cannot delete backups |
-
-```bash
-node scripts/backup-restore/verify-restore.mjs \
-  --metadata ./drill/metadata.json \
-  --baseline-counts ./drill/baseline-counts.json \
-  --baseline-hashes ./drill/baseline-hashes.json \
-  --active-pointer ./drill/active-pointer.json \
-  --release ./drill/release.json
-```
-
-### 4. Tear down
-
-- Delete staging import database or project slice.
-- Archive drill report (ticket + command log + verification JSON).
-
-## Point-in-time recovery (operational)
-
-For accidental deletes within PITR window:
-
-1. Identify timestamp (UTC) from audit trail.
-2. Human runs Firestore PITR restore to **new** database ID (not in-place overwrite).
-3. Run `verify-restore.mjs` against export closest to timestamp.
-4. Merge recovered docs via controlled migration job (out of  scope).
-
-## Release-specific restore
-
-If a bad activation slipped past checks (should be blocked by ):
-
-1. Roll back `publicMeta/activeRelease` to last good `active` release (publication worker).
-2. Restore `publication` + `public` tier on-release export for that `releaseId`.
-3. Verify manifest signature and pointer alignment before re-activating.
-
-## Escalation
-
-| Severity | Condition | Action |
-|----------|-----------|--------|
-| SEV2 | Daily export missing | Trigger manual export; investigate Scheduler |
-| SEV1 | Weekly full corrupt / hash mismatch | Halt releases; restore from prior weekly + PITR |
-| SEV1 | Backup bucket delete attempted by runtime SA | Security incident; rotate credentials |
-
-## References
-
-- [`infra/firebase/backup/README.md`](../../infra/firebase/backup/README.md)
-- [`retention-matrix.md`](../../infra/firebase/backup/retention-matrix.md)
-- [`iam-backup-protection.md`](../../infra/firebase/backup/iam-backup-protection.md)
-- [`scripts/backup-restore/README.md`](../../scripts/backup-restore/README.md)
+Contain publication and writes first using the [incident runbook](./incident-response.md).
+Use an uncompromised administrator identity. Restore to an isolated destination, verify it, and
+coordinate the database, auth, storage and application cutover. Keep the original recovery point
+until the replacement is checked. Replaying only a deployment does not reverse data mutations.

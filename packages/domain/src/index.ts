@@ -1,13 +1,4 @@
-/**
- * Shared domain primitives for BlackStory entities, geography, provenance,
- * claims confidence, append-only audit contracts, immutable
- * publication releases, and source adapter registry contracts.
- * Living-status and public precision rules come from
- * @repo/schemas (constitution). The document schemas live in @repo/ops-data's `firestore/`
- * modules (Firestore-era names, live store is Supabase Postgres). PostGIS is installed there
- * but no query path uses it: geo work is geohash plus haversine in this package. See
- * docs/decisions-carryover.md, "Firestore as system of record, reversed".
- */
+/** Framework-independent domain logic. Record schemas live in @repo/ops-data; database and provider adapters remain outside this package. */
 export { asEntityId, asRelationshipId, asMergeId, asLocationId } from './ids.js';
 export type { EntityId, RelationshipId, MergeId, LocationId } from './ids.js';
 
@@ -142,8 +133,7 @@ export type {
 export { ENTITY_KINDS, isEntityKind } from './entity-kinds.js';
 export type { EntityKind } from './entity-kinds.js';
 
-// Coarse entity classification (the related workstream) additive to `kind`, not wired into any
-// publish/search/filter pipeline in this pass.
+// Coarse classification derived from canonical kind.
 export {
   ENTITY_CLASSES,
   isEntityClass,
@@ -153,8 +143,7 @@ export {
 } from './entity-class.js';
 export type { EntityClass, EntityClassification } from './entity-class.js';
 
-// Unified temporal naming + external-identifier contracts (the related workstream), plus the
-// namespace/value uniqueness invariant. See ./naming.ts's module doc for scope rationale.
+// Temporal naming, external identifiers and namespace/value uniqueness.
 export {
   ENTITY_NAME_TYPES,
   migrateEntityNames,
@@ -291,8 +280,7 @@ export type {
   RelationshipResolutionState,
 } from './relationship.js';
 
-// publish invariants for EntityRelationship (BB the related workstream) not yet wired into a publish
-// pipeline (release-builder bead the related workstream owns that wiring).
+// Relationship publication validators; callers must enforce them at the write boundary.
 export {
   assertRelationshipEndpointsResolvedForPublish,
   excludeSelfFromCorroboration,
@@ -571,8 +559,8 @@ export type {
   PublicVisit,
 } from './geography/visit.js';
 
-// HOLC-polygon -> modern-tract crosswalk schema (repo-xez5.7). No rows populated
-// yet — see geography/holc-tract-crosswalk.ts module doc for the GIS-tooling blocker.
+// Historical HOLC polygon to modern tract crosswalk contracts; population requires an explicit
+// GIS ingestion step.
 export {
   HOLC_TRACT_CROSSWALK_METHODS,
   HOLC_TRACT_CROSSWALK_CONFIDENCE_LEVELS,
@@ -859,8 +847,7 @@ export * from './relevance-feedback/index.js';
 // notability-gate-enforcing search-index builder. Mirrors ./graph/index.js's own barrel.
 export * from './search/index.js';
 
-// Controlled historical-theme taxonomy (the related workstream): the registry, and the migration
-// helper that splits legacy `topicTags` into topicIds/mentionedEntityIds/keywords.
+// Controlled taxonomy and tag-classification helpers.
 export * from './taxonomy/index.js';
 
 // Quality-first national seed campaigns: curated fixtures + fail-closed gate validators.

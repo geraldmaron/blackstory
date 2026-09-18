@@ -53,3 +53,5 @@ brand/qa
 # Local, gitignored article drafts (packages/ops-data/drafts/.gitignore ignores `*`). CI never
 # sees these, but without this entry `pnpm format:check` fails locally on scratch output.
 packages/ops-data/drafts
+
+.playwright-mcp/

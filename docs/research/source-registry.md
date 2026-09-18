@@ -1,6 +1,6 @@
 # Source registry and adapter contract
 
-Contract-layer API for registering source adapters, approving policies, and gating research runs. Persistence is in-memory in this bead; Firestore wiring follows in a later bead.
+Contract-layer API for registering source adapters, approving policies, and gating research runs. The pure registry interface is independent of storage. Postgres adapters own persisted research state.
 
 **Context indicators (statistics lane):** Pre-ingestion metadata for demographics/context datasets lives in [`external-data-sources.ts`](../../packages/domain/src/external-data-sources.ts) and the ranked theme matrix in [`context-data-source-matrix.md`](context-data-source-matrix.md) — not in `registerSource`.
 
@@ -41,7 +41,6 @@ Domain validation enforces the same shape via `ADAPTER_CANDIDATE_SCHEMA_VERSION`
 ## Deferred (not this bead)
 
 - **Admin registry UI** —  Administration and research console
-- **Live Firestore persistence** — `SourceRegistryStore` interface only; implement against `evidenceSources`
 - **HTTP admin API** — register/approve endpoints on admin service
 - **Telemetry alerts** — parser drift metrics recorded here; alerting in
 
@@ -63,7 +62,7 @@ and `20260914130000_source_library_set_based_host_resolution.sql` (faster host r
 
 ### Publisher record
 
-`bb_evidence.source_organizations` is the publisher. Profile columns:
+`evidence.source_organizations` is the publisher. Profile columns:
 
 | Column | Meaning |
 |---|---|
@@ -93,10 +92,10 @@ Tiers follow the repo's classifier, not intuition:
 ### Host resolution
 
 A citation host is the lowercase hostname of `citationHref` with port, userinfo, a trailing dot
-and a leading `www.` removed (`bb_evidence.citation_host`). It resolves to a publisher by the
-longest `bb_evidence.source_domains.hostname` that equals the host or is a parent domain of it
+and a leading `www.` removed (`evidence.citation_host`). It resolves to a publisher by the
+longest `evidence.source_domains.hostname` that equals the host or is a parent domain of it
 (both www-stripped). On a tie the bare hostname wins, then the lower organization id. The result
-follows `merged_into_organization_id` to the survivor. `bb_evidence.resolve_citation_host_organization(host)`
+follows `merged_into_organization_id` to the survivor. `evidence.resolve_citation_host_organization(host)`
 does this for one host; `published_citations` does the same thing as one join and must agree
 with it.
 
@@ -112,7 +111,7 @@ a state agency, check that its host has its own row. The same applies to multi-t
 
 ### Relevance by evidence use
 
-`bb_evidence.source_policies.organization_id` ties a policy to a publisher. Its
+`evidence.source_policies.organization_id` ties a policy to a publisher. Its
 `source_policy_claim_fitness` rows use `claim_class` as an evidence use:
 `identity_and_life_dates`, `location_and_address`, `designation_and_listing`,
 `legal_and_court_record`, `event_narrative`, `superlative_or_first`, `direct_quotation`,
@@ -124,14 +123,14 @@ All four are `security_invoker`, revoked from `anon`, and return nothing to an `
 caller who is not staff. Service role and the direct Postgres connection the admin app and
 operator scripts use see everything.
 
-- `bb_evidence.published_citations`: one row per claim in the active release, with host and
+- `evidence.published_citations`: one row per claim in the active release, with host and
   resolved `organization_id` (NULL when unmapped).
-- `bb_evidence.source_library`: one row per surviving publisher with its profile, `hosts`,
+- `evidence.source_library`: one row per surviving publisher with its profile, `hosts`,
   `published_entities`, `published_claims`, `canonical_entities` (reached through the evidence
   chain), `evidence_sources`, `source_items`, and `merged_organization_ids`.
-- `bb_evidence.source_library_unmapped_hosts`: published hosts with no publisher. This is the
+- `evidence.source_library_unmapped_hosts`: published hosts with no publisher. This is the
   work queue.
-- `bb_evidence.source_library_fitness`: evidence-use fitness per publisher, current policy
+- `evidence.source_library_fitness`: evidence-use fitness per publisher, current policy
   version only.
 
 Invariant: `sum(source_library.published_claims) + sum(source_library_unmapped_hosts.published_claims)`

@@ -1,6 +1,6 @@
 # Versioned historical query packs
 
-Contract-layer API for versioned discovery query packs grouped by entity type and research theme. In-memory registry in this bead; Firestore persistence follows in a later bead.
+Contract-layer API for versioned discovery query packs grouped by entity type and research theme. The pure registry interface is independent of storage. Persisted execution uses the Postgres research ledger.
 
 ## Domain API (`@repo/domain` → `query-packs/`)
 
@@ -64,6 +64,5 @@ Gold fixture: `packages/domain/src/query-packs/fixtures/person-civil-rights-fixt
 
 ## Deferred (not this bead)
 
-- **Firestore persistence** for query packs and effectiveness metrics
 - **Discovery pipeline integration** —  wires `stampDiscoveryRun` into campaign runs
 - **Admin UI** for pack review and approval —

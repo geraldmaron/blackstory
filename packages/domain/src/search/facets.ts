@@ -13,10 +13,7 @@ function increment(counts: Record<string, number>, key: string | undefined): voi
 }
 
 /**
- * Resolves the effective controlled-taxonomy topic ids for a record (the related workstream): prefers
- * the new `topicIds` field, falling back to the legacy `topicTags` field for records built
- * before the split. Either way, every value is validated against `TOPIC_REGISTRY` — the theme
- * facet is NEVER built from raw, uncontrolled tag counting.
+ * Validate controlled theme identifiers against TOPIC_REGISTRY before facet aggregation.
  */
 function effectiveTopicIds(record: SearchableEntityRecord): readonly string[] {
   const source = record.topicIds ?? record.topicTags;

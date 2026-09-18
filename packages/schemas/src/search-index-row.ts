@@ -1,5 +1,5 @@
 /**
- * Maps `bb_public.search_index` rows into canonical public search projections.
+ * Maps `published.search_index` rows into canonical public search projections.
  *
  * Migrated Supabase rows often leave `name` / `entity_id` null while `name_lower` and `id`
  * carry the display string and entity id — recover those before Zod parse.
@@ -48,12 +48,9 @@ function asStringArray(value: unknown): readonly string[] {
 }
 
 /**
- * The cached grading inputs, or `undefined` when the row predates the field.
- *
- * Never substituted with an empty projection: an empty one grades `unrated`, while absent means
- * "not projected yet", and `/records` decides whether it can serve from the slim index on exactly
- * that distinction. Legacy rows carrying only the old derived `facets.confidenceTier` read as
- * absent here on purpose — a cached conclusion is the thing this field replaced (repo-6qjv0).
+ * Optional cached grading inputs. Absence requires hydration; an explicitly empty projection
+ * grades unrated. A stored conclusion such as confidenceTier is not a substitute for these
+ * inputs.
  */
 function evidenceInputs(value: unknown): RecordEvidenceInputsDoc | undefined {
   const parsed = recordEvidenceInputsSchema.safeParse(value);

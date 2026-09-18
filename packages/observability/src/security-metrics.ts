@@ -33,10 +33,10 @@ export const SECURITY_METRIC_DESCRIPTORS: Readonly<Record<string, SecurityMetric
     labelKeys: ['service', 'policy'],
     gcpMetricType: 'networksecurity.googleapis.com/https/requests_throttled',
   },
-  app_check_failures_total: {
-    name: 'app_check_failures_total',
+  client_header_failures_total: {
+    name: 'client_header_failures_total',
     type: 'counter',
-    description: 'App Check verification failures (monitor or enforce)',
+    description: 'Client-header protocol failures (not authentication)',
     labelKeys: ['service', 'mode', 'reason'],
   },
   authentication_failures_total: {
@@ -120,7 +120,7 @@ export const SECURITY_METRIC_DESCRIPTORS: Readonly<Record<string, SecurityMetric
   storage_access_denials_total: {
     name: 'storage_access_denials_total',
     type: 'counter',
-    description: 'Firebase Storage rule denials',
+    description: 'Storage authorization denials',
     labelKeys: ['service', 'bucket'],
   },
   service_errors_total: {
@@ -151,7 +151,7 @@ export const EVENT_KIND_TO_METRICS: Readonly<
 > = {
   'armor.deny': ['armor_denies_total'],
   'armor.throttle': ['armor_throttles_total'],
-  'app_check.failure': ['app_check_failures_total'],
+  'client_header.failure': ['client_header_failures_total'],
   'authentication.failure': ['authentication_failures_total'],
   'administrator.role_changed': ['administrator_role_changes_total'],
   'submission.spike': ['submission_requests_total'],

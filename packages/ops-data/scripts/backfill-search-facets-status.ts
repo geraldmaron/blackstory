@@ -1,5 +1,5 @@
 /**
- * Realign `bb_public.search_index.facets->>'status'` (and the `status` COLUMN beside it) with the
+ * Realign `published.search_index.facets->>'status'` (and the `status` COLUMN beside it) with the
  * release projection.
  *
  * A thin wrapper over `lib/search-facet-realign.ts`, configured for the `status` key: this runs

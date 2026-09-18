@@ -65,7 +65,7 @@ export type {
 } from './security-alerts.js';
 
 export {
-  adaptAppCheckTelemetry,
+  adaptClientAttestationTelemetry,
   adaptAuditEvent,
   adaptRateLimitDenial,
   adaptSlowQuery,
@@ -79,7 +79,7 @@ export {
   adaptDatabaseConnections,
 } from './security-adapters.js';
 export type {
-  AppCheckTelemetryInput,
+  ClientAttestationTelemetryInput,
   RateLimitDenialInput,
   SlowQueryInput,
   QueueSignalInput,

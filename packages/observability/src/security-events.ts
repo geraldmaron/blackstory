@@ -9,7 +9,7 @@ export const SECURITY_TELEMETRY_VERSION = '1.0.0' as const;
 export const securityEventKinds = [
   'armor.deny',
   'armor.throttle',
-  'app_check.failure',
+  'client_header.failure',
   'authentication.failure',
   'administrator.role_changed',
   'submission.spike',
@@ -103,7 +103,7 @@ export function defaultRunbookForKind(kind: SecurityEventKind): string {
   const runbooks: Record<SecurityEventKind, string> = {
     'armor.deny': 'runbook/armor-deny-spike',
     'armor.throttle': 'runbook/armor-throttle-spike',
-    'app_check.failure': 'runbook/app-check-failures',
+    'client_header.failure': 'runbook/client-header-failures',
     'authentication.failure': 'runbook/auth-failure-spike',
     'administrator.role_changed': 'runbook/admin-role-change',
     'submission.spike': 'runbook/submission-spike',

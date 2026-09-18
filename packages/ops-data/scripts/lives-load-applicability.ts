@@ -5,7 +5,7 @@
  * the text of a basis claim. Rows are data, so the JSON lives outside git (session scratch or
  * .cache).
  *
- * Canonical coverage is reported, not required. The incremental publisher writes bb_public
+ * Canonical coverage is reported, not required. The incremental publisher writes published
  * directly, and backfill-canonical-claims-from-release.ts only reaches entities with no canonical
  * claims at all, so a sourced claim added to an already-traced record can be public before it
  * has a canonical row. Missing rows are listed so the trace gap stays visible.
@@ -56,25 +56,25 @@ async function main(): Promise<void> {
     const [entities, jurisdictions, canonical, texts] = await Promise.all([
       pool.query<{ id: string }>(
         `SELECT DISTINCT e.projection->>'id' AS id
-         FROM bb_public.release_entities e
-         JOIN bb_public.active_release a ON a.release_id = e.release_id
+         FROM published.release_entities e
+         JOIN published.active_release a ON a.release_id = e.release_id
          WHERE e.projection->>'id' = ANY($1::text[])`,
         [entityIds],
       ),
       pool.query<{ id: string }>(
-        'SELECT id FROM bb_reference.jurisdictions WHERE id = ANY($1::text[])',
+        'SELECT id FROM reference.jurisdictions WHERE id = ANY($1::text[])',
         [jurisdictionIds],
       ),
       pool.query<{ id: string }>(
-        `SELECT id FROM bb_canonical.claims
+        `SELECT id FROM canonical.claims
          WHERE id = ANY($1::text[]) AND publication_status = 'published'`,
         [claimIds],
       ),
       pool.query<{ id: string; text: string }>(
         `SELECT DISTINCT claim->>'id' AS id,
                 concat_ws(' ', claim->>'object', claim->>'citationLabel') AS text
-         FROM bb_public.release_entities e
-         JOIN bb_public.active_release a ON a.release_id = e.release_id,
+         FROM published.release_entities e
+         JOIN published.active_release a ON a.release_id = e.release_id,
               jsonb_array_elements(e.projection->'claims') AS claim
          WHERE claim->>'id' = ANY($1::text[])
            AND coalesce(claim->>'citationHref', '') <> ''`,
@@ -125,7 +125,7 @@ async function main(): Promise<void> {
       await client.query('BEGIN');
       for (const row of rows) {
         await client.query(
-          `INSERT INTO bb_reference.law_applicability (
+          `INSERT INTO reference.law_applicability (
              id, entity_id, jurisdiction_id, scope_level, in_force_from_edtf, in_force_to_edtf,
              in_force_span, date_precision, groups_named, applies_to_slices, life_domains,
              text_posture, disputed, basis_claim_ids, notes, status

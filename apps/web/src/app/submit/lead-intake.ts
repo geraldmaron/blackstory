@@ -1,7 +1,7 @@
 /**
  * Shapes a public "submit a lead" form payload into the exact `SubmissionInput` shape
  * `createQuarantinedSubmission` accepts. Pure and
- * synchronous no Firebase, no App Check, no rate limiting so the field rules here are
+ * synchronous no network calls or rate limiting so the field rules here are
  * trivially testable in isolation. See `api/route.ts` for where this plugs into the real
  * quarantine intake.
  *

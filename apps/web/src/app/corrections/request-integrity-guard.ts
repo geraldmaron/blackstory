@@ -2,7 +2,7 @@
  * Corrections-route request-integrity guard.
  *
  * Same-origin CSRF/request-integrity control for correction, appeal, and abuse POSTs.
- * Replaces the former Firebase App Check guard on these mutation surfaces.
+ * Rejects missing or mismatched request-origin evidence on mutation surfaces.
  */
 import {
   createRequestIntegrityGuard,

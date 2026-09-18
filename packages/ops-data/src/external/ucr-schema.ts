@@ -1,5 +1,5 @@
 /**
- * Firestore schemas for FBI UCR data (the related workstream) — hate crime bulk records plus the
+ * Validated records for FBI UCR data — hate crime bulk records plus the
  * two reference layers that make them interpretable and joinable.
  *
  * Three collections:
@@ -34,7 +34,7 @@
  * county-year's incidents arrived that way, so the approximation is never invisible.
  */
 import { z } from 'zod';
-import { datasetArtifactProvenanceFields } from '../firestore/statistic-provenance.js';
+import { datasetArtifactProvenanceFields } from '../records/statistic-provenance.js';
 
 /** How an agency's county assignment was determined — recorded per agency, never inferred. */
 export const UCR_FIPS_BASES = [

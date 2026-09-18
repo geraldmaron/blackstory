@@ -1,29 +1,8 @@
 /**
- * Statistical data storage model (the related workstream).
- *
- * An external architecture review found that Census/ACS/FBI-hate-crime/Opportunity-Atlas-style
- * statistics were not modeled as a distinct concept from ordinary entity claims — folding them
- * in loses margin of error, geography vintage, source variable provenance, and the
- * observed/derived/modeled distinction. This module is the STORAGE MODEL for that data; it does
- * NOT duplicate the Census Geocoder adapter logic in `../adapters/census-geo/` (that adapter
- * resolves addresses/coordinates to jurisdictions — an entirely different concern from storing
- * a metric's time series of estimates).
- *
- * Three types, one lifecycle:
- *  - `StatisticalSeries` — the metric definition (what is measured, in what units, from which
- *    source variable, at what geography/estimate/period type). One series, many observations.
- *  - `StatisticalObservation` — a single as-reported estimate for a series at a jurisdiction and
- *    period, `status: 'observed'` for as-reported figures or `'tabulated'` for BlackStory's own
- *    weighted counts from licensed microdata. `boundaryVersion` is the vintage/crosswalk key: bd
- *    memory records "Tract-keyed collections must carry explicit tractVintage: ACS 2020s
- *    releases use 2020 tracts, Opportunity Atlas uses 2010 tracts — never join without a
- *    crosswalk," and `boundaryVersion` generalizes that constraint to every geography type (not
- *    just tracts), so a combination rule can refuse to combine observations whose boundary
- *    versions differ.
- *  - `DerivedMeasurement` — a value computed from one or more observations (sums, rates,
- *    growth, model output). `status` is a required literal `'derived' | 'modeled'` — there is no
- *    way to construct one without picking a state, and no boolean/implicit-string stands in for
- *    the observed/derived/modeled axis.
+ * Statistics preserve units, source variables, margin of error, geography/boundary vintage and
+ * observed/tabulated/derived/modeled status. A series defines the metric, an observation
+ * reports one place/period estimate and a derived measurement records computation inputs.
+ * Boundary versions constrain valid combinations independently of address geocoding.
  */
 
 /** Stable id for a `StatisticalSeries` (the metric definition, not an individual reading). */

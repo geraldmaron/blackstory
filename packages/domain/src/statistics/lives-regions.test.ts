@@ -8,7 +8,7 @@ import {
   livesRegionForState,
 } from './lives-regions.js';
 
-/** 50 states and the District of Columbia, as loaded in bb_reference.jurisdictions (Puerto Rico excluded). */
+/** 50 states and the District of Columbia, as loaded in reference.jurisdictions (Puerto Rico excluded). */
 const STATE_FIPS = [
   '01',
   '02',

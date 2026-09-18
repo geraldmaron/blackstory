@@ -58,7 +58,7 @@ export const FIXTURE_STATE_BOUNDARIES: readonly StateBoundary[] = [
 ] as const;
 
 /**
- * Rows shaped like `bb_reference.jurisdictions` plus GeoJSON in metadata for loader dry-runs.
+ * Rows shaped like `reference.jurisdictions` plus GeoJSON in metadata for loader dry-runs.
  * `parent_id` uses the `us` / `us-{stateFips}` id scheme recorded in
  * `docs/decisions-carryover.md` ("Jurisdiction reference data").
  */

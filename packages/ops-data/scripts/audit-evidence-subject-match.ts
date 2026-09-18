@@ -1,71 +1,8 @@
 /**
- * repo-pjob — does each captured evidence document actually mention the entity it is attached to?
- *
- * Wave 3 of the drafting campaign refused 17 of 40 subjects, and 9 of those refusals were not thin
- * evidence at all: the attached document was about a different subject entirely (a US disability-
- * rights timeline filed under a church, an encyclopedia entry on Frankfurt filed under Hogan
- * Quarters). Those entities are unretrieved, not undraftable — a distinction that matters because
- * repo-n9dq is about to give "no Black-history significance" a TERMINAL ledger state, and applying
- * it to a retrieval failure would permanently close a record whose real nomination was never
- * fetched.
- *
- * This measures the size of that population instead of extrapolating it from one batch.
- *
- * THE TEST IS FREQUENCY, NOT PRESENCE, and that distinction is the whole script. "Does a token
- * from the display name appear anywhere in the text" fails badly here, because the mis-attached
- * documents are enormous general-encyclopedia articles (116,000-240,000 chars against a real
- * nomination's ~23,000) and a document that long contains almost any token by coincidence. All
- * three cases below passed a presence test while being obviously wrong:
- *
- *   Hosanna Church and Cemetery  <- disability-rights timeline   "hosanna" hit Hosanna-Tabor, the
- *                                                                 Supreme Court case
- *   Hogan Quarters               <- encyclopedia entry, Frankfurt "hogan" hit the law firm Hogan
- *                                                                 Lovells; "quarters" hit
- *                                                                 head-QUARTERS
- *   Lawrence A. Davis Student Union <- Confederate monuments      "davis" hit Jefferson Davis;
- *                                                                 "union" hit the Union army
- *
- * A document actually about a subject names it repeatedly. A document that merely collides with it
- * names it once. So the signal is the subject-mention RATE, and matching is word-boundary (the
- * head-quarters hit above was a substring artifact, not a coincidence).
- *
- * A flag is strong evidence of mis-attachment; a clean result is NOT proof of correct attachment
- * (this will not catch right-town/wrong-building). Read the flagged count as a floor.
- *
- * READ-ONLY: no write path.
- *
- * WHY THIS QUARANTINES RATHER THAN ONLY REPORTING
- *
- * A hand-read of a 20-subject stratified sample of the flagged tier2 population returned 2 usable,
- * 7 thin, 11 unrelated — 90% unusable. The thin ones are the reason this writes: they are more
- * dangerous than the unrelated ones, not less. A city article attached to one of its own historic
- * districts is full of *real* Black history about a DIFFERENT district — Roanoke's Gainsboro and
- * Henry Street material sitting under Southwest Historic District, Charlottesville's Vinegar Hill
- * material under West Main Street. Every quote a drafter pulls from it is a genuine verbatim
- * substring, so `validateEnrichmentResponse` passes it, and the result is a sourced-looking
- * paragraph attributing a neighboring place's history to this entity. Leaving the row
- * `status='captured'` is not neutral.
- *
- * Quarantining costs the ~10% that were usable. That trade is deliberate and cheap to reverse: the
- * row keeps its content, the flip is one column, and the entity returns to the sweep to be
- * re-fetched by a collector that can do better.
- *
- * NOT APPLIED TO tier1 nomination captures, which this audit flags but must not act on. Those are
- * fetched by the entity's own refnum (verified: every flagged one has the refnum in its
- * source_url), so the document is right by construction and a missing name means the NPS text
- * extraction dropped the header field — "The ___ is historically significant because..." — or the
- * capture truncated. Quarantining them would delete correct evidence over an extraction artifact.
- * Their real defect is capture quality; see repo-pjob.
- *
- * Usage (from repo root):
- *   set -a && source apps/web/.env.local && set +a
- *   export DATABASE_SSL=1
- *   node --conditions development --import tsx \
- *     packages/ops-data/scripts/audit-evidence-subject-match.ts [--lane=nrhp-black-heritage] \
- *     [--samples=15] [--json=<path>]
- *
- * Dry-run by default. Writes require:
- *   DRY_RUN=0 AUDIT_EVIDENCE_SUBJECT_MATCH_APPLY=1
+ * Audits whether captured documents concern their attached subjects. Frequent or distinctive
+ * subject mentions provide stronger signals than an incidental token in a long general article.
+ * Misattached evidence is an acquisition failure, not proof that the subject lacks historical
+ * significance.
  */
 import pg from 'pg';
 import { writeFileSync } from 'node:fs';
@@ -242,15 +179,8 @@ type Row = {
 };
 
 /**
- * repo-nlcq: tokens that are simply the row's own location carry no identifying power, and the two
- * anti-mis-attachment layers have to agree about that or a whole class escapes both.
- *
- * Caswell County Training School sits in Caswell County and was attached to the Wikipedia article
- * "Caswell County, North Carolina". subject-identity.ts strips "caswell" as a place word — correct,
- * a name that only repeats its location says nothing — which leaves that name one distinctive
- * token and too few for its co-occurrence rule. This audit then cleared the document because its
- * TITLE contains "caswell": the very token the gate had just discarded as meaningless. Stripping a
- * place word in one layer while honoring it in the other is what let the document through both.
+ * Ignore location-only tokens for title-based identity checks. Otherwise a county article can
+ * appear to identify every property whose name contains that county.
  */
 export function placeWordsOf(row: Pick<Row, 'city' | 'county' | 'state'>): ReadonlySet<string> {
   return new Set(
@@ -272,9 +202,9 @@ async function main(): Promise<void> {
             lc.payload->>'state' AS state,
             ev.id AS ev_id, ev.source_tier, ev.title, ev.content_text,
             ee.status AS ledger_status
-       FROM bb_research.landscape_candidates lc
-       JOIN bb_research.entity_evidence ev ON ev.entity_id = lc.id AND ev.status = 'captured'
-       LEFT JOIN bb_research.entity_enrichment ee ON ee.entity_id = lc.id
+       FROM research.landscape_candidates lc
+       JOIN research.entity_evidence ev ON ev.entity_id = lc.id AND ev.status = 'captured'
+       LEFT JOIN research.entity_enrichment ee ON ee.entity_id = lc.id
       WHERE lc.lane = $1
       ORDER BY lc.id, ev.source_tier`,
     [LANE],
@@ -316,9 +246,8 @@ async function main(): Promise<void> {
       continue;
     }
 
-    // repo-nlcq. Body matching still uses every token — a document about the subject names the
-    // whole thing, place word and all — but the TITLE test must not be satisfied by a word that is
-    // only the row's location, or a county article clears every property in that county.
+    // Body matching retains full name tokens, but title matching excludes tokens that merely
+    // repeat the subject's location.
     const placeWords = placeWordsOf(row);
     const titleTokens = tokens.filter((token) => !placeWords.has(token));
 
@@ -457,10 +386,9 @@ async function main(): Promise<void> {
     return;
   }
 
-  // Reason is stored so a later reader can tell this apart from an identity-gate quarantine —
-  // these rows passed checkSubjectIdentity and were rejected on a different test (repo-u84y).
+  // Record the specific subject-match reason separately from the earlier identity-gate result.
   const result = await pool.query(
-    `UPDATE bb_research.entity_evidence
+    `UPDATE research.entity_evidence
         SET status = 'quarantined',
             provenance = coalesce(provenance, '{}'::jsonb) || jsonb_build_object(
               'quarantineReason', 'subject-match: document title does not name the entity (repo-pjob)',
@@ -473,10 +401,10 @@ async function main(): Promise<void> {
   console.log(`\nApplied: ${result.rowCount} evidence row(s) quarantined.`);
 
   const stranded = await pool.query<{ n: string }>(
-    `SELECT count(*) AS n FROM bb_research.entity_enrichment ee
+    `SELECT count(*) AS n FROM research.entity_enrichment ee
       WHERE ee.lane = $1 AND ee.status = 'pending'
         AND NOT EXISTS (
-          SELECT 1 FROM bb_research.entity_evidence ev
+          SELECT 1 FROM research.entity_evidence ev
            WHERE ev.entity_id = ee.entity_id AND ev.status = 'captured')`,
     [LANE],
   );

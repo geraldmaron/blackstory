@@ -22,7 +22,6 @@ import { shouldShowVisitBlock } from '../lib/geography/visit-handoff';
 import { Connections, Room, TrustBlock } from '../components/room';
 import { geoAnchorFor } from '../lib/map-experience/entity-geo';
 import { recordConfidenceTier } from '../lib/map-experience/build-explore-map-source';
-import { geoPrecisionTierForPublicPrecision } from '../lib/map-experience/geo-precision';
 import type { PlaceDiscoveryReturn } from '../lib/discovery/discovery-state';
 import { placeDiscoveryReturn } from '../lib/discovery/discovery-state';
 import type { PublicEntityView } from '../data/public-seed';
@@ -37,10 +36,7 @@ import {
 } from '../components/entity/RecordChrome';
 import { humanizeToken } from '../components/entity/format';
 import { confidenceIconFor } from '../lib/map-experience/confidence-icons';
-import {
-  METHODOLOGY_EVIDENCE_GRADES_HREF,
-  METHODOLOGY_HOW_RECORD_GETS_IN_HREF,
-} from '../components/evidence/editorial-links';
+import { METHODOLOGY_HOW_RECORD_GETS_IN_HREF } from '../components/evidence/editorial-links';
 import { EntityRoomSections } from './entity/[id]/EntityRoomSections';
 import { toEvidenceClaimInputs, withoutSummaryEchoClaims } from './entity/[id]/adapters';
 import { placeHref } from '../lib/place/public-place-path';
@@ -182,13 +178,7 @@ export function HomeFirstPaint({
     const sourceCount = citedSourceCount(displayClaims);
     const confidenceTier = recordConfidenceTier(lead.claims);
     const gradeWord = evidenceGradeWord(confidenceTier);
-    const precisionTier = geoPrecisionTierForPublicPrecision(lead.locationPrecision);
-    const precisionValue =
-      lead.locationPrecision && lead.locationPrecision.trim().length > 0
-        ? humanizeToken(lead.locationPrecision)
-        : precisionTier
-          ? humanizeToken(precisionTier)
-          : 'Not recorded';
+    const precisionValue = geo ? humanizeToken(lead.locationPrecision) : 'Not pinned';
     const hasPhoto = lead.primaryImage !== undefined;
     const returns =
       discovery ??
@@ -211,7 +201,7 @@ export function HomeFirstPaint({
             icon={recordSectionIcon('where')}
             label="Precision"
             value={precisionValue}
-            support="How sharp the pin is"
+            support={geo ? 'How sharp the pin is' : 'No public map location'}
           />
           <RecordFactTile
             icon={recordSectionIcon('claims')}
@@ -233,7 +223,7 @@ export function HomeFirstPaint({
               className="ds-rec-inline-icon"
               aria-hidden="true"
             />
-            See it on the map
+            {geo ? 'See it on the map' : 'Browse the map'}
           </Link>
         </div>
       </div>

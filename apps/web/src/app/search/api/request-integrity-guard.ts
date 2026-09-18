@@ -2,7 +2,7 @@
  * Search API request-integrity guard.
  *
  * Same-origin CSRF/request-integrity control for progressive-enhancement search
- * endpoints. Replaces the former Firebase App Check guard.
+ * endpoints.
  */
 import {
   createRequestIntegrityGuard,

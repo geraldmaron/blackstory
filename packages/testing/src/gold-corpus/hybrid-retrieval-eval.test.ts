@@ -79,3 +79,29 @@ test('fusion weight version is recorded in eval output', async () => {
   assert.equal(result.fusionWeightsVersion, 'hybrid-fusion-weights.v2-test');
   assert.deepEqual(result.fusionWeights, { structured: 2, vector: 1 });
 });
+
+test('empty corpora, invalid cutoffs and nonfinite thresholds cannot pass an evaluation', async () => {
+  await assert.rejects(
+    runHybridRetrievalEval({ ...MINI_QUERY_SET, queries: [] }, () => []),
+    /nonempty/,
+  );
+  await assert.rejects(
+    runHybridRetrievalEval(MINI_QUERY_SET, () => [], { k: 0 }),
+    /integer/,
+  );
+  await assert.rejects(
+    runHybridRetrievalEval(MINI_QUERY_SET, () => [], {
+      thresholds: { ...DEFAULT_HYBRID_RETRIEVAL_THRESHOLDS, minimumRecallAt5: NaN },
+    }),
+    /finite/,
+  );
+});
+
+test('duplicate results cannot inflate recall and missing result slots reduce precision at k', async () => {
+  const result = await runHybridRetrievalEval(
+    { ...MINI_QUERY_SET, queries: [MINI_QUERY_SET.queries[0]!] },
+    () => ['a', 'a', 'a', 'a', 'a'],
+  );
+  assert.equal(result.meanRecallAt5, 0.5);
+  assert.equal(result.meanPrecisionAt5, 0.2);
+});

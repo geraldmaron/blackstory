@@ -1,6 +1,6 @@
 /**
- * Maps Firestore-style document paths used by commitWithAudit onto bb_* Postgres upserts.
- * Unsupported roots throw with a clear path error (fail closed — no silent Firestore fallback).
+ * Maps audit resource paths used by commitWithAudit onto typed Postgres upserts.
+ * Unsupported resource roots throw before a write.
  */
 import type pg from 'pg';
 import { randomUUID } from 'node:crypto';
@@ -37,7 +37,7 @@ async function upsertResearchCase(
 ): Promise<void> {
   const now = new Date().toISOString();
   await client.query(
-    `INSERT INTO bb_research.cases
+    `INSERT INTO research.cases
       (id, state, candidate_id, title, relevance_assessment, assignment, publication, retraction,
        created_at, updated_at)
      VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10)
@@ -64,8 +64,8 @@ async function upsertResearchCase(
     ],
   );
 
-  await client.query(`DELETE FROM bb_research.case_history_events WHERE case_id = $1`, [caseId]);
-  await client.query(`DELETE FROM bb_research.case_checklist_items WHERE case_id = $1`, [caseId]);
+  await client.query(`DELETE FROM research.case_history_events WHERE case_id = $1`, [caseId]);
+  await client.query(`DELETE FROM research.case_checklist_items WHERE case_id = $1`, [caseId]);
 
   const history = Array.isArray(data.history) ? data.history : [];
   for (const entry of history) {
@@ -75,7 +75,7 @@ async function upsertResearchCase(
       metadata.mergedIntoCaseId = event.mergedIntoCaseId;
     }
     await client.query(
-      `INSERT INTO bb_research.case_history_events
+      `INSERT INTO research.case_history_events
         (case_id, from_state, to_state, reason_code, reason, actor_id, evidence_ids, occurred_at, metadata)
        VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9)`,
       [
@@ -99,7 +99,7 @@ async function upsertResearchCase(
     const key = asString(row.key);
     if (!key) continue;
     await client.query(
-      `INSERT INTO bb_research.case_checklist_items
+      `INSERT INTO research.case_checklist_items
         (case_id, key, complete, evidence_ids, note)
        VALUES ($1,$2,$3,$4,$5)
        ON CONFLICT (case_id, key) DO UPDATE SET
@@ -138,7 +138,7 @@ async function upsertSubmission(
     ...(typeof data.createdBy === 'string' ? { _createdByStamp: data.createdBy } : {}),
   };
   await client.query(
-    `INSERT INTO bb_submissions.intake_items
+    `INSERT INTO submissions.intake_items
       (id, status, created_by, kind, payload, source_url, created_at)
      VALUES ($1,$2,$3::uuid,$4,$5,$6,$7)
      ON CONFLICT (id) DO UPDATE SET
@@ -166,7 +166,7 @@ async function upsertCatalogDecision(
   const now = new Date().toISOString();
   const decision = asString(data.action ?? data.decision, 'needs_review');
   await client.query(
-    `INSERT INTO bb_ops.catalog_decisions
+    `INSERT INTO ops.catalog_decisions
       (entity_id, decision, actor_id, reason, decided_at, metadata)
      VALUES ($1,$2,$3,$4,$5,$6)
      ON CONFLICT (entity_id) DO UPDATE SET
@@ -195,7 +195,7 @@ async function upsertSourceOrganization(
 ): Promise<void> {
   const now = new Date().toISOString();
   await client.query(
-    `INSERT INTO bb_evidence.source_organizations
+    `INSERT INTO evidence.source_organizations
       (id, name, homepage, created_at, updated_at)
      VALUES ($1,$2,$3,$4,$5)
      ON CONFLICT (id) DO UPDATE SET
@@ -230,7 +230,7 @@ async function upsertEntityLocation(
     typeof point.lng === 'number' ? point.lng : typeof data.lng === 'number' ? data.lng : null;
   const role = asString(data.role, 'approximate');
   await client.query(
-    `INSERT INTO bb_canonical.entity_locations
+    `INSERT INTO canonical.entity_locations
       (id, entity_id, role, lat, lng, geohash, precision, match_method, label, created_at, updated_at)
      VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11)
      ON CONFLICT (id) DO UPDATE SET
@@ -269,7 +269,7 @@ async function insertAuditEvent(
   data: Readonly<Record<string, unknown>>,
 ): Promise<void> {
   await client.query(
-    `INSERT INTO bb_audit.events
+    `INSERT INTO audit.events
       (id, action, category, actor, subject, reason, request_id, correlation_id,
        release_id, entity_id, idempotency_key, occurred_at, data)
      VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13)
@@ -298,7 +298,7 @@ async function insertOutboxMessage(
   data: Readonly<Record<string, unknown>>,
 ): Promise<void> {
   await client.query(
-    `INSERT INTO bb_ops.outbox_messages
+    `INSERT INTO ops.outbox_messages
       (id, event_id, topic, aggregate_type, aggregate_id, payload, status, attempts,
        max_attempts, available_at, created_at, correlation_id, idempotency_key)
      VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13)
@@ -326,7 +326,7 @@ async function insertIdempotencyKey(
   data: Readonly<Record<string, unknown>>,
 ): Promise<void> {
   await client.query(
-    `INSERT INTO bb_ops.idempotency_keys
+    `INSERT INTO ops.idempotency_keys
       (key, event_id, outbox_message_id, correlation_id, created_at)
      VALUES ($1,$2,$3,$4,$5)
      ON CONFLICT (key) DO NOTHING`,
@@ -346,7 +346,7 @@ async function upsertKillSwitch(
   data: Readonly<Record<string, unknown>>,
 ): Promise<void> {
   await client.query(
-    `INSERT INTO bb_ops.kill_switches (id, enabled, reason, updated_at)
+    `INSERT INTO ops.kill_switches (id, enabled, reason, updated_at)
      VALUES ($1,$2,$3,$4)
      ON CONFLICT (id) DO UPDATE SET
        enabled = EXCLUDED.enabled,
@@ -438,7 +438,7 @@ export async function readPostgresDocument(
       created_at: Date | string;
     }>(
       `SELECT key, event_id, outbox_message_id, correlation_id, created_at
-       FROM bb_ops.idempotency_keys
+       FROM ops.idempotency_keys
        WHERE key = $1`,
       [key],
     );
@@ -462,7 +462,7 @@ export async function readPostgresDocument(
       enabled: boolean;
       reason: string | null;
       updated_at: Date | string;
-    }>(`SELECT id, enabled, reason, updated_at FROM bb_ops.kill_switches WHERE id = $1`, [id]);
+    }>(`SELECT id, enabled, reason, updated_at FROM ops.kill_switches WHERE id = $1`, [id]);
     const row = result.rows[0];
     if (!row) return { exists: false, data: () => undefined };
     return {

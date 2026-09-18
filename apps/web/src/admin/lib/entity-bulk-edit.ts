@@ -113,7 +113,7 @@ export function bulkUpdateStatement(
   switch (edit.field) {
     case 'kind':
       return {
-        sql: `UPDATE bb_canonical.entities
+        sql: `UPDATE canonical.entities
               SET kind = $2, entity_class = $3, updated_at = now()
               ${guard}
               RETURNING id`,
@@ -121,7 +121,7 @@ export function bulkUpdateStatement(
       };
     case 'livingStatus':
       return {
-        sql: `UPDATE bb_canonical.entities
+        sql: `UPDATE canonical.entities
               SET living_status = $2, updated_at = now()
               ${guard}
               RETURNING id`,
@@ -129,7 +129,7 @@ export function bulkUpdateStatement(
       };
     case 'sensitivity':
       return {
-        sql: `UPDATE bb_canonical.entities
+        sql: `UPDATE canonical.entities
               SET sensitivity = $2::jsonb, updated_at = now()
               ${guard}
               RETURNING id`,
@@ -156,7 +156,7 @@ export function bulkBeforeStatement(
         : 'sensitivity::text';
   return {
     sql: `SELECT ${expression} AS value, array_agg(id ORDER BY id) AS ids
-          FROM bb_canonical.entities
+          FROM canonical.entities
           WHERE id = ANY($1::text[])
             AND (merge_state IS NULL OR merge_state->>'status' IS DISTINCT FROM 'absorbed')
           GROUP BY 1

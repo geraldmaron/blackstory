@@ -1,9 +1,9 @@
 /**
- * Postgres/pgvector-backed storage for entity embeddings replaces the Firestore-backed
+ * Postgres/pgvector-backed storage for entity embeddings replaces the Postgres-backed
  * `createAdminVectorIndexStore` (`vector-store.ts`) after the Postgres cutover
  * (`docs/decisions-carryover.md`, "entity source-of-truth precedence").
  *
- * Targets `bb_canonical.entity_embeddings` (entity_id text pk, kind/state/era_bucket text,
+ * Targets `canonical.entity_embeddings` (entity_id text pk, kind/state/era_bucket text,
  * embedding vector, dims int, model text, source_text_hash text, updated_at timestamptz), which
  * already exists in the `blackstory-app` Supabase project with an HNSW `vector_cosine_ops` index.
  * `1 - (embedding <=> query)` converts pgvector's cosine DISTANCE (0 = identical) into the same
@@ -52,7 +52,7 @@ export function createPostgresVectorIndexStore(query: PostgresQueryExecutor): Ve
     async writeEmbedding(doc: EntityEmbeddingDoc): Promise<void> {
       assertSafeEntityId(doc.entityId);
       await query(
-        `INSERT INTO bb_canonical.entity_embeddings
+        `INSERT INTO canonical.entity_embeddings
            (entity_id, kind, state, era_bucket, embedding, dims, model, source_text_hash, updated_at)
          VALUES ($1, $2, $3, $4, $5::vector, $6, $7, $8, $9)
          ON CONFLICT (entity_id) DO UPDATE SET
@@ -80,7 +80,7 @@ export function createPostgresVectorIndexStore(query: PostgresQueryExecutor): Ve
 
     async deleteEmbedding(entityId: string): Promise<void> {
       assertSafeEntityId(entityId);
-      await query('DELETE FROM bb_canonical.entity_embeddings WHERE entity_id = $1', [entityId]);
+      await query('DELETE FROM canonical.entity_embeddings WHERE entity_id = $1', [entityId]);
     },
 
     async findNearest(input): Promise<readonly VectorQueryMatch[]> {
@@ -121,7 +121,7 @@ export function createPostgresVectorIndexStore(query: PostgresQueryExecutor): Ve
         `SELECT entity_id, kind, state, era_bucket, distance FROM (
            SELECT entity_id, kind, state, era_bucket,
                   1 - (embedding <=> $1::vector) AS distance
-           FROM bb_canonical.entity_embeddings
+           FROM canonical.entity_embeddings
            ${whereClause}
            ORDER BY embedding <=> $1::vector ASC
            LIMIT $${limitIndex}

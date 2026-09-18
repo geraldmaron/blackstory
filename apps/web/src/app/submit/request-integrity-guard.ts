@@ -2,7 +2,7 @@
  * Submit-route request-integrity guard.
  *
  * Thin wrapper around the shared same-origin CSRF/request-integrity control used by
- * anonymous public mutation surfaces. Replaces the former Firebase App Check guard on
+ * anonymous public mutation surfaces. Protects
  * this route without changing rate-limit or quarantine behavior.
  */
 import {

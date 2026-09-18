@@ -6,10 +6,10 @@ committed national CSV (`twps0056-national-1790-1990.csv`) exactly. Stdlib only 
 the agent env does not need openpyxl.
 
 Usage (from repo root):
-    python3 packages/firebase/scripts/derive-twps0056-state.py
+    python3 packages/ops-data/scripts/derive-twps0056-state.py
     # or with a local workbook:
     TWPS0056_STATE_XLSX=/path/to/tabs15-65.xlsx \\
-      python3 packages/firebase/scripts/derive-twps0056-state.py
+      python3 packages/ops-data/scripts/derive-twps0056-state.py
 """
 from __future__ import annotations
 
@@ -233,7 +233,7 @@ def write_csv(rows: list[tuple[str, str, str, int, int, str, str]]) -> None:
 # DERIVATION: NUMBER block, first main decade row only (skip Sample / 15% / 5% subrows).
 #   Not every state appears every decade (admission / coverage). Free/Slave columns only when
 #   they reconstitute Black within ±5. State Black sums per decade equal the committed national
-#   CSV exactly (validated by packages/firebase/scripts/derive-twps0056-state.py).
+#   CSV exactly (validated by packages/ops-data/scripts/derive-twps0056-state.py).
 #
 # Columns: stateFips,stateName,decade,totalPopulation,blackPopulation,blackFree,blackSlave
 """

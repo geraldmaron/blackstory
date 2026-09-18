@@ -109,7 +109,11 @@ function predictionMap(
     if (predictions.has(prediction.exampleId)) {
       throw new Error(`Duplicate prediction for gold-corpus example: ${prediction.exampleId}.`);
     }
-    if (prediction.confidence < 0 || prediction.confidence > 1) {
+    if (
+      !Number.isFinite(prediction.confidence) ||
+      prediction.confidence < 0 ||
+      prediction.confidence > 1
+    ) {
       throw new Error(`Confidence for ${prediction.exampleId} must be between zero and one.`);
     }
     predictions.set(prediction.exampleId, prediction);

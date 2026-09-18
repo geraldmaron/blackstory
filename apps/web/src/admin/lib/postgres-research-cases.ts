@@ -1,5 +1,5 @@
 /**
- * Postgres reads/writes for bb_research.cases and normalized history/checklist tables.
+ * Postgres reads/writes for research.cases and normalized history/checklist tables.
  * Reconstructs serialized documents so parseResearchCaseRecord remains the shared parser.
  */
 import type pg from 'pg';
@@ -99,7 +99,7 @@ export async function loadResearchCaseDocument(
   const cases = await queryPostgres<CaseRow>(
     `SELECT id, state, candidate_id, title, relevance_assessment, assignment, publication,
             retraction, created_at, updated_at
-     FROM bb_research.cases
+     FROM research.cases
      WHERE id = $1`,
     [caseId],
   );
@@ -109,14 +109,14 @@ export async function loadResearchCaseDocument(
     queryPostgres<HistoryRow>(
       `SELECT case_id, from_state, to_state, reason_code, reason, actor_id, evidence_ids,
               occurred_at, metadata
-       FROM bb_research.case_history_events
+       FROM research.case_history_events
        WHERE case_id = $1
        ORDER BY occurred_at ASC, id ASC`,
       [caseId],
     ),
     queryPostgres<ChecklistRow>(
       `SELECT case_id, key, complete, evidence_ids, note
-       FROM bb_research.case_checklist_items
+       FROM research.case_checklist_items
        WHERE case_id = $1
        ORDER BY key ASC`,
       [caseId],
@@ -131,7 +131,7 @@ export async function countCasesByStatePostgres(
   states: readonly ResearchCaseState[],
 ): Promise<number> {
   const rows = await queryPostgres<{ readonly count: string }>(
-    `SELECT count(*)::text AS count FROM bb_research.cases WHERE state = ANY($1::text[])`,
+    `SELECT count(*)::text AS count FROM research.cases WHERE state = ANY($1::text[])`,
     [states],
   );
   return Number(rows[0]?.count ?? 0);
@@ -145,7 +145,7 @@ export async function listCaseIdsPostgres(input: {
   if (states.length > 0 && states.length <= 10) {
     const rows = await queryPostgres<{ readonly id: string }>(
       `SELECT id
-       FROM bb_research.cases
+       FROM research.cases
        WHERE state = ANY($1::text[])
        ORDER BY updated_at DESC
        LIMIT $2`,
@@ -156,7 +156,7 @@ export async function listCaseIdsPostgres(input: {
 
   const rows = await queryPostgres<{ readonly id: string; readonly state: string }>(
     `SELECT id, state
-     FROM bb_research.cases
+     FROM research.cases
      ORDER BY updated_at DESC
      LIMIT $1`,
     [input.limit],
@@ -176,13 +176,13 @@ function historyMetadataFromEvent(
   return metadata;
 }
 
-/** Persists a full ResearchCaseRecord into normalized bb_research tables inside a transaction. */
+/** Persists a full ResearchCaseRecord into normalized research tables inside a transaction. */
 export async function writeResearchCasePostgres(
   client: pg.PoolClient,
   record: ResearchCaseRecord,
 ): Promise<void> {
   await client.query(
-    `INSERT INTO bb_research.cases
+    `INSERT INTO research.cases
       (id, state, candidate_id, title, relevance_assessment, assignment, publication, retraction,
        created_at, updated_at)
      VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10)
@@ -209,10 +209,10 @@ export async function writeResearchCasePostgres(
     ],
   );
 
-  await client.query(`DELETE FROM bb_research.case_history_events WHERE case_id = $1`, [record.id]);
+  await client.query(`DELETE FROM research.case_history_events WHERE case_id = $1`, [record.id]);
   for (const event of record.history) {
     await client.query(
-      `INSERT INTO bb_research.case_history_events
+      `INSERT INTO research.case_history_events
         (case_id, from_state, to_state, reason_code, reason, actor_id, evidence_ids, occurred_at, metadata)
        VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9)`,
       [
@@ -231,7 +231,7 @@ export async function writeResearchCasePostgres(
 
   for (const item of record.checklist.items) {
     await client.query(
-      `INSERT INTO bb_research.case_checklist_items
+      `INSERT INTO research.case_checklist_items
         (case_id, key, complete, evidence_ids, note)
        VALUES ($1,$2,$3,$4,$5)
        ON CONFLICT (case_id, key) DO UPDATE SET
@@ -244,12 +244,10 @@ export async function writeResearchCasePostgres(
 
   const checklistKeys = record.checklist.items.map((item) => item.key);
   if (checklistKeys.length === 0) {
-    await client.query(`DELETE FROM bb_research.case_checklist_items WHERE case_id = $1`, [
-      record.id,
-    ]);
+    await client.query(`DELETE FROM research.case_checklist_items WHERE case_id = $1`, [record.id]);
   } else {
     await client.query(
-      `DELETE FROM bb_research.case_checklist_items
+      `DELETE FROM research.case_checklist_items
        WHERE case_id = $1 AND NOT (key = ANY($2::text[]))`,
       [record.id, checklistKeys],
     );

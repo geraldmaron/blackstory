@@ -63,12 +63,12 @@ const profiles: readonly ResolutionProfile[] = [
   },
   {
     entity: entity('person-alex-a', 'person', 'Alex Johnson', {
-      person: { livingStatus: 'unknown', birthYear: 1930 },
+      person: { birthYear: 1930 },
     }),
   },
   {
     entity: entity('person-alex-b', 'person', 'Alex Johnson', {
-      person: { livingStatus: 'unknown', birthYear: 1932 },
+      person: { birthYear: 1932 },
     }),
   },
   {
@@ -216,12 +216,12 @@ test('historically invalid locations and impossible lifespans reduce confidence'
   );
 });
 
-test('an exact trusted-namespace identifier match outranks a merely-similar name (the related workstream)', () => {
+test('an exact trusted-namespace identifier match outranks a merely-similar name', () => {
   const nameLookalike = entity('person-name-lookalike', 'person', 'John Smith', {
-    person: { livingStatus: 'unknown' },
+    person: {},
   });
   const identifierMatch = entity('person-identifier-match', 'person', 'Someone Else Entirely', {
-    person: { livingStatus: 'unknown' },
+    person: {},
     identifiers: [{ system: 'wikidata', value: 'Q999' }],
   });
   const candidate: ResolutionCandidate = {

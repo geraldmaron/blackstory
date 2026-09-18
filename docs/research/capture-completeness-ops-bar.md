@@ -2,8 +2,8 @@
 
 BlackStory's publish gates require archived capture pointers on web citations before a fact or
 claim may reach a public release. Production posture (queried 2026-07-21) still lags that
-architecture: **4** rows in `bb_evidence.source_captures` against **1,103** rows in
-`bb_public.release_entities`. This memo defines how operators measure capture completeness, when
+architecture: **4** rows in `evidence.source_captures` against **1,103** rows in
+`published.release_entities`. This memo defines how operators measure capture completeness, when
 the corpus is ready to market a queryable developer surface, and how to backfill under bounded
 Save Page Now (SPN) budgets.
 
@@ -23,7 +23,7 @@ designations are excluded — they follow a different evidence path.
 **Numerator:** a web citation counts as captured when its `capture` pointer includes either:
 
 - a valid `waybackCaptureUrl` on an `archive.org` / `web.archive.org` host, or
-- a content-addressed hash (`contentHash`) indicating a row in `bb_evidence.source_captures`.
+- a content-addressed hash (`contentHash`) indicating a row in `evidence.source_captures`.
 
 Pure in-memory measurement — the evaluator never triggers SPN or mutates records.
 
@@ -35,7 +35,7 @@ Run against the active release. Adjust JSON paths if the release manifest citati
 -- Active release id
 WITH active AS (
   SELECT release_id
-  FROM bb_public.active_release
+  FROM published.active_release
   WHERE id = 'active'
 ),
 -- Flatten web citations from release entity claims (manifest-dependent JSON shape)
@@ -47,7 +47,7 @@ web_citations AS (
     cite -> 'capture' ->> 'captureId' AS capture_id,
     cite -> 'capture' ->> 'waybackCaptureUrl' AS wayback_url,
     cite -> 'capture' -> 'contentHash' ->> 'digest' AS content_hash_digest
-  FROM bb_public.release_entities re
+  FROM published.release_entities re
   CROSS JOIN LATERAL jsonb_array_elements(re.claims) AS claim
   CROSS JOIN LATERAL jsonb_array_elements(
     COALESCE(claim -> 'citations', '[]'::jsonb)
@@ -71,7 +71,7 @@ captured AS (
   )
   OR EXISTS (
     SELECT 1
-    FROM bb_evidence.source_captures sc
+    FROM evidence.source_captures sc
     WHERE sc.id = wc.capture_id
   )
 )
@@ -86,7 +86,7 @@ SELECT
       4
     )
   END AS capture_ratio,
-  (SELECT count(*) FROM bb_evidence.source_captures) AS source_captures_rows;
+  (SELECT count(*) FROM evidence.source_captures) AS source_captures_rows;
 ```
 
 **Interpretation:** compare `capture_ratio` to `CAPTURE_COMPLETENESS_BAR_RATIO` (0.95). Until
@@ -123,7 +123,7 @@ explicitly overrides.
 3. **Budget** — allocate ≤ **1,500** `source_fetch` requests per day for SPN backfill (leaves
    headroom below soft shutdown for link-health sweeps and discovery adapters).
 4. **Capture** — route live Save Page Now through `capture-backfill --commit --wayback` (domain
-   SPN2 client + operator-cli SafeHttpClient). Persist rows to `bb_evidence.source_captures` and
+   SPN2 client + operator-cli SafeHttpClient). Persist rows to `evidence.source_captures` and
    attach the snapshot URL on `storage_object`. Never fabricate pointers when SPN fails closed.
    The lane looks before it saves: an availability lookup that finds an existing capture is
    reused instead of minting a new SPN job, so the run's `wayback.reusedExistingSnapshot` count

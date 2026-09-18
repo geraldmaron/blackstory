@@ -1,38 +1,8 @@
 /**
- * Alert when the expensive public reads start costing real egress again.
- *
- * WHY THIS EXISTS. Between 2026-07-21 and 2026-08-09, `SELECT projection FROM
- * bb_public.release_entities` ran 49,226 times for 140.6M rows: roughly 253GB of egress and
- * about 80% of all query time on the project. Every instance re-pulled the whole ~7MB catalog
- * every 5 minutes because it was too big for Next's data cache. The causes are fixed
- * (dd7d71e5, 8aa98eeb, 3b38bae0). The reason it ran for 20 days is not: nothing was watching,
- * and it was found by hand after the bill.
- *
- * This is the same shape as `.github/workflows/canonical-convergence-monitor.yml`, and for the
- * same stated reason: a scheduled check that FAILS on breach, because GitHub notifies watchers
- * of scheduled-workflow failures by default. It is read-only apart from its own watermark row,
- * and it never changes application behavior.
- *
- * HOW IT DECIDES. pg_stat_statements counters are cumulative since `stats_reset`, so a
- * threshold on raw totals cannot distinguish a spike today from one three weeks ago. Each run
- * stores its reading in `bb_ops.public_read_egress_watermark` and compares against the previous
- * one, projecting the delta to a per-day rate. Counter resets are detected and re-baselined
- * rather than read as "no traffic" — see lib/public-read-egress-budget.ts.
- *
- * Statements are matched by SQL fingerprint, not by `queryid`: queryid is a hash of the
- * normalized text and changes on any edit to the SQL, which would silently re-baseline to zero
- * during an unrelated refactor and hide the exact regression this watches for.
- *
- * Usage — manual run:
- *   cd apps/web && set -a && . ./.env.local && set +a && cd ../../ && \
- *   node --conditions development --import tsx \
- *     packages/ops-data/scripts/check-public-read-egress.ts
- *
- * Scheduled run: off as of 2026-09-16. `.github/workflows/public-read-egress-monitor.yml`
- * is dispatch-only; run this script locally when you want the alarm.
- *
- * Env: DATABASE_URL (or APP_DATABASE_URL). DRY_RUN=1 reports without writing the watermark,
- * so a manual look never disturbs the scheduled baseline.
+ * Checks expensive public reads using pg_stat_statements deltas and a persisted watermark.
+ * Detects counter resets and estimates daily request/egress rates from the observation
+ * interval. Writes only its own watermark. Runs explicitly through the CLI or manual workflow;
+ * no schedule is installed.
  */
 import pg from 'pg';
 import { normalizePgConnectionString } from './lib/pg-connection.ts';
@@ -46,13 +16,9 @@ import {
 const DRY_RUN = process.env.DRY_RUN === '1';
 
 /**
- * The reads worth watching, with a per-row size measured from the live active release on
- * 2026-08-09 and a budget set from what each one actually costs when healthy.
- *
- * Budgets are deliberately generous. This is a smoke alarm for a return to the incident's order
- * of magnitude (the catalog pull alone was ~12GB/day), not a performance regression detector.
- * A monitor tuned so tight that it fires on ordinary cold-start variance gets muted, and a muted
- * monitor is worse than none because it looks like coverage.
+ * Approximate bytes per row and alarm budgets for full-catalog read regressions. Re-measure
+ * sizes and healthy traffic before changing thresholds; these estimates are not billing
+ * measurements.
  */
 type WatchedRead = {
   readonly label: string;
@@ -61,7 +27,7 @@ type WatchedRead = {
    * Matched with LIKE against pg_stat_statements.query. Every matching statement is summed,
    * which is the right answer for "how many bytes did reads of this shape send".
    *
-   * Anchor these on the select list, not just the table name. `%FROM bb_public.release_entities%`
+   * Anchor these on the select list, not just the table name. `%FROM published.release_entities%`
    * looks specific and is not: it also matches the ops scripts' DELETE and the projection-shaped
    * variants against the same table, so the monitor would silently be measuring a different
    * population than the one it names. The first draft of this file made exactly that mistake on
@@ -80,7 +46,7 @@ const WATCHED_READS: readonly WatchedRead[] = [
   {
     label: 'release_entities_full_catalog',
     description: 'Full entity catalog pull (the 2026-08-07 incident query)',
-    fingerprint: 'SELECT projection%FROM bb_public.release_entities%ORDER BY entity_id%',
+    fingerprint: 'SELECT projection%FROM published.release_entities%ORDER BY entity_id%',
     // 7,382 kB across 4,092 rows on the active release.
     bytesPerRow: 1_847,
     // Healthy is a handful of cold starts per day (single-digit GB is already far above that).
@@ -90,7 +56,7 @@ const WATCHED_READS: readonly WatchedRead[] = [
   {
     label: 'search_index_full',
     description: 'Full search index pull',
-    fingerprint: 'SELECT id, release_id, entity_id, name, name_lower%FROM bb_public.search_index%',
+    fingerprint: 'SELECT id, release_id, entity_id, name, name_lower%FROM published.search_index%',
     // ~2.09MB across ~4,092 docs.
     bytesPerRow: 512,
     budgetBytesPerDay: 1 * GB,
@@ -98,22 +64,20 @@ const WATCHED_READS: readonly WatchedRead[] = [
   {
     label: 'release_graph_adjacency_full',
     description: 'Full graph adjacency pull',
-    fingerprint: 'SELECT entity_id, adjacency%FROM bb_public.release_graph_adjacency%',
+    fingerprint: 'SELECT entity_id, adjacency%FROM published.release_graph_adjacency%',
     // 656 kB across 4,092 rows.
     bytesPerRow: 164,
     budgetBytesPerDay: 1 * GB,
   },
-  // The three below were added 2026-09-02. pg_stat_statements since 2026-07-20 showed them at
-  // 478k, 515k and 960k calls respectively: small rows, but read on every dynamic request with
-  // only per-request memoisation, so they are the calls-blow-up alarm rather than the bytes one.
-  // Per-row sizes measured on the active release the same day.
+  // Small pointer/policy reads are monitored for excessive call volume even when their byte
+  // totals are small.
   {
     label: 'release_articles_full',
     description: 'Full article list pull (article index, cites edge, story lead)',
     // Anchored on the ORDER BY so the by-slug point read (`WHERE articles.slug = $1`) is not
     // counted as a full pull.
     fingerprint:
-      'SELECT articles.payload%FROM bb_public.release_articles%ORDER BY articles.published_at%',
+      'SELECT articles.payload%FROM published.release_articles%ORDER BY articles.published_at%',
     // 222,633 bytes across 48 rows.
     bytesPerRow: 4_638,
     // Healthy is one pull per instance per 30m (the release-scoped cache TTL); 1GB/day is
@@ -123,7 +87,7 @@ const WATCHED_READS: readonly WatchedRead[] = [
   {
     label: 'release_theme_impact_packets',
     description: 'Theme-impact packet reads (all shapes: full, by theme, by packet id)',
-    fingerprint: 'SELECT packets.payload%FROM bb_public.release_theme_impact_packets%',
+    fingerprint: 'SELECT packets.payload%FROM published.release_theme_impact_packets%',
     // 106,791 bytes across 13 rows.
     bytesPerRow: 8_215,
     budgetBytesPerDay: 1 * GB,
@@ -133,23 +97,20 @@ const WATCHED_READS: readonly WatchedRead[] = [
     description: 'Active-release pointer read (one tiny row; this is a call-count alarm)',
     // The select list and FROM are on separate lines in the source, so `%` between them.
     fingerprint:
-      'SELECT release_id, activated_at, search_index_version, manifest_hash%FROM bb_public.active_release%',
+      'SELECT release_id, activated_at, search_index_version, manifest_hash%FROM published.active_release%',
     // 171 bytes, one row per call.
     bytesPerRow: 171,
     // ~600k calls/day. The pointer is memoised for 30s per instance and per request, so a
     // healthy day is a few thousand calls; this only fires if the memo is bypassed wholesale.
     budgetBytesPerDay: 100 * 1024 * 1024,
   },
-  // The two below were added 2026-09-12 (repo-s0lq): /law and /books+/data+the homepage data
-  // pulse read these on every dynamic request with no cross-request cache. pg_stat_statements
-  // since 2026-07-20 showed 22,532 and 172,919 calls respectively, now moved onto
-  // createReleaseScopedCache (legal/public-source.ts, public-data/materialized-snapshots.ts).
+  // Legal and materialized-snapshot reads should be amortized by their release-scoped caches.
   {
     label: 'release_legal_snapshots_full',
     description: 'Full legal snapshot list pull (/law)',
     // Anchored on the select list and ORDER BY so the release_id-only count/exists probes
     // elsewhere are not counted as a full pull.
-    fingerprint: 'SELECT payload%FROM bb_public.release_legal_snapshots%ORDER BY slug%',
+    fingerprint: 'SELECT payload%FROM published.release_legal_snapshots%ORDER BY slug%',
     // 26,696 bytes across 12 rows on the active release.
     bytesPerRow: 2_225,
     // Healthy is one pull per instance per 30m (the release-scoped cache TTL).
@@ -158,7 +119,7 @@ const WATCHED_READS: readonly WatchedRead[] = [
   {
     label: 'materialized_snapshots_point',
     description: 'Materialized snapshot point read by name (/books, /data, demographics)',
-    fingerprint: 'SELECT payload%FROM bb_public.materialized_snapshots%WHERE name = $1%',
+    fingerprint: 'SELECT payload%FROM published.materialized_snapshots%WHERE name = $1%',
     // 69,259 bytes across 6 snapshots on the active release.
     bytesPerRow: 11_543,
     // Healthy is one pull per name per instance per 30m (the release-scoped cache TTL).
@@ -232,7 +193,7 @@ async function readWatermark(
 ): Promise<EgressWatermark | undefined> {
   const result = await client.query<WatermarkRow>(
     `SELECT calls, rows_returned, stats_since, captured_at, fingerprint
-       FROM bb_ops.public_read_egress_watermark
+       FROM ops.public_read_egress_watermark
       WHERE label = $1`,
     [label],
   );
@@ -255,7 +216,7 @@ async function writeWatermark(
   fingerprint: string,
 ): Promise<void> {
   await client.query(
-    `INSERT INTO bb_ops.public_read_egress_watermark
+    `INSERT INTO ops.public_read_egress_watermark
        (label, calls, rows_returned, stats_since, captured_at, fingerprint)
      VALUES ($1, $2, $3, $4, $5, $6)
      ON CONFLICT (label) DO UPDATE

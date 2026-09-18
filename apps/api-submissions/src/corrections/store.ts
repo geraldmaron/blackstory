@@ -1,6 +1,6 @@
 /**
  * In-memory correction receipt store for the api-submissions corrections route.
- * Production wiring persists through Firestore `submissionInbox`; this module provides
+ * Production wiring persists through Postgres `submissions.intake_items`; this module provides
  * the same quarantine-only lookup-by-receipt contract for Cloud Run routes and tests.
  * Deliberately exposes lookup-by-receipt only — no list or enumerate API exists for submitters.
  */

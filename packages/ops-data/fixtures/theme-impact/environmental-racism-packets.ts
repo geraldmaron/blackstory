@@ -1,6 +1,6 @@
 /**
  * Environmental racism theme packets (Q9) for Cook County / Chicago metro pilot.
- * Observations from live bb_reference.statistical_observations (ACS, CDC EJI, EPA TRI).
+ * Observations from live reference.statistical_observations (ACS, CDC EJI, EPA TRI).
  */
 export const CHICAGO_ENVIRONMENTAL_SCOPE = 'metro:chicago-il' as const;
 export const CHICAGO_COOK_JURISDICTION = 'county:17031' as const;

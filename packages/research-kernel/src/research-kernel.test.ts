@@ -23,6 +23,13 @@ const invocation: ModelInvocation = {
   modelId: 'deepseek/deepseek-v3.2',
   modelFamily: 'deepseek',
   providerRoute: { provider: 'example' },
+  accounting: {
+    promptTokens: null,
+    completionTokens: null,
+    costUsd: null,
+    source: null,
+    incomplete: true,
+  },
   priceSnapshot: { inputPerMillion: 1 },
   promptHash: 'a'.repeat(64),
   outputSchemaId: 'ResearchCase',
@@ -147,7 +154,18 @@ test('frontier ranking and stop policy use information value, cost, and escalati
   assert.equal(
     evaluateStopping({
       profile: blackHistoryProfile,
-      needs: [],
+      needs: [
+        {
+          schemaVersion: '1.0.0',
+          id: 'counter',
+          questionId: 'q',
+          claimClass: 'history',
+          description: 'Counterevidence search',
+          mandatory: true,
+          contradictionSearch: true,
+          status: 'satisfied',
+        },
+      ],
       recentCompletedTasks: lowTasks,
       unresolvedEscalationTriggers: [],
       hardCapReached: false,
@@ -183,5 +201,29 @@ test('review approval cannot share actor or model lineage with production', () =
   assert.throws(
     () => assertIndependentApproval({ ...decision, reviewerModelFamily: 'kimi' }),
     /different model families/,
+  );
+});
+
+test('a required contradiction search cannot be satisfied by omitting it', () => {
+  assert.equal(
+    evaluateStopping({
+      profile: blackHistoryProfile,
+      needs: [],
+      recentCompletedTasks: [frontierTask('a', 0), frontierTask('b', 0), frontierTask('c', 0)],
+      unresolvedEscalationTriggers: [],
+      hardCapReached: false,
+    }).decision,
+    'continue',
+  );
+});
+
+test('nonfinite frontier values cannot bypass priority and stopping policy', () => {
+  assert.throws(
+    () =>
+      rankFrontierTasks([
+        { ...frontierTask('a', 0), normalizedCost: Infinity },
+        frontierTask('b', 1),
+      ]),
+    /finite/,
   );
 });

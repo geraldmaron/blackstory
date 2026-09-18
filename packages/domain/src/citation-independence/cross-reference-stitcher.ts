@@ -1,27 +1,8 @@
 /**
- * Cross-Reference Entity Resolution — the "Multi-Source Stitcher".
- *
- * Extends the citation-independence principle (near-duplicate cosine ≥ 0.92 between
- * excerpts, see `./review-signal.ts`) from the *citation* level down to the *entity*
- * level. Instead of asking "do two citations share upstream prose?", it asks "does the
- * same person/place appear in two or more otherwise-independent source datasets while
- * still being absent from the catalog?". Such cross-source co-appearance is itself a
- * unit of corroboration: it aggregates independent source references onto a single
- * private discovery candidate so a reviewer can decide whether the accumulated evidence
- * clears the confidence floor (repo-w4bk: 521 single-source records stuck at 0.72).
- *
- * INVARIANTS (`docs/decisions-carryover.md`, "Research and discovery cannot publish"):
- * - PURE + read-only. Produces **private** `DiscoveryCandidateRecord`s only — never a
- *   public projection, release row, or canonical entity. Corroboration raises a
- *   candidate's review-readiness; it never auto-promotes and never publishes.
- * - Deterministic: output is independent of dataset / mention ordering.
- * - Reuses the discovery `mergeDuplicateCandidates` provenance-accumulation pattern so
- *   both source references land on one survivor without losing lineage.
- *
- * Persistence is a caller concern. Confirmed cross-source stitches map onto the existing
- * `bb_canonical.entity_merges` + `entity_merge_absorbed` ledger after human review — this
- * module introduces **no new tables and needs no migration**
- * (see `docs/research/cross-reference-stitcher.md`).
+ * Aggregates cross-source mentions into private discovery candidates with retained references.
+ * Co-appearance is a review signal, not proof of identity or independent corroboration. The
+ * pure deterministic stitcher neither promotes nor publishes; confirmed merges use the
+ * canonical merge ledger.
  */
 import { hashUtf8, type ContentHash } from '../provenance/hashes.js';
 import { mergeDuplicateCandidates } from '../discovery/deduplication.js';

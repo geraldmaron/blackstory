@@ -1,34 +1,8 @@
 /**
- * repo-ppeu — retract published claims whose cited document has since been quarantined.
- *
- * `audit-evidence-identity.ts` re-adjudicates stored evidence and moves rows that fail the
- * tightened identity gate from 'captured' to 'quarantined'. That protects everything drafted or
- * published AFTER it runs, and nothing published before: a live record keeps citing the document
- * regardless, because the projection in `bb_public.release_entities` is a snapshot, not a view.
- *
- * Found on the first audit run: Mount Sinai School carried a 'source states' claim citing an
- * hmdb.org RESULTS page — a list of every marker in Prattville, Alabama — under the citation label
- * "Touch for a list and map". The quoted sentence is genuinely on that page, so no quote validator
- * would ever have objected. It is still not a source about the school.
- *
- * Why not just republish the affected records: `publish-release-entities-incremental.ts` re-derives
- * from landscape and runs the full publish gate, and a record that loses a document routinely falls
- * below the confidence floor — so the republish is refused and the stale claim stays live. (That is
- * exactly what happened to Mount Sinai School.) This pass edits the published projection directly,
- * which is the only route that reaches a record the gate would now reject.
- *
- * `researchCoverage` is recomputed from the surviving claims with the real function from
- * @repo/domain, in BOTH denormalized copies (projection and search_index.facets), because dropping
- * a document is precisely the kind of change that moves a record's coverage tier down.
- *
- * Default is dry-run. Production writes require:
- *   DRY_RUN=0 RETRACT_CITATIONS_APPLY=1 DATABASE_URL=postgresql://...
- *
- * Usage (from repo root):
- *   set -a && source apps/web/.env.local && set +a
- *   export DATABASE_SSL=1
- *   node --conditions development --import tsx \
- *     packages/ops-data/scripts/retract-quarantined-citations.ts
+ * Retract published claims citing quarantined documents and recompute researchCoverage in
+ * projection and search facets. Direct withdrawal is necessary because a full republish can
+ * reject a record after evidence loss and leave its stale snapshot intact. Default dry-run;
+ * writes require DRY_RUN=0 and RETRACT_CITATIONS_APPLY=1.
  */
 import {
   computeReleaseResearchCoverage,
@@ -96,7 +70,7 @@ async function main(): Promise<void> {
   // A document still captured for the entity also wins over a quarantined row for the same URL:
   // the same document can be reached by two collectors and adjudicated differently.
   const quarantined = await pool.query<{ entity_id: string; source_url: string; status: string }>(
-    `SELECT entity_id, source_url, status FROM bb_research.entity_evidence`,
+    `SELECT entity_id, source_url, status FROM research.entity_evidence`,
   );
   const rejected = new Set<string>();
   const stillCaptured = new Set<string>();
@@ -111,9 +85,9 @@ async function main(): Promise<void> {
   const live = await pool.query<LiveRow>(
     `SELECT e.entity_id, e.display_name, e.summary, e.claims, e.projection,
             s.facets->>'researchCoverage' AS facet_coverage
-       FROM bb_public.release_entities e
-       JOIN bb_public.active_release a ON a.release_id = e.release_id
-       LEFT JOIN bb_public.search_index s ON s.entity_id = e.entity_id
+       FROM published.release_entities e
+       JOIN published.active_release a ON a.release_id = e.release_id
+       LEFT JOIN published.search_index s ON s.entity_id = e.entity_id
       ORDER BY e.entity_id`,
   );
 
@@ -162,8 +136,8 @@ async function main(): Promise<void> {
       dropped,
       keptClaims: kept,
       coverageBefore: String(row.projection?.researchCoverage ?? ''),
-      // repo-vymq: summary passed so a retraction cannot leave a templated record reading
-      // 'partial' — dropping claims may only lower coverage, never lift the template cap.
+      // Pass the summary so removing claims cannot lift a templated record above its coverage
+      // cap.
       coverageAfter: computeReleaseResearchCoverage(toClaimProjections(kept), row.summary ?? ''),
       facetBefore: row.facet_coverage,
     });
@@ -193,7 +167,7 @@ async function main(): Promise<void> {
     await client.query('BEGIN');
     for (const item of retractions) {
       await client.query(
-        `UPDATE bb_public.release_entities
+        `UPDATE published.release_entities
             SET projection = jsonb_set(
                   jsonb_set(projection, '{claims}', $2::jsonb, true),
                   '{researchCoverage}', to_jsonb($3::text), true)
@@ -202,7 +176,7 @@ async function main(): Promise<void> {
       );
       if (item.facetBefore !== null && item.facetBefore !== item.coverageAfter) {
         await client.query(
-          `UPDATE bb_public.search_index
+          `UPDATE published.search_index
               SET facets = jsonb_set(facets, '{researchCoverage}', to_jsonb($2::text), true)
             WHERE entity_id = $1`,
           [item.entityId, item.coverageAfter],

@@ -15,7 +15,7 @@ import {
 import { guardIntakeOperation, guardPublishAttempt } from './posture.js';
 
 export type SubmissionSecurityContext = {
-  /** True when `X-BlackStory-Client` (or legacy App Check) attestation passed. */
+  /** True when the spoofable `X-BlackStory-Client` header check passed; not authentication. */
   readonly attestationAllowed: boolean;
   readonly quotaAllowed: boolean;
   readonly submitterToken?: string;

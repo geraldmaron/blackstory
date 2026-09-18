@@ -1,8 +1,8 @@
 /**
- * Public data source selector: Supabase Postgres (`bb_public.*`) is the sole source of truth.
+ * Public data source selector: Supabase Postgres (`published.*`) is the sole source of truth.
  * Hydrates 1-hop related neighbor stubs and composes capped 2-hop continue-learning on
  * entity pages only. List/map/search may use versioned release artifacts as a read-through
- * cache, but canonical live reads always come from `bb_public.*`. Postgres read failures propagate
+ * cache, but canonical live reads always come from `published.*`. Postgres read failures propagate
  * as errors — there is no hardcoded seed/snapshot fallback.
  * Card rails use a thin batched point-get (`listPublicEntityViewsByIds`) — never the
  * 2-hop learning graph. Sitemap and entity `generateStaticParams` use `getPublicSearchIndex`
@@ -51,9 +51,9 @@ import { fetchReleaseEntitiesListArtifact, fetchReleaseSearchIndexArtifact } fro
 /**
  * Cross-request cache window for release catalog / search index (seconds).
  *
- * Correction (repo-csw0 follow-up): the cache key includes `releaseId + activatedAt`, but
+ * Correction: the cache key includes `releaseId + activatedAt`, but
  * those do NOT change when content is corrected in place — dozens of `packages/ops-data/scripts`
- * fix/backfill scripts upsert `bb_public.release_entities` under the *same* release id and
+ * fix/backfill scripts upsert `published.release_entities` under the *same* release id and
  * `active_release.activated_at` is not bumped by them. So this TTL is a real freshness bound
  * on editorial corrections, not just a memory bound as originally assumed when it was raised
  * from 300s to 6h. 30 minutes bounds a correction's visible staleness to roughly
@@ -454,7 +454,7 @@ export const resolvePublicEntityView = cache(async function resolvePublicEntityV
 });
 
 /**
- * The survivor a merged-away entity id forwards to (repo-n7p6.29).
+ * The survivor a merged-away entity id forwards to.
  *
  * Only ever called on a miss, so the common path pays nothing. A read failure resolves to
  * `undefined` rather than throwing: the caller is already about to render a 404, and a redirect
@@ -498,7 +498,7 @@ export const listPublicEntityViews = cache(async function listPublicEntityViews(
 });
 
 /**
- * Search index: prefer a version-matched release artifact, then Postgres `bb_public.search_index`.
+ * Search index: prefer a version-matched release artifact, then Postgres `published.search_index`.
  * Never rebuilds from a full entity projection scan when live index exists. No seed fallback.
  */
 export const getPublicSearchIndex = cache(async function getPublicSearchIndex(): Promise<{

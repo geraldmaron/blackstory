@@ -1,11 +1,10 @@
 /**
  * Fail-closed guard for operator-cli writes and Postgres-backed editorial paths.
- * Firestore editorial/catalog surfaces are retired; explicit OPS_DATA_SOURCE=postgres is required.
+ * Explicit OPS_DATA_SOURCE=postgres is required.
  */
 import { resolveOpsDataSource } from '@repo/data-access';
 
-export const POSTGRES_OPS_DATA_SOURCE_MESSAGE =
-  'OPS_DATA_SOURCE=postgres is required; Firestore editorial and commit paths are retired';
+export const POSTGRES_OPS_DATA_SOURCE_MESSAGE = 'OPS_DATA_SOURCE=postgres is required';
 
 export function assertPostgresOpsDataSource(
   environment: Readonly<Record<string, string | undefined>> = process.env,
@@ -22,10 +21,7 @@ export function assertPostgresOpsDataSource(
 }
 
 export function editorialCatalogFromError(catalogFrom: string): Error {
-  if (catalogFrom === 'firestore') {
-    return new Error(
-      `${POSTGRES_OPS_DATA_SOURCE_MESSAGE}. Use --catalog-from=postgres for embedding-backed catalog reads.`,
-    );
-  }
-  return new Error('--catalog-from must be "postgres" when set');
+  return new Error(
+    `Unsupported catalog source ${JSON.stringify(catalogFrom)}; --catalog-from must be "postgres"`,
+  );
 }

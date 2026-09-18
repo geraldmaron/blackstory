@@ -86,7 +86,7 @@ async function main(): Promise<void> {
       const row = await client.query<CandidateRow>(
         `SELECT id, lane, status, summary, payload->>'historicalContext' AS historical_context,
                 payload->'evidenceCitations' AS citations
-           FROM bb_research.landscape_candidates
+           FROM research.landscape_candidates
           WHERE id = $1 AND ($2::text IS NULL OR lane = $2)`,
         [record.id, lane ?? null],
       );
@@ -122,7 +122,7 @@ async function main(): Promise<void> {
 
       if ((merged.added.length === 0 && proseApplied === 0) || DRY_RUN || !APPLY) continue;
       await client.query(
-        `UPDATE bb_research.landscape_candidates
+        `UPDATE research.landscape_candidates
             SET payload = jsonb_set(
                   CASE WHEN $6::boolean
                        THEN jsonb_set(payload, '{historicalContext}', to_jsonb($5::text), true)

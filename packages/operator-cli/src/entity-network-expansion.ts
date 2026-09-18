@@ -1,23 +1,9 @@
 /**
- * Entity network expansion engine: seed (canonical entity id + Wikidata QID, or a raw QID) ->
- * Wikidata claims traversal -> staged candidates with typed relationship hypotheses.
- *
- * Reuses the `WikidataFetcher` injection pattern from `./entity-reconciliation.ts` (never guess:
- * every neighbor is backed by an actual Wikidata claim or SPARQL row, never invented). Forward
- * claims (employer, educated at, member of, archives at) are read off the seed's own
- * `Special:EntityData` document, same as `fetchWikidataIdentifiers`. Reverse claims (orgs founded
- * BY the seed, works authored BY the seed) are not present on the seed's own claims — Wikidata
- * only records them on the neighbor's item (P112/P50 point at the seed) — so those use the public
- * SPARQL query service instead. Both paths take an injectable fetcher for testing; nothing here
- * calls `bb_canonical` directly. Output rows are always `status: 'pending_review'` in the staging
- * table — see `stageNetworkCandidates` — never written to `bb_canonical.entities` or
- * `entity_relationships`.
- *
- * Relationship types are restricted to the exact vocabulary in `docs/relationship-taxonomy.md`
- * (`RelationshipType` from `@repo/domain`). Wikidata properties with no dedicated taxonomy type
- * (educated at, archives at) are mapped to the closest documented fit and flagged with a note
- * explaining the mapping, rather than inventing a new type.
+ * Bounded Wikidata traversal producing private relationship hypotheses.
+ * Each edge retains its immediate endpoints and the path that discovered it.
+ * Wikidata statements are discovery leads; their underlying evidence needs review.
  */
+import { createHash } from 'node:crypto';
 import type { RelationshipType } from '@repo/domain';
 
 const WIKIDATA_ENTITY_DATA = (qid: string) =>
@@ -28,8 +14,8 @@ const WIKIDATA_SPARQL = 'https://query.wikidata.org/sparql';
 export type EntityKindForExpansion = 'person' | 'organization' | 'institution' | 'other';
 
 export type ExpansionSeed = {
-  /** Canonical entity id, when the seed is already a resolved bb_canonical row. Optional — a raw
-   * QID-only seed (e.g. Audre Lorde before repo-xez5.12's audit backfills her) omits this. */
+  /** Canonical entity id, when the seed is already a resolved canonical row. A raw
+   * QID-only seed omits this. */
   readonly entityId?: string;
   readonly qid: string;
   readonly kind: EntityKindForExpansion;
@@ -41,6 +27,7 @@ export type ExpansionConfig = {
   readonly depth: 1 | 2;
   /** Hard cap on total candidates emitted for the whole run, across all hops. */
   readonly maxCandidates: number;
+  readonly maxRequests?: number;
 };
 
 export const DEFAULT_EXPANSION_CONFIG: ExpansionConfig = { depth: 1, maxCandidates: 50 };
@@ -48,31 +35,23 @@ export const DEFAULT_EXPANSION_CONFIG: ExpansionConfig = { depth: 1, maxCandidat
 export type WikidataFetcher = (url: string) => Promise<unknown>;
 
 const USER_AGENT =
-  'blackstory-entity-network-expansion/0.1 (repo-xez5.4; research staging lane, never auto-published)';
-
-async function fetchWithRetry(url: string, attempts = 3): Promise<Response> {
-  let lastError: unknown;
-  for (let i = 0; i < attempts; i += 1) {
-    const res = await fetch(url, {
-      headers: { accept: 'application/json', 'user-agent': USER_AGENT },
-    });
-    if (res.ok) return res;
-    if (res.status === 429 || res.status === 503) {
-      lastError = new Error(`Wikidata request failed: ${res.status} ${url}`);
-      await new Promise((resolve) => setTimeout(resolve, 500 * (i + 1)));
-      continue;
-    }
-    throw new Error(`Wikidata request failed: ${res.status} ${url}`);
-  }
-  throw lastError instanceof Error ? lastError : new Error(`Wikidata request failed: ${url}`);
-}
+  'blackstory-entity-network-expansion/0.1 (research staging lane; proposals only)';
 
 const defaultFetcher: WikidataFetcher = async (url) => {
-  const res = await fetchWithRetry(url);
-  return res.json();
+  const response = await fetch(url, {
+    headers: { accept: 'application/json', 'user-agent': USER_AGENT },
+    redirect: 'error',
+    signal: AbortSignal.timeout(15000),
+  });
+  if (!response.ok) throw new Error(`Wikidata request failed: ${response.status} ${url}`);
+  return response.json();
 };
 
 type WikidataClaim = {
+  readonly id?: string;
+  readonly rank?: string;
+  readonly qualifiers?: Readonly<Record<string, unknown>>;
+  readonly references?: readonly Readonly<Record<string, unknown>>[];
   readonly mainsnak?: {
     readonly datavalue?: { readonly value?: unknown };
   };
@@ -102,22 +81,22 @@ const PERSON_FORWARD_PROPERTIES: readonly PropertyMapping[] = [
   { propertyId: 'P108', relationshipType: 'employed_by', direction: 'outgoing' },
   {
     propertyId: 'P69',
-    relationshipType: 'member_of',
+    relationshipType: 'other',
     direction: 'outgoing',
-    note: 'Wikidata P69 "educated at" — taxonomy has no dedicated educated_at type; staged as member_of (student as institutional member) per docs/relationship-taxonomy.md guidance to prefer the closest documented fit.',
+    note: 'Wikidata P69 means educated at. Preserve that predicate for review; it does not establish membership.',
   },
   { propertyId: 'P463', relationshipType: 'member_of', direction: 'outgoing' },
   {
     propertyId: 'P485',
     relationshipType: 'other',
     direction: 'outgoing',
-    note: 'Wikidata P485 "archives at" — taxonomy has no dedicated archived_at type; staged as other pending a reviewer decision (candidates for located_at or a new type are both defensible).',
+    note: 'Wikidata P485 identifies the archive holding records; it does not locate the person.',
   },
 ];
 
 const ORG_FORWARD_PROPERTIES: readonly PropertyMapping[] = [
   { propertyId: 'P112', relationshipType: 'founded', direction: 'incoming' }, // org FOUNDED_BY founder -> founder founded org
-  { propertyId: 'P527', relationshipType: 'member_of', direction: 'incoming' }, // org has-part member -> member member_of org
+  { propertyId: 'P527', relationshipType: 'part_of', direction: 'incoming' }, // part -> whole
 ];
 
 /** Reverse claims: Wikidata only records these on the neighbor's item, so they're queried via
@@ -148,10 +127,16 @@ export type RelationshipHypothesis = {
 export type ProvenanceHop = {
   readonly sourceQid: string;
   readonly propertyId: string;
+  readonly targetQid: string;
   readonly referenceUrl: string;
+  readonly statementSubjectQid: string;
+  readonly statementObjectQid: string;
+  readonly statement: WikidataClaim;
 };
 
 export type NetworkCandidate = {
+  readonly sourceQid: string;
+  readonly sourceLabel: string;
   readonly qid: string;
   readonly label: string;
   readonly hypothesis: RelationshipHypothesis;
@@ -163,37 +148,38 @@ function getLabel(doc: WikidataEntityDoc, qid: string): string {
   return doc.entities?.[qid]?.labels?.en?.value ?? qid;
 }
 
-function extractEntityIds(claims: readonly WikidataClaim[] | undefined): string[] {
-  if (!claims) return [];
-  const ids: string[] = [];
-  for (const claim of claims) {
-    const value = claim.mainsnak?.datavalue?.value;
-    if (
-      value &&
-      typeof value === 'object' &&
-      'id' in (value as Record<string, unknown>) &&
-      typeof (value as { id?: unknown }).id === 'string'
-    ) {
-      ids.push((value as { id: string }).id);
-    }
-  }
-  return ids;
+function entityIdFromClaim(claim: WikidataClaim): string | undefined {
+  if (claim.rank === 'deprecated') return undefined;
+  const value = claim.mainsnak?.datavalue?.value;
+  if (!value || typeof value !== 'object' || !('id' in value) || typeof value.id !== 'string')
+    return undefined;
+  return /^Q[0-9]+$/u.test(value.id) ? value.id : undefined;
 }
 
 function extractYearFromWikidataTimeClaim(
   claims: readonly WikidataClaim[] | undefined,
 ): number | undefined {
-  if (!claims?.length) return undefined;
-  const value = claims[0]?.mainsnak?.datavalue?.value;
-  if (!value || typeof value !== 'object' || !('time' in (value as Record<string, unknown>))) {
-    return undefined;
-  }
-  const time = (value as { time?: unknown }).time;
-  if (typeof time !== 'string') return undefined;
-  const match = /^[+-]?(\d{4})-/.exec(time);
-  if (!match?.[1]) return undefined;
-  const year = Number.parseInt(match[1], 10);
-  return Number.isFinite(year) ? year : undefined;
+  const usable = (claims ?? []).filter((claim) => claim.rank !== 'deprecated');
+  const preferred = usable.filter((claim) => claim.rank === 'preferred');
+  const years = (preferred.length ? preferred : usable).map((claim) => {
+    const value = claim.mainsnak?.datavalue?.value;
+    if (
+      !value ||
+      typeof value !== 'object' ||
+      !('time' in value) ||
+      !('precision' in value) ||
+      typeof value.time !== 'string' ||
+      typeof value.precision !== 'number' ||
+      value.precision < 9
+    )
+      return undefined;
+    const match = /^([+-]?\d{4,})-/u.exec(value.time);
+    return match ? Number(match[1]) : undefined;
+  });
+  const year = years[0];
+  return year !== undefined && Number.isSafeInteger(year) && years.every((item) => item === year)
+    ? year
+    : undefined;
 }
 
 /** Reads Wikidata P569 (birth) and P570 (death) time claims from an entity claims map. */
@@ -234,6 +220,7 @@ async function expandForwardClaims(
   fetcher: WikidataFetcher,
   hop: 1 | 2,
   seedBirthDeathOut?: { birthYear?: number; deathYear?: number },
+  limit = 50,
 ): Promise<NetworkCandidate[]> {
   const doc = (await fetcher(WIKIDATA_ENTITY_DATA(seedQid))) as WikidataEntityDoc;
   const claims = doc.entities?.[seedQid]?.claims ?? {};
@@ -244,10 +231,15 @@ async function expandForwardClaims(
   }
   const out: NetworkCandidate[] = [];
   for (const mapping of mappings) {
-    const neighborQids = extractEntityIds(claims[mapping.propertyId]);
-    for (const neighborQid of neighborQids) {
+    for (const statement of claims[mapping.propertyId] ?? []) {
+      const neighborQid = entityIdFromClaim(statement);
+      if (!neighborQid) continue;
+      if (out.length >= limit) return out;
+      if (neighborQid === seedQid || !/^Q[0-9]+$/u.test(neighborQid)) continue;
       const label = await fetchLabel(neighborQid, fetcher);
       out.push({
+        sourceQid: seedQid,
+        sourceLabel: getLabel(doc, seedQid),
         qid: neighborQid,
         label,
         hop,
@@ -260,7 +252,11 @@ async function expandForwardClaims(
           {
             sourceQid: seedQid,
             propertyId: mapping.propertyId,
+            targetQid: neighborQid,
             referenceUrl: WIKIDATA_ITEM_URL(seedQid),
+            statementSubjectQid: seedQid,
+            statementObjectQid: neighborQid,
+            statement,
           },
         ],
       });
@@ -284,30 +280,48 @@ async function expandReverseClaims(
   queries: readonly SparqlReverseQuery[],
   fetcher: WikidataFetcher,
   hop: 1 | 2,
+  sourceLabel: string,
+  limit = 50,
 ): Promise<NetworkCandidate[]> {
   const out: NetworkCandidate[] = [];
   for (const q of queries) {
-    const query = `SELECT ?item ?itemLabel WHERE { ?item wdt:${q.property} wd:${seedQid} . SERVICE wikibase:label { bd:serviceParam wikibase:language "en". } }`;
+    const query = `SELECT ?item ?itemLabel WHERE { ?item wdt:${q.property} wd:${seedQid} . SERVICE wikibase:label { bd:serviceParam wikibase:language "en". } } LIMIT ${limit}`;
     const result = (await fetcher(sparqlUrl(query))) as SparqlResult;
     const bindings = result.results?.bindings ?? [];
     for (const binding of bindings) {
+      if (out.length >= limit) return out;
       const uri = binding.item?.value;
       if (!uri) continue;
       const qid = uri.split('/').pop();
-      if (!qid) continue;
-      out.push({
-        qid,
-        label: binding.itemLabel?.value ?? qid,
-        hop,
-        hypothesis: {
-          relationshipType: q.relationshipType,
-          direction: q.direction,
-          ...(q.note !== undefined ? { note: q.note } : {}),
-        },
-        provenance: [
-          { sourceQid: seedQid, propertyId: q.property, referenceUrl: WIKIDATA_ITEM_URL(seedQid) },
-        ],
-      });
+      if (!qid || qid === seedQid || !/^Q[0-9]+$/u.test(qid)) continue;
+      const document = (await fetcher(WIKIDATA_ENTITY_DATA(qid))) as WikidataEntityDoc;
+      for (const statement of document.entities?.[qid]?.claims?.[q.property] ?? []) {
+        if (out.length >= limit) return out;
+        if (entityIdFromClaim(statement) !== seedQid) continue;
+        out.push({
+          sourceQid: seedQid,
+          sourceLabel,
+          qid,
+          label: binding.itemLabel?.value ?? qid,
+          hop,
+          hypothesis: {
+            relationshipType: q.relationshipType,
+            direction: q.direction,
+            ...(q.note !== undefined ? { note: q.note } : {}),
+          },
+          provenance: [
+            {
+              sourceQid: seedQid,
+              targetQid: qid,
+              propertyId: q.property,
+              referenceUrl: WIKIDATA_ITEM_URL(qid),
+              statementSubjectQid: qid,
+              statementObjectQid: seedQid,
+              statement,
+            },
+          ],
+        });
+      }
     }
   }
   return out;
@@ -325,17 +339,18 @@ function reverseQueriesFor(kind: EntityKindForExpansion): readonly SparqlReverse
 }
 
 function dedupeCandidates(candidates: readonly NetworkCandidate[]): NetworkCandidate[] {
-  const byQid = new Map<string, NetworkCandidate>();
-  for (const c of candidates) {
-    const existing = byQid.get(c.qid);
-    if (!existing) {
-      byQid.set(c.qid, c);
-    } else {
-      // Same neighbor reached more than once: keep the first hypothesis, merge provenance.
-      byQid.set(c.qid, { ...existing, provenance: [...existing.provenance, ...c.provenance] });
-    }
+  const byEdge = new Map<string, NetworkCandidate>();
+  for (const candidate of candidates) {
+    const key = [
+      candidate.sourceQid,
+      candidate.qid,
+      candidate.hypothesis.relationshipType,
+      candidate.hypothesis.direction,
+      ...candidate.provenance.map((hop) => JSON.stringify(hop)),
+    ].join('|');
+    if (!byEdge.has(key)) byEdge.set(key, candidate);
   }
-  return [...byQid.values()];
+  return [...byEdge.values()];
 }
 
 /**
@@ -349,6 +364,29 @@ export async function expandEntityNetwork(
   fetcher: WikidataFetcher = defaultFetcher,
   meta?: EntityNetworkExpansionMeta,
 ): Promise<NetworkCandidate[]> {
+  if (!/^Q[0-9]+$/u.test(seed.qid)) throw new Error('Seed must have a valid Wikidata QID');
+  const maxRequests = config.maxRequests ?? 100;
+  if (
+    ![1, 2].includes(config.depth) ||
+    !Number.isSafeInteger(config.maxCandidates) ||
+    config.maxCandidates < 1 ||
+    config.maxCandidates > 1000 ||
+    !Number.isSafeInteger(maxRequests) ||
+    maxRequests < 1 ||
+    maxRequests > 1000
+  ) {
+    throw new Error('Expansion requires depth 1-2 and candidate/request limits 1-1000');
+  }
+  const upstream = fetcher;
+  const cache = new Map<string, Promise<unknown>>();
+  fetcher = (url) => {
+    const cached = cache.get(url);
+    if (cached) return cached;
+    if (cache.size >= maxRequests) throw new Error('Expansion request budget exhausted');
+    const result = upstream(url);
+    cache.set(url, result);
+    return result;
+  };
   const seedBirthDeathOut =
     seed.kind === 'person' ? ({} as { birthYear?: number; deathYear?: number }) : undefined;
   const hop1Forward = await expandForwardClaims(
@@ -357,6 +395,7 @@ export async function expandEntityNetwork(
     fetcher,
     1,
     seedBirthDeathOut,
+    config.maxCandidates,
   );
   if (meta && seedBirthDeathOut) {
     const hasBirth = seedBirthDeathOut.birthYear !== undefined;
@@ -368,20 +407,39 @@ export async function expandEntityNetwork(
       };
     }
   }
-  const hop1Reverse = await expandReverseClaims(seed.qid, reverseQueriesFor(seed.kind), fetcher, 1);
+  const hop1Reverse =
+    hop1Forward.length < config.maxCandidates
+      ? await expandReverseClaims(
+          seed.qid,
+          reverseQueriesFor(seed.kind),
+          fetcher,
+          1,
+          seed.displayName,
+          config.maxCandidates - hop1Forward.length,
+        )
+      : [];
   let all = dedupeCandidates([...hop1Forward, ...hop1Reverse]);
 
   if (config.depth === 2) {
-    const hop1Qids = all.map((c) => c.qid);
-    const hop2Batches: NetworkCandidate[][] = [];
-    for (const qid of hop1Qids) {
-      if (all.length + hop2Batches.flat().length >= config.maxCandidates) break;
-      // Second-hop neighbors are treated as generic ("other") since we don't know the neighbor's
-      // canonical kind without a resolution step — safer to under-classify than guess.
-      const forward = await expandForwardClaims(qid, PERSON_FORWARD_PROPERTIES, fetcher, 2);
-      hop2Batches.push(forward);
+    const parents = all;
+    const hop2Batches: NetworkCandidate[] = [];
+    for (const parent of parents) {
+      const remaining = config.maxCandidates - all.length - hop2Batches.length;
+      if (remaining <= 0) break;
+      const forward = await expandForwardClaims(
+        parent.qid,
+        [...PERSON_FORWARD_PROPERTIES, ...ORG_FORWARD_PROPERTIES],
+        fetcher,
+        2,
+        undefined,
+        remaining,
+      );
+      for (const child of forward) {
+        if (child.qid === seed.qid) continue;
+        hop2Batches.push({ ...child, provenance: [...parent.provenance, ...child.provenance] });
+      }
     }
-    all = dedupeCandidates([...all, ...hop2Batches.flat()]);
+    all = dedupeCandidates([...all, ...hop2Batches]);
   }
 
   if (all.length > config.maxCandidates) {
@@ -391,7 +449,7 @@ export async function expandEntityNetwork(
 }
 
 // ---------------------------------------------------------------------------
-// Staging (bb_research.landscape_candidates — lane 'wikidata')
+// Staging (research.landscape_candidates — lane 'wikidata')
 // ---------------------------------------------------------------------------
 
 export type LandscapeCandidateRow = {
@@ -419,8 +477,8 @@ export type LandscapeCandidateRow = {
     readonly note?: string;
     readonly seedBirthYear?: number;
     readonly seedDeathYear?: number;
-    readonly birthYear?: number;
-    readonly deathYear?: number;
+    readonly sourceQid: string;
+    readonly targetQid: string;
   };
   readonly discovered_at: string;
 };
@@ -428,10 +486,10 @@ export type LandscapeCandidateRow = {
 export type StagingInserter = (rows: readonly LandscapeCandidateRow[]) => Promise<void>;
 
 /**
- * Shapes traversal output into `bb_research.landscape_candidates` rows (lane='wikidata',
- * status='pending') and hands them to `insert`. Never writes to `bb_canonical.*` — the caller's
+ * Shapes traversal output into `research.landscape_candidates` rows (lane='wikidata',
+ * status='pending') and hands them to `insert`. Never writes to `canonical.*` — the caller's
  * `insert` is expected to target the staging table only; this function does not know how to reach
- * bb_canonical and has no code path that could.
+ * canonical and has no code path that could.
  */
 export async function stageNetworkCandidates(
   seed: ExpansionSeed,
@@ -445,15 +503,17 @@ export async function stageNetworkCandidates(
   const hasSeedBirth = seedBirthDeathYears?.birthYear !== undefined;
   const hasSeedDeath = seedBirthDeathYears?.deathYear !== undefined;
   const rows: LandscapeCandidateRow[] = candidates.map((c) => ({
-    id: `landcand_wikidata_${seed.qid}_${c.qid}`,
+    id: `landcand_wikidata_${createHash('sha256')
+      .update(JSON.stringify([runId, seed.qid, c.provenance]))
+      .digest('hex')}`,
     run_id: runId,
     lane: 'wikidata',
     source_program_id: 'wikidata-network-expansion',
-    source_item_id: c.qid,
+    source_item_id: `${c.sourceQid}:${c.hypothesis.relationshipType}:${c.hypothesis.direction}:${c.qid}`,
     display_name: c.label,
     kind: 'other',
-    summary: `${c.hypothesis.direction === 'outgoing' ? seed.displayName : c.label} ${c.hypothesis.relationshipType} ${
-      c.hypothesis.direction === 'outgoing' ? c.label : seed.displayName
+    summary: `${c.hypothesis.direction === 'outgoing' ? c.sourceLabel : c.label} ${c.hypothesis.relationshipType} ${
+      c.hypothesis.direction === 'outgoing' ? c.label : c.sourceLabel
     }`,
     canonical_url: WIKIDATA_ITEM_URL(c.qid),
     status: 'pending',
@@ -465,6 +525,8 @@ export async function stageNetworkCandidates(
       hops: c.provenance,
     },
     payload: {
+      sourceQid: c.sourceQid,
+      targetQid: c.qid,
       relationship_type: c.hypothesis.relationshipType,
       direction: c.hypothesis.direction,
       hop: c.hop,
@@ -472,13 +534,11 @@ export async function stageNetworkCandidates(
       ...(hasSeedBirth
         ? {
             seedBirthYear: seedBirthDeathYears!.birthYear,
-            birthYear: seedBirthDeathYears!.birthYear,
           }
         : {}),
       ...(hasSeedDeath
         ? {
             seedDeathYear: seedBirthDeathYears!.deathYear,
-            deathYear: seedBirthDeathYears!.deathYear,
           }
         : {}),
     },

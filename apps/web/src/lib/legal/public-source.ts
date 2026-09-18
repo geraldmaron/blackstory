@@ -1,6 +1,6 @@
 /**
  * Legal read routing for the public `/law` surface. Reads the frozen projection in
- * bb_public.release_legal_snapshots for the active release; otherwise falls back to
+ * published.release_legal_snapshots for the active release; otherwise falls back to
  * the curated seed, mirroring apps/web/src/lib/banned-books/public-source.ts.
  *
  * The projection payload is the same document shape the seed exposes, so callers
@@ -50,10 +50,8 @@ const releaseLegalSnapshotsCache = createReleaseScopedCache<readonly unknown[]>(
 });
 
 /**
- * Every frozen legal snapshot in the active release (~12 rows, ~27KB), read once per
- * release-scoped cache window and shared across requests — mirrors the entities/search-index
- * pattern in public-data/source.ts. Before this, `/law` read bb_public.release_legal_snapshots
- * on every request: 22,532 calls between 2026-07-20 and 2026-09-12 with no cross-request cache.
+ * Shares the active release's frozen legal snapshots across requests for the release-scoped
+ * cache window.
  */
 const listReleaseLegalSnapshotsCached = cache(async (): Promise<readonly unknown[]> => {
   const release = await getPublicActiveReleaseMeta();

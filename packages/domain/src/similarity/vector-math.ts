@@ -3,7 +3,7 @@
  *
  * Deliberately duplicated (in miniature) from @repo/ops-data's embeddings/vector-math.ts
  * rather than imported: @repo/ops-data depends on @repo/domain (not the reverse),
- * and this package's discovery/research logic must stay Firestore-free so it can run inside
+ * and this package's discovery/research logic must stay independent of persistence so it can run inside
  * research workers without pulling in Admin SDK credentials. Both copies assert the same
  * invariant (finite, unit-normalized, equal length) and will be trivial to reconcile if a
  * future extracts a shared math-only package.

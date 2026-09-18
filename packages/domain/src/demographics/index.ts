@@ -1,6 +1,6 @@
 /**
  * Demographics comparability and census category documentation — shared vocabulary for
- * firebase loaders, Data page copy, and future NHGIS historical ingestion.
+ * database loaders, Data page copy, and future NHGIS historical ingestion.
  */
 export {
   BOUNDARY_CHANGE_CAUTION,

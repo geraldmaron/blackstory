@@ -58,7 +58,7 @@ Reuses `discovery/obscurity.ts` (`obscurity.v1`) unchanged. Each survivor gets a
 
 ## Invariants
 
-- **No publish path.** Research workers cannot publish (`docs/decisions-carryover.md`, "Research and discovery cannot publish"). No writes to public projections, release tables, or `bb_public` / `bb_canonical`. `assertCampaignCannotPublish()` / `assertDiscoveryCannotPublish` guard the boundary.
+- **No publish path.** Research workers cannot publish (`docs/decisions-carryover.md`, "Research and discovery cannot publish"). No writes to public projections, release tables, or `published` / `canonical`. `assertCampaignCannotPublish()` / `assertDiscoveryCannotPublish` guard the boundary.
 - **Anonymous clients never write canonical history.**
 - **Safe-fetch only.** Live harvesting uses `@repo/security` safe-fetch; this module is fixture-first and performs no network I/O itself.
 - **Evidence before assertion; no completeness overclaims.** Metadata + pointers + capped snippets only; no bulk OCR / full text.
@@ -68,7 +68,7 @@ Reuses `discovery/obscurity.ts` (`obscurity.v1`) unchanged. Each survivor gets a
 
 ## Storage
 
-Sources use the existing `bb_evidence.evidence_sources` registry — **no new migration is required** (assigned prefix `20260724000001` is intentionally unused). Candidates are private `discovery-candidate.v1` records.
+Sources use the existing `evidence.evidence_sources` registry — **no new migration is required** (assigned prefix `20260724000001` is intentionally unused). Candidates are private `discovery-candidate.v1` records.
 
 ## Integration (barrel export lines for the parent agent)
 
@@ -98,4 +98,3 @@ export {
 - Live safe-fetch-backed `FindingAidAdapter` implementation (EAD/XML + OAI-PMH parsing).
 - Per-institution OAI-PMH endpoint confirmation.
 - Scheduled roster job + operator CLI wiring.
-- Firestore persistence for finding-aid candidates.

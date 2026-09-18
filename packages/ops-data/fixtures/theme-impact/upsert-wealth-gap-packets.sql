@@ -3,7 +3,7 @@
 -- directly). Only the "2023 dollars" -> "2024 dollars" wording was patched here for textual
 -- consistency with the corrected .ts; it was NOT resynced with wealth-gap-packets.ts's other
 -- content and should not be treated as current. Recommend deleting it or wiring a real generator.
-INSERT INTO bb_reference.theme_impact_packets (
+INSERT INTO reference.theme_impact_packets (
   id, question_id, theme_id, title, summary, policy_eras, geography,
   method_stance, method_note, observations, derived, artifacts, gap_states,
   entity_id, binding_purpose, status, created_at, updated_at

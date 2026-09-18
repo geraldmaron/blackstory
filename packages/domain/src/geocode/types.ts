@@ -20,7 +20,7 @@ export type ResolvedJurisdictionIds = {
    * product does not yet have a live `jurisdictions/{id}` writer for the `city` kind
    * (`packages/ops-data` owns that write path). `placeId` is the deterministic id a future
    * on-demand-city-creation pass should use, and `placeCreateHint` carries the minimal fields
-   * that pass would need to actually create the doc. Neither is written to Firestore by this
+   * that pass would need to actually create the doc. Neither is persisted by this
    * module.
    */
   readonly placeId?: string;

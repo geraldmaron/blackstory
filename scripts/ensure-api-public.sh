@@ -4,7 +4,7 @@
 # Safe port handling:
 #   - Reuses a healthy api-public already listening
 #   - Restarts only processes whose cmdline matches api-public / tsx src/main.ts
-#   - Refuses when :8080 is held by Firestore emulator or an unknown process
+#   - Refuses when :8080 is held by an unrelated process
 #
 # Usage:
 #   ./scripts/ensure-api-public.sh           # ensure (start if needed)
@@ -155,23 +155,11 @@ is_api_public_pid() {
   [[ "$cwd" == *"/apps/api-public" ]]
 }
 
-is_firestore_emulator_cmdline() {
-  local cmd="$1"
-  [[ "$cmd" == *"cloud-firestore-emulator"* ]] || \
-    [[ "$cmd" == *"Firestore Emulator"* ]] || \
-    [[ "$cmd" == *"firebase"* && "$cmd" == *"emulator"* && "$cmd" == *"firestore"* ]]
-}
 
 describe_port_blocker() {
   local pid="$1"
   local cmd
   cmd="$(process_cmdline "$pid")"
-  if is_firestore_emulator_cmdline "$cmd"; then
-    echo "Firestore emulator holds :${API_PUBLIC_PORT} (firebase.json default)."
-    echo "  Stop it: quit \`pnpm firebase:emulators\` or reconfigure the emulator port in infra/firebase/firebase.json."
-    echo "  api-public and the Firestore emulator cannot share :8080."
-    return
-  fi
   if is_api_public_pid "$pid"; then
     echo "api-public on :${API_PUBLIC_PORT} (pid ${pid})."
     return
@@ -268,11 +256,6 @@ fi
 listen_pid="$(port_listen_pid)"
 if [[ -n "$listen_pid" ]]; then
   cmd="$(process_cmdline "$listen_pid")"
-  if is_firestore_emulator_cmdline "$cmd"; then
-    echo "ensure-api-public: ERROR — port :${API_PUBLIC_PORT} blocked." >&2
-    describe_port_blocker "$listen_pid" >&2
-    exit 1
-  fi
   if is_api_public_pid "$listen_pid"; then
     if [[ "$probe_status" == "stale" || "$probe_status" == "wrong_service" ]]; then
       echo "ensure-api-public: stale api-public on :${API_PUBLIC_PORT} — restarting with postgres env…"

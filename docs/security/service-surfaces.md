@@ -4,7 +4,7 @@
 jobs remain human provisioning steps (see [`infra/gcp/surfaces/README.md`](../../infra/gcp/surfaces/README.md)).
 
 **Decision:** ADR-005, removed 2026-07-24, recovered in [`../decisions-carryover.md`](../decisions-carryover.md), "Service surface separation"
-**Data store:** ~~Firestore system of record (ADR-011)~~ — reversed; Postgres is now the system of record ([`../decisions-carryover.md`](../decisions-carryover.md), "Firestore as system of record, reversed")
+**Data store:** Supabase Postgres; see [architecture](../architecture.md).
 
 ## Threat model summary
 
@@ -13,8 +13,8 @@ jobs remain human provisioning steps (see [`infra/gcp/surfaces/README.md`](../..
 | Anonymous / public API traffic | Canonical writes, publication, quarantine reads |
 | Submissions API | Publication, canonical writes, evidence reads |
 | A bug in public (non-`/admin`) code inside the `apps/web` bundle | The `ADMIN_DATABASE_URL` write-capable credential, internal APIs, publish helpers |
-| End-user Firebase token on internal API | Any internal publication call |
-| `/admin` request without a valid Supabase session + staff `app_metadata.bb_role` | Console access |
+| End-user token on internal API | Any internal publication call |
+| `/admin` request without a valid Supabase session + staff `app_metadata.app_role` | Console access |
 
 Admin moved from a separate Vercel deployable into `/admin` routes inside `apps/web` (2026-09-11;
 see `docs/decisions-carryover.md`). "Public web bundle must not gain admin routes" is no longer
@@ -55,10 +55,9 @@ enforced by `apps/web/src/admin/canonical-write-boundary.test.ts`.
 
 ### Admin console (`/admin` inside `apps/web`)
 
-- **Hosting:** Vercel, same project (`blackstory`) and deployment as the public site — folded in 2026-09-11. Was previously a standalone Vercel project (`apps/admin`, since 2026-07-25 — see [firebase wind-down](../data/firebase-wind-down.md)) kept separate specifically for DB credential isolation; that isolation is now enforced by credential scope instead of by process — see the threat model above.
-- **Posture:** staff-gated route group — `apps/web/src/middleware.ts` matches only `/admin/:path*` and requires a valid Supabase session with `app_metadata.bb_role` set (`apps/web/src/admin/proxy.ts`). `/admin/api/**` authenticates by bearer token instead (`apps/web/src/admin/auth/request-auth.ts`).
+- **Hosting:** Vercel, shared `apps/web` deployment. Credential scope and server authorization separate public reads from staff writes.
+- **Posture:** staff-gated route group — `apps/web/src/proxy.ts` matches only `/admin/:path*` and requires a valid Supabase session with `app_metadata.app_role` set (`apps/web/src/admin/admin-auth-gate.ts`). `/admin/api/**` authenticates by bearer token instead (`apps/web/src/admin/auth/request-auth.ts`).
 - **Invariant:** only `apps/web/src/admin/**` may import the write-capable `canonical-postgres-client.ts` / `canonical-write.ts` (see `apps/web/src/admin/canonical-write-boundary.test.ts`). The old "no imports from apps/web" invariant is retired — admin routes are now part of apps/web by design.
-- **SA:** N/A — Vercel serverless, same as `apps/web` (see that entry above); the `admin@black-book-efaaf.iam.gserviceaccount.com` GCP service account predates the Vercel move and is not used by this surface.
 
 ## Typed capability matrix
 
@@ -66,7 +65,6 @@ Source of truth:
 
 - **Runtime TypeScript:** `packages/config/src/surfaces.ts`
 - **Infra JSON:** `infra/gcp/surfaces/surface-matrix.json`
-- **IAM / SA names:** `infra/gcp/isolation-matrix.json`, `infra/gcp/service-accounts.matrix.md`
 
 Each API `health()` response includes:
 
@@ -90,11 +88,10 @@ accepts a forbidden auth mode.
 |-----------|----------|
 | Submissions cannot publish | `packages/config/src/surfaces.test.ts`, `apps/api-submissions/src/index.test.ts` |
 | Public API cannot write canonical data | `packages/config/src/surfaces.test.ts`, `apps/api-public/src/index.test.ts` |
-| Admin write-capable credential scoped to `/admin` code only | `apps/web/src/admin/canonical-write-boundary.test.ts`, `apps/web/src/middleware.ts` matcher |
+| Admin write-capable credential scoped to `/admin` code only | `apps/web/src/admin/canonical-write-boundary.test.ts`, `apps/web/src/proxy.ts` matcher |
 | Internal API rejects end-user tokens | `packages/config/src/surfaces.test.ts`, `apps/api-internal/src/index.test.ts` |
 
 ## Related docs
 
 - [Environment isolation](./environment-isolation.md)
 - [GCP isolation matrices](../../infra/gcp/README.md)
-- [WIF deploy identity](../../infra/gcp/wif/README.md)

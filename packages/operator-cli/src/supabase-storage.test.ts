@@ -1,4 +1,5 @@
 /** Verifies the Supabase Storage capture sink: upload call shape, dedup on 409, env config. */
+import { createHash } from 'node:crypto';
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import { createSupabaseStorage, supabaseStorageConfigFromEnv } from './supabase-storage.ts';
@@ -30,7 +31,7 @@ test('stores the snapshot text content-addressed under captures/<sha256>.txt', a
   assert.equal(calls.length, 1);
   assert.equal(
     calls[0]?.url,
-    `https://ref.supabase.co/storage/v1/object/raw-sources/captures/${SHA}.txt`,
+    `https://ref.supabase.co/storage/v1/object/raw-sources/captures/${createHash('sha256').update('extracted text').digest('hex')}.txt`,
   );
   const headers = calls[0]?.init.headers as Record<string, string>;
   assert.equal(headers.authorization, 'Bearer test-secret');
@@ -39,12 +40,14 @@ test('stores the snapshot text content-addressed under captures/<sha256>.txt', a
   assert.deepEqual(object, {
     stored: 'supabase-storage',
     bucket: 'raw-sources',
-    path: `captures/${SHA}.txt`,
+    path: `captures/${createHash('sha256').update('extracted text').digest('hex')}.txt`,
     sourceUrl: 'https://example.org/doc',
     sha256: SHA,
     contentType: 'text/html',
     byteLength: 1234,
     snapshotBytes: 'extracted text'.length,
+    snapshotSha256: createHash('sha256').update('extracted text').digest('hex'),
+    representation: 'extracted-text',
     deduplicated: false,
   });
 });

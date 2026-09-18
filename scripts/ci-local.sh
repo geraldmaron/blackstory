@@ -45,8 +45,6 @@ done
 # code that branches on NODE_ENV behaves differently under a bare shell.
 export NODE_ENV=test
 export LOG_LEVEL=info
-export FIREBASE_PROJECT_ID=demo-repo
-export BLACK_BOOK_TEST_DATABASE_URL=postgresql://blackbook:blackbook@127.0.0.1:5432/blackbook
 
 # ---------------------------------------------------------------------------
 # Toolchain fidelity. CI pins Node from .nvmrc and pnpm from setup-node-pnpm;
@@ -115,8 +113,12 @@ compute_lanes() {
     exit 2
   fi
   local files
-  # Three-dot: compare against the merge base, which is what a pull request diffs.
-  mapfile -t files < <(git diff --name-only "${BASE_REF}...HEAD")
+  # Include the PR diff and unfinished local changes so pre-commit runs exercise every lane.
+  mapfile -t files < <({
+    git diff --name-only "${BASE_REF}...HEAD"
+    git diff --name-only HEAD
+    git ls-files --others --exclude-standard
+  } | sort -u)
   CHANGED_COUNT=${#files[@]}
   if [[ $CHANGED_COUNT -eq 0 ]]; then
     CODE=true; MOBILE=true; PYTHON=true; SECURITY_CODE=true
@@ -259,8 +261,6 @@ Not reproducible locally — these run in CI only, so a green run here is not a 
     security.yml's Policy and API Security job DOES run here — it is the security-policy lane below.
   * security.yml's Filesystem Vulnerabilities, Image and Signature, and DAST Staging are
     workflow_dispatch-only, so they do not gate a pull request at all.
-  * Integration Postgres (ci.yml): gated on the repo variable ENABLE_POSTGRES_CI and needs the
-    postgis service container. Not a required check. Run it with `pnpm db:up` first if wanted.
   * Ubuntu-vs-macOS differences: case-sensitive filesystem, glibc, and the pinned runner Node.
 NOTE
 

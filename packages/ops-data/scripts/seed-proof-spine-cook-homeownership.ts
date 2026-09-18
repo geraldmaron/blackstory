@@ -1,19 +1,7 @@
 /**
- * Proof spine: Black homeownership rate, Cook County IL — splices the NHGIS
- * decennial county tenure series (1990-2010) onto the ACS 5-year county series
- * (2020-2024 vintage, the only ACS vintage ingested so far). Demonstrates the
- * spine_series / spine_segments / spine_observations_v mechanism ahead of the
- * national Phase 1 backfills (repo-zxjz.2-.10).
- *
- * Usage (repo root):
- *   # Dry-run (default)
- *   node --conditions development --import tsx \
- *     packages/ops-data/scripts/seed-proof-spine-cook-homeownership.ts
- *
- *   # Apply to Postgres
- *   DRY_RUN=0 SEED_PROOF_SPINE_APPLY=1 DATABASE_URL=postgresql://... \
- *     node --conditions development --import tsx \
- *     packages/ops-data/scripts/seed-proof-spine-cook-homeownership.ts
+ * Seed the Cook County Black homeownership series from NHGIS decennial tenure data (1990-2010)
+ * and ACS five-year data (2020-2024). Preserve the source and comparability seam in spine
+ * segments. Default dry-run; writes require DRY_RUN=0 and SEED_PROOF_SPINE_APPLY=1.
  */
 import pg from 'pg';
 import { normalizePgConnectionString } from './lib/pg-connection.ts';
@@ -45,13 +33,13 @@ async function main(): Promise<void> {
 
   try {
     const existing = await pool.query<{ metric_id: string }>(
-      `SELECT metric_id FROM bb_reference.statistical_series WHERE metric_id = ANY($1::text[])`,
+      `SELECT metric_id FROM reference.statistical_series WHERE metric_id = ANY($1::text[])`,
       [[NHGIS_METRIC_ID, ACS_METRIC_ID]],
     );
     const found = new Set(existing.rows.map((r) => r.metric_id));
     if (!found.has(NHGIS_METRIC_ID) || !found.has(ACS_METRIC_ID)) {
       throw new Error(
-        `Missing source metric(s) in bb_reference.statistical_series: ` +
+        `Missing source metric(s) in reference.statistical_series: ` +
           [NHGIS_METRIC_ID, ACS_METRIC_ID].filter((id) => !found.has(id)).join(', ') +
           ' — run ingest-phase1-nhgis.ts and ingest-phase1-acs.ts first.',
       );
@@ -63,14 +51,14 @@ async function main(): Promise<void> {
       estimate: number;
     }>(
       `SELECT reference_period, source, estimate
-       FROM bb_reference.statistical_observations
+       FROM reference.statistical_observations
        WHERE metric_id = ANY($1::text[])
        ORDER BY reference_period`,
       [[NHGIS_METRIC_ID, ACS_METRIC_ID]],
     );
 
     await pool.query(
-      `INSERT INTO bb_reference.spine_series
+      `INSERT INTO reference.spine_series
         (spine_id, title, outcome, race_ethnicity_slice, geography_type, unit, definition, comparability_note, theme, status)
        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
        ON CONFLICT (spine_id) DO UPDATE SET
@@ -93,7 +81,7 @@ async function main(): Promise<void> {
     );
 
     await pool.query(
-      `INSERT INTO bb_reference.spine_segments
+      `INSERT INTO reference.spine_segments
         (id, spine_id, metric_id, period_start, period_end, priority, splice_note, seam_check)
        VALUES
         ($1, $2, $3, '1990', '2010', 0, $4, '{}'::jsonb),

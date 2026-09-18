@@ -1,22 +1,22 @@
 /**
- * Backfill bb_canonical claims (and their evidence chain) for active-release entities that have
+ * Backfill canonical claims (and their evidence chain) for active-release entities that have
  * none.
  *
  * Why: entities published through the landscape lane / incremental publisher, the invention and
- * inventor cohort scripts, and the research-case bridge write bb_public directly and never reach
- * bb_canonical. Their public claims are fully cited, but the canonical chain
- * claims -> claim_versions -> claim_evidence_links -> bb_evidence.evidence_records ->
+ * inventor cohort scripts, and the research-case bridge write published directly and never reach
+ * canonical. Their public claims are fully cited, but the canonical chain
+ * claims -> claim_versions -> claim_evidence_links -> evidence.evidence_records ->
  * source_items -> evidence_sources -> source_organizations does not exist for them, so any
  * canonical-side audit or trace misses them.
  *
  * What it does (computed at run time, no ids or claim text embedded here):
- *  - Selects active-release entities with zero bb_canonical.claims rows.
+ *  - Selects active-release entities with zero canonical.claims rows.
  *  - For each public claim, creates the canonical claim under the SAME id as the public claim,
  *    its current claim_version, and a supporting claim_evidence_link, with the published status
  *    conventions canonical-convergence used for the ~15.7k claims already traced.
  *  - Resolves each citation to the existing evidence library without fragmenting it; see
  *    scripts/lib/canonical-claims-backfill-plan.ts for the rules.
- *  - Never touches bb_public, so published output is unchanged and no catalog republish is due.
+ *  - Never touches published, so published output is unchanged and no catalog republish is due.
  *
  * Transaction: ONE transaction for the whole run. Organizations, domains, evidence sources and
  * source items are shared across entities, and the plan resolves them globally (an organization
@@ -85,20 +85,20 @@ async function loadSnapshotBase(
     claims: unknown;
     release_id: string;
   }>(`
-    WITH active AS (SELECT release_id FROM bb_public.active_release WHERE id = 'active')
+    WITH active AS (SELECT release_id FROM published.active_release WHERE id = 'active')
     SELECT re.entity_id, re.kind, re.projection->>'researchCoverage' AS research_coverage,
            (e.id IS NOT NULL) AS canonical_entity_exists, re.claims, active.release_id
-    FROM bb_public.release_entities re
+    FROM published.release_entities re
     JOIN active ON re.release_id = active.release_id
-    LEFT JOIN bb_canonical.entities e ON e.id = re.entity_id
-    WHERE NOT EXISTS (SELECT 1 FROM bb_canonical.claims c WHERE c.entity_id = re.entity_id)
+    LEFT JOIN canonical.entities e ON e.id = re.entity_id
+    WHERE NOT EXISTS (SELECT 1 FROM canonical.claims c WHERE c.entity_id = re.entity_id)
     ORDER BY re.entity_id
   `);
   const active = await client.query<{ release_id: string }>(
-    `SELECT release_id FROM bb_public.active_release WHERE id = 'active'`,
+    `SELECT release_id FROM published.active_release WHERE id = 'active'`,
   );
   const releaseId = active.rows[0]?.release_id;
-  if (!releaseId) throw new Error('No active release (bb_public.active_release id=active)');
+  if (!releaseId) throw new Error('No active release (published.active_release id=active)');
 
   const entities: SnapshotEntity[] = entityRows.rows.map((row) => ({
     entityId: row.entity_id,
@@ -137,7 +137,7 @@ async function loadSnapshotBase(
   const mergedColumn = await client.query<{ present: boolean }>(`
     SELECT EXISTS (
       SELECT 1 FROM information_schema.columns
-      WHERE table_schema = 'bb_evidence' AND table_name = 'source_organizations'
+      WHERE table_schema = 'evidence' AND table_name = 'source_organizations'
         AND column_name = 'merged_into_organization_id'
     ) AS present
   `);
@@ -146,10 +146,10 @@ async function loadSnapshotBase(
   // Sequential on purpose: one client, one transaction, and pg deprecates concurrent queries.
   const organizations = await client.query<{ id: string; merged: string | null }>(
     `SELECT id, ${hasMergedColumn ? 'merged_into_organization_id' : 'NULL::text'} AS merged
-     FROM bb_evidence.source_organizations`,
+     FROM evidence.source_organizations`,
   );
   const domains = await client.query<{ id: string; organization_id: string; hostname: string }>(
-    `SELECT id, organization_id, hostname FROM bb_evidence.source_domains`,
+    `SELECT id, organization_id, hostname FROM evidence.source_domains`,
   );
   const sources = await client.query<{
     id: string;
@@ -157,8 +157,8 @@ async function loadSnapshotBase(
     item_count: number;
   }>(
     `SELECT s.id, s.organization_id, count(i.id)::int AS item_count
-     FROM bb_evidence.evidence_sources s
-     LEFT JOIN bb_evidence.source_items i ON i.source_id = s.id
+     FROM evidence.evidence_sources s
+     LEFT JOIN evidence.source_items i ON i.source_id = s.id
      GROUP BY s.id, s.organization_id`,
   );
   const items = await client.query<{
@@ -167,7 +167,7 @@ async function loadSnapshotBase(
     stable_identifier: string;
     url: string | null;
   }>(
-    `SELECT id, source_id, stable_identifier, url FROM bb_evidence.source_items
+    `SELECT id, source_id, stable_identifier, url FROM evidence.source_items
      WHERE url = ANY($1::text[]) OR stable_identifier = ANY($1::text[])`,
     [hrefs],
   );
@@ -177,7 +177,7 @@ async function loadSnapshotBase(
     source_item_id: string;
     excerpt: string | null;
   }>(
-    `SELECT id, source_item_id, excerpt FROM bb_evidence.evidence_records
+    `SELECT id, source_item_id, excerpt FROM evidence.evidence_records
      WHERE source_item_id = ANY($1::text[])`,
     [itemIds],
   );
@@ -214,7 +214,7 @@ async function loadSnapshotBase(
       sourceItemId: row.source_item_id,
       excerpt: row.excerpt,
     })),
-    existingClaimIds: await ids(client, 'bb_canonical.claims', publicClaimIds),
+    existingClaimIds: await ids(client, 'canonical.claims', publicClaimIds),
   };
 }
 
@@ -234,13 +234,13 @@ async function planWithExistence(client: Client): Promise<BackfillPlan> {
     links: new Set<string>(),
   };
   const tables = {
-    organizations: 'bb_evidence.source_organizations',
-    domains: 'bb_evidence.source_domains',
-    sources: 'bb_evidence.evidence_sources',
-    items: 'bb_evidence.source_items',
-    evidence: 'bb_evidence.evidence_records',
-    claimVersions: 'bb_canonical.claim_versions',
-    links: 'bb_canonical.claim_evidence_links',
+    organizations: 'evidence.source_organizations',
+    domains: 'evidence.source_domains',
+    sources: 'evidence.evidence_sources',
+    items: 'evidence.source_items',
+    evidence: 'evidence.evidence_records',
+    claimVersions: 'canonical.claim_versions',
+    links: 'canonical.claim_evidence_links',
   } as const;
   for (let round = 0; round < 5; round += 1) {
     const plan = buildBackfillPlan({ ...base, existingGeneratedIds: known });
@@ -295,7 +295,7 @@ async function applyPlan(client: Client, plan: BackfillPlan): Promise<void> {
     'source_organizations',
     insertRows(
       client,
-      'bb_evidence.source_organizations',
+      'evidence.source_organizations',
       { id: 'text', name: 'text', homepage: 'text' },
       plan.organizations,
     ),
@@ -305,7 +305,7 @@ async function applyPlan(client: Client, plan: BackfillPlan): Promise<void> {
     'source_domains',
     insertRows(
       client,
-      'bb_evidence.source_domains',
+      'evidence.source_domains',
       { id: 'text', organization_id: 'text', hostname: 'text' },
       plan.domains,
     ),
@@ -315,7 +315,7 @@ async function applyPlan(client: Client, plan: BackfillPlan): Promise<void> {
     'evidence_sources',
     insertRows(
       client,
-      'bb_evidence.evidence_sources',
+      'evidence.evidence_sources',
       {
         id: 'text',
         organization_id: 'text',
@@ -331,7 +331,7 @@ async function applyPlan(client: Client, plan: BackfillPlan): Promise<void> {
     'source_items',
     insertRows(
       client,
-      'bb_evidence.source_items',
+      'evidence.source_items',
       {
         id: 'text',
         source_id: 'text',
@@ -348,7 +348,7 @@ async function applyPlan(client: Client, plan: BackfillPlan): Promise<void> {
     'evidence_records',
     insertRows(
       client,
-      'bb_evidence.evidence_records',
+      'evidence.evidence_records',
       {
         id: 'text',
         source_item_id: 'text',
@@ -367,7 +367,7 @@ async function applyPlan(client: Client, plan: BackfillPlan): Promise<void> {
     'claims',
     insertRows(
       client,
-      'bb_canonical.claims',
+      'canonical.claims',
       {
         id: 'text',
         entity_id: 'text',
@@ -388,7 +388,7 @@ async function applyPlan(client: Client, plan: BackfillPlan): Promise<void> {
     'claim_versions',
     insertRows(
       client,
-      'bb_canonical.claim_versions',
+      'canonical.claim_versions',
       {
         id: 'text',
         claim_id: 'text',
@@ -409,7 +409,7 @@ async function applyPlan(client: Client, plan: BackfillPlan): Promise<void> {
     'claim_evidence_links',
     insertRows(
       client,
-      'bb_canonical.claim_evidence_links',
+      'canonical.claim_evidence_links',
       {
         id: 'text',
         claim_id: 'text',
@@ -433,17 +433,17 @@ async function applyPlan(client: Client, plan: BackfillPlan): Promise<void> {
     WITH planned AS (SELECT unnest($1::text[]) AS entity_id)
     SELECT
       (SELECT count(*)::int FROM planned p
-        WHERE NOT EXISTS (SELECT 1 FROM bb_canonical.claims c WHERE c.entity_id = p.entity_id)
+        WHERE NOT EXISTS (SELECT 1 FROM canonical.claims c WHERE c.entity_id = p.entity_id)
       ) AS entities_still_without_claims,
-      (SELECT count(*)::int FROM bb_canonical.claims c
+      (SELECT count(*)::int FROM canonical.claims c
         JOIN planned p ON p.entity_id = c.entity_id
         WHERE NOT EXISTS (
           SELECT 1
-          FROM bb_canonical.claim_versions v
-          JOIN bb_canonical.claim_evidence_links l ON l.claim_version_id = v.id
-          JOIN bb_evidence.evidence_records er ON er.id = l.evidence_id
-          JOIN bb_evidence.source_items si ON si.id = er.source_item_id
-          JOIN bb_evidence.evidence_sources es ON es.id = si.source_id
+          FROM canonical.claim_versions v
+          JOIN canonical.claim_evidence_links l ON l.claim_version_id = v.id
+          JOIN evidence.evidence_records er ON er.id = l.evidence_id
+          JOIN evidence.source_items si ON si.id = er.source_item_id
+          JOIN evidence.evidence_sources es ON es.id = si.source_id
           WHERE v.id = c.current_version_id AND l.claim_id = c.id
         )
       ) AS broken_chains
@@ -519,7 +519,7 @@ async function main(): Promise<void> {
       }
       await applyPlan(client, plan);
       await client.query('COMMIT');
-      console.log('Committed. bb_public untouched; no catalog republish needed.');
+      console.log('Committed. published untouched; no catalog republish needed.');
     } catch (error) {
       await client.query('ROLLBACK').catch(() => undefined);
       throw error;

@@ -39,7 +39,7 @@ async function applyFixes(
 ): Promise<void> {
   for (const fix of fixes) {
     const { rows } = await client.query<EntityRow>(
-      `SELECT status_history FROM bb_canonical.entities WHERE id = $1`,
+      `SELECT status_history FROM canonical.entities WHERE id = $1`,
       [fix.entityId],
     );
     const row = rows[0];
@@ -56,7 +56,7 @@ async function applyFixes(
     if (DRY_RUN || !APPLY) continue;
 
     await client.query(
-      `UPDATE bb_canonical.entities
+      `UPDATE canonical.entities
        SET status_history = $2::jsonb, updated_at = now()
        WHERE id = $1`,
       [fix.entityId, JSON.stringify(nextHistory)],
@@ -82,7 +82,7 @@ async function main(): Promise<void> {
 
     const { rows: gapLaws } = await client.query<{ id: string; display_name: string }>(
       `SELECT id, display_name
-       FROM bb_canonical.entities
+       FROM canonical.entities
        WHERE kind = 'law'
          AND id LIKE 'gap_%'
          AND (status_history IS NULL OR jsonb_array_length(status_history) = 0)
@@ -99,7 +99,7 @@ async function main(): Promise<void> {
       kind_detail: unknown;
     }>(
       `SELECT id, display_name, status_history, kind_detail
-       FROM bb_canonical.entities
+       FROM canonical.entities
        WHERE kind = 'case'
        ORDER BY display_name`,
     );

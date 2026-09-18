@@ -2,7 +2,7 @@
  * The comparison rules behind the projection-divergence audit.
  *
  * Two classes of case matter here and both are represented by the shapes that actually occur in
- * `bb_public`: the drift this must catch (a column or search row updated without the projection),
+ * `published`: the drift this must catch (a column or search row updated without the projection),
  * and the look-alikes it must NOT report, because a false positive in a gate costs more than the
  * drift it invents — an absent `related` key against an empty column, a blank jurisdiction label
  * against an omitted facet, topics in a different order.
@@ -192,7 +192,7 @@ describe('divergentFieldsForRow — drift on the release_entities columns', () =
   });
 });
 
-describe('divergentFieldsForRow — drift on bb_public.search_index', () => {
+describe('divergentFieldsForRow — drift on published.search_index', () => {
   it('catches an empty topics column against a projection carrying topicIds', () => {
     // The measured shape: incrementally published rows built with topicTags: [] published
     // topics: [] because `??` falls through on null only, so topic browse misses them.

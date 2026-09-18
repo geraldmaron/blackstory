@@ -1,5 +1,5 @@
 /**
- * Shared ON CONFLICT fragments for `bb_research.landscape_candidates` upserts.
+ * Shared ON CONFLICT fragments for `research.landscape_candidates` upserts.
  *
  * A re-stage (running a staging script again after correcting one record) upserts every row in
  * its cohort, including rows that were already accepted and have since been enriched or reviewed

@@ -15,6 +15,7 @@
  *     packages/ops-data/scripts/preview-republish-diff.ts --lane=nrhp-black-heritage
  */
 import pg from 'pg';
+import { loadReviewedClaimAssessments } from './lib/confidence.ts';
 import { normalizePgConnectionString } from './lib/pg-connection.ts';
 import {
   assessLandscapeDepth,
@@ -22,7 +23,6 @@ import {
   buildLiveDepthEntry,
   catalogDecisionFromRow,
   gateLandscapePublishCandidate,
-  liveClaimConfidence,
   liveLocationFromRow,
   parseCanonicalStatusSnapshot,
   type CatalogDecisionRow,
@@ -43,21 +43,21 @@ if (!databaseUrl) {
 
 /** Same shape the publish script reads, including the two computed release-overlap flags. */
 const LANDSCAPE_BY_LANE_SQL = `
-WITH active AS (SELECT release_id FROM bb_public.active_release LIMIT 1)
+WITH active AS (SELECT release_id FROM published.active_release LIMIT 1)
 SELECT lc.id, lc.lane, lc.kind, lc.display_name, lc.summary, lc.lat, lc.lng, lc.canonical_url,
        lc.source_item_id, lc.provenance, lc.payload,
        EXISTS (
          SELECT 1 FROM active a
-         JOIN bb_public.release_entities re ON re.release_id = a.release_id
+         JOIN published.release_entities re ON re.release_id = a.release_id
           AND re.entity_id = ANY(ARRAY[lc.id, lc.source_item_id])
        ) AS exact_in_release,
        EXISTS (
          SELECT 1 FROM active a
-         JOIN bb_public.release_entities re ON re.release_id = a.release_id
+         JOIN published.release_entities re ON re.release_id = a.release_id
           AND lower(re.display_name) = lower(lc.display_name)
           AND re.entity_id <> lc.id AND re.entity_id <> lc.source_item_id
        ) AS name_overlap
-FROM bb_research.landscape_candidates lc
+FROM research.landscape_candidates lc
 WHERE lc.lane = $1
 ORDER BY lc.id
 `;
@@ -77,7 +77,7 @@ const tally = (t: Record<string, number>, k: string) => {
 try {
   const releaseId = (
     await client.query<{ release_id: string }>(
-      `SELECT release_id FROM bb_public.active_release LIMIT 1`,
+      `SELECT release_id FROM published.active_release LIMIT 1`,
     )
   ).rows[0]?.release_id;
   if (!releaseId) throw new Error('no active release pointer');
@@ -89,19 +89,18 @@ try {
     (
       await client.query(
         `SELECT id AS entity_id, living_status, status_history, kind_detail
-           FROM bb_canonical.entities WHERE id = ANY($1::text[])`,
+           FROM canonical.entities WHERE id = ANY($1::text[])`,
         [ids],
       )
     ).rows.map((row) => [row.entity_id as string, parseCanonicalStatusSnapshot(row)]),
   );
-  // repo-vj7cs: the withdrawal rulings the publisher now gates on. Loaded here for the same
-  // reason liveDepth, liveConfidence and liveLocation are below: a preview that withholds an
-  // input the publisher supplies reports a republish the publisher would refuse to make.
+  // Load the same withdrawal decisions and reviewed assessments as publication; a preview
+  // missing those inputs would report an operation the publisher rejects.
   const catalogDecisionById = new Map(
     (
       await client.query<CatalogDecisionRow>(
         `SELECT entity_id, decision, reason
-           FROM bb_ops.catalog_decisions WHERE entity_id = ANY($1::text[])`,
+           FROM ops.catalog_decisions WHERE entity_id = ANY($1::text[])`,
         [ids],
       )
     ).rows.map((row) => [row.entity_id, catalogDecisionFromRow(row)]),
@@ -110,14 +109,15 @@ try {
     (
       await client.query<LivePublishedRow & { readonly entity_id: string }>(
         `SELECT e.entity_id, e.summary, e.claims, e.projection
-           FROM bb_public.release_entities e
-           JOIN bb_public.active_release a ON a.release_id = e.release_id
+           FROM published.release_entities e
+           JOIN published.active_release a ON a.release_id = e.release_id
           WHERE e.entity_id = ANY($1::text[])`,
         [ids],
       )
     ).rows.map((r) => [r.entity_id, r]),
   );
 
+  const reviewedClaims = await loadReviewedClaimAssessments(client, ids);
   const generatedAt = new Date().toISOString();
   const statusMoves: Record<string, number> = {};
   const eraMoves: Record<string, number> = {};
@@ -134,9 +134,6 @@ try {
     }
     const canonicalStatus = canonicalById.get(row.id);
     const liveDepth = assessLandscapeDepth(buildLiveDepthEntry(live), row);
-    const liveConfidence = liveClaimConfidence(live);
-    // Passed for the same reason liveDepth and liveConfidence are: a preview that withholds an
-    // input the publisher supplies reports rejections the publisher would not make (repo-lai8y).
     const liveLocation = liveLocationFromRow(live);
     const catalogDecision = catalogDecisionById.get(row.id);
     const gate = gateLandscapePublishCandidate({
@@ -145,7 +142,7 @@ try {
       generatedAt,
       allowRepublish: true,
       liveDepth,
-      liveConfidence,
+      reviewedClaims,
       ...(liveLocation !== undefined ? { liveLocation } : {}),
       ...(canonicalStatus !== undefined ? { canonicalStatus } : {}),
       ...(catalogDecision !== undefined ? { catalogDecision } : {}),

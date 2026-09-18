@@ -1,8 +1,4 @@
-/**
- * Resolves evidence-backed entity relationships for the `/history` graph release artifact
- * and edge builder. Prefers catalog `related` entries (same pipeline as national-catalog publish);
- * falls back to hand-authored seed edges when the catalog carries no extractable pairs.
- */
+/** Projects exact cited relationship claims from the released entity catalog. */
 import {
   extractCatalogRelationships,
   RELATIONSHIP_TYPES,
@@ -11,7 +7,6 @@ import {
   type EntityRelationship,
   type RelationshipType,
 } from '@repo/domain';
-import { SEED_ENTITY_RELATIONSHIPS } from '../../data/entity-graph-seed';
 import type { PublicEntityView } from '../../data/public-seed';
 
 const RELATIONSHIP_TYPE_SET = new Set<string>(RELATIONSHIP_TYPES);
@@ -45,5 +40,5 @@ export function resolveHistoryRelationships(
     }),
     { generatedAt },
   );
-  return relationships.length > 0 ? relationships : [...SEED_ENTITY_RELATIONSHIPS];
+  return relationships;
 }

@@ -1,23 +1,8 @@
 /**
- * Edge web security composed with query normalization, behind the maintenance wall — plus the
- * `/admin` staff-session gate.
- *
- * Was `middleware.ts`. Next 16 deprecated that file convention in favor of `proxy`, and allows
- * only one such entrypoint per app: there is no separate `middleware.ts` for `/admin` precisely
- * because Next 16 refuses to build with both present. `/admin` routes moved inside this app from
- * their own Next.js deployable (`apps/admin`) — see `docs/security/service-surfaces.md` — and
- * their edge auth gate (`./admin/admin-auth-gate.ts`) composes here rather than living in a file
- * of its own.
- *
- * This is also where the CSP nonce pipeline lives (repo-77nk): a nonce cannot be a static
- * `next.config.mjs` header, so it is generated once per request, forwarded to the app as the
- * `x-nonce` request header (Server Components with a manual `<script>` needing it read this back
- * with `headers()` — see the JSON-LD script components; the root layout's one manual script is
- * allowed by content hash instead, see THEME_BOOTSTRAP_SCRIPT_SHA256 in csp.ts), and set as the
- * `Content-Security-Policy` response header — uniformly, on every branch below, so no route
- * loses CSP coverage now that the static header is gone. `script-src` uses
- * `'nonce-<value>' 'strict-dynamic'` instead of `'unsafe-inline'`; see csp.ts for the directive
- * itself.
+ * Composes maintenance controls, query normalization, staff authentication and response
+ * security headers. Next.js uses one proxy entry point. A fresh nonce is forwarded through
+ * x-nonce and applied consistently to every response branch; the theme bootstrap uses its
+ * explicit content hash.
  */
 
 import { type NextRequest, NextResponse } from 'next/server';
@@ -72,12 +57,16 @@ export async function proxy(request: NextRequest): Promise<NextResponse> {
   // branch already set (maintenance-gate.ts, edge-security.ts both call `applySecurityHeaders`
   // without a nonce) is overwritten here with the nonce-bearing value — `Headers.set` replaces,
   // it does not append.
-  applySecurityHeaders(response.headers, { nonce });
+  const authUrl =
+    request.nextUrl.pathname === '/admin' || request.nextUrl.pathname.startsWith('/admin/')
+      ? process.env.NEXT_PUBLIC_SUPABASE_URL
+      : undefined;
+  applySecurityHeaders(response.headers, { nonce, ...(authUrl ? { authUrl } : {}) });
   return attachStandCookie(request, response);
 }
 
 async function resolveProxyResponse(request: NextRequest): Promise<NextResponse> {
-  // First, always. A walled request must not reach a route, a React render, or `bb_public` —
+  // First, always. A walled request must not reach a route, a React render, or `published` —
   // and that includes `/admin`: a maintenance window is not staff-exempt by default. Staff use
   // the same MAINTENANCE_BYPASS_TOKEN cookie redemption as anyone let through on purpose.
   const maintenanceResponse = handleMaintenance(request);

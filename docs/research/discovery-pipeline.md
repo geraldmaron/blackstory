@@ -106,9 +106,11 @@ Bands: `common` &lt; 0.35 ≤ `notable` &lt; 0.55 ≤ `obscure` &lt; 0.72 ≤ `h
 
 Disclaimer: `OBSCURITY_METHODOLOGY_DISCLAIMER` — relative heuristic only; never importance/truth/completeness; never authorizes publication.
 
-## Periodic schedule + operator dry-run
+## Explicit operator execution
 
-Roster job `community-obscurity-discovery` (`packages/config/src/scheduled-jobs/`) runs weekly (Sundays 10:00 UTC), kill switch `research-campaigns`, `publicEffect: none`, `rosterStatus: real`. **Production trigger:** ADR-018 (Firebase Functions v2 `onSchedule` calling `dispatchDiscoveryCampaign`) is dead — the Cloud Functions package was deleted (`repo-348e.8`) and `.github/workflows/discovery-campaigns.yml` is the live production scheduler (`../decisions-carryover.md`, "Small recovered decisions", ADR-018 entry). Cloud Run Jobs remain for runs that may exceed ~30 minutes. GHA weekly fixture smoke + `workflow_dispatch` are CI/operator paths. The Cloud Scheduler / Jobs mirror in `infra/gcp/scheduler/scheduled-jobs.json` stays `"status": design` until a human apply for the Jobs path.
+The roster retains cadence metadata, budgets and kill switches. It does not install schedules.
+Research is manual/headless only; use the operator CLI or manual Actions dispatch. No Corsair
+or Cloud Scheduler path is supported. See the [execution runbook](../runbooks/discovery-campaign-automation.md).
 
 On-demand (no network; pass a downloaded feed file):
 
@@ -131,32 +133,33 @@ After discovery/obscurity yields pending leads, run the editorial judge (`mock` 
 `publicSummary` with optional `[[entityId|Label]]` prose links, suggests related ids
 (vectors when provided), validates learning-summary + public-language gates, and stages
 quarantine packets — **never publishes**. Use `--concurrency N` for parallel subjects;
-`hybrid` fails over OpenRouter free → Ollama. Overnight Corsair job:
-[`docs/runbooks/overnight-hybrid-enrichment.md`](../runbooks/overnight-hybrid-enrichment.md).
+`hybrid` can fail over from the configured OpenRouter provider to the configured Ollama endpoint.
+Provider configuration is explicit; there is no host or schedule assumption.
 
 ```bash
 node --conditions development --import tsx packages/operator-cli/src/bin.ts pending-list --from /tmp/obscurity.json
 node --conditions development --import tsx packages/operator-cli/src/bin.ts enrichment-run \
   --subjects /tmp/subjects.json --provider hybrid \
   --model openai/gpt-oss-20b:free --ollama-model qwen3:8b --concurrency 4 \
-  --catalog-from=firestore \
+  --catalog-from=postgres \
   --operator-id "$USER" --session-id "sess-$(date +%s)" --identity-source cursor_session
 ```
 
-Embed the public catalog first (Gemini Developer API key required):
+Entity-vector backfill reads the released Postgres catalog. Set the database and Gemini credentials
+through the local environment; invoke only with an explicit item/cost cap. This is separate from
+evidence-passage retrieval:
 
 ```bash
-GEMINI_API_KEY=... APP_FIREBASE_ALLOW_PRODUCTION=1 FIREBASE_PROJECT_ID=black-book-efaaf \
   node --conditions development --import tsx \
-  packages/firebase/src/embeddings/backfill-cli.ts \
-  --source=publicSearchIndex --max-items 600 --max-cost-usd 1
+  packages/ops-data/src/embeddings/backfill-cli.ts \
+  --max-items 600 --max-cost-usd 1
 ```
 
 Skill: `.claude/skills/blackstory/editorial-enrichment/SKILL.md`.
 
 ## Deferred (not this bead)
 
-- Firestore persistence for discovery candidates and campaign runs
+- Postgres persistence for discovery candidates and campaign runs
 - Adapter-specific discovery implementations
 - Live catalog query wiring (callers supply profiles today)
 - Automatic `research-intake` commit of authority follow-ups

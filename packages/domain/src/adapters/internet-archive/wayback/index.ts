@@ -3,6 +3,7 @@
  */
 export {
   WAYBACK_SPN_SUBMIT_URL,
+  parseWaybackCaptureUrl,
   waybackSpnStatusUrl,
   SPN_STATUSES,
   WAYBACK_AVAILABILITY_URL,
@@ -30,11 +31,3 @@ export {
   buildWaybackCaptureUrl,
   type PollSpnStatusOptions,
 } from './client.js';
-
-export {
-  captureUrlToEvidencePointer,
-  requireCaptureBeforeReview,
-  requireCaptureForAllCandidates,
-  assertReviewEligible,
-  type CaptureAwareCandidate,
-} from './capture-gate.js';

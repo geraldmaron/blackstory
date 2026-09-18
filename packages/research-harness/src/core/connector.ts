@@ -1,17 +1,7 @@
-export type ConnectorKind = 'nps_network_to_freedom' | 'dpla' | 'wikidata' | 'web_search';
+import { parseCsvRows } from './csv.js';
+import type { HarnessSourceRecord } from '@repo/research-kernel';
 
-export interface HarnessRawSubject {
-  readonly id: string;
-  readonly connectorKind: ConnectorKind;
-  readonly title: string;
-  readonly description: string;
-  readonly coordinates?: { readonly latitude: number; readonly longitude: number } | undefined;
-  readonly locationName?: string | undefined;
-  readonly county?: string | undefined;
-  readonly state?: string | undefined;
-  readonly cites: readonly string[];
-  readonly rawRecord: Record<string, unknown>;
-}
+export type HarnessRawSubject = HarnessSourceRecord;
 
 export interface ConnectorFetchOptions {
   readonly query?: string;
@@ -20,32 +10,17 @@ export interface ConnectorFetchOptions {
   readonly county?: string;
 }
 
-/** Stateful CSV line splitter that respects quoted fields containing commas. */
-export function splitCsvLine(line: string): string[] {
-  const result: string[] = [];
-  let current = '';
-  let inQuotes = false;
-  for (let i = 0; i < line.length; i++) {
-    const char = line[i];
-    if (char === '"') {
-      inQuotes = !inQuotes;
-    } else if (char === ',' && !inQuotes) {
-      result.push(current.trim());
-      current = '';
-    } else {
-      current += char;
-    }
-  }
-  result.push(current.trim());
-  return result;
-}
-
-/** Parses a simulated NPS Network to Freedom CSV record row. */
+/** Normalizes a supplied NPS Network to Freedom record. */
 export function parseNpsNetworkToFreedomRow(row: Record<string, string>): HarnessRawSubject {
-  const latitude = row.latitude ? parseFloat(row.latitude) : undefined;
-  const longitude = row.longitude ? parseFloat(row.longitude) : undefined;
+  const latitude = row.latitude ? Number(row.latitude) : undefined;
+  const longitude = row.longitude ? Number(row.longitude) : undefined;
   const coords =
-    latitude !== undefined && longitude !== undefined && !isNaN(latitude) && !isNaN(longitude)
+    latitude !== undefined &&
+    longitude !== undefined &&
+    Number.isFinite(latitude) &&
+    Math.abs(latitude) <= 90 &&
+    Number.isFinite(longitude) &&
+    Math.abs(longitude) <= 180
       ? { latitude, longitude }
       : undefined;
 
@@ -68,21 +43,15 @@ export function fetchNpsNetworkToFreedom(
   csvData: string,
   options: ConnectorFetchOptions = {},
 ): readonly HarnessRawSubject[] {
-  const lines = csvData
-    .split('\n')
-    .map((line) => line.trim())
-    .filter(Boolean);
-  if (lines.length < 2) return [];
-
-  const firstLine = lines[0];
-  if (!firstLine) return [];
-  const headers = splitCsvLine(firstLine).map((h) => h.replace(/^"|"$/g, '').trim());
+  const lines = parseCsvRows(csvData);
+  const headers = lines[0]?.map((header) => header.trim());
+  if (!headers) return [];
   const subjects: HarnessRawSubject[] = [];
 
   for (let i = 1; i < lines.length; i++) {
     const rawLine = lines[i];
     if (rawLine === undefined) continue;
-    const values = splitCsvLine(rawLine).map((v) => v.replace(/^"|"$/g, '').trim());
+    const values = rawLine;
     const row: Record<string, string> = {};
     headers.forEach((header, idx) => {
       if (header) {
@@ -100,13 +69,18 @@ export function fetchNpsNetworkToFreedom(
   return subjects;
 }
 
-/** Queries DPLA API items (simulated search query mapping to standard shapes). */
+/** Normalizes supplied DPLA API records; this function does not fetch them. */
 export function fetchDplaItems(
   results: readonly Record<string, unknown>[],
   options: ConnectorFetchOptions = {},
 ): readonly HarnessRawSubject[] {
+  const limit = options.limit ?? 100;
+  if (!Number.isSafeInteger(limit) || limit < 1)
+    throw new Error('DPLA limit must be a positive integer');
   return results
     .map((item) => {
+      if (typeof item.id !== 'string' || !item.id.trim())
+        throw new Error('DPLA record requires a stable id');
       const sourceResource = (item.sourceResource || {}) as Record<string, unknown>;
       const title = Array.isArray(sourceResource.title)
         ? sourceResource.title[0]
@@ -118,7 +92,7 @@ export function fetchDplaItems(
       const isShownAt = item.isShownAt ? [String(item.isShownAt)] : [];
 
       return {
-        id: `dpla:${item.id || item.ingestDate || Math.random().toString()}`,
+        id: `dpla:${item.id}`,
         connectorKind: 'dpla' as const,
         title: String(title),
         description: String(description),
@@ -135,5 +109,6 @@ export function fetchDplaItems(
         );
       }
       return true;
-    });
+    })
+    .slice(0, limit);
 }

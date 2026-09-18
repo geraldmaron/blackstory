@@ -1,17 +1,17 @@
 /**
- * Verifies the public entity projection converter routes writes through the central
+ * Verifies the public entity projection validator routes writes through the central
  * redaction assertion (@repo/security) and learning-index gates so no prohibited
  * precision, residential address, short summary, or uncleared primaryImage can persist.
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { publicEntityProjectionConverter } from './firestore/index.js';
+import { preparePublicEntityProjectionForWrite } from './records/index.js';
 
 const LEARNING_SUMMARY =
   'A historically documented public place in the BlackStory learning index, with published ' +
   'claims and provenance suitable for educators and researchers.';
 
-test('public projection converter accepts a safe, coarse projection', () => {
+test('public projection validation accepts a safe, coarse projection', () => {
   const safe = {
     id: 'ent_1',
     releaseId: 'rel_1',
@@ -23,12 +23,12 @@ test('public projection converter accepts a safe, coarse projection', () => {
     claimIds: [],
     topicTags: ['community'],
   };
-  const stored = publicEntityProjectionConverter.toFirestore(safe);
+  const stored = preparePublicEntityProjectionForWrite(safe);
   assert.equal((stored as { id: string }).id, 'ent_1');
   assert.equal((stored as { summary: string }).summary, LEARNING_SUMMARY);
 });
 
-test('public projection converter rejects summaries below the learning-index minimum', () => {
+test('public projection validation rejects summaries below the learning-index minimum', () => {
   const shortSummary = {
     id: 'ent_short',
     releaseId: 'rel_1',
@@ -39,12 +39,12 @@ test('public projection converter rejects summaries below the learning-index min
     claimIds: [],
   };
   assert.throws(
-    () => publicEntityProjectionConverter.toFirestore(shortSummary),
+    () => preparePublicEntityProjectionForWrite(shortSummary),
     /Learning-index projection rejected|at least 120/,
   );
 });
 
-test('public projection converter drops incomplete primaryImage instead of persisting it', () => {
+test('public projection validation drops incomplete primaryImage instead of persisting it', () => {
   const withBadImage = {
     id: 'ent_img',
     releaseId: 'rel_1',
@@ -61,11 +61,11 @@ test('public projection converter drops incomplete primaryImage instead of persi
       rightsStatus: 'public_domain' as const,
     },
   };
-  const stored = publicEntityProjectionConverter.toFirestore(withBadImage);
+  const stored = preparePublicEntityProjectionForWrite(withBadImage);
   assert.equal(Object.hasOwn(stored, 'primaryImage'), false);
 });
 
-test('public projection converter rejects prohibited precision', () => {
+test('public projection validation rejects prohibited precision', () => {
   const unsafe = {
     id: 'ent_2',
     releaseId: 'rel_1',
@@ -76,10 +76,10 @@ test('public projection converter rejects prohibited precision', () => {
     location: { lat: 40.74, lng: -73.99, geohash: 'dr5r', precision: 'street_address' },
     claimIds: [],
   };
-  assert.throws(() => publicEntityProjectionConverter.toFirestore(unsafe), /prohibited precision/);
+  assert.throws(() => preparePublicEntityProjectionForWrite(unsafe), /prohibited precision/);
 });
 
-test('public projection converter rejects exact coordinates', () => {
+test('public projection validation rejects exact coordinates', () => {
   const unsafe = {
     id: 'ent_3',
     releaseId: 'rel_1',
@@ -90,5 +90,5 @@ test('public projection converter rejects exact coordinates', () => {
     location: { lat: 40.741895, lng: -73.989308, geohash: 'dr5ru', precision: 'city' },
     claimIds: [],
   };
-  assert.throws(() => publicEntityProjectionConverter.toFirestore(unsafe), /exact coordinate/);
+  assert.throws(() => preparePublicEntityProjectionForWrite(unsafe), /exact coordinate/);
 });

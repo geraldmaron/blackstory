@@ -1,6 +1,6 @@
 /**
  * Loads authored law and court-case records from a JSON file into
- * `bb_research.landscape_candidates`, validating every record against the publisher's own gate
+ * `research.landscape_candidates`, validating every record against the publisher's own gate
  * before anything is written: the record must satisfy `buildReleaseSourceFromLandscape`, clear
  * `assessLandscapeDepth` and `gateLandscapePublishCandidate`, and carry claims whose text will
  * later let `validateApplicability` bind a `law_applicability` row to it. Records are data, so the
@@ -20,7 +20,7 @@
  *
  * WHAT IT CANNOT PROVE. The gate is asked about a row that is not yet in the table, so
  * `exact_in_release` and `name_overlap` are read live from the active release and are true as of
- * this run. A standing `bb_ops.catalog_decisions` verdict is not consulted: these ids are new, so
+ * this run. A standing `ops.catalog_decisions` verdict is not consulted: these ids are new, so
  * there is nothing to consult, and the publisher reads it for every id regardless.
  *
  * Usage (repo root):
@@ -194,26 +194,26 @@ async function main(): Promise<void> {
     const ids = authored.map((record) => record.id);
     const names = authored.map((record) => record.displayName);
     const [release, existing, inRelease, overlapping, jurisdictions] = await Promise.all([
-      pool.query<{ release_id: string }>('SELECT release_id FROM bb_public.active_release LIMIT 1'),
+      pool.query<{ release_id: string }>('SELECT release_id FROM published.active_release LIMIT 1'),
       pool.query<{ id: string }>(
-        'SELECT id FROM bb_research.landscape_candidates WHERE id = ANY($1::text[])',
+        'SELECT id FROM research.landscape_candidates WHERE id = ANY($1::text[])',
         [ids],
       ),
       pool.query<{ entity_id: string }>(
-        `SELECT e.entity_id FROM bb_public.release_entities e
-         JOIN bb_public.active_release a ON a.release_id = e.release_id
+        `SELECT e.entity_id FROM published.release_entities e
+         JOIN published.active_release a ON a.release_id = e.release_id
          WHERE e.entity_id = ANY($1::text[])`,
         [ids],
       ),
       pool.query<{ display_name: string; entity_id: string }>(
-        `SELECT e.display_name, e.entity_id FROM bb_public.release_entities e
-         JOIN bb_public.active_release a ON a.release_id = e.release_id
+        `SELECT e.display_name, e.entity_id FROM published.release_entities e
+         JOIN published.active_release a ON a.release_id = e.release_id
          WHERE lower(e.display_name) = ANY(SELECT lower(n) FROM unnest($1::text[]) AS n)
            AND e.entity_id <> ALL($2::text[])`,
         [names, ids],
       ),
       pool.query<{ id: string }>(
-        'SELECT id FROM bb_reference.jurisdictions WHERE id = ANY($1::text[])',
+        'SELECT id FROM reference.jurisdictions WHERE id = ANY($1::text[])',
         [[...new Set(authored.map((record) => record.applicability.jurisdictionId))]],
       ),
     ]);
@@ -332,7 +332,7 @@ async function main(): Promise<void> {
       // written by some ingest run, and these records are no different for being authored by hand:
       // the run is what says where they came from and who may reuse the text.
       await client.query(
-        `INSERT INTO bb_research.source_program_runs (
+        `INSERT INTO research.source_program_runs (
            id, lane, source_program_id, source_program_name, custodian, license,
            rows_fetched, candidate_count, dropped_count, retrieved_at, summary, methodology_notes
          ) VALUES ($1,$2,$3,$4,$5,$6,$7,$7,0, now(), $8::jsonb, $9::jsonb)
@@ -370,7 +370,7 @@ async function main(): Promise<void> {
       for (const report of reports) {
         const row = report.row;
         await client.query(
-          `INSERT INTO bb_research.landscape_candidates (
+          `INSERT INTO research.landscape_candidates (
              id, run_id, lane, source_program_id, source_item_id, display_name, kind, summary,
              lat, lng, canonical_url, research_lane_only, status, provenance, payload, discovered_at
            ) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14::jsonb,$15::jsonb, now())
@@ -387,7 +387,7 @@ async function main(): Promise<void> {
              canonical_url = EXCLUDED.canonical_url,
              research_lane_only = EXCLUDED.research_lane_only,
              status = EXCLUDED.status,
-             provenance = bb_research.landscape_candidates.provenance || EXCLUDED.provenance,
+             provenance = research.landscape_candidates.provenance || EXCLUDED.provenance,
              payload = EXCLUDED.payload,
              updated_at = now()`,
           [

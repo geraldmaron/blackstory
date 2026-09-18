@@ -80,16 +80,13 @@ function assertDynamicAfterImports(source, label) {
 function main() {
   const errors = [];
 
-  // --- Route ownership: Door at `/`, Atlas at `/explore`, live JSON at `/explore/api` ---
-  //
-  // `/` is the Door (`DoorHome`, ISR). `/explore` is the Atlas instrument (`AtlasHome`,
-  // force-dynamic — searchParams filters). Exactly one explore page; no stale `(map)` group.
+  // The home journey and filtered browse route share DoorHome.
   const explorePages = walkFiles(APP_DIR).filter((f) =>
     /(^|\/)explore\/page\.tsx$/.test(relativeAppPath(f)),
   );
   if (explorePages.length !== 1) {
     errors.push(
-      `Expected exactly one explore/page.tsx (Atlas instrument); found ${explorePages.length}: ` +
+      `Expected exactly one explore/page.tsx (browse route); found ${explorePages.length}: ` +
         `${explorePages.map(relativeAppPath).join(', ') || '(none)'}`,
     );
   }
@@ -114,7 +111,7 @@ function main() {
   try {
     homeSource = readFileSync(home, 'utf8');
   } catch {
-    errors.push('Missing apps/web/src/app/page.tsx (the Atlas homepage)');
+    errors.push('Missing apps/web/src/app/page.tsx (the homepage)');
   }
 
   const exploreApiRoute = path.join(APP_DIR, 'explore', 'api', 'route.ts');
@@ -124,18 +121,11 @@ function main() {
     errors.push('Missing apps/web/src/app/explore/api/route.ts (live JSON refine endpoint)');
   }
 
-  // --- No seed bake at build (RUNTIME DATABASE_URL) ---
-  //
-  // `/` is ISR (Door pin plate). `/explore` is force-dynamic (Atlas filters via searchParams).
-  // `/entity/[id]` is ISR. force-dynamic on entity pages cost a CDN MISS on 100% of requests.
-  // The no-seed-bake guarantee comes from generateStaticParams returning [] unconditionally.
+  // Live home data is loaded at request time. Entity ISR generates only requested ids.
   if (homeSource !== undefined) {
     const homeLabel = relativeAppPath(home);
-    if (!/^export\s+const\s+revalidate\s*=\s*\d+/m.test(homeSource)) {
-      errors.push(`${homeLabel}: missing export const revalidate (Door ISR)`);
-    }
-    if (/^export\s+const\s+dynamic\s*=/m.test(homeSource)) {
-      errors.push(`${homeLabel}: must not declare force-dynamic — the Door is ISR`);
+    if (!/await connection\(\)/.test(homeSource)) {
+      errors.push(`${homeLabel}: must await connection() before reading the live catalog`);
     }
     if (!/DoorHome/.test(homeSource)) {
       errors.push(`${homeLabel}: must mount DoorHome, not the Atlas instrument`);
@@ -149,8 +139,8 @@ function main() {
     try {
       const exploreSource = readFileSync(explorePages[0], 'utf8');
       assertDynamicAfterImports(exploreSource, relativeAppPath(explorePages[0]));
-      if (!/AtlasHome/.test(exploreSource)) {
-        errors.push(`${relativeAppPath(explorePages[0])}: must mount AtlasHome`);
+      if (!/DoorHome/.test(exploreSource) || !/initialBrowse/.test(exploreSource)) {
+        errors.push(`${relativeAppPath(explorePages[0])}: must mount DoorHome with initialBrowse`);
       }
     } catch (error) {
       errors.push(error instanceof Error ? error.message : String(error));
@@ -195,7 +185,7 @@ function main() {
   }
 
   console.log(
-    'check-web-entity-visibility-guards: ok (Door at /, Atlas at /explore, /explore/api owned, segment config after imports)',
+    'check-web-entity-visibility-guards: ok (Door journey at /, shared browse at /explore, /explore/api owned, segment config after imports)',
   );
 }
 

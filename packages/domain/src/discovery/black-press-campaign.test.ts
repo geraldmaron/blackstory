@@ -201,7 +201,7 @@ test('cannot-publish holds: guard armed, forbidden ops throw, registration ships
   assert.ok(FORBIDDEN_DISCOVERY_OPERATIONS.length > 0);
   for (const operation of FORBIDDEN_DISCOVERY_OPERATIONS) {
     assert.throws(
-      () => assertDiscoveryCannotPublish({ operation, target: 'bb_public' }),
+      () => assertDiscoveryCannotPublish({ operation, target: 'published' }),
       /Discovery cannot publish/,
     );
   }

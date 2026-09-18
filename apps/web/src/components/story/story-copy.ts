@@ -39,22 +39,17 @@ export const STORY_COPY: readonly ChapterCopy[] = [
     heading: 'History happened {accent}.',
     accent: 'here',
     prose:
-      'Every record in this archive is tied to a place you can stand in. This is a short pass over what is in it. The map moves with the story.',
+      'This archive connects records to places where the evidence supports a location. This is a short pass over what is in it. The map moves with the story.',
     cite: 'Counts on this page are counts of the active release, not claims about everything that happened.',
   },
   {
     id: 'thickest',
-    kicker: 'Where the record is thickest',
+    kicker: 'Reading the gaps',
     heading: 'The archive is not {accent} spread.',
     accent: 'evenly',
     prose:
-      'Coverage follows surviving evidence. The Mississippi Delta, the Carolina low country and the District carry the deepest documentation in this release because that is where the paper survived: church minutes, school registers, deeds and National Register nominations.',
-    facts: [
-      { value: 'Delta', label: 'deepest coverage' },
-      { value: 'District of Columbia', label: 'most records per square mile' },
-      { value: 'South Carolina', label: 'deep low country record' },
-    ],
-    cite: 'Coverage depth is a statement about which sources survived, not about where history happened.',
+      'The map reflects surviving sources, what has been digitized, and what has been researched and reviewed here. A cluster can reflect concentrated cataloging as well as history. A blank area does not establish that nothing happened.',
+    cite: 'Release counts measure published records. They do not measure all surviving evidence or the full history of a place.',
   },
   {
     id: 'one-record',

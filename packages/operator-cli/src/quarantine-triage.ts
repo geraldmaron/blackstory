@@ -1,5 +1,5 @@
 /**
- * LLM-assisted triage for the Postgres-backed intake quarantine (`bb_submissions.intake_items`,
+ * LLM-assisted triage for the Postgres-backed intake quarantine (`submissions.intake_items`,
  * status='quarantined'). This is the write path `graylist-read` (cli.ts) documented as missing.
  *
  * Judging and writing are split on purpose:
@@ -10,11 +10,11 @@
  *
  * Authority stays inside what operator-cli already does elsewhere in this package (see
  * `intake.ts`'s header comment and `promotion-boundary.test.ts`): a 'case' decision opens a
- * real draft research case (`bb_research.cases`, `state: 'candidate'`) exactly like
- * `prepareLeadIntake` does for its own (Firestore-ledger) pipeline — it does not write
- * `bb_canonical.*`, evaluate a promotion gate, or otherwise decide anything is publishable.
+ * real draft research case (`research.cases`, `state: 'candidate'`) exactly like
+ * `prepareLeadIntake` does for its own intake pipeline — it does not write
+ * `canonical.*`, evaluate a promotion gate, or otherwise decide anything is publishable.
  * A 'reject'/'spam' decision only updates `intake_items.status`. Every decision is logged to
- * `bb_audit.events` with the model's rationale so a human can review what happened.
+ * `audit.events` with the model's rationale so a human can review what happened.
  */
 import { randomUUID } from 'node:crypto';
 import type { getOpsPostgresPool } from '@repo/data-access';
@@ -245,8 +245,8 @@ export type QuarantineTriageCommitSummary = {
 /**
  * Writes each plan's decision inside its own transaction: update `intake_items.status`
  * (guarded so an item already moved out of 'quarantined' is left alone rather than double-
- * processed), optionally insert the new `bb_research.cases` row, and always record a
- * `bb_audit.events` row carrying the model's rationale.
+ * processed), optionally insert the new `research.cases` row, and always record a
+ * `audit.events` row carrying the model's rationale.
  */
 export async function commitQuarantineTriagePlans(
   pool: Pool,
@@ -265,7 +265,7 @@ export async function commitQuarantineTriagePlans(
     try {
       await client.query('BEGIN');
       const updated = await client.query(
-        `UPDATE bb_submissions.intake_items
+        `UPDATE submissions.intake_items
             SET status = $1
           WHERE id = $2 AND status = 'quarantined'
         RETURNING id`,
@@ -279,7 +279,7 @@ export async function commitQuarantineTriagePlans(
       if (plan.write.caseWrite) {
         const record = plan.write.caseWrite.record;
         await client.query(
-          `INSERT INTO bb_research.cases (id, state, candidate_id, title, created_at, updated_at)
+          `INSERT INTO research.cases (id, state, candidate_id, title, created_at, updated_at)
            VALUES ($1, $2, $3, $4, $5, $6)`,
           [
             record.id,
@@ -292,7 +292,7 @@ export async function commitQuarantineTriagePlans(
         );
       }
       await client.query(
-        `INSERT INTO bb_audit.events
+        `INSERT INTO audit.events
            (id, action, category, actor, subject, reason, request_id, correlation_id,
             entity_id, idempotency_key, occurred_at, data)
          VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)`,

@@ -12,7 +12,7 @@ import {
   withRetry,
   type SafeHttpClient,
 } from '../shared/http-port.js';
-import { waybackSpnStatusUrl, WAYBACK_SPN_SUBMIT_URL } from './types.js';
+import { waybackSpnStatusUrl, WAYBACK_SPN_SUBMIT_URL, parseWaybackCaptureUrl } from './types.js';
 import type { SpnCredentials, SpnStatus, SpnStatusResult, SpnSubmitResult } from './types.js';
 
 const SPN_ALLOWED_CONTENT_TYPES = ['application/json'];
@@ -133,10 +133,15 @@ export async function pollSpnStatus(
       await sleep(delayMs);
     }
   }
-  return { status: 'error', message: 'timed_out_waiting_for_capture' };
+  return { status: 'pending', message: 'poll_budget_exhausted' };
 }
 
 /** Builds the deterministic Wayback capture pointer URL from a completed job's timestamp. */
 export function buildWaybackCaptureUrl(timestamp: string, originalUrl: string): string {
-  return `https://web.archive.org/web/${timestamp}/${originalUrl}`;
+  const pointer = parseWaybackCaptureUrl(
+    `https://web.archive.org/web/${timestamp}/${originalUrl}`,
+    originalUrl,
+  );
+  if (!pointer) throw new Error('Invalid Wayback capture timestamp or original URL');
+  return pointer.url;
 }

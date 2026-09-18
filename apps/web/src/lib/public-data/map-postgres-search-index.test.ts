@@ -71,7 +71,7 @@ test('mapPostgresSearchIndexRow reads evidenceInputs from facets', () => {
 
 test('mapPostgresSearchIndexRow ignores a row carrying only the retired derived tier', () => {
   // A legacy row whose facets hold `confidenceTier` and nothing else reads as unprojected, which
-  // is what keeps `/records` off a cached conclusion until the backfill lands (repo-6qjv0).
+  // is what keeps `/records` off a cached conclusion until the backfill lands.
   const doc = mapPostgresSearchIndexRow({
     id: 'ent_legacy_001',
     release_id: 'rel_live_001',

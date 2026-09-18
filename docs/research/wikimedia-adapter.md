@@ -34,7 +34,7 @@ Dry-run against the national catalog:
 
 ```bash
 node --conditions development --import tsx \
-  packages/firebase/scripts/dry-run-commons-entity-media.ts
+  packages/ops-data/scripts/dry-run-commons-entity-media.ts
 ```
 
 Efficiency: batch ≤50 titles/QIDs/files; skip entities with `primaryImage`; never download image bytes on dry-run.
@@ -66,5 +66,4 @@ Both `api` and `bulk` call the same normalizer (`normalizeWikimediaPage`). Fixtu
 ## Deferred (not this bead)
 
 - Live MediaWiki / Wikidata HTTP clients
-- Firestore persistence for adapter runs
 - Registry UI registration of `wikimedia-discovery-v1`

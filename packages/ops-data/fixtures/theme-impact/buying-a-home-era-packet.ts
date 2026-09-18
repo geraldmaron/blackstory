@@ -1,30 +1,10 @@
 /**
- * "Buying a home" era-immersion theme packet (theme_id: redlining).
- *
- * Era-immersion rewrite per docs/content/neo-voice.md Part III: a second-person
- * sequence of eras (1938, 1955, 1985) landing on a present-day (2023) close, each
- * era pairing a verbatim primary-document "rule in force" with the measured national
- * spine odds for that year. Numbers in the narrative are stated as odds/comparisons;
- * the exact figures and their provenance live in the observations below.
- *
- * Provenance note: every observation references a live bb_reference.statistical_observations
- * row (id, metric_id, estimate, reference_period, source, source_url, content_hash verified
- * against the warehouse on 2026-07-25; the 1950 and 1960 homeownership figures and the 1900/1940
- * closing-chart endpoints were re-verified against primary decennial volumes and corrected on
- * 2026-09-13, repo-uf6q — see packages/ops-data/fixtures/reference-indicators/
- * census-national-homeownership-by-race-1900-2000.csv for the per-decade citation trail). Every
- * quoted passage references a live bb_evidence.evidence_records / bb_canonical.claims row.
- * National spine series (spine-homeownership-black-us / -white-us) anchor the closing chart.
- *
- * method_stance: gated_causal_claim. Only the 1938 HOLC/FHA -> credit-access sentence
- * uses causal language, gated to Aaronson, Hartley & Mazumder (2021) via the artifact
- * claimId + packet causalClaimIds. Every other comparison (homeownership, income, wealth,
- * denial) is juxtaposition ("against", "alongside", "in the same year").
- *
- * This file is not wired into apply-theme-impact-packets.ts (that script publishes the
- * hardwired RESEARCHED_THEME_IMPACT_PACKETS set and requires status='published'). This
- * packet lands at status='review' via a direct upsert of the shape below into
- * bb_reference.theme_impact_packets.
+ * Redlining theme packet pairing historical rules with cited national statistical observations.
+ * Per-decade references are in
+ * fixtures/reference-indicators/census-national-homeownership-by-race-1900-2000.csv. Only the
+ * identified HOLC/FHA credit-access claim uses causal language, tied to Aaronson, Hartley and
+ * Mazumder (2021); other comparisons are descriptive. This review-status packet is separate
+ * from the researched-packet publisher.
  */
 
 const REDLINING = 'redlining' as const;
@@ -32,12 +12,9 @@ const NOW = '2026-07-25T00:00:00.000Z';
 const RETRIEVED = '2026-07-25T00:00:00.000Z';
 
 const CENSUS_HOUSING_SOURCE = 'Census Bureau Historical Census of Housing Tables';
-// The original URL (census.gov/topics/housing/homeownership/data/historical.html) 404s and never
-// carried a race breakout anyway (repo-uf6q, 2026-09-13). This is the closest live, on-topic
-// census.gov page still standing -- it has the TOTAL rate per decade but not a race breakout;
-// only used below for the 1980 figures, which remain UNVERIFIED against a primary race-tabulated
-// table this pass. The 1940/1950/1960 observations below cite the specific decennial volume each
-// figure was actually read from.
+// This Census page gives total homeownership rates without a race breakout. It is contextual
+// only for the unverified 1980 figures; the other observations cite their specific decennial
+// volumes.
 const CENSUS_HOUSING_URL =
   'https://www2.census.gov/programs-surveys/decennial/tables/time-series/census-housing-tables/owner.pdf';
 const ACS_SOURCE = 'ACS 1-Year Detailed Tables';
@@ -163,11 +140,9 @@ const OBSERVATIONS: Observation[] = [
     unit: 'percent',
     referencePeriod: '1960',
     label: 'Black homeownership rate, United States, 1960',
-    // UNVERIFIED (repo-uf6q, 2026-09-13): the 1960 volume's Table H gives a "Nonwhite" rate of
-    // 38.4% for 1960 (which this figure matches), but the summary chapter does not break tenure
-    // out by Negro specifically the way the 1940/1950 volumes do -- so this may overstate the
-    // true Negro-specific rate slightly, by the same kind of margin the 1940/1950 Negro-vs-
-    // Nonwhite gap showed (0.4-0.8 points). Left unchanged pending a follow-up.
+    // UNVERIFIED: Table H reports Nonwhite homeownership of 38.4%, not a separately verified
+    // Black rate. Do not present these populations as interchangeable; a race-specific primary
+    // table is still needed.
     source: CENSUS_HOUSING_SOURCE,
     sourceUrl:
       'https://www2.census.gov/library/publications/decennial/1960/housing-volume-1/41962442v1p1ch01.pdf',
@@ -210,8 +185,7 @@ const OBSERVATIONS: Observation[] = [
     unit: 'percent',
     referencePeriod: '1980',
     label: 'Black homeownership rate, United States, 1980',
-    // UNVERIFIED (repo-uf6q, 2026-09-13): no primary 1980 Census of Housing race-tenure table
-    // was located this pass. Left unchanged.
+    // UNVERIFIED: no primary race-specific 1980 tenure table is attached to this figure.
     source: CENSUS_HOUSING_SOURCE,
     sourceUrl: CENSUS_HOUSING_URL,
     contentHash: 'b8ce1edee93e4d0737aaf87eac2912fcdaca5f441b583cd32ebc4b33fd5948d1',
@@ -225,7 +199,7 @@ const OBSERVATIONS: Observation[] = [
     unit: 'percent',
     referencePeriod: '1980',
     label: 'White homeownership rate, United States, 1980',
-    // UNVERIFIED (repo-uf6q, 2026-09-13) -- see the Black 1980 observation above.
+    // UNVERIFIED: the primary-table gap also applies to this 1980 comparison.
     source: CENSUS_HOUSING_SOURCE,
     sourceUrl: CENSUS_HOUSING_URL,
     contentHash: '610bc8d477835448d454dd99daf3faa9acefa8c3262bc7cd024f31db97504a00',

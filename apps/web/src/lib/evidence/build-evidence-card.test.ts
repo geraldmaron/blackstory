@@ -10,8 +10,6 @@ import {
   buildEvidenceCards,
   mostRecentLastCheckedAt,
   resolveRecordSourceLineage,
-  totalSourceLineageCount,
-  uniqueCitationSourceCount,
 } from './build-evidence-card';
 import type { EvidenceClaimInput } from './types';
 
@@ -123,59 +121,39 @@ test('defaults revisionHistory to an empty array rather than undefined when omit
   assert.deepEqual(card.revisionHistory, []);
 });
 
-test('totalSourceLineageCount sums independent lineage counts across cards', () => {
+test('does not sum lineage counts that may overlap across claims', () => {
   const cards = buildEvidenceCards([
     { ...BASE_CLAIM, id: 'a', sourceLineage: { independentLineageCount: 2 } },
-    { ...BASE_CLAIM, id: 'b', sourceLineage: { independentLineageCount: 1 } },
-    { ...BASE_CLAIM, id: 'c' },
+    { ...BASE_CLAIM, id: 'b', sourceLineage: { independentLineageCount: 2 } },
   ]);
-  assert.equal(totalSourceLineageCount(cards), 3);
+  assert.equal(resolveRecordSourceLineage(cards), undefined);
+  assert.deepEqual(resolveRecordSourceLineage(cards, { independentLineageCount: 2 }), {
+    independentLineageCount: 2,
+  });
 });
 
-test('uniqueCitationSourceCount counts distinct non-empty citation sources case-insensitively', () => {
+test('preserves the reviewed count when one claim represents the entire record', () => {
   const cards = buildEvidenceCards([
-    {
-      ...BASE_CLAIM,
-      id: 'a',
-      citation: { ...BASE_CLAIM.citation, source: 'National Archives (seed)' },
-    },
-    {
-      ...BASE_CLAIM,
-      id: 'b',
-      citation: { ...BASE_CLAIM.citation, source: '  national archives (seed)  ' },
-    },
-    {
-      ...BASE_CLAIM,
-      id: 'c',
-      citation: { ...BASE_CLAIM.citation, source: 'D.C. Historical Society (seed)' },
-    },
-    { ...BASE_CLAIM, id: 'd', citation: { ...BASE_CLAIM.citation, source: '' } },
-  ]);
-  assert.equal(uniqueCitationSourceCount(cards), 2);
-});
-
-test('resolveRecordSourceLineage prefers the sum of per-claim lineage counts', () => {
-  const cards = buildEvidenceCards([
-    { ...BASE_CLAIM, id: 'a', sourceLineage: { independentLineageCount: 2 } },
-    { ...BASE_CLAIM, id: 'b', sourceLineage: { independentLineageCount: 1 } },
-  ]);
-  assert.deepEqual(resolveRecordSourceLineage(cards), { independentLineageCount: 3 });
-});
-
-test('resolveRecordSourceLineage falls back to distinct citation sources when lineage is absent', () => {
-  const cards = buildEvidenceCards([
-    {
-      ...BASE_CLAIM,
-      id: 'a',
-      citation: { ...BASE_CLAIM.citation, source: 'National Archives (seed)' },
-    },
-    {
-      ...BASE_CLAIM,
-      id: 'b',
-      citation: { ...BASE_CLAIM.citation, source: 'D.C. Historical Society (seed)' },
-    },
+    { ...BASE_CLAIM, sourceLineage: { independentLineageCount: 2 } },
   ]);
   assert.deepEqual(resolveRecordSourceLineage(cards), { independentLineageCount: 2 });
+});
+
+test('does not infer independence from distinct citation labels or URLs', () => {
+  const cards = buildEvidenceCards([
+    { ...BASE_CLAIM, id: 'a' },
+    {
+      ...BASE_CLAIM,
+      id: 'b',
+      citation: {
+        source: 'A different label',
+        label: 'Secondary',
+        href: 'https://example.org/copied',
+      },
+    },
+  ]);
+  assert.equal(resolveRecordSourceLineage(cards), undefined);
+  assert.equal(resolveRecordSourceLineage(cards.slice(0, 1)), undefined);
 });
 
 test('resolveRecordSourceLineage returns undefined when there is no lineage or citation source signal', () => {

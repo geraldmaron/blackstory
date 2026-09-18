@@ -138,7 +138,7 @@ test('isFactSearchIndexable is true only for published/corrected', () => {
   assert.equal(isFactSearchIndexable(buildFixtureFact({ status: 'superseded' })), false);
 });
 
-// --- derivation-consistency wiring (the related workstream) ---
+// Derivation-consistency integration checks.
 
 const BACKING_CLAIM = {
   id: 'claim-1',

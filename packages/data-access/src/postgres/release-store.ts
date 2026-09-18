@@ -1,15 +1,4 @@
-/**
- * Postgres-backed mobile release store for MOB-005 (the Postgres SoR cutover —
- * `docs/decisions-carryover.md`, "entity source-of-truth precedence").
- *
- * Persists immutable release artifacts, release registry rows, and the compare-and-set
- * mobile release pointer in `bb_public.materialized_snapshots` — the same table Firestore
- * `publicMeta/*` docs migrate into. On pointer flip, optionally syncs `bb_public.active_release`
- * and `bb_publication.releases` so api-public Postgres readers see the new active release.
- *
- * GCS/Firebase Storage remains the blob surface for large artifacts in production; snapshot
- * rows store canonical JSON + hashes for validation and rollback drills.
- */
+/** Postgres release storage for immutable artifacts, registry rows and compare-and-set mobile pointers. Snapshot rows retain canonical JSON and hashes for validation and rollback. */
 import type pg from 'pg';
 import {
   ReleaseActivationError,
@@ -219,7 +208,7 @@ export type SyncPublicationPointerOptions = {
   readonly manifest: MobileBootstrapManifest;
 };
 
-/** Keeps bb_public.active_release aligned with the mobile pointer flip (Postgres SoR). */
+/** Keeps published.active_release aligned with the mobile pointer flip (Postgres SoR). */
 export async function syncPublicationPointerRow(
   options: SyncPublicationPointerOptions,
 ): Promise<void> {
@@ -228,7 +217,7 @@ export async function syncPublicationPointerRow(
   const searchIndexVersion = manifest.searchIndexVersion ?? manifest.activeRelease.releaseId;
 
   await client.query(
-    `INSERT INTO bb_publication.releases
+    `INSERT INTO publication.releases
       (id, status, signed_manifest, search_index_version, activated_at, updated_at)
      VALUES ($1, 'active', $2::jsonb, $3, $4::timestamptz, now())
      ON CONFLICT (id) DO UPDATE SET
@@ -247,7 +236,7 @@ export async function syncPublicationPointerRow(
 
   if (pointer.previousReleaseId) {
     await client.query(
-      `UPDATE bb_publication.releases
+      `UPDATE publication.releases
        SET status = 'superseded', updated_at = now()
        WHERE id = $1 AND status = 'active'`,
       [pointer.previousReleaseId],
@@ -255,7 +244,7 @@ export async function syncPublicationPointerRow(
   }
 
   await client.query(
-    `INSERT INTO bb_public.active_release
+    `INSERT INTO published.active_release
       (id, release_id, activated_at, search_index_version, manifest_hash)
      VALUES ('active', $1, $2::timestamptz, $3, $4)
      ON CONFLICT (id) DO UPDATE SET
@@ -365,7 +354,7 @@ export function createPoolPostgresReleaseStoreBackend(pool: pg.Pool): PostgresRe
   return {
     async read(key) {
       const result = await pool.query<{ payload: unknown }>(
-        `SELECT payload FROM bb_public.materialized_snapshots WHERE name = $1 LIMIT 1`,
+        `SELECT payload FROM published.materialized_snapshots WHERE name = $1 LIMIT 1`,
         [key],
       );
       const payload = result.rows[0]?.payload;
@@ -377,14 +366,14 @@ export function createPoolPostgresReleaseStoreBackend(pool: pg.Pool): PostgresRe
 
     async listKeys(prefix) {
       const result = await pool.query<{ name: string }>(
-        `SELECT name FROM bb_public.materialized_snapshots WHERE name LIKE $1 ORDER BY name`,
+        `SELECT name FROM published.materialized_snapshots WHERE name LIKE $1 ORDER BY name`,
         [`${prefix}%`],
       );
       return result.rows.map((row) => row.name);
     },
 
     async delete(key) {
-      await pool.query(`DELETE FROM bb_public.materialized_snapshots WHERE name = $1`, [key]);
+      await pool.query(`DELETE FROM published.materialized_snapshots WHERE name = $1`, [key]);
     },
 
     async runTransaction(operation) {
@@ -402,7 +391,7 @@ export function createPoolPostgresReleaseStoreBackend(pool: pg.Pool): PostgresRe
         const transaction: PostgresReleaseStoreTransaction = {
           get: async (key) => {
             const result = await client.query<{ payload: unknown }>(
-              `SELECT payload FROM bb_public.materialized_snapshots WHERE name = $1 FOR UPDATE`,
+              `SELECT payload FROM published.materialized_snapshots WHERE name = $1 FOR UPDATE`,
               [key],
             );
             const payload = result.rows[0]?.payload;
@@ -420,13 +409,13 @@ export function createPoolPostgresReleaseStoreBackend(pool: pg.Pool): PostgresRe
         const result = await operation(transaction);
         for (const write of pending) {
           if (write.kind === 'delete') {
-            await client.query(`DELETE FROM bb_public.materialized_snapshots WHERE name = $1`, [
+            await client.query(`DELETE FROM published.materialized_snapshots WHERE name = $1`, [
               write.key,
             ]);
             continue;
           }
           await client.query(
-            `INSERT INTO bb_public.materialized_snapshots (name, payload, updated_at)
+            `INSERT INTO published.materialized_snapshots (name, payload, updated_at)
              VALUES ($1, $2::jsonb, now())
              ON CONFLICT (name) DO UPDATE SET payload = EXCLUDED.payload, updated_at = now()`,
             [write.key, JSON.stringify(write.payload)],
@@ -448,7 +437,7 @@ export function createPoolPostgresReleaseStoreBackend(pool: pg.Pool): PostgresRe
   };
 }
 
-/** Production store: materialized_snapshots + bb_public.active_release sync on pointer flip. */
+/** Production store: materialized_snapshots + published.active_release sync on pointer flip. */
 export function createPoolPostgresReleaseStore(pool: pg.Pool): PostgresReleaseStore {
   const backend = createPoolPostgresReleaseStoreBackend(pool);
   return createPostgresReleaseStore(backend, {

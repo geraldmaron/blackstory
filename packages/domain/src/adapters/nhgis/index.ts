@@ -3,7 +3,7 @@
  * IPUMS API v2 async EXTRACT workflow (submit → poll → download a CSV zip) and parsed here.
  * A registered `NHGIS_API_KEY` is required (a human gate; see external-data-sources.ts). This
  * module is pure/injectable: the parser takes CSV text, the client takes an injected fetch — no
- * filesystem or unzip (the firebase loader owns download + unzip against Cloud Storage).
+ * filesystem or unzip (the acquisition adapter owns download and extraction).
  *
  * Verified end-to-end for 1860 (extract → parse → cross-checked vs twps0056 national totals
  * within the expected ~0.3% "population not in any county" residual). Additional decades are

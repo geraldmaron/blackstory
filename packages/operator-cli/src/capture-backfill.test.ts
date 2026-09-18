@@ -19,17 +19,22 @@ function fakeDb(
   const writes: { sql: string; params?: readonly unknown[] }[] = [];
   return {
     writes,
+    async connect() {
+      return { query: this.query.bind(this), release() {} };
+    },
     async query<T = Record<string, unknown>>(sql: string, params?: readonly unknown[]) {
       if (sql.includes('theme_impact_packets')) {
         return { rows: [{ ref_id: 'obs1', url: 'https://census.gov/a' }] as unknown as T[] };
       }
-      if (sql.includes('bb_reference.articles')) {
+      if (sql.includes('reference.articles')) {
         return { rows: [{ ref_id: 'art1', url: 'https://census.gov/a' }] as unknown as T[] };
       }
       if (sql.includes('release_entities')) {
         return { rows: entityRows as unknown as T[] };
       }
       writes.push({ sql, params });
+      if (sql.includes('INSERT INTO evidence.capture_origins'))
+        return { rows: [{ source_item_id: 'fixture-item' }] as unknown as T[] };
       if (sql.includes('source_captures')) return { rows: [{ id: 'x' }] as unknown as T[] };
       return { rows: [] as T[] };
     },
@@ -66,7 +71,7 @@ test('dry-run inventories all surfaces, dedupes, and writes nothing', async () =
   assert.equal(report.mode, 'dry-run');
   assert.equal(report.totalUnique, 2); // census.gov/a (packet+article dup) + bls.gov/b
   assert.equal(report.inventory.packet.cited, 1);
-  assert.equal(report.inventory.article.unique, 0); // dup
+  assert.equal(report.inventory.article.unique, 1); // dup
   assert.equal(report.attempted, 0);
   assert.equal(db.writes.length, 0); // no writes on dry-run
   assert.equal(report.wayback.status, 'off');

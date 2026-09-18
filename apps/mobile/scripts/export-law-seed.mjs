@@ -1,7 +1,7 @@
 /**
  * Export the legal snapshot catalog from the active Supabase release into mobile JSON.
  *
- * Source of truth is bb_public.release_legal_snapshots (published by
+ * Source of truth is published.release_legal_snapshots (published by
  * packages/ops-data/scripts/load-legal-snapshots-to-supabase.ts), not a committed
  * TS seed. Each payload is already the public document shape; the mapping below
  * only flattens a payload into the entry row the mobile law catalog reads.
@@ -33,8 +33,8 @@ const client = new pg.Client({
 await client.connect();
 const { rows: released } = await client.query(`
   SELECT release_id, payload
-  FROM bb_public.release_legal_snapshots
-  WHERE release_id = (SELECT release_id FROM bb_public.active_release WHERE id = 'active')
+  FROM published.release_legal_snapshots
+  WHERE release_id = (SELECT release_id FROM published.active_release WHERE id = 'active')
   ORDER BY snapshot_id
 `);
 await client.end();

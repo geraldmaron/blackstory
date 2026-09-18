@@ -171,7 +171,7 @@ export function resolveEntityContainmentPaths(
 // `../geography/jurisdiction-refs.ts` resolver-port pattern.
 // ---------------------------------------------------------------------------
 
-/** Minimal read port a projection build supplies; a real implementation is Firestore-backed
+/** Minimal read port a projection build supplies; a real implementation is Postgres-backed
  * against the `jurisdictions` collection. Mirrors `JurisdictionResolver`'s shape in
  * `../geography/jurisdiction-refs.ts` (sync-or-async, structurally typed, no import needed). */
 export type JurisdictionParentLookup = {

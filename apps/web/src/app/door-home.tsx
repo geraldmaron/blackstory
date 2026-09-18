@@ -78,7 +78,7 @@ export async function DoorHome({ params = {}, initialBrowse = false }: DoorHomeP
 
   return (
     <main id="main" className="ds-door">
-      {/* The plate is the only map on `/` (repo-18ma2): without JavaScript there is no map at
+      {/* The plate is the only map on `/`: without JavaScript there is no map at
           all, so say so once and point at the index that needs none. Cold browse keeps a
           filterable list so deep links stay useful without JS. */}
       <noscript>

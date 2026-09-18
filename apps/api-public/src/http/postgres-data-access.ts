@@ -1,5 +1,5 @@
 /**
- * Live Postgres `bb_public` bindings for `PublicDataAccess` (MOB-004; the Postgres SoR cutover,
+ * Live Postgres `published` bindings for `PublicDataAccess` (MOB-004; the Postgres SoR cutover,
  * `docs/decisions-carryover.md`, "entity source-of-truth precedence").
  *
  * Reads the same Supabase Postgres projections as `apps/web/src/lib/public-data/postgres-readers.ts`
@@ -74,15 +74,9 @@ export type CreatePostgresDataAccessReadersOptions = {
 };
 
 /**
- * Matches `apps/web`'s release-catalog cache window (`RELEASE_CATALOG_REVALIDATE_SECONDS`).
- *
- * Correction (repo-csw0 follow-up): release contents are NOT immutable once published —
- * `packages/ops-data/scripts` fix/backfill scripts upsert `bb_public.release_entities` in
- * place under the same release id, without bumping `active_release.activated_at`. So this
- * TTL is a real freshness bound on editorial corrections, not just a memory bound. 30 minutes
- * bounds visible staleness to roughly TTL + the artifact-republish cron interval
- * (`publish-release-catalog-artifacts.yml`) while keeping Postgres pulls far below the
- * pre-fix per-request rate.
+ * Matches the web release-catalog cache window. Operators can correct rows under the same
+ * release id, so this TTL bounds cache freshness after artifact publication. Artifact
+ * regeneration is explicit; no scheduled republish is assumed.
  */
 const ENTITY_PROJECTIONS_CACHE_TTL_MS = 30 * 60 * 1000;
 /** Only ever 1-2 releases are active in practice; bounded defensively against release churn. */
@@ -286,9 +280,8 @@ export function createPostgresDataAccessReaders(
     },
 
     async readEntityRedirect(releaseId, entityId): Promise<string | undefined> {
-      // Uncached on purpose: it only runs on a miss, it is a primary-key point-get against a
-      // table with one row per merge (16 on 2026-09-13), and caching it would hold a stale
-      // forwarding address after a merge is reversed.
+      // Read merge redirects without caching: the primary-key lookup occurs only on an entity
+      // miss, and a reversed merge must not retain a stale forwarding address.
       return fetchPublicEntityRedirect(releaseId, entityId, runQuery);
     },
 

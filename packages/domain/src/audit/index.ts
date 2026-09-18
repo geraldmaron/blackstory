@@ -1,6 +1,6 @@
 /**
  * Append-only audit contracts and publication-history reconstruction.
- * These framework-independent types are shared by Firestore writers, consumers, and future APIs.
+ * These framework-independent types are shared by persistence adapters and their consumers.
  */
 export const AUDIT_EVENT_ACTIONS = [
   'policy.changed',

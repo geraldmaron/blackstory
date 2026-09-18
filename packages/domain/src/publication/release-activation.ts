@@ -4,7 +4,7 @@
  * immutable publication snapshots") and `workers/publication/MAP_SOURCE_INTEGRATION.md` describe
  * as designed but not wired. It is implemented and tested here, and still not wired: nothing
  * outside this package's own tests calls `activateRelease`, `rollbackTo` or `collectGarbage`, and
- * the live publish path upserts `bb_public` under the unchanged active release id instead.
+ * the live publish path upserts `published` under the unchanged active release id instead.
  *
  * Responsibilities, all fail-closed:
  *  - GENERATE every release-coupled aggregate artifact deterministically from one release's inputs:
@@ -22,7 +22,7 @@
  *  - GARBAGE-COLLECT old releases while structurally refusing to delete the active or the
  *    immediately-previous (rollback-target) release.
  *
- * The `ReleaseStore` is the seam a real Firebase/GCP adapter implements; `createInMemoryReleaseStore`
+ * The `ReleaseStore` is the seam a persistent adapter implements; `createInMemoryReleaseStore`
  * is a complete, tested reference implementation used by the sandbox tests here. Emulator-backed
  * integration and real CDN cache-header verification are deferred to MOB-021's launch gate.
  */

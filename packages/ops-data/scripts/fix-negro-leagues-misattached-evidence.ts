@@ -1,38 +1,8 @@
 /**
- * repo-2t04.7 — corrects a name-collision bug in the automated evidence sweep.
- *
- * Running sweep-entity-evidence.ts over the negro-leagues-hof lane (2026-08-16) fetched the
- * WRONG Wikipedia article for 5 of 27 entities: the sweep's identity check only corroborates that
- * the subject's name tokens appear in the article (`nameCorroborated`), with no check that the
- * article's SUBJECT MATTER matches (baseball, Negro Leagues). Five Hall of Fame players share a
- * name with an unrelated notable person, and the wrong article passed corroboration every time:
- *
- *   - negro-leagues-hof-brown-ray   -> fetched "Ray Brown (musician)" (a jazz bassist)
- *   - negro-leagues-hof-foster-bill -> fetched "Bill Foster (character)" (a FICTIONAL character)
- *   - negro-leagues-hof-grant-frank -> fetched "Frank Grant (boxer)"
- *   - negro-leagues-hof-williams-joe-> fetched "Joe Williams (jazz singer)"
- *   - negro-leagues-hof-taylor-ben  -> fetched "Ben Taylor (newspaper editor)" (this one WAS
- *     correctly auto-quarantined by the sweep's own quality check, but for the wrong reason —
- *     confirmed the sweep does not reliably catch this failure mode)
- *
- * Verified the correct disambiguated Wikipedia titles by search (Ray Brown (Negro leagues
- * pitcher), Bill Foster (baseball), Frank Grant (baseball), Smokey Joe Williams, Ben Taylor
- * (first baseman, born 1888)) and fetched their real extracts via the same en.wikipedia.org
- * action=query&prop=extracts API the project's own wikipedia.ts collector uses — not an
- * AI-summarized fetch, so citation quotes anchor to the actual article text.
- *
- * This script: (1) quarantines the mis-attached rows so fetchEnrichmentSubjects never offers them
- * to a drafter again, (2) inserts the corrected evidence as status='captured'.
- *
- * Usage (from repo root):
- *   set -a && source apps/web/.env.local && set +a
- *   export DATABASE_SSL=1
- *   node --conditions development --import tsx \
- *     packages/ops-data/scripts/fix-negro-leagues-misattached-evidence.ts
- *
- * Apply:
- *   DRY_RUN=0 FIX_NEGRO_LEAGUES_EVIDENCE_APPLY=1 node --conditions development --import tsx \
- *     packages/ops-data/scripts/fix-negro-leagues-misattached-evidence.ts
+ * Quarantines misattached namesake articles and inserts evidence for the identified Negro
+ * Leagues players. Name-token overlap alone cannot establish subject identity; occupation and
+ * article subject matter must agree. Default dry-run; writes require DRY_RUN=0 and
+ * FIX_NEGRO_LEAGUES_EVIDENCE_APPLY=1.
  */
 import { createHash } from 'node:crypto';
 import pg from 'pg';
@@ -137,7 +107,7 @@ async function main(): Promise<void> {
         if (!extract) continue;
 
         const quarantined = await client.query(
-          `UPDATE bb_research.entity_evidence
+          `UPDATE research.entity_evidence
               SET status = 'quarantined',
                   provenance = provenance || '{"misattached": true, "misattachedReason": "wrong subject — name collision, corrected by fix-negro-leagues-misattached-evidence.ts"}'::jsonb
             WHERE entity_id = $1 AND collector = 'wikipedia' AND title = $2`,
@@ -147,7 +117,7 @@ async function main(): Promise<void> {
         const contentHash = createHash('sha256').update(extract.extract).digest('hex');
         const id = `ev_fix_${c.entityId.replace(/-/g, '_')}_wikipedia`;
         await client.query(
-          `INSERT INTO bb_research.entity_evidence
+          `INSERT INTO research.entity_evidence
              (id, entity_id, lane, collector, source_url, source_tier, title, content_text,
               content_hash, char_count, quality_score, status, provenance, fetched_at)
            VALUES ($1,$2,'negro-leagues-hof','wikipedia',$3,'tier2',$4,$5,$6,$7,0.9,'captured',$8::jsonb, now())

@@ -62,7 +62,7 @@ if ! gcloud iam workload-identity-pools describe "$POOL_ID" \
   --project="$PROJECT_ID" \
   --location=global \
   --format='yaml(name,state)' 2>/dev/null; then
-  skip_or_fail "WIF pool ${POOL_ID} not found (declarative only until apply-wif.sh --apply)"
+  skip_or_fail "WIF pool ${POOL_ID} not found (provisioning is managed outside this repository)"
 fi
 
 echo "==> Provider ${PROVIDER_ID}"

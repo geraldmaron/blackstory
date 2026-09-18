@@ -30,7 +30,7 @@ type RelationshipRow = {
 };
 
 /**
- * A minimal in-memory stand-in for bb_canonical.entity_relationships that executes exactly the
+ * A minimal in-memory stand-in for canonical.entity_relationships that executes exactly the
  * four query shapes rewriteRelationshipsForPair issues, so the scoping guard can be exercised
  * without a real database.
  */
@@ -61,7 +61,7 @@ function fakeRelationshipsClient(initialRows: readonly RelationshipRow[]) {
         );
         return { rowCount: before - rows.length };
       }
-      if (text.includes('USING bb_canonical.entity_relationships r2')) {
+      if (text.includes('USING canonical.entity_relationships r2')) {
         const [ids] = params as [readonly string[]];
         const before = rows.length;
         const toDelete = new Set<string>();
@@ -170,7 +170,7 @@ type ParticipationRow = {
   role: string;
 };
 
-/** Same shape as fakeRelationshipsClient, for bb_canonical.event_participation. */
+/** Same shape as fakeRelationshipsClient, for canonical.event_participation. */
 function fakeParticipationClient(initialRows: readonly ParticipationRow[]) {
   let rows = initialRows.map((row) => ({ ...row }));
   return {
@@ -196,7 +196,7 @@ function fakeParticipationClient(initialRows: readonly ParticipationRow[]) {
         rows = rows.filter((row) => !(row.event_id === row.participant_id && ids.includes(row.id)));
         return { rowCount: before - rows.length };
       }
-      if (text.includes('USING bb_canonical.event_participation ep2')) {
+      if (text.includes('USING canonical.event_participation ep2')) {
         const [ids] = params as [readonly string[]];
         const before = rows.length;
         const toDelete = new Set<string>();

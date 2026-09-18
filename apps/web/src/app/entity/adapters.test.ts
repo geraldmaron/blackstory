@@ -30,14 +30,14 @@ test('toEvidenceClaimInputs maps explicit independentLineageCount when greater t
   assert.deepEqual(mapped!.sourceLineage, { independentLineageCount: 3 });
 });
 
-test('toEvidenceClaimInputs omits sourceLineage when count is absent (panel uses citation proxy)', () => {
+test('toEvidenceClaimInputs omits sourceLineage when count is absent', () => {
   const [mapped] = toEvidenceClaimInputs([BASE_CLAIM]);
   assert.equal(mapped!.sourceLineage, undefined);
 });
 
-test('toEvidenceClaimInputs omits sourceLineage when count is zero', () => {
+test('toEvidenceClaimInputs preserves an explicit zero lineage count', () => {
   const [mapped] = toEvidenceClaimInputs([{ ...BASE_CLAIM, independentLineageCount: 0 }]);
-  assert.equal(mapped!.sourceLineage, undefined);
+  assert.deepEqual(mapped!.sourceLineage, { independentLineageCount: 0 });
 });
 
 const SUMMARY =
@@ -73,11 +73,8 @@ test('withoutSummaryEchoClaims leaves every claim in place when the summary is e
 });
 
 /*
- * `buildWhyThisAppearsForEntity` is what the record room's "Why this is here" block mounts
- * (repo-tgfw5). The domain composer it wraps fails CLOSED — it throws rather than returning a
- * partial payload — and on a server-rendered record page an uncaught throw is not a collapsed
- * block, it is a page that does not render. So the contract these tests pin is that a refusal
- * comes back as `undefined`, letting the caller fall back to the rubric labels.
+ * A refused inclusion explanation returns undefined so the record page can render its
+ * rubric-label fallback.
  */
 
 type EntityOverrides = Partial<PublicEntityView> & { readonly id: string };

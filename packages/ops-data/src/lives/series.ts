@@ -1,5 +1,5 @@
 /**
- * `bb_reference.statistical_series` rows for the Lives Across the Decades series. Every era's loader
+ * `reference.statistical_series` rows for the Lives Across the Decades series. Every era's loader
  * upserts through this one definition so a later loader never rewrites a series another wrote.
  * Method: docs/methodology/lives-across-decades.md.
  */
@@ -119,7 +119,7 @@ export function livesSeriesRow(metricId: string): LivesSeriesRow | null {
   return null;
 }
 
-/** Column values for `INSERT INTO bb_reference.statistical_series`, in table column order after metric_id. */
+/** Column values for `INSERT INTO reference.statistical_series`, in table column order after metric_id. */
 export function livesSeriesColumns(row: LivesSeriesRow) {
   return {
     metric_id: row.metricId,

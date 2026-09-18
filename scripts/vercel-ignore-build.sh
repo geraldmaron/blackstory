@@ -71,8 +71,6 @@ SHARED_SKIP=(
   'packages/operator-mcp/'
   'packages/research-harness/'
   'packages/research-kernel/'
-  'packages/migrate-firestore-postgres/'
-  'packages/firebase/'
 )
 
 # Each project is also unaffected by the other project's app directory. `apps/api-public/`

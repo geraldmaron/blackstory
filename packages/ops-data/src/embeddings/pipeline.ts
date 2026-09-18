@@ -1,17 +1,4 @@
-/**
- * Embedding pipeline orchestration: text -> provider -> truncate/normalize -> record.
- *
- * This module has no Firestore dependency — it takes an injected EmbeddingProvider and returns
- * plain data. `vector-store.ts` is the thin layer that actually writes/queries Firestore.
- *
- * Integration point (documented, not yet wired): the on-write trigger belongs in the
- * publication/projection build step in `workers/publication/`. After a canonical entity's
- * title/summary/place/era-relevant fields change (or an entity is (re)promoted into a release),
- * that worker should call `embedEntity` with the entity's resolved location/state and pass the
- * result to `createAdminVectorIndexStore(firestore).writeEmbedding(...)`. That worker is not
- * a concrete Cloud Run Job yet. The backfill CLI (`backfill-cli.ts`) exercises the identical
- * `embedEntity` codepath today.
- */
+/** Builds versioned embedding records from entity text, with content hashes and cost estimates. */
 import { createHash } from 'node:crypto';
 import { APPROX_TOKENS_PER_CHAR, APPROX_USD_PER_1K_TOKENS, EMBEDDING_DIMS } from './constants.js';
 import type { EmbeddingProvider } from './provider.js';

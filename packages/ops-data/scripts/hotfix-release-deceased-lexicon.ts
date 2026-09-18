@@ -2,7 +2,7 @@
  * WS0 hotfix: flip release_entities (+ search_index) person rows whose summary
  * matches the extended deceased lexicon but still project status='living'.
  *
- * Does NOT write bb_canonical.living_status from regex (that is WS3). Display
+ * Does NOT write canonical.living_status from regex (that is WS3). Display
  * and release projections only — McGhie-class falsehoods.
  *
  * Usage (from repo root):
@@ -30,7 +30,7 @@ WITH living_persons AS (
     re.entity_id,
     re.projection,
     coalesce(re.projection->>'summary','') || ' ' || coalesce(re.projection->>'historicalContext','') AS text
-  FROM bb_public.release_entities re
+  FROM published.release_entities re
   WHERE re.projection->>'kind' = 'person'
     AND re.projection->>'status' = 'living'
 )
@@ -83,7 +83,7 @@ async function main(): Promise<void> {
       let searchUpdated = 0;
       for (const row of rows) {
         const ent = await client.query(
-          `UPDATE bb_public.release_entities
+          `UPDATE published.release_entities
            SET projection = jsonb_set(projection, '{status}', '"deceased"'::jsonb, true)
            WHERE release_id = $1 AND entity_id = $2
              AND projection->>'status' = 'living'`,
@@ -92,7 +92,7 @@ async function main(): Promise<void> {
         entitiesUpdated += ent.rowCount ?? 0;
 
         const search = await client.query(
-          `UPDATE bb_public.search_index
+          `UPDATE published.search_index
            SET status = 'deceased'
            WHERE release_id = $1 AND entity_id = $2
              AND status IS DISTINCT FROM 'deceased'`,
@@ -112,7 +112,7 @@ async function main(): Promise<void> {
     const verify = await client.query<{ count: string }>(
       `WITH living_persons AS (
          SELECT coalesce(projection->>'summary','') || ' ' || coalesce(projection->>'historicalContext','') AS text
-         FROM bb_public.release_entities
+         FROM published.release_entities
          WHERE projection->>'kind' = 'person'
            AND projection->>'status' = 'living'
        )
@@ -126,7 +126,7 @@ async function main(): Promise<void> {
 
     const mcg = await client.query<{ status: string }>(
       `SELECT projection->>'status' AS status
-       FROM bb_public.release_entities
+       FROM published.release_entities
        WHERE entity_id = 'lynching_isaac_mcghie_duluth_minnesota'
        LIMIT 1`,
     );

@@ -1,8 +1,7 @@
 # Staging deploy pipeline.
 # Public web ships on Vercel from the staging git branch (see docs/decisions-carryover.md,
 # "Small recovered decisions": Vercel public web hosting). This workflow pins a
-# commit SHA, records provenance, and optionally smokes E2E_BASE_URL. It does not promote
-# Firebase App Hosting.
+# commit SHA, records provenance, and optionally smokes E2E_BASE_URL.
 
 name: Deploy Staging
 
@@ -88,7 +87,6 @@ jobs:
           SHA="${{ steps.resolve.outputs.commit_sha }}"
           echo "Public web staging: Vercel Preview for git ref staging @ ${SHA}"
           echo "Alias: https://blackstory-git-staging-geraldmarons-projects.vercel.app"
-          echo "No Firebase App Hosting promote for public web (see docs/decisions-carryover.md)."
 
       - name: Write and validate provenance
         env:

@@ -1,38 +1,9 @@
 /**
- * repo-n7p6.3 (WS3) — evidence sweep.
- *
- * The missing step. The released catalog was built with no evidence fetch at all: lane records
- * were published from string templates over registry index fields, which is why 2,578 NRHP
- * places read like an index card. This script fetches the actual history and lands it in
- * bb_research.entity_evidence, from which WS4's model harness — and nothing else — is allowed
- * to write public prose.
- *
- * PATH 1 (this script, deterministic, no model):
- *   - nrhp-nomination: the National Register nomination form from NPGallery. Public domain,
- *     10-70k characters of real narrative per property. Richest source we have.
- *   - wikipedia: broad coverage for everything else, CC BY-SA, license recorded per row.
- *
- * PATH 2 (search-driven agent collection for entities still thin after PATH 1) is deliberately
- * NOT in this script: it needs judgment per entity and is run as a separate pass over the
- * `no-evidence` rows this sweep reports.
- *
- * Discipline enforced here, not left to the caller:
- *   - Identity before capture. Fetching by refnum or search rank is not self-verifying; a
- *     fluent document about the wrong property is worse than no document. Place must
- *     corroborate or the capture is quarantined.
- *   - OCR quality before capture. Nomination forms are scans; a model handed shredded OCR will
- *     smooth it into confident invented history.
- *   - Never pad. An entity with no evidence is recorded `skipped:no-evidence` and keeps its
- *     thin-record state. It does not get generic prose.
- *
- * Default is dry-run. Production writes require:
- *   DRY_RUN=0 EVIDENCE_SWEEP_APPLY=1 DATABASE_URL=postgresql://...
- *
- * Usage (from repo root):
- *   set -a && source apps/web/.env.local && set +a
- *   export DATABASE_SSL=1
- *   node --conditions development --import tsx \
- *     packages/ops-data/scripts/sweep-entity-evidence.ts --lanes=nrhp-black-heritage --limit=100
+ * Fetch entity evidence through deterministic source collectors and record source rights,
+ * identity checks and OCR quality. Quarantine identity failures and report no-evidence rows
+ * without generating filler prose. Search-supplied leads and reference hops use the same
+ * acquisition gates. Default dry-run; writes require DRY_RUN=0 and EVIDENCE_SWEEP_APPLY=1.
+ * --lanes and --limit scope acquisition.
  */
 import { createHash } from 'node:crypto';
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
@@ -78,7 +49,10 @@ const REPORT_DIR = join(REPO_ROOT, '.cache/evidence-sweep');
 const DRY_RUN = process.env.DRY_RUN !== '0';
 const APPLY = process.env.EVIDENCE_SWEEP_APPLY === '1';
 
-/** Greenbook is HARD-EXCLUDED until repo-jzgy triage completes (epic guardrail). */
+/**
+ * Greenbook candidates are excluded from this sweep pending a source-specific eligibility and
+ * sensitivity review.
+ */
 const EXCLUDED_LANES = new Set(['greenbook']);
 
 function flag(name: string, fallback: string): string {
@@ -111,15 +85,10 @@ const REFETCH = process.argv.includes('--refetch');
 /** Politeness delay between outbound fetches. NPS assets are multi-MB scans. */
 const FETCH_DELAY_MS = Number.parseInt(flag('delay-ms', '750'), 10);
 /**
- * repo-75et (PATH 2) — candidate URLs found by a search step this script does not itself run.
- * This script has no LLM/search access of its own (PATH 1 is deliberately deterministic, no
- * model); PATH 2 needs judgment per entity per the epic's own charter, so search happens in a
- * separate pass (a subagent, or any process with real web-search access) that writes
- * `{ [entityId]: string[] }` to this file. What THIS script does with those URLs is unchanged
- * from every other collector here: fetch via the same safe-fetch path, gate via the same
- * checkSubjectIdentity + assessText discipline, classify tier via the same isTier1Host list.
- * Nothing about the identity bar is relaxed for search-sourced candidates — if anything they need
- * it more, since a search hit's relevance ranking is not evidence of subject identity.
+ * Load externally researched candidate URLs shaped as { [entityId]: string[] }. This collector
+ * does not run web search or a model. Each supplied URL passes the same safe-fetch,
+ * full-subject identity and text-quality gates as other collectors; search relevance confers no
+ * evidence trust.
  */
 const WEBSEARCH_LEADS_PATH = flag('websearch-leads', '');
 /** Cap outbound fetches per entity for search-sourced candidates — a search can return many
@@ -321,10 +290,9 @@ async function collectNomination(row: CandidateRow): Promise<EvidenceRow | null>
       publisher: 'National Park Service',
       sectionsFound: parsed.sections.map((section) => section.section),
       hasSignificance: parsed.hasSignificance,
-      // 'section-table' came from the form's own numbered section boxes; 'narrative-headings'
-      // came from the looser fallback used when OCR destroyed that table (repo-n7p6.12). Worth
-      // recording: the fallback can run a section to end-of-document when the closing heading
-      // is missing, so its captures are slightly noisier at the tail.
+      // Record whether extraction used section tables or narrative headings. Missing closing
+      // headings can extend a fallback section to the document's end and admit unrelated tail
+      // text.
       segmentation: parsed.segmentation,
       identity,
       // Recorded, not resolved: place agrees but the name does not, so a human decides whether
@@ -376,15 +344,9 @@ async function collectWikipedia(row: CandidateRow): Promise<EvidenceRow | null> 
 }
 
 /**
- * repo-n7p6.22: the DC HPO import's canonicalUrl falls back to this dataset landing page — not
- * a per-item historicsites.dcpreservation.org URL — for rows whose ArcGIS source record has no
- * Hyperlink value. Confirmed directly against AAHT_Source_Data for all 7 affected rows: URL_Status
- * there reads "*Not Currently Available*" or is unset, i.e. this is DC HPO's own admission that no
- * item page exists yet, not an import bug that dropped a real link. Every affected row gets this
- * identical URL, so it can never BE a row's identity the way a real per-item URL is (see the
- * collector's doc comment below) — capturing it as evidence would silently store the dataset's
- * generic dcat:Dataset description as if it were about that one site. Shared with the same literal
- * string in landscape-intake-weed.ts ('fallback_catalog_url') and incremental-publish.ts.
+ * The DC HPO dataset landing URL is shared by records without an item hyperlink. Its generic
+ * dataset description cannot establish any one site's identity and must not be captured as item
+ * evidence.
  */
 const DC_HPO_FALLBACK_URL = 'https://catalog.data.gov/dataset/black-history-sites-washington';
 
@@ -402,8 +364,8 @@ async function collectDcHpo(row: CandidateRow): Promise<EvidenceRow | null> {
   if (url === undefined) throw new SkipReason('dc-sites row has no canonicalUrl');
 
   if (url === DC_HPO_FALLBACK_URL) {
-    // Written (not skipped) so a re-sweep overwrites any earlier run's mistaken 'captured' status
-    // for this exact (entity_id, collector, source_url) key — see repo-n7p6.22.
+    // Write the rejection so a repeated sweep replaces an incorrectly captured status for the
+    // same entity, collector and source URL.
     return {
       id: evidenceId(row.id, 'dc-hpo', url),
       entityId: row.id,
@@ -457,9 +419,8 @@ async function collectDcHpo(row: CandidateRow): Promise<EvidenceRow | null> {
 }
 
 /**
- * NCES College Navigator — second-lineage source for the `us-ed-hbcu-*` lane (repo-2t04.6).
- * `collectNcesNavigatorEvidence` returns null for any entity_id without a `us-ed-hbcu-<UNITID>`
- * shape, so this is a no-op skip for every other lane.
+ * Collect NCES College Navigator evidence for us-ed-hbcu-<UNITID> entities. Other identifier
+ * forms are skipped. A separate dataset is not automatically an independent evidence lineage.
  */
 async function collectNcesNavigator(row: CandidateRow): Promise<EvidenceRow | null> {
   const result = await collectNcesNavigatorEvidence({
@@ -532,7 +493,7 @@ async function collectRestoredClaimSources(row: CandidateRow): Promise<EvidenceR
       qualityScore: quality.score,
       status,
       provenance: {
-        restoredFrom: 'bb_public.release_entities.projection.claims[].citationHref',
+        restoredFrom: 'published.release_entities.projection.claims[].citationHref',
         citationHref,
         fetchedFinalUrl: page.finalUrl,
         identity,
@@ -548,14 +509,8 @@ async function collectRestoredClaimSources(row: CandidateRow): Promise<EvidenceR
 }
 
 /**
- * repo-75et (PATH 2) — candidate URLs found by a search step outside this script (see
- * loadWebSearchLeads' docs). Structurally this is collectRestoredClaimSources with a different
- * URL source, but the identity bar is checkSubjectIdentity (place AND name AND focus) rather than
- * the looser checkSubjectIdentity call restored-claim-source already uses — both already use
- * checkSubjectIdentity, so the real difference is trust: a citation already published on this
- * entity's own claims (restored-claim-source) has a prior human/pipeline decision behind it; a
- * search hit has none, so it gets the same full gate every reference-hop candidate gets, and nas
- * no default trust from being merely "found".
+ * Fetch externally supplied search leads through the full name, place and focus checks. Search
+ * rank is a candidate-selection signal and does not establish subject identity or entailment.
  */
 async function collectWebSearchLeads(
   row: CandidateRow,
@@ -611,11 +566,9 @@ async function collectWebSearchLeads(
 }
 
 /**
- * Person-kind landscape candidates (discovered from a Wikidata QID, or from a mention gap-fill —
- * see repo-n7p6.3 notes). When the row already carries a Wikipedia canonicalUrl its identity was
- * anchored at discovery time by the QID binding, so this fetches that exact article by title
- * rather than re-running `collectWikipedia`'s place-corroborated search: these rows have no
- * city/county/state at all, which would make `articleCorroboratesPlace` reject every hit.
+ * For person candidates with a QID-bound Wikipedia URL, fetch that exact article by title. Do
+ * not require absent city/county fields to pass a place-oriented search gate; the stored
+ * discovery binding still requires evidence review.
  */
 async function collectPersonWikipedia(row: CandidateRow): Promise<EvidenceRow | null> {
   if (row.payload.kind !== 'person') throw new SkipReason('not a person-kind row');
@@ -655,17 +608,9 @@ async function collectPersonWikipedia(row: CandidateRow): Promise<EvidenceRow | 
 }
 
 /**
- * repo-n7p6.17 (WS3 PATH 2) — fetching loop over the pure traversal policy in reference-hops.ts.
- *
- * Runs only when PATH 1 left the entity thin: a nomination form or a solid Wikipedia article is
- * already the richest source we have, and re-walking their citations would spend the entity's
- * hop budget for little gain. "Thin" here means no tier1 evidence, or under 4,000 combined
- * captured characters — a threshold, not a law; the epic's PATH 2 charter is "entities still thin
- * after PATH 1" and this is what operationalizes that.
- *
- * Only PATH 1 rows with a real fetched page (dc-hpo, nomination-quality Wikipedia) can seed a
- * walk: the NRHP nomination is a PDF, not an HTML page with a reference list, so it is never a
- * seed even though it is tier1.
+ * Run bounded reference hops over fetched HTML when evidence is thin, defined here as no tier1
+ * capture or fewer than 4,000 captured characters. This is a cost heuristic, not a completeness
+ * test. PDF nomination forms cannot seed the HTML reference walker.
  */
 type ReferenceHopResult = {
   readonly evidence: readonly EvidenceRow[];
@@ -752,15 +697,9 @@ async function collectReferenceHops(
         if (hopPage === undefined) continue;
 
         const quality = assessText(hopPage.text);
-        // The relevance gate that picked this candidate is a budget filter, not an evidence
-        // gate (reference-hops.ts docs): what actually clears a fetched page for storage is the
-        // same identity discipline every other collector applies — the full page text must
-        // corroborate the subject, not just the anchor's 300-char context window.
-        //
-        // repo-ppeu: this used to be `tokens.some(...)`, and `tokens` folds place words in, so a
-        // page containing the word "Virginia" anywhere corroborated a Virginia house. That is how
-        // a house was given an article about a gubernatorial election. The shared gate requires
-        // place AND name AND focus, and rejects index pages outright.
+        // Reference relevance limits acquisition cost. Storage still requires the full page to
+        // corroborate name, place and focus, with index pages rejected; nearby geographic words
+        // or anchor text alone do not identify the subject.
         const identity = checkSubjectIdentity(hopPage.text, subject, {
           title: hop.candidate.anchorText,
         });
@@ -966,7 +905,7 @@ async function main(): Promise<void> {
   // Evidence freshness lives in entity_evidence.fetched_at, so that is what gates a re-fetch.
   const alreadyCaptured = await pool.query<{ entity_id: string }>(
     `SELECT DISTINCT entity_id
-       FROM bb_research.entity_evidence
+       FROM research.entity_evidence
       WHERE status = 'captured'
         AND fetched_at >= now() - make_interval(days => $1::int)`,
     [STALE_DAYS],
@@ -989,20 +928,20 @@ async function main(): Promise<void> {
 
   const rows = await pool.query<CandidateRow>(
     `WITH active AS (
-       SELECT release_id FROM bb_public.active_release LIMIT 1
+       SELECT release_id FROM published.active_release LIMIT 1
      )
      SELECT lc.id,
             lc.lane,
             lc.display_name,
             lc.payload,
             COALESCE(citations.urls, ARRAY[]::text[]) AS "publicClaimCitationUrls"
-       FROM bb_research.landscape_candidates lc
+       FROM research.landscape_candidates lc
        JOIN active a ON true
        -- Publication is optional: a candidate not yet in the active release (e.g. blocked by the
        -- confidence gate) is still a legitimate evidence-sweep target, it just contributes no
        -- restored-claim-source citations. Do not join source_item_id or a same-name record: that
        -- would bind a different entity's citations to this candidate.
-       LEFT JOIN bb_public.release_entities re
+       LEFT JOIN published.release_entities re
          ON re.release_id = a.release_id
         AND re.entity_id = lc.id
        LEFT JOIN LATERAL (
@@ -1019,12 +958,8 @@ async function main(): Promise<void> {
   const resolvedIds = new Set(rows.rows.map((row) => row.id));
   const unresolvedAfterLandscape = targeted.filter((id) => !resolvedIds.has(id));
 
-  // repo-qe6j: curated one-off entities (ent_/recon_/lynching_/west_ prefixes, hand-authored
-  // directly against bb_canonical rather than sourced from a landscape_candidates row) were
-  // silently dropped here entirely — no collector ever ran for them. They are still real,
-  // published entities with real citationHref values on their public claims, so build a
-  // synthetic CandidateRow straight from bb_public.release_entities for any id that survives
-  // the landscape_candidates lookup unresolved.
+  // For published entities without landscape rows, derive collector input from release records
+  // and their cited URLs so curated canonical records remain eligible for evidence acquisition.
   if (unresolvedAfterLandscape.length > 0) {
     const fallback = await pool.query<{
       id: string;
@@ -1035,7 +970,7 @@ async function main(): Promise<void> {
       publicClaimCitationUrls: readonly string[];
     }>(
       `WITH active AS (
-         SELECT release_id FROM bb_public.active_release LIMIT 1
+         SELECT release_id FROM published.active_release LIMIT 1
        )
        SELECT re.entity_id AS id,
               re.projection->>'displayName' AS display_name,
@@ -1043,7 +978,7 @@ async function main(): Promise<void> {
               re.projection->>'jurisdictionLabel' AS jurisdiction_label,
               re.projection->>'locationLabel' AS location_label,
               COALESCE(citations.urls, ARRAY[]::text[]) AS "publicClaimCitationUrls"
-         FROM bb_public.release_entities re
+         FROM published.release_entities re
          JOIN active a ON re.release_id = a.release_id
          LEFT JOIN LATERAL (
            SELECT array_agg(DISTINCT claim->>'citationHref')
@@ -1063,11 +998,8 @@ async function main(): Promise<void> {
         // exactly as they would for any other non-dc-sites row.
         lane: row.id.split(/[_-]/u)[0] ?? 'curated',
         display_name: row.display_name,
-        // repo-f85hp: derived in TS, not by splitting one label in SQL. `locationLabel` is prose
-        // about where a thing stands ("Hanging Bridge, Clarke County"), not an administrative
-        // place, and splitting it on the comma gave `checkSubjectIdentity` city "Hanging Bridge"
-        // and state "Clarke County" — which is why a correct marker page for Alma Howze was
-        // rejected with "identity not corroborated by place".
+        // Derive administrative place fields with the shared TypeScript resolver. locationLabel
+        // is descriptive prose and cannot safely be split into city/state fields.
         payload: {
           kind: row.kind ?? undefined,
           ...placeExpectationFromProjection({
@@ -1161,12 +1093,8 @@ async function main(): Promise<void> {
     return;
   }
 
-  // One transaction PER ENTITY, not one transaction for the whole batch. A multi-hour sweep can
-  // touch hundreds of entities; wrapping all of them in a single BEGIN...COMMIT means one bad row
-  // (repo-5csj: a redirect-target flip produced an id/source_url mismatch and threw a raw PK
-  // violation mid-batch) discards every entity's already-fetched evidence, not just the offender's.
-  // Evidence rows and their entity's ledger row still commit together, so a partial write for one
-  // entity can never leave its evidence captured but its ledger status stale.
+  // Commit evidence and ledger status atomically per entity. A failed entity must not discard
+  // an entire batch's acquired evidence or leave its own ledger inconsistent.
   const client = await pool.connect();
   let appliedEntities = 0;
   let appliedEvidenceRows = 0;
@@ -1190,7 +1118,7 @@ async function main(): Promise<void> {
         await client.query('BEGIN');
         for (const item of entityEvidence) {
           await client.query(
-            `INSERT INTO bb_research.entity_evidence
+            `INSERT INTO research.entity_evidence
                (id, entity_id, lane, collector, source_url, source_tier, title, content_text,
                 content_hash, char_count, quality_score, status, provenance, fetched_at)
              VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13, now())
@@ -1222,7 +1150,7 @@ async function main(): Promise<void> {
 
         // Ledger: evidence_digest is what WS4 compares to decide "nothing changed since last pass".
         await client.query(
-          `INSERT INTO bb_research.entity_enrichment
+          `INSERT INTO research.entity_enrichment
              (entity_id, lane, status, evidence_digest, notes, updated_at)
            VALUES ($1,$2,$3,$4,$5, now())
            ON CONFLICT (entity_id) DO UPDATE SET

@@ -34,13 +34,13 @@
       "enabled": true
     },
     {
-      "id": "SEC-APPCHK-01",
-      "kind": "app_check.failure",
+      "id": "SEC-CLIENT-01",
+      "kind": "client_header.failure",
       "severity": "warning",
-      "runbookId": "runbook/app-check-failures",
-      "description": "App Check failure burst",
+      "runbookId": "runbook/client-header-failures",
+      "description": "Client-header failure burst",
       "notificationChannels": ["security_alerts"],
-      "metric": "app_check_failures_total",
+      "metric": "client_header_failures_total",
       "windowMs": 300000,
       "threshold": 25,
       "comparator": "gt",

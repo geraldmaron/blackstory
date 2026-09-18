@@ -1,17 +1,5 @@
-/**
- * Supabase Storage capture sink: persists the sanitized snapshot text of a capture as a
- * content-addressed object (`captures/<sha256>.txt`) in a private Supabase Storage bucket,
- * via the Storage REST API (`POST /storage/v1/object/<bucket>/<path>`, Bearer secret key).
- *
- * Chosen over GCS deliberately: the evidence DB is already Supabase Postgres, so blobs and
- * rows share one platform and one credential path (SUPABASE_URL + SUPABASE_SECRET_KEY),
- * and nothing new lands in the legacy Firebase/GCP project. No supabase-js dependency —
- * the upload is a single authenticated HTTP call, and the transport is injected for tests.
- *
- * Idempotent by construction: the object key is the sha256 of the raw bytes, and an
- * "already exists" response is treated as stored — same content, same object. Storage
- * sometimes wraps that as HTTP 400 with `code: KeyAlreadyExists` rather than HTTP 409.
- */
+/** Private, content-addressed extracted-text storage. Raw-source and text hashes stay distinct. */
+import { createHash } from 'node:crypto';
 import type { CaptureStorage } from './source-capture.js';
 
 export type SupabaseStorageConfig = {
@@ -21,6 +9,8 @@ export type SupabaseStorageConfig = {
   readonly secretKey: string;
   /** Private bucket name holding capture snapshots. */
   readonly bucket: string;
+  /** Authorization revision isolates renewed retention from pending deletions. */
+  readonly retentionRevision?: string;
   /** Injected transport for tests; defaults to global fetch. */
   readonly transport?: typeof fetch;
 };
@@ -52,12 +42,15 @@ async function isAlreadyExistsResponse(response: Response): Promise<boolean> {
 }
 
 export function createSupabaseStorage(config: SupabaseStorageConfig): CaptureStorage {
+  if (config.retentionRevision && !/^[a-f0-9]{64}$/.test(config.retentionRevision))
+    throw new Error('Invalid retention revision');
   const base = config.url.replace(/\/+$/, '');
   const transport = config.transport ?? fetch;
   return {
     kind: 'supabase-storage',
     async store({ url, sha256, contentType, byteLength, text }) {
-      const path = `captures/${sha256}.txt`;
+      const snapshotSha256 = createHash('sha256').update(text, 'utf8').digest('hex');
+      const path = `captures/${config.retentionRevision ? `${config.retentionRevision}/` : ''}${snapshotSha256}.txt`;
       const response = await transport(`${base}/storage/v1/object/${config.bucket}/${path}`, {
         method: 'POST',
         headers: {
@@ -67,6 +60,7 @@ export function createSupabaseStorage(config: SupabaseStorageConfig): CaptureSto
           'x-upsert': 'false',
         },
         body: text,
+        signal: AbortSignal.timeout(30_000),
       });
       // Duplicate is success: same hash, same object. Storage may send HTTP 409,
       // or HTTP 400 with a JSON body `{ statusCode: "409", code: "KeyAlreadyExists" }`.
@@ -85,7 +79,9 @@ export function createSupabaseStorage(config: SupabaseStorageConfig): CaptureSto
         sha256,
         contentType,
         byteLength,
-        snapshotBytes: text.length,
+        snapshotBytes: Buffer.byteLength(text, 'utf8'),
+        snapshotSha256,
+        representation: 'extracted-text',
         deduplicated: alreadyExists,
       };
     },

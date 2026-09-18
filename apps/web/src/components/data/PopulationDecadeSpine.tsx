@@ -41,13 +41,13 @@ export function PopulationDecadeSpine({
   const boundaryIndex = rows.findIndex((row) => row.opensDefinitionBoundary);
 
   const linePoints = rows
-    .map((row, index) => `${xScale(index).toFixed(1)},${yScale(shares[index] ?? 0).toFixed(1)}`)
+    .map((_row, index) => `${xScale(index).toFixed(1)},${yScale(shares[index] ?? 0).toFixed(1)}`)
     .join(' ');
 
   const areaPoints = [
     `${xScale(0).toFixed(1)},${yScale(0).toFixed(1)}`,
     ...rows.map(
-      (row, index) => `${xScale(index).toFixed(1)},${yScale(shares[index] ?? 0).toFixed(1)}`,
+      (_row, index) => `${xScale(index).toFixed(1)},${yScale(shares[index] ?? 0).toFixed(1)}`,
     ),
     `${xScale(rows.length - 1).toFixed(1)},${yScale(0).toFixed(1)}`,
   ].join(' ');
@@ -77,7 +77,7 @@ export function PopulationDecadeSpine({
             </tr>
           </thead>
           <tbody>
-            {rows.map((row, index) => (
+            {rows.map((row) => (
               <tr key={row.decade}>
                 <th scope="row">{row.decade}</th>
                 <td>{formatSharePct(row.blackPopulation, row.totalPopulation)}</td>

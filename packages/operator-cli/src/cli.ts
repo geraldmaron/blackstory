@@ -1,3 +1,9 @@
+import {
+  retrieveEvidence,
+  parseEvidenceQueryVector,
+  indexCaptureText,
+  attachPassageEmbedding,
+} from './evidence-retrieval.js';
 /**
  * Thin argument-parsing CLI over this package's real, tested functions mirrors the
  * parse-args-then-call-a-tested-function shape of
@@ -12,6 +18,20 @@
  * `promotion-boundary.test.ts`.
  */
 import { appendFileSync, readFileSync, writeFileSync } from 'node:fs';
+import {
+  assertContract,
+  validateExecutionPlan,
+  blackHistoryProfile,
+  type PreservationDecision,
+} from '@repo/research-kernel';
+import {
+  startResearchExecution,
+  claimResearchTask,
+  completeResearchTask,
+  heartbeatResearchTask,
+  researchExecutionStatus,
+  type TaskModelMetadata,
+} from './research-execution.js';
 import type { AuthorityFollowUpLead, RelationshipRole, RelationshipType } from '@repo/domain';
 import { getOpsPostgresPool, type AtomicStore } from '@repo/data-access';
 import type { SafeFetchDependencies } from '@repo/security/url-safety';
@@ -51,7 +71,13 @@ import {
   snapshotForReleasedEntity,
   type ReleasedClaim,
 } from './research-quality-audit.js';
-import { describePlan, planEnrichment, targetIsAbove } from './enrichment-plan.js';
+import {
+  describePlan,
+  planEnrichment,
+  targetIsAbove,
+  enrichmentExecutionPlan,
+} from './enrichment-plan.js';
+import { runResearchWorker } from './research-worker.js';
 import { createLlmProvider } from './llm-provider.js';
 import { loadPendingEditorialItems } from './pending-list.js';
 import {
@@ -84,18 +110,50 @@ import {
 import { createSupabaseStorage, supabaseStorageConfigFromEnv } from './supabase-storage.js';
 import { runCaptureBackfill, persistCapture } from './capture-backfill.js';
 import { waybackCredentialsFromEnv } from './wayback-credentials.js';
-import { createWaybackAnchor } from './wayback-anchor.js';
+import {
+  createWaybackAnchor,
+  createPostgresWaybackJobStore,
+  validatePreservationDecision,
+} from './wayback-anchor.js';
+import {
+  sweepCaptureRetention,
+  drainCaptureDisposals,
+  reconcileOrphanCaptures,
+} from './capture-retention.js';
 import { createWaybackLookup } from './wayback-lookup.js';
 import { waybackSafeHttpClient } from './wayback-http.js';
 
 /**
  * Capture blob sink selection: Supabase Storage when SUPABASE_URL + SUPABASE_SECRET_KEY are
  * configured (blobs live next to the evidence DB, no legacy GCP dependency), else honest
- * metadata-only (hash + excerpt inline).
+ * metadata-only (no retained source text).
  */
-function captureStorageFromEnv(env: Record<string, string | undefined>): CaptureStorage {
+function captureStorageFromEnv(
+  env: Record<string, string | undefined>,
+  decisions: readonly PreservationDecision[] = [],
+): CaptureStorage {
   const config = supabaseStorageConfigFromEnv(env);
-  return config ? createSupabaseStorage(config) : createMetadataOnlyStorage();
+
+  return {
+    kind: 'policy-controlled',
+    async store(input) {
+      const candidate = decisions.find((decision) => decision.sourceUrl === input.url);
+      const decision = candidate
+        ? validatePreservationDecision(candidate, input.url, new Date().toISOString())
+        : undefined;
+      const stored = await (
+        decision?.allowTextRetention && config
+          ? createSupabaseStorage({
+              ...config,
+              retentionRevision: createHash('sha256')
+                .update(JSON.stringify(decision))
+                .digest('hex'),
+            })
+          : createMetadataOnlyStorage()
+      ).store(input);
+      return { ...stored, preservationDecision: decision ?? null };
+    },
+  };
 }
 import type { ResearchCaptureSink } from './research-intake.js';
 import { createHash } from 'node:crypto';
@@ -120,9 +178,10 @@ import {
 import {
   fetchNpsNetworkToFreedom,
   fetchDplaItems,
-  findSpatialTemporalOverlaps,
+  findRelationshipCandidates,
   enrichSubjectCandidate,
   adjudicateRelationship,
+  InvalidHarnessOutputError,
   type HarnessRawSubject,
   type EnrichmentBridgeClient,
   type EnrichedCandidate,
@@ -172,7 +231,7 @@ const BOOLEAN_FLAGS = new Set([
   '--omit-raw-model',
   '--queue-survivors',
   '--wayback',
-  // Accepted uniformly on every verb (repo-xez5.9): every command already prints JSON by
+  // Accepted uniformly on every verb: every command already prints JSON by
   // default (see the file header comment), so this flag is a no-op that makes the contract
   // explicit and machine-discoverable rather than switching a text-mode command to JSON.
   '--json',
@@ -458,6 +517,173 @@ export async function runCli(argv: readonly string[], deps: CliDependencies = {}
   try {
     const flags = parseFlags(rest);
     switch (command) {
+      case 'capture-retention': {
+        assertPostgresOpsDataSource(process.env);
+        const commit = flags.booleans.has('--commit');
+        const sourceItemId = optionalFlag(flags, '--source-item-id');
+        const limit = Number(optionalFlag(flags, '--limit') ?? '100');
+        if (flags.booleans.has('--orphans'))
+          stdout(
+            JSON.stringify(
+              await reconcileOrphanCaptures(getOpsPostgresPool(), {
+                commit,
+                actor: requireFlag(flags, '--operator-id'),
+                limit,
+                bucket: requireFlag(flags, '--bucket'),
+              }),
+              null,
+              2,
+            ),
+          );
+        const result = await sweepCaptureRetention(getOpsPostgresPool(), {
+          commit,
+          actor: requireFlag(flags, '--operator-id'),
+          limit,
+          ...(sourceItemId ? { sourceItemId } : {}),
+        });
+        stdout(JSON.stringify(result, null, 2));
+        if (flags.booleans.has('--delete-storage')) {
+          if (!commit) throw new Error('--delete-storage requires --commit');
+          const config = supabaseStorageConfigFromEnv(process.env);
+          if (!config) throw new Error('Capture storage must be configured for disposal');
+          stdout(
+            JSON.stringify(
+              await drainCaptureDisposals(getOpsPostgresPool(), config, limit),
+              null,
+              2,
+            ),
+          );
+        }
+        return 0;
+      }
+      case 'research-retrieve': {
+        assertPostgresOpsDataSource(process.env);
+        const vectorPath = optionalFlag(flags, '--vector-file');
+        const vector = vectorPath
+          ? parseEvidenceQueryVector(JSON.parse(readFile(vectorPath)))
+          : undefined;
+        const sourceIds = optionalFlag(flags, '--source-item-ids');
+        const result = await retrieveEvidence(getOpsPostgresPool(), {
+          query: requireFlag(flags, '--query'),
+          limit: Number(optionalFlag(flags, '--limit') ?? 10),
+          ...(sourceIds ? { sourceItemIds: sourceIds.split(',') } : {}),
+          ...(vector ? { vector } : {}),
+          approximate: flags.booleans.has('--approximate'),
+        });
+        stdout(JSON.stringify(result, null, 2));
+        return 0;
+      }
+      case 'research-index': {
+        if (!flags.booleans.has('--commit')) throw new Error('research-index requires --commit');
+        assertPostgresOpsDataSource(process.env);
+        const count = await indexCaptureText(getOpsPostgresPool(), {
+          captureId: requireFlag(flags, '--capture-id'),
+          sourceItemId: requireFlag(flags, '--source-item-id'),
+          parserVersion: requireFlag(flags, '--parser-version'),
+          text: readFile(requireFlag(flags, '--text-path')),
+          decision: assertContract(
+            'PreservationDecision',
+            JSON.parse(readFile(requireFlag(flags, '--preservation-decision'))),
+          ),
+        });
+        stdout(JSON.stringify({ indexedPassages: count }));
+        return 0;
+      }
+      case 'research-embed': {
+        if (!flags.booleans.has('--commit')) throw new Error('research-embed requires --commit');
+        assertPostgresOpsDataSource(process.env);
+        const input = JSON.parse(readFile(requireFlag(flags, '--embedding-file'))) as Parameters<
+          typeof attachPassageEmbedding
+        >[1];
+        await attachPassageEmbedding(getOpsPostgresPool(), input);
+        stdout(JSON.stringify({ stored: true, passageId: input.passageId }));
+        return 0;
+      }
+      case 'research-run': {
+        const plan = validateExecutionPlan(JSON.parse(readFile(requireFlag(flags, '--plan'))));
+        const result = flags.booleans.has('--commit')
+          ? (assertPostgresOpsDataSource(process.env),
+            await startResearchExecution(getOpsPostgresPool(), plan))
+          : { runId: plan.run.id, created: false, validated: true, tasks: plan.tasks.length };
+        stdout(JSON.stringify(result, null, 2));
+        return 0;
+      }
+      case 'research-status': {
+        assertPostgresOpsDataSource(process.env);
+        stdout(
+          JSON.stringify(
+            await researchExecutionStatus(getOpsPostgresPool(), requireFlag(flags, '--run-id')),
+            null,
+            2,
+          ),
+        );
+        return 0;
+      }
+      case 'research-work': {
+        if (!flags.booleans.has('--commit'))
+          throw new Error(
+            'research-work requires --commit for ledger writes and bounded external calls',
+          );
+        assertPostgresOpsDataSource(process.env);
+        const result = await runResearchWorker(getOpsPostgresPool(), {
+          runId: requireFlag(flags, '--run-id'),
+          workerId: requireFlag(flags, '--worker-id'),
+          maxTasks: Number(requireFlag(flags, '--max-tasks')),
+        });
+        const output = optionalFlag(flags, '--output');
+        if (output) writeFile(output, JSON.stringify(result, null, 2));
+        stdout(JSON.stringify(result, null, 2));
+        return result.attempts.some((attempt) => !attempt.valid) ? 1 : 0;
+      }
+      case 'research-claim':
+      case 'research-heartbeat':
+      case 'research-complete': {
+        if (!flags.booleans.has('--commit'))
+          throw new Error(`${command} requires --commit to change the execution ledger`);
+        assertPostgresOpsDataSource(process.env);
+        const pool = getOpsPostgresPool();
+        let result: unknown;
+        if (command === 'research-claim') {
+          result = await claimResearchTask(
+            pool,
+            requireFlag(flags, '--run-id'),
+            requireFlag(flags, '--worker-id'),
+            Number(optionalFlag(flags, '--lease-seconds') ?? '300'),
+          );
+        } else {
+          const lease = assertContract(
+            'ResearchTaskLease',
+            JSON.parse(readFile(requireFlag(flags, '--lease-path'))),
+          );
+          if (command === 'research-heartbeat') {
+            result = {
+              renewed: await heartbeatResearchTask(
+                pool,
+                lease,
+                Number(optionalFlag(flags, '--lease-seconds') ?? '300'),
+              ),
+            };
+          } else {
+            const modelPath = optionalFlag(flags, '--model-record');
+            result = await completeResearchTask(
+              pool,
+              lease,
+              readFile(requireFlag(flags, '--result-path')),
+              modelPath ? (JSON.parse(readFile(modelPath)) as TaskModelMetadata) : undefined,
+            );
+          }
+        }
+        const json = JSON.stringify(result, null, 2);
+        const output = optionalFlag(flags, '--output');
+        if (output) writeFile(output, json);
+        stdout(json);
+        return result &&
+          typeof result === 'object' &&
+          (('valid' in result && result.valid === false) ||
+            ('renewed' in result && result.renewed === false))
+          ? 1
+          : 0;
+      }
       case 'preflight': {
         const report = await runWorkerPreflight();
         stdout(JSON.stringify(report, null, 2));
@@ -844,10 +1070,8 @@ export async function runCli(argv: readonly string[], deps: CliDependencies = {}
         const maxCandidatesRaw = optionalFlag(flags, '--max-candidates');
         const queueSurvivors = flags.booleans.has('--queue-survivors');
         const maxSurvivorsRaw = optionalFlag(flags, '--max-survivors');
-        // Real catalog match needs a live Postgres with bb_public.search_index populated
-        // (this repo's CI foundation does not provision it — see db:init). Soft match only:
-        // a load failure never blocks dispatch, it just runs without match enrichment, same
-        // as the empty-catalog case `attachCatalogMatch` already treats as normal.
+        // Catalog matching is optional enrichment; a read failure preserves discovery output
+        // while reporting that existing-record matching was unavailable.
         let catalogProfiles:
           Awaited<ReturnType<typeof loadDiscoveryCatalogProfilesFromPostgres>> | undefined;
         if (modeRaw === 'live' && killRaw !== 'engaged') {
@@ -965,11 +1189,15 @@ export async function runCli(argv: readonly string[], deps: CliDependencies = {}
         if (maxEntities !== undefined && (!Number.isFinite(maxEntities) || maxEntities < 0)) {
           throw new Error('--max-entities must be a non-negative integer');
         }
+        const decisionsPath = optionalFlag(flags, '--preservation-decisions');
+        const values: unknown = decisionsPath ? JSON.parse(readFile(decisionsPath)) : [];
+        if (!Array.isArray(values)) throw new Error('--preservation-decisions requires an array');
+        const decisions = values.map((value) => assertContract('PreservationDecision', value));
         const fetchDependencies = deps.fetchDependencies ?? createNodeSafeFetchDependencies();
         const waybackCredentials = wayback ? waybackCredentialsFromEnv(process.env) : undefined;
         const captureDeps: CaptureDeps = {
           fetchUrl: (url) => runQuickAddFetch(url, fetchDependencies),
-          storage: captureStorageFromEnv(process.env),
+          storage: captureStorageFromEnv(process.env, decisions),
           parserVersion: 'capture-backfill-v1',
           newId: (prefix, seed) =>
             `${prefix}_${createHash('sha1').update(seed).digest('hex').slice(0, 16)}`,
@@ -979,6 +1207,8 @@ export async function runCli(argv: readonly string[], deps: CliDependencies = {}
             ? {
                 waybackAnchor: createWaybackAnchor({
                   client: waybackSafeHttpClient,
+                  decisionForUrl: (url) => decisions.find((decision) => decision.sourceUrl === url),
+                  jobs: createPostgresWaybackJobStore(pool),
                   credentials: waybackCredentials,
                   now: () => new Date().toISOString(),
                 }),
@@ -1211,7 +1441,16 @@ export async function runCli(argv: readonly string[], deps: CliDependencies = {}
       }
       case 'harness-run': {
         const theme = requireFlag(flags, '--theme');
-        const metro = requireFlag(flags, '--metro');
+        const metro = optionalFlag(flags, '--metro') ?? 'unspecified';
+        const maxSubjects = Number(optionalFlag(flags, '--max-subjects') ?? '25');
+        const maxRelations = Number(optionalFlag(flags, '--max-relations') ?? '25');
+        if (
+          maxSubjects < 1 ||
+          ![maxSubjects, maxRelations].every((n) => Number.isSafeInteger(n) && n >= 0 && n <= 100)
+        ) {
+          throw new Error('Harness limits must be integers: subjects 1-100, relations 0-100');
+        }
+        const subjectsPath = optionalFlag(flags, '--subjects');
         const harnessProgressPath = optionalFlag(flags, '--progress-path');
         if (harnessProgressPath) writeFile(harnessProgressPath, '');
         const reportHarnessProgress = (line: Readonly<Record<string, unknown>>): void => {
@@ -1222,9 +1461,15 @@ export async function runCli(argv: readonly string[], deps: CliDependencies = {}
             ...(harnessProgressPath !== undefined ? { progressPath: harnessProgressPath } : {}),
           });
         };
-        const connectorList = (optionalFlag(flags, '--connectors') ?? 'dpla,nps_network_to_freedom')
+        const connectorList = (optionalFlag(flags, '--connectors') ?? '')
           .split(',')
-          .map((c) => c.trim().toLowerCase());
+          .map((c) => c.trim().toLowerCase())
+          .filter(Boolean);
+        if (
+          connectorList.some((c) => !['dpla', 'nps_network_to_freedom', 'web_search'].includes(c))
+        ) {
+          throw new Error('Unknown harness connector');
+        }
         const query = optionalFlag(flags, '--query') ?? theme;
         const urlToScrape = optionalFlag(flags, '--url');
 
@@ -1236,6 +1481,17 @@ export async function runCli(argv: readonly string[], deps: CliDependencies = {}
         });
 
         let rawSubjects: HarnessRawSubject[] = [];
+        if (subjectsPath) {
+          const supplied: unknown = JSON.parse(readFile(subjectsPath));
+          if (!Array.isArray(supplied))
+            throw new Error('--subjects must contain an array of source records');
+          rawSubjects = supplied.map((record) => assertContract('HarnessSourceRecord', record));
+        }
+        if (!subjectsPath && !urlToScrape && connectorList.length === 0) {
+          throw new Error(
+            'Supply --subjects, --url, or an explicit --connectors selection; example data is never injected',
+          );
+        }
 
         // 1. Live crawl / scrape if URL supplied
         if (urlToScrape) {
@@ -1248,12 +1504,16 @@ export async function runCli(argv: readonly string[], deps: CliDependencies = {}
             const firstLine = text.split(/(?<=[.!?])\s|\n/u)[0]?.trim() ?? '';
             const title = firstLine.slice(0, 80) || 'Scraped Live Page';
             rawSubjects.push({
-              id: `scraped:${Buffer.from(urlToScrape).toString('base64').slice(0, 12)}`,
-              connectorKind: 'dpla',
+              id: `scraped:${createHash('sha256').update(urlToScrape).digest('hex').slice(0, 24)}`,
+              connectorKind: 'web_page',
               title: title.trim(),
               description: text.trim().slice(0, 1200),
               cites: [urlToScrape],
-              rawRecord: { scrapedUrl: urlToScrape, fullTextLength: text.length },
+              rawRecord: {
+                scrapedUrl: urlToScrape,
+                fullTextLength: text.length,
+                textTruncated: text.trim().length > 1200,
+              },
             });
           } else {
             stderr(`Failed to scrape live URL "${urlToScrape}": ${fetchResult.reason}\n`);
@@ -1261,48 +1521,16 @@ export async function runCli(argv: readonly string[], deps: CliDependencies = {}
         }
 
         if (connectorList.includes('nps_network_to_freedom')) {
-          reportHarnessProgress({
-            stage: 'connector.mock_fixture',
-            connectorKind: 'nps_network_to_freedom',
-            note: 'hardcoded fixture rows, not a live NPS pull',
-          });
-          const csvData = `id,name,abstract,latitude,longitude,address,city,county,state,source_url
-ntf-1,Chicago Quinn Chapel A.M.E. Church,"Historic church that served as an Underground Railroad station, active from 1847.",41.854,-87.625,"2401 S Wabash Ave",Chicago,Cook,Illinois,https://nps.gov/quinn-chapel
-ntf-2,Dunbar High School,"Dunbar was established in 1870 as the first public high school for Black students.",38.909,-77.017,"1301 New Jersey Ave NW",Washington,D.C.,DC,https://nps.gov/dunbar
-ntf-3,Providence Hospital,"First African American owned and operated hospital in Chicago founded in 1891.",41.803,-87.620,"426 E 51st St",Chicago,Cook,Illinois,https://nps.gov/providence-hospital
-`;
-          rawSubjects = [...rawSubjects, ...fetchNpsNetworkToFreedom(csvData)];
+          const csvPath = requireFlag(flags, '--nps-csv');
+          rawSubjects.push(...fetchNpsNetworkToFreedom(readFile(csvPath), { limit: maxSubjects }));
         }
 
         if (connectorList.includes('dpla')) {
-          reportHarnessProgress({
-            stage: 'connector.mock_fixture',
-            connectorKind: 'dpla',
-            note: 'hardcoded fixture rows, not a live DPLA API pull',
-          });
-          const mockDpla = [
-            {
-              id: 'dpla-1',
-              isShownAt: 'https://archive.org/item1',
-              sourceResource: {
-                title: ['Chicago Housing segregation study'],
-                description: [
-                  'A report detailing HOLC mortgage boundaries and housing credit in Chicago during 1937.',
-                ],
-              },
-            },
-            {
-              id: 'dpla-2',
-              isShownAt: 'https://archive.org/item2',
-              sourceResource: {
-                title: ['Providence Hospital Auxiliary Board'],
-                description: [
-                  'Organized in 1892 to support Chicago Providence Hospital operations.',
-                ],
-              },
-            },
-          ];
-          rawSubjects = [...rawSubjects, ...fetchDplaItems(mockDpla, { query })];
+          const dplaPath = requireFlag(flags, '--dpla-json');
+          const records: unknown = JSON.parse(readFile(dplaPath));
+          if (!Array.isArray(records))
+            throw new Error('--dpla-json must contain an array of DPLA records');
+          rawSubjects.push(...fetchDplaItems(records, { query, limit: maxSubjects }));
         }
 
         if (connectorList.includes('web_search')) {
@@ -1311,10 +1539,12 @@ ntf-3,Providence Hospital,"First African American owned and operated hospital in
           // be fetched through safe-fetch before it can become a subject at all: only a page that
           // answered becomes one, carrying the text that was actually read and the URL that
           // actually served it.
-          const searchQuery = `${theme} ${metro} historical sites`;
+          const searchQuery =
+            optionalFlag(flags, '--query') ??
+            [theme, metro === 'unspecified' ? '' : metro].filter(Boolean).join(' ');
           try {
             const searchResult = await runSearchQueries({
-              queries: [{ query: searchQuery, seeking: 'historic site page' }],
+              queries: [{ query: searchQuery, seeking: 'source for the research question' }],
               environment: process.env,
               executedAt: new Date().toISOString(),
               maxLeadsPerQuery: 5,
@@ -1360,11 +1590,11 @@ ntf-3,Providence Hospital,"First African American owned and operated hospital in
               // provenance, and this record is written to the run JSON and the progress file —
               // which is persistence, whatever the storage-rights flag says. So neither string
               // appears here, not even labeled: a label does not stop a write.
-              const webSubjects: HarnessRawSubject[] = gathered.map((snippet, index) => {
+              const webSubjects: HarnessRawSubject[] = gathered.map((snippet) => {
                 const lead = leadByUrl.get(snippet.url);
                 const citedUrl = snippet.finalUrl ?? snippet.url;
                 return {
-                  id: `web-${index}`,
+                  id: `web:${createHash('sha256').update(citedUrl).digest('hex').slice(0, 24)}`,
                   connectorKind: 'web_search',
                   title: deriveSuggestedTitle(snippet.text),
                   description: snippet.excerpt,
@@ -1392,49 +1622,40 @@ ntf-3,Providence Hospital,"First African American owned and operated hospital in
           connectorKinds: [...new Set(rawSubjects.map((s) => s.connectorKind))],
         });
 
-        // 2. Fetch existing catalog profiles from Postgres for deduplication check
-        let existingProfiles: { name: string; entity_id: string }[] = [];
-        try {
-          const pool = getOpsPostgresPool(process.env);
-          const searchResult = await pool.query<{ name: string; entity_id: string }>(
-            `SELECT name, entity_id FROM bb_public.search_index LIMIT 2000`,
-          );
-          existingProfiles = searchResult.rows;
-        } catch (err) {
-          stderr(`Warning: Database connection failed (profiles skipped): ${String(err)}\n`);
+        // Stable ids deduplicate fetched/supplied records. Names alone never resolve identity.
+        rawSubjects = rawSubjects.map((subject) => assertContract('HarnessSourceRecord', subject));
+        const byId = new Map<string, HarnessRawSubject>();
+        for (const subject of rawSubjects) {
+          const prior = byId.get(subject.id);
+          if (prior && JSON.stringify(prior) !== JSON.stringify(subject))
+            throw new Error(`Conflicting source records share id ${subject.id}`);
+          byId.set(subject.id, subject);
         }
+        rawSubjects = [...byId.values()];
+        const deferredSubjects = Math.max(0, rawSubjects.length - maxSubjects);
+        const deduplicatedSubjects = rawSubjects.slice(0, maxSubjects);
 
-        const deduplicatedSubjects = rawSubjects.map((subject) => {
-          const cleanName = subject.title.toLowerCase().trim();
-          const matched = existingProfiles.find((p) => {
-            const pName = p.name ? p.name.toLowerCase().trim() : '';
-            return (
-              pName === cleanName || pName.startsWith(cleanName) || cleanName.startsWith(pName)
-            );
-          });
-          return {
-            ...subject,
-            existingEntityId: matched ? matched.entity_id : null,
-            isDuplicate: !!matched,
-          };
-        });
-
-        const overlaps = findSpatialTemporalOverlaps(deduplicatedSubjects, {
+        const overlaps = findRelationshipCandidates(deduplicatedSubjects, {
           maxDistanceMeters: 10000,
-        });
+        }).slice(0, maxRelations);
 
         reportHarnessProgress({
           stage: 'dedup.complete',
           rawSubjectsCount: deduplicatedSubjects.length,
-          duplicateCount: deduplicatedSubjects.filter((s) => s.isDuplicate).length,
+          deferredSubjects,
           overlapsCount: overlaps.length,
         });
 
-        type EnrichmentFailure = { readonly id: string; readonly error: string };
+        type EnrichmentFailure = {
+          readonly id: string;
+          readonly error: string;
+          readonly rawOutput?: string;
+        };
         type RelationFailure = {
           readonly subjectAId: string;
           readonly subjectBId: string;
           readonly error: string;
+          readonly rawOutput?: string;
         };
         const enrichedCandidates: Array<EnrichedCandidate | EnrichmentFailure> = [];
         const adjudicatedRelations: Array<AdjudicatedRelationship | RelationFailure> = [];
@@ -1452,10 +1673,11 @@ ntf-3,Providence Hospital,"First African American owned and operated hospital in
           });
 
           const bridgeClient: EnrichmentBridgeClient = {
-            complete: async (prompt: string) => {
+            complete: async (prompt, schemaName, schema) => {
               const res = await provider.complete({
                 model: model ?? '',
                 messages: [{ role: 'user', content: prompt }],
+                responseSchema: { name: schemaName, schema },
               });
               return res.content;
             },
@@ -1474,7 +1696,11 @@ ntf-3,Providence Hospital,"First African American owned and operated hospital in
                 ok: true,
               });
             } catch (err) {
-              enrichedCandidates.push({ id: subject.id, error: String(err) });
+              enrichedCandidates.push({
+                id: subject.id,
+                error: String(err),
+                ...(err instanceof InvalidHarnessOutputError ? { rawOutput: err.rawOutput } : {}),
+              });
               reportHarnessProgress({
                 stage: 'enrich.subject',
                 index: index + 1,
@@ -1504,6 +1730,7 @@ ntf-3,Providence Hospital,"First African American owned and operated hospital in
                 subjectAId: overlap.subjectA.id,
                 subjectBId: overlap.subjectB.id,
                 error: String(err),
+                ...(err instanceof InvalidHarnessOutputError ? { rawOutput: err.rawOutput } : {}),
               });
               reportHarnessProgress({
                 stage: 'adjudicate.relationship',
@@ -1570,6 +1797,10 @@ ntf-3,Providence Hospital,"First African American owned and operated hospital in
           theme,
           metro,
           connectorList,
+          deferredSubjects,
+          limits: { maxSubjects, maxRelations },
+          confidenceMeaning: 'uncalibrated_model_self_report',
+          disposition: 'proposals_require_independent_review',
           rawSubjectsCount: deduplicatedSubjects.length,
           rawSubjects: deduplicatedSubjects,
           overlapsCount: overlaps.length,
@@ -1720,7 +1951,7 @@ ntf-3,Providence Hospital,"First African American owned and operated hospital in
       case 'graylist-read': {
         // Read path for parked/quarantined items — documented as missing in the
         // triage-graylist lane. Covers the Postgres-backed quarantine table
-        // (bb_submissions.intake_items, status='quarantined'); Firestore-backed
+        // (submissions.intake_items, status='quarantined'); Postgres-backed
         // submissionInbox/discoveryCandidates (moderationState/status fields) are not yet
         // reachable from this CLI — see docs/research/research-operations.md ("graylist read
         // path") for that gap.
@@ -1732,7 +1963,7 @@ ntf-3,Providence Hospital,"First African American owned and operated hospital in
         const pool = getOpsPostgresPool(process.env);
         const { rows } = await pool.query(
           `SELECT id, status, kind, source_url, created_at
-             FROM bb_submissions.intake_items
+             FROM submissions.intake_items
             WHERE status = 'quarantined'
             ORDER BY created_at DESC
             LIMIT $1`,
@@ -1753,7 +1984,7 @@ ntf-3,Providence Hospital,"First African American owned and operated hospital in
         return 0;
       }
       case 'quarantine-triage': {
-        // Write path for the graylist: judges each quarantined bb_submissions.intake_items
+        // Write path for the graylist: judges each quarantined submissions.intake_items
         // row with an LLM (see quarantine-triage.ts for the authority this does and does not
         // have) and, with --commit, moves it to promoted/rejected/spam.
         const limitRaw = optionalFlag(flags, '--limit');
@@ -1777,7 +2008,7 @@ ntf-3,Providence Hospital,"First African American owned and operated hospital in
         const pool = getOpsPostgresPool(process.env);
         const { rows } = await pool.query(
           `SELECT id, kind, payload, source_url, created_at
-             FROM bb_submissions.intake_items
+             FROM submissions.intake_items
             WHERE status = 'quarantined'
             ORDER BY created_at ASC
             LIMIT $1`,
@@ -1927,14 +2158,8 @@ ntf-3,Providence Hospital,"First African American owned and operated hospital in
         return 0;
       }
       case 'enrich-entity': {
-        // The deep-research path's PLANNER. It reads a record, works out what is missing, and
-        // emits the evidence needs and bounded queries that would close the gap.
-        //
-        // IT DOES NOT EXECUTE. There is no --commit, deliberately: the search, fetch, capture,
-        // selector and claim-extraction stages are not built, and a --commit that staged an
-        // empty result would be the same lie `enrichment-run` tells by relabelling the
-        // editorial judge. A query emitted here is a lead. Nothing it returns is evidence until
-        // it has been independently resolved and fetched through the safe-fetch path.
+        // Deficit planning and acquisition share the durable research protocol. Review owns maturity.
+        assertPostgresOpsDataSource(process.env);
         const entityId = requireFlag(flags, '--entity-id');
         const targetRaw = optionalFlag(flags, '--target-maturity') ?? 'corroborated';
         if (!(RESEARCH_MATURITY_STATES as readonly string[]).includes(targetRaw)) {
@@ -1947,8 +2172,8 @@ ntf-3,Providence Hospital,"First African American owned and operated hospital in
         const { rows } = await pool.query(
           `SELECT re.entity_id, re.kind, re.display_name, re.summary,
                   COALESCE(re.claims, '[]'::jsonb) AS claims
-             FROM bb_public.release_entities re
-             JOIN bb_public.active_release ar ON ar.release_id = re.release_id
+             FROM published.release_entities re
+             JOIN published.active_release ar ON ar.release_id = re.release_id
             WHERE re.entity_id = $1`,
           [entityId],
         );
@@ -1970,12 +2195,51 @@ ntf-3,Providence Hospital,"First African American owned and operated hospital in
           deficits: assessment.evidenceDeficits,
           context: { subjectName: released.displayName },
         });
+        const runId = optionalFlag(flags, '--run-id');
+        const decisionsPath = optionalFlag(flags, '--preservation-decisions');
+        const decisions: PreservationDecision[] = decisionsPath
+          ? (JSON.parse(readFile(decisionsPath)) as unknown[]).map((value) =>
+              assertContract('PreservationDecision', value),
+            )
+          : [];
+        const executionPlan = runId
+          ? validateExecutionPlan(
+              enrichmentExecutionPlan({
+                plan,
+                profile: blackHistoryProfile,
+                runId,
+                now: new Date().toISOString(),
+                decisions,
+                subjectName: released.displayName,
+              }),
+            )
+          : null;
+        let execution: Awaited<ReturnType<typeof runResearchWorker>> | null = null;
+        if (flags.booleans.has('--commit')) {
+          if (!executionPlan) throw new Error('enrich-entity --commit requires --run-id');
+          const workerId = requireFlag(flags, '--worker-id');
+          const maxTasks = Number(requireFlag(flags, '--max-tasks'));
+          if (!Number.isSafeInteger(maxTasks) || maxTasks < 1 || maxTasks > 100)
+            throw new Error('--max-tasks must be between 1 and 100');
+          await startResearchExecution(pool, executionPlan);
+          execution = await runResearchWorker(pool, {
+            runId: executionPlan.run.id,
+            workerId,
+            maxTasks,
+          });
+        }
+        const outputPath = optionalFlag(flags, '--output');
+        if (outputPath && executionPlan)
+          writeFile(outputPath, JSON.stringify(executionPlan, null, 2));
         stdout(
           JSON.stringify(
             {
               verb: 'enrich-entity',
-              status: 'planned',
-              executed: false,
+              status: execution ? 'execution-attempted' : 'planned',
+              executed: execution !== null,
+              execution,
+              executionPlan,
+              publicationAuthorized: false,
               entityId: released.entityId,
               displayName: released.displayName,
               maturity: assessment.maturity,
@@ -1990,7 +2254,7 @@ ntf-3,Providence Hospital,"First African American owned and operated hospital in
             2,
           ),
         );
-        return 0;
+        return execution?.attempts.some((attempt) => !attempt.valid) ? 1 : 0;
       }
       case 'research-quality-audit': {
         // Read-only. No --commit exists and none should: this measures the released catalog,
@@ -2008,7 +2272,7 @@ ntf-3,Providence Hospital,"First African American owned and operated hospital in
         const pool = getOpsPostgresPool(process.env);
         const releaseId =
           releaseFlag ??
-          (await pool.query('SELECT release_id FROM bb_public.active_release LIMIT 1')).rows[0]
+          (await pool.query('SELECT release_id FROM published.active_release LIMIT 1')).rows[0]
             ?.release_id;
         if (releaseId === undefined) throw new Error('No active release and no --release-id given');
 
@@ -2023,7 +2287,7 @@ ntf-3,Providence Hospital,"First African American owned and operated hospital in
           conditions.push(`entity_id = $${params.length}`);
         }
         let sql = `SELECT entity_id, kind, display_name, summary, COALESCE(claims, '[]'::jsonb) AS claims
-             FROM bb_public.release_entities
+             FROM published.release_entities
             WHERE ${conditions.join(' AND ')}
             ORDER BY entity_id`;
         // A bounded --deficit cohort has to be picked from the WHOLE matching set, not from a
@@ -2059,13 +2323,13 @@ ntf-3,Providence Hospital,"First African American owned and operated hospital in
       }
       default: {
         stderr(
-          'Usage: operator-cli <preflight|model-report|submit-lead|research-intake|register-source|attach-evidence|bulk-import|propose-edge|discovery-run|community-obscurity-run|rss-campaign-run|discovery-dispatch|pending-list|editorial-run|enrichment-run|story-research-run|sundown-town-brief|harness-run|locate|backfill-entity|prose-run|expand|graylist-read|quarantine-triage|capture-backfill|research-quality-audit|enrich-entity> [flags]\n' +
+          'Usage: operator-cli <research-run|research-work|research-status|research-claim|research-heartbeat|research-complete|research-index|research-embed|research-retrieve|capture-retention|preflight|model-report|submit-lead|research-intake|register-source|attach-evidence|bulk-import|propose-edge|discovery-run|community-obscurity-run|rss-campaign-run|discovery-dispatch|pending-list|editorial-run|enrichment-run|story-research-run|sundown-town-brief|harness-run|locate|backfill-entity|prose-run|expand|graylist-read|quarantine-triage|capture-backfill|research-quality-audit|enrich-entity> [flags]\n' +
             'Every command accepts --json (no-op: output is always JSON) and every id-bearing command uses --entity-id / --case-id for its target.\n' +
             'For model-report: [--since <ISO date>] [--json]\n' +
-            'For harness-run: --theme <theme> --metro <metro> [--connectors dpla,nps_network_to_freedom,web_search] [--enrich] [--provider openrouter|ollama|mock] [--progress-path <file>]\n' +
+            'For harness-run: --theme <theme> [--metro <metro>] [--subjects <source-records.json> | --url <url> | --connectors dpla,nps_network_to_freedom,web_search] [--nps-csv <file>] [--dpla-json <file>] [--max-subjects 25] [--max-relations 25] [--enrich] [--provider openrouter|ollama|mock] [--progress-path <file>]\n' +
             'For backfill-entity/prose-run: --entity-id <id> [--title ...] [--summary ...] [--provider mock|openrouter|ollama|hybrid] [--commit]\n' +
             'For capture-backfill: [--commit] [--wayback] [--max-captures N] [--max-entities N]\n' +
-            'For expand: --entity-id <id> [--depth N] [--commit] — live Wikidata traversal; stages landscape_candidates, never bb_canonical\n' +
+            'For expand: --entity-id <id> [--depth N] [--commit] — live Wikidata traversal; stages landscape_candidates, never canonical\n' +
             'For enrich-entity: --entity-id <id> [--target-maturity seeded|grounded|corroborated|contextualized|deep_research|reference] — PLANS research; it does not execute, and has no --commit\n' +
             'For research-quality-audit: [--release-id <id>] [--kind <kind>] [--entity-id <id>] [--deficit <code>] [--limit N] — read-only; narrow the query to get per-entity rows; --deficit with --limit returns the next N matching entities in priority order, not a deficit filter over the first N by id\n' +
             'For graylist-read: [--limit N] — Postgres quarantine only, see docs/research/research-operations.md\n',

@@ -4,7 +4,7 @@
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { listPublicEntities } from '../../data/public-seed';
+import { listPublicEntities, type PublicEntityView } from '../../data/public-seed';
 import { buildExploreViewModel } from './explore-view-model';
 
 test('includes every geo-anchored active-release entity by default', () => {
@@ -50,7 +50,7 @@ test('legacy density=1 deep links still open presence layer', () => {
 });
 
 test('lines=1 projects evidence-backed history edges onto the map', () => {
-  const view = buildExploreViewModel({ lines: '1' });
+  const view = buildExploreViewModel({ lines: '1' }, relationshipFixtures());
   assert.equal(view.viewState.lines, true);
   assert.ok(view.availableDecades.length > 0);
   assert.ok(view.historyEdges.length > 0);
@@ -58,8 +58,8 @@ test('lines=1 projects evidence-backed history edges onto the map', () => {
 });
 
 test('decade slice filters relationship lines', () => {
-  const allTime = buildExploreViewModel({ lines: '1' });
-  const fifties = buildExploreViewModel({ lines: '1', decade: '1950s' });
+  const allTime = buildExploreViewModel({ lines: '1' }, relationshipFixtures());
+  const fifties = buildExploreViewModel({ lines: '1', decade: '1950s' }, relationshipFixtures());
   assert.ok(fifties.historyEdges.length <= allTime.historyEdges.length);
 });
 
@@ -72,6 +72,17 @@ test('lines=1 draws connections from live geoAnchor outside the seed table', () 
     {
       ...church,
       id: 'ent_live_catalog_place_a',
+      claims: [
+        {
+          id: 'live-relationship-claim',
+          predicate: 'located_at',
+          object: 'ent_live_catalog_place_b',
+          confidenceLevel: 'high' as const,
+          citationSource: 'fixture-archive',
+          citationLabel: 'Synthetic relationship fixture',
+          citationHref: 'https://archive.example.org/relationship',
+        },
+      ],
       relatedIds: ['ent_live_catalog_place_b'],
       related: [
         { id: 'ent_live_catalog_place_b', type: 'located_at', direction: 'outgoing' as const },
@@ -107,4 +118,33 @@ test('lines=1 draws connections from live geoAnchor outside the seed table', () 
       view.edgeLineCollection.features[0]?.properties.toEntityId === 'ent_live_catalog_place_a',
     true,
   );
+});
+
+function relationshipFixtures(): readonly PublicEntityView[] {
+  const [first, second] = listPublicEntities();
+  return [
+    {
+      ...first!,
+      related: [{ id: second!.id, type: 'related_to', direction: 'outgoing' }],
+      claims: [
+        {
+          id: 'projection-relationship-claim',
+          predicate: 'related_to',
+          object: second!.id,
+          confidenceLevel: 'high',
+          citationSource: 'fixture-archive',
+          citationLabel: 'Synthetic relationship fixture',
+          citationHref: 'https://archive.example.org/relationship',
+        },
+      ],
+    },
+    { ...second!, related: [], claims: [] },
+  ];
+}
+
+test('map connection lines stay empty when relationship proof is missing', () => {
+  const entities = relationshipFixtures().map((entity) => ({ ...entity, claims: [] }));
+  const view = buildExploreViewModel({ lines: '1' }, entities);
+  assert.deepEqual(view.historyEdges, []);
+  assert.deepEqual(view.edgeLineCollection.features, []);
 });

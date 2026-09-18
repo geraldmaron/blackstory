@@ -97,7 +97,7 @@ test('postgres mode uses release-catalog artifacts only behind an explicit origi
     }),
     false,
   );
-  // With an explicit origin, artifacts act as the egress read-through cache (repo-csw0);
+  // With an explicit origin, artifacts act as the egress read-through cache;
   // The shared release-artifact fetcher still rejects any artifact whose releaseId mismatches
   // the live pointer.
   assert.equal(
@@ -191,9 +191,8 @@ test('mapProjectionToPublicEntityView places MapFrame pins as 0–100 percentage
 });
 
 test('mapProjectionToPublicEntityView does not backfill from the bundled seed catalog even when the id matches', () => {
-  // `ent_15th_st_church_001` is a real bundled seed id with its own summary/claims. A live
-  // projection sharing that id must render only its own (thinner) data — never silently pull
-  // in the seed's summary/topicTags/claims (the related workstream fixed this seed-enrichment bug).
+  // A live record sharing a bundled seed id must render only its live fields, never borrow the
+  // seed's claims, summary or topics.
   const view = mapProjectionToPublicEntityView({
     id: 'ent_15th_st_church_001',
     releaseId: 'rel_live_001',
@@ -318,7 +317,7 @@ test('live-only projections get a default notability label for search-pool parit
     locationLabel: 'Tulsa, Oklahoma',
   });
   assert.ok(view.notabilityLabels && view.notabilityLabels.length >= 1);
-  assert.match(view.notabilityLabels![0]!, /documented site/i);
+  assert.match(view.notabilityLabels![0]!, /record in the active public release/i);
 });
 
 test('mapProjectionToPublicEntityView uses the release builder real notabilityBasis/researchCoverage/revision metadata when present (the related workstream)', () => {
@@ -495,4 +494,42 @@ test('hydrateEntityLearningLinks builds a timeline from status history and dated
   assert.ok(hydrated.timeline.length >= 2);
   assert.ok(hydrated.timeline.some((item) => item.time === '1900'));
   assert.ok(hydrated.timeline.some((item) => item.time === '1910'));
+});
+
+test('projection grades do not invent scores and missing or unrecognized precision never creates a pin', () => {
+  const projection = {
+    id: 'publication',
+    releaseId: 'release',
+    kind: 'publication',
+    displayName: 'Source review',
+    nameLower: 'source review',
+    claimIds: ['claim'],
+    claims: [
+      {
+        id: 'claim',
+        predicate: 'description',
+        object: 'A sourced statement',
+        confidenceLevel: 'low' as const,
+        citationSource: 'Archive',
+        citationLabel: 'Record',
+      },
+    ],
+  };
+  const view = mapProjectionToPublicEntityView(projection);
+  assert.equal(view.claims[0]?.confidenceScore, undefined);
+  assert.equal(view.locationPrecision, 'none');
+  assert.equal(view.geoAnchor, undefined);
+  assert.doesNotMatch(view.relevanceExplanation, /documented site/);
+  for (const precision of [undefined, 'unrecognized', 'none', 'country']) {
+    const located = mapProjectionToPublicEntityView({
+      ...projection,
+      location: {
+        lat: 38,
+        lng: -77,
+        geohash: 'dqc',
+        ...(precision !== undefined ? { precision } : {}),
+      },
+    });
+    assert.equal(located.geoAnchor, undefined);
+  }
 });

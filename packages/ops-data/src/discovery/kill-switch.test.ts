@@ -1,10 +1,8 @@
-/**
- * Unit tests for research-campaigns kill switch engagement semantics (no firebase-admin).
- */
+/** Research dispatch fails closed when its operational kill switch is missing or enabled. */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { firestorePaths } from '../firestore/paths.js';
-import type { KillSwitchDoc } from '../firestore/types.js';
+import { ledgerPaths } from '@repo/data-access';
+import type { KillSwitchDoc } from '../records/types.js';
 import {
   fetchResearchCampaignsKillSwitch,
   isKillSwitchEngagedFromDoc,
@@ -62,8 +60,8 @@ test('engagement matches research-campaigns deny-on-missing policy', () => {
   assert.equal(isResearchCampaignsKillSwitchEngaged(disengagedDoc), false);
 });
 
-test('fetchResearchCampaignsKillSwitch reads the canonical Firestore path', async () => {
-  const path = firestorePaths.killSwitch('research-campaigns');
+test('fetchResearchCampaignsKillSwitch reads the configured operations switch path', async () => {
+  const path = ledgerPaths.killSwitch('research-campaigns');
   const getter = createGetter({
     [path]: { enabled: false },
   });
@@ -72,7 +70,7 @@ test('fetchResearchCampaignsKillSwitch reads the canonical Firestore path', asyn
 });
 
 test('isResearchCampaignsKillSwitchEngagedIn combines fetch and evaluation', async () => {
-  const path = firestorePaths.killSwitch('research-campaigns');
+  const path = ledgerPaths.killSwitch('research-campaigns');
   const engagedGetter = createGetter({ [path]: { enabled: true } });
   const disengagedGetter = createGetter({ [path]: { enabled: false } });
   const missingGetter = createGetter({});

@@ -1,154 +1,50 @@
-<!--
-  Operator runbook for cutting public apps/web from Firebase App Hosting to Vercel.
-  Hard-cut DNS flip completed 2026-07-22; soak closed; public web App Hosting retired in-repo.
--->
+# Vercel web deployment
 
-# Runbook: Vercel public-web cutover
+The public site and staff workbench run in `apps/web` on Vercel. Supabase provides Postgres,
+Auth and object storage. [The web surface contract](../../apps/web/SURFACE.md) defines the boundary.
 
-**Decision:** ADR-027, removed 2026-07-24, recovered in [`../decisions-carryover.md`](../decisions-carryover.md), "Small recovered decisions"  
-**Project:** Vercel `geraldmarons-projects/blackstory` (`prj_AJYcJozo2XqLfBXItGxHV5SQP06h`)  
-**Root Directory:** `apps/web`
+## Prepare
 
-## Current state (2026-07-22 — complete)
+1. Use the linked Vercel project with Root Directory `apps/web`. Inspect its current production
+   branch, deployment protection, domains and environment targets. Repository files cannot prove
+   the current account configuration.
+2. Run the applicable local CI lanes before pushing. Use one consolidated PR for a coherent
+   change; avoid repeated remote CI and deployment attempts as a debugging loop.
+3. Configure the keys described by `apps/web/.env.example`. Public reads use `DATABASE_URL`;
+   staff writes use the separate `ADMIN_DATABASE_URL`. Require encrypted database connections
+   outside local development. Use the project's supported connection pooler and least-privilege roles.
+4. Configure Supabase Auth's HTTPS origin and public client key for staff login. Keep service-role
+   credentials server-only. Staff JWT authorization uses `app_metadata.app_role`.
+5. Configure `APP_PUBLIC_RELEASE_ARTIFACT_BASE_URL` for release artifacts and
+   `SUBMISSION_PRIVACY_PEPPER` for submission hashing. Read secrets through approved local mounts
+   or provider configuration; never print values or put them in command arguments.
 
-| Item | Value |
-|------|--------|
-| Preview / default alias | `https://blackstory-geraldmarons-projects.vercel.app` |
-| Git production branch | `main` at `bd1b1c08` (includes `5ea25768` `_vercel_*` preserve) |
-| Production deploy | `dpl_ERR5rbReMAdUkrA3uscmYQZ9BCN6` READY |
-| Vercel domains | `blackstory.app` + `www.blackstory.app` attached; `misconfigured=false`; Production public |
-| Production DNS | **Cloudflare-proxied → Vercel.** At cutover this was DNS-only / gray cloud (apex `A 76.76.21.21`, `www` `CNAME cname.vercel-dns.com`). It is no longer: measured 2026-08-24, the apex resolves to Cloudflare anycast (`172.67.210.34`, `104.21.16.57`) and every response carries `server: cloudflare` + `cf-ray`, i.e. orange cloud. **This matters for cost decisions:** gray cloud would mean Cloudflare never sees a request and any Cache Rule is a no-op; orange cloud means Cloudflare rules can absorb traffic before Vercel bills it (see `repo-uuzm`). Re-measure before relying on either state. |
-| Live probe (post-flip) | `server: Vercel` (not App Hosting `envoy` / `via: google`); `/explore/api` `totalMatched=1338` `degraded=false`; `/history/api` `1340`; `/search?q=obama` 200 with Barack Obama; sample entity 200 |
-| Soak | **Closed** — Vercel is sole public web host |
-| Owner wind-down | **Done** — public web App Hosting deleted 2026-07-22; admin App Hosting + Cloud Run `black-book-admin-production` deleted 2026-08-15 |
+## Verify a preview
 
-### DNS records in effect (re-confirm via Vercel domain API before any future change)
+Exercise the homepage, records, map, a record with citations, a missing record, staff login and
+an unauthorized staff request against the intended database. Check both themes, console/network
+failures, security headers and source links. An HTTP 200 alone is not a catalog health check.
+For pooler or artifact failures, inspect runtime logs and the actual response before changing DNS.
 
-Live Vercel recommendation at flip time (owner applied):
+Deployment-protection redirects must preserve Vercel's `_vercel_*` handshake parameters without
+using tokens in shared cache keys. Do not redirect solely to alphabetize query parameters.
 
-| Type | Name | Content | Proxy |
-|------|------|---------|-------|
-| A | `@` / `blackstory.app` | `76.76.21.21` | DNS only |
-| CNAME | `www` | `cname.vercel-dns.com` | DNS only |
+Environment changes require a new deployment. Preview and production need separate environment
+values and should not share a writable production credential for verification.
 
-Older dual-A / project-hash CNAME targets may still resolve on Vercel’s edge but are **not** what Production is using now. Preserve MX/TXT. Optional agent unblock: Cloudflare Zone DNS Edit token as `CLOUDFLARE_API_TOKEN` in 1Password.
+## Release and recovery
 
-## Agent / MCP
+Treat merging to the configured production branch as a release: Vercel's Git integration can
+build and activate it automatically. For incompatible schema changes, verify deployed migration
+history, isolated restore evidence, client compatibility and the maintenance procedure first.
+See [production release](production-release.md) and [database restore](backup-restore.md).
 
-- Cursor MCP endpoint: `https://mcp.vercel.com` (server id `user-vercel` after OAuth)
-- Prefer MCP `list_deployments` / `get_deployment_build_logs` / `get_runtime_logs` for diagnosis
-- CLI fallback: `vercel` (linked via `.vercel/project.json`, gitignored)
+Promote a known-good Vercel deployment only when it matches the database schema. Rolling back
+application code alone after a schema cutover is unsafe. Preserve logs and the release identity;
+use the coordinated database recovery procedure when the stored schema must also roll back.
 
-## Preview validation (required before hard cut)
+## Cost observation
 
-1. Deploy Preview from a linked branch or `vercel` (non-`--prod`) from a clean tree with current `apps/web` config.
-2. Confirm:
-   - Homepage renders (not empty seed-only dig)
-   - `/explore` shows live catalog (~1k+ records when `PUBLIC_DATA_SOURCE=postgres`)
-   - `/search?q=obama` returns results (no browser `ERR_TOO_MANY_REDIRECTS`)
-   - Security headers still present
-   - No App Hosting-only assumptions in runtime logs
-3. Soak Preview for at least one owner review session.
-
-### Deployment Protection / Authentication
-
-If Vercel Authentication (or share-link protection) is on for Preview, SSO returns with `_vercel_share=…`. Edge query normalization **must preserve** `_vercel_*` handshake params on redirects (see `apps/web/src/lib/runtime-hardening/query-normalization.ts`). Stripping them 308s to a bare URL and re-triggers SSO → `ERR_TOO_MANY_REDIRECTS` (often described by users as “too many requests”). Share tokens stay out of CDN cache keys.
-
-**Query-param order:** Do **not** 308 solely to alphabetize allowlisted keys. The `/search` GET form submits `q&kind&status&era`; a reorder-only Location can equal the request on Vercel/Next middleware and loop (`ERR_TOO_MANY_REDIRECTS`). Cache keys may still sort; redirects only when keys/values/path actually change (tracking strip, unknown keys, value canonicalization, trailing slash).
-
-**Evidence matrix (2026-07-22 probe, no secrets):**
-
-| Surface | Backend | Deployment Protection | `/search?q=obama` | `?_vercel_share=` behavior | Loop? |
-|--------|---------|----------------------|-------------------|----------------------------|-------|
-| Preview branch alias `…-69ebd1-….vercel.app` | Vercel Preview (`5ea25768`+) | Auth on → SSO | **200** after share auth (Barack Obama) | Preserved by fix | **Fixed** (was SSO↔308 strip) |
-| Preview deployment `blackstory-le31w9fbq-…` | Same commit | Auth on | Same | Same | **Fixed** |
-| Vercel Production `blackstory-….vercel.app` / `blackstory-5x9edrjgc-…` | Vercel Production (`main` / `e1c1f415`) | **Off** (direct 200) | **200**, 1 result | Still **308 strips** share (fix not on `main`) | **No** (Auth off; strip is inert) |
-| `https://blackstory.app` | **Vercel Production** (`server: Vercel`) after DNS GO | Off | **200**, Barack Obama | Share strip inert (Auth off) | **No** |
-| `https://www.blackstory.app` | **Vercel** (`CNAME cname.vercel-dns.com`, `server: Vercel`) | Off | **200** (via public DNS; some local resolvers lag briefly) | N/A | **No** |
-
-Do **not** enable Production Deployment Protection until `isPlatformPassthroughQueryKey` is on the Production deployment. Cloudflare SSL was not in these chains (Vercel or Google/envoy only).
-
-## Environment variables
-
-Set on the Vercel project (Preview + Production unless noted):
-
-| Key | Notes |
-|-----|--------|
-| `NEXT_PUBLIC_APP_ENV` | `production` |
-| `NEXT_PUBLIC_SITE_URL` | Preview: `*.vercel.app` alias; Production: `https://blackstory.app` |
-| `PUBLIC_DATA_SOURCE` | `postgres` |
-| `PUBLIC_READ_API_DISABLED` | `0` (or `1` to force degraded mode) |
-| `REQUEST_INTEGRITY_MODE` | `enforce` |
-| `DATABASE_SSL` | `1` |
-| `DATABASE_URL` | Sensitive; **Supabase session pooler** (IPv4). Direct `db.<ref>.supabase.co` is IPv6-only and fails on Vercel (`ENOTFOUND`). For `blackstory-app` use `aws-1-us-west-2.pooler.supabase.com:5432` with user `postgres.<ref>`, `sslmode=require`, `uselibpqcompat=true`. Decode the DB password once if the source URL was already percent-encoded (passwords containing `%`/`@` break when double-encoded). |
-| `SENTRY_DSN` | Optional; not wired in `apps/web` yet — **omit on Vercel** until observability lands |
-| `SUBMISSION_PRIVACY_PEPPER` | Required for production `POST /submit` and corrections IP hashing; not needed for public catalog reads. **Set 2026-07-22** (see below). |
-| `APP_PUBLIC_RELEASE_ARTIFACT_BASE_URL` | Public-media origin, no trailing slash: `https://twykhihqkcldpreuovay.supabase.co/storage/v1/object/public/public-media`. Required on Production and all Preview branches. Without it (or if the 13.8 MB GET times out), every catalog cold start runs full-table `bb_public.release_entities` SQL. Fetch timeout in code is 60s; redeploy after changing it. Set 2026-08-15 on Production, Preview (`staging`), and Preview (all branches). |
-
-### Secrets checklist (names only)
-
-| Name | Preview | Production | Notes |
-|------|---------|------------|-------|
-| `DATABASE_URL` | required (sensitive) | required (sensitive) | Session pooler only |
-| `DATABASE_SSL` | required | required | `1` |
-| `PUBLIC_DATA_SOURCE` | required | required | `postgres` |
-| `PUBLIC_READ_API_DISABLED` | required | required | `0` for live reads |
-| `REQUEST_INTEGRITY_MODE` | required | required | `enforce` |
-| `NEXT_PUBLIC_APP_ENV` | required | required | `production` |
-| `NEXT_PUBLIC_SITE_URL` | required (preview URL) | required (`https://blackstory.app`) | Separate per target |
-| `SENTRY_DSN` | omit for now | omit for now | Not wired in `apps/web` |
-| `SUBMISSION_PRIVACY_PEPPER` | set (sensitive) | set (sensitive) | 1Password + Vercel; never commit value |
-| `NEXT_PUBLIC_ADMIN_ORIGIN` | optional | optional | Footer admin link only |
-| `NEXT_PUBLIC_FIREBASE_*` | not required for Vercel public reads | not required | Public dig uses Postgres |
-| `APP_PUBLIC_RELEASE_ARTIFACT_BASE_URL` | required | required | Public-media origin; 60s fetch timeout in `apps/web` |
-
-### `SUBMISSION_PRIVACY_PEPPER` (set 2026-07-22)
-
-Dedicated pepper is live for Vercel Preview and Production (sensitive). Value is **not** in git.
-
-| Source | Status |
-|--------|--------|
-| 1Password (Private vault) | Item `BlackStory submission privacy pepper` — fields `credential` / `SUBMISSION_PRIVACY_PEPPER` |
-| Vercel project env | Present Preview + Production as Encrypted/sensitive |
-| `OPERATOR_CLI_PRIVACY_PEPPER` | Separate 1Password item — **do not reuse** for submissions |
-
-After any env change, **redeploy** Preview/Production — existing deployments keep the prior env snapshot. Smoke submit/corrections on Preview when ready: confirm no `SUBMISSION_PRIVACY_PEPPER must be set in production` runtime error. Public catalog / Explore reads do not need this pepper.
-
-Update without printing secrets:
-
-```bash
-# Preview: omit git branch to apply to all Preview branches (CLI may prompt otherwise)
-vercel env add DATABASE_URL preview --value "$DATABASE_URL" --yes
-vercel env add DATABASE_URL production --value "$DATABASE_URL" --yes
-# Or POST to Vercel API v10 with type=sensitive, target=["preview"|"production"]
-vercel redeploy <preview-deployment-url>
-```
-
-## Hard cut (completed 2026-07-22)
-
-Owner flipped Cloudflare DNS to Vercel (apex A + www CNAME, DNS-only). Post-flip verification: Vercel `misconfigured=false`; catalog `/explore/api` `totalMatched=1338`; Obama search + sample entity OK.
-
-**Soak closed:** Vercel is the sole public web host. Public web App Hosting configs are removed from the repo. Firebase backends `black-book-web-production` and `black-book-web-staging` were deleted 2026-07-22. Admin App Hosting + Cloud Run `black-book-admin-production` were deleted 2026-08-15.
-
-**Web Analytics (2026-08-15):** Enable on the Vercel project (`vercel project web-analytics`), ship `<WebAnalytics />` (pageviews plus a classified `traffic` custom event), and allow `va.vercel-scripts.com` + `vitals.vercel-insights.com` in CSP. Redeploy Production so the 60s artifact timeout and analytics script actually run.
-
-**Traffic by class:** each JS pageview also sends `track('traffic', { class })` where `class` is one of `likely_human`, `automated`, `search_crawler`, `ai_crawler`, `tool`. Query the Vercel `events` dataset, filter `eventName eq 'traffic'`, group by `eventData/class`. This only sees clients that run the analytics script. Search crawlers that do not execute JS will not appear. Stealth scrapers that spoof a full browser can still land in `likely_human`.
-
-## Rollback
-
-1. **Vercel promote/redeploy** the prior known-good Production deployment SHA (dashboard or `vercel promote <deployment-url>`).
-2. Do **not** repoint DNS to App Hosting — public web backends are wind-down targets, not rollback.
-3. Leave the Vercel project intact for log forensics.
-
-## Do not
-
-- Host `apps/admin` on this Vercel project — keep it a separate deployment (admin moved to its
-  own standalone Vercel project 2026-07-25, gated by Postgres roles via `bb_auth.current_role()`,
-  not an IAP boundary; the ADR-001/ADR-005 service-surface-separation decision
-  (`../decisions-carryover.md`, "Service surface separation") predates that cutover).
-- Assume there is a manual "Promote to Production" step before a `main` push goes live: Vercel's
-  git integration auto-builds and auto-aliases every `main` commit to Production with no such step
-  (confirmed 2026-08-05 / 2026-08-12, repo-8ary / repo-h1b2). Treat the staging → main PR merge
-  itself as the production release (see `docs/runbooks/production-release.md`).
-- Recreate public web App Hosting configs in-repo.
-- Put secrets in user-facing copy.
+Measure artifact size, cache hit rate, origin egress, serverless compute and database query load.
+Supabase pooler traffic and Storage CDN hits still contribute to their respective egress meters.
+Vercel browser analytics sees clients that execute its script; it is not a complete crawler count.

@@ -12,7 +12,7 @@
  * use `createDeterministicMockEmbeddingProvider` from ./provider.js instead).
  */
 import { GoogleGenAI } from '@google/genai';
-import type { EnvironmentLike } from '../guard.js';
+type EnvironmentLike = Readonly<Record<string, string | undefined>>;
 import { EMBEDDING_DIMS, EMBEDDING_MODEL } from './constants.js';
 import { EmbeddingProviderError, type EmbeddingProvider } from './provider.js';
 

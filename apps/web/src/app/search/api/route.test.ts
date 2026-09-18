@@ -151,8 +151,7 @@ test('repeated calls exhaust the rate limit and are denied (429)', async () => {
 });
 
 test('cursor round-trip returns the next page, not the same page', async () => {
-  // Offline snapshot is the Dunbar cluster only; national-catalog search docs come from
-  // Firestore in production. Query a term that hits multiple Dunbar fixtures.
+  // Query multiple Dunbar fixtures so the cursor must advance to a distinct record.
   const deps = await buildDeps();
 
   const first = (await (

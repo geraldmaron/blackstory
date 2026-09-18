@@ -543,7 +543,7 @@ The repeatable loop. Order is load-bearing; do not reorder or skip.
    blockers, and the drafter cannot overrule the reviewer. That authority
    rule is itself a lesson from the record: the most damaging story about
    comparable work was "their own fact-checker was ignored."
-5. **Gates**: chapters are canonical in `bb_reference.articles` (Supabase),
+5. **Gates**: chapters are canonical in `reference.articles` (Supabase),
    never in git. Edit via `articles.ts pull` (DB to a gitignored local
    draft), then `validate`, `apply`, `promote` (re-gates the DB row),
    `project`. A human activates the release.

@@ -1,5 +1,5 @@
 /**
- * Maps git-durable bulk discovery fixtures to bb_research.landscape_candidates rows.
+ * Maps git-durable bulk discovery fixtures to research.landscape_candidates rows.
  * Pure functions only — no network or database I/O.
  */
 export type BulkLane = 'dc-sites' | 'greenbook' | 'hbcu' | 'nrhp' | 'other';

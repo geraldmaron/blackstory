@@ -1,15 +1,7 @@
-/**
- * Every automated write a job makes carries the job-run id as (or alongside)
- * the correlation id, and is traceable back to the exact run that made it. This test
- * imports the REAL commitWithAudit (packages/ops-data/src/firestore/audit-outbox.ts, devDep-only
- * import @repo/config does not depend on @repo/ops-data at runtime, see audit.ts's
- * module doc) and proves objects built by buildJobRunAuditEvent/buildJobRunOutboxMessage are
- * accepted by it unmodified, i.e. this module follows commitWithAudit's exact calling
- * convention rather than a parallel one that merely looks similar.
- */
+/** Job audit events and outbox messages share a correlation ID and commit atomically. */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { commitWithAudit, type AtomicStore, type AtomicTransaction } from '@repo/ops-data';
+import { commitWithAudit, type AtomicStore, type AtomicTransaction } from '@repo/data-access';
 import { buildJobRunAuditEvent, buildJobRunOutboxMessage } from './audit.ts';
 
 type StagedOperation =
@@ -24,7 +16,7 @@ type StagedOperation =
       readonly data: Readonly<Record<string, unknown>>;
     };
 
-/** Minimal in-memory AtomicStore double, mirroring packages/ops-data/src/audit-outbox.test.ts. */
+/** Minimal in-memory AtomicStore double, for testing atomic commits. */
 class MemoryAtomicStore implements AtomicStore {
   private documents = new Map<string, Readonly<Record<string, unknown>>>();
 
@@ -53,13 +45,13 @@ class MemoryAtomicStore implements AtomicStore {
 }
 
 test('a job-run audit event and outbox message are accepted by the real commitWithAudit unmodified', async () => {
-  const jobRunId = 'jobrun_2026-07-17T04-00-00Z_backup-verification-daily';
+  const jobRunId = 'jobrun_2026-07-17T04-00-00Z_source-drift-daily';
   const auditEvent = buildJobRunAuditEvent({
     jobRunId,
     action: 'research.completed',
-    actor: { id: 'scheduled-job:backup-verification-daily', type: 'system' },
+    actor: { id: 'scheduled-job:source-drift-daily', type: 'system' },
     subject: { type: 'job-run', id: jobRunId, path: `jobRuns/${jobRunId}` },
-    reason: 'Scheduled backup verification completed',
+    reason: 'Source drift review completed',
     occurredAt: '2026-07-17T04:05:00.000Z',
   });
   const outboxMessage = buildJobRunOutboxMessage({
@@ -68,7 +60,7 @@ test('a job-run audit event and outbox message are accepted by the real commitWi
     topic: 'job-run.completed',
     aggregateType: 'job-run',
     aggregateId: jobRunId,
-    payload: { jobId: 'backup-verification-daily' },
+    payload: { jobId: 'source-drift-daily' },
     createdAt: '2026-07-17T04:05:00.000Z',
   });
 
@@ -78,7 +70,7 @@ test('a job-run audit event and outbox message are accepted by the real commitWi
       {
         operation: 'set',
         path: `jobRuns/${jobRunId}`,
-        data: { jobId: 'backup-verification-daily', status: 'success' },
+        data: { jobId: 'source-drift-daily', status: 'success' },
       },
     ],
     auditEvent,

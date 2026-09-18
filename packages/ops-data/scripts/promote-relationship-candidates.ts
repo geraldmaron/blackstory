@@ -39,8 +39,8 @@ function connectionString(): string {
 async function loadActiveMergeMap(client: pg.PoolClient): Promise<ReadonlyMap<string, string>> {
   const result = await client.query<{ absorbed_id: string; survivor_id: string }>(
     `SELECT a.absorbed_id, m.survivor_id
-     FROM bb_canonical.entity_merge_absorbed a
-     JOIN bb_canonical.entity_merges m ON m.id = a.merge_id
+     FROM canonical.entity_merge_absorbed a
+     JOIN canonical.entity_merges m ON m.id = a.merge_id
      WHERE m.status = 'active'`,
   );
   return buildAbsorbedToSurvivorMap(
@@ -62,7 +62,7 @@ async function loadPendingCandidates(
     payload: Record<string, unknown>;
   }>(
     `SELECT id, status, lane, payload
-     FROM bb_research.landscape_candidates
+     FROM research.landscape_candidates
      WHERE lane = $1
        AND status = 'pending'
      ORDER BY id`,
@@ -85,7 +85,7 @@ async function loadExistingAcceptedEdges(
     relationship_type: string;
   }>(
     `SELECT from_entity_id, to_entity_id, relationship_type
-     FROM bb_canonical.entity_relationships
+     FROM canonical.entity_relationships
      WHERE workflow_status = 'accepted'`,
   );
   return buildExistingEdgeKeySet(
@@ -104,7 +104,7 @@ async function loadEntityProfiles(
   if (entityIds.length === 0) return new Map();
   const result = await client.query<{ id: string; kind: string; living_status: string }>(
     `SELECT id, kind, living_status
-     FROM bb_canonical.entities
+     FROM canonical.entities
      WHERE id = ANY($1::text[])`,
     [entityIds],
   );
@@ -127,15 +127,15 @@ async function loadEdgeCoverage(client: pg.PoolClient): Promise<EdgeCoverageSnap
   }>(
     `WITH touched AS (
        SELECT from_entity_id AS entity_id
-       FROM bb_canonical.entity_relationships
+       FROM canonical.entity_relationships
        WHERE workflow_status = 'accepted'
        UNION
        SELECT to_entity_id
-       FROM bb_canonical.entity_relationships
+       FROM canonical.entity_relationships
        WHERE workflow_status = 'accepted'
      )
      SELECT
-       (SELECT COUNT(*)::text FROM bb_canonical.entities) AS total_entities,
+       (SELECT COUNT(*)::text FROM canonical.entities) AS total_entities,
        (SELECT COUNT(DISTINCT entity_id)::text FROM touched) AS entities_with_accepted_edge`,
   );
   return {
@@ -218,7 +218,7 @@ async function main(): Promise<void> {
       for (const decision of decisions) {
         if (decision.action !== 'insert') continue;
         const insertResult = await client.query(
-          `INSERT INTO bb_canonical.entity_relationships (
+          `INSERT INTO canonical.entity_relationships (
              id, from_entity_id, to_entity_id, relationship_type,
              workflow_status, publication_status, confidence, updated_at
            ) VALUES ($1, $2, $3, $4, 'accepted', 'published', $5::jsonb, now())
@@ -240,7 +240,7 @@ async function main(): Promise<void> {
         if ((insertResult.rowCount ?? 0) === 0) continue;
         inserted += 1;
         const updateResult = await client.query(
-          `UPDATE bb_research.landscape_candidates
+          `UPDATE research.landscape_candidates
            SET status = 'accepted', updated_at = now()
            WHERE id = $1 AND status = 'pending'`,
           [decision.candidate.candidateId],

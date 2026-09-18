@@ -163,7 +163,7 @@ test('a single-entity write still names its entity', async () => {
   assert.ok(commit);
   assert.equal(commit.auditEvent.entityId, 'entity-1');
   assert.equal(commit.auditEvent.subject.type, 'entity');
-  assert.equal(commit.auditEvent.subject.path, 'bb_canonical.entities/entity-1');
+  assert.equal(commit.auditEvent.subject.path, 'canonical.entities/entity-1');
 });
 
 test('a failing transaction reports failure rather than throwing into the render', async () => {

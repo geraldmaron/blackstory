@@ -1,16 +1,7 @@
 /**
- * Browser-safe fetch wrapper for the `/locate/api` geocode endpoint. Deliberately
- * separate from `./pipeline.ts` and `./safe-http-client.ts` both of those pull in Node's
- * `dns`/`https` modules and must never reach a browser bundle. This module only ever calls
- * `fetch('/locate/api',...)` from a Client Component and re-shapes the JSON response into a
- * small discriminated union the UI can switch on directly, instead of the UI parsing raw HTTP
- * status codes and route-specific error bodies itself.
- *
- * App Check headers are passed in by the caller (`components/location/LocateExperience.tsx`,
- * sourced from `../../lib/request-integrity/client.ts`) rather than fetched by this module
- * keeping this file free of any `app/` import mirrors how `apps/web/src/app/submit/SubmitLeadForm.tsx`
- * calls `getRequestIntegrityHeaders()` directly rather than through a shared `lib/`
- * layer, and keeps this module usable from any future caller with a different integrity source.
+ * Browser-safe wrapper for /locate/api. Keep Node DNS/HTTPS acquisition code out of client
+ * bundles. Callers supply request-integrity headers; this module converts HTTP responses into a
+ * small result union for the UI.
  */
 
 export type LocateJurisdictionIds = {

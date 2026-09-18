@@ -104,7 +104,7 @@ function pythonDefinition(name, definition) {
       ? `    ${propertyName}: ${type}`
       : `    ${propertyName}: ${type} | None = None`;
   });
-  return `class ${name}(BaseModel):\n    model_config = ConfigDict(extra="forbid", frozen=True)\n\n${fields.join('\n')}`;
+  return `class ${name}(ContractModel):\n${fields.join('\n')}`;
 }
 
 const entries = Object.entries(definitions);
@@ -146,7 +146,7 @@ const pythonOutput = `${[
   '',
   `from typing import Any, Literal${hasTypeAliases ? ', TypeAlias' : ''}`,
   '',
-  'from pydantic import BaseModel, ConfigDict',
+  'from .validation import ContractModel',
   '',
   ...entries.flatMap(([name, definition]) => [pythonDefinition(name, definition), '']),
   ...modelNames.map((name) => `${name}.model_rebuild()`),
@@ -167,3 +167,7 @@ async function emit(path, content) {
 
 await emit(tsPath, tsOutput);
 await emit(pythonPath, pythonOutput);
+await emit(
+  join(dirname(pythonPath), 'research-kernel.v1.schema.json'),
+  await readFile(schemaPath, 'utf8'),
+);

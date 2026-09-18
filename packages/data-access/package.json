@@ -13,14 +13,12 @@
     }
   },
   "files": [
-    "dist",
-    "generated"
+    "dist"
   ],
   "scripts": {
     "build": "tsc -p tsconfig.json",
     "typecheck": "tsc -p tsconfig.json --noEmit",
-    "test": "node --conditions development --import tsx --test src/index.test.ts src/firestore.test.ts src/sql-static.test.ts src/postgres/data-source.test.ts src/postgres/release-store.test.ts src/postgres/release-activation.test.ts",
-    "test:integration": "node --conditions development --import tsx --test src/postgres.integration.test.ts",
+    "test": "node --conditions development --import tsx --test src/index.test.ts src/postgres/*.test.ts",
     "lint": "echo 'lint: use root pnpm lint'"
   },
   "dependencies": {

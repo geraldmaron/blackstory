@@ -1,11 +1,8 @@
 # Research-case and publication workflow
 
- turns discovery candidates into reviewable research cases while preserving an
-append-only decision history. Canonical case records, assignments, backfill
-jobs, and release references belong in Postgres (`bb_canonical`/`bb_research`) — ADR-011's
-Firestore design was reversed (`../decisions-carryover.md`, "Firestore as system of record,
-reversed"). Public clients read only active release
-projections; they never write workflow state.
+Discovery candidates become reviewable cases with append-only decision history. Postgres
+research and canonical tables hold workflow state; public clients read released projections.
+The durable worker protocol is described in [operations](research-operations.md).
 
 ## States and transitions
 
@@ -63,7 +60,7 @@ The domain module provides deterministic operations for:
 - building a release preview and promotion eligibility decision;
 - scheduling future backfill for incomplete checklist fields.
 
-Assignments and backfill records are workflow data in Firestore, not authorization grants.
+Assignments and backfill records are workflow data in Postgres, not authorization grants.
 
 ## Exclusion and reconsideration
 
@@ -82,34 +79,23 @@ traffic changes.
 
 This design preserves the original signed manifest and historical snapshot. It also makes a
 retraction independently reviewable and reversible through release history rather than
-destructive Firestore deletion.
+destructive record deletion.
 
 ## Server authorization
 
-Clients must call a trusted server or worker. The Firebase helper checks verified Firebase
-administrator claims and MFA before executing any callback:
+Trusted server operations verify a Supabase session and `app_metadata.app_role` using the
+shared admin authorization helpers. Research workflow permission does not authorize publication.
+Role-to-verb permissions live in `apps/web/src/admin/auth/staff-permissions.ts`; route handlers
+use `route-permissions.ts`. Writes carry a verified actor and durable reason through the
+Postgres audit/outbox transaction.
 
-- `research:write` is required for assignment, evidence changes, review transitions,
-  previews, and backfill scheduling.
-- `publication:publish` plus recent authentication is required for promotion.
-- `publication:retract` plus recent authentication is required for retraction.
-- administrators inherit both role sets.
+Case readiness alone does not approve a claim. Publication additionally checks the current
+claim version, attached evidence selectors, reviewed confidence assessment, lineage and
+contradiction policy. See [promotion controls](../security/promotion-controls.md).
 
-Research-only identities cannot publish or retract. Publication-only identities cannot
-change research workflow state. Firestore rules remain deny-by-default for direct canonical
-client writes; Admin SDK handlers must use these server gates and the existing audit/outbox
-transaction pattern when persistence is wired.
+## Contracts
 
-## Schemas and exports
-
-Firestore-facing JSON Schemas are in:
-
-- `packages/schemas/research-case/research-case.v1.schema.json`
-- `packages/schemas/research-case/backfill-job.v1.schema.json`
-
-The domain local barrel is `packages/domain/src/research-case/index.ts`. Package-root
-integration should export `./research-case/index.js`. Firebase integration should export
-`./firestore/research-case.js` from its Firestore and package barrels.
-
-No Firebase or GCP resource is applied by . Collection rules, indexes, handlers, and
-deployment remain reviewed human/deployment work when the persistence adapter is connected.
+The domain state machine is `packages/domain/src/research-case/`. JSON schemas are under
+`packages/schemas/research-case/`. Persistence is under `packages/ops-data/src/postgres/`.
+Backfill jobs describe explicit work; no timer is installed by creating a case or running this
+workflow. Actual scheduling requires a separate authorized operational change.

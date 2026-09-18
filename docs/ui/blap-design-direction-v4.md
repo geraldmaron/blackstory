@@ -157,7 +157,7 @@ block the visiting job.
 | `/stories`, `/stories/[slug]` | History articles | Longform narratives → entity off-ramps | 2-col → 1-col |
 | `/methodology` | Trust: how records qualify | Longform serif, numbered sections, confidence-language explainer | — |
 | `/errata`, `/corrections` | Visible fallibility | Dated entries, hairline separation | — |
-| `/submit` | Community intake | Guided form on shell rhythm, moderation framing, App Check | full-width fields |
+| `/submit` | Community intake | Guided form on shell rhythm, moderation framing, client-header check | full-width fields |
 | `/about` | Who/why | Longform serif + voice lines | — |
 | `/law` | Plain-language law | Serif longform + mono citations | — |
 | `/design-system` | Internal reference | Token/primitive gallery — stays current with this doc | — |

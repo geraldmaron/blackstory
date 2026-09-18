@@ -1,5 +1,5 @@
 /**
- * Loads editorial catalog entries with embedding vectors from Postgres (bb_canonical + bb_public).
+ * Loads editorial catalog entries with embedding vectors from Postgres (canonical + published).
  * Read-only assembly for operator staging — does not publish or promote.
  */
 import { getOpsPostgresPool } from '@repo/data-access';
@@ -33,7 +33,7 @@ export async function loadEditorialCatalogFromPostgres(
     dims: number | null;
   }>(
     `SELECT entity_id, embedding, dims
-     FROM bb_canonical.entity_embeddings
+     FROM canonical.entity_embeddings
      WHERE dims = $1 OR dims IS NULL
      ORDER BY updated_at DESC NULLS LAST
      LIMIT $2`,
@@ -49,7 +49,7 @@ export async function loadEditorialCatalogFromPostgres(
       aliases: string[] | null;
     }>(
       `SELECT entity_id, name, aliases
-       FROM bb_public.search_index
+       FROM published.search_index
        WHERE entity_id = ANY($1::text[])`,
       [ids],
     );

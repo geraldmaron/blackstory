@@ -1,17 +1,9 @@
 /**
- * Central redaction primitives for BlackStory.
- *
- * This module is the single policy-driven engine that reduces location precision
- * before publication and scrubs protected values (residential addresses, exact
- * coordinates) out of any serialized payload public projections, search index
- * documents, logs, error telemetry, and exports. All rules derive from the product
- * constitution (@repo/schemas) and from `docs/security/location-precision-standard.md`
- * (the location precision standard, repo-wqcn); nothing here weakens those rules.
- *
- * `reducePublicPrecision` runs INSIDE the publish path itself (the release builder,
- * `packages/domain/src/publication/release-builder.ts`) for every `bb_public.release_entities`
- * projection — it is not merely a library other code may choose to call before serializing.
- * See the standard's §4 "One engine on the publish path."
+ * Shared policy engine for reducing public location precision and scrubbing protected values in
+ * serialized outputs. Publication calls reducePublicPrecision while building release
+ * projections. Follow the product constitution and
+ * docs/security/location-precision-standard.md; downstream logs and exports must also apply the
+ * applicable redaction rules.
  */
 import { loadProductConstitution } from '@repo/schemas';
 import { treatAsLiving, type LivingStatus } from '@repo/domain-core/living';

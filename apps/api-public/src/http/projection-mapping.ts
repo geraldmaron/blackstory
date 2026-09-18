@@ -1,35 +1,4 @@
-/**
- * Maps a `PublicEntityProjectionDoc` (the storage-neutral `bb_public` projection shape, shared with
- * `apps/web/src/lib/public-data/map-projection.ts`) onto the public-contracts `EntityV1` wire DTO.
- *
- * This mapping used to live in `./firestore-data-access.ts` alongside the Firestore-specific client
- * plumbing; it moved here when the Firestore read path was removed (repo-348e.3; the Postgres
- * cutover, `docs/decisions-carryover.md`, "entity source-of-truth precedence")
- * because `./postgres-data-access.ts` — the only remaining live adapter — depends on it too.
- *
- * Mapping a projection onto `EntityV1` is lossy by design, honestly:
- * - `kind` must be in the full public ontology (`ENTITY_KINDS` / docs/decisions-carryover.md,
- *   "Entity ontology"). A projection whose
- *   `kind` falls outside that set maps to `undefined`, which — same as an unpublished or
- *   nonexistent id — the handler cannot distinguish from a 404 (T3).
- * - Inline `claims` on the projection map through when present; bootstrap-window stubs that carry
- *   only `claimIds` still emit `claims: []`. No per-claim reads are added here.
- * - `timeline` is DERIVED, not stored: `@repo/domain`'s `buildGraphTimeline` composes it from the
- *   projection's own `statusHistory` records and dated `related` timespans — the identical builder
- *   `apps/web` renders from, so the same record no longer carries a timeline on the website and an
- *   empty array over the API (repo-n7p6.6 item 2). Neighbor display names are resolved on the
- *   entity GET path after bounded neighbor batching (`hydrateEntityV1Neighbors`); this mapper
- *   itself keeps an empty lookup so list/search mapping stays O(1) per row.
- * - `related` neighbor entries map straight from the projection's own `related` array (ids/types/
- *   direction/timespan only). `relatedNeighbors`/`continueLearning` are hydrated on the
- *   single-entity read path via bounded `ANY()` batches (`hydrate-entity-neighbors.ts`) — the
- *   same caps as web Place, never N+1 point-gets. Collection/list reads still omit them.
- * - Timeline neighbor display names stay unresolved here (id-only labels) so list/search paths
- *   never pay neighbor reads; Place/entity detail can still resolve names from the hydrate catalog.
- * - Fields absent on bootstrap-window stubs (`jurisdictionLabel`, `locationLabel`,
- *   `researchCoverage`, revision timestamps) fall back to the same honest placeholders
- *   `apps/web`'s `map-projection.ts` uses — never fabricated curated content.
- */
+/** Maps immutable release projections into the public API contract. */
 import {
   buildGraphTimeline,
   findUsStateForPoint,
@@ -109,14 +78,9 @@ function mapLocationPrecision(precision: string | undefined): EntityV1['location
 }
 
 /**
- * Stored labels that should not be replaced by bbox state attribution.
- * Empty and Unknown still fall through to coordinates. Country-only
- * "United States" stays stored until republish (repo-2t04.2/repo-tjqn): the
- * lat/lng fallback below is bbox-based and gets border cases wrong — the
- * Shelley House (St. Louis) pin sits in the Illinois/Missouri bbox overlap,
- * so swapping a stored "United States" for a coordinate guess here would
- * trade one placeholder for a confidently wrong state. Matches
- * apps/web's map-projection.ts of the same name and for the same reason.
+ * Preserve stored country labels until republish. Coordinate fallback uses overlapping state
+ * bounding boxes and cannot reliably replace a broad label near a border. Empty and Unknown
+ * labels may use the fallback.
  */
 function isUsableStoredJurisdictionLabel(label: string | undefined): boolean {
   const trimmed = label?.trim() ?? '';

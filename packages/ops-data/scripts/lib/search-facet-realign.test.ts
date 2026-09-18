@@ -250,8 +250,7 @@ test('evidence-inputs: writes the lineage keys, never a graded tier', async () =
       evidenceLineageKeys: ['loc.gov', 'nps.gov'],
     },
   });
-  // The whole point of the cutover: a grade never reaches the row, so a rule change cannot
-  // strand it (repo-6qjv0).
+  // Store grading inputs so changing the read-time rule does not leave a stale finished tier.
   assert.equal('confidenceTier' in (plan.changes[0]?.facetsPatch ?? {}), false);
 });
 
@@ -395,7 +394,7 @@ test('applySearchFacetRealign issues one UPDATE per changed row and reports rows
   const updated = await applySearchFacetRealign(client, plan);
   assert.equal(updated, 1);
   assert.equal(client.updates.length, 1);
-  assert.match(client.updates[0]?.sql ?? '', /UPDATE bb_public\.search_index/);
+  assert.match(client.updates[0]?.sql ?? '', /UPDATE published\.search_index/);
 });
 
 test('planSearchFacetRealign never writes — a plan-only call issues no UPDATE', async () => {

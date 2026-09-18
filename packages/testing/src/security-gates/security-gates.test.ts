@@ -7,7 +7,7 @@ import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { describe, it } from 'node:test';
 import { fileURLToPath } from 'node:url';
-import { assertAdminPermission } from '../../../ops-data/src/admin-auth.ts';
+import { assertStaffPermission } from '../../../../apps/web/src/admin/auth/staff-permissions.ts';
 import {
   evaluateDailyBudget,
   evaluateSearchQueryGuardrails,
@@ -75,20 +75,9 @@ describe('API authorization and OWASP API abuse contracts', () => {
     );
   });
 
-  it('calls the Firebase administrator permission gate for end-user token rejection', () => {
-    assert.throws(
-      () =>
-        assertAdminPermission(
-          {
-            uid: 'end-user',
-            auth_time: 1,
-            bb_roles: [],
-            amr: ['pwd'],
-          },
-          'publication:publish',
-        ),
-      /administrator identity|multi-factor/iu,
-    );
+  it('the current staff permission gate rejects research publication', () => {
+    assert.throws(() => assertStaffPermission('research', 'publication:publish'));
+    assert.doesNotThrow(() => assertStaffPermission('publication', 'publication:publish'));
   });
 });
 

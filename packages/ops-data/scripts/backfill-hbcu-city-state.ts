@@ -1,14 +1,7 @@
 /**
- * repo-j4q1 mitigation: us-ed-hbcu-* landscape_candidates rows carry no payload.city/state at
- * all, which starves subject-identity.ts's place-corroboration check and let a Wikipedia search
- * for "Lincoln University" (the Missouri HBCU) attach evidence about the unrelated University of
- * Lincoln in England — the identity gate fell back to weak name-only matching because it had no
- * place to check against. This backfills city/state from the NCES College Navigator address
- * already captured this session (bb_research.entity_evidence, collector='nces-navigator'),
- * a government source keyed by UNITID (the entity_id's own numeric suffix) — not invented, not
- * guessed. One-off backfill, not part of the regular pipeline.
- *
- * Usage: DRY_RUN=0 BACKFILL_HBCU_CITY_STATE_APPLY=1 to apply.
+ * Backfills HBCU city/state from captured NCES College Navigator evidence keyed by UNITID.
+ * Location context helps distinguish institutional namesakes. Default dry-run; writes require
+ * DRY_RUN=0 and BACKFILL_HBCU_CITY_STATE_APPLY=1.
  */
 import pg from 'pg';
 import { normalizePgConnectionString } from './lib/pg-connection.ts';
@@ -35,8 +28,8 @@ async function main(): Promise<void> {
 
   const rows = await pool.query<{ entity_id: string; address: string }>(
     `SELECT ev.entity_id, ev.provenance->'facts'->>'address' as address
-       FROM bb_research.entity_evidence ev
-       JOIN bb_research.landscape_candidates lc ON lc.id = ev.entity_id
+       FROM research.entity_evidence ev
+       JOIN research.landscape_candidates lc ON lc.id = ev.entity_id
       WHERE ev.collector = 'nces-navigator' AND ev.status = 'captured'
         AND (lc.payload->>'city' IS NULL OR lc.payload->>'state' IS NULL)`,
   );
@@ -53,7 +46,7 @@ async function main(): Promise<void> {
     console.log(`  ${row.entity_id} — city="${parsed.city}" state="${parsed.state}"`);
     if (!DRY_RUN && APPLY) {
       await pool.query(
-        `UPDATE bb_research.landscape_candidates
+        `UPDATE research.landscape_candidates
             SET payload = payload || jsonb_build_object('city', $2::text, 'state', $3::text)
           WHERE id = $1`,
         [row.entity_id, parsed.city, parsed.state],

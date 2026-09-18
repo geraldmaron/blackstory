@@ -44,7 +44,7 @@ export const BETA_LAUNCH_GATES: readonly LaunchGateDefinition[] = [
       {
         type: 'command',
         ref: 'node --import tsx scripts/run-testing-layer.mjs security',
-        description: 'Includes living-address adversarial scenarios ().',
+        description: 'Includes living-address adversarial scenarios.',
       },
       {
         type: 'file',
@@ -103,39 +103,18 @@ export const BETA_LAUNCH_GATES: readonly LaunchGateDefinition[] = [
   },
   {
     id: 'restore-rehearsal-complete',
-    title: 'Restore rehearsal complete ()',
+    title: 'Executed Postgres and object recovery verified',
     kind: 'machine',
     required: true,
     description:
-      'Recovery rehearsal runner and last dry-run report fixtures are present and valid.',
+      'An isolated restore has measured recovery targets, integrity and authorization checks, and a hashed execution log.',
     evidence: [
-      {
-        type: 'command',
-        ref: 'node scripts/recovery-rehearsal/run-rehearsal.mjs --verify-only',
-      },
-      {
-        type: 'artifact',
-        ref: 'scripts/recovery-rehearsal/fixtures/last-rehearsal-report.json',
-      },
-      {
-        type: 'command',
-        ref: 'bash infra/github/release-pipeline/rollback-dry-run.sh 0000000000000000000000000000000000000001',
-      },
+      { type: 'doc', ref: 'docs/runbooks/backup-restore.md' },
+      { type: 'artifact', ref: 'artifacts/recovery/latest.json' },
     ],
   },
   {
-    /**
-     * DOWNGRADED TO OPTIONAL 2026-08-25. A tabletop exercise is a team practice: its value is
-     * rehearsing handoff, escalation and who-calls-it under pressure, and none of those exist for
-     * a single operator who is already every role in the runbook. Kept as a gate rather than
-     * deleted so the decision artifact still shows it was considered and consciously not required
-     * — a gate that silently disappears reads, later, like one that was never thought about.
-     *
-     * This is NOT a judgment that incident readiness does not matter. `beta-disable-path-ready`
-     * and `restore-rehearsal-complete` are machine gates covering the two things a solo operator
-     * actually needs under pressure: a way to turn the site off and a proven restore. Both pass.
-     * If this ever becomes a team, make this required again.
-     */
+    // A team incident exercise is optional for solo operation; recovery evidence remains required.
     id: 'incident-exercise-complete',
     title: 'Incident exercise complete (optional for solo operation)',
     kind: 'human',
@@ -151,7 +130,7 @@ export const BETA_LAUNCH_GATES: readonly LaunchGateDefinition[] = [
   },
   {
     id: 'load-abuse-verified',
-    title: 'Load and abuse limits verified ()',
+    title: 'Load and abuse limits verified',
     kind: 'machine',
     required: true,
     description:
@@ -173,7 +152,7 @@ export const BETA_LAUNCH_GATES: readonly LaunchGateDefinition[] = [
   },
   {
     id: 'adversarial-integrity-verified',
-    title: 'Adversarial integrity exercise ()',
+    title: 'Adversarial integrity exercise',
     kind: 'machine',
     required: true,
     description: 'Adversarial integrity harness ships all required scenario ids.',
@@ -190,7 +169,7 @@ export const BETA_LAUNCH_GATES: readonly LaunchGateDefinition[] = [
   },
   {
     id: 'methodology-corrections-available',
-    title: 'Public methodology and correction process ()',
+    title: 'Public methodology and correction process',
     kind: 'machine',
     required: true,
     description: 'Methodology, corrections, errata, and myths public surfaces exist in repo.',
@@ -225,7 +204,7 @@ export const BETA_LAUNCH_GATES: readonly LaunchGateDefinition[] = [
   },
   {
     id: 'disclaimer-framework-live',
-    title: 'Disclaimer framework live on public surfaces ()',
+    title: 'Disclaimer framework live on public surfaces',
     kind: 'machine',
     required: true,
     description: 'Versioned disclaimer registry module exists and ships tests.',
@@ -242,7 +221,7 @@ export const BETA_LAUNCH_GATES: readonly LaunchGateDefinition[] = [
   },
   {
     id: 'release-pipeline-ready',
-    title: 'Production release pipeline ready ()',
+    title: 'Production release pipeline ready',
     kind: 'machine',
     required: true,
     description: 'Release runbook, rollback dry-run script, and provenance schema are present.',

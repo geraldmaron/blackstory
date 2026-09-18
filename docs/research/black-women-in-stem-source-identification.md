@@ -1,7 +1,7 @@
 # Black Women Lead — source identity (owner-confirmed)
 
-**Bead:** `repo-tt2u.8` (identity) / `repo-tt2u.13` (source-policy audit) / HUMAN `repo-ae8y`  
-**Owner confirmation:** 2026-07-19 — intended source is **`https://blackwomenleadproject.org/`**  
+**Bead:** `repo-tt2u.8` (identity) / `repo-tt2u.13` (source-policy audit) / HUMAN `repo-ae8y`
+**Owner confirmation:** 2026-07-19 — intended source is **`https://blackwomenleadproject.org/`**
 **Status:** Identity **confirmed**. Source-policy audit (`repo-tt2u.13`) **closed 2026-09-12** with a **register-disabled verdict**: rights/license status stays an open unknown pending GGHMS contact (plan below), so the source stays **disabled**, not approved. **No scrape, adapter enablement, or persistent capture until that unknown resolves and a follow-up policy decision approves it.**
 
 ---
@@ -38,7 +38,7 @@
 
 ## No-persist probe (2026-07-19)
 
-Probe UA: `BlackStorySourceAudit/0.1 (+research; no-persist probe)`. Responses were inspected in memory only; **no fixture capture, no Firestore write, no full-body retention.**
+Probe UA: `BlackStorySourceAudit/0.1 (+research; no-persist probe)`. Responses were inspected in memory only; **no fixture capture, no database write, no full-body retention.**
 
 ### robots.txt
 
@@ -77,10 +77,10 @@ The public WordPress install looks **thin relative to the 212-banner project** d
 
 ### Unresolved (block adapter work)
 
-1. Written terms of use / license for republication of biographies, portraits, and selection text  
-2. Whether BPL/Northeastern host the structured bios under a clearer rights regime  
-3. Portrait/banner image rights (artists, GGHMS, funders) — almost certainly **not** free for bulk retention  
-4. Whether WP will gain custom post types for leaders later  
+1. Written terms of use / license for republication of biographies, portraits, and selection text
+2. Whether BPL/Northeastern host the structured bios under a clearer rights regime
+3. Portrait/banner image rights (artists, GGHMS, funders) — almost certainly **not** free for bulk retention
+4. Whether WP will gain custom post types for leaders later
 5. Contact path for rights review with GGHMS — **unknown-with-owner-contact plan** (no verdict yet; this is the plan to get one):
    - **Who:** Greater Grove Hall Main Streets (GGHMS), as the project's stated custodian/organizer. No named rights contact has been identified from the public site; the outreach starts at GGHMS's general organizational contact (site/press-listed email or contact form) and asks to be routed to whoever holds rights decisions for the banner biographies and portrait images.
    - **What to ask:** (a) is there a written license or terms of use covering republication of leader biography text, selection/curation text, and portrait/banner images; (b) do BPL or Northeastern hold a separate, clearer rights regime for any structured biography content; (c) is there a preferred citation or attribution form GGHMS requires.
@@ -101,8 +101,8 @@ The public WordPress install looks **thin relative to the 212-banner project** d
 
 ## Acquisition recommendation (after policy approval only)
 
-1. **Prefer partner structured corpora** (BPL / Northeastern bios) if they exist with clearer licenses — audit those as **related source identities**, not as independent corroboration of the same text.  
-2. If this domain remains the primary surface: **RSS is currently useless** for leader inventory; prefer **sitemap + selective page fetch** only after rights review; keep retention **metadata/snippet** unless rights allow more.  
+1. **Prefer partner structured corpora** (BPL / Northeastern bios) if they exist with clearer licenses — audit those as **related source identities**, not as independent corroboration of the same text.
+2. If this domain remains the primary surface: **RSS is currently useless** for leader inventory; prefer **sitemap + selective page fetch** only after rights review; keep retention **metadata/snippet** unless rights allow more.
 3. Register adapter **disabled**; fixtures from permitted captures; canary; explicit approval.
    **Documented deferral (this audit's registration decision):** no `registerSource(...)` entry (see `packages/domain/src/adapters/registry.ts`'s `registerSource`, whose `registryState` defaults to `'disabled'` when omitted — the same pattern `packages/domain/src/historic-safety/source-registry.ts` uses to register its own sources) exists for `blackwomenleadproject.org`, and none will be added until the unresolved items above close. This is the explicit deferral in place of a registration stub: registration itself is deferred, not merely unbuilt.
 4. For “Black women in STEM” operator goals: use **STEM-intent query plans** against authorities (NASA, ORCID, patents, etc.) **and/or** filter this Boston leadership set by occupation evidence — do not rename this source “STEM.”
@@ -111,15 +111,15 @@ The public WordPress install looks **thin relative to the 212-banner project** d
 
 ## Explicit non-actions (still in force)
 
-- No Scrapy/Crawlee/Playwright run against this domain  
-- No bulk image download of banners/portraits  
-- No `registerSource` enablement  
-- No publication from this source alone  
+- No Scrapy/Crawlee/Playwright run against this domain
+- No bulk image download of banners/portraits
+- No `registerSource` enablement
+- No publication from this source alone
 
 ---
 
 ## Related docs
 
-- Program audit: `docs/research/entity-acquisition-current-state-audit.md`  
-- Crawler decision: docs/decisions-carryover.md, "Acquisition crawler runtime" (recovered ADR-019 — Trafilatura extraction ships; the Scrapy crawl engine it named was never built)  
-- Prior empty-candidate research (superseded for identity only): git history of this file before owner confirmation  
+- Program audit: `docs/research/README.md`
+- Crawler decision: docs/decisions-carryover.md, "Acquisition crawler runtime" (recovered ADR-019 — Trafilatura extraction ships; the Scrapy crawl engine it named was never built)
+- Prior empty-candidate research (superseded for identity only): git history of this file before owner confirmation

@@ -141,6 +141,5 @@ coverage snapshots gain persistence).
 ## Deferred (not this bead)
 
 - Campaign runner (`runTemporalGapCampaign`) wiring era packs into the discovery pipeline
-- Firestore persistence of decade coverage snapshots (prefix `20260724000005`)
 - Black-population-relative density (juxtaposing `population-decades` counts against catalog density, with comparability-band caveats)
 - obscurity.v2 implementation per the proposal above

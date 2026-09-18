@@ -1,6 +1,5 @@
 /**
- * Unit tests for the single deterministic per-entity release/projection builder
- * (the related workstream). See ./release-builder.ts's module doc comment for the contract.
+ * Deterministic entity/search release-builder tests.
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';

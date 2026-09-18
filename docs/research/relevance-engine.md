@@ -43,6 +43,5 @@ cd workers/research && uv run pytest src/black_book_research/relevance/test_rele
 
 ## Follow-ups
 
-- Firestore persistence for relevance assessments
 - Gold corpus calibration harness
 - Public “Why this appears” storytelling layer
