@@ -1,6 +1,6 @@
 /**
  * Shareable URL state for Lives Across the Decades.
- * Canonical immersive surface is `/lives` (and `/lives?area=`). Data Act II deep-links here.
+ * The guided reader is `/lives`; this state belongs to the decade × area evidence appendix.
  * Every group stays on screen; `race` only changes emphasis. Unknown values fall back to defaults.
  */
 import {
@@ -25,6 +25,8 @@ export const DEFAULT_LIVES_VIEW: LivesViewState = {
 
 /** Immersive Lives room. Data Act II still deep-links with `#lives` into a compact entry. */
 export const LIVES_CANONICAL_PATH = '/lives';
+
+export const LIVES_EXPLORER_PATH = '/lives/explorer';
 
 export const LIVES_DATA_ENTRY_PATH = '/data';
 
@@ -57,14 +59,14 @@ export function buildLivesSearchParams(state: LivesViewState): string {
   return params.toString();
 }
 
-/** Immersive Lives href on `/lives`. */
+/** Decade × area evidence href. */
 export function buildLivesHref(areaSlug: string, state: LivesViewState): string {
   const params = new URLSearchParams();
   if (areaSlug !== LIVES_NATIONAL.slug) params.set('area', areaSlug);
   if (state.race !== DEFAULT_LIVES_VIEW.race) params.set('race', state.race);
   if (state.decade !== DEFAULT_LIVES_VIEW.decade) params.set('decade', String(state.decade));
   const query = params.toString();
-  return query ? `${LIVES_CANONICAL_PATH}?${query}` : LIVES_CANONICAL_PATH;
+  return query ? `${LIVES_EXPLORER_PATH}?${query}` : LIVES_EXPLORER_PATH;
 }
 
 /** Compact Data Act II entry that still scrolls to `#lives`. */

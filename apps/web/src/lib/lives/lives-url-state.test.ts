@@ -9,10 +9,10 @@ import {
   parseLivesSearchParams,
 } from './lives-url-state';
 
-test('empty params open the default view on /lives', () => {
+test('empty params open the default view in the evidence appendix', () => {
   assert.deepEqual(parseLivesSearchParams({}), DEFAULT_LIVES_VIEW);
-  assert.equal(buildLivesHref('deep-south', DEFAULT_LIVES_VIEW), '/lives?area=deep-south');
-  assert.equal(buildLivesHref('united-states', DEFAULT_LIVES_VIEW), '/lives');
+  assert.equal(buildLivesHref('deep-south', DEFAULT_LIVES_VIEW), '/lives/explorer?area=deep-south');
+  assert.equal(buildLivesHref('united-states', DEFAULT_LIVES_VIEW), '/lives/explorer');
   assert.equal(buildLivesDataEntryHref('united-states', DEFAULT_LIVES_VIEW), '/data#lives');
 });
 
@@ -46,7 +46,7 @@ test('old slice ids and off-grid decades fall back to defaults', () => {
 test('retired unit and tier params are ignored and removed from generated links', () => {
   const state = parseLivesSearchParams({ tier: 'middle', unit: 'child', decade: '1950' });
   assert.deepEqual(state, { race: 'black', decade: 1950 });
-  assert.equal(buildLivesHref('united-states', state), '/lives?decade=1950');
+  assert.equal(buildLivesHref('united-states', state), '/lives/explorer?decade=1950');
 });
 
 test('the first value of a repeated param wins', () => {

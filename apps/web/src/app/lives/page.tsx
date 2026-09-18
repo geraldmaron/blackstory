@@ -1,18 +1,14 @@
-/**
- * `/lives`: immersive Lives Across the Decades room. Region, decade, and emphasis change a
- * hand-drawn street bound to published counts, with sourced world beats opening the archive.
- * `/lives/[region]` still resolves via `?area=`. Data Act II remains a compact entry that links here.
- */
+/** `/lives`: one life question across time, using only publishable and cited comparisons. */
 import type { Metadata } from 'next';
-import React, { Suspense } from 'react';
-import { LIVES_NATIONAL, livesAreaBySlug } from '@repo/domain/statistics/lives';
+import React from 'react';
+import { LIVES_NATIONAL } from '@repo/domain/statistics/lives';
 import { buildStaticPageMetadata } from '../../lib/seo/metadata-builders';
 import { DocumentColophon, ReadingEntry, Room } from '../../components/room';
 import { WalkOffRamp } from '../walk-off-ramp';
 import { emptyLivesAreaBundle, loadLivesAreaBundle } from '../../lib/lives/lives-source';
-import { parseLivesAreaSlug, type RawLivesSearchParams } from '../../lib/lives/lives-url-state';
-import { LivesTimeline } from '../../components/lives/LivesTimeline';
-import { LivesTimelineStatic } from '../../components/lives/LivesTimelineStatic';
+import type { RawLivesSearchParams } from '../../lib/lives/lives-url-state';
+import { parseLivesMilestone } from '../../lib/lives/lives-milestones';
+import { LivesMilestoneExperience } from '../../components/lives/LivesMilestoneExperience';
 import '../reading-room.css';
 import './lives.css';
 
@@ -33,27 +29,24 @@ export default async function LivesIndexPage({
   readonly searchParams: Promise<RawLivesSearchParams>;
 }) {
   const raw = await searchParams;
-  const livesAreaSlug = parseLivesAreaSlug(raw);
-  const area = livesAreaBySlug(livesAreaSlug) ?? LIVES_NATIONAL;
-  const loaded = await loadLivesAreaBundle(livesAreaSlug);
-  const bundle = loaded ?? emptyLivesAreaBundle(area);
+  const milestone = parseLivesMilestone(raw.milestone);
+  const loaded = await loadLivesAreaBundle(LIVES_NATIONAL.slug);
+  const bundle = loaded ?? emptyLivesAreaBundle(LIVES_NATIONAL);
 
   return (
     <Room>
       <ReadingEntry
         pathname="/lives"
         title="Lives across the decades"
-        lede="Published counts set the frame. Sourced voices, places, and records open what the numbers cannot."
+        lede="Follow one ordinary question through changing counts, rules, and accounts of lived experience. Every visible figure is sourced."
         showCrumb={false}
       />
-      <DocumentColophon facts={[`Area · ${bundle.areaName}`, 'Span · 1870s to 2020s']} />
+      <DocumentColophon facts={['United States', '1870 to 2020', 'Published comparisons only']} />
 
-      <Suspense fallback={<LivesTimelineStatic bundle={bundle} areaSlug={livesAreaSlug} />}>
-        <LivesTimeline bundle={bundle} areaSlug={livesAreaSlug} />
-      </Suspense>
+      <LivesMilestoneExperience bundle={bundle} milestone={milestone} />
 
       <WalkOffRamp>
-        Every figure names its table. Laws sit beside the numbers, not as their cause. Method on{' '}
+        Every figure names its table. Rules sit beside the numbers, not as their cause. Method on{' '}
         <a href="/methodology#lives-across-decades">Methodology</a>. Compact census spine on{' '}
         <a href="/data#lives">Data</a>.
       </WalkOffRamp>

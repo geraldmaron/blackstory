@@ -6,7 +6,7 @@
 
 # Lives: the structure decision
 
-**Status:** Decision record, pending two owner calls (§10)
+**Status:** Amended reader decision, pending two owner calls (§10)
 **Date:** 2026-09-17
 **Epic:** `repo-0clax`
 **How it was reached:** Two adversarial design passes. The first challenged the collection-first
@@ -17,13 +17,21 @@ survived; every structure's *mechanic* broke. What follows is composed from the 
 
 ---
 
+> **Owner amendment, 2026-09-18.** The mandatory six-panel mechanic is superseded. It recreated the
+> blank-catalog failure the reader was meant to solve. `/lives` now renders only eras with a cited
+> Black value and at least one cited comparison value; gaps remain inspectable in
+> `/lives/explorer`. The milestone spine, unconnected panels, in-place definitions, and evidence
+> rules remain binding. This is a direct product decision, not an ADR inference.
+
 ## 1. The decision
 
-**One milestone, six eras, one panel per era.**
+**One milestone, evidence-backed eras, one panel per visible era.**
 
 The reader picks a life milestone and nothing else. That choice fixes the measure, the universe,
-and the unit. Each era contributes exactly one panel: one decade, one place, the comparison already
-drawn, each figure carrying its own definition label printed in place.
+and the unit. Each publishable era contributes one panel: one decade, one place, the comparison
+already drawn, each figure carrying its own definition label printed in place. An era without a
+cited Black value and at least one cited comparison value is omitted from the public reader and
+remains available in the evidence appendix.
 
 Panels stack and are **never connected by a line.** Every definitional break, regime break, and
 visibility break lands between panels, where it can be stated instead of crossed.

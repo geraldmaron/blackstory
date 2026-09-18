@@ -1061,3 +1061,385 @@
     transition: none;
   }
 }
+
+/* Guided milestone reader. The decade grid above is retained only by /lives/explorer. */
+.lives-milestone {
+  margin-top: var(--ds-space-8);
+}
+
+.lives-milestone__choices {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--ds-space-2);
+  padding: var(--ds-space-2);
+  background: var(--ds-surface-sunken);
+  border: var(--ds-border-width) solid var(--ds-rule);
+  border-radius: var(--ds-radius-md);
+}
+
+.lives-milestone__choices a {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-width: 0;
+  min-height: 3.5rem;
+  padding: var(--ds-space-3);
+  color: var(--ds-ink-muted);
+  text-decoration: none;
+  background: transparent;
+  border: var(--ds-border-width) solid transparent;
+  border-radius: var(--ds-radius-sm);
+}
+
+.lives-milestone__choices a:hover {
+  color: var(--ds-ink);
+  border-color: var(--ds-rule);
+}
+
+.lives-milestone__choices a[aria-current='page'] {
+  color: var(--ds-ink);
+  background: var(--ds-surface);
+  border-color: var(--ds-accent-graphic);
+  box-shadow: inset 3px 0 0 var(--ds-accent-graphic);
+}
+
+.lives-milestone__choices a:focus-visible,
+.lives-milestone a:focus-visible,
+.lives-explorer__return a:focus-visible {
+  outline: var(--ds-focus-ring);
+  outline-offset: 3px;
+}
+
+.lives-milestone__choices span {
+  font-family: var(--ds-font-display);
+  font-weight: 600;
+}
+
+.lives-milestone__choices small {
+  margin-top: 0.15rem;
+  font-size: 0.75rem;
+  line-height: 1.25;
+  white-space: normal;
+}
+
+.lives-milestone__opening {
+  display: grid;
+  gap: var(--ds-space-3);
+  max-width: 52rem;
+  margin: clamp(var(--ds-space-10), 8vw, var(--ds-space-24)) 0 var(--ds-space-12);
+}
+
+.lives-milestone__opening > * {
+  margin: 0;
+}
+
+.lives-milestone__kicker,
+.lives-era__eyebrow,
+.lives-era__source-label,
+.lives-milestone__context-kicker {
+  font-family: var(--ds-font-mono);
+  font-size: 0.75rem;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--ds-accent);
+}
+
+.lives-milestone__opening h2 {
+  max-width: 12ch;
+  font-family: var(--ds-font-display);
+  font-size: clamp(2.5rem, 8vw, 5.75rem);
+  line-height: 0.94;
+  letter-spacing: -0.045em;
+}
+
+.lives-milestone__opening > p:not([class]) {
+  max-width: 38rem;
+  font-family: var(--ds-font-editorial);
+  font-size: clamp(1.25rem, 3vw, 1.75rem);
+  line-height: 1.35;
+}
+
+.lives-milestone__orientation {
+  max-width: 45rem;
+  padding-top: var(--ds-space-4);
+  font-size: 0.9rem;
+  line-height: 1.55;
+  color: var(--ds-ink-muted);
+  border-top: var(--ds-border-width) solid var(--ds-rule);
+}
+
+.lives-milestone__eras {
+  counter-reset: lives-era;
+  border-top: var(--ds-border-width) solid var(--ds-ink);
+}
+
+.lives-era {
+  counter-increment: lives-era;
+  display: grid;
+  gap: var(--ds-space-6);
+  padding: clamp(var(--ds-space-10), 8vw, var(--ds-space-24)) 0;
+  border-bottom: var(--ds-border-width) solid var(--ds-ink);
+}
+
+.lives-era__header {
+  display: grid;
+  grid-template-columns: minmax(5rem, 0.28fr) minmax(0, 1fr);
+  gap: var(--ds-space-6);
+  align-items: start;
+}
+
+.lives-era__number {
+  margin: 0;
+  font-family: var(--ds-font-mono);
+  font-size: clamp(1rem, 2.5vw, 1.4rem);
+  color: var(--ds-ink-muted);
+}
+
+.lives-era__number::before {
+  content: '0' counter(lives-era) ' / ';
+  display: block;
+  margin-bottom: var(--ds-space-2);
+  font-size: 0.7rem;
+  color: var(--ds-accent);
+}
+
+.lives-era__header h3 {
+  max-width: 24ch;
+  margin: var(--ds-space-1) 0 var(--ds-space-2);
+  font-family: var(--ds-font-display);
+  font-size: clamp(1.75rem, 4vw, 3rem);
+  line-height: 1.02;
+}
+
+.lives-era__universe {
+  max-width: 42rem;
+  margin: 0;
+  color: var(--ds-ink-muted);
+}
+
+.lives-era__values {
+  display: grid;
+  gap: var(--ds-space-4);
+  margin: 0;
+}
+
+.lives-era__value {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: var(--ds-space-2) var(--ds-space-4);
+  min-width: 0;
+  padding-bottom: var(--ds-space-4);
+  border-bottom: var(--ds-border-width) solid var(--ds-rule);
+}
+
+.lives-era__value dt,
+.lives-era__value dd {
+  position: relative;
+  z-index: 1; /* local: labels and values above their decorative bar within one row */
+  margin: 0;
+}
+
+.lives-era__value dt {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ds-space-1);
+  min-width: 0;
+  font-family: var(--ds-font-display);
+  font-size: 1.05rem;
+}
+
+.lives-era__value dt small,
+.lives-era__value dd small,
+.lives-era__rules small {
+  display: block;
+  font-family: var(--ds-font-mono);
+  font-size: 0.7rem;
+  font-weight: 400;
+  line-height: 1.4;
+  color: var(--ds-ink-muted);
+}
+
+.lives-era__value dd {
+  text-align: right;
+}
+
+.lives-era__estimate {
+  display: block;
+  font-family: var(--ds-font-mono);
+  font-size: clamp(1.5rem, 4vw, 2.25rem);
+  font-weight: 600;
+  line-height: 1;
+}
+
+.lives-era__bar {
+  grid-column: 1 / -1;
+  display: block;
+  width: var(--lives-value);
+  min-width: 2px;
+  height: 0.35rem;
+  background: currentColor;
+}
+
+.lives-era__value[data-lens='white'] .lives-era__bar {
+  height: 0.2rem;
+  opacity: 0.52;
+}
+
+.lives-era__value[data-lens='hispanic'] .lives-era__bar {
+  height: 0.3rem;
+  opacity: 0.72;
+}
+
+.lives-era__evidence,
+.lives-era__rules {
+  padding: var(--ds-space-4);
+  background: var(--ds-surface-sunken);
+  border-left: 3px solid var(--ds-rule);
+}
+
+.lives-era__source-label {
+  margin: 0 0 var(--ds-space-2);
+}
+
+.lives-milestone__sources,
+.lives-era__rules ul {
+  display: grid;
+  gap: var(--ds-space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: 0.82rem;
+}
+
+.lives-milestone__sources a,
+.lives-era__rules a,
+.lives-milestone__footer a,
+.lives-explorer__return a {
+  color: var(--ds-accent);
+  text-underline-offset: 0.2em;
+}
+
+.lives-milestone__context {
+  max-width: 46rem;
+  padding: var(--ds-space-6) 0 var(--ds-space-2);
+}
+
+.lives-milestone__context h4 {
+  margin: var(--ds-space-2) 0;
+  font-family: var(--ds-font-editorial);
+  font-size: clamp(1.35rem, 3vw, 2rem);
+  line-height: 1.2;
+}
+
+.lives-milestone__context > p:not([class]) {
+  font-family: var(--ds-font-editorial);
+  font-size: 1.05rem;
+  line-height: 1.65;
+}
+
+.lives-milestone__speaker {
+  margin: 0 0 var(--ds-space-3);
+  font-family: var(--ds-font-mono);
+  font-size: 0.75rem;
+  color: var(--ds-ink-muted);
+}
+
+.lives-era__rules {
+  border-left-color: var(--ds-accent-graphic);
+}
+
+.lives-era__rules li {
+  display: grid;
+  grid-template-columns: 3.5rem minmax(0, 1fr);
+  gap: var(--ds-space-1) var(--ds-space-3);
+  padding-top: var(--ds-space-2);
+  border-top: var(--ds-border-width) solid var(--ds-rule);
+}
+
+.lives-era__rules li > span {
+  grid-row: span 2;
+  font-family: var(--ds-font-mono);
+  color: var(--ds-ink-muted);
+}
+
+.lives-milestone__footer,
+.lives-milestone__unavailable,
+.lives-explorer__return {
+  margin: var(--ds-space-10) 0;
+  padding: var(--ds-space-5);
+  background: var(--ds-surface);
+  border: var(--ds-border-width) solid var(--ds-rule);
+  border-radius: var(--ds-radius-md);
+}
+
+.lives-milestone__footer {
+  display: grid;
+  gap: var(--ds-space-4);
+  align-items: start;
+}
+
+.lives-milestone__footer p,
+.lives-explorer__return {
+  font-size: 0.875rem;
+  line-height: 1.55;
+  color: var(--ds-ink-muted);
+}
+
+@media (min-width: 40rem) {
+  .lives-milestone__choices {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .lives-milestone__footer {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+}
+
+@media (min-width: 64rem) {
+  .lives-milestone__choices {
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+  }
+
+  .lives-era {
+    grid-template-columns: minmax(0, 1.35fr) minmax(18rem, 0.65fr);
+    column-gap: clamp(var(--ds-space-8), 6vw, var(--ds-space-16));
+  }
+
+  .lives-era__header,
+  .lives-era__values {
+    grid-column: 1;
+  }
+
+  .lives-era__evidence,
+  .lives-era__context,
+  .lives-era__rules {
+    grid-column: 2;
+  }
+
+  .lives-era__evidence {
+    grid-row: 1;
+    align-self: end;
+  }
+
+  .lives-era__context {
+    grid-row: 2;
+    align-self: start;
+    padding-top: 0;
+  }
+}
+
+@media (max-width: 31.25rem) {
+  .lives-era__header {
+    grid-template-columns: 1fr;
+    gap: var(--ds-space-4);
+  }
+
+  .lives-era__number::before {
+    display: inline;
+  }
+
+  .lives-era__value {
+    grid-template-columns: minmax(0, 1fr) minmax(4.5rem, auto);
+  }
+}

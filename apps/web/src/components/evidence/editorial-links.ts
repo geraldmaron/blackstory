@@ -1,7 +1,7 @@
 /**
  * Shareable editorial off-ramps from record evidence chrome into Methodology and Data.
  * Methodology anchors re-export the binding hrefs from `methodology-copy.ts`; decade links
- * use the Lives room on `/lives`.
+ * use the Lives evidence appendix on `/lives/explorer`.
  */
 import { isLivesDecade, LIVES_NATIONAL } from '@repo/domain/statistics/lives';
 import { METHODOLOGY_SOURCE_LIBRARY_HREF } from '../../app/methodology/methodology-copy';
@@ -15,7 +15,7 @@ export const METHODOLOGY_HOW_IT_HOLDS_TOGETHER_HREF = '/methodology#how-it-holds
 export const METHODOLOGY_INTERNET_ARCHIVE_HREF = '/methodology#internet-archive';
 export { METHODOLOGY_SOURCE_LIBRARY_HREF };
 
-/** Map one decade bucket (e.g. `1930s`) to the Lives room when that decade exists. */
+/** Map one decade bucket (e.g. `1930s`) to the Lives appendix when that decade exists. */
 export function livedDecadeHrefForBucket(bucket: string): string | undefined {
   const decadeMatch = /^(\d{4})s$/i.exec(bucket.trim());
   if (!decadeMatch) return undefined;

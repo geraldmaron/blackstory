@@ -48,7 +48,7 @@ export function LivesTimeline({ bundle, areaSlug, hideAreaNav = false }: LivesTi
     parseLivesSearchParams(Object.fromEntries(searchParams.entries())),
   );
   const touched = useRef(false);
-  const onLivesRoom = pathname === '/lives' || pathname.startsWith('/lives/');
+  const onLivesRoom = pathname === '/lives/explorer';
 
   useEffect(() => {
     const fromUrl = parseLivesSearchParams(Object.fromEntries(searchParams.entries()));

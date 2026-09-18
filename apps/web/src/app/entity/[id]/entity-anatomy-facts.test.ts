@@ -13,12 +13,12 @@ function requireEntity(id: string) {
   return entity;
 }
 
-test('buildEntityAnatomyInputs links resolvable decades to the Lives room', () => {
+test('buildEntityAnatomyInputs links resolvable decades to the Lives evidence appendix', () => {
   const entity = requireEntity('ent_15th_st_church_001');
   const inputs = buildEntityAnatomyInputs(entity, undefined);
   assert.notEqual(inputs.eraLabel, 'Undated');
   if (inputs.eraHref) {
-    assert.match(inputs.eraHref, /^\/lives(\?decade=\d+)?$/);
+    assert.match(inputs.eraHref, /^\/lives\/explorer(\?decade=\d+)?$/);
   }
 });
 

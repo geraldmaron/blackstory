@@ -39,10 +39,8 @@ import {
   DATA_SOURCE_LIBRARY_HANDOFF,
   type DataPageSectionId,
 } from './data-copy';
-import { LIVES_NATIONAL } from '@repo/domain/statistics/lives';
 import { DataPageNav } from './DataPageNav';
 import { DestinationIcon } from '../../components/patterns/DestinationIcon';
-import { buildLivesHref, DEFAULT_LIVES_VIEW } from '../../lib/lives/lives-url-state';
 
 void React;
 
@@ -365,11 +363,11 @@ export function DataSections({
 
       <Section id="lives" meta={['1870s to 2020s']}>
         <p className="ds-data-lives-entry">
-          Class shares, measured conditions, and laws in force live in their own room. The decade
-          rail continues this census spine there, with a street hatched from published tables.
+          Follow one life question across changing census definitions, rules, and sourced accounts.
+          Only evidence-backed comparisons appear in the guided experience.
         </p>
         <p className="ds-data-lives-entry__cta">
-          <Link href={buildLivesHref(LIVES_NATIONAL.slug, DEFAULT_LIVES_VIEW)}>
+          <Link href="/lives">
             <DestinationIcon id="person" className="ds-kicker-glyph" />
             Open Lives
           </Link>

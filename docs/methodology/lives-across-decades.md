@@ -187,7 +187,7 @@ people.
 | `wide_margin` | Value with a wide-margin marker |
 | `suppressed` | "Too few counted to say," linked to the reason |
 | `not_measured` | "The census did not publish this," linked to the decade's count note |
-| `pending` | "Not yet counted" (build not complete) |
+| `pending` | Evidence appendix only. The guided reader does not publish production-state cells. |
 
 ## Build
 

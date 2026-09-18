@@ -50,11 +50,11 @@ test('data index is the ledger room, not a redirect into a merged hub', () => {
 test('lives is an immersive room; Data Act II is a compact door into it', () => {
   const livesIndex = readFileSync(join(here, '../lives/page.tsx'), 'utf8');
   const livesRegion = readFileSync(join(here, '../lives/[region]/page.tsx'), 'utf8');
-  assert.match(livesIndex, /LivesTimeline/);
+  const livesExplorer = readFileSync(join(here, '../lives/explorer/page.tsx'), 'utf8');
+  assert.match(livesIndex, /LivesMilestoneExperience/);
   assert.doesNotMatch(livesIndex, /permanentRedirect/);
-  assert.match(livesRegion, /LivesTimeline/);
-  assert.doesNotMatch(livesRegion, /permanentRedirect/);
-  assert.match(sectionsSource, /buildLivesHref/);
+  assert.match(livesRegion, /permanentRedirect/);
+  assert.match(livesExplorer, /LivesTimeline/);
   assert.match(sectionsSource, /Open Lives/);
   assert.doesNotMatch(sectionsSource, /LivesAreaNav/);
 });
@@ -73,7 +73,7 @@ test('data sections keep census and indicator chart wiring', () => {
   assert.match(sectionsSource, /GroupedBarIndicatorChart/);
   assert.match(sectionsSource, /StatePopulationShiftChart/);
   assert.match(sectionsSource, /TrendLineChart/);
-  assert.match(sectionsSource, /buildLivesHref/);
+  assert.match(sectionsSource, /href="\/lives"/);
   assert.match(sectionsSource, /id="counted"/);
   assert.match(sectionsSource, /id="lives"/);
   assert.match(sectionsSource, /id="gaps"/);
