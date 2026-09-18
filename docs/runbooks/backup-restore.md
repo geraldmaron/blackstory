@@ -5,22 +5,36 @@ publication state. Supabase Storage holds source text and public media. A databa
 does not prove object recovery. Confirm the configured project's actual backup retention and
 point-in-time recovery entitlement; neither is assumed by this repository.
 
+An application-schema dump is not a complete Supabase recovery set. A complete logical recovery
+bundle includes application schemas, the `auth` and `storage` database schemas, migration history,
+required roles and grants, a sanitized inventory of provider Auth configuration, recoverable
+private and public objects with byte hashes, and the matching old application build identities.
+Auth exports contain sensitive credential records, including password hashes and login tokens.
+Keep the complete bundle in owner-only local storage, exclude it from Git and shared logs, and
+use synthetic identities for checks that do not require original Auth records.
+A provider physical clone may supply some database/Auth pieces, but its current documented scope
+must be checked at drill time; Storage objects and provider settings require separate recovery.
+
 ## Isolated restore
 
-1. Identify the backup, its source project, cutoff time, and required RPO/RTO before starting.
+1. Identify the backup, its source project, cutoff time, and proposed RPO/RTO before starting.
+   Targets remain unmeasured until this complete restore finishes.
    Preserve it and its checksums. Use a destination separate from the source; never overwrite the
    system of record during a rehearsal. Do not copy production application secrets into it.
-2. Restore the database using the supported Supabase recovery/export procedure for that backup.
+2. Restore either a provider-supported physical recovery point or the complete logical bundle.
    Record commands, tool versions, start/end times and failures in a sanitized execution log.
    Apply only the migrations needed to reach the intended application revision.
-3. Compare table counts and stable content hashes against the backup baseline. Verify foreign
-   keys, functions, RLS, staff role claims and denied anonymous/research-worker writes. An empty
-   schema reset proves migration mechanics, not recovery of recorded history.
+3. Compare table counts and stable content hashes against the backup baseline. Verify required
+   roles and grants, foreign keys, functions, RLS, Auth users, staff role claims, migration history,
+   Storage metadata and denied anonymous/research-worker writes. An empty schema reset or an
+   application-only dump proves migration mechanics, not recovery of the complete system.
 4. Restore or independently verify the required storage objects. Check their hashes, private
    access and public delivery paths against database references. Include source text and media.
 5. Exercise public record/source delivery and authorized admin reads against the isolated restore.
    Verify release pointers and derived projections; record mismatches before rebuilding them.
-6. Record measured recovery time and data loss. Resolve failures before declaring the drill passed.
+6. Record measured recovery time and data loss. A paid provider clone is not required when a
+   complete logical restore meets the approved targets and all checks above; it remains a valid
+   alternative until that evidence exists. Resolve failures before declaring the drill passed.
    Keep the backup and evidence until the replacement recovery point is verified.
 
 ## Launch evidence contract

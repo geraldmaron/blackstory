@@ -23,9 +23,10 @@ Two isolated database paths have been exercised with the final migration files:
   `model_invocations` table. Six tables were added and 14 source-linked capture origins were
   backfilled; 55 captures without a source-item relationship were left uninferred.
 
-This proves the checked-in clean and restored-data migration paths locally. It does not prove
-production backup entitlement, provider recovery time, full object recovery, production
-credentials, PostgREST cache convergence or a production cutover.
+This proves the checked-in clean and restored-data migration paths locally. The application dump
+did not contain Auth, Storage metadata, provider Auth settings or database roles, so it is not a
+complete recovery set. It also does not prove provider recovery time, full object recovery,
+production credentials, PostgREST cache convergence or a production cutover.
 
 ## Release prerequisites
 
@@ -35,45 +36,83 @@ credentials, PostgREST cache convergence or a production cutover.
 2. Run `fnm exec --using=22 -- ./scripts/ci-local.sh --base origin/staging` on the final tree. For
    this database change, retain the successful clean-chain, restored-data upgrade, SQL
    authorization and public/admin surface evidence with the release record.
-3. Set an approved RPO and RTO. Complete the executed-restore evidence required by
+3. Set an approved RPO and RTO. Any target written before a complete timed restore is proposed and
+   unmeasured. Complete the executed-restore evidence required by
    [backup and recovery](./backup-restore.md). The application-dump rehearsal does not establish a
    production failover target.
 4. Create and verify one matched pre-cutover recovery set:
-   - a provider-supported database and auth recovery point at a recorded cutoff;
+   - either a provider-supported database/Auth recovery point or a freeze-time logical bundle that
+     includes application schemas, `auth`, `storage`, migration history, required roles and grants,
+     and a sanitized provider Auth configuration inventory;
    - an export of `supabase_migrations.schema_migrations`, table counts and stable table hashes;
-   - protected staff-auth metadata sufficient to verify `app_metadata.bb_role` before cutover,
-     without exporting access tokens or application secrets;
+   - a sanitized staff-role inventory sufficient to verify `app_metadata.bb_role` before cutover;
+     keep tokens and application secrets out of that inventory and the shared execution log;
+     the separate full Auth recovery dump requires owner-only protection;
    - complete inventories and recoverable copies of every required `raw-sources` and
      `public-media` object, with downloaded-byte hashes, access-policy checks and readback from an
      isolated destination;
    - the old application, API and worker build identities that match that database and auth state.
 
-   A database hash is not an object checksum. The audit verified all 58 referenced raw objects,
+   A paid provider clone is optional only after the complete logical bundle has restored into an
+   isolated Supabase environment and met the approved RPO/RTO with Auth users, role metadata, RLS,
+   Storage references and application surfaces intact. The existing application dump does not meet
+   that bar. A database hash is not an object checksum. The audit verified all 58 referenced raw objects,
    and all 228 available media objects referenced by release projections (457,165,770 bytes),
    with local readback and access checks. One further referenced Dunbar school image is absent
-   from Supabase and returns HTTP 403 at its old GCS URL. Resolve that missing object or review
-   its removal from published projections before claiming complete recovery. The remaining
+   from Supabase, and an authenticated object describe returns `404` at its old GCS location.
+   Remove that reference through the immutable release-repair procedure below before claiming
+   complete recovery. The remaining
    unreferenced objects in the 242-object bucket were not restored.
-5. Confirm that the release operator can access Supabase, Vercel and every deployed API or worker
+5. Confirm that Preview database credentials are removed or point to an isolated destination.
+   Visibility of masked variables does not prove they differ from Production credentials.
+6. Confirm that the release operator can access Supabase, Vercel and every deployed API or worker
    surface with uncompromised administrator identities. Verify the production branch, domains,
    environment targets and current providers rather than inferring them from repository files.
-6. Prepare one sanitized execution log that records the tested commit, backup identifiers and
+7. Prepare one sanitized execution log that records the tested commit, backup identifiers and
    hashes, migration plan, deployed build identities, operators, start/end times and every failed
    or uncertain command. Keep credentials out of commands, logs and bundles.
+
+### Repair immutable release data
+
+Do not update an active release row in place. Create a replacement release from the active release,
+apply the approved canonical correction, and carry the release ID consistently through entity
+projections, search document IDs/facets, articles and their content hashes, redirects, graph rows,
+legal snapshots and theme packets. `evidence.published_citations` is derived from the active
+release and must not be inserted into directly.
+
+Before activation, verify equal row counts, compare every projection after excluding release
+metadata and the approved field change, and prove the source release hashes are unchanged. Build
+the replacement entity and search artifacts at their new release paths, verify zero forbidden
+references, upload and read them back, then build and sign the release manifest with
+`buildReleaseManifest` and `signReleaseManifest` from `@repo/domain`. Verify it with
+`verifySignedReleaseManifest`; never put a placeholder signature into production.
+
+Activate through the database's authorized publisher gate, not a raw
+`published.active_release` update: call `bb_publication.activate_release(release_id)` before the
+namespace cutover or `publication.activate_release(release_id)` afterward. This gate records the
+audit event and rejects research identities. A reviewed one-time operator script may connect these
+existing primitives; a new reusable publishing service is not required for this correction. Load
+an ECDSA private key and nonempty key ID from the configured secret store, and retain the matching
+public key for verification. The repository currently defines no production release-signing env
+name or key registry, so record the selected secret reference, key ID and public verifier before
+the window without logging private key material. Purge the release cache and verify the live
+database views, artifacts and public surface. Preserve the old release for rollback.
 
 ## Coordinated cutover
 
 ### 1. Enter maintenance and freeze writes
 
 1. Enable the production web wall using [maintenance mode](./maintenance-mode.md), redeploy and
-   verify `503` from a browser without the bypass cookie on `/`, `/robots.txt` and a record URL.
-   Keep an operator browser on the maintenance bypass for later checks.
-2. The web wall does not cover `apps/api-public`, mobile, submissions, internal APIs, scheduled
-   jobs or manual operators. Put public API search/location on its existing fail-closed/static
-   controls, pause submissions and publication, and stop every research, ingestion, enrichment,
-   preservation and release writer at its deployed provider. Re-check GitHub, Vercel, database and
-   any other configured scheduler immediately before the window; the 2026-09-18 no-schedule audit
-   is not a permanent guarantee.
+   verify `503` from a browser without the bypass cookie on `/`, `/robots.txt`, a record URL,
+   `/submit/api` and `/admin`. The web proxy is the write boundary for all `apps/web` routes. Keep
+   an operator browser on the maintenance bypass for later checks, but do not use it for staff
+   writes during the freeze.
+2. The web wall does not cover `apps/api-public`, mobile, scheduled jobs or manual operators. Put
+   the public API in its seed/fail-closed data mode and verify it opens no application database
+   session. Pause publication and stop every research, ingestion, enrichment, preservation and
+   release writer at its deployed provider. Re-check GitHub, Vercel, database and any other
+   configured scheduler immediately before the window; the 2026-09-18 no-schedule audit is not a
+   permanent guarantee.
 3. Confirm that no old application, worker or operator process can open a write transaction. Record
    the freeze time and the final database/auth/storage cutoff. Do not proceed while writes can race
    the snapshot or namespace rename.
