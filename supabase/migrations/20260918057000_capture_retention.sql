@@ -20,7 +20,10 @@ CREATE POLICY capture_disposals_staff_read ON evidence.capture_disposals FOR SEL
 CREATE INDEX capture_disposals_pending_idx ON evidence.capture_disposals(requested_at) WHERE deleted_at IS NULL;
 -- Recover only origins with an existing source-item relationship; never infer missing custody.
 INSERT INTO evidence.capture_origins(capture_id,source_item_id,source_url,final_url,storage_object,observed_at)
-SELECT c.id,i.id,i.url,coalesce(nullif(c.storage_object->>'finalUrl',''),i.url),c.storage_object,c.captured_at
+SELECT c.id,i.id,i.url,coalesce(nullif(c.storage_object->>'finalUrl',''),i.url),
+  CASE WHEN jsonb_typeof(c.storage_object)='object' THEN c.storage_object
+    ELSE jsonb_build_object('stored','metadata-only','sha256',c.content_hash_digest) END,
+  c.captured_at
 FROM evidence.source_captures c JOIN evidence.source_items i ON i.id=c.source_item_id
 WHERE i.url ~ '^https?://' ON CONFLICT DO NOTHING;
 -- Lock the origin so withdrawal cannot race with passage insertion or renewal.

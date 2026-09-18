@@ -33,9 +33,7 @@ WHERE re.release_id = (
 );
 
 COMMENT ON VIEW public.published_entities IS
-  'Published-read PostgREST surface (docs/decisions-carryover.md, '
-  '"Small recovered decisions"): entity rows for the active release only. '
-  'Resolvability status vocabulary lives in projection/search_index (published|corrected|superseded|deprecated).';
+  'ADR-026 PostgREST surface: entity rows for the active release only.';
 
 -- ---------------------------------------------------------------------------
 -- public.published_search_index — active-release search rows
@@ -65,8 +63,7 @@ WHERE si.release_id = (
 );
 
 COMMENT ON VIEW public.published_search_index IS
-  'Published-read PostgREST surface (docs/decisions-carryover.md, '
-  '"Small recovered decisions"): search index rows for the active release only.';
+  'ADR-026 PostgREST surface: search index rows for the active release only.';
 
 -- ---------------------------------------------------------------------------
 -- Grants: SELECT only; no write paths; no canonical/research widening

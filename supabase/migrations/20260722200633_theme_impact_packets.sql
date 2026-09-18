@@ -45,7 +45,7 @@ CREATE INDEX IF NOT EXISTS theme_impact_packets_entity_id_idx
 COMMENT ON TABLE bb_reference.theme_impact_packets IS
   'ThemeImpactPacket rows: canonical question answers composing stats/evidence refs. '
   'method_stance defaults to juxtaposition in product code; gated_causal_claim requires claim ids. '
-  'Juxtaposition ≠ causation — see docs/methodology/juxtaposition-not-causation.md.';
+  'Juxtaposition ≠ causation — see docs/methodology/juxtaposition-not-causation.md and ADR-029.';
 
 ALTER TABLE bb_reference.theme_impact_packets ENABLE ROW LEVEL SECURITY;
 

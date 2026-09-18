@@ -30,14 +30,14 @@ SET LOCAL request.jwt.claims = '{"role":"service_role"}';
 INSERT INTO research.research_profiles (
   id, version, schema_version, checksum, profile, active
 ) VALUES (
-  'black-history', '1.0.0', '1.0.0', repeat('a', 64), '{}'::jsonb, true
+  'verification-research-profile', '1.0.0', '1.0.0', repeat('a', 64), '{}'::jsonb, true
 );
 
 INSERT INTO research.cases (id, state, candidate_id, title, profile_id, profile_version, risk_class)
-VALUES ('case-test', 'candidate', 'candidate-test', 'Research kernel verification', 'black-history', '1.0.0', 'standard');
+VALUES ('case-test', 'candidate', 'candidate-test', 'Research kernel verification', 'verification-research-profile', '1.0.0', 'standard');
 
 INSERT INTO research.runs (id,case_id,profile_id,profile_version,policy_version,mode,status,started_at,execution_plan,manifest_hash,max_cost_usd,deadline_at)
-VALUES ('frontier-run-test','case-test','black-history','1.0.0','1.0.0','deterministic','pending',now(),'{}',repeat('f',64),0,now()+interval '1 hour');
+VALUES ('frontier-run-test','case-test','verification-research-profile','1.0.0','1.0.0','deterministic','pending',now(),'{}',repeat('f',64),0,now()+interval '1 hour');
 
 INSERT INTO research.frontier_tasks (
   id, case_id, run_id, task_type, risk_weight, expected_entropy_reduction,
@@ -99,7 +99,7 @@ $$;
 INSERT INTO research.runs (
   id, case_id, profile_id, profile_version, policy_version, mode, status, started_at
 ) VALUES (
-  'run-test', 'case-test', 'black-history', '1.0.0', '1.0.0',
+  'run-test', 'case-test', 'verification-research-profile', '1.0.0', '1.0.0',
   'quality-prose', 'running', now()
 );
 INSERT INTO research.agent_activities (

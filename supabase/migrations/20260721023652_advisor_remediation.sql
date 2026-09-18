@@ -77,10 +77,6 @@ BEGIN
   ]
   LOOP
     EXECUTE format(
-      'DROP POLICY IF EXISTS %I ON bb_ops.%I',
-      'deny_authenticated_' || t, t
-    );
-    EXECUTE format(
       'CREATE POLICY %I ON bb_ops.%I FOR ALL TO authenticated USING (false) WITH CHECK (false)',
       'deny_authenticated_' || t, t
     );
@@ -110,3 +106,16 @@ CREATE INDEX IF NOT EXISTS import_quarantines_batch_id_idx ON bb_ops.import_quar
 CREATE INDEX IF NOT EXISTS import_validation_findings_batch_id_idx ON bb_ops.import_validation_findings (batch_id);
 CREATE INDEX IF NOT EXISTS outbox_consumer_receipts_message_id_idx ON bb_ops.outbox_consumer_receipts (message_id);
 CREATE INDEX IF NOT EXISTS active_release_release_id_idx ON bb_public.active_release (release_id);
+
+-- Record API-applied migration filenames in history (idempotent)
+INSERT INTO supabase_migrations.schema_migrations (version, name)
+VALUES
+  ('20260720220004', 'ops_audit'),
+  ('20260720220005', 'evidence_sources'),
+  ('20260720220006', 'canonical_entities_claims'),
+  ('20260720220007', 'research'),
+  ('20260720220008', 'publication_public'),
+  ('20260720220009', 'reference_stats'),
+  ('20260720220010', 'rls_policies'),
+  ('20260720220011', 'indexes')
+ON CONFLICT DO NOTHING;

@@ -37,22 +37,3 @@ alter table bb_ops.public_read_egress_watermark enable row level security;
 comment on table bb_ops.public_read_egress_watermark is
   'Last pg_stat_statements reading per watched public read, so the egress monitor can compute a '
   'delta. RLS enabled with no policies ON PURPOSE (service_role only).';
-
--- Added in the same session, after the monitor's own end-to-end test caught the gap.
---
--- The table above deliberately avoids keying on `queryid`, because queryid changes whenever the
--- SQL text is edited and would silently re-baseline. The same hazard applies one level up: the
--- monitor matches statements by a LIKE fingerprint, and editing a fingerprint changes which
--- statements the counters cover. Observed live: correcting an over-broad fingerprint made the
--- next run compare the new population against the old one's stored total and report 20 days of
--- accumulated traffic as a single day's egress, i.e. a false alarm at ~6x budget.
---
--- Storing the fingerprint alongside the counters lets the monitor notice that the baseline is
--- not comparable and re-baseline instead of alerting on an artefact.
-alter table bb_ops.public_read_egress_watermark
-  add column if not exists fingerprint text;
-
-comment on column bb_ops.public_read_egress_watermark.fingerprint is
-  'The LIKE pattern the stored counters were captured under. When the monitor edits a '
-  'fingerprint, the previous counters describe a different set of statements and the delta '
-  'between them is meaningless; comparing this column forces a re-baseline instead.';
