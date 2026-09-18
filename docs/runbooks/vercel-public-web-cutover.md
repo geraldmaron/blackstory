@@ -32,6 +32,13 @@ using tokens in shared cache keys. Do not redirect solely to alphabetize query p
 Environment changes require a new deployment. Preview and production need separate environment
 values and should not share a writable production credential for verification.
 
+Both Vercel apps install through `scripts/install-vercel-dependencies.mjs`. Healthy dependency
+caches keep the normal frozen install. Broken hoisted pnpm links discard only the root and
+workspace `node_modules` directories, then reinstall from the committed lockfile. The check also
+runs after installation because dependency removal can expose stale links. A failed repair stops
+the build. The package-manager download store is preserved; retired packages are never added back
+just to satisfy a restored cache.
+
 ## Release and recovery
 
 Treat merging to the configured production branch as a release: Vercel's Git integration can

@@ -455,13 +455,44 @@ Command: cd apps/mobile && fnm exec --using=22 -- npm run deps:check
 Result: pass
 Observed: Expo reports dependencies up to date. Existing exclusions were unchanged. Native Release rebuild remains unproven on this host until its Xcode license is resolved by the owner.
 
-The API's automatic preview compiled, then failed while tracing a missing `supports-color@7.2.0`
-path after restoring an older cache. A clean local trace of the compiled API traversed 1,114 files
-without that filesystem error (optional-module/type-declaration warnings remain). A normal frozen
-install over an isolated old dependency graph retained the old package; it did not reproduce the
-remote missing target. A stale cache is a hypothesis, not an established diagnosis. No dependency
-was reintroduced, build gate bypassed, manual deployment or workflow retry started. The next normal
-PR checks must verify the security/mobile changes and establish whether the preview failure persists.
+All automatically triggered GitHub Actions checks on `d6b7bb75` passed, including both CodeQL
+languages, the combined CodeQL check, mobile, workspace checks/tests, Python and security gates.
+The API preview repeated the same missing `supports-color` target after restoring the old cache.
+A normal frozen install retained stale package links; forcing installation also retained the hoist
+and left missing targets. An isolated missing-target reproduction contained 56 broken hoisted
+links. The shared Vercel installer discards only broken root/workspace dependency directories,
+then reinstalls the frozen graph. It checks before and after installation, preserves healthy
+caches and the download store, and fails if links remain broken. The exact command repaired the
+isolated graph in 2.8 seconds with 479 reused packages and no downloads. Remote preview success
+still requires the updated head's automatic build.
+
+**Dependency cache repair. Accepted with controls.** The alternative is a cold install on every
+build or restoring retired dependencies. Both waste resources or compromise the intended graph.
+Only observed broken hoisted links trigger cleanup; source and package-manager download caches
+are preserved. Filesystem regression tests verify the warm path, broken path, source preservation
+and repeated invocation. The new helper was added after searching repository Vercel/install
+scripts and the installed pnpm/Vercel tooling; no existing repair helper was available.
+
+Check: Reader fallback and build gates
+Command: fnm exec --using=22 -- ./scripts/ci-local.sh --base origin/staging --lane validate --lane unit-js-apps --lane build-typecheck
+Result: pass
+Observed: all three lanes passed. After capping the final serialized fallback at 20 records, fnm exec --using=22 -- pnpm --filter @repo/web build and fnm exec --using=22 -- pnpm --filter @repo/web typecheck also passed; the restarted build passed the HTTP regression again.
+
+Check: Cache-repair validation and package suite
+Command: RESEARCH_TEST_DATABASE_URL=postgresql://postgres:postgres@127.0.0.1:55322/postgres fnm exec --using=22 -- ./scripts/ci-local.sh --base origin/staging --lane validate --lane unit-js-packages
+Result: pass
+Observed: both lanes passed, including real filesystem cache regression cases. The testing package typecheck also passed separately.
+
+Check: Real HTTP fallback regression
+Command: E2E_BASE_URL=http://127.0.0.1:3148 fnm exec --using=22 -- pnpm test:e2e
+Result: pass
+Observed: the root and cold Explore HTML checks passed. The test asserting an unset E2E URL correctly skipped because a real local URL was supplied.
+
+Outcome: Cold map browse hydrates while its no-JavaScript filters and record links remain in HTML.
+Surface: Chrome, /explore, using the isolated local public-record fixtures.
+Data: Two browsable Washington, D.C. records from the local rehearsal.
+Observed: before the fix, five React placeholders were trapped inside noscript text, React threw parentNode-null errors, and no map canvas appeared. Owning the entire fallback in one SSR client boundary removed those placeholders. Chrome rendered one canvas, filters and both records in light/dark themes; no new stream errors appeared. Selecting Dunbar opened its record sheet, preserved block precision and honestly displayed the fixture’s zero published sources. Existing filter/list components and styling are reused.
+Verdict: proven for map rendering and hydration. Positive relationship-line display on an independently reviewed release dataset remains a deployment acceptance check.
 
 Opened primary references for these fixes:
 
@@ -495,7 +526,7 @@ Opened primary references for these fixes:
 - Surface inspected: answered: “light/dark themes”, source links, no-coordinate and missing-record behavior; production not inspected.
 - Diff reviewed: partial: high-risk contracts, SQL, authorization, accounting, capture disposal, semantic runtime changes, authority documents and workflow commands reviewed. Mechanical schema/path changes were classified separately and comment batches checked for syntax-tree equivalence. The entire raw diff, including generated output and retired files, has not received line-by-line review; this remains a draft.
 - Residual risk: listed in “Remaining gates”, with the evidence each requires.
-- Root-cause-debugging: remote annotations and mobile failures reproduced/read; malicious-input regressions pass. The API cache hypothesis remains inconclusive, and the Xcode license blocks native proof.
+- Root-cause-debugging: remote annotations and mobile failures reproduced/read; malicious-input regressions pass. The cache failure class and noscript stream failure were reproduced and repaired locally; remote cache repair awaits its automatic preview, and the Xcode license blocks native proof.
 - Commit-and-PR: draft consolidation; staged-tree secret scan passed; branch targets staging. No merge or deployment is authorized by local checks.
 
 Additional opened primary sources:
