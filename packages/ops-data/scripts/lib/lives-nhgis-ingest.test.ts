@@ -7,11 +7,14 @@ import { test } from 'node:test';
 import type { LivesPublishedObservation } from '../../src/lives/published-observation.ts';
 import {
   downloadNhgisExtract,
+  fetchNhgisTableMeta,
   livesSeriesForObservations,
   summarizeLivesObservations,
 } from './lives-nhgis-ingest.ts';
 
 const TABLE_URL = 'https://api.ipums.org/downloads/nhgis/api/v1/extracts/123/nhgis0001_csv.zip';
+const META_URL =
+  'https://api.ipums.org/metadata/datasets/2023_ACS5a/data_tables/B25003B?collection=nhgis&version=2';
 
 function archiveFixture(
   entries: { name: string; mode?: number; declaredSize?: number }[],
@@ -43,6 +46,71 @@ sys.stdout.buffer.write(payload)
     ),
   );
 }
+
+test('NHGIS metadata is validated at the HTTP boundary before use', async () => {
+  const valid = {
+    name: 'B25003B',
+    nhgisCode: 'AJO',
+    variables: [{ description: 'Total', nhgisCode: 'AJO001' }],
+  };
+  const parsed = await fetchNhgisTableMeta({
+    dataset: '2023_ACS5a',
+    table: 'B25003B',
+    apiKey: 'test-credential',
+    fetchImpl: async (url, options) => {
+      assert.equal(url, META_URL);
+      assert.deepEqual(options?.headers, { Authorization: 'test-credential' });
+      assert.equal(options?.redirect, 'error');
+      assert.ok(options?.signal instanceof AbortSignal);
+      return Response.json(valid);
+    },
+  });
+  assert.deepEqual(parsed, {
+    group: 'B25003B',
+    nhgisCode: 'AJO',
+    variables: [{ description: 'Total', nhgisCode: 'AJO001' }],
+  });
+
+  await assert.rejects(
+    fetchNhgisTableMeta({
+      dataset: '2023_ACS5a',
+      table: 'B25003B',
+      apiKey: 'test-credential',
+      fetchImpl: async () => Response.json({ ...valid, variables: [{ description: 'Total' }] }),
+    }),
+    /NHGIS variable without a description or code/,
+  );
+  await assert.rejects(
+    fetchNhgisTableMeta({
+      dataset: '2023_ACS5a',
+      table: 'B25003B',
+      apiKey: 'test-credential',
+      fetchImpl: async () => Response.json({ ...valid, name: 'B25003H' }),
+    }),
+    /returned B25003H for requested table B25003B/,
+  );
+  await assert.rejects(
+    fetchNhgisTableMeta({
+      dataset: '2023_ACS5a',
+      table: 'B25003B',
+      apiKey: 'test-credential',
+      fetchImpl: async () => new Response(null, { status: 503 }),
+    }),
+    /HTTP 503/,
+  );
+
+  await assert.rejects(
+    fetchNhgisTableMeta({
+      dataset: '../foreign',
+      table: 'B25003B',
+      apiKey: 'test-credential',
+      fetchImpl: async () => {
+        assert.fail('invalid identifiers must be rejected before credentials reach fetch');
+      },
+    }),
+    /identifiers must be alphanumeric/,
+  );
+});
 
 test('NHGIS downloads authenticate only to IPUMS and preserve table/codebook bytes privately', async (t) => {
   const cacheDir = await mkdtemp(path.join(tmpdir(), 'nhgis-download-test-'));

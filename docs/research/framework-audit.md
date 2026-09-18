@@ -241,6 +241,50 @@ repository-wide retired-reference/deletion scans, plus targeted implementation g
 read every line of every changed product/generated file. Subsequent fixes require their own
 validation. Do not convert targeted review coverage into a claim of exhaustive line review.
 
+## Security check disposition
+
+The PR checks for `06c9d2a2` passed workspace, mobile, Python, dependency, secret,
+policy and preview validation. CodeQL analysis completed successfully but its aggregate
+check reported four changed-line alerts. These are distinct outcomes: completing the
+scanner is not passing its findings gate.
+
+- ACS metadata used a predictable file under the OS temporary directory. This is an
+  actionable local file-safety defect, surfaced by a changed comment on existing code.
+  Permanent metadata caching also lacked freshness semantics. Metadata is now parsed
+  into memory on each run, and the default extract root is an unpredictable private
+  directory. Reusing a downloaded extract remains supported. The metadata helper builds
+  only official IPUMS URLs, rejects redirects and mismatched table identities, and uses
+  the existing parser. This trades 28 small metadata requests per run for fresh schemas
+  and removes the unnecessary disk-write boundary.
+- CodeQL alert 327 follows public Wikidata SPARQL JSON into a cache file. The URL endpoint
+  is fixed, the filename is derived from a batch hash, and publication uses an exclusive
+  mode-0600 file inside `mkdtemp`, followed by atomic rename. The JSON is parsed as data,
+  not executed. This intentional transfer requires an explicit finding disposition.
+- Alert 328 follows selected benchmark queries into the JSON body sent to the fixed
+  OpenRouter embeddings endpoint. The runner requires explicit provider, model and cost
+  arguments and uses the selected corpus, not a filesystem crawl. This is the requested
+  embedding operation. The alert does not trace local file bytes into authorization headers.
+
+The exact SARIF source-to-sink paths and the official CodeQL query definitions were read.
+`fnm exec --using=22 -- node --conditions development --import tsx --test
+scripts/gold-corpus/openrouter-evaluation-embedding-provider.test.ts
+packages/ops-data/scripts/backfill-visit-from-wikidata.test.ts` passed all ten cases.
+These tests establish provider request shape and parsing behavior; they are not live
+provider calls or a complete filesystem adversary test. Intentional-transfer findings
+remain open pending operator disposition. No security rule is suppressed or disabled.
+The focused NHGIS command
+`pnpm --filter @repo/ops-data exec node --conditions development --import tsx --test
+scripts/lib/lives-nhgis-ingest.test.ts` passed eight cases, including invalid destination
+identifiers, malformed metadata and a different returned table. The command
+`pnpm --filter @repo/ops-data typecheck:scripts` also passed. The first full package run
+failed two unrelated socket tests under sandbox `listen EPERM`; that run is not a pass.
+The complete affected CI lanes then passed with local socket permission:
+`RESEARCH_TEST_DATABASE_URL=postgresql://postgres:postgres@127.0.0.1:55322/postgres
+fnm exec --using=22 -- ./scripts/ci-local.sh --base origin/staging --lane validate
+--lane unit-js-packages`. This includes the previously blocked socket cases.
+No credentialed live NHGIS ingestion was performed. The current commit and final remote
+check state are maintained in the PR delivery record.
+
 ## Primary sources consulted
 
 Opened during this work; technical references inform decisions without proving conformance:

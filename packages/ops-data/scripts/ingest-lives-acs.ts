@@ -5,8 +5,8 @@
  *
  * The Census API data endpoint needs a key, so figures come from an IPUMS NHGIS extract of the same
  * tables (NHGIS_API_KEY). Point LIVES_NHGIS_EXTRACT_DIR at an unzipped extract to reuse one; otherwise
- * the script submits the extract, waits for it and unzips it under LIVES_ACS_CACHE_DIR (default the OS
- * temp dir). Nothing downloaded is written to the repo.
+ * the script submits the extract, waits for it and unzips it under LIVES_ACS_CACHE_DIR (default a
+ * private directory under the OS temp dir). Nothing downloaded is written to the repo.
  *
  * Usage (repo root):
  *   set -a && . apps/web/.env.local && set +a
@@ -14,7 +14,7 @@
  *   DRY_RUN=0 INGEST_LIVES_ACS_APPLY=1 node --conditions development --import tsx \
  *     packages/ops-data/scripts/ingest-lives-acs.ts
  */
-import { mkdir, readFile, readdir, writeFile } from 'node:fs/promises';
+import { mkdtemp, readFile, readdir } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import pg from 'pg';
@@ -27,12 +27,12 @@ import {
   livesNhgisExtractDefinition,
   nhgisTableToAcs,
   parseCsv,
-  readNhgisTableMeta,
   type NhgisTableMeta,
 } from '../src/lives/acs.ts';
 import type { LivesPublishedObservation } from '../src/lives/published-observation.ts';
 import {
   assertLivesJurisdictions,
+  fetchNhgisTableMeta,
   livesSeriesForObservations,
   nhgisExtractDirectory,
   summarizeLivesObservations,
@@ -41,22 +41,8 @@ import {
 import { normalizePgConnectionString } from './lib/pg-connection.ts';
 
 const apply = process.env.DRY_RUN === '0' && process.env.INGEST_LIVES_ACS_APPLY === '1';
-const cacheDir = process.env.LIVES_ACS_CACHE_DIR ?? path.join(tmpdir(), 'blackstory-lives-acs');
-
-async function cachedJson(url: string, cacheName: string, apiKey: string): Promise<unknown> {
-  const cachePath = path.join(cacheDir, 'meta', cacheName);
-  try {
-    return JSON.parse(await readFile(cachePath, 'utf8'));
-  } catch {
-    // not cached yet
-  }
-  const response = await fetch(url, { headers: { Authorization: apiKey } });
-  if (!response.ok) throw new Error(`HTTP ${response.status} for ${url}`);
-  const json: unknown = await response.json();
-  await mkdir(path.dirname(cachePath), { recursive: true });
-  await writeFile(cachePath, JSON.stringify(json));
-  return json;
-}
+const cacheDir =
+  process.env.LIVES_ACS_CACHE_DIR ?? (await mkdtemp(path.join(tmpdir(), 'blackstory-lives-acs-')));
 
 async function collect(apiKey: string): Promise<LivesPublishedObservation[]> {
   const tables = livesAcsTables();
@@ -67,13 +53,11 @@ async function collect(apiKey: string): Promise<LivesPublishedObservation[]> {
       const dataset = livesNhgisDataset(vintage, table);
       metas.set(
         table.group,
-        readNhgisTableMeta(
-          await cachedJson(
-            `https://api.ipums.org/metadata/datasets/${dataset}/data_tables/${table.group}?collection=nhgis&version=2`,
-            `${dataset}-${table.group}.json`,
-            apiKey,
-          ),
-        ),
+        await fetchNhgisTableMeta({
+          dataset,
+          table: table.group,
+          apiKey,
+        }),
       );
     }
     metaByPeriod.set(vintage.period, metas);

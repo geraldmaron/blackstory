@@ -8,6 +8,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import type { Pool } from 'pg';
 import { getNhgisExtractStatus, submitNhgisExtract, type NhgisFetchLike } from '@repo/domain';
+import { readNhgisTableMeta, type NhgisTableMeta } from '../../src/lives/acs.ts';
 import type { LivesPublishedObservation } from '../../src/lives/published-observation.ts';
 import { livesSeriesColumns, livesSeriesRow } from '../../src/lives/series.ts';
 
@@ -16,6 +17,40 @@ const MAX_POLLS = 135;
 const BATCH = 400;
 const MAX_DOWNLOAD_BYTES = 128 * 1024 * 1024;
 const EXTRACTOR = fileURLToPath(new URL('./extract-nhgis-tables.py', import.meta.url));
+
+/** Fetch and validate one NHGIS table definition before it reaches the observation builder. */
+export async function fetchNhgisTableMeta(options: {
+  readonly dataset: string;
+  readonly table: string;
+  readonly apiKey: string;
+  readonly fetchImpl?: typeof fetch;
+}): Promise<NhgisTableMeta> {
+  if (!/^[a-zA-Z0-9_]+$/.test(options.dataset) || !/^[a-zA-Z0-9]+$/.test(options.table)) {
+    throw new Error('NHGIS metadata identifiers must be alphanumeric');
+  }
+  const url = new URL(
+    `/metadata/datasets/${options.dataset}/data_tables/${options.table}`,
+    'https://api.ipums.org',
+  );
+  url.search = new URLSearchParams({ collection: 'nhgis', version: '2' }).toString();
+  const response = await (options.fetchImpl ?? fetch)(url.href, {
+    headers: { Authorization: options.apiKey },
+    redirect: 'error',
+    signal: AbortSignal.timeout(30_000),
+  });
+  if (!response.ok || response.redirected) {
+    await response.body?.cancel();
+    throw new Error(`NHGIS metadata request failed: HTTP ${response.status}`);
+  }
+  const json: unknown = await response.json();
+  const metadata = readNhgisTableMeta(json);
+  if (metadata.group !== options.table) {
+    throw new Error(
+      `NHGIS metadata returned ${metadata.group} for requested table ${options.table}`,
+    );
+  }
+  return metadata;
+}
 
 /** Download an authenticated IPUMS table extract into an isolated, validated data directory. */
 export async function downloadNhgisExtract(options: {
