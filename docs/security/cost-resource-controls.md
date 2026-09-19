@@ -110,9 +110,15 @@ DNS-only until 2026-08-24; that was stale, and it mattered — gray cloud would 
 below a no-op.
 
 **Cache rule** (ruleset `fbba310d91a3483f88cc5686b25684e1`, phase `http_request_cache_settings`):
-`/`, `/rooms`, `/memorial`, excluding requests carrying the `rsc` header, are edge-cached for
+`/`, `/library`, `/memorial`, excluding requests carrying the `rsc` header, are edge-cached for
 one hour with `browser_ttl: respect_origin` and `status_code_ttl` `200-226 -> 3600`,
 `300-526 -> 0`.
+
+The final rule bypasses shared caching when the request carries the `bs_maint_bypass` cookie,
+the `x-maintenance-bypass` header, or the `maintenance_bypass` query parameter. This prevents
+an operator's successful maintenance response from entering the anonymous cache. Purge the
+zone after enabling the wall, then verify anonymous maintenance both before and after an
+operator request. A Vercel redeploy does not invalidate Cloudflare's existing HTML cache.
 
 Three constraints that are not obvious and cost a live incident on 2026-08-24 when they were
 missed:

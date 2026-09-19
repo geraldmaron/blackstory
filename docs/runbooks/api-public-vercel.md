@@ -1,9 +1,8 @@
 # api-public deploy (Vercel)
 
-Replaces `api-public-cloud-run.md`. That runbook documented an unverified deploy to a platform
-this project has left: `docs/data/firebase-wind-down.md` records Cloud Run, Cloud Functions,
-Scheduler and App Hosting all deliberately deleted between 2026-07-22 and 2026-08-15, and
-`gcloud run services list` on `black-book-efaaf` is empty by design.
+The public versioned API runs on Vercel and reads released data from Supabase Postgres.
+The [service inventory](../security/service-surfaces.md) distinguishes deployed services from
+optional infrastructure definitions.
 
 ## Why Vercel, and why its own origin
 
@@ -43,81 +42,50 @@ built output keeps one compiler in charge of types.
 Both hosts share one handler so neither can drift; `src/http/request-handler.test.ts` asserts they
 answer identically.
 
-## Verified 2026-09-10
+## Deployment and credentials
 
-- `vercel build` from `apps/api-public` completes clean, no type errors.
-- The bundle traces every workspace dependency: `@repo/security`, `@repo/ops-data`, `@repo/domain`,
-  `@repo/config`, `@repo/public-contracts`, `@repo/schemas`, and `pg`.
-- Driving the built bundle at `.vercel/output/functions/api/index.func/api/index.js` directly:
-  `GET /v1/health` → 200 with the real service payload, `GET /v1/nope` → structured 404 with a
-  request id.
-- Project `blackstory-api` exists under `geraldmarons-projects`, with the build, install and
-  output settings above already applied.
-- `vercel git connect` against this repository succeeds and `vercel git disconnect` reverses it,
-  so step 2 below is a proven command rather than a guess. It is left disconnected on purpose.
+The `blackstory-api` project has Root Directory `apps/api-public`, uses Node 24, and is linked
+to this repository. The web/admin project is `blackstory`; there is no separate deployed admin
+application. Both projects use `main` for Production. Git pushes can build and activate deployments
+independently of GitHub Actions. `scripts/vercel-ignore-build.sh` skips irrelevant changes.
 
-## Deploys happen on push
-
-Like `blackstory` and `blackstory-admin`, this deploys through Vercel's Git integration: push to
-`main` builds production, push to `staging` builds a preview, and
-`scripts/vercel-ignore-build.sh api-public` skips the build when the diff cannot reach it. No
-workflow and no CLI deploy is involved — the CLI deploys in this repo's history were verification
-only, and a CLI deploy from this subdirectory does not work anyway (it uploads only the subfolder,
-so `cd ../..` escapes the checkout).
-
-**Root Directory is `apps/api-public`, set 2026-09-10.** This is what makes the rest work: Vercel
-reads `vercel.json` from the Root Directory, looks for the `api/` function directory there, and
-starts the build there so `cd ../..` reaches the workspace root. At the default `.` none of that
-happens.
-
-It is the one setting with no CLI or `vercel.json` surface. It was set through the REST API using
-the token the Vercel CLI already holds:
+Use the installed Vercel CLI with the project's linked directory. It consumes its existing
+credential without extracting a token into shell arguments or printing secret values:
 
 ```bash
-TOKEN=$(python3 -c "import json,os;print(json.load(open(os.path.expanduser('~/Library/Application Support/com.vercel.cli/auth.json')))['token'])")
-curl -sS -X PATCH "https://api.vercel.com/v9/projects/blackstory-api?teamId=team_DldsFiy3ArSsA0sJvIXr2zId" \
-  -H "Authorization: Bearer $TOKEN" -H "Content-Type: application/json" \
-  -d '{"rootDirectory":"apps/api-public"}'
+vercel inspect api.blackstory.app --format=json
+vercel env list production --cwd apps/api-public
+vercel api /v9/projects/blackstory-api
 ```
 
-Git is connected. Verified 2026-09-10 by pushing an empty commit to `staging` and watching Vercel
-build a Ready preview from the repository.
+Project API responses can include environment metadata. Filter output to the fields needed for
+the check; never print environment values. Feed secret updates through stdin. Environment changes
+require a new deployment before they affect the running service.
 
-## Remaining steps
+Production uses `PUBLIC_DATA_SOURCE=postgres` and its own `DATABASE_URL`. The staging Preview
+uses `PUBLIC_DATA_SOURCE=seed` and has no database credential. A Preview may instead use an isolated
+database, but must never receive Production credentials. Do not copy the web's local production
+connection into Preview. Removing a variable does not change older immutable deployments.
 
-### Environment variables
+The custom domain is `api.blackstory.app`. Its Cloudflare CNAME is DNS-only. Deployment protection
+is `all_except_custom_domains`: the custom domain is publicly readable, while direct Vercel
+deployment URLs require SSO. Keep that boundary when deploying or rehearsing maintenance.
 
-`PUBLIC_DATA_SOURCE=postgres` is set on Production and Preview. `DATABASE_URL` is not — it is a
-production credential and belongs to the operator:
+## Verify and cut over
 
-```bash
-cd ~/Developer/Projects/blackstory/apps/api-public && set -a && . ../web/.env.local && set +a \
-  && printf '%s' "$DATABASE_URL" | vercel env add DATABASE_URL production --force --yes \
-  && printf '%s' "$DATABASE_URL" | vercel env add DATABASE_URL preview staging --force --yes
-```
+`/v1/health` verifies process health. `/v1/bootstrap`, a known entity, map and search responses
+verify the data contract. In explicit seed mode, verify an empty catalog and no application
+Postgres session. In Production, compare the active release and real catalog against the frozen
+baseline; an HTTP 200 alone does not establish database access or complete data.
 
-`preview` needs its branch named or the CLI prompts. Without `DATABASE_URL` the API boots and
-serves an empty in-memory catalog rather than failing, so check `/v1/bootstrap` returns real data.
-`/v1/health` returning 200 proves nothing about the database.
+The API is a read-only surface, but it must be coordinated with the web and database for an
+incompatible schema change. Set Production to seed mode and redeploy the recorded old revision
+before the write freeze. Restore the Postgres mode only after the matching new revision and
+schema pass the checks in [production release](production-release.md). Do not enable schedules
+or dispatch deployment workflows to substitute for that procedure.
 
-### Domain
-
-`vercel domains add api.blackstory.app` refuses while the project's latest **production**
-deployment is in an errored state — the message is "Your project's latest production deployment
-has errored. Therefore, the domain cannot be assigned." A push to `main` that builds green clears
-it. Then add the `CNAME` Vercel asks for at Cloudflare, **DNS-only (grey cloud)**, not proxied:
-`blackstory.app` sits on Cloudflare nameservers (`langston`/`marjory.ns.cloudflare.com`), not
-Vercel's, so Vercel cannot create the record itself.
-
-Deployment protection needs no change: `ssoProtection` is `all_except_custom_domains`, so
-`api.blackstory.app` is anonymous while the `*.vercel.app` URLs stay behind SSO. A 302 to a Vercel
-login on a `.vercel.app` preview is that working, not a fault.
-
-### Not a step: the ingress matrix
-
-`infra/gcp/armor/ingress-matrix.json` still names `api.blackbook.app` and `submit.blackbook.app`.
-It governs Cloud Armor, which fronts nothing here. Fold it into the GCP wind-down rather than
-repointing it at a live host.
+The optional GCP ingress configuration is not a live Vercel control plane. Inspect current
+provider deployments and account settings rather than treating an infrastructure file as proof.
 
 ## Known difference from a long-lived host
 

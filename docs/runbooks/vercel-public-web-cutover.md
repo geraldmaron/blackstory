@@ -29,8 +29,10 @@ For pooler or artifact failures, inspect runtime logs and the actual response be
 Deployment-protection redirects must preserve Vercel's `_vercel_*` handshake parameters without
 using tokens in shared cache keys. Do not redirect solely to alphabetize query parameters.
 
-Environment changes require a new deployment. Preview and production need separate environment
-values and should not share a writable production credential for verification.
+Environment changes require a new deployment. Preview must not contain Production database
+credentials. Use an isolated database or leave its data plane unconfigured. Removing variables
+does not revoke credentials embedded in older deployments; protect all deployment URLs with
+`all_except_custom_domains` and include authenticated operators in the maintenance embargo.
 
 Both Vercel apps install through `scripts/install-vercel-dependencies.mjs`. Healthy dependency
 caches keep the normal frozen install. Broken hoisted pnpm links discard only the root and

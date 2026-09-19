@@ -1,11 +1,6 @@
 /**
- * Edge authorization gate for every `/admin` page, invoked from `apps/web/src/middleware.ts`
- * (whose `matcher` scopes it to `/admin/:path*` — this function doesn't decide that scope).
- *
- * Deliberately not named `proxy.ts`: Next 16 treats a file by that name as a second
- * middleware/proxy entrypoint and refuses to build if one exists alongside `src/middleware.ts`
- * (`middleware-to-proxy` migration), even though this one is an ordinary imported helper, not a
- * framework entrypoint itself.
+ * Staff authorization gate composed by `apps/web/src/proxy.ts` for `/admin` pages.
+ * The proxy owns route selection; this helper owns staff-session verification and refresh.
  *
  * This runs before any server component renders, so an unauthenticated request never
  * reaches page code and never triggers the Postgres reads those pages perform. It also
