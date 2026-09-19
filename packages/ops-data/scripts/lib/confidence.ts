@@ -1,36 +1,15 @@
 /**
- * Wires the REAL multi-factor confidence engine (packages/domain/src/claims/confidence.ts
- * — sourceAuthority + lineageIndependence + directness + temporalProximity +
- * geographicPrecision + entityMatchQuality + extractionQuality, weighted,
- * checked against the product constitution's publish thresholds) into the
- * corsair pipeline, replacing a cruder "every claim's citationHref must
- * literally be a .gov domain" binary check.
- *
- * The key behavior this restores: multiple INDEPENDENT sources (different
- * lineageRootId) corroborating the same subject raise confidence — a
- * Wikipedia-only claim caps at one lineage (component 0.4) and won't clear
- * standardPublish (0.75); the same claim WITH an independently-fetched Tier-1
- * corroborating source (two lineages, component 0.7, one of them
- * government_record-authority) can clear it. That is "use multiple sources
- * together to build confidence" as an actual formula, not a slogan.
+ * Source display classification and independently reviewed publication confidence.
+ * Host heuristics do not establish support for a claim.
  */
-import {
-  calculateClaimConfidence,
-  resolveSourceLineage,
-  type ClaimEvidenceLink,
-  type ConfidenceEngineResult,
-} from '@repo/domain';
+import type { ReleaseSourceClaim, ReleaseSourceEntity } from '@repo/domain';
+import { validateContract, type ConfidenceAssessment } from '@repo/research-kernel';
+import type { PoolClient } from 'pg';
 import { isPatentDocumentUrl } from '@repo/domain-core/claims/lineage';
 import { lookupSourceRegister } from './source-register.ts';
 import { isReputableSecondaryHost, isTier1Host, isWikipediaHost } from './tier1-sources.ts';
 
-/**
- * Host classification by comparison, not by regular expression.
- *
- * The `/\.gov$/iu`-style patterns here ran against a parsed hostname and were correct, but an
- * unanchored expression tested against a URL matches anywhere, which CodeQL cannot distinguish
- * (js/regex/missing-regexp-anchor). `hostUnderTld` and `hostMatches` say the rule outright.
- */
+/** Classifies parsed hostnames, so URL paths and query strings cannot affect host rules. */
 const GOVERNMENT_TLDS = ['gov', 'mil'];
 const GOVERNMENT_DOMAINS = ['si.edu'];
 const ARCHIVAL_DOMAINS = ['rosenwald.fisk.edu', 'archive.org'];
@@ -52,24 +31,9 @@ function hostMatches(hostname: string, domain: string): boolean {
 }
 
 /**
- * The display register a claim earns from its source alone.
- *
- * This replaces the publisher's binary `sourceTier === 'tier1' ? 'high' : 'medium'`, which never
- * emitted `low` and so rendered a three-segment meter from a two-value vocabulary: 10,572 of
- * 11,555 published claims were `high` and none were `low` (repo-hqwt9).
- *
- * - A government or military record is the archive's primary evidence. `high`. A patent
- *   document is one of these on any mirror that serves it (patents.google.com,
- *   patentimages.storage.googleapis.com, freepatentsonline.com, patentsview.org), not only on
- *   uspto.gov — see `classifySourceForConfidence`.
- * - Wikipedia and Wikidata are bridge sources. `claim-corroborate` puts a Wikipedia-only claim at
- *   `low` outright, and 2,049 published claims cited Wikipedia at `high`.
- * - Everything else is `medium`, INCLUDING hosts the classifier cannot place. That is deliberate
- *   and conservative in the honest direction: the unclassified tail here is dominated by state
- *   historical societies, state encyclopedias, NPR and the Smithsonian, and calling those `low`
- *   would understate real evidence far more often than `medium` overstates it. Promoting the
- *   deserving ones to `high` is per-host editorial review, the same dated operator review that
- *   built `REPUTABLE_SECONDARY_HOST_SUFFIXES`, and is not a thing to infer in code.
+ * Source-class display heuristic. Government records and patent specifications receive
+ * high, Wikipedia receives low, and other sources receive medium. This does not assess
+ * whether a particular source supports a particular claim.
  */
 export function confidenceLevelForSource(url: string | undefined): 'high' | 'medium' | 'low' {
   if (url === undefined || url.trim().length === 0) return 'low';
@@ -125,126 +89,198 @@ export function classifySourceForConfidence(url: string): string {
   return 'unknown';
 }
 
-export type SourceForConfidence = {
-  readonly url: string;
-  /** Whether the fetched page text actually contains the subject's name — a cheap
-   *  directness/entity-match proxy without full NLP entailment checking. */
-  readonly textContainsSubjectName?: boolean;
-  /**
-   * The underlying work this source reproduces, where the pipeline knows it.
-   *
-   * Set this for a syndicated story or a reprint. Nothing in three newspaper URLs says they
-   * are carrying one wire report, so provenance is the only way that gets collapsed.
-   */
-  readonly upstreamWorkId?: string | undefined;
-  /**
-   * Set only when provenance confirms this document was created independently of others from
-   * the same authority — two separately authored collections at one archive, not two pages of
-   * one report.
-   */
-  readonly independentCreation?: { readonly documentId: string } | undefined;
-  /**
-   * The source document's own creation or publication date (ISO 8601), when it is actually
-   * recorded — never a system capture timestamp. There is currently no bb_evidence column that
-   * supplies this, so every caller today leaves it unset; when a caller does set it,
-   * temporalProximity is scored from it instead of being recorded as unassessed.
-   */
-  readonly documentDate?: string | undefined;
-  /**
-   * The selector or field path that isolated the extracted passage, when the pipeline used a
-   * real one rather than a raw page fetch. When set, extractionQuality is scored instead of
-   * being recorded as unassessed.
-   */
-  readonly extractionSelector?: string | undefined;
+/** A database-reviewed assessment of one immutable claim version. Never load from model payloads. */
+export type ReviewedClaimAssessment = {
+  readonly entityId: string;
+  readonly claimId: string;
+  readonly claimVersionId: string;
+  readonly predicate: string;
+  readonly object: string;
+  readonly citationHrefs: readonly string[];
+  readonly reviewedEvidenceCaptures: readonly ReviewedEvidenceCapture[];
+  readonly assessmentId: string;
+  readonly reviewDecisionId: string;
+  readonly assessment: ConfidenceAssessment;
 };
 
-function scoreDimension(textContainsSubjectName: boolean | undefined): number {
-  // Conservative default: 0.6 for "unknown whether the text is really about the subject",
-  // 0.85 when we've actually checked and confirmed the subject's name appears.
-  return textContainsSubjectName ? 0.85 : 0.6;
-}
-
-function buildEvidenceLink(
-  claimId: string,
-  source: SourceForConfidence,
-  index: number,
-  now: string,
-): ClaimEvidenceLink {
-  const dimensionScore = scoreDimension(source.textContainsSubjectName);
-  const hasDocumentDate = Boolean(source.documentDate?.trim());
-  const hasExtractionSelector = Boolean(source.extractionSelector?.trim());
-
-  /**
-   * Dimensions this evidence link does not measure.
-   *
-   * geographicPrecision is unconditional: place precision is not read off the evidence at all
-   * yet, so there is no per-source signal to check either way. temporalProximity and
-   * extractionQuality are conditional on the signal above — a document date or a real
-   * extraction selector — being present; without it, the dimension is named here rather than
-   * scored with a placeholder that would read as a measurement. The confidence engine
-   * (`@repo/domain-core`) renormalizes its weighted score around whichever of these two are
-   * actually assessed, and the research maturity gates read this same list to tell an assessed
-   * record from one that merely scored.
-   *
-   * `directness` and `entityMatchQuality` are never in this list: they ARE derived from
-   * something observed, even if only from whether the subject's name appears in the fetched
-   * text. That proxy is weak, and it is a different problem from never having looked.
-   */
-  const unassessedDimensions: string[] = ['geographicPrecision'];
-  if (!hasDocumentDate) unassessedDimensions.push('temporalProximity');
-  if (!hasExtractionSelector) unassessedDimensions.push('extractionQuality');
-
-  // Lineage is the underlying work, not the host serving it. `resolveSourceLineage` collapses
-  // a patent read at the Patent Office and at a mirror, collapses an authority's subdomains,
-  // and puts every Wikipedia spelling on one bridge key.
-  const lineage = resolveSourceLineage({
-    url: source.url,
-    upstreamWorkId: source.upstreamWorkId,
-    independentCreation: source.independentCreation,
-  });
-  return {
-    id: `${claimId}-evidence-${index}`,
-    claimId,
-    claimVersionId: `${claimId}-v1`,
-    evidenceId: source.url,
-    role: 'supporting',
-    lineageRootId: lineage.key,
-    bridgeSource: lineage.bridge,
-    credible: true,
-    sourceClassification: classifySourceForConfidence(source.url),
-    directness: dimensionScore,
-    // 0 when unassessed: the confidence engine excludes this dimension from the weighted score
-    // whenever it is unassessed, so this value is never averaged in as a measurement — but it
-    // must still stay a real number in [0, 1] to satisfy ClaimEvidenceLink.
-    temporalProximity: hasDocumentDate ? 0.7 : 0,
-    geographicPrecision: 0.7,
-    entityMatchQuality: dimensionScore,
-    extractionQuality: hasExtractionSelector ? 0.8 : 0,
-    unassessedDimensions,
-    createdAt: now,
-  };
-}
+/** Exact immutable capture revisions present in accepted evidence assignments for this review. */
+export type ReviewedEvidenceCapture = {
+  readonly sourceUrl: string;
+  readonly sourceItemId: string;
+  readonly captureId: string;
+  readonly contentHashDigest: string;
+};
 
 /**
- * Computes real multi-source confidence for one claim from every source
- * available for its subject (its own citation plus any independently-found
- * corroborating source). `standardPublish`/`highImpactPublish` thresholds and
- * component weights come from the product constitution, not this file.
+ * Review must cover the current version, latest assessment and every evidence assignment.
+ * A newer rejection, correction, assessment or assignment invalidates an older approval.
+ * Source URLs come from reviewed, captured selectors; a projection citation is not evidence.
  */
-export function computeClaimConfidence(
-  claimId: string,
-  sources: readonly SourceForConfidence[],
-  options: { readonly claimClass?: 'standard' | 'high_impact'; readonly now?: string } = {},
-): ConfidenceEngineResult {
-  const now = options.now ?? new Date().toISOString();
-  const evidenceLinks = sources.map((source, index) =>
-    buildEvidenceLink(claimId, source, index, now),
+export const REVIEWED_CLAIM_ASSESSMENTS_SQL = `
+SELECT c.entity_id AS "entityId", c.id AS "claimId", v.id AS "claimVersionId",
+       v.predicate, v.object, ca.id AS "assessmentId", review.id AS "reviewDecisionId",
+       jsonb_build_object(
+         'acceptanceProbability', ca.acceptance_probability,
+         'intervalLow', ca.interval_low, 'intervalHigh', ca.interval_high,
+         'sourceReliability', ca.source_reliability, 'entailment', ca.entailment,
+         'independence', ca.independence, 'identityConfidence', ca.identity_confidence,
+         'relevance', ca.relevance, 'researchCompleteness', ca.research_completeness,
+         'calibrationVersion', ca.calibration_version
+       ) AS assessment,
+       ARRAY(
+         SELECT DISTINCT si.url
+         FROM canonical.evidence_assignments ea
+         JOIN evidence.evidence_selectors es ON es.id = ea.selector_id
+         JOIN evidence.capture_origins origin ON origin.capture_id = es.capture_id
+           AND origin.source_item_id = es.source_item_id AND origin.retention_revoked_at IS NULL
+         JOIN evidence.source_items si ON si.id = origin.source_item_id
+         WHERE ea.claim_version_id = v.id AND ea.status = 'accepted'
+           AND ea.role = 'supporting' AND ea.fitness IN ('authoritative', 'strong', 'conditional')
+           AND nullif(btrim(ea.reviewer_actor_id), '') IS NOT NULL
+           AND nullif(btrim(si.url), '') IS NOT NULL
+       ) AS "citationHrefs",
+       COALESCE((
+         SELECT jsonb_agg(
+           jsonb_build_object(
+             'sourceUrl', reviewed.source_url,
+             'sourceItemId', reviewed.source_item_id,
+             'captureId', reviewed.capture_id,
+             'contentHashDigest', reviewed.content_hash_digest
+           ) ORDER BY reviewed.source_url, reviewed.source_item_id,
+                      reviewed.capture_id, reviewed.content_hash_digest
+         )
+         FROM (
+           SELECT DISTINCT si.url AS source_url, si.id AS source_item_id,
+                  es.capture_id, capture.content_hash_digest
+           FROM canonical.evidence_assignments ea
+           JOIN evidence.evidence_selectors es ON es.id = ea.selector_id
+           JOIN evidence.capture_origins origin ON origin.capture_id = es.capture_id
+             AND origin.source_item_id = es.source_item_id
+             AND origin.retention_revoked_at IS NULL
+           JOIN evidence.source_items si ON si.id = origin.source_item_id
+           JOIN evidence.source_captures capture ON capture.id = es.capture_id
+           WHERE ea.claim_version_id = v.id AND ea.status = 'accepted'
+             AND ea.role = 'supporting'
+             AND ea.fitness IN ('authoritative', 'strong', 'conditional')
+             AND nullif(btrim(ea.reviewer_actor_id), '') IS NOT NULL
+             AND nullif(btrim(si.url), '') IS NOT NULL
+         ) reviewed
+       ), '[]'::jsonb) AS "reviewedEvidenceCaptures"
+FROM canonical.claims c
+JOIN canonical.claim_versions v ON v.id = c.current_version_id AND v.claim_id = c.id
+JOIN LATERAL (
+  SELECT a.* FROM canonical.claim_confidence_assessments a
+  WHERE a.claim_version_id = v.id ORDER BY a.created_at DESC, a.id DESC LIMIT 1
+) ca ON true
+JOIN LATERAL (
+  SELECT r.*, artifact.status AS artifact_status
+  FROM research.artifact_claims ac
+  JOIN research.artifacts artifact ON artifact.id = ac.artifact_id
+  JOIN research.review_decisions r ON r.artifact_id = artifact.id
+  WHERE ac.claim_version_id = v.id
+  ORDER BY r.decided_at DESC, r.id DESC LIMIT 1
+) review ON true
+WHERE c.entity_id = ANY($1::text[])
+  AND c.workflow_status = 'accepted' AND v.workflow_status = 'accepted'
+  AND review.decision = 'approve' AND review.artifact_status = 'accepted'
+  AND review.reviewer_actor_id <> review.producer_actor_id
+  AND nullif(btrim(review.reviewer_actor_id), '') IS NOT NULL
+  AND ca.created_at <= review.decided_at
+  AND NOT EXISTS (
+    SELECT 1 FROM canonical.claim_tombstones t WHERE t.claim_version_id = v.id
+  )
+  AND NOT EXISTS (
+    SELECT 1 FROM canonical.evidence_assignments ea
+    WHERE ea.claim_version_id = v.id AND ea.created_at > review.decided_at
+  )
+`;
+
+export async function loadReviewedClaimAssessments(
+  client: Pick<PoolClient, 'query'>,
+  entityIds: readonly string[],
+): Promise<readonly ReviewedClaimAssessment[]> {
+  if (entityIds.length === 0) return [];
+  const result = await client.query<ReviewedClaimAssessment>(REVIEWED_CLAIM_ASSESSMENTS_SQL, [
+    entityIds,
+  ]);
+  return result.rows.filter((row) => validReviewedAssessment(row));
+}
+
+function validReviewedAssessment(row: ReviewedClaimAssessment): boolean {
+  const result = validateContract('ConfidenceAssessment', row.assessment);
+  if (!result.ok) return false;
+  const assessment = result.value;
+  return Boolean(
+    row.entityId &&
+    row.claimId &&
+    row.claimVersionId &&
+    row.assessmentId &&
+    row.reviewDecisionId &&
+    typeof row.object === 'string' &&
+    Array.isArray(row.citationHrefs) &&
+    row.citationHrefs.length > 0 &&
+    Array.isArray(row.reviewedEvidenceCaptures) &&
+    row.reviewedEvidenceCaptures.length > 0 &&
+    row.reviewedEvidenceCaptures.every(validReviewedEvidenceCapture) &&
+    assessment.intervalLow <= assessment.acceptanceProbability &&
+    assessment.acceptanceProbability <= assessment.intervalHigh,
   );
-  return calculateClaimConfidence({
-    claimClass: options.claimClass ?? 'standard',
-    evidenceLinks,
-    calculatedAt: now,
-  });
+}
+
+function validReviewedEvidenceCapture(capture: ReviewedEvidenceCapture): boolean {
+  return Boolean(
+    capture &&
+    typeof capture.sourceUrl === 'string' &&
+    capture.sourceUrl.length > 0 &&
+    typeof capture.sourceItemId === 'string' &&
+    capture.sourceItemId.length > 0 &&
+    typeof capture.captureId === 'string' &&
+    capture.captureId.length > 0 &&
+    typeof capture.contentHashDigest === 'string' &&
+    /^[a-f0-9]{64}$/u.test(capture.contentHashDigest),
+  );
+}
+
+export type PublicationClaimAssessment =
+  | {
+      readonly ok: true;
+      readonly reviewBasis: 'independent_review';
+      readonly claims: readonly ReleaseSourceClaim[];
+    }
+  | { readonly ok: false; readonly detail: string };
+
+/**
+ * Every public assertion must match one reviewed version, including its cited source. A reviewed
+ * assessment remains qualitative evidence until its calibration version is bound to an approved,
+ * held-out calibration artifact. The ledger currently stores only a free-form version label, so
+ * this gate can admit independently reviewed claims but cannot return a numerical probability.
+ */
+export function assessPublicationClaims(
+  entry: Pick<ReleaseSourceEntity, 'id' | 'claims'>,
+  reviewed: readonly ReviewedClaimAssessment[],
+): PublicationClaimAssessment {
+  if (!entry.claims?.length) return { ok: false, detail: 'No assessed claims' };
+  const claims: ReleaseSourceClaim[] = [];
+  for (const claim of entry.claims) {
+    const matches = reviewed.filter(
+      (row) =>
+        validReviewedAssessment(row) &&
+        row.entityId === entry.id &&
+        (claim.id === undefined || row.claimId === claim.id) &&
+        row.predicate === claim.predicate &&
+        row.object === claim.object &&
+        claim.citationHref !== undefined &&
+        row.citationHrefs.includes(claim.citationHref),
+    );
+    if (matches.length !== 1) {
+      return {
+        ok: false,
+        detail: `Claim requires an exact, independently reviewed assessment: ${claim.predicate}`,
+      };
+    }
+    claims.push({ ...claim, id: matches[0]!.claimId });
+  }
+  return { ok: true, reviewBasis: 'independent_review', claims };
 }
 
 export { isTier1Host };

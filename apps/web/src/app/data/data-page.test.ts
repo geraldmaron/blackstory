@@ -1,6 +1,5 @@
 /**
- * `/data` wiring: the room kit draws the room, every chart still renders, every section keeps
- * its anchor, and the copy stays in the archive's voice.
+ * `/data` wiring: the ledger room owns census, Lives, and indicator figures.
  */
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
@@ -14,6 +13,7 @@ import {
   DATA_READING_LINKS,
   DATA_READING_RULES,
   DATA_SECTION_COPY,
+  DATA_SOURCE_LIBRARY_HANDOFF,
 } from './data-copy';
 import { DATA_PAGE_INDICATOR_FIXTURE_BUNDLE } from '@repo/domain/statistics/data-page-series';
 
@@ -21,6 +21,7 @@ const here = dirname(fileURLToPath(import.meta.url));
 const pageSource = readFileSync(join(here, 'page.tsx'), 'utf8');
 const sectionsSource = readFileSync(join(here, 'DataSections.tsx'), 'utf8');
 const copySource = readFileSync(join(here, 'data-copy.ts'), 'utf8');
+const loaderSource = readFileSync(join(here, 'load-data-page-model.ts'), 'utf8');
 
 const allCopy = [
   DATA_PAGE_DESCRIPTION,
@@ -28,6 +29,7 @@ const allCopy = [
   DATA_INTRO.lede,
   ...DATA_READING_RULES.flatMap((rule) => [rule.kicker, rule.body]),
   ...DATA_READING_LINKS.map((link) => link.label),
+  DATA_SOURCE_LIBRARY_HANDOFF.label,
   ...Object.values(DATA_SECTION_COPY).flatMap((section) => [
     section.kicker,
     section.title,
@@ -36,31 +38,63 @@ const allCopy = [
   ...DATA_PAGE_SECTIONS.map((section) => section.label),
 ];
 
-test('data page renders through the room kit, with no edition chrome left', () => {
-  assert.doesNotMatch(pageSource, /EditionAtmosphereMosaic|DATA_EDITION_MOSAIC_SEED/);
-  assert.doesNotMatch(pageSource, /dataEditionRootClassName/);
-  assert.match(pageSource, /from '\.\.\/\.\.\/components\/room'/);
-  assert.match(pageSource, /<Room>/);
-  assert.match(pageSource, /<RoomHeader/);
-  assert.doesNotMatch(pageSource, /ds-page__title/);
-  // The section panels are gone. A figure is framed by a rule, not a box inside a box.
-  assert.doesNotMatch(sectionsSource, /UtilityCard|ds-data-edition/);
+test('data index is the ledger room, not a redirect into a merged hub', () => {
+  assert.match(pageSource, /loadDataPageModel/);
+  assert.doesNotMatch(pageSource, /loadLivesAreaBundle/);
+  assert.match(pageSource, /<DataSections/);
+  assert.doesNotMatch(pageSource, /how-it-works/);
+  assert.doesNotMatch(pageSource, /SectionFocus/);
+  assert.match(loaderSource, /export async function loadDataPageModel/);
 });
 
-test('data page preserves census and indicator chart wiring', () => {
+test('lives is an immersive room; Data Act II is a compact door into it', () => {
+  const livesIndex = readFileSync(join(here, '../lives/page.tsx'), 'utf8');
+  const livesRegion = readFileSync(join(here, '../lives/[region]/page.tsx'), 'utf8');
+  const livesExplorer = readFileSync(join(here, '../lives/explorer/page.tsx'), 'utf8');
+  assert.match(livesIndex, /LivesMilestoneExperience/);
+  assert.doesNotMatch(livesIndex, /permanentRedirect/);
+  assert.match(livesRegion, /permanentRedirect/);
+  assert.match(livesExplorer, /LivesTimeline/);
+  assert.match(sectionsSource, /Open Lives/);
+  assert.doesNotMatch(sectionsSource, /LivesAreaNav/);
+});
+
+test('legacy \\?s=lives on /data rewrites to the hash deep link', () => {
+  assert.match(pageSource, /firstValue\(raw\.s\)/);
+  assert.match(pageSource, /buildLivesHref/);
+});
+
+test('data sections keep census and indicator chart wiring', () => {
+  assert.match(sectionsSource, /PopulationDecadeSpine/);
   assert.match(sectionsSource, /PopulationByDecadeChart/);
   assert.match(sectionsSource, /BlackPopulationShareChart/);
+  assert.match(sectionsSource, /GapMagnitudeSight/);
   assert.match(sectionsSource, /RacePairComparisonChart/);
   assert.match(sectionsSource, /GroupedBarIndicatorChart/);
   assert.match(sectionsSource, /StatePopulationShiftChart/);
   assert.match(sectionsSource, /TrendLineChart/);
+  assert.match(sectionsSource, /href="\/lives"/);
+  assert.match(sectionsSource, /id="counted"/);
+  assert.match(sectionsSource, /id="lives"/);
+  assert.match(sectionsSource, /id="gaps"/);
+  assert.doesNotMatch(sectionsSource, /UtilityCard|ds-data-edition/);
 });
 
 test('data page keeps section anchors for the section rail', () => {
   for (const section of DATA_PAGE_SECTIONS) {
     assert.match(sectionsSource, new RegExp(`id="${section.id}"`));
+    assert.ok(section.icon, `${section.id} carries a section glyph`);
   }
   assert.match(sectionsSource, /DataPageNav sections=\{DATA_PAGE_SECTIONS\}/);
+  assert.match(sectionsSource, /DestinationIcon/);
+  assert.match(sectionsSource, /ds-kicker-glyph/);
+});
+
+test('reading rules carry orientation glyphs', () => {
+  for (const rule of DATA_READING_RULES) {
+    assert.ok(rule.icon, `${rule.kicker} carries a rule glyph`);
+  }
+  assert.match(sectionsSource, /rule\.icon/);
 });
 
 test('the headline band links into the figures it summarizes', () => {
@@ -70,7 +104,7 @@ test('the headline band links into the figures it summarizes', () => {
     '#housing-ownership',
     '#justice-imprisonment',
   ]) {
-    assert.match(pageSource, new RegExp(anchor));
+    assert.match(loaderSource, new RegExp(anchor));
     const id = anchor.slice(1);
     assert.match(sectionsSource, new RegExp(`id="${id}"`), `no figure carries ${anchor}`);
   }
@@ -83,8 +117,6 @@ test('data user-facing copy does not leak internal vocabulary', () => {
   for (const source of [copySource, pageSource, sectionsSource]) {
     assert.doesNotMatch(source, /Phase 1|warehouse|fixture-backed/i);
   }
-  // The counted breakdown of the archive is not a figure here, and the page does not send a
-  // reader to the record list to find one.
   assert.doesNotMatch(sectionsSource, /href="\/explore"|href="\/records"/);
   assert.doesNotMatch(sectionsSource, /Mosaic credits|ATMOSPHERE_ATTRIBUTION|mosaic-credits/);
 });
@@ -98,6 +130,13 @@ test('data user-facing copy avoids em dashes', () => {
 
 test('the reading rules are not numbered: they hold at once', () => {
   assert.doesNotMatch(sectionsSource, /DATA_READING_RULES\.map\([\s\S]{0,400}index \+ 1/);
+});
+
+test('data reading section links to the source library room', () => {
+  assert.equal(DATA_SOURCE_LIBRARY_HANDOFF.href, '/sources');
+  assert.match(sectionsSource, /DATA_SOURCE_LIBRARY_HANDOFF/);
+  assert.match(sectionsSource, /ds-data-reading__handoff/);
+  assert.equal(DATA_SOURCE_LIBRARY_HANDOFF.label, 'Where these figures come from');
 });
 
 test('the indicator fixture captions the figures print verbatim keep the same voice', () => {

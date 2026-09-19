@@ -1,5 +1,5 @@
 /**
- * Backfill bb_canonical.event_participation from entity_relationships (participated_in,
+ * Backfill canonical.event_participation from entity_relationships (participated_in,
  * attended, person/org occurred_at) and event mentionedEntityIds in release projections.
  * Optionally links lynching victim persons to existing kind=event lynching records (never
  * mints new events).
@@ -44,14 +44,14 @@ SELECT
   COALESCE(
     (
       SELECT array_agg(ere.evidence_id ORDER BY ere.evidence_id)
-      FROM bb_canonical.entity_relationship_evidence ere
+      FROM canonical.entity_relationship_evidence ere
       WHERE ere.relationship_id = r.id
     ),
     '{}'::text[]
   ) AS evidence_ids
-FROM bb_canonical.entity_relationships r
-JOIN bb_canonical.entities e_from ON e_from.id = r.from_entity_id
-JOIN bb_canonical.entities e_to ON e_to.id = r.to_entity_id
+FROM canonical.entity_relationships r
+JOIN canonical.entities e_from ON e_from.id = r.from_entity_id
+JOIN canonical.entities e_to ON e_to.id = r.to_entity_id
 WHERE r.relationship_type IN ('participated_in', 'attended')
    OR (
      r.relationship_type = 'occurred_at'
@@ -72,9 +72,9 @@ const MENTION_SQL = `
 SELECT
   re.entity_id AS event_id,
   jsonb_array_elements_text(COALESCE(re.projection->'mentionedEntityIds', '[]'::jsonb)) AS participant_id
-FROM bb_public.release_entities re
-JOIN bb_public.active_release ar ON re.release_id = ar.release_id
-JOIN bb_canonical.entities e ON e.id = re.entity_id
+FROM published.release_entities re
+JOIN published.active_release ar ON re.release_id = ar.release_id
+JOIN canonical.entities e ON e.id = re.entity_id
 WHERE e.kind = 'event'
 ORDER BY re.entity_id
 `;
@@ -83,8 +83,8 @@ const LYNCHING_VICTIM_EVENT_SQL = `
 SELECT
   v.id AS victim_id,
   ev.id AS event_id
-FROM bb_canonical.entities v
-JOIN bb_canonical.entities ev
+FROM canonical.entities v
+JOIN canonical.entities ev
   ON ev.kind = 'event'
  AND (
    ev.id = regexp_replace(v.id, '^lynching_([^_]+(?:_[^_]+)*)_[^_]+_[^_]+$', 'lynching_\\1')
@@ -101,9 +101,9 @@ ORDER BY v.id, ev.id
 
 const COVERAGE_SQL = `
 SELECT
-  (SELECT COUNT(*)::int FROM bb_canonical.entities WHERE kind = 'event') AS total_events,
-  (SELECT COUNT(DISTINCT event_id)::int FROM bb_canonical.event_participation) AS events_with_participants,
-  (SELECT COUNT(*)::int FROM bb_canonical.event_participation) AS participation_rows
+  (SELECT COUNT(*)::int FROM canonical.entities WHERE kind = 'event') AS total_events,
+  (SELECT COUNT(DISTINCT event_id)::int FROM canonical.event_participation) AS events_with_participants,
+  (SELECT COUNT(*)::int FROM canonical.event_participation) AS participation_rows
 `;
 
 function participationId(eventId: string, participantId: string, role: string): string {
@@ -264,7 +264,7 @@ async function main(): Promise<void> {
       let inserted = 0;
       for (const row of draftList) {
         const result = await client.query(
-          `INSERT INTO bb_canonical.event_participation (
+          `INSERT INTO canonical.event_participation (
              id, event_id, participant_id, role, status_at_event, valid_edtf,
              evidence_ids, claim_ids, provenance
            ) VALUES ($1, $2, $3, $4, NULL, $5, $6, $7, $8::jsonb)

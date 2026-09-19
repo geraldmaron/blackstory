@@ -56,7 +56,7 @@ function mapExpansionKind(kind: string): EntityKindForExpansion {
 export async function loadExpansionSeed(pool: Pool, entityId: string): Promise<ExpansionSeed> {
   const { rows } = await pool.query<CanonicalEntityRow>(
     `SELECT id, kind, display_name, identifiers
-       FROM bb_canonical.entities
+       FROM canonical.entities
       WHERE id = $1`,
     [entityId],
   );
@@ -97,7 +97,7 @@ export async function insertLandscapeCandidateRows(
   let inserted = 0;
   for (const row of rows) {
     const result = await client.query(
-      `INSERT INTO bb_research.landscape_candidates
+      `INSERT INTO research.landscape_candidates
         (id, run_id, lane, source_program_id, source_item_id, display_name, kind, summary,
          canonical_url, research_lane_only, status, payload, provenance, discovered_at, updated_at)
        VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,true,$10,$11::jsonb,$12::jsonb,$13,now())
@@ -133,7 +133,7 @@ export async function ensureSourceProgramRun(
   lane: 'wikidata' | 'other' = 'wikidata',
 ): Promise<void> {
   await client.query(
-    `INSERT INTO bb_research.source_program_runs
+    `INSERT INTO research.source_program_runs
       (id, lane, source_program_id, source_program_name, retrieved_at, rows_fetched, candidate_count, summary, updated_at)
      VALUES ($1, $2, $3, $4, now(), $5, $6, $7::jsonb, now())
      ON CONFLICT (id) DO UPDATE SET

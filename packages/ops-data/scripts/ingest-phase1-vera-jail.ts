@@ -1,6 +1,6 @@
 /**
  * Live Vera Incarceration Trends ingest for Phase 1 county jail population rate
- * observations into bb_reference.statistical_observations.
+ * observations into reference.statistical_observations.
  *
  * Usage (repo root):
  *   # Dry-run (default) — bounded to GA+MD unless PHASE1_VERA_ALL_COUNTIES=1
@@ -75,7 +75,7 @@ async function loadExistingJurisdictionIds(databaseUrl: string): Promise<Set<str
     ...(conn.ssl ? { ssl: conn.ssl } : {}),
   });
   try {
-    const result = await pool.query<{ id: string }>('SELECT id FROM bb_reference.jurisdictions');
+    const result = await pool.query<{ id: string }>('SELECT id FROM reference.jurisdictions');
     return new Set(result.rows.map((row) => row.id));
   } finally {
     await pool.end();
@@ -114,7 +114,7 @@ async function applyObservations(
 
     for (const series of listPhase1VeraJailIndicators()) {
       await client.query(
-        `INSERT INTO bb_reference.statistical_series
+        `INSERT INTO reference.statistical_series
           (metric_id, metric_definition, universe, unit, source_dataset, source_table,
            source_variable, geography_type, estimate_type, period_type,
            external_data_source_id, theme, metadata)
@@ -154,7 +154,7 @@ async function applyObservations(
 
     for (const obs of observations) {
       await client.query(
-        `INSERT INTO bb_reference.statistical_observations
+        `INSERT INTO reference.statistical_observations
           (id, metric_id, jurisdiction_id, boundary_version, reference_period, dataset_vintage,
            estimate, margin_of_error, race_ethnicity_slice, status, source, source_url,
            retrieved_at, content_hash, metadata)

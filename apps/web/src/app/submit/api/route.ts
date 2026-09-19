@@ -55,8 +55,8 @@ export async function POST(request: Request): Promise<Response> {
     subject: 'anonymous',
     ...(clientIp ? { clientIp } : {}),
     // Monitor allow-through must satisfy the quota gate; otherwise missing integrity
-    // tokens become fake 429s. Field name remains appCheckVerified for @repo/security compat.
-    appCheckVerified: integrityDecision.verified || integrityDecision.mode === 'monitor',
+    // tokens become fake 429s. Field name remains clientAttested for @repo/security compat.
+    clientAttested: integrityDecision.verified || integrityDecision.mode === 'monitor',
   });
   if (!rateDecision.allowed) {
     const response = rateLimitGuard.formatDeniedResponse(rateDecision);

@@ -26,7 +26,6 @@ test('exactly fourteen real job bodies are registered (prior thirteen plus banne
     .map((job) => job.id)
     .sort();
   assert.deepEqual(real, [
-    'backup-verification-daily',
     'citation-link-health-sweep',
     'community-obscurity-discovery',
     'discovery-campaign-archive-dpla',
@@ -38,7 +37,6 @@ test('exactly fourteen real job bodies are registered (prior thirteen plus banne
     'legal-change-monitoring',
     'reddit-deletion-sync',
     'relevance-confidence-recalibration-report',
-    'restore-drill-quarterly',
     'source-drift-run-health-check',
   ]);
 });
@@ -99,8 +97,6 @@ test('the roster covers every acceptance-criterion job family', () => {
     'relevance-confidence-recalibration-report',
     'source-drift-run-health-check',
     'gold-corpus-regression',
-    'backup-verification-',
-    'restore-drill-',
     'cost-budget-report',
   ];
   for (const family of expectedFamilies) {

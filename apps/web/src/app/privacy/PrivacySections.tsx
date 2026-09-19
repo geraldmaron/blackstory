@@ -12,19 +12,25 @@
 import React from 'react';
 import { SUPPORT_CONTACT } from '../../lib/config/contact';
 import Link from 'next/link';
+import { RoomJump, RoomSection, roomSectionTone } from '../../components/room';
+import type { DestinationIconId } from '@repo/public-contracts/destinations';
 import './privacy.css';
 
 void React;
 
-const PAGE_SECTIONS = [
-  { id: 'scope', label: 'Scope' },
-  { id: 'web', label: 'Website' },
-  { id: 'not-collected', label: 'Not collected' },
-  { id: 'location', label: 'Location' },
-  { id: 'integrity', label: 'Abuse checks' },
-  { id: 'corrections', label: 'Corrections' },
-  { id: 'changes', label: 'Changes' },
-] as const;
+const PAGE_SECTIONS: readonly {
+  readonly id: string;
+  readonly label: string;
+  readonly icon: DestinationIconId;
+}[] = [
+  { id: 'scope', label: 'Scope', icon: 'about' },
+  { id: 'web', label: 'Website', icon: 'records' },
+  { id: 'not-collected', label: 'Not collected', icon: 'privacy' },
+  { id: 'location', label: 'Location', icon: 'precision' },
+  { id: 'integrity', label: 'Abuse checks', icon: 'evidence' },
+  { id: 'corrections', label: 'Corrections', icon: 'correction' },
+  { id: 'changes', label: 'Changes', icon: 'support' },
+];
 
 const WEB_INVENTORY = [
   {
@@ -93,174 +99,130 @@ function InventoryLedger({
 export function PrivacySections() {
   return (
     <div className="ds-privacy">
-      <nav className="ds-privacy__nav" aria-labelledby="privacy-toc-title">
-        <p className="ds-privacy__nav-title" id="privacy-toc-title">
-          On this page
+      <RoomJump sections={PAGE_SECTIONS} />
+
+      <RoomSection
+        id="scope"
+        icon="about"
+        kicker="Who this covers"
+        title="BlackStory public website"
+        tone={roomSectionTone(0)}
+      >
+        <p className="ds-privacy__follow">
+          This policy describes how BlackStory handles information on{' '}
+          <span className="ds-phrase-nowrap">blackstory.app</span>. It covers what the site does
+          now. It is not a promise about features that do not exist yet.
         </p>
-        <ul className="ds-privacy__nav-list">
-          {PAGE_SECTIONS.map((section) => (
-            <li key={section.id}>
-              <a className="ds-privacy__nav-link" href={`#${section.id}`}>
-                {section.label}
-              </a>
+        <p className="ds-privacy__follow">
+          Data controller: <strong>Gerald Dagher</strong> (individual).
+        </p>
+        <p className="ds-privacy__meta">Last updated: August 2026</p>
+      </RoomSection>
+
+      <RoomSection
+        id="web"
+        icon="records"
+        kicker="Website"
+        title="What this site may process"
+        tone={roomSectionTone(1)}
+      >
+        <p className="ds-privacy__follow">
+          The public website is read-first. Interactive flows are optional and labeled before you
+          use them.
+        </p>
+        <InventoryLedger items={WEB_INVENTORY} label="Website data inventory" />
+        <p className="ds-privacy__follow">
+          For how published records are verified and corrected, see{' '}
+          <Link href="/methodology">methodology</Link> and the{' '}
+          <Link href="/corrections">corrections lane</Link>.
+        </p>
+      </RoomSection>
+
+      <RoomSection
+        id="not-collected"
+        icon="privacy"
+        kicker="Explicit limits"
+        title="What I do not collect"
+        tone={roomSectionTone(2)}
+      >
+        <p className="ds-privacy__follow">
+          These are rules the software follows. If a release ever adds one of the things listed
+          here, this page changes before that release ships.
+        </p>
+        <ol className="ds-privacy__rule-strip" aria-label="Limits on what is collected">
+          {NOT_COLLECTED_RULES.map((rule) => (
+            <li key={rule} className="ds-privacy__rule-row">
+              <span className="ds-privacy__rule-text">{rule}</span>
             </li>
           ))}
-        </ul>
-      </nav>
+        </ol>
+      </RoomSection>
 
-      <div className="ds-entity-sections">
-        <section
-          className="ds-section ds-record-section ds-section--flush"
-          aria-labelledby="privacy-scope"
-          id="scope"
-        >
-          <p className="ds-section__kicker">
-            <span className="ds-kicker-index" aria-hidden="true" />
-            Who this covers
-          </p>
-          <h2 className="ds-section__title" id="privacy-scope">
-            BlackStory public website
-          </h2>
-          <p className="ds-section__lede">
-            This policy describes how BlackStory handles information on{' '}
-            <span className="ds-phrase-nowrap">blackstory.app</span>. It covers what the site does
-            now. It is not a promise about features that do not exist yet.
-          </p>
-          <p className="ds-privacy__follow">
-            Data controller: <strong>Gerald Dagher</strong> (individual).
-          </p>
-          <p className="ds-privacy__meta">Last updated: August 2026</p>
-        </section>
+      <RoomSection
+        id="location"
+        icon="precision"
+        kicker="Optional location"
+        title="Location is never required"
+        tone={roomSectionTone(3)}
+      >
+        <p className="ds-privacy__follow">
+          Location lookup starts only after you press a labeled control; the page never requests
+          device location automatically. You can always browse by state or search by place name
+          instead.
+        </p>
+      </RoomSection>
 
-        <section className="ds-section ds-record-section" aria-labelledby="privacy-web" id="web">
-          <p className="ds-section__kicker">
-            <span className="ds-kicker-index" aria-hidden="true" />
-            Website
-          </p>
-          <h2 className="ds-section__title" id="privacy-web">
-            What this site may process
-          </h2>
-          <p className="ds-section__lede">
-            The public website is read-first. Interactive flows are optional and labeled before you
-            use them.
-          </p>
-          <InventoryLedger items={WEB_INVENTORY} label="Website data inventory" />
-          <p className="ds-privacy__follow">
-            For how published records are verified and corrected, see{' '}
-            <Link href="/methodology">methodology</Link> and the{' '}
-            <Link href="/corrections">corrections lane</Link>.
-          </p>
-        </section>
+      <RoomSection
+        id="integrity"
+        icon="evidence"
+        kicker="Abuse protection"
+        title="What the abuse checks look at"
+        tone={roomSectionTone(4)}
+      >
+        <p className="ds-privacy__follow">
+          Pages that could be hit at scale (search, corrections, lead submission) sit behind rate
+          limits and same-origin checks. Nothing those checks record is used to build a marketing
+          profile.
+        </p>
+      </RoomSection>
 
-        <section
-          className="ds-section ds-record-section"
-          aria-labelledby="privacy-not-collected"
-          id="not-collected"
-        >
-          <p className="ds-section__kicker">
-            <span className="ds-kicker-index" aria-hidden="true" />
-            Explicit limits
-          </p>
-          <h2 className="ds-section__title" id="privacy-not-collected">
-            What I do not collect
-          </h2>
-          <p className="ds-section__lede">
-            These are rules the software follows. If a release ever adds one of the things listed
-            here, this page changes before that release ships.
-          </p>
-          <ol className="ds-privacy__rule-strip" aria-label="Limits on what is collected">
-            {NOT_COLLECTED_RULES.map((rule) => (
-              <li key={rule} className="ds-privacy__rule-row">
-                <span className="ds-privacy__rule-text">{rule}</span>
-              </li>
-            ))}
-          </ol>
-        </section>
+      <RoomSection
+        id="corrections"
+        icon="correction"
+        kicker="Submissions"
+        title="Corrections and leads"
+        tone={roomSectionTone(5)}
+      >
+        <p className="ds-privacy__follow">
+          When you file a correction, appeal, abuse report, or research lead, you choose what to
+          write. Submissions enter a restricted quarantine queue, are kept so they can be opened
+          later, and are never published as submitted. A screen runs over incoming mail before I
+          read it, so likely-hate is held aside and handled separately. Submissions are not used to
+          train models. The optional contact fields are used only to follow up with you about that
+          submission, and they are never shown publicly.
+        </p>
+        <p className="ds-privacy__follow">
+          Read the corrections privacy notice on the{' '}
+          <Link href="/corrections">corrections page</Link> before submitting. Do not include
+          anyone&apos;s home address or other sensitive personal details about a living person
+          unless strictly necessary for the correction.
+        </p>
+      </RoomSection>
 
-        <section
-          className="ds-section ds-record-section"
-          aria-labelledby="privacy-location"
-          id="location"
-        >
-          <p className="ds-section__kicker">
-            <span className="ds-kicker-index" aria-hidden="true" />
-            Optional location
-          </p>
-          <h2 className="ds-section__title" id="privacy-location">
-            Location is never required
-          </h2>
-          <p className="ds-section__lede">
-            Location lookup starts only after you press a labeled control; the page never requests
-            device location automatically. You can always browse by state or search by place name
-            instead.
-          </p>
-        </section>
-
-        <section
-          className="ds-section ds-record-section"
-          aria-labelledby="privacy-integrity"
-          id="integrity"
-        >
-          <p className="ds-section__kicker">
-            <span className="ds-kicker-index" aria-hidden="true" />
-            Abuse protection
-          </p>
-          <h2 className="ds-section__title" id="privacy-integrity">
-            What the abuse checks look at
-          </h2>
-          <p className="ds-section__lede">
-            Pages that could be hit at scale (search, corrections, lead submission) sit behind rate
-            limits and same-origin checks. Nothing those checks record is used to build a marketing
-            profile.
-          </p>
-        </section>
-
-        <section
-          className="ds-section ds-record-section"
-          aria-labelledby="privacy-corrections"
-          id="corrections"
-        >
-          <p className="ds-section__kicker">
-            <span className="ds-kicker-index" aria-hidden="true" />
-            Submissions
-          </p>
-          <h2 className="ds-section__title" id="privacy-corrections">
-            Corrections and leads
-          </h2>
-          <p className="ds-section__lede">
-            When you file a correction, appeal, abuse report, or research lead, you choose what to
-            write. Submissions enter a restricted quarantine queue and are never published as
-            submitted. The optional contact fields are used only to follow up with you about that
-            submission, and they are never shown publicly.
-          </p>
-          <p className="ds-privacy__follow">
-            Read the corrections privacy notice on the{' '}
-            <Link href="/corrections">corrections page</Link> before submitting. Do not include
-            anyone&apos;s home address or other sensitive personal details about a living person
-            unless strictly necessary for the correction.
-          </p>
-        </section>
-
-        <section
-          className="ds-section ds-record-section"
-          aria-labelledby="privacy-changes"
-          id="changes"
-        >
-          <p className="ds-section__kicker">
-            <span className="ds-kicker-index" aria-hidden="true" />
-            Updates
-          </p>
-          <h2 className="ds-section__title" id="privacy-changes">
-            Changes and contact
-          </h2>
-          <p className="ds-section__lede">
-            A material change to this policy is posted here, with a new date at the top. For a
-            privacy request, or a question about how any of this runs, write to{' '}
-            <a href={`mailto:${SUPPORT_CONTACT}`}>{SUPPORT_CONTACT}</a> or use the{' '}
-            <Link href="/support">support page</Link>.
-          </p>
-        </section>
-      </div>
+      <RoomSection
+        id="changes"
+        icon="support"
+        kicker="Updates"
+        title="Changes and contact"
+        tone={roomSectionTone(6)}
+      >
+        <p className="ds-privacy__follow">
+          A material change to this policy is posted here, with a new date at the top. For a privacy
+          request, or a question about how any of this runs, write to{' '}
+          <a href={`mailto:${SUPPORT_CONTACT}`}>{SUPPORT_CONTACT}</a> or use the{' '}
+          <Link href="/support">support page</Link>.
+        </p>
+      </RoomSection>
     </div>
   );
 }

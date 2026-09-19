@@ -139,7 +139,7 @@ test('narrow breakpoint switches exactly at the documented width', () => {
 });
 
 test('short viewports fall back to symmetric vertical padding', () => {
-  // 88 + min(210, 120) = 208, past the 200 budget on a 400px-tall canvas.
+  // 88 + min(280, 152) = 240, past the 200 budget on a 400px-tall canvas.
   const short = chromePadding({
     viewportWidth: 320,
     viewportHeight: 400,

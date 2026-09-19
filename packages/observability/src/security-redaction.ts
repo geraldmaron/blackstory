@@ -1,6 +1,5 @@
 /**
- * Security telemetry redaction strips App Check tokens, credentials, and protected
- * addresses before events reach logs or exported metrics.
+ * Redact credentials and protected addresses before security events reach logs or metrics.
  */
 import { createSensitiveDataRedactor } from '@repo/security';
 import type { SecurityTelemetryEvent } from './security-events.js';

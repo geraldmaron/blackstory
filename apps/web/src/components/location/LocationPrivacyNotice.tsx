@@ -4,26 +4,20 @@
  * `LocateExperience.tsx` hydrates a no-JS visitor still sees exactly what this feature does
  * with their input before any interactive control appears.
  *
- * Collapsed by default via native `<details>` (no JS required to open it) so the four-bullet
- * disclosure doesn't push "Use my current location" below the fold on narrow viewports the
- * one line every visitor actually needs ("press the button below, nothing runs automatically")
- * stays visible in the `<summary>`; the rest is one tap away.
+ * Collapsed by default via native `<details>`. The summary is quiet text, not a warning card;
+ * the four bullets are one tap away.
  */
 import React from 'react';
-import { Notice } from '@repo/ui';
 
-// See `@repo/ui`'s Notice.tsx/EmptyState.tsx for why this otherwise-unused import stays:
-// it makes this file safe to cross-transpile under a classic JSX runtime (e.g. this app's own
-// test runner), where compiled JSX needs `React` in scope.
 void React;
 
 export function LocationPrivacyNotice() {
   return (
     <details className="ds-location-privacy-notice">
       <summary className="ds-sans ds-location-privacy-notice__summary">
-        How this lookup uses your location. Press the button below; nothing runs automatically
+        Location is opt-in. Press the button below; nothing runs automatically.
       </summary>
-      <Notice tone="warning" title="How this lookup uses your location">
+      <div className="ds-location-privacy-notice__body">
         <ul
           className="ds-stack"
           style={{ gap: 'var(--ds-space-1)', margin: 0, paddingLeft: '1.1em' }}
@@ -46,7 +40,7 @@ export function LocationPrivacyNotice() {
             search by place name instead.
           </li>
         </ul>
-      </Notice>
+      </div>
     </details>
   );
 }

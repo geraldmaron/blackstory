@@ -12,6 +12,7 @@ import { dirname, join } from 'node:path';
 import { test } from 'node:test';
 import { fileURLToPath } from 'node:url';
 import { FAQ_ENTRIES, FAQ_LEDE, FAQ_SECTIONS } from './faq-copy';
+import { MAKER } from '@repo/config';
 import { destinationFor } from '../../lib/nav/destination-registry';
 import { surfaceClassFor } from '../../lib/nav/surface-classes';
 
@@ -45,6 +46,14 @@ test('section ids are unique, because the contents list links to them', () => {
   assert.equal(new Set(ids).size, ids.length, 'two sections share an anchor');
 });
 
+test('section headings carry orientation glyphs', () => {
+  for (const section of FAQ_SECTIONS) {
+    assert.ok(section.icon, `${section.heading} carries a section glyph`);
+  }
+  assert.match(pageSource, /RoomJump/);
+  assert.match(pageSource, /RoomSection/);
+});
+
 test('the answers are open on the page, never behind a disclosure', () => {
   // The two answers a reader most needs (who runs this, how AI is used) are exactly the two a
   // collapsed drawer would hide. If this page ever becomes an accordion, that is the cost.
@@ -63,6 +72,22 @@ test('the AI question is answered, and the answer is no', () => {
   assert.match(all, /scan of a drawing/, 'the covers are drawn, and the page says so');
 });
 
+test('incoming mail is screened, and that is not a publish gate', () => {
+  const used = FAQ_ENTRIES.find((item) => /where is AI actually used/i.test(item.question));
+  assert.ok(used);
+  assert.doesNotMatch(
+    used.answer.join(' '),
+    /what people send|likely-hate/,
+    'inbox screening is its own question, not a third research use',
+  );
+  const entry = FAQ_ENTRIES.find((item) => /read what I send/i.test(item.question));
+  assert.ok(entry, 'a stranger sending a lead has to be told the mail is screened');
+  const all = entry.answer.join(' ');
+  assert.match(all, /kept/);
+  assert.match(all, /likely-hate/i);
+  assert.match(all, /never goes live/);
+});
+
 test('no model vendor or version is named, because that answer would go stale', () => {
   const all = [FAQ_LEDE, ...FAQ_ENTRIES.flatMap((entry) => [entry.question, ...entry.answer])].join(
     ' ',
@@ -74,6 +99,22 @@ test('the durability answer keeps its limit and does not promise permanence', ()
   const entry = FAQ_ENTRIES.find((item) => /still be here/i.test(item.question));
   assert.ok(entry, 'the "will this last" question is the one a reader deserves an answer to');
   assert.match(entry.answer.join(' '), /for as long as I can/);
+});
+
+test('the scope question names the charge without making the archive a rebuttal', () => {
+  const entry = FAQ_ENTRIES.find((item) => /only Black history/i.test(item.question));
+  assert.ok(entry, 'a stranger asking why the archive is Black history has to get an answer');
+  assert.match(entry.answer.join(' '), /anti-white/);
+  assert.match(entry.answer.join(' '), /anyone else's history/);
+  assert.ok(entry.links?.some((link) => link.href === '/about#stance'));
+});
+
+test('who makes this points at the stance and the personal site, and does not hide the job', () => {
+  const entry = FAQ_ENTRIES.find((item) => item.question === 'Who makes this?');
+  assert.ok(entry);
+  assert.match(entry.answer.join(' '), /product manager/);
+  assert.ok(entry.links?.some((link) => link.href === '/about#stance'));
+  assert.ok(entry.links?.some((link) => link.href === MAKER.url));
 });
 
 test('no answer speaks as an institutional "we"', () => {

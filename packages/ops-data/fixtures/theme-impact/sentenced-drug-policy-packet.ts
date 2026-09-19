@@ -13,7 +13,7 @@
  * odds not bare decimals, statute text quoted verbatim, gaps in the method note).
  *
  * Every observation id, estimate, source, and content_hash below is a verified
- * snapshot of bb_reference.statistical_observations. Statute quotes are verbatim
+ * snapshot of reference.statistical_observations. Statute quotes are verbatim
  * from the curated 21 U.S.C. 841 evidence record (public domain) ingested for
  * the drug-policy primary-document pass.
  *
@@ -46,7 +46,7 @@ const USC841_URL =
 const METHOD =
   'Statute text, prison-admission shares, federal cocaine caseloads, and imprisonment rates describe different systems and are juxtaposed, not combined into a causal estimate; the statutory quantity ratios speak for themselves. Coverage is named rather than smoothed. The Black share of prison admissions runs 1926-1986 (BJS, Race of Prisoners in State and Federal Institutions, 1926-86); this arc uses 1975 through 1986. The assembled national imprisonment spine (spine-imprisonment-rate-black-us and its White twin) covers 2010-2023 only, so there is no 1999 observation to anchor a peak: the peak the series can see is 2013, and pre-2010 rates sit outside coverage. That spine carries an unreconciled 2012->2013 vintage seam (BJS CSAT p20st for 2010-2012, BJS NPS p23st for 2013-2023), so every imprisonment comparison here stays inside the post-2013 vintage (2013, 2020, 2023) and none is drawn across the seam. The U.S. Sentencing Commission crack caseload figures are fiscal-year 2016 and 2023 readings of a modern federal docket, not 1986-contemporaneous counts. Juxtaposition is not causation.';
 
-// --- Observations (verified against bb_reference.statistical_observations) ---
+// --- Observations (verified against reference.statistical_observations) ---
 
 const ADMISSIONS = [
   ['1975', 35, '786262fb748b88d099adcb700d3222d90f0bdb90eb2a6837469c12128d82c216'],

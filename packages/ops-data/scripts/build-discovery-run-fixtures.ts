@@ -6,7 +6,7 @@
  * which no longer exists in the repo, and the wikidata run artifact is a merge of
  * prior runs. Their promoted candidates are already entities (149 gap_* rows are
  * in the active release), but the un-promoted remainder is the research backlog
- * and exists nowhere else, so it moves to bb_research.landscape_candidates before
+ * and exists nowhere else, so it moves to research.landscape_candidates before
  * the committed JSON is retired.
  *
  * Usage (repo root):

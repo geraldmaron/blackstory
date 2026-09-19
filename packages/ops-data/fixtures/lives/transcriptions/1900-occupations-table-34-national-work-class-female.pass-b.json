@@ -1,0 +1,101 @@
+{
+  "source": "U.S. Census Bureau, Occupations at the Twelfth Census, Special Reports: General Tables, States and Territories, Table 34",
+  "sourceUrl": "https://www2.census.gov/library/publications/decennial/1900/occupations/1900-census-occupations-8.pdf",
+  "table": "Table 34",
+  "page": "154-165",
+  "boundaryVersion": "us-nation-1900",
+  "datasetVintage": "1904 printed volume",
+  "figures": [
+    {
+      "metricId": "lives-class-work-lower",
+      "jurisdictionId": "nation:US",
+      "referencePeriod": "1900",
+      "raceEthnicitySlice": "all",
+      "estimate": 57.8,
+      "numerator": 3079190,
+      "denominator": 5329292,
+      "universe": "Female gainful workers only; females 10 years old and over engaged in gainful occupations; Aggregate",
+      "note": "Female gainful workers only"
+    },
+    {
+      "metricId": "lives-class-work-middle",
+      "jurisdictionId": "nation:US",
+      "referencePeriod": "1900",
+      "raceEthnicitySlice": "all",
+      "estimate": 34.1,
+      "numerator": 1818928,
+      "denominator": 5329292,
+      "universe": "Female gainful workers only; females 10 years old and over engaged in gainful occupations; Aggregate"
+    },
+    {
+      "metricId": "lives-class-work-upper",
+      "jurisdictionId": "nation:US",
+      "referencePeriod": "1900",
+      "raceEthnicitySlice": "all",
+      "estimate": 8.1,
+      "numerator": 431174,
+      "denominator": 5329292,
+      "universe": "Female gainful workers only; females 10 years old and over engaged in gainful occupations; Aggregate"
+    },
+    {
+      "metricId": "lives-class-work-lower",
+      "jurisdictionId": "nation:US",
+      "referencePeriod": "1900",
+      "raceEthnicitySlice": "white",
+      "estimate": 44.7,
+      "numerator": 1786403,
+      "denominator": 3992292,
+      "universe": "Female gainful workers only; females 10 years old and over engaged in gainful occupations; Total white (Native white + Foreign white)"
+    },
+    {
+      "metricId": "lives-class-work-middle",
+      "jurisdictionId": "nation:US",
+      "referencePeriod": "1900",
+      "raceEthnicitySlice": "white",
+      "estimate": 44.5,
+      "numerator": 1775606,
+      "denominator": 3992292,
+      "universe": "Female gainful workers only; females 10 years old and over engaged in gainful occupations; Total white (Native white + Foreign white)"
+    },
+    {
+      "metricId": "lives-class-work-upper",
+      "jurisdictionId": "nation:US",
+      "referencePeriod": "1900",
+      "raceEthnicitySlice": "white",
+      "estimate": 10.4,
+      "numerator": 415263,
+      "denominator": 3992292,
+      "universe": "Female gainful workers only; females 10 years old and over engaged in gainful occupations; Total white (Native white + Foreign white)"
+    },
+    {
+      "metricId": "lives-class-work-lower",
+      "jurisdictionId": "nation:US",
+      "referencePeriod": "1900",
+      "raceEthnicitySlice": "black",
+      "estimate": 96.0,
+      "numerator": 1263948,
+      "denominator": 1316872,
+      "universe": "Female gainful workers only; females 10 years old and over engaged in gainful occupations; Negro"
+    },
+    {
+      "metricId": "lives-class-work-middle",
+      "jurisdictionId": "nation:US",
+      "referencePeriod": "1900",
+      "raceEthnicitySlice": "black",
+      "estimate": 2.8,
+      "numerator": 37323,
+      "denominator": 1316872,
+      "universe": "Female gainful workers only; females 10 years old and over engaged in gainful occupations; Negro"
+    },
+    {
+      "metricId": "lives-class-work-upper",
+      "jurisdictionId": "nation:US",
+      "referencePeriod": "1900",
+      "raceEthnicitySlice": "black",
+      "estimate": 1.2,
+      "numerator": 15601,
+      "denominator": 1316872,
+      "universe": "Female gainful workers only; females 10 years old and over engaged in gainful occupations; Negro"
+    }
+  ]
+}

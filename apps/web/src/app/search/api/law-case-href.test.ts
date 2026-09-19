@@ -1,5 +1,5 @@
 /**
- * `/search/api` attaches a resolved `/law/{slug}` href to a law/case result (repo-skocy),
+ * `/search/api` attaches a resolved `/law/{slug}` href to a law/case result,
  * through the real handler with the real request-integrity + rate-limit guards, and only
  * queries the injected resolver when the page actually holds a law/case row.
  */
@@ -101,7 +101,7 @@ test('never calls the resolver when the page holds no law/case row', async () =>
   assert.equal(calls, 0, 'a place-only page must not pay for a legal-catalog lookup');
 });
 
-test("omitting the dependency entirely (today's production shape before repo-skocy) still works", async () => {
+test('omitting the optional resolver still returns results without law hrefs', async () => {
   const deps = await buildDeps();
   const response = await handleSearchRequest(searchRequest('?q=civil+rights+act'), deps);
   assert.equal(response.status, 200);

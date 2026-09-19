@@ -472,6 +472,16 @@ describe('/stories · facts and pagination', () => {
     assert.equal(facts.publishedCount, 2);
     assert.equal(facts.eraSpanLabel, '2019 to 2024');
     assert.equal(facts.placeCount, 2);
+    assert.equal(facts.placeLabel, '2 places');
+  });
+
+  it('omits a collapsed publication-year span and singularizes one place', () => {
+    const facts = computeStoriesFacts([
+      item({ id: '1', slug: '1', publishedAt: '2026-01-01', placeLabel: 'United States' }),
+      item({ id: '2', slug: '2', publishedAt: '2026-06-01', placeLabel: 'United States' }),
+    ]);
+    assert.equal(facts.eraSpanLabel, undefined);
+    assert.equal(facts.placeLabel, '1 place');
   });
 
   it('never emits page=1 in the previous link, and clamps an out-of-range page', () => {

@@ -1,5 +1,5 @@
 /**
- * repo-z97f — pins the exact defect the William F. Penn record shipped with (repo-wqtq): a
+ * Pins the exact defect the William F. Penn record shipped with: a
  * `first_to_do_x` basis record whose only resolvable evidence is Wikipedia. Each case below is a
  * boundary this audit has to get right, not a restatement of the implementation.
  */

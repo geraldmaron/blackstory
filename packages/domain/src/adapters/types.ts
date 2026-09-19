@@ -40,7 +40,7 @@ export type GeographicCoverage = {
 
 /**
  * Full adapter contract: identity, rights, permitted claims, operational limits, and parser version.
- * Mirrors Firestore `evidenceSources` plus operational metadata.
+ * Mirrors `evidence.evidence_sources` plus operational metadata.
  */
 export type SourceAdapterContract = {
   readonly adapterId: string;

@@ -1,6 +1,6 @@
 /**
  * Server-side Postgres readers for the active-release Article projection
- * (`bb_public.release_articles`). The `payload` column carries the full article
+ * (`published.release_articles`). The `payload` column carries the full article
  * document frozen at projection time by the ops `articles.ts project` step; the
  * envelope is validated here via the Zod schema and the rest is trusted as the
  * projection pipeline's output.
@@ -9,7 +9,7 @@ import { publicArticleProjectionSchema, type PublicArticleProjectionDoc } from '
 import { queryPostgres } from '../public-data/postgres-client';
 
 const ACTIVE_RELEASE_JOIN = `
-  JOIN bb_public.active_release active
+  JOIN published.active_release active
     ON active.id = 'active' AND active.release_id = articles.release_id`;
 
 type ReleaseArticleRow = { readonly payload: unknown };
@@ -21,7 +21,7 @@ function mapRow(row: ReleaseArticleRow): PublicArticleProjectionDoc {
 export async function listReleaseArticles(): Promise<readonly PublicArticleProjectionDoc[]> {
   const rows = await queryPostgres<ReleaseArticleRow>(
     `SELECT articles.payload
-     FROM bb_public.release_articles articles
+     FROM published.release_articles articles
      ${ACTIVE_RELEASE_JOIN}
      ORDER BY articles.published_at DESC, articles.slug`,
   );
@@ -33,7 +33,7 @@ export async function fetchReleaseArticle(
 ): Promise<PublicArticleProjectionDoc | undefined> {
   const rows = await queryPostgres<ReleaseArticleRow>(
     `SELECT articles.payload
-     FROM bb_public.release_articles articles
+     FROM published.release_articles articles
      ${ACTIVE_RELEASE_JOIN}
      WHERE articles.slug = $1
      LIMIT 1`,

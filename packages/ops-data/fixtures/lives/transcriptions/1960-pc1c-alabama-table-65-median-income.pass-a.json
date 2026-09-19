@@ -1,0 +1,35 @@
+{
+  "source": "U.S. Bureau of the Census, U.S. Census of Population: 1960, Vol. I, Characteristics of the Population, Part 2, Alabama, Chapter C, General Social and Economic Characteristics",
+  "sourceUrl": "https://www2.census.gov/library/publications/decennial/1960/population-volume-1/vol-01-02-e.pdf",
+  "table": "Table 65",
+  "page": "2-140",
+  "boundaryVersion": "us-states-1960",
+  "datasetVintage": "1963 printed volume",
+  "figures": [
+    {
+      "metricId": "lives-income-median",
+      "jurisdictionId": "state:01",
+      "referencePeriod": "1960",
+      "raceEthnicitySlice": "all",
+      "estimate": 3937,
+      "universe": "Families; income in 1959 dollars; THE STATE",
+      "note": "Families block median, not families and unrelated individuals."
+    },
+    {
+      "metricId": "lives-income-median",
+      "jurisdictionId": "state:01",
+      "referencePeriod": "1960",
+      "raceEthnicitySlice": "white",
+      "estimate": 4764,
+      "universe": "Families; WHITE; income in 1959 dollars; THE STATE"
+    },
+    {
+      "metricId": "lives-income-median",
+      "jurisdictionId": "state:01",
+      "referencePeriod": "1960",
+      "raceEthnicitySlice": "nonwhite",
+      "estimate": 2009,
+      "universe": "Families; NONWHITE; income in 1959 dollars; THE STATE"
+    }
+  ]
+}

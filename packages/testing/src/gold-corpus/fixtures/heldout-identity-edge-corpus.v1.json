@@ -1,0 +1,212 @@
+{
+  "schemaVersion": "heldout-identity-edge-corpus.v1",
+  "version": "heldout-identity-edge-v1-blind",
+  "retrievedAt": "2026-09-18T15:21:59Z",
+  "protocol": "Blind public-source identity and relationship cases. Expected identity and edge labels are withheld in a separate independently authored gold file.",
+  "sourceExcerpts": [
+    {
+      "id": "nps-mary-p5-p6",
+      "sourceUrl": "https://www.nps.gov/people/mary-fields.htm",
+      "selector": "locally retained paragraphs P5-P6",
+      "excerpt": "Some secondary sources claim that Mary made the journey to St. Peter's to care for Mother Mary Amadeus... It is likely that Mary relocated to St. Peter's Mission in Montana because the nuns needed more support running the school and the grounds. In 1895, she became the first African American woman and the second woman to receive a Star Route contract. Mary's route ran between St. Peter's Mission and the town of Cascade."
+    },
+    {
+      "id": "nps-mary-burial",
+      "sourceUrl": "https://www.nps.gov/people/mary-fields.htm",
+      "selector": "quick facts and closing paragraph",
+      "excerpt": "Quick facts list PLACE OF BURIAL: St. Peter's Mission, Montana. The closing paragraph states that she died in 1914 and is buried in Cascade."
+    },
+    {
+      "id": "nps-will-p2-p5",
+      "sourceUrl": "https://www.nps.gov/people/will-garvin.htm",
+      "selector": "locally retained paragraphs P2-P5",
+      "excerpt": "William ‘Will’ Garvin was born into slavery in southcentral Kentucky in 1847 or 1848. Many other records of Garvins in the area have been found; any relationships with Will remain unknown. He married Hannah Bransford, the daughter of formerly enslaved guide Nick Bransford, on May 27, 1876. Will Garvin is most widely known for discovering an area known as the Corkscrew."
+    },
+    {
+      "id": "nps-nick-p2-p5",
+      "sourceUrl": "https://www.nps.gov/people/nick-bransford.htm",
+      "selector": "locally retained paragraphs P2-P5",
+      "excerpt": "Nicholas (Nick) Bransford and Mat Bransford share the same last name but have no blood relation. Nick was a father to two daughters, Hannah and Annie. Hannah later married Will Garvin. Records show that Nick married Stephen Bishop's widow, Charlotte."
+    },
+    {
+      "id": "nps-mat-p2-p4",
+      "sourceUrl": "https://www.nps.gov/people/mat-bransford.htm",
+      "selector": "locally retained paragraphs P2-P4",
+      "excerpt": "Materson (Mat) Bransford was leased to Franklin Gorin and worked at Mammoth Cave. Mat married an enslaved woman named Parthena. He guided alongside Stephen Bishop, Nick Bransford, and Alfred Croghan."
+    },
+    {
+      "id": "epa-definition-p2-p4",
+      "sourceUrl": "https://www.epa.gov/wetlands/what-wetland",
+      "selector": "locally retained paragraphs P2-P4",
+      "excerpt": "Wetlands generally include swamps, marshes, bogs, and similar areas. Wetlands are found on every continent except Antarctica. Seasonal wetlands that appear dry at times often provide critical habitat for wildlife."
+    },
+    {
+      "id": "epa-functions-p2-p3",
+      "sourceUrl": "https://www.epa.gov/wetlands/how-do-wetlands-function-and-why-are-they-valuable",
+      "selector": "locally retained paragraphs P2-P3",
+      "excerpt": "Wetland functions and their value depend on relationships between the wetland and other ecosystems in the watershed. Wetlands store carbon within plant communities and soil and help moderate global climate conditions."
+    }
+  ],
+  "identityCases": [
+    {
+      "id": "i01",
+      "left": { "name": "Nicholas (Nick) Bransford", "sourceExcerptId": "nps-nick-p2-p5" },
+      "right": { "name": "Nick Bransford", "sourceExcerptId": "nps-mat-p2-p4" }
+    },
+    {
+      "id": "i02",
+      "left": { "name": "Materson (Mat) Bransford", "sourceExcerptId": "nps-mat-p2-p4" },
+      "right": { "name": "Mat Bransford", "sourceExcerptId": "nps-nick-p2-p5" }
+    },
+    {
+      "id": "i03",
+      "left": { "name": "William ‘Will’ Garvin", "sourceExcerptId": "nps-will-p2-p5" },
+      "right": { "name": "Will Garvin", "sourceExcerptId": "nps-nick-p2-p5" }
+    },
+    {
+      "id": "i04",
+      "left": { "name": "Nick Bransford", "sourceExcerptId": "nps-nick-p2-p5" },
+      "right": { "name": "Mat Bransford", "sourceExcerptId": "nps-mat-p2-p4" }
+    },
+    {
+      "id": "i05",
+      "left": { "name": "Will Garvin", "sourceExcerptId": "nps-will-p2-p5" },
+      "right": { "name": "Nick Bransford", "sourceExcerptId": "nps-nick-p2-p5" }
+    },
+    {
+      "id": "i06",
+      "left": { "name": "Will Garvin", "sourceExcerptId": "nps-will-p2-p5" },
+      "right": { "name": "Mat Bransford", "sourceExcerptId": "nps-mat-p2-p4" }
+    },
+    {
+      "id": "i07",
+      "left": { "name": "Mary Fields", "sourceExcerptId": "nps-mary-p5-p6" },
+      "right": { "name": "Will Garvin", "sourceExcerptId": "nps-will-p2-p5" }
+    },
+    {
+      "id": "i08",
+      "left": { "name": "Hannah Bransford", "sourceExcerptId": "nps-will-p2-p5" },
+      "right": { "name": "Hannah Bransford", "sourceExcerptId": "nps-nick-p2-p5" }
+    },
+    {
+      "id": "i09",
+      "left": { "name": "Stephen Bishop", "sourceExcerptId": "nps-nick-p2-p5" },
+      "right": { "name": "Stephen Bishop", "sourceExcerptId": "nps-mat-p2-p4" }
+    },
+    {
+      "id": "i10",
+      "left": { "name": "Nick Bransford", "sourceExcerptId": "nps-nick-p2-p5" },
+      "right": { "name": "Nick Bransford", "sourceExcerptId": "nps-mat-p2-p4" }
+    },
+    {
+      "id": "i11",
+      "left": { "name": "Mat Bransford", "sourceExcerptId": "nps-nick-p2-p5" },
+      "right": { "name": "Mat Bransford", "sourceExcerptId": "nps-mat-p2-p4" }
+    },
+    {
+      "id": "i12",
+      "left": { "name": "Will Garvin", "sourceExcerptId": "nps-will-p2-p5" },
+      "right": { "name": "Will Garvin", "sourceExcerptId": "nps-nick-p2-p5" }
+    }
+  ],
+  "edgeCases": [
+    {
+      "id": "g01",
+      "subject": "Mary Fields",
+      "predicate": "moved-to",
+      "object": "St. Peter's Mission, Montana",
+      "sourceExcerptIds": ["nps-mary-p5-p6"]
+    },
+    {
+      "id": "g02",
+      "subject": "Mary Fields",
+      "predicate": "route-ran-between",
+      "object": "St. Peter's Mission and Cascade",
+      "sourceExcerptIds": ["nps-mary-p5-p6"]
+    },
+    {
+      "id": "g03",
+      "subject": "Will Garvin",
+      "predicate": "married",
+      "object": "Hannah Bransford",
+      "sourceExcerptIds": ["nps-will-p2-p5"]
+    },
+    {
+      "id": "g04",
+      "subject": "Nick Bransford",
+      "predicate": "father-of",
+      "object": "Hannah Bransford",
+      "sourceExcerptIds": ["nps-nick-p2-p5"]
+    },
+    {
+      "id": "g05",
+      "subject": "Nick Bransford",
+      "predicate": "not-blood-related-to",
+      "object": "Mat Bransford",
+      "sourceExcerptIds": ["nps-nick-p2-p5"]
+    },
+    {
+      "id": "g06",
+      "subject": "Mat Bransford",
+      "predicate": "married",
+      "object": "Parthena",
+      "sourceExcerptIds": ["nps-mat-p2-p4"]
+    },
+    {
+      "id": "g07",
+      "subject": "Wetlands",
+      "predicate": "store-carbon-in",
+      "object": "plant communities and soil",
+      "sourceExcerptIds": ["epa-functions-p2-p3"]
+    },
+    {
+      "id": "g08",
+      "subject": "Wetlands",
+      "predicate": "include",
+      "object": "swamps, marshes, bogs, and similar areas",
+      "sourceExcerptIds": ["epa-definition-p2-p4"]
+    },
+    {
+      "id": "g09",
+      "subject": "Will Garvin",
+      "predicate": "son-in-law-of",
+      "object": "Nick Bransford",
+      "sourceExcerptIds": ["nps-will-p2-p5", "nps-nick-p2-p5"]
+    },
+    {
+      "id": "g10",
+      "subject": "Nick Bransford",
+      "predicate": "brother-of",
+      "object": "Mat Bransford",
+      "sourceExcerptIds": ["nps-nick-p2-p5"]
+    },
+    {
+      "id": "g11",
+      "subject": "Mary Fields",
+      "predicate": "moved-solely-to-care-for",
+      "object": "Mother Mary Amadeus",
+      "sourceExcerptIds": ["nps-mary-p5-p6"]
+    },
+    {
+      "id": "g12",
+      "subject": "Mary Fields",
+      "predicate": "buried-at",
+      "object": "St. Peter's Mission",
+      "sourceExcerptIds": ["nps-mary-burial"]
+    },
+    {
+      "id": "g13",
+      "subject": "Wetlands",
+      "predicate": "occur-on",
+      "object": "every continent including Antarctica",
+      "sourceExcerptIds": ["epa-definition-p2-p4"]
+    },
+    {
+      "id": "g14",
+      "subject": "Wetlands",
+      "predicate": "moderate",
+      "object": "global climate conditions",
+      "sourceExcerptIds": ["epa-functions-p2-p3"]
+    }
+  ]
+}

@@ -111,7 +111,7 @@
 ```
 
 
-## Per-entity field completeness (bb_public.release_entities)
+## Per-entity field completeness (published.release_entities)
 
 _Snapshot as of 2026-07-24. Methodology: docs/research/entity-completeness-audit.md §1-2._
 
@@ -137,7 +137,7 @@ Sources checked:
 - https://www.blackpast.org/ (403 — blocked automated fetch, cited as attempted primary source)
 - https://en.wikipedia.org/wiki/List_of_civil_rights_leaders (fetched successfully; used as fallback roster)
 
-**Civil Rights Movement leaders: 18 of 30 known figures present in bb_canonical (as person entities).**
+**Civil Rights Movement leaders: 18 of 30 known figures present in canonical (as person entities).**
 
 | Figure | Present | Note |
 |---|---|---|

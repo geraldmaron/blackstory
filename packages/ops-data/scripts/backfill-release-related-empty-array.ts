@@ -1,5 +1,5 @@
 /**
- * Backfill bb_public.release_entities rows whose empty `related` column was stored as `{}`
+ * Backfill published.release_entities rows whose empty `related` column was stored as `{}`
  * instead of `[]`, which breaks consumers using jsonb_array_length or .map.
  *
  * Usage (from repo root):
@@ -21,12 +21,12 @@ const APPLY = process.env.BACKFILL_RELEASE_RELATED_APPLY === '1';
 
 const COUNT_SQL = `
 SELECT COUNT(*)::text AS n
-FROM bb_public.release_entities
+FROM published.release_entities
 WHERE jsonb_typeof(related) = 'object' AND related = '{}'::jsonb
 `;
 
 const UPDATE_SQL = `
-UPDATE bb_public.release_entities re
+UPDATE published.release_entities re
 SET
   projection = CASE
     WHEN jsonb_typeof(re.projection->'related') = 'object'

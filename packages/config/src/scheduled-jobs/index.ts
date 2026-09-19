@@ -87,23 +87,6 @@ export {
 } from './jobs/gold-corpus-regression.js';
 
 export {
-  BACKUP_VERIFICATION_JOB_ID,
-  runBackupVerificationJob,
-  buildVerifyRestoreArgs,
-  type ExecFileFn,
-  type ExecFileResult,
-  type BackupVerificationJobInput,
-  type BackupVerificationJobResult,
-} from './jobs/backup-verification.js';
-
-export {
-  RESTORE_DRILL_JOB_ID,
-  runRestoreDrillJob,
-  type RestoreDrillJobInput,
-  type RestoreDrillJobResult,
-} from './jobs/restore-drill.js';
-
-export {
   RECALIBRATION_REPORT_JOB_ID,
   DEFAULT_RECALIBRATION_DRIFT_THRESHOLDS,
   runRecalibrationReportJob,

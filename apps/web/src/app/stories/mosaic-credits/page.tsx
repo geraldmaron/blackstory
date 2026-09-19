@@ -12,7 +12,7 @@ import {
   OffRamp,
   Prose,
   Room,
-  RoomHeader,
+  ReadingEntry,
 } from '../../../components/room';
 import '../../utility.css';
 
@@ -26,9 +26,8 @@ export const metadata: Metadata = buildStaticPageMetadata({
 export default function MosaicCreditsPage() {
   return (
     <Room>
-      <RoomHeader
+      <ReadingEntry
         pathname="/stories/mosaic-credits"
-        kicker="Attribution"
         title={
           <>
             Archive mosaic <em>credits</em>

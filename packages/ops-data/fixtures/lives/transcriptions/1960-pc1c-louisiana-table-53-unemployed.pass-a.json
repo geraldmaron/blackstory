@@ -1,0 +1,100 @@
+{
+  "source": "U.S. Bureau of the Census, U.S. Census of Population: 1960, Vol. I, Characteristics of the Population, Part 20, Louisiana, Chapter C, General Social and Economic Characteristics",
+  "sourceUrl": "https://www2.census.gov/library/publications/decennial/1960/population-volume-1/37722904v1p20ch4.pdf",
+  "table": "Table 53",
+  "page": "20-127",
+  "boundaryVersion": "us-states-1960",
+  "datasetVintage": "1963 printed volume",
+  "figures": [
+    {
+      "metricId": "lives-unemployed",
+      "jurisdictionId": "state:22",
+      "referencePeriod": "1960",
+      "raceEthnicitySlice": "all",
+      "estimate": 6.1,
+      "numerator": 65474,
+      "denominator": 1073286,
+      "universe": "Civilian labor force; persons 14 years old and over; both sexes"
+    },
+    {
+      "metricId": "lives-unemployed",
+      "jurisdictionId": "state:22",
+      "referencePeriod": "1960",
+      "raceEthnicitySlice": "white",
+      "estimate": 4.7,
+      "numerator": 35322,
+      "denominator": 756995,
+      "universe": "Civilian labor force; WHITE; both sexes"
+    },
+    {
+      "metricId": "lives-unemployed",
+      "jurisdictionId": "state:22",
+      "referencePeriod": "1960",
+      "raceEthnicitySlice": "nonwhite",
+      "estimate": 9.5,
+      "numerator": 30152,
+      "denominator": 316291,
+      "universe": "Civilian labor force; NONWHITE; both sexes"
+    },
+    {
+      "metricId": "lives-unemployed",
+      "jurisdictionId": "state:22",
+      "referencePeriod": "1950",
+      "raceEthnicitySlice": "all",
+      "estimate": 4.6,
+      "numerator": 42194,
+      "denominator": 917802,
+      "universe": "Civilian labor force; both sexes"
+    },
+    {
+      "metricId": "lives-unemployed",
+      "jurisdictionId": "state:22",
+      "referencePeriod": "1950",
+      "raceEthnicitySlice": "white",
+      "estimate": 3.7,
+      "numerator": 23339,
+      "denominator": 625707,
+      "universe": "Civilian labor force; WHITE; both sexes"
+    },
+    {
+      "metricId": "lives-unemployed",
+      "jurisdictionId": "state:22",
+      "referencePeriod": "1950",
+      "raceEthnicitySlice": "nonwhite",
+      "estimate": 6.5,
+      "numerator": 18855,
+      "denominator": 292095,
+      "universe": "Civilian labor force; NONWHITE; both sexes"
+    },
+    {
+      "metricId": "lives-unemployed",
+      "jurisdictionId": "state:22",
+      "referencePeriod": "1940",
+      "raceEthnicitySlice": "all",
+      "estimate": 12.8,
+      "numerator": 113022,
+      "denominator": 880964,
+      "universe": "Civilian labor force; both sexes"
+    },
+    {
+      "metricId": "lives-unemployed",
+      "jurisdictionId": "state:22",
+      "referencePeriod": "1940",
+      "raceEthnicitySlice": "white",
+      "estimate": 12.8,
+      "numerator": 69377,
+      "denominator": 542980,
+      "universe": "Civilian labor force; WHITE; both sexes"
+    },
+    {
+      "metricId": "lives-unemployed",
+      "jurisdictionId": "state:22",
+      "referencePeriod": "1940",
+      "raceEthnicitySlice": "nonwhite",
+      "estimate": 12.9,
+      "numerator": 43645,
+      "denominator": 337984,
+      "universe": "Civilian labor force; NONWHITE; both sexes"
+    }
+  ]
+}

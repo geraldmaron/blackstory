@@ -1,5 +1,5 @@
 /**
- * CSP nonce pipeline (repo-77nk): `proxy.ts` must issue a fresh per-request nonce, forward it to
+ * CSP nonce pipeline: `proxy.ts` must issue a fresh per-request nonce, forward it to
  * the app as the `x-nonce` request header, and set a nonce-based `Content-Security-Policy` on
  * every response it returns — not only the narrower `isSecurityNormalizedPath` set.
  *
@@ -57,4 +57,34 @@ test('proxy forwards the nonce as a request header the app can read via next/hea
   assert.ok(forwarded);
   const csp = response.headers.get('Content-Security-Policy');
   assert.match(csp ?? '', new RegExp(`nonce-${forwarded}`));
+});
+
+test('proxy forwards the nonce-bearing CSP request header Next uses for framework scripts', async () => {
+  const response = await proxy(requestFor('/admin/login'));
+  const responseCsp = response.headers.get('Content-Security-Policy');
+  const forwardedCsp = response.headers.get('x-middleware-request-content-security-policy');
+  assert.ok(responseCsp);
+  assert.equal(forwardedCsp, responseCsp);
+  assert.match(
+    response.headers.get('x-middleware-override-headers') ?? '',
+    /content-security-policy/,
+  );
+});
+
+test('ungated admin login preserves proxy request headers through the auth gate', async () => {
+  const response = await proxy(requestFor('/admin/login'));
+  const forwardedNonce = response.headers.get(`x-middleware-request-${CSP_NONCE_HEADER}`);
+  assert.ok(forwardedNonce);
+  assert.match(
+    response.headers.get('Content-Security-Policy') ?? '',
+    new RegExp(`nonce-${forwardedNonce}`),
+  );
+});
+
+test('request CSP forwarding also reaches public routes without changing their route config', async () => {
+  const response = await proxy(requestFor('/'));
+  assert.equal(
+    response.headers.get('x-middleware-request-content-security-policy'),
+    response.headers.get('Content-Security-Policy'),
+  );
 });

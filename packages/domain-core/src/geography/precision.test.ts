@@ -196,7 +196,7 @@ test('normalizePublicPrecision passes through every controlled tier unchanged', 
   }
 });
 
-test('normalizePublicPrecision normalizes every raw value seen in live bb_public data', () => {
+test('normalizePublicPrecision normalizes every raw value seen in live published data', () => {
   const cases: Record<string, string> = {
     site: 'site',
     county: 'county',

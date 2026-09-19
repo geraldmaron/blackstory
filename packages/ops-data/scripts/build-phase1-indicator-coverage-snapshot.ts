@@ -1,6 +1,6 @@
 /**
- * Build and upsert `phase1IndicatorCoverage` into `bb_public.materialized_snapshots`.
- * Aggregates row counts from `bb_reference.statistical_series` and
+ * Build and upsert `phase1IndicatorCoverage` into `published.materialized_snapshots`.
+ * Aggregates row counts from `reference.statistical_series` and
  * `statistical_observations` so `/data` can show `sampleObservationCount` via a
  * point-get (same pattern as `nationalPopulationTimeline` / `data-summaries.ts`).
  *
@@ -63,8 +63,8 @@ export async function buildPhase1IndicatorCoverageSnapshot(
 ): Promise<Phase1IndicatorCoverageSnapshot> {
   const result = await pool.query<CountRow>(
     `SELECT
-       (SELECT count(*)::int FROM bb_reference.statistical_series) AS series_count,
-       (SELECT count(*)::int FROM bb_reference.statistical_observations) AS observation_count`,
+       (SELECT count(*)::int FROM reference.statistical_series) AS series_count,
+       (SELECT count(*)::int FROM reference.statistical_observations) AS observation_count`,
   );
   const row = result.rows[0];
   const seriesCount = row?.series_count ?? 0;
@@ -80,7 +80,7 @@ export async function writePhase1IndicatorCoverageSnapshot(
   snapshot: Phase1IndicatorCoverageSnapshot,
 ): Promise<'created' | 'updated' | 'unchanged'> {
   const existing = await pool.query<{ payload: Phase1IndicatorCoverageSnapshot }>(
-    `SELECT payload FROM bb_public.materialized_snapshots WHERE name = $1 LIMIT 1`,
+    `SELECT payload FROM published.materialized_snapshots WHERE name = $1 LIMIT 1`,
     [SNAPSHOT_NAME],
   );
   const prior = existing.rows[0]?.payload;
@@ -88,7 +88,7 @@ export async function writePhase1IndicatorCoverageSnapshot(
     return 'unchanged';
   }
   await pool.query(
-    `INSERT INTO bb_public.materialized_snapshots (name, payload, updated_at)
+    `INSERT INTO published.materialized_snapshots (name, payload, updated_at)
      VALUES ($1, $2::jsonb, now())
      ON CONFLICT (name) DO UPDATE SET payload = EXCLUDED.payload, updated_at = now()`,
     [SNAPSHOT_NAME, JSON.stringify(snapshot)],

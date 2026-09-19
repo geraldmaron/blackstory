@@ -174,6 +174,13 @@ test('copy carries no em dash', () => {
   assert.equal(html.includes('—'), false);
 });
 
+test('Filters is a non-modal instrument so the map stays operable', () => {
+  const html = renderToStaticMarkup(createElement(LensPanel, lensProps({ onHide: () => {} })));
+  assert.doesNotMatch(html, /aria-modal/);
+  assert.doesNotMatch(html, /role="dialog"/);
+  assert.match(html, /Filters/);
+});
+
 /**
  * Isolated to the Population layer group's own markup, not the whole panel: `PlaceFinder` (in
  * the Where group, well before this text in document order) starts its own "Go" button disabled

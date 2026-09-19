@@ -11,7 +11,8 @@ import { fileURLToPath } from 'node:url';
 const here = dirname(fileURLToPath(import.meta.url));
 
 const WALK_ROOMS = [
-  'about/page.tsx',
+  // About's off-ramp lives in its sections file, the same split data/privacy/law already use.
+  'about/AboutSections.tsx',
   'data/page.tsx',
   'methodology/MethodologySections.tsx',
   'errata/page.tsx',

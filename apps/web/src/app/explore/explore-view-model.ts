@@ -76,7 +76,7 @@ export type ExploreViewModel = {
   readonly citesEdge: CitesEdgeIndex;
   /**
    * Palette records for entities `exploreMapSourceFor` had no map feature for — mostly laws,
-   * cases, and national organizations with no resolvable `geoAnchor` (repo-jnmwu). Release-wide
+   * cases, and national organizations with no resolvable `geoAnchor`. Release-wide
    * and reader-independent, so it rides the catalog half of the wire split like `citesEdge`
    * rather than the per-request shell. See `build-palette-records.ts`'s
    * `buildUnmappedPaletteRecords`.

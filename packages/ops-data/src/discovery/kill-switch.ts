@@ -1,20 +1,16 @@
 /**
- * Research-campaigns kill switch reads via a minimal DocGetter (no firebase-admin in unit tests).
- * Semantics mirror `@repo/config`'s `evaluateKillSwitch` for `research-campaigns`:
- * `enabled: true` means engaged; a missing doc fails closed (`missingFlagBehavior: deny`).
- *
- * Production should materialize `killSwitches/research-campaigns` so operators can disengage
- * explicitly. Local fixture runs may omit the doc and still observe engaged behavior.
+ * Research-campaign kill-switch reads through the atomic-store lookup interface.
+ * An enabled or missing switch prevents dispatch until explicitly disengaged by an operator.
  */
-import type { KillSwitchDoc } from '../firestore/types.js';
-import { firestorePaths } from '../firestore/paths.js';
+import type { KillSwitchDoc } from '../records/types.js';
+import { ledgerPaths } from '@repo/data-access';
 import { RESEARCH_CAMPAIGNS_KILL_SWITCH_ID } from './campaign-run.js';
 
 export type KillSwitchDocSnapshot = {
   readonly enabled?: boolean;
 };
 
-/** Minimal read surface for kill-switch documents (Firestore Admin or in-memory test double). */
+/** Minimal read surface for kill-switch documents (Postgres or an in-memory test double). */
 export type DocGetter = {
   getDoc(path: string): Promise<KillSwitchDocSnapshot | null | undefined>;
 };
@@ -44,7 +40,7 @@ export function isResearchCampaignsKillSwitchEngaged(
 export async function fetchResearchCampaignsKillSwitch(
   getter: DocGetter,
 ): Promise<KillSwitchDocSnapshot | null | undefined> {
-  return getter.getDoc(firestorePaths.killSwitch(RESEARCH_CAMPAIGNS_KILL_SWITCH_ID));
+  return getter.getDoc(ledgerPaths.killSwitch(RESEARCH_CAMPAIGNS_KILL_SWITCH_ID));
 }
 
 /** Convenience: fetch then evaluate engagement in one call. */

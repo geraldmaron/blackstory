@@ -85,7 +85,7 @@ export type MemorialWallAtmosphereProps = {
   /** Memorial name -> public entity id, for the small subset with a real entity page. */
   readonly entityLinksByName?: Readonly<Record<string, string>>;
   /**
-   * The reader's own "Hold the wall still" choice (repo-92n2.18), ORed with the live
+   * The reader's own "Hold the wall still" choice, ORed with the live
    * `prefers-reduced-motion` read below to decide whether the reveal clock and the subset
    * rotation actually run. `MemorialWallSection` (bottom of this file) owns this state and
    * renders the real, keyboard-reachable control — this component's own root stays
@@ -227,15 +227,12 @@ function positionScrollCue(
 }
 
 /**
- * Left and bottom edges of the page's RoomHeader (kicker/title/breadcrumb),
- * in the wall's local coordinate space (the wall's own left edge is flush
- * with `.ds-memorial`'s, only its top is offset, so `left` here is
- * also directly usable by the scroll cue — see rebuild()). The header
- * renders outside this component's own tree as a sibling under the shared
- * `.ds-memorial` root.
+ * Left and bottom edges of a page header, when one exists, in the wall's local
+ * coordinate space. The memorial opening no longer renders a title over the
+ * wall; this returns null there and rebuild() falls back to a viewport guess.
  */
 function getHeaderBox(root: HTMLElement): { left: number; bottom: number } | null {
-  const header = root.parentElement?.querySelector('.ds-room-header');
+  const header = root.parentElement?.querySelector('.ds-entry--reading, .ds-room-header');
   if (!header) {
     return null;
   }
@@ -277,7 +274,7 @@ function measureChromeAvoidBoxes(root: HTMLElement): readonly MemorialAvoidBox[]
     });
   }
 
-  const header = container?.querySelector('.ds-room-header');
+  const header = container?.querySelector('.ds-entry--reading, .ds-room-header');
   const headerBox = header?.getBoundingClientRect();
   if (headerBox && headerBox.width > 0 && headerBox.height > 0) {
     boxes.push({

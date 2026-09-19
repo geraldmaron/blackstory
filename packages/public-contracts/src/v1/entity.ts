@@ -1,27 +1,8 @@
 /**
- * Public entity DTO — extracted from `apps/web/src/data/public-seed.ts`'s `PublicEntityView`
- * (the same shape `apps/web/src/lib/public-data/map-projection.ts`'s
- * `mapProjectionToPublicEntityView` produces from a live public projection; the live store is
- * Postgres `bb_public`, not Firestore. See `docs/decisions-carryover.md`, "Public projection and
- * immutable publication snapshots".) This is the single richest DTO in the package, so the
- * exclusions matter most here:
- *
- * Omitted BY CONSTRUCTION (no field exists to carry these — `docs/decisions-carryover.md`,
- * "ADR-021's two invariants": public-response redaction, and "Public projection and immutable
- * publication snapshots": canonical evidence, claims and research data are not public-readable):
- * - No raw notability/relevance ranking score. `notabilityBasis` carries only string leaves
- *   (`criterion`, `note`, `evidenceIds`) — see `packages/domain/src/entity-status.ts`'s own
- *   comment: "never a numeric score." `notabilityLabels` are human-readable rubric text.
- * - `locationPrecision` is one of the four public precision tiers and cannot express `'address'`
- *   or `'exact'` — that part IS structural. `geoAnchor` is not: it carries numeric `lat`/`lng`
- *   bounded only to valid coordinate ranges, so the public-precision property of the anchor comes
- *   from the projection that produced it, not from this schema.
- * - No internal review/source-lineage-internal fields: no reviewer identity, no moderation
- *   state, no spam/abuse signal, no internal-only source-lineage rollup (claims carry only the
- *   public `independentLineageCount` integer — see `./claim.ts`).
- *
- * Kept VISIBLE by explicit MOB-003 requirement ("disputes and provenance remain visible"):
- * `statusHistory`, `sensitivity`, claim-level `dispute`/`revisionHistory`/`retraction`.
+ * Public entity DTO shared by web and mobile. Excludes internal ranking scores, reviewer
+ * identity, moderation state and private lineage details. Public location precision is a
+ * restricted vocabulary, but coordinate coarseness must be enforced by the producing
+ * projection. Status history, sensitivity, disputes, revisions and retractions remain visible.
  */
 import { z } from 'zod';
 import {
@@ -156,17 +137,8 @@ export const entityV1Schema = z.object({
   locationLabel: nonEmptyText(300),
   relevanceExplanation: nonEmptyText(4000),
   /**
-   * Always present, but MAY be empty. "No historical context has been written for this record
-   * yet" is a real, honest state for a registry listing, and the field is how a client learns it.
-   *
-   * This was `nonEmptyText(4000)` until repo-n7p6.6. The effect was not a stricter contract, it
-   * was a silent outage: `mapProjectionToEntityV1` deliberately emits `''` rather than substituting
-   * build-status prose, so every record without written context failed validation and the handler
-   * — which cannot distinguish an unmappable projection from a missing one — served it as 404.
-   * That was 2,667 of the 4,094 entities in the active release, 65% of the published catalog.
-   * Clients already treat it as possibly-empty (`apps/mobile`'s entity normalizer defaults it to
-   * `''` and its narrative section renders only when non-blank), so allowing the empty string
-   * describes what the field already meant.
+   * Always present but may be empty when historical context has not been written. Clients must
+   * preserve that absence rather than invent prose or treat the record as missing.
    */
   historicalContext: z.string().max(4000),
   extendedNarrative: z.string().max(20_000).optional(),

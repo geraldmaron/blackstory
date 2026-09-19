@@ -1,5 +1,5 @@
 /**
- * MOB-005 close evidence: deterministic two-release activation/rollback/size report.
+ * release activation close evidence: deterministic two-release activation/rollback/size report.
  *
  * Validates committed fixtures under `fixtures/release-evidence/` match live generation.
  * Regenerate with: UPDATE_RELEASE_EVIDENCE=1 pnpm --filter @repo/domain test release-evidence

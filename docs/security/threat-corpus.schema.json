@@ -1,19 +1,21 @@
-/**
- * JSON Schema for docs/security/threat-corpus.json.
- * Validates that each threat has P0 priority, four control quadrants, and bead mappings.
- */
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://black-book.local/schemas/threat-corpus.json",
+  "$id": "urn:repo:schema:security-threat-corpus",
   "title": "BlackStory threat corpus",
   "type": "object",
-  "required": ["version", "bead", "threats"],
-  "additionalProperties": true,
+  "required": ["version", "updatedAt", "assumptionsRef", "architectureRefs", "threats"],
+  "additionalProperties": false,
   "properties": {
+    "$schema": { "type": "string" },
     "version": { "type": "string" },
-    "bead": { "const": "" },
-    "updatedAt": { "type": "string" },
-    "assumptionsRef": { "type": "string" },
+    "updatedAt": { "type": "string", "format": "date" },
+    "assumptionsRef": { "$ref": "#/$defs/repositoryPath" },
+    "architectureRefs": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": { "$ref": "#/$defs/repositoryPath" }
+    },
     "threats": {
       "type": "array",
       "minItems": 19,
@@ -25,11 +27,11 @@
           "name",
           "priority",
           "abuseCaseIds",
-          "implementationBeads",
+          "implementationRefs",
           "controls",
           "residualRisk"
         ],
-        "additionalProperties": true,
+        "additionalProperties": false,
         "properties": {
           "id": {
             "type": "string",
@@ -50,10 +52,11 @@
             "minItems": 1,
             "items": { "type": "string", "pattern": "^AC-[0-9]{2}$" }
           },
-          "implementationBeads": {
+          "implementationRefs": {
             "type": "array",
             "minItems": 1,
-            "items": { "type": "string", "pattern": "^BB-[0-9]{3}$" }
+            "uniqueItems": true,
+            "items": { "$ref": "#/$defs/repositoryPath" }
           },
           "controls": {
             "type": "object",
@@ -85,6 +88,13 @@
           "residualRisk": { "type": "string", "minLength": 1 }
         }
       }
+    }
+  },
+  "$defs": {
+    "repositoryPath": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "^(?!/)(?!.*(?:^|/)\\.\\.(?:/|$)).+$"
     }
   }
 }

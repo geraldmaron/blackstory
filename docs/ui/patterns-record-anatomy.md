@@ -106,3 +106,18 @@ Import `record-anatomy.css` once per web route bundle that renders `RecordAnatom
 ## Supersedes
 
 - Soft **2×2 label-over-value fact grid** beside map preview (2026-07-23 and earlier). Equal four-column strips with vertical hairlines remain banned per v5 cognitive-accessibility law.
+
+## Evidence and location honesty
+
+A stored qualitative grade stays qualitative. Do not manufacture a numerical score from a
+category or permit a caller to self-certify calibration. Numerical heuristic scores, when
+actually supplied, remain distinct from probabilities.
+
+Citation labels and hosts do not prove independent origin. A record-level independence count
+requires a reviewed aggregate, or a single claim whose lineage count covers the entire record.
+Counts from multiple claims cannot be added without lineage identifiers to remove overlap.
+Claim counts must be labeled as claims, not sources.
+
+Without a public coordinate anchor, show “Not pinned” and “No public map location”. Do not
+invent city precision. Missing, unrecognized, withheld or country-only precision cannot create
+a map pin. Non-place records must not receive generic “documented site” copy.

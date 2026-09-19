@@ -96,7 +96,7 @@
   }
 }
 
-/* repo-92n2.18: the reader's own "Hold the wall still" toggle, mirroring the reduced-motion
+/* The reader's own "Hold the wall still" toggle mirrors the reduced-motion
    rule above exactly. Per-name opacity is a CSS animation, not React state, so it cannot see
    `held` any other way; MemorialWallAtmosphere sets `data-held` on this element's own root. */
 .ds-memorial-wall[data-held='true'] .ds-memorial-wall__name {
@@ -108,7 +108,7 @@
    handwriting mechanic, then rests as one paragraph, permanently. Does not
    fade with scroll (unlike ambient names — no --memorial-wall-fade here). */
 .ds-memorial-wall__message-field {
-  /* Anchored a fixed gap below the RoomHeader (see --memorial-message-top,
+  /* Anchored a fixed gap below the reading entry (see --memorial-message-top,
      set in MemorialWallAtmosphere.tsx) rather than centered at 50% of the
      viewport height: a viewport-percentage position drifts the message
      toward mid-screen on a tall monitor, opening a dead gap under the title.

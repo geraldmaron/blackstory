@@ -1,34 +1,8 @@
 /**
- * repo-n7p6.18 — corpus triage sweep.
- *
- * Answers the question every enrichment batch has to ask first: which released records already
- * meet the bar and can be left alone, and which need work and specifically what kind. Without
- * it, enrichment picks targets by lane guesswork and progress is unmeasurable.
- *
- * Runs the deterministic content-expectations evaluator (`@repo/domain`, spec v2 — per-kind
- * floors: places and schools need 2 distinct sources, laws and cases need an impact statement
- * and 2 narrative paragraphs) over every entity in the active release, and records the verdict
- * plus the specific failed checks in the WS2 ledger (bb_research.entity_enrichment).
- *
- * No models and no network — the evaluator is pure, so this is cheap to run and cheap to re-run
- * whenever the spec version changes or records are enriched.
- *
- * Ledger semantics, since `status` is a fixed enum shared with the evidence sweep:
- *   - meets the bar  -> status 'skipped', notes.triage.verdict 'meets_bar'
- *     ("skipped" reads as "deliberately not queued for enrichment", which is what a passing
- *      record is. notes.triage.reason distinguishes it from the sweep's skipped:no-evidence.)
- *   - needs work     -> status 'pending', notes.triage.failedChecks listing exactly what failed
- * A row already marked 'enriched' or 'quarantined' by a later pass is never downgraded here —
- * this audit reports on content, it does not undo another pass's work.
- *
- * Default is dry-run. Production writes require:
- *   DRY_RUN=0 CONTENT_AUDIT_APPLY=1 DATABASE_URL=postgresql://...
- *
- * Usage (from repo root):
- *   set -a && source apps/web/.env.local && set +a
- *   export DATABASE_SSL=1
- *   node --conditions development --import tsx \
- *     packages/ops-data/scripts/audit-entity-content.ts --limit=0
+ * Runs deterministic content-expectation checks over the active release and reports specific
+ * deficits. Meets-bar rows become skipped; deficient rows remain pending. Do not downgrade
+ * enriched or quarantined rows. Default dry-run; ledger writes require DRY_RUN=0 and
+ * CONTENT_AUDIT_APPLY=1.
  */
 import { mkdirSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
@@ -69,14 +43,14 @@ async function main(): Promise<void> {
 
   try {
     const release = await pool.query<{ release_id: string }>(
-      'SELECT release_id FROM bb_public.active_release LIMIT 1',
+      'SELECT release_id FROM published.active_release LIMIT 1',
     );
     const releaseId = release.rows[0]?.release_id;
     if (!releaseId) throw new Error('no active release');
 
     const rows = await pool.query<ReleaseRow>(
       `SELECT entity_id, projection
-         FROM bb_public.release_entities
+         FROM published.release_entities
         WHERE release_id = $1
         ORDER BY entity_id
         ${LIMIT > 0 ? 'LIMIT ' + String(LIMIT) : ''}`,
@@ -151,18 +125,18 @@ async function main(): Promise<void> {
       for (const audit of audits) {
         const meets = audit.verdict === 'meets_bar';
         await client.query(
-          `INSERT INTO bb_research.entity_enrichment
+          `INSERT INTO research.entity_enrichment
              (entity_id, status, notes, updated_at)
            VALUES ($1, $2, $3::jsonb, now())
            ON CONFLICT (entity_id) DO UPDATE SET
              -- Never downgrade a row a later pass has already enriched or quarantined; this
              -- audit reports on content, it does not undo another pass's work.
              status = CASE
-               WHEN bb_research.entity_enrichment.status IN ('enriched', 'quarantined')
-                 THEN bb_research.entity_enrichment.status
+               WHEN research.entity_enrichment.status IN ('enriched', 'quarantined')
+                 THEN research.entity_enrichment.status
                ELSE EXCLUDED.status
              END,
-             notes = bb_research.entity_enrichment.notes || EXCLUDED.notes,
+             notes = research.entity_enrichment.notes || EXCLUDED.notes,
              updated_at = now()`,
           [
             audit.entityId,

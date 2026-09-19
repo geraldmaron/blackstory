@@ -1,9 +1,6 @@
-/**
- * Quarantine-write-only posture helpers for the submissions API (see docs/decisions-carryover.md,
- * "Service surface separation" — ADR-005 does not exist). This surface's guards are called for
- * real from quarantine.ts, unlike the equivalent helpers in apps/api-public.
- */
+/** Quarantine-only intake capabilities; publication requires the internal service boundary. */
 import {
+  assertAuthAccepted,
   assertOperationAllowed,
   rejectPublicationOperation,
   type AuthMode,
@@ -17,9 +14,7 @@ export function guardIntakeOperation(operation: OperationId): void {
 }
 
 export function guardIncomingAuth(authMode: AuthMode): void {
-  if (authMode === 'service-identity' || authMode === 'iap-session') {
-    throw new Error('api-submissions accepts only anonymous or end-user intake tokens');
-  }
+  assertAuthAccepted(SURFACE_ID, authMode);
 }
 
 export function guardPublishAttempt(operation: OperationId): void {

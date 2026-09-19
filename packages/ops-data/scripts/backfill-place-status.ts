@@ -53,7 +53,7 @@ async function stageReviewCandidates(
 
   if (!DRY_RUN && STAGE_REVIEW && candidates.length > 0) {
     await client.query(
-      `INSERT INTO bb_research.source_program_runs
+      `INSERT INTO research.source_program_runs
         (id, lane, source_program_id, source_program_name, retrieved_at, rows_fetched, candidate_count, summary, updated_at)
        VALUES ($1, 'other', $2, $3, now(), $4, $4, $5::jsonb, now())
        ON CONFLICT (id) DO UPDATE SET
@@ -83,7 +83,7 @@ async function stageReviewCandidates(
     if (DRY_RUN || !STAGE_REVIEW) continue;
 
     const result = await client.query(
-      `INSERT INTO bb_research.landscape_candidates
+      `INSERT INTO research.landscape_candidates
         (id, run_id, lane, source_program_id, source_item_id, display_name, kind, summary,
          canonical_url, research_lane_only, status, provenance, payload, discovered_at, updated_at)
        VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,true,'pending',$10::jsonb,$11::jsonb,now(),now())
@@ -124,7 +124,7 @@ async function main(): Promise<void> {
   try {
     const reviewCandidates = await client.query<ReviewCandidate>(
       `SELECT e.id, e.display_name, e.kind, (e.status_history->0->>'status') AS status
-       FROM bb_canonical.entities e
+       FROM canonical.entities e
        WHERE e.kind IN ('place', 'school', 'organization', 'institution')
          AND jsonb_array_length(e.status_history) = 1
          AND e.status_history->0->>'status' = 'historic'
@@ -142,7 +142,7 @@ async function main(): Promise<void> {
 
     for (const fix of PLACE_STATUS_FIXES) {
       const { rows } = await client.query<{ status_history: StatusHistoryEntry<string>[] }>(
-        `SELECT status_history FROM bb_canonical.entities WHERE id = $1`,
+        `SELECT status_history FROM canonical.entities WHERE id = $1`,
         [fix.entityId],
       );
       const row = rows[0];
@@ -159,7 +159,7 @@ async function main(): Promise<void> {
       if (DRY_RUN || !APPLY) continue;
 
       await client.query(
-        `UPDATE bb_canonical.entities
+        `UPDATE canonical.entities
          SET status_history = $2::jsonb, updated_at = now()
          WHERE id = $1`,
         [fix.entityId, JSON.stringify(nextHistory)],
@@ -184,7 +184,7 @@ async function main(): Promise<void> {
         `Review staging dry-run (${staged} would insert). Set DRY_RUN=0 STAGE_PLACE_STATUS_REVIEW_APPLY=1 to stage.`,
       );
     } else {
-      console.log(`Staged ${staged} new review rows to bb_research.landscape_candidates.`);
+      console.log(`Staged ${staged} new review rows to research.landscape_candidates.`);
     }
   } finally {
     await client.end();

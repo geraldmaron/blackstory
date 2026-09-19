@@ -46,6 +46,10 @@ import 'maplibre-gl/dist/maplibre-gl.css';
 import '../../app/first-paint-pin-plate.css';
 import { US_CONUS_BOUNDS } from '@repo/domain/map/geography';
 import {
+  EXPLORE_CLUSTER_COUNT_INCOMING_LAYER_ID,
+  EXPLORE_CLUSTER_COUNT_LAYER_ID,
+  EXPLORE_CLUSTER_INCOMING_LAYER_ID,
+  EXPLORE_CLUSTER_LAYER_ID,
   EXPLORE_ENTITIES_INCOMING_SOURCE_ID,
   EXPLORE_ENTITIES_SOURCE_ID,
   EXPLORE_HISTORY_EDGES_INCOMING_SOURCE_ID,
@@ -176,7 +180,13 @@ import { bindPlateCameraListeners, bindPlateClickListeners } from './event-wirin
 import { usePathname } from 'next/navigation';
 import { surfaceClassFor, type SurfaceClass } from '../../lib/nav/surface-classes';
 import { useSurfaceClass } from '../../lib/nav/use-surface-class';
-import { defaultPostureFor, framedClaimAllowed, type PlatePosture } from './plate-posture';
+import {
+  AMBIENT_CLUSTER_MIN_ZOOM,
+  clusterMarkersVisible,
+  defaultPostureFor,
+  framedClaimAllowed,
+  type PlatePosture,
+} from './plate-posture';
 import { createFramedSlotRegistry } from './framed-slot-registry';
 import { boxIsPaintable, plateBoxForSlot, resolvePlatePosture, type PlateBox } from './plate-frame';
 import { applyGesturesForPosture, lockGestures, rotateGestureAllowed } from './gesture-lock';
@@ -296,6 +306,11 @@ export type MapStageHandle = {
   /** Re-read container layout after external geometry changes (hero inset, panel open). */
   readonly resize: () => void;
   /**
+   * Door browse morph: force Live posture (reader-steered gestures) while the journey surface
+   * stays mounted on `/`. Clears back to the surface-class default when browse ends.
+   */
+  readonly setDoorBrowseLive: (live: boolean) => void;
+  /**
    * The live MapLibre map, or null before it starts and after it fails.
    *
    * Deliberately narrow: `camera-moves.ts` drives the plate through a structural `MapLike`, and
@@ -333,9 +348,32 @@ export function useMapStage(): MapStageHandle {
   return ctx;
 }
 
+/** The cluster discs and their counts, in the primary buffer and the decade crossfade's incoming one. */
+const CLUSTER_LAYER_IDS = [
+  EXPLORE_CLUSTER_LAYER_ID,
+  EXPLORE_CLUSTER_COUNT_LAYER_ID,
+  EXPLORE_CLUSTER_INCOMING_LAYER_ID,
+  EXPLORE_CLUSTER_COUNT_INCOMING_LAYER_ID,
+] as const;
+
 /**
- * Keyed sync of the DOM hit-target markers — the single-feature invariant (repo-4v3a.1 /
- * repo-mrmh / repo-pgzr) extended to the DOM path: markers are keyed by `entityId` and reused
+ * Holds the cluster layers off the plate below state scale in the ambient posture
+ * (`clusterMarkersVisible`) and gives them every zoom back in any other posture. A zoom range
+ * rather than a visibility flip, so a Door chapter flying in to state scale brings them back with
+ * no zoom listener. Each layer keeps its own max zoom. Re-applied wherever the entity layers can
+ * be rebuilt, because a rebuilt layer takes its range from the style again.
+ */
+function syncClusterZoomRange(map: MapLibreMap, posture: PlatePosture): void {
+  const minZoom = clusterMarkersVisible(posture, 0) ? 0 : AMBIENT_CLUSTER_MIN_ZOOM;
+  for (const id of CLUSTER_LAYER_IDS) {
+    const layer = map.getLayer(id);
+    if (layer) map.setLayerZoomRange(id, minZoom, layer.maxzoom ?? 24);
+  }
+}
+
+/**
+ * Keyed sync extends the map's single-feature invariant to DOM hit-target markers. Markers are
+ * keyed by `entityId` and reused
  * in place, so a selection change or `zoomend` resync never mass-unmounts and recreates the
  * whole collection (which read as "all entities light up"). Only genuinely new ids mount and
  * only stale ids unmount.
@@ -533,6 +571,14 @@ export function MapStageProvider({
   const [posture, setPosture] = useState<PlatePosture>(() =>
     defaultPostureFor(surfaceClassFor(pathname ?? '/')),
   );
+  /** Door in-place browse: Live gestures without leaving the Door route tree. */
+  const [doorBrowseLive, setDoorBrowseLiveState] = useState(false);
+  const doorBrowseLiveRef = useRef(false);
+  doorBrowseLiveRef.current = doorBrowseLive;
+  const setDoorBrowseLive = useCallback((live: boolean) => {
+    doorBrowseLiveRef.current = live;
+    setDoorBrowseLiveState(live);
+  }, []);
   /** The posture as of the last render, readable from the async mount path below. */
   const postureRef = useRef<PlatePosture>(posture);
   postureRef.current = posture;
@@ -559,7 +605,7 @@ export function MapStageProvider({
   const [mapAvailable, setMapAvailable] = useState(true);
   const mapAvailableRef = useRef(true);
   // Published to every MapMoment through MapMomentStage, so a moment refuses LIVE rather than
-  // going transparent under a tag that says the map is there — see repo-kz9z.
+  // going transparent under a tag that says the map is there.
   useReportMapAvailability(mapAvailable);
   /**
    * GL lifecycle, held in refs rather than closure locals because construction no longer happens
@@ -620,7 +666,7 @@ export function MapStageProvider({
   const activeDensityMorphRef = useRef<readonly DensityColorMorphState[]>([]);
   /*
    * The record ids on the plate BEFORE the config patch that triggered this morph, and the set
-   * currently held still by it (repo-o56o).
+   * currently held still by it.
    *
    * `previousEntityIdsRef` is captured in the patch rather than at promote because by the time a
    * morph starts, `configRef.current.featureCollection` is already the incoming decade — the patch
@@ -706,8 +752,7 @@ export function MapStageProvider({
     for (const [, entry] of stateLabelMarkersRef.current) {
       // Through the marker, never `element.style.opacity`: a MapLibre marker owns its element's
       // inline opacity and rewrites it on every map update (terrain occlusion), so a value written
-      // straight to the element held for one frame and the fade never happened at any zoom
-      // (repo-27uao).
+      // straight to the element would survive for one frame and prevent the fade at every zoom.
       entry.marker.setOpacity(opacity);
     }
   }, []);
@@ -827,6 +872,7 @@ export function MapStageProvider({
           ...(options?.preserveDecadeFadeOpacities ? { preserveDecadeFadeOpacities: true } : {}),
           ...(options?.deferPrimaryDecadeData ? { deferPrimaryDecadeData: true } : {}),
         });
+        syncClusterZoomRange(map, postureRef.current);
         setSelectedStateFilter(map, configRef.current.selectedState);
         if (!options?.deferPrimaryDecadeData) {
           setHistoryEdgeData(map, configRef.current.historyEdgeCollection);
@@ -1422,6 +1468,7 @@ export function MapStageProvider({
       // must still scroll the document that asked for it.
       applyGesturesForPosture(activeMap, postureRef.current, { pointerFine: prefersFinePointer() });
       syncRotateGestures(activeMap, postureRef.current, prefersFinePointer());
+      syncClusterZoomRange(activeMap, postureRef.current);
 
       syncEntityMarkers();
       lastViewportRef.current = readViewport(activeMap);
@@ -1531,7 +1578,7 @@ export function MapStageProvider({
         // DOM hit-target discs are fixed-pixel; a camera ease that crosses the cluster gate
         // (closing a record card flies point zoom -> national) must unmount them at the
         // crossing, not at `zoomend` — otherwise every disc rides the whole flight oversized
-        // and the map reads as "all entities light up" (repo-pgzr).
+        // and the map reads as "all entities light up".
         if (
           !shouldMountEntityMarkers(activeMap.getZoom(), EXPLORE_CLUSTER_CONFIG.clusterMaxZoom) &&
           markersRef.current.length > 0
@@ -1631,8 +1678,20 @@ export function MapStageProvider({
       heldSlotRef.current = null;
     }
     lastFramedMomentRef.current = null;
+    if (doorBrowseLiveRef.current) {
+      setPosture('live');
+      return;
+    }
     setPosture(defaultPostureFor(surfaceClass));
   }, [surfaceClass]);
+
+  useEffect(() => {
+    if (doorBrowseLive) {
+      setPosture('live');
+      return;
+    }
+    setPosture(defaultPostureFor(surfaceClass));
+  }, [doorBrowseLive, surfaceClass]);
 
   /**
    * Posture changes reach the gesture handlers directly. The Framed path below does the same
@@ -1645,6 +1704,7 @@ export function MapStageProvider({
     if (!map) return;
     applyGesturesForPosture(map, posture, { pointerFine: prefersFinePointer() });
     syncRotateGestures(map, posture, prefersFinePointer());
+    syncClusterZoomRange(map, posture);
     // The Door's phone strip may have sunk the zoom floor below the Instrument's national floor
     // (camera.ts, `zoomFloor: 'fit'`); every other posture gets the floor back.
     if (posture !== 'ambient') map.setMinZoom(MAP_MIN_ZOOM);
@@ -1804,6 +1864,7 @@ export function MapStageProvider({
         ensureMap();
         resize();
       },
+      setDoorBrowseLive,
       getMap: () => {
         ensureMap();
         return getMap();
@@ -1819,6 +1880,7 @@ export function MapStageProvider({
       setSearchCenterMarker,
       clearSearchCenterMarker,
       resize,
+      setDoorBrowseLive,
       getMap,
     ],
   );

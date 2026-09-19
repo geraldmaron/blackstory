@@ -1,10 +1,4 @@
-/**
- * repo-n7p6.6 item 2 — the API must serve the same timeline the website renders.
- *
- * Before this, `mapProjectionToEntityV1` hard-coded `timeline: []`, so a record with a full
- * status history read as having no history at all over the API while the web page showed one.
- * These tests pin the wire DTO to the projection's own evidence-backed time records.
- */
+/** The public API preserves projected status history in the timeline it serves. */
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 import type { PublicEntityProjectionDoc } from '@repo/ops-data';

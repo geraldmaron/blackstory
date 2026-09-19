@@ -15,7 +15,7 @@ reduces origin load during volumetric read abuse (T-01, T-19) and improves laten
 anonymous users.
 
 `api-submissions` remains **CDN-disabled** — all intake traffic must reach origin for
-App Check, rate limits, and quarantine writes.
+client-header check, rate limits, and quarantine writes.
 
 ## Backend configuration
 
@@ -43,7 +43,7 @@ Source: [`ingress-matrix.json`](./ingress-matrix.json) → `backends[].cdn`.
 Requests carrying these headers bypass CDN and hit origin:
 
 - `Authorization`
-- `X-Black-Book-App-Check` (when BB-024 enforcement is on)
+- `X-BlackStory-Client` (when BB-024 enforcement is on)
 
 `POST`, `PUT`, `PATCH`, `DELETE` are never cached (submissions surface has CDN off entirely).
 

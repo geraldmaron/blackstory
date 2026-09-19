@@ -1,5 +1,5 @@
 /**
- * Private-network, service-identity-only posture for internal publication APIs.
+ * Service-identity-only capabilities for internal publication APIs.
  */
 import {
   assertAuthAccepted,

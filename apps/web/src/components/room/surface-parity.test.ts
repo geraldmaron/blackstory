@@ -1,23 +1,16 @@
 /**
- * The structural half of the SP-24 surface parity gate (repo-92n2.31), as a test rather than an
- * observation.
+ * The structural half of the surface parity gate, expressed as a test rather than an observation.
  *
- * SP-24 is a per-screen pass: open each room beside its mock at three breakpoints in two themes
- * and record a verdict. The judgment half of that — does the block order match the display spec —
- * needs a person and a mock. The half below does not: "no screen renders a header, panel frame or
- * kicker that came from the v6 edition chrome" is a fact about the source, and a fact about the
- * source is something a test should hold, not something a human should re-derive every time the
- * gate is run. Run once by hand, it was true on the day it was run and unenforced the day after.
+ * Visual parity still requires a person to compare each room with its mock across breakpoints and
+ * themes. Source-level invariants do not: this suite ensures no screen renders a header, panel
+ * frame, or kicker from the v6 edition chrome.
  *
  * WHY THIS FILE EXISTS SEPARATELY FROM THE ROOM-KIT RATCHET. `room-kit.test.tsx` already forbids
- * `*-edition.css` and `*-panel-chrome.ts`, and its list is empty since repo-92n2.30. But it walks
- * `app/` only:
+ * `*-edition.css` and `*-panel-chrome.ts`, but it walks `app/` only:
  *
  *     const APP_DIR = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../app');
  *
- * so a v6 stylesheet that lives anywhere else was never in scope. The parity gate found exactly
- * that: `components/patterns/utility-edition/utility-edition.css` is a live v6 edition sheet with a
- * `__kicker`, outside the ratchet since the day it was written. This file walks `src/`.
+ * This file walks all of `src/` so shared component styles are covered too.
  */
 import assert from 'node:assert/strict';
 import { readFileSync, readdirSync, statSync } from 'node:fs';
@@ -40,17 +33,15 @@ function walk(dir: string, out: string[] = []): string[] {
 const SOURCES = walk(SRC_DIR).filter((file) => /\.(tsx|ts|css)$/.test(file));
 
 /**
- * The v6 edition class families still in the tree, with the element count each renders on its
- * busiest live surface, measured 2026-09-13 on the dev server.
+ * The v6 edition class families still present in source.
  *
  * A RATCHET, NOT AN ALLOWLIST, and it fails in both directions: a family here that no longer
- * appears is a stale exemption to delete, a family in the tree that is not here is the v6
- * vocabulary spreading again. Every entry is tracked by repo-ps0rm, which also has to decide the
- * question this test deliberately does not: whether these are v6 markup to rebuild onto the room
- * kit, or only v6 names on markup that already looks right.
+ * appears is a stale exemption to delete, and a family in the tree that is not here means the v6
+ * vocabulary is spreading again. This test deliberately does not decide whether the remaining
+ * entries need a room-kit rebuild or only a class rename.
  *
- * `history` is the clearest case for deletion — /history was dissolved in repo-92n2.27 and the
- * route does not exist.
+ * `history` remains in the ratchet while its class family is present in source, even though no
+ * `/history` page renders.
  */
 const V6_EDITION_FAMILIES: readonly string[] = [
   'ds-books-edition',
@@ -79,7 +70,7 @@ describe('surface parity · the v6 edition vocabulary only shrinks', () => {
     assert.deepEqual(
       found,
       [...V6_EDITION_FAMILIES].sort(),
-      'v6 edition class families changed — shrink the list when one goes (repo-ps0rm), never grow it',
+      'v6 edition class families changed: shrink the list when one goes; never grow it',
     );
   });
 
@@ -95,7 +86,7 @@ describe('surface parity · the v6 edition vocabulary only shrinks', () => {
     assert.deepEqual(
       offenders,
       ['components/patterns/utility-edition/utility-edition.css'],
-      'a per-route stylesheet or panel-chrome module appeared outside app/ (repo-ps0rm)',
+      'a per-route stylesheet or panel-chrome module appeared outside app/',
     );
   });
 });
@@ -103,16 +94,9 @@ describe('surface parity · the v6 edition vocabulary only shrinks', () => {
 describe('surface parity · the page body is rendered once', () => {
   it('ShellPageTransition does not pass children into both the fallback and the boundary', () => {
     /*
-     * repo-bko39. The component hands `{children}` to the Suspense fallback AND to the boundary
-     * content, so React streams the whole page twice and every shipped document carries two
-     * <main> landmarks, two h1s and a duplicate of every id. Measured in the production build:
-     * about.html, data.html, support.html and corrections.html each contain id="main" twice, and
-     * the duplicate is ~25% of the document.
-     *
-     * It is invisible — the retained fallback frame measured 0x0 — which is why it survived every
-     * functional check and why it needs a test rather than an eye. Fixed by deleting the boundary,
-     * whose two branches were the same function: useSurfaceClass() reads usePathname() only, so
-     * nothing there ever suspended.
+     * Passing `{children}` to both a Suspense fallback and the boundary content streams the page
+     * twice, producing duplicate landmarks, headings, and ids. Page-root Suspense is prohibited;
+     * any component that can suspend must own its boundary locally.
      */
     const raw = readFileSync(path.join(SRC_DIR, 'components/ShellPageTransition.tsx'), 'utf8');
     // Strip comments first: the file's own doc comment quotes the defective JSX on purpose, so
@@ -126,14 +110,49 @@ describe('surface parity · the page body is rendered once', () => {
     assert.doesNotMatch(
       source,
       /<Suspense/,
-      'a Suspense boundary at the page root ships the body twice (repo-bko39)',
+      'a Suspense boundary at the page root ships the body twice',
     );
     // Exactly one element may carry the frame class. Two render sites is what a fallback plus a
     // boundary produced, and it is the shape to watch for however it is reintroduced.
     assert.equal(
       (source.match(/className="ds-shell-page-transition"/g) ?? []).length,
       1,
-      'the page frame must be rendered from exactly one place (repo-bko39)',
+      'the page frame must be rendered from exactly one place',
     );
+  });
+});
+
+describe('surface parity · three entry postures only', () => {
+  it('does not invent a fourth page-header posture beyond Field, Record and Reading', () => {
+    const allowed = new Set([
+      'ReadingEntry',
+      'DocumentColophon',
+      'OrientationInstrument',
+      'EntryPosture',
+      'SiteShellHeader', // site chrome, not a room entry posture
+    ]);
+    const offenders: string[] = [];
+    for (const file of SOURCES) {
+      if (!/\.(tsx|ts)$/.test(file)) continue;
+      const text = readFileSync(file, 'utf8');
+      for (const match of text.matchAll(
+        /\b(?:export\s+function|function)\s+([A-Z][A-Za-z0-9]*(?:Entry|Header|Masthead|Posture))\b/g,
+      )) {
+        const name = match[1]!;
+        if (allowed.has(name)) continue;
+        if (name === 'UtilityEditionIntro') continue;
+        offenders.push(`${path.relative(SRC_DIR, file)}:${name}`);
+      }
+    }
+    assert.deepEqual(
+      offenders,
+      [],
+      `fourth entry posture invented: ${offenders.join(', ') || '(none)'}`,
+    );
+  });
+
+  it('EntryPosture module declares the three legal postures', () => {
+    const source = readFileSync(path.join(SRC_DIR, 'components/room/EntryPosture.tsx'), 'utf8');
+    assert.match(source, /export type EntryPosture = 'field' \| 'record' \| 'reading'/);
   });
 });

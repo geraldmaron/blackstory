@@ -1,0 +1,109 @@
+{
+  "source": "U.S. Bureau of the Census, U.S. Census of Population: 1960, Vol. I, Characteristics of the Population, Part 6, California, Chapter C, General Social and Economic Characteristics",
+  "sourceUrl": "https://www2.census.gov/library/publications/decennial/1960/population-volume-1/vol-01-06-f.pdf",
+  "table": "Table 53",
+  "page": "6-241",
+  "boundaryVersion": "us-states-1960",
+  "datasetVintage": "1963 printed volume",
+  "figures": [
+    {
+      "metricId": "lives-unemployed",
+      "jurisdictionId": "state:06",
+      "referencePeriod": "1960",
+      "raceEthnicitySlice": "all",
+      "estimate": 6.1,
+      "numerator": 373908,
+      "denominator": 6135341,
+      "universe": "Civilian labor force; persons 14 years old and over; both sexes",
+      "note": "Second pass agrees."
+    },
+    {
+      "metricId": "lives-unemployed",
+      "jurisdictionId": "state:06",
+      "referencePeriod": "1960",
+      "raceEthnicitySlice": "white",
+      "estimate": 5.8,
+      "numerator": 325090,
+      "denominator": 5646116,
+      "universe": "Civilian labor force; WHITE; both sexes",
+      "note": "Unemployed 325090: OCR sometimes read 325060; confirmed Total\u2212Nonwhite residual (373908\u221248818). Second pass agrees."
+    },
+    {
+      "metricId": "lives-unemployed",
+      "jurisdictionId": "state:06",
+      "referencePeriod": "1960",
+      "raceEthnicitySlice": "nonwhite",
+      "estimate": 10.0,
+      "numerator": 48818,
+      "denominator": 489225,
+      "universe": "Civilian labor force; NONWHITE; both sexes",
+      "note": "Second pass agrees."
+    },
+    {
+      "metricId": "lives-unemployed",
+      "jurisdictionId": "state:06",
+      "referencePeriod": "1950",
+      "raceEthnicitySlice": "all",
+      "estimate": 7.9,
+      "numerator": 335425,
+      "denominator": 4237703,
+      "universe": "Civilian labor force; both sexes",
+      "note": "Second pass agrees."
+    },
+    {
+      "metricId": "lives-unemployed",
+      "jurisdictionId": "state:06",
+      "referencePeriod": "1950",
+      "raceEthnicitySlice": "white",
+      "estimate": 7.5,
+      "numerator": 294082,
+      "denominator": 3942149,
+      "universe": "Civilian labor force; WHITE; both sexes",
+      "note": "Second pass agrees."
+    },
+    {
+      "metricId": "lives-unemployed",
+      "jurisdictionId": "state:06",
+      "referencePeriod": "1950",
+      "raceEthnicitySlice": "nonwhite",
+      "estimate": 14.0,
+      "numerator": 41343,
+      "denominator": 295554,
+      "universe": "Civilian labor force; NONWHITE; both sexes",
+      "note": "Second pass agrees."
+    },
+    {
+      "metricId": "lives-unemployed",
+      "jurisdictionId": "state:06",
+      "referencePeriod": "1940",
+      "raceEthnicitySlice": "all",
+      "estimate": 14.6,
+      "numerator": 423146,
+      "denominator": 2898727,
+      "universe": "Civilian labor force; both sexes",
+      "note": "Second pass agrees."
+    },
+    {
+      "metricId": "lives-unemployed",
+      "jurisdictionId": "state:06",
+      "referencePeriod": "1940",
+      "raceEthnicitySlice": "white",
+      "estimate": 14.4,
+      "numerator": 396658,
+      "denominator": 2745821,
+      "universe": "Civilian labor force; WHITE; both sexes",
+      "note": "Second pass agrees."
+    },
+    {
+      "metricId": "lives-unemployed",
+      "jurisdictionId": "state:06",
+      "referencePeriod": "1940",
+      "raceEthnicitySlice": "nonwhite",
+      "estimate": 17.3,
+      "numerator": 26488,
+      "denominator": 152906,
+      "universe": "Civilian labor force; NONWHITE; both sexes",
+      "note": "Second pass agrees."
+    }
+  ]
+}

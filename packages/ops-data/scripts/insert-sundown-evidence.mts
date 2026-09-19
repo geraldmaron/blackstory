@@ -1,16 +1,7 @@
 /**
- * repo-2t04.8.1 — manual capture insert for bb_research.entity_evidence. No automated collector in
- * sweep-entity-evidence.ts targets justice.tougaloo.edu (or the ad hoc corroborating sources this
- * wave used), so these rows are inserted directly from research-workflow output, matching the
- * exact INSERT shape sweep-entity-evidence.ts itself uses (id = ev_${sha1(entityId|collector|url)}
- * so re-runs upsert cleanly on the (entity_id, collector, source_url) unique constraint).
- *
- * Default is dry-run (prints the plan only). Production writes require:
- *   DRY_RUN=0 INSERT_SUNDOWN_EVIDENCE_APPLY=1 DATABASE_URL=postgresql://...
- *
- * Usage:
- *   node --conditions development --import tsx \
- *     packages/ops-data/scripts/insert-sundown-evidence.mts --in=<dir>/evidence-rows.json
+ * Inserts externally acquired sundown-town evidence using the collector's idempotent
+ * entity/collector/URL key. Input: --in=<evidence-rows.json>. Default dry-run; writes require
+ * DRY_RUN=0 and INSERT_SUNDOWN_EVIDENCE_APPLY=1.
  */
 import { readFileSync } from 'node:fs';
 import pg from 'pg';
@@ -63,7 +54,7 @@ try {
   await client.query('BEGIN');
   for (const row of rows) {
     await client.query(
-      `INSERT INTO bb_research.entity_evidence
+      `INSERT INTO research.entity_evidence
          (id, entity_id, lane, collector, source_url, source_tier, title, content_text,
           content_hash, char_count, quality_score, status, provenance, fetched_at)
        VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,'captured',$12, now())

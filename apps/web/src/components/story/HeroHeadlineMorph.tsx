@@ -26,6 +26,11 @@ const STORY_TAIL = storySuffix().slice(1); // "tory"
 const FINAL_INDEX = getHeroHeadlinePhaseIndexById(HERO_HEADLINE_FINAL_PHASE_ID);
 const FINAL_PHASE = getHeroHeadlinePhaseById(HERO_HEADLINE_FINAL_PHASE_ID);
 
+function inlinePaddingWidth(element: HTMLElement): number {
+  const style = window.getComputedStyle(element);
+  return Number.parseFloat(style.paddingLeft) + Number.parseFloat(style.paddingRight);
+}
+
 /** Survives React Strict Mode remount so the morph clock does not restart mid-sequence in dev. */
 let morphSequenceStartedAt: number | null = null;
 
@@ -81,7 +86,11 @@ function MorphingPrefix({
     let raf2 = 0;
     const raf1 = window.requestAnimationFrame(() => {
       raf2 = window.requestAnimationFrame(() => {
-        const toWidth = inRef.current?.scrollWidth ?? fromWidth;
+        const incomingWidth = inRef.current?.getBoundingClientRect().width;
+        const toWidth =
+          incomingWidth !== undefined && rootRef.current
+            ? incomingWidth + inlinePaddingWidth(rootRef.current)
+            : fromWidth;
         setWidthTransition(true);
         setSlotWidthPx(toWidth);
       });

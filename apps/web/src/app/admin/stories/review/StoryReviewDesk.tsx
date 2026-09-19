@@ -2,11 +2,9 @@
  * Story packet review queue — filter, sort, inspect, single + bulk decisions.
  * Auth is enforced by the stories layout gate; APIs re-verify the ID token.
  *
- * The interactive half of /admin/stories/review, split out of the route in repo-gyq6.9. The packet
- * list is read on the server and arrives as `initialRows`; this component no longer fetches it on
- * mount. Everything that stays here needs a browser — the filter and sort query, the selection,
- * the note field, and the single and bulk decision POSTs, which are the genuine mutations the
- * /admin/api routes exist for.
+ * The packet list is read on the server and arrives as `initialRows`; this component does not
+ * fetch it on mount. Browser state covers filtering, sorting, selection, notes, and the single and
+ * bulk decision POSTs.
  */
 'use client';
 

@@ -28,7 +28,7 @@ async function main(): Promise<void> {
   await client.connect();
   try {
     const before = await client.query<{ n: number }>(
-      `SELECT count(*)::int AS n FROM bb_public.release_entities
+      `SELECT count(*)::int AS n FROM published.release_entities
        WHERE projection->>'kind' = 'person' AND projection->>'status' = 'living'`,
     );
     console.log(`living persons before: ${before.rows[0]?.n ?? 0}`);
@@ -38,15 +38,15 @@ async function main(): Promise<void> {
     }
     await client.query('BEGIN');
     const ent = await client.query(
-      `UPDATE bb_public.release_entities
+      `UPDATE published.release_entities
        SET projection = jsonb_set(projection, '{status}', '"unknown"'::jsonb, true)
        WHERE projection->>'kind' = 'person'
          AND projection->>'status' = 'living'`,
     );
     const search = await client.query(
-      `UPDATE bb_public.search_index si
+      `UPDATE published.search_index si
        SET status = 'unknown'
-       FROM bb_public.release_entities re
+       FROM published.release_entities re
        WHERE si.release_id = re.release_id
          AND si.entity_id = re.entity_id
          AND re.projection->>'kind' = 'person'
@@ -57,7 +57,7 @@ async function main(): Promise<void> {
     console.log(`search_index updated: ${search.rowCount}`);
     const after = await client.query<{ status: string; n: number }>(
       `SELECT projection->>'status' AS status, count(*)::int AS n
-       FROM bb_public.release_entities
+       FROM published.release_entities
        WHERE projection->>'kind' = 'person'
        GROUP BY 1 ORDER BY n DESC`,
     );

@@ -39,7 +39,7 @@ content eligible for a separate moderation/publication decision; it never publis
 
 The queue contract includes `fetchDuringSubmissionRequest: false`. Intake code must not accept a
 resolver, transport, or generic HTTP client. Fetched bytes and parser output belong in restricted
-quarantine storage, not canonical Firestore collections, public projections, search indexes, or
+quarantine storage, not canonical tables, public projections, search indexes, or
 model-training corpora.
 
 ## Source-domain policy
@@ -50,7 +50,7 @@ denylist in addition to IP classification. Domain approval never overrides desti
 Internationalized names are evaluated after the runtime parser converts them to canonical ASCII.
 
 Do not allow wildcard exceptions for organization-owned internal zones. At minimum deny metadata
-hostnames and all private/internal DNS suffixes used by BlackStory, Firebase, Google APIs, and
+hostnames and all private/internal DNS suffixes used by the application, database providers, metadata services and
 service discovery.
 
 ## Worker egress boundary
@@ -73,19 +73,19 @@ Denied egress:
 - RFC1918, loopback, link-local, carrier-grade NAT, multicast, reserved, and IPv6 ULA/link-local
   ranges.
 - `169.254.169.254`, `metadata.google.internal`, and every cloud metadata alias.
-- Production Firestore/Firebase data APIs, deferred Cloud SQL, Redis, admin endpoints, internal APIs,
+- Production database APIs, cache services, admin endpoints, internal APIs,
   serverless VPC connector private ranges, and organization service-discovery zones.
 - Arbitrary Google APIs and `*.googleapis.com` unless a later reviewed design introduces a
   dedicated, narrowly scoped result channel.
 
-The runtime service account must have no production database role, no Firebase Admin capability,
+The runtime service account must have no production database role, no privileged object-store capability,
 no Secret Manager accessor role, and no token-creation or service-account impersonation role.
 Application policy and IAM are defense in depth; the network boundary must independently deny these
 destinations.
 
 ## Human GCP deployment steps
 
-These are reviewed human steps; this repository does not apply live GCP or Firebase changes.
+These are reviewed human steps; this repository does not apply live provider changes.
 
 1. Create a dedicated Cloud Run worker service/job and service account for URL evaluation. Do not
    reuse any application, admin, or research identity.
@@ -93,7 +93,7 @@ These are reviewed human steps; this repository does not apply live GCP or Fireb
    controlled NAT/proxy path. Use hierarchical firewall policy or the approved secure-web-proxy
    design to deny internal, metadata, Google API, and production service ranges before permitting
    public TCP 80/443. A plain Cloud NAT gateway alone is not a destination allow/deny control.
-3. Add explicit deny logging and alerts for metadata, private ranges, production Firebase/Firestore,
+3. Add explicit deny logging and alerts for metadata, private ranges, production data services,
    internal API addresses, and unexpected ports. Verify the deny has higher priority than broad
    egress permits.
 4. Restrict ingress to the authenticated queue dispatcher. Grant only queue consumption and the
@@ -103,7 +103,7 @@ These are reviewed human steps; this repository does not apply live GCP or Fireb
    resolver and socket-level IP pinning. Set platform request/task deadlines no higher than the
    application limit.
 6. Deploy to a non-production environment and run controlled canary tests against owned public and
-   private fixtures. Confirm firewall logs show denied attempts to metadata, Firestore/Google APIs,
+   private fixtures. Confirm firewall logs show denied attempts to metadata, database/metadata APIs,
    internal APIs, loopback, private IPv4, ULA IPv6, and link-local IPv6.
 7. Have security review the effective IAM policy, firewall priorities, routes, DNS policy, VPC
    connector, and NAT/proxy configuration before production rollout.

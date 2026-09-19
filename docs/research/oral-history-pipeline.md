@@ -59,7 +59,7 @@ Tests inject a deterministic inline adapter. A **live** adapter MUST use `@repo/
 
 ## Invariants
 
-- **No publish path.** Research workers cannot publish (`docs/decisions-carryover.md`, "Research and discovery cannot publish"). No writes to public projections, release tables, or `bb_public` / `bb_canonical`. `assertCampaignCannotPublish()` / `assertDiscoveryCannotPublish` guard the boundary (covered by tests).
+- **No publish path.** Research workers cannot publish (`docs/decisions-carryover.md`, "Research and discovery cannot publish"). No writes to public projections, release tables, or `published` / `canonical`. `assertCampaignCannotPublish()` / `assertDiscoveryCannotPublish` guard the boundary (covered by tests).
 - **Safe-fetch only.** Live harvesting uses `@repo/security` safe-fetch; this module is fixture-first and performs no network I/O itself.
 - **Evidence before assertion.** Mentions are leads; kernel fitness is strong only for lived-experience claims, and identity/chronology/coordination require review before any claim is asserted. Obscurity is a relative heuristic — never importance/truth, never a publication authorization.
 - **No migrations needed.** This methodology is domain-layer only (reserved prefix `20260724000006` unused).

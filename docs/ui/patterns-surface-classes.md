@@ -12,12 +12,12 @@ That attribute is the single switch every shell rule, plate posture, keyboard sc
 
 | Class | `data-surface` | Routes | Map | Document scrolls | Single-key bindings |
 |---|---|---|---|---|---|
-| Instrument | `instrument` | 4 | Live, full viewport | No | Yes, while focus is in `main` |
-| Door | `door` | 1 (`/`) | Ambient, full viewport: the Instrument's plate and markers, gestures locked, camera driven by the scroll chapters | Yes | Chorded only |
-| Reading room | `reading` | 11 | Parked, one Framed slot at a time | Yes | Chorded only |
-| Record page | `record` | 4 | Framed | Yes | Chorded only |
-| Utility | `utility` | 9 | Parked and hidden | Yes | Chorded only |
-| Endpoint | none | 19 | None | Not applicable | None |
+| Door | `door` | `/` journey + `/explore` browse | Ambient on journey; Live while browse-armed (`setDoorBrowseLive`) | Journey yes; browse locks scroll | Chorded on journey; instrument keys while atlas mounted |
+| Instrument | `instrument` | *(none emitted — legacy CSS / posture helpers)* | Live, full viewport | No | Yes, while focus is in `main` |
+| Reading room | `reading` | catalog and editorial rooms | Parked, one Framed slot at a time | Yes | Chorded only |
+| Record page | `record` | place / law / books detail | Framed | Yes | Chorded only |
+| Utility | `utility` | task surfaces | Parked and hidden | Yes | Chorded only |
+| Endpoint | none | APIs, feeds, crawler files | None | Not applicable | None |
 
 47 routes, which is the whole public surface. If a new route does not fit a class, the class list is wrong, not the route.
 
@@ -27,22 +27,28 @@ That attribute is the single switch every shell rule, plate posture, keyboard sc
 
 Verdicts and URL dispositions are in [`design-direction-v9-surfaces.md`](./design-direction-v9-surfaces.md) section 4. This is the class membership only.
 
-### Instrument (4)
+### Door (`/` + `/explore`)
 
 | Route | Note |
 |---|---|
-| `/` | Front door: the Explore map of the archive. A leftover `?atlas=1` is not a second door. |
-| `/story` | New. Six chapters at `/story#chapter-{id}` inside one document. |
-| `/explore` | Explore instrument (catalog + map). Not a query on `/`. |
-| `/locate` | 308 to `/?find=place`. Folds into the Lens Where group and a narrow place sheet. |
+| `/` | Journey: scroll chapters over the shared map plate. Browse morphs in place. |
+| `/explore` | Same Door already armed (filters / rail). Deep link, share, locate. Not a second cockpit. |
 
-Pattern: [`patterns-atlas-instrument.md`](./patterns-atlas-instrument.md). Design law: [`design-direction-v9-atlas.md`](./design-direction-v9-atlas.md).
+Browse instruments still use atlas patterns: [`patterns-atlas-instrument.md`](./patterns-atlas-instrument.md).
 
-### Reading room (11)
+### Instrument (legacy class; no live routes)
+
+Kept in `SurfaceClass` for plate-posture helpers and shell CSS. Do not classify new routes here.
 
 | Route | Note |
 |---|---|
-| `/records` | New. The archive's crawlable non-spatial index. |
+| — | Formerly `/explore`. Folded into Door browse. |
+
+### Reading room
+
+| Route | Note |
+|---|---|
+| `/records` | The archive's crawlable non-spatial index. |
 | `/history` | Thin server route that maps decade to era and redirects to `/records`, always. Can never be deleted: cached permanent redirects point at it. |
 | `/chapters` | The publication index. |
 | `/chapters/[slug]` | Chapter detail. Keeps `generateStaticParams`. |

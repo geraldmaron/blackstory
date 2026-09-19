@@ -116,9 +116,9 @@ to merge). This is enforced server-side, not just a convention.
 - If you're unsure whether a change belongs on `staging` alone or should also go to `main`,
   default to `staging` and ask.
 
-## Republishing the CDN catalog after a bb_public write
+## Republishing the CDN catalog after a published write
 
-A direct write to `bb_public.release_entities` / `bb_public.search_index` leaves the published
+A direct write to `published.release_entities` / `published.search_index` leaves the published
 `entities.json` / `search-index.json` stale — the read-side guard only compares `releaseId`, which
 an in-place correction does not change. Rebuild the graph, then republish **locally**:
 
@@ -128,19 +128,19 @@ cd apps/web && set -a && . ./.env.local && set +a && node --conditions developme
 
 **Then stop. Do not run `gh workflow run publish-release-catalog-artifacts.yml` afterwards.** The
 workflow runs that same script against the same watermark
-(`bb_public.release_catalog_publish_watermark`), so once the local run has consumed it the
+(`published.release_catalog_publish_watermark`), so once the local run has consumed it the
 dispatch reports `up to date — skipping`: CI minutes spent to reach a no-op. On 2026-09-12 there
 were eight such dispatches in one day, several of them no-ops.
 
 The workflow is the right entry point only when there is no local environment to run it from. Its
-daily cron is forgetting-insurance, a ~24h worst-case bound, not the freshness mechanism.
+daily cron is off as of 2026-09-16; a forgotten mutation no longer self-heals.
 
 ## BlackStory research skills
 
 Research playbooks live in `.claude/skills/blackstory/`. CLI pointers load a verb from
 `docs/research/research-operations.md`. Judgment playbooks (`entity-verify`,
 `claim-corroborate`, `entity-complete`, `entity-relate`, `coverage-target`, `publish-preview`,
-`neo-voice`, `prose-review`, `ringer-review`, `surface-triage`) have unique content. See `AGENTS.md` for the
+`neo-voice`, `prose-review`, `ringer-review`, `surface-triage`, `intake-review`) have unique content. See `AGENTS.md` for the
 lane index.
 
 ## Web local QA (agents)
@@ -159,7 +159,7 @@ dev lock per *directory*, not per port: a second `next dev` on `apps/web` binds 
 prints "Ready", and is then killed by the first instance's lock. The port was never the conflict.
 
 The server is Postgres-backed (`dev-web.sh` loads `apps/web/.env.local` and sets
-`PUBLIC_DATA_SOURCE=postgres`), so a preview reflects live `bb_public` data, not seed.
+`PUBLIC_DATA_SOURCE=postgres`), so a preview reflects live `published` data, not seed.
 
 **A running server does not see a record you RENAME under it.** Entity routes resolve through
 `record-first-paint.tsx`'s slug path, which reads process-cached shared sources, so after an

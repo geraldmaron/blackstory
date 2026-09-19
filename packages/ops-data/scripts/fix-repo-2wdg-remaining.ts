@@ -1,86 +1,9 @@
 /**
- * repo-2wdg items 7, 8 and 9 — the corrections left after the six duplicate merges.
- *
- * Item 8, the typo. The DC HPO "African American Heritage Trail" source spells its own
- * `Resource` field "Engine Compnay No. 4" while spelling it "Engine Company No. 4" twice in the
- * `Details` field of the same feature. We publish the correct name. That is a deliberate
- * divergence from the upstream name field, so re-running the dc-sites lane will reintroduce the
- * typo unless a per-item override is added — filed as a follow-up, not fixed here. The name lives
- * in nine places (measured with a full-row `to_jsonb(t)::text ILIKE '%compnay%'` sweep over 47
- * base tables, which found exactly these and nothing else); all nine move in one transaction.
- * `search_index.facets` is deliberately NOT among them: this row's facets object carries no
- * `displayName`/`nameLower`, `isFullSearchIndexDoc` is false for it, so the reader takes the
- * `name` column — and `upsertSearchIndex` writes `facets = EXCLUDED.facets`, a whole-object
- * replace, so hand-added keys would be deleted on the next incremental publish anyway.
- *
- * The public address changes with the name: /place/engine-compnay-no-4 becomes
- * /place/engine-company-no-4, because `publicPlaceSlug` runs over the published display name.
- * A running dev server does not see a record renamed under it — the record's own page returns
- * "Place not found" until the server restarts, with every layer correct (repo-iejg8, now in
- * CLAUDE.md). Verify a rename in the database, not in the browser.
- *
- * Item 7, two bad pins. Both are corrected to a coordinate the repo already holds, from the
- * absorbed/pending landscape row for the same resource, and both are corroborated three ways:
- *
- *  - Frederick Douglass NHS (nrhp-black-heritage-66000033) sat at 38.904247,-77.016517, which
- *    reverse-geocodes to an apartment building at 415 L Street NW in Mount Vernon Square, 5.6 km
- *    from Cedar Hill. It moves to the DC HPO AAHT point for the same site (UniqueID p32,
- *    1411 W Street SE), which OSM reverse-geocodes as "Frederick Douglass National Historic
- *    Site" and which the Census geocode of 1411 W St SE corroborates to ~90 m. NPS's own
- *    nrhp_locations layer has no feature for this refnum. Precision goes `county` -> `site`.
- *
- *  - William Syphax School (nrhp-black-heritage-03000672) kept the NPS ArcGIS point through the
- *    repo-k552 merge. NPS's own metadata marks that point BND_TYPE "Arbitrary point",
- *    MAP_METHOD "Derived by XY event point or centroid generation", while claiming ±12 m. The
- *    nomination itself settles it: its verbal boundary description reads "1360 Half Street,
- *    S. W., facing west mid-block between N and O Streets ... lot 822 in Square 653", and DC
- *    Square 0653 spans lng -77.0105..-77.0093, lat 38.8731..38.8745. The stored point
- *    (38.875879,-77.008252) is outside that square and reverse-geocodes to Van Street SE in
- *    Navy Yard; the absorbed record's point (38.873835,-77.010372 — DC HPO AAHT c18) is inside
- *    it, on Half Street SW, and the Census geocode of 1360 Half St SW agrees to ~28 m. The
- *    nomination's own UTM (Zone 18 / 325760 / 4304700) is not usable against it: rounded to the
- *    nearest 100 m northing, it lands in SE on either datum reading and contradicts the prose
- *    on the same page. So the match method also stops claiming NPS provenance and becomes
- *    `manual_research`; the street stays "1360 Half St., SW".
- *
- * Item 7, one bad label. Contrabands and Freedmen Cemetery is pinned correctly in Alexandria
- * (343 m from 1001 S Washington St, 44 m from the OSM memorial node) and labeled "District of
- * Columbia". `bb_canonical.entities.kind_detail.jurisdiction.label` already says "Alexandria,
- * Virginia"; the release projection and the search facet are what disagree. The pin is not
- * touched.
- *
- * Item 7, one bad summary. The Washington Afro-American Newspaper Office Building's public
- * summary was lifted wholesale from its Maryland State Archives citation and is about the
- * BALTIMORE paper: it names neither this building, nor 14th Street, nor Washington. Canonical
- * already holds the correct sentence, so this publishes that rather than writing new prose. The
- * same string is the record's `record_index` claim object, so this is a claim edit, not a
- * cosmetic one, and all five mirrors move together.
- *
- * Item 9, an uncited death date. Ellen Eglin's summary asserted "(died c. 1915)" and her
- * `living_status_derived` recorded `deathYear: 1915` with an EMPTY `basisClaimIds` and a basis
- * that cites the very prose it produced. Neither of the record's two cited sources supports it:
- * BlackPast titles her "Ellen Eglin (1849–?)", and Wikipedia — the other citation — leads with
- * "(before 1849 – after 1890)" and states outright that "Little is known about the later stages
- * of Eglin's life, including the place or date of her death." The 1915 in Wikipedia's infobox
- * carries no reference. So the clause goes, and the status becomes the answer the repo already
- * computes for a person born 1849 with no death year: `deriveLivingStatus` returns
- * `presumed_deceased` (WP:BDP, MAX_PLAUSIBLE_HUMAN_AGE_YEARS = 115). She is the first of 483
- * live person records to carry it.
- *
- * REQUIRES the widened `livingStatus` enum in packages/schemas/src/public-projections.ts. The
- * release-side half of item 9 is deliberately NOT written here — run the existing
- * `sync-canonical-living-to-release.ts --ids=ent_ellen_eglin_001` after this, which is the
- * script that already knows to write BOTH the `search_index.status` column and `facets.status`.
- *
- * Usage (from repo root):
- *   set -a && source apps/web/.env.local && set +a
- *   export DATABASE_SSL=1
- *   node --conditions development --import tsx \
- *     packages/ops-data/scripts/fix-repo-2wdg-remaining.ts
- *
- * Apply:
- *   DRY_RUN=0 FIX_REPO_2WDG_APPLY=1 node --conditions development --import tsx \
- *     packages/ops-data/scripts/fix-repo-2wdg-remaining.ts
+ * Targeted repairs for sourced DC record names, locations and descriptions, plus removal of an
+ * unsupported Ellen Eglin death date. Preserve source distinctions and update all public
+ * representations together. Canonical living-status changes require
+ * sync-canonical-living-to-release.ts. Inspect the dry-run before using DRY_RUN=0 and
+ * FIX_REPO_2WDG_APPLY=1; verify both database rows and the refreshed public surface.
  */
 import pg from 'pg';
 import { encodeGeohash, geohashPrefixes } from '@repo/domain/geography/geohash';
@@ -173,7 +96,7 @@ async function reportBefore(client: pg.Client, releaseId: string): Promise<void>
             re.location ->> 'matchMethod' AS match_method,
             re.projection ->> 'jurisdictionLabel' AS jurisdiction_label,
             left(re.summary, 90) AS summary_head
-     FROM bb_public.release_entities re
+     FROM published.release_entities re
      WHERE re.release_id = $1 AND re.entity_id = ANY($2::text[])
      ORDER BY re.entity_id`,
     [releaseId, [ENGINE_ID, DOUGLASS_ID, SYPHAX_ID, CEMETERY_ID, AFRO_ID, EGLIN_ID]],
@@ -182,7 +105,7 @@ async function reportBefore(client: pg.Client, releaseId: string): Promise<void>
   for (const row of rows) console.log(`  ${JSON.stringify(row)}`);
 
   const eglin = await client.query<{ living_status: string }>(
-    `SELECT living_status FROM bb_canonical.entities WHERE id = $1`,
+    `SELECT living_status FROM canonical.entities WHERE id = $1`,
     [EGLIN_ID],
   );
   console.log(`  Eglin canonical living_status: ${eglin.rows[0]?.living_status}`);
@@ -196,7 +119,7 @@ async function main(): Promise<void> {
   try {
     const releaseId = (
       await client.query<{ release_id: string }>(
-        `SELECT release_id FROM bb_public.active_release LIMIT 1`,
+        `SELECT release_id FROM published.active_release LIMIT 1`,
       )
     ).rows[0]?.release_id;
     if (!releaseId) throw new Error('no active release');
@@ -206,7 +129,7 @@ async function main(): Promise<void> {
 
     const eglinSummary = (
       await client.query<{ summary: string }>(
-        `SELECT summary FROM bb_public.release_entities WHERE release_id = $1 AND entity_id = $2`,
+        `SELECT summary FROM published.release_entities WHERE release_id = $1 AND entity_id = $2`,
         [releaseId, EGLIN_ID],
       )
     ).rows[0]?.summary;
@@ -246,11 +169,11 @@ async function main(): Promise<void> {
     try {
       // --- item 8: the typo, all nine copies -----------------------------------------
       await client.query(
-        `UPDATE bb_canonical.entities SET display_name = $2, updated_at = now() WHERE id = $1`,
+        `UPDATE canonical.entities SET display_name = $2, updated_at = now() WHERE id = $1`,
         [ENGINE_ID, ENGINE_NEW_NAME],
       );
       await client.query(
-        `UPDATE bb_public.release_entities
+        `UPDATE published.release_entities
          SET projection = jsonb_set(
                jsonb_set(projection, '{displayName}', to_jsonb($3::text), true),
                '{nameLower}', to_jsonb(lower($3::text)), true
@@ -259,20 +182,20 @@ async function main(): Promise<void> {
         [releaseId, ENGINE_ID, ENGINE_NEW_NAME],
       );
       await client.query(
-        `UPDATE bb_public.search_index
+        `UPDATE published.search_index
          SET name = $3, name_lower = lower($3)
          WHERE release_id = $1 AND entity_id = $2`,
         [releaseId, ENGINE_ID, ENGINE_NEW_NAME],
       );
       await client.query(
-        `UPDATE bb_research.landscape_candidates
+        `UPDATE research.landscape_candidates
          SET display_name = $2,
              payload = jsonb_set(payload, '{displayName}', to_jsonb($2::text), true),
              updated_at = now()
          WHERE id = $1`,
         [ENGINE_ID, ENGINE_NEW_NAME],
       );
-      await client.query(`UPDATE bb_research.entity_evidence SET title = $2 WHERE id = $1`, [
+      await client.query(`UPDATE research.entity_evidence SET title = $2 WHERE id = $1`, [
         ENGINE_EVIDENCE_ID,
         ENGINE_NEW_NAME,
       ]);
@@ -290,7 +213,7 @@ async function main(): Promise<void> {
         // "same object, not a second copy that drifts" this used to need two statements for is
         // now structural.
         await client.query(
-          `UPDATE bb_public.release_entities
+          `UPDATE published.release_entities
            SET projection = jsonb_set(
                  projection, '{location}',
                  COALESCE(projection -> 'location', '{}'::jsonb) || $3::jsonb
@@ -304,13 +227,13 @@ async function main(): Promise<void> {
           [releaseId, pin.entityId, locationJson, pin.precision ?? null, pin.matchMethod ?? null],
         );
         await client.query(
-          `UPDATE bb_public.search_index SET geohash = $3 WHERE release_id = $1 AND entity_id = $2`,
+          `UPDATE published.search_index SET geohash = $3 WHERE release_id = $1 AND entity_id = $2`,
           [releaseId, pin.entityId, geohash],
         );
         // The canonical mirror the admin console reads. Its geohash length is per-row; keep it.
         const canonicalLength = (
           await client.query<{ len: number }>(
-            `SELECT coalesce(length(geohash), $2) AS len FROM bb_canonical.entity_locations WHERE id = $1`,
+            `SELECT coalesce(length(geohash), $2) AS len FROM canonical.entity_locations WHERE id = $1`,
             [pin.locationId, CATALOG_GEOHASH_LENGTH],
           )
         ).rows[0]?.len;
@@ -319,7 +242,7 @@ async function main(): Promise<void> {
         }
         const canonicalGeohash = encodeGeohash(pin.lat, pin.lng, canonicalLength);
         await client.query(
-          `UPDATE bb_canonical.entity_locations
+          `UPDATE canonical.entity_locations
            SET lat = $2, lng = $3, geohash = $4, geohash_prefixes = $5::text[],
                precision = COALESCE($6, precision),
                match_method = COALESCE($7, match_method),
@@ -339,13 +262,13 @@ async function main(): Promise<void> {
 
       // --- item 7: the cemetery label ------------------------------------------------
       await client.query(
-        `UPDATE bb_public.release_entities
+        `UPDATE published.release_entities
          SET projection = jsonb_set(projection, '{jurisdictionLabel}', to_jsonb($3::text), true)
          WHERE release_id = $1 AND entity_id = $2`,
         [releaseId, CEMETERY_ID, CEMETERY_JURISDICTION],
       );
       await client.query(
-        `UPDATE bb_public.search_index
+        `UPDATE published.search_index
          SET facets = CASE
                WHEN jsonb_typeof(facets) = 'object'
                  THEN jsonb_set(facets, '{jurisdictionState}', to_jsonb($3::text), true)
@@ -356,7 +279,7 @@ async function main(): Promise<void> {
 
       // --- item 7: the Afro-American summary, all five mirrors -----------------------
       await client.query(
-        `UPDATE bb_public.release_entities
+        `UPDATE published.release_entities
          SET projection = jsonb_set(
                jsonb_set(projection, '{summary}', to_jsonb($3::text), true),
                '{claims,0,object}', to_jsonb($3::text), true
@@ -364,20 +287,20 @@ async function main(): Promise<void> {
          WHERE release_id = $1 AND entity_id = $2`,
         [releaseId, AFRO_ID, AFRO_SUMMARY],
       );
-      await client.query(`UPDATE bb_research.landscape_candidates SET summary = $2 WHERE id = $1`, [
+      await client.query(`UPDATE research.landscape_candidates SET summary = $2 WHERE id = $1`, [
         AFRO_ID,
         AFRO_SUMMARY,
       ]);
 
       // --- item 9: Ellen Eglin -------------------------------------------------------
       await client.query(
-        `UPDATE bb_public.release_entities
+        `UPDATE published.release_entities
          SET projection = jsonb_set(projection, '{summary}', to_jsonb($3::text), true)
          WHERE release_id = $1 AND entity_id = $2`,
         [releaseId, EGLIN_ID, eglinFixed],
       );
       await client.query(
-        `UPDATE bb_canonical.entities
+        `UPDATE canonical.entities
          SET kind_detail = jsonb_set(kind_detail, '{editorial,summary}', to_jsonb($2::text), true),
              living_status = $3,
              living_status_derived = $4::jsonb,

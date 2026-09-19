@@ -66,6 +66,11 @@
   background: var(--ds-canvas);
 }
 
+.ds-lens__hide:focus-visible {
+  outline: 2px solid var(--ds-accent-graphic);
+  outline-offset: 2px;
+}
+
 /* ---- body ---------------------------------------------------------------- */
 
 .ds-lens__body {
@@ -442,9 +447,11 @@
     top: auto;
     left: var(--ds-space-2);
     right: var(--ds-space-2);
-    bottom: calc(var(--ds-space-2) + 66px);
+    bottom: var(--ds-atlas-dock-clearance);
     width: auto;
-    max-height: min(46dvh, 360px);
+    /* Peek: the map stays the majority of the viewport and remains hittable above the sheet. */
+    max-height: var(--ds-atlas-sheet-peek);
+    border-radius: var(--ds-radius-md) var(--ds-radius-md) 0 0;
   }
 }
 

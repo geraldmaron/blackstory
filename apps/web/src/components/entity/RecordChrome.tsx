@@ -314,8 +314,11 @@ export function RecordFactTile({
 
 export type RecordBeatHeadProps = {
   readonly id: string;
-  /** Running index in the column, `01`, `02`... */
-  readonly index: string;
+  /**
+   * Optional running index (`01`, `02`…). Retired on place first-paint: evidence and section
+   * titles carry the hierarchy now, and numbered chrome competed with them.
+   */
+  readonly index?: string;
   readonly icon: RecordSectionIconKey;
   readonly title: ReactNode;
   readonly count?: number;
@@ -325,9 +328,11 @@ export type RecordBeatHeadProps = {
 export function RecordBeatHead({ id, index, icon, title, count, standfirst }: RecordBeatHeadProps) {
   return (
     <header className="ds-rec-beat-head">
-      <span className="ds-rec-beat-head__index" aria-hidden="true">
-        {index}
-      </span>
+      {index ? (
+        <span className="ds-rec-beat-head__index" aria-hidden="true">
+          {index}
+        </span>
+      ) : null}
       <span className="ds-rec-beat-head__plate" aria-hidden="true">
         <FontAwesomeIcon icon={recordSectionIcon(icon)} className="ds-rec-beat-head__icon" />
       </span>

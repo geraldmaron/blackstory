@@ -7,6 +7,7 @@ import Link from 'next/link';
 import React from 'react';
 import { PRODUCT_NAME } from '@repo/config';
 import { footerColumns, policyLinks } from '../lib/nav/destination-registry';
+import { DestinationIcon } from './patterns/DestinationIcon';
 import { MakerCredit } from './MakerCredit';
 
 void React;
@@ -41,6 +42,7 @@ export function SiteFooter() {
                       {/* Footer nav mounts on every route; skip the default viewport prefetch
                           so it doesn't compete with whatever the current page actually needs. */}
                       <Link href={item.href} prefetch={false}>
+                        <DestinationIcon id={item.icon} />
                         {item.label}
                       </Link>
                     </li>

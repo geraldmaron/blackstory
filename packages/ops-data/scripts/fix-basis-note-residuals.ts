@@ -1,68 +1,8 @@
 /**
- * repo-lod22 — the two basis-note residuals left after repo-15slz fixed the composer.
- *
- * PASS 1 gives a subject back to the `source states` claims whose object is a subjectless
- * fragment, so their notability-basis note stops reading as one.
- *
- * PASS 2 refreshes the handful of stored notes that still carry a predicate lead the builder now
- * drops ("First to In 1949, when the U.S. mission in Liberia..."). These are NOT a composer bug:
- * the builder already spells them correctly. They are stale stored copies that
- * `resync-notability-basis.ts` reports as "already correct" and declines to touch, because its S2
- * step matches a published record to a recomputed one on an EXACT evidenceIds set, and these rows
- * were published when the builder grouped that predicate's claims differently. Matching on
- * evidence OVERLAP instead finds them. That gap is the resync's to close for the whole catalog
- * (repo-4qlmt); this script only applies the same S2 test, unchanged, to two named records.
- *
- * THE DEFECT. `buildNotabilityBasisNote` joins a predicate lead to the claim object. For the
- * `source states` predicate that yields "Source states <object>", which is correct English when
- * the object carries its own subject ("Source states Alonzo Herndon, who was born into slavery in
- * 1858...") and broken when it does not:
- *
- *   "Source states was the only hospital serving West Palm Beach's African American community."
- *
- * repo-15slz already fixed the composer's general rule; this is not that bug wearing the same
- * clothes. No composition rule can make a sentence out of "was the only hospital" — keeping the
- * prefix gives the line above, dropping it gives something worse. The object needs a subject, so
- * this is a data repair on the claim, which is what the bead ruled.
- *
- * WHY THE NOTE IS WRITTEN TOO, rather than left to the resync. `resolveNotabilityBasisForRow`
- * refuses to overwrite a stored note unless `notesAreSameSentence` holds. Inserting a subject
- * makes the builder's note a DIFFERENT sentence from the stored one, so the resync would
- * (correctly) decline and the repaired claim would sit behind a stale note. The note here is not
- * hand-composed either: this script calls `buildReleaseNotabilityBasis` on the repaired claims and
- * takes its spelling, so it cannot drift from the builder.
- *
- * THE SUBJECT IS NOT MECHANICALLY `displayName`. It is whatever the source is talking about. Two
- * cases that a sweep would have got wrong:
- *   - Evans, Dr. Matilda A., House — "was the first African-American woman licensed to practice
- *     medicine in South Carolina" is Dr. Evans, not her house. A house cannot be licensed.
- *   - Community Hospital — the object opens "founded in 1927, is historically significant...", so
- *     the subject needs a comma after it (`mode: 'comma'`), not a bare join.
- *
- * TWO OF THE EIGHTEEN ARE DELIBERATELY NOT HERE. Their subject is not recoverable from the record:
- *   - nrhp-black-heritage-02001290 "helped to secure funds for the purchase of land..." — the
- *     subject is whoever raised the money, not the school later built on that land.
- *   - nrhp-black-heritage-95000855 "led from the Natchez slave markets at the Forks of the Road
- *     to Zion Chapel African Methodist Episcopal Church Episcopal Church..." — the subject is a
- *     route, not the historic district, and the object also carries a duplicated phrase.
- * Both need their nomination read. Guessing a subject onto a cited claim would publish a
- * fabrication, which is worse than the fragment. They stay open on repo-lod22.
- *
- * The repaired text is DERIVED from the live object rather than transcribed into this file, so a
- * copy error cannot silently rewrite a published claim. The only hand-written full replacement is
- * the one record whose stored object is itself truncated mid-clause.
- *
- * Writes `projection` only. The eleven derived columns are GENERATED from it (repo-m14ko), so a
- * column write would now be refused by Postgres and is not attempted.
- *
- * Usage (from repo root):
- *   set -a && source apps/web/.env.local && set +a
- *   node --conditions development --import tsx \
- *     packages/ops-data/scripts/fix-basis-note-residuals.ts
- *
- * Apply:
- *   DRY_RUN=0 FIX_BASIS_NOTE_RESIDUALS_APPLY=1 node --conditions development --import tsx \
- *     packages/ops-data/scripts/fix-basis-note-residuals.ts
+ * Targeted repair of subjectless source-states fragments and stale inclusion notes. Reuses the
+ * shared note-resync evidence matching. Does not invent missing factual subjects; unresolved
+ * cases remain for evidence review. Generated release columns must be updated through
+ * projection.
  */
 import { buildReleaseNotabilityBasis } from '@repo/domain';
 import type { ReleaseClaimProjection, ReleaseSourceEntity } from '@repo/domain';
@@ -258,7 +198,7 @@ async function refreshStaleNotes(client: pg.PoolClient): Promise<number> {
             e.projection ->> 'summary'     AS summary,
             COALESCE(e.projection -> 'claims', '[]'::jsonb)          AS claims,
             COALESCE(e.projection -> 'notabilityBasis', '[]'::jsonb) AS basis
-       FROM bb_public.release_entities e, bb_public.v_active_release_id a
+       FROM published.release_entities e, published.v_active_release_id a
       WHERE e.release_id = a.release_id
         AND e.entity_id = ANY($1::text[])`,
     [REFRESH_IDS],
@@ -298,10 +238,10 @@ async function refreshStaleNotes(client: pg.PoolClient): Promise<number> {
     changed += 1;
     if (DRY_RUN || !APPLY) continue;
     await client.query(
-      `UPDATE bb_public.release_entities
+      `UPDATE published.release_entities
           SET projection = jsonb_set(projection, '{notabilityBasis}', $2::jsonb, true)
         WHERE entity_id = $1
-          AND release_id = (SELECT release_id FROM bb_public.v_active_release_id)`,
+          AND release_id = (SELECT release_id FROM published.v_active_release_id)`,
       [row.entity_id, JSON.stringify(nextBasis)],
     );
   }
@@ -323,7 +263,7 @@ async function main(): Promise<void> {
               e.projection ->> 'summary'     AS summary,
               COALESCE(e.projection -> 'claims', '[]'::jsonb)          AS claims,
               COALESCE(e.projection -> 'notabilityBasis', '[]'::jsonb) AS basis
-         FROM bb_public.release_entities e, bb_public.v_active_release_id a
+         FROM published.release_entities e, published.v_active_release_id a
         WHERE e.release_id = a.release_id
           AND e.entity_id = ANY($1::text[])`,
       [REPAIRS.map((repair) => repair.entityId)],
@@ -397,13 +337,13 @@ async function main(): Promise<void> {
 
       if (DRY_RUN || !APPLY) continue;
       await client.query(
-        `UPDATE bb_public.release_entities
+        `UPDATE published.release_entities
             SET projection = jsonb_set(
                   jsonb_set(projection, '{claims}', $2::jsonb, true),
                   '{notabilityBasis}', $3::jsonb, true
                 )
           WHERE entity_id = $1
-            AND release_id = (SELECT release_id FROM bb_public.v_active_release_id)`,
+            AND release_id = (SELECT release_id FROM published.v_active_release_id)`,
         [repair.entityId, JSON.stringify(nextClaims), JSON.stringify(nextBasis)],
       );
     }

@@ -1,21 +1,6 @@
 /**
- * Builds job-run audit events and outbox messages using the exact DomainAuditEvent
- * DomainOutboxMessage shapes (packages/domain/src/audit/index.ts) that
- * @repo/ops-data's commitWithAudit (packages/ops-data/src/firestore/audit-outbox.ts)
- * consumes unmodified.
- *
- * This module deliberately does NOT depend on @repo/ops-data at runtime pulling
- * firebase-admin into the operational-config layer would be architecturally wrong for a package
- * other lightweight surfaces (web, edge) may also import. It only builds plain,
- * framework-independent objects matching commitWithAudit's exact calling convention; the worker
- * or app that actually performs the Firestore write already depends on @repo/ops-data and
- * passes the objects built here straight through. audit.test.ts proves this concretely by
- * importing the real commitWithAudit (as a devDependency-only, test-time import) and calling it
- * with objects built by this module, unmodified.
- *
- * The load-bearing invariant: correlationId === jobRunId on both the audit event and the outbox
- * message. Every automated write a scheduled job makes carries its run id as the
- * correlation id, so it is traceable back to the exact run that made it (.
+ * Builds storage-independent domain audit events and outbox messages.
+ * Both carry the job-run correlation ID and are committed atomically through @repo/data-access.
  */
 import { auditCategoryFor } from '@repo/domain';
 import type {

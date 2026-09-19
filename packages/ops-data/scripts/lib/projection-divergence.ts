@@ -1,38 +1,8 @@
 /**
- * Compares `bb_public.release_entities.projection` against every derived copy of the same facts.
- *
- * Public readers serve the projection jsonb and nothing else — `fetchPublicEntityProjection`,
- * `listPublicEntityProjections` and `fetchPublicEntityProjectionsByIds` in
- * `apps/web/src/lib/public-data/postgres-readers.ts`, and the `apps/api-public` twin, all SELECT
- * `projection`. Every other store of those facts is derived and invisible to a reader:
- *
- *   - the columns on the same `release_entities` row (`summary`, `location`, `lat`, `lng`,
- *     `geohash`, `claims`, `related`, `taxonomy`, `primary_image`, `kind`, `display_name`),
- *     written from the projection by `toReleaseEntityRow` in `lib/incremental-publish.ts`;
- *   - `bb_public.search_index` (`kind`, `status`, `topics`, `facets`), written from the same
- *     build by `toSearchIndexRow`.
- *
- * A write that lands on one store and not the other leaves readers serving the older value while
- * an operator reads the newer one back out of the column and calls the work done. That has
- * happened repeatedly, each time silently, which is why the comparison lives in one module: an
- * audit run and a post-apply check cannot then disagree about what "in sync" means.
- *
- * SCOPE — only facts the projection actually carries. `search_index.recordMaturity`,
- * `evidenceInputs`, `relatedCount`, `claimCount` and `aliases` are computed by the release
- * builder from inputs the projection does not restate, so there is nothing here to compare them
- * against and they are deliberately absent. `facets.summary` is absent for the same reason
- * `toSearchIndexRow` omits it: an index-size decision, not drift.
- *
- * A SECOND KIND OF DRIFT, added for repo-rm2y: a field can agree with every copy of itself and
- * still be stale, because all of them were written from a version of the record that no longer
- * exists. `notabilityBasis`, `notabilityLabels` and `researchCoverage` are DERIVED from the
- * record's own claims, and five scripts rewrite `projection.claims` in place without recomputing
- * any of them — which is how three records ended up publishing an inclusion reason whose evidence
- * pointed at claim ids the record no longer carried. The `builder.*` checks below recompute those
- * three from the projection and report a row the recompute would move, so the audit's existing
- * exit-code-1 contract covers staleness as well as disagreement.
- *
- * READ-ONLY: this module opens no write path.
+ * Compares public projection with generated columns and search copies, then optionally
+ * recomputes derived builder fields from claims. Shared logic supports read-only audits and
+ * publication checks. Only compare fields for which the selected inputs provide an
+ * authoritative value.
  */
 import { isDeepStrictEqual } from 'node:util';
 import { computeReleaseResearchCoverage } from '@repo/domain';
@@ -111,19 +81,8 @@ function trimmedOrNull(value: unknown): string | null {
 }
 
 /**
- * The topics a search row should carry: the display tags when the build produced any, otherwise
- * the topic ids. THE one definition (repo-ttlce).
- *
- * Three writers each spelled this rule differently and two of them got it wrong, which is how
- * 2,141 live rows ended up with real topics in the projection and an empty `search_index.topics`
- * (repo-p1m1y, measured 2026-09-12: 2,137 with ids only, 4 with tags only): `toSearchIndexRow` used `topicTags ?? topicIds`, and `??` falls through only on
- * nullish, so the empty tag list every id-only lane produces won over real ids. The realigner
- * sent to repair them read `topicIds` alone, so it would have written the ids over a record whose
- * build had real display tags. Both now call this.
- *
- * Order is the projection's own — a reader does nothing with topic order, and re-ordering every
- * row would be a write with nothing behind it. `expectedSearchTopics` sorts only so two arrays
- * can be compared as sets.
+ * Selects nonempty display tags, otherwise topic ids, retaining projection order. Comparison
+ * callers sort copies to avoid reporting order-only drift.
  */
 export function searchTopicsFromProjection(projection: {
   readonly topicTags?: unknown;
@@ -453,8 +412,8 @@ const PROJECTION_DIVERGENCE_SQL = `
          si.status AS si_status,
          si.topics AS si_topics,
          si.facets AS si_facets
-    FROM bb_public.release_entities re
-    LEFT JOIN bb_public.search_index si
+    FROM published.release_entities re
+    LEFT JOIN published.search_index si
       ON si.release_id = re.release_id AND si.entity_id = re.entity_id
    WHERE re.release_id = $1
      AND ($2::text[] IS NULL OR re.entity_id = ANY($2::text[]))
@@ -475,7 +434,7 @@ export type ActiveReleaseClient = {
 
 export async function resolveActiveReleaseId(client: ActiveReleaseClient): Promise<string> {
   const result = await client.query<{ release_id: string }>(
-    'SELECT release_id FROM bb_public.v_active_release_id',
+    'SELECT release_id FROM published.v_active_release_id',
   );
   const releaseId = result.rows[0]?.release_id;
   if (releaseId === undefined) throw new Error('no active release');

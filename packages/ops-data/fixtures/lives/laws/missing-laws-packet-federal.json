@@ -1,0 +1,103 @@
+{
+  "version": 1,
+  "source": "docs/research/lives-missing-laws-packet.md",
+  "records": [
+    {
+      "id": "ent_law_national_labor_relations_act_1935",
+      "packetItem": 2,
+      "kind": "law",
+      "displayName": "National Labor Relations Act of 1935",
+      "scope": {
+        "level": "federal",
+        "jurisdictionId": "nation:US",
+        "jurisdictionName": "United States"
+      },
+      "place": {
+        "state": "DC",
+        "lat": 38.8977,
+        "lng": -77.0365,
+        "precision": "city"
+      },
+      "summary": "The National Labor Relations Act of 1935 gave covered private-sector workers a federally protected right to organize, bargain collectively, and strike, and created the National Labor Relations Board to enforce those rights against employers. Protection ran only to people the Act called employees. Agricultural laborers and domestic workers were carved out of that definition, so a farmworker or household worker who organized had no federal remedy if fired for it. That exclusion remains in the statute. The text names no race; the occupations it left uncovered were disproportionately Black in the 1930s South and in urban domestic service.",
+      "historicalContext": "Congress approved the Wagner Act on July 5, 1935 (49 Stat. 449). Section 2(3) defined employee to exclude agricultural laborers and domestic service of any family or person at his home.\n\nThe National Labor Relations Board still publishes the same carve-outs in its current statute text, with later additions for independent contractors, supervisors, and Railway Labor Act employers. Lives shows the Act beside 1930s class and work figures as juxtaposition, not as a proven cause of those shares.",
+      "impactStatement": "Black farm and domestic workers, overrepresented in the excluded occupations, stayed outside federal collective-bargaining protection while industrial workers gained it. The Act is facially race-neutral; the occupational exclusion is the mechanism Lives must keep visible.",
+      "topicIds": ["labor", "civil-rights"],
+      "eraBuckets": ["1930s"],
+      "keywords": ["Wagner Act", "NLRA", "collective bargaining", "agricultural exclusion"],
+      "canonicalSource": {
+        "url": "https://www.govinfo.gov/content/pkg/STATUTE-49/pdf/STATUTE-49-Pg449.pdf",
+        "title": "National Labor Relations Act, 49 Stat. 449 (1935), page images"
+      },
+      "evidence": [
+        {
+          "sourceUrl": "https://www.nlrb.gov/guidance/key-reference-materials/national-labor-relations-act",
+          "title": "National Labor Relations Board, current statute text including §2(3)",
+          "quote": "shall not include any individual employed as an agricultural laborer, or in the domestic service of any family or person at his home",
+          "verbatim": true
+        }
+      ],
+      "applicability": {
+        "id": "lives-us-national-labor-relations-act-1935",
+        "jurisdictionId": "nation:US",
+        "scopeLevel": "federal",
+        "inForceFromEdtf": "1935-07-05",
+        "inForceToEdtf": null,
+        "lifeDomains": ["work"],
+        "textPosture": "facially_neutral",
+        "appliesToSlices": ["all"],
+        "disputed": true,
+        "notes": "Agricultural and domestic exclusion never repealed; disparate effect on Black workers is a dispute to render, not a finding."
+      },
+      "gaps": [
+        "Union density by race and region is not a Lives cell; this record is the statute beside the figures."
+      ]
+    },
+    {
+      "id": "ent_law_fair_labor_standards_act_1938",
+      "packetItem": 3,
+      "kind": "law",
+      "displayName": "Fair Labor Standards Act of 1938",
+      "scope": {
+        "level": "federal",
+        "jurisdictionId": "nation:US",
+        "jurisdictionName": "United States"
+      },
+      "place": {
+        "state": "DC",
+        "lat": 38.8977,
+        "lng": -77.0365,
+        "precision": "city"
+      },
+      "summary": "The Fair Labor Standards Act of 1938 set a federal minimum wage and maximum workweek for workers in interstate commerce and banned oppressive child labor. Section 13(a)(6) exempted employees employed in agriculture. Domestic workers usually fell outside the interstate-commerce coverage test entirely. As passed, the Act covered about one-fifth of the labor force. Agricultural coverage broadened in 1967 and domestic service came under the Act in 1974. The text names no race; the exemptions tracked occupations that were disproportionately Black.",
+      "historicalContext": "Congress approved the Act on June 25, 1938 (52 Stat. 1060). Wage and hour provisions took effect October 24, 1938.\n\nLater amendments brought more agricultural and domestic workers under coverage, but Lives must keep the original carve-outs visible for decades when they still governed.",
+      "impactStatement": "Black agricultural and domestic workers remained outside federal wage and hour floors longer than industrial workers covered from 1938. Facially race-neutral text; occupational exclusions are the mechanism.",
+      "topicIds": ["labor", "civil-rights"],
+      "eraBuckets": ["1930s"],
+      "keywords": ["FLSA", "minimum wage", "agricultural exemption"],
+      "canonicalSource": {
+        "url": "https://www.govinfo.gov/content/pkg/STATUTE-52/pdf/STATUTE-52-Pg1060.pdf",
+        "title": "Fair Labor Standards Act of 1938, 52 Stat. 1060, page images"
+      },
+      "evidence": [
+        {
+          "sourceUrl": "https://www.dol.gov/general/aboutdol/history/flsa1938",
+          "title": "U.S. Department of Labor history of the Fair Labor Standards Act of 1938",
+          "quote": "The Act as passed covered only about one-fifth of the labor force.",
+          "verbatim": false
+        }
+      ],
+      "applicability": {
+        "id": "lives-us-fair-labor-standards-act-1938",
+        "jurisdictionId": "nation:US",
+        "scopeLevel": "federal",
+        "inForceFromEdtf": "1938-10-24",
+        "inForceToEdtf": null,
+        "lifeDomains": ["work", "income_support"],
+        "textPosture": "facially_neutral",
+        "appliesToSlices": ["all"],
+        "disputed": true,
+        "notes": "Domestic coverage effective May 1, 1974; agricultural coverage broadened earlier. Disparate effect remains a dispute."
+      }
+    }
+  ]
+}

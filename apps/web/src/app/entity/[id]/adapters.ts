@@ -152,6 +152,8 @@ export function toEvidenceClaimInputs(
       source: claim.citationSource,
       label: claim.citationLabel,
       ...(claim.citationHref !== undefined ? { href: claim.citationHref } : {}),
+      ...(claim.archivedUrl !== undefined ? { archivedUrl: claim.archivedUrl } : {}),
+      ...(claim.archivedAt !== undefined ? { archivedAt: claim.archivedAt } : {}),
     };
     const dispute =
       claim.disputed === true || claim.disputeNote !== undefined
@@ -161,18 +163,16 @@ export function toEvidenceClaimInputs(
             ...(claim.disputeNote !== undefined ? { disputeNote: claim.disputeNote } : {}),
           }
         : undefined;
-    // Only pass through scored lineage. Do not invent `1` from a citation — that would make
-    // the record rollup sum claims instead of unique sources; EntityEvidencePanel falls back to
-    // distinct citation sources when claim lineage is absent.
+    // A citation alone does not establish source independence.
     const sourceLineage =
-      claim.independentLineageCount !== undefined && claim.independentLineageCount > 0
+      claim.independentLineageCount !== undefined && claim.independentLineageCount >= 0
         ? { independentLineageCount: claim.independentLineageCount }
         : undefined;
     return {
       id: claim.id,
       predicate: claim.predicate,
       object: claim.object,
-      confidenceScore: claim.confidenceScore,
+      ...(claim.confidenceScore !== undefined ? { confidenceScore: claim.confidenceScore } : {}),
       confidenceLevel: claim.confidenceLevel,
       citation,
       ...(dispute !== undefined ? { dispute } : {}),
@@ -214,23 +214,9 @@ export function whyAppearsEvidenceById(
 }
 
 /**
- * Builds the public why-this-appears payload from an entity view, or `undefined` when the
- * domain composer refuses this record.
- *
- * `buildPublicWhyThisAppears` fails closed — it throws when the explanation is too short, when
- * no accepted (non-gate) evidence backs it, when no basis record survives, and when its editorial
- * sweeps catch a passive euphemism or a score-shaped word anywhere in the composed payload. Those
- * are publish-time guards. On a server-rendered record page an uncaught one is not a collapsed
- * block, it is a page that does not render at all: the exact trade `packages/schemas`'
- * `public-projections.ts` documents on `notabilityBasis` and deliberately decided the other way
- * ("showing no inclusion reason is recoverable and visible; showing the page not at all is
- * neither"). It is not hypothetical — the score sweep fires on 15 live records whose own notes
- * read "ranking fourth highest" or "slugging percentage" (counted against `bb_public` on
- * 2026-09-12), and the euphemism sweep on one more.
- *
- * So the refusal is returned rather than thrown, and the caller falls back to the record's rubric
- * labels. Nothing is swallowed silently in the sense that matters: the reader still sees an
- * inclusion reason, just the generic one.
+ * Returns the structured inclusion explanation, or undefined when the domain composer rejects
+ * it. The record page then displays rubric labels, so invalid explanatory copy does not prevent
+ * the entire record from rendering. Publication applies the stricter content gate.
  */
 export function buildWhyThisAppearsForEntity(
   entity: PublicEntityView,

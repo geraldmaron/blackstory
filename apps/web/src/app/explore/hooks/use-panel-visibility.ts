@@ -54,15 +54,16 @@ export function usePanelVisibility() {
    * All four open is the wide default. On a narrow viewport four panels would cover the plate
    * between them, so only Lens (the filters) stays open; Results, Decade and Camera collapse
    * to the dock and the reader brings one in when asked. Landing on Explore with every panel
-   * collapsed read as "just a map, no controls" (repo report, 2026-09-02) — Lens is the one
-   * panel a reader expects the instrument to open on. Server-rendered as the wide layout and
-   * corrected after mount.
+   * collapsed would leave a map with no visible controls. Lens is the instrument that remains
+   * open at every width. Server-rendered as the wide layout and corrected after mount.
    */
   const [panels, setPanels] = useState<PanelVisibility>({
     lens: true,
     results: true,
     decade: true,
-    camera: true,
+    // Camera console stays behind an explicit restore; landing with every copper instrument
+    // open made Explore feel like a second cockpit (plan.md decision 3).
+    camera: false,
   });
   const [narrow, setNarrow] = useState(false);
   const [bothColumns, setBothColumns] = useState(false);
@@ -75,12 +76,13 @@ export function usePanelVisibility() {
       const isNarrow = query.matches;
       setNarrow(isNarrow);
       setBothColumns(wideQuery.matches);
-      setPanels({
+      setPanels((current) => ({
         lens: true,
         results: !isNarrow,
         decade: !isNarrow,
-        camera: !isNarrow,
-      });
+        // Preserve an explicit reader open; otherwise stay closed at rest.
+        camera: isNarrow ? false : current.camera,
+      }));
     };
     sync();
     query.addEventListener('change', sync);

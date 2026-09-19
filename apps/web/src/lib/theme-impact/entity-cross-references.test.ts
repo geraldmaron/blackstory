@@ -1,7 +1,6 @@
 /**
  * Tests for `resolveEntityCrossReferences`: entities as connective tissue between
- * entity pages and theme-impact packets. With the legacy story/theme surfaces retired
- * (repo-dx4n / repo-8dj0), packets bound via `entityBinding.entityId` are the only
+ * entity pages and theme-impact packets. Packets bound via `entityBinding.entityId` are the
  * cross-reference surface. Uses test-only `deps` injection so this suite runs offline.
  * Covers an entity with zero, one, and multiple cross-references, and asserts every
  * resolved href/label pair is a real, non-dead target.

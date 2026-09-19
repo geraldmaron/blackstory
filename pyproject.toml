@@ -35,7 +35,7 @@ dev = [
 ]
 
 [tool.pytest.ini_options]
-testpaths = ["packages/constitution", "workers"]
+testpaths = ["packages/constitution", "packages/research-kernel/python/tests", "workers"]
 pythonpath = [
   "packages/constitution/src",
   "packages/research-kernel/python/src",

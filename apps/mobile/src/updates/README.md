@@ -57,11 +57,11 @@ production `eas update` publish.
 ## MFA custody (threat-model T6 primary control on the free tier)
 
 The EAS organization is root-account-tier custody, same bar as the
-Apple/Google/Firebase root accounts `mobile-identity.md` already requires:
+Apple/Google root accounts `mobile-identity.md` already requires:
 
 - **Phishing-resistant MFA required** on the EAS organization account
   (hardware security key or platform passkey — not SMS/TOTP, matching the
-  "root-account custody" requirement already applied to Apple/Google/Firebase).
+  "root-account custody" requirement already applied to Apple/Google).
 - **A recorded custody owner and a recovery plan**, same as those other root
   accounts — record who holds it and how it is recovered if that person is
   unavailable, before the first production publish.

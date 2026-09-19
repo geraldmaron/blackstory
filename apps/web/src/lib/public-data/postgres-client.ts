@@ -1,5 +1,5 @@
 /**
- * Server-only lazy Postgres pool for public structured-data reads (`bb_public.*`).
+ * Server-only lazy Postgres pool for public structured-data reads (`published.*`).
  * Uses `DATABASE_URL` or `APP_DATABASE_URL`; never accepts `NEXT_PUBLIC_*` credentials.
  *
  * Supabase URLs often include `sslmode=require`. Recent node-pg treats that as verify-full,

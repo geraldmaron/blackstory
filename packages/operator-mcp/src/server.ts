@@ -98,7 +98,7 @@ export function registerIndicatorTools(server: McpServer, reader: IndicatorDbRea
     {
       title: 'Lookup indicator series',
       description:
-        'List or fetch Phase 1 metric definitions from bb_reference.statistical_series (catalog fallback when DB is empty).',
+        'List or fetch Phase 1 metric definitions from reference.statistical_series (catalog fallback when DB is empty).',
       inputSchema: {
         metricId: z.string().optional(),
         theme: z.string().optional(),

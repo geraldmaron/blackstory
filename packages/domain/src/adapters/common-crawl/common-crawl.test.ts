@@ -31,7 +31,6 @@ import {
   createCommonCrawlAdapterContract,
   fetchCommonCrawlCdx,
   fetchCommonCrawlCdxBatch,
-  ingestCommonCrawlCandidatesThroughPipeline,
   normalizeCdxRecord,
   parseCdxResponse,
   stampCommonCrawlQueryProvenance,
@@ -411,58 +410,3 @@ test('fetchCommonCrawlCdx rejects a response whose content type is outside the a
 // ---------------------------------------------------------------------------------------------
 // Pipeline integration: Wayback capture gate -> ingestApiCandidate
 // ---------------------------------------------------------------------------------------------
-
-test('ingestCommonCrawlCandidatesThroughPipeline routes candidates through the Wayback capture gate before  ingestion', async () => {
-  const entry = commonCrawlRegistryEntry();
-  const pack = loadPack();
-  const batch = parseCdxResponse(loadFixtureText('cdx-response.ndjson'));
-  const candidate = normalizeCdxRecord({
-    record: batch.records[0]!,
-    crawlId: 'CC-MAIN-2016-07',
-    geographicLabel: 'Montgomery',
-    queryProvenance: sampleQueryProvenance(),
-    registryEntry: entry,
-    runId: 'run_1',
-    capturedAt: FIXED_NOW,
-  });
-
-  let submitCount = 0;
-  const client = async (request: SafeHttpRequest): Promise<SafeHttpResponse> => {
-    if (request.url === 'https://web.archive.org/save') {
-      submitCount += 1;
-      return {
-        status: 200,
-        headers: { 'content-type': 'application/json' },
-        bodyText: JSON.stringify({ job_id: 'job-1' }),
-        finalUrl: '',
-      };
-    }
-    return {
-      status: 200,
-      headers: { 'content-type': 'application/json' },
-      bodyText: JSON.stringify({
-        status: 'success',
-        timestamp: '20260717140512',
-        original_url: candidate.canonicalUrl,
-      }),
-      finalUrl: '',
-    };
-  };
-
-  const ingested = await ingestCommonCrawlCandidatesThroughPipeline({
-    candidates: [candidate],
-    client,
-    credentials: { accessKey: 'ak', secretKey: 'sk' },
-    pack,
-    now: FIXED_NOW,
-  });
-
-  assert.equal(
-    submitCount,
-    1,
-    'the discovered URL must go through a real Wayback capture before ingestion',
-  );
-  assert.equal(ingested.length, 1);
-  assert.equal(ingested[0]?.ingestMode, 'api');
-  assert.equal(ingested[0]?.adapterRecord.provenance.adapterId, COMMON_CRAWL_ADAPTER_ID);
-});

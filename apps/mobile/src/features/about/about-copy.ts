@@ -82,7 +82,7 @@ export const ABOUT_DESTINATIONS = [
   {
     href: '/law',
     label: 'Law',
-    detail: 'Plain-language entry points to landmark civil-rights statutes and decisions.',
+    detail: 'Statutes and rulings, in plain language, with the official source on each entry.',
     icon: 'law' as const,
   },
   {

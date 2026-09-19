@@ -5,7 +5,7 @@
 import type { Metadata } from 'next';
 import { buildStaticPageMetadata } from '../../lib/seo/metadata-builders';
 import { CorrectionsSections } from './CorrectionsSections';
-import { Room, RoomHeader } from '../../components/room';
+import { Room, ReadingEntry } from '../../components/room';
 import '../utility.css';
 
 export const metadata: Metadata = buildStaticPageMetadata({
@@ -18,12 +18,11 @@ export const metadata: Metadata = buildStaticPageMetadata({
 export default function CorrectionsPage() {
   return (
     <Room>
-      <RoomHeader
+      <ReadingEntry
         pathname="/corrections"
-        kicker="Take part"
         title="Tell the archive it is wrong"
         lede="You get a receipt code and a tracked outcome. A person reads every correction, and nothing you send publishes on arrival."
-        showPath={false}
+        showCrumb={false}
       />
       <CorrectionsSections />
     </Room>

@@ -20,14 +20,14 @@ test('resolvePublicEndpointClass maps read paths to endpoint classes', () => {
   assert.equal(resolvePublicEndpointClass('/v1/corrections', 'POST'), null);
 });
 
-test('public rate limit guard denies anonymous search without App Check', () => {
+test('public rate limit guard denies anonymous search with a declared client header', () => {
   const guard = createPublicRateLimitGuard({ now: () => 1_700_001_000_000 });
   const decision = guard.evaluate({
     method: 'GET',
     path: '/v1/search?q=test',
     subject: 'anonymous',
     clientIp: '203.0.113.50',
-    appCheckVerified: false,
+    clientAttested: false,
   });
 
   assert.ok(decision);
@@ -40,14 +40,14 @@ test('public rate limit guard denies anonymous search without App Check', () => 
   }
 });
 
-test('public rate limit guard allows authenticated entity reads with App Check', () => {
+test('public rate limit guard allows authenticated entity reads with client header', () => {
   const guard = createPublicRateLimitGuard({ now: () => 1_700_001_100_000 });
   const decision = guard.evaluate({
     method: 'GET',
     path: '/v1/entities/person-1',
     subject: 'authenticated',
     userId: 'user-99',
-    appCheckVerified: true,
+    clientAttested: true,
   });
 
   assert.ok(decision);

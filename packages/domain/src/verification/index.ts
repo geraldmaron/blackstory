@@ -1,6 +1,6 @@
 /**
- * Verification/refresh domain surface (the related workstream): policies, cadences, per-subject
- * verification state, due-record selection, and the never-overwrite `CandidateUpdate` model.
+ * Verification policies, cadence defaults, subject state, due-record selection and review-only
+ * update candidates.
  */
 export {
   VOLATILITY_CLASSES,

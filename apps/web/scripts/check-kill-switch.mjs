@@ -1,15 +1,5 @@
 #!/usr/bin/env node
-/**
- * Reads a single row from bb_ops.kill_switches and prints "engaged" or "disengaged" to stdout.
- * Postgres-native replacement for the Firestore `killSwitches/{id}` read the old Firebase
- * Functions scheduler used, since retired along with the rest of functions/ (repo-348e.8;
- * see docs/decisions-carryover.md, "Small recovered decisions": Firebase scheduled
- * Functions). Fails closed (prints "engaged") on any error or missing row, matching the
- * Firestore fail-closed behavior.
- *
- * Usage: node scripts/check-kill-switch.mjs <kill-switch-id>
- * Requires DATABASE_URL (or APP_DATABASE_URL) in the environment.
- */
+/** Reads the configured Postgres kill switch and fails closed when the control plane is unavailable. */
 import pg from 'pg';
 
 const killSwitchId = process.argv[2] ?? 'research-campaigns';
@@ -27,10 +17,9 @@ const pool = new pg.Pool({
 });
 
 try {
-  const result = await pool.query(
-    'SELECT enabled FROM bb_ops.kill_switches WHERE id = $1 LIMIT 1',
-    [killSwitchId],
-  );
+  const result = await pool.query('SELECT enabled FROM ops.kill_switches WHERE id = $1 LIMIT 1', [
+    killSwitchId,
+  ]);
   if (result.rows.length === 0) {
     console.error(`check-kill-switch: no row for id=${killSwitchId}; failing closed`);
     console.log('engaged');

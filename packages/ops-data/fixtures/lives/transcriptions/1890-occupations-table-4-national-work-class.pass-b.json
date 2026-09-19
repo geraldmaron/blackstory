@@ -1,0 +1,101 @@
+{
+  "source": "U.S. Bureau of the Census, Special Census Report on Occupations, Eleventh Census: 1890",
+  "sourceUrl": "https://www2.census.gov/library/publications/decennial/1890/occupations/1890c3-01.pdf",
+  "table": "Table 4",
+  "page": "58-63",
+  "boundaryVersion": "us-nation-1890",
+  "datasetVintage": "1896 printed volume",
+  "figures": [
+    {
+      "metricId": "lives-class-work-lower",
+      "jurisdictionId": "nation:US",
+      "referencePeriod": "1890",
+      "raceEthnicitySlice": "all",
+      "estimate": 58.8,
+      "numerator": 13373913,
+      "denominator": 22735661,
+      "universe": "Persons 10 years old and over engaged in gainful occupations; both sexes; Aggregate",
+      "note": "National Table 4 United States row rendered from published pages 58-63; aggregate class totals for all slice checked against the printed national summary on page 6."
+    },
+    {
+      "metricId": "lives-class-work-middle",
+      "jurisdictionId": "nation:US",
+      "referencePeriod": "1890",
+      "raceEthnicitySlice": "all",
+      "estimate": 37.0,
+      "numerator": 8417415,
+      "denominator": 22735661,
+      "universe": "Persons 10 years old and over engaged in gainful occupations; both sexes; Aggregate"
+    },
+    {
+      "metricId": "lives-class-work-upper",
+      "jurisdictionId": "nation:US",
+      "referencePeriod": "1890",
+      "raceEthnicitySlice": "all",
+      "estimate": 4.2,
+      "numerator": 944333,
+      "denominator": 22735661,
+      "universe": "Persons 10 years old and over engaged in gainful occupations; both sexes; Aggregate"
+    },
+    {
+      "metricId": "lives-class-work-lower",
+      "jurisdictionId": "nation:US",
+      "referencePeriod": "1890",
+      "raceEthnicitySlice": "white",
+      "estimate": 54.2,
+      "numerator": 10557109,
+      "denominator": 19492188,
+      "universe": "Persons 10 years old and over engaged in gainful occupations; both sexes; Total white"
+    },
+    {
+      "metricId": "lives-class-work-middle",
+      "jurisdictionId": "nation:US",
+      "referencePeriod": "1890",
+      "raceEthnicitySlice": "white",
+      "estimate": 41.4,
+      "numerator": 8075893,
+      "denominator": 19492188,
+      "universe": "Persons 10 years old and over engaged in gainful occupations; both sexes; Total white"
+    },
+    {
+      "metricId": "lives-class-work-upper",
+      "jurisdictionId": "nation:US",
+      "referencePeriod": "1890",
+      "raceEthnicitySlice": "white",
+      "estimate": 4.4,
+      "numerator": 859186,
+      "denominator": 19492188,
+      "universe": "Persons 10 years old and over engaged in gainful occupations; both sexes; Total white"
+    },
+    {
+      "metricId": "lives-class-work-lower",
+      "jurisdictionId": "nation:US",
+      "referencePeriod": "1890",
+      "raceEthnicitySlice": "black",
+      "estimate": 86.9,
+      "numerator": 2670513,
+      "denominator": 3073164,
+      "universe": "Persons 10 years old and over engaged in gainful occupations; both sexes; Persons of negro descent"
+    },
+    {
+      "metricId": "lives-class-work-middle",
+      "jurisdictionId": "nation:US",
+      "referencePeriod": "1890",
+      "raceEthnicitySlice": "black",
+      "estimate": 10.4,
+      "numerator": 318687,
+      "denominator": 3073164,
+      "universe": "Persons 10 years old and over engaged in gainful occupations; both sexes; Persons of negro descent"
+    },
+    {
+      "metricId": "lives-class-work-upper",
+      "jurisdictionId": "nation:US",
+      "referencePeriod": "1890",
+      "raceEthnicitySlice": "black",
+      "estimate": 2.7,
+      "numerator": 83964,
+      "denominator": 3073164,
+      "universe": "Persons 10 years old and over engaged in gainful occupations; both sexes; Persons of negro descent"
+    }
+  ]
+}

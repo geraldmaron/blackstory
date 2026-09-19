@@ -1,5 +1,5 @@
 /**
- * Destination registry tests (SP-15, repo-92n2.15 · SP-21, repo-92n2.29).
+ * Destination registry coverage and room-parent tests.
  *
  * The coverage suite is the acceptance criterion "a registry test fails when a public route is
  * absent" and "a registry test fails when a public reading room, record class or utility route
@@ -16,6 +16,7 @@ import {
   browsableDestinations,
   cardTitleFor,
   classLabelFor,
+  destinationById,
   destinationFor,
   destinationsInGroup,
   footerColumns,
@@ -82,10 +83,12 @@ describe('destination registry · coverage', () => {
       '/books',
       '/law',
       '/data',
+      '/lives',
       '/memorial',
       '/about',
       '/faq',
       '/methodology',
+      '/sources',
       '/errata',
       '/submit',
       '/corrections',
@@ -175,11 +178,11 @@ describe('destination registry · the footer is derived, not authored', () => {
     // what made Records read as a supporting page.
     assert.deepEqual(
       destinationsInGroup('read').map((destination) => destination.path),
-      ['/law', '/data', '/books', '/memorial'],
+      ['/law', '/data', '/lives', '/books', '/memorial'],
     );
     assert.deepEqual(
       destinationsInGroup('check').map((destination) => destination.path),
-      ['/about', '/faq', '/methodology', '/errata'],
+      ['/about', '/faq', '/methodology', '/sources', '/errata'],
     );
     assert.deepEqual(
       destinationsInGroup('take-part').map((destination) => destination.path),
@@ -200,11 +203,15 @@ describe('destination registry · the footer is derived, not authored', () => {
     const palette = browsableDestinations().map((destination) => destination.path);
     assert.ok(hrefs.includes('/stories'));
     assert.ok(hrefs.includes('/about'));
+    assert.ok(hrefs.includes('/data'));
+    assert.ok(hrefs.includes('/lives'));
+    assert.ok(hrefs.includes('/sources'));
     assert.ok(hrefs.includes('/submit'));
     assert.ok(hrefs.includes('/explore'));
     assert.ok(hrefs.includes('/records'));
     assert.ok(!hrefs.includes('/history'));
     assert.ok(!hrefs.includes('/banned-books'));
+    assert.ok(!hrefs.includes('/how-it-works'));
     assert.ok(!palette.includes('/explore'));
     assert.ok(!palette.includes('/records'));
     assert.ok(!palette.includes('/rooms'));
@@ -219,15 +226,13 @@ describe('destination registry · the footer is derived, not authored', () => {
     assert.equal(home.description, undefined);
     assert.equal(home.menuLine, undefined);
     const explore = destinationFor('/explore');
-    assert.equal(explore?.label, 'Explore');
+    assert.equal(explore?.label, 'Map');
     assert.equal(explore?.description, 'The map.');
   });
 
-  it('ships /books as a reading room, and never lists /banned-books', () => {
-    // `/books` was held off the walk in ab4c1231 while the room was unfinished. It has shipped
-    // since — it is in the shell bar, the sitemap and the Rooms menu — so holding it out of the
-    // room groups only meant two registries disagreed about the same route.
-    assert.equal(destinationFor('/books')?.group, 'read');
+  it('ships banned books as a browsable room without listing /banned-books', () => {
+    assert.equal(destinationFor('/books')?.browsable, true);
+    assert.equal(destinationFor('/books')?.path, '/books');
     const hrefs = footerColumns().flatMap((column) => column.items.map((item) => item.href));
     assert.ok(hrefs.includes('/books'));
     assert.ok(!hrefs.includes('/banned-books'));
@@ -245,5 +250,30 @@ describe('destination registry · the footer is derived, not authored', () => {
         );
       }
     }
+  });
+
+  it('carries the catalog icon on every footer item', () => {
+    for (const column of footerColumns()) {
+      for (const item of column.items) {
+        const destination = destinationFor(item.href);
+        assert.ok(destination, `${item.href} must be a catalog destination`);
+        assert.equal(item.icon, destination.icon);
+      }
+    }
+  });
+});
+
+describe('destination registry · id lookup', () => {
+  it('resolves trust and read rooms by catalog id', () => {
+    assert.equal(destinationById('how-it-works'), undefined);
+    assert.equal(destinationById('about')?.path, '/about');
+    assert.equal(destinationById('methodology')?.icon, 'methodology');
+    assert.equal(destinationById('books')?.label, 'Banned books');
+    assert.equal(destinationById('data')?.browsable, true);
+    assert.equal(destinationById('lives')?.path, '/lives');
+    assert.equal(destinationById('lives')?.family, 'read');
+    assert.equal(destinationById('sources')?.path, '/sources');
+    assert.equal(destinationById('sources')?.family, 'trust');
+    assert.equal(destinationById('nope'), undefined);
   });
 });

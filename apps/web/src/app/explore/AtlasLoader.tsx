@@ -4,9 +4,9 @@
  *
  * The catalog is ~15 MB (see `atlas-catalog.ts`) and must not ride every
  * `/explore` request as RSC. The plate cannot wait for it either: first paint
- * is the pins `AtlasHome` already built from `getSharedPublicEntities`.
- * Instruments fill in when the catalog arrives — from the CDN on a warm path,
- * from the browser cache on a client-side return to `/explore`.
+ * is the Door pin field (or morph-from-home plate), then instruments fill in when
+ * the catalog arrives — from the CDN on a warm path, from the browser cache on a
+ * client-side return to browse.
  *
  * The last catalog is also kept in module memory: navigating away and back within
  * one session re-mounts this component, and a 1 MB re-parse for bytes already in
@@ -57,9 +57,19 @@ export type AtlasLoaderProps = {
   readonly pins: ExploreMapFeatureCollection;
   /** Overridable for tests and previews; defaults to the live route. */
   readonly catalogUrl?: string;
+  /**
+   * Door browse (morph or cold `/explore`): skip the second CommandBar (SiteShell already
+   * has one). Exit back to the journey is owned by DoorImmersive.
+   */
+  readonly embedded?: boolean;
 };
 
-export function AtlasLoader({ shell, pins, catalogUrl = ATLAS_CATALOG_PATH }: AtlasLoaderProps) {
+export function AtlasLoader({
+  shell,
+  pins,
+  catalogUrl = ATLAS_CATALOG_PATH,
+  embedded = false,
+}: AtlasLoaderProps) {
   const firstPaint = useMemo(
     () => firstPaintCatalog(pins, shell.dataSource),
     [pins, shell.dataSource],
@@ -104,7 +114,7 @@ export function AtlasLoader({ shell, pins, catalogUrl = ATLAS_CATALOG_PATH }: At
       <div className="ds-atlas ds-atlas--pending" data-atlas-catalog="error">
         <Notice
           tone="error"
-          title="Explore could not load its records"
+          title="Map browse could not load its records"
           className="ds-atlas__pending"
         >
           <p>The record catalog did not arrive. Check your connection and try again.</p>
@@ -122,5 +132,5 @@ export function AtlasLoader({ shell, pins, catalogUrl = ATLAS_CATALOG_PATH }: At
     );
   }
 
-  return <AtlasExperience initial={assembleExploreViewModel(shell, active)} />;
+  return <AtlasExperience initial={assembleExploreViewModel(shell, active)} embedded={embedded} />;
 }

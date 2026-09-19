@@ -262,7 +262,7 @@ last, and only after measurement.
    verified on the page. `repo-39h6s` (agency inversion) is still open.
 2. **Vocabulary** — `repo-tfqrm`, **done**. Add the four criteria to all four copies that must agree —
    `packages/domain/src/entity-status.ts`, `packages/schemas/src/public-projections.ts`,
-   `packages/ops-data/src/firestore/types.ts`, and `NOTABILITY_CRITERION_LABELS` in
+   `packages/ops-data/src/records/types.ts`, and `NOTABILITY_CRITERION_LABELS` in
    `packages/domain/src/relevance/why-public-basis.ts`. Missing the fourth 404s records; see
    `repo-8x306`.
 3. **Positive matching + M1 + M3** — `repo-teb1z`, **done**. Applied as a MERGE, never a

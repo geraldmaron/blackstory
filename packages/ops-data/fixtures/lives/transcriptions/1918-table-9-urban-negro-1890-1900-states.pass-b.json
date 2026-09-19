@@ -1,0 +1,990 @@
+{
+  "source": "U.S. Bureau of the Census, Negro Population 1790-1915 (1918), Chapter IX Urbanization",
+  "sourceUrl": "https://www.census.gov/library/publications/1918/dec/negro-population-1790-1915.html",
+  "table": "Table 9",
+  "page": "92",
+  "boundaryVersion": "us-states-1910",
+  "datasetVintage": "1918 printed bulletin",
+  "figures": [
+    {
+      "metricId": "lives-urban",
+      "jurisdictionId": "state:23",
+      "referencePeriod": "1900",
+      "raceEthnicitySlice": "black",
+      "estimate": 67,
+      "numerator": 815,
+      "denominator": 1216,
+      "universe": "Negro population"
+    },
+    {
+      "metricId": "lives-urban",
+      "jurisdictionId": "state:23",
+      "referencePeriod": "1890",
+      "raceEthnicitySlice": "black",
+      "estimate": 67.1,
+      "numerator": 792,
+      "denominator": 1180,
+      "universe": "Negro population"
+    },
+    {
+      "metricId": "lives-urban",
+      "jurisdictionId": "state:33",
+      "referencePeriod": "1900",
+      "raceEthnicitySlice": "black",
+      "estimate": 63.3,
+      "numerator": 419,
+      "denominator": 662,
+      "universe": "Negro population"
+    },
+    {
+      "metricId": "lives-urban",
+      "jurisdictionId": "state:33",
+      "referencePeriod": "1890",
+      "raceEthnicitySlice": "black",
+      "estimate": 54.7,
+      "numerator": 300,
+      "denominator": 548,
+      "universe": "Negro population"
+    },
+    {
+      "metricId": "lives-urban",
+      "jurisdictionId": "state:50",
+      "referencePeriod": "1900",
+      "raceEthnicitySlice": "black",
+      "estimate": 53.6,
+      "numerator": 444,
+      "denominator": 828,
+      "universe": "Negro population"
+    },
+    {
+      "metricId": "lives-urban",
+      "jurisdictionId": "state:50",
+      "referencePeriod": "1890",
+      "raceEthnicitySlice": "black",
+      "estimate": 62.8,
+      "numerator": 460,
+      "denominator": 733,
+      "universe": "Negro population"
+    },
+    {
+      "metricId": "lives-urban",
+      "jurisdictionId": "state:25",
+      "referencePeriod": "1900",
+      "raceEthnicitySlice": "black",
+      "estimate": 93.2,
+      "numerator": 29897,
+      "denominator": 32064,
+      "universe": "Negro population"
+    },
+    {
+      "metricId": "lives-urban",
+      "jurisdictionId": "state:25",
+      "referencePeriod": "1890",
+      "raceEthnicitySlice": "black",
+      "estimate": 92.2,
+      "numerator": 20427,
+      "denominator": 22144,
+      "universe": "Negro population"
+    },
+    {
+      "metricId": "lives-urban",
+      "jurisdictionId": "state:44",
+      "referencePeriod": "1900",
+      "raceEthnicitySlice": "black",
+      "estimate": 95.9,
+      "numerator": 8565,
+      "denominator": 8934,
+      "universe": "Negro population"
+    },
+    {
+      "metricId": "lives-urban",
+      "jurisdictionId": "state:44",
+      "referencePeriod": "1890",
+      "raceEthnicitySlice": "black",
+      "estimate": 96.2,
+      "numerator": 7044,
+      "denominator": 7319,
+      "universe": "Negro population"
+    },
+    {
+      "metricId": "lives-urban",
+      "jurisdictionId": "state:09",
+      "referencePeriod": "1900",
+      "raceEthnicitySlice": "black",
+      "estimate": 88.4,
+      "numerator": 13459,
+      "denominator": 15226,
+      "universe": "Negro population"
+    },
+    {
+      "metricId": "lives-urban",
+      "jurisdictionId": "state:09",
+      "referencePeriod": "1890",
+      "raceEthnicitySlice": "black",
+      "estimate": 86,
+      "numerator": 10574,
+      "denominator": 12302,
+      "universe": "Negro population"
+    },
+    {
+      "metricId": "lives-urban",
+      "jurisdictionId": "state:36",
+      "referencePeriod": "1900",
+      "raceEthnicitySlice": "black",
+      "estimate": 86.3,
+      "numerator": 81356,
+      "denominator": 94232,
+      "universe": "Negro population"
+    },
+    {
+      "metricId": "lives-urban",
+      "jurisdictionId": "state:36",
+      "referencePeriod": "1890",
+      "raceEthnicitySlice": "black",
+      "estimate": 84.8,
+      "numerator": 51364,
+      "denominator": 60592,
+      "universe": "Negro population"
+    },
+    {
+      "metricId": "lives-urban",
+      "jurisdictionId": "state:34",
+      "referencePeriod": "1900",
+      "raceEthnicitySlice": "black",
+      "estimate": 66.1,
+      "numerator": 46128,
+      "denominator": 69844,
+      "universe": "Negro population"
+    },
+    {
+      "metricId": "lives-urban",
+      "jurisdictionId": "state:34",
+      "referencePeriod": "1890",
+      "raceEthnicitySlice": "black",
+      "estimate": 52.2,
+      "numerator": 25045,
+      "denominator": 47981,
+      "universe": "Negro population"
+    },
+    {
+      "metricId": "lives-urban",
+      "jurisdictionId": "state:42",
+      "referencePeriod": "1900",
+      "raceEthnicitySlice": "black",
+      "estimate": 75.3,
+      "numerator": 120285,
+      "denominator": 159845,
+      "universe": "Negro population"
+    },
+    {
+      "metricId": "lives-urban",
+      "jurisdictionId": "state:42",
+      "referencePeriod": "1890",
+      "raceEthnicitySlice": "black",
+      "estimate": 71.4,
+      "numerator": 76939,
+      "denominator": 107796,
+      "universe": "Negro population"
+    },
+    {
+      "metricId": "lives-urban",
+      "jurisdictionId": "state:39",
+      "referencePeriod": "1900",
+      "raceEthnicitySlice": "black",
+      "estimate": 67.1,
+      "numerator": 64986,
+      "denominator": 96901,
+      "universe": "Negro population"
+    },
+    {
+      "metricId": "lives-urban",
+      "jurisdictionId": "state:39",
+      "referencePeriod": "1890",
+      "raceEthnicitySlice": "black",
+      "estimate": 62.9,
+      "numerator": 61124,
+      "denominator": 97113,
+      "universe": "Negro population"
+    },
+    {
+      "metricId": "lives-urban",
+      "jurisdictionId": "state:18",
+      "referencePeriod": "1900",
+      "raceEthnicitySlice": "black",
+      "estimate": 72.8,
+      "numerator": 42274,
+      "denominator": 58105,
+      "universe": "Negro population"
+    },
+    {
+      "metricId": "lives-urban",
+      "jurisdictionId": "state:18",
+      "referencePeriod": "1890",
+      "raceEthnicitySlice": "black",
+      "estimate": 63.8,
+      "numerator": 28839,
+      "denominator": 45217,
+      "universe": "Negro population"
+    },
+    {
+      "metricId": "lives-urban",
+      "jurisdictionId": "state:17",
+      "referencePeriod": "1900",
+      "raceEthnicitySlice": "black",
+      "estimate": 71.5,
+      "numerator": 60993,
+      "denominator": 85258,
+      "universe": "Negro population"
+    },
+    {
+      "metricId": "lives-urban",
+      "jurisdictionId": "state:17",
+      "referencePeriod": "1890",
+      "raceEthnicitySlice": "black",
+      "estimate": 60.7,
+      "numerator": 34076,
+      "denominator": 56128,
+      "universe": "Negro population"
+    },
+    {
+      "metricId": "lives-urban",
+      "jurisdictionId": "state:26",
+      "referencePeriod": "1900",
+      "raceEthnicitySlice": "black",
+      "estimate": 63.2,
+      "numerator": 10009,
+      "denominator": 15846,
+      "universe": "Negro population"
+    },
+    {
+      "metricId": "lives-urban",
+      "jurisdictionId": "state:26",
+      "referencePeriod": "1890",
+      "raceEthnicitySlice": "black",
+      "estimate": 57.4,
+      "numerator": 8734,
+      "denominator": 15223,
+      "universe": "Negro population"
+    },
+    {
+      "metricId": "lives-urban",
+      "jurisdictionId": "state:55",
+      "referencePeriod": "1900",
+      "raceEthnicitySlice": "black",
+      "estimate": 76.1,
+      "numerator": 1859,
+      "denominator": 2442,
+      "universe": "Negro population"
+    },
+    {
+      "metricId": "lives-urban",
+      "jurisdictionId": "state:55",
+      "referencePeriod": "1890",
+      "raceEthnicitySlice": "black",
+      "estimate": 58.9,
+      "numerator": 1440,
+      "denominator": 2444,
+      "universe": "Negro population"
+    },
+    {
+      "metricId": "lives-urban",
+      "jurisdictionId": "state:27",
+      "referencePeriod": "1900",
+      "raceEthnicitySlice": "black",
+      "estimate": 90.1,
+      "numerator": 4495,
+      "denominator": 4989,
+      "universe": "Negro population"
+    },
+    {
+      "metricId": "lives-urban",
+      "jurisdictionId": "state:27",
+      "referencePeriod": "1890",
+      "raceEthnicitySlice": "black",
+      "estimate": 89.2,
+      "numerator": 3286,
+      "denominator": 3683,
+      "universe": "Negro population"
+    },
+    {
+      "metricId": "lives-urban",
+      "jurisdictionId": "state:19",
+      "referencePeriod": "1900",
+      "raceEthnicitySlice": "black",
+      "estimate": 63.6,
+      "numerator": 8097,
+      "denominator": 12735,
+      "universe": "Negro population"
+    },
+    {
+      "metricId": "lives-urban",
+      "jurisdictionId": "state:19",
+      "referencePeriod": "1890",
+      "raceEthnicitySlice": "black",
+      "estimate": 62.1,
+      "numerator": 6635,
+      "denominator": 10685,
+      "universe": "Negro population"
+    },
+    {
+      "metricId": "lives-urban",
+      "jurisdictionId": "state:29",
+      "referencePeriod": "1900",
+      "raceEthnicitySlice": "black",
+      "estimate": 55.6,
+      "numerator": 89247,
+      "denominator": 160534,
+      "universe": "Negro population"
+    },
+    {
+      "metricId": "lives-urban",
+      "jurisdictionId": "state:29",
+      "referencePeriod": "1890",
+      "raceEthnicitySlice": "black",
+      "estimate": 47,
+      "numerator": 70636,
+      "denominator": 150184,
+      "universe": "Negro population"
+    },
+    {
+      "metricId": "lives-urban",
+      "jurisdictionId": "state:38",
+      "referencePeriod": "1900",
+      "raceEthnicitySlice": "black",
+      "estimate": 40.8,
+      "numerator": 125,
+      "denominator": 306,
+      "universe": "Negro population"
+    },
+    {
+      "metricId": "lives-urban",
+      "jurisdictionId": "state:38",
+      "referencePeriod": "1890",
+      "raceEthnicitySlice": "black",
+      "estimate": 20.7,
+      "numerator": 81,
+      "denominator": 392,
+      "universe": "Negro population"
+    },
+    {
+      "metricId": "lives-urban",
+      "jurisdictionId": "state:46",
+      "referencePeriod": "1900",
+      "raceEthnicitySlice": "black",
+      "estimate": 41.9,
+      "numerator": 195,
+      "denominator": 465,
+      "universe": "Negro population"
+    },
+    {
+      "metricId": "lives-urban",
+      "jurisdictionId": "state:46",
+      "referencePeriod": "1890",
+      "raceEthnicitySlice": "black",
+      "estimate": 26.9,
+      "numerator": 149,
+      "denominator": 554,
+      "universe": "Negro population"
+    },
+    {
+      "metricId": "lives-urban",
+      "jurisdictionId": "state:31",
+      "referencePeriod": "1900",
+      "raceEthnicitySlice": "black",
+      "estimate": 84.4,
+      "numerator": 5441,
+      "denominator": 6449,
+      "universe": "Negro population"
+    },
+    {
+      "metricId": "lives-urban",
+      "jurisdictionId": "state:31",
+      "referencePeriod": "1890",
+      "raceEthnicitySlice": "black",
+      "estimate": 85.4,
+      "numerator": 7188,
+      "denominator": 8413,
+      "universe": "Negro population"
+    },
+    {
+      "metricId": "lives-urban",
+      "jurisdictionId": "state:20",
+      "referencePeriod": "1900",
+      "raceEthnicitySlice": "black",
+      "estimate": 61.1,
+      "numerator": 31763,
+      "denominator": 52003,
+      "universe": "Negro population"
+    },
+    {
+      "metricId": "lives-urban",
+      "jurisdictionId": "state:20",
+      "referencePeriod": "1890",
+      "raceEthnicitySlice": "black",
+      "estimate": 53.9,
+      "numerator": 25170,
+      "denominator": 46710,
+      "universe": "Negro population"
+    },
+    {
+      "metricId": "lives-urban",
+      "jurisdictionId": "state:10",
+      "referencePeriod": "1900",
+      "raceEthnicitySlice": "black",
+      "estimate": 37.6,
+      "numerator": 11537,
+      "denominator": 30687,
+      "universe": "Negro population"
+    },
+    {
+      "metricId": "lives-urban",
+      "jurisdictionId": "state:10",
+      "referencePeriod": "1890",
+      "raceEthnicitySlice": "black",
+      "estimate": 33.2,
+      "numerator": 9428,
+      "denominator": 28386,
+      "universe": "Negro population"
+    },
+    {
+      "metricId": "lives-urban",
+      "jurisdictionId": "state:24",
+      "referencePeriod": "1900",
+      "raceEthnicitySlice": "black",
+      "estimate": 39.8,
+      "numerator": 93349,
+      "denominator": 234564,
+      "universe": "Negro population"
+    },
+    {
+      "metricId": "lives-urban",
+      "jurisdictionId": "state:24",
+      "referencePeriod": "1890",
+      "raceEthnicitySlice": "black",
+      "estimate": 36.8,
+      "numerator": 79392,
+      "denominator": 215677,
+      "universe": "Negro population"
+    },
+    {
+      "metricId": "lives-urban",
+      "jurisdictionId": "state:11",
+      "referencePeriod": "1900",
+      "raceEthnicitySlice": "black",
+      "estimate": 100,
+      "numerator": 86702,
+      "denominator": 86702,
+      "universe": "Negro population"
+    },
+    {
+      "metricId": "lives-urban",
+      "jurisdictionId": "state:11",
+      "referencePeriod": "1890",
+      "raceEthnicitySlice": "black",
+      "estimate": 100,
+      "numerator": 75572,
+      "denominator": 75572,
+      "universe": "Negro population"
+    },
+    {
+      "metricId": "lives-urban",
+      "jurisdictionId": "state:51",
+      "referencePeriod": "1900",
+      "raceEthnicitySlice": "black",
+      "estimate": 18.9,
+      "numerator": 124799,
+      "denominator": 661002,
+      "universe": "Negro population"
+    },
+    {
+      "metricId": "lives-urban",
+      "jurisdictionId": "state:51",
+      "referencePeriod": "1890",
+      "raceEthnicitySlice": "black",
+      "estimate": 18.4,
+      "numerator": 117092,
+      "denominator": 635438,
+      "universe": "Negro population"
+    },
+    {
+      "metricId": "lives-urban",
+      "jurisdictionId": "state:54",
+      "referencePeriod": "1900",
+      "raceEthnicitySlice": "black",
+      "estimate": 13.8,
+      "numerator": 8761,
+      "denominator": 63544,
+      "universe": "Negro population"
+    },
+    {
+      "metricId": "lives-urban",
+      "jurisdictionId": "state:54",
+      "referencePeriod": "1890",
+      "raceEthnicitySlice": "black",
+      "estimate": 10,
+      "numerator": 6327,
+      "denominator": 63478,
+      "universe": "Negro population"
+    },
+    {
+      "metricId": "lives-urban",
+      "jurisdictionId": "state:37",
+      "referencePeriod": "1900",
+      "raceEthnicitySlice": "black",
+      "estimate": 12.2,
+      "numerator": 76169,
+      "denominator": 624492,
+      "universe": "Negro population"
+    },
+    {
+      "metricId": "lives-urban",
+      "jurisdictionId": "state:37",
+      "referencePeriod": "1890",
+      "raceEthnicitySlice": "black",
+      "estimate": 10,
+      "numerator": 55935,
+      "denominator": 561758,
+      "universe": "Negro population"
+    },
+    {
+      "metricId": "lives-urban",
+      "jurisdictionId": "state:45",
+      "referencePeriod": "1900",
+      "raceEthnicitySlice": "black",
+      "estimate": 10.8,
+      "numerator": 84358,
+      "denominator": 782289,
+      "universe": "Negro population"
+    },
+    {
+      "metricId": "lives-urban",
+      "jurisdictionId": "state:45",
+      "referencePeriod": "1890",
+      "raceEthnicitySlice": "black",
+      "estimate": 9.3,
+      "numerator": 64049,
+      "denominator": 688437,
+      "universe": "Negro population"
+    },
+    {
+      "metricId": "lives-urban",
+      "jurisdictionId": "state:13",
+      "referencePeriod": "1900",
+      "raceEthnicitySlice": "black",
+      "estimate": 15.5,
+      "numerator": 161061,
+      "denominator": 1035224,
+      "universe": "Negro population"
+    },
+    {
+      "metricId": "lives-urban",
+      "jurisdictionId": "state:13",
+      "referencePeriod": "1890",
+      "raceEthnicitySlice": "black",
+      "estimate": 14.4,
+      "numerator": 123862,
+      "denominator": 857947,
+      "universe": "Negro population"
+    },
+    {
+      "metricId": "lives-urban",
+      "jurisdictionId": "state:12",
+      "referencePeriod": "1900",
+      "raceEthnicitySlice": "black",
+      "estimate": 21.3,
+      "numerator": 49136,
+      "denominator": 230700,
+      "universe": "Negro population"
+    },
+    {
+      "metricId": "lives-urban",
+      "jurisdictionId": "state:12",
+      "referencePeriod": "1890",
+      "raceEthnicitySlice": "black",
+      "estimate": 21.1,
+      "numerator": 35102,
+      "denominator": 166180,
+      "universe": "Negro population"
+    },
+    {
+      "metricId": "lives-urban",
+      "jurisdictionId": "state:21",
+      "referencePeriod": "1900",
+      "raceEthnicitySlice": "black",
+      "estimate": 35.2,
+      "numerator": 100145,
+      "denominator": 284706,
+      "universe": "Negro population"
+    },
+    {
+      "metricId": "lives-urban",
+      "jurisdictionId": "state:21",
+      "referencePeriod": "1890",
+      "raceEthnicitySlice": "black",
+      "estimate": 28.1,
+      "numerator": 75274,
+      "denominator": 268071,
+      "universe": "Negro population"
+    },
+    {
+      "metricId": "lives-urban",
+      "jurisdictionId": "state:47",
+      "referencePeriod": "1900",
+      "raceEthnicitySlice": "black",
+      "estimate": 27.3,
+      "numerator": 131144,
+      "denominator": 479949,
+      "universe": "Negro population"
+    },
+    {
+      "metricId": "lives-urban",
+      "jurisdictionId": "state:47",
+      "referencePeriod": "1890",
+      "raceEthnicitySlice": "black",
+      "estimate": 21.8,
+      "numerator": 94076,
+      "denominator": 430806,
+      "universe": "Negro population"
+    },
+    {
+      "metricId": "lives-urban",
+      "jurisdictionId": "state:01",
+      "referencePeriod": "1900",
+      "raceEthnicitySlice": "black",
+      "estimate": 11.9,
+      "numerator": 98154,
+      "denominator": 827307,
+      "universe": "Negro population"
+    },
+    {
+      "metricId": "lives-urban",
+      "jurisdictionId": "state:01",
+      "referencePeriod": "1890",
+      "raceEthnicitySlice": "black",
+      "estimate": 10.3,
+      "numerator": 69607,
+      "denominator": 678489,
+      "universe": "Negro population"
+    },
+    {
+      "metricId": "lives-urban",
+      "jurisdictionId": "state:28",
+      "referencePeriod": "1900",
+      "raceEthnicitySlice": "black",
+      "estimate": 6.3,
+      "numerator": 56825,
+      "denominator": 907630,
+      "universe": "Negro population"
+    },
+    {
+      "metricId": "lives-urban",
+      "jurisdictionId": "state:28",
+      "referencePeriod": "1890",
+      "raceEthnicitySlice": "black",
+      "estimate": 4.6,
+      "numerator": 34192,
+      "denominator": 742559,
+      "universe": "Negro population"
+    },
+    {
+      "metricId": "lives-urban",
+      "jurisdictionId": "state:05",
+      "referencePeriod": "1900",
+      "raceEthnicitySlice": "black",
+      "estimate": 10.1,
+      "numerator": 37171,
+      "denominator": 366856,
+      "universe": "Negro population"
+    },
+    {
+      "metricId": "lives-urban",
+      "jurisdictionId": "state:05",
+      "referencePeriod": "1890",
+      "raceEthnicitySlice": "black",
+      "estimate": 8.2,
+      "numerator": 25491,
+      "denominator": 309120,
+      "universe": "Negro population"
+    },
+    {
+      "metricId": "lives-urban",
+      "jurisdictionId": "state:22",
+      "referencePeriod": "1900",
+      "raceEthnicitySlice": "black",
+      "estimate": 18,
+      "numerator": 116954,
+      "denominator": 650804,
+      "universe": "Negro population"
+    },
+    {
+      "metricId": "lives-urban",
+      "jurisdictionId": "state:22",
+      "referencePeriod": "1890",
+      "raceEthnicitySlice": "black",
+      "estimate": 15.6,
+      "numerator": 87094,
+      "denominator": 559193,
+      "universe": "Negro population"
+    },
+    {
+      "metricId": "lives-urban",
+      "jurisdictionId": "state:40",
+      "referencePeriod": "1900",
+      "raceEthnicitySlice": "black",
+      "estimate": 15.6,
+      "numerator": 8702,
+      "denominator": 55684,
+      "universe": "Negro population"
+    },
+    {
+      "metricId": "lives-urban",
+      "jurisdictionId": "state:40",
+      "referencePeriod": "1890",
+      "raceEthnicitySlice": "black",
+      "estimate": 3.1,
+      "numerator": 679,
+      "denominator": 21609,
+      "universe": "Negro population"
+    },
+    {
+      "metricId": "lives-urban",
+      "jurisdictionId": "state:48",
+      "referencePeriod": "1900",
+      "raceEthnicitySlice": "black",
+      "estimate": 19.2,
+      "numerator": 119329,
+      "denominator": 620662,
+      "universe": "Negro population"
+    },
+    {
+      "metricId": "lives-urban",
+      "jurisdictionId": "state:48",
+      "referencePeriod": "1890",
+      "raceEthnicitySlice": "black",
+      "estimate": 16.3,
+      "numerator": 79481,
+      "denominator": 488071,
+      "universe": "Negro population"
+    },
+    {
+      "metricId": "lives-urban",
+      "jurisdictionId": "state:30",
+      "referencePeriod": "1900",
+      "raceEthnicitySlice": "black",
+      "estimate": 61.1,
+      "numerator": 931,
+      "denominator": 1523,
+      "universe": "Negro population"
+    },
+    {
+      "metricId": "lives-urban",
+      "jurisdictionId": "state:30",
+      "referencePeriod": "1890",
+      "raceEthnicitySlice": "black",
+      "estimate": 43.9,
+      "numerator": 628,
+      "denominator": 1430,
+      "universe": "Negro population"
+    },
+    {
+      "metricId": "lives-urban",
+      "jurisdictionId": "state:16",
+      "referencePeriod": "1900",
+      "raceEthnicitySlice": "black",
+      "estimate": 24.2,
+      "numerator": 71,
+      "denominator": 293,
+      "universe": "Negro population"
+    },
+    {
+      "metricId": "lives-urban",
+      "jurisdictionId": "state:16",
+      "referencePeriod": "1890",
+      "raceEthnicitySlice": "black",
+      "estimate": 20.2,
+      "numerator": 51,
+      "denominator": 252,
+      "universe": "Negro population"
+    },
+    {
+      "metricId": "lives-urban",
+      "jurisdictionId": "state:56",
+      "referencePeriod": "1900",
+      "raceEthnicitySlice": "black",
+      "estimate": 52,
+      "numerator": 489,
+      "denominator": 940,
+      "universe": "Negro population"
+    },
+    {
+      "metricId": "lives-urban",
+      "jurisdictionId": "state:56",
+      "referencePeriod": "1890",
+      "raceEthnicitySlice": "black",
+      "estimate": 59.3,
+      "numerator": 327,
+      "denominator": 552,
+      "universe": "Negro population"
+    },
+    {
+      "metricId": "lives-urban",
+      "jurisdictionId": "state:08",
+      "referencePeriod": "1900",
+      "raceEthnicitySlice": "black",
+      "estimate": 82.3,
+      "numerator": 7052,
+      "denominator": 8570,
+      "universe": "Negro population"
+    },
+    {
+      "metricId": "lives-urban",
+      "jurisdictionId": "state:08",
+      "referencePeriod": "1890",
+      "raceEthnicitySlice": "black",
+      "estimate": 80.3,
+      "numerator": 5009,
+      "denominator": 6235,
+      "universe": "Negro population"
+    },
+    {
+      "metricId": "lives-urban",
+      "jurisdictionId": "state:35",
+      "referencePeriod": "1900",
+      "raceEthnicitySlice": "black",
+      "estimate": 36,
+      "numerator": 581,
+      "denominator": 1614,
+      "universe": "Negro population"
+    },
+    {
+      "metricId": "lives-urban",
+      "jurisdictionId": "state:35",
+      "referencePeriod": "1890",
+      "raceEthnicitySlice": "black",
+      "estimate": 17.8,
+      "numerator": 274,
+      "denominator": 1537,
+      "universe": "Negro population"
+    },
+    {
+      "metricId": "lives-urban",
+      "jurisdictionId": "state:04",
+      "referencePeriod": "1900",
+      "raceEthnicitySlice": "black",
+      "estimate": 32.1,
+      "numerator": 330,
+      "denominator": 1029,
+      "universe": "Negro population"
+    },
+    {
+      "metricId": "lives-urban",
+      "jurisdictionId": "state:04",
+      "referencePeriod": "1890",
+      "raceEthnicitySlice": "black",
+      "estimate": 20.7,
+      "numerator": 274,
+      "denominator": 1326,
+      "universe": "Negro population"
+    },
+    {
+      "metricId": "lives-urban",
+      "jurisdictionId": "state:49",
+      "referencePeriod": "1900",
+      "raceEthnicitySlice": "black",
+      "estimate": 51,
+      "numerator": 343,
+      "denominator": 672,
+      "universe": "Negro population"
+    },
+    {
+      "metricId": "lives-urban",
+      "jurisdictionId": "state:49",
+      "referencePeriod": "1890",
+      "raceEthnicitySlice": "black",
+      "estimate": 61.4,
+      "numerator": 294,
+      "denominator": 479,
+      "universe": "Negro population"
+    },
+    {
+      "metricId": "lives-urban",
+      "jurisdictionId": "state:32",
+      "referencePeriod": "1900",
+      "raceEthnicitySlice": "black",
+      "estimate": 8.2,
+      "numerator": 37,
+      "denominator": 450,
+      "universe": "Negro population"
+    },
+    {
+      "metricId": "lives-urban",
+      "jurisdictionId": "state:32",
+      "referencePeriod": "1890",
+      "raceEthnicitySlice": "black",
+      "estimate": 40.8,
+      "numerator": 107,
+      "denominator": 262,
+      "universe": "Negro population"
+    },
+    {
+      "metricId": "lives-urban",
+      "jurisdictionId": "state:53",
+      "referencePeriod": "1900",
+      "raceEthnicitySlice": "black",
+      "estimate": 63.9,
+      "numerator": 1606,
+      "denominator": 2514,
+      "universe": "Negro population"
+    },
+    {
+      "metricId": "lives-urban",
+      "jurisdictionId": "state:53",
+      "referencePeriod": "1890",
+      "raceEthnicitySlice": "black",
+      "estimate": 60.9,
+      "numerator": 973,
+      "denominator": 1597,
+      "universe": "Negro population"
+    },
+    {
+      "metricId": "lives-urban",
+      "jurisdictionId": "state:41",
+      "referencePeriod": "1900",
+      "raceEthnicitySlice": "black",
+      "estimate": 79.5,
+      "numerator": 878,
+      "denominator": 1105,
+      "universe": "Negro population"
+    },
+    {
+      "metricId": "lives-urban",
+      "jurisdictionId": "state:41",
+      "referencePeriod": "1890",
+      "raceEthnicitySlice": "black",
+      "estimate": 50.3,
+      "numerator": 597,
+      "denominator": 1186,
+      "universe": "Negro population"
+    },
+    {
+      "metricId": "lives-urban",
+      "jurisdictionId": "state:06",
+      "referencePeriod": "1900",
+      "raceEthnicitySlice": "black",
+      "estimate": 73.1,
+      "numerator": 8075,
+      "denominator": 11045,
+      "universe": "Negro population"
+    },
+    {
+      "metricId": "lives-urban",
+      "jurisdictionId": "state:06",
+      "referencePeriod": "1890",
+      "raceEthnicitySlice": "black",
+      "estimate": 60.8,
+      "numerator": 6338,
+      "denominator": 10432,
+      "universe": "Negro population"
+    }
+  ]
+}

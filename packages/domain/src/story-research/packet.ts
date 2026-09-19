@@ -35,7 +35,7 @@ export type StoryDraftSectionDispute = {
   readonly sideB: StoryDraftSectionDisputeSide;
 };
 
-/** Mirrors publicStoryProjection draft fields without coupling to Firestore. */
+/** Mirrors publicStoryProjection draft fields without coupling to persistence. */
 export type StoryDraftSection = {
   readonly heading?: string;
   readonly paragraphs: readonly string[];

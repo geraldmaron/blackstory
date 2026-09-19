@@ -1,0 +1,64 @@
+{
+  "schemaVersion": "heldout-entailment-predictions.v1",
+  "benchmarkVersion": "heldout-research-eval-v1-blind",
+  "predictor": "root-gpt-6-astra-session",
+  "generatedAt": "2026-09-18T15:35:12.267921+00:00",
+  "predictions": [
+    {
+      "id": "e01",
+      "label": "supported"
+    },
+    {
+      "id": "e02",
+      "label": "supported"
+    },
+    {
+      "id": "e03",
+      "label": "insufficient"
+    },
+    {
+      "id": "e04",
+      "label": "supported"
+    },
+    {
+      "id": "e05",
+      "label": "insufficient"
+    },
+    {
+      "id": "e06",
+      "label": "supported"
+    },
+    {
+      "id": "e07",
+      "label": "supported"
+    },
+    {
+      "id": "e08",
+      "label": "contradicted"
+    },
+    {
+      "id": "e09",
+      "label": "supported"
+    },
+    {
+      "id": "e10",
+      "label": "insufficient"
+    },
+    {
+      "id": "e11",
+      "label": "supported"
+    },
+    {
+      "id": "e12",
+      "label": "contradicted"
+    },
+    {
+      "id": "e13",
+      "label": "supported"
+    },
+    {
+      "id": "e14",
+      "label": "contradicted"
+    }
+  ]
+}

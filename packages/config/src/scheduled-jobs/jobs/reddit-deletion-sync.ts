@@ -21,7 +21,7 @@
  * in this file's test.
  *
  * `pointers` and `purgeStore` are likewise caller-supplied: this job is store-agnostic (mirrors
- * `PurgeableStore` in packages/domain/src/rights/deletion-sync.ts) so a Firestore-backed adapter
+ * `PurgeableStore` in packages/domain/src/rights/deletion-sync.ts) so a Postgres-backed adapter
  * (outside this package's scope) can plug in its own pointer source and delete implementation
  * without this job body changing.
  */

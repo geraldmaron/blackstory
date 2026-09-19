@@ -6,7 +6,12 @@
  */
 
 import React from 'react';
+import Link from 'next/link';
 import { Notice } from '@repo/ui';
+import {
+  METHODOLOGY_HOW_IT_HOLDS_TOGETHER_HREF,
+  METHODOLOGY_SOURCE_LIBRARY_HREF,
+} from './editorial-links';
 import {
   formatIsoDate,
   humanizeToken,
@@ -70,6 +75,17 @@ export function EvidenceResearchCoverageSummary({
           </div>
         ) : null}
       </dl>
+      {sourceLineage ? (
+        <p className="ds-aside-block__meta ds-sans" style={{ margin: 'var(--ds-space-3) 0 0 0' }}>
+          <Link href={METHODOLOGY_SOURCE_LIBRARY_HREF} prefetch={false}>
+            Where the evidence comes from
+          </Link>
+          {' · '}
+          <Link href={METHODOLOGY_HOW_IT_HOLDS_TOGETHER_HREF} prefetch={false}>
+            How citations hold together
+          </Link>
+        </p>
+      ) : null}
 
       {retractionNotices.length > 0 ? (
         <div className="ds-stack" style={{ marginTop: 'var(--ds-space-4)' }}>

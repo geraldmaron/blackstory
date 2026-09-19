@@ -6,6 +6,7 @@ import React from 'react';
 import Link from 'next/link';
 import { Confidence } from '@repo/ui';
 import { FACT_CONFIDENCE_DEFINITIONS, type FactConfidenceGrade } from '@repo/domain/facts';
+import { METHODOLOGY_EVIDENCE_GRADES_HREF } from '../evidence/editorial-links';
 import { humanizeToken, mapConfidenceToUiLevel } from '../facts/format';
 
 export type ConfidenceLabelWithNuanceProps = {
@@ -17,7 +18,7 @@ export type ConfidenceLabelWithNuanceProps = {
 export function ConfidenceLabelWithNuance({
   confidence,
   confidenceNote,
-  methodologyHref = '/methodology#confidence',
+  methodologyHref = METHODOLOGY_EVIDENCE_GRADES_HREF,
 }: ConfidenceLabelWithNuanceProps) {
   const level = mapConfidenceToUiLevel(confidence);
   const label = `${humanizeToken(confidence)} evidence grade`;

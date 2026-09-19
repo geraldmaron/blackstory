@@ -1,5 +1,5 @@
 /**
- * Drift guard (repo-hi8c / MOB-005 concern 3): api-public's bootstrap/compatibility wire
+ * Drift guard: api-public's bootstrap/compatibility wire
  * constants must stay aligned with the values domain release-activation fixtures use when
  * minting mobile bootstrap manifests. Domain cannot import `@repo/public-contracts` (the dependency
  * direction in `docs/decisions-carryover.md`), so this consumer-side test is the compile/test-level shared check.

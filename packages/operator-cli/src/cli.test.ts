@@ -6,6 +6,8 @@ import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import type { AtomicStore, AtomicTransaction } from '@repo/data-access';
 import { runCli } from './cli.ts';
+import type { CaptureDb } from './capture-backfill.ts';
+import type { ExecutionClient, ExecutionPool } from './research-execution.js';
 
 class MemoryAtomicStore implements AtomicStore {
   readonly writes: string[] = [];
@@ -40,6 +42,45 @@ function capture() {
     stdout: (line: string) => lines.push(line),
     stderr: (line: string) => errors.push(line),
   };
+}
+
+class CaptureRetentionPool implements ExecutionPool {
+  readonly statements: string[] = [];
+  constructor(private readonly orphanPath: string) {}
+
+  async connect(): Promise<ExecutionClient> {
+    return {
+      query: async <Row extends Record<string, unknown>>(text: string) => {
+        this.statements.push(text);
+        let rows: Record<string, unknown>[] = [];
+        if (text.includes('SELECT object.name FROM storage.objects')) {
+          rows = [{ name: this.orphanPath }];
+        } else if (text.includes('AS count')) {
+          rows = [{ count: '0' }];
+        }
+        return { rows: rows as Row[] };
+      },
+      release() {},
+    };
+  }
+}
+
+class CaptureBackfillDb implements CaptureDb {
+  async connect() {
+    return { query: this.query.bind(this), release() {} };
+  }
+
+  async query<T = Record<string, unknown>>(sql: string): Promise<{ rows: T[] }> {
+    let rows: Record<string, unknown>[] = [];
+    if (sql.includes('theme_impact_packets')) {
+      rows = [{ ref_id: 'obs-1', url: 'https://census.gov/a' }];
+    } else if (sql.includes('reference.articles')) {
+      rows = [{ ref_id: 'article-1', url: 'https://loc.gov/b' }];
+    } else if (sql.includes('release_entities')) {
+      rows = [{ ref_id: 'entity-1', url: 'https://nps.gov/c' }];
+    }
+    return { rows: rows as T[] };
+  }
 }
 
 const BASE_FLAGS = [
@@ -115,6 +156,105 @@ test('a missing required flag fails cleanly with a non-zero exit code and no wri
   assert.equal(code, 1);
   assert.match(out.errors[0] ?? '', /--description/);
   assert.equal(store.writes.length, 0);
+});
+
+test('capture-retention parses --orphans and keeps the default command read-only', async () => {
+  const out = capture();
+  const orphanPath = `captures/${'a'.repeat(64)}.txt`;
+  const postgresPool = new CaptureRetentionPool(orphanPath);
+  const code = await runCli(
+    [
+      'capture-retention',
+      '--orphans',
+      '--bucket',
+      'raw-sources',
+      '--operator-id',
+      'operator-1',
+      '--limit',
+      '100',
+      // All CLI booleans must remain standalone instead of consuming a following value.
+      '--approximate',
+    ],
+    { postgresPool, stdout: out.stdout, stderr: out.stderr },
+  );
+
+  assert.equal(code, 0);
+  assert.deepEqual(JSON.parse(out.lines[0] ?? '{}').orphanObjects, [
+    { bucket: 'raw-sources', path: orphanPath },
+  ]);
+  assert.equal(JSON.parse(out.lines[1] ?? '{}').committed, false);
+  assert.ok(
+    postgresPool.statements.every(
+      (statement) => !/^\s*(DELETE|INSERT|LOCK|UPDATE)\b/i.test(statement),
+    ),
+  );
+});
+
+test('capture-retention parses --delete-storage and refuses it without --commit', async () => {
+  const out = capture();
+  const postgresPool = new CaptureRetentionPool(`captures/${'b'.repeat(64)}.txt`);
+  const code = await runCli(
+    ['capture-retention', '--delete-storage', '--operator-id', 'operator-1', '--limit', '100'],
+    { postgresPool, stdout: out.stdout, stderr: out.stderr },
+  );
+
+  assert.equal(code, 1);
+  assert.match(out.errors[0] ?? '', /--delete-storage requires --commit/);
+  assert.ok(
+    postgresPool.statements.every(
+      (statement) => !/^\s*(DELETE|INSERT|LOCK|UPDATE)\b/i.test(statement),
+    ),
+  );
+});
+
+test('capture-backfill CLI wires exact targets and deterministic resume flags', async () => {
+  const captureDb = new CaptureBackfillDb();
+  const firstOut = capture();
+  const firstCode = await runCli(['capture-backfill', '--max-captures', '1'], {
+    captureDb,
+    stdout: firstOut.stdout,
+    stderr: firstOut.stderr,
+  });
+  assert.equal(firstCode, 0, firstOut.errors.join('\n'));
+  const first = JSON.parse(firstOut.lines[0] ?? '{}') as {
+    inventoryFingerprint?: string;
+    nextCursor?: string;
+    totalUnique?: number;
+  };
+  assert.equal(first.totalUnique, 3);
+  assert.equal(first.nextCursor, 'https://census.gov/a');
+  assert.equal(first.inventoryFingerprint?.length, 64);
+
+  const resumedOut = capture();
+  const resumedCode = await runCli(
+    [
+      'capture-backfill',
+      '--max-captures',
+      '1',
+      '--after-url',
+      first.nextCursor!,
+      '--inventory-fingerprint',
+      first.inventoryFingerprint!,
+    ],
+    { captureDb, stdout: resumedOut.stdout, stderr: resumedOut.stderr },
+  );
+  assert.equal(resumedCode, 0);
+  const resumed = JSON.parse(resumedOut.lines[0] ?? '{}') as { afterUrl?: string };
+  assert.equal(resumed.afterUrl, 'https://census.gov/a');
+
+  const targetedOut = capture();
+  const targetedCode = await runCli(['capture-backfill', '--url', 'https://nps.gov/c'], {
+    captureDb,
+    stdout: targetedOut.stdout,
+    stderr: targetedOut.stderr,
+  });
+  assert.equal(targetedCode, 0);
+  const targeted = JSON.parse(targetedOut.lines[0] ?? '{}') as {
+    targetUrl?: string;
+    planned?: number;
+  };
+  assert.equal(targeted.targetUrl, 'https://nps.gov/c');
+  assert.equal(targeted.planned, 1);
 });
 
 test('research-intake fetches through an injected transport, then opens a draft case', async () => {
@@ -684,4 +824,61 @@ test('harness-run web_search reports an unavailable provider and still exits cle
   assert.match(String(unavailable.reason), /SEARXNG_BASE_URL/u);
   const connectorsComplete = progress.find((entry) => entry.stage === 'connectors.complete');
   assert.equal(connectorsComplete?.rawSubjectsCount, 0);
+});
+
+test('harness-run never fills an unspecified connector with example records', async () => {
+  const out = capture();
+  const code = await runCli(['harness-run', '--theme', 'energy systems'], {
+    stdout: out.stdout,
+    stderr: out.stderr,
+  });
+  assert.notEqual(code, 0);
+  assert.match(out.errors.join(''), /example data is never injected/);
+});
+
+test('harness-run accepts another domain without geography, models, or a database', async () => {
+  const out = capture();
+  const source = {
+    id: 'rfc-9110',
+    connectorKind: 'standards',
+    title: 'HTTP Semantics',
+    description: 'HTTP is a stateless application-level protocol.',
+    cites: ['https://www.rfc-editor.org/rfc/rfc9110.html'],
+    rawRecord: { sourceType: 'standard' },
+  };
+  const code = await runCli(
+    [
+      'harness-run',
+      '--theme',
+      'HTTP protocol design',
+      '--subjects',
+      'records.json',
+      '--max-subjects',
+      '1',
+    ],
+    {
+      stdout: out.stdout,
+      stderr: out.stderr,
+      readFile: () => JSON.stringify([source, { ...source, id: 'rfc-9111' }]),
+    },
+  );
+  assert.equal(code, 0);
+  const output = JSON.parse(out.lines.join(''));
+  assert.equal(output.rawSubjects.length, 1);
+  assert.equal(output.deferredSubjects, 1);
+  assert.equal(output.rawSubjects[0].connectorKind, 'standards');
+  assert.equal(output.disposition, 'proposals_require_independent_review');
+});
+
+test('harness-run refuses unsupported connectors and missing explicit adapter input', async () => {
+  for (const connector of ['fictional', 'dpla', 'nps_network_to_freedom']) {
+    const out = capture();
+    assert.notEqual(
+      await runCli(['harness-run', '--theme', 'history', '--connectors', connector], {
+        stdout: out.stdout,
+        stderr: out.stderr,
+      }),
+      0,
+    );
+  }
 });

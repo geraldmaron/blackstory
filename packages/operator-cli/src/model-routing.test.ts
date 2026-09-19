@@ -1,5 +1,5 @@
 /**
- * Unit tests for the model routing policy (repo-xez5.2): lane -> tier table, free-roster
+ * Unit tests for the model routing policy: lane -> tier table, free-roster
  * failover through the routed provider, low-confidence/disagreement escalation, verifier
  * independence, and cost estimation.
  */
@@ -8,13 +8,12 @@ import { test } from 'node:test';
 import {
   LANE_ROUTING_POLICY,
   createLaneProvider,
-  estimateCostUsd,
   pickIndependentVerifierModel,
   shouldEscalateToPaid,
   withLaneMetadata,
 } from './model-routing.ts';
 
-test('every research lane declares a tier that matches bb_research.runs.mode vocabulary', () => {
+test('every research lane declares a tier that matches research.runs.mode vocabulary', () => {
   const validModes = new Set([
     'deterministic',
     'local-triage',
@@ -111,22 +110,7 @@ test('pickIndependentVerifierModel throws when no independent model is available
   );
 });
 
-test('estimateCostUsd treats free-suffixed models as zero cost', () => {
-  assert.equal(
-    estimateCostUsd('openai/gpt-oss-20b:free', { promptTokens: 10_000, completionTokens: 5_000 }),
-    0,
-  );
-});
-
-test('estimateCostUsd computes from the price table for a known paid model', () => {
-  const cost = estimateCostUsd('deepseek/deepseek-v3.2', {
-    promptTokens: 1_000_000,
-    completionTokens: 1_000_000,
-  });
-  assert.ok(cost > 0);
-});
-
-test('withLaneMetadata attaches lane, tier, and a cost estimate to the completion', async () => {
+test('withLaneMetadata preserves unknown cost to the completion', async () => {
   const wrapped = withLaneMetadata('story-craft', {
     id: 'mock',
     async complete() {
@@ -141,5 +125,5 @@ test('withLaneMetadata attaches lane, tier, and a cost estimate to the completio
   const result = await wrapped.complete({ model: '', messages: [] });
   assert.equal(result.lane, 'story-craft');
   assert.equal(result.tier, 'quality-prose');
-  assert.ok(result.costUsdEstimate > 0);
+  assert.equal(result.costUsd, null);
 });

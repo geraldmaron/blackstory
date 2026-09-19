@@ -1,18 +1,7 @@
 /**
- * Defensive native-module loader for `expo-updates` (MOB-019, repo-ovn7;
- * ADR-024 §2/§7, threat-model T6, restated in `docs/decisions-carryover.md`,
- * "Mobile cache and OTA release"; cited as "ADR-023" before the 2026-07-22
- * mobile renumbering).
- *
- * Mirrors `src/security/app-check.ts`'s `loadNativeAppCheck` and
- * `src/observability/native-bridge.ts`'s Crashlytics/Perf loaders: a
- * `require` (not a static import, so the load is lazy and catchable) wrapped
- * in a try/catch that returns `null` — never throws — when the native module
- * is absent (Expo Go, web, a test runner, or any environment without the
- * native `expo-updates` module linked). `expo-updates` is autolinked from
- * `package.json` in a real Expo/EAS build, so this loader exists for the
- * environments where it isn't (unit tests, `expo start --web`), not because
- * we expect it to actually fail in a real app build.
+ * Load expo-updates lazily and return null if unavailable, such as in Expo Go, web or tests. A
+ * real native build must link the dependency; defensive loading is not proof that updates are
+ * configured.
  */
 
 /** Minimal `expo-updates` surface this app consumes. */

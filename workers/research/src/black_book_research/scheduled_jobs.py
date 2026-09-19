@@ -1,10 +1,4 @@
-"""BB-084: schedulable entry points for the research worker.
-
-Historical Cloud Scheduler dispatch targeted Cloud Run Jobs (docs/decisions-carryover.md,
-"Scheduled-job worker packages"). Scheduled discovery and overnight enrichment now run on
-Corsair/systemd against the Postgres research ledger; this module retains the source-drift
-run-health job shape for adapter evaluation only.
-"""
+"""Schedulable research-worker functions; importing this module installs no schedule."""
 
 from __future__ import annotations
 

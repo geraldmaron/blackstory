@@ -20,20 +20,7 @@ function attestationFor(
   return bundle?.attestations.find((record) => record.gateId === gateId);
 }
 
-/**
- * Signatures that are obviously not a person.
- *
- * WHY THIS EXISTS. `artifact.ts` rejects an empty `attestedBy` at load, but this module only
- * checked `.trim()` — so ANY non-empty string passed, and a bundle signed `TODO` six times
- * produced a full GO with exit code 0. There was no state that both loaded successfully and read
- * as unsigned, which meant the natural way to fill in the scaffold (drop TODO in the blanks, come
- * back later) silently attested every gate, including living-addresses-zero. Demonstrated and
- * fixed 2026-08-25.
- *
- * The denylist is the weaker half of the fix and is not meant to be exhaustive — `attestedAt`
- * having to be a real, non-future date is what actually stops improvised placeholders, since
- * almost nothing a person types absent-mindedly parses as a date.
- */
+/** Placeholder identities cannot attest a release gate. */
 const PLACEHOLDER_SIGNATURES: ReadonlySet<string> = new Set([
   '-',
   '?',
@@ -56,14 +43,7 @@ const PLACEHOLDER_SIGNATURES: ReadonlySet<string> = new Set([
 /** Date-only or full ISO-8601. Rejects sloppiness like a bare year that `Date.parse` accepts. */
 const ISO_8601 = /^\d{4}-\d{2}-\d{2}([T ]\d{2}:\d{2}(:\d{2}(\.\d+)?)?(Z|[+-]\d{2}:?\d{2})?)?$/;
 
-/**
- * Returns why an attestation is not usable, or undefined when it is.
- *
- * Deliberately NOT checking staleness (an attestation older than N days). That is a policy call
- * about how long a human review stays valid, and it belongs to whoever sets the release cadence —
- * not smuggled in behind a placeholder fix. Note the shipped fixture attests at 2026-07-17, so a
- * staleness rule would need that fixture regenerated rather than a constant nudged.
- */
+/** Validate identity and date; review freshness belongs to the release policy. */
 export function humanAttestationDefect(
   record: HumanAttestationRecord,
   evaluatedAtMs: number,

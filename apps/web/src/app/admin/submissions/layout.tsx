@@ -1,5 +1,5 @@
 /**
- * Protected layout for the raw submissions queue (bb_submissions.intake_items).
+ * Protected layout for the raw submissions queue (submissions.intake_items).
  */
 import type { ReactNode } from 'react';
 import { RequireAdminAuth } from '../../../admin/components/RequireAdminAuth';

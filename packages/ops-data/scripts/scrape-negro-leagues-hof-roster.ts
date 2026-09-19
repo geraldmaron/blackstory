@@ -1,45 +1,8 @@
 /**
- * Lane B / repo-bmmo — deterministic Negro Leagues Hall of Fame roster scraper.
- *
- * Stages Negro Leagues-era National Baseball Hall of Fame inductees into
- * bb_research.landscape_candidates (lane='negro-leagues-hof'). No LLM
- * anywhere — pure regex/HTML parsing of a server-rendered Drupal Views page.
- *
- * baseballhall.org has no dedicated "Negro Leagues era" facet: the Hall of
- * Fame Explorer (https://baseballhall.org/hall-of-fame/hall-of-fame-explorer)
- * exposes a server-rendered `?primary_team=<id>` filter over a fixed list of
- * team options. NEGRO_LEAGUE_TEAM_OPTIONS below is that exact option list
- * (value + label) copied verbatim from the page's own <select name="primary_team">
- * markup, filtered down to genuine Negro Leagues-era franchises (excludes
- * same-named MLB/other-league entries that share the select, e.g. "New York
- * Giants" (NL) id=43 and "San Francisco Giants" id=97). Each team id is
- * queried individually; every Hall of Famer whose *primary* team is one of
- * these franchises is enumerated this way — this is the site's own
- * authoritative grouping, not a guessed roster.
- *
- * canonical_url = the inductee's own /hall-of-famers/<slug> HOF page, verified
- * to actually fetch (via lib/fetch-page.ts) before being staged; failures are
- * reported separately and never staged.
- *
- * Dedup: lane='negro-leagues-hof' has no prior rows (new lane), so the
- * meaningful diff is against bb_canonical.entities.display_name — several
- * Negro Leagues honorees (Satchel Paige, Jackie Robinson, Josh Gibson, Cool
- * Papa Bell, ...) are already canonical people entities in this dataset and
- * must not be re-staged.
- *
- * Default is dry-run (plan + report only, no database writes). Production
- * writes require:
- *   DRY_RUN=0 NEGRO_LEAGUES_HOF_APPLY=1 DATABASE_URL=postgresql://...
- *
- * Usage (from repo root):
- *   set -a && source apps/web/.env.local && set +a
- *   export DATABASE_SSL=1
- *   node --conditions development --import tsx \
- *     packages/ops-data/scripts/scrape-negro-leagues-hof-roster.ts
- *
- * Apply DB writes (after reviewing the dry-run report):
- *   DRY_RUN=0 NEGRO_LEAGUES_HOF_APPLY=1 node --conditions development --import tsx \
- *     packages/ops-data/scripts/scrape-negro-leagues-hof-roster.ts
+ * Enumerate Hall of Fame inductees whose primary team matches the explicit Negro Leagues
+ * franchise options. This source filter excludes players whose primary team is another
+ * franchise. Verify individual profile URLs and report failures; name-based deduplication is
+ * heuristic. Default dry-run; writes require DRY_RUN=0 and NEGRO_LEAGUES_HOF_APPLY=1.
  */
 import { mkdirSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
@@ -62,7 +25,7 @@ const SOURCE_PROGRAM_NAME =
   'National Baseball Hall of Fame — Hall of Fame Explorer, Negro Leagues-era primary-team franchises';
 const LANE = 'negro-leagues-hof';
 /**
- * bb_research.source_program_runs.lane has a CHECK constraint restricted to
+ * research.source_program_runs.lane has a CHECK constraint restricted to
  * ('dc-sites','greenbook','hbcu','nrhp','wikidata','other') — 'negro-leagues-hof'
  * isn't a member, so the *run* row uses 'other' while every candidate row still
  * carries lane='negro-leagues-hof' (landscape_candidates.lane has no CHECK).
@@ -217,11 +180,11 @@ async function main(): Promise<void> {
 
   const pool = new pg.Pool(normalizePgConnectionString(databaseUrl));
   const existingLandscapeRes = await pool.query<ExistingLandscapeRow>(
-    `SELECT display_name, canonical_url FROM bb_research.landscape_candidates WHERE lane = $1`,
+    `SELECT display_name, canonical_url FROM research.landscape_candidates WHERE lane = $1`,
     [LANE],
   );
   const existingEntitiesRes = await pool.query<ExistingEntity>(
-    `SELECT display_name FROM bb_canonical.entities`,
+    `SELECT display_name FROM canonical.entities`,
   );
 
   const existingLandscapeNames = new Set(
@@ -233,7 +196,7 @@ async function main(): Promise<void> {
 
   console.log(
     `Existing landscape_candidates (lane='${LANE}'): ${existingLandscapeRes.rows.length}. ` +
-      `bb_canonical.entities total: ${existingEntitiesRes.rows.length}.`,
+      `canonical.entities total: ${existingEntitiesRes.rows.length}.`,
   );
 
   let dedupedOutLandscapeLane = 0;
@@ -342,7 +305,7 @@ async function main(): Promise<void> {
     await client.query('BEGIN');
     const runId = `negro-leagues-hof-${report.generatedAt.slice(0, 10)}`;
     await client.query(
-      `INSERT INTO bb_research.source_program_runs
+      `INSERT INTO research.source_program_runs
         (id, lane, source_program_id, source_program_name, canonical_url, retrieved_at,
          rows_fetched, candidate_count, dropped_count, summary, updated_at)
        VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,now())
@@ -368,7 +331,7 @@ async function main(): Promise<void> {
     for (const row of netNewRows) {
       const id = `${LANE}-${row.sourceItemId}`;
       await client.query(
-        `INSERT INTO bb_research.landscape_candidates
+        `INSERT INTO research.landscape_candidates
           (id, run_id, lane, source_program_id, source_item_id, display_name, kind, summary,
            lat, lng, canonical_url, research_lane_only, status, provenance, payload, discovered_at, updated_at)
          VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,true,'pending',$12,$13,$14,now())

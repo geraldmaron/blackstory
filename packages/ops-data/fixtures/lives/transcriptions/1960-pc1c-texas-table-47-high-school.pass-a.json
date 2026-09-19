@@ -1,0 +1,109 @@
+{
+  "source": "U.S. Bureau of the Census, U.S. Census of Population: 1960, Vol. I, Characteristics of the Population, Part 45, Texas, Chapter C, General Social and Economic Characteristics",
+  "sourceUrl": "https://www2.census.gov/library/publications/decennial/1960/population-volume-1/33255142v1p45ch05.pdf",
+  "table": "Table 47",
+  "page": "45-330",
+  "boundaryVersion": "us-states-1960",
+  "datasetVintage": "1963 printed volume",
+  "figures": [
+    {
+      "metricId": "lives-high-school",
+      "jurisdictionId": "state:48",
+      "referencePeriod": "1960",
+      "raceEthnicitySlice": "all",
+      "estimate": 39.5,
+      "numerator": 1989554,
+      "denominator": 5030559,
+      "universe": "Persons 25 years old and over; high school 4 years plus college",
+      "note": "Derived share: HS 4 + college 1-3 + college 4 or more over total 25+. Printed: total_25_plus=5030559, hs4=1095017, college_1_3=491090, college_4_plus=403447."
+    },
+    {
+      "metricId": "lives-high-school",
+      "jurisdictionId": "state:48",
+      "referencePeriod": "1960",
+      "raceEthnicitySlice": "white",
+      "estimate": 42.0,
+      "numerator": 1866977,
+      "denominator": 4442605,
+      "universe": "Persons 25 years old and over; WHITE",
+      "note": "Printed: total_25_plus=4442605, hs4=1021807, college_1_3=464981, college_4_plus=380189."
+    },
+    {
+      "metricId": "lives-high-school",
+      "jurisdictionId": "state:48",
+      "referencePeriod": "1960",
+      "raceEthnicitySlice": "nonwhite",
+      "estimate": 20.8,
+      "numerator": 122577,
+      "denominator": 587954,
+      "universe": "Persons 25 years old and over; NONWHITE",
+      "note": "Printed: total_25_plus=587954, hs4=73210, college_1_3=26109, college_4_plus=23258."
+    },
+    {
+      "metricId": "lives-high-school",
+      "jurisdictionId": "state:48",
+      "referencePeriod": "1950",
+      "raceEthnicitySlice": "all",
+      "estimate": 29.9,
+      "numerator": 1260685,
+      "denominator": 4212755,
+      "universe": "Persons 25 years old and over; includes persons not reporting years of school completed",
+      "note": "Printed: total_25_plus=4212755, hs4=661605, college_1_3=344715, college_4_plus=254365."
+    },
+    {
+      "metricId": "lives-high-school",
+      "jurisdictionId": "state:48",
+      "referencePeriod": "1950",
+      "raceEthnicitySlice": "white",
+      "estimate": 32.5,
+      "numerator": 1200370,
+      "denominator": 3694060,
+      "universe": "Persons 25 years old and over; WHITE",
+      "note": "Printed: total_25_plus=3694060, hs4=629795, college_1_3=329190, college_4_plus=241385."
+    },
+    {
+      "metricId": "lives-high-school",
+      "jurisdictionId": "state:48",
+      "referencePeriod": "1950",
+      "raceEthnicitySlice": "nonwhite",
+      "estimate": 11.6,
+      "numerator": 60315,
+      "denominator": 518695,
+      "universe": "Persons 25 years old and over; NONWHITE",
+      "note": "Printed: total_25_plus=518695, hs4=31810, college_1_3=15525, college_4_plus=12980."
+    },
+    {
+      "metricId": "lives-high-school",
+      "jurisdictionId": "state:48",
+      "referencePeriod": "1940",
+      "raceEthnicitySlice": "all",
+      "estimate": 24.5,
+      "numerator": 834876,
+      "denominator": 3413739,
+      "universe": "Persons 25 years old and over; includes persons not reporting years of school completed",
+      "note": "Printed: total_25_plus=3413739, hs4=450439, college_1_3=234018, college_4_plus=150419."
+    },
+    {
+      "metricId": "lives-high-school",
+      "jurisdictionId": "state:48",
+      "referencePeriod": "1940",
+      "raceEthnicitySlice": "white",
+      "estimate": 27.1,
+      "numerator": 795234,
+      "denominator": 2936638,
+      "universe": "Persons 25 years old and over; WHITE",
+      "note": "Printed: total_25_plus=2936638, hs4=430337, college_1_3=222251, college_4_plus=142646."
+    },
+    {
+      "metricId": "lives-high-school",
+      "jurisdictionId": "state:48",
+      "referencePeriod": "1940",
+      "raceEthnicitySlice": "nonwhite",
+      "estimate": 8.3,
+      "numerator": 39642,
+      "denominator": 477101,
+      "universe": "Persons 25 years old and over; NONWHITE",
+      "note": "Printed: total_25_plus=477101, hs4=20102, college_1_3=11767, college_4_plus=7773."
+    }
+  ]
+}

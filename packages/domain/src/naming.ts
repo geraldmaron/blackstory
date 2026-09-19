@@ -1,25 +1,4 @@
-/**
- * Temporal naming + external-identifier contracts (the related workstream).
- *
- * Names today are scattered by kind: `CanonicalEntity.displayName`/`aliases`, `PlaceFields
- * .historicalNames` (`./geography/location.ts`), `SchoolFields.names` (`./school.ts`). This
- * module adds a single unified `EntityName` shape any kind can migrate its scattered names into,
- * and an `EntityIdentifierRecord` shape for external authority-control ids (Wikidata QID, LoC,
- * VIAF, NPS, NRHP, NCES, etc.) with a namespace/value uniqueness invariant.
- *
- * SCOPE DECISION: this is a domain-layer contract (types + migration-mapping functions from the
- * existing scattered fields), NOT new Firestore top-level collections. Two new collections
- * (`entityNames`, `entityIdentifiers`) plus their Zod schemas, security rules, and writer
- * migrations is a large lift on top of beads 9mox/mpfb landing in the same pass — the
- * domain-layer contract is the acceptable smaller scope the bead explicitly allows, and it is
- * what `resolver.ts`'s re-weighting (below) actually consumes.
- *
- * NAMING NOTE: `./entity.ts` already exports an `EntityIdentifier` type (`{system, value, note?}`,
- * the per-entity identifier bag on `CanonicalEntity.identifiers`, used throughout resolution and
- * publish code). The new external-identifier contract is deliberately named
- * `EntityIdentifierRecord` instead of reusing/renaming `EntityIdentifier`, to avoid a breaking
- * rename of a widely-consumed existing type — see the bead's own call-site-auditing guardrail.
- */
+/** Unified names and identifiers with temporal qualifiers. Pure mapping helpers collect entity name fields without changing stored records or asserting identity matches. */
 import type { CanonicalEntity } from './entity.js';
 import { normalizeAlias } from './resolution/normalization.js';
 
@@ -72,7 +51,7 @@ function toEntityName(
 /**
  * Migrates every scattered name field on a `CanonicalEntity` (`displayName`, `aliases`,
  * `school.names`, `place.historicalNames`) into the unified `EntityName` shape. Pure and
- * read-only — does not mutate the entity or assert anything about Firestore storage.
+ * read-only; does not mutate the entity or its stored form.
  */
 export function migrateEntityNames(entity: CanonicalEntity): readonly EntityName[] {
   const names: EntityName[] = [

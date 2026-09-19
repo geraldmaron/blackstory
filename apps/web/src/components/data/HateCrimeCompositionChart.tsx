@@ -3,7 +3,7 @@
  * vs all other reported bias categories. Framed as reporting composition, not danger heat.
  *
  * Not currently rendered — see the note in HateCrimeYearSeriesChart.tsx. Awaiting the typed
- * `statistical_series` hate-crime metric (repo-zxjz.10, repo-a03ca83f).
+ * `statistical_series` hate-crime metric.
  */
 import React from 'react';
 import type { HateCrimeYearSummary } from '@repo/domain/statistics/public-data-summaries';

@@ -1,0 +1,35 @@
+{
+  "source": "U.S. Bureau of the Census, U.S. Census of Population: 1960, Vol. I, Characteristics of the Population, Part 26, Mississippi, Chapter C, General Social and Economic Characteristics",
+  "sourceUrl": "https://www2.census.gov/library/publications/decennial/1960/population-volume-1/37745223v1p26ch4.pdf",
+  "table": "Table 65",
+  "page": "26-132",
+  "boundaryVersion": "us-states-1960",
+  "datasetVintage": "1963 printed volume",
+  "figures": [
+    {
+      "metricId": "lives-income-median",
+      "jurisdictionId": "state:28",
+      "referencePeriod": "1960",
+      "raceEthnicitySlice": "all",
+      "estimate": 2884,
+      "universe": "Families; income in 1959 dollars; THE STATE",
+      "note": "Families block median, not families and unrelated individuals."
+    },
+    {
+      "metricId": "lives-income-median",
+      "jurisdictionId": "state:28",
+      "referencePeriod": "1960",
+      "raceEthnicitySlice": "white",
+      "estimate": 4209,
+      "universe": "Families; WHITE; income in 1959 dollars; THE STATE"
+    },
+    {
+      "metricId": "lives-income-median",
+      "jurisdictionId": "state:28",
+      "referencePeriod": "1960",
+      "raceEthnicitySlice": "nonwhite",
+      "estimate": 1444,
+      "universe": "Families; NONWHITE; income in 1959 dollars; THE STATE"
+    }
+  ]
+}

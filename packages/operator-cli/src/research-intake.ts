@@ -31,7 +31,7 @@ import {
 
 /**
  * Optional capture sink. When provided, a successful research-intake fetch is persisted as a
- * real bb_evidence.source_capture (+ retrieval_event) instead of only planning one — closing
+ * real evidence.source_capture (+ retrieval_event) instead of only planning one — closing
  * the no-op that let intake-cited URLs go uncaptured.
  */
 export type ResearchCaptureSink = {

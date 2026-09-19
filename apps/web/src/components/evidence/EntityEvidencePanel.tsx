@@ -6,7 +6,7 @@
  *
  * Claims lead; the measurement legend collapses into `<details>`; record-level coverage and
  * retraction notices follow as flat chrome. Per claim: evidence-score confidence (never
- * probability language unless calibrated), claim↔citation aria association, preserved
+ * probability language), claim↔citation aria association, preserved
  * contradiction notices, and rights-limited excerpts.
  */
 
@@ -36,8 +36,7 @@ export type EntityEvidencePanelProps = {
   /** Record-level research-coverage measurement (e.g. `entity.researchCoverage`, wrapped as
    * `{ level: entity.researchCoverage }`). Kept required since every record carries one today. */
   readonly researchCoverage: EvidenceResearchCoverageInput;
-  /** Record-level independent-source-lineage rollup. Falls back to the sum of each claim's own
-   * `sourceLineage.independentLineageCount`, then distinct citation sources, when omitted. */
+  /** Reviewed record-level lineage rollup. Without it, only a sole claim can supply the count. */
   readonly sourceLineage?: EvidenceSourceLineageInput;
   /** Record-level last-checked date. Falls back to the most recent date across claims when
    * omitted. */

@@ -7,7 +7,7 @@
 
 import {
   deriveCatalogEntityStatus,
-  normalizePublicPrecision,
+  isPublicPrecisionTier,
   type EntityStatusValue,
   type NotabilityCriterion,
   type StatusHistoryEntry,
@@ -17,6 +17,7 @@ import { sanitizePublicProseText } from '@repo/domain/editorial';
 import { isDatePrecision, resolveEraBucketsFromEvidence } from '@repo/domain/era';
 import { findUsStateForPoint, isDisplayableJurisdictionLabel } from '@repo/domain/map/geography';
 import { type PublicEntityView, type PublicVisitView } from '../../data/public-seed';
+import { parseWaybackCaptureUrl } from '@repo/domain';
 
 /**
  * Narrow projection shape used by the web mapper so rendering remains storage-independent.
@@ -40,7 +41,7 @@ export type PublicProjectionInput = {
    * absent on bootstrap-window stubs — mapper derives state name from `location` when present. */
   readonly jurisdictionLabel?: string;
   readonly locationLabel?: string;
-  /** Release-shipped visit contract (repo-el9p WS3), already gated by `publicVisitForTier`. */
+  /** Release-shipped visit contract, already gated by `publicVisitForTier`. */
   readonly visit?: PublicVisitView;
   /** Accepted public claims with citations. Non-numeric by standing policy: the projection
    * carries `confidenceLevel` (the display register), never a raw confidence score. */
@@ -51,6 +52,8 @@ export type PublicProjectionInput = {
     readonly confidenceLevel: 'high' | 'medium' | 'low';
     readonly citationSource: string;
     readonly citationHref?: string;
+    readonly archivedUrl?: string;
+    readonly archivedAt?: string;
     readonly citationLabel: string;
     readonly independentLineageCount?: number;
     readonly claimRole?: string;
@@ -66,7 +69,7 @@ export type PublicProjectionInput = {
   }[];
   readonly eraBuckets?: readonly string[];
   readonly notabilityLabels?: readonly string[];
-  /** Structured, auditable inclusion basis (the related workstream's release builder). Present on
+  /** Structured, auditable inclusion basis (the release builder). Present on
    * releases built by `buildReleaseEntityArtifacts`; absent on pre-existing bootstrap-window
    * stubs, which carry only the derived `notabilityLabels` above. */
   readonly notabilityBasis?: readonly {
@@ -74,10 +77,10 @@ export type PublicProjectionInput = {
     readonly note: string;
     readonly evidenceIds: readonly string[];
   }[];
-  /** Research-depth signal computed once at release-build time (the related workstream). Absent on
+  /** Research-depth signal computed once at release-build time. Absent on
    * pre-existing bootstrap-window stubs. */
   readonly researchCoverage?: 'minimal' | 'partial' | 'substantial';
-  /** Real release-build-time timestamps (the related workstream). Absent on pre-existing
+  /** Real release-build-time timestamps. Absent on pre-existing
    * bootstrap-window stubs, which predate the release builder that populates these. */
   readonly generatedAt?: string;
   readonly recordUpdatedAt?: string;
@@ -94,7 +97,7 @@ export type PublicProjectionInput = {
     readonly width?: number;
     readonly height?: number;
     readonly objectPath?: string;
-    /** Pin-and-serve (repo-4vuf): see PublicEntityPrimaryImageView for field rationale. */
+    /** Pin-and-serve: see PublicEntityPrimaryImageView for field rationale. */
     readonly sourceSystem?: 'wikimedia_commons' | 'nps' | 'loc' | 'public_media';
     readonly fileTitle?: string;
     readonly sha1?: string;
@@ -117,45 +120,36 @@ export type PublicProjectionInput = {
 function locationPrecisionFromProjection(
   precision: string | undefined,
 ): PublicEntityView['locationPrecision'] {
-  const normalized = normalizePublicPrecision(precision);
-  // 'none' and 'country' are withheld/too-coarse-to-render tiers that never carry a map pin;
-  // PublicEntityView.locationPrecision only ever renders a real geo anchor, so both fall to
-  // the same 'city' floor as an unrecognized raw value.
-  if (normalized === 'none' || normalized === 'country') {
-    return 'city';
-  }
-  return normalized;
+  return precision !== undefined && isPublicPrecisionTier(precision) ? precision : 'none';
 }
 
-/** View claims render a nominal score alongside the level chip; the projection carries only the
- * level (non-numeric public-payload policy), so the score here is the level's register midpoint —
- * a display value, never a stored ranking. */
-const NOMINAL_CONFIDENCE_SCORE: Record<'high' | 'medium' | 'low', number> = {
-  high: 0.85,
-  medium: 0.6,
-  low: 0.4,
-};
-
 function mapClaims(claims: PublicProjectionInput['claims']): PublicEntityView['claims'] {
-  return (claims ?? []).map((claim) => ({
-    id: claim.id,
-    predicate: claim.predicate,
-    object: sanitizePublicProseText(claim.object),
-    confidenceScore: NOMINAL_CONFIDENCE_SCORE[claim.confidenceLevel],
-    confidenceLevel: claim.confidenceLevel,
-    citationSource: claim.citationSource,
-    ...(claim.citationHref !== undefined ? { citationHref: claim.citationHref } : {}),
-    citationLabel: claim.citationLabel,
-    ...(claim.independentLineageCount !== undefined
-      ? { independentLineageCount: claim.independentLineageCount }
-      : {}),
-    // Load-bearing for the record tier: dropping it here would silently downgrade the rule to
-    // its predicate fallback on every entity the site renders. The stored value is untrusted
-    // text, so it is checked against the wire vocabulary rather than cast: an out-of-vocabulary
-    // role falls back to the predicate deliberately, which is the same outcome as before but
-    // reached by a decision rather than by a lie about the type.
-    ...(isClaimRoleV1(claim.claimRole) ? { claimRole: claim.claimRole } : {}),
-  }));
+  return (claims ?? []).map((claim) => {
+    const pointer =
+      claim.archivedUrl && claim.archivedAt && claim.citationHref
+        ? parseWaybackCaptureUrl(claim.archivedUrl, claim.citationHref)
+        : null;
+    const archive =
+      pointer !== null && pointer.capturedAt === claim.archivedAt
+        ? { archivedUrl: pointer.url, archivedAt: pointer.capturedAt }
+        : {};
+    return {
+      id: claim.id,
+      predicate: claim.predicate,
+      object: sanitizePublicProseText(claim.object),
+      confidenceLevel: claim.confidenceLevel,
+      citationSource: claim.citationSource,
+      ...(claim.citationHref !== undefined ? { citationHref: claim.citationHref } : {}),
+      ...archive,
+      citationLabel: claim.citationLabel,
+      ...(claim.independentLineageCount !== undefined
+        ? { independentLineageCount: claim.independentLineageCount }
+        : {}),
+      // Validate stored roles against the public vocabulary. Unknown roles use the record
+      // classifier's predicate fallback instead of bypassing its evidence requirements.
+      ...(isClaimRoleV1(claim.claimRole) ? { claimRole: claim.claimRole } : {}),
+    };
+  });
 }
 
 /** True when a stored claim role is one the wire contract actually defines. */
@@ -255,6 +249,15 @@ function resolveStatusHistory(
 
 function mapGeoAnchor(location: PublicProjectionInput['location']): PublicEntityView['geoAnchor'] {
   if (!location) return undefined;
+  const precision = locationPrecisionFromProjection(location.precision);
+  if (precision === 'none' || precision === 'country') return undefined;
+  if (
+    !Number.isFinite(location.lat) ||
+    !Number.isFinite(location.lng) ||
+    Math.abs(location.lat) > 90 ||
+    Math.abs(location.lng) > 180
+  )
+    return undefined;
   return {
     lat: location.lat,
     lng: location.lng,
@@ -380,7 +383,7 @@ export function mapProjectionToPublicEntityView(
     notabilityLabels:
       projection.notabilityLabels && projection.notabilityLabels.length > 0
         ? projection.notabilityLabels
-        : ['A documented site in the active public release.'],
+        : ['A record in the active public release.'],
     ...(projection.notabilityBasis !== undefined
       ? { notabilityBasis: projection.notabilityBasis }
       : {}),
@@ -394,7 +397,7 @@ export function mapProjectionToPublicEntityView(
     ...(projection.visit !== undefined ? { visit: projection.visit } : {}),
     relevanceExplanation:
       claims.length > 0
-        ? 'Included as a documented site in the active public release; each accepted claim below cites its source.'
+        ? 'Included in the active public release; each accepted claim below cites its source.'
         : 'No sourced claims have been accepted for this record yet. It is listed because it is part of the active public release, and it will carry its evidence here as research lands.',
     /*
      * Empty, not a note about the publication pipeline. Substituting build-status prose here
@@ -419,13 +422,8 @@ export function mapProjectionToPublicEntityView(
     ...(primaryImage !== undefined ? { primaryImage } : {}),
     ...(geoAnchor !== undefined ? { geoAnchor } : {}),
     recordMaturity: claims.length > 0 ? 'partial_enrichment' : 'projection_stub',
-    // Prefer the release builder's own computed researchCoverage (the related workstream,
-    // packages/domain/src/publication/release-builder.ts's computeReleaseResearchCoverage) —
-    // it is derived from the real distinct-source-document count at release-BUILD time.
-    // The fallback below is only for bootstrap-window stubs that predate the release builder and
-    // never carried this field. repo-z1pw: it counted claims (`claims.length >= 2`), the same
-    // defect the builder just shed — two claims carved out of one document are one document — so
-    // it now defers to a stub being 'minimal' unless it cites more than one distinct source.
+    // Prefer publication's researchCoverage. If absent, count distinct cited documents rather
+    // than claims so multiple claims from one document cannot inflate coverage.
     researchCoverage:
       projection.researchCoverage ??
       (new Set(claims.map((claim) => claim.citationSource?.trim().toLowerCase()).filter(Boolean))
@@ -440,7 +438,7 @@ export function mapProjectionToPublicEntityView(
     revision: {
       releaseId: projection.releaseId,
       // Prefer the release builder's real "this release build ran at this instant" timestamps
-      // (the related workstream) when present. Bootstrap-window stubs that predate the release builder
+      // when present. Bootstrap-window stubs that predate the release builder
       // carry neither field; '' is an honest "unknown", never a fabricated "now".
       generatedAt: projection.generatedAt ?? '',
       recordUpdatedAt: projection.recordUpdatedAt ?? '',

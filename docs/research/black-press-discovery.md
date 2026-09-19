@@ -22,7 +22,7 @@ Black-press OCR mentions enter as the first class, so:
 
 | Invariant | Enforcement |
 |-----------|-------------|
-| Discovery cannot publish (`docs/decisions-carryover.md`, "Research and discovery cannot publish") | `assertCampaignCannotPublish()` at campaign entry; `assertDiscoveryCannotPublish` blocks `write_public_projection` / `create_public_entity` / `activate_release` / `publish_snapshot`; no bb_public / bb_canonical / release write paths anywhere in the module |
+| Discovery cannot publish (`docs/decisions-carryover.md`, "Research and discovery cannot publish") | `assertCampaignCannotPublish()` at campaign entry; `assertDiscoveryCannotPublish` blocks `write_public_projection` / `create_public_entity` / `activate_release` / `publish_snapshot`; no published / canonical / release write paths anywhere in the module |
 | Safe fetch only | `@repo/domain` performs **no network I/O**. OCR bundles are supplied by callers; any live `BlackPressAdapter` implementation MUST fetch exclusively through `@repo/security` safe-fetch |
 | Adapter disabled by default | `registerBlackPressSource` ships `registryState: 'disabled'`, `adapterEnabled: false`; campaign approval is run-scoped in-memory only (mirrors `rss-campaign.ts`), never persisted |
 | Rights / dignity | Rights default `unknown`; `full_text_republication` and `commercial_reuse` prohibited; OCR text is ephemeral — only evidence-pointer-capped snippets (≤320 chars / ≤60 words) and HTTPS link hints survive onto payloads. HOLC period language (`"colored grade"`) is `researchOnlyOffensive: true`: research recall only, never default public language. Living addresses never public (leads carry archive/issue URLs, not residences) |
@@ -98,5 +98,4 @@ export {
 
 - Live archive clients (must land behind `@repo/security` safe-fetch with per-archive allowlists and honor `registryState`)
 - OCR acquisition/quality pipeline (adapter consumes OCR; it does not produce it)
-- Firestore persistence of black-press campaign runs
 - Automatic `research-intake` commit of authority follow-ups

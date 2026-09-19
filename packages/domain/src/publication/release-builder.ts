@@ -1,42 +1,9 @@
 /**
- * Single deterministic per-entity release/projection builder (the related workstream).
- *
- * `./index.ts` already owns release-level infrastructure (manifest hashing, signing, lifecycle
- * transitions). This module owns the CONTENT of one entity's release artifacts — the piece that
- * was previously duplicated, thinned-out logic living inline in
- * `packages/ops-data/scripts/publish-national-catalog.ts`. That script is today's only writer of
- * `publicReleases/{releaseId}/entities/{id}` + `publicSearchIndex/{id}` docs, and it works from a
- * `CatalogEntry` fixture shape (see that script's header) rather than the richer
- * `CanonicalEntityDoc`/`CanonicalClaimDoc` model — so `ReleaseSourceEntity` below intentionally
- * mirrors `CatalogEntry`'s shape, generalized so it carries no dependency on `@repo/ops-data`'s
- * Zod schemas (this package must not depend on that package). When a canonical-graph release
- * builder replaces the fixture-driven one, adapt a `CanonicalEntityDoc` into this same
- * `ReleaseSourceEntity` shape rather than writing a second builder.
- *
- * What this module makes REAL instead of fabricated (see each function's doc comment):
- *  - `notabilityBasis`: derived from the entry's own claims (one basis record per distinct claim
- *    predicate, `evidenceIds` pointing at that predicate's claim ids), not a single hardcoded
- *    placeholder string.
- *  - `researchCoverage`: derived from the number of distinct SOURCE DOCUMENTS the entry's claims
- *    rest on, not a UI-side guess and not duplicated ad hoc between the projection and
- *    search-index builders. Counting claims instead measured how finely a publish path chose to
- *    slice one source — see `computeReleaseResearchCoverage` and repo-z1pw.
- *  - `generatedAt`/`recordUpdatedAt`: a real "this publish happened at this instant" timestamp,
- *    legitimate at release-BUILD time (unlike the web read-path, which must never fabricate one
- *    at render time — see `apps/web/src/lib/public-data/map-projection.ts`).
- *
- * Fail-closed reference resolution (`resolveReleaseEntityReferences`): refuses to build artifacts
- * for an entry whose declared topics/jurisdiction/location/evidence do not resolve to something
- * real. `mentionedEntityIds` is deliberately NOT checked here: per `publicEntityProjectionSchema`'s
- * own doc comment these may still be raw legacy-tag placeholder strings pending the related workstream's
- * real entity-resolution work, so treating them as fail-closed today would reject legitimate,
- * already-reviewed records for a gap this bead does not own.
- *
- * Opt-in geo-integrity (`evaluateReleaseGeoIntegrityGate`): when `ReleaseBuildContext` supplies
- * `geoIntegrity.stateBoundaries` (or shorthand `stateBoundaries`), declared state vs coordinates
- * is checked via `evaluateGeoIntegrityPublishGate` before artifacts are emitted. Omitted boundaries
- * preserve backward-compatible fixture behavior. Mismatch fails closed; lat/lng/state are never
- * auto-rewritten.
+ * Deterministically builds one entity's release projection and search document from
+ * ReleaseSourceEntity. Shared helpers derive inclusion basis, research coverage, public
+ * location precision and evidence-grading inputs. Callers adapt their canonical data into this
+ * shape; release manifests and lifecycle transitions belong to the surrounding publication
+ * module.
  */
 import {
   NOTABILITY_CRITERIA,
@@ -70,6 +37,7 @@ import { US_STATES } from '../map/us-geography.js';
 import type { PublicRelatedEntry } from '../graph/adjacency.js';
 import type { RelationshipType, TemporalContext } from '../relationship.js';
 import { RELATIONSHIP_TYPES } from '../relationship.js';
+import { parseWaybackCaptureUrl } from '@repo/schemas';
 
 export type ReleaseSourceClaim = {
   readonly id?: string;
@@ -78,6 +46,10 @@ export type ReleaseSourceClaim = {
   readonly confidenceLevel: 'high' | 'medium' | 'low';
   readonly citationSource: string;
   readonly citationHref?: string;
+  /** Verified public archive pointer for the exact cited URL. */
+  readonly archivedUrl?: string;
+  /** ISO timestamp encoded by archivedUrl. */
+  readonly archivedAt?: string;
   readonly citationLabel: string;
   readonly independentLineageCount?: number;
   /** `record_index` for a claim built from the record's own index row; `evidence` otherwise. */
@@ -126,7 +98,7 @@ export type ReleaseSourceEntity = {
   /**
    * Raw visit-contact input (address/phone/website/hours/visitability), pre-gating. Prefer
    * `ReleaseBuildContext.visitOverride` when the caller has looked up
-   * `bb_canonical.entity_visit` + `entity_locations.street`/`postal_code` for a canonical
+   * `canonical.entity_visit` + `entity_locations.street`/`postal_code` for a canonical
    * entity — same precedence as `locationOverride` above.
    */
   readonly visit?: PublicVisit;
@@ -139,6 +111,8 @@ export type ReleaseClaimProjection = {
   readonly confidenceLevel: 'high' | 'medium' | 'low';
   readonly citationSource: string;
   readonly citationHref?: string;
+  readonly archivedUrl?: string;
+  readonly archivedAt?: string;
   readonly citationLabel: string;
   readonly independentLineageCount?: number;
   readonly claimRole?: ClaimRole;
@@ -147,17 +121,9 @@ export type ReleaseClaimProjection = {
 export type ReleaseResearchCoverage = 'minimal' | 'partial' | 'substantial';
 
 /**
- * A location supplied by the caller that wins over the source entry's own
- * `lat`/`lng`/`locationPrecision`/`locationLabel`, plus the `matchMethod` the entry has no field
- * for. One production caller supplies it today: the incremental publisher, inheriting the location
- * an already-live record publishes, for a republish whose landscape row never carried coordinates
- * (repo-lai8y). The field predates that and was written for a canonical EntityLocation
- * (Census-validated) source, which nothing supplies yet — the doc on `ReleaseBuildContext` still
- * describes that intent.
- *
- * `precision` travels with the point on purpose. A precision tier describes a POINT, so a caller
- * that overrides the coordinates and leaves the tier to be re-derived elsewhere is describing
- * someone else's point.
+ * Caller-supplied public location and match method that override source-entry coordinates.
+ * Republishing may inherit an already-published location when the candidate lacks coordinates;
+ * callers must preserve its recorded precision and provenance.
  */
 export type ReleaseLocationOverride = {
   readonly lat: number;
@@ -185,7 +151,7 @@ export type ReleaseBuildContext = {
    */
   readonly locationOverride?: ReleaseLocationOverride;
   /**
-   * Canonical visit-contact input (`bb_canonical.entity_visit` joined with
+   * Canonical visit-contact input (`canonical.entity_visit` joined with
    * `entity_locations.street`/`postal_code`), when the caller looked one up. Wins over
    * `entry.visit` — same precedence as `locationOverride` above. Gated through
    * `publicVisitForTier` before it reaches the projection; this is raw input, not the
@@ -212,7 +178,7 @@ export type ReleaseBuildContext = {
   /** Shorthand for `geoIntegrity.stateBoundaries` when no other geo-integrity options are needed. */
   readonly stateBoundaries?: StateBoundaryIndex;
   /**
-   * Authoritative lifecycle status from `bb_canonical.entities`. When present for an entity,
+   * Authoritative lifecycle status from `canonical.entities`. When present for an entity,
    * canonical values win over heuristic derivation from summary text.
    */
   readonly canonicalStatus?: CanonicalStatusSnapshot;
@@ -221,7 +187,7 @@ export type ReleaseBuildContext = {
 /** Where release projection status fields were resolved. */
 export type StatusProvenance = 'canonical' | 'derived_heuristic';
 
-/** Canonical lifecycle fields loaded at publish time (subset of bb_canonical.entities). */
+/** Canonical lifecycle fields loaded at publish time (subset of canonical.entities). */
 export type CanonicalStatusSnapshot = {
   readonly livingStatus?: LivingStatus | 'not_applicable';
   readonly statusHistory?: readonly StatusHistoryEntry<EntityStatusValue>[];
@@ -248,9 +214,11 @@ export type ReleaseEntityProjectionFields = {
     readonly geohashPrefixes: readonly string[];
     readonly precision: string;
     readonly matchMethod: string;
-    /** Set only when `reducePublicPrecision` (the location precision standard's one publish-path
-     * engine, repo-wqcn) actually coarsened this entity's precision see §3 of the standard for
-     * the reason vocabulary. Absent means the location published at its source precision. */
+    /**
+     * Present only when reducePublicPrecision coarsens the source location. The
+     * location-precision standard defines the reason vocabulary; absence means no reduction was
+     * applied.
+     */
     readonly precisionReductionReason?: string;
   };
   readonly claimIds: readonly string[];
@@ -291,13 +259,8 @@ export type ReleaseEntityProjectionFields = {
 };
 
 /**
- * Record grading no longer happens in this package.
- *
- * `highestClaimConfidenceTier` used to live here and write a finished `confidenceTier` onto the
- * search index for `/records` to read back — one rule with two implementations, which stranded
- * `/records` for a day when the rule changed (repo-ngojq, repo-6qjv0). The builder now projects
- * the grading INPUTS instead, and every surface applies the single rule at read time. See
- * `../evidence-inputs.js` for why the split falls where it does.
+ * Projects grading inputs for the shared read-time confidence rule. Caching a finished tier
+ * would leave existing records stale whenever the rule changes.
  */
 export {
   CLAIM_ROLE_RECORD_INDEX,
@@ -366,28 +329,44 @@ export function resolveReleaseClaimId(
 }
 
 function buildClaimProjections(entry: ReleaseSourceEntity): readonly ReleaseClaimProjection[] {
-  return (entry.claims ?? []).map((claim, index) => ({
-    id: resolveReleaseClaimId(entry, claim, index),
-    predicate: claim.predicate,
-    object: sanitizePublicProseText(claim.object),
-    confidenceLevel: claim.confidenceLevel,
-    citationSource: claim.citationSource,
-    ...(claim.citationHref !== undefined ? { citationHref: claim.citationHref } : {}),
-    citationLabel: claim.citationLabel,
-    // Pass through scored lineage only. Inventing `1` per cited claim overcounts the same
-    // source across claims; the web evidence panel uses unique citation sources as proxy.
-    ...(claim.independentLineageCount !== undefined
-      ? { independentLineageCount: claim.independentLineageCount }
-      : {}),
-    ...(claim.claimRole !== undefined ? { claimRole: claim.claimRole } : {}),
-  }));
+  return (entry.claims ?? []).map((claim, index) => {
+    const hasArchiveField = claim.archivedUrl !== undefined || claim.archivedAt !== undefined;
+    const pointer =
+      claim.archivedUrl !== undefined && claim.citationHref !== undefined
+        ? parseWaybackCaptureUrl(claim.archivedUrl, claim.citationHref)
+        : null;
+    if (
+      hasArchiveField &&
+      (claim.archivedUrl === undefined ||
+        claim.archivedAt === undefined ||
+        claim.citationHref === undefined ||
+        pointer === null ||
+        pointer.capturedAt !== claim.archivedAt)
+    ) {
+      throw new Error(`Claim ${claim.id ?? index} carries an invalid archive pointer`);
+    }
+    return {
+      id: resolveReleaseClaimId(entry, claim, index),
+      predicate: claim.predicate,
+      object: sanitizePublicProseText(claim.object),
+      confidenceLevel: claim.confidenceLevel,
+      citationSource: claim.citationSource,
+      ...(claim.citationHref !== undefined ? { citationHref: claim.citationHref } : {}),
+      ...(claim.archivedUrl !== undefined ? { archivedUrl: claim.archivedUrl } : {}),
+      ...(claim.archivedAt !== undefined ? { archivedAt: claim.archivedAt } : {}),
+      citationLabel: claim.citationLabel,
+      ...(claim.independentLineageCount !== undefined
+        ? { independentLineageCount: claim.independentLineageCount }
+        : {}),
+      ...(claim.claimRole !== undefined ? { claimRole: claim.claimRole } : {}),
+    };
+  });
 }
 
 function claimToFactCitationStandIn(claim: ReleaseSourceClaim): FactCitation {
-  // Minimal structural stand-in sufficient to express "a citation exists" for the no_citations
-  // floor check. The fuller completeness sub-check (archived-capture pointer, retrieval date) is
-  // a genuine pipeline-wide data gap (see publish-national-catalog.ts's wiring-note history,
-  // the related workstream) — not fabricated here, deliberately not enforced yet.
+  // A structural citation marker supports the no_citations check. It does not prove
+  // archived-capture completeness or passage entailment; those require the evidence publication
+  // gates.
   return {
     csl: {
       id: claim.citationSource,
@@ -420,25 +399,10 @@ function claimToFactCitationStandIn(claim: ReleaseSourceClaim): FactCitation {
  * it whatever the record's kind.
  */
 /**
- * Whether a claim records a racial-terror killing OF THIS RECORD'S OWN SUBJECT.
- *
- * The verb is matched against the PREDICATE alone, never the object. Matching the whole claim
- * text instead swept in everyone who fought lynching alongside everyone killed by it: on the
- * active release it reclassified Ida B. Wells (predicate `launched_crusade`), the NAACP
- * (`pursued`), Mary Church Terrell, the Richmond Planet and the Savannah Tribune, because their
- * claims name lynching for the reason those records exist — they campaigned against it. Filing
- * the chronicler under the same criterion as the murdered is its own category error.
- *
- * `lynched` is the only verb that stands alone, in any position — a past participle in a
- * predicate always means this. The noun `lynching` deliberately does NOT stand alone, because
- * that is how a campaigner's predicate reads ("condemning the lynching of Wright Smith"). `killed` is deliberately absent and `hanged`
- * never stands alone: "was killed in action" is Doris Miller, who died aboard the USS Liscome
- * Bay, and a hanging can be a judicial execution — the memorial source data carries Nat Turner
- * on exactly that distinction. Those verbs must bring racial-terror context with them.
- *
- * Verified against every claim predicate in rel_20260723_authority_net_001 on 2026-09-09: it
- * matches all 32 records in the lynching cohort plus James G. Patterson (`was lynched on`, a
- * Reconstruction-era record outside that cohort), and nothing else.
+ * Matches a racial-terror killing of the record's subject from the predicate. Object text can
+ * mention violence documented or opposed by a chronicler and must not classify that chronicler
+ * as a victim. Lynched can stand alone; killed or hanged require additional context to exclude
+ * military deaths and judicial executions.
  */
 const RACIAL_TERROR_KILLED_PREDICATE =
   /\blynched\b|\b(?:was|were)\s+(?:hanged|hung|burned\s+alive|murdered|beaten\s+to\s+death)\b|reclassified\s+as\s+a\s+lynching|\bis\s+a\s+documented\s+instance\s+of\b.*\blynch|\bbody\s+was\s+(?:found|recovered)\b|\bhad\s+body\s+recovered\b/i;
@@ -452,27 +416,9 @@ const RACIAL_TERROR_CONTEXT =
   /(?:lynch\w*|racial\s+terror|racial\s+violence|\bmob\b|hate\s+crime)/i;
 
 /**
- * Context strong enough to be read from ANYWHERE on a record — every claim plus the summary —
- * rather than from the one claim under test.
- *
- * The claim-scoped rules above exist because a chronicler's own claim text names lynching for the
- * reason their record exists: matching the whole claim swept in Ida B. Wells, the NAACP and the
- * Richmond Planet alongside the people they wrote about. That danger does not go away by widening
- * the window, so this vocabulary is deliberately NARROWER than `RACIAL_TERROR_CONTEXT`: it names
- * the perpetrator, not the violence. `\bmob\b` and `hate crime` are absent — a record can
- * discuss a mob without being about a killing — and the record must independently carry a killing
- * predicate before any of this is consulted.
- *
- * This carried `emanuel nine` for one release. Sharonda Coleman-Singleton's record named neither
- * her killer nor the attack, so she alone would have kept publishing as a documented site while
- * her eight siblings were repaired. Naming a victim cohort in a general expression does not scale,
- * and the term is gone now that her record carries the claim the other eight always had
- * (repo-00gxb). If a cohort ever has to be named here again, treat it as a record defect with a
- * deadline, not a rule.
- *
- * Verified across rel_20260723_authority_net_001 on 2026-09-09: Ida B. Wells (`launched_crusade`,
- * `resided_at`), the Richmond Planet (`founded`, `published_from`), Mary Church Terrell and
- * T. Thomas Fortune carry no killing predicate and are untouched.
+ * Record-wide perpetrator context is consulted only alongside a killing predicate. Generic
+ * references to a mob or hate crime are insufficient. Do not add victim cohort names to
+ * compensate for missing claims; repair those records from evidence.
  */
 const RACIAL_TERROR_RECORD_CONTEXT =
   /white[\s-]?supremacis[tm]|white\s+mobs?|white\s+militia|ku\s+klux\s+klan|\bklan\b|lynch\w*|racial\s+terror|racial\s+violence|racist\s+attack/i;
@@ -531,17 +477,10 @@ const AUTHORITY_KILLING_CONTEXT =
   /\bpolice\b|\bofficers?\b|\bNYPD\b|\bpatrolm[ae]n\b|\btroopers?\b|\bdeputies\b|\bhighway\s+patrol\b|\bneighborhood[\s-]?watch\b|\bstand[\s-]your[\s-]ground\b|\bchokehold\b|\bin\s+custody\b|\bno-knock\b|\bsearch\s+warrant\b/i;
 
 /**
- * True when the record is about a killing by police or by someone claiming authority to use force.
- *
- * A SEPARATE criterion from `documented_racial_terror`, not an extension of it, and the separation
- * is the point. The two rest on different documentary records — the Equal Justice Initiative's
- * lynching research on one side, investigations, grand jury proceedings, federal findings and
- * consent decrees on the other. Collapsing a killing by the state into "racial terror" makes a
- * category claim this catalog cannot source; leaving Breonna Taylor under `movement_significance`
- * said her reason for being here was a role she played in a movement, when she was asleep in her
- * apartment. Ratified 2026-09-09; see docs/methodology/notability-rubric.md.
- *
- * Order is load-bearing: `isRacialTerrorRecord` is asked first everywhere this is used.
+ * Classifies killings by police or others claiming authority to use force using the separate
+ * documented_police_killing criterion. Racial-terror classification runs first. Keep the
+ * criteria distinct because they require different documentary support; see
+ * docs/methodology/notability-rubric.md.
  */
 export function isRacialKillingRecord(
   entry: Pick<ReleaseSourceEntity, 'kind' | 'displayName' | 'summary'>,
@@ -715,16 +654,9 @@ const MOVEMENT_NAME =
   /\bcivil\s+rights\s+movement\b|\bgreat\s+migration\b|\bblack\s+power\b|\bblack\s+arts\b|\bharlem\s+renaissance\b|\bunderground\s+railroad\b|\babolition\w*\b|\bfreedom\s+(?:rides?|riders?|summer|vote|school)\b|\bsit-?ins?\b|\bboycott\b|\bdesegregat\w*\b|\bvoter\s+registration\b|\bmarch\s+on\s+washington\b/i;
 
 /**
- * The kind IS the criterion for these, and kind is structured data rather than free-text prose.
- * That matters: there are 1,580 distinct claim predicates behind the fallback basis records, so a
- * keyword ladder cannot reach the tail, and the kinds listed here are the ones where a fallback
- * states something true of every record of that kind.
- *
- * Deliberately absent: person, school, institution, organization, event. Each is heterogeneous —
- * Little Rock Central High School is a school whose honest basis really is `documented_site`, and
- * the `organization` kind holds movement orgs, fraternities and USCT regiments together. Those
- * kinds get positive matching only, and whatever does not match keeps `documented_site` until
- * repo-o6k0c retires it against a measured residual rather than an assumed one.
+ * Uses structured kind for homogeneous inclusion categories. Heterogeneous kinds such as
+ * person, school and organization require positive evidence matching rather than a kind-only
+ * criterion.
  */
 /** Kinds whose records can carry a movement role — the kinds `movement_significance` names. */
 const MOVEMENT_ANCHOR_KINDS = new Set(['organization', 'event', 'person']);
@@ -1096,33 +1028,10 @@ export function formatClaimInclusionNote(predicate: string, object: string): str
   if (body.length === 0) return `${sentenceLead}.`;
 
   /*
-   * repo-15slz. An earlier spelling of this function assumed objects are "lowercase continuations
-   * authored to follow those keys" and said "for most of the corpus they are". Measured over the
-   * active release that was false: of 12,137 claim objects, 5,533 (45.6%) open lowercase, 6,175
-   * (50.9%) open with a capital and 404 with a digit. The designed shape is a MINORITY, and 3,885
-   * of the capital-initial objects are long enough to be whole clauses. Two defects followed.
-   *
-   * (a) DOUBLED VERB — the object opens by repeating the predicate's own verb, so joining the two
-   * stutters:
-   *
-   *   born_in            + "Born into slavery on April 5, 1856, ..."  -> "Born in Born into slavery ..."
-   *   delivered          + "Delivered the 'Atlanta Compromise' ..."   -> "Delivered Delivered the ..."
-   *   pulitzer_prizes    + "Pulitzer Prize for Drama for 'Fences' ..."-> "Pulitzer prizes Pulitzer Prize ..."
-   *
-   * When that happens the two sides are saying one thing twice, so keep the fuller of them and
-   * drop the other. Nothing is lost from the RECORD by choosing: the claim keeps both its
-   * predicate and its object and still renders in full under "what the sources say". Only this
-   * note — a one-sentence summary of why the record is in the catalog — stops repeating itself.
-   *
-   * Which side is fuller has to be measured, not assumed, because the repeat runs both ways.
-   * Usually the object is the prose and the predicate a short key. But sometimes the predicate is
-   * the whole statement and the object a stub restating it — "was the third Black man elected as
-   * alderman in Annapolis" + "third Black alderman" — and there, dropping the predicate would
-   * throw away the election and the town.
-   *
-   * Matching is on the predicate's FIRST meaning-bearing word only. Matching any shared word
-   * destroys real prose: "was first African American to hit a home run in" + "American League"
-   * shares "American", and collapsing that pair leaves the note reading "American League".
+   * Avoids repeating a predicate's opening verb in the inclusion note. Keep the fuller
+   * statement when predicate and object duplicate each other. Match only the first
+   * meaning-bearing predicate word: arbitrary shared words such as American do not establish
+   * repetition. The underlying claim retains both fields.
    */
   const objectLeadWord = body.match(/^[A-Za-z']+/u)?.[0]?.toLowerCase() ?? '';
   if (objectLeadWord.length > 0 && predicateLeadWord(lead) === objectLeadWord) {
@@ -1214,49 +1123,17 @@ export function buildReleaseNotabilityBasis(
     'documented_site';
 
   /*
-   * M1. A basis record answers "why is this record in the catalog". One record per distinct claim
-   * predicate encoded the assumption that every claim is such an answer, and most are not:
-   * "Architectural style Greek Revival.", "Collection size more than 35,000 artifacts.", "Buried
-   * at Lincoln Cemetery.", "Boarded northbound F train." The Tulsa Race Massacre published six.
-   *
-   * Three cases, in this order, and the order is what keeps it honest:
-   *
-   *   A killing record states the killing. The date and the street it happened on are record
-   *   content, not reasons — Susie Jackson's page said "Date June 17, 2015." and "Location 110
-   *   Calhoun Street." were why she is in this catalog.
-   *
-   *   A racial-terror record with no killing PREDICATE keeps everything. The Elaine Massacre's
-   *   claims are `resulted in` and `listed on`; keeping only what the inference identifies would
-   *   leave the National Register listing and drop the massacre, so the record would stop saying
-   *   why it exists. This case exists because that regression shipped twice in draft.
-   *
-   *   Everything else keeps the identified claims, or all of them when nothing is identified. The
-   *   second half matters: a record with no basis cannot publish, and that residual is the
-   *   measurement repo-o6k0c retires `documented_site` against. It must not be hidden here.
+   * Inclusion basis answers why the record belongs in the catalog. Killing records prioritize
+   * claims stating the killing. If racial-terror classification lacks a matching killing
+   * predicate, retain the available claims rather than dropping the event. Other records use
+   * positively identified claims, retaining the residual when none qualifies.
    */
   const racialKillingRecord = !racialTerrorRecord && isRacialKillingRecord(entry, claims);
 
   /*
-   * repo-oyxgh. "States the killing" has to mean it in the vocabulary the record actually uses.
-   * `isKillingPredicate` is the police-killing cohort's test (killed | shot | died | victim of)
-   * and matches none of a lynching record's predicates: Ell Persons's claims read `was lynched`,
-   * `was burned alive and dismembered`, `was subjected to`, `was captured by`. So the `.some()`
-   * below was false for him, M1 fell through to "keep everything", and a recompute promoted
-   * "Was subjected to brutal interrogation leading to a forced confession" and "Was captured by a
-   * lynch mob while in transit to stand trial" into this catalog's stated reasons for naming him.
-   * Those are things done TO him on the way to his murder, not why he is here.
-   *
-   * Measured on the active release 2026-09-12: 20 of the 32 `lynching_*` records had no claim
-   * matching `isKillingPredicate`, and all 20 are covered by the union below — none is left
-   * falling through.
-   *
-   * A union, not a replacement, and the two tests stay separate: `isRacialTerrorKillingPredicate`
-   * is deliberately the stricter one (it is what decides `documented_racial_terror` at all, where
-   * "was killed in action" is Doris Miller and a hanging can be a judicial execution), while
-   * `isKillingPredicate` is deliberately the broader one (Eric Garner's and Jordan Neely's claims
-   * say only `died`). Neither is a superset of the other, and this line needs both. It is applied
-   * ONLY here, not to `isRacialKillingRecord`'s classification, so nothing about which records
-   * count as racial-terror or racial-killing changes.
+   * Include both the broad killing predicates and the stricter racial-terror predicates when
+   * selecting basis claims. Neither vocabulary contains the other. This selection does not
+   * broaden the separate record-classification rule.
    */
   const statesTheKilling = (claim: ReleaseClaimProjection): boolean =>
     isKillingPredicate(claim.predicate) || isRacialTerrorKillingPredicate(claim.predicate);
@@ -1285,12 +1162,9 @@ export function buildReleaseNotabilityBasis(
     }
   }
 
-  // A record carrying any racial-terror claim is a record about a killing, and that is its reason
-  // for inclusion. `documented_site` is only ever reached as a fallback — the inference has no
-  // positive branch for it — and repo-9ki8 established that the rubric reserves it for sites, so
-  // on this record it is both a fallback AND the sentence that told a reader Alma Howze is a
-  // documented site. Fall back to the criterion that is actually true here instead. Criteria the
-  // inference positively identified (a landmark listing, a documented first) are left alone.
+  // For a racial-terror record, replace only the generic documented_site fallback with the
+  // supported killing criterion. Preserve positively identified criteria such as landmark
+  // designation.
   const fallback: NotabilityCriterion = racialTerrorRecord
     ? 'documented_racial_terror'
     : racialKillingRecord
@@ -1348,37 +1222,10 @@ function citationDocumentKey(claim: ReleaseClaimProjection): string | null {
 }
 
 /**
- * Derives `researchCoverage` from how many distinct SOURCE DOCUMENTS an entry's claims rest on
- * never a UI-side guess, and computed exactly ONCE here so the projection and search-index
- * builders below always agree.
- *
- * repo-z1pw: this counted CLAIMS before (`claimCount >= 2 -> 'partial'`), which measured how many
- * assertions a publish path chose to split a source into, not how much documentation backs the
- * record. The nrhp-black-heritage lane synthesizes exactly two claims — a listing fact and a
- * significance fact — from one registry index row, both citing that row's own URL. 2,436 live
- * records built from a single spreadsheet line therefore published as 'partial', and because
- * `isThinRecord()` (apps/web) keys strictly on 'minimal', the registry-listing disclosure never
- * fired for the population it was written for. A reader saw an uncaveated description and
- * reasonably concluded it was the whole of the recorded history.
- *
- * Reasoning (documented, not a scoring formula): coverage answers "how much documentation stands
- * behind this record", so the unit is the document.
- *  - `minimal`     — fewer than two distinct cited documents. One document, however many claims
- *                    were carved out of it, is one document.
- *  - `partial`     — two or more distinct cited documents.
- *  - `substantial` — two or more distinct documents AND a meaningfully sized claim set (>=5) AND
- *                    every one of those claims carrying a citation (the pre-existing
- *                    completeness requirement, unchanged).
- *
- * repo-vymq: the document count above is necessary but not sufficient, because it measures the
- * claims and never looks at the prose those claims are supposed to support. A roster importer
- * templates its summary from index fields BY CONSTRUCTION and can still accumulate two cited
- * documents — a corroborating catalog page, a second registry URL — at which point a record whose
- * description nobody researched would publish as 'partial'. `summary` is therefore a required
- * argument, not an optional refinement: a registered template fingerprint caps coverage at
- * 'minimal' regardless of how the claim set scores. Required rather than optional so that adding
- * a new call site is a compile error instead of a silently uncapped publish path — the last
- * version of this guard was bypassed exactly that way.
+ * Computes coverage once for both projection and search output. Fewer than two distinct cited
+ * documents is minimal; two is partial; substantial also requires at least five claims with
+ * every claim cited. Recognized template prose caps coverage at minimal. Distinct URLs measure
+ * document coverage, not independent lineages or historical completeness.
  */
 export function computeReleaseResearchCoverage(
   claims: readonly ReleaseClaimProjection[],
@@ -1451,12 +1298,9 @@ export function resolveReleaseEntityReferences(
       reason: 'locationPrecision does not resolve to a real precision level (empty)',
     };
   }
-  // repo-wqcn — location precision is no longer a publish-time REJECTION gate. A prohibited
-  // raw level, a living person's own residence, a restricted site, etc. all still reach the
-  // public projection they are COARSENED there by `reducePublicPrecision` (the one engine on
-  // the publish path, `docs/security/location-precision-standard.md` §4), with the reason
-  // recorded on `projection.location.precisionReductionReason`, never silently. See
-  // `buildReleaseEntityArtifacts` below for where that engine actually runs.
+  // The publication precision engine coarsens prohibited precision, living residences and
+  // restricted locations. It records precisionReductionReason on the projection rather than
+  // silently changing coordinates.
 
   return { ok: true };
 }
@@ -1682,11 +1526,8 @@ export function normalizeReleaseRelated(
 }
 
 /**
- * Ensures claims is always an array at the write boundary, never a legacy `{}` object
- * (repo-n7p6.14: four seed rows reached bb_public.release_entities with `claims: {}`, which
- * jsonb_array_length/.map consumers can't handle). buildClaimProjections already always returns
- * an array, so this only guards a write path that bypasses it — same shape as
- * normalizeReleaseRelated above.
+ * Ensures claims is an array at the write boundary so array consumers cannot receive an
+ * object-shaped value.
  */
 export function normalizeReleaseClaims(
   claims: readonly ReleaseClaimProjection[] | undefined,
@@ -1695,19 +1536,10 @@ export function normalizeReleaseClaims(
 }
 
 /**
- * The single deterministic release/projection builder (the related workstream). Given one source entry,
- * produces BOTH the entity-projection fields and the search-index fields from the same claims,
- * notabilityBasis, and researchCoverage never two independently-recomputed copies. Fails closed
- * (returns `{ok: false}`, never throws for an expected data-shape gap) when:
- *  - the entry has zero claims (`evaluateFactPublishGate`'s `no_citations` floor),
- *  - the derived `notabilityBasis` fails `evaluateNotabilityGate` or contains a basis record with
- *    zero resolvable evidence, or
- *  - `resolveReleaseEntityReferences` rejects a dangling topic/evidence/jurisdiction/location
- *    reference, or
- *  - opt-in `evaluateReleaseGeoIntegrityGate` rejects a declared-state vs coordinate mismatch
- *    when `geoIntegrity.stateBoundaries` / `stateBoundaries` is supplied on context.
- * An out-of-range lat/lng throws (via `buildGeoPointFields`) rather than returning `{ok:false}`
- * this mirrors the pre-existing behavior callers already handle as a thrown, per-entity failure.
+ * Build entity and search projections together from the same reviewed claims, inclusion basis
+ * and coverage. Return a failure for expected content/reference gaps and optionally check
+ * declared geography against supplied boundaries. Invalid coordinate ranges throw and must be
+ * handled per entity by the caller.
  */
 export function buildReleaseEntityArtifacts(
   entry: ReleaseSourceEntity,

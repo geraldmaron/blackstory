@@ -20,7 +20,7 @@
   margin-bottom: var(--ds-space-8);
 }
 
-/* SP-27 (repo-92n2.34) — reading progress: a hairline that fills as the reader scrolls the
+/* Reading progress: a hairline that fills as the reader scrolls the
    document. One rule for the whole Reading class, not a per-screen decision. Design law:
    docs/ui/patterns-reading-room.md, design-direction-v9-surfaces.md §4; reference build
    .design-mocks/blackstory-atlas-v9.html #docprog (line 965).
@@ -820,51 +820,27 @@ a.ds-errata__row-id {
 /* —— end /stories/[slug] rail —————————————————————————————————————————————— */
 /* —— end /chapters pager —————————————————————————————————————————————————————— */
 
-/* —— /books index rows ————————————————————————————————————————————————————————
-   Two things the shared kit cannot know about this room.
-
-   1. `HairlineIndex` declares its glyph track at 16px because every other room puts an icon
-      there. `/books` puts a real cover thumbnail in it, and `.ds-books-edition__cover` is 5rem
-      wide (7.5rem tall when it falls back to the initials placeholder), so on the kit's own
-      track the cover overflowed its column and printed on top of the title and author.
-
-   2. Each `__row` is its own grid, so `auto` tracks are measured per row: the year and the
-      state codes landed at a different x in every row and the list read as rubble. The list
-      becomes the grid and the rows take `subgrid`, which sizes those tracks once across every
-      row — that is what actually lines the columns up, not a guessed width. */
-.ds-books-idx {
-  --books-row-cover: 2.5rem;
-  /* Space between the cover and the title, on top of the list's shared `column-gap`. It is a
-     token rather than a literal because the row's own inline padding is absorbed by the outer
-     tracks of a subgrid, so the rendered gutter is smaller than the number written here; the
-     value is tuned against the measured cover-to-title distance, not against the source. */
-  --books-cover-gutter: var(--ds-space-5);
-}
-
-/* The cover track is deliberately wider than the cover itself. A shared `column-gap` is the
-   right separation between the three data columns, but it is too tight between a piece of
-   artwork and the title that names it: the title read as a caption stuck to the image rather
-   than as the row's own heading. Widening the track (rather than raising the gap) buys space
-   after the cover alone, and leaves author/year/states at the measure they already read well at. */
-.ds-books-idx .ds-room-idx__list {
+/* —— /books catalog rows —————————————————————————————————————————————————————
+   Kit rows are a 16px glyph plus clipped 13.5px name. A challenged title is a book: the
+   cover has to be readable, the title has to wrap, and the summary has to sit under the
+   byline. Subgrid sizes cover / copy / facts once across the list, same as `/law`. */
+.ds-books-idx.ds-room-idx__list {
+  --books-row-cover: 4.5rem;
   display: grid;
-  grid-template-columns:
-    calc(var(--books-row-cover) + var(--books-cover-gutter))
-    minmax(0, 1.6fr)
-    minmax(0, 1fr)
-    auto
-    auto;
-  column-gap: var(--ds-space-4);
+  grid-template-columns: var(--books-row-cover) minmax(0, 1fr) minmax(7rem, 0.55fr);
+  column-gap: var(--ds-space-5);
 }
 
 .ds-books-idx .ds-room-idx__row {
   grid-column: 1 / -1;
   grid-template-columns: subgrid;
-  /* No `column-gap` here: leaving it unset is what makes a subgrid inherit the list's gap.
-     Setting it to any value, including 0, breaks that inheritance instead of confirming it. */
+  align-items: start;
+  column-gap: unset;
+  padding-block: var(--ds-space-4);
 }
 
 .ds-books-idx .ds-room-idx__glyph {
+  display: block;
   width: var(--books-row-cover);
   justify-self: start;
 }
@@ -873,72 +849,93 @@ a.ds-errata__row-id {
   width: var(--books-row-cover);
 }
 
-/* The placeholder's 7.5rem floor is sized for the detail header; in a row the 2/3 aspect
-   ratio already gives it height, and the floor would triple the row's height. */
 .ds-books-idx .ds-books-edition__cover--placeholder {
   min-height: 0;
 }
 
 .ds-books-idx .ds-books-edition__cover-initials {
-  font-size: 0.75rem;
+  font-size: 0.875rem;
   letter-spacing: 0.04em;
 }
 
-/* The kit leaves `__grade` unstyled because every other room passes a small dot there.
-   `/books` passes the reported state codes as text, so unstyled means they inherit the row's
-   body size and shout louder than the title. They are data, not a heading: same mono caption
-   register as the author and year columns, one ink step brighter because they are the payload. */
+.ds-books-idx__copy {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  min-width: 0;
+}
+
+.ds-books-idx .ds-room-idx__name {
+  overflow: visible;
+  text-overflow: unset;
+  white-space: normal;
+  font-family: var(--ds-font-display);
+  font-size: 1.125rem;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+}
+
+.ds-books-idx__byline {
+  font-family: var(--ds-font-sans);
+  font-size: 0.875rem;
+  line-height: 1.4;
+  color: var(--ds-ink-muted);
+}
+
+.ds-books-idx__gloss {
+  font-family: var(--ds-font-editorial);
+  font-size: 0.9375rem;
+  line-height: 1.45;
+  color: var(--ds-ink-muted);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.ds-books-idx__facts {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  min-width: 0;
+  padding-top: 0.2rem;
+}
+
 .ds-books-idx .ds-room-idx__grade {
   justify-self: start;
   font-family: var(--ds-font-mono);
   font-size: 10px;
   letter-spacing: 0.08em;
-  white-space: nowrap;
+  line-height: 1.4;
+  white-space: normal;
   color: var(--room-ink-3);
 }
 
-/* Year sits hard against the state codes it qualifies, so it right-aligns into its own track
-   and the two read as one field pair rather than two drifting ones. */
-.ds-books-idx .ds-room-idx__era {
-  text-align: right;
+.ds-books-idx__cites {
+  font-family: var(--ds-font-mono);
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  color: var(--room-ink-4);
 }
 
 @media (max-width: 47.9375rem) {
-  /* Under this measure five columns cannot hold their own. The title takes the full line and
-     the three data fields share the second, still on the list's shared tracks so author, year
-     and states line up down the page exactly as they do on the wide layout. */
-  .ds-books-idx .ds-room-idx__list {
-    grid-template-columns:
-      calc(var(--books-row-cover) + var(--books-cover-gutter))
-      minmax(0, 1fr)
-      auto
-      auto;
-    column-gap: var(--ds-space-3);
+  .ds-books-idx.ds-room-idx__list {
+    grid-template-columns: var(--books-row-cover) minmax(0, 1fr);
+    column-gap: var(--ds-space-4);
   }
 
   .ds-books-idx .ds-room-idx__row {
-    row-gap: 4px;
+    row-gap: var(--ds-space-2);
   }
 
   .ds-books-idx .ds-room-idx__name {
-    grid-column: 2 / -1;
-    grid-row: 1;
+    grid-column: auto;
+    grid-row: auto;
   }
 
-  .ds-books-idx .ds-room-idx__place {
-    grid-column: 2 / 3;
-    grid-row: 2;
-  }
-
-  .ds-books-idx .ds-room-idx__era {
-    grid-column: 3 / 4;
-    grid-row: 2;
-  }
-
-  .ds-books-idx .ds-room-idx__grade {
-    grid-column: 4 / 5;
-    grid-row: 2;
-    align-self: end;
+  .ds-books-idx__facts {
+    grid-column: 2;
   }
 }
 
@@ -1094,12 +1091,9 @@ a.ds-errata__row-id {
 
 /* ===========================================================================
    /memorial — the reading room whose canvas is the handwritten wall.
-   Moved here from the route's own memorial-edition.css (repo-92n2.30), which
-   was the last of the twelve v6 per-route stylesheets. The rules are the same
-   rules; only the `-edition` half of the class name is gone, because the room
-   is not an edition of anything. `.ds-memorial` stays the positioned root so
-   the wall (absolute, z-index 0) cannot paint over the room content that
-   follows it in the document.
+   Shared reading-room styles own this rule. `.ds-memorial` is the positioned
+   root so the wall (absolute, z-index 0) cannot paint over the room content
+   that follows it in the document.
    =========================================================================== */
 
 .ds-memorial {
@@ -1116,18 +1110,14 @@ a.ds-errata__row-id {
   z-index: var(--ds-z-content);
 }
 
-/* First screen reads as wall plus title only: the opening block reserves the
-   whole opening field so the full list starts well below the fold and is
-   reached by scrolling. 125svh matches the wall's own height
-   (MEMORIAL_OPENING_SCREENS) so the names have room past the fold; the 7rem
-   subtraction is the room's offset from the top of the viewport, which keeps
-   the list's top edge landing at the end of the field rather than past it. */
+/* First screen is the wall: the opening block reserves the field so the full
+   list starts well below the fold. 125svh matches the wall's own height
+   (MEMORIAL_OPENING_SCREENS); the 7rem subtraction is the room's offset from
+   the top of the viewport. */
 .ds-memorial__opening {
-  /* The scroll cue used to live here and get pushed to the foot of the
-     screen via `justify-content: space-between`; it now renders as a sibling
-     of the wall, positioned to the message's actual bottom edge (see
-     page.tsx and MemorialWallAtmosphere.tsx), so this block just needs to
-     reserve the opening viewport for the header. */
+  /* The scroll cue renders as a sibling of the wall (see page.tsx and
+     MemorialWallAtmosphere.tsx). This block only reserves the opening
+     viewport. */
   min-block-size: calc(100vh - 7rem);
   min-block-size: calc(100svh - 7rem);
   /* The remaining quarter screen of wall (MEMORIAL_OPENING_SCREENS = 1.25):
@@ -1189,7 +1179,7 @@ a.ds-errata__row-id {
   outline-offset: 2px;
 }
 
-/* "Hold the wall still" (repo-92n2.18). Fixed to the viewport rather than positioned within the
+/* "Hold the wall still." Fixed to the viewport rather than positioned within the
    wall's own document flow: the packer's avoid-boxes only know about the header, the held
    message and the scroll cue, and a name drawn through this control is exactly the "canvas
    packed around real chrome" defect those boxes exist to prevent. Fixed positioning keeps it out
@@ -1288,7 +1278,7 @@ a.ds-errata__row-id {
 }
 
 /* No copper accent on this surface — italic alone carries the emphasis this em would
-   otherwise take from the room kit's RoomHeader convention. */
+   otherwise take from the room kit's ReadingEntry convention. */
 .ds-memorial__title em {
   font-family: var(--ds-font-editorial);
   font-style: italic;
@@ -1335,8 +1325,8 @@ a.ds-errata__row-id {
 .ds-memorial__jump-link {
   display: inline-grid;
   place-items: center;
-  min-width: 1.75rem;
-  min-height: 1.75rem;
+  min-width: 2.75rem;
+  min-height: 2.75rem;
   border-radius: var(--ds-radius-sm);
   font-family: var(--ds-font-mono);
   font-size: 0.8125rem;
@@ -1347,7 +1337,8 @@ a.ds-errata__row-id {
     color var(--ds-duration-fast, 0.15s) var(--ds-easing, ease);
 }
 
-.ds-memorial__jump-link:hover {
+.ds-memorial__jump-link:hover,
+.ds-memorial__jump-link[aria-current='location'] {
   background: var(--ds-surface-raised);
   color: var(--ds-ink);
 }
@@ -1507,8 +1498,23 @@ a.ds-errata__row-id {
   color: var(--ds-ink-muted);
 }
 
+.ds-memorial__related {
+  margin-top: var(--ds-space-6);
+}
+
+/* Related rooms sit after the names. Ink plates, not copper: this surface takes no accent. */
+.ds-memorial .ds-room-section__plate {
+  color: var(--ds-ink);
+}
+
+.ds-memorial .ds-room-handoff:hover .ds-room-section__plate,
+.ds-memorial .ds-room-handoff:focus-visible .ds-room-section__plate {
+  color: var(--ds-ink);
+  border-color: var(--ds-ink);
+}
+
 .ds-memorial__note a {
-  color: var(--ds-accent);
+  color: var(--ds-ink);
   text-decoration-thickness: 1px;
   text-underline-offset: 0.15em;
 }

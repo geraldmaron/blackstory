@@ -1,4 +1,4 @@
--- Allow presumed_deceased living status (WP:BDP plausibility token, WS3).
+-- Allow explicitly assessed presumed-deceased status while retaining unknown status.
 ALTER TABLE bb_canonical.entities
   DROP CONSTRAINT IF EXISTS entities_living_status_check;
 

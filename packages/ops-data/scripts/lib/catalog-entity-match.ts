@@ -41,7 +41,7 @@ const NON_ENTITY_TITLE_EXACT =
 const TITLE_SUFFIX =
   /\s*([|\-–—:]|\bWikipedia\b|\bNASA\+?\b|\bNational Park Service\b|\bU\.S\. National.*|\bSmithsonian.*|\bLibrary of Congress\b).*$/i;
 
-/** High-frequency Corsair collisions → canonical catalog ids. */
+/** Curated title hints for catalog candidate lookup; these do not establish identity. */
 const KNOWN_TITLE_TO_ENTITY: ReadonlyArray<{
   readonly pattern: RegExp;
   readonly entityId: string;

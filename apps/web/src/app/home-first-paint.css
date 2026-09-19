@@ -1,45 +1,78 @@
 /**
  * Place-page spacing and mast presence over the record room.
- * Flat matte only. No new visual language beyond existing record tokens.
+ * Archive material law: depth from occlusion and value, not elevation stacks.
+ * Evidence glance uses the record fact band; typed relation chips stay distinct from site-nav CTAs.
  */
 
+.ds-home-first-paint .ds-room__mast {
+  background: var(--ds-canvas);
+}
+
+/*
+ * Place first-paint has no rail. The record shell otherwise adds the rail track, so on a wide
+ * viewport the mast and the glance band started ~140px left of Visit and the reading column.
+ */
+[data-surface='record'] .ds-home-first-paint {
+  --record-shell-w: calc(var(--room-doc-w) - 2 * var(--ds-gutter));
+}
+
 .ds-home-first-paint .ds-record-mast {
-  min-height: clamp(14rem, 36vh, 22rem);
+  min-height: clamp(18rem, 42vh, 30rem);
 }
 
-.ds-home-first-paint .ds-record-mast__title {
-  font-size: clamp(1.75rem, 3.5vw, 2.75rem);
-  letter-spacing: -0.02em;
-  line-height: 1.1;
+.ds-home-first-paint .ds-record-mast[data-media='map'] {
+  /* Neighborhood locator is the hero image when no photograph exists. */
+  min-height: clamp(20rem, 48vh, 32rem);
 }
 
-.ds-home-place-kicker {
-  margin: 0 0 var(--ds-space-2);
-  font-family: var(--ds-font-mono);
-  font-size: 0.75rem;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  color: var(--ds-accent-text);
+.ds-home-first-paint .ds-record-mast__map {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
 }
 
-.ds-home-place-era {
-  margin: 0 0 var(--ds-space-5);
-  font-family: var(--ds-font-mono);
-  font-size: 0.875rem;
-  letter-spacing: 0.02em;
-  color: var(--ds-ink-muted);
-}
-
-.ds-home-place-stand {
-  margin: 0 0 var(--ds-space-8);
-}
-
-.ds-home-place-stand .ds-record-anatomy__place {
+.ds-home-first-paint .ds-record-mast__map .ds-record-anatomy__place {
+  position: absolute;
+  inset: 0;
+  height: 100%;
   margin: 0;
 }
 
-.ds-home-place-stand .ds-room-precision {
-  margin-top: var(--ds-space-3);
+/*
+ * Crop the 960/500 locator into the tall mast. Stretching it made the pin a percentage of a
+ * distorted canvas, which is why neighborhood zoom painted a comic-sized ring over the lede.
+ */
+.ds-home-first-paint .ds-record-mast__map .ds-locator {
+  position: absolute;
+  left: 0;
+  width: 100%;
+  height: auto;
+  min-height: 0;
+  aspect-ratio: 960 / 500;
+  top: 50%;
+  transform: translateY(-50%);
+  margin: 0;
+  border: 0;
+  border-radius: 0;
+}
+
+.ds-home-first-paint .ds-record-mast__map .ds-record-anatomy__place-caption {
+  display: none;
+}
+
+.ds-home-first-paint .ds-record-beat {
+  margin-bottom: var(--ds-space-10);
+  padding-bottom: var(--ds-space-7);
+  border-bottom: var(--ds-border-width) solid var(--ds-rule);
+}
+
+.ds-record-evidence-gap {
+  margin: 0;
+  max-width: 38rem;
+  font-family: var(--ds-font-editorial);
+  font-size: var(--ds-text-editorial);
+  line-height: var(--ds-leading-editorial);
+  color: var(--ds-ink-muted);
 }
 
 .ds-home-door-rooms,
@@ -48,6 +81,32 @@
   flex-wrap: wrap;
   gap: var(--ds-space-2);
   margin: var(--ds-space-8) 0 0;
+}
+
+/* Typed peer places: edged chips, not the same quiet CTA pills as archive doors. */
+.ds-relation-chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.4rem 0.75rem;
+  border: var(--ds-border-width) solid var(--ds-rule);
+  border-radius: var(--ds-radius-sm);
+  background: var(--ds-surface-sunken);
+  color: var(--ds-ink);
+  font-family: var(--ds-font-sans);
+  font-size: var(--ds-text-body-sm);
+  text-decoration: none;
+  box-shadow: var(--ds-contact-hairline);
+}
+
+.ds-relation-chip:hover,
+.ds-relation-chip:focus-visible {
+  border-color: var(--ds-accent);
+  color: var(--ds-accent);
+}
+
+.ds-relation-chip:focus-visible {
+  outline: var(--ds-focus-width) solid var(--ds-focus-ring);
+  outline-offset: var(--ds-focus-offset);
 }
 
 #trust {

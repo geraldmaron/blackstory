@@ -1,7 +1,6 @@
 /**
- * Catalog pulse: corpus size, author breadth, and state coverage as mono facts for the
- * `RoomHeader` meta row. Pure computation, no chrome of its own; the room kit's header owns
- * how a meta row renders.
+ * Catalog pulse: corpus size, author breadth, and state coverage as mono facts for
+ * DocumentColophon. Pure computation, no chrome of its own.
  */
 import type { BannedBooksListingSnapshot } from '@repo/domain';
 import { bannedBookReportedStates } from '@repo/domain';

@@ -185,3 +185,5 @@ export {
   listThemeImpactLinkedStatutesForQuestion,
 } from './theme-impact-linked-statutes.js';
 export type { ThemeImpactLinkedStatuteView } from './theme-impact-linked-statutes.js';
+
+export * from './lives.js';

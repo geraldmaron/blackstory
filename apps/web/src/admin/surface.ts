@@ -5,6 +5,7 @@
  * `canonical-write-boundary.test.ts`.
  */
 import {
+  assertAuthAccepted,
   buildSurfaceHealth,
   getSurfaceDefinition,
   parseNodeEnv,
@@ -22,7 +23,5 @@ export function health() {
 }
 
 export function guardAdminAuth(authMode: AuthMode): void {
-  if (authMode === 'anonymous') {
-    throw new Error('admin requires IAP session and app authorization');
-  }
+  assertAuthAccepted(SURFACE_ID, authMode);
 }

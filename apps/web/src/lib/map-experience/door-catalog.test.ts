@@ -56,15 +56,16 @@ test('door redirect table fits Next data cache; full pin plate does not ride uns
 test('door home and pin route share the cached pin plate loader', () => {
   assert.match(doorHome, /loadDoorPinPlate/);
   assert.doesNotMatch(doorHome, /toDoorLinkPins/);
-  assert.doesNotMatch(doorHome, /getSharedPublicEntities/);
+  assert.match(doorHome, /buildAtlasShell\(params, entities, dataSource\)/);
+  assert.doesNotMatch(catalogSource, /return \{ data: listPublicEntities\(\)/);
   assert.match(pinRoute, /resolveDoorPinRedirect/);
   assert.doesNotMatch(pinRoute, /getSharedPublicEntities|buildExploreMapSource/);
   assert.doesNotMatch(pinRoute, /force-dynamic/);
 });
 
-test('home page is ISR, not force-dynamic', () => {
-  assert.match(homePage, /export const revalidate = 300/);
-  assert.doesNotMatch(homePage, /force-dynamic/);
+test('home reads the cached live catalog only at request time', () => {
+  assert.match(homePage, /await connection\(\)/);
+  assert.doesNotMatch(homePage, /export const revalidate/);
 });
 
 test('pin redirect table matches resolveDoorPinTarget for each index', () => {

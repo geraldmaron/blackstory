@@ -16,8 +16,7 @@ import {
 import React from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
 import { MemorialSections } from './MemorialSections';
-import { commandBarIsQuiet } from '../../components/shell/CommandBar';
-import { CLASSIFIED_PATHS, surfaceClassFor } from '../../lib/nav/surface-classes';
+import { surfaceClassFor } from '../../lib/nav/surface-classes';
 import { defaultPostureFor } from '../../components/map-stage/plate-posture';
 
 const here = dirname(fileURLToPath(import.meta.url));
@@ -26,12 +25,14 @@ test('the memorial root is the wall atmosphere on the room class, not a photo mo
   const pageSource = readFileSync(join(here, 'page.tsx'), 'utf8');
   assert.match(pageSource, /MemorialWallAtmosphere/);
   assert.doesNotMatch(pageSource, /EditionAtmosphereMosaic/);
-  // The positioned root the wall is measured against. Was a helper in the route's own
-  // panel-chrome module until repo-92n2.30 retired it; it is a literal class now.
+  // The literal class is the positioned root against which the wall is measured.
   assert.match(pageSource, /className="ds-memorial"/);
   // The route carries the class stylesheet and no per-route stylesheet of its own.
   assert.match(pageSource, /import '\.\.\/reading-room\.css'/);
   assert.doesNotMatch(pageSource, /memorial-edition\.css/);
+  assert.doesNotMatch(pageSource, /<ReadingEntry/);
+  assert.doesNotMatch(pageSource, /Every name the archive has been given/);
+  assert.doesNotMatch(pageSource, /Written by hand, one at a time/);
 });
 
 test('the memorial list is not drawn as a panel', () => {
@@ -97,6 +98,8 @@ test('memorial sections render full list anchor and no em dashes in copy', () =>
   assert.match(sections, /memorialNamesByInitial/);
   assert.doesNotMatch(copy, /\u2014/);
   assert.doesNotMatch(sections, /\u2014/);
+  assert.doesNotMatch(copy, /Every name the archive has been given/);
+  assert.doesNotMatch(copy, /Written by hand, one at a time/);
 });
 
 test('memorial scroll cue does not auto-scroll on load', () => {
@@ -106,8 +109,8 @@ test('memorial scroll cue does not auto-scroll on load', () => {
 });
 
 /*
- * repo-92n2.30 acceptance. The three clauses that are behavior rather than file hygiene: the
- * name-link rule, the quiet command bar, and the plate posture.
+ * Name-link rule and plate posture. The command bar is the same Find + Rooms chrome as every
+ * other room: a quiet bar on this route is what made the rest of the menu unreachable.
  */
 
 test('a name with a record is a link, a name without one is not, and the difference is stated', () => {
@@ -132,17 +135,6 @@ test('a name with a record is a link, a name without one is not, and the differe
   const withoutLinks = renderToStaticMarkup(<MemorialSections />);
   assert.doesNotMatch(withoutLinks, /href="\/entity\//);
   assert.doesNotMatch(withoutLinks, /their name is a link to it/);
-});
-
-test('the command bar is quiet on /memorial and on no other classified route', () => {
-  assert.equal(commandBarIsQuiet('/memorial'), true);
-  const others = CLASSIFIED_PATHS.filter((route) => route !== '/memorial');
-  assert.deepEqual(
-    others.filter((route) => commandBarIsQuiet(route)),
-    [],
-  );
-  // Exact match: a child route is not the memorial wall.
-  assert.equal(commandBarIsQuiet('/memorial/names'), false);
 });
 
 test('no plate posture other than Parked is reachable on /memorial', () => {

@@ -23,7 +23,6 @@ export type SubmissionsRateLimitRequest = {
   readonly userId?: string;
   readonly deviceId?: string;
   readonly sessionId?: string;
-  readonly appCheckVerified?: boolean;
   /** Parseable `X-BlackStory-Client` header (mobile / direct callers). */
   readonly clientAttested?: boolean;
   readonly riskSignals?: readonly RiskSignal[];
@@ -101,9 +100,6 @@ export function createSubmissionsRateLimitGuard(options: SubmissionsRateLimitGua
         subject: request.subject,
         endpointClass,
         key,
-        ...(request.appCheckVerified !== undefined
-          ? { appCheckVerified: request.appCheckVerified }
-          : {}),
         ...(request.clientAttested !== undefined ? { clientAttested: request.clientAttested } : {}),
         ...(request.riskSignals ? { riskSignals: request.riskSignals } : {}),
       });

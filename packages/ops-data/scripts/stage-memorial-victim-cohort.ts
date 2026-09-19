@@ -1,5 +1,5 @@
 /**
- * Stage the two memorial-wall victims who had no record of their own (repo-5jxh).
+ * Stage the two memorial-wall victims who had no record of their own.
  *
  * The machinery is shared with the inventor cohort — see `lib/stage-person-cohort.ts` for the
  * person-review gate, the owned-key merge and why `personReview` is exempt from it.

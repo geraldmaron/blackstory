@@ -17,17 +17,17 @@
  * Endpoints (redirects, JSON, feeds, crawler files) have no class. They render no chrome, so
  * `surfaceClassFor` returns `null` and nothing is emitted.
  *
- * `/` is the door: the locked about mast plus the pin plate. `/explore` mounts the
- * Explore instrument. A place is `/place/{slug}`.
+ * `/` is the door journey. `/explore` is the same door already in browse posture (deep link /
+ * share). A place is `/place/{slug}`.
  */
 /**
  * The five rendered surface classes. Endpoints are represented by `null`.
  *
- * `door` is `/` alone: reading-room chrome (bar, scroll, footer decision) over an ambient map
- * plate — the same persistent MapLibre plate the Instrument steers, painted full-bleed with its
- * gestures locked so the scroll chapters own the camera. It is neither a reading room (paper
- * covers the plate there) nor the Instrument (the reader steers there), and pretending it was one
- * of them is how `/` ended up drawing a second, static map of its own.
+ * `door` is `/` and `/explore`: reading-room chrome (bar, scroll, footer decision) over the shared
+ * map plate. On `/` the plate rests ambient under scroll chapters; browse (morph or cold
+ * `/explore`) flips Live gestures via `setDoorBrowseLive` without a second shell. `instrument`
+ * remains in the type union for plate-posture and legacy CSS, but no public route emits it —
+ * Explore is a Door posture, not a peer cockpit.
  */
 export type SurfaceClass = 'door' | 'instrument' | 'reading' | 'record' | 'utility';
 
@@ -36,10 +36,9 @@ export type SurfaceClass = 'door' | 'instrument' | 'reading' | 'record' | 'utili
  * (`/stories/mosaic-credits` is Utility) can never be swallowed by its parent's prefix rule.
  */
 const SURFACE_CLASS_BY_PATH: ReadonlyMap<string, SurfaceClass> = new Map([
-  // Front door: scroll chapters over the shared ambient map plate. Same bar as the archive.
-  // `/explore` is the live catalog instrument. Story is a mode of Explore, not a path.
+  // Front door + browse deep link: one map product, two URLs. Story is a mode of browse, not a path.
   ['/', 'door'],
-  ['/explore', 'instrument'],
+  ['/explore', 'door'],
 
   // Reading room — one scrolling, measure-limited column on paper.
   // `/rooms` is the hub the rest of this list hangs off: it renders cards, not records, but it
@@ -50,10 +49,13 @@ const SURFACE_CLASS_BY_PATH: ReadonlyMap<string, SurfaceClass> = new Map([
   ['/books', 'reading'],
   ['/law', 'reading'],
   ['/data', 'reading'],
+  // Lives Across the Decades: immersive cited decade world on /lives.
+  ['/lives', 'reading'],
   ['/memorial', 'reading'],
   ['/about', 'reading'],
   ['/faq', 'reading'],
   ['/methodology', 'reading'],
+  ['/sources', 'reading'],
   ['/errata', 'reading'],
 
   // Utility — task surfaces, finished and left.
@@ -72,10 +74,11 @@ const SURFACE_CLASS_BY_PATH: ReadonlyMap<string, SurfaceClass> = new Map([
  */
 const SURFACE_CLASS_PREFIXES: readonly (readonly [string, SurfaceClass])[] = [
   ['/corrections/status/', 'utility'],
-  // `/corrections/appeal` and `/corrections/abuse` used to be classified here. Neither renders:
-  // both are API-only directories, and the appeal and abuse forms are mounted inside the receipt
-  // status page. Classifying them promised chrome for two URLs that 404 (SP-19, repo-92n2.19).
+  // `/corrections/appeal` and `/corrections/abuse` are API-only directories. Their forms render
+  // inside the receipt status page, so classifying the directory paths would advertise chrome for
+  // URLs that return 404.
   ['/stories/', 'reading'],
+  ['/lives/', 'reading'],
   ['/place/', 'record'],
   ['/invention/', 'record'],
   ['/entity/', 'record'],
@@ -109,6 +112,11 @@ export const ENDPOINT_ROUTES: readonly string[] = [
   '/.well-known/security.txt',
   '/robots.txt',
   '/sitemap.xml',
+  // Retired merged trust hub and its escape hatches. Thin redirect routes only.
+  '/how-it-works',
+  '/apparatus',
+  '/law/browse',
+  '/books/browse',
 ];
 
 const ENDPOINT_ROUTE_SET = new Set(ENDPOINT_ROUTES);
@@ -128,7 +136,7 @@ function normalizePath(pathname: string): string {
  * of a page with no class and therefore no shell rules.
  *
  * `search` is accepted so older call sites keep compiling. It does not change the class:
- * `/` is always the door. `?atlas=1` is not a second home. The Explore instrument is `/explore`.
+ * `/` is always the door journey. `?atlas=1` is not a second home. `/explore` is door browse.
  */
 export function surfaceClassFor(pathname: string, _search?: string): SurfaceClass | null {
   const path = normalizePath(pathname);

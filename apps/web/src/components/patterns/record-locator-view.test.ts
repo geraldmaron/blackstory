@@ -4,12 +4,19 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import {
+  LOCATOR_MAX_SCALE,
   defaultLocatorView,
   locatorCanvasTransform,
+  neighborhoodLocatorView,
   panLocatorView,
   wheelFactorForDelta,
   zoomLocatorViewAt,
 } from './record-locator-view';
+
+test('neighborhood opening scale is a region, not a town lot', () => {
+  const view = neighborhoodLocatorView(40, 50, 720, 420);
+  assert.equal(view.scale, 2.15);
+});
 
 test('default view is identity scale at origin', () => {
   assert.deepEqual(defaultLocatorView(), { scale: 1, panX: 0, panY: 0 });
@@ -25,9 +32,9 @@ test('zoom anchors to a pointer position', () => {
 });
 
 test('zoom clamps at max scale', () => {
-  const nearMax = { scale: 4.9, panX: 0, panY: 0 };
+  const nearMax = { scale: LOCATOR_MAX_SCALE - 0.1, panX: 0, panY: 0 };
   const zoomed = zoomLocatorViewAt(nearMax, 1.5, 0, 0);
-  assert.equal(zoomed.scale, 5);
+  assert.equal(zoomed.scale, LOCATOR_MAX_SCALE);
 });
 
 test('pan accumulates deltas', () => {

@@ -44,7 +44,7 @@ test('first-paint pin plate declares shared size tokens', () => {
   assert.match(pinPlateCss, /--ds-accent-graphic/);
 });
 
-test('door-home carries no pin-plate rules: the Door has no static board (repo-18ma2)', () => {
+test('door-home carries no pin-plate rules: the Door has no static board', () => {
   assert.doesNotMatch(doorCss, /ds-first-paint-pin/);
   assert.doesNotMatch(doorCss, /ds-door__board/);
 });

@@ -12,10 +12,14 @@
  *
  * This panel is a view over the existing explore view model — kind families, evidence floor and
  * `?state=` all already exist there. It adds no state of its own beyond the scroll fade.
+ *
+ * The map is the product, same as RecordSheet: this panel is never `aria-modal`. Inerting the
+ * plate made the visible geography decorative. Escape still hides the panel; pan/pinch/pin hits
+ * on the map around it stay live.
  */
 'use client';
 
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useId, useRef, useState } from 'react';
 import { cx } from '@repo/ui';
 import {
   EVIDENCE_FLOORS,
@@ -111,7 +115,7 @@ export type LensPanelProps = {
    * carries, not a reader-facing "population" choice. */
   readonly layerMode: ExploreLayerMode;
   readonly onLayerModeChange: (mode: ExploreLayerMode) => void;
-  /** Composition dignity gate (repo-92n2.18): false while the active topic is about racial
+  /** Composition dignity gate: false while the active topic is about racial
    * violence — an area fill would read the harm itself as density. Defaults to true so an
    * omitted prop never silently disables the population layer for a caller that hasn't wired
    * this yet. */
@@ -124,6 +128,8 @@ export type LensPanelProps = {
 
   readonly onReset: () => void;
   readonly onHide?: () => void;
+  /** Narrow overlay: Escape hides the panel. Does not trap focus or inert the map. */
+  readonly escapeDismiss?: boolean;
   readonly className?: string;
 };
 
@@ -160,10 +166,29 @@ export function LensPanel({
   onShowLegend,
   onReset,
   onHide,
+  escapeDismiss = false,
   className,
 }: LensPanelProps) {
+  const panelRef = useRef<HTMLElement | null>(null);
   const bodyRef = useRef<HTMLDivElement | null>(null);
   const [overflowing, setOverflowing] = useState(false);
+  const titleId = useId();
+
+  const hideRef = useRef(onHide);
+  hideRef.current = onHide;
+
+  useEffect(() => {
+    if (!onHide || !escapeDismiss) return;
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape' || event.key === 'Esc') {
+        event.preventDefault();
+        event.stopImmediatePropagation();
+        hideRef.current?.();
+      }
+    };
+    window.addEventListener('keydown', onKeyDown, true);
+    return () => window.removeEventListener('keydown', onKeyDown, true);
+  }, [onHide, escapeDismiss]);
 
   /**
    * The bottom fade is an affordance, not decoration: without it a panel that scrolls looks
@@ -190,19 +215,27 @@ export function LensPanel({
 
   return (
     <section
+      ref={panelRef}
       className={cx('ds-lens', className)}
-      aria-label="Lens: what you are looking at"
+      aria-labelledby={titleId}
       data-overflowing={overflowing ? 'true' : undefined}
     >
       <header className="ds-lens__head">
-        <h2 className="ds-lens__title">Lens</h2>
+        <h2 className="ds-lens__title" id={titleId}>
+          Filters
+        </h2>
         <span className="ds-lens__count">
           {matched === total
             ? `${total.toLocaleString('en-US')} in view`
             : `${matched.toLocaleString('en-US')} in view`}
         </span>
         {onHide ? (
-          <button type="button" className="ds-lens__hide" onClick={onHide} aria-label="Hide lens">
+          <button
+            type="button"
+            className="ds-lens__hide"
+            onClick={onHide}
+            aria-label="Hide filters"
+          >
             <svg width="13" height="13" viewBox="0 0 16 16" fill="none" aria-hidden="true">
               <path
                 d="M10 3.5 5.5 8l4.5 4.5"

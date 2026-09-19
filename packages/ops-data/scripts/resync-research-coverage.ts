@@ -1,38 +1,7 @@
 /**
- * repo-z1pw — corpus-wide resync of the DERIVED `researchCoverage` field after
- * `computeReleaseResearchCoverage` changed from counting claims to counting distinct source
- * documents.
- *
- * Why a correction pass rather than a republish: `publish-release-entities-incremental.ts`
- * re-derives an entity from its `bb_research.landscape_candidates` row and runs the full publish
- * gate, and the depth gate ('template_only', added 2026-08-06) now REJECTS exactly the rows whose
- * coverage is wrong. Routing the fix through that path would skip every record it needs to
- * correct. This pass recomputes one derived field from the claims already published, touching
- * nothing else — the same shape as `fix-civil-rights-leaders-derived-fields.ts`, widened from
- * four hand-listed ids to the active release.
- *
- * `researchCoverage` is denormalized in two places, and they must move together or search facets
- * disagree with the record page:
- *   - bb_public.release_entities.projection->>'researchCoverage'
- *   - bb_public.search_index.facets->>'researchCoverage'
- *
- * Coverage is recomputed with the real function from @repo/domain rather than restated here, so
- * this cannot drift from what the next full release build would produce.
- *
- * Why it matters: 'minimal' plus an empty historicalContext is what makes the record page print
- * its REGISTRY LISTING notice (apps/web `isThinRecord`). While coverage counted claims, the
- * nrhp-black-heritage lane's two claims — a listing fact and a significance fact carved out of
- * ONE index row, both citing that row's own URL — graded 'partial', so 2,436 records built from a
- * single spreadsheet line suppressed the notice and read to a visitor as researched history.
- *
- * Default is dry-run. Production writes require:
- *   DRY_RUN=0 COVERAGE_RESYNC_APPLY=1 DATABASE_URL=postgresql://...
- *
- * Usage (from repo root):
- *   set -a && source apps/web/.env.local && set +a
- *   export DATABASE_SSL=1
- *   node --conditions development --import tsx \
- *     packages/ops-data/scripts/resync-research-coverage.ts
+ * Recompute derived research coverage from published claims and summaries.
+ * Reconcile both release projections and search facets with the domain calculation.
+ * Default is dry-run; writes require DRY_RUN=0 and COVERAGE_RESYNC_APPLY=1.
  */
 import { mkdirSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
@@ -77,34 +46,21 @@ async function main(): Promise<void> {
   const res = await pool.query<Row>(
     `SELECT e.entity_id, e.release_id, e.display_name, e.summary, e.projection,
             s.facets->>'researchCoverage' AS facet_coverage
-       FROM bb_public.release_entities e
-       JOIN bb_public.active_release a ON a.release_id = e.release_id
-       LEFT JOIN bb_public.search_index s ON s.entity_id = e.entity_id
+       FROM published.release_entities e
+       JOIN published.active_release a ON a.release_id = e.release_id
+       LEFT JOIN published.search_index s ON s.entity_id = e.entity_id
       ORDER BY e.entity_id`,
   );
   console.log(`Entities in the active release: ${res.rows.length}`);
 
   const changes: Change[] = [];
-  // The two denormalized copies are reconciled INDEPENDENTLY against the recomputed value.
-  // Gating the search_index write on "the projection changed" (the first cut of this script)
-  // leaves behind facets that were already stale before this pass ran — 671 of them on the
-  // 2026-08-10 run, every one a facet sitting BELOW its own projection, the repo-rm2y symptom
-  // where an earlier in-place correction updated one copy and not the other. The recomputed
-  // value is authoritative for both, so each copy is compared to it on its own.
+  // Compare each denormalized copy independently with the recomputed value.
   const facetFixes: { entityId: string; before: string; after: ReleaseResearchCoverage }[] = [];
   for (const row of res.rows) {
-    // repo-rm2y: the PROJECTION's claims, not the `claims` column. `lib/projection-divergence.ts`
-    // establishes the projection as the only store public readers touch, and five scripts
-    // (backfill-legacy-seed-claims, fix-accusation-claim-objects,
-    // fix-civil-rights-leaders-uncorroborated, fix-record-accuracy-followups,
-    // fix-howze-sisters-record) write `projection.claims` directly. The two agree on all 4,198
-    // rows today, so this changes no result — it removes the trap that the next in-place claim
-    // edit would have sprung, which is the whole subject of this bead.
+    // Public readers consume projection claims.
     const claims = toClaimProjections(row.projection?.claims);
     const before = String(row.projection?.researchCoverage ?? '');
-    // repo-vymq: the live summary is passed, not omitted — this pass recomputes the authoritative
-    // value for BOTH denormalized copies, so a version of it that could not see a template
-    // fingerprint would quietly restore 'partial' on every record the guard just capped.
+    // Summary content participates in the coverage grade.
     const after = computeReleaseResearchCoverage(claims, row.summary ?? '');
     const facetBefore = row.facet_coverage;
     if (facetBefore !== null && facetBefore !== after) {
@@ -185,7 +141,7 @@ async function main(): Promise<void> {
     await client.query('BEGIN');
     for (const change of changes) {
       await client.query(
-        `UPDATE bb_public.release_entities
+        `UPDATE published.release_entities
             SET projection = jsonb_set(projection, '{researchCoverage}', to_jsonb($1::text), true)
           WHERE entity_id = $2`,
         [change.after, change.entityId],
@@ -193,7 +149,7 @@ async function main(): Promise<void> {
     }
     for (const fix of facetFixes) {
       await client.query(
-        `UPDATE bb_public.search_index
+        `UPDATE published.search_index
             SET facets = jsonb_set(facets, '{researchCoverage}', to_jsonb($1::text), true)
           WHERE entity_id = $2`,
         [fix.after, fix.entityId],

@@ -1,31 +1,9 @@
 /**
- * Targeted discovery for documented lynching victims: Wikipedia's "List of
- * lynching victims in the United States" is 11 wikitables (one per era, ~828
- * rows total) with columns Name/Age/Ethnicity/City/County/State/Date/
- * Accusation/Comment, individually cited (Tuskegee Institute records plus,
- * for many victims, a dedicated per-lynching Wikipedia article). Filtered to
- * "African American" rows only (the article also documents ~1,300 White
- * victims, out of BlackStory's scope here).
- *
- * This is the one discovery script this session that genuinely needed care
- * beyond the simple bulleted-list pattern (discover-sundown-towns.ts,
- * discover-reconstruction-officeholders.ts): MediaWiki `rowspan="N"` cells
- * apply a single value across N consecutive rows (ethnicity, city, county,
- * state, date, and/or accusation are frequently shared across a group of
- * victims from the same incident) — reading rows independently would
- * silently misattribute a shared column to the wrong row once a rowspan
- * expires. Verified against real 2+ and 8-row rowspan groups in the source
- * before trusting this at scale (see the corroborating memory entry).
- *
- * As a safety margin against the rare row that's ALSO missing other columns
- * in the source (observed twice out of 549 rows during verification), any
- * extracted row with no `state` value is dropped rather than guessed at —
- * a genuinely location-less record can't be usefully researched anyway, and
- * the existing pipeline's location gate would hold it either way.
- *
- * Usage:
- *   node --conditions development --import tsx \
- *     packages/ops-data/scripts/discover-lynching-victims.ts --out <candidates.json>
+ * Discover victim candidates from the cited Wikipedia lynching tables, restricted to the
+ * source's African American category. Expand rowspan cells before assigning columns so shared
+ * incident values do not shift across victims. Rows missing state are excluded by this
+ * collector, a recall limitation rather than evidence that they are unresearchable. Staged
+ * allegations remain attributed source text and require review before public use.
  */
 import { writeFileSync } from 'node:fs';
 

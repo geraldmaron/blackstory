@@ -1,12 +1,11 @@
 # Security telemetry and anomaly detection
 
 Design-only contracts for security dashboards, metrics, anomaly rules, and alert policies.
-Producers (App Check guards, rate limiters, audit writers, query guardrails) keep their existing
+Producers (Client-header guards, rate limiters, audit writers, query guardrails) keep their existing
 implementations and emit signals through `@repo/observability` adapters.
 
 **Depends on:** [ audit/outbox](../../packages/domain/src/audit/index.ts),
 [ Cloud Armor](../../infra/gcp/armor/metrics-alerts-checklist.md),
-[ App Check](../../infra/firebase/auth-and-app-check.md),
 [ rate limits](./rate-limits.md)
 
 ## Package surface
@@ -26,7 +25,7 @@ Import from `@repo/observability`:
 ```typescript
 import {
   createSecurityTelemetryRecorder,
-  adaptAppCheckTelemetry,
+  adaptClientAttestationTelemetry,
   adaptAuditEvent,
 } from '@repo/observability';
 ```
@@ -37,7 +36,7 @@ import {
 |--------|------------|----------------|
 | Cloud Armor denies | `armor.deny` | `armor_denies_total` |
 | Cloud Armor throttles | `armor.throttle` | `armor_throttles_total` |
-| App Check failures | `app_check.failure` | `app_check_failures_total` |
+| Client-header failures | `client_header.failure` | `client_header_failures_total` |
 | Authentication failures | `authentication.failure` | `authentication_failures_total` |
 | Administrator role changes | `administrator.role_changed` | `administrator_role_changes_total` |
 | Submission spikes | `submission.spike` | `submission_requests_total` |
@@ -59,7 +58,7 @@ import {
 
 Security telemetry **never** emits:
 
-- Raw Firebase App Check tokens or `Authorization` headers
+- Raw authentication tokens or `Authorization` headers
 - Session cookies, JWTs, API keys, or credentials
 - Residential street addresses or high-precision coordinates (via `@repo/security`)
 
@@ -69,7 +68,6 @@ Opaque identifiers (actor IDs, object paths) are fingerprinted before they becom
 
 | Producer | Adapter | Notes |
 |----------|---------|-------|
-| `@repo/firebase` App Check guard | `adaptAppCheckTelemetry` | Mirrors `AppCheckTelemetryEvent` shape |
 |  audit events | `adaptAuditEvent` | Maps `authentication.failed`, `administrative.role_changed`, publication/retraction actions |
 |  rate limit denials | `adaptRateLimitDenial` | Classifies search/geocoder/submission/auth abuse |
 |  slow query events | `adaptSlowQuery` | Uses query hash — never raw query text |
@@ -87,7 +85,7 @@ const security = createSecurityTelemetryRecorder({
   releaseId: process.env.RELEASE_ID,
 });
 
-const event = adaptAppCheckTelemetry(appCheckEvent, {
+const event = adaptClientAttestationTelemetry(clientAttestationEvent, {
   service: 'api-public',
   correlationId: requestId,
   requestId,

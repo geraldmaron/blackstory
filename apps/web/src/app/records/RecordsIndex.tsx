@@ -13,34 +13,46 @@ import {
   EmptyList,
   HairlineIndex,
   OffRamp,
-  RailGroup,
+  OrientationInstrument,
+  ReadingEntry,
+  DocumentColophon,
   Room,
-  RoomHeader,
 } from '../../components/room';
 import { meterLevelForTier, RecordMeter } from '../../components/entity/RecordChrome';
 import { KindGlyph } from '../../components/map-experience/KindGlyph';
+import { AutoSubmitSelect } from '../../components/forms/AutoSubmitSelect';
 import type { RecordsIndex as RecordsIndexModel } from '../../lib/records/build-records-index';
 import { RECORDS_FILTER_KEYS } from '../../lib/records/build-records-index';
 
 void React;
 
-const FILTER_GROUP_LABELS: Readonly<Record<(typeof RECORDS_FILTER_KEYS)[number], string>> =
-  Object.freeze({
-    kind: 'Kind',
-    era: 'Era',
-    state: 'State',
-    topic: 'Topic',
-    status: 'Status',
-    evidence: 'Grade',
-  });
+type FilterKey = (typeof RECORDS_FILTER_KEYS)[number];
+
+const FILTER_GROUP_LABELS: Readonly<Record<FilterKey, string>> = Object.freeze({
+  kind: 'Kind',
+  era: 'Era',
+  state: 'State',
+  topic: 'Topic',
+  status: 'Status',
+  evidence: 'Grade',
+});
+
+/** The first option of a long facet's select: the narrowing lifted. */
+const FILTER_ALL_LABELS: Readonly<Record<FilterKey, string>> = Object.freeze({
+  kind: 'All kinds',
+  era: 'All eras',
+  state: 'All states',
+  topic: 'All topics',
+  status: 'All statuses',
+  evidence: 'Any grade',
+});
 
 /**
- * The chip bar shows the vocabulary a reader can act on without drowning the surface. Six, not
- * eight: at eight most groups wrapped to a second line, which doubled the panel's height and put
- * the first record below the fold. The rail carries the long tail of era and state, and the tail
- * of every group stays reachable through search.
+ * A facet with more values than this opens as a native select holding every value; a shorter one
+ * stays a row of chips. The tray used to show the first six chips and drop the rest, so most
+ * states, eras and topics could not be picked from the facet at all.
  */
-const CHIPS_PER_GROUP = 6;
+const CHIP_FACET_MAX = 8;
 
 export type RecordsIndexProps = {
   readonly model: RecordsIndexModel;
@@ -67,46 +79,47 @@ export function RecordsIndexRoom({ model, releaseLabel }: RecordsIndexProps) {
   } = model;
 
   const rail = (
-    <>
-      <RailGroup
-        title="By era"
-        entries={eraGroups.map((group) => ({
-          label: group.label,
-          href: group.href,
-          count: group.count,
-        }))}
-        limit={12}
-      />
-      <RailGroup
-        title="By state"
-        entries={stateGroups.map((group) => ({
-          label: group.label,
-          href: group.href,
-          count: group.count,
-        }))}
-        limit={12}
-      />
-    </>
+    <OrientationInstrument
+      where={`${countLabel} in the list`}
+      {...(query.era.length > 0 ? { eraBand: query.era } : {})}
+      moves={[
+        {
+          label: 'Open the map',
+          icon: 'explore' as const,
+          href: atlasHref,
+          note: atlasReason,
+        },
+        ...(eraGroups[0]
+          ? [
+              {
+                label: `Browse ${eraGroups[0].label}`,
+                icon: 'time' as const,
+                href: eraGroups[0].href,
+                note: `${eraGroups[0].count.toLocaleString('en-US')} records`,
+              },
+            ]
+          : []),
+        ...(stateGroups[0]
+          ? [
+              {
+                label: `Browse ${stateGroups[0].label}`,
+                icon: 'place' as const,
+                href: stateGroups[0].href,
+                note: `${stateGroups[0].count.toLocaleString('en-US')} records`,
+              },
+            ]
+          : []),
+      ].slice(0, 3)}
+    />
   );
 
   return (
     <Room rail={rail}>
-      <RoomHeader
+      <ReadingEntry
         pathname="/records"
-        kicker="The whole archive, as a list"
         title="Records"
-        lede={
-          <>
-            Every record in the release as a list. The map shows where a record sits. This list
-            shows what the archive holds.
-          </>
-        }
-        meta={[
-          `${totalAll.toLocaleString('en-US')} records`,
-          releaseLabel,
-          'Readable without the map',
-        ]}
-        showPath={false}
+        lede="The map shows where a record sits. This list shows what the archive holds."
+        showCrumb={false}
       />
 
       {/*
@@ -161,16 +174,52 @@ export function RecordsIndexRoom({ model, releaseLabel }: RecordsIndexProps) {
                 role="group"
                 aria-label={FILTER_GROUP_LABELS[key]}
               >
-                {options.slice(0, CHIPS_PER_GROUP).map((option) => (
-                  <a
-                    className="ds-room-chip"
-                    href={option.href}
-                    key={option.id}
-                    aria-current={option.id === query[key] ? true : undefined}
-                  >
-                    {option.label} <span className="ds-room-num">{option.count}</span>
-                  </a>
-                ))}
+                {options.length > CHIP_FACET_MAX ? (
+                  /*
+                    A long vocabulary (every state, every era, every topic) is a list to pick
+                    from, not a wall of chips to scan. A native select gives the whole list with
+                    the platform's own picker on a phone, applies on change, and without
+                    JavaScript the form still submits through its fallback button. The other
+                    narrowings ride along as hidden fields, as in the find form above.
+                  */
+                  <form className="ds-records-facet__form" action="/records" method="get">
+                    {query.q.length > 0 ? <input type="hidden" name="q" value={query.q} /> : null}
+                    {RECORDS_FILTER_KEYS.filter(
+                      (other) => other !== key && query[other].length > 0,
+                    ).map((other) => (
+                      <input key={other} type="hidden" name={other} value={query[other]} />
+                    ))}
+                    <AutoSubmitSelect
+                      id={`records-facet-${key}`}
+                      name={key}
+                      label={FILTER_GROUP_LABELS[key]}
+                      defaultValue={active ? active.id : ''}
+                      options={[
+                        { value: '', label: FILTER_ALL_LABELS[key] },
+                        ...options.map((option) => ({
+                          value: option.id,
+                          label: `${option.label} (${option.count.toLocaleString('en-US')})`,
+                        })),
+                      ]}
+                    />
+                    <noscript>
+                      <button className="ds-records-find__go" type="submit">
+                        Show
+                      </button>
+                    </noscript>
+                  </form>
+                ) : (
+                  options.map((option) => (
+                    <a
+                      className="ds-room-chip"
+                      href={option.href}
+                      key={option.id}
+                      aria-current={option.id === query[key] ? true : undefined}
+                    >
+                      {option.label} <span className="ds-room-num">{option.count}</span>
+                    </a>
+                  ))
+                )}
               </div>
             </details>
           );
@@ -264,6 +313,14 @@ export function RecordsIndexRoom({ model, releaseLabel }: RecordsIndexProps) {
         </nav>
       ) : null}
 
+      <DocumentColophon
+        facts={[
+          `${totalAll.toLocaleString('en-US')} records`,
+          releaseLabel,
+          'Readable without the map',
+        ]}
+      />
+
       <OffRamp
         title={
           <>
@@ -271,14 +328,14 @@ export function RecordsIndexRoom({ model, releaseLabel }: RecordsIndexProps) {
           </>
         }
         actions={[
-          { href: atlasHref, label: 'Open this selection in Explore', emphasis: 'copper' },
+          { href: atlasHref, label: 'Open this selection on the map', emphasis: 'copper' },
           { href: '/methodology', label: 'How a record gets in' },
           { href: '/submit', label: 'Submit a record the archive is missing' },
         ]}
       >
         {atlasReason}
         {query.q.length > 0 ? (
-          <> Explore has no text search, so that part of this narrowing stays here.</>
+          <> The map has no text search, so that part of this narrowing stays here.</>
         ) : null}
       </OffRamp>
     </Room>

@@ -176,7 +176,7 @@ test('recordConfidenceTier keeps grade A once a second independent lineage corro
 
 test('recordConfidenceTier does not let Wikipedia be the lineage that lifts a record to A', () => {
   // `claim-corroborate` lists counting Wikipedia as the second lineage under Never. It carried
-  // 335 records to grade A before this (repo-goyut).
+  // 335 records to grade A before this.
   assert.equal(
     recordConfidenceTier([
       { confidenceLevel: 'high', citationSource: 'npgallery.nps.gov' },
@@ -203,7 +203,7 @@ test('recordConfidenceTier does not let Wikipedia be the lineage that lifts a re
 test('recordConfidenceTier does not let a record corroborate itself with its own index row', () => {
   // The real shape of nrhp-black-heritage-00000006: the listing and significance claims are the
   // NARA catalog row the record was seeded from, and the nomination form is the one document
-  // anyone actually read. One corroborating lineage, so it cannot reach A (repo-6jizv). Every
+  // anyone actually read. One corroborating lineage, so it cannot reach A. Every
   // claim states its role explicitly, matching what the publisher writes post-migration.
   assert.equal(
     recordConfidenceTier([

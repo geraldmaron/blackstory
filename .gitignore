@@ -34,7 +34,6 @@ coverage/
 .env.*
 !.env.example
 !.env.1password
-!.env.corsair.example
 *.pem
 credentials.json
 service-account*.json
@@ -61,6 +60,10 @@ tmp/
 .tmp/
 .local/
 artifacts/
+!packages/testing/src/gold-corpus/artifacts/
+packages/testing/src/gold-corpus/artifacts/*
+!packages/testing/src/gold-corpus/artifacts/evidence-retrieval-pilot-2026-09-18.json
+!packages/testing/src/gold-corpus/artifacts/evidence-retrieval-index-mechanics.json
 
 # scripts/dev-web.sh output (dev-web.log, dev-web.pid) — local-only, not *.log
 # scoped (directory name, not a file extension match).
@@ -84,6 +87,7 @@ packages/data-access/generated/*/
 !.claude/skills/
 .claude/skills/*
 !.claude/skills/blackstory/
+!.claude/skills/research-framework/
 .codex/
 .cursor/
 .vscode/
@@ -121,8 +125,23 @@ packages/ops-data/fixtures/person-commemorative-locations.json
 packages/ops-data/fixtures/national-catalog-location-overrides.json
 
 # Bulk discovery fixtures are working space, not source. The loaded candidates live
-# in bb_research.landscape_candidates; `--fetch` repopulates this directory on demand.
+# in research.landscape_candidates; `--fetch` repopulates this directory on demand.
 packages/ops-data/fixtures/discovery-candidates/bulk-*.json
 
 # Built at deploy time: the OpenAPI spec copied out for static serving.
 apps/api-public/public/
+
+# Local transcription and verification scratch (page scans, probe output)
+.tmp-transcribe/
+.tmp-lives-verify/
+.tmp-lives-batch4-pages/
+apps/web/.tmp-lives-verify/
+:memory:.ses
+.tmp-lives-batch4-crops/
+.tmp-lives-batch4-focus/
+.tmp-lives-batch4-locator/
+
+.playwright-mcp/
+
+# Local visual experiments are generated artifacts.
+/.tmp-hero-proof/

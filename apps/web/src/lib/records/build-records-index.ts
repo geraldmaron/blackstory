@@ -1,5 +1,5 @@
 /**
- * `/records` — the archive read as a list, not a map (SP-09, repo-92n2.9).
+ * `/records` — the archive read as a list, not a map.
  *
  * This module is the whole surface's logic: filtering, faceting, paging and href construction.
  * It is pure and synchronous so the page can be a plain server component and every test runs
@@ -15,12 +15,9 @@
  * records: full `PublicEntityView` today, or the search_index slim when `evidenceInputs` is
  * projected on active-release docs.
  *
- * THE TIER IS NEVER READ OUT OF THE INDEX. The slim path used to take a graded `confidenceTier`
- * facet straight off the doc, which made `/records` the one surface serving a cached CONCLUSION
- * while every other surface derived one — and when the rule changed on 2026-09-07 this room kept
- * the old answer for a day (repo-ngojq, repo-6qjv0). The index now carries the INPUTS and both
- * paths end at the same `confidenceTierFromEvidenceInputs`, so a rule change reaches Explore and
- * Records in the same deploy.
+ * THE TIER IS NEVER READ OUT OF THE INDEX. The index carries evidence inputs, and both catalog
+ * paths derive the tier with `confidenceTierFromEvidenceInputs`. Explore and Records therefore
+ * apply the same current grading rule instead of trusting a cached conclusion.
  *
  * The filter VOCABULARY, though, must not drift from the Lens. Every label and bucket here is
  * derived by calling the same shared modules Explore calls — `kindFamilyFor`,
@@ -42,7 +39,7 @@ import {
 import { resolveEntityEraBuckets } from '../map-experience/entity-era-facts';
 import { geoAnchorFor } from '../map-experience/entity-geo';
 import { mapListContinuityLabel } from '../discovery/continuity-label';
-import { canStandHere, staysOffPublicMap } from '../place/public-place-path';
+import { canStandHere, staysOffPublicMap, isInternalRecordLabel } from '../place/public-place-path';
 import { publicRecordHref, placeSlugCollisionCounts } from '../place/place-slug';
 import {
   EVIDENCE_FLOORS,
@@ -505,6 +502,36 @@ function compareGroups(a: RecordsGroup, b: RecordsGroup): number {
   return b.count - a.count || a.label.localeCompare(b.label);
 }
 
+/** Sequenced discovery: authored, graded, dated records before opaque site codes and undated rows. */
+const TIER_RANK: Readonly<Record<string, number>> = {
+  high: 0,
+  medium: 1,
+  low: 2,
+  unrated: 3,
+};
+
+function earliestEraYear(facts: RecordFacts): number {
+  let earliest = Number.POSITIVE_INFINITY;
+  for (const bucket of facts.eraBuckets) {
+    const year = Number.parseInt(bucket, 10);
+    if (Number.isFinite(year) && year < earliest) earliest = year;
+  }
+  return earliest;
+}
+
+function compareDiscoveryOrder(a: RecordFacts, b: RecordFacts): number {
+  const internalA = isInternalRecordLabel(a.row.name) ? 1 : 0;
+  const internalB = isInternalRecordLabel(b.row.name) ? 1 : 0;
+  if (internalA !== internalB) return internalA - internalB;
+  const tierA = TIER_RANK[a.confidenceTier] ?? 3;
+  const tierB = TIER_RANK[b.confidenceTier] ?? 3;
+  if (tierA !== tierB) return tierA - tierB;
+  const eraA = earliestEraYear(a);
+  const eraB = earliestEraYear(b);
+  if (eraA !== eraB) return eraA - eraB;
+  return a.row.name.localeCompare(b.row.name);
+}
+
 /**
  * Builds everything `/records` renders for one request.
  *
@@ -529,7 +556,9 @@ export function buildRecordsIndex(
     }
   }
 
-  const matched = facts.filter((record) => matchesExcept(record, query, 'none'));
+  const matched = facts
+    .filter((record) => matchesExcept(record, query, 'none'))
+    .sort(compareDiscoveryOrder);
   const mappableMatched = matched.filter((record) => record.mappable).length;
 
   const facets = Object.fromEntries(

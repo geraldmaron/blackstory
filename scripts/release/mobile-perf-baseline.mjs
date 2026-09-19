@@ -381,7 +381,7 @@ async function collectIos({ bundleId, runs }) {
     reason:
       '`footprint(1)` and `ps(1)` both exist on this host (confirmed via their man pages) and can ' +
       'target a Simulator process by name, since Simulator apps run as ordinary host processes. ' +
-      'Neither was invoked against a real device in this session, so no output was captured to ' +
+      'Device measurements were not supplied, so no output was captured to ' +
       'verify a parser against — implement once a real sample exists rather than guessing the shape.',
   });
   unmeasured.push({

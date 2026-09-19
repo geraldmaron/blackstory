@@ -1,29 +1,7 @@
-/**
- * Composes verified edge and bearer-token identities into server-side administrator authorization.
- * Browser route state is intentionally absent from this module and cannot grant access.
- */
+/** Server request headers, permissions, and authentication failures for Supabase admin routes. */
 export type AdminRequestHeaders =
   | { get(name: string): string | null }
   | Readonly<Record<string, string | readonly string[] | undefined>>;
-
-export type VerifiedIapPrincipal = {
-  readonly subject: string;
-  readonly email: string;
-};
-
-export type VerifiedAdminIdentity = {
-  readonly uid: string;
-  readonly email?: string;
-  readonly auth_time: number;
-  readonly admin?: boolean;
-  readonly research?: boolean;
-  readonly publication?: boolean;
-  readonly security?: boolean;
-  readonly bb_role?: 'admin' | 'research' | 'publication' | 'security';
-  readonly bb_roles?: readonly unknown[];
-  readonly amr?: readonly string[];
-  readonly [claim: string]: unknown;
-};
 
 export type AdminPermission =
   | 'research:write'
@@ -45,17 +23,8 @@ export type PrivilegedAdminAction =
   | 'privileged_export'
   | 'role_change';
 
-export type AuthorizedAdminRequest = {
-  readonly iap: VerifiedIapPrincipal;
-  readonly admin: VerifiedAdminIdentity;
-};
-
 export class ServerAdminAuthorizationError extends Error {
-  readonly code:
-    | 'IAP_ASSERTION_REQUIRED'
-    | 'ADMIN_BEARER_TOKEN_REQUIRED'
-    | 'ADMIN_IDENTITY_MISMATCH'
-    | 'IAP_DOMAIN_DENIED';
+  readonly code: 'ADMIN_BEARER_TOKEN_REQUIRED';
 
   constructor(code: ServerAdminAuthorizationError['code'], message: string) {
     super(message);

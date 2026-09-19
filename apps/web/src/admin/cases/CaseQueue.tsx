@@ -45,12 +45,10 @@ export function CaseQueue({ mode, initialRows = [] }: CaseQueueProps) {
   const { getIdToken, user } = useAdminAuth();
   const [rows, setRows] = useState<readonly AdminCaseListItem[]>(initialRows);
   /*
-   * Whether the server already handed us this queue (repo-gyq6.9). `initialRows` existed before
-   * that change but nothing passed it, so the mount always fetched. Now that /admin/inbox and
-   * /admin/cases read the queue in the request, re-fetching on mount would throw away the whole
-   * point and show the operator a list that flickers from server truth to an identical client
-   * copy. A ref, not state: it must not re-arm on a re-render, and it is deliberately NOT reset
-   * by a later `load()` — every refresh after the first is a real read the operator asked for.
+   * Server-rendered rows are authoritative for the initial paint, so the client must not replace
+   * them with an identical mount-time fetch. A ref, not state: it must not re-arm on a re-render,
+   * and it is deliberately not reset by a later `load()` because subsequent refreshes are reads
+   * the operator requested.
    */
   const servedFromServer = useRef(initialRows.length > 0);
   const [query, setQuery] = useState<CaseQueueQuery>({

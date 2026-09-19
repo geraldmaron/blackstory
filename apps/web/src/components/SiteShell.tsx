@@ -1,10 +1,10 @@
 /**
  * App shell wrapper: header, offline notice, main body slot, and document footer.
  *
- * Explore (`/explore`) is the instrument: no site header, no mega footer, its own
- * command bar. The door (`/`) is a reading surface: same room chrome as the archive,
- * mast plus plate in the page. `SiteShellHeader` and `SiteShellFooter` read the same
- * surface-class registry so they cannot disagree.
+ * The Door (`/` journey, `/explore` browse) shares room chrome: `SiteShellHeader` mounts the
+ * CommandBar; browse keeps that bar and embeds atlas instruments (no second instrument bar).
+ * `SiteShellHeader` and `SiteShellFooter` read the same surface-class registry so they cannot
+ * disagree. The legacy `instrument` class still suppresses chrome if ever emitted.
  */
 
 import type { ReactNode } from 'react';

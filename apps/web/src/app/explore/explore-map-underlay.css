@@ -1,7 +1,7 @@
 /**
  * Explore first-paint geography: the CONUS board in Web Mercator, laid over the exact frame the
  * live plate opens on, so the plate's reveal is a crossfade between two identical maps and not
- * one map replaced by another (repo-27uao).
+ * one map replaced by another.
  *
  * The frame is MapStage's constructor fit: `US_CONUS_BOUNDS` inside `PLATE_OPENING_PADDING_PX`
  * (32px) of clearance on every side, centered — never smaller than the box at the national floor

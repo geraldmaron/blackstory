@@ -44,7 +44,7 @@ export function isSparseRecord(entity: PublicEntityView): boolean {
  * published fields, never inferred from how empty the page looks.
  *
  * Two conditions, both required, because `researchCoverage` alone answers a narrower question
- * than THIN_RECORD_COPY asserts. Coverage counts distinct source DOCUMENTS (repo-z1pw), so
+ * than THIN_RECORD_COPY asserts. Coverage counts distinct source documents, so
  * 'minimal' means "one document stands behind this", which covers two different records:
  *
  *  - a registry row nobody has researched (no historicalContext) — the notice is exactly true;
@@ -56,7 +56,7 @@ export function isSparseRecord(entity: PublicEntityView): boolean {
  *
  * So the notice requires the absence of narrative context too. Single-sourced-but-researched
  * records need a corroboration disclosure instead — a different sentence, see
- * isSingleSourceRecord below (repo-ol8v).
+ * `isSingleSourceRecord` below.
  */
 export function isThinRecord(entity: PublicEntityView): boolean {
   if (entity.researchCoverage !== 'minimal') return false;
@@ -72,7 +72,7 @@ export function isThinRecord(entity: PublicEntityView): boolean {
  * The inverse of isThinRecord's second condition, on the same researchCoverage === 'minimal'
  * gate: isThinRecord fires when historicalContext is empty, this fires when it is not. The two
  * are mutually exclusive by construction, so at most one of their notices ever renders for a
- * given record (repo-ol8v).
+ * given record.
  */
 export function isSingleSourceRecord(entity: PublicEntityView): boolean {
   if (entity.researchCoverage !== 'minimal') return false;

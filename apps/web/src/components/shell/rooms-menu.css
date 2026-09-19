@@ -1,6 +1,7 @@
 /**
- * The Rooms menu's panel. Sits under the bar's right end, at the overlay tier: it is a
- * reader-summoned list over whatever the surface is showing, not part of the surface.
+ * The Rooms menu's panel. Sits under the bar's right end, at the command-overlay
+ * tier: it is a reader-summoned list over whatever the surface is showing, including
+ * the memorial wall, not part of the surface.
  */
 
 .ds-roomsmenu {
@@ -38,13 +39,13 @@
   color: var(--ds-ink);
 }
 
-.ds-roomsmenu[open] > .ds-roomsmenu__trigger svg {
+.ds-roomsmenu[open] > .ds-roomsmenu__trigger .ds-roomsmenu__chevron {
   transform: rotate(180deg);
 }
 
 .ds-roomsmenu__panel {
   position: absolute;
-  z-index: var(--ds-z-modal-sheet);
+  z-index: var(--ds-z-command-overlay);
   top: calc(100% + 10px);
   right: 0;
   width: min(440px, calc(100vw - var(--ds-space-4) * 2));
@@ -86,9 +87,10 @@
 }
 
 .ds-roomsmenu__item {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  column-gap: 0.55rem;
+  align-items: start;
   padding-block: 9px;
   border-top: var(--ds-border-width) solid color-mix(in srgb, var(--ds-rule) 72%, transparent);
   color: var(--ds-ink);
@@ -96,6 +98,17 @@
   text-decoration: none;
   overflow-wrap: break-word;
   white-space: normal;
+}
+
+.ds-roomsmenu__item .ds-destination-icon {
+  margin-top: 0.35em;
+}
+
+.ds-roomsmenu__copy {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
 }
 
 .ds-roomsmenu__item:hover {
@@ -108,7 +121,9 @@
 }
 
 .ds-roomsmenu__hub {
-  display: block;
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
   margin-top: var(--ds-space-5);
   padding-top: var(--ds-space-4);
   border-top: var(--ds-border-width) solid color-mix(in srgb, var(--ds-rule) 72%, transparent);
@@ -161,13 +176,19 @@
 @media (max-width: 819px) {
   /* Rooms stays on the phone bar. Panel sits below the stacked
      island, not over the trigger, and scrolls if the three groups run long. */
+  /* Same size and weight as the three axis links beside it. Closed, it drops its ring so Rooms
+     reads as the fourth axis rather than a larger control; open, the accent wash above returns. */
   .ds-roomsmenu__trigger {
     padding: 0 var(--ds-space-2);
-    font-size: 12px;
-    gap: 0;
+    font-size: 0.75rem;
+    gap: 0.3rem;
   }
 
-  .ds-roomsmenu__trigger svg {
+  .ds-roomsmenu:not([open]) > .ds-roomsmenu__trigger {
+    border-color: transparent;
+  }
+
+  .ds-roomsmenu__trigger .ds-roomsmenu__chevron {
     display: none;
   }
 

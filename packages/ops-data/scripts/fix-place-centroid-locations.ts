@@ -15,7 +15,7 @@
  * skipped rather than rewritten.
  *
  * SOURCE. U.S. Census Bureau 2024 Gazetteer place files (public domain), the same publisher and
- * the same release already used for `bb_reference.jurisdictions` via
+ * the same release already used for `reference.jurisdictions` via
  * `src/jurisdictions/tiger-gazetteer.ts`. The published value is the Census internal point
  * (INTPTLAT/INTPTLONG) for the incorporated place — a town centroid, which is exactly the
  * `precision: 'town'` these rows already declare. This does not sharpen any record.
@@ -155,14 +155,14 @@ async function main(): Promise<void> {
       }>(
         `SELECT id, lat, lng, label, match_method,
                 ST_X(location::geometry) AS geo_lng, ST_Y(location::geometry) AS geo_lat
-           FROM bb_canonical.entity_locations WHERE entity_id = $1`,
+           FROM canonical.entity_locations WHERE entity_id = $1`,
         [fix.entityId],
       );
       const published = await client.query<{ match_method: string | null }>(
         `SELECT location->>'matchMethod' AS match_method
-           FROM bb_public.release_entities
+           FROM published.release_entities
           WHERE entity_id = $1
-            AND release_id = (SELECT release_id FROM bb_public.v_active_release_id)`,
+            AND release_id = (SELECT release_id FROM published.v_active_release_id)`,
         [fix.entityId],
       );
       const publishedMethod = published.rows[0]?.match_method ?? null;
@@ -243,7 +243,7 @@ async function main(): Promise<void> {
         await client.query('BEGIN');
         try {
           await client.query(
-            `UPDATE bb_canonical.entity_locations
+            `UPDATE canonical.entity_locations
                 SET lat = $2, lng = $3, geohash = $4, geohash_prefixes = $5,
                     match_method = $6,
                     location = ST_SetSRID(ST_MakePoint($3, $2), 4326)::geography,
@@ -251,12 +251,11 @@ async function main(): Promise<void> {
               WHERE id = $1`,
             [row.id, place.lat, place.lng, geohash, prefixes, MATCH_METHOD],
           );
-          // The published release carries its own copy: the site reads bb_public, so a canonical
-          // fix alone would leave the wrong pin live until the next full republish. That copy is
-          // `projection`; location/lat/lng/geohash are GENERATED from it. This wrote the columns
-          // until repo-qqy04, which is why the pin stayed wrong on the live site anyway.
+          // Update projection because public readers use that representation and location
+          // columns are generated from it. A canonical-only correction does not update the
+          // published pin.
           await client.query(
-            `UPDATE bb_public.release_entities
+            `UPDATE published.release_entities
                 SET projection = jsonb_set(
                       projection, '{location}',
                       jsonb_set(
@@ -273,7 +272,7 @@ async function main(): Promise<void> {
                       true
                     )
               WHERE entity_id = $1
-                AND release_id = (SELECT release_id FROM bb_public.v_active_release_id)`,
+                AND release_id = (SELECT release_id FROM published.v_active_release_id)`,
             [fix.entityId, place.lat, place.lng, geohash, prefixes, MATCH_METHOD],
           );
           await client.query('COMMIT');

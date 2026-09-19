@@ -3,16 +3,10 @@
  * `EntityRelationship` records and projects relationships back to public
  * adjacency entries for release materialization.
  *
- * Also wires forward each entity's `mentionedEntityIds` (WS6 — see `./mention-resolver.ts`'s
- * header comment for why those tokens are a mixed bag of already-canonical ids, bare acronyms,
- * and event slugs). A resolved mention becomes a minimal `related_to` edge only — it is
- * deliberately NOT typed any more specifically than that. Specific edge typing (e.g. `member_of`,
- * `attended`, `participated_in`) is the candidate/proposal pipeline's job
- * (`./relationship-candidates.ts` + `packages/ops-data/scripts/generate-relationship-candidates.ts`
- * stage 2), which has the context to assign a real type per `docs/relationship-taxonomy.md` and
- * route through human review before publication. This extraction path publishes directly
- * (`workflowStatus: 'accepted'`), so it only ever emits the one edge type that's true by
- * construction: "these two entities are documented as related."
+ * Stored mentions must identify an existing catalog entity exactly. Legacy names, aliases
+ * and acronyms require research resolution before they can contribute a relationship.
+ * Only released, cited claims naming the exact predicate and target can support an edge.
+ * This projection does not perform independent review or create publication authority.
  */
 import { resolveReleaseClaimId, type ReleaseSourceClaim } from '../publication/release-builder.js';
 import type { EntityRelationship, RelationshipType, TemporalContext } from '../relationship.js';
@@ -37,8 +31,7 @@ export type CatalogEntityForRelationships = {
   readonly aliases?: readonly string[];
   readonly claims?: readonly ReleaseSourceClaim[];
   readonly related?: readonly CatalogRelatedEntry[];
-  /** Slug/acronym/already-canonical-id tokens naming other entities this entity's catalog prose
-   * mentions — see this module's header comment and `./mention-resolver.ts`. */
+  /** Exact catalog references; mentions still require a supporting relationship claim. */
   readonly mentionedEntityIds?: readonly string[];
 };
 
@@ -63,13 +56,10 @@ function isRelationshipType(value: string): value is RelationshipType {
 }
 
 function dedupKey(entityA: string, entityB: string, type: RelationshipType): string {
-  const [left, right] = entityA < entityB ? [entityA, entityB] : [entityB, entityA];
-  return `${left}|${right}|${type}`;
+  return `${entityA}|${entityB}|${type}`;
 }
 
-/** Same pairing as `dedupKey` but WITHOUT the relationship type — used to detect that two
- * endpoints already have SOME explicit `related[]` edge between them (of any type), so a
- * resolved-mention `related_to` edge never duplicates an already-authored, more specific edge. */
+/** Avoid a generic mention edge when a more specific relationship already connects the pair. */
 function unorderedPairKey(entityA: string, entityB: string): string {
   const [left, right] = entityA < entityB ? [entityA, entityB] : [entityB, entityA];
   return `${left}|${right}`;
@@ -79,21 +69,22 @@ function relationshipId(fromEntityId: string, type: RelationshipType, toEntityId
   return `rel_${fromEntityId}_${type}_${toEntityId}`;
 }
 
-function resolveEntityClaimIds(entity: CatalogEntityForRelationships): readonly string[] {
-  return (entity.claims ?? []).map((claim, index) => resolveReleaseClaimId(entity, claim, index));
-}
-
 function resolveEvidenceIds(
   fromEntity: CatalogEntityForRelationships | undefined,
-  toEntity: CatalogEntityForRelationships | undefined,
+  type: RelationshipType,
+  targetId: string,
 ): readonly string[] {
-  const fromClaimIds = fromEntity ? resolveEntityClaimIds(fromEntity) : [];
-  if (fromClaimIds.length > 0) {
-    const toClaimIds = toEntity ? resolveEntityClaimIds(toEntity) : [];
-    return [...new Set([...fromClaimIds, ...toClaimIds])];
-  }
-  const toClaimIds = toEntity ? resolveEntityClaimIds(toEntity) : [];
-  return toClaimIds;
+  if (!fromEntity) return [];
+  return (fromEntity.claims ?? []).flatMap((claim, index) => {
+    if (claim.predicate !== type || claim.object !== targetId || !claim.id || !claim.citationHref)
+      return [];
+    try {
+      if (!['http:', 'https:'].includes(new URL(claim.citationHref).protocol)) return [];
+    } catch {
+      return [];
+    }
+    return [resolveReleaseClaimId(fromEntity, claim, index)];
+  });
 }
 
 function endpointsFromCatalogEntry(
@@ -108,9 +99,8 @@ function endpointsFromCatalogEntry(
 
 /**
  * Deduplicates bidirectional fixture pairs into one `EntityRelationship` each.
- * Direction semantics: outgoing uses from=entity, to=related.id; incoming uses
- * from=related.id, to=entity. Canonical direction prefers the first-seen outgoing
- * edge; otherwise the first incoming edge with endpoints flipped to match adjacency.
+ * Outgoing uses from=entity, to=related.id; incoming uses the reversed endpoints.
+ * Opposite directed assertions and distinct predicates remain separate.
  */
 export function extractCatalogRelationships(
   entities: readonly CatalogEntityForRelationships[],
@@ -177,7 +167,7 @@ export function extractCatalogRelationships(
   for (const entity of sortedEntities) {
     for (const token of entity.mentionedEntityIds ?? []) {
       const resolvedId = resolveMentionToken(token, mentionIndex);
-      if (!resolvedId) continue; // unresolved mention: never guessed, silently skipped.
+      if (!resolvedId) continue; // Unresolved references cannot establish an edge.
       if (resolvedId === entity.id) continue; // self-loop.
       if (!entityById.has(resolvedId)) continue; // defensive: resolver already restricts to this set.
       if (explicitPairKeys.has(unorderedPairKey(entity.id, resolvedId))) continue; // already an edge.
@@ -198,12 +188,11 @@ export function extractCatalogRelationships(
   )) {
     const type = key.split('|').at(-1) as RelationshipType;
     const fromEntity = entityById.get(canonical.endpoints.fromEntityId);
-    const toEntity = entityById.get(canonical.endpoints.toEntityId);
-    const evidenceIds = resolveEvidenceIds(fromEntity, toEntity);
+    const evidenceIds = resolveEvidenceIds(fromEntity, type, canonical.endpoints.toEntityId);
 
     if (evidenceIds.length === 0) {
       skipped.push(
-        `${canonical.endpoints.fromEntityId} -> ${canonical.endpoints.toEntityId} (${type}): no resolvable claim evidence`,
+        `${canonical.endpoints.fromEntityId} -> ${canonical.endpoints.toEntityId} (${type}): no exact cited relationship claim`,
       );
       continue;
     }

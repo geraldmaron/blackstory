@@ -32,14 +32,19 @@ This skill decides the judgment those tools execute.
    "sued," "founded") only when a record states the relation; causal verbs only
    behind a gated causal claim. Never upgrade an address match into an
    acquaintanceship, or co-membership into collaboration.
-4. **Expand deliberately, not greedily.** From a verified entity, the productive next
+4. **Preserve the path.** A → B → C is two edges, not an A → C assertion. Keep each
+   predicate, direction, identity ambiguity, time qualifier and evidence selector. Two different
+   relations to the same node must survive deduplication. Do not multiply model scores into a
+   chain probability. Retain an unmapped source predicate instead of forcing it into a misleading
+   category. Source dates and the seed's lifespan do not become facts about the neighbor.
+5. **Expand deliberately, not greedily.** From a verified entity, the productive next
    hops are: co-signers and witnesses on its documents; co-plaintiffs and opposing
    parties in its cases; the institutions its records name; the named neighbors on
    its census page and city-block records. One hop at a time, each candidate through
    [`blackstory-entity-verify`](../entity-verify/SKILL.md) before it becomes a source
    of further hops. A network built on an unverified hub is a network of errors.
-5. **Record negative and ambiguous results.** "Searched the case file, no co-plaintiff
-   named" is a finding; log it so the next researcher does not re-run the dead end.
+6. **Record negative and ambiguous results.** "Searched the case file, no co-plaintiff
+   named" is a search outcome; record collection coverage and access limits before interpreting absence. Log it so the next researcher does not re-run the dead end.
    Same-name candidates that cannot be disambiguated go to the graylist
    ([`blackstory-triage-graylist`](../triage-graylist/SKILL.md)), never into the graph.
 

@@ -1,6 +1,6 @@
 /**
  * Validate and optionally upsert Phase 1 indicator catalog + sample observations
- * into bb_reference.statistical_* (and seed jurisdictions / entity_context_bindings).
+ * into reference.statistical_* (and seed jurisdictions / entity_context_bindings).
  *
  * Usage (repo root):
  *   # Validate fixture only (default)
@@ -154,7 +154,7 @@ async function applyToPostgres(fixture: Phase1Fixture, databaseUrl: string): Pro
     await client.query('BEGIN');
     for (const j of fixture.jurisdictions) {
       await client.query(
-        `INSERT INTO bb_reference.jurisdictions
+        `INSERT INTO reference.jurisdictions
           (id, kind, name, state_fips, county_fips, parent_id, metadata)
          VALUES ($1, $2, $3, $4, $5, $6, $7::jsonb)
          ON CONFLICT (id) DO UPDATE SET
@@ -178,7 +178,7 @@ async function applyToPostgres(fixture: Phase1Fixture, databaseUrl: string): Pro
 
     for (const series of PHASE1_INDICATOR_CATALOG) {
       await client.query(
-        `INSERT INTO bb_reference.statistical_series
+        `INSERT INTO reference.statistical_series
           (metric_id, metric_definition, universe, unit, source_dataset, source_table,
            source_variable, geography_type, estimate_type, period_type,
            external_data_source_id, theme, metadata)
@@ -225,7 +225,7 @@ async function applyToPostgres(fixture: Phase1Fixture, databaseUrl: string): Pro
         boundaryVersion: obs.boundaryVersion,
       });
       await client.query(
-        `INSERT INTO bb_reference.statistical_observations
+        `INSERT INTO reference.statistical_observations
           (id, metric_id, jurisdiction_id, boundary_version, reference_period, dataset_vintage,
            estimate, margin_of_error, race_ethnicity_slice, status, source, source_url,
            retrieved_at, content_hash, metadata)
@@ -257,7 +257,7 @@ async function applyToPostgres(fixture: Phase1Fixture, databaseUrl: string): Pro
 
     for (const binding of fixture.bindings ?? []) {
       await client.query(
-        `INSERT INTO bb_reference.entity_context_bindings
+        `INSERT INTO reference.entity_context_bindings
           (id, entity_id, metric_id, purpose, jurisdiction_id, notes)
          VALUES ($1,$2,$3,$4,$5,$6)
          ON CONFLICT (id) DO UPDATE SET

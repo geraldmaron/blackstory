@@ -17,5 +17,5 @@ Built from rights-cleared public-media promotions (Commons auto_propose). Regene
 tiles, `manifest.json`, and `tile-credits.ts`:
 
 ```bash
-node --conditions development --import tsx packages/firebase/scripts/build-archive-collage-tiles.ts
+node --conditions development --import tsx packages/ops-data/scripts/build-archive-collage-tiles.ts
 ```

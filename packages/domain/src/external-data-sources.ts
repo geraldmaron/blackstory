@@ -1,20 +1,8 @@
 /**
- * External dataset acquisition registry (owner directive 2026-07-18): every third-party
- * dataset BlackStory plans to ingest for the demographics/context modeling layers, recorded
- * BEFORE ingestion with its direct data URL, license verdict, geography, cadence, and (once
- * downloaded) checksum — so each future ingestion session starts from a vetted entry instead
- * of a link dump.
- *
- * Lane boundaries: this is NOT `launch-corpora.ts` (that is the bulk-import vetting lane for
- * entity-bearing corpora; `assertCorpusNotInExcludedLane` would reject several of these) and
- * these are NOT yet `registerSource` registrations (the in-memory registry is for adapters
- * with parser contracts; each ingestion bead builds its full `SourceAdapterContract` when the
- * parser exists). Every entry here starts `registryState: 'disabled'` — recording a source is
- * never approval to ingest it, and license verdicts of `noncommercial`/`unverified` are hard
- * gates requiring rights review before any public surface use.
- *
- * `rightsPolicyForVerdict` projects an entry's license verdict onto the shared
- * `RightsPolicy` vocabulary so future contracts stay consistent with launch-corpora's usage.
+ * Records dataset URLs, rights verdicts, geography, refresh cadence and content hashes before
+ * ingestion. Entries start disabled; registration is not permission to ingest. Entity
+ * bulk-import vetting and source-adapter registration are separate steps. Unverified or
+ * restricted rights require review before public use.
  */
 import type { RightsPolicy } from './provenance/rights.js';
 
@@ -42,6 +30,7 @@ export const EXTERNAL_SOURCE_GEOGRAPHIES = [
   'facility',
   'state',
   'nation',
+  'region',
 ] as const;
 
 export type ExternalSourceGeography = (typeof EXTERNAL_SOURCE_GEOGRAPHIES)[number];
@@ -109,7 +98,7 @@ export const EXTERNAL_DATA_SOURCES: readonly ExternalDataSource[] = [
     notes:
       'Child income rank / incarceration outcomes by race, sex, and parental income percentile. ' +
       '73,278 tracts × 7,897 columns; curated starter subset (72,014 tracts × 11 outcome fields) ' +
-      'lives in bb_reference.opportunity_atlas_tracts (tractVintage 2010 — crosswalk needed ' +
+      'lives in reference.opportunity_atlas_tracts (tractVintage 2010 — crosswalk needed ' +
       'against 2020-tract collections). Owner ruling 2026-09-12 (repo-7w972): the 2.47 GiB raw ' +
       'file is cite-only — BlackStory does not host a copy anywhere (not GCS, not Supabase ' +
       'Storage); dataUrl above is the public Opportunity Insights artifact and checksumSha256 / ' +

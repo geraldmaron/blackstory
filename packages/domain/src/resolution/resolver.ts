@@ -28,12 +28,9 @@ const REVIEW_THRESHOLD = 0.55;
 const AMBIGUITY_MARGIN = 0.12;
 
 /**
- * the related workstream (identifier-dominant resolution): an exact match on a TRUSTED-namespace
- * identifier (Wikidata QID, LoC, VIAF, NPS, NRHP, NCES, etc. — see `../naming.js`) must clearly
- * outrank name similarity, whose maximum contribution is 0.55 (see `nameFactor` below). 0.65
- * dominates that ceiling on its own. An exact match on an UNTRUSTED/internal namespace carries a
- * much smaller weight (0.1), since an internal accession number is not unambiguous evidence the
- * way an external authority-control id is.
+ * Trusted external-identifier matches outweigh the maximum name-similarity contribution in this
+ * candidate score. Untrusted namespace matches receive less weight. These are review-ranking
+ * heuristics, not identity proof or calibrated probabilities.
  */
 const EXACT_TRUSTED_IDENTIFIER_SCORE = 0.65;
 const EXACT_UNTRUSTED_IDENTIFIER_SCORE = 0.1;

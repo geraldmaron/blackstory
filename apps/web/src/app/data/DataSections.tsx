@@ -1,15 +1,8 @@
 /**
- * `/data` body: the headline band, the section rail, four sections of figures, and the reading
- * rules.
+ * Data chapter body: Counted → Lived (door into the Lives room) → Measured gaps → How to read.
  *
- * Every figure renders through `DataChartFrame`, which is the Data Figure anatomy: label, title,
- * reading, graphic, caption, source, numbers. This file decides which figures a section holds,
- * writes each figure's reading sentence from the data it was given, and places the figures in a
- * one- or two-column grid. It draws no chart of its own.
- *
- * The section carries the as-of date once, in its head. The figure carries the source, because
- * two figures in one section can come from two agencies and a source line that names both under
- * each is a source line that names neither.
+ * Every figure renders through `DataChartFrame` (DataFigure anatomy). This file decides order,
+ * readings, and placement. It draws no chart of its own.
  */
 import React, { type ReactNode } from 'react';
 import Link from 'next/link';
@@ -24,8 +17,10 @@ import type {
 } from '@repo/domain/statistics/data-page-series';
 import { BlackPopulationShareChart } from '../../components/data/BlackPopulationShareChart';
 import { DataChartFrame } from '../../components/data/DataChartFrame';
+import { GapMagnitudeSight } from '../../components/data/GapMagnitudeSight';
 import { GroupedBarIndicatorChart } from '../../components/data/GroupedBarIndicatorChart';
 import { PopulationByDecadeChart } from '../../components/data/PopulationByDecadeChart';
+import { PopulationDecadeSpine } from '../../components/data/PopulationDecadeSpine';
 import {
   isRatioLabel,
   RacePairComparisonChart,
@@ -41,21 +36,20 @@ import {
   DATA_READING_LINKS,
   DATA_READING_RULES,
   DATA_SECTION_COPY,
+  DATA_SOURCE_LIBRARY_HANDOFF,
   type DataPageSectionId,
 } from './data-copy';
 import { DataPageNav } from './DataPageNav';
+import { DestinationIcon } from '../../components/patterns/DestinationIcon';
 
 void React;
 
 export type DataHeadline = {
   readonly id: string;
-  /** The number, already formatted. */
   readonly value: string;
-  /** A short unit or qualifier printed small beside the value: "%", "×", "million". */
   readonly unit?: string;
   readonly label: string;
   readonly source: string;
-  /** Anchor of the figure or section that carries this number. */
   readonly href: string;
 };
 
@@ -77,8 +71,6 @@ export type DataSectionsProps = {
   readonly populationAsOf: string;
   readonly indicatorsAsOf: string;
 };
-
-/* —— readings: one sentence per figure, written from the data ————————————— */
 
 function formatMillions(value: number): string {
   return `${(value / 1_000_000).toLocaleString('en-US', { maximumFractionDigits: 1 })} million`;
@@ -185,12 +177,10 @@ function groupedReading(series: DataPageGroupedBarSeries): ReactNode {
   );
 }
 
-/* —— blocks ————————————————————————————————————————————————————————————————— */
-
-function Headlines({ items }: { readonly items: readonly DataHeadline[] }) {
+function OpeningBeat({ items }: { readonly items: readonly DataHeadline[] }) {
   if (items.length === 0) return null;
   return (
-    <ol className="ds-data-headlines" aria-label="Headline figures">
+    <ol className="ds-data-headlines" aria-label="Opening figures">
       {items.map((item) => (
         <li key={item.id}>
           <a className="ds-data-headline" href={item.href}>
@@ -217,11 +207,17 @@ function Section({
   readonly children: ReactNode;
 }) {
   const copy = DATA_SECTION_COPY[id];
+  const sectionMeta = DATA_PAGE_SECTIONS.find((entry) => entry.id === id);
   const headingId = `${id}-heading`;
   return (
     <section className="ds-data-section" id={id} aria-labelledby={headingId}>
       <header className="ds-data-section__head">
-        <p className="ds-data-section__kicker">{copy.kicker}</p>
+        <p className="ds-data-section__kicker">
+          {sectionMeta ? (
+            <DestinationIcon id={sectionMeta.icon} className="ds-kicker-glyph" />
+          ) : null}
+          {copy.kicker}
+        </p>
         <h2 className="ds-data-section__title" id={headingId}>
           {copy.title}
         </h2>
@@ -239,7 +235,6 @@ function Section({
   );
 }
 
-/** The change ledger: recent decade deltas as a figure body, so it carries the same anatomy. */
 function DeltaFigure({
   items,
   sources,
@@ -300,8 +295,6 @@ function DeltaFigure({
   );
 }
 
-/* —— the page body —————————————————————————————————————————————————————————— */
-
 export function DataSections({
   headlines,
   timelineRows,
@@ -318,32 +311,39 @@ export function DataSections({
 
   return (
     <>
-      <Headlines items={headlines} />
+      <OpeningBeat items={headlines} />
       <DataPageNav sections={DATA_PAGE_SECTIONS} />
 
-      <Section id="population" meta={[`As of ${populationAsOf}`, '1790 to 2020, every census']}>
+      <Section id="counted" meta={[`As of ${populationAsOf}`, '1790 to 2020, every census']}>
         {hasPopulation ? (
           <div className="ds-data-section__figures">
+            <PopulationDecadeSpine
+              id="population-spine"
+              figureLabel="Figure 1"
+              rows={timelineRows}
+              sources={chartSources}
+              reading={shareReading(timelineRows)}
+            />
             <PopulationByDecadeChart
               id="population-count"
-              figureLabel="Figure 1"
+              figureLabel="Figure 2"
               rows={timelineRows}
               sources={chartSources}
               reading={populationReading(timelineRows)}
             />
             <BlackPopulationShareChart
               id="population-share"
-              figureLabel="Figure 2"
+              figureLabel="Figure 3"
               span="half"
               rows={timelineRows}
               sources={chartSources}
               reading={shareReading(timelineRows)}
             />
-            <DeltaFigure items={deltaItems} sources={chartSources} figureLabel="Figure 3" />
+            <DeltaFigure items={deltaItems} sources={chartSources} figureLabel="Figure 4" />
             {stateChanges.length > 0 ? (
               <StatePopulationShiftChart
                 id="population-states"
-                figureLabel="Figure 4"
+                figureLabel="Figure 5"
                 fromDecade="2010"
                 toDecade="2020"
                 changes={stateChanges}
@@ -355,17 +355,36 @@ export function DataSections({
           </div>
         ) : (
           <p className="ds-data-empty">
-            Census population figures are not available on this release. The indicator sections
-            below are unaffected.
+            Census population figures are not available on this release. The acts below are
+            unaffected.
           </p>
         )}
       </Section>
 
-      <Section id="wealth" meta={indicatorMeta}>
+      <Section id="lives" meta={['1870s to 2020s']}>
+        <p className="ds-data-lives-entry">
+          Follow one life question across changing census definitions, rules, and sourced accounts.
+          Only evidence-backed comparisons appear in the guided experience.
+        </p>
+        <p className="ds-data-lives-entry__cta">
+          <Link href="/lives">
+            <DestinationIcon id="person" className="ds-kicker-glyph" />
+            Open Lives
+          </Link>
+        </p>
+      </Section>
+
+      <Section id="gaps" meta={indicatorMeta}>
         <div className="ds-data-section__figures">
+          <GapMagnitudeSight
+            id="wealth-ratio-sight"
+            figureLabel="Figure 6"
+            series={indicators.wealthComparison}
+            reading={pairReading(indicators.wealthComparison, 'held a median')}
+          />
           <RacePairComparisonChart
             id="wealth-gap"
-            figureLabel="Figure 5"
+            figureLabel="Figure 7"
             span="half"
             series={indicators.wealthComparison}
             reading={pairReading(indicators.wealthComparison, 'held a median')}
@@ -373,7 +392,7 @@ export function DataSections({
           {indicators.wealthTrend ? (
             <GroupedBarIndicatorChart
               id="wealth-trend"
-              figureLabel="Figure 6"
+              figureLabel="Figure 8"
               span="half"
               series={indicators.wealthTrend}
               reading={groupedReading(indicators.wealthTrend)}
@@ -382,26 +401,21 @@ export function DataSections({
           {indicators.wealthRatioLongArc ? (
             <TrendLineChart
               id="wealth-ratio-long-arc"
-              figureLabel="Figure 7"
+              figureLabel="Figure 9"
               series={indicators.wealthRatioLongArc}
               reading={groupedReading(indicators.wealthRatioLongArc)}
             />
           ) : null}
-        </div>
-      </Section>
-
-      <Section id="housing" meta={indicatorMeta}>
-        <div className="ds-data-section__figures">
           <GroupedBarIndicatorChart
             id="housing-ownership"
-            figureLabel="Figure 8"
+            figureLabel="Figure 10"
             span="half"
             series={indicators.cookHomeownership}
             reading={groupedReading(indicators.cookHomeownership)}
           />
           <GroupedBarIndicatorChart
             id="housing-denials"
-            figureLabel="Figure 9"
+            figureLabel="Figure 11"
             span="half"
             series={indicators.hmdaDenialRates}
             reading={groupedReading(indicators.hmdaDenialRates)}
@@ -409,32 +423,33 @@ export function DataSections({
           {indicators.nationalHomeownershipLongArc ? (
             <TrendLineChart
               id="housing-ownership-long-arc"
-              figureLabel="Figure 10"
+              figureLabel="Figure 12"
               series={indicators.nationalHomeownershipLongArc}
               reading={groupedReading(indicators.nationalHomeownershipLongArc)}
             />
           ) : null}
           <RacePairComparisonChart
             id="housing-cost-burden"
-            figureLabel="Figure 11"
+            figureLabel="Figure 13"
             series={indicators.costBurdenComparison}
             reading={pairReading(indicators.costBurdenComparison, 'cost-burdened at')}
           />
-        </div>
-      </Section>
-
-      <Section id="justice" meta={indicatorMeta}>
-        <div className="ds-data-section__figures">
+          <GapMagnitudeSight
+            id="justice-ratio-sight"
+            figureLabel="Figure 14"
+            series={indicators.imprisonmentComparison}
+            reading={pairReading(indicators.imprisonmentComparison, 'imprisoned at')}
+          />
           <RacePairComparisonChart
             id="justice-imprisonment"
-            figureLabel="Figure 12"
+            figureLabel="Figure 15"
             span="half"
             series={indicators.imprisonmentComparison}
             reading={pairReading(indicators.imprisonmentComparison, 'imprisoned at')}
           />
           <GroupedBarIndicatorChart
             id="justice-sentences"
-            figureLabel="Figure 13"
+            figureLabel="Figure 16"
             span="half"
             series={indicators.federalDrugSentences}
             reading={groupedReading(indicators.federalDrugSentences)}
@@ -446,11 +461,20 @@ export function DataSections({
         <ul className="ds-data-rules" aria-label="Rules for reading these figures">
           {DATA_READING_RULES.map((rule) => (
             <li key={rule.kicker} className="ds-data-rule">
-              <h3 className="ds-data-rule__kicker">{rule.kicker}</h3>
+              <h3 className="ds-data-rule__kicker">
+                <DestinationIcon id={rule.icon} className="ds-kicker-glyph" />
+                {rule.kicker}
+              </h3>
               <p className="ds-data-rule__body">{rule.body}</p>
             </li>
           ))}
         </ul>
+        <p className="ds-data-reading__handoff">
+          <Link className="ds-cta ds-cta--copper" href={DATA_SOURCE_LIBRARY_HANDOFF.href}>
+            <DestinationIcon id="source" />
+            {DATA_SOURCE_LIBRARY_HANDOFF.label}
+          </Link>
+        </p>
         <p className="ds-data-reading__links">
           {DATA_READING_LINKS.map((link, index) => (
             <Link
@@ -458,6 +482,7 @@ export function DataSections({
               className={index === 0 ? 'ds-cta ds-cta--copper' : 'ds-cta ds-cta--quiet'}
               href={link.href}
             >
+              <DestinationIcon id={link.icon} />
               {link.label}
             </Link>
           ))}

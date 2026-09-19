@@ -17,14 +17,14 @@ test('resolveAdminAuthMode accepts supabase', () => {
   assert.equal(resolveClientAdminAuthMode({ NEXT_PUBLIC_ADMIN_AUTH_MODE: 'supabase' }), 'supabase');
 });
 
-test('readSupabaseRoleFromAppMetadata reads bb_role only from app_metadata', () => {
-  assert.equal(readSupabaseRoleFromAppMetadata({ bb_role: 'admin' }), 'admin');
-  assert.equal(readSupabaseRoleFromAppMetadata({ bb_role: 'research' }), 'research');
-  assert.equal(readSupabaseRoleFromAppMetadata({ bb_role: 'owner' }), undefined);
+test('readSupabaseRoleFromAppMetadata reads app_role only from app_metadata', () => {
+  assert.equal(readSupabaseRoleFromAppMetadata({ app_role: 'admin' }), 'admin');
+  assert.equal(readSupabaseRoleFromAppMetadata({ app_role: 'research' }), 'research');
+  assert.equal(readSupabaseRoleFromAppMetadata({ app_role: 'owner' }), undefined);
   assert.equal(readSupabaseRoleFromAppMetadata(undefined), undefined);
 });
 
-test('supabase session authorizer verifies bearer token, email, and app_metadata.bb_role', async () => {
+test('supabase session authorizer verifies bearer token, email, and app_metadata.app_role', async () => {
   const authorizer = createSupabaseSessionAuthorizer({
     async getUser(accessToken) {
       if (accessToken === 'admin-token') {
@@ -33,7 +33,7 @@ test('supabase session authorizer verifies bearer token, email, and app_metadata
             user: {
               id: 'uid-admin',
               email: FIXTURE_OPERATOR_EMAIL,
-              app_metadata: { bb_role: 'admin' },
+              app_metadata: { app_role: 'admin' },
             },
           },
           error: null,
@@ -45,7 +45,7 @@ test('supabase session authorizer verifies bearer token, email, and app_metadata
             user: {
               id: 'uid-research',
               email: 'researcher@example.com',
-              app_metadata: { bb_role: 'research' },
+              app_metadata: { app_role: 'research' },
             },
           },
           error: null,
@@ -53,7 +53,7 @@ test('supabase session authorizer verifies bearer token, email, and app_metadata
       }
       if (accessToken === 'no-email') {
         return {
-          data: { user: { id: 'uid-no-email', app_metadata: { bb_role: 'admin' } } },
+          data: { user: { id: 'uid-no-email', app_metadata: { app_role: 'admin' } } },
           error: null,
         };
       }
@@ -75,7 +75,7 @@ test('supabase session authorizer verifies bearer token, email, and app_metadata
             user: {
               id: 'uid-bad-role',
               email: FIXTURE_OPERATOR_EMAIL,
-              app_metadata: { bb_role: 'owner' },
+              app_metadata: { app_role: 'owner' },
             },
           },
           error: null,
@@ -88,7 +88,7 @@ test('supabase session authorizer verifies bearer token, email, and app_metadata
   const admin = await authorizer.assertAuthenticated({ authorization: 'Bearer admin-token' });
   assert.equal(admin.email, FIXTURE_OPERATOR_EMAIL);
   assert.equal(admin.role, 'admin');
-  assert.equal(admin.admin.app_metadata.bb_role, 'admin');
+  assert.equal(admin.admin.app_metadata.app_role, 'admin');
 
   const research = await authorizer.assertAuthenticated({ authorization: 'Bearer research-token' });
   assert.equal(research.role, 'research');
@@ -128,7 +128,7 @@ test('authErrorResponse surfaces supabase role failures as 403', async () => {
   const response = authErrorResponse(
     new SupabaseSessionAuthorizationError(
       'ADMIN_ROLE_REQUIRED',
-      'Supabase administrator must have app_metadata.bb_role set',
+      'Supabase administrator must have app_metadata.app_role set',
     ),
   );
   assert.equal(response.status, 403);

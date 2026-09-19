@@ -3,11 +3,16 @@
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { LEGAL_DISCLAIMER_TITLE } from './copy';
+import { LEGAL_DISCLAIMER_TITLE, LAW_BROWSE_LEDE } from './copy';
 import { humanizeLegalKind, isLawStatus, lawStatusTone, legalStatusDisplay } from './format';
 
 test('legal disclaimer title is present', () => {
   assert.equal(LEGAL_DISCLAIMER_TITLE, 'Not legal advice');
+});
+
+test('law browse lede does not call the room civil rights law', () => {
+  assert.doesNotMatch(LAW_BROWSE_LEDE, /—/);
+  assert.doesNotMatch(LAW_BROWSE_LEDE, /civil rights/i);
 });
 
 test('humanizeLegalKind maps federal-statute', () => {

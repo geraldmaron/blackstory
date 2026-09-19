@@ -207,7 +207,7 @@ export function buildEditStatements(
     case 'displayName':
       return [
         {
-          sql: `UPDATE bb_canonical.entities SET display_name = $2, ${touch} WHERE id = $1`,
+          sql: `UPDATE canonical.entities SET display_name = $2, ${touch} WHERE id = $1`,
           params: [entityId, edit.value],
           requireRowsElse: MISSING_ENTITY,
         },
@@ -216,7 +216,7 @@ export function buildEditStatements(
     case 'kind':
       return [
         {
-          sql: `UPDATE bb_canonical.entities SET kind = $2, entity_class = $3, ${touch} WHERE id = $1`,
+          sql: `UPDATE canonical.entities SET kind = $2, entity_class = $3, ${touch} WHERE id = $1`,
           params: [entityId, edit.value, entityClassForKind(edit.value)],
           requireRowsElse: MISSING_ENTITY,
         },
@@ -225,7 +225,7 @@ export function buildEditStatements(
     case 'livingStatus':
       return [
         {
-          sql: `UPDATE bb_canonical.entities SET living_status = $2, ${touch} WHERE id = $1`,
+          sql: `UPDATE canonical.entities SET living_status = $2, ${touch} WHERE id = $1`,
           params: [entityId, edit.value],
           requireRowsElse: MISSING_ENTITY,
         },
@@ -234,7 +234,7 @@ export function buildEditStatements(
     case 'aliases':
       return [
         {
-          sql: `UPDATE bb_canonical.entities SET aliases = $2::jsonb, ${touch} WHERE id = $1`,
+          sql: `UPDATE canonical.entities SET aliases = $2::jsonb, ${touch} WHERE id = $1`,
           params: [entityId, JSON.stringify(edit.value)],
           requireRowsElse: MISSING_ENTITY,
         },
@@ -243,7 +243,7 @@ export function buildEditStatements(
     case 'sensitivity':
       return [
         {
-          sql: `UPDATE bb_canonical.entities SET sensitivity = $2::jsonb, ${touch} WHERE id = $1`,
+          sql: `UPDATE canonical.entities SET sensitivity = $2::jsonb, ${touch} WHERE id = $1`,
           params: [entityId, JSON.stringify(edit.value.map((value) => ({ class: value })))],
           requireRowsElse: MISSING_ENTITY,
         },
@@ -256,10 +256,10 @@ export function buildEditStatements(
           // exactly one entity in the archive. So re-adding this entity's own identifier just
           // updates its trust flag, while one already claimed by a different entity updates zero
           // rows — and that must surface as a refusal, not a silent no-op that looks like success.
-          sql: `INSERT INTO bb_canonical.entity_identifiers (id, entity_id, namespace, value, trusted)
+          sql: `INSERT INTO canonical.entity_identifiers (id, entity_id, namespace, value, trusted)
                 VALUES ($2, $1, $3, $4, $5)
                 ON CONFLICT (namespace, value) DO UPDATE SET trusted = EXCLUDED.trusted
-                WHERE bb_canonical.entity_identifiers.entity_id = $1
+                WHERE canonical.entity_identifiers.entity_id = $1
                 RETURNING id`,
           params: [
             entityId,
@@ -271,7 +271,7 @@ export function buildEditStatements(
           requireRowsElse: `${edit.value.namespace}:${edit.value.value} already belongs to a different entity. Identifiers are unique across the archive — merge the two records instead.`,
         },
         {
-          sql: `UPDATE bb_canonical.entities SET ${touch} WHERE id = $1`,
+          sql: `UPDATE canonical.entities SET ${touch} WHERE id = $1`,
           params: [entityId],
         },
       ];
@@ -280,12 +280,12 @@ export function buildEditStatements(
       return [
         {
           // Scoped by entity_id as well as id: an id from another entity's form must not delete.
-          sql: `DELETE FROM bb_canonical.entity_identifiers WHERE id = $2 AND entity_id = $1`,
+          sql: `DELETE FROM canonical.entity_identifiers WHERE id = $2 AND entity_id = $1`,
           params: [entityId, edit.value.id],
           requireRowsElse: 'That identifier is no longer on this entity — reload and try again.',
         },
         {
-          sql: `UPDATE bb_canonical.entities SET ${touch} WHERE id = $1`,
+          sql: `UPDATE canonical.entities SET ${touch} WHERE id = $1`,
           params: [entityId],
         },
       ];

@@ -4,33 +4,26 @@
  * Names stay names. This is the national memorial, not a join from this
  * place's record, and wall names do not follow `/entity/ent_…`.
  *
- * Converted to the v9 room kit (SP-22). Renders through Room, RoomHeader and
- * OffRamp with the standard reading-room design language. The
- * MemorialWallAtmosphere (handwritten names canvas) is the background layer;
- * MemorialSections renders the accessible list.
+ * Converted to the v9 room kit (SP-22). Renders through Room and OffRamp. The
+ * MemorialWallAtmosphere (handwritten names canvas) is the opening field;
+ * MemorialSections renders the accessible list below the fold.
  *
- * The opening screen is the wall plus a bare kicker/title and one quiet link
- * down to the list. No lede, no intro prose, no message assembling out of the
- * handwriting: the room-kit conversion left those stacked on top of the wall,
- * which is what made the first viewport read as clutter. The full list starts
- * below the fold (`__opening` reserves the opening viewport) and is reached by
- * scrolling.
+ * The first screen is the wall and one quiet link down to the list. No title,
+ * lede, or intro prose over the names. `__opening` reserves the opening
+ * viewport so the list starts below the fold.
  */
 
 import type { Metadata } from 'next';
 import React from 'react';
 import { buildStaticPageMetadata } from '../../lib/seo/metadata-builders';
 import { MemorialWallSection } from '../../components/patterns/memorial-wall/MemorialWallAtmosphere';
-import { Room, RoomHeader } from '../../components/room';
+import { Room } from '../../components/room';
 import { WalkOffRamp } from '../walk-off-ramp';
 import { MemorialSections } from './MemorialSections';
 import { MemorialScrollCue } from './MemorialScrollCue';
 import {
   MEMORIAL_HELD_MESSAGE_LINES,
-  MEMORIAL_KICKER,
-  MEMORIAL_PAGE_LEDE,
   MEMORIAL_PAGE_DESCRIPTION,
-  MEMORIAL_PAGE_TITLE,
   MEMORIAL_QUIET_LIST_LINK_A11Y_LABEL,
   MEMORIAL_QUIET_LIST_LINK_LABEL,
   MEMORIAL_WALL_SEED,
@@ -43,7 +36,7 @@ export const revalidate = 3600;
 
 export const metadata: Metadata = buildStaticPageMetadata({
   path: '/memorial',
-  title: MEMORIAL_PAGE_TITLE,
+  title: 'Memorial',
   description: MEMORIAL_PAGE_DESCRIPTION,
 });
 
@@ -67,15 +60,7 @@ export default function MemorialPage() {
         className="ds-memorial__scroll-cue"
       />
       <Room>
-        <div className="ds-memorial__opening">
-          <RoomHeader
-            pathname="/memorial"
-            kicker={MEMORIAL_KICKER}
-            title={MEMORIAL_PAGE_TITLE}
-            lede={MEMORIAL_PAGE_LEDE}
-            showPath={false}
-          />
-        </div>
+        <div className="ds-memorial__opening" />
 
         <MemorialSections />
 

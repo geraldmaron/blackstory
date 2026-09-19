@@ -1,6 +1,6 @@
 /**
  * Tests for USPS city centroid lookup (zipcodes dataset) and the curated non-US city
- * centroid table (repo-9rkh, 2026-09-12 OWNER RULING).
+ * centroid table.
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';

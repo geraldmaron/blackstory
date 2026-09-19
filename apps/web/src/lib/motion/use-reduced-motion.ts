@@ -1,5 +1,5 @@
 /**
- * React-facing, live `prefers-reduced-motion` (repo-92n2.18).
+ * React-facing, live `prefers-reduced-motion`.
  *
  * A `useSyncExternalStore` wrapper OVER `components/map-stage/reduced-motion-listener.ts`'s
  * imperative listener — never a second `matchMedia(...).addEventListener('change', ...)`. That

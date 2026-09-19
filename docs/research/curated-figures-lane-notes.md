@@ -4,10 +4,10 @@ Staged 27 named-person leads through the real `research-intake` verb
 (`packages/operator-cli/src/bin.ts research-intake`, composed in
 `packages/operator-cli/src/research-intake.ts`), landing them in the existing
 quarantine pipeline exactly like repo-xez5.12's Lorde/Baldwin/hooks/Hansberry
-batch. Nothing was written to `bb_canonical`; every row below is
-`bb_submissions.intake_items.status = 'quarantined'` with
+batch. Nothing was written to `canonical`; every row below is
+`submissions.intake_items.status = 'quarantined'` with
 `payload.moderationState = 'pending_review'`, and the paired
-`bb_research.cases` row is `state = 'candidate'`. No git commit/push, no
+`research.cases` row is `state = 'candidate'`. No git commit/push, no
 `bd dolt push`.
 
 ## Why these names
@@ -15,7 +15,7 @@ batch. Nothing was written to `bb_canonical`; every row below is
 repo-xez5.12 already staged Audre Lorde, James Baldwin, bell hooks, and
 Lorraine Hansberry via this same lane (not restaged). This batch fills the
 same "cultural/literary/movement figures" gap the repo-xez5.6 brief calls
-out, cross-checked against the current `bb_canonical.entities` person roster
+out, cross-checked against the current `canonical.entities` person roster
 (394 names as of this run) so nothing here duplicates an existing entity or
 the four names above.
 
@@ -71,7 +71,7 @@ Every row was verified after staging with:
 
 ```sql
 select id, status, payload->'moderationState' as mod_state, source_url, created_at
-from bb_submissions.intake_items
+from submissions.intake_items
 where source_url ilike '%en.wikipedia.org/wiki/%'
   and created_at > now() - interval '30 minutes'
 order by created_at desc;
@@ -79,7 +79,7 @@ order by created_at desc;
 
 All 27 returned `status = 'quarantined'`, `mod_state = 'pending_review'`, matching
 the shape of the existing Lorde/Baldwin/hooks/Hansberry rows staged by repo-xez5.12.
-A spot-check join against `bb_research.cases` confirmed matching draft
+A spot-check join against `research.cases` confirmed matching draft
 `state = 'candidate'` research cases for the sampled submission IDs.
 
 ## How it was run
@@ -91,17 +91,17 @@ export OPS_DATA_SOURCE=postgres
 node --conditions development --import tsx packages/operator-cli/src/bin.ts research-intake \
   --url "<wikipedia URL>" \
   --title "<name>" \
-  --description "Curated figures lane (repo-xez5.6a): comparably significant Black feminist/queer writer, organizer, press figure, artist, scientist, or labor leader missing from bb_canonical.entities person roster." \
+  --description "Curated figures lane (repo-xez5.6a): comparably significant Black feminist/queer writer, organizer, press figure, artist, scientist, or labor leader missing from canonical.entities person roster." \
   --privacy-pepper devpepper \
   --operator-id agent-repo-xez5.6 --session-id sess-repo-xez5-6-curated \
   --identity-source claude_session --commit
 ```
 
-`--commit` here writes only to the quarantine tables (`bb_submissions.intake_items`,
-`bb_research.cases`) through the same audit/outbox path every operator-cli
+`--commit` here writes only to the quarantine tables (`submissions.intake_items`,
+`research.cases`) through the same audit/outbox path every operator-cli
 writer uses (`commitWithAudit`) — there is no promote/publish path in this
 CLI (`promotion-boundary.test.ts`). `committed: true` in the JSON output
-means the audit event landed, not that anything reached `bb_canonical`.
+means the audit event landed, not that anything reached `canonical`.
 
 ## Failures
 

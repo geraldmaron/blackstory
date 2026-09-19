@@ -25,9 +25,9 @@
       "gcpMetricType": "networksecurity.googleapis.com/https/request_count"
     },
     {
-      "id": "app-check-failures",
-      "title": "App Check failures by mode and reason",
-      "metric": "black_book/security/app_check_failures_total",
+      "id": "client-header-failures",
+      "title": "Client-header failures by mode and reason",
+      "metric": "black_book/security/client_header_failures_total",
       "visualization": "line",
       "description": "Monitor and enforce failure rates before tightening policy",
       "groupBy": ["service", "mode", "reason"]
@@ -109,7 +109,7 @@
       "title": "Storage access denials",
       "metric": "black_book/security/storage_access_denials_total",
       "visualization": "line",
-      "description": "Firebase Storage rule denials by bucket",
+      "description": "Storage access denials by bucket",
       "groupBy": ["service", "bucket"]
     },
     {

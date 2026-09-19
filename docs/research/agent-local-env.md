@@ -14,7 +14,7 @@ Use gitignored local files only.
 When signed in to 1Password CLI, seed keys into the gitignored env file (never commit `.env.local`):
 
 ```bash
-cd /path/to/blackstory-mobile
+cd /path/to/blackstory
 # OPENROUTER — if not already present
 printf 'OPENROUTER_API_KEY=%s\n' "$(op read 'op://Private/OpenRouter/credential')" >> apps/web/.env.local
 # Census Data API — Phase 1 ACS ingest + demographics adapters
@@ -26,7 +26,7 @@ If a key already exists, edit in place instead of appending duplicates.
 ## Headless agent invocation
 
 ```bash
-cd /path/to/blackstory-mobile
+cd /path/to/blackstory
 set -a && source apps/web/.env.local && set +a
 export OPS_DATA_SOURCE=postgres
 export RESEARCH_PROFILE_ID=black-history
@@ -38,7 +38,7 @@ node --conditions development --import tsx packages/operator-cli/src/bin.ts enri
 Or use the wrapper (same env file):
 
 ```bash
-packages/firebase/scripts/run-enrichment-with-local-env.sh …
+packages/ops-data/scripts/run-enrichment-with-local-env.sh …
 ```
 
 Override path: `LOCAL_ENV_FILE=/path/to/.env.local`.
@@ -69,7 +69,7 @@ run-with-dev-secrets node --conditions development --import tsx \
 still captures locally.
 
 Optional 1Password path when signed in: `run-with-dev-secrets bash -c 'test -n "$OPENROUTER_API_KEY" && echo ok'`.
-Corsair overnight jobs continue to use `~/.config/blackstory/enrichment.env` (see overnight runbook).
+Headless runs use the same explicitly supplied environment as manual CLI runs. No host or schedule is assumed.
 
 **Note:** `run-with-dev-secrets <cmd>` alone will fail with `DATABASE_URL or APP_DATABASE_URL is
 required` — it only wraps `op run --env-file=~/.env.1password`, and that file does not carry
@@ -78,7 +78,7 @@ the default local path for those keys.
 
 ## Phase 1 ACS ingest
 
-`packages/firebase/scripts/ingest-phase1-acs.ts` reads `CENSUS_API_KEY` from env or `apps/web/.env.local`
+`packages/ops-data/scripts/ingest-phase1-acs.ts` reads `CENSUS_API_KEY` from env or `apps/web/.env.local`
 (see `.env.example`). It does **not** call 1Password itself — source the env file first.
 
 **County bound (default):** 12 high Black-population states — AL, CA, FL, GA, IL, LA, MD, MS, NC, NY, SC, TX
@@ -90,15 +90,15 @@ set -a && source apps/web/.env.local && set +a
 export DATABASE_SSL=1
 
 # Dry-run (default)
-node --conditions development --import tsx packages/firebase/scripts/ingest-phase1-acs.ts
+node --conditions development --import tsx packages/ops-data/scripts/ingest-phase1-acs.ts
 
 # Apply
 DRY_RUN=0 INGEST_PHASE1_ACS_APPLY=1 node --conditions development --import tsx \
-  packages/firebase/scripts/ingest-phase1-acs.ts
+  packages/ops-data/scripts/ingest-phase1-acs.ts
 
 # Rebuild coverage snapshot for /data
 DRY_RUN=0 BUILD_PHASE1_COVERAGE_APPLY=1 node --conditions development --import tsx \
-  packages/firebase/scripts/build-phase1-indicator-coverage-snapshot.ts
+  packages/ops-data/scripts/build-phase1-indicator-coverage-snapshot.ts
 ```
 
 Requires jurisdictions loaded first (`load-reference-jurisdictions.ts`; see `docs/runbooks/load-reference-jurisdictions.md`).

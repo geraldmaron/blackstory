@@ -92,7 +92,7 @@ an explicit ingestion approval. Until then, list proposed metrics in `gap_states
 When a separate ingestion approval clears HMDA for the Chicago pilot:
 
 1. **Ingest HMDA aggregates at county+ only** — roll up from FFIEC snapshot or data-browser
-   exports to `bb_reference.statistical_observations` for `jurisdiction_id` `17031` (and pilot
+   exports to `reference.statistical_observations` for `jurisdiction_id` `17031` (and pilot
    peer counties if metro scope expands).
 2. **Provenance quartet required** on every observation: `source`, `source_url`, `retrieved_at`,
    `content_hash`, plus `humanCitation`.
@@ -124,4 +124,4 @@ framing.
 - `packages/domain/src/external-data-sources.ts` — `hmda-loan-level`, `fed-survey-consumer-finances`, `census-sipp-wealth`
 - [context-data-source-matrix.md](./context-data-source-matrix.md) — strategy legend (`aggregate` vs `store`)
 - [theme-impact-canonical-questions.md](./theme-impact-canonical-questions.md) — Q3 metric bindings
-- `packages/firebase/fixtures/theme-impact/chicago-redlining-packets.ts` — Q3 pilot fixture with gap artifact
+- `packages/ops-data/fixtures/theme-impact/chicago-redlining-packets.ts` — Q3 pilot fixture with gap artifact

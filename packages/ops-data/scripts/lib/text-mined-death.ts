@@ -1,6 +1,6 @@
 /**
  * Regex text-mining helpers for person death-year signals in summary / historicalContext prose.
- * Review lane only — never auto-writes bb_canonical.living_status.
+ * Review lane only — never auto-writes canonical.living_status.
  */
 export type TextMinedDeathSignal = 'life_range' | 'death_lexicon' | 'lynching_verb';
 

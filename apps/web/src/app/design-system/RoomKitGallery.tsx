@@ -1,9 +1,9 @@
 /**
- * Fixture gallery for the v9 room kit (SP-22, repo-92n2.28).
+ * Fixture gallery for the v9 room kit.
  *
  * Every block in `components/room` renders here with the design tokens it reads printed in
  * mono beside it, so a reviewer can check the kit in light and dark without opening twenty-one
- * routes. This is the fixture surface the per-screen parity gate (repo-92n2.31) checks against
+ * routes. This is the fixture surface the per-screen parity gate checks against
  * the mock rooms in `.design-mocks/blackstory-atlas-v9.html`.
  *
  * The gallery wraps each specimen in `.ds-room` because the kit's ink and wash aliases are
@@ -30,7 +30,8 @@ import {
   Prose,
   RecordNav,
   RoomCard,
-  RoomHeader,
+  ReadingEntry,
+  DocumentColophon,
   SourceList,
   TrustBlock,
   UtilityCard,
@@ -67,12 +68,13 @@ export function RoomKitGallery() {
     <section className="ds-gallery-section" aria-labelledby="room-kit-heading">
       <h2 id="room-kit-heading">Room kit (v9 surfaces)</h2>
       <p>
-        The shared vocabulary for every Reading, Record and Utility room. A room renders{' '}
-        <code className="ds-mono">RoomHeader</code> and nothing else as a header, and imports
-        exactly one of <code className="ds-mono">reading-room.css</code>,{' '}
+        The shared vocabulary for every Reading, Record and Utility room. A room opens in one of
+        three postures (Field, Record, Reading) and imports exactly one of{' '}
+        <code className="ds-mono">reading-room.css</code>,{' '}
         <code className="ds-mono">record-page.css</code> or{' '}
         <code className="ds-mono">utility.css</code>. Design law:{' '}
-        <code className="ds-mono">docs/ui/design-direction-v9-surfaces.md</code> §2 and §4.
+        <code className="ds-mono">docs/ui/design-direction-v9-surfaces.md</code> §2 and §4, amended
+        by plan.md entry postures.
       </p>
 
       <Specimen name="Breadcrumb" tokens={['--ds-accent', '--ds-ink-subtle', '--ds-font-mono']}>
@@ -80,20 +82,20 @@ export function RoomKitGallery() {
       </Specimen>
 
       <Specimen
-        name="RoomHeader"
+        name="ReadingEntry"
         tokens={['--ds-font-display', '--ds-font-editorial', '--ds-accent', '--ds-rule']}
       >
-        <RoomHeader
+        <ReadingEntry
           pathname="/books"
-          kicker="Catalog"
           title={
             <>
               Banned <em>books</em>
             </>
           }
           lede="Every title removed from a public shelf, with the order that removed it and the district that signed it."
-          meta={['1,204 titles', '1963 to 2024']}
+          showCrumb={false}
         />
+        <DocumentColophon facts={['1,204 titles', '1963 to 2024']} />
       </Specimen>
 
       <Specimen
@@ -172,6 +174,13 @@ export function RoomKitGallery() {
         <SourceList
           sources={[
             { text: 'Library of Congress, Prints and Photographs Division', year: '1963' },
+            {
+              text: 'Example public record',
+              archivedUrl:
+                'https://web.archive.org/web/20260901000000/https://example.gov/record/1',
+              archivedAt: '2026-09-01T00:00:00.000Z',
+              originalUrl: 'https://example.gov/record/1',
+            },
             { text: 'Birmingham Civil Rights Institute, oral history collection', year: '1998' },
             { text: 'County deed book 14' },
           ]}
@@ -272,7 +281,7 @@ export function RoomKitGallery() {
 
       <Specimen
         name="OffRamp · RecordNav"
-        tokens={['--ds-surface', '--ds-elevation-sm', '--ds-rule']}
+        tokens={['--ds-surface', '--ds-contact-overlap', '--ds-rule']}
       >
         <OffRamp
           title="No reading room is a dead end"
@@ -315,7 +324,8 @@ export function RoomKitGallery() {
             Reading or Record surface.
 
             The Duluth specimen passes `subject` rather than a hand-set `plain` (SP-26,
-            repo-92n2.33): STILL follows from the topic being violence-adjacent, the same way it
+            the composition dignity rule): STILL follows from the topic being violence-adjacent,
+            the same way it
             would for a real chapter's moment, not from this call site's own judgement. */}
         <MapMoment
           camera={{ center: [-87.635, 41.901], zoom: 12.8, pitch: 36, bearing: -12 }}

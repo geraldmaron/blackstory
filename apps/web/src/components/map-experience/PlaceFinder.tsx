@@ -1,8 +1,7 @@
 'use client';
 
 /**
- * PlaceFinder — the merged `/locate` experience, remounted into the Atlas Lens's Where group
- * (repo-92n2.14 / SP-14, `docs/ui/design-direction-v9-surfaces.md` §4.1 and §"`/locate`").
+ * PlaceFinder is the place-search experience mounted in the Atlas Lens's Where group.
  *
  * One component, two postures:
  *   - Wide (>= `NARROW_BREAKPOINT`): renders inline inside the Lens's Where group, always
@@ -29,10 +28,8 @@
  * `ExploreAddressSearch` — never from an effect, never on mount. A denied permission is handled
  * entirely inside `LocationConsentButton`, which falls back to a plain sentence next to the
  * manual field rather than an error state. `LocationPrivacyNotice` renders above every control in
- * both postures, forced open: it collapses by default behind a `<summary>` (right for `/locate`'s
- * old, lower-traffic standalone page), but this bead's acceptance criteria call for the full
- * four-point disclosure visible before permission is ever requested. The component has no `open`
- * prop to pass instead, so this file reaches into its own rendered `<details>` after mount.
+ * both postures. The notice collapses by default behind a `<summary>` so Explore does not open
+ * as a consent wall; the reader expands it before opting into geolocation.
  *
  * Radius (owned here, lifted into `ExploreAddressSearch` as a controlled prop) and the state
  * select (`LensPanel`'s own Where field, owned by the caller) are two different, non-composable
@@ -83,7 +80,7 @@ const NARROW_BREAKPOINT = 820;
 
 /**
  * "Radius and state select disagreement resolves to the most recent action, with the other
- * control visibly cleared" (repo-92n2.14 acceptance criterion). These two pure functions are the
+ * control visibly cleared" (acceptance criterion). These two pure functions are the
  * whole rule, factored out of the component so they are unit-testable without a DOM
  * (`PlaceFinder.test.ts`) — this file has no jsdom-driven interaction tests anywhere else, only
  * SSR markup smoke tests, so logic that needs a click or a prop change to exercise has to live
@@ -133,7 +130,6 @@ export function PlaceFinder({
   const [narrow, setNarrow] = useState(false);
   const [open, setOpen] = useState(false);
   const [geoStatus, setGeoStatus] = useState<GeoStatus>({ kind: 'idle' });
-  const privacyRef = useRef<HTMLDivElement | null>(null);
   const dialogTitleId = useId();
 
   const skipFirstStateSync = useRef(true);
@@ -166,13 +162,8 @@ export function PlaceFinder({
     // resyncing from (see this file's doc comment and `url-state.ts`'s note on `selected`).
   }, []);
 
-  // `LocationPrivacyNotice` collapses by default; force it open wherever this file mounts it, in
-  // both postures. Runs after every render (cheap, idempotent) rather than once, because the
-  // wide/narrow-open form is torn down and remounted as the reader resizes or opens the sheet.
-  useEffect(() => {
-    const details = privacyRef.current?.querySelector('details');
-    if (details && !details.open) details.open = true;
-  });
+  // Privacy notice stays collapsed until the reader opens it. Forcing it open on every Explore
+  // landing made the instrument feel like a consent wall before any map action.
 
   function selectRadius(id: ExploreRadiusPresetId) {
     setRadiusIdState(id);
@@ -260,7 +251,7 @@ export function PlaceFinder({
   function renderForm() {
     return (
       <div className="ds-place-finder__form">
-        <div className="ds-place-finder__privacy" ref={privacyRef}>
+        <div className="ds-place-finder__privacy">
           <LocationPrivacyNotice />
         </div>
         <LocationConsentButton

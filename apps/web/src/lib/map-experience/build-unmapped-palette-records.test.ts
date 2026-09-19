@@ -1,5 +1,5 @@
 /**
- * `buildUnmappedPaletteRecords` (repo-jnmwu): the Explore palette's corpus must match
+ * `buildUnmappedPaletteRecords`: the Explore palette's corpus must match
  * `/search/api`'s, not just the entities `exploreMapSourceFor` could place on the map.
  *
  * Built over `listPublicEntities()`'s real fixtures rather than hand-rolled minimal objects, per

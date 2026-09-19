@@ -268,6 +268,13 @@ describe('the plate is styled globally, not from the route group', () => {
     );
   });
 
+  it('hides MapLibre controls on covered plates so a compass cannot sit on a record', () => {
+    assert.match(
+      shellCss,
+      /body:not\(:has\(\[data-surface='instrument'\]\)\):not\(:has\(\[data-surface='door'\]\)\)\s+\.ds-map-stage:not\(\[data-plate-slot\]\)\s+\.maplibregl-ctrl\s*\{[^}]*display:\s*none/s,
+    );
+  });
+
   it('never covers a plate that is holding a MapMoment slot', () => {
     // Regression: a plate holding a slot was uncovered by a SECOND rule setting `content: none`,
     // and that rule lost. Both selectors computed to (0,3,2) — `:not(:has([data-surface='…']))`
@@ -318,5 +325,18 @@ describe('the plate is styled globally, not from the route group', () => {
         );
       }
     }
+  });
+
+  it('anchors the slotted plate in document space via a positioned body', () => {
+    // Without this, `plateBoxForSlot`'s stable document offsets resolve against the viewport
+    // and the map drifts from its MapMoment frame while the reader scrolls.
+    assert.match(shellCss, /body\s*\{[^}]*position:\s*relative/s);
+  });
+
+  it('clips the slotted plate to the same radius as the MapMoment frame', () => {
+    assert.match(
+      shellCss,
+      /\.ds-map-stage\[data-plate-slot\]\s*\{[^}]*border-radius:\s*var\(--ds-radius-md\)/s,
+    );
   });
 });

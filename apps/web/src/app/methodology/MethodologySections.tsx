@@ -2,13 +2,21 @@
  * `/methodology` — how a record gets in, in English. Shop tokens stay off the page.
  */
 import React from 'react';
-import Link from 'next/link';
 import { Citation, Confidence, Notice } from '@repo/ui';
 import { FACT_CONFIDENCE_GRADES, type FactConfidenceGrade } from '@repo/domain/facts';
 import { humanizeToken, mapConfidenceToUiLevel } from '../../components/facts/format';
 import { TrustSiteDisclaimer } from '../../components/trust/TrustSiteDisclaimer';
 import { formatCitation } from '../../lib/citation/format';
-import { GroupHeading, Note, Prose, RoomHeader } from '../../components/room';
+import {
+  Note,
+  Prose,
+  ReadingEntry,
+  RoomFactList,
+  RoomHandoff,
+  RoomJump,
+  RoomSection,
+  roomSectionTone,
+} from '../../components/room';
 import { WalkOffRamp } from '../walk-off-ramp';
 import {
   EvidenceConvergenceDiagram,
@@ -27,7 +35,11 @@ import {
   METHODOLOGY_MISSION_BEATS,
   METHODOLOGY_PAGE_SECTIONS,
   METHODOLOGY_PUBLISH_RULES,
+  METHODOLOGY_SOURCE_LIBRARY_HREF,
   METHODOLOGY_STRUCTURE_LEDE,
+  LIVES_METHOD_LEDE,
+  LIVES_METHOD_RULES,
+  SOURCE_LIBRARY_LEDE,
   VERIFICATION_STEPS,
 } from './methodology-copy';
 
@@ -43,44 +55,43 @@ const EXAMPLE_CITATION = formatCitation({
   accessed: new Date('2026-01-01T00:00:00Z'),
 });
 
-export function MethodologySections() {
+const METHODOLOGY_JUMP = METHODOLOGY_PAGE_SECTIONS.filter(
+  (section) => section.id !== 'see-it-applied',
+);
+
+export function MethodologySections({ omitEntry = false }: { readonly omitEntry?: boolean }) {
   const grades = FACT_CONFIDENCE_GRADES as readonly FactConfidenceGrade[];
+  let chapter = 0;
+  const nextTone = () => roomSectionTone(chapter++);
 
   return (
     <>
-      <RoomHeader
-        pathname="/methodology"
-        kicker="Receipt"
-        title={
-          <>
-            How the archive <em>works</em>.
-          </>
-        }
-        lede={METHODOLOGY_INTRO_LEDE}
-        showPath={false}
-      />
+      {omitEntry ? null : (
+        <ReadingEntry
+          pathname="/methodology"
+          title={
+            <>
+              How the archive <em>works</em>.
+            </>
+          }
+          lede={METHODOLOGY_INTRO_LEDE}
+          showCrumb={false}
+        />
+      )}
 
       <Prose>
         <TrustSiteDisclaimer />
       </Prose>
 
-      <nav aria-labelledby="methodology-toc-title">
-        <GroupHeading>
-          <span id="methodology-toc-title">On this page</span>
-        </GroupHeading>
-        <ul className="ds-stack">
-          {METHODOLOGY_PAGE_SECTIONS.map((section) => (
-            <li key={section.id}>
-              <a href={`#${section.id}`}>{section.label}</a>
-            </li>
-          ))}
-        </ul>
-      </nav>
+      <RoomJump sections={METHODOLOGY_JUMP} />
 
-      <section aria-labelledby="how-a-record-gets-in-heading" id="how-a-record-gets-in">
-        <GroupHeading>
-          <span id="how-a-record-gets-in-heading">How a record gets in</span>
-        </GroupHeading>
+      <RoomSection
+        id="how-a-record-gets-in"
+        icon="records"
+        kicker="Admission"
+        title="How a record gets in"
+        tone={nextTone()}
+      >
         <Prose>
           <p>
             Candidates come in from research runs, and every one of them is pinned to somewhere real
@@ -90,14 +101,14 @@ export function MethodologySections() {
           </p>
         </Prose>
         <RecordIntakeDiagram />
-        <ul className="ds-stack">
-          {METHODOLOGY_MISSION_BEATS.map((beat) => (
-            <li key={beat.kicker}>
-              <p className="ds-mono">{beat.kicker}</p>
-              <p>{beat.body}</p>
-            </li>
-          ))}
-        </ul>
+        <RoomFactList
+          items={METHODOLOGY_MISSION_BEATS.map((beat) => ({
+            title: beat.kicker,
+            body: beat.body,
+            icon: 'methodology' as const,
+            kicker: beat.kicker,
+          }))}
+        />
         <ol className="ds-stack">
           {METHODOLOGY_PUBLISH_RULES.map((item, index) => (
             <li key={item.title}>
@@ -110,12 +121,15 @@ export function MethodologySections() {
           ))}
         </ol>
         <Note kind="VERIFICATION">{VERIFICATION_STEPS.join(' ')}</Note>
-      </section>
+      </RoomSection>
 
-      <section aria-labelledby="evidence-grades-heading" id="evidence-grades">
-        <GroupHeading>
-          <span id="evidence-grades-heading">What the evidence grades mean</span>
-        </GroupHeading>
+      <RoomSection
+        id="evidence-grades"
+        icon="evidence"
+        kicker="Grades"
+        title="What the evidence grades mean"
+        tone={nextTone()}
+      >
         <Prose>
           <p>
             A grade is never a color on its own. Each one carries a mark, a label in words, and the
@@ -139,12 +153,15 @@ export function MethodologySections() {
           <p>Every citation on the site is built the same way, including this example:</p>
         </Prose>
         <Citation label="Example citation" source={EXAMPLE_CITATION} />
-      </section>
+      </RoomSection>
 
-      <section aria-labelledby="editorial-standards-heading" id="editorial-standards">
-        <GroupHeading>
-          <span id="editorial-standards-heading">Editorial standards</span>
-        </GroupHeading>
+      <RoomSection
+        id="editorial-standards"
+        icon="publication"
+        kicker="Framing"
+        title="Editorial standards"
+        tone={nextTone()}
+      >
         <Prose>
           <p>
             Accuracy is not enough on its own. These are the framing and corroboration rails a
@@ -152,22 +169,22 @@ export function MethodologySections() {
             yet published.
           </p>
         </Prose>
-        <ul className="ds-stack">
-          {EDITORIAL_STANDARDS.map((item) => (
-            <li key={item.title}>
-              <strong>{item.title}</strong>
-              <p>{item.body}</p>
-            </li>
-          ))}
-        </ul>
-      </section>
+        <RoomFactList
+          items={EDITORIAL_STANDARDS.map((item) => ({
+            title: item.title,
+            body: item.body,
+            icon: 'publication' as const,
+          }))}
+        />
+      </RoomSection>
 
-      <section aria-labelledby="how-a-point-is-drawn-heading" id="how-a-point-is-drawn">
-        <GroupHeading>
-          <span id="how-a-point-is-drawn-heading">
-            Why a point is never drawn sharper than its source
-          </span>
-        </GroupHeading>
+      <RoomSection
+        id="how-a-point-is-drawn"
+        icon="precision"
+        kicker="Map dignity"
+        title="Why a point is never drawn sharper than its source"
+        tone={nextTone()}
+      >
         <Prose>
           <p>
             Place is how this archive is organized. It is also the field most likely to put a living
@@ -183,37 +200,107 @@ export function MethodologySections() {
           ))}
         </ol>
         <Note kind="LIMITATIONS">{LIMITATION_RULES.join(' ')}</Note>
-      </section>
+      </RoomSection>
 
-      <section aria-labelledby="how-it-holds-together-heading" id="how-it-holds-together">
-        <GroupHeading>
-          <span id="how-it-holds-together-heading">How it holds together</span>
-        </GroupHeading>
+      <RoomSection
+        id="how-it-holds-together"
+        icon="collection"
+        kicker="Structure"
+        title="How it holds together"
+        tone={nextTone()}
+      >
         <Prose>
           <p>{METHODOLOGY_STRUCTURE_LEDE}</p>
         </Prose>
         <RecordDataModelDiagram />
         <SiteStructureDiagram />
-      </section>
+      </RoomSection>
 
-      <section aria-labelledby="living-person-protection-heading" id="living-person-protection">
-        <GroupHeading>
-          <span id="living-person-protection-heading">Living person protection</span>
-        </GroupHeading>
+      <RoomSection
+        id="lives-across-decades"
+        icon="person"
+        kicker="Lives"
+        title="Lives across the decades"
+        tone={nextTone()}
+      >
+        <Prose>
+          <p>{LIVES_METHOD_LEDE}</p>
+        </Prose>
+        <RoomFactList
+          items={LIVES_METHOD_RULES.map((rule) => ({
+            title: rule.title,
+            body: rule.body,
+            icon: 'person' as const,
+          }))}
+        />
+        <div className="ds-room-handoffs">
+          <RoomHandoff
+            href="/lives"
+            icon="person"
+            title="Open Lives"
+            line="Published counts beside sourced voices, places, laws, and records."
+          />
+          <RoomHandoff
+            href="/data#lives"
+            icon="data"
+            title="Data · Lived"
+            line="A compact door on Data. The timeline itself lives on Lives."
+          />
+        </div>
+      </RoomSection>
+
+      <RoomSection
+        id="where-the-evidence-comes-from"
+        icon="source"
+        kicker="Sources"
+        title="Where the evidence comes from"
+        tone={nextTone()}
+      >
+        <Prose>
+          <p>{SOURCE_LIBRARY_LEDE}</p>
+          <p>
+            Publisher kinds, the citation chain, and where sources already appear live in the source
+            library. This heading stays so an old link still lands on the method page.
+          </p>
+        </Prose>
+        <RoomHandoff
+          href={METHODOLOGY_SOURCE_LIBRARY_HREF}
+          icon="source"
+          title="Open the source library"
+          line="Publisher kinds, how a URL becomes a citation, and where sources already appear."
+        />
+      </RoomSection>
+
+      <RoomSection
+        id="living-person-protection"
+        icon="privacy"
+        kicker="Dignity"
+        title="Living person protection"
+        tone={nextTone()}
+      >
         <Prose>
           <p>{METHODOLOGY_DIGNITY_LINE}</p>
           <p>
             When the sources do not say whether someone is living, the archive treats them as living
-            and publishes accordingly. Some of the people this rule exists for are named on{' '}
-            <Link href="/memorial">the memorial wall</Link>, which holds a name and nothing else.
+            and publishes accordingly. Some of the people this rule exists for are named on the
+            memorial wall, which holds a name and nothing else.
           </p>
         </Prose>
-      </section>
+        <RoomHandoff
+          href="/memorial"
+          icon="memorial"
+          title="The memorial wall"
+          line="A name, held. Not a join from a place record."
+        />
+      </RoomSection>
 
-      <section aria-labelledby="internet-archive-heading" id="internet-archive">
-        <GroupHeading>
-          <span id="internet-archive-heading">Internet Archive handoff</span>
-        </GroupHeading>
+      <RoomSection
+        id="internet-archive"
+        icon="collection"
+        kicker="Preservation"
+        title="Internet Archive handoff"
+        tone={nextTone()}
+      >
         <Prose>
           <p>
             BlackStory links out to preserved copies rather than republishing full third-party
@@ -227,7 +314,7 @@ export function MethodologySections() {
             is no automatic public upload from the reader site.
           </p>
         </Prose>
-      </section>
+      </RoomSection>
 
       <div id="see-it-applied">
         <WalkOffRamp
@@ -235,6 +322,7 @@ export function MethodologySections() {
           extra={[
             { label: 'Errata', href: '/errata' },
             { label: 'Request a correction', href: '/corrections' },
+            { label: 'Source library', href: '/sources' },
           ]}
         >
           The same rules run on every public record.

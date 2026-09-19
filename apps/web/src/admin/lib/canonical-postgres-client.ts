@@ -1,12 +1,8 @@
 /**
- * Server-only lazy Postgres pool for the canonical, write-capable admin connection
- * (`bb_canonical`/`bb_ops`/`bb_research`/etc., via the `role_admin_app` Postgres role).
- * Uses `ADMIN_DATABASE_URL` (or `ADMIN_APP_DATABASE_URL`) — deliberately a different name from
- * the public read-only pool's `DATABASE_URL`/`APP_DATABASE_URL` (`../../lib/public-data/postgres-client.ts`).
- * Admin used to run as its own Vercel project specifically so its write-capable credential never
- * lived in the process serving anonymous public traffic; now that `/admin` is a route inside this
- * same app, the credential split has to happen by env-var name instead of by process. Never
- * accepts `NEXT_PUBLIC_*` credentials.
+ * Server-only lazy Postgres pool for staff reads and writes to canonical, ops, research,
+ * and publication data. `ADMIN_DATABASE_URL` (or `ADMIN_APP_DATABASE_URL`) keeps this connection
+ * separate from the public pool's `DATABASE_URL`/`APP_DATABASE_URL`
+ * (`../../lib/public-data/postgres-client.ts`). Never accepts `NEXT_PUBLIC_*` credentials.
  *
  * Supabase URLs often include `sslmode=require`. Recent node-pg treats that as verify-full,
  * which fails on the platform CA chain unless we normalize to `uselibpqcompat=true` and
@@ -84,10 +80,8 @@ export function normalizePgConnectionString(
 }
 
 /**
- * Timeout budget. Pages are server-rendered, so first byte waits on these queries: an
- * unreachable database used to hang a render for minutes (repo-7pqy measured `GET / 200 in
- * 18.4min`) because the pool had no connect or statement bound at all. Every number here is a
- * ceiling on how long a page can be stuck, not a performance tuning knob.
+ * Connection and statement timeouts bound how long server-rendered pages can wait on the
+ * database.
  */
 export const POSTGRES_TIMEOUT_DEFAULTS = {
   /** Give up reaching the host. Covers a wrong pooler host or a dropped IPv6 route. */

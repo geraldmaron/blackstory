@@ -52,7 +52,7 @@ async function main(): Promise<void> {
     await client.query('BEGIN');
     const { rows } = await client.query<ObsRow>(
       `SELECT id, metric_id, reference_period, estimate, content_hash
-       FROM bb_reference.statistical_observations
+       FROM reference.statistical_observations
        WHERE content_hash !~ '^[0-9a-f]{64}$'
        ORDER BY id`,
     );
@@ -67,7 +67,7 @@ async function main(): Promise<void> {
     if (commit) {
       for (const u of updates) {
         await client.query(
-          `UPDATE bb_reference.statistical_observations SET content_hash = $2 WHERE id = $1`,
+          `UPDATE reference.statistical_observations SET content_hash = $2 WHERE id = $1`,
           [u.id, u.to],
         );
         applied += 1;

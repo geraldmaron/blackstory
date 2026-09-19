@@ -1,10 +1,10 @@
 /**
- * Claims-mining relationship extraction engine (repo-xez5.5).
+ * Claims-mining relationship extraction engine.
  *
- * `entity-network-expansion.ts` (repo-xez5.4) stages relationship hypotheses discovered by
+ * `entity-network-expansion.ts` stages relationship hypotheses discovered by
  * traversing Wikidata claims for a seed entity. This module stages hypotheses mined from a
  * *different* source: the free-text `predicate`/`object` pair already sitting on every row of
- * `bb_canonical.claims` (via `claim_versions`), which today back only 543 `entity_relationships`
+ * `canonical.claims` (via `claim_versions`), which today back only 543 `entity_relationships`
  * rows across 1,383 entities — heavily skewed to `related_to`.
  *
  * Claims are semi-structured fact-tuples, not free prose and not a fixed schema: a short
@@ -31,8 +31,8 @@
  *     historical timespan). No date found -> flagged `needs_temporal_context`, never staged as an
  *     unanchored causal edge.
  *
- * Nothing here writes to `bb_canonical.entity_relationships`. Output is always
- * `status: 'pending'` rows in `bb_research.landscape_candidates` (lane `'claims-relationship'`),
+ * Nothing here writes to `canonical.entity_relationships`. Output is always
+ * `status: 'pending'` rows in `research.landscape_candidates` (lane `'claims-relationship'`),
  * mirroring `stageNetworkCandidates`'s staging convention from `entity-network-expansion.ts`.
  */
 import type { EntityKind, RelationshipType } from '@repo/domain';
@@ -62,7 +62,7 @@ type PredicatePattern = {
   /**
    * When true, orientation is not fixed: it flips to `mention_to_entity` unless the claim's own
    * entity is a `person`. This matches the real catalog shape observed in
-   * `bb_canonical.claim_versions` — a "founded" claim usually sits on the *founded* org/place/
+   * `canonical.claim_versions` — a "founded" claim usually sits on the *founded* org/place/
    * publication entity, naming its (often non-canonical) human founder in free prose, not on a
    * person entity naming what they founded. Fixed patterns (e.g. `occurred_at`, `part_of`) don't
    * need this because their subject is unambiguous regardless of kind.
@@ -385,7 +385,7 @@ export function extractCandidate(
   // claim's own entity isn't a person, the relationship almost always runs the other way (the
   // mentioned party is the one who founded/authored/joined/attended, and the claim's own entity
   // — an org/place/publication/event — is the object), per the catalog shape found in
-  // bb_canonical.claim_versions (see module doc comment).
+  // canonical.claim_versions (see module doc comment).
   const effectiveOrientation: EdgeOrientation =
     pattern.personOriented === true && claim.entity.kind !== 'person' && mention.kind === 'person'
       ? 'mention_to_entity'
@@ -456,7 +456,7 @@ export function extractCandidates(
 }
 
 // ---------------------------------------------------------------------------
-// Staging (bb_research.landscape_candidates — lane 'claims-relationship')
+// Staging (research.landscape_candidates — lane 'claims-relationship')
 // ---------------------------------------------------------------------------
 
 export type RelationshipCandidateRow = {
@@ -486,10 +486,10 @@ export type RelationshipCandidateRow = {
 export type StagingInserter = (rows: readonly RelationshipCandidateRow[]) => Promise<void>;
 
 /**
- * Shapes extraction output into `bb_research.landscape_candidates` rows (lane
+ * Shapes extraction output into `research.landscape_candidates` rows (lane
  * `'claims-relationship'`, status `'pending'`) and hands them to `insert`. Reuses
  * `landscape_candidates` per `entity-network-expansion.ts`'s convention rather than minting a new
- * table, distinguished only by `lane`. Never writes to `bb_canonical.*`.
+ * table, distinguished only by `lane`. Never writes to `canonical.*`.
  */
 export async function stageRelationshipCandidates(
   candidates: readonly RelationshipCandidate[],

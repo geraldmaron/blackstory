@@ -1,12 +1,8 @@
 /**
- * Researched public theme-impact packets.
- *
- * Authoring fixture for the published packets, applied and promoted via
- * scripts/theme-packets.ts. The database is the source of truth at runtime;
- * this file records authoring lineage. Observation values are verified snapshots of
- * bb_reference.statistical_observations. Artifact hashes are SHA-256 digests of
- * bytes fetched directly from the cited source (CPS A-1 and BJS NPS refreshes
- * on 2026-07-24; earlier rows retain their fetch-day hashes).
+ * Authoring fixtures for published theme-impact packets. Runtime reads the database.
+ * Observation values mirror verified reference.statistical_observations snapshots; artifact
+ * hashes are SHA-256 digests of cited source bytes. CPS A-1 and BJS NPS artifacts were fetched
+ * 2026-07-24; earlier rows retain their fetch-day hashes.
  */
 import {
   buildThemeImpactPacket,

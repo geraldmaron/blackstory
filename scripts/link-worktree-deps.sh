@@ -4,7 +4,7 @@
 # A `git worktree` is a bare source tree: no node_modules anywhere, so nothing runs in it until
 # dependencies exist. `pnpm install` per worktree is the obvious answer and the wrong one — it
 # costs minutes and gigabytes each, and a previous agent session left 58 worktrees holding
-# roughly 26GB of duplicated dependency trees (repo-un17q).
+# roughly 26GB of duplicated dependency trees.
 #
 # pnpm's layout makes linking safe: every node_modules directory it creates is already nothing
 # but symlinks into the single content-addressed store under the ROOT node_modules/.pnpm. So

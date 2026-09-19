@@ -31,9 +31,7 @@ const DEFAULT_LIMIT = 10;
 
 /**
  * Ranks `corpus` by cosine similarity to `target`, descending, applying an optional similarity
- * floor and an id exclusion. This is the same ranking shape as the Firestore KNN query path in
- * @repo/ops-data, but works entirely in memory over whatever embeddings the caller already
- * has loaded appropriate for research-worker-side recall, not for querying the full index.
+ * floor and an id exclusion. Uses caller-supplied in-memory embeddings for bounded worker recall.
  */
 export function findSimilarCandidates<TPayload = unknown>(
   target: EmbeddingVector,

@@ -128,7 +128,7 @@ export type ResolveHistoryGraphReleaseOptions = HistoryGraphReleaseOptions & {
 };
 
 /**
- * Resolves the graph release artifact: prefers stored bb_public.release_graph_* payloads,
+ * Resolves the graph release artifact: prefers stored published.release_graph_* payloads,
  * falling back to in-process build when HISTORY_GRAPH_IN_PROCESS_FALLBACK=1 or stored rows
  * are absent.
  */

@@ -21,15 +21,14 @@ These hold across every child bead unless an accepted ADR explicitly supersedes 
 1. **Stack**: Expo React Native with custom development builds and MapLibre Native,
    unless MOB-002 records evidence that invalidates the decision.
 2. **Read boundary**: `apps/api-public` is the mobile read surface. No direct
-   canonical/research Firestore access from any client.
+   canonical/research database access from any client.
 3. **Sharing**: only environment-neutral contracts and pure behavior are shared
    across web/mobile (no app-to-app imports, no server-only transitive deps).
 4. **Releases**: immutable release artifacts with atomic activation and proven rollback.
 5. **Identity first**: product identity (MOB-001) resolves before any permanent store
    resource is created.
-6. **Client trust**: client attestation is a signal, not authorization (2026-08-14: this was
-   Firebase App Check at writing; the live mechanism is the `X-BlackStory-Client` header check,
-   see `docs/mobile/security/threat-model.md`'s 2026-08-14 amendment — the invariant is unchanged).
+6. **Client trust**: the `X-BlackStory-Client` header is a version signal, not authorization.
+   See `docs/mobile/security/threat-model.md`.
    The server stays authoritative; a compromised client must not gain a canonical write path.
 7. **Privacy**: no ad/tracking SDKs; no query text, correction content, precise
    location, or sensitive entity classifications in logs or crash reports.

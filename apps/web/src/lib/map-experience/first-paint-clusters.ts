@@ -8,8 +8,8 @@
  * integer tile zoom below it. The board runs the same library with the same numbers over the same
  * pin collection the plate opens on (`firstPaintCatalog`), at the tile zooms the plate's opening
  * frame can land in, so every disc — position, count and membership — is the disc the plate will
- * paint at the handoff (repo-27uao). Before this the board grouped greedily by index within a
- * scaled radius, which put a different pattern of discs on screen from the plate's on every load.
+ * paint at the handoff. Any separate grouping algorithm would produce a different pattern of
+ * discs from the live plate.
  */
 import Supercluster, { type PointFeature } from 'supercluster';
 import { EXPLORE_CLUSTER_CONFIG } from './dignity-style';

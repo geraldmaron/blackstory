@@ -1,7 +1,4 @@
-/**
- * In-memory source registry with register/get/list/approve policy.
- * Firestore persistence implements SourceRegistryStore in a later.
- */
+/** Source adapter registry contracts and deterministic validation. */
 import { assertEvidenceSourceValid } from '../provenance/source.js';
 import { assertSourceAdapterContractValid } from './contract.js';
 import type { AdapterRegistryState, SourceAdapterContract, SourceRegistryEntry } from './types.js';
@@ -21,7 +18,7 @@ export type ApproveSourcePolicyInput = {
   readonly registryState?: Extract<AdapterRegistryState, 'approved' | 'canary'>;
 };
 
-/** Persistence boundary for registry entries (Firestore adapter implements later). */
+/** Persistence boundary for registry entries (the caller supplies persistence). */
 export type SourceRegistryStore = {
   get(id: string): SourceRegistryEntry | undefined;
   list(): readonly SourceRegistryEntry[];

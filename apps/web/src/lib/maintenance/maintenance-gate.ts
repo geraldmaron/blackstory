@@ -3,7 +3,7 @@
  *
  * Runs first in `proxy.ts`, ahead of every security and normalization step, because the whole
  * value of the wall is that nothing downstream runs at all. A blocked request never reaches a
- * route, never renders a React tree, and never opens a connection to `bb_public`.
+ * route, never renders a React tree, and never opens a connection to `published`.
  */
 
 import { type NextRequest, NextResponse } from 'next/server';

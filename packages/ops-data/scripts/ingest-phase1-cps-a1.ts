@@ -1,25 +1,8 @@
 /**
- * Census CPS A-1 Historical Reported Voting Rates ingest for Phase 1 observations
- * into bb_reference.statistical_observations. Extends the Black turnout metric back
- * to 1964 and adds new Black + White non-Hispanic registration metrics (repo-zxjz.8).
- * White turnout stays at 1980-2020: the source table has no "White non-Hispanic"
- * breakout at all before 1980 (see the fixture CSV's header comment), so extending
- * it further back would mean quietly swapping in a different race definition.
- *
- * Usage (repo root):
- *   # Dry-run (default)
- *   node --conditions development --import tsx \
- *     packages/ops-data/scripts/ingest-phase1-cps-a1.ts
- *
- *   # Apply to Postgres
- *   DRY_RUN=0 INGEST_PHASE1_CPS_A1_APPLY=1 DATABASE_URL=postgresql://... \
- *     node --conditions development --import tsx \
- *     packages/ops-data/scripts/ingest-phase1-cps-a1.ts
- *
- *   # Custom fixture CSV
- *   node --conditions development --import tsx \
- *     packages/ops-data/scripts/ingest-phase1-cps-a1.ts \
- *     --cps-fixture-csv=packages/ops-data/fixtures/reference-indicators/cps-a1-presidential-citizen-turnout-by-race-1964-2020.csv
+ * Loads cited Census CPS A-1 turnout and registration observations. Preserve each year's
+ * population definition: White non-Hispanic data is unavailable before 1980 in this table.
+ * Default dry-run; writes require DRY_RUN=0 and INGEST_PHASE1_CPS_A1_APPLY=1. --cps-fixture-csv
+ * selects an alternate input.
  */
 import { existsSync, readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
@@ -44,20 +27,9 @@ const CPS_A1_RETRIEVED = '2026-07-24T05:02:00.000Z';
 const NATION_JURISDICTION = 'nation:US';
 
 /**
- * THE SEAM. CPS Table A-1 publishes a citizen-population rate only from 1980 on. For 1964-1976
- * the sheet's citizen columns (D/F/H/J/L/N) are literally the string "NA" and only the
- * total-voting-age-population columns (C/E/G/I/K/M) carry a figure. The derived fixture already
- * falls back to the total-population column for those years — correctly, since the alternative
- * is no pre-1980 history at all — but nothing recorded that it had done so, and every
- * observation went to Postgres with `metadata = {}`. A reader comparing 1976 to 1980 was
- * comparing two different denominators with no way to know it.
- *
- * Census says so itself, in Table A-1's own footnote, quoted verbatim in the fixture header:
- * estimates before 1996 "should be interpreted with caution, as they are not directly comparable
- * to estimates from 1996 and after."
- *
- * So each observation now carries the universe it was actually computed on. repo-zxjz.8's second
- * acceptance clause asks for exactly this ("record which years use which").
+ * Records the actual denominator for every observation. CPS A-1 lacks citizen-population rates
+ * for 1964-1976, so those observations use total voting-age population. Comparisons across that
+ * seam and the source's pre/post-1996 caveat require explicit qualification.
  */
 const POPULATION_UNIVERSE_SEAM_YEAR = 1980;
 
@@ -559,7 +531,7 @@ async function loadExistingJurisdictionIds(databaseUrl: string): Promise<Set<str
     ...(conn.ssl ? { ssl: conn.ssl } : {}),
   });
   try {
-    const result = await pool.query<{ id: string }>('SELECT id FROM bb_reference.jurisdictions');
+    const result = await pool.query<{ id: string }>('SELECT id FROM reference.jurisdictions');
     return new Set(result.rows.map((row) => row.id));
   } finally {
     await pool.end();
@@ -599,7 +571,7 @@ async function applyObservations(
 
     for (const s of series) {
       await client.query(
-        `INSERT INTO bb_reference.statistical_series
+        `INSERT INTO reference.statistical_series
           (metric_id, metric_definition, universe, unit, source_dataset, source_table,
            source_variable, geography_type, estimate_type, period_type,
            external_data_source_id, theme, metadata)
@@ -642,7 +614,7 @@ async function applyObservations(
 
     for (const obs of observations) {
       await client.query(
-        `INSERT INTO bb_reference.statistical_observations
+        `INSERT INTO reference.statistical_observations
           (id, metric_id, jurisdiction_id, boundary_version, reference_period, dataset_vintage,
            estimate, margin_of_error, race_ethnicity_slice, status, source, source_url,
            retrieved_at, content_hash, metadata)

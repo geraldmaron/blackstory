@@ -1,11 +1,6 @@
 /**
- * Guards the defect repo-5tlq was filed against: a legal snapshot pointing at an entity id that
- * exists nowhere. The web seed shipped three of those (`ent_seed_law_1983` and friends) and the
- * surface rendered "View the archive record" for every one of them, because the link is drawn for
- * any non-empty string. Nothing here can reach the database — the live-release check belongs to
- * the loader, which verifies each id against `bb_public.release_entities` before it writes — so
- * these assert the two things a static file can be wrong about: an id from the dead namespace,
- * and a seed row nobody ruled on.
+ * Static tests reject invalid curated legal-entity mappings. The loader separately checks every
+ * non-null entity id against the active public release.
  */
 import assert from 'node:assert/strict';
 import test from 'node:test';

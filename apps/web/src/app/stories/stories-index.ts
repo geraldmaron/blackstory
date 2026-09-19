@@ -217,20 +217,29 @@ export function paginateStories(
   };
 }
 
-/** Published count, era span and place count for the header meta row. */
+/** Published count and place count for the document colophon. Publication-year spans that
+ * collapse to one year (e.g. "2026 to 2026") are omitted; place grammar is singular-aware. */
 export function computeStoriesFacts(items: readonly PublicArticleListItemDoc[]): {
   readonly publishedCount: number;
   readonly eraSpanLabel: string | undefined;
   readonly placeCount: number;
+  readonly placeLabel: string;
 } {
   const publishedCount = items.length;
   const years = items
     .map((item) => Number.parseInt(item.publishedAt.slice(0, 4), 10))
     .filter((year) => Number.isFinite(year));
+  const minYear = years.length === 0 ? undefined : Math.min(...years);
+  const maxYear = years.length === 0 ? undefined : Math.max(...years);
   const eraSpanLabel =
-    years.length === 0 ? undefined : `${Math.min(...years)} to ${Math.max(...years)}`;
-  const placeCount = new Set(items.map((item) => item.placeLabel)).size;
-  return { publishedCount, eraSpanLabel, placeCount };
+    minYear === undefined || maxYear === undefined || minYear === maxYear
+      ? undefined
+      : `${minYear} to ${maxYear}`;
+  const placeCount = new Set(
+    items.map((item) => item.placeLabel).filter((label) => label.trim().length > 0),
+  ).size;
+  const placeLabel = placeCount === 1 ? '1 place' : `${placeCount.toLocaleString('en-US')} places`;
+  return { publishedCount, eraSpanLabel, placeCount, placeLabel };
 }
 
 function buildGroups(

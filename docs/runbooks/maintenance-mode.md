@@ -2,9 +2,9 @@
 
 **Scope:** `apps/web` on Vercel — parking the whole public surface behind an edge-served 503 so
 that neither a Vercel function nor Supabase is touched by public traffic.
-**Not in scope:** `apps/api-public` (a separate Node service with its own deploy and its own
-Supabase reads), the `/admin` console inside it, and the `apps/mobile` client that calls `api-public`. Walling the
-web app does **not** stop those. See "What this does not cover" below.
+**Not in scope:** `apps/api-public` (a separate Node service with its own deploy and Supabase
+reads) and the `apps/mobile` client that calls it. The staff `/admin` console belongs to
+`apps/web` and is covered by the wall. See "What this does not cover" below.
 
 ## What it does
 
@@ -12,7 +12,7 @@ With `MAINTENANCE_MODE` on, `apps/web/src/proxy.ts` answers every request at the
 Next routes it:
 
 - No route is matched, so no serverless function boots.
-- No React tree renders, so no `bb_public` query runs.
+- No React tree renders, so no `published` query runs.
 - The response is a self-contained HTML page — inline CSS, no script, no font request. The only
   other request the browser makes is the brand lockup from `/public/brand`, which Vercel serves
   from static storage.
@@ -33,7 +33,12 @@ it to reindex the archive as a maintenance notice instead.
 2. **Redeploy.** This is not optional and there is no way around it. These variables are read
    inside the edge bundle, and Next inlines non-public env vars into that bundle at build time,
    so a dashboard change alone changes nothing.
-3. Verify from a browser with no bypass cookie:
+3. Purge the Cloudflare zone cache after the maintenance deployment becomes ready. A previously
+   cached HTML response can otherwise outlive the Vercel deployment. The final cache rule must
+   bypass shared caching for requests with `bs_maint_bypass`, `x-maintenance-bypass`, or the
+   `maintenance_bypass` query parameter; an operator's successful response must not populate
+   the anonymous cache. Check an anonymous request again after an operator request.
+4. Verify from a browser with no bypass cookie:
 
    ```bash
    curl -sS -o /dev/null -w '%{http_code}\n' https://<site>/
@@ -41,11 +46,18 @@ it to reindex the archive as a maintenance notice instead.
 
    Expect `503`. Check `/robots.txt` and one entity URL too.
 
-Leave the variables **unset on Preview**, so a preview build is never accidentally walled. Note
-that a Preview deployment is not a substitute for the bypass on this project: `DATABASE_URL` is
-scoped to Production only, so Preview has no data plane and serves an empty catalog whether the
-wall is up or not. The bypass below is the way to look at the real site while Production is
-parked.
+Leave maintenance variables **unset on Preview**. Preview must have no production database
+credentials; use an isolated database when catalog verification is needed. Without one, web
+catalog routes can fail closed, and the API's explicit seed mode returns an empty catalog.
+Neither outcome verifies Production. Use the maintenance bypass to inspect the parked live site.
+
+Set both projects' deployment protection to `all_except_custom_domains`. Verify direct
+`*.vercel.app` deployment URLs redirect anonymous requests to Vercel SSO while custom production
+domains reach the maintenance wall. Otherwise an older public deployment URL can bypass a wall
+enabled only on the latest build. Removing environment variables does not change older immutable
+deployments. Keep authenticated operators out of those builds during the freeze; no automation
+bypass may grant a writer access. The namespace cutover then invalidates their old database
+contract without compatibility aliases.
 
 ## Turning it off
 

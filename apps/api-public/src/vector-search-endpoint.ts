@@ -1,32 +1,4 @@
-/**
- * `find_nearest` semantic search endpoint composition.
- *
- * Exposed ONLY through this server-side apps/api-public module Firestore's `findNearest` KNN
- * is not supported by client/web SDKs at all, so there is no parallel client surface to
- * accidentally create. Every dependency (client-attestation guard, rate limiter, kill-switch
- * snapshot, embedding provider, vector store) is injected, matching the factory-function style
- * already used by `createPublicSearchGuard`/`createPublicRateLimitGuard`/
- * `createPublicApiClientAttestationGuard` in this same directory so this composes with those
- * guards rather than replacing them.
- *
- * 2026-08-14: swapped from Firebase App Check to client attestation (`X-BlackStory-Client`) —
- * see `docs/mobile/security/threat-model.md`'s 2026-08-14 amendment. The original version of this
- * file hard-denied a request on failed attestation (`!appCheckDecision.allowed` -> 401), which
- * never matched the fail-open convention every other handler in this directory follows (T1/T2:
- * attestation is a signal, never an authorization gate). Fixed here rather than carried forward —
- * this endpoint was never wired into the live route table, so there was no shipped behavior to
- * preserve.
- *
- * Guardrail order:
- * 1. Client attestation (`createPublicApiClientAttestationGuard`, imported not modified) — feeds
- *    the risk/rate-limit signal only, never denies (fail-open, matches every other handler).
- * 2. Kill switch (`vector-search-kill-switch.ts`, reusing the existing `search` switch)
- * 3. Rate limit (`createPublicRateLimitGuard`, imported not modified `/v1/search/nearest`
- * already resolves to the `search` endpoint class via the existing path regex)
- * 4. Query guardrails (`vector-search-guardrails.ts`: shared text/filter validation +
- * vector-specific distanceThreshold/eraBucket/k bounds)
- * 5. Embed the validated query text, then run the capped, thresholded KNN query.
- */
+/** Server-only vector search with client-header policy, rate limits, query budgets, and kill switches. */
 import type { EmbeddingProvider, VectorIndexStore, VectorQueryMatch } from '@repo/ops-data';
 import { truncateAndNormalize, EMBEDDING_DIMS } from '@repo/ops-data';
 import type { KillSwitchSnapshot } from '@repo/config';
@@ -93,7 +65,7 @@ export type FindNearestEndpoint = {
 };
 
 /**
- * Builds the composed `find_nearest` handler. Construction never touches Firestore or the
+ * Builds the composed `find_nearest` handler. Construction never touches the database or the
  * network every side effect happens inside `.handle`.
  */
 export function createFindNearestEndpoint(

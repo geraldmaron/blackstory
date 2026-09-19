@@ -12,7 +12,7 @@
  *   evidence before acceptance."
  * - Discovery cannot publish (`docs/decisions-carryover.md`, "Research and discovery
  *   cannot publish"). Nothing here touches public
- *   projections, release tables, or any bb_public/bb_canonical write path.
+ *   projections, release tables, or any published/canonical write path.
  * - OCR issue text is EPHEMERAL input: only capped snippets (evidence-pointer
  *   limits) and outbound link hints survive onto candidate payloads. Full
  *   article bodies are never stored (rights: many runs remain under copyright).

@@ -41,8 +41,7 @@ test('the sitemap never advertises a URL that redirects', () => {
 });
 
 test('the sitemap never lists the same URL twice', () => {
-  // `/history` was listed twice for two releases, which put a duplicate `<url>` element in the
-  // shipped sitemap. This is the standing assertion SP-19 (repo-92n2.19) requires.
+  // A public sitemap must contain one `<url>` element per canonical destination.
   const urls = buildPublicSitemapEntries({
     siteUrl: 'https://blackbook.example',
     releaseGeneratedAt: '2026-07-17T00:00:00.000Z',
@@ -95,6 +94,7 @@ test('a destination is left out of the sitemap only on purpose', () => {
   // `/terms` on the phone) with no web page behind it, and `crawl` would have advertised a route
   // that 404s. The web page exists now, so /terms came off the list and into the sitemap.
   // /story left this list by leaving the registry entirely when the route was deprecated.
+  // /lives is now a public immersive room (crawl monthly). Only /design-system stays out.
   // Any further omission is an oversight until someone records why.
   const omitted = allDestinations()
     .filter((destination) => destination.crawl === undefined)

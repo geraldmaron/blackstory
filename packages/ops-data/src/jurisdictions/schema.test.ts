@@ -1,12 +1,11 @@
 /**
- * Tests for the `jurisdictions` Firestore doc schema/converter.
+ * Tests for the `jurisdictions` jurisdiction record schema.
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import {
   countryJurisdictionId,
   countyJurisdictionId,
-  jurisdictionConverter,
   jurisdictionSchema,
   stateJurisdictionId,
 } from './schema.js';
@@ -68,14 +67,6 @@ test('jurisdictionSchema requires sourceDataset (provenance is not optional)', (
   assert.throws(() => jurisdictionSchema.parse(withoutSource));
 });
 
-test('jurisdictionConverter round-trips through toFirestore/fromFirestore', () => {
-  const written = jurisdictionConverter.toFirestore(VALID_STATE_DOC);
-  const read = jurisdictionConverter.fromFirestore({ data: () => written });
-  assert.deepEqual(read, VALID_STATE_DOC);
-});
-
-test('jurisdictionConverter fails closed on a corrupted document', () => {
-  assert.throws(() =>
-    jurisdictionConverter.fromFirestore({ data: () => ({ ...VALID_STATE_DOC, name: '' }) }),
-  );
+test('jurisdiction parsing rejects a corrupted record', () => {
+  assert.throws(() => parseJurisdictionDoc({ ...VALID_STATE_DOC, name: '' }));
 });

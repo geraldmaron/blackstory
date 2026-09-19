@@ -42,9 +42,9 @@ for (const page of ROOM_KIT_PAGES) {
     // Depth-agnostic: these rooms sit anywhere from the app root (`not-found.tsx`) to four
     // levels down (`corrections/status/[receiptCode]`), so pinning the `../` count would fail
     // a correct conversion for the wrong reason.
-    assert.match(source, /from '(?:\.\.\/)+components\/room(?:'|\/(?:Room|RoomHeader)')/);
+    assert.match(source, /from '(?:\.\.\/)+components\/room(?:'|\/(?:Room)')/);
     assert.match(source, /<Room/);
-    assert.match(source, /<RoomHeader/);
+    assert.match(source, /<ReadingEntry/);
     // The v6 shell must be gone rather than merely unused: two chromes on one page is the drift
     // the kit exists to remove, and an unused import is how the second one comes back.
     assert.doesNotMatch(source, /UtilityEditionShell/);

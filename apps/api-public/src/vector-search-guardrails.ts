@@ -73,7 +73,7 @@ export type VectorSearchGuardDecisionAllowed = {
   readonly cacheKey: string;
   readonly queryHash: string;
   readonly timeoutMs: number;
-  readonly firestoreTimeoutMs: number;
+  readonly databaseTimeoutMs: number;
   readonly path: string;
   readonly endpointClass: 'search';
 };
@@ -183,7 +183,7 @@ export function evaluateVectorSearchGuardrails(
     cacheKey: baseDecision.cacheKey,
     queryHash: baseDecision.queryHash,
     timeoutMs: baseDecision.timeoutMs,
-    firestoreTimeoutMs: baseDecision.firestoreTimeoutMs,
+    databaseTimeoutMs: baseDecision.databaseTimeoutMs,
     path: request.path,
     endpointClass: 'search',
   };

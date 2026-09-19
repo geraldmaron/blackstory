@@ -64,7 +64,7 @@ type FakeState = {
 
 function createFakeQuery(state: FakeState): PostgresQueryFn {
   return async (sql, params = []) => {
-    if (sql.includes('bb_public.active_release')) {
+    if (sql.includes('published.active_release')) {
       return [
         {
           release_id: RELEASE_ID,
@@ -74,15 +74,15 @@ function createFakeQuery(state: FakeState): PostgresQueryFn {
         },
       ];
     }
-    if (sql.includes('bb_public.release_articles')) {
+    if (sql.includes('published.release_articles')) {
       state.counts.articleReads += 1;
       return (state.articles ?? []).map((payload) => ({ payload }));
     }
-    if (sql.includes('bb_public.release_entities') && sql.includes('entity_id = $2')) {
+    if (sql.includes('published.release_entities') && sql.includes('entity_id = $2')) {
       const found = state.entities?.get(params[1] as string);
       return found ? [{ projection: found }] : [];
     }
-    if (sql.includes('bb_public.release_entities') && sql.includes('entity_id = ANY')) {
+    if (sql.includes('published.release_entities') && sql.includes('entity_id = ANY')) {
       const ids = (params[1] as readonly string[]) ?? [];
       const rows: { projection: PublicEntityProjectionDoc }[] = [];
       for (const id of ids) {
@@ -91,7 +91,7 @@ function createFakeQuery(state: FakeState): PostgresQueryFn {
       }
       return rows;
     }
-    if (sql.includes('bb_public.release_entities')) {
+    if (sql.includes('published.release_entities')) {
       return [...(state.entities?.values() ?? [])].map((p) => ({ projection: p }));
     }
     return [];
@@ -162,7 +162,7 @@ test('the article fold happens once per release, not once per record open', asyn
 
 test('an unreadable article table costs story links, never the record', async () => {
   const failing: PostgresQueryFn = async (sql, params = []) => {
-    if (sql.includes('bb_public.release_articles')) throw new Error('relation does not exist');
+    if (sql.includes('published.release_articles')) throw new Error('relation does not exist');
     return createFakeQuery({
       counts: { articleReads: 0 },
       entities: new Map([['ent_a', projection({})]]),

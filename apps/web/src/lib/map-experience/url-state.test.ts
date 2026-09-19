@@ -12,7 +12,7 @@ import {
   viewportForState,
 } from './url-state';
 
-test('an empty explore state links to /explore, which still mounts the instrument', () => {
+test('an empty explore state links to /explore, the Door browse deep link', () => {
   assert.equal(
     buildExploreHref({
       filters: {
@@ -562,7 +562,7 @@ test('parseExploreSearchParams ignores an invalid radius token', () => {
 });
 
 /**
- * `find=place` (repo-92n2.14 / SP-14) has to survive the edge's query normalization for
+ * `find=place` has to survive the edge's query normalization for
  * `/locate`'s redirect (`/explore?find=place`) to actually open `PlaceFinder`'s place sheet
  * rather than 308ing again with the param stripped — see `query-normalization.test.ts`'s drift
  * tests, which fail if this key is read by the parser but missing from

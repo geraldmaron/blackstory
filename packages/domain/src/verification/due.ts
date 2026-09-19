@@ -1,7 +1,6 @@
 /**
- * Pure due-record logic (the related workstream): decides whether a subject is due for
- * re-verification, and derives its `VerificationStatus`. No I/O — a real scheduled job supplies
- * the subject list via a `VerificationStateProvider` and reads `now` from its own clock.
+ * Pure due-record selection and status derivation. Callers supply subject states and time; this
+ * module installs no scheduled jobs.
  */
 import type { VerificationState } from './state.js';
 import type { VerificationStatus } from './state.js';
@@ -63,15 +62,10 @@ export function deriveVerificationStatus(input: {
   return 'overdue';
 }
 
-/** Supplies the full set of `VerificationState` records a due-record sweep should consider. A
- * real scheduled job's implementation would page a Firestore/`verificationStates`-shaped query;
- * tests and small callers can supply a plain array literal (`() => states`). */
+/** Supplies the bounded set of verification states to examine. */
 export type VerificationStateProvider = () => readonly VerificationState[];
 
-/** Pure selector: given a provider and `now`, returns every subject whose `nextReviewAt` is due
- * (or which was never scheduled). Building the actual scheduled cron job / Firestore query
- * index that implements `VerificationStateProvider` for production is explicitly out of scope
- * for this pass — this is the domain logic a future job calls. */
+/** Select subjects whose next review is due; this function never installs a schedule. */
 export function selectDueVerificationStates(
   provider: VerificationStateProvider,
   now: string,

@@ -1,9 +1,7 @@
 /**
- * Proves `promoteCaseToCanonical`'s actual transactional write path — not just the pure
- * `evaluateCasePromotionGate`/`validateCanonicalPromotionRecord` functions it calls, which
- * `packages/domain/src/promotion/case-promotion.test.ts` already covers on their own (repo-k2kb).
- * Mirrors `canonical-write.test.ts`'s fixture style: a fake `pg.PoolClient` records every query
- * instead of hitting a real database.
+ * Exercises promotion's transaction calls with a recording PoolClient double. Domain tests
+ * cover the pure gate; this suite verifies commit and rollback orchestration, not live database
+ * enforcement.
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
@@ -104,7 +102,7 @@ function fixture(
   const client = {
     query: async (sql: string, params?: readonly unknown[]) => {
       queries.push({ sql, params: params ?? [] });
-      if (sql.includes('FROM bb_canonical.entities') && sql.includes('WHERE id <>')) {
+      if (sql.includes('FROM canonical.entities') && sql.includes('WHERE id <>')) {
         const rows = options.duplicateRows ?? [];
         return { rows, rowCount: rows.length };
       }
@@ -179,9 +177,9 @@ test('a live catalog duplicate aborts the transaction without inserting the enti
 
   await assert.rejects(() => promoteCaseToCanonical(promoteInput(), dependencies), /duplicate/i);
 
-  // The duplicate check ran, but nothing after it did: no INSERT INTO bb_canonical.entities.
+  // The duplicate check ran, but nothing after it did: no INSERT INTO canonical.entities.
   assert.ok(queries.some((q) => q.sql.includes('WHERE id <>')));
-  assert.ok(!queries.some((q) => q.sql.includes('INSERT INTO bb_canonical.entities')));
+  assert.ok(!queries.some((q) => q.sql.includes('INSERT INTO canonical.entities')));
 });
 
 test('a valid promotion commits the entity, claim, evidence, and case history in one pass', async () => {
@@ -194,22 +192,22 @@ test('a valid promotion commits the entity, claim, evidence, and case history in
   assert.equal(result.evidenceIds.length, 2);
 
   const sqlOf = (fragment: string) => queries.some((q) => q.sql.includes(fragment));
-  assert.ok(sqlOf('INSERT INTO bb_canonical.entities'));
-  assert.ok(sqlOf('INSERT INTO bb_canonical.entity_locations'));
-  assert.ok(sqlOf('INSERT INTO bb_canonical.claims'));
-  assert.ok(sqlOf('INSERT INTO bb_canonical.claim_versions'));
-  assert.ok(sqlOf('INSERT INTO bb_canonical.claim_evidence_links'));
-  assert.ok(sqlOf('INSERT INTO bb_research.case_history_events'));
-  assert.ok(sqlOf('INSERT INTO bb_audit.events'));
+  assert.ok(sqlOf('INSERT INTO canonical.entities'));
+  assert.ok(sqlOf('INSERT INTO canonical.entity_locations'));
+  assert.ok(sqlOf('INSERT INTO canonical.claims'));
+  assert.ok(sqlOf('INSERT INTO canonical.claim_versions'));
+  assert.ok(sqlOf('INSERT INTO canonical.claim_evidence_links'));
+  assert.ok(sqlOf('INSERT INTO research.case_history_events'));
+  assert.ok(sqlOf('INSERT INTO audit.events'));
 
-  const entityInsert = queries.find((q) => q.sql.includes('INSERT INTO bb_canonical.entities'));
+  const entityInsert = queries.find((q) => q.sql.includes('INSERT INTO canonical.entities'));
   assert.deepEqual(
     entityInsert?.params[3],
     JSON.stringify([{ scheme: 'research_case', value: 'case-1' }]),
   );
 
   const historyInsert = queries.find((q) =>
-    q.sql.includes('INSERT INTO bb_research.case_history_events'),
+    q.sql.includes('INSERT INTO research.case_history_events'),
   );
   // reason_code is a SQL literal ('canonical_promotion_approved'), not a bound param.
   assert.ok(historyInsert?.sql.includes("'canonical_promotion_approved'"));

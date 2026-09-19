@@ -8,7 +8,7 @@
  * single-value `eraBucket` pre-filter field (see `docs/decisions-carryover.md`, "Vector search").
  */
 import { deriveEraBuckets } from '@repo/domain';
-import type { CanonicalEntityDoc, EntityKindDoc } from '../firestore/types.js';
+import type { CanonicalEntityDoc, EntityKindDoc } from '../records/types.js';
 
 /** Caller-resolved location context the pipeline does not itself geocode/resolve state. */
 export type EntityLocationContext = {

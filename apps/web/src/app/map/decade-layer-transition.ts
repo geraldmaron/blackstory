@@ -5,7 +5,7 @@
  * driven by requestAnimationFrame — not a dual-buffer opacity wipe. Pins, clusters, and
  * relationship lines keep a true out/in opacity crossfade on incoming buffers.
  *
- * PER-ENTITY MORPH (repo-o56o). A record documented in both the outgoing and incoming decade no
+ * PER-ENTITY MORPH. A record documented in both the outgoing and incoming decade no
  * longer dissolves and reappears. The dual buffer stays — it is what lets arriving and departing
  * pins overlap — but a record present on both sides is HELD: full opacity on the current buffer,
  * zero on the incoming one, for the whole morph. Only records that actually enter or leave the
@@ -494,7 +494,7 @@ export function runDecadeMorphAnimation(options: {
   readonly durationMs: number;
   readonly isCurrent: () => boolean;
   readonly onProgress?: (easedProgress: number) => void;
-  /** Hold records documented in both decades still for the whole morph (repo-o56o). */
+  /** Hold records documented in both decades still for the whole morph. */
   readonly holdPersistingRecords?: boolean;
 }): DecadeMorphAnimationHandle {
   const morphOptions = { holdPersistingRecords: options.holdPersistingRecords === true };

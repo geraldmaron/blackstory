@@ -1,43 +1,8 @@
 /**
- * repo-x8j6 — repoint people who were pinned at the institution that honors or buried them,
- * and lint the whole catalog for the same shape.
- *
- * repo-9ki8 found Harriet Tubman pinned at her visitor center. The same shape turned out to be
- * everywhere: 31 people on the Baseball Hall of Fame's coordinate in Cooperstown, 11 members of
- * Congress on the US Capitol, 10 military figures on Arlington National Cemetery. Nobody was born
- * in a hall of fame. On a catalog whose tagline is "History, pinned to place," the Atlas was
- * saying 31 Black baseball figures are from upstate New York.
- *
- * Retro fix: repoint each person to their documented birthplace, resolved through the existing
- * local city-centroid lookup (packages/domain/src/geocode/city-centroid.ts) — no new geocoding
- * dependency, no network call. Precision becomes `city`, which is what a city centroid actually
- * supports; the old `site`/`institution` asserted a building.
- *
- * Where no birthplace could be sourced, the pin is REMOVED rather than left on the honoring
- * institution. A missing pin is honest; a wrong one is not.
- *
- * Non-US birthplaces (2026-09-12 OWNER RULING, repo-9rkh: "the Atlas supports non-US
- * birthplaces") try `lookupNonUsCityCentroid`'s small curated table first — still no network
- * call, same "documented city, no invented coordinate" posture as the US path. This line used to
- * say non-US birthplaces were cleared unconditionally because the centroid dataset was US-only;
- * that was true when it was written and is why José Méndez, Martín Dihigo, and Cristóbal
- * Torriente (Cárdenas/Matanzas/Cienfuegos, Cuba) sat unpinned until repo-9rkh added the non-US
- * table. A city/country pair still missing from that table is cleared exactly as before.
- *
- * Go-forward fix: ./lib/pin-saturation-linter.ts runs over the whole catalog on every invocation
- * and fails when people stack on an exact coordinate. Genuine co-location (the nine people
- * murdered at Emanuel AME) is exempted by coordinate, with a written reason.
- *
- * Usage (from repo root):
- *   set -a && source apps/web/.env.local && set +a
- *   export DATABASE_SSL=1
- *   node --conditions development --import tsx packages/ops-data/scripts/fix-pin-saturation.ts
- *
- * Apply:
- *   DRY_RUN=0 FIX_PIN_SATURATION_APPLY=1 node --conditions development --import tsx \
- *     packages/ops-data/scripts/fix-pin-saturation.ts
- *
- * After applying, rebuild the release graph if adjacency/geo views depend on it.
+ * Replaces institutional pins on person records with sourced birthplace city centroids, or
+ * removes the pin when no supported location is available. Supports explicitly curated US and
+ * non-US city matches. Runs the pin-saturation audit with documented exceptions for genuine
+ * co-location. Writes require DRY_RUN=0 and FIX_PIN_SATURATION_APPLY=1.
  */
 import { readFileSync } from 'node:fs';
 import pg from 'pg';
@@ -55,10 +20,8 @@ const BIRTHPLACE_INPUT = process.env.BIRTHPLACE_INPUT ?? '';
 const CATALOG_GEOHASH_LENGTH = 5;
 
 /**
- * Display names for the ISO 3166-1 alpha-2 `birth_country` codes this catalog has needed so far
- * (repo-9rkh). Extend alongside `NON_US_CITY_CENTROIDS`
- * (packages/domain/src/geocode/city-centroid.ts) as new non-US birthplaces are documented; a
- * code missing here falls back to the bare ISO code rather than failing the run.
+ * Display labels for supported ISO country codes. Extend alongside the curated non-US
+ * city-centroid table; unknown codes retain their ISO value.
  */
 const NON_US_COUNTRY_LABELS: Readonly<Record<string, string>> = {
   CU: 'Cuba',
@@ -96,8 +59,8 @@ async function auditPinSaturation(client: pg.Client, label: string): Promise<voi
     precision: string | null;
   }>(
     `SELECT entity_id, kind, lat, lng, location ->> 'precision' AS precision
-     FROM bb_public.release_entities
-     WHERE release_id = (SELECT release_id FROM bb_public.v_active_release_id)`,
+     FROM published.release_entities
+     WHERE release_id = (SELECT release_id FROM published.v_active_release_id)`,
   );
   const report = lintPinSaturation(rows.map((row) => ({ ...row, entityId: row.entity_id })));
   console.log(`\n=== Pin saturation (${label}) ===`);
@@ -220,7 +183,7 @@ async function main(): Promise<void> {
 
     const releaseId = (
       await client.query<{ release_id: string }>(
-        `SELECT release_id FROM bb_public.active_release LIMIT 1`,
+        `SELECT release_id FROM published.active_release LIMIT 1`,
       )
     ).rows[0]?.release_id;
     if (!releaseId) throw new Error('no active release');
@@ -239,7 +202,7 @@ async function main(): Promise<void> {
         const locationJson = JSON.stringify(location);
         const label = `${entry.city}, ${entry.state}`;
         await client.query(
-          `UPDATE bb_public.release_entities
+          `UPDATE published.release_entities
            SET projection = jsonb_set(
                  jsonb_set(projection, '{location}', $3::jsonb, true),
                  '{locationLabel}', to_jsonb($4::text), true
@@ -248,20 +211,20 @@ async function main(): Promise<void> {
           [releaseId, entry.id, locationJson, label],
         );
         await client.query(
-          `UPDATE bb_public.search_index SET geohash = $3 WHERE release_id = $1 AND entity_id = $2`,
+          `UPDATE published.search_index SET geohash = $3 WHERE release_id = $1 AND entity_id = $2`,
           [releaseId, entry.id, entry.geohash],
         );
       }
 
       for (const entry of clearPin) {
         await client.query(
-          `UPDATE bb_public.release_entities
+          `UPDATE published.release_entities
            SET projection = (projection - 'location') - 'locationLabel'
            WHERE release_id = $1 AND entity_id = $2`,
           [releaseId, entry.id],
         );
         await client.query(
-          `UPDATE bb_public.search_index SET geohash = NULL WHERE release_id = $1 AND entity_id = $2`,
+          `UPDATE published.search_index SET geohash = NULL WHERE release_id = $1 AND entity_id = $2`,
           [releaseId, entry.id],
         );
       }

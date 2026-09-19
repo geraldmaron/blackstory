@@ -12,7 +12,7 @@
  * also imports `getSeedStoryProjection`, purely as a ready-made
  * StoryProjection-shaped test fixture unrelated to that admin workflow.
  *
- * Decision (repo-zcnr, 2026-09-12): kept, not dead code. Retiring this file
+ * Decision: kept, not dead code. Retiring this file
  * would break the admin cover-package workflow above, so it stays until that
  * workflow gets a real-article data source (separate, larger work). Checked
  * against the theme-packet slug bindings in
@@ -20,7 +20,7 @@
  * no overlap with these five legacy slugs, so no conflict there either.
  *
  * This fixture is also the only thing keeping `publicStoryProjectionSchema`
- * alive in `@repo/schemas` (repo-vn1z). `public-story-seed.test.ts` parses
+ * alive in `@repo/schemas`. `public-story-seed.test.ts` parses
  * every story through that schema so the tie is enforced, not just asserted
  * here.
  */

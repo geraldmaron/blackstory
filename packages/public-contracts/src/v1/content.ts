@@ -1,8 +1,7 @@
 /**
  * Public supporting-content (Learn surface) shape — extracted from
  * `apps/web/src/data/stories-seed.ts`'s `StoryRecord`/`StorySection`, the longform editorial
- * article shape backing `/stories` and the pattern MOB-015 ("Learn and supporting public content
- * surfaces") follows for mobile. Every field on `StoryRecord` was already public-safe (it is
+ * article shape backing `/stories` and the supporting-content contract used by mobile. Every field on `StoryRecord` was already public-safe (it is
  * rendered directly on the public web app today); this schema adds bounds only.
  */
 import { z } from 'zod';

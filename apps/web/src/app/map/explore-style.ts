@@ -734,8 +734,8 @@ export function buildExploreMapStyle(input: BuildExploreMapStyleInput): StyleSpe
       },
       [EXPLORE_ENTITIES_SOURCE_ID]: {
         type: 'geojson',
-        // Address features by their own record id so the decade morph can hold the records that
-        // survive a decade change still (repo-o56o). Safe alongside clustering: MapLibre promotes
+        // Address features by their record id so the decade morph can hold records that appear in
+        // both decades. This is safe alongside clustering: MapLibre promotes
         // the property when it is there and keeps its generated id for a cluster, which has none.
         promoteId: 'entityId',
         // eslint-disable-next-line @typescript-eslint/no-explicit-any -- GeoJSON ambient namespace unavailable
@@ -859,7 +859,7 @@ export function buildExploreMapStyle(input: BuildExploreMapStyleInput): StyleSpe
            (`explore-street-casing`/`-fill` below, minzoom 8). `maxzoom` hands off exactly where
            that local layer picks the same classes back up at their own tuned widths, so the two
            never double-paint the same geometry. `plate.road` had no consumer until this layer;
-           see repo-rnlh. */
+           see the shared palette role. */
         id: 'plate-road',
         type: 'line',
         source: OPENFREEMAP_SOURCE_ID,
@@ -1014,12 +1014,8 @@ export function buildExploreMapStyle(input: BuildExploreMapStyleInput): StyleSpe
         },
       },
       {
-        // County hairlines (the related workstream): the fainter tier of the same boundary system as
-        // the state bounds line below it in this array — theme-aware ink (stone on light, paper on
-        // dark), thinner and more transparent, fading in from `minzoom` so the national frame stays
-        // clean. Sits BELOW state bounds (so state borders keep reading stronger) and far below the
-        // entity marker stack, whose zoom-scaled radius (marker-size.ts's `markerZoomScaleExpression`)
-        // keeps a circle proportionate to the county polygon behind it at every zoom.
+        // County boundaries use thinner, more transparent theme-aware ink beneath state borders
+        // and entity markers. Their zoom range preserves a clear national frame.
         id: EXPLORE_COUNTY_LINES_LAYER_ID,
         type: 'line',
         source: EXPLORE_COUNTY_LINES_SOURCE_ID,

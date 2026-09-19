@@ -1,8 +1,8 @@
 /**
- * Deterministic WS4 relationship candidate sweep from bb_canonical signals.
+ * Deterministic relationship-candidate sweep from canonical signals.
  * Feeds proposeRelationshipCandidates (geohash, jurisdiction, mentions, decade overlap),
  * ranks with explainable score components, and stages to landscape_candidates — never
- * writes bb_canonical.entity_relationships.
+ * writes canonical.entity_relationships.
  *
  * Usage (from repo root):
  *   set -a && source apps/web/.env.local && set +a
@@ -53,29 +53,29 @@ SELECT
   el.valid_to_edtf,
   COALESCE(re.projection->'eraBuckets', '[]'::jsonb) AS era_buckets,
   COALESCE(re.projection->'mentionedEntityIds', '[]'::jsonb) AS mentioned_entity_ids
-FROM bb_canonical.entities e
+FROM canonical.entities e
 LEFT JOIN LATERAL (
   SELECT geohash, precision, jurisdiction_ids, label, valid_from_edtf, valid_to_edtf
-  FROM bb_canonical.entity_locations
+  FROM canonical.entity_locations
   WHERE entity_id = e.id
   ORDER BY CASE role WHEN 'historical' THEN 0 WHEN 'current' THEN 1 ELSE 2 END, id
   LIMIT 1
 ) el ON true
-LEFT JOIN bb_public.release_entities re
+LEFT JOIN published.release_entities re
   ON re.entity_id = e.id
-LEFT JOIN bb_public.active_release ar
+LEFT JOIN published.active_release ar
   ON re.release_id = ar.release_id
 ORDER BY e.id
 `;
 
 const RELATIONSHIP_SQL = `
 SELECT from_entity_id, to_entity_id, relationship_type AS type
-FROM bb_canonical.entity_relationships
+FROM canonical.entity_relationships
 `;
 
 const PARTICIPATION_SQL = `
 SELECT event_id, participant_id, role
-FROM bb_canonical.event_participation
+FROM canonical.event_participation
 `;
 
 type EntityRow = {
@@ -271,7 +271,7 @@ async function main(): Promise<void> {
 
     await client.query('BEGIN');
     await client.query(
-      `INSERT INTO bb_research.source_program_runs
+      `INSERT INTO research.source_program_runs
         (id, lane, source_program_id, source_program_name, retrieved_at, rows_fetched, candidate_count, summary, updated_at)
        VALUES ($1, 'other', $2, $3, now(), $4, $5, $6::jsonb, now())
        ON CONFLICT (id) DO UPDATE SET
@@ -292,7 +292,7 @@ async function main(): Promise<void> {
     let inserted = 0;
     for (const row of rows) {
       const result = await client.query(
-        `INSERT INTO bb_research.landscape_candidates
+        `INSERT INTO research.landscape_candidates
           (id, run_id, lane, source_program_id, source_item_id, display_name, kind, summary,
            canonical_url, research_lane_only, status, provenance, payload, discovered_at, updated_at)
          VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,true,$10,$11::jsonb,$12::jsonb,$13,now())
@@ -318,7 +318,7 @@ async function main(): Promise<void> {
     }
     await client.query('COMMIT');
     console.log(
-      `\nStaged ${inserted} new rows to bb_research.landscape_candidates (lane='${RELATIONSHIP_INFERENCE_LANE}').`,
+      `\nStaged ${inserted} new rows to research.landscape_candidates (lane='${RELATIONSHIP_INFERENCE_LANE}').`,
     );
   } catch (error) {
     await client.query('ROLLBACK').catch(() => {});

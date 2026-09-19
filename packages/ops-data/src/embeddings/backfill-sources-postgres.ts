@@ -1,24 +1,5 @@
-/**
- * Postgres entity source + hash lookup for the embedding backfill CLI, replacing the
- * Firestore-backed sources in `backfill-sources.ts` after the Postgres cutover
- * (`docs/decisions-carryover.md`, "entity source-of-truth precedence") —
- * `canonicalEntities`/`publicSearchIndex` no longer exist (`docs/data/firebase-wind-down.md`).
- *
- * Reads `bb_public.release_entities` for the currently active release: the same public
- * projection (display_name, kind, summary) apps/api-public and apps/web already serve reads
- * from, so what gets embedded matches what a reader actually sees. The `location` COLUMN on
- * this table is lat/lng/geohash only, but `projection->>'jurisdictionLabel'` carries a "City,
- * State" label on nearly every row, and this source resolves the `state` pre-filter from it with
- * the same `parseStateCodeFromJurisdiction` the old search-index source used on the identical
- * label shape (`backfill-sources.ts`) — no cross-schema join needed, and one would break this
- * module's design principle of embedding only what the public projection already contains.
- * `eraBucket` is still omitted: no kind-specific year fields (birthYear, startAt, ...) survive
- * projection into this table, so there is nothing to resolve it from without that same join. It
- * remains a valid `undefined` input to `deriveEntityFilters` (text.ts) — filtering on `kind`
- * (and now `state`) still works, and the endpoint's `eraBucket` query param simply matches
- * nothing extra until a richer source is wired.
- */
-import type { EntityKindDoc } from '../firestore/types.js';
+/** Postgres sources and existing-content-hash lookup for bounded embedding backfills. */
+import type { EntityKindDoc } from '../records/types.js';
 import type { CanonicalEntitySource, ExistingEmbeddingHashLookup } from './backfill-cli.js';
 import { parseStateCodeFromJurisdiction } from './backfill-sources.js';
 import type { EntityEmbeddingInput } from './pipeline.js';
@@ -58,7 +39,7 @@ type ReleaseEntityRow = {
   readonly jurisdiction_label: string | null;
 };
 
-/** Pages `bb_public.release_entities` (active release) ordered by entity_id. Skips missing display_name. */
+/** Pages `published.release_entities` (active release) ordered by entity_id. Skips missing display_name. */
 export function createPostgresCanonicalEntitySource(
   query: PostgresQueryExecutor,
   pageSize = PAGE_SIZE,
@@ -68,8 +49,8 @@ export function createPostgresCanonicalEntitySource(
       const rows = await query<ReleaseEntityRow>(
         `SELECT re.entity_id, re.display_name, re.kind, re.summary,
                 re.projection->>'jurisdictionLabel' AS jurisdiction_label
-         FROM bb_public.release_entities re
-         JOIN bb_public.active_release ar ON ar.release_id = re.release_id
+         FROM published.release_entities re
+         JOIN published.active_release ar ON ar.release_id = re.release_id
          WHERE re.entity_id > COALESCE($1, '')
          ORDER BY re.entity_id ASC
          LIMIT $2`,
@@ -109,7 +90,7 @@ export function createPostgresCanonicalEntitySource(
   };
 }
 
-/** Looks up the stored `source_text_hash` per entity from `bb_canonical.entity_embeddings`. */
+/** Looks up the stored `source_text_hash` per entity from `canonical.entity_embeddings`. */
 export function createPostgresExistingHashLookup(
   query: PostgresQueryExecutor,
 ): ExistingEmbeddingHashLookup {
@@ -118,7 +99,7 @@ export function createPostgresExistingHashLookup(
   async function loadAll(): Promise<Map<string, string>> {
     if (!cache) {
       const rows = await query<{ readonly entity_id: string; readonly source_text_hash: string }>(
-        'SELECT entity_id, source_text_hash FROM bb_canonical.entity_embeddings',
+        'SELECT entity_id, source_text_hash FROM canonical.entity_embeddings',
         [],
       );
       cache = new Map(rows.map((row) => [row.entity_id, row.source_text_hash]));

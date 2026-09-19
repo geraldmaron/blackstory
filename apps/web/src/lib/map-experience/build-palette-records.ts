@@ -6,11 +6,11 @@
  * a subject the index does not carry is a subject the palette cannot find, so what belongs in a
  * `PaletteRecord` is the whole question and it deserves to be answerable in isolation.
  *
- * Four fields beyond name and place, added in repo-92n2.35: topic labels, kind label, era label,
+ * The index includes four fields beyond name and place: topic labels, kind label, era label, and
  * summary. Topic labels resolve through the controlled taxonomy rather than shipping the slug,
  * because a reader types "restrictive covenant" and the id reads `restrictive-covenants`.
  *
- * `buildUnmappedPaletteRecords` (repo-jnmwu) is the second half of that same corpus. A map
+ * `buildUnmappedPaletteRecords` is the second half of that same corpus. A map
  * feature only exists for an entity `exploreMapSourceFor` could place — it drops anything with
  * no resolvable `geoAnchor` (most laws, cases, and national organizations), so a palette built
  * from `view.allFeatures` alone answered a query differently on `/explore` than `/search/api`

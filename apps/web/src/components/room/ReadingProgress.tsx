@@ -7,7 +7,7 @@
  * Reference build: `.design-mocks/blackstory-atlas-v9.html`, `#docprog` (line 965) and
  * `updateProgress()` (line 5163).
  *
- * SP-27 (repo-92n2.34). The rule belongs to the Reading surface class, not to a screen: this is
+ * The rule belongs to the Reading surface class, not to a screen: this is
  * mounted exactly once, in `ShellPageTransition.tsx` — the one place a route's surface class is
  * already resolved for every page — rather than composed into each room's own markup. A screen
  * that wants the gauge does not import anything, and a screen that should not have one cannot

@@ -1,18 +1,15 @@
 # Database compromise
 
-## Trigger and triage
+Preserve database audit records, affected table/key ranges, actor identities and the earliest
+confirmed compromise time. Do not copy sensitive rows into incident messages.
 
-- Trigger on unauthorized Firestore reads/writes, rules/IAM changes, bulk mutation, or audit-log gaps.
-- Identify collections, principals, operations, and time range; preserve Cloud Audit Logs and exports.
+1. Pause publication and affected research/intake writers with the supported kill switches.
+2. Revoke compromised database credentials and Supabase sessions; rotate reachable secrets.
+3. Inspect schema grants, RLS policies, role memberships and privileged functions for changes.
+4. Keep a verified release artifact available if the database must be isolated. Confirm its
+   actual availability before relying on degraded mode.
+5. Restore a verified backup into a separate database using [recovery](../backup-restore.md).
+   Compare row counts, hashes, release manifests, authorization and storage references.
+6. Repair unauthorized changes, canary read-only access, then restore writes deliberately.
 
-## Contain
-
-1. Engage `publication`, submissions, research, exports, uploads, and queue processing.
-2. Enter `public-static-mode` so immutable snapshots remain readable without canonical access.
-3. Revoke affected Firestore identities/bindings independently and block further canonical mutation.
-
-## Recover
-
-- Roll public output back with  when sufficient; use [`../backup-restore.md`](../backup-restore.md) PITR/export recovery for canonical corruption.
-- Restore into an isolated database first, verify counts/hashes and release manifests, then perform a controlled migration.
-- Rotate reachable credentials, repair rules/IAM, and canary read-only access before writes.
+A credential rotation does not repair corrupted records. A schema reset does not prove recovery.

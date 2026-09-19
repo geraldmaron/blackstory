@@ -1,5 +1,5 @@
 /**
- * One bounded corroboration pass for pending landscape intake below the 0.75 publish gate.
+ * One bounded corroboration pass for pending landscape intake below the publication gate.
  * Fetches each row's canonical_url, finds an independent Tier-1/Tier-2 source via
  * lib/corroborate-source.ts, and writes provenance.sourceUrl on the landscape row.
  * Never publishes — run publish-release-entities-incremental.ts after review.
@@ -36,7 +36,7 @@ const APPLY = process.env.LANDSCAPE_ENRICH_APPLY === '1';
 
 const PENDING_BELOW_GATE_SQL = `
 WITH active AS (
-  SELECT release_id FROM bb_public.active_release LIMIT 1
+  SELECT release_id FROM published.active_release LIMIT 1
 )
 SELECT
   lc.id,
@@ -53,20 +53,20 @@ SELECT
   EXISTS (
     SELECT 1
     FROM active a
-    JOIN bb_public.release_entities re
+    JOIN published.release_entities re
       ON re.release_id = a.release_id
       AND re.entity_id = ANY(ARRAY[lc.id, lc.source_item_id])
   ) AS exact_in_release,
   EXISTS (
     SELECT 1
     FROM active a
-    JOIN bb_public.release_entities re
+    JOIN published.release_entities re
       ON re.release_id = a.release_id
       AND lower(re.display_name) = lower(lc.display_name)
       AND re.entity_id <> lc.id
       AND re.entity_id <> lc.source_item_id
   ) AS name_overlap
-FROM bb_research.landscape_candidates lc
+FROM research.landscape_candidates lc
 WHERE lc.status = 'pending'
   -- Persons/People stay excluded unless an operator recorded a privacy review
   -- (payload.personReview), mirroring gateLandscapePublishCandidate. The
@@ -177,15 +177,15 @@ async function main(): Promise<void> {
 
   try {
     const pendingBefore = await client.query(
-      `SELECT COUNT(*)::text AS n FROM bb_research.landscape_candidates WHERE status = 'pending'`,
+      `SELECT COUNT(*)::text AS n FROM research.landscape_candidates WHERE status = 'pending'`,
     );
     const releaseBefore = await client.query(
       `SELECT COUNT(*)::text AS n
-       FROM bb_public.release_entities re
-       JOIN bb_public.active_release ar ON ar.release_id = re.release_id`,
+       FROM published.release_entities re
+       JOIN published.active_release ar ON ar.release_id = re.release_id`,
     );
     const activeRelease = await client.query(
-      `SELECT release_id FROM bb_public.active_release LIMIT 1`,
+      `SELECT release_id FROM published.active_release LIMIT 1`,
     );
     const releaseId = activeRelease.rows[0]?.release_id as string | undefined;
     if (!releaseId) {
@@ -207,8 +207,7 @@ async function main(): Promise<void> {
     const updates: Array<{
       readonly id: string;
       readonly displayName: string;
-      readonly beforeConfidence?: number | undefined;
-      readonly afterConfidence?: number | undefined;
+      readonly reviewBasis?: 'independent_review' | undefined;
       readonly corroboratingUrl?: string | undefined;
       readonly method?: string | undefined;
       readonly status: 'updated' | 'unchanged' | 'already_had' | 'clears_gate';
@@ -228,7 +227,7 @@ async function main(): Promise<void> {
           updates.push({
             id: row.id,
             displayName: row.display_name,
-            afterConfidence: beforeGate.confidence,
+            reviewBasis: beforeGate.reviewBasis,
             status: 'clears_gate',
           });
           return;
@@ -296,13 +295,13 @@ async function main(): Promise<void> {
           releaseId,
           generatedAt,
         });
-        const afterConfidence = afterGate.eligible ? afterGate.confidence : undefined;
+        const reviewBasis = afterGate.eligible ? afterGate.reviewBasis : undefined;
         const clearsGate = afterGate.eligible;
         if (clearsGate) wouldClearGate += 1;
 
         if (APPLY && !DRY_RUN) {
           await client.query(
-            `UPDATE bb_research.landscape_candidates
+            `UPDATE research.landscape_candidates
              SET provenance = provenance || $2::jsonb,
                  payload = payload || $3::jsonb
              WHERE id = $1 AND status = 'pending'`,
@@ -313,7 +312,7 @@ async function main(): Promise<void> {
         updates.push({
           id: row.id,
           displayName: row.display_name,
-          afterConfidence,
+          reviewBasis,
           corroboratingUrl: corroborationUrl,
           method: corroboration.method,
           status: clearsGate ? 'clears_gate' : 'updated',
@@ -326,15 +325,15 @@ async function main(): Promise<void> {
     const pendingAfter =
       APPLY && !DRY_RUN
         ? await client.query(
-            `SELECT COUNT(*)::text AS n FROM bb_research.landscape_candidates WHERE status = 'pending'`,
+            `SELECT COUNT(*)::text AS n FROM research.landscape_candidates WHERE status = 'pending'`,
           )
         : pendingBefore;
     const releaseAfter =
       APPLY && !DRY_RUN
         ? await client.query(
             `SELECT COUNT(*)::text AS n
-             FROM bb_public.release_entities re
-             JOIN bb_public.active_release ar ON ar.release_id = re.release_id`,
+             FROM published.release_entities re
+             JOIN published.active_release ar ON ar.release_id = re.release_id`,
           )
         : releaseBefore;
 
@@ -361,7 +360,7 @@ async function main(): Promise<void> {
     console.log(`Corroborated: ${corroborated}`);
     console.log(`Already clears gate: ${alreadyClearsGate}`);
     console.log(`Unchanged (no corroboration found): ${unchanged}`);
-    console.log(`Would clear 0.75 gate: ${wouldClearGate}`);
+    console.log(`Would clear publication gate: ${wouldClearGate}`);
     console.log(`Report: ${REPORT_PATH}`);
     if (DRY_RUN || !APPLY) {
       console.log(

@@ -134,7 +134,7 @@ test('deriveEntityLivingStatus derives deceased from person.deathYear, unknown o
     id: 'ent-person-4',
     kind: 'person',
     displayName: 'Historical Figure',
-    person: { livingStatus: 'unknown', birthYear: 1929, deathYear: 1968 },
+    person: { birthYear: 1929, deathYear: 1968 },
     createdAt: NOW,
     updatedAt: NOW,
   };

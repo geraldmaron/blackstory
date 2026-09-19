@@ -1,0 +1,100 @@
+{
+  "source": "U.S. Bureau of the Census, U.S. Census of Population: 1960, Vol. I, Characteristics of the Population, Part 44, Tennessee, Chapter C, General Social and Economic Characteristics",
+  "sourceUrl": "https://www2.census.gov/library/publications/decennial/1960/population-volume-1/37749959v1p44ch4.pdf",
+  "table": "Table 53",
+  "page": "44-152",
+  "boundaryVersion": "us-states-1960",
+  "datasetVintage": "1963 printed volume",
+  "figures": [
+    {
+      "metricId": "lives-unemployed",
+      "jurisdictionId": "state:47",
+      "referencePeriod": "1960",
+      "raceEthnicitySlice": "all",
+      "estimate": 5.2,
+      "numerator": 67144,
+      "denominator": 1289401,
+      "universe": "Civilian labor force; persons 14 years old and over; both sexes"
+    },
+    {
+      "metricId": "lives-unemployed",
+      "jurisdictionId": "state:47",
+      "referencePeriod": "1960",
+      "raceEthnicitySlice": "white",
+      "estimate": 5.0,
+      "numerator": 53974,
+      "denominator": 1087020,
+      "universe": "Civilian labor force; WHITE; both sexes"
+    },
+    {
+      "metricId": "lives-unemployed",
+      "jurisdictionId": "state:47",
+      "referencePeriod": "1960",
+      "raceEthnicitySlice": "nonwhite",
+      "estimate": 6.5,
+      "numerator": 13170,
+      "denominator": 202381,
+      "universe": "Civilian labor force; NONWHITE; both sexes"
+    },
+    {
+      "metricId": "lives-unemployed",
+      "jurisdictionId": "state:47",
+      "referencePeriod": "1950",
+      "raceEthnicitySlice": "all",
+      "estimate": 3.9,
+      "numerator": 46422,
+      "denominator": 1182068,
+      "universe": "Civilian labor force; both sexes"
+    },
+    {
+      "metricId": "lives-unemployed",
+      "jurisdictionId": "state:47",
+      "referencePeriod": "1950",
+      "raceEthnicitySlice": "white",
+      "estimate": 3.5,
+      "numerator": 34165,
+      "denominator": 973751,
+      "universe": "Civilian labor force; WHITE; both sexes"
+    },
+    {
+      "metricId": "lives-unemployed",
+      "jurisdictionId": "state:47",
+      "referencePeriod": "1950",
+      "raceEthnicitySlice": "nonwhite",
+      "estimate": 5.9,
+      "numerator": 12257,
+      "denominator": 208317,
+      "universe": "Civilian labor force; NONWHITE; both sexes"
+    },
+    {
+      "metricId": "lives-unemployed",
+      "jurisdictionId": "state:47",
+      "referencePeriod": "1940",
+      "raceEthnicitySlice": "all",
+      "estimate": 12.1,
+      "numerator": 130190,
+      "denominator": 1071604,
+      "universe": "Civilian labor force; both sexes"
+    },
+    {
+      "metricId": "lives-unemployed",
+      "jurisdictionId": "state:47",
+      "referencePeriod": "1940",
+      "raceEthnicitySlice": "white",
+      "estimate": 11.8,
+      "numerator": 100022,
+      "denominator": 847540,
+      "universe": "Civilian labor force; WHITE; both sexes"
+    },
+    {
+      "metricId": "lives-unemployed",
+      "jurisdictionId": "state:47",
+      "referencePeriod": "1940",
+      "raceEthnicitySlice": "nonwhite",
+      "estimate": 13.5,
+      "numerator": 30168,
+      "denominator": 224064,
+      "universe": "Civilian labor force; NONWHITE; both sexes"
+    }
+  ]
+}

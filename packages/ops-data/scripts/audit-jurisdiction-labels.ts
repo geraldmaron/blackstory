@@ -1,21 +1,6 @@
 /**
- * repo-2t04.2 — detector for country-only jurisdictionLabel values ("United States", "USA", "U.S.")
- * on live release_entities. Read-only, so it can run before AND after a fix (repo-2t04.2's
- * residual sweep, repo-tjqn's NRHP republish) to prove the count moved, and again later as a
- * regression check.
- *
- * Deliberately does NOT reuse `isDisplayableJurisdictionLabel` from @repo/domain here: that
- * function also rejects "Unknown", which is a legitimately different defect (missing data) from
- * a country-only literal (wrong-grained data) — conflating the two hides whichever is smaller,
- * same reasoning as audit-live-depth-gate.ts keeping its leak and depth checks separate. This
- * script's country-literal pattern intentionally matches the one is-displayable already rejects,
- * so the two can never disagree about what counts.
- *
- * Usage (from repo root):
- *   set -a && source apps/web/.env.local && set +a
- *   export DATABASE_SSL=1
- *   node --conditions development --import tsx \
- *     packages/ops-data/scripts/audit-jurisdiction-labels.ts
+ * Read-only audit of country-only jurisdiction labels. Distinguishes wrong-grained labels from
+ * missing labels such as Unknown so each defect remains measurable.
  */
 import pg from 'pg';
 import { normalizePgConnectionString } from './lib/pg-connection.ts';
@@ -56,14 +41,14 @@ async function main(): Promise<void> {
   try {
     const releaseId = (
       await client.query<{ release_id: string }>(
-        `SELECT release_id FROM bb_public.active_release LIMIT 1`,
+        `SELECT release_id FROM published.active_release LIMIT 1`,
       )
     ).rows[0]?.release_id;
     if (!releaseId) throw new Error('no active release');
 
     const rows = await client.query<{ entity_id: string; label: string | null }>(
       `SELECT entity_id, projection ->> 'jurisdictionLabel' AS label
-       FROM bb_public.release_entities
+       FROM published.release_entities
        WHERE release_id = $1`,
       [releaseId],
     );

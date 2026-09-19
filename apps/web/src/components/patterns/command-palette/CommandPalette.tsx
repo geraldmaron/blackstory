@@ -24,6 +24,8 @@ import { cx } from '@repo/ui';
 import { isTypingTarget, matchesPaletteOpen } from '../../../lib/keyboard/bindings';
 import { normalizeTypeaheadQuery, typeaheadMatchTier } from '../../../lib/typeahead/match';
 import { COMMANDS, type Command, type CommandContext } from './command-registry';
+import type { DestinationIconId } from '@repo/public-contracts/destinations';
+import { DestinationIcon } from '../DestinationIcon';
 import './command-palette.css';
 
 void React;
@@ -35,11 +37,9 @@ const MAX_STATE_ROWS = 4;
 /**
  * One record in the palette's client index.
  *
- * Name and place were the whole index until repo-92n2.35. A reader who types a subject rather
- * than a proper noun — "restrictive covenant", "Great Migration" — knows what happened without
- * knowing what any single record is called, and against a name/place index that reader got an
- * empty palette. The four subject fields below are indexed but not all displayed: what a row
- * shows is `place`, plus the field the match actually landed in when that was something else.
+ * The index includes subject fields so a reader can search for what happened without knowing a
+ * record's proper name. The subject fields below are indexed but not all displayed: a row shows
+ * `place`, plus the field the match actually landed in when that was something else.
  */
 export type PaletteRecord = {
   readonly id: string;
@@ -76,6 +76,7 @@ export type PaletteState = {
 export type PaletteDestination = {
   readonly href: string;
   readonly label: string;
+  readonly icon: DestinationIconId;
 };
 
 export type CommandPaletteProps = {
@@ -467,6 +468,7 @@ export function CommandPalette({
                   {row.kind === 'destination' ? (
                     <>
                       <span className="ds-palette__title">
+                        <DestinationIcon id={row.destination.icon} />
                         <Highlighted text={row.destination.label} query={query} />
                       </span>
                       <span className="ds-palette__meta">{row.destination.href}</span>

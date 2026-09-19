@@ -51,6 +51,8 @@ Live instrument chrome belongs on `/explore`. See [`v10/design-doc-reconciliatio
 | **Map entity encoding** | [`patterns-map-entity-encoding.md`](./patterns-map-entity-encoding.md) | `kind-encoding.ts`, `MapExperienceLegend.tsx`, `explore-style.ts` | Binding (map surfaces) |
 | **Map canvas lifecycle** | [`patterns-map-canvas.md`](./patterns-map-canvas.md) | `map-libre-lifecycle.ts`, `MapStage.tsx`, `EntityLocationMap.tsx` | Binding (cross-browser WebGL) |
 | **Edition fact icon** | [`patterns-edition-fact-icon.md`](./patterns-edition-fact-icon.md) | [`patterns-registry.md`](./patterns-registry.md) | Reusable |
+| **Destination icon** | [`patterns-destination-icon.md`](./patterns-destination-icon.md) | [`patterns-registry.md`](./patterns-registry.md) | Reusable |
+| **How it works hub** | [`patterns-how-it-works.md`](./patterns-how-it-works.md) | `app/how-it-works/*`, Data decade spine | Binding |
 | **Browse mode** | [`patterns-browse-mode.md`](./patterns-browse-mode.md) | [`patterns-registry.md`](./patterns-registry.md) | Reusable |
 | **Relationship constellation** | [`patterns-relationship-constellation.md`](./patterns-relationship-constellation.md) | `RelationshipConstellation.tsx` | Reusable (Place typed edges) |
 | **Footer** | [`patterns-site-footer.md`](./patterns-site-footer.md) | `SiteFooter.tsx`, `shell.css` `.ds-shell-footer*` | Reusable. Rewritten from the destination registry in SP-15 |

@@ -1,62 +1,7 @@
 /**
- * repo-kdmrc (dignity slice) — repairs the published `notabilityBasis` on records about racial
- * terror killings, and on any record whose inclusion basis was built from an accusation.
- *
- * Two defects, both visible on live pages:
- *
- * 1. WRONG CRITERION. 31 of the 32 `lynching_*` person records carried
- *    `criterion: 'documented_site'`, whose ratified rubric text reads "The entity is a documented
- *    site of a historically significant event or practice (a sit-in lunch counter, a Freedom
- *    School...)". So the stated reason Alma Howze appears in this catalog was that she is a
- *    documented site. `documented_racial_terror` now exists for exactly this and is inferred
- *    ahead of every other criterion.
- *
- * 2. THE ACCUSATION AS THE REASON. `buildReleaseNotabilityBasis` emitted one basis record per
- *    claim predicate, which assumes every claim is an inclusion reason. For Alma Howze that
- *    published "Was accused of alleged murder of a dentist." as a reason she belongs here — the
- *    pretext the mob used, printed as this catalog's own justification. She was 16, pregnant and
- *    near term, and was taken from the Shubuta jail with her sister Maggie and the Clark brothers
- *    and hanged before any trial. The Equal Justice Initiative's Lynching in America records that
- *    nearly every victim was killed without being legally convicted of any offense, that such
- *    accusations were routinely fabricated, and that they were rarely seriously investigated.
- *
- * The accusation CLAIM is deliberately left in place. It is documented history and belongs on the
- * record; it simply is not a reason for inclusion. Only `notabilityBasis` (and the
- * `notabilityLabels` derived from it) are rewritten here.
- *
- * The basis is recomputed by calling `buildReleaseNotabilityBasis` itself on the row's own
- * published claims, so this script cannot drift from the builder — there is no second copy of the
- * grouping, inference or note rules here.
- *
- * SECOND PASS, repo-90g0i. The first pass read one claim at a time, which cannot see a record
- * whose sentences are split across claims. Three cohorts carrying the identical defect were left
- * behind and are now in scope, via `isRacialTerrorRecord`:
- *
- *   - All nine of the Emanuel Nine, murdered at Emanuel AME on 17 June 2015. Susie Jackson's
- *     published reasons for inclusion were "Killed Susie Jackson.", "Date June 17, 2015.",
- *     "Location 110 Calhoun Street." and "Group Emanuel Nine." Tywanza Sanders's record carries
- *     `killed` six times and no context at all — the massacre is named only in his summary.
- *   - Denise McNair, Addie Mae Collins, Carole Robertson and Cynthia Wesley, killed in the 16th
- *     Street Baptist Church bombing, filed under `movement_significance`: "played a documented,
- *     non-incidental role in a named movement." They were eleven and fourteen.
- *   - Every massacre. `documented_racial_terror` was in use on 136 people and ZERO events, though
- *     its ratified text covers "the event or place where such a killing is documented."
- *
- * SCOPE. Only rows whose recomputed basis differs AND that are a racial-terror record or carry an
- * accusation. A killing by police or by a civilian claiming authority is deliberately OUT: the
- * Orangeburg Massacre, Breonna Taylor, Trayvon Martin and Eric Garner rest on a different
- * documentary record and get `documented_racial_killing` once ratified. The wider catalog-wide
- * `documented_site` category error is repo-kdmrc and docs/methodology/notability-rubric.md.
- *
- * Usage (from repo root):
- *   set -a && source apps/web/.env.local && set +a
- *   export DATABASE_SSL=1
- *   node --conditions development --import tsx \
- *     packages/ops-data/scripts/fix-racial-terror-notability-basis.ts
- *
- * Apply:
- *   DRY_RUN=0 FIX_RACIAL_TERROR_BASIS_APPLY=1 node --conditions development --import tsx \
- *     packages/ops-data/scripts/fix-racial-terror-notability-basis.ts
+ * Repairs inclusion reasons for racial-terror records. Accusations may remain attributed
+ * historical claims, but must not become the archive's reason for commemorating a victim. Use
+ * the shared rubric to select supported killing claims.
  */
 import pg from 'pg';
 import {
@@ -112,14 +57,14 @@ async function main(): Promise<void> {
 
   try {
     const active = await client.query<{ release_id: string }>(
-      `SELECT release_id FROM bb_public.v_active_release_id`,
+      `SELECT release_id FROM published.v_active_release_id`,
     );
     const releaseId = active.rows[0]?.release_id;
     if (!releaseId) throw new Error('No active release');
 
     const { rows } = await client.query<Row>(
       `SELECT entity_id, display_name, kind, summary, claims, projection, taxonomy
-         FROM bb_public.release_entities WHERE release_id = $1 ORDER BY entity_id`,
+         FROM published.release_entities WHERE release_id = $1 ORDER BY entity_id`,
       [releaseId],
     );
 
@@ -226,7 +171,7 @@ async function main(): Promise<void> {
       for (const change of changes) {
         const labels = [...new Set(change.after.map((b) => NOTABILITY_RUBRIC[b.criterion]))];
         await client.query(
-          `UPDATE bb_public.release_entities
+          `UPDATE published.release_entities
              SET projection = COALESCE(projection, '{}'::jsonb)
                    || jsonb_build_object('notabilityBasis', $1::jsonb, 'notabilityLabels', $2::jsonb)
            WHERE release_id = $3 AND entity_id = $4`,

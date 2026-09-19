@@ -3,12 +3,12 @@
  *
  * Authorization is decided from the verified user returned by auth.getUser(), which
  * re-validates the token against Supabase — never from the cookie payload alone, which
- * the browser controls. Role comes from app_metadata.bb_role only, matching the API path
+ * the browser controls. Role comes from app_metadata.app_role only, matching the API path
  * in supabase-session-authorizer.ts.
  */
 import { createServerClient } from '@supabase/ssr';
 import { cookies } from 'next/headers';
-import type { StaffRole } from './role-mutation';
+import type { StaffRole } from './staff-permissions';
 import {
   readSupabaseRoleFromAppMetadata,
   readSupabaseServerConfig,
@@ -41,7 +41,7 @@ async function createAdminServerClient() {
 
 /**
  * The verified staff identity for this request, or null when the caller is not signed
- * in or carries no recognized app_metadata.bb_role. A signed-in Supabase user without a
+ * in or carries no recognized app_metadata.app_role. A signed-in Supabase user without a
  * staff role is not an administrator and must be treated as anonymous.
  */
 export async function readVerifiedAdminIdentity(): Promise<ServerAdminIdentity | null> {

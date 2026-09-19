@@ -2,7 +2,8 @@
  * Machine-checkable evidence probes for launch gates (filesystem + harness smoke).
  */
 import { existsSync, readFileSync } from 'node:fs';
-import { join } from 'node:path';
+import { createHash } from 'node:crypto';
+import { isAbsolute, join, relative, resolve } from 'node:path';
 import { ALL_ADVERSARIAL_INTEGRITY_SCENARIO_IDS } from '../adversarial-integrity/types.js';
 import { ALL_LOAD_ABUSE_SCENARIO_IDS } from '../load-abuse/types.js';
 import { evaluateCorpus } from '../gold-corpus/metrics.js';
@@ -43,26 +44,70 @@ export function checkGoldCorpusPrecision(repoRoot: string): MachineCheckResult {
   return { pass: true };
 }
 
+/** A simulated report cannot establish that a backup was restored and inspected. */
 export function checkRestoreRehearsal(repoRoot: string): MachineCheckResult {
-  const runner = 'scripts/recovery-rehearsal/run-rehearsal.mjs';
-  const reportPath = 'scripts/recovery-rehearsal/fixtures/last-rehearsal-report.json';
-  const rollback = 'infra/github/release-pipeline/rollback-dry-run.sh';
-  for (const ref of [runner, reportPath, rollback]) {
-    if (!pathExists(repoRoot, ref)) {
-      return { pass: false, message: `Missing restore rehearsal evidence: ${ref}` };
+  const reportPath = 'artifacts/recovery/latest.json';
+  if (!pathExists(repoRoot, reportPath)) {
+    return { pass: false, message: `Missing executed recovery evidence: ${reportPath}` };
+  }
+  try {
+    const report = readJson(repoRoot, reportPath) as Record<string, unknown>;
+    if (
+      report.schemaVersion !== 1 ||
+      report.mode !== 'executed' ||
+      report.database !== 'postgres'
+    ) {
+      throw new Error('A versioned, executed Postgres restore report is required');
     }
+    for (const key of ['backupId', 'sourceId', 'destinationId', 'verifiedBy']) {
+      if (typeof report[key] !== 'string' || !String(report[key]).trim()) {
+        throw new Error(`Missing ${key}`);
+      }
+    }
+    if (report.sourceId === report.destinationId)
+      throw new Error('Restore destination must be isolated');
+    const completedAt = Date.parse(String(report.completedAt));
+    if (!Number.isFinite(completedAt) || completedAt > Date.now())
+      throw new Error('Invalid completion time');
+    for (const key of ['elapsedSeconds', 'rtoSeconds', 'dataLossSeconds', 'rpoSeconds']) {
+      if (
+        typeof report[key] !== 'number' ||
+        !Number.isFinite(report[key]) ||
+        Number(report[key]) < 0
+      ) {
+        throw new Error(`Invalid ${key}`);
+      }
+    }
+    if (
+      Number(report.rtoSeconds) === 0 ||
+      Number(report.elapsedSeconds) > Number(report.rtoSeconds) ||
+      Number(report.dataLossSeconds) > Number(report.rpoSeconds)
+    )
+      throw new Error('Recovery target exceeded');
+    const checks = report.checks as Record<string, unknown> | undefined;
+    for (const key of [
+      'rowCounts',
+      'contentHashes',
+      'authorization',
+      'publicProjection',
+      'storageObjects',
+    ]) {
+      if (checks?.[key] !== true) throw new Error(`Recovery check not verified: ${key}`);
+    }
+    if (typeof report.logPath !== 'string' || isAbsolute(report.logPath))
+      throw new Error('Invalid log path');
+    const logPath = resolve(repoRoot, report.logPath);
+    if (relative(resolve(repoRoot), logPath).startsWith('..'))
+      throw new Error('Log must be inside the evidence root');
+    const hash = createHash('sha256').update(readFileSync(logPath)).digest('hex');
+    if (hash !== report.logSha256) throw new Error('Recovery log hash mismatch');
+    return { pass: true };
+  } catch (error) {
+    return {
+      pass: false,
+      message: `Invalid recovery evidence: ${error instanceof Error ? error.message : String(error)}`,
+    };
   }
-  const report = readJson(repoRoot, reportPath) as {
-    allWithinRto?: boolean;
-    mode?: string;
-  };
-  if (report.mode !== 'dry-run') {
-    return { pass: false, message: 'Last rehearsal report is not marked dry-run.' };
-  }
-  if (report.allWithinRto !== true) {
-    return { pass: false, message: 'Last rehearsal report indicates RTO breach.' };
-  }
-  return { pass: true };
 }
 
 export function checkLoadAbuseVerified(repoRoot: string): MachineCheckResult {

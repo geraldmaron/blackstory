@@ -20,7 +20,7 @@ test('beta disable controls inventory includes the static-mode switch', () => {
 });
 
 test('public-static-mode kill switch is registered', () => {
-  assert.doesNotThrow(() => assertBetaDisableConfigKeys(repoRoot));
+  assert.doesNotThrow(() => assertBetaDisableConfigKeys());
 });
 
 test('disable runbook documents env flag and kill switch', () => {

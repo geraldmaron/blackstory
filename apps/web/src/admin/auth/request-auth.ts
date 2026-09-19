@@ -7,7 +7,7 @@
  * any route, so routes call `authorizeAdminRoute`.
  */
 import { createClient } from '@supabase/supabase-js';
-import type { StaffRole } from './role-mutation';
+import type { StaffRole } from './staff-permissions';
 import { AdminRouteUndeclaredError, STAFF_READ, findAdminRouteAccess } from './route-permissions';
 import { ServerAdminAuthorizationError, type AdminRequestHeaders } from './server-authorization';
 import { StaffPermissionDeniedError, assertStaffPermission } from './staff-permissions';

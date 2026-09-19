@@ -8,7 +8,7 @@
  */
 import { unstable_cache } from 'next/cache';
 import { cache } from 'react';
-import { listPublicEntities } from '../../data/public-seed';
+import type { listPublicEntities } from '../../data/public-seed';
 import type { PublicReadSource } from '../public-data/source';
 import {
   createLiveCatalogMemoryCache,
@@ -41,7 +41,7 @@ export type DoorRedirectTableCache = {
   readonly pinRedirects: readonly string[];
   readonly releaseId: string;
   readonly generatedAt: string;
-  readonly source: PublicReadSource | 'none';
+  readonly source: PublicReadSource;
 };
 
 export type DoorPinPlateCache = DoorRedirectTableCache & {
@@ -64,18 +64,14 @@ function doorPlateMemoryKey(releaseId: string, generatedAt: string): string {
 
 async function loadDoorCatalogEntities(): Promise<{
   readonly data: ReturnType<typeof listPublicEntities>;
-  readonly source: PublicReadSource | 'none';
+  readonly source: PublicReadSource;
 }> {
-  try {
-    return await getSharedPublicEntities();
-  } catch {
-    return { data: listPublicEntities(), source: 'none' };
-  }
+  return getSharedPublicEntities();
 }
 
 function buildDoorPinPlateCache(
   entities: ReturnType<typeof listPublicEntities>,
-  source: PublicReadSource | 'none',
+  source: PublicReadSource,
 ): DoorPinPlateCache {
   const mapSource = exploreMapSourceFor(entities);
   const features = mapSource.featureCollection.features;
@@ -159,7 +155,7 @@ export async function resolveDoorPinRedirect(pinId: string): Promise<string | nu
 /** Test hook: build redirect table from seed entities and report Next cache fit. */
 export function doorRedirectTableCacheShapeForTest(
   entities: ReturnType<typeof listPublicEntities>,
-  source: PublicReadSource | 'none' = 'none',
+  source: PublicReadSource = 'none',
 ): { readonly table: DoorRedirectTableCache; readonly bytes: number; readonly fitsNext: boolean } {
   const table = buildRedirectTableOnly(buildDoorPinPlateCache(entities, source));
   const bytes = estimateJsonCacheBytes(table);

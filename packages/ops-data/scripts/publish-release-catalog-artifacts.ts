@@ -1,67 +1,13 @@
 /**
- * Publish the active release's catalog artifacts (`entities.json` + `search-index.json`)
- * to the Supabase `public-media` bucket (read-through cache; repo-csw0;
- * `docs/decisions-carryover.md`, "Public projection and immutable publication snapshots").
- *
- * Reads `bb_public.*` for the active release, builds the aggregate artifacts with
- * `buildReleaseCatalogArtifacts`, and upserts them at
- * `public/releases/{releaseId}/…` via the Storage REST API. The web app (and any other
- * consumer with `APP_PUBLIC_RELEASE_ARTIFACT_BASE_URL` configured) then serves catalog
- * reads from CDN-cached Storage instead of pulling multi-MB projections from Postgres
- * on every cold start.
- *
- * Event-driven, not blind-poll (repo-csw0 follow-up): `bb_public.release_catalog_publish_watermark`
- * is set dirty by a statement-level trigger on any write to `release_entities` / `search_index`
- * (see `supabase/migrations/20260808020846_release_catalog_publish_watermark.sql`). This script
- * checks that watermark BEFORE doing any expensive work, so a scheduled run that finds nothing
- * changed costs one single-row SELECT — not a 13MB rebuild + upload. When something did change,
- * each artifact's upload is further skipped independently if its content hash matches what's
- * already published (a touch-and-rewrite-same-value write still marks dirty but need not
- * re-upload or force a CDN cache invalidation).
- *
- * Race safety: the watermark's `dirty_at` is captured ONCE at the start, before the read. On
- * success, `published_at` is advanced to that captured value — not to "now" — so a write that
- * lands mid-run (after the catalog read started) stays flagged dirty and is picked up next run,
- * rather than being silently skipped because "now" had already moved past it.
- *
- * Manual runs (see usage below) always do real work — DRY_RUN inspects without ever touching
- * the watermark; FORCE=1 does a real publish while ignoring the watermark and hash checks.
- *
- * Upload safety (repo-kywgj, live 2026-09-12): a transient network failure mid-upload used to
- * surface as a bare `fetch failed` and could leave the published pair mismatched — one artifact
- * newly uploaded, the other stale, with nothing announcing it. Each artifact is now uploaded
- * through `publishArtifactWithRetry` (see `lib/release-catalog-publish-upload.ts`), which
- * retries with exponential backoff and, ONLY once that artifact's upload has actually
- * succeeded, immediately persists JUST that artifact's `published_*_hash` column — not batched
- * with the other artifact or with `published_at`. `published_at` is advanced only after BOTH
- * artifacts have resolved, so a failure partway through never advances the watermark past a
- * half-completed publish: the next run's hash comparison skips the artifact that already
- * succeeded and retries only the one that actually failed. Upload failures also carry the HTTP
- * status, the request URL, and the object path (`ArtifactUploadError`), not a bare `fetch
- * failed`.
- *
- * Usage — manual run:
- *   cd apps/web && set -a && . ./.env.local && set +a && cd ../../ && \
- *   node --conditions development --import tsx \
- *     packages/ops-data/scripts/publish-release-catalog-artifacts.ts
- *
- * Scheduled run: .github/workflows/publish-release-catalog-artifacts.yml. The workflow's
- * PRIMARY trigger is workflow_dispatch right after an operator runs an ops-data script; the
- * cron is a DAILY tick ('17 9 * * *') that bounds worst-case staleness after a forgotten
- * publish. It polled every 5 minutes until 2026-08-08 and was deliberately slowed: 288 runs/day
- * to detect a human-initiated action is noise, not coverage. Do not read the watermark's
- * cheapness as a reason to restore polling — read it as the reason a missed tick is recoverable.
- *
- * Env: DATABASE_URL (or APP_DATABASE_URL), SUPABASE_URL, SUPABASE_SECRET_KEY
- * (or SUPABASE_SERVICE_ROLE_KEY). DRY_RUN=1 builds and reports without uploading or touching
- * the watermark. FORCE=1 bypasses both the watermark skip and the per-artifact hash skip.
- * Consumers validate `releaseId` against the live active-release pointer, so a stale
- * artifact is ignored, never served.
+ * Publishes active-release entities and search artifacts to Supabase Storage. Skip clean
+ * watermarks and unchanged content hashes. Capture dirty_at before reads and advance
+ * published_at only through that captured point so concurrent writes remain pending. Retries
+ * must preserve upload success/failure accurately. Runs explicitly; no schedule is installed.
  */
 import pg from 'pg';
 import { mapPostgresSearchIndexRow, type PublicSearchIndexRow } from '@repo/schemas';
 import { sha256Json, type JsonValue } from '@repo/domain';
-import { buildReleaseCatalogArtifacts } from '../src/firestore/release-artifacts.ts';
+import { buildReleaseCatalogArtifacts } from '../src/records/release-artifacts.ts';
 import { normalizePgConnectionString } from './lib/pg-connection.ts';
 import { shouldSkipPublish } from './lib/release-catalog-publish-decision.ts';
 import {
@@ -72,30 +18,10 @@ import {
 const PUBLIC_MEDIA_BUCKET = process.env.APP_PUBLIC_MEDIA_BUCKET?.trim() || 'public-media';
 
 /**
- * What the CDN and browsers are told about a published artifact.
- *
- * WHY THIS IS LONG (measured 2026-08-24). It was `max-age=3600`, under a comment that said
- * "cache aggressively" — one hour is not aggressive for an object that changes a few times a
- * month. `entities.json` for the active release is **16.0 MB**. At a one-hour TTL every
- * Cloudflare PoP that serves a request re-fetches all 16 MB from Storage every hour, forever,
- * for bytes that did not change. That is billed Storage egress, and at ~20-30 active PoPs it is
- * hundreds of GB/month on its own.
- *
- * WHY A LONG TTL IS SAFE HERE, which is not obvious. The object path is release-versioned
- * (`public/releases/{releaseId}/…`), but that alone does NOT make the URL immutable: this script
- * uploads with `x-upsert: true`, and the watermark trigger fires on any write to
- * `release_entities` / `search_index` for the release that is already active. So editing the
- * live release rewrites the same URL, and a naive `immutable` would pin stale data at the edge
- * until the releaseId changed.
- *
- * It is safe because Supabase's Smart CDN purges on overwrite. Verified empirically on
- * 2026-08-24: uploaded a probe object, confirmed `cf-cache-status: HIT`, overwrote it, and the
- * very next request served the new body. Re-verify this before shortening the reasoning — the
- * whole TTL rests on it.
- *
- * `max-age` (browser) stays short because Smart CDN purges the EDGE, not somebody's browser
- * cache; `s-maxage` is the edge TTL that actually carries the saving. Same shape as
- * `ATLAS_CATALOG_CACHE_CONTROL` in apps/web.
+ * Short browser caching limits stale client copies; longer edge caching reduces repeated
+ * Storage reads. Same-release overwrites require verified CDN invalidation because the URL
+ * itself is not immutable. Recheck overwrite behavior when changing storage or CDN
+ * configuration.
  */
 const PUBLIC_ARTIFACT_CACHE_CONTROL =
   'max-age=300, s-maxage=31536000, stale-while-revalidate=86400';
@@ -117,7 +43,7 @@ function requireEnv(...names: readonly string[]): string {
 
 async function persistEntitiesHash(client: pg.Client, hash: string): Promise<void> {
   await client.query(
-    `UPDATE bb_public.release_catalog_publish_watermark
+    `UPDATE published.release_catalog_publish_watermark
      SET published_entities_hash = $1
      WHERE id = 'catalog'`,
     [hash],
@@ -126,7 +52,7 @@ async function persistEntitiesHash(client: pg.Client, hash: string): Promise<voi
 
 async function persistSearchIndexHash(client: pg.Client, hash: string): Promise<void> {
   await client.query(
-    `UPDATE bb_public.release_catalog_publish_watermark
+    `UPDATE published.release_catalog_publish_watermark
      SET published_search_index_hash = $1
      WHERE id = 'catalog'`,
     [hash],
@@ -145,7 +71,7 @@ async function main(): Promise<void> {
     // flagged dirty (see the race-safety note at the top of the file) and is caught next run.
     const watermark = await client.query<WatermarkRow>(
       `SELECT dirty_at, published_at, published_entities_hash, published_search_index_hash
-       FROM bb_public.release_catalog_publish_watermark WHERE id = 'catalog' LIMIT 1`,
+       FROM published.release_catalog_publish_watermark WHERE id = 'catalog' LIMIT 1`,
     );
     const dirtyAt = watermark.rows[0]?.dirty_at ?? null;
     const publishedAt = watermark.rows[0]?.published_at ?? null;
@@ -158,19 +84,19 @@ async function main(): Promise<void> {
     }
 
     const active = await client.query<{ release_id: string; activated_at: Date }>(
-      `SELECT release_id, activated_at FROM bb_public.active_release WHERE id = 'active' LIMIT 1`,
+      `SELECT release_id, activated_at FROM published.active_release WHERE id = 'active' LIMIT 1`,
     );
     const releaseId = active.rows[0]?.release_id;
-    if (!releaseId) throw new Error('no active release found in bb_public.active_release');
+    if (!releaseId) throw new Error('no active release found in published.active_release');
 
     const projections = await client.query<{ projection: JsonValue }>(
-      `SELECT projection FROM bb_public.release_entities WHERE release_id = $1 ORDER BY entity_id`,
+      `SELECT projection FROM published.release_entities WHERE release_id = $1 ORDER BY entity_id`,
       [releaseId],
     );
     const searchRows = await client.query<PublicSearchIndexRow>(
       `SELECT id, release_id, entity_id, name, name_lower, aliases, topics, kind, status,
               geohash, related_count, claim_count, facets
-       FROM bb_public.search_index WHERE release_id = $1 ORDER BY id`,
+       FROM published.search_index WHERE release_id = $1 ORDER BY id`,
       [releaseId],
     );
 
@@ -270,7 +196,7 @@ async function main(): Promise<void> {
     // (after we snapshotted the watermark) must stay dirty so the next run picks it up, rather
     // than being masked because "now" had already moved past it.
     await client.query(
-      `UPDATE bb_public.release_catalog_publish_watermark
+      `UPDATE published.release_catalog_publish_watermark
        SET published_at = COALESCE($1::timestamptz, now())
        WHERE id = 'catalog'`,
       [dirtyAt ? dirtyAt.toISOString() : null],

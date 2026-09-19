@@ -1,5 +1,5 @@
 /**
- * One-time backfill: populates `bb_reference.jurisdictions.location` for county rows loaded
+ * One-time backfill: populates `reference.jurisdictions.location` for county rows loaded
  * before load-reference-counties.ts started writing that column (see that file's
  * upsertCountyBatch; location was NULL for all 3,144 existing county rows).
  *

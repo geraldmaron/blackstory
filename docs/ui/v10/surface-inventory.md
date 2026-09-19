@@ -18,11 +18,12 @@
 | `/stories` | `reading` | Editorial index | `stories/page.tsx` | Docs said `/chapters` | **Redesign** editorial archive | Story Spine (index) |
 | `/stories/[slug]` | `reading` | Chapter/article | story components | Spine/map moments incomplete | **Redesign** | Story Spine |
 | `/stories/mosaic-credits` | `utility` | Mosaic rights | mosaic-credits page | — | **Keep** | Utility Desk |
-| `/books` | `reading` | Challenged titles index | books index | Off rooms chrome by design | **Keep**/enrich | Archive Shelf |
+| `/books` | `reading` | Challenged titles (hub chapter + browse) | books index / browse | Off rooms chrome by design | **Keep**/enrich | Archive Shelf |
 | `/books/[slug]` | `record` | Book detail | book detail | — | **Keep**/enrich | Archive Shelf |
-| `/law` | `reading` | Law index | law browse | — | **Keep**/enrich | Reference Ledger |
+| `/law` | `reading` | Law (hub chapter + browse) | law browse | — | **Keep**/enrich | Reference Ledger |
 | `/law/[slug]` | `record` | Law detail | law detail | No shared RecordAnatomy yet | **Keep**/enrich anatomy | Reference Ledger |
-| `/data` | `reading` | Charts/indicators | data charts | Avoid BI dashboard feel | **Keep**/enrich Data Figure | Reference Ledger + Data Figure |
+| `/data` | `reading` | 308 into How it works Data chapter | data charts, Lives | Avoid BI dashboard feel | **Keep**/enrich decade spine | How it works · Data |
+| `/how-it-works` | `reading` | Trust hub: About, Methodology, Data, Law, Books | `how-it-works/*` | Renamed from `/apparatus` | **Keep**/enrich immersive Data | How it works hub |
 | `/memorial` | `reading` | Protected wall | `MemorialWallAtmosphere`, sections | Inventory once said “redesign”; **P-01 overrides** | **Keep** immutable | Memorial (P-01) |
 | `/about` | `reading` | Origin + destinations | about sections | Can demonstrate pipeline | **Redesign** lightly | Reading / About |
 | `/methodology` | `reading` | Evidence teaching | live Confidence/Citation | Align with production primitives | **Keep**/align | Methodology |

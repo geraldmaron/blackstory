@@ -19,7 +19,7 @@ import {
   ThemeToggle,
   Timeline,
 } from '@repo/ui';
-import { Room, RoomHeader } from '../../components/room';
+import { Room, ReadingEntry } from '../../components/room';
 import { DialogFixture } from './DialogFixture';
 import { RoomKitGallery } from './RoomKitGallery';
 // /design-system is a Utility surface, and Utility is one of the three room stylesheets.
@@ -35,7 +35,7 @@ export const metadata: Metadata = buildStaticPageMetadata({
 export default function DesignSystemPage() {
   return (
     <Room>
-      <RoomHeader
+      <ReadingEntry
         pathname="/design-system"
         title="Design system"
         lede="Archive Paper / Black Ink foundation, copper as the orientation signal, hairline separation, visible focus, reduced-motion support. This route is the component fixture gallery (Storybook equivalent)."

@@ -1,6 +1,6 @@
 /**
- * Deterministic status derivation helpers for WS3 backfill lanes (person, place, law).
- * Pure functions only — DB I/O lives in lane scripts.
+ * Deterministic status derivation helpers for person, place, and law backfill lanes. Pure
+ * functions only; database I/O lives in the lane scripts.
  */
 import {
   MAX_PLAUSIBLE_HUMAN_AGE_YEARS,

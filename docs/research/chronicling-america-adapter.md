@@ -116,5 +116,4 @@ Parent should add this path to `packages/domain/package.json` `test` script when
 ## Deferred
 
 - Discovery campaign orchestration (`discovery-campaign-chronicling-america` scheduled job)
-- Firestore persistence for adapter runs
 - Python mirror under `workers/research/`

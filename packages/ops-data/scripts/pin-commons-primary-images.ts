@@ -1,53 +1,8 @@
 /**
- * Pin-and-serve Commons primary images (repo-4vuf, WS5 / architecture repo-n7p6.7.1).
- *
- * Turns one or more auto_propose plan files — dry-run-commons-qid-leftover.ts's output
- * (people/institutions) and/or resolve-nrhp-commons-images.ts's output (NRHP places) — into a
- * pin plan: a 960px Special:FilePath thumbnail URL the reader's browser fetches directly from
- * Wikimedia at view time. Never downloads or stores the original image bytes.
- *
- * Applies the same gates as the source dry-run scripts (DIGNITY_CLASSES + `lynching_`
- * entity-id prefix), re-derived independently rather than trusted from the input file (see
- * scripts/lib/pin-commons-primary-images-plan.ts). Skips `kind: 'place'` rows unless
- * `--allow-places` is passed — the architecture decision (repo-n7p6.7.1) is that places are
- * never auto-photographed by default, but the NRHP lane is all places and is meant to run with
- * this flag.
- *
- * sha1 pinning: a row already carries `sha1` when its source plan fetched Commons imageinfo
- * (both dry-run-commons-qid-leftover.ts and resolve-nrhp-commons-images.ts do, via the shared
- * evaluateCommonsMediaPropose). Only rows without one get a metadata fetch here, sequentially,
- * 1 request/second — or none at all if `--sha1-cache=<path>` points at a JSON file of
- * `{ [fileTitle]: sha1 }` already covering every such row.
- *
- * Supabase Postgres is the sole source of truth (bb_public.release_entities.projection is what
- * the web reads; docs/data/firebase-wind-down.md) — this script writes there, not Firestore.
- *
- * --dry-run (default): writes the plan JSON only. Also runs the read-only Postgres checks
- *   (existing primaryImage per candidate) so the report is accurate before anything is applied.
- * --apply: for each gated-in, sha1-resolved row, in one transaction per row:
- *     1. UPDATE bb_public.release_entities SET projection = jsonb_set(projection,
- *        '{primaryImage}', $primaryImage, true) WHERE release_id = $releaseId AND
- *        entity_id = $entityId
- *     2. UPSERT bb_canonical.entity_media (entity_id, role='primary', ...) — the canonical copy
- *   primaryImage is built by buildPrimaryImageForRelease (lib/entity-media-row.ts) then run
- *   through sanitizePrimaryImageForRelease, so a row that fails the publication gate (missing
- *   alt/credit/rights) is dropped, not written. A row whose entity already has a primaryImage
- *   in Postgres is skipped, never overwritten.
- *   Requires DRY_RUN=0 and PIN_COMMONS_APPLY=1 in the environment (in addition to --apply) —
- *   orchestrator-run only, never from this script's tests.
- *
- * Usage (repo root):
- *   node --conditions development --import tsx \
- *     packages/ops-data/scripts/pin-commons-primary-images.ts \
- *     --from=.cache/commons-qid-leftover-dry-run.json \
- *     --from=.cache/landscape-intake/nrhp-commons-images-2026-09-02.json --allow-places \
- *     --out=.cache/commons-pin-plan.json
- *
- * Apply (writes; requires credentials — orchestrator-run only, never from this script's tests):
- *   set -a && . apps/web/.env.local && set +a
- *   DRY_RUN=0 PIN_COMMONS_APPLY=1 node --conditions development --import tsx \
- *     packages/ops-data/scripts/pin-commons-primary-images.ts \
- *     --from=.cache/commons-pin-plan.json --apply --release-id=rel_xxx
+ * Builds source-hosted Commons thumbnail plans without storing image bytes. Rechecks dignity
+ * and eligibility independently of input plans; place images require --allow-places. Missing
+ * source hashes use throttled metadata requests or --sha1-cache. Writes canonical media and
+ * public projection only after the apply gates pass.
  */
 import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import { resolve } from 'node:path';
@@ -148,12 +103,12 @@ async function loadEntitiesWithExistingPrimaryImage(
       releaseId ??
       (
         await client.query<{ release_id: string }>(
-          `SELECT release_id FROM bb_public.active_release LIMIT 1`,
+          `SELECT release_id FROM published.active_release LIMIT 1`,
         )
       ).rows[0]?.release_id;
     if (!resolvedReleaseId) return { ids: new Set(), releaseId: undefined };
     const { rows } = await client.query<{ entity_id: string }>(
-      `SELECT entity_id FROM bb_public.release_entities
+      `SELECT entity_id FROM published.release_entities
         WHERE release_id = $1 AND entity_id = ANY($2) AND projection->'primaryImage' IS NOT NULL`,
       [resolvedReleaseId, entityIds],
     );
@@ -327,13 +282,13 @@ async function main(): Promise<void> {
     try {
       await client.query('BEGIN');
       await client.query(
-        `UPDATE bb_public.release_entities
+        `UPDATE published.release_entities
             SET projection = jsonb_set(projection, '{primaryImage}', $1::jsonb, true)
           WHERE release_id = $2 AND entity_id = $3`,
         [JSON.stringify(primaryImage), releaseId, row.entityId],
       );
       await client.query(
-        `INSERT INTO bb_canonical.entity_media
+        `INSERT INTO canonical.entity_media
            (entity_id, role, source_system, file_title, sha1, source_page_url, license, credit,
             alt, url, pinned_at, updated_at)
          VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, now())

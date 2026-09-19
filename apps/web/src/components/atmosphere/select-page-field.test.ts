@@ -16,13 +16,15 @@ test('map paths return null', () => {
   assert.equal(selectPageField('/explore/district'), null);
 });
 
-test('/data selects ledger with page-field asset paths', () => {
-  const selection = selectPageField('/data');
-  assert.ok(selection);
-  assert.equal(selection.motifId, 'ledger');
-  assert.equal(selection.lightPath, `${PAGE_FIELD_BASE}/ledger-light.svg`);
-  assert.equal(selection.darkPath, `${PAGE_FIELD_BASE}/ledger-dark.svg`);
-  assert.equal(selection.label, 'Horizontal ledger lines');
+test('/data and /lives select ledger with page-field asset paths', () => {
+  for (const path of ['/data', '/lives'] as const) {
+    const selection = selectPageField(path);
+    assert.ok(selection);
+    assert.equal(selection.motifId, 'ledger');
+    assert.equal(selection.lightPath, `${PAGE_FIELD_BASE}/ledger-light.svg`);
+    assert.equal(selection.darkPath, `${PAGE_FIELD_BASE}/ledger-dark.svg`);
+    assert.equal(selection.label, 'Horizontal ledger lines');
+  }
 });
 
 test('/history selects rules with page-field asset paths', () => {
@@ -58,13 +60,19 @@ test('about uses bands; legal and submit use pins', () => {
   const submit = selectPageField('/submit');
   assert.ok(submit);
   assert.equal(submit.motifId, 'pins');
+
+  const sources = selectPageField('/sources');
+  assert.ok(sources);
+  assert.equal(sources.motifId, 'pins');
 });
 
-test('entity uses rules; locate uses pins; unknown defaults to rules', () => {
-  const entity = selectPageField('/entity/ent_example');
-  assert.ok(entity);
-  assert.equal(entity.motifId, 'rules');
+test('place and entity records skip the page-field grid', () => {
+  assert.equal(selectPageField('/place/ame-church-of-new-haven'), null);
+  assert.equal(selectPageField('/entity/ent_example'), null);
+  assert.equal(selectPageField('/invention/some-invention'), null);
+});
 
+test('locate uses pins; unknown defaults to rules', () => {
   const locate = selectPageField('/locate');
   assert.ok(locate);
   assert.equal(locate.motifId, 'pins');

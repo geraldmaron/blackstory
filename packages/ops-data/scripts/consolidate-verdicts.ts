@@ -1,5 +1,5 @@
 /**
- * WS4 stage-3: consolidate adversarial verdicts, apply corrections (finalType / direction),
+ * Consolidate relationship-review verdicts, apply corrections (finalType / direction),
  * and split into the tiered gate:
  *   - publishNow: verdict=accept AND reviewFlag=none
  *   - reviewQueue: verdict=accept AND reviewFlag in {living_person, high_impact, contested}

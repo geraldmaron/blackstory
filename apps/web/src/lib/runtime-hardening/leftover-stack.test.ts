@@ -164,10 +164,8 @@ test('CSP allows blackstory-app and leftover GCS; no other supabase.co host', ()
 });
 
 test('first paint no longer boots the full catalog: `/` is the Door, Explore stays on /explore', () => {
-  // The 2026-08-28 leftover this test originally documented ("Loading 4,101 records…" from
-  // buildAtlasShell(getSharedPublicEntities()) on `/`) was fixed: `/` renders DoorHome under
-  // ISR and never mounts the Explore instrument. Guard the fix, and keep the catalog route's
-  // cache contract, which Explore on /explore still depends on.
+  // The homepage must use DoorHome and the live catalog cache without mounting the Explore
+  // instrument.
   const page = readFileSync(join(SRC_ROOT, 'app/page.tsx'), 'utf8');
   const shell = readFileSync(join(SRC_ROOT, 'app/explore/explore-view-model.ts'), 'utf8');
   const catalogRoute = readFileSync(join(SRC_ROOT, 'app/atlas/catalog/route.ts'), 'utf8');
@@ -187,19 +185,19 @@ test('point reads are limited; full catalog SQL stays the documented unbounded f
   const source = readFileSync(join(SRC_ROOT, 'lib/public-data/postgres-readers.ts'), 'utf8');
   assert.match(
     source,
-    /FROM bb_public\.active_release[\s\S]*?LIMIT 1/,
+    /FROM published\.active_release[\s\S]*?LIMIT 1/,
     'active-release pointer must stay a single-row read',
   );
   assert.match(
     source,
-    /FROM bb_public\.release_entities[\s\S]*?LIMIT 1/,
+    /FROM published\.release_entities[\s\S]*?LIMIT 1/,
     'single-entity point-get must stay limited',
   );
   assert.match(source, /export const POSTGRES_ENTITY_BATCH_SIZE = 100/);
 
   const listFn = /export async function listPublicEntityProjections[\s\S]*?\n\}/.exec(source)?.[0];
   assert.ok(listFn, 'listPublicEntityProjections must exist');
-  assert.match(listFn, /FROM bb_public\.release_entities/);
+  assert.match(listFn, /FROM published\.release_entities/);
   assert.doesNotMatch(
     listFn,
     /LIMIT \d+/,

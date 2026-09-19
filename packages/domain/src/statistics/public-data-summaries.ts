@@ -1,7 +1,7 @@
 /**
  * Pure types and helpers for public `/data` and homepage demographic summaries.
  * Postgres materialized snapshots and release artifacts carry these shapes; apps/web reads
- * them without a Firebase runtime dependency.
+ * them without a database runtime dependency.
  */
 import { computeGrowthRecord } from './combination-rules.js';
 import type {

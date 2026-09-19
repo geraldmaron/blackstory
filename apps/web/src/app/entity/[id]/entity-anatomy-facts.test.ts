@@ -13,11 +13,20 @@ function requireEntity(id: string) {
   return entity;
 }
 
+test('buildEntityAnatomyInputs links resolvable decades to the Lives evidence appendix', () => {
+  const entity = requireEntity('ent_15th_st_church_001');
+  const inputs = buildEntityAnatomyInputs(entity, undefined);
+  assert.notEqual(inputs.eraLabel, 'Undated');
+  if (inputs.eraHref) {
+    assert.match(inputs.eraHref, /^\/lives\/explorer(\?decade=\d+)?$/);
+  }
+});
+
 test('buildEntityAnatomyInputs resolves era from structured buckets before Undated', () => {
   const entity = requireEntity('ent_15th_st_church_001');
   const inputs = buildEntityAnatomyInputs(entity, undefined);
   assert.notEqual(inputs.eraLabel, 'Undated');
-  assert.match(inputs.evidenceLabel, /source/);
+  assert.match(inputs.evidenceLabel, /claim/);
   assert.equal(
     inputs.whereLabel,
     'Dupont/Sixteenth Street Historic District area, Washington, D.C.',

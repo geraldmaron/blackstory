@@ -1,5 +1,5 @@
 /**
- * Postgres release-activation drill tests (MOB-005 evidence gate).
+ * Postgres release-activation drill tests (release activation evidence gate).
  *
  * Exercises generateReleaseArtifacts → activateReleaseAsync → rollbackToAsync → collectGarbageAsync
  * against the injectable in-memory Postgres store backend — no live GCP/Supabase required.

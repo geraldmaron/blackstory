@@ -21,7 +21,7 @@ import type { PublicEntityView } from '../../../data/public-seed';
 import { EntitySensitivityBanner } from '../../../components/entity/EntitySensitivityBanner';
 import { RecordVisitBlock } from '../../../components/patterns/RecordVisitBlock';
 import '../../../components/entity/entity-page.css';
-import { EntityMastMedia } from '../../../components/entity/EntityMastMedia';
+import { EntityMastMedia, RecordPhotoCredit } from '../../../components/entity/EntityMastMedia';
 import { LinkedProse, type EntityLinkCatalogEntry } from '../../../components/entity/LinkedProse';
 import { EntityTopicTags } from '../../../components/entity/EntityTopicTags';
 import {
@@ -35,6 +35,10 @@ import {
   RecordSmallTitle,
   RecordStatusPill,
 } from '../../../components/entity/RecordChrome';
+import {
+  METHODOLOGY_HOW_RECORD_GETS_IN_HREF,
+  METHODOLOGY_SOURCE_LIBRARY_HREF,
+} from '../../../components/evidence/editorial-links';
 import { HowToReadThisRecord } from '../../../components/trust';
 import { Breadcrumb, Room, SourceList, type RoomSource } from '../../../components/room';
 import { MapsExternalLink } from '../../../components/map-experience/MapsExternalLink';
@@ -81,18 +85,9 @@ import '../../record-page.css';
 import './record-room.css';
 
 /**
- * Incrementally regenerated, not force-dynamic.
- *
- * `force-dynamic` here dated from the era when the catalog was an expensive per-request
- * Postgres pull. Its cost was measured on 2026-08-09: every response carried Next's dynamic
- * `cache-control: private, no-cache, no-store`, which overrides the `s-maxage=3600` rule this
- * route already declares in `next.config.mjs`, so `x-vercel-cache` was MISS on 100% of entity
- * requests and every reader hit a function.
- *
- * `revalidate` keeps the original guarantee intact (nothing renders at build, so a build
- * without `DATABASE_URL` can never bake the Dunbar seed into a page) while letting a rendered
- * page be reused. 3600s matches the Cache-Control this route already advertises; visible
- * staleness for an in-place correction is bounded by that plus the 30m catalog TTL.
+ * Caches rendered records with hourly revalidation. In-place corrections can remain stale
+ * through both this page cache and the release-catalog cache; publication must account for both
+ * windows.
  */
 
 function entityLinkCatalogFromNeighbors(
@@ -153,7 +148,18 @@ function toRoomSources(claims: PublicEntityView['claims']): readonly RoomSource[
     const href = claim.citationHref;
     const key = href ?? claim.citationSource ?? claim.citationLabel;
     if (!key || seen.has(key)) continue;
-    seen.set(key, { text: sourceLabel(claim), ...(href ? { href } : {}) });
+    seen.set(key, {
+      text: sourceLabel(claim),
+      ...(claim.archivedUrl && claim.archivedAt && href
+        ? {
+            archivedUrl: claim.archivedUrl,
+            archivedAt: claim.archivedAt,
+            originalUrl: href,
+          }
+        : href
+          ? { href }
+          : {}),
+    });
   }
   return [...seen.values()];
 }
@@ -279,7 +285,9 @@ export async function EntityRecordRoom({ entity }: { readonly entity: PublicEnti
   const decadeCount = entity.eraBuckets?.length ?? 0;
   const evidenceHref = entityEvidenceHref(`/entity/${entity.id}`);
   const correctionsHref = `/corrections?target=${encodeURIComponent(entity.id)}`;
-  const locationPrecisionLabel = `${humanizeToken(entity.locationPrecision)} precision`;
+  const locationPrecisionLabel = geoAnchor
+    ? `${humanizeToken(entity.locationPrecision)} precision`
+    : 'No public map location';
 
   /*
    * The rail: where the record is, what is on the page, and the record's own file. The
@@ -369,6 +377,21 @@ export async function EntityRecordRoom({ entity }: { readonly entity: PublicEnti
               <span className="ds-rec-count">{sources.length}</span>
             </RecordSmallTitle>
             <SourceList sources={sources} />
+            <p className="ds-record-appx__note ds-sans">
+              Source hierarchy and verification live in{' '}
+              <Link href="/methodology#evidence-grades" prefetch={false}>
+                evidence grades
+              </Link>
+              ,{' '}
+              <Link href={METHODOLOGY_SOURCE_LIBRARY_HREF} prefetch={false}>
+                where the evidence comes from
+              </Link>
+              , and{' '}
+              <Link href="/methodology#how-it-holds-together" prefetch={false}>
+                how citations hold together
+              </Link>
+              .
+            </p>
           </section>
         ) : null}
 
@@ -439,7 +462,10 @@ export async function EntityRecordRoom({ entity }: { readonly entity: PublicEnti
             </section>
           ) : null}
 
-          <HowToReadThisRecord variant="compact" />
+          <HowToReadThisRecord
+            variant="compact"
+            methodologyHref={METHODOLOGY_HOW_RECORD_GETS_IN_HREF}
+          />
         </div>
       </div>
     </div>
@@ -472,6 +498,7 @@ export async function EntityRecordRoom({ entity }: { readonly entity: PublicEnti
               kind={entity.kind}
               {...(jurisdictionLabel !== undefined ? { jurisdictionLabel } : {})}
               {...(entity.primaryImage !== undefined ? { primaryImage: entity.primaryImage } : {})}
+              hideCredit
               priority
             />
             <figcaption className="ds-record-mast__over">
@@ -505,6 +532,13 @@ export async function EntityRecordRoom({ entity }: { readonly entity: PublicEnti
                   catalog={entityLinkCatalog}
                 />
               </p>
+              {entity.primaryImage !== undefined ? (
+                <RecordPhotoCredit
+                  entityId={entity.id}
+                  image={entity.primaryImage}
+                  className="ds-record-mast__credit"
+                />
+              ) : null}
             </figcaption>
           </figure>
 

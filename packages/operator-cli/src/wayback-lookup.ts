@@ -38,9 +38,9 @@ export function createWaybackLookup(input: CreateWaybackLookupInput): WaybackLoo
  * event belongs to should not have to learn two vocabularies.
  *
  * The keys stay clear of `attachWaybackMetadata`'s SPN keys (`waybackStatus`, `waybackReason`)
- * so a row can honestly record "looked, missed, then minted a new one". The one key they share
- * is `waybackCaptureUrl`, which is deliberate: downstream readers want the pointer, not the
- * provenance of how we got it. `waybackCaptureSource` is there for when they do.
+ * so a row can honestly record "looked, found an older snapshot, then minted a new one".
+ * Availability pointers use their own names and never masquerade as the current revision's
+ * `waybackCaptureUrl`.
  */
 export function attachWaybackLookup(
   bag: Record<string, unknown>,
@@ -50,12 +50,12 @@ export function attachWaybackLookup(
     return {
       ...bag,
       waybackLookupStatus: 'found',
-      waybackCaptureUrl: result.snapshot.url,
-      waybackCaptureTimestamp: result.snapshot.timestamp,
+      waybackAvailabilityUrl: result.snapshot.url,
+      waybackAvailabilityTimestamp: result.snapshot.timestamp,
       ...(result.snapshot.httpStatus !== undefined
-        ? { waybackCaptureHttpStatus: result.snapshot.httpStatus }
+        ? { waybackAvailabilityHttpStatus: result.snapshot.httpStatus }
         : {}),
-      waybackCaptureSource: 'availability-lookup',
+      waybackAvailabilitySource: 'availability-lookup',
     };
   }
   return {

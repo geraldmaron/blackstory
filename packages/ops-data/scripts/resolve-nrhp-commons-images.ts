@@ -1,39 +1,9 @@
 /**
- * repo-4vuf (WS5) — resolve primary images for the NRHP Black heritage lane
- * (bb_research.landscape_candidates lane 'nrhp-black-heritage') via Wikidata
- * P649 (NRHP reference number) → P18 (image) → Commons license map.
- *
- * Read-only network calls only:
- *   1. SELECT refnum + entity_id for every lane row whose entity's active-
- *      release projection has no primaryImage yet.
- *   2. Batch-query Wikidata's public SPARQL endpoint (200 refnums/request,
- *      1 req/s, cached under .cache/landscape-intake/wikidata-nrhp-images/
- *      sparql/) for `?item wdt:P649 ?ref` and `OPTIONAL { ?item wdt:P18
- *      ?image }`, recording no_item / item_no_image / image_found per ref.
- *   3. For image_found rows, fetch Commons imageinfo/extmetadata for the
- *      first P18 file (same pacing, cached under .../commons-meta/) through
- *      the existing @repo/domain commons-media client, and decide
- *      auto_propose vs. a license-hold outcome via the same
- *      evaluateCommonsMediaPropose the dry-run-commons-qid-leftover.ts /
- *      pin-commons-primary-images.ts pair already trusts.
- *   4. Write a plan file shaped as `{ proposes: [...] }` — a drop-in --from
- *      input for pin-commons-primary-images.ts — plus a counts summary.
- *
- * Never writes to the database or to Storage. DATABASE_URL is used for a
- * single SELECT.
- *
- * Usage (from repo root):
- *   cd apps/web && set -a && . ./.env.local && set +a && cd ../..
- *   node --conditions development --import tsx \
- *     packages/ops-data/scripts/resolve-nrhp-commons-images.ts
- *
- * Optional env:
- *   NRHP_COMMONS_ENTITY_LIMIT   cap how many lane rows are processed (testing)
- *   NRHP_COMMONS_METADATA_CAP   cap on image_found rows sent to the Commons
- *                                metadata step (default 300, only applied if
- *                                the projected 1 req/s runtime exceeds
- *                                NRHP_COMMONS_METADATA_MINUTES)
- *   NRHP_COMMONS_METADATA_MINUTES  minutes threshold for the cap (default 40)
+ * Build Commons image proposals for NRHP records without a primary image using Wikidata P649,
+ * P18 and Commons license metadata. Pace and cache requests; use evaluateCommonsMediaPropose
+ * for license holds. Write a plan for pin-commons-primary-images.ts, never database or Storage
+ * changes. NRHP_COMMONS_ENTITY_LIMIT and NRHP_COMMONS_METADATA_CAP bound work;
+ * NRHP_COMMONS_METADATA_MINUTES controls the time-based cap.
  */
 import { createHash } from 'node:crypto';
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
@@ -68,7 +38,9 @@ const SPARQL_ENDPOINT = 'https://query.wikidata.org/sparql';
 const SPARQL_BATCH_SIZE = 200;
 const SPARQL_DELAY_MS = 1000;
 const COMMONS_BATCH_DELAY_MS = 1000;
-/** BlackStory-ops/1.0 is the descriptive User-Agent required by this repo-4vuf task. */
+/**
+ * Identifying User-Agent for Wikimedia requests.
+ */
 const SPARQL_USER_AGENT = 'BlackStory-ops/1.0 (https://blackstory.app)';
 
 const ENTITY_LIMIT = process.env.NRHP_COMMONS_ENTITY_LIMIT
@@ -103,13 +75,13 @@ function sleep(ms: number): Promise<void> {
 /** SELECT only — every refnum + entity_id in the lane whose entity has no primaryImage yet. */
 async function loadLaneRows(client: pg.Client): Promise<readonly LaneRow[]> {
   const { rows } = await client.query<LaneRow>(
-    `WITH active AS (SELECT release_id FROM bb_public.active_release LIMIT 1)
+    `WITH active AS (SELECT release_id FROM published.active_release LIMIT 1)
      SELECT lc.id AS entity_id,
             lc.display_name,
             lc.payload->>'refnum' AS refnum
-       FROM bb_research.landscape_candidates lc
+       FROM research.landscape_candidates lc
        CROSS JOIN active a
-       LEFT JOIN bb_public.release_entities re
+       LEFT JOIN published.release_entities re
          ON re.entity_id = lc.id AND re.release_id = a.release_id
       WHERE lc.lane = $1
         AND lc.payload->>'refnum' IS NOT NULL

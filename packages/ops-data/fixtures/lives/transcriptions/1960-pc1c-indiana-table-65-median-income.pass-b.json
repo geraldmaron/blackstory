@@ -1,0 +1,37 @@
+{
+  "source": "U.S. Bureau of the Census, U.S. Census of Population: 1960, Vol. I, Characteristics of the Population, Part 16, Indiana, Chapter C, General Social and Economic Characteristics",
+  "sourceUrl": "https://www2.census.gov/library/publications/decennial/1960/population-volume-1/vol-01-16-h.pdf",
+  "table": "Table 65",
+  "page": "16-186",
+  "boundaryVersion": "us-states-1960",
+  "datasetVintage": "1963 printed volume",
+  "figures": [
+    {
+      "metricId": "lives-income-median",
+      "jurisdictionId": "state:18",
+      "referencePeriod": "1960",
+      "raceEthnicitySlice": "all",
+      "estimate": 5798,
+      "universe": "Families; income in 1959 dollars; THE STATE",
+      "note": "Families block median, not families and unrelated individuals. Second pass agrees."
+    },
+    {
+      "metricId": "lives-income-median",
+      "jurisdictionId": "state:18",
+      "referencePeriod": "1960",
+      "raceEthnicitySlice": "white",
+      "estimate": 5879,
+      "universe": "Families; WHITE; income in 1959 dollars; THE STATE",
+      "note": "Second pass agrees."
+    },
+    {
+      "metricId": "lives-income-median",
+      "jurisdictionId": "state:18",
+      "referencePeriod": "1960",
+      "raceEthnicitySlice": "nonwhite",
+      "estimate": 4363,
+      "universe": "Families; NONWHITE; income in 1959 dollars; THE STATE",
+      "note": "Second pass agrees."
+    }
+  ]
+}

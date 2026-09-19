@@ -1,6 +1,6 @@
 /**
- * The lens-level composition gate — repo-92n2.18 / design-direction-v9-surfaces.md's
- * "composition dignity gate". Exercises the same violence vocabulary `camera-dignity.test.ts`
+ * The lens-level composition dignity gate. Exercises the same violence vocabulary
+ * `camera-dignity.test.ts`
  * pins, applied to a lens's active topic constraint rather than a selected record.
  */
 import assert from 'node:assert/strict';

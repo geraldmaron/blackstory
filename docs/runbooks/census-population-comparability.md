@@ -18,10 +18,10 @@ require NHGIS time-series tables plus explicit crosswalks — not label matching
 
 - **Category documentation** — `packages/domain/src/demographics/comparability.ts` defines
   `DecadeComparabilityBand`, decade race labels, and `COMPARABILITY_NOTE_2000_2020` for UI and
-  Firestore disclaimers.
+  stored provenance notes.
 - **Modern alone-comparable trio** — 2000, 2010, and 2020 use Census "Black or African American
   alone" one-race tables. National rollups on the Data page aggregate ingested county rows for
-  these decades only (via `@repo/firebase` national-stats readers).
+  these decades only (via Postgres national-statistics readers).
 - **Boundary caution** — `BOUNDARY_CHANGE_CAUTION` and `COUNTY_FIPS_CHANGES` warn that FIPS
   renames, merges, and Connecticut's 2022 planning-region switch invalidate naive same-code
   decade deltas.
@@ -49,24 +49,7 @@ require NHGIS time-series tables plus explicit crosswalks — not label matching
 
 ## Explore map population index
 
-County choropleths on Explore load `/geo/county-population-decades.json` (compact fips5 → decade →
-counts). Regenerate from Admin SDK export of `censusCountyDecades` — do not full-scan Firestore in
-the browser. The checked-in file may be a small real-shaped sample until a full export is published.
-
-
-1. Confirm registry entry `nhgis-county-race` in `external-data-sources.ts` (`registryState:
-   disabled`).
-2. Register for IPUMS NHGIS and store `NHGIS_API_KEY` via Secret Manager / `run-with-dev-secrets`
-   — never commit the key.
-3. Implement live extract in `packages/domain/src/adapters/nhgis/` (scaffold throws until then).
-4. Archive raw NHGIS extract + checksum per [data-ingestion-methodology.md](./data-ingestion-methodology.md).
-5. Attach `COMPARABILITY_NOTE_2000_2020` (or era-specific notes) on any new public surface that
-   spans pre-2000 and post-2000 decades.
-
-## Related modules
-
-- `packages/domain/src/external-data-sources.ts` — acquisition registry
-- `packages/domain/src/demographics/comparability.ts` — comparability matrix
-- `packages/domain/src/geography/county-fips-changes.ts` — FIPS transition edges
-- `packages/domain/src/adapters/census-demographics/` — live 2000–2020 pulls
-- `packages/domain/src/adapters/nhgis/` — NHGIS scaffold (API key gate)
+County choropleths read bounded static artifacts. Generate them from reviewed Postgres rows or
+validated source CSVs, retain vintage and provenance, and verify completeness before replacing a
+published artifact. Never scan private source tables in the browser or treat sample data as a
+complete national inventory. Read the current dataset registry before acquisition.

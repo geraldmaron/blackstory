@@ -1,6 +1,6 @@
 /**
  * Write back operator-attested livingStatus=deceased from landscape personReview
- * markers onto bb_canonical.entities.living_status.
+ * markers onto canonical.entities.living_status.
  *
  * Scope: only rows where payload->personReview->>'livingStatus'='deceased'
  * (exactly the operator-attested set — not regex bulk backfill).
@@ -51,8 +51,8 @@ async function main(): Promise<void> {
          lc.kind,
          e.living_status,
          (e.id IS NOT NULL) AS has_canonical
-       FROM bb_research.landscape_candidates lc
-       LEFT JOIN bb_canonical.entities e
+       FROM research.landscape_candidates lc
+       LEFT JOIN canonical.entities e
          ON e.id = coalesce(nullif(lc.source_item_id, ''), lc.payload->>'entityId', lc.id)
        WHERE lc.payload->'personReview'->>'livingStatus' = 'deceased'
          AND (
@@ -106,7 +106,7 @@ async function main(): Promise<void> {
     try {
       for (const row of toUpdate) {
         const result = await client.query(
-          `UPDATE bb_canonical.entities
+          `UPDATE canonical.entities
            SET living_status = 'deceased', updated_at = now()
            WHERE id = $1 AND living_status IS DISTINCT FROM 'deceased'`,
           [row.candidate_id],
@@ -122,8 +122,8 @@ async function main(): Promise<void> {
 
     const verify = await client.query<{ count: string }>(
       `SELECT count(*)::text AS count
-       FROM bb_research.landscape_candidates lc
-       JOIN bb_canonical.entities e
+       FROM research.landscape_candidates lc
+       JOIN canonical.entities e
          ON e.id = coalesce(nullif(lc.source_item_id, ''), lc.payload->>'entityId', lc.id)
        WHERE lc.payload->'personReview'->>'livingStatus' = 'deceased'
          AND (lc.payload->'personReview'->>'approved')::boolean IS TRUE

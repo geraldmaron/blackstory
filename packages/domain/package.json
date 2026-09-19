@@ -144,6 +144,16 @@
       "types": "./dist/statistics/data-page-series.d.ts",
       "import": "./dist/statistics/data-page-series.js"
     },
+    "./statistics/lives": {
+      "development": "./src/statistics/lives.ts",
+      "types": "./dist/statistics/lives.d.ts",
+      "import": "./dist/statistics/lives.js"
+    },
+    "./juxtaposition": {
+      "development": "./src/juxtaposition.ts",
+      "types": "./dist/juxtaposition.d.ts",
+      "import": "./dist/juxtaposition.js"
+    },
     "./temporal": {
       "development": "./src/temporal/index.ts",
       "types": "./dist/temporal/index.d.ts",
@@ -174,7 +184,7 @@
     "dist"
   ],
   "scripts": {
-    "build": "tsc -p tsconfig.json && mkdir -p dist/graph/data && cp src/graph/data/mention-overrides.json dist/graph/data/mention-overrides.json && mkdir -p dist/map/data && cp src/map/data/us-states-20m.json dist/map/data/us-states-20m.json",
+    "build": "tsc -p tsconfig.json && mkdir -p dist/map/data && cp src/map/data/us-states-20m.json dist/map/data/us-states-20m.json",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "test": "node --conditions development --import tsx --test 'src/**/*.test.ts' 'fixtures/**/*.test.ts'",
     "lint": "echo 'lint: use root pnpm lint'"

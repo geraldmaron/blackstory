@@ -1,19 +1,6 @@
-/**
- * Deletion-sync framework: a shared, scheduler-agnostic purge mechanism that a
- * scheduled job or a manual operator invocation can call whenever an upstream
- * source requires deletion sync (e.g. Reddit's <=48h contractual obligation see
- * ./obligations.js). A purge cascades through quarantine, graylist, and research-case
- * attachment targets, and produces an audit record that captures the FACT of deletion
- * (source id, timestamp, reason, correlation id) without retaining the deleted content.
- *
- * This module is pure and framework-independent: it does not touch Firestore. It follows
- * audit/outbox shape at the domain layer (DomainAuditEvent DomainOutboxMessage,
- * ./audit/index.js) so a storage adapter can hand `auditEvent` + `outboxMessage` straight to
- * the existing `commitWithAudit` path (packages/ops-data/src/firestore/audit-outbox.ts) the
- * same way every other audited mutation in this repo does, and can translate `mutations` into
- * real deletes against its own store. packages/ops-data is out of scope for this (read-only
- * context), so that translation step is deliberately left to the caller.
- */
+/** Store-independent purge planning for source deletion obligations. Produces audit/outbox
+ * records without retaining removed content. Adapters must execute and acknowledge the plan;
+ * creating a plan does not prove deletion from storage or derived indexes. */
 import { randomUUID } from 'node:crypto';
 import {
   auditCategoryFor,
@@ -32,7 +19,7 @@ export type DeletionSyncCascadeKind = (typeof DELETION_SYNC_CASCADE_KINDS)[numbe
 
 export type DeletionSyncCascadeTarget = {
   readonly kind: DeletionSyncCascadeKind;
-  /** Store-agnostic path the executing adapter purges (e.g. a Firestore document path). */
+  /** Store-agnostic path the executing adapter purges (e.g. a resource path). */
   readonly path: string;
   readonly id: string;
 };

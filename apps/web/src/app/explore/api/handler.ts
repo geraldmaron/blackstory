@@ -20,7 +20,7 @@ import type { createExploreRateLimitGuard } from './rate-limit-guard';
 
 /**
  * Monitor allow-through must satisfy the quota gate (compat with @repo/security's
- * `appCheckVerified` field name on rate-limit requests).
+ * `clientAttested` field name on rate-limit requests).
  */
 function integritySatisfiesRateLimitGate(decision: {
   readonly verified: boolean;
@@ -141,7 +141,7 @@ export async function handleExploreRefineRequest(
   const rateDecision = deps.rateLimitGuard.evaluate({
     subject: 'anonymous',
     ...(clientIp ? { clientIp } : {}),
-    appCheckVerified: integritySatisfiesRateLimitGate(integrityDecision),
+    clientAttested: integritySatisfiesRateLimitGate(integrityDecision),
   });
   if (!rateDecision.allowed) {
     const response = deps.rateLimitGuard.formatDeniedResponse(rateDecision);

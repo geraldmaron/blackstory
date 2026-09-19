@@ -1,37 +1,8 @@
 /**
- * repo-9ki8 — split person records that are really their monument's record.
- *
- * A person entity seeded from a site record inherits the site's claim, its map pin, and its
- * `documented_site` notability criterion — a criterion the rubric in
- * packages/domain/src/entity-status.ts reserves for sites. The result reads as the park's
- * record filed under the person's name.
- *
- * ent_harriet_tubman_001 was the worst case: one claim, and it was visitor-center directions.
- * The site content it carried is already held, correctly and in full, by
- * ent_tubman_underground_railroad_md_001 — so this is a split, not a rewrite: the person keeps
- * the person, the park keeps the park.
- *
- * Every claim written here is copied from a claim already published in this catalog on a
- * neighboring entity (the park, the Combahee raid, the Auburn home), with its citation. No new
- * sources, no new facts.
- *
- * The audit pass runs unconditionally and reports any other person record showing the same
- * shape, so the next occurrence is caught rather than stumbled on.
- *
- * Usage (from repo root):
- *   set -a && source apps/web/.env.local && set +a
- *   export DATABASE_SSL=1
- *   node --conditions development --import tsx \
- *     packages/ops-data/scripts/fix-person-site-conflation.ts
- *
- * Apply:
- *   DRY_RUN=0 FIX_PERSON_SITE_CONFLATION_APPLY=1 node --conditions development --import tsx \
- *     packages/ops-data/scripts/fix-person-site-conflation.ts
- *
- * After applying, populate the relationship edges into related[] and rebuild the graph:
- *   DRY_RUN=0 BACKFILL_RELATED_FROM_EDGES_APPLY=1 node --conditions development --import tsx \
- *     packages/ops-data/scripts/backfill-release-related-from-edges.ts
- *   node --conditions development --import tsx packages/ops-data/scripts/rebuild-release-graph.ts
+ * Separates a person's biography from the monument or institution honoring them, retaining
+ * citations when transferring relevant claims. Audits other person records for the same
+ * conflation. Writes require DRY_RUN=0 and FIX_PERSON_SITE_CONFLATION_APPLY=1; synchronize
+ * related lists and rebuild the graph afterward.
  */
 import pg from 'pg';
 import { remindToRepublishCatalogArtifacts } from './lib/catalog-republish-reminder.ts';
@@ -212,7 +183,7 @@ async function auditPersonSiteConflation(client: pg.Client): Promise<void> {
     criteria: string | null;
     claim_count: number;
   }>(
-    `WITH ar AS (SELECT release_id FROM bb_public.v_active_release_id)
+    `WITH ar AS (SELECT release_id FROM published.v_active_release_id)
      SELECT
        e.id,
        e.display_name,
@@ -223,8 +194,8 @@ async function auditPersonSiteConflation(client: pg.Client): Promise<void> {
          FROM jsonb_array_elements(COALESCE(e.notability_basis, '[]'::jsonb)) b
        ) AS criteria,
        COALESCE(jsonb_array_length(r.claims), 0) AS claim_count
-     FROM bb_canonical.entities e
-     LEFT JOIN bb_public.release_entities r
+     FROM canonical.entities e
+     LEFT JOIN published.release_entities r
        ON r.entity_id = e.id AND r.release_id = (SELECT release_id FROM ar)
      WHERE e.kind = 'person'
      ORDER BY e.display_name`,
@@ -262,7 +233,7 @@ async function applyTubmanSplit(client: pg.Client, releaseId: string): Promise<v
   const locationJson = JSON.stringify(TUBMAN_LOCATION);
 
   await client.query(
-    `UPDATE bb_canonical.entities
+    `UPDATE canonical.entities
      SET
        notability_basis = $2::jsonb,
        kind_detail = jsonb_set(
@@ -287,7 +258,7 @@ async function applyTubmanSplit(client: pg.Client, releaseId: string): Promise<v
   );
 
   await client.query(
-    `UPDATE bb_public.release_entities
+    `UPDATE published.release_entities
      SET
        projection = jsonb_set(
          jsonb_set(
@@ -327,7 +298,7 @@ async function applyTubmanSplit(client: pg.Client, releaseId: string): Promise<v
   );
 
   await client.query(
-    `UPDATE bb_public.search_index
+    `UPDATE published.search_index
      SET
        claim_count = $3,
        geohash = $4,
@@ -352,7 +323,7 @@ async function applyTubmanSplit(client: pg.Client, releaseId: string): Promise<v
   // Link her to her own park, raid, and home. Only edges whose target is in the active release.
   for (const edge of TUBMAN_EDGES) {
     await client.query(
-      `INSERT INTO bb_canonical.entity_relationships
+      `INSERT INTO canonical.entity_relationships
          (id, from_entity_id, to_entity_id, relationship_type, workflow_status,
           publication_status, confidence, created_at, updated_at)
        SELECT
@@ -361,7 +332,7 @@ async function applyTubmanSplit(client: pg.Client, releaseId: string): Promise<v
          '{"level":"high","source":"repo-9ki8 person/site split"}'::jsonb,
          now(), now()
        WHERE EXISTS (
-         SELECT 1 FROM bb_public.release_entities
+         SELECT 1 FROM published.release_entities
          WHERE release_id = $4 AND entity_id = $2
        )
        ON CONFLICT (id) DO NOTHING`,
@@ -372,7 +343,7 @@ async function applyTubmanSplit(client: pg.Client, releaseId: string): Promise<v
 
 /**
  * Washington's release row already carries a real biography with four cited claims — only
- * bb_canonical still holds the stale site shell. Pull the good published text back into
+ * canonical still holds the stale site shell. Pull the good published text back into
  * canonical so the next release build does not overwrite the good row with the bad one.
  */
 async function applyWashingtonCanonicalDrift(
@@ -380,7 +351,7 @@ async function applyWashingtonCanonicalDrift(
   releaseId: string,
 ): Promise<boolean> {
   const { rowCount } = await client.query(
-    `UPDATE bb_canonical.entities e
+    `UPDATE canonical.entities e
      SET
        kind_detail = jsonb_set(
          jsonb_set(
@@ -394,7 +365,7 @@ async function applyWashingtonCanonicalDrift(
          true
        ),
        updated_at = now()
-     FROM bb_public.release_entities r
+     FROM published.release_entities r
      WHERE e.id = $1
        AND r.entity_id = $1
        AND r.release_id = $2
@@ -416,14 +387,14 @@ async function main(): Promise<void> {
     await auditPersonSiteConflation(client);
 
     const activeRelease = await client.query<{ release_id: string }>(
-      `SELECT release_id FROM bb_public.active_release LIMIT 1`,
+      `SELECT release_id FROM published.active_release LIMIT 1`,
     );
     const releaseId = activeRelease.rows[0]?.release_id;
     if (!releaseId) throw new Error('no active release');
 
     const before = await client.query(
       `SELECT summary, jsonb_array_length(COALESCE(claims, '[]'::jsonb)) AS claims
-       FROM bb_public.release_entities WHERE release_id = $1 AND entity_id = $2`,
+       FROM published.release_entities WHERE release_id = $1 AND entity_id = $2`,
       [releaseId, TUBMAN_ID],
     );
     console.log('\nTubman release row before:', JSON.stringify(before.rows[0] ?? null));
@@ -453,7 +424,7 @@ async function main(): Promise<void> {
     const after = await client.query(
       `SELECT summary, jsonb_array_length(COALESCE(claims, '[]'::jsonb)) AS claims,
               location ->> 'precision' AS precision
-       FROM bb_public.release_entities WHERE release_id = $1 AND entity_id = $2`,
+       FROM published.release_entities WHERE release_id = $1 AND entity_id = $2`,
       [releaseId, TUBMAN_ID],
     );
     console.log('\nTubman release row after:', JSON.stringify(after.rows[0] ?? null));

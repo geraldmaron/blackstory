@@ -3,8 +3,7 @@
  * Matches docs/methodology/juxtaposition-not-causation.md.
  */
 
-export const JUXTAPOSITION_DISCLAIMER =
-  'Context indicators are published measurements from named custodians. Showing them with a law or place does not establish that the law caused the indicator values. Causal statements require separately evidenced claims.';
+export { JUXTAPOSITION_DISCLAIMER } from '@repo/domain/juxtaposition';
 
 export const OBSERVATIONS_DISCLAIMER =
   'Values are transcribed published statistics, not BlackStory judgments.';

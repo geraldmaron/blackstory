@@ -20,7 +20,7 @@ export type LoadAbuseScenarioId =
 
 /** Control layers that can independently deny abusive traffic. */
 export type ControlLayer =
-  | 'app_check'
+  | 'client_header'
   | 'rate_limit_token_bucket'
   | 'rate_limit_rolling_window'
   | 'rate_limit_daily_cap'
@@ -73,7 +73,6 @@ export type LayeredControlProof = {
 export type CostEstimate = {
   readonly scenarioId: LoadAbuseScenarioId;
   readonly perRequestCostUnits: number;
-  readonly perRequestUsdMicros: number;
   readonly notes: string;
 };
 

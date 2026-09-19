@@ -34,18 +34,30 @@ test('the bar renders the product axes and never a hand-written list', () => {
   // was Stories — one of the four ways into the product — reachable only through Rooms.
   assert.match(source, /primaryNavDestinations/);
   assert.match(source, /aria-label="Find"/);
-  assert.match(source, /<RoomsMenu \/>/);
+  assert.match(source, /<RoomsMenu overflowFind=\{overflowFind\} \/>/);
+  assert.match(source, /DestinationIcon/);
   // Home is the brand lockup, not a nav item beside Explore.
   assert.match(source, /ds-bar__brand[\s\S]*href="\/"/);
   assert.doesNotMatch(source, /\n\s*Door\n/);
   assert.doesNotMatch(source, />\s*Journey\s*</);
   assert.doesNotMatch(source, /onModeChange!\('story'\)/);
+  // Browse is a Map posture entered from journey CTAs, not a fifth Find chip beside Map.
+  assert.doesNotMatch(source, />\s*Browse\s*</);
+  assert.doesNotMatch(source, /enterMapBrowse/);
+  assert.match(source, /exitMapBrowse/);
+  assert.match(source, /pathIsBrowsing/);
+  assert.doesNotMatch(source, />\s*Filters\s*</);
+  // Phone map Find folds Stories/Records into Rooms so the bar stays Map + Rooms.
+  assert.match(source, /overflowFind/);
+  assert.match(source, /PHONE_OVERFLOW_AXIS_PATHS/);
   // A literal axis href inside the nav is a second registry waiting to drift from the first.
   // Scoped to the nav element: the no-JS search fallback legitimately links `/records` as the
   // place a reader searches when the combobox cannot mount.
   const navStart = source.indexOf('aria-label="Find"');
   const nav = source.slice(navStart, source.indexOf('</nav>', navStart));
-  for (const axis of ['/explore', '/stories', '/records']) {
+  assert.doesNotMatch(nav, /href="\/explore"/);
+  assert.doesNotMatch(nav, />\s*Browse\s*</);
+  for (const axis of ['/stories', '/records']) {
     assert.doesNotMatch(
       nav,
       new RegExp(`href="${axis}"`),
@@ -57,6 +69,6 @@ test('the bar renders the product axes and never a hand-written list', () => {
 test('the bar names exactly the four axes, in product order', () => {
   assert.deepEqual(
     primaryNavDestinations().map((axis) => axis.label),
-    ['Explore', 'Stories', 'Records', 'Rooms'],
+    ['Map', 'Stories', 'Records', 'Rooms'],
   );
 });

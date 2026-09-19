@@ -13,6 +13,7 @@ These carry no folder of their own. They are law about how routes, the shell and
 | Surface classes | [`patterns-surface-classes.md`](./patterns-surface-classes.md) | `app/layout.tsx`, `app/shell.css`, `components/SiteShell.tsx`, `lib/keyboard/bindings.ts`, `lib/nav/destination-registry.ts` | Binding. `data-surface` emission pending (SP-07) |
 | Plate posture | [`patterns-plate-posture.md`](./patterns-plate-posture.md) | `components/map-stage/MapStage.tsx`, `lib/map-experience/map-libre-lifecycle.ts`, `components/theme-spine/MapInsetMoment.tsx`, `components/patterns/RecordPlacePreview.tsx`; `lib/motion/use-reduced-motion.ts` is new in SP-18 | Binding. Postures pending (SP-07, SP-08) |
 | Reading room | [`patterns-reading-room.md`](./patterns-reading-room.md) | `components/article/*`, `components/SiteFooter.tsx`; `app/reading-room.css` and `components/shell/SiteFooter.tsx` are new in SP-11 and SP-15 | Binding. Stylesheet pending (SP-11) |
+| Documentary figure | [`patterns-reading-room.md`](./patterns-reading-room.md) | `components/room/Evidence.tsx` (`ArchiveFigure`), `room-kit.css` | Shared by Lives and article image blocks; full frame, caption, credit, optional rights/source and verbal reading |
 | Record page | [`patterns-record-page.md`](./patterns-record-page.md) | `components/patterns/RecordAnatomyPanel.tsx`, `RecordPlacePreview.tsx`, `lib/citation/format.ts`; `app/record-page.css` is new in SP-12 | Binding. Page class pending (SP-12) |
 | Lens handoff | [`patterns-lens-handoff.md`](./patterns-lens-handoff.md) | `lib/map-experience/url-state.ts`, `lib/share/deep-link.ts`, `lib/runtime-hardening/{constants,query-normalization,edge-query-normalization}.ts`, `middleware.ts` | Binding. Typed builder pending (SP-15, SP-16) |
 
@@ -23,8 +24,11 @@ These carry no folder of their own. They are law about how routes, the shell and
 | Browse mode | [`patterns-browse-mode.md`](./patterns-browse-mode.md) | `browse-mode.ts`, `BrowseModeToggle.tsx`, `RecordBrowseControls.tsx`, `browse-mode.css` | `BrowseMode`, `stepIndex`, `pickRandomIndex`, `formatBrowsePosition`, `initialBrowseIndex`, `browseModeLabel`, `BrowseModeToggle`, `RecordBrowseControls` |
 | Relationship constellation | [`patterns-relationship-constellation.md`](./patterns-relationship-constellation.md) | `RelationshipConstellation.tsx`, `relationship-constellation.css` | `RelationshipConstellation`, `ConstellationEdge` |
 | Edition fact icon + record anatomy | [`patterns-edition-fact-icon.md`](./patterns-edition-fact-icon.md), [`patterns-record-anatomy.md`](./patterns-record-anatomy.md) | `edition-fact-icon.ts`, `EditionFactIcon.tsx`, `edition-fact-icon.css`, `RecordAnatomyPanel.tsx`, `RecordPlacePreview.tsx`, `record-anatomy.css` | `EditionFactIcon`, `RecordAnatomyPanel`, `RecordPlacePreview`, icon helpers |
+| Destination icon | [`patterns-destination-icon.md`](./patterns-destination-icon.md) | `DestinationIcon.tsx`, `destination-icon.css`; resolver `lib/nav/destination-icons.ts` | `DestinationIcon`, `destinationGlyphFor` |
+| Room section | [`patterns-room-section.md`](./patterns-room-section.md) | `components/room/RoomSection.tsx`, `RoomJump.tsx`, `room-kit.css` | `RoomSection`, `RoomJump`, `RoomFactList`, `RoomHandoff`, `roomSectionTone` |
+| Lives scene | [`patterns-lives-scene.md`](./patterns-lives-scene.md) | `patterns/sketch/sketch-path.ts`, `lives/scene/*`, `lives/LivesPlaceAnchors.tsx`, `app/lives/lives.css` | `LivesScene`, place anchors (2–3 per region), `buildLivesSceneLayers`, sketch primitives |
 | Visit handoff + public address | [`patterns-visit-handoff.md`](./patterns-visit-handoff.md) | `lib/geography/{public-address,visit-handoff,public-visit-contact,visit-advisory,external-maps-url}.ts`, `RecordVisitBlock.tsx`, `record-visit.css` | `RecordVisitBlock`, `resolvePublicAddressLine`, `buildVisitHandoff`, `resolvePublicVisitContact` |
-| Internet Archive handoff | [`patterns-internet-archive-handoff.md`](./patterns-internet-archive-handoff.md) | `lib/geography/internet-archive-sources.ts`, `RecordArchiveSources.tsx`, `RecordArchiveContribution.tsx`, `record-archive.css` | `RecordArchiveSources`, `resolveInternetArchiveSources`, `RecordArchiveContribution` |
+| Internet Archive handoff | [`patterns-internet-archive-handoff.md`](./patterns-internet-archive-handoff.md) | `lib/geography/internet-archive-sources.ts`, `RecordArchiveSources.tsx`, `RecordArchiveContribution.tsx`, `components/room/Evidence.tsx`, `components/evidence/EvidenceCard.tsx`, `record-archive.css` | `RecordArchiveSources`, `resolveInternetArchiveSources`, `RecordArchiveContribution`, `ArchivedSourceLinks`, `SourceList`, `EvidenceCard` |
 | Edition atmosphere (grain + grid canvas) | [`design-direction-v6-home.md`](./design-direction-v6-home.md) §2 (superseded, kept for provenance) | `edition-atmosphere/*` | `editionAtmosphereCanvasClassName` only. The gutter mosaic (`EditionAtmosphereMosaic`, `computeScatteredMosaicLayout`, `edition-atmosphere-config`) was retired; page tests assert it is absent. |
 | Memorial wall | [`design-direction-v6-memorial.md`](./design-direction-v6-memorial.md) (superseded by v9 surfaces §4.2) | `memorial-wall/*` | `MemorialWallAtmosphere`, `packMemorialNames`, `MEMORIAL_NAMES` |
 | Utility edition (compact pages) | [`patterns-utility-edition.md`](./patterns-utility-edition.md) | `utility-edition/*` | `UtilityEditionShell`, `UtilityEditionIntro`, `UtilityEditionBodyPanel`, `UtilityEditionErrorView`, chrome helpers |
@@ -56,6 +60,9 @@ import { EditionFactIcon } from '@/components/patterns/EditionFactIcon';
 import { RecordAnatomyPanel } from '@/components/patterns/RecordAnatomyPanel';
 import '@/components/patterns/edition-fact-icon.css';
 import '@/components/patterns/record-anatomy.css';
+
+// Destination wayfinding (CSS is imported by the component)
+import { DestinationIcon } from '@/components/patterns/DestinationIcon';
 
 // Record page: the place frame and the citation formatter the sheet also uses
 import { RecordPlacePreview } from '@/components/patterns/RecordPlacePreview';
@@ -117,25 +124,22 @@ Relative imports from `apps/web/src` use the paths above without the `@/` alias 
 
 | Surface | Patterns used |
 |---|---|
-| `/` home edition | `CinematicMapProvider`, `useCinematicMap`, `ExploreMapControl`, `CinematicScrim`, `MapIntroBeat` (Rest → Invite → Engaged); `RecordBrowseControls`, `EditionFactIcon`, `RecordAnatomyPanel`, `home-featured-set`, `browse-mode` helpers |
-| `HomeFeaturedRecord` | `RecordBrowseControls`, `RecordAnatomyPanel` |
-| `HomeAbout` | `EditionFactIcon` (entry steps) |
-| `/explore` spotlight + instruments | `RecordBrowseControls`, `BrowseModeToggle`, `EditionFactIcon`, edition segmented tabs (`explore-edition.css`), decade stepper rail |
-| `/explore` `NarrativeCard` | `RecordAnatomyPanel`, `RecordBrowseControls` browse toolbar |
-| `/explore` shell | Footer omitted by design; other routes use [`patterns-site-footer.md`](./patterns-site-footer.md) |
-| `/history` find-in-time | Explore decade scrubber classes, `HistoryRipRow`, `EditionFactIcon`, edition Surface panels |
-| `/chapters`, `/chapters/[slug]` | `ArticleBody`, `ArticleProse`, `ArticleReferences`, `MapInsetMoment`, `EraTimeline`, `DisputeBlock`, theme-impact charts, `articles-edition.css` |
-| `/chapters/mosaic-credits` | v6 stories edition chrome, local to that folder (`stories-edition.css`, `stories-panel-chrome.ts`) |
-| `/about` product thesis | edition Surface panels (`about-edition.css`) |
-| `/books` challenged titles | `BooksRipRow`, `EditionFactIcon`, `BooksCoverArt`, `RecordAnatomyPanel` (detail place), `books-edition.css` |
-| `/law`, `/data`, `/methodology`, `/memorial` | edition Surface panels |
-| `/entity/[id]` record detail | `RecordAnatomyPanel`, `EditionFactIcon`, `EntityMastMedia` fail-closed, session nav; `CinematicMapProvider`, `useCinematicMap`, `ExploreMapControl`, `CinematicMapClose`, `CinematicScrim` around the place-context locator map (`EntityLocationCinematicMap`, Rest → Engaged, no Invite) |
-| `/locate`, `/submit`, `/corrections`, `/corrections/status/[receiptCode]`, 404, error | `UtilityEditionShell`, `UtilityEditionIntro`, `UtilityEditionBodyPanel`, `UtilityEditionErrorView` |
-| `/search` | Redirect only, to `/history`, per the `next.config.mjs` rule |
+| `/` Door journey | Door immersive chapters + pin plate; Field posture. **Browse** morphs in place to filters on the same MapStage. |
+| `/explore` | Browse posture deep link (`/explore?…`). Cold load lands armed. `/explore/api` stays. |
+| `/records` | Sequenced discovery list + OrientationInstrument |
+| `/stories`, `/stories/[slug]` | Reading posture; long-form chapters and short entries |
+| `/place/*`, `/invention/*` | Record posture: photo or neighborhood-zoom map hero; evidence at display scale |
+| `/how-it-works` | Single How it works room: About + Methodology inlined; Data (Counted → Lived → Measured gaps); Law/Books chapters deep-link to browse URLs |
+| `/about`, `/methodology` | 308 into `/how-it-works?s=…` |
+| `/data`, `/law`, `/books` | Deep links into How it works; Law/Books browse tools at `/law/browse`, `/books/browse` |
+| `/memorial` | Immutable memorial wall (P-01); ReadingEntry over the wall |
+| `/privacy`, `/terms`, `/corrections`, `/submit`, `/support`, `/locate`, `/errata` | Quiet supporting cast; Reading posture |
+| `/search`, `/history`, `/facts` | Redirect into `/records` (query mapped) |
+| `/chapters`, `/library`, `/themes`, `/map` | Permanent redirects (`/stories`, `/rooms`, `/stories`, `/`) — not live surfaces |
 
-`app/stories` and `app/themes` no longer exist. Both folded into `app/chapters`, and their design docs are provenance only. See [`design-direction-v9-chapters.md`](./design-direction-v9-chapters.md).
+`app/stories` and `app/themes` both exist: `/stories` is the live long-form index; `/themes` is a redirect into it. Do not cite `app/chapters` as the publication surface.
 
-**Cinematic map backdrop** adoption status: `/` home shipped (Rest → Invite → Engaged); mobile Explore tab shipped (Rest → Engaged, reference implementation); `/explore` shipped (Rest → Engaged, dense surface); `/entity/[id]` place-context locator shipped (Rest → Engaged, supplementary-surface shape, no auto-engage or Invite because the map sits inside other record content rather than being the page's point). See [`patterns-cinematic-map.md`](./patterns-cinematic-map.md) §1.
+**Cinematic map backdrop** adoption status: `/` home shipped (Rest → Invite → Engaged); mobile Explore tab shipped (Rest → Engaged, reference implementation); `/explore` shipped as map-focus posture (Rest → Engaged, dense surface); `/entity/[id]` place-context locator shipped (Rest → Engaged, supplementary-surface shape, no auto-engage or Invite because the map sits inside other record content rather than being the page's point). See [`patterns-cinematic-map.md`](./patterns-cinematic-map.md) §1.
 
 **On web this pattern is being replaced.** v9 gives every non-instrument surface a Framed or Parked plate borrowed from the single persistent `MapStage`, which removes the second MapLibre instance the backdrop mounts on `/entity/[id]` and inside chapter map moments. The mobile adoption is unaffected. See [`patterns-plate-posture.md`](./patterns-plate-posture.md).
 
@@ -148,6 +152,7 @@ Shared fail-closed patterns. Never render broken decorative or record media.
 | Entity mast photo | `EntityMastMedia.tsx` | URL candidate chain, then `EntityRecordMark` on exhaustion; Save-Data prefers the mark |
 | Story/atmosphere mosaic | `AtmospherePlane.tsx`, `LivingAtmosphereMosaic.tsx` | `onError` hides the mosaic; the geometric plate remains |
 | Kind / confidence badges | `KindBadge.tsx`, `ConfidenceMark.tsx`, `EditionFactIcon.tsx` | `iconWithFallback()` to `faCircle`; label text always visible (WCAG 1.4.1) |
+| Destination wayfinding | `DestinationIcon.tsx` | `iconWithFallback()` to `faCircle`; label text always visible beside the glyph |
 | Bare embeds | `EntityPrimaryImage.tsx` | No fallback; callers must use `EntityMastMedia` or own the policy |
 | Framed map plate | see [`patterns-plate-posture.md`](./patterns-plate-posture.md) §6 | A slot with no plate keeps its caption and states that the map is unavailable; never a blank rectangle |
 
@@ -159,6 +164,7 @@ Helper: `apps/web/src/lib/map-experience/icon-fallback.ts` (`iconWithFallback`).
 |---|---|
 | Browse mode helpers + controls | `apps/web/src/components/patterns/browse-mode.test.tsx` |
 | Record anatomy panel | `apps/web/src/components/patterns/record-anatomy.test.ts` |
+| Destination icons | `apps/web/src/lib/nav/destination-icons.test.ts`, `apps/web/src/components/patterns/DestinationIcon.test.ts` |
 | Citation formatter | `apps/web/src/lib/citation/format.test.ts` |
 | Share deep link (no viewport key) | `apps/web/src/lib/share/deep-link.test.ts` |
 | Atlas URL state | `apps/web/src/lib/map-experience/url-state.test.ts` |

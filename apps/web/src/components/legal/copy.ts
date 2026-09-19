@@ -15,7 +15,7 @@ export const LEGAL_SECTION_LABELS = {
 } as const;
 
 export const LAW_BROWSE_LEDE =
-  'Landmark federal statutes, regulations, and court decisions that shape civil rights — explained in plain language with links to official sources and canonical fact records.';
+  'Statutes, regulations, and court decisions that shaped what could be built, owned, attended and voted for. Each entry is in plain language, quotes the operative text, and links to the official source it was checked against.';
 
 export const LEGAL_KIND_LABELS: Readonly<Record<string, string>> = {
   'federal-statute': 'Federal statute',

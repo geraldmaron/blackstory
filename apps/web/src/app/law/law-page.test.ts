@@ -9,31 +9,31 @@ import { fileURLToPath } from 'node:url';
 import { LAW_EDITION_BROWSE_LEDE } from './law-copy';
 
 const here = dirname(fileURLToPath(import.meta.url));
-const browsePageSource = readFileSync(join(here, 'page.tsx'), 'utf8');
+const indexPageSource = readFileSync(join(here, 'page.tsx'), 'utf8');
 const browseSectionsSource = readFileSync(join(here, 'LawBrowseSections.tsx'), 'utf8');
 const detailPageSource = readFileSync(join(here, '[slug]', 'page.tsx'), 'utf8');
 const detailSectionsSource = readFileSync(join(here, 'LawDetailSections.tsx'), 'utf8');
 const anatomySource = readFileSync(join(here, 'LawAnatomyStrip.tsx'), 'utf8');
 
-test('law browse page renders through the room kit, with no edition chrome left', () => {
-  assert.doesNotMatch(browsePageSource, /EditionAtmosphereMosaic/);
-  assert.doesNotMatch(browsePageSource, /LAW_EDITION_MOSAIC_SEED/);
-  // `data-law-edition="v6"` marked the per-route chrome the shared kit replaces.
-  assert.doesNotMatch(browsePageSource, /data-law-edition="v6"/);
-  assert.match(browsePageSource, /from '\.\.\/\.\.\/components\/room'/);
-  assert.match(browsePageSource, /<Room>/);
-  assert.doesNotMatch(browsePageSource, /\/explore/);
-  assert.match(browsePageSource, /<RoomHeader/);
-  assert.doesNotMatch(browsePageSource, /ds-page__title/);
+test('law index is the catalog room; /law/browse is a config redirect only', () => {
+  assert.match(indexPageSource, /LawBrowseSections/);
+  assert.match(indexPageSource, /<ReadingEntry/);
+  assert.match(indexPageSource, /<Room rail=\{rail\}>/);
+  assert.match(indexPageSource, /OrientationInstrument/);
+  assert.doesNotMatch(indexPageSource, /how-it-works|LawHubSections/);
+  assert.doesNotMatch(indexPageSource, /EditionAtmosphereMosaic|LAW_EDITION_MOSAIC_SEED/);
 });
 
-test('law browse preserves GET URL contract', () => {
+test('law browse preserves GET URL contract at /law', () => {
   assert.match(browseSectionsSource, /method="get"/);
-  assert.match(browseSectionsSource, /action="\/law"/);
+  assert.match(browseSectionsSource, /action="\/law#browse"/);
+  assert.match(browseSectionsSource, /id="browse"/);
   assert.match(browseSectionsSource, /name="q"/);
   assert.match(browseSectionsSource, /name="kind"/);
   assert.match(browseSectionsSource, /name="topic"/);
   assert.match(browseSectionsSource, /name="sort"/);
+  assert.match(browseSectionsSource, /aria-label="Sort order"/);
+  assert.match(browseSectionsSource, /sortOptions\.map/);
   assert.match(browseSectionsSource, /href="\/law"/);
 });
 
@@ -58,6 +58,25 @@ test('law detail page uses anatomy strip without gutter mosaic', () => {
   assert.match(anatomySource, /EditionFactIcon/);
 });
 
+test('the anatomy strip names topics by label, the way the browse chips do', async () => {
+  // The detail page printed "constitutional · criminal-justice" while /law chips said
+  // "Constitutional" and "Criminal justice".
+  const React = await import('react');
+  const { renderToStaticMarkup } = await import('react-dom/server');
+  const { LawAnatomyStrip } = await import('./LawAnatomyStrip');
+  const markup = renderToStaticMarkup(
+    React.createElement(LawAnatomyStrip, {
+      kind: 'constitutional-amendment',
+      lawStatus: 'in_force',
+      jurisdictionId: 'federal',
+      citation: 'U.S. Const. amend. XIII',
+      topics: ['constitutional', 'criminal-justice'],
+    }),
+  );
+  assert.match(markup, /Constitutional · Criminal justice/);
+  assert.doesNotMatch(markup, /criminal-justice/);
+});
+
 test('law detail page renders through the room kit, with no edition chrome left', () => {
   assert.doesNotMatch(detailPageSource, /law-panel-chrome/);
   assert.doesNotMatch(detailPageSource, /law-edition\.css/);
@@ -66,15 +85,18 @@ test('law detail page renders through the room kit, with no edition chrome left'
   assert.match(detailPageSource, /<Room>/);
   assert.doesNotMatch(detailSectionsSource, /law-panel-chrome/);
   assert.doesNotMatch(detailSectionsSource, /ds-law-edition__panel/);
-  assert.match(detailSectionsSource, /<RoomHeader/);
+  assert.match(detailSectionsSource, /<ReadingEntry/);
 });
 
-test('law browse lede preserved without em dashes', () => {
-  assert.match(browsePageSource, /LAW_EDITION_BROWSE_LEDE/);
+test('law browse lede preserved without em dashes, and the room is not titled civil rights law', () => {
+  assert.match(indexPageSource, /LAW_EDITION_BROWSE_LEDE/);
   assert.doesNotMatch(LAW_EDITION_BROWSE_LEDE, /—/);
+  assert.doesNotMatch(indexPageSource, /Civil rights/);
+  assert.match(indexPageSource, /title="Law"/);
+  assert.doesNotMatch(LAW_EDITION_BROWSE_LEDE, /civil rights/i);
 });
 
-// SP-12c (repo-92n2.12.3): the connected-records hand-off, camera dignity, prev/next, and the
+// The contract covers the connected-records hand-off, camera dignity, prev/next navigation, and
 // deliberate absence of a jurisdiction plate. `law-detail-sections.test.tsx` exercises the real
 // seed data through the real `buildLensHandoff` guard; these pin the source-level contract.
 

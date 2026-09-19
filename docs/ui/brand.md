@@ -50,10 +50,13 @@ Recorded so nobody “fixes” the codebase back to a retired rule:
 4. **Lockup rendering.** Official artwork PNGs at `apps/web/public/brand/` —
    never type the wordmark next to a bare symbol in React.
 5. **Copper text.** Use `#8E4F2A` on light / `#D07A32` on dark
-   (`--ds-copper-text`), not raw Copper Pin for body text on light canvas.
-6. **Home layout.** The `/` page layout pattern (beats, hero, footer) lives in
-   [`design-direction-v6-home.md`](./design-direction-v6-home.md); tokens and
-   palette rules in this file still govern home.
+   (`--ds-accent`), not raw Copper Pin for body text on light canvas.
+   Inline links in operational notices use that theme-aware token, an underline, and a
+   visible focus outline; browser-default blue does not provide dark-theme contrast.
+6. **Home layout.** The `/` surface follows
+   [design direction v10](./design-direction-v10.md) and its
+   [reconciliation](./v10/design-doc-reconciliation.md); tokens and palette rules in this file
+   govern the shared brand.
 
 ## The signature
 
@@ -124,7 +127,11 @@ and technical labels. All open-source; no licensed fonts.
 
 ## Shape
 
-Radii 8/16/28px (sm/md/lg). Flat matte fills only.
+Radii 8/16/28px (sm/md/lg). The archive is material, not glass: depth comes from
+stacking, occlusion, crop and value (four surface steps per theme), never from
+synthetic light. Decorative gradients, glows, neon, bevels, glass and 3D stay
+banned. One low-opacity contact shadow (`--ds-contact-*`) is allowed only where
+a layer genuinely overlaps another.
 
 ## Imagery and people
 
@@ -141,43 +148,7 @@ color is never the only signal (confidence stays glyph-encoded); points
 render no sharper than stored precision and a coarsened point is never
 labeled as an exact address.
 
-## Infra naming
+## Infrastructure naming
 
-- GCP / Firebase **project id** `black-book-efaaf` is immutable. Documented
-  as legacy in `@repo/config` (`GCP_PROJECT_ID_PROD`). Display names and
-  labels use BlackStory / `product=blackstory`.
-- New GCP project ids use the stable `repo-` prefix (`repo-staging`,
-  `repo-internal`).
-- Local directory and GitHub repo: `blackstory` (HUMAN rename).
-
-## File naming
-
-Lowercase-kebab file names everywhere, including docs and asset packs —
-no uppercase file names in new work. Public brand filenames are **role-based**
-(`lockup-dark.png`), not product-prefixed.
-
-## Open Graph / social banners
-
-Served copies: `apps/web/public/brand/open-graph-*-1200x630.png` (and the
-docs twin). Masters: `brand/social/*/BlackStory-social-banner-*-1200x630.png`.
-
-These must be **opaque** 1200×630 RGB PNGs — solid Black Ink (`#0A0A0A`) or
-Archive Paper (`#F4EFE5`) canvas with the approved transparent lockup
-composited on top. Do not ship transparent OG assets or grain overlays;
-iMessage and other scrapers flatten alpha poorly and will show RGB noise as
-static. When regenerating, bump the `?v=` query on `BRAND_ASSETS.openGraph`
-(and the docs layout twin) so cached previews refresh.
-
-## Add to Home Screen / install icons
-
-Opaque PNGs for the web app manifest and Android install UI:
-
-| Role path | Source |
-|---|---|
-| `icon-192.png` / `icon-512.png` | `brand/app-icons/light/*-512.png` flattened on Archive Paper |
-| `icon-maskable-512.png` | Same mark, ~80% content safe-zone on Archive Paper |
-
-Manifest: `apps/web/public/manifest.webmanifest`. No service worker is shipped;
-installability is online-first only. (Owner how-to note for iOS Add to Home
-Screen limits was removed 2026-07-24; iOS requires the user to use Safari's
-Share → Add to Home Screen manually — there is no programmatic install prompt.)
+Infrastructure identifiers are configuration, not product copy. Package names use `@repo/*`,
+CSS uses `ds-*` / `--ds-*`, and break-glass environment controls use `APP_*`.

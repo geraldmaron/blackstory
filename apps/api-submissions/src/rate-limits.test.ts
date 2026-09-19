@@ -29,7 +29,7 @@ test('submissions guard requires attestation for anonymous corrections', () => {
   assert.ok(denied);
   assert.equal(denied.allowed, false);
   if (!denied.allowed) {
-    assert.equal(denied.reason, 'app_check_required');
+    assert.equal(denied.reason, 'client_header_required');
   }
 });
 

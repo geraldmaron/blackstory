@@ -59,6 +59,14 @@ See `apps/mobile/README.md` for setup (`API_BASE_URL=http://127.0.0.1:8080` in `
 
 ## BlackStory research lanes
 
+Start at [`docs/architecture.md`](docs/architecture.md) and
+[`docs/research/README.md`](docs/research/README.md). These define current authority and the
+challenge procedure. Inspect code and evidence before accepting a design claim. Historical
+ADRs/PRDs and dated audits are supporting records, not competing operating instructions.
+Research is explicit manual/headless work; do not use Corsair or install a schedule.
+Code comments explain behavior and constraints, not session history or incidental dates.
+
+
 Two skill kinds live under `.claude/skills/blackstory/`:
 
 - **CLI pointers** (`research-intake`, `discovery-run`, `editorial-enrichment`, `locate`,
@@ -67,7 +75,7 @@ Two skill kinds live under `.claude/skills/blackstory/`:
   duplicate command flags.
 - **Judgment playbooks** (`entity-verify`, `claim-corroborate`, `entity-complete`,
   `entity-relate`, `coverage-target`, `publish-preview`, `neo-voice`, `prose-review`,
-  `ringer-review`, `surface-triage`) carry decision order, source ladders, and Do/Never. They
+  `ringer-review`, `surface-triage`, `intake-review`) carry decision order, source ladders, and Do/Never. They
   have no operator-cli verb of their own.
 
 `blackstory-locate` Census-geocodes a sourced address (no LLM). Finding the place, confirming
@@ -87,7 +95,7 @@ All commands: `node --conditions development --import tsx packages/operator-cli/
 | backfill-entity | Re-run enrichment/backfill for one known entity id | `backfill-entity --entity-id <id> --provider mock --operator-id "$USER" --session-id "<id>"` |
 | prose-run | Short-form prose draft for one subject (lighter than story-research-run) | `prose-run --entity-id <id> --provider mock --operator-id "$USER" --session-id "<id>"` |
 | story-research-run | Draft/recommend longform `/stories` articles via citation-gated story packets | `story-research-run --topics <topics.json> --provider mock --operator-id "$USER" --session-id "<id>"` |
-| harness-run | Run a thematic study (redlining, urban renewal) and draft ThemeImpactPackets | `harness-run --theme <theme> --metro <metro> --connectors dpla,nps-network-to-freedom,shpo --output <out.json>` |
+| harness-run | Run a thematic study (redlining, urban renewal) and draft ThemeImpactPackets | `harness-run --theme <question> --subjects <source-records.json> --max-subjects 25 --max-relations 25` |
 | locate | Census-geocode a sourced address to lat/lng (no LLM). Finding the place is `blackstory-entity-verify`. | `locate --entity-id <id> --address "<address>" --precision institution --operator-id "$USER" --session-id "<id>"` |
 | capture-backfill | Snapshot cited URLs into `source_captures`; looks up existing Wayback captures when a fetch fails, and `--wayback` secondary-anchors the rest at Save Page Now | `capture-backfill [--commit] [--wayback] [--max-captures 25]` |
 | case-drafting (`attach-evidence`) | Check if a research case is review-ready; fill missing evidence | `attach-evidence --case-id "<id>" --description "<what this fills>" --source-url "<url>" --operator-id "$USER" --session-id "<id>"` |
@@ -216,7 +224,7 @@ The base image ships an older `/exec-daemon/node` (v22.14.0) that lacks `module.
 `/corrections` and `/submit` use an in-memory store (`apps/web/src/app/corrections/store.ts`), so a submission succeeds and returns a receipt code with no DB. The `/corrections/status/<receipt>` lookup will report "Receipt not found" in dev because the in-memory store is not shared across route handlers/process boundaries (production persists via the `submissionInbox` backing). This is expected locally, not a bug.
 
 ### Optional services (not needed for core web dev)
-Docker is not installed, so the parked local PostGIS (`pnpm db:up`) does not run here; it is a dev-only convenience, unrelated to system-of-record status (`docs/decisions-carryover.md`, "Firestore as system of record, reversed"). Firebase emulators need a Java runtime and are optional. `apps/mobile` (Expo iOS) cannot run on this Linux VM (requires macOS/Xcode) and is excluded from the pnpm workspace (its own `package-lock.json`).
+Local database integration tests use an isolated Supabase instance when Docker is available. Firebase emulators and the parked database stack are removed. Native iOS QA requires macOS/Xcode; `apps/mobile` uses its own npm graph.
 
 <!-- BEGIN BEADS INTEGRATION v:1 profile:minimal hash:ca08a54f -->
 ## Beads Issue Tracker

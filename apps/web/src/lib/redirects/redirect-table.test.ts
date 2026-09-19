@@ -127,7 +127,7 @@ test('every folded path reaches its surface in exactly one hop', () => {
     ['/myths', '/stories'],
     ['/myths/anything', '/stories'],
     ['/legal', '/law'],
-    ['/map', '/explore'],
+    ['/map', '/'],
     ['/locate', '/explore'],
   ] as const;
 
@@ -152,13 +152,13 @@ test('/locate folds into the Atlas place finder, carrying the focus-instruction 
   assert.equal(rule?.permanent, true);
 });
 
-test('/map lands on the Explore instrument; /explore renders it', () => {
+test('/map lands on the Door journey; /explore stays the map-focus instrument', () => {
   const map = RULES.find((entry) => entry.source === '/map');
   const explore = RULES.find((entry) => entry.source === '/explore');
   assert.ok(map, '/map must have a config rule');
-  assert.equal(map?.destination, '/explore');
+  assert.equal(map?.destination, '/');
   assert.equal(map?.permanent, true);
-  assert.equal(explore, undefined, '/explore is the instrument, not a redirect');
+  assert.equal(explore, undefined, '/explore must not 308 (Chrome RSC cache hazard)');
 });
 
 test('the /explore rule is the exact path, so /explore/api keeps answering', () => {
@@ -247,12 +247,8 @@ test('decadeParamToEra rejects anything that is not a decade boundary', () => {
 });
 
 /**
- * A permanent redirect off a route that later comes back is remembered by every browser that
- * ever followed it. f9f9fcc8 (2026-07-30) sent `/explore` to `/` with a 308; ca3f5274
- * (2026-08-28) brought `/explore` back as the Atlas. Chrome kept the 308 for the exact URL the
- * app router fetches on a nav click (`/explore?_rsc=<stable hash>`), so every later "fix" of
- * Explore verified clean in a fresh browser and failed in the developer's own, for five weeks
- * (2026-09-02). A rule may only redirect a path that has no page behind it.
+ * Browsers cache permanent redirects, including app-router requests with stable query values.
+ * A redirect rule may therefore target only a path with no live page behind it.
  */
 test('no rule redirects away from a route that still has a page', () => {
   const appDir = fileURLToPath(new URL('../../app/', import.meta.url));
@@ -278,9 +274,10 @@ test('every legacy alias in the semantic catalog is honored by the redirect tabl
     if (hops === 0) {
       // `/history` and `/search` deliberately have no config rule: both carry a query value a
       // config rule cannot read (`decade` becomes `era`, and `q` has to survive), so the
-      // filesystem route runs and does the transform. The catalog annotates both.
+      // filesystem route runs and does the transform. `/how-it-works` and `/apparatus` are the
+      // same shape: `?s=` must map to different rooms, which a static rule cannot do.
       assert.ok(
-        ['/history', '/search'].includes(alias.from),
+        ['/history', '/search', '/how-it-works', '/apparatus'].includes(alias.from),
         `${alias.from} is a catalog alias with no redirect rule`,
       );
       continue;

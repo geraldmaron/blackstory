@@ -440,18 +440,9 @@ function round4(value: number): number {
 }
 
 /**
- * Graph-consistency diagnostic (BB the related workstream additive, not wired into
- * `recalculateConfidence` above, following the same pattern as
- * `computeReviewerAgreementSignal`/`citationRotRateAuthoritySignal`).
- *
- * Graph corroboration relationships in the graph agreeing or conflicting with a given edge
- * is a real signal, but it must never be folded into `sourceAuthority` or `lineageIndependence`
- * (`../claims/confidence.ts`): those two components are deliberately evidence-sourced only, so
- * that a bad source's own derived cluster of relationships can never launder itself into a
- * higher score by corroborating itself through the graph. This diagnostic is the ONLY place
- * graph corroboration is allowed to surface today; a future integration may additionally let it
- * inform `entityMatchQuality`, but that composition is not implemented here — this function only
- * computes and returns the diagnostic.
+ * Graph-consistency diagnostic kept separate from sourceAuthority and lineageIndependence.
+ * Derived edges must not corroborate their own source into a higher confidence score. This
+ * function returns a diagnostic and does not modify recalculateConfidence.
  */
 export const GRAPH_CONSISTENCY_SIGNAL_VERSION = 'graph-consistency-signal.v1' as const;
 

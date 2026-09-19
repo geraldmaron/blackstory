@@ -1,0 +1,28 @@
+{
+  "source": "U.S. Bureau of the Census, Census of Housing: 1970, Vol. I, Housing Characteristics for States, Cities, and Counties, Part 1, United States Summary, Chapter A, General Housing Characteristics",
+  "sourceUrl": "https://www2.census.gov/library/publications/decennial/1970/housing-volume-1/13276827v1p1ch01.pdf",
+  "table": "Table 1",
+  "page": "1-9",
+  "boundaryVersion": "us-states-1970",
+  "datasetVintage": "1972 printed volume",
+  "figures": [
+    {
+      "metricId": "lives-median-rent",
+      "jurisdictionId": "nation:US",
+      "referencePeriod": "1970",
+      "raceEthnicitySlice": "all",
+      "estimate": 89,
+      "universe": "Specified renter-occupied units; median monthly contract rent, dollars",
+      "note": "Second pass: United States total column, median contract rent $89."
+    },
+    {
+      "metricId": "lives-median-home-value",
+      "jurisdictionId": "nation:US",
+      "referencePeriod": "1970",
+      "raceEthnicitySlice": "all",
+      "estimate": 17000,
+      "universe": "Specified owner-occupied units; median value, dollars",
+      "note": "Second pass: United States total column, median value $17,000."
+    }
+  ]
+}

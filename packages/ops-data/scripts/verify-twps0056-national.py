@@ -14,7 +14,7 @@ A missing figure means either a transcription error or an upstream workbook chan
 fail closed and investigate before re-loading.
 
 Usage (from repo root, Python with openpyxl available via `uv`):
-    uv run python packages/firebase/scripts/verify-twps0056-national.py
+    uv run python packages/ops-data/scripts/verify-twps0056-national.py
 """
 from __future__ import annotations
 

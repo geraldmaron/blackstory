@@ -79,7 +79,7 @@ export type RelationshipType = (typeof RELATIONSHIP_TYPES)[number];
  * - no live row uses one (the migration measured 0 of 1,064 rows);
  * - none has a `RELATIONSHIP_TYPE_SEMANTICS` entry, so an edge typed with one has no documented
  *   direction, no temporal rule and no causal guardrail;
- * - the names are real elsewhere as *claim* predicates (`bb_research.claim_versions.predicate`,
+ * - the names are real elsewhere as *claim* predicates (`research.claim_versions.predicate`,
  *   the discovery query packs in docs/research/network-traversal-discovery.md), which is a
  *   different vocabulary that happens to share spellings.
  *
@@ -106,13 +106,9 @@ export const DB_RELATIONSHIP_TYPES = [
 export type DbRelationshipType = (typeof DB_RELATIONSHIP_TYPES)[number];
 
 /**
- * Read-side gate for a stored relationship type.
- *
- * Unknown values degrade to `other` with a warning naming the value, rather than failing the
- * parse: a projection that fails to parse does not degrade, it 404s. On 2026-09-09 a narrower
- * copy of this enum unpublished 39 live records for exactly that reason. The warning is what makes
- * the degradation visible — an unknown type means this list is behind the database, and the fix is
- * to add the value here.
+ * Read-side gate for stored relationship types. Unknown values warn and degrade to other so
+ * vocabulary drift does not hide an entire entity. The warning requires reconciliation with the
+ * authoritative vocabulary; it is not permission to rewrite evidence predicates.
  */
 export const relationshipTypeSchema = z.enum(DB_RELATIONSHIP_TYPES).catch((ctx) => {
   console.warn(

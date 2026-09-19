@@ -74,7 +74,7 @@ test('every RelationshipType has a documented direction and temporal-semantics e
 });
 
 // ---------------------------------------------------------------------------
-// causal-weight ranking (repo-q16vc, 2026-09-12 owner ruling).
+// Causal-weight ranking contract.
 // ---------------------------------------------------------------------------
 
 test('RELATIONSHIP_CAUSAL_WEIGHT_TIERS partitions every RelationshipType exactly once', () => {

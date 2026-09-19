@@ -1,5 +1,5 @@
 /**
- * Upsert US state (+ DC) and nation jurisdiction rows into bb_reference.jurisdictions.
+ * Upsert US state (+ DC) and nation jurisdiction rows into reference.jurisdictions.
  * County rows: packages/ops-data/scripts/load-reference-counties.ts (Census Gazetteer).
  *
  * Usage:
@@ -80,7 +80,7 @@ async function main(): Promise<void> {
     await client.query('BEGIN');
     for (const j of seeds) {
       await client.query(
-        `INSERT INTO bb_reference.jurisdictions
+        `INSERT INTO reference.jurisdictions
           (id, kind, name, state_fips, county_fips, parent_id, metadata)
          VALUES ($1,$2,$3,$4,$5,$6,$7::jsonb)
          ON CONFLICT (id) DO UPDATE SET

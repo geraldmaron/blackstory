@@ -9,7 +9,7 @@
  * Usage (from the repo root; the env file is what supplies DATABASE_URL):
  *   cd apps/web && set -a && . ./.env.local && set +a && \
  *     node --conditions development --import tsx ../../packages/ops-data/scripts/dbq.mts \
- *     "SELECT count(*) FROM bb_public.release_entities"
+ *     "SELECT count(*) FROM published.release_entities"
  *
  * `--conditions development` is not optional: without it the workspace packages this script's
  * sibling imports resolve from do not resolve at all.

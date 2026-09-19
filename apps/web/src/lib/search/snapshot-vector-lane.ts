@@ -1,10 +1,4 @@
-/**
- * Snapshot-mode vector lane for hybrid search.
- *
- * Provides an in-memory deterministic vector recall port over the bundled seed index so hybrid
- * fusion can run locally without Firestore `findNearest`. Production wiring swaps this for a
- * server-side vector store call.
- */
+/** Bounded in-memory vector ranking for supplied snapshots. Live retrieval uses its configured Postgres adapter. */
 import { findSimilarCandidates, type EmbeddingVector } from '@repo/domain';
 import type { PublicSearchIndexDoc, SearchFilter } from '@repo/domain';
 

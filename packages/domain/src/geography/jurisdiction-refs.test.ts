@@ -71,7 +71,7 @@ test('assertJurisdictionReferencesResolve resolves cleanly when every reference 
   );
 });
 
-test('assertJurisdictionReferencesResolve supports an async Firestore-shaped resolver', async () => {
+test('assertJurisdictionReferencesResolve supports an asynchronous record resolver', async () => {
   const resolver = {
     async exists(jurisdictionId: string) {
       await Promise.resolve();

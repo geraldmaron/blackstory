@@ -51,7 +51,7 @@ export type RateLimitSimInput = {
   readonly subject: 'anonymous' | 'authenticated';
   readonly endpointClass: EndpointClass;
   readonly clientIp: string;
-  readonly appCheckVerified?: boolean;
+  readonly clientAttested?: boolean;
   readonly riskSignals?: readonly RiskSignal[];
   readonly releaseAfter?: boolean;
 };
@@ -79,8 +79,8 @@ function mapQuotaDenial(reason: string): ControlDenial {
       return { layer: 'rate_limit_concurrency', reason };
     case 'risk_score_exceeded':
       return { layer: 'rate_limit_risk_score', reason };
-    case 'app_check_required':
-      return { layer: 'app_check', reason };
+    case 'client_header_required':
+      return { layer: 'client_header', reason };
     default:
       return { layer: 'rate_limit_rolling_window', reason };
   }
@@ -115,9 +115,7 @@ export function createLoadAbuseHarness(options: LoadAbuseHarnessOptions = {}) {
         subject: input.subject,
         endpointClass: input.endpointClass,
         key,
-        ...(input.appCheckVerified !== undefined
-          ? { appCheckVerified: input.appCheckVerified }
-          : {}),
+        ...(input.clientAttested !== undefined ? { clientAttested: input.clientAttested } : {}),
         ...(input.riskSignals !== undefined ? { riskSignals: input.riskSignals } : {}),
       });
       if (input.releaseAfter !== false && decision.allowed) {
@@ -238,7 +236,7 @@ export function createLoadAbuseHarness(options: LoadAbuseHarnessOptions = {}) {
         subject: 'anonymous',
         endpointClass: 'geocoding',
         clientIp: '203.0.113.50',
-        appCheckVerified: true,
+        clientAttested: true,
       });
       if (!rate.decision.allowed) {
         denials.push(mapQuotaDenial(rate.decision.reason));
@@ -288,9 +286,7 @@ export function createLoadAbuseHarness(options: LoadAbuseHarnessOptions = {}) {
             key,
             nowMs,
             consume: true,
-            ...(input.appCheckVerified !== undefined
-              ? { appCheckVerified: input.appCheckVerified }
-              : {}),
+            ...(input.clientAttested !== undefined ? { clientAttested: input.clientAttested } : {}),
           },
           { store },
         );
@@ -306,9 +302,7 @@ export function createLoadAbuseHarness(options: LoadAbuseHarnessOptions = {}) {
           key,
           nowMs,
           consume: true,
-          ...(input.appCheckVerified !== undefined
-            ? { appCheckVerified: input.appCheckVerified }
-            : {}),
+          ...(input.clientAttested !== undefined ? { clientAttested: input.clientAttested } : {}),
         },
         { store },
       );

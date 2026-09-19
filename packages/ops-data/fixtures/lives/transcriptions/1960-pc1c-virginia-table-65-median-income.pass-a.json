@@ -1,0 +1,35 @@
+{
+  "source": "U.S. Bureau of the Census, U.S. Census of Population: 1960, Vol. I, Characteristics of the Population, Part 48, Virginia, Chapter C, General Social and Economic Characteristics",
+  "sourceUrl": "https://www2.census.gov/library/publications/decennial/1960/population-volume-1/09768066v1p48ch4.pdf",
+  "table": "Table 65",
+  "page": "48-166",
+  "boundaryVersion": "us-states-1960",
+  "datasetVintage": "1963 printed volume",
+  "figures": [
+    {
+      "metricId": "lives-income-median",
+      "jurisdictionId": "state:51",
+      "referencePeriod": "1960",
+      "raceEthnicitySlice": "all",
+      "estimate": 4966,
+      "universe": "Families; income in 1959 dollars; THE STATE",
+      "note": "Families block median, not families and unrelated individuals."
+    },
+    {
+      "metricId": "lives-income-median",
+      "jurisdictionId": "state:51",
+      "referencePeriod": "1960",
+      "raceEthnicitySlice": "white",
+      "estimate": 5522,
+      "universe": "Families; WHITE; income in 1959 dollars; THE STATE"
+    },
+    {
+      "metricId": "lives-income-median",
+      "jurisdictionId": "state:51",
+      "referencePeriod": "1960",
+      "raceEthnicitySlice": "nonwhite",
+      "estimate": 2780,
+      "universe": "Families; NONWHITE; income in 1959 dollars; THE STATE"
+    }
+  ]
+}

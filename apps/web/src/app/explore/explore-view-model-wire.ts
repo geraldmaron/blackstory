@@ -97,7 +97,7 @@ export type AtlasCatalogPayload = {
   readonly edgeLineCatalog: ExploreEdgeLineCatalog;
   readonly availableDecades: readonly string[];
   readonly citesEdge: CitesEdgeIndex;
-  /** See `ExploreViewModel`'s field of the same name (repo-jnmwu). Release-wide like every
+  /** See `ExploreViewModel`'s field of the same name. Release-wide like every
    * other field here — derived from `source` alone, never from the reader's request. */
   readonly unmappedPaletteRecords: readonly PaletteRecord[];
 };

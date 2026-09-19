@@ -37,12 +37,11 @@ describe('moment dignity · resolveMomentPlain', () => {
 
 /**
  * "A test enumerates every moment in the app, resolves its subject, and fails when a
- * violence-adjacent subject is not plain" (repo-92n2.33's acceptance criterion). `MapMoment`
+ * violence-adjacent subject is not plain" (acceptance criterion). `MapMoment`
  * itself already refuses to be dramatised — see `resolveMomentPlain` above — so a call site
  * cannot get this wrong by omission. What it can still get wrong is an explicit `plain={false}`
- * fighting a subject it was handed, which is the one way a future call site could reintroduce
- * the exact regression this bead exists to close. This walks the real source tree rather than a
- * fixture list, so a moment added after this package closes is covered without editing this file.
+ * fighting a subject it was handed. This walks the real source tree rather than a fixture list,
+ * so newly added moments are covered without editing this file.
  */
 
 const SRC_DIR = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');

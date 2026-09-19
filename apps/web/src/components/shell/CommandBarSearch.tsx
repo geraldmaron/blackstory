@@ -38,6 +38,12 @@ void React;
 /** The input's id, and the handle the shortcut handler focuses it by. */
 const BAR_SEARCH_INPUT_ID = 'bar-search';
 
+/**
+ * Suggestions, not the results page: eight rows fit the list, and the facet counts the endpoint
+ * computes for the full results page were most of every response (about 46KB of 54KB).
+ */
+const SUGGESTION_PAGE_SIZE = 8;
+
 export type CommandBarSearchProps = {
   /** Reads as a promise the surface can keep: the count is only shown where it is known. */
   readonly placeholder: string;
@@ -50,7 +56,7 @@ type SearchApiResult = {
   readonly matchedText?: unknown;
   /**
    * Set server-side only for a law/case result the legal catalog could resolve by exact title
-   * match (repo-skocy). Absent — never `undefined` explicitly — for everything else, including
+   * match. Absent — never `undefined` explicitly — for everything else, including
    * a law/case result that DIDN'T resolve: those still fall through to `recordHrefFrom` below,
    * which sends them to `/law` exactly as before this field existed.
    */
@@ -97,10 +103,13 @@ export function CommandBarSearch({ placeholder }: CommandBarSearchProps) {
 
   const suggestRemote = useCallback(
     async (query: string, signal: AbortSignal): Promise<readonly TypeaheadSuggestion[]> => {
-      const response = await fetch(`/search/api?q=${encodeURIComponent(query)}`, {
-        headers: { accept: 'application/json' },
-        signal,
-      });
+      const response = await fetch(
+        `/search/api?q=${encodeURIComponent(query)}&pageSize=${SUGGESTION_PAGE_SIZE}&facets=0`,
+        {
+          headers: { accept: 'application/json' },
+          signal,
+        },
+      );
       if (!response.ok) {
         // Thrown, not swallowed. Returning `[]` here is what made a 429 read as an empty archive:
         // the endpoint's anonymous quota is a per-minute window, so the reader most likely to be

@@ -89,7 +89,7 @@ export {
 
 Add the test file to the `packages/domain` `test` script list: `src/discovery/hbcu-campaign.test.ts`.
 
-No migration required (registry entries are in-memory/Firestore-later per `adapters/registry.ts`); if a durable table ever becomes necessary, use migration timestamp prefix `20260724000010`.
+Registry entries are currently in-memory (`adapters/registry.ts`). Persisted intake uses the existing research schema; review its contract before adding storage.
 
 ## Open follow-ups
 

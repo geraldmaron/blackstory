@@ -65,7 +65,7 @@ test('collectPublicRenderPathFindings flags forbidden imports', () => {
   // FORBIDDEN_PUBLIC_RENDER_IMPORTS' import-context requirement without
   // satisfying scripts/validate-boundaries.mjs's IMPORT_PATTERN (which
   // requires a literal "import"/"export" keyword) so this fixture
-  // exercises the real detector without the repo-wide boundary scanner
+  // exercises the real detector without the repository-wide boundary scanner
   // mistaking it for an actual cross-boundary import.
   const findings = collectPublicRenderPathFindings(
     'fake.tsx',
@@ -146,14 +146,14 @@ test('Explore and entity route segment config stays after all imports', () => {
     /\d+/,
   );
   assertSegmentConfigAfterImports(
-    readFileSync(join(APP_ROOT, 'page.tsx'), 'utf8'),
-    'page.tsx',
-    'revalidate',
-    /300/,
+    readFileSync(join(APP_ROOT, 'explore/page.tsx'), 'utf8'),
+    'explore/page.tsx',
+    'dynamic',
+    /force-dynamic/,
   );
 });
 
-test('Explore is `/`; `/explore` may still mount the same instrument', () => {
+test('Explore is `/`; `/explore` mounts the same Door browse shell', () => {
   const explorePages = collectAppRouteFiles(APP_ROOT).filter((file) =>
     /(^|\/)explore\/page\.tsx$/.test(
       file
@@ -162,11 +162,15 @@ test('Explore is `/`; `/explore` may still mount the same instrument', () => {
         .join('/'),
     ),
   );
-  assert.equal(explorePages.length, 1, '/explore may still render the instrument');
+  assert.equal(explorePages.length, 1, '/explore may still render browse');
 
   const home = readFileSync(join(APP_ROOT, 'page.tsx'), 'utf8');
+  const explore = readFileSync(join(APP_ROOT, 'explore/page.tsx'), 'utf8');
   assert.match(home, /DoorHome/);
   assert.doesNotMatch(home, /AtlasHome|HomeFirstPaint|wantsAtlasInstrument|atlas=1/);
+  assert.match(explore, /DoorHome/);
+  assert.match(explore, /initialBrowse/);
+  assert.doesNotMatch(explore, /AtlasHome/);
 
   assert.equal(
     existsSync(join(APP_ROOT, '(map)')),

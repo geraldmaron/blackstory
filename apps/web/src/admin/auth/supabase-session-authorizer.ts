@@ -1,9 +1,9 @@
 /**
  * Supabase session authorizer for admin API access.
  * Verifies a Supabase access token via auth.getUser(jwt), requires email, and reads
- * staff role exclusively from app_metadata.bb_role (never user_metadata).
+ * staff role exclusively from app_metadata.app_role (never user_metadata).
  */
-import type { StaffRole } from './role-mutation';
+import type { StaffRole } from './staff-permissions';
 import {
   AUTHORIZATION_HEADER,
   ServerAdminAuthorizationError,
@@ -17,9 +17,9 @@ function normalizeAdminEmail(value: string): string {
 export type VerifiedSupabaseAdminIdentity = {
   readonly uid: string;
   readonly email: string;
-  readonly bb_role: StaffRole;
+  readonly app_role: StaffRole;
   readonly app_metadata: {
-    readonly bb_role: StaffRole;
+    readonly app_role: StaffRole;
   };
 };
 
@@ -84,7 +84,7 @@ export class SupabaseSessionAuthorizationError extends Error {
 export function readSupabaseRoleFromAppMetadata(
   appMetadata: Readonly<Record<string, unknown>> | null | undefined,
 ): StaffRole | undefined {
-  const role = appMetadata?.bb_role;
+  const role = appMetadata?.app_role;
   return isStaffRole(role) ? role : undefined;
 }
 
@@ -111,16 +111,16 @@ export function createSupabaseSessionAuthorizer(verifier: SupabaseUserVerifier) 
         );
       }
 
-      const bbRole = readSupabaseRoleFromAppMetadata(data.user.app_metadata);
-      if (!bbRole) {
-        const rawRole = data.user.app_metadata?.bb_role;
+      const appRole = readSupabaseRoleFromAppMetadata(data.user.app_metadata);
+      if (!appRole) {
+        const rawRole = data.user.app_metadata?.app_role;
         throw new SupabaseSessionAuthorizationError(
           rawRole === undefined || rawRole === null || rawRole === ''
             ? 'ADMIN_ROLE_REQUIRED'
             : 'ADMIN_ROLE_UNKNOWN',
           rawRole === undefined || rawRole === null || rawRole === ''
-            ? 'Supabase administrator must have app_metadata.bb_role set'
-            : 'Supabase administrator has an unknown app_metadata.bb_role',
+            ? 'Supabase administrator must have app_metadata.app_role set'
+            : 'Supabase administrator has an unknown app_metadata.app_role',
         );
       }
 
@@ -129,11 +129,11 @@ export function createSupabaseSessionAuthorizer(verifier: SupabaseUserVerifier) 
         admin: {
           uid: data.user.id,
           email: normalizedEmail,
-          bb_role: bbRole,
-          app_metadata: { bb_role: bbRole },
+          app_role: appRole,
+          app_metadata: { app_role: appRole },
         },
         email: normalizedEmail,
-        role: bbRole,
+        role: appRole,
       };
     },
   };

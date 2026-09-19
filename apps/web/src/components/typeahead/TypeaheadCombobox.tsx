@@ -33,7 +33,10 @@ import React, {
  * Said to a reader whose lookup failed. It names the fallback rather than the cause, because the
  * cause (rate limit, offline, 5xx) is not something the reader can act on and the fallback is.
  */
-const UNAVAILABLE_NOTE = 'Suggestions are unavailable right now — press Enter to search.';
+const UNAVAILABLE_NOTE = 'Suggestions are unavailable right now. Press Enter to search.';
+
+/** Shown while a remote lookup is outstanding, so a slow answer is not mistaken for none. */
+const SEARCHING_NOTE = 'Searching…';
 
 export type TypeaheadSuggestion = {
   readonly id: string;
@@ -101,6 +104,11 @@ export function TypeaheadCombobox({
   const [suggestions, setSuggestions] = useState<readonly TypeaheadSuggestion[]>([]);
   /** True when the last remote lookup failed, so the field can say so rather than say "none". */
   const [unavailable, setUnavailable] = useState(false);
+  /**
+   * True while a remote lookup is scheduled or in flight. A cold server can take seconds to answer
+   * the first one, and a list that says nothing in the meantime reads as a search that is broken.
+   */
+  const [pending, setPending] = useState(false);
   const deferredQuery = useDeferredValue(query);
   const rootRef = useRef<HTMLDivElement | null>(null);
 
@@ -110,6 +118,7 @@ export function TypeaheadCombobox({
       setSuggestions([]);
       setActiveIndex(-1);
       setUnavailable(false);
+      setPending(false);
       return;
     }
 
@@ -117,10 +126,12 @@ export function TypeaheadCombobox({
       setSuggestions(suggestLocal(trimmed));
       setActiveIndex(-1);
       setUnavailable(false);
+      setPending(false);
       return;
     }
 
     if (!suggestRemote) return;
+    setPending(true);
 
     // One controller per effect run, aborted by this run's own cleanup. The previous version kept
     // it in a ref and aborted the *previous* controller on the way in, which left the final
@@ -136,12 +147,14 @@ export function TypeaheadCombobox({
           setSuggestions(next);
           setActiveIndex(-1);
           setUnavailable(false);
+          setPending(false);
         } catch {
           // An abort lands here too, and an abort is not a failure: the reader simply kept typing.
           if (canceled || controller.signal.aborted) return;
           setSuggestions([]);
           setActiveIndex(-1);
           setUnavailable(true);
+          setPending(false);
         }
       })();
     }, remoteDebounceMs);
@@ -204,15 +217,18 @@ export function TypeaheadCombobox({
   }
 
   const showUnavailable = unavailable && suggestions.length === 0;
+  const showSearching = pending && suggestions.length === 0 && !showUnavailable;
 
   const statusMessage =
     deferredQuery.trim().length < minChars
       ? ''
       : showUnavailable
         ? UNAVAILABLE_NOTE
-        : suggestions.length === 0
-          ? 'No matching suggestions'
-          : `${suggestions.length} suggestion${suggestions.length === 1 ? '' : 's'} available`;
+        : showSearching
+          ? SEARCHING_NOTE
+          : suggestions.length === 0
+            ? 'No matching suggestions'
+            : `${suggestions.length} suggestion${suggestions.length === 1 ? '' : 's'} available`;
 
   return (
     <div className={className ?? 'ds-typeahead'} ref={rootRef}>
@@ -250,6 +266,12 @@ export function TypeaheadCombobox({
       <p className="ds-visually-hidden" id={statusId} aria-live="polite">
         {statusMessage}
       </p>
+      {/* The live region above already announces this; the visible note is for sighted readers. */}
+      {showSearching && open ? (
+        <p className="ds-typeahead__note" aria-hidden="true">
+          {SEARCHING_NOTE}
+        </p>
+      ) : null}
       {showUnavailable && open ? (
         <p className="ds-typeahead__note" role="status">
           {UNAVAILABLE_NOTE}

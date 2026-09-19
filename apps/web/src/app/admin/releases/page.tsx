@@ -1,15 +1,13 @@
 /**
  * Publication release browser — manifests plus the active public release pointer.
  *
- * Server component (repo-gyq6.9). The manifest list and the active pointer are read in the request
- * and arrive in the first byte; an operator deciding whether to stage an activation no longer
- * waits on a hydrate and a token refresh to see which release is live.
+ * This server component reads the manifest list and active pointer in the request, so the initial
+ * response identifies the live release before client hydration.
  *
  * Unlike the other surfaces in this pass, this one has a genuine mutation, so it splits rather
  * than converts: the read is here, and {@link ReleasesDesk} keeps the client boundary for row
- * selection, the decision reason and the stage POST. `/admin/api/releases/stage` therefore stays a
- * real client API — which is the distinction the bead draws — while `/admin/api/releases` is no
- * longer called by this page.
+ * selection, the decision reason, and the stage POST. `/admin/api/releases/stage` is the client
+ * mutation API; this page does not call `/admin/api/releases` for its initial data.
  */
 import type { Metadata } from 'next';
 import { readPostgresOrDegrade } from '../../../admin/lib/canonical-postgres-client';

@@ -1,14 +1,8 @@
 /**
- * "Safe combination" validators for statistics (the related workstream), per the architecture
- * review: summing or otherwise combining two `StatisticalObservation`s is only valid when
- * they share a series/universe, come from compatible source data, cover disjoint
- * geographies, and share a boundary version (the tractVintage-style constraint from bd
- * memory: "Tract-keyed collections must carry explicit tractVintage: ACS 2020s releases use
- * 2020 tracts, Opportunity Atlas uses 2010 tracts — never join without a crosswalk").
- *
- * Disjointness of two jurisdictions is NOT computed here — real geometry intersection is out
- * of scope. Callers supply either a predicate or a static list of already-known-disjoint id
- * pairs (see `JurisdictionDisjointnessInput`).
+ * Combine statistical observations only when series/universe, source compatibility, disjoint
+ * geography and boundary vintage agree. Callers supply verified geographic disjointness; this
+ * module performs no geometry intersection. Never join different tract vintages without a
+ * crosswalk.
  */
 import type { StatisticalObservation } from './types.js';
 

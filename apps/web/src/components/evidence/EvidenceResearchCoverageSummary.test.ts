@@ -19,6 +19,8 @@ test('renders the research coverage level, source lineage count, and last-checke
   assert.match(html, /3 independent sources across this record/);
   assert.match(html, /Last checked/);
   assert.match(html, /2026-06-01/);
+  assert.match(html, /href="\/sources"/);
+  assert.match(html, /href="\/methodology#how-it-holds-together"/);
   assert.doesNotMatch(html, /sourcesacross/i);
 });
 

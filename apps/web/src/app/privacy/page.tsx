@@ -4,7 +4,7 @@
  */
 import type { Metadata } from 'next';
 import { buildStaticPageMetadata } from '../../lib/seo/metadata-builders';
-import { Room, RoomHeader } from '../../components/room';
+import { Room, ReadingEntry } from '../../components/room';
 import { WalkOffRamp } from '../walk-off-ramp';
 import '../utility.css';
 import { PrivacySections } from './PrivacySections';
@@ -19,9 +19,8 @@ export const metadata: Metadata = buildStaticPageMetadata({
 export default function PrivacyPage() {
   return (
     <Room>
-      <RoomHeader
+      <ReadingEntry
         pathname="/privacy"
-        kicker="Trust"
         title="Privacy policy"
         lede="What the BlackStory website processes, and what it deliberately does not. There are no accounts and no advertising, and the map asks for your location only when you press a control that says so."
       />

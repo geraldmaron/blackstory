@@ -72,14 +72,14 @@ async function main(): Promise<void> {
 
   try {
     const active = await client.query<{ release_id: string }>(
-      `SELECT release_id FROM bb_public.v_active_release_id`,
+      `SELECT release_id FROM published.v_active_release_id`,
     );
     const releaseId = active.rows[0]?.release_id;
     if (!releaseId) throw new Error('No active release');
 
     const { rows } = await client.query<Row>(
       `SELECT entity_id, display_name, kind, claims, projection
-         FROM bb_public.release_entities WHERE release_id = $1 ORDER BY kind, display_name`,
+         FROM published.release_entities WHERE release_id = $1 ORDER BY kind, display_name`,
       [releaseId],
     );
 

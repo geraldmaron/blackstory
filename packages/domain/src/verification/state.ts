@@ -1,29 +1,8 @@
 /**
- * Per-subject verification STATE (the related workstream): `lastVerifiedAt`, `nextReviewAt`,
- * `verificationStatus`, `verificationPolicyId`, `lastVerificationRunId`.
- *
- * Design choice — a SEPARATE type keyed by `(subjectType, subjectId)`, rather than adding these
- * 4 fields directly onto `CanonicalClaim` (`../claims/claim.ts`, which already carries
- * `lastVerifiedAt`/`lastVerifiedVersionId` per the related workstream) or `EntityRelationship`
- * (`../relationship.ts`, already carries `lastVerifiedAt` per the related workstream):
- *
- *  1. Entities need the same state shape, but `../entity.ts` is explicitly off-limits this pass
- *     (large file, recently touched by other work). A single `VerificationState` type usable
- *     for claims, relationships, AND entities means the due-record selector and candidate-update
- *     flow (`./due.ts`, `./candidate-update.ts`) have one shape to work with instead of three
- *     parallel branches, one of which (entity) couldn't be embedded even if desired.
- *  2. Blast radius: `claim.ts` and `relationship.ts` are both actively-touched shared files this
- *     session (per this session's own guardrails: prefer new files over editing shared existing
- *     ones). A separate keyed-by-id table is strictly additive with zero risk to any existing
- *     consumer of `CanonicalClaim`/`EntityRelationship` shape.
- *  3. Cardinality/nature: verification state is operational scheduling metadata ("did a bot
- *     check this, is a re-check due"), not editorial content — the same separation
- *     `../adapters/types.ts` already draws between `SourceRegistryEntry` (operational) and the
- *     `EvidenceSource`/candidate records it governs.
- *
- * The two existing `lastVerifiedAt` fields on `CanonicalClaim`/`EntityRelationship` are left
- * untouched; a `VerificationState` for a given subject is additional bookkeeping, not a
- * replacement. A future pass could reconcile them, but that is out of scope here.
+ * Operational verification state keyed by subject type and id, shared across claims,
+ * relationships and entities. Due-record selection reads this shape independently of editorial
+ * content. It supplements the subject's verification metadata; callers must keep their apply
+ * paths consistent.
  */
 
 export const VERIFICATION_STATUSES = ['current', 'due', 'overdue', 'unverified'] as const;

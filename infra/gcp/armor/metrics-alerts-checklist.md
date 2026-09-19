@@ -53,7 +53,7 @@ Create log metrics from external HTTP(S) LB logs:
 | Throttle spike, 429 | Volumetric abuse or load test | Confirm intent; tighten ban duration if attack |
 | WAF deny spike | Scanner or injection attempt | Review sampled payloads; no app change needed |
 | Adaptive protection alert | L7 DDoS | Enable preview rules; consider emergency deny |
-| 5xx with low Armor drops | Origin / Cloud Run issue | Check Run concurrency and Firestore quotas |
+| 5xx with low Armor drops | Origin / Cloud Run issue | Check Run concurrency and database resource limits |
 
 ## Sign-off before production
 

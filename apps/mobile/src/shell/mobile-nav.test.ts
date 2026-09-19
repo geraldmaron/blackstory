@@ -29,7 +29,7 @@ const allRows = MOBILE_MORE_SECTIONS.flatMap((section) => section.rows);
 describe('MOBILE_PRIMARY_TABS', () => {
   it('is the three product axes a phone navigates between, plus More', () => {
     expect(MOBILE_PRIMARY_TABS.map((tab) => tab.label)).toEqual([
-      'Explore',
+      'Map',
       'Stories',
       'Records',
       'More',
@@ -87,6 +87,7 @@ describe('MOBILE_MORE_SECTIONS', () => {
     expect(MOBILE_MORE_SECTIONS[0]?.rows.map((row) => row.title)).toEqual([
       'Law',
       'Data',
+      'Lives',
       'Banned books',
       'Memorial',
     ]);
@@ -94,6 +95,7 @@ describe('MOBILE_MORE_SECTIONS', () => {
       'About',
       'Questions',
       'Methodology',
+      'Source library',
       'Errata',
     ]);
     expect(MOBILE_MORE_SECTIONS[2]?.rows.map((row) => row.title)).toEqual([
@@ -122,8 +124,25 @@ describe('MOBILE_MORE_SECTIONS', () => {
     expect(allRows.some((row) => row.title === 'Legal')).toBe(false);
     const privacy = allRows.find((row) => row.id === 'privacy');
     expect(privacy?.destination).toEqual({ kind: 'native', route: '/privacy' });
-    const law = allRows.find((row) => row.id === 'law');
-    expect(law?.destination).toEqual({ kind: 'native', route: '/law' });
+    expect(allRows.some((row) => row.id === 'law')).toBe(true);
+    expect(allRows.some((row) => row.id === 'data')).toBe(true);
+    expect(allRows.some((row) => row.id === 'about')).toBe(true);
+  });
+
+  it('opens Law, Data, and About as native rooms again', () => {
+    expect(allRows.find((row) => row.id === 'how-it-works')).toBeUndefined();
+    expect(allRows.find((row) => row.id === 'law')?.destination).toEqual({
+      kind: 'native',
+      route: '/law',
+    });
+    expect(allRows.find((row) => row.id === 'data')?.destination).toEqual({
+      kind: 'native',
+      route: '/data',
+    });
+    expect(allRows.find((row) => row.id === 'about')?.destination).toEqual({
+      kind: 'native',
+      route: '/about',
+    });
   });
 
   it('reaches Terms as a native screen, never a web fallback to a page that does not exist', () => {

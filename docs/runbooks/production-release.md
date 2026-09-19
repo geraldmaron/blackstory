@@ -1,302 +1,332 @@
-# Runbook: Production release pipeline
+# Production release
 
-> **2026-08-15:** Admin App Hosting + Cloud Run `black-book-admin-production` are deleted. Do not
-> recreate them. **2026-09-11 (repo-z3g1f):** the standalone `apps/admin` Vercel project was itself
-> retired — admin is now a staff-gated route group inside `apps/web`, deployed with public web as
-> one Vercel project. The Admin/App-Hosting and Firestore-rules steps below are historical. Public
-> web / Vercel guidance is current and now covers admin too.
+Public web and staff administration share the `apps/web` Vercel deployment. Merging to the
+configured production branch (`main`) can immediately build and activate that commit through
+Vercel Git integration. There is no separate repository-controlled promotion step. A feature PR
+into `staging` is separate from the deliberate `staging` to `main` release PR.
 
-**Scope:** End-to-end release procedure for BlackStory — from merged PR through staging
-validation, the staging → main release merge, post-deploy health checks, and rollback rehearsal.
+## Current release boundary
 
-**There is no manual Vercel promote gate.** Public web (and admin, which now deploys inside the
-same `apps/web` Vercel project) has no separate "Promote to Production" step. Vercel's git
-integration builds and aliases every commit landed on `main` straight to `blackstory.app` and
-`www.blackstory.app`, automatically, with no human step in between (confirmed 2026-08-05 on PR
-\#116 and again 2026-08-12 on PR \#130 — repo-8ary, repo-h1b2). **The real release gate is the
-staging → main PR itself** — the deliberate, separate action described in this repo's root
-`CLAUDE.md` under "Branching & Release Policy." Approve that PR only when `staging` is in a state
-you want live, because merging it **is** the production release.
+The coordinated non-iOS release is live. Production has the signed Dunbar replacement release,
+all 75 database migrations, the ten current responsibility schemas, and `app_role` staff metadata.
+No `bb_*` responsibility schema or `bb_role` remains. API deployment
+`dpl_693wvmnFYhFzVNgnWWo1AAg6Q6or` and web deployment
+`dpl_4U8WcqP5bGJpgp71dfz1YhH4VwMQ` are READY against production Postgres. The web build uses
+staging SHA `6f96a2b7d7362a22a19c9300502518e2fa325095`. Maintenance is off, Cloudflare was purged, and
+the anonymous reopened canary completed at `2026-09-19T15:08:59.850Z`.
 
-**Solo-dev hotfix loop (preferred for one-person prod bugs):** see
-[solo-dev-hotfix.md](./solo-dev-hotfix.md) — branch from `main`, tiny PR, preflight lockfile +
-`force-dynamic`, merge to `main`, smoke Production directly (merging already shipped it — there is
-no separate promote step to run first). Do **not** merge large divergent feature branches to fix
-web prod; the merge commit goes live immediately.
+The frozen cutoff was `2026-09-19T04:43:09.299Z`; matched recovery completed at
+`2026-09-19T05:07:26.655Z` in 1,457.356 seconds with RPO 0 against the approved 14,400-second RTO.
+Preview database credentials are removed, direct deployment URLs require Vercel SSO, Vercel cron
+lists are empty, and the four historical scheduled GitHub workflows remain disabled. The final
+transaction check found no active or idle-in-transaction client and no prepared transaction.
+Owner-only records retain recovery locations and execution details; the
+[framework audit](../research/framework-audit.md) contains the sanitized evidence.
 
-**Repo acceptance:** Firestore migrate / surface deploy / rollback helpers stay **dry-run safe**.
-**Public web** (including admin) deploys via **Vercel** git integration on merge to `main` — no
-separate promote. `.github/workflows/deploy-production.yml` does not gate that traffic; it is a
-separately workflow-dispatched pipeline for provenance recording and optional post-hoc health/E2E
-checks against a pinned SHA, and its Cloud Run "surface" steps are a dry-run plan, not a live
-deploy (see its own "no live apply" comment). Deploy workflows do not promote App Hosting, which is
-retired.
+The reopened canary returned 200 for `/`, `/records`, `/explore`, the Dunbar place, `/about` and
+`/admin/login`; anonymous admin checks returned 401/307, staff APIs returned 200, and a missing
+record returned 404. The API reported the active release with four Dunbar claims and citations.
+Both release artifacts matched their recorded byte counts and SHA-256 hashes. Browser checks
+verified the final headline, light/dark controls, a real staff session with `ADMIN` and production
+Supabase/Postgres, and empty runtime logs. Native iOS Release execution remains deferred.
 
-**Architecture anchors:** `../decisions-carryover.md`, "Small recovered decisions" (ADR-006,
-GitHub Actions deployment model, and ADR-027, Vercel for public web hosting, entries) and
-"Firestore as system of record, reversed" (ADR-011 — "Firestore rules/indexes before traffic" is
-stale: Firestore has no live database left, and Postgres is the live SoR, not parked).
+### Launch decision
 
----
+Tier assignment: research framework and schema cutover
+- Tier:            2
+- Blast radius:    all public web and API users, plus staff administration
+- Reversibility:   maintenance can be restored within minutes; application rollback requires the matched client/database set
+- Irreversible parts: migration history and the active signed release are retained as auditable history
+- Decider:         Gerald Dagher
+- Re-tier trigger: a terms, pricing, market or unrehearsed destructive data change
 
-## Pipeline overview
+Kill switch: research framework and schema cutover
+- What flips:      set production `MAINTENANCE_MODE=1` and redeploy; restore the matched database/Auth/Storage set if data rollback is required
+- Who can flip it: Gerald Dagher
+- Time to effect:  minutes for the web wall; the recorded restore completed in 1,457.356 seconds
+- Rehearsed:       yes, 2026-09-19
+- Data cleanup:    none for the web wall; matched recovery owns database/Auth/Storage rollback
 
-```mermaid
-flowchart LR
-  PR[Staging -> main PR review] --> MERGE[Merge to main]
-  MERGE --> WEB[Vercel auto-builds + auto-aliases to Production]
-  MERGE -.-> OPT[Optional: workflow_dispatch deploy-production.yml]
-  OPT --> HC[Health + E2E smoke, provenance]
-  HC -->|fail| RB[Rollback dry-run / prior SHA]
-```
+Go/no-go record: research framework and schema cutover
+- Tier:       2
+- Decider:    Gerald Dagher
+- Decision:   go with mitigations
+- Criteria:
+  - schema, roles, counts and hashes match the frozen baseline — green — observed via the postcutover verifier — red triggers maintenance and matched rollback
+  - public, staff and denial paths work on the exact production build — green — observed via the reopened canary and Chrome — red triggers maintenance and fix-forward or rollback
+  - signed release artifacts match — green — observed via byte counts and SHA-256 readback — red triggers release rollback
+  - native iOS Release works — deferred by the operator — observed via explicit waiver — red does not block this non-iOS release
+- Skipped workstreams: sales, marketing, pricing, billing and localization — decided by Gerald Dagher — no commercial or localized launch was in scope; legal/privacy — decided by Gerald Dagher — no terms or new personal-data handling changed
+- Kill switch:  rehearsed yes | time to effect minutes
+- Metric registered: the reopened production canary stays green with no release-attributed P0/P1 incident; baseline green at 2026-09-19T15:08:59.850Z; review 2026-09-26
+- Dissent: the strongest objection is a split schema/client contract or nonce regression that breaks all public or staff clients; the exact-build canary, matched recovery and maintenance switch control it
+- Conditions: keep native iOS deferred, keep schedules off, and do not represent the small research evaluation or one archived URL as complete coverage
 
-Public web (and admin) traffic changes at the `MERGE` step, not at `OPT`. The optional workflow
-records provenance and can run health/E2E checks against a pinned SHA after the fact; it is not
-what puts the merge commit in front of users.
+Pre-mortem: The likely severe failure is an apparently healthy cached home page hiding a broken
+dynamic or staff route after the schema rename. The release therefore purged Cloudflare, tested
+anonymous and authenticated routes separately, checked framework script nonces, and retained the
+rehearsed maintenance switch and matched recovery set.
 
-| Stage | Workflow | Gate |
-|-------|----------|------|
-| PR validation | `.github/workflows/ci.yml` | Required status checks (unchanged) |
-| Security scans | `.github/workflows/security.yml` | High/critical findings block release |
-| Staging deploy | `.github/workflows/deploy-staging.yml` | Pinned `commit_sha`; optional `staging` branch push |
-| **Public web + admin release** | **Vercel git integration** | **staging → main PR review/merge (see CLAUDE.md Branching & Release Policy) — merge itself is the production deploy; no separate promote** |
-| Release metadata (optional, post-hoc) | `.github/workflows/progressive-release.yml` | Changelog + provenance for a pinned SHA |
-| Production pipeline (optional, post-hoc) | `.github/workflows/deploy-production.yml` | Protected `production` environment approval gates provenance/health checks only, not Vercel traffic |
-| Uptime canary | `.github/workflows/canary-uptime.yml` | Optional; reset baseline after verified deploy |
+Readiness record
+- Tier assigned:      answered — see “Tier assignment: research framework and schema cutover” | tier: 2
+- Workstreams:        answered — see “Skipped workstreams: sales, marketing, pricing, billing and localization” | skipped: 6, decided by Gerald Dagher
+- Specialist cover:   answered — see “legal/privacy — decided by Gerald Dagher” | unreviewed: no separate legal/privacy specialist
+- Rollout mechanic:   answered — see “maintenance is off, Cloudflare was purged”
+- Kill switch:        answered — see “set production `MAINTENANCE_MODE=1` and redeploy” | rehearsed: yes
+- Criteria:           answered — see “schema, roles, counts and hashes match” | written before launch week: no, the cutover was already underway
+- Decider:            answered — see “Decider: Gerald Dagher” | Gerald Dagher
+- Metric registered:  answered — see “reopened production canary stays green” | baseline: green at 2026-09-19T15:08:59.850Z
+- Dissent:            answered — see “split schema/client contract or nonce regression”
+- Pre-mortem:         answered — see “cached home page hiding a broken dynamic or staff route”
+- Review scheduled:   answered — see “review 2026-09-26” | owner: Gerald Dagher
+- Implementation verification: answered — exact local commands and production observations are in the framework audit
 
----
+## Release prerequisites
 
-## AC #1 — Automatic App Hosting rollouts are disabled (admin)
+1. Review the complete diff, current [architecture](../architecture.md), migration history and the
+   exact commit to release. Do not treat an old ADR, preview, dry run or local restore as release
+   approval.
+2. Run `fnm exec --using=22 -- ./scripts/ci-local.sh --base origin/staging` on the final tree. For
+   this database change, retain the successful clean-chain, restored-data upgrade, SQL
+   authorization and public/admin surface evidence with the release record.
+3. Set an approved RPO and RTO. Any target written before a complete timed restore is proposed and
+   unmeasured. Complete the executed-restore evidence required by
+   [backup and recovery](./backup-restore.md). The application-dump rehearsal does not establish a
+   production failover target.
+4. Create and verify one matched pre-cutover recovery set:
+   - either a provider-supported database/Auth recovery point or a freeze-time logical bundle that
+     includes application schemas, `auth`, `storage`, migration history, required roles and grants,
+     and a sanitized provider Auth configuration inventory;
+   - an export of `supabase_migrations.schema_migrations`, table counts and stable table hashes;
+   - a sanitized staff-role inventory sufficient to verify `app_metadata.bb_role` before cutover;
+     keep tokens and application secrets out of that inventory and the shared execution log;
+     the separate full Auth recovery dump requires owner-only protection;
+   - complete inventories and recoverable copies of every required `raw-sources` and
+     `public-media` object, with downloaded-byte hashes, access-policy checks and readback from an
+     isolated destination;
+   - the old application, API and worker build identities that match that database and auth state.
 
-**Historical — App Hosting itself was deleted 2026-08-15 and admin moved into `apps/web` on
-2026-09-11 (repo-z3g1f); nothing below this line needs doing.** Public web (and admin, now part of
-the same deploy) Production traffic moves automatically when a commit lands on `main` — Vercel's
-git integration builds and aliases it to Production with no explicit promote step (repo-8ary,
-repo-h1b2). What this AC actually guards is that nothing in this repo's own GitHub Actions
-workflows adds an *additional*, unattended auto-deploy path (App Hosting's old auto-rollout hooks).
+   A paid provider clone is optional only after the complete logical bundle has restored into an
+   isolated Supabase environment and met the approved RPO/RTO with Auth users, role metadata, RLS,
+   Storage references and application surfaces intact. The existing application dump does not meet
+   that bar. A database hash is not an object checksum. The audit verified all 58 referenced raw objects,
+   and all 228 available media objects referenced by release projections (457,165,770 bytes),
+   with local readback and access checks. One further referenced Dunbar school image is absent
+   from Supabase, and an authenticated object describe returns `404` at its old GCS location.
+   The signed replacement `rel_20260918_dunbar_media_correction_001` removes that current reference
+   and preserves the original signed release as superseded history. A required-object inventory
+   must include both replacement release artifacts and explicitly report the unavailable historical
+   reference. A historical missing object is not recovered by removing its current reference. The remaining
+   unreferenced objects in the 242-object bucket were not restored.
+5. Confirm that Preview database credentials are removed or point to an isolated destination.
+   Visibility of masked variables does not prove they differ from Production credentials.
+6. Confirm that the release operator can access Supabase, Vercel and every deployed API or worker
+   surface with uncompromised administrator identities. Verify the production branch, domains,
+   environment targets and current providers rather than inferring them from repository files.
+7. Prepare one sanitized execution log that records the tested commit, backup identifiers and
+   hashes, migration plan, deployed build identities, operators, start/end times and every failed
+   or uncertain command. Keep credentials out of commands, logs and bundles.
 
-**Human steps (admin backend) — historical, App Hosting no longer exists:**
+### Repair immutable release data
 
-1. ~~Open Firebase console → App Hosting → backend (`black-book-admin-production`).~~
-2. ~~Confirm **automatic rollouts** / GitHub auto-deploy hooks are **off**.~~
-3. ~~Record evidence (screenshot or CLI output) in the release ticket.~~
+Do not update an active release row in place. Create a replacement release from the active release,
+apply the approved canonical correction, and carry the release ID consistently through entity
+projections, search document IDs/facets, articles and their content hashes, redirects, graph rows,
+legal snapshots and theme packets. `evidence.published_citations` is derived from the active
+release and must not be inserted into directly.
 
-**Repo enforcement:**
+Before activation, verify equal row counts, compare every projection after excluding release
+metadata and the approved field change, and prove the source release hashes are unchanged. Build
+the replacement entity and search artifacts at their new release paths, verify zero forbidden
+references, upload and read them back, then build and sign the release manifest with
+`buildReleaseManifest` and `signReleaseManifest` from `@repo/domain`. Verify it with
+`verifySignedReleaseManifest`; never put a placeholder signature into production.
 
-- `node infra/github/release-pipeline/assert-no-auto-rollout.mjs` (also runs in deploy workflows)
-- `apphosting.admin.yaml` documents the policy
-- Deploy workflows record Vercel expectations and run gates — they do **not** call App Hosting
-  promote helpers; never `on: push: branches: [main]` for production deploy
+Activate through the database's authorized publisher gate, not a raw
+`published.active_release` update: call `bb_publication.activate_release(release_id)` before the
+namespace cutover or `publication.activate_release(release_id)` afterward. This gate records the
+audit event and rejects research identities. A reviewed one-time operator script may connect these
+existing primitives; a new reusable publishing service is not required for this correction. Load
+an ECDSA private key and nonempty key ID from the configured secret store, and retain the matching
+public key for verification. The repository currently defines no production release-signing env
+name; the current key registry is held privately with its 1Password item references. Record the
+selected secret reference, key ID and public verifier before the window without logging private
+key material. Purge the release cache and verify the live
+database views, artifacts and public surface. Preserve the old release for rollback.
 
-Public web App Hosting configs are retired; there is no `black-book-web-*` promote path.
+## Coordinated cutover
 
----
+### 1. Enter maintenance and freeze writes
 
-## AC #2 — Deploy only the tested commit (pinned SHA)
+1. Enable the production web wall using [maintenance mode](./maintenance-mode.md), redeploy and
+   verify `503` from a browser without the bypass cookie on `/`, `/robots.txt`, a record URL,
+   `/submit/api` and `/admin`. The web proxy is the write boundary for all `apps/web` routes. Keep
+   an operator browser on the maintenance bypass for later checks, but do not use it for staff
+   writes during the freeze.
+2. The web wall does not cover `apps/api-public`, mobile, scheduled jobs or manual operators. Put
+   the public API in its seed/fail-closed data mode and verify it opens no application database
+   session. Pause publication and stop every research, ingestion, enrichment, preservation and
+   release writer at its deployed provider. Re-check GitHub, Vercel, database and any other
+   configured scheduler immediately before the window; the 2026-09-18 no-schedule audit is not a
+   permanent guarantee.
+3. Confirm that no old application, worker or operator process can open a write transaction. Record
+   the freeze time and the final database/auth/storage cutoff. Do not proceed while writes can race
+   the snapshot or namespace rename.
 
-Never deploy `main` or `@latest` for Cloud Run. Every workflow_dispatch deploy workflow requires a
-full 40-character git SHA that passed CI on that exact commit — but public web has no such
-dispatch step; see below.
+### 2. Capture the final recovery point
 
-**Public web (Vercel) — merge is the deploy:**
+1. Take the matched database/auth recovery point and final storage inventory after the write
+   freeze. Preserve the migration ledger, row-count manifest, stable table hashes, object-byte
+   hashes and provider backup identifiers.
+2. Restore the recovery point to an isolated destination and verify the approved RPO/RTO,
+   constraints, indexes, functions, RLS, staff role claims, public projections and required storage
+   objects. A schema-only reset is not sufficient.
+3. Stop the release if database, auth or storage evidence is incomplete. Do not accept metadata,
+   a URL, a historical Wayback pointer or one media sample as proof that current object bytes are
+   recoverable.
 
-1. Merge the staging → main PR — this is the release action (CLAUDE.md Branching & Release
-   Policy); do it only when `staging` is in a state you want live.
-2. Vercel's git integration builds the merge commit and aliases it straight to
-   `blackstory.app` / `www.blackstory.app` as Production — automatically, within seconds, with no
-   dashboard step and no `vercel promote` command to run.
-3. Smoke Production directly (there is no separate Preview-then-promote step for `main`; Preview
-   builds only exist for non-`main` branches/PRs).
-4. Confirm the live SHA (Vercel dashboard deployment detail, or `x-vercel-id` / deployment API)
-   matches the merge commit — this is verification after the fact, not a gate before it.
+### 3. Inspect the exact migration plan
 
-**Staging (APIs):**
-
-```bash
-gh workflow run deploy-staging.yml \
-  -f commit_sha="$(git rev-parse HEAD)" \
-  -f confirm=deploy-staging
-```
-
-Requires GitHub Environment `staging` vars `GCP_WORKLOAD_IDENTITY_PROVIDER` and
-`GCP_SERVICE_ACCOUNT` (after `infra/github/scripts/apply-wif.sh --apply`). Public web staging is a
-Vercel Preview built from the `staging` branch — smoke it before opening the staging → main PR.
-
-Admin has no separate rollout step: since 2026-09-11 (repo-z3g1f) `/admin` is a staff-gated route
-group inside `apps/web` itself, not a separate app or Vercel project — it deploys automatically
-with the same public web Vercel build described above. (App Hosting `black-book-admin-production`
-was deleted 2026-08-15 and does not exist; do not run `firebase apphosting:rollouts:create` against
-it.) Credential isolation for admin's write-capable database access now lives at the credential
-layer (`ADMIN_DATABASE_URL`, distinct from the public `DATABASE_URL`), not the process layer.
-
-**Production pipeline (APIs; optional and post-hoc for public web):**
-
-```bash
-TESTED_SHA="<40-char-sha, e.g. the staging -> main merge commit>"
-gh workflow run progressive-release.yml \
-  -f commit_sha="$TESTED_SHA" \
-  -f confirm=release
-
-gh workflow run deploy-production.yml \
-  -f commit_sha="$TESTED_SHA" \
-  -f prior_release_sha="<optional-prior-good-sha>" \
-  -f confirm=deploy
-```
-
-For public web/admin this pipeline runs *after* the fact — the merge already shipped the SHA to
-Vercel Production. What it adds is provenance and optional health/E2E checks against that pinned
-SHA; its Cloud Run "surface deploy" step is a dry-run plan, not a live deploy. Download the
-`deployment-provenance-<sha>` artifact and verify `git.commitSha` matches `TESTED_SHA`.
-
----
-
-## AC #3 — `deploy-production.yml` requires protected environment approval
-
-This approval gates the optional, workflow_dispatch-only `deploy-production.yml` pipeline
-(provenance, changelog, and health/E2E checks). **It does not gate Vercel public web/admin
-traffic** — that already moved when the staging → main PR was merged, per AC #2. Configure the
-GitHub `production` environment before relying on this pipeline's checks:
-
-```bash
-gh api --method PUT "repos/OWNER/REPO/environments/production" \
-  --input infra/github/oidc/environments/production.json
-```
-
-Set environment variables (names only — no JSON SA keys):
-
-| Variable | Purpose |
-|----------|---------|
-| `GCP_PROJECT_ID` | `black-book-efaaf` |
-| `GCP_WORKLOAD_IDENTITY_PROVIDER` | WIF provider resource name |
-| `GCP_SERVICE_ACCOUNT` | `github-deploy@black-book-efaaf.iam.gserviceaccount.com` |
-| `HEALTH_CHECK_URL` | HTTPS production health endpoint (optional until live) |
-| `CI_REQUIRE_HEALTH_CHECK` | Set `1` to fail-closed when URL unset |
-| `E2E_BASE_URL` | Post-deploy smoke target (optional until live) |
-| `CI_REQUIRE_E2E` | Set `1` to fail-closed when E2E URL unset |
-
-Jobs with `environment: production` pause for required reviewers configured in
-`infra/github/oidc/environments/production.json`.
-
----
-
-## AC #4 — Migrations / rules sequencing before traffic
-
-Per [ADR-020](../decisions-carryover.md) (`docs/adr/` was purged 2026-07-24; the precedence rule is
-restated in `docs/decisions-carryover.md`), **Supabase Postgres** is the
-product system of record (`bb_public.*`). **Admin** is a staff-gated route group inside `apps/web`
-(since 2026-09-11, repo-z3g1f) — it has no separate host or promote step, it deploys with public
-web. **Firebase Storage / GCS** remains the blob store. Firestore is
-wind-down / rollback only ([firebase-wind-down.md](../data/firebase-wind-down.md)) — not a live
-public-read backend. **Public web** is Vercel (`../decisions-carryover.md`, "Small recovered decisions", ADR-027 entry).
-
-Before public web / API surfaces receive incompatible traffic:
-
-1. **Postgres migrations / schema** applied to the target Supabase project (when schema changed)
-2. **Storage rules** (if blob ACL changed) — still under `infra/firebase/`
-3. **Merge staging → main** — when public web or admin changed, this one PR merge is the deploy
-   (Vercel builds and aliases it to Production automatically; there is no separate promote command)
-4. **Cloud Run / api-public deploy** with `PUBLIC_DATA_SOURCE=postgres` + `DATABASE_URL` (if API changed)
-5. **Firestore rules/indexes** only when touching rollback/legacy surfaces (optional during wind-down)
-
-**Human commands (after checkout of pinned SHA):**
+Load the production database URL through the approved secret mount or runner without printing it.
+Run the CLI with Node 22:
 
 ```bash
-# Blob ACL (keep — Storage is still live)
-firebase deploy --only storage \
-  --project=black-book-efaaf --config=infra/firebase/firebase.json
-
-# Public web + admin: no command here — merging the staging -> main PR (step 3 above)
-# already deployed it via Vercel's git integration.
-
-# Optional during wind-down only:
-# firebase deploy --only firestore:rules,firestore:indexes \
-#   --project=black-book-efaaf --config=infra/firebase/firebase.json
+fnm exec --using=22 -- pnpm exec supabase db push \
+  --dry-run \
+  --include-all \
+  --db-url "$SUPABASE_DB_URL" \
+  --yes
 ```
 
-CI may still run `migrate-firestore-dry-run.sh` as a historical gate; live public reads use Postgres.
+`--include-all` is mandatory for this upgrade. The bootstrap version
+`20260720220000_fresh_install_prerequisites.sql` sorts before production's current migration
+frontier. The default push correctly refuses it. On the audited 61-row production history, the
+reviewed plan contains that no-op bootstrap plus the thirteen migrations from
+`20260918041932_reviewed_claim_assessment_integrity.sql` through
+`20260918154322_reconcile_unrecorded_public_projection_schema.sql`.
 
----
+Stop if the live ledger, schema state or plan differs. Rebuild the isolated rehearsal from the new
+frozen snapshot before changing production. Do not use migration-history repair, rename an applied
+version, or edit historical SQL to force the plan through. The bootstrap refuses partial or mixed
+old/current namespace states, and the projection migration refuses mixed or unexpected generated
+columns.
 
-## AC #5 — Rollback procedure (tested dry-run)
+Before applying, confirm that no staff user has conflicting old and new role metadata. The cutover
+migration also fails closed on this condition:
 
-On failed health check or E2E smoke, `deploy-production.yml` triggers `rollback-on-failure` which
-runs `rollback-dry-run.sh`.
+```sql
+SELECT id
+FROM auth.users
+WHERE raw_app_meta_data ? 'bb_role'
+  AND raw_app_meta_data ? 'app_role'
+  AND raw_app_meta_data->'bb_role' IS DISTINCT FROM raw_app_meta_data->'app_role';
+```
 
-**Local dry-run test (safe — no cloud writes):**
+Resolve any returned identity through the approved auth administration process, refresh the
+recovery point, and rehearse again.
+
+### 4. Apply the database cutover
+
+With maintenance and the write freeze still active, run the same reviewed plan without
+`--dry-run`:
 
 ```bash
-GOOD_SHA="$(git rev-parse HEAD~1)"
-BAD_SHA="$(git rev-parse HEAD)"
-bash infra/github/release-pipeline/rollback-dry-run.sh "$GOOD_SHA" "$BAD_SHA" production
-node infra/github/release-pipeline/release-pipeline.test.mjs
+fnm exec --using=22 -- pnpm exec supabase db push \
+  --include-all \
+  --db-url "$SUPABASE_DB_URL" \
+  --yes
 ```
 
-**Operator rollback (live):**
+Do not automatically retry a timeout or uncertain result. Read the remote migration ledger and
+schema state first. The CLI applies multiple migration files, so an error can leave a valid partial
+advance that requires a new diagnosis rather than a blind rerun.
 
-1. Engage publication kill switch — see [incident-response.md](./incident-response.md)
-2. **Public web + admin:** on Vercel, redeploy/promote the prior known-good Production deployment
-   (dashboard "Instant Rollback" or `vercel promote <deployment-url>`) — this is a genuine rollback
-   action, distinct from the forward release path in AC #2, which has no equivalent manual step
-   (one deployment covers both surfaces — admin has no separate host to roll back)
-3. **APIs:** Re-run `deploy-production.yml` with `commit_sha=<prior-good-sha>`
-4. Repoint `publicMeta/activeRelease` if publication metadata changed — see
-   [recovery-rollback-rehearsal.md](./recovery-rollback-rehearsal.md)
-5. Run `canary-uptime.yml` with `reset_baseline: true` after verification
+The namespace migration makes one compatibility-free transition:
 
----
+- `bb_auth`, `bb_audit`, `bb_canonical`, `bb_evidence`, `bb_ops`, `bb_public`,
+  `bb_publication`, `bb_reference`, `bb_research` and `bb_submissions` become
+  `access_control`, `audit`, `canonical`, `evidence`, `ops`, `published`, `publication`,
+  `reference`, `research` and `submissions`.
+- Staff metadata moves from `app_metadata.bb_role` to `app_metadata.app_role`. Existing JWTs do
+  not acquire the new claim until they are refreshed or replaced.
+- PostgREST's `authenticator` schema list becomes `public,published,submissions`; the migration
+  sends both config and schema-cache reload notifications.
 
-## Security scans
+No compatibility aliases or dual writes exist. Keep every old client stopped until the matching
+application and service revision is active.
 
-`security.yml` runs on PRs and `main` pushes. Before production:
+### 5. Activate matching clients and auth
 
-- Confirm latest `security.yml` run is green for the deploy SHA
-- Optionally run staging DAST:
+1. Merge the reviewed `staging` to `main` release PR only inside the maintenance window. Vercel may
+   activate the resulting `apps/web` build immediately. Deploy the same tested commit to every
+   separately hosted API and worker surface before allowing traffic or work.
+2. Confirm the active build identities rather than relying on an HTTP header alone. Do not use a
+   Preview with different database credentials as production evidence.
+3. Obtain a refreshed or newly signed-in staff session and verify its JWT contains trusted
+   `app_metadata.app_role`. Web pages and admin APIs call Auth `getUser` and require the current
+   server-returned `app_role`; they do not authorize from a retired JWT claim. An unexpired older
+   token can therefore authenticate a user whose current Auth record has the required role.
+   PostgREST/RPC authorization instead reads the JWT payload: a token containing only `bb_role`
+   must have no staff authority there. Test both boundaries. Session revocation prevents refresh
+   but does not guarantee immediate access-token invalidation; use the
+   [account-compromise procedure](incidents/account-compromise.md) when forced invalidation is required.
+4. Verify that PostgREST exposes only `public`, `published` and `submissions`, resolves the new
+   views, and rejects old schema names. If its config or schema cache is stale, use the
+   provider-supported reload or restart and keep traffic frozen. Do not recreate `bb_*` aliases to
+   mask a stale cache.
 
-```bash
-gh workflow run security.yml \
-  -f staging_base_url="https://staging.example.blackbook.app" \
-  -f staging_identity_label="ds-security-dast-release-001"
-```
+### 6. Verify before reopening
 
----
+Record each result against the frozen baseline:
 
-## Release provenance and changelog
+1. The migration ledger has 75 distinct versions, preserves the deployed NULL name at
+   `20260908120000`, and ends at `20260918154322`.
+2. All ten current responsibility schemas exist, no `bb_*` responsibility schema remains, all
+   eleven projection-derived columns have the expected stored-generated expressions, and no
+   application constraint is unvalidated.
+3. Every original table remains. Counts and stable hashes over the original columns match the
+   frozen manifest except for an explicitly reviewed transformation. New capture origins correspond
+   only to existing source-item relationships; captures without one remain uninferred.
+4. Database and Storage references still resolve. Required private objects remain private, public
+   media delivers through its intended path, and byte hashes match the recovery inventory.
+5. Through the maintenance bypass, exercise the home page, records, map, a cited record, a missing
+   record, staff login, an unauthorized staff request, source links and the separately hosted
+   public API. Verify light and dark themes and inspect runtime/PostgREST errors.
+6. A refreshed staff JWT carries the expected `app_role`. Web/admin authorization rejects a
+   current Auth user record with a missing or invalid role; database authorization rejects missing
+   or retired JWT role claims. Anonymous, public-reader and research-worker denials still hold.
+7. A second `supabase db push --dry-run --include-all` reports the database up to date.
 
-Artifacts:
+Only the named release decision-maker may end the window. Re-enable services in a controlled order:
+read-only public API, public web/mobile traffic, submissions, then staff and background writers.
+Remove maintenance last, after canary reads and writes remain observable. Record the final state and
+retain the recovery point until the replacement backup is independently verified.
 
-| File | Producer |
-|------|----------|
-| `artifacts/deployment-provenance.json` | `write-provenance.mjs` |
-| `artifacts/release-changelog.md` | `generate-changelog.mjs` |
+## Rollback
 
-Schema: `infra/github/release-metadata/deployment-provenance.schema.json`
+The strongest failure mode is a split contract: old code reads `bb_*` and `bb_role`, while the new
+database exposes current schemas and `app_role`. Rolling back only Vercel, an API, the database or
+auth would create that split. There are no down migrations, aliases or dual-write bridge.
 
-Validate locally:
+Prefer fixing forward while maintenance and the write freeze remain active when the migrated
+database is intact. If rollback is required, keep all traffic and writers frozen and restore a
+matched pre-cutover set:
 
-```bash
-node infra/github/release-pipeline/write-provenance.mjs  # requires PROVENANCE_* env
-node infra/github/release-pipeline/validate-provenance.mjs artifacts/deployment-provenance.json
-```
+1. Restore the old database and auth recovery point to an isolated destination. It must contain the
+   old `bb_*` schemas, matching 61-row migration ledger and `app_metadata.bb_role` state.
+2. Restore or verify the corresponding Storage objects and references. Do not point the old database
+   at an unmatched object inventory.
+3. Verify counts, hashes, constraints, RLS, role claims, public projections and required object
+   bytes before routing anything to it.
+4. Cut over the restored database/auth state and the recorded old web, API and worker builds as one
+   operation. Restore the matching PostgREST schema configuration and reload its cache. Refresh
+   staff sessions again so tokens match the restored role claim.
+5. Exercise the same public, staff, API and denial checks before reopening reads and then writes.
 
----
+Application rollback alone does not undo schema or data changes. Git revert alone cannot recover
+database, auth or Storage state. Never restore directly over the only production copy, and never
+discard either recovery point until the replacement has passed the full verification set.
 
-## Local validation (no cloud)
-
-```bash
-node infra/github/release-pipeline/release-pipeline.test.mjs
-node scripts/release/run-pipeline-checks.mjs
-node scripts/validate-github-governance.mjs
-```
-
----
-
-## Human cloud prerequisites (deferred until remote + Blaze)
-
-See [production-cloud-apply-checklist.md](./production-cloud-apply-checklist.md) sections 1–4:
-
-1. GitHub remote + rulesets + WIF (`infra/github/scripts/apply-wif.sh --apply`)
-2. Protected `production` environment
-3. Firebase Blaze + admin App Hosting backend with **automatic rollouts disabled**
-4. Firestore named databases + rules deploy targets
-
-**Status:** DEFERRED — repo delivers workflow shape and dry-run scripts only.
+Keep the sanitized execution log, deployed commit, migration ledger, manifests, backup identifiers
+and release/rollback decision together. If any command has an uncertain outcome, leave maintenance
+and the write freeze in place and inspect the resulting state before taking another action.

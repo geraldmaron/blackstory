@@ -133,6 +133,9 @@ test('every row renders citation, year, jurisdiction and a gloss', () => {
   assert.match(html, /ds-law-idx__citation/);
   assert.match(html, /ds-law-idx__gloss/);
   assert.doesNotMatch(html, /ds-room-idx__grade/);
+  assert.match(html, /aria-label="Sort order"/);
+  assert.match(html, /Oldest first/);
+  assert.match(html, /id="browse"/);
 });
 
 test('the jurisdictional-not-documented sentence renders as visible body text', () => {

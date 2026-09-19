@@ -1,11 +1,11 @@
 /**
  * Article lifecycle CLI — the long-form /articles publication surface.
  *
- * Articles are canonical in bb_reference.articles (Supabase) — the database is
+ * Articles are canonical in reference.articles (Supabase) — the database is
  * the source of truth, not files in git. To edit, `pull` an article into a
  * local draft (JSON, gitignored), edit it, `validate`, `apply` it back, then
  * `promote` (which re-runs every gate against the DB row) and `project` into
- * bb_public.release_articles for the active release. Mirrors the theme-impact
+ * published.release_articles for the active release. Mirrors the theme-impact
  * packet CLI (packages/ops-data/scripts/theme-packets.ts).
  *
  * Usage (repo root; DATABASE_URL required for every command except validate):
@@ -118,13 +118,9 @@ function gateArticleSourceTiers(article: ArticleAuthoring): {
 const ANCHORABLE_BLOCKS = new Set(['stat', 'figure', 'pullquote']);
 
 /**
- * Two-anchor corroboration rule (repo-k2q3 crit 3). A stat/figure/pullquote block
- * that declares `anchors` is asserting itself as a load-bearing figure; validate then
- * enforces the declaration: published requires two independent T1/T2 anchors, or one
- * T1 anchor plus `replicationVerified: true` (a human attesting the cited replication
- * package was checked — see repo-fj3a). A block with no `anchors` field is not
- * considered load-bearing and is not gated; this rule doesn't retroactively demand
- * anchors on every existing figure, only ones an author flags as needing them.
+ * For blocks declaring load-bearing anchors, publication requires two independent T1/T2 anchors
+ * or one T1 anchor with an explicit replicationVerified review. Blocks without anchors are not
+ * covered by this gate; declaration coverage requires separate editorial review.
  */
 function gateLoadBearingAnchors(article: ArticleAuthoring): { warnings: string[] } {
   const warnings: string[] = [];
@@ -167,11 +163,8 @@ function gateLoadBearingAnchors(article: ArticleAuthoring): { warnings: string[]
 }
 
 /**
- * Immersion floor (editorial direction, 2026-07-27): a published chapter carries
- * at least 2,000 words of body prose across its paragraph blocks. Counted after
- * stripping `[ref:id]` markers and reducing `[[entityId|Label]]` markup to its
- * visible label, so citation plumbing never pads the floor. Hard error on
- * published articles, surfaced warning otherwise — same posture as the tier gate.
+ * Published chapters require at least 2,000 body-prose words. Remove citation markers and count
+ * entity-link labels as visible text. Drafts receive warnings instead of publication errors.
  */
 const MIN_PUBLISHED_PROSE_WORDS = 2000;
 
@@ -270,18 +263,9 @@ function gateSeriesPositions(articles: readonly ArticleAuthoring[]): void {
 }
 
 /**
- * Standalone-prose gate (editorial direction, 2026-08-07). A chapter is a piece of
- * history, not a page of a product: its prose never names the site it is published on,
- * never cross-references sibling chapters as chapters, and never speaks in the
- * publisher's first person ("our summary," "a story we are telling you"). Readers arrive
- * on these pages from search and syndication with no idea what else exists here, and a
- * sentence like "another chapter on this site follows what happened next" is a dead end
- * to them and an unexplained brand reference to everyone else. Related history is reached
- * through `[[entityId|Label]]` links and `relatedEntityIds`, which resolve to real
- * records, rather than through prose pointing at navigation.
- *
- * Hard error on published articles, surfaced warning otherwise — same posture as the tier
- * and word-floor gates. Governed by docs/content/neo-voice.md Part V ("The chapter stands alone").
+ * Requires standalone historical prose without publisher self-reference or navigation
+ * instructions. Use entity links and relatedEntityIds for related history. Published violations
+ * fail; drafts receive warnings. See docs/content/neo-voice.md.
  */
 const SELF_REFERENCE_PATTERNS: readonly { readonly label: string; readonly pattern: RegExp }[] = [
   { label: 'names the publishing surface', pattern: /\bthis (?:site|website|project|page)\b/i },
@@ -397,7 +381,7 @@ async function verifyArticleReferences(
   const packetsById = new Map<string, PacketRefRows>();
   if (packetIds.size > 0) {
     const rows = await client.query<PacketRow>(
-      `SELECT id, observations, derived, artifacts FROM bb_reference.theme_impact_packets
+      `SELECT id, observations, derived, artifacts FROM reference.theme_impact_packets
        WHERE id = ANY($1::text[]) AND status = 'published'`,
       [[...packetIds]],
     );
@@ -437,7 +421,7 @@ async function verifyArticleReferences(
   if (entityIds.size > 0) {
     const releaseId = await resolveActiveReleaseId(client);
     const rows = await client.query<{ entity_id: string }>(
-      `SELECT entity_id FROM bb_public.release_entities
+      `SELECT entity_id FROM published.release_entities
        WHERE release_id = $1 AND entity_id = ANY($2::text[])`,
       [releaseId, [...entityIds]],
     );
@@ -453,7 +437,7 @@ async function verifyArticleReferences(
 }
 
 const UPSERT_SQL = `
-INSERT INTO bb_reference.articles (
+INSERT INTO reference.articles (
   id, slug, title, summary, theme_id, era_label, place_label, published_at, updated_at,
   hero_image, body, "references", related_entity_ids, status, kind, series, tags, row_updated_at
 ) VALUES (
@@ -590,10 +574,10 @@ async function withDb<T>(run: (ctx: DbContext) => Promise<T>): Promise<T> {
 
 async function resolveActiveReleaseId(client: pg.PoolClient): Promise<string> {
   const active = await client.query<{ release_id: string }>(
-    `SELECT release_id FROM bb_public.active_release WHERE id = 'active'`,
+    `SELECT release_id FROM published.active_release WHERE id = 'active'`,
   );
   const releaseId = active.rows[0]?.release_id;
-  if (!releaseId) throw new Error('no active release configured in bb_public.active_release');
+  if (!releaseId) throw new Error('no active release configured in published.active_release');
   return releaseId;
 }
 
@@ -620,12 +604,9 @@ const doiHttpClient: SafeHttpClient = async (request) => {
 };
 
 /**
- * DOI resolution gate (repo-k2q3 crit 2 / repo-vdtm): live network call against
- * Crossref/OpenAlex, so gated behind CHECK_DOIS=1 rather than run unconditionally like
- * the offline hash/tier lints. Any reference with a `scholarlyCitation.doi` field is
- * checked; a stored citation whose DOI resolves to a mismatching title/author/venue,
- * or fails to resolve at all, is a hard error regardless of article status — an
- * attached DOI is a specific factual claim, not a soft-linted quality signal.
+ * CHECK_DOIS=1 verifies attached DOIs through Crossref/OpenAlex. An unresolved DOI or
+ * title/author/venue mismatch is an error regardless of publication status. Offline validation
+ * does not perform these network checks.
  */
 async function gateDoiCitations(article: ArticleAuthoring): Promise<void> {
   const errors: string[] = [];
@@ -692,12 +673,8 @@ async function checkReferenceUrlReachable(
 }
 
 /**
- * Reference URL reachability gate (repo-8py8): mirrors gateDoiCitations's
- * error-collection/throw shape and live-network gating. `reference.url` is checked on
- * every reference (not just scholarly ones, which gateDoiCitations already covers via
- * `scholarlyCitation.doi`), gated behind CHECK_URLS=1 for the same reason DOI resolution
- * is gated behind CHECK_DOIS=1 — a live network call has no business running
- * unconditionally alongside the offline hash/tier lints.
+ * CHECK_URLS=1 checks every reference URL and reports reachability failures. The opt-in network
+ * gate is separate from offline content validation and DOI identity checks.
  */
 async function gateReferenceUrls(article: ArticleAuthoring): Promise<void> {
   const errors: string[] = [];
@@ -792,7 +769,7 @@ async function commandApply(paths: readonly string[]): Promise<void> {
 const DRAFTS_DIR = resolve('packages/ops-data/drafts');
 
 /**
- * DB -> local draft. Exports bb_reference.articles rows (matched by id or slug)
+ * DB -> local draft. Exports reference.articles rows (matched by id or slug)
  * as authoring JSON into packages/ops-data/drafts/, which is gitignored: drafts
  * are working copies for an edit session, never a second source of truth.
  */
@@ -801,7 +778,7 @@ async function commandPull(idsOrSlugs: readonly string[]): Promise<void> {
 
   const result = await withDb(async ({ client }) => {
     const rows = await client.query<ArticleRow>(
-      `SELECT ${REFERENCE_COLUMNS} FROM bb_reference.articles
+      `SELECT ${REFERENCE_COLUMNS} FROM reference.articles
        WHERE id = ANY($1::text[]) OR slug = ANY($1::text[])`,
       [[...idsOrSlugs]],
     );
@@ -831,7 +808,7 @@ async function commandPromote(articleIds: readonly string[]): Promise<void> {
 
   const result = await withDb(async ({ client, dryRun }) => {
     const rows = await client.query<ArticleRow>(
-      `SELECT ${REFERENCE_COLUMNS} FROM bb_reference.articles WHERE id = ANY($1::text[])`,
+      `SELECT ${REFERENCE_COLUMNS} FROM reference.articles WHERE id = ANY($1::text[])`,
       [[...articleIds]],
     );
     const foundIds = new Set(rows.rows.map((row) => row.id));
@@ -850,7 +827,7 @@ async function commandPromote(articleIds: readonly string[]): Promise<void> {
     const promoted: string[] = [];
     for (const id of articleIds) {
       const updated = await client.query<{ id: string }>(
-        `UPDATE bb_reference.articles SET status = 'published', row_updated_at = now()
+        `UPDATE reference.articles SET status = 'published', row_updated_at = now()
          WHERE id = $1 RETURNING id`,
         [id],
       );
@@ -888,7 +865,7 @@ async function commandProject(): Promise<void> {
   const result = await withDb(async ({ client, dryRun }) => {
     const releaseId = await resolveActiveReleaseId(client);
     const rows = await client.query<ArticleRow>(
-      `SELECT ${REFERENCE_COLUMNS} FROM bb_reference.articles WHERE status = 'published' ORDER BY id`,
+      `SELECT ${REFERENCE_COLUMNS} FROM reference.articles WHERE status = 'published' ORDER BY id`,
     );
 
     const projected: string[] = [];
@@ -897,7 +874,7 @@ async function commandProject(): Promise<void> {
       const doc = rowToProjection(row, releaseId);
       const hash = contentHash(doc);
       const upserted = await client.query<{ article_id: string }>(
-        `INSERT INTO bb_public.release_articles (
+        `INSERT INTO published.release_articles (
            release_id, article_id, slug, theme_id, published_at, payload, content_hash
          ) VALUES ($1, $2, $3, $4, $5::date, $6::jsonb, $7)
          ON CONFLICT (release_id, article_id) DO UPDATE SET
@@ -906,7 +883,7 @@ async function commandProject(): Promise<void> {
            published_at = EXCLUDED.published_at,
            payload = EXCLUDED.payload,
            content_hash = EXCLUDED.content_hash
-         WHERE bb_public.release_articles.content_hash IS DISTINCT FROM EXCLUDED.content_hash
+         WHERE published.release_articles.content_hash IS DISTINCT FROM EXCLUDED.content_hash
          RETURNING article_id`,
         [
           releaseId,
@@ -923,7 +900,7 @@ async function commandProject(): Promise<void> {
     }
 
     const stale = await client.query<{ article_id: string }>(
-      `DELETE FROM bb_public.release_articles
+      `DELETE FROM published.release_articles
        WHERE release_id = $1 AND article_id <> ALL($2::text[])
        RETURNING article_id`,
       [releaseId, rows.rows.map((row) => row.id)],
@@ -945,10 +922,10 @@ async function commandAudit(): Promise<void> {
   const result = await withDb(async ({ client }) => {
     const releaseId = await resolveActiveReleaseId(client);
     const referenceRows = await client.query<ArticleRow>(
-      `SELECT ${REFERENCE_COLUMNS} FROM bb_reference.articles WHERE status = 'published'`,
+      `SELECT ${REFERENCE_COLUMNS} FROM reference.articles WHERE status = 'published'`,
     );
     const releaseRows = await client.query<{ article_id: string; content_hash: string }>(
-      `SELECT article_id, content_hash FROM bb_public.release_articles WHERE release_id = $1`,
+      `SELECT article_id, content_hash FROM published.release_articles WHERE release_id = $1`,
       [releaseId],
     );
     const releaseHashById = new Map(

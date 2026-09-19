@@ -26,7 +26,7 @@ import type { createLocateRateLimitGuard } from './rate-limit-guard';
 
 /**
  * Monitor allow-through must satisfy the quota gate (compat with @repo/security's
- * `appCheckVerified` field name on rate-limit requests).
+ * `clientAttested` field name on rate-limit requests).
  */
 function integritySatisfiesRateLimitGate(decision: {
   readonly verified: boolean;
@@ -58,11 +58,9 @@ function clientIpFrom(request: Request): string | undefined {
 const ZIP_ONLY_PATTERN = /^\d{5}(-\d{4})?$/;
 
 /**
- * Shared handler used by both the exported Next.js `GET` (production defaults) and `route.test.ts`
- * (injected fake App Check verifier, deterministic rate-limit clock, injected fetch fakes so no
- * real Census network call ever happens in tests). Ordering mirrors search route: App
- * Check guard -> rate-limit guard -> input parsing -> geocode pipeline, with a `finally` that
- * always releases the concurrency slot.
+ * Shared locate handler with injectable integrity, quota and fetch dependencies. Check request
+ * integrity, rate limits and input before geocoding; always release the concurrency slot in
+ * finally.
  */
 export async function handleLocateRequest(
   request: Request,
@@ -80,7 +78,7 @@ export async function handleLocateRequest(
   const rateDecision = deps.rateLimitGuard.evaluate({
     subject: 'anonymous',
     ...(clientIp ? { clientIp } : {}),
-    appCheckVerified: integritySatisfiesRateLimitGate(integrityDecision),
+    clientAttested: integritySatisfiesRateLimitGate(integrityDecision),
   });
   if (!rateDecision.allowed) {
     const response = deps.rateLimitGuard.formatDeniedResponse(rateDecision);

@@ -243,7 +243,7 @@ test('restoreDecadeFadePaintFromStyle resets incoming to 0 and restores primary 
   assert.deepEqual(paints.get(`${EXPLORE_UNCLUSTERED_POINT_LAYER_ID}:circle-opacity`), kindOpacity);
 });
 
-/* repo-o56o — per-entity decade morph: a record in both decades does not move. */
+/* Per-entity decade morph: a record in both decades does not move. */
 
 test('the hold set is the records documented in both decades, and nothing else', () => {
   const held = buildDecadeHoldSet(['ent_a', 'ent_b', 'ent_c'], ['ent_b', 'ent_c', 'ent_d']);

@@ -1,110 +1,54 @@
-# Security test checklist ( / )
+# Security verification
 
-> Manual and future-automated checks derived from [`../abuse-cases.md`](../abuse-cases.md).
->  automation is mapped below and in [`asvs-checklist.md`](./asvs-checklist.md).
-> Human and downstream checks remain release blockers where marked.
+Use the [threat model](../threat-model.md) and [abuse cases](../abuse-cases.md) to choose checks.
+A test of a policy function establishes that function's behavior, not deployed middleware, provider
+configuration or production authorization. The [framework audit](../../research/framework-audit.md)
+records the executed checks and their limits.
 
-**Last updated:** 2026-07-17
-**Corpus version:** see `docs/security/threat-corpus.json` → `version`
+## Repository checks
 
-## Always-on (repo / scaffold)
+| Boundary | Evidence | Validation |
+|---|---|---|
+| Threat coverage | `packages/testing/src/security/threat-corpus.test.ts` validates threat IDs, control quadrants, implementation references and residual risks | `pnpm --filter @repo/testing test` |
+| Authorization, quotas, URL safety and publication integrity | `packages/testing/src/security-gates/security-gates.test.ts` exercises adversarial fixtures against policy contracts | `pnpm --filter @repo/testing test` |
+| Staff/public credential separation | `apps/web/src/admin/canonical-write-boundary.test.ts` and staff authorization tests | `pnpm --filter @repo/web test` |
+| Database role denials | `supabase/tests/research-kernel.sql` checks research, publication, source and retention boundaries against an isolated migrated database | `psql -v ON_ERROR_STOP=1 -f supabase/tests/research-kernel.sql` |
+| Dependency and source boundaries | Repository validation, pinned Actions and dependency policy | `pnpm validate` and the applicable CI jobs |
+| Secrets | Gitleaks on the exact staged files and the ordinary CI secret scan | `gitleaks dir <staged-file-export> --config gitleaks.toml --redact --no-banner` |
 
-| ID | Check | Status | Notes |
-|----|-------|--------|-------|
-| S-01 | Threat corpus JSON validates (19 threats, four control quadrants, residual risk) | automated | `pnpm --filter @repo/testing test` |
-| S-02 | Every `T-xx` has matching `AC-xx` | automated | same package |
-| S-03 | Every P0 threat lists ≥1 implementation bead | automated | same package |
-| S-04 | Uploads disabled or gated until  | manual/scaffold | assert feature flag / route absent |
-| S-05 | Tool-using LLM research disabled until  | manual/scaffold | assert no public LLM; no tool egress |
+Run the complete applicable path through `fnm exec --using=22 -- ./scripts/ci-local.sh` before a
+release. Its changed-path predicates determine the required lanes. Passing a smaller helper suite
+does not replace that gate. Record skipped jobs and environment limitations explicitly.
 
-## AuthZ / surfaces (, , , )
+## Deployed checks
 
-| ID | Abuse | Check | Mode |
-|----|-------|-------|------|
-| A-04a | AC-04 | Public token cannot call `api-internal` publish | ci (`security-gates.test.ts`) |
-| A-04b | AC-04 | Cannot read/modify another actor’s submission by ID | ci (`security-gates.test.ts`, BOLA) |
-| A-03a | AC-03 | End-user Firebase token rejected on admin/publication | ci (`security-gates.test.ts` → Firebase auth gate) |
-| A-16a | AC-16 | Research worker credentials cannot activate release | ci (`security-gates.test.ts`) |
+These need the actual deployment or an isolated representative restore. They remain unproven until
+an execution record identifies the tested revision, data and observed result.
 
-## Abuse / quotas (–026, , )
+1. Public and ordinary user credentials cannot enter staff routes, write canonical history or
+   publish. Staff role claims come from trusted Supabase app metadata. Internal operations require
+   service identity; the code contract alone does not establish private network isolation.
+2. Flood and cache-bypass scenarios exercise the deployed rate-limit store and middleware. Verify
+   bounded requests, failure behavior and continued availability of safe public reads. Fixture
+   evaluators alone do not prove throttling.
+3. Submitted URLs cannot cause synchronous uncontrolled fetches, internal-network access, redirect
+   escape or oversized downloads. File acquisition rejects unsafe archive entries. Any new upload
+   path requires its own malware, type, size and quarantine checks before exposure.
+4. Research output remains a proposal. Prompt injection, duplicate submissions, circular citations
+   and semantic similarity cannot bypass evidence, independent review or publication controls.
+5. Public records respect stored location precision and living-person address restrictions. Inspect
+   actual DTOs, rendered records and logs using representative sensitive fixtures.
+6. Recovery restores a matched database, auth, objects and compatible application revision. A prior
+   release pointer or an application rollback alone cannot reverse an incompatible schema change.
+   Follow [production release](../../runbooks/production-release.md).
 
-| ID | Abuse | Check | Mode |
-|----|-------|-------|------|
-| A-01a | AC-01 | Edge/app returns 429 under flood; snapshots still readable | manual /  |
-| A-02a | AC-02 | Cache-busting query params do not bypass CDN for static | ci |
-| A-02b | AC-02 | Over-complex search rejected or times out | ci (`security-gates.test.ts` → query guardrails) |
-| A-05a | AC-05 | Duplicate corrections do not raise confidence | ci |
-| A-05b | AC-05 | Submission burst / oversized body hits quota | ci (`security-gates.test.ts`) |
-| A-19a | AC-19 | Sequential entity enumeration throttled | ci /  |
+## CI evidence and release decision
 
-## URL / file / model (, , )
+`.github/workflows/security.yml` owns the configured CodeQL, dependency review, Gitleaks, SBOM,
+Trivy, image/signature and manual staging DAST jobs. Some run only when their conditions are met.
+An absent or skipped job is not a passing check; manual DAST must never target production.
+Provider push protection, live monitoring and account controls need separate verification.
 
-| ID | Abuse | Check | Mode |
-|----|-------|-------|------|
-| A-08a | AC-08 | Request path never fetches submitted URL synchronously | ci |
-| A-08b | AC-08 | Fetcher denies link-local, RFC1918, metadata, and loopback fixtures | ci (`security-gates.test.ts` → URL safety) |
-| A-08c | AC-08 | Oversized response aborted | ci |
-| A-09a | AC-09 | Malware/polyglot upload rejected or quarantined | deferred  |
-| A-10a | AC-10 | Injection fixture cannot trigger publish or secret tool | deferred  |
-
-## Privacy (, , )
-
-| ID | Abuse | Check | Mode |
-|----|-------|-------|------|
-| A-15a | AC-15 | Living-person fixture never emits residential address on public DTO | ci |
-| A-15b | AC-15 | Unknown living status ⇒ treat as living (constitution) | ci (exists via  fixtures) |
-| A-15c | AC-15 | Logs/redaction strips protected addresses | ci / manual |
-
-## Supply chain / secrets (, )
-
-| ID | Abuse | Check | Mode |
-|----|-------|-------|------|
-| A-11a | AC-11 | Workflows use pinned Actions only | ci (`pnpm validate:governance`; `security.yml`) |
-| A-11b | AC-11 | Deploy uses OIDC/WIF, not static keys | review (`infra/gcp/wif/`, `.github/workflows/deploy-production.yml`; no `credentials_json`) |
-| A-12a | AC-12 | Secret scanning + push protection enabled | Gitleaks CI + human repo setting (`infra/github/security-gates/README.md`) |
-| A-12b | AC-12 | Web client bundle scan finds no private keys | ci |
-
-## Publication integrity (, , )
-
-| ID | Abuse | Check | Mode |
-|----|-------|-------|------|
-| A-16b | AC-16 | Activate prior release restores public content | manual /  |
-| A-17a | AC-17 | Staging credentials cannot mutate prod | ci / env isolation  |
-| A-06a | AC-06 | Circular citation does not inflate confidence | ci  |
-| A-07a | AC-07 | Quarantine item never appears on public projection without promotion | ci |
-
-## Adapter drift (, , )
-
-| ID | Abuse | Check | Mode |
-|----|-------|-------|------|
-| A-18a | AC-18 | Fixture with removed required fields fails closed | ci |
-| A-18b | AC-18 | Adapter health alert on null-field spike | telemetry  |
-
-## Sign-off
-
-| Gate | Owner bead | Required before |
-|------|------------|-----------------|
-| Checklist items Mode=`ci` green in pipeline |  |  prod pipeline |
-| Load/abuse/cost scenarios |  |  beta gate |
-| Adversarial integrity |  |  |
-| Rollback rehearsal |  |  |
-
-When a check moves from scaffold → ci, update this table and link the test path (do not leave orphan checklist rows).
-
-##  production security gates
-
-| Gate | Automated evidence | Production rule |
-|------|--------------------|-----------------|
-| Code scanning | CodeQL security-extended SARIF | high/critical blocks |
-| Dependency review | PR dependency review | high/critical blocks |
-| Secrets | Gitleaks plus GitHub secret-scanning policy | any verified secret blocks |
-| SBOM | SPDX JSON artifact | retained and attached to release |
-| Vulnerabilities / IaC | Trivy filesystem, secret, misconfiguration, and image SARIF | high/critical blocks |
-| API / abuse | `packages/testing/src/security-gates/security-gates.test.ts` | any failure blocks |
-| DAST | protected manual staging ZAP baseline | production target forbidden |
-| Release | Cosign verification + release-evidence contract | exact commit and digest required |
-
-Suppressions are accepted only through
-`infra/github/security-gates/suppressions.json`; reason, `team/handle` owner, and
-future expiration are mandatory. Security artifacts are retained for at least 90 days
-and must be attached to the release before production promotion.
+Suppression requirements live in `infra/github/security-gates/suppressions.json`. Each exception
+needs a reason, an accountable owner and an expiration. Retain the applicable security artifacts
+with the tested commit and release decision. Do not infer a release approval from this checklist.

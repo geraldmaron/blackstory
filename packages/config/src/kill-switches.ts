@@ -183,7 +183,7 @@ function denied(
   };
 }
 
-/** Creates the stable Firestore/Remote Config key for an individual source adapter. */
+/** Creates the stable configuration key for an individual source adapter. */
 export function sourceAdapterKillSwitchId(adapterId: string): SourceAdapterKillSwitchId {
   const normalized = adapterId.trim();
   if (!/^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$/.test(normalized)) {

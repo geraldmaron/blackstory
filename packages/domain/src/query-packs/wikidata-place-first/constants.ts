@@ -1,5 +1,5 @@
 /**
- * Shared constants for Wikidata place-first portfolio query packs (WS7 / repo-2ztn.8).
+ * Shared constants for Wikidata place-first portfolio query packs (portfolio discovery).
  */
 export const WIKIDATA_PLACE_FIRST_PORTFOLIO_WAVE_BEAD = 'repo-tt2u.8' as const;
 

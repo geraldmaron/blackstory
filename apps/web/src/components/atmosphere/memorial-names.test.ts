@@ -57,10 +57,9 @@ test('Trayvon Martin is present as a racial-terror milestone', () => {
 });
 
 test('no memorial name carries markup residue', () => {
-  // repo-5gyq: one scraped entry shipped as "Matthew Johnson#Shooting_of_Matthew_Johnson)" — a
-  // Wikipedia anchor painted verbatim on the wall in handwriting. A memorial cannot render a URL
-  // fragment as a person's name. Parenthesised alternate spellings from the source rolls are
-  // legitimate and pass; wiki anchors, underscores and unbalanced brackets are not.
+  // A memorial cannot render a URL fragment as a person's name. Parenthesised alternate
+  // spellings from the source rolls are legitimate; wiki anchors, underscores, and unbalanced
+  // brackets are not.
   for (const entry of MEMORIAL_NAMES) {
     assert.doesNotMatch(entry.name, /[#_|[\]]/, `markup residue in name: ${entry.name}`);
     const opens = (entry.name.match(/\(/g) ?? []).length;
@@ -70,21 +69,18 @@ test('no memorial name carries markup residue', () => {
 });
 
 test('George Bush III is not on the wall', () => {
-  // repo-5jxh: he had been carried as "killed by law enforcement, 2016, St Louis, Missouri". The
-  // contemporaneous record is that on 20 November 2016 he shot a St. Louis sergeant twice in the
-  // head, and that he was killed the next morning firing on the officers who found him. A
-  // memorial cannot seat him beside the people it memorializes. The open police-shooting
-  // datasets this roll draws on record every person police killed, whatever the circumstances,
-  // so being in them corroborates that a killing happened and nothing more. See
+  // The contemporaneous record says he shot a St. Louis sergeant on 20 November 2016 and was
+  // killed the next morning while firing on the officers who found him. The open police-shooting
+  // datasets record every person police killed, whatever the circumstances, so inclusion in those
+  // datasets corroborates that a killing happened and nothing more. See
   // docs/research/police-violence-memorial-names.sources.json.
   const names = new Set(MEMORIAL_NAMES.map((entry) => entry.name));
   assert.equal(names.has('George Bush III'), false);
 });
 
 test('Charles Brown and Robert Johnson stay on the wall with their own facts', () => {
-  // repo-5jxh: the other two names from the same mislinking. Both are real victims and both stay,
-  // unlinked, until each has an entity record of their own. Charles Brown's place was the county
-  // seat, Yazoo City; the Justice Department's Notice to Close File names Benton, in Yazoo County.
+  // Both are documented victims and remain unlinked until each has an entity record. The Justice
+  // Department's Notice to Close File places Charles Brown in Benton, in Yazoo County.
   const charles = MEMORIAL_NAMES.find((entry) => entry.name === 'Charles Brown');
   assert.ok(charles);
   assert.equal(charles!.year, 1957);

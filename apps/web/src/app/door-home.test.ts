@@ -41,7 +41,14 @@ test('DoorImmersive scrolls chapters and drives the shared plate', () => {
   assert.match(immersive, /resolveDoorFocus/);
   assert.match(immersive, /scrollIntoView/);
   assert.match(immersive, />\s*Begin\s*</);
-  assert.match(immersive, /Open Explore/);
+  assert.match(immersive, /Browse the map/);
+  assert.doesNotMatch(immersive, /Filter the map|Enter the map/);
+  assert.match(immersive, /How this archive works/);
+  assert.match(immersive, /enterBrowse|MAP_BROWSE_ENTER_EVENT/);
+  assert.match(immersive, /ds-door__filters/);
+  assert.match(immersive, /AtlasLoader/);
+  assert.match(immersive, /browseShell/);
+  assert.doesNotMatch(immersive, /Stay with the map/);
   // The one persistent plate, never a second MapLibre instance and never the map's story runner.
   assert.match(immersive, /useMapStage\(\)/);
   assert.match(
@@ -52,7 +59,36 @@ test('DoorImmersive scrolls chapters and drives the shared plate', () => {
   assert.doesNotMatch(immersive, /useStoryRunner|from 'maplibre-gl'|new maplibregl/);
 });
 
-test('the Door has one map: no static board, no layout zoom, no pin plate (repo-18ma2)', () => {
+test('Door browse morphs in place rather than hard-linking Filter CTAs to /explore', () => {
+  assert.match(immersive, /setDoorBrowseLive/);
+  assert.match(immersive, /ds-door-journey--browse/);
+  assert.match(immersive, /initialBrowse/);
+  assert.match(css, /ds-door-journey--browse/);
+  assert.match(css, /--ds-door-browse-ms/);
+  assert.match(door, /buildAtlasShell/);
+  assert.match(door, /browseShell/);
+  assert.match(door, /initialBrowse/);
+  // Exit lives on the Door, outside the atlas pointer-events:none stack.
+  assert.match(immersive, /ds-door__browse-exit/);
+  assert.match(immersive, /Back to journey/);
+  assert.match(immersive, /data-browse-chrome/);
+  assert.match(css, /\.ds-door__browse-exit/);
+  assert.match(css, /z-index:\s*calc\(var\(--ds-z-atlas-instruments\) - 1\)/);
+});
+
+test('cold `/explore` mounts the same Door browse shell, not a second instrument', () => {
+  const explorePage = readFileSync(
+    fileURLToPath(new URL('./explore/page.tsx', import.meta.url)),
+    'utf8',
+  );
+  assert.match(explorePage, /DoorHome/);
+  assert.match(explorePage, /initialBrowse/);
+  assert.doesNotMatch(explorePage, /AtlasHome/);
+  assert.match(immersive, /data-cold=\{initialBrowse/);
+  // Cold browse never runs journey framing; still flip `framed` so the field canvas clears.
+  assert.match(immersive, /if \(browseModeRef\.current\) \{[\s\S]*?setFramed\(true\)/);
+});
+test('the Door has one map: no static board, no layout zoom, no pin plate', () => {
   assert.doesNotMatch(immersive, /FirstPaintPinPlate|usePinPhotoHoverAnchor|locatorPinPercent/);
   assert.doesNotMatch(immersive, /ds-door__board|ds-door__ground|focus\.scale|is-zoomed/);
   assert.doesNotMatch(css, /ds-door__board|ds-door__ground|us-locator\.svg|ds-first-paint/);
@@ -63,8 +99,10 @@ test('the Door has one map: no static board, no layout zoom, no pin plate (repo-
 
 test('the plate is framed against the Door window and re-framed on resize', () => {
   assert.match(immersive, /ds-door__window/);
-  assert.match(immersive, /doorFramePadding\(windowBox, plateBox, chromeBox\)/);
+  assert.match(immersive, /doorFramePadding\(windowBox, plateBox, chromeBox, bottomChrome\)/);
   assert.match(immersive, /doorFrameOffset\(windowBox, plateBox\)/);
+  assert.match(immersive, /openSheetRef/);
+  assert.match(immersive, /bottomChrome: onOpen \? boxOf\(openSheetRef\.current\) : null/);
   // The canvas box comes from MapLibre's own container through the stage handle, never from a
   // class-name query into another component's DOM.
   assert.match(immersive, /boxOf\(map\.getContainer\(\)\)/);
@@ -152,37 +190,96 @@ test('immersive CSS uses document snap over a fixed full-bleed plate', () => {
   assert.match(css, /\.ds-door__window\s*\{[^}]*pointer-events:\s*none/);
   // Page Sand / copper wash behind the map was the distracting orange field.
   assert.doesNotMatch(css, /mix-blend-mode:\s*multiply/);
-  assert.doesNotMatch(css, /radial-gradient|linear-gradient|box-shadow|backdrop-filter/);
+  // Archive material law permits `--ds-contact-*` where a layer overlaps; ban decorative stacks.
+  assert.doesNotMatch(
+    css.replace(/box-shadow:\s*var\(--ds-contact-[a-z]+\);/g, ''),
+    /radial-gradient|linear-gradient|box-shadow|backdrop-filter/,
+  );
   // Nested overflow scrollport was the bug: wheel only hit cards. Document scrolls instead.
   assert.doesNotMatch(css, /\.ds-door-journey\s*\{[^}]*overflow-y:\s*auto/);
-  // Opening invitation card stays vertically centered in the viewport chapter.
-  assert.match(
-    css,
-    /\.ds-door-journey__chapter--center\.ds-door-journey__chapter--rest[\s\S]*align-content:\s*center/,
-  );
+  // Opening masthead is edge-anchored (ds-door-open), not a centered dialog card.
+  assert.match(css, /\.ds-door-open\s*\{/);
   assert.match(css, /ds-door-journey__chapter--rest/);
+  // The measured morph slot stays clipped, but display-font ink may paint outside its fractional
+  // layout bounds. Cross-browser padding preserves that ink while its negative margin keeps the
+  // animated slot's footprint unchanged.
   assert.match(
     css,
-    /\.ds-door-journey__chapter--rest \.ds-door-journey__card[\s\S]*max-height:\s*min\(31rem/,
+    /\.ds-hero-headline-morph__prefix\s*\{[^}]*overflow:\s*clip;[^}]*padding-inline:\s*var\(--ds-hero-glyph-bleed\);[^}]*margin-inline:\s*calc\(var\(--ds-hero-glyph-bleed\) \* -1\)/s,
   );
+  assert.match(
+    css,
+    /\.ds-hero-headline-morph__prefix-out\s*\{[^}]*left:\s*var\(--ds-hero-glyph-bleed\)/s,
+  );
+  assert.match(css, /\.ds-door-journey__card[\s\S]*max-height/);
   assert.match(css, /@media \(max-height: 52rem\)/);
   assert.match(css, /\.ds-door__field-chrome[\s\S]*top:\s*var\(--ds-space-4\)/);
+  assert.match(css, /\.ds-door__filters[\s\S]*min-height:\s*44px/);
+  assert.match(css, /@media \(max-width: 899px\)[\s\S]*\.ds-door__filters[\s\S]*margin-left:\s*0/);
   assert.match(
     css,
     /body:has\(\.ds-door\)\s+\.ds-shell\s*>\s*\.ds-bar[\s\S]*pointer-events:\s*auto/,
   );
   // Mobile chapters are in document flow; nested card scroll would steal the page wheel.
   assert.match(css, /@media \(max-width: 899px\)[\s\S]*max-height:\s*none/);
-  // On a phone the strip is the window; the camera frames the country inside its padding.
+  // On a phone the window is a band under the bar, sized to the country, that the chapters
+  // scroll over; the plate stays fixed full-bleed rather than a sticky strip cards cover.
   assert.match(
     css,
-    /@media \(max-width: 899px\)[\s\S]*\.ds-door__window\s*\{[^}]*position:\s*relative/,
+    /@media \(max-width: 899px\)[\s\S]*\.ds-door__window\s*\{[^}]*height:\s*var\(--ds-door-band\)/,
   );
+  assert.doesNotMatch(css, /position:\s*sticky/);
+  // Every later chapter opens with a band-high gap, so the flown map is seen before its card.
+  assert.match(css, /\.ds-door-journey__chapter\s*\{[^}]*padding:\s*var\(--ds-door-band\)/);
+  // Below 900px every card is one centered column at a reading width: full width on a phone,
+  // centered under the country on a tablet rather than a 480px card against the left edge.
+  assert.match(
+    css,
+    /@media \(max-width: 899px\)[\s\S]*\.ds-door-journey__chapter--center\s*\{\s*justify-items:\s*center/,
+  );
+  assert.match(css, /\.ds-door-journey__card[\s\S]*width:\s*min\(36rem/);
+  // The morph slot stays shrinkable so its animated width directly positions Story.
+  assert.doesNotMatch(css, /\.ds-hero-headline-morph__prefix\s*\{[^}]*min-width:\s*max-content/);
+  // Opening masthead is edge-anchored low so the map reads as the stage.
+  assert.match(css, /\.ds-door-journey__chapter--rest\s*\{[^}]*align-content:\s*end/);
 });
 
 test('door-home CSS switches mobile typography and gutters', () => {
-  assert.match(css, /ds-door-journey__cold[\s\S]*clamp\(/);
+  assert.match(css, /ds-door-open__headline[\s\S]*clamp\(/);
   assert.match(css, /var\(--ds-gutter\)/);
+});
+
+test('the phone opening card never scrolls inside itself', () => {
+  // A capped height with an inner scroller clipped the headline on a 320x568 screen.
+  const start = css.indexOf('@media (max-width: 559px) {');
+  assert.ok(start >= 0, 'the phone block exists');
+  const next = css.indexOf('@media', start + 1);
+  const phone = css.slice(start, next === -1 ? undefined : next);
+  assert.doesNotMatch(phone, /overflow-y:\s*auto/);
+  assert.doesNotMatch(phone, /max-height:\s*calc\(100dvh/);
+});
+
+test('the opening masthead names a place through the public pin href', () => {
+  assert.match(immersive, /ds-door-open/);
+  assert.match(immersive, /ds-door-open__place/);
+  // The same pin table a marker click opens, so the link is the canonical place URL.
+  assert.match(immersive, /hrefByPinId\.get\(spotlightPinId\)/);
+});
+
+test('the opening masthead densifies with invite, kind ledger, and morphing headline', () => {
+  assert.match(immersive, /HeroHeadlineMorph/);
+  assert.match(immersive, /DOOR_OPEN_INVITE/);
+  assert.match(immersive, /ds-door-open__invite/);
+  assert.match(immersive, /ds-door-open__ledger/);
+  assert.match(immersive, /ds-door-open__ledger-row/);
+  assert.match(immersive, /openLedger/);
+  assert.match(immersive, /ref=\{openSheetRef\}/);
+  assert.match(door, /openLedger=\{openLedger\}/);
+  assert.match(door, /KIND_FAMILY_ENTRIES/);
+  assert.match(door, /buildOpenLedger/);
+  assert.match(css, /\.ds-door-open__invite\s*\{/);
+  assert.match(css, /\.ds-door-open__ledger\s*\{/);
+  assert.match(css, /\.ds-door-open__ledger-count\s*\{/);
 });
 
 test('DoorImmersive hands every record to the plate', () => {
@@ -217,9 +314,14 @@ test('a reader without a plate is told so, where the map would be, and sent to t
     immersive,
     /plateUnavailable \? \([\s\S]*ds-door__field-note[\s\S]*href="\/records"/,
   );
-  // No JavaScript: the server component says so above the chapters.
+  // The server-rendered fallback remains useful when JavaScript is unavailable.
+  assert.match(door, /<DoorNoscript view=\{noscriptView\}/);
+  const noscript = readFileSync(
+    fileURLToPath(new URL('./door-noscript.tsx', import.meta.url)),
+    'utf8',
+  );
   assert.match(
-    door,
+    noscript,
     /<noscript>[\s\S]*ds-door__noscript[\s\S]*href="\/records"[\s\S]*<\/noscript>/,
   );
   assert.match(css, /\.ds-door__field-note,\s*\.ds-door__noscript\s*\{/);

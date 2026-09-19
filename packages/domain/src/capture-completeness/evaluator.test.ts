@@ -62,14 +62,24 @@ test('webCitationHasArchivedCapture accepts a valid Wayback pointer', () => {
   assert.equal(webCitationHasArchivedCapture(webCitation('a')), true);
 });
 
-test('webCitationHasArchivedCapture accepts a content-addressed stored capture', () => {
+test('webCitationHasArchivedCapture rejects hash-only metadata without recoverable content', () => {
   const citation = webCitation('hash-only', {
     capture: {
       captureId: 'cap-hash-only',
       contentHash: { algorithm: 'sha256', digest: 'a'.repeat(64) },
     },
   });
-  assert.equal(webCitationHasArchivedCapture(citation), true);
+  assert.equal(webCitationHasArchivedCapture(citation), false);
+});
+
+test('webCitationHasArchivedCapture rejects an archive URL without a completion timestamp', () => {
+  const citation = webCitation('url-only', {
+    capture: {
+      captureId: 'cap-url-only',
+      waybackCaptureUrl: WAYBACK,
+    },
+  });
+  assert.equal(webCitationHasArchivedCapture(citation), false);
 });
 
 test('webCitationHasArchivedCapture rejects bare captureId without archive evidence', () => {
@@ -84,6 +94,39 @@ test('webCitationHasArchivedCapture rejects non-archive https URLs', () => {
     capture: {
       captureId: 'cap-fake',
       waybackCaptureUrl: 'https://example.com/not-wayback',
+    },
+  });
+  assert.equal(webCitationHasArchivedCapture(citation), false);
+});
+
+test('webCitationHasArchivedCapture requires the archive pointer to name the cited URL', () => {
+  const citation = webCitation('wrong-source', {
+    capture: {
+      captureId: 'cap-wrong-source',
+      waybackCaptureUrl: 'https://web.archive.org/web/20260101000000/https://example.gov/other',
+      waybackCapturedAt: '2026-01-01T00:00:00.000Z',
+    },
+  });
+  assert.equal(webCitationHasArchivedCapture(citation), false);
+});
+
+test('webCitationHasArchivedCapture requires timestamp to match the archive pointer', () => {
+  const citation = webCitation('wrong-time', {
+    capture: {
+      captureId: 'cap-wrong-time',
+      waybackCaptureUrl: WAYBACK,
+      waybackCapturedAt: '2026-01-02T00:00:00.000Z',
+    },
+  });
+  assert.equal(webCitationHasArchivedCapture(citation), false);
+});
+
+test('webCitationHasArchivedCapture rejects a bare archive host', () => {
+  const citation = webCitation('bare-host', {
+    capture: {
+      captureId: 'cap-bare-host',
+      waybackCaptureUrl: 'https://web.archive.org',
+      waybackCapturedAt: '2026-01-01T00:00:00.000Z',
     },
   });
   assert.equal(webCitationHasArchivedCapture(citation), false);

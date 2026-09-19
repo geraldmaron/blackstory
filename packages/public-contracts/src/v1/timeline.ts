@@ -1,7 +1,7 @@
 /**
  * Public timeline entry — extracted from `apps/web/src/data/entity-graph-seed.ts`'s
  * `GraphTimelineEntry` (`{id, time, title, body}`), extended with an explicit `datePrecision`
- * field per MOB-003's requirement that "dates include precision." `GraphTimelineEntry.time` is a
+ * field per public contract's requirement that "dates include precision." `GraphTimelineEntry.time` is a
  * display-ready label (sometimes "Undated"), not a precision-tagged date, so this contract adds
  * `datePrecision` (the same `DatePrecision` vocabulary already carried by
  * `PublicEventWindow.datePrecision` in `apps/web/src/data/public-seed.ts`) and keeps the original

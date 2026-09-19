@@ -16,26 +16,39 @@ test('the room menu is the locked about groups, not a second board', () => {
   // reachable from the footer and the breadcrumb chain but from nothing in the bar.
   assert.match(source, /href="\/rooms"/);
   assert.match(source, /All rooms/);
+  assert.match(source, /DestinationIcon/);
   assert.doesNotMatch(source, /Straight to the records/);
   assert.doesNotMatch(source, /The Atlas answers where and when/);
   assert.doesNotMatch(source, /The whole archive as a list/);
   assert.doesNotMatch(source, /Everything here is also reachable/);
   assert.doesNotMatch(source, /Open the Atlas|ATLAS_INSTRUMENT/);
   assert.doesNotMatch(source, /['"`]\/banned-books/);
-  assert.doesNotMatch(source, /DIRECT_PATHS|\/explore|\/records/);
+  assert.doesNotMatch(source, /DIRECT_PATHS/);
 });
 
 test('the Rooms menu rooms come from the same registry groups the hub renders', () => {
   assert.match(source, /ROOMS_CARD_GROUPS/);
   assert.match(source, /destinationsInGroup/);
+  assert.ok(destinationsInGroup('read').some((destination) => destination.path === '/memorial'));
+  // Banned books is a way to read the archive: it sits in the read group beside law, data, lives, memorial.
   assert.ok(destinationsInGroup('read').some((destination) => destination.path === '/books'));
-  // The menu lists rooms, never the product axes — those are always-visible primary nav.
+  assert.ok(destinationsInGroup('read').some((destination) => destination.path === '/lives'));
+  assert.ok(destinationsInGroup('check').some((destination) => destination.path === '/sources'));
+  // Default panel lists rooms, never the product axes — those stay in the Find pill on wide.
+  // Phone map overflow may add Stories/Records via overflowFind; that is gated, not the groups.
   for (const axis of ['/explore', '/stories', '/records', '/rooms']) {
     assert.ok(
       !destinationsInGroup('read').some((destination) => destination.path === axis),
       `${axis} is an axis, not a room`,
     );
   }
+});
+
+test('phone map Find overflow can surface Stories and Records inside Rooms', () => {
+  assert.match(source, /overflowFind/);
+  assert.match(source, /OVERFLOW_FIND_PATHS/);
+  assert.match(source, /primaryNavDestinations/);
+  assert.match(source, />Find</);
 });
 
 test('the narrow rooms panel clears the stacked bar, not the Explore gutter', () => {

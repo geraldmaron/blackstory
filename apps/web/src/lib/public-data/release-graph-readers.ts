@@ -1,5 +1,5 @@
 /**
- * Server-side readers for stored release graph artifacts in bb_public.release_graph_*.
+ * Server-side readers for stored release graph artifacts in published.release_graph_*.
  */
 import type { GraphReleaseArtifact } from '@repo/domain';
 import {
@@ -23,15 +23,8 @@ import {
 const GRAPH_RELEASE_TTL_MS = 30 * 60 * 1000;
 
 /**
- * Before this cache, `fetchStoredGraphReleaseArtifact` pulled three full tables from Postgres
- * on *every* call with no TTL and no dedupe: `release_graph_adjacency` (~656KB / 4,092 rows),
- * `release_graph_decades` (~339KB) and `release_graph_all_time` (~61KB), so ~1MB per invocation.
- * Over the 20 days to 2026-08-09 that was 9,347 calls and 38.2M adjacency rows (~6.3GB egress).
- *
- * Structurally this was the same defect as the `release_entities` catalog pull that produced
- * ~253GB of egress, just two orders of magnitude smaller — an unbounded per-instance full-table
- * read behind no cache. It gets the same treatment: release-keyed process memory plus
- * single-flight so a cold instance under concurrent load issues one pull, not N.
+ * Caches graph artifacts by release in process memory. Single-flight loading coalesces
+ * concurrent misses so one cold instance performs one full pull.
  */
 const graphArtifactMemory = createLiveCatalogMemoryCache<GraphReleaseArtifact>({
   defaultTtlMs: GRAPH_RELEASE_TTL_MS,
@@ -108,7 +101,7 @@ async function loadStoredGraphReleaseArtifact(input: {
 }): Promise<GraphReleaseArtifact | undefined> {
   const adjacencyRows = await queryPostgres<GraphAdjacencyRow>(
     `SELECT entity_id, adjacency
-     FROM bb_public.release_graph_adjacency
+     FROM published.release_graph_adjacency
      WHERE release_id = $1
      ORDER BY entity_id`,
     [input.releaseId],
@@ -117,7 +110,7 @@ async function loadStoredGraphReleaseArtifact(input: {
 
   const decadeRows = await queryPostgres<GraphDecadeRow>(
     `SELECT decade, payload
-     FROM bb_public.release_graph_decades
+     FROM published.release_graph_decades
      WHERE release_id = $1
      ORDER BY decade`,
     [input.releaseId],
@@ -125,7 +118,7 @@ async function loadStoredGraphReleaseArtifact(input: {
 
   const allTimeRows = await queryPostgres<GraphAllTimeRow>(
     `SELECT payload
-     FROM bb_public.release_graph_all_time
+     FROM published.release_graph_all_time
      WHERE release_id = $1
      LIMIT 1`,
     [input.releaseId],

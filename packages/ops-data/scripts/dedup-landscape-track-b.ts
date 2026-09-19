@@ -1,5 +1,5 @@
 /**
- * Track B — DB-only dedup for bb_research.landscape_candidates vs active release.
+ * Track B — DB-only dedup for research.landscape_candidates vs active release.
  * Phase 1: exact-ID catalog dupes → accepted (no republish).
  * Phase 2: name-overlap catalog_enrich → merged + provenance link (no new pins).
  * Leaves clean pending untouched.
@@ -83,7 +83,7 @@ type PendingRow = {
 
 const CLASSIFY_SQL = `
 WITH active AS (
-  SELECT release_id FROM bb_public.active_release LIMIT 1
+  SELECT release_id FROM published.active_release LIMIT 1
 ),
 pending AS (
   SELECT
@@ -91,14 +91,14 @@ pending AS (
     lc.lane,
     lc.display_name,
     lc.source_item_id
-  FROM bb_research.landscape_candidates lc
+  FROM research.landscape_candidates lc
   WHERE lc.status = 'pending'
 ),
 exact AS (
   SELECT p.id
   FROM pending p
   CROSS JOIN active a
-  JOIN bb_public.release_entities re
+  JOIN published.release_entities re
     ON re.release_id = a.release_id
     AND (re.entity_id = p.id OR re.entity_id = p.source_item_id)
 )
@@ -111,7 +111,7 @@ SELECT
   EXISTS (
     SELECT 1
     FROM active a
-    JOIN bb_public.release_entities re
+    JOIN published.release_entities re
       ON re.release_id = a.release_id
     WHERE lower(re.display_name) = lower(p.display_name)
       AND p.id NOT IN (SELECT id FROM exact)
@@ -119,7 +119,7 @@ SELECT
   (
     SELECT re.entity_id
     FROM active a
-    JOIN bb_public.release_entities re
+    JOIN published.release_entities re
       ON re.release_id = a.release_id
     WHERE re.entity_id = p.id OR re.entity_id = p.source_item_id
     LIMIT 1
@@ -130,13 +130,13 @@ ORDER BY p.lane, p.id
 
 const NAME_OVERLAP_DETAIL_SQL = `
 WITH active AS (
-  SELECT release_id FROM bb_public.active_release LIMIT 1
+  SELECT release_id FROM published.active_release LIMIT 1
 ),
 exact AS (
   SELECT lc.id
-  FROM bb_research.landscape_candidates lc
+  FROM research.landscape_candidates lc
   CROSS JOIN active a
-  JOIN bb_public.release_entities re
+  JOIN published.release_entities re
     ON re.release_id = a.release_id
     AND re.entity_id = ANY(ARRAY[lc.id, lc.source_item_id])
   WHERE lc.status = 'pending'
@@ -146,9 +146,9 @@ SELECT
   lc.display_name AS candidate_name,
   re.entity_id AS release_entity_id,
   re.display_name AS release_display_name
-FROM bb_research.landscape_candidates lc
+FROM research.landscape_candidates lc
 CROSS JOIN active a
-JOIN bb_public.release_entities re
+JOIN published.release_entities re
   ON re.release_id = a.release_id
   AND lower(re.display_name) = lower(lc.display_name)
 WHERE lc.status = 'pending'
@@ -186,7 +186,7 @@ type CatalogEnrichRow = {
 
 const CATALOG_ENRICH_VALIDATE_SQL = `
 WITH active AS (
-  SELECT release_id FROM bb_public.active_release LIMIT 1
+  SELECT release_id FROM published.active_release LIMIT 1
 ),
 pairs AS (
   SELECT * FROM jsonb_to_recordset($1::jsonb) AS x(candidate_id text, release_entity_id text)
@@ -199,12 +199,12 @@ SELECT
   EXISTS (
     SELECT 1
     FROM active a
-    JOIN bb_public.release_entities re
+    JOIN published.release_entities re
       ON re.release_id = a.release_id
       AND re.entity_id = p.release_entity_id
   ) AS release_exists
 FROM pairs p
-LEFT JOIN bb_research.landscape_candidates lc ON lc.id = p.candidate_id
+LEFT JOIN research.landscape_candidates lc ON lc.id = p.candidate_id
 ORDER BY p.candidate_id
 `;
 
@@ -214,7 +214,7 @@ async function applyAccepted(
   matchedEntityId: string | null,
 ): Promise<void> {
   await client.query(
-    `UPDATE bb_research.landscape_candidates
+    `UPDATE research.landscape_candidates
      SET status = 'accepted',
          provenance = provenance || $2::jsonb,
          updated_at = now()
@@ -229,7 +229,7 @@ async function applyCatalogEnrich(
   releaseEntityId: string,
 ): Promise<void> {
   await client.query(
-    `UPDATE bb_research.landscape_candidates
+    `UPDATE research.landscape_candidates
      SET status = 'merged',
          provenance = provenance || $2::jsonb,
          updated_at = now()
@@ -258,7 +258,7 @@ async function runCatalogEnrichPhase(client: pg.PoolClient): Promise<{
   const skipped = rows.filter((row) => row.candidate_status !== 'pending' || !row.release_exists);
 
   const pendingCount = await client.query<{ n: string }>(
-    `SELECT COUNT(*)::text AS n FROM bb_research.landscape_candidates WHERE status = 'pending'`,
+    `SELECT COUNT(*)::text AS n FROM research.landscape_candidates WHERE status = 'pending'`,
   );
   const leftPendingBefore = Number(pendingCount.rows[0]?.n ?? 0);
 
@@ -315,12 +315,12 @@ async function runCatalogEnrichPhase(client: pg.PoolClient): Promise<{
 
   const statusAfter = await client.query<{ status: string; n: string }>(
     `SELECT status, COUNT(*)::text AS n
-     FROM bb_research.landscape_candidates
+     FROM research.landscape_candidates
      GROUP BY status
      ORDER BY status`,
   );
   const pendingAfter = await client.query<{ n: string }>(
-    `SELECT COUNT(*)::text AS n FROM bb_research.landscape_candidates WHERE status = 'pending'`,
+    `SELECT COUNT(*)::text AS n FROM research.landscape_candidates WHERE status = 'pending'`,
   );
   const leftPending = Number(pendingAfter.rows[0]?.n ?? 0);
 
@@ -365,7 +365,7 @@ async function main(): Promise<void> {
 
     const statusBefore = await client.query<{ status: string; n: string }>(
       `SELECT status, COUNT(*)::text AS n
-       FROM bb_research.landscape_candidates
+       FROM research.landscape_candidates
        GROUP BY status
        ORDER BY status`,
     );
@@ -449,7 +449,7 @@ async function main(): Promise<void> {
 
     const statusAfter = await client.query<{ status: string; n: string }>(
       `SELECT status, COUNT(*)::text AS n
-       FROM bb_research.landscape_candidates
+       FROM research.landscape_candidates
        GROUP BY status
        ORDER BY status`,
     );

@@ -1,30 +1,7 @@
 /**
- * repo-8zvt — write extracted periods of significance into landscape payloads as eraBuckets.
- *
- * The reader (./lib/nrhp-period-of-significance.ts) turns captured nomination text into a period;
- * the publish path reads `bb_research.landscape_candidates.payload.eraBuckets`. This is the link
- * between them, and it is deliberately the only place that writes era from a nomination.
- *
- * Two rules it will not break:
- *
- *   Never overwrite an existing era. 347 nrhp rows already carry eraBuckets from editorial
- *   enrichment, which is a better source than a regex over OCR. Only absent or empty values are
- *   filled.
- *
- *   Never write a construction date. `extractPeriodOfSignificance` defaults to periods only, and
- *   this script does not pass `allowConstructionFallback` — measured against the nominations that
- *   state both, a construction year sits inside the stated period just 38.3% of the time.
- *
- * Provenance travels with the value in `payload.eraProvenance`, so any published era traces back
- * to the method, the exact substring it was read from, and the NPS document it came from.
- *
- * Usage (from repo root):
- *   set -a && source apps/web/.env.local && set +a
- *   export DATABASE_SSL=1
- *   node --conditions development --import tsx \
- *     packages/ops-data/scripts/apply-nrhp-period-era.ts                       # dry run
- *   DRY_RUN=0 NRHP_ERA_APPLY=1 node --conditions development --import tsx \
- *     packages/ops-data/scripts/apply-nrhp-period-era.ts                       # apply
+ * Adds nomination periods of significance to missing eraBuckets and records the matched text
+ * and document in eraProvenance. Existing eras remain intact. Construction dates are not
+ * substituted. Default dry-run; apply requires DRY_RUN=0 and NRHP_ERA_APPLY=1.
  */
 import { mkdirSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
@@ -64,8 +41,8 @@ try {
             CASE WHEN jsonb_typeof(lc.payload->'eraBuckets') = 'array'
                  THEN ARRAY(SELECT jsonb_array_elements_text(lc.payload->'eraBuckets'))
                  ELSE NULL END AS existing_era
-       FROM bb_research.landscape_candidates lc
-       JOIN bb_research.entity_evidence ev
+       FROM research.landscape_candidates lc
+       JOIN research.entity_evidence ev
          ON ev.entity_id = lc.id AND ev.collector = 'nrhp-nomination' AND ev.status = 'captured'
       WHERE lc.lane = 'nrhp-black-heritage'`,
   );
@@ -140,7 +117,7 @@ try {
         // jsonb_set twice rather than a payload merge: this must add two keys and disturb nothing
         // else in a payload that carries geo, topics and source fields.
         const result = await client.query(
-          `UPDATE bb_research.landscape_candidates
+          `UPDATE research.landscape_candidates
               SET payload = jsonb_set(
                     jsonb_set(payload, '{eraBuckets}', $2::jsonb, true),
                     '{eraProvenance}', $3::jsonb, true),

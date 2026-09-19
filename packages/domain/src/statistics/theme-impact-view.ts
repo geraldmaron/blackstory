@@ -50,7 +50,9 @@ export type ThemeImpactPacketView = {
   readonly artifacts: readonly ThemeImpactArtifactView[];
   readonly gapStates: readonly ThemeImpactGapState[];
   readonly dataSource?: 'live' | 'fixture';
-  /** Entity this packet is bound to (e.g. for map-panel/story consumers) — repo-cqey.8 entity cross-referencing. */
+  /**
+   * Entity associated with this packet for map and story consumers.
+   */
   readonly entityBinding?: ThemeImpactEntityBinding;
 };
 
@@ -188,7 +190,7 @@ export function themeImpactPacketToView(
   };
 }
 
-/** Parse one published row from bb_reference.theme_impact_packets. */
+/** Parse one published row from reference.theme_impact_packets. */
 export function parseThemeImpactPacketRow(row: {
   readonly id: string;
   readonly question_id: string;
@@ -241,7 +243,7 @@ export function parseThemeImpactPacketRow(row: {
     derived,
     artifacts,
     // The row shape carries no multi_decade_checklist column (it isn't persisted
-    // to bb_reference.theme_impact_packets); derive it the same way the pure
+    // to reference.theme_impact_packets); derive it the same way the pure
     // buildThemeImpactPacket path does so every parsed packet — DB row or
     // fixture — actually has one instead of failing the checklist gate closed
     // on an unpopulated field.

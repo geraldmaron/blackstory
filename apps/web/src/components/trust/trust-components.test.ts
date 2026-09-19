@@ -79,6 +79,7 @@ test('ConfidenceLabelWithNuance includes grade definition link and optional note
     }),
   );
   assert.match(html, /See grade definitions/);
+  assert.match(html, /href="\/methodology#evidence-grades"/);
   assert.match(html, /Nuance:/);
   assert.match(html, /~1,200/);
 });

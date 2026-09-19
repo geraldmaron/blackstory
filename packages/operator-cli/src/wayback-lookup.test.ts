@@ -80,12 +80,12 @@ test('attachWaybackLookup records a found snapshot with its provenance', () => {
   assert.equal(merged.stored, 'metadata-only', 'existing keys survive the merge');
   assert.equal(merged.waybackLookupStatus, 'found');
   assert.equal(
-    merged.waybackCaptureUrl,
+    merged.waybackAvailabilityUrl,
     'https://web.archive.org/web/20260214093311/https://gazette.example.org/1948/inquest',
   );
-  assert.equal(merged.waybackCaptureTimestamp, '20260214093311');
-  assert.equal(merged.waybackCaptureHttpStatus, '200');
-  assert.equal(merged.waybackCaptureSource, 'availability-lookup');
+  assert.equal(merged.waybackAvailabilityTimestamp, '20260214093311');
+  assert.equal(merged.waybackAvailabilityHttpStatus, '200');
+  assert.equal(merged.waybackAvailabilitySource, 'availability-lookup');
 });
 
 test('attachWaybackLookup records a miss with its reason and never a URL', () => {
@@ -96,15 +96,16 @@ test('attachWaybackLookup records a miss with its reason and never a URL', () =>
   assert.equal(merged.waybackLookupStatus, 'miss');
   assert.equal(merged.waybackLookupReason, 'no_snapshot');
   assert.equal(
-    merged.waybackCaptureUrl,
+    merged.waybackAvailabilityUrl,
     undefined,
-    'a miss must not leave a pointer key behind for a reader to mistake for a capture',
+    'a miss must not leave a pointer key behind for a reader to mistake for an availability result',
   );
 });
 
-test('a miss followed by an SPN anchor leaves both outcomes legible on one row', () => {
-  // This is the ordering capture-backfill actually runs: look first, mint only if nothing
-  // was found. The row has to say both things without either key overwriting the other.
+test('a lookup followed by an SPN anchor leaves both outcomes legible on one row', () => {
+  // This is the ordering capture-backfill actually runs: record the availability result first,
+  // then preserve the current revision. The row has to say both things without either key
+  // overwriting the other.
   const afterLookup = attachWaybackLookup(
     { sha256: 'abc' },
     { status: 'miss', reason: 'no_snapshot' },

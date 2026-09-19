@@ -138,12 +138,7 @@ export function RecordVisitBlock({
           </dl>
         </div>
       ) : null}
-      {!compact ? (
-        <Precision
-          resolution={visit.precisionLabel}
-          caveat="The archive never draws a point sharper than the source supports."
-        />
-      ) : null}
+      {!compact ? <Precision resolution={visit.precisionLabel} /> : null}
       {/*
        * Both maps apps, same destination: a reader picks the one on their phone. The exits are
        * quiet, never copper — an external handoff is not the primary action of any view it sits

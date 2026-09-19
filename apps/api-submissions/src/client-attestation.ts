@@ -1,9 +1,4 @@
-/**
- * Client attestation boundary for `apps/api-submissions` — replaces Firebase App Check
- * after the Postgres cutover (`docs/decisions-carryover.md`, "entity source-of-truth
- * precedence"). Mobile corrections declare platform + API major via
- * `X-BlackStory-Client`; rate limits treat that as the abuse-trust signal for mutations.
- */
+/** Client-version header policy for direct API callers. Rate limits remain server-side. */
 import {
   createClientAttestationGuard,
   type ClientAttestationHeaders,

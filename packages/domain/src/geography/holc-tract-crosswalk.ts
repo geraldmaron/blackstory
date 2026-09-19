@@ -1,28 +1,8 @@
 /**
- * HOLC-polygon -> modern-census-tract crosswalk (repo-xez5.7).
- *
- * Schema for the historical-geography -> modern-tract linkage layer that lets a
- * theme-impact packet join a 1930s HOLC security-map polygon (bb_reference.holc_areas)
- * to the modern census tract(s) it now overlaps. This is the NCRC / Aaronson,
- * Hartley & Mazumder (2021, "The Effects of the 1930s HOLC 'Redlining' Maps")
- * linkage approach: area-weighted spatial overlay of the historical HOLC polygon
- * against current TIGER/Line tract boundaries, not a lookup by name or centroid.
- *
- * STATUS: schema + provenance-quartet convention only. No rows are populated by
- * this module yet. Producing real rows requires:
- *   1. TIGER/Line current-vintage tract boundary shapefiles (census.gov/geo/tiger),
- *   2. a polygon-overlay library (e.g. turf.js `intersect`/`area`, or a GIS runtime
- *      such as GDAL/PostGIS `ST_Intersection`) — neither is a dependency of this
- *      repo today,
- *   3. the HOLC polygon geometries themselves, which live only in the archived
- *      Storage object referenced by bb_reference.holc_areas.geometry
- *      (raw-sources/mapping-inequality/2023-full-download/mappinginequality.json),
- *      not inline in Postgres.
- * A follow-up loader (packages/ops-data/scripts/ingest-holc-tract-crosswalk.ts,
- * not yet written) should: load that GeoJSON, load TIGER tract boundaries for the
- * target county/state, compute area-weighted overlay fractions per HOLC area id,
- * and upsert one HolcTractCrosswalkRow per (holcAreaId, tractGeoid) pair with
- * shareOfHolcAreaInTract >= a minimum threshold (e.g. 0.05) to avoid slivers.
+ * Schema for area-weighted overlap between historical HOLC polygons and modern Census tracts.
+ * This module supplies no populated crosswalk. A loader needs both boundary vintages, polygon
+ * intersection and area calculations, source hashes and per-pair overlap fractions. Name or
+ * centroid matching cannot substitute for that overlay.
  */
 
 /** Provenance quartet convention shared with ThemeImpactProvenanceQuartet. */

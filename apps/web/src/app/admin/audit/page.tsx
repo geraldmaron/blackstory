@@ -1,11 +1,8 @@
 /**
  * Audit event browser — recent append-only operator and system actions.
  *
- * Server component (repo-gyq6.9). Was a client page that waited for `AdminAuthProvider` to mint a
- * token before it could fetch `/admin/api/audit`, so an operator chasing "what just happened" paid
- * a hydrate and a token refresh before the first row. An append-only log is the clearest case for
- * reading in the request: nothing on this page responds to the reader, so there was no client
- * state worth the wait.
+ * The append-only log is read in the server request because this page has no interactive state.
+ * Operators receive the current rows in the first response.
  *
  * `/admin/api/audit` stays for callers outside this page.
  */

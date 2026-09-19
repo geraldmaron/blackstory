@@ -1,0 +1,101 @@
+{
+  "source": "U.S. Bureau of the Census, U.S. Census of Population: 1960, Vol. I, Characteristics of the Population, Part 37, Ohio, Chapter C, General Social and Economic Characteristics",
+  "sourceUrl": "https://www2.census.gov/library/publications/decennial/1960/population-volume-1/37749282v1p37_ch04.pdf",
+  "table": "Table 47",
+  "page": "37-230",
+  "boundaryVersion": "us-states-1960",
+  "datasetVintage": "1963 printed volume",
+  "figures": [
+    {
+      "metricId": "lives-high-school",
+      "jurisdictionId": "state:39",
+      "referencePeriod": "1960",
+      "raceEthnicitySlice": "all",
+      "estimate": 41.9,
+      "numerator": 2255168,
+      "denominator": 5377547,
+      "universe": "Persons 25 years old and over; high school 4 years plus college",
+      "note": "Derived share: HS 4 + college 1-3 + college 4 or more over total 25+."
+    },
+    {
+      "metricId": "lives-high-school",
+      "jurisdictionId": "state:39",
+      "referencePeriod": "1960",
+      "raceEthnicitySlice": "white",
+      "estimate": 43.3,
+      "numerator": 2152235,
+      "denominator": 4968834,
+      "universe": "Persons 25 years old and over; WHITE"
+    },
+    {
+      "metricId": "lives-high-school",
+      "jurisdictionId": "state:39",
+      "referencePeriod": "1960",
+      "raceEthnicitySlice": "nonwhite",
+      "estimate": 25.2,
+      "numerator": 102933,
+      "denominator": 408713,
+      "universe": "Persons 25 years old and over; NONWHITE"
+    },
+    {
+      "metricId": "lives-high-school",
+      "jurisdictionId": "state:39",
+      "referencePeriod": "1950",
+      "raceEthnicitySlice": "all",
+      "estimate": 35.6,
+      "numerator": 1690305,
+      "denominator": 4745470,
+      "universe": "Persons 25 years old and over; includes persons not reporting years of school completed"
+    },
+    {
+      "metricId": "lives-high-school",
+      "jurisdictionId": "state:39",
+      "referencePeriod": "1950",
+      "raceEthnicitySlice": "white",
+      "estimate": 36.8,
+      "numerator": 1635355,
+      "denominator": 4448580,
+      "universe": "Persons 25 years old and over; WHITE"
+    },
+    {
+      "metricId": "lives-high-school",
+      "jurisdictionId": "state:39",
+      "referencePeriod": "1950",
+      "raceEthnicitySlice": "nonwhite",
+      "estimate": 18.5,
+      "numerator": 54950,
+      "denominator": 296890,
+      "universe": "Persons 25 years old and over; NONWHITE"
+    },
+    {
+      "metricId": "lives-high-school",
+      "jurisdictionId": "state:39",
+      "referencePeriod": "1940",
+      "raceEthnicitySlice": "all",
+      "estimate": 25.4,
+      "numerator": 1043118,
+      "denominator": 4103918,
+      "universe": "Persons 25 years old and over; includes persons not reporting years of school completed"
+    },
+    {
+      "metricId": "lives-high-school",
+      "jurisdictionId": "state:39",
+      "referencePeriod": "1940",
+      "raceEthnicitySlice": "white",
+      "estimate": 26.1,
+      "numerator": 1020595,
+      "denominator": 3904526,
+      "universe": "Persons 25 years old and over; WHITE"
+    },
+    {
+      "metricId": "lives-high-school",
+      "jurisdictionId": "state:39",
+      "referencePeriod": "1940",
+      "raceEthnicitySlice": "nonwhite",
+      "estimate": 11.3,
+      "numerator": 22523,
+      "denominator": 199392,
+      "universe": "Persons 25 years old and over; NONWHITE"
+    }
+  ]
+}

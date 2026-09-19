@@ -1,6 +1,6 @@
 /**
  * CDC EJI + EPA TRI county environmental ingest for Phase 1 observations into
- * bb_reference.statistical_observations. Fixture-backed by default (Cook 17031 +
+ * reference.statistical_observations. Fixture-backed by default (Cook 17031 +
  * DuPage 17043 + Lake 17097); set PHASE1_EJI_TRI_ALL_IL_COUNTIES=1 for all 102 IL
  * counties via eji-il-counties-full.csv / tri-il-counties-full.csv; optional --live
  * for source downloads (CDC EJI via Zenodo fallback when state CSV 404s).
@@ -121,7 +121,7 @@ async function loadExistingJurisdictionIds(databaseUrl: string): Promise<Set<str
     ...(conn.ssl ? { ssl: conn.ssl } : {}),
   });
   try {
-    const result = await pool.query<{ id: string }>('SELECT id FROM bb_reference.jurisdictions');
+    const result = await pool.query<{ id: string }>('SELECT id FROM reference.jurisdictions');
     return new Set(result.rows.map((row) => row.id));
   } finally {
     await pool.end();
@@ -160,7 +160,7 @@ async function applyObservations(
 
     for (const series of listPhase1EjiTriIndicators()) {
       await client.query(
-        `INSERT INTO bb_reference.statistical_series
+        `INSERT INTO reference.statistical_series
           (metric_id, metric_definition, universe, unit, source_dataset, source_table,
            source_variable, geography_type, estimate_type, period_type,
            external_data_source_id, theme, metadata)
@@ -214,7 +214,7 @@ async function applyObservations(
             };
 
       await client.query(
-        `INSERT INTO bb_reference.statistical_observations
+        `INSERT INTO reference.statistical_observations
           (id, metric_id, jurisdiction_id, boundary_version, reference_period, dataset_vintage,
            estimate, margin_of_error, race_ethnicity_slice, status, source, source_url,
            retrieved_at, content_hash, metadata)

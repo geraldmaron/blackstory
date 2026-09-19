@@ -1,6 +1,6 @@
 /**
  * Server-side Postgres readers for theme-impact packets in the active release
- * (`bb_public.release_theme_impact_packets`). The payload column carries the
+ * (`published.release_theme_impact_packets`). The payload column carries the
  * full packet document frozen at projection time by the ops
  * `theme-packets.ts project` step; the envelope is validated here and the rest
  * of the document is trusted as the projection pipeline's output.
@@ -10,7 +10,7 @@ import { publicThemeImpactPacketProjectionSchema } from '@repo/schemas';
 import { queryPostgres } from '../public-data/postgres-client';
 
 const ACTIVE_RELEASE_JOIN = `
-  JOIN bb_public.active_release active
+  JOIN published.active_release active
     ON active.id = 'active' AND active.release_id = packets.release_id`;
 
 type ReleasePacketRow = {
@@ -30,7 +30,7 @@ function mapRow(row: ReleasePacketRow): ThemeImpactPacket {
 export async function listReleaseThemeImpactPackets(): Promise<readonly ThemeImpactPacket[]> {
   const rows = await queryPostgres<ReleasePacketRow>(
     `SELECT packets.payload
-     FROM bb_public.release_theme_impact_packets packets
+     FROM published.release_theme_impact_packets packets
      ${ACTIVE_RELEASE_JOIN}
      ORDER BY packets.theme_id, packets.question_id`,
   );
@@ -42,7 +42,7 @@ export async function listReleaseThemeImpactPacketsByTheme(
 ): Promise<readonly ThemeImpactPacket[]> {
   const rows = await queryPostgres<ReleasePacketRow>(
     `SELECT packets.payload
-     FROM bb_public.release_theme_impact_packets packets
+     FROM published.release_theme_impact_packets packets
      ${ACTIVE_RELEASE_JOIN}
      WHERE packets.theme_id = $1
      ORDER BY packets.question_id`,
@@ -57,7 +57,7 @@ export async function listReleaseThemeImpactPacketsByIds(
   if (ids.length === 0) return [];
   const rows = await queryPostgres<ReleasePacketRow>(
     `SELECT packets.payload
-     FROM bb_public.release_theme_impact_packets packets
+     FROM published.release_theme_impact_packets packets
      ${ACTIVE_RELEASE_JOIN}
      WHERE packets.packet_id = ANY($1::text[])`,
     [[...ids]],

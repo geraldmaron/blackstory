@@ -1,38 +1,7 @@
 /**
- * Second half of repo-wqtq. Correcting the two summaries was not enough: `notability_basis`
- * holds its own copy of the summary text, and the entity page renders it as "Why this is here".
- * So the sentence Yale contradicts — "First African American to graduate from Yale Medical
- * School (1897)" — survived the summary rewrite and was still on the page, now directly beneath
- * a summary saying something different. Same for Shirley's Sistrunk-neighborhood branch.
- *
- * Three things are wrong in these two records and fixed here:
- *
- * 1. The note is a stale copy. Nothing syncs it when a summary is corrected, so every summary
- *    fix silently leaves a contradiction behind. Only the two records this issue covers are
- *    resynced here; the lane-wide drift is filed separately.
- *
- * 2. Penn's criterion is `first_to_do_x`, which is the specific thing he was not. The rubric for
- *    it reads "documented as the first Black person… not merely an early or contemporaneous
- *    participant" — that is an assertion, printed on the page, that the research disproved. He
- *    moves to `movement_significance`, which the Library of Congress print of the Atlanta
- *    branch's 1917 officers evidences directly.
- *
- * 3. `evidenceIds` points at `claim_civil-rights-leaders-william-f-penn_01`, hyphenated. The
- *    claims are `claim_civil_rights_leaders_william_f_penn_01`, underscored. The reference has
- *    never resolved. Corrected for these two; also filed for the lane.
- *
- * The "Documented site " prefix is dropped from both notes. These are people, not sites, and the
- * phrase is leftover boilerplate from the same pass that gave 95 records a generic reason.
- *
- * Usage (from repo root):
- *   set -a && source apps/web/.env.local && set +a
- *   export DATABASE_SSL=1
- *   node --conditions development --import tsx \
- *     packages/ops-data/scripts/fix-civil-rights-leaders-notability-basis.ts
- *
- * Apply:
- *   DRY_RUN=0 FIX_CRL_NOTABILITY_APPLY=1 node --conditions development --import tsx \
- *     packages/ops-data/scripts/fix-civil-rights-leaders-notability-basis.ts
+ * Repairs stale inclusion notes, unsupported first-person criteria and unresolved evidence ids
+ * on the specified civil-rights records. Summary corrections must also reach derived inclusion
+ * explanations and search copies.
  */
 import pg from 'pg';
 import { remindToRepublishCatalogArtifacts } from './lib/catalog-republish-reminder.ts';
@@ -87,7 +56,7 @@ async function main(): Promise<void> {
   try {
     const releaseId = (
       await client.query<{ release_id: string }>(
-        `SELECT release_id FROM bb_public.active_release LIMIT 1`,
+        `SELECT release_id FROM published.active_release LIMIT 1`,
       )
     ).rows[0]?.release_id;
     if (!releaseId) throw new Error('no active release');
@@ -100,8 +69,8 @@ async function main(): Promise<void> {
                 ARRAY(
                   SELECT jsonb_array_elements(re.claims) ->> 'id'
                 ) AS claim_ids
-         FROM bb_canonical.entities e
-         JOIN bb_public.release_entities re
+         FROM canonical.entities e
+         JOIN published.release_entities re
            ON re.entity_id = e.id AND re.release_id = $1
          WHERE e.id = ANY($2::text[])`,
         [releaseId, ids],
@@ -134,13 +103,13 @@ async function main(): Promise<void> {
       for (const id of ids) {
         const json = JSON.stringify([REWRITES[id]]);
         await client.query(
-          `UPDATE bb_canonical.entities
+          `UPDATE canonical.entities
            SET notability_basis = $2::jsonb, updated_at = now()
            WHERE id = $1`,
           [id, json],
         );
         await client.query(
-          `UPDATE bb_public.release_entities
+          `UPDATE published.release_entities
            SET projection = jsonb_set(projection, '{notabilityBasis}', $3::jsonb, true)
            WHERE release_id = $1 AND entity_id = $2`,
           [releaseId, id, json],

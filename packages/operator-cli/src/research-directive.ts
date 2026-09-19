@@ -1,10 +1,4 @@
-/**
- * Unified research-directive framework: plan → gather → extract → decide.
- *
- * Existing corsair / story / gap-fill scripts keep their own extract/decide
- * logic; this module formalizes the shared loop shape and supplies default
- * gather wiring so callers opt in incrementally instead of rewriting pipelines.
- */
+/** Executes a plan/gather/extract/decide adapter; default gathering fetches seed URLs only. */
 import type { SafeFetchDependencies } from '@repo/security/url-safety';
 import {
   formatGatheredSourceSnippets,

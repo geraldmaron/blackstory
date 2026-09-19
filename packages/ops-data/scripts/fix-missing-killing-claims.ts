@@ -1,45 +1,6 @@
 /**
- * repo-00gxb — adds the one claim each of two records is missing: that its subject was killed.
- *
- * Both records are ABOUT a killing and neither says so in a claim, which is why the racial-terror
- * matcher (repo-90g0i) could not reach them honestly. The matcher was deliberately not widened to
- * cover them: inferring a killing from summary prose is what nearly filed Ida B. Wells as a victim
- * of the lynchings she reported. The defect is in the records, so it is fixed in the records.
- *
- * Neither claim introduces a new source. Both promote a fact the record ALREADY carries in a
- * citation it already holds, into the claim where a reader and the basis builder can see it:
- *
- *   Sharonda Coleman-Singleton — one of the Emanuel Nine. Her claims say `killed | Sharonda
- *   Coleman-Singleton`, `member of`, `killed during | Bible study`, `killed on`, `listed as |
- *   Emanuel Nine`. Nothing names the attack as racial. The other eight records carry exactly the
- *   claim added here, from the same cited page. Verified 2026-09-09: that page names her among the
- *   nine killed and records the attacker's white-supremacist motive.
- *
- *   Emmett Till (the PERSON record; the event record gap_emmett_till_lynching is already correct).
- *   His claims are `was found` and `was recovered | near Graball Landing on the Tallahatchie
- *   River`. Nothing says he was lynched — so a 14-year-old who was abducted, tortured and lynched
- *   publishes under `movement_significance`, "played a documented, non-incidental role in a named
- *   movement". His record already cites the National Park Service's Graball Landing page at
- *   confidence `high`, whose text reads "Fourteen-year-old Emmett Till's body was found near
- *   Graball Landing on the Tallahatchie River following his lynching in 1955." The lynching is
- *   already sourced on this record. It is simply not in a claim.
- *
- * Neither record has a `bb_research.landscape_candidates` row, so there is no upstream row that
- * would overwrite these on a republish.
- *
- * Idempotent: a claim already carrying the same predicate and object is left alone. The record's
- * `notabilityBasis` is recomputed afterwards by `buildReleaseNotabilityBasis` on the new claim set,
- * so this script holds no second copy of the inference.
- *
- * Usage (from repo root):
- *   set -a && source apps/web/.env.local && set +a
- *   export DATABASE_SSL=1
- *   node --conditions development --import tsx \
- *     packages/ops-data/scripts/fix-missing-killing-claims.ts
- *
- * Apply:
- *   DRY_RUN=0 FIX_MISSING_KILLING_CLAIMS_APPLY=1 node --conditions development --import tsx \
- *     packages/ops-data/scripts/fix-missing-killing-claims.ts
+ * Adds missing source-cited killing claims to the specified records. Correct the record's
+ * evidence rather than broadening the classifier to infer a killing from general summary text.
  */
 import pg from 'pg';
 import {
@@ -135,14 +96,14 @@ async function main(): Promise<void> {
 
   try {
     const active = await client.query<{ release_id: string }>(
-      `SELECT release_id FROM bb_public.v_active_release_id`,
+      `SELECT release_id FROM published.v_active_release_id`,
     );
     const releaseId = active.rows[0]?.release_id;
     if (!releaseId) throw new Error('No active release');
 
     const { rows } = await client.query<Row>(
       `SELECT entity_id, display_name, kind, summary, claims, projection, taxonomy
-         FROM bb_public.release_entities WHERE release_id = $1 AND entity_id = ANY($2)`,
+         FROM published.release_entities WHERE release_id = $1 AND entity_id = ANY($2)`,
       [releaseId, ADDITIONS.map((a) => a.entityId)],
     );
 
@@ -252,11 +213,9 @@ async function main(): Promise<void> {
       for (const write of writes) {
         const labels = [...new Set(write.basis.map((b) => NOTABILITY_RUBRIC[b.criterion]))];
         await client.query(
-          // A released row keeps THREE copies of its claims: the `claims` column, `projection.claims`
-          // (what the web app actually renders), and `projection.claimIds`. Writing only the column
-          // left the page showing "Killed Sharonda Coleman-Singleton" while the database held the
-          // repaired claim. Same stale-copy trap as repo-rm2y and repo-8x306 — all copies or none.
-          `UPDATE bb_public.release_entities
+          // Update claims, projection.claims and projection.claimIds together so public readers
+          // and stored claim identifiers agree.
+          `UPDATE published.release_entities
              SET projection = COALESCE(projection, '{}'::jsonb)
                    || jsonb_build_object(
                         'claims', $1::jsonb,

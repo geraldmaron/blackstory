@@ -1,39 +1,10 @@
 /**
- * Lane B / repo-bmmo — deterministic Black newspapers roster from the Library
- * of Congress.
- *
- * Stages historically African American newspapers into
- * bb_research.landscape_candidates (lane='black-newspapers'). No LLM anywhere
- * — pure JSON API enumeration of the LOC "Directory of US Newspapers in
- * American Libraries", filtered to titles that (a) carry the directory's own
- * subject_ethnicity="african american" facet AND (b) are digitized in the
- * Chronicling America collection (partof_collection facet). The digitized
- * bound keeps the lane at ~350 auditable titles instead of the full 2,640
- * directory records (which include print/online duplicates and
- * holdings-only records).
- *
- * canonical_url = the title's own LOC item page (https://www.loc.gov/item/<lccn>/),
- * taken verbatim from the API's `url` field and re-verified per row via the
- * item's fo=json endpoint (must return 200 JSON naming the same title tokens)
- * before being staged; failures are reported separately and never staged.
- *
- * loc.gov sits behind Cloudflare and 403s default curl/node UAs, so every
- * request sends a browser User-Agent (verified working 2026-07-28).
- *
- * Dedup: within-roster by LCCN, then print-vs-online duplicates of the same
- * title collapse via normalized title (which includes the "(City, ST)"
- * qualifier); then against prior lane rows and bb_canonical.entities
- * display names.
- *
- * Default is dry-run (plan + report only, no database writes). Production
- * writes require:
- *   DRY_RUN=0 BLACK_NEWSPAPERS_APPLY=1 DATABASE_URL=postgresql://...
- *
- * Usage (from repo root):
- *   set -a && source apps/web/.env.local && set +a
- *   export DATABASE_SSL=1
- *   node --conditions development --import tsx \
- *     packages/ops-data/scripts/scrape-black-newspapers-roster.ts
+ * Enumerate Library of Congress newspaper records with the African American subject facet and
+ * Chronicling America digitization facet. This scope excludes undigitized holdings. Verify each
+ * item URL before staging; report fetch or name failures. Deduplicate by LCCN and normalized
+ * title with city/state before comparing existing records. Name similarity is a candidate
+ * heuristic, not identity proof. Default dry-run; writes require DRY_RUN=0 and
+ * BLACK_NEWSPAPERS_APPLY=1.
  */
 import { mkdirSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
@@ -57,7 +28,7 @@ const SOURCE_PROGRAM_NAME =
   'Library of Congress — US Newspaper Directory, African American titles digitized in Chronicling America';
 const LANE = 'black-newspapers';
 /**
- * bb_research.source_program_runs.lane has a CHECK constraint restricted to
+ * research.source_program_runs.lane has a CHECK constraint restricted to
  * ('dc-sites','greenbook','hbcu','nrhp','wikidata','other') — the *run* row
  * uses 'other' while candidate rows carry lane='black-newspapers'.
  */
@@ -257,11 +228,11 @@ async function main(): Promise<void> {
 
   const pool = new pg.Pool(normalizePgConnectionString(databaseUrl));
   const existingLandscapeRes = await pool.query<ExistingRow>(
-    `SELECT display_name FROM bb_research.landscape_candidates WHERE lane = $1`,
+    `SELECT display_name FROM research.landscape_candidates WHERE lane = $1`,
     [LANE],
   );
   const existingEntitiesRes = await pool.query<ExistingRow>(
-    `SELECT display_name FROM bb_canonical.entities`,
+    `SELECT display_name FROM canonical.entities`,
   );
   const existingLandscapeNames = new Set(
     existingLandscapeRes.rows.map((row) => normalizeNameForDiff(row.display_name)),
@@ -271,7 +242,7 @@ async function main(): Promise<void> {
   );
   console.log(
     `Existing landscape_candidates (lane='${LANE}'): ${existingLandscapeRes.rows.length}. ` +
-      `bb_canonical.entities total: ${existingEntitiesRes.rows.length}.`,
+      `canonical.entities total: ${existingEntitiesRes.rows.length}.`,
   );
 
   let dedupedOutLandscapeLane = 0;
@@ -385,7 +356,7 @@ async function main(): Promise<void> {
     await client.query('BEGIN');
     const runId = `black-newspapers-${generatedAt.slice(0, 10)}`;
     await client.query(
-      `INSERT INTO bb_research.source_program_runs
+      `INSERT INTO research.source_program_runs
         (id, lane, source_program_id, source_program_name, canonical_url, retrieved_at,
          rows_fetched, candidate_count, dropped_count, summary, updated_at)
        VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,now())
@@ -411,7 +382,7 @@ async function main(): Promise<void> {
     for (const row of netNewRows) {
       const id = `${LANE}-${row.lccn}`;
       await client.query(
-        `INSERT INTO bb_research.landscape_candidates
+        `INSERT INTO research.landscape_candidates
           (id, run_id, lane, source_program_id, source_item_id, display_name, kind, summary,
            lat, lng, canonical_url, research_lane_only, status, provenance, payload, discovered_at, updated_at)
          VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,true,'pending',$12,$13,$14,now())

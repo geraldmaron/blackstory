@@ -20,7 +20,7 @@ export const DESIGN_TOKEN_PREFIX = 'ds' as const;
 export const APP_ENV_PREFIX = 'APP' as const;
 
 /**
- * Production GCP / Firebase project id. Immutable (GCP constraint).
+ * Optional GCP deployment project id. Immutable (GCP constraint).
  * Display names and labels may say BlackStory; this id does not change.
  */
 export const GCP_PROJECT_ID_PROD = 'black-book-efaaf' as const;

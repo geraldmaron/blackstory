@@ -1,23 +1,7 @@
 /**
- * Finds `first_to_do_x` / `only_or_oldest` notability-basis rows whose ONLY supporting evidence
- * is Wikipedia — the exact defect repo-z97f exists to catch (repo-wqtq: William F. Penn's record
- * asserted "First African American to graduate from Yale Medical School (1897)" on Wikipedia's
- * authority alone, and Yale says the actual first was Cortlandt Van Rensselaer Creed, MD 1857).
- *
- * docs/research/citation-standard.md is unambiguous: Wikipedia may carry a claim but never
- * corroborates one and is never sufficient for a superlative. This module answers, for the
- * published catalog, which `first_to_do_x`/`only_or_oldest` basis records violate that — so each
- * can be corroborated institutionally, softened, or withdrawn, per the standard.
- *
- * NOT the general research-quality audit (packages/operator-cli/src/research-quality-audit.ts).
- * That tool flags every `superlative`-class claim regardless of criterion or citation, and does
- * not know whether the superlative reached the published summary. This is narrower and
- * criterion-scoped, matching exactly what the bead asks for: the two criteria whose text is a
- * public "why this is here" ranking claim, and whether it is corroborated, and whether the
- * uncorroborated version is what a reader actually sees.
- *
- * Pure and read-only: takes rows already fetched from `bb_public.release_entities`, returns
- * findings. The DB read lives in the sibling CLI script so this stays testable without Postgres.
+ * Pure audit of published first/oldest inclusion claims backed only by Wikipedia. Returns
+ * findings for independent corroboration or correction; it neither performs research nor
+ * changes publication state.
  */
 import { makesSuperlativeClaim } from '@repo/domain-core';
 

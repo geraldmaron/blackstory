@@ -17,7 +17,7 @@
  * second subscription to the same media query: two independent subscriptions to one query is
  * exactly the duplicate-variant pattern the repo rules forbid.
  *
- * `subscribe` (repo-92n2.18) exists for exactly that wrapper: `useSyncExternalStore` needs to be
+ * `subscribe` exists for exactly that wrapper: `useSyncExternalStore` needs to be
  * told when the snapshot may have changed, and this listener's own `change` handler is the one
  * place that already knows. Adding a notify-on-change hook here, rather than a second
  * `matchMedia(...).addEventListener('change', ...)` in `use-reduced-motion.ts`, keeps this the

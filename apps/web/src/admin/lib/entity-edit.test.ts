@@ -121,7 +121,7 @@ test('adding an identifier already owned by another entity is refused, not moved
   // UNIQUE(namespace, value) is global, so the upsert is scoped to this entity and must match a
   // row; zero rows means another entity owns it.
   assert.match(statements[0]!.sql, /ON CONFLICT \(namespace, value\)/);
-  assert.match(statements[0]!.sql, /WHERE bb_canonical\.entity_identifiers\.entity_id = \$1/);
+  assert.match(statements[0]!.sql, /WHERE canonical\.entity_identifiers\.entity_id = \$1/);
   assert.match(String(statements[0]!.requireRowsElse), /already belongs to a different entity/);
 });
 
@@ -134,7 +134,7 @@ test('removing an identifier is scoped to the entity, not the id alone', () => {
 
   assert.match(
     statements[0]!.sql,
-    /DELETE FROM bb_canonical\.entity_identifiers WHERE id = \$2 AND entity_id = \$1/,
+    /DELETE FROM canonical\.entity_identifiers WHERE id = \$2 AND entity_id = \$1/,
   );
   assert.deepEqual(statements[0]!.params, ['ent-1', 'ident-9']);
 });

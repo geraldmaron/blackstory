@@ -5,7 +5,7 @@
 
 ## Problem
 
-`bb_reference.jurisdictions` is empty (0 rows). Entity locations can carry a declared state code that does not match their WGS84 coordinates. Without a structural containment check, wrong-state tags can reach public release.
+`reference.jurisdictions` is empty (0 rows). Entity locations can carry a declared state code that does not match their WGS84 coordinates. Without a structural containment check, wrong-state tags can reach public release.
 
 ## Target behavior
 
@@ -45,7 +45,7 @@ node scripts/load-state-jurisdictions.mjs --emit-sql > jurisdictions-state-load.
 node scripts/load-state-jurisdictions.mjs --emit-sql --output jurisdictions-state-load.sql
 ```
 
-The default fixture matches the conceptual shape of `bb_reference.jurisdictions` rows:
+The default fixture matches the conceptual shape of `reference.jurisdictions` rows:
 
 - `id`: `us-{stateFips}` (`../decisions-carryover.md`, "Jurisdiction reference data")
 - `kind`: `state`
@@ -75,7 +75,7 @@ Without `LOAD_JURISDICTIONS_APPLY=1`, `--apply` exits with code 2.
 ## Wiring (follow-up)
 
 1. Parent merges barrel: `export * from './geo-integrity/index.js'` in `packages/domain/src/index.ts`.
-2. Release/projection pipeline calls `assertGeoIntegrityPublishGate` with entity rows + boundary index loaded from `bb_reference.jurisdictions` (or PostGIS `ST_Contains` equivalent in SQL).
+2. Release/projection pipeline calls `assertGeoIntegrityPublishGate` with entity rows + boundary index loaded from `reference.jurisdictions` (or PostGIS `ST_Contains` equivalent in SQL).
 3. One-off mismatch inventory: run `auditEntityStateContainment` over existing release entities; human correction only.
 
 ## Tests

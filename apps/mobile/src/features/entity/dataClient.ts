@@ -12,7 +12,7 @@
  * bead on that wiring, `fetchEntityDetail` below treats EVERY successful `/v1/entity/:id`
  * response as authoritative for the global release stamp (via `releaseCache.applyReleaseStamp`,
  * the exact same primitive `bootstrap-sync.ts` uses). That is valid because exactly one release
- * is active at a time: `bb_public.active_release` is a single row, `CHECK (id = 'active')`, in
+ * is active at a time: `published.active_release` is a single row, `CHECK (id = 'active')`, in
  * `supabase/migrations/20260720220008_publication_public.sql`, so any endpoint's
  * `revision.releaseId` names the same release `/v1/bootstrap` would (see
  * `docs/decisions-carryover.md`, "Public projection and immutable publication snapshots"). A
@@ -22,7 +22,7 @@
  *
  * `EntityDataDeps` is fully dependency-injected (mirroring every other module in `data/`) so
  * `useEntityDetail.test.ts` can exercise offline/cache/error paths with fakes — no SQLite, no
- * network, no Firebase in the unit test run. `createRuntimeEntityDataDeps` is the ONE function
+ * network, no external services in the unit test run. `createRuntimeEntityDataDeps` is the ONE function
  * that binds the real native singletons, analogous to `data/index.ts`'s `createRuntimeCache`.
  */
 import { TransportError, type CacheStore, type Connectivity, type ReleaseCache } from '@/data';
@@ -152,8 +152,8 @@ export async function fetchEntityDetail(
 let runtimeDepsPromise: Promise<EntityDataDeps> | null = null;
 
 /**
- * Binds entity fetch deps to the shared app runtime (repo-8b5h). Memoized so
- * screens do not re-resolve the composition root on every mount.
+ * Binds entity fetch dependencies to the shared app runtime. Memoization avoids rebuilding the
+ * composition root on every mount.
  */
 export function createRuntimeEntityDataDeps(): Promise<EntityDataDeps> {
   if (!runtimeDepsPromise) {

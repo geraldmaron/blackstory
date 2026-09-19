@@ -28,20 +28,27 @@ test('logModelInvocation inserts a row with lane, tier, tokens, and cost', async
     provider: 'openrouter',
     modelId: 'deepseek/deepseek-v3.2',
     usage: { promptTokens: 120, completionTokens: 45 },
+    accounting: {
+      promptTokens: 120,
+      completionTokens: 45,
+      costUsd: 0.00123,
+      source: 'provider-response',
+      incomplete: false,
+    },
     lane: 'editorial-enrichment',
     tier: 'free-batch',
-    costUsdEstimate: 0.00123,
+    costUsd: 0.00123,
   };
   const id = await logModelInvocation(pool, completion, {
     activityId: 'activity-1',
-    promptHash: 'hash-1',
+    promptHash: 'a'.repeat(64),
     outputSchemaId: 'editorial.decision.v1',
     outputSchemaVersion: '1.0.0',
     benchmarkVersion: '1.0.0',
     status: 'valid',
   });
   assert.equal(queries.length, 1);
-  assert.match(queries[0]!.text, /INSERT INTO bb_research\.model_invocations/);
+  assert.match(queries[0]!.text, /INSERT INTO research\.model_invocations/);
   assert.equal(queries[0]!.values[0], id);
   assert.equal(queries[0]!.values[1], 'activity-1');
   assert.equal(queries[0]!.values[14], 'editorial-enrichment');
@@ -62,7 +69,10 @@ test('loadLaneModelSpend maps numeric aggregate columns', async () => {
             invocation_count: '3',
             prompt_tokens: '900',
             completion_tokens: '450',
-            cost_usd_estimate: '1.234500',
+            cost_usd: '1.234500',
+            unpriced_invocation_count: '1',
+            missing_usage_count: '1',
+            incomplete_accounting_count: '1',
           },
         ],
       };
@@ -76,7 +86,10 @@ test('loadLaneModelSpend maps numeric aggregate columns', async () => {
       invocationCount: 3,
       promptTokens: 900,
       completionTokens: 450,
-      costUsdEstimate: 1.2345,
+      costUsd: 1.2345,
+      unpricedInvocationCount: 1,
+      missingUsageCount: 1,
+      incompleteAccountingCount: 1,
     },
   ]);
 });
@@ -93,9 +106,52 @@ test('formatLaneSpendReport renders a total line and handles the empty case', ()
       invocationCount: 2,
       promptTokens: 100,
       completionTokens: 50,
-      costUsdEstimate: 0.5,
+      costUsd: 0.5,
+      unpricedInvocationCount: 1,
+      missingUsageCount: 1,
+      incompleteAccountingCount: 1,
     },
   ]);
   assert.match(report, /story-craft/);
-  assert.match(report, /TOTAL cost_usd_estimate: 0\.5000/);
+  assert.match(report, /KNOWN cost_usd: 0\.5000/);
+});
+
+test('unknown provider usage stays NULL and an all-unknown report cannot report zero spend', async () => {
+  const queries: { text: string; values: unknown[] }[] = [];
+  await logModelInvocation(
+    fakePool(queries),
+    {
+      content: '{}',
+      provider: 'other',
+      modelId: 'unlisted-model',
+      lane: 'story-craft',
+      tier: 'quality-prose',
+      costUsd: null,
+    },
+    {
+      activityId: 'activity-1',
+      promptHash: 'b'.repeat(64),
+      outputSchemaId: 'ResearchTaskReport',
+      outputSchemaVersion: '1.0.0',
+      benchmarkVersion: 'unassessed',
+      status: 'valid',
+    },
+  );
+  assert.deepEqual(queries[0]!.values.slice(16), [null, null, null, null, true]);
+  assert.match(
+    formatLaneSpendReport([
+      {
+        lane: null,
+        modelId: 'unlisted-model',
+        invocationCount: 1,
+        promptTokens: null,
+        completionTokens: null,
+        costUsd: null,
+        unpricedInvocationCount: 1,
+        missingUsageCount: 1,
+        incompleteAccountingCount: 1,
+      },
+    ]),
+    /KNOWN cost_usd: unknown; incomplete accounting calls: 1/,
+  );
 });

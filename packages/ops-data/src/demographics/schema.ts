@@ -1,5 +1,5 @@
 /**
- * Firestore document schema for the `censusCountyDecades` collection — one doc per county per
+ * Validated record shape for county census decades — one doc per county per
  * decennial vintage: total + Black ("Black or African American alone") population counts.
  *
  * Policy reading (public-numeric-policy.ts, permitted category 3, referenced there by this
@@ -7,10 +7,10 @@
  * permitted public numerics ONLY because this schema makes the provenance quartet
  * (`source`, `sourceUrl`, `retrievedAt`, `contentHash`) required — a count without provenance
  * is an assertion, not a statistic. Writers additionally call
- * `assertPublishedStatisticProvenance` before persisting (see ./load-cli.ts).
+ * `assertPublishedStatisticProvenance` before persisting (see ./loader.ts).
  *
  * `contentHash` is computed over the stable statistic fields only (see
- * `censusCountyDecadeContentFields` in ./load-cli.ts) — `retrievedAt` is deliberately
+ * `censusCountyDecadeContentFields` in ./loader.ts) — `retrievedAt` is deliberately
  * excluded so re-fetching unchanged data hashes identically and re-runs are no-ops.
  *
  * Lives in its own `demographics/` directory for the same reason `jurisdictions/` does:
@@ -21,7 +21,7 @@ import { FREE_ENSLAVED_SPLIT_DECADES, HISTORICAL_NATIONAL_DECADES } from '@repo/
 import {
   datasetArtifactProvenanceFields,
   publishedStatisticProvenanceFields,
-} from '../firestore/statistic-provenance.js';
+} from '../records/statistic-provenance.js';
 
 /** Decade labels this collection carries — matches `CENSUS_DECENNIAL_VINTAGES` in @repo/domain. */
 export const censusCountyDecadeDecadeSchema = z.enum(['2000', '2010', '2020']);
@@ -209,7 +209,7 @@ export function parseCensusStateDecadeDoc(data: unknown): CensusStateDecadeDoc {
  * keyed by NHGIS `gisJoin` on that decade's HISTORICAL boundaries (`boundaryVersion` =
  * `nhgis-<decade>`) — NOT a modern 5-digit FIPS, so cross-vintage or modern joins require an
  * NHGIS crosswalk (deferred). `blackFree`/`blackEnslaved` are present only for the 1790–1860
- * free/slave decades and reconstitute `black`. Client read stays CLOSED (see firestore.rules):
+ * free/slave decades and reconstitute `black`. Client access remains private:
  * ~45k docs; the public map reads a bounded static artifact, never this collection.
  */
 export const censusCountyHistoricalDecadeSchema = z
@@ -339,7 +339,7 @@ export type AcsCountyProfileDoc = z.infer<typeof acsCountyProfileSchema>;
  *
  * ACCESS DISCIPLINE: ~85k docs per vintage — clients must NEVER full-scan this collection.
  * Reads are county-bounded (`where('fips5','==',...)`) or served by server-side aggregates;
- * firestore.rules keeps client read closed until such a surface exists.
+ * A rights-reviewed projection is required before public access.
  */
 export const acsTractProfileSchema = z.object({
   id: z.string().regex(/^\d{11}_\d{4}$/),

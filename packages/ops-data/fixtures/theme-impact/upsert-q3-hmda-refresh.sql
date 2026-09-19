@@ -3,7 +3,7 @@
 -- Run after ingest-phase1-hmda-aggregates has loaded statistical_observations.
 -- Juxtaposition only — gap_states retains insufficient_evidence for NHGIS/wealth/era deltas.
 
-UPDATE bb_reference.theme_impact_packets
+UPDATE reference.theme_impact_packets
 SET
   method_note = 'Indicators and HOLC-era history are shown together for context. HMDA county denial rates (2022–2023) are loaded from warehouse aggregates; decennial era deltas, national wealth series, and rights-gated map metrics remain gap-labeled. Juxtaposition is not causation.',
   observations = observations || '[

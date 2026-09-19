@@ -1,30 +1,16 @@
 /**
- * Scheduled-job registry contracts that other packages' recurring jobs plug into.
- * docs/decisions-carryover.md ("scheduled-job worker packages") already picked the mechanism (Cloud Scheduler -> Cloud Tasks -> Cloud Run
- * Jobs/workers); this module only declares the versioned, fail-closed config contract that
- * mechanism is driven by. No live GCP mutation happens anywhere in this package — see
- * infra/gcp/scheduler/ for the declarative (not-applied) Cloud Scheduler mirror.
- *
- * Binding operating principle: automation PROPOSES, humans/reviewers DISPOSE. Every job here
- * either writes nothing public at all, or is one of the two pre-approved mechanical + reversible
- * exceptions declared below.
+ * Schedulable job contracts: budgets, timeouts, ownership and allowed effects.
+ * Registering a job installs no schedule. Research jobs produce private proposals.
  */
 import type { KillSwitchId } from '../kill-switches.js';
 
 export const SCHEDULED_JOB_REGISTRY_VERSION = '1.0.0' as const;
 
-/** See docs/decisions-carryover.md, "scheduled-job worker packages": worker code lives only in these three packages, never a new worker microservice (workers/research-node is a disclosed, unwired exception — see that entry). */
+/** Logical worker ownership, independent of the process or hosting provider. */
 export const TARGET_WORKER_PACKAGES = ['research', 'publication', 'security'] as const;
 export type TargetWorkerPackage = (typeof TARGET_WORKER_PACKAGES)[number];
 
-/**
- * Environment every scheduled job runs in. `repo-internal` is the functional project id
- * the ADR-012 design gave the still-unprovisioned research/admin project (see
- * docs/decisions-carryover.md, "Small recovered decisions": production environment
- * re-split). No such project is live yet; every resource today still runs inside the
- * single production project `black-book-efaaf`, and this name is not a numeric GCP
- * project id because none has been provisioned to have one.
- */
+/** Logical execution environment; not a provisioned cloud project identifier. */
 export const SCHEDULED_JOB_ENVIRONMENTS = ['repo-internal'] as const;
 export type ScheduledJobEnvironment = (typeof SCHEDULED_JOB_ENVIRONMENTS)[number];
 
@@ -55,10 +41,8 @@ export const JOB_ROSTER_STATUSES = ['real', 'stub'] as const;
 export type JobRosterStatus = (typeof JOB_ROSTER_STATUSES)[number];
 
 export type JobCadence = {
-  /** Five-field cron expression (minute hour day-of-month month day-of-week), UTC, OR the
-   * literal sentinel 'event-driven' for jobs primarily triggered by a Pub/Sub event (mirrors
-   * infra/firebase/backup/export-schedule.md's firestore-export-on-release convention) such
-   * jobs still declare nominalIntervalMs as the safety-net poll missed-run window. */
+  /** Five-field UTC cron expression or 'event-driven'. A definition does not install a schedule.
+   * Event-driven jobs use nominalIntervalMs only for optional missed-run observation. */
   readonly cronExpression: string;
   /** Nominal interval in ms between expected runs. Cron intervals for monthly/annual cadences
    * are not evenly spaced; this is the deliberate operating approximation used for missed-run

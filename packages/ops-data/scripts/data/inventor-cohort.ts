@@ -1,38 +1,8 @@
 /**
- * Inventors named on the invention cohort who had no person record in this catalog.
- *
- * The first invention cohort named twenty contributions and linked none of them to a person,
- * because four of the people it centers were not in `bb_canonical.entities` at all: an invention
- * page could not reach its inventor, and the inventor had no page to reach. The second cohort
- * named eight more. Marjorie Stewart Joyner is the one adopted seed record: she already had a
- * person row from the seed release with no path to new evidence, so this cohort carries her with
- * her live browse facets (`topicIds`, `keywords`, `mentionedEntityIds`) named on the record.
- * Every other name on those receipts either already has a record or is deliberately not modeled
- * (see `InventionContributor` in `./invention-cohort.ts`).
- *
- * Scope discipline matches the invention cohort. Each summary says what the person is documented
- * to have done, and stops. Where a claim is commonly repeated but rests on the limits of the
- * surviving record — "first" claims especially — it is written as the record actually supports
- * it, not as the slogan.
- *
- * `personReviewApproved` in `../lib/incremental-publish.ts` blocks every person row from
- * incremental publish until `payload.personReview` records approved/approvedBy/approvedAt/basis.
- * Thirteen of the fourteen are long-deceased historical figures, and each basis names the death
- * date and where it is published, or, where no death date survives (Reed, Newman), the birth-era
- * evidence that rules out a living person. The staging script writes that marker rather than
- * leaving rows stranded pending on a fact nobody disputes. Lonnie G. Johnson is living: his row
- * records `livingStatus: 'living'`, a basis naming his public professional standing, and carries
- * no residence, birth date or family detail, with the anchor capped at city precision per
- * `docs/security/location-precision-standard.md`.
- *
- * Henry E. Baker (repo-93p35.20) closes the twenty-name roster bead, and he is not an inventor:
- * no patent under his own name is documented. He is the Patent Office examiner who compiled the
- * evidence that several *other* records in `./invention-cohort.ts` (Benjamin, Reed, Lee, Murray)
- * already cite by name, so his own row is a person record with no `invented` edge of its own —
- * `namedOn` here lists the invention records that name him, for a reviewer's benefit, not a claim
- * that he invented any of them. His own 1913 pamphlet is the record's central citation for the
- * one fact this catalog most needs to get right about him: his list of Black patentees was never
- * a census, and he said so himself, in print, in 1913.
+ * Evidence-cited person fixtures for invention contributors. Summaries stay within the
+ * documented contribution and qualify disputed firsts. Publication requires explicit person
+ * review with living-status evidence. Henry E. Baker is included as a documenting researcher,
+ * not as an inventor.
  */
 export type InventorCohortRecord = {
   readonly id: string;
@@ -70,7 +40,7 @@ export type InventorCohortRecord = {
    * Browse-facet topic ids for this record. Defaults to `['invention']` when absent.
    *
    * When this cohort adopts a seed person record that already has claims live on
-   * `bb_public.release_entities` (same entity id, republished rather than created), list that
+   * `published.release_entities` (same entity id, republished rather than created), list that
    * live record's topic ids here — otherwise the republish overwrites them with the bare
    * `['invention']` default and the record's other browse facets (e.g. business, women,
    * community) silently drop off.

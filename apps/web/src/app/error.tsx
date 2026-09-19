@@ -8,8 +8,7 @@ import { useEffect } from 'react';
 import Link from 'next/link';
 import { Notice } from '@repo/ui';
 import { sanitizeClientErrorDisplay } from '../lib/runtime-hardening/error-surface';
-import { Room } from '../components/room/Room';
-import { RoomHeader } from '../components/room/RoomHeader';
+import { Room, ReadingEntry } from '../components/room';
 import './utility.css';
 
 export default function Error({
@@ -27,9 +26,8 @@ export default function Error({
 
   return (
     <Room>
-      <RoomHeader
+      <ReadingEntry
         pathname="/error"
-        kicker="Error"
         title="Something went wrong"
         lede="The public shell hit an unexpected error. You can retry or return home."
       />

@@ -1,31 +1,8 @@
 /**
- * Log scrubbing (MOB-010; privacy invariant 7, threat-model T1/privacy; see
- * `docs/decisions-carryover.md`, "Mobile stack": no Firebase or analytics SDK).
- *
- * The mobile app must NEVER emit — to console, crash reports, or any log
- * sink — any of these sensitive categories:
- *
- *   - search query text                (what a user is looking for)
- *   - correction content               (free-text a user submitted)
- *   - precise location                 (device lat/lng, fine coordinates)
- *   - citation / source URLs           (which specific evidence was viewed)
- *   - sensitive entity classifications (e.g. protected-status / era labels)
- *   - raw attestation credentials      (JWT-shaped values — never log; see
- *     docs/decisions-carryover.md, "Security and abuse assumptions", for why
- *     this predates the retired App Check mechanism)
- *
- * `redactForLog` takes an arbitrary log payload (string or object/error) and
- * returns a structurally-similar value with every sensitive field/value
- * replaced by a stable placeholder. It is deliberately conservative: it
- * redacts by KEY NAME (any key whose name matches a sensitive category) and by
- * VALUE PATTERN (coordinates, JWTs, and known URL shapes) so a sensitive value
- * placed under an unexpected key is still caught. Redaction is
- * whole-value — we never emit a partial/truncated sensitive value that could
- * be reassembled.
- *
- * This utility does not by itself guarantee redaction everywhere; it is the
- * primitive every log/crash-report call site must route through. MOB-018
- * wires the observability sinks to use it.
+ * Scrub logs by sensitive field names and value patterns. Remove query text, correction
+ * content, precise location, citation URLs, sensitive classifications and credentials as whole
+ * values. Every log/crash sink must call this primitive; having the helper alone does not
+ * guarantee coverage.
  */
 
 export const REDACTED = '[redacted]';
@@ -47,7 +24,7 @@ const SENSITIVE_KEY_PATTERNS: readonly RegExp[] = [
  * innocuous or unknown key (defense in depth against mis-keyed leaks).
  */
 const SENSITIVE_VALUE_PATTERNS: readonly RegExp[] = [
-  // JWT-shaped token (three base64url segments) — App Check tokens.
+  // JWT-shaped credential: three base64url segments.
   /\b[A-Za-z0-9_-]{10,}\.[A-Za-z0-9_-]{10,}\.[A-Za-z0-9_-]{10,}\b/,
   // Decimal lat,lng pair, e.g. "40.7128,-74.0060".
   /-?\d{1,3}\.\d{3,},\s*-?\d{1,3}\.\d{3,}/,

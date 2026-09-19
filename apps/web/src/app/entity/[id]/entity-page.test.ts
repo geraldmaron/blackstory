@@ -35,7 +35,7 @@ test('standable records 308 to /place; non-standable records still render here',
 });
 
 test('a merged-away id forwards to its survivor instead of 404ing', () => {
-  // repo-n7p6.29: unpublishing an absorbed record was right; killing its URL was not. The route
+  // Unpublishing an absorbed record is correct, but its URL must redirect to the survivor. The route
   // must consult the published absorbed->survivor map before it renders a miss.
   assert.match(pageSource, /resolvePublicEntityRedirect/);
   // The redirect lookup belongs on the miss path only — a hit must not pay for it.
@@ -153,4 +153,12 @@ test('entity user-facing copy avoids em dashes on touched surfaces', () => {
   for (const source of [pageSource, sectionsSource]) {
     assert.doesNotMatch(source, /—/);
   }
+});
+
+test('entity record room links evidence chrome to Methodology anchors', () => {
+  assert.match(roomSource, /methodology#evidence-grades/);
+  assert.match(roomSource, /methodology#how-it-holds-together/);
+  assert.match(roomSource, /METHODOLOGY_SOURCE_LIBRARY_HREF/);
+  assert.match(roomSource, /METHODOLOGY_HOW_RECORD_GETS_IN_HREF/);
+  assert.match(sectionsSource, /METHODOLOGY_EVIDENCE_GRADES_HREF/);
 });

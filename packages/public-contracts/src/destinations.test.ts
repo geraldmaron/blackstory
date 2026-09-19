@@ -63,7 +63,7 @@ test('the parent chain terminates at the door with no cycles', () => {
 test('primary navigation is the four product axes, in order', () => {
   assert.deepEqual(
     primaryAxes().map((destination) => destination.label),
-    ['Explore', 'Stories', 'Records', 'Rooms'],
+    ['Map', 'Stories', 'Records', 'Rooms'],
   );
   assert.deepEqual(
     primaryAxes().map((destination) => destination.path),
@@ -136,6 +136,7 @@ test('product policy is never routed into historical Law', () => {
   const law = semanticDestinationByPath('/law');
   assert.ok(law);
   assert.equal(law.family, 'read');
+  assert.equal(law.browsable, true);
   // `/legal` meant historical legal reference. If a policy address were ever added to the alias
   // table pointing at Law, this fails.
   for (const alias of LEGACY_ALIASES) {
@@ -187,15 +188,21 @@ test('an axis destination carries an axis, and a non-axis destination does not',
 test('the Rooms families each hold the destinations Rooms groups them under', () => {
   assert.deepEqual(
     semanticDestinationsInFamily('read').map((destination) => destination.label),
-    ['Law', 'Data', 'Banned books', 'Memorial'],
+    ['Law', 'Data', 'Lives', 'Banned books', 'Memorial'],
   );
   assert.deepEqual(
     semanticDestinationsInFamily('trust').map((destination) => destination.label),
-    ['About', 'Questions', 'Methodology', 'Errata'],
+    ['About', 'Questions', 'Methodology', 'Source library', 'Errata'],
   );
   assert.deepEqual(
     semanticDestinationsInFamily('participate').map((destination) => destination.label),
     ['Submit', 'Corrections', 'Support'],
+  );
+  assert.deepEqual(
+    semanticDestinationsInFamily('utility')
+      .filter((destination) => destination.id.endsWith('-browse'))
+      .map((destination) => destination.path),
+    [],
   );
 });
 
@@ -222,6 +229,16 @@ test('Rooms does not list the primary axes as ordinary rooms', () => {
   );
   for (const axis of primaryAxes()) {
     assert.ok(!roomPaths.includes(axis.path), `${axis.path} is an axis, not a room card`);
+  }
+});
+
+test('utility destinations are never browsable', () => {
+  for (const destination of semanticDestinationsInFamily('utility')) {
+    assert.equal(
+      destination.browsable,
+      false,
+      `${destination.id} is utility and must not appear in Rooms`,
+    );
   }
 });
 

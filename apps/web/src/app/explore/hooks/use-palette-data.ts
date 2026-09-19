@@ -14,12 +14,12 @@ export function usePaletteData(
   stateOptions: readonly { value: string; label: string }[],
 ) {
   /**
-   * Name and place only, until repo-92n2.35 widened this to topic, kind, era and summary. The
+   * The palette index includes name, place, topic, kind, era, and summary. The
    * build moved to `build-palette-records.ts` so what the index carries has a test over real
    * release features — a subject missing from the index is a subject the palette cannot find,
    * and that is not a fact a component test can establish.
    *
-   * `view.unmappedPaletteRecords` is the other half of that same corpus (repo-jnmwu): entities
+   * `view.unmappedPaletteRecords` is the other half of that same corpus: entities
    * `exploreMapSourceFor` never turned into a map feature at all — mostly laws, cases, and
    * national organizations with no resolvable `geoAnchor` — precomputed server-side by
    * `buildUnmappedPaletteRecords` because it needs the full, unfiltered entity list this hook
@@ -41,6 +41,7 @@ export function usePaletteData(
       browsableDestinations().map((destination) => ({
         href: destination.path,
         label: destination.label,
+        icon: destination.icon,
       })),
     [],
   );

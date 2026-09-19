@@ -10,6 +10,8 @@ import React from 'react';
 import type { ReactNode } from 'react';
 import Link from 'next/link';
 import { cx } from '@repo/ui';
+import type { DestinationIconId } from '@repo/public-contracts/destinations';
+import { DestinationIcon } from '../patterns/DestinationIcon';
 
 void React;
 
@@ -77,6 +79,7 @@ export type RoomCardProps = {
   readonly tag?: string;
   /** Hero image, above the title. */
   readonly media?: RoomCardMedia;
+  readonly icon?: DestinationIconId;
   readonly className?: string;
 };
 
@@ -88,6 +91,7 @@ export function RoomCard({
   meta,
   tag,
   media,
+  icon,
   className,
 }: RoomCardProps) {
   void kind;
@@ -104,7 +108,10 @@ export function RoomCard({
           <img src={media.url} alt={media.alt} loading="lazy" />
         </span>
       ) : null}
-      <h3 className="ds-room-card__title">{title}</h3>
+      <h3 className="ds-room-card__title">
+        {icon ? <DestinationIcon id={icon} /> : null}
+        {title}
+      </h3>
       {description ? <p className="ds-room-card__desc">{description}</p> : null}
       {tag ? <span className="ds-room-card__tag">{tag}</span> : null}
       {meta ? <span className="ds-room-card__meta">{meta}</span> : null}

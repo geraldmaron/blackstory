@@ -49,7 +49,7 @@ maximally thin"; the functions report no relative gap signal.
    [`blackstory-discovery-run`](../discovery-run/SKILL.md). Confirming a pin is
    [`blackstory-entity-verify`](../entity-verify/SKILL.md).
 
-Staff-only coverage view: `bb_ops.coverage_gap_by_county_decade`. Brief helper:
+Staff-only coverage view: `ops.coverage_gap_by_county_decade`. Brief helper:
 `runGeographicGapCountyBrief` in `packages/operator-cli/src/lib/geographic-gap-brief.ts`.
 
 ## Do / Never
@@ -58,7 +58,7 @@ Staff-only coverage view: `bb_ops.coverage_gap_by_county_decade`. Brief helper:
 precision rules downstream, fetch through DNS-pinned safe-fetch.
 
 **Never:** tell a reader a place "has no Black history"; launch unbounded discovery to chase
-a ratio; write `bb_public` from this skill; treat a thin decade as historical
+a ratio; write `published` from this skill; treat a thin decade as historical
 underrepresentation.
 
 ## Related

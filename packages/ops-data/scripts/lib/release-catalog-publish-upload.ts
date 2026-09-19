@@ -1,13 +1,10 @@
 /**
  * Upload + retry + partial-publish bookkeeping for publish-release-catalog-artifacts.ts.
  *
- * Extracted for the same reason release-catalog-publish-decision.ts's watermark logic is
- * extracted: the actual bug happened in production (2026-09-12, repo-kywgj). Two of three
- * consecutive runs died with a bare `fetch failed` mid-upload. On the first failure,
- * entities.json had already uploaded and search-index.json had not, leaving the published
- * pair mismatched — and the error gave no status, URL, or artifact name, so it was unclear
- * which upload had died. Testing the fix (retry, per-artifact hash bookkeeping, and a real
- * error message) needs a stubbed uploader, not a live database or Storage bucket.
+ * A partial upload can replace entities.json while leaving search-index.json stale. Per-artifact
+ * hashes distinguish completed uploads from pending ones, retries bound transient failures, and
+ * errors identify the failing artifact. The uploader is injectable so failure sequences can be
+ * tested without a live database or Storage bucket.
  */
 
 import { shouldUploadArtifact } from './release-catalog-publish-decision.ts';
@@ -77,6 +74,24 @@ export class ArtifactUploadError extends Error {
   }
 }
 
+/**
+ * `fetch failed` alone names nothing: undici puts the real reason (a reset socket, a timeout, a
+ * TLS failure) on `error.cause`. Surfacing its code is what separates a stale keep-alive socket
+ * from a rejected body without re-running the whole publish under a debugger.
+ */
+export function describeFetchFailure(error: unknown): string {
+  const message = error instanceof Error ? error.message : String(error);
+  const cause =
+    error instanceof Error && typeof error.cause === 'object' && error.cause !== null
+      ? (error.cause as { readonly code?: unknown; readonly message?: unknown })
+      : undefined;
+  if (!cause) return message;
+  const code = typeof cause.code === 'string' ? cause.code : undefined;
+  const detail = typeof cause.message === 'string' ? cause.message : undefined;
+  if (!code && !detail) return message;
+  return `${message} (${[code, detail].filter(Boolean).join(': ')})`;
+}
+
 export type UploadArtifactConfig = {
   readonly supabaseUrl: string;
   readonly secretKey: string;
@@ -113,9 +128,8 @@ export async function uploadArtifactJson(
       body,
     });
   } catch (error) {
-    const cause = error instanceof Error ? error.message : String(error);
     throw new ArtifactUploadError(
-      `upload failed for ${objectPath} at ${url}: ${cause}`,
+      `upload failed for ${objectPath} at ${url}: ${describeFetchFailure(error)}`,
       { objectPath, url },
       { cause: error },
     );

@@ -37,13 +37,13 @@ function concretePath(route: string): string {
 }
 
 describe('surface class resolution', () => {
-  it('puts the front door on its own class and /explore on the Explore instrument', () => {
+  it('puts the front door and /explore browse on the door class', () => {
     assert.equal(surfaceClassFor('/'), 'door');
     assert.equal(surfaceClassFor('/', 'atlas=1'), 'door');
     assert.equal(surfaceClassFor('/?atlas=1'), 'door');
     assert.equal(surfaceClassFor('/?state=DC'), 'door');
-    assert.equal(surfaceClassFor('/explore'), 'instrument');
-    assert.equal(surfaceClassFor('/explore?state=DC'), 'instrument');
+    assert.equal(surfaceClassFor('/explore'), 'door');
+    assert.equal(surfaceClassFor('/explore?state=DC'), 'door');
   });
 
   it('does not classify /story, which was deprecated in favor of the Explore story mode', () => {
@@ -82,7 +82,7 @@ describe('surface class resolution', () => {
     assert.equal(surfaceClassFor('/?era=1960s&kind=school'), 'door');
     assert.equal(surfaceClassFor('/about#sources'), 'reading');
     assert.equal(surfaceClassFor('/?junk=1'), 'door');
-    assert.equal(surfaceClassFor('/explore?era=1960s'), 'instrument');
+    assert.equal(surfaceClassFor('/explore?era=1960s'), 'door');
   });
 
   it('falls back to utility so an unknown path still gets the 404 surface chrome', () => {

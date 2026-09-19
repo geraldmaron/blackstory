@@ -19,7 +19,7 @@ import {
   subscribeAdminAuth,
 } from './client-auth';
 import type { AdminSessionUser } from './session-user';
-import type { StaffRole } from './role-mutation';
+import type { StaffRole } from './staff-permissions';
 
 export type AdminAuthContextValue = {
   readonly ready: boolean;
@@ -39,7 +39,7 @@ export function AdminAuthProvider({ children }: { readonly children: ReactNode }
   const [user, setUser] = useState<AdminSessionUser | null>(null);
   const [role, setRole] = useState<StaffRole | null>(null);
 
-  // The role is only trustworthy from the server, which reads app_metadata.bb_role off a
+  // The role is only trustworthy from the server, which reads app_metadata.app_role off a
   // verified token. Never read it from the client session object, which the browser holds.
   useEffect(() => {
     let canceled = false;

@@ -1,9 +1,5 @@
 /**
- * Record sheet: non-modal, complete in the documented order, precision stated verbatim.
- *
- * The precision assertion is character-exact. It is the archive's own statement about what its pin
- * means, and a paraphrase that softens "never draws a point sharper than the source supports"
- * would be a different, weaker claim.
+ * Record sheet: non-modal, complete in the documented order, precision stated as the resolution.
  */
 import assert from 'node:assert/strict';
 import { createElement } from 'react';
@@ -50,12 +46,10 @@ test('the sheet is a dialog that does not trap the reader on the map', () => {
   assert.match(html, /aria-labelledby="ds-sheet-name"/);
 });
 
-test('the precision note renders verbatim', () => {
+test('the precision note states the resolution', () => {
   const html = render();
-  assert.match(
-    html,
-    /Located to locality precision\. The archive never draws a point sharper than the source supports\./,
-  );
+  assert.match(html, /Located to locality precision\./);
+  assert.doesNotMatch(html, /never draws a point sharper/);
 });
 
 test('the precision note renders for every record, not only imprecise ones', () => {

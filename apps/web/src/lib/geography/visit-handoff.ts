@@ -37,7 +37,7 @@ export type VisitHandoffInput = {
   >[];
   readonly placeAdvisories?: readonly PlaceAdvisoryRecord[];
   /**
-   * Release-shipped visit contract (repo-el9p WS3), already gated by `publicVisitForTier` at
+   * Release-shipped visit contract, already gated by `publicVisitForTier` at
    * publish time. When present, address/phone/website/hours/visitability derive from this
    * instead of claim-mining and label composition below.
    */

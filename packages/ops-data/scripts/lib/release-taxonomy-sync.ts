@@ -1,6 +1,6 @@
 /**
- * Shared logic for syncing `bb_public.release_entities.taxonomy` from the canonical source of
- * truth, `bb_canonical.entities.kind_detail->'classification'` (topicIds/topicTags).
+ * Shared logic for syncing `published.release_entities.taxonomy` from the canonical source of
+ * truth, `canonical.entities.kind_detail->'classification'` (topicIds/topicTags).
  *
  * Root cause this closes: the release-build path that created the currently active release wrote
  * `taxonomy` without reading `kind_detail.classification` at all, so 1,167 of 1,375 entities in
@@ -53,8 +53,8 @@ export async function planReleaseTaxonomySync(
       re.entity_id,
       re.taxonomy,
       e.kind_detail -> 'classification' AS classification
-    FROM bb_public.release_entities re
-    JOIN bb_canonical.entities e ON e.id = re.entity_id
+    FROM published.release_entities re
+    JOIN canonical.entities e ON e.id = re.entity_id
     WHERE re.release_id = $1
     ORDER BY re.entity_id
     `,
@@ -108,36 +108,9 @@ export async function planReleaseTaxonomySync(
 }
 
 /**
- * Applies a previously computed plan: merges `topicIds`/`topicTags` into each row's existing
- * `taxonomy` jsonb, preserving any other keys already there (e.g. `notabilityLabels`) — and into
- * the two derived stores that carry the same fact.
- *
- * repo-ttlce: this used to write the `taxonomy` column ALONE. Readers never see that column —
- * `fetchPublicEntityProjection` and its siblings serve `projection`, and topic browse reads
- * `search_index.topics` — so every sync that changed an entity's topics left both of them stale,
- * and the publisher calls this on every run that touches topics. Together with the `??`
- * fallthrough in `toSearchIndexRow` that is how 2,141 live rows reached a state where the
- * taxonomy column was right, the projection was right, and the search index had nothing
- * (repo-p1m1y, measured 2026-09-12).
- *
- * BLAST RADIUS. `planReleaseTaxonomySync` scans the WHOLE release, not this run's ids, so a
- * one-entity publish can now rewrite reader-visible topics on any row whose taxonomy column
- * disagrees with canonical. That was already true of the taxonomy column; widening it to the
- * projection and the search index is what makes it reader-visible. Every such write is internally
- * consistent across the three stores, so it cannot trip the publisher's divergence check, but a
- * run that reports more changed rows than it published is doing exactly this and is not a bug.
- *
- * One statement, not three, so a row cannot end up with its taxonomy updated and its projection
- * not. The two `UPDATE`s are a single data-modifying CTE: they see the same snapshot and commit
- * or fail together, and the second one is driven by what the first actually matched rather than
- * by re-stating the key.
- *
- * Still four parameters. A fifth would be the pre-computed topics column, and it is deliberately
- * derived in SQL instead: the `CASE` below is the same rule as `searchTopicsFromProjection` in
- * `lib/projection-divergence.ts` (non-empty tags, else ids). `array_length` returns NULL rather
- * than 0 for an empty array, hence the COALESCE — without it the `CASE` would fall to the ids
- * branch by accident rather than by rule, which is the same class of mistake as the `??` this
- * bead is fixing.
+ * Applies canonical taxonomy across the whole release, updating projection and search copies
+ * atomically. A one-entity publication can therefore reconcile other divergent rows too; report
+ * that scope explicitly.
  */
 export async function applyReleaseTaxonomySync(
   client: Pool | PoolClient,
@@ -151,13 +124,13 @@ export async function applyReleaseTaxonomySync(
         -- The projection only. The taxonomy column is GENERATED from it now, so writing both
         -- would be rejected by Postgres and was, before that, the whole mechanism of the drift:
         -- two writes of one fact that could disagree.
-        UPDATE bb_public.release_entities
+        UPDATE published.release_entities
         SET projection = COALESCE(projection, '{}'::jsonb)
           || jsonb_build_object('topicIds', $1::text[], 'topicTags', $2::text[])
         WHERE release_id = $3 AND entity_id = $4
         RETURNING release_id, entity_id
       )
-      UPDATE bb_public.search_index si
+      UPDATE published.search_index si
       SET topics = CASE
             WHEN COALESCE(array_length($2::text[], 1), 0) > 0 THEN $2::text[]
             ELSE $1::text[]

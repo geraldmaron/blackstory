@@ -22,7 +22,7 @@ Top to bottom, in one column:
 2. **Reading progress rule.** A 2px copper hairline pinned under the bar, filling as the column scrolls. Present on every Reading room; absent everywhere else.
 3. **Crumb.** Explore / parent chain / here. Every step is a live control, so up is always one click. The parent is where a reader would expect "up" to go, which is not always the index.
 4. **Surface header.** Mono kicker, Sora title, serif lede, then a mono meta line carrying the route path and any as-of stamp.
-5. **The column.** `min(720px, 100% - gutters)`. Source Serif 4 body at roughly a 66 character measure. Hairline section rules rather than a stack of identical cards. Exactly one `h1`.
+5. **The column.** `min(720px, 100% - gutters)`. Geist / Newsreader body at roughly a 66 character measure. Standalone rooms break the column into chapters (`RoomSection`: icon plate, heading, optional sunk band) with one sticky `RoomJump`. Catalog indexes still use hairline rows. Exactly one `h1`. See [`patterns-room-section.md`](./patterns-room-section.md).
 6. **Right rail**, on wide viewports only. Grouped links that stay inside the room. It never sends a reader who wanted a different chapter out to the map.
 7. **Records off ramp.** Mandatory. Every instance ends with a named handoff into the map or `/records`.
 8. **Site footer.**
@@ -72,6 +72,12 @@ Only chorded bindings are live on this class. `A` and `ESC` are the exceptions t
 ---
 
 ## 6. Content law
+
+### Documentary reading amendment, 18 September 2026
+
+Primary documents in Stories start open. Their date, quotation and source are part of the argument, not hidden receipts. Other contextual drawers remain reader-controlled. `ArchiveFigure` in the Room evidence kit is shared by article image blocks and Lives: preserve the complete frame, retain alt text, credit and caption, link to the source when supplied, and keep provenance readable if the image fails. Rights must be verified before authoring a new image. Existing article image contracts are unchanged; no rights claims are invented for legacy material.
+
+Catalog entries use the existing optional `DestinationIcon` for typed wayfinding. Metadata is readable 12px mono with wrapping, not clipped 10px decoration. Source-authored Stories images appear beside desktop rows and above phone rows; entries without images do not reserve a blank frame. The Memorial wall is excluded from these composition changes.
 
 - **Cards are real links in document order**, never divs with click handlers.
 - **Any index that can reach fifty rows adopts the Results rail windowing law.** `/history` currently renders 4,078 anchors in one document. Do not repeat that.

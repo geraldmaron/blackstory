@@ -1,7 +1,7 @@
 # Chapter fact validation
 
 **Status:** binding for every article published on the `/chapters` surface.
-Chapters are canonical in `bb_reference.articles` (Supabase), edited via
+Chapters are canonical in `reference.articles` (Supabase), edited via
 `articles.ts pull` into gitignored local drafts and applied back; they do not
 live as fixture files in git. This document defines how facts get
 into chapter prose and how they are validated before publish. It composes

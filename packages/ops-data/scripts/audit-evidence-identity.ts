@@ -1,29 +1,8 @@
 /**
- * repo-ppeu — re-adjudicate already-captured evidence against the tightened identity gate.
- *
- * The gate in subject-identity.ts stops NEW mismatches at capture. It does nothing about the rows
- * captured under the old place-only check, which is most of the corpus: as of 2026-08-10 that is
- * 634 wikipedia rows and 485 reference-hop rows, and the measured mismatch rate in a hand-read
- * sample of 24 subjects was 37.5%. Those rows are live inputs — the drafting harness reads
- * status='captured' and the publish bridge cites it — so leaving them is not neutral.
- *
- * Identity is a pure function of the stored text plus the roster row, so this needs no refetching:
- * it replays `checkSubjectIdentity` over `content_text` exactly as the collector would now.
- *
- * Two collectors are deliberately NOT audited:
- *   - nrhp-nomination: addressed by refnum, and already gated by checkNominationIdentity.
- *   - dc-hpo / person-wikipedia: identity anchored by the row's own canonicalUrl, not by search.
- *     Re-deriving identity from text would wrongly quarantine person rows, which carry no
- *     city/county/state to corroborate against at all.
- *
- * Default is dry-run. Writes require:
- *   DRY_RUN=0 AUDIT_EVIDENCE_IDENTITY_APPLY=1 DATABASE_URL=postgresql://...
- *
- * Usage (from repo root):
- *   set -a && source apps/web/.env.local && set +a
- *   export DATABASE_SSL=1
- *   node --conditions development --import tsx \
- *     packages/ops-data/scripts/audit-evidence-identity.ts [--lanes=nrhp-black-heritage] [--samples=12]
+ * Rechecks stored evidence text with checkSubjectIdentity without refetching. Excludes
+ * collectors anchored by nomination reference numbers or canonical URLs, which have separate
+ * identity checks. Default dry-run; writes require DRY_RUN=0 and
+ * AUDIT_EVIDENCE_IDENTITY_APPLY=1. Scope with --lanes and --samples.
  */
 import pg from 'pg';
 import { normalizePgConnectionString } from './lib/pg-connection.ts';
@@ -77,8 +56,8 @@ async function main(): Promise<void> {
   const rows = await pool.query<EvidenceAuditRow>(
     `SELECT e.id, e.entity_id, e.collector, e.source_url, e.title, e.content_text,
             c.display_name, c.payload
-       FROM bb_research.entity_evidence e
-       JOIN bb_research.landscape_candidates c ON c.id = e.entity_id
+       FROM research.entity_evidence e
+       JOIN research.landscape_candidates c ON c.id = e.entity_id
       WHERE e.status = 'captured' AND e.collector = ANY($1::text[])${laneClause}
       ORDER BY e.entity_id, e.id`,
     params,
@@ -169,8 +148,8 @@ async function main(): Promise<void> {
   // this audit is about to reject. Those records need re-drafting, not just a quarantined row.
   const publishedHits = await pool.query<{ id: string; display_name: string; source_url: string }>(
     `SELECT DISTINCT c.id, c.display_name, e.source_url
-       FROM bb_research.entity_evidence e
-       JOIN bb_research.landscape_candidates c ON c.id = e.entity_id
+       FROM research.entity_evidence e
+       JOIN research.landscape_candidates c ON c.id = e.entity_id
       WHERE e.id = ANY($1::text[])
         AND c.payload -> 'evidenceCitations' @> jsonb_build_array(
               jsonb_build_object('sourceUrl', e.source_url))
@@ -195,7 +174,7 @@ async function main(): Promise<void> {
     await client.query('BEGIN');
     for (const item of failures) {
       await client.query(
-        `UPDATE bb_research.entity_evidence
+        `UPDATE research.entity_evidence
             SET status = 'quarantined',
                 provenance = provenance || $2::jsonb
           WHERE id = $1`,
@@ -210,25 +189,19 @@ async function main(): Promise<void> {
         ],
       );
     }
-    // Reconcile the ledger for entities this pass emptied. Their row still says 'pending', which
-    // in this ledger means "evidence is in hand, WS4 has not drafted from it yet" — no longer true
-    // once the last captured document is withdrawn, and `dump-enrichment-subjects` would keep
-    // offering them as draftable subjects with nothing to draft from.
-    //
-    // Scoped to entities that have evidence rows, i.e. ones the sweep actually visited. Most
-    // 'pending' rows in this ledger (2,333 of 2,894 on 2026-08-11) were seeded before any sweep
-    // ran and have no evidence rows at all; sweeping them in here would mark them 'skipped' and
-    // hide them from the selector for a full staleDays window, which is the opposite of the truth.
+    // Reconcile drafting readiness only for entities whose last captured evidence was
+    // withdrawn. Untouched pending rows with no prior evidence must remain eligible for
+    // acquisition.
     const reconciled = await client.query(
-      `UPDATE bb_research.entity_enrichment ee
+      `UPDATE research.entity_enrichment ee
           SET status = 'skipped',
               notes = COALESCE(ee.notes, '{}'::jsonb)
                       || jsonb_build_object('reason', 'evidence withdrawn by identity audit'),
               updated_at = now()
         WHERE ee.status = 'pending'
-          AND EXISTS (SELECT 1 FROM bb_research.entity_evidence e WHERE e.entity_id = ee.entity_id)
+          AND EXISTS (SELECT 1 FROM research.entity_evidence e WHERE e.entity_id = ee.entity_id)
           AND NOT EXISTS (
-                SELECT 1 FROM bb_research.entity_evidence e
+                SELECT 1 FROM research.entity_evidence e
                  WHERE e.entity_id = ee.entity_id AND e.status = 'captured')`,
     );
     await client.query('COMMIT');

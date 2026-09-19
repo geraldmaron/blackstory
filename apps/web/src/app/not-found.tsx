@@ -19,8 +19,7 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { EmptyState } from '@repo/ui';
 import { PaletteSeed } from '../components/shell/PaletteSeed';
-import { Room } from '../components/room/Room';
-import { RoomHeader } from '../components/room/RoomHeader';
+import { Room, ReadingEntry } from '../components/room';
 import { loadWalkBackPlace } from './walk-back-place';
 import './utility.css';
 
@@ -28,7 +27,7 @@ import './utility.css';
  * A route that calls `notFound()` renders THIS component, and its own `generateMetadata` result
  * is discarded — so without this the tab on a missed record read `BlackStory`, the layout
  * default, and a reader with several tabs open could not tell the miss from the home page
- * (repo-n7p6.29). The status was already a real 404; only the title was lying.
+ * The response is a real 404 and its title must say so.
  *
  * Only the title. Next already emits `<meta name="robots" content="noindex">` for this boundary
  * on its own; declaring it here too just prints the tag twice.
@@ -42,16 +41,15 @@ export default async function NotFound() {
   return (
     <Room>
       <PaletteSeed />
-      <RoomHeader
+      <ReadingEntry
         pathname="/not-found"
-        kicker="Nothing at this address"
         title="That page is not here"
         lede="Either the address has a typo in it, or it names a record the archive has not published."
         /* Every other room prints its own route as a mono fact because readers cite URLs. This
            room's route is not the reader's route — they are standing on the address that failed,
            and `/not-found` is a path that does not resolve. Printing it twice, once as a crumb
            and once as a fact, tells a lost reader where they are not. */
-        showPath={false}
+        showCrumb={false}
       />
 
       <EmptyState

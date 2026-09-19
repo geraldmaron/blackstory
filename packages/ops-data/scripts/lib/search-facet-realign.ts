@@ -1,50 +1,8 @@
 /**
- * Shared engine behind the `backfill-search-facets-*.ts` scripts: realigns
- * `bb_public.search_index` from the active release's projection, which every one of those scripts
- * treats as the sole authority. Two families of write target are supported — an array copied into
- * a `facets` key, and a scalar copied into a `facets` key or a plain column — and this module is
- * the one place both are decided. Each of the five CLI scripts
- * (`backfill-search-facets-projection.ts`/`-era.ts`/`-jurisdiction.ts`/`-status.ts`/
- * `-evidence-inputs.ts`) configures it for its own key(s) and prints the result.
- *
- * TARGET REGISTRY
- * `TARGET_REGISTRY` maps a `FACET_KEYS` entry to how it is sourced, compared, and written:
- *   - 'array-facet'     copies a same-named projection array into the same-named `facets` key
- *                       (`eraBuckets`, `topicIds`, `mentionedEntityIds`, `notabilityBasis`,
- *                       `notabilityLabels`).
- *   - 'scalar-facet'    copies a projection scalar into a `facets` key; the two names may differ
- *                       (`jurisdictionLabel` -> `jurisdictionState`; `summary` -> `summary`).
- *   - 'topics-column'   copies the projection's topics into the `topics` COLUMN, not a `facets`
- *                       key. Which topics: non-empty `topicTags`, else `topicIds`, shared with the
- *                       publisher as `searchTopicsFromProjection` (repo-ttlce) rather than spelled
- *                       a second time here.
- *                       `mapPostgresSearchIndexRow` (`packages/schemas/src/search-index-row.ts`)
- *                       reads the column first, falling back to `facets.topicTags`, so a facets
- *                       write here would never be read back.
- *   - 'status-column'   copies `projection.status` into BOTH the `status` COLUMN and
- *                       `facets.status`, and resolves ANY mismatch rather than only an empty one.
- *                       `mapPostgresSearchIndexRow` prefers the column, so a stale column value
- *                       serves a wrong status even with a correct facet sitting next to it, and a
- *                       record showing "living" on stale data is exactly what must not stand.
- *   - 'evidence-inputs' recomputes `facets.evidenceInputs` with `recordEvidenceInputs`
- *                       (`@repo/domain`) — the same projection the release builder writes —
- *                       rather than copying a projection field verbatim: nothing in the stored
- *                       projection already carries it. What lands on the row is the strongest
- *                       claim level and the distinct lineage keys, NEVER a graded tier: readers
- *                       apply the one rule at read time, so this backfill cannot bake a rule
- *                       version into the data the way the `confidenceTier` target it replaced
- *                       did (repo-6qjv0).
- *
- * ONE-DIRECTIONAL BY DEFAULT
- * Every target except 'status-column' and 'evidence-inputs' only fills a gap: a row whose facet
- * (or column) already carries a value is left alone unless `resolveConflicts` is passed, matching
- * every array/scalar script's own `OVERWRITE_CONFLICTS` convention. 'status-column' and
- * 'evidence-inputs' always resolve a mismatch, matching what `backfill-search-facets-status.ts`
- * and `backfill-search-facets-evidence-inputs.ts` already do today — neither ever had a fill-only
- * mode, because both guard an assertion (nobody is "living" without evidence; the grading inputs
- * are derived, not asserted) rather than copy a value nobody disputes.
- *
- * Read-only until `applySearchFacetRealign` is called: `planSearchFacetRealign` never writes.
+ * Shared search realignment engine configured by TARGET_REGISTRY. Supports projection
+ * arrays/scalars, topics, status and evidence inputs. Topic selection uses
+ * searchTopicsFromProjection; evidence inputs use the domain projector. Inspect conflicts
+ * before opting into destructive replacement.
  */
 import { recordEvidenceInputs } from '@repo/domain';
 import type { EvidenceInputClaim } from '@repo/domain';
@@ -207,15 +165,8 @@ function evaluateScalarFacet(
 }
 
 /**
- * repo-ttlce: this read `projection.topicIds` alone, so on a record whose build produced real
- * display tags it would have written the IDS over them — the realigner sent to repair the topics
- * column would itself have put the column back out of step with the invariant the divergence
- * audit measures. It now shares that invariant with the publisher.
- *
- * The comparison stays order-insensitive on purpose: `jsonEqual` on two sorted copies, matching
- * the divergence check's own note that "nothing a reader does with topics depends on their order,
- * so ordering alone is not worth reporting as drift". Without this, a row already carrying the
- * right topics in a different order would be rewritten for nothing.
+ * Compare selected topics as sets using the same rule as publication. Do not rewrite rows
+ * solely because array order differs.
  */
 function evaluateTopicsColumn(row: SearchFacetRealignRow): TargetOutcome {
   const desired = searchTopicsFromProjection(row.projection);
@@ -356,9 +307,9 @@ export async function planSearchFacetRealign(
 
   const { rows } = await client.query<RawRow>(
     `SELECT si.entity_id, si.kind, si.facets, si.status, si.topics, re.projection
-       FROM bb_public.search_index si
-       JOIN bb_public.v_active_release_id r ON r.release_id = si.release_id
-       JOIN bb_public.release_entities re
+       FROM published.search_index si
+       JOIN published.v_active_release_id r ON r.release_id = si.release_id
+       JOIN published.release_entities re
          ON re.release_id = si.release_id AND re.entity_id = si.entity_id
       WHERE si.release_id = r.release_id
         AND jsonb_typeof(si.facets) = 'object'${kindClause}
@@ -472,9 +423,9 @@ export async function applySearchFacetRealign(
     params.push(change.entityId);
     const entityParamIndex = params.length;
     const result = await client.query(
-      `UPDATE bb_public.search_index si
+      `UPDATE published.search_index si
           SET ${setClauses.join(', ')}
-         FROM bb_public.v_active_release_id r
+         FROM published.v_active_release_id r
         WHERE si.release_id = r.release_id
           AND si.entity_id = $${entityParamIndex}`,
       params,

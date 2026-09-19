@@ -25,6 +25,10 @@
   overflow: hidden;
 }
 
+.ds-results:has(.ds-results__constraints) {
+  grid-template-rows: auto auto minmax(0, 1fr);
+}
+
 .ds-results__head {
   display: flex;
   align-items: center;
@@ -353,9 +357,9 @@
     top: auto;
     left: var(--ds-space-2);
     right: var(--ds-space-2);
-    bottom: calc(var(--ds-space-2) + 66px);
+    bottom: var(--ds-atlas-dock-clearance);
     width: auto;
-    max-height: min(46dvh, 360px);
+    max-height: var(--ds-atlas-sheet-peek);
   }
 }
 

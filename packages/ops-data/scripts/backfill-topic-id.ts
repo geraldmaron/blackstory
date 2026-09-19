@@ -1,38 +1,7 @@
 /**
- * Adds one controlled topic id to a named set of entities, in `bb_canonical` where topics are
- * authored, and leaves propagation to `sync-release-taxonomy-from-canonical.ts`.
- *
- * WHY THIS EXISTS (repo-92n2.37). A topic added to `packages/domain/src/taxonomy/topics.ts` is
- * inert until records carry it. `redlining` and `sundown-towns` were added in 4a5a558d and then
- * carried by ZERO records, so the Theme facet offered two subjects it could never filter to and
- * the archive's own sundown cohort — 122 records whose ids start `sundown_` and whose canonical
- * keywords already say "sundown town" — stayed findable only by prose.
- *
- * WHY CANONICAL AND NOT THE RELEASE. `bb_canonical.entities.kind_detail.classification` is where
- * topics are authored; the release copy is derived. Writing the release directly would be undone
- * by the next taxonomy sync, which reads canonical and treats it as the truth.
- *
- * `topicIds` and `topicTags` are both written. They are mirrored on every row this targets, the
- * release build carries tags onto the projection, and `searchTopicsFromProjection` prefers a
- * non-empty tag list — so writing ids alone would leave the new topic out of `search_index.topics`
- * and therefore out of topic browse (repo-ttlce).
- *
- * Idempotent: an entity that already carries the topic is counted and skipped, so a re-run after a
- * partial failure is safe.
- *
- * Usage (from repo root):
- *   set -a && source apps/web/.env.local && set +a
- *   export DATABASE_SSL=1
- *   TOPIC_ID=sundown-towns IDS_FILE=/tmp/ids.txt node --conditions development --import tsx \
- *     packages/ops-data/scripts/backfill-topic-id.ts
- *
- * Apply:
- *   TOPIC_ID=sundown-towns IDS_FILE=/tmp/ids.txt DRY_RUN=0 BACKFILL_TOPIC_ID_APPLY=1 \
- *     node --conditions development --import tsx packages/ops-data/scripts/backfill-topic-id.ts
- *
- * THEN PROPAGATE — writing canonical does not move the release:
- *   DRY_RUN=0 RELEASE_TAXONOMY_SYNC_APPLY=1 node --conditions development --import tsx \
- *     packages/ops-data/scripts/sync-release-taxonomy-from-canonical.ts
+ * Adds a controlled topic to named canonical entities, updating both topicIds and topicTags
+ * idempotently. Propagate through sync-release-taxonomy-from-canonical.ts so public copies
+ * remain derived. TOPIC_ID and IDS_FILE scope the operation.
  */
 import { readFileSync } from 'node:fs';
 import pg from 'pg';
@@ -92,7 +61,7 @@ async function main(): Promise<void> {
         `SELECT id,
                 kind_detail->'classification'->'topicIds'  AS topic_ids,
                 kind_detail->'classification'->'topicTags' AS topic_tags
-           FROM bb_canonical.entities
+           FROM canonical.entities
           WHERE id = ANY($1::text[])
           ORDER BY id`,
         [ids],
@@ -107,7 +76,7 @@ async function main(): Promise<void> {
     const already = rows.filter((row) => asArray(row.topic_ids).includes(topicId));
     const toWrite = rows.filter((row) => !asArray(row.topic_ids).includes(topicId));
 
-    console.log(`=== Backfill topic "${topicId}" onto bb_canonical classification ===`);
+    console.log(`=== Backfill topic "${topicId}" onto canonical classification ===`);
     console.log(`  ids requested:            ${ids.length}`);
     console.log(`  canonical rows found:     ${rows.length}`);
     console.log(
@@ -153,7 +122,7 @@ async function main(): Promise<void> {
          * `classification: null`) was skipped exactly that way while the script reported success.
          */
         const updated = await client.query(
-          `UPDATE bb_canonical.entities
+          `UPDATE canonical.entities
               SET kind_detail = COALESCE(kind_detail, '{}'::jsonb)
                     || jsonb_build_object(
                          'classification',

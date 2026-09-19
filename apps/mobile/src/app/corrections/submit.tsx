@@ -1,24 +1,8 @@
 /**
- * Correction-submission sheet (MOB-016) — a modal route (`presentation: 'modal'`),
- * reachable from the More tab and from an entity record's correction CTA.
- *
- * Program invariant 7 / MOB-016 requirement #5: correction content and the
- * receipt code are NEVER encoded in a URL parameter. The only route params this
- * screen accepts are an optional `entityId` (context — which record the
- * correction is about, validated exactly as the entity detail route does) and an
- * optional `returnTo` (validated against the safe-route allowlist). The
- * correction text, contact details, and the returned receipt code live ONLY in
- * local component / feature state — there is no `router.push`/`setParams` call
- * anywhere near the free-text fields or the receipt, by design. Navigation to
- * the status screen carries no receipt (the user re-enters it there).
- *
- * Draft policy (MOB-016 requirement #6): form content is in-memory only for the
- * life of this modal. It is deliberately NOT persisted across app restarts — the
- * simplest safe choice, so correction content never touches the general cache.
- *
- * App Check posture (requirement #2): submission FAILS CLOSED — if no attestation
- * token can be obtained the write is not sent and the form shows a "try again"
- * notice (see the corrections client). Reads/status lookups do not.
+ * Correction-submission modal. Only validated entityId and returnTo values enter route
+ * parameters. Correction text, contact details and receipt codes stay in component state and
+ * are not persisted across restarts or embedded in URLs. Submission uses the shared
+ * client-header protocol and server validation; the header does not establish identity.
  */
 import { router, useLocalSearchParams } from 'expo-router';
 import { useMemo, useRef, useState } from 'react';
@@ -54,8 +38,8 @@ export default function CorrectionsSubmitSheet() {
   const [receiptCode, setReceiptCode] = useState<string | null>(null);
   const scrollRef = useRef<ScrollView>(null);
 
-  // Lazily build the transport deps (App Check token provider, SecureStore,
-  // connectivity). Held in a ref-like memo so the native backends load once.
+  // Memoize transport, secure storage and connectivity dependencies so native backends
+  // initialize once.
   const depsPromise = useMemo(() => createCorrectionClientDeps(), []);
 
   async function handleSubmit(state: CorrectionFormState): Promise<SubmitResult> {

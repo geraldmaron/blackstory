@@ -14,9 +14,49 @@
 import React from 'react';
 import type { ReactNode } from 'react';
 import { cx } from '@repo/ui';
+import { DestinationIcon } from '../patterns/DestinationIcon';
 import './precision.css';
 
 void React;
+
+/** Documentary images keep their complete frame and provenance, never a decorative crop. */
+export function ArchiveFigure({
+  image,
+  caption,
+  href,
+  rights,
+  children,
+}: {
+  readonly image: { readonly url: string; readonly alt: string; readonly credit: string };
+  readonly caption?: string;
+  readonly href?: string;
+  readonly rights?: string;
+  readonly children?: ReactNode;
+}) {
+  return (
+    <figure className="ds-archive-figure">
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        src={image.url}
+        alt={image.alt}
+        loading="lazy"
+        decoding="async"
+        referrerPolicy="no-referrer"
+      />
+      <figcaption>
+        {caption ? <p>{caption}</p> : null}
+        <p className="ds-archive-figure__credit">{image.credit}</p>
+        {rights ? <p className="ds-archive-figure__credit">{rights}</p> : null}
+        {href ? (
+          <a className="ds-archive-figure__source" href={href} rel="noreferrer">
+            <DestinationIcon id="external" /> Inspect the original and source record
+          </a>
+        ) : null}
+        {children}
+      </figcaption>
+    </figure>
+  );
+}
 
 /* —— SourceList ————————————————————————————————————————————————————————————— */
 
@@ -26,12 +66,43 @@ export type RoomSource = {
   /** Year of the source, not of the event. */
   readonly year?: string;
   readonly href?: string;
+  /** Verified archive pointer and its original source, shown as separate reader choices. */
+  readonly archivedUrl?: string;
+  readonly archivedAt?: string;
+  readonly originalUrl?: string;
 };
 
 export type SourceListProps = {
   readonly sources: readonly RoomSource[];
   readonly className?: string;
 };
+
+export type ArchivedSourceLinksProps = {
+  readonly archivedUrl: string;
+  readonly archivedAt: string;
+  readonly originalUrl: string;
+  readonly className?: string;
+};
+
+/** One shared, explicit handoff for every public claim surface that has a verified archive. */
+export function ArchivedSourceLinks({
+  archivedUrl,
+  archivedAt,
+  originalUrl,
+  className,
+}: ArchivedSourceLinksProps) {
+  return (
+    <span className={className}>
+      <a href={archivedUrl} rel="noreferrer">
+        Archived copy
+      </a>{' '}
+      (captured {archivedAt.slice(0, 10)})<span aria-hidden="true"> · </span>
+      <a href={originalUrl} rel="noreferrer">
+        Original source
+      </a>
+    </span>
+  );
+}
 
 export function SourceList({ sources, className }: SourceListProps) {
   return (
@@ -42,7 +113,17 @@ export function SourceList({ sources, className }: SourceListProps) {
             {index + 1}
           </span>
           <span className="ds-room-src__t">
-            {source.href ? (
+            {source.archivedUrl && source.archivedAt && source.originalUrl ? (
+              <>
+                <span className="ds-room-src__label">{source.text}</span>
+                <ArchivedSourceLinks
+                  archivedUrl={source.archivedUrl}
+                  archivedAt={source.archivedAt}
+                  originalUrl={source.originalUrl}
+                  className="ds-room-src__links"
+                />
+              </>
+            ) : source.href ? (
               <a href={source.href} rel="noreferrer">
                 {source.text}
               </a>
@@ -50,7 +131,7 @@ export function SourceList({ sources, className }: SourceListProps) {
               source.text
             )}
           </span>
-          <span className="ds-room-src__y">{source.year ?? '—'}</span>
+          <span className="ds-room-src__y">{source.year ?? 'Undated'}</span>
         </li>
       ))}
     </ol>
@@ -148,8 +229,8 @@ export function Anatomy({ cells, label = 'Record anatomy', className }: AnatomyP
 export type PrecisionProps = {
   /** What the coordinate resolves to: "county centroid", "street address", "block". */
   readonly resolution: string;
-  /** What it does not claim. Required: an unqualified pin is the failure this block exists for. */
-  readonly caveat: string;
+  /** What it does not claim. Omit when the resolution line is enough on this surface. */
+  readonly caveat?: string;
   readonly className?: string;
 };
 
@@ -161,7 +242,7 @@ export function Precision({ resolution, caveat, className }: PrecisionProps) {
         <circle cx="6" cy="6" r="1.5" fill="currentColor" />
       </svg>
       <span>
-        Located to {resolution}. {caveat}
+        Located to {resolution}.{caveat ? ` ${caveat}` : ''}
       </span>
     </p>
   );

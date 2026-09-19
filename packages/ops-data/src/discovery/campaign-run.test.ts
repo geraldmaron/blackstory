@@ -3,7 +3,7 @@
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { discoveryCampaignRunSchema } from '../firestore/types.js';
+import { discoveryCampaignRunSchema } from '../records/types.js';
 import {
   assertDiscoveryRunCannotPublish,
   buildDiscoveryCampaignRunDoc,

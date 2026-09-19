@@ -178,7 +178,7 @@ test('Door link pins expose public hrefs and opaque entity redirects', () => {
   });
   const features = [...source.featureCollection.features, entityOnly];
   const pins = toDoorLinkPins(features);
-  // The Door hands these to the live plate: a marker click opens the pin's href (repo-18ma2).
+  // The Door hands these to the live plate: a marker click opens the pin's href.
   const walkCount = pins.features.filter(
     (feature) => feature.properties.holdingWalk === true,
   ).length;

@@ -1,6 +1,6 @@
 /**
  * Wikidata place-first / authority-first portfolio query pack types.
- * Feeds source-portfolio wave one (`repo-tt2u.8`); does not use P172 ethnic-group-only harvest.
+ * Feeds the first source-portfolio wave; does not use P172 ethnic-group-only harvest.
  */
 import type { QueryPack } from '../types.js';
 

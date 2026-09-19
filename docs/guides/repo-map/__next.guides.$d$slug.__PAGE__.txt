@@ -1,14 +1,11 @@
 1:"$Sreact.fragment"
 5:I[99990,["/blackstory/_next/static/chunks/13m8d36xc7t9s.js","/blackstory/_next/static/chunks/03obgaj591_9a.js"],"OutletBoundary"]
 6:"$Sreact.suspense"
-2:Td8c,<h1 id="repository-map"><a class="heading-anchor" href="#repository-map">Repository map</a></h1>
+2:Tc12,<h1 id="repository-map"><a class="heading-anchor" href="#repository-map">Repository map</a></h1>
 <p>BlackStory ships as one monorepo so public surfaces, private research tools, and
 shared libraries stay on the same contracts.</p>
-<p>Current live stack (verified 2026-08-28): public web on <strong>Vercel</strong>, product data
-and media on <strong>Supabase</strong> <code>blackstory-app</code>
-(<code>https://twykhihqkcldpreuovay.supabase.co</code>). Firebase App Hosting, Firestore,
-GCS dual-serve, and parked PostGIS are leftover, not the current system of
-record. See <a href="./architecture.md">Architecture</a>.</p>
+<p>The application uses Vercel and Supabase Postgres, Auth and Storage. Research runs are explicit
+CLI or headless worker operations. See <a href="./architecture.md">Architecture</a> for boundaries and limits.</p>
 <table>
 <thead>
 <tr>
@@ -19,11 +16,7 @@ record. See <a href="./architecture.md">Architecture</a>.</p>
 <tbody>
 <tr>
 <td><code>apps/web</code></td>
-<td>Public Next.js app on Vercel (live at blackstory.app)</td>
-</tr>
-<tr>
-<td><code>apps/admin</code></td>
-<td>Private Next.js admin and research console (separate Vercel project)</td>
+<td>Public Next.js app on Vercel (live at blackstory.app); private admin/research console at <code>/admin</code>, staff-gated</td>
 </tr>
 <tr>
 <td><code>apps/api-public</code></td>
@@ -59,11 +52,11 @@ record. See <a href="./architecture.md">Architecture</a>.</p>
 </tr>
 <tr>
 <td><code>infra/*</code></td>
-<td>Leftover Firebase / GCP scaffolding, GitHub, parked PostGIS</td>
+<td>GitHub governance and optional service-control configuration</td>
 </tr>
 <tr>
 <td><code>docs/</code></td>
-<td>Operating docs, historical ADRs, methodology, and runbooks</td>
+<td>Current authority, methodology and operational runbooks</td>
 </tr>
 <tr>
 <td><code>brand/</code></td>
@@ -71,8 +64,6 @@ record. See <a href="./architecture.md">Architecture</a>.</p>
 </tr>
 </tbody>
 </table>
-<p><code>functions/</code> (Firebase Cloud Functions schedules) is gone. Do not add it back as
-a current host.</p>
 <h2 id="stable-code-prefixes"><a class="heading-anchor" href="#stable-code-prefixes">Stable code prefixes</a></h2>
 <p>Package scope is brand-agnostic so a product rename does not rewrite the
 monorepo:</p>
@@ -105,12 +96,12 @@ monorepo:</p>
 repository:</p>
 <ul>
 <li>Architecture (current stack): <code>docs/architecture.md</code></li>
-<li>Historical decisions: <code>docs/decisions-carryover.md</code> and <code>git log -- docs/adr/</code></li>
+<li>Current engineering contract: <code>docs/decisions-carryover.md</code></li>
 <li>Methodology: <code>docs/methodology/</code></li>
 <li>Research pipeline: <code>docs/research/</code></li>
 <li>Security: <code>docs/security/</code></li>
 <li>Runbooks: <code>docs/runbooks/</code></li>
-</ul>0:{"rsc":["$","$1","c",{"children":[["$","article",null,{"className":"prose","children":[["$","p",null,{"className":"hero-eyebrow","children":[["$","span",null,{"className":"pin","aria-hidden":true}],["$","span",null,{"children":"start"}]]}],["$","p",null,{"className":"doc-lede","children":"Where apps, packages, workers, and infra live in the monorepo."}],["$","div",null,{"dangerouslySetInnerHTML":{"__html":"$2"}}],"$L3"]}],null,"$L4"]}],"isPartial":false,"staleTime":300,"varyParams":null,"buildId":"yuuD63I0OldEjDA3acYkx"}
+</ul>0:{"rsc":["$","$1","c",{"children":[["$","article",null,{"className":"prose","children":[["$","p",null,{"className":"hero-eyebrow","children":[["$","span",null,{"className":"pin","aria-hidden":true}],["$","span",null,{"children":"start"}]]}],["$","p",null,{"className":"doc-lede","children":"Where apps, packages, workers, and infra live in the monorepo."}],["$","div",null,{"dangerouslySetInnerHTML":{"__html":"$2"}}],"$L3"]}],null,"$L4"]}],"isPartial":false,"staleTime":300,"varyParams":null,"buildId":"KHh4eEKAuEiF9M8bZ4j5n"}
 3:["$","footer",null,{"className":"site-footer","children":["$","p",null,{"children":["Edit this page in the repo under ",["$","code",null,{"children":["apps/docs/content/","repo-map",".md"]}],"."," ",["$","a",null,{"href":"https://github.com/geraldmaron/blackstory","target":"_blank","rel":"noreferrer","children":["BlackStory"," on GitHub"]}]]}]}]
 4:["$","$L5",null,{"children":["$","$6",null,{"name":"Next.MetadataOutlet","children":"$@7"}]}]
 7:null

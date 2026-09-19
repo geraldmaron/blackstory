@@ -113,7 +113,7 @@ async function main(): Promise<void> {
   try {
     const releaseId = (
       await client.query<{ release_id: string }>(
-        'SELECT release_id FROM bb_public.v_active_release_id',
+        'SELECT release_id FROM published.v_active_release_id',
       )
     ).rows[0]?.release_id;
     if (!releaseId) throw new Error('no active release');
@@ -121,8 +121,8 @@ async function main(): Promise<void> {
     const ell = await client.query<{ quote: string | null; draft_quote: string | null }>(
       `SELECT lc.payload->'evidenceCitations'->0->>'quote' AS quote,
               ee.notes->'draft'->'summaryCitations'->0->>'quote' AS draft_quote
-       FROM bb_research.landscape_candidates lc
-       LEFT JOIN bb_research.entity_enrichment ee ON ee.entity_id = lc.id
+       FROM research.landscape_candidates lc
+       LEFT JOIN research.entity_enrichment ee ON ee.entity_id = lc.id
        WHERE lc.id = $1`,
       [ELL_PERSONS_SITE],
     );
@@ -140,8 +140,8 @@ async function main(): Promise<void> {
       `SELECT lc.payload->>'historicalContext' AS context,
               ee.notes->'draft'->>'historicalContext' AS draft_context,
               lc.payload->'provenance'->>'notes' AS notes
-       FROM bb_research.landscape_candidates lc
-       LEFT JOIN bb_research.entity_enrichment ee ON ee.entity_id = lc.id
+       FROM research.landscape_candidates lc
+       LEFT JOIN research.entity_enrichment ee ON ee.entity_id = lc.id
        WHERE lc.id = $1`,
       [HARRISON],
     );
@@ -157,7 +157,7 @@ async function main(): Promise<void> {
     console.log(`  provenance notes state accusation: ${statesAccusation(harrisonRow.notes)}`);
 
     const lowman = await client.query<{ claims: readonly ReleaseClaim[] | null; summary: string }>(
-      'SELECT claims, summary FROM bb_public.release_entities WHERE release_id = $1 AND entity_id = $2',
+      'SELECT claims, summary FROM published.release_entities WHERE release_id = $1 AND entity_id = $2',
       [releaseId, LOWMAN],
     );
     const lowmanRow = lowman.rows[0];
@@ -193,28 +193,28 @@ async function main(): Promise<void> {
 
     await client.query('BEGIN');
     await client.query(
-      `UPDATE bb_research.landscape_candidates
+      `UPDATE research.landscape_candidates
        SET payload = jsonb_set(payload, '{evidenceCitations,0,quote}', to_jsonb($2::text), true),
            updated_at = now()
        WHERE id = $1`,
       [ELL_PERSONS_SITE, ELL_PERSONS_QUOTE],
     );
     await client.query(
-      `UPDATE bb_research.entity_enrichment
+      `UPDATE research.entity_enrichment
        SET notes = jsonb_set(notes, '{draft,summaryCitations,0,quote}', to_jsonb($2::text), true),
            updated_at = now()
        WHERE entity_id = $1 AND notes->'draft'->'summaryCitations'->0 IS NOT NULL`,
       [ELL_PERSONS_SITE, ELL_PERSONS_QUOTE],
     );
     await client.query(
-      `UPDATE bb_research.entity_enrichment
+      `UPDATE research.entity_enrichment
        SET notes = jsonb_set(notes, '{draft,historicalContext}', to_jsonb($2::text), true),
            updated_at = now()
        WHERE entity_id = $1 AND notes->'draft' IS NOT NULL`,
       [HARRISON, HARRISON_CONTEXT],
     );
     await client.query(
-      `UPDATE bb_research.landscape_candidates
+      `UPDATE research.landscape_candidates
        SET payload = jsonb_set(
              jsonb_set(payload, '{historicalContext}', to_jsonb($2::text), true),
              '{provenance,notes}', to_jsonb($3::text), true
@@ -226,7 +226,7 @@ async function main(): Promise<void> {
       [HARRISON, HARRISON_CONTEXT, HARRISON_NOTES],
     );
     await client.query(
-      `UPDATE bb_public.release_entities
+      `UPDATE published.release_entities
        SET projection = jsonb_set(
              jsonb_set(projection, '{summary}', to_jsonb($3::text), true),
              '{claims}', $4::jsonb, true
@@ -235,7 +235,7 @@ async function main(): Promise<void> {
       [releaseId, LOWMAN, LOWMAN_SUMMARY, JSON.stringify(nextLowmanClaims)],
     );
     await client.query(
-      `UPDATE bb_canonical.entities
+      `UPDATE canonical.entities
        SET kind_detail = jsonb_set(kind_detail, '{editorial,summary}', to_jsonb($2::text), true),
            updated_at = now()
        WHERE id = $1 AND kind_detail ? 'editorial'`,

@@ -1,5 +1,5 @@
 /**
- * Sync bb_canonical.entities.living_status onto active-release projections + search_index.
+ * Sync canonical.entities.living_status onto active-release projections + search_index.
  *
  * Used when landscape-driven incremental publish cannot rebuild (no matching landscape id).
  * Only patches status / livingStatus fields — does not regenerate full projections.
@@ -60,9 +60,9 @@ async function main(): Promise<void> {
               e.living_status AS canonical_status,
               re.projection->>'status' AS release_status,
               re.projection->>'livingStatus' AS release_living
-       FROM bb_canonical.entities e
-       JOIN bb_public.active_release ar ON true
-       JOIN bb_public.release_entities re
+       FROM canonical.entities e
+       JOIN published.active_release ar ON true
+       JOIN published.release_entities re
          ON re.release_id = ar.release_id AND re.entity_id = e.id
        WHERE e.kind = 'person'
          AND e.living_status IN ('deceased', 'presumed_deceased')
@@ -97,7 +97,7 @@ async function main(): Promise<void> {
     try {
       for (const row of rows) {
         const ent = await client.query(
-          `UPDATE bb_public.release_entities
+          `UPDATE published.release_entities
            SET projection = jsonb_set(
                  jsonb_set(projection, '{status}', to_jsonb($3::text), true),
                  '{livingStatus}', to_jsonb($3::text), true
@@ -108,19 +108,12 @@ async function main(): Promise<void> {
         entitiesUpdated += ent.rowCount ?? 0;
 
         /*
-         * BOTH the `status` column and the `facets` blob, because the blob is what gets served.
-         *
-         * `search_index.facets` holds the whole search document, and
-         * apps/api-public/src/http/postgres-search-index.ts's mapPostgresSearchIndexRow returns
-         * `parseSearchProjection(facets)` verbatim whenever that blob is a full doc — the `status`
-         * column is never consulted on that path. Updating only the column (what this script and
-         * flip-release-living-to-unknown.ts both used to do) therefore changed nothing a reader
-         * could see: the public search API went on serving `status: "living"` for 338 of 469
-         * persons, 212 of them already recorded as deceased, Denmark Vesey and W. E. B. Du Bois
-         * among them. See repo-n7p6.28.
+         * Update both the status column and facets document. Public search returns parsed
+         * facets directly, so changing only the scalar column leaves reader-visible status
+         * stale.
          */
         const search = await client.query(
-          `UPDATE bb_public.search_index
+          `UPDATE published.search_index
            SET status = $3,
                facets = CASE
                  WHEN jsonb_typeof(facets) = 'object'

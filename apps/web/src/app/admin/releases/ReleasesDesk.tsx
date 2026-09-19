@@ -2,11 +2,9 @@
  * The interactive half of /admin/releases: row selection, the decision reason, and the two stage
  * verbs.
  *
- * Split out of the route (repo-gyq6.9) when the page became a server component. The list is read
- * in the request and arrives as props; this component never fetches it. What stays client-side is
- * only what genuinely needs a browser: which row the operator has selected, the reason they are
- * typing, and the POST to `/admin/api/releases/stage` — a real mutation, which is exactly the case
- * the bead says the /api routes should keep serving.
+ * The list is read in the server request and arrives as props; this component never fetches it.
+ * Client state is limited to the selected row, the decision reason, and the POST to
+ * `/admin/api/releases/stage`.
  *
  * Staging records intent for review. It does not move the public pointer, and nothing here does:
  * privileged apply with signed-manifest verification is a separate path. `router.refresh()` after

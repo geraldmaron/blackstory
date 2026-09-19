@@ -8,7 +8,16 @@
  */
 
 export { Room, type RoomProps } from './Room';
-export { RoomHeader, type RoomHeaderProps } from './RoomHeader';
+export {
+  ReadingEntry,
+  DocumentColophon,
+  OrientationInstrument,
+  type EntryPosture,
+  type ReadingEntryProps,
+  type DocumentColophonProps,
+  type OrientationInstrumentProps,
+  type OrientationMove,
+} from './EntryPosture';
 export { RailGroup, type RailGroupProps, type RailEntry } from './RoomRail';
 export { Breadcrumb, type BreadcrumbProps } from './Breadcrumb';
 export { resolveTrail, roomLabelFor, type RoomCrumb } from './room-trail';
@@ -20,9 +29,21 @@ export {
   type CardGridProps,
   type RoomCardProps,
 } from './RoomCards';
+export {
+  RoomSection,
+  RoomFactList,
+  RoomHandoff,
+  roomSectionTone,
+  type RoomSectionProps,
+  type RoomSectionTone,
+  type RoomFact,
+  type RoomHandoffProps,
+} from './RoomSection';
+export { RoomJump, type RoomJumpProps, type RoomJumpSection } from './RoomJump';
 export { Prose, RecordRef, type ProseProps, type RecordRefProps } from './Prose';
 export { ReadingProgress, type ReadingProgressProps } from './ReadingProgress';
 export {
+  ArchiveFigure,
   SourceList,
   Connections,
   TrustBlock,

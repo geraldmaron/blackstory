@@ -1,0 +1,37 @@
+{
+  "source": "U.S. Bureau of the Census, U.S. Census of Population: 1960, Vol. I, Characteristics of the Population, Part 45, Texas, Chapter C, General Social and Economic Characteristics",
+  "sourceUrl": "https://www2.census.gov/library/publications/decennial/1960/population-volume-1/33255142v1p45ch05.pdf",
+  "table": "Table 65",
+  "page": "45-345",
+  "boundaryVersion": "us-states-1960",
+  "datasetVintage": "1963 printed volume",
+  "figures": [
+    {
+      "metricId": "lives-income-median",
+      "jurisdictionId": "state:48",
+      "referencePeriod": "1960",
+      "raceEthnicitySlice": "all",
+      "estimate": 4884,
+      "universe": "Families; income in 1959 dollars; THE STATE",
+      "note": "Families block median, not families and unrelated individuals. Family count THE STATE=2392564. Second pass agrees."
+    },
+    {
+      "metricId": "lives-income-median",
+      "jurisdictionId": "state:48",
+      "referencePeriod": "1960",
+      "raceEthnicitySlice": "white",
+      "estimate": 5239,
+      "universe": "Families; WHITE; income in 1959 dollars; THE STATE",
+      "note": "Family count WHITE THE STATE=2127731. Second pass agrees."
+    },
+    {
+      "metricId": "lives-income-median",
+      "jurisdictionId": "state:48",
+      "referencePeriod": "1960",
+      "raceEthnicitySlice": "nonwhite",
+      "estimate": 2591,
+      "universe": "Families; NONWHITE; income in 1959 dollars; THE STATE",
+      "note": "Family count NONWHITE THE STATE=264833. Second pass agrees."
+    }
+  ]
+}

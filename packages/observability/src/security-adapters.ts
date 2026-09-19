@@ -3,6 +3,7 @@
  * Structural contracts mirror existing producers no rewrites required.
  */
 import type { DomainAuditEvent } from '@repo/domain';
+import type { ClientAttestationTelemetryEvent } from '@repo/security';
 import {
   AUDIT_ACTION_TO_SECURITY_KIND,
   createSecurityEventId,
@@ -16,14 +17,8 @@ import {
 } from './security-events.js';
 import { fingerprintDimension } from './security-redaction.js';
 
-/** Mirrors @repo/ops-data AppCheckTelemetryEvent without a runtime dependency. */
-export type AppCheckTelemetryInput = {
-  readonly event: 'app_check_verification';
-  readonly mode: 'monitor' | 'enforce';
-  readonly outcome: 'verified' | 'monitored_failure' | 'rejected' | 'trusted_service';
-  readonly reason?: string | undefined;
-  readonly replayProtection: boolean;
-};
+/** The client-header producer contract; this signal does not establish identity. */
+export type ClientAttestationTelemetryInput = ClientAttestationTelemetryEvent;
 
 export type RateLimitDenialInput = {
   readonly endpointClass: string;
@@ -97,24 +92,18 @@ function baseEvent(
   };
 }
 
-export function adaptAppCheckTelemetry(
-  input: AppCheckTelemetryInput,
+export function adaptClientAttestationTelemetry(
+  input: ClientAttestationTelemetryInput,
   context: SecurityEventContext,
 ): SecurityTelemetryEvent | undefined {
-  if (input.outcome === 'verified' || input.outcome === 'trusted_service') {
+  if (input.outcome === 'verified') {
     return undefined;
   }
-  return baseEvent(
-    'app_check.failure',
-    context,
-    {
-      mode: input.mode,
-      outcome: input.outcome,
-      reason: input.reason ?? 'unknown',
-      replayProtection: input.replayProtection,
-    },
-    { replayProtection: input.replayProtection },
-  );
+  return baseEvent('client_header.failure', context, {
+    mode: input.mode,
+    outcome: input.outcome,
+    reason: input.reason ?? 'unknown',
+  });
 }
 
 export function adaptAuditEvent(

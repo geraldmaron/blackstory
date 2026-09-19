@@ -1,83 +1,18 @@
 /**
  * `/about` page-local layout.
  *
- * The room kit owns the surface: column measure, header, prose, cards and off-ramp. What is left
- * here is the two lists this page alone renders (pillars and refusals) plus the foot credits.
- * Nothing here restyles a kit component.
+ * The room kit owns the surface: column, header, chapter bands, facts and off-ramp. What is
+ * left here is the refusals list this page alone renders, plus the foot credits.
  *
- * MOBILE FIRST. An earlier version declared `repeat(3, ...)` on the pillars and `repeat(2, ...)`
- * on the destinations with no media query anywhere in the file, so both held their desktop column
- * count down to 375px and the pillar bodies wrapped to two or three words per line. Any
- * multi-column rule here has to sit inside a `min-width` query, with single column as the default.
+ * MOBILE FIRST. Any multi-column rule here has to sit inside a `min-width` query.
  *
- * THE PILLARS ARE A LIST, NOT A ROW OF THREE. They used to be three equal cards in three equal
- * columns, which is the shape that made the page read as generated. There are four now and they
- * are deliberately different lengths, so they stack as a hairline list at every width, the same
- * treatment the refusals get.
- *
- * ONE RULE PER SELECTOR. The previous version declared `.ds-about-page__mission` three times with
- * conflicting `grid-template-columns`, and applied it to the section wrapper while styling it as a
- * grid row, so most of those declarations did nothing. Each selector below appears once.
+ * THE PILLARS ARE KIT FACTS. The refusals stay a hairline list: these are limits, and giving
+ * them card weight would present them as features.
  */
-
-.ds-about-page__section {
-  margin-block-start: var(--ds-space-7);
-}
-
-/* —— Pillars ——————————————————————————————————————————————————————————————
-   Not numbered: the rules hold at once, so an order would be a false claim. */
-
-.ds-about-page__pillars {
-  list-style: none;
-  margin: var(--ds-space-5) 0 0;
-  padding: 0;
-  display: grid;
-  gap: 0;
-}
-
-.ds-about-page__pillar {
-  display: grid;
-  gap: var(--ds-space-2);
-  padding-block: var(--ds-space-4);
-  border-top: var(--ds-border-width) solid var(--ds-rule);
-}
-
-.ds-about-page__pillar-kicker {
-  margin: 0;
-  font-family: var(--ds-font-mono);
-  font-size: 0.6875rem;
-  font-weight: 500;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: var(--ds-accent);
-}
-
-.ds-about-page__pillar-title {
-  margin: 0;
-  font-family: var(--ds-font-display);
-  font-weight: 600;
-  font-size: 1.0625rem;
-  letter-spacing: -0.02em;
-  line-height: 1.25;
-  color: var(--ds-ink);
-}
-
-.ds-about-page__pillar-body {
-  margin: 0;
-  max-width: 62ch;
-  font-family: var(--ds-font-sans);
-  font-size: 0.9375rem;
-  line-height: 1.55;
-  color: var(--ds-ink-muted);
-}
-
-/* —— Refusals ——————————————————————————————————————————————————————————————
-   A hairline list, not cards: these are limits, and giving them card weight would present them
-   as features. The rule between rows is the only ornament. */
 
 .ds-about-page__refusals {
   list-style: none;
-  margin: var(--ds-space-5) 0 0;
+  margin: 0;
   padding: 0;
 }
 
@@ -91,6 +26,10 @@
   color: var(--ds-ink-muted);
 }
 
+.ds-about-page__refusal:last-child {
+  border-bottom: var(--ds-border-width) solid var(--ds-rule);
+}
+
 .ds-about-page__refusal::before {
   content: 'Never';
   display: block;
@@ -102,8 +41,6 @@
   text-transform: uppercase;
   color: var(--ds-ink-muted);
 }
-
-/* —— Foot ——————————————————————————————————————————————————————————————— */
 
 .ds-about-page__foot {
   margin-block-start: var(--ds-space-6);

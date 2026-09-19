@@ -1,21 +1,11 @@
-/**
- * Exposes server-side administrator authorization and role-mutation composition helpers.
- */
+/** Administrator session verification, route policy, and staff permissions. */
 export { AUTHORIZATION_HEADER, ServerAdminAuthorizationError } from './server-authorization';
 export type {
   AdminPermission,
   AdminRequestHeaders,
-  AuthorizedAdminRequest,
   PrivilegedAdminAction,
-  VerifiedAdminIdentity,
-  VerifiedIapPrincipal,
 } from './server-authorization';
-export { mutateAdminRoles } from './role-mutation';
-export type {
-  AdminRoleMutationService,
-  PrivilegedActionAuthorizer,
-  StaffRole,
-} from './role-mutation';
+export type { StaffRole } from './staff-permissions';
 export {
   StaffPermissionDeniedError,
   assertStaffPermission,

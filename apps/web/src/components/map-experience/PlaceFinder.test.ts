@@ -1,7 +1,7 @@
 /**
  * PlaceFinder: SSR markup smoke test for the wide (default, pre-mount) posture, plus unit tests
  * for the radius/state disagreement rule those two are pure functions specifically so this file
- * does not need a DOM to pin the acceptance criterion (repo-92n2.14): "Radius and state select
+ * does not need a DOM to pin the acceptance criterion: "Radius and state select
  * disagreement resolves to the most recent action with the other control visibly cleared."
  */
 import assert from 'node:assert/strict';
@@ -16,7 +16,7 @@ test('renders the full form inline, privacy notice first, before any permission 
   );
   // Privacy notice content (`LocationPrivacyNotice`), ahead of the consent button in source
   // order — full length, not the collapsed one-line summary a reader would have to expand.
-  const privacyIndex = html.indexOf('How this lookup uses your location');
+  const privacyIndex = html.indexOf('Location is opt-in');
   const consentIndex = html.indexOf('Use my current location');
   assert.ok(privacyIndex >= 0, 'privacy notice not found');
   assert.ok(consentIndex >= 0, 'consent button not found');

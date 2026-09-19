@@ -1,14 +1,6 @@
-/**
- * The single source of truth for what each staff role may do.
- *
- * repo-qv9h recorded that the permission vocabulary in server-authorization.ts was declared and
- * never invoked: every route asserted authentication only, so any staff role could do anything.
- * This module is the map that makes the vocabulary load-bearing, and it is deliberately pure —
- * no headers, no Supabase, no database — so both the server write path and the client's
- * affordance-hiding hook read the same table instead of drifting apart.
- */
+/** Shared permission table for server authorization and client control visibility. */
 import type { AdminPermission } from './server-authorization';
-import type { StaffRole } from './role-mutation';
+export type StaffRole = 'admin' | 'research' | 'publication' | 'security';
 
 /**
  * Canonical writes are separated from `research:write` on purpose. Research writes propose;

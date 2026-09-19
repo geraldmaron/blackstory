@@ -17,10 +17,12 @@ import React from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
 
 import { Room } from './Room';
-import { RoomHeader } from './RoomHeader';
+import { ReadingEntry, DocumentColophon } from './EntryPosture';
 import { Breadcrumb } from './Breadcrumb';
 import { resolveTrail } from './room-trail';
 import { CardGrid, GroupHeading, RoomCard } from './RoomCards';
+import { RoomSection, RoomHandoff } from './RoomSection';
+import { RoomJump } from './RoomJump';
 import { Prose, RecordRef } from './Prose';
 import { Anatomy, Connections, Note, Precision, SourceList, TrustBlock } from './Evidence';
 import { HairlineIndex } from './HairlineIndex';
@@ -42,22 +44,8 @@ void React;
 const APP_DIR = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../app');
 
 /**
- * The v6 edition system as it stands the day the kit lands: twelve per-route stylesheets and
- * nine panel-chrome modules. This is a ratchet, not an allowlist. Each entry is deleted from
- * the repo *and* from this list as its screen moves onto the kit in SP-11, SP-12 and SP-13,
- * and the test fails in both directions — a file here that no longer exists is a stale
- * exemption, a file on disk that is not here is the v6 system growing back.
- *
- * The `history-*` pair left once /history became a redirect endpoint and its orphaned render
- * components were deleted. The `explore-*` pair left once the one live dependency — a direct
- * stylesheet import on the Explore surface — was broken: the v9 atlas instruments (TimePanel,
- * CameraConsole, LensPanel, ResultsRail) had already replaced everything the two files styled.
- *
- * The list is now EMPTY, and that is the end state, not a gap: `memorial/memorial-edition.css`
- * and `memorial/memorial-panel-chrome.ts` were the last two, retired in repo-92n2.30 when
- * /memorial moved onto the Reading room class. The ratchet still runs in both directions, so
- * it now reads simply as "no route may grow a per-route stylesheet or panel-chrome module
- * under app/ again".
+ * Prevents per-route edition stylesheets and panel-chrome modules from returning. The empty
+ * exemption list is intentional; any new matching file must fail this guard.
  */
 const LEGACY_EDITION_CHROME: readonly string[] = [];
 
@@ -71,20 +59,15 @@ function walk(dir: string, out: string[] = []): string[] {
 }
 
 describe('room kit · a title is JSX, never a string of markup', () => {
-  // `RoomHeader`'s title is a ReactNode so `<em>` renders in the editorial accent. Passed as a
-  // string attribute instead, React escapes it and the reader sees the literal tags: /law shipped
-  // reading "Civil rights <em>law</em>" and /about "History, pinned to <em>place</em>.".
+  // ReadingEntry title is a ReactNode so `<em>` renders in the editorial accent. Passed as a
+  // string attribute instead, React escapes it and the reader sees the literal tags.
   it('no room passes markup inside a quoted title attribute', () => {
     const offenders = walk(APP_DIR)
       .filter((file) => file.endsWith('.tsx'))
       .filter((file) => /title="[^"]*<[a-z]/i.test(readFileSync(file, 'utf8')))
       .map((file) => path.relative(APP_DIR, file));
 
-    assert.deepEqual(
-      offenders,
-      [],
-      'pass the title as JSX: title={<>Civil rights <em>law</em></>}',
-    );
+    assert.deepEqual(offenders, [], 'pass the title as JSX: title={<>Banned <em>books</em></>}');
   });
 });
 
@@ -124,13 +107,53 @@ describe('room kit · the v6 edition system stays retired', () => {
       );
     }
   });
+
+  it('the kit styles an unclassed content link at zero specificity', () => {
+    // A byline "Neo" and an anatomy "3 sources" rendered in the browser default link color
+    // because only `.ds-room-prose a` had a rule. The base rule must stay inside `:where()` so
+    // it never outranks a classed link or a block-level `.x a` rule.
+    const kitCss = readFileSync(path.join(APP_DIR, '../components/room/room-kit.css'), 'utf8');
+    assert.match(
+      kitCss,
+      /:where\(\.ds-room\) :where\(a:not\(\[class\]\)\) \{\s*color: var\(--ds-accent\);/,
+    );
+  });
+});
+
+describe('room kit · a catalog block a second room renders is styled by the kit', () => {
+  // /law reused the Records find field while its rules shipped only in the Records stylesheet,
+  // which /law never loads, so the search rendered as bare browser controls. Any `ds-records-*`
+  // class used outside app/records must be defined in room-kit.css, which every room loads.
+  it('every ds-records-* class used outside app/records is defined in room-kit.css', () => {
+    const kitCss = readFileSync(path.join(APP_DIR, '../components/room/room-kit.css'), 'utf8');
+    const recordsDir = path.join(APP_DIR, 'records') + path.sep;
+    const missing = new Set<string>();
+
+    for (const file of walk(APP_DIR)) {
+      if (!file.endsWith('.tsx') || file.endsWith('.test.tsx') || file.startsWith(recordsDir)) {
+        continue;
+      }
+      const source = readFileSync(file, 'utf8')
+        .replace(/\/\*[\s\S]*?\*\//g, '')
+        .replace(/^\s*\/\/.*$/gm, '');
+      for (const [className] of source.matchAll(/\bds-records-[a-z0-9_-]+/g)) {
+        if (!new RegExp(`\\.${className}(?![a-z0-9_-])`).test(kitCss)) {
+          missing.add(`${path.relative(APP_DIR, file)}: ${className}`);
+        }
+      }
+    }
+
+    assert.deepEqual(
+      [...missing].sort(),
+      [],
+      'move the block into components/room/room-kit.css rather than importing a route stylesheet',
+    );
+  });
 });
 
 describe('room kit · the trail is computed, never hand-written', () => {
-  // SP-21 (repo-92n2.29) shipped /rooms, so a reading room's parent is Rooms rather than
-  // the site root — matching `SURF_PARENT` in the mock, where Rooms is the default up-link. These
-  // chains were one step short while the route was held. The site root itself is resolved but
-  // not rendered as a step (see resolveTrail).
+  // Reading rooms use Rooms as their parent. The site root resolves the trail but is not
+  // rendered as a breadcrumb step.
   it('a reading room hangs off Rooms', () => {
     assert.deepEqual(resolveTrail('/books'), [
       { label: 'Rooms', href: '/rooms' },
@@ -188,42 +211,31 @@ describe('room kit · the trail is computed, never hand-written', () => {
   });
 });
 
-describe('room kit · RoomHeader is the only header a room renders', () => {
-  it('renders breadcrumb, sentence-case kicker, title, lede and mono meta in one block', () => {
+describe('room kit · ReadingEntry is the Reading posture mast', () => {
+  it('renders title and lede without a kicker or mono meta row', () => {
     const html = renderToStaticMarkup(
-      <RoomHeader
+      <ReadingEntry
         pathname="/books"
-        kicker="Catalog"
         title="Banned books"
         lede="Every title removed from a public shelf, with the order that removed it."
-        meta={['1,204 titles', '1963 to 2024']}
+        showCrumb={false}
       />,
     );
 
-    assert.match(html, /ds-room-crumb/);
-    // The kicker renders again, above the title and in sentence case. It was muted while the
-    // register was mono-caps, which shouted over the title; the register changed, so the line
-    // came back rather than the prop staying dead on twelve callers.
-    assert.match(html, /<p class="ds-room-header__kicker">Catalog<\/p>/);
-    assert.match(html, /<h1 class="ds-room-header__title">Banned books<\/h1>/);
-    assert.match(html, /ds-room-header__lede/);
-    assert.match(html, /1,204 titles/);
-
-    // The path leads the meta row, ahead of every count. Mock: `#docmeta`, path then meta.
-    assert.match(
-      html,
-      /ds-room-header__meta"><span class="ds-room-header__path">\/books<\/span><span>1,204 titles<\/span>/,
-    );
-
+    assert.match(html, /data-posture="reading"/);
+    assert.match(html, /<h1 class="ds-entry__title">Banned books<\/h1>/);
+    assert.match(html, /ds-entry__lede/);
+    assert.doesNotMatch(html, /kicker|ds-room-header/);
     assert.equal(html.match(/<h1/g)?.length, 1, 'a room renders exactly one h1');
     assert.equal(html.match(/<header/g)?.length, 1, 'a room renders exactly one header');
   });
 
-  it('omits the meta row entirely when there are no facts and no path', () => {
+  it('DocumentColophon carries mono citation facts at the foot', () => {
     const html = renderToStaticMarkup(
-      <RoomHeader pathname="/privacy" title="Privacy" showPath={false} />,
+      <DocumentColophon facts={['1,204 titles', '1963 to 2024']} />,
     );
-    assert.doesNotMatch(html, /ds-room-header__meta/);
+    assert.match(html, /data-posture-colophon/);
+    assert.match(html, /1,204 titles/);
   });
 
   it('the breadcrumb marks the current step and does not link it', () => {
@@ -268,6 +280,43 @@ describe('room kit · catalog blocks', () => {
     const html = renderToStaticMarkup(<GroupHeading>By decade</GroupHeading>);
     assert.match(html, /<h2 class="ds-room-grouphd">By decade<\/h2>/);
   });
+
+  it('RoomSection is a labelled chapter with a destination plate', () => {
+    const html = renderToStaticMarkup(
+      <RoomSection
+        id="grades"
+        icon="evidence"
+        kicker="Grades"
+        title="What the grades mean"
+        tone="sunk"
+      >
+        <p>A grade is never a color on its own.</p>
+      </RoomSection>,
+    );
+    assert.match(html, /id="grades"/);
+    assert.match(html, /ds-room-section--sunk/);
+    assert.match(html, /ds-room-section__plate/);
+    assert.match(html, /id="grades-heading"/);
+    assert.match(html, /ds-destination-icon--lg/);
+  });
+
+  it('RoomHandoff is a link with a plate, never a buried paragraph', () => {
+    const html = renderToStaticMarkup(
+      <RoomHandoff href="/sources" icon="source" title="Source library" line="Publisher kinds." />,
+    );
+    assert.match(html, /href="\/sources"/);
+    assert.match(html, /ds-room-handoff/);
+    assert.match(html, /Source library/);
+  });
+
+  it('RoomJump is a list of hash links that work without JavaScript', () => {
+    const html = renderToStaticMarkup(
+      <RoomJump sections={[{ id: 'origin', label: 'Why this exists', icon: 'about' }]} />,
+    );
+    assert.match(html, /href="#origin"/);
+    assert.match(html, /ds-room-jump/);
+    assert.doesNotMatch(html, /aria-current/);
+  });
 });
 
 describe('room kit · prose and inline references', () => {
@@ -293,7 +342,7 @@ describe('room kit · prose and inline references', () => {
 });
 
 describe('room kit · evidence blocks', () => {
-  it('SourceList numbers sources and shows an em dash when the year is unknown', () => {
+  it('SourceList numbers sources and identifies an unknown source date', () => {
     const html = renderToStaticMarkup(
       <SourceList
         sources={[
@@ -305,7 +354,31 @@ describe('room kit · evidence blocks', () => {
     assert.match(html, /ds-room-src__i[^>]*>1</);
     assert.match(html, /ds-room-src__i[^>]*>2</);
     assert.match(html, /ds-room-src__y[^>]*>1963</);
-    assert.match(html, /ds-room-src__y[^>]*>—</);
+    assert.match(html, /ds-room-src__y[^>]*>Undated</);
+  });
+
+  it('SourceList keeps archived and original source links independently visible', () => {
+    const html = renderToStaticMarkup(
+      <SourceList
+        sources={[
+          {
+            text: 'National Archives: Record 1',
+            archivedUrl: 'https://web.archive.org/web/20260901000000/https://example.gov/record/1',
+            archivedAt: '2026-09-01T00:00:00.000Z',
+            originalUrl: 'https://example.gov/record/1',
+          },
+        ]}
+      />,
+    );
+    assert.match(html, /Archived copy/);
+    assert.match(html, /Original source/);
+    assert.ok(
+      html.includes(
+        'href="https://web.archive.org/web/20260901000000/https://example.gov/record/1"',
+      ),
+    );
+    assert.ok(html.includes('href="https://example.gov/record/1"'));
+    assert.match(html, /2026-09-01/);
   });
 
   it('a Connection states the relation in words and never a bare arrow', () => {
@@ -318,12 +391,16 @@ describe('room kit · evidence blocks', () => {
     assert.doesNotMatch(html, /[→←]/);
   });
 
-  it('Precision always says what the coordinate does not claim', () => {
+  it('Precision states the resolution, and an optional caveat when given', () => {
     const html = renderToStaticMarkup(
       <Precision resolution="county centroid" caveat="This is not the address of the event." />,
     );
     assert.match(html, /Located to county centroid\./);
     assert.match(html, /This is not the address of the event\./);
+
+    const bare = renderToStaticMarkup(<Precision resolution="site precision" />);
+    assert.match(bare, /Located to site precision\./);
+    assert.doesNotMatch(bare, /never draws a point sharper/);
   });
 
   it('TrustBlock and Anatomy render label/value pairs in a labeled group', () => {
@@ -631,10 +708,8 @@ describe('room kit · map moment', () => {
 });
 
 describe('room kit · map moment visibility', () => {
-  // repo-kz9z: MapMoment derived LIVE from `stage.liveId === reactId` alone, so on a browser with
-  // no WebGL — or any run where MapStage called `markMapUnavailable()` — a moment still went
-  // transparent and printed PLATE · LIVE over an empty box. These pin the fix at the seam, since
-  // no test in this file can drive an actual WebGL failure through SSR.
+  // When the map is unavailable, a map moment must retain its still image even if its id is
+  // selected. These tests exercise that state boundary without simulating WebGL itself.
   it('a stage being mounted is not the same as the plate being able to paint', () => {
     const resolved = resolveMomentVisibility({
       plateAvailable: true,
@@ -765,21 +840,19 @@ describe('room kit · a live moment is a window onto the borrowed plate', () => 
       /background:\s*transparent/,
       'a live slot must drop its background so the borrowed plate shows through',
     );
+    assert.match(
+      liveRule[1]!,
+      /pointer-events:\s*none/,
+      'a live slot must not intercept hover over the aligned map layer',
+    );
   });
 });
 
 describe('room kit · a live plate never sits behind a prose column', () => {
   /*
-   * repo-92n2.11.2. The bead's rule is "never full bleed behind prose, enforced in CSS rather
-   * than left to authors", and the enforcement is a two-part invariant rather than one rule:
-   *
-   *   1. the ladder — the plate is fixed at `--ds-z-map-plate` and document content sits at
-   *      `--ds-z-content`, so the plate paints UNDER the page and an opaque ground hides it;
-   *   2. the one window — the only selector that makes a box transparent over that plate is the
-   *      live map-moment slot, which is bounded, in flow, and released on scroll out.
-   *
-   * Either half alone is not the rule. Raise the plate above content, or let some other
-   * container go transparent, and a live map reads straight through body text.
+   * The map plate stays below opaque document content. Only the bounded live map-moment slot
+   * may reveal it; raising the plate or making other prose containers transparent breaks the
+   * reading surface.
    */
   const tokens = readFileSync(
     path.resolve(
@@ -820,10 +893,9 @@ describe('room kit · a live plate never sits behind a prose column', () => {
 
 describe('room kit · no room invents its own map moment', () => {
   it('no route defines moment markup outside the kit', () => {
-    // The gap this package closed: the mock renders a moment in seven rooms and the kit had no
-    // component for it, so six of them would each have grown their own.
+    // Routes use the shared map moment component; CSS may style its descendants.
     const offenders = walk(APP_DIR)
-      .filter((file) => /\.(tsx|ts|css)$/.test(file))
+      .filter((file) => /\.(tsx|jsx)$/.test(file))
       .filter((file) => /ds-mapmoment__plate|mm-plate/.test(readFileSync(file, 'utf8')))
       .map((file) => path.relative(APP_DIR, file));
     assert.deepEqual(offenders, [], 'map moment markup belongs to components/room/MapMoment.tsx');
@@ -831,11 +903,8 @@ describe('room kit · no room invents its own map moment', () => {
 });
 
 describe('room kit · the reading progress rule is class-wide', () => {
-  // SP-27 (repo-92n2.34). The gap the ticket named: the rule appeared once, prose-only, inside
-  // SP-11's umbrella body, so /memorial and /records — Reading rooms filed outside SP-11 —
-  // and every other room had no reason to know it applied to them too. Driven from the surface
-  // registry rather than a hand-written route list, so a route added to it later is covered
-  // without anyone remembering to update this file.
+  // Apply the rule to every room registered in the surface catalog so new routes are covered
+  // automatically.
   it('renders on every route the registry resolves to Reading, and only those', () => {
     for (const routePath of CLASSIFIED_PATHS) {
       const surface = surfaceClassFor(routePath);
@@ -866,7 +935,7 @@ describe('room kit · the reading progress rule is class-wide', () => {
 
   it('no screen defines its own progress element', () => {
     const offenders = walk(APP_DIR)
-      .filter((file) => /\.(tsx|ts|css)$/.test(file))
+      .filter((file) => /\.(tsx|jsx)$/.test(file))
       .filter((file) => path.relative(APP_DIR, file) !== 'reading-room.css')
       .filter((file) => /ds-reading-progress|docprog/.test(readFileSync(file, 'utf8')))
       .map((file) => path.relative(APP_DIR, file));

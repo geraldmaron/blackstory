@@ -1,0 +1,37 @@
+{
+  "source": "U.S. Bureau of the Census, U.S. Census of Population: 1960, Vol. I, Characteristics of the Population, Part 23, Massachusetts, Chapter C, General Social and Economic Characteristics",
+  "sourceUrl": "https://www2.census.gov/library/publications/decennial/1960/population-volume-1/37722946v1p23ch4.pdf",
+  "table": "Table 65",
+  "page": "23-144",
+  "boundaryVersion": "us-states-1960",
+  "datasetVintage": "1963 printed volume",
+  "figures": [
+    {
+      "metricId": "lives-income-median",
+      "jurisdictionId": "state:25",
+      "referencePeriod": "1960",
+      "raceEthnicitySlice": "all",
+      "estimate": 6272,
+      "universe": "Families; income in 1959 dollars; THE STATE",
+      "note": "Families block median, not families and unrelated individuals. Second pass agrees."
+    },
+    {
+      "metricId": "lives-income-median",
+      "jurisdictionId": "state:25",
+      "referencePeriod": "1960",
+      "raceEthnicitySlice": "white",
+      "estimate": 6311,
+      "universe": "Families; WHITE; income in 1959 dollars; THE STATE",
+      "note": "Second pass agrees."
+    },
+    {
+      "metricId": "lives-income-median",
+      "jurisdictionId": "state:25",
+      "referencePeriod": "1960",
+      "raceEthnicitySlice": "nonwhite",
+      "estimate": 4383,
+      "universe": "Families; NONWHITE; income in 1959 dollars; THE STATE",
+      "note": "Second pass agrees."
+    }
+  ]
+}

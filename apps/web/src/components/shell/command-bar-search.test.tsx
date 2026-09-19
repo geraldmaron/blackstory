@@ -68,6 +68,14 @@ describe('bar search', () => {
     assert.doesNotMatch(source, /if \(!response\.ok\) \{\s*return \[\];/);
   });
 
+  it('asks for suggestions, not a results page', () => {
+    const source = code('components/shell/CommandBarSearch.tsx');
+    // Twenty rows and the full facet counts were about 66KB per pause in typing; the list shows
+    // eight names. The results page owns the full set.
+    assert.match(source, /pageSize=\$\{SUGGESTION_PAGE_SIZE\}/);
+    assert.match(source, /&facets=0/);
+  });
+
   it('hands the abort signal to fetch so a superseded lookup is canceled', () => {
     const source = code('components/shell/CommandBarSearch.tsx');
     // The endpoint caps concurrent in-flight requests per caller. A lookup the reader has already
@@ -97,10 +105,21 @@ describe('CommandBar destinations', () => {
     assert.match(source, /syncCommandBarClearance/);
     assert.match(source, /ds-bar__brand[\s\S]*href="\/"/);
     assert.match(source, /aria-label="Find"/);
-    assert.match(source, /<RoomsMenu \/>/);
+    assert.match(source, /<RoomsMenu\b/);
     assert.doesNotMatch(source, />\s*Journey\s*</);
     assert.doesNotMatch(source, /\n\s*Door\n/);
     assert.doesNotMatch(source, /onModeChange!\('story'\)/);
+  });
+
+  it('renders Find and Rooms on every route, including /memorial', () => {
+    const source = code('components/shell/CommandBar.tsx');
+    // v9 parked a "quiet bar" on the memorial: brand, search, theme, no Find. That made the
+    // rest of the menu unreachable on the one surface a reader most needs a way out of. The wall
+    // stays quiet; the shell does not.
+    assert.doesNotMatch(source, /QUIET_BAR_PATHS|commandBarIsQuiet/);
+    assert.doesNotMatch(source, /pathname === ['"]\/memorial['"]/);
+    assert.match(source, /aria-label="Find"/);
+    assert.match(source, /<RoomsMenu\b/);
   });
 
   it('does not greet with the catalog count', () => {
@@ -133,15 +152,14 @@ describe('the shell above the error boundary', () => {
 
   it('the shell mounts the plate provider without awaiting its base', () => {
     // `loadMapStageBase()` is the specific dependency SP-07 hoisted this provider away from.
-    // Awaiting it here would make every room force-dynamic and give the shell a way to fail.
+    // Awaiting it here would give the root shell a new failure path above every page boundary.
     assert.doesNotMatch(code('components/SiteShell.tsx'), /loadMapStageBase/);
   });
 });
 
 describe('Journey is not advertised as a room', () => {
   it('the off-Explore bar does not link to /journey or /#journey', () => {
-    // Verified 2026-08-28: /journey is HTTP 404 on apex and www. About already refuses to
-    // list unfinished rooms. A CommandBar href would undo that.
+    // Journey is not a published room, so shell navigation must not advertise it.
     const source = code('components/shell/CommandBar.tsx');
     assert.doesNotMatch(source, /href=["']\/journey["']/);
     assert.doesNotMatch(source, /href=["']\/#journey["']/);

@@ -5,7 +5,7 @@
 import type { Metadata } from 'next';
 import { buildStaticPageMetadata } from '../../lib/seo/metadata-builders';
 import { EmptyState, Notice } from '@repo/ui';
-import { Room, RoomHeader } from '../../components/room';
+import { Room, ReadingEntry, RoomSection } from '../../components/room';
 import { SUPPORT_CONTACT } from '../../lib/config/contact';
 import { WalkOffRamp } from '../walk-off-ramp';
 import '../utility.css';
@@ -23,30 +23,31 @@ export const metadata: Metadata = buildStaticPageMetadata({
 export default function SubmitLeadPage() {
   return (
     <Room>
-      <RoomHeader
+      <ReadingEntry
         pathname="/submit"
-        kicker="Contribute"
         title="Submit a lead"
         lede="Some of the most important sources for this history sit where no compliant automated search can reach them: closed Facebook groups, Discord servers, private forums, family papers in a shoebox, an account nobody ever wrote down. If you know of one, this is where to say so."
       />
 
-      <Notice tone="warning" title="This is not a public post">
-        Leads submitted here are never published as sent. Every submission enters a moderated
-        quarantine queue, is reviewed independently by more than one reviewer, and seeds a private
-        research case only if those reviewers agree it is worth pursuing. It still has to clear the
-        full research and fact-checking process before anything about it is public. Please do not
-        include anyone's home address or other sensitive personal details about a living person.
-      </Notice>
+      <RoomSection id="lead" icon="submit" kicker="Lead" title="What you know" tone="sunk">
+        <Notice tone="warning" title="This is not a public post">
+          Leads submitted here are never published as sent. I read every lead. A submission that is
+          worth pursuing still has to clear the full research and fact-checking process before
+          anything about it is public. Please do not include anyone's home address or other
+          sensitive personal details about a living person.
+        </Notice>
 
-      <SubmitLeadForm />
+        <SubmitLeadForm />
 
-      <EmptyState title="What happens after you submit">
-        A lead is never published on arrival. Several people read it independently, and if they
-        agree it is worth pursuing it becomes a private research candidate. If they disagree, a
-        person decides; disagreement is never silently averaged away. See{' '}
-        <a href="/methodology">how a record gets in</a>. If a form is the wrong shape for what you
-        have, write to <a href={`mailto:${SUPPORT_CONTACT}`}>{SUPPORT_CONTACT}</a> instead.
-      </EmptyState>
+        <EmptyState title="What happens after you submit">
+          A lead is never published on arrival. I read it, after a screen that holds likely-hate
+          aside. If it is worth pursuing it becomes a private research candidate. See{' '}
+          <a href="/faq#ai">how AI is used</a>
+          {' · '}
+          <a href="/methodology">how a record gets in</a>. If a form is the wrong shape for what you
+          have, write to <a href={`mailto:${SUPPORT_CONTACT}`}>{SUPPORT_CONTACT}</a> instead.
+        </EmptyState>
+      </RoomSection>
 
       <WalkOffRamp>Nothing you send here is public on arrival.</WalkOffRamp>
     </Room>

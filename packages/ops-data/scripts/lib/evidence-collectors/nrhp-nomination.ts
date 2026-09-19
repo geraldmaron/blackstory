@@ -1,5 +1,5 @@
 /**
- * repo-n7p6.3 (WS3) — NRHP nomination form parsing.
+ * NRHP nomination form parsing.
  *
  * The National Register nomination form is the richest public-domain source we have for the
  * 2,578 template-only NRHP places in the released catalog, and it was never fetched. NPS

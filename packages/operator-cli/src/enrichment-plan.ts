@@ -1,52 +1,20 @@
-/**
- * Turning a deficit into research.
- *
- * This is the difference between enrichment and prose rewriting, and it is worth stating
- * plainly because the repository has been calling the second one the first. `enrichment-run` is
- * 21 lines: it awaits `runEditorialJudge` and relabels the result. Its input type is an alias of
- * the editorial input type, the CLI dispatches both through one case body, and it fetches
- * nothing — a subject with no `sourceSnippets` can only ever come back `needs_evidence`,
- * because the judge is told its citations must come from the snippets it was handed.
- *
- * Rewriting prose over the same evidence cannot make a record better researched. It can only
- * make it read as though it were.
- *
- * What deep enrichment needs first is a statement of what is MISSING, specific enough to search
- * for. That is what this module produces: deficits in, evidence needs and bounded queries out.
- * Every step here is deterministic — no model call decides what research is needed, because
- * "this claim rests on one lineage" is counting, and a model asked to invent research questions
- * will invent plausible ones rather than the ones this record actually lacks.
- *
- * A query here is a LEAD. Nothing it returns is evidence until it has been independently
- * resolved and fetched through the safe-fetch path. That boundary is the reason this module
- * emits query strings rather than results.
+/** Converts research deficits into bounded evidence needs and search leads.
+ * Planning is deterministic. A lead becomes evidence only after independent retrieval.
  */
 import type { ResearchDeficit, ResearchDeficitCode, ResearchMaturity } from '@repo/domain';
 
-/**
- * The kernel's EvidenceNeed, built here rather than imported so this module stays free of a
- * research-kernel dependency it would only use for one type. The shape is asserted against the
- * real contract in the test, so a schema change fails loudly rather than drifting.
- */
-export type PlannedEvidenceNeed = {
-  readonly schemaVersion: '1.0.0';
-  readonly id: string;
-  readonly questionId: string;
-  readonly claimClass: string;
-  readonly description: string;
-  readonly mandatory: boolean;
-  readonly contradictionSearch: boolean;
-  readonly status: 'open';
-};
+import type {
+  EvidenceNeed,
+  ResearchQuestion,
+  ResearchProfile,
+  PreservationDecision,
+  ResearchExecutionPlan,
+  ResearchTaskSpec,
+  FrontierTask,
+} from '@repo/research-kernel';
 
-export type PlannedQuestion = {
-  readonly schemaVersion: '1.0.0';
-  readonly id: string;
-  readonly caseId: string;
-  readonly question: string;
-  readonly priority: number;
-  readonly status: 'open';
-};
+export type PlannedEvidenceNeed = Omit<EvidenceNeed, 'status'> & { readonly status: 'open' };
+export type PlannedQuestion = Omit<ResearchQuestion, 'status'> & { readonly status: 'open' };
 
 /** A bounded search to run. Results are leads, never evidence. */
 export type PlannedQuery = {
@@ -420,4 +388,168 @@ export function describePlan(plan: EnrichmentPlan): string {
   }
   const mandatory = plan.evidenceNeeds.filter((need) => need.mandatory).length;
   return `${plan.entityId}: ${plan.evidenceNeeds.length} evidence need(s), ${mandatory} mandatory, ${plan.queries.length} bounded queries, ${plan.currentMaturity} -> ${plan.targetMaturity}`;
+}
+
+/** Compile deficit questions into the same resumable protocol used by every domain. */
+export function enrichmentExecutionPlan(input: {
+  plan: EnrichmentPlan;
+  profile: ResearchProfile;
+  runId: string;
+  now: string;
+  decisions: readonly PreservationDecision[];
+  subjectName: string;
+}): ResearchExecutionPlan {
+  const { profile, runId, now, decisions } = input;
+  const caseId = `case-${runId}`;
+  const bounds = profile.budgets.standard;
+  // Each selected query gets one fetched source at most; preserve all unselected needs as open.
+  const capacity = Math.min(bounds.queries, bounds.candidateUrls, bounds.fullCaptures, 60);
+  if (capacity < 1) throw new Error('Enrichment requires a query, candidate and capture allowance');
+  const questions = input.plan.questions.map((q) => ({ ...q, id: `${runId}:${q.id}`, caseId }));
+  const needs = input.plan.evidenceNeeds.map((n) => ({
+    ...n,
+    id: `${runId}:${n.id}`,
+    questionId: `${runId}:${n.questionId}`,
+  }));
+  const queries = input.plan.queries.map((q) => ({ ...q, needId: `${runId}:${q.needId}` }));
+  if (
+    profile.stopping.requireContradictionSearch &&
+    !needs.some((need) => need.contradictionSearch)
+  ) {
+    const questionId = `${runId}:alternatives-question`;
+    const needId = `${runId}:alternatives-need`;
+    questions.push({
+      schemaVersion: '1.0.0',
+      id: questionId,
+      caseId,
+      question: `What evidence challenges the account of ${input.plan.entityId}?`,
+      priority: 100,
+      status: 'open',
+    });
+    needs.push({
+      schemaVersion: '1.0.0',
+      id: needId,
+      questionId,
+      claimClass: 'historical-assertion',
+      description: 'Search competing accounts, corrections and namesakes',
+      mandatory: true,
+      contradictionSearch: true,
+      status: 'open',
+    });
+    queries.unshift({
+      needId,
+      query: `"${input.subjectName}" correction disputed namesake`,
+      seeking: 'counterevidence',
+    });
+  }
+  const contradiction = queries.find(
+    (q) => needs.find((n) => n.id === q.needId)?.contradictionSearch,
+  );
+  const selected = [
+    ...(contradiction ? [contradiction] : []),
+    ...queries.filter((q) => q !== contradiction),
+  ].slice(0, capacity);
+  const tasks: ResearchTaskSpec[] = [];
+  const frontier = (id: string, taskType: FrontierTask['taskType']) => ({
+    schemaVersion: '1.0.0' as const,
+    id,
+    caseId,
+    taskType,
+    targetId: input.plan.entityId,
+    riskWeight: 1,
+    expectedEntropyReduction: 1,
+    sourceNovelty: 0,
+    contradictionValue: 0,
+    normalizedCost: 1,
+    score: 1,
+    hop: 0,
+    status: 'pending' as const,
+  });
+  for (const [index, query] of selected.entries()) {
+    const searchId = `${runId}:search-${index}`;
+    const acquireId = `${runId}:acquire-${index}`;
+    tasks.push({
+      frontier: frontier(
+        searchId,
+        needs.find((n) => n.id === query.needId)?.contradictionSearch
+          ? 'contradictionSearch'
+          : 'query',
+      ),
+      evidenceNeedId: query.needId,
+      dependsOn: [],
+      input: {
+        executor: 'builtin',
+        operation: 'search',
+        query: query.query,
+        seeking: query.seeking,
+        limit: 1,
+      },
+      outputContract: 'ResearchSearchResult',
+      maxAttempts: 1,
+      maxCostUsdPerAttempt: 0,
+    });
+    tasks.push({
+      frontier: frontier(acquireId, 'capture'),
+      evidenceNeedId: query.needId,
+      dependsOn: [searchId],
+      input: { executor: 'builtin', operation: 'acquire', urls: [], limit: 1, decisions },
+      outputContract: 'ResearchAcquisitionResult',
+      maxAttempts: 1,
+      maxCostUsdPerAttempt: 0,
+    });
+    tasks.push({
+      frontier: frontier(`${runId}:report-${index}`, 'verify'),
+      evidenceNeedId: query.needId,
+      dependsOn: [acquireId],
+      input: {
+        executor: 'builtin',
+        operation: 'synthesize',
+        instruction: query.seeking,
+        model: null,
+      },
+      outputContract: 'ResearchTaskReport',
+      maxAttempts: 1,
+      maxCostUsdPerAttempt: 0,
+    });
+  }
+  // Unfunded mandatory questions get an explicit unresolved inventory task, never a fabricated answer.
+  for (const need of needs.filter((n) => !tasks.some((t) => t.evidenceNeedId === n.id)))
+    tasks.push({
+      frontier: frontier(`${runId}:unfunded-${tasks.length}`, 'verify'),
+      evidenceNeedId: need.id,
+      dependsOn: [],
+      input: {
+        executor: 'builtin',
+        operation: 'synthesize',
+        instruction: `No acquisition budget allocated: ${need.description}`,
+        model: null,
+      },
+      outputContract: 'ResearchTaskReport',
+      maxAttempts: 1,
+      maxCostUsdPerAttempt: 0,
+    });
+  if (!tasks.length) throw new Error('No research deficits require execution');
+  return {
+    schemaVersion: '1.0.0',
+    budgetClass: 'standard',
+    profile,
+    run: {
+      schemaVersion: '1.0.0',
+      id: runId,
+      caseId,
+      profileId: profile.id,
+      profileVersion: profile.version,
+      policyVersion: '1.0.0',
+      mode: 'deterministic',
+      status: 'pending',
+      startedAt: now,
+      completedAt: null,
+      costUsd: 0,
+      counts: {},
+      terminalReason: null,
+    },
+    questions,
+    needs,
+    tasks,
+  };
 }

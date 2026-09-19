@@ -1,6 +1,6 @@
 /**
  * Server-side reader for `/data` Phase 1 indicator chart bundles — Postgres snapshot,
- * live `bb_reference.statistical_observations`, or domain fixture fallback.
+ * live `reference.statistical_observations`, or domain fixture fallback.
  */
 import {
   DATA_PAGE_INDICATOR_FIXTURE_BUNDLE,
@@ -50,7 +50,7 @@ async function fetchDataPageObservations(): Promise<readonly DataPageObservation
   try {
     const rows = await queryPostgres<ObservationQueryRow>(
       `SELECT metric_id, jurisdiction_id, reference_period, estimate, source, source_url
-       FROM bb_reference.statistical_observations
+       FROM reference.statistical_observations
        WHERE metric_id = ANY($1::text[])
        ORDER BY reference_period, jurisdiction_id`,
       [[...DATA_PAGE_METRIC_IDS]],

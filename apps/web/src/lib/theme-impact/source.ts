@@ -38,11 +38,9 @@ const releasePacketsCache = createReleaseScopedCache<readonly ThemeImpactPacket[
 });
 
 /**
- * Every packet in the active release (~13 rows, ~107KB), read once per release-scoped cache
- * window and shared across requests. The by-theme and by-id readers below are filters over
- * this list. Before this, `resolveEntityCrossReferences` issued one by-theme query per theme
- * on every entity page render — nine queries a page, 515k calls between 2026-07-20 and
- * 2026-09-02. Throws on read failure; the exported readers own the degraded state.
+ * Every packet in the active release, read once per release-scoped cache window and shared
+ * across requests. The by-theme and by-id readers below filter this list. Throws on read failure;
+ * the exported readers own the degraded state.
  */
 const listReleasePacketsCached = cache(async (): Promise<readonly ThemeImpactPacket[]> => {
   const release = await getPublicActiveReleaseMeta();
@@ -108,11 +106,8 @@ export async function listThemeImpactPacketViews(themeId: string): Promise<{
 }
 
 /* -------------------------------------------------------------------------------------------- *
- * Entity cross-references: resolve every published surface a given entityId appears on.
- * With the legacy /stories + /themes routes retired (repo-dx4n) and release_stories dropped
- * (repo-8dj0), the only remaining surface is theme-impact packets bound via
- * `entityBinding.entityId`, rendered on /chapters. Read-only composition over the existing
- * `listThemeImpactPacketViews` reader — no new live reads.
+ * Entity cross-references resolve theme-impact packets bound through `entityBinding.entityId`.
+ * This is read-only composition over `listThemeImpactPacketViews` and adds no live reads.
  * -------------------------------------------------------------------------------------------- */
 
 export type EntityCrossReferenceSurface = {
@@ -162,8 +157,8 @@ export async function resolveEntityCrossReferences(
 }
 
 /**
- * Themes absent from the table have no chapter yet (repo-8602) and fall back to the chapters
- * index — the same place the `/themes/:path*` catch-all would land them, without the 308 hop.
+ * Themes absent from the table fall back to the chapter index, the same destination as the
+ * `/themes/:path*` catch-all but without a redirect hop.
  * The table itself lives in `lib/redirects/theme-alias-table.mjs`, which `next.config.mjs` also
  * generates its `/themes` rules from, so an in-app href and its redirect cannot disagree.
  */

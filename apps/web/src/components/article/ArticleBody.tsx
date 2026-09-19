@@ -7,10 +7,9 @@
  * Reading-surface conventions (tuned on the redlining chapter, then rolled out):
  *  - Charts/graphs (`figure`) render open and are never collapsible — the data
  *    picture is part of the argument, not an aside.
- *  - Evidence artifacts (`primaryDocument`, `timeline`, `dispute`, `mapInset`)
- *    render as `<details>` disclosures that begin collapsed, so the prose reads
- *    as prose and the reader opens the receipt when they want it. No JS: the
- *    native element carries the state and stays accessible.
+ *  - Primary documents begin open so the evidence is part of the reading experience.
+ *    Other evidence drawers remain collapsible. Native details keep keyboard access
+ *    and work without JavaScript.
  *  - Consecutive `stat` blocks coalesce into one compact comparison rail instead
  *    of a vertical wall of full-width cards.
  */
@@ -26,6 +25,8 @@ import type {
 } from '../../lib/articles/hydrate';
 import { extractChapterHeadings } from '../../lib/articles/heading-anchors';
 import { ArticleCitationMarks, ArticleProse } from './ArticleProse';
+import { ArchiveFigure } from '../room/Evidence';
+import { DestinationIcon } from '../patterns/DestinationIcon';
 
 void React;
 
@@ -70,15 +71,19 @@ function ArtifactDrawer({
   kind,
   lead,
   children,
+  open = false,
 }: {
   readonly kind: string;
   readonly lead: string;
   readonly children: React.ReactNode;
+  readonly open?: boolean;
 }) {
   return (
-    <details className="ds-article__drawer">
+    <details className="ds-article__drawer" open={open}>
       <summary className="ds-article__drawer-summary">
-        <span className="ds-article__drawer-kind ds-mono">{kind}</span>
+        <span className="ds-article__drawer-kind ds-mono">
+          <DestinationIcon id="artifact" /> {kind}
+        </span>
         <span className="ds-article__drawer-lead">{lead}</span>
         <span className="ds-article__drawer-cue" aria-hidden="true" />
       </summary>
@@ -184,16 +189,11 @@ function Block({
     case 'primaryDocument':
       return (
         <ArtifactDrawer
+          open
           kind={block.dateLabel ? `Primary document · ${block.dateLabel}` : 'Primary document'}
           lead={block.title}
         >
           <figure className="ds-article__document">
-            <div className="ds-article__document-head">
-              {block.dateLabel ? (
-                <span className="ds-article__document-date ds-mono">{block.dateLabel}</span>
-              ) : null}
-              <span className="ds-article__document-title">{block.title}</span>
-            </div>
             {block.quote ? (
               <blockquote className="ds-article__document-quote">{block.quote}</blockquote>
             ) : null}
@@ -245,14 +245,7 @@ function Block({
       );
     case 'image':
       return (
-        <figure className="ds-article__image">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={block.image.url} alt={block.image.alt} loading="lazy" />
-          <figcaption className="ds-article__figcaption">
-            {block.caption ? <span>{block.caption} · </span> : null}
-            <span className="ds-article__credit">{block.image.credit}</span>
-          </figcaption>
-        </figure>
+        <ArchiveFigure image={block.image} {...(block.caption ? { caption: block.caption } : {})} />
       );
     default:
       return null;

@@ -1,6 +1,6 @@
 /**
- * Shape ranked relationship candidates into bb_research.landscape_candidates rows.
- * Candidate generator only — never writes bb_canonical.entity_relationships.
+ * Shape ranked relationship candidates into research.landscape_candidates rows.
+ * Candidate generator only — never writes canonical.entity_relationships.
  */
 import type { RankedRelationshipCandidate } from './relationship-candidate-ranking.ts';
 

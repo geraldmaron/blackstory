@@ -17,6 +17,7 @@ docs/bb-001
 .beads/backup
 .beads/export-state.json
 .beads/**/*.darc
+supabase/.temp
 
 # Published GitHub Pages output, committed on purpose. These are exactly the paths
 # scripts/publish-docs-pages.sh rm -rf's and re-copies from apps/docs/out on every publish;
@@ -44,6 +45,9 @@ apps/mobile
 docs/ui/mobile-polish-mockups.html
 docs/ui/prototypes
 
+# Raw evaluation receipts are hash-bound evidence; preserve the exact emitted bytes.
+packages/testing/src/gold-corpus/artifacts
+
 # Generated geometry fixture — reformatting rewrites every coordinate line.
 scripts/fixtures
 
@@ -53,3 +57,5 @@ brand/qa
 # Local, gitignored article drafts (packages/ops-data/drafts/.gitignore ignores `*`). CI never
 # sees these, but without this entry `pnpm format:check` fails locally on scratch output.
 packages/ops-data/drafts
+
+.playwright-mcp/

@@ -52,22 +52,16 @@ Reuse domain provenance gates (`requiresResolvedRights('media')`,
 `PUBLISHABLE_RIGHTS_STATUSES`). Release builders must drop `primaryImage` when
 the rights gate fails rather than publishing unclear media.
 
-## Leftover GCS / public-media (photos)
+## Entity media storage
 
-> **Current media path (2026-08-28):** Supabase Storage on `blackstory-app`. The GCS /
-> Firestore projection notes below are leftover dual-serve history.
-
-Entity photos are **not** Firebase Storage objects. The Firestore-era promote/clear scripts
-that uploaded bytes to the GCP `black-book-efaaf-public-media` bucket and patched a Firestore
-projection have been retired with the Firestore wind-down
-(`docs/data/firebase-wind-down.md`). The live path is Postgres-only:
+Stored entity photos use Supabase Storage. Media metadata and release projections use Postgres.
 
 | Concern | Convention |
 |---------|------------|
 | Object path | `public/entities/{entityId}/primary.png` (helper: `entityPrimaryImageObjectPath`), for stored objects in the Supabase `public-media` bucket |
 | Projection fields | `primaryImage.url`, `alt`, `credit`, `rightsStatus`, optional `objectPath` / dimensions |
 | Write gate | `preparePublicEntityProjectionForWrite` / `sanitizePrimaryImageForRelease` drop incomplete images; requires learning-index `summary` |
-| Assign an image | `packages/ops-data/scripts/pin-commons-primary-images.ts` turns a Commons auto-propose plan into `bb_public.release_entities.projection` + `bb_canonical.entity_media` rows |
+| Assign an image | `packages/ops-data/scripts/pin-commons-primary-images.ts` turns a Commons auto-propose plan into `published.release_entities.projection` + `canonical.entity_media` rows |
 | Plan inputs | `dry-run-commons-qid-leftover.ts` (people/institutions), `resolve-nrhp-commons-images.ts` (NRHP places) |
 
 ```bash
@@ -94,11 +88,11 @@ Storage need the object to be publicly readable in the `public-media` bucket.
 | This contract | `docs/ui/learning-index-entity.md` |
 | Brand story / voice | `docs/ui/story.md` |
 | Domain helpers | `packages/domain/src/learning-index/` |
-| Projection schema | `packages/firebase/src/firestore/types.ts` (`publicEntityProjectionSchema`) |
-| Entity media paths | `packages/firebase/src/firestore/entity-media.ts` |
+| Projection schema | `packages/ops-data/src/records/types.ts` (`publicEntityProjectionSchema`) |
+| Entity media paths | `packages/ops-data/src/records/entity-media.ts` |
 | Serialize choke point | `packages/security/src/serialize.ts` |
 | Entity page | `apps/web/src/app/entity/[id]/page.tsx` |
 | Quiet entity name links | `apps/web/src/components/entity/EntityLink.tsx` (`ds-entity-link`) |
 | Catalog → relationships | `packages/domain/src/graph/catalog-related.ts` + `publish-national-catalog.ts` |
-| Immutable releases | ADR-004 (removed 2026-07-24; see `docs/decisions-carryover.md` and `docs/runbooks/release-activation-postgres.md`) |
-| Public-media bucket matrix | `infra/gcp/storage-buckets.matrix.md` |
+| Immutable releases | `docs/decisions-carryover.md` and `docs/runbooks/release-activation-postgres.md` |
+| Public-media bucket matrix | `docs/data/supabase-storage-cutover.md` |

@@ -1,5 +1,5 @@
 /**
- * Regression tests for the pin-saturation linter (repo-x8j6). The defect it exists to catch:
+ * Regression tests for the pin-saturation linter. The defect it exists to catch:
  * people pinned at the institution that honors or buried them rather than anywhere they lived.
  */
 import assert from 'node:assert/strict';

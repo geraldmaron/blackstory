@@ -1,5 +1,5 @@
 /**
- * repo-n7p6.3 (WS3) — street-address redaction for address-restricted properties.
+ * Street-address redaction for address-restricted properties.
  *
  * The National Register withholds locations for properties vulnerable to vandalism, looting or
  * trespass (archaeological sites, burial grounds, some rural churches and homesteads). 63 rows

@@ -17,7 +17,7 @@
  */
 'use client';
 
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Notice } from '@repo/ui';
 import { focusLandmark } from '../../lib/keyboard/use-focus-trap';
 import { CommandBar } from '../../components/shell/CommandBar';
@@ -60,6 +60,7 @@ import { useCommandContext } from './hooks/use-command-context';
 import { useExploreUrlSync } from './hooks/use-explore-url-sync';
 import { atlasWalkHref } from '../../lib/place/public-place-path';
 import { placeArrivalQuery } from '../../lib/discovery/discovery-arrival';
+import { clearPinContinuity, readPinContinuity } from '../../lib/discovery/pin-continuity';
 import './atlas.css';
 
 void React;
@@ -73,16 +74,25 @@ void React;
 const PLACE_LABEL_LAYER_IDS = ['plate-place-city', 'explore-street-label'] as const;
 
 /**
- * The dock's chips, in the order the narrow switcher shows them. Wide only ever renders the two
- * that carry a hide control of their own; the other two exist for the narrow layout, where the
- * dock is the only way to change which single instrument is on screen.
+ * The dock's chips, in the order the narrow switcher shows them.
+ *
+ * Every chip that renders is a toggle: `aria-pressed` says whether its instrument is on screen and
+ * pressing it flips that. Filters is the one chip that renders at every width whatever its state,
+ * because it is the control readers look for first and it used to disappear the moment the panel it
+ * governs was open — the only way to close Filters was a hide control inside the panel, and the only
+ * way to reopen it was a chip that only existed while it was shut. The other three still appear on
+ * the wide layout when their own panel is hidden, and always on the narrow one, where the dock is
+ * the switcher that says which single instrument the reader is holding.
  */
 const NARROW_INSTRUMENTS = [
-  { key: 'lens', label: 'Lens' },
+  { key: 'lens', label: 'Filters' },
   { key: 'results', label: 'Records' },
-  { key: 'decade', label: 'Decade' },
-  { key: 'camera', label: 'Camera' },
+  { key: 'decade', label: 'When' },
+  { key: 'camera', label: 'View' },
 ] as const satisfies readonly { key: keyof PanelVisibility; label: string }[];
+
+/** Renders at every width in both states, so opening and closing Filters is one control. */
+const ALWAYS_DOCKED: keyof PanelVisibility = 'lens';
 
 /** The narrow slice of the MapLibre instance the label toggle needs. `stage.getMap()` types as
  * `AtlasCameraTarget` (camera-only, by design — MapStage.tsx §doc comment), so this file casts
@@ -96,9 +106,14 @@ type LabelLayerMap = {
 
 export type AtlasExperienceProps = {
   readonly initial: SerializableExploreViewModel;
+  /**
+   * Door browse posture (morph-from-home or cold `/explore`). Keeps the room CommandBar;
+   * exit back to the journey is owned by DoorImmersive (outside this pointer-events:none stack).
+   */
+  readonly embedded?: boolean;
 };
 
-export function AtlasExperience({ initial }: AtlasExperienceProps) {
+export function AtlasExperience({ initial, embedded = false }: AtlasExperienceProps) {
   const stage = useMapStage();
   const view = useMemo(() => hydrateExploreViewModel(initial), [initial]);
   const toasts = useToasts();
@@ -359,6 +374,26 @@ export function AtlasExperience({ initial }: AtlasExperienceProps) {
       view.allFeatures,
       holdingPlaceArrival,
     );
+
+  /** Restore the last map→record pin when the URL did not already select one. */
+  const continuityRestoredRef = useRef(false);
+  useEffect(() => {
+    if (continuityRestoredRef.current) return;
+    if (initial.viewState.selected) return;
+    const saved = readPinContinuity();
+    if (!saved) return;
+    continuityRestoredRef.current = true;
+    const byId = view.allFeatures.find((feature) => feature.properties.entityId === saved.entityId);
+    if (byId) {
+      selectById(saved.entityId);
+    } else {
+      camera.flyToRecord({
+        center: [saved.lng, saved.lat],
+        place: saved.label ?? 'Place',
+      });
+    }
+    clearPinContinuity();
+  }, [camera, initial.viewState.selected, selectById, view.allFeatures]);
   const { copy, citationFor, nearMe } = useReaderActions(toasts, camera);
   const { paletteRecords, destinations, paletteStates, featureById } = usePaletteData(
     view,
@@ -422,20 +457,23 @@ export function AtlasExperience({ initial }: AtlasExperienceProps) {
        else. `handleKeyStroke` walks up from the keystroke's target looking for it, so Explore
        marking its own root is the entire scope contract — no route check, no second list. */
     <div
-      className="ds-atlas"
+      className={embedded ? 'ds-atlas ds-atlas--embedded' : 'ds-atlas'}
       data-key-scope="instrument"
       data-chrome={chromeHidden ? 'hidden' : 'shown'}
       data-mode={mode}
+      data-embedded={embedded ? 'true' : undefined}
     >
-      <CommandBar
-        mode={mode}
-        onModeChange={setMode}
-        onOpenPalette={() => setPaletteOpen(true)}
-        savedCount={collection.records.length}
-        onOpenSaved={() => setSavedOpen(true)}
-        onOpenShortcuts={() => setShortcutsOpen(true)}
-        onToggleTheme={commandContext.toggleTheme}
-      />
+      {embedded ? null : (
+        <CommandBar
+          mode={mode}
+          onModeChange={setMode}
+          onOpenPalette={() => setPaletteOpen(true)}
+          savedCount={collection.records.length}
+          onOpenSaved={() => setSavedOpen(true)}
+          onOpenShortcuts={() => setShortcutsOpen(true)}
+          onToggleTheme={commandContext.toggleTheme}
+        />
+      )}
 
       {!stage.mapAvailable ? (
         <div className="ds-atlas__notice">
@@ -496,6 +534,7 @@ export function AtlasExperience({ initial }: AtlasExperienceProps) {
           onShowLegend={() => setLegendOpen(true)}
           onReset={resetLens}
           onHide={() => hidePanel('lens')}
+          escapeDismiss={narrow}
         />
       ) : null}
 
@@ -562,17 +601,21 @@ export function AtlasExperience({ initial }: AtlasExperienceProps) {
       {/*
        * The dock. Two different objects sharing one row of chips.
        *
-       * Wide: chips for whatever the reader has hidden, and nothing else. `data-dock` is the
-       * focus contract's handle — hiding a panel moves focus to the chip that brings it back.
+       * Wide: the Filters toggle, plus a chip for anything else the reader has hidden. `data-dock`
+       * is the focus contract's handle — hiding a panel moves focus to the chip that brings it back.
        *
        * Narrow: the four-way instrument switcher. Four panels do not fit on a phone, so the
        * surface shows one at a time and the dock is how the reader changes which — the mechanism
        * the dock already existed for, rather than a second one invented for small screens.
        */}
-      {(narrow || !panels.lens || !panels.results) && !chromeHidden ? (
-        <div className="ds-atlas__dock" data-switcher={narrow ? 'true' : undefined}>
+      {!chromeHidden ? (
+        <div
+          className="ds-atlas__dock"
+          data-switcher={narrow ? 'true' : undefined}
+          data-browse-chrome="true"
+        >
           {NARROW_INSTRUMENTS.map(({ key, label }) => {
-            if (!(narrow || !panels[key])) return null;
+            if (!(narrow || key === ALWAYS_DOCKED || !panels[key])) return null;
             // A hidden Lens/Results is a peek, not a blank chip: the reader closed the panel, not
             // its state, so the dock keeps reporting what that state is — the literal "closed but
             // still visible" instrument the chip was always meant to be, just without a live
@@ -590,8 +633,8 @@ export function AtlasExperience({ initial }: AtlasExperienceProps) {
                 key={key}
                 type="button"
                 data-dock={key}
-                aria-pressed={narrow ? panels[key] : undefined}
-                onClick={() => (narrow && panels[key] ? hidePanel(key) : restorePanel(key))}
+                aria-pressed={panels[key]}
+                onClick={() => (panels[key] ? hidePanel(key) : restorePanel(key))}
               >
                 <span className="ds-atlas__dock-label">{label}</span>
                 {detail ? <span className="ds-atlas__dock-detail">{detail}</span> : null}
@@ -653,13 +696,10 @@ export function AtlasExperience({ initial }: AtlasExperienceProps) {
             setPaletteOpen(false);
             return;
           }
-          // The palette searches the whole index, but only records with a map feature in the
-          // current projection can be selected on the map. Without this the click was
-          // swallowed: the palette closed and nothing opened, which reads as a broken search.
-          // Every record has a page even when it has no pin, so fall through to it. `kind`
-          // matters here (repo-jnmwu): the palette's corpus now includes entities that were
-          // never mappable at all — mostly laws, cases, and national organizations — and
-          // without it every one of them fell into the place-page guess below and 404'd.
+          // The palette searches the whole index, but only records with a feature in the current
+          // projection can be selected on the map. Every record still has a page, so records with
+          // no pin fall through to their page. `kind` selects the correct route for entities that
+          // are not mappable, including laws, cases, and national organizations.
           setPaletteOpen(false);
           const walk = atlasWalkHref({
             displayName: record.name,

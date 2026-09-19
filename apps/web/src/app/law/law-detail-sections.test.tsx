@@ -1,6 +1,6 @@
 /**
  * Behavioral render tests for the `/law/[slug]` connected-records hand-off, camera dignity, and
- * prev/next nav — the three acceptance gates on SP-12c (repo-92n2.12.3). `law-page.test.ts` pins
+ * prev/next navigation. `law-page.test.ts` pins
  * the source-level contract; this file exercises real seed data through the real
  * `buildLensHandoff` guard, so a reason string that later drifts into implying causation fails
  * loudly here (a thrown `CausalReasonStringError` during render) rather than only in production.

@@ -7,7 +7,7 @@ project_id = "twykhihqkcldpreuovay"
 [api]
 enabled = true
 # Product tables live in bb_* schemas; expose only what grants allow.
-schemas = ["public", "bb_public", "bb_submissions"]
+schemas = ["public", "published", "submissions"]
 extra_search_path = ["public", "extensions"]
 max_rows = 1000
 
@@ -23,7 +23,7 @@ enabled = false
 
 [auth]
 enabled = true
-# Roles for RLS live in app_metadata.bb_role — never user_metadata.
+# Roles for RLS live in app_metadata.app_role — never user_metadata.
 
 [studio]
 enabled = true

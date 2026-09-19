@@ -3,7 +3,7 @@
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { listPublicEntities } from '../../data/public-seed';
+import { listPublicEntities, type PublicEntityView } from '../../data/public-seed';
 import {
   getHistoryGraphReleaseArtifact,
   resetHistoryGraphReleaseArtifactForTests,
@@ -23,20 +23,19 @@ test.beforeEach(() => {
 });
 
 test('resolveHistoryRelationships extracts evidence-backed edges from catalog related entries', () => {
-  const entities = listPublicEntities();
+  const entities = releasedRelationshipFixtures();
   const relationships = resolveHistoryRelationships(entities, HISTORY_GRAPH_GENERATED_AT);
-  assert.ok(relationships.length >= 3);
+  assert.ok(relationships.length === 1);
   for (const relationship of relationships) {
     assert.ok(relationship.evidenceIds.length > 0);
   }
 });
 
 test('history graph connection count follows visible published edges, not a hard cap', () => {
-  // The same slice -> nodes -> edges -> connection-count pipeline Explore reads (build-history-graph
-  // via explore-view-model), rather than the deleted /history/api view-model chain (repo-92n2.36).
-  const entities = listPublicEntities();
+  // Exercise the visible graph slice through its connection counts.
+  const entities = releasedRelationshipFixtures();
   const entitiesById = new Map(entities.map((entity) => [entity.id, entity]));
-  const artifact = getHistoryGraphReleaseArtifact();
+  const artifact = getHistoryGraphReleaseArtifact(entities);
   const relationships = resolveHistoryRelationships(entities, HISTORY_GRAPH_GENERATED_AT);
   const slice = resolveHistoryGraphSlice(artifact, 'all-time', undefined);
   const nodes = buildHistoryNodes(slice, DEFAULT_HISTORY_FILTERS, entitiesById);
@@ -44,9 +43,37 @@ test('history graph connection count follows visible published edges, not a hard
   const edges = buildHistoryEdges(slice, relationships, entitiesById, visibleNodeIds);
   const nodesWithCounts = withHistoryConnectionCounts(nodes, edges);
 
-  assert.ok(edges.length >= 3);
+  assert.ok(edges.length === 1);
   assert.ok(
     nodesWithCounts.some((node) => node.connectionCount > 0),
     'connected nodes should reflect edge inventory',
   );
+});
+
+function releasedRelationshipFixtures(): readonly PublicEntityView[] {
+  const [first, second] = listPublicEntities();
+  return [
+    {
+      ...first!,
+      related: [{ id: second!.id, type: 'related_to', direction: 'outgoing' }],
+      claims: [
+        {
+          id: 'reviewed-relationship-claim',
+          predicate: 'related_to',
+          object: second!.id,
+          confidenceLevel: 'high',
+          citationSource: 'archive',
+          citationLabel: 'Exact relationship',
+          citationHref: 'https://archive.example.org/relationship',
+        },
+      ],
+    },
+    { ...second!, related: [], claims: [] },
+  ];
+}
+
+test('missing relationship evidence cannot trigger a seed fallback or borrow entity-wide citations', () => {
+  const entities = releasedRelationshipFixtures().map((entity) => ({ ...entity, claims: [] }));
+  assert.deepEqual(resolveHistoryRelationships(entities, HISTORY_GRAPH_GENERATED_AT), []);
+  assert.deepEqual(getHistoryGraphReleaseArtifact(entities).allTimeView.edgeIds, []);
 });

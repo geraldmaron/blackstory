@@ -20,7 +20,7 @@
  * with the recomputed movement_significance record (the existing documented_racial_terror
  * entries are kept exactly as published); the same basis on the canonical row, whose
  * movement_significance entry had no evidence; and the search-index facets for both fields.
- * Canonical claim text lives in bb_canonical.claim_versions and is versioned there; this script
+ * Canonical claim text lives in canonical.claim_versions and is versioned there; this script
  * reports whether a canonical claim row exists but leaves that history untouched.
  *
  * A straight recompute is deliberately not used: on the Persons record it would also promote
@@ -147,7 +147,7 @@ async function main(): Promise<void> {
   try {
     const releaseId = (
       await client.query<{ release_id: string }>(
-        'SELECT release_id FROM bb_public.v_active_release_id',
+        'SELECT release_id FROM published.v_active_release_id',
       )
     ).rows[0]?.release_id;
     if (!releaseId) throw new Error('no active release');
@@ -160,7 +160,7 @@ async function main(): Promise<void> {
         labels: readonly string[] | null;
       }>(
         `SELECT claims, projection->'notabilityBasis' AS basis, projection->'notabilityLabels' AS labels
-         FROM bb_public.release_entities WHERE release_id = $1 AND entity_id = $2`,
+         FROM published.release_entities WHERE release_id = $1 AND entity_id = $2`,
         [releaseId, fix.entityId],
       );
       const row = live.rows[0];
@@ -187,7 +187,7 @@ async function main(): Promise<void> {
         );
       }
       const canonicalClaimRows = await client.query<{ n: string }>(
-        'SELECT count(*) AS n FROM bb_canonical.claims WHERE id = $1',
+        'SELECT count(*) AS n FROM canonical.claims WHERE id = $1',
         [fix.claim.id],
       );
 
@@ -203,14 +203,14 @@ async function main(): Promise<void> {
       );
       console.log(`  labels: ${(row.labels ?? []).length} -> ${nextLabels.length}`);
       console.log(
-        `  bb_canonical.claims rows for this claim id: ${canonicalClaimRows.rows[0]?.n ?? '0'}`,
+        `  canonical.claims rows for this claim id: ${canonicalClaimRows.rows[0]?.n ?? '0'}`,
       );
 
       if (DRY_RUN || !APPLY) continue;
 
       await client.query('BEGIN');
       await client.query(
-        `UPDATE bb_public.release_entities
+        `UPDATE published.release_entities
          SET projection = jsonb_set(
                jsonb_set(
                  jsonb_set(projection, '{claims}', $3::jsonb, true),
@@ -228,7 +228,7 @@ async function main(): Promise<void> {
         ],
       );
       await client.query(
-        `UPDATE bb_public.search_index
+        `UPDATE published.search_index
          SET facets = jsonb_set(
                jsonb_set(COALESCE(facets, '{}'::jsonb), '{notabilityBasis}', $3::jsonb, true),
                '{notabilityLabels}', $4::jsonb, true
@@ -237,7 +237,7 @@ async function main(): Promise<void> {
         [releaseId, fix.entityId, JSON.stringify(nextBasis), JSON.stringify(nextLabels)],
       );
       await client.query(
-        `UPDATE bb_canonical.entities SET notability_basis = $2::jsonb, updated_at = now() WHERE id = $1`,
+        `UPDATE canonical.entities SET notability_basis = $2::jsonb, updated_at = now() WHERE id = $1`,
         [fix.entityId, JSON.stringify(nextBasis)],
       );
       await client.query('COMMIT');

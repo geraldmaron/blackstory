@@ -9,7 +9,7 @@ import type { LawStatus } from '@repo/domain/entity-status';
 import type { ConfidenceTierKey } from '../../lib/map-experience/confidence-icons';
 import { EditionFactIcon } from '../../components/patterns/EditionFactIcon';
 import { LegalStatusBadge } from '../../components/legal/LegalStatusBadge';
-import { humanizeLegalKind } from '../../components/legal/format';
+import { humanizeLegalKind, humanizeLegalTopic } from '../../components/legal/format';
 import { Anatomy } from '../../components/room';
 import { jurisdictionLabel } from './LawBrowseSections';
 import '../../components/patterns/edition-fact-icon.css';
@@ -47,7 +47,10 @@ export function LawAnatomyStrip({
   citation,
   topics,
 }: LawAnatomyStripProps) {
-  const topicLine = topics.length > 0 ? topics.slice(0, 3).join(' · ') : 'Topic not yet tagged';
+  const topicLine =
+    topics.length > 0
+      ? topics.slice(0, 3).map(humanizeLegalTopic).join(' · ')
+      : 'Topic not yet tagged';
 
   return (
     <Anatomy

@@ -106,11 +106,9 @@ test('hydrateArticle keeps resolvable blocks and attaches source numbers', () =>
   assert.deepEqual(stat.sourceNumbers, [1]);
 });
 
-test("a mapInset block carries the entity's own violence-adjacency signal through (SP-26, repo-92n2.33)", () => {
-  // MapInsetMoment (the room kit's map moment, threaded through ArticleBody) derives PLATE - STILL
-  // from these fields via `resolveMomentPlain`. Before this test existed, hydrate.ts's mapInset
-  // case discarded topicTags/topicIds/kind/displayName entirely, so a chapter's map inset for a
-  // lynching or massacre entity had no way to render as anything but PLATE - LIVE.
+test("a mapInset block carries the entity's own violence-adjacency signal through", () => {
+  // MapInsetMoment derives PLATE - STILL from these fields via `resolveMomentPlain`, so hydration
+  // must retain them for violence-adjacent subjects.
   const violentEntity: PublicEntityView = {
     ...listPublicEntities()[0]!,
     id: 'ent_test_duluth_1920',

@@ -3,7 +3,7 @@
 - **Bead**: `repo-fsxq` (MOB-001 human gates)
 - **Blocks**: `black-book-mobile-020` (MOB-020), first real EAS preview submit, TestFlight/Play closed testing
 - **Source**: identity/gate decision record (removed 2026-07-24; proposed bundle IDs are now implemented in `apps/mobile/app.config.ts`)
-- **Status**: **none complete** for account enrollment — verified 2026-07-22; store-search research notes added 2026-07-22; Firebase §8 superseded for v1
+- **Status**: **none complete** for account enrollment — verified 2026-07-22; store-search research notes added 2026-07-22
 
 Owner-ordered checklist. Complete in sequence where noted; do not mark items done until evidence is recorded (account IDs, screenshots of console settings, or 1Password item links — never paste secrets into git).
 
@@ -138,17 +138,15 @@ Store listings require live HTTPS URLs on the production domain.
 
 ---
 
-## 8. Signing / submit secrets in 1Password (Firebase App Check N/A)
+## 8. Signing / submit secrets in 1Password
 
-**Superseded for v1 mobile client:** `apps/mobile` uses Postgres-backed `X-BlackStory-Client` attestation — **no** `@react-native-firebase/*`, **no** `GoogleService-Info.plist` / `google-services.json` in the native app (see `apps/mobile/README.md`, `apps/mobile/PRIVACY.md`). Do **not** block preview builds on Firebase mobile app registration.
-
-Still required for EAS Submit automation (store when ready):
+**Superseded for v1 mobilMobile API requests carry a forgeable client-version header. Signing and submission credentials
+belong in 1Password and the intended build provider; the header grants no server authorization.Submit automation (store when ready):
 
 - [ ] Apple Developer / App Store Connect API key (Issuer ID, Key ID, `.p8`) in 1Password
 - [ ] Google Play service account JSON (if using EAS Submit for Android)
 - [ ] EAS CI token (scoped, revocable)
 
-Optional later: if a future bead reintroduces Firebase Crashlytics or App Check, register iOS/Android apps under `black-book-efaaf` then — not a MOB-020 gate today.
 
 ---
 

@@ -151,7 +151,7 @@
 }
 
 /* The one section a reader may arrive looking for. Flagged, not shouted. */
-.ds-terms__section--flagged .ds-section__title {
+.ds-terms__section--flagged .ds-room-section__title {
   color: var(--ds-accent);
 }
 

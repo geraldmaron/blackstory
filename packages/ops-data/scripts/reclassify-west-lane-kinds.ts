@@ -1,39 +1,8 @@
 /**
- * repo-n7p6.24 — 14 `west_*` records were published as `kind='person'` but are parks, hotels,
- * buildings, a military unit, a law, and three history topics.
- *
- * How they were found, and how to find the next batch: for every active-release row with
- * `kind='person'` and a `bb_canonical.entity_identifiers` wikidata value, fetch
- * `Special:EntityData/{qid}.json` and check that P31 contains Q5 (human). None of the records
- * below do. Their QIDs are CORRECT — the Wikidata item genuinely is a park or a hotel; it is the
- * `kind` on our side that is wrong. That is why this script only rewrites `kind`, and never
- * touches identifiers.
- *
- * Each target kind is taken from the record's own P31, not guessed from its name:
- *   urban park / seaside resort / protected area / homestead / historic site / hotel / clubhouse /
- *   archaeological site  -> place
- *   military unit                                                                 -> organization
- *   (Oregon black exclusion laws: no P31, description "Law attempt of Oregon")     -> law
- *   aspect of history                                                             -> other
- *
- * `other` for the three "history of ..." rows is deliberate: the published kind vocabulary
- * (ENTITY_KINDS) has no `topic` member, and calling an overview article a place or an event would
- * be a second miscategorization. Whether encyclopedia-topic rows belong in the entity catalog at
- * all is a separate question, left open on the bead.
- *
- * The person-only status fields go too. These rows carried `status='unknown'` — a value from the
- * living/deceased/unknown vocabulary — which is meaningless on a hotel and was polluting
- * person-status accounting. They are removed rather than replaced: we have no evidence for a
- * place-status on these records, and inventing `active` or `historic` would be a guess.
- *
- * Usage (from repo root):
- *   set -a && source apps/web/.env.local && set +a && export DATABASE_SSL=1
- *   node --conditions development --import tsx \
- *     packages/ops-data/scripts/reclassify-west-lane-kinds.ts
- *
- * Apply:
- *   DRY_RUN=0 RECLASSIFY_WEST_LANE_KINDS_APPLY=1 node --conditions development --import tsx \
- *     packages/ops-data/scripts/reclassify-west-lane-kinds.ts
+ * Correct kind assignments for the explicit west-lane targets from their documented Wikidata
+ * types. Identifiers stay intact; person-only status fields are removed without inventing a
+ * replacement status. Overview topics use other because ENTITY_KINDS has no topic member.
+ * Default dry-run; writes require DRY_RUN=0 and RECLASSIFY_WEST_LANE_KINDS_APPLY=1.
  */
 import pg from 'pg';
 import { remindToRepublishCatalogArtifacts } from './lib/catalog-republish-reminder.ts';
@@ -132,9 +101,9 @@ async function main(): Promise<void> {
               re.kind AS release_kind,
               re.projection->>'kind' AS projection_kind,
               re.projection->>'status' AS projection_status
-         FROM bb_public.release_entities re
-         JOIN bb_public.v_active_release_id r ON r.release_id = re.release_id
-         LEFT JOIN bb_canonical.entities e ON e.id = re.entity_id
+         FROM published.release_entities re
+         JOIN published.v_active_release_id r ON r.release_id = re.release_id
+         LEFT JOIN canonical.entities e ON e.id = re.entity_id
         WHERE re.entity_id = ANY($1::text[])
         ORDER BY re.entity_id`,
       [ids],
@@ -162,28 +131,28 @@ async function main(): Promise<void> {
     await client.query('BEGIN');
     try {
       for (const target of RECLASSIFICATIONS) {
-        const c = await client.query(`UPDATE bb_canonical.entities SET kind = $2 WHERE id = $1`, [
+        const c = await client.query(`UPDATE canonical.entities SET kind = $2 WHERE id = $1`, [
           target.entityId,
           target.kind,
         ]);
         canonical += c.rowCount ?? 0;
 
         const e = await client.query(
-          `UPDATE bb_public.release_entities re
+          `UPDATE published.release_entities re
               SET projection = (
                     jsonb_set(re.projection, '{kind}', to_jsonb($2::text), true)
                     - 'status' - 'livingStatus' - 'statusProvenance' - 'statusHistory'
                   )
-             FROM bb_public.v_active_release_id r
+             FROM published.v_active_release_id r
             WHERE re.release_id = r.release_id AND re.entity_id = $1`,
           [target.entityId, target.kind],
         );
         release += e.rowCount ?? 0;
 
-        // The search doc is served from `facets` verbatim (see repo-n7p6.28), so it must be
-        // rewritten alongside the column, not instead of it.
+        // Update facets alongside the status column because public search serves the facets
+        // document.
         const s = await client.query(
-          `UPDATE bb_public.search_index si
+          `UPDATE published.search_index si
               SET kind = $2,
                   status = NULL,
                   facets = CASE
@@ -191,7 +160,7 @@ async function main(): Promise<void> {
                       THEN jsonb_set(si.facets, '{kind}', to_jsonb($2::text), true) - 'status'
                     ELSE si.facets
                   END
-             FROM bb_public.v_active_release_id r
+             FROM published.v_active_release_id r
             WHERE si.release_id = r.release_id AND si.entity_id = $1`,
           [target.entityId, target.kind],
         );
@@ -204,7 +173,7 @@ async function main(): Promise<void> {
     }
 
     console.log(
-      `\nApplied: bb_canonical.entities=${canonical} release_entities=${release} search_index=${search}`,
+      `\nApplied: canonical.entities=${canonical} release_entities=${release} search_index=${search}`,
     );
     remindToRepublishCatalogArtifacts(release);
   } finally {

@@ -1,38 +1,8 @@
 /**
- * Lane B / repo-bmmo — deterministic HBCU roster diff.
- *
- * Scrapes the U.S. Department of Education / White House Initiative on HBCUs
- * accredited-institution table and stages only net-new rows into
- * bb_research.landscape_candidates (lane='hbcu'). No LLM anywhere — pure
- * regex/HTML-table parsing of a static server-rendered page.
- *
- * Primary source: https://sites.ed.gov/whhbcu/one-hundred-and-five-historically-black-colleges-and-universities/
- * (linked from https://sites.ed.gov/whhbcu/ as "Accredited HBCU listing"; the
- * older /whhbcu/one-hundreds-strong/ URL 404s as of 2026-07).
- *
- * Diffs the scraped roster against BOTH:
- *   - existing bb_research.landscape_candidates rows with lane='hbcu' (any status)
- *   - bb_canonical.entities.display_name (case/punctuation-normalized)
- * so only genuinely net-new institutions are reported as would-be-staged.
- *
- * Every staged row's canonical_url (the institution's own site, from the
- * source table) is verified to actually fetch (via lib/fetch-page.ts, which
- * only returns a page on a successful HTTP fetch) before being counted as
- * net-new; failures are reported separately and never staged.
- *
- * Default is dry-run (plan + report only, no database writes). Production
- * writes require:
- *   DRY_RUN=0 HBCU_ROSTER_DIFF_APPLY=1 DATABASE_URL=postgresql://...
- *
- * Usage (from repo root):
- *   set -a && source apps/web/.env.local && set +a
- *   export DATABASE_SSL=1
- *   node --conditions development --import tsx \
- *     packages/ops-data/scripts/scrape-hbcu-roster-diff.ts
- *
- * Apply DB writes (after reviewing the dry-run report):
- *   DRY_RUN=0 HBCU_ROSTER_DIFF_APPLY=1 node --conditions development --import tsx \
- *     packages/ops-data/scripts/scrape-hbcu-roster-diff.ts
+ * Parse the Department of Education accredited HBCU table and compare it with existing lane and
+ * canonical names. Verify each institution URL before staging; report fetch failures
+ * separately. Normalized names suppress candidate duplicates but do not prove identity or
+ * complete coverage. Default dry-run; writes require DRY_RUN=0 and HBCU_ROSTER_DIFF_APPLY=1.
  */
 import { mkdirSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
@@ -139,10 +109,8 @@ function normalizeNameForDiff(name: string): string {
 }
 
 /**
- * Institution-name synonym folds for dedup keys. College/University are folded
- * together on purpose: the roster's remaining "net-new" rows in the 2026-07-28
- * run were all College->University renames of institutions we already track
- * (repo-9qp9), and two distinct HBCUs never differ only by that word.
+ * Fold College/University variants for candidate deduplication. This heuristic can conflate
+ * distinct institutions; a folded match does not establish identity.
  */
 const DEDUP_TOKEN_FOLDS: Readonly<Record<string, string>> = {
   university: 'univ',
@@ -282,11 +250,11 @@ async function main(): Promise<void> {
 
   const pool = new pg.Pool(normalizePgConnectionString(databaseUrl));
   const existingLandscapeRes = await pool.query<ExistingRow>(
-    `SELECT display_name, status FROM bb_research.landscape_candidates WHERE lane = $1`,
+    `SELECT display_name, status FROM research.landscape_candidates WHERE lane = $1`,
     [LANE],
   );
   const existingEntitiesRes = await pool.query<ExistingEntity>(
-    `SELECT display_name, kind FROM bb_canonical.entities`,
+    `SELECT display_name, kind FROM canonical.entities`,
   );
 
   const existingLandscapeDisplayNames = existingLandscapeRes.rows.map((row) => row.display_name);
@@ -297,7 +265,7 @@ async function main(): Promise<void> {
 
   console.log(
     `Existing landscape_candidates (lane='hbcu'): ${existingLandscapeRes.rows.length}. ` +
-      `bb_canonical.entities total: ${existingEntitiesRes.rows.length}.`,
+      `canonical.entities total: ${existingEntitiesRes.rows.length}.`,
   );
 
   const dedupedOutLandscapeLaneNames: string[] = [];
@@ -420,7 +388,7 @@ async function main(): Promise<void> {
     await client.query('BEGIN');
     const runId = `hbcu-negro-leagues-diff-${report.generatedAt.slice(0, 10)}`;
     await client.query(
-      `INSERT INTO bb_research.source_program_runs
+      `INSERT INTO research.source_program_runs
         (id, lane, source_program_id, source_program_name, canonical_url, retrieved_at,
          rows_fetched, candidate_count, dropped_count, summary, updated_at)
        VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,now())
@@ -446,7 +414,7 @@ async function main(): Promise<void> {
     for (const row of netNewRows) {
       const id = `${LANE}-${row.sourceItemId}`;
       await client.query(
-        `INSERT INTO bb_research.landscape_candidates
+        `INSERT INTO research.landscape_candidates
           (id, run_id, lane, source_program_id, source_item_id, display_name, kind, summary,
            lat, lng, canonical_url, research_lane_only, status, provenance, payload, discovered_at, updated_at)
          VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,true,'pending',$12,$13,$14,now())

@@ -1,5 +1,5 @@
 /**
- * Pure classification + parsing for `backfill-nrhp-addresses.ts` (repo-2qbj WS2). Split into a
+ * Pure classification + parsing for `backfill-nrhp-addresses.ts` intake helpers. Split into a
  * `lib/` module with no `main()` entrypoint so it can be imported by its test file without
  * triggering the orchestrating script's network/DB `main()` — matching this package's convention
  * (see `lib/nrhp-area-labels.ts`, `lib/corroborate-source.ts`) of keeping side-effect-free logic

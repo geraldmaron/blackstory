@@ -1,40 +1,10 @@
 /**
- * Person-status campaign (repo-n7p6.8): resolve published status='unknown' persons via
- * Wikidata P569 (birth) / P570 (death), staged to the living-status-review lane.
- *
- * For every active-release person with projection status 'unknown' and a stored Wikidata QID
- * (bb_canonical.entity_identifiers, namespace 'wikidata'):
- *   - fetch Special:EntityData/{qid}.json
- *   - extract en label/description, P569/P570 years
- *   - persons with a P570 death date are staged to bb_research.landscape_candidates
- *     (lane living-status-review, same shape as stage-text-mined-death-review.ts) for
- *     operator batch approval via apply-death-review-verdicts.ts
- *   - persons without P570 stay 'unknown' — this script never writes bb_canonical.living_status
- *     and never weakens treatAsLiving('unknown') redaction.
- *
- * Every fetch attempt (staged, no-death-date, fetch-failed, no-qid) is recorded in the
- * source_program_runs summary and in the JSON report.
- *
- * Confidence written into the report/TSV:
- *   high   — normalized en label equals normalized display name, death year present with
- *            year-or-better precision, and plausible against birth year when known
- *   medium — alias match or minor label variance, dates still plausible
- *   low    — label mismatch or implausible dates; stage but do not auto-approve
- *
- * Usage (from repo root):
- *   set -a && source apps/web/.env.local && set +a && export DATABASE_SSL=1
- *   node --conditions development --import tsx \
- *     packages/ops-data/scripts/stage-wikidata-status-review.ts
- *
- * Apply inserts:
- *   DRY_RUN=0 STAGE_WIKIDATA_STATUS_REVIEW_APPLY=1 ...
- *
- * Outputs (default .cache/wikidata-status-review/, override via WIKIDATA_STATUS_REVIEW_REPORT /
- * WIKIDATA_STATUS_REVIEW_TSV):
- *   report.json   (all attempts)
- *   verdicts.tsv  (apply-death-review-verdicts.ts input; verdict column pre-filled 'approve'
- *   only for high-confidence rows, else 'reject' with empty true_death_year so the apply script
- *   quarantines nothing silently — operator edits before use)
+ * Fetch Wikidata P569/P570 for unknown-status people with stored QIDs and stage death-date
+ * proposals for review. Never change canonical living status or weaken unknown-person
+ * protections. Report every attempt. Label name/date agreement as a review heuristic, not
+ * calibrated probability. Generated verdict TSVs require operator review before
+ * apply-death-review-verdicts.ts. Default dry-run; inserts require DRY_RUN=0 and
+ * STAGE_WIKIDATA_STATUS_REVIEW_APPLY=1.
  */
 import { mkdirSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
@@ -60,10 +30,8 @@ const REPORT_PATH =
 const TSV_PATH = process.env.WIKIDATA_STATUS_REVIEW_TSV?.trim() || join(REPORT_DIR, 'verdicts.tsv');
 const FETCH_DELAY_MS = Number(process.env.WIKIDATA_FETCH_DELAY_MS ?? 400);
 /**
- * Optional comma-separated entity-id allowlist (repo-n7p6.23). Re-running the full sweep to
- * re-check a handful of repaired QIDs would re-stage every other unknown person alongside them,
- * churning the operator's review lane for no new information. Empty means "every unknown person",
- * the original behavior.
+ * Optional comma-separated entity-id allowlist. Empty selects every eligible unknown-status
+ * person; use a bounded list to avoid restaging unrelated review candidates.
  */
 const ONLY_ENTITY_IDS = new Set(
   (process.env.WIKIDATA_STATUS_REVIEW_ENTITY_IDS ?? '')
@@ -230,11 +198,11 @@ async function loadUnknownPersons(client: pg.Client): Promise<PersonRow[]> {
   const { rows } = await client.query<PersonRow>(
     `SELECT re.entity_id,
             re.display_name,
-            (SELECT ei.value FROM bb_canonical.entity_identifiers ei
+            (SELECT ei.value FROM canonical.entity_identifiers ei
               WHERE ei.entity_id = re.entity_id AND ei.namespace = 'wikidata'
               ORDER BY ei.created_at ASC LIMIT 1) AS qid
-     FROM bb_public.release_entities re
-     JOIN bb_public.active_release ar ON ar.release_id = re.release_id
+     FROM published.release_entities re
+     JOIN published.active_release ar ON ar.release_id = re.release_id
      WHERE re.kind = 'person'
        AND re.projection->>'status' = 'unknown'
      ORDER BY re.entity_id`,
@@ -364,7 +332,7 @@ async function main(): Promise<void> {
     await client.query('BEGIN');
     try {
       await client.query(
-        `INSERT INTO bb_research.source_program_runs
+        `INSERT INTO research.source_program_runs
           (id, lane, source_program_id, source_program_name, retrieved_at, rows_fetched, candidate_count, summary, updated_at)
          VALUES ($1, 'other', $2, $3, now(), $4, $5, $6::jsonb, now())
          ON CONFLICT (id) DO UPDATE SET
@@ -387,7 +355,7 @@ async function main(): Promise<void> {
           .replace(/[^a-zA-Z0-9_]+/g, '_')
           .slice(0, 180);
         const result = await client.query(
-          `INSERT INTO bb_research.landscape_candidates
+          `INSERT INTO research.landscape_candidates
             (id, run_id, lane, source_program_id, source_item_id, display_name, kind, summary,
              canonical_url, research_lane_only, status, payload, provenance, discovered_at, updated_at)
            VALUES ($1,$2,$3,$4,$5,$6,'person',$7,$8,true,'pending',$9::jsonb,$10::jsonb,$11,now())
@@ -397,8 +365,8 @@ async function main(): Promise<void> {
              payload = EXCLUDED.payload,
              provenance = EXCLUDED.provenance,
              updated_at = now()
-           WHERE bb_research.landscape_candidates.payload->'personReview'->>'approved' IS DISTINCT FROM 'true'
-             AND bb_research.landscape_candidates.status IS DISTINCT FROM 'quarantined'`,
+           WHERE research.landscape_candidates.payload->'personReview'->>'approved' IS DISTINCT FROM 'true'
+             AND research.landscape_candidates.status IS DISTINCT FROM 'quarantined'`,
           [
             landscapeId,
             runId,

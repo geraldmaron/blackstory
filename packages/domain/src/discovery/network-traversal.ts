@@ -2,7 +2,7 @@
  * Network Traversal Discovery.
  *
  * A catalog-seeded discovery methodology: start from a KNOWN canonical entity, read its
- * relationships (`bb_canonical.entity_relationships`), and for every related entity that is NOT
+ * relationships (`canonical.entity_relationships`), and for every related entity that is NOT
  * already in the catalog (catalog-match `no_match`), emit a private discovery candidate carrying
  * the relationship context that surfaced it. Historical networks are dense — every organization
  * has local chapter leaders, every court case has plaintiffs and attorneys, every movement has
@@ -78,7 +78,7 @@ export type NetworkRelationshipTargetDescriptor = {
 };
 
 /**
- * A single relationship row as read from `bb_canonical.entity_relationships`, augmented with a
+ * A single relationship row as read from `canonical.entity_relationships`, augmented with a
  * descriptor of the neighbor entity. Callers project the row + neighbor display fields into this
  * shape; this module never touches the database.
  */
@@ -401,7 +401,7 @@ export type NetworkTraversalRankedLead = {
 
 export type RunNetworkTraversalCampaignInput = {
   readonly seedEntityId: string;
-  /** Relationships already read from `bb_canonical.entity_relationships` for the seed. */
+  /** Relationships already read from `canonical.entity_relationships` for the seed. */
   readonly relationships?: readonly NetworkRelationshipRecord[];
   /**
    * Optional injected reader (fixtures in tests; a safe-fetch/DB-backed reader in production).

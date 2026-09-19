@@ -14,7 +14,7 @@ import {
 import { listErrataEntries } from '../../lib/trust/errata-seed';
 import { TRUST_PATHS } from '../../lib/trust/site-identity';
 import { ErrataSections } from './ErrataSections';
-import { Room, RoomHeader } from '../../components/room';
+import { Room, ReadingEntry, RoomHandoff, RoomSection } from '../../components/room';
 import { WalkOffRamp } from '../walk-off-ramp';
 import '../reading-room.css';
 
@@ -32,22 +32,39 @@ export default function ErrataPage() {
     <Room>
       <TrustSiteJsonLdScript />
       <PublishingPrinciplesJsonLdScript pagePath={TRUST_PATHS.errata} pageTitle="Errata" />
-      <RoomHeader
+      <ReadingEntry
         pathname="/errata"
-        kicker="Corrections"
         title="Errata log"
         lede="Every correction to a published record lands here, with the date it was made and what it changed. Nothing on this site is edited quietly."
       />
-      <p className="ds-errata__feedbar" aria-label="Subscribe to the errata log">
-        <a className="ds-room-chip" href="/errata/feed.json">
-          JSON Feed
-        </a>
-        <a className="ds-room-chip" href="/errata/feed.xml">
-          RSS
-        </a>
-      </p>
 
-      <ErrataSections entries={entries} />
+      <RoomSection id="log" icon="errata" kicker="Log" title="Published corrections" tone="sunk">
+        <p className="ds-errata__feedbar" aria-label="Subscribe to the errata log">
+          <a className="ds-room-chip" href="/errata/feed.json">
+            JSON Feed
+          </a>
+          <a className="ds-room-chip" href="/errata/feed.xml">
+            RSS
+          </a>
+        </p>
+
+        <ErrataSections entries={entries} />
+
+        <div className="ds-room-handoffs">
+          <RoomHandoff
+            href="/corrections"
+            icon="correction"
+            title="Request a correction"
+            line="A person reads it. You get a receipt code. Nothing publishes on arrival."
+          />
+          <RoomHandoff
+            href="/methodology"
+            icon="methodology"
+            title="How a correction is handled"
+            line="A fix is appended. The earlier reading stays readable."
+          />
+        </div>
+      </RoomSection>
 
       <WalkOffRamp
         title="Mistakes, published"

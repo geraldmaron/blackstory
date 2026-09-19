@@ -131,4 +131,4 @@ Same closed lane as [HOLC](./holc-chicago-pilot-attribution.md) §5–§6. **Do 
 - [Renewing Inequality — Urban Renewal and the American City](https://dsl.richmond.edu/panorama/renewal/)
 - [Renewing Inequality Data (GitHub)](https://github.com/americanpanorama/Renewing_Inequality_Data)
 - `packages/domain/src/adapters/dsl-renewing-inequality/` — Chicago pilot adapter
-- `packages/firebase/fixtures/reference-indicators/dsl-renewing-inequality-chicago-*` — curated fixtures
+- `packages/ops-data/fixtures/reference-indicators/dsl-renewing-inequality-chicago-*` — curated fixtures

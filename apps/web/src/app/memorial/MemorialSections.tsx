@@ -1,7 +1,7 @@
 /**
- * Memorial edition list section. The opening screen is the wall plus the room
- * header (see page.tsx); this renders the full alphabetical list, which starts
- * below the fold and is the accessible, readable record of the same names.
+ * Memorial edition list section. The opening screen is the wall (see page.tsx);
+ * this renders the full alphabetical list below the fold, the accessible record
+ * of the same names.
  */
 import React from 'react';
 import Link from 'next/link';
@@ -11,6 +11,8 @@ import {
 } from '../../components/patterns/memorial-wall/memorial-names';
 import { MEMORIAL_LIST_NOTE } from './memorial-copy';
 import { MemorialListContrastZone } from './MemorialListContrastZone';
+import { MemorialLetterJump } from './MemorialLetterJump';
+import { RoomHandoff } from '../../components/room';
 
 void React;
 
@@ -27,8 +29,8 @@ export type MemorialSectionsProps = {
    * is a list of strings with no entity ids, so populating this would mean matching a murdered
    * person to a record by their name. Two people share a name often enough that the failure mode
    * is attributing one person's killing to another person's record, on the one surface where
-   * that is least forgivable. The rendering rule ships here; the join is repo-92n2.30's
-   * follow-up and needs verified per-name evidence, not a string match.
+   * that is least forgivable. The rendering rule ships here; the join is a follow-up and needs
+   * verified per-name evidence, not a string match.
    */
   readonly entityLinksByName?: Readonly<Record<string, string>>;
 };
@@ -58,9 +60,9 @@ export function MemorialSections({ entityLinksByName = {} }: MemorialSectionsPro
         tabIndex={-1}
       >
         <header className="ds-memorial__header">
-          <h2 className="ds-memorial__title" id="memorial-names-heading">
+          <h1 className="ds-memorial__title" id="memorial-names-heading">
             Every name on this memorial
-          </h2>
+          </h1>
           <p className="ds-memorial__count">{total.toLocaleString('en-US')} names, alphabetical</p>
           {anyLinked ? (
             <p className="ds-memorial__link-note">
@@ -70,21 +72,7 @@ export function MemorialSections({ entityLinksByName = {} }: MemorialSectionsPro
           ) : null}
         </header>
 
-        {/* Plain in-page anchors, no JS: the list is long enough that scrolling to
-            a letter is the difference between finding a name and giving up, and a
-            nav of links is the version that works for keyboard, screen reader and
-            a page that has not hydrated alike. */}
-        <nav className="ds-memorial__jump" aria-label="Jump to a letter">
-          {groups.map((group) => (
-            <a
-              className="ds-memorial__jump-link"
-              key={group.letter}
-              href={`#${groupId(group.letter)}`}
-            >
-              {group.letter}
-            </a>
-          ))}
-        </nav>
+        <MemorialLetterJump letters={groups.map((group) => group.letter)} />
 
         {groups.map((group) => (
           <section
@@ -92,11 +80,11 @@ export function MemorialSections({ entityLinksByName = {} }: MemorialSectionsPro
             key={group.letter}
             aria-labelledby={`${groupId(group.letter)}-heading`}
           >
-            <h3 className="ds-memorial__group-letter" id={`${groupId(group.letter)}-heading`}>
+            <h2 className="ds-memorial__group-letter" id={`${groupId(group.letter)}-heading`}>
               <span id={groupId(group.letter)} className="ds-memorial__group-anchor" />
               {group.letter}
               <span className="ds-memorial__group-count">{group.names.length}</span>
-            </h3>
+            </h2>
             <ul className="ds-memorial__name-list">
               {group.names.map((name) => {
                 const year = memorialNameYear(name);
@@ -118,11 +106,28 @@ export function MemorialSections({ entityLinksByName = {} }: MemorialSectionsPro
           </section>
         ))}
 
-        <p className="ds-memorial__note">
-          {MEMORIAL_LIST_NOTE} <Link href="/submit">Submit</Link>
-          {' · '}
-          <Link href="/methodology">Methodology</Link>
-        </p>
+        <p className="ds-memorial__note">{MEMORIAL_LIST_NOTE}</p>
+
+        <div className="ds-memorial__related ds-room-handoffs">
+          <RoomHandoff
+            href="/submit"
+            icon="submit"
+            title="Submit a name"
+            line="A lead is reviewed before anything is added. Nothing publishes on arrival."
+          />
+          <RoomHandoff
+            href="/methodology"
+            icon="methodology"
+            title="How names are held"
+            line="Living-person protection, and why a memorial name is not a map pin."
+          />
+          <RoomHandoff
+            href="/about"
+            icon="about"
+            title="Who keeps this"
+            line="One person, and the limits that come with that."
+          />
+        </div>
       </article>
     </MemorialListContrastZone>
   );

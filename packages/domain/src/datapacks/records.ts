@@ -1,10 +1,6 @@
 /**
- * Loose, generic JSON-shaped record types for the seven Data Pack v1 resource kinds
- * (the related workstream). These deliberately do NOT match `CanonicalEntity`/`CanonicalClaim` — that
- * reconciliation is the import pipeline's job (`./import-pipeline.ts`), not the manifest/record
- * contract's. Every record carries its own `externalId`: the pack's own identifier for the
- * thing, scoped to the pack's `datasetId` namespace and NEVER auto-promoted to a canonical
- * BlackStory entity id (see `NamespacedExternalId` in `./import-pipeline.ts`).
+ * JSON record contracts for data-pack resources. externalId is scoped by datasetId and never
+ * automatically promoted to a canonical entity id.
  */
 import type { JsonValue } from '../publication/index.js';
 

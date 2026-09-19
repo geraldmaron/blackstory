@@ -1,16 +1,9 @@
-/**
- * Embedding pipeline + Firestore vector-search public surface.
- */
+/** Embedding pipeline and vector-store contracts. */
 export {
   EMBEDDING_MODEL,
   EMBEDDING_DIMS,
-  FIRESTORE_VECTOR_DIM_CAP,
+  MAX_INDEXED_VECTOR_DIMS,
   PLATFORM_MAX_NEIGHBORS,
-  ENTITY_EMBEDDINGS_COLLECTION,
-  VECTOR_FIELD_NAME,
-  DISTANCE_MEASURE,
-  VECTOR_INDEX_READ_METERING_DIVISOR,
-  STANDARD_INDEX_READ_METERING_DIVISOR,
   APPROX_USD_PER_1K_TOKENS,
   APPROX_TOKENS_PER_CHAR,
 } from './constants.js';
@@ -63,7 +56,7 @@ export type {
   BatchEmbedResult,
 } from './pipeline.js';
 
-export { createAdminVectorIndexStore, createInMemoryVectorIndexStore } from './vector-store.js';
+export { createInMemoryVectorIndexStore } from './vector-store.js';
 export type {
   EntityEmbeddingDoc,
   VectorQueryInput,
@@ -71,11 +64,7 @@ export type {
   VectorIndexStore,
 } from './vector-store.js';
 
-export {
-  runBackfill,
-  createFirestoreCanonicalEntitySource,
-  createFirestoreExistingHashLookup,
-} from './backfill-cli.js';
+export { runBackfill } from './backfill-cli.js';
 export type {
   BackfillOptions,
   BackfillSummary,
@@ -85,7 +74,6 @@ export type {
 } from './backfill-cli.js';
 
 export {
-  createFirestorePublicSearchIndexEntitySource,
   mapSearchIndexRecordToEmbeddingInput,
   parseStateCodeFromJurisdiction,
 } from './backfill-sources.js';

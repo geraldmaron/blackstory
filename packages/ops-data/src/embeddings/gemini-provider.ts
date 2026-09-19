@@ -1,5 +1,5 @@
 /**
- * Real gemini-embedding-001 provider, built on the official `@google/genai` client.
+ * Real Gemini embedding provider, built on the official `@google/genai` client.
  *
  * Uses the Gemini Developer API (API-key auth), not Vertex AI the decision explicitly rejects
  * Vertex AI *Vector Search* for the index itself (always-on per-node cost floor), and this
@@ -12,7 +12,7 @@
  * use `createDeterministicMockEmbeddingProvider` from ./provider.js instead).
  */
 import { GoogleGenAI } from '@google/genai';
-import type { EnvironmentLike } from '../guard.js';
+type EnvironmentLike = Readonly<Record<string, string | undefined>>;
 import { EMBEDDING_DIMS, EMBEDDING_MODEL } from './constants.js';
 import { EmbeddingProviderError, type EmbeddingProvider } from './provider.js';
 
@@ -21,7 +21,7 @@ export type GeminiEmbedContentClient = {
   models: {
     embedContent(params: {
       readonly model: string;
-      readonly contents: readonly string[];
+      readonly contents: string | readonly string[];
       readonly config?: { readonly outputDimensionality?: number; readonly taskType?: string };
     }): Promise<{ readonly embeddings?: ReadonlyArray<{ readonly values?: number[] }> }>;
   };
@@ -67,26 +67,54 @@ export function createGeminiEmbeddingProvider(
   const clientFactory = options.clientFactory ?? defaultClientFactory;
   let client: GeminiEmbedContentClient | undefined;
 
+  const config = { outputDimensionality, taskType: 'SEMANTIC_SIMILARITY' } as const;
+
+  async function embedRequest(
+    contents: string | readonly string[],
+  ): Promise<ReadonlyArray<{ readonly values?: number[] }>> {
+    if (!client) client = clientFactory(resolveApiKey(environment));
+    try {
+      const response = await client.models.embedContent({ model, contents, config });
+      return response.embeddings ?? [];
+    } catch (error) {
+      throw new EmbeddingProviderError(`Gemini embedContent call failed for model "${model}"`, {
+        cause: error,
+      });
+    }
+  }
+
   return {
     model,
     async embed(texts) {
       if (texts.length === 0) return [];
-      if (!client) {
-        client = clientFactory(resolveApiKey(environment));
+      // @google/genai treats multiple contents for gemini-embedding-2 as parts of one
+      // multimodal content and returns one vector. Preserve the EmbeddingProvider contract by
+      // issuing bounded, sequential one-content calls for that model family. The Gemini API
+      // batchEmbedContents path used by gemini-embedding-001 keeps each text as a separate
+      // request, so the normal batched call remains correct there.
+      if (model.includes('gemini-embedding-2')) {
+        const vectors: number[][] = [];
+        // Keep concurrency at one: embedding backfills can contain many passages and should
+        // not turn one provider.embed call into an unbounded request burst.
+        for (let index = 0; index < texts.length; index += 1) {
+          const response = await embedRequest(texts[index]!);
+          if (response.length !== 1) {
+            throw new EmbeddingProviderError(
+              `Gemini embedContent returned ${response.length} embeddings for input ${index}`,
+            );
+          }
+          const values = response[0]?.values;
+          if (!values || values.length === 0) {
+            throw new EmbeddingProviderError(
+              `Gemini embedContent returned no values at index ${index}`,
+            );
+          }
+          vectors.push(values);
+        }
+        return vectors;
       }
-      let response: { readonly embeddings?: ReadonlyArray<{ readonly values?: number[] }> };
-      try {
-        response = await client.models.embedContent({
-          model,
-          contents: texts,
-          config: { outputDimensionality, taskType: 'SEMANTIC_SIMILARITY' },
-        });
-      } catch (error) {
-        throw new EmbeddingProviderError(`Gemini embedContent call failed for model "${model}"`, {
-          cause: error,
-        });
-      }
-      const embeddings = response.embeddings ?? [];
+
+      const embeddings = await embedRequest(texts);
       if (embeddings.length !== texts.length) {
         throw new EmbeddingProviderError(
           `Gemini embedContent returned ${embeddings.length} embeddings for ${texts.length} inputs`,

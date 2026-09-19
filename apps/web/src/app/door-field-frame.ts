@@ -2,11 +2,11 @@
  * The Door's map window: the box on screen the live plate frames its camera against.
  *
  * The plate is one fixed, full-viewport canvas shared with Explore (MapStage.tsx), but on `/` the
- * reader only ever sees part of it: below the bar on a desktop, and inside the sticky strip above
- * the chapters on a phone. A national frame fitted to the whole canvas put the 49th parallel under
+ * reader only ever sees part of it: below the bar on a desktop, and inside a band under the bar,
+ * which the chapters scroll over, on a phone. A national frame fitted to the whole canvas put the 49th parallel under
  * the bar and, on a phone, the country behind the cards; and because it was fitted once, for the
  * viewport the plate happened to be built in, a window resized afterwards kept the old zoom and
- * lost a coast or two (repo-18ma2).
+ * lost a coast or two.
  *
  * So the frame is derived from the window's own rect, every time it changes. `doorFramePadding`
  * turns the window into `cameraForBounds` padding (the plate fits CONUS inside the window, below
@@ -68,6 +68,7 @@ export function doorFramePadding(
   window: DoorFrameBox,
   plate: DoorFrameBox,
   chrome: DoorFrameBox | null = null,
+  bottomChrome: DoorFrameBox | null = null,
 ): DoorFramePadding | null {
   if (!isPaintable(window) || !isPaintable(plate)) return null;
   const margin = doorFrameMargin(window);
@@ -75,11 +76,19 @@ export function doorFramePadding(
     chrome !== null && isPaintable(chrome)
       ? Math.max(0, chrome.top + chrome.height - window.top)
       : 0;
+  // Opening masthead (and any future bottom sheet) occupies the lower window; fit CONUS above it.
+  const bottomBand =
+    bottomChrome !== null && isPaintable(bottomChrome)
+      ? Math.max(0, window.top + window.height - bottomChrome.top)
+      : 0;
   const padding = {
     top: Math.max(0, window.top - plate.top + chromeBand + margin),
     left: Math.max(0, window.left - plate.left + margin),
     right: Math.max(0, plate.left + plate.width - (window.left + window.width) + margin),
-    bottom: Math.max(0, plate.top + plate.height - (window.top + window.height) + margin),
+    bottom: Math.max(
+      0,
+      plate.top + plate.height - (window.top + window.height) + bottomBand + margin,
+    ),
   };
   if (
     plate.width - padding.left - padding.right < DOOR_FRAME_MIN_BOX_PX ||

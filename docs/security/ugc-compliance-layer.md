@@ -61,14 +61,12 @@ timestamp, reason, correlation id, and target references — and never the delet
 itself. The plan's `auditEvent`/`outboxMessage` are shaped as `DomainAuditEvent` /
 `DomainOutboxMessage` (, `packages/domain/src/audit/index.ts`) using the new
 `deletion.purged` audit action, so a storage adapter can hand them straight to the existing
-`commitWithAudit` path (`packages/firebase/src/firestore/audit-outbox.ts`) the same way every
+`commitWithAudit` path (`packages/ops-data/src/records/audit-outbox.ts`) the same way every
 other audited mutation in this repo does.
 
-**Known integration gap:** `packages/firebase`'s current `StateMutation` union only supports
-`create`/`set`/`update`, not a true `delete`. Wiring a real Firestore purge through
-`commitWithAudit` needs that added — out of scope for this bead (packages/firebase is read-only
-context here) and flagged for whoever builds the  scheduler integration or the –076
-adapters.
+Deletion must remove the database record and derived private content through audited Postgres
+operations. Verify actual downstream deletion coverage; a domain deletion plan or removed UI
+row is not evidence that all retained copies were erased.
 
 ## 4. Living-person UGC ethics rules
 

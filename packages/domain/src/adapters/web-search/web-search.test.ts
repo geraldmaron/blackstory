@@ -33,7 +33,6 @@ import {
   fetchBraveWebSearch,
   fetchBraveWebSearchBudgeted,
   fetchSearxngWebSearchBudgeted,
-  ingestWebSearchCandidatesThroughPipeline,
   normalizeWebSearchResult,
   parseBraveSearchResponse,
   parseSearxngSearchResponse,
@@ -600,128 +599,6 @@ test('fetchBraveWebSearchBudgeted proceeds and reports the budget decision when 
 
 // ---------------------------------------------------------------------------------------------
 // Pipeline integration: Wayback capture gate -> ingestApiCandidate
-// ---------------------------------------------------------------------------------------------
-
-test('ingestWebSearchCandidatesThroughPipeline routes candidates through the Wayback capture gate before  ingestion', async () => {
-  const entry = braveRegistryEntry();
-  const pack = loadPack();
-  const queryProvenance = stampExternalQueryProvenance({
-    provider: 'brave',
-    queryText: 'civil rights activist Montgomery',
-    executedAt: FIXED_NOW,
-    planTermsVersion: 'brave-storage-rights-tier-2026-07',
-  });
-  const candidate = normalizeWebSearchResult({
-    result: {
-      title: 'Piedmont County history',
-      url: 'https://piedmontcountyhistory.example.org/freedom-riders',
-      description: 'History page.',
-    },
-    registryEntry: entry,
-    runId: 'run_1',
-    capturedAt: FIXED_NOW,
-    config: confirmedConfig(),
-    queryProvenance,
-  });
-
-  let submitCount = 0;
-  const client = async (request: SafeHttpRequest): Promise<SafeHttpResponse> => {
-    if (request.url === 'https://web.archive.org/save') {
-      submitCount += 1;
-      return {
-        status: 200,
-        headers: { 'content-type': 'application/json' },
-        bodyText: JSON.stringify({ job_id: 'job-1' }),
-        finalUrl: '',
-      };
-    }
-    return {
-      status: 200,
-      headers: { 'content-type': 'application/json' },
-      bodyText: JSON.stringify({
-        status: 'success',
-        timestamp: '20260717140512',
-        original_url: candidate.canonicalUrl,
-      }),
-      finalUrl: '',
-    };
-  };
-
-  const ingested = await ingestWebSearchCandidatesThroughPipeline({
-    candidates: [candidate],
-    provider: 'brave',
-    client,
-    credentials: { accessKey: 'ak', secretKey: 'sk' },
-    pack,
-    now: FIXED_NOW,
-  });
-
-  assert.equal(
-    submitCount,
-    1,
-    'the discovered URL must go through a real Wayback capture before ingestion',
-  );
-  assert.equal(ingested.length, 1);
-  assert.equal(ingested[0]?.ingestMode, 'api');
-  assert.equal(ingested[0]?.status, 'pending');
-  assert.equal(ingested[0]?.adapterRecord.provenance.adapterId, BRAVE_SEARCH_ADAPTER_ID);
-});
-
-test('ingestWebSearchCandidatesThroughPipeline fails closed when the Wayback capture fails -- no silent ingestion', async () => {
-  const entry = braveRegistryEntry();
-  const pack = loadPack();
-  const queryProvenance = stampExternalQueryProvenance({
-    provider: 'brave',
-    queryText: 'civil rights activist Montgomery',
-    executedAt: FIXED_NOW,
-    planTermsVersion: 'brave-storage-rights-tier-2026-07',
-  });
-  const candidate = normalizeWebSearchResult({
-    result: {
-      title: 'Broken capture page',
-      url: 'https://example.org/broken',
-      description: 'History page.',
-    },
-    registryEntry: entry,
-    runId: 'run_1',
-    capturedAt: FIXED_NOW,
-    config: confirmedConfig(),
-    queryProvenance,
-  });
-
-  const client = async (request: SafeHttpRequest): Promise<SafeHttpResponse> => {
-    if (request.url === 'https://web.archive.org/save') {
-      return {
-        status: 200,
-        headers: { 'content-type': 'application/json' },
-        bodyText: JSON.stringify({ job_id: 'job-1' }),
-        finalUrl: '',
-      };
-    }
-    return {
-      status: 200,
-      headers: { 'content-type': 'application/json' },
-      bodyText: JSON.stringify({ status: 'error', message: 'blocked_by_robots' }),
-      finalUrl: '',
-    };
-  };
-
-  await assert.rejects(
-    () =>
-      ingestWebSearchCandidatesThroughPipeline({
-        candidates: [candidate],
-        provider: 'brave',
-        client,
-        credentials: { accessKey: 'ak', secretKey: 'sk' },
-        pack,
-        now: FIXED_NOW,
-      }),
-    /did not succeed/,
-  );
-});
-
-// ---------------------------------------------------------------------------------------------
-// Real wiring: proves the budget-guard port can be backed by the real evaluateDailyBudget
 // ---------------------------------------------------------------------------------------------
 
 test('a real -backed DailyBudgetEvaluator (thin wrapper over the real evaluateDailyBudget) composes correctly', async () => {

@@ -1,11 +1,10 @@
 /**
  * Keyed diff for the DOM entity hit-target markers (`.ds-map-entity-marker`).
  *
- * MapStage used to rebuild the whole marker collection (remove every marker, recreate every
- * marker) on each `zoomend`/data sync. That mass unmount/remount made every pin change visual
- * state at once — the "all entities light up" flash (repo-pgzr). The single-feature invariant
- * the canvas layers follow (repo-4v3a.1 / repo-mrmh: a selection change may only repaint the
- * selected feature) extends to the DOM marker path via this diff: markers are keyed by
+ * A `zoomend` or data sync must not rebuild the whole marker collection because a mass
+ * unmount/remount makes every pin change visual state at once. The single-feature invariant used
+ * by the canvas layers also applies to the DOM marker path: a selection change may repaint only
+ * the selected feature. Markers are keyed by
  * `entityId`, kept instances are mutated in place, and only genuinely new/stale ids mount or
  * unmount.
  */

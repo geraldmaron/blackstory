@@ -7,7 +7,7 @@
 
 **Status:** Binding product methodology  
 **Date:** 2026-07-21  
-**Related:** [context-data-source-matrix.md](../research/context-data-source-matrix.md), [confidence-lineage.md](../research/confidence-lineage.md), `../decisions-carryover.md`, "Small recovered decisions" (ADR-029, theme impact packets, removed 2026-07-24), constitution `policy.v1.json`, `bb_reference.entity_context_bindings`
+**Related:** [context-data-source-matrix.md](../research/context-data-source-matrix.md), [confidence-lineage.md](../research/confidence-lineage.md), `../decisions-carryover.md`, "Small recovered decisions" (ADR-029, theme impact packets, removed 2026-07-24), constitution `policy.v1.json`, `reference.entity_context_bindings`
 
 ## Problem
 
@@ -33,7 +33,7 @@ Users (and MCP clients) will ask: *What was the impact of this law on Black comm
 
 ## `entity_context_bindings`
 
-Postgres table `bb_reference.entity_context_bindings` (see migration `statistical_series_observations`):
+Postgres table `reference.entity_context_bindings` (see migration `statistical_series_observations`):
 
 | Column | Role |
 |--------|------|

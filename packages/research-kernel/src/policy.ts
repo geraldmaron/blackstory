@@ -16,6 +16,17 @@ export function scoreFrontierTask(
     | 'normalizedCost'
   >,
 ): number {
+  for (const field of [
+    'riskWeight',
+    'expectedEntropyReduction',
+    'sourceNovelty',
+    'contradictionValue',
+    'normalizedCost',
+  ] as const) {
+    const value = task[field];
+    if (!Number.isFinite(value) || value < 0)
+      throw new Error(`${field} must be finite and nonnegative`);
+  }
   if (task.normalizedCost <= 0) throw new Error('normalizedCost must be positive');
   const informationValue =
     task.expectedEntropyReduction + task.sourceNovelty + task.contradictionValue;
@@ -23,10 +34,10 @@ export function scoreFrontierTask(
 }
 
 export function rankFrontierTasks(tasks: readonly FrontierTask[]): readonly FrontierTask[] {
-  return [...tasks].sort((left, right) => {
-    const scoreDifference = scoreFrontierTask(right) - scoreFrontierTask(left);
-    return scoreDifference === 0 ? left.id.localeCompare(right.id) : scoreDifference;
-  });
+  return tasks
+    .map((task) => ({ task, score: scoreFrontierTask(task) }))
+    .sort((left, right) => right.score - left.score || left.task.id.localeCompare(right.task.id))
+    .map(({ task }) => task);
 }
 
 export interface StopEvaluationInput {
@@ -57,9 +68,9 @@ export function evaluateStopping(input: StopEvaluationInput): StopEvaluation {
   if (input.profile.stopping.requireMandatoryNeedsComplete && mandatoryIncomplete) {
     return { decision: 'continue', reason: 'Mandatory evidence needs remain open' };
   }
-  const contradictionIncomplete = input.needs.some(
-    (need) => need.contradictionSearch && need.status !== 'satisfied',
-  );
+  const contradictionIncomplete =
+    !input.needs.some((need) => need.contradictionSearch) ||
+    input.needs.some((need) => need.contradictionSearch && need.status !== 'satisfied');
   if (input.profile.stopping.requireContradictionSearch && contradictionIncomplete) {
     return { decision: 'continue', reason: 'Contradiction search remains open' };
   }

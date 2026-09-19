@@ -1,7 +1,7 @@
 /**
  * "The gap that never closed" (theme_id: wealth_gap) era-immersion packet for
  * ThemeImpactPacket upsert. National spine series only; every figure resolves to
- * a bb_reference.spine_observations_v spine_id or a statistical_observations obs id
+ * a reference.spine_observations_v spine_id or a statistical_observations obs id
  * (listed in each observation row). method_stance: juxtaposition throughout; the
  * two wealth series are placed side by side across eras, never spliced into one line
  * and never presented as one causing the next. Lands at status='review'.
@@ -24,10 +24,8 @@ const SCF_HUMAN =
   'Federal Reserve Board, Survey of Consumer Finances: median household net worth by race/ethnicity.';
 
 const CENSUS_HOMEOWN_SOURCE = 'Census Bureau Historical Census of Housing Tables';
-// The original URL (census.gov/topics/housing/homeownership/data/historical.html) 404s and never
-// carried a race breakout anyway (repo-uf6q, 2026-09-13). This is the closest live, on-topic
-// census.gov page -- it has the 1970 TOTAL rate (62.9%) but not race-specific figures; see the
-// UNVERIFIED notes on homeownBlack1970 / homeownWhite1970 below.
+// The linked Census page reports total 1970 homeownership, not race-specific rates. See the
+// UNVERIFIED limitations on both race observations.
 const CENSUS_HOMEOWN_URL =
   'https://www2.census.gov/programs-surveys/decennial/tables/time-series/census-housing-tables/owner.pdf';
 
@@ -334,11 +332,9 @@ const OBS = {
     unit: 'percent',
     referencePeriod: '1970',
     label: 'Black homeownership rate (1970 decennial)',
-    // UNVERIFIED (repo-uf6q, 2026-09-13): flagged by ringer review -- 1970 white_nh is not a
-    // real 1970 census race category, and secondary compilations commonly give ~41.6/65.2-65.4
-    // against 42.0/65.3 here. No primary 1970 Census of Housing table could be located this pass
-    // (the volume's PDFs at census.gov are scanned images with no text layer). Left unchanged
-    // pending a follow-up that can read the actual 1970 race-tenure table.
+    // UNVERIFIED: white_nh is not a verified category in the cited 1970 Census table. These
+    // race-specific values need direct reading of the scanned primary tenure table; secondary
+    // compilations disagree.
     provenance: {
       source: CENSUS_HOMEOWN_SOURCE,
       sourceUrl: CENSUS_HOMEOWN_URL,
@@ -356,7 +352,8 @@ const OBS = {
     unit: 'percent',
     referencePeriod: '1970',
     label: 'White homeownership rate (1970 decennial)',
-    // UNVERIFIED (repo-uf6q, 2026-09-13) -- see homeownBlack1970 above; same caveat applies.
+    // UNVERIFIED: the primary-table and population-category limitations also apply to this
+    // comparison.
     provenance: {
       source: CENSUS_HOMEOWN_SOURCE,
       sourceUrl: CENSUS_HOMEOWN_URL,

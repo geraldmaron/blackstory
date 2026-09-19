@@ -39,6 +39,44 @@ test('associates the claim card with its citation block via aria-describedby (WC
   assert.match(html, /id="claim_seed_001-evidence-citation"/);
 });
 
+test('renders verified archived and original claim links as separate reader choices', () => {
+  const html = renderToStaticMarkup(
+    createElement(EvidenceCard, {
+      card: buildEvidenceCard({
+        ...BASE_CLAIM,
+        citation: {
+          ...BASE_CLAIM.citation,
+          archivedUrl: 'https://web.archive.org/web/20260918210000/https://catalog.archives.gov/',
+          archivedAt: '2026-09-18T21:00:00.000Z',
+        },
+      }),
+    }),
+  );
+  assert.match(html, />Archived copy<\/a> \(captured 2026-09-18\)/);
+  assert.match(html, />Original source<\/a>/);
+});
+
+test('keeps the original link when an archive pointer is incomplete or names another source', () => {
+  for (const archive of [
+    { archivedUrl: 'https://web.archive.org/web/20260918210000/https://catalog.archives.gov/' },
+    {
+      archivedUrl: 'https://web.archive.org/web/20260918210000/https://example.gov/other',
+      archivedAt: '2026-09-18T21:00:00.000Z',
+    },
+  ]) {
+    const html = renderToStaticMarkup(
+      createElement(EvidenceCard, {
+        card: buildEvidenceCard({
+          ...BASE_CLAIM,
+          citation: { ...BASE_CLAIM.citation, ...archive },
+        }),
+      }),
+    );
+    assert.match(html, /href="https:\/\/catalog.archives.gov\/"/);
+    assert.doesNotMatch(html, /Archived copy/);
+  }
+});
+
 test('renders relevance and connection-strength notes distinctly from the confidence badge (AC2)', () => {
   const html = renderToStaticMarkup(
     createElement(EvidenceCard, {
@@ -96,12 +134,17 @@ test('withholds a protected citation link and never renders the underlying URL (
           source: 'Living-person-sensitive capture',
           label: 'Protected source',
           href: 'https://internal.example.org/should-not-leak',
+          archivedUrl:
+            'https://web.archive.org/web/20260918210000/https://internal.example.org/should-not-leak',
+          archivedAt: '2026-09-18T21:00:00.000Z',
           protectedFromPublicLink: true,
         },
       }),
     }),
   );
-  assert.equal(html.includes('internal.example.org'), false);
+  const hrefs = [...html.matchAll(/href="([^"]+)"/g)].map((match) => match[1]);
+  assert.deepEqual(hrefs, []);
+  assert.doesNotMatch(html, /Archived copy/);
   assert.match(html, /Source link withheld/);
 });
 

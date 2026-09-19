@@ -32,18 +32,11 @@ export type SearchableEntityRecord = {
   readonly aliases: readonly string[];
   readonly summary?: string;
   /**
-   * @deprecated Superseded by `topicIds` below (the related workstream's controlled-taxonomy split).
-   * Kept for backward compatibility: `computeFacetCounts` (./facets.ts) still falls back to
-   * this, filtered through the new `TOPIC_REGISTRY`, when `topicIds` is absent so records built
-   * before the split keep faceting correctly.
+   * Uncontrolled tags for text matching; theme facets must use validated topicIds.
    */
   readonly topicTags: readonly string[];
   /**
-   * Controlled historical-theme ids (the related workstream) — the ONLY source `computeFacetCounts`
-   * should treat as authoritative for the `theme` facet. Every id is expected to resolve
-   * against `@repo/domain`'s `TOPIC_REGISTRY` (packages/domain/src/taxonomy/topics.ts); readers
-   * should still validate with `isValidTopicId` rather than trusting this blindly. Optional so
-   * every existing `SearchableEntityRecord` literal keeps compiling during the transition.
+   * Controlled theme identifiers validated against TOPIC_REGISTRY.
    */
   readonly topicIds?: readonly string[];
   /** State-level jurisdiction label, used by the `state` facet + filter. */
@@ -74,15 +67,9 @@ export type SearchableEntityRecord = {
   /** Server-internal supporting-claim count. Same policy as `relatedCount`: never client-facing. */
   readonly claimCount: number;
   /**
-   * The grading inputs `/records` derives its evidence floors from, cached on the slim index so
-   * the room does not have to hydrate 18MB of full entities to draw a meter.
-   *
-   * Deliberately the INPUTS and not the graded tier: a cached conclusion goes stale the moment
-   * the rule changes, which is exactly what stranded `/records` for a day (repo-6qjv0). The
-   * reader hands this straight to `confidenceTierFromEvidenceInputs`
-   * (`@repo/public-contracts/evidence`), the same rule Explore applies. Optional because rows
-   * published before the field existed do not carry it, and a reader must be able to detect that
-   * rather than grade an absent projection as `unrated`.
+   * Evidence-grading inputs cached on the slim index and passed to
+   * confidenceTierFromEvidenceInputs. Missing inputs remain detectable; do not silently treat
+   * an absent projection as an observed unrated record.
    */
   readonly evidenceInputs?: RecordEvidenceInputs;
   /** Public geohash when the search row is mappable; absent for ungeocoded records. */
@@ -90,7 +77,7 @@ export type SearchableEntityRecord = {
 };
 
 /**
- * The Firestore-persisted search index document.
+ * The persisted search index row.
  *
  * A structural superset of `SearchableEntityRecord` (all of its fields plus `releaseId`), so a
  * `PublicSearchIndexDoc` can be passed anywhere a `SearchableEntityRecord` is expected without a

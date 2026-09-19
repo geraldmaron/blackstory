@@ -1,19 +1,5 @@
 1:"$Sreact.fragment"
-3:I[99990,["/blackstory/_next/static/chunks/13m8d36xc7t9s.js","/blackstory/_next/static/chunks/03obgaj591_9a.js"],"OutletBoundary"]
-4:"$Sreact.suspense"
-2:T43c,<h1 id="architecture-decisions"><a class="heading-anchor" href="#architecture-decisions">Architecture decisions</a></h1>
-<p>Formal ADRs were removed from the repository 2026-07-24. History is in git
-(<code>git log -- docs/adr/</code>). Still-binding invariants live in
-<a href="https://github.com/geraldmaron/blackstory/blob/main/docs/decisions-carryover.md"><code>docs/decisions-carryover.md</code></a>.</p>
-<p>The current stack (verified 2026-08-28 against live blackstory.app):</p>
-<ul>
-<li>Public web: <strong>Vercel</strong> (Cloudflare in front). Not Firebase App Hosting. Not Cloud Run.</li>
-<li>Data and media: <strong>Supabase</strong> project <code>blackstory-app</code>
-(<code>https://twykhihqkcldpreuovay.supabase.co</code>).</li>
-<li>Leftover, not current SoR: Firestore, Firebase App Hosting, GCS dual-serve,
-parked PostGIS.</li>
-</ul>
-<p>See <a href="./architecture.md">Architecture</a> for the full table. Filenames and older
-runbooks may still say "firebase" for history. Titles that still read as current
-hosting or SoR are leftover unless they match that table.</p>0:{"rsc":["$","$1","c",{"children":[["$","article",null,{"className":"prose","children":[["$","p",null,{"className":"hero-eyebrow","children":[["$","span",null,{"className":"pin","aria-hidden":true}],["$","span",null,{"children":"reference"}]]}],["$","p",null,{"className":"doc-lede","children":"Pointers into the historical ADR set and the current stack."}],["$","div",null,{"dangerouslySetInnerHTML":{"__html":"$2"}}],["$","footer",null,{"className":"site-footer","children":["$","p",null,{"children":["Edit this page in the repo under ",["$","code",null,{"children":["apps/docs/content/","adrs",".md"]}],"."," ",["$","a",null,{"href":"https://github.com/geraldmaron/blackstory","target":"_blank","rel":"noreferrer","children":["BlackStory"," on GitHub"]}]]}]}]]}],null,["$","$L3",null,{"children":["$","$4",null,{"name":"Next.MetadataOutlet","children":"$@5"}]}]]}],"isPartial":false,"staleTime":300,"varyParams":null,"buildId":"yuuD63I0OldEjDA3acYkx"}
-5:null
+2:I[99990,["/blackstory/_next/static/chunks/13m8d36xc7t9s.js","/blackstory/_next/static/chunks/03obgaj591_9a.js"],"OutletBoundary"]
+3:"$Sreact.suspense"
+0:{"rsc":["$","$1","c",{"children":[["$","article",null,{"className":"prose","children":[["$","p",null,{"className":"hero-eyebrow","children":[["$","span",null,{"className":"pin","aria-hidden":true}],["$","span",null,{"children":"concepts"}]]}],["$","p",null,{"className":"doc-lede","children":"Find and challenge the current engineering contracts."}],["$","div",null,{"dangerouslySetInnerHTML":{"__html":"<h1 id=\"engineering-decisions\"><a class=\"heading-anchor\" href=\"#engineering-decisions\">Engineering decisions</a></h1>\n<p><a href=\"https://github.com/geraldmaron/blackstory/blob/main/docs/architecture.md\">Architecture</a> identifies\ncurrent implementation owners and the challenge procedure. The\n<a href=\"https://github.com/geraldmaron/blackstory/blob/main/docs/decisions-carryover.md\">engineering contract</a>\nand <a href=\"https://github.com/geraldmaron/blackstory/blob/main/docs/research/README.md\">research framework</a>\nown their respective constraints and known gaps.</p>\n<p>Challenge a rule against observed behavior, its strongest failure mode, and the best viable\nalternative. Update the owning contract and its enforcement together. Historical ADRs and PRDs\nare evidence of prior reasoning, not competing authority or a reason to add another decision memo.</p>"}}],["$","footer",null,{"className":"site-footer","children":["$","p",null,{"children":["Edit this page in the repo under ",["$","code",null,{"children":["apps/docs/content/","adrs",".md"]}],"."," ",["$","a",null,{"href":"https://github.com/geraldmaron/blackstory","target":"_blank","rel":"noreferrer","children":["BlackStory"," on GitHub"]}]]}]}]]}],null,["$","$L2",null,{"children":["$","$3",null,{"name":"Next.MetadataOutlet","children":"$@4"}]}]]}],"isPartial":false,"staleTime":300,"varyParams":null,"buildId":"KHh4eEKAuEiF9M8bZ4j5n"}
+4:null

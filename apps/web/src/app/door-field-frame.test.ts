@@ -1,5 +1,5 @@
 /**
- * The Door's map window → plate camera arithmetic (repo-18ma2). Rects in, padding and offset
+ * The Door's map window → plate camera arithmetic. Rects in, padding and offset
  * out; no DOM, no MapLibre.
  */
 import assert from 'node:assert/strict';
@@ -39,7 +39,16 @@ test('without chrome the country only keeps its margin from the bar', () => {
   const padding = doorFramePadding(DESKTOP_WINDOW, DESKTOP_PLATE);
   assert.ok(padding);
   assert.equal(padding.top, 84 + 32);
+  assert.equal(padding.bottom, 32);
   assert.deepEqual(doorFramePadding(DESKTOP_WINDOW, DESKTOP_PLATE, HIDDEN_CHROME), padding);
+});
+
+test('a bottom masthead lifts the country into the visible band above it', () => {
+  const masthead = { top: 420, left: 0, width: 560, height: 280 };
+  const padding = doorFramePadding(DESKTOP_WINDOW, DESKTOP_PLATE, DESKTOP_CHROME, masthead);
+  assert.ok(padding);
+  // Window bottom is 84+636=720; masthead starts at 420 → 300px of sheet inside the window.
+  assert.equal(padding.bottom, 300 + 32);
 });
 
 test('the phone strip fits the whole country inside the strip', () => {

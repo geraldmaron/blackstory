@@ -1,6 +1,6 @@
 /**
  * DKKS "Wealth of Two Nations" adapter surface for Phase 2 national racial
- * wealth-gap ingest (repo-zxjz.2).
+ * wealth-gap ingest.
  */
 export {
   DKKS_WEALTH_GAP_SOURCE_URL,

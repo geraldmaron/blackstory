@@ -1,28 +1,8 @@
 /**
- * Statistical data storage model (the related workstream).
- *
- * An external architecture review found that Census/ACS/FBI-hate-crime/Opportunity-Atlas-style
- * statistics were not modeled as a distinct concept from ordinary entity claims — folding them
- * in loses margin of error, geography vintage, source variable provenance, and the
- * observed/derived/modeled distinction. This module is the STORAGE MODEL for that data; it does
- * NOT duplicate the Census Geocoder adapter logic in `../adapters/census-geo/` (that adapter
- * resolves addresses/coordinates to jurisdictions — an entirely different concern from storing
- * a metric's time series of estimates).
- *
- * Three types, one lifecycle:
- *  - `StatisticalSeries` — the metric definition (what is measured, in what units, from which
- *    source variable, at what geography/estimate/period type). One series, many observations.
- *  - `StatisticalObservation` — a single as-reported estimate for a series at a jurisdiction and
- *    period, always `status: 'observed'`. `boundaryVersion` is the vintage/crosswalk key: bd
- *    memory records "Tract-keyed collections must carry explicit tractVintage: ACS 2020s
- *    releases use 2020 tracts, Opportunity Atlas uses 2010 tracts — never join without a
- *    crosswalk," and `boundaryVersion` generalizes that constraint to every geography type (not
- *    just tracts), so a combination rule can refuse to combine observations whose boundary
- *    versions differ.
- *  - `DerivedMeasurement` — a value computed from one or more observations (sums, rates,
- *    growth, model output). `status` is a required literal `'derived' | 'modeled'` — there is no
- *    way to construct one without picking a state, and no boolean/implicit-string stands in for
- *    the observed/derived/modeled axis.
+ * Statistics preserve units, source variables, margin of error, geography/boundary vintage and
+ * observed/tabulated/derived/modeled status. A series defines the metric, an observation
+ * reports one place/period estimate and a derived measurement records computation inputs.
+ * Boundary versions constrain valid combinations independently of address geocoding.
  */
 
 /** Stable id for a `StatisticalSeries` (the metric definition, not an individual reading). */
@@ -70,6 +50,8 @@ export const STATISTICAL_GEOGRAPHY_TYPES = [
   'facility',
   'state',
   'nation',
+  /** A modeled multi-county region whose extent is defined per decade (Lives Across the Decades). */
+  'region',
 ] as const;
 
 export type StatisticalGeographyType = (typeof STATISTICAL_GEOGRAPHY_TYPES)[number];
@@ -136,8 +118,10 @@ export type StatisticalSeries = {
 
 /**
  * A single as-reported estimate for a series at one jurisdiction and reference period.
- * Always `status: 'observed'` — an observation is never derived or modeled, it is a
- * transcription of what the source dataset reported.
+ * `status: 'observed'` is a transcription of what the source dataset reported. `'tabulated'`
+ * is BlackStory's own weighted count from licensed microdata (IPUMS USA), which the source never
+ * published and which must never be presented as if it had. Neither is derived or modeled.
+ * See docs/methodology/lives-across-decades.md.
  *
  * `boundaryVersion` is the vintage/crosswalk key (generalizes the tractVintage constraint —
  * see module doc). Two observations may only be safely combined when their `boundaryVersion`
@@ -162,7 +146,7 @@ export type StatisticalObservation = {
   readonly sourceItemId: string;
   /** ISO 8601 timestamp of when this reading was captured. */
   readonly retrievedAt: string;
-  readonly status: 'observed';
+  readonly status: 'observed' | 'tabulated';
 };
 
 /**

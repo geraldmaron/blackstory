@@ -1,10 +1,4 @@
-/**
- * Geohash encode/prefix helpers for radius queries without PostGIS.
- * Writers store lat/lng + geohash (+ optional prefixes) in bb_canonical.entity_locations;
- * radius filtering is haversine in application code, never a PostGIS query. The shape outlived
- * the Firestore store it was designed for, deliberately: see docs/decisions-carryover.md,
- * "Firestore as system of record, reversed".
- */
+/** Geohash encoding and haversine distance for bounded candidate filtering. Precision and source coordinates remain explicit; proximity never establishes a historical relationship. */
 const BASE32 = '0123456789bcdefghjkmnpqrstuvwxyz';
 
 export const DEFAULT_GEOHASH_PRECISION = 9;
@@ -97,7 +91,7 @@ export function geohashPrefixes(geohash: string, minLength = 1): string[] {
   return prefixes;
 }
 
-/** Build Firestore-friendly geo fields from a coordinate. */
+/** Build JSON-compatible geo fields from a coordinate. */
 export function buildGeoPointFields(
   lat: number,
   lng: number,

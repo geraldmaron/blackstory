@@ -49,7 +49,7 @@ export type ClaimVersion = {
  * Canonical atomic claim: identity + current version pointer + measurements.
  *
  * Prior versions no longer live in an embedded array on this parent doc — each
- * version is its own immutable document in the Firestore
+ * version is its own immutable record in the
  * `canonicalClaims/{claimId}/versions/{versionId}` subcollection (append-only:
  * creates allowed, updates/deletes denied). Load a specific version (or the
  * current one, via `currentVersionId`) from that subcollection rather than

@@ -19,8 +19,10 @@ export function treatAsLiving(status: LivingStatus): boolean {
 /** Default living status when writers omit one unknown, therefore treated as living. */
 export const DEFAULT_LIVING_STATUS: LivingStatus = 'unknown';
 
-/** Signals used to derive a living-status guess (the related workstream). Nothing beyond birth/death
- * years exists as a structured signal in this model today; this is intentionally minimal. */
+/**
+ * Structured birth/death-year signals for an inferred living status. They do not establish a
+ * sourced death assertion.
+ */
 export type LivingStatusDerivationSignal = {
   readonly birthYear?: number | null;
   readonly deathYear?: number | null;

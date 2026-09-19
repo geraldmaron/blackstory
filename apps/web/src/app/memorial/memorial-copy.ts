@@ -1,20 +1,10 @@
 /**
  * User-facing copy for the /memorial edition. Dignity-first; incomplete by design.
+ * The opening viewport is the wall; this file does not put a title or lede over it.
  */
-
-/**
- * The room says what it holds rather than naming its own genre. "Memorial" is the label on the
- * door; this is the sentence a reader arrives on.
- */
-export const MEMORIAL_PAGE_TITLE = 'Every name the archive has been given';
 
 export const MEMORIAL_PAGE_DESCRIPTION =
   'A memorial wall of names, written out one at a time, with the same names listed alphabetically underneath. The list is incomplete, and always will be.';
-
-export const MEMORIAL_KICKER = 'Held in remembrance';
-
-export const MEMORIAL_PAGE_LEDE =
-  'Written by hand, one at a time. The wall holds them as handwriting; the list below holds the same names in alphabetical order, with a jump to any letter.';
 
 /**
  * "Held in the Wall" message: assembles from the wall's own handwriting
@@ -44,6 +34,6 @@ export const MEMORIAL_QUIET_LIST_LINK_A11Y_LABEL = 'Read every name held here';
  * Deterministic seed for the wall's handwriting layout. The value still reads `v6` and is
  * deliberately unchanged: it is a seed, not a label, and rewriting the string would reshuffle
  * every name's position, size and ink on a memorial wall. It moved here from the route's
- * `memorial-panel-chrome.ts` when that last v6 chrome module was retired (repo-92n2.30).
+ * Reading-room styles own the memorial entry label.
  */
 export const MEMORIAL_WALL_SEED = 'memorial-edition-v6';

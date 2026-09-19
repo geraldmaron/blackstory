@@ -1,0 +1,62 @@
+{
+  "source": "U.S. Bureau of the Census, Census of Population: 1970, Vol. I, Characteristics of the Population, Part 1, United States Summary, Section 1",
+  "sourceUrl": "https://www2.census.gov/library/publications/decennial/1970/population-volume-1/1970a_us1-10.pdf",
+  "table": "Table 83",
+  "page": "1-377",
+  "boundaryVersion": "us-states-1970",
+  "datasetVintage": "1973 printed volume",
+  "figures": [
+    {
+      "metricId": "lives-income-median",
+      "jurisdictionId": "nation:US",
+      "referencePeriod": "1970",
+      "raceEthnicitySlice": "all",
+      "estimate": 9590,
+      "universe": "Families, income in 1969 dollars",
+      "note": "PC(1)-C1 Table 83 Families Total column for 1969. Threshold for 1970 family income bands."
+    },
+    {
+      "metricId": "lives-income-median",
+      "jurisdictionId": "nation:US",
+      "referencePeriod": "1970",
+      "raceEthnicitySlice": "white",
+      "estimate": 9961,
+      "universe": "Families, income in 1969 dollars"
+    },
+    {
+      "metricId": "lives-income-median",
+      "jurisdictionId": "nation:US",
+      "referencePeriod": "1970",
+      "raceEthnicitySlice": "black",
+      "estimate": 6067,
+      "universe": "Families, income in 1969 dollars",
+      "note": "Negro row in Table 83, not Negro and other races."
+    },
+    {
+      "metricId": "lives-income-median",
+      "jurisdictionId": "nation:US",
+      "referencePeriod": "1960",
+      "raceEthnicitySlice": "all",
+      "estimate": 5660,
+      "universe": "Families, income in 1959 dollars",
+      "note": "1959 median from the same Table 83 panel."
+    },
+    {
+      "metricId": "lives-income-median",
+      "jurisdictionId": "nation:US",
+      "referencePeriod": "1960",
+      "raceEthnicitySlice": "white",
+      "estimate": 5893,
+      "universe": "Families, income in 1959 dollars"
+    },
+    {
+      "metricId": "lives-income-median",
+      "jurisdictionId": "nation:US",
+      "referencePeriod": "1960",
+      "raceEthnicitySlice": "nonwhite",
+      "estimate": 3161,
+      "universe": "Families, income in 1959 dollars",
+      "note": "1960 panel publishes Negro and other races, not a Negro-only row."
+    }
+  ]
+}

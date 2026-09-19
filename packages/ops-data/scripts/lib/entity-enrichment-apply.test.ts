@@ -1,4 +1,6 @@
-/** repo-n7p6.16 items 2/5 — review-sampling selector + ledger write shape. */
+/**
+ * Tests deterministic review selection and the enrichment ledger write shape.
+ */
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 import {
@@ -64,7 +66,7 @@ describe('applyEnrichmentResult review-sample notes', () => {
       entityId: 'ent_x_001',
       attempt: acceptedAttempt,
       modelId: 'test-model',
-      costUsdEstimate: 0,
+      costUsd: null,
       ...(reviewSample !== undefined ? { reviewSample } : {}),
     });
     return JSON.parse(captured as string) as Record<string, unknown>;
@@ -86,7 +88,10 @@ describe('applyEnrichmentResult review-sample notes', () => {
   });
 });
 
-/** repo-n9dq — the third outcome of a drafting pass, alongside accepted and quarantined. */
+/**
+ * Tests evidence-scoped no-significance outcomes separately from validated and quarantined
+ * drafts.
+ */
 describe('applyLaneSignificanceRefusal', () => {
   async function capture(input: {
     reason: string;

@@ -5,6 +5,7 @@ import {
   publishArtifactWithRetry,
   retryWithBackoff,
   uploadArtifactJson,
+  describeFetchFailure,
 } from './release-catalog-publish-upload.ts';
 
 function noSleep() {
@@ -306,4 +307,14 @@ test('partial publish: a search-index failure after a successful entities upload
   assert.equal(watermark.publishedEntitiesHash, 'new-entities-hash');
   assert.equal(watermark.publishedSearchIndexHash, 'old-search-hash');
   assert.equal(watermark.publishedAt, '2026-09-01T00:00:00.000Z');
+});
+
+test('describeFetchFailure surfaces the undici cause code behind a bare fetch failure', () => {
+  const socket = Object.assign(new Error('other side closed'), { code: 'UND_ERR_SOCKET' });
+  assert.equal(
+    describeFetchFailure(new TypeError('fetch failed', { cause: socket })),
+    'fetch failed (UND_ERR_SOCKET: other side closed)',
+  );
+  assert.equal(describeFetchFailure(new TypeError('fetch failed')), 'fetch failed');
+  assert.equal(describeFetchFailure('boom'), 'boom');
 });

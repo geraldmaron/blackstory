@@ -1,8 +1,5 @@
 /**
  * Public law reference browse surface at `/law`.
- *
- * v9 room kit edition with shared browse/filter surface. Preserves GET
- * browse URL contract (`q`, `kind`, `topic`) and auto-submit facet selects.
  */
 import type { Metadata } from 'next';
 import React from 'react';
@@ -12,8 +9,9 @@ import { LAW_EDITION_BROWSE_LEDE } from './law-copy';
 import { buildLawBrowseViewModel, type RawLawBrowseParams } from './law-view-model';
 import { loadLegalCatalog } from '../../lib/legal/public-source';
 import { LawBrowseSections } from './LawBrowseSections';
-import { humanizeLegalKind } from '../../components/legal';
-import { Room, RoomHeader } from '../../components/room';
+import { humanizeLegalKind, humanizeLegalTopic } from '../../components/legal';
+import { DocumentColophon, OrientationInstrument, ReadingEntry, Room } from '../../components/room';
+import './law-browse.css';
 import '../reading-room.css';
 
 void React;
@@ -22,14 +20,14 @@ export const metadata: Metadata = buildStaticPageMetadata({
   path: '/law',
   title: 'Law',
   description:
-    'Plain-language access to landmark civil-rights statutes, regulations, and court decisions.',
+    'Plain-language statutes, regulations, and court decisions that shaped what could be built, owned, attended and voted for.',
 });
 
 type LawPageProps = {
   readonly searchParams: Promise<RawLawBrowseParams>;
 };
 
-export default async function LawBrowsePage({ searchParams }: LawPageProps) {
+export default async function LawPage({ searchParams }: LawPageProps) {
   const params = await searchParams;
   const source = await loadLegalCatalog();
   const catalog = source.snapshots;
@@ -46,24 +44,37 @@ export default async function LawBrowsePage({ searchParams }: LawPageProps) {
         `${count} ${humanizeLegalKind(kind).toLowerCase()}${count === 1 ? '' : 's'}`,
     );
 
+  const topicCounts = new Map<string, number>();
+  for (const snapshot of catalog) {
+    for (const topic of snapshot.topics) {
+      topicCounts.set(topic, (topicCounts.get(topic) ?? 0) + 1);
+    }
+  }
+  const topTopics = [...topicCounts.entries()]
+    .sort((left, right) => right[1] - left[1] || left[0].localeCompare(right[0]))
+    .slice(0, 2)
+    .map(([topic, count]) => ({
+      label: humanizeLegalTopic(topic),
+      href: `/law?topic=${encodeURIComponent(topic)}#browse`,
+      note: `${count.toLocaleString('en-US')} entries`,
+      icon: 'law' as const,
+    }));
+
+  const rail = (
+    <OrientationInstrument
+      where="Statutes and rulings, in plain language"
+      moves={[
+        ...topTopics,
+        { label: 'How this catalog is built', href: '/methodology', icon: 'methodology' as const },
+      ].slice(0, 3)}
+    />
+  );
+
   return (
-    <Room>
-      <RoomHeader
-        pathname="/law"
-        kicker="Reference"
-        title={
-          <>
-            Civil rights <em>law</em>
-          </>
-        }
-        lede={
-          <>
-            {LAW_EDITION_BROWSE_LEDE} This catalog holds the statutes, regulations, constitutional
-            amendments and landmark decisions themselves. It is linked to a place only by
-            jurisdiction and era, never by a documented evidentiary join.
-          </>
-        }
-        meta={[`${catalog.length.toLocaleString('en-US')} law entries`, ...kindMeta]}
+    <Room rail={rail}>
+      <ReadingEntry pathname="/law" title="Law" lede={LAW_EDITION_BROWSE_LEDE} showCrumb={false} />
+      <DocumentColophon
+        facts={[`${catalog.length.toLocaleString('en-US')} law entries`, ...kindMeta]}
       />
 
       <LawBrowseSections view={view} catalog={catalog} />

@@ -42,16 +42,8 @@ const APPLY = process.env.MERGE_DUPLICATE_HUBS_APPLY === '1';
 const ACTOR_ID = process.env.OPERATOR_ID?.trim() || 'ops-data/merge-duplicate-hubs';
 
 /**
- * Pairs to merge. Defaults to the WS4 hub set this script was written for; `MERGE_PAIRS` supplies
- * others as one `absorbed>survivor[>reason]` entry PER LINE.
- *
- * One per line, not comma-separated: a merge reason is a sentence and sentences contain commas.
- * The first version of this split on commas too and choked on its own first real reason.
- *
- * This exists because the script's safety properties are general but its pair list was not: after
- * the cleanup deletes were scoped to the merge's own rows (02630381, repo-iypc) the machinery is
- * safe for any pair, and the alternative was hand-written SQL per duplicate, which is how an
- * unscoped delete gets written in the first place.
+ * MERGE_PAIRS supplies one absorbed>survivor>reason entry per line. Commas belong to the reason
+ * text and are not separators. Review the default pair list before applying any merge.
  */
 function resolveMergePairs(): readonly HubMergePair[] {
   const raw = process.env.MERGE_PAIRS?.trim();
@@ -99,7 +91,7 @@ function connectionString(): string {
 
 async function entityExists(client: pg.PoolClient, entityId: string): Promise<boolean> {
   const result = await client.query<{ exists: boolean }>(
-    `SELECT EXISTS (SELECT 1 FROM bb_canonical.entities WHERE id = $1) AS exists`,
+    `SELECT EXISTS (SELECT 1 FROM canonical.entities WHERE id = $1) AS exists`,
     [entityId],
   );
   return result.rows[0]?.exists === true;
@@ -109,8 +101,8 @@ async function mergeAlreadyApplied(client: pg.PoolClient, absorbedId: string): P
   const result = await client.query<{ exists: boolean }>(
     `SELECT EXISTS (
        SELECT 1
-       FROM bb_canonical.entity_merge_absorbed a
-       JOIN bb_canonical.entity_merges m ON m.id = a.merge_id
+       FROM canonical.entity_merge_absorbed a
+       JOIN canonical.entity_merges m ON m.id = a.merge_id
        WHERE a.absorbed_id = $1 AND m.status = 'active'
      ) AS exists`,
     [absorbedId],
@@ -121,7 +113,7 @@ async function mergeAlreadyApplied(client: pg.PoolClient, absorbedId: string): P
 async function relationshipDegree(client: pg.PoolClient, entityId: string): Promise<number> {
   const result = await client.query<{ degree: string }>(
     `SELECT COUNT(*)::text AS degree
-     FROM bb_canonical.entity_relationships
+     FROM canonical.entity_relationships
      WHERE from_entity_id = $1 OR to_entity_id = $1`,
     [entityId],
   );
@@ -151,15 +143,15 @@ async function loadEdgeCoverage(client: pg.PoolClient): Promise<EdgeCoverageSnap
   }>(
     `WITH touched AS (
        SELECT from_entity_id AS entity_id
-       FROM bb_canonical.entity_relationships
+       FROM canonical.entity_relationships
        WHERE workflow_status = 'accepted'
        UNION
        SELECT to_entity_id
-       FROM bb_canonical.entity_relationships
+       FROM canonical.entity_relationships
        WHERE workflow_status = 'accepted'
      )
      SELECT
-       (SELECT COUNT(*)::text FROM bb_canonical.entities) AS total_entities,
+       (SELECT COUNT(*)::text FROM canonical.entities) AS total_entities,
        (SELECT COUNT(DISTINCT entity_id)::text FROM touched) AS entities_with_accepted_edge`,
   );
   return {
@@ -183,7 +175,7 @@ export async function rewriteRelationshipsForPair(
   const touchedIds = new Set<string>();
 
   const fromUpdate = await client.query<{ id: string }>(
-    `UPDATE bb_canonical.entity_relationships
+    `UPDATE canonical.entity_relationships
        SET from_entity_id = $2, updated_at = now()
        WHERE from_entity_id = $1
        RETURNING id`,
@@ -193,7 +185,7 @@ export async function rewriteRelationshipsForPair(
   const updatedFrom = fromUpdate.rowCount ?? 0;
 
   const toUpdate = await client.query<{ id: string }>(
-    `UPDATE bb_canonical.entity_relationships
+    `UPDATE canonical.entity_relationships
        SET to_entity_id = $2, updated_at = now()
        WHERE to_entity_id = $1
        RETURNING id`,
@@ -209,7 +201,7 @@ export async function rewriteRelationshipsForPair(
   const deletedSelfLoops =
     (
       await client.query(
-        `DELETE FROM bb_canonical.entity_relationships
+        `DELETE FROM canonical.entity_relationships
        WHERE from_entity_id = to_entity_id
          AND id = ANY($1::text[])`,
         [touched],
@@ -218,8 +210,8 @@ export async function rewriteRelationshipsForPair(
   const deletedDuplicates =
     (
       await client.query(
-        `DELETE FROM bb_canonical.entity_relationships r1
-       USING bb_canonical.entity_relationships r2
+        `DELETE FROM canonical.entity_relationships r1
+       USING canonical.entity_relationships r2
        WHERE r1.from_entity_id = r2.from_entity_id
          AND r1.to_entity_id = r2.to_entity_id
          AND r1.relationship_type = r2.relationship_type
@@ -243,7 +235,7 @@ export async function rewriteEventParticipationForPair(
   const touchedIds = new Set<string>();
 
   const participantUpdate = await client.query<{ id: string }>(
-    `UPDATE bb_canonical.event_participation
+    `UPDATE canonical.event_participation
        SET participant_id = $2, updated_at = now()
        WHERE participant_id = $1
        RETURNING id`,
@@ -253,7 +245,7 @@ export async function rewriteEventParticipationForPair(
   const updatedParticipant = participantUpdate.rowCount ?? 0;
 
   const eventUpdate = await client.query<{ id: string }>(
-    `UPDATE bb_canonical.event_participation
+    `UPDATE canonical.event_participation
        SET event_id = $2, updated_at = now()
        WHERE event_id = $1
        RETURNING id`,
@@ -269,7 +261,7 @@ export async function rewriteEventParticipationForPair(
   const deletedSelfLoops =
     (
       await client.query(
-        `DELETE FROM bb_canonical.event_participation
+        `DELETE FROM canonical.event_participation
        WHERE event_id = participant_id
          AND id = ANY($1::text[])`,
         [touched],
@@ -278,8 +270,8 @@ export async function rewriteEventParticipationForPair(
   const deletedDuplicates =
     (
       await client.query(
-        `DELETE FROM bb_canonical.event_participation ep1
-       USING bb_canonical.event_participation ep2
+        `DELETE FROM canonical.event_participation ep1
+       USING canonical.event_participation ep2
        WHERE ep1.event_id = ep2.event_id
          AND ep1.participant_id = ep2.participant_id
          AND ep1.role = ep2.role
@@ -297,11 +289,11 @@ async function rewriteReleaseEntitiesForPair(
 ): Promise<{ readonly updated: number; readonly conflicts: readonly string[] }> {
   const conflictRes = await client.query<{ release_id: string }>(
     `SELECT re.release_id
-     FROM bb_public.release_entities re
+     FROM published.release_entities re
      WHERE re.entity_id = $1
        AND EXISTS (
          SELECT 1
-         FROM bb_public.release_entities re2
+         FROM published.release_entities re2
          WHERE re2.release_id = re.release_id
            AND re2.entity_id = $2
        )`,
@@ -310,12 +302,12 @@ async function rewriteReleaseEntitiesForPair(
   const updated =
     (
       await client.query(
-        `UPDATE bb_public.release_entities re
+        `UPDATE published.release_entities re
        SET entity_id = $2
        WHERE re.entity_id = $1
          AND NOT EXISTS (
            SELECT 1
-           FROM bb_public.release_entities re2
+           FROM published.release_entities re2
            WHERE re2.release_id = re.release_id
              AND re2.entity_id = $2
          )`,
@@ -331,11 +323,11 @@ async function rewriteSearchIndexForPair(
 ): Promise<{ readonly updated: number; readonly conflicts: readonly string[] }> {
   const conflictRes = await client.query<{ release_id: string }>(
     `SELECT si.release_id
-     FROM bb_public.search_index si
+     FROM published.search_index si
      WHERE si.entity_id = $1
        AND EXISTS (
          SELECT 1
-         FROM bb_public.search_index si2
+         FROM published.search_index si2
          WHERE si2.release_id = si.release_id
            AND si2.entity_id = $2
        )`,
@@ -344,12 +336,12 @@ async function rewriteSearchIndexForPair(
   const updated =
     (
       await client.query(
-        `UPDATE bb_public.search_index si
+        `UPDATE published.search_index si
        SET entity_id = $2
        WHERE si.entity_id = $1
          AND NOT EXISTS (
            SELECT 1
-           FROM bb_public.search_index si2
+           FROM published.search_index si2
            WHERE si2.release_id = si.release_id
              AND si2.entity_id = $2
          )`,
@@ -364,7 +356,7 @@ async function rewriteLandscapeCandidatesForPair(
   pair: HubMergePair,
 ): Promise<number> {
   const result = await client.query(
-    `UPDATE bb_research.landscape_candidates lc
+    `UPDATE research.landscape_candidates lc
      SET payload = jsonb_set(
            jsonb_set(
              payload,
@@ -406,12 +398,12 @@ async function applyHubMerge(
 }> {
   const mergeId = mergeLedgerId(pair.absorbedId);
   await client.query(
-    `INSERT INTO bb_canonical.entity_merges (id, survivor_id, status, reason, actor_id)
+    `INSERT INTO canonical.entity_merges (id, survivor_id, status, reason, actor_id)
      VALUES ($1, $2, 'active', $3, $4)`,
     [mergeId, pair.survivorId, pair.reason, ACTOR_ID],
   );
   await client.query(
-    `INSERT INTO bb_canonical.entity_merge_absorbed (merge_id, absorbed_id)
+    `INSERT INTO canonical.entity_merge_absorbed (merge_id, absorbed_id)
      VALUES ($1, $2)`,
     [mergeId, pair.absorbedId],
   );
@@ -423,7 +415,7 @@ async function applyHubMerge(
   const landscapeCandidates = await rewriteLandscapeCandidatesForPair(client, pair);
 
   await client.query(
-    `UPDATE bb_canonical.entities
+    `UPDATE canonical.entities
      SET merge_state = $2::jsonb, updated_at = now()
      WHERE id = $1`,
     [pair.absorbedId, JSON.stringify(buildMergeStatePayload(pair, mergeId, absorbedAt))],

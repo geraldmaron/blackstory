@@ -59,8 +59,3 @@ export {
   fetchCommonCrawlCdxBatch,
   type FetchCommonCrawlCdxInput,
 } from './fetch-cdx.js';
-
-export {
-  ingestCommonCrawlCandidatesThroughPipeline,
-  type IngestCommonCrawlCandidatesThroughPipelineInput,
-} from './pipeline.js';

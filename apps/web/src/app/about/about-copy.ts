@@ -15,11 +15,13 @@
  * silently the moment a paragraph was inserted above them, and inserting paragraphs is what a
  * rewrite of this page does.
  *
- * The destination lists are NOT here. They are generated from `lib/nav/destination-registry.ts`,
- * so a room cannot be described on this page and missing from the footer, or listed here after it
- * stops existing. The previous hardcoded list pointed twice at `/history`, which has been a
- * redirect for months.
+ * Contribution cards (`take-part`) are generated from `lib/nav/destination-registry.ts`. The full
+ * room catalogue lives on `/rooms`; About hands off there instead of re-listing every room. The
+ * previous hardcoded list pointed twice at `/history`, which has been a redirect for months.
  */
+import { MAKER } from '@repo/config';
+import type { DestinationIconId } from '@repo/public-contracts/destinations';
+import { METHODOLOGY_SOURCE_LIBRARY_HREF } from '../methodology/methodology-copy';
 
 /**
  * The product line. The door mast is this string. `/about` uses the full lede.
@@ -42,37 +44,77 @@ export const ABOUT_ORIGIN = [
   "I'm not an institution. I'm one person with a laptop, a stack of evenings, and access to more public records than any generation before mine could have searched in a lifetime.",
   ABOUT_WALK_PAST,
   "I'm not a historian, and I'm not an expert in the software I use to do this. What I have is the means, and enough command of the tools to put history that other people are working to hide in front of more of the people it belongs to. That is the size of the claim, and I would rather state it that small than dress it up.",
-  'So I started pulling the records into one place, pinned to where they happened, with the source attached to every claim. I have gotten things wrong. Those are in the errata with the earlier wording still readable, because a correction you cannot check is just a second assertion.',
+  'So I started pulling the records into one place, pinned to where they happened, with the source attached to every claim. I parse and review this in good faith, and I still get things wrong: there is more of it than one person can hold at once. Those mistakes are in the errata with the earlier wording still readable, because a correction you cannot check is just a second assertion.',
   "This was never going to be finished by one person, and I was never going to be the authority on any of it. I'll do my part for as long as I can. The rest of the work is making this solid enough that somebody else can add to it and trust what they find.",
 ] as const;
+
+/**
+ * How the maker means the archive to be read. First person, because the framing is a person's
+ * choice rather than a rule the software can enforce. FAQ answers the short form and points here.
+ */
+export const ABOUT_STANCE = {
+  heading: 'How I mean this',
+  paragraphs: [
+    "This is not anti-white, and it is not a case against anybody else. Black history is here because it happened in these places, and because the paper that survived it is still sitting in public files. Presence here is not a subtraction from anyone else's history.",
+    'I try to keep the framing even. Assembling the site is still an opinion. I chose what to look for, which records to open first, and what to leave for later. The citations are how you form your own reading, including one that disagrees with mine.',
+    'You can challenge how I assembled this. You should not have to go looking for who I am in order to do it. I work as a product manager. The job is storytelling that has to survive the facts. I have done that at IBM, AT&T, HashiCorp and Sentry Data Systems, and I have led employee groups for people who were not the default in those rooms.',
+  ],
+  maker: {
+    lead: 'The rest of who I am, if you want it, is at',
+    href: MAKER.url,
+    label: 'geralddagher.com',
+  },
+} as const;
 
 /** Place pillar body. The ground the record sits on. Do not retype. */
 export const ABOUT_ON_THE_GROUND =
   'People, schools, congregations, businesses and events are pinned to the ground they happened on, at the precision their sources support, so a record is something you can go and stand in front of.';
 
 /** What every record stands on. Rules, stated impersonally. */
-export const ABOUT_PILLARS = [
+export const ABOUT_PILLARS: readonly {
+  readonly kicker: string;
+  readonly icon: DestinationIconId;
+  readonly title: string;
+  readonly body: string;
+}[] = [
   {
     kicker: 'Place',
+    icon: 'place',
     title: 'Every record sits somewhere you can stand',
     body: ABOUT_ON_THE_GROUND,
   },
   {
     kicker: 'Evidence',
+    icon: 'evidence',
     title: 'Citations, and a grade for how sure the archive is',
     body: 'An accepted claim carries its citations and one of four grades: established, corroborated, single source, contested. The grade is spelled out in words beside its mark, so reading it never depends on telling two colors apart. Where the sources disagree, the record says so and keeps both of them.',
   },
   {
     kicker: 'Precision',
+    icon: 'precision',
     title: 'A point is drawn no sharper than its source',
     body: 'A record known to a county is drawn as a county, and a coarsened point is never labeled as an address.',
   },
   {
     kicker: 'Living people',
+    icon: 'privacy',
     title: 'The protections are in the code, not in the tone',
     body: 'Public precision stops at a city, a campus or an institution. Current residential addresses for living private people do not appear on public pages, and a record whose living status is unknown is treated as living.',
   },
 ] as const;
+
+/** Handoff from About to the Methodology source-library section. */
+export const ABOUT_SOURCE_LIBRARY_HANDOFF = {
+  href: METHODOLOGY_SOURCE_LIBRARY_HREF,
+  label: 'Where the evidence comes from',
+} as const;
+
+/** Handoff from About to the published room list. The catalogue lives on `/rooms`, not here. */
+export const ABOUT_ROOMS_HANDOFF = {
+  href: '/rooms',
+  label: 'Browse the rooms',
+  lede: 'Law, data, lives across the decades, the source library, the memorial wall, the methods behind each record, and the ways to add what is missing all live on one page. If a room is not on that list, it is not finished.',
+} as const;
 
 /**
  * How the long-form writing gets made, including the part most sites leave out.
@@ -112,6 +154,7 @@ export const ABOUT_REFUSALS = [
   'Publish a fact because a model produced it. Facts come from fetched sources and are checked before any of the writing starts.',
   'Publish a living private person at a street address, or frame anyone as a case study in harm.',
   'Fix a mistake quietly. Corrections are published, with the earlier wording still readable.',
+  "Treat Black history as a rebuttal of anyone else's. Presence here is not a subtraction from another archive, and it is not a claim that somebody else's experience did not happen.",
   'Ask you to make an account, or to identify yourself, in order to read anything here.',
 ] as const;
 
@@ -121,5 +164,6 @@ export const ABOUT_CONTRIBUTE = {
   lede: 'Most of what is missing here is already known by somebody, and often that somebody is not in an archive at all. You do not need an account or a credential to hand it over.',
   terms:
     'I read every lead before anything is published. Nothing you send goes public on arrival, and nothing is published without a source someone else can check. If you tell the archive it is wrong, you get a receipt code and a tracked outcome, not a thank-you note.',
-  direct: 'If a form is the wrong shape for what you have, write to me:',
+  direct:
+    'This is a side project. If you want to partner, or a form is the wrong shape for what you have, write to me:',
 } as const;

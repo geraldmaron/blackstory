@@ -1,5 +1,5 @@
 /**
- * Confirms the palette's record index carries subjects, not just proper nouns (repo-92n2.35):
+ * Confirms the palette's record index carries subjects, not just proper nouns:
  * the four most-searched terms in the archive each reach a record through some indexed field, a
  * name match still outranks every subject match, and the row can say which field it matched.
  */

@@ -11,10 +11,10 @@ import { surfaceClassFor } from '../lib/nav/surface-classes';
 
 const here = dirname(fileURLToPath(import.meta.url));
 
-test('only Explore resolves to the instrument class', () => {
+test('`/` and `/explore` share the door class; browse is a posture, not instrument chrome', () => {
   assert.equal(surfaceClassFor('/'), 'door');
   assert.equal(surfaceClassFor('/', 'atlas=1'), 'door');
-  assert.equal(surfaceClassFor('/explore'), 'instrument');
+  assert.equal(surfaceClassFor('/explore'), 'door');
   assert.equal(surfaceClassFor('/explore/api'), null);
   assert.equal(surfaceClassFor('/locate'), 'utility');
   assert.equal(surfaceClassFor('/stories'), 'reading');

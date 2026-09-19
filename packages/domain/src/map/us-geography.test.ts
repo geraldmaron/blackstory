@@ -59,13 +59,13 @@ test('NY/NJ carve-out: Hoboken and Newark stay NJ; Staten Island is NY', () => {
 
 test('bbox-ambiguous points resolve via real state polygons, not smallest-bbox-first', () => {
   // Philadelphia's bbox test previously lost to NJ's smaller overlapping bbox
-  // (repo-jevj): NJ's rectangle happens to reach across the Delaware River and
+  // New Jersey's rectangle happens to reach across the Delaware River and
   // cover Philadelphia even though the point is nowhere near New Jersey.
   assert.equal(findUsStateForPoint(39.95, -75.16)?.postalCode, 'PA'); // Philadelphia, PA
 
   // A Mississippi River bend point on the Louisiana side near Milliken's Bend
   // previously lost to Mississippi's smaller overlapping bbox for the same
-  // reason (repo-jevj).
+  // bbox-overlap reason.
   assert.equal(findUsStateForPoint(32.48, -91.14)?.postalCode, 'LA'); // LA side of the river bend
 });
 

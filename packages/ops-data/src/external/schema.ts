@@ -1,5 +1,5 @@
 /**
- * Firestore document schemas for tier-1 external datasets (see
+ * Validated records for external datasets (see
  * @repo/domain's `external-data-sources.ts` for the acquisition registry):
  *
  * - `opportunityAtlasTracts` — curated starter subset of the Opportunity Atlas tract
@@ -10,14 +10,14 @@
  * Both carry the provenance quartet (public-numeric-policy category 3 discipline — these are
  * published research/archival statistics, provenance is structurally required) plus a
  * `license` string so the restriction travels with every doc. Both collections stay
- * client-CLOSED in firestore.rules until a rights-reviewed public surface exists.
+ * private until a rights-reviewed publication projection exists.
  *
  * Opportunity Atlas values are rates/percentile ranks in [0,1]-ish space, NOT counts —
  * a value is retained only when its reliability count (`*_n`) clears the ingest threshold;
  * dropped cells are listed in `suppressed` (same convention as ACS docs).
  */
 import { z } from 'zod';
-import { datasetArtifactProvenanceFields } from '../firestore/statistic-provenance.js';
+import { datasetArtifactProvenanceFields } from '../records/statistic-provenance.js';
 
 /** Outcome estimates retained from the tract_outcomes_early release. All optional — a cell
  * below the reliability threshold is omitted and recorded in `suppressed`. */
@@ -82,8 +82,7 @@ export const holcAreaSchema = z.object({
   industrial: z.boolean(),
   /** Whether the area belonged to a formal city survey. */
   citySurvey: z.boolean(),
-  /** Polygon geometry stays in the raw GeoJSON in Storage (Firestore 1MB doc limit; the
-   * map-tile follow-up consumes the file directly). This reference locates it exactly. */
+  /** Polygon geometry stays in raw GeoJSON Storage objects. This reference locates it exactly. */
   geometryRef: z.object({
     storagePath: z.string().min(1),
     featureIndex: z.number().int().nonnegative(),

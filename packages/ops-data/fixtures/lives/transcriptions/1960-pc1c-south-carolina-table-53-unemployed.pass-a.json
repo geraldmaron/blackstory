@@ -1,0 +1,100 @@
+{
+  "source": "U.S. Bureau of the Census, U.S. Census of Population: 1960, Vol. I, Characteristics of the Population, Part 42, South Carolina, Chapter C, General Social and Economic Characteristics",
+  "sourceUrl": "https://www2.census.gov/library/publications/decennial/1960/population-volume-1/37749999v1p42ch4.pdf",
+  "table": "Table 53",
+  "page": "42-102",
+  "boundaryVersion": "us-states-1960",
+  "datasetVintage": "1963 printed volume",
+  "figures": [
+    {
+      "metricId": "lives-unemployed",
+      "jurisdictionId": "state:45",
+      "referencePeriod": "1960",
+      "raceEthnicitySlice": "all",
+      "estimate": 4.1,
+      "universe": "Civilian labor force; persons 14 years old and over; both sexes",
+      "numerator": 34568,
+      "denominator": 838301
+    },
+    {
+      "metricId": "lives-unemployed",
+      "jurisdictionId": "state:45",
+      "referencePeriod": "1960",
+      "raceEthnicitySlice": "white",
+      "estimate": 3.4,
+      "universe": "Civilian labor force; WHITE; both sexes",
+      "numerator": 19895,
+      "denominator": 582274
+    },
+    {
+      "metricId": "lives-unemployed",
+      "jurisdictionId": "state:45",
+      "referencePeriod": "1960",
+      "raceEthnicitySlice": "nonwhite",
+      "estimate": 5.7,
+      "universe": "Civilian labor force; NONWHITE; both sexes",
+      "numerator": 14673,
+      "denominator": 256027
+    },
+    {
+      "metricId": "lives-unemployed",
+      "jurisdictionId": "state:45",
+      "referencePeriod": "1950",
+      "raceEthnicitySlice": "all",
+      "estimate": 3.4,
+      "universe": "Civilian labor force; both sexes",
+      "numerator": 26688,
+      "denominator": 782066
+    },
+    {
+      "metricId": "lives-unemployed",
+      "jurisdictionId": "state:45",
+      "referencePeriod": "1950",
+      "raceEthnicitySlice": "white",
+      "estimate": 2.9,
+      "universe": "Civilian labor force; WHITE; both sexes",
+      "numerator": 14300,
+      "denominator": 497176
+    },
+    {
+      "metricId": "lives-unemployed",
+      "jurisdictionId": "state:45",
+      "referencePeriod": "1950",
+      "raceEthnicitySlice": "nonwhite",
+      "estimate": 4.3,
+      "universe": "Civilian labor force; NONWHITE; both sexes",
+      "numerator": 12388,
+      "denominator": 284890
+    },
+    {
+      "metricId": "lives-unemployed",
+      "jurisdictionId": "state:45",
+      "referencePeriod": "1940",
+      "raceEthnicitySlice": "all",
+      "estimate": 9.6,
+      "universe": "Civilian labor force; both sexes",
+      "numerator": 69707,
+      "denominator": 725280
+    },
+    {
+      "metricId": "lives-unemployed",
+      "jurisdictionId": "state:45",
+      "referencePeriod": "1940",
+      "raceEthnicitySlice": "white",
+      "estimate": 10.5,
+      "universe": "Civilian labor force; WHITE; both sexes",
+      "numerator": 43179,
+      "denominator": 410021
+    },
+    {
+      "metricId": "lives-unemployed",
+      "jurisdictionId": "state:45",
+      "referencePeriod": "1940",
+      "raceEthnicitySlice": "nonwhite",
+      "estimate": 8.4,
+      "universe": "Civilian labor force; NONWHITE; both sexes",
+      "numerator": 26528,
+      "denominator": 315259
+    }
+  ]
+}

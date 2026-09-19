@@ -4,6 +4,9 @@
 Supabase/Postgres schemas remain the canonical ledger; JSON files in the package are versioned wire
 contracts and profile configuration, not a second datastore.
 
+Start with the [research framework](./README.md) for operating method and verified limits.
+A contract in this package does not establish that a live worker uses it.
+
 ## Contract flow
 
 `schemas/research-kernel.v1.schema.json` is the JSON Schema 2020-12 source of truth. The generator

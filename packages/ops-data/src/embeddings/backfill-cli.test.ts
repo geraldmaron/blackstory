@@ -1,18 +1,19 @@
 /**
- * Tests for the budget-aware backfill runner, fully in-memory no Firestore, no
+ * Tests for the budget-aware backfill runner, fully in-memory no database, no
  * network access. Exercises: pagination, skip-unchanged-hash, --force, item cap, cost budget.
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import {
   runBackfill,
+  parseBackfillArgs,
   type CanonicalEntitySource,
   type EntityEmbeddingInput,
 } from './backfill-cli.js';
 import { createDeterministicMockEmbeddingProvider } from './provider.js';
 import { createInMemoryVectorIndexStore } from './vector-store.js';
 import { buildEntityEmbeddingText } from './text.js';
-import { sha256Hex } from './pipeline.js';
+import { sha256Hex, estimateEmbeddingCostUsd } from './pipeline.js';
 
 function makeSource(inputs: readonly EntityEmbeddingInput[], pageSize = 10): CanonicalEntitySource {
   return {
@@ -116,4 +117,43 @@ test('runBackfill records per-entity embedding errors without aborting the run',
   assert.equal(summary.embedded, 1);
   assert.equal(summary.skippedErrors.length, 1);
   assert.equal(summary.skippedErrors[0]!.entityId, 'blank');
+});
+
+test('backfill CLI rejects absent, malformed and unrecognized budget arguments', () => {
+  for (const args of [
+    [],
+    ['--max-items', '10'],
+    ['--max-items', '10', '--max-cost-usd'],
+    ['--max-items', 'NaN', '--max-cost-usd', '1'],
+    ['--max-items', '1.5', '--max-cost-usd', '1'],
+    ['--max-items', '10', '--max-cost-usd', 'Infinity'],
+    ['--max-items', '10', '--max-cost-usd', '-1'],
+    ['--max-items=10', '--max-cost-usd', '1'],
+  ])
+    assert.throws(() => parseBackfillArgs(args));
+  assert.deepEqual(parseBackfillArgs(['--max-items', '10', '--max-cost-usd', '0']), {
+    maxItems: 10,
+    maxCostUsd: 0,
+    force: false,
+  });
+});
+
+test('failed embedding writes retain the attempted-call budget reservation', async () => {
+  const input = entityInput('a', 'Alpha');
+  const estimated = estimateEmbeddingCostUsd(buildEntityEmbeddingText(input.entity).length);
+  const store = createInMemoryVectorIndexStore();
+  const summary = await runBackfill({
+    source: makeSource([input, entityInput('b', 'Alpha')]),
+    provider: createDeterministicMockEmbeddingProvider(),
+    store: {
+      ...store,
+      writeEmbedding: async () => {
+        throw new Error('Storage unavailable');
+      },
+    },
+    maxEstimatedCostUsd: estimated,
+  });
+  assert.equal(summary.processed, 1);
+  assert.equal(summary.skippedErrors.length, 1);
+  assert.equal(summary.stoppedForBudget, true);
 });

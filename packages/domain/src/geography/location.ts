@@ -7,7 +7,7 @@ import type { GeoPointFields } from './geohash.js';
 import type { PublicPrecisionLevel } from './precision.js';
 import type { GeoPrecisionTier, PrecisionBasis } from './precision.js';
 
-/** Firestore-friendly geometry shapes (no PostGIS WKT required). */
+/** JSON-compatible geometry shapes (no PostGIS WKT required). */
 export type GeoGeometry =
   | { readonly type: 'Point'; readonly coordinates: readonly [lng: number, lat: number] }
   | {

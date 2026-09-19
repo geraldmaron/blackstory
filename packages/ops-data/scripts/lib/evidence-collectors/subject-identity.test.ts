@@ -13,10 +13,9 @@ import {
 } from './subject-identity.ts';
 
 /**
- * The negative cases below are the real mismatches measured in the 2026-08-10 enrichment round
- * (repo-ppeu): 9 of 24 subjects were handed evidence about a different subject. Each is written
- * from what the captured document actually was, because the point of the gate is these documents
- * and a synthetic "obviously wrong" fixture would not have exercised the old code either.
+ * The negative cases below are the real mismatches measured in the 2026-08-10 enrichment round:
+ * 9 of 24 subjects were handed evidence about a different subject. Each case uses the captured
+ * document because a synthetic, obviously wrong fixture would not exercise the same boundary.
  */
 describe('checkSubjectIdentity rejects the measured repo-ppeu mismatches', () => {
   it('rejects the wrong state: Covington, KENTUCKY for a Covington, VIRGINIA church', () => {
@@ -387,7 +386,7 @@ describe('significantNameTokens', () => {
 });
 
 /**
- * repo-u84y. Same convention as the repo-ppeu cases above: every negative below is written from a
+ * Same convention as the cases above: every negative below is written from a
  * document that was really attached to that entity and really passed the old gate, because a
  * synthetic "obviously wrong" fixture would have passed the old code too and so proves nothing.
  */
@@ -598,7 +597,7 @@ describe('checkSubjectIdentity requires a geography match for a common instituti
 
 describe('placeExpectationFromProjection (repo-f85hp)', () => {
   /*
-   * repo-f85hp. The curated records (lynching_*, gap_*, recon_*) have no landscape_candidates row,
+   * The curated records (lynching_*, gap_*, recon_*) have no landscape_candidates row,
    * so the sweep builds a synthetic candidate from the published projection. It used to split
    * `locationLabel` on the comma, which is prose about where a thing stands rather than an
    * administrative place.

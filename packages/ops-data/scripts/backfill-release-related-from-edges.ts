@@ -1,24 +1,8 @@
 /**
- * Standalone pass that syncs the active release's `related[]` from canonical relationship edges.
- *
- * The mapping itself lives in ./lib/release-related-sync.ts, which the incremental publisher now
- * runs on every apply (repo-66mv1). That makes this script a repair/inspection tool rather than a
- * required follow-up step: reach for it to preview or fix the active release out of band, not to
- * finish a publish.
- *
- * Two behaviors changed when the mapping moved into the shared module, both deliberate:
- *  - it is authoritative, replacing `related[]` instead of only filling an empty one, which is the
- *    only way to reach a list that is stale rather than absent (the entity-merge case);
- *  - BACKFILL_RELATED_REFRESH_ENTITY_IDS is therefore gone — it existed solely to force past the
- *    empty-only guard for named ids.
- *
- * After applying, rebuild the release graph (it derives from projection.related):
- *   node --conditions development --import tsx packages/ops-data/scripts/rebuild-release-graph.ts
- *
- * Default dry-run. Apply:
- *   set -a && source apps/web/.env.local && set +a && export DATABASE_SSL=1
- *   DRY_RUN=0 BACKFILL_RELATED_FROM_EDGES_APPLY=1 node --conditions development --import tsx \
- *     packages/ops-data/scripts/backfill-release-related-from-edges.ts
+ * Previews or repairs active-release related lists from canonical edges using the same shared
+ * mapper as incremental publication. Lists are replaced so stale links can be removed. Rebuild
+ * the release graph after an applied repair. Writes require DRY_RUN=0 and
+ * BACKFILL_RELATED_FROM_EDGES_APPLY=1.
  */
 import pg from 'pg';
 import { normalizePgConnectionString } from './lib/pg-connection.ts';
@@ -43,7 +27,7 @@ async function main(): Promise<void> {
 
   try {
     const active = await client.query<{ release_id: string }>(
-      `SELECT release_id FROM bb_public.v_active_release_id`,
+      `SELECT release_id FROM published.v_active_release_id`,
     );
     const releaseId = active.rows[0]?.release_id;
     if (!releaseId) throw new Error('No active release');

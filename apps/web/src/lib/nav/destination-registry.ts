@@ -33,6 +33,7 @@ import {
   primaryAxes,
   semanticDestinationsInFamily,
   type DestinationFamily,
+  type DestinationIconId,
   type SemanticDestination,
 } from '@repo/public-contracts/destinations';
 
@@ -75,11 +76,12 @@ export const ROOMS_GROUP_COPY: Readonly<
   find: { heading: null, standfirst: null },
   read: {
     heading: 'Rooms for reading',
-    standfirst: 'Law, data, banned books, and the memorial wall.',
+    standfirst: 'Law, data, lives across the decades, banned books, and the memorial wall.',
   },
   check: {
     heading: 'How a record gets in',
-    standfirst: 'Methods, origin, plain answers, and the log of what we corrected.',
+    standfirst:
+      'Origin, methods, the source library, plain answers, and the log of what was corrected.',
   },
   'take-part': {
     heading: 'Add what is missing',
@@ -169,6 +171,12 @@ const WEB_PRESENTATION: Readonly<Record<string, WebPresentation>> = Object.freez
     menuLine: 'National series',
     crawl: { changeFrequency: 'weekly', priority: 0.6 },
   },
+  lives: {
+    kind: 'TIMELINE',
+    modifier: 'IMMERSIVE',
+    menuLine: 'Class, decade by decade',
+    crawl: { changeFrequency: 'monthly', priority: 0.6 },
+  },
   books: {
     kind: 'CATALOG',
     menuLine: 'Documented challenges',
@@ -195,6 +203,11 @@ const WEB_PRESENTATION: Readonly<Record<string, WebPresentation>> = Object.freez
     kind: 'TRANSPARENCY',
     modifier: 'RECEIPT',
     menuLine: 'How a record gets in',
+    crawl: { changeFrequency: 'monthly', priority: 0.5 },
+  },
+  sources: {
+    kind: 'PUBLISHERS',
+    menuLine: 'Where evidence comes from',
     crawl: { changeFrequency: 'monthly', priority: 0.5 },
   },
   errata: {
@@ -283,6 +296,10 @@ const DESTINATION_BY_PATH: ReadonlyMap<string, Destination> = new Map(
   DESTINATIONS.map((destination) => [destination.path, destination]),
 );
 
+const DESTINATION_BY_ID: ReadonlyMap<string, Destination> = new Map(
+  DESTINATIONS.map((destination) => [destination.id, destination]),
+);
+
 /**
  * Parents for dynamic segments, longest prefix first. A record's parent is its catalog, which
  * is what makes "every record links back to the room that lists it" hold without any record page
@@ -301,6 +318,7 @@ export const DYNAMIC_PARENTS: readonly (readonly [string, string])[] = [
   ['/entity/', '/records'],
   ['/books/', '/books'],
   ['/law/', '/law'],
+  ['/lives/', '/lives'],
 ];
 
 /**
@@ -316,6 +334,11 @@ export function destinationFor(pathname: string): Destination | undefined {
   return DESTINATION_BY_PATH.get(normalizeDestinationPath(pathname));
 }
 
+/** Lookup by catalog id. Paths can 308; the id is what a TOC or deep-link section keys on. */
+export function destinationById(id: string): Destination | undefined {
+  return DESTINATION_BY_ID.get(id);
+}
+
 /** Every destination, in registry order. */
 export function allDestinations(): readonly Destination[] {
   return DESTINATIONS;
@@ -327,8 +350,9 @@ export function destinationsInGroup(group: DestinationGroup): readonly Destinati
 }
 
 /**
- * The one room list: the same three groups as `/about`, Rooms, and the editorial footer columns.
- * Explore, Records, and Rooms itself stay off this list; Find chrome lists them separately.
+ * The one room list: the same three groups as `/rooms` and the editorial footer columns.
+ * About hands off here rather than re-listing every room. Explore, Records, and Rooms itself
+ * stay off this list; Find chrome lists them separately.
  */
 export function browsableDestinations(): readonly Destination[] {
   return ROOMS_CARD_GROUPS.flatMap((group) => destinationsInGroup(group));
@@ -380,27 +404,32 @@ export function parentPathFor(pathname: string): string | null {
  * joins the footer by having a group, and leaves it by losing one — so `/history` cannot linger
  * after it becomes a redirect.
  */
+export type FooterNavItem = {
+  readonly href: string;
+  readonly label: string;
+  readonly icon: DestinationIconId;
+};
+
 export type FooterColumn = {
   readonly title: string;
-  readonly items: readonly { readonly href: string; readonly label: string }[];
+  readonly items: readonly FooterNavItem[];
 };
+
+function footerItem(destination: Destination): FooterNavItem {
+  return { href: destination.path, label: destination.label, icon: destination.icon };
+}
 
 export function footerColumns(): readonly FooterColumn[] {
   const column = (title: string, groups: readonly DestinationGroup[]): FooterColumn => ({
     title,
-    items: groups
-      .flatMap((group) => destinationsInGroup(group))
-      .map((destination) => ({ href: destination.path, label: destination.label })),
+    items: groups.flatMap((group) => destinationsInGroup(group)).map(footerItem),
   });
 
   /* Find stays in the footer and the command bar; Rooms / browsableDestinations stay editorial. */
   return [
     {
       title: 'Find',
-      items: destinationsInGroup('find').map((destination) => ({
-        href: destination.path,
-        label: destination.label,
-      })),
+      items: destinationsInGroup('find').map(footerItem),
     },
     column(GROUP_HEADINGS.read ?? 'Where to begin', ['read']),
     column(GROUP_HEADINGS.check ?? 'How it decides', ['check']),

@@ -1,22 +1,3 @@
-/**
- * Budget-aware bulk (re)embedding CLI for entity corpora.
- *
- * 2026-08-14: live source and store are Postgres (`bb_public.release_entities` /
- * `bb_canonical.entity_embeddings` via `@repo/data-access`'s ops pool) after the Postgres
- * cutover (`docs/decisions-carryover.md`, "entity source-of-truth precedence")
- * `canonicalEntities`/`publicSearchIndex` no longer exist in Firestore
- * (docs/data/firebase-wind-down.md). Run:
- * GEMINI_API_KEY=... DATABASE_URL=... node --conditions development --import tsx \
- * packages/ops-data/src/embeddings/backfill-cli.ts --max-items 500 --max-cost-usd 1
- *
- * The `createFirestore*` source/lookup functions below are retained only as bounded
- * history/reference (firebase-wind-down.md) — Firestore has no live database left to read from.
- *
- * Every dependency (entity source, provider, store) is injected so `runBackfill` itself is
- * fully unit-testable without Postgres, Firestore, or network access; only the
- * `if (import.meta.url...)` block at the bottom touches real infrastructure.
- */
-import type { Firestore } from 'firebase-admin/firestore';
 import { getOpsPostgresPool } from '@repo/data-access';
 import {
   createPostgresCanonicalEntitySource,
@@ -32,7 +13,7 @@ import {
   type EntityEmbeddingResult,
 } from './pipeline.js';
 import type { EmbeddingProvider } from './provider.js';
-import { buildEntityEmbeddingText, type EntityLocationContext } from './text.js';
+import { buildEntityEmbeddingText } from './text.js';
 import { createPostgresVectorIndexStore } from './postgres-vector-store.js';
 import { type VectorIndexStore } from './vector-store.js';
 
@@ -76,6 +57,7 @@ export type BackfillSummary = {
  * the last run (unless `force`), stopping early on the item cap or cost budget.
  */
 export async function runBackfill(options: BackfillOptions): Promise<BackfillSummary> {
+  validateBackfillBounds(options.maxItems, options.maxEstimatedCostUsd);
   const dims = options.dims ?? EMBEDDING_DIMS;
   const now = options.now ?? (() => new Date().toISOString());
 
@@ -126,6 +108,8 @@ export async function runBackfill(options: BackfillOptions): Promise<BackfillSum
       }
 
       processed += 1;
+      // Failed or interrupted calls can still be billed; retain their estimated reservation.
+      cumulativeCostUsd += projectedCost;
       try {
         const result: EntityEmbeddingResult = await embedEntity(options.provider, input, {
           dims,
@@ -142,7 +126,6 @@ export async function runBackfill(options: BackfillOptions): Promise<BackfillSum
           sourceTextHash: result.sourceTextHash,
           updatedAt: result.computedAt,
         });
-        cumulativeCostUsd += projectedCost;
         embedded += 1;
       } catch (error) {
         skippedErrors.push({
@@ -166,65 +149,14 @@ export async function runBackfill(options: BackfillOptions): Promise<BackfillSum
   };
 }
 
-const CANONICAL_ENTITIES_PAGE_SIZE = 200;
-
-/**
- * Real Firestore-backed entity source. Location/state resolution is intentionally out of
- * scope here: entity documents don't carry a resolved state code directly, and joining the
- * `locations` subcollection + geocode cache per entity is a documented integration gap.
- * Backfilled vectors therefore get `kind`/`eraBucket` pre-filters but generally not `state`
- * until that join is wired in.
- */
-export function createFirestoreCanonicalEntitySource(
-  firestore: Firestore,
-  resolveLocation?: (entityId: string) => Promise<EntityLocationContext | undefined>,
-): CanonicalEntitySource {
-  return {
-    async listPage(cursor) {
-      let query = firestore
-        .collection('canonicalEntities')
-        .orderBy('__name__')
-        .limit(CANONICAL_ENTITIES_PAGE_SIZE);
-      if (cursor) {
-        query = query.startAfter(cursor);
-      }
-      const snapshot = await query.get();
-      const items: EntityEmbeddingInput[] = [];
-      for (const doc of snapshot.docs) {
-        const data = doc.data() as Record<string, unknown>;
-        const location = resolveLocation ? await resolveLocation(doc.id) : undefined;
-        items.push({
-          entityId: doc.id,
-          entity: data as EntityEmbeddingInput['entity'],
-          ...(location ? { location } : {}),
-        });
-      }
-      const lastDoc = snapshot.docs.at(-1);
-      return {
-        items,
-        ...(lastDoc && snapshot.docs.length === CANONICAL_ENTITIES_PAGE_SIZE
-          ? { nextCursor: lastDoc.id }
-          : {}),
-      };
-    },
-  };
+function validateBackfillBounds(maxItems?: number, maxCostUsd?: number): void {
+  if (maxItems !== undefined && (!Number.isSafeInteger(maxItems) || maxItems < 1))
+    throw new Error('maxItems must be a positive safe integer');
+  if (maxCostUsd !== undefined && (!Number.isFinite(maxCostUsd) || maxCostUsd < 0))
+    throw new Error('maxCostUsd must be finite and nonnegative');
 }
 
-/** Reads existing embedding docs' sourceTextHash directly, one Firestore get per entity. */
-export function createFirestoreExistingHashLookup(
-  firestore: Firestore,
-): ExistingEmbeddingHashLookup {
-  return {
-    async get(entityId) {
-      const snapshot = await firestore.collection('entityEmbeddings').doc(entityId).get();
-      if (!snapshot.exists) return undefined;
-      const data = snapshot.data() as Record<string, unknown> | undefined;
-      return typeof data?.sourceTextHash === 'string' ? data.sourceTextHash : undefined;
-    },
-  };
-}
-
-function parseArgs(argv: readonly string[]): {
+export function parseBackfillArgs(argv: readonly string[]): {
   maxItems?: number;
   maxCostUsd?: number;
   force: boolean;
@@ -232,15 +164,22 @@ function parseArgs(argv: readonly string[]): {
   const result: { maxItems?: number; maxCostUsd?: number; force: boolean } = { force: false };
   for (let index = 0; index < argv.length; index += 1) {
     const arg = argv[index];
-    if (arg === '--max-items') result.maxItems = Number(argv[++index]);
-    else if (arg === '--max-cost-usd') result.maxCostUsd = Number(argv[++index]);
-    else if (arg === '--force') result.force = true;
+    if (arg === '--force') result.force = true;
+    else if (arg === '--max-items' || arg === '--max-cost-usd') {
+      const value = argv[++index];
+      if (!value?.trim()) throw new Error(`${arg} requires a value`);
+      if (arg === '--max-items') result.maxItems = Number(value);
+      else result.maxCostUsd = Number(value);
+    } else throw new Error(`Unknown backfill argument: ${arg}`);
   }
+  validateBackfillBounds(result.maxItems, result.maxCostUsd);
+  if (result.maxItems === undefined || result.maxCostUsd === undefined)
+    throw new Error('Backfill requires both --max-items and --max-cost-usd');
   return result;
 }
 
 async function mainCli(argv: string[]): Promise<void> {
-  const args = parseArgs(argv);
+  const args = parseBackfillArgs(argv);
   const pool = getOpsPostgresPool(process.env);
   const query = async <T extends Record<string, unknown> = Record<string, unknown>>(
     sql: string,
@@ -250,26 +189,30 @@ async function mainCli(argv: string[]): Promise<void> {
     return result.rows;
   };
 
-  const summary = await runBackfill({
-    source: createPostgresCanonicalEntitySource(query),
-    provider: createGeminiEmbeddingProvider({ environment: process.env }),
-    store: createPostgresVectorIndexStore(query),
-    existingHashes: createPostgresExistingHashLookup(query),
-    ...(args.maxItems !== undefined ? { maxItems: args.maxItems } : {}),
-    ...(args.maxCostUsd !== undefined ? { maxEstimatedCostUsd: args.maxCostUsd } : {}),
-    force: args.force,
-  });
+  try {
+    const summary = await runBackfill({
+      source: createPostgresCanonicalEntitySource(query),
+      provider: createGeminiEmbeddingProvider({ environment: process.env }),
+      store: createPostgresVectorIndexStore(query),
+      existingHashes: createPostgresExistingHashLookup(query),
+      ...(args.maxItems !== undefined ? { maxItems: args.maxItems } : {}),
+      ...(args.maxCostUsd !== undefined ? { maxEstimatedCostUsd: args.maxCostUsd } : {}),
+      force: args.force,
+    });
 
-  console.log(
-    JSON.stringify(
-      {
-        source: 'bb_public.release_entities',
-        ...summary,
-      },
-      null,
-      2,
-    ),
-  );
+    console.log(
+      JSON.stringify(
+        {
+          source: 'published.release_entities',
+          ...summary,
+        },
+        null,
+        2,
+      ),
+    );
+  } finally {
+    await pool.end();
+  }
 }
 
 if (import.meta.url === `file://${process.argv[1]}`) {

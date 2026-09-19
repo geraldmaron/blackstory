@@ -1,8 +1,6 @@
 /**
- * Unit tests for the mobile performance baseline harness's pure parsers
- * (`lib/mobile-perf-parsers.mjs`). Fixture strings below are hand-built from the documented output
- * shapes of `am start -W`, `dumpsys meminfo`, `dumpsys gfxinfo`, and `perf-marks.ts`'s log line —
- * not captured from a real run, since this harness is not run against a device in this session.
+ * Mobile performance parser tests use synthetic documented command-output shapes. They do not
+ * establish measured device performance.
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';

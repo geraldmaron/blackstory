@@ -59,7 +59,7 @@ export type RetryPolicy = {
 
 export type ServiceScalingLimits = {
   readonly serviceId: ServiceId;
-  readonly runtime: 'vercel' | 'firebase-app-hosting' | 'cloud-run';
+  readonly runtime: 'vercel' | 'cloud-run';
   readonly tier: WorkloadTier;
   readonly minInstances: number;
   readonly maxInstances: number;
@@ -367,7 +367,7 @@ export const DEFAULT_CLOUD_RUN_JOB_POLICIES: Record<WorkerJobId, CloudRunJobPoli
   },
 };
 
-/** Per-role database connection and statement limits (Firestore-era: pool sizing for deferred SQL). */
+/** Per-role database connection and statement limits. */
 export const DEFAULT_DATABASE_LIMITS: Record<string, DatabaseResourceLimits> = {
   role_public_read: {
     role: 'role_public_read',

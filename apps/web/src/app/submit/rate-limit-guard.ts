@@ -28,7 +28,7 @@ export type SubmitLeadRateLimitRequest = {
   readonly clientIp?: string;
   readonly deviceId?: string;
   readonly sessionId?: string;
-  readonly appCheckVerified?: boolean;
+  readonly clientAttested?: boolean;
   readonly riskSignals?: readonly RiskSignal[];
 };
 
@@ -73,9 +73,7 @@ export function createSubmitLeadRateLimitGuard(options: SubmitLeadRateLimitGuard
         subject: request.subject,
         endpointClass: ENDPOINT_CLASS,
         key,
-        ...(request.appCheckVerified !== undefined
-          ? { appCheckVerified: request.appCheckVerified }
-          : {}),
+        ...(request.clientAttested !== undefined ? { clientAttested: request.clientAttested } : {}),
         ...(request.riskSignals ? { riskSignals: request.riskSignals } : {}),
       });
 

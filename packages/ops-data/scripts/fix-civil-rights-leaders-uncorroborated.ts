@@ -1,55 +1,7 @@
 /**
- * Resolves repo-wqtq: four details asserted in civil-rights-leaders summaries that no source
- * had been produced for. Each was chased to an institutional source; two survived, one was
- * corrected, one turned out to be false.
- *
- * 1. von-d-mizell — "South Florida's first NAACP chapter". SURVIVES. The Florida Civil Rights
- *    Museum's Broward County exhibit says outright that he "founded South Florida's first
- *    chapter of the NAACP", independently of aaregistry.org, which already backed the claim.
- *    Wikipedia's narrower "first chapter in Broward County (1945)" is the lone dissent and is
- *    the weakest of the three. Summary stands; the claim goes to two independent lineages.
- *    The museum also supplies a fact nothing in the record carried — Morehouse, and his being
- *    the county's second Black doctor — so its lineage is visible in the record, not just in a
- *    count.
- *
- * 2. calvin-shirley — "Sistrunk-neighborhood branch". CORRECTED. The Westside Gazette obituary
- *    names the facility (Northwest Health Center) and locates it in "a predominately Black
- *    community"; it never says Sistrunk. Naming the neighborhood was an invention on top of the
- *    source. The summary now says what the source says and names the building.
- *
- * 3. eula-johnson — the 1959 election year. SURVIVES. The Florida Civil Rights Museum gives it
- *    directly: "In 1959, Johnson broke new ground when she became the first woman to serve as
- *    president of the Fort Lauderdale branch of the NAACP." The NSU exhibit already had the
- *    "first woman" half without the year; this adds the year on its own citation rather than
- *    backfilling a year into a claim whose source does not state one.
- *
- * 4. william-f-penn — "First African American to graduate from Yale Medical School (1897)".
- *    FALSE, and the reason to distrust a Wikipedia-only superlative. Yale says the first African
- *    American graduate of its medical school was Cortlandt Van Rensselaer Creed, MD 1857 — the
- *    first person of African descent to take a degree from Yale in any discipline. Penn earned
- *    his MD in 1897, thirty years later. Yale's own exhibit on early Black students, which would
- *    have every reason to say "first", does not.
- *
- *    Penn's record was the thinnest of the seven precisely because the summary's claims were
- *    being held to a standard the catalog does not actually apply. Read properly, the Yale
- *    exhibit supports four facts, and the Library of Congress holds a 1917 photograph from the
- *    NAACP's own records captioned with the Atlanta branch's officers and executive committee,
- *    Penn among them — a Tier-1 primary source better than the date it was doubted over. Penn
- *    goes from one claim to five and loses the one thing that was wrong.
- *
- * Not changed: james-sistrunk's birth year. The museum gives 1897–1967, agreeing with one side
- * of the 1891/1897 split, but the year appears in no summary and moves no pin, so there is
- * nothing here to correct. His birthplace and pin are untouched, as before.
- *
- * Usage (from repo root):
- *   set -a && source apps/web/.env.local && set +a
- *   export DATABASE_SSL=1
- *   node --conditions development --import tsx \
- *     packages/ops-data/scripts/fix-civil-rights-leaders-uncorroborated.ts
- *
- * Apply:
- *   DRY_RUN=0 FIX_CRL_UNCORROBORATED_APPLY=1 node --conditions development --import tsx \
- *     packages/ops-data/scripts/fix-civil-rights-leaders-uncorroborated.ts
+ * Applies source-specific corrections and corroboration to the listed civil-rights records.
+ * Each assertion retains its cited institution or publication; source disagreement and
+ * unsupported geographic specificity require explicit treatment.
  */
 import pg from 'pg';
 import { remindToRepublishCatalogArtifacts } from './lib/catalog-republish-reminder.ts';
@@ -241,7 +193,7 @@ async function main(): Promise<void> {
   try {
     const releaseId = (
       await client.query<{ release_id: string }>(
-        `SELECT release_id FROM bb_public.active_release LIMIT 1`,
+        `SELECT release_id FROM published.active_release LIMIT 1`,
       )
     ).rows[0]?.release_id;
     if (!releaseId) throw new Error('no active release');
@@ -254,7 +206,7 @@ async function main(): Promise<void> {
         claims: ProjectionClaim[];
       }>(
         `SELECT entity_id, summary, COALESCE(claims, '[]'::jsonb) AS claims
-         FROM bb_public.release_entities
+         FROM published.release_entities
          WHERE release_id = $1 AND entity_id = ANY($2::text[])`,
         [releaseId, entityIds],
       )
@@ -306,7 +258,7 @@ async function main(): Promise<void> {
         const claimsJson = JSON.stringify(item.claims);
         const claimIdsJson = JSON.stringify(item.claims.map((claim) => claim.id));
         await client.query(
-          `UPDATE bb_public.release_entities
+          `UPDATE published.release_entities
            SET projection = jsonb_set(
                  jsonb_set(
                    jsonb_set(projection, '{summary}', to_jsonb($3::text), true),
@@ -318,14 +270,14 @@ async function main(): Promise<void> {
           [releaseId, item.entityId, item.summary, claimsJson, claimIdsJson],
         );
         await client.query(
-          `UPDATE bb_canonical.entities
+          `UPDATE canonical.entities
            SET kind_detail = jsonb_set(kind_detail, '{editorial,summary}', to_jsonb($2::text), true),
                updated_at = now()
            WHERE id = $1`,
           [item.entityId, item.summary],
         );
         await client.query(
-          `UPDATE bb_public.search_index
+          `UPDATE published.search_index
            SET claim_count = $3,
                facets = jsonb_set(facets, '{claimCount}', to_jsonb($3::int), true)
            WHERE release_id = $1 AND entity_id = $2`,
@@ -342,8 +294,8 @@ async function main(): Promise<void> {
 
     const after = await client.query(
       `SELECT e.entity_id, jsonb_array_length(e.claims) AS claims, s.claim_count, e.summary
-       FROM bb_public.release_entities e
-       JOIN bb_public.search_index s
+       FROM published.release_entities e
+       JOIN published.search_index s
          ON s.release_id = e.release_id AND s.entity_id = e.entity_id
        WHERE e.release_id = $1 AND e.entity_id = ANY($2::text[])
        ORDER BY e.entity_id`,

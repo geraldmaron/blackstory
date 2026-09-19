@@ -57,38 +57,30 @@ export function redirectsForNextConfig() {
     { source: '/legal', destination: '/law', permanent: true },
     { source: '/legal/:path*', destination: '/law/:path*', permanent: true },
 
-    // `/map` is the old name for Explore. `/` is the map door; `/explore` still renders it.
-    { source: '/map', destination: '/explore', permanent: true },
+    // `/map` folds into the Door journey. `/explore` stays the map-focus instrument URL —
+    // a permanent 308 from `/explore` → `/` is deliberately rejected: Chrome caches RSC
+    // navigations (`/explore?_rsc=…`) and a prior fold left the instrument unreachable
+    // (redirect-table.test.ts). Nav and CTAs point at `/`; deep links keep `/explore?…`.
+    { source: '/map', destination: '/', permanent: true },
 
-    // repo-92n2.14 (SP-14): the standalone `/locate` page and `LocateExperience` are deleted —
-    // the address/ZIP field, radius presets, catalog typeahead, and opt-in geolocation are one
-    // `PlaceFinder` component now, folded into the Atlas Lens's Where group (wide) and a
-    // dedicated place sheet (narrow). `design-direction-v9-surfaces.md`'s `/locate` row names
-    // the destination as `/?find=place`, the future state where `/explore` has folded into `/`
-    // (WP-25) — not done yet, deliberately deferred and out of this bead's scope
-    // (`AtlasExperience.tsx`'s own doc comment). Today the live Atlas instrument is `/explore`,
-    // so that is where a working deep link has to land; repoint this to `/?find=place` in the
-    // same commit that ships WP-25, not before. `/locate/api` is unchanged and stays out of the
-    // proxy's query-normalization matcher (`proxy.ts`), so it is unaffected by this rule.
+    // Redirect the retired locate page to Explore's place finder. The locate API is separate
+    // and is unaffected by this page redirect.
     { source: '/locate', destination: '/explore?find=place', permanent: true },
 
     // `/library` is the old name for Rooms.
     { source: '/library', destination: '/rooms', permanent: true },
 
+    // Retired hub escape hatches. Query strings are preserved by Next when the destination
+    // omits its own query, so `/law/browse?q=voting` lands on `/law?q=voting`.
+    { source: '/law/browse', destination: '/law', permanent: true },
+    { source: '/books/browse', destination: '/books', permanent: true },
+
     // The inventions index is the Records kind filter, not a second catalog.
     { source: '/inventions', destination: '/records?kind=inventions', permanent: true },
 
-    // repo-ytq3n: the disc_ and gap_ lanes each produced their own live Tulsa Race Massacre
-    // record, so the collision suffix in `place-slug.ts` gave the loser its own public address
-    // rather than 404ing outright. The 2026-09-12 owner ruling merged it into
-    // disc_tulsa_race_massacre_q1824714 and unpublished it, which turns that address into a 404.
-    //
-    // ONLY the /place form is here. The /entity form is already handled, and better, by
-    // bb_public.release_entity_redirects (repo-n7p6.29): /entity/[id] resolves merged ids
-    // through the release, so every future merge redirects with no code change. The slug route
-    // cannot use that table today because it resolves by slug rather than entity id, and
-    // teaching it to is work that belongs with the /place retirement (repo-giah), not a second
-    // redirect mechanism bolted on beside the first.
+    // Preserve the absorbed Tulsa record's published place URL. Entity-id redirects use
+    // published.release_entity_redirects; this slug-specific redirect serves the older place
+    // URL.
     {
       source: '/place/tulsa-race-massacre--gap_tulsa_race_massacre',
       destination: '/place/tulsa-race-massacre',

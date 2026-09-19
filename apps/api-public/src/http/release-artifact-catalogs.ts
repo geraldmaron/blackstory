@@ -1,23 +1,8 @@
 /**
- * Release-catalog artifacts as a read-through cache for `apps/api-public` (repo-csw0;
- * `docs/decisions-carryover.md`, "Public projection and immutable publication snapshots").
- *
- * Serverless instances scale to zero, so every cold start previously pulled the full multi-MB
- * entity catalog and search index out of Postgres. Those objects are release-scoped, so they are
- * served from the public-media CDN instead when an artifact origin is configured. They are not
- * immutable in practice: the publisher upserts the same object path (`x-upsert: true`) whenever
- * an ops-data script corrects `bb_public` under the unchanged active release id, which is why
- * the release-id guard below is identity-based rather than content-based.
- *
- * Postgres stays the system of record and the safety properties are explicit:
- * - artifacts are used only when `APP_PUBLIC_RELEASE_ARTIFACT_BASE_URL` names an origin, so an
- *   unconfigured deployment can never pick one up implicitly;
- * - `allowLocalFallback: false` keeps `packages/ops-data/fixtures/release-artifacts` out of the
- *   serving path — a fixture slice must never shadow `bb_public`;
- * - the caller passes the release id from the live `active_release` pointer and the shared
- *   fetchers reject any artifact whose `releaseId` differs, so a stale object is ignored;
- * - every loader returns `undefined` on any miss/parse failure, and the caller falls back to
- *   Postgres.
+ * Loads release-scoped catalog artifacts from the configured public-media origin. Require the
+ * live active-release id, reject mismatches and malformed artifacts, disable fixture fallback,
+ * and fall back to Postgres on a miss. In-place corrections can replace an artifact under the
+ * same release id.
  */
 import {
   fetchReleaseEntitiesListArtifact,

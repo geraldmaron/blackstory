@@ -10,9 +10,19 @@ import type { Metadata } from 'next';
 import React from 'react';
 import Link from 'next/link';
 import { buildStaticPageMetadata } from '../../lib/seo/metadata-builders';
-import { Room, RoomHeader, Prose, CardGrid, RoomCard, UtilityCard } from '../../components/room';
+import {
+  Room,
+  ReadingEntry,
+  Prose,
+  CardGrid,
+  RoomCard,
+  RoomSection,
+  roomSectionTone,
+} from '../../components/room';
+import { DestinationIcon } from '../../components/patterns/DestinationIcon';
 import { WalkOffRamp } from '../walk-off-ramp';
 import { SUPPORT_CONTACT } from '../../lib/config/contact';
+import type { DestinationIconId } from '@repo/public-contracts/destinations';
 import '../utility.css';
 import './support.css';
 
@@ -25,38 +35,52 @@ export const metadata: Metadata = buildStaticPageMetadata({
     'How to report a correction, read the BlackStory trust documentation, and reach the person who runs it.',
 });
 
-const SUPPORT_PATHS = [
+const SUPPORT_PATHS: readonly {
+  readonly href: string;
+  readonly label: string;
+  readonly icon: DestinationIconId;
+  readonly detail: string;
+}[] = [
   {
     href: '/corrections',
     label: 'Report a correction',
+    icon: 'correction',
     detail:
       'Say a published record is wrong, or point at evidence it is missing. Submissions enter moderated review, and nothing changes publicly until a person accepts it. You get a receipt code.',
   },
   {
     href: '/methodology',
     label: 'Read the methodology',
+    icon: 'methodology',
     detail:
       'Definitions, source rules, confidence grades, map dignity limits, and how corrections are handled.',
   },
   {
     href: '/errata',
     label: 'Browse the errata log',
+    icon: 'errata',
     detail: 'Corrections, clarifications, updates, and editor notes already applied, newest first.',
   },
-] as const;
+];
 
 export default function SupportPage() {
   return (
     <Room>
-      <RoomHeader
+      <ReadingEntry
         pathname="/support"
-        kicker="Help"
         title="Support"
         lede="BlackStory is one person's archive of Black history, tied to the places it happened. If something in a record is wrong, corrections is the fastest way in: it is moderated, it gives you a receipt code, and nothing is published as submitted."
-        showPath={false}
+        showCrumb={false}
       />
 
-      <UtilityCard className="ds-support__section-paths">
+      <RoomSection
+        id="paths"
+        icon="correction"
+        kicker="Start here"
+        title="The fastest ways in"
+        tone={roomSectionTone(0)}
+        className="ds-support__section-paths"
+      >
         <Prose>
           <p className="ds-support__section-intro">
             A question about one specific record is best filed as a correction, because that puts
@@ -69,14 +93,26 @@ export default function SupportPage() {
               key={path.href}
               href={path.href}
               kind="OPTION"
-              title={path.label}
+              title={
+                <>
+                  <DestinationIcon id={path.icon} size="md" />
+                  {path.label}
+                </>
+              }
               description={path.detail}
             />
           ))}
         </CardGrid>
-      </UtilityCard>
+      </RoomSection>
 
-      <UtilityCard title="Reach me" className="ds-support__section-contact">
+      <RoomSection
+        id="contact"
+        icon="support"
+        kicker="Mailbox"
+        title="Reach me"
+        tone={roomSectionTone(1)}
+        className="ds-support__section-contact"
+      >
         <Prose>
           <p className="ds-support__contact-intro">
             For anything the corrections form has no field for (how the archive is run, a privacy
@@ -97,7 +133,7 @@ export default function SupportPage() {
           so a reply can take a few days. I read everything that comes in, and I'll keep this
           running for as long as I can.
         </p>
-      </UtilityCard>
+      </RoomSection>
 
       <WalkOffRamp>Saying a record is wrong is the fastest way to change what it says.</WalkOffRamp>
     </Room>

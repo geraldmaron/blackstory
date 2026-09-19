@@ -1,5 +1,5 @@
 /**
- * Stable HTTP response primitives for the `/v1` public read API (MOB-004).
+ * Stable HTTP response primitives for the `/v1` public read API.
  *
  * These helpers are server-only (they use `node:crypto` for ETag/request-id hashing) and live in
  * `apps/api-public` — NOT in `@repo/public-contracts`, which must stay node-free for the mobile
@@ -97,7 +97,7 @@ export function jsonRead(
 }
 
 /**
- * A permanent redirect with an empty body (repo-n7p6.29).
+ * A permanent redirect with an empty body.
  *
  * 308, not 301, for two reasons: it is what `apps/web`'s `permanentRedirect` emits, so the two
  * public surfaces answer a merged-away id the same way; and 301 permits a client to rewrite the

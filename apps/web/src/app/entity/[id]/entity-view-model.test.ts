@@ -59,7 +59,7 @@ test('isThinRecord reads the published coverage field, not how empty the page lo
 });
 
 /**
- * repo-z1pw/repo-ol8v: coverage counts distinct source DOCUMENTS, so 'minimal' also covers a
+ * Coverage counts distinct source documents, so 'minimal' also covers a
  * genuinely researched record that leans on one source. THIN_RECORD_COPY tells the reader "what
  * you see here is the listing itself rather than a researched history" — false over real
  * narrative prose, so narrative context suppresses the notice.

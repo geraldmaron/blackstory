@@ -2,13 +2,11 @@
 
 from __future__ import annotations
 
-from typing import Any, Literal
+from typing import Any, Literal, TypeAlias
 
-from pydantic import BaseModel, ConfigDict
+from .validation import ContractModel
 
-class Budget(BaseModel):
-    model_config = ConfigDict(extra="forbid", frozen=True)
-
+class Budget(ContractModel):
     queries: int
     candidateUrls: int
     fullCaptures: int
@@ -16,43 +14,33 @@ class Budget(BaseModel):
     durationMinutes: int
     paidModelUsd: float
 
-class RiskClassPolicy(BaseModel):
-    model_config = ConfigDict(extra="forbid", frozen=True)
-
+class RiskClassPolicy(ContractModel):
     id: str
     description: str
     budgetClass: Literal["standard", "highImpact"]
     escalationTriggers: list[str]
 
-class SourceFitnessRule(BaseModel):
-    model_config = ConfigDict(extra="forbid", frozen=True)
-
+class SourceFitnessRule(ContractModel):
     sourceClass: str
     claimClass: str
     fitness: Literal["authoritative", "strong", "conditional", "leadOnly", "unfit"]
     limitations: list[str]
 
-class ModelPolicy(BaseModel):
-    model_config = ConfigDict(extra="forbid", frozen=True)
-
+class ModelPolicy(ContractModel):
     mode: Literal["deterministic", "local-triage", "free-batch", "paid-research", "quality-prose", "independent-review", "trusted-session"]
     modelIds: list[str]
     authority: list[str]
     requiresBenchmark: bool
     mayApprove: bool
 
-class RetentionPolicy(BaseModel):
-    model_config = ConfigDict(extra="forbid", frozen=True)
-
+class RetentionPolicy(ContractModel):
     acceptedProvenanceDays: int | None
     searchCacheDays: int
     failedModelPayloadDays: int
     deadLetterDraftDays: int
     holdExemptions: list[Literal["case", "audit", "rights", "legal"]]
 
-class PublicationPolicy(BaseModel):
-    model_config = ConfigDict(extra="forbid", frozen=True)
-
+class PublicationPolicy(ContractModel):
     automaticPublicPromotion: bool
     requireDistinctActor: bool
     requireDistinctModelFamily: bool
@@ -62,18 +50,14 @@ class PublicationPolicy(BaseModel):
     confidenceEceMaximum: float
     unsupportedSentenceRateMaximum: float
 
-class StoppingPolicy(BaseModel):
-    model_config = ConfigDict(extra="forbid", frozen=True)
-
+class StoppingPolicy(ContractModel):
     frontierScoreThreshold: float
     consecutiveTasksBelowThreshold: int
     requireMandatoryNeedsComplete: bool
     requireContradictionSearch: bool
     escalationTriggers: list[str]
 
-class ResearchProfile(BaseModel):
-    model_config = ConfigDict(extra="forbid", frozen=True)
-
+class ResearchProfile(ContractModel):
     schemaVersion: Literal["1.0.0"]
     id: str
     version: str
@@ -90,9 +74,7 @@ class ResearchProfile(BaseModel):
     publication: PublicationPolicy
     stopping: StoppingPolicy
 
-class SourcePolicy(BaseModel):
-    model_config = ConfigDict(extra="forbid", frozen=True)
-
+class SourcePolicy(ContractModel):
     schemaVersion: Literal["1.0.0"]
     id: str
     version: str
@@ -102,9 +84,7 @@ class SourcePolicy(BaseModel):
     retrieval: dict[str, Any]
     claimFitness: list[SourceFitnessRule]
 
-class SourceItem(BaseModel):
-    model_config = ConfigDict(extra="forbid", frozen=True)
-
+class SourceItem(ContractModel):
     schemaVersion: Literal["1.0.0"]
     id: str
     sourcePolicyId: str
@@ -115,9 +95,7 @@ class SourceItem(BaseModel):
     upstreamSourceIds: list[str]
     metadata: dict[str, Any] | None = None
 
-class Capture(BaseModel):
-    model_config = ConfigDict(extra="forbid", frozen=True)
-
+class Capture(ContractModel):
     schemaVersion: Literal["1.0.0"]
     id: str
     sourceItemId: str
@@ -130,9 +108,7 @@ class Capture(BaseModel):
     rightsStatus: Literal["open", "licensed", "restricted", "unknown", "prohibited"]
     dedupOfCaptureId: str | None | None = None
 
-class EvidenceSelector(BaseModel):
-    model_config = ConfigDict(extra="forbid", frozen=True)
-
+class EvidenceSelector(ContractModel):
     schemaVersion: Literal["1.0.0"]
     id: str
     captureId: str
@@ -147,19 +123,16 @@ class EvidenceSelector(BaseModel):
     timeStartSeconds: float | None | None = None
     timeEndSeconds: float | None | None = None
     fragment: str | None | None = None
+    sourceItemId: str
 
-class ClaimQualifiers(BaseModel):
-    model_config = ConfigDict(extra="forbid", frozen=True)
-
+class ClaimQualifiers(ContractModel):
     temporal: dict[str, Any]
     geographic: dict[str, Any]
     jurisdictional: dict[str, Any]
     procedural: dict[str, Any]
     uncertainty: dict[str, Any]
 
-class ConfidenceAssessment(BaseModel):
-    model_config = ConfigDict(extra="forbid", frozen=True)
-
+class ConfidenceAssessment(ContractModel):
     acceptanceProbability: float
     intervalLow: float
     intervalHigh: float
@@ -171,9 +144,7 @@ class ConfidenceAssessment(BaseModel):
     researchCompleteness: float
     calibrationVersion: str
 
-class ClaimStatement(BaseModel):
-    model_config = ConfigDict(extra="forbid", frozen=True)
-
+class ClaimStatement(ContractModel):
     schemaVersion: Literal["1.0.0"]
     id: str
     version: int
@@ -186,9 +157,7 @@ class ClaimStatement(BaseModel):
     supersedesClaimVersionId: str | None
     confidence: ConfidenceAssessment | None | None = None
 
-class EvidenceAssignment(BaseModel):
-    model_config = ConfigDict(extra="forbid", frozen=True)
-
+class EvidenceAssignment(ContractModel):
     schemaVersion: Literal["1.0.0"]
     id: str
     claimVersionId: str
@@ -201,9 +170,7 @@ class EvidenceAssignment(BaseModel):
     reviewerActorId: str | None
     status: Literal["proposed", "accepted", "rejected", "superseded"]
 
-class ResearchCase(BaseModel):
-    model_config = ConfigDict(extra="forbid", frozen=True)
-
+class ResearchCase(ContractModel):
     schemaVersion: Literal["1.0.0"]
     id: str
     profileId: str
@@ -213,9 +180,7 @@ class ResearchCase(BaseModel):
     createdBy: str
     createdAt: str
 
-class ResearchQuestion(BaseModel):
-    model_config = ConfigDict(extra="forbid", frozen=True)
-
+class ResearchQuestion(ContractModel):
     schemaVersion: Literal["1.0.0"]
     id: str
     caseId: str
@@ -223,18 +188,14 @@ class ResearchQuestion(BaseModel):
     priority: float
     status: Literal["open", "answered", "deferred", "cancelled"]
 
-class Hypothesis(BaseModel):
-    model_config = ConfigDict(extra="forbid", frozen=True)
-
+class Hypothesis(ContractModel):
     schemaVersion: Literal["1.0.0"]
     id: str
     questionId: str
     statement: str
     status: Literal["open", "supported", "contradicted", "mixed", "rejected"]
 
-class EvidenceNeed(BaseModel):
-    model_config = ConfigDict(extra="forbid", frozen=True)
-
+class EvidenceNeed(ContractModel):
     schemaVersion: Literal["1.0.0"]
     id: str
     questionId: str
@@ -244,9 +205,7 @@ class EvidenceNeed(BaseModel):
     contradictionSearch: bool
     status: Literal["open", "satisfied", "blocked", "waived"]
 
-class FrontierTask(BaseModel):
-    model_config = ConfigDict(extra="forbid", frozen=True)
-
+class FrontierTask(ContractModel):
     schemaVersion: Literal["1.0.0"]
     id: str
     caseId: str
@@ -261,9 +220,7 @@ class FrontierTask(BaseModel):
     hop: int
     status: Literal["pending", "leased", "completed", "failed", "deadLetter", "cancelled"]
 
-class EntityCandidate(BaseModel):
-    model_config = ConfigDict(extra="forbid", frozen=True)
-
+class EntityCandidate(ContractModel):
     schemaVersion: Literal["1.0.0"]
     id: str
     mention: str
@@ -276,9 +233,7 @@ class EntityCandidate(BaseModel):
     blockingKeys: list[str]
     sourceSelectorId: str
 
-class ResolutionDecision(BaseModel):
-    model_config = ConfigDict(extra="forbid", frozen=True)
-
+class ResolutionDecision(ContractModel):
     schemaVersion: Literal["1.0.0"]
     id: str
     candidateId: str
@@ -291,9 +246,7 @@ class ResolutionDecision(BaseModel):
     modelVersion: str
     reviewerActorId: str | None
 
-class RelationshipStatement(BaseModel):
-    model_config = ConfigDict(extra="forbid", frozen=True)
-
+class RelationshipStatement(ContractModel):
     schemaVersion: Literal["1.0.0"]
     id: str
     subjectEntityId: str
@@ -303,9 +256,7 @@ class RelationshipStatement(BaseModel):
     evidenceAssignmentIds: list[str]
     status: Literal["proposed", "accepted", "rejected", "superseded", "retracted"]
 
-class ResearchRun(BaseModel):
-    model_config = ConfigDict(extra="forbid", frozen=True)
-
+class ResearchRun(ContractModel):
     schemaVersion: Literal["1.0.0"]
     id: str
     caseId: str
@@ -320,9 +271,7 @@ class ResearchRun(BaseModel):
     counts: dict[str, int]
     terminalReason: str | None
 
-class AgentActivity(BaseModel):
-    model_config = ConfigDict(extra="forbid", frozen=True)
-
+class AgentActivity(ContractModel):
     schemaVersion: Literal["1.0.0"]
     id: str
     runId: str
@@ -336,9 +285,7 @@ class AgentActivity(BaseModel):
     generatedArtifactIds: list[str]
     wasAssociatedWith: str
 
-class ModelInvocation(BaseModel):
-    model_config = ConfigDict(extra="forbid", frozen=True)
-
+class ModelInvocation(ContractModel):
     schemaVersion: Literal["1.0.0"]
     id: str
     activityId: str
@@ -354,10 +301,9 @@ class ModelInvocation(BaseModel):
     rawResponse: str
     status: Literal["pending", "valid", "invalid", "failed"]
     repairOfInvocationId: str | None
+    accounting: ModelAccounting
 
-class InvalidModelOutput(BaseModel):
-    model_config = ConfigDict(extra="forbid", frozen=True)
-
+class InvalidModelOutput(ContractModel):
     schemaVersion: Literal["1.0.0"]
     id: str
     invocationId: str
@@ -366,9 +312,7 @@ class InvalidModelOutput(BaseModel):
     quarantinedAt: str
     retentionUntil: str
 
-class Artifact(BaseModel):
-    model_config = ConfigDict(extra="forbid", frozen=True)
-
+class Artifact(ContractModel):
     schemaVersion: Literal["1.0.0"]
     id: str
     runId: str
@@ -381,9 +325,7 @@ class Artifact(BaseModel):
     status: Literal["proposed", "accepted", "rejected", "quarantined", "superseded"]
     createdAt: str
 
-class ReviewDecision(BaseModel):
-    model_config = ConfigDict(extra="forbid", frozen=True)
-
+class ReviewDecision(ContractModel):
     schemaVersion: Literal["1.0.0"]
     id: str
     artifactId: str
@@ -395,9 +337,7 @@ class ReviewDecision(BaseModel):
     findings: list[dict[str, Any]]
     decidedAt: str
 
-class ReleaseDecision(BaseModel):
-    model_config = ConfigDict(extra="forbid", frozen=True)
-
+class ReleaseDecision(ContractModel):
     schemaVersion: Literal["1.0.0"]
     id: str
     artifactId: str
@@ -409,18 +349,14 @@ class ReleaseDecision(BaseModel):
     policyVersion: str
     decidedAt: str
 
-class SentenceCitation(BaseModel):
-    model_config = ConfigDict(extra="forbid", frozen=True)
-
+class SentenceCitation(ContractModel):
     sentenceId: str
     sentenceText: str
     factual: bool
     claimVersionIds: list[str]
     evidenceAssignmentIds: list[str]
 
-class VerificationReport(BaseModel):
-    model_config = ConfigDict(extra="forbid", frozen=True)
-
+class VerificationReport(ContractModel):
     factualSentenceCount: int
     supportedFactualSentenceCount: int
     distinctLineageChecked: bool
@@ -431,9 +367,7 @@ class VerificationReport(BaseModel):
     styleChecked: bool
     blockingFindings: list[str]
 
-class StoryResearchPacket(BaseModel):
-    model_config = ConfigDict(extra="forbid", frozen=True)
-
+class StoryResearchPacket(ContractModel):
     schemaVersion: Literal["1.0.0"]
     id: str
     caseId: str
@@ -448,9 +382,7 @@ class StoryResearchPacket(BaseModel):
     approvalLineageComplete: bool
     status: Literal["draft", "auditReady", "awaitingApproval", "approved", "rejected", "released", "retracted"]
 
-class RoCrateExport(BaseModel):
-    model_config = ConfigDict(extra="forbid", frozen=True)
-
+class RoCrateExport(ContractModel):
     schemaVersion: Literal["1.0.0"]
     conformsTo: Literal["https://w3id.org/ro/crate/1.1"]
     crateId: str
@@ -460,6 +392,113 @@ class RoCrateExport(BaseModel):
     activities: list[AgentActivity]
     artifacts: list[Artifact]
     checksums: dict[str, str]
+
+class ResearchQuote(ContractModel):
+    citationUrl: str
+    quote: str
+
+class ExtractedResearchClaim(ContractModel):
+    id: str
+    predicate: str
+    object: str
+    confidence: float
+    evidence: ResearchQuote
+
+class SubjectExtraction(ContractModel):
+    title: str
+    publicSummary: str
+    historicalContext: str
+    confidence: float
+    claims: list[ExtractedResearchClaim]
+
+class RelationshipHypothesisExtraction(ContractModel):
+    relationType: str
+    confidence: float
+    rationale: str
+    evidence: list[ResearchQuote]
+
+class HarnessSourceRecord(ContractModel):
+    id: str
+    connectorKind: str
+    title: str
+    description: str
+    cites: list[str]
+    rawRecord: dict[str, Any]
+    coordinates: dict[str, Any] | None = None
+    locationName: str | None = None
+    county: str | None = None
+    state: str | None = None
+
+class ResearchTaskSpec(ContractModel):
+    frontier: FrontierTask
+    evidenceNeedId: str | None
+    dependsOn: list[str]
+    input: dict[str, Any]
+    outputContract: Literal["HarnessSourceRecord", "SubjectExtraction", "RelationshipHypothesisExtraction", "ResearchSearchResult", "ResearchTaskReport", "ResearchAcquisitionResult"]
+    maxAttempts: int
+    maxCostUsdPerAttempt: float
+
+class ResearchExecutionPlan(ContractModel):
+    schemaVersion: Literal["1.0.0"]
+    profile: ResearchProfile
+    run: ResearchRun
+    budgetClass: Literal["standard", "highImpact"]
+    questions: list[ResearchQuestion]
+    needs: list[EvidenceNeed]
+    tasks: list[ResearchTaskSpec]
+
+class ResearchSearchResult(ContractModel):
+    query: str
+    seeking: str
+    leads: list[dict[str, Any]]
+    limitations: list[str]
+
+class ResearchTaskReport(ContractModel):
+    summary: str
+    limitations: list[str]
+    evidence: list[ResearchQuote]
+
+class ModelAccounting(ContractModel):
+    promptTokens: int | None
+    completionTokens: int | None
+    costUsd: float | None
+    source: Literal["provider-response", "external-receipt", None]
+    incomplete: bool
+
+class ResearchTaskLease(ContractModel):
+    runId: str
+    task: ResearchTaskSpec
+    workerId: str
+    leaseToken: str
+    expiresAt: str
+    attempt: int
+    activityId: str
+    dependencies: list[dict[str, Any]]
+
+class PreservationDecision(ContractModel):
+    sourceUrl: str
+    allowTextRetention: bool
+    allowArchive: bool
+    sensitivity: Literal["public", "restricted", "unknown"]
+    reviewedBy: str
+    reviewedAt: str
+    expiresAt: str
+    basis: str
+
+class ResearchAcquisitionResult(ContractModel):
+    sources: list[HarnessSourceRecord]
+    limitations: list[str]
+
+class ResearchWorkerModel(ContractModel):
+    provider: Literal["openrouter", "ollama"]
+    id: str
+    family: str
+    maxTokens: int
+    maxPromptBytes: int
+    promptUsdPerMillion: float
+    completionUsdPerMillion: float
+
+ResearchWorkerInput: TypeAlias = dict[str, Any] | dict[str, Any] | dict[str, Any]
 
 Budget.model_rebuild()
 RiskClassPolicy.model_rebuild()
@@ -496,6 +535,20 @@ SentenceCitation.model_rebuild()
 VerificationReport.model_rebuild()
 StoryResearchPacket.model_rebuild()
 RoCrateExport.model_rebuild()
+ResearchQuote.model_rebuild()
+ExtractedResearchClaim.model_rebuild()
+SubjectExtraction.model_rebuild()
+RelationshipHypothesisExtraction.model_rebuild()
+HarnessSourceRecord.model_rebuild()
+ResearchTaskSpec.model_rebuild()
+ResearchExecutionPlan.model_rebuild()
+ResearchSearchResult.model_rebuild()
+ResearchTaskReport.model_rebuild()
+ModelAccounting.model_rebuild()
+ResearchTaskLease.model_rebuild()
+PreservationDecision.model_rebuild()
+ResearchAcquisitionResult.model_rebuild()
+ResearchWorkerModel.model_rebuild()
 
-CONTRACT_MODEL_NAMES = ("Budget", "RiskClassPolicy", "SourceFitnessRule", "ModelPolicy", "RetentionPolicy", "PublicationPolicy", "StoppingPolicy", "ResearchProfile", "SourcePolicy", "SourceItem", "Capture", "EvidenceSelector", "ClaimQualifiers", "ConfidenceAssessment", "ClaimStatement", "EvidenceAssignment", "ResearchCase", "ResearchQuestion", "Hypothesis", "EvidenceNeed", "FrontierTask", "EntityCandidate", "ResolutionDecision", "RelationshipStatement", "ResearchRun", "AgentActivity", "ModelInvocation", "InvalidModelOutput", "Artifact", "ReviewDecision", "ReleaseDecision", "SentenceCitation", "VerificationReport", "StoryResearchPacket", "RoCrateExport",)
+CONTRACT_MODEL_NAMES = ("Budget", "RiskClassPolicy", "SourceFitnessRule", "ModelPolicy", "RetentionPolicy", "PublicationPolicy", "StoppingPolicy", "ResearchProfile", "SourcePolicy", "SourceItem", "Capture", "EvidenceSelector", "ClaimQualifiers", "ConfidenceAssessment", "ClaimStatement", "EvidenceAssignment", "ResearchCase", "ResearchQuestion", "Hypothesis", "EvidenceNeed", "FrontierTask", "EntityCandidate", "ResolutionDecision", "RelationshipStatement", "ResearchRun", "AgentActivity", "ModelInvocation", "InvalidModelOutput", "Artifact", "ReviewDecision", "ReleaseDecision", "SentenceCitation", "VerificationReport", "StoryResearchPacket", "RoCrateExport", "ResearchQuote", "ExtractedResearchClaim", "SubjectExtraction", "RelationshipHypothesisExtraction", "HarnessSourceRecord", "ResearchTaskSpec", "ResearchExecutionPlan", "ResearchSearchResult", "ResearchTaskReport", "ModelAccounting", "ResearchTaskLease", "PreservationDecision", "ResearchAcquisitionResult", "ResearchWorkerModel",)
 

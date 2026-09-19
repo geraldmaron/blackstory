@@ -1,6 +1,6 @@
 /**
  * Chicago redlining pilot packets (metro:chicago-il) for ThemeImpactPacket upsert.
- * Numbers from live bb_reference.statistical_observations (Cook County ACS 2020–2024).
+ * Numbers from live reference.statistical_observations (Cook County ACS 2020–2024).
  * HOLC geometry is cite-only on public surfaces (CC BY-NC-SA); grade counts from staff inventory.
  */
 export const CHICAGO_REDLINING_SCOPE = 'metro:chicago-il' as const;

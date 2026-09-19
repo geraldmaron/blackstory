@@ -46,6 +46,15 @@
   --record-shell-pad: max(var(--ds-gutter), calc((100% - var(--record-shell-w)) / 2));
 }
 
+[data-surface='record'] .ds-room__mast {
+  background: var(--ds-canvas);
+}
+
+/* The reading column sits on canvas so the page-field grid cannot run through type and beat plates. */
+[data-surface='record'] .ds-room__doc {
+  background: var(--ds-canvas);
+}
+
 /*
  * The shell only aligns to the column while the column and rail are side by side. Below the
  * kit's rail breakpoint the rail stacks under the column and the pair's width stops meaning

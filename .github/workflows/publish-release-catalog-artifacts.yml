@@ -1,40 +1,12 @@
-# repo-csw0 follow-up: publish-release-catalog-artifacts.ts must run after every release
-# activation AND after in-place release mutations (the many `packages/ops-data/scripts`
-# fix/backfill scripts that upsert bb_public.release_entities under the same release id
-# without bumping active_release.activated_at) — otherwise the CDN artifact silently drifts
-# from bb_public and consumers keep serving stale data for as long as their cache TTL allows.
-# There is no single "activation" code path to hook this into; ops-data has ~19 scripts that
-# mutate release_entities directly and ad hoc, none through a shared write path.
-#
-# This is event-driven, not a blind timer: a statement-level trigger (see
-# supabase/migrations/20260808020846_release_catalog_publish_watermark.sql) marks
-# bb_public.release_catalog_publish_watermark dirty on any write to release_entities /
-# search_index. The script checks that watermark FIRST and returns immediately if nothing
-# changed — the common case on every tick costs one single-row SELECT, not a 13MB rebuild.
-# When something did change, each artifact (entities.json / search-index.json) is uploaded
-# only if its content hash actually differs from what's published, so a value-preserving
-# rewrite still marks dirty but doesn't force a needless re-upload / CDN invalidation.
-#
-# The upload is idempotent (x-upsert) and derived-only — it republishes a read-through cache
-# artifact, never bb_public itself — so unlike canonical-convergence-monitor.yml (which
-# deliberately stays dry-run-only ahead of a human-reviewed --apply) this is safe to run
-# unattended on every tick.
-#
-# Requires HOSTED_DATABASE_URL (already set, see canonical-convergence-monitor.yml) plus
-# SUPABASE_URL and SUPABASE_SECRET_KEY (or SUPABASE_SERVICE_ROLE_KEY) repo secrets with
-# Storage write access to the public-media bucket. Fails closed with a clear message if any
-# are missing rather than silently reporting green.
+# Manually rebuilds derived release artifacts after activation or an in-place write.
+# The database watermark tracks changes to release_entities and search_index.
+# Unchanged content hashes avoid unnecessary uploads and CDN invalidation.
+# Run locally or dispatch after a published write; no scheduler repairs missed updates.
+# Requires HOSTED_DATABASE_URL and Supabase Storage credentials for public-media.
 
 name: Publish Release Catalog Artifacts
 
 on:
-  # Release data only changes when an operator runs an ops-data script by hand, so the primary
-  # trigger is a manual dispatch right after such a run. The daily tick is forgetting-insurance:
-  # it bounds worst-case artifact staleness after an unpublished mutation to ~24h instead of
-  # indefinitely. (Was */5 polling — 288 runs/day to detect a human-initiated action; see
-  # 2026-08-08 session.)
-  schedule:
-    - cron: '17 9 * * *'
   workflow_dispatch:
     inputs:
       force:
@@ -80,7 +52,7 @@ jobs:
       - name: Fail closed if required secrets are not configured
         run: |
           if [ -z "${DATABASE_URL:-}" ]; then
-            echo "::error::HOSTED_DATABASE_URL secret is not set — this job cannot read bb_public. See this workflow's header comment."
+            echo "::error::HOSTED_DATABASE_URL secret is not set — this job cannot read published. See this workflow's header comment."
             exit 1
           fi
           if [ -z "${SUPABASE_URL:-}" ]; then

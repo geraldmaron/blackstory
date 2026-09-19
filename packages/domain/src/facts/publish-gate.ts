@@ -1,36 +1,9 @@
 /**
- * Fail-closed publish gate for `FactRecord`.
- *
- * "Unsourced" is not a publishable state: a fact may only transition to `published`/`corrected`
- * when every citation is structurally complete AND every web citation carries an archived-capture
- * pointer (`archivedUrl` + `archivedAt`) and a retrieval date (`accessedAt`) see
- * `./citation.ts`. This mirrors `../citations/completeness-gate.ts`'s claim-level gate and
- * `../publication/index.ts`'s release-build discipline, applied to the fact registry's own
- * record shape.
- *
- * Capture-completeness ops bar: after structural completeness passes, web URL citations are
- * mapped to `../capture-completeness/index.js`'s `CitationForCaptureCompleteness` and evaluated
- * via `evaluateCaptureCompleteness` against `CAPTURE_COMPLETENESS_BAR_RATIO` (default 0.95).
- * Offline-only facts vacuously pass — the evaluator excludes non-URL locations from the
- * denominator. Per-record structural discipline (archivedUrl present) and corpus-level capture
- * evidence (valid Wayback pointer or content hash) are intentionally separate axes.
- *
- * Not wired live: the projection-build pipeline (`workers/publication/`, per docs/decisions-carryover.md, "scheduled-job worker packages") is
- * the intended caller. Call `assertFactMayPublish` immediately before including a fact in a
- * release/projection build and do not proceed if it throws.
- *
- * Independence of axes: this gate checks `status` transitions and citation completeness; it
- * never reads or derives `confidence` as a publish precondition. A `contested`-confidence fact
- * may publish (with its dispute disclosed via `confidenceNote`/`counterClaims`) exactly as
- * readily as an `established`-confidence one — confidence is a caveat, not a publish blocker.
- *
- * Derivation consistency (the related workstream): when a fact declares `derivedFromClaimIds`, this
- * gate ALSO cross-checks its citations/confidence against the named canonical claims via
- * `./derivation.ts`'s `evaluateFactDerivationConsistency` — see that module's doc comment for the
- * exact comparison rule. This is opt-in and additive, never a new hard requirement: a fact with
- * an empty `derivedFromClaimIds` (all pre-existing fact data today) is unaffected, and a caller
- * that does not supply `backingClaims` for a fact that HAS declared derivation ids fails the gate
- * closed rather than silently skipping the check (see `derivation.ts` for why).
+ * Fact publication requires structurally complete citations, archived/retrieval metadata for
+ * web sources and the capture-completeness threshold. Offline sources are outside the URL
+ * denominator. Disputed facts may publish with explicit caveats. Declared derivation ids
+ * require supplied backing claims and the consistency check; empty derivation ids skip that
+ * comparison. Callers must invoke this gate at their publication boundary.
  */
 import {
   evaluateCaptureCompleteness,

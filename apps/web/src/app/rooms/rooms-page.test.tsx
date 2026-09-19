@@ -1,5 +1,5 @@
 /**
- * `/rooms` room contracts (SP-21, repo-92n2.29).
+ * `/rooms` room contracts.
  *
  * The room's *content* is not asserted here — it is generated from the destination registry, and
  * `lib/nav/destination-registry.test.ts` is what proves no public route is missing from it.
@@ -26,6 +26,7 @@ describe('/rooms · the room renders without JavaScript', () => {
 
   it('cards come from the registry rather than being written out here', () => {
     assert.match(pageSource, /destinationsInGroup\(group\)/);
+    assert.match(pageSource, /DestinationIcon/);
     // A hand-written card is the failure this room exists to prevent, so the room must not
     // contain a literal href for any of the routes it lists.
     for (const group of ROOMS_CARD_GROUPS) {

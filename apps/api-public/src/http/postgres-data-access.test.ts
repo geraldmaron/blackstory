@@ -50,16 +50,16 @@ function createFakeQuery(state: {
   readonly searchRows?: readonly Record<string, unknown>[];
 }): PostgresQueryFn {
   return async (sql, params = []) => {
-    if (sql.includes('bb_public.active_release')) {
+    if (sql.includes('published.active_release')) {
       return state.activeRelease ? [state.activeRelease] : [];
     }
-    if (sql.includes('bb_public.release_entities') && sql.includes('entity_id = $2')) {
+    if (sql.includes('published.release_entities') && sql.includes('entity_id = $2')) {
       const releaseId = params[0] as string;
       const entityId = params[1] as string;
       const projection = state.entities?.get(`${releaseId}:${entityId}`);
       return projection ? [{ projection }] : [];
     }
-    if (sql.includes('bb_public.release_entities') && sql.includes('entity_id = ANY')) {
+    if (sql.includes('published.release_entities') && sql.includes('entity_id = ANY')) {
       const releaseId = params[0] as string;
       const ids = (params[1] as readonly string[]) ?? [];
       const rows: { projection: PublicEntityProjectionDoc }[] = [];
@@ -69,7 +69,7 @@ function createFakeQuery(state: {
       }
       return rows;
     }
-    if (sql.includes('bb_public.release_entities') && sql.includes('ORDER BY entity_id')) {
+    if (sql.includes('published.release_entities') && sql.includes('ORDER BY entity_id')) {
       const releaseId = params[0] as string;
       const rows: { projection: PublicEntityProjectionDoc }[] = [];
       for (const [key, projection] of state.entities ?? []) {
@@ -77,7 +77,7 @@ function createFakeQuery(state: {
       }
       return rows;
     }
-    if (sql.includes('bb_public.search_index')) {
+    if (sql.includes('published.search_index')) {
       return state.searchRows ?? [];
     }
     return [];
@@ -237,7 +237,7 @@ test('createPostgresDataAccessReaders caches readEntities per release id', async
     entities: new Map([[`${RELEASE_ID}:${sampleProjection.id}`, sampleProjection]]),
   });
   const countingQuery: PostgresQueryFn = async (sql, params) => {
-    if (sql.includes('bb_public.release_entities') && sql.includes('ORDER BY entity_id')) {
+    if (sql.includes('published.release_entities') && sql.includes('ORDER BY entity_id')) {
       queryCalls += 1;
     }
     return baseQuery(sql, params);

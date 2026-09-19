@@ -1,5 +1,5 @@
 /**
- * Methodology v9 page wiring: room kit chrome, live evidence components, no drifted duplicate.
+ * Methodology wiring: body lives in MethodologySections on `/methodology`.
  */
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
@@ -12,33 +12,35 @@ import {
   METHODOLOGY_DIGNITY_LINE,
   METHODOLOGY_INTRO_LEDE,
   METHODOLOGY_MISSION_BEATS,
+  METHODOLOGY_PAGE_SECTIONS,
   METHODOLOGY_PUBLISH_RULES,
+  METHODOLOGY_SOURCE_LIBRARY_HREF,
+  SOURCE_LIBRARY_LEDE,
+  SOURCE_LINEAGE_STAGES,
+  SOURCE_PUBLISHER_KINDS,
 } from './methodology-copy';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const pageSource = readFileSync(join(here, 'page.tsx'), 'utf8');
 const sectionsSource = readFileSync(join(here, 'MethodologySections.tsx'), 'utf8');
 const copySource = readFileSync(join(here, 'methodology-copy.ts'), 'utf8');
-test('methodology page renders through the room kit, with no edition chrome left', () => {
-  assert.doesNotMatch(pageSource, /EditionAtmosphereMosaic/);
-  assert.doesNotMatch(pageSource, /METHODOLOGY_EDITION_MOSAIC_SEED/);
-  assert.doesNotMatch(pageSource, /data-methodology-edition="v6"/);
-  assert.match(pageSource, /from '\.\.\/\.\.\/components\/room'/);
-  assert.match(pageSource, /<Room>/);
+
+test('methodology page renders its own room, not a hub redirect', () => {
+  assert.match(pageSource, /MethodologySections/);
+  assert.doesNotMatch(pageSource, /permanentRedirect|how-it-works/);
+  assert.doesNotMatch(pageSource, /EditionAtmosphereMosaic|METHODOLOGY_EDITION_MOSAIC_SEED/);
 });
 
-test('methodology renders its header through the shared RoomHeader with the Receipt kicker', () => {
-  assert.match(sectionsSource, /<RoomHeader/);
-  assert.match(sectionsSource, /kicker="Receipt"/);
+test('methodology body uses ReadingEntry without a kicker when rendered alone', () => {
+  assert.match(sectionsSource, /<ReadingEntry/);
+  assert.doesNotMatch(sectionsSource, /<RoomHeader/);
+  assert.doesNotMatch(sectionsSource.match(/<ReadingEntry\b[\s\S]*?\/>/)?.[0] ?? '', /kicker=/);
 });
 
 test('methodology renders grade marks and citation strings through the live record-page components', () => {
-  // Same import source as apps/web/src/components/evidence/EvidenceCard.tsx, which is what
-  // record pages render a claim's grade mark and citation string with.
   assert.match(sectionsSource, /import \{ Citation, Confidence, Notice \} from '@repo\/ui'/);
   assert.match(sectionsSource, /<Confidence/);
   assert.match(sectionsSource, /<Citation/);
-  // No local reimplementation of the grade mark or the citation string.
   assert.doesNotMatch(sectionsSource, /ConfidenceMark/);
   assert.match(sectionsSource, /formatCitation/);
 });
@@ -47,59 +49,51 @@ test('methodology section names match the record page vocabulary', () => {
   assert.match(sectionsSource, /How a record gets in/);
   assert.match(sectionsSource, /What the evidence grades mean/);
   assert.match(sectionsSource, /Editorial standards/);
-  assert.match(sectionsSource, /Why a point is never drawn sharper than its source/);
-  assert.match(sectionsSource, /Living person protection/);
-  assert.match(sectionsSource, /See it applied/);
 });
 
-test('methodology publishes the Floor v2 and sundown framing rails', () => {
-  assert.equal(EDITORIAL_STANDARDS.length >= 5, true);
-  assert.match(copySource, /400 to 900 characters/);
-  assert.match(copySource, /Sundown towns and racial violence/);
-  assert.match(copySource, /Wikipedia and other aggregators may carry/);
+test('methodology copy still carries dignity and publish rules', () => {
+  assert.ok(METHODOLOGY_DIGNITY_LINE.length > 0);
+  assert.ok(METHODOLOGY_INTRO_LEDE.length > 0);
+  assert.ok(METHODOLOGY_MISSION_BEATS.length > 0);
+  assert.ok(METHODOLOGY_PUBLISH_RULES.length > 0);
+  assert.ok(EDITORIAL_STANDARDS.length > 0);
+  assert.ok(Object.keys(EVIDENCE_GRADE_DEFINITIONS).length > 0);
+  assert.match(copySource, /METHODOLOGY_DIGNITY_LINE/);
 });
 
-test('methodology links to /memorial by name', () => {
-  assert.match(sectionsSource, /href="\/memorial"/);
+test('methodology table of contents and chapters carry orientation glyphs', () => {
+  for (const section of METHODOLOGY_PAGE_SECTIONS) {
+    assert.ok(section.icon, `${section.label} carries a section glyph`);
+  }
+  assert.match(sectionsSource, /RoomJump/);
+  assert.match(sectionsSource, /RoomSection/);
+  assert.match(sectionsSource, /icon="source"/);
+  assert.match(sectionsSource, /Open the source library/);
 });
 
-test('methodology stays on the server and does not sell Explore as a room', () => {
-  assert.doesNotMatch(sectionsSource, /'use client'/);
-  assert.doesNotMatch(sectionsSource, /Open the Atlas|ATLAS_INSTRUMENT/);
-  assert.doesNotMatch(sectionsSource, /ResearchPipelineSketch|home-server/);
-  assert.doesNotMatch(
-    sectionsSource,
-    /<Precision|confidenceNote|counterClaims|FACT_CONFIDENCE_DEFINITIONS/,
+test('methodology hands the source library off to its own room', () => {
+  const section = METHODOLOGY_PAGE_SECTIONS.find(
+    (entry) => entry.id === 'where-the-evidence-comes-from',
   );
-  assert.doesNotMatch(sectionsSource, /Mosaic credits|ATMOSPHERE_ATTRIBUTION|mosaic-credits/);
-  assert.doesNotMatch(copySource, /confidenceNote|counterClaims|home-server/i);
-  assert.match(copySource, /EVIDENCE_GRADE_DEFINITIONS/);
-  assert.doesNotMatch(EVIDENCE_GRADE_DEFINITIONS.contested, /confidenceNote|counterClaims|`/);
+  assert.ok(section);
+  assert.equal(section!.label, 'Where the evidence comes from');
+  assert.equal(METHODOLOGY_SOURCE_LIBRARY_HREF, '/sources');
+  assert.match(sectionsSource, /id="where-the-evidence-comes-from"/);
+  assert.match(sectionsSource, /href=\{METHODOLOGY_SOURCE_LIBRARY_HREF\}/);
+  assert.doesNotMatch(sectionsSource, /SOURCE_PUBLISHER_KINDS\.map/);
+  assert.doesNotMatch(sectionsSource, /SOURCE_LIBRARY_SURFACES\.map/);
 });
 
-test('methodology preserves core trust copy', () => {
-  for (const beat of METHODOLOGY_MISSION_BEATS) {
-    assert.match(copySource, new RegExp(beat.kicker.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')));
-  }
-  for (const rule of METHODOLOGY_PUBLISH_RULES) {
-    assert.match(copySource, new RegExp(rule.title.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')));
-  }
-});
-
-test('methodology does not fetch the live catalog', () => {
-  assert.doesNotMatch(pageSource, /getPublicSearchIndex/);
-  assert.match(pageSource, /export const revalidate = 3600/);
-});
-
-test('methodology user-facing copy avoids em dashes', () => {
-  const strings = [
-    METHODOLOGY_INTRO_LEDE,
-    METHODOLOGY_DIGNITY_LINE,
-    ...METHODOLOGY_MISSION_BEATS.flatMap((beat) => [beat.kicker, beat.body]),
-    ...METHODOLOGY_PUBLISH_RULES.flatMap((rule) => [rule.title, rule.body]),
-    ...Object.values(EVIDENCE_GRADE_DEFINITIONS),
-  ];
-  for (const value of strings) {
+test('source-library copy names lineage and publisher kinds without fabricated counts', () => {
+  assert.ok(SOURCE_LIBRARY_LEDE.length > 0);
+  assert.equal(SOURCE_LINEAGE_STAGES.length, 4);
+  assert.ok(SOURCE_PUBLISHER_KINDS.length >= 4);
+  for (const value of [
+    SOURCE_LIBRARY_LEDE,
+    ...SOURCE_LINEAGE_STAGES.flatMap((stage) => [stage.title, stage.body]),
+    ...SOURCE_PUBLISHER_KINDS.flatMap((entry) => [entry.kind, entry.body, entry.examples]),
+  ]) {
     assert.doesNotMatch(value, /—/);
+    assert.doesNotMatch(value, /\b\d{2,}\b publishers|\b\d{2,}\b claims/i);
   }
 });

@@ -6,6 +6,13 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import { headingAnchorId } from './ArticleBody';
+import { readFileSync } from 'node:fs';
+
+test('primary documents are visible on entry and article images share the archive figure', () => {
+  const source = readFileSync(new URL('./ArticleBody.tsx', import.meta.url), 'utf8');
+  assert.match(source, /case 'primaryDocument':[\s\S]*?<ArtifactDrawer\s+open/);
+  assert.match(source, /case 'image':[\s\S]*?<ArchiveFigure/);
+});
 
 test('the id is stable and readable: index prefix plus a slug of the text', () => {
   assert.equal(

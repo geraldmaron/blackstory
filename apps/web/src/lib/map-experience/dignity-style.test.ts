@@ -1,8 +1,6 @@
 /**
- * Enforces map color rules: density stays non-red (presence, not crime-heat);
- * kind shades stay non-red except the allowlisted massacre tone (product
- * direction the related workstream). Every kind still carries a glyph so color is never
- * the only signal (WCAG 1.4.1).
+ * Tests for map palette and glyph rules. These assertions describe the implemented palette;
+ * color must not be the sole marker signal.
  */
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';

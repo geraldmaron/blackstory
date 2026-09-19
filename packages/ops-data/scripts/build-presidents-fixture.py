@@ -27,7 +27,7 @@ FIRST presidency. Two people have held non-consecutive presidencies: Cleveland (
 24th) and Trump (45th and 47th). Each gets one entry, at 22 and 45, whose `termLabel`
 carries both date ranges; 24 and 47 are deliberately vacant. That is forced rather than
 chosen. `position` is the collection's ordering key and has to be unique (gateSeriesPositions
-in scripts/articles.ts, and articles_series_position_unique on bb_reference.articles), so a
+in scripts/articles.ts, and articles_series_position_unique on reference.articles), so a
 second entry for the same person would have to invent a slug and a portrait for a record
 that is one person's. `ordinalLabel` is the escape hatch the two-presidency case needs:
 without it the display label is derived from `number` alone and reads "45th president" on a

@@ -1,61 +1,15 @@
 /**
- * The source register: which hosts are institutions, and on whose authority.
+ * Institution-host registry used by source classification. Registration requires an institution's
+ * root official website (Wikidata P856), a library/research authority identifier, and an allowed
+ * organization class. Deep article links cannot establish authority over a publisher's domain.
  *
- * WHAT THIS REPLACES
+ * Hostnames are compared exactly, including the permitted www variant. Wikipedia's website text
+ * alone cannot register a host. Non-government TLDs receive government classification only when
+ * the registered item is a government agency; .gov/.mil classification happens before lookup.
+ * These signals identify institutional custody, not the truth or fitness of an individual claim.
  *
- * `classifySourceForConfidence` used to place a host by shape — `.gov`/`.mil` and `si.edu` were
- * government records, `.edu` and two archival domains were reputable secondary, and everything
- * else fell through a hand-typed suffix list to `unknown`, worth 0.2 authority. The Academy of
- * American Poets, the Schomburg Center and a state historical society all landed in that tail,
- * so a claim resting on one of them scored 0.583 — below a crowd-edited marker database at
- * 0.720 — and appending such a source to a record LOWERED its minimum claim confidence under
- * the 0.75 publish floor. More research made a record less publishable. The suffix list fixed
- * that for the hosts someone had typed in, which is not a mechanism, it is a backlog.
- *
- * THE ACCEPTANCE RULE, AND WHY A FAKE SITE CANNOT PASS IT
- *
- * A host enters this register only through an authority-controlled item that names THAT HOST as
- * its own official website. Concretely, all three must hold at once:
- *
- *   1. Some Wikidata item's official website (P856) is the ROOT of the host being registered —
- *      `https://host/` or its `www.` form, compared as a parsed hostname, never as a substring
- *      and never a deep link. A deep link says "this page is about me", which is a different
- *      claim: on the first migration run a Texas town's P856 pointed at its Handbook of Texas
- *      article, and without the root rule the tool would have registered the publisher's whole
- *      domain on the town's authority.
- *   2. That item carries at least one library or research authority identifier: LCNAF (P244),
- *      VIAF (P214), ISNI (P213), ROR (P6782), GRID (P2427) or the IMLS Museum Universe Data
- *      File id (P6006). These come from national libraries and research-infrastructure
- *      registries that mint records for institutions they have actually cataloged.
- *   3. That item's instance-of (P31), followed up the subclass chain (P279*), lands on one of
- *      the classes in `WIKIDATA_CLASS_ALLOWLIST` below.
- *
- * A look-alike domain — `nypl.org.evil.example`, `schomburg-center.co` — fails at (1): no
- * cataloged institution claims it as its website, and hostname comparison will not let it
- * borrow a real host's suffix. A vanity item created for a fake museum fails at (2): the
- * attacker would have to get a national library to catalog the invention. An item that exists
- * but describes a website, a book, or a prize rather than an institution fails at (3).
- *
- * Wikipedia's own "official website" line is a corroborating signal a reviewer may look at. It
- * is never sufficient on its own: it is uncontrolled free text with no authority record behind
- * it.
- *
- * Government authority is held to a further rule. The register never grants
- * `government_record` to a host outside a government TLD unless the item is a government
- * agency AND carries an authority identifier. A state park foundation's `.org` is a real
- * institution; it is not a federal record, and the difference is 0.2 of authority weight.
- *
- * The register also declines to hold `.gov` and `.mil` hosts at all. Those are already
- * `government_record` from their TLD, decided before this register is consulted, so an entry
- * could only ever lower them — the Maryland State Archives is an `archive` in Wikidata's terms,
- * and an archive is reputable_secondary.
- *
- * DRIFT
- *
- * Sites change hands. Every entry carries `verifiedAt`, and `source-register.ts verify`
- * re-checks the three conditions plus a live HTTPS request against the host. Drift is printed
- * and exits non-zero; nothing is ever deleted automatically, because a host that stops
- * answering for a week is not the same event as a host that has been sold.
+ * Entries carry verifiedAt. The verify command rechecks registration evidence and HTTPS access,
+ * reports drift, and exits nonzero without deleting entries after transient network failures.
  */
 import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
@@ -63,19 +17,7 @@ import { fileURLToPath } from 'node:url';
 
 const REGISTER_PATH = join(dirname(fileURLToPath(import.meta.url)), 'source-register.json');
 
-/**
- * The organization types the register can hold, and what each is worth.
- *
- * Every type here is reachable: each one is produced by at least one class in
- * `WIKIDATA_CLASS_ALLOWLIST`. A type nothing can produce would be a promise the tool cannot
- * keep, since `apply` only writes entries the verdict logic accepted.
- *
- * Two candidates were considered and left out. "Humanities council" is not a Wikidata class,
- * and the sites that prompted it (64parishes.org for the Louisiana Endowment for the
- * Humanities, connecticuthistory.org for Connecticut Humanities) are online encyclopedias in
- * Wikidata's own terms, which is what they are to a reader too. "Heritage trust" likewise has
- * no class of its own; a trust that runs a listed site is a cultural institution.
- */
+/** Organization types reachable through WIKIDATA_CLASS_ALLOWLIST. */
 export const SOURCE_REGISTER_ORG_TYPES = [
   /** A collecting institution with a curatorial staff. The plain case for the whole register. */
   'museum',
@@ -83,7 +25,7 @@ export const SOURCE_REGISTER_ORG_TYPES = [
   'archive',
   /** Includes public libraries with named research collections — Schomburg, Harsh, Vivian Harsh. */
   'library',
-  /** State and county historical societies: the tail that started this work. */
+  /** State and county historical societies. */
   'historical_society',
   /** Scholarly and professional bodies — ACS, AIP, IEEE, SABR — publishing edited scholarship. */
   'learned_society',

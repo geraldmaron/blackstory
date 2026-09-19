@@ -1,27 +1,8 @@
 /**
- * Typed HTTP transport (MOB-009 §1).
- *
- * Wraps the App Check-attaching `ApiClient` from `src/security/api-client.ts`
- * (MOB-010) — it does NOT reimplement token attachment. On top of that thin
- * security wrapper this adds the read-path concerns the cache decision and the threat model
- * need (`docs/decisions-carryover.md`, "Mobile cache and OTA release";
- * `docs/mobile/security/threat-model.md`):
- *
- *   - Cancellation via AbortController; a superseding request cancels the
- *     in-flight one it replaces (e.g. a new keystroke supersedes a search).
- *   - Bounded exponential backoff + jitter, for IDEMPOTENT READS ONLY. A
- *     mutation is NEVER retried (double-submit hazard) — `mutate()` has no
- *     retry path at all.
- *   - `Retry-After` header respect on 429/503.
- *   - ETag / `If-None-Match` conditional requests with 304 handling: a 304
- *     returns `notModified: true` and no body, so the caller keeps its cached
- *     copy (backs TTL revalidation without re-sending the payload).
- *   - A hard response-size cap enforced BEFORE JSON parsing (threat-model:
- *     maliciously large payload must not be parsed/cached).
- *
- * Every dependency that makes tests non-deterministic (`sleep`, `random`, the
- * monotonic clock) is injectable so backoff/jitter/Retry-After are testable
- * without real timers.
+ * Typed HTTP transport over the shared client-header API wrapper. Supports cancellation,
+ * bounded backoff for idempotent reads only, Retry-After, ETag/304 revalidation and
+ * response-size limits before JSON parsing. Mutations are never automatically retried. Clocks,
+ * sleep and randomness are injectable for deterministic tests.
  */
 import type { ApiClient, ApiRequestOptions } from '../security/api-client';
 

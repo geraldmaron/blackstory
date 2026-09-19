@@ -131,7 +131,7 @@ async function main(): Promise<void> {
   try {
     const releaseId = (
       await client.query<{ release_id: string }>(
-        'SELECT release_id FROM bb_public.v_active_release_id',
+        'SELECT release_id FROM published.v_active_release_id',
       )
     ).rows[0]?.release_id;
     if (!releaseId) throw new Error('no active release');
@@ -140,9 +140,9 @@ async function main(): Promise<void> {
     for (const correction of CORRECTIONS) {
       const canonical = await client.query<{
         notability_basis: readonly { readonly note?: string }[] | null;
-      }>('SELECT notability_basis FROM bb_canonical.entities WHERE id = $1', [correction.entityId]);
+      }>('SELECT notability_basis FROM canonical.entities WHERE id = $1', [correction.entityId]);
       const live = await client.query<{ claims: readonly ReleaseClaim[] | null; summary: string }>(
-        'SELECT claims, summary FROM bb_public.release_entities WHERE release_id = $1 AND entity_id = $2',
+        'SELECT claims, summary FROM published.release_entities WHERE release_id = $1 AND entity_id = $2',
         [releaseId, correction.entityId],
       );
       const canonicalRow = canonical.rows[0];
@@ -189,7 +189,7 @@ async function main(): Promise<void> {
 
       await client.query('BEGIN');
       await client.query(
-        `UPDATE bb_canonical.entities
+        `UPDATE canonical.entities
          SET kind_detail = jsonb_set(
                jsonb_set(kind_detail, '{editorial,summary}', to_jsonb($2::text), true),
                '{editorial,historicalContext}', to_jsonb($3::text), true
@@ -205,7 +205,7 @@ async function main(): Promise<void> {
         ],
       );
       await client.query(
-        `UPDATE bb_public.release_entities
+        `UPDATE published.release_entities
          SET projection = jsonb_set(
                jsonb_set(
                  jsonb_set(
@@ -227,7 +227,7 @@ async function main(): Promise<void> {
         ],
       );
       await client.query(
-        `UPDATE bb_public.search_index
+        `UPDATE published.search_index
          SET claim_count = $3,
              facets = jsonb_set(facets, '{claimCount}', to_jsonb($3::int), true)
          WHERE release_id = $1 AND entity_id = $2`,

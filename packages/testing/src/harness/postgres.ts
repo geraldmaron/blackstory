@@ -54,10 +54,12 @@ export function createPostgresHarness(
     return unavailable('psql client is not installed');
   }
   if (!canConnect(connectionString)) {
-    return unavailable('PostgreSQL is unreachable (start with `pnpm db:up` or provide CI service)');
+    return unavailable(
+      'PostgreSQL is unreachable (provide APP_TEST_DATABASE_URL for a disposable database)',
+    );
   }
 
-  const schemaName = `bb_test_${randomBytes(4).toString('hex')}`;
+  const schemaName = `research_test_${randomBytes(4).toString('hex')}`;
   const create = spawnSync(
     'psql',
     [connectionString, '-v', 'ON_ERROR_STOP=1', '-c', `CREATE SCHEMA ${schemaName}`],

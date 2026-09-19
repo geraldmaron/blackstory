@@ -3,7 +3,7 @@
  * `EvidenceClaimView` and `apps/web/src/data/public-seed.ts`'s `PublicClaimView` (the two
  * structurally-compatible web-owned shapes this schema unifies into one versioned contract).
  *
- * Per MOB-003 requirements: "disputes and provenance remain visible" — `dispute`,
+ * Per public contract requirements: "disputes and provenance remain visible" — `dispute`,
  * `revisionHistory`, and `retraction` are deliberately part of the PUBLIC shape (they are
  * transparency features, not internal fields to hide). What is excluded by construction:
  * `sourceLineage`'s full internal rollup is flattened to the single public

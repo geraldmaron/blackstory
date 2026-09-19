@@ -1,0 +1,270 @@
+{
+  "version": "heldout-research-eval-v1-blind",
+  "retrievedAt": "2026-09-18T15:21:59Z",
+  "protocol": "Blind corpus. Documents and prompts are exposed here; curated relevance, forbidden merges, and entailment judgments are recorded only in heldout-source-notes.md.",
+  "documents": [
+    {
+      "id": "nps-mary-fields",
+      "title": "Mary Fields (U.S. National Park Service)",
+      "sourceUrl": "https://www.nps.gov/people/mary-fields.htm",
+      "aliases": ["Stagecoach Mary"],
+      "text": "[P1] SIGNIFICANCE: First African American woman to work as a Star Route Carrier for the US Postal Service. PLACE OF BIRTH: Tennessee. DATE OF BIRTH: Early 1830s (Exact date unknown). PLACE OF DEATH: Cascade, Montana. DATE OF DEATH: 1914. PLACE OF BURIAL: St. Peter's Mission, Montana.\n\n[P2] There are many legends about Mary Fields, an African American pioneer in late 19th century Montana. These myths have been exaggerated in the century since her death, yet oral and written accounts describe her as one of the toughest, most resilient residents of Cascade, Montana.\n\n[P3] Born enslaved in Tennessee in the early 1830s, she lived in bondage until the end of the Civil War. After emancipation, Mary traveled around the southern United States, finding work on steamboats along the Mississippi River. She eventually made her way to an Ursuline convent in Toledo, Ohio.\n\n[P4] As the lived experiences of enslaved people were seldom documented, we know little about Mary's early years. Most of what we know comes from the convent records in Toledo. According to Sister Kathleen Padden, archivist for Toledo's Ursuline Convent, Mary arrived in Toledo by train in 1870 and worked for the nuns at the convent, washing laundry, managing the kitchen, and maintaining the convent garden and grounds.\n\n[P5] During the years Mary lived at the convent, several of the nuns had departed Toledo for St. Peter's Mission in Montana, now a historic site listed on the National Register of Historic Places. Here the nuns ran a school for American Indian girls. We know that Mary moved to Montana in 1885, but she did not document why. Some secondary sources claim that Mary made the journey to St. Peter's to care for Mother Mary Amadeus, as the two women knew each other before their time at the convent. It is likely that Mary relocated to St. Peter's Mission in Montana because the nuns needed more support running the school and the grounds.\n\n[P6] In 1895, Mary obtained a contract to be a Star Route Carrier for the United States Post Office Department. A carrier was an independent contractor who used a stagecoach to deliver the mail. Mary's route ran between St. Peter's Mission and the town of Cascade. She delivered the mail for eight years without missing a day of work. Traversing the 34 mile round trip, Mary endured the harsh weather, bandits, and wolves of northern Montana. She was the first African American woman and the second woman to receive a Star Route contract from the United States Post Office Department.\n\n[P7] After retiring from her postal route, Mary established her own laundry business in town. She died in 1914 and is buried in Cascade.\n\n[P8] Bibliography includes the title: “'Stagecoach Mary' Broke Barriers of Race and Gender.”",
+      "relationshipEdges": [
+        {
+          "subject": "Mary Fields",
+          "predicate": "worked-at",
+          "object": "Ursuline convent in Toledo, Ohio"
+        },
+        {
+          "subject": "Mary Fields",
+          "predicate": "moved-to",
+          "object": "St. Peter's Mission, Montana"
+        },
+        { "subject": "Mary Fields", "predicate": "contracted-as", "object": "Star Route Carrier" },
+        {
+          "subject": "Mary Fields",
+          "predicate": "route-ran-between",
+          "object": "St. Peter's Mission and Cascade"
+        }
+      ]
+    },
+    {
+      "id": "nps-will-garvin",
+      "title": "Will Garvin (U.S. National Park Service)",
+      "sourceUrl": "https://www.nps.gov/people/will-garvin.htm",
+      "aliases": ["William Garvin", "Will Garvin"],
+      "text": "[P1] QUICK FACTS: SIGNIFICANCE: Cave guide and explorer. PLACE OF BIRTH: Hart County, Kentucky, USA. DATE OF BIRTH: 1847 or 1848. PLACE OF DEATH: Edmonson County, Kentucky, USA. DATE OF DEATH: May 24, 1906.\n\n[P2] William “Will” Garvin was born into slavery in southcentral Kentucky in 1847 or 1848, his last name came from his and his parents' enslaver, Sinclair Garvin. Many other records of Garvins in the area have been found, both African American and European American, any relationships with Will remain unknown.\n\n[P3] On February 25, 1865, Will Garvin enlisted with Company M, 12th Heavy Artillery, U.S. Colored Troops which served at Camp Nelson in Nicholasville, KY. It remains unknown whether or not Will had permission from his enslaver when he enlisted in 1865.\n\n[P4] After the Civil War, Will settled in Edmonson County, Kentucky where he was one of only six black Civil War veterans, and soon began guiding tours at Mammoth Cave. He married Hannah Bransford, the daughter of formerly enslaved guide Nick Bransford, on May 27, 1876.\n\n[P5] Will Garvin is most widely known in Mammoth Cave history for discovering an area known as the Corkscrew.\n\n[P6] On May 24, 1906, just three days before his 30th wedding anniversary, Will Garvin passed away. The exact place of his burial is unknown, the most likely locations are Will and Hannah's former homestead or the cemetery of Pleasant Union Baptist Church.",
+      "relationshipEdges": [
+        {
+          "subject": "Will Garvin",
+          "predicate": "enlisted-in",
+          "object": "Company M, 12th Heavy Artillery, U.S. Colored Troops"
+        },
+        { "subject": "Will Garvin", "predicate": "guided-tours-at", "object": "Mammoth Cave" },
+        { "subject": "Will Garvin", "predicate": "married", "object": "Hannah Bransford" },
+        { "subject": "Hannah Bransford", "predicate": "daughter-of", "object": "Nick Bransford" },
+        {
+          "subject": "Will Garvin",
+          "predicate": "discovered",
+          "object": "Corkscrew area at Mammoth Cave"
+        }
+      ]
+    },
+    {
+      "id": "nps-nick-bransford",
+      "title": "Nick Bransford (U.S. National Park Service)",
+      "sourceUrl": "https://www.nps.gov/people/nick-bransford.htm",
+      "aliases": ["Nicholas Bransford", "Nick Bransford"],
+      "text": "[P1] QUICK FACTS: SIGNIFICANCE: One of the first African-American guides at Mammoth Cave. DATE OF BIRTH: c. 1820. PLACE OF DEATH: Edmonson County, Kentucky. DATE OF DEATH: 1895.\n\n[P2] Nicholas (Nick) Bransford was brought to Mammoth Cave in the same manner and time as Mat Bransford: as an enslaved man leased to the owner of the cave in 1838. Although they share the same last name, Nick and Mat have no blood relation. It was common during slavery for enslaved people to be given the last name of their enslaver.\n\n[P3] Descriptions of Nick as a guide do not exist until after Stephen Bishop's death. Perhaps he was not a regular guide until this time, or he had been assigned to other duties such as maintaining the grounds of the Mammoth Cave Estate. Nonetheless, Nick quickly became an adept Mammoth Cave tour guide.\n\n[P4] In 1863 he raised enough money and successfully bought his freedom. He decided to stay at Mammoth Cave, however, as a paid employee for a total of 50 years.\n\n[P5] Beyond his role as a guide, Nick was also a father to two daughters, Hannah and Annie. Hannah later married Will Garvin, another black cave guide. Records show that Nick married Stephen Bishop's widow, Charlotte, sometime after Stephen died in 1857.\n\n[P6] Nick continued to work at Mammoth Cave until he died in 1895. His exact gravesite is unknown, but is likely located near the Pleasant Union Baptist Church.",
+      "relationshipEdges": [
+        {
+          "subject": "Nick Bransford",
+          "predicate": "not-blood-related-to",
+          "object": "Mat Bransford"
+        },
+        { "subject": "Nick Bransford", "predicate": "father-of", "object": "Hannah Bransford" },
+        { "subject": "Nick Bransford", "predicate": "father-of", "object": "Annie Bransford" },
+        { "subject": "Hannah Bransford", "predicate": "married", "object": "Will Garvin" },
+        { "subject": "Nick Bransford", "predicate": "married", "object": "Charlotte" },
+        { "subject": "Nick Bransford", "predicate": "worked-at", "object": "Mammoth Cave" }
+      ]
+    },
+    {
+      "id": "nps-mat-bransford",
+      "title": "Mat Bransford (U.S. National Park Service)",
+      "sourceUrl": "https://www.nps.gov/people/mat-bransford.htm",
+      "aliases": ["Materson Bransford", "Mat Bransford"],
+      "text": "[P1] QUICK FACTS: SIGNIFICANCE: One of the first African-American guides at Mammoth Cave. PLACE OF BIRTH: Glasgow, Barren County, Kentucky. DATE OF BIRTH: 1815. PLACE OF DEATH: Edmonson County, Kentucky. DATE OF DEATH: August 13th, 1885.\n\n[P2] Materson (Mat) Bransford was born in 1815 to an enslaved woman and her enslaver, Thomas Bransford. As a result, Mat was biracial, but that did not change his birth status as a slave.\n\n[P3] In 1838 Thomas Bransford leased Mat to his business partner, Franklin Gorin, who owned and managed Mammoth Cave. Mat soon began leading tours to white tourists alongside other enslaved guides such as Stephen Bishop, Nick Bransford, and Alfred Croghan.\n\n[P4] While at Mammoth Cave, Mat married an enslaved woman named Parthena, who lived on a farm located two miles from the cave. Mat built a home for himself, Parthena, and their children. Parthena's enslaver sold three of their four children away from them.\n\n[P5] After his emancipation, Mat remained at Mammoth Cave for the rest of his life, guiding tours into his 70s. He remarked about the cave, “...it seems most like a child now, you know, we've been together so long.”\n\n[P6] Mat would be the first of 5 generations that have played a part in the legacy of Bransfords as Mammoth Cave guides.",
+      "relationshipEdges": [
+        { "subject": "Mat Bransford", "predicate": "leased-to", "object": "Franklin Gorin" },
+        { "subject": "Mat Bransford", "predicate": "guided-tours-at", "object": "Mammoth Cave" },
+        { "subject": "Mat Bransford", "predicate": "married", "object": "Parthena" },
+        { "subject": "Mat Bransford", "predicate": "guided-alongside", "object": "Stephen Bishop" },
+        { "subject": "Mat Bransford", "predicate": "guided-alongside", "object": "Nick Bransford" },
+        { "subject": "Mat Bransford", "predicate": "guided-alongside", "object": "Alfred Croghan" }
+      ]
+    },
+    {
+      "id": "epa-wetland-definition",
+      "title": "What is a Wetland? | US EPA",
+      "sourceUrl": "https://www.epa.gov/wetlands/what-wetland",
+      "text": "[P1] Wetlands are areas where water covers the soil, or is present at or near the soil surface all year or during varying periods of the year, including the growing season. Water saturation largely determines how soil develops and the plant and animal communities living in and on it. Wetlands may support both aquatic and terrestrial species.\n\n[P2] For Clean Water Act regulatory purposes, wetlands are those areas inundated or saturated by surface or ground water at a frequency and duration sufficient to support, and that under normal circumstances do support, a prevalence of vegetation typically adapted for life in saturated soil conditions. Wetlands generally include swamps, marshes, bogs, and similar areas.\n\n[P3] Wetlands vary widely because of regional and local differences in soils, topography, climate, hydrology, water chemistry, vegetation, and human disturbance. Wetlands are found from the tundra to the tropics and on every continent except Antarctica. Two general categories are recognized: coastal or tidal wetlands and inland or non-tidal wetlands.\n\n[P4] Inland wetlands are common on floodplains, in isolated depressions, along the margins of lakes and ponds, and in low-lying areas where groundwater intercepts the soil surface or precipitation saturates the soil. Many are seasonal and may be wet only periodically. Even wetlands that appear dry at times for significant parts of the year, such as vernal pools, often provide critical habitat for wildlife adapted to breeding exclusively in these areas.",
+      "relationshipEdges": [
+        {
+          "subject": "Wetlands",
+          "predicate": "support",
+          "object": "aquatic and terrestrial species"
+        },
+        {
+          "subject": "Wetlands",
+          "predicate": "include",
+          "object": "swamps, marshes, bogs, and similar areas"
+        },
+        {
+          "subject": "Wetlands",
+          "predicate": "occur-on",
+          "object": "every continent except Antarctica"
+        },
+        {
+          "subject": "Wetlands",
+          "predicate": "have-category",
+          "object": "coastal/tidal or inland/non-tidal"
+        }
+      ]
+    },
+    {
+      "id": "epa-wetland-functions",
+      "title": "How do Wetlands Function and Why are they Valuable? | US EPA",
+      "sourceUrl": "https://www.epa.gov/wetlands/how-do-wetlands-function-and-why-are-they-valuable",
+      "text": "[P1] Wetlands are among the most productive ecosystems in the world, comparable to rain forests and coral reefs. An immense variety of species of microbes, plants, insects, amphibians, reptiles, birds, fish and mammals can be part of a wetland ecosystem. Physical and chemical features such as climate, landscape shape, geology and the movement and abundance of water help determine the plants and animals that inhabit each wetland.\n\n[P2] The functions of a wetland and the values of these functions to human society depend on a complex set of relationships between the wetland and the other ecosystems in the watershed. A watershed is a geographic area in which water, sediments and dissolved materials drain from higher elevations to a common low-lying outlet or basin or a point on a larger stream, lake, aquifer, or estuary.\n\n[P3] Wetlands play an integral role in watershed ecology. Wetlands provide food, water and shelter for many species, especially during migration and breeding. Wetlands store carbon within their plant communities and soil instead of releasing it to the atmosphere as carbon dioxide. Thus, wetlands help moderate global climate conditions.",
+      "relationshipEdges": [
+        {
+          "subject": "Wetland function value",
+          "predicate": "depends-on",
+          "object": "relationships between a wetland and other watershed ecosystems"
+        },
+        { "subject": "Wetlands", "predicate": "provide", "object": "food, water, and shelter" },
+        {
+          "subject": "Wetlands",
+          "predicate": "store-carbon-in",
+          "object": "plant communities and soil"
+        },
+        {
+          "subject": "Wetlands",
+          "predicate": "help-moderate",
+          "object": "global climate conditions"
+        }
+      ]
+    }
+  ],
+  "retrievalCases": [
+    { "id": "r01", "query": "Mary Fields", "category": "exact_name" },
+    { "id": "r02", "query": "Will Garvin", "category": "exact_name" },
+    { "id": "r03", "query": "Nick Bransford", "category": "exact_name" },
+    { "id": "r04", "query": "Mat Bransford", "category": "exact_name" },
+    { "id": "r05", "query": "Nicholas Bransford", "category": "alias" },
+    { "id": "r06", "query": "Materson Bransford", "category": "alias" },
+    { "id": "r07", "query": "William Garvin", "category": "alias" },
+    { "id": "r08", "query": "Stagecoach Mary", "category": "alias" },
+    { "id": "r09", "query": "Materson Bransf0rd", "category": "ocr" },
+    { "id": "r10", "query": "N!ck Bransford", "category": "ocr" },
+    {
+      "id": "r11",
+      "query": "Black cave guide whose daughter Hannah married Will Garvin",
+      "category": "semantic"
+    },
+    {
+      "id": "r12",
+      "query": "African American woman who carried mail by stagecoach between St. Peter's Mission and Cascade",
+      "category": "missed_entity"
+    },
+    {
+      "id": "r13",
+      "query": "Cave guide who was father of Hannah and Annie and later married Stephen Bishop's widow",
+      "category": "missed_entity"
+    },
+    { "id": "r14", "query": "Who was married to Parthena?", "category": "relationship" },
+    {
+      "id": "r15",
+      "query": "Who married Hannah Bransford on May 27, 1876?",
+      "category": "relationship"
+    },
+    {
+      "id": "r16",
+      "query": "Which person relocated to St. Peter's Mission in Montana in 1885?",
+      "category": "relationship"
+    },
+    {
+      "id": "r17",
+      "query": "What direct relationship between Will Garvin and Nick Bransford is stated by the sources?",
+      "category": "path"
+    },
+    {
+      "id": "r18",
+      "query": "What wetland definition covers areas that may be dry for one or more seasons yet still provide critical wildlife habitat?",
+      "category": "semantic"
+    },
+    {
+      "id": "r19",
+      "query": "What environmental relationship explains why wetland functions have value to human society?",
+      "category": "semantic"
+    },
+    {
+      "id": "r20",
+      "query": "Which source defines wetlands as including swamps, marshes, bogs, and similar areas?",
+      "category": "missed_entity"
+    }
+  ],
+  "entailmentCases": [
+    {
+      "id": "e01",
+      "evidence": "Mary Fields: 'She was the first African American woman and the second woman to receive a Star Route contract from the United States Post Office Department.'",
+      "claim": "Mary Fields was the first African American woman to receive a Star Route contract."
+    },
+    {
+      "id": "e02",
+      "evidence": "Mary Fields: 'Mary's route ran between St. Peter's Mission and the town of Cascade.'",
+      "claim": "Mary Fields's postal route connected St. Peter's Mission and Cascade."
+    },
+    {
+      "id": "e03",
+      "evidence": "Mary Fields: 'Some secondary sources claim that Mary made the journey to St. Peter's to care for Mother Mary Amadeus... It is likely that Mary relocated to St. Peter's Mission in Montana because the nuns needed more support running the school and the grounds.'",
+      "claim": "The source establishes as fact that Mary Fields moved to Montana solely to care for Mother Mary Amadeus."
+    },
+    {
+      "id": "e04",
+      "evidence": "Will Garvin: 'On February 25, 1865, Will Garvin enlisted with Company M, 12th Heavy Artillery, U.S. Colored Troops which served at Camp Nelson in Nicholasville, KY.'",
+      "claim": "Will Garvin enlisted in Company M of the 12th Heavy Artillery, U.S. Colored Troops."
+    },
+    {
+      "id": "e05",
+      "evidence": "Will Garvin: 'Many other records of Garvins in the area have been found, both African American and European American, any relationships with Will remain unknown.'",
+      "claim": "Every Garvin record in the area was a relative of Will Garvin."
+    },
+    {
+      "id": "e06",
+      "evidence": "Nick Bransford: 'Although they share the same last name, Nick and Mat have no blood relation.'",
+      "claim": "Nick Bransford and Mat Bransford were not blood relatives."
+    },
+    {
+      "id": "e07",
+      "evidence": "Nick Bransford: 'Nick was also a father to two daughters, Hannah and Annie.'",
+      "claim": "Nick Bransford was the father of Hannah and Annie."
+    },
+    {
+      "id": "e08",
+      "evidence": "Nick Bransford: 'Although they share the same last name, Nick and Mat have no blood relation.'",
+      "claim": "Nick and Mat Bransford were brothers."
+    },
+    {
+      "id": "e09",
+      "evidence": "Mat Bransford: 'While at Mammoth Cave, Mat married an enslaved woman named Parthena... Parthena's enslaver sold three of their four children away from them.'",
+      "claim": "Mat Bransford married Parthena and they had four children, three of whom were sold away."
+    },
+    {
+      "id": "e10",
+      "evidence": "Nick Bransford: 'Nick was also a father to two daughters, Hannah and Annie. Hannah later married Will Garvin.' Will Garvin: 'He married Hannah Bransford, the daughter of formerly enslaved guide Nick Bransford.'",
+      "claim": "The source directly identifies Will Garvin as Nick Bransford's son-in-law."
+    },
+    {
+      "id": "e11",
+      "evidence": "EPA: 'Many of these wetlands are seasonal... may be wet only periodically... Even wetlands that appear dry at times for significant parts of the year -- such as vernal pools-- often provide critical habitat for wildlife adapted to breeding exclusively in these areas.'",
+      "claim": "A wetland can be seasonally dry and still provide critical wildlife habitat."
+    },
+    {
+      "id": "e12",
+      "evidence": "EPA: 'Wetlands are found from the tundra to the tropics and on every continent except Antarctica.'",
+      "claim": "Wetlands occur only in North America."
+    },
+    {
+      "id": "e13",
+      "evidence": "EPA: 'Wetlands store carbon within their plant communities and soil instead of releasing it to the atmosphere as carbon dioxide. Thus, wetlands help to moderate global climate conditions.'",
+      "claim": "Wetlands store carbon in plant communities and soil and can help moderate global climate conditions."
+    },
+    {
+      "id": "e14",
+      "evidence": "Mary Fields quick facts list 'PLACE OF BURIAL: St. Peter's Mission, Montana.' The same page later states: 'She died in 1914 and is buried in Cascade.'",
+      "claim": "The page consistently establishes that Mary Fields was buried at St. Peter's Mission."
+    }
+  ]
+}

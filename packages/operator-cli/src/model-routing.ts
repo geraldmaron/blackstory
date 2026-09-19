@@ -1,15 +1,15 @@
 /**
- * Model routing policy (repo-xez5.2). Codifies, in one reviewed module, which model tier
+ * Model routing policy. Codifies, in one reviewed module, which model tier
  * each research lane uses instead of leaving it to scattered `EDITORIAL_LLM_PROVIDER` /
  * `OPENROUTER_MODELS` / `STORY_REWRITE_MODEL(S)` env defaults (see `llm-provider.ts` and
  * `story-rewrite.ts`, which remain the actual HTTP clients this module wraps).
  *
- * Tier names mirror `bb_research.runs.mode` (`supabase/migrations/20260721041950_research_kernel_ledger.sql`)
+ * Tier names mirror `research.runs.mode` (`supabase/migrations/20260721041950_research_kernel_ledger.sql`)
  * so a run's mode and its model tier are the same vocabulary end to end:
  *   deterministic | local-triage | free-batch | paid-research | quality-prose |
  *   independent-review | trusted-session
  *
- * Verification/second-opinion independence: repo-4sg5 already requires producer and approver
+ * Verification/second-opinion independence: already requires producer and approver
  * lineages to differ before automated promotion. `pickIndependentVerifierModel` reuses that
  * constraint at the routing layer (never suggest a verifier from the producer's own model
  * family) instead of duplicating a separate lineage check.
@@ -21,7 +21,7 @@ import {
   resolveOpenRouterModels,
 } from './llm-provider.js';
 
-/** Matches `bb_research.runs.mode` exactly; do not add a tier without a matching mode value. */
+/** Matches `research.runs.mode` exactly; do not add a tier without a matching mode value. */
 export type RoutingTier =
   | 'deterministic'
   | 'local-triage'
@@ -141,9 +141,8 @@ export function rosterForTier(
     case 'quality-prose':
     case 'paid-research':
     case 'independent-review':
-      // STORY_REWRITE_MODELS / DEFAULT_STORY_REWRITE_MODELS in story-rewrite.ts is the current
-      // "strongest paid roster" lineup (Kimi K2.5 / DeepSeek / Qwen as of 2026-07-24). Revisit
-      // quarterly — OpenRouter's frontier lineup moves fast.
+      // Story rewrite uses the configured reviewer roster. Reassess model fitness and current
+      // provider prices before paid dispatch.
       return options.paidRoster ?? [];
     case 'deterministic':
     case 'trusted-session':
@@ -227,8 +226,8 @@ function modelFamily(modelId: string): string {
 
 /**
  * Verification/second-opinion routing: picks a model independent of the producer, per the
- * repo-4sg5 requirement that producer and approver lineages differ. Throws rather than silently
- * falling back to the producer's own family, which is the failure mode repo-4sg5 exists to
+ * requirement that producer and approver lineages differ. Throws rather than silently
+ * falling back to the producer's own family, which is the failure mode exists to
  * prevent for automated promotion.
  */
 export function pickIndependentVerifierModel(
@@ -246,48 +245,16 @@ export function pickIndependentVerifierModel(
   return independent;
 }
 
-/**
- * Per-model $/token pricing used to estimate `cost_usd_estimate` for bb_research.model_invocations.
- * PLACEHOLDER PRICING, not independently re-verified against a live OpenRouter pricing pull on
- * 2026-07-24 (the fetch used to compile this table did not resolve current listings for these
- * specific model ids). Confirm against https://openrouter.ai/models before treating totals from
- * `model-report` as billing-accurate; free-roster entries (":free" suffix) are $0 by construction
- * since OpenRouter free endpoints do not meter cost.
- */
-export const MODEL_PRICE_PER_MILLION_TOKENS: Readonly<
-  Record<string, { readonly prompt: number; readonly completion: number }>
-> = Object.freeze({
-  'moonshotai/kimi-k2.5': { prompt: 0.6, completion: 2.5 },
-  'deepseek/deepseek-r1-0528': { prompt: 0.55, completion: 2.19 },
-  'deepseek/deepseek-v3.2': { prompt: 0.28, completion: 0.42 },
-  'qwen/qwen3.5-122b-a10b': { prompt: 0.4, completion: 1.2 },
-  'mistralai/mistral-medium-3.1': { prompt: 0.4, completion: 2.0 },
-});
-
-/** Any `:free` suffix (or a model absent from the price table) is treated as $0/token. */
-export function estimateCostUsd(
-  modelId: string,
-  usage: { readonly promptTokens: number; readonly completionTokens: number },
-): number {
-  if (modelId.endsWith(':free')) return 0;
-  const price = MODEL_PRICE_PER_MILLION_TOKENS[modelId];
-  if (!price) return 0;
-  return (
-    (usage.promptTokens / 1_000_000) * price.prompt +
-    (usage.completionTokens / 1_000_000) * price.completion
-  );
-}
-
 export type RoutedCompletion = LlmCompletionResult & {
   readonly lane: ResearchLane;
   readonly tier: RoutingTier;
-  readonly costUsdEstimate: number;
+  readonly costUsd: number | null;
 };
 
 /**
  * Wraps any provider's `.complete()` so every call made "through this module" carries the lane,
  * tier, and a cost estimate alongside the raw completion — the shape `logModelInvocation`
- * (`model-invocation-log.ts`) writes to `bb_research.model_invocations`.
+ * (`model-invocation-log.ts`) writes to `research.model_invocations`.
  */
 export function withLaneMetadata(
   lane: ResearchLane,
@@ -299,12 +266,11 @@ export function withLaneMetadata(
   return {
     async complete(request) {
       const result = await provider.complete(request);
-      const usage = result.usage ?? { promptTokens: 0, completionTokens: 0 };
       return {
         ...result,
         lane,
         tier,
-        costUsdEstimate: estimateCostUsd(result.modelId, usage),
+        costUsd: result.accounting?.costUsd ?? null,
       };
     },
   };

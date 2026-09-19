@@ -1,6 +1,6 @@
 /**
- * DOI resolution check (repo-k2q3 criterion 2): verifies a scholarly citation actually
- * matches what its DOI resolves to, so a citation can't silently drift or be fabricated
+ * DOI resolution verifies that a scholarly citation matches what its DOI resolves to, so a
+ * citation can't silently drift or be fabricated
  * with a plausible-looking DOI attached. Tries Crossref first (api.crossref.org/works/{doi}),
  * falling back to OpenAlex (api.openalex.org/works/doi:{doi}) when Crossref has no record —
  * both are free, keyless, public metadata APIs.

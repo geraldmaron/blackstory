@@ -4,10 +4,16 @@
  * Methodology, Errata) is the same on every place. Stories exists only when this
  * record already names a chapter. Evidence, trust, and map/list return paths render
  * when the release carries them.
+ *
+ * Visual law (plan.md Phase 1): the mast is a photograph at full bleed, or the map at
+ * neighborhood zoom as the hero. Evidence (confidence, precision, source count) sits at
+ * display scale. Typed relationships and site-nav chips use distinct treatments.
  */
 import React from 'react';
 import Link from 'next/link';
-import { EntityMastMedia } from '../components/entity/EntityMastMedia';
+import { faMapLocationDot } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { EntityMastMedia, RecordPhotoCredit } from '../components/entity/EntityMastMedia';
 import { EntitySensitivityBanner } from '../components/entity/EntitySensitivityBanner';
 import { LinkedProse, type EntityLinkCatalogEntry } from '../components/entity/LinkedProse';
 import { RecordPlacePreview } from '../components/patterns/RecordPlacePreview';
@@ -15,17 +21,23 @@ import { RecordVisitBlock } from '../components/patterns/RecordVisitBlock';
 import { shouldShowVisitBlock } from '../lib/geography/visit-handoff';
 import { Connections, Room, TrustBlock } from '../components/room';
 import { geoAnchorFor } from '../lib/map-experience/entity-geo';
+import { recordConfidenceTier } from '../lib/map-experience/build-explore-map-source';
 import type { PlaceDiscoveryReturn } from '../lib/discovery/discovery-state';
 import { placeDiscoveryReturn } from '../lib/discovery/discovery-state';
 import type { PublicEntityView } from '../data/public-seed';
 import {
   RecordBeatHead,
+  RecordFactTile,
   RecordSmallTitle,
   RecordKindPill,
   RecordPill,
+  RecordGradePill,
   recordSectionIcon,
 } from '../components/entity/RecordChrome';
-import { EntityRoomSections, renderedBeatCount } from './entity/[id]/EntityRoomSections';
+import { humanizeToken } from '../components/entity/format';
+import { confidenceIconFor } from '../lib/map-experience/confidence-icons';
+import { METHODOLOGY_HOW_RECORD_GETS_IN_HREF } from '../components/evidence/editorial-links';
+import { EntityRoomSections } from './entity/[id]/EntityRoomSections';
 import { toEvidenceClaimInputs, withoutSummaryEchoClaims } from './entity/[id]/adapters';
 import { placeHref } from '../lib/place/public-place-path';
 import { instrumentRecordHref, placeSlugCollisionCounts } from '../lib/place/place-slug';
@@ -33,19 +45,26 @@ import { isInternalRecordLabel, type HomeFirstPaintModel } from './home-first-pa
 import { MAP_BACK } from './walk-back-place';
 import { WalkOffRampView } from './walk-off-ramp';
 import {
-  firstPaintEraLine,
+  firstPaintEraLink,
   firstPaintLocatorName,
   firstPaintRecord,
   publishableCitingStories,
   selectDoorRooms,
   walkOnPlaces,
 } from './home-first-paint-surface';
+import { destinationById } from '../lib/nav/destination-registry';
+import { DestinationIcon } from '../components/patterns/DestinationIcon';
 import '../components/entity/entity-page.css';
 import './record-page.css';
 import './entity/[id]/record-room.css';
 import './home-first-paint.css';
 
 void React;
+
+/** Catalog notability strings sometimes carry an em dash; display never does. */
+function displayTrustReason(reason: string): string {
+  return reason.replace(/\u2014/g, ',').replace(/\s+,/g, ',');
+}
 
 function neighborCatalog(entity: PublicEntityView): readonly EntityLinkCatalogEntry[] {
   const seen = new Set<string>();
@@ -63,21 +82,19 @@ function DoorRooms({ rooms }: { readonly rooms: ReturnType<typeof selectDoorRoom
   if (rooms.length === 0) return null;
   return (
     <nav className="ds-home-door-rooms" aria-label="Archive">
-      {rooms.map((room) => (
-        // Stories is the one room that is not on every place's door — it exists only when this
-        // record already names a chapter, which is a real reason to lead with it. Law, Data,
-        // Memorial, Methodology and Errata are the same five links on every place (see the module
-        // doc above), so none of them is more "current" than another: copper on one of them by
-        // array position read as a false active-tab state that had nothing to do with the place
-        // on screen.
-        <Link
-          key={room.id}
-          className={room.id === 'stories' ? 'ds-cta ds-cta--copper' : 'ds-cta ds-cta--quiet'}
-          href={room.href}
-        >
-          {room.label}
-        </Link>
-      ))}
+      {rooms.map((room) => {
+        const icon = destinationById(room.id)?.icon;
+        return (
+          <Link
+            key={room.id}
+            className={room.id === 'stories' ? 'ds-cta ds-cta--copper' : 'ds-cta ds-cta--quiet'}
+            href={room.href}
+          >
+            {icon ? <DestinationIcon id={icon} /> : null}
+            {room.label}
+          </Link>
+        );
+      })}
     </nav>
   );
 }
@@ -91,13 +108,11 @@ function WalkOnPlaces({
 }) {
   if (places.length === 0) return null;
   return (
-    // Peer suggestions, not the page's primary action — quiet like Data/Memorial/Methodology/
-    // Errata above, so a stack of them doesn't compete with the one copper off-ramp below.
     <nav className="ds-home-walk-on" aria-label="Also documented">
       {places.map((place) => {
         const href = instrumentRecordHref(place, collisions) || placeHref(place.displayName);
         return (
-          <Link key={place.id} className="ds-cta ds-cta--quiet" href={href}>
+          <Link key={place.id} className="ds-relation-chip" href={href}>
             {place.displayName}
           </Link>
         );
@@ -113,6 +128,13 @@ function citedSourceCount(claims: PublicEntityView['claims']): number {
     if (key.length > 0) sources.add(key);
   }
   return sources.size;
+}
+
+function evidenceGradeWord(tier: ReturnType<typeof recordConfidenceTier>): string {
+  if (tier === 'high') return 'Grade A';
+  if (tier === 'medium') return 'Grade B';
+  if (tier === 'low') return 'Grade C';
+  return 'Unrated';
 }
 
 export function HomeFirstPaint({
@@ -132,7 +154,7 @@ export function HomeFirstPaint({
     const geo = lead.geoAnchor ?? geoAnchorFor(lead.id);
     const citing = publishableCitingStories(model.citing);
     const rooms = selectDoorRooms(lead, citing);
-    const eraLine = firstPaintEraLine(lead);
+    const eraLink = firstPaintEraLink(lead);
     const nextPlaces = walkOnPlaces(lead, model.also);
     const collisions = placeSlugCollisionCounts([lead, ...model.also]);
     const locatorName = firstPaintLocatorName(lead);
@@ -154,89 +176,154 @@ export function HomeFirstPaint({
     const evidenceClaims = toEvidenceClaimInputs(displayClaims);
     const inclusionBasis = lead.notabilityLabels ?? [];
     const sourceCount = citedSourceCount(displayClaims);
+    const confidenceTier = recordConfidenceTier(lead.claims);
+    const gradeWord = evidenceGradeWord(confidenceTier);
+    const precisionValue = geo ? humanizeToken(lead.locationPrecision) : 'Not pinned';
+    const hasPhoto = lead.primaryImage !== undefined;
     const returns =
       discovery ??
       placeDiscoveryReturn(lead.id, {}, geo ? { lat: geo.lat, lng: geo.lng } : undefined);
-    const beatsBefore = renderedBeatCount({ entity: lead, evidenceClaims, firstPaint: true });
-    const storiesIndex = String(beatsBefore + 1).padStart(2, '0');
-    const trustIndex = String(beatsBefore + (citing.length > 0 ? 2 : 1)).padStart(2, '0');
+
+    const evidenceStrip = (
+      <div className="ds-rec-facts ds-record-evidence-strip">
+        <dl
+          className="ds-rec-facts__tiles ds-rec-facts__tiles--glance"
+          aria-label="Evidence at a glance"
+        >
+          <RecordFactTile
+            className={`ds-rec-tile--evidence ds-rec-tile--evidence-${confidenceTier}`}
+            icon={confidenceIconFor(confidenceTier)}
+            label="Confidence"
+            value={<RecordGradePill tier={confidenceTier}>{gradeWord}</RecordGradePill>}
+            support={gradeWord === 'Unrated' ? 'Not graded on this page' : 'Evidence grade'}
+          />
+          <RecordFactTile
+            icon={recordSectionIcon('where')}
+            label="Precision"
+            value={precisionValue}
+            support={geo ? 'How sharp the pin is' : 'No public map location'}
+          />
+          <RecordFactTile
+            icon={recordSectionIcon('claims')}
+            label="Sources"
+            value={sourceCount === 0 ? 'None' : sourceCount.toLocaleString('en-US')}
+            support={
+              sourceCount === 0
+                ? 'Not linked on this page'
+                : sourceCount === 1
+                  ? 'cited source'
+                  : 'cited sources'
+            }
+          />
+        </dl>
+        <div className="ds-rec-facts__actions">
+          <Link className="ds-cta ds-cta--copper" href={returns.mapHref} scroll={false}>
+            <FontAwesomeIcon
+              icon={faMapLocationDot}
+              className="ds-rec-inline-icon"
+              aria-hidden="true"
+            />
+            {geo ? 'See it on the map' : 'Browse the map'}
+          </Link>
+        </div>
+      </div>
+    );
+
+    const mastMedia = hasPhoto ? (
+      <EntityMastMedia
+        entityId={lead.id}
+        entityName={lead.displayName}
+        {...(lead.primaryImage !== undefined ? { primaryImage: lead.primaryImage } : {})}
+        hideCredit
+        priority
+      />
+    ) : geo && locatorName ? (
+      <div className="ds-record-mast__map">
+        <RecordPlacePreview
+          lat={geo.lat}
+          lng={geo.lng}
+          label={locatorName}
+          accessibleName={locatorName}
+          interactive
+          neighborhood
+          atlasHref={returns.mapHref}
+          entityId={lead.id}
+        />
+      </div>
+    ) : (
+      <EntityMastMedia entityId={lead.id} entityName={lead.displayName} hideCredit priority />
+    );
 
     return (
       <Room
         className="ds-home-first-paint"
         masthead={
-          <figure
-            className="ds-record-mast"
-            data-media={lead.primaryImage !== undefined ? 'photo' : 'mark'}
-          >
-            <EntityMastMedia
-              entityId={lead.id}
-              entityName={lead.displayName}
-              {...(lead.primaryImage !== undefined ? { primaryImage: lead.primaryImage } : {})}
-              // First paint carries no missing-photo or rights-clearance caption (the mast is the
-              // place), but a licensed photograph must show its credit and source: for a Creative
-              // Commons pin, attribution is a license condition, not a caption.
-              hideCredit={lead.primaryImage === undefined}
-              priority
-            />
-            <figcaption className="ds-record-mast__over">
-              <div className="ds-rec-pills" aria-label="Place at a glance">
-                <RecordKindPill kind={lead.kind} />
-                {eraLine ? (
-                  <RecordPill tone="era" icon={recordSectionIcon('era')}>
-                    {eraLine}
-                  </RecordPill>
+          <>
+            <figure
+              className="ds-record-mast"
+              data-media={hasPhoto ? 'photo' : geo ? 'map' : 'mark'}
+            >
+              {mastMedia}
+              <figcaption className="ds-record-mast__over">
+                <div className="ds-rec-pills" aria-label="Place at a glance">
+                  <RecordKindPill kind={lead.kind} />
+                  {eraLink ? (
+                    <RecordPill
+                      tone="era"
+                      icon={recordSectionIcon('era')}
+                      {...(eraLink.href ? { href: eraLink.href } : {})}
+                    >
+                      {eraLink.label}
+                    </RecordPill>
+                  ) : null}
+                </div>
+                <h1 className="ds-record-mast__title">{lead.displayName}</h1>
+                <p className="ds-record-mast__lede">
+                  <LinkedProse
+                    as="span"
+                    text={lead.summary}
+                    skipEntityIds={[lead.id]}
+                    catalog={catalog}
+                    hrefFor={(entry) => {
+                      const neighbor = [
+                        ...(lead.relatedNeighbors ?? []),
+                        ...(lead.continueLearning ?? []),
+                      ].find((item) => item.id === entry.entityId);
+                      if (neighbor) {
+                        return (
+                          instrumentRecordHref(
+                            {
+                              id: neighbor.id,
+                              displayName: neighbor.displayName,
+                              kind: neighbor.kind,
+                              summary: neighbor.summary,
+                            },
+                            collisions,
+                          ) || placeHref(entry.label)
+                        );
+                      }
+                      return placeHref(entry.label);
+                    }}
+                  />
+                </p>
+                {lead.primaryImage !== undefined ? (
+                  <RecordPhotoCredit
+                    entityId={lead.id}
+                    image={lead.primaryImage}
+                    className="ds-record-mast__credit"
+                  />
                 ) : null}
-              </div>
-              <h1 className="ds-record-mast__title">{lead.displayName}</h1>
-              <p className="ds-record-mast__lede">
-                <LinkedProse
-                  as="span"
-                  text={lead.summary}
-                  skipEntityIds={[lead.id]}
-                  catalog={catalog}
-                  hrefFor={(entry) => {
-                    const neighbor = [
-                      ...(lead.relatedNeighbors ?? []),
-                      ...(lead.continueLearning ?? []),
-                    ].find((item) => item.id === entry.entityId);
-                    if (neighbor) {
-                      return (
-                        instrumentRecordHref(
-                          {
-                            id: neighbor.id,
-                            displayName: neighbor.displayName,
-                            kind: neighbor.kind,
-                            summary: neighbor.summary,
-                          },
-                          collisions,
-                        ) || placeHref(entry.label)
-                      );
-                    }
-                    return placeHref(entry.label);
-                  }}
-                />
-              </p>
-            </figcaption>
-          </figure>
+              </figcaption>
+            </figure>
+            {evidenceStrip}
+          </>
         }
       >
-        {geo && locatorName ? (
-          <section className="ds-home-place-stand">
-            <RecordPlacePreview
-              lat={geo.lat}
-              lng={geo.lng}
-              label={locatorName}
-              accessibleName={locatorName}
-              interactive
-              atlasHref={returns.mapHref}
-            />
-          </section>
-        ) : null}
-
+        {/* Visit / maps handoff only when there is something to visit. The mast already
+            carries the one map affordance (pin → atlas). */}
         {shouldShowVisitBlock(visitInput) ? (
           <RecordVisitBlock
-            atlasHref={returns.mapHref}
+            className="ds-record-beat"
             {...(locatorName !== undefined ? { locatorLabel: locatorName } : {})}
             {...visitInput}
           />
@@ -253,11 +340,25 @@ export function HomeFirstPaint({
           firstPaint
         />
 
+        {evidenceClaims.length === 0 ? (
+          <section
+            className="ds-record-beat"
+            id="evidence-gap"
+            aria-labelledby="evidence-gap-heading"
+          >
+            <RecordBeatHead id="evidence-gap-heading" icon="claims" title="Evidence on this page" />
+            <p className="ds-record-evidence-gap">
+              This place is in the release with a name, location and era. Cited sources have not
+              been linked on this page yet. Coverage is recorded as{' '}
+              {lead.researchCoverage.replace(/[_-]+/g, ' ')}.
+            </p>
+          </section>
+        ) : null}
+
         {citing.length > 0 ? (
           <section className="ds-record-beat" id="stories" aria-labelledby="stories-heading">
             <RecordBeatHead
               id="stories-heading"
-              index={storiesIndex}
               icon="stories"
               title="Stories"
               count={citing.length}
@@ -273,19 +374,7 @@ export function HomeFirstPaint({
         ) : null}
 
         <section className="ds-record-beat" id="trust" aria-labelledby="trust-heading">
-          <RecordBeatHead
-            id="trust-heading"
-            index={trustIndex}
-            icon="trust"
-            title="Can I trust this"
-          />
-          {/*
-           * The inclusion basis, which `/entity/{id}` has always shown in its apparatus band and
-           * this room did not. Nearly every visitable record redirects here from there, so the
-           * archive's auditable answer to "why is this record in the catalog" — the one thing the
-           * rubric exists to publish — was invisible on most of the catalog. It reads before the
-           * measurements: why the record is here, then how well it is evidenced.
-           */}
+          <RecordBeatHead id="trust-heading" icon="trust" title="Can I trust this" />
           {inclusionBasis.length > 0 ? (
             <>
               <RecordSmallTitle icon="why" id="why-heading">
@@ -293,7 +382,7 @@ export function HomeFirstPaint({
               </RecordSmallTitle>
               <ul className="ds-record-rail-block__reasons" aria-labelledby="why-heading">
                 {inclusionBasis.map((reason) => (
-                  <li key={reason}>{reason}</li>
+                  <li key={reason}>{displayTrustReason(reason)}</li>
                 ))}
               </ul>
             </>
@@ -309,13 +398,13 @@ export function HomeFirstPaint({
                 label: 'Cited sources on this page',
                 value:
                   sourceCount === 0
-                    ? 'None linked yet'
+                    ? 'Not linked yet. The place still stands on its published identity.'
                     : `${sourceCount.toLocaleString('en-US')} ${sourceCount === 1 ? 'source' : 'sources'}`,
               },
               {
                 label: 'How a record gets in',
                 value: (
-                  <Link href="/methodology" prefetch={false}>
+                  <Link href={METHODOLOGY_HOW_RECORD_GETS_IN_HREF} prefetch={false}>
                     Methodology
                   </Link>
                 ),
@@ -354,12 +443,13 @@ export function HomeFirstPaint({
             ...(returns.nextHref && returns.nextLabel
               ? [{ href: returns.nextHref, label: returns.nextLabel }]
               : []),
-            { href: returns.mapHref, label: returns.mapLabel },
             { href: returns.listHref, label: returns.listLabel },
-            { href: '/methodology', label: 'How a record gets in' },
+            { href: METHODOLOGY_HOW_RECORD_GETS_IN_HREF, label: 'How a record gets in' },
           ]}
         >
-          {returns.positionLabel ? `${returns.positionLabel}. ${lead.summary}` : lead.summary}
+          {returns.positionLabel
+            ? returns.positionLabel
+            : 'Return to the map, or continue through the list.'}
         </WalkOffRampView>
       </Room>
     );
@@ -378,11 +468,8 @@ export function HomeFirstPaint({
           </p>
         </>
       ) : (
-        <h1 className="ds-record-mast__title">BlackStory</h1>
+        <p>This place is not in the current release.</p>
       )}
-      <WalkOffRampView placeName={MAP_BACK.displayName} href={MAP_BACK.href}>
-        {story ? story.summary : MAP_BACK.displayName}
-      </WalkOffRampView>
     </Room>
   );
 }

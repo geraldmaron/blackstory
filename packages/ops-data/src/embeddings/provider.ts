@@ -1,10 +1,4 @@
-/**
- * Embedding provider abstraction. Everything downstream (the pipeline, the backfill
- * CLI, the gold-corpus eval) depends on this interface, not on any specific SDK that's the
- * "control over model, dims, retries" the pre-GA `firestore-vector-search` extension can't give
- * us. `gemini-provider.ts` implements it against the real API; `createDeterministicMockEmbeddingProvider`
- * below implements it for tests/CI without any network access.
- */
+/** Provider-neutral embedding generation with explicit attempt and delay bounds. */
 
 export class EmbeddingProviderError extends Error {
   constructor(

@@ -1,5 +1,5 @@
 /**
- * Rebuild bb_public.release_graph_* for the active release from canonical relationships
+ * Rebuild published.release_graph_* for the active release from canonical relationships
  * and release entity projections (publish-time graph surfaces).
  *
  * Usage (from repo root):
@@ -43,7 +43,7 @@ const DRY_RUN = process.env.DRY_RUN !== '0';
 const APPLY = process.env.RELEASE_GRAPH_APPLY === '1';
 const ENFORCE_COVERAGE = process.env.ENFORCE_DECADE_COVERAGE !== '0';
 
-const ACTIVE_RELEASE_SQL = `SELECT release_id FROM bb_public.active_release LIMIT 1`;
+const ACTIVE_RELEASE_SQL = `SELECT release_id FROM published.active_release LIMIT 1`;
 
 /**
  * The decade-coverage floor this rebuild accepts, mirroring
@@ -85,7 +85,7 @@ async function main(): Promise<void> {
     const activeRes = await client.query<{ release_id: string }>(ACTIVE_RELEASE_SQL);
     const releaseId = activeRes.rows[0]?.release_id;
     if (!releaseId) {
-      throw new Error('no active release pointer in bb_public.active_release');
+      throw new Error('no active release pointer in published.active_release');
     }
 
     const regression = runPublishRegressionGates();

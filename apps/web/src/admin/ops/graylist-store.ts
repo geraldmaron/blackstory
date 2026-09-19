@@ -31,7 +31,7 @@ export async function listDiscoveryGraylist(limit = 100): Promise<readonly Grayl
     readonly adapter_id: string | null;
   }>(
     `SELECT id, candidate_id, disposition, status, composite_score, parked_at, updated_at, reason, adapter_id
-     FROM bb_ops.discovery_graylist
+     FROM ops.discovery_graylist
      ORDER BY parked_at DESC
      LIMIT $1`,
     [capped],

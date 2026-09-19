@@ -3,7 +3,7 @@
  *
  * The point of this module is cost, not aesthetics. When the wall is up, a request must be
  * answered *at the edge* — before Next routes it, before a serverless function boots, and
- * before anything opens a Postgres connection to `bb_public`. Every decision here is therefore
+ * before anything opens a Postgres connection to `published`. Every decision here is therefore
  * synchronous, allocation-light, and free of I/O.
  *
  * Toggling requires a redeploy. `process.env.MAINTENANCE_MODE` is read inside the edge bundle,

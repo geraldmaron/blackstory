@@ -161,8 +161,24 @@
   }
 }
 
-/* The credit is a rights obligation on a photograph, not decoration: bottom-right of the plate. */
-.ds-record-mast[data-media='photo'] .ds-entity-photo__credit,
+/* The credit is a rights obligation, in flow under the lede. It used to sit absolutely in the
+   photo's bottom-right corner, which is also where the lede ends, so the two painted over each
+   other. Record masts hide the in-photo caption and render this line in the overlay instead. */
+.ds-record-mast__credit {
+  margin: var(--ds-space-4) 0 0;
+  max-width: 54ch;
+  font-family: var(--ds-font-mono);
+  font-size: var(--rec-eyebrow);
+  font-weight: 400;
+  letter-spacing: 0.02em;
+  line-height: 1.45;
+  color: var(--room-ink-4, var(--ds-ink-subtle));
+}
+
+.ds-record-mast__credit a {
+  color: inherit;
+}
+
 .ds-record-mast[data-media='photo'] .ds-entity-mark__context {
   position: absolute;
   right: var(--record-shell-pad);
@@ -173,10 +189,6 @@
   text-align: right;
   font-size: var(--rec-eyebrow);
   color: var(--room-ink-4);
-}
-
-.ds-record-mast[data-media='photo'] .ds-entity-photo__credit {
-  bottom: calc(var(--ds-space-3) + 16px);
 }
 
 /* The scrim: a floor under the type over a photograph the archive does not control the exposure of. */
@@ -216,6 +228,7 @@
 
 .ds-record-mast[data-media='photo'] .ds-record-mast__title,
 .ds-record-mast[data-media='photo'] .ds-record-mast__lede,
+.ds-record-mast[data-media='photo'] .ds-record-mast__credit,
 .ds-record-mast[data-media='photo'] .ds-record-mast__over .ds-room-crumb {
   text-shadow: 0 1px 16px var(--ds-canvas);
 }
@@ -233,10 +246,12 @@
    value and one supporting line (or a meter): the same shape five times, which is what makes
    the row read as one instrument. */
 .ds-rec-facts {
-  width: min(100%, var(--record-shell-w));
-  margin-inline: auto;
-  padding: var(--ds-space-5) 0 var(--ds-space-6);
+  box-sizing: border-box;
+  width: 100%;
+  margin: 0;
+  padding: var(--ds-space-5) var(--record-shell-pad) var(--ds-space-6);
   border-bottom: var(--ds-border-width) solid var(--ds-rule);
+  background: var(--ds-canvas);
 }
 
 /*
@@ -261,6 +276,19 @@
   margin: 0;
   border-top: var(--ds-border-width) solid var(--room-rule-2, var(--ds-rule));
   border-bottom: var(--ds-border-width) solid var(--room-rule-2, var(--ds-rule));
+}
+
+.ds-rec-facts__tiles--glance {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.ds-rec-facts__tiles--glance .ds-rec-tile__value {
+  display: block;
+  -webkit-line-clamp: unset;
+  line-clamp: unset;
+  overflow: visible;
+  overflow-wrap: break-word;
+  word-break: normal;
 }
 
 .ds-rec-tile {
@@ -362,6 +390,7 @@
   flex-wrap: wrap;
   align-items: center;
   gap: var(--ds-space-3);
+  margin-top: var(--ds-space-4);
 }
 
 .ds-rec-facts__actions .ds-cta {
@@ -369,17 +398,49 @@
 }
 
 @media (max-width: 67.9375rem) {
-  .ds-rec-facts {
-    padding-inline: var(--ds-gutter);
-  }
-
   /*
-   * Below the rail breakpoint the band becomes a list. Five columns at this width would give
-   * each fact about 90px, and an auto-fit grid would wrap into rows whose vertical dividers
-   * start mid-band, drawing a rule against nothing. A stacked list keeps the same hairline
-   * vocabulary and turns it the only way that stays true when the columns run out.
+   * Below the rail breakpoint five columns would give each fact about 90px. Two columns keep
+   * the hairline vocabulary without shredding values; glance (three facts) stays three until
+   * the phone breakpoint below.
    */
   .ds-rec-facts__tiles {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .ds-rec-facts__tiles--glance {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .ds-rec-tile {
+    padding: var(--ds-space-4);
+  }
+
+  .ds-rec-tile + .ds-rec-tile {
+    padding-left: var(--ds-space-4);
+    border-left: 0;
+  }
+
+  .ds-rec-facts__tiles:not(.ds-rec-facts__tiles--glance) .ds-rec-tile:nth-child(even) {
+    border-left: var(--ds-border-width) solid var(--room-rule-2, var(--ds-rule));
+  }
+
+  .ds-rec-facts__tiles:not(.ds-rec-facts__tiles--glance) .ds-rec-tile:nth-child(n + 3) {
+    border-top: var(--ds-border-width) solid var(--room-rule-2, var(--ds-rule));
+  }
+
+  .ds-rec-facts__tiles--glance .ds-rec-tile + .ds-rec-tile {
+    border-left: var(--ds-border-width) solid var(--room-rule-2, var(--ds-rule));
+  }
+
+  /* Stacked, the support line sits under its value rather than at the foot of a column. */
+  .ds-rec-tile__support {
+    margin-top: 0;
+  }
+}
+
+@media (max-width: 47.9375rem) {
+  .ds-rec-facts__tiles,
+  .ds-rec-facts__tiles--glance {
     grid-template-columns: 1fr;
   }
 
@@ -387,15 +448,12 @@
     padding: var(--ds-space-3) 0;
   }
 
-  .ds-rec-tile + .ds-rec-tile {
+  .ds-rec-tile + .ds-rec-tile,
+  .ds-rec-facts__tiles:not(.ds-rec-facts__tiles--glance) .ds-rec-tile:nth-child(even),
+  .ds-rec-facts__tiles--glance .ds-rec-tile + .ds-rec-tile {
     padding-left: 0;
     border-left: 0;
     border-top: var(--ds-border-width) solid var(--room-rule-2, var(--ds-rule));
-  }
-
-  /* Stacked, the support line sits under its value rather than at the foot of a column. */
-  .ds-rec-tile__support {
-    margin-top: 0;
   }
 }
 
@@ -483,8 +541,8 @@
   width: var(--rec-plate-sm);
   height: var(--rec-plate-sm);
   border-radius: var(--ds-radius-sm);
-  background: color-mix(in srgb, var(--ds-canvas) 90%, var(--ds-ink));
-  border: var(--ds-border-width) solid var(--room-rule-2);
+  background: var(--ds-canvas);
+  border: 0;
 }
 
 .ds-rec-beat-head__icon {
@@ -994,13 +1052,6 @@
 
 /* —— narrow ——————————————————————————————————————————————————————————————————— */
 @media (max-width: 47.9375rem) {
-  /* The credit's corner is the lede's corner on a phone. Give the overlay a floor for it and
-     run it the width of the plate, under the last line, instead of over it. */
-  .ds-record-mast[data-media='photo'] .ds-record-mast__over {
-    padding-bottom: calc(var(--ds-space-8) + 3.25rem);
-  }
-
-  .ds-record-mast[data-media='photo'] .ds-entity-photo__credit,
   .ds-record-mast[data-media='photo'] .ds-entity-mark__context {
     right: var(--ds-gutter);
     left: var(--ds-gutter);

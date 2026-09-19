@@ -40,8 +40,8 @@ export type ProductAxis = (typeof PRODUCT_AXES)[number];
  * question, not the CMS's taxonomy.
  *
  * - `axis` — a top-level product axis (the five above).
- * - `read` — another way to read the archive: law, data, books, the memorial wall.
- * - `trust` — how the archive decides, and what it got wrong.
+ * - `read` — another way to read the archive: law, data, lives, banned books, and the memorial wall.
+ * - `trust` — how the archive decides, the source library, and what it got wrong.
  * - `participate` — how a reader adds to it or corrects it.
  * - `policy` — BlackStory's own product policy. Never historical Law; see `/law` versus
  *   `/privacy` in `LEGACY_ALIASES`, and the note on `legal` there.
@@ -162,7 +162,7 @@ const DESTINATIONS: readonly SemanticDestination[] = [
   },
   {
     id: 'explore',
-    label: 'Explore',
+    label: 'Map',
     path: '/explore',
     parent: '/',
     family: 'axis',
@@ -236,6 +236,18 @@ const DESTINATIONS: readonly SemanticDestination[] = [
       'National series with their sources attached, and a plain account of what each one cannot tell you.',
   },
   {
+    id: 'lives',
+    label: 'Lives',
+    path: '/lives',
+    parent: '/rooms',
+    family: 'read',
+    icon: 'person',
+    isPublic: true,
+    browsable: true,
+    description:
+      'Class and conditions by race, decade by decade, bound to published census tables.',
+  },
+  {
     id: 'books',
     label: 'Banned books',
     path: '/books',
@@ -293,6 +305,18 @@ const DESTINATIONS: readonly SemanticDestination[] = [
     browsable: true,
     description:
       'How a record gets in, what the evidence grades mean, and why a point is never drawn sharper than its source.',
+  },
+  {
+    id: 'sources',
+    label: 'Source library',
+    path: '/sources',
+    parent: '/rooms',
+    family: 'trust',
+    icon: 'source',
+    isPublic: true,
+    browsable: true,
+    description:
+      'The publishers a public claim traces to, and how a URL becomes a citation on a record.',
   },
   {
     id: 'errata',
@@ -461,8 +485,9 @@ export const LEGACY_ALIASES: readonly {
   },
   {
     from: '/map',
-    to: '/explore',
-    because: 'Map was the old name for the Explore instrument.',
+    to: '/',
+    because:
+      'Map is the Door journey. Filter deep links still use /explore?… as map-focus posture.',
     subtree: false,
   },
   {
@@ -485,6 +510,34 @@ export const LEGACY_ALIASES: readonly {
     because:
       'The old `/legal` tree was historical legal reference, which is Law. Product policy was never under it; `/privacy` has always been its own address and must never be routed here.',
     subtree: true,
+  },
+  {
+    from: '/apparatus',
+    to: '/about',
+    because:
+      'Apparatus was an internal jargon slug for a merged trust hub. Trust is back to individual rooms; About is the honest default landing. Query-aware hops (`?s=data|law|…`) are handled by the thin `/apparatus` and `/how-it-works` redirect routes.',
+    subtree: false,
+  },
+  {
+    from: '/how-it-works',
+    to: '/about',
+    because:
+      'How it works was a single-room merge of About, Methodology, Data, Law and Banned books. Those are individual rooms again. Bare `/how-it-works` lands on About; `?s=` section focus is handled by the thin redirect route.',
+    subtree: false,
+  },
+  {
+    from: '/law/browse',
+    to: '/law',
+    because:
+      'Law browse tools live on `/law` itself; `/law/browse` was an escape hatch from the merged hub.',
+    subtree: false,
+  },
+  {
+    from: '/books/browse',
+    to: '/books',
+    because:
+      'Banned-books browse tools live on `/books` itself; `/books/browse` was an escape hatch from the merged hub.',
+    subtree: false,
   },
 ];
 

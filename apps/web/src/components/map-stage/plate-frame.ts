@@ -67,9 +67,11 @@ export function resolvePlatePosture(input: {
  * resizing its drawing buffer mid-gesture.
  *
  * `origin` is the containing block's current viewport rect — `document.documentElement`'s, in
- * practice, since the plate is a direct child of `<body>` and neither is positioned. Subtracting
- * it rather than adding `scrollY` is what makes the result stable during a scroll: both rects
- * shift by the same amount, so the difference does not move.
+ * practice, since the plate is a direct child of `<body>`. Subtracting it rather than adding
+ * `scrollY` is what makes the result stable during a scroll: both rects shift by the same amount,
+ * so the difference does not move. The slotted plate resolves those offsets against `<body>`; it
+ * must carry `position: relative` in `shell.css` or the initial containing block treats them as
+ * viewport-fixed and the map drifts from its frame on every scroll gesture.
  *
  * A zero-area slot still yields a zero-area box. The caller treats that as "do not paint" rather
  * than as a box, because a zero-height GL canvas still costs a resize.

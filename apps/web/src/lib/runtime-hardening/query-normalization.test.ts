@@ -330,9 +330,8 @@ test('normalizeQueryString canonicalizes explore layerMode', () => {
 });
 
 test('/history carries no browse allowlist, because normalizing it would break the redirect', () => {
-  // The decade stepper and its selection params went with the browse UI (repo-92n2.27). What is
-  // left of /history maps an incoming `decade` onto `era` and 308s to /records, so its params are
-  // cargo for one hop rather than filters on a page.
+  // /history maps an incoming `decade` onto `era` and redirects to /records, so its params are
+  // cargo for one hop rather than filters on a rendered page.
   //
   // Normalization must never touch them: stripping `decade` would land a five-year-old bookmark
   // on an unfiltered index quietly, which is worse than failing. The route is out of the
@@ -367,12 +366,24 @@ test('buildNormalizedUrl issues canonical Explore URLs on /explore', () => {
   assert.equal(normalized.search, '?state=VA&lines=1');
 });
 
-test('/law keeps its GET browse contract (q, kind, topic)', () => {
+test('/law and /law keep the GET browse contract (q, kind, topic)', () => {
   assert.equal(
     normalizeQueryString('/law', { q: ' voting ', kind: 'statute', topic: 'voting_rights' }),
     'kind=statute&q=voting&topic=voting_rights',
   );
+  assert.equal(
+    normalizeQueryString('/law', {
+      q: ' voting ',
+      kind: 'statute',
+      topic: 'voting_rights',
+    }),
+    'kind=statute&q=voting&topic=voting_rights',
+  );
   // The filters reach the page as-is: a form submit must not 308 away its own params.
+  assert.equal(
+    needsQueryNormalizationRedirect(new URL('https://example.com/law?q=voting&kind=statute')),
+    false,
+  );
   assert.equal(
     needsQueryNormalizationRedirect(new URL('https://example.com/law?q=voting&kind=statute')),
     false,

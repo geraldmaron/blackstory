@@ -1,6 +1,6 @@
 /**
  * Co-participation inference: derive person↔person (and org) associations through shared
- * events. Same-event co-participation is the strongest deterministic tier for WS4 — the
+ * events. Same-event co-participation is the strongest deterministic tier for drafting — the
  * event itself is the assertion; no separate review edge is required.
  */
 export type EventParticipationRow = {
