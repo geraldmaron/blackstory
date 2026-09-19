@@ -1,6 +1,6 @@
 # Research framework audit evidence
 
-Engineering verification record, observed 2026-09-18. The maintained method is
+Engineering verification record, observed 2026-09-19. The maintained method is
 [Research framework](README.md); [Architecture](../architecture.md) owns authority and the challenge
 procedure. Beads epic `repo-91sqj` owns execution status. This record replaces superseded intermediate
 results rather than accumulating competing completion claims.
@@ -12,10 +12,15 @@ proposals, review gates and manual worker entry points are implemented. Black hi
 profile; the same loop has acquired EPA wetland sources. Research cannot publish. No Firebase,
 Firestore or Corsair runtime is required, and no research timer is enabled in the inspected accounts.
 
-This remains a draft release candidate. The database and application changes are incompatible with
-the currently deployed schema names. Production still uses `bb_*`; no production mutation, merge or
-cutover has occurred. Native iOS Release verification is deferred by the operator. A passing build
-or preview does not prove production migration, reviewed graph coverage or research quality.
+The coordinated release remains under production maintenance. The signed Dunbar correction is
+active, Preview database credentials are removed, and the separately deployed API is in seed mode.
+The authorized production migration has completed all 14 pending files, advancing the ledger from
+61 to 75 versions, removing the `bb_*` responsibility schemas, and moving staff metadata to
+`app_role`. Matching web/API clients have not yet been deployed, so traffic remains gated. The
+freeze cutoff is `2026-09-19T04:43:09.299Z`; the matched recovery completed at
+`2026-09-19T05:07:26.655Z` in 1,457.356 seconds, meeting RPO 0 and RTO 14,400 seconds. Native iOS
+Release verification is deferred by the operator. A passing build or preview does not prove
+reviewed graph coverage or research quality.
 
 ## Decisions challenged
 
@@ -26,6 +31,7 @@ or preview does not prove production migration, reviewed graph coverage or resea
 | Semantic candidate discovery | Similar names or topics can invent identity and relationships. Alternative: lexical-only retrieval | Accepted with controls: similarity proposes; exact source selectors and independent review establish assertions |
 | Institutional source preference | Custody does not remove exclusion, copying or archival silence. Alternative: equal source weights | Claim-relative fitness, lineage checks, community/oral/Black press discovery and explicit negative-case searches |
 | Prefix removal | Old clients, SQL function bodies and JWT claims can fail together. Alternative: compatibility aliases | One coordinated schema/auth/client cutover; no alias views or dual writes; restored-data rehearsal before release |
+| Staff session authority | A runbook can mistake session revocation for immediate JWT invalidation. Alternative: add a separate revocation gate | Retain server-verified current `app_role` for web/admin and JWT `app_role` for database RPCs; test each boundary, refresh the cutover session, and do not promise forced reauthentication or a retired-claim fallback |
 | Public relationship shortcuts | A stored connection can borrow unrelated evidence. Alternative: leave old edges visible | Require the exact directed predicate, target and cited claim throughout public graphs and record chains |
 | Preservation | Metadata or an old Wayback snapshot can masquerade as saved bytes. Alternative: URL-only citations | Distinct raw/extracted hashes, explicit rights decisions, historical availability pointers and revision-keyed resumable saves |
 | Automated continuity | Timers create unbounded work and cost. Alternative: scheduled campaigns | Durable leases and headless workers retained; scheduling capability exists without active timers |
@@ -54,13 +60,14 @@ or preview does not prove production migration, reviewed graph coverage or resea
   The security catalog points to existing implementation and architecture files rather than
   retired tracker codes; its validator rejects missing repository references.
 - Broken recovery commands and simulated passing recovery evidence were removed. Launch recovery
-  requires an executed restore and a verifiable log. The launch decision remains `NO_GO`.
+  requires an executed restore and a verifiable log. Traffic remains gated until recovery,
+  namespace migration and matching client verification are complete.
 - Literal NUL source characters were replaced by equivalent string escapes. Active scripts use the
   responsibility schemas. Rewritten comments describe behavior and constraints rather than session history.
 
 ## Database and storage evidence
 
-The configured production source was read without mutation. It held ten `bb_*` namespaces,
+The initial production inventory was read without mutation. It held ten `bb_*` namespaces,
 133 application tables and 412,140 exact rows on Postgres 17.6. A consistent application snapshot
 was exported to a private local dump (90,198,939 bytes). The isolated restore matched all table
 counts and stable row hashes, with 467 constraints, 342 indexes, 18 functions and no invalid
@@ -101,18 +108,41 @@ All 228 available referenced media objects were downloaded, restored into a priv
 and read back with identical hashes and sizes; 456 anonymous access probes were denied, and the
 temporary bucket was removed. The missing object is the Dunbar school primary image; its original
 GCS URL denied public access; an authenticated object lookup confirms HTTP 404. No authentic
-replacement exists in the recovery set. Its stale published reference requires a corrected
-release and rebuilt artifacts; it is not a successfully recovered 229th object. The private backups are retained outside Git. Recovery targets and production failover have not
-been established by these local timings.
+replacement exists in the recovery set. The signed correction below removes its current reference;
+the original immutable release preserves the historical reference. It is not a successfully
+recovered 229th object. The private backups are retained outside Git. These component timings alone
+do not establish complete recovery.
 
 A separate local Dunbar correction cloned the release, removed the unavailable media reference,
 built a 4,210-entry manifest, signed it with a throwaway P-256 key, verified the persisted signature,
 and activated it through `publication.activate_release`. The previous release became superseded
 and one activation audit event was recorded. Source release hashes remained unchanged. The new
 release retained 4,210 entities and search rows, 12,180 citations, and Dunbar’s four claims and one
-related record. No production signature, upload, cache purge or activation occurred; this verifies
-the correction mechanism, not live delivery. Production signing configuration and a complete timed
-Auth/database/object recovery remain cutover prerequisites.
+related record. This rehearsal established the correction mechanism before production delivery.
+
+The production replacement `rel_20260918_dunbar_media_correction_001` is now active. Both release
+artifacts were uploaded through resumable Storage uploads and read back with exact byte hashes:
+`entities.json` is 17,665,183 bytes with SHA-256
+`eb200fb283e8fce0df2f733fceb4be0a34a1af8be776a518f177cab9a7e4a8ed`; `search-index.json` is
+8,310,554 bytes with SHA-256
+`c39a64fdbe27269192a9e7ffc21974f666e9a1b22b3660b34f3ac9a7992e623d`. The production P-256 signature
+verified before and after persistence. Activation used `bb_publication.activate_release`.
+All nine release tables matched normalized source content except the approved image removal and
+replacement release identifiers; the original signed release was preserved and superseded.
+The new release retains the same entities, search documents, citations and Dunbar evidence as the
+rehearsal. The signing key and maintenance credential are held in 1Password; private key material,
+upload journals and recovery exports remain outside Git.
+
+Production maintenance was verified anonymously before and after an operator bypass request.
+Cloudflare excludes bypass cookies, headers and query parameters from shared caching. Both Vercel
+projects protect direct deployment URLs with SSO and have no Preview database credentials or cron
+definitions. The four scheduled GitHub workflows remain disabled. The freeze check found no active
+or idle-in-transaction client, no prepared transaction and no external-job database extension.
+The frozen inventory contains 170 tables, 433,931 rows, 303 Storage metadata rows and 288 required
+objects totaling 499,737,392 bytes (58 private and 230 public), including both new release
+artifacts. Exact readbacks and access denials passed for the required objects; the absent historical
+Dunbar image is reported separately. The complete matched restore is proven in the owner-only
+recovery record.
 
 The authorized private Auth/Storage database drill restored a consistent table/Auth/Storage metadata snapshot into a dedicated
 loopback-only container with fresh local database credentials. All **170 tables and 421,166 rows**
@@ -129,14 +159,15 @@ JSON row-hash comparison; the fresh server's value of `1` caused four apparent m
 vanished with equal serialization settings. Extension and full-role metadata were inventoried
 after the data snapshot. They are supplemental component evidence, not a freeze-time manifest.
 
-The dump, configuration, manifests and logs remain outside Git in owner-only storage. Verification
+The dump, configuration, manifests and logs remain outside Git in owner-only storage. This is a
+historical component proof. Verification
 ran with `node --conditions=development --import tsx
 .cache/research-reconciliation/preproduction-recovery-drill.mts
 .cache/research-reconciliation/blackstory_preprod_recovery_20260918222337-source.json --verify-only`.
 The report is `.cache/research-reconciliation/preproduction-recovery-drill.json`, with result
 `component-pass-recovery-gate-open` and `completeRecoveryProven: false`. Its 4.162-second timing
 covers final verification only, not recovery time. Restoration and permission corrections preceded
-that comparison; no launch-ready recovery artifact was generated.
+that comparison; no launch-ready recovery artifact was generated by that earlier drill.
 
 A separate Auth API proof used the source's observed GoTrue `v2.197.0`, the restored
 `supabase_auth_admin` role, its observed `search_path=auth`, and fresh local credentials. From the
@@ -147,13 +178,24 @@ refresh-token reuse returned 400. No email was sent. The command was
 .cache/research-reconciliation/preproduction-auth-service-proof.mts --go-ahead`; its private report
 records `auth-service-proof-pass`. Temporary credentials, service/network and the disposable
 recovery database were removed after verification; the protected dump and reports are retained.
-This proves the local Auth API flow, not the original password, email delivery, a browser sign-in
+This historical proof establishes the local Auth API flow, not the original password, email delivery, a browser sign-in
 page, production JWT reuse or a restored Storage service. The host HTTP route was not verified.
 
-This comparison does not independently establish all ownership, schema/default/sequence ACLs,
+This historical comparison did not independently establish all ownership, schema/default/sequence ACLs,
 role settings, or full-surface object references. The retained 286-object byte proofs predate this
-snapshot. A matched-cutoff Storage service restore, matching old application builds and approved
-RPO/RTO remain required for complete recovery.
+snapshot. Those limits were closed by the later matched recovery; the component records remain
+supporting evidence rather than the release-time measurement.
+
+The completed matched recovery is recorded in the owner-only artifacts
+`artifacts/recovery/latest.json` and `.cache/research-reconciliation/matched-recovery-run.json`.
+It proves `completeRecoveryProven: true` from the frozen cutoff through completion, with RPO 0 and
+RTO 14,400 seconds. The postcutover production verifier completed at
+`2026-09-19T05:13:29.865Z`: migration frontier `20260918154322`, 10 current responsibility
+schemas and no `bb_*` schemas, 11 expected generated columns, zero invalid constraints, and
+PostgREST configured for `public,published,submissions`. It found one admin `app_role`, no
+`bb_role`, exact mapped counts and full-row hashes for 133 original application tables and
+424,903 rows, 14 new capture origins, five other new tables, and passed anonymous and privileged
+function denial checks. Matching client deployment and public canary verification remain pending.
 
 Preservation coverage is materially incomplete. The production snapshot has 12,180 cited claims
 across 7,566 distinct entity URLs; packets contribute 202 references
@@ -170,8 +212,21 @@ embedded data rows, images or original response bytes. Both captures were retrie
 Supabase Storage with matching hashes and sizes (14,654 and 3,923 bytes); anonymous reads were
 denied. `research-retrieve` returned source-bound passages with selectors for both sources.
 An identical NARA capture deduplicated successfully. Two one-URL dry-run batches advanced the
-cursor without network requests. Authenticated Internet Archive completion remains blocked on
-credential access; no successful save is inferred from local storage or an availability lookup.
+cursor without network requests. The bounded authenticated preservation pilot submitted the NARA
+URL once. Internet Archive's account status recorded one daily capture, and CDX reported a new
+HTTP 200 capture at `20260919023853`, eleven seconds after the local revision reservation. The
+[sanitized receipt](../../packages/testing/src/gold-corpus/artifacts/internet-archive-preservation-pilot-2026-09-18.json)
+records the exact URL, local digest, CDX digest, replay URL, capture time and readback result without
+credential values. The exact replay returned HTTP 200 with the matching Memento datetime.
+
+The initial SPN response was `text/html`, so no remote job id could be parsed. The local URL-plus-
+digest reservation remains `reserved`; it is not relabeled as a completed job and prevents an
+automatic duplicate POST. External capture completion and local job completion therefore remain
+separate facts. Internet Archive's official `gospn` client requests `application/json`; the shared
+client now sends the same `Accept` header on submission and status polling. No NPS URL was
+submitted. This proves one rights-reviewed external save, not preservation coverage for the
+**7,913-URL** inventory, and it does not establish byte equality between the local extracted text
+and the Archive's independent fetch.
 
 Publication attaches an Archive pointer only to its independently reviewed claim and exact
 supporting capture revision, source item, URL and digest. The completed job's original and current
@@ -186,10 +241,35 @@ with separate archived/original links, an explicitly labeled capture date, visib
 and no captured console errors. The Place fixture used the real loader, current schema contract,
 public projection and source renderer. Original signed release rows stayed untouched; the
 temporary unsigned release and jobs were removed and the local active pointer restored. Its
-Wayback result was explicitly synthetic, so this proves local delivery, not an Archive save.
+Wayback result was explicitly synthetic, so this proves local delivery separately from the live
+NARA save above; it does not prove that the new external pointer has been published on the route.
 The persistent working database predates the final migration rehearsal; its empty job table was
-temporarily conformed for this component check and restored afterward. The complete 75-file
+conformed to the checked-in revision-keyed schema for the authenticated pilot. The complete 75-file
 CLI proofs used separate disposable databases, as recorded above.
+
+Preservation verification commands:
+
+```text
+Command: fnm exec --using=22 -- pnpm --filter @repo/domain test
+Result: pass
+Observed: 1,830 tests passed, including the SPN request contract.
+
+Command: fnm exec --using=22 -- pnpm --filter @repo/domain typecheck
+Result: pass
+Observed: TypeScript completed without errors.
+
+Command: fnm exec --using=22 -- node --conditions development --import tsx --test packages/domain/src/adapters/internet-archive/wayback/wayback.test.ts packages/operator-cli/src/wayback-anchor.test.ts packages/operator-cli/src/capture-backfill.test.ts
+Result: pass
+Observed: 44 tests passed, including JSON negotiation, durable revision keys and ambiguous-submission no-retry behavior.
+
+Command: curl -sS -G 'https://web.archive.org/cdx/search/cdx' --data-urlencode 'url=https://www.archives.gov/research/african-americans/freedmens-bureau' --data-urlencode 'output=json' --data-urlencode 'filter=timestamp:2026091902' --data-urlencode 'fl=timestamp,original,statuscode,digest' --data-urlencode 'limit=10'
+Result: pass
+Observed: CDX returned timestamp 20260919023853, the exact NARA URL, HTTP 200 and digest XOEYUUVS6M5ILY53LOOKCFV4G6G4G4H3.
+
+Command: curl -sS -L -o /dev/null -D - 'https://web.archive.org/web/20260919023853id_/https://www.archives.gov/research/african-americans/freedmens-bureau'
+Result: pass
+Observed: the exact replay returned HTTP 200 and Memento-Datetime Sat, 19 Sep 2026 02:38:53 GMT.
+```
 
 ## Research evaluation
 
@@ -197,7 +277,7 @@ The reusable [held-out corpus](../../packages/testing/src/gold-corpus/fixtures/h
 contains six opened primary pages, 20 retrieval questions and 14 entailment cases. It includes
 rare people, aliases, synthetic OCR perturbations, indirect questions, a two-hop chain, conflicting
 fields, missing evidence and a second domain. A separate agent authored provisional gold labels;
-root predictions were frozen before reading those labels. This is not a human-adjudicated benchmark.
+predictions were frozen before reading those labels. This is a small, independently labeled engineering benchmark.
 
 The actual lexical SQL baseline measured precision@5 **0.09**, recall@5 **0.45** and MRR **0.425**.
 Exact-name and alias recall was 1.0; OCR, semantic, missed-entity and path categories were 0.
@@ -205,37 +285,39 @@ Forbidden-document retrieval occurred in 0.10 of queries. That is a candidate fa
 not an identity-merge rate. The frozen entailment pass matched 12/14 provisional labels and made
 no false-support decisions; two disagreements concern boundary-sensitive labels.
 
-The real [embedding pilot](../../packages/testing/src/gold-corpus/artifacts/evidence-retrieval-pilot-2026-09-18.json)
+The corrected [embedding pilot](../../packages/testing/src/gold-corpus/artifacts/evidence-retrieval-pilot-2026-09-18.json)
 used OpenRouter `openai/text-embedding-3-small`, returning `text-embedding-3-small`, at 768
-dimensions. The explicit normalized model mapping is allowlisted; arbitrary model substitutions
-are rejected. Seven passages and 20 queries used 2,392 reported tokens and $0.00004784 in
-provider-reported credit charges. Including two earlier failed-contract attempts at their full
-pre-call byte-rate estimates, the cumulative budgeted estimate was **$0.00255264**, below the
-authorized $0.25. This estimate was not an external billing cap; the successful provider receipt
-is authoritative, and the earlier charges are not independently known. Failed credential reads
-made no provider calls.
+dimensions. The explicit normalized model mapping is allowlisted; arbitrary substitutions fail.
+The run scopes lexical and vector fusion to the six held-out source items and isolates synthetic
+index-mechanics padding from semantic vectors. Seven passages and 20 queries used 2,392 reported
+tokens and **$0.00004784** in provider-reported charges. The cumulative receipt plus prior reserved
+estimate is **$0.00260048**, below the authorized $0.25. Earlier failed attempts remain charged at
+their conservative reservations because their actual charges are unknown. This is local accounting,
+not an external billing cap.
 
-Hybrid SQL retrieval measured precision@5 **0.23**, recall@5 **1.0** and MRR **0.975**. It also
-retrieved a forbidden document on **0.55** of queries, versus **0.10** lexically. This is a useful
-recall signal and a strong reason to retain strict identity, entailment and edge review. It does
-not justify automatic assertion admission. Exact and approximate modes returned identical results,
-but both actual plans used sequential scans: this tiny corpus provides **no HNSW recall evidence**.
-That historical provider run omitted a source-item allowlist during vector-mode fusion, so unrelated
-local lexical rows could enter its rankings. Its semantic scores remain provenance for the pilot,
-not current bounded quality evidence. The runner now scopes provider semantic retrieval to held-out
-document source items and keeps deterministic mechanics padding in a separate namespace.
-The artifact includes input hashes, query-level outcomes, SQL plans and cleanup counts; all six
-classes of temporary evaluation rows were removed. The successful OpenRouter pilot does not
-verify the corrected Gemini adapter against its live service. The reusable runner accepts prior
-spend and call counts as inputs; historical attempt details belong to the recorded artifact.
-Entailment inputs are validated before any provider call.
+Hybrid SQL retrieval measured precision@5 **0.23**, recall@5 **1.0** and MRR **0.975**, compared
+with lexical recall **0.45**. It retrieved a forbidden candidate on **0.55** of queries, versus
+**0.10** lexically. That tradeoff supports candidate discovery with strict review; it does not
+support automatic merges or assertions. Exact and approximate fused results matched on all 20
+queries. A controlled preflight exercised HNSW, while source-filtered plans preferred the origin
+index. This provides bounded semantic and index-mechanics evidence, not representative ANN recall.
+Exact retrieval remains the default.
+
+The artifact binds input hashes, query outcomes, categorical measurements, SQL plans, costs and
+cleanup receipts. All six temporary-row classes were empty after cleanup. The corrected provider
+vectors were retained only in an owner-only local replay cache keyed by input-text hashes and
+model/dimension contract. A zero-call replay reproduced every quality section exactly. Invalid,
+missing or mismatched cached vectors fail closed. Public EXPLAIN plans retain operators, index
+names and measured plan details while replacing embedded SQL vector literals with a redaction
+marker; the public artifact contains no vectors or credentials. Executable tests recompute the
+categorical summary and bind the provider report to its frozen inputs. This does not verify the
+Gemini adapter against its live service. Entailment
+inputs are validated before any provider call.
 
 Entailment predictions are frozen agent decisions, not a paid model comparison. The retrieval path
 category measures retrieval of supporting documents, not end-to-end relationship extraction.
 Measurement-only reports use `qualityAdmission: not_evaluated`; zero measurement thresholds
-cannot produce a misleading quality-pass flag. The original pilot did not measure identity merges. No probability calibration, human-adjudicated
-quality threshold or population-level quality claim is supported; the later categorical and index
-mechanics measurements below have their own explicit limits.
+cannot produce a misleading quality-pass flag. Identity and edge decisions are measured separately below; retrieving a forbidden candidate is not an admitted assertion. No probability calibration or population-level quality claim is supported.
 
 The [controlled index and categorical measurement](../../packages/testing/src/gold-corpus/fixtures/heldout-quality-measurement.v1.json)
 uses 1,000 included deterministic-vector rows and 100 wrong-model rows. The approximate SQL bounds
@@ -276,25 +358,10 @@ connection, workflow dispatch or new schedule was made. Unrelated provider resou
 ## Verification
 
 ```text
-Check: Complete non-mobile local CI mirror, Node 22
-Command: RESEARCH_TEST_DATABASE_URL=postgresql://postgres:postgres@127.0.0.1:55322/postgres fnm exec --using=22 -- ./scripts/ci-local.sh --base origin/staging --skip mobile
-Result: fail, corrected in affected-lane rerun below
-Observed: install, package/app tests, Python, contract/security/a11y, coverage, build/typecheck, E2E harness, governance and security-policy passed. Only formatting failed on hash-bound raw evaluation receipts; those emitted bytes are now explicitly excluded from Prettier.
-
-Check: Final publication package and build gates
-Command: RESEARCH_TEST_DATABASE_URL=postgresql://postgres:postgres@127.0.0.1:55322/postgres fnm exec --using=22 -- ./scripts/ci-local.sh --base origin/staging --lane validate --lane unit-js-packages --lane build-typecheck
-Result: fail in lint only, corrected below
-Observed: package tests and all workspace builds/types passed. Domain 1,830, ops-data 1,153, operator 303 and testing 135 tests passed, with four intentional testing skips. Lint identified cleanup throws inside finally; cleanup now preserves both original and cleanup failures outside finally.
-
-Check: Final static gate after cleanup error handling correction
-Command: fnm exec --using=22 -- ./scripts/ci-local.sh --base origin/staging --lane validate
-Result: pass
-Observed: lint, boundaries, local governance and formatting passed. Standalone evaluation lint/types and the real pilot also passed after the correction.
-
-Check: Public app regressions
-Command: RESEARCH_TEST_DATABASE_URL=postgresql://postgres:postgres@127.0.0.1:55322/postgres fnm exec --using=22 -- ./scripts/ci-local.sh --base origin/staging --lane validate --lane unit-js-packages --lane unit-js-apps --lane build-typecheck
-Result: pass
-Observed: all four lanes passed; web reported 2,582 passes and one intentional skip. This ran after the final UI changes and before the publication-only transaction corrections.
+Check: Final complete local CI mirror, Node 22
+Command: fnm exec --using=22 -- ./scripts/ci-local.sh --base origin/main
+Result: fail only on the operator-waived native iOS prerequisite
+Observed: install, validate, package/app tests, Python, contract/security/a11y, coverage, build/typecheck, E2E harness, governance and security-policy passed. Mobile formatting, types, lint and all 167 suites / 1,275 tests passed. Expo Doctor passed 20/21 checks and failed only its CocoaPods native-tooling prerequisite. The final log is /tmp/blackstory-cutover-ci-final-sanitized.log. Earlier receipt-formatting and cleanup-lint failures were corrected before this full run.
 
 Check: Reviewed capture and withdrawal database regression
 Command: RESEARCH_TEST_DATABASE_URL=postgresql://postgres:postgres@127.0.0.1:55322/postgres node --conditions development --import tsx --test packages/ops-data/scripts/lib/confidence.integration.test.ts
@@ -418,6 +485,7 @@ Opened during this work; technical references inform decisions without proving c
 - [NARA search guidance](https://www.archives.gov/research/catalog/help/search-tips), [FAIR](https://www.go-fair.org/fair-principles/) and [Oral History Association](https://oralhistory.org/best-practices/): retrieval tradeoffs, reuse, consent and context.
 - [Wikidata statements](https://www.wikidata.org/wiki/Help:Statements): ranks, qualifiers and references.
 - [Wayback availability](https://archive.org/help/wayback_api.php): a historical pointer does not create a capture.
+- [Internet Archive gospn](https://github.com/internetarchive/gospn/blob/main/capture.go): the official SPN client requests JSON on authenticated submissions.
 - [NARA reuse policy](https://www.archives.gov/global-pages/privacy.html), [NPS disclaimer](https://www.nps.gov/aboutus/disclaimer.htm), [Freedmen’s Bureau guide](https://www.archives.gov/research/african-americans/freedmens-bureau) and [St. Louis 1860 schedule explanation](https://www.nps.gov/articles/000/united-states-census-slave-schedule-for-st-louis-county-1860.htm): exact-source preservation review and local capture pilot.
 - [Supabase Auth link generation](https://supabase.com/docs/reference/javascript/auth-admin-generatelink) and [GoTrue v2.197.0 verification contract](https://github.com/supabase/auth/blob/v2.197.0/internal/api/verify.go): generated links do not send email; hash verification accepts only the hash and type.
 - [Supabase Storage](https://supabase.com/docs/guides/storage/schema/design.md) and [backup/restore](https://supabase.com/docs/guides/platform/migrating-within-supabase/backup-restore.md): metadata inventory is separate from object operations; role credentials, provider configuration and extension prerequisites need separate recovery treatment.
@@ -431,10 +499,10 @@ Opened during this work; technical references inform decisions without proving c
 - Project inspected: schema, evidence, auth, projections and durable execution are scoped in “Reconciled implementation”.
 - Reuse checked: existing kernel, source clients, capture sink, pgvector and job registry extended; repository, sibling utilities and installed tooling were searched before additions.
 - Validation path run: exact commands and observed exceptions are recorded above; final-tree checks and their limits are recorded in “Verification”.
-- Outcome observed: restored record and staff reads proven locally; unsupported relationship removal and a sourced positive two-hop chain proven in Chrome; actual Archive completion remains unproven.
+- Outcome observed: restored record and staff reads proven locally; unsupported relationship removal and a sourced positive two-hop chain proven in Chrome; one rights-reviewed NARA Archive capture and exact replay proven externally.
 - Surface inspected: both admin and graph themes, restored records, citations and staff redirect observed in Chrome.
 - Diff reviewed: targeted independent review and migration equivalence completed; full raw-line review is not claimed.
 - Recovery verification: exact private commands and scope appear above; `fnm exec --using=22 -- ./scripts/ci-local.sh --base HEAD` passed the governance lane for the documentation-only update. Code lanes were correctly gated off.
 - Root-cause debugging: the row-hash comparison failed with local `extra_float_digits=1` and passed with the observed source setting `0`; no row data was changed to make hashes match.
-- Residual risk: production cutover, approved recovery targets, production delivery of the rehearsed Dunbar correction, Archive completion and representative-scale quality evidence remain explicit.
+- Residual risk: matching web/API client deployment, public canary verification, preservation of the remaining 7,912 inventory URLs, the unresolved no-job-id local reservation and representative-scale quality evidence remain explicit.
 - Commit-and-PR: scoped signed commits on `codex/research-framework-reconciliation`, one authorized draft PR into staging, reviewed index and staged-file secret scan. No merge or production release follows from local checks. Ordinary remote checks are reported in the PR delivery record.

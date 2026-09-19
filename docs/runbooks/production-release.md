@@ -7,11 +7,19 @@ into `staging` is separate from the deliberate `staging` to `main` release PR.
 
 ## Current release boundary
 
-As of 2026-09-18, production was inspected read-only and still used the ten `bb_*` responsibility
-schemas with 61 migration-history rows. No production migration, merge, auth-role change, client
-cutover or traffic move described here has been executed. The research framework remains
-`NO_GO` for production until the recovery prerequisites below have evidence and an authorized
-operator makes the release decision.
+The coordinated release remains under maintenance. Production has the signed Dunbar replacement
+release and the authorized database migration is complete: all 14 pending files advanced the
+ledger from 61 to 75 versions, the ten `bb_*` responsibility schemas were replaced by the current
+namespaces, and staff metadata moved to `app_role`. Matching web/API clients have not yet been
+deployed, so traffic remains gated. The matched recovery proved RPO 0 and RTO 14,400 seconds.
+
+The frozen cutoff is `2026-09-19T04:43:09.299Z`, with recovery completed at
+`2026-09-19T05:07:26.655Z` in 1,457.356 seconds. Web maintenance and API seed mode are deployed;
+Preview database credentials are removed; direct deployment URLs require SSO. Both Vercel cron
+lists are empty and the four scheduled GitHub workflows are disabled. The final transaction check
+found no active or idle-in-transaction client and no prepared transaction. Live execution details
+and private recovery locations are retained in the owner-only cutover record. The
+[framework audit](../research/framework-audit.md) records the sanitized evidence.
 
 Two isolated database paths have been exercised with the final migration files:
 
@@ -23,15 +31,21 @@ Two isolated database paths have been exercised with the final migration files:
   `model_invocations` table. Six tables were added and 14 source-linked capture origins were
   backfilled; 55 captures without a source-item relationship were left uninferred.
 
-This proves the checked-in clean and restored-data migration paths locally. The application dump
+This is historical evidence for the checked-in clean and restored-data migration paths. The application dump
 did not contain Auth, Storage metadata, provider Auth settings or database roles, so it is not a
 complete recovery set. A later authorized private Auth/Storage snapshot was also restored:
 170 tables and 421,166 rows matched, including one staff Auth identity, 301 Storage metadata rows and
 61 migrations. Queried grants, RLS/policies and role memberships matched, and five access probes
 passed. A matching-version local Auth API also verified the restored staff identity/role, token
 issuance, authenticated user lookup and session revocation. See the [audit evidence](../research/framework-audit.md) for exact scope and commands.
-These component proofs do not establish a matched-cutoff Storage/application restore, approved
-recovery time, production credentials, PostgREST cache convergence or a production cutover.
+These component proofs did not establish a matched-cutoff Storage/application restore, approved
+recovery time, production credentials, PostgREST cache convergence or a production cutover. The
+later owner-only matched recovery and postcutover verifier closed those gates. The verifier found
+the `20260918154322` frontier, 10 current and zero old responsibility schemas, 11 expected
+generated columns, zero invalid constraints, PostgREST `public,published,submissions`, one admin
+`app_role` and zero `bb_role`, exact mapped counts/full-row hashes for 133 original tables and
+424,903 rows, 14 new capture origins, five other new tables, and passing anonymous and privileged
+function denials. Matching client deployment and public canary checks remain pending.
 
 ## Release prerequisites
 
@@ -65,8 +79,10 @@ recovery time, production credentials, PostgREST cache convergence or a producti
    and all 228 available media objects referenced by release projections (457,165,770 bytes),
    with local readback and access checks. One further referenced Dunbar school image is absent
    from Supabase, and an authenticated object describe returns `404` at its old GCS location.
-   Remove that reference through the immutable release-repair procedure below before claiming
-   complete recovery. The remaining
+   The signed replacement `rel_20260918_dunbar_media_correction_001` removes that current reference
+   and preserves the original signed release as superseded history. A required-object inventory
+   must include both replacement release artifacts and explicitly report the unavailable historical
+   reference. A historical missing object is not recovered by removing its current reference. The remaining
    unreferenced objects in the 242-object bucket were not restored.
 5. Confirm that Preview database credentials are removed or point to an isolated destination.
    Visibility of masked variables does not prove they differ from Production credentials.
@@ -99,8 +115,9 @@ audit event and rejects research identities. A reviewed one-time operator script
 existing primitives; a new reusable publishing service is not required for this correction. Load
 an ECDSA private key and nonempty key ID from the configured secret store, and retain the matching
 public key for verification. The repository currently defines no production release-signing env
-name or key registry, so record the selected secret reference, key ID and public verifier before
-the window without logging private key material. Purge the release cache and verify the live
+name; the current key registry is held privately with its 1Password item references. Record the
+selected secret reference, key ID and public verifier before the window without logging private
+key material. Purge the release cache and verify the live
 database views, artifacts and public surface. Preserve the old release for rollback.
 
 ## Coordinated cutover
@@ -211,9 +228,14 @@ application and service revision is active.
    separately hosted API and worker surface before allowing traffic or work.
 2. Confirm the active build identities rather than relying on an HTTP header alone. Do not use a
    Preview with different database credentials as production evidence.
-3. Expire or refresh staff sessions so newly issued JWTs carry trusted
-   `app_metadata.app_role`. Require staff to sign in again before testing admin access. A valid old
-   session containing only `bb_role` must fail closed during the window, not be granted a fallback.
+3. Obtain a refreshed or newly signed-in staff session and verify its JWT contains trusted
+   `app_metadata.app_role`. Web pages and admin APIs call Auth `getUser` and require the current
+   server-returned `app_role`; they do not authorize from a retired JWT claim. An unexpired older
+   token can therefore authenticate a user whose current Auth record has the required role.
+   PostgREST/RPC authorization instead reads the JWT payload: a token containing only `bb_role`
+   must have no staff authority there. Test both boundaries. Session revocation prevents refresh
+   but does not guarantee immediate access-token invalidation; use the
+   [account-compromise procedure](incidents/account-compromise.md) when forced invalidation is required.
 4. Verify that PostgREST exposes only `public`, `published` and `submissions`, resolves the new
    views, and rejects old schema names. If its config or schema cache is stale, use the
    provider-supported reload or restart and keep traffic frozen. Do not recreate `bb_*` aliases to
@@ -236,8 +258,9 @@ Record each result against the frozen baseline:
 5. Through the maintenance bypass, exercise the home page, records, map, a cited record, a missing
    record, staff login, an unauthorized staff request, source links and the separately hosted
    public API. Verify light and dark themes and inspect runtime/PostgREST errors.
-6. A refreshed staff session authorizes the expected `app_role`; an old or missing role fails
-   closed. Anonymous, public-reader and research-worker denial checks still hold.
+6. A refreshed staff JWT carries the expected `app_role`. Web/admin authorization rejects a
+   current Auth user record with a missing or invalid role; database authorization rejects missing
+   or retired JWT role claims. Anonymous, public-reader and research-worker denials still hold.
 7. A second `supabase db push --dry-run --include-all` reports the database up to date.
 
 Only the named release decision-maker may end the window. Re-enable services in a controlled order:
