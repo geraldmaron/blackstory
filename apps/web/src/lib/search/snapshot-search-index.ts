@@ -1,18 +1,4 @@
-/**
- * Adapts the hand-authored seed catalog (`../../data/public-seed.ts`) into
- * `@repo/domain`'s search-index shape, so the real search pipeline
- * (`runPublicSearch`) has something to query today. This is the same "snapshot" posture as
- * `resolvePublicEntity`: a `liveFetch`-shaped seam exists so a later live Firestore
- * `publicSearchIndex` reader can plug in without changing the search route/page
- * contract — see `getSnapshotSearchIndex` below.
- *
- * `notabilityBasis` synthesis: the bundled seed catalog often carries hand-authored
- * `notabilityLabels` (display strings), not always a structured `NotabilityBasisRecord` from
- * `buildReleaseEntityArtifacts`. When a seed entity DOES carry a real `notabilityBasis`, this
- * adapter uses it (filling empty `evidenceIds` from cited claims). Otherwise it reverse-maps each
- * label to its rubric criterion and attaches the entity's cited claim ids so search and public
- * surfaces share citation-backed inclusion evidence — never empty-evidence theater.
- */
+/** Deterministic snapshot search index for isolated fixtures and explicitly supplied release data. */
 import {
   NOTABILITY_RUBRIC,
   buildPublicSearchIndexDocs,

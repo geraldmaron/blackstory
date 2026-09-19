@@ -32,8 +32,8 @@ test('worker preflight passes only when every canonical dependency is available'
     fetch: healthyFetch,
     freeBytes: () => 10 * 1024 ** 3,
     queryDatabase: async () => ({
-      frontierTasks: 'bb_research.frontier_tasks',
-      researchRuns: 'bb_research.runs',
+      frontierTasks: 'research.frontier_tasks',
+      researchRuns: 'research.runs',
     }),
     now: () => new Date('2026-07-21T12:00:00.000Z'),
   });
@@ -61,7 +61,7 @@ test('worker preflight fails closed when research ledger tables are missing', as
     freeBytes: () => 10 * 1024 ** 3,
     queryDatabase: async () => ({
       frontierTasks: null,
-      researchRuns: 'bb_research.runs',
+      researchRuns: 'research.runs',
     }),
     now: () => new Date('2026-07-21T12:00:00.000Z'),
   });
@@ -79,7 +79,7 @@ test('worker preflight fails closed when frontier_tasks exists but runs table is
     fetch: healthyFetch,
     freeBytes: () => 10 * 1024 ** 3,
     queryDatabase: async () => ({
-      frontier_tasks: 'bb_research.frontier_tasks',
+      frontier_tasks: 'research.frontier_tasks',
       research_runs: null,
     }),
     now: () => new Date('2026-07-21T12:00:00.000Z'),

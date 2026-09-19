@@ -1,14 +1,7 @@
 /**
- * Builds the static Lives Across the Decades snapshots (bead repo-0clax.21): one
- * `bb_public.materialized_snapshots` row per area (`livesArea:<slug>`) holding the built bundle, so
- * /lives pages never query the reference tables at request time. Rebuild after loading figures, count
- * notes or rules; unchanged content is left alone.
- *
- * Usage (repo root):
- *   set -a && . apps/web/.env.local && set +a
- *   node --conditions development --import tsx packages/ops-data/scripts/build-lives-snapshots.ts
- *   DRY_RUN=0 BUILD_LIVES_SNAPSHOTS_APPLY=1 node --conditions development --import tsx \
- *     packages/ops-data/scripts/build-lives-snapshots.ts
+ * Builds one materialized Lives snapshot per area from figures, notes and rules, skipping
+ * unchanged content. Default dry-run; writes require DRY_RUN=0 and
+ * BUILD_LIVES_SNAPSHOTS_APPLY=1.
  */
 import pg from 'pg';
 import { sha256Json } from '@repo/domain';
@@ -97,7 +90,7 @@ async function main(): Promise<void> {
       const contentHash = sha256Json({ bundle, ruleEntities }).digest;
       const name = livesSnapshotName(area.slug);
       const prior = await pool.query<{ payload: { contentHash?: string } }>(
-        'SELECT payload FROM bb_public.materialized_snapshots WHERE name = $1',
+        'SELECT payload FROM published.materialized_snapshots WHERE name = $1',
         [name],
       );
       const priorHash = prior.rows[0]?.payload?.contentHash;
@@ -121,7 +114,7 @@ async function main(): Promise<void> {
       });
       if (apply && outcome !== 'unchanged') {
         await pool.query(
-          `INSERT INTO bb_public.materialized_snapshots (name, payload, updated_at)
+          `INSERT INTO published.materialized_snapshots (name, payload, updated_at)
            VALUES ($1, $2::jsonb, now())
            ON CONFLICT (name) DO UPDATE SET payload = EXCLUDED.payload, updated_at = now()`,
           [name, payload],

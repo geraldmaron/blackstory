@@ -1,4 +1,4 @@
-# Black Book CI — pull request quality gates (BB-008) + governance policy (BB-009).
+# BlackStory pull request quality gates and repository governance.
 # Stable job names below are wired into infra/github/rulesets/main-protection.json.
 # Permissions stay read-only. Third-party actions are pinned to immutable SHAs.
 # Do not use pull_request_target.
@@ -24,8 +24,6 @@ concurrency:
 env:
   NODE_ENV: test
   LOG_LEVEL: info
-  FIREBASE_PROJECT_ID: demo-repo
-  BLACK_BOOK_TEST_DATABASE_URL: postgresql://blackbook:blackbook@127.0.0.1:5432/blackbook
 
 jobs:
   changes:
@@ -45,22 +43,8 @@ jobs:
         id: detect
         uses: ./.github/actions/detect-changes
 
-  # Two pnpm jobs, not seven. Validate, Build and Typecheck, both Unit Tests lanes,
-  # Contract Security Accessibility, Coverage and E2E Harness each began with the same
-  # checkout + pnpm install, and that setup was 4.4 of the 13.1 minutes a CI run spent —
-  # 34% of it — paid once per job because each job gets a fresh runner. Seven lanes became
-  # two, so the workspace is installed twice instead of seven times.
-  #
-  # The split is deliberately checks-vs-tests rather than one job. Tests here have always
-  # run against an UNBUILT workspace, because the old lanes were independent and only
-  # `Build and Typecheck` ever ran `pnpm build`. Keeping the build in a separate job keeps
-  # that true: fold it in with the tests and every suite would start resolving dist/
-  # instead of source. It also keeps the two running in parallel, so wall-clock is close
-  # to what it was.
-  #
-  # What is lost is per-lane reporting: a red run now names the failing step rather than
-  # a failing check, and the job stops at the first failure instead of telling you that
-  # coverage AND a11y are both broken in one pass.
+  # Separate build checks from tests so tests resolve an unbuilt workspace.
+  # Consolidated steps share installation work; failures report at the step level.
   workspace-checks:
     name: Workspace Checks
     needs: changes
@@ -92,8 +76,7 @@ jobs:
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - name: Setup Node and pnpm
         uses: ./.github/actions/setup-node-pnpm
-      # First, and unchanged: it fails closed on production identifiers, so nothing below
-      # it should run if it trips. It ran in three separate lanes before; once is enough.
+      # Fail closed on production identifiers before any test can access services.
       - name: Test preflight (fail closed on production identifiers)
         run: pnpm test:preflight
       - name: Run package tests
@@ -111,13 +94,8 @@ jobs:
       - name: E2E harness (skip without E2E_BASE_URL; no silent retries)
         run: pnpm test:e2e
 
-  # apps/mobile is deliberately excluded from the root pnpm workspace
-  # (see pnpm-workspace.yaml `!apps/mobile` and apps/mobile/README.md) and manages its
-  # own npm-based dependency graph, so it cannot run through `pnpm -r --filter './apps/**'`
-  # above. These three jobs are its dedicated npm-based lane; `npm ci` here never touches the
-  # root pnpm-lock.yaml, so `pnpm install --frozen-lockfile` in `validate` above is unaffected.
-  # One job, not three: format, typecheck, lint and Jest each paid their own `npm ci` against
-  # the same isolated lockfile. Ordered cheapest first so a lint error does not wait on Jest.
+  # Mobile owns its npm lockfile and is excluded from the pnpm workspace.
+  # Run its checks together, with cheap static checks before Jest.
   mobile-checks:
     name: Mobile Checks
     needs: changes
@@ -204,52 +182,6 @@ jobs:
         run: pnpm test:preflight
       - name: Run pytest
         run: uv run pytest
-
-  # Off by default because this job exercises the PARKED Cloud SQL foundation under
-  # infra/database/ (apply-init.sh / verify-isolation.sh), not supabase/migrations/. Postgres
-  # itself is the system of record. See docs/decisions-carryover.md, "Firestore as system of
-  # record, reversed". Enabling this would gate PRs on non-production schema.
-  integration-postgres:
-    name: Integration Postgres
-    needs: changes
-    if: needs.changes.outputs.code == 'true' && vars.ENABLE_POSTGRES_CI == 'true'
-    runs-on: ubuntu-latest
-    timeout-minutes: 20
-    services:
-      postgres:
-        image: postgis/postgis:16-3.4
-        env:
-          POSTGRES_USER: blackbook
-          POSTGRES_PASSWORD: blackbook
-          POSTGRES_DB: blackbook
-        ports:
-          - 5432:5432
-        options: >-
-          --health-cmd "pg_isready -U blackbook -d blackbook"
-          --health-interval 5s
-          --health-timeout 5s
-          --health-retries 20
-    env:
-      CI_REQUIRE_POSTGRES: '1'
-      DATABASE_URL: postgresql://blackbook:blackbook@127.0.0.1:5432/blackbook
-      BLACK_BOOK_TEST_DATABASE_URL: postgresql://blackbook:blackbook@127.0.0.1:5432/blackbook
-    steps:
-      - name: Checkout
-        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-      - name: Setup Node and pnpm
-        uses: ./.github/actions/setup-node-pnpm
-      - name: Install psql client
-        run: sudo apt-get update && sudo apt-get install -y postgresql-client
-      - name: Integration and migration harnesses
-        run: |
-          pnpm --filter @repo/testing exec node --import tsx --test \
-            src/harness/postgres.integration.test.ts \
-            src/migration/migration.harness.test.ts
-      - name: Apply DB foundation and role isolation checks
-        run: |
-          pnpm db:init
-          pnpm db:verify
-          pnpm test:db:integration
 
   governance:
     name: Governance

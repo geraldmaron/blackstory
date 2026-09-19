@@ -107,7 +107,7 @@ export type CameraConsoleProps = {
   /** The record the camera is acting on, if any. Drives the dignity gate. */
   readonly activeRecord?: RecordLike | null;
   /**
-   * The lens's own active topic constraint (repo-92n2.18). `allowedMovesFor` already refuses
+   * The lens's own active topic constraint. `allowedMovesFor` already refuses
    * spotlight/trace for a violence-adjacent SELECTED record; a violence-constrained lens must
    * refuse the same two moves even with nothing selected, since they would isolate or draw a
    * route across the very set of records the constraint names.

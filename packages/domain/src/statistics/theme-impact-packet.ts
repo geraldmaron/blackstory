@@ -17,7 +17,7 @@ export const THEME_IMPACT_PACKET_KIND = 'theme.impact.packet.v1' as const;
  * docs/methodology/scholarship-principles.md (§6 names the boundary-discontinuity-grade
  * citations, e.g. Aaronson/Hartley/Mazumder, Faber, NCRC, required for any gated causal claim in
  * a redlining narrative). Additive reference only — does not change packet shape or the publish
- * gate below (repo-xez5.7 owns structural changes to that gate).
+ * gate below (the recorded change owns structural changes to that gate).
  */
 export const THEME_IMPACT_METHODOLOGY_DOC_PATHS = Object.freeze([
   'docs/methodology/juxtaposition-not-causation.md',
@@ -34,7 +34,7 @@ export const THEME_IMPACT_GAP_STATES = ['insufficient_evidence', 'modeled'] as c
 export type ThemeImpactGapState = (typeof THEME_IMPACT_GAP_STATES)[number];
 
 /**
- * Multi-decade evidence-spine checklist (repo-xez5.7). A published theme-impact
+ * Multi-decade evidence-spine checklist. A published theme-impact
  * packet must account for every item — either with real evidence in the packet,
  * or with an explicit gap_state entry naming why the spine is missing. Silent
  * absence (an item just not mentioned) is never acceptable for a published packet.
@@ -90,8 +90,7 @@ export type ThemeImpactPacketGeography = {
 };
 
 /**
- * One independent corroborating source for a load-bearing observation (repo-k2q3 crit 3,
- * extended to packets by repo-xjxf). Mirrors ArticleAnchorDoc in @repo/schemas — tier is
+ * One independent corroborating source for a load-bearing observation (criterion 3). Mirrors ArticleAnchorDoc in @repo/schemas — tier is
  * derived at validate time via isAnchorTierUrl, never stored here.
  */
 export type ThemeImpactAnchor = {
@@ -112,7 +111,7 @@ export type ThemeImpactPacketObservation = {
 };
 
 /**
- * Two-anchor corroboration rule (repo-k2q3 crit 3 / repo-xjxf), packet-observation form.
+ * Two-anchor corroboration rule (criterion 3), packet-observation form.
  * An observation that declares `anchors` is asserting itself as load-bearing; this then
  * requires two independent-host T1/T2 anchors, or one T1/T2 anchor plus
  * `replicationVerified: true`. An observation with no `anchors` field is not considered
@@ -153,7 +152,7 @@ export type ThemeImpactPacketDerived = {
 
 /**
  * Optional scholarly-citation metadata for an artifact whose source is a peer-reviewed
- * paper (repo-k2q3 crit 2). When present, `doi` is checked against Crossref/OpenAlex at
+ * paper (criterion 2). When present, `doi` is checked against Crossref/OpenAlex at
  * validate time (gated behind CHECK_DOIS=1 — see checkDoiCitation and the validate wiring
  * in ops-data/scripts/theme-packets.ts) so a citation can't silently drift or be fabricated
  * with a plausible-looking DOI attached. Mirrors ArticleScholarlyCitationDoc in

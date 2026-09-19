@@ -1,15 +1,4 @@
-/**
- * Loads active canonical entities from Postgres as discovery `ResolutionProfile[]`.
- *
- * `bb_public.search_index` is the read-side catalog of active-release entities — Firestore's
- * `publicSearchIndex` is retired (see `packages/migrate-firestore-postgres/README.md`, "leftover,
- * not a current write target"). This is the discovery-match counterpart to
- * `loadEditorialCatalogFromPostgres` in this same package: same pool, same table, mapped to the
- * resolver's shape instead of the embedding shape.
- *
- * Soft match only, same contract as `attachCatalogMatch` (`@repo/domain`) — never hard-excludes a
- * discovery candidate just because a name overlaps an entry here.
- */
+/** Loads bounded active-release resolution profiles from published.search_index. Catalog matches are proposals, never a reason to discard a newly discovered source. */
 import { isEntityKind, type ResolutionProfile } from '@repo/domain';
 import { getOpsPostgresPool } from '@repo/data-access';
 
@@ -34,8 +23,8 @@ export function buildDiscoveryCatalogQuery(input: { readonly limit: number }): {
   return {
     sql: `
       SELECT si.entity_id, si.name, si.kind, si.aliases
-      FROM bb_public.search_index si
-      JOIN bb_public.v_active_release_id v ON v.release_id = si.release_id
+      FROM published.search_index si
+      JOIN published.v_active_release_id v ON v.release_id = si.release_id
       WHERE si.entity_id IS NOT NULL
       ORDER BY si.entity_id
       LIMIT $1
@@ -77,7 +66,7 @@ export type LoadDiscoveryCatalogProfilesFromPostgresOptions = {
 };
 
 /**
- * Loads active canonical entities from `bb_public.search_index` as discovery
+ * Loads active canonical entities from `published.search_index` as discovery
  * `ResolutionProfile[]`, for `catalogProfiles` on `dispatchDiscoveryCampaign`
  * (`@repo/config/scheduled-jobs`).
  */

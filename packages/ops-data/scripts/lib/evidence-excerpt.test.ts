@@ -1,5 +1,5 @@
 /**
- * Unit tests for relevance-aware excerpting (repo-z57b).
+ * Unit tests for relevance-aware excerpting.
  *
  * The failure this guards is silent and expensive: a drafter handed the front of a 290,000-
  * character nomination sees criteria checkboxes and building inventory, writes a sentence about

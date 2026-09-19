@@ -1,24 +1,8 @@
 /**
- * repo-2t04.8.1 — turns research-workflow output (one JSON object per town, matching the
- * sundown-sub220-research workflow's FINDINGS_SCHEMA) into:
- *   1. bb_research.entity_evidence rows (manual capture — no automated collector targets
- *      justice.tougaloo.edu yet) for every 'draft' outcome.
- *   2. a BulkFixtureFile fixture (same shape build-sundown-towns-fixture.ts produces) for
- *      load-bulk-candidates-to-supabase.ts to create the missing bb_research.landscape_candidates
- *      row per entity (these 31 entities are already LIVE in bb_public.release_entities but were
- *      never staged through landscape_candidates, so apply-enrichment-to-landscape.ts's plain
- *      UPDATE would otherwise match zero rows).
- *   3. answers.jsonl for session-enrich-apply.ts ({entityId, rawContent}).
- *   4. a refusals summary (printed only — NOT fed to session-enrich-apply's --refusals-file,
- *      because that records a terminal no-lane-significance status, and README-fanout-drafting.md
- *      is explicit that sundown refusals route to human/editorial review instead).
- *
- * This script only WRITES the fixture/answers files and PRINTS the evidence-insert plan; it does
- * not touch the database. Run insert-sundown-evidence.mts separately to apply the evidence rows.
- *
- * Usage:
- *   node --conditions development --import tsx \
- *     packages/ops-data/scripts/apply-sundown-wave2.mts --in=<results.json> --out-dir=<dir>
+ * Converts structured sundown-town findings into a candidate fixture, externally supplied draft
+ * answers and an evidence-insert plan. Writes local files only; insert-sundown-evidence.mts
+ * applies evidence separately. Refusals require editorial review and must not become terminal
+ * no-significance decisions. Arguments: --in=<results.json> --out-dir=<dir>.
  */
 import { createHash } from 'node:crypto';
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
@@ -61,7 +45,7 @@ type Finding = {
 
 const findings = JSON.parse(readFileSync(IN, 'utf8')) as readonly Finding[];
 
-/** Already-live display name + coordinates (bb_public.release_entities), carried through so the
+/** Already-live display name + coordinates (published.release_entities), carried through so the
  * new landscape_candidates row doesn't regress either — this loader's ON CONFLICT overwrites both. */
 const KNOWN: Readonly<
   Record<string, { readonly displayName: string; readonly lat: number; readonly lng: number }>
@@ -273,7 +257,7 @@ const fixture: BulkFixtureFile = {
     count: candidates.length,
     droppedCount: 0,
     methodologyNotes: [
-      'repo-2t04.8.1: entities already live in bb_public.release_entities under 220 chars, ' +
+      'repo-2t04.8.1: entities already live in published.release_entities under 220 chars, ' +
         'staged into landscape_candidates for the first time so apply-enrichment-to-landscape.ts ' +
         'and publish-release-entities-incremental.ts --republish can update them in place.',
     ],

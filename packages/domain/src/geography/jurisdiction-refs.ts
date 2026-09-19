@@ -1,25 +1,6 @@
-/**
- * Fail-closed jurisdiction-reference gate for projection build.
- *
- * `LawFields.jurisdictionId` (`packages/domain/src/specialized.ts`) and
- * `EntityLocation.jurisdictionIds` / `PlaceFields.jurisdictionIds`
- * (`packages/domain/src/geography/location.ts`) are plain string references today — nothing
- * validates that the id they point at actually resolves to a `jurisdictions/{id}` document.
- * This module is the gate that closes that hole: it does not decide *when* projection build
- * runs, only whether a given set of jurisdiction references is safe to publish.
- *
- * Not wired live: call `assertJurisdictionReferencesResolve` with every `jurisdictionId` /
- * `jurisdictionIds` entry collected off the claims/entities/locations slated for a projection
- * build, and a `JurisdictionResolver` backed by the real `jurisdictions` Firestore collection
- * (see `packages/ops-data/src/jurisdictions/resolver.ts`,
- * `createFirestoreJurisdictionResolver`), immediately before the release manifest is built
- * (`buildReleaseManifest` in `packages/domain/src/publication/index.ts`, or its Python
- * equivalent in `workers/publication/` per docs/decisions-carryover.md, "scheduled-job worker packages"). Do not proceed to build/activate the
- * release if it throws. The gate fails closed (throws rather than returning a boolean), so
- * wiring is a single guarded call.
- */
+/** Validate jurisdiction references before publishing a projection. The caller supplies a resolver over its configured reference data; unresolved identifiers prevent release. */
 
-/** Minimal read port a projection build supplies; a real implementation is Firestore-backed. */
+/** Minimal read port a projection build supplies; a real implementation is Postgres-backed. */
 export type JurisdictionResolver = {
   /** Returns true when `jurisdictionId` resolves to a real `jurisdictions/{id}` document. */
   exists(jurisdictionId: string): Promise<boolean> | boolean;

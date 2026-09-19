@@ -55,7 +55,7 @@ function toStateJurisdictionDoc(
 /**
  * Builds all 51 state jurisdiction docs (50 states + D.C.) plus the single country row, every
  * field traced back to `US_STATES` never re-deriving state bbox/FIPS/name/postal from any
- * other source. Deterministic ids make repeated calls (and repeated Firestore writes) a no-op
+ * other source. Deterministic ids make repeated calls (and repeated upserts) a no-op
  * write of the same content, satisfying the "idempotent" requirement at the state layer.
  */
 export function buildStateJurisdictionDocs(

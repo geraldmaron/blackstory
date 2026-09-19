@@ -17,9 +17,9 @@ coverage_ratio = entity_count / black_population
 ```
 
 - `black_population` — Black or African American alone population from
-  `bb_reference.census_county_decades` (payload key `blackPopulation`, decennial census).
+  `reference.census_county_decades` (payload key `blackPopulation`, decennial census).
 - `entity_count` — published entities attributed to the county in the **active release**
-  (`bb_public.release_entities`), read-only.
+  (`published.release_entities`), read-only.
 - Bottom-N counties by `coverage_ratio` become **priority discovery zones**, seeded with
   `GeographicHint`s (`kind: 'region'` — the same kind `scoreObscurity`'s
   `geographicSpecificity` factor boosts) and neutral search queries for the
@@ -45,13 +45,13 @@ Same honesty posture as the obscurity methodology
 |---|---|---|
 | Pure scanner | `packages/domain/src/discovery/geographic-gap-scanner.ts` | `computeCoverageGaps` (pure ratio math), `rankCoverageGaps` (lowest first, deterministic tie-breaks), `buildPriorityDiscoveryZones` (hint + query seeding) |
 | Tests | `packages/domain/src/discovery/geographic-gap-scanner.test.ts` | ratio math, ranking order, floors, empty input |
-| Staff view | `supabase/migrations/20260724000003_coverage_gap_view.sql` | `bb_ops.coverage_gap_by_county_decade` — definer view, staff-only (`bb_auth.is_staff()` in-view + grants), no anon access, read-only |
+| Staff view | `supabase/migrations/20260724000003_coverage_gap_view.sql` | `ops.coverage_gap_by_county_decade` — definer view, staff-only (`access_control.is_staff()` in-view + grants), no anon access, read-only |
 | Directive preset | `packages/operator-cli/src/lib/geographic-gap-brief.ts` | `runGeographicGapCountyBrief` — one priority county through `createTargetedBriefHandlers` + `runResearchDirective` |
 | Methodology doc | this file | — |
 
 ## Flow
 
-1. **Scan** (staff/service only): read `bb_ops.coverage_gap_by_county_decade` rows.
+1. **Scan** (staff/service only): read `ops.coverage_gap_by_county_decade` rows.
 2. **Compute + rank** (pure, replayable): feed rows to `computeCoverageGaps` →
    `rankCoverageGaps(gaps, topN)`. Same inputs, same ranking — audit-friendly.
 3. **Zone** — `buildPriorityDiscoveryZones(gaps)` collapses county×decade gaps into one zone
@@ -68,12 +68,12 @@ Same honesty posture as the obscurity methodology
 
 ## Invariants
 
-- **Research cannot publish** (`docs/decisions-carryover.md`, "Research and discovery cannot publish"). Nothing in this methodology writes to `bb_public`
-  or `bb_publication`. The view is read-only; the domain functions are pure; the directive
+- **Research cannot publish** (`docs/decisions-carryover.md`, "Research and discovery cannot publish"). Nothing in this methodology writes to `published`
+  or `publication`. The view is read-only; the domain functions are pure; the directive
   decision vocabulary has no publish action.
-- **Staff-only surface.** `bb_ops.coverage_gap_by_county_decade` carries an in-view
-  `bb_auth.is_staff()` gate plus explicit grants (authenticated + service_role; no anon
-  policies, no anon grants). `bb_ops` has no default SELECT privileges, so the schema
+- **Staff-only surface.** `ops.coverage_gap_by_county_decade` carries an in-view
+  `access_control.is_staff()` gate plus explicit grants (authenticated + service_role; no anon
+  policies, no anon grants). `ops` has no default SELECT privileges, so the schema
   `USAGE` grant exposes exactly this view.
 - **Safe fetch only.** All gathering flows through the shared research-directive gather
   path (DNS-pinned `runQuickAddFetch`), never bare `fetch()`.

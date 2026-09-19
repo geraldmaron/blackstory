@@ -1,5 +1,5 @@
 /**
- * `resolveLawCaseHref` (repo-skocy): the exact-title bridge between the search index's law/case
+ * `resolveLawCaseHref`: the exact-title bridge between the search index's law/case
  * entities and the legal catalog's `/law/{slug}` pages, and the two ways it must fail closed
  * rather than guess a wrong page.
  *

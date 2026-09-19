@@ -1,10 +1,10 @@
 /**
  * Discovery graylist browser — candidates parked below the relevance threshold.
  *
- * Server component (repo-gyq6.9): the hold list is read in the request instead of after a hydrate and a token refresh.
+ * The hold list is read in the server request so the first response contains the queue.
  *
- * The matching /admin/api route stays for callers outside this page. The Refresh button went
- * with the client state: a server-rendered page IS the refresh.
+ * Reloading the page repeats the server read. The matching `/admin/api` route remains available
+ * to other callers.
  */
 import type { Metadata } from 'next';
 import Link from 'next/link';

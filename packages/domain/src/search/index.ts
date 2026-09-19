@@ -15,5 +15,4 @@ export * from './lanes.js';
 export * from './fusion.js';
 export * from './hybrid-explain.js';
 export * from './hybrid.js';
-export * from './topic-allowlist.js';
 export * from './recommendations.js';

@@ -25,7 +25,7 @@ Black Book. This runbook is the pattern; the census/ACS/Opportunity-Atlas/HOLC i
    untouched download to
    `gs://black-book-efaaf-raw-sources/raw-sources/<source>/<version>/<file>` with a
    `.sha256` sidecar (bucket is uniform-access, public-access-prevention enforced), then call
-   `recordDatasetAcquisition` (`packages/firebase/src/external/capture.ts`) — it writes the
+   `recordDatasetAcquisition` (`packages/ops-data/src/external/capture.ts`) — it writes the
    EXISTING evidence-provenance chain (`evidenceSources` → `sourceItems` → `retrievalEvents`
    → `sourceCaptures`, with `snapshotStorageObject` pointing at the archived file). The
    digest also becomes `datasetChecksum` on every derived doc and is recorded back on the
@@ -88,8 +88,8 @@ Decision tree, in order:
    (19 entries) is API- or bulk-served. If one ever does, it gets its own adapter behind
    the same contract, not an ad-hoc script.
 
-Discovery-lane campaigns (`workers/research/`, Corsair systemd, operator-cli discovery commands)
-write **private candidates and ledger runs in Postgres** via quarantine gates — not Firestore.
+Discovery-lane campaigns (`workers/research/`, explicit operator-cli discovery commands)
+write **private candidates and ledger runs in Postgres** via quarantine gates.
 Dataset ingestion (this runbook) is for *carrying* published data faithfully. Don't mix the lanes: statistics never go through the
 candidate pipeline, and scraped candidates never skip corpus vetting.
 
@@ -120,15 +120,15 @@ and the admin console. The bar for a researched entity is unchanged:
 | Pattern | File |
 | --- | --- |
 | API adapter, fail-closed dictionary assertion | `packages/domain/src/adapters/census-demographics/` |
-| Per-state fan-out with retry + batched writes | `packages/firebase/src/demographics/acs-load-cli.ts` |
-| Bulk/API ingest into the typed statistical model | `packages/ops-data/scripts/ingest-phase1-*.ts`, `ingest-phase2-*.ts` (write `bb_reference.statistical_series` / `statistical_observations`) |
-| Idempotent doc loader (compare-then-set) | `packages/firebase/src/demographics/load-cli.ts` |
-| THE batch upsert + writer contract (use this, never re-implement) | `packages/firebase/src/external/batch-upsert.ts` |
-| THE acquisition capture chain (evidenceSources→…→sourceCaptures) | `packages/firebase/src/external/capture.ts` |
-| THE provenance zod fragments (compose, never restate) | `packages/firebase/src/firestore/statistic-provenance.ts` |
-| Catalog fixture QA gate (state-bbox + precision-decimals) | `packages/firebase/scripts/qa-catalog-fixtures.ts` |
+| Per-state fan-out with retry + batched writes | `packages/ops-data/src/demographics/acs-loader.ts` |
+| Bulk/API ingest into the typed statistical model | `packages/ops-data/scripts/ingest-phase1-*.ts`, `ingest-phase2-*.ts` (write `reference.statistical_series` / `statistical_observations`) |
+| Idempotent doc loader (compare-then-set) | `packages/ops-data/src/demographics/loader.ts` |
+| THE batch upsert + writer contract (use this, never re-implement) | `packages/ops-data/src/external/batch-upsert.ts` |
+| THE acquisition capture chain (evidenceSources→…→sourceCaptures) | `packages/ops-data/src/external/capture.ts` |
+| THE provenance zod fragments (compose, never restate) | `packages/ops-data/src/records/statistic-provenance.ts` |
+| Catalog fixture QA gate (state-bbox + precision-decimals) | `packages/ops-data/scripts/qa-catalog-fixtures.ts` |
 | Acquisition registry | `packages/domain/src/external-data-sources.ts` |
 | Context indicator matrix | [`docs/research/context-data-source-matrix.md`](../research/context-data-source-matrix.md) |
-| Phase 1 indicator catalog + ingest | `packages/domain/src/statistics/phase1-indicator-catalog.ts`, `packages/firebase/scripts/ingest-phase1-indicators.ts` |
+| Phase 1 indicator catalog + ingest | `packages/domain/src/statistics/phase1-indicator-catalog.ts`, `packages/ops-data/scripts/ingest-phase1-indicators.ts` |
 | Rights-restricted corpus vetting | `packages/domain/src/launch-corpora.ts` (HOLC entry) |
 | Dignity-lane sources | `packages/domain/src/historic-safety/source-registry.ts` |

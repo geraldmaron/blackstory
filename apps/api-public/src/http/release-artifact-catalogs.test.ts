@@ -1,10 +1,6 @@
 /**
- * Unit tests for the release-artifact read-through (repo-csw0; `docs/decisions-carryover.md`,
- * "Public projection and immutable publication snapshots").
- *
- * The safety properties matter more than the happy path: an unconfigured deployment must never
- * pick up an artifact, and an artifact from a different release must never be served — those are
- * what keep Postgres the system of record while catalogs come off the CDN.
+ * Release-artifact tests reject unconfigured origins and mismatched release ids, preserving
+ * Postgres as the source of truth.
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
@@ -90,7 +86,7 @@ test('an artifact for a different release is rejected, never served', async () =
     // Stale object left at the path after a new release activated.
     fetchImpl: async () => jsonResponse(entitiesArtifact('rel_previous_000')),
   });
-  assert.equal(projections, undefined, 'release mismatch must fall through to bb_public');
+  assert.equal(projections, undefined, 'release mismatch must fall through to published');
 });
 
 test('a missing or failing artifact falls through rather than throwing', async () => {

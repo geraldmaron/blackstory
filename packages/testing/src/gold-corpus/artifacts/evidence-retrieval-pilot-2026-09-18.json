@@ -1,0 +1,1828 @@
+{
+  "schemaVersion": "evidence-retrieval-pilot.v1",
+  "benchmarkVersion": "heldout-research-eval-v1-blind:heldout-research-eval-v1-curated",
+  "evaluatedAt": "2026-09-19T02:30:02.154Z",
+  "inputProvenance": {
+    "blind": {
+      "path": "packages/testing/src/gold-corpus/fixtures/heldout-evidence-retrieval-corpus.v1.json",
+      "fileByteSha256": "6a193e805e0713db4575bff8738879a66e7b4c8128a88c36386a302de1c34970"
+    },
+    "gold": {
+      "path": "packages/testing/src/gold-corpus/fixtures/heldout-evidence-retrieval-gold.v1.json",
+      "fileByteSha256": "085c4a5120d47daa9fb0a640e8e6ef6ce0d772833fd3f50a564403e7dee8b723"
+    },
+    "entailmentPredictions": {
+      "path": "packages/testing/src/gold-corpus/fixtures/heldout-entailment-predictions.v1.json",
+      "fileByteSha256": "3c64a1c3ac5587bb8917655a24b21ba510a8bf5942f3aa2dcf94ecb02c4b99bc",
+      "canonicalJsonSha256": "fff08c8b8c96732bbebbad56b2ccfe5e9af1ada9557a5fe8c3faa18255afc00a"
+    },
+    "heldoutIdentityAndEdges": {
+      "cases": {
+        "path": "packages/testing/src/gold-corpus/fixtures/heldout-identity-edge-corpus.v1.json",
+        "fileByteSha256": "8581645419a2eaad1c5312916f6ab02a851ef10197fa05c0369dcbc572e33d3e"
+      },
+      "predictions": {
+        "path": "packages/testing/src/gold-corpus/fixtures/heldout-identity-edge-predictions.v1.json",
+        "fileByteSha256": "a1a3c029d44309a35ebb6b05f72ed356b323e181d95dfe7cb0dd19eb091f0bfb"
+      },
+      "gold": {
+        "path": "packages/testing/src/gold-corpus/fixtures/heldout-identity-edge-gold.v1.json",
+        "fileByteSha256": "53dffe4d12f3c893f2b7feed7757f26ace75b891bae6cd1730bce879aed4ddae"
+      },
+      "freezeManifest": {
+        "path": "packages/testing/src/gold-corpus/fixtures/heldout-identity-edge-freeze.v1.json",
+        "fileByteSha256": "b818d4b073bf3cb5dd340a05841580d23550ad01c9c3a44f57f23e6b000189f1"
+      }
+    }
+  },
+  "corpus": {
+    "documentCount": 6,
+    "queryCount": 20,
+    "sourceUrls": [
+      "https://www.nps.gov/people/mary-fields.htm",
+      "https://www.nps.gov/people/will-garvin.htm",
+      "https://www.nps.gov/people/nick-bransford.htm",
+      "https://www.nps.gov/people/mat-bransford.htm",
+      "https://www.epa.gov/wetlands/what-wetland",
+      "https://www.epa.gov/wetlands/how-do-wetlands-function-and-why-are-they-valuable"
+    ]
+  },
+  "execution": {
+    "implementation": "packages/operator-cli/src/evidence-retrieval.ts#retrieveEvidence",
+    "database": "local temporary evidence rows",
+    "k": 5,
+    "lexicalVectorFusion": "reciprocal rank fusion",
+    "controlledHnswMechanics": {
+      "status": "completed",
+      "includedPaddingRows": 1000,
+      "excludedPaddingRows": 100,
+      "filter": "A run-unique deterministic mechanics namespace includes only the intended padding partition and excludes existing/private rows and the wrong-model partition; semantic retrieval also uses an explicit held-out source-item allowlist.",
+      "interpretation": "The natural padding preflight records the default plan, and the forced padding preflight proves HNSW execution mechanics. The filtered semantic query records its separate plan under transaction-local controls and may use the source-item B-tree instead; synthetic rows do not represent natural distractors or production-scale research quality.",
+      "embeddingInterpretation": "Provider vectors are isolated to held-out documents; the deterministic padding namespace is used only for the separate mechanics preflight.",
+      "semanticSourceScope": "Held-out document source items only.",
+      "naturalPlannerPreflight": {
+        "statement": "EXPLAIN (ANALYZE, BUFFERS, FORMAT JSON)",
+        "setting": "default local planner settings",
+        "hnswIndexSelected": false,
+        "hnswIndexUsed": false,
+        "hnswActualLoops": 0,
+        "nodeTypes": [
+          "Incremental Sort",
+          "Limit",
+          "Sort",
+          "Seq Scan",
+          "CTE Scan"
+        ],
+        "indexNames": []
+      },
+      "forcedIndexMechanicsPreflight": {
+        "statement": "EXPLAIN (ANALYZE, BUFFERS, FORMAT JSON)",
+        "setting": "SET LOCAL enable_seqscan=off; SET LOCAL enable_bitmapscan=off in an isolated rolled-back transaction",
+        "hnswIndexSelected": true,
+        "hnswIndexUsed": true,
+        "hnswActualLoops": 1,
+        "nodeTypes": [
+          "Incremental Sort",
+          "Limit",
+          "Index Scan",
+          "CTE Scan"
+        ],
+        "indexNames": [
+          "retrieval_passages_vector_idx"
+        ]
+      }
+    }
+  },
+  "cost": {
+    "status": "completed",
+    "provider": "openrouter",
+    "requestedModel": "openai/text-embedding-3-small",
+    "responseModel": "text-embedding-3-small",
+    "dimensions": 768,
+    "providerCalls": 1,
+    "priorProviderCalls": 3,
+    "totalProviderCalls": 4,
+    "embeddedPassageCount": 7,
+    "embeddedQueryCount": 20,
+    "inputUtf8Bytes": 10636,
+    "expectedRateEstimateTokens": 10636,
+    "currentRunExpectedRateEstimateUsd": 0.00021272,
+    "priorRunReservedCostUsd": 0.00255264,
+    "cumulativePreCallBudgetedCostUsd": 0.00276536,
+    "preCallEstimateLimitation": "UTF-8 bytes priced at the listed text-token rate are a pre-call expected-rate budget estimate, not an external billing cap. The provider receipt is authoritative when available.",
+    "totalCostCapUsd": 0.01255264,
+    "providerReportedPromptTokens": 2392,
+    "providerReportedTotalTokens": 2392,
+    "providerReportedCostUsd": 4.784e-05,
+    "embeddingReplay": {
+      "status": "cached_private_local",
+      "inputSha256": "df7983cff5817f0f30990e38eefbedf09ed17893784105e6fea7b0d1bb7e84af"
+    },
+    "budgetGate": {
+      "passed": true,
+      "reservationPassed": true,
+      "providerReceiptAvailable": true,
+      "cumulativeProviderReportedCostUsd": 0.00260048,
+      "failureReason": null
+    },
+    "accountingLimitation": "OpenRouter usage.cost is a provider-reported USD-denominated credit charge.",
+    "priceUsdPerMillionTextTokens": 0.02,
+    "priceSource": "https://openrouter.ai/api/v1/embeddings/models",
+    "priceRetrievedAt": "2026-09-18"
+  },
+  "lexical": {
+    "querySetVersion": "heldout-research-eval-v1-blind:heldout-research-eval-v1-curated",
+    "fusionWeightsVersion": "production-evidence-rrf-v1",
+    "fusionWeights": {
+      "structured": 1,
+      "vector": 1
+    },
+    "queryCount": 20,
+    "meanPrecisionAt5": 0.09,
+    "meanRecallAt5": 0.45,
+    "meanReciprocalRank": 0.425,
+    "forbiddenResultRateAt5": 0.1,
+    "byCategory": {
+      "name_lookup": {
+        "queryCount": 4,
+        "meanPrecisionAt5": 0.2,
+        "meanRecallAt5": 1,
+        "meanReciprocalRank": 0.875,
+        "forbiddenResultRateAt5": 0.5
+      },
+      "alias": {
+        "queryCount": 4,
+        "meanPrecisionAt5": 0.2,
+        "meanRecallAt5": 1,
+        "meanReciprocalRank": 1,
+        "forbiddenResultRateAt5": 0
+      },
+      "ocr": {
+        "queryCount": 2,
+        "meanPrecisionAt5": 0,
+        "meanRecallAt5": 0,
+        "meanReciprocalRank": 0,
+        "forbiddenResultRateAt5": 0
+      },
+      "descriptive": {
+        "queryCount": 3,
+        "meanPrecisionAt5": 0,
+        "meanRecallAt5": 0,
+        "meanReciprocalRank": 0,
+        "forbiddenResultRateAt5": 0
+      },
+      "missed_entity": {
+        "queryCount": 3,
+        "meanPrecisionAt5": 0,
+        "meanRecallAt5": 0,
+        "meanReciprocalRank": 0,
+        "forbiddenResultRateAt5": 0
+      },
+      "relationship": {
+        "queryCount": 3,
+        "meanPrecisionAt5": 0.06666666666666667,
+        "meanRecallAt5": 0.3333333333333333,
+        "meanReciprocalRank": 0.3333333333333333,
+        "forbiddenResultRateAt5": 0
+      },
+      "path": {
+        "queryCount": 1,
+        "meanPrecisionAt5": 0,
+        "meanRecallAt5": 0,
+        "meanReciprocalRank": 0,
+        "forbiddenResultRateAt5": 0
+      }
+    },
+    "perQuery": [
+      {
+        "queryId": "r01",
+        "category": "name_lookup",
+        "precisionAt5": 0.2,
+        "recallAt5": 1,
+        "reciprocalRank": 1,
+        "forbiddenResultCount": 0,
+        "topIds": [
+          "nps-mary-fields"
+        ]
+      },
+      {
+        "queryId": "r02",
+        "category": "name_lookup",
+        "precisionAt5": 0.2,
+        "recallAt5": 1,
+        "reciprocalRank": 1,
+        "forbiddenResultCount": 0,
+        "topIds": [
+          "nps-will-garvin",
+          "nps-nick-bransford"
+        ]
+      },
+      {
+        "queryId": "r03",
+        "category": "name_lookup",
+        "precisionAt5": 0.2,
+        "recallAt5": 1,
+        "reciprocalRank": 0.5,
+        "forbiddenResultCount": 1,
+        "topIds": [
+          "nps-will-garvin",
+          "nps-nick-bransford",
+          "nps-mat-bransford"
+        ]
+      },
+      {
+        "queryId": "r04",
+        "category": "name_lookup",
+        "precisionAt5": 0.2,
+        "recallAt5": 1,
+        "reciprocalRank": 1,
+        "forbiddenResultCount": 1,
+        "topIds": [
+          "nps-mat-bransford",
+          "nps-nick-bransford"
+        ]
+      },
+      {
+        "queryId": "r05",
+        "category": "alias",
+        "precisionAt5": 0.2,
+        "recallAt5": 1,
+        "reciprocalRank": 1,
+        "forbiddenResultCount": 0,
+        "topIds": [
+          "nps-nick-bransford"
+        ]
+      },
+      {
+        "queryId": "r06",
+        "category": "alias",
+        "precisionAt5": 0.2,
+        "recallAt5": 1,
+        "reciprocalRank": 1,
+        "forbiddenResultCount": 0,
+        "topIds": [
+          "nps-mat-bransford"
+        ]
+      },
+      {
+        "queryId": "r07",
+        "category": "alias",
+        "precisionAt5": 0.2,
+        "recallAt5": 1,
+        "reciprocalRank": 1,
+        "forbiddenResultCount": 0,
+        "topIds": [
+          "nps-will-garvin"
+        ]
+      },
+      {
+        "queryId": "r08",
+        "category": "alias",
+        "precisionAt5": 0.2,
+        "recallAt5": 1,
+        "reciprocalRank": 1,
+        "forbiddenResultCount": 0,
+        "topIds": [
+          "nps-mary-fields"
+        ]
+      },
+      {
+        "queryId": "r09",
+        "category": "ocr",
+        "precisionAt5": 0,
+        "recallAt5": 0,
+        "reciprocalRank": 0,
+        "forbiddenResultCount": 0,
+        "topIds": []
+      },
+      {
+        "queryId": "r10",
+        "category": "ocr",
+        "precisionAt5": 0,
+        "recallAt5": 0,
+        "reciprocalRank": 0,
+        "forbiddenResultCount": 0,
+        "topIds": []
+      },
+      {
+        "queryId": "r11",
+        "category": "descriptive",
+        "precisionAt5": 0,
+        "recallAt5": 0,
+        "reciprocalRank": 0,
+        "forbiddenResultCount": 0,
+        "topIds": []
+      },
+      {
+        "queryId": "r12",
+        "category": "missed_entity",
+        "precisionAt5": 0,
+        "recallAt5": 0,
+        "reciprocalRank": 0,
+        "forbiddenResultCount": 0,
+        "topIds": []
+      },
+      {
+        "queryId": "r13",
+        "category": "missed_entity",
+        "precisionAt5": 0,
+        "recallAt5": 0,
+        "reciprocalRank": 0,
+        "forbiddenResultCount": 0,
+        "topIds": []
+      },
+      {
+        "queryId": "r14",
+        "category": "relationship",
+        "precisionAt5": 0.2,
+        "recallAt5": 1,
+        "reciprocalRank": 1,
+        "forbiddenResultCount": 0,
+        "topIds": [
+          "nps-mat-bransford"
+        ]
+      },
+      {
+        "queryId": "r15",
+        "category": "relationship",
+        "precisionAt5": 0,
+        "recallAt5": 0,
+        "reciprocalRank": 0,
+        "forbiddenResultCount": 0,
+        "topIds": []
+      },
+      {
+        "queryId": "r16",
+        "category": "relationship",
+        "precisionAt5": 0,
+        "recallAt5": 0,
+        "reciprocalRank": 0,
+        "forbiddenResultCount": 0,
+        "topIds": []
+      },
+      {
+        "queryId": "r17",
+        "category": "path",
+        "precisionAt5": 0,
+        "recallAt5": 0,
+        "reciprocalRank": 0,
+        "forbiddenResultCount": 0,
+        "topIds": []
+      },
+      {
+        "queryId": "r18",
+        "category": "descriptive",
+        "precisionAt5": 0,
+        "recallAt5": 0,
+        "reciprocalRank": 0,
+        "forbiddenResultCount": 0,
+        "topIds": []
+      },
+      {
+        "queryId": "r19",
+        "category": "descriptive",
+        "precisionAt5": 0,
+        "recallAt5": 0,
+        "reciprocalRank": 0,
+        "forbiddenResultCount": 0,
+        "topIds": []
+      },
+      {
+        "queryId": "r20",
+        "category": "missed_entity",
+        "precisionAt5": 0,
+        "recallAt5": 0,
+        "reciprocalRank": 0,
+        "forbiddenResultCount": 0,
+        "topIds": []
+      }
+    ],
+    "qualityAdmission": "not_evaluated"
+  },
+  "exactVector": {
+    "querySetVersion": "heldout-research-eval-v1-blind:heldout-research-eval-v1-curated",
+    "fusionWeightsVersion": "production-evidence-rrf-v1",
+    "fusionWeights": {
+      "structured": 1,
+      "vector": 1
+    },
+    "queryCount": 20,
+    "meanPrecisionAt5": 0.23000000000000007,
+    "meanRecallAt5": 1,
+    "meanReciprocalRank": 0.975,
+    "forbiddenResultRateAt5": 0.55,
+    "byCategory": {
+      "name_lookup": {
+        "queryCount": 4,
+        "meanPrecisionAt5": 0.2,
+        "meanRecallAt5": 1,
+        "meanReciprocalRank": 1,
+        "forbiddenResultRateAt5": 0.5
+      },
+      "alias": {
+        "queryCount": 4,
+        "meanPrecisionAt5": 0.2,
+        "meanRecallAt5": 1,
+        "meanReciprocalRank": 1,
+        "forbiddenResultRateAt5": 0.5
+      },
+      "ocr": {
+        "queryCount": 2,
+        "meanPrecisionAt5": 0.2,
+        "meanRecallAt5": 1,
+        "meanReciprocalRank": 1,
+        "forbiddenResultRateAt5": 1
+      },
+      "descriptive": {
+        "queryCount": 3,
+        "meanPrecisionAt5": 0.26666666666666666,
+        "meanRecallAt5": 1,
+        "meanReciprocalRank": 1,
+        "forbiddenResultRateAt5": 0.6666666666666666
+      },
+      "missed_entity": {
+        "queryCount": 3,
+        "meanPrecisionAt5": 0.20000000000000004,
+        "meanRecallAt5": 1,
+        "meanReciprocalRank": 1,
+        "forbiddenResultRateAt5": 0.6666666666666666
+      },
+      "relationship": {
+        "queryCount": 3,
+        "meanPrecisionAt5": 0.26666666666666666,
+        "meanRecallAt5": 1,
+        "meanReciprocalRank": 0.8333333333333334,
+        "forbiddenResultRateAt5": 0
+      },
+      "path": {
+        "queryCount": 1,
+        "meanPrecisionAt5": 0.4,
+        "meanRecallAt5": 1,
+        "meanReciprocalRank": 1,
+        "forbiddenResultRateAt5": 1
+      }
+    },
+    "perQuery": [
+      {
+        "queryId": "r01",
+        "category": "name_lookup",
+        "precisionAt5": 0.2,
+        "recallAt5": 1,
+        "reciprocalRank": 1,
+        "forbiddenResultCount": 0,
+        "topIds": [
+          "nps-mary-fields",
+          "nps-mat-bransford",
+          "nps-will-garvin",
+          "nps-nick-bransford"
+        ]
+      },
+      {
+        "queryId": "r02",
+        "category": "name_lookup",
+        "precisionAt5": 0.2,
+        "recallAt5": 1,
+        "reciprocalRank": 1,
+        "forbiddenResultCount": 0,
+        "topIds": [
+          "nps-will-garvin",
+          "nps-nick-bransford",
+          "nps-mat-bransford",
+          "nps-mary-fields"
+        ]
+      },
+      {
+        "queryId": "r03",
+        "category": "name_lookup",
+        "precisionAt5": 0.2,
+        "recallAt5": 1,
+        "reciprocalRank": 1,
+        "forbiddenResultCount": 1,
+        "topIds": [
+          "nps-nick-bransford",
+          "nps-will-garvin",
+          "nps-mat-bransford",
+          "nps-mary-fields",
+          "epa-wetland-definition"
+        ]
+      },
+      {
+        "queryId": "r04",
+        "category": "name_lookup",
+        "precisionAt5": 0.2,
+        "recallAt5": 1,
+        "reciprocalRank": 1,
+        "forbiddenResultCount": 1,
+        "topIds": [
+          "nps-mat-bransford",
+          "nps-nick-bransford",
+          "epa-wetland-definition",
+          "nps-mary-fields",
+          "nps-will-garvin"
+        ]
+      },
+      {
+        "queryId": "r05",
+        "category": "alias",
+        "precisionAt5": 0.2,
+        "recallAt5": 1,
+        "reciprocalRank": 1,
+        "forbiddenResultCount": 1,
+        "topIds": [
+          "nps-nick-bransford",
+          "nps-mat-bransford",
+          "nps-mary-fields",
+          "nps-will-garvin",
+          "epa-wetland-definition"
+        ]
+      },
+      {
+        "queryId": "r06",
+        "category": "alias",
+        "precisionAt5": 0.2,
+        "recallAt5": 1,
+        "reciprocalRank": 1,
+        "forbiddenResultCount": 1,
+        "topIds": [
+          "nps-mat-bransford",
+          "nps-nick-bransford",
+          "nps-mary-fields",
+          "epa-wetland-functions"
+        ]
+      },
+      {
+        "queryId": "r07",
+        "category": "alias",
+        "precisionAt5": 0.2,
+        "recallAt5": 1,
+        "reciprocalRank": 1,
+        "forbiddenResultCount": 0,
+        "topIds": [
+          "nps-will-garvin",
+          "nps-mat-bransford",
+          "nps-nick-bransford",
+          "nps-mary-fields"
+        ]
+      },
+      {
+        "queryId": "r08",
+        "category": "alias",
+        "precisionAt5": 0.2,
+        "recallAt5": 1,
+        "reciprocalRank": 1,
+        "forbiddenResultCount": 0,
+        "topIds": [
+          "nps-mary-fields",
+          "nps-mat-bransford",
+          "nps-nick-bransford",
+          "nps-will-garvin"
+        ]
+      },
+      {
+        "queryId": "r09",
+        "category": "ocr",
+        "precisionAt5": 0.2,
+        "recallAt5": 1,
+        "reciprocalRank": 1,
+        "forbiddenResultCount": 1,
+        "topIds": [
+          "nps-mat-bransford",
+          "nps-mary-fields",
+          "nps-nick-bransford",
+          "epa-wetland-definition"
+        ]
+      },
+      {
+        "queryId": "r10",
+        "category": "ocr",
+        "precisionAt5": 0.2,
+        "recallAt5": 1,
+        "reciprocalRank": 1,
+        "forbiddenResultCount": 1,
+        "topIds": [
+          "nps-nick-bransford",
+          "nps-mat-bransford",
+          "epa-wetland-definition",
+          "epa-wetland-functions",
+          "nps-mary-fields"
+        ]
+      },
+      {
+        "queryId": "r11",
+        "category": "descriptive",
+        "precisionAt5": 0.4,
+        "recallAt5": 1,
+        "reciprocalRank": 1,
+        "forbiddenResultCount": 1,
+        "topIds": [
+          "nps-will-garvin",
+          "nps-nick-bransford",
+          "nps-mat-bransford",
+          "nps-mary-fields"
+        ]
+      },
+      {
+        "queryId": "r12",
+        "category": "missed_entity",
+        "precisionAt5": 0.2,
+        "recallAt5": 1,
+        "reciprocalRank": 1,
+        "forbiddenResultCount": 0,
+        "topIds": [
+          "nps-mary-fields",
+          "nps-nick-bransford",
+          "nps-mat-bransford",
+          "nps-will-garvin"
+        ]
+      },
+      {
+        "queryId": "r13",
+        "category": "missed_entity",
+        "precisionAt5": 0.2,
+        "recallAt5": 1,
+        "reciprocalRank": 1,
+        "forbiddenResultCount": 1,
+        "topIds": [
+          "nps-nick-bransford",
+          "nps-mat-bransford",
+          "nps-will-garvin",
+          "nps-mary-fields"
+        ]
+      },
+      {
+        "queryId": "r14",
+        "category": "relationship",
+        "precisionAt5": 0.2,
+        "recallAt5": 1,
+        "reciprocalRank": 1,
+        "forbiddenResultCount": 0,
+        "topIds": [
+          "nps-mat-bransford",
+          "nps-mary-fields",
+          "nps-will-garvin",
+          "nps-nick-bransford"
+        ]
+      },
+      {
+        "queryId": "r15",
+        "category": "relationship",
+        "precisionAt5": 0.4,
+        "recallAt5": 1,
+        "reciprocalRank": 0.5,
+        "forbiddenResultCount": 0,
+        "topIds": [
+          "nps-mat-bransford",
+          "nps-nick-bransford",
+          "nps-mary-fields",
+          "nps-will-garvin"
+        ]
+      },
+      {
+        "queryId": "r16",
+        "category": "relationship",
+        "precisionAt5": 0.2,
+        "recallAt5": 1,
+        "reciprocalRank": 1,
+        "forbiddenResultCount": 0,
+        "topIds": [
+          "nps-mary-fields",
+          "nps-nick-bransford",
+          "nps-mat-bransford",
+          "nps-will-garvin"
+        ]
+      },
+      {
+        "queryId": "r17",
+        "category": "path",
+        "precisionAt5": 0.4,
+        "recallAt5": 1,
+        "reciprocalRank": 1,
+        "forbiddenResultCount": 1,
+        "topIds": [
+          "nps-will-garvin",
+          "nps-nick-bransford",
+          "nps-mat-bransford",
+          "nps-mary-fields",
+          "epa-wetland-functions"
+        ]
+      },
+      {
+        "queryId": "r18",
+        "category": "descriptive",
+        "precisionAt5": 0.2,
+        "recallAt5": 1,
+        "reciprocalRank": 1,
+        "forbiddenResultCount": 0,
+        "topIds": [
+          "epa-wetland-definition",
+          "epa-wetland-functions",
+          "nps-mat-bransford",
+          "nps-mary-fields"
+        ]
+      },
+      {
+        "queryId": "r19",
+        "category": "descriptive",
+        "precisionAt5": 0.2,
+        "recallAt5": 1,
+        "reciprocalRank": 1,
+        "forbiddenResultCount": 1,
+        "topIds": [
+          "epa-wetland-functions",
+          "epa-wetland-definition",
+          "nps-mat-bransford",
+          "nps-will-garvin",
+          "nps-mary-fields"
+        ]
+      },
+      {
+        "queryId": "r20",
+        "category": "missed_entity",
+        "precisionAt5": 0.2,
+        "recallAt5": 1,
+        "reciprocalRank": 1,
+        "forbiddenResultCount": 1,
+        "topIds": [
+          "epa-wetland-definition",
+          "epa-wetland-functions",
+          "nps-mat-bransford",
+          "nps-will-garvin",
+          "nps-mary-fields"
+        ]
+      }
+    ],
+    "qualityAdmission": "not_evaluated"
+  },
+  "approximateVector": {
+    "querySetVersion": "heldout-research-eval-v1-blind:heldout-research-eval-v1-curated",
+    "fusionWeightsVersion": "production-evidence-rrf-v1",
+    "fusionWeights": {
+      "structured": 1,
+      "vector": 1
+    },
+    "queryCount": 20,
+    "meanPrecisionAt5": 0.23000000000000007,
+    "meanRecallAt5": 1,
+    "meanReciprocalRank": 0.975,
+    "forbiddenResultRateAt5": 0.55,
+    "byCategory": {
+      "name_lookup": {
+        "queryCount": 4,
+        "meanPrecisionAt5": 0.2,
+        "meanRecallAt5": 1,
+        "meanReciprocalRank": 1,
+        "forbiddenResultRateAt5": 0.5
+      },
+      "alias": {
+        "queryCount": 4,
+        "meanPrecisionAt5": 0.2,
+        "meanRecallAt5": 1,
+        "meanReciprocalRank": 1,
+        "forbiddenResultRateAt5": 0.5
+      },
+      "ocr": {
+        "queryCount": 2,
+        "meanPrecisionAt5": 0.2,
+        "meanRecallAt5": 1,
+        "meanReciprocalRank": 1,
+        "forbiddenResultRateAt5": 1
+      },
+      "descriptive": {
+        "queryCount": 3,
+        "meanPrecisionAt5": 0.26666666666666666,
+        "meanRecallAt5": 1,
+        "meanReciprocalRank": 1,
+        "forbiddenResultRateAt5": 0.6666666666666666
+      },
+      "missed_entity": {
+        "queryCount": 3,
+        "meanPrecisionAt5": 0.20000000000000004,
+        "meanRecallAt5": 1,
+        "meanReciprocalRank": 1,
+        "forbiddenResultRateAt5": 0.6666666666666666
+      },
+      "relationship": {
+        "queryCount": 3,
+        "meanPrecisionAt5": 0.26666666666666666,
+        "meanRecallAt5": 1,
+        "meanReciprocalRank": 0.8333333333333334,
+        "forbiddenResultRateAt5": 0
+      },
+      "path": {
+        "queryCount": 1,
+        "meanPrecisionAt5": 0.4,
+        "meanRecallAt5": 1,
+        "meanReciprocalRank": 1,
+        "forbiddenResultRateAt5": 1
+      }
+    },
+    "perQuery": [
+      {
+        "queryId": "r01",
+        "category": "name_lookup",
+        "precisionAt5": 0.2,
+        "recallAt5": 1,
+        "reciprocalRank": 1,
+        "forbiddenResultCount": 0,
+        "topIds": [
+          "nps-mary-fields",
+          "nps-mat-bransford",
+          "nps-will-garvin",
+          "nps-nick-bransford"
+        ]
+      },
+      {
+        "queryId": "r02",
+        "category": "name_lookup",
+        "precisionAt5": 0.2,
+        "recallAt5": 1,
+        "reciprocalRank": 1,
+        "forbiddenResultCount": 0,
+        "topIds": [
+          "nps-will-garvin",
+          "nps-nick-bransford",
+          "nps-mat-bransford",
+          "nps-mary-fields"
+        ]
+      },
+      {
+        "queryId": "r03",
+        "category": "name_lookup",
+        "precisionAt5": 0.2,
+        "recallAt5": 1,
+        "reciprocalRank": 1,
+        "forbiddenResultCount": 1,
+        "topIds": [
+          "nps-nick-bransford",
+          "nps-will-garvin",
+          "nps-mat-bransford",
+          "nps-mary-fields",
+          "epa-wetland-definition"
+        ]
+      },
+      {
+        "queryId": "r04",
+        "category": "name_lookup",
+        "precisionAt5": 0.2,
+        "recallAt5": 1,
+        "reciprocalRank": 1,
+        "forbiddenResultCount": 1,
+        "topIds": [
+          "nps-mat-bransford",
+          "nps-nick-bransford",
+          "epa-wetland-definition",
+          "nps-mary-fields",
+          "nps-will-garvin"
+        ]
+      },
+      {
+        "queryId": "r05",
+        "category": "alias",
+        "precisionAt5": 0.2,
+        "recallAt5": 1,
+        "reciprocalRank": 1,
+        "forbiddenResultCount": 1,
+        "topIds": [
+          "nps-nick-bransford",
+          "nps-mat-bransford",
+          "nps-mary-fields",
+          "nps-will-garvin",
+          "epa-wetland-definition"
+        ]
+      },
+      {
+        "queryId": "r06",
+        "category": "alias",
+        "precisionAt5": 0.2,
+        "recallAt5": 1,
+        "reciprocalRank": 1,
+        "forbiddenResultCount": 1,
+        "topIds": [
+          "nps-mat-bransford",
+          "nps-nick-bransford",
+          "nps-mary-fields",
+          "epa-wetland-functions"
+        ]
+      },
+      {
+        "queryId": "r07",
+        "category": "alias",
+        "precisionAt5": 0.2,
+        "recallAt5": 1,
+        "reciprocalRank": 1,
+        "forbiddenResultCount": 0,
+        "topIds": [
+          "nps-will-garvin",
+          "nps-mat-bransford",
+          "nps-nick-bransford",
+          "nps-mary-fields"
+        ]
+      },
+      {
+        "queryId": "r08",
+        "category": "alias",
+        "precisionAt5": 0.2,
+        "recallAt5": 1,
+        "reciprocalRank": 1,
+        "forbiddenResultCount": 0,
+        "topIds": [
+          "nps-mary-fields",
+          "nps-mat-bransford",
+          "nps-nick-bransford",
+          "nps-will-garvin"
+        ]
+      },
+      {
+        "queryId": "r09",
+        "category": "ocr",
+        "precisionAt5": 0.2,
+        "recallAt5": 1,
+        "reciprocalRank": 1,
+        "forbiddenResultCount": 1,
+        "topIds": [
+          "nps-mat-bransford",
+          "nps-mary-fields",
+          "nps-nick-bransford",
+          "epa-wetland-definition"
+        ]
+      },
+      {
+        "queryId": "r10",
+        "category": "ocr",
+        "precisionAt5": 0.2,
+        "recallAt5": 1,
+        "reciprocalRank": 1,
+        "forbiddenResultCount": 1,
+        "topIds": [
+          "nps-nick-bransford",
+          "nps-mat-bransford",
+          "epa-wetland-definition",
+          "epa-wetland-functions",
+          "nps-mary-fields"
+        ]
+      },
+      {
+        "queryId": "r11",
+        "category": "descriptive",
+        "precisionAt5": 0.4,
+        "recallAt5": 1,
+        "reciprocalRank": 1,
+        "forbiddenResultCount": 1,
+        "topIds": [
+          "nps-will-garvin",
+          "nps-nick-bransford",
+          "nps-mat-bransford",
+          "nps-mary-fields"
+        ]
+      },
+      {
+        "queryId": "r12",
+        "category": "missed_entity",
+        "precisionAt5": 0.2,
+        "recallAt5": 1,
+        "reciprocalRank": 1,
+        "forbiddenResultCount": 0,
+        "topIds": [
+          "nps-mary-fields",
+          "nps-nick-bransford",
+          "nps-mat-bransford",
+          "nps-will-garvin"
+        ]
+      },
+      {
+        "queryId": "r13",
+        "category": "missed_entity",
+        "precisionAt5": 0.2,
+        "recallAt5": 1,
+        "reciprocalRank": 1,
+        "forbiddenResultCount": 1,
+        "topIds": [
+          "nps-nick-bransford",
+          "nps-mat-bransford",
+          "nps-will-garvin",
+          "nps-mary-fields"
+        ]
+      },
+      {
+        "queryId": "r14",
+        "category": "relationship",
+        "precisionAt5": 0.2,
+        "recallAt5": 1,
+        "reciprocalRank": 1,
+        "forbiddenResultCount": 0,
+        "topIds": [
+          "nps-mat-bransford",
+          "nps-mary-fields",
+          "nps-will-garvin",
+          "nps-nick-bransford"
+        ]
+      },
+      {
+        "queryId": "r15",
+        "category": "relationship",
+        "precisionAt5": 0.4,
+        "recallAt5": 1,
+        "reciprocalRank": 0.5,
+        "forbiddenResultCount": 0,
+        "topIds": [
+          "nps-mat-bransford",
+          "nps-nick-bransford",
+          "nps-mary-fields",
+          "nps-will-garvin"
+        ]
+      },
+      {
+        "queryId": "r16",
+        "category": "relationship",
+        "precisionAt5": 0.2,
+        "recallAt5": 1,
+        "reciprocalRank": 1,
+        "forbiddenResultCount": 0,
+        "topIds": [
+          "nps-mary-fields",
+          "nps-nick-bransford",
+          "nps-mat-bransford",
+          "nps-will-garvin"
+        ]
+      },
+      {
+        "queryId": "r17",
+        "category": "path",
+        "precisionAt5": 0.4,
+        "recallAt5": 1,
+        "reciprocalRank": 1,
+        "forbiddenResultCount": 1,
+        "topIds": [
+          "nps-will-garvin",
+          "nps-nick-bransford",
+          "nps-mat-bransford",
+          "nps-mary-fields",
+          "epa-wetland-functions"
+        ]
+      },
+      {
+        "queryId": "r18",
+        "category": "descriptive",
+        "precisionAt5": 0.2,
+        "recallAt5": 1,
+        "reciprocalRank": 1,
+        "forbiddenResultCount": 0,
+        "topIds": [
+          "epa-wetland-definition",
+          "epa-wetland-functions",
+          "nps-mat-bransford",
+          "nps-mary-fields"
+        ]
+      },
+      {
+        "queryId": "r19",
+        "category": "descriptive",
+        "precisionAt5": 0.2,
+        "recallAt5": 1,
+        "reciprocalRank": 1,
+        "forbiddenResultCount": 1,
+        "topIds": [
+          "epa-wetland-functions",
+          "epa-wetland-definition",
+          "nps-mat-bransford",
+          "nps-will-garvin",
+          "nps-mary-fields"
+        ]
+      },
+      {
+        "queryId": "r20",
+        "category": "missed_entity",
+        "precisionAt5": 0.2,
+        "recallAt5": 1,
+        "reciprocalRank": 1,
+        "forbiddenResultCount": 1,
+        "topIds": [
+          "epa-wetland-definition",
+          "epa-wetland-functions",
+          "nps-mat-bransford",
+          "nps-will-garvin",
+          "nps-mary-fields"
+        ]
+      }
+    ],
+    "qualityAdmission": "not_evaluated"
+  },
+  "approximateAgainstExact": {
+    "meanSourceDocumentTopKOverlapAgainstExactFusion": 1,
+    "nonemptyBaselineQueryCount": 20,
+    "emptyBaselineQueryCount": 0,
+    "identicalSourceDocumentTopKRateAfterFusion": 1
+  },
+  "semanticQueryPlans": {
+    "setting": "SET LOCAL enable_seqscan=off; SET LOCAL enable_bitmapscan=off in an isolated rolled-back transaction",
+    "interpretation": "These are the plans PostgreSQL chose for source-filtered semantic retrieval under the recorded transaction-local controls. HNSW is not required here because the source-item B-tree remains eligible; HNSW execution is asserted only by the separate forced padding preflight.",
+    "exact": {
+      "mode": "exact",
+      "statement": "EXPLAIN (ANALYZE, BUFFERS, FORMAT JSON)",
+      "hnswIndexSelected": false,
+      "hnswIndexUsed": false,
+      "hnswActualLoops": 0,
+      "nodeTypes": [
+        "Limit",
+        "Index Scan",
+        "Sort",
+        "CTE Scan"
+      ],
+      "indexNames": [
+        "retrieval_passages_origin_idx"
+      ],
+      "plan": [
+        {
+          "Plan": {
+            "Node Type": "Limit",
+            "Parallel Aware": false,
+            "Async Capable": false,
+            "Startup Cost": 40.67,
+            "Total Cost": 40.68,
+            "Plan Rows": 1,
+            "Plan Width": 40,
+            "Actual Startup Time": 0.052,
+            "Actual Total Time": 0.053,
+            "Actual Rows": 7,
+            "Actual Loops": 1,
+            "Shared Hit Blocks": 33,
+            "Shared Read Blocks": 0,
+            "Shared Dirtied Blocks": 0,
+            "Shared Written Blocks": 0,
+            "Local Hit Blocks": 0,
+            "Local Read Blocks": 0,
+            "Local Dirtied Blocks": 0,
+            "Local Written Blocks": 0,
+            "Temp Read Blocks": 0,
+            "Temp Written Blocks": 0,
+            "Plans": [
+              {
+                "Node Type": "Index Scan",
+                "Parent Relationship": "InitPlan",
+                "Subplan Name": "CTE eligible",
+                "Parallel Aware": false,
+                "Async Capable": false,
+                "Scan Direction": "Forward",
+                "Index Name": "retrieval_passages_origin_idx",
+                "Relation Name": "retrieval_passages",
+                "Alias": "retrieval_passages",
+                "Startup Cost": 0.28,
+                "Total Cost": 40.64,
+                "Plan Rows": 1,
+                "Plan Width": 113,
+                "Actual Startup Time": 0.009,
+                "Actual Total Time": 0.016,
+                "Actual Rows": 7,
+                "Actual Loops": 1,
+                "Index Cond": "(source_item_id = ANY ('{src_item_6700c5869ce3e76de97ba221722bf3645cbd45dab289f7fb9440701c388ed4b0,src_item_d4b70ccc14c7ea6fb51659610b1fa368b3592a006f7185baeea0a2e994ccbc5e,src_item_3b09d5fe1d90f1cec2dd41dbd680b576d950bc50aade53df8e528aadbc631ce9,src_item_12171222dc12af83934b30f5bcaa587d890c5c823bbeae027973c526a908abf8,src_item_aa85b05605fcea0be4e57b2d2f3e540c0694ec8b5fbd8ec03f1ff63768debc8b,src_item_3fb8536fca56f5d9226240e96c644948027a3c0354babca67ecd4e0056a8b65d}'::text[]))",
+                "Rows Removed by Index Recheck": 0,
+                "Filter": "((withdrawn_at IS NULL) AND (embedding_model = 'openai/text-embedding-3-small:heldout:retrieval-pilot-6ef7ff95-4d13-49fa-b671-c9be99b6103c'::text) AND (embedding_text_hash = body_hash) AND (retention_expires_at > clock_timestamp()))",
+                "Rows Removed by Filter": 0,
+                "Shared Hit Blocks": 10,
+                "Shared Read Blocks": 0,
+                "Shared Dirtied Blocks": 0,
+                "Shared Written Blocks": 0,
+                "Local Hit Blocks": 0,
+                "Local Read Blocks": 0,
+                "Local Dirtied Blocks": 0,
+                "Local Written Blocks": 0,
+                "Temp Read Blocks": 0,
+                "Temp Written Blocks": 0
+              },
+              {
+                "Node Type": "Sort",
+                "Parent Relationship": "Outer",
+                "Parallel Aware": false,
+                "Async Capable": false,
+                "Startup Cost": 0.03,
+                "Total Cost": 0.04,
+                "Plan Rows": 1,
+                "Plan Width": 40,
+                "Actual Startup Time": 0.052,
+                "Actual Total Time": 0.052,
+                "Actual Rows": 7,
+                "Actual Loops": 1,
+                "Sort Key": [
+                  "((eligible.embedding <=> '<redacted-vector>'::vector))",
+                  "eligible.id"
+                ],
+                "Sort Method": "quicksort",
+                "Sort Space Used": 25,
+                "Sort Space Type": "Memory",
+                "Shared Hit Blocks": 33,
+                "Shared Read Blocks": 0,
+                "Shared Dirtied Blocks": 0,
+                "Shared Written Blocks": 0,
+                "Local Hit Blocks": 0,
+                "Local Read Blocks": 0,
+                "Local Dirtied Blocks": 0,
+                "Local Written Blocks": 0,
+                "Temp Read Blocks": 0,
+                "Temp Written Blocks": 0,
+                "Plans": [
+                  {
+                    "Node Type": "CTE Scan",
+                    "Parent Relationship": "Outer",
+                    "Parallel Aware": false,
+                    "Async Capable": false,
+                    "CTE Name": "eligible",
+                    "Alias": "eligible",
+                    "Startup Cost": 0,
+                    "Total Cost": 0.02,
+                    "Plan Rows": 1,
+                    "Plan Width": 40,
+                    "Actual Startup Time": 0.017,
+                    "Actual Total Time": 0.047,
+                    "Actual Rows": 7,
+                    "Actual Loops": 1,
+                    "Shared Hit Blocks": 33,
+                    "Shared Read Blocks": 0,
+                    "Shared Dirtied Blocks": 0,
+                    "Shared Written Blocks": 0,
+                    "Local Hit Blocks": 0,
+                    "Local Read Blocks": 0,
+                    "Local Dirtied Blocks": 0,
+                    "Local Written Blocks": 0,
+                    "Temp Read Blocks": 0,
+                    "Temp Written Blocks": 0
+                  }
+                ]
+              }
+            ]
+          },
+          "Planning": {
+            "Shared Hit Blocks": 0,
+            "Shared Read Blocks": 0,
+            "Shared Dirtied Blocks": 0,
+            "Shared Written Blocks": 0,
+            "Local Hit Blocks": 0,
+            "Local Read Blocks": 0,
+            "Local Dirtied Blocks": 0,
+            "Local Written Blocks": 0,
+            "Temp Read Blocks": 0,
+            "Temp Written Blocks": 0
+          },
+          "Planning Time": 0.074,
+          "Triggers": [],
+          "Execution Time": 0.069
+        }
+      ]
+    },
+    "approximate": {
+      "mode": "approximate",
+      "statement": "EXPLAIN (ANALYZE, BUFFERS, FORMAT JSON)",
+      "hnswIndexSelected": false,
+      "hnswIndexUsed": false,
+      "hnswActualLoops": 0,
+      "nodeTypes": [
+        "Incremental Sort",
+        "Limit",
+        "Sort",
+        "Index Scan",
+        "CTE Scan"
+      ],
+      "indexNames": [
+        "retrieval_passages_origin_idx"
+      ],
+      "plan": [
+        {
+          "Plan": {
+            "Node Type": "Incremental Sort",
+            "Parallel Aware": false,
+            "Async Capable": false,
+            "Startup Cost": 40.69,
+            "Total Cost": 40.73,
+            "Plan Rows": 2,
+            "Plan Width": 40,
+            "Actual Startup Time": 0.021,
+            "Actual Total Time": 0.021,
+            "Actual Rows": 7,
+            "Actual Loops": 1,
+            "Sort Key": [
+              "approximate_candidates.distance",
+              "approximate_candidates.id"
+            ],
+            "Presorted Key": [
+              "approximate_candidates.distance"
+            ],
+            "Full-sort Groups": {
+              "Group Count": 1,
+              "Sort Methods Used": [
+                "quicksort"
+              ],
+              "Sort Space Memory": {
+                "Average Sort Space Used": 25,
+                "Peak Sort Space Used": 25
+              }
+            },
+            "Shared Hit Blocks": 33,
+            "Shared Read Blocks": 0,
+            "Shared Dirtied Blocks": 0,
+            "Shared Written Blocks": 0,
+            "Local Hit Blocks": 0,
+            "Local Read Blocks": 0,
+            "Local Dirtied Blocks": 0,
+            "Local Written Blocks": 0,
+            "Temp Read Blocks": 0,
+            "Temp Written Blocks": 0,
+            "Plans": [
+              {
+                "Node Type": "Limit",
+                "Parent Relationship": "InitPlan",
+                "Subplan Name": "CTE approximate_candidates",
+                "Parallel Aware": false,
+                "Async Capable": false,
+                "Startup Cost": 40.65,
+                "Total Cost": 40.66,
+                "Plan Rows": 1,
+                "Plan Width": 103,
+                "Actual Startup Time": 0.017,
+                "Actual Total Time": 0.018,
+                "Actual Rows": 7,
+                "Actual Loops": 1,
+                "Shared Hit Blocks": 33,
+                "Shared Read Blocks": 0,
+                "Shared Dirtied Blocks": 0,
+                "Shared Written Blocks": 0,
+                "Local Hit Blocks": 0,
+                "Local Read Blocks": 0,
+                "Local Dirtied Blocks": 0,
+                "Local Written Blocks": 0,
+                "Temp Read Blocks": 0,
+                "Temp Written Blocks": 0,
+                "Plans": [
+                  {
+                    "Node Type": "Sort",
+                    "Parent Relationship": "Outer",
+                    "Parallel Aware": false,
+                    "Async Capable": false,
+                    "Startup Cost": 40.65,
+                    "Total Cost": 40.66,
+                    "Plan Rows": 1,
+                    "Plan Width": 103,
+                    "Actual Startup Time": 0.017,
+                    "Actual Total Time": 0.017,
+                    "Actual Rows": 7,
+                    "Actual Loops": 1,
+                    "Sort Key": [
+                      "((retrieval_passages.embedding <=> '<redacted-vector>'::vector))"
+                    ],
+                    "Sort Method": "quicksort",
+                    "Sort Space Used": 25,
+                    "Sort Space Type": "Memory",
+                    "Shared Hit Blocks": 33,
+                    "Shared Read Blocks": 0,
+                    "Shared Dirtied Blocks": 0,
+                    "Shared Written Blocks": 0,
+                    "Local Hit Blocks": 0,
+                    "Local Read Blocks": 0,
+                    "Local Dirtied Blocks": 0,
+                    "Local Written Blocks": 0,
+                    "Temp Read Blocks": 0,
+                    "Temp Written Blocks": 0,
+                    "Plans": [
+                      {
+                        "Node Type": "Index Scan",
+                        "Parent Relationship": "Outer",
+                        "Parallel Aware": false,
+                        "Async Capable": false,
+                        "Scan Direction": "Forward",
+                        "Index Name": "retrieval_passages_origin_idx",
+                        "Relation Name": "retrieval_passages",
+                        "Alias": "retrieval_passages",
+                        "Startup Cost": 0.28,
+                        "Total Cost": 40.64,
+                        "Plan Rows": 1,
+                        "Plan Width": 103,
+                        "Actual Startup Time": 0.006,
+                        "Actual Total Time": 0.016,
+                        "Actual Rows": 7,
+                        "Actual Loops": 1,
+                        "Index Cond": "(source_item_id = ANY ('{src_item_6700c5869ce3e76de97ba221722bf3645cbd45dab289f7fb9440701c388ed4b0,src_item_d4b70ccc14c7ea6fb51659610b1fa368b3592a006f7185baeea0a2e994ccbc5e,src_item_3b09d5fe1d90f1cec2dd41dbd680b576d950bc50aade53df8e528aadbc631ce9,src_item_12171222dc12af83934b30f5bcaa587d890c5c823bbeae027973c526a908abf8,src_item_aa85b05605fcea0be4e57b2d2f3e540c0694ec8b5fbd8ec03f1ff63768debc8b,src_item_3fb8536fca56f5d9226240e96c644948027a3c0354babca67ecd4e0056a8b65d}'::text[]))",
+                        "Rows Removed by Index Recheck": 0,
+                        "Filter": "((withdrawn_at IS NULL) AND (embedding_model = 'openai/text-embedding-3-small:heldout:retrieval-pilot-6ef7ff95-4d13-49fa-b671-c9be99b6103c'::text) AND (embedding_text_hash = body_hash) AND (retention_expires_at > clock_timestamp()))",
+                        "Rows Removed by Filter": 0,
+                        "Shared Hit Blocks": 33,
+                        "Shared Read Blocks": 0,
+                        "Shared Dirtied Blocks": 0,
+                        "Shared Written Blocks": 0,
+                        "Local Hit Blocks": 0,
+                        "Local Read Blocks": 0,
+                        "Local Dirtied Blocks": 0,
+                        "Local Written Blocks": 0,
+                        "Temp Read Blocks": 0,
+                        "Temp Written Blocks": 0
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "Node Type": "CTE Scan",
+                "Parent Relationship": "Outer",
+                "Parallel Aware": false,
+                "Async Capable": false,
+                "CTE Name": "approximate_candidates",
+                "Alias": "approximate_candidates",
+                "Startup Cost": 0,
+                "Total Cost": 0.02,
+                "Plan Rows": 1,
+                "Plan Width": 40,
+                "Actual Startup Time": 0.018,
+                "Actual Total Time": 0.019,
+                "Actual Rows": 7,
+                "Actual Loops": 1,
+                "Shared Hit Blocks": 33,
+                "Shared Read Blocks": 0,
+                "Shared Dirtied Blocks": 0,
+                "Shared Written Blocks": 0,
+                "Local Hit Blocks": 0,
+                "Local Read Blocks": 0,
+                "Local Dirtied Blocks": 0,
+                "Local Written Blocks": 0,
+                "Temp Read Blocks": 0,
+                "Temp Written Blocks": 0
+              }
+            ]
+          },
+          "Planning": {
+            "Shared Hit Blocks": 1,
+            "Shared Read Blocks": 0,
+            "Shared Dirtied Blocks": 0,
+            "Shared Written Blocks": 0,
+            "Local Hit Blocks": 0,
+            "Local Read Blocks": 0,
+            "Local Dirtied Blocks": 0,
+            "Local Written Blocks": 0,
+            "Temp Read Blocks": 0,
+            "Temp Written Blocks": 0
+          },
+          "Planning Time": 0.028,
+          "Triggers": [],
+          "Execution Time": 0.028
+        }
+      ]
+    }
+  },
+  "entailment": {
+    "predictor": "root-gpt-6-astra-session",
+    "generatedAt": "2026-09-18T15:35:12.267921+00:00",
+    "labelStatus": "Curated provisional labels from an independent corpus author; no consensus or human adjudication.",
+    "caseCount": 14,
+    "exactAccuracy": 0.8571428571428571,
+    "falseSupportRate": 0,
+    "confusion": {
+      "supported": {
+        "supported": 8,
+        "contradicted": 0,
+        "insufficient": 0
+      },
+      "contradicted": {
+        "supported": 0,
+        "contradicted": 2,
+        "insufficient": 1
+      },
+      "insufficient": {
+        "supported": 0,
+        "contradicted": 1,
+        "insufficient": 2
+      }
+    },
+    "perCase": [
+      {
+        "id": "e01",
+        "expected": "supported",
+        "predicted": "supported",
+        "correct": true
+      },
+      {
+        "id": "e02",
+        "expected": "supported",
+        "predicted": "supported",
+        "correct": true
+      },
+      {
+        "id": "e03",
+        "expected": "insufficient",
+        "predicted": "insufficient",
+        "correct": true
+      },
+      {
+        "id": "e04",
+        "expected": "supported",
+        "predicted": "supported",
+        "correct": true
+      },
+      {
+        "id": "e05",
+        "expected": "contradicted",
+        "predicted": "insufficient",
+        "correct": false
+      },
+      {
+        "id": "e06",
+        "expected": "supported",
+        "predicted": "supported",
+        "correct": true
+      },
+      {
+        "id": "e07",
+        "expected": "supported",
+        "predicted": "supported",
+        "correct": true
+      },
+      {
+        "id": "e08",
+        "expected": "contradicted",
+        "predicted": "contradicted",
+        "correct": true
+      },
+      {
+        "id": "e09",
+        "expected": "supported",
+        "predicted": "supported",
+        "correct": true
+      },
+      {
+        "id": "e10",
+        "expected": "insufficient",
+        "predicted": "insufficient",
+        "correct": true
+      },
+      {
+        "id": "e11",
+        "expected": "supported",
+        "predicted": "supported",
+        "correct": true
+      },
+      {
+        "id": "e12",
+        "expected": "contradicted",
+        "predicted": "contradicted",
+        "correct": true
+      },
+      {
+        "id": "e13",
+        "expected": "supported",
+        "predicted": "supported",
+        "correct": true
+      },
+      {
+        "id": "e14",
+        "expected": "insufficient",
+        "predicted": "contradicted",
+        "correct": false
+      }
+    ],
+    "probabilityCalibration": {
+      "status": "unavailable",
+      "probabilityClaimSupported": false,
+      "reason": "The predictor emitted categorical labels and no probabilities."
+    }
+  },
+  "heldoutIdentityAndEdges": {
+    "predictor": "quality-completion-gpt-5-categorical",
+    "generatedAt": "2026-09-18T20:00:00.000Z",
+    "labelStatus": "independent-agent-authored-provisional",
+    "limitations": [
+      "Not human-adjudicated; the labels are provisional and challengeable.",
+      "A small purposive case set is not a representative population estimate or probability calibration.",
+      "Repeated alias pairs overlap; counts must not be described as independent historical discoveries.",
+      "Identity is resolved only within the supplied sources and context; unknown namesakes outside this sample remain possible.",
+      "Case g09 tests direct-evidence admission policy rather than denying the logical kinship inference.",
+      "The blind file contains shortened summaries and local paragraph selectors, not source-native text-quote selectors or preserved page bytes."
+    ],
+    "identity": {
+      "caseCount": 12,
+      "distinctCaseCount": 4,
+      "predictedMergeCount": 8,
+      "accuracy": 1,
+      "falseMergeCount": 0,
+      "falseMergeRate": 0,
+      "falseMergeCoverage": "available",
+      "missedMergeCount": 0,
+      "perCase": [
+        {
+          "id": "i01",
+          "predicted": "merge",
+          "expected": "same",
+          "correct": true
+        },
+        {
+          "id": "i02",
+          "predicted": "merge",
+          "expected": "same",
+          "correct": true
+        },
+        {
+          "id": "i03",
+          "predicted": "merge",
+          "expected": "same",
+          "correct": true
+        },
+        {
+          "id": "i04",
+          "predicted": "distinct",
+          "expected": "distinct",
+          "correct": true
+        },
+        {
+          "id": "i05",
+          "predicted": "distinct",
+          "expected": "distinct",
+          "correct": true
+        },
+        {
+          "id": "i06",
+          "predicted": "distinct",
+          "expected": "distinct",
+          "correct": true
+        },
+        {
+          "id": "i07",
+          "predicted": "distinct",
+          "expected": "distinct",
+          "correct": true
+        },
+        {
+          "id": "i08",
+          "predicted": "merge",
+          "expected": "same",
+          "correct": true
+        },
+        {
+          "id": "i09",
+          "predicted": "merge",
+          "expected": "same",
+          "correct": true
+        },
+        {
+          "id": "i10",
+          "predicted": "merge",
+          "expected": "same",
+          "correct": true
+        },
+        {
+          "id": "i11",
+          "predicted": "merge",
+          "expected": "same",
+          "correct": true
+        },
+        {
+          "id": "i12",
+          "predicted": "merge",
+          "expected": "same",
+          "correct": true
+        }
+      ]
+    },
+    "edges": {
+      "caseCount": 14,
+      "unsupportedCaseCount": 5,
+      "assertedEdgeCount": 8,
+      "accuracy": 0.9285714285714286,
+      "unsupportedAssertionCount": 0,
+      "unsupportedEdgeRate": 0,
+      "unsupportedEdgeCoverage": "available",
+      "assertedEdgeFalseDiscoveryRate": 0,
+      "assertedEdgeFalseDiscoveryCoverage": "available",
+      "missedSupportedEdgeCount": 1,
+      "perCase": [
+        {
+          "id": "g01",
+          "predicted": "withhold",
+          "expected": "supported",
+          "correct": false
+        },
+        {
+          "id": "g02",
+          "predicted": "assert",
+          "expected": "supported",
+          "correct": true
+        },
+        {
+          "id": "g03",
+          "predicted": "assert",
+          "expected": "supported",
+          "correct": true
+        },
+        {
+          "id": "g04",
+          "predicted": "assert",
+          "expected": "supported",
+          "correct": true
+        },
+        {
+          "id": "g05",
+          "predicted": "assert",
+          "expected": "supported",
+          "correct": true
+        },
+        {
+          "id": "g06",
+          "predicted": "assert",
+          "expected": "supported",
+          "correct": true
+        },
+        {
+          "id": "g07",
+          "predicted": "assert",
+          "expected": "supported",
+          "correct": true
+        },
+        {
+          "id": "g08",
+          "predicted": "assert",
+          "expected": "supported",
+          "correct": true
+        },
+        {
+          "id": "g09",
+          "predicted": "withhold",
+          "expected": "unsupported",
+          "correct": true
+        },
+        {
+          "id": "g10",
+          "predicted": "withhold",
+          "expected": "unsupported",
+          "correct": true
+        },
+        {
+          "id": "g11",
+          "predicted": "withhold",
+          "expected": "unsupported",
+          "correct": true
+        },
+        {
+          "id": "g12",
+          "predicted": "withhold",
+          "expected": "unsupported",
+          "correct": true
+        },
+        {
+          "id": "g13",
+          "predicted": "withhold",
+          "expected": "unsupported",
+          "correct": true
+        },
+        {
+          "id": "g14",
+          "predicted": "assert",
+          "expected": "supported",
+          "correct": true
+        }
+      ]
+    },
+    "probabilityCalibration": {
+      "status": "unavailable",
+      "probabilityClaimSupported": false,
+      "reason": "The frozen predictor emitted categorical decisions and no probabilities."
+    },
+    "integrity": {
+      "schemaVersion": "heldout-identity-edge-freeze.v1",
+      "benchmarkVersion": "heldout-identity-edge-v1-blind",
+      "recordedAt": "2026-09-18T20:45:00.000Z",
+      "bindingStatus": "posthoc-integrity-record",
+      "originalBlindFileByteSha256": "7386f335cdf81a05a8379ba64f0a6763def6bad448cce0abfc297522b2a3617b",
+      "currentBlindFileByteSha256": "8581645419a2eaad1c5312916f6ab02a851ef10197fa05c0369dcbc572e33d3e",
+      "blindCanonicalJsonSha256": "4548bb1ea187bc81d0217e45cdaf72fde62fa6b9b49c7d4dd1ae40a4a6c1fa5e",
+      "frozenPredictionsFileByteSha256": "a1a3c029d44309a35ebb6b05f72ed356b323e181d95dfe7cb0dd19eb091f0bfb",
+      "independentGoldFileByteSha256": "53dffe4d12f3c893f2b7feed7757f26ace75b891bae6cd1730bce879aed4ddae",
+      "limitation": "This manifest was created after the frozen predictions and independent gold. The blind corpus was subsequently reformatted without changing parsed JSON; the original byte hash remains recorded, while the current byte and canonical JSON hashes enforce future integrity. This post-hoc record does not establish preregistration."
+    }
+  },
+  "uncertainty": {
+    "calibrationStatus": "unavailable",
+    "probabilityClaimSupported": false,
+    "reason": "Retrieval ranks are not probabilities, and this bounded corpus does not supply probabilistic predictions for held-out calibration."
+  },
+  "limitations": [
+    "This is a bounded held-out pilot; its sample size does not support population-level quality claims.",
+    "Temporary local rows exercise production SQL and isolation filters but do not reproduce production corpus composition or natural distractors; source-item filtering is covered separately by the integration regression.",
+    "Controlled deterministic padding proves HNSW selection and execution only in the separate forced mechanics preflight. A source-filtered semantic query may legitimately use the source-item B-tree, and neither plan is representative-scale retrieval-quality evidence.",
+    "Retrieval relevance does not establish identity, entailment, relationship truth, or source independence.",
+    "Forbidden retrieval results remain candidate-level false positives; false merges and unsupported edge assertions are measured separately on categorical held-out cases when their independent gold file is supplied.",
+    "Entailment labels are curated provisional judgments rather than consensus or human-adjudicated gold labels."
+  ],
+  "cleanup": {
+    "status": "completed",
+    "plannerStatisticsRefreshed": true,
+    "deletedRows": {
+      "retrievalPassages": 1107,
+      "captureOrigins": 8,
+      "sourceCaptures": 8,
+      "retrievalEvents": 8,
+      "sourceItems": 8,
+      "evidenceSources": 1
+    },
+    "remainingRows": {
+      "retrievalPassages": 0,
+      "captureOrigins": 0,
+      "sourceCaptures": 0,
+      "retrievalEvents": 0,
+      "sourceItems": 0,
+      "evidenceSources": 0
+    }
+  }
+}

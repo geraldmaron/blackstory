@@ -14,7 +14,7 @@ import {
   type EgressWatermark,
 } from './public-read-egress-budget.ts';
 
-const FINGERPRINT = 'SELECT projection%FROM bb_public.release_entities%';
+const FINGERPRINT = 'SELECT projection%FROM published.release_entities%';
 const STATS_SINCE = new Date('2026-07-21T04:56:26Z');
 const CAPTURED_AT = new Date('2026-08-09T00:00:00Z');
 const GB = 1024 ** 3;
@@ -146,12 +146,12 @@ test('editing a fingerprint re-baselines instead of alerting on an incomparable 
   // rows as a single day of egress — a ~6x-budget false alarm. The counters were fine; they just
   // described different sets of statements.
   const verdict = evaluateEgress({
-    previous: watermark({ fingerprint: '%FROM bb_public.search_index%' }),
+    previous: watermark({ fingerprint: '%FROM published.search_index%' }),
     current: { calls: 5_000, rowsReturned: 12_000_000, statsSince: STATS_SINCE },
     now: new Date(CAPTURED_AT.getTime() + 24 * 3_600_000),
     bytesPerRow: 512,
     budgetBytesPerDay: GB,
-    fingerprint: 'SELECT id, release_id%FROM bb_public.search_index%',
+    fingerprint: 'SELECT id, release_id%FROM published.search_index%',
   });
   assert.equal(verdict.kind, 'fingerprint-changed');
 });

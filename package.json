@@ -2,7 +2,7 @@
   "name": "blackstory",
   "private": true,
   "version": "0.0.0",
-  "description": "BlackStory — place-connected Black history research platform (monorepo; code scope @repo)",
+  "description": "BlackStory \u2014 place-connected Black history research platform (monorepo; code scope @repo)",
   "packageManager": "pnpm@9.12.3",
   "engines": {
     "node": ">=22"
@@ -45,20 +45,11 @@
     "dev:mobile:start": "./scripts/dev-mobile.sh --start",
     "ensure-api-public": "./scripts/ensure-api-public.sh",
     "ensure-metro": "./scripts/ensure-metro.sh",
-    "probe-metro": "node scripts/probe-metro.mjs",
-    "db:up": "docker compose -f infra/database/docker-compose.yml up -d",
-    "db:down": "docker compose -f infra/database/docker-compose.yml down",
-    "db:status": "docker compose -f infra/database/docker-compose.yml ps",
-    "db:init": "bash infra/database/scripts/apply-init.sh",
-    "db:verify": "bash infra/database/scripts/verify-isolation.sh",
-    "db:sql-connect:compile": "FIREBASE_CLI_DISABLE_UPDATE_CHECK=true firebase dataconnect:compile -c infra/database/sql-connect/firebase.json",
-    "db:sql-connect:sdk": "FIREBASE_CLI_DISABLE_UPDATE_CHECK=true firebase dataconnect:sdk:generate -c infra/database/sql-connect/firebase.json",
-    "test:db:integration": "pnpm --filter @repo/data-access test:integration"
+    "probe-metro": "node scripts/probe-metro.mjs"
   },
   "devDependencies": {
     "@repo/eslint-config": "workspace:^",
     "@repo/typescript-config": "workspace:^",
-    "firebase-tools": "^15.24.0",
     "prettier": "^3.9.6",
     "tsx": "^4.23.1",
     "typescript": "^5.8.3"

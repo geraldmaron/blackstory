@@ -94,7 +94,7 @@ try {
   await client.query('BEGIN');
 
   const { rows: activeRows } = await client.query(
-    `SELECT release_id FROM bb_public.active_release WHERE id = 'active'`,
+    `SELECT release_id FROM published.active_release WHERE id = 'active'`,
   );
   const releaseId = activeRows[0]?.release_id;
   if (!releaseId) throw new Error('no active release — cannot project legal snapshots');
@@ -103,7 +103,7 @@ try {
   for (const row of rows) {
     if (!row.canonicalEntityId) continue;
     const { rows: hit } = await client.query(
-      `SELECT 1 FROM bb_public.release_entities WHERE release_id = $1 AND entity_id = $2`,
+      `SELECT 1 FROM published.release_entities WHERE release_id = $1 AND entity_id = $2`,
       [releaseId, row.canonicalEntityId],
     );
     if (hit.length === 0) {
@@ -116,7 +116,7 @@ try {
   for (const row of rows) {
     const { snapshot, catalog, payload, canonicalEntityId } = row;
     await client.query(
-      `INSERT INTO bb_reference.legal_snapshots
+      `INSERT INTO reference.legal_snapshots
          (id, slug, title, kind, law_status, jurisdiction_id, topics, citation,
           explainer, fact_id, canonical_entity_id, status, row_updated_at)
        VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,'published', now())
@@ -143,7 +143,7 @@ try {
     );
 
     await client.query(
-      `INSERT INTO bb_public.release_legal_snapshots
+      `INSERT INTO published.release_legal_snapshots
          (release_id, snapshot_id, slug, canonical_entity_id, payload, content_hash)
        VALUES ($1,$2,$3,$4,$5,$6)
        ON CONFLICT (release_id, snapshot_id) DO UPDATE SET

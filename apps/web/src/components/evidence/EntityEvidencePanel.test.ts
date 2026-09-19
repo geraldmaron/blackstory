@@ -47,13 +47,12 @@ test('renders the measurement legend distinguishing all four dimensions (AC2)', 
   );
   assert.match(html, /<details/);
   assert.match(html, /How to read this record.{0,10}s measurements/);
-  assert.match(html, /Confidence.{0,20}evidence score/);
+  assert.match(html, /Confidence.{0,20}evidence grade/);
   assert.match(html, /Relevance/);
   assert.match(html, /Connection strength/);
   assert.match(html, /Research coverage/);
   assert.match(html, /href="\/methodology#evidence-grades"/);
   assert.match(html, /href="\/methodology#how-a-record-gets-in"/);
-  assert.match(html, /href="\/methodology#where-the-evidence-comes-from"/);
 });
 
 test('leads with claim cards before the collapsed measurement legend', () => {
@@ -82,7 +81,7 @@ test('renders one evidence card per claim', () => {
   assert.match(html, /id="claim_seed_005"/);
 });
 
-test('derives the record-level source-lineage rollup from claims when not supplied explicitly', () => {
+test('omits an unreviewed record-level lineage aggregate', () => {
   const html = renderToStaticMarkup(
     createElement(EntityEvidencePanel, {
       labelledBy: 'evidence-heading',
@@ -90,8 +89,7 @@ test('derives the record-level source-lineage rollup from claims when not suppli
       researchCoverage: { level: 'partial' },
     }),
   );
-  // 2 (claim_seed_001) + 1 (claim_seed_005) = 3 independent sources at the record level.
-  assert.match(html, /3.*independent.*sources/s);
+  assert.doesNotMatch(html, /<span class="ds-mono">3<\/span> independent sources/);
 });
 
 const CLAIMS_WITHOUT_LINEAGE: readonly EvidenceClaimInput[] = [
@@ -117,7 +115,7 @@ const CLAIMS_WITHOUT_LINEAGE: readonly EvidenceClaimInput[] = [
   },
 ];
 
-test('uses distinct citation sources when claims lack sourceLineage', () => {
+test('does not treat citation labels as independent lineages', () => {
   const html = renderToStaticMarkup(
     createElement(EntityEvidencePanel, {
       labelledBy: 'evidence-heading',
@@ -125,7 +123,7 @@ test('uses distinct citation sources when claims lack sourceLineage', () => {
       researchCoverage: { level: 'partial' },
     }),
   );
-  assert.match(html, /2.*independent.*sources/s);
+  assert.doesNotMatch(html, /independent.*sources/s);
   assert.doesNotMatch(html, /<span class="ds-mono">0<\/span> independent/);
 });
 

@@ -38,8 +38,8 @@ Fail-closed: `(lat, lng)` must sit in the declared state polygon.
 (`docs/research/geo-integrity-gate.md`). The audit API returns mismatches only. Do not
 auto-correct production coordinates.
 
-Catalog fixtures: `packages/firebase/scripts/qa-catalog-fixtures.ts` (state-bbox,
-precision decimals). Live geocoders are enrichment-only. Publish reads overrides and
+Catalog fixtures: `evaluateGeoIntegrityPublishGate` with sourced jurisdiction polygons and
+precision checks. Live geocoders are enrichment-only. Publish reads overrides and
 `EntityLocation`, never a live geocoder.
 
 Identity + place + era judgment: [`blackstory-entity-verify`](../entity-verify/SKILL.md).

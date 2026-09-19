@@ -115,7 +115,7 @@ export type LensPanelProps = {
    * carries, not a reader-facing "population" choice. */
   readonly layerMode: ExploreLayerMode;
   readonly onLayerModeChange: (mode: ExploreLayerMode) => void;
-  /** Composition dignity gate (repo-92n2.18): false while the active topic is about racial
+  /** Composition dignity gate: false while the active topic is about racial
    * violence — an area fill would read the harm itself as density. Defaults to true so an
    * omitted prop never silently disables the population layer for a caller that hasn't wired
    * this yet. */

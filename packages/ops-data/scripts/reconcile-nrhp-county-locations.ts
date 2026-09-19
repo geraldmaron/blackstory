@@ -1,41 +1,9 @@
 /**
- * Lane B / repo-bmmo — county-centroid location fallback for NRHP Black
- * heritage rows that NPS's own ArcGIS points layer (cultural_resources/
- * nrhp_locations) does not cover.
- *
- * scrape-nrhp-black-heritage-roster.ts joins listings to lat/lng strictly by
- * NRIS_Refnum against that ArcGIS layer; 988 of 2582 rows found no match
- * there (verified: the refnums are genuinely absent from that service, not a
- * join bug — spot-checked directly against the layer). 62 of those are
- * NPS-flagged restrictedAddress (archaeological/burial sites where NPS
- * deliberately withholds the precise location); the remaining 926 are
- * ordinary listings the mapped layer simply hasn't geocoded.
- *
- * This does NOT invent site-level coordinates. It looks up the county
- * centroid from the Census Bureau's own county Gazetteer file (the same
- * public-domain source and parser already used for bb_reference.jurisdictions
- * — see src/jurisdictions/tiger-gazetteer.ts) by the row's own County+State
- * fields (already present in the NPS dataset, not guessed), and publishes at
- * `locationPrecision: 'county'` — a first-class precision tier the app's
- * redaction policy (packages/security/src/redaction.ts PRECISION_RANK)
- * recognizes. The map display layer (apps/web/src/lib/map-experience/
- * geo-precision.ts) maps `county` -> GeoPrecisionTier 'county', but
- * `resolveDisplayRadiusMeters` has no county-bbox reference data wired yet
- * and fails closed for that tier (`jurisdiction_bbox_unresolved`, asserted by
- * geo-precision.test.ts) — so today the entity renders as a plain pin with
- * no radius affordance, not the county-radius circle a future bbox source
- * would draw. That fail-closed pin is still the honest choice here: coarser
- * than the City value NPS already publishes in the same public dataset, so
- * restrictedAddress rows are not exposed beyond what NPS itself discloses.
- *
- * Default is dry-run. Production writes require:
- *   DRY_RUN=0 NRHP_COUNTY_RECONCILE_APPLY=1 DATABASE_URL=postgresql://...
- *
- * Usage (from repo root):
- *   set -a && source apps/web/.env.local && set +a
- *   export DATABASE_SSL=1
- *   node --conditions development --import tsx \
- *     packages/ops-data/scripts/reconcile-nrhp-county-locations.ts
+ * Supply county-centroid locations only for NRHP rows without an NPS ArcGIS point. Join the
+ * row's own County and State to Census Gazetteer data and label precision county; this is never
+ * site-level geocoding. Restricted addresses remain protected. A county radius requires
+ * resolved jurisdiction bounds. Default dry-run; writes require DRY_RUN=0 and
+ * NRHP_COUNTY_RECONCILE_APPLY=1.
  */
 import { mkdirSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
@@ -189,7 +157,7 @@ async function main(): Promise<void> {
 
   const pool = new pg.Pool(normalizePgConnectionString(databaseUrl));
   const res = await pool.query<Row>(
-    `SELECT id, payload FROM bb_research.landscape_candidates
+    `SELECT id, payload FROM research.landscape_candidates
      WHERE lane = $1 AND (lat IS NULL OR lng IS NULL)
      ORDER BY id`,
     [LANE],
@@ -259,7 +227,7 @@ async function main(): Promise<void> {
     await client.query('BEGIN');
     for (const m of matched) {
       await client.query(
-        `UPDATE bb_research.landscape_candidates
+        `UPDATE research.landscape_candidates
          SET lat = $1, lng = $2,
              payload = jsonb_set(payload, '{geocode}', $3::jsonb, true),
              updated_at = now()

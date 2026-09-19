@@ -1,5 +1,5 @@
 /**
- * Server-side Postgres readers for active-release public projections in `bb_public.*`.
+ * Server-side Postgres readers for active-release public projections in `published.*`.
  * Maps `projection` jsonb and denormalized search columns into storage-neutral public contracts.
  */
 import type {
@@ -37,7 +37,7 @@ function toIsoTimestamp(value: Date | string): string {
 export async function fetchActiveRelease(): Promise<PublicActiveReleaseDoc | undefined> {
   const rows = await queryPostgres<ActiveReleaseRow>(
     `SELECT release_id, activated_at, search_index_version, manifest_hash
-     FROM bb_public.active_release
+     FROM published.active_release
      WHERE id = 'active'
      LIMIT 1`,
   );
@@ -57,7 +57,7 @@ export async function fetchPublicEntityProjection(
 ): Promise<PublicEntityProjectionDoc | undefined> {
   const rows = await queryPostgres<ProjectionRow>(
     `SELECT projection
-     FROM bb_public.release_entities
+     FROM published.release_entities
      WHERE release_id = $1 AND entity_id = $2
      LIMIT 1`,
     [releaseId, entityId],
@@ -68,7 +68,7 @@ export async function fetchPublicEntityProjection(
 
 /**
  * The survivor a merged-away entity id forwards to, or `undefined` when this id is simply not
- * published (repo-n7p6.29).
+ * published.
  *
  * `to_entity_id` is already the terminal survivor of any merge chain — the publisher
  * (`packages/ops-data/scripts/reconcile-absorbed-entities.ts`) resolves chains before writing —
@@ -80,7 +80,7 @@ export async function fetchPublicEntityRedirect(
 ): Promise<string | undefined> {
   const rows = await queryPostgres<{ readonly to_entity_id: string }>(
     `SELECT to_entity_id
-     FROM bb_public.release_entity_redirects
+     FROM published.release_entity_redirects
      WHERE release_id = $1 AND from_entity_id = $2
      LIMIT 1`,
     [releaseId, fromEntityId],
@@ -93,7 +93,7 @@ export async function listPublicEntityProjections(
 ): Promise<readonly PublicEntityProjectionDoc[]> {
   const rows = await queryPostgres<ProjectionRow>(
     `SELECT projection
-     FROM bb_public.release_entities
+     FROM published.release_entities
      WHERE release_id = $1
      ORDER BY entity_id`,
     [releaseId],
@@ -118,7 +118,7 @@ export async function fetchPublicEntityProjectionsByIds(
     const chunk = unique.slice(offset, offset + POSTGRES_ENTITY_BATCH_SIZE);
     const rows = await queryPostgres<ProjectionRow>(
       `SELECT projection
-       FROM bb_public.release_entities
+       FROM published.release_entities
        WHERE release_id = $1 AND entity_id = ANY($2::text[])`,
       [releaseId, chunk],
     );
@@ -136,7 +136,7 @@ export async function listPublicSearchIndexDocs(
   const rows = await queryPostgres<Parameters<typeof mapPostgresSearchIndexRow>[0]>(
     `SELECT id, release_id, entity_id, name, name_lower, aliases, topics, kind, status,
             geohash, related_count, claim_count, facets
-     FROM bb_public.search_index
+     FROM published.search_index
      WHERE release_id = $1
      ORDER BY id`,
     [releaseId],
@@ -153,18 +153,18 @@ export async function listPublicSearchIndexDocs(
 export async function listPublicLegalSnapshots(): Promise<readonly unknown[]> {
   const rows = await queryPostgres<MaterializedSnapshotRow>(
     `SELECT payload
-     FROM bb_public.release_legal_snapshots
-     WHERE release_id = (SELECT release_id FROM bb_public.active_release WHERE id = 'active')
+     FROM published.release_legal_snapshots
+     WHERE release_id = (SELECT release_id FROM published.active_release WHERE id = 'active')
      ORDER BY slug`,
   );
   return rows.map((row) => row.payload);
 }
 
-/** Reads one materialized `publicMeta` snapshot migrated into `bb_public.materialized_snapshots`. */
+/** Reads one materialized `publicMeta` snapshot migrated into `published.materialized_snapshots`. */
 export async function fetchMaterializedSnapshot(name: string): Promise<unknown | undefined> {
   const rows = await queryPostgres<MaterializedSnapshotRow>(
     `SELECT payload
-     FROM bb_public.materialized_snapshots
+     FROM published.materialized_snapshots
      WHERE name = $1
      LIMIT 1`,
     [name],

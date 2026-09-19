@@ -1,9 +1,7 @@
 /**
- * repo-n7p6.4 (WS4) — shared ledger write for every WS4 entry point (enrich-entities-llm.ts,
- * session-enrich-apply.ts). One place decides what an accepted or quarantined attempt writes to
- * bb_research.entity_enrichment, so an OpenRouter-drafted result and a session-drafted result
- * land in the ledger identically. NEVER writes to bb_public — publishing an accepted draft into
- * the release projection is WS5 (repo-n7p6.5), a separately gated step.
+ * Shared enrichment-ledger writes for provider and externally supplied drafts. Deterministic
+ * validation applies equally to both. Publication is a separate reviewed operation; this module
+ * never writes published data.
  */
 import { createHash } from 'node:crypto';
 import type pg from 'pg';
@@ -14,10 +12,8 @@ import {
 } from './entity-enrichment-llm.ts';
 
 /**
- * repo-n7p6.16 item 5: deterministic random-sample selector for passing outputs. Hash-based
- * rather than Math.random so a re-run of the same batch (resume after interruption) selects the
- * same entities — the sample can't be dodged or double-counted by re-running. `salt` varies the
- * draw per batch (e.g. the run date) so the same entity isn't permanently in/out of the sample.
+ * Selects a stable review sample by entity id and batch salt. Resuming the same batch preserves
+ * selection; changing the salt permits a new sample.
  */
 export function isReviewSampled(entityId: string, rate: number, salt = ''): boolean {
   if (!(rate > 0)) return false;
@@ -34,13 +30,11 @@ export type ApplyEnrichmentResultInput = {
   readonly entityId: string;
   readonly attempt: EnrichmentAttempt;
   readonly modelId: string;
-  /** 0 for a session-drafted answer (no metered API cost). */
-  readonly costUsdEstimate: number;
+  /** NULL when original compute cost is unknown. */
+  readonly costUsd: number | null;
   /**
-   * repo-n7p6.16 item 5: a deterministically sampled PASSING output routed to review alongside
-   * quarantined ones, so a validator/judge that starts waving through weak work is caught early.
-   * The row keeps status='enriched' (it passed every deterministic check); reviewers pull the
-   * queue with: status='quarantined' OR notes->'reviewSample'->>'selected' = 'true'.
+   * Marks a deterministically sampled passing output for review without changing its enriched
+   * status. Review queries include quarantined rows and notes.reviewSample.selected=true.
    */
   readonly reviewSample?: boolean;
 };
@@ -77,26 +71,9 @@ function notesFor(attempt: EnrichmentAttempt, reviewSample: boolean): Record<str
 
 /** UPDATEs the entity's existing ledger row (WS3 must have INSERTed it already, status='pending'). */
 /**
- * repo-n9dq — the third outcome of a drafting pass, alongside accepted and quarantined.
- *
- * A drafter that reads captured, identity-verified evidence and finds no Black-history
- * significance in it is doing the right thing by refusing: the alternative is architectural
- * padding to clear the 120-char summary floor, which is the failure the whole enrichment effort
- * exists to undo. But until now a refusal wrote nothing, so the row stayed `pending` and every
- * later pass re-selected and re-spent on it. Wave 4's selection was 8 of wave 3's own refusals,
- * top of the list, because they still carried the most evidence by volume.
- *
- * `no-lane-significance` is terminal but NOT permanent, and `evidence_digest` is what makes the
- * difference. It records exactly which evidence was judged. A later sweep that captures a new
- * source changes the digest, and the row can be reopened by comparing the two — the refusal
- * expires when the input it was made about does, and not before.
- *
- * NOT to be used for a mis-attached document (repo-pjob). "This evidence says nothing about Black
- * history" and "this evidence is about a different subject entirely" look identical to a drafter
- * and are opposite facts: the first is a finished judgment about the entity, the second is a
- * retrieval bug where the entity was never researched at all. Marking the second terminal would
- * permanently close a record whose real nomination was simply never fetched. Those belong in the
- * identity gate and leave the row with no captured evidence at all.
+ * Stores a no-lane-significance judgment against the exact evidence digest. New evidence
+ * permits reopening. Misattached or absent evidence is an acquisition failure and must not
+ * become a terminal significance judgment.
  */
 export async function applyLaneSignificanceRefusal(
   client: QueryableClient,
@@ -110,7 +87,7 @@ export async function applyLaneSignificanceRefusal(
   },
 ): Promise<void> {
   await client.query(
-    `UPDATE bb_research.entity_enrichment
+    `UPDATE research.entity_enrichment
         SET status = 'no-lane-significance',
             model_id = $2,
             evidence_digest = $3,
@@ -142,10 +119,10 @@ export async function applyEnrichmentResult(
   input: ApplyEnrichmentResultInput,
 ): Promise<void> {
   await client.query(
-    `UPDATE bb_research.entity_enrichment
+    `UPDATE research.entity_enrichment
         SET status = $2,
             model_id = $3,
-            cost_usd = coalesce(cost_usd, 0) + $4,
+            cost_usd = CASE WHEN cost_usd IS NULL OR $4::numeric IS NULL THEN NULL ELSE cost_usd + $4 END,
             fields_written = $5,
             notes = $6::jsonb,
             last_enriched_at = now(),
@@ -155,7 +132,7 @@ export async function applyEnrichmentResult(
       input.entityId,
       input.attempt.validation.ok ? 'enriched' : 'quarantined',
       input.modelId,
-      input.costUsdEstimate,
+      input.costUsd,
       fieldsWrittenFor(input.attempt),
       JSON.stringify(notesFor(input.attempt, input.reviewSample === true)),
     ],

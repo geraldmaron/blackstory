@@ -271,7 +271,7 @@ export function entityWithMaliciouslyLargeNarrative(): RawEntity {
 }
 
 const MALICIOUS_TEXT =
-  "<script>alert(1)</script> ‮gnitset‬   ${process.env.SECRET} '; DROP TABLE entities; --";
+  "<script>alert(1)</script> ‮gnitset‬ \0\x01 ${process.env.SECRET} '; DROP TABLE entities; --";
 
 export function entityWithMaliciousText(): RawEntity {
   const base = fullEntityFixture('place', 'ent_place_malicious_001');

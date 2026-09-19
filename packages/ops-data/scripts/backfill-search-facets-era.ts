@@ -1,5 +1,5 @@
 /**
- * Realign `bb_public.search_index.facets->'eraBuckets'` with the release projection.
+ * Realign `published.search_index.facets->'eraBuckets'` with the release projection.
  *
  * A thin wrapper over `lib/search-facet-realign.ts`, configured for the `eraBuckets` key: this is
  * a plain array facet, so it runs through that shared engine's `array-facet` mode directly. Kept
@@ -7,13 +7,13 @@
  * `apply-era-from-captured-evidence.ts` names it by file and tells the operator to run it next.
  *
  * 1,134 entities in the active release carry a non-empty `eraBuckets` in
- * `bb_public.release_entities.projection` but an empty one in the matching `search_index` row.
+ * `published.release_entities.projection` but an empty one in the matching `search_index` row.
  * They render an era on their entity page and are simultaneously invisible to era filtering,
  * era facet counts, and era sort in search.
  *
  * These rows predate the release-builder change that made it derive `eraBuckets` once and write
  * the same value to both artifacts. Republishing the affected lanes would fix them, but the incremental
- * path cannot reach this population: 918 of them are absent from `bb_research.landscape_candidates`
+ * path cannot reach this population: 918 of them are absent from `research.landscape_candidates`
  * and ~192 more fail the publish gate. Copying the already-correct projection onto the search doc
  * needs no builder run and touches nothing else.
  *

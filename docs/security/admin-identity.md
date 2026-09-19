@@ -1,111 +1,29 @@
 # Administrator identity and authorization
 
-> **This document does not match the current implementation and predates the 2026-09-11
-> admin-into-web merge — the gap is pre-existing, not something that migration introduced.** The
-> admin console actually runs on Supabase Auth (`ADMIN_AUTH_MODE=supabase`), authorizing on
-> `app_metadata.bb_role` (`admin`/`research`/`publication`/`security`), with no Google Cloud IAP
-> and no Firebase Authentication/MFA layer — see `docs/security/service-surfaces.md` and
-> `apps/web/src/admin/auth/`. Whether the IAP+Firebase+MFA design below is superseded, a future
-> target, or dead, is a call for a human, not inferred here. The one path reference below is
-> corrected to its current location; the rest of the document is left as written.
+The admin console runs under `/admin` in the web application. Supabase Auth verifies staff
+sessions. Server routes resolve the user through `auth.getUser`, require an email, and read
+exactly one role from trusted `app_metadata.app_role`. User-editable metadata never grants access.
 
- implements administrator identity as two independent controls: Google Cloud IAP at the
-admin service boundary and Firebase Authentication inside the application. Neither control alone
-authorizes a request.
+`apps/web/src/admin/auth/request-auth.ts` applies the route policy in `route-permissions.ts`.
+Undeclared routes fail closed. Server writes use the shared permissions in `staff-permissions.ts`;
+client-side controls only hide unavailable actions and cannot authorize them.
 
-## Request authorization
-
-`apps/web/src/admin/auth/server-authorization.ts` is the server composition boundary. Every protected
-handler must call one of its assertions before reading administrative data or invoking an internal
-workflow:
-
-- `assertAuthenticated` for administrator reads.
-- `assertPermission` for non-privileged writes.
-- `assertPrivilegedAction` for publication, retraction, rights changes, policy changes, privileged
-  exports, and role changes.
-
-The helper verifies the IAP JWT through an injected verifier, verifies the Firebase ID token with
-`checkRevoked: true`, requires the IAP and Firebase email identities to match, and then invokes the
-application authorization policy. A client-side route guard may improve navigation, but it is never
-an authorization control and cannot replace these server assertions.
-
-The production IAP verifier must validate signature, issuer, expiry, and the exact backend-service
-audience. Forwarded identity headers are not trusted without JWT verification. See
-`infra/gcp/iap/README.md` and `../decisions-carryover.md`, "Service surface separation" (ADR-005).
-
-## Firebase custom claims
-
-`packages/firebase/src/admin-auth.ts` defines claims version 1:
-
-```json
-{
-  "bb_claims_version": 1,
-  "bb_roles": ["publication"]
-}
-```
-
-Legacy single-role/boolean claims continue to resolve through `resolveStaffRoles`; new writes use
-`bb_roles`. Claims contain authorization metadata only—never profile data, secrets, tokens, or MFA
-recovery material.
-
-| Role | Effective permissions |
+| Role | Permissions |
 |---|---|
-| `research` | Research writes |
+| `research` | Research proposals and canonical record edits |
 | `publication` | Publish and retract |
 | `security` | Rights changes and privileged exports |
-| `admin` | All permissions, including policy and role changes |
+| `admin` | All declared permissions, including merge, bulk changes, policy, and roles |
 
-The `admin` role inherits research, publication, and security capabilities. Research alone never
-publishes. Publication activation remains an internal workflow per `../decisions-carryover.md`, "Service surface separation" (ADR-005); the admin service
-authorizes the human request but does not gain a direct public projection mutation path.
+There is no Firebase identity, IAP principal, boolean-role fallback, or multiple-role claim.
+Role administration uses trusted Supabase administrative operations; there is no public role-write
+endpoint. Database RLS is a separate control and must agree with the application's role vocabulary.
+The schema cutover migration changes both the database role reader and stored app metadata.
 
-Role changes are server-only. `mutateAdminRoles` requires layered authorization and fresh
-reauthentication before calling a trusted mutation service. That service must use `setAdminRoles`,
-which runs `assertRoleMutationAuthorized`, writes Firebase custom claims with the Admin SDK, and
-revokes the target user's refresh tokens. There is no client SDK role-write path.
+The current route authorizer does not enforce MFA assurance level or recent reauthentication.
+Do not claim those controls from provider availability or a design document. Adding either requires
+an explicit policy, server enforcement, and tests for expired and insufficient-assurance sessions.
 
-## MFA and recent authentication
-
-All administrator sessions require Firebase MFA. The server accepts only a verified ID token whose
-authentication methods show a second factor (`firebase.sign_in_second_factor` or `amr: "mfa"`).
-There are no bypass tokens.
-
-The following actions require an authentication time no older than 10 minutes:
-
-- publication;
-- retraction;
-- rights changes;
-- policy changes;
-- privileged export;
-- role changes.
-
-The UI should ask the user to reauthenticate with their primary credential and enrolled second
-factor, then send the newly issued ID token. Extending the browser session or refreshing an old
-token does not change `auth_time` and does not satisfy the gate.
-
-## Revocation and alerts
-
-`revokeAdminSessions` revokes Firebase refresh tokens and returns the server revocation cutoff.
-Protected requests verify ID tokens with revoked-token checking; `assertSessionNotRevoked` is
-available where an explicit cutoff is already loaded. Revoke sessions immediately after role
-changes, suspected compromise, administrator offboarding, or MFA reset.
-
-`AdministrativeAuthAlertEvent` defines sanitized events for login success/failure, new-device
-signals, session revocation, and role changes. `emitAdministrativeAuthAlert` is an injected sink
-stub;  does not select or provision an alert transport. Device and source-IP values must be
-pseudonymous hashes. Events must never contain raw ID tokens, IAP assertions, passwords, factor
-secrets, recovery codes, or full IP addresses.
-
-## Human console steps
-
-1. In Google Cloud, provision and enable the reviewed IAP/load-balancer design in
-   `infra/gcp/iap/`; grant access only to the administrator group.
-2. In Firebase Authentication, enable approved first-factor providers and an MFA factor supported
-   for the project. Require every administrator to enroll before claims are granted.
-3. Bootstrap the first administrator claim through a reviewed, audited server/Admin SDK operation.
-4. Test an allowed IAP user with no Firebase role, a Firebase admin outside IAP, a non-MFA token, a
-   stale authentication, and a revoked token; all must fail.
-5. Configure the alert sink and route login failure, new-device, revocation, and role-change events
-   to the security response channel.
-
-No live IAP or Firebase console changes were applied by .
+Validation: admin request, route-permission, staff-permission, and Supabase-session tests exercise
+invalid tokens, missing roles, forbidden roles, and routes absent from the policy. Session cookies
+and service credentials must never appear in research evidence, logs, or public bundles.

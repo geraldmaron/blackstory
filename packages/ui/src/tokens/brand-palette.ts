@@ -1,8 +1,7 @@
 /**
  * Fixed BlackStory brand palette, kept in step with brand/tokens/colors.json.
  *
- * The "Pinned Page" name this comment used to carry was retired at the rebrand, and the label
- * outliving the palette is what made repo-2jmd read as an unmigrated pre-rebrand file. Every hex
+ * The "Pinned Page" name this comment used to carry was retired at the rebrand, and that stale label made the file look unmigrated after the rebrand. Every hex
  * below already matches brand/tokens/colors.json, which is the source mobile generates from; the
  * only value here without a counterpart there is the extra copper shade.
  *

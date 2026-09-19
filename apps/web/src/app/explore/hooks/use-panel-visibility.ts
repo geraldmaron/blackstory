@@ -54,9 +54,8 @@ export function usePanelVisibility() {
    * All four open is the wide default. On a narrow viewport four panels would cover the plate
    * between them, so only Lens (the filters) stays open; Results, Decade and Camera collapse
    * to the dock and the reader brings one in when asked. Landing on Explore with every panel
-   * collapsed read as "just a map, no controls" (repo report, 2026-09-02) — Lens is the one
-   * panel a reader expects the instrument to open on. Server-rendered as the wide layout and
-   * corrected after mount.
+   * collapsed would leave a map with no visible controls. Lens is the instrument that remains
+   * open at every width. Server-rendered as the wide layout and corrected after mount.
    */
   const [panels, setPanels] = useState<PanelVisibility>({
     lens: true,

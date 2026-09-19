@@ -11,7 +11,7 @@ production or use production data.
 - [x] V4 / API1 BOLA: a user cannot read or mutate another user's submission by ID.
 - [x] V4 / API5 BFLA: research workers cannot activate releases; publication workers
   and MFA publication staff are explicitly allowed.
-- [x] V2: Firebase administrator permission checks reject end-user claims.
+- [x] V2: Supabase staff permission checks reject end-user claims.
 - [ ] Human: staging DAST identity has synthetic-only data, least privilege, short-lived
   credentials, and no production IAM.
 

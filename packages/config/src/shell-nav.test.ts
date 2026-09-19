@@ -38,7 +38,7 @@ test('primary nav is the four product axes', () => {
   );
   assert.deepEqual(
     PRIMARY_NAV.map((item) => item.label),
-    ['Explore', 'Stories', 'Records', 'Rooms'],
+    ['Map', 'Stories', 'Records', 'Rooms'],
   );
 });
 

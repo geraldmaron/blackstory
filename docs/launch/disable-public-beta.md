@@ -20,7 +20,7 @@ Engage switches in **containment order** (see `packages/config/src/kill-switches
 3. `geocoding` / `nearby-location` — stop location expansion
 4. **`public-static-mode`** — force read-only serving from immutable release snapshots
 
-Firestore documents: `killSwitches/{id}` (see `infra/gcp/kill-switches/README.md`).
+The operational switch store is `ops.kill_switches`; use the authenticated admin switch controls.
 
 When `public-static-mode` is engaged, dynamic workloads are denied with reason `static-read-only`; the immutable corpus stays online.
 

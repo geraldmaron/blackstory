@@ -1,20 +1,7 @@
 /**
- * React hook wiring `fetchEntityDetail` (dataClient.ts) into a screen-consumable state union
- * (MOB-014). Kept separate from `EntityDetailScreen.tsx` so the screen itself stays a pure,
- * state-in/props-out presentational component (same split `features/map/MapScreen.tsx` uses:
- * the screen takes injected state/props, a thin wrapper owns the real fetch) — that split is
- * what makes the adversarial fixture matrix in `__tests__/EntityDetailScreen.test.tsx` possible
- * without mocking SQLite/NetInfo/App Check for every case.
- *
- * DEFENSIVE DEPENDENCY HANDLING: the effect below re-fetches on `entityId` change or on `deps`
- * transitioning from unavailable to available — deliberately NOT on `deps`'s object identity.
- * A caller that (by mistake) passes a freshly-constructed `EntityDataDeps` object on every
- * render (e.g. an un-memoized inline object, as an early draft of this hook's own test suite
- * did) would otherwise retrigger the fetch effect every render — an unbounded
- * fetch/setState/re-render loop that manifests as a real, silent memory blowup, not just a
- * theoretical concern (this was caught by `useEntityDetail.test.ts` OOMing during this bead's
- * own test run). Keying off `Boolean(deps)` instead of `deps` itself makes that class of bug
- * structurally impossible here, independent of how disciplined any given call site is.
+ * Fetch entity details when entityId changes or dependencies become available. Depend on
+ * availability rather than dependency-object identity so an inline object cannot trigger an
+ * unbounded fetch/render loop. Keep the screen's presentation separate from runtime effects.
  */
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { fetchEntityDetail, type EntityDataDeps, type EntityFetchResult } from './dataClient';

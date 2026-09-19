@@ -1,4 +1,4 @@
-INSERT INTO bb_reference.theme_impact_packets (
+INSERT INTO reference.theme_impact_packets (
   id, question_id, theme_id, title, summary, policy_eras, geography,
   method_stance, method_note, observations, derived, artifacts, gap_states, status, created_at, updated_at
 ) VALUES (
@@ -35,7 +35,7 @@ ON CONFLICT (id) DO UPDATE SET
   status = EXCLUDED.status,
   updated_at = EXCLUDED.updated_at;
 
-INSERT INTO bb_reference.theme_impact_packets (
+INSERT INTO reference.theme_impact_packets (
   id, question_id, theme_id, title, summary, policy_eras, geography,
   method_stance, method_note, observations, derived, artifacts, gap_states, status, created_at, updated_at
 ) VALUES (
@@ -72,7 +72,7 @@ ON CONFLICT (id) DO UPDATE SET
   status = EXCLUDED.status,
   updated_at = EXCLUDED.updated_at;
 
-INSERT INTO bb_reference.theme_impact_packets (
+INSERT INTO reference.theme_impact_packets (
   id, question_id, theme_id, title, summary, policy_eras, geography,
   method_stance, method_note, observations, derived, artifacts, gap_states, status, created_at, updated_at
 ) VALUES (
@@ -109,7 +109,7 @@ ON CONFLICT (id) DO UPDATE SET
   status = EXCLUDED.status,
   updated_at = EXCLUDED.updated_at;
 
-INSERT INTO bb_reference.theme_impact_packets (
+INSERT INTO reference.theme_impact_packets (
   id, question_id, theme_id, title, summary, policy_eras, geography,
   method_stance, method_note, observations, derived, artifacts, gap_states, status, created_at, updated_at
 ) VALUES (

@@ -6,7 +6,7 @@
  * set of typed `EntityRelationship` edges never hand-typed as a final related-entry array. This
  * is the same graph-view shape a real `publicReleases/{releaseId}/graph` build
  * (`packages/domain/src/graph/build.ts`) would produce; this module stands in for that pipeline
- * until release build is wired to a live Firestore relationship collection (see
+ * until release build is wired to released relationship records (see
  * `public-seed.ts`'s own module doc for the parallel "seed stands in for a release" convention).
  *
  * Also carries the time-scoped `statusHistory` and schema-only `sensitivity` fixtures the
@@ -160,9 +160,7 @@ export function sensitivityFor(entityId: string): EntitySensitivity | undefined 
 // ---------------------------------------------------------------------------
 
 /**
- * The builder itself now lives in `@repo/domain` (`graph/timeline.ts`) so `apps/api-public` can
- * serve the same timeline this page renders instead of hard-coding an empty array — see
- * repo-n7p6.6 item 2. Re-exported here unchanged so every existing import path keeps working.
+ * Re-exports the shared domain timeline builder for the entity graph view.
  */
 export {
   buildGraphTimeline,

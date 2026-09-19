@@ -1,5 +1,5 @@
 /**
- * repo-ppeu — the identity gate shared by every collector that finds a document by SEARCH.
+ * Identity gate shared by every collector that finds a document by SEARCH.
  *
  * Background, measured rather than assumed. In the 2026-08-10 enrichment round, 9 of 24 subjects
  * (37.5%) had been given evidence documenting a different subject entirely: a house matched to an
@@ -130,7 +130,7 @@ export function foldPunctuation(text: string): string {
 /**
  * Whole-word occurrences of a token in punctuation-folded text.
  *
- * repo-u84y: every name test here used `haystack.includes(token)`, which is a SUBSTRING scan, and
+ * Every name test here used `haystack.includes(token)`, which is a SUBSTRING scan, and
  * substring matching manufactured corroboration on real rows. "Hogan Quarters" scored 45 hits for
  * the token "quarters" inside an encyclopedia article about Frankfurt, Germany — all 45 were
  * head-QUARTERS. "Our Lady of Victory" scored "catholic" three times inside catholiCISM. Since

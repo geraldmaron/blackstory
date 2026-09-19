@@ -1,13 +1,11 @@
 /**
  * Story packet review queue — the route.
  *
- * Server component (repo-gyq6.9). This was 713 lines of client page that waited for
- * `AdminAuthProvider` to mint a token before it could fetch `/admin/api/stories/packets`, so a
- * reviewer opening the queue paid a hydrate and a token refresh before the first packet appeared.
- * The list is now read in the request and handed to {@link StoryReviewDesk} as `initialRows`.
+ * The packet list is read in the server request and handed to {@link StoryReviewDesk} as
+ * `initialRows` so the first response contains the review queue.
  *
  * The desk stays a client component, and should: filtering, sorting, selection and the single and
- * bulk decision POSTs are real interaction against real mutation APIs. Only the initial read moved.
+ * bulk decision POSTs are real interaction against mutation APIs.
  */
 import type { Metadata } from 'next';
 import { listStoryPackets } from '../../../../admin/stories/story-packet-store';

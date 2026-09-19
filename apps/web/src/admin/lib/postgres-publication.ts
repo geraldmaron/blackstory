@@ -1,5 +1,5 @@
 /**
- * Postgres reads for bb_publication releases and the active release pointer.
+ * Postgres reads for publication releases and the active release pointer.
  */
 import { queryPostgres } from './canonical-postgres-client.js';
 
@@ -54,14 +54,14 @@ export async function listPublicationReleasesPostgres(limit: number): Promise<Re
   const [releaseRows, activeRows] = await Promise.all([
     queryPostgres<ReleaseRow>(
       `SELECT id, status, search_index_version, created_at, created_by, activated_at
-       FROM bb_publication.releases
+       FROM publication.releases
        ORDER BY created_at DESC
        LIMIT $1`,
       [cappedLimit],
     ),
     queryPostgres<ActiveReleaseRow>(
       `SELECT release_id, activated_at, search_index_version, manifest_hash
-       FROM bb_public.active_release
+       FROM published.active_release
        WHERE id = 'active'`,
     ),
   ]);

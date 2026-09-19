@@ -14,11 +14,9 @@ import {
   claimCountRegressed,
   liveSourceClaims,
   gateLandscapePublishCandidate,
-  INCREMENTAL_PUBLISH_CONFIDENCE_FLOOR,
   incrementalPublishProvenancePatch,
   jurisdictionFromPlace,
   jurisdictionFromProvenance,
-  liveClaimConfidence,
   liveLocationFromRow,
   MERGED_EVIDENCE_QUOTE_MAX_CHARS,
   parseCanonicalStatusSnapshot,
@@ -38,6 +36,56 @@ import {
 } from '@repo/domain';
 import { mapPostgresSearchIndexRow } from '@repo/schemas';
 import { divergentFieldsForRow, expectedSearchTopics } from './projection-divergence.ts';
+
+import type { ReviewedClaimAssessment } from './confidence.ts';
+
+/** Other gate tests supply independent ledger fixtures so they isolate their stated rule. */
+function reviewedClaimsFor(row: LandscapePublishRow, score = 0.9): ReviewedClaimAssessment[] {
+  const entry = buildReleaseSourceFromLandscape(row);
+  return (entry?.claims ?? []).map((claim, index) => ({
+    entityId: entry!.id,
+    claimId: claim.id ?? `reviewed-claim-${index}`,
+    claimVersionId: `version-${index}`,
+    predicate: claim.predicate,
+    object: claim.object,
+    citationHrefs: claim.citationHref ? [claim.citationHref] : [],
+    reviewedEvidenceCaptures: claim.citationHref
+      ? [
+          {
+            sourceUrl: claim.citationHref,
+            sourceItemId: `source-item-${index}`,
+            captureId: `capture-${index}`,
+            contentHashDigest: index.toString(16).padStart(64, '0'),
+          },
+        ]
+      : [],
+    assessmentId: `assessment-${index}`,
+    reviewDecisionId: `review-${index}`,
+    assessment: {
+      acceptanceProbability: score,
+      intervalLow: score,
+      intervalHigh: 1,
+      sourceReliability: score,
+      entailment: score,
+      independence: score,
+      identityConfidence: score,
+      relevance: 1,
+      researchCompleteness: score,
+      calibrationVersion: 'test-held-out-v1',
+    },
+  }));
+}
+
+function gateWithReviewedClaims(input: Parameters<typeof gateLandscapePublishCandidate>[0]) {
+  return gateLandscapePublishCandidate({
+    ...input,
+    reviewedClaims: reviewedClaimsFor({
+      ...input.row,
+      lat: input.row.lat ?? input.liveLocation?.lat ?? null,
+      lng: input.row.lng ?? input.liveLocation?.lng ?? null,
+    }),
+  });
+}
 
 /** Parsed host, or null for anything unparseable — never a substring test on the raw URL. */
 const hostOf = (url: string): string | null => {
@@ -194,7 +242,7 @@ test('buildReleaseSourceFromLandscape leaves an invention row without payload.gr
 });
 
 test('gateLandscapePublishCandidate rejects person privacy holds', () => {
-  const result = gateLandscapePublishCandidate({
+  const result = gateWithReviewedClaims({
     row: baseRow({ kind: 'person' }),
     releaseId: 'rel_seed_001',
     generatedAt: '2026-07-22T00:00:00.000Z',
@@ -215,7 +263,7 @@ test('gateLandscapePublishCandidate lets an operator-reviewed person past the pr
       },
     },
   });
-  const result = gateLandscapePublishCandidate({
+  const result = gateWithReviewedClaims({
     row: reviewed,
     releaseId: 'rel_seed_001',
     generatedAt: '2026-07-22T00:00:00.000Z',
@@ -225,7 +273,7 @@ test('gateLandscapePublishCandidate lets an operator-reviewed person past the pr
 });
 
 test('gateLandscapePublishCandidate rejects incomplete personReview markers', () => {
-  const result = gateLandscapePublishCandidate({
+  const result = gateWithReviewedClaims({
     row: baseRow({ kind: 'person', payload: { personReview: { approved: true } } }),
     releaseId: 'rel_seed_001',
     generatedAt: '2026-07-22T00:00:00.000Z',
@@ -235,7 +283,7 @@ test('gateLandscapePublishCandidate rejects incomplete personReview markers', ()
 });
 
 test('gateLandscapePublishCandidate rejects greenbook lane', () => {
-  const result = gateLandscapePublishCandidate({
+  const result = gateWithReviewedClaims({
     row: baseRow({ lane: 'greenbook' }),
     releaseId: 'rel_seed_001',
     generatedAt: '2026-07-22T00:00:00.000Z',
@@ -245,7 +293,7 @@ test('gateLandscapePublishCandidate rejects greenbook lane', () => {
 });
 
 test('gateLandscapePublishCandidate rejects already-in-public rows', () => {
-  const result = gateLandscapePublishCandidate({
+  const result = gateWithReviewedClaims({
     row: baseRow({ exact_in_release: true }),
     releaseId: 'rel_seed_001',
     generatedAt: '2026-07-22T00:00:00.000Z',
@@ -255,7 +303,7 @@ test('gateLandscapePublishCandidate rejects already-in-public rows', () => {
 });
 
 test('gateLandscapePublishCandidate allowRepublish lets an already-published row past already_in_public', () => {
-  const result = gateLandscapePublishCandidate({
+  const result = gateWithReviewedClaims({
     row: baseRow({ exact_in_release: true }),
     releaseId: 'rel_seed_001',
     generatedAt: '2026-07-22T00:00:00.000Z',
@@ -320,7 +368,7 @@ test('buildReleaseSourceFromLandscape keeps the single-claim shape for non-NRHP 
  * that put template-only records in front of readers — and the depth gate now holds it back.
  */
 test('gateLandscapePublishCandidate holds back a row whose only claim restates its summary', () => {
-  const result = gateLandscapePublishCandidate({
+  const result = gateWithReviewedClaims({
     row: baseRow(),
     releaseId: 'rel_seed_001',
     generatedAt: '2026-07-22T00:00:00.000Z',
@@ -333,7 +381,7 @@ test('gateLandscapePublishCandidate holds back a row whose only claim restates i
 });
 
 test('gateLandscapePublishCandidate holds back a generated NRHP template summary', () => {
-  const result = gateLandscapePublishCandidate({
+  const result = gateWithReviewedClaims({
     row: nrhpRow(),
     releaseId: 'rel_seed_001',
     generatedAt: '2026-07-22T00:00:00.000Z',
@@ -346,13 +394,11 @@ test('gateLandscapePublishCandidate holds back a generated NRHP template summary
 });
 
 /**
- * repo-63ka — the same template_only verdict as the test above, but the row also carries a
- * newer, unstaged WS4 draft (`enrichment_draft_unstaged`). The detail must say so: a caller
- * reading only "generated-template signature" cannot tell "no draft exists" from "a draft
- * exists but the bridge hasn't run" without this.
+ * Distinguishes an absent draft from a validated draft that has not been staged when reporting
+ * a template-only record.
  */
 test('template_only detail names an unstaged newer enrichment draft when one exists', () => {
-  const result = gateLandscapePublishCandidate({
+  const result = gateWithReviewedClaims({
     row: nrhpRow({ enrichment_draft_unstaged: true }),
     releaseId: 'rel_seed_001',
     generatedAt: '2026-07-22T00:00:00.000Z',
@@ -367,7 +413,7 @@ test('template_only detail names an unstaged newer enrichment draft when one exi
 
 /** The same rejection with no unstaged draft says nothing about one — the default (`undefined`) case. */
 test('template_only detail stays silent about a draft when none is unstaged', () => {
-  const result = gateLandscapePublishCandidate({
+  const result = gateWithReviewedClaims({
     row: nrhpRow(),
     releaseId: 'rel_seed_001',
     generatedAt: '2026-07-22T00:00:00.000Z',
@@ -377,9 +423,8 @@ test('template_only detail stays silent about a draft when none is unstaged', ()
 });
 
 /**
- * repo-b4ad — ADMISSION vs REGRESSION. All four tests below use the SAME shallow candidate, the
- * one the test directly above rejects. What changes is whether the record is already live and
- * what is published for it, because that is the only thing that should change the answer.
+ * Exercises depth admission and non-regression decisions using the same shallow candidate with
+ * different published-state inputs.
  */
 
 /** The live baseline: a shallow published row, the shape 2,360 live records are in. */
@@ -397,7 +442,7 @@ const deepLiveRow = () => ({
 });
 
 test('depth gate still rejects a shallow candidate for a record that is NOT live', () => {
-  const result = gateLandscapePublishCandidate({
+  const result = gateWithReviewedClaims({
     row: nrhpRow(),
     releaseId: 'rel_seed_001',
     generatedAt: '2026-07-22T00:00:00.000Z',
@@ -413,7 +458,7 @@ test('depth gate lets a corrected summary replace SHALLOW published prose', () =
   const liveDepth = assessLandscapeDepth(buildLiveDepthEntry(shallowLiveRow()), row);
   assert.equal(liveDepth.deep, false);
 
-  const result = gateLandscapePublishCandidate({
+  const result = gateWithReviewedClaims({
     row,
     releaseId: 'rel_seed_001',
     generatedAt: '2026-07-22T00:00:00.000Z',
@@ -428,7 +473,7 @@ test('depth gate refuses to replace DEEP published prose with a shallow candidat
   const liveDepth = assessLandscapeDepth(buildLiveDepthEntry(deepLiveRow()), row);
   assert.equal(liveDepth.deep, true);
 
-  const result = gateLandscapePublishCandidate({
+  const result = gateWithReviewedClaims({
     row,
     releaseId: 'rel_seed_001',
     generatedAt: '2026-07-22T00:00:00.000Z',
@@ -444,7 +489,7 @@ test('depth gate refuses to replace DEEP published prose with a shallow candidat
  * so forgetting to pass `liveDepth` cannot silently widen what publishes.
  */
 test('depth gate falls back to the strict admission test when live state is unknown', () => {
-  const result = gateLandscapePublishCandidate({
+  const result = gateWithReviewedClaims({
     row: nrhpRow({ exact_in_release: true }),
     releaseId: 'rel_seed_001',
     generatedAt: '2026-07-22T00:00:00.000Z',
@@ -455,11 +500,11 @@ test('depth gate falls back to the strict admission test when live state is unkn
 });
 
 /**
- * repo-8dlu — name_overlap, same admission/regression split. The overlap flag is identical in all
- * three cases; only whether the row is already live changes the answer.
+ * Name overlap blocks new admission but does not itself establish regression of an
+ * already-published record.
  */
 test('name_overlap still blocks a NEW candidate whose name collides with a live entity', () => {
-  const result = gateLandscapePublishCandidate({
+  const result = gateWithReviewedClaims({
     row: enrichedRow({ name_overlap: true }),
     releaseId: 'rel_seed_001',
     generatedAt: '2026-07-22T00:00:00.000Z',
@@ -469,7 +514,7 @@ test('name_overlap still blocks a NEW candidate whose name collides with a live 
 });
 
 test('name_overlap still blocks a colliding candidate that is NOT already live, even on a republish run', () => {
-  const result = gateLandscapePublishCandidate({
+  const result = gateWithReviewedClaims({
     row: enrichedRow({ name_overlap: true, exact_in_release: false }),
     releaseId: 'rel_seed_001',
     generatedAt: '2026-07-22T00:00:00.000Z',
@@ -480,7 +525,7 @@ test('name_overlap still blocks a colliding candidate that is NOT already live, 
 });
 
 test('name_overlap does not block an in-place correction of a row already live under its own id', () => {
-  const result = gateLandscapePublishCandidate({
+  const result = gateWithReviewedClaims({
     row: enrichedRow({ name_overlap: true, exact_in_release: true }),
     releaseId: 'rel_seed_001',
     generatedAt: '2026-07-22T00:00:00.000Z',
@@ -490,15 +535,8 @@ test('name_overlap does not block an in-place correction of a row already live u
 });
 
 /**
- * repo-n7p6.10 — `name_overlap` runs LAST, so the skip report names the binding constraint.
- *
- * Ranked ahead of the content gates it hid them. All 18 held nrhp-black-heritage candidates
- * reported `name_overlap` while every one of them was really a 319-392 character generated
- * template, short of the 400-character floor; the bead that measurement produced asked for a
- * human to adjudicate 99 name collisions that no adjudication could have unblocked.
- *
- * The rows below are the two shapes that mattered in that measurement: a short NRHP template and
- * a row with no coordinates, each also carrying the overlap flag.
+ * Report content and location blockers before name overlap so the reason identifies the first
+ * actionable constraint.
  */
 const shortNrhpTemplateRow = (overrides: Partial<LandscapePublishRow> = {}): LandscapePublishRow =>
   nrhpRow({
@@ -519,7 +557,7 @@ test('a name-overlapping candidate that is also too short reports the length, no
   const length = row.summary!.length;
   assert.ok(length >= 319 && length <= 392, `fixture must sit in the measured band, got ${length}`);
 
-  const result = gateLandscapePublishCandidate({
+  const result = gateWithReviewedClaims({
     row,
     releaseId: 'rel_seed_001',
     generatedAt: '2026-07-22T00:00:00.000Z',
@@ -530,7 +568,7 @@ test('a name-overlapping candidate that is also too short reports the length, no
 });
 
 test('a name-overlapping candidate with no coordinates reports the missing location', () => {
-  const result = gateLandscapePublishCandidate({
+  const result = gateWithReviewedClaims({
     row: enrichedRow({ name_overlap: true, lat: null, lng: null }),
     releaseId: 'rel_seed_001',
     generatedAt: '2026-07-22T00:00:00.000Z',
@@ -540,14 +578,14 @@ test('a name-overlapping candidate with no coordinates reports the missing locat
 });
 
 test('the collision is still what blocks a candidate that is otherwise publish-ready', () => {
-  const clean = gateLandscapePublishCandidate({
+  const clean = gateWithReviewedClaims({
     row: enrichedRow({ name_overlap: false }),
     releaseId: 'rel_seed_001',
     generatedAt: '2026-07-22T00:00:00.000Z',
   });
   assert.equal(clean.eligible, true, 'the fixture must clear every other gate');
 
-  const colliding = gateLandscapePublishCandidate({
+  const colliding = gateWithReviewedClaims({
     row: enrichedRow({ name_overlap: true }),
     releaseId: 'rel_seed_001',
     generatedAt: '2026-07-22T00:00:00.000Z',
@@ -556,10 +594,12 @@ test('the collision is still what blocks a candidate that is otherwise publish-r
   if (!colliding.eligible) assert.equal(colliding.reason, 'name_overlap');
 });
 
-/** A republish admitted by the regression clause must still read as thin (repo-vymq). */
+/**
+ * A republished shallow record must retain its thin-evidence disclosure.
+ */
 test('a regression-clause republish publishes researchCoverage=minimal', () => {
   const row = nrhpRow({ exact_in_release: true });
-  const result = gateLandscapePublishCandidate({
+  const result = gateWithReviewedClaims({
     row,
     releaseId: 'rel_seed_001',
     generatedAt: '2026-07-22T00:00:00.000Z',
@@ -663,8 +703,7 @@ test('buildReleaseSourceFromLandscape carries enrichment historicalContext onto 
 });
 
 test('buildReleaseSourceFromLandscape carries enrichment topicIds/eraBuckets/keywords onto the entry', () => {
-  // Same passthrough gap as historicalContext, for the rest of the WS4 (repo-n7p6.4) harness's
-  // output — never wired in before because nothing wrote these fields onto a landscape row.
+  // Preserve every supported enrichment output field through the publication adapter.
   const entry = buildReleaseSourceFromLandscape(
     enrichedRow({
       payload: {
@@ -682,9 +721,7 @@ test('buildReleaseSourceFromLandscape carries enrichment topicIds/eraBuckets/key
 });
 
 test('buildReleaseSourceFromLandscape carries payload.mentionedEntityIds onto the entry', () => {
-  // A cohort-adopted seed record's related entity ids have to survive a republish the same way
-  // topicIds/keywords do, or adopting the row silently drops them (repo-n7p6, mentionedEntityIds
-  // used to be hardcoded to []).
+  // Preserve related entity identifiers when adopting or republishing a cohort record.
   const entry = buildReleaseSourceFromLandscape(
     enrichedRow({
       payload: {
@@ -730,7 +767,7 @@ test('incrementalPublishProvenancePatch records publish metadata', () => {
   assert.ok(typeof patch.incremental_publish === 'string');
 });
 
-test('parseCanonicalStatusSnapshot maps bb_canonical row fields', () => {
+test('parseCanonicalStatusSnapshot maps canonical row fields', () => {
   const snapshot = parseCanonicalStatusSnapshot({
     entity_id: 'ent-1',
     living_status: 'deceased',
@@ -787,7 +824,7 @@ test('visitOverrideFromCanonicalRow returns undefined when canonical has no visi
 /**
  * A lane republish rebuilds `ReleaseSourceEntity` from the landscape row alone, which
  * never carries phone/website/hours/street — that data lives only in
- * `bb_canonical.entity_visit`/`entity_locations`. Before `visitOverride` was threaded through the
+ * `canonical.entity_visit`/`entity_locations`. Before `visitOverride` was threaded through the
  * gate and the artifact build, a republish of an already-live, already-enriched record silently
  * dropped that block; this proves the same republish now carries it through when the caller
  * supplies the canonical visit row it loaded, and confirms it does NOT appear without one.
@@ -797,7 +834,7 @@ test('a lane republish preserves phone/website/hours/street via visitOverride fr
   const visitOverride = visitOverrideFromCanonicalRow(row, canonicalVisitRow());
   assert.ok(visitOverride);
 
-  const gateWithoutOverride = gateLandscapePublishCandidate({
+  const gateWithoutOverride = gateWithReviewedClaims({
     row,
     releaseId: 'rel_seed_001',
     generatedAt: '2026-07-22T00:00:00.000Z',
@@ -815,7 +852,7 @@ test('a lane republish preserves phone/website/hours/street via visitOverride fr
   // Confirms the bug this fixes: the landscape row alone rebuilds no visit block at all.
   assert.equal((builtWithoutOverride.entityRow.projection as { visit?: unknown }).visit, undefined);
 
-  const gateWithOverride = gateLandscapePublishCandidate({
+  const gateWithOverride = gateWithReviewedClaims({
     row,
     releaseId: 'rel_seed_001',
     generatedAt: '2026-07-22T00:00:00.000Z',
@@ -858,7 +895,7 @@ test('buildArtifactsForEntry publishes canonical deceased even when personReview
       },
     },
   });
-  const gate = gateLandscapePublishCandidate({
+  const gate = gateWithReviewedClaims({
     row: reviewed,
     releaseId: 'rel_seed_001',
     generatedAt: '2026-07-22T00:00:00.000Z',
@@ -878,7 +915,7 @@ test('buildArtifactsForEntry publishes canonical deceased even when personReview
 });
 
 test('toReleaseEntityRow normalizes empty related to array', () => {
-  const result = gateLandscapePublishCandidate({
+  const result = gateWithReviewedClaims({
     row: enrichedRow(),
     releaseId: 'rel_seed_001',
     generatedAt: '2026-07-22T00:00:00.000Z',
@@ -921,11 +958,8 @@ test('canonicalUpsertParamsFromLandscape maps personReview livingStatus', () => 
 });
 
 /**
- * repo-fbjr — the documents the sweep actually read become claims that cite them.
- *
- * Before this, an enriched record published citing only its registry index row: the nomination
- * form every sentence came from appeared nowhere in the projection, so the depth gate saw no
- * evidence beyond the index and researchCoverage counted one document for a researched record.
+ * Published citations must include the documents used by the enrichment draft, not only its
+ * discovery registry.
  */
 test('buildReleaseSourceFromLandscape cites the evidence documents an enriched record was written from', () => {
   const entry = buildReleaseSourceFromLandscape(
@@ -975,10 +1009,8 @@ test('buildReleaseSourceFromLandscape cites the evidence documents an enriched r
   );
   assert.equal(nomination!.predicate, 'source states');
   assert.ok(wiki);
-  // Not 'medium'. Wikipedia does not corroborate at all — `claim-corroborate` puts a Wikipedia
-  // claim at `low`, and the record tier drops its lineage from the corroborating count outright.
-  // The old expectation here said "tier2 corroborates", which is the belief that carried 335
-  // records to grade A (repo-goyut, repo-hqwt9).
+  // Wikipedia-only evidence is low and does not add an independently corroborating lineage to
+  // the record grade.
   assert.equal(wiki!.confidenceLevel, 'low', 'Wikipedia carries a claim, it does not corroborate');
 });
 
@@ -1137,277 +1169,6 @@ test('gateLandscapePublishCandidate admits a null-context record that cites a re
 });
 
 /**
- * A landscape row from a research case whose canonical document (nps.gov) is also the
- * provenance `sourceUrl` — the shape a research-case promotion produces when the canonical link
- * IS the source the record was built from. `corroboratingSourcesForLandscape` no longer deletes
- * that URL out of the corroboration pool it just built.
- */
-const researchCaseRow = (overrides: Partial<LandscapePublishRow> = {}): LandscapePublishRow =>
-  baseRow({
-    id: 'ent_research_case_probe',
-    lane: 'research-cases',
-    display_name: 'Nicodemus AME Church',
-    summary:
-      'Nicodemus AME Church is a historic congregation in Nicodemus, Kansas, documented by the ' +
-      'National Park Service as part of the Nicodemus National Historic Site. The congregation ' +
-      'was organized by formerly enslaved settlers who founded the town in 1877, and the church ' +
-      'building itself has stood as a landmark of the settlement since the nineteenth century. ' +
-      'A roadside historical marker placed by the local historical society also records the ' +
-      "congregation's founding and its role in the town's early religious life, noting that the " +
-      'building has hosted continuous worship since its construction.',
-    lat: 39.75,
-    lng: -99.62,
-    canonical_url: 'https://www.nps.gov/nico/learn/historyculture/ame-church.htm',
-    provenance: { sourceUrl: 'https://www.nps.gov/nico/learn/historyculture/ame-church.htm' },
-    payload: {},
-    ...overrides,
-  });
-
-/**
- * repo defect fix: a claim built from a second document (the marker database) used to lose the
- * record's own canonical government page from its corroboration set, because
- * `corroboratingSourcesForLandscape` deleted `canonical_url` out of the pool it had just built —
- * a second self-corroboration guard on top of the per-claim filter `minClaimConfidence` already
- * applies. Measured live on ent_research_case_20260902_nicodemus-ame-church: canonical nps.gov +
- * evidence hmdb.org + wikipedia scored 0.720 (below the 0.75 floor) because the hmdb claim's only
- * remaining corroborator was the Wikipedia bridge, which counts zero lineages. With the canonical
- * document back in the pool, the same claim is corroborated by a second real authority
- * (national-park-service) and clears the floor.
- */
-test("gateLandscapePublishCandidate: a claim from a second document is corroborated by the record's own canonical government page", () => {
-  const row = researchCaseRow({
-    payload: {
-      evidenceCitations: [
-        {
-          sourceUrl: 'https://www.hmdb.org/m.asp?m=12345',
-          title: 'Nicodemus AME Church historical marker',
-          sourceTier: 'tier2',
-          quote: 'the congregation organized this church soon after the town was founded in 1877',
-        },
-      ],
-    },
-  });
-  const result = gateLandscapePublishCandidate({
-    row,
-    releaseId: 'rel_test',
-    generatedAt: '2026-09-09T00:00:00.000Z',
-  });
-  assert.equal(result.eligible, true);
-  if (!result.eligible) return;
-  assert.ok(
-    result.confidence >= INCREMENTAL_PUBLISH_CONFIDENCE_FLOOR,
-    `expected confidence >= floor, got ${result.confidence}`,
-  );
-  assert.equal(result.confidence, 0.8);
-});
-
-/**
- * A canonical page and its only evidence citation from the SAME authority (two different
- * hmdb.org marker pages) still collapse onto one lineage — `resolveSourceLineage` groups by
- * issuing authority, not by exact URL, so this is unaffected by removing the delete guard. A
- * record with two pages from one institution gains nothing from counting both.
- */
-test('gateLandscapePublishCandidate: canonical and evidence from the same authority still fail the floor (one lineage)', () => {
-  const row = researchCaseRow({
-    canonical_url: 'https://www.hmdb.org/m.asp?m=11111',
-    provenance: { sourceUrl: 'https://www.hmdb.org/m.asp?m=11111' },
-    payload: {
-      evidenceCitations: [
-        {
-          sourceUrl: 'https://www.hmdb.org/m.asp?m=12345',
-          title: 'Nicodemus AME Church historical marker',
-          sourceTier: 'tier2',
-          quote: 'the congregation organized this church soon after the town was founded in 1877',
-        },
-      ],
-    },
-  });
-  const result = gateLandscapePublishCandidate({
-    row,
-    releaseId: 'rel_test',
-    generatedAt: '2026-09-09T00:00:00.000Z',
-  });
-  assert.equal(result.eligible, false);
-  if (result.eligible) return;
-  assert.equal(result.reason, 'confidence_below_floor');
-  assert.equal(result.detail, 'confidence 0.707 < floor 0.75');
-});
-
-/**
- * repo-2t04.17 — ADMISSION vs REGRESSION for confidence, same shape as the depth clause above.
- * Reuses the exact fixture from the test just above (0.7067, below the 0.75 floor) so the only
- * variable across these four tests is whether/what live state is supplied.
- */
-test('confidence gate still rejects a low-scoring candidate for a record that is NOT live', () => {
-  const row = researchCaseRow({
-    canonical_url: 'https://www.hmdb.org/m.asp?m=11111',
-    provenance: { sourceUrl: 'https://www.hmdb.org/m.asp?m=11111' },
-    payload: {
-      evidenceCitations: [
-        {
-          sourceUrl: 'https://www.hmdb.org/m.asp?m=12345',
-          title: 'Nicodemus AME Church historical marker',
-          sourceTier: 'tier2',
-          quote: 'the congregation organized this church soon after the town was founded in 1877',
-        },
-      ],
-    },
-  });
-  const result = gateLandscapePublishCandidate({
-    row,
-    releaseId: 'rel_test',
-    generatedAt: '2026-09-09T00:00:00.000Z',
-    allowRepublish: true,
-    liveConfidence: 0.72, // irrelevant — row.exact_in_release is false, so this is not a republish
-  });
-  assert.equal(result.eligible, false);
-  if (!result.eligible) assert.equal(result.reason, 'confidence_below_floor');
-});
-
-test('confidence gate lets a candidate that scores no worse replace an already-live record below the floor', () => {
-  const row = researchCaseRow({
-    canonical_url: 'https://www.hmdb.org/m.asp?m=11111',
-    provenance: { sourceUrl: 'https://www.hmdb.org/m.asp?m=11111' },
-    exact_in_release: true,
-    payload: {
-      evidenceCitations: [
-        {
-          sourceUrl: 'https://www.hmdb.org/m.asp?m=12345',
-          title: 'Nicodemus AME Church historical marker',
-          sourceTier: 'tier2',
-          quote: 'the congregation organized this church soon after the town was founded in 1877',
-        },
-      ],
-    },
-  });
-  const result = gateLandscapePublishCandidate({
-    row,
-    releaseId: 'rel_test',
-    generatedAt: '2026-09-09T00:00:00.000Z',
-    allowRepublish: true,
-    liveConfidence: 0.7067, // what is currently public scores the same — not a regression
-  });
-  assert.equal(result.eligible, true);
-});
-
-test('confidence gate refuses to replace an already-live record with a candidate that scores WORSE', () => {
-  const row = researchCaseRow({
-    canonical_url: 'https://www.hmdb.org/m.asp?m=11111',
-    provenance: { sourceUrl: 'https://www.hmdb.org/m.asp?m=11111' },
-    exact_in_release: true,
-    payload: {
-      evidenceCitations: [
-        {
-          sourceUrl: 'https://www.hmdb.org/m.asp?m=12345',
-          title: 'Nicodemus AME Church historical marker',
-          sourceTier: 'tier2',
-          quote: 'the congregation organized this church soon after the town was founded in 1877',
-        },
-      ],
-    },
-  });
-  const result = gateLandscapePublishCandidate({
-    row,
-    releaseId: 'rel_test',
-    generatedAt: '2026-09-09T00:00:00.000Z',
-    allowRepublish: true,
-    liveConfidence: 0.8, // what is currently public already clears the floor
-  });
-  assert.equal(result.eligible, false);
-  if (!result.eligible) assert.equal(result.reason, 'confidence_below_floor');
-});
-
-/**
- * The fail-closed default. A caller that never loaded live state gets the strict admission test,
- * so forgetting to pass `liveConfidence` cannot silently widen what publishes — same guarantee
- * `liveDepth`'s omission gives above.
- */
-test('confidence gate falls back to the strict admission test when live confidence is unknown', () => {
-  const row = researchCaseRow({
-    canonical_url: 'https://www.hmdb.org/m.asp?m=11111',
-    provenance: { sourceUrl: 'https://www.hmdb.org/m.asp?m=11111' },
-    exact_in_release: true,
-    payload: {
-      evidenceCitations: [
-        {
-          sourceUrl: 'https://www.hmdb.org/m.asp?m=12345',
-          title: 'Nicodemus AME Church historical marker',
-          sourceTier: 'tier2',
-          quote: 'the congregation organized this church soon after the town was founded in 1877',
-        },
-      ],
-    },
-  });
-  const result = gateLandscapePublishCandidate({
-    row,
-    releaseId: 'rel_test',
-    generatedAt: '2026-09-09T00:00:00.000Z',
-    allowRepublish: true,
-  });
-  assert.equal(result.eligible, false);
-  if (!result.eligible) assert.equal(result.reason, 'confidence_below_floor');
-});
-
-/**
- * `liveClaimConfidence` must score the SAME evidence the same way `minClaimConfidence` does for a
- * candidate — otherwise a depth verdict and a confidence verdict on one live row could disagree
- * with what that row would score as a fresh candidate. Reuses the claims `buildReleaseSourceFromLandscape`
- * produces for the 0.7067 fixture above, repackaged as a `LivePublishedRow`.
- */
-test('liveClaimConfidence scores a live row the same way a candidate with identical evidence would score', () => {
-  const row = researchCaseRow({
-    canonical_url: 'https://www.hmdb.org/m.asp?m=11111',
-    provenance: { sourceUrl: 'https://www.hmdb.org/m.asp?m=11111' },
-    payload: {
-      evidenceCitations: [
-        {
-          sourceUrl: 'https://www.hmdb.org/m.asp?m=12345',
-          title: 'Nicodemus AME Church historical marker',
-          sourceTier: 'tier2',
-          quote: 'the congregation organized this church soon after the town was founded in 1877',
-        },
-      ],
-    },
-  });
-  const entry = buildReleaseSourceFromLandscape(row);
-  assert.ok(entry);
-  const liveRow = { summary: row.summary, claims: entry!.claims, projection: {} };
-  assert.equal(liveClaimConfidence(liveRow), 0.7067);
-});
-
-test('liveClaimConfidence returns 0 for a live row with no claims, never undefined or NaN', () => {
-  assert.equal(liveClaimConfidence({ summary: 'x', claims: [], projection: {} }), 0);
-});
-
-/**
- * A row with only its own canonical citation — no evidence documents, no duplicated sourceUrl to
- * corroborate from — is unaffected by removing the delete guard: `minClaimConfidence` already
- * filters a claim's own citationHref out of its corroboration sources
- * (`.filter((url) => url !== citationHref)`), so the index claim never counted itself before this
- * fix and does not start counting itself now. Depth is cleared here via `historicalContext`
- * rather than a second document, since a canonical-only row has no independent source.
- */
-test('gateLandscapePublishCandidate: the index claim still does not count itself (canonical only)', () => {
-  const row = researchCaseRow({
-    provenance: {},
-    payload: {
-      historicalContext:
-        'The congregation organized this church soon after formerly enslaved settlers founded ' +
-        'Nicodemus in 1877.',
-    },
-  });
-  const result = gateLandscapePublishCandidate({
-    row,
-    releaseId: 'rel_test',
-    generatedAt: '2026-09-09T00:00:00.000Z',
-  });
-  assert.equal(result.eligible, true);
-  if (!result.eligible) return;
-  // Unchanged from before the fix: a lone government citation, one lineage, no corroborator.
-  assert.equal(result.confidence, 0.7733);
-});
-
-/**
  * The writer/reader round-trip for `search_index.facets`.
  *
  * This test exists because the two halves drifted apart silently. `toSearchIndexRow` carried five
@@ -1421,7 +1182,7 @@ test('gateLandscapePublishCandidate: the index claim still does not count itself
  * key added to `mapPostgresSearchIndexRow` and not to `toSearchIndexRow` should fail here.
  */
 test('toSearchIndexRow: facets survive a round-trip through the search-doc reader', () => {
-  const gate = gateLandscapePublishCandidate({
+  const gate = gateWithReviewedClaims({
     row: enrichedRow(),
     releaseId: 'rel_seed_001',
     generatedAt: '2026-07-22T00:00:00.000Z',
@@ -1502,14 +1263,8 @@ test('toSearchIndexRow: an empty jurisdiction omits the facet rather than blanki
 });
 
 /*
- * repo-lai8y: the location gate's ADMISSION vs REGRESSION clause.
- *
- * `curatedLiveRow` is shaped on the real cohort this was written for — the curated one-off
- * entities (gap_*, ent_*) that were never geocoded. Measured on all 57 of them in the active
- * release: the landscape row carries null lat/lng and no place field of any kind (no geocode, no
- * historicAddress, no sourceCity/sourceState), while the live record publishes a real point, a
- * real precision tier, and real place prose. `baseRow` is the opposite case and stays the default:
- * it carries coordinates AND a full historicAddress/city/state provenance.
+ * Exercises location inheritance from an existing public record when the staging candidate
+ * lacks coordinates. Retain the published point, precision and location description together.
  */
 const curatedRow = (overrides: Partial<LandscapePublishRow> = {}): LandscapePublishRow => ({
   id: 'gap_boston_african_american_nhs',
@@ -1600,7 +1355,7 @@ test('liveLocationFromRow offers nothing for a live row with no usable point', (
 });
 
 test('location gate still rejects a coordinate-less NEW candidate', () => {
-  const result = gateLandscapePublishCandidate({
+  const result = gateWithReviewedClaims({
     row: curatedRow({ exact_in_release: false }),
     releaseId: 'rel_seed_001',
     generatedAt: '2026-09-12T00:00:00.000Z',
@@ -1610,7 +1365,7 @@ test('location gate still rejects a coordinate-less NEW candidate', () => {
 });
 
 test('location gate rejects a coordinate-less row that is not live under its own id', () => {
-  const result = gateLandscapePublishCandidate({
+  const result = gateWithReviewedClaims({
     row: curatedRow({ exact_in_release: false }),
     releaseId: 'rel_seed_001',
     generatedAt: '2026-09-12T00:00:00.000Z',
@@ -1626,7 +1381,7 @@ test('location gate rejects a coordinate-less row that is not live under its own
 });
 
 test('location gate fails closed when the caller loaded no live location', () => {
-  const result = gateLandscapePublishCandidate({
+  const result = gateWithReviewedClaims({
     row: curatedRow(),
     releaseId: 'rel_seed_001',
     generatedAt: '2026-09-12T00:00:00.000Z',
@@ -1637,7 +1392,7 @@ test('location gate fails closed when the caller loaded no live location', () =>
 });
 
 test('republish keeps the location an already-live record publishes today', () => {
-  const result = gateLandscapePublishCandidate({
+  const result = gateWithReviewedClaims({
     row: curatedRow(),
     releaseId: 'rel_seed_001',
     generatedAt: '2026-09-12T00:00:00.000Z',
@@ -1670,7 +1425,7 @@ test('republish keeps the location an already-live record publishes today', () =
 });
 
 test('an inherited point does not overwrite place prose the landscape row supplies', () => {
-  const result = gateLandscapePublishCandidate({
+  const result = gateWithReviewedClaims({
     row: curatedRow({
       provenance: {
         historicAddress: '46 Joy Street',
@@ -1701,7 +1456,7 @@ test('an inherited point does not overwrite place prose the landscape row suppli
 });
 
 test('a row with its own coordinates ignores the live location entirely', () => {
-  const result = gateLandscapePublishCandidate({
+  const result = gateWithReviewedClaims({
     row: enrichedRow({ exact_in_release: true }),
     releaseId: 'rel_seed_001',
     generatedAt: '2026-09-12T00:00:00.000Z',
@@ -1715,7 +1470,7 @@ test('a row with its own coordinates ignores the live location entirely', () => 
 });
 
 test('an inherited location survives the real build, matchMethod included', () => {
-  const gate = gateLandscapePublishCandidate({
+  const gate = gateWithReviewedClaims({
     row: curatedRow(),
     releaseId: 'rel_seed_001',
     generatedAt: '2026-09-12T00:00:00.000Z',
@@ -1759,7 +1514,7 @@ test('an inherited location survives the real build, matchMethod included', () =
 });
 
 test('the build a republish writes is the build the gate approved', () => {
-  const gate = gateLandscapePublishCandidate({
+  const gate = gateWithReviewedClaims({
     row: curatedRow(),
     releaseId: 'rel_seed_001',
     generatedAt: '2026-09-12T00:00:00.000Z',
@@ -1803,7 +1558,7 @@ test('a live location whose tier was reduced by a sensitivity rule is not inheri
       'own output back would republish the tier with the reason code silently dropped',
   );
 
-  const result = gateLandscapePublishCandidate({
+  const result = gateWithReviewedClaims({
     row: curatedRow(),
     releaseId: 'rel_seed_001',
     generatedAt: '2026-09-12T00:00:00.000Z',
@@ -1818,7 +1573,7 @@ test('a live location whose tier was reduced by a sensitivity rule is not inheri
 });
 
 test('a state without a city does not overwrite the city the live record prints', () => {
-  const result = gateLandscapePublishCandidate({
+  const result = gateWithReviewedClaims({
     row: curatedRow({ provenance: { sourceState: 'MA' } }),
     releaseId: 'rel_seed_001',
     generatedAt: '2026-09-12T00:00:00.000Z',
@@ -1837,7 +1592,7 @@ test('a state without a city does not overwrite the city the live record prints'
 });
 
 test('a city named by the landscape row wins over the live jurisdiction', () => {
-  const result = gateLandscapePublishCandidate({
+  const result = gateWithReviewedClaims({
     row: curatedRow({ provenance: { sourceCity: 'Cambridge', sourceState: 'MA' } }),
     releaseId: 'rel_seed_001',
     generatedAt: '2026-09-12T00:00:00.000Z',
@@ -1854,18 +1609,9 @@ test('a city named by the landscape row wins over the live jurisdiction', () => 
 });
 
 /*
- * repo-fz6k0: the same curated cohort, one gate earlier.
- *
- * A curated record is not in any registry, so it has no canonical_url — and an empty
- * canonical_url alone used to make `buildReleaseSourceFromLandscape` return null, which the gate
- * reports as `missing_canonical_url`. The 24 live coverage-gap drafts were held there with their
- * corrected summaries staged and their evidence citations sitting unread on the row. These rows
- * publish the evidence they actually have, and a row with no source of any kind still skips.
- *
- * `curatedRow`'s own payload (historicalContext + confidence 0.82) is replaced here on purpose:
- * the real cohort has neither, so depth has to come from the evidence claim being independent of
- * a registry document there isn't one of, and confidence comes from the claims — 0.627 against a
- * 0.75 floor, admitted only by the repo-2t04.17 regression clause, exactly as it does live.
+ * A curated record can use its own cited evidence without a registry canonical_url. It still
+ * needs reviewed claim assessments and the publication floor; a source-free row remains
+ * blocked.
  */
 const curatedEvidencePayload = {
   evidenceCitations: [
@@ -1879,13 +1625,12 @@ const curatedEvidencePayload = {
 };
 
 test('a curated row with no canonical_url publishes its evidence claim instead of skipping', () => {
-  const result = gateLandscapePublishCandidate({
+  const result = gateWithReviewedClaims({
     row: curatedRow({ canonical_url: null, payload: curatedEvidencePayload }),
     releaseId: 'rel_seed_001',
     generatedAt: '2026-09-12T00:00:00.000Z',
     allowRepublish: true,
     liveLocation: curatedLiveLocation(),
-    liveConfidence: 0.5,
   });
   assert.equal(result.eligible, true);
   if (!result.eligible) return;
@@ -1907,13 +1652,12 @@ test('a curated row with no canonical_url publishes its evidence claim instead o
 });
 
 test('a row with no canonical_url and no evidence citation still reports missing_canonical_url', () => {
-  const result = gateLandscapePublishCandidate({
+  const result = gateWithReviewedClaims({
     row: curatedRow({ canonical_url: null, payload: {} }),
     releaseId: 'rel_seed_001',
     generatedAt: '2026-09-12T00:00:00.000Z',
     allowRepublish: true,
     liveLocation: curatedLiveLocation(),
-    liveConfidence: 0.5,
   });
   assert.equal(result.eligible, false);
   assert.equal(result.eligible === false && result.reason, 'missing_canonical_url');
@@ -1923,7 +1667,7 @@ test('a row whose every evidence citation is unusable fails closed rather than p
   // The cheap pre-check passes (a url string and a quote are both present) and the citation is
   // then dropped as unparseable, leaving an empty claims array. Without the fail-closed guard
   // after the evidence loop this row would publish asserting nothing and citing nothing.
-  const result = gateLandscapePublishCandidate({
+  const result = gateWithReviewedClaims({
     row: curatedRow({
       canonical_url: null,
       payload: { evidenceCitations: [{ sourceUrl: 'not a url', title: 'x', quote: 'something' }] },
@@ -1932,7 +1676,6 @@ test('a row whose every evidence citation is unusable fails closed rather than p
     generatedAt: '2026-09-12T00:00:00.000Z',
     allowRepublish: true,
     liveLocation: curatedLiveLocation(),
-    liveConfidence: 0.5,
   });
   assert.equal(result.eligible, false);
   assert.equal(result.eligible === false && result.reason, 'missing_canonical_url');
@@ -1965,10 +1708,8 @@ test('a row WITH a canonical_url still leads with its record_index claim', () =>
 });
 
 /*
- * repo-ttlce. `topics` was written with `topicTags ?? topicIds ?? []`, which falls through only on
- * nullish — so a build carrying `topicTags: []` and real `topicIds` wrote an EMPTY topics column
- * while its projection kept the ids. That is the whole of repo-p1m1y: 1,729 live rows invisible to
- * topic browse and topic filters with nothing in the projection to show for it.
+ * An empty topicTags array must fall back to nonempty topicIds. Nullish coalescing alone cannot
+ * implement that rule.
  */
 const searchFields = (overrides: Record<string, unknown> = {}) => ({
   releaseId: 'rel_seed_001',
@@ -2039,14 +1780,9 @@ test('toSearchIndexRow agrees with the invariant the divergence audit measures a
 });
 
 /*
- * repo-ttlce. The publisher's post-apply divergence check is now FATAL, and that only makes sense
- * if a freshly built row is self-consistent across all three stores. Nothing asserted that: the
- * check has only ever run against a live database, so the flip rested on inference.
- *
- * This feeds the two row builders' own output into the same `divergentFieldsForRow` the publisher
- * calls, shaped as the row `PROJECTION_DIVERGENCE_SQL` would return. If a builder and the audit
- * ever disagree about where a fact lives, this fails here instead of aborting a publish that has
- * already committed.
+ * Feeds freshly built projection and search rows through the publisher's divergence checker.
+ * Builder output must agree before persistence; a recording test does not replace the live
+ * post-write check.
  */
 const divergenceRowFromBuild = (built: {
   readonly entityRow: ReturnType<typeof toReleaseEntityRow>;
@@ -2094,7 +1830,7 @@ const divergenceRowFromBuild = (built: {
 };
 
 test('a freshly built row does not diverge from its own projection', () => {
-  const gate = gateLandscapePublishCandidate({
+  const gate = gateWithReviewedClaims({
     row: enrichedRow(),
     releaseId: 'rel_seed_001',
     generatedAt: '2026-09-12T00:00:00.000Z',
@@ -2155,7 +1891,7 @@ test('the round-trip check would catch a topics writer that drops real topics', 
   );
 });
 
-// --- repo-cjlkp: a republish may not shrink a record's published evidence ---------------------
+// Republishing must not silently shrink published evidence.
 
 const LIVE_CLAIM = {
   id: 'claim_gap_tulsa_race_massacre_01',
@@ -2273,28 +2009,9 @@ test('the regression control fires when the union is bypassed', () => {
 });
 
 /*
- * repo-vj7cs — a withdrawn record must not come back on the next rebuild.
- *
- * Three records were withdrawn from the active release under owner rulings on 2026-09-13:
- * sundown_crescent_springs_kentucky and nrhp-black-heritage-08000095 (repo-eh9cp / repo-n09b),
- * then sundown_st_john_missouri (repo-tdffc). Each withdrawal deleted the record's
- * bb_public.release_entities + search_index rows and recorded the reason in
- * bb_ops.catalog_decisions. All three still exist in bb_canonical by design — the ruling was
- * "unpublish, do not delete the research."
- *
- * That left the withdrawal holding only until something rebuilt release_entities, and this
- * publisher is the only thing that inserts into it. So these tests use the real withdrawn ids,
- * each row in the ENRICHED state that would actually reach the publisher: a summary inside the
- * current editorial band, plus written historical context. A bare registry row is held back by
- * the depth and length gates for reasons that have nothing to do with the ruling, and a test
- * leaning on those would pass while proving nothing.
- *
- * Two caveats a later reader should not have to rediscover. The sundown records carry no
- * bb_research.landscape_candidates row today, so `sundown-towns` is a stand-in lane name for the
- * shape a future rebuild would present, not a lane that exists. And the NRHP row's live summary
- * is currently 246 characters, below the publisher's floor, so that record cannot resurrect
- * through this path until an enrichment pass lengthens it — which is a timing accident, not a
- * second gate, and exactly the kind of thing this test exists to stop depending on.
+ * A standing withdrawal decision blocks republishing even when canonical research and a fully
+ * enriched candidate remain. Tests must use otherwise-eligible candidates so unrelated quality
+ * failures cannot mask a missing withdrawal gate.
  */
 /**
  * Prose long enough to clear the editorial band the publisher enforces, hedged and attributed the
@@ -2404,7 +2121,7 @@ const decisionFor = (row: CatalogDecisionRow): PublishCatalogDecision => {
  */
 test('the three records withdrawn on 2026-09-13 are otherwise publishable', () => {
   for (const row of WITHDRAWN_ROWS) {
-    const result = gateLandscapePublishCandidate({
+    const result = gateWithReviewedClaims({
       row,
       releaseId: 'rel_seed_001',
       generatedAt: '2026-09-13T00:00:00.000Z',
@@ -2415,7 +2132,7 @@ test('the three records withdrawn on 2026-09-13 are otherwise publishable', () =
 
 test('an open flag_for_retraction keeps a withdrawn record out of a rebuild', () => {
   for (const row of WITHDRAWN_ROWS) {
-    const result = gateLandscapePublishCandidate({
+    const result = gateWithReviewedClaims({
       row,
       releaseId: 'rel_seed_001',
       generatedAt: '2026-09-13T00:00:00.000Z',
@@ -2440,7 +2157,7 @@ test('an open flag_for_retraction keeps a withdrawn record out of a rebuild', ()
  */
 test('the withdrawal ruling outranks the editorial gates that would also skip the record', () => {
   const row = { ...WITHDRAWN_ROWS[2]!, summary: 'Too short to publish on its own.' };
-  const withoutDecision = gateLandscapePublishCandidate({
+  const withoutDecision = gateWithReviewedClaims({
     row,
     releaseId: 'rel_seed_001',
     generatedAt: '2026-09-13T00:00:00.000Z',
@@ -2450,7 +2167,7 @@ test('the withdrawal ruling outranks the editorial gates that would also skip th
   assert.equal(withoutDecision.eligible, false);
   assert.equal(withoutDecision.eligible === false && withoutDecision.reason, 'summary_too_short');
 
-  const withDecision = gateLandscapePublishCandidate({
+  const withDecision = gateWithReviewedClaims({
     row,
     releaseId: 'rel_seed_001',
     generatedAt: '2026-09-13T00:00:00.000Z',
@@ -2484,7 +2201,7 @@ test('buildArtifactsForEntry refuses to build rows for a withdrawn record', () =
 test('a lifted or advisory decision does not block a republish', () => {
   const row = WITHDRAWN_ROWS[0]!;
   for (const decision of ['clear_flag', 'needs_review'] as const) {
-    const result = gateLandscapePublishCandidate({
+    const result = gateWithReviewedClaims({
       row,
       releaseId: 'rel_seed_001',
       generatedAt: '2026-09-13T00:00:00.000Z',
@@ -2499,7 +2216,7 @@ test('catalogDecisionFromRow reads the standing verdict and refuses to guess', (
     action: 'flag_for_retraction',
     reason: 'repo-eh9cp: owner ruling 2026-09-12',
   });
-  // `reason` is nullable in bb_ops.catalog_decisions; an absent one must not become "null".
+  // `reason` is nullable in ops.catalog_decisions; an absent one must not become "null".
   assert.deepEqual(catalogDecisionFromRow({ ...RETRACTION, reason: null }), {
     action: 'flag_for_retraction',
     reason: '',
@@ -2507,4 +2224,53 @@ test('catalogDecisionFromRow reads the standing verdict and refuses to guess', (
   assert.equal(catalogDecisionFromRow(undefined), undefined);
   assert.equal(catalogDecisionFromRow(null), undefined);
   assert.equal(catalogDecisionFromRow({ ...RETRACTION, decision: 'retract_maybe' }), undefined);
+});
+
+test('model self-confidence and entity-wide citations cannot bypass claim review, even on republish', () => {
+  const row = enrichedRow({
+    exact_in_release: true,
+    payload: {
+      ...enrichedRow().payload,
+      confidence: 1,
+      enrichment: { confidence: 1 },
+      evidenceCitations: [{ sourceUrl: 'https://www.nps.gov/', quote: 'Gardner Bishop' }],
+    },
+  });
+  for (const allowRepublish of [false, true]) {
+    const result = gateLandscapePublishCandidate({
+      row: { ...row, exact_in_release: allowRepublish },
+      releaseId: 'test',
+      generatedAt: '2026-01-01T00:00:00Z',
+      allowRepublish,
+    });
+    assert.equal(result.eligible, false);
+    if (!result.eligible) assert.equal(result.reason, 'claim_assessment_required');
+  }
+});
+
+test('independent review of every exact claim permits publication and keeps canonical ids', () => {
+  const row = enrichedRow();
+  const reviewedClaims = reviewedClaimsFor(row);
+  const result = gateLandscapePublishCandidate({
+    row,
+    reviewedClaims,
+    releaseId: 'test',
+    generatedAt: '2026-01-01T00:00:00Z',
+  });
+  assert.ok(result.eligible);
+  assert.equal(result.reviewBasis, 'independent_review');
+  assert.equal(result.entry.claims?.[0]?.id, reviewedClaims[0]?.claimId);
+});
+
+test('an uncalibrated numeric interval neither blocks nor authorizes independently reviewed claims', () => {
+  const row = enrichedRow({ exact_in_release: true });
+  const result = gateLandscapePublishCandidate({
+    row,
+    reviewedClaims: reviewedClaimsFor(row, 0.7),
+    releaseId: 'test',
+    generatedAt: '2026-01-01T00:00:00Z',
+    allowRepublish: true,
+  });
+  assert.ok(result.eligible);
+  assert.equal(result.reviewBasis, 'independent_review');
 });

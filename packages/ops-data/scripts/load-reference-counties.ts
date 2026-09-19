@@ -1,5 +1,5 @@
 /**
- * Upsert US county jurisdiction rows into bb_reference.jurisdictions from the Census
+ * Upsert US county jurisdiction rows into reference.jurisdictions from the Census
  * Bureau national county Gazetteer file (public domain). Polygons are optional for this
  * pass — id hierarchy is the priority for statistical_observations FK joins.
  *
@@ -156,7 +156,7 @@ export type CountyUpsertClient = Pick<PoolClient, 'query'>;
 /**
  * Builds and runs the batched county upsert, including `location` — a bbox envelope (see
  * reference-county-seeds.ts's ReferenceCountySeed.bbox) derived from each seed's Gazetteer
- * centroid + area. `bb_reference.jurisdictions.location` is declared
+ * centroid + area. `reference.jurisdictions.location` is declared
  * `geography(Polygon, 4326)` (supabase/migrations/20260721180100_jurisdictions_geography.sql),
  * so this writes a `ST_MakeEnvelope(...)::geography` polygon, not a bare point — a Point value
  * would fail that column's type check. A degenerate zero-area bbox (west==east or south==north,
@@ -197,7 +197,7 @@ export async function upsertCountyBatch(
     bboxNorth.push(north);
   }
   await client.query(
-    `INSERT INTO bb_reference.jurisdictions
+    `INSERT INTO reference.jurisdictions
       (id, kind, name, state_fips, county_fips, parent_id, metadata, location)
      SELECT
        id, kind, name, state_fips, county_fips, parent_id, metadata,
@@ -265,7 +265,7 @@ async function upsertCounties(
       await upsertCountyBatch(client, batch, provenance);
     }
     const verify = await client.query<{ count: string }>(
-      `SELECT count(*)::text AS count FROM bb_reference.jurisdictions WHERE kind = 'county'`,
+      `SELECT count(*)::text AS count FROM reference.jurisdictions WHERE kind = 'county'`,
     );
     const countyCount = Number(verify.rows[0]?.count ?? '0');
     if (countyCount < 3000) {

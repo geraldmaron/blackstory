@@ -1,19 +1,19 @@
 /**
- * Evidence capture core: turn a cited URL into a persisted bb_evidence.source_capture
+ * Evidence capture core: turn a cited URL into a persisted evidence.source_capture
  * (+ retrieval_event), through the SSRF-safe fetch path. Anti-rot, anti-spoof: a
  * capture proves what a source said, and its sha256, when we cited it.
  *
  * Everything with a side effect — the fetch, the blob store, the DB writes — is an
  * injected dependency, so the orchestration is unit-testable with fakes and the CLI
- * wires the real safe-fetch + Postgres + (optional) GCS/Wayback implementations.
+ * wires the real safe-fetch + Postgres + (optional) Supabase Storage/Wayback implementations.
  *
  * Storage note: executeSafeFetch never exposes raw bytes (it hashes then sandbox-parses
  * them), so a capture snapshot is the sanitized extracted text plus the sha256 of the
- * raw bytes. When no blob store is configured we persist metadata-only (hash + excerpt),
- * which still anchors the claim; a GCS writer can be injected to store the full snapshot.
+ * raw bytes. When no blob store is configured we persist metadata only. A rights-authorized storage writer can retain extracted text.
  */
 import { createHash } from 'node:crypto';
 import type { SafeFetchResult } from '@repo/security/url-safety';
+import { normalizeCitationUrl } from '@repo/domain';
 import type { WaybackAnchor } from './wayback-anchor.js';
 import type { WaybackLookup } from './wayback-lookup.js';
 
@@ -21,7 +21,7 @@ import type { WaybackLookup } from './wayback-lookup.js';
 export type CaptureSurface = 'entity' | 'packet' | 'article';
 
 /**
- * retrieval_events.source_id is a foreign key into bb_evidence.evidence_sources — a
+ * retrieval_events.source_id is a foreign key into evidence.evidence_sources — a
  * registry keyed per citing *hostname*, not per citing record. Derive a stable id from
  * the URL's host so every capture from the same domain converges on one registry row,
  * instead of the citing entity/packet/article id (which evidence_sources never contains).
@@ -47,26 +47,10 @@ export type CitedUrl = {
 };
 
 /**
- * Normalize a URL for dedup: lowercase scheme+host, drop the fragment, strip a trailing
- * slash on the path. Query is significant (it selects a table/download) so it is kept.
+ * Normalize a URL for dedup: lowercase scheme+host, drop the fragment. Preserve the exact path, including its trailing slash. Query is significant (it selects a table/download) so it is kept.
  * Returns null for anything that is not an http(s) URL.
  */
-export function normalizeCaptureUrl(raw: string): string | null {
-  let parsed: URL;
-  try {
-    parsed = new URL(raw.trim());
-  } catch {
-    return null;
-  }
-  if (parsed.protocol !== 'http:' && parsed.protocol !== 'https:') return null;
-  parsed.hash = '';
-  parsed.hostname = parsed.hostname.toLowerCase();
-  parsed.protocol = parsed.protocol.toLowerCase();
-  if (parsed.pathname.length > 1 && parsed.pathname.endsWith('/')) {
-    parsed.pathname = parsed.pathname.replace(/\/+$/, '');
-  }
-  return parsed.toString();
-}
+export const normalizeCaptureUrl = normalizeCitationUrl;
 
 export type SurfaceTally = { readonly cited: number; readonly unique: number };
 
@@ -90,20 +74,28 @@ export function buildCaptureInventory(refs: readonly CitedUrl[]): CaptureInvento
     article: { ...EMPTY_SURFACES.article },
   };
   const seen = new Set<string>();
+  const bySurface = {
+    entity: new Set<string>(),
+    packet: new Set<string>(),
+    article: new Set<string>(),
+  };
   const urls: CitedUrl[] = [];
   for (const ref of refs) {
     const normalized = normalizeCaptureUrl(ref.url);
     if (normalized === null) continue;
     tally[ref.surface].cited += 1;
+    if (!bySurface[ref.surface].has(normalized)) {
+      tally[ref.surface].unique += 1;
+      bySurface[ref.surface].add(normalized);
+    }
     if (seen.has(normalized)) continue;
     seen.add(normalized);
-    tally[ref.surface].unique += 1;
     urls.push({ url: normalized, surface: ref.surface, refId: ref.refId });
   }
   return { urls, bySurface: tally };
 }
 
-// ---- persistence row shapes (mirror bb_evidence column shapes exactly) ----
+// ---- persistence row shapes (mirror evidence column shapes exactly) ----
 
 export type SourceCaptureRow = {
   readonly id: string;
@@ -115,6 +107,8 @@ export type SourceCaptureRow = {
   readonly dedupOfCaptureId: string | null;
   readonly storageObject: Record<string, unknown>;
   readonly capturedAt: string;
+  /** Transient parsed text; persisted only when its retention decision permits indexing. */
+  readonly extractedText?: string;
 };
 
 export type RetrievalEventRow = {
@@ -141,18 +135,17 @@ export type CaptureStorage = {
   }): Promise<CaptureStorageObject>;
 };
 
-/** Default sink: persist hash + excerpt inline, no external blob. Honest when GCS is absent. */
-export function createMetadataOnlyStorage(excerptChars = 2000): CaptureStorage {
+/** Default sink retains only retrieval metadata, never source text. */
+export function createMetadataOnlyStorage(): CaptureStorage {
   return {
     kind: 'metadata-only',
-    async store({ url, sha256, contentType, byteLength, text }) {
+    async store({ url, sha256, contentType, byteLength }) {
       return {
         stored: 'metadata-only',
         sourceUrl: url,
         sha256,
         contentType,
         byteLength,
-        excerpt: text.slice(0, excerptChars),
       };
     },
   };
@@ -256,7 +249,13 @@ export async function buildCaptureFromFetch(
       parserVersion: deps.parserVersion,
       snapshotMode: 'selective',
       dedupOfCaptureId: null,
-      storageObject,
+      storageObject: {
+        ...storageObject,
+        extractedTextHash: createHash('sha256')
+          .update(result.parser.extractedText, 'utf8')
+          .digest('hex'),
+      },
+      extractedText: result.parser.extractedText,
       capturedAt: occurredAt,
     },
     retrievalEvent: {

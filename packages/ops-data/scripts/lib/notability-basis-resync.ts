@@ -1,81 +1,8 @@
 /**
- * The one implementation of the ratified notability-basis merge rule, plus the two staleness
- * tests repo-rm2y measured. `apply-notability-rubric-ruling.ts` (the ruling pass) and
- * `resync-notability-basis.ts` (the standing resync) both call it, so the rule cannot exist twice
- * and drift.
- *
- * WHY A MERGE AND NOT A RECOMPUTE — this is the part that matters, and it is lifted verbatim from
- * the ruling pass that established it.
- *
- * A record's published basis is not always derived from its claims. Earlier passes hand-authored
- * criteria (`fix-civil-rights-leaders-notability-basis.ts`, `fix-person-notability-and-stubs.ts`,
- * `packages/domain/src/seed-campaigns/records.ts`), and nothing in those records' claim text
- * carries the keyword that would reproduce them. A straight recompute — which is what a first
- * draft of the ruling pass did — took `first_to_do_x` off Carter G. Woodson and Hattie McDaniel,
- * `major_honor_or_hall_of_fame` off Denzel Washington, Stevie Wonder and Katherine Johnson, and
- * `movement_significance` off Fred Shuttlesworth and Bayard Rustin. Twenty records in that sample
- * alone, all curated work, all silently replaced by the fallback. Measured corpus-wide on
- * rel_20260723_authority_net_001 (2026-09-12, repo-rm2y): a strict recompute changes 195 records
- * and strips a hand-authored criterion from 47 of them.
- *
- * So: every non-fallback criterion a record already publishes is KEPT. Only the `documented_site`
- * records are up for replacement. The pass can add a criterion and can drop a metadata basis
- * record; it cannot take away a reason a person put there.
- *
- * TWO STALENESS TESTS ON TOP OF THE MERGE (repo-rm2y). Both are provable from the row, neither is
- * a taste call, and neither can reach curated prose:
- *
- *   S1 PROVABLY DANGLING. A published basis record carrying an `evidenceId` that no longer
- *   resolves to any claim the record currently carries is dropped, and the merge then re-adds the
- *   recomputed record(s) for that criterion. These exist because
- *   `fix-civil-rights-leaders-uncorroborated.ts` rewrote summary, claims and claimIds with
- *   hand-written claim ids and recomputed none of the derived fields — the note it left behind is
- *   the record's OLD summary with the literal string "Documented site " on the front of a person.
- *   Three records in the release, all in that one lane.
- *
- *   S2 FORMATTING DRIFT. A published record whose criterion AND sorted `evidenceIds` exactly equal
- *   a recomputed record's, and whose note is identical to the recomputed note after normalization
- *   (see `notesAreSameSentence`), takes the builder's note. This is the "led by: X.. Cited from
- *   nps.gov." / "Is listed on the National Register of Historic Places Quindaro Townsite." shape:
- *   a stored note produced by an older spelling of `buildNotabilityBasisNote`, before the
- *   colon-form lead, the trailing citation and the self-naming display-name object were fixed.
- *
- * The normalization is what makes S2 safe, and it was measured rather than assumed: of the 13
- * candidate refreshes in the release, 12 normalize-equal and one does not —
- * `ent_harriet_tubman_001`'s `first_to_do_x`, a curated sentence about the Combahee River Raid
- * that the builder would have replaced with a different sentence. S2 leaves it alone by
- * construction, which is the same principle the merge rule already encodes.
- *
- * WHAT IS DELIBERATELY LEFT ALONE
- *   - The 67 basis records carrying zero `evidenceIds`. They were hand-authored on purpose
- *     (repo-z1uk, `fix-person-notability-and-stubs.ts`, tradeoff stated in its header). An empty
- *     evidence list vacuously resolves, so S1 never touches them, and no recomputed record shares
- *     their evidence key, so S2 never touches them either.
- *   - Notes that begin "Documented site " and ARE reproducible from a live claim. 313 of the 316
- *     in the release are: the claim's predicate is literally `documented_site` and its object is
- *     the record's own summary, written by `buildReleaseSourceFromLandscape`. That is a
- *     claims-level defect with its own fix; a basis resync reproduces them exactly, and a "no
- *     change" here must not be read as proof they are correct.
- *   - A record whose recompute yields no basis at all. Publishing requires >= 1 basis record; a
- *     row with no evidenced reason is a research gap to fill, not a default to invent — the call
- *     already made for `sundown_crescent_springs_kentucky`.
- *
- * WRITE TARGETS. A released row keeps the same basis in more than one place, and a write that
- * lands on one of them looks applied and changes nothing a reader sees. `applyNotabilityBasisResync`
- * writes all of them in one statement per row:
- *   - `bb_public.release_entities.projection` — `notabilityBasis` + `notabilityLabels`
- *   - `bb_public.release_entities.taxonomy`   — `notabilityLabels`, only where the row already
- *                                               carries that key (other rows never had it)
- *   - `bb_public.search_index.facets`         — `notabilityBasis` + `notabilityLabels`
- * The ruling pass omitted the third, which is part of why 18 rows diverged between the projection
- * and their search facets.
- *
- * `bb_canonical.entities.notability_basis` is NOT written. The incremental publisher inserts it as
- * `'[]'::jsonb` and never updates it on conflict, so it has never been maintained, nothing on any
- * reader path reads it, and it disagrees with the projection on 3,683 of 4,198 released rows.
- * Bringing it into line or deprecating it is its own decision, not a side effect of this pass.
- *
- * Read-only until `applyNotabilityBasisResync` is called: `planNotabilityBasisResync` never writes.
+ * Shared inclusion-basis merge for rubric application and resync. Preserve curated non-fallback
+ * criteria; recompute eligible fallback records and refresh notes only when evidence matching
+ * and the same-sentence check establish the relationship. A strict rebuild can discard curated
+ * judgments absent from claim keywords.
  */
 import {
   buildReleaseNotabilityBasis,
@@ -114,7 +41,7 @@ export type NotabilityBasisResyncRow = {
   readonly publishedLabels: readonly string[];
   /** Whether `taxonomy` already carries `notabilityLabels`; rows without it never get it added. */
   readonly hasTaxonomyLabels: boolean;
-  /** Whether the row has a `bb_public.search_index` twin to keep in step. */
+  /** Whether the row has a `published.search_index` twin to keep in step. */
   readonly hasSearchIndex: boolean;
 };
 
@@ -180,31 +107,9 @@ function escapeForRegExp(text: string): string {
 }
 
 /**
- * Whether two notes are the same sentence differently spelled — the S2 test, and the only thing
- * standing between this pass and a curated sentence.
- *
- * Three normalizations, each one an artifact of a specific older spelling of
- * `buildNotabilityBasisNote` that the current one no longer produces:
- *   - a trailing "Cited from <source>." clause, which the builder's own contract forbids
- *     ("citations stay on evidenceIds; this note does not repeat 'Cited from …'");
- *   - the record's own display name appearing in the note, which the self-naming-object guard now
- *     strips ("Is listed on the National Register of Historic Places Quindaro Townsite.");
- *   - punctuation and case, which covers the colon-form predicate lead ("led by: X." vs
- *     "Led by X.") and a doubled full stop.
- *
- * A fourth, added by repo-15slz: `droppedLead`, the humanized predicate the builder now declines
- * to join onto an object that is already a sentence of its own. A stored note that is the
- * builder's note with exactly that lead still on the front is the same sentence, and refreshing
- * it is the whole point of that fix — "Led legal campaign resulting in The NAACP's legal campaign
- * culminated in …" becomes "The NAACP's legal campaign culminated in …". Measured on
- * rel_20260723_authority_net_001 (2026-09-13): of the 1,605 published basis records whose note
- * the new builder changes, 1,022 sit on a non-fallback criterion, so the merge keeps the stored
- * record and only this test can refresh them. Without the lead the comparison is unchanged, so
- * every caller that cannot name a predicate gets exactly the old behavior.
- *
- * Everything else — a different verb, a different fact, a different length — survives
- * normalization and the stored note is left alone. The Tubman case is still left alone: its
- * stored note is a different sentence, not this sentence with a lead on it.
+ * Compares note variants using explicit normalization of citation suffixes, self-naming,
+ * punctuation/case and redundant predicate leads. This narrow same-sentence test protects
+ * curated prose from unrelated replacement.
  */
 export function notesAreSameSentence(
   a: string,
@@ -284,19 +189,9 @@ export function resolveNotabilityBasisForRow(
   const refreshedNotes: NotabilityBasisNoteRefresh[] = [];
   const refreshed = survivors.map((record) => {
     /*
-     * Exact evidence first, then SHARED evidence (repo-4qlmt). An exact-set match alone silently
-     * finds nothing whenever the builder's grouping of a predicate's claims has changed since the
-     * row was published: the record is kept verbatim, the merge then skips the recomputed record
-     * because its criterion is already kept, and the row reports as converged without
-     * `notesAreSameSentence` ever being consulted. That is how the pass reported 4,197 of 4,197
-     * already correct on rel_20260723_authority_net_001 while `ent_edward_dudley_001` and
-     * `ent_macon_bolling_allen_001` were live with "First to In 1949, when the U.S. mission in
-     * Liberia..." — the builder already spelled both correctly and the sentence test agreed.
-     *
-     * The fallback cannot loosen what actually gets written. It only decides which recomputed
-     * record is compared; `notesAreSameSentence` below is unchanged and still refuses anything
-     * that is not this sentence differently spelled. A wrong candidate therefore fails that test
-     * and the stored note is kept, which is the same outcome as finding no candidate at all.
+     * Prefer exact evidence sets, then shared evidence. The fallback changes only which
+     * recomputed note is compared; notesAreSameSentence still controls whether prose may be
+     * replaced.
      */
     const sameCriterion = (other: NotabilityBasisRecord): boolean =>
       other.criterion === record.criterion;
@@ -311,8 +206,8 @@ export function resolveNotabilityBasisForRow(
           sameCriterion(other) && other.evidenceIds.some((id) => record.evidenceIds.includes(id)),
       );
     if (candidate === undefined || candidate.note === record.note) return record;
-    // The lead the builder may have dropped (repo-15slz). Every claim behind one basis record
-    // shares a predicate by construction, so the first evidenced claim names it.
+    // Claims grouped into one basis record share a predicate; the first evidenced claim
+    // supplies the potentially redundant lead.
     const evidencedClaim = row.claims.find((claim) => record.evidenceIds.includes(claim.id));
     const droppedLead = evidencedClaim?.predicate.replaceAll('_', ' ').trim() ?? '';
     if (!notesAreSameSentence(record.note, candidate.note, row.displayName, droppedLead)) {
@@ -497,7 +392,7 @@ export function formatNotabilityBasisResyncPlan(
  * projection and not in the column, which is how 1,051 of 4,195 live rows came to disagree.
  */
 const PROJECTION_AND_TAXONOMY_SQL = `
-  UPDATE bb_public.release_entities
+  UPDATE published.release_entities
      SET projection = COALESCE(projection, '{}'::jsonb)
            || jsonb_build_object('notabilityBasis', $1::jsonb, 'notabilityLabels', $2::jsonb)
    WHERE release_id = $3 AND entity_id = $4
@@ -509,7 +404,7 @@ const PROJECTION_AND_TAXONOMY_SQL = `
  * bead was filed about.
  */
 const SEARCH_INDEX_SQL = `
-  UPDATE bb_public.search_index
+  UPDATE published.search_index
      SET facets = jsonb_set(
            jsonb_set(COALESCE(facets, '{}'::jsonb), '{notabilityBasis}', $1::jsonb, true),
            '{notabilityLabels}', $2::jsonb, true)
@@ -574,8 +469,8 @@ const LOAD_SQL = `
          COALESCE(re.projection->'notabilityLabels', '[]'::jsonb) AS published_labels,
          (re.taxonomy ? 'notabilityLabels')                       AS has_taxonomy_labels,
          (si.entity_id IS NOT NULL)                               AS has_search_index
-    FROM bb_public.release_entities re
-    LEFT JOIN bb_public.search_index si
+    FROM published.release_entities re
+    LEFT JOIN published.search_index si
       ON si.release_id = re.release_id AND si.entity_id = re.entity_id
    WHERE re.release_id = $1
      AND ($2::text[] IS NULL OR re.entity_id = ANY($2::text[]))

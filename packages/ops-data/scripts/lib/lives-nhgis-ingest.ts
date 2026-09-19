@@ -1,19 +1,126 @@
 /**
- * Steps shared by the Lives Across the Decades loaders that read an IPUMS NHGIS extract (beads
- * repo-0clax.22 and repo-0clax.23): get the extract's files, report what was built, and write the
- * observations with their series rows in one transaction. Nothing downloaded is written to the repo.
+ * Shared NHGIS extract ingestion: acquire files, report derived observations, and persist
+ * observations with series rows in one transaction. Downloads remain outside the repository.
  */
 import { execFileSync } from 'node:child_process';
-import { mkdir, writeFile } from 'node:fs/promises';
+import { mkdir, mkdtemp, rm } from 'node:fs/promises';
 import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import type { Pool } from 'pg';
 import { getNhgisExtractStatus, submitNhgisExtract, type NhgisFetchLike } from '@repo/domain';
+import { readNhgisTableMeta, type NhgisTableMeta } from '../../src/lives/acs.ts';
 import type { LivesPublishedObservation } from '../../src/lives/published-observation.ts';
 import { livesSeriesColumns, livesSeriesRow } from '../../src/lives/series.ts';
 
 const POLL_MS = 20_000;
 const MAX_POLLS = 135;
 const BATCH = 400;
+const MAX_DOWNLOAD_BYTES = 128 * 1024 * 1024;
+const EXTRACTOR = fileURLToPath(new URL('./extract-nhgis-tables.py', import.meta.url));
+
+/** Fetch and validate one NHGIS table definition before it reaches the observation builder. */
+export async function fetchNhgisTableMeta(options: {
+  readonly dataset: string;
+  readonly table: string;
+  readonly apiKey: string;
+  readonly fetchImpl?: typeof fetch;
+}): Promise<NhgisTableMeta> {
+  if (!/^[a-zA-Z0-9_]+$/.test(options.dataset) || !/^[a-zA-Z0-9]+$/.test(options.table)) {
+    throw new Error('NHGIS metadata identifiers must be alphanumeric');
+  }
+  const url = new URL(
+    `/metadata/datasets/${options.dataset}/data_tables/${options.table}`,
+    'https://api.ipums.org',
+  );
+  url.search = new URLSearchParams({ collection: 'nhgis', version: '2' }).toString();
+  const response = await (options.fetchImpl ?? fetch)(url.href, {
+    headers: { Authorization: options.apiKey },
+    redirect: 'error',
+    signal: AbortSignal.timeout(30_000),
+  });
+  if (!response.ok || response.redirected) {
+    await response.body?.cancel();
+    throw new Error(`NHGIS metadata request failed: HTTP ${response.status}`);
+  }
+  const json: unknown = await response.json();
+  const metadata = readNhgisTableMeta(json);
+  if (metadata.group !== options.table) {
+    throw new Error(
+      `NHGIS metadata returned ${metadata.group} for requested table ${options.table}`,
+    );
+  }
+  return metadata;
+}
+
+/** Download an authenticated IPUMS table extract into an isolated, validated data directory. */
+export async function downloadNhgisExtract(options: {
+  readonly url: string;
+  readonly apiKey: string;
+  readonly cacheDir: string;
+  readonly fetchImpl?: typeof fetch;
+}): Promise<string> {
+  const url = new URL(options.url);
+  if (
+    url.origin !== 'https://api.ipums.org' ||
+    url.username ||
+    url.password ||
+    url.hash ||
+    url.search ||
+    !/^\/downloads\/nhgis\/[a-zA-Z0-9_./-]+\.zip$/.test(url.pathname)
+  ) {
+    throw new Error('NHGIS download must use the official IPUMS table endpoint');
+  }
+  const response = await (options.fetchImpl ?? fetch)(url.href, {
+    headers: { Authorization: options.apiKey },
+    redirect: 'error',
+    signal: AbortSignal.timeout(120_000),
+  });
+  if (!response.ok || response.redirected) {
+    await response.body?.cancel();
+    throw new Error(`NHGIS download failed: HTTP ${response.status}`);
+  }
+  const declaredLength = response.headers.get('content-length');
+  if (
+    declaredLength !== null &&
+    (!/^\d+$/.test(declaredLength) || Number(declaredLength) > MAX_DOWNLOAD_BYTES)
+  ) {
+    await response.body?.cancel();
+    throw new Error('NHGIS download exceeds the compressed byte limit');
+  }
+  if (!response.body) throw new Error('NHGIS download has no body');
+  const reader = response.body.getReader();
+  const chunks: Uint8Array[] = [];
+  let bytes = 0;
+  try {
+    for (;;) {
+      const result = await reader.read();
+      if (result.done) break;
+      bytes += result.value.byteLength;
+      if (bytes > MAX_DOWNLOAD_BYTES) {
+        throw new Error('NHGIS download exceeds the compressed byte limit');
+      }
+      chunks.push(result.value);
+    }
+  } finally {
+    await reader.cancel();
+    reader.releaseLock();
+  }
+  await mkdir(options.cacheDir, { recursive: true, mode: 0o700 });
+  const directory = await mkdtemp(path.join(options.cacheDir, 'nhgis-extract-'));
+  try {
+    // Only validated CSV/text entries are written; the downloaded archive is never executed.
+    execFileSync('python3', ['-I', EXTRACTOR, directory], {
+      input: Buffer.concat(chunks, bytes),
+      timeout: 120_000,
+      maxBuffer: 1024 * 1024,
+      stdio: ['pipe', 'pipe', 'pipe'],
+    });
+    return directory;
+  } catch (error) {
+    await rm(directory, { recursive: true, force: true });
+    throw new Error('NHGIS archive rejected or extraction failed', { cause: error });
+  }
+}
 
 /**
  * An unzipped extract: `givenDirectory` when set, otherwise a new extract of `definition`, awaited and
@@ -38,13 +145,7 @@ export async function nhgisExtractDirectory(options: {
       throw new Error(`NHGIS extract ${handle.number} ${status.status}`);
     }
     if (status.status !== 'completed' || !status.tableDataUrl) continue;
-    const response = await fetch(status.tableDataUrl, { headers: { Authorization: apiKey } });
-    if (!response.ok) throw new Error(`NHGIS download failed: HTTP ${response.status}`);
-    const directory = path.join(cacheDir, `nhgis-extract-${handle.number}`);
-    await mkdir(directory, { recursive: true });
-    const zipPath = path.join(directory, 'table-data.zip');
-    await writeFile(zipPath, Buffer.from(await response.arrayBuffer()));
-    execFileSync('unzip', ['-o', '-q', zipPath, '-d', directory]);
+    const directory = await downloadNhgisExtract({ url: status.tableDataUrl, apiKey, cacheDir });
     console.log(`Downloaded extract ${handle.number} to ${directory}`);
     return directory;
   }
@@ -93,14 +194,14 @@ export function livesSeriesForObservations(observations: readonly LivesPublished
   });
 }
 
-/** Throws unless every observation's jurisdiction is already in `bb_reference.jurisdictions`. */
+/** Throws unless every observation's jurisdiction is already in `reference.jurisdictions`. */
 export async function assertLivesJurisdictions(
   pool: Pool,
   observations: readonly LivesPublishedObservation[],
 ): Promise<void> {
   const jurisdictionIds = [...new Set(observations.map((o) => o.jurisdictionId))];
   const known = await pool.query<{ id: string }>(
-    'SELECT id FROM bb_reference.jurisdictions WHERE id = ANY($1::text[])',
+    'SELECT id FROM reference.jurisdictions WHERE id = ANY($1::text[])',
     [jurisdictionIds],
   );
   const existing = new Set(known.rows.map((row) => row.id));
@@ -120,7 +221,7 @@ export async function upsertLivesObservations(
     await client.query('BEGIN');
     for (const s of series) {
       await client.query(
-        `INSERT INTO bb_reference.statistical_series
+        `INSERT INTO reference.statistical_series
           (metric_id, metric_definition, universe, unit, source_dataset, source_table, source_variable,
            geography_type, estimate_type, period_type, external_data_source_id, theme, metadata)
          VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13::jsonb)
@@ -174,7 +275,7 @@ export async function upsertLivesObservations(
         return `(${p(0)},${p(1)},${p(2)},${p(3)},${p(4)},${p(5)},${p(6)},${p(7)},${p(8)},${p(9)},${p(10)},'observed',${p(11)},${p(12)},$1::timestamptz,${p(13)},${p(14)}::jsonb)`;
       });
       await client.query(
-        `INSERT INTO bb_reference.statistical_observations
+        `INSERT INTO reference.statistical_observations
           (id, metric_id, jurisdiction_id, boundary_version, reference_period, dataset_vintage, estimate,
            margin_of_error, numerator, denominator, race_ethnicity_slice, status, source, source_url,
            retrieved_at, content_hash, metadata)

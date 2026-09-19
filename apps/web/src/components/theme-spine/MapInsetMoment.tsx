@@ -33,7 +33,7 @@ export type MapInsetMomentProps = {
   readonly precision:
     'state' | 'county' | 'city' | 'neighborhood' | 'campus' | 'institution' | 'site' | 'address';
   /**
-   * The entity's own violence-adjacency signal (SP-26 / repo-92n2.33), forwarded to `MapMoment`
+   * The entity's own violence-adjacency signal, forwarded to `MapMoment`
    * as its `subject` so a chapter's map inset for a lynching or massacre entity derives PLATE ·
    * STILL rather than always rendering LIVE. Optional only because `hydrate.ts` is the sole
    * caller and some historical test fixtures predate this field; every real article carries it.

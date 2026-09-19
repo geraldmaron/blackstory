@@ -5,7 +5,7 @@
 
 # Operator MCP — indicator and entity-context contracts
 
-**Purpose:** Define read-only tool shapes for an **operator / research** MCP that wraps PostgREST or internal readers over `bb_reference` statistical tables and published entities. This is **not** the public Black-history MCP ([public-mcp-unlock-criteria.md](public-mcp-unlock-criteria.md)).
+**Purpose:** Define read-only tool shapes for an **operator / research** MCP that wraps PostgREST or internal readers over `reference` statistical tables and published entities. This is **not** the public Black-history MCP ([public-mcp-unlock-criteria.md](public-mcp-unlock-criteria.md)).
 
 **Depends on:** Phase 1 indicator catalog + `statistical_series` / `statistical_observations` tables; the published-views decision for entity reads (`../decisions-carryover.md`, "Small recovered decisions", ADR-026 entry); [juxtaposition-not-causation.md](../methodology/juxtaposition-not-causation.md).
 
@@ -152,15 +152,15 @@ Heritage-lane helper (wraps published entity + relationships).
 | Code | When |
 |------|------|
 | `unknown_metric` | metricId not in catalog / series table |
-| `unknown_jurisdiction` | jurisdiction id missing from `bb_reference.jurisdictions` |
+| `unknown_jurisdiction` | jurisdiction id missing from `reference.jurisdictions` |
 | `boundary_mismatch` | Requested join crosses `boundary_version` without crosswalk |
 | `forbidden_causal` | Client asks for “impact of X on Y” as a computed effect — return methodology pointer instead of a number |
 
 ## Implementation notes
 
-- Prefer PostgREST views over `bb_reference.statistical_*` with RLS (service/research roles) or a thin Next.js route used only by operator credentials.
+- Prefer PostgREST views over `reference.statistical_*` with RLS (service/research roles) or a thin Next.js route used only by operator credentials.
 - Reuse `assertPublishedStatisticProvenance` before any public projection of observations.
-- Phase 1 fixture path: load from `packages/firebase/fixtures/reference-indicators/` via `ingest-phase1-indicators.ts` until live ACS/BJS loaders land.
+- Phase 1 fixture path: load from `packages/ops-data/fixtures/reference-indicators/` via `ingest-phase1-indicators.ts` until live ACS/BJS loaders land.
 
 ### Shipped implementation (Phase 1)
 

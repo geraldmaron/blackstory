@@ -1,11 +1,11 @@
 /**
  * Validation for authored law and court-case catalog candidates, and the
- * `bb_research.landscape_candidates` row each one becomes.
+ * `research.landscape_candidates` row each one becomes.
  *
  * These records are drafted by hand from a research packet, not swept by a lane importer, so
  * nothing upstream has already checked them. This module is the check: it validates the authored
  * shape, then builds the exact row the incremental publisher will read. The publisher
- * (publish-release-entities-incremental.ts) is the only path into `bb_public.release_entities`
+ * (publish-release-entities-incremental.ts) is the only path into `published.release_entities`
  * and it sources rows from this table alone, so a record that is wrong here is wrong in public.
  *
  * Pure by design, like `applicability.ts` next to it: no database, no filesystem, so the rules are

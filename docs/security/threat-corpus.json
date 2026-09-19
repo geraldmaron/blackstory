@@ -1,23 +1,21 @@
 {
   "$schema": "./threat-corpus.schema.json",
-  "version": "1.0.0",
-  "bead": "",
-  "updatedAt": "2026-07-16",
-  "assumptionsRef": "docs/adr/ADR-010-security-and-abuse-assumptions.md",
+  "version": "2.0.0",
+  "updatedAt": "2026-09-18",
+  "assumptionsRef": "docs/decisions-carryover.md",
   "threats": [
     {
       "id": "T-01",
       "name": "Volumetric and application-layer denial of service",
       "priority": "P0",
-      "assets": ["public web", "api-public", "CDN/cache", "Cloud Run capacity"],
+      "assets": ["public web", "api-public", "CDN/cache", "provider and application capacity"],
       "actors": ["botnet", "scripted scraper", "opportunistic vandal"],
       "abuseCaseIds": ["AC-01"],
-      "implementationBeads": ["BB-022", "BB-023", "BB-025", "BB-033", "BB-034", "BB-035", "BB-059"],
       "controls": {
         "preventive": [
-          "Cloud Armor / ALB rate and geo/IP controls at edge",
+          "Configured Cloudflare/Vercel edge behavior and application rate limits where present",
           "CDN caching for immutable release snapshots and static assets",
-          "App Hosting and Cloud Run concurrency/request limits",
+          "Optional Cloud Armor/ALB and Cloud Run limits are design targets, not evidence of a live GCP deployment",
           "Degraded read-only mode serves last good snapshots without origin fan-out"
         ],
         "detective": [
@@ -26,9 +24,9 @@
           "Cost and request budget burn-rate alerts"
         ],
         "containment": [
-          "Feature kill switches for search, submissions, geocode, exports before wiping corpus",
-          "Armor adaptive protection / emergency block rules",
-          "Scale-to-zero or throttle non-essential workers"
+          "Feature kill switches for search, submissions, geocode, and exports before public snapshots",
+          "Provider edge blocks where configured; optional Armor rules require a verified GCP deployment",
+          "Throttle non-essential workers"
         ],
         "recovery": [
           "Restore CDN/origin from last known-good release snapshot",
@@ -36,7 +34,12 @@
           "Post-incident rule and quota tuning"
         ]
       },
-      "residualRisk": "Large volumetric attacks can still degrade origin before Armor/CDN absorb traffic; perfect bot elimination is out of scope (ADR-010)."
+      "residualRisk": "Large volumetric attacks can still degrade the active provider edge or origin; perfect bot elimination is out of scope.",
+      "implementationRefs": [
+        "docs/security/rate-limits.md",
+        "docs/security/cost-resource-controls.md",
+        "docs/security/service-surfaces.md"
+      ]
     },
     {
       "id": "T-02",
@@ -45,13 +48,12 @@
       "assets": ["search API", "geocode quota", "DB CPU", "CDN hit ratio"],
       "actors": ["scraper", "cost attacker", "researcher competitor"],
       "abuseCaseIds": ["AC-02"],
-      "implementationBeads": ["BB-023", "BB-024", "BB-025", "BB-026", "BB-033", "BB-049", "BB-059"],
       "controls": {
         "preventive": [
-          "Normalize and strip cache-busting query params for public reads",
-          "Strict App Check on expensive reads after ",
-          "Search query complexity caps, timeouts, result limits",
-          "Separate stricter quotas for search/geocode/nearby vs static reads (ADR-010)"
+          "Normalize and strip cache-busting query parameters for public reads",
+          "Client-header format checks may classify requests but are not authentication and are not asserted as deployed",
+          "Search query complexity caps, timeouts, and result limits",
+          "Separate stricter quotas for search, geocode, and nearby reads where rate-limit wiring is configured"
         ],
         "detective": [
           "Low cache-hit-ratio and high unique-query cardinality alerts",
@@ -64,44 +66,53 @@
           "Fallback to cached popular queries only"
         ],
         "recovery": [
-          "Flush poisoned edge configs; restore CDN rules",
-          "Re-enable search with tightened quotas after  soak"
+          "Restore verified cache configuration",
+          "Re-enable search with tightened quotas after a load exercise"
         ]
       },
-      "residualRisk": "Legitimate bursty research traffic may look like abuse; quotas will false-positive and require allowlists for known partners."
+      "residualRisk": "Legitimate bursty research traffic may look like abuse; quotas will false-positive and require allowlists for known partners.",
+      "implementationRefs": [
+        "docs/security/rate-limits.md",
+        "docs/security/query-guardrails.md",
+        "packages/security/src/query-guardrails.ts"
+      ]
     },
     {
       "id": "T-03",
       "name": "Credential stuffing and administrator phishing",
       "priority": "P0",
-      "assets": ["admin console", "Firebase Auth admin users", "IAP-protected surfaces"],
+      "assets": ["admin console", "Supabase Auth staff identities", "staff-authorized routes"],
       "actors": ["credential stuffer", "phisher", "account takeover"],
       "abuseCaseIds": ["AC-03"],
-      "implementationBeads": ["BB-005", "BB-011", "BB-021", "BB-027", "BB-034", "BB-035"],
       "controls": {
         "preventive": [
-          "Admin never exposed as public+role-claim-only (ADR-010)",
-          "Firebase Auth + IAP + application RBAC for administrators",
-          "MFA required for admin; phishing-resistant factors preferred",
-          "Separate admin identity pool from public end-user auth where feasible"
+          "Authorize staff requests in the proxy and every server mutation",
+          "Supabase Auth sessions and trusted app_metadata.app_role authorization",
+          "MFA and recent reauthentication are desired controls but are not currently enforced",
+          "Use separate administrative identities where feasible"
         ],
         "detective": [
-          "Failed login / impossible travel / new-device alerts for admin",
-          "IAP and Auth audit log monitoring",
-          "Anomalous admin API volume alerts"
+          "Review failed-login and anomalous-admin signals where the provider exposes them",
+          "Supabase auth and application audit records where configured",
+          "Review anomalous admin API volume where telemetry exists"
         ],
         "containment": [
-          "Disable compromised accounts; revoke sessions and refresh tokens",
-          "Kill switch for publication and admin mutation paths",
-          "IAP lockdown to break-glass identities only"
+          "Disable compromised accounts and revoke sessions",
+          "Disable publication and admin mutation paths",
+          "Restrict staff mutations through deployed provider controls"
         ],
         "recovery": [
           "Credential rotation and forced re-auth",
           "Audit trail review of actions during compromise window",
-          "Rollback unauthorized releases (, )"
+          "Rollback unauthorized releases"
         ]
       },
-      "residualRisk": "Targeted phishing of break-glass operators remains possible; residual mitigated by dual control on publication, not by perfect human immunity."
+      "residualRisk": "Targeted phishing of privileged operators remains possible; approval separation and fast rollback reduce risk only where those controls are deployed, exercised, and verified.",
+      "implementationRefs": [
+        "docs/security/admin-identity.md",
+        "apps/web/src/admin/auth/request-auth.ts",
+        "apps/web/src/admin/auth/route-permissions.ts"
+      ]
     },
     {
       "id": "T-04",
@@ -110,22 +121,12 @@
       "assets": ["api-public", "api-submissions", "api-internal", "admin", "DB roles"],
       "actors": ["authenticated attacker", "curious user", "compromised client"],
       "abuseCaseIds": ["AC-04"],
-      "implementationBeads": [
-        "BB-003",
-        "BB-013",
-        "BB-015",
-        "BB-019",
-        "BB-021",
-        "BB-027",
-        "BB-028",
-        "BB-036"
-      ],
       "controls": {
         "preventive": [
-          "Separate deployables and networks per ADR-005 / ",
-          "Server-side authZ on every request; no client-trusted role claims for publication",
-          "Object-level checks for submission/case ownership and release IDs",
-          "DB role allowlists: public read-only on public schema; research \u2260 publication (ADR-003)"
+          "Apply the typed service-surface capability matrix",
+          "Enforce server-side authorization on every request; publication never trusts client-editable role claims",
+          "Check submission, case, and release object access at the operation boundary",
+          "Keep public reads, research, and publication permissions distinct"
         ],
         "detective": [
           "403/401 anomaly spikes and IDOR probe patterns",
@@ -143,7 +144,11 @@
           "Re-issue least-privilege credentials"
         ]
       },
-      "residualRisk": "New endpoints can introduce IDOR until  coverage exists; residual accepted only with mandatory authZ review in PR checklist."
+      "residualRisk": "New endpoints can introduce IDOR until coverage exists; mandatory authorization review and regression tests bound the risk.",
+      "implementationRefs": [
+        "docs/security/service-surfaces.md",
+        "packages/testing/src/security-gates/security-gates.test.ts"
+      ]
     },
     {
       "id": "T-05",
@@ -152,12 +157,11 @@
       "assets": ["submissions API", "moderation queue", "operator attention"],
       "actors": ["spammer", "coordinated brigade", "reputation launderer"],
       "abuseCaseIds": ["AC-05"],
-      "implementationBeads": ["BB-024", "BB-025", "BB-029", "BB-032", "BB-034", "BB-055"],
       "controls": {
         "preventive": [
-          "App Check + rate limits on corrections/submissions",
+          "Apply application rate limits where configured; client-header checks are not authentication",
           "Quarantine-first intake; never write canonical history from anonymous clients",
-          "Volume \u2260 truth: duplicates do not raise confidence or publish",
+          "Volume ≠ truth: duplicates do not raise confidence or publish",
           "Cooldown and similarity clustering for near-identical submissions"
         ],
         "detective": [
@@ -176,7 +180,12 @@
           "Tune similarity and quota thresholds post-incident"
         ]
       },
-      "residualRisk": "Human brigades with diverse IPs and unique prose can still consume moderator time; automation reduces but does not eliminate attention cost."
+      "residualRisk": "Human brigades with diverse IPs and unique prose can still consume moderator time; automation reduces but does not eliminate attention cost.",
+      "implementationRefs": [
+        "docs/security/submission-quarantine.md",
+        "apps/api-submissions/src/quarantine.ts",
+        "packages/security/src/submissions/quarantine.ts"
+      ]
     },
     {
       "id": "T-06",
@@ -185,23 +194,12 @@
       "assets": ["claims", "evidence", "public projections", "trust of corpus"],
       "actors": ["ideological adversary", "grifter", "lazy secondary mirror"],
       "abuseCaseIds": ["AC-06"],
-      "implementationBeads": [
-        "BB-003",
-        "BB-016",
-        "BB-017",
-        "BB-032",
-        "BB-037",
-        "BB-043",
-        "BB-047",
-        "BB-053",
-        "BB-060"
-      ],
       "controls": {
         "preventive": [
           "Constitution gates for inclusion, confidence, and precision",
           "Provenance and rights model; secondary mirrors do not become primary",
           "Lineage/confidence engine rejects circular citation inflation",
-          "Promotion workflow required before public visibility (/044)"
+          "Require the promotion workflow before public visibility"
         ],
         "detective": [
           "Contradiction and dispute signals on entity pages",
@@ -219,7 +217,12 @@
           "Update query packs / adapters that admitted laundered sources"
         ]
       },
-      "residualRisk": "Well-sourced-looking falsehoods can pass until human review or gold-corpus gaps are closed; residual is integrity risk bounded by promotion gates, not zero error."
+      "residualRisk": "Well-sourced-looking falsehoods can pass until human review or gold-corpus gaps are closed; residual is integrity risk bounded by promotion gates, not zero error.",
+      "implementationRefs": [
+        "docs/security/promotion-controls.md",
+        "packages/domain/src/promotion/controls.ts",
+        "packages/domain/src/promotion/preview.ts"
+      ]
     },
     {
       "id": "T-07",
@@ -228,11 +231,10 @@
       "assets": ["quarantine store", "research candidates", "promotion pipeline"],
       "actors": ["poisoner", "SEO farmer", "compromised upstream source"],
       "abuseCaseIds": ["AC-07"],
-      "implementationBeads": ["BB-029", "BB-032", "BB-037", "BB-039", "BB-040", "BB-044", "BB-060"],
       "controls": {
         "preventive": [
-          "Submissions quarantine with promotion controls (/032)",
-          "Research workers cannot publish (ADR-009)",
+          "Keep submissions in quarantine until explicit promotion controls pass",
+          "Research workers cannot approve or publish their own output",
           "Deterministic relevance and multi-source corroboration before acceptance",
           "Source registry trust tiers and adapter allowlists"
         ],
@@ -249,10 +251,15 @@
         "recovery": [
           "Purge or demote tainted claims; republish clean release",
           "Replay promotion from known-good evidence",
-          "Update gold corpus with the poison pattern (/060)"
+          "Add the poisoning pattern to regression fixtures"
         ]
       },
-      "residualRisk": "Slow, low-and-slow poisoning across many sources may evade burst detection; residual accepted with periodic adversarial review."
+      "residualRisk": "Slow, low-and-slow poisoning across many sources may evade burst detection; residual accepted with periodic adversarial review.",
+      "implementationRefs": [
+        "docs/security/submission-quarantine.md",
+        "docs/security/promotion-controls.md",
+        "packages/domain/src/promotion/controls.ts"
+      ]
     },
     {
       "id": "T-08",
@@ -261,13 +268,12 @@
       "assets": ["workers/security", "research fetchers", "metadata store", "internal network"],
       "actors": ["SSRF attacker", "submission abuser", "malicious publisher"],
       "abuseCaseIds": ["AC-08"],
-      "implementationBeads": ["BB-004", "BB-029", "BB-030", "BB-033", "BB-036", "BB-065"],
       "controls": {
         "preventive": [
-          "No synchronous fetch of submitted URLs in user requests (ADR-010)",
+          "Never fetch submitted URLs synchronously in a user request",
           "Async fetcher with allow/deny lists, private-IP block, DNS rebinding checks",
           "Redirect limits, scheme allowlist (https), response size/time caps",
-          "Egress controls from workers; no cloud metadata access from fetcher role"
+          "Treat egress isolation as a deployment requirement; repository policy alone does not prove it is active"
         ],
         "detective": [
           "Fetcher denials for private ranges / rebind attempts",
@@ -277,7 +283,7 @@
         "containment": [
           "Disable URL fetch / adapter fetch kill switch",
           "Quarantine URL and related submissions",
-          "Block offending domains at Armor or fetcher deny list"
+          "Block offending domains at the deployed edge where supported or in the fetcher deny list"
         ],
         "recovery": [
           "Rotate any credentials that could have been reached",
@@ -285,7 +291,12 @@
           "Re-scan quarantine queue with fixed fetcher"
         ]
       },
-      "residualRisk": "Novel DNS/CDN edge cases and IPv6 dual-stack rebinding may slip until  hardening matures; treat all fetched content as hostile."
+      "residualRisk": "Novel DNS, CDN, IPv6, and rebinding cases may evade known checks; all fetched content remains hostile.",
+      "implementationRefs": [
+        "docs/security/url-ssrf.md",
+        "packages/security/src/url-safety/policy.ts",
+        "packages/security/src/url-safety/fetch.ts"
+      ]
     },
     {
       "id": "T-09",
@@ -294,7 +305,6 @@
       "assets": ["upload storage", "virus/content scanners", "admin viewers"],
       "actors": ["malware uploader", "polyglot file attacker"],
       "abuseCaseIds": ["AC-09"],
-      "implementationBeads": ["BB-005", "BB-029", "BB-031", "BB-033", "BB-036"],
       "controls": {
         "preventive": [
           "Uploads deferred/quarantined; not served from public CDN by default",
@@ -318,16 +328,20 @@
           "Re-enable uploads after scanner and policy fixes"
         ]
       },
-      "residualRisk": " is deferred (P1); until then uploads must remain disabled or narrowly scoped. Residual: zero-day malware packing past scanners."
+      "residualRisk": "Uploads remain disabled until quarantine and scanning controls are implemented and verified; scanners would still carry zero-day residual risk.",
+      "implementationRefs": [
+        "docs/security/submission-quarantine.md",
+        "apps/api-submissions/src/quarantine.ts",
+        "docs/security/abuse-cases.md"
+      ]
     },
     {
       "id": "T-10",
       "name": "Prompt injection inside researched documents",
       "priority": "P0",
-      "assets": ["LLM research modes", "tool-using agents", "claim extraction"],
+      "assets": ["research drafting", "future tool-using research", "claim extraction"],
       "actors": ["document author", "compromised web page", "indirect injector"],
       "abuseCaseIds": ["AC-10"],
-      "implementationBeads": ["BB-030", "BB-042", "BB-044", "BB-064", "BB-065"],
       "controls": {
         "preventive": [
           "Public rendering never invokes an LLM (invariant)",
@@ -351,7 +365,12 @@
           "Update isolation and prompt firewall rules"
         ]
       },
-      "residualRisk": "/065 are deferred (P2); residual is high if LLMs are enabled early. Do not enable tool-using research until  controls exist."
+      "residualRisk": "Private research workers support bounded, operator-dispatched source and model calls and cannot publish. No active schedule or public/autonomous model access is intended; enabling either without verified isolation and review controls would create high residual risk.",
+      "implementationRefs": [
+        "docs/security/service-surfaces.md",
+        "docs/security/promotion-controls.md",
+        "packages/domain/src/promotion/controls.ts"
+      ]
     },
     {
       "id": "T-11",
@@ -360,13 +379,12 @@
       "assets": ["build artifacts", "deploy identities", "source integrity"],
       "actors": ["dependency attacker", "malicious Action", "compromised maintainer"],
       "abuseCaseIds": ["AC-11"],
-      "implementationBeads": ["BB-006", "BB-008", "BB-009", "BB-010", "BB-036", "BB-062"],
       "controls": {
         "preventive": [
-          "Pinned Actions; allowlist publishers",
-          "OIDC/WIF deploy identities; no long-lived keys in CI",
-          "Dependabot / lockfile discipline; review high-risk deps",
-          "CODEOWNERS for security, infra, policies, publication"
+          "Pin Actions and allowlist publishers",
+          "Use provider-native short-lived deployment identities where configured; no current GCP WIF deployment is asserted",
+          "Maintain lockfiles and review high-risk dependency changes",
+          "Use CODEOWNERS for security, infrastructure, policy, and publication paths"
         ],
         "detective": [
           "Dependabot and secret-scanning alerts",
@@ -374,7 +392,7 @@
           "Artifact hash / provenance checks in release pipeline"
         ],
         "containment": [
-          "Disable compromised workflows; revoke OIDC bindings",
+          "Disable compromised workflows and revoke the deployed provider identity",
           "Freeze deploys; pull tainted packages",
           "Rotate tokens and npm/uv credentials"
         ],
@@ -384,22 +402,26 @@
           "Post-mortem and Action allowlist tightening"
         ]
       },
-      "residualRisk": "Typosquatting and delayed CVE disclosure remain; residual reduced by pinning and review, not eliminated."
+      "residualRisk": "Typosquatting and delayed CVE disclosure remain; residual reduced by pinning and review, not eliminated.",
+      "implementationRefs": [
+        ".github/workflows/security.yml",
+        "infra/github/security-gates/README.md",
+        ".github/CODEOWNERS"
+      ]
     },
     {
       "id": "T-12",
       "name": "Secret leakage",
       "priority": "P0",
-      "assets": ["API keys", "DB credentials", "App Check secrets", "service accounts"],
+      "assets": ["API keys", "DB credentials", "service tokens", "service accounts"],
       "actors": ["accidental committer", "log scraper", "client bundle inspector"],
       "abuseCaseIds": ["AC-12"],
-      "implementationBeads": ["BB-005", "BB-009", "BB-010", "BB-011", "BB-027", "BB-034"],
       "controls": {
         "preventive": [
           "1Password / Secret Manager; no secrets in source or client bundles",
           "Push protection and secret scanning",
-          "Workload identity over static keys; least privilege",
-          "Logging redaction: no raw App Check tokens or protected addresses (ADR-010)"
+          "Prefer provider-native short-lived identities over static keys where configured",
+          "Redact secrets, client headers, and protected addresses from logs"
         ],
         "detective": [
           "Secret scanning alerts on push/PR",
@@ -417,16 +439,20 @@
           "Purge secrets from git history if ever committed (break-glass)"
         ]
       },
-      "residualRisk": "Human error and third-party log retention can still expose secrets briefly; detection+rotation time defines residual blast radius."
+      "residualRisk": "Human error and third-party log retention can still expose secrets briefly; detection+rotation time defines residual blast radius.",
+      "implementationRefs": [
+        "SECURITY.md",
+        ".github/workflows/security.yml",
+        "infra/github/security-gates/README.md"
+      ]
     },
     {
       "id": "T-13",
       "name": "Database exhaustion and connection starvation",
       "priority": "P0",
-      "assets": ["Cloud SQL", "connection pools", "public/read replicas"],
+      "assets": ["Supabase Postgres", "connection pools", "public read paths"],
       "actors": ["abuse traffic", "buggy client", "expensive query author"],
       "abuseCaseIds": ["AC-13"],
-      "implementationBeads": ["BB-012", "BB-013", "BB-025", "BB-026", "BB-033", "BB-034"],
       "controls": {
         "preventive": [
           "Pool size caps per service; statement timeouts",
@@ -445,36 +471,31 @@
           "Disable offending endpoints via kill switch"
         ],
         "recovery": [
-          "Scale or restart pools; restore from PITR if corruption",
+          "Restart or resize pools; restore from a verified backup or PITR where configured",
           "Fix offending queries; add regression tests",
           "Rehearse restore"
         ]
       },
-      "residualRisk": "Novel query shapes can still starve pools until observed; residual mitigated by timeouts and shedding, not infinite capacity."
+      "residualRisk": "Novel query shapes can still starve pools until observed; residual mitigated by timeouts and shedding, not infinite capacity.",
+      "implementationRefs": [
+        "docs/security/query-guardrails.md",
+        "docs/security/cost-resource-controls.md",
+        "packages/security/src/resource-controls.ts"
+      ]
     },
     {
       "id": "T-14",
       "name": "Cloud bill exhaustion",
       "priority": "P0",
-      "assets": ["GCP billing", "model APIs", "egress", "Cloud Run/Jobs"],
+      "assets": ["provider billing", "model APIs", "egress", "background jobs"],
       "actors": ["cost attacker", "misconfigured autoscaler", "runaway worker"],
       "abuseCaseIds": ["AC-14"],
-      "implementationBeads": [
-        "BB-005",
-        "BB-022",
-        "BB-023",
-        "BB-025",
-        "BB-033",
-        "BB-034",
-        "BB-035",
-        "BB-059"
-      ],
       "controls": {
         "preventive": [
-          "Budgets and hard quotas per project/env (/033)",
-          "Bounded concurrency for every queue, worker, API, model provider",
-          "Separate billing alerts for research vs public",
-          "No unbounded retries; dead-letter with caps"
+          "Configure budgets and quotas per deployed environment and verify them at the provider",
+          "Bound concurrency for queues, workers, APIs, and model providers",
+          "Separate cost attribution for research and public serving where provider telemetry allows",
+          "Bound retries and dead-letter handling"
         ],
         "detective": [
           "Budget burn-rate and anomaly billing alerts",
@@ -482,9 +503,9 @@
           "Worker fan-out cardinality monitors"
         ],
         "containment": [
-          "Kill switches for research, LLM, geocode, exports",
-          "Disable autoscaling max; pause Cloud Tasks queues",
-          "Emergency project quota freeze"
+          "Disable research, model, geocode, and export work before public serving",
+          "Pause configured queues and cap worker concurrency",
+          "Apply provider quota controls where available and verified"
         ],
         "recovery": [
           "Root-cause and restore essential services first (public snapshots)",
@@ -492,7 +513,12 @@
           "Cost soak test gates before launch"
         ]
       },
-      "residualRisk": "GCP budget alerts are not always hard stops; residual spend can accrue until automation enforces caps\u2014treat  hard limits as launch-critical."
+      "residualRisk": "Budget alerts are not necessarily hard stops; deployed provider quotas and shutdown behavior require direct verification.",
+      "implementationRefs": [
+        "docs/security/cost-resource-controls.md",
+        "packages/security/src/resource-controls.ts",
+        "docs/architecture.md"
+      ]
     },
     {
       "id": "T-15",
@@ -501,16 +527,6 @@
       "assets": ["living-person data", "sensitive locations", "public API responses", "logs"],
       "actors": ["doxxer", "stalker", "curious scraper", "insider"],
       "abuseCaseIds": ["AC-15"],
-      "implementationBeads": [
-        "BB-003",
-        "BB-015",
-        "BB-019",
-        "BB-028",
-        "BB-034",
-        "BB-036",
-        "BB-050",
-        "BB-057"
-      ],
       "controls": {
         "preventive": [
           "Constitution: unknown living status treated as living",
@@ -534,7 +550,12 @@
           "Add fixtures and CI guards from the leak pattern"
         ]
       },
-      "residualRisk": "Historical public records and third-party sites may already contain living addresses; product residual is not re-amplifying them via BlackStory APIs or UI."
+      "residualRisk": "Historical public records and third-party sites may already contain living addresses; product residual is not re-amplifying them via BlackStory APIs or UI.",
+      "implementationRefs": [
+        "docs/security/location-precision-standard.md",
+        "packages/security/src/redaction.ts",
+        "packages/testing/src/security-gates/security-gates.test.ts"
+      ]
     },
     {
       "id": "T-16",
@@ -543,21 +564,11 @@
       "assets": ["public projections", "release channel", "CDN content"],
       "actors": ["compromised admin", "broken authZ", "CI deployer"],
       "abuseCaseIds": ["AC-16"],
-      "implementationBeads": [
-        "BB-018",
-        "BB-019",
-        "BB-021",
-        "BB-027",
-        "BB-032",
-        "BB-035",
-        "BB-044",
-        "BB-062"
-      ],
       "controls": {
         "preventive": [
           "Immutable release snapshots; activation is explicit",
-          "Dual control / RBAC for publication (/044)",
-          "Internal API private; research cannot publish",
+          "Require explicit publication authorization and approval separation",
+          "Internal API requires service identity and research cannot publish; network isolation remains unproven",
           "Deploy pipeline gates"
         ],
         "detective": [
@@ -576,7 +587,12 @@
           "Harden authZ and add regression tests"
         ]
       },
-      "residualRisk": "A fully compromised publisher identity can still activate a bad release until detected; residual time-to-detect depends on  telemetry maturity."
+      "residualRisk": "A compromised publisher identity can activate a bad release until detected; residual risk depends on verified audit and rollback behavior.",
+      "implementationRefs": [
+        "docs/security/promotion-controls.md",
+        "docs/runbooks/release-activation-postgres.md",
+        "packages/domain/src/publication/release-activation.ts"
+      ]
     },
     {
       "id": "T-17",
@@ -585,16 +601,6 @@
       "assets": ["staging/prod isolation", "promotion UI", "release activation"],
       "actors": ["well-meaning operator", "fat-finger deployer"],
       "abuseCaseIds": ["AC-17"],
-      "implementationBeads": [
-        "BB-005",
-        "BB-018",
-        "BB-019",
-        "BB-027",
-        "BB-035",
-        "BB-044",
-        "BB-056",
-        "BB-061"
-      ],
       "controls": {
         "preventive": [
           "Strict env isolation; no shared prod resources",
@@ -618,7 +624,12 @@
           "Add guardrails (checklists, dual approval) where mistakes recur"
         ]
       },
-      "residualRisk": "Process controls cannot remove all human error; residual is bounded by fast rollback and auditability."
+      "residualRisk": "Process controls cannot remove all human error; residual is bounded by fast rollback and auditability.",
+      "implementationRefs": [
+        "docs/security/environment-isolation.md",
+        "docs/runbooks/production-release.md",
+        "docs/runbooks/release-activation-postgres.md"
+      ]
     },
     {
       "id": "T-18",
@@ -627,10 +638,9 @@
       "assets": ["adapters", "captures", "relevance ranking", "rights compliance"],
       "actors": ["upstream site change", "silent schema drift", "adversarial upstream"],
       "abuseCaseIds": ["AC-18"],
-      "implementationBeads": ["BB-016", "BB-037", "BB-038", "BB-045", "BB-046", "BB-047"],
       "controls": {
         "preventive": [
-          "Versioned adapter contracts and query packs (/038)",
+          "Use versioned adapter contracts and query packs",
           "Contract tests against fixtures; fail closed on parse errors",
           "Rights/provenance checks before capture acceptance"
         ],
@@ -650,7 +660,12 @@
           "Update fixtures and contracts"
         ]
       },
-      "residualRisk": "Upstream can change faster than detection windows; residual is temporary data gaps or quarantine backlog, preferred over silent corruption."
+      "residualRisk": "Upstream can change faster than detection windows; residual is temporary data gaps or quarantine backlog, preferred over silent corruption.",
+      "implementationRefs": [
+        "docs/research/research-operations.md",
+        "packages/domain/src/adapters/index.ts",
+        "docs/security/tests/checklist.md"
+      ]
     },
     {
       "id": "T-19",
@@ -659,10 +674,9 @@
       "assets": ["public corpus", "search API", "entity pages", "competitive IP"],
       "actors": ["commercial scraper", "archive bot", "hostile mirror"],
       "abuseCaseIds": ["AC-19"],
-      "implementationBeads": ["BB-023", "BB-024", "BB-025", "BB-026", "BB-034", "BB-049", "BB-059"],
       "controls": {
         "preventive": [
-          "Rate limits, App Check, and bot management on search and list endpoints",
+          "Rate limits, client-header check, and bot management on search and list endpoints",
           "Pagination caps; no unbounded export in v1 public API",
           "robots/ToS; CDN caching without facilitating full dump APIs",
           "Differentiate human page views vs API enumeration patterns"
@@ -675,15 +689,25 @@
         "containment": [
           "Throttle or challenge suspicious clients",
           "Temporary search/list kill switch; keep snapshot HTML if needed",
-          "Block ASN/IP ranges via Armor"
+          "Use provider ASN or IP blocks only where the deployed edge supports and verifies them"
         ],
         "recovery": [
-          "Tune limits after  load tests",
+          "Tune limits after a load exercise",
           "Legal/ToS follow-up for persistent scrapers if required",
           "Consider watermarking or delayed fields only if product accepts"
         ]
       },
-      "residualRisk": "Public historical data is inherently copyable page-by-page; residual goal is raising cost and detecting bulk extraction, not making public facts secret."
+      "residualRisk": "Public historical data is inherently copyable page-by-page; residual goal is raising cost and detecting bulk extraction, not making public facts secret.",
+      "implementationRefs": [
+        "docs/security/rate-limits.md",
+        "docs/security/query-guardrails.md",
+        "packages/security/src/rate-limits.ts"
+      ]
     }
+  ],
+  "architectureRefs": [
+    "docs/architecture.md",
+    "docs/security/service-surfaces.md",
+    "docs/security/tests/checklist.md"
   ]
 }

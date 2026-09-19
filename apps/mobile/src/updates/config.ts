@@ -1,19 +1,7 @@
 /**
- * EAS Update / OTA posture (MOB-019, repo-ovn7; ADR-024 §2/§7, threat-model
- * T6). ADR-024 was removed in the 2026-07-24 purge and is restated in
- * `docs/decisions-carryover.md`, "Mobile cache and OTA release"; comments in
- * this module cited "ADR-023" before the 2026-07-22 mobile renumbering, which
- * is the cache/offline decision, not this one. Pure functions only — no native I/O, no `expo-constants` /
- * `expo-updates` calls — so they are deterministically unit-testable. The
- * runtime wiring that gathers real inputs (`expo-updates`'s
- * `isEnabled`/`channel`/`runtimeVersion`/`updateId`) lives in
- * `native-bridge.ts`; this module only decides what those values MEAN.
- *
- * Mirrors the `resolveObservabilityConfig` / `resolveAppCheckProviderConfig`
- * split already used in `src/observability/config.ts` and
- * `src/security/app-check.ts`: a pure resolver plus a defensive native
- * loader, kept in separate files so the decision logic is testable without
- * mocking native modules.
+ * Pure EAS Update posture resolution. Native-bridge supplies isEnabled, channel, runtimeVersion
+ * and updateId; this module interprets them without native I/O. Runtime-version compatibility
+ * must hold before applying an update.
  */
 
 /**

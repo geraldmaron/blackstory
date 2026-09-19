@@ -1,26 +1,4 @@
-/**
- * Wayback availability lookup: ask Internet Archive what it already holds for a URL.
- *
- * The other half of this directory submits captures (SPN2, `client.ts`). This half reads them,
- * and the two are wired lookup-first for a reason. Many cited URLs already have snapshots, so
- * minting a new one duplicates work the archive has already done; and a lookup recovers pages
- * our own safe-fetch refuses (a PDF, a robots block, a dead host) whenever IA got there first.
- * The lookup needs no credentials, so it stays available on lanes where SPN keys are absent.
- *
- * Two invariants hold everything else together:
- *
- * 1. The result is total. Every failure a lookup can hit, a 500, a truncated body, a DNS
- *    error, a safe-fetch rejection, comes back as a typed `miss` rather than a throw. A
- *    fallback that can itself fail the caller is not a fallback, and criterion 4 of the bead
- *    this implements says a miss is a logged skip.
- * 2. A pointer is never invented. We return the `url` the API named, and only after checking
- *    it is on an Internet Archive host, so a surprising response cannot smuggle an arbitrary
- *    URL into an evidence row. The one edit we make is upgrading the archive's own `http://`
- *    pointer to `https://` (the API still answers in http), which keeps stored pointers and
- *    every later link check on TLS without changing which capture is named.
- *
- * Goes through the injected `SafeHttpClient` like every other adapter here; never calls `fetch`.
- */
+/** Reads existing snapshots and verifies their timestamp, status, and exact source URL. */
 import {
   assertAllowedContentType,
   defaultIsRetryable,
@@ -28,13 +6,10 @@ import {
   type SafeHttpClient,
   type SafeHttpResponse,
 } from '../shared/http-port.js';
-import { waybackAvailabilityUrl } from './types.js';
+import { waybackAvailabilityUrl, parseWaybackCaptureUrl } from './types.js';
 import type { WaybackLookupResult, WaybackSnapshot } from './types.js';
 
 const AVAILABILITY_ALLOWED_CONTENT_TYPES = ['application/json'];
-
-/** Hosts a returned pointer may live on. Suffix-matched, so `web.archive.org` is covered. */
-const ARCHIVE_POINTER_HOST_SUFFIX = 'archive.org';
 
 function miss(
   reason: Extract<WaybackLookupResult, { status: 'miss' }>['reason'],
@@ -44,35 +19,14 @@ function miss(
 }
 
 /**
- * Accepts a pointer only when it is an http(s) URL on an Internet Archive host, and upgrades
- * the archive's http answers to https. Returns null for anything else, which the caller reads
- * as a malformed response rather than as a snapshot.
- */
-function normalizePointerUrl(raw: string): string | null {
-  let parsed: URL;
-  try {
-    parsed = new URL(raw);
-  } catch {
-    return null;
-  }
-  if (parsed.protocol !== 'http:' && parsed.protocol !== 'https:') return null;
-  const hostname = parsed.hostname.toLowerCase();
-  const onArchive =
-    hostname === ARCHIVE_POINTER_HOST_SUFFIX ||
-    hostname.endsWith(`.${ARCHIVE_POINTER_HOST_SUFFIX}`);
-  if (!onArchive) return null;
-  if (parsed.protocol === 'http:') {
-    parsed.protocol = 'https:';
-  }
-  return parsed.toString();
-}
-
-/**
  * Parses one `/wayback/available` body. Defensive in the same spirit as
  * `parseSpnStatusResponse`: any shape we do not fully recognize becomes a miss, never a
  * half-populated snapshot.
  */
-export function parseWaybackAvailabilityResponse(raw: unknown): WaybackLookupResult {
+export function parseWaybackAvailabilityResponse(
+  raw: unknown,
+  targetUrl?: string,
+): WaybackLookupResult {
   if (!raw || typeof raw !== 'object') {
     return miss('malformed_response', 'body_not_an_object');
   }
@@ -101,13 +55,15 @@ export function parseWaybackAvailabilityResponse(raw: unknown): WaybackLookupRes
   if (!rawUrl || !timestamp) {
     return miss('malformed_response', 'closest_missing_url_or_timestamp');
   }
-  const url = normalizePointerUrl(rawUrl);
-  if (url === null) {
+  const pointer = parseWaybackCaptureUrl(rawUrl, targetUrl);
+  if (pointer === null || pointer.timestamp !== timestamp) {
     return miss('malformed_response', 'closest_url_not_an_archive_pointer');
   }
-  const httpStatus = typeof record.status === 'string' ? record.status.trim() : '';
+  const httpStatus =
+    typeof record.status === 'string' ? record.status.trim() : String(record.status ?? '');
+  if (!/^2\d\d$/.test(httpStatus)) return miss('http_error', 'snapshot_status_not_success');
   const snapshot: WaybackSnapshot = {
-    url,
+    url: pointer.url,
     timestamp,
     ...(httpStatus ? { httpStatus } : {}),
   };
@@ -165,5 +121,5 @@ export async function lookupWaybackSnapshot(
   } catch {
     return miss('malformed_response', 'invalid_json');
   }
-  return parseWaybackAvailabilityResponse(parsed);
+  return parseWaybackAvailabilityResponse(parsed, targetUrl);
 }

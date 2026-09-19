@@ -3,7 +3,7 @@
  *
  * Pure deterministic validation for public search: Unicode normalization, approved query
  * shapes only, bounded filters/radius/date/page depth, opaque cursor pagination, cache keys,
- * timeout policy, and slow-query telemetry shapes. Firestore-scoped; SQL paths deferred.
+ * timeout policy, and slow-query telemetry shapes. Storage-independent policy; database adapters enforce statement timeouts.
  */
 import { createHash, timingSafeEqual } from 'node:crypto';
 import type { EndpointClass } from './rate-limits.js';
@@ -123,7 +123,7 @@ export type QueryGuardrailDecisionAllowed = {
   readonly cacheKey: string;
   readonly queryHash: string;
   readonly timeoutMs: number;
-  readonly firestoreTimeoutMs: number;
+  readonly databaseTimeoutMs: number;
   readonly exportLimit: number;
   readonly estimatedCost: number;
   readonly policyVersion: typeof QUERY_GUARDRAIL_POLICY_VERSION;
@@ -153,7 +153,7 @@ export type QueryGuardrailLimits = {
   readonly maxPaginationDepth: number;
   readonly maxExportResults: number;
   readonly queryTimeoutMs: number;
-  readonly firestoreStatementTimeoutMs: number;
+  readonly databaseStatementTimeoutMs: number;
   readonly maxEstimatedCost: number;
 };
 
@@ -170,7 +170,7 @@ export const DEFAULT_QUERY_GUARDRAIL_LIMITS: QueryGuardrailLimits = {
   maxPaginationDepth: 20,
   maxExportResults: 500,
   queryTimeoutMs: 5_000,
-  firestoreStatementTimeoutMs: 4_000,
+  databaseStatementTimeoutMs: 4_000,
   maxEstimatedCost: 2_500,
 };
 
@@ -196,7 +196,7 @@ export type SlowQueryLogEvent = {
 
 export type QueryTimeoutPolicy = {
   readonly queryTimeoutMs: number;
-  readonly firestoreStatementTimeoutMs: number;
+  readonly databaseStatementTimeoutMs: number;
   readonly failClosed: true;
 };
 
@@ -297,7 +297,7 @@ function allow(
     cacheKey,
     queryHash,
     timeoutMs: limits.queryTimeoutMs,
-    firestoreTimeoutMs: limits.firestoreStatementTimeoutMs,
+    databaseTimeoutMs: limits.databaseStatementTimeoutMs,
     exportLimit: limits.maxExportResults,
     estimatedCost,
     policyVersion: QUERY_GUARDRAIL_POLICY_VERSION,
@@ -661,7 +661,7 @@ export function getQueryTimeoutPolicy(
 ): QueryTimeoutPolicy {
   return {
     queryTimeoutMs: limits.queryTimeoutMs,
-    firestoreStatementTimeoutMs: limits.firestoreStatementTimeoutMs,
+    databaseStatementTimeoutMs: limits.databaseStatementTimeoutMs,
     failClosed: true,
   };
 }
@@ -724,9 +724,9 @@ export function searchQueryEndpointMetadata(decision: QueryGuardrailDecisionAllo
 /**
  * Validates and canonicalizes a public search query.
  * No statement timeout is applied on the live read path: the public Postgres pool sets none, and
- * `queryTimeoutMs` / `firestoreStatementTimeoutMs` below are reported as policy metadata only.
+ * `queryTimeoutMs` / `databaseStatementTimeoutMs` below are reported as policy metadata only.
  * What bounds a query here is the cost estimate and the page-size ceilings. See
- * docs/decisions-carryover.md, "Firestore as system of record, reversed".
+ * the database pool configuration for actual server timeout enforcement.
  */
 export function evaluateSearchQueryGuardrails(
   input: SearchQueryInput,

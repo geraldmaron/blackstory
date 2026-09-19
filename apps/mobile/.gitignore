@@ -18,16 +18,9 @@ expo-env.d.ts
 *.key
 *.mobileprovision
 
-# Firebase app config (App Check + Crashlytics/Perf, MOB-010/MOB-018) — real
-# credentials come from real Firebase app registrations (a human gate; see
-# docs/mobile/decisions/mobile-identity.md). Never commit the real files; wire
-# them per-environment via a config plugin (see app.config.ts) sourced from a
-# gitignored local path or an EAS file secret. See README "Firebase & EAS
-# secret wiring". These patterns match the files anywhere in the tree.
+# Reject accidental provider credential drops, including retired provider formats.
 GoogleService-Info.plist
 google-services.json
-# Local Firebase credential drop (referenced by GOOGLE_SERVICES_* env for local
-# dev — never committed). Keep real plist/json here on your machine only.
 secrets/
 
 # Metro

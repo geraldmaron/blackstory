@@ -1,13 +1,10 @@
 /**
  * Upload + retry + partial-publish bookkeeping for publish-release-catalog-artifacts.ts.
  *
- * Extracted for the same reason release-catalog-publish-decision.ts's watermark logic is
- * extracted: the actual bug happened in production (2026-09-12, repo-kywgj). Two of three
- * consecutive runs died with a bare `fetch failed` mid-upload. On the first failure,
- * entities.json had already uploaded and search-index.json had not, leaving the published
- * pair mismatched — and the error gave no status, URL, or artifact name, so it was unclear
- * which upload had died. Testing the fix (retry, per-artifact hash bookkeeping, and a real
- * error message) needs a stubbed uploader, not a live database or Storage bucket.
+ * A partial upload can replace entities.json while leaving search-index.json stale. Per-artifact
+ * hashes distinguish completed uploads from pending ones, retries bound transient failures, and
+ * errors identify the failing artifact. The uploader is injectable so failure sequences can be
+ * tested without a live database or Storage bucket.
  */
 
 import { shouldUploadArtifact } from './release-catalog-publish-decision.ts';

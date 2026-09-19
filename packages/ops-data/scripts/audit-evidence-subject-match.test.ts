@@ -1,5 +1,5 @@
 /**
- * repo-pjob / repo-nlcq — the token rules behind the mis-attachment audit.
+ * Token rules behind the evidence mis-attachment audit.
  *
  * These rules have been wrong twice in ways that looked right in aggregate, so the cases below are
  * the real documents that exposed each mistake rather than synthetic fixtures. Both wrong versions

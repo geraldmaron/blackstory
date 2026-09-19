@@ -12,18 +12,18 @@
 **Migration:** [`supabase/migrations/20260721180000_postgrest_published_views.sql`](../../supabase/migrations/20260721180000_postgrest_published_views.sql)  
 **Bead:** repo-651l.3 (data-landscape capitalization)
 
-Supabase exposes the Data API (PostgREST) for schemas listed in [`supabase/config.toml`](../../supabase/config.toml) (`public`, `bb_public`, `bb_submissions`). Product tables remain in private `bb_*` schemas; **open developer reads** use narrow **`public` views** that project only the active release. Mobile and App Check clients continue to use [`apps/api-public`](../../apps/api-public/) (dual-surface model).
+Supabase exposes the Data API (PostgREST) for schemas listed in [`supabase/config.toml`](../../supabase/config.toml) (`public`, `published`, `submissions`). Product tables remain in private `bb_*` schemas; **open developer reads** use narrow **`public` views** that project only the active release. Mobile and App Check clients continue to use [`apps/api-public`](../../apps/api-public/) (dual-surface model).
 
 ## Views
 
 | View | Source table | Scope |
 |------|--------------|-------|
-| `public.published_entities` | `bb_public.release_entities` | Rows where `release_id` matches `bb_public.active_release` (`id = 'active'`) |
-| `public.published_search_index` | `bb_public.search_index` | Same active-release filter |
+| `public.published_entities` | `published.release_entities` | Rows where `release_id` matches `published.active_release` (`id = 'active'`) |
+| `public.published_search_index` | `published.search_index` | Same active-release filter |
 
-Both views use `WITH (security_invoker = true)` so existing RLS on `bb_public` tables ([`20260720220010_rls_policies.sql`](../../supabase/migrations/20260720220010_rls_policies.sql)) still applies. The view `WHERE` clause is defense-in-depth; it does **not** widen access beyond the active-release policies already granted to `anon` / `authenticated`.
+Both views use `WITH (security_invoker = true)` so existing RLS on `published` tables ([`20260720220010_rls_policies.sql`](../../supabase/migrations/20260720220010_rls_policies.sql)) still applies. The view `WHERE` clause is defense-in-depth; it does **not** widen access beyond the active-release policies already granted to `anon` / `authenticated`.
 
-**Not exposed:** `bb_canonical`, `bb_research`, drafts, unpublished candidates, `bb_ops` write paths, or service-role capabilities.
+**Not exposed:** `canonical`, `research`, drafts, unpublished candidates, `ops` write paths, or service-role capabilities.
 
 ## URL patterns (Supabase Data API)
 
@@ -67,7 +67,7 @@ PostgREST filter operators follow [Supabase REST docs](https://supabase.com/docs
 
 ## RLS and access model
 
-| Role | `published_*` views | `bb_canonical` / `bb_research` |
+| Role | `published_*` views | `canonical` / `research` |
 |------|---------------------|--------------------------------|
 | `anon` | SELECT (active release only) | No access |
 | `authenticated` | SELECT (active release only) | Staff roles only via separate policies |
@@ -111,7 +111,7 @@ Verify views:
 ```sql
 SELECT count(*) FROM public.published_entities;
 SELECT count(*) FROM public.published_search_index;
--- Counts should match active-release rows in bb_public.* (RLS-aware as current role).
+-- Counts should match active-release rows in published.* (RLS-aware as current role).
 ```
 
 Optional smoke test against local REST (anon key from `supabase status`):
@@ -129,7 +129,7 @@ curl -s \
 2. `supabase link --project-ref twykhihqkcldpreuovay` (once)
 3. `SUPABASE_ACCESS_TOKEN` from 1Password (`op://Private/Supabase/credential`)
 4. `supabase db push` **or** paste migration into Dashboard → SQL Editor after approval
-5. Confirm views in Dashboard (schema `public`) and spot-check counts vs `bb_public.release_entities`
+5. Confirm views in Dashboard (schema `public`) and spot-check counts vs `published.release_entities`
 
 Rollback: `REVOKE SELECT ON public.published_entities, public.published_search_index FROM anon, authenticated;` then `DROP VIEW` if removing the surface entirely (rollback clause of the ADR-026 decision, `decisions-carryover.md`, "Small recovered decisions").
 

@@ -1,11 +1,4 @@
-/**
- * Async release-activation orchestration for Postgres SoR (MOB-005).
- *
- * Reuses domain validation and manifest generation from `@repo/domain` while persisting through
- * the Postgres `PostgresReleaseStore`. Firestore remains an explicit opt-in rollback path via
- * `@repo/ops-data` — this module is the primary activation surface after the Postgres cutover
- * (`docs/decisions-carryover.md`, "entity source-of-truth precedence").
- */
+/** Async release activation. Validates domain manifests before persisting immutable artifacts and changing the active Postgres pointer. */
 import {
   ReleaseActivationError,
   publicReleaseBootstrapPath,
@@ -110,9 +103,8 @@ export async function rollbackToAsync(
 }
 
 /**
- * Garbage collection policy (repo-hi8c concern 2 — owner-confirmed):
- * retain active + immediately-previous release only; `GcOptions.retain` pins extras.
- * One-deep rollback depth is intentional for launch — deeper history requires GCS/CDN pins.
+ * Retains the active and immediately previous release. GcOptions.retain pins additional
+ * releases; deeper rollback requires preserving their storage objects too.
  */
 export async function collectGarbageAsync(
   store: PostgresReleaseStore,

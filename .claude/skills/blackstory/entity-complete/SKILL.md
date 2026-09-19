@@ -37,9 +37,9 @@ There is no bulk image-sourcing adapter. Rights clearance is a minimum-case fiel
 hot-link a search result.
 
 Contract: [`docs/ui/learning-index-entity.md`](../../../../docs/ui/learning-index-entity.md).
-Promote a local, rights-cleared file with
-`packages/firebase/scripts/promote-entity-primary-image.ts` (`--alt`, `--credit`,
-`--rights`). Incomplete images are dropped at write (`preparePublicEntityProjectionForWrite`).
+For Commons media, use the rights-reviewed plan accepted by
+`packages/ops-data/scripts/pin-commons-primary-images.ts`; inspect its dry-run before applying.
+Local file upload is not provided by that command. Incomplete images are dropped at write (`preparePublicEntityProjectionForWrite`).
 
 People in images need PERSON / ROLE / PLACE / YEAR. No anonymous decoration, no generic
 "Black history" stock, no AI image presented as documentary.
@@ -50,7 +50,7 @@ scrape Wikimedia and assume public domain.
 ## Related entities
 
 `propose-edge` is the verb that proposes an edge. `expand` is a different job: it traverses
-Wikidata from the entity's QID and stages neighbors in `bb_research.landscape_candidates` as
+Wikidata from the entity's QID and stages neighbors in `research.landscape_candidates` as
 pending candidates, which a reviewer still has to turn into edges. It fills the research queue,
 not the related rail. See `docs/research/research-operations.md` for its flags and its two
 current wiring gaps.

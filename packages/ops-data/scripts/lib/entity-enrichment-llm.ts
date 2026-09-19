@@ -1,12 +1,7 @@
 /**
- * repo-n7p6.4 (WS4) — cheap-model entity enrichment: prompt, schema, response validation.
- *
- * Same discipline as claim-date-llm-extraction.ts (Stage 2 date extraction): the model states
- * only facts present in supplied evidence, every factual field carries a citation (evidence id +
- * verbatim quote), and a deterministic validator — not the model's own claim — decides whether a
- * response is trustworthy enough to store. A response that fails validation is quarantined, never
- * written to the public projection; WS5 (separately gated) is the only path from ledger to
- * bb_public.
+ * Builds evidence-bound enrichment prompts and validates structured responses and quotation
+ * attachment. Invalid outputs are quarantined. Structural and quote validation do not prove
+ * entailment; independent claim review precedes publication.
  */
 import { treatAsLiving } from '@repo/domain';
 import { decadeStartYearFromLabel, isDecadeAtOrBeforeCurrent } from '@repo/domain';
@@ -33,10 +28,8 @@ export type EnrichmentEvidenceInput = {
   /** Possibly truncated by the caller to bound prompt size; truncation never hides a citation's source. */
   readonly text: string;
   /**
-   * How `text` relates to the source document, when it is not the whole of it (repo-z57b). Says
-   * whether the excerpt was selected for relevance or is a plain head slice, how much was left
-   * out, and — the part a drafter must act on — whether the document mentions the lane's subject
-   * matter anywhere at all. Absent when the source was handed over whole.
+   * Describes excerpt selection, omitted content and subject-matter signals. Absent when the
+   * complete source text is supplied.
    */
   readonly readNote?: string | null;
 };
@@ -64,10 +57,9 @@ export type EnrichmentDraft = {
   readonly eraBuckets: readonly string[];
   readonly keywords: readonly string[];
   /**
-   * Floor v2 (repo-2t04.1): the only way a summary under SUMMARY_MIN_CHARS is ever accepted.
-   * Requires bestEffortReason stating the evidence sweep was exhausted — never silent. Written
-   * through to the ledger's notes.draft (entity-enrichment-apply.ts) so best-effort rows stay
-   * queryable and re-sweepable once better evidence lands.
+   * A summary below the normal floor requires bestEffortReason and remains identifiable in the
+   * ledger for further acquisition and review. A drafter's assertion of exhaustion is not
+   * independent proof of completeness.
    */
   readonly bestEffort?: boolean;
   readonly bestEffortReason?: string | null;
@@ -260,11 +252,8 @@ export function buildEnrichmentRequest(
     ],
     model,
     temperature: 0.2,
-    // Reasoning models on the default paid roster (deepseek-r1-0528) write their chain-of-thought
-    // directly into the response body ahead of the final JSON — OpenRouter's `reasoning` field
-    // separation isn't honored by every router. 1400 tokens was measured truncating mid-reasoning
-    // on 17/20 real dc-sites entities (2026-08-06 live run), never reaching the JSON at all. 6000
-    // leaves headroom for a multi-paragraph reasoning chain plus the (short) final answer.
+    // Output budget includes provider reasoning overhead. Responses without complete valid JSON
+    // must fail validation rather than be repaired into assertions.
     maxTokens: 6000,
     responseSchema: ENTITY_ENRICHMENT_RESPONSE_SCHEMA,
   };
@@ -359,16 +348,9 @@ function parseStringArray(raw: unknown, errors: string[], fieldLabel: string): s
 }
 
 /**
- * Quote must appear verbatim, or after whitespace + typographic-punctuation normalization —
- * never fuzzy-matched, never word-overlap scored. The second pass exists because source
- * evidence routinely carries curly quotes/apostrophes and em/en dashes (Wikipedia, NPS OCR),
- * and a model "copying verbatim" overwhelmingly straightens that punctuation as a side effect
- * of tokenization — measured directly against a live 21-entity batch (2026-08-06): of 47
- * citations that failed a raw substring check, 33 were this exact case (curly "'"/'"' vs
- * straight) and matched cleanly once normalized. That is not the model inventing a quote; it is
- * the validator being stricter than the actual anchoring guarantee needs. Straight-vs-curly
- * carries zero factual risk either direction, unlike whitespace collapsing (already handled)
- * or actual paraphrase (still caught: this only folds a fixed, small character set).
+ * Matches quotations exactly or after the explicit whitespace and typographic-punctuation
+ * normalization. Does not accept paraphrase, token overlap or fuzzy similarity. The recorded
+ * normalization does not establish entailment.
  */
 function normalizeQuoteText(value: string): string {
   return value
@@ -386,16 +368,8 @@ function quoteAppearsIn(quote: string, text: string): boolean {
 }
 
 /**
- * repo-otll — true when the matched span for `quote` inside `text` crosses an elision marker
- * ("[…]", see ELISION_MARKER in evidence-excerpt.ts).
- *
- * quoteAppearsIn() only confirms the quote's characters occur as a contiguous substring of
- * evidence.text; a quote can satisfy that check while actually splicing two sides of an excerpt
- * gap into one "verbatim" sentence, fabricating continuity the source never asserted. The prompt
- * already tells the model a quote must come from one side of "[…]", never span it
- * (buildEnrichmentUserPrompt), but nothing enforced that rule — this closes the gap by locating
- * the same span quoteAppearsIn() matched (raw, or normalized when only the normalized form
- * matched) and checking it for the ellipsis character.
+ * Reject quotations spanning an excerpt elision marker. A substring across omitted text cannot
+ * establish a continuous passage in the original source.
  */
 function quoteSpansGapMarker(quote: string, text: string): boolean {
   if (quote.length === 0) return false;
@@ -462,17 +436,8 @@ function checkNoAddressTokens(text: string | null, errors: string[], fieldLabel:
 }
 
 /**
- * repo-lm6h — refuse a draft that copies raw registry vocabulary into prose.
- *
- * Quote-verification cannot catch this and never will: "recognized under ethnic heritage (black)"
- * is a genuine substring of the NPS source document, so the citation anchors, the draft validates,
- * and the phrase publishes. `humanizeAreaCode` cannot catch it either — it guards the template
- * path, where a code is substituted into a generated sentence, and here no substitution ever
- * happened. The only place this is catchable is here, on the model's own output text, which is
- * also where `checkNoAddressTokens` sits for the same structural reason.
- *
- * Applied to every lane, not just nrhp-black-heritage: an entity drafted from an NPS nomination
- * carries the same vocabulary whatever lane routed it.
+ * Rejects raw registry vocabulary copied into narrative across all lanes. Quote attachment can
+ * succeed on such text, so prose validation is a separate check.
  */
 function checkNoRawRegistryVocabulary(
   text: string | null,
@@ -495,10 +460,8 @@ export function validateEnrichmentResponse(
 ): EnrichmentAttempt {
   let payload: RawDraft;
   try {
-    // A session-drafted answer (Haiku subagent, human operator) commonly wraps its JSON in a
-    // markdown fence out of habit; OpenRouter responses already get this treatment inside
-    // extractMessageContent before reaching here. Normalizing at the validation boundary means
-    // every raw-content source — API or session — is held to one parsing rule, not one per caller.
+    // Applies the same fenced-JSON normalization to all externally supplied content at this
+    // draft validation boundary.
     payload = JSON.parse(stripMarkdownCodeFence(rawContent)) as RawDraft;
   } catch {
     return {

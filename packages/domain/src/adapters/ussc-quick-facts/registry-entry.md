@@ -35,10 +35,10 @@ After merge, enable `registryState: 'enabled'` only when parent bead integrates 
 ```bash
 # Dry-run
 node --conditions development --import tsx \
-  packages/firebase/scripts/ingest-phase1-ussc-quick-facts.ts
+  packages/ops-data/scripts/ingest-phase1-ussc-quick-facts.ts
 
 # Apply
 DRY_RUN=0 INGEST_PHASE1_USSC_APPLY=1 DATABASE_URL=postgresql://... \
   node --conditions development --import tsx \
-  packages/firebase/scripts/ingest-phase1-ussc-quick-facts.ts
+  packages/ops-data/scripts/ingest-phase1-ussc-quick-facts.ts
 ```

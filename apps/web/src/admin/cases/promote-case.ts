@@ -1,28 +1,8 @@
 /**
- * Case -> canonical entity promotion (repo-k2kb). Replaces the untracked, gitignored
- * `.cache/promote-authority-net-2026-07-23.mjs` script — same transactional writes into
- * `bb_canonical.*`, `bb_evidence.*`, and `bb_research.case_history_events`, but committed,
- * tested, parameterized, and gated by `evaluateCasePromotionGate`
- * (`@repo/domain`, `packages/domain/src/promotion/case-promotion.ts`) instead of a hardcoded
- * actor id anyone with repo access could re-run unreviewed.
- *
- * Authority boundary: this module lives in apps/web/src/admin, not operator-cli, because promoting a
- * canonical entity requires an *approver* identity distinct from whoever proposed the record
- * admin already has that distinction via Supabase-role auth (see `auth/request-auth.ts`);
- * operator-cli deliberately does not (see `promotion-boundary.test.ts`).
- *
- * Deliberately does NOT write into `bb_research.cases.publication` the ad hoc script it
- * replaces did, but that column is typed (`ResearchCaseRecord['publication']`) for *public
- * release* metadata (`releaseId`/`publishedAt`/`revision`), a later, distinct stage. Reusing it
- * for "promoted to canonical" would silently corrupt that field for any later release step.
- * Instead the canonical link is recorded the same way the ad hoc script already did on the
- * entity side (`entities.identifiers: [{scheme: 'research_case', value: caseId}]`) and on the
- * case side via a `case_history_events` row (same state in/out, reason_code carries the fact).
- *
- * The Postgres seam is injectable (`PromoteCaseDependencies`, same shape as
- * `canonical-write.ts`'s `CanonicalWriteDependencies`) so `promote-case.test.ts` can exercise the
- * real transactional write path — gate rejection, validation rejection, and a happy-path commit —
- * against a fake client instead of only the pure gate/validation functions.
+ * Promotes a reviewed case into canonical and evidence tables under an independent approver
+ * identity. Case history records the canonical link. The publication field is reserved for
+ * public-release metadata and is not written by canonical promotion. Postgres dependencies are
+ * injectable for transaction tests.
  */
 import { randomUUID, createHash } from 'node:crypto';
 import type pg from 'pg';
@@ -85,7 +65,7 @@ async function ensureNoCatalogDuplicate(
   const aliases = (record.aliases ?? []).map((alias) => alias.toLowerCase());
   const result = await client.query(
     `SELECT id, display_name
-       FROM bb_canonical.entities
+       FROM canonical.entities
       WHERE id <> $1
         AND (
           lower(display_name) = lower($2)
@@ -116,13 +96,13 @@ async function insertSourceAndEvidence(
   const evidenceId = evidenceIdFor(source.url, source.excerpt);
 
   await client.query(
-    `INSERT INTO bb_evidence.evidence_sources (id, display_name, adapter_id, adapter_enabled, rights)
+    `INSERT INTO evidence.evidence_sources (id, display_name, adapter_id, adapter_enabled, rights)
      VALUES ($1, $2, 'manual-review', false, $3::jsonb)
      ON CONFLICT (id) DO NOTHING`,
     [sourceId, host, JSON.stringify({ citationOnly: true, sourceType: 'web' })],
   );
   await client.query(
-    `INSERT INTO bb_evidence.source_items (id, source_id, stable_identifier, title, url, metadata)
+    `INSERT INTO evidence.source_items (id, source_id, stable_identifier, title, url, metadata)
      VALUES ($1, $2, $3, $4, $3, $5::jsonb)
      ON CONFLICT (id) DO NOTHING`,
     [
@@ -134,7 +114,7 @@ async function insertSourceAndEvidence(
     ],
   );
   await client.query(
-    `INSERT INTO bb_evidence.evidence_records (id, source_item_id, rights_status, excerpt, lineage_root_id, metadata)
+    `INSERT INTO evidence.evidence_records (id, source_item_id, rights_status, excerpt, lineage_root_id, metadata)
      VALUES ($1, $2, $3, $4, $1, $5::jsonb)
      ON CONFLICT (id) DO NOTHING`,
     [
@@ -199,7 +179,7 @@ async function insertCanonicalRecord(
   };
 
   await client.query(
-    `INSERT INTO bb_canonical.entities
+    `INSERT INTO canonical.entities
       (id, kind, entity_class, display_name, aliases, identifiers, living_status,
        status_history, notability_basis, sensitivity, kind_detail)
      VALUES ($1, 'place', 'place', $2, $3::jsonb, $4::jsonb, 'not_applicable',
@@ -222,7 +202,7 @@ async function insertCanonicalRecord(
   );
 
   await client.query(
-    `INSERT INTO bb_canonical.entity_locations
+    `INSERT INTO canonical.entity_locations
       (id, entity_id, role, geometry_type, geometry, location, lat, lng,
        geohash, geohash_prefixes, precision, match_method, label, evidence_ids, modern_zip)
      SELECT
@@ -254,7 +234,7 @@ async function insertCanonicalRecord(
   );
 
   await client.query(
-    `INSERT INTO bb_canonical.claims
+    `INSERT INTO canonical.claims
       (id, entity_id, claim_class, workflow_status, publication_status, procedural_status,
        confidence, research_coverage, verification)
      VALUES ($1, $2, 'standard', 'accepted', 'staged', 'reviewed', $3::jsonb, $4::jsonb, $5::jsonb)
@@ -281,7 +261,7 @@ async function insertCanonicalRecord(
   );
 
   await client.query(
-    `INSERT INTO bb_canonical.claim_versions
+    `INSERT INTO canonical.claim_versions
       (id, claim_id, predicate, object, workflow_status, publication_status, confidence, body, created_by)
      VALUES ($1, $2, 'documented_site', $3::jsonb, 'accepted', 'staged', $4::jsonb, $5::jsonb, $6)
      ON CONFLICT (id) DO NOTHING`,
@@ -317,7 +297,7 @@ async function insertCanonicalRecord(
   );
 
   await client.query(
-    `UPDATE bb_canonical.claims SET current_version_id = $2, updated_at = now()
+    `UPDATE canonical.claims SET current_version_id = $2, updated_at = now()
      WHERE id = $1 AND current_version_id IS NULL`,
     [claimId, claimVersionId],
   );
@@ -325,7 +305,7 @@ async function insertCanonicalRecord(
   for (const item of evidence) {
     const linkId = `cel_canonical_promotion_${shortHash(`${claimId}\n${item.evidenceId}`)}`;
     await client.query(
-      `INSERT INTO bb_canonical.claim_evidence_links
+      `INSERT INTO canonical.claim_evidence_links
         (id, claim_id, claim_version_id, evidence_id, role, lineage_root_id, quality, asserted_value)
        VALUES ($1, $2, $3, $4, $5, $4, $6::jsonb, $7::jsonb)
        ON CONFLICT (id) DO NOTHING`,
@@ -363,7 +343,7 @@ async function recordCaseHistoryAndAudit(
   nowIso: string,
 ): Promise<string> {
   await client.query(
-    `INSERT INTO bb_research.case_history_events
+    `INSERT INTO research.case_history_events
       (case_id, from_state, to_state, reason_code, reason, actor_id, evidence_ids, occurred_at, metadata)
      VALUES ($1, $2, $2, 'canonical_promotion_approved', $3, $4, $5::text[], $6, $7::jsonb)`,
     [
@@ -379,7 +359,7 @@ async function recordCaseHistoryAndAudit(
 
   const auditId = randomUUID();
   await client.query(
-    `INSERT INTO bb_audit.events
+    `INSERT INTO audit.events
       (id, action, category, actor, subject, reason, request_id, correlation_id,
        entity_id, idempotency_key, occurred_at, data)
      VALUES ($1, 'research_case.promoted_to_canonical', 'research', $2::jsonb, $3::jsonb, $4, $5, $5,
@@ -407,7 +387,7 @@ async function recordCaseHistoryAndAudit(
 }
 
 /**
- * Promotes one research case's proposed record into `bb_canonical.*`. Throws
+ * Promotes one research case's proposed record into `canonical.*`. Throws
  * `CasePromotionRejected` (gate/validation failure, no writes) or a plain `Error` (case not
  * found, live duplicate). All writes happen in one transaction.
  */

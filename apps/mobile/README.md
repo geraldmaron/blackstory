@@ -111,7 +111,7 @@ npx expo start --dev-client
 ```
 
 Launch **BlackStory (Dev)** (`app.blackstory.mobile.dev`) from the Simulator home screen or
-Xcode — not Expo Go. RN Firebase / App Check is not in this app; `USE_FRAMEWORKS=static`
+Xcode — not Expo Go. `USE_FRAMEWORKS=static`
 is only for MapLibre.
 
 ## CI (black-book-mobile-019)
@@ -185,7 +185,7 @@ Empirical evidence from this scaffold:
   --frozen-lockfile` at the repo root now fails immediately with
   `ERR_PNPM_OUTDATED_LOCKFILE` ("specifiers in the lockfile ({}) don't match specs in
   package.json"), because pnpm treats apps/mobile as a workspace member the lockfile has never
-  seen. This reproduces on a clean checkout, not just in this session.
+  seen. This reproduces on a clean checkout, independently of local application state.
 - ADR-020 §5's own resolution path — excluding `apps/mobile` from `pnpm-workspace.yaml` via a
   negation entry, or isolating it with its own nested lockfile — was the tested fix, but
   **editing `pnpm-workspace.yaml` was out of scope for this scaffolding session** (explicit
@@ -214,7 +214,7 @@ across `apps/`. Running it against the stock Expo template code failed hard — 
 `@repo/eslint-config` has no RN exception for. `apps/mobile/eslint.config.js` (this directory)
 uses Expo's own maintained `eslint-config-expo` instead; ESLint's flat-config resolution finds
 the nearest config walking up from a file, so this local config governs everything under
-`apps/mobile` without needing (or being permitted, in this session) to edit the root
+`apps/mobile` without needing to edit the root
 `eslint.config.mjs`. Run `npm run lint` from `apps/mobile`, not the root aggregate, until/unless
 a follow-up wires an explicit ignore for `apps/mobile/**` into the root config.
 
@@ -238,7 +238,7 @@ unaffected and is enforced via the `expo-build-properties` plugin
 Mobile never talks to Supabase/Postgres directly (`docs/decisions-carryover.md`, "Mobile data
 boundary"). The only network
 origin is `extra.apiBaseUrl` → `apps/api-public` over HTTPS (or LAN HTTP in
-Dev). That service reads `bb_public.*` when
+Dev). That service reads `published.*` when
 `PUBLIC_DATA_SOURCE=postgres` + `DATABASE_URL` / `APP_DATABASE_URL` are set.
 
 | Surface | Data source today |
@@ -393,9 +393,8 @@ pnpm ensure-api-public
 
 #### Port conflicts
 
-`infra/firebase/firebase.json` assigns the Firestore emulator to `:8080`, same as api-public.
-The ensure script **refuses** to kill unknown processes. Stop `pnpm firebase:emulators` before
-mobile dev, or reconfigure the emulator port.
+The API helper refuses to kill unknown processes. If port 8080 is occupied, identify the owning
+process before choosing another local API port.
 
 #### Physical device
 
@@ -487,58 +486,13 @@ In the simulator Dev Menu (⌘D): disable Fast Refresh only if a bad HMR loop
 persists after the cache clear. Never open this project in Expo Go (MapLibre
 native module is missing there).
 
-## Package naming — a documented discrepancy, not a guess
+## Package and validation contract
 
-The now-removed identity decision record stated the live package scope is `@black-book`
-and called `@repo` "a stale pre-rename scope surviving only in build artifacts." Checking this
-worktree's actual `packages/*/package.json` / `apps/*/package.json` files at scaffold time
-shows the opposite: every existing package here is still `@repo/*` (e.g. `@repo/web`,
-`@repo/config`, `@repo/typescript-config`) — the identity doc's rename claim does not hold in
-this branch, even though a commit on this same branch (`d237aa9`) says it "fixed" the
-scope reference in that doc. This package is named **`@repo/mobile`** to match every sibling
-package actually present today; if/when the real `@repo` → `@black-book` rename lands on this
-branch, `apps/mobile`'s name should be renamed alongside every other package in the same
-commit, not out of step with it.
+The package is `@repo/mobile`, matching the stable repository package scope. It has its own
+npm dependency graph and is excluded from the root pnpm workspace.
 
-## What was verified vs. what remains (adversarial-case checklist)
-
-Verified with runtime evidence in this session:
-
-- `npx expo-doctor`: 21/21 after fixing an `eas-cli`-as-local-dependency flag (removed; use
-  `npx eas-cli` instead) and the pnpm-lockfile issue above.
-- `npx expo prebuild --platform ios` + `cd ios && pod install`: succeeded cleanly — 103
-  dependencies from the Podfile, 102 pods installed, no errors.
-- `npx expo prebuild --platform android`: succeeded; confirmed `minSdkVersion=26` landed in
-  the generated Gradle config.
-- `npm run typecheck` (`tsc --noEmit`) and `npm run lint` (`expo lint` via the local
-  `eslint-config-expo`): both clean.
-- `npm run build` (`expo export`): produced real static web bundles (JS + CSS + routes) —
-  proves the JS/TS graph actually bundles end-to-end.
-- Root `pnpm install --frozen-lockfile` behavior with `apps/mobile` present (see above) —
-  confirmed it fails today; this is real, not assumed.
-
-Not verified / explicitly out of scope for this pass:
-
-- **No physical-device or simulator boot.** A full `xcodebuild`/simulator launch and an
-  Android emulator/Gradle build were not attempted — no Xcode simulator run and no working
-  `java` were exercised in this session (`java -version` reports no runtime installed here).
-  `pod install` is the iOS build-readiness evidence; Android prebuild-config-only is the
-  Android evidence.
-- **Physical-device dev builds** (a real iPhone/Android device paired to a real
-  Apple/Google developer account) are out of scope structurally, not just for this session —
-  MOB-001's human gates (Apple Developer Program, Google Play Console, EAS org) are not yet
-  cleared, so there is no signing identity to test against yet.
-- **Stale native-directory recovery** (deleting `ios`/`android` mid-development and
-  re-running `expo prebuild` cleanly) was exercised once each for iOS/Android in this session
-  (both regenerated cleanly after the OS-floor fix), but not stress-tested across repeated
-  config changes.
-- **Metro resolving server-only barrel files** — not applicable yet: no `packages/*` imports
-  exist in apps/mobile's source, and `packages/public-contracts` (MOB-003, in progress on this
-  branch by a parallel change) is not yet consumed here.
-- **New-architecture compatibility** — SDK 56 no longer exposes a `newArchEnabled` toggle at
-  all (confirmed against `@expo/config-types`); New Architecture is the only supported mode,
-  so there is nothing to opt into or verify as a separate axis.
-- **Root `pnpm install --frozen-lockfile` full CI gate** — reproduced the failure (see above)
-  but did not resolve it, per this session's explicit boundary against editing
-  `pnpm-workspace.yaml`/root lockfile. Flagged as an immediate follow-up, not silently left
-  broken without notice.
+Run `npm run lint`, `npm run typecheck`, and `npm test` from `apps/mobile`. These validate the
+JavaScript graph, not a native installation. On macOS, `pnpm mobile:ios:verify` from the root
+checks the production-like Release build on a booted simulator and a live public API. Metro
+health alone does not prove that the installed app works. Android and physical-device builds
+require their own runtime checks and signing configuration.

@@ -180,6 +180,6 @@ export function writeStoryRewriteArtifact(result: StoryRewriteResult, outputDir:
 
 // NOTE: The batch lane that rewrote the legacy 5-story seed corpus
 // (runStoryRewriteLane / formatStoryRewriteLaneResult) was removed when the
-// seed stories were retired in favor of theme-chapter essays (repo-gvd0).
+// seed stories were retired in favor of theme-chapter essays.
 // The provider resolution and artifact-writing utilities above remain
 // available for any future rewrite tooling against the live catalog.

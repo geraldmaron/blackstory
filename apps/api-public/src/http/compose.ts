@@ -1,20 +1,4 @@
-/**
- * Production `HandlerDeps` composition — Postgres `bb_public` reads when
- * `PUBLIC_DATA_SOURCE=postgres` + `DATABASE_URL`; client-attestation + rate limits replace
- * Firebase App Check after the Postgres cutover (`docs/decisions-carryover.md`, "entity
- * source-of-truth precedence"). Postgres is the only live data path (the legacy
- * Firestore read branch was removed — repo-348e.3).
- *
- * `vectorSearch` (`/v1/search/nearest`, 2026-08-14) shares the same rate-limit store as
- * `rateLimitGuard` (both hit the `search` endpoint class) rather than constructing its own — see
- * `createFindNearestEndpoint`'s `rateLimitGuardOptions.store`. It's `undefined` (route 404s) when
- * no embedding API key is configured (`GEMINI_API_KEY`/`GOOGLE_AI_API_KEY`) since the endpoint
- * cannot function without one.
- *
- * `sharedRateLimitStore` is shared only within this one warm instance, not across instances —
- * `apps/api-public/src/rate-limits.ts`'s header documents the actual per-instance semantics on
- * Vercel and why that's an accepted, measured tradeoff (repo-2mqm2) rather than a bug to fix here.
- */
+/** Composes explicit Postgres reads, client-header policy, and bounded API controls. */
 import { createInMemoryRateLimitStore } from '@repo/security';
 import { createPostgresVectorIndexStore, createGeminiEmbeddingProvider } from '@repo/ops-data';
 import { createPublicApiClientAttestationGuard } from '../client-attestation.js';

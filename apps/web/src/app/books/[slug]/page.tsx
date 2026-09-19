@@ -32,7 +32,6 @@ import { BooksAffiliateNotice } from '../BooksAffiliateNotice';
 import { BooksAnatomyStrip } from '../BooksAnatomyStrip';
 import { BooksCoverArt } from '../BooksCoverArt';
 import { coverIsbnForBook } from '../books-cover';
-import { BOOKS_DETAIL } from '../books-copy';
 import { Room, ReadingEntry } from '../../../components/room';
 import { WalkOffRamp } from '../../walk-off-ramp';
 import '../../reading-room.css';

@@ -1,7 +1,6 @@
 /**
- * Tests for `computeGraphConsistencySignal` (BB the related workstream): a diagnostic, additive signal
- * that is never folded into `sourceAuthority`/`lineageIndependence` (`../claims/confidence.ts`),
- * and never allows a relationship to corroborate itself.
+ * Graph-consistency tests reject self-corroboration and keep graph agreement separate from
+ * evidence authority and lineage independence.
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';

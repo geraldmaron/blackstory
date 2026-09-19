@@ -1,8 +1,4 @@
-/**
- * Acceptance tests for the surface capability matrix (see docs/decisions-carryover.md, "Service
- * surface separation" — ADR-005 does not exist). This tests the typed matrix in ./surfaces.ts only;
- * see that section for what network isolation is and isn't actually deployed.
- */
+/** Typed surface capabilities; deployment and credential isolation need runtime verification. */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import {
@@ -49,12 +45,15 @@ test('public API compromise cannot modify canonical data', () => {
   );
 });
 
-test('admin and web are separate deployables with distinct identities', () => {
+test('admin and web share Vercel with distinct logical credential scopes', () => {
   const web = getSurfaceDefinition('web');
   const admin = getSurfaceDefinition('admin');
   assert.notEqual(web.appPath, admin.appPath);
-  assert.notEqual(web.serviceAccountId, admin.serviceAccountId);
-  assert.notEqual(web.runtime, admin.runtime);
+  assert.notEqual(web.credentialScope, admin.credentialScope);
+  assert.equal(web.runtime, 'vercel');
+  assert.equal(admin.runtime, web.runtime);
+  assert.equal(isAuthAccepted('admin', 'staff-session'), true);
+  assert.equal(isAuthAccepted('admin', 'end-user-token'), false);
 });
 
 test('internal publication endpoints reject end-user tokens', () => {

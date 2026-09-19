@@ -244,7 +244,7 @@ The reader arrives having scrolled past this column's earlier panels, each label
 > **Over the same twenty years, Black homeownership went which way?**
 > [ up ] [ flat ] [ down ]
 
-Reveal: **down.** Verified against `bb_reference.statistical_observations` on 2026-09-17:
+Reveal: **down.** Verified against `reference.statistical_observations` on 2026-09-17:
 
 | National homeownership | 2000 | 2010 | 2020 |
 |---|---|---|---|
@@ -310,7 +310,7 @@ addresses matter: roughly **50 addresses, not 1,105**.
 ### Mortality: wiring, not collection
 
 **Correction to an earlier claim in this epic's discussion.** NCHS life expectancy at birth by race
-is **already in `bb_reference`** and routed only to `/data`:
+is **already in `reference`** and routed only to `/data`:
 
 ```
 nchs-life-expectancy-birth-black-nation   19 obs   1900-2021

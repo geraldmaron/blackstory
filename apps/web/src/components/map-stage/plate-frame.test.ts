@@ -1,5 +1,5 @@
 /**
- * SP-08 (repo-92n2.8): the Framed posture's transition and geometry.
+ * The Framed posture's transition and geometry.
  *
  * The acceptance criterion these cover is "a Framed plate releases on exit and a second Framed
  * request while one is live is refused". The refusal itself lives in `framed-slot-registry`; what

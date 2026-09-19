@@ -1,33 +1,8 @@
 /**
- * Data Pack v1 manifest contract (the related workstream).
- *
- * Goal: no third-party's independently-hosted dataset ever becomes a direct, unvetted public
- * dependency of BlackStory. A "data pack" is the unit a publisher ships: a signed manifest
- * describing a set of checksummed JSON resources. Everything downstream (validation, import
- * pipeline) works from this contract, never from a live upstream URL directly.
- *
- * Reuses, does NOT reimplement:
- *  - `Sha256Hash`, `canonicalJson`, `sha256Bytes`, `sha256Json` from `../publication/index.js`
- *    (deterministic canonical-JSON + SHA-256 hashing).
- *  - The ECDSA-SHA256 signature shape from `../publication/index.js`'s `SignedReleaseManifest`
- *    (`{algorithm: 'ecdsa-sha256', keyId, value}`) — `SignedDataPackManifest` below mirrors that
- *    wrapper shape (`{manifest, manifestHash, signature}`) exactly, one manifest field layout
- *    away from a second copy-paste of `signReleaseManifest`/`verifySignedReleaseManifest`. The
- *    sign/verify functions here reuse the same primitives (`canonicalJson` + `sha256Bytes` +
- *    node:crypto `sign`/`verify`) rather than forking the hashing/signing algorithm itself; only
- *    the manifest-to-JSON field mapping differs because the manifest shape differs.
- *  - `ExternalSourceLicenseVerdict` / `EXTERNAL_SOURCE_LICENSE_VERDICTS` from
- *    `../external-data-sources.js` for the license vocabulary, instead of inventing a parallel
- *    one.
- *  - `RefreshCadence` / `REFRESH_CADENCES` from `../corpus-vetting.js` for `updateCadence`,
- *    instead of a third cadence enum (corpus-vetting.ts already has one, external-data-sources.ts
- *    has a near-duplicate `cadence` union — this reuses the corpus-vetting one since data packs
- *    are, like vetted corpora, a "vet once, import in structured batches" concept).
- *
- * Eventual target vocabularies this deliberately does NOT implement (cited for future alignment,
- * not built from scratch here): DCAT2 for dataset/distribution metadata, JSON Schema 2020-12 for
- * per-resource shape validation, PROV-O for provenance chains. This is a small, hand-rolled
- * contract sized for the resource kinds BlackStory actually ingests.
+ * Signed manifests describe checksummed JSON resources before third-party data can enter
+ * review. Reuse publication hashing/signing primitives and shared license/cadence vocabularies.
+ * Validation does not make an upstream dataset a public dependency or resolve its identities
+ * automatically.
  */
 import { sign as signBytes, verify as verifyBytes, type KeyLike } from 'node:crypto';
 import {

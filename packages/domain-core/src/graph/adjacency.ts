@@ -134,7 +134,7 @@ export function buildAllEntityAdjacency(
 
 /**
  * Projects a build-internal `EntityAdjacency` down to the public `{id, type, direction,
- * timespan}` shape. Drops `relationshipId` (an internal Firestore document pointer with no
+ * timespan}` shape. Drops `relationshipId` (an internal relationship identifier with no
  * public meaning) and `evidenceCount` — evidence counts may be used as an internal ranking key,
  * but the public related-entry shape itself is exactly `{id, type, direction, timespan}`, so
  * evidence count stays internal rather than a public field on this projection.

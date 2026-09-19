@@ -1,6 +1,6 @@
 /**
  * Loads Lives figures TRANSCRIBED BY HAND from a printed federal statistical volume, from a JSON
- * file, into `bb_reference.statistical_observations`.
+ * file, into `reference.statistical_observations`.
  *
  * The NHGIS loaders (`ingest-lives-acs.ts`, `ingest-lives-decennial.ts`, `ingest-lives-historical.ts`)
  * cover every figure a machine can fetch. They are not the whole published record. Most of what the

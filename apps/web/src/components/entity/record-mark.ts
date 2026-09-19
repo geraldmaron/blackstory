@@ -171,7 +171,7 @@ const PIN_SOURCE_SYSTEM_LABELS: Readonly<Record<string, string>> = {
 };
 
 /**
- * Source-link line for a pinned photo (repo-4vuf, pin-and-serve): "Source: <system>"
+ * Source-link line for a pin-and-serve photo: "Source: <system>"
  * plus a short license id, shown only when the mast has both a source page and a
  * recognized source system. Absent for legacy stored images that predate pinning.
  */

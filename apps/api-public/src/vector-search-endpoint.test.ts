@@ -1,7 +1,7 @@
 /**
  * Tests for the composed `find_nearest` endpoint every dependency is a fake or the
  * deterministic mock embedding provider, so this runs with no network access, no API key, and
- * no Firestore emulator.
+ * no database service.
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
@@ -45,7 +45,7 @@ function baseRequest(overrides: Partial<FindNearestHttpRequest> = {}): FindNeare
 
 test('find_nearest never hard-denies at the attestation-guard layer itself (fail-open, T1/T2)', async () => {
   // Failed attestation still reaches the same quota policy every other expensive-read endpoint
-  // uses (unattested anonymous + expensive_read -> app_check_required, packages/security's
+  // uses (unattested anonymous + expensive_read -> client_header_required, packages/security's
   // evaluateQuota) this is the existing enumeration defense, not a bespoke 401 branch in this
   // file. The old version of this file short-circuited to 401 before quota evaluation ever ran;
   // this test proves that branch is gone by confirming the *quota* denial reason surfaces

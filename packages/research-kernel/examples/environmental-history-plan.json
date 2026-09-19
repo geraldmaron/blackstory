@@ -1,0 +1,141 @@
+{
+  "schemaVersion": "1.0.0",
+  "budgetClass": "standard",
+  "profile": {
+    "schemaVersion": "1.0.0",
+    "id": "environmental-history-example",
+    "version": "1.1.0",
+    "name": "Environmental history example",
+    "scope": {
+      "domain": "environmental history"
+    },
+    "vocabulary": {
+      "entityKinds": ["person", "organization", "place"]
+    },
+    "sensitivityRules": [],
+    "sourceFitness": [],
+    "queryPacks": {},
+    "riskClasses": [],
+    "budgets": {
+      "standard": {
+        "queries": 4,
+        "candidateUrls": 10,
+        "fullCaptures": 4,
+        "relationshipHops": 2,
+        "durationMinutes": 30,
+        "paidModelUsd": 1
+      },
+      "highImpact": {
+        "queries": 4,
+        "candidateUrls": 10,
+        "fullCaptures": 4,
+        "relationshipHops": 2,
+        "durationMinutes": 30,
+        "paidModelUsd": 1
+      }
+    },
+    "modelPolicies": [
+      {
+        "mode": "trusted-session",
+        "modelIds": ["replace-with-your-model-id"],
+        "authority": ["proposal"],
+        "requiresBenchmark": false,
+        "mayApprove": false
+      }
+    ],
+    "retention": {
+      "acceptedProvenanceDays": null,
+      "searchCacheDays": 30,
+      "failedModelPayloadDays": 90,
+      "deadLetterDraftDays": 180,
+      "holdExemptions": ["case", "audit", "rights", "legal"]
+    },
+    "publication": {
+      "automaticPublicPromotion": false,
+      "requireDistinctActor": true,
+      "requireDistinctModelFamily": true,
+      "claimPrecisionLowerBound": 0.99,
+      "highImpactPrecisionLowerBound": 0.995,
+      "entityFalseMergeUpperBound": 0.001,
+      "confidenceEceMaximum": 0.03,
+      "unsupportedSentenceRateMaximum": 0.005
+    },
+    "stopping": {
+      "frontierScoreThreshold": 0.05,
+      "consecutiveTasksBelowThreshold": 3,
+      "requireMandatoryNeedsComplete": true,
+      "requireContradictionSearch": true,
+      "escalationTriggers": [
+        "identity conflict",
+        "material contradiction",
+        "living-person risk",
+        "legal status ambiguity",
+        "buried consequential connection"
+      ]
+    }
+  },
+  "run": {
+    "schemaVersion": "1.0.0",
+    "id": "river-restoration-example-run",
+    "caseId": "river-restoration-example-case",
+    "profileId": "environmental-history-example",
+    "profileVersion": "1.1.0",
+    "policyVersion": "1.0.0",
+    "mode": "trusted-session",
+    "status": "pending",
+    "startedAt": "2026-01-01T00:00:00Z",
+    "completedAt": null,
+    "costUsd": 0,
+    "counts": {},
+    "terminalReason": null
+  },
+  "questions": [
+    {
+      "schemaVersion": "1.0.0",
+      "id": "river-question",
+      "caseId": "river-restoration-example-case",
+      "question": "Which organizations supported or disputed the river restoration plan?",
+      "priority": 1,
+      "status": "open"
+    }
+  ],
+  "needs": [
+    {
+      "schemaVersion": "1.0.0",
+      "id": "river-counterevidence",
+      "questionId": "river-question",
+      "claimClass": "historical-assertion",
+      "description": "Find contemporary records of dissent and alternative explanations",
+      "mandatory": true,
+      "contradictionSearch": true,
+      "status": "open"
+    }
+  ],
+  "tasks": [
+    {
+      "frontier": {
+        "schemaVersion": "1.0.0",
+        "id": "river-counter-search",
+        "caseId": "river-restoration-example-case",
+        "taskType": "contradictionSearch",
+        "targetId": null,
+        "riskWeight": 1,
+        "expectedEntropyReduction": 1,
+        "sourceNovelty": 0,
+        "contradictionValue": 0,
+        "normalizedCost": 1,
+        "score": 1,
+        "hop": 0,
+        "status": "pending"
+      },
+      "evidenceNeedId": "river-counterevidence",
+      "dependsOn": [],
+      "input": {
+        "question": "Search contemporary proceedings, local press, community archives and corrections. Record coverage and access limits. Replace this example with an explicit place, plan and period before dispatch."
+      },
+      "outputContract": "ResearchSearchResult",
+      "maxAttempts": 2,
+      "maxCostUsdPerAttempt": 0.5
+    }
+  ]
+}

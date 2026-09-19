@@ -7,7 +7,7 @@ import { test } from 'node:test';
 import { authErrorResponse, createAdminRouteAuthorizer } from './request-auth';
 import { AdminRouteUndeclaredError } from './route-permissions';
 import { StaffPermissionDeniedError } from './staff-permissions';
-import type { StaffRole } from './role-mutation';
+import type { StaffRole } from './staff-permissions';
 import type { SupabaseUserVerifier } from './supabase-session-authorizer';
 
 /** A token that verifies, for a staff account holding exactly the given role. */
@@ -19,7 +19,7 @@ function verifierForRole(role: StaffRole): SupabaseUserVerifier {
           user: {
             id: `uid-${role}`,
             email: `${role}@blackstory.test`,
-            app_metadata: { bb_role: role },
+            app_metadata: { app_role: role },
           },
         },
         error: null,

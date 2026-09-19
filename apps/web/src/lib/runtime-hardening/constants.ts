@@ -135,11 +135,7 @@ export const PLACE_PAGE_PARAM_ALLOWLIST = [
 
 export type PlacePageParam = (typeof PLACE_PAGE_PARAM_ALLOWLIST)[number];
 
-// HISTORY_PAGE_PARAM_ALLOWLIST stood here for the /history decade stepper and its selection
-// params. Both the stepper and the browse UI are gone (repo-92n2.27), and /history left the
-// middleware matcher in SP-06, so nothing read this at the edge or anywhere else.
-//
-// /history must stay OUT of the matcher. The route's whole remaining job is to map an incoming
+// /history must stay OUT of the matcher. The route maps an incoming
 // `decade` onto `era` and 308 to /records, and normalization would strip the very params the
 // redirect exists to carry — a bookmark would land on an unfiltered index instead of failing
 // loudly. An allowlist here would make adding it to the matcher look safe when it is not.

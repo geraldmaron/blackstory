@@ -1,6 +1,6 @@
 /**
  * BJS admissions-by-race share ingest (1926-1986) for national observations
- * into bb_reference.statistical_observations. Creates separate metric for
+ * into reference.statistical_observations. Creates separate metric for
  * prison admissions share (not rates, since historical counts-only data exists).
  *
  * Usage (repo root):
@@ -157,14 +157,14 @@ async function ensureSeriesDefined(databaseUrl: string): Promise<void> {
 
   try {
     const result = await pool.query<{ metric_id: string }>(
-      `SELECT metric_id FROM bb_reference.statistical_series WHERE metric_id = $1`,
+      `SELECT metric_id FROM reference.statistical_series WHERE metric_id = $1`,
       [METRIC_ID],
     );
 
     if (result.rows.length === 0) {
       // Series does not exist; create it
       await pool.query(
-        `INSERT INTO bb_reference.statistical_series
+        `INSERT INTO reference.statistical_series
           (metric_id, metric_definition, universe, unit, source_dataset, source_table,
            source_variable, geography_type, estimate_type, period_type,
            external_data_source_id, theme, metadata)
@@ -247,7 +247,7 @@ async function applyObservations(
 
     for (const obs of observations) {
       await client.query(
-        `INSERT INTO bb_reference.statistical_observations
+        `INSERT INTO reference.statistical_observations
           (id, metric_id, jurisdiction_id, boundary_version, reference_period, dataset_vintage,
            estimate, race_ethnicity_slice, status, source, source_url,
            retrieved_at, content_hash, metadata)

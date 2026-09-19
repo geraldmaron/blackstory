@@ -1,5 +1,5 @@
 /**
- * Wikidata place-first portfolio query packs — public surface for WS7 (repo-2ztn.8).
+ * Wikidata place-first portfolio query packs — public surface for portfolio discovery.
  */
 export {
   WIKIDATA_PLACE_FIRST_PORTFOLIO_WAVE_BEAD,

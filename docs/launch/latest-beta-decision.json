@@ -1,12 +1,12 @@
 {
   "schemaVersion": 1,
   "bead": "",
-  "evaluator": "cli-test",
-  "evaluatedAt": "2026-08-16T04:19:01.406Z",
+  "evaluator": "research-framework-verification",
+  "evaluatedAt": "2026-09-18T15:25:56.926Z",
   "decision": "NO_GO",
   "requiredFailed": 7,
-  "requiredPassed": 8,
-  "optionalFailed": 0,
+  "requiredPassed": 7,
+  "optionalFailed": 1,
   "gates": [
     {
       "id": "published-claims-with-evidence",
@@ -49,7 +49,7 @@
         {
           "type": "command",
           "ref": "node --import tsx scripts/run-testing-layer.mjs security",
-          "description": "Includes living-address adversarial scenarios ()."
+          "description": "Includes living-address adversarial scenarios."
         },
         {
           "type": "file",
@@ -110,31 +110,27 @@
     },
     {
       "id": "restore-rehearsal-complete",
-      "title": "Restore rehearsal complete ()",
+      "title": "Executed Postgres and object recovery verified",
       "kind": "machine",
       "required": true,
-      "status": "pass",
-      "message": "Machine evidence checks passed.",
+      "status": "fail",
+      "message": "Evidence file missing: artifacts/recovery/latest.json",
       "evidence": [
         {
-          "type": "command",
-          "ref": "node scripts/recovery-rehearsal/run-rehearsal.mjs --verify-only"
+          "type": "doc",
+          "ref": "docs/runbooks/backup-restore.md"
         },
         {
           "type": "artifact",
-          "ref": "scripts/recovery-rehearsal/fixtures/last-rehearsal-report.json"
-        },
-        {
-          "type": "command",
-          "ref": "bash infra/github/release-pipeline/rollback-dry-run.sh 0000000000000000000000000000000000000001"
+          "ref": "artifacts/recovery/latest.json"
         }
       ]
     },
     {
       "id": "incident-exercise-complete",
-      "title": "Incident exercise complete",
+      "title": "Incident exercise complete (optional for solo operation)",
       "kind": "human",
-      "required": true,
+      "required": false,
       "status": "fail",
       "message": "Human attestation missing — fail-closed until recorded.",
       "evidence": [
@@ -146,7 +142,7 @@
     },
     {
       "id": "load-abuse-verified",
-      "title": "Load and abuse limits verified ()",
+      "title": "Load and abuse limits verified",
       "kind": "machine",
       "required": true,
       "status": "pass",
@@ -168,7 +164,7 @@
     },
     {
       "id": "adversarial-integrity-verified",
-      "title": "Adversarial integrity exercise ()",
+      "title": "Adversarial integrity exercise",
       "kind": "machine",
       "required": true,
       "status": "pass",
@@ -186,7 +182,7 @@
     },
     {
       "id": "methodology-corrections-available",
-      "title": "Public methodology and correction process ()",
+      "title": "Public methodology and correction process",
       "kind": "machine",
       "required": true,
       "status": "pass",
@@ -222,7 +218,7 @@
     },
     {
       "id": "disclaimer-framework-live",
-      "title": "Disclaimer framework live on public surfaces ()",
+      "title": "Disclaimer framework live on public surfaces",
       "kind": "machine",
       "required": true,
       "status": "pass",
@@ -240,7 +236,7 @@
     },
     {
       "id": "release-pipeline-ready",
-      "title": "Production release pipeline ready ()",
+      "title": "Production release pipeline ready",
       "kind": "machine",
       "required": true,
       "status": "pass",

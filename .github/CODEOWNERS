@@ -14,7 +14,7 @@
 /workers/security/ @geraldmaron
 /SECURITY.md @geraldmaron
 
-# Infrastructure (GCP, Firebase, GitHub, database compose)
+# Infrastructure (GCP, GitHub, database compose)
 /infra/ @geraldmaron
 /.github/ @geraldmaron
 
@@ -23,7 +23,7 @@
 /packages/constitution/ @geraldmaron
 
 # Database scaffolding and future schema/migrations
-/infra/database/ @geraldmaron
+/supabase/ @geraldmaron
 
 # Publication surface (projection workers + internal promotion API)
 /workers/publication/ @geraldmaron

@@ -1,17 +1,8 @@
 /**
- * US county polygon asset for the national map (the related workstream: county hairlines as boundary
- * context beneath the entity markers).
- *
- * Source: U.S. Census Bureau 2010 cartographic boundary counties at 1:20,000,000 (public
- * domain U.S. Government work), via the plotly/datasets GeoJSON conversion of
- * `gz_2010_us_050_00_20m`; territories dropped, properties slimmed to name + FIPS pair,
- * coordinates rounded to 4 decimals (~11 m — hairline-rendering precision, not survey). Cite
- * the Census Bureau when redistributing.
- *
- * Served from `/geo/us-counties-20m.geojson` (apps/web/public), same URL-not-inlined pattern
- * as `us-state-polygons.ts`. The stage fetches it lazily, and only once the camera first
- * approaches `COUNTY_LINES_MIN_ZOOM` — the ~2.3 MB geometry never taxes the national resting
- * frame, where county hairlines would be sub-pixel noise anyway.
+ * County boundary asset from Census 2010 cartographic boundaries at 1:20,000,000 via the Plotly
+ * GeoJSON conversion. Territories are omitted, properties retain name/FIPS and coordinates are
+ * rounded for display, not survey precision. Cite Census on redistribution. Load
+ * /geo/us-counties-20m.geojson lazily near COUNTY_LINES_MIN_ZOOM.
  */
 
 export const US_COUNTIES_GEOJSON_PATH = '/geo/us-counties-20m.geojson';

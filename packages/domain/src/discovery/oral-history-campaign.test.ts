@@ -240,7 +240,7 @@ test('discovery publish guard holds for the Oral History Pipeline', () => {
     /Discovery cannot publish/,
   );
   assert.throws(
-    () => assertDiscoveryCannotPublish({ operation: 'activate_release', target: 'bb_public' }),
+    () => assertDiscoveryCannotPublish({ operation: 'activate_release', target: 'published' }),
     /Discovery cannot publish/,
   );
   assert.throws(

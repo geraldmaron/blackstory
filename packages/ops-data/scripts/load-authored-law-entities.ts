@@ -1,6 +1,6 @@
 /**
  * Loads authored law and court-case records from a JSON file into
- * `bb_research.landscape_candidates`, validating every record against the publisher's own gate
+ * `research.landscape_candidates`, validating every record against the publisher's own gate
  * before anything is written: the record must satisfy `buildReleaseSourceFromLandscape`, clear
  * `assessLandscapeDepth` and `gateLandscapePublishCandidate`, and carry claims whose text will
  * later let `validateApplicability` bind a `law_applicability` row to it. Records are data, so the
@@ -20,7 +20,7 @@
  *
  * WHAT IT CANNOT PROVE. The gate is asked about a row that is not yet in the table, so
  * `exact_in_release` and `name_overlap` are read live from the active release and are true as of
- * this run. A standing `bb_ops.catalog_decisions` verdict is not consulted: these ids are new, so
+ * this run. A standing `ops.catalog_decisions` verdict is not consulted: these ids are new, so
  * there is nothing to consult, and the publisher reads it for every id regardless.
  *
  * Usage (repo root):
@@ -49,7 +49,6 @@ import {
   type LandscapePublishRow,
   type PublishGateResult,
 } from './lib/incremental-publish.ts';
-import { classifySourceForConfidence } from './lib/confidence.ts';
 import { normalizePgConnectionString } from './lib/pg-connection.ts';
 
 const apply = process.env.DRY_RUN === '0' && process.env.LOAD_LAW_ENTITIES_APPLY === '1';
@@ -113,7 +112,7 @@ function printReport(report: Report): void {
       ? 'federal'
       : `${record.scope.level} ${record.scope.jurisdictionName}`;
   const verdict = gate.eligible
-    ? `gate PASS  confidence ${gate.confidence.toFixed(3)}`
+    ? `gate PASS  basis ${gate.reviewBasis}`
     : `gate SKIP  ${gate.reason}: ${gate.detail}`;
   console.log(`\n${record.id}`);
   console.log(`  ${record.displayName} — ${scope} (${record.applicability.jurisdictionId})`);
@@ -154,14 +153,6 @@ function printReport(report: Report): void {
   console.log(
     `  evidence: ${record.evidence.length} citation(s), ${verbatim} verbatim, ${record.evidence.length - verbatim} sourced statement(s)`,
   );
-  // The confidence floor is a per-source authority question, so when the gate refuses on it, name
-  // the sources and how the engine grades them rather than leaving an operator to guess which one
-  // is short. `classifySourceForConfidence` is the engine's own classifier, not a copy of it.
-  if (!gate.eligible && gate.reason === 'confidence_below_floor') {
-    for (const url of [record.canonicalSource.url, ...record.evidence.map((c) => c.sourceUrl)]) {
-      console.log(`  source:   ${classifySourceForConfidence(url)}  ${url}`);
-    }
-  }
   for (const gap of record.gaps ?? []) console.log(`  gap:      ${gap}`);
   for (const warning of report.warnings) console.log(`  warn:     ${warning}`);
 }
@@ -194,26 +185,26 @@ async function main(): Promise<void> {
     const ids = authored.map((record) => record.id);
     const names = authored.map((record) => record.displayName);
     const [release, existing, inRelease, overlapping, jurisdictions] = await Promise.all([
-      pool.query<{ release_id: string }>('SELECT release_id FROM bb_public.active_release LIMIT 1'),
+      pool.query<{ release_id: string }>('SELECT release_id FROM published.active_release LIMIT 1'),
       pool.query<{ id: string }>(
-        'SELECT id FROM bb_research.landscape_candidates WHERE id = ANY($1::text[])',
+        'SELECT id FROM research.landscape_candidates WHERE id = ANY($1::text[])',
         [ids],
       ),
       pool.query<{ entity_id: string }>(
-        `SELECT e.entity_id FROM bb_public.release_entities e
-         JOIN bb_public.active_release a ON a.release_id = e.release_id
+        `SELECT e.entity_id FROM published.release_entities e
+         JOIN published.active_release a ON a.release_id = e.release_id
          WHERE e.entity_id = ANY($1::text[])`,
         [ids],
       ),
       pool.query<{ display_name: string; entity_id: string }>(
-        `SELECT e.display_name, e.entity_id FROM bb_public.release_entities e
-         JOIN bb_public.active_release a ON a.release_id = e.release_id
+        `SELECT e.display_name, e.entity_id FROM published.release_entities e
+         JOIN published.active_release a ON a.release_id = e.release_id
          WHERE lower(e.display_name) = ANY(SELECT lower(n) FROM unnest($1::text[]) AS n)
            AND e.entity_id <> ALL($2::text[])`,
         [names, ids],
       ),
       pool.query<{ id: string }>(
-        'SELECT id FROM bb_reference.jurisdictions WHERE id = ANY($1::text[])',
+        'SELECT id FROM reference.jurisdictions WHERE id = ANY($1::text[])',
         [[...new Set(authored.map((record) => record.applicability.jurisdictionId))]],
       ),
     ]);
@@ -300,7 +291,7 @@ async function main(): Promise<void> {
      * says a rejected row is not discarded: it stays in the lane, where the enrichment sweep picks
      * it up, and the record surfaces its honest state instead of publishing as though the work
      * were done. Refusing to stage a validated, bindable record because it is one corroborating
-     * source short of the confidence floor would strand it outside the lane that exists to finish
+     * source short of independent review would strand it outside the lane that exists to finish
      * it. So the skips are reported by name and the rows are written; nothing is published either
      * way, because this script does not publish.
      */
@@ -332,7 +323,7 @@ async function main(): Promise<void> {
       // written by some ingest run, and these records are no different for being authored by hand:
       // the run is what says where they came from and who may reuse the text.
       await client.query(
-        `INSERT INTO bb_research.source_program_runs (
+        `INSERT INTO research.source_program_runs (
            id, lane, source_program_id, source_program_name, custodian, license,
            rows_fetched, candidate_count, dropped_count, retrieved_at, summary, methodology_notes
          ) VALUES ($1,$2,$3,$4,$5,$6,$7,$7,0, now(), $8::jsonb, $9::jsonb)
@@ -370,7 +361,7 @@ async function main(): Promise<void> {
       for (const report of reports) {
         const row = report.row;
         await client.query(
-          `INSERT INTO bb_research.landscape_candidates (
+          `INSERT INTO research.landscape_candidates (
              id, run_id, lane, source_program_id, source_item_id, display_name, kind, summary,
              lat, lng, canonical_url, research_lane_only, status, provenance, payload, discovered_at
            ) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14::jsonb,$15::jsonb, now())
@@ -387,7 +378,7 @@ async function main(): Promise<void> {
              canonical_url = EXCLUDED.canonical_url,
              research_lane_only = EXCLUDED.research_lane_only,
              status = EXCLUDED.status,
-             provenance = bb_research.landscape_candidates.provenance || EXCLUDED.provenance,
+             provenance = research.landscape_candidates.provenance || EXCLUDED.provenance,
              payload = EXCLUDED.payload,
              updated_at = now()`,
           [

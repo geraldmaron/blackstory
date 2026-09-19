@@ -1,29 +1,7 @@
 /**
- * Lane B / repo-bmmo — deterministic summary backfill for the NRHP Black
- * heritage lane (nrhp-black-heritage).
- *
- * scrape-nrhp-black-heritage-roster.ts stages rows with summary=NULL (the
- * dataset has no prose description). buildReleaseSourceFromLandscape /
- * gateLandscapePublishCandidate both require a non-empty summary before a
- * row can even be corroborated, so every row is stuck at
- * 'insufficient landscape fields' until this runs.
- *
- * No LLM: the summary sentence is templated purely from fields already
- * captured in landscape_candidates.payload (category, city, county, state,
- * area of significance, listed date) at scrape time — the same fields NPS
- * itself publishes in the dataset. Output length is checked against the
- * downstream publicEntityProjectionSchema bound (120-400 chars); rows that
- * don't fit after the fallback expansion are reported, not silently
- * truncated into something misleading.
- *
- * Default is dry-run. Production writes require:
- *   DRY_RUN=0 NRHP_SUMMARY_BACKFILL_APPLY=1 DATABASE_URL=postgresql://...
- *
- * Usage (from repo root):
- *   set -a && source apps/web/.env.local && set +a
- *   export DATABASE_SSL=1
- *   node --conditions development --import tsx \
- *     packages/ops-data/scripts/backfill-nrhp-black-heritage-summaries.ts
+ * Builds deterministic NRHP summary text from captured registry fields and reports invalid
+ * lengths. This is index-derived prose, not independent research. Default dry-run; writes
+ * require DRY_RUN=0 and NRHP_SUMMARY_BACKFILL_APPLY=1.
  */
 import { mkdirSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
@@ -112,10 +90,8 @@ export function buildSummary(displayName: string, payload: Row['payload']): stri
   return core.length <= MAX_LEN ? core : core.slice(0, MAX_LEN);
 }
 
-// repo-n7p6.1: the original run only backfilled NULL summaries (new rows staged with no prose
-// yet). Fixing the raw-code leak ("(Black)", "historic - non-aboriginal", "entertainment/
-// recreation") requires regenerating summaries that already exist too — set REGENERATE_ALL=1 to
-// re-run buildSummary() over every row in the lane instead of only the NULL/empty ones.
+// REGENERATE_ALL=1 rebuilds existing summaries as well as empty ones, allowing corrected
+// registry-vocabulary mapping to reach previously staged rows.
 const REGENERATE_ALL = process.env.REGENERATE_ALL === '1';
 
 async function main(): Promise<void> {
@@ -126,11 +102,11 @@ async function main(): Promise<void> {
   const res = await pool.query<Row>(
     REGENERATE_ALL
       ? `SELECT id, display_name, payload
-         FROM bb_research.landscape_candidates
+         FROM research.landscape_candidates
          WHERE lane = $1
          ORDER BY id`
       : `SELECT id, display_name, payload
-         FROM bb_research.landscape_candidates
+         FROM research.landscape_candidates
          WHERE lane = $1 AND (summary IS NULL OR length(trim(summary)) = 0)
          ORDER BY id`,
     [LANE],
@@ -185,7 +161,7 @@ async function main(): Promise<void> {
     await client.query('BEGIN');
     for (const update of updates) {
       await client.query(
-        `UPDATE bb_research.landscape_candidates SET summary = $1, updated_at = now() WHERE id = $2`,
+        `UPDATE research.landscape_candidates SET summary = $1, updated_at = now() WHERE id = $2`,
         [update.summary, update.id],
       );
     }

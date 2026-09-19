@@ -1,8 +1,7 @@
 /**
- * Session-driven variant of operator-cli's editorial-run: prints the exact same
- * system prompt + user payload the LLM-provider path sends, for a Claude Code session
- * (subagent) to answer directly instead of paying for OpenRouter/Ollama. Mirrors
- * session-enrich-prepare.ts's pattern for the entity-enrichment lane.
+ * Offline prompt export for operator-cli's editorial-run. It writes the same system prompt and
+ * user payload as the provider path, so offline drafts pass through the same packet builder and
+ * validation rules. Mirrors session-enrich-prepare.ts for the entity-enrichment lane.
  *
  * Usage (from repo root):
  *   node --conditions development --import tsx \

@@ -27,7 +27,7 @@ export default function LoginClient() {
 
   /**
    * A Supabase session alone is not admin access — the gates require a staff role in
-   * app_metadata.bb_role. Confirm it here, otherwise redirecting would bounce straight
+   * app_metadata.app_role. Confirm it here, otherwise redirecting would bounce straight
    * back off the middleware and loop. router.refresh() drops the cached RSC payload so
    * the destination re-renders on the server with the new session cookie.
    */

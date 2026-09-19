@@ -1,5 +1,5 @@
 /**
- * Tests for Wikidata place-first / authority-first portfolio query packs (WS7).
+ * Tests for Wikidata place-first / authority-first portfolio query packs (portfolio discovery).
  * Fixture-driven — no live SPARQL against query.wikidata.org.
  */
 import assert from 'node:assert/strict';

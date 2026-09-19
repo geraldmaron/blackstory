@@ -1,11 +1,9 @@
 /**
- * repo-2t04.6 — NCES College Navigator collector for the `us-ed-hbcu-*` lane.
+ * NCES College Navigator collector for the `us-ed-hbcu-*` lane.
  *
- * 22 HBCU entities are blocked from publish by the confidence gate: each has exactly ONE
- * evidence lineage (a Wikipedia article), which caps `lineageIndependence` at 0.4 and lands the
- * whole score at 0.720, just under the 0.75 floor. 6 sibling entities in the same lane already
- * cleared the floor because they carry a second, independent, non-Wikipedia source. See
- * `bd show repo-2t04.6` for the full root-cause writeup.
+ * HBCU entities whose only evidence lineage is a Wikipedia article need an independent,
+ * authoritative source before claim review. This collector supplies that second lineage directly
+ * from NCES.
  *
  * Every US degree-granting institution has a stable page at
  *   https://nces.ed.gov/collegenavigator/?id=<UNITID>

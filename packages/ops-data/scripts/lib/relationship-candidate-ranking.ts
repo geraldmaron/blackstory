@@ -1,6 +1,6 @@
 /**
  * Explainable Fellegi-Sunter-style additive scoring for ranked relationship candidates.
- * Score components stay separate so repo-si5a can calibrate m/u weights later.
+ * Score components stay separate so future calibration can adjust m/u weights.
  */
 import type {
   RelationshipCandidate,

@@ -1,6 +1,6 @@
 /**
  * Commit live DC enrichment packets (keep + needs_evidence) from enrichment-run JSON
- * into bb_submissions quarantine via Postgres commitWithAudit. Never writes bb_public.
+ * into submissions quarantine via Postgres commitWithAudit. Never writes published.
  */
 import { readFileSync, writeFileSync } from 'node:fs';
 import { join, dirname } from 'node:path';

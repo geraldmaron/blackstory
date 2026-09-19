@@ -1,28 +1,7 @@
 /**
- * repo-n7p6.3 (WS3) — English Wikipedia collector.
- *
- * The NRHP nomination form is the deepest source but it only exists for NRHP places. Persons,
- * organizations, and the non-NRHP lanes need a second source, and Wikipedia is the one with
- * broad coverage, a stable API, and a license we can actually carry (CC BY-SA 4.0, recorded in
- * provenance on every row so WS4's output can be attributed).
- *
- * Two rules from the WS3 spec are enforced here rather than left to the caller:
- *
- *   1. Search snippets are NEVER evidence. Search is used only to pick a title; the article is
- *      then fetched in full via prop=extracts and that fetched prose is what gets stored. The
- *      domain adapter states the same rule (assertSearchSnippetsNotCopied) — this collector is
- *      the fetch-side half of it.
- *
- *   2. Identity is corroborated, not assumed. Wikipedia search will confidently return
- *      *something* for any query, and a wrong article is worse than no article: it produces
- *      fluent, plausible, well-cited history about the wrong subject. So a candidate article is
- *      rejected unless it clears the shared identity gate in `subject-identity.ts`.
- *
- *      That gate replaced this module's own place-only check in repo-ppeu. The place-only check
- *      accepted an article if ANY ONE of city/county/state appeared, which is how "First Baptist
- *      Church of Covington, Virginia" was given the article for Covington, KENTUCKY, and how a
- *      house in Virginia was given an article about a Virginia election. Search picks the
- *      candidate; identity — place AND name AND focus — decides whether it becomes evidence.
+ * Uses Wikipedia search only to select a candidate article, then fetches article prose and
+ * checks subject identity. Search snippets are not evidence. Retain source URL and license
+ * metadata; article availability does not establish independent corroboration.
  */
 import { WIKIMEDIA_USER_AGENT } from '@repo/domain';
 import {
@@ -36,11 +15,7 @@ export { isDisambiguationExtract };
 const API = 'https://en.wikipedia.org/w/api.php';
 
 /**
- * Wikipedia text is CC BY-SA 4.0; stored verbatim, so the license travels with the row.
- *
- * Written into `provenance` under the key `license` (repo-pck8y, 2026-09-12): the 2,633 rows in
- * bb_research.entity_evidence that carried the British-spelled `licence` key have been migrated,
- * and this collector now writes the American spelling to match.
+ * Retain the source text's CC BY-SA attribution information in provenance.license.
  */
 export const WIKIPEDIA_LICENSE = 'CC BY-SA 4.0';
 

@@ -1,14 +1,14 @@
 # v10 schema and cost audit
 
-**Status:** source-validated draft (2026-08-31).  
-**Parent:** [`../design-direction-v10.md`](../design-direction-v10.md).  
+**Status:** source-validated draft (2026-08-31).
+**Parent:** [`../design-direction-v10.md`](../design-direction-v10.md).
 **Branch:** `cursor/v10-modernization`.
 
 ## Persistence one-liner
 
-**Write:** canonical/research (`bb_canonical`, `bb_research`, …) → publication → `bb_public` release projections + Storage/CDN artifacts.  
-**Read:** active-release pointer + CDN/SQL catalogs for map/list/search; point SQL for Place.  
-No Prisma/Drizzle live path; Firebase not on the public read path.
+**Write:** canonical/research (`canonical`, `research`, …) → publication → `published` release projections + Storage/CDN artifacts.
+**Read:** active-release pointer + CDN/SQL catalogs for map/list/search; point SQL for Place.
+Public readers use direct Postgres queries and released artifacts.
 
 ## ERD (compact)
 
@@ -23,7 +23,7 @@ erDiagram
   claims ||--o{ evidence_sources : cites
 ```
 
-Typed relationship vocabulary (20 types) lives on `bb_canonical.entity_relationships` — see migration `20260729203000_entity_relationships_type_check.sql`.
+Typed relationship vocabulary (20 types) lives on `canonical.entity_relationships` — see migration `20260729203000_entity_relationships_type_check.sql`.
 
 ## Measured sizes (ops-cited; no artifacts in repo)
 
@@ -85,7 +85,7 @@ Books / Law / Data
 
 ## Map architecture decision
 
-**Option A (release catalog) wins** at current scale.  
+**Option A (release catalog) wins** at current scale.
 Option B (viewport SQL) and Option C (tiles) deferred until catalog growth makes full hydrate dominate (well beyond ~4k).
 
 ## Schema gaps for richer Place UX

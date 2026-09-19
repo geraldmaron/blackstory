@@ -1,7 +1,7 @@
 /**
  * Explore first-paint map: the CONUS board in Web Mercator (state hairlines) plus the pin plate,
  * at the exact frame the live plate opens on (explore-map-underlay.css), so the handoff is a
- * crossfade between two identical maps (repo-27uao). Geography is server HTML. Pan, wheel, and
+ * crossfade between two identical maps. Geography is server HTML. Pan, wheel, and
  * pinch hydrate on. Hidden once MapLibre has painted live geography (`data-plate-ready` on
  * `.ds-map-stage`).
  */

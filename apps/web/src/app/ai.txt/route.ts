@@ -1,10 +1,6 @@
 /**
- * /ai.txt. An emerging, AI-specific complement to /robots.txt that a
- * subset of AI-training crawlers check independently of the standard robots convention. Same
- * caveat as robots.ts: this is a courtesy signal, not an access control real enforcement lives
- * in rate limits App Check cache-busting normalization (docs/security/threat-model.md T-19).
- * Reuses the single AI_TRAINING_USER_AGENTS list from the traffic-class agent
- * lists so /robots.txt, /ai.txt, and the classifier cannot drift.
+ * Serve /ai.txt using the shared AI_TRAINING_USER_AGENTS list. Crawler directives are courtesy
+ * signals; request controls and budgets enforce resource limits.
  */
 import { AI_TRAINING_USER_AGENTS } from '../../lib/traffic-class/agent-lists';
 

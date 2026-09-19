@@ -1,5 +1,5 @@
 /**
- * z-index token ladder (repo-92n2.7): guards the one `--ds-z-*` ladder in
+ * Guards the one `--ds-z-*` token ladder in
  * `packages/ui/src/styles/tokens.css` against reintroduced raw literals and against silent
  * reordering. The ladder must stay declared exactly once, in non-decreasing order, and every
  * stylesheet must reference it by name rather than by number except the allowlisted

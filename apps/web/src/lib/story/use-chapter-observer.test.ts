@@ -45,7 +45,7 @@ test('a non-intersecting entry never outranks an intersecting one, regardless of
   assert.equal(pickWinnerChapterIndex([entry(0, 0.95, false), entry(1, 0.1, true)]), 1);
 });
 
-test('the chapter in view from rects is the most-visible one past the threshold (repo-27uao)', () => {
+test('the chapter in view from rects is the most-visible one past the threshold', () => {
   // A 900px viewport scrolled so chapter 2 fills it and chapter 3's top 200px show.
   const rects = [
     { chapterIndex: 0, top: -1800, bottom: -900 },

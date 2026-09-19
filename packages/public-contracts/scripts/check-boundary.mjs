@@ -1,42 +1,9 @@
 #!/usr/bin/env node
 /**
- * Static forbidden-import scanner + Metro-bundle-smoke-test stand-in for
- * `@repo/public-contracts` (MOB-003; `docs/decisions-carryover.md`, "ADR-021's two invariants":
- * the public-contracts boundary).
- *
- * The decision requires a compile-time CI gate — not a code-review convention — that fails on any
- * `node:*` built-in or server-only dependency anywhere this package's shipped surface can reach.
- * This script is that gate, and it runs as the first half of the package's own `test` script, so
- * CI's "Run package tests" step (`pnpm -r --filter './packages/**' run --if-present test`) fires
- * it on every change that reaches this package. Plain Node, no TypeScript compilation: it
- * statically regex-scans import/require/dynamic-import specifiers, which catches every statically
- * written specifier without needing a real bundler.
- *
- * The real gate is the ALLOWLIST below (`ALLOWED_EXTERNAL_SPECIFIERS`, `zod` only), not the named
- * `FORBIDDEN_PACKAGE_SPECIFIERS` list — that list only improves the failure message. So
- * `@repo/firebase` and a direct Firestore import fail too, reported as an unlisted external
- * dependency rather than by name.
- *
- * Two passes:
- *
- * 1. `scanOwnSource()` — walks every `.ts` file under `src/`, excluding `src/**\/*.test.ts` and
- *    `src/testing/**` (test-support code that legitimately uses `node:fs` to load JSON fixtures
- *    under `node --test`, and is never part of the shipped `dist` or reachable from any
- *    `package.json` "exports" entrypoint — see `src/testing/load-fixture.ts`'s own doc comment).
- *
- * 2. `scanEntrypointGraph()` — the Metro-bundle-smoke-test stand-in required by MOB-003 (real
- *    Metro/React Native tooling does not exist yet; that is MOB-006). Starting ONLY from the
- *    files `package.json`'s "exports" map actually points at (the "development" condition, i.e.
- *    the real TS source a bundler resolving this package would start from), it follows relative
- *    imports transitively — exactly the set of files a bundler would actually include — and
- *    additionally resolves and scans the one allowed external dependency (`zod`) one level deep,
- *    satisfying "walks ... its resolved dependency graph." Any `node:*` built-in, bare Node
- *    built-in name, or non-`zod` external specifier reachable from an entrypoint fails the gate.
- *
- * An honest stand-in, not a full bundler: no code execution, no resolution of
- * conditional/dynamic requires, no model of Metro's actual resolver algorithm. A real
- * Metro bundle test belongs here once `apps/mobile` exists (MOB-006) and can import the
- * package for real; until then, the strongest CI-runnable proxy available.
+ * Static public-contract import boundary and compiled-output smoke check. Only allowlisted
+ * dependencies may be reachable from shipped exports. Exclude test-support modules that load
+ * fixtures with Node. This scanner checks literal import/require specifiers; it is not a real
+ * Metro bundle or a detector of arbitrary computed imports.
  */
 import { readFileSync, readdirSync, statSync } from 'node:fs';
 import { createRequire } from 'node:module';

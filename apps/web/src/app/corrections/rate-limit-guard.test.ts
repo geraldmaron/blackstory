@@ -10,7 +10,7 @@ test('denies anonymous corrections without App Check verification', () => {
   const decision = guard.evaluate({ subject: 'anonymous', clientIp: '203.0.113.10' });
   assert.equal(decision.allowed, false);
   if (decision.allowed) return;
-  assert.equal(decision.reason, 'app_check_required');
+  assert.equal(decision.reason, 'client_header_required');
 });
 
 test('allows only two verified anonymous corrections per rolling window', () => {
@@ -18,7 +18,7 @@ test('allows only two verified anonymous corrections per rolling window', () => 
   const request = {
     subject: 'anonymous' as const,
     clientIp: '203.0.113.11',
-    appCheckVerified: true,
+    clientAttested: true,
   };
 
   const first = guard.evaluate(request);

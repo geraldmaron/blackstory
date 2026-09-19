@@ -29,32 +29,10 @@ function normalizeName(value) {
 }
 
 /**
- * Memorial names whose entity record is filed under a fuller or differently punctuated name.
- * Each pair was checked by hand against the entity's summary in the active release before
- * being listed here.
- *
- * Matching must stay exact; every variant belongs in this table. First-token + last-token
- * fuzzy matching attached three unrelated people to victims on the wall, along with that
- * stranger's coordinates on the victim's memorial pin:
- *   - "Charles Brown"   -> Charles I. Brown, a 1914 founder of Phi Beta Sigma at Howard
- *   - "George Bush III" -> George Washington Bush, an 1840s Black pioneer settler
- *   - "Robert Johnson"  -> Robert L. Johnson, who founded BET in 1980 and is living
- * Common Black surnames make near-miss collisions routine rather than exceptional, and no
- * entity field separates a memorial victim from anyone else: Charles I. Brown carries
- * status `deceased` exactly as the real victims do.
- *
- * Where those three stand now (repo-5jxh):
- *   - Charles Brown and Robert Johnson are real victims and stay UNLINKED. Neither has an
- *     entity record; the active release holds only the namesakes above. The research that a
- *     record would be built from, with its sources, is in
- *     docs/research/memorial-names-wall.sources.json under `namesAwaitingEntityRecords`. Add
- *     the alias here only after a record exists and its summary describes the victim.
- *   - George Bush III is no longer a memorial name at all. He had been carried as a 2016
- *     St. Louis police killing; the contemporaneous record is that he shot a police sergeant
- *     twice in the head and was killed the next morning firing on the officers who found him.
- *     He is off the roll, so there is nothing here left to link. See
- *     `intentionally_excluded_examples` in
- *     docs/research/police-violence-memorial-names.sources.json.
+ * Explicit memorial identity aliases. Common names must not be linked using first/last-token
+ * similarity: a namesake can carry plausible dates or coordinates while identifying a different
+ * person. Add an alias only after checking the record's evidence against the memorial subject;
+ * source rosters retain inclusion and exclusion decisions.
  */
 const VERIFIED_ENTITY_ALIASES = new Map([
   // Emanuel AME Church, Charleston, June 17 2015.
@@ -68,12 +46,8 @@ const VERIFIED_ENTITY_ALIASES = new Map([
   ['delano herman middleton', 'gap_delano_middleton'],
   // NAACP chapter president, killed by Klan arson in Hattiesburg, January 1966.
   ['vernon ferdinand dahmer', 'ent_vernon_dahmer_001'],
-  // repo-5jxh. Both of these are why exact matching replaced fuzzy matching here: "Charles Brown"
-  // had been matched to a 1914 Phi Beta Sigma founder and "Robert Johnson" to the living founder
-  // of BET, both different men entirely. They are aliased explicitly, to records created for them
-  // (packages/ops-data/scripts/data/memorial-victim-cohort.ts), rather than matched by name —
-  // because a common name is exactly what went wrong before, and an alias states which man is
-  // meant.
+  // Explicit identifiers distinguish these memorial victims from unrelated namesakes, including
+  // Charles I. Brown and Robert L. Johnson.
   ['charles brown', 'ent_charles_brown_1957_001'],
   ['robert johnson', 'ent_robert_johnson_1934_001'],
 ]);
@@ -98,8 +72,8 @@ const { rows: candidates } = await client.query(`
          location->>'precision' AS location_precision,
          projection->>'locationLabel' AS location_label,
          projection->>'jurisdictionLabel' AS jurisdiction_label
-  FROM bb_public.release_entities
-  WHERE release_id = (SELECT release_id FROM bb_public.active_release WHERE id = 'active')
+  FROM published.release_entities
+  WHERE release_id = (SELECT release_id FROM published.active_release WHERE id = 'active')
     AND kind = 'person'
 `);
 await client.end();

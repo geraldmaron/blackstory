@@ -170,10 +170,8 @@ export function liveCatalogCacheKey(
 /**
  * Collapses concurrent loads of the same key onto one in-flight promise.
  *
- * Every full-catalog reader has the same failure mode: the process-memory TTL expires, N
- * concurrent requests all miss at that instant, and each one issues its own multi-MB Postgres
- * pull. That produced the bursty read pattern observed on 2026-08-08 (several full pulls within
- * seconds, then quiet). One load per key now serves all waiters.
+ * When a process-memory TTL expires, concurrent requests can miss the same key together. One
+ * load per key serves all waiters and prevents duplicate full-catalog reads.
  *
  * The key is released in `finally`, not `then`, so a rejected load cannot wedge the key and
  * starve every later request.

@@ -1,12 +1,9 @@
 /**
- * repo-qauh — dump enrichment subjects (evidence + allowed topic ids) as JSON so an in-session
- * agent can draft the tier-0 `--session-answers` payload `enrich-entities-llm.ts` already
- * accepts.
+ * Export enrichment subjects (evidence + allowed topic ids) as JSON for the offline
+ * `--session-answers` path accepted by `enrich-entities-llm.ts`.
  *
- * Why this exists: the enrichment harness's tier 0 takes session-drafted answers and costs
- * nothing, but nothing wrote them out in a draftable shape — the evidence lived only inside the
- * harness's own prompt construction, so drafting meant either calling a metered provider or
- * hand-assembling the subject payload and risking a mismatch with what validation checks.
+ * The evidence otherwise lives only inside the harness's prompt construction. This export avoids
+ * hand-assembling a payload that can drift from the evidence and truncation validation checks.
  *
  * This reuses `fetchEnrichmentSubjects` — the SAME function the harness calls — so a draft is
  * written against exactly the evidence text, evidence ids, and truncation the validator will

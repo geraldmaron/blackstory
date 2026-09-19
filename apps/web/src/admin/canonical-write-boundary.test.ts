@@ -6,7 +6,7 @@
  * What actually has to stay true after the merge: nothing outside `src/admin/**` can reach the
  * write-capable canonical Postgres pool (`ADMIN_DATABASE_URL`, via `canonical-postgres-client.ts`)
  * or the single write-authorization choke point (`canonical-write.ts`). A bug anywhere in the
- * public site's code must not be able to write `bb_canonical`/`bb_ops` just because it now shares
+ * public site's code must not be able to write `canonical`/`ops` just because it now shares
  * a process with `/admin`.
  */
 import assert from 'node:assert/strict';

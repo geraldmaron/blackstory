@@ -9,7 +9,7 @@ import {
   type CoverPackageInput,
   type CoverPackageIssue,
 } from '@repo/domain';
-import type { StaffRole } from '../auth/role-mutation';
+import type { StaffRole } from '../auth/staff-permissions';
 import { StaffPermissionDeniedError, assertStaffPermission } from '../auth/staff-permissions';
 import { markCoverReady } from './cover-package-store';
 

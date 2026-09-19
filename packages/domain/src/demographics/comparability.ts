@@ -95,7 +95,7 @@ export const DECADE_RACE_CATEGORY_BANDS: readonly DecadeRaceCategoryBand[] = [
   },
 ] as const;
 
-/** Reusable UI / Firestore disclaimer for the modern alone-comparable trio. */
+/** Reusable UI / stored-data disclaimer for the modern alone-comparable trio. */
 export const COMPARABILITY_NOTE_2000_2020 =
   'The 2000, 2010, and 2020 decennial vintages use the Census Bureau’s “Black or African American alone” ' +
   'one-race category. Category labels align across these three decades, but county-level decade-over-decade ' +

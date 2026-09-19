@@ -1,38 +1,9 @@
 /**
- * repo-rm2y — the standing resync for the DERIVED `notabilityBasis` / `notabilityLabels` fields.
- *
- * The bead: nothing resynchronizes a record's derived fields when its summary or claim set is
- * edited in place, so a hand-fix pass leaves the reasons a record is in the catalog describing a
- * version of the record that no longer exists. `fix-civil-rights-leaders-uncorroborated.ts`
- * rewrote three records' summary, claims and claimIds with hand-written claim ids and recomputed
- * no derived field; the basis records it left behind still point at claim ids nobody carries, and
- * their notes are those records' OLD summaries with the literal string "Documented site " on the
- * front of a person.
- *
- * WHY A CORRECTION PASS RATHER THAN A REPUBLISH: `publish-release-entities-incremental.ts`
- * re-derives an entity from its `bb_research.landscape_candidates` row and runs the full publish
- * gate, so routing this through it would both skip rows the gate rejects and REPLACE the curated
- * basis records that earlier passes hand-authored (repo-z1uk). This pass recomputes derived fields
- * from the claims already published, merging rather than replacing. Same shape as
- * `resync-research-coverage.ts`, which does the third derived field.
- *
- * The rule — the ratified merge, plus the two provable staleness tests — lives in
- * `lib/notability-basis-resync.ts` and is shared with `apply-notability-rubric-ruling.ts`, so the
- * one-off ruling pass and this standing resync cannot disagree about what the rule is.
- *
- * Every copy of the value moves together. A released row keeps the basis in the projection, in
- * `taxonomy.notabilityLabels`, and in `search_index.facets`; the ruling pass wrote the first two
- * and not the third, which is part of why 18 rows diverged. See the library header for what is
- * written, and for why `bb_canonical.entities.notability_basis` deliberately is not.
- *
- * Default is dry-run. Production writes require:
- *   DRY_RUN=0 NOTABILITY_BASIS_RESYNC_APPLY=1
- *
- * Usage (from repo root):
- *   set -a && source apps/web/.env.local && set +a
- *   export DATABASE_SSL=1
- *   node --conditions development --import tsx \
- *     packages/ops-data/scripts/resync-notability-basis.ts [--ids=ent_a,ent_b] [--release=rel_...]
+ * Resync derived inclusion-basis fields from published claims using
+ * lib/notability-basis-resync.ts. Merge curated reasons, remove provably stale entries and
+ * update projection, taxonomy and search facets together. This does not republish from
+ * landscape or rewrite canonical basis. Default dry-run; writes require DRY_RUN=0 and
+ * NOTABILITY_BASIS_RESYNC_APPLY=1. Optional --ids and --release scope the pass.
  */
 import { mkdirSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';

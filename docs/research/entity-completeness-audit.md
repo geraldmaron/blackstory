@@ -1,7 +1,7 @@
 # Entity completeness audit + backfill/discovery run (repo-xez5.12)
 
 Date: 2026-07-24. All numbers below queried directly against Supabase project
-`twykhihqkcldpreuovay` (`bb_canonical`, `bb_public`, `bb_publication`). No canonical data was
+`twykhihqkcldpreuovay` (`canonical`, `published`, `publication`). No canonical data was
 written; all backfill/discovery output is staged (review-gated), not published.
 
 > **Note added later: this audit measures display completeness, not research depth.** The two
@@ -19,7 +19,7 @@ written; all backfill/discovery output is staged (review-gated), not published.
 > [confidence-lineage.md](confidence-lineage.md) for how depth is derived.
 
 **Correction, same day, post-audit follow-up:** the `taxonomy` finding below (§2, §6.2) measured
-`bb_public.release_entities.taxonomy`, a denormalized column. The web/API actually serve
+`published.release_entities.taxonomy`, a denormalized column. The web/API actually serve
 `release_entities.projection->>'topicIds'`/`'topicTags'` (`apps/api-public`,
 `apps/web/src/lib/public-data/postgres-readers.ts`, parsed by `@repo/schemas`'
 `publicEntityProjectionSchema`) — confirmed by reading the render path
@@ -31,7 +31,7 @@ topics. What was real: the separate `taxonomy` column had silently drifted out o
 `projection` and canonical `kind_detail.classification` — used only by
 `canonical-release-gate.ts`'s convergence check, which was comparing against itself
 (`classification.taxonomy`, always `{}`) rather than `classification.topicIds`/`topicTags`, so it
-could never have caught this drift. Fixed via `packages/firebase/scripts/lib/release-taxonomy-sync.ts`
+could never have caught this drift. Fixed via `packages/ops-data/scripts/lib/release-taxonomy-sync.ts`
 (one-time backfill: 1,167/1,375 rows synced, 200 have no canonical topic data at all — a real
 gap, left alone) and wired into `publish-release-entities-incremental.ts` so future incremental
 publishes re-sync automatically instead of drifting again. See git commit for repo-xez5.12b.
@@ -62,14 +62,14 @@ A/B/C · N sources" evidence chip via `buildEntityAnatomyInputs`), `related`/`re
 (related-entities rail), `geoAnchor` (map pin), `notabilityLabels`, `sensitivity`,
 `extendedNarrative` (optional).
 
-These map directly onto `bb_public.release_entities` columns: `summary`, `location`/`lat`/`lng`,
+These map directly onto `published.release_entities` columns: `summary`, `location`/`lat`/`lng`,
 `claims` (jsonb array), `related` (jsonb array), `primary_image`, `taxonomy`, and
 `projection->>'historicalContext'` / `projection->'eraBuckets'` (the nested JSON the web/mobile
 view-models actually read).
 
-## 2. Before completeness — active release (`bb_public.release_entities`, 1,375 rows)
+## 2. Before completeness — active release (`published.release_entities`, 1,375 rows)
 
-Active release: `rel_20260723_authority_net_001` (confirmed via `bb_public.active_release`; 2
+Active release: `rel_20260723_authority_net_001` (confirmed via `published.active_release`; 2
 releases total exist per repo-xez5.10's uniqueness-constraint audit, `rel_seed_001` is the other).
 
 | kind | n | blank summary | blank location | blank geo | blank claims | blank related | blank image | blank taxonomy | blank historicalContext | blank eraBuckets |
@@ -99,7 +99,7 @@ already backfilled these). The load-bearing blanks left on the live page are:
 5. **`eraBuckets`** — mostly populated; residual gaps concentrated in `place` (202) and `school`
    (12).
 
-Canonical-side (`bb_canonical.entities`, 1,383 rows) cross-check: every entity has at least one
+Canonical-side (`canonical.entities`, 1,383 rows) cross-check: every entity has at least one
 `entity_locations` row and at least one `claims` row (`no_location`/`no_claims` = 0 for all
 kinds) — so the release-level claim/geo gaps above (the 1-2 per kind) are release-build
 artifacts, not canonical data gaps. `entity_relationships` coverage is the canonical root cause
@@ -141,7 +141,7 @@ paid-model draft — do not read it as content-ready prose).
 ## 4. After completeness
 
 **Unchanged.** Every `backfill-entity` call above omitted `--commit`, so nothing reached
-`bb_research`'s quarantine tables and nothing touched `bb_canonical`/`bb_public`. The completeness
+`research`'s quarantine tables and nothing touched `canonical`/`published`. The completeness
 table in §2 is identical before and after this run for canonical/release data.
 
 **Staged and pending review**: 10 mock enrichment drafts (§3) covering 2 fields per entity
@@ -151,17 +151,17 @@ the mock text is templated and not suitable to promote as-is even after approval
 
 ## 5. Discovery
 
-Checked `bb_canonical.entities.display_name` for all four named figures — **zero matches**:
+Checked `canonical.entities.display_name` for all four named figures — **zero matches**:
 
 **Correction, same day, post-audit follow-up:** the table below originally read `committed: false`
 for all four and described them as "staged" — that was wrong. `committed: false` means the
 `research-intake` call ran in preview mode and **never wrote anything to the database** — no
-`bb_submissions.intake_items` row, no `bb_research.cases` row ever existed at the case IDs listed
+`submissions.intake_items` row, no `research.cases` row ever existed at the case IDs listed
 below. This was caught when a follow-up review pass queried those exact case IDs and got zero
 rows back. Re-ran all four with `--commit` on 2026-07-24 (later same day) — they are now genuinely
 staged. Table updated with the real, committed case/submission IDs.
 
-| Figure | In bb_canonical? | Staged? |
+| Figure | In canonical? | Staged? |
 |---|---|---|
 | Audre Lorde | No | Yes (re-staged, `--commit`) — `submissionId b791ed36-8b9d-4850-bbde-6662fbd03599`, `researchCaseId a5fd0dcf-e8d1-4ca8-a307-ade6d14b45e0`, `committed: true` |
 | James Baldwin | No | Yes (re-staged, `--commit`) — `submissionId cea09361-850b-423d-8473-7ddf3ad87d12`, `researchCaseId 37b0926a-0467-4644-89a9-35b19b1ced2c`, `committed: true` |

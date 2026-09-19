@@ -1,17 +1,4 @@
-/**
- * Minimal, dependency-free embedding math + a deterministic mock provider for the retrieval
- * eval in retrieval-eval.ts.
- *
- * This is deliberately NOT imported from @repo/ops-data's real embedding pipeline:
- * docs/research/gold-corpus.md states the gold-corpus harness is local-only ("evaluation does
- * not read or write" the product store "and neither CLI applies cloud changes"), and
- * @repo/ops-data pulls in firebase-admin + @google/genai infra this package's harness
- * is intentionally decoupled from. The interface below (`EvalEmbeddingProvider`) is shaped so a
- * caller *outside* this package can still plug in the real
- * `@repo/ops-data`'s `createGeminiEmbeddingProvider` (same `embed(texts)` signature) to
- * get a real recall number see `docs/decisions-carryover.md` ("Vector search") for what that requires (a live
- * `GEMINI_API_KEY`).
- */
+/** Deterministic local embeddings for retrieval-policy fixtures; not a semantic model benchmark. */
 
 export type EvalEmbeddingProvider = {
   readonly model: string;

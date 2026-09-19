@@ -1,15 +1,6 @@
 /**
- * Coarse entity classification (the related workstream).
- *
- * `CanonicalEntity.kind` (`./entity-kinds.ts`) mixes broad classes and narrow subtypes: `school`,
- * `organization`, and `institution` overlap ambiguously (a historically Black church could
- * plausibly be filed under any of the three). `entityClass` is a small, fixed set of coarse
- * buckets that every `kind` maps onto unambiguously; `entityTypes` carries the finer, still-
- * controlled subtype label(s) that would otherwise be lost in the coarsening (e.g. `['church']`).
- *
- * Both fields are NEW and ADDITIVE — `kind` remains the canonical field every existing consumer
- * (search facets, map filters, resolution, publish gates) reads; `entityClass`/`entityTypes` are
- * derived, optional, and not wired into any of those consumers in this pass.
+ * Map each canonical kind to a coarse class and optional finer types. kind remains the input;
+ * derived classification must not create a competing identity or source of truth.
  */
 import type { EntityKind } from './entity-kinds.js';
 

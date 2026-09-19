@@ -1,12 +1,7 @@
 /**
- * Server-side read of one canonical entity, for the editable detail page.
- *
- * Identifiers and locations live in their own tables (`entity_identifiers`, 919 rows;
- * `entity_locations`, 4,108 rows), not in the JSONB columns of the same name on `entities` —
- * only 23 rows carry JSONB identifiers at all, and `entity_aliases` is empty while 19 rows carry
- * JSONB aliases. That split is verified against the live database, not inferred: reading the
- * wrong side of it is exactly the class of drift repo-gyq6.13 records. Aliases are read from
- * JSONB; identifiers and locations from their tables.
+ * Reads the canonical entity for staff editing. Identifiers and locations come from their
+ * normalized tables; aliases come from the entity JSONB field. Keep reads aligned with the
+ * corresponding write paths.
  */
 import { queryPostgres } from './canonical-postgres-client.js';
 import type { EntitySensitivity } from './entity-query.js';
@@ -107,8 +102,8 @@ export async function readEntityDetail(entityId: string): Promise<EntityDetail |
     `SELECT
        e.id, e.kind, e.entity_class, e.display_name, e.living_status,
        e.aliases, e.sensitivity, e.merge_state, e.created_at, e.updated_at,
-       (SELECT count(*) FROM bb_canonical.claims c WHERE c.entity_id = e.id) AS claim_count
-     FROM bb_canonical.entities e
+       (SELECT count(*) FROM canonical.claims c WHERE c.entity_id = e.id) AS claim_count
+     FROM canonical.entities e
      WHERE e.id = $1`,
     [id],
   );
@@ -123,7 +118,7 @@ export async function readEntityDetail(entityId: string): Promise<EntityDetail |
       readonly trusted: boolean;
     }>(
       `SELECT id, namespace, value, trusted
-       FROM bb_canonical.entity_identifiers
+       FROM canonical.entity_identifiers
        WHERE entity_id = $1
        ORDER BY namespace ASC, value ASC`,
       [id],
@@ -137,7 +132,7 @@ export async function readEntityDetail(entityId: string): Promise<EntityDetail |
       readonly lng: number | null;
     }>(
       `SELECT id, role, label, precision, lat, lng
-       FROM bb_canonical.entity_locations
+       FROM canonical.entity_locations
        WHERE entity_id = $1
        ORDER BY role ASC, id ASC`,
       [id],

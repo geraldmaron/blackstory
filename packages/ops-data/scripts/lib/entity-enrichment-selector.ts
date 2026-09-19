@@ -1,19 +1,6 @@
 /**
- * Selector for the entity-depth enrichment ledger (bb_research.entity_enrichment,
- * repo-n7p6.2 / WS2). Every later enrichment pass (WS3 evidence sweep, WS4 cheap-model
- * harness) imports this to decide which active-release entities still need work, so a
- * re-run is resumable: skip anything already freshly enriched, but always re-include
- * anything missing a field the harness is supposed to fill in, and support
- * "re-enrich anything older than N days".
- *
- * Two layers, per the ledger's idempotency rule (unchanged evidence_digest + fresh
- * last_enriched_at => skip):
- *   1. `buildEnrichmentSelectorQuery` / `selectEntitiesForEnrichment` — the coarse SQL
- *      pass. Cheap: runs before any evidence fetch, so it can only reason about
- *      timestamps and the projection actually published today.
- *   2. `evaluateEnrichmentCandidacy` — a pure, DB-free re-check a harness runs after it
- *      has fetched fresh evidence and computed a digest for it, to avoid writing (and
- *      paying for an LLM call) when nothing actually changed since the last pass.
+ * Selects enrichment work first by stored deficits and freshness, then rechecks after fetching
+ * evidence. An unchanged evidence digest and fresh result prevent repeated drafting calls.
  */
 import type pg from 'pg';
 
@@ -30,7 +17,7 @@ export type EntityEnrichmentSelectorParams = {
    */
   readonly missingFields?: readonly string[];
   /**
-   * Restrict to these bb_research.landscape_candidates.lane values (joined on
+   * Restrict to these research.landscape_candidates.lane values (joined on
    * landscape_candidates.id = release_entities.entity_id — the same id space; see the
    * entity_enrichment migration comment for why). Curated entities that were never
    * landscape-imported (ent_, recon_, gap_ prefixed ids) have no lane and are excluded
@@ -61,7 +48,7 @@ function missingFieldClause(paramIndex: number): string {
 
 /**
  * Pure SQL-predicate builder — no I/O, so it is unit-testable without a live DB. Selects
- * bb_public.release_entities.entity_id for the active release where the entity was never
+ * published.release_entities.entity_id for the active release where the entity was never
  * enriched, is missing a requested field, or was last enriched further back than
  * staleDays. `lanes`, when non-empty, additionally restricts to matching
  * landscape_candidates.lane.
@@ -97,17 +84,8 @@ export function buildEnrichmentSelectorQuery(
   }
 
   /**
-   * Exclude entities the sweep already looked at and found nothing for, until they go stale.
-   *
-   * This is an AND, deliberately, not another OR branch: a swept-and-empty entity is by definition
-   * still missing every requested field, so an OR would be satisfied by `missingFieldClause` and
-   * the exclusion would never bite.
-   *
-   * Without it the sweep loops. The sweep records its outcome as status='skipped' + updated_at but
-   * never sets last_enriched_at (it does not enrich — WS4 does), so `ee.last_enriched_at IS NULL`
-   * stays true forever, and with ORDER BY entity_id the same lowest-id entities are re-offered on
-   * every pass. Measured 2026-08-11: the last six chunks of a 24-chunk run re-swept an identical
-   * set of 50 entities, ~100 minutes of fetching for zero new evidence.
+   * Exclude recently swept empty results with an AND condition. Missing-field OR branches would
+   * otherwise reselect them indefinitely because acquisition does not set last_enriched_at.
    */
   const retrySkippedClause = `\n      AND NOT (
         ee.status = 'skipped'
@@ -116,13 +94,13 @@ export function buildEnrichmentSelectorQuery(
 
   const sql = `
     WITH active AS (
-      SELECT release_id FROM bb_public.active_release WHERE id = 'active'
+      SELECT release_id FROM published.active_release WHERE id = 'active'
     )
     SELECT re.entity_id
-    FROM bb_public.release_entities re
+    FROM published.release_entities re
     JOIN active a ON re.release_id = a.release_id
-    LEFT JOIN bb_research.entity_enrichment ee ON ee.entity_id = re.entity_id
-    LEFT JOIN bb_research.landscape_candidates lc ON lc.id = re.entity_id
+    LEFT JOIN research.entity_enrichment ee ON ee.entity_id = re.entity_id
+    LEFT JOIN research.landscape_candidates lc ON lc.id = re.entity_id
     WHERE (
       ${inclusionReasons.join('\n      OR ')}
     )${laneClause}${retrySkippedClause}

@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# repo-qauh — run the evidence sweep over the nrhp-black-heritage backlog in committing chunks.
+# Run the evidence sweep over the nrhp-black-heritage backlog in committing chunks.
 #
 # sweep-entity-evidence.ts accumulates a whole run in memory and writes it in ONE transaction at
 # the end, so a single failure at --limit=2000 throws away hours of fetching. It is also
@@ -10,7 +10,7 @@
 # The selector advances on its own — entities with fresh captured evidence are skipped on the next
 # pass — so repeated fixed-size runs walk the backlog without bookkeeping here.
 #
-# A third argument re-sweeps an EXPLICIT id list instead of walking the backlog (repo-de8i). The
+# A third argument re-sweeps an EXPLICIT id list instead of walking the backlog. The
 # selector cannot produce these: they already carry fresh captured evidence, which is exactly why
 # it skips them, and the point of a re-sweep is to replace that evidence. The file is one entity id
 # per line and is consumed in chunks of SIZE.

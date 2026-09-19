@@ -10,7 +10,7 @@
 
 **Companion docs:** [data-ingestion-methodology.md](../runbooks/data-ingestion-methodology.md), [juxtaposition-not-causation.md](../methodology/juxtaposition-not-causation.md), [theme-impact-canonical-questions.md](./theme-impact-canonical-questions.md), [external-data-sources.ts](../../packages/domain/src/external-data-sources.ts), [public-mcp-unlock-criteria.md](public-mcp-unlock-criteria.md).
 
-**Lane rule:** Statistics → `bb_reference` / `StatisticalSeries` path. Entity corpora → launch-corpora / landscape candidates. Never mix.
+**Lane rule:** Statistics → `reference` / `StatisticalSeries` path. Entity corpora → launch-corpora / landscape candidates. Never mix.
 
 ## Legend
 
@@ -28,7 +28,7 @@
 | Id | Theme | Strategy | Ingest | License | Geography | Notes |
 |----|-------|----------|--------|---------|-----------|-------|
 | `opportunity-atlas-tract-outcomes` | justice / wealth | store (subset) | optional | attribution | tract (2010) | Checksum recorded; child cohort outcomes — **modeled**, not jurisdiction imprisonment rates; needs 2010→2020 crosswalk |
-| `mapping-inequality-holc` | housing / historical | gated → store | fixture | NC | city polygons | Staff inventory in `bb_reference.holc_areas`; public **cite-only** until commercial-surface rights review |
+| `mapping-inequality-holc` | housing / historical | gated → store | fixture | NC | city polygons | Staff inventory in `reference.holc_areas`; public **cite-only** until commercial-surface rights review |
 | `dsl-renewing-inequality` | housing / historical | gated → store | fixture | NC | city | Chicago attributes fixture (43 projects / 5 pilot); polygons **cite/staff-gated** — see [dsl-renewing-inequality-rights.md](./dsl-renewing-inequality-rights.md) |
 | `fbi-ucr-hate-crime` | justice | store + participation | registered | PD | county×year | Only with `fbi-ucr-participation` denominator |
 | `fbi-ucr-agency-directory` | justice | store | registered | PD | agency | Crosswalk for UCR |
@@ -65,7 +65,7 @@
 | `mit-election-lab` | voting | cite / selective store | optional | attribution | state / county | Registered; election-admin context — verify terms per dataset |
 | `voting-rights-lab-indicators` | voting | cite / selective | optional | attribution | state | Registered; confirm redistribution before bulk load |
 
-**ACS / decennial** live primarily under census-demographics adapters and `bb_reference.acs_*` / `census_*` tables (not every variable is an `EXTERNAL_DATA_SOURCES` row). Treat ACS race-sliced income, poverty, homeownership, and attainment as **Phase 1 store** targets.
+**ACS / decennial** live primarily under census-demographics adapters and `reference.acs_*` / `census_*` tables (not every variable is an `EXTERNAL_DATA_SOURCES` row). Treat ACS race-sliced income, poverty, homeownership, and attainment as **Phase 1 store** targets.
 
 ---
 

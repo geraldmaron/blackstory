@@ -39,7 +39,7 @@ const TEST_NONCE = 'dGVzdC1ub25jZS12YWx1ZQ==';
 test('CSP includes strict defaults and frame-ancestors none', () => {
   const csp = buildContentSecurityPolicy({ isDev: false, nonce: TEST_NONCE });
   assert.match(csp, /default-src 'self'/);
-  // repo-77nk: production script-src is nonce + strict-dynamic, not 'unsafe-inline'.
+  // Production scripts require a nonce and strict-dynamic.
   assert.match(csp, new RegExp(`script-src 'self' 'nonce-${TEST_NONCE}' 'strict-dynamic'`));
   assert.doesNotMatch(csp, /script-src[^;]*unsafe-inline/);
   assert.doesNotMatch(csp, /script-src[^;]*unsafe-eval/);
@@ -155,8 +155,7 @@ test('global security headers include clickjacking and MIME sniffing protection'
 });
 
 test('next.config.mjs wires the static global security headers, with CSP deliberately absent', () => {
-  // repo-77nk: CSP carries a per-request nonce, so it cannot be one of next.config.mjs's static
-  // `/:path*` headers — it moves to proxy.ts instead (see proxy.test.ts).
+  // CSP is generated in proxy.ts because its nonce changes per request.
   const source = readFileSync(NEXT_CONFIG_PATH, 'utf8');
   assert.match(source, /next-config-headers\.mjs/);
   assert.match(source, /globalSecurityHeaders/);
@@ -220,4 +219,23 @@ test('trusted types stub exposes policy name', () => {
   const policy = createTrustedTypesPolicyStub();
   assert.equal(typeof policy.createHTML('x'), 'string');
   assert.equal(TRUSTED_TYPES_POLICY_NAME, 'blackBookDefault');
+});
+
+test('CSP grants only the configured auth origin and restricts loopback to development', () => {
+  const connect = (authUrl: string | undefined, isDev: boolean) =>
+    buildContentSecurityPolicy({ isDev, nonce: TEST_NONCE, ...(authUrl ? { authUrl } : {}) })
+      .split(';')
+      .find((directive) => directive.trim().startsWith('connect-src'))!;
+  assert.match(connect('https://project.supabase.co', false), /https:\/\/project\.supabase\.co/);
+  assert.doesNotMatch(connect(undefined, false), /supabase/);
+  assert.match(connect('http://127.0.0.1:55321', true), /http:\/\/127\.0\.0\.1:55321/);
+  for (const url of [
+    'http://127.0.0.1:55321',
+    'http://auth.example.org',
+    'https://*.supabase.co',
+    'https://user:password@auth.example.org',
+    'invalid',
+  ]) {
+    assert.equal(connect(url, false), connect(undefined, false));
+  }
 });

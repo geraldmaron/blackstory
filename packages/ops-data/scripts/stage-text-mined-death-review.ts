@@ -1,6 +1,6 @@
 /**
- * Stage regex text-mined person death-year signals into bb_research.landscape_candidates
- * (lane living-status-review). Never writes bb_canonical.living_status.
+ * Stage regex text-mined person death-year signals into research.landscape_candidates
+ * (lane living-status-review). Never writes canonical.living_status.
  *
  * Usage (from repo root):
  *   set -a && source apps/web/.env.local && set +a
@@ -89,9 +89,9 @@ async function loadUnknownPersons(client: pg.Client): Promise<PersonRow[]> {
        e.living_status,
        coalesce(re.projection->>'summary', '') AS summary,
        coalesce(re.projection->>'historicalContext', '') AS historical_context
-     FROM bb_canonical.entities e
-     LEFT JOIN bb_public.active_release ar ON true
-     LEFT JOIN bb_public.release_entities re
+     FROM canonical.entities e
+     LEFT JOIN published.active_release ar ON true
+     LEFT JOIN published.release_entities re
        ON re.entity_id = e.id AND re.release_id = ar.release_id
      WHERE e.kind = 'person'
        AND e.living_status = 'unknown'
@@ -104,9 +104,9 @@ async function loadUnknownPersons(client: pg.Client): Promise<PersonRow[]> {
 async function loadClaimTextByEntity(client: pg.Client): Promise<Map<string, string>> {
   const { rows } = await client.query<ClaimTextRow>(
     `SELECT c.entity_id, v.predicate, coalesce(v.object::text, '') AS object
-     FROM bb_canonical.claims c
-     JOIN bb_canonical.claim_versions v ON v.id = c.current_version_id
-     JOIN bb_canonical.entities e ON e.id = c.entity_id
+     FROM canonical.claims c
+     JOIN canonical.claim_versions v ON v.id = c.current_version_id
+     JOIN canonical.entities e ON e.id = c.entity_id
      WHERE e.kind = 'person'
        AND e.living_status = 'unknown'
        AND c.current_version_id IS NOT NULL`,
@@ -179,7 +179,7 @@ async function main(): Promise<void> {
     try {
       // landscape_candidates.run_id FK → source_program_runs; lane CHECK only allows catalog lanes.
       await client.query(
-        `INSERT INTO bb_research.source_program_runs
+        `INSERT INTO research.source_program_runs
           (id, lane, source_program_id, source_program_name, retrieved_at, rows_fetched, candidate_count, summary, updated_at)
          VALUES ($1, 'other', $2, $3, now(), $4, $4, $5::jsonb, now())
          ON CONFLICT (id) DO UPDATE SET
@@ -204,7 +204,7 @@ async function main(): Promise<void> {
           .replace(/[^a-zA-Z0-9_]+/g, '_')
           .slice(0, 180);
         const result = await client.query(
-          `INSERT INTO bb_research.landscape_candidates
+          `INSERT INTO research.landscape_candidates
             (id, run_id, lane, source_program_id, source_item_id, display_name, kind, summary,
              canonical_url, research_lane_only, status, payload, provenance, discovered_at, updated_at)
            VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,true,$10,$11::jsonb,$12::jsonb,$13,now())
@@ -214,7 +214,7 @@ async function main(): Promise<void> {
              payload = EXCLUDED.payload,
              provenance = EXCLUDED.provenance,
              updated_at = now()
-           WHERE bb_research.landscape_candidates.payload->'personReview'->>'approved' IS DISTINCT FROM 'true'`,
+           WHERE research.landscape_candidates.payload->'personReview'->>'approved' IS DISTINCT FROM 'true'`,
           [
             landscapeId,
             row.run_id,

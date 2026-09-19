@@ -1,28 +1,4 @@
-/**
- * Observability kill-switch and sampling configuration (MOB-018).
- *
- * Mirrors the repo's existing `operating-principle-runs-itself-within-reason`
- * posture (budget-capped, kill-switch, free-tier-first — see
- * `docs/mobile/decisions/mobile-identity.md` spend-ceiling gate,
- * `docs/mobile/security/threat-model.md` T9, and the server-side pattern in
- * `infra/gcp/cost-controls/cost-controls-matrix.json` /
- * `packages/security/src/resource-controls.ts`) rather than inventing a new
- * shape for mobile. Firebase Crashlytics and Performance Monitoring are BOTH
- * free-tier / not-metered-per-event in Firebase's actual pricing model
- * (unlike Firestore reads or a paid map API — see `README.md` "Cost
- * ceilings" for the full reasoning), so there is no daily-budget/soft-
- * shutdown automation to wire here the way `resource-controls.ts` does for
- * metered services. What this module DOES provide, consistent with that
- * posture:
- *
- *   - `observabilityEnabled` — a blunt kill switch (default ON, override-able
- *     per build/config), for the case Firebase's free-tier posture ever
- *     changes, a runaway crash loop floods the dashboard, or an operator
- *     simply wants it off.
- *   - `performanceSampleRate` — a documented sampling rate that bounds trace
- *     VOLUME/NOISE (not cost, since perf traces are unmetered), so dashboards
- *     stay legible under real traffic. See README.md "Sampling & retention".
- */
+/** Mobile telemetry policy. The configured sink is a bounded development console reporter; no remote telemetry provider is enabled. */
 
 export interface ObservabilityConfig {
   readonly observabilityEnabled: boolean;

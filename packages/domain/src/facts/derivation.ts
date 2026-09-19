@@ -1,52 +1,11 @@
 /**
- * Fact <-> canonical-claim derivation consistency (the related workstream).
- *
- * `FactRecord` (`./record.ts`) carries its own independent `citations`/`confidence` rather than
- * pointing at a `CanonicalClaim` (`../claims/claim.ts`) for those values. `derivedFromClaimIds`
- * records WHICH claims a fact was written from, but nothing enforces that the fact's own
- * citations/confidence stay consistent with what those claims actually support  a fact could
- * silently claim stronger sourcing than its canonical claim ever had. This module is that check.
- *
- * === The comparison rule (a judgment call  documented here, not left implicit) ===
- *
- * There is no shared schema between a `FactCitation` (CSL-JSON + Black Book extension block) and
- * a `CanonicalClaim`'s evidence (`ConfidenceScore.contributingEvidenceIds`, deduped by
- * lineage in `../claims/confidence.ts`'s engine): they are deliberately different shapes for
- * different surfaces. So this is NOT a byte-for-byte equivalence check. Instead:
- *
- * 1. CONFIDENCE CEILING: `maxFactConfidenceGradeForClaim` derives the strongest `FactConfidenceGrade`
- *    a single claim can justify, reusing signals the claim confidence engine already computes
- *    (never re-deriving them):
- *      - A claim that is not `isClaimPublished` (accepted + published)  contested. Citing an
- *        unpublished/unaccepted claim as solid ground is exactly the drift this check exists to
- *        catch.
- *      - A claim with any `contradictingEvidenceCount > 0`  contested. "established"/"corroborated"
- *        both require `FACT_CONFIDENCE_DEFINITIONS` says "no credible ... dispute".
- *      - Otherwise the ceiling comes from `independentLineageCount` (the exact lineage-dedupe
- *        concept `../claims/confidence.ts` already uses):
- *          0 lineages -> contested (no real support behind the claim)
- *          1 lineage  -> single-source
- *          >=2 lineages and `components.sourceAuthority >= 0.75` (the same bar
- *            `CLASSIFICATION_AUTHORITY.reputable_secondary` uses in the claim engine, chosen here
- *            rather than an arbitrary new number) -> established
- *          >=2 lineages otherwise -> corroborated
- *    When a fact derives from MULTIPLE claims, its ceiling is the WEAKEST per-claim ceiling (a
- *    chain is only as strong as its weakest link)  the fact's declared `confidence` must be no
- *    stronger than that combined ceiling.
- *
- * 2. CITATION TRACEABILITY (the closest available "subset" check): a `FactCitation.documentId`
- *    is the one field that can literally share an identifier with claim evidence. When a fact
- *    citation carries a `documentId`, it must appear in the union of the backing claims'
- *    `contributingEvidenceIds`. Citations without a `documentId` (most CSL-only citations) are
- *    NOT checkable this way and are treated as consistent  this is deliberately the "consistent
- *    with, not perfect equivalence" half of the rule; forcing every citation to carry a
- *    `documentId` is a separate, larger data-modeling change outside this check's scope.
- *
- * A fact with an EMPTY `derivedFromClaimIds` has nothing to check against and always passes
- * (see `./record.ts`'s field doc + this repo's existing seed data, which predates this field).
- * A fact that DECLARES `derivedFromClaimIds` but whose backing claims were not supplied to the
- * checker fails closed (`unresolved_claim_id`)  an unverifiable derivation claim is not treated
- * as an implicitly passing one.
+ * Check a fact's declared derivation against supplied canonical claims. Confidence cannot
+ * exceed the weakest backing claim: unpublished or contradictory claims yield contested;
+ * otherwise lineage count and the existing authority threshold set a qualitative ceiling.
+ * Citation document ids must occur among backing evidence ids. Citations without document ids
+ * cannot be checked by this method. Empty derivedFromClaimIds skips comparison; declared but
+ * unresolved ids fail closed. This is a consistency rule, not calibrated probability or
+ * independent entailment review.
  */
 import { isClaimPublished, type CanonicalClaim } from '../claims/claim.js';
 import type { ConfidenceScore } from '../claims/confidence.js';

@@ -1,5 +1,5 @@
 /**
- * Postgres reads/writes for story packets in bb_submissions.intake_items and bb_ops.story_packet_reviews.
+ * Postgres reads/writes for story packets in submissions.intake_items and ops.story_packet_reviews.
  */
 import type { StoryResearchPacket } from '@repo/domain';
 import { storyPacketToSeedRecord } from '@repo/domain';
@@ -129,7 +129,7 @@ export async function listStoryPacketsPostgres(
   const [intakeRows, reviewRows] = await Promise.all([
     queryPostgres<IntakeRow>(
       `SELECT id, created_by, payload, created_at
-       FROM bb_submissions.intake_items
+       FROM submissions.intake_items
        WHERE payload->>'proposalKind' = 'story_packet'
           OR payload->'storyPacket' IS NOT NULL
        ORDER BY created_at DESC
@@ -138,7 +138,7 @@ export async function listStoryPacketsPostgres(
     ),
     queryPostgres<ReviewRow>(
       `SELECT submission_id, decision, reviewer_id, notes, packet, updated_at
-       FROM bb_ops.story_packet_reviews`,
+       FROM ops.story_packet_reviews`,
     ),
   ]);
 
@@ -162,7 +162,7 @@ export async function getStoryPacketPostgres(
 ): Promise<StoryPacketListItem | null> {
   const intakeRows = await queryPostgres<IntakeRow>(
     `SELECT id, created_by, payload, created_at
-     FROM bb_submissions.intake_items
+     FROM submissions.intake_items
      WHERE id = $1`,
     [submissionId],
   );
@@ -173,7 +173,7 @@ export async function getStoryPacketPostgres(
 
   const reviewRows = await queryPostgres<ReviewRow>(
     `SELECT submission_id, decision, reviewer_id, notes, packet, updated_at
-     FROM bb_ops.story_packet_reviews
+     FROM ops.story_packet_reviews
      WHERE submission_id = $1`,
     [submissionId],
   );
@@ -206,7 +206,7 @@ export async function recordStoryPacketReviewPostgres(input: {
   };
 
   await queryPostgres(
-    `INSERT INTO bb_ops.story_packet_reviews
+    `INSERT INTO ops.story_packet_reviews
       (id, submission_id, decision, reviewer_id, notes, packet, created_at, updated_at)
      VALUES ($1,$2,$3,$4,$5,$6,$7,$8)
      ON CONFLICT (id) DO UPDATE SET

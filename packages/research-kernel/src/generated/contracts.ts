@@ -143,6 +143,7 @@ export interface EvidenceSelector {
   readonly timeStartSeconds?: number | null;
   readonly timeEndSeconds?: number | null;
   readonly fragment?: string | null;
+  readonly sourceItemId: string;
 }
 
 export interface ClaimQualifiers {
@@ -366,6 +367,7 @@ export interface ModelInvocation {
   readonly rawResponse: string;
   readonly status: 'pending' | 'valid' | 'invalid' | 'failed';
   readonly repairOfInvocationId: string | null;
+  readonly accounting: ModelAccounting;
 }
 
 export interface InvalidModelOutput {
@@ -473,6 +475,157 @@ export interface RoCrateExport {
   readonly checksums: Readonly<Record<string, string>>;
 }
 
+export interface ResearchQuote {
+  readonly citationUrl: string;
+  readonly quote: string;
+}
+
+export interface ExtractedResearchClaim {
+  readonly id: string;
+  readonly predicate: string;
+  readonly object: string;
+  readonly confidence: number;
+  readonly evidence: ResearchQuote;
+}
+
+export interface SubjectExtraction {
+  readonly title: string;
+  readonly publicSummary: string;
+  readonly historicalContext: string;
+  readonly confidence: number;
+  readonly claims: readonly ExtractedResearchClaim[];
+}
+
+export interface RelationshipHypothesisExtraction {
+  readonly relationType: string;
+  readonly confidence: number;
+  readonly rationale: string;
+  readonly evidence: readonly ResearchQuote[];
+}
+
+export interface HarnessSourceRecord {
+  readonly id: string;
+  readonly connectorKind: string;
+  readonly title: string;
+  readonly description: string;
+  readonly cites: readonly string[];
+  readonly rawRecord: Readonly<Record<string, unknown>>;
+  readonly coordinates?: { readonly latitude: number; readonly longitude: number };
+  readonly locationName?: string;
+  readonly county?: string;
+  readonly state?: string;
+}
+
+export interface ResearchTaskSpec {
+  readonly frontier: FrontierTask;
+  readonly evidenceNeedId: string | null;
+  readonly dependsOn: readonly string[];
+  readonly input: Readonly<Record<string, unknown>>;
+  readonly outputContract:
+    | 'HarnessSourceRecord'
+    | 'SubjectExtraction'
+    | 'RelationshipHypothesisExtraction'
+    | 'ResearchSearchResult'
+    | 'ResearchTaskReport'
+    | 'ResearchAcquisitionResult';
+  readonly maxAttempts: number;
+  readonly maxCostUsdPerAttempt: number;
+}
+
+export interface ResearchExecutionPlan {
+  readonly schemaVersion: '1.0.0';
+  readonly profile: ResearchProfile;
+  readonly run: ResearchRun;
+  readonly budgetClass: 'standard' | 'highImpact';
+  readonly questions: readonly ResearchQuestion[];
+  readonly needs: readonly EvidenceNeed[];
+  readonly tasks: readonly ResearchTaskSpec[];
+}
+
+export interface ResearchSearchResult {
+  readonly query: string;
+  readonly seeking: string;
+  readonly leads: readonly {
+    readonly url: string;
+    readonly title: string;
+    readonly snippet: string;
+  }[];
+  readonly limitations: readonly string[];
+}
+
+export interface ResearchTaskReport {
+  readonly summary: string;
+  readonly limitations: readonly string[];
+  readonly evidence: readonly ResearchQuote[];
+}
+
+export interface ModelAccounting {
+  readonly promptTokens: number | null;
+  readonly completionTokens: number | null;
+  readonly costUsd: number | null;
+  readonly source: 'provider-response' | 'external-receipt' | null;
+  readonly incomplete: boolean;
+}
+
+export interface ResearchTaskLease {
+  readonly runId: string;
+  readonly task: ResearchTaskSpec;
+  readonly workerId: string;
+  readonly leaseToken: string;
+  readonly expiresAt: string;
+  readonly attempt: number;
+  readonly activityId: string;
+  readonly dependencies: readonly { readonly taskId: string; readonly output: unknown }[];
+}
+
+export interface PreservationDecision {
+  readonly sourceUrl: string;
+  readonly allowTextRetention: boolean;
+  readonly allowArchive: boolean;
+  readonly sensitivity: 'public' | 'restricted' | 'unknown';
+  readonly reviewedBy: string;
+  readonly reviewedAt: string;
+  readonly expiresAt: string;
+  readonly basis: string;
+}
+
+export interface ResearchAcquisitionResult {
+  readonly sources: readonly HarnessSourceRecord[];
+  readonly limitations: readonly string[];
+}
+
+export interface ResearchWorkerModel {
+  readonly provider: 'openrouter' | 'ollama';
+  readonly id: string;
+  readonly family: string;
+  readonly maxTokens: number;
+  readonly maxPromptBytes: number;
+  readonly promptUsdPerMillion: number;
+  readonly completionUsdPerMillion: number;
+}
+
+export type ResearchWorkerInput =
+  | {
+      readonly executor: 'builtin';
+      readonly operation: 'search';
+      readonly query: string;
+      readonly seeking: string;
+      readonly limit: number;
+    }
+  | {
+      readonly executor: 'builtin';
+      readonly operation: 'acquire';
+      readonly urls: readonly string[];
+      readonly limit: number;
+      readonly decisions: readonly PreservationDecision[];
+    }
+  | {
+      readonly executor: 'builtin';
+      readonly operation: 'synthesize';
+      readonly instruction: string;
+      readonly model: ResearchWorkerModel | null;
+    };
+
 export interface ResearchContractMap {
   readonly Budget: Budget;
   readonly RiskClassPolicy: RiskClassPolicy;
@@ -509,6 +662,21 @@ export interface ResearchContractMap {
   readonly VerificationReport: VerificationReport;
   readonly StoryResearchPacket: StoryResearchPacket;
   readonly RoCrateExport: RoCrateExport;
+  readonly ResearchQuote: ResearchQuote;
+  readonly ExtractedResearchClaim: ExtractedResearchClaim;
+  readonly SubjectExtraction: SubjectExtraction;
+  readonly RelationshipHypothesisExtraction: RelationshipHypothesisExtraction;
+  readonly HarnessSourceRecord: HarnessSourceRecord;
+  readonly ResearchTaskSpec: ResearchTaskSpec;
+  readonly ResearchExecutionPlan: ResearchExecutionPlan;
+  readonly ResearchSearchResult: ResearchSearchResult;
+  readonly ResearchTaskReport: ResearchTaskReport;
+  readonly ModelAccounting: ModelAccounting;
+  readonly ResearchTaskLease: ResearchTaskLease;
+  readonly PreservationDecision: PreservationDecision;
+  readonly ResearchAcquisitionResult: ResearchAcquisitionResult;
+  readonly ResearchWorkerModel: ResearchWorkerModel;
+  readonly ResearchWorkerInput: ResearchWorkerInput;
 }
 
 export type ResearchContractName = keyof ResearchContractMap;

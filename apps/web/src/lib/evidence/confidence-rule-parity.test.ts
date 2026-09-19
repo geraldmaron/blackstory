@@ -1,35 +1,7 @@
 /**
- * One evidence rule, one implementation, and the tests that keep it that way.
- *
- * The rule used to be computed twice. `recordConfidenceTier` (`@repo/public-contracts/evidence`)
- * is what Explore, the record page and the phone call at read time; `highestClaimConfidenceTier`
- * (`@repo/domain`) restated it because `@repo/domain` takes no dependency on the public contracts
- * package, and it wrote a finished `search_index` tier for `/records` to read back instead of
- * hydrating full entities. That duplication was deliberate and documented at both sites, and it
- * still cost a day: when the rule changed on 2026-09-07 the code was correct on every surface
- * that computes, while `/records` kept serving a facet written under the old rule. 4,152 of 4,167
- * records showed grade A (repo-ngojq). Nothing failed, because nothing was comparing anything.
- *
- * The earlier version of this suite compared the two implementations. It was a control, not a
- * cure. repo-6qjv0 removed the second implementation instead: `@repo/domain` now projects the
- * grading INPUTS (`recordEvidenceInputs`), the index caches those, and every surface — `/records`
- * included — ends at the one rule, `confidenceTierFromEvidenceInputs`. What is left to guard is
- * narrower and mechanical, so this suite has two jobs.
- *
- * 1. THE TWO PROJECTIONS AGREE. `recordEvidenceInputs` exists on both sides of the dependency
- *    boundary and both must reduce a record's claims to the same lineage keys and the same
- *    strongest level. That is identity normalization, not grading, but a divergence there would
- *    feed the one rule different ingredients and produce the same visible drift by another route.
- *
- * 2. CACHED INPUTS GRADE LIKE LIVE CLAIMS. The tier `/records` computes from what the index
- *    cached must equal the tier Explore computes from the claims themselves. This is the property
- *    the whole design rests on, and it is now a theorem about one function rather than a
- *    coincidence between two.
- *
- * The corpus is flat-shape claims (`citationSource`) because that is the shape the index path
- * actually sees. Both projections additionally read the nested wire shape (`citation.source`)
- * that `ClaimV1` and the phone use; those cases belong to
- * `packages/public-contracts/src/evidence.test.ts` instead.
+ * Verifies that both evidence-input projections agree on lineage keys and strongest level, and
+ * that every surface uses the shared confidenceTierFromEvidenceInputs rule. Cache inputs rather
+ * than a finished tier that can outlive the grading rule.
  */
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
@@ -46,7 +18,7 @@ const LEVELS = ['high', 'medium', 'low', undefined] as const;
 /**
  * Citation sets chosen to straddle every branch: no citation at all, one lineage, one publisher
  * spelled several ways, genuinely independent publishers, and the blank strings a bad ingest
- * writes. The names are the real spellings in `bb_public` today, not invented hosts.
+ * writes. The names are the real spellings in `published` today, not invented hosts.
  */
 const CITATION_SETS: readonly (readonly (string | undefined)[])[] = [
   [],

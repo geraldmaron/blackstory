@@ -107,7 +107,7 @@ async function validateCodeowners() {
     '/packages/security/',
     '/infra/',
     '/packages/schemas/constitution/',
-    '/infra/database/',
+    '/supabase/',
     '/workers/publication/',
   ];
   for (const hint of requiredPathHints) {

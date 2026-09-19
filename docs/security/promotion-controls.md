@@ -1,6 +1,6 @@
 # Data-poisoning and promotion controls
 
- makes publication a controlled state machine:
+Publication is a controlled state machine:
 
 `submission/discovery → research case → proposed claim → accepted claim → publication candidate → release`
 
@@ -28,26 +28,21 @@ The versioned policy contract is `packages/schemas/promotion/promotion-policy.v1
 
 Queue routing prioritizes review; it never bypasses an evidence gate.
 
-## Publication preview and transaction
+## Publication preview and persistence
 
-A publication-candidate preview compares claim sets and explicitly lists added, changed, removed, and unchanged claims. Changed claims include both previous and candidate values.
+A publication preview compares claim sets and lists added, changed, removed and unchanged
+claims. Approval must refer to the exact current claim version and evidence assignments.
+An excerpt match proves attachment, not entailment. Source labels, citation counts and heuristic
+scores cannot substitute for reviewed evidence or establish calibration.
 
-`promoteClaimToPublicationCandidate` performs one Firestore transaction that:
+Postgres persistence lives under `packages/ops-data/src/postgres/`. Canonical changes, audit
+entries and outbox messages commit transactionally. Release activation has a separate authority
+and signed-manifest gate. Verify effective grants and RLS under the actual operator role;
+function-level checks do not compensate for a broadly privileged worker credential.
 
-1. verifies the persisted claim is accepted and records distinct proposer/approver identities;
-2. verifies the deterministic gate and candidate metadata agree;
-3. advances the promotion record and creates the immutable candidate;
-4. appends the approval audit event, pending outbox message, and idempotency marker.
+## Deployment verification
 
-Any conflict aborts all writes. Replaying the same idempotency key produces no duplicate effects. Release activation remains governed by the signed-manifest transaction in `release-activation.ts`.
-
-## Human Firebase/IAM steps
-
-No cloud changes are applied by this bead. Before production rollout, a human administrator must review Firestore Security Rules and IAM so:
-
-- intake and research identities cannot write `publicationCandidates`, `auditEvents`, `outboxMessages`, or release pointers;
-- only the narrowly scoped promotion service identity can run the promotion transaction;
-- publication approvers have review access but cannot impersonate proposers;
-- audit and idempotency collections remain append-only to application identities.
-
-Apply those controls only through the reviewed production rollout process after emulator and IAM review.
+Before cutover, test rejected anonymous and research-worker publication, stale claim versions,
+missing selectors, unresolved contradictions and approval by the proposer. Follow
+[release](../runbooks/production-release.md) and [schema validation](../data/schema-validation.md).
+Thresholds above are policy heuristics, not measured probabilities or proof of historical truth.

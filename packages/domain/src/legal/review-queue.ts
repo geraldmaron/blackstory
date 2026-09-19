@@ -29,7 +29,7 @@ export type ReviewQueueEvidence = {
   readonly diffHint?: string;
 };
 
-/** Proposed change event landing in Firestore `review_queue`. */
+/** Proposed change event landing in the review queue. */
 export type LegalReviewQueueEvent = {
   readonly source: string;
   readonly eventType: ReviewQueueEventType;

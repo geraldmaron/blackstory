@@ -48,6 +48,7 @@ export type GlobalSecurityHeaderOptions = {
    * rather than emit a nonce-less one.
    */
   nonce?: string;
+  authUrl?: string;
 };
 
 /** Build global security headers applied to all public routes.  */
@@ -60,6 +61,7 @@ export function buildGlobalSecurityHeaders(
     // Spread-conditional rather than `nonce: options.nonce`: with `exactOptionalPropertyTypes`,
     // an explicit `nonce: undefined` is a different thing from the key being absent.
     ...(options.nonce ? { nonce: options.nonce } : {}),
+    ...(options.authUrl ? { authUrl: options.authUrl } : {}),
   });
 
   return [

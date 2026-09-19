@@ -10,14 +10,14 @@ fields, non-HTTPS URLs, URL credentials, and publication operations are outside 
 
 Requests pass through these controls in order:
 
-1.  App Check verification with replay consumption.
+1.  Client-version header format check. This spoofable signal provides no authentication or replay protection.
 2.  correction endpoint quota and distributed-risk evaluation.
 3.  schema, encoded-size, text-length, prohibited-character, source/link-count, and independent
    frequency validation.
 4. Deterministic spam scoring and duplicate/coordinated-campaign assessment.
 5. Append to submission quarantine with `canonicalWriteAllowed: false`.
 
-`apps/api-submissions/src/quarantine.ts` requires the App Check and quota decisions explicitly. It
+`apps/api-submissions/src/quarantine.ts` requires the client-header check and quota decisions explicitly. It
 also calls the  `write:quarantine` capability guard. A denied prerequisite or validation error
 cannot append a record.
 
@@ -64,7 +64,7 @@ shared source sets across bounded actor/network dimensions and time windows. Mod
 can transition records, block an opaque subject token, and submit abuse reports; reports use the same
 quarantine path and cannot publish.
 
-The included repository is an in-memory contract/test adapter. A durable Firestore adapter must
+The included repository is an in-memory contract/test adapter. A durable Postgres adapter must
 preserve append-only originals, audit events, restricted access, and quarantine-only destination
 semantics.
 

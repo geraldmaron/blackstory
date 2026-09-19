@@ -1,17 +1,6 @@
 /**
- * Kill switch browser — operational circuit breakers for adapters and public surfaces.
- *
- * Server component (repo-gyq6.9). This was a client page that mounted, waited for
- * `AdminAuthProvider` to produce a token, then fetched `/admin/api/switches` — three round trips
- * before an operator saw a single row, to render a table that never changes in response to
- * anything the reader does. The rows are now read in the request and arrive in the first byte.
- *
- * `/admin/api/switches` stays: it is a real API for callers outside this page. This page simply
- * no longer needs to be one of them.
- *
- * The Refresh button went with the client state. A server-rendered page IS the refresh — the
- * browser's own reload re-runs the read — and a button that could only re-request what the page
- * had just fetched was chrome standing in for a reload key.
+ * Server-rendered operational kill-switch browser. Reloading the page refreshes the database
+ * read; the matching API also serves external staff callers.
  */
 import type { Metadata } from 'next';
 import Link from 'next/link';
@@ -27,7 +16,7 @@ export const metadata: Metadata = {
 export const dynamic = 'force-dynamic';
 
 function formatWhen(iso: string): string {
-  if (!iso) return '—';
+  if (!iso) return 'Unknown';
   const date = new Date(iso);
   if (Number.isNaN(date.getTime())) return iso;
   return date.toLocaleString(undefined, {
@@ -53,22 +42,22 @@ export default async function SwitchesPage() {
           <h1 className="ds-page__title">Kill switches</h1>
           <p className="ds-page__lede">
             Operational circuit breakers for discovery campaigns, source adapters, and public
-            surfaces. Engaged switches halt automated work — they are not a publication or catalog
-            editing desk.
+            surfaces. Engaged switches halt the work controlled by each switch.
           </p>
           <p className="story-review__notice">
-            Read-only mirror — no toggles here. A human platform administrator engages or disengages
-            switches in Postgres <span className="ds-mono">bb_ops.kill_switches</span> rows
-            (IAP-protected ops path) with a durable reason; each change is recorded in{' '}
-            <Link href="/admin/audit">Audit</Link>. See{' '}
-            <span className="ds-mono">infra/gcp/kill-switches/</span> for the matrix and runbooks.
+            This page displays switch state. Platform administrators change{' '}
+            <span className="ds-mono">ops.kill_switches</span> through the privileged operations
+            database. Record a reason and an audit event for each change. Review{' '}
+            <Link href="/admin/audit">Audit</Link> and{' '}
+            <span className="ds-mono">docs/runbooks/incident-response.md</span> for the response
+            procedure.
           </p>
         </div>
       </header>
 
       {degradedReason ? (
         <p className="story-review__alert" role="alert">
-          Switch state is unavailable — the operational database did not answer, so this page is
+          Switch state is unavailable. The operational database did not answer, so this page is
           showing nothing rather than a stale or partial matrix. Reload to retry.{' '}
           <span className="ds-mono">{degradedReason}</span>
         </p>
@@ -81,8 +70,8 @@ export default async function SwitchesPage() {
       <section className="story-review__queue" aria-label="Kill switches">
         {rows.length === 0 && !degradedReason ? (
           <p className="ds-sans">
-            No kill switches found in this project. When configured, their state appears here —
-            return to <Link href="/admin">Operations</Link> or review changes in{' '}
+            No kill switches found in this project. When configured, their state appears here.
+            Return to <Link href="/admin">Operations</Link> or review changes in{' '}
             <Link href="/admin/audit">Audit</Link>.
           </p>
         ) : rows.length > 0 ? (
@@ -112,7 +101,7 @@ export default async function SwitchesPage() {
                         {row.enabled ? 'engaged' : 'disengaged'}
                       </span>
                     </td>
-                    <td className="ds-sans">{row.reason ?? '—'}</td>
+                    <td className="ds-sans">{row.reason ?? 'Not recorded'}</td>
                     <td className="ds-mono">{formatWhen(row.updatedAt)}</td>
                   </tr>
                 ))}

@@ -67,7 +67,7 @@ Verified in source on this branch:
 | Library hub exists | `/library` classified `reading` |
 | Memorial remains wall-first | `apps/web/src/app/memorial/page.tsx` + `MemorialWallAtmosphere` |
 | Explore URL state is already a typed shareable shape | `apps/web/src/lib/map-experience/url-state.ts` |
-| Typed relationship vocabulary exists in DB | `bb_canonical.entity_relationships` + 20-type check |
+| Typed relationship vocabulary exists in DB | `canonical.entity_relationships` + 20-type check |
 
 v10 does **not** rewind the door tip back to a first-paint WebGL cockpit. Progressive disclosure (Rest → Explore → Focus → Journey) is the law.
 

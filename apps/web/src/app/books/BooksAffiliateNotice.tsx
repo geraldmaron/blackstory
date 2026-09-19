@@ -1,7 +1,7 @@
 /**
  * The Bookshop affiliate call to action: the only commercial element on `/books/[slug]`.
  *
- * SP-12b (repo-92n2.12.2) requires this to sit below the evidence sections (challenges,
+ * This block sits below the evidence sections (challenges,
  * citations), separated from them by a hairline rule, and to name itself as an affiliate
  * link in plain body text next to the button, so it never reads as evidence. `.ds-room-section`
  * is the section's own hairline rule (see reading-room.css); this block gets no other treatment

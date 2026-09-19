@@ -26,16 +26,6 @@ test('postgres: false when caller forces fixtures/seed source', () => {
   );
 });
 
-test('postgres: false when emulator signals are present', () => {
-  assert.equal(
-    shouldUsePublicPostgresDataAccess({
-      ...POSTGRES_PRODUCTION,
-      FIRESTORE_EMULATOR_HOST: '127.0.0.1:8080',
-    }),
-    false,
-  );
-});
-
 test('postgres: false without DATABASE_URL even when source is postgres', () => {
   assert.equal(
     shouldUsePublicPostgresDataAccess({ PUBLIC_DATA_SOURCE: 'postgres', NODE_ENV: 'production' }),

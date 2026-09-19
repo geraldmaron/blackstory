@@ -44,6 +44,9 @@ apps/mobile
 docs/ui/mobile-polish-mockups.html
 docs/ui/prototypes
 
+# Raw evaluation receipts are hash-bound evidence; preserve the exact emitted bytes.
+packages/testing/src/gold-corpus/artifacts
+
 # Generated geometry fixture — reformatting rewrites every coordinate line.
 scripts/fixtures
 
@@ -53,3 +56,5 @@ brand/qa
 # Local, gitignored article drafts (packages/ops-data/drafts/.gitignore ignores `*`). CI never
 # sees these, but without this entry `pnpm format:check` fails locally on scratch output.
 packages/ops-data/drafts
+
+.playwright-mcp/

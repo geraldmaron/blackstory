@@ -19,8 +19,8 @@ async function main(): Promise<void> {
       projection: unknown;
     }>(
       `SELECT re.entity_id, re.kind, re.projection
-       FROM bb_public.release_entities re
-       JOIN bb_public.active_release a ON re.release_id = a.release_id
+       FROM published.release_entities re
+       JOIN published.active_release a ON re.release_id = a.release_id
        WHERE re.kind = 'invention'
        ORDER BY re.entity_id`,
     );
@@ -41,8 +41,8 @@ async function main(): Promise<void> {
     }>(
       `SELECT si.id, si.release_id, si.entity_id, si.name, si.name_lower, si.aliases, si.topics,
               si.kind, si.status, si.geohash, si.related_count, si.claim_count, si.facets
-       FROM bb_public.search_index si
-       JOIN bb_public.active_release a ON si.release_id = a.release_id
+       FROM published.search_index si
+       JOIN published.active_release a ON si.release_id = a.release_id
        WHERE si.kind = 'invention'
        ORDER BY si.entity_id`,
     );

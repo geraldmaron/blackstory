@@ -4,7 +4,7 @@
  */
 
 export const MAP_SEARCH_ACCESSIBLE_PEERS = Object.freeze([
-  // The `history` journey's peer left with repo-92n2.27, which deleted the orphaned /history
+  // The `history` journey moved when the orphaned /history
   // render layer once /history became a redirect. Its accessibility contract did not disappear
   // with it: the find-in-time journey now lands on /records, whose rows, filters and page steps
   // are server-rendered anchors, and the test below asserts exactly that.
@@ -17,7 +17,7 @@ export const MAP_SEARCH_ACCESSIBLE_PEERS = Object.freeze([
   {
     journey: 'atlas',
     component: 'Atlas noscript filters',
-    // Moved with SP-07 slice 2: `/` is the Atlas and `(map)/explore/page.tsx` was deleted, so the
+    // The Atlas now lives at `/`; `(map)/explore/page.tsx` was deleted, so the
     // native GET FilterBar now ships from the Atlas page itself. Moved again when a216dd88
     // deleted the `(map)` route group and the Atlas landed at the app root.
     webPath: 'apps/web/src/app/page.tsx',

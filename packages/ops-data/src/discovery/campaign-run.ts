@@ -1,9 +1,5 @@
-/**
- * Discovery campaign run documents: pure builders, publish guard, and an in-memory store
- * for tests. Firestore persistence uses `discoveryCampaignRuns/{runId}` via Admin SDK writers
- * outside this module; every run records `publicEffect: 'none'`.
- */
-import { discoveryCampaignRunSchema, type DiscoveryCampaignRunDoc } from '../firestore/types.js';
+/** Discovery campaign accounting and persistence ports. In-memory storage supports isolated tests; production persistence is supplied by the operator adapter. */
+import { discoveryCampaignRunSchema, type DiscoveryCampaignRunDoc } from '../records/types.js';
 
 export const DISCOVERY_CAMPAIGN_RUN_STATUSES = ['success', 'skipped_kill_switch', 'error'] as const;
 

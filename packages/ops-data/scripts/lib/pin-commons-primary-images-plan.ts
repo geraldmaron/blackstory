@@ -1,9 +1,9 @@
 /**
- * Pure gate + plan-row logic for pin-commons-primary-images.ts (repo-4vuf, pin-and-serve).
+ * Pure gate + plan-row logic for pin-commons-primary-images.ts (pin-and-serve).
  *
  * Extracted so the dignity/place gates and the pin-plan row shape are unit-testable without
  * a dry-run file, a live database, or a network call. Mirrors dry-run-commons-qid-leftover.ts's
- * DIGNITY_CLASSES set and lynching_ prefix rule (repo-n7p6.7.1) — this module reapplies both as
+ * DIGNITY_CLASSES set and lynching_ prefix rule — this module reapplies both as
  * a second, independent check on the dry-run's own output rather than trusting its `dignityHold`
  * field unexamined, since a bad or hand-edited `--from` file is the input this gate exists to
  * catch.
@@ -174,7 +174,7 @@ export function evaluatePinGate(
   return { ok: true };
 }
 
-/** One row of the pin plan output (repo-4vuf task 5 shape). */
+/** One row of the pin plan output. */
 export type PinPlanRow = {
   readonly entityId: string;
   readonly url: string;

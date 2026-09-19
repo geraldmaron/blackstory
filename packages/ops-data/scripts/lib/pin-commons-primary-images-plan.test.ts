@@ -166,7 +166,7 @@ test('mergeCandidatePayloads on no payloads returns an empty list', () => {
 });
 
 /*
- * The depiction gate (repo-n7p6.7.1).
+ * The depiction gate.
  *
  * Every string below is a REAL file title or Commons ImageDescription that was live on a
  * BlackStory person record on 2026-09-13, fetched from the Commons API. They are here verbatim

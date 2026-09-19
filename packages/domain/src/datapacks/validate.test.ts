@@ -1,7 +1,6 @@
 /**
- * Unit tests for Data Pack v1 validation functions (the related workstream): checksum mismatch,
- * budget rejection, and license rejection. Signature verification round-trip lives in
- * ./manifest.test.ts alongside the sign/verify functions it exercises.
+ * Data-pack checksum, budget and rights validation tests. Signature round trips are covered by
+ * manifest tests.
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';

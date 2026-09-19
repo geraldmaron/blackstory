@@ -1,12 +1,6 @@
 /**
- * Submissions queue — every row in bb_submissions.intake_items, not only the story-packet slice
- * `/admin/stories/review` already covers.
- *
- * repo-gyq6.10 (D2): of 2,175 intake_items rows, only a handful shaped like a story packet
- * (`payload->>'proposalKind' = 'story_packet'`) were reachable from any admin surface — 2,060 of
- * them sit quarantined today with no other way to see or decide them. This page is the general
- * reader: server-rendered, filtered and paginated in SQL before the first byte, following the
- * same pattern `/admin/catalog` established for the entity workbench (repo-gyq6.9).
+ * Server-rendered queue for all submission kinds, filtered and paginated in SQL. Story-specific
+ * review remains available in the story workbench.
  */
 import Link from 'next/link';
 import { FacetRail, Pagination, Toolbar, ToolbarField, type FacetGroup } from '@repo/ui';

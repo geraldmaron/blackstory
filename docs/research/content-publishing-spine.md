@@ -8,22 +8,22 @@
 The database is the source of truth for authored content; code owns the schema,
 the validation gates, and the structural registries. Concretely:
 
-1. **Authoring** lives in `bb_reference.theme_impact_packets` with the
+1. **Authoring** lives in `reference.theme_impact_packets` with the
    `draft -> review -> published` lifecycle. Fixture modules under
    `packages/ops-data/fixtures/theme-impact/` are authoring inputs and lineage,
    not runtime data; nothing imports them at runtime.
 2. **Publishing** is a promotion + projection step run by
    `packages/ops-data/scripts/theme-packets.ts`:
-   - `validate <fixture...>`: parse fixtures (bb_reference row shape) through
+   - `validate <fixture...>`: parse fixtures (reference row shape) through
      the domain parser; run full publish gates on anything declared published.
    - `apply <fixture...>`: upsert at the declared status. Every cited
-     observation must match `bb_reference.statistical_observations` (or
+     observation must match `reference.statistical_observations` (or
      `spine_observations_v` for `spine:` refs) verbatim, at every status.
      Nothing enters the authoring table with an unverifiable number.
    - `promote <id...>`: run `assertThemeImpactPacketPublishable` and the
      multi-decade checklist gate, then flip to published.
    - `project`: freeze all published packets into
-     `bb_public.release_theme_impact_packets` for the active release, with a
+     `published.release_theme_impact_packets` for the active release, with a
      content hash per row.
    - `audit`: drift report between the active release projection and the
      authoring table (`published_not_projected`, `drifted_since_projection`,

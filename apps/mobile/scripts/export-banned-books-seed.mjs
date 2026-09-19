@@ -1,7 +1,7 @@
 /**
  * Export the banned-books listing from Supabase into the mobile JSON catalog.
  *
- * Source of truth is the `bannedBooksListing` row in bb_public.materialized_snapshots
+ * Source of truth is the `bannedBooksListing` row in published.materialized_snapshots
  * (published by packages/ops-data/scripts/load-banned-books-to-supabase.ts), not a
  * committed TS seed.
  *
@@ -31,7 +31,7 @@ const client = new pg.Client({
 });
 await client.connect();
 const { rows } = await client.query(
-  `SELECT payload FROM bb_public.materialized_snapshots WHERE name = 'bannedBooksListing'`,
+  `SELECT payload FROM published.materialized_snapshots WHERE name = 'bannedBooksListing'`,
 );
 await client.end();
 

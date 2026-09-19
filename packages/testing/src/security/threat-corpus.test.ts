@@ -1,6 +1,5 @@
 /**
- * Automated acceptance checks for the threat abuse corpus.
- * Full security CI gates land in; this scaffold only validates the corpus.
+ * Automated acceptance checks for the threat and abuse corpus.
  */
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
@@ -11,7 +10,7 @@ import {
   validateThreatCorpus,
 } from './threat-corpus.ts';
 
-describe(' threat corpus', () => {
+describe('threat corpus', () => {
   it('loads nineteen P0 threats with full control quadrants and implementation refs', () => {
     const corpus = loadThreatCorpus();
     const issues = validateThreatCorpus(corpus);
@@ -30,5 +29,15 @@ describe(' threat corpus', () => {
     for (const threat of corpus.threats) {
       assert.ok(threat.residualRisk.length > 20, `${threat.id} residual risk too thin`);
     }
+  });
+
+  it('rejects implementation references that do not resolve inside the repository', () => {
+    const corpus = structuredClone(loadThreatCorpus());
+    corpus.threats[0]!.implementationRefs = ['docs/security/does-not-exist.md'];
+    const issues = validateThreatCorpus(corpus);
+    assert.ok(
+      issues.some((issue) => issue.code === 'missing-reference'),
+      issues.map((issue) => `${issue.code}: ${issue.message}`).join('\n'),
+    );
   });
 });

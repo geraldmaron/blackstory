@@ -171,12 +171,12 @@ test('catalog propose-match attaches selectedEntityId for a trusted-identifier h
   const profiles: readonly ResolutionProfile[] = [
     {
       entity: entity('person-name-lookalike', 'person', 'John Smith', {
-        person: { livingStatus: 'unknown' },
+        person: {},
       }),
     },
     {
       entity: entity('person-identifier-match', 'person', 'Someone Else Entirely', {
-        person: { livingStatus: 'unknown' },
+        person: {},
         identifiers: [{ system: 'wikidata', value: 'Q999' }],
       }),
     },

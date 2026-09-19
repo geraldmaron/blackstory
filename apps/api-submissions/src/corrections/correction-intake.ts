@@ -1,15 +1,7 @@
 /**
- * Shapes and validates the mobile/web correction submission body into the `SubmissionInput`
- * `createSubmissionQuarantineService().intake()` accepts (MOB-016 / repo-zir9).
- *
- * The wire shape is `CorrectionSubmissionRequest` from `apps/mobile/src/features/corrections/contract.ts`,
- * which is identical to web's `CorrectionSubmissionInput`
- * (`apps/web/src/app/corrections/correction-intake.ts`) — the field rules below mirror web's
- * validator exactly so a submission that is valid on one surface is valid on the other. Pure and
- * synchronous: no Firebase, App Check, or rate limiting here, so field rules stay trivially
- * testable in isolation. Authoritative spam scoring, campaign detection, and the
- * quarantine-only/no-canonical-write guard still happen one layer down, inside
- * `createQuarantinedSubmission` (via the quarantine service).
+ * Validates correction submissions before quarantine intake. Field rules mirror the web/mobile
+ * request contract. Spam scoring and canonical-write exclusion remain in the quarantine
+ * service; this module performs no network or rate-limit operations.
  */
 import type { SubmissionInput } from '@repo/security';
 import {

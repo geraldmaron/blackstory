@@ -1,9 +1,7 @@
 /**
- * Seed default verification cadences (the related workstream), one entry per scenario named in the
- * bead's own spec. These are STARTING DEFAULTS a real `VerificationPolicy` (see `./policy.ts`)
- * would be seeded from — this table itself is not a `VerificationPolicy` (it has no id,
- * appliesToEntityClasses/appliesToPredicates, or authoritativeSourceIds; a seeding script would
- * fill those in per concrete predicate).
+ * Default verification cadences used to seed concrete policies. Each policy must additionally
+ * specify its subject classes, predicates and applicable sources; these defaults do not install
+ * schedules.
  */
 import type { ReviewInterval, VolatilityClass } from './policy.js';
 
@@ -63,8 +61,8 @@ export const DEFAULT_VERIFICATION_CADENCES: Readonly<
   },
   demographic_estimate: {
     volatilityClass: 'low',
-    // TODO(the related workstream): should inherit the authoritative source's own
-    // SourceAdapterContract.refreshSchedule instead of this fixed floor; not wired in this pass.
+    // This fixed floor does not inherit a source adapter's refresh schedule. Policy selection
+    // must account for source-specific update behavior.
     defaultReviewInterval: { unit: 'year', count: 1 },
     rationale:
       'Placeholder floor only (bead spec: "source-cadence") pending adapter-refreshSchedule wiring; see TODO above this entry.',

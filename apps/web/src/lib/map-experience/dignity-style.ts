@@ -1,9 +1,6 @@
 /**
- * Map color tokens for kind encoding, semantic tones (massacre / plantation /
- * epicenter), confidence, and light/dark plate variants. Product direction
- * (the related workstream) expands beyond the copper-only archive register: confidence
- * runs green→orange, and certain historical tones use red/gold/black while
- * every marker still carries a non-color glyph (WCAG 1.4.1).
+ * Map color tokens for kinds, semantic tones, confidence and themes. Pair color with glyphs;
+ * changes must satisfy the binding map dignity and brand rules.
  */
 import { brandPalette, mapPalettes } from '@repo/ui';
 

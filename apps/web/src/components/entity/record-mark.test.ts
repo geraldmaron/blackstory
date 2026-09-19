@@ -144,7 +144,7 @@ test('primaryImageSourceLine omits the license segment when absent', () => {
 });
 
 test('isPortraitPrimaryImage flags a source photo too tall to cover-crop into the masthead banner', () => {
-  // David Paterson's pinned Wikimedia photo (repo-observed regression): a portrait close to 3:4
+  // David Paterson's pinned Wikimedia photo: a portrait close to 3:4
   // cover-cropped into the wide masthead band showed only forehead and hairline.
   assert.equal(isPortraitPrimaryImage(1105, 1570), true);
   assert.equal(isPortraitPrimaryImage(1600, 900), false, 'a 16:9 landscape photo is not portrait');

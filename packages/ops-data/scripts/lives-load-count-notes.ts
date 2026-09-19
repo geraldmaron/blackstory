@@ -1,15 +1,7 @@
 /**
- * Loads Lives Across the Decades count notes ("What the count could see") from a JSON file into
- * bb_reference.lives_count_notes (bead repo-0clax.20). The notes themselves live only in Supabase;
- * the file is a working copy, never committed.
- *
- * Usage (repo root):
- *   set -a && . apps/web/.env.local && set +a
- *   LIVES_COUNT_NOTES_FILE=/path/notes.json node --conditions development --import tsx \
- *     packages/ops-data/scripts/lives-load-count-notes.ts
- *   # Apply; add LIVES_COUNT_NOTES_PRUNE=1 to delete notes the file no longer lists
- *   DRY_RUN=0 LIVES_LOAD_COUNT_NOTES_APPLY=1 LIVES_COUNT_NOTES_FILE=... node --conditions development \
- *     --import tsx packages/ops-data/scripts/lives-load-count-notes.ts
+ * Loads Lives count notes from LIVES_COUNT_NOTES_FILE into reference.lives_count_notes. Default
+ * dry-run; writes require DRY_RUN=0 and LIVES_LOAD_COUNT_NOTES_APPLY=1.
+ * LIVES_COUNT_NOTES_PRUNE=1 additionally removes omitted notes.
  */
 import { readFile } from 'node:fs/promises';
 import pg from 'pg';
@@ -39,7 +31,7 @@ async function main(): Promise<void> {
     await client.query('BEGIN');
     for (const note of records) {
       await client.query(
-        `INSERT INTO bb_reference.lives_count_notes
+        `INSERT INTO reference.lives_count_notes
           (id, decade, applies_to, area_ids, heading, body, citations, sort_order, status)
          VALUES ($1, $2, $3::text[], $4::text[], $5, $6, $7::jsonb, $8, $9)
          ON CONFLICT (id) DO UPDATE SET
@@ -61,7 +53,7 @@ async function main(): Promise<void> {
     }
     if (prune) {
       const removed = await client.query(
-        'DELETE FROM bb_reference.lives_count_notes WHERE NOT (id = ANY($1::text[]))',
+        'DELETE FROM reference.lives_count_notes WHERE NOT (id = ANY($1::text[]))',
         [records.map((note) => note.id)],
       );
       console.log(`Removed ${removed.rowCount ?? 0} note(s) not in the file.`);

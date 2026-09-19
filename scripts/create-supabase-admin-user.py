@@ -113,7 +113,7 @@ def main() -> int:
 
     alphabet = string.ascii_letters + string.digits + "!@#$%^&*-_"
     temp_password = "".join(secrets.choice(alphabet) for _ in range(28))
-    app_meta = {"bb_role": "admin"}
+    app_meta = {"app_role": "admin"}
 
     if existing:
         uid = existing["id"]
@@ -152,11 +152,11 @@ def main() -> int:
 
     uid = user.get("id")
     email = user.get("email")
-    role = (user.get("app_metadata") or {}).get("bb_role")
+    role = (user.get("app_metadata") or {}).get("app_role")
     print(f"action={action}")
     print(f"user_id={uid}")
     print(f"email={email}")
-    print(f"bb_role={role}")
+    print(f"app_role={role}")
     # The password itself is never printed and never written to disk: it goes to 1Password
     # below, and stdout on an operator's terminal is scrollback, shell history and CI logs
     # (CodeQL py/clear-text-logging-sensitive-data). Replacing the old /tmp file with a print
@@ -185,7 +185,7 @@ def main() -> int:
                     match["id"],
                     f"password={temp_password}",
                     f"username={EMAIL}",
-                    "notesPlain=Temporary admin password for Supabase Auth blackstory-app. Rotate after first login. app_metadata.bb_role=admin.",
+                    "notesPlain=Temporary admin password for Supabase Auth blackstory-app. Rotate after first login. app_metadata.app_role=admin.",
                 ],
                 check=True,
                 capture_output=True,
@@ -207,7 +207,7 @@ def main() -> int:
                     f"username={EMAIL}",
                     f"password={temp_password}",
                     f"--url={PROJECT_URL}",
-                    "notesPlain=Temporary admin password for Supabase Auth blackstory-app. Rotate after first login. app_metadata.bb_role=admin.",
+                    "notesPlain=Temporary admin password for Supabase Auth blackstory-app. Rotate after first login. app_metadata.app_role=admin.",
                 ],
                 check=True,
                 capture_output=True,

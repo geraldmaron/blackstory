@@ -1,37 +1,7 @@
 /**
- * How many published records serve one answer to readers and hold a different one in the copies
- * nobody reads?
- *
- * `bb_public.release_entities.projection` is the only store the public read path touches. The
- * columns beside it on the same row and the `bb_public.search_index` row are derived copies,
- * written from the same build at publish time and then updated independently by backfills. Every
- * backfill that writes one store and not the other leaves readers stale while the operator who
- * reads the column back sees the corrected value and calls the work done — the drift is invisible
- * from both ends, which is why it has recurred.
- *
- * This measures it per field, so a resync can be aimed rather than applied blind, and so a
- * "divergence is zero" claim is a number somebody ran rather than an assumption. The comparison
- * itself lives in `lib/projection-divergence.ts` and is shared with the post-write check the
- * publisher calls, so an audit result and a gate verdict cannot drift apart.
- *
- * It also measures a second kind of staleness (repo-rm2y): `builder.notabilityBasis`,
- * `builder.notabilityLabels` and `builder.researchCoverage` recompute those three derived fields
- * from the record's own claims and report a row the recompute would move. Every copy of such a
- * field can agree and all of them still be wrong, because all of them were written before an
- * in-place claim edit. `resync-notability-basis.ts` and `resync-research-coverage.ts` are what
- * clear those two counts.
- *
- * READ-ONLY: SELECT only, no write path, no `--apply`.
- *
- * EXIT CODE is 1 when any field diverges, so this can stand in a check suite. `--allow` reports
- * the same numbers and exits 0, for a run that is measuring rather than gating.
- *
- * Usage (from repo root):
- *   set -a && source apps/web/.env.local && set +a
- *   export DATABASE_SSL=1
- *   node --conditions development --import tsx \
- *     packages/ops-data/scripts/audit-projection-divergence.ts \
- *     [--ids=ent_a,ent_b] [--release=rel_...] [--samples=10] [--json=<path>] [--allow]
+ * Read-only comparison of public projection, scalar columns and search facets, plus recomputed
+ * inclusion basis and coverage. Copies can agree while all remain stale after a claim edit.
+ * Shared divergence logic also runs after publication writes.
  */
 import { mkdirSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
@@ -76,10 +46,8 @@ async function main(): Promise<void> {
       ...(RELEASE.length > 0 ? { releaseId: RELEASE } : {}),
       ...(IDS.length > 0 ? { ids: IDS } : {}),
       ...(Number.isFinite(SAMPLES) && SAMPLES > 0 ? { sampleLimit: SAMPLES } : {}),
-      // repo-rm2y: the standing gate asks the wider question. `'all'` adds the `builder.*` checks
-      // — is what the projection publishes still what the record's own claims say — on top of the
-      // copy-vs-copy comparison. A row can have every copy in agreement and still be stale,
-      // because they were all written from a version of the record that no longer exists.
+      // The all mode includes recomputed builder fields. Agreement among stored copies does not
+      // establish agreement with the record's current claims.
       scope: 'all' as const,
     });
 

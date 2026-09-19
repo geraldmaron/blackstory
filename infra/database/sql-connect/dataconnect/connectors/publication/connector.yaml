@@ -1,6 +1,0 @@
-# Publication connector — server-only (api-internal / publication worker).
-connectorId: 'publication'
-generate:
-  adminNodeSdk:
-    outputDir: '../../../../../../packages/data-access/generated/publication'
-    package: '@repo/sql-connect-publication'

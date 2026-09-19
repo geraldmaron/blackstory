@@ -19,7 +19,7 @@ describe('themes catalog', () => {
     const snap = loadThemesCatalog();
     expect(snap.themes.length).toBeGreaterThanOrEqual(7);
     expect(snap.packets.length).toBeGreaterThanOrEqual(11);
-    // Seed is exported from bb_public.release_theme_impact_packets, never a
+    // Seed is exported from published.release_theme_impact_packets, never a
     // committed fixture — that is what keeps unreleased packets out of the app.
     expect(snap.source).toBe('supabase-active-release');
     expect(snap.releaseId).toMatch(/^rel_/);

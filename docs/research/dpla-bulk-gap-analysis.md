@@ -98,7 +98,7 @@ Export published entities (or national-catalog fixtures) with at least:
 - `keywords`
 - `eraBuckets` when decade coverage matters
 
-Example source for a full run: `packages/firebase/fixtures/national-catalog/*.json` merged into one array (script does not merge directories automatically — concatenate or point `--corpus` at a single export file).
+Example source for a full run: `packages/ops-data/fixtures/national-catalog/*.json` merged into one array (script does not merge directories automatically — concatenate or point `--corpus` at a single export file).
 
 ### 4.3 Execute and archive
 
@@ -122,7 +122,7 @@ From [supabase-pro-cost-envelope.md §2](./supabase-pro-cost-envelope.md#2-disk-
 - Live corpus today is **~260 MB** — ample headroom for embeddings and captures.
 - A full DPLA metadata dump can be **multiple GB** on disk and must **never** be loaded into Postgres as a mirror table.
 
-**Operational default:** Analyze bulk exports on the workstation; store gap **reports** under `docs/research/` and optional machine-readable summaries under `.cache/dpla-gap/`. If long-term retention of a bulk slice is needed, use object storage or an external drive — not `bb_canonical` or Supabase Storage for the full dump.
+**Operational default:** Analyze bulk exports on the workstation; store gap **reports** under `docs/research/` and optional machine-readable summaries under `.cache/dpla-gap/`. If long-term retention of a bulk slice is needed, use object storage or an external drive — not `canonical` or Supabase Storage for the full dump.
 
 ---
 

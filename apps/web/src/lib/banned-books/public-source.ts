@@ -1,6 +1,6 @@
 /**
  * Banned-books read routing for the public `/books` surface. Reads materialized snapshots
- * from `bb_public.materialized_snapshots` when available; otherwise falls back to seed data.
+ * from `published.materialized_snapshots` when available; otherwise falls back to seed data.
  */
 import {
   BANNED_BOOKS_SNAPSHOT_NAME,

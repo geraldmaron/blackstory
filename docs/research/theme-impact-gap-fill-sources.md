@@ -11,7 +11,7 @@
 
 ## 1. Method
 
-1. Inventory `bb_reference.statistical_observations` metric coverage and packet `gap_states`.
+1. Inventory `reference.statistical_observations` metric coverage and packet `gap_states`.
 2. Cross-check registered / proposed sources in `EXTERNAL_DATA_SOURCES` and the context matrix.
 3. External research for custodians, access URLs, years, geography, and rights posture.
 4. Rank fills by packet impact (Q3–Q9) and feasibility (API / PD / attribution / gated).

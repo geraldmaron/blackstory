@@ -1,6 +1,6 @@
 /**
  * BJS CSAT historical imprisonment rate ingest (1978-2012) for national observations
- * into bb_reference.statistical_observations. Extends existing 2013-2023 series back
+ * into reference.statistical_observations. Extends existing 2013-2023 series back
  * to 1978 using CSAT-Prisoners export.
  *
  * Usage (repo root):
@@ -175,7 +175,7 @@ async function loadExistingSeriesMetadata(
   });
   try {
     const result = await pool.query<{ metric_id: string; unit: string; source_dataset: string }>(
-      `SELECT metric_id, unit, source_dataset FROM bb_reference.statistical_series
+      `SELECT metric_id, unit, source_dataset FROM reference.statistical_series
        WHERE metric_id IN ($1, $2, $3)`,
       [METRIC_IDS.BLACK, METRIC_IDS.WHITE, METRIC_IDS.HISPANIC],
     );
@@ -282,7 +282,7 @@ async function applyObservations(
 
     for (const obs of observations) {
       await client.query(
-        `INSERT INTO bb_reference.statistical_observations
+        `INSERT INTO reference.statistical_observations
           (id, metric_id, jurisdiction_id, boundary_version, reference_period, dataset_vintage,
            estimate, race_ethnicity_slice, status, source, source_url,
            retrieved_at, content_hash, metadata)

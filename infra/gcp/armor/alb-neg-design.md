@@ -1,6 +1,7 @@
 # Global external ALB and serverless NEG design (BB-023)
 
-**Status:** Design stub — not applied.  
+**Status:** Optional design stub — not applied or evidence of a live GCP deployment.
+**Current boundary:** `api-public` is a Vercel function and the public web is Cloudflare-fronted; `api-submissions` and `api-internal` require separate deployment verification. See [`packages/config/src/surfaces.ts`](../../../packages/config/src/surfaces.ts) for the typed capability contract.
 **Project:** `black-book-efaaf` · **Region:** `us-central1`
 
 ## Topology
@@ -18,9 +19,7 @@ Global external HTTP(S) LB  (black-book-public-api-lb)
            └── Serverless NEG → Cloud Run (internal-and-cloud-load-balancing)
 ```
 
-Public APIs **must not** accept direct `*.run.app` traffic. Cloud Run ingress is
-`internal-and-cloud-load-balancing` so only the load balancer (and authorized VPC
-paths) can reach the revision.
+If this design is ever provisioned, public APIs should not accept direct `*.run.app` traffic. Cloud Run ingress would be `internal-and-cloud-load-balancing` so only the load balancer (and authorized VPC paths) can reach the revision. None of those GCP controls is established by this repository.
 
 ## Load balancer (global external managed)
 
@@ -52,7 +51,7 @@ Serverless NEGs bind each backend service to a Cloud Run service in `us-central1
 | `black-book-api-public-neg` | `black-book-api-public` | Read/search/geo API |
 | `black-book-api-submissions-neg` | `black-book-api-submissions` | Intake only; no CDN |
 
-### Cloud Run ingress (required)
+### Cloud Run ingress (proposed)
 
 Deploy both public APIs with:
 
@@ -68,15 +67,14 @@ gcloud run services update black-book-api-submissions \
   --project=black-book-efaaf
 ```
 
-**Negative test (acceptance):** `curl https://black-book-api-public-xxxxx-uc.a.run.app/health`
+**Negative test (future acceptance if provisioned):** `curl https://black-book-api-public-xxxxx-uc.a.run.app/health`
 must fail (403/404) from the public internet after ingress is applied.
 
-Compare with `api-internal` and `admin`, which already target the same ingress mode in
-[`../surfaces/surface-matrix.json`](../surfaces/surface-matrix.json).
+Do not infer this ingress posture for the current Vercel or node-service deployments from this optional design.
 
 ## Backend service wiring
 
-Each backend service attaches:
+If provisioned, each backend service would attach:
 
 1. **Serverless NEG** (single region `us-central1`)
 2. **Cloud Armor security policy** — see `policies/api-*-policy.json`
@@ -93,4 +91,4 @@ Each backend service attaches:
 6. Update Cloud Run ingress to `internal-and-cloud-load-balancing`.
 7. Verify LB health and direct `run.app` negative test.
 
-Full security narrative: [`../../../docs/security/ingress-armor.md`](../../../docs/security/ingress-armor.md).
+Full conditional security narrative: [`../../../docs/security/ingress-armor.md`](../../../docs/security/ingress-armor.md).

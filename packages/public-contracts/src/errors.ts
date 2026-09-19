@@ -3,7 +3,7 @@
  * two invariants": app/API compatibility).
  *
  * `CLIENT_VERSION_UNSUPPORTED` is the version-floor error code: both server (`apps/api-public`,
- * MOB-004) and client (`apps/mobile`, MOB-009) must agree on this code and its HTTP status at
+ * API compatibility) and client (`apps/mobile`, mobile client) must agree on this code and its HTTP status at
  * compile time, which is exactly why it lives in the shared contracts package rather than being
  * hand-copied on each side. `apps/api-public/src/http/responses.ts`'s `ERROR_CODE_STATUS` reads
  * `CLIENT_VERSION_UNSUPPORTED_HTTP_STATUS` below rather than repeating `426`, so the pair has one

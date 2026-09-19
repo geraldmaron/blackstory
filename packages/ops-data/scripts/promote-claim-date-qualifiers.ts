@@ -71,8 +71,8 @@ async function loadCurrentClaims(client: pg.PoolClient): Promise<readonly ClaimR
        c.entity_id,
        v.predicate,
        v.object
-     FROM bb_canonical.claims c
-     JOIN bb_canonical.claim_versions v ON v.id = c.current_version_id
+     FROM canonical.claims c
+     JOIN canonical.claim_versions v ON v.id = c.current_version_id
      WHERE c.current_version_id IS NOT NULL`,
   );
   return result.rows.map((row) => ({
@@ -87,7 +87,7 @@ async function loadCurrentClaims(client: pg.PoolClient): Promise<readonly ClaimR
 async function loadExistingQualifierKeys(client: pg.PoolClient): Promise<ReadonlySet<string>> {
   const result = await client.query<{ claim_version_id: string; property: string }>(
     `SELECT claim_version_id, property
-     FROM bb_canonical.claim_qualifiers
+     FROM canonical.claim_qualifiers
      WHERE qualifier_type = 'temporal'`,
   );
   return new Set(result.rows.map((row) => `${row.claim_version_id}|${row.property}`));
@@ -124,7 +124,7 @@ async function applyPromotions(
   let inserted = 0;
   for (const row of rows) {
     const result = await client.query(
-      `INSERT INTO bb_canonical.claim_qualifiers (
+      `INSERT INTO canonical.claim_qualifiers (
          id, claim_version_id, qualifier_type, property, value
        ) VALUES ($1, $2, 'temporal', $3, $4::jsonb)
        ON CONFLICT (claim_version_id, qualifier_type, property) DO NOTHING`,

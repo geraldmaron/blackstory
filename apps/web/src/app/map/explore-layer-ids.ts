@@ -40,8 +40,10 @@ export const EXPLORE_UNCLUSTERED_EVENT_GLYPH_INCOMING_LAYER_ID =
 export const EXPLORE_SELECTED_POINT_LAYER_ID = 'explore-point-selected';
 export const EXPLORE_STATE_DENSITY_LAYER_ID = 'explore-state-density-fill';
 export const EXPLORE_STATE_DENSITY_INCOMING_LAYER_ID = 'explore-state-density-fill-incoming';
-/** the related workstream: county hairlines — the fainter tier of the boundary system beneath the
- * state bounds line, zoom-gated so the national frame stays clean. */
+/**
+ * County boundary hairlines sit beneath stronger state borders and appear only at the
+ * configured zoom range.
+ */
 export const EXPLORE_COUNTY_LINES_LAYER_ID = 'explore-county-lines-line';
 /** County name labels on the same GeoJSON source as hairlines (symbol layer, OpenFreeMap glyphs). */
 export const EXPLORE_COUNTY_LABEL_LAYER_ID = 'explore-county-labels';

@@ -6,7 +6,7 @@
  * file. Pure zod + string/number logic only: no `node:*`, no I/O, no `@repo/*` imports.
  *
  * Bounds below exist specifically to defeat the adversarial "maliciously large DTO" case
- * (MOB-003 adversarial review; `docs/decisions-carryover.md`, "ADR-021's two invariants": the
+ * (public contract adversarial review; `docs/decisions-carryover.md`, "ADR-021's two invariants": the
  * public-contracts boundary): every string and array field in this package has an explicit
  * `max`, so a hostile or buggy upstream response cannot force a client to allocate an
  * unbounded structure just by parsing it.

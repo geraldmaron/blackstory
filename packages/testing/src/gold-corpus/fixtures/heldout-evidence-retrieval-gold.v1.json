@@ -1,0 +1,228 @@
+{
+  "schemaVersion": "heldout-research-gold.v1",
+  "version": "heldout-research-eval-v1-curated",
+  "benchmarkVersion": "heldout-research-eval-v1-blind",
+  "curatedAt": "2026-09-18",
+  "labelStatus": "Curated provisional labels from an independent corpus author; no consensus or human adjudication.",
+  "retrievalLabelSemantics": "relevantDocumentIds and forbiddenDocumentIds label document-level retrieval. A forbidden result is an adjudicated confusable retrieval candidate, not a measured identity merge.",
+  "retrievalCases": [
+    {
+      "id": "r01",
+      "relevantDocumentIds": ["nps-mary-fields"],
+      "forbiddenDocumentIds": [],
+      "rationale": "Exact page heading and body match Mary Fields."
+    },
+    {
+      "id": "r02",
+      "relevantDocumentIds": ["nps-will-garvin"],
+      "forbiddenDocumentIds": [],
+      "rationale": "Exact page heading and body match Will Garvin."
+    },
+    {
+      "id": "r03",
+      "relevantDocumentIds": ["nps-nick-bransford"],
+      "forbiddenDocumentIds": ["nps-mat-bransford"],
+      "rationale": "Exact Nick page; same surname is explicitly not blood relation to Mat."
+    },
+    {
+      "id": "r04",
+      "relevantDocumentIds": ["nps-mat-bransford"],
+      "forbiddenDocumentIds": ["nps-nick-bransford"],
+      "rationale": "Exact Mat page; same surname must not collapse Nick and Mat."
+    },
+    {
+      "id": "r05",
+      "relevantDocumentIds": ["nps-nick-bransford"],
+      "forbiddenDocumentIds": ["nps-mat-bransford"],
+      "rationale": "Nicholas is the page's full-name variant for Nick."
+    },
+    {
+      "id": "r06",
+      "relevantDocumentIds": ["nps-mat-bransford"],
+      "forbiddenDocumentIds": ["nps-nick-bransford"],
+      "rationale": "Materson (Mat) is the page's full-name variant for Mat."
+    },
+    {
+      "id": "r07",
+      "relevantDocumentIds": ["nps-will-garvin"],
+      "forbiddenDocumentIds": [],
+      "rationale": "The page itself writes William “Will” Garvin."
+    },
+    {
+      "id": "r08",
+      "relevantDocumentIds": ["nps-mary-fields"],
+      "forbiddenDocumentIds": [],
+      "rationale": "Stagecoach Mary appears in the page bibliography title; this is a weaker alias signal than the heading."
+    },
+    {
+      "id": "r09",
+      "relevantDocumentIds": ["nps-mat-bransford"],
+      "forbiddenDocumentIds": ["nps-nick-bransford"],
+      "rationale": "Synthetic OCR perturbation of Materson Bransford. This is a query perturbation, not a claimed source OCR defect."
+    },
+    {
+      "id": "r10",
+      "relevantDocumentIds": ["nps-nick-bransford"],
+      "forbiddenDocumentIds": ["nps-mat-bransford"],
+      "rationale": "Synthetic OCR perturbation of Nick Bransford. This is a query perturbation, not a claimed source OCR defect."
+    },
+    {
+      "id": "r11",
+      "relevantDocumentIds": ["nps-will-garvin", "nps-nick-bransford"],
+      "forbiddenDocumentIds": ["nps-mat-bransford"],
+      "rationale": "Will married Hannah; the pages identify Hannah as Nick's daughter. Return both endpoint records and preserve the two edges."
+    },
+    {
+      "id": "r12",
+      "relevantDocumentIds": ["nps-mary-fields"],
+      "forbiddenDocumentIds": [],
+      "rationale": "The route, Star Route contract, Montana setting, and identity are all in Mary P5-P6."
+    },
+    {
+      "id": "r13",
+      "relevantDocumentIds": ["nps-nick-bransford"],
+      "forbiddenDocumentIds": ["nps-mat-bransford"],
+      "rationale": "Nick is father of Hannah and Annie and married Charlotte; Mat is a same-surname, explicitly unrelated cave guide."
+    },
+    {
+      "id": "r14",
+      "relevantDocumentIds": ["nps-mat-bransford"],
+      "forbiddenDocumentIds": [],
+      "rationale": "Mat P4 directly states that Mat married Parthena."
+    },
+    {
+      "id": "r15",
+      "relevantDocumentIds": ["nps-will-garvin", "nps-nick-bransford"],
+      "forbiddenDocumentIds": [],
+      "rationale": "Will P4 gives the date and marriage; Nick P5 independently names Hannah's marriage to Will."
+    },
+    {
+      "id": "r16",
+      "relevantDocumentIds": ["nps-mary-fields"],
+      "forbiddenDocumentIds": [],
+      "rationale": "Mary P5 states that Mary moved to Montana in 1885 and identifies St. Peter's Mission."
+    },
+    {
+      "id": "r17",
+      "relevantDocumentIds": ["nps-will-garvin", "nps-nick-bransford"],
+      "forbiddenDocumentIds": ["nps-mat-bransford"],
+      "rationale": "The endpoints are relevant, but the sources state Will married Nick's daughter Hannah. They do not state a direct Will-to-Nick edge with a named predicate; do not infer a son-in-law relation from the two-hop path."
+    },
+    {
+      "id": "r18",
+      "relevantDocumentIds": ["epa-wetland-definition"],
+      "forbiddenDocumentIds": [],
+      "rationale": "EPA definition page directly describes seasonal or periodically wet wetlands that remain critical habitat."
+    },
+    {
+      "id": "r19",
+      "relevantDocumentIds": ["epa-wetland-functions"],
+      "forbiddenDocumentIds": ["epa-wetland-definition"],
+      "rationale": "EPA functions page directly connects wetland value to relationships with other watershed ecosystems."
+    },
+    {
+      "id": "r20",
+      "relevantDocumentIds": ["epa-wetland-definition"],
+      "forbiddenDocumentIds": ["epa-wetland-functions"],
+      "rationale": "The exact swamps, marshes, bogs, and similar areas wording is on the EPA definition page."
+    }
+  ],
+  "entailmentCases": [
+    {
+      "id": "e01",
+      "expected": "supported",
+      "sourceUrls": ["https://www.nps.gov/people/mary-fields.htm"],
+      "rationale": "Mary P1 and P6 explicitly call her the first African American woman to receive a Star Route contract."
+    },
+    {
+      "id": "e02",
+      "expected": "supported",
+      "sourceUrls": ["https://www.nps.gov/people/mary-fields.htm"],
+      "rationale": "Mary P6 explicitly states that her route ran between St. Peter's Mission and Cascade."
+    },
+    {
+      "id": "e03",
+      "expected": "insufficient",
+      "sourceUrls": ["https://www.nps.gov/people/mary-fields.htm"],
+      "rationale": "P5 attributes the care-for-Amadeus account to some secondary sources and then gives a different likely explanation; it does not establish sole cause as fact."
+    },
+    {
+      "id": "e04",
+      "expected": "supported",
+      "sourceUrls": ["https://www.nps.gov/people/will-garvin.htm"],
+      "rationale": "Will P3 explicitly names Company M, 12th Heavy Artillery, U.S. Colored Troops."
+    },
+    {
+      "id": "e05",
+      "expected": "contradicted",
+      "sourceUrls": ["https://www.nps.gov/people/will-garvin.htm"],
+      "rationale": "Will P2 says relationships with the many African American and European American Garvin records remain unknown."
+    },
+    {
+      "id": "e06",
+      "expected": "supported",
+      "sourceUrls": ["https://www.nps.gov/people/nick-bransford.htm"],
+      "rationale": "Nick P2 explicitly says Nick and Mat share a last name but have no blood relation."
+    },
+    {
+      "id": "e07",
+      "expected": "supported",
+      "sourceUrls": ["https://www.nps.gov/people/nick-bransford.htm"],
+      "rationale": "Nick P5 explicitly identifies Hannah and Annie as his two daughters."
+    },
+    {
+      "id": "e08",
+      "expected": "contradicted",
+      "sourceUrls": ["https://www.nps.gov/people/nick-bransford.htm"],
+      "rationale": "Nick P2 explicitly denies a blood relation, which conflicts with a brothers claim."
+    },
+    {
+      "id": "e09",
+      "expected": "supported",
+      "sourceUrls": ["https://www.nps.gov/people/mat-bransford.htm"],
+      "rationale": "Mat P4 explicitly states the marriage to Parthena and that three of their four children were sold away."
+    },
+    {
+      "id": "e10",
+      "expected": "insufficient",
+      "sourceUrls": [
+        "https://www.nps.gov/people/nick-bransford.htm",
+        "https://www.nps.gov/people/will-garvin.htm"
+      ],
+      "rationale": "The evidence supplies Nick-to-Hannah and Hannah-to-Will edges. It never states the direct predicate son-in-law; inferring A-to-C from A-to-B-to-C is disallowed."
+    },
+    {
+      "id": "e11",
+      "expected": "supported",
+      "sourceUrls": ["https://www.epa.gov/wetlands/what-wetland"],
+      "rationale": "EPA P4 explicitly says seasonal or periodically wet areas can remain critical wildlife habitat."
+    },
+    {
+      "id": "e12",
+      "expected": "contradicted",
+      "sourceUrls": ["https://www.epa.gov/wetlands/what-wetland"],
+      "rationale": "EPA P3 says wetlands occur on every continent except Antarctica."
+    },
+    {
+      "id": "e13",
+      "expected": "supported",
+      "sourceUrls": [
+        "https://www.epa.gov/wetlands/how-do-wetlands-function-and-why-are-they-valuable"
+      ],
+      "rationale": "EPA functions P3 explicitly states that wetlands store carbon in plant communities and soil and help moderate global climate conditions."
+    },
+    {
+      "id": "e14",
+      "expected": "insufficient",
+      "sourceUrls": ["https://www.nps.gov/people/mary-fields.htm"],
+      "rationale": "Mary's quick facts list St. Peter's Mission, while the later prose says she is buried in Cascade. The page is internally inconsistent; the claim cannot be called consistently established."
+    }
+  ],
+  "limitations": [
+    "Six documents and 20 retrieval queries do not support population-level retrieval claims.",
+    "The corpus does not reproduce live corpus size, HNSW planner selection, or production filtering.",
+    "Entailment labels are provisional curated judgments rather than consensus or human-adjudicated gold labels.",
+    "Categorical entailment predictions contain no probabilities, so probability calibration is unavailable.",
+    "Forbidden-document retrieval measures candidate-level false positives; resolver false-merge behavior remains unmeasured."
+  ]
+}

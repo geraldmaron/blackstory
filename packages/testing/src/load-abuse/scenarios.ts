@@ -73,7 +73,7 @@ export const runHighVolumeStaticScenario = runner('high_volume_static', (h) => {
       subject: 'anonymous',
       endpointClass: 'entityRetrieval',
       clientIp: STATIC_IP,
-      appCheckVerified: true,
+      clientAttested: true,
     });
     outcomes.push(
       rate.decision.allowed
@@ -89,14 +89,14 @@ export const runHighVolumeStaticScenario = runner('high_volume_static', (h) => {
     subject: 'anonymous',
     endpointClass: 'search',
     clientIp: STATIC_IP,
-    appCheckVerified: false,
+    clientAttested: false,
   });
   outcomes.push(
     searchDenied.decision.allowed
       ? { allowed: true, denials: [], estimatedCostUnits: 0 }
       : {
           allowed: false,
-          denials: [{ layer: 'app_check', reason: 'app_check_required' }],
+          denials: [{ layer: 'client_header', reason: 'client_header_required' }],
           estimatedCostUnits: 0,
         },
   );
@@ -113,7 +113,7 @@ export const runSearchFloodScenario = runner('search_flood', (h) => {
           subject: 'anonymous',
           endpointClass: 'search',
           clientIp: '203.0.113.2',
-          appCheckVerified: i % 3 !== 0,
+          clientAttested: i % 3 !== 0,
         },
       }),
     );
@@ -147,7 +147,7 @@ export const runCacheBustingScenario = runner('cache_busting', (h) => {
         subject: 'anonymous',
         endpointClass: 'search',
         clientIp: '203.0.113.3',
-        appCheckVerified: true,
+        clientAttested: true,
       },
     }),
   );
@@ -159,7 +159,7 @@ export const runCacheBustingScenario = runner('cache_busting', (h) => {
           subject: 'anonymous',
           endpointClass: 'search',
           clientIp: '203.0.113.3',
-          appCheckVerified: true,
+          clientAttested: true,
         },
       }),
     );
@@ -181,7 +181,7 @@ export const runGeocoderAbuseScenario = runner('geocoder_abuse', (h) => {
       subject: 'anonymous',
       endpointClass: 'geocoding',
       clientIp: '203.0.113.50',
-      appCheckVerified: true,
+      clientAttested: true,
     });
     outcomes.push(
       rate.decision.allowed
@@ -205,7 +205,7 @@ function mapRateLayer(reason: string): SimulatedRequestOutcome['denials'][number
   if (reason === 'daily_cap_exceeded') return 'rate_limit_daily_cap';
   if (reason === 'concurrency_exceeded') return 'rate_limit_concurrency';
   if (reason === 'risk_score_exceeded') return 'rate_limit_risk_score';
-  if (reason === 'app_check_required') return 'app_check';
+  if (reason === 'client_header_required') return 'client_header';
   return 'rate_limit_rolling_window';
 }
 
@@ -222,7 +222,7 @@ export const runSubmissionSpamScenario = runner('submission_spam', (h) => ({
         subject: 'anonymous',
         endpointClass: 'corrections',
         clientIp: '203.0.113.77',
-        appCheckVerified: true,
+        clientAttested: true,
       },
     }),
     h.simulateSubmission({
@@ -231,7 +231,7 @@ export const runSubmissionSpamScenario = runner('submission_spam', (h) => ({
         subject: 'anonymous',
         endpointClass: 'corrections',
         clientIp: '203.0.113.77',
-        appCheckVerified: true,
+        clientAttested: true,
       },
       recentSubmissionTimestamps: [h.nowMs - 1_000, h.nowMs - 2_000, h.nowMs - 3_000],
     }),
@@ -244,7 +244,7 @@ export const runSlowClientsScenario = runner('slow_clients', (h) => ({
       subject: 'anonymous',
       endpointClass: 'search',
       clientIp: '203.0.113.88',
-      appCheckVerified: true,
+      clientAttested: true,
     }),
     h.simulateSearch({
       query: { q: 'slow follow-up' },
@@ -252,7 +252,7 @@ export const runSlowClientsScenario = runner('slow_clients', (h) => ({
         subject: 'anonymous',
         endpointClass: 'search',
         clientIp: '203.0.113.88',
-        appCheckVerified: false,
+        clientAttested: false,
       },
     }),
   ],
@@ -267,7 +267,7 @@ export const runOversizedPayloadsScenario = runner('oversized_payloads', (h) => 
         subject: 'anonymous',
         endpointClass: 'search',
         clientIp: '203.0.113.90',
-        appCheckVerified: true,
+        clientAttested: true,
       },
     }),
     h.simulateSubmission({
@@ -279,7 +279,7 @@ export const runOversizedPayloadsScenario = runner('oversized_payloads', (h) => 
         subject: 'anonymous',
         endpointClass: 'corrections',
         clientIp: '203.0.113.91',
-        appCheckVerified: true,
+        clientAttested: true,
       },
     }),
   ],
@@ -302,7 +302,7 @@ export const runDistributedLowRateScenario = runner('distributed_low_rate', (h) 
           subject: 'anonymous',
           endpointClass: 'search',
           clientIp: `203.0.113.${100 + i}`,
-          appCheckVerified: i % 2 === 0,
+          clientAttested: i % 2 === 0,
           riskSignals: signals,
         },
       }),
@@ -328,7 +328,7 @@ export const runDatabaseConnectionExhaustionScenario = runner(
           subject: 'anonymous',
           endpointClass: 'search',
           clientIp: '203.0.113.95',
-          appCheckVerified: true,
+          clientAttested: true,
         },
       }),
     );
@@ -351,7 +351,7 @@ export const runQueueRetryStormsScenario = runner('queue_retry_storms', (h) => {
         subject: 'anonymous',
         endpointClass: 'corrections',
         clientIp: '203.0.113.96',
-        appCheckVerified: true,
+        clientAttested: true,
       },
     }),
   );
@@ -382,7 +382,7 @@ export const runExpensiveFilterCombinationsScenario = runner(
           subject: 'anonymous',
           endpointClass: 'search',
           clientIp: '203.0.113.120',
-          appCheckVerified: true,
+          clientAttested: true,
         },
       }),
       h.simulateSearch({
@@ -401,7 +401,7 @@ export const runExpensiveFilterCombinationsScenario = runner(
           subject: 'anonymous',
           endpointClass: 'search',
           clientIp: '203.0.113.120',
-          appCheckVerified: true,
+          clientAttested: true,
         },
       }),
       h.simulateSearch({
@@ -410,7 +410,7 @@ export const runExpensiveFilterCombinationsScenario = runner(
           subject: 'anonymous',
           endpointClass: 'search',
           clientIp: '203.0.113.121',
-          appCheckVerified: true,
+          clientAttested: true,
         },
       }),
     ];
@@ -429,7 +429,7 @@ export const runExpensiveFilterCombinationsScenario = runner(
             subject: 'anonymous',
             endpointClass: 'search',
             clientIp: '203.0.113.120',
-            appCheckVerified: true,
+            clientAttested: true,
           },
         }),
       );
@@ -464,7 +464,7 @@ export const runScrapingPatternsScenario = runner('scraping_patterns', (h) => {
         subject: 'anonymous',
         endpointClass: 'search',
         clientIp: '203.0.113.130',
-        appCheckVerified: true,
+        clientAttested: true,
       },
     }),
   );
@@ -479,7 +479,7 @@ export const runScrapingPatternsScenario = runner('scraping_patterns', (h) => {
       subject: 'anonymous',
       endpointClass: 'entityRetrieval',
       clientIp: '203.0.113.131',
-      appCheckVerified: true,
+      clientAttested: true,
     });
     outcomes.push(
       rate.decision.allowed

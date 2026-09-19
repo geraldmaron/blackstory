@@ -1,7 +1,7 @@
 /**
- * Loads published 1980, 1990 and 2000 census tables by race for Lives Across the Decades (bead
- * repo-0clax.23), for every state, DC and the nation: population and urban shares, homeownership, high
- * school completion, unemployment, income brackets and the national median of each decade's income
+ * Loads published 1980, 1990, and 2000 census tables by race for Lives Across the Decades, for
+ * every state, D.C., and the nation: population and urban shares, homeownership, high-school
+ * completion, unemployment, income brackets, and the national median of each decade's income
  * unit. Regions are summed later by the builder.
  *
  * Figures come from one IPUMS NHGIS extract of the Census Bureau's summary files (NHGIS_API_KEY). Point

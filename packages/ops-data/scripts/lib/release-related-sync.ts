@@ -1,26 +1,8 @@
 /**
- * Shared logic for syncing `bb_public.release_entities.related` (and `projection.related`) from
- * the canonical source of truth, `bb_canonical.entity_relationships`.
- *
- * Root cause this closes: `ReleaseSourceEntity` carries no relationship edges, so every path that
- * rebuilds a release row from source — notably `publish-release-entities-incremental --republish`
- * — writes `related: []`. The links only came back by remembering to run two more scripts in the
- * right order afterwards, and nothing warned when they were skipped: the records simply published
- * with no connections and the "How this record connects" beat disappeared. That was forgotten
- * twice in one session by someone who knew about it, which is what makes documentation the wrong
- * fix. This module is the one place the edge -> related mapping happens, callable both as a
- * one-time backfill and as a step every release-affecting operation runs afterward.
- *
- * The sync is authoritative — it replaces `related` rather than only filling an empty one. That
- * is deliberate and was measured before it was chosen: on the active release, canonical edges are
- * a strict superset of what is published (1,193 published pairs, 1,762 derivable, zero published
- * pairs with no canonical edge behind them), so replacing deletes nothing that had a source. It
- * also fixes the case an empty-only guard structurally cannot reach — a list that is stale rather
- * than empty, which is what an entity merge leaves behind (repo-n7p6.15) and how Garrett Morgan
- * kept one 'authored' edge while both of his inventions stayed missing.
- *
- * Only edges whose OTHER endpoint is also in the release are emitted; an edge to an unreleased
- * entity never renders and would dead-link.
+ * Shared canonical-edge to public-related mapping. Release writes must synchronize related
+ * lists and rebuild graph artifacts because the source entity shape alone carries no edges.
+ * Replace lists to remove stale links after merges; preserve only relationships backed by the
+ * canonical graph and eligible endpoints.
  */
 import { RELATIONSHIP_CAUSAL_WEIGHT } from '@repo/domain-core/relationship';
 import type { Client, Pool, PoolClient } from 'pg';
@@ -66,16 +48,16 @@ const CAUSAL_WEIGHT_CASE_SQL = `CASE e.relationship_type\n${Object.entries(
  */
 const DERIVE_SQL = `
   WITH released AS (
-    SELECT entity_id FROM bb_public.release_entities WHERE release_id = $1
+    SELECT entity_id FROM published.release_entities WHERE release_id = $1
   ),
   edges AS (
     SELECT er.from_entity_id AS eid, er.to_entity_id AS other_id,
            er.relationship_type, 'outgoing'::text AS direction
-    FROM bb_canonical.entity_relationships er
+    FROM canonical.entity_relationships er
     WHERE er.workflow_status = 'accepted' AND er.publication_status = 'published'
     UNION ALL
     SELECT er.to_entity_id, er.from_entity_id, er.relationship_type, 'incoming'
-    FROM bb_canonical.entity_relationships er
+    FROM canonical.entity_relationships er
     WHERE er.workflow_status = 'accepted' AND er.publication_status = 'published'
   )
   SELECT e.eid AS entity_id, e.other_id, e.relationship_type, e.direction
@@ -164,7 +146,7 @@ export async function planReleaseRelatedSync(
   }
 
   const published = await client.query<{ entity_id: string; related: unknown }>(
-    `SELECT entity_id, related FROM bb_public.release_entities WHERE release_id = $1
+    `SELECT entity_id, related FROM published.release_entities WHERE release_id = $1
      ORDER BY entity_id`,
     [releaseId],
   );
@@ -201,7 +183,7 @@ export async function applyReleaseRelatedSync(
     const related = JSON.stringify(row.after);
     await client.query(
       // The projection only; `related` is GENERATED from it.
-      `UPDATE bb_public.release_entities
+      `UPDATE published.release_entities
          SET projection = COALESCE(projection, '{}'::jsonb) || jsonb_build_object('related', $1::jsonb)
        WHERE release_id = $2 AND entity_id = $3`,
       [related, releaseId, row.entityId],

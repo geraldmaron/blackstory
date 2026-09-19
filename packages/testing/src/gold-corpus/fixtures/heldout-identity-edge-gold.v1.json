@@ -1,0 +1,148 @@
+{
+  "schemaVersion": "heldout-identity-edge-gold.v1",
+  "benchmarkVersion": "heldout-identity-edge-v1-blind",
+  "labelStatus": "independent-agent-authored-provisional",
+  "adjudicationProtocol": "Root labeled blind cases against the retained public NPS/EPA passages before opening the separate frozen prediction file. Supported edges mean admissible direct source assertions; derivations and conflicting claims require their own explicit representation and review.",
+  "identityCases": [
+    {
+      "id": "i01",
+      "expected": "same",
+      "rationale": "The Nick source explicitly expands Nicholas to Nick; the Mat source names the same Mammoth Cave guide."
+    },
+    {
+      "id": "i02",
+      "expected": "same",
+      "rationale": "The Mat source explicitly expands Materson to Mat; the Nick source discusses the same contemporary cave guide."
+    },
+    {
+      "id": "i03",
+      "expected": "same",
+      "rationale": "William and Will are explicitly paired in the Will page; the Nick page identifies the same guide married to Hannah."
+    },
+    {
+      "id": "i04",
+      "expected": "distinct",
+      "rationale": "Nick and Mat are described as separate enslaved guides and their shared surname is explicitly not evidence of blood relation."
+    },
+    {
+      "id": "i05",
+      "expected": "distinct",
+      "rationale": "Will married Nick's daughter Hannah; the passages describe different people and roles."
+    },
+    {
+      "id": "i06",
+      "expected": "distinct",
+      "rationale": "The named guides have different full names, birth histories and marriages. Shared work and surname networks do not merge them."
+    },
+    {
+      "id": "i07",
+      "expected": "distinct",
+      "rationale": "Mary Fields and Will Garvin are separately identified people in different places and histories."
+    },
+    {
+      "id": "i08",
+      "expected": "same",
+      "rationale": "Both passages identify Hannah as Nick's daughter and Will's wife; the combined family relations resolve this mention."
+    },
+    {
+      "id": "i09",
+      "expected": "same",
+      "rationale": "Both sources concern the same Mammoth Cave guide network: Stephen Bishop was a fellow guide and Charlotte's deceased husband."
+    },
+    {
+      "id": "i10",
+      "expected": "same",
+      "rationale": "The same full name occurs in mutually consistent Mammoth Cave guide context."
+    },
+    {
+      "id": "i11",
+      "expected": "same",
+      "rationale": "The Nick page explicitly references Mat, whose own source supplies the corresponding full name and shared guide history."
+    },
+    {
+      "id": "i12",
+      "expected": "same",
+      "rationale": "Both passages identify Will as the Mammoth Cave guide married to Nick's daughter Hannah."
+    }
+  ],
+  "edgeCases": [
+    {
+      "id": "g01",
+      "expected": "supported",
+      "rationale": "The retained source P5 expressly says Mary moved to Montana in 1885 and discusses her relocation to St. Peter's. Her motive remains uncertain; this edge asserts only the move."
+    },
+    {
+      "id": "g02",
+      "expected": "supported",
+      "rationale": "The route endpoints are stated in P6. This does not establish exact coordinates or intermediate stops."
+    },
+    {
+      "id": "g03",
+      "expected": "supported",
+      "rationale": "Will P4 directly records the marriage to Hannah on May 27, 1876."
+    },
+    {
+      "id": "g04",
+      "expected": "supported",
+      "rationale": "Nick P5 directly names Hannah among his two daughters."
+    },
+    {
+      "id": "g05",
+      "expected": "supported",
+      "rationale": "Nick P2 explicitly denies a blood relation between Nick and Mat. Do not broaden this to deny every social or legal relation."
+    },
+    {
+      "id": "g06",
+      "expected": "supported",
+      "rationale": "Mat P4 directly names Parthena as his wife."
+    },
+    {
+      "id": "g07",
+      "expected": "supported",
+      "rationale": "The EPA functions P3 explicitly describes carbon storage in wetland plant communities and soil."
+    },
+    {
+      "id": "g08",
+      "expected": "supported",
+      "rationale": "The EPA definition P2 expressly lists these wetland classes."
+    },
+    {
+      "id": "g09",
+      "expected": "unsupported",
+      "rationale": "The proposed direct edge is a reasonable kinship inference, but neither cited passage directly asserts its predicate. Preserve Will-to-Hannah and Hannah-to-Nick as two cited hops, or separately label and review a derived assertion. This untyped proposal cannot be admitted as a direct source assertion."
+    },
+    {
+      "id": "g10",
+      "expected": "unsupported",
+      "rationale": "The source provides no sibling assertion and expressly denies blood relation. Shared surname and occupation do not establish brothers."
+    },
+    {
+      "id": "g11",
+      "expected": "unsupported",
+      "rationale": "The source attributes the care explanation to secondary sources, states Mary did not document her reason, and offers another likely explanation. Sole causation is unsupported."
+    },
+    {
+      "id": "g12",
+      "expected": "unsupported",
+      "rationale": "The source conflicts internally: its quick facts name St. Peter's Mission, while its closing paragraph says Cascade. A single unqualified burial assertion must abstain pending reconciliation."
+    },
+    {
+      "id": "g13",
+      "expected": "unsupported",
+      "rationale": "The EPA definition explicitly excludes Antarctica."
+    },
+    {
+      "id": "g14",
+      "expected": "supported",
+      "rationale": "The EPA functions P3 expressly states that wetlands help moderate global climate conditions."
+    }
+  ],
+  "limitations": [
+    "Not human-adjudicated; the labels are provisional and challengeable.",
+    "A small purposive case set is not a representative population estimate or probability calibration.",
+    "Repeated alias pairs overlap; counts must not be described as independent historical discoveries.",
+    "Identity is resolved only within the supplied sources and context; unknown namesakes outside this sample remain possible.",
+    "Case g09 tests direct-evidence admission policy rather than denying the logical kinship inference.",
+    "The blind file contains shortened summaries and local paragraph selectors, not source-native text-quote selectors or preserved page bytes."
+  ]
+}

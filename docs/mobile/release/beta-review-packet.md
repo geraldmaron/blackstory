@@ -229,7 +229,6 @@ Contact for review questions: Gerald Dagher, me@geralddagher.com.
 | Trademark search not done | Owner | `repo-fsxq` |
 | `/support` and `/privacy` not live on production (repo pages exist; lander still intercepts) | Engineering + owner | `repo-tbpa` (code closed; deploy + placeholders remain) |
 | Spend ceiling not set | Owner | `repo-fsxq` |
-| Firebase mobile App Check configs | **N/A for v1** — Postgres client attestation; no `@react-native-firebase/*` | superseded |
 | ASC API / Play service account / EAS token in 1Password | Owner (when EAS Submit automation needed) | `repo-fsxq` |
 | Physical device + VoiceOver/TalkBack evidence | Owner + engineering | `repo-f7we`, `repo-1z1a` |
 

@@ -1,5 +1,5 @@
 /**
- * Shared source/citation display for data surfaces. Pattern (owner 2026-07-18):
+ * Shared source/citation display for data surfaces:
  *  - When every figure in a group shares the same source(s), render one group footer.
  *  - When a figure carries a unique extra source, render a compact inline citation
  *    under that figure only — never repeat a full SOURCE box for the same link.

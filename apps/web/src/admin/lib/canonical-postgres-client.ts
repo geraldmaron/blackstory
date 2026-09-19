@@ -1,6 +1,6 @@
 /**
  * Server-only lazy Postgres pool for the canonical, write-capable admin connection
- * (`bb_canonical`/`bb_ops`/`bb_research`/etc., via the `role_admin_app` Postgres role).
+ * (`canonical`/`ops`/`research`/etc., via the `role_admin_app` Postgres role).
  * Uses `ADMIN_DATABASE_URL` (or `ADMIN_APP_DATABASE_URL`) — deliberately a different name from
  * the public read-only pool's `DATABASE_URL`/`APP_DATABASE_URL` (`../../lib/public-data/postgres-client.ts`).
  * Admin used to run as its own Vercel project specifically so its write-capable credential never
@@ -84,10 +84,8 @@ export function normalizePgConnectionString(
 }
 
 /**
- * Timeout budget. Pages are server-rendered, so first byte waits on these queries: an
- * unreachable database used to hang a render for minutes (repo-7pqy measured `GET / 200 in
- * 18.4min`) because the pool had no connect or statement bound at all. Every number here is a
- * ceiling on how long a page can be stuck, not a performance tuning knob.
+ * Connection and statement timeouts bound how long server-rendered pages can wait on the
+ * database.
  */
 export const POSTGRES_TIMEOUT_DEFAULTS = {
   /** Give up reaching the host. Covers a wrong pooler host or a dropped IPv6 route. */

@@ -1,5 +1,5 @@
 /**
- * Serialize/deserialize graph release artifacts for bb_public.release_graph_* persistence.
+ * Serialize/deserialize graph release artifacts for published.release_graph_* persistence.
  */
 import type { Sha256Hash } from '../publication/index.js';
 import type { EntityAdjacency } from './adjacency.js';

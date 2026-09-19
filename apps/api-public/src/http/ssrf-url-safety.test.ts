@@ -1,5 +1,5 @@
 /**
- * SSRF regression tests for citation/media URLs on the public read surface (repo-rw1p).
+ * SSRF regression tests for citation/media URLs on the public read surface.
  *
  * Proves api-public never server-fetches user-controlled or entity-embedded URLs — URLs are
  * pass-through of already-redacted release projections, bounded by `@repo/public-contracts` zod

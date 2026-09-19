@@ -1,9 +1,4 @@
-/**
- * Tests for the jurisdiction resolver's in-memory implementation (no Firestore
- * dependency). The Firestore-backed `createFirestoreJurisdictionResolver` shares the exact
- * same `{exists, get}` shape, exercised here structurally via the in-memory variant, and used
- * for real in `load-cli.ts`'s CLI entry (not unit-testable without a live Firestore instance).
- */
+/** Tests the in-memory jurisdiction resolver contract. */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import { createInMemoryJurisdictionDocResolver } from './resolver.js';

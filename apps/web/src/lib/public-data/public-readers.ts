@@ -1,6 +1,6 @@
 /**
  * Postgres-only public projection facade. Release JSON artifacts remain a read-through cache,
- * but canonical live reads always come from `bb_public.*`.
+ * but canonical live reads always come from `published.*`.
  */
 import * as postgresReaders from './postgres-readers';
 

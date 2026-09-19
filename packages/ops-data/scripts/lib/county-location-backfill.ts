@@ -1,5 +1,5 @@
 /**
- * Backfill logic for `bb_reference.jurisdictions.location` on county rows that were loaded
+ * Backfill logic for `reference.jurisdictions.location` on county rows that were loaded
  * before load-reference-counties.ts started writing that column (see that file's
  * upsertCountyBatch; before that, location was NULL for all 3,144 existing county rows).
  *
@@ -51,7 +51,7 @@ export async function planCountyLocationBackfill(
 ): Promise<CountyLocationPlan> {
   const result = await client.query(
     `SELECT id, state_fips, county_fips
-       FROM bb_reference.jurisdictions
+       FROM reference.jurisdictions
       WHERE kind = 'county' AND location IS NULL
       ORDER BY id`,
   );
@@ -85,7 +85,7 @@ export async function applyCountyLocationBackfill(
   for (const row of matched) {
     const [west, south, east, north] = row.bbox;
     await client.query(
-      `UPDATE bb_reference.jurisdictions
+      `UPDATE reference.jurisdictions
           SET location = ST_MakeEnvelope($1, $2, $3, $4, 4326)::geography,
               updated_at = now()
         WHERE id = $5 AND kind = 'county'`,

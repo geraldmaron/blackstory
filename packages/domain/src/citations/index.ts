@@ -19,6 +19,7 @@ export type {
   LinkHealthStatus,
   Citation,
 } from './citation.js';
+export { normalizeCitationUrl } from '@repo/schemas';
 
 export {
   evaluateClaimCitationCompleteness,
@@ -53,8 +54,7 @@ export type {
   LinkHealthState,
 } from './link-health.js';
 
-export { buildSpnSaveUrl, interpretSpnFetchResult } from './spn-client.js';
-export type { SpnFetchResult, SpnCaptureOutcome } from './spn-client.js';
+export type { SpnCaptureOutcome } from './repair-ladder.js';
 
 export { REPAIR_LADDER_STEPS, decideRepairLadderStep, applyRepairLadder } from './repair-ladder.js';
 export type {

@@ -1,6 +1,6 @@
 /**
  * Canonical entity kind vocabulary for BlackStory.
- * Kinds map to Firestore `canonicalEntities.kind` and public projection kinds.
+ * Kinds map to `canonical.entities.kind` and public projection kinds.
  *
  * `movement` is the 12th kind: a sustained, multi-actor, multi-decade phenomenon (Civil Rights
  * Movement, Great Migration, Black Power, Black Arts Movement, etc.) that individual

@@ -1,27 +1,21 @@
 /**
- * repo-n7p6.4 (WS4) — collect a fan-out batch of session-drafted answers into the answers.jsonl
- * that session-enrich-apply.ts consumes.
+ * Collect offline draft files into the answers.jsonl consumed by session-enrich-apply.ts.
  *
- * Why this exists: session-enrich-prepare.ts emits one prompt per line and session-enrich-apply.ts
- * takes back { entityId, rawContent } per line, but nothing joined the two when the drafting is
- * done by a FAN-OUT of subagents rather than by the orchestrating session itself. Each subagent
- * writes drafts/draft-<line>.json (or drafts/refuse-<line>.json), and this maps those back onto
- * the entity ids by line number.
+ * session-enrich-prepare.ts emits one prompt per line, while session-enrich-apply.ts accepts
+ * `{ entityId, rawContent }` rows. Each offline draft is written as `drafts/draft-<line>.json`
+ * (or `drafts/refuse-<line>.json`), and this collector maps that line number back to the entity id.
  *
- * The line number is the join key on purpose. A subagent is given line numbers, not entity ids, so
- * it cannot silently draft for the wrong subject: a draft file's name is the only thing that binds
- * it to an entity, and that binding is resolved here from the prompts file rather than from
- * anything the subagent wrote.
+ * The line number is the join key on purpose. The prompts file, rather than draft-authored
+ * metadata, determines which entity a draft belongs to.
  *
  * REFUSALS ARE NOT FAILURES. A subject whose captured evidence carries no Black-history
  * significance should be refused, not padded to reach the 120-char summary floor. Those are
- * reported and written to a separate file for triage — see repo-n9dq, which is about the ledger
- * having no terminal state to record them in. Until that lands, a refused subject stays 'pending'
- * and will be re-offered on the next pass.
+ * reported and written to a separate file for triage. The ledger has no terminal refusal state,
+ * so refused subjects remain 'pending' and may be offered again on the next pass.
  *
  * This validates NOTHING itself. Everything it emits still goes through
  * session-enrich-apply.ts -> validateEnrichmentResponse, which is the single validator for both
- * the OpenRouter and the session path. Adding checks here would create a second, drifting copy.
+ * provider-backed and offline paths. Adding checks here would create a second, drifting copy.
  *
  * Usage (from repo root):
  *   node --conditions development --import tsx \

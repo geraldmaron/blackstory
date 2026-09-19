@@ -6,8 +6,8 @@ description: Use when a published surface shows something the record's own data 
 # Surface triage (the page disagrees with the record)
 
 A record in this archive is published twice: once as a **projection** in
-`bb_public.release_entities`, which is what the entity page reads, and once as a **search doc**
-in `bb_public.search_index`, which is what `/records`, `/explore`, search, and every facet read.
+`published.release_entities`, which is what the entity page reads, and once as a **search doc**
+in `published.search_index`, which is what `/records`, `/explore`, search, and every facet read.
 The release builder writes both. Anything that writes one without the other, or writes one from
 a stale idea of the other, produces exactly this class of bug: a page that knows the answer next
 to a list that does not.
@@ -30,7 +30,7 @@ search:
 4. **Counter-evidence that narrows it.** Usually: the same record's entity page is correct. That
    one observation converts "data is missing" into "a writer or reader is dropping it" and skips
    an entire research detour.
-5. **Authority and done.** May you change code? Write `bb_public`? Is done the merged fix, the
+5. **Authority and done.** May you change code? Write `published`? Is done the merged fix, the
    repaired rows, or the live page? Ask once, up front. Finding out mid-task costs a stall.
 
 ## Decision order

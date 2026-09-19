@@ -2,7 +2,7 @@
  * Source library detail — one publisher's profile, fitness by policy, and the entities that
  * cite it.
  *
- * Server-rendered, read-only: nothing here writes. `bb_evidence.source_library` is a staff-only
+ * Server-rendered, read-only: nothing here writes. `evidence.source_library` is a staff-only
  * view, so a miss on `organizationId` reads as `notFound()` rather than a degraded banner.
  */
 import Link from 'next/link';

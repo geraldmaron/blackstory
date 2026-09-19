@@ -26,7 +26,7 @@ export default function robots(): MetadataRoute.Robots {
         disallow: '/',
       })),
     ],
-    // No `disallow` beyond the AI-training agents above, and SP-19 (repo-92n2.19) adds none.
+    // No `disallow` applies beyond the AI-training agents above.
     // The two routes kept out of the index — /design-system and /corrections/status/* — say so
     // with noindex instead, which a crawler can only read if it is allowed to fetch the page.
     host: siteUrl(),

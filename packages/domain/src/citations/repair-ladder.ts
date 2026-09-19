@@ -5,7 +5,7 @@
  * original URL is preserved as "originally published at", never
  * discarded.
  * 3. retroactive_spn if no capture exists yet, attempt a retroactive Save Page Now
- * (./spn-client.ts) and swap to that fresh capture on success.
+ * (the injected preservation gateway) and swap to that fresh capture on success.
  * 4. dead_mark only once none of the above apply/succeed, mark the citation dead.
  *
  * `decideRepairLadderStep` is the pure, synchronous priority decision (no I/O see
@@ -16,7 +16,9 @@
  */
 import type { Citation, CitationLocation } from './citation.js';
 import type { LinkCheckClassification } from './link-health.js';
-import type { SpnCaptureOutcome } from './spn-client.js';
+export type SpnCaptureOutcome =
+  | { readonly ok: true; readonly waybackCaptureUrl: string; readonly capturedAt: string }
+  | { readonly ok: false; readonly reason: string };
 
 export const REPAIR_LADDER_STEPS = [
   'permanent_redirect',

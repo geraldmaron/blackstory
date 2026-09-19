@@ -7,11 +7,9 @@
  * is that a hand-written chain drifts: twenty-one screens each typing their own parent is how the
  * v6 edition system ended up with twenty-one different headers.
  *
- * SP-15 (repo-92n2.15) landed the registry and this module's own copy of the route table went
- * with it — labels and parents now come from `lib/nav/destination-registry.ts`, so the breadcrumb,
- * the rooms hub, the footer, the palette and the sitemap cannot disagree about where a room
- * sits. SP-21 (repo-92n2.29) shipped `/rooms`, so the reading and utility rooms whose parent
- * was held at `/` now resolve up through it, matching `SURF_PARENT` in the mock.
+ * Labels and parents come from `lib/nav/destination-registry.ts`, so the breadcrumb, rooms hub,
+ * footer, palette, and sitemap cannot disagree about where a room sits. Reading and utility rooms
+ * resolve through `/rooms`, matching `SURF_PARENT` in the mock.
  */
 
 import {

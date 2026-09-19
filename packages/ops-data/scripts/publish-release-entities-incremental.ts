@@ -1,46 +1,20 @@
 /**
- * Incremental upsert of selected entity rows into bb_public.release_entities (+ search_index).
- * Sources rows exclusively from bb_research.landscape_candidates — the IDs you pass or gated
- * landscape pending. (Fixture-catalog sourcing was removed when entity data moved to Supabase.)
- *
- * Usage (from repo root):
- *   set -a && source apps/web/.env.local && set +a
- *   export DATABASE_SSL=1
- *
- *   # Dry-run gated landscape pending (default)
- *   node --conditions development --import tsx \
- *     packages/ops-data/scripts/publish-release-entities-incremental.ts --from-landscape-pending
- *
- *   # Dry-run explicit IDs (resolved from landscape rows)
- *   node --conditions development --import tsx \
- *     packages/ops-data/scripts/publish-release-entities-incremental.ts \
- *     --ids=dc-black-history-sites-b10,dc-black-history-sites-b11
- *
- *   # Dry-run a correction pass over an already-published lane (repo-n7p6.1): re-derives every
- *   # row in the lane regardless of status and, with --republish, doesn't skip rows already live
- *   # in the active release ('already_in_public') the way a normal new-candidate publish would.
- *   node --conditions development --import tsx \
- *     packages/ops-data/scripts/publish-release-entities-incremental.ts \
- *     --lane=nrhp-black-heritage --republish
- *
- * Apply (requires explicit flag):
- *   DRY_RUN=0 INCREMENTAL_PUBLISH_APPLY=1 node --conditions development --import tsx \
- *     packages/ops-data/scripts/publish-release-entities-incremental.ts --from-landscape-pending
- *
- * WITHDRAWN RECORDS (repo-vj7cs): this is the only path that inserts into
- * `bb_public.release_entities` / `bb_public.search_index`, which makes it the only place a
- * record withdrawn from the catalog can come back. It reads the standing
- * `bb_ops.catalog_decisions` verdict for every id it evaluates and skips anything carrying an
- * open `flag_for_retraction` — reported as its own `catalog_decision_retracted` skip reason and
- * listed in full under `retractedIds` in the run report. Withdrawing a record is therefore two
- * steps that both matter: delete its published rows, and record the decision. The decision is
- * what makes the deletion stick across the next rebuild.
+ * Publishes selected landscape candidates through reviewed-claim, privacy, withdrawal and
+ * content gates. --ids, --lane or --from-landscape-pending scope input; --republish permits
+ * corrections to existing records. Default dry-run; writes require DRY_RUN=0 and
+ * INCREMENTAL_PUBLISH_APPLY=1. Post-write taxonomy, relationships and divergence checks cover
+ * the active release.
  */
 import { mkdirSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import pg from 'pg';
 import type { PublicVisit, ReleaseSourceEntity } from '@repo/domain';
+import {
+  assessPublicationClaims,
+  loadReviewedClaimAssessments,
+  type ReviewedClaimAssessment,
+} from './lib/confidence.ts';
 import { normalizePgConnectionString } from './lib/pg-connection.ts';
 import {
   assessLandscapeDepth,
@@ -52,7 +26,6 @@ import {
   claimCountRegressed,
   gateLandscapePublishCandidate,
   incrementalPublishProvenancePatch,
-  liveClaimConfidence,
   liveLocationFromRow,
   parseCanonicalStatusSnapshot,
   visitOverrideFromCanonicalRow,
@@ -80,6 +53,12 @@ import {
 import { assertNoProjectionDivergence } from './lib/projection-divergence.ts';
 import { applyReleaseTaxonomySync, planReleaseTaxonomySync } from './lib/release-taxonomy-sync.ts';
 import { applyReleaseRelatedSync, planReleaseRelatedSync } from './lib/release-related-sync.ts';
+import {
+  attachPublicCitationArchives,
+  assertArchiveHydrationTargetIsUnsigned,
+  loadPublicCitationArchives,
+  type ReviewedCitationCapture,
+} from './lib/citation-archive-publication.ts';
 
 const SCRIPT_DIR = dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = join(SCRIPT_DIR, '../../..');
@@ -89,22 +68,14 @@ const DRY_RUN = process.env.DRY_RUN !== '0';
 const APPLY = process.env.INCREMENTAL_PUBLISH_APPLY === '1';
 
 /**
- * All three LANDSCAPE_* queries below test release membership with
- * `re.entity_id = ANY(ARRAY[lc.id, lc.source_item_id])`. Do not "simplify" that back to
- * `(re.entity_id = lc.id OR re.entity_id = lc.source_item_id)`.
- *
- * The two forms are logically identical and the planner does not treat them the same. As an OR,
- * Postgres uses the (release_id, entity_id) primary key as an Index Only Scan but demotes the OR
- * to a Filter, so the subplan walks every entity in the active release once per candidate row.
- * Measured on 2026-08-09: subplan cost 174.17, whole-query cost 434,525, mean execution 44.8s
- * (max 50.0s) over 30,965 rows. As an array-ANY it becomes an Index Cond — subplan cost 2.86,
- * query cost 9,950, roughly 44x cheaper.
- *
- * A NULL `source_item_id` never matches under either form, so the semantics are unchanged.
+ * Use re.entity_id = ANY(ARRAY[lc.id, lc.source_item_id]) for release membership. The
+ * equivalent OR can become a filter that scans the active release for each candidate instead of
+ * an index condition. Check EXPLAIN when changing this predicate. A null source_item_id matches
+ * neither form.
  */
 const LANDSCAPE_PENDING_SQL = `
 WITH active AS (
-  SELECT release_id FROM bb_public.active_release LIMIT 1
+  SELECT release_id FROM published.active_release LIMIT 1
 )
 SELECT
   lc.id,
@@ -121,14 +92,14 @@ SELECT
   EXISTS (
     SELECT 1
     FROM active a
-    JOIN bb_public.release_entities re
+    JOIN published.release_entities re
       ON re.release_id = a.release_id
       AND re.entity_id = ANY(ARRAY[lc.id, lc.source_item_id])
   ) AS exact_in_release,
   EXISTS (
     SELECT 1
     FROM active a
-    JOIN bb_public.release_entities re
+    JOIN published.release_entities re
       ON re.release_id = a.release_id
       AND lower(re.display_name) = lower(lc.display_name)
       AND re.entity_id <> lc.id
@@ -140,20 +111,20 @@ SELECT
   -- looking cases it is: no draft was ever written, or one was written but never staged.
   EXISTS (
     SELECT 1
-    FROM bb_research.entity_enrichment ee
+    FROM research.entity_enrichment ee
     WHERE ee.entity_id = lc.id
       AND ee.status = 'enriched'
       AND (ee.notes->'draft'->>'summary') IS NOT NULL
       AND (ee.notes->'draft'->>'summary') IS DISTINCT FROM lc.summary
   ) AS enrichment_draft_unstaged
-FROM bb_research.landscape_candidates lc
+FROM research.landscape_candidates lc
 WHERE lc.status = 'pending'
   -- repo-n7p6.15: never publish an entity that has been merged away. An absorbed record is not a
   -- separate thing, and without this filter it republishes as one: both SCLC records and both SNCC
   -- records were live in the active release six days after they were merged, because the merge
   -- wrote merge_state and nothing on the publish path ever read it.
   AND NOT EXISTS (
-    SELECT 1 FROM bb_canonical.entities me
+    SELECT 1 FROM canonical.entities me
      WHERE me.id IN (lc.id, lc.source_item_id)
        AND me.merge_state->>'status' = 'absorbed'
   )
@@ -162,7 +133,7 @@ ORDER BY lc.lane, lc.id
 
 const LANDSCAPE_BY_IDS_SQL = `
 WITH active AS (
-  SELECT release_id FROM bb_public.active_release LIMIT 1
+  SELECT release_id FROM published.active_release LIMIT 1
 )
 SELECT
   lc.id,
@@ -179,14 +150,14 @@ SELECT
   EXISTS (
     SELECT 1
     FROM active a
-    JOIN bb_public.release_entities re
+    JOIN published.release_entities re
       ON re.release_id = a.release_id
       AND re.entity_id = ANY(ARRAY[lc.id, lc.source_item_id])
   ) AS exact_in_release,
   EXISTS (
     SELECT 1
     FROM active a
-    JOIN bb_public.release_entities re
+    JOIN published.release_entities re
       ON re.release_id = a.release_id
       AND lower(re.display_name) = lower(lc.display_name)
       AND re.entity_id <> lc.id
@@ -198,24 +169,22 @@ SELECT
   -- looking cases it is: no draft was ever written, or one was written but never staged.
   EXISTS (
     SELECT 1
-    FROM bb_research.entity_enrichment ee
+    FROM research.entity_enrichment ee
     WHERE ee.entity_id = lc.id
       AND ee.status = 'enriched'
       AND (ee.notes->'draft'->>'summary') IS NOT NULL
       AND (ee.notes->'draft'->>'summary') IS DISTINCT FROM lc.summary
   ) AS enrichment_draft_unstaged
-FROM bb_research.landscape_candidates lc
+FROM research.landscape_candidates lc
 WHERE lc.id = ANY($1::text[])
 ORDER BY lc.id
 `;
 
-// repo-n7p6.1: a correction pass (e.g. the NRHP raw-code-leak fix) needs to re-derive every row
-// in one lane regardless of status — unlike LANDSCAPE_PENDING_SQL, no `status = 'pending'` filter.
-// Combine with --republish so gateLandscapePublishCandidate doesn't skip the already-accepted /
-// already-published rows this is meant to correct.
+// Lane correction passes include non-pending rows. Combine with --republish to reevaluate
+// already accepted or published records.
 const LANDSCAPE_BY_LANE_SQL = `
 WITH active AS (
-  SELECT release_id FROM bb_public.active_release LIMIT 1
+  SELECT release_id FROM published.active_release LIMIT 1
 )
 SELECT
   lc.id,
@@ -232,14 +201,14 @@ SELECT
   EXISTS (
     SELECT 1
     FROM active a
-    JOIN bb_public.release_entities re
+    JOIN published.release_entities re
       ON re.release_id = a.release_id
       AND re.entity_id = ANY(ARRAY[lc.id, lc.source_item_id])
   ) AS exact_in_release,
   EXISTS (
     SELECT 1
     FROM active a
-    JOIN bb_public.release_entities re
+    JOIN published.release_entities re
       ON re.release_id = a.release_id
       AND lower(re.display_name) = lower(lc.display_name)
       AND re.entity_id <> lc.id
@@ -251,38 +220,38 @@ SELECT
   -- looking cases it is: no draft was ever written, or one was written but never staged.
   EXISTS (
     SELECT 1
-    FROM bb_research.entity_enrichment ee
+    FROM research.entity_enrichment ee
     WHERE ee.entity_id = lc.id
       AND ee.status = 'enriched'
       AND (ee.notes->'draft'->>'summary') IS NOT NULL
       AND (ee.notes->'draft'->>'summary') IS DISTINCT FROM lc.summary
   ) AS enrichment_draft_unstaged
-FROM bb_research.landscape_candidates lc
+FROM research.landscape_candidates lc
 WHERE lc.lane = $1
 ORDER BY lc.id
 `;
 
-const ACTIVE_RELEASE_SQL = `SELECT release_id FROM bb_public.active_release LIMIT 1`;
+const ACTIVE_RELEASE_SQL = `SELECT release_id FROM published.active_release LIMIT 1`;
 
 const PENDING_COUNT_SQL = `
-SELECT COUNT(*)::text AS n FROM bb_research.landscape_candidates WHERE status = 'pending'
+SELECT COUNT(*)::text AS n FROM research.landscape_candidates WHERE status = 'pending'
 `;
 
 const CANONICAL_STATUS_BY_IDS_SQL = `
 SELECT id AS entity_id, living_status, status_history, kind_detail
-FROM bb_canonical.entities
+FROM canonical.entities
 WHERE id = ANY($1::text[])
 `;
 
 /**
  * Canonical visit-contact input for every entity this run is about to (re)build,
  * so a lane republish stops silently dropping the phone/website/hours/street a backfill wrote
- * onto `bb_canonical.entity_visit` / `entity_locations` — data the landscape row this run
+ * onto `canonical.entity_visit` / `entity_locations` — data the landscape row this run
  * rebuilds `ReleaseSourceEntity` from never carries at all.
  *
  * Mirrors the join in sync-visit-to-projection.ts (the one-off script that, until now, was the
  * only path that ever wrote `projection.visit`), anchored on the id list this run is evaluating
- * rather than on already-published `bb_public.release_entities` rows — a republish candidate may
+ * rather than on already-published `published.release_entities` rows — a republish candidate may
  * not have one yet. `entity_locations` is joined LATERAL to take the most recently updated row
  * per entity, same as that script.
  */
@@ -291,10 +260,10 @@ SELECT ids.entity_id,
        v.phone_e164, v.phone_display, v.website, v.hours, v.visitability, v.source_ids,
        l.street, l.postal_code
   FROM UNNEST($1::text[]) AS ids(entity_id)
-  LEFT JOIN bb_canonical.entity_visit v ON v.entity_id = ids.entity_id
+  LEFT JOIN canonical.entity_visit v ON v.entity_id = ids.entity_id
   LEFT JOIN LATERAL (
     SELECT street, postal_code
-      FROM bb_canonical.entity_locations el
+      FROM canonical.entity_locations el
      WHERE el.entity_id = ids.entity_id
        AND (el.street IS NOT NULL OR el.postal_code IS NOT NULL)
      ORDER BY el.updated_at DESC
@@ -304,47 +273,26 @@ SELECT ids.entity_id,
 `;
 
 /**
- * repo-vj7cs: the standing admin decision on each entity this run is about to (re)build.
- *
- * `bb_ops.catalog_decisions` is where a withdrawal ruling is recorded, and until this query
- * existed nothing on any publish path read it. Withdrawing a record meant deleting its
- * `bb_public.release_entities` + `search_index` rows, which this script rebuilds from
- * `bb_research.landscape_candidates` — so the withdrawal survived exactly until the next lane
- * republish, and the three records withdrawn on 2026-09-13 would have come back without anyone
- * deciding to bring them back.
- *
- * Keyed on both `lc.id` and `lc.source_item_id` for the same reason the release-membership
- * subqueries above are: the two ids name one record, and a ruling recorded against either of
- * them is a ruling against the record. `entity_id` is the table's primary key, so this returns
- * at most one standing verdict per id and a later `clear_flag` has already replaced the
- * retraction it lifts.
- *
- * Deliberately its own lookup rather than a NOT EXISTS bolted onto the three LANDSCAPE_* queries,
- * which is how the absorbed-entity filter (repo-n7p6.15) was written. That filter sits in
- * LANDSCAPE_PENDING_SQL alone, so it covers a pending publish and not a `--lane` or `--ids`
- * republish. Loading the verdict once and gating every candidate the run evaluates cannot go out
- * of sync that way, and it can say WHY a record was skipped instead of making it vanish from the
- * result set.
+ * Load standing catalog decisions against both candidate id and source_item_id, because either
+ * can identify the same record. Apply this lookup to every selection mode, including --lane and
+ * --ids, and report withheld records explicitly. A later clear_flag replaces the prior verdict
+ * for that id.
  */
 const CATALOG_DECISIONS_BY_IDS_SQL = `
 SELECT entity_id, decision, reason
-FROM bb_ops.catalog_decisions
+FROM ops.catalog_decisions
 WHERE entity_id = ANY($1::text[])
 `;
 
 /**
- * repo-b4ad: what is CURRENTLY published for these entities, so the depth gate can ask the
- * non-regression question ("is this better than what readers see?") instead of the admission
- * question ("is this good enough to publish at all?") for a record that is already live.
- *
- * Only the three columns `assessLandscapeDepth` reads — see `buildLiveDepthEntry`. Scoped to the
- * ACTIVE release: a row from a superseded release is not what any reader is looking at, and
- * treating it as the live baseline would compare the candidate against text nobody can see.
+ * Use the active release as the depth baseline for already published records.
+ * buildLiveDepthEntry reads only these three columns; superseded releases must not decide
+ * whether a reader-visible record regresses.
  */
 const LIVE_PUBLISHED_BY_IDS_SQL = `
 SELECT e.entity_id, e.summary, e.claims, e.projection
-FROM bb_public.release_entities e
-JOIN bb_public.active_release a ON a.release_id = e.release_id
+FROM published.release_entities e
+JOIN published.active_release a ON a.release_id = e.release_id
 WHERE e.entity_id = ANY($1::text[])
 `;
 
@@ -401,20 +349,45 @@ type SkippedRow = {
 
 type PreparedPublish = {
   readonly id: string;
-  readonly confidence: number;
+  readonly reviewBasis: 'independent_review';
   readonly entityRow: ReleaseEntityUpsertRow;
   readonly searchRow: SearchIndexUpsertRow;
   readonly fromLandscape: boolean;
   readonly landscapeRow: LandscapePublishRow | null;
   readonly lintReport: PublishStatusLintReport;
   /**
-   * repo-lai8y: this record's coordinates came from what it already publishes, not from its
-   * landscape row. Reported per id so a coordinate with no visible lineage on the landscape row
-   * is never silent — the one real objection to inheriting a location is that an auditor later
-   * cannot tell where the point came from.
+   * Reports coordinates inherited from the published record so their lineage remains visible
+   * when the landscape row has no location.
    */
   readonly locationInherited?: boolean;
 };
+
+function reviewedCitationCaptures(
+  reviewedClaims: readonly ReviewedClaimAssessment[],
+): readonly ReviewedCitationCapture[] {
+  return reviewedClaims.flatMap((claim) =>
+    claim.reviewedEvidenceCaptures.map((capture) => ({
+      claimId: claim.claimId,
+      sourceUrl: capture.sourceUrl,
+      sourceItemId: capture.sourceItemId,
+      captureId: capture.captureId,
+      contentHashDigest: capture.contentHashDigest,
+    })),
+  );
+}
+
+function hydratePreparedArchives(
+  rows: readonly PreparedPublish[],
+  archives: ReadonlyMap<string, { readonly archivedUrl: string; readonly archivedAt: string }>,
+): readonly { readonly row: PreparedPublish; readonly changed: boolean }[] {
+  return rows.map((row) => {
+    const projection = attachPublicCitationArchives(row.entityRow.projection, archives);
+    return {
+      row: { ...row, entityRow: { ...row.entityRow, projection } },
+      changed: projection !== row.entityRow.projection,
+    };
+  });
+}
 
 /** Reads one string field out of a stored projection, whose static type is `unknown` jsonb. */
 function projectionString(projection: unknown, key: string): string | undefined {
@@ -433,7 +406,7 @@ function projectionString(projection: unknown, key: string): string | undefined 
  */
 async function upsertEntity(client: pg.PoolClient, row: ReleaseEntityUpsertRow): Promise<void> {
   await client.query(
-    `INSERT INTO bb_public.release_entities
+    `INSERT INTO published.release_entities
       (release_id, entity_id, projection, created_at)
      VALUES ($1,$2,$3::jsonb,now())
      ON CONFLICT (release_id, entity_id) DO UPDATE SET
@@ -444,7 +417,7 @@ async function upsertEntity(client: pg.PoolClient, row: ReleaseEntityUpsertRow):
 
 async function upsertSearchIndex(client: pg.PoolClient, row: SearchIndexUpsertRow): Promise<void> {
   await client.query(
-    `INSERT INTO bb_public.search_index
+    `INSERT INTO published.search_index
       (id, release_id, entity_id, name, name_lower, aliases, topics, kind, status, geohash,
        related_count, claim_count, facets, created_at)
      VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13::jsonb,now())
@@ -487,14 +460,14 @@ async function markLandscapeAccepted(
 ): Promise<void> {
   const canonical = canonicalUpsertParamsFromLandscape(landscapeRow, entityId);
   await client.query(
-    `INSERT INTO bb_canonical.entities
+    `INSERT INTO canonical.entities
       (id, kind, entity_class, display_name, living_status, status_history, notability_basis, sensitivity, kind_detail)
      VALUES ($1, $2, $3, $4, $5, '[]'::jsonb, '[]'::jsonb, '[]'::jsonb, '{}'::jsonb)
      ON CONFLICT (id) DO UPDATE SET
        display_name = EXCLUDED.display_name,
        living_status = CASE
          WHEN EXCLUDED.kind = 'person' THEN EXCLUDED.living_status
-         ELSE bb_canonical.entities.living_status
+         ELSE canonical.entities.living_status
        END,
        updated_at = now()`,
     [
@@ -506,7 +479,7 @@ async function markLandscapeAccepted(
     ],
   );
   await client.query(
-    `UPDATE bb_research.landscape_candidates
+    `UPDATE research.landscape_candidates
      SET status = 'accepted',
          provenance = provenance || $2::jsonb,
          updated_at = now()
@@ -521,13 +494,16 @@ function preparePublish(input: {
   readonly generatedAt: string;
   readonly entityId: string;
   readonly fromLandscape: boolean;
+  readonly reviewedClaims: readonly ReviewedClaimAssessment[];
   readonly canonicalStatus?: ReturnType<typeof parseCanonicalStatusSnapshot>;
   readonly allowRepublish?: boolean;
-  /** The active-release row for this entity, when it is already live (repo-b4ad). */
+  /**
+   * The active-release row for an already published entity.
+   */
   readonly livePublished?: LivePublishedRow;
   /** Raw canonical visit-contact input for this entity, when one exists. */
   readonly visitOverride?: PublicVisit;
-  /** The standing `bb_ops.catalog_decisions` verdict for this entity, when one exists. */
+  /** The standing `ops.catalog_decisions` verdict for this entity, when one exists. */
   readonly catalogDecision?: PublishCatalogDecision;
 }): PreparedPublish | SkippedRow {
   if (input.fromLandscape && input.row) {
@@ -538,11 +514,6 @@ function preparePublish(input: {
       input.livePublished === undefined
         ? undefined
         : assessLandscapeDepth(buildLiveDepthEntry(input.livePublished), input.row);
-    const liveConfidence =
-      input.livePublished === undefined ? undefined : liveClaimConfidence(input.livePublished);
-    // repo-lai8y: the location this record already publishes, for the gate's regression clause on
-    // a landscape row that never carried coordinates. Read off the same live row as the depth and
-    // confidence verdicts above.
     const liveLocation =
       input.livePublished === undefined ? undefined : liveLocationFromRow(input.livePublished);
     const gate = gateLandscapePublishCandidate({
@@ -551,7 +522,7 @@ function preparePublish(input: {
       generatedAt: input.generatedAt,
       allowRepublish: input.allowRepublish ?? false,
       ...(liveDepth !== undefined ? { liveDepth } : {}),
-      ...(liveConfidence !== undefined ? { liveConfidence } : {}),
+      reviewedClaims: input.reviewedClaims,
       ...(liveLocation !== undefined ? { liveLocation } : {}),
       ...(input.canonicalStatus !== undefined ? { canonicalStatus: input.canonicalStatus } : {}),
       ...(input.visitOverride !== undefined ? { visitOverride: input.visitOverride } : {}),
@@ -560,12 +531,17 @@ function preparePublish(input: {
     if (!gate.eligible) {
       return { id: input.entityId, reason: gate.reason, detail: gate.detail };
     }
-    // A landscape row proves what a candidate can prove today, not what the record has
-    // accumulated, so building claims from it alone drops every separately-cited fact the record
-    // already publishes. The union keeps both; the regression check below is its control, not a
-    // second implementation (repo-cjlkp).
+    // Combine candidate claims with separately cited published claims, then reassess the
+    // combined set. Rebuilding from the landscape row alone would discard accumulated evidence.
     const carry = carryLiveClaims(gate.entry.claims ?? [], input.livePublished);
-    const entry: ReleaseSourceEntity = { ...gate.entry, claims: carry.claims };
+    const combined = assessPublicationClaims(
+      { ...gate.entry, claims: carry.claims },
+      input.reviewedClaims,
+    );
+    if (!combined.ok) {
+      return { id: input.entityId, reason: 'claim_assessment_required', detail: combined.detail };
+    }
+    const entry: ReleaseSourceEntity = { ...gate.entry, claims: combined.claims };
     if (claimCountRegressed(carry.claims, input.livePublished)) {
       return {
         id: input.entityId,
@@ -593,7 +569,7 @@ function preparePublish(input: {
     }
     return {
       id: input.entityId,
-      confidence: gate.confidence,
+      reviewBasis: combined.reviewBasis,
       entityRow: built.entityRow,
       searchRow: built.searchRow,
       fromLandscape: true,
@@ -642,7 +618,7 @@ async function main(): Promise<void> {
     const activeRes = await client.query<{ release_id: string }>(ACTIVE_RELEASE_SQL);
     const releaseId = activeRes.rows[0]?.release_id;
     if (!releaseId) {
-      throw new Error('no active release pointer in bb_public.active_release');
+      throw new Error('no active release pointer in published.active_release');
     }
 
     let landscapeRows: LandscapePublishRow[] = [];
@@ -692,6 +668,11 @@ async function main(): Promise<void> {
 
     const sliced = limit !== undefined ? toEvaluate.slice(0, limit) : toEvaluate;
 
+    const reviewedClaims = await loadReviewedClaimAssessments(
+      client,
+      sliced.map((item) => item.entityId),
+    );
+
     const canonicalRes = await client.query<CanonicalEntityPublishRow>(
       CANONICAL_STATUS_BY_IDS_SQL,
       [sliced.map((item) => item.entityId)],
@@ -732,7 +713,7 @@ async function main(): Promise<void> {
       catalogDecisionRes.rows.map((row) => [row.entity_id, catalogDecisionFromRow(row)]),
     );
 
-    const prepared: PreparedPublish[] = [];
+    let prepared: PreparedPublish[] = [];
     const skipped: SkippedRow[] = [];
     const skipCounts = new Map<string, number>();
     const lintReports: PublishStatusLintReport[] = [];
@@ -760,6 +741,7 @@ async function main(): Promise<void> {
         generatedAt,
         entityId: item.entityId,
         fromLandscape: item.fromLandscape,
+        reviewedClaims,
         allowRepublish,
         ...(livePublished !== undefined ? { livePublished } : {}),
         ...(canonicalStatus !== undefined ? { canonicalStatus } : {}),
@@ -774,6 +756,19 @@ async function main(): Promise<void> {
         lintReports.push(result.lintReport);
       }
     }
+
+    // Hydrate archive pointers only after the final claim set is known. This keeps private
+    // evidence tables out of public reads and ensures a later preservation job changes a release
+    // only through an explicit publication run.
+    const unhydratedPrepared = prepared;
+    const citationArchives = await loadPublicCitationArchives(
+      client,
+      reviewedCitationCaptures(reviewedClaims),
+      generatedAt,
+    );
+    const hydratedPrepared = hydratePreparedArchives(unhydratedPrepared, citationArchives);
+    const archiveProjectionChanges = hydratedPrepared.filter((entry) => entry.changed).length;
+    prepared = hydratedPrepared.map((entry) => entry.row);
 
     const lintSummary = mergePublishStatusLintReports(lintReports);
 
@@ -801,15 +796,15 @@ async function main(): Promise<void> {
       pendingBefore,
       scanned: sliced.length,
       eligible: prepared.length,
+      archivePointersSelected: citationArchives.size,
+      archiveProjectionChanges,
       skipped: skipped.length,
       skipCounts: Object.fromEntries(skipCounts),
       publishedIds: prepared.map((row) => row.id),
       // Full list, not a sample: see `PreparedPublish.locationInherited`.
       locationInheritedIds: prepared.filter((row) => row.locationInherited).map((row) => row.id),
-      // Full list for the same reason, and a stronger one: this names every record a withdrawal
-      // ruling held back on this run (repo-vj7cs). A withdrawal that quietly stopped applying is
-      // the failure mode the gate exists to prevent, so it has to be legible in the report, not
-      // just possibly inside the first 20 skips.
+      // Report every record withheld by a withdrawal decision, beyond the abbreviated skip
+      // list, so operators can verify that withdrawals remain effective.
       retractedIds: skipped
         .filter((row) => row.reason === 'catalog_decision_retracted')
         .map((row) => row.id),
@@ -833,7 +828,7 @@ async function main(): Promise<void> {
     mkdirSync(dirname(REPORT_PATH), { recursive: true });
     writeFileSync(REPORT_PATH, `${JSON.stringify(report, null, 2)}\n`);
 
-    console.log('=== Incremental publish (bb_public.release_entities) ===');
+    console.log('=== Incremental publish (published.release_entities) ===');
     console.log(`Active release: ${releaseId}`);
     console.log(`Scanned: ${sliced.length}`);
     console.log(`Eligible: ${prepared.length}`);
@@ -843,7 +838,7 @@ async function main(): Promise<void> {
       console.log('');
       console.log('Eligible IDs:');
       for (const row of prepared) {
-        console.log(`  ${row.id} (conf=${row.confidence.toFixed(3)})`);
+        console.log(`  ${row.id} (basis=${row.reviewBasis})`);
       }
     }
     if (skipped.length > 0) {
@@ -882,102 +877,104 @@ async function main(): Promise<void> {
     }
 
     await client.query('BEGIN');
-    for (const row of prepared) {
-      await upsertEntity(client, row.entityRow);
-      await upsertSearchIndex(client, row.searchRow);
-      if (row.fromLandscape && row.landscapeRow) {
-        await markLandscapeAccepted(client, row.id, row.entityRow.entity_id, row.landscapeRow);
-      }
-    }
-    await client.query('COMMIT');
-
-    // repo-xez5.12 follow-up: taxonomy (topicIds/topicTags) lives on
-    // bb_canonical.entities.kind_detail->'classification', not on whatever this run built the
-    // entity row from (landscape payload / fixture) — those never carry topics. Any entity this
-    // run just published that ALREADY has canonical kind_detail (e.g. re-publishing something an
-    // editorial pass already tagged) would otherwise ship with the taxonomy this run computed
-    // (usually blank) instead of what canonical actually knows. Re-sync from canonical
-    // immediately after commit so this incremental path can't reopen the taxonomy-drop gap that
-    // the one-time backfill (sync-release-taxonomy-from-canonical.ts) just fixed for the rest of
-    // the release. Idempotent and cheap (single scan of the release) — safe to run every time.
-    if (prepared.length > 0) {
-      const taxonomyPlan = await planReleaseTaxonomySync(client, releaseId);
-      if (taxonomyPlan.changed.length > 0) {
-        await applyReleaseTaxonomySync(client, releaseId, taxonomyPlan);
-        console.log(
-          `Re-synced taxonomy from canonical for ${taxonomyPlan.changed.length} entities.`,
-        );
-      }
-
-      // repo-66mv1: ReleaseSourceEntity carries no relationship edges, so every row this run
-      // rebuilt from source just wrote `related: []` — a republish silently stripped the
-      // connections off already-live records and the "How this record connects" beat vanished.
-      // Re-derive from canonical here, after the commit, so co-published neighbors are visible
-      // to the both-endpoints-released join, and before the graph rebuild below, which reads
-      // projection.related. This is the same shape as the taxonomy re-sync above and for the same
-      // reason: canonical knows something the source row never carried.
-      const relatedPlan = await planReleaseRelatedSync(client, releaseId);
-      if (relatedPlan.changed.length > 0) {
-        await applyReleaseRelatedSync(client, releaseId, relatedPlan);
-        console.log(
-          `Re-synced related[] from canonical edges for ${relatedPlan.changed.length} entities` +
-            `${relatedPlan.repaired > 0 ? ` (${relatedPlan.repaired} had no connections at all)` : ''}.`,
-        );
-      }
-
-      const enforceCoverage = process.env.ENFORCE_DECADE_COVERAGE !== '0';
-      console.log(
-        enforceCoverage
-          ? `  graph: decade coverage floor ${minDecadeCoverage ?? 90}%` +
-              `${minDecadeCoverage === undefined ? ' (default)' : ' (acknowledged via --min-decade-coverage)'}`
-          : '  graph: decade coverage NOT ENFORCED (ENFORCE_DECADE_COVERAGE=0)',
+    try {
+      const release = await client.query<{ readonly signed_manifest: unknown }>(
+        'SELECT signed_manifest FROM publication.releases WHERE id=$1 FOR UPDATE',
+        [releaseId],
       );
-      const graphRebuild = await rebuildReleaseGraphForRelease(client, {
-        releaseId,
-        generatedAt,
-        dryRun: false,
-        enforceCoverage,
-        ...(minDecadeCoverage !== undefined ? { minDecadeCoveragePct: minDecadeCoverage } : {}),
-      });
-      for (const line of formatReleaseGraphAuditLog(graphRebuild.audit)) {
-        console.log(`  graph: ${line}`);
+      // Every incremental upsert mutates the release, even when archive hydration itself is a
+      // no-op. Missing or malformed release state reaches the guard unchanged and fails closed.
+      assertArchiveHydrationTargetIsUnsigned(release.rows[0]?.signed_manifest, prepared.length);
+
+      if (prepared.length > 0) {
+        const transactionReviewedClaims = await loadReviewedClaimAssessments(
+          client,
+          prepared.map((row) => row.entityRow.entity_id),
+        );
+        const transactionArchives = await loadPublicCitationArchives(
+          client,
+          reviewedCitationCaptures(transactionReviewedClaims),
+          new Date().toISOString(),
+          { lock: true },
+        );
+        const transactionPrepared = hydratePreparedArchives(
+          unhydratedPrepared,
+          transactionArchives,
+        ).map((entry) => entry.row);
+        const hydrationChanged = transactionPrepared.some(
+          (row, index) =>
+            JSON.stringify(row.entityRow.projection) !==
+            JSON.stringify(prepared[index]?.entityRow.projection),
+        );
+        if (hydrationChanged) {
+          throw new Error(
+            'Archive eligibility changed after preflight; retry incremental publication',
+          );
+        }
+        prepared = transactionPrepared;
+      }
+      for (const row of prepared) {
+        await upsertEntity(client, row.entityRow);
+        await upsertSearchIndex(client, row.searchRow);
+        if (row.fromLandscape && row.landscapeRow) {
+          await markLandscapeAccepted(client, row.id, row.entityRow.entity_id, row.landscapeRow);
+        }
       }
 
-      // Everything above this line wrote derived copies — the release_entities columns, the
-      // search_index row, the two post-commit re-syncs — of facts readers only ever get from
-      // `projection`. Measure the rows this run touched against it rather than assuming.
-      //
-      // FATAL since repo-ttlce. This reported instead of throwing for one stated reason:
-      // `applyReleaseTaxonomySync` wrote the taxonomy column without the projection or the search
-      // index, so a throw would have aborted every publish that touches topics over a defect the
-      // run did not introduce. That write path now updates all three in one statement, so a
-      // divergence reported here is this run's own — and every previous time these stores drifted
-      // it was silent, which is the whole argument for failing loudly instead.
-      //
-      // It examines only the ids this run prepared (`PROJECTION_DIVERGENCE_SQL` filters on them),
-      // so the 1,729 rows repo-p1m1y is still repairing cannot trip it.
-      //
-      // The upserts are ALREADY COMMITTED when this runs — the commit is what makes the derived
-      // copies readable to compare. So this does not undo the publish and the message must not
-      // imply it did; it stops the run before the artifact-republish reminder, which is the next
-      // thing an operator would act on, and exits non-zero.
-      try {
+      // Keep reconciliation under the same release-row lock as the entity upserts. A signer
+      // cannot freeze the release between these derived writes.
+      if (prepared.length > 0) {
+        const taxonomyPlan = await planReleaseTaxonomySync(client, releaseId);
+        if (taxonomyPlan.changed.length > 0) {
+          await applyReleaseTaxonomySync(client, releaseId, taxonomyPlan);
+          console.log(
+            `Re-synced taxonomy from canonical for ${taxonomyPlan.changed.length} entities.`,
+          );
+        }
+
+        // Resync relationships after the entity upserts so both endpoints can be found in the
+        // transaction. Do this before rebuilding the graph, which reads projection.related;
+        // source rows do not carry canonical edges.
+        const relatedPlan = await planReleaseRelatedSync(client, releaseId);
+        if (relatedPlan.changed.length > 0) {
+          await applyReleaseRelatedSync(client, releaseId, relatedPlan);
+          console.log(
+            `Re-synced related[] from canonical edges for ${relatedPlan.changed.length} entities` +
+              `${relatedPlan.repaired > 0 ? ` (${relatedPlan.repaired} had no connections at all)` : ''}.`,
+          );
+        }
+
+        const enforceCoverage = process.env.ENFORCE_DECADE_COVERAGE !== '0';
+        console.log(
+          enforceCoverage
+            ? `  graph: decade coverage floor ${minDecadeCoverage ?? 90}%` +
+                `${minDecadeCoverage === undefined ? ' (default)' : ' (acknowledged via --min-decade-coverage)'}`
+            : '  graph: decade coverage NOT ENFORCED (ENFORCE_DECADE_COVERAGE=0)',
+        );
+        const graphRebuild = await rebuildReleaseGraphForRelease(client, {
+          releaseId,
+          generatedAt,
+          dryRun: false,
+          manageTransaction: false,
+          enforceCoverage,
+          ...(minDecadeCoverage !== undefined ? { minDecadeCoveragePct: minDecadeCoverage } : {}),
+        });
+        for (const line of formatReleaseGraphAuditLog(graphRebuild.audit)) {
+          console.log(`  graph: ${line}`);
+        }
+
+        // The same client can read its uncommitted writes, so divergence validation remains
+        // inside the transaction and any failure rolls the complete incremental update back.
         await assertNoProjectionDivergence(
           client,
           prepared.map((row) => row.entityRow.entity_id),
           { releaseId },
         );
-      } catch (error) {
-        const detail = error instanceof Error ? error.message : String(error);
-        throw new Error(
-          `${detail}\n\n` +
-            `The ${prepared.length} upserts above ARE COMMITTED — this check runs after COMMIT, ` +
-            'because the derived copies have to be readable to be compared. Nothing was rolled ' +
-            'back. Repair the diverged rows (see backfill-search-facets-projection.ts) before ' +
-            'republishing the catalog artifacts, or readers will serve the diverged copy.',
-          { cause: error },
-        );
       }
+      await client.query('COMMIT');
+    } catch (error) {
+      await client.query('ROLLBACK');
+      throw error;
     }
 
     const pendingAfter = Number(

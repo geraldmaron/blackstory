@@ -1,26 +1,8 @@
 /**
- * Cross-request cache for release-wide public reads.
- *
- * One rule for every public surface: no route reads Postgres per request. Anything that is the
- * same bytes for every reader until the release changes (the entity catalog, the search index,
- * the article list, the theme-impact packets) goes through here, keyed on the active release
- * pointer, with a stated TTL.
- *
- * Why the TTL is a real freshness bound and not just a memory bound: the key carries
- * `releaseId + activatedAt`, but the ops-data fix/backfill scripts upsert `bb_public.*` under
- * the same release id without bumping `activated_at`, so an in-place correction only becomes
- * visible when the TTL lapses. 30 minutes is the bound the catalog already accepted.
- *
- * Three layers, in order:
- *   1. process memory (per instance, TTL) — the hot path, zero I/O;
- *   2. single-flight — N concurrent misses on one instance produce one load, not N (the bursty
- *      full-pull pattern observed on 2026-08-08);
- *   3. Next's data cache (`unstable_cache`, shared across instances on Vercel) — so a cold
- *      instance fills from the platform cache rather than the database. Values over Next's 2MB
- *      limit store only a sentinel there and stay in process memory (see live-catalog-cache.ts).
- *
- * `undefined` from `load` means "nothing to cache" (no active release, empty table) and is
- * never stored, so a transient miss retries on the next request.
+ * Release-scoped public read cache: process memory with TTL, single-flight loading, then the
+ * shared Next data cache. In-place corrections under an unchanged release pointer become
+ * visible after cache expiry. Values above Next's size limit remain in process memory;
+ * undefined results are not cached.
  */
 import { unstable_cache } from 'next/cache';
 import {

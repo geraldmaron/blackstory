@@ -1,20 +1,7 @@
 /**
- * Release/build metadata tagging (MOB-018).
- *
- * Every crash and performance report must carry the same identifying
- * metadata so an incident can be traced to an exact build, release, and
- * runtime state — without ever carrying any of the privacy-invariant-7
- * categories (query text, correction content, precise location, citation
- * URLs, sensitive classifications). None of the fields here are in those
- * categories: they are build/version identifiers and a coarse connectivity
- * flag, not user data.
- *
- * `buildReportContext` is a PURE function (no `expo-constants` / native I/O)
- * so it is deterministically unit-testable; `bootstrap.ts` owns the runtime
- * wiring that gathers the real inputs (Constants, cache diagnostics,
- * connectivity) and calls this function. This mirrors the
- * `resolveAppCheckProviderConfig` / `initializeAppCheckClient` split already
- * used in `src/security/app-check.ts`.
+ * Build shared release/version and coarse connectivity context for crash and performance
+ * reports. Exclude queries, correction content, precise coordinates, citation URLs and
+ * sensitive classifications. This function is pure; bootstrap supplies runtime values.
  */
 
 const UNKNOWN = 'unknown';

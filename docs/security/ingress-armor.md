@@ -1,159 +1,57 @@
-# Protected public API ingress and Cloud Armor
+# Optional GCP ingress controls
 
-> **Leftover GCP ingress design — never applied, not an actionable plan.** Current public web
-> is Vercel (Cloudflare in front), not App Hosting CDN, and `api-public`/`api-submissions` are
-> Vercel-hosted too: Cloud Armor here "fronts nothing" in production (see
-> [`../runbooks/api-public-vercel.md`](../runbooks/api-public-vercel.md)). The Cloud Run +
-> Armor rows below, the "Human provisioning" steps, and the validation commands describe a
-> GCP architecture that was designed but never built, not a deferred-but-live one. Current
-> stack: [`../data/firebase-wind-down.md`](../data/firebase-wind-down.md).
+**Status:** Optional design stubs only. No Cloud Armor policy, Cloud Run service, global load
+balancer, or GCP ingress path is proven provisioned by this repository. The current product uses
+Vercel for the web deployment and public API function deployment, Cloudflare in front of the
+public web property, and Supabase for Auth, Postgres, and Storage. See
+[infra/gcp/README.md](../../infra/gcp/README.md).
 
-**Status:** Design + declarative stubs in-repo. Live GCP resources are **not** provisioned by
-this bead.
-**Machine source:** [`../../infra/gcp/armor/ingress-matrix.json`](../../infra/gcp/armor/ingress-matrix.json)
-**Decisions:** ADR-005 and ADR-010, both removed 2026-07-24, recovered in [`../decisions-carryover.md`](../decisions-carryover.md), "Service surface separation" and "Security and abuse assumptions" respectively
-**Threats:** [T-01](./threat-model.md#t-01-volumetric-and-application-layer-denial-of-service), [T-19](./threat-model.md#t-19-search-scraping-and-corpus-extraction)
+The files under infra/gcp/armor/ preserve a possible future deployment shape. They are useful for
+policy review and tests, but their JSON, diagrams, and validation commands do not establish live
+provider state.
 
-## Objective
+## Current boundary
 
-Expose `api-public` and `api-submissions` to the internet **only** through a global external
-HTTP(S) load balancer with Cloud Armor. Block direct access to Cloud Run `*.run.app` URLs.
-Cache safe read responses at the edge. Provide emergency deny controls that do not require an
-application redeploy.
+- apps/web and /admin run in the shared Vercel web deployment.
+- apps/api-public has a Vercel function entry point in apps/api-public/vercel.json.
+- apps/api-submissions has a quarantine-only capability contract. Its live provider and edge
+  controls require separate verification.
+- apps/api-internal accepts service identity in code. A private network or deployed service is not
+  proven here.
+- Admin authorization is Supabase Auth plus trusted app_metadata.app_role; IAP and Firebase are
+  not current admin controls. MFA and recent reauthentication are not enforced.
+- Application rate-limit evaluators exist in @repo/security and API packages, but the shared
+  distributed store and live middleware wiring remain follow-on work. See rate-limits.md.
 
-## Architecture
+## Conditional future design
 
-```mermaid
-flowchart TB
-  Internet([Internet clients])
-  LB[Global external HTTPS LB]
-  ArmorPub[Cloud Armor — api-public]
-  ArmorSub[Cloud Armor — api-submissions]
-  CDN[Cloud CDN — read paths]
-  NEGPub[Serverless NEG]
-  NEGSub[Serverless NEG]
-  RunPub[Cloud Run black-book-api-public]
-  RunSub[Cloud Run black-book-api-submissions]
+If a separate GCP deployment is explicitly approved and provisioned, the intended controls are:
 
-  Internet --> LB
-  LB -->|api.blackbook.app| ArmorPub
-  LB -->|submit.blackbook.app| ArmorSub
-  ArmorPub --> CDN --> NEGPub --> RunPub
-  ArmorSub --> NEGSub --> RunSub
+1. Put public API services behind an external HTTPS load balancer and Cloud Armor.
+2. Restrict direct service URLs and verify the restriction with a negative test.
+3. Apply rate, WAF, and emergency-deny policies to public traffic.
+4. Cache only safe immutable read responses at the edge. Never cache submissions or internal
+   publication operations.
+5. Record the applied provider state, service identity, ingress setting, policy revision, and
+   rollback procedure before calling the design operational.
 
-  DirectRun["*.run.app direct URL"] -.->|blocked| RunPub
-  DirectRun -.->|blocked| RunSub
-```
+Until that work is verified, treat Cloud Armor and Cloud Run references as unproven controls. Do
+not use the commands in the historical runbooks as incident instructions for the current
+Vercel/Supabase deployment.
 
-## Surfaces in scope
+## Threats and remaining checks
 
-| Surface | Hostname (design) | Cloud Run service | CDN | Armor policy |
-|---------|-------------------|-------------------|-----|--------------|
-| `api-public` | `api.blackbook.app` | `black-book-api-public` | Yes (read paths) | `black-book-api-public-armor` |
-| `api-submissions` | `submit.blackbook.app` | `black-book-api-submissions` | No | `black-book-api-submissions-armor` |
+- T-01: volumetric and application-layer denial of service.
+- T-02: expensive reads and cache bypass.
+- T-19: scraping and corpus extraction.
 
-Out of scope: `api-internal` (private ingress), `admin` (now Vercel; IAP + LB is leftover), `web` (Vercel; App Hosting CDN is leftover).
-
-## Cloud Armor policy summary
-
-Both policies include:
-
-| Priority | Control | Default |
-|----------|---------|---------|
-| 10 | Emergency deny slot | `allow` (flip to `deny(403)` via gcloud) |
-| 100–120 | Preconfigured WAF (SQLi, XSS, RCE) | `deny(403)` |
-| 200–210 | Rate-based ban per IP | `deny(429)` with ban duration |
-| 900 | Geographic restriction placeholder | **Disabled** (`preview`, match `false`) |
-| max | Default allow | `allow` |
-
-Submissions limits are **stricter** than public read (lower per-minute thresholds, longer bans).
-Policy JSON: [`../../infra/gcp/armor/policies/`](../../infra/gcp/armor/policies/).
-
-## Geographic controls
-
-**Default: OFF.** Do not enable country/region blocks without documented abuse evidence,
-impact review, and rollback plan. See
-[`../../infra/gcp/armor/geo-controls.md`](../../infra/gcp/armor/geo-controls.md).
-
-## Direct Cloud Run URL posture
-
-Both public APIs deploy with:
-
-```text
-ingress = internal-and-cloud-load-balancing
-```
-
-This ensures:
-
-- Traffic from the global LB (via serverless NEG) reaches the service.
-- Direct `https://SERVICE-xxx.run.app` requests from the public internet **fail**.
-
-Negative test procedure: [`../../infra/gcp/armor/load-test-plan.md`](../../infra/gcp/armor/load-test-plan.md) § `direct-url-negative-test`.
-
-> **Note:** [`infra/gcp/surfaces/surface-matrix.json`](../../infra/gcp/surfaces/surface-matrix.json)
-> still lists legacy `ingress: "all"` for historical  stubs. ** supersedes** that
-> deploy target for public APIs — apply `internal-and-cloud-load-balancing` at provisioning time.
-
-## Cloud CDN
-
-Enabled on `api-public` for cacheable GET responses (`/v1/search`, `/v1/entities/*`,
-`/v1/locations/nearby`, `/health`). Submissions must never be edge-cached.
-
-Details: [`../../infra/gcp/armor/cdn-design.md`](../../infra/gcp/armor/cdn-design.md).
-
-## Emergency deny (no code deploy)
-
-Pre-provisioned Armor rule **priority 10** on each policy. Activation:
-
-```bash
-gcloud compute security-policies rules update 10 \
-  --security-policy=black-book-api-public-armor \
-  --action=deny-403 \
-  --project=black-book-efaaf
-```
-
-Full runbook: [`../../infra/gcp/armor/emergency-deny-runbook.md`](../../infra/gcp/armor/emergency-deny-runbook.md).
-
-## Metrics and alerts
-
-Monitor throttles (429), WAF denials (403), backend 5xx, and adaptive protection alerts.
-Checklist: [`../../infra/gcp/armor/metrics-alerts-checklist.md`](../../infra/gcp/armor/metrics-alerts-checklist.md).
-
-## Acceptance mapping
-
-| Criterion | Evidence in repo |
-|-----------|------------------|
-| Internet traffic only through LB | `ingress-matrix.json` → `internetTrafficOnlyThroughLb`; `armor-policy.test.mjs` |
-| Direct `run.app` fails | `cloudRunIngress` fields; `load-test-plan.md` |
-| Rate limits return 429 | Policy `rateLimitOptions.exceedAction`; load-test stub |
-| Denials/throttles observable | `metrics-alerts-checklist.md` |
-| Emergency deny without deploy | Rule 10 + `emergency-deny-runbook.md` + `emergency-deny-snippet.yaml` |
-
-## Validation commands
-
-```bash
-cd infra/gcp/armor
-node --test armor-policy.test.mjs
-```
-
-Schema validation command in [`../../infra/gcp/armor/README.md`](../../infra/gcp/armor/README.md).
-
-## Human provisioning (ordered) — historical design, not a plan to execute
-
-The GCP surface this section describes was never built; `api-public`/`api-submissions` run on
-Vercel instead (see the banner above). Steps below are retained as a record of the original
-design, not instructions to carry out.
-
-1. Apply Cloud Armor policies (`policies/*.json`).
-2. Create serverless NEGs and backend services; enable CDN on public backend only.
-3. Create global external HTTPS load balancer, certificates, and DNS records.
-4. Update Cloud Run ingress to `internal-and-cloud-load-balancing` for both public APIs.
-5. Run load-test plan stub (staging); wire Monitoring alerts.
-6. Update `ingress-matrix.json` `status` to `applied` when complete.
+The repository tests policy shape and fail-closed capability decisions. It does not prove live
+Cloudflare, Vercel, Supabase, or optional GCP configuration. Provider dashboards, deployment logs,
+and a bounded staging test are required for that claim.
 
 ## Related
 
-- [Service surfaces](./service-surfaces.md)
-- [Abuse cases](./abuse-cases.md) — AC-01, AC-02, AC-19
-- [ALB / NEG design](../../infra/gcp/armor/alb-neg-design.md)
-- Follow-on beads:  (app quotas),  (telemetry),  (live load tests)
+- Service surfaces: service-surfaces.md
+- Abuse cases: abuse-cases.md
+- Cost and resource exhaustion controls: cost-resource-controls.md
+- Optional GCP Armor stubs: infra/gcp/armor/README.md

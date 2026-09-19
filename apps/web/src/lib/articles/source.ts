@@ -4,12 +4,10 @@
  * caller receives an explicit `unavailable` source and renders a degraded state
  * instead of stale substitute content.
  *
- * The whole article list (~48 docs, ~220KB) is one release-scoped read shared across
- * requests (see `release-scoped-cache.ts`). Every surface that used to issue its own query
- * per render — the `/stories` index, the cites edge on every record page and the Explore
- * catalog, the story lead on `/` and `/place`, the by-slug detail read — is now a lookup over
- * that one cached list. Before this (pg_stat_statements, 2026-07-20 → 2026-09-02) the list
- * query had run 478k times: once per dynamic request, with only per-request memoisation.
+ * The whole article list is one release-scoped read shared across requests (see
+ * `release-scoped-cache.ts`). The `/stories` index, record-page citation edges, Explore catalog,
+ * story leads, and by-slug detail reads all filter that cached list instead of issuing separate
+ * list queries.
  *
  * A detail read composes three readers: the article doc, the theme-impact
  * packets its data blocks reference (by packet id), and the entities its map

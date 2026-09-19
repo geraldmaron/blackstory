@@ -1,7 +1,7 @@
 /**
- * Load bulk discovery fixtures into Supabase bb_research.landscape_candidates.
+ * Load bulk discovery fixtures into Supabase research.landscape_candidates.
  *
- * Research-lane only: never writes bb_public.* or activates releases.
+ * Research-lane only: never writes published.* or activates releases.
  *
  * Default is dry-run (plan only). Production writes require:
  *   DRY_RUN=0 LOAD_BULK_CANDIDATES_APPLY=1 DATABASE_URL=postgresql://...
@@ -87,7 +87,7 @@ function resolveFixturePath(lane: BulkLane, explicit?: string): string {
   const absolute = join(REPO_ROOT, relative);
   if (!existsSync(absolute)) {
     // Bulk fixtures are no longer committed — Supabase holds the loaded candidates
-    // (bb_research.landscape_candidates), and this directory is gitignored working
+    // (research.landscape_candidates), and this directory is gitignored working
     // space that --fetch repopulates.
     throw new Error(
       `fixture not found: ${absolute}\n` +
@@ -161,7 +161,7 @@ function normalizePgConnectionString(connectionString: string): {
 async function upsertPlan(client: pg.PoolClient, plan: BulkFixtureLoadPlan): Promise<void> {
   const run = plan.run;
   await client.query(
-    `INSERT INTO bb_research.source_program_runs
+    `INSERT INTO research.source_program_runs
       (id, lane, source_program_id, source_program_name, custodian, license, canonical_url,
        attribution, retrieved_at, fixture_path, rows_fetched, candidate_count, dropped_count,
        summary, methodology_notes, updated_at)
@@ -201,7 +201,7 @@ async function upsertPlan(client: pg.PoolClient, plan: BulkFixtureLoadPlan): Pro
 
   for (const capture of plan.captures) {
     await client.query(
-      `INSERT INTO bb_research.source_acquisition_captures
+      `INSERT INTO research.source_acquisition_captures
         (id, run_id, url, content_sha256, bytes, cached_as, fetched_at)
        VALUES ($1,$2,$3,$4,$5,$6,$7)
        ON CONFLICT (id) DO UPDATE SET
@@ -255,7 +255,7 @@ async function upsertPlan(client: pg.PoolClient, plan: BulkFixtureLoadPlan): Pro
     });
 
     await client.query(
-      `INSERT INTO bb_research.landscape_candidates
+      `INSERT INTO research.landscape_candidates
         (id, run_id, lane, source_program_id, source_item_id, display_name, kind, summary,
          lat, lng, canonical_url, research_lane_only, status, provenance, payload,
          discovered_at, updated_at)

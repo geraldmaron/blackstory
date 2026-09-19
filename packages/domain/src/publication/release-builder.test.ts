@@ -1,6 +1,5 @@
 /**
- * Unit tests for the single deterministic per-entity release/projection builder
- * (the related workstream). See ./release-builder.ts's module doc comment for the contract.
+ * Deterministic entity/search release-builder tests.
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
@@ -67,6 +66,68 @@ test('resolveReleaseClaimId respects an explicit id when present', () => {
   const entry = baseEntry();
   const claim = { ...entry.claims![0]!, id: 'claim_custom' };
   assert.equal(resolveReleaseClaimId(entry, claim, 0), 'claim_custom');
+});
+
+test('buildReleaseEntityArtifacts retains verified archive fields beside the original citation', () => {
+  const citationHref = 'https://example.gov/record/1';
+  const archivedUrl = 'https://web.archive.org/web/20260901000000/https://example.gov/record/1';
+  const result = buildReleaseEntityArtifacts(
+    baseEntry({
+      claims: [
+        {
+          predicate: 'founded_year',
+          object: '1900',
+          confidenceLevel: 'high',
+          citationSource: 'Example Source',
+          citationHref,
+          archivedUrl,
+          archivedAt: '2026-09-01T00:00:00.000Z',
+          citationLabel: 'Example Citation',
+        },
+      ],
+    }),
+    CONTEXT,
+  );
+  assert.equal(result.ok, true);
+  if (!result.ok) return;
+  assert.equal(result.projection.claims[0]?.citationHref, citationHref);
+  assert.equal(result.projection.claims[0]?.archivedUrl, archivedUrl);
+  assert.equal(result.projection.claims[0]?.archivedAt, '2026-09-01T00:00:00.000Z');
+});
+
+test('buildReleaseEntityArtifacts rejects incomplete and wrong-source archive pointers', () => {
+  const claim = {
+    predicate: 'founded_year',
+    object: '1900',
+    confidenceLevel: 'high' as const,
+    citationSource: 'Example Source',
+    citationHref: 'https://example.gov/record/1',
+    citationLabel: 'Example Citation',
+  };
+  assert.throws(
+    () =>
+      buildReleaseEntityArtifacts(
+        baseEntry({ claims: [{ ...claim, archivedAt: '2026-09-01T00:00:00.000Z' }] }),
+        CONTEXT,
+      ),
+    /invalid archive pointer/u,
+  );
+  assert.throws(
+    () =>
+      buildReleaseEntityArtifacts(
+        baseEntry({
+          claims: [
+            {
+              ...claim,
+              archivedUrl: 'https://web.archive.org/web/20260901000000/https://other.gov/record/1',
+              archivedAt: '2026-09-01T00:00:00.000Z',
+            },
+          ],
+        }),
+        CONTEXT,
+      ),
+    /invalid archive pointer/u,
+  );
 });
 
 test('inferNotabilityCriterionFromClaim recognizes a documented "first" claim', () => {
@@ -664,7 +725,7 @@ test('buildReleaseNotabilityBasis never fabricates evidence for an uncited claim
 /**
  * Prose with no registered template fingerprint — the normal case, where coverage is decided by
  * the claim set alone. The tests below that exercise the fingerprint cap pass a templated summary
- * instead, so the two axes stay independently testable (repo-vymq).
+ * instead, so the two axes stay independently testable.
  */
 const RESEARCHED_SUMMARY =
   'Founded in 1881 by formerly enslaved families, the school served the county until 1968 and its ' +
@@ -685,9 +746,9 @@ test('computeReleaseResearchCoverage: a single cited claim is minimal', () => {
   assert.equal(computeReleaseResearchCoverage(claims, RESEARCHED_SUMMARY), 'minimal');
 });
 
-/** repo-z1pw, the exact live shape: the nrhp-black-heritage lane carves a listing fact and a
- *  significance fact out of ONE registry index row, both citing that row's own URL. Counting
- *  claims graded this 'partial' and suppressed the thin-record notice on 2,436 live records. */
+/** The exact live shape: the nrhp-black-heritage lane carves a listing fact and a
+ * significance fact out of ONE registry index row, both citing that row's own URL. Counting
+ * claims graded this 'partial' and suppressed the thin-record notice on 2,436 live records. */
 test('computeReleaseResearchCoverage: many claims citing ONE document is minimal, not partial', () => {
   const claims: readonly ReleaseClaimProjection[] = Array.from({ length: 3 }, (_, i) => ({
     id: `c${i}`,
@@ -762,7 +823,7 @@ test('computeReleaseResearchCoverage: five+ fully-cited claims across two docume
 });
 
 /**
- * repo-vymq. The claim set here is the SAME one that scores 'substantial' directly above — five
+ * The claim set here is the SAME one that scores 'substantial' directly above — five
  * fully-cited claims across two documents. Only the summary differs. A record whose description
  * was assembled from index fields cannot publish above 'minimal' no matter how its claims score,
  * because coverage is a statement about the prose a reader actually sees.
@@ -922,7 +983,7 @@ test('resolveReleaseEntityReferences fails closed on an empty jurisdictionLabel'
   if (!result.ok) assert.match(result.reason, /jurisdiction/);
 });
 
-// repo-wqcn / docs/security/location-precision-standard.md: location precision is no longer a
+// docs/security/location-precision-standard.md: location precision is no longer a
 // publish-time REJECTION gate for `resolveReleaseEntityReferences` — a prohibited raw level, a
 // living person's own residence, etc. all still reach publish; `buildReleaseEntityArtifacts`
 // COARSENS them via `reducePublicPrecision` instead (see the tests on that function below).
@@ -1130,8 +1191,8 @@ test('recordEvidenceInputs collapses one publisher spelled several ways to one l
 });
 
 test("recordEvidenceInputs keeps the record's own index row out of the evidence lineages", () => {
-  // Wikipedia stays in BOTH lists on purpose. It carries a claim and never corroborates one
-  // (repo-goyut), but that is a policy about one publisher and policy is the rule's, so the
+  // Wikipedia stays in BOTH lists on purpose. It carries claims but never counts as
+  // corroboration. This publisher-specific policy is applied by the confidence rule, so the
   // projection records it and `confidenceTierFromEvidenceInputs` discounts it.
   assert.deepEqual(
     recordEvidenceInputs([
@@ -1144,8 +1205,8 @@ test("recordEvidenceInputs keeps the record's own index row out of the evidence 
       evidenceLineageKeys: ['npgallery.nps.gov', 'wikipedia'],
     },
   );
-  // nrhp-black-heritage-00000006: the listing claims are the NARA row the record was seeded
-  // from, so the nomination form is the only document evidencing anything (repo-6jizv). Every
+  // nrhp-black-heritage-00000006: the listing claims cite the same NARA row that seeded the
+  // record, so the nomination form is the only document evidencing anything. Every
   // claim states its role explicitly, matching what the publisher writes post-migration.
   assert.deepEqual(
     recordEvidenceInputs([

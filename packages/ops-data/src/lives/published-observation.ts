@@ -1,5 +1,5 @@
 /**
- * One published figure as `bb_reference.statistical_observations` stores it, whichever census table it
+ * One published figure as `reference.statistical_observations` stores it, whichever census table it
  * came from. The ACS and decennial loaders build these; `scripts/lib/lives-nhgis-ingest.ts` writes them.
  * Method: docs/methodology/lives-across-decades.md.
  */

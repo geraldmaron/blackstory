@@ -6,7 +6,7 @@
  */
 
 /* -------------------------------------------------------------------------------------------- *
- * EraTimeline — horizontal event strip moment (repo-cqey.9).
+ * EraTimeline — horizontal event strip moment.
  * -------------------------------------------------------------------------------------------- */
 
 .ds-era-timeline {
@@ -137,7 +137,7 @@
 }
 
 /* -------------------------------------------------------------------------------------------- *
- * MapInsetMoment — small static map panel moment (repo-cqey.9).
+ * MapInsetMoment — small static map panel moment.
  * -------------------------------------------------------------------------------------------- */
 
 .ds-map-inset-moment {

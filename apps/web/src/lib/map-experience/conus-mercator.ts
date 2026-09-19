@@ -4,7 +4,8 @@
  * The board under the live plate has to be the plate's own picture: same projection, same box,
  * same frame. Albers (the record locator's projection, albers-usa.ts) can never be that picture —
  * a conic equal-area board arcs the 49th parallel a tenth of its height where Mercator draws it
- * straight — so the handoff read as one map replaced by another on every load (repo-27uao).
+ * straight. Using the Albers projection here would make the handoff look like one map replacing
+ * another.
  *
  * This module projects onto the box the plate opens on: `US_CONUS_BOUNDS`, which MapStage's
  * constructor fits to the canvas. A pin percent here and the plate's `project()` land on the same

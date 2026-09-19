@@ -17,8 +17,8 @@ const NOW = '2026-09-12T00:00:00.000Z';
 
 test('buildDiscoveryCatalogQuery joins the active release and parameterizes the limit', () => {
   const { sql, params } = buildDiscoveryCatalogQuery({ limit: 500 });
-  assert.match(sql, /FROM bb_public\.search_index si/);
-  assert.match(sql, /JOIN bb_public\.v_active_release_id v ON v\.release_id = si\.release_id/);
+  assert.match(sql, /FROM published\.search_index si/);
+  assert.match(sql, /JOIN published\.v_active_release_id v ON v\.release_id = si\.release_id/);
   assert.match(sql, /LIMIT \$1/);
   assert.deepEqual(params, [500]);
 });

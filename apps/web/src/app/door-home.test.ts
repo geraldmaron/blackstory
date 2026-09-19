@@ -88,7 +88,7 @@ test('cold `/explore` mounts the same Door browse shell, not a second instrument
   // Cold browse never runs journey framing; still flip `framed` so the field canvas clears.
   assert.match(immersive, /if \(browseModeRef\.current\) \{[\s\S]*?setFramed\(true\)/);
 });
-test('the Door has one map: no static board, no layout zoom, no pin plate (repo-18ma2)', () => {
+test('the Door has one map: no static board, no layout zoom, no pin plate', () => {
   assert.doesNotMatch(immersive, /FirstPaintPinPlate|usePinPhotoHoverAnchor|locatorPinPercent/);
   assert.doesNotMatch(immersive, /ds-door__board|ds-door__ground|focus\.scale|is-zoomed/);
   assert.doesNotMatch(css, /ds-door__board|ds-door__ground|us-locator\.svg|ds-first-paint/);
@@ -303,9 +303,14 @@ test('a reader without a plate is told so, where the map would be, and sent to t
     immersive,
     /plateUnavailable \? \([\s\S]*ds-door__field-note[\s\S]*href="\/records"/,
   );
-  // No JavaScript: the server component says so above the chapters.
+  // The server-rendered fallback remains useful when JavaScript is unavailable.
+  assert.match(door, /<DoorNoscript view=\{noscriptView\}/);
+  const noscript = readFileSync(
+    fileURLToPath(new URL('./door-noscript.tsx', import.meta.url)),
+    'utf8',
+  );
   assert.match(
-    door,
+    noscript,
     /<noscript>[\s\S]*ds-door__noscript[\s\S]*href="\/records"[\s\S]*<\/noscript>/,
   );
   assert.match(css, /\.ds-door__field-note,\s*\.ds-door__noscript\s*\{/);

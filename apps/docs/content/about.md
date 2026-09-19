@@ -87,26 +87,16 @@ Confidence stays visible. Color is never the only signal. Citations should carry
 archived captures before they meet our public evidence bar. That bar measures
 readiness of the evidence ledger, not coverage of the entire field.
 
-## Where we are today
+## What is implemented
 
-The public product is live and growing. Verified 2026-08-28:
-[blackstory.app](https://blackstory.app/) is still the old catalog filter board
-(Kind / Tone / Era / Theme / Status / Confidence / Where) with about 4,100
-released records, hosted on Vercel, reading Supabase Postgres. That is
-production today.
+The web application reads reviewed release projections from Supabase Postgres and is hosted
+on Vercel. The research framework records source evidence, relationship proposals, unresolved
+needs and bounded execution state. It can be used through explicit CLI commands across model
+sessions. Research proposals do not authorize publication.
 
-The intended first-run, sat 2026-08-28 on isolated branch
-`cursor/first-paint-local-119c` at localhost:3048 (commit `0dfc8f5a`), is
-Greenwood first, with header rooms Atlas and Library only. It does not list
-Journey as a room, and it does not put a confidence grade or a source count on
-first paint. `/?atlas=1` 308s home. That chrome is not live until that isolated
-work lands. The product line *History, pinned to place* is still the design
-target. It is not a claim that today's homepage already looks like that first-run.
-
-The catalog is not a finished national inventory. Capture coverage, developer
-query surfaces, and leftover cloud wiring (Firebase / GCS / parked PostGIS) are
-still catching up to the current stack. This docs site is the orientation
-layer. The repository is the source of truth.
+The catalog is not a finished inventory. Source-capture coverage, semantic retrieval quality,
+identity resolution and historical missingness require continuing evaluation. The repository's
+research guide distinguishes working mechanisms from unmeasured research quality.
 
 If you are here to contribute, start with [Install and bootstrap](./install.md)
 and the [Architecture](./architecture.md) guide. If you are here to understand

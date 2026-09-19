@@ -1,5 +1,5 @@
 /**
- * Storage-neutral parsers for Postgres `bb_public` release rows.
+ * Storage-neutral parsers for Postgres `published` release rows.
  * Same schemas as `apps/web/src/lib/public-data/projection-contracts.ts`.
  */
 import {

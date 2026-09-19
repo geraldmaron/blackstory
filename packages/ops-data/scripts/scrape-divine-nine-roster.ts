@@ -1,72 +1,9 @@
 /**
- * Lane B / repo-bmmo — deterministic Divine Nine (NPHC) roster + founders scraper.
- *
- * Stages the nine National Pan-Hellenic Council ("Divine Nine") organizations
- * (kind='organization') and their individually-verified founders
- * (kind='person') into bb_research.landscape_candidates (lane='divine-nine').
- * No LLM anywhere.
- *
- * Unlike scrape-negro-leagues-hof-roster.ts / scrape-hbcu-roster-diff.ts,
- * there is no single machine-parseable listing page across all nine
- * organizations — each org publishes its own history/founders page, several
- * behind bot-detection (Cloudflare challenge pages, image-based responses)
- * that this pipeline's safe-fetch transport cannot get past. Because of that,
- * DIVINE_NINE_ROSTER below is a hardcoded candidate list, but every row is
- * still gated the same way the scraped-HTML scripts gate theirs: at runtime
- * this script re-fetches each row's own sourceUrl via fetchPage() and only
- * stages the row if the fetch succeeds AND the row's own displayName text
- * (or a documented alias) appears in the fetched page text. Rows that fail
- * that check are reported as urlFailed/nameNotFound and never staged — same
- * as a scraped row failing verification in the sibling scripts.
- *
- * Sourcing notes (as of 2026-07, verified by curl with a browser User-Agent
- * during construction of this dataset — see VERIFICATION_SOURCE per row):
- *   - Alpha Phi Alpha (apa1906.net/our-history/): org + all 7 Jewel founders
- *     confirmed present in fetched page text.
- *   - Alpha Kappa Alpha (aka1908.com/): org confirmed (name + "1908" present
- *     on the fetched homepage). The site's dedicated history/founders page
- *     returns a binary (non-HTML) bot-challenge response to this pipeline's
- *     fetcher, so individual AKA founder names could NOT be verified and are
- *     deliberately omitted — see UNVERIFIED_NAMES below.
- *   - Kappa Alpha Psi (kappaalphapsi1911.com): every page on this domain
- *     returned HTTP 403 (Cloudflare) to this pipeline's fetcher at
- *     construction time. Org and founders both omitted from the roster below
- *     and reported as unverified; the org row can be added once the page is
- *     reachable.
- *   - Omega Psi Phi (oppf.org/about-omega/): org + 3 undergraduate founders +
- *     faculty adviser Ernest Everett Just confirmed present.
- *   - Delta Sigma Theta (deltasigmatheta.org/): org confirmed (name + "1913"
- *     + "Howard University" present on the fetched homepage). No official
- *     page listing all 22 individual founders was reachable via this
- *     pipeline's fetcher at construction time; individual DST founders are
- *     omitted — see UNVERIFIED_NAMES below.
- *   - Phi Beta Sigma (phibetasigma1914.org/history/): org + all 3 founders
- *     confirmed present.
- *   - Zeta Phi Beta (zphib1920.org/about/founders-first-initiates/): org +
- *     all 5 founders confirmed present.
- *   - Sigma Gamma Rho (sgrho1922.org/her-story/): org + all 7 founders
- *     confirmed present.
- *   - Iota Phi Theta (iotaphitheta.org/founders/): org + all 12 founders
- *     confirmed present.
- *
- * Dedup: lane='divine-nine' has no prior rows (new lane), so the meaningful
- * diff is against bb_canonical.entities.display_name — several Divine Nine
- * founders or orgs may already be canonical entities in this dataset and
- * must not be re-staged.
- *
- * Default is dry-run (plan + report only, no database writes). Production
- * writes require:
- *   DRY_RUN=0 DIVINE_NINE_APPLY=1 DATABASE_URL=postgresql://...
- *
- * Usage (from repo root):
- *   set -a && source apps/web/.env.local && set +a
- *   export DATABASE_SSL=1
- *   node --conditions development --import tsx \
- *     packages/ops-data/scripts/scrape-divine-nine-roster.ts
- *
- * Apply DB writes (after reviewing the dry-run report):
- *   DRY_RUN=0 DIVINE_NINE_APPLY=1 node --conditions development --import tsx \
- *     packages/ops-data/scripts/scrape-divine-nine-roster.ts
+ * Stage the explicit Divine Nine organizations and founders roster only when the source fetch
+ * succeeds and contains the name or documented alias. Report unreachable or unverified rows;
+ * missing founder names remain omitted. Each row's VERIFICATION_SOURCE records its basis.
+ * Name-based suppression can miss distinct entities and is not an identity decision. Default
+ * dry-run; writes require DRY_RUN=0 and DIVINE_NINE_APPLY=1.
  */
 import { mkdirSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
@@ -87,7 +24,7 @@ const SOURCE_PROGRAM_NAME =
   'National Pan-Hellenic Council (Divine Nine) member organizations — official org history/founders pages';
 const LANE = 'divine-nine';
 /**
- * bb_research.source_program_runs.lane has a CHECK constraint restricted to
+ * research.source_program_runs.lane has a CHECK constraint restricted to
  * ('dc-sites','greenbook','hbcu','nrhp','wikidata','other') — 'divine-nine'
  * isn't a member, so the *run* row uses 'other' while every candidate row
  * still carries lane='divine-nine' (landscape_candidates.lane has no CHECK).
@@ -477,11 +414,11 @@ async function main(): Promise<void> {
 
   const pool = new pg.Pool(normalizePgConnectionString(databaseUrl));
   const existingLandscapeRes = await pool.query<ExistingLandscapeRow>(
-    `SELECT display_name, canonical_url FROM bb_research.landscape_candidates WHERE lane = $1`,
+    `SELECT display_name, canonical_url FROM research.landscape_candidates WHERE lane = $1`,
     [LANE],
   );
   const existingEntitiesRes = await pool.query<ExistingEntity>(
-    `SELECT display_name FROM bb_canonical.entities`,
+    `SELECT display_name FROM canonical.entities`,
   );
 
   const existingLandscapeNames = new Set(
@@ -493,7 +430,7 @@ async function main(): Promise<void> {
 
   console.log(
     `Existing landscape_candidates (lane='${LANE}'): ${existingLandscapeRes.rows.length}. ` +
-      `bb_canonical.entities total: ${existingEntitiesRes.rows.length}.`,
+      `canonical.entities total: ${existingEntitiesRes.rows.length}.`,
   );
 
   let dedupedOutLandscapeLane = 0;
@@ -600,7 +537,7 @@ async function main(): Promise<void> {
     await client.query('BEGIN');
     const runId = `divine-nine-${report.generatedAt.slice(0, 10)}`;
     await client.query(
-      `INSERT INTO bb_research.source_program_runs
+      `INSERT INTO research.source_program_runs
         (id, lane, source_program_id, source_program_name, canonical_url, retrieved_at,
          rows_fetched, candidate_count, dropped_count, summary, updated_at)
        VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,now())
@@ -627,7 +564,7 @@ async function main(): Promise<void> {
       const id = `${LANE}-${row.sourceItemId}`;
       const sourceRow = DIVINE_NINE_ROSTER.find((r) => r.sourceItemId === row.sourceItemId)!;
       await client.query(
-        `INSERT INTO bb_research.landscape_candidates
+        `INSERT INTO research.landscape_candidates
           (id, run_id, lane, source_program_id, source_item_id, display_name, kind, summary,
            lat, lng, canonical_url, research_lane_only, status, provenance, payload, discovered_at, updated_at)
          VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,true,'pending',$12,$13,$14,now())

@@ -1,10 +1,7 @@
 /**
- * Client attestation for direct API callers (mobile, future native surfaces).
- *
- * Replaces Firebase App Check for the public read/submissions boundary: a well-formed
- * `X-BlackStory-Client` header proves the caller is an honest shipped client declaring
- * its platform and API major. Abuse control remains rate limits + guardrails — this is
- * not authorization.
+ * Client-version protocol for direct API callers.
+ * A caller can forge this header. It grants no identity, authorization, or higher quota tier;
+ * server rate limits and query budgets must bound all anonymous callers.
  */
 export const CLIENT_VERSION_HEADER = 'x-blackstory-client';
 
@@ -112,7 +109,7 @@ export function createClientAttestationGuard(
   };
 }
 
-/** True when the request carries a parseable client version header (rate-limit trust signal). */
+/** True when the request carries a parseable client version header (client protocol signal). */
 export function isClientAttested(headers: ClientAttestationHeaders): boolean {
   const raw = headerValue(headers, CLIENT_VERSION_HEADER);
   return Boolean(raw && parseClientVersionHeader(raw));

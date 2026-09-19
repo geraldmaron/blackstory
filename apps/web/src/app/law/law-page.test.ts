@@ -96,7 +96,7 @@ test('law browse lede preserved without em dashes, and the room is not titled ci
   assert.doesNotMatch(LAW_EDITION_BROWSE_LEDE, /civil rights/i);
 });
 
-// SP-12c (repo-92n2.12.3): the connected-records hand-off, camera dignity, prev/next, and the
+// The contract covers the connected-records hand-off, camera dignity, prev/next navigation, and
 // deliberate absence of a jurisdiction plate. `law-detail-sections.test.tsx` exercises the real
 // seed data through the real `buildLensHandoff` guard; these pin the source-level contract.
 

@@ -73,7 +73,7 @@ test('deriveEraBucket buckets by decade and is undefined without any temporal an
     deriveEraBucket({
       kind: 'person',
       displayName: 'x',
-      person: { livingStatus: 'deceased', birthYear: 1957, deathYear: null },
+      person: { birthYear: 1957, deathYear: null },
     }),
     '1950s',
   );

@@ -1,11 +1,11 @@
 /**
- * repo-n7p6.3 (WS3) — OCR quality scoring for captured evidence.
+ * OCR quality scoring for captured evidence.
  *
  * NPS nomination forms are scans, OCR'd at varying quality by form vintage. The sampled 1999
  * form reads cleanly; the 1990 one renders "NPS Form" as "NFS Form" and drops characters mid
  * word ("individua properties and districts^ Sge losiiuctions"). A model handed that text will
  * not refuse — it will smooth the noise into confident prose and we will publish invented
- * history under a federal citation. So bad OCR is quarantined here, before it can reach WS4.
+ * history under a federal citation. Bad OCR is quarantined here before downstream drafting.
  *
  * The score is a deliberately boring bag of signals rather than anything clever: real English
  * prose has a stable ratio of letters to junk, a stable mean word length, and very few tokens
@@ -16,7 +16,7 @@
  * scattered through the collectors.
  */
 
-/** Evidence scoring at or above this is usable by WS4; below it is quarantined. */
+/** Evidence at or above this score may enter drafting; lower-scoring text is quarantined. */
 export const QUARANTINE_BELOW = 0.62;
 
 /** Below this many characters there is not enough prose to be worth enriching from. */

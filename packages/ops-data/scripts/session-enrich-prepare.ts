@@ -1,13 +1,11 @@
 /**
- * repo-n7p6.4 (WS4) — session-driven variant of enrich-entities-llm.ts.
+ * Offline variant of enrich-entities-llm.ts.
  *
- * Prints the exact same prompts the harness would send to OpenRouter, but for an operator (or
- * the Claude Code session itself, via a Haiku subagent) to answer directly — no OpenRouter
- * spend, no separate ANTHROPIC_API_KEY. The prompt content comes from the SAME
+ * Exports the exact prompts used by the provider-backed enrichment path for offline drafting.
+ * The prompt content comes from the same
  * buildEnrichmentUserPrompt/ENTITY_ENRICHMENT_SYSTEM_PROMPT/fetchEnrichmentSubjects that
- * enrich-entities-llm.ts uses, so a session-drafted answer and an OpenRouter-drafted answer are
- * validated by the exact same rules in validateEnrichmentResponse — nothing about the trust
- * model changes, only who answers.
+ * enrich-entities-llm.ts uses, so offline and provider-backed answers are validated by the same
+ * rules in validateEnrichmentResponse.
  *
  * Usage (from repo root):
  *   set -a && source apps/web/.env.local && set +a

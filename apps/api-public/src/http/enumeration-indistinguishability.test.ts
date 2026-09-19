@@ -1,8 +1,6 @@
 /**
- * Timing-channel / enumeration indistinguishability tests (repo-rw1p, T3).
- *
- * Uses a deterministic tracing data-access adapter to record backend lookup patterns — same call
- * sequence and stable error shape for nonexistent vs unpublished ids, without flaky wall-clock timing.
+ * Enumeration tests compare backend lookup sequences and error shapes for nonexistent and
+ * unpublished ids without depending on wall-clock timing.
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
@@ -110,8 +108,7 @@ test('T3: nonexistent and unpublished ids share identical backend lookup trace',
     callPattern(unpublishedTrace),
     'nonexistent and unpublished must hit the same backend lookup sequence',
   );
-  // repo-n7p6.29 added the merge-redirect lookup. It runs on EVERY miss, absorbed or not, which
-  // is exactly what keeps this trace identical for the two ids under test.
+  // The redirect lookup runs on every miss, keeping the two traces identical.
   assert.deepEqual(callPattern(nonexistentTrace), [
     'getReleasePointer',
     'getEntity',
@@ -122,7 +119,7 @@ test('T3: nonexistent and unpublished ids share identical backend lookup trace',
 });
 
 test('T3: a merge redirect does not widen the enumeration surface for unpublished ids', async () => {
-  // The absorbed id is published in bb_public.release_entity_redirects on purpose — it was a
+  // The absorbed id is published in published.release_entity_redirects on purpose — it was a
   // public URL before the merge. Every OTHER miss must still be indistinguishable.
   const traced = traceDataAccess(
     createInMemoryPublicDataAccess({

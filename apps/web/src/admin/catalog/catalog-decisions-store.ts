@@ -1,7 +1,7 @@
 /**
  * Bulk admin decisions on published catalog entities (flag for retraction, needs review,
  * clear). Records audited DECISIONS only — this never mutates the entity or a release directly.
- * Writes only to Postgres (bb_ops.catalog_decisions).
+ * Writes only to Postgres (ops.catalog_decisions).
  *
  * The whole selection commits with one INSERT ... SELECT over `unnest($1::text[])` inside one
  * audited transaction, the same set-based shape as the canonical bulk field edit in

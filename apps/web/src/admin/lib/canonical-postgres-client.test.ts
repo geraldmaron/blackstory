@@ -1,5 +1,5 @@
 /**
- * Proves the pool fails fast instead of hanging a server-rendered page (repo-7pqy).
+ * Proves the pool fails fast instead of hanging a server-rendered page.
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';

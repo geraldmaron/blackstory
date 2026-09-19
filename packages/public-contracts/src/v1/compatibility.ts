@@ -1,7 +1,7 @@
 /**
  * Client-version-floor compatibility check — the pure, environment-neutral function both
- * `apps/api-public` (server-side enforcement, MOB-004) and `apps/mobile` (client-side self-check
- * before even calling the server, MOB-009) can share (`docs/decisions-carryover.md`, "ADR-021's
+ * `apps/api-public` (server-side enforcement, API compatibility) and `apps/mobile` (client-side self-check
+ * before even calling the server, mobile client) can share (`docs/decisions-carryover.md`, "ADR-021's
  * two invariants": app/API compatibility).
  *
  * This module does NOT parse the `X-BlackStory-Client` header itself (header parsing is

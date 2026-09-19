@@ -1,5 +1,5 @@
 /**
- * Faceted, paginated, sortable server-side query layer for bb_canonical.entities.
+ * Faceted, paginated, sortable server-side query layer for canonical.entities.
  *
  * Replaces the previous `ORDER BY updated_at DESC LIMIT 200` + client-side substring filter,
  * which made ~95% of the 4,097-row catalog unreachable from the UI. Every filter, sort, and
@@ -132,7 +132,7 @@ function buildWhere(query: EntityQuery, omit?: keyof EntityQuery): WhereClause {
       OR e.id ILIKE ${needle}
       OR e.aliases::text ILIKE ${needle}
       OR EXISTS (
-        SELECT 1 FROM bb_canonical.entity_identifiers ei
+        SELECT 1 FROM canonical.entity_identifiers ei
         WHERE ei.entity_id = e.id AND ei.value ILIKE ${needle}
       )
     )`);
@@ -166,7 +166,7 @@ function buildWhere(query: EntityQuery, omit?: keyof EntityQuery): WhereClause {
   }
 
   if (query.withoutClaims && omit !== 'withoutClaims') {
-    conditions.push(`NOT EXISTS (SELECT 1 FROM bb_canonical.claims c WHERE c.entity_id = e.id)`);
+    conditions.push(`NOT EXISTS (SELECT 1 FROM canonical.claims c WHERE c.entity_id = e.id)`);
   }
 
   return {
@@ -282,7 +282,7 @@ export async function queryEntityPage(query: EntityQuery): Promise<EntityPage> {
   const direction = query.direction === 'asc' ? 'ASC' : 'DESC';
 
   const countRows = await queryPostgres<{ readonly total: string }>(
-    `SELECT count(*)::text AS total FROM bb_canonical.entities e ${where.sql}`,
+    `SELECT count(*)::text AS total FROM canonical.entities e ${where.sql}`,
     where.params,
   );
   const total = Number(countRows[0]?.total ?? 0);
@@ -297,10 +297,10 @@ export async function queryEntityPage(query: EntityQuery): Promise<EntityPage> {
        e.id, e.kind, e.entity_class, e.display_name, e.living_status,
        e.sensitivity, e.aliases, e.merge_state, e.created_at, e.updated_at,
        coalesce(cc.claim_count, 0) AS claim_count
-     FROM bb_canonical.entities e
+     FROM canonical.entities e
      LEFT JOIN (
        SELECT entity_id, count(*)::int AS claim_count
-       FROM bb_canonical.claims
+       FROM canonical.claims
        GROUP BY entity_id
      ) cc ON cc.entity_id = e.id
      ${where.sql}
@@ -328,7 +328,7 @@ async function facetCounts(
     // ORDER BY the numeric count, not the text-cast alias — ordering by the alias sorts
     // lexicographically, which puts 79 above 3195.
     `SELECT ${expression} AS value, count(*)::text AS count
-     FROM bb_canonical.entities e
+     FROM canonical.entities e
      ${where.sql}
      GROUP BY 1
      ORDER BY count(*) DESC, 1 ASC`,
@@ -368,7 +368,7 @@ export async function queryMatchingEntityIds(
 ): Promise<readonly string[]> {
   const where = buildWhere(query);
   const rows = await queryPostgres<{ readonly id: string }>(
-    `SELECT e.id FROM bb_canonical.entities e ${where.sql} ORDER BY e.id ASC LIMIT $${
+    `SELECT e.id FROM canonical.entities e ${where.sql} ORDER BY e.id ASC LIMIT $${
       where.params.length + 1
     }`,
     [...where.params, cap],

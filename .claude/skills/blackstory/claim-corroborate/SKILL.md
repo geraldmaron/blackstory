@@ -34,6 +34,19 @@ Tier-1 references, never returned as evidence itself.
 `confidenceLevel: 'low'` exists on the public claim contract and must be used when evidence
 is thin. Do not silently upgrade to `high`.
 
+## Claim-relative fitness and uncertainty
+
+An institution can be authoritative for its own records and still omit, misidentify or erase a
+subject. Community archives, attributed oral histories and contemporary Black press can be the
+best evidence for a claim. The existing source ladder is a retrieval heuristic, not a universal
+truth hierarchy. Preserve disagreement and search the strongest alternative; do not let a
+host's reputation substitute for what its document establishes.
+
+Keep identity, entailment, lineage, source fitness and archival coverage separate. Numeric model
+confidence is uncalibrated unless held-out evaluation establishes otherwise. “Not found” requires
+a record of search terms, collection coverage, period, access and OCR limitations; otherwise it
+says nothing about historical absence. See the [research framework](../../../../docs/research/README.md).
+
 ## Source ladder (same subject, different lineage)
 
 `corroborate-source.ts` already tries, in order:

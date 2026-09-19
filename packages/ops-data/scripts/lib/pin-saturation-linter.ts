@@ -1,7 +1,7 @@
 /**
  * Pin-saturation linter: catches people pinned at the institution that honors them.
  *
- * repo-9ki8 found Harriet Tubman's record pinned at her visitor center. repo-x8j6 found the same
+ * Previous audits found Harriet Tubman's record pinned at her visitor center and the same
  * shape at scale: 28 Negro Leagues figures on one coordinate at the Baseball Hall of Fame, 11
  * members of Congress on the US Capitol, 10 military figures on Arlington National Cemetery.
  * Nobody was born in a hall of fame. The pin was the museum's, filed under the person's name.

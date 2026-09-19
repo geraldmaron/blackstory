@@ -14,7 +14,7 @@ import { rewriteStory, validateStoryRewrite } from './story-rewrite.js';
 // NOTE: `getSeedStoryProjection` here pulls from the @repo/domain legacy seed
 // corpus purely as a stable, ready-made StoryProjection fixture for exercising
 // the mock rewrite/validation gates below. It is unrelated to the retired
-// runStoryRewriteLane batch lane (repo-gvd0) and does not depend on the
+// runStoryRewriteLane batch lane and does not depend on the
 // seed stories being served on any live route.
 
 test('mock story rewrite body passes validation gates for seed stories', () => {

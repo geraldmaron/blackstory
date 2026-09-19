@@ -1,43 +1,8 @@
 /**
- * repo-n7p6.15 — make an entity merge STAY merged.
- *
- * merge-duplicate-hubs.ts performs a merge correctly: it marks the absorbed entity
- * `merge_state.status='absorbed'`, records the ledger row, and repoints every edge onto the
- * survivor. What it cannot do is keep that true. Nothing downstream reads `merge_state`, so an
- * absorbed id stays a live, writable target across the whole pipeline:
- *
- *   - `publish-release-entities-incremental.ts` selects `FROM bb_canonical.entities WHERE id =
- *     ANY(...)` with no merge filter, so an absorbed entity publishes like any other. Both SCLC
- *     records and both SNCC records were live in the active release, six days after they were
- *     merged on 2026-07-29 — a reader searching "SCLC" got two results for one organization.
- *   - Relationship inference re-created 41 edges pointing at the absorbed ids on 2026-08-04,
- *     re-splitting the graph the merge had just joined.
- *
- * So this is a reconciler, not a one-shot repair, and it is deliberately generic over the merge
- * ledger rather than hardcoded to a pair: it re-derives the absorbed→survivor map from every
- * ACTIVE merge and re-asserts it. Running it twice is a no-op. Run it after any pass that writes
- * relationships. The durable half of the fix is the publish-side filter (see
- * `absorbedEntityIds` usage in publish-release-entities-incremental.ts) — this script repairs
- * what already drifted.
- *
- * Reversed merges (`entity_merges.status <> 'active'`) are ignored, so un-merging an entity and
- * re-running does not re-absorb it.
- *
- * repo-n7p6.29: it also publishes the map it just enforced into
- * `bb_public.release_entity_redirects`, in the same transaction as the unpublish. Removing the
- * absorbed record was right; killing its URL was not, and the public readers cannot see the
- * ledger (bb_canonical merge tables are staff-only RLS). That table is what lets `/entity/{id}`
- * and `/v1/entity/{id}` forward an absorbed id to its survivor instead of 404ing it.
- *
- * Usage (from repo root):
- *   set -a && source apps/web/.env.local && set +a
- *   export DATABASE_SSL=1
- *   node --conditions development --import tsx \
- *     packages/ops-data/scripts/reconcile-absorbed-entities.ts
- *
- * Apply:
- *   DRY_RUN=0 RECONCILE_ABSORBED_ENTITIES_APPLY=1 node --conditions development --import tsx \
- *     packages/ops-data/scripts/reconcile-absorbed-entities.ts
+ * Reconcile absorbed entities from the active merge ledger: repoint edges, remove absorbed
+ * release rows and publish terminal-survivor redirects in one transaction. Reversed merges are
+ * excluded. Run after relationship writes; the publisher also excludes absorbed ids. Default
+ * dry-run; writes require DRY_RUN=0 and RECONCILE_ABSORBED_ENTITIES_APPLY=1.
  */
 import pg from 'pg';
 import { remindToRepublishCatalogArtifacts } from './lib/catalog-republish-reminder.ts';
@@ -78,8 +43,8 @@ async function loadActiveMerges(client: pg.PoolClient): Promise<readonly MergePa
     reason: string;
   }>(
     `SELECT a.absorbed_id, m.survivor_id, m.reason
-       FROM bb_canonical.entity_merge_absorbed a
-       JOIN bb_canonical.entity_merges m ON m.id = a.merge_id
+       FROM canonical.entity_merge_absorbed a
+       JOIN canonical.entity_merges m ON m.id = a.merge_id
       WHERE m.status = 'active'`,
   );
   const direct = new Map(rows.map((r) => [r.absorbed_id, r.survivor_id]));
@@ -125,7 +90,7 @@ async function repointGraph(client: pg.PoolClient, pairs: readonly MergePair[]):
   counts.relationships_from =
     (
       await client.query(
-        `UPDATE bb_canonical.entity_relationships
+        `UPDATE canonical.entity_relationships
             SET from_entity_id = $1::jsonb ->> from_entity_id, updated_at = now()
           WHERE from_entity_id = ANY($2::text[])`,
         [map, absorbed],
@@ -134,7 +99,7 @@ async function repointGraph(client: pg.PoolClient, pairs: readonly MergePair[]):
   counts.relationships_to =
     (
       await client.query(
-        `UPDATE bb_canonical.entity_relationships
+        `UPDATE canonical.entity_relationships
             SET to_entity_id = $1::jsonb ->> to_entity_id, updated_at = now()
           WHERE to_entity_id = ANY($2::text[])`,
         [map, absorbed],
@@ -151,7 +116,7 @@ async function repointGraph(client: pg.PoolClient, pairs: readonly MergePair[]):
   counts.relationship_self_loops =
     (
       await client.query(
-        `DELETE FROM bb_canonical.entity_relationships
+        `DELETE FROM canonical.entity_relationships
           WHERE from_entity_id = to_entity_id AND from_entity_id = ANY($1::text[])`,
         [survivors],
       )
@@ -159,8 +124,8 @@ async function repointGraph(client: pg.PoolClient, pairs: readonly MergePair[]):
   counts.relationship_duplicates =
     (
       await client.query(
-        `DELETE FROM bb_canonical.entity_relationships r1
-          USING bb_canonical.entity_relationships r2
+        `DELETE FROM canonical.entity_relationships r1
+          USING canonical.entity_relationships r2
           WHERE r1.from_entity_id = r2.from_entity_id
             AND r1.to_entity_id = r2.to_entity_id
             AND r1.relationship_type = r2.relationship_type
@@ -173,7 +138,7 @@ async function repointGraph(client: pg.PoolClient, pairs: readonly MergePair[]):
   counts.participation_participant =
     (
       await client.query(
-        `UPDATE bb_canonical.event_participation
+        `UPDATE canonical.event_participation
             SET participant_id = $1::jsonb ->> participant_id, updated_at = now()
           WHERE participant_id = ANY($2::text[])`,
         [map, absorbed],
@@ -182,7 +147,7 @@ async function repointGraph(client: pg.PoolClient, pairs: readonly MergePair[]):
   counts.participation_event =
     (
       await client.query(
-        `UPDATE bb_canonical.event_participation
+        `UPDATE canonical.event_participation
             SET event_id = $1::jsonb ->> event_id, updated_at = now()
           WHERE event_id = ANY($2::text[])`,
         [map, absorbed],
@@ -199,8 +164,8 @@ async function repointGraph(client: pg.PoolClient, pairs: readonly MergePair[]):
   counts.participation_duplicates =
     (
       await client.query(
-        `DELETE FROM bb_canonical.event_participation p1
-          USING bb_canonical.event_participation p2
+        `DELETE FROM canonical.event_participation p1
+          USING canonical.event_participation p2
           WHERE p1.event_id = p2.event_id
             AND p1.participant_id = p2.participant_id
             AND p1.role IS NOT DISTINCT FROM p2.role
@@ -217,7 +182,7 @@ async function repointGraph(client: pg.PoolClient, pairs: readonly MergePair[]):
  *
  * Deleting the release row is the correct operation, not blanking a field: the merge's whole
  * claim is that this record is not a separate thing. Its claims and summary are preserved in
- * bb_canonical, and the merge ledger row makes the removal reversible.
+ * canonical, and the merge ledger row makes the removal reversible.
  */
 async function unpublishAbsorbed(
   client: pg.PoolClient,
@@ -228,18 +193,18 @@ async function unpublishAbsorbed(
   const releaseEntities =
     (
       await client.query(
-        `DELETE FROM bb_public.release_entities
+        `DELETE FROM published.release_entities
           WHERE entity_id = ANY($1::text[])
-            AND release_id = (SELECT release_id FROM bb_public.v_active_release_id)`,
+            AND release_id = (SELECT release_id FROM published.v_active_release_id)`,
         [absorbed],
       )
     ).rowCount ?? 0;
   const searchIndex =
     (
       await client.query(
-        `DELETE FROM bb_public.search_index
+        `DELETE FROM published.search_index
           WHERE entity_id = ANY($1::text[])
-            AND release_id = (SELECT release_id FROM bb_public.v_active_release_id)`,
+            AND release_id = (SELECT release_id FROM published.v_active_release_id)`,
         [absorbed],
       )
     ).rowCount ?? 0;
@@ -247,25 +212,10 @@ async function unpublishAbsorbed(
 }
 
 /**
- * repo-n7p6.29 — publishes the absorbed→survivor map into
- * `bb_public.release_entity_redirects` for the ACTIVE release, so the public readers
- * (apps/web `/entity/{id}`, apps/api-public `/v1/entity/{id}`) can 308 a merged-away id to its
- * survivor instead of serving an indistinguishable 404. They cannot read the ledger itself: the
- * merge tables live in bb_canonical behind a staff-only RLS policy.
- *
- * Companion to `unpublishAbsorbed` above, and deliberately in the same transaction: the statement
- * that removes the absorbed record's own row is the statement that must leave a forwarding
- * address behind, or the URL dies between the two.
- *
- * `to_entity_id` is the fully-resolved terminal survivor from `loadActiveMerges`, so a reader
- * never walks a chain. Rows for merges that are no longer active (reversed, or the ledger row
- * removed) are deleted, which is what makes re-running this a true reconcile rather than an
- * append.
- *
- * A redirect is published even when the survivor is not currently in the release. That is
- * deliberate: the reader resolves the survivor before redirecting, so an unpublished survivor
- * degrades to the same honest 404 the absorbed id would have given, and the row starts working
- * again by itself the moment the survivor publishes.
+ * Publish fully resolved absorbed-to-survivor redirects with unpublication in the same
+ * transaction. Remove redirects for inactive merges. Public readers cannot access the canonical
+ * merge ledger and must confirm the survivor is public before redirecting; an unpublished
+ * survivor still returns not found.
  */
 async function publishRedirects(
   client: pg.PoolClient,
@@ -276,10 +226,10 @@ async function publishRedirects(
       ? 0
       : ((
           await client.query(
-            `INSERT INTO bb_public.release_entity_redirects
+            `INSERT INTO published.release_entity_redirects
                (release_id, from_entity_id, to_entity_id, reason)
              SELECT a.release_id, p.from_entity_id, p.to_entity_id, nullif(p.reason, '')
-               FROM bb_public.v_active_release_id a,
+               FROM published.v_active_release_id a,
                     unnest($1::text[], $2::text[], $3::text[])
                       AS p(from_entity_id, to_entity_id, reason)
              ON CONFLICT (release_id, from_entity_id) DO UPDATE
@@ -295,8 +245,8 @@ async function publishRedirects(
   const removed =
     (
       await client.query(
-        `DELETE FROM bb_public.release_entity_redirects r
-          USING bb_public.v_active_release_id a
+        `DELETE FROM published.release_entity_redirects r
+          USING published.v_active_release_id a
           WHERE r.release_id = a.release_id
             AND NOT (r.from_entity_id = ANY($1::text[]))`,
         [pairs.map((p) => p.absorbedId)],
@@ -322,8 +272,8 @@ async function remapReleaseReferences(
   const map = JSON.stringify(Object.fromEntries(pairs.map((p) => [p.absorbedId, p.survivorId])));
   const absorbed = pairs.map((p) => p.absorbedId);
   const { rowCount } = await client.query(
-    `WITH active AS (SELECT release_id FROM bb_public.v_active_release_id)
-     UPDATE bb_public.release_entities e
+    `WITH active AS (SELECT release_id FROM published.v_active_release_id)
+     UPDATE published.release_entities e
         SET projection = jsonb_set(
               jsonb_set(
                 e.projection, '{related}',
@@ -367,7 +317,7 @@ async function reportDrift(
     // though there are no absorbed ids left to reconcile.
     const orphaned = await client.query<{ n: string }>(
       `SELECT count(*)::text n
-         FROM bb_public.release_entity_redirects r, bb_public.v_active_release_id a
+         FROM published.release_entity_redirects r, published.v_active_release_id a
         WHERE r.release_id = a.release_id`,
     );
     return {
@@ -378,19 +328,19 @@ async function reportDrift(
     };
   }
   const edges = await client.query<{ n: string }>(
-    `SELECT count(*)::text n FROM bb_canonical.entity_relationships
+    `SELECT count(*)::text n FROM canonical.entity_relationships
       WHERE from_entity_id = ANY($1::text[]) OR to_entity_id = ANY($1::text[])`,
     [absorbed],
   );
   const published = await client.query<{ n: string }>(
-    `SELECT count(*)::text n FROM bb_public.release_entities
+    `SELECT count(*)::text n FROM published.release_entities
       WHERE entity_id = ANY($1::text[])
-        AND release_id = (SELECT release_id FROM bb_public.v_active_release_id)`,
+        AND release_id = (SELECT release_id FROM published.v_active_release_id)`,
     [absorbed],
   );
   const relatedRefs = await client.query<{ n: string }>(
     `SELECT count(*)::text n
-       FROM bb_public.release_entities e, bb_public.v_active_release_id a
+       FROM published.release_entities e, published.v_active_release_id a
       WHERE e.release_id = a.release_id
         AND (
           EXISTS (
@@ -411,9 +361,9 @@ async function reportDrift(
   const missingRedirects = await client.query<{ n: string }>(
     `SELECT count(*)::text n
        FROM unnest($1::text[], $2::text[]) AS p(from_entity_id, to_entity_id),
-            bb_public.v_active_release_id a
+            published.v_active_release_id a
       WHERE NOT EXISTS (
-        SELECT 1 FROM bb_public.release_entity_redirects r
+        SELECT 1 FROM published.release_entity_redirects r
          WHERE r.release_id = a.release_id
            AND r.from_entity_id = p.from_entity_id
            AND r.to_entity_id = p.to_entity_id
@@ -422,7 +372,7 @@ async function reportDrift(
   );
   const staleRedirects = await client.query<{ n: string }>(
     `SELECT count(*)::text n
-       FROM bb_public.release_entity_redirects r, bb_public.v_active_release_id a
+       FROM published.release_entity_redirects r, published.v_active_release_id a
       WHERE r.release_id = a.release_id
         AND NOT (r.from_entity_id = ANY($1::text[]))`,
     [absorbed],

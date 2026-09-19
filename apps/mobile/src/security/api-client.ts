@@ -1,21 +1,7 @@
 /**
- * Client-attestation header attachment layer (MOB-010).
- *
- * Thin security wrapper that, on EVERY outgoing request to `apps/api-public`,
- * attaches the client version-floor header `X-BlackStory-Client:
- * mobile/<version>; api=<major>` (`docs/decisions-carryover.md`, "ADR-021's
- * two invariants": app/API compatibility; parsed server-side by handlers.ts's
- * `parseClientApiVersion`). Server-side attestation validates this header with
- * a stateless format check (`packages/security/src/client-attestation.ts`) —
- * not Firebase App Check, and not a database lookup: no client registry
- * exists on the server.
- *
- * Design invariants:
- *   - The version header is attached on EVERY request — never silently omitted.
- *   - No token or attestation secret is logged (invariant 7) — see
- *     log-redaction.ts.
- *   - The client makes NO guarantee about server authorization; it surfaces
- *     server responses verbatim.
+ * Attach X-BlackStory-Client: mobile/<version>; api=<major> to every API request. The server
+ * checks its format; callers can forge it, so it grants no authorization or higher quota.
+ * Surface server responses unchanged and never log credentials.
  */
 
 export const CLIENT_VERSION_HEADER = 'X-BlackStory-Client';

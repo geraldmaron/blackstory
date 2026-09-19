@@ -35,7 +35,7 @@ export async function GET(request: Request): Promise<Response> {
       return Response.json(
         {
           error: 'Postgres unavailable. Check the server database connection, then retry.',
-          code: 'FIRESTORE_UNAVAILABLE',
+          code: 'DATABASE_UNAVAILABLE',
         },
         { status: 503 },
       );

@@ -6,10 +6,9 @@
  *
  * THE MAP IS EXPLORE'S MAP, AND IT IS THE ONLY MAP HERE. The Door hands the persistent `MapStage`
  * the same national-field patch Explore rests on (`nationalFieldPatch`: grouped at national zoom,
- * the same style, the same entity markers) and flies its camera per chapter. There is no static
- * board underneath any more (repo-18ma2): a server-rendered Albers pin board fading into a Web
- * Mercator plate read as an old map replaced by a new one on every load. The field is the page's
- * own ground until the plate has painted, and then it is the plate.
+ * the same style, the same entity markers) and flies its camera per chapter. A static Albers pin
+ * board would not align with the Web Mercator plate during the handoff, so the field is the page's
+ * ground until the shared plate has painted.
  *
  * The opening is not one of the chapter cards. It renders on its own path as the masthead sheet
  * clamped into the frame's left edge: block type that morphs, a short invite into the field, the
@@ -479,7 +478,7 @@ export function DoorImmersive({
   /**
    * A page that mounts already scrolled — a reload, a restored history entry — frames the chapter
    * the reader is on before the plate's first frame, instead of framing the opening chapter and
-   * then flying (repo-27uao). A layout effect, so it runs before the passive effects that land
+   * then flying. A layout effect, so it runs before the passive effects that land
    * the first frame, and after the sections have their boxes. The sweep chapter is left to the
    * observer: its camera is the national frame either way, and the sweep has to start from the
    * observer's own batch the way it does from a scroll.
@@ -628,7 +627,7 @@ export function DoorImmersive({
    * national zoom floor, so the fit may sink the floor to what it needs (`zoomFloor: 'fit'`,
    * camera.ts). Pitch and bearing are passed even though a national chapter
    * authors them as 0: scrolling back up from a tilted chapter has to be able to say "flat", or
-   * the tilt and the turn survive the move (repo-lk7p8). A place chapter keeps the chapter's own
+   * the tilt and the turn survive the move. A place chapter keeps the chapter's own
    * spec and lands the place at the window's center through `offset`.
    *
    * `cut` lands the frame in one step — the first frame after mount, and every refit after a

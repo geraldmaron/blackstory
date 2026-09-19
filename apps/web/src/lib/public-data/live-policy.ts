@@ -33,16 +33,15 @@ export function isPostgresPublicDataSource(env: EnvironmentLike = process.env): 
  * Postgres stays the system of record for WHICH release is active: the active-release pointer
  * is always read live, and the shared release-artifact fetcher (`@repo/domain`) rejects any
  * artifact whose `releaseId` doesn't match that pointer, so an artifact from a DIFFERENT
- * (superseded) release can never shadow `bb_public`. That is weaker than "a stale artifact can
- * never shadow bb_public" — the guard is identity-based, not content-based. Dozens of
+ * (superseded) release can never shadow `published`. That is weaker than "a stale artifact can
+ * never shadow published" — the guard is identity-based, not content-based. Dozens of
  * `packages/ops-data/scripts` fix/backfill scripts upsert
- * `bb_public.release_entities`/`search_index` under the SAME release id without
- * bumping the active-release pointer (repo-19mxs), so a pre-correction artifact and a
+ * `published.release_entities`/`search_index` under the SAME release id without
+ * bumping the active-release pointer, so a pre-correction artifact and a
  * post-correction one carry an identical `releaseId` and the guard cannot tell them apart. The
  * CDN artifact catches up via `publish-release-catalog-artifacts.yml`, which is dispatched
- * manually right after such a script runs (each now prints a reminder — see
- * `remindToRepublishCatalogArtifacts`) or, failing that, by a once-daily forgetting-insurance
- * cron — so worst-case staleness on this path is bounded at roughly 24h, not zero. In postgres
+ * manually after writes (see `remindToRepublishCatalogArtifacts`). There is no scheduled
+ * refresh and therefore no automatic staleness bound after an in-place correction. In postgres
  * mode artifacts are used only when an explicit origin (`APP_PUBLIC_RELEASE_ARTIFACT_BASE_URL`)
  * is configured — they are the read-through cache that keeps multi-MB catalog pulls off the
  * database (Supabase egress audit 2026-08: cold-start catalog reads were the dominant

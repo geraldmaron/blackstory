@@ -1,5 +1,5 @@
 /**
- * SP-12b acceptance (repo-92n2.12.2): the Bookshop affiliate block must sit below the evidence
+ * The Bookshop affiliate block must sit below the evidence
  * sections (challenges, citations), separated from them by a hairline rule, and must name itself
  * as an affiliate link in reader-visible body text, not only in a `rel="sponsored"` attribute a
  * reader never sees. Renders the real seed book so the "evidence" markup is authentic content,

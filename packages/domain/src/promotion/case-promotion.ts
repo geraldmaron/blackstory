@@ -1,19 +1,19 @@
 /**
- * Case → canonical entity promotion authority (repo-k2kb).
+ * Case → canonical entity promotion authority.
  *
  * The tracked path from a research case to a canonical entity. This is pure, DB-free logic: two
  * functions a caller (apps/web/src/admin's promote-case.ts) must both pass before writing anything:
  *
- *  - `evaluateCasePromotionGate`: the *authority* check. Mirrors `evaluatePromotionGate`
- *    (./controls.ts)'s core invariant proposer and approver can never be the same identity
- *    plus a case-state eligibility check. This is deliberately NOT reused as-is: that gate
- *    operates on a `PromotionClaim` shape (contradiction-search records, evidence-lineage
- *    reputation) this pipeline has never populated; forcing case data into that shape would
- *    fabricate fields no one actually assessed. This is a smaller, honest gate for what this
- *    pipeline actually has.
- *  - `validateCanonicalPromotionRecord`: the *content* check. Two independent source hosts, US
- *    coordinate bounds, well-formed decade buckets, a non-trivial summary — enforced on every
- *    promotion rather than left to whoever is running one.
+ * - `evaluateCasePromotionGate`: the *authority* check. Mirrors `evaluatePromotionGate`
+ * (./controls.ts)'s core invariant proposer and approver can never be the same identity
+ * plus a case-state eligibility check. This is deliberately NOT reused as-is: that gate
+ * operates on a `PromotionClaim` shape (contradiction-search records, evidence-lineage
+ * reputation) this pipeline has never populated; forcing case data into that shape would
+ * fabricate fields no one actually assessed. This is a smaller, honest gate for what this
+ * pipeline actually has.
+ * - `validateCanonicalPromotionRecord`: the *content* check. Two independent source hosts, US
+ * coordinate bounds, well-formed decade buckets, a non-trivial summary — enforced on every
+ * promotion rather than left to whoever is running one.
  */
 
 /** Case states the ad hoc script treated as "ready" the enrichment tier is complete. */

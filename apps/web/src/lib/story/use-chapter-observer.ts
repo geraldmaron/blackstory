@@ -49,7 +49,7 @@ export function pickWinnerChapterIndex(
  * observer applies to its batches, applied to `getBoundingClientRect` results. For a page that
  * mounts already scrolled — a reload, a restored history entry — so the surface can frame the
  * chapter the reader is actually on before the plate's first frame, instead of framing the
- * opening chapter and then flying (repo-27uao). `null` when nothing crosses the threshold.
+ * opening chapter and then flying. `null` when nothing crosses the threshold.
  */
 export function chapterInViewFromRects(
   rects: readonly {

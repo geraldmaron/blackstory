@@ -6,11 +6,11 @@
 
 # Theme impact packet system — design
 
-**Status:** Design locked (2026-07-22); v1 scaffold noted  
-**Decision:** ADR-029, removed 2026-07-24, recovered in [`../decisions-carryover.md`](../decisions-carryover.md), "Small recovered decisions"  
-**Catalog:** [theme-impact-canonical-questions.md](./theme-impact-canonical-questions.md)  
-**Domain:** `theme-impact-questions.ts`, `theme-impact-packet.ts`, `phase1-indicator-catalog.ts`  
-**v1 migration:** `supabase/migrations/20260722160000_theme_impact_packets.sql` → `bb_reference.theme_impact_packets`  
+**Status:** Design locked (2026-07-22); v1 scaffold noted
+**Decision:** ADR-029, removed 2026-07-24, recovered in [`../decisions-carryover.md`](../decisions-carryover.md), "Small recovered decisions"
+**Catalog:** [theme-impact-canonical-questions.md](./theme-impact-canonical-questions.md)
+**Domain:** `theme-impact-questions.ts`, `theme-impact-packet.ts`, `phase1-indicator-catalog.ts`
+**v1 migration:** `supabase/migrations/20260722160000_theme_impact_packets.sql` → `reference.theme_impact_packets`
 **Methodology:** [juxtaposition-not-causation.md](../methodology/juxtaposition-not-causation.md)
 
 ## 1. Purpose
@@ -26,15 +26,15 @@ This document is the implementation blueprint between the locked question catalo
 
 | Stage | Storage | Who writes | Public read |
 |-------|---------|------------|-------------|
-| **v1 scaffold** | `bb_reference.theme_impact_packets` (`status` column) | research/publication staff | Yes when `status = 'published'` (RLS) |
-| Draft (target) | `bb_canonical.theme_impact_packets` | research, publication staff | No |
-| Candidate (target) | linked from `bb_canonical.publication_candidates` (optional) | publication | Admin preview only |
-| Published (target) | `bb_public.release_theme_impact_packets` (+ optional snapshot JSON) | publication worker on promote | Yes (active release only) |
+| **v1 scaffold** | `reference.theme_impact_packets` (`status` column) | research/publication staff | Yes when `status = 'published'` (RLS) |
+| Draft (target) | `canonical.theme_impact_packets` | research, publication staff | No |
+| Candidate (target) | linked from `canonical.publication_candidates` (optional) | publication | Admin preview only |
+| Published (target) | `published.release_theme_impact_packets` (+ optional snapshot JSON) | publication worker on promote | Yes (active release only) |
 
 **v1 note:** The scaffold table is the working store for `/themes` fixtures and the first pilot
 load. When the pilot enters release activation (`../decisions-carryover.md`, "Public projection
 and immutable publication snapshots"), migrate authoring to canonical + project
-into `bb_public` — do not leave production publish SoT on the status-column table alone.
+into `published` — do not leave production publish SoT on the status-column table alone.
 
 **Primary key (logical):** `{ question_id, theme_id, scope_key }` where `scope_key` encodes
 pilot geography (e.g. `metro:chicago-il`) or `national` for spine packets. Entity-bound
@@ -42,7 +42,7 @@ variants add `entity_id` to `scope_key` or a dedicated column.
 
 **Release invariant (`../decisions-carryover.md`, "Public projection and immutable publication
 snapshots" target):** projection rows are insert-only per release; rollback switches
-`bb_public.active_release`.
+`published.active_release`.
 
 ## 3. Field table
 
@@ -163,14 +163,14 @@ Set `method_stance: 'gated_causal_claim'` only when at least one ref has
 
 ### 4.0 v1 scaffold (shipped)
 
-`bb_reference.theme_impact_packets` — see migration `20260722160000_theme_impact_packets.sql`.
+`reference.theme_impact_packets` — see migration `20260722160000_theme_impact_packets.sql`.
 Columns: `id`, `question_id`, `theme_id`, `title`, `summary`, `policy_eras`, `geography`,
 `method_stance`, `method_note`, `observations`, `derived`, `artifacts`, `gap_states`,
 `entity_id` / `binding_purpose`, `status`, timestamps. RLS: published for anon; staff all.
 
 ### 4.1 Target DDL (promote per `../decisions-carryover.md`, "Public projection and immutable publication snapshots")
 
-Draft table **`bb_canonical.theme_impact_packets`** (research write; staff read):
+Draft table **`canonical.theme_impact_packets`** (research write; staff read):
 
 | Column | Type | Notes |
 |--------|------|-------|
@@ -198,11 +198,11 @@ Draft table **`bb_canonical.theme_impact_packets`** (research write; staff read)
 | `metadata` | jsonb NOT NULL DEFAULT `'{}'` | |
 | `created_at` / `updated_at` | timestamptz | |
 
-Projection table **`bb_public.release_theme_impact_packets`**:
+Projection table **`published.release_theme_impact_packets`**:
 
 | Column | Type | Notes |
 |--------|------|-------|
-| `release_id` | uuid FK | `bb_publication.releases` |
+| `release_id` | uuid FK | `publication.releases` |
 | `packet_id` | text | |
 | `payload` | jsonb NOT NULL | Frozen public document (field table §3) |
 | `content_hash` | text NOT NULL | |
@@ -213,14 +213,14 @@ Projection table **`bb_public.release_theme_impact_packets`**:
 
 | Base | Schema.table | Packet use |
 |------|--------------|------------|
-| Metric definitions | `bb_reference.statistical_series` | Resolve `metric_id` labels/units |
-| Observations | `bb_reference.statistical_observations` | `observation_refs[].observation_id` |
-| Derived / modeled | `bb_reference.derived_measurements` | `derived_refs[].derived_id`; honor `status` |
-| Juxtaposition | `bb_reference.entity_context_bindings` | `entity_context_binding_refs` |
-| Claims | `bb_canonical.claims` + versions | `claim_refs`; causal gate |
-| Artifacts | `bb_evidence.source_items`, captures | `artifact_refs` |
+| Metric definitions | `reference.statistical_series` | Resolve `metric_id` labels/units |
+| Observations | `reference.statistical_observations` | `observation_refs[].observation_id` |
+| Derived / modeled | `reference.derived_measurements` | `derived_refs[].derived_id`; honor `status` |
+| Juxtaposition | `reference.entity_context_bindings` | `entity_context_binding_refs` |
+| Claims | `canonical.claims` + versions | `claim_refs`; causal gate |
+| Artifacts | `evidence.source_items`, captures | `artifact_refs` |
 
-RLS: anon SELECT on projection table **only** via view joining `bb_public.active_release`
+RLS: anon SELECT on projection table **only** via view joining `published.active_release`
 (`../decisions-carryover.md`, "Small recovered decisions", ADR-026 pattern). Canonical draft table: no anon policies.
 
 ## 5. Domain type mapping (target)
@@ -380,10 +380,10 @@ flowchart LR
   Q[THEME_IMPACT_QUESTIONS] --> A[Author draft packet]
   P1[phase1-indicator-catalog] --> L[Load observations]
   L --> A
-  E[bb_evidence artifacts] --> A
-  A --> D[bb_canonical.theme_impact_packets]
+  E[evidence artifacts] --> A
+  A --> D[canonical.theme_impact_packets]
   D --> R[Review + promote]
-  R --> P[bb_public.release_theme_impact_packets]
+  R --> P[published.release_theme_impact_packets]
   P --> W["/themes · story · map"]
 ```
 
@@ -392,5 +392,5 @@ flowchart LR
 - ADR-029, removed 2026-07-24, recovered in [`../decisions-carryover.md`](../decisions-carryover.md), "Small recovered decisions"
 - [theme-impact-canonical-questions.md](./theme-impact-canonical-questions.md)
 - [context-data-source-matrix.md](./context-data-source-matrix.md)
-- [postgres-schema.md](../data/postgres-schema.md) — `bb_reference.statistical_*`
+- [postgres-schema.md](../data/postgres-schema.md) — `reference.statistical_*`
 - Migration `20260721220000_statistical_series_observations.sql`

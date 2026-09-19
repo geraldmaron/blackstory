@@ -1,5 +1,5 @@
 /**
- * Postgres implementation of IndicatorDbReader over bb_reference.statistical_* tables.
+ * Postgres implementation of IndicatorDbReader over reference.statistical_* tables.
  * Uses DATABASE_URL (research/operator role — never service-role in public MCP paths).
  */
 import pg from 'pg';
@@ -98,7 +98,7 @@ export class PgIndicatorDbReader implements IndicatorDbReader {
       `SELECT metric_id, metric_definition, universe, unit, source_dataset, source_table,
               source_variable, geography_type, estimate_type, period_type,
               external_data_source_id, theme
-       FROM bb_reference.statistical_series
+       FROM reference.statistical_series
        ${where}
        ORDER BY metric_id`,
       params,
@@ -113,7 +113,7 @@ export class PgIndicatorDbReader implements IndicatorDbReader {
 
   async jurisdictionExists(jurisdictionId: string): Promise<boolean> {
     const result = await this.pool.query<{ readonly exists: boolean }>(
-      'SELECT EXISTS (SELECT 1 FROM bb_reference.jurisdictions WHERE id = $1) AS exists',
+      'SELECT EXISTS (SELECT 1 FROM reference.jurisdictions WHERE id = $1) AS exists',
       [jurisdictionId],
     );
     return result.rows[0]?.exists === true;
@@ -139,7 +139,7 @@ export class PgIndicatorDbReader implements IndicatorDbReader {
       `SELECT id, metric_id, jurisdiction_id, boundary_version, reference_period,
               dataset_vintage, estimate, margin_of_error, status, source, source_url,
               retrieved_at, content_hash
-       FROM bb_reference.statistical_observations
+       FROM reference.statistical_observations
        WHERE ${clauses.join(' AND ')}
        ORDER BY reference_period DESC, jurisdiction_id
        LIMIT ${limitParam}`,
@@ -176,7 +176,7 @@ export class PgIndicatorDbReader implements IndicatorDbReader {
 
     const result = await this.pool.query<EntityBindingRow>(
       `SELECT id, entity_id, metric_id, purpose, jurisdiction_id, notes
-       FROM bb_reference.entity_context_bindings
+       FROM reference.entity_context_bindings
        WHERE entity_id = $1 ${purposeClause}
        ORDER BY metric_id, jurisdiction_id NULLS LAST`,
       params,

@@ -40,21 +40,21 @@ This module stays **in-memory** for review-queue items. Persisted lineage lives 
 
 | Review signal | Ledger home | Notes |
 |---|---|---|
-| Flag pair `(cite-a, cite-b)` | `bb_evidence.lineage_clusters` + `lineage_cluster_members` | Human may open or extend a cluster when similarity is confirmed |
+| Flag pair `(cite-a, cite-b)` | `evidence.lineage_clusters` + `lineage_cluster_members` | Human may open or extend a cluster when similarity is confirmed |
 | Near-duplicate relationship | `lineage_cluster_members.relationship = 'near_duplicate'` | Set only after human review — not by this function |
 | Similarity score | `lineage_cluster_members.similarity` | Optional numeric audit field |
-| Claim assignment lineage | `bb_canonical.evidence_assignments.lineage_cluster_id` | Each accepted assignment references one cluster |
-| Capture root | `bb_evidence.lineage_clusters.root_capture_id` | Cluster anchor capture |
+| Claim assignment lineage | `canonical.evidence_assignments.lineage_cluster_id` | Each accepted assignment references one cluster |
+| Capture root | `evidence.lineage_clusters.root_capture_id` | Cluster anchor capture |
 
 Workflow: flags surface in the operator review queue → reviewer inspects captures and
-attributions (`bb_evidence.capture_attributions`) → if excerpts truly share upstream prose,
+attributions (`evidence.capture_attributions`) → if excerpts truly share upstream prose,
 update lineage cluster membership and **re-count** independent lineages before promotion. Until
 then, promotion continues to treat the citations as separate groups; the flag is advisory.
 
 ## Operator workflow
 
 1. **Run the signal** when assembling or re-checking a research case (embeddings from the existing
-   `@repo/firebase` pipeline or fixture vectors in dev).
+   configured embedding provider; fixture vectors validate mechanics only).
 2. **Triage each flag** — high similarity does not prove syndication; it warrants reading both
    captures, checking `capture_attributions`, and comparing content fingerprints.
 3. **Resolve lineage** — merge into an existing `lineage_clusters` row or create one with explicit
@@ -75,5 +75,4 @@ then, promotion continues to treat the citations as separate groups; the flag is
 ## Related docs
 
 - `docs/research/confidence-lineage.md` — deterministic confidence and lineage grouping
-- ADR-014 (vector search; removed 2026-07-24, recovered in `../decisions-carryover.md`, "Vector search") — embedding pipeline and similarity helpers
 - `docs/research/research-kernel.md` — ledger schemas and human-in-the-loop release policy

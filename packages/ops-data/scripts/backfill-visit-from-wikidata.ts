@@ -1,38 +1,11 @@
 /**
- * repo-el9p (WS3) — populate bb_canonical.entity_visit + entity_locations.street/postal_code
- * from Wikidata, for entities that already carry a stored QID
- * (bb_canonical.entity_identifiers, namespace 'wikidata').
- *
- * Pulled properties:
- *   P856  official website  -> entity_visit.website
- *   P1329 phone number      -> entity_visit.phone_e164 / phone_display
- *   P669  located on street (statement) with qualifier
- *   P670  house number      -> entity_locations.street ("<house number> <street label>")
- *   P281  postal code       -> entity_locations.postal_code
- *   P625  coordinate location -> cross-check only; logged when it disagrees with the stored
- *         entity_locations point by more than COORD_DRIFT_WARN_METERS, never used to rewrite
- *         lat/lng (this script does not touch geometry/lat/lng at all).
- *
- * Eligible entities are the same kinds `publicVisitForTier` (packages/domain/src/geography/
- * visit.ts) will ever attach phone/website to: place, institution, school, organization. Person
- * entities are never queried here.
- *
- * QIDs are batched (100 per SPARQL request, one VALUES clause), rate-limited to 1 request/second,
- * sent with a descriptive User-Agent, and each batch's raw JSON response is cached under
- * .cache/landscape-intake/wikidata-visit/ so a re-run without new entities makes zero network
- * calls.
- *
- * Default is dry-run. Production writes require:
- *   DRY_RUN=0 BACKFILL_VISIT_FROM_WIKIDATA_APPLY=1 DATABASE_URL=postgresql://...
- *
- * Usage (from repo root):
- *   set -a && source apps/web/.env.local && set +a
- *   export DATABASE_SSL=1
- *   node --conditions development --import tsx \
- *     packages/ops-data/scripts/backfill-visit-from-wikidata.ts
+ * Fetches visit metadata for eligible place/institution/school/organization entities with
+ * stored Wikidata identifiers. Website, phone, street qualifiers and postal code retain source
+ * provenance. Coordinates are cross-checked only. Requests are batched, throttled and cached.
+ * Default dry-run; writes require DRY_RUN=0 and BACKFILL_VISIT_FROM_WIKIDATA_APPLY=1.
  */
 import { createHash } from 'node:crypto';
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { mkdirSync, mkdtempSync, readFileSync, renameSync, rmSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import pg from 'pg';
@@ -98,11 +71,11 @@ async function loadEligibleEntities(client: pg.Client): Promise<readonly EntityR
             ei.value AS qid,
             loc.lat,
             loc.lng
-     FROM bb_canonical.entities e
-     JOIN bb_canonical.entity_identifiers ei
+     FROM canonical.entities e
+     JOIN canonical.entity_identifiers ei
        ON ei.entity_id = e.id AND ei.namespace = 'wikidata'
      LEFT JOIN LATERAL (
-       SELECT lat, lng FROM bb_canonical.entity_locations el
+       SELECT lat, lng FROM canonical.entity_locations el
        WHERE el.entity_id = e.id AND el.lat IS NOT NULL AND el.lng IS NOT NULL
        ORDER BY el.updated_at DESC LIMIT 1
      ) loc ON true
@@ -140,12 +113,16 @@ function buildSparqlQuery(qids: readonly string[]): string {
 }`;
 }
 
-async function fetchSparqlBatch(qids: readonly string[]): Promise<readonly SparqlBinding[]> {
+async function fetchSparqlBatch(
+  qids: readonly string[],
+): Promise<{ bindings: readonly SparqlBinding[]; cacheHit: boolean }> {
   mkdirSync(CACHE_DIR, { recursive: true });
   const cachePath = join(CACHE_DIR, `batch-${batchCacheKey(qids)}.json`);
-  if (existsSync(cachePath)) {
+  try {
     const cached = JSON.parse(readFileSync(cachePath, 'utf8')) as SparqlResponse;
-    return cached.results.bindings;
+    return { bindings: cached.results.bindings, cacheHit: true };
+  } catch (error) {
+    if ((error as NodeJS.ErrnoException).code !== 'ENOENT') throw error;
   }
 
   const query = buildSparqlQuery(qids);
@@ -163,8 +140,16 @@ async function fetchSparqlBatch(qids: readonly string[]): Promise<readonly Sparq
     throw new Error(`Wikidata SPARQL request failed: ${res?.status ?? 'no response'}`);
   }
   const data = (await res.json()) as SparqlResponse;
-  writeFileSync(cachePath, JSON.stringify(data, null, 2));
-  return data.results.bindings;
+  const temporaryDirectory = mkdtempSync(join(CACHE_DIR, '.batch-'));
+  try {
+    const temporaryPath = join(temporaryDirectory, 'response.json');
+    writeFileSync(temporaryPath, JSON.stringify(data, null, 2), { flag: 'wx', mode: 0o600 });
+    // Publish a complete response atomically so another process cannot read a partial cache entry.
+    renameSync(temporaryPath, cachePath);
+  } finally {
+    rmSync(temporaryDirectory, { recursive: true, force: true });
+  }
+  return { bindings: data.results.bindings, cacheHit: false };
 }
 
 function qidFromItemUri(uri: string): string {
@@ -246,10 +231,8 @@ async function main(): Promise<void> {
 
     for (const [index, group] of batches.entries()) {
       const qids = group.map((row) => row.qid);
-      const cachePath = join(CACHE_DIR, `batch-${batchCacheKey(qids)}.json`);
-      const wasCached = existsSync(cachePath);
-      const bindings = await fetchSparqlBatch(qids);
-      if (!wasCached) {
+      const { bindings, cacheHit } = await fetchSparqlBatch(qids);
+      if (!cacheHit) {
         console.log(`Batch ${index + 1}/${batches.length}: fetched ${qids.length} QIDs`);
         await sleep(FETCH_DELAY_MS);
       }
@@ -342,14 +325,14 @@ async function main(): Promise<void> {
         const sourceId = `wikidata:${row.qid}`;
         if (row.website || row.phone) {
           await client.query(
-            `INSERT INTO bb_canonical.entity_visit (entity_id, phone_display, website, source_ids, updated_at)
+            `INSERT INTO canonical.entity_visit (entity_id, phone_display, website, source_ids, updated_at)
              VALUES ($1, $2, $3, ARRAY[$4]::text[], now())
              ON CONFLICT (entity_id) DO UPDATE SET
-               phone_display = COALESCE(EXCLUDED.phone_display, bb_canonical.entity_visit.phone_display),
-               website = COALESCE(EXCLUDED.website, bb_canonical.entity_visit.website),
+               phone_display = COALESCE(EXCLUDED.phone_display, canonical.entity_visit.phone_display),
+               website = COALESCE(EXCLUDED.website, canonical.entity_visit.website),
                source_ids = (
                  SELECT array_agg(DISTINCT id) FROM unnest(
-                   bb_canonical.entity_visit.source_ids || EXCLUDED.source_ids
+                   canonical.entity_visit.source_ids || EXCLUDED.source_ids
                  ) AS id
                ),
                updated_at = now()`,
@@ -358,7 +341,7 @@ async function main(): Promise<void> {
         }
         if (row.street || row.postalCode) {
           await client.query(
-            `UPDATE bb_canonical.entity_locations
+            `UPDATE canonical.entity_locations
              SET street = COALESCE($2, street),
                  postal_code = COALESCE($3, postal_code),
                  updated_at = now()

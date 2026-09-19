@@ -1,5 +1,5 @@
 /**
- * `/records` — the archive read as a list, not a map (SP-09, repo-92n2.9).
+ * `/records` — the archive read as a list, not a map.
  *
  * This module is the whole surface's logic: filtering, faceting, paging and href construction.
  * It is pure and synchronous so the page can be a plain server component and every test runs
@@ -15,12 +15,9 @@
  * records: full `PublicEntityView` today, or the search_index slim when `evidenceInputs` is
  * projected on active-release docs.
  *
- * THE TIER IS NEVER READ OUT OF THE INDEX. The slim path used to take a graded `confidenceTier`
- * facet straight off the doc, which made `/records` the one surface serving a cached CONCLUSION
- * while every other surface derived one — and when the rule changed on 2026-09-07 this room kept
- * the old answer for a day (repo-ngojq, repo-6qjv0). The index now carries the INPUTS and both
- * paths end at the same `confidenceTierFromEvidenceInputs`, so a rule change reaches Explore and
- * Records in the same deploy.
+ * THE TIER IS NEVER READ OUT OF THE INDEX. The index carries evidence inputs, and both catalog
+ * paths derive the tier with `confidenceTierFromEvidenceInputs`. Explore and Records therefore
+ * apply the same current grading rule instead of trusting a cached conclusion.
  *
  * The filter VOCABULARY, though, must not drift from the Lens. Every label and bucket here is
  * derived by calling the same shared modules Explore calls — `kindFamilyFor`,

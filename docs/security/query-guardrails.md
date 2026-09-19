@@ -7,7 +7,7 @@ tests are follow-on work (, ).
 
 ## Objective
 
-Bound search cost before Firestore reads: approved query shapes only, no user SQL/sort/field
+Bound search cost before database reads: approved query shapes only, no user SQL/sort/field
 selection, normalized Unicode, capped filters/radius/date/page depth, opaque cursors, cache keys,
 and fail-closed timeouts.
 
@@ -30,7 +30,7 @@ and fail-closed timeouts.
 | Pagination depth | ≤ 20 pages (cursor-bound) |
 | Export results | ≤ 500 per request |
 | Query timeout | 5 s (fail-closed) |
-| Firestore statement budget | 4 s |
+| Database statement budget | 4 s |
 | Estimated cost ceiling | 2 500 units |
 
 ## Approved query shapes
@@ -61,7 +61,8 @@ edge cache keys (see [`infra/gcp/armor/cdn-design.md`](../../infra/gcp/armor/cdn
 `getQueryTimeoutPolicy()` returns fail-closed budgets. On timeout, abort the in-flight read and
 emit `createSlowQueryLogEvent` / `createTimeoutFailure` — do not hold pool slots.
 
-Cloud SQL `statement_timeout` remains **deferred** (`../decisions-carryover.md`, "Firestore as system of record, reversed" — this is the one ADR-011 citation still accurate: no statement timeout exists on the live Postgres public read path either); document only until SQL search paths exist.
+Database adapters must apply the statement timeout on the actual query connection. Pure query
+validation tests do not prove cancellation or pool recovery under live load.
 
 ##  integration
 
@@ -77,9 +78,8 @@ pnpm --filter @repo/security typecheck
 pnpm --filter @repo/api-public typecheck
 ```
 
-## Remaining live work
+## Runtime verification
 
-1. Wire `createPublicSearchGuard` into Cloud Run middleware (after App Check + rate limits).
-2. Firestore query builder consuming `CanonicalSearchQuery` only.
-3. Slow-query telemetry export to .
-4. Live load / fuzz under  against staging.
+Exercise the deployed HTTP search path with bounded hostile and expensive inputs. Inspect query
+plans, cancellation, connection release and cache behavior on representative Postgres data.
+A simulated cost unit is not a provider charge; retain measured latency and resource evidence.

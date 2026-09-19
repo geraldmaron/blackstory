@@ -20,11 +20,9 @@ Threat model, abuse-case corpus, environment isolation design, and security test
 | [`ugc-compliance-layer.md`](./ugc-compliance-layer.md) |  per-source obligations registry, evidence-pointer doctrine, deletion-sync framework, living-person UGC ethics, takedown routing |
 | [`ugc-legal-posture.md`](./ugc-legal-posture.md) |  CCPA/CPRA publicly-available posture and fair-use ground truth for counsel review |
 | [`location-precision-standard.md`](./location-precision-standard.md) | Adopted public location precision tier list, coarsening conditions, and the one publish-path redaction engine |
-| [`../infra/firebase/auth-and-app-check.md`](../../infra/firebase/auth-and-app-check.md) |  Auth plan + App Check scaffold (enforcement = ) |
 | [`tests/checklist.md`](./tests/checklist.md) | Manual/CI security checklist scaffold |
 
 Assumptions: `../decisions-carryover.md`, "Security and abuse assumptions" (ADR-010 no longer exists as a file).
-Isolation matrices / IaC stubs: [`../../infra/gcp/`](../../infra/gcp/), [`../../infra/firebase/`](../../infra/firebase/).
 GitHub governance (, local): [`../../infra/github/README.md`](../../infra/github/README.md), [`../../SECURITY.md`](../../SECURITY.md).
 
 Automated completeness: `pnpm --filter @repo/testing test`.

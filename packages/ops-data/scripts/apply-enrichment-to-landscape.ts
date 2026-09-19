@@ -1,22 +1,8 @@
 /**
- * repo-n7p6.5 (WS5 bridge) — copies a validated WS4 draft (bb_research.entity_enrichment,
- * status='enriched', notes.draft) onto its bb_research.landscape_candidates row, in the exact
- * shape publish-release-entities-incremental.ts already knows how to read: `summary` (the DB
- * column) and `payload.historicalContext` / `payload.topicIds` / `payload.eraBuckets` /
- * `payload.keywords` (see lib/incremental-publish.ts buildReleaseSourceFromLandscape).
- *
- * This script does NOT publish anything — it only stages the landscape row. Publishing to
- * bb_public.release_entities is publish-release-entities-incremental.ts, run separately (with
- * --republish for entities already live) after reviewing this script's dry-run.
- *
- * Default is dry-run. Production writes require:
- *   DRY_RUN=0 APPLY_ENRICHMENT_TO_LANDSCAPE_APPLY=1 DATABASE_URL=postgresql://...
- *
- * Usage (from repo root):
- *   set -a && source apps/web/.env.local && set +a
- *   export DATABASE_SSL=1
- *   node --conditions development --import tsx \
- *     packages/ops-data/scripts/apply-enrichment-to-landscape.ts --entity-ids=id1,id2,...
+ * Stages validated enrichment drafts on landscape candidates, including narrative, taxonomy and
+ * source citations. This does not publish. Default dry-run; writes require DRY_RUN=0 and
+ * APPLY_ENRICHMENT_TO_LANDSCAPE_APPLY=1. Use --entity-ids to scope the batch, then review
+ * through the incremental publisher.
  */
 import pg from 'pg';
 import { SUMMARY_MIN_CHARS, SUMMARY_MAX_CHARS } from './lib/entity-enrichment-llm.ts';
@@ -93,17 +79,9 @@ function citationEntries(raw: unknown): { evidenceId: string; quote: string }[] 
 }
 
 /**
- * repo-fbjr: turns the draft's citations into the citable-document list the publish builder
- * reads (`payload.evidenceCitations` -> `buildReleaseSourceFromLandscape`), so a record's
- * projection cites the documents its prose was actually written from instead of only the
- * registry index row it was found through.
- *
- * One entry per distinct DOCUMENT. A draft cites the same nomination form repeatedly; publishing
- * one claim per citation would multiply a single PDF into eight sources and inflate exactly the
- * count the depth gate and researchCoverage use to judge how well-sourced a record is. The
- * representative quote is the LONGEST one the draft anchored to that document — the most
- * substantive sentence a reader can check the prose against, and already validated by the
- * enrichment harness as a verbatim substring of that document's captured text.
+ * Builds one evidenceCitations entry per distinct document, retaining the longest anchored
+ * quote. Repeated quotations from one document must not inflate document coverage. Quotation
+ * attachment alone does not prove the draft's claims.
  */
 function buildEvidenceCitations(
   draft: NonNullable<EnrichedRow['notes']['draft']>,
@@ -154,7 +132,7 @@ async function main(): Promise<void> {
 
   const rows = await pool.query<EnrichedRow>(
     `SELECT entity_id, notes
-       FROM bb_research.entity_enrichment
+       FROM research.entity_enrichment
       WHERE status = 'enriched' AND (${whereClause})
       ORDER BY entity_id`,
     params,
@@ -165,7 +143,7 @@ async function main(): Promise<void> {
   // check at sweep time) must never become a public citation, however the draft referenced it.
   const evidenceRows = await pool.query<EvidenceDocRow>(
     `SELECT entity_id, id, source_url, title, source_tier
-       FROM bb_research.entity_evidence
+       FROM research.entity_evidence
       WHERE status = 'captured' AND entity_id = ANY($1::text[])`,
     [rows.rows.map((row) => row.entity_id)],
   );
@@ -253,7 +231,7 @@ async function main(): Promise<void> {
       const summary = typeof draft.summary === 'string' ? draft.summary : undefined;
       if (summary === undefined || !summaryInBounds(draft)) continue;
       await client.query(
-        `UPDATE bb_research.landscape_candidates
+        `UPDATE research.landscape_candidates
             SET summary = $2,
                 payload = payload || $3::jsonb,
                 updated_at = now()
@@ -262,13 +240,8 @@ async function main(): Promise<void> {
           row.entity_id,
           summary,
           JSON.stringify({
-            // An explicit null means the drafter READ the evidence and judged it insufficient for
-            // narrative — a different statement from "this draft has nothing to say about the
-            // field". Both used to serialize away to undefined, which JSON.stringify drops, so
-            // `payload || ...` left the previous prose standing and a re-draft could never
-            // retract. Found on Killearn Plantation (2026-08-11): a drafter with three times the
-            // evidence set historicalContext to null, and the record kept narrative written from
-            // the old truncated excerpt. Null now clears the field; absent still leaves it alone.
+            // Explicit null clears prior narrative; an absent field preserves it. JSON
+            // serialization must not erase that distinction during the payload merge.
             historicalContext:
               draft.historicalContext === null
                 ? ''
@@ -276,16 +249,8 @@ async function main(): Promise<void> {
                   ? draft.historicalContext
                   : undefined,
             topicIds: Array.isArray(draft.topicIds) ? draft.topicIds : undefined,
-            // eraBuckets is required on every draft, so it is an array even when the drafter's
-            // evidence slice named no date -- WS4 sees only a snippet, not the full nomination form
-            // apply-nrhp-period-era.ts reads. An empty draft array means "this drafter found
-            // nothing", not "there is no era": writing it through `payload || $3::jsonb` would
-            // overwrite (not merge over) an already-populated key, silently erasing nomination-
-            // derived decade data on every wave that touched the entity. Found 2026-08-15: coverage
-            // fell from 98.8% (2026-08-07 rebuild) to 60.4% after round 14, tracking the waves run
-            // in between (repo-o4zu). Only write eraBuckets forward when the drafter actually found
-            // one; leave an existing value alone otherwise, matching apply-nrhp-period-era.ts's own
-            // "never overwrite an existing era" rule.
+            // An empty draft era list means the excerpt supplied no dates. Preserve previously
+            // sourced eras; update eraBuckets only when the draft provides a nonempty list.
             eraBuckets:
               Array.isArray(draft.eraBuckets) && draft.eraBuckets.length > 0
                 ? draft.eraBuckets

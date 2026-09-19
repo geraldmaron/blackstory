@@ -48,7 +48,7 @@ describe('exploreHrefFromLens', () => {
     assert.equal(href.includes('lat='), false);
   });
 
-  it('writes the live routes toggle to lines=1, not the static base value (repo-i2n5)', () => {
+  it('writes the live routes toggle to lines=1, not the static base value', () => {
     const href = exploreHrefFromLens(
       { ...base, lines: false },
       {

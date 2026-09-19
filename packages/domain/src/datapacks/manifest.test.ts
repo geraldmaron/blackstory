@@ -1,7 +1,5 @@
 /**
- * Unit tests for the Data Pack v1 manifest contract (the related workstream): shape validation, deterministic
- * signing, and signature verification (valid + tampered). See ./manifest.ts's header for the
- * design rationale.
+ * Data-pack manifest shape, deterministic signing and tamper-detection tests.
  */
 import assert from 'node:assert/strict';
 import { generateKeyPairSync } from 'node:crypto';

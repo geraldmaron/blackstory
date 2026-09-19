@@ -1,31 +1,14 @@
 /**
- * Postgres reads and decision-writes for the raw submissions queue (`bb_submissions.intake_items`).
- *
- * repo-gyq6.10 (D2): 2,175 rows in this table (measured live 2026-09-13: 2,060 quarantined, 50
- * promoted, 64 rejected, 1 spam, every one `kind = 'contribution'`), and the only admin surface
- * that ever read it (`postgres-story-packets.ts`, backing `/admin/stories/review`) filters to
- * `payload->>'proposalKind' = 'story_packet'` — a handful of rows. Everything else (public
- * submit-form leads, discovery-survivor intake, quick-add proposals, anything that is not a
- * story packet) had no list, no detail view, and no decision path outside a terminal. This
- * module is the general reader/writer: every row, not one proposal kind.
- *
- * The write side deliberately narrows `packages/operator-cli/src/quarantine-triage.ts`'s LLM
- * triage down to its human-operator case: same status machine (`quarantined` -> `promoted` |
- * `rejected` | `spam`, guarded so a row already moved out of `quarantined` cannot be
- * double-processed), same "'promote' opens a `bb_research.cases` candidate, 'reject'/'spam' only
- * flip status" split. It does not reuse that module's functions directly because operator-cli
- * writes through `getOpsPostgresPool()` (`DATABASE_URL`, the public/ops credential), while every
- * write this app makes goes through `ADMIN_DATABASE_URL`'s `role_admin_app` connection
- * (`canonical-postgres-client.ts`'s header explains why the two are kept apart by env var name).
- * Reaching into operator-cli here would write a privileged admin decision under the wrong
- * credential. `writeResearchCasePostgres` (already shared by `research-case-store.ts`) is reused
- * for the one part that is safe and correct to share: turning a `ResearchCaseRecord` into rows.
+ * Reads all proposal kinds in submissions.intake_items. Decisions transition only quarantined
+ * rows: promote creates a research case; reject and spam update intake status. Writes use the
+ * staff ADMIN_DATABASE_URL connection. Shared research-case row serialization is reused without
+ * adopting operator-cli credentials.
  */
 import { randomUUID } from 'node:crypto';
 import type pg from 'pg';
 import { auditCategoryFor, createResearchCase, type AuditEventAction } from '@repo/domain';
 import type { AdminPermission } from '../auth/server-authorization.js';
-import type { StaffRole } from '../auth/role-mutation.js';
+import type { StaffRole } from '../auth/staff-permissions.js';
 import type { ServerAdminIdentity } from '../auth/supabase-server.js';
 import { StaffPermissionDeniedError, assertStaffPermission } from '../auth/staff-permissions.js';
 import { queryPostgres } from './canonical-postgres-client.js';
@@ -179,7 +162,7 @@ export async function queryIntakeItemPage(query: SubmissionQuery): Promise<Submi
   const direction = query.direction === 'asc' ? 'ASC' : 'DESC';
 
   const countRows = await queryPostgres<{ readonly total: string }>(
-    `SELECT count(*)::text AS total FROM bb_submissions.intake_items ${where.sql}`,
+    `SELECT count(*)::text AS total FROM submissions.intake_items ${where.sql}`,
     where.params,
   );
   const total = Number(countRows[0]?.total ?? 0);
@@ -190,7 +173,7 @@ export async function queryIntakeItemPage(query: SubmissionQuery): Promise<Submi
   // `id` breaks ties so pagination stays deterministic across rows sharing a created_at.
   const rows = await queryPostgres<IntakeRow>(
     `SELECT ${LIST_COLUMNS}
-     FROM bb_submissions.intake_items
+     FROM submissions.intake_items
      ${where.sql}
      ORDER BY created_at ${direction}, id ASC
      LIMIT $${where.params.length + 1} OFFSET $${where.params.length + 2}`,
@@ -208,7 +191,7 @@ async function facetCounts(
   const where = buildWhere(query, omit);
   const rows = await queryPostgres<{ readonly value: string | null; readonly count: string }>(
     `SELECT ${expression} AS value, count(*)::text AS count
-     FROM bb_submissions.intake_items
+     FROM submissions.intake_items
      ${where.sql}
      GROUP BY 1
      ORDER BY count(*) DESC, 1 ASC`,
@@ -230,7 +213,7 @@ export async function queryIntakeItemFacets(query: SubmissionQuery): Promise<Sub
 
 export async function getIntakeItemDetail(id: string): Promise<SubmissionDetail | null> {
   const rows = await queryPostgres<IntakeRow>(
-    `SELECT ${LIST_COLUMNS} FROM bb_submissions.intake_items WHERE id = $1`,
+    `SELECT ${LIST_COLUMNS} FROM submissions.intake_items WHERE id = $1`,
     [id],
   );
   const row = rows[0];
@@ -239,7 +222,7 @@ export async function getIntakeItemDetail(id: string): Promise<SubmissionDetail 
 }
 
 /**
- * `bb_research.cases.candidate_id` is set to the intake item's id for every case opened this way
+ * `research.cases.candidate_id` is set to the intake item's id for every case opened this way
  * (see `commitSubmissionDecision` below and `quarantine-triage.ts`'s identical convention), so a
  * promoted submission's case is a reverse lookup, not a stored column on `intake_items` itself.
  */
@@ -247,7 +230,7 @@ export async function findResearchCaseIdForSubmission(
   intakeItemId: string,
 ): Promise<string | null> {
   const rows = await queryPostgres<{ readonly id: string }>(
-    `SELECT id FROM bb_research.cases WHERE candidate_id = $1 ORDER BY created_at ASC LIMIT 1`,
+    `SELECT id FROM research.cases WHERE candidate_id = $1 ORDER BY created_at ASC LIMIT 1`,
     [intakeItemId],
   );
   return rows[0]?.id ?? null;
@@ -366,7 +349,7 @@ export function prepareSubmissionDecisionPlan(input: {
       subject: {
         type: 'intake_item',
         id: input.intakeItemId,
-        path: `bb_submissions.intake_items/${input.intakeItemId}`,
+        path: `submissions.intake_items/${input.intakeItemId}`,
       },
       reason: input.reason,
       requestId: eventId,
@@ -436,7 +419,7 @@ const defaultDependencies: SubmissionDecisionDependencies = {
 class SubmissionAlreadyProcessedError extends Error {}
 
 /**
- * Decides one quarantined submission: 'promote' opens a `bb_research.cases` candidate (state
+ * Decides one quarantined submission: 'promote' opens a `research.cases` candidate (state
  * 'candidate', same shape `discovery-survivor-intake`/`quarantine-triage` produce elsewhere);
  * 'reject'/'spam' only flip `intake_items.status`. Every decision is one audited, transactional
  * commit — the status flip, the optional case insert, and the audit/outbox rows land together or
@@ -502,7 +485,7 @@ export async function commitSubmissionDecision(
       outboxMessage: plan.outboxMessage,
       applyState: async (client: pg.PoolClient) => {
         const updated = await client.query(
-          `UPDATE bb_submissions.intake_items
+          `UPDATE submissions.intake_items
               SET status = $1
             WHERE id = $2 AND status = 'quarantined'
           RETURNING id`,

@@ -1,14 +1,7 @@
 /**
- * Data Pack v1 validation functions (the related workstream): checksum verification, signature
- * verification, budget enforcement, and license/rights eligibility. Each check is a pure,
- * non-throwing function returning a pass/fail + reason so the import pipeline
- * (`./import-pipeline.ts`) can collect every failure instead of stopping at the first one —
- * mirroring the release builder's/`publish-national-catalog.ts`'s "validate everything, name
- * every failure, then decide" pattern.
- *
- * Reuses `sha256Bytes`/`sha256Json` from `../publication/index.js` for checksum verification and
- * `verifySignedDataPackManifest` from `./manifest.js` for signature verification — no hashing or
- * signing logic is reimplemented here.
+ * Pure checks for resource hashes, signatures, budgets and rights. Return reasons so import
+ * decisions can collect all failures. Reuse publication hash functions and manifest signature
+ * verification.
  */
 import type { KeyLike } from 'node:crypto';
 import { sha256Bytes, sha256Json, type JsonValue } from '../publication/index.js';

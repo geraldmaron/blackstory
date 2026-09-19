@@ -5,7 +5,7 @@
  * (`DISCLAIMER_REGISTRY` `getDisclaimer`) lives in `packages/domain/src/disclaimers.ts`. Never
  * hand-write a disclaimer sentence inline elsewhere in apps/web; resolve it from the registry and
  * pass the result here (or to `SensitivityContextBanner` `AdvisoryNotice`, which both render
- * through this component internally). `packages/domain/src/disclaimers.test.ts` runs a repo-wide
+ * through this component internally). `packages/domain/src/disclaimers.test.ts` runs a repository-wide
  * check that no ad-hoc disclaimer strings exist in apps/web source outside this path.
  *
  * Callers resolve copy via `getDisclaimer(disclaimerClass)` from `@repo/domain` and

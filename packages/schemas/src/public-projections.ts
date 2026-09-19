@@ -3,10 +3,11 @@
  *
  * These schemas describe Postgres-backed release payloads and portable release artifacts.
  * They intentionally live outside every storage adapter so web, workers, and migration tools
- * validate the same wire shape without importing Firebase or a database client.
+ * validate the same wire shape without importing a database client.
  */
 import { z } from 'zod';
 import { relationshipTypeSchema } from './relationship-vocabulary.js';
+import { parseWaybackCaptureUrl } from './archive-pointer.js';
 
 /**
  * Mirrors ThemeImpactThemeId / THEME_IMPACT_THEME_IDS from
@@ -52,17 +53,16 @@ const geoPointSchema = z.object({
   geohashPrefixes: z.array(z.string().min(1)).max(12).optional(),
   precision: z.string().min(1).optional(),
   matchMethod: z.string().min(1).optional(),
-  /** Set only when `reducePublicPrecision` (`@repo/security`, the location precision standard's
-   * publish-path engine, repo-wqcn) coarsened this location; see
-   * `docs/security/location-precision-standard.md` §3 for the reason vocabulary. */
+  /**
+   * Set when reducePublicPrecision coarsens the location. Reason vocabulary is defined in
+   * docs/security/location-precision-standard.md.
+   */
   precisionReductionReason: z.string().min(1).optional(),
 });
 
 /**
- * A reader-facing "go visit this place" contract (repo-el9p / WS3). Optional/additive: absent
- * on records that predate the release builder wiring this up, or that have nothing publishable
- * once `publicVisitForTier` (packages/domain/src/geography/visit.ts) gates it against location
- * precision, entity kind, and living status.
+ * Reader-facing visit information, present only when publicVisitForTier permits fields for the
+ * entity kind, living status and location precision.
  */
 const publicVisitAddressSchema = z.object({
   street: z.string().min(1).optional(),
@@ -143,22 +143,51 @@ export const publicActiveReleaseSchema = z.object({
 });
 export type PublicActiveReleaseDoc = z.infer<typeof publicActiveReleaseSchema>;
 
-export const publicClaimProjectionSchema = z.object({
-  id: z.string().min(1),
-  predicate: z.string().min(1),
-  object: z.string().min(1),
-  confidenceLevel: z.enum(['high', 'medium', 'low']),
-  citationSource: z.string().min(1),
-  citationHref: z.string().url().optional(),
-  citationLabel: z.string().min(1),
-  independentLineageCount: z.number().int().nonnegative().optional(),
-  /**
-   * Whether the claim is the record's own index row or evidence about its subject. Optional
-   * because claims published before the role existed do not carry it; the record tier falls back
-   * to the predicate for those (repo-8dmey).
-   */
-  claimRole: z.enum(['record_index', 'evidence']).optional(),
-});
+export const publicClaimProjectionSchema = z
+  .object({
+    id: z.string().min(1),
+    predicate: z.string().min(1),
+    object: z.string().min(1),
+    confidenceLevel: z.enum(['high', 'medium', 'low']),
+    citationSource: z.string().min(1),
+    citationHref: z.string().url().optional(),
+    archivedUrl: z.string().url().optional(),
+    archivedAt: z.string().datetime().optional(),
+    citationLabel: z.string().min(1),
+    independentLineageCount: z.number().int().nonnegative().optional(),
+    /**
+     * Whether the claim describes an index row or evidence about its subject. When unspecified,
+     * record-tier classification uses the predicate.
+     */
+    claimRole: z.enum(['record_index', 'evidence']).optional(),
+  })
+  .superRefine((claim, context) => {
+    if ((claim.archivedUrl === undefined) !== (claim.archivedAt === undefined)) {
+      context.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: 'archivedUrl and archivedAt must be published together',
+      });
+    }
+    if (claim.archivedUrl !== undefined && claim.citationHref === undefined) {
+      context.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: 'an archived citation must retain citationHref as its original source',
+      });
+    }
+    if (
+      claim.archivedUrl !== undefined &&
+      claim.archivedAt !== undefined &&
+      claim.citationHref !== undefined
+    ) {
+      const pointer = parseWaybackCaptureUrl(claim.archivedUrl, claim.citationHref);
+      if (pointer === null || pointer.capturedAt !== claim.archivedAt) {
+        context.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: 'archive pointer must be a timestamp-matched Wayback copy of citationHref',
+        });
+      }
+    }
+  });
 export type PublicClaimProjectionDoc = z.infer<typeof publicClaimProjectionSchema>;
 
 export const publicEntityProjectionSchema = z.object({
@@ -168,21 +197,9 @@ export const publicEntityProjectionSchema = z.object({
   displayName: z.string().min(1),
   nameLower: z.string().min(1),
   /**
-   * The `min(120)` floor is the load-bearing half: it keeps a one-line stub from passing as a
-   * summary.
-   *
-   * The ceiling is 5000 to match `entityV1Schema.summary` in @repo/public-contracts — the contract
-   * the data is actually served under. It was 400, which made this READ-side parser stricter than
-   * the wire contract, and the failure mode was not a truncated summary: `parseEntityProjection`
-   * returned undefined, so the whole record vanished from both surfaces (repo-n7p6.26). That hit
-   * 9 records in the active release — Baldwin, Audre Lorde, bell hooks, Pauli Murray, Breonna
-   * Taylor, Lorraine Hansberry, Cool Papa Bell, Annie Easley, Leesylvania — which is to say it
-   * deleted precisely the best-enriched records in the catalog, because richer enrichment writes
-   * longer summaries. A read-side length check must never be the thing that unpublishes a record.
-   *
-   * ~400 chars remains the editorial norm for a card blurb. That belongs in the enrichment and
-   * publish-gate checks, which can flag or trim before anything ships; it does not belong here,
-   * where it silently 404s already-published work.
+   * Summary length matches the public wire contract's 5,000-character ceiling; the
+   * 120-character floor rejects stubs. Shorter card prose belongs in editorial checks rather
+   * than a stricter read parser that would hide already published records.
    */
   summary: z.string().min(120).max(5000),
   location: geoPointSchema.optional(),
@@ -194,34 +211,18 @@ export const publicEntityProjectionSchema = z.object({
   status: z.string().min(1).optional(),
   statusHistory: z.array(statusHistoryEntrySchema).optional(),
   /**
-   * Four tokens, not three. `presumed_deceased` is the WP:BDP plausibility answer
-   * `deriveLivingStatus` (packages/domain-core/src/living.ts) returns for a person born beyond
-   * MAX_PLAUSIBLE_HUMAN_AGE_YEARS with no death year, `deriveCatalogEntityStatus` emits it, the
-   * `entities_living_status_check` constraint accepts it, and the web UI already has an icon
-   * (status-icons.ts), help copy (metadata-help.ts) and an admin label for it.
-   *
-   * Only this parser rejected it, which made it a loaded gun rather than a gap: the first record
-   * anyone ever set to `presumed_deceased` would not have degraded, it would have 404'd — the
-   * same shape as the 2026-09-09 incident this file documents two fields below, where a
-   * vocabulary widened in the database and not here took 39 live records off the site. It had
-   * never fired only because 0 of 483 live person records used the token. Ellen Eglin
-   * (repo-2wdg item 9) is the first, so the gun is now unloaded rather than pointed.
+   * Include presumed_deceased in the living-status vocabulary. deriveLivingStatus can infer it
+   * from the age bound without a sourced death year; keep that distinction visible and apply
+   * the shared privacy policy.
    */
   livingStatus: z.enum(['living', 'deceased', 'presumed_deceased', 'unknown']).optional(),
   statusProvenance: z.enum(['canonical', 'derived_heuristic']).optional(),
   eraBuckets: z.array(z.string().min(1)).optional(),
   notabilityLabels: z.array(z.string().min(1)).optional(),
   /**
-   * `.catch([])` for the same reason the relationship enum carries one: a criterion this list has
-   * not caught up to must not delete the record that uses it. On 2026-09-09 a vocabulary widened
-   * in the database and not here took 39 live records off the site, because a projection that
-   * fails to parse does not degrade — it 404s.
-   *
-   * The cost of the catch is that the "Why this is here" block collapses for a record whose basis
-   * this parser cannot read. Showing no inclusion reason is recoverable and visible; showing the
-   * page not at all is neither. It is deliberately array-level rather than per-entry: a criterion
-   * we cannot name must not be silently rewritten into one we can, which is what a per-entry
-   * fallback would do.
+   * If an inclusion-basis criterion cannot be parsed, omit the basis array rather than hide the
+   * entire record or silently relabel the criterion. This degradation loses the reason block
+   * and must not imply the underlying evidence was verified.
    */
   notabilityBasis: z.array(notabilityBasisRecordSchema).catch([]).optional(),
   researchCoverage: z.enum(['minimal', 'partial', 'substantial']).optional(),
@@ -251,12 +252,10 @@ export const publicEntityProjectionSchema = z.object({
       height: z.number().int().positive().optional(),
       objectPath: z.string().min(1).optional(),
       /**
-       * Pin-and-serve fields (repo-4vuf / WS5): identify a source-hosted photo that is
-       * fetched by the reader's browser at view time rather than stored as an original.
-       * `sourceSystem` names where the pin resolves; `fileTitle`/`sha1` pin the exact
-       * upstream file version so a weekly imageinfo check can detect drift; `sourcePageUrl`
-       * is the human-readable attribution page; `license` is a short SPDX-ish id
-       * (e.g. 'CC-BY-SA-4.0', 'PD') distinct from the coarse `rightsStatus` bucket above.
+       * Identify source-hosted images fetched by the reader's browser. sourceSystem, fileTitle
+       * and sha1 identify the upstream version for drift checks; sourcePageUrl supplies
+       * attribution. license is the specific license identifier, separate from the coarse
+       * rightsStatus category. No schedule is implied.
        */
       sourceSystem: z.enum(['wikimedia_commons', 'nps', 'loc', 'public_media']).optional(),
       fileTitle: z.string().min(1).optional(),
@@ -339,19 +338,9 @@ export const publicStoryThemeBindingSchema = z.object({
 export type PublicStoryThemeBindingDoc = z.infer<typeof publicStoryThemeBindingSchema>;
 
 /**
- * Longform story shape. `bb_public.release_stories` was dropped on 2026-07-29
- * (supabase/migrations/20260729190000_drop_release_stories.sql) and `/stories` now reads
- * articles, so nothing publishes against this schema any more.
- *
- * It is still load-bearing as a TYPE, not as a parser: `PublicStoryProjectionDoc` types the
- * five-story fixture in `packages/domain/src/publication/public-story-seed.ts`, which backs the
- * admin cover-package workflow (`/admin/stories/articles`, `/admin/stories/review`) through
- * `apps/web/src/admin/stories/cover-article-catalog.ts`. repo-zcnr (2026-09-12) decided that
- * fixture stays until the admin workflow gets a real-article source, so this schema stays with
- * it. Retire them together, not separately.
- *
- * The companion list-item projection was deleted with repo-vn1z: it existed only to keep
- * `/stories` list reads small, and that route is gone.
+ * Longform fixture shape used by the admin cover-package catalog and public-story-seed. Public
+ * /stories reads articles. Retire this shape with its fixture consumers when the admin catalog
+ * uses real article records.
  */
 export const publicStoryProjectionSchema = z.object({
   id: z.string().min(1),
@@ -408,14 +397,9 @@ export const publicSearchProjectionSchema = z.object({
   relatedCount: z.number().int().min(0),
   claimCount: z.number().int().min(0),
   /**
-   * The grading inputs `/records` derives evidence floors from — the strongest claim level and
-   * the distinct lineage keys, never the graded tier itself. Caching the conclusion is what let
-   * `/records` serve a day-old answer after the rule changed (repo-6qjv0); caching the inputs
-   * lets it call the one read-time rule over cheap slim data.
-   *
-   * Absent on rows published before the field existed; do not invent an empty projection at parse
-   * time — an empty one grades `unrated`, while absent means "not projected yet" and Records slim
-   * needs to tell those apart to decide whether it can leave the full-entity hydrate.
+   * Cache evidence-grading inputs, not the resulting tier. The reader applies the shared rule
+   * to strongest claim level and lineage keys. An absent projection requires hydration; an
+   * explicitly empty projection grades unrated.
    */
   evidenceInputs: recordEvidenceInputsSchema.optional(),
   /** Present when the search row carries a public geohash (mappable signal for Records). */
@@ -425,8 +409,8 @@ export type PublicSearchProjectionDoc = z.infer<typeof publicSearchProjectionSch
 
 /**
  * Frozen ThemeImpactPacket projection payload — one row per packet in
- * `bb_public.release_theme_impact_packets.payload`. The payload is the packet
- * document exactly as authored in `bb_reference.theme_impact_packets` at
+ * `published.release_theme_impact_packets.payload`. The payload is the packet
+ * document exactly as authored in `reference.theme_impact_packets` at
  * promotion time; the domain parser (`parseThemeImpactPacketRow`) remains the
  * deep validator. This schema pins only the envelope fields the read path and
  * projection step key on, so schemas keeps no reverse dependency on domain.

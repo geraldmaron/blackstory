@@ -1,5 +1,5 @@
 /**
- * Validation for authored `bb_reference.law_applicability` rows.
+ * Validation for authored `reference.law_applicability` rows.
  *
  * A row says a law or ruling was in force for a jurisdiction and certain groups over a window.
  * The window must come from the record's own cited claims, never from entity `statusHistory`

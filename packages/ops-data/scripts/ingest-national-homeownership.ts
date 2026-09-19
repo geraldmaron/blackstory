@@ -1,6 +1,6 @@
 /**
  * National homeownership rate by race ingest for Phase 1 observations into
- * bb_reference.statistical_observations. Uses curated decennial (1900-2000)
+ * reference.statistical_observations. Uses curated decennial (1900-2000)
  * and ACS 1-year (2005-2024) national fixtures.
  *
  * Usage (repo root):
@@ -334,7 +334,7 @@ async function applyObservations(
 
     for (const series of buildSeriesDefinitions()) {
       await client.query(
-        `INSERT INTO bb_reference.statistical_series
+        `INSERT INTO reference.statistical_series
           (metric_id, metric_definition, universe, unit, source_dataset, source_table,
            source_variable, geography_type, estimate_type, period_type,
            external_data_source_id, theme, metadata)
@@ -377,7 +377,7 @@ async function applyObservations(
 
     for (const obs of observations) {
       await client.query(
-        `INSERT INTO bb_reference.statistical_observations
+        `INSERT INTO reference.statistical_observations
           (id, metric_id, jurisdiction_id, boundary_version, reference_period, dataset_vintage,
            estimate, margin_of_error, race_ethnicity_slice, status, source, source_url,
            retrieved_at, content_hash, metadata)

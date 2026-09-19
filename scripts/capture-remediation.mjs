@@ -220,7 +220,7 @@ async function planSpnSubmissions(missingCitations, options) {
   console.log('');
   console.log('CAPTURE_REMEDIATION_SPN=1: live SPN path is intentionally stubbed in this script.');
   console.log(
-    'Route captures through captureUrlToEvidencePointer + operator review — see runbook.',
+    'Use capture-backfill with preservation decisions and independent evidence review — see runbook.',
   );
   return { submitted: 0, stubbed: true };
 }

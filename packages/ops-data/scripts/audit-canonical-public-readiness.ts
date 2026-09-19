@@ -1,10 +1,10 @@
 /**
- * Read-only audit: `bb_canonical.entities` vs active `bb_public.release_entities`.
+ * Read-only audit: `canonical.entities` vs active `published.release_entities`.
  * Classifies each canonical row for promote eligibility using the same gates as
  * auto-promote / constitution (person privacy, location, claims, notability).
  * Emits a weed table with counts and writes JSON under `.cache/ledger-audit/`.
  *
- * Does not write bb_public or activate releases.
+ * Does not write published or activate releases.
  *
  * Usage (from repo root):
  *   DATABASE_URL=… DATABASE_SSL=true node --conditions development --import tsx \
@@ -26,7 +26,7 @@ type KindRow = { readonly kind: string; readonly n: number };
 type WeedRow = { readonly skip_reason: string; readonly n: number };
 type EntityRow = { readonly id: string; readonly display_name: string; readonly kind: string };
 
-/** `bb_public.release_entities` names the entity `entity_id`, not `id`. */
+/** `published.release_entities` names the entity `entity_id`, not `id`. */
 type ReleaseEntityRow = {
   readonly entity_id: string;
   readonly display_name: string;
@@ -35,7 +35,7 @@ type ReleaseEntityRow = {
 
 const AUDIT_SQL = `
 WITH active AS (
-  SELECT release_id FROM bb_public.active_release LIMIT 1
+  SELECT release_id FROM published.active_release LIMIT 1
 ),
 entity_stats AS (
   SELECT
@@ -44,14 +44,14 @@ entity_stats AS (
     e.kind,
     e.living_status,
     jsonb_array_length(COALESCE(e.notability_basis, '[]'::jsonb)) AS notability_count,
-    (SELECT COUNT(*)::int FROM bb_canonical.claims c WHERE c.entity_id = e.id) AS claim_count,
-    (SELECT COUNT(*)::int FROM bb_canonical.entity_locations el
+    (SELECT COUNT(*)::int FROM canonical.claims c WHERE c.entity_id = e.id) AS claim_count,
+    (SELECT COUNT(*)::int FROM canonical.entity_locations el
        WHERE el.entity_id = e.id AND el.lat IS NOT NULL AND el.lng IS NOT NULL) AS loc_count,
     EXISTS (
-      SELECT 1 FROM bb_public.release_entities re, active a
+      SELECT 1 FROM published.release_entities re, active a
       WHERE re.release_id = a.release_id AND re.entity_id = e.id
     ) AS in_public
-  FROM bb_canonical.entities e
+  FROM canonical.entities e
 ),
 classified AS (
   SELECT
@@ -75,39 +75,39 @@ ORDER BY n DESC;
 `;
 
 const SUMMARY_SQL = `
-WITH active AS (SELECT release_id FROM bb_public.active_release LIMIT 1),
+WITH active AS (SELECT release_id FROM published.active_release LIMIT 1),
 pub AS (
-  SELECT entity_id FROM bb_public.release_entities re, active a WHERE re.release_id = a.release_id
+  SELECT entity_id FROM published.release_entities re, active a WHERE re.release_id = a.release_id
 ),
-canon AS (SELECT id FROM bb_canonical.entities)
+canon AS (SELECT id FROM canonical.entities)
 SELECT
-  (SELECT COUNT(*)::int FROM bb_canonical.entities) AS canonical_total,
+  (SELECT COUNT(*)::int FROM canonical.entities) AS canonical_total,
   (SELECT COUNT(*)::int FROM pub) AS public_active_total,
   (SELECT COUNT(*)::int FROM canon c WHERE c.id NOT IN (SELECT entity_id FROM pub)) AS canonical_not_in_public,
   (SELECT COUNT(*)::int FROM pub p WHERE p.entity_id NOT IN (SELECT id FROM canon)) AS public_not_in_canonical,
-  (SELECT COUNT(*)::int FROM bb_canonical.claims) AS canonical_claim_rows,
-  (SELECT COUNT(*)::int FROM bb_canonical.entity_locations) AS canonical_location_rows;
+  (SELECT COUNT(*)::int FROM canonical.claims) AS canonical_claim_rows,
+  (SELECT COUNT(*)::int FROM canonical.entity_locations) AS canonical_location_rows;
 `;
 
 const EMPTY_CLAIMS_PUBLIC_SQL = `
-WITH active AS (SELECT release_id FROM bb_public.active_release LIMIT 1)
+WITH active AS (SELECT release_id FROM published.active_release LIMIT 1)
 SELECT re.entity_id, re.display_name, re.kind
-FROM bb_public.release_entities re, active a
+FROM published.release_entities re, active a
 WHERE re.release_id = a.release_id
   AND (re.claims IS NULL OR jsonb_typeof(re.claims) <> 'array' OR jsonb_array_length(re.claims) = 0)
 ORDER BY re.kind, re.display_name;
 `;
 
 const KINDS_CANONICAL_SQL = `
-SELECT kind, COUNT(*)::int AS n FROM bb_canonical.entities GROUP BY kind ORDER BY n DESC;
+SELECT kind, COUNT(*)::int AS n FROM canonical.entities GROUP BY kind ORDER BY n DESC;
 `;
 
 const PUBLIC_ONLY_KINDS_SQL = `
-WITH active AS (SELECT release_id FROM bb_public.active_release LIMIT 1)
+WITH active AS (SELECT release_id FROM published.active_release LIMIT 1)
 SELECT re.kind, COUNT(*)::int AS n
-FROM bb_public.release_entities re, active a
+FROM published.release_entities re, active a
 WHERE re.release_id = a.release_id
-  AND re.entity_id NOT IN (SELECT id FROM bb_canonical.entities)
+  AND re.entity_id NOT IN (SELECT id FROM canonical.entities)
 GROUP BY re.kind ORDER BY n DESC;
 `;
 
@@ -156,12 +156,12 @@ async function main(): Promise<void> {
     console.log('\n## Counts\n');
     console.log(`| Metric | Before audit |`);
     console.log(`|--------|-------------:|`);
-    console.log(`| bb_canonical.entities | ${summary.canonical_total} |`);
-    console.log(`| bb_public.release_entities (active) | ${summary.public_active_total} |`);
+    console.log(`| canonical.entities | ${summary.canonical_total} |`);
+    console.log(`| published.release_entities (active) | ${summary.public_active_total} |`);
     console.log(`| Canonical not in public | ${summary.canonical_not_in_public} |`);
     console.log(`| Public not in canonical (fixture drift) | ${summary.public_not_in_canonical} |`);
-    console.log(`| bb_canonical.claims rows | ${summary.canonical_claim_rows} |`);
-    console.log(`| bb_canonical.entity_locations rows | ${summary.canonical_location_rows} |`);
+    console.log(`| canonical.claims rows | ${summary.canonical_claim_rows} |`);
+    console.log(`| canonical.entity_locations rows | ${summary.canonical_location_rows} |`);
     console.log(`| Promote-eligible (net-new) | ${promoteEligible} |`);
 
     console.log('\n## Canonical kind breakdown\n');
@@ -205,8 +205,7 @@ async function main(): Promise<void> {
       promoteCommands: [
         '# No net-new canonical rows eligible — skip publish-national-catalog until ledger backfill.',
         '# When eligible rows exist:',
-        'DRY_RUN=1 APP_FIREBASE_ALLOW_PRODUCTION=1 node --conditions development --import tsx packages/ops-data/scripts/publish-national-catalog.ts',
-        'APP_FIREBASE_ALLOW_PRODUCTION=1 node --conditions development --import tsx packages/ops-data/scripts/publish-national-catalog.ts',
+        'Read docs/runbooks/release-activation-postgres.md and verify the reviewed claim ledger before publication.',
       ],
     };
     writeFileSync(reportPath, `${JSON.stringify(report, null, 2)}\n`);
@@ -214,16 +213,16 @@ async function main(): Promise<void> {
 
     if (writeList) {
       const listSql = `
-WITH active AS (SELECT release_id FROM bb_public.active_release LIMIT 1),
+WITH active AS (SELECT release_id FROM published.active_release LIMIT 1),
 entity_stats AS (
   SELECT e.id, e.display_name, e.kind, e.living_status,
     jsonb_array_length(COALESCE(e.notability_basis, '[]'::jsonb)) AS notability_count,
-    (SELECT COUNT(*)::int FROM bb_canonical.claims c WHERE c.entity_id = e.id) AS claim_count,
-    (SELECT COUNT(*)::int FROM bb_canonical.entity_locations el
+    (SELECT COUNT(*)::int FROM canonical.claims c WHERE c.entity_id = e.id) AS claim_count,
+    (SELECT COUNT(*)::int FROM canonical.entity_locations el
        WHERE el.entity_id = e.id AND el.lat IS NOT NULL AND el.lng IS NOT NULL) AS loc_count,
-    EXISTS (SELECT 1 FROM bb_public.release_entities re, active a
+    EXISTS (SELECT 1 FROM published.release_entities re, active a
       WHERE re.release_id = a.release_id AND re.entity_id = e.id) AS in_public
-  FROM bb_canonical.entities e
+  FROM canonical.entities e
 )
 SELECT id, display_name, kind FROM entity_stats
 WHERE CASE

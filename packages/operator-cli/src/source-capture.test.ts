@@ -10,8 +10,8 @@ import {
   type CitedUrl,
 } from './source-capture.js';
 
-test('normalizeCaptureUrl lowercases host, drops fragment, trims trailing slash', () => {
-  assert.equal(normalizeCaptureUrl('HTTPS://WWW.Census.gov/data/'), 'https://www.census.gov/data');
+test('normalizeCaptureUrl lowercases host, drops fragments and preserves path identity', () => {
+  assert.equal(normalizeCaptureUrl('HTTPS://WWW.Census.gov/data/'), 'https://www.census.gov/data/');
   assert.equal(normalizeCaptureUrl('https://x.org/a?b=1#frag'), 'https://x.org/a?b=1');
   assert.equal(normalizeCaptureUrl('ftp://x.org/a'), null);
   assert.equal(normalizeCaptureUrl('not a url'), null);
@@ -20,7 +20,7 @@ test('normalizeCaptureUrl lowercases host, drops fragment, trims trailing slash'
 test('buildCaptureInventory dedupes by normalized URL and tallies per surface', () => {
   const refs: CitedUrl[] = [
     { url: 'https://census.gov/a/', surface: 'packet', refId: 'p1' },
-    { url: 'https://census.gov/a', surface: 'article', refId: 'a1' }, // dup of p1 after normalize
+    { url: 'https://census.gov/a/', surface: 'article', refId: 'a1' }, // dup of p1 after normalize
     { url: 'https://bls.gov/b', surface: 'packet', refId: 'p2' },
     { url: 'mailto:x@y.com', surface: 'entity', refId: 'e1' }, // dropped
   ];
@@ -29,7 +29,7 @@ test('buildCaptureInventory dedupes by normalized URL and tallies per surface', 
   assert.equal(inv.bySurface.packet.cited, 2);
   assert.equal(inv.bySurface.packet.unique, 2);
   assert.equal(inv.bySurface.article.cited, 1);
-  assert.equal(inv.bySurface.article.unique, 0); // its only URL was a dup
+  assert.equal(inv.bySurface.article.unique, 1); // its only URL was a dup
   assert.equal(inv.bySurface.entity.cited, 0); // mailto dropped before tally
 });
 
@@ -66,6 +66,7 @@ test('captureCitedUrl on success builds a capture row + success event', async ()
   assert.equal(out.capture?.sourceItemId, null);
   assert.equal(out.capture?.snapshotMode, 'selective');
   assert.equal((out.capture?.storageObject as { stored?: string }).stored, 'metadata-only');
+  assert.equal(Object.hasOwn(out.capture!.storageObject, 'excerpt'), false);
   assert.equal(out.retrievalEvent.status, 'success');
   assert.equal(out.retrievalEvent.httpStatus, 200);
 });

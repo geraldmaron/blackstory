@@ -75,11 +75,13 @@ export type ExploreMapFeatureProperties = {
    * page's "Accepted claims" section) a transparency affordance, not a hidden ranking input. */
   readonly evidenceCount: number;
   readonly confidenceTier: ConfidenceTier;
-  /** @deprecated Superseded by `topicIds` (the related workstream); kept for the facet builder's
-   * fallback path. */
+  /**
+   * Uncontrolled search tags; do not treat them as controlled theme identifiers.
+   */
   readonly topicTags: readonly string[];
-  /** Controlled historical-theme ids (the related workstream) — the ONLY field
-   * `buildExploreFacetOptions` should treat as authoritative for the theme facet. */
+  /**
+   * Controlled theme identifiers for facet construction.
+   */
   readonly topicIds?: readonly string[];
   /** Semantic tone override from topics (massacre / plantation / epicenter). */
   readonly mapTone?: string;
@@ -362,7 +364,7 @@ export function buildExploreMapSource(
 
   for (const entity of entities) {
     if (staysOffPublicMap(entity)) continue;
-    // Live projections carry their own public-precision anchor; the repo-side table is the
+    // Live projections carry their own public-precision anchor; the repository-side table is the
     // fallback for bundled seed fixtures only (see entity-geo.ts's retirement note).
     const anchor = entity.geoAnchor ?? resolveAnchor(entity.id);
     if (!anchor) {

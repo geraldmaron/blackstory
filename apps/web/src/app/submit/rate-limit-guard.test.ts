@@ -21,7 +21,7 @@ test('denies an anonymous submission without App Check verification', () => {
   const decision = guard.evaluate({ subject: 'anonymous', clientIp: '203.0.113.1' });
   assert.equal(decision.allowed, false);
   if (decision.allowed) return;
-  assert.equal(decision.reason, 'app_check_required');
+  assert.equal(decision.reason, 'client_header_required');
 });
 
 test('allows a verified anonymous submission and denies once the rolling window is exhausted', () => {
@@ -30,7 +30,7 @@ test('allows a verified anonymous submission and denies once the rolling window 
   const request = {
     subject: 'anonymous' as const,
     clientIp: '203.0.113.2',
-    appCheckVerified: true,
+    clientAttested: true,
   };
 
   const first = guard.evaluate(request);
@@ -54,7 +54,7 @@ test('a second concurrent submission from the same key is denied until the first
   const request = {
     subject: 'anonymous' as const,
     clientIp: '203.0.113.3',
-    appCheckVerified: true,
+    clientAttested: true,
   };
 
   const first = guard.evaluate(request);
@@ -76,7 +76,7 @@ test('the rolling window resets once enough time has passed', () => {
   const request = {
     subject: 'anonymous' as const,
     clientIp: '203.0.113.4',
-    appCheckVerified: true,
+    clientAttested: true,
   };
 
   const first = guard.evaluate(request);
@@ -99,12 +99,12 @@ test('different client IPs get independent rate-limit keys', () => {
   const a = guard.evaluate({
     subject: 'anonymous',
     clientIp: '203.0.113.5',
-    appCheckVerified: true,
+    clientAttested: true,
   });
   const b = guard.evaluate({
     subject: 'anonymous',
     clientIp: '203.0.113.6',
-    appCheckVerified: true,
+    clientAttested: true,
   });
   assert.equal(a.allowed, true);
   assert.equal(b.allowed, true);

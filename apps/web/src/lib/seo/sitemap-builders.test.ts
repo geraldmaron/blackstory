@@ -41,8 +41,7 @@ test('the sitemap never advertises a URL that redirects', () => {
 });
 
 test('the sitemap never lists the same URL twice', () => {
-  // `/history` was listed twice for two releases, which put a duplicate `<url>` element in the
-  // shipped sitemap. This is the standing assertion SP-19 (repo-92n2.19) requires.
+  // A public sitemap must contain one `<url>` element per canonical destination.
   const urls = buildPublicSitemapEntries({
     siteUrl: 'https://blackbook.example',
     releaseGeneratedAt: '2026-07-17T00:00:00.000Z',

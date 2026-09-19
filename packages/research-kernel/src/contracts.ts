@@ -35,6 +35,26 @@ function validatorFor(name: ResearchContractName): ValidateFunction {
   return validator;
 }
 
+/** Standalone schema for provider structured-output requests, from the same validation source. */
+export function contractSchema(name: ResearchContractName): Readonly<Record<string, unknown>> {
+  const definitions: Record<string, unknown> = {};
+  const visit = (value: unknown): void => {
+    if (value === null || typeof value !== 'object') return;
+    for (const [key, child] of Object.entries(value)) {
+      if (key === '$ref' && typeof child === 'string') {
+        const ref = child.replace('#/$defs/', '') as ResearchContractName;
+        if (!(ref in definitions)) {
+          definitions[ref] = researchKernelSchema.$defs[ref];
+          visit(definitions[ref]);
+        }
+      } else visit(child);
+    }
+  };
+  const root = researchKernelSchema.$defs[name];
+  visit(root);
+  return { ...root, ...(Object.keys(definitions).length ? { $defs: definitions } : {}) };
+}
+
 function formatError(error: ErrorObject): string {
   const path = error.instancePath.length > 0 ? error.instancePath : '/';
   return `${path} ${error.message ?? error.keyword}`;

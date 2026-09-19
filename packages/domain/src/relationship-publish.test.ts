@@ -1,8 +1,6 @@
 /**
- * Tests for the EntityRelationship publish invariants (BB the related workstream): evidence presence,
- * endpoint resolution, type-specific temporal requirements, the edge-cannot-corroborate-itself
- * guard, and syndicated-evidence dedupe. Not wired into a publish pipeline yet (release-builder
- * bead the related workstream owns that); these tests exercise the validators directly.
+ * Relationship invariant tests cover evidence, endpoints, temporal requirements,
+ * self-corroboration and syndicated-source deduplication.
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';

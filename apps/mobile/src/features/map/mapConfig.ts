@@ -1,26 +1,8 @@
 /**
- * Native map configuration and the tile cost kill-switch (MOB-011;
- * `docs/decisions-carryover.md`, "Native map render layer").
- *
- * This module is the single place the map surface reads its tile source and
- * attribution from, so a build (or an OTA config push) can retarget the PMTiles
- * archive or disable the basemap entirely without touching render code.
- *
- * Cost/dignity posture (`docs/decisions-carryover.md`, "Explore basemap and live map
- * source" for the tile source, "Native map render layer" for the render rules). The
- * path this line used to name, `docs/adr/ADR-024-mobile-map-data.md`, never existed
- * under either number: the map-data ADR shipped as `ADR-025-mobile-map-data.md` while
- * `ADR-024-mobile-build-release.md` already held 024.
- *  - Default basemap matches web Explore: free OpenFreeMap vector tiles
- *    (`tiles.openfreemap.org/planet`) — no per-tile vendor fees.
- *  - Optional self-hosted Protomaps PMTiles (the target recorded in
- *    `docs/decisions-carryover.md`, "Map stack": tile strategy) via
- *    `extra.map.pmtilesUrl` when a U.S. archive is published on CDN.
- *  - `MAP_BASEMAP_ENABLED` is the kill-switch: when false, no tile source is
- *    attached at all, so the map renders entity points over a flat dark canvas
- *    with ZERO tile egress. Flip it via `extra.map.basemapEnabled` in an OTA
- *    config push if CDN egress cost spikes — the app keeps working, degraded to
- *    points-only, instead of continuing to bill range requests.
+ * Native map source, attribution and basemap kill switch. Defaults to OpenFreeMap; an
+ * explicitly configured PMTiles URL can replace it. Disabling the basemap keeps entity points
+ * visible without tile requests. Follow the map dignity and precision rules in
+ * docs/ui/PROTECTED-EXPERIENCES.md.
  */
 import Constants from 'expo-constants';
 
@@ -60,7 +42,7 @@ export const DEFAULT_OPENFREEMAP_TILE_SOURCE_URL = 'https://tiles.openfreemap.or
 export const MAP_LABEL_TEXT_FONT = ['Noto Sans Regular'] as const;
 
 type MapExtra = {
-  /** HTTPS URL of the self-hosted PMTiles archive on Firebase Hosting/CDN. */
+  /** HTTPS URL of the self-hosted PMTiles archive on the configured CDN. */
   readonly pmtilesUrl?: string;
   /**
    * HTTPS MapLibre TileJSON / style source URL (OpenFreeMap by default).

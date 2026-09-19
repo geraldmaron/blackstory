@@ -1,27 +1,6 @@
-/**
- * research-quality-audit: a repeatable, read-only assessment of how well researched the
- * released catalog actually is.
- *
- * Research-quality findings in this repository have historically been produced by hand and
- * written into dated markdown under docs/research/. They are true on the day they are written
- * and wrong soon after: the numbers this program was scoped against — roughly 2,200
- * Wikipedia-cited claims, 549 entities, zero low-confidence claims — included one that had
- * already been fixed while the document still asserted it. A number you cannot re-derive on
- * demand is a number you will eventually quote wrongly.
- *
- * This reads. It never writes a claim, a projection or a release, and it has no --commit.
- *
- * IT DOES NOT REPLACE THE COMPLETENESS AUDIT. docs/research/entity-completeness-audit.md asks
- * whether a record's rendered fields are populated. This asks whether the research was done.
- * A record can be complete and unresearched — every field filled from one templated import —
- * and telling those apart is the entire point.
- *
- * HEURISTICS ARE MARKED AS SUCH. The released projection stores a citation host and label, not
- * a document class, so `sourceClassForCitation` infers one. That inference is the weakest link
- * in this audit and it is deliberately conservative: an unrecognized host lands at
- * `modern_reputable_secondary`, the same honest middle the publish-time classifier chose,
- * because calling a state historical society a lead would understate real evidence more often
- * than calling an unknown blog a secondary source overstates it.
+/** Read-only research maturity assessment of the released catalog.
+ * URL patterns identify limited document types. A host alone cannot establish peer review,
+ * primary-source status, independence, or fitness for a particular claim.
  */
 import {
   type AssertionClass,
@@ -71,58 +50,37 @@ function hostMatches(host: string, domain: string): boolean {
   return host === domain || host.endsWith(`.${domain}`);
 }
 
-/**
- * Infer a document class from a citation host.
- *
- * A HEURISTIC, and the audit says so wherever it reports a fitness finding. The right long-term
- * answer is a stored document class on the source item; until that exists, this is the honest
- * approximation, and it errs toward the middle rather than toward either extreme.
- */
+/** Conservative document hints. Unclassified citations require source-level review. */
 export function sourceClassForCitation(
   href: string | undefined,
   source: string | undefined,
 ): SourceClass {
   const host = hostOf(href, source);
-  if (host === undefined || host.length === 0) return 'search_result_lead';
-
-  if (host.includes('wikipedia')) return 'wikipedia_bridge';
-  if (host.includes('wikidata')) return 'wikidata_bridge';
-
+  if (!host) return 'search_result_lead';
+  if (hostMatches(host, 'wikipedia.org') || host === 'wikipedia_api') return 'wikipedia_bridge';
+  if (hostMatches(host, 'wikidata.org') || host === 'wikidata_api') return 'wikidata_bridge';
+  let path = '';
+  try {
+    path = href ? new URL(href).pathname : '';
+  } catch {
+    return 'search_result_lead';
+  }
   if (
-    hostMatches(host, 'patents.google.com') ||
-    hostMatches(host, 'uspto.gov') ||
-    hostMatches(host, 'freepatentsonline.com') ||
-    hostMatches(host, 'patentimages.storage.googleapis.com')
-  ) {
+    (hostMatches(host, 'patents.google.com') && path.startsWith('/patent/')) ||
+    (hostMatches(host, 'patentimages.storage.googleapis.com') && path.endsWith('.pdf'))
+  )
     return 'patent_specification';
-  }
-
-  // Chronicling America and other period newspaper archives.
-  if (host.includes('chroniclingamerica') || host.includes('newspapers.com')) {
-    return 'contemporaneous_newspaper';
-  }
-
-  // NRHP nomination forms are government technical reports, not biographies.
-  if (hostMatches(host, 'npgallery.nps.gov')) return 'government_technical_report';
-
-  if (hostMatches(host, 'catalog.archives.gov') || hostMatches(host, 'archives.gov')) {
-    return 'archival_manuscript';
-  }
-  if (hostMatches(host, 'loc.gov')) return 'archival_manuscript';
-  if (hostMatches(host, 'si.edu') || hostMatches(host, 'smithsonianmag.com')) {
-    return 'museum_curatorial_history';
-  }
-  if (hostMatches(host, 'archive.org')) return 'archival_manuscript';
-  if (hostMatches(host, 'doi.org') || host.includes('jstor') || host.includes('.edu.au')) {
-    return 'peer_reviewed_scholarship';
-  }
-
-  // Remaining government and institutional hosts speak for their institutions.
-  if (host.endsWith('.gov') || host.endsWith('.mil')) return 'institutional_biography';
-  if (host.endsWith('.edu')) return 'institutional_biography';
-
-  // Everything else. See the module doc for why this is the middle and not the bottom.
-  return 'modern_reputable_secondary';
+  if (hostMatches(host, 'npgallery.nps.gov') && path.startsWith('/NRHP/GetAsset/'))
+    return 'government_technical_report';
+  // Official pages are institutional accounts until their underlying document is classified.
+  if (
+    host.endsWith('.gov') ||
+    host.endsWith('.mil') ||
+    host.endsWith('.edu') ||
+    hostMatches(host, 'si.edu')
+  )
+    return 'institutional_biography';
+  return 'search_result_lead';
 }
 
 /** Whether a source class is one of the patent record classes — a technical, not a racial, record. */
@@ -185,7 +143,7 @@ export function assertionClassForClaim(claim: ReleasedClaim): AssertionClass {
  *  - selectors: the released projection carries a citation href, never a passage, so
  *    `hasSelector` is false everywhere. That is accurate about the released data.
  *  - captures: not represented in the projection, so `captured` is false.
- *  - document dates: no column exists anywhere in bb_evidence, so `documentDate` is undefined.
+ *  - document dates: no column exists anywhere in evidence, so `documentDate` is undefined.
  *  - assessed dimensions: the publish path defaults three of them, so none are claimed.
  * Each of those produces a real deficit rather than a silent pass, which is the intended
  * behavior: "we have not recorded this" and "this is fine" must not look the same.
@@ -219,7 +177,7 @@ export function snapshotForReleasedEntity(entity: ReleasedEntity): RecordSnapsho
   });
 
   // Technical identity and Black-history relevance are two separate evidence requirements
-  // (repo-93p35.16). An invention record's technical claim needs a technical receipt; a person
+  //. An invention record's technical claim needs a technical receipt; a person
   // record whose only cited evidence is a patent needs an independent identity receipt, because
   // the Patent Office never recorded inventor race and a patent cannot answer that question.
   const citesPatentSource = claims.some((claim) =>

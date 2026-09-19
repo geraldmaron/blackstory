@@ -1,5 +1,5 @@
 /**
- * Public module boundary for national seed campaigns (fixture-only no Firestore apply).
+ * Public module boundary for national seed campaigns (fixture-only no database writes).
  */
 export {
   SEED_CAMPAIGN_SCHEMA_VERSION,

@@ -34,7 +34,7 @@ Policy implementation lives in
 
 ### Before a scheduled run
 
-1. Confirm the kill switch is **disengaged** in `bb_ops.kill_switches`.
+1. Confirm the kill switch is **disengaged** in `ops.kill_switches`.
 2. Confirm the research worker target is wired (see runner gaps in
    [`scheduled-jobs-configuration.md`](./scheduled-jobs-configuration.md)).
 3. Review any open validation errors from the prior quarter.
@@ -59,7 +59,7 @@ To add or elevate a challenged title:
    editorial path.
 
 Discovery queries for book-challenge leads live in
-[`corsair-web-search-queries.json`](../../packages/config/src/scheduled-jobs/data/corsair-web-search-queries.json)
+[`web-search-queries.json`](../../packages/config/src/scheduled-jobs/data/web-search-queries.json)
 (`theme: book_challenges`). SERP hits are leads only until captured and reviewed.
 
 ## External data registry

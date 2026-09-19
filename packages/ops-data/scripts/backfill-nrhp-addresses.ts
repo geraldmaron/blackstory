@@ -1,57 +1,8 @@
 /**
- * repo-2qbj (WS2) — zero-cost street-address backfill for NRHP Black heritage listings.
- *
- * `scrape-nrhp-black-heritage-roster.ts` joins the lane to the NPS ArcGIS listings layer
- * (cultural_resources/nrhp_locations/MapServer/0) by NRIS_Refnum for lat/lng only, requesting
- * just `NRIS_Refnum` back. The same layer publishes a street address (or a directional
- * "vicinity of" description) per listing, plus positional-accuracy and boundary metadata NPS
- * already computed. This script re-queries that layer with the fuller field list and turns the
- * result into a location-precision upgrade plan for `bb_canonical.entity_locations` and the
- * active release's `bb_public.release_entities` projection — no geocoding, no LLM, no new source:
- * every value published here is copied verbatim from a field NPS's own service already returns.
- *
- * OUTCOMES (classifyNrhpAddressOutcome, pure — see the test file):
- *   restricted        payload.restrictedAddress is true (the roster's own NPS-sourced flag).
- *                      Never emit an address or geometry for these; the plan only carries a
- *                      recommendation to flag sensitivityClass 'sensitive_site'.
- *   address_found      Layer has a non-empty Address AND Vicinity is not "True": a real street
- *                      address for THIS parcel.
- *   vicinity           Layer's Vicinity flag is "True": the Address field is a directional
- *                      description ("5th Ave., Denny Way, and Cedar St.") that locates the
- *                      general area around a landmark, not the parcel itself — published as
- *                      locality-level text, never as a site-precision pin.
- *   coordinates_only    No usable address/vicinity text, but the layer has geometry.
- *   no_match           The refnum is absent from the layer entirely.
- *
- * TIER PROPOSAL. `NRHP_ADDRESS_TIER_TABLE` is the one exported constant that maps an outcome
- * (plus, for coordinates_only, the layer's own SRC_ACCU positional-accuracy string) to a
- * precision tier. It intentionally reuses this lane's OWN already-published precision vocabulary
- * ('site', 'county', ...) — see `bb_canonical.entity_locations.precision` on the 2,550 rows this
- * lane has already published — rather than `@repo/security`'s narrower internal PRECISION_RANK
- * scale (which has no 'site' level at all). That existing-lane convention is a deliberate call,
- * not an oversight: flag it to the orchestrator if the standards research underway elsewhere
- * lands on a different vocabulary, since this table is the only place that would need to change.
- *
- * SCHEMA GAP (report, don't guess). Neither `bb_canonical.entity_locations` nor
- * `bb_public.release_entities.projection.location` has a column for the raw street-address
- * TEXT — only `label`/`locationLabel` (the entity's display name) and geometry/precision. This
- * script therefore carries the fetched address string in the plan JSON only (`entries[].address`)
- * and does not write it anywhere; `report.counts.addressTextHasNoColumn` says so explicitly so the
- * orchestrator can decide whether a migration is warranted.
- *
- * WRITE SHAPE. The apply path patches BOTH copies the way `fix-place-centroid-locations.ts`
- * does (entity_locations is canonical; release_entities.projection.location is what the site
- * actually reads) — `reconcile-nrhp-county-locations.ts` only ever wrote
- * `bb_research.landscape_candidates` and is not a precedent for the two-copy write.
- *
- * Default is dry-run. Production writes require:
- *   DRY_RUN=0 NRHP_ADDRESS_BACKFILL_APPLY=1 DATABASE_URL=postgresql://...
- *
- * Usage (from repo root):
- *   set -a && source apps/web/.env.local && set +a
- *   export DATABASE_SSL=1
- *   node --conditions development --import tsx \
- *     packages/ops-data/scripts/backfill-nrhp-addresses.ts
+ * Builds NRHP address/precision plans from NPS ArcGIS fields joined by NRIS reference number.
+ * Restricted addresses stay withheld; vicinity descriptions do not establish an exact address.
+ * Preserve positional-accuracy and boundary metadata. This operation performs no model or
+ * geocoding calls.
  */
 import { createHash } from 'node:crypto';
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
@@ -275,7 +226,7 @@ async function main(): Promise<void> {
   const pool = new pg.Pool(normalizePgConnectionString(databaseUrl));
 
   const landscapeRes = await pool.query<LandscapeRow>(
-    `SELECT id, payload FROM bb_research.landscape_candidates WHERE lane = $1 ORDER BY id`,
+    `SELECT id, payload FROM research.landscape_candidates WHERE lane = $1 ORDER BY id`,
     [LANE],
   );
   console.log(`Landscape candidates (lane='${LANE}'): ${landscapeRes.rows.length}`);
@@ -292,19 +243,19 @@ async function main(): Promise<void> {
 
   const entityIds = landscapeRes.rows.map((row) => row.id);
   const entityLocationsRes = await pool.query<EntityLocationRow>(
-    `SELECT entity_id, id, precision, label FROM bb_canonical.entity_locations WHERE entity_id = ANY($1)`,
+    `SELECT entity_id, id, precision, label FROM canonical.entity_locations WHERE entity_id = ANY($1)`,
     [entityIds],
   );
   const entityLocationByEntityId = new Map<string, EntityLocationRow>();
   for (const row of entityLocationsRes.rows) entityLocationByEntityId.set(row.entity_id, row);
   console.log(
-    `Existing bb_canonical.entity_locations rows for lane: ${entityLocationByEntityId.size}`,
+    `Existing canonical.entity_locations rows for lane: ${entityLocationByEntityId.size}`,
   );
 
   const releaseRes = await pool.query<{ entity_id: string }>(
-    `SELECT entity_id FROM bb_public.release_entities
+    `SELECT entity_id FROM published.release_entities
       WHERE entity_id = ANY($1)
-        AND release_id = (SELECT release_id FROM bb_public.v_active_release_id)`,
+        AND release_id = (SELECT release_id FROM published.v_active_release_id)`,
     [entityIds],
   );
   const releaseEntityIds = new Set(releaseRes.rows.map((row) => row.entity_id));
@@ -372,7 +323,7 @@ async function main(): Promise<void> {
     ).length,
     skippedNotInRelease: entries.filter((e) => e.skipReason === 'not_in_active_release').length,
     addressTextHasNoColumn:
-      'bb_canonical.entity_locations and bb_public.release_entities have no street-address ' +
+      'canonical.entity_locations and published.release_entities have no street-address ' +
       'column; entries[].address is reported here only and is never written to the database.',
   };
 
@@ -471,7 +422,7 @@ async function main(): Promise<void> {
     try {
       await client.query('BEGIN');
       await client.query(
-        `UPDATE bb_canonical.entity_locations
+        `UPDATE canonical.entity_locations
             SET geometry = $2::jsonb,
                 geometry_type = 'Point',
                 location = ST_SetSRID(ST_MakePoint($3, $4), 4326)::geography,
@@ -497,7 +448,7 @@ async function main(): Promise<void> {
         ],
       );
       await client.query(
-        `UPDATE bb_public.release_entities
+        `UPDATE published.release_entities
             SET projection = jsonb_set(
                   projection, '{location}',
                   jsonb_set(
@@ -516,7 +467,7 @@ async function main(): Promise<void> {
                   true
                 )
           WHERE entity_id = $1
-            AND release_id = (SELECT release_id FROM bb_public.v_active_release_id)`,
+            AND release_id = (SELECT release_id FROM published.v_active_release_id)`,
         [entry.entityId, entry.lat, entry.lng, geohash, prefixes, entry.proposedTier, MATCH_METHOD],
       );
       await client.query('COMMIT');

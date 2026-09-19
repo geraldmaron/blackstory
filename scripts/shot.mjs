@@ -70,9 +70,8 @@ class Cdp {
         const entry = this.pending.get(message.id);
         if (entry) {
           this.pending.delete(message.id);
-          message.error
-            ? entry.reject(new Error(message.error.message))
-            : entry.resolve(message.result);
+          if (message.error) entry.reject(new Error(message.error.message));
+          else entry.resolve(message.result);
         }
         return;
       }

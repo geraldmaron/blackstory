@@ -1,5 +1,5 @@
 /**
- * Server-only lazy Postgres pool for public structured-data reads (`bb_public.*`).
+ * Server-only lazy Postgres pool for public structured-data reads (`published.*`).
  * Uses `DATABASE_URL` or `APP_DATABASE_URL`; never accepts `NEXT_PUBLIC_*` credentials.
  * Mirrors `apps/web/src/lib/public-data/postgres-client.ts` so api-public and web share one
  * connection contract without cross-app imports.

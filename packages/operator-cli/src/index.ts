@@ -142,15 +142,6 @@ export {
 } from './worker-preflight.js';
 
 export {
-  LEDGER_PARITY_CHECKLIST,
-  DEFAULT_PARITY_CYCLES,
-  parityChecklistMarkdown,
-  type ParityChecklistItem,
-  type ParityCycleRecord,
-  type ParityCycleStatus,
-} from './ledger-parity.js';
-
-export {
   assertPostgresOpsDataSource,
   editorialCatalogFromError,
   POSTGRES_OPS_DATA_SOURCE_MESSAGE,
@@ -249,3 +240,8 @@ export { runCli, type CliDependencies } from './cli.js';
 // Research-discovery methodology directives (propose-only; never publish).
 export * from './lib/geographic-gap-brief.js';
 export * from './story-gap-discovery.js';
+
+export * from './research-execution.js';
+
+export * from './evidence-retrieval.js';
+export * from './research-worker.js';

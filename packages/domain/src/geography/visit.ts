@@ -1,5 +1,5 @@
 /**
- * Public "go visit this place" contact contract (repo-el9p / WS3).
+ * Public "go visit this place" contact contract (evidence acquisition).
  *
  * A reader who wants to physically go somewhere needs a structured address (at the precision
  * the location-precision standard allows), phone, website, hours, and a visitability signal.

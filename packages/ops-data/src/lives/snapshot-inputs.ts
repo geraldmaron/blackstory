@@ -1,10 +1,7 @@
 /**
- * Reads behind the static Lives Across the Decades snapshot (bead repo-0clax.21): the published figures
- * for the nation and an area's states, count notes, coverage overrides, and rules whose records are
- * live in the active release. Row mappers are pure and tested; the build script runs the SQL.
- *
- * Rules join to `bb_public.release_entities` on the active release when the snapshot is built, so a
- * law withdrawn from the catalog drops off at the next rebuild.
+ * Read published figures, count notes, coverage overrides and active-release laws for the Lives
+ * Across the Decades snapshot. Pure row mappers are shared with tests; the build script
+ * executes SQL. Withdrawn laws disappear when the snapshot is rebuilt.
  */
 import {
   isLivesLens,
@@ -61,23 +58,23 @@ export type ApplicabilityRow = {
 };
 
 export const JURISDICTIONS_SQL = `
-  SELECT id, name FROM bb_reference.jurisdictions WHERE id = ANY($1::text[])`;
+  SELECT id, name FROM reference.jurisdictions WHERE id = ANY($1::text[])`;
 
 export const OBSERVATIONS_SQL = `
   SELECT metric_id, jurisdiction_id, reference_period, race_ethnicity_slice, estimate, numerator,
          denominator, source, source_url, metadata
-  FROM bb_reference.statistical_observations
+  FROM reference.statistical_observations
   WHERE jurisdiction_id = ANY($1::text[]) AND status = 'observed' AND metric_id LIKE 'lives-%'`;
 
 export const COUNT_NOTES_SQL = `
   SELECT id, decade, applies_to, area_ids, heading, body, citations
-  FROM bb_reference.lives_count_notes
+  FROM reference.lives_count_notes
   WHERE status = 'published'
   ORDER BY decade, sort_order, id`;
 
 export const COVERAGE_SQL = `
   SELECT decade, coverage
-  FROM bb_reference.region_decade_definitions
+  FROM reference.region_decade_definitions
   WHERE region_id = $1 AND status = 'published'`;
 
 export const APPLICABILITY_SQL = `
@@ -87,10 +84,10 @@ export const APPLICABILITY_SQL = `
          e.projection->>'displayName' AS display_name,
          e.projection->>'kind' AS kind,
          e.projection->>'impactStatement' AS impact_statement
-  FROM bb_reference.law_applicability a
-  JOIN bb_public.release_entities e
+  FROM reference.law_applicability a
+  JOIN published.release_entities e
     ON e.projection->>'id' = a.entity_id
-   AND e.release_id = (SELECT release_id FROM bb_public.active_release WHERE id = 'active')
+   AND e.release_id = (SELECT release_id FROM published.active_release WHERE id = 'active')
   WHERE a.status = 'published' AND a.jurisdiction_id = ANY($1::text[])`;
 
 function numberOrNull(value: unknown): number | null {

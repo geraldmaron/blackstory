@@ -1,34 +1,9 @@
 /**
- * Re-run the location precision engine over a published release and write BOTH stores.
- *
- * bb_public.release_entities keeps a location twice: as the `location` column (plus the scalar
- * lat/lng/geohash columns) and inside `projection->'location'`. Post-publish geocode lanes have
- * written the column and skipped the projection JSON, so the two drifted (repo-e1uib): 1,593 rows
- * on rel_20260723_authority_net_001, including 1,592 rows whose column geohash is 9 characters
- * because a lane called the geohash helper without the builder's precision argument and picked up
- * DEFAULT_GEOHASH_PRECISION (9) instead of the publish path's 5.
- *
- * Rather than copy one store onto the other — neither is a validly published value on its own —
- * this rebuilds both from the canonical source through the same engine the release builder runs
- * (`docs/security/location-precision-standard.md` §4, "One engine on the publish path"). The
- * algorithm here mirrors release-builder.ts's location block exactly, including the part that is
- * easy to get wrong: `redactLocationForPublic` runs ONLY when `reducePublicPrecision` actually
- * reduced. An unreduced tier keeps its raw point at the builder's geohash precision; it is not
- * coarsened to the tier's GEOHASH_LENGTH/COORDINATE_DECIMALS.
- *
- * Source of truth per row: bb_canonical.entity_locations (role precedence current > approximate >
- * historical, then most recently updated). Rows with no canonical location keep their published
- * point and are only re-normalized through the engine.
- *
- * Usage (from repo root):
- *   set -a && source apps/web/.env.local && set +a
- *   export DATABASE_SSL=1
- *   node --conditions development --import tsx \
- *     packages/ops-data/scripts/resync-release-location-precision.ts
- *
- * Apply:
- *   DRY_RUN=0 RESYNC_RELEASE_LOCATION_APPLY=1 node --conditions development --import tsx \
- *     packages/ops-data/scripts/resync-release-location-precision.ts
+ * Recompute release locations through the publication precision engine and update both scalar
+ * columns and projection JSON. Prefer canonical locations by current, approximate, historical
+ * role and recency; otherwise normalize the published point. Apply coordinate redaction only
+ * when reducePublicPrecision actually reduces the tier, matching the builder. Default dry-run;
+ * writes require DRY_RUN=0 and RESYNC_RELEASE_LOCATION_APPLY=1.
  */
 import pg from 'pg';
 import { buildGeoPointFields, type GeoPointFields } from '@repo/domain/geography/geohash';
@@ -46,7 +21,7 @@ const SELECT_SQL = `
 WITH canon AS (
   SELECT DISTINCT ON (el.entity_id)
     el.entity_id, el.precision, el.match_method, el.lat, el.lng
-  FROM bb_canonical.entity_locations el
+  FROM canonical.entity_locations el
   ORDER BY el.entity_id,
     CASE el.role WHEN 'current' THEN 0 WHEN 'approximate' THEN 1 ELSE 2 END,
     el.updated_at DESC NULLS LAST, el.id
@@ -58,14 +33,14 @@ SELECT re.entity_id, re.kind,
        re.projection->>'sensitivityClass' AS sens,
        c.precision AS canon_precision, c.match_method AS canon_match,
        c.lat AS canon_lat, c.lng AS canon_lng
-FROM bb_public.release_entities re
+FROM published.release_entities re
 LEFT JOIN canon c ON c.entity_id = re.entity_id
 WHERE re.release_id = $1 AND re.projection ? 'location'
 ORDER BY re.entity_id
 `;
 
 const UPDATE_SQL = `
-UPDATE bb_public.release_entities
+UPDATE published.release_entities
 SET projection = jsonb_set(projection, '{location}', $3::jsonb, true)
 WHERE release_id = $1 AND entity_id = $2
 `;

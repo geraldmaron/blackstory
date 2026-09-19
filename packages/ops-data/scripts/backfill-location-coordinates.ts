@@ -1,19 +1,9 @@
 /**
- * Backfills real coordinates for gap-fill subjects the judge already located in
- * text (packet.drafts.location) but which auto-promote-corsair-keeps.ts held
- * because the subject's own Wikipedia article carries no Wikidata coordinates —
- * the common case for laws, government bodies, and organizations with no single
- * point of their own. Writes an augmented copy of the subjects file with lat/lng
- * patched in wherever resolveGovernmentCenterCoordinates finds a real anchor
- * (a named headquarters/milestone site, a state capitol, or the U.S. Capitol for
- * federal subjects) — every value is itself a real, separately-verifiable
- * Wikipedia/Wikidata lookup, never a guessed point. Unresolved subjects are left
- * exactly as they were, still correctly held.
+ * Backfills candidate coordinates from the named location in packet.drafts.location.
+ * Writes an augmented subjects file using independently resolved Wikipedia/Wikidata
+ * location anchors. Unresolved subjects retain their original coordinates.
  *
- * Usage:
- *   node --conditions development --import tsx \
- *     packages/ops-data/scripts/backfill-location-coordinates.ts \
- *     --run <run.json> --subjects <subjects.json> --out <augmented-subjects.json>
+ * Usage: --run <run.json> --subjects <subjects.json> --out <augmented-subjects.json>
  */
 import { readFileSync, writeFileSync } from 'node:fs';
 import { resolveGovernmentCenterCoordinates } from './lib/corroborate-source.ts';

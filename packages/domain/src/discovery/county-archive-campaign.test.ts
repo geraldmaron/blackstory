@@ -171,7 +171,7 @@ test('discovery publish guard holds for County Archive Ladder', () => {
     /Discovery cannot publish/,
   );
   assert.throws(
-    () => assertDiscoveryCannotPublish({ operation: 'activate_release', target: 'bb_public' }),
+    () => assertDiscoveryCannotPublish({ operation: 'activate_release', target: 'published' }),
     /Discovery cannot publish/,
   );
   // Non-publish operations pass.

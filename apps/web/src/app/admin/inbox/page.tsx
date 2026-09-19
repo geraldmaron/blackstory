@@ -1,11 +1,10 @@
 /**
  * Inbox — pending research-case triage queue (candidate, relevance review, needs evidence).
  *
- * Server component (repo-gyq6.9). The queue is read in the request and handed to {@link CaseQueue}
- * as `initialRows`, so an operator sees the work in the first byte instead of after a hydrate, a
- * token refresh and a fetch. CaseQueue stays a client component because the surface is genuinely
- * interactive — selection, the detail sheet, transitions and assignment — and those /admin/api
- * routes remain exactly what the bead says they should be: real APIs for real mutations.
+ * Server component. The queue is read in the request and handed to {@link CaseQueue}
+ * as `initialRows`, so the first response contains the queue. CaseQueue is a client component
+ * because selection, the detail sheet, transitions, and assignment are interactive. The
+ * `/admin/api` routes handle those mutations.
  */
 import type { Metadata } from 'next';
 import { CaseQueue } from '../../../admin/cases/CaseQueue';

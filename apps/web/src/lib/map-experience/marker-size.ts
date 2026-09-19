@@ -77,17 +77,9 @@ export function markerHaloRadius(
 }
 
 /**
- * County-proportionate zoom scaling (the related workstream). With county hairlines on the canvas from
- * `COUNTY_LINES_MIN_ZOOM` up (see `us-county-lines.ts`), a fixed-px radius reads wrong at both
- * ends: at the national frame a max-evidence marker blots out several counties at once, and at
- * locality zoom the same pixels under-read against the county polygon around them. The
- * data-driven radius (evidence × confidence, clamped) is therefore multiplied by this
- * zoom-keyed factor so a circle keeps a stable visual relationship to the geography behind it.
- * Stops are calibrated against the 20m county asset: at z3.8 (CONUS resting frame) the median
- * county is ~4 px wide → shrink toward aggregate reading; z5.5 is the state frame where the
- * authored px scale was originally tuned → identity; by z9 (locality) a county spans hundreds
- * of px → the marker can afford presence. The neutral midpoint means the pure
- * `markerRadius()` contract above is unchanged — zoom scaling composes on top of it.
+ * Scale marker radius with zoom so markers remain proportionate to county geography. Compose
+ * the zoom factor with the bounded evidence/confidence radius; the neutral midpoint preserves
+ * the authored state-level scale.
  */
 export const MARKER_ZOOM_SCALE_STOPS: ReadonlyArray<readonly [zoom: number, scale: number]> = [
   [3, 0.4],

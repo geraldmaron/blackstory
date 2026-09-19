@@ -288,23 +288,23 @@ async function main(): Promise<void> {
 
     const activeReleaseResult = await client.query(`
       SELECT ar.*, r.status, r.created_at, r.activated_at, r.updated_at
-      FROM bb_public.active_release ar
-      JOIN bb_publication.releases r ON r.id = ar.release_id
+      FROM published.active_release ar
+      JOIN publication.releases r ON r.id = ar.release_id
       WHERE ar.id = 'active'
     `);
 
     const releaseStatusesResult = await client.query(`
       SELECT status, COUNT(*)::int AS n
-      FROM bb_publication.releases
+      FROM publication.releases
       GROUP BY status
       ORDER BY n DESC, status
     `);
 
     const publicKindsResult = await client.query(`
-      WITH active AS (SELECT release_id FROM bb_public.active_release WHERE id = 'active')
+      WITH active AS (SELECT release_id FROM published.active_release WHERE id = 'active')
       SELECT re.kind, COUNT(*)::int AS n,
         COUNT(*) FILTER (WHERE re.lat IS NOT NULL AND re.lng IS NOT NULL)::int AS map_ready
-      FROM bb_public.release_entities re, active a
+      FROM published.release_entities re, active a
       WHERE re.release_id = a.release_id
       GROUP BY re.kind
       ORDER BY n DESC, re.kind
@@ -312,13 +312,13 @@ async function main(): Promise<void> {
 
     const canonicalKindsResult = await client.query(`
       SELECT kind, entity_class, COUNT(*)::int AS n
-      FROM bb_canonical.entities
+      FROM canonical.entities
       GROUP BY kind, entity_class
       ORDER BY n DESC, kind, entity_class
     `);
 
     const catalogHealthResult = await client.query(`
-      WITH active AS (SELECT release_id FROM bb_public.active_release WHERE id = 'active')
+      WITH active AS (SELECT release_id FROM published.active_release WHERE id = 'active')
       SELECT
         COUNT(*)::int AS public_entities,
         COUNT(*) FILTER (WHERE re.lat IS NOT NULL AND re.lng IS NOT NULL)::int AS map_ready,
@@ -333,27 +333,27 @@ async function main(): Promise<void> {
         COUNT(*) FILTER (WHERE re.primary_image IS NOT NULL)::int AS with_primary_image,
         COUNT(*) FILTER (WHERE jsonb_typeof(re.taxonomy) = 'object' AND re.taxonomy <> '{}'::jsonb)::int
           AS with_taxonomy
-      FROM bb_public.release_entities re, active a
+      FROM published.release_entities re, active a
       WHERE re.release_id = a.release_id
     `);
 
     const canonicalHealthResult = await client.query(`
       SELECT
-        (SELECT COUNT(*)::int FROM bb_canonical.entities) AS entities,
-        (SELECT COUNT(*)::int FROM bb_canonical.entity_locations) AS locations,
-        (SELECT COUNT(*)::int FROM bb_canonical.claims) AS claims,
-        (SELECT COUNT(*)::int FROM bb_canonical.claim_versions) AS claim_versions,
-        (SELECT COUNT(*)::int FROM bb_canonical.claim_evidence_links) AS claim_evidence_links,
-        (SELECT COUNT(*)::int FROM bb_canonical.entity_relationships) AS relationships,
-        (SELECT COUNT(*)::int FROM bb_canonical.entity_aliases) AS normalized_aliases,
-        (SELECT COUNT(*)::int FROM bb_canonical.entity_identifiers) AS normalized_identifiers,
-        (SELECT COUNT(*)::int FROM bb_canonical.entity_embeddings) AS embeddings
+        (SELECT COUNT(*)::int FROM canonical.entities) AS entities,
+        (SELECT COUNT(*)::int FROM canonical.entity_locations) AS locations,
+        (SELECT COUNT(*)::int FROM canonical.claims) AS claims,
+        (SELECT COUNT(*)::int FROM canonical.claim_versions) AS claim_versions,
+        (SELECT COUNT(*)::int FROM canonical.claim_evidence_links) AS claim_evidence_links,
+        (SELECT COUNT(*)::int FROM canonical.entity_relationships) AS relationships,
+        (SELECT COUNT(*)::int FROM canonical.entity_aliases) AS normalized_aliases,
+        (SELECT COUNT(*)::int FROM canonical.entity_identifiers) AS normalized_identifiers,
+        (SELECT COUNT(*)::int FROM canonical.entity_embeddings) AS embeddings
     `);
 
     const taxonomyKeysResult = await client.query(`
-      WITH active AS (SELECT release_id FROM bb_public.active_release WHERE id = 'active')
+      WITH active AS (SELECT release_id FROM published.active_release WHERE id = 'active')
       SELECT key, COUNT(*)::int AS n
-      FROM bb_public.release_entities re, active a
+      FROM published.release_entities re, active a
       CROSS JOIN LATERAL jsonb_object_keys(
         CASE WHEN jsonb_typeof(re.taxonomy) = 'object' THEN re.taxonomy ELSE '{}'::jsonb END
       ) AS key
@@ -363,9 +363,9 @@ async function main(): Promise<void> {
     `);
 
     const projectionKeysResult = await client.query(`
-      WITH active AS (SELECT release_id FROM bb_public.active_release WHERE id = 'active')
+      WITH active AS (SELECT release_id FROM published.active_release WHERE id = 'active')
       SELECT key, COUNT(*)::int AS n
-      FROM bb_public.release_entities re, active a
+      FROM published.release_entities re, active a
       CROSS JOIN LATERAL jsonb_object_keys(
         CASE WHEN jsonb_typeof(re.projection) = 'object' THEN re.projection ELSE '{}'::jsonb END
       ) AS key
@@ -375,9 +375,9 @@ async function main(): Promise<void> {
     `);
 
     const claimKeysResult = await client.query(`
-      WITH active AS (SELECT release_id FROM bb_public.active_release WHERE id = 'active')
+      WITH active AS (SELECT release_id FROM published.active_release WHERE id = 'active')
       SELECT key, COUNT(*)::int AS n
-      FROM bb_public.release_entities re, active a
+      FROM published.release_entities re, active a
       CROSS JOIN LATERAL jsonb_array_elements(
         CASE WHEN jsonb_typeof(re.claims) = 'array' THEN re.claims ELSE '[]'::jsonb END
       ) AS claim
@@ -390,7 +390,7 @@ async function main(): Promise<void> {
     `);
 
     const plantationResult = await client.query(`
-      WITH active AS (SELECT release_id FROM bb_public.active_release WHERE id = 'active')
+      WITH active AS (SELECT release_id FROM published.active_release WHERE id = 'active')
       SELECT
         re.entity_id,
         re.display_name,
@@ -401,7 +401,7 @@ async function main(): Promise<void> {
         re.taxonomy::text ~* '\\mplantation\\M' AS taxonomy_match,
         re.summary ~* '\\mplantation\\M' AS summary_match,
         COALESCE(re.projection ->> 'locationLabel', re.location ->> 'label') AS location_label
-      FROM bb_public.release_entities re, active a
+      FROM published.release_entities re, active a
       WHERE re.release_id = a.release_id
         AND concat_ws(
           ' ',
@@ -425,12 +425,12 @@ async function main(): Promise<void> {
         named_match: number;
       }>(
         `
-          WITH active AS (SELECT release_id FROM bb_public.active_release WHERE id = 'active')
+          WITH active AS (SELECT release_id FROM published.active_release WHERE id = 'active')
           SELECT
             COUNT(*)::int AS n,
             COUNT(*) FILTER (WHERE re.lat IS NOT NULL AND re.lng IS NOT NULL)::int AS map_ready,
             COUNT(*) FILTER (WHERE re.display_name ~* $1)::int AS named_match
-          FROM bb_public.release_entities re, active a
+          FROM published.release_entities re, active a
           WHERE re.release_id = a.release_id
             AND concat_ws(
               ' ',
@@ -450,7 +450,7 @@ async function main(): Promise<void> {
 
     const researchCasesResult = await client.query(`
       SELECT state, COUNT(*)::int AS n
-      FROM bb_research.cases
+      FROM research.cases
       GROUP BY state
       ORDER BY n DESC, state
     `);
@@ -461,14 +461,14 @@ async function main(): Promise<void> {
         COALESCE(SUM(query_count), 0)::bigint AS query_count,
         COALESCE(SUM(candidate_url_count), 0)::bigint AS candidate_url_count,
         COALESCE(SUM(capture_count), 0)::bigint AS capture_count
-      FROM bb_research.runs
+      FROM research.runs
       GROUP BY mode, status
       ORDER BY n DESC, mode, status
     `);
 
     const frontierResult = await client.query(`
       SELECT status, COUNT(*)::int AS n
-      FROM bb_research.frontier_tasks
+      FROM research.frontier_tasks
       GROUP BY status
       ORDER BY n DESC, status
     `);
@@ -476,7 +476,7 @@ async function main(): Promise<void> {
     const landscapeResult = await client.query(`
       SELECT lane, status, COUNT(*)::int AS n,
         COUNT(*) FILTER (WHERE lat IS NOT NULL AND lng IS NOT NULL)::int AS map_ready
-      FROM bb_research.landscape_candidates
+      FROM research.landscape_candidates
       GROUP BY lane, status
       ORDER BY n DESC, lane, status
     `);
@@ -486,7 +486,7 @@ async function main(): Promise<void> {
         COALESCE(SUM(rows_fetched), 0)::bigint AS rows_fetched,
         COALESCE(SUM(candidate_count), 0)::bigint AS candidates,
         COALESCE(SUM(dropped_count), 0)::bigint AS dropped
-      FROM bb_research.source_program_runs
+      FROM research.source_program_runs
       GROUP BY lane
       ORDER BY candidates DESC, lane
     `);
@@ -497,7 +497,7 @@ async function main(): Promise<void> {
         geography_type,
         COUNT(*)::int AS series,
         COUNT(DISTINCT source_dataset)::int AS source_datasets
-      FROM bb_reference.statistical_series
+      FROM reference.statistical_series
       GROUP BY theme, geography_type
       ORDER BY series DESC, theme, geography_type
     `);
@@ -505,12 +505,12 @@ async function main(): Promise<void> {
     const statisticalSourcesResult = await client.query(`
       SELECT source_dataset, COUNT(*)::int AS series,
         (SELECT COUNT(*)::int
-         FROM bb_reference.statistical_observations o
+         FROM reference.statistical_observations o
          WHERE o.metric_id IN (
-           SELECT s2.metric_id FROM bb_reference.statistical_series s2
+           SELECT s2.metric_id FROM reference.statistical_series s2
            WHERE s2.source_dataset = s.source_dataset
          )) AS observations
-      FROM bb_reference.statistical_series s
+      FROM reference.statistical_series s
       GROUP BY source_dataset
       ORDER BY observations DESC, source_dataset
     `);

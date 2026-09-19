@@ -52,7 +52,7 @@ export type ArticleImageDoc = z.infer<typeof articleImageSchema>;
 
 /**
  * Optional scholarly-citation metadata for a reference whose source is a peer-reviewed
- * paper (repo-k2q3 crit 2). When present, `doi` is checked against Crossref/OpenAlex at
+ * paper (criterion 2). When present, `doi` is checked against Crossref/OpenAlex at
  * validate time (gated behind CHECK_DOIS=1 — see checkDoiCitation in @repo/domain and
  * the validate wiring in ops-data/scripts/articles.ts) so a citation can't silently drift
  * or be fabricated with a plausible-looking DOI attached.
@@ -83,7 +83,7 @@ export const articleReferenceSchema = z.object({
 export type ArticleReferenceDoc = z.infer<typeof articleReferenceSchema>;
 
 /**
- * One independent corroborating source for a load-bearing figure (repo-k2q3 crit 3:
+ * One independent corroborating source for a load-bearing figure (criterion 3:
  * two-anchor corroboration rule). `url` is checked against the shared source-tier
  * registry at validate time (packages/domain's isAnchorTierUrl) — tier is derived,
  * never stored here, so there is one source of truth for what counts as trusted.
@@ -113,8 +113,7 @@ const articleParagraphBlockSchema = z.object({
 
 /**
  * A block quotation, optionally attributed. `anchors`/`replicationVerified` back the
- * two-anchor corroboration rule when the quoted figure is load-bearing (repo-k2q3
- * crit 3) — see gateLoadBearingAnchors in ops-data/scripts/articles.ts.
+ * two-anchor corroboration rule when the quoted figure is load-bearing (criterion 3) — see gateLoadBearingAnchors in ops-data/scripts/articles.ts.
  */
 const articlePullQuoteBlockSchema = z.object({
   type: z.literal('pullquote'),

@@ -101,10 +101,8 @@ export type HydratedArticleMapInset = {
   readonly precision:
     'state' | 'county' | 'city' | 'neighborhood' | 'campus' | 'institution' | 'site' | 'address';
   /**
-   * The entity's own violence-adjacency signal (SP-26 / repo-92n2.33), carried through so
-   * `MapInsetMoment` can derive PLATE - STILL from the real subject rather than always rendering
-   * LIVE. Without these, a chapter's map inset for a lynching or massacre entity had no way to
-   * know its own subject was violence-adjacent.
+   * Carries the entity's violence-adjacency signal so the article map inset can choose a still
+   * plate for sensitive subjects.
    */
   readonly kind: PublicEntityKind;
   readonly topicTags: readonly string[];
@@ -418,7 +416,11 @@ function hydrateBlock(
         warn(`mapInset references unknown entity "${block.entityId}" in "${slug}" — dropping`);
         return undefined;
       }
-      if (!entity.geoAnchor) {
+      if (
+        !entity.geoAnchor ||
+        entity.locationPrecision === 'none' ||
+        entity.locationPrecision === 'country'
+      ) {
         warn(`mapInset entity "${block.entityId}" in "${slug}" has no geo anchor — dropping`);
         return undefined;
       }

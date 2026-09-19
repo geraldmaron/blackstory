@@ -1,9 +1,6 @@
 /**
- * Guards against automatic production deploys (`docs/decisions-carryover.md`,
- * "Small recovered decisions": ADR-006 GitHub Actions deployment model /
- * ADR-027 Vercel for public web hosting).
- * Validates repo docs and deploy workflows — not live Vercel or Firebase consoles.
- * Public web ships on Vercel; App Hosting promote for public web is retired.
+ * Checks repository deployment workflows and runbooks for automatic-production-rollout hazards.
+ * It cannot verify live Vercel or other provider settings.
  */
 import { readFile, readdir } from 'node:fs/promises';
 import path from 'node:path';

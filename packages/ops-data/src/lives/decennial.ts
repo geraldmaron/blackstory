@@ -1,8 +1,7 @@
 /**
- * Published 1980, 1990 and 2000 census tables by race for Lives Across the Decades (bead
- * repo-0clax.23). Pure: the ingest script downloads one IPUMS NHGIS extract of these tables for the
- * nation and every state, and these functions turn its CSV files into observations that keep the
- * published counts, so the domain builder can sum states into regions.
+ * Published 1980, 1990, and 2000 census tables by race for Lives Across the Decades. The ingest
+ * script downloads one IPUMS NHGIS extract for the nation and every state; these pure functions
+ * turn its CSV files into observations that preserve published counts for regional aggregation.
  *
  * Groups follow the pattern of the ACS decades, so each decade reads like the next: population and
  * urban shares count non-Hispanic Black and white residents and Hispanic residents of any race;
@@ -125,7 +124,7 @@ export const LIVES_DECENNIAL_DATASETS: Readonly<Record<string, LivesDecennialDat
   },
   // The 2010s and 2020s take every other figure from the ACS, which has no urban/rural question.
   // Urban residence is only ever a decennial count, so these two datasets are read for that alone
-  // (bead repo-0clax.29), each for the whole area and again for its urban geographic component.
+  // Each dataset covers the whole area and its urban geographic component.
   '2010_SF1a': {
     name: '2010 Census Summary File 1 (100-percent data)',
     sourceUrl: 'https://www.census.gov/data/datasets/2010/dec/summary-file-1.html',

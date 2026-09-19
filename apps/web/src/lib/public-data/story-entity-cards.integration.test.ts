@@ -1,11 +1,11 @@
 /**
- * Integration coverage for `listPublicEntityViewsByIds` over live Postgres rows (repo-ihsw).
+ * Integration coverage for `listPublicEntityViewsByIds` over live Postgres rows.
  *
  * `story-entity-cards.test.ts` covers only the DB-independent behavior (empty/blank input,
  * the mosaic id bound) because the loader went live-Postgres-only when the degraded-mode/seed
  * fallback was removed (d9a5c9e5); request-order preservation and dedup can no longer be
  * asserted against seed-backed fixtures. This file proves both against real
- * `bb_public.release_entities` rows.
+ * `published.release_entities` rows.
  *
  * Skips locally when live public projections are not configured (no `PUBLIC_DATA_SOURCE=postgres`
  * + `DATABASE_URL`/`APP_DATABASE_URL`) or the configured Postgres is unreachable; fails closed
@@ -24,7 +24,7 @@ type EntityIdRow = { readonly entity_id: string };
 
 test('listPublicEntityViewsByIds preserves request order and dedupes repeated ids over live rows', async (t) => {
   if (!shouldUseLivePublicProjections()) {
-    t.skip('requires PUBLIC_DATA_SOURCE=postgres + DATABASE_URL/APP_DATABASE_URL (see repo-ihsw)');
+    t.skip('requires live Postgres public projections');
     return;
   }
 
@@ -34,7 +34,7 @@ test('listPublicEntityViewsByIds preserves request order and dedupes repeated id
     active = await fetchActiveRelease();
     if (!active) throw new Error('no active release');
     rows = await queryPostgres<EntityIdRow>(
-      `SELECT entity_id FROM bb_public.release_entities
+      `SELECT entity_id FROM published.release_entities
          WHERE release_id = $1
          ORDER BY entity_id
          LIMIT 3`,

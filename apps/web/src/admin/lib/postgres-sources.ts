@@ -1,9 +1,9 @@
 /**
- * Postgres reads for bb_evidence source-library views: `source_library`,
+ * Postgres reads for evidence source-library views: `source_library`,
  * `published_citations`, `source_library_unmapped_hosts`, `source_library_fitness`.
  *
  * These are staff/service-role views layered over the evidence-source schema — none of them are
- * written from this module. `bb_evidence.source_organizations` (the older, narrower table) stays
+ * written from this module. `evidence.source_organizations` (the older, narrower table) stays
  * here too: some callers still read the plain organization registry rather than the library view.
  */
 import { queryPostgres } from './canonical-postgres-client.js';
@@ -44,7 +44,7 @@ export async function listSourceOrganizationsPostgres(
   const cappedLimit = Math.min(200, Math.max(1, limit));
   const rows = await queryPostgres<SourceOrgRow>(
     `SELECT id, name, homepage, created_at, updated_at
-     FROM bb_evidence.source_organizations
+     FROM evidence.source_organizations
      ORDER BY updated_at DESC
      LIMIT $1`,
     [cappedLimit],
@@ -261,7 +261,7 @@ export async function listSourceLibraryPostgres(options: {
 
   const rows = await queryPostgres<SourceLibraryRow>(
     `SELECT ${SOURCE_LIBRARY_COLUMNS}
-     FROM bb_evidence.source_library
+     FROM evidence.source_library
      ${where}
      ORDER BY ${orderBy}
      LIMIT $${params.length}`,
@@ -278,11 +278,11 @@ export async function getSourceLibraryTotalsPostgres(): Promise<SourceLibraryTot
       readonly claims_mapped: number | string;
     }>(
       `SELECT count(*) AS publisher_count, coalesce(sum(published_claims), 0) AS claims_mapped
-       FROM bb_evidence.source_library`,
+       FROM evidence.source_library`,
       [],
     ),
     queryPostgres<{ readonly unmapped_host_count: number | string }>(
-      `SELECT count(*) AS unmapped_host_count FROM bb_evidence.source_library_unmapped_hosts`,
+      `SELECT count(*) AS unmapped_host_count FROM evidence.source_library_unmapped_hosts`,
       [],
     ),
   ]);
@@ -299,7 +299,7 @@ export async function getSourceLibraryEntryPostgres(
 ): Promise<SourceLibraryEntry | null> {
   const rows = await queryPostgres<SourceLibraryRow>(
     `SELECT ${SOURCE_LIBRARY_COLUMNS}
-     FROM bb_evidence.source_library
+     FROM evidence.source_library
      WHERE organization_id = $1
      LIMIT 1`,
     [organizationId],
@@ -331,7 +331,7 @@ export async function listSourceLibraryFitnessPostgres(
 ): Promise<readonly SourceLibraryFitnessRow[]> {
   const rows = await queryPostgres<FitnessRow>(
     `SELECT policy_id, evidence_use, fitness, limitations
-     FROM bb_evidence.source_library_fitness
+     FROM evidence.source_library_fitness
      WHERE organization_id = $1
      ORDER BY policy_id ASC`,
     [organizationId],
@@ -378,7 +378,7 @@ export async function listSourceEntitiesPostgres(
               max(entity_display_name) AS entity_display_name,
               count(*) AS claim_count,
               min(citation_href) AS sample_citation_href
-       FROM bb_evidence.published_citations
+       FROM evidence.published_citations
        WHERE organization_id = $1
        GROUP BY entity_id
        ORDER BY count(*) DESC, entity_id ASC
@@ -387,7 +387,7 @@ export async function listSourceEntitiesPostgres(
     ),
     queryPostgres<{ readonly total: number | string }>(
       `SELECT count(DISTINCT entity_id) AS total
-       FROM bb_evidence.published_citations
+       FROM evidence.published_citations
        WHERE organization_id = $1`,
       [organizationId],
     ),
@@ -423,7 +423,7 @@ export async function listUnmappedHostsPostgres(
   const cappedLimit = Math.min(200, Math.max(1, limit));
   const rows = await queryPostgres<UnmappedHostRow>(
     `SELECT host, published_entities, published_claims, sample_href
-     FROM bb_evidence.source_library_unmapped_hosts
+     FROM evidence.source_library_unmapped_hosts
      ORDER BY published_entities DESC, host ASC
      LIMIT $1`,
     [cappedLimit],

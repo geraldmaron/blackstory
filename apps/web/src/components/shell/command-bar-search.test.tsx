@@ -159,8 +159,7 @@ describe('the shell above the error boundary', () => {
 
 describe('Journey is not advertised as a room', () => {
   it('the off-Explore bar does not link to /journey or /#journey', () => {
-    // Verified 2026-08-28: /journey is HTTP 404 on apex and www. About already refuses to
-    // list unfinished rooms. A CommandBar href would undo that.
+    // Journey is not a published room, so shell navigation must not advertise it.
     const source = code('components/shell/CommandBar.tsx');
     assert.doesNotMatch(source, /href=["']\/journey["']/);
     assert.doesNotMatch(source, /href=["']\/#journey["']/);

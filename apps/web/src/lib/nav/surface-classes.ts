@@ -74,9 +74,9 @@ const SURFACE_CLASS_BY_PATH: ReadonlyMap<string, SurfaceClass> = new Map([
  */
 const SURFACE_CLASS_PREFIXES: readonly (readonly [string, SurfaceClass])[] = [
   ['/corrections/status/', 'utility'],
-  // `/corrections/appeal` and `/corrections/abuse` used to be classified here. Neither renders:
-  // both are API-only directories, and the appeal and abuse forms are mounted inside the receipt
-  // status page. Classifying them promised chrome for two URLs that 404 (SP-19, repo-92n2.19).
+  // `/corrections/appeal` and `/corrections/abuse` are API-only directories. Their forms render
+  // inside the receipt status page, so classifying the directory paths would advertise chrome for
+  // URLs that return 404.
   ['/stories/', 'reading'],
   ['/lives/', 'reading'],
   ['/place/', 'record'],

@@ -1,7 +1,7 @@
 /**
  * Cursor pagination shapes shared by every `v1/*` list endpoint (search, related, timeline, etc).
  *
- * `MAX_PAGE_SIZE` exists specifically to defeat the "unbounded arrays" adversarial case (MOB-003
+ * `MAX_PAGE_SIZE` exists specifically to defeat the "unbounded arrays" adversarial case (public contract
  * adversarial review): a response schema built from `cursorPageResponseSchema` can never validate
  * an `items` array longer than `MAX_PAGE_SIZE`, regardless of what an upstream response claims.
  */

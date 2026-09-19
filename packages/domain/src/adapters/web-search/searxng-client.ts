@@ -3,8 +3,7 @@
  *
  * Endpoint shape: GET {baseUrl}/search?q=…&format=json
  * Optional shared-secret auth via Authorization header when the operator puts a
- * reverse-proxy token in front of the instance — never required for a Tailscale-only
- * Corsair deployment. Parsing is defensive: a missing `results` array or bad row
+ * reverse-proxy token in front of the instance when required by the endpoint policy. Parsing is defensive: a missing `results` array or bad row
  * degrades one hit, never the whole batch.
  */
 import type { WebSearchParsedBatch, WebSearchRawResult } from './types.js';

@@ -2,9 +2,9 @@
  * Theme-impact packet lifecycle CLI.
  *
  * Replaces the hardcoded-array apply flow: packets are authored as fixture
- * modules, applied to bb_reference.theme_impact_packets at any lifecycle
+ * modules, applied to reference.theme_impact_packets at any lifecycle
  * status, promoted to published behind the full publish gate, and projected
- * into bb_public.release_theme_impact_packets for the active release.
+ * into published.release_theme_impact_packets for the active release.
  *
  * Usage (repo root; DATABASE_URL required for every command except validate):
  *   node --conditions development --import tsx packages/ops-data/scripts/theme-packets.ts \
@@ -36,7 +36,7 @@ import { normalizePgConnectionString } from './lib/pg-connection.ts';
 
 const USAGE = 'usage: theme-packets.ts <validate|apply|promote|project|audit> [args...]';
 
-/** Row shape of bb_reference.theme_impact_packets, as parseThemeImpactPacketRow expects. */
+/** Row shape of reference.theme_impact_packets, as parseThemeImpactPacketRow expects. */
 type PacketRow = {
   readonly id: string;
   readonly question_id: string;
@@ -64,7 +64,7 @@ const PACKET_COLUMNS = `id, question_id, theme_id, title, summary, policy_eras, 
   causal_claim_ids, entity_id, binding_purpose, status, created_at, updated_at`;
 
 const UPSERT_SQL = `
-INSERT INTO bb_reference.theme_impact_packets (
+INSERT INTO reference.theme_impact_packets (
   id, question_id, theme_id, title, summary, policy_eras, geography,
   method_stance, method_note, observations, derived, artifacts, gap_states,
   causal_claim_ids, entity_id, binding_purpose, status, created_at, updated_at
@@ -94,7 +94,7 @@ RETURNING id, status;
 `;
 
 /**
- * Fixture modules export packet rows in the bb_reference.theme_impact_packets
+ * Fixture modules export packet rows in the reference.theme_impact_packets
  * column shape (snake_case) — the same contract the DB and the read path use.
  */
 function isPacketRowLike(value: unknown): value is PacketRow {
@@ -211,10 +211,8 @@ function gateSourceTiers(packets: readonly ThemeImpactPacket[]): {
 }
 
 /**
- * Two-anchor corroboration rule, warning half (repo-k2q3 crit 3 / repo-xjxf). Published
- * packets are already hard-gated by assertThemeImpactPacketPublishable (via
- * satisfiesTwoAnchorRule) at validate/promote time; this surfaces the same check as a
- * warning for draft/review packets, so authors see the gap before it blocks a publish.
+ * Warn on draft/review packets missing two-anchor corroboration. Publication enforces the same
+ * satisfiesTwoAnchorRule check through assertThemeImpactPacketPublishable.
  */
 function gatePacketAnchorWarnings(packets: readonly ThemeImpactPacket[]): { warnings: string[] } {
   const warnings: string[] = [];
@@ -270,7 +268,7 @@ async function verifyObservationsAgainstCanonical(
       source_url: string;
     }>(
       `SELECT spine_id, reference_period, estimate, source, source_url
-       FROM bb_reference.spine_observations_v
+       FROM reference.spine_observations_v
        WHERE spine_id = ANY($1::text[])`,
       [[...new Set(spineKeys.map((key) => key.spineId))]],
     );
@@ -305,7 +303,7 @@ async function verifyObservationsAgainstCanonical(
     content_hash: string;
   }>(
     `SELECT id, metric_id, estimate, reference_period, source, source_url, content_hash
-     FROM bb_reference.statistical_observations
+     FROM reference.statistical_observations
      WHERE id = ANY($1::text[])`,
     [[...packetObservations.keys()]],
   );
@@ -385,10 +383,8 @@ const doiHttpClient: SafeHttpClient = async (request) => {
 };
 
 /**
- * DOI resolution gate (repo-k2q3 crit 2 / repo-vdtm): live network call against
- * Crossref/OpenAlex, gated behind CHECK_DOIS=1 (mirrors articles.ts's gateDoiCitations).
- * Checks any artifact carrying a `scholarlyCitation.doi` field; a mismatch or failure
- * to resolve is a hard error regardless of packet status.
+ * With CHECK_DOIS=1, resolve scholarlyCitation.doi through Crossref/OpenAlex. Resolution
+ * failure or mismatch is an error for every packet status.
  */
 async function gateDoiCitations(packets: readonly ThemeImpactPacket[]): Promise<void> {
   const errors: string[] = [];
@@ -515,7 +511,7 @@ async function commandPromote(packetIds: readonly string[]): Promise<void> {
 
   const result = await withDb(async ({ client, dryRun }) => {
     const rows = await client.query<PacketRow>(
-      `SELECT ${PACKET_COLUMNS} FROM bb_reference.theme_impact_packets WHERE id = ANY($1::text[])`,
+      `SELECT ${PACKET_COLUMNS} FROM reference.theme_impact_packets WHERE id = ANY($1::text[])`,
       [[...packetIds]],
     );
     const foundIds = new Set(rows.rows.map((row) => row.id));
@@ -540,7 +536,7 @@ async function commandPromote(packetIds: readonly string[]): Promise<void> {
     const promoted: string[] = [];
     for (const id of packetIds) {
       const updated = await client.query<{ id: string }>(
-        `UPDATE bb_reference.theme_impact_packets
+        `UPDATE reference.theme_impact_packets
          SET status = 'published', updated_at = now()
          WHERE id = $1 RETURNING id`,
         [id],
@@ -559,10 +555,10 @@ function contentHash(payload: unknown): string {
 
 async function resolveActiveReleaseId(client: pg.PoolClient): Promise<string> {
   const active = await client.query<{ release_id: string }>(
-    `SELECT release_id FROM bb_public.active_release WHERE id = 'active'`,
+    `SELECT release_id FROM published.active_release WHERE id = 'active'`,
   );
   const releaseId = active.rows[0]?.release_id;
-  if (!releaseId) throw new Error('no active release configured in bb_public.active_release');
+  if (!releaseId) throw new Error('no active release configured in published.active_release');
   return releaseId;
 }
 
@@ -570,7 +566,7 @@ async function commandProject(): Promise<void> {
   const result = await withDb(async ({ client, dryRun }) => {
     const releaseId = await resolveActiveReleaseId(client);
     const rows = await client.query<PacketRow>(
-      `SELECT ${PACKET_COLUMNS} FROM bb_reference.theme_impact_packets WHERE status = 'published' ORDER BY id`,
+      `SELECT ${PACKET_COLUMNS} FROM reference.theme_impact_packets WHERE status = 'published' ORDER BY id`,
     );
 
     const projected: string[] = [];
@@ -579,7 +575,7 @@ async function commandProject(): Promise<void> {
       const packet = parseThemeImpactPacketRow(row);
       const hash = contentHash(packet);
       const upserted = await client.query<{ packet_id: string; inserted: boolean }>(
-        `INSERT INTO bb_public.release_theme_impact_packets (
+        `INSERT INTO published.release_theme_impact_packets (
            release_id, packet_id, theme_id, question_id, payload, content_hash
          ) VALUES ($1, $2, $3, $4, $5::jsonb, $6)
          ON CONFLICT (release_id, packet_id) DO UPDATE SET
@@ -587,7 +583,7 @@ async function commandProject(): Promise<void> {
            question_id = EXCLUDED.question_id,
            payload = EXCLUDED.payload,
            content_hash = EXCLUDED.content_hash
-         WHERE bb_public.release_theme_impact_packets.content_hash IS DISTINCT FROM EXCLUDED.content_hash
+         WHERE published.release_theme_impact_packets.content_hash IS DISTINCT FROM EXCLUDED.content_hash
          RETURNING packet_id, (xmax = 0) AS inserted`,
         [releaseId, packet.id, packet.themeId, packet.questionId, JSON.stringify(packet), hash],
       );
@@ -596,7 +592,7 @@ async function commandProject(): Promise<void> {
     }
 
     const stale = await client.query<{ packet_id: string }>(
-      `DELETE FROM bb_public.release_theme_impact_packets
+      `DELETE FROM published.release_theme_impact_packets
        WHERE release_id = $1 AND packet_id <> ALL($2::text[])
        RETURNING packet_id`,
       [releaseId, rows.rows.map((row) => row.id)],
@@ -618,10 +614,10 @@ async function commandAudit(): Promise<void> {
   const result = await withDb(async ({ client }) => {
     const releaseId = await resolveActiveReleaseId(client);
     const referenceRows = await client.query<PacketRow>(
-      `SELECT ${PACKET_COLUMNS} FROM bb_reference.theme_impact_packets WHERE status = 'published'`,
+      `SELECT ${PACKET_COLUMNS} FROM reference.theme_impact_packets WHERE status = 'published'`,
     );
     const releaseRows = await client.query<{ packet_id: string; content_hash: string }>(
-      `SELECT packet_id, content_hash FROM bb_public.release_theme_impact_packets WHERE release_id = $1`,
+      `SELECT packet_id, content_hash FROM published.release_theme_impact_packets WHERE release_id = $1`,
       [releaseId],
     );
     const releaseHashById = new Map(

@@ -1,126 +1,30 @@
-# GitHub repository governance (BB-009) + OIDC deploy identities (BB-010)
+# GitHub governance
 
-Declarative governance for the Black Book GitHub repository. Local policy is enforced by `pnpm validate:governance`. Remote settings are applied only with an authenticated admin `gh` session. WIF/OIDC cloud resources are declarative stubs until `apply-wif.sh --apply`.
+Local policy is checked by `pnpm validate:governance`. Remote settings are a separate system:
+inspect them with `infra/github/scripts/check-governance.sh` before claiming they are applied.
 
-## Status (verified 2026-07-16)
+The policy files under `.github/` and `infra/github/` define path ownership, allowed actions,
+branch rules and security settings. `scripts/apply-governance.sh --dry-run` previews changes;
+`--apply` requires an authenticated repository administrator. Never recreate retired cloud
+identity infrastructure to satisfy an obsolete runbook.
 
-| Item | State |
-|------|--------|
-| Local governance files | Present under `.github/` + `infra/github/` |
-| Git remote | **Absent** (`git remote -v` empty) |
-| `gh` auth | Token in keyring **invalid** (`gh auth status`) |
-| Rulesets / Actions allowlist / secret scanning on GitHub | **Not applied** (cannot verify via `gh api`) |
-| OIDC deploy workflow stub | `.github/workflows/deploy-production.yml` (`workflow_dispatch` only) |
-| GCP WIF pool/provider | **Not applied** — see `infra/gcp/wif/` + `scripts/apply-wif.sh` |
+## Validation and cost
 
-Do not claim GitHub settings are live until `infra/github/scripts/check-governance.sh` passes without `--allow-missing-remote`.
+Required CI names are `Workspace Checks`, `Workspace Tests`, `Unit Tests (Python)` and
+`Governance`. Keep those aligned with `.github/workflows/ci.yml` and the ruleset. Run
+`fnm exec --using=22 -- ./scripts/ci-local.sh --base origin/staging` before pushing. Consolidate
+related work and avoid repeated pushes solely to discover failures that can be checked locally.
 
-## Artifacts
+Production deployment is governed by [the release runbook](../../docs/runbooks/production-release.md).
+Vercel Git integration can deploy independently of Actions. Manual workflow capability does not
+mean a deployment or schedule is enabled. No research schedule is intended.
 
-| Path | Role |
-|------|------|
-| `.github/CODEOWNERS` | Path owners for security, infra, policies, DB, publication |
-| `.github/dependabot.yml` | npm / pip / github-actions weekly updates |
-| `SECURITY.md` | Security policy + private reporting instructions |
-| `rulesets/main-protection.json` | Main branch ruleset (PR, checks, no force-push/delete, resolved threads) |
-| `allowed-actions.json` | Selected Actions publishers/patterns (includes `google-github-actions/auth`) |
-| `security-settings.json` | Secret scanning, push protection, private vulnerability reporting |
-| `scripts/apply-governance.sh` | Dry-run by default; `--apply` mutates via `gh api` |
-| `scripts/check-governance.sh` | Read-only verification via `gh api` |
-| `scripts/apply-wif.sh` | WIF Terraform dry-run by default; `--apply` mutates GCP |
-| `scripts/check-wif.sh` | Read-only WIF inventory (`--allow-missing` for local) |
-| `oidc/` | Protected environment stubs + SA key removal path |
-| `release-metadata/` | Deployment provenance schema + stub (BB-062) |
-| `.github/workflows/pages.yml` | Optional Actions publish (manual); primary Pages source is branch `/docs` via `pnpm docs:publish` |
-| `../../scripts/validate-github-governance.mjs` | Local/CI policy checker (pins, permissions, events, files) |
+The public documentation site uses the branch `/docs` export produced by `pnpm docs:publish`.
+Its source is `apps/docs`; retain operating Markdown when rebuilding generated assets.
 
-## Required CI check names
+## Remote changes
 
-Must match job `name:` values in `.github/workflows/ci.yml` and the ruleset:
-
-- Workspace Checks
-- Workspace Tests
-- Unit Tests (Python)
-- Governance
-
-Four, not the nine that stood here before. The seven pnpm lanes (Validate, Unit Tests (JS
-Packages), Unit Tests (JS Apps), Contract Security Accessibility, Coverage, Build and
-Typecheck, E2E Harness) were seven runners repeating one checkout and one install; they are
-now steps inside `Workspace Checks` and `Workspace Tests`. Every command still runs. The
-build stays in its own job on purpose: the test lanes have always run against an unbuilt
-workspace, and folding the build in with them would change what the suites resolve.
-
-## Local validation
-
-```bash
-cd ~/Developer/Projects/black-book
-pnpm validate:governance
-# or
-node scripts/validate-github-governance.mjs
-
-# Remote check (SKIP/exit 0 when no remote if flag set)
-./infra/github/scripts/check-governance.sh --allow-missing-remote
-```
-
-## Apply once remote + admin exist
-
-Prerequisites:
-
-1. Create the GitHub repository (do **not** invent one without an explicit request).
-2. Add the `origin` remote and push `main`.
-3. `gh auth login -h github.com` with a token that can administer the repo (rulesets, Actions, security settings).
-4. Create CODEOWNER teams on the org (optional but recommended): `security`, `infra`, `policies`, `database`, `publication`, then update `.github/CODEOWNERS`.
-
-Dry-run (safe):
-
-```bash
-cd ~/Developer/Projects/black-book
-./infra/github/scripts/apply-governance.sh --dry-run
-```
-
-Apply:
-
-```bash
-./infra/github/scripts/apply-governance.sh --apply
-# If main-protection already exists:
-./infra/github/scripts/apply-governance.sh --apply --force
-```
-
-Verify:
-
-```bash
-./infra/github/scripts/check-governance.sh
-# Optional: fail when secret scanning entitlements are missing
-./infra/github/scripts/check-governance.sh --strict-security
-```
-
-Override target repo:
-
-```bash
-GH_REPO=owner/name ./infra/github/scripts/apply-governance.sh --dry-run
-GH_REPO=owner/name ./infra/github/scripts/check-governance.sh
-```
-
-## Production deploy invariant
-
-The main ruleset requires a reviewed PR and green required checks before merge to `main`. Production deploy workflows (BB-010 / BB-062) must deploy only from `main` (or another ruleset-protected ref). Unreviewed branches cannot merge to `main` and therefore cannot be a legitimate production deploy source once those workflows exist.
-
-## OIDC / WIF (BB-010)
-
-Design and commands: [`../gcp/wif/README.md`](../gcp/wif/README.md), [`oidc/README.md`](./oidc/README.md).
-
-```bash
-# Local (no cloud mutation)
-./infra/github/scripts/apply-wif.sh --dry-run
-./infra/github/scripts/check-wif.sh --allow-missing
-
-# After remote + numeric IDs + gcloud ADC + github-deploy SA:
-# ./infra/github/scripts/apply-wif.sh --apply
-# ./infra/github/scripts/check-wif.sh
-```
-
-Deploy stub workflow is **not** a required check. Full rollout pipeline is BB-062.
-
-## Secret scanning note
-
-Enabling secret scanning / push protection / private vulnerability reporting depends on repository visibility and GitHub plan. The apply script warns on API failure; `--strict-security` makes the checker fail closed when those settings are absent.
+Use `scripts/apply-governance.sh --dry-run` and inspect its proposed repository target and diff.
+After an authorized apply, run `scripts/check-governance.sh`. Secret scanning and push protection
+availability depend on the repository's GitHub plan; absence must not be reported as success.
+Deployment credentials and secret-removal procedure are documented under `oidc/`.

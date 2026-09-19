@@ -1,5 +1,5 @@
 /**
- * Postgres reads and the set-based bulk write for bb_ops catalog decisions.
+ * Postgres reads and the set-based bulk write for ops catalog decisions.
  */
 import type pg from 'pg';
 import { queryPostgres } from './canonical-postgres-client.js';
@@ -54,7 +54,7 @@ export async function listCatalogDecisionsPostgres(
   if (entityIds.length === 0) return new Map();
   const rows = await queryPostgres<CatalogDecisionRow>(
     `SELECT entity_id, decision, actor_id, reason, decided_at, metadata
-     FROM bb_ops.catalog_decisions
+     FROM ops.catalog_decisions
      WHERE entity_id = ANY($1::text[])`,
     [entityIds],
   );
@@ -83,7 +83,7 @@ export async function writeCatalogDecisionsBulkPostgres(
   },
 ): Promise<readonly string[]> {
   const result = await client.query<{ entity_id: string }>(
-    `INSERT INTO bb_ops.catalog_decisions
+    `INSERT INTO ops.catalog_decisions
       (entity_id, decision, actor_id, reason, decided_at, metadata)
      SELECT entity_id, $2, $3, $4, $5, $6
      FROM unnest($1::text[]) AS entity_id

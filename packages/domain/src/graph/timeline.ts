@@ -1,16 +1,11 @@
 /**
- * repo-n7p6.6 item 2 — one entity-timeline builder, shared by every public surface.
- *
- * Lifted verbatim (behavior-preserving) from `apps/web/src/data/entity-graph-seed.ts`, where it
- * was reachable only by the web app. `apps/api-public` hard-coded `timeline: []` because it had
- * no access to it, so the same record carried a timeline on the website and an empty one over the
- * API. The builder lives here now and both surfaces call it; the web module re-exports from this
- * one rather than keeping a second copy.
+ * Shared entity-timeline builder for the web app and public API. The web module re-exports this
+ * implementation so both surfaces derive the same timeline.
  *
  * The inputs are the only two structured, evidence-backed time sources a published record has:
- *   - `statusHistory` — time-scoped status records, each already carrying its own
- *     `datePrecision` and the claim ids it rests on.
- *   - `related[].timespan` — dated graph edges.
+ * - `statusHistory` — time-scoped status records, each already carrying its own
+ * `datePrecision` and the claim ids it rests on.
+ * - `related[].timespan` — dated graph edges.
  *
  * Nothing is inferred beyond those. An entry with no `validFrom` is emitted with the literal
  * label "Undated" rather than a guessed date, and callers that cannot render an undated row drop

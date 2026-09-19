@@ -1,19 +1,15 @@
 # Account compromise
 
-## Trigger and triage
+Investigate unexpected role changes, MFA/session anomalies and unauthorized publication actions.
+Record the account, affected sessions, actions and earliest confirmed compromise time.
 
-- Trigger on impossible travel, MFA/reset anomalies, unexpected IAP access, role changes, or publication actions.
-- Identify the account, sessions, roles, actions, and earliest confirmed compromise time.
+1. Revoke the account's Supabase sessions and remove compromised application-role grants.
+   Existing access tokens can remain valid until expiry; sensitive operations must be blocked
+   during containment. Do not rely on user deletion alone.
+2. Pause publication and affected writers. Preserve independent service identities and audit data.
+3. Review accepted changes and activated releases. Restore a verified release when necessary.
+4. Reset MFA from a trusted device, rotate exposed secrets, and verify a clean-session canary.
+5. Assess required user or regulatory notifications with the responsible operator.
 
-## Contain
-
-1. Disable the account and revoke its Firebase/Auth/IAP sessions.
-2. Engage `publication` and any feature switches the account could operate.
-3. Remove only the compromised account's grants; preserve independent service identities.
-4. If a release changed, execute the  prior-release rollback and verify hashes.
-
-## Recover
-
-- Reset MFA from a trusted device, review  and Cloud Audit Logs, and revert unauthorized grants/data.
-- Re-enable least privilege only after security approval and a clean-session canary.
-- Notify affected users and regulators when legal/privacy assessment requires it.
+Use [database compromise](database-compromise.md) if canonical records or authorization policy
+were changed. Recovery requires observed evidence, not only successful authentication.

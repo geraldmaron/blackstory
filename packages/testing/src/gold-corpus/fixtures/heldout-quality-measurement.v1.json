@@ -1,0 +1,109 @@
+{
+  "schemaVersion": "heldout-quality-measurement.v1",
+  "evaluatedAt": "2026-09-18T21:27:48.047Z",
+  "rawArtifact": {
+    "location": "packages/testing/src/gold-corpus/artifacts/evidence-retrieval-index-mechanics.json",
+    "sha256": "2713305dd39e5c83f04807d207894132731324cfb1126e258a08640d77155ed3"
+  },
+  "inputs": {
+    "originalBlindIdentityAndEdgesFileByteSha256": "7386f335cdf81a05a8379ba64f0a6763def6bad448cce0abfc297522b2a3617b",
+    "currentBlindIdentityAndEdgesFileByteSha256": "8581645419a2eaad1c5312916f6ab02a851ef10197fa05c0369dcbc572e33d3e",
+    "blindIdentityAndEdgesCanonicalJsonSha256": "4548bb1ea187bc81d0217e45cdaf72fde62fa6b9b49c7d4dd1ae40a4a6c1fa5e",
+    "frozenPredictionsSha256": "a1a3c029d44309a35ebb6b05f72ed356b323e181d95dfe7cb0dd19eb091f0bfb",
+    "independentGoldSha256": "53dffe4d12f3c893f2b7feed7757f26ace75b891bae6cd1730bce879aed4ddae",
+    "bindingStatus": "posthoc-integrity-record"
+  },
+  "cost": {
+    "provider": "deterministic-evaluation",
+    "providerCalls": 0,
+    "currentRunExpectedRateEstimateUsd": 0,
+    "cumulativePriorReservedCostUsd": 0.00255264
+  },
+  "hnswMechanics": {
+    "embeddingInterpretation": "Deterministic document and included-padding vectors share a mechanics-only namespace and are not semantically meaningful.",
+    "includedPaddingRows": 1000,
+    "wrongModelPaddingRows": 100,
+    "defaultPlanner": {
+      "statement": "EXPLAIN (ANALYZE, BUFFERS, FORMAT JSON)",
+      "setting": "default local planner settings",
+      "hnswIndexSelected": false,
+      "hnswIndexUsed": false,
+      "hnswActualLoops": 0,
+      "nodeTypes": ["Incremental Sort", "Limit", "Sort", "Seq Scan", "CTE Scan"],
+      "indexNames": []
+    },
+    "forcedMechanicsPlanner": {
+      "statement": "EXPLAIN (ANALYZE, BUFFERS, FORMAT JSON)",
+      "setting": "SET LOCAL enable_seqscan=off; SET LOCAL enable_bitmapscan=off in an isolated rolled-back transaction",
+      "hnswIndexSelected": true,
+      "hnswIndexUsed": true,
+      "hnswActualLoops": 1,
+      "nodeTypes": ["Incremental Sort", "Limit", "Index Scan", "CTE Scan"],
+      "indexNames": ["retrieval_passages_vector_idx"]
+    },
+    "sourceFilteredExactPlanUsedHnsw": false,
+    "sourceFilteredApproximatePlanUsedHnsw": false,
+    "sourceFilteredIndexNames": ["retrieval_passages_origin_idx"],
+    "meanSourceDocumentTopKOverlapAgainstExactFusion": 1,
+    "nonemptyBaselineQueryCount": 14,
+    "emptyBaselineQueryCount": 6,
+    "identicalSourceDocumentTopKRateAfterFusion": 1
+  },
+  "identity": {
+    "caseCount": 12,
+    "distinctCaseCount": 4,
+    "falseMergeCount": 0,
+    "falseMergeRate": 0,
+    "falseMergeCoverage": "available",
+    "missedMergeCount": 0
+  },
+  "edges": {
+    "caseCount": 14,
+    "unsupportedCaseCount": 5,
+    "unsupportedAssertionCount": 0,
+    "unsupportedEdgeRate": 0,
+    "unsupportedEdgeCoverage": "available",
+    "assertedEdgeFalseDiscoveryRate": 0,
+    "assertedEdgeFalseDiscoveryCoverage": "available",
+    "supportedCaseCount": 9,
+    "missedSupportedEdgeCount": 1,
+    "accuracy": 0.9285714285714286
+  },
+  "probabilityCalibration": {
+    "status": "unavailable",
+    "probabilityClaimSupported": false,
+    "reason": "The frozen predictor emitted categorical decisions and no probabilities."
+  },
+  "limitations": [
+    "The identity and edge gold labels are independent-agent-authored and provisional, not human-adjudicated.",
+    "The blind sourceExcerpts.excerpt values are shortened or paraphrased summaries with local paragraph selectors, not source-native exact quote selectors or preserved page bytes.",
+    "Repeated alias pairs overlap; the identity counts are not independent historical observations or a population estimate.",
+    "The default planner did not select HNSW at this bounded local scale. HNSW execution used explicitly recorded planner controls in an isolated transaction.",
+    "The current runner asserts HNSW execution only in the dedicated forced padding preflight. Source-filtered semantic queries record PostgreSQL's plan under the transaction-local controls and may legitimately select the source-item B-tree.",
+    "The integrity manifest was created after predictions and independent gold. The blind file was later reformatted without changing its parsed JSON; the original byte hash is preserved, and current byte plus canonical JSON hashes now fail closed on further changes. This is not preregistration.",
+    "Case g09 measures direct assertion admission. Withholding that untyped direct edge does not deny that a kinship inference may be reasonable as a derived, reviewable two-hop relationship.",
+    "No probability or calibration claim follows from categorical predictions.",
+    "Source-document top-k overlap is measured after reciprocal-rank fusion, not raw vector-neighbor recall. Empty exact baselines are excluded from the mean and reported separately.",
+    "Deterministic mechanics vectors do not measure semantic quality. Provider embeddings use a separate namespace and held-out source allowlist; the historical provider receipt is retained only with its original scope limitations."
+  ],
+  "cleanup": {
+    "status": "completed",
+    "plannerStatisticsRefreshed": true,
+    "deletedRows": {
+      "retrievalPassages": 1107,
+      "captureOrigins": 8,
+      "sourceCaptures": 8,
+      "retrievalEvents": 8,
+      "sourceItems": 8,
+      "evidenceSources": 1
+    },
+    "remainingRows": {
+      "retrievalPassages": 0,
+      "captureOrigins": 0,
+      "sourceCaptures": 0,
+      "retrievalEvents": 0,
+      "sourceItems": 0,
+      "evidenceSources": 0
+    }
+  }
+}

@@ -1,5 +1,5 @@
 /**
- * Pure mapping/parsing helpers for repo-4vuf (WS5) — resolving NRHP Black
+ * Pure mapping/parsing helpers for the publication workflow — resolving NRHP Black
  * heritage place images via Wikidata P649 (NRHP reference number) → P18
  * (image) → Commons license map.
  *

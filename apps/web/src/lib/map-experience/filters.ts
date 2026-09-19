@@ -23,10 +23,8 @@ import type { ExploreMapBounds } from './url-state';
 import { isInternalRecordLabel } from '../place/public-place-path';
 
 /**
- * Resolves the effective controlled-taxonomy topic ids for a feature (the related workstream): prefers
- * the new `topicIds` field, falling back to the legacy `topicTags` field for features built
- * before the split. Either way every value is validated against `TOPIC_REGISTRY` — the theme
- * facet is NEVER built from raw, uncontrolled tag counting.
+ * Resolve theme identifiers and validate each against TOPIC_REGISTRY before constructing facet
+ * options.
  */
 export function effectiveTopicIds(feature: ExploreMapFeature): readonly string[] {
   const source = feature.properties.topicIds ?? feature.properties.topicTags;

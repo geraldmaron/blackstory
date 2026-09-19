@@ -3,11 +3,7 @@
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import {
-  assertNoUncalibratedProbabilityLanguage,
-  EVIDENCE_DIMENSION_COPY,
-  formatEvidenceScoreLabel,
-} from './confidence-language';
+import { EVIDENCE_DIMENSION_COPY, formatEvidenceScoreLabel } from './confidence-language';
 
 test('formats an uncalibrated confidence label as an evidence score, never a probability', () => {
   const label = formatEvidenceScoreLabel(0.78, 'high');
@@ -15,25 +11,11 @@ test('formats an uncalibrated confidence label as an evidence score, never a pro
   assert.doesNotMatch(label, /probability/i);
 });
 
-test('formats a calibrated confidence label distinctly when the caller proves calibration', () => {
-  const label = formatEvidenceScoreLabel(0.62, 'medium', {
-    calibrated: true,
-    calibrationMethodNote: 'validated against 2025 outcome cohort',
-  });
-  assert.match(label, /^Calibrated confidence: medium \(0\.62\)/);
-  assert.match(label, /validated against 2025 outcome cohort/);
-});
-
-test('assertNoUncalibratedProbabilityLanguage throws on probability language without calibration', () => {
-  assert.throws(() =>
-    assertNoUncalibratedProbabilityLanguage('60% probability this is true', false),
-  );
-  assert.doesNotThrow(() =>
-    assertNoUncalibratedProbabilityLanguage('60% probability this is true', true),
-  );
-  assert.doesNotThrow(() =>
-    assertNoUncalibratedProbabilityLanguage('Evidence score: high (0.78 of 1.00)', false),
-  );
+test('shows a qualitative grade when no valid measurement is supplied', () => {
+  for (const score of [undefined, NaN, Infinity, -1, 2]) {
+    assert.equal(formatEvidenceScoreLabel(score, 'low'), 'Evidence grade: low');
+  }
+  assert.equal(formatEvidenceScoreLabel(0, 'low'), 'Evidence score: low (0.00 of 1.00)');
 });
 
 test('EVIDENCE_DIMENSION_COPY gives confidence, relevance, connection strength, and research coverage each a distinct label and description', () => {
@@ -50,7 +32,10 @@ test('EVIDENCE_DIMENSION_COPY gives confidence, relevance, connection strength, 
   assert.equal(descriptions.size, 4, 'every dimension must have a unique description');
   // The confidence description explicitly clarifies it is a score, not a probability —
   // the negation itself is the guard; other dimensions must not mention probability at all.
-  assert.match(EVIDENCE_DIMENSION_COPY.confidence.description, /not a probability/i);
+  assert.match(
+    EVIDENCE_DIMENSION_COPY.confidence.description,
+    /Neither is a calibrated.*probability/i,
+  );
   assert.doesNotMatch(EVIDENCE_DIMENSION_COPY.relevance.description, /probability/i);
   assert.doesNotMatch(EVIDENCE_DIMENSION_COPY.connectionStrength.description, /probability/i);
   assert.doesNotMatch(EVIDENCE_DIMENSION_COPY.researchCoverage.description, /probability/i);

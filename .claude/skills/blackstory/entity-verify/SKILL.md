@@ -32,7 +32,7 @@ Task:
 ```
 
 Homonyms are normal. The reconciliation queue
-(`docs/research/entity-reconciliation-review-queue.md`) exists because "Clinton High School"
+(`docs/research/README.md`) exists because "Clinton High School"
 and "Charles Young" are many records. Pick nothing unless kind + place + years collapse to one
 candidate.
 
@@ -82,9 +82,9 @@ exact address; parent-site snaps cap at 15km, otherwise keep the pin and downgra
 Never snap to a US state or city centroid — for a site-of-the-history anchor or a birthplace
 anchor alike.
 
-When you have a sourced address, use [`blackstory-locate`](../locate/SKILL.md). Batch audits:
-`packages/firebase/scripts/audit-entity-locations.ts`,
-`packages/firebase/scripts/enrich-entity-locations.ts`.
+When you have a sourced address, use [`blackstory-locate`](../locate/SKILL.md).
+For batch proposals, inspect `packages/ops-data/scripts/backfill-location-coordinates.ts`
+and its dry-run output before applying any correction.
 
 **Never:** invent coordinates; invent a street so Census will "confirm" it; call Nominatim from
 product `/locate`; use live geocoders at publish time.
@@ -116,8 +116,8 @@ After a pin exists:
 1. Declared `stateCode` must contain the WGS84 point
    (`docs/research/geo-integrity-gate.md`, `evaluateGeoIntegrityPublishGate`).
    Mismatches are an audit list. Do not auto-rewrite coordinates to pass.
-2. Catalog fixtures: `packages/firebase/scripts/qa-catalog-fixtures.ts` (state-bbox +
-   precision decimals).
+2. Catalog fixtures: `evaluateGeoIntegrityPublishGate` with sourced jurisdiction polygons and
+   precision checks.
 3. Re-publish so projections pick up `EntityLocation` overrides. This skill still cannot
    promote. That is a separate publication-role action.
 

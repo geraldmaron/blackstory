@@ -1,11 +1,6 @@
 /**
- * Source library — the evidence-source publisher desk.
- *
- * Server component (repo-gyq6.9 pattern): name search and sort live in the URL and resolve in
- * SQL before the first byte. Reads `bb_evidence.source_library`, a staff-only view over the
- * evidence schema — nothing here writes, and entity/claim publication stays in release workflows.
- *
- * The matching /admin/api route stays for callers outside this page.
+ * Staff source library with URL-driven search and sort resolved in SQL before rendering. Reads
+ * evidence.source_library; publication belongs to the release workflow.
  */
 import type { Metadata } from 'next';
 import { readPostgresOrDegrade } from '../../../admin/lib/canonical-postgres-client';

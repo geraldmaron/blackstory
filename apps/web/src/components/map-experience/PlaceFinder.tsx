@@ -1,8 +1,7 @@
 'use client';
 
 /**
- * PlaceFinder — the merged `/locate` experience, remounted into the Atlas Lens's Where group
- * (repo-92n2.14 / SP-14, `docs/ui/design-direction-v9-surfaces.md` §4.1 and §"`/locate`").
+ * PlaceFinder is the place-search experience mounted in the Atlas Lens's Where group.
  *
  * One component, two postures:
  *   - Wide (>= `NARROW_BREAKPOINT`): renders inline inside the Lens's Where group, always
@@ -81,7 +80,7 @@ const NARROW_BREAKPOINT = 820;
 
 /**
  * "Radius and state select disagreement resolves to the most recent action, with the other
- * control visibly cleared" (repo-92n2.14 acceptance criterion). These two pure functions are the
+ * control visibly cleared" (acceptance criterion). These two pure functions are the
  * whole rule, factored out of the component so they are unit-testable without a DOM
  * (`PlaceFinder.test.ts`) — this file has no jsdom-driven interaction tests anywhere else, only
  * SSR markup smoke tests, so logic that needs a click or a prop change to exercise has to live

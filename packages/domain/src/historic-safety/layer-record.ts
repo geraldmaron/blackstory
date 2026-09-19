@@ -240,7 +240,7 @@ export function currentRedliningGrade(
 }
 
 // ---------------------------------------------------------------------------
-// Storage boundary (Firestore adapter is a later, same shape convention as elsewhere)
+// Storage boundary supplied by the caller
 // ---------------------------------------------------------------------------
 
 export type PlaceConditionLayerStore = {

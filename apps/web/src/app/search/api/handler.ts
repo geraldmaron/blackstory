@@ -29,7 +29,7 @@ import type { createSearchRateLimitGuard } from './rate-limit-guard';
 
 /**
  * Monitor allow-through must satisfy the quota gate (compat with @repo/security's
- * `appCheckVerified` field name on rate-limit requests).
+ * `clientAttested` field name on rate-limit requests).
  */
 function integritySatisfiesRateLimitGate(decision: {
   readonly verified: boolean;
@@ -43,10 +43,8 @@ export type SearchRouteDependencies = {
   readonly rateLimitGuard: ReturnType<typeof createSearchRateLimitGuard>;
   readonly searchIndex: readonly PublicSearchIndexDoc[];
   /**
-   * Resolves `/law/{slug}` for a law/case result (repo-skocy), or `undefined` to leave that
-   * result's href unresolved. Optional and omitted in most tests: production wires the real
-   * legal-catalog-backed resolver in `route.ts`; a test that doesn't care about law/case hrefs
-   * gets today's behavior (no `href` field) with no changes to its own fixtures.
+   * Resolves a law/case result to /law/{slug}. Undefined leaves the href unresolved; production
+   * supplies the legal-catalog resolver in route.ts.
    */
   readonly resolveLawCaseHref?: (result: {
     readonly kind: string;
@@ -136,7 +134,7 @@ export async function handleSearchRequest(
   const rateDecision = deps.rateLimitGuard.evaluate({
     subject: 'anonymous',
     ...(clientIp ? { clientIp } : {}),
-    appCheckVerified: integritySatisfiesRateLimitGate(integrityDecision),
+    clientAttested: integritySatisfiesRateLimitGate(integrityDecision),
   });
   if (!rateDecision.allowed) {
     const response = deps.rateLimitGuard.formatDeniedResponse(rateDecision);
@@ -187,7 +185,7 @@ export async function handleSearchRequest(
     // `canonical.depth + 1` here would double-increment and skip a page on the next request.
     // Embedding the current page's depth lets the guardrail's own +1 land on exactly the next page.
     // Verified by the cursor round-trip test. `position` is an opaque offset-string: this in-memory
-    // snapshot index has no real Firestore document cursor to encode. Encoding a live Firestore
+    // snapshot index has no database row cursor to encode. Encoding a live database
     // cursor here is the future seam that lands with the live index reader.
     let nextCursor: string | undefined;
     if (result.hasMore) {

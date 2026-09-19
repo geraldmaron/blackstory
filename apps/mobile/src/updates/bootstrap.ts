@@ -1,16 +1,7 @@
 /**
- * Runtime wiring that binds the pure `config.ts` resolver to the real
- * `expo-updates` native module (MOB-019, repo-ovn7). Kept separate from the
- * pure/testable module so `config.ts` stays free of native calls — the same
- * split `src/observability/bootstrap.ts` uses for Crashlytics/Perf and
- * `src/security/bootstrap.ts` uses for App Check.
- *
- * NOT wired into the app's entry point by this bead — that composition-root
- * call (alongside `initializeObservability`/`bootstrapAppCheck`) belongs to
- * whichever bead owns `src/runtime/AppProviders.tsx` (MOB-008 lineage), per
- * the same boundary `observability/bootstrap.ts` documents for itself. This
- * module exists so that wiring is a one-line call away once made, not so
- * this bead reaches into another bead's exclusive file.
+ * Bind the pure update configuration resolver to the defensive expo-updates loader. The runtime
+ * composition root owns initialization; this module keeps native dependencies out of pure
+ * policy tests.
  */
 import { resolveUpdatesPosture, type UpdatesPosture } from './config';
 import { loadNativeUpdates } from './native-bridge';

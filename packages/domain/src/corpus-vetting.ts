@@ -220,8 +220,7 @@ export function assertCorpusVettingRecordValid(record: CorpusVettingRecord): voi
 // Storage
 // ---------------------------------------------------------------------------
 
-/** Persistence boundary for corpus vetting records (Firestore adapter is a later, same
- * shape as `./adapters/registry.js`'s `SourceRegistryStore`). */
+/** Persistence boundary for corpus vetting records. */
 export type CorpusVettingStore = {
   get(corpus: string): CorpusVettingRecord | undefined;
   list(): readonly CorpusVettingRecord[];

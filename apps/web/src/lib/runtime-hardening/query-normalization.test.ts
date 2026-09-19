@@ -330,9 +330,8 @@ test('normalizeQueryString canonicalizes explore layerMode', () => {
 });
 
 test('/history carries no browse allowlist, because normalizing it would break the redirect', () => {
-  // The decade stepper and its selection params went with the browse UI (repo-92n2.27). What is
-  // left of /history maps an incoming `decade` onto `era` and 308s to /records, so its params are
-  // cargo for one hop rather than filters on a page.
+  // /history maps an incoming `decade` onto `era` and redirects to /records, so its params are
+  // cargo for one hop rather than filters on a rendered page.
   //
   // Normalization must never touch them: stripping `decade` would land a five-year-old bookmark
   // on an unfiltered index quietly, which is worse than failing. The route is out of the

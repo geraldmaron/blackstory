@@ -1,20 +1,7 @@
 /**
- * `CandidateUpdate` (the related workstream): the critical invariant from the bead is that a refresh
- * must NEVER directly overwrite public truth — it produces a candidate that enters the normal
- * review pipeline instead. This module models that candidate and the pure function that
- * produces one from a verification run's observation.
- *
- * `createCandidateUpdateFromVerificationRun` below takes only primitive/plain-data inputs (an
- * id, ids, strings, an ISO timestamp) — never the `CanonicalClaim`/`EntityRelationship` object
- * itself — so there is no reference through which it COULD mutate the subject it's checking,
- * by construction. See `candidate-update.test.ts` for a test that also verifies this
- * behaviorally (running a check against a frozen claim throws if anything attempts to write to
- * it, and the claim is unchanged afterward).
- *
- * Not wired into the release builder (`../publication/release-builder.ts`) or any publish path
- * — a `CandidateUpdate` with `status: 'accepted'` still requires whatever separate review/apply
- * step turns accepted candidates into an actual new claim version, same as any other
- * human-reviewed proposal.
+ * Create review candidates from verification observations without mutating the subject. Inputs
+ * are plain identifiers and values; acceptance still requires an explicit reviewed apply step
+ * to create a new claim version. A refresh never directly changes public truth.
  */
 import type { VerificationSubjectType } from './state.js';
 

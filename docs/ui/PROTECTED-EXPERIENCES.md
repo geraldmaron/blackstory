@@ -59,7 +59,7 @@ Never visually imply a relationship the source material does not establish.
 | Algorithmic similarity ⇒ evidence | Never present as historical edge |
 | Geographic proximity ⇒ relationship | Distinct from `related` |
 
-Every shown edge must have a semantic basis (`bb_canonical.entity_relationships.relationship_type` or an equivalently typed public projection). Different strengths/types must not look identical when the data distinguishes them.
+Every shown edge must have a semantic basis (`canonical.entity_relationships.relationship_type` or an equivalently typed public projection). Different strengths/types must not look identical when the data distinguishes them.
 
 ---
 

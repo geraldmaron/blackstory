@@ -6,7 +6,7 @@
  * which the chapters scroll over, on a phone. A national frame fitted to the whole canvas put the 49th parallel under
  * the bar and, on a phone, the country behind the cards; and because it was fitted once, for the
  * viewport the plate happened to be built in, a window resized afterwards kept the old zoom and
- * lost a coast or two (repo-18ma2).
+ * lost a coast or two.
  *
  * So the frame is derived from the window's own rect, every time it changes. `doorFramePadding`
  * turns the window into `cameraForBounds` padding (the plate fits CONUS inside the window, below

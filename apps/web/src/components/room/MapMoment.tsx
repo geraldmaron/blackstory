@@ -92,7 +92,7 @@ export function resolveMomentCamera(
  *
  * Pure, for the same reason `resolveMomentCamera` is: `data-live` and the idle line drive render
  * output, but the condition that decides them cannot be exercised by scrolling anything through
- * this repo's SSR test harness (see repo-urqy). Split out here, "a moment refuses LIVE when the
+ * this repository's SSR test harness. Split out here, "a moment refuses LIVE when the
  * plate cannot paint" is an assertion over a function call rather than a browser fact this test
  * suite cannot produce.
  *
@@ -100,7 +100,7 @@ export function resolveMomentCamera(
  * the only thing that knows whether the plate has a working GL context. A stage being MOUNTED
  * only says a plate could in principle be borrowed; it says nothing about whether this one can
  * currently paint. Conflating the two is the exact bug this function exists to keep from coming
- * back — see repo-kz9z: a moment held the LIVE tag and the copper edge over a transparent box on
+ * back: a moment must not hold the LIVE tag and copper edge over a transparent box on
  * any run where the plate had already failed.
  */
 export function resolveMomentVisibility(input: {
@@ -380,7 +380,7 @@ export function useMapMomentFrame(listener: (frame: MomentFrame | null) => void)
  * that failed to load), and this is the seam that carries that fact to every `MapMoment` without
  * the kit importing MapStage. A moment reads it back to refuse the LIVE tag and the "scroll to
  * bring the map here" idle line when the plate has nothing to show even if a moment IS live —
- * see repo-kz9z.
+ * This keeps the visible map state and its label aligned.
  *
  * A no-op when no `MapMomentStage` is mounted, so a caller does not have to guard for it.
  */

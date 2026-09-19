@@ -16,7 +16,7 @@ import {
   mapProjectionToPublicEntityView,
   resolveJurisdictionLabel,
 } from './map-projection';
-import { hydrateEntityLearningLinks } from './source';
+import { hydrateEntityLearningLinks, retainCitedRelationshipViews } from './source';
 test('shouldUseLivePublicProjections is off by default in development', () => {
   assert.equal(
     shouldUseLivePublicProjections({
@@ -97,7 +97,7 @@ test('postgres mode uses release-catalog artifacts only behind an explicit origi
     }),
     false,
   );
-  // With an explicit origin, artifacts act as the egress read-through cache (repo-csw0);
+  // With an explicit origin, artifacts act as the egress read-through cache;
   // The shared release-artifact fetcher still rejects any artifact whose releaseId mismatches
   // the live pointer.
   assert.equal(
@@ -159,6 +159,9 @@ test('mapProjectionToPublicEntityView renders claims carried by the projection i
         object: '1841',
         confidenceLevel: 'high',
         citationSource: 'nps.gov',
+        citationHref: 'https://example.gov/record/1',
+        archivedUrl: 'https://web.archive.org/web/20260901000000/https://example.gov/record/1',
+        archivedAt: '2026-09-01T00:00:00.000Z',
         citationLabel: 'National Park Service',
       },
     ],
@@ -166,7 +169,37 @@ test('mapProjectionToPublicEntityView renders claims carried by the projection i
   assert.equal(view.id, 'ent_15th_st_church_001');
   assert.equal(view.claims.length, 1);
   assert.equal(view.claims[0]!.object, '1841');
+  assert.equal(view.claims[0]!.citationHref, 'https://example.gov/record/1');
+  assert.equal(view.claims[0]!.archivedAt, '2026-09-01T00:00:00.000Z');
   assert.equal(view.revision.releaseId, 'rel_seed_001');
+});
+
+test('mapProjectionToPublicEntityView drops an unvalidated archive pointer and keeps the original', () => {
+  const view = mapProjectionToPublicEntityView({
+    id: 'ent_archive_invalid_001',
+    releaseId: 'rel_seed_001',
+    kind: 'place',
+    displayName: 'Archive Validation Site',
+    nameLower: 'archive validation site',
+    summary: 'Fixture projection for invalid archive pointer handling.',
+    claimIds: ['claim-1'],
+    claims: [
+      {
+        id: 'claim-1',
+        predicate: 'documented_at',
+        object: 'the cited record',
+        confidenceLevel: 'high',
+        citationSource: 'example.gov',
+        citationHref: 'https://example.gov/record/1',
+        archivedUrl: 'https://web.archive.org/web/20260901000000/https://other.gov/record/1',
+        archivedAt: '2026-09-01T00:00:00.000Z',
+        citationLabel: 'Example record',
+      },
+    ],
+  });
+  assert.equal(view.claims[0]?.citationHref, 'https://example.gov/record/1');
+  assert.equal(view.claims[0]?.archivedUrl, undefined);
+  assert.equal(view.claims[0]?.archivedAt, undefined);
 });
 
 test('mapProjectionToPublicEntityView places MapFrame pins as 0–100 percentages', () => {
@@ -191,9 +224,8 @@ test('mapProjectionToPublicEntityView places MapFrame pins as 0–100 percentage
 });
 
 test('mapProjectionToPublicEntityView does not backfill from the bundled seed catalog even when the id matches', () => {
-  // `ent_15th_st_church_001` is a real bundled seed id with its own summary/claims. A live
-  // projection sharing that id must render only its own (thinner) data — never silently pull
-  // in the seed's summary/topicTags/claims (the related workstream fixed this seed-enrichment bug).
+  // A live record sharing a bundled seed id must render only its live fields, never borrow the
+  // seed's claims, summary or topics.
   const view = mapProjectionToPublicEntityView({
     id: 'ent_15th_st_church_001',
     releaseId: 'rel_live_001',
@@ -318,7 +350,7 @@ test('live-only projections get a default notability label for search-pool parit
     locationLabel: 'Tulsa, Oklahoma',
   });
   assert.ok(view.notabilityLabels && view.notabilityLabels.length >= 1);
-  assert.match(view.notabilityLabels![0]!, /documented site/i);
+  assert.match(view.notabilityLabels![0]!, /record in the active public release/i);
 });
 
 test('mapProjectionToPublicEntityView uses the release builder real notabilityBasis/researchCoverage/revision metadata when present (the related workstream)', () => {
@@ -495,4 +527,151 @@ test('hydrateEntityLearningLinks builds a timeline from status history and dated
   assert.ok(hydrated.timeline.length >= 2);
   assert.ok(hydrated.timeline.some((item) => item.time === '1900'));
   assert.ok(hydrated.timeline.some((item) => item.time === '1910'));
+});
+
+test('public relationship hydration rejects unsupported candidates and retains cited direction', () => {
+  const root = mapProjectionToPublicEntityView({
+    ...relationshipProjection('root', 'Root record'),
+    claims: [relationshipClaim('root-outgoing', 'founded', 'outgoing')],
+    related: [
+      { id: 'outgoing', type: 'founded', direction: 'outgoing' },
+      { id: 'incoming', type: 'employed_by', direction: 'incoming' },
+      { id: 'unsupported', type: 'related_to', direction: 'outgoing' },
+    ],
+  });
+  const outgoing = mapProjectionToPublicEntityView(
+    relationshipProjection('outgoing', 'Outgoing target'),
+  );
+  const incoming = mapProjectionToPublicEntityView({
+    ...relationshipProjection('incoming', 'Incoming source'),
+    claims: [relationshipClaim('incoming-root', 'employed_by', 'root')],
+  });
+  const unsupported = mapProjectionToPublicEntityView(
+    relationshipProjection('unsupported', 'Unsupported target'),
+  );
+
+  const gated = retainCitedRelationshipViews([root, outgoing, incoming, unsupported]);
+  const byId = new Map(gated.map((entity) => [entity.id, entity]));
+
+  assert.deepEqual(byId.get('root')?.related, [
+    { id: 'incoming', type: 'employed_by', direction: 'incoming' },
+    { id: 'outgoing', type: 'founded', direction: 'outgoing' },
+  ]);
+  assert.deepEqual(byId.get('root')?.relatedIds, ['incoming', 'outgoing']);
+  assert.deepEqual(byId.get('outgoing')?.related, [
+    { id: 'root', type: 'founded', direction: 'incoming' },
+  ]);
+  assert.deepEqual(byId.get('incoming')?.related, [
+    { id: 'root', type: 'employed_by', direction: 'outgoing' },
+  ]);
+  assert.deepEqual(byId.get('unsupported')?.related, []);
+});
+
+test('each relationship hop needs its own exact cited claim before hydration can traverse it', () => {
+  const root = mapProjectionToPublicEntityView({
+    ...relationshipProjection('root', 'Root record'),
+    related: [{ id: 'first', type: 'employed_by', direction: 'incoming' }],
+  });
+  const firstWithoutProof = mapProjectionToPublicEntityView({
+    ...relationshipProjection('first', 'First hop'),
+    claims: [relationshipClaim('first-root', 'employed_by', 'root')],
+    related: [{ id: 'second', type: 'related_to', direction: 'incoming' }],
+  });
+  const second = mapProjectionToPublicEntityView(relationshipProjection('second', 'Second hop'));
+
+  const rejectedCatalog = retainCitedRelationshipViews([root, firstWithoutProof, second]);
+  const rejectedRoot = rejectedCatalog.find((entity) => entity.id === 'root');
+  assert.ok(rejectedRoot);
+  const rejectedHydration = hydrateEntityLearningLinks(rejectedRoot, rejectedCatalog);
+  assert.deepEqual(
+    rejectedHydration.relatedNeighbors?.map((entity) => entity.id),
+    ['first'],
+  );
+  assert.equal(rejectedHydration.continueLearning, undefined);
+  assert.deepEqual(
+    rejectedHydration.relationshipGraph?.nodes.map((node) => node.id),
+    ['first'],
+  );
+
+  const secondWithProof = mapProjectionToPublicEntityView({
+    ...relationshipProjection('second', 'Second hop'),
+    claims: [relationshipClaim('second-first', 'related_to', 'first')],
+  });
+  const acceptedCatalog = retainCitedRelationshipViews([root, firstWithoutProof, secondWithProof]);
+  const acceptedRoot = acceptedCatalog.find((entity) => entity.id === 'root');
+  assert.ok(acceptedRoot);
+  const acceptedHydration = hydrateEntityLearningLinks(acceptedRoot, acceptedCatalog);
+  assert.deepEqual(
+    acceptedHydration.continueLearning?.map((entity) => entity.id),
+    ['second'],
+  );
+  assert.deepEqual(
+    acceptedHydration.relationshipGraph?.nodes.map((node) => [node.id, node.hop]),
+    [
+      ['first', 1],
+      ['second', 2],
+    ],
+  );
+});
+
+function relationshipProjection(id: string, displayName: string) {
+  return {
+    id,
+    releaseId: 'rel_relationship_gate',
+    kind: 'place',
+    displayName,
+    nameLower: displayName.toLowerCase(),
+    summary: `${displayName} is a projection fixture for evidence-gated public relationships.`,
+    claimIds: [],
+  } as const;
+}
+
+function relationshipClaim(id: string, predicate: string, object: string) {
+  return {
+    id,
+    predicate,
+    object,
+    confidenceLevel: 'high' as const,
+    citationSource: 'Archive',
+    citationLabel: 'Cited relationship record',
+    citationHref: `https://archive.example.org/${id}`,
+  };
+}
+
+test('projection grades do not invent scores and missing or unrecognized precision never creates a pin', () => {
+  const projection = {
+    id: 'publication',
+    releaseId: 'release',
+    kind: 'publication',
+    displayName: 'Source review',
+    nameLower: 'source review',
+    claimIds: ['claim'],
+    claims: [
+      {
+        id: 'claim',
+        predicate: 'description',
+        object: 'A sourced statement',
+        confidenceLevel: 'low' as const,
+        citationSource: 'Archive',
+        citationLabel: 'Record',
+      },
+    ],
+  };
+  const view = mapProjectionToPublicEntityView(projection);
+  assert.equal(view.claims[0]?.confidenceScore, undefined);
+  assert.equal(view.locationPrecision, 'none');
+  assert.equal(view.geoAnchor, undefined);
+  assert.doesNotMatch(view.relevanceExplanation, /documented site/);
+  for (const precision of [undefined, 'unrecognized', 'none', 'country']) {
+    const located = mapProjectionToPublicEntityView({
+      ...projection,
+      location: {
+        lat: 38,
+        lng: -77,
+        geohash: 'dqc',
+        ...(precision !== undefined ? { precision } : {}),
+      },
+    });
+    assert.equal(located.geoAnchor, undefined);
+  }
 });

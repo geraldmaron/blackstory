@@ -1,5 +1,5 @@
 /**
- * Unit tests for the entity-enrichment ledger selector (repo-n7p6.2 / WS2): SQL predicate
+ * Unit tests for the entity-enrichment ledger selector (intake): SQL predicate
  * construction and the pure skip/include candidacy logic, both without a live DB.
  */
 import assert from 'node:assert/strict';

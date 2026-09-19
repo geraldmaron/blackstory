@@ -1,5 +1,5 @@
 /**
- * Release-activation state-machine tests (MOB-005). Covers determinism, the atomic single-pointer
+ * Release-activation state-machine tests (release activation). Covers determinism, the atomic single-pointer
  * activation transaction, fail-closed rejection of corrupted/missing artifacts, crash-mid-flight
  * safety, concurrent/duplicate activation, the rollback drill, schema-migration rollback guard,
  * retention/GC protection of active + rollback releases, the bounded-point size/gzip budget, and —

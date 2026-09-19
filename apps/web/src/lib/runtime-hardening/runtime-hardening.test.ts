@@ -65,7 +65,7 @@ test('collectPublicRenderPathFindings flags forbidden imports', () => {
   // FORBIDDEN_PUBLIC_RENDER_IMPORTS' import-context requirement without
   // satisfying scripts/validate-boundaries.mjs's IMPORT_PATTERN (which
   // requires a literal "import"/"export" keyword) so this fixture
-  // exercises the real detector without the repo-wide boundary scanner
+  // exercises the real detector without the repository-wide boundary scanner
   // mistaking it for an actual cross-boundary import.
   const findings = collectPublicRenderPathFindings(
     'fake.tsx',
@@ -146,10 +146,10 @@ test('Explore and entity route segment config stays after all imports', () => {
     /\d+/,
   );
   assertSegmentConfigAfterImports(
-    readFileSync(join(APP_ROOT, 'page.tsx'), 'utf8'),
-    'page.tsx',
-    'revalidate',
-    /300/,
+    readFileSync(join(APP_ROOT, 'explore/page.tsx'), 'utf8'),
+    'explore/page.tsx',
+    'dynamic',
+    /force-dynamic/,
   );
 });
 

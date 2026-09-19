@@ -861,6 +861,23 @@
   color: var(--room-ink-2);
 }
 
+.ds-room-src__label,
+.ds-room-src__links {
+  display: block;
+}
+
+.ds-room-src__links {
+  margin-top: 2px;
+  font-family: var(--ds-font-mono);
+  font-size: 10.5px;
+  color: var(--room-ink-4);
+}
+
+.ds-room-src__links a:focus-visible {
+  outline: 2px solid var(--ds-accent);
+  outline-offset: 2px;
+}
+
 .ds-room-src__y {
   font-family: var(--ds-font-mono);
   font-variant-numeric: tabular-nums;

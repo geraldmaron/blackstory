@@ -7,15 +7,9 @@ import {
 } from './crash-reporter';
 
 /**
- * Integration-style smoke tests for the runtime wiring layer. Unlike
- * `src/security/bootstrap.ts` (its App Check counterpart, which has no
- * dedicated test file — the pure modules it wires carry the real test
- * coverage), this module's core assembly logic is cheap to exercise against
- * the real in-memory `CacheStore` / `Connectivity` test doubles already
- * built for MOB-009, so we do — but the bar here is "never throws and wires
- * the pieces together correctly," not exhaustive Constants-mock coverage
- * (Expo's own jest-expo preset provides `expo-constants`, so `Constants.expoConfig`
- * reflects this repo's real `app.config.ts` in the test runner).
+ * Runtime wiring smoke tests use the existing in-memory cache and connectivity doubles. They
+ * exercise assembly and nonthrowing behavior with jest-expo configuration, not native-device
+ * integration.
  */
 
 beforeEach(() => {

@@ -1,10 +1,10 @@
 /**
  * Demographics read routing for public web surfaces (`/data`, homepage data pulse).
- * Reads materialized census snapshots from `bb_public.materialized_snapshots` when
+ * Reads materialized census snapshots from `published.materialized_snapshots` when
  * `PUBLIC_DATA_SOURCE=postgres`; otherwise returns empty/absent summaries.
  *
  * ACS and FBI hate-crime summaries deliberately do NOT live here. Those datasets belong in the
- * typed `bb_reference.statistical_series` / `statistical_observations` model — the opaque
+ * typed `reference.statistical_series` / `statistical_observations` model — the opaque
  * `acs_*` / `hate_crime_county_years` payload tables are the legacy loader path (see
  * supabase/migrations/20260721220000_statistical_series_observations.sql). A bespoke rollup here
  * would drop margin of error, boundary version, and source-variable provenance, which is the

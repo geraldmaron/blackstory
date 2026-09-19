@@ -1,5 +1,5 @@
 /**
- * Publish-time graph build + persist to bb_public.release_graph_* from canonical
+ * Publish-time graph build + persist to published.release_graph_* from canonical
  * relationships and release entity projections.
  */
 import type pg from 'pg';
@@ -10,8 +10,6 @@ import {
   serializeGraphAdjacency,
   serializeGraphAllTimeView,
   serializeGraphDecadeView,
-  extractCatalogRelationships,
-  RELATIONSHIP_TYPES,
   type DecadeBucketEntityInput,
   type EntityRelationship,
   type GraphPublishAuditReport,
@@ -51,7 +49,7 @@ export type CanonicalRelationshipRow = {
 
 export const RELEASE_ENTITIES_SQL = `
 SELECT entity_id, kind, projection
-FROM bb_public.release_entities
+FROM published.release_entities
 WHERE release_id = $1
 ORDER BY entity_id
 `;
@@ -64,10 +62,10 @@ SELECT
   e.kind_detail,
   el.valid_from_edtf,
   el.valid_to_edtf
-FROM bb_canonical.entities e
+FROM canonical.entities e
 LEFT JOIN LATERAL (
   SELECT valid_from_edtf, valid_to_edtf
-  FROM bb_canonical.entity_locations
+  FROM canonical.entity_locations
   WHERE entity_id = e.id
   ORDER BY CASE role WHEN 'historical' THEN 0 WHEN 'current' THEN 1 ELSE 2 END, id
   LIMIT 1
@@ -90,11 +88,12 @@ SELECT
       FILTER (WHERE ere.evidence_id IS NOT NULL),
     '{}'::text[]
   ) AS evidence_ids
-FROM bb_canonical.entity_relationships r
-LEFT JOIN bb_canonical.entity_relationship_evidence ere
+FROM canonical.entity_relationships r
+LEFT JOIN canonical.entity_relationship_evidence ere
   ON ere.relationship_id = r.id
-WHERE r.publication_status IS DISTINCT FROM 'retracted'
-  AND (r.workflow_status IS NULL OR r.workflow_status IN ('accepted'))
+WHERE r.publication_status = 'published'
+  AND r.workflow_status = 'accepted'
+  AND EXISTS (SELECT 1 FROM canonical.entity_relationship_evidence support WHERE support.relationship_id=r.id)
   AND (r.from_entity_id = ANY($1::text[]) OR r.to_entity_id = ANY($1::text[]))
 GROUP BY r.id
 ORDER BY r.id
@@ -148,52 +147,8 @@ function temporalFromRelationship(row: CanonicalRelationshipRow): RelationshipTe
   };
 }
 
-function isRelationshipType(value: unknown): value is RelationshipType {
-  return typeof value === 'string' && (RELATIONSHIP_TYPES as readonly string[]).includes(value);
-}
-
-function relatedFromProjection(
-  projection: Readonly<Record<string, unknown>>,
-): readonly { id: string; type: RelationshipType; direction: 'outgoing' | 'incoming' }[] {
-  const related = projection.related;
-  if (!Array.isArray(related)) return [];
-  return related.filter(
-    (entry): entry is { id: string; type: RelationshipType; direction: 'outgoing' | 'incoming' } =>
-      !!entry &&
-      typeof entry === 'object' &&
-      typeof (entry as Record<string, unknown>).id === 'string' &&
-      isRelationshipType((entry as Record<string, unknown>).type) &&
-      ((entry as Record<string, unknown>).direction === 'outgoing' ||
-        (entry as Record<string, unknown>).direction === 'incoming'),
-  );
-}
-
-function relationshipsFromReleaseProjections(
-  releaseRows: readonly ReleaseGraphEntityRow[],
-  generatedAt: string,
-): readonly EntityRelationship[] {
-  const entities = releaseRows.map((row) => {
-    const projection = asRecord(row.projection) ?? {};
-    return {
-      id: row.entity_id,
-      related: relatedFromProjection(projection),
-    };
-  });
-  return extractCatalogRelationships(entities, { generatedAt }).relationships;
-}
-
-function mergeRelationships(
-  canonical: readonly EntityRelationship[],
-  fromProjections: readonly EntityRelationship[],
-): readonly EntityRelationship[] {
-  const byId = new Map<string, EntityRelationship>();
-  for (const rel of [...canonical, ...fromProjections]) {
-    byId.set(rel.id, rel);
-  }
-  return [...byId.values()].sort((a, b) => a.id.localeCompare(b.id));
-}
-
 export function mapCanonicalRelationshipRow(row: CanonicalRelationshipRow): EntityRelationship {
+  if (!row.evidence_ids.length) throw new Error(`Relationship ${row.id} has no explicit evidence`);
   const now = new Date().toISOString();
   const temporal = temporalFromRelationship(row);
   return {
@@ -268,14 +223,8 @@ export function buildReleaseGraphArtifact(input: {
     releaseRows: input.releaseRows,
     canonicalById: input.canonicalById,
   });
-  // Published canonical edges are graph-eligible even when the evidence junction
-  // table is sparse — audit logs still surface edge retention vs input set.
-  const canonicalRelationships = input.relationshipRows.map(mapCanonicalRelationshipRow);
-  const projectionRelationships = relationshipsFromReleaseProjections(
-    input.releaseRows,
-    input.generatedAt,
-  );
-  const relationships = mergeRelationships(canonicalRelationships, projectionRelationships);
+  // Only explicitly published, accepted canonical relationships enter the release graph.
+  const relationships = input.relationshipRows.map(mapCanonicalRelationshipRow);
 
   const artifact = buildGraphReleaseArtifact({
     releaseId: input.releaseId,
@@ -324,41 +273,34 @@ export async function loadReleaseGraphInputs(
 }
 
 /**
- * repo-zocd — the delete+reinsert used to run as bare auto-committed statements with no
- * surrounding transaction. Observed twice (2026-08-07, 2026-08-17) leaving the active release's
- * graph tables empty or partially populated for the whole run: readers see a catalog with no
- * relationships, and a mid-run failure (a slow remote round trip timing out, or two overlapping
- * runs racing on the same primary key) leaves permanently broken partial state rather than either
- * the old graph or the new one. BEGIN/COMMIT here means a reader always sees a complete graph —
- * the prior one until this transaction commits, the new one after — and any failure rolls back to
- * the prior state instead of leaving a partial one. This alone removes the outage; batching the
- * INSERTs (still one row per statement below) is a separate, non-correctness follow-up.
+ * Replaces the graph in one transaction so readers see either the complete prior graph or the
+ * complete new graph. By default this manages that transaction; a caller already holding the
+ * release lock can own it instead and remains responsible for rollback.
  */
 export async function persistReleaseGraphArtifact(
   client: pg.PoolClient,
   releaseId: string,
   artifact: GraphReleaseArtifact,
+  options: { readonly manageTransaction?: boolean } = {},
 ): Promise<{ readonly adjacencyRows: number; readonly decadeRows: number }> {
-  await client.query('BEGIN');
+  const manageTransaction = options.manageTransaction ?? true;
+  if (manageTransaction) await client.query('BEGIN');
   try {
-    // Session default statement_timeout canceled the bulk DELETE mid-transaction on 2026-08-19
-    // (SQLSTATE 57014 "while deleting tuple ... release_graph_adjacency") once the table had
-    // accumulated dead tuples from earlier aborted rebuilds. SET LOCAL scopes the override to
-    // this transaction only — the session default is restored at COMMIT/ROLLBACK.
+    // Scope the bulk-rebuild timeout to this transaction; COMMIT or ROLLBACK restores the
+    // connection's default.
     await client.query(`SET LOCAL statement_timeout = '15min'`);
-    await client.query(`DELETE FROM bb_public.release_graph_adjacency WHERE release_id = $1`, [
+    await client.query(`DELETE FROM published.release_graph_adjacency WHERE release_id = $1`, [
       releaseId,
     ]);
-    await client.query(`DELETE FROM bb_public.release_graph_decades WHERE release_id = $1`, [
+    await client.query(`DELETE FROM published.release_graph_decades WHERE release_id = $1`, [
       releaseId,
     ]);
-    await client.query(`DELETE FROM bb_public.release_graph_all_time WHERE release_id = $1`, [
+    await client.query(`DELETE FROM published.release_graph_all_time WHERE release_id = $1`, [
       releaseId,
     ]);
 
-    // Chunked multi-row inserts (repo-z4id): one row per statement was ~4,100 sequential network
-    // round trips at ~100ms each — over seven silent minutes inside one transaction, which reads
-    // as a hang and invites an operator kill. 200 rows per statement is ~21 round trips.
+    // Chunk multi-row inserts to bound statement size while avoiding one network round trip per
+    // graph row.
     const adjacencyRows = [...artifact.adjacencyByEntityId.values()];
     const CHUNK = 200;
     for (let start = 0; start < adjacencyRows.length; start += CHUNK) {
@@ -369,7 +311,7 @@ export async function persistReleaseGraphArtifact(
         return `($1, $${params.length - 1}, $${params.length}::jsonb)`;
       });
       await client.query(
-        `INSERT INTO bb_public.release_graph_adjacency (release_id, entity_id, adjacency)
+        `INSERT INTO published.release_graph_adjacency (release_id, entity_id, adjacency)
          VALUES ${tuples.join(', ')}`,
         params,
       );
@@ -379,14 +321,14 @@ export async function persistReleaseGraphArtifact(
       const decadeInt = decadeStartYearFromLabel(view.decade);
       if (decadeInt === undefined) continue;
       await client.query(
-        `INSERT INTO bb_public.release_graph_decades (release_id, decade, payload)
+        `INSERT INTO published.release_graph_decades (release_id, decade, payload)
          VALUES ($1, $2, $3::jsonb)`,
         [releaseId, decadeInt, JSON.stringify(serializeGraphDecadeView(view))],
       );
     }
 
     await client.query(
-      `INSERT INTO bb_public.release_graph_all_time (release_id, payload)
+      `INSERT INTO published.release_graph_all_time (release_id, payload)
        VALUES ($1, $2::jsonb)`,
       [
         releaseId,
@@ -394,9 +336,9 @@ export async function persistReleaseGraphArtifact(
       ],
     );
 
-    await client.query('COMMIT');
+    if (manageTransaction) await client.query('COMMIT');
   } catch (error) {
-    await client.query('ROLLBACK');
+    if (manageTransaction) await client.query('ROLLBACK');
     throw error;
   }
 
@@ -471,6 +413,8 @@ export async function rebuildReleaseGraphForRelease(
     readonly minDecadeCoveragePct?: number;
     readonly enforceCoverage?: boolean;
     readonly dryRun?: boolean;
+    /** Set false when the caller already owns the transaction protecting the target release. */
+    readonly manageTransaction?: boolean;
   },
 ): Promise<
   BuildReleaseGraphResult & {
@@ -495,7 +439,11 @@ export async function rebuildReleaseGraphForRelease(
   });
 
   if (!input.dryRun) {
-    const persisted = await persistReleaseGraphArtifact(client, input.releaseId, built.artifact);
+    const persisted = await persistReleaseGraphArtifact(client, input.releaseId, built.artifact, {
+      ...(input.manageTransaction !== undefined
+        ? { manageTransaction: input.manageTransaction }
+        : {}),
+    });
     return { ...built, persisted };
   }
   return built;

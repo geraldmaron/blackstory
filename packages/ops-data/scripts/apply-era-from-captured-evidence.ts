@@ -6,10 +6,10 @@
  * from one artifact and present in another, which is what `backfill-search-facets-era.ts`
  * repairs: it is absent everywhere. They carry no claim date qualifier, they are not in the
  * research lane, and `apply-nrhp-period-era.ts` cannot reach them because it reads
- * `bb_research.landscape_candidates` and only one of them is in that table.
+ * `research.landscape_candidates` and only one of them is in that table.
  *
  * What they do have is captured source text. 1,021 of them carry a Wikipedia article, a
- * nomination form, or another fetched document in `bb_research.entity_evidence`, and nothing has
+ * nomination form, or another fetched document in `research.entity_evidence`, and nothing has
  * ever read those for a date. This script lands the result of that reading.
  *
  * IT DOES NOT DECIDE ANYTHING. A proposal arrives as JSONL from a reviewer with the decade
@@ -153,9 +153,9 @@ async function main(): Promise<void> {
   try {
     const { rows: undatedRows } = await client.query<{ entity_id: string }>(
       `SELECT si.entity_id
-         FROM bb_public.search_index si
-         JOIN bb_public.v_active_release_id r ON r.release_id = si.release_id
-         JOIN bb_public.release_entities re
+         FROM published.search_index si
+         JOIN published.v_active_release_id r ON r.release_id = si.release_id
+         JOIN published.release_entities re
            ON re.release_id = si.release_id AND re.entity_id = si.entity_id
         WHERE coalesce(jsonb_array_length(
                 case when jsonb_typeof(re.projection->'eraBuckets') = 'array'
@@ -200,7 +200,7 @@ async function main(): Promise<void> {
         continue;
       }
       const { rows: evidence } = await client.query<{ content_text: string }>(
-        `SELECT content_text FROM bb_research.entity_evidence
+        `SELECT content_text FROM research.entity_evidence
           WHERE entity_id = $1 AND status = 'captured' AND content_text IS NOT NULL`,
         [proposal.entityId],
       );
@@ -248,11 +248,11 @@ async function main(): Promise<void> {
         appliedAt: runStamp,
       };
       const result = await client.query(
-        `UPDATE bb_public.release_entities re
+        `UPDATE published.release_entities re
             SET projection = jsonb_set(
                   jsonb_set(re.projection, '{eraBuckets}', $2::jsonb, true),
                   '{eraProvenance}', $3::jsonb, true)
-           FROM bb_public.v_active_release_id r
+           FROM published.v_active_release_id r
           WHERE re.release_id = r.release_id
             AND re.entity_id = $1
             AND coalesce(jsonb_array_length(

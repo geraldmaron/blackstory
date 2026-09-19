@@ -21,12 +21,8 @@ pnpm --filter @repo/docs dev
 pnpm docs:publish       # static export into repo docs/ for GitHub Pages
 
 pnpm --filter @repo/web build
-pnpm --filter @repo/web build  # includes /admin — it is no longer a separate package
 pnpm --filter @repo/api-public build
 
-# leftover local Firebase emulators (not product SoR)
-pnpm firebase:emulators
-pnpm firebase:test:rules
 ```
 
 Full command list and project overview: repository root `README.md`.

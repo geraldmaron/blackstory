@@ -1,0 +1,12 @@
+{
+  "schemaVersion": "heldout-identity-edge-freeze.v1",
+  "benchmarkVersion": "heldout-identity-edge-v1-blind",
+  "recordedAt": "2026-09-18T20:45:00.000Z",
+  "bindingStatus": "posthoc-integrity-record",
+  "originalBlindFileByteSha256": "7386f335cdf81a05a8379ba64f0a6763def6bad448cce0abfc297522b2a3617b",
+  "currentBlindFileByteSha256": "8581645419a2eaad1c5312916f6ab02a851ef10197fa05c0369dcbc572e33d3e",
+  "blindCanonicalJsonSha256": "4548bb1ea187bc81d0217e45cdaf72fde62fa6b9b49c7d4dd1ae40a4a6c1fa5e",
+  "frozenPredictionsFileByteSha256": "a1a3c029d44309a35ebb6b05f72ed356b323e181d95dfe7cb0dd19eb091f0bfb",
+  "independentGoldFileByteSha256": "53dffe4d12f3c893f2b7feed7757f26ace75b891bae6cd1730bce879aed4ddae",
+  "limitation": "This manifest was created after the frozen predictions and independent gold. The blind corpus was subsequently reformatted without changing parsed JSON; the original byte hash remains recorded, while the current byte and canonical JSON hashes enforce future integrity. This post-hoc record does not establish preregistration."
+}

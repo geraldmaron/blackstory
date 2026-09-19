@@ -1,5 +1,5 @@
 /**
- * Sync `bb_public.release_entities.taxonomy` from `bb_canonical.entities.kind_detail` for the
+ * Sync `published.release_entities.taxonomy` from `canonical.entities.kind_detail` for the
  * active release. Run this:
  *   - once now, to fix the 1,167/1,375 active-release rows whose topicIds/topicTags were dropped
  *     when the release was built (docs/research/entity-completeness-audit.md's #2 gap);
@@ -43,7 +43,7 @@ async function resolveReleaseId(client: pg.PoolClient): Promise<string> {
   const explicit = readReleaseIdArg();
   if (explicit) return explicit;
   const result = await client.query<{ release_id: string }>(
-    `SELECT release_id FROM bb_public.active_release LIMIT 1`,
+    `SELECT release_id FROM published.active_release LIMIT 1`,
   );
   const releaseId = result.rows[0]?.release_id;
   if (!releaseId) throw new Error('No active release found and no --release-id= given');

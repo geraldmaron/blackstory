@@ -1,28 +1,7 @@
 /**
- * Accuracy corrections surfaced while fixing repo-9ki8 / repo-z1uk / repo-x8j6.
- *
- * 1. negro-leagues-hof-wilkinson-jl — J.L. Wilkinson was white. He sits in a Black history
- *    catalog alongside Black players with nothing saying so, which leaves a reader to assume
- *    otherwise. The fix is not to remove him: he founded and ran the Kansas City Monarchs for
- *    28 years and the record belongs. The fix is to say what the sources say, including that
- *    Rube Foster hesitated to admit a white-owned club to the Negro National League. That
- *    hesitation is the historically interesting part, and it disappears if the record is silent.
- *
- * 2. recon_h_e_hayne — display name was the initialism "H. E. Hayne"; the National Park Service
- *    gives it as Henry Hayne. (This record also has a duplicate, recon_harry_e_hayne — that
- *    merge is repo-jnpk and deliberately NOT done here, because merging belongs on the admin
- *    console's reversible applyEntityMerge path, not in a third hand-rolled implementation. See
- *    repo-iypc for why the existing ops merge script must not be used.)
- *
- * Usage (from repo root):
- *   set -a && source apps/web/.env.local && set +a
- *   export DATABASE_SSL=1
- *   node --conditions development --import tsx \
- *     packages/ops-data/scripts/fix-record-accuracy-followups.ts
- *
- * Apply:
- *   DRY_RUN=0 FIX_RECORD_ACCURACY_APPLY=1 node --conditions development --import tsx \
- *     packages/ops-data/scripts/fix-record-accuracy-followups.ts
+ * Applies the listed source-backed identity and description corrections. Duplicate entity
+ * merges belong to the staff console's reversible merge operation. Default dry-run; writes
+ * require DRY_RUN=0 and FIX_RECORD_ACCURACY_APPLY=1.
  */
 import pg from 'pg';
 import { remindToRepublishCatalogArtifacts } from './lib/catalog-republish-reminder.ts';
@@ -72,7 +51,7 @@ async function main(): Promise<void> {
   try {
     const releaseId = (
       await client.query<{ release_id: string }>(
-        `SELECT release_id FROM bb_public.active_release LIMIT 1`,
+        `SELECT release_id FROM published.active_release LIMIT 1`,
       )
     ).rows[0]?.release_id;
     if (!releaseId) throw new Error('no active release');
@@ -81,7 +60,7 @@ async function main(): Promise<void> {
 
     const wilkinson = await client.query<{ summary: string; claims: { predicate: string }[] }>(
       `SELECT summary, COALESCE(claims, '[]'::jsonb) AS claims
-       FROM bb_public.release_entities WHERE release_id = $1 AND entity_id = $2`,
+       FROM published.release_entities WHERE release_id = $1 AND entity_id = $2`,
       [releaseId, WILKINSON_ID],
     );
     const wilkinsonRow = wilkinson.rows[0];
@@ -94,7 +73,7 @@ async function main(): Promise<void> {
     console.log(`  summary now: ${wilkinsonRow.summary.slice(0, 120)}…`);
 
     const hayne = await client.query<{ display_name: string }>(
-      `SELECT display_name FROM bb_canonical.entities WHERE id = $1`,
+      `SELECT display_name FROM canonical.entities WHERE id = $1`,
       [HAYNE_SURVIVOR_ID],
     );
     console.log(
@@ -116,7 +95,7 @@ async function main(): Promise<void> {
         const summary = `${wilkinsonRow.summary.trimEnd()}${WILKINSON_SUMMARY_SENTENCE}`;
 
         await client.query(
-          `UPDATE bb_public.release_entities
+          `UPDATE published.release_entities
            SET projection = jsonb_set(
                  jsonb_set(
                    jsonb_set(projection, '{summary}', to_jsonb($3::text), true),
@@ -128,14 +107,14 @@ async function main(): Promise<void> {
           [releaseId, WILKINSON_ID, summary, JSON.stringify([claim]), JSON.stringify([claimId])],
         );
         await client.query(
-          `UPDATE bb_canonical.entities
+          `UPDATE canonical.entities
            SET kind_detail = jsonb_set(kind_detail, '{editorial,summary}', to_jsonb($2::text), true),
                updated_at = now()
            WHERE id = $1`,
           [WILKINSON_ID, summary],
         );
         await client.query(
-          `UPDATE bb_public.search_index
+          `UPDATE published.search_index
            SET claim_count = claim_count + 1,
                facets = jsonb_set(facets, '{claimCount}', to_jsonb(claim_count + 1), true)
            WHERE release_id = $1 AND entity_id = $2`,
@@ -144,11 +123,11 @@ async function main(): Promise<void> {
       }
 
       await client.query(
-        `UPDATE bb_canonical.entities SET display_name = $2, updated_at = now() WHERE id = $1`,
+        `UPDATE canonical.entities SET display_name = $2, updated_at = now() WHERE id = $1`,
         [HAYNE_SURVIVOR_ID, HAYNE_DISPLAY_NAME],
       );
       await client.query(
-        `UPDATE bb_public.release_entities
+        `UPDATE published.release_entities
          SET projection = jsonb_set(
                jsonb_set(projection, '{displayName}', to_jsonb($3::text), true),
                '{nameLower}', to_jsonb(lower($3::text)), true
@@ -157,7 +136,7 @@ async function main(): Promise<void> {
         [releaseId, HAYNE_SURVIVOR_ID, HAYNE_DISPLAY_NAME],
       );
       await client.query(
-        `UPDATE bb_public.search_index
+        `UPDATE published.search_index
          SET name = $3, name_lower = lower($3),
              facets = jsonb_set(
                jsonb_set(facets, '{displayName}', to_jsonb($3::text), true),
@@ -177,7 +156,7 @@ async function main(): Promise<void> {
 
     const after = await client.query(
       `SELECT summary, jsonb_array_length(claims) AS claims
-       FROM bb_public.release_entities WHERE release_id = $1 AND entity_id = $2`,
+       FROM published.release_entities WHERE release_id = $1 AND entity_id = $2`,
       [releaseId, WILKINSON_ID],
     );
     console.log('\nWilkinson after:', JSON.stringify(after.rows[0]));

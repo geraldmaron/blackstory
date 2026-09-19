@@ -1,17 +1,8 @@
-/**
- * Evidence-pointer doctrine: the strongest fair-use posture available for
- * third-party/UGC material. Store an outbound URL, a short judge-relevance snippet, a
- * mandatory Wayback/Internet Archive capture pointer, and retrieval metadata never a
- * self-hosted full-page copy.
- *
- * Research basis: search-caching (Field v. Google) and Google Books precedents protect
- * indexing plus minimal excerpts that do not substitute for the original work; archive
- * posture is strongest when the viewable portion is minimized and full-page preservation is
- * delegated to the Internet Archive Wayback Machine rather than self-hosted. This module
- * encodes that as a type/schema constraint, not just a comment: the `EvidencePointer` type
- * has no field capable of holding a full page body, and `assertEvidencePointerValid`
- * `assertNoFullPageFields` fail closed at construction time.
+/** Outbound citations with bounded excerpts and independently verifiable archive pointers.
+ * Rights and sensitivity must be assessed before retaining or archiving a source.
+ * A third-party archive does not confer permission to copy or redistribute material.
  */
+import { parseWaybackCaptureUrl } from '../adapters/internet-archive/wayback/types.js';
 
 /**
  * Concrete cap for "1-2 sentences, the minimum needed to judge relevance": the tighter of a
@@ -19,8 +10,6 @@
  */
 export const MAX_EVIDENCE_SNIPPET_CHARACTERS = 320;
 export const MAX_EVIDENCE_SNIPPET_WORDS = 60;
-
-const WAYBACK_HOST_PATTERN = /(^|\.)web\.archive\.org$|(^|\.)archive\.org$/i;
 
 /**
  * Keys that would indicate a full page body is being smuggled into an otherwise-valid
@@ -75,15 +64,6 @@ function isHttpsUrl(value: string): boolean {
   }
 }
 
-function isWaybackCaptureUrl(value: string): boolean {
-  try {
-    const url = new URL(value);
-    return url.protocol === 'https:' && WAYBACK_HOST_PATTERN.test(url.hostname);
-  } catch {
-    return false;
-  }
-}
-
 /**
  * Defensive check against full-page fields arriving on a payload bound for an evidence
  * pointer (e.g. from a not-yet-conformant adapter). Throws rather than silently dropping
@@ -131,7 +111,10 @@ export function assertEvidencePointerValid(
     );
   }
 
-  if (!pointer.waybackCaptureUrl?.trim() || !isWaybackCaptureUrl(pointer.waybackCaptureUrl)) {
+  if (
+    !pointer.waybackCaptureUrl?.trim() ||
+    !parseWaybackCaptureUrl(pointer.waybackCaptureUrl, pointer.sourceUrl)
+  ) {
     throw new Error(
       'Evidence pointer requires a mandatory Wayback/Internet Archive capture pointer ' +
         '(https URL on an archive.org host)',

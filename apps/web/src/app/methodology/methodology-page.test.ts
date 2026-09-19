@@ -34,7 +34,7 @@ test('methodology page renders its own room, not a hub redirect', () => {
 test('methodology body uses ReadingEntry without a kicker when rendered alone', () => {
   assert.match(sectionsSource, /<ReadingEntry/);
   assert.doesNotMatch(sectionsSource, /<RoomHeader/);
-  assert.doesNotMatch(sectionsSource, /kicker=/);
+  assert.doesNotMatch(sectionsSource.match(/<ReadingEntry\b[\s\S]*?\/>/)?.[0] ?? '', /kicker=/);
 });
 
 test('methodology renders grade marks and citation strings through the live record-page components', () => {
@@ -79,7 +79,7 @@ test('methodology hands the source library off to its own room', () => {
   assert.equal(section!.label, 'Where the evidence comes from');
   assert.equal(METHODOLOGY_SOURCE_LIBRARY_HREF, '/sources');
   assert.match(sectionsSource, /id="where-the-evidence-comes-from"/);
-  assert.match(sectionsSource, /href="\/sources"/);
+  assert.match(sectionsSource, /href=\{METHODOLOGY_SOURCE_LIBRARY_HREF\}/);
   assert.doesNotMatch(sectionsSource, /SOURCE_PUBLISHER_KINDS\.map/);
   assert.doesNotMatch(sectionsSource, /SOURCE_LIBRARY_SURFACES\.map/);
 });

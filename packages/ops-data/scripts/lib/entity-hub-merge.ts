@@ -10,7 +10,7 @@ export type HubMergePair = {
   readonly reason: string;
 };
 
-/** WS4 hub dedup pairs verified live before merge. */
+/** Relationship-hub deduplication pairs verified against live data before merge. */
 export const DEFAULT_HUB_MERGE_PAIRS: readonly HubMergePair[] = [
   {
     absorbedId: 'ent_sncc_001',

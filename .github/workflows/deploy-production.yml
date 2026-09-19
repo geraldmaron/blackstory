@@ -83,10 +83,8 @@ jobs:
           SHA="${{ needs.gate.outputs.commit_sha }}"
           echo "[DRY-RUN] Deploy surfaces for ${SHA}"
           echo "  - public web → Vercel Production (git main auto-deploy; no explicit promote step)"
-          echo "  - deploy-api-public → Cloud Run black-book-api-public"
-          echo "  - deploy-api-submissions → Cloud Run black-book-api-submissions"
-          echo "  - deploy-api-internal → Cloud Run black-book-api-internal (internal ingress)"
-          echo "See infra/gcp/surfaces/README.md for impersonation boundaries."
+          echo "  - API deployment targets require verification against the service surface contract"
+          echo "See docs/security/service-surfaces.md for authorization boundaries."
 
   record-vercel-production:
     name: Record Vercel Production Expectation
@@ -105,7 +103,6 @@ jobs:
           echo "Public web Production: https://blackstory.app (Vercel; /admin is a route inside this same deployment)"
           echo "Expected git SHA on Production: ${SHA}"
           echo "Confirm in Vercel dashboard that the blackstory project's Production points at this commit before treating health as authoritative."
-          echo "No Firebase App Hosting promote for public web."
 
   health-check:
     name: Health Check Production

@@ -1,5 +1,5 @@
 /**
- * `/rooms` room contracts (SP-21, repo-92n2.29).
+ * `/rooms` room contracts.
  *
  * The room's *content* is not asserted here — it is generated from the destination registry, and
  * `lib/nav/destination-registry.test.ts` is what proves no public route is missing from it.

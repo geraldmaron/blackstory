@@ -1,5 +1,5 @@
 /**
- * Tests for the unified naming/identifier contracts + uniqueness invariant (the related workstream).
+ * Temporal naming and identifier-uniqueness tests.
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';

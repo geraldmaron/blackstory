@@ -1,6 +1,6 @@
 /**
  * Pure helpers for promoting relationship-inference landscape candidates
- * into bb_canonical.entity_relationships.
+ * into canonical.entity_relationships.
  */
 import { createHash } from 'node:crypto';
 import { treatAsLiving, type LivingStatus } from '../../../domain/src/living.ts';

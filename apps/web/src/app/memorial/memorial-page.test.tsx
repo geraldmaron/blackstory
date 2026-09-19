@@ -25,8 +25,7 @@ test('the memorial root is the wall atmosphere on the room class, not a photo mo
   const pageSource = readFileSync(join(here, 'page.tsx'), 'utf8');
   assert.match(pageSource, /MemorialWallAtmosphere/);
   assert.doesNotMatch(pageSource, /EditionAtmosphereMosaic/);
-  // The positioned root the wall is measured against. Was a helper in the route's own
-  // panel-chrome module until repo-92n2.30 retired it; it is a literal class now.
+  // The literal class is the positioned root against which the wall is measured.
   assert.match(pageSource, /className="ds-memorial"/);
   // The route carries the class stylesheet and no per-route stylesheet of its own.
   assert.match(pageSource, /import '\.\.\/reading-room\.css'/);

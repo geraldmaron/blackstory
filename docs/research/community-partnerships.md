@@ -81,7 +81,7 @@ New self-contained files only; no barrels or shared configs were edited. To wire
 
 ## Deferred (not this change)
 
-- Firestore/Supabase persistence for campaign briefs and submission assessments
+- Postgres persistence for campaign briefs and submission assessments
 - Operator CLI command to print a county brief for outreach packets
 - Holder onboarding runbook (private contact handling, consent language for oral histories)
 - Linking accepted community leads to `authority-harvest` follow-ups when holders cite digitized sources

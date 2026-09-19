@@ -1,0 +1,54 @@
+{
+  "schemaVersion": "internet-archive-preservation-pilot.v1",
+  "evaluatedAt": "2026-09-19T02:44:56.000Z",
+  "scope": {
+    "mode": "bounded-single-source",
+    "sourceUrl": "https://www.archives.gov/research/african-americans/freedmens-bureau",
+    "rightsDecision": {
+      "allowArchive": true,
+      "sensitivity": "public",
+      "reviewedAt": "2026-09-18T20:23:39.354Z",
+      "expiresAt": "2027-09-18T23:59:59.000Z"
+    },
+    "productionCoverageClaimed": false
+  },
+  "localRevision": {
+    "contentHashAlgorithm": "sha256",
+    "contentHashDigest": "0d81f1269110ae28e4d105a55a4b2bc7e76a5ec2a8d733411cefe6e0f2665a44",
+    "reservationCreatedAt": "2026-09-19T02:38:42.837253Z",
+    "reservationState": "reserved",
+    "jobId": null,
+    "interpretation": "The authenticated response used text/html, so the client did not parse a job id. The reservation remains unresolved and prevents an automatic duplicate POST."
+  },
+  "authenticatedSubmission": {
+    "submissionCount": 1,
+    "accountStatusCheckedAt": "2026-09-19T02:43:00.000Z",
+    "accountStatusHttpStatus": 200,
+    "dailyCaptures": 1,
+    "dailyCapturesLimit": 30000,
+    "credentialValuesRecorded": false
+  },
+  "externalCapture": {
+    "observedBy": "Internet Archive CDX and exact replay retrieval",
+    "timestamp": "20260919023853",
+    "capturedAt": "2026-09-19T02:38:53.000Z",
+    "originalUrl": "https://www.archives.gov/research/african-americans/freedmens-bureau",
+    "httpStatus": 200,
+    "cdxDigest": "XOEYUUVS6M5ILY53LOOKCFV4G6G4G4H3",
+    "replayUrl": "https://web.archive.org/web/20260919023853id_/https://www.archives.gov/research/african-americans/freedmens-bureau",
+    "replayVerifiedAt": "2026-09-19T02:44:56.000Z",
+    "replayHttpStatus": 200,
+    "mementoDatetime": "Sat, 19 Sep 2026 02:38:53 GMT"
+  },
+  "clientCorrection": {
+    "implementation": "packages/domain/src/adapters/internet-archive/wayback/client.ts",
+    "change": "Request application/json explicitly for submission and status responses.",
+    "primaryReference": "https://github.com/internetarchive/gospn/blob/main/capture.go"
+  },
+  "limitations": [
+    "The Archive fetched the URL independently; this record does not claim byte equality with the local extracted-text capture.",
+    "CDX and replay prove an external capture, while the local revision reservation remains unresolved because no job id was returned.",
+    "One completed source does not establish preservation coverage for the 7,913-URL inventory.",
+    "No NPS URL was submitted during this authenticated pilot."
+  ]
+}

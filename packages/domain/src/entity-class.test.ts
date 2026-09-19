@@ -1,5 +1,5 @@
 /**
- * Tests for coarse entity classification (the related workstream).
+ * Coarse entity-classification tests.
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';

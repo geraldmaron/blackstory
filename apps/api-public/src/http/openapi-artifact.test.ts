@@ -1,5 +1,5 @@
 /**
- * MOB-004 evidence gate — validates the OpenAPI artifact route table matches the live router and
+ * Validates the OpenAPI artifact route table against the live router and
  * that redacted response example JSON files parse against `@repo/public-contracts` zod schemas.
  */
 import assert from 'node:assert/strict';

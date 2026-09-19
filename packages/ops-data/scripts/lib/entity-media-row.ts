@@ -1,13 +1,7 @@
 /**
- * Pure row-shaping for pin-commons-primary-images.ts's Postgres apply path (repo-4vuf, WS5).
- *
- * Kept separate from the script so the shape of what gets written — the release_entities
- * `projection.primaryImage` jsonb object and the bb_canonical.entity_media upsert row — is
- * testable without a database connection. Both builders are deliberately dumb: no gating, no
- * defaults beyond what the caller passes in. Gating (dignity, place-kind, missing fields)
- * happens earlier, in evaluatePinGate; sanitizePrimaryImageForRelease (imported by the script,
- * not here, to avoid this module depending on @repo/domain) is the last-line rights/alt/credit
- * check applied to buildPrimaryImageForRelease's output before either write happens.
+ * Pure builders for canonical media rows and public primary-image objects. Callers perform
+ * dignity and eligibility checks first and apply final rights/alt/credit sanitization before
+ * persistence.
  */
 import type { PinPlanRow } from './pin-commons-primary-images-plan.ts';
 
@@ -52,7 +46,7 @@ export function buildPrimaryImageForRelease(
   };
 }
 
-/** One row for the `bb_canonical.entity_media` upsert (snake_case, matching the migration's
+/** One row for the `canonical.entity_media` upsert (snake_case, matching the migration's
  * column names 1:1) — the canonical counterpart to the release_entities projection patch. */
 export type EntityMediaRow = {
   readonly entityId: string;
@@ -68,7 +62,7 @@ export type EntityMediaRow = {
   readonly pinnedAt: string;
 };
 
-/** Build the bb_canonical.entity_media row for one entity from its resolved primaryImage. */
+/** Build the canonical.entity_media row for one entity from its resolved primaryImage. */
 export function buildEntityMediaRow(entityId: string, image: PrimaryImageFields): EntityMediaRow {
   return {
     entityId,

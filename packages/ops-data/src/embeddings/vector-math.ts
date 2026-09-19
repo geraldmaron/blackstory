@@ -1,9 +1,9 @@
 /**
- * Pure vector arithmetic for the embedding pipeline. No I/O, no Firestore every
+ * Pure vector arithmetic for the embedding pipeline. No I/O; every
  * function here is a deterministic, synchronously testable building block for truncation,
  * unit-normalization, and DOT_PRODUCT similarity.
  */
-import { EMBEDDING_DIMS, FIRESTORE_VECTOR_DIM_CAP } from './constants.js';
+import { EMBEDDING_DIMS, MAX_INDEXED_VECTOR_DIMS } from './constants.js';
 
 export type EmbeddingVector = readonly number[];
 
@@ -59,9 +59,9 @@ export function truncateVector(
   if (!Number.isInteger(dims) || dims <= 0) {
     throw new InvalidEmbeddingVectorError('truncateVector: dims must be a positive integer');
   }
-  if (dims > FIRESTORE_VECTOR_DIM_CAP) {
+  if (dims > MAX_INDEXED_VECTOR_DIMS) {
     throw new InvalidEmbeddingVectorError(
-      `truncateVector: dims ${dims} exceeds the Firestore vector field cap of ${FIRESTORE_VECTOR_DIM_CAP}`,
+      `truncateVector: dims ${dims} exceeds the pgvector index dimension limit of ${MAX_INDEXED_VECTOR_DIMS}`,
     );
   }
   if (vector.length < dims) {
@@ -95,7 +95,7 @@ export function dotProduct(a: EmbeddingVector, b: EmbeddingVector): number {
 }
 
 /**
- * DOT_PRODUCT "distance" as Firestore reports it: for unit-normalized vectors this equals
+ * Dot-product similarity: for unit-normalized vectors this equals
  * cosine similarity, and unlike COSINE/EUCLIDEAN *higher* values mean *more* similar.
  */
 export function dotProductDistance(a: EmbeddingVector, b: EmbeddingVector): number {

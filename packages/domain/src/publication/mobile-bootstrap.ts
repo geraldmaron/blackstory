@@ -1,5 +1,5 @@
 /**
- * Mobile cold-start bootstrap manifest (MOB-005 — implements the release-activation integration
+ * Mobile cold-start bootstrap manifest (release activation — implements the release-activation integration
  * that was designed but left unwired; see `docs/decisions-carryover.md`, "Map stack":
  * release-coupled build, which also records that nothing calls it outside tests yet).
  *

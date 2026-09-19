@@ -73,7 +73,7 @@ describe('articleCorroboratesSubject', () => {
     );
   });
 
-  // repo-ppeu, the case that named the bead: search returns the same city name in a different
+  // This regression case: search returns the same city name in a different
   // state, and the article corroborates "Covington" perfectly.
   it('refuses the same city name in the wrong state', () => {
     const extract =

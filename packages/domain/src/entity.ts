@@ -58,7 +58,7 @@ export type EntityMergeState = {
 
 /**
  * Canonical historical entity. Kind-specific payloads are optional bags on the same document.
- * Locations and relationships are typically separate Firestore docs/subcollections.
+ * Locations and relationships are stored separately from entity identity.
  *
  * `statusHistory` is entity-LIFECYCLE status only (active/historic/inactive/in_force/etc, per
  * kind — see `./entity-status.ts`). It must NEVER be used to store area/condition designations
@@ -72,10 +72,7 @@ export type CanonicalEntity = {
   readonly id: string;
   readonly kind: EntityKind;
   /**
-   * Coarse entity classification (the related workstream, `./entity-class.ts`). NEW, additive, and
-   * optional — `kind` remains the canonical field every existing consumer reads; these two are
-   * derived via `deriveEntityClassification` and not wired into any publish/search/filter
-   * pipeline in this pass.
+   * Optional coarse class and subtype labels derived from kind by deriveEntityClassification.
    */
   readonly entityClass?: EntityClass;
   /** Controlled finer-grained subtype label(s) within `entityClass` (e.g. `['church']`). */
@@ -86,11 +83,8 @@ export type CanonicalEntity = {
   /** Required for person; optional elsewhere. Default unknown ⇒ treat as living. */
   readonly livingStatus?: LivingStatus;
   /**
-   * Computed/output-only signal from `deriveLivingStatus` (`./living.ts`), the related workstream.
-   * NEVER hand-set independently — it exists so callers can store a derivation result without
-   * a second independently-settable source of truth. Not wired into `currentEntityStatus` or any
-   * publish pipeline in this pass (that overlaps live-release work owned elsewhere); see
-   * `deriveEntityLivingStatus` below for how to compute it from this entity's person signals.
+   * Output of deriveLivingStatus computed from person signals. It is an inference, not a second
+   * independently authored living-status assertion.
    */
   readonly livingStatusDerived?: LivingStatus;
   readonly mergeState?: EntityMergeState;
@@ -140,12 +134,8 @@ export function currentEntityStatus(entity: CanonicalEntity): string | undefined
 }
 
 /**
- * Computes `livingStatusDerived` (the related workstream) for a person entity from the closest existing
- * signal in this model — `PersonFields.birthYear`/`deathYear` — via `deriveLivingStatus`
- * (`./living.ts`). Returns `undefined` for non-person kinds (living status is only meaningful for
- * persons). This is a pure computation, not wired into `currentEntityStatus` or any publish
- * pipeline in this pass — callers decide when/whether to store the result on
- * `livingStatusDerived`.
+ * Derive living status from birth/death years for person entities. Return undefined for other
+ * kinds. Callers decide whether to persist the result; this function does not publish it.
  */
 export function deriveEntityLivingStatus(entity: CanonicalEntity): LivingStatus | undefined {
   if (entity.kind !== 'person') return undefined;

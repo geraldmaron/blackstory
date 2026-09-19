@@ -1,8 +1,10 @@
 /**
- * Stage harness spatiotemporal adjudicator output into bb_research.landscape_candidates.
- * LLM tier only — never writes bb_canonical.entity_relationships.
+ * Stage harness spatiotemporal adjudicator output into research.landscape_candidates.
+ * LLM tier only — never writes canonical.entity_relationships.
  */
 import type { AdjudicatedRelationship } from '@repo/research-harness';
+import { createHash } from 'node:crypto';
+import { assertContract } from '@repo/research-kernel';
 
 export const HARNESS_ADJUDICATION_LANE = 'harness-spatiotemporal' as const;
 export const HARNESS_ADJUDICATION_PROGRAM_ID = 'harness-spatiotemporal-adjudicator' as const;
@@ -17,7 +19,7 @@ export type HarnessAdjudicationRow = {
   readonly kind: string;
   readonly summary: string;
   readonly canonical_url: string;
-  readonly status: 'pending' | 'quarantined';
+  readonly status: 'quarantined';
   readonly provenance: {
     readonly subject_a_id: string;
     readonly subject_b_id: string;
@@ -32,6 +34,8 @@ export type HarnessAdjudicationRow = {
     readonly confidence: number;
     readonly rationale: string;
     readonly tier: 'llm';
+    readonly evidence: AdjudicatedRelationship['evidence'];
+    readonly confidence_meaning: 'uncalibrated_model_self_report';
   };
   readonly discovered_at: string;
 };
@@ -53,11 +57,19 @@ export function shapeHarnessAdjudicationRows(
   return relations
     .filter((relation) => relation.relationType.trim().toLowerCase() !== 'none')
     .map((relation) => {
+      const { subjectAId, subjectBId, ...extraction } = relation;
+      assertContract('RelationshipHypothesisExtraction', extraction);
+      if (!subjectAId.trim() || !subjectBId.trim() || subjectAId === subjectBId)
+        throw new Error('Relationship endpoints must be distinct nonempty identifiers');
+      if (!relation.evidence.length) throw new Error('Relationship staging requires edge evidence');
       const relationshipType = normalizeRelationshipType(relation.relationType);
-      const sourceItemId = `${relation.subjectAId}|${relation.subjectBId}|${relationshipType}`;
-      const quarantine = relation.confidence < 0.35;
+      const sourceItemId = createHash('sha256')
+        .update(
+          JSON.stringify([runId, subjectAId, subjectBId, relationshipType, relation.evidence]),
+        )
+        .digest('hex');
       return {
-        id: `landcand_harness_${sourceItemId}`.replace(/[^a-zA-Z0-9_|]+/g, '_').slice(0, 180),
+        id: `landcand_harness_${sourceItemId}`,
         run_id: runId,
         lane: HARNESS_ADJUDICATION_LANE,
         source_program_id: HARNESS_ADJUDICATION_PROGRAM_ID,
@@ -65,8 +77,9 @@ export function shapeHarnessAdjudicationRows(
         display_name: `${relation.subjectAId} ↔ ${relation.subjectBId}`,
         kind: 'other',
         summary: `${relation.subjectAId} ${relationshipType} ${relation.subjectBId} (${relation.rationale.slice(0, 180)})`,
-        canonical_url: '',
-        status: quarantine ? 'quarantined' : 'pending',
+        canonical_url: relation.evidence[0]?.citationUrl ?? '',
+        // Self-reported confidence cannot admit an edge to a promotion queue.
+        status: 'quarantined',
         provenance: {
           subject_a_id: relation.subjectAId,
           subject_b_id: relation.subjectBId,
@@ -81,6 +94,8 @@ export function shapeHarnessAdjudicationRows(
           confidence: relation.confidence,
           rationale: relation.rationale,
           tier: 'llm',
+          evidence: relation.evidence,
+          confidence_meaning: 'uncalibrated_model_self_report',
         },
         discovered_at: nowIso,
       };

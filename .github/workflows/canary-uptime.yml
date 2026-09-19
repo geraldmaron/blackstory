@@ -1,19 +1,11 @@
-# BB-089 uptime / defacement canary. Fetches a canary URL on a schedule, hashes the response
-# body, and fails the run (which GitHub notifies watchers of by default for scheduled workflows)
-# on a non-200 status or a content hash change versus the last known-good hash. Persists the
-# baseline hash between runs via actions/cache (restore-keys prefix match), not a committed repo
-# file, since no production domain exists yet — see docs/runbooks/pre-launch-operator-protection.md.
-# Cannot run for real until `canary_url` points at a live domain and CANARY_URL/CANARY_SCHEDULE
-# are set up per that runbook; the schedule trigger is commented out until then so this workflow
-# does not silently fail on an empty target every 30 minutes.
-# Third-party actions are pinned to immutable SHAs, matching ci.yml / security.yml.
+# Manually checks an HTTPS canary for availability and content changes.
+# The accepted hash persists through actions/cache. A changed response requires
+# investigation before an operator explicitly resets the baseline.
+# See docs/runbooks/pre-launch-operator-protection.md.
 
 name: Canary Uptime and Defacement Check
 
 on:
-  # Uncomment once a production canary URL exists (BB-089 runbook step "uptime canary go-live").
-  # schedule:
-  #   - cron: '*/30 * * * *'
   workflow_dispatch:
     inputs:
       canary_url:
@@ -67,7 +59,7 @@ jobs:
           status=$(curl -sS -o response.body -w '%{http_code}' --max-time 15 --retry 2 "$CANARY_URL")
           echo "HTTP status: $status"
           if [[ "$status" != "200" ]]; then
-            echo "::error::Canary target returned HTTP $status (expected 200). Possible outage or takedown — see docs/runbooks/incidents/platform-takedown.md and the BB-033/035 kill-switch runbook."
+            echo "::error::Canary target returned HTTP $status (expected 200). Possible outage or takedown — see docs/runbooks/incidents/platform-takedown.md and the kill-switch runbook."
             exit 1
           fi
           sha256sum response.body | awk '{ print $1 }' > new-canary-hash.txt

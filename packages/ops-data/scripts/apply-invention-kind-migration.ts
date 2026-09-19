@@ -50,23 +50,23 @@ async function main(): Promise<void> {
     }
     await client.query('BEGIN');
     await client.query(
-      'ALTER TABLE bb_canonical.entities DROP CONSTRAINT IF EXISTS entities_kind_check',
+      'ALTER TABLE canonical.entities DROP CONSTRAINT IF EXISTS entities_kind_check',
     );
     await client.query(`
-      ALTER TABLE bb_canonical.entities ADD CONSTRAINT entities_kind_check
+      ALTER TABLE canonical.entities ADD CONSTRAINT entities_kind_check
       CHECK (kind IN (
         'person', 'place', 'school', 'organization', 'institution', 'event',
         'law', 'case', 'publication', 'artifact', 'movement', 'invention', 'other'
       ))
     `);
     await client.query(
-      'ALTER TABLE bb_canonical.entity_relationships DROP CONSTRAINT IF EXISTS entity_relationships_typed_predicate',
+      'ALTER TABLE canonical.entity_relationships DROP CONSTRAINT IF EXISTS entity_relationships_typed_predicate',
     );
     await client.query(
-      'ALTER TABLE bb_canonical.entity_relationships DROP CONSTRAINT IF EXISTS entity_relationships_relationship_type_check',
+      'ALTER TABLE canonical.entity_relationships DROP CONSTRAINT IF EXISTS entity_relationships_relationship_type_check',
     );
     await client.query(`
-      ALTER TABLE bb_canonical.entity_relationships
+      ALTER TABLE canonical.entity_relationships
         ADD CONSTRAINT entity_relationships_relationship_type_check
         CHECK (relationship_type IN (${RELATIONSHIP_TYPE_SQL_LIST}))
     `);

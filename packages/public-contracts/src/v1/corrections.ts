@@ -1,5 +1,5 @@
 /**
- * Correction submission + opaque receipt/status shapes (MOB-016).
+ * Correction submission + opaque receipt/status shapes (corrections).
  *
  * Extracted from `apps/web/src/app/corrections/categories.ts` (`CorrectionTargetType`,
  * `CorrectionCategory`), `.../correction-intake.ts`'s `CorrectionSubmissionInput`, and

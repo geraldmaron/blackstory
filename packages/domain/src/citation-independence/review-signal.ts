@@ -9,7 +9,7 @@
  * are near-duplicates, reviewers need a deterministic flag before those citations can
  * credibly support triangulation.
  *
- * Persisted lineage lives in `bb_evidence.lineage_clusters` / `lineage_cluster_members`
+ * Persisted lineage lives in `evidence.lineage_clusters` / `lineage_cluster_members`
  * (see `docs/research/citation-independence-review-signal.md`). This module stays
  * in-memory for review-queue items until a human decides whether to merge clusters.
  */

@@ -1,5 +1,5 @@
 /**
- * `/v1` public read handlers (MOB-004).
+ * `/v1` public read handlers.
  *
  * Each handler is a pure async function over an already-parsed `ApiRequest` + injected `HandlerDeps`
  * — no `node:http` types leak in here, so handlers are unit-testable without a socket. The
@@ -15,8 +15,8 @@
  *   - `X-BlackStory-Client` is an abuse-trust signal for direct API callers (mobile), not
  *     authorization. A missing header NEVER hard-denies a read — it feeds rate limits as the
  *     lowest-trust anonymous subject (fail-open for static reads; expensive reads need the header
- *     or they hit `app_check_required` via quota policy).
- *   - Replaces Firebase App Check after the Postgres cutover; web uses same-origin request
+ *     or they hit `client_header_required` via quota policy).
+ *   - Web mutation routes use same-origin request
  *     integrity on Next.js routes instead.
  */
 import type { ClientAttestationDecision, ClientAttestationHeaders } from '@repo/security';
@@ -77,16 +77,13 @@ export type HandlerDeps = {
 
 const ENTITY_ID_PATTERN = /^[A-Za-z0-9_-]{1,200}$/;
 
-// ---------------------------------------------------------------------------
-// Client-version floor (`docs/decisions-carryover.md`, "ADR-021's two invariants":
-// app/API compatibility)
-// ---------------------------------------------------------------------------
+// Client-version compatibility floor.
 
-/** Parses `X-BlackStory-Client: <platform>/<semver>; api=<n>` into a normalized `v<n>` api major.
- * Absent/unparseable header → `undefined` (unknown), which is treated as "not below floor": the
- * floor is a UX affordance for HONEST clients, never a security gate, so we never fail-closed on
- * a missing header (`docs/decisions-carryover.md`, "ADR-021's two invariants": the floor fails
- * open). */
+/**
+ * Parses the client header into an API major version. Missing or malformed headers return
+ * undefined and do not trigger the floor: version guidance is a client UX affordance, never an
+ * authorization boundary.
+ */
 export function parseClientApiVersion(headerValue: string | undefined): string | undefined {
   if (!headerValue) return undefined;
   const apiMatch = /(?:^|;|\s)api=(\d{1,5})\b/i.exec(headerValue);
@@ -119,7 +116,7 @@ function enforceClientFloor(request: ApiRequest): ApiResponse | null {
 // ---------------------------------------------------------------------------
 
 export function handleHealth(request: ApiRequest): ApiResponse {
-  // Exposes the existing `health()` surface posture. No App Check, no cache (operator sees live).
+  // Exposes the existing `health()` surface posture. No client-header check, no cache (operator sees live).
   return {
     status: 200,
     headers: {
@@ -154,11 +151,8 @@ export function handleCompatibility(request: ApiRequest): ApiResponse {
     );
   }
 
-  // A supported-but-not-current client gets a soft `Deprecation` signal so it can surface an
-  // "update available" nudge before the hard floor (`docs/decisions-carryover.md`, "ADR-021's
-  // two invariants": the deprecation window). Dormant today: `API_VERSION` and
-  // `MIN_SUPPORTED_API_VERSION` are both `v1`, so `softDeprecated` is never true, and this header
-  // is only ever sent on `/v1/compatibility` — never on an ordinary read.
+  // A supported older client receives a Deprecation signal from the compatibility endpoint. The
+  // signal is inactive when the current and minimum-supported versions are equal.
   const extraHeaders = compat.softDeprecated ? { Deprecation: 'true' } : undefined;
   return {
     status: 200,
@@ -183,7 +177,7 @@ export async function handleBootstrap(
   const floor = enforceClientFloor(request);
   if (floor) return floor;
 
-  // App Check as a signal only — never denies (fail-open, T2).
+  // client-header check as a signal only — never denies (fail-open, T2).
   await deps.clientAttestationGuard({ headers: request.headers });
 
   const pointer = await deps.dataAccess.getReleasePointer();
@@ -248,15 +242,9 @@ export async function handleEntity(
 
     const entity = await deps.dataAccess.getEntity(pointer.activeRelease.releaseId, entityId);
     if (!entity) {
-      // A merged-away id is not a miss — it is an address that moved. repo-n7p6.15 correctly
-      // stopped publishing absorbed records; without this the ids they used to answer on became
-      // indistinguishable 404s (repo-n7p6.29).
-      //
-      // The redirect lookup runs on EVERY miss, not only on ids we expect to forward, so the
-      // backend call sequence is identical for nonexistent, unpublished and absorbed ids — the
-      // T3 property the enumeration tests pin. What a 308 reveals is only what
-      // bb_public.release_entity_redirects publishes on purpose: an already-public id and the
-      // published survivor it folded into.
+      // Look up published redirects on every miss to keep the backend sequence identical for
+      // missing, unpublished and absorbed ids. A redirect exposes only the already-public id
+      // and its published survivor.
       const redirectTo = await deps.dataAccess.getEntityRedirect(
         pointer.activeRelease.releaseId,
         entityId,

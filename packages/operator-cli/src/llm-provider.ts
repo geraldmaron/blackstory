@@ -1,3 +1,5 @@
+import type { ModelAccounting } from '@repo/research-kernel';
+
 /**
  * Pluggable LLM completion port for editorial/enrichment runs.
  *
@@ -15,6 +17,8 @@ export type LlmCompletionRequest = {
   readonly model: string;
   readonly temperature?: number;
   readonly maxTokens?: number;
+  /** USD per million tokens; OpenRouter rejects routes priced above these limits. */
+  readonly priceLimits?: { readonly prompt: number; readonly completion: number };
   /** Provider-enforced JSON Schema. Structured tasks must supply this. */
   readonly responseSchema?: {
     readonly name: string;
@@ -36,6 +40,8 @@ export type LlmCompletionResult = {
   readonly attempts?: number;
   /** OpenAI-compatible `usage` block, when the endpoint returned one (model-routing cost logging). */
   readonly usage?: LlmTokenUsage;
+  /** Reported inference charges only; missing usage and costs remain unknown. */
+  readonly accounting?: ModelAccounting;
 };
 
 export type LlmProvider = {
@@ -109,7 +115,11 @@ type ChatMessagePayload = {
 };
 
 /** Prefer message.content; fall back to reasoning/thinking (qwen3 OpenAI-compat quirk). */
-export function extractMessageContent(message: ChatMessagePayload | undefined): string {
+export function extractMessageContent(
+  message: ChatMessagePayload | undefined,
+  strict = false,
+): string {
+  if (strict) return message?.content ?? '';
   const content = message?.content?.trim();
   if (content) return stripMarkdownCodeFence(content);
   const reasoning = message?.reasoning?.trim() || message?.thinking?.trim();
@@ -219,6 +229,15 @@ async function completeOpenAiCompatible(
         ...responseFormat,
         ...modelExtraBody,
         ...extraBody,
+        ...(request.priceLimits
+          ? {
+              provider: {
+                require_parameters: true,
+                data_collection: 'deny',
+                max_price: { ...request.priceLimits, request: 0, image: 0 },
+              },
+            }
+          : {}),
       }),
     });
   } catch (error) {
@@ -245,9 +264,12 @@ async function completeOpenAiCompatible(
   const json = (await response.json()) as {
     choices?: Array<{ message?: ChatMessagePayload }>;
     model?: string;
-    usage?: { prompt_tokens?: number; completion_tokens?: number };
+    usage?: { prompt_tokens?: unknown; completion_tokens?: unknown; cost?: unknown };
   };
-  const content = extractMessageContent(json.choices?.[0]?.message);
+  const content = extractMessageContent(
+    json.choices?.[0]?.message,
+    request.responseSchema !== undefined,
+  );
   if (!content) {
     const err = new Error(`${providerId} returned empty completion content`) as Error & {
       retryable?: boolean;
@@ -255,16 +277,33 @@ async function completeOpenAiCompatible(
     err.retryable = true;
     throw err;
   }
+  const tokenCount = (value: unknown): number | null =>
+    typeof value === 'number' && Number.isSafeInteger(value) && value >= 0 ? value : null;
+  const promptTokens = tokenCount(json.usage?.prompt_tokens);
+  const completionTokens = tokenCount(json.usage?.completion_tokens);
+  const cost = json.usage?.cost;
+  // OpenRouter's usage.cost is denominated in USD credits; fees and external BYOK bills are separate.
+  const costUsd =
+    providerId === 'openrouter' && typeof cost === 'number' && Number.isFinite(cost) && cost >= 0
+      ? cost
+      : null;
   const usage =
-    typeof json.usage?.prompt_tokens === 'number' &&
-    typeof json.usage?.completion_tokens === 'number'
-      ? { promptTokens: json.usage.prompt_tokens, completionTokens: json.usage.completion_tokens }
+    promptTokens !== null && completionTokens !== null
+      ? { promptTokens, completionTokens }
       : undefined;
+  const accounting: ModelAccounting = {
+    promptTokens,
+    completionTokens,
+    costUsd,
+    source: costUsd === null ? null : 'provider-response',
+    incomplete: costUsd === null,
+  };
   return {
     content,
     provider: providerId,
     modelId: typeof json.model === 'string' && json.model ? json.model : request.model,
     ...(usage ? { usage } : {}),
+    accounting,
   };
 }
 
@@ -319,7 +358,7 @@ async function completeOllamaNative(
     message?: ChatMessagePayload;
     model?: string;
   };
-  const content = extractMessageContent(json.message);
+  const content = extractMessageContent(json.message, request.responseSchema !== undefined);
   if (!content) {
     const err = new Error('ollama returned empty completion content') as Error & {
       retryable?: boolean;
@@ -343,7 +382,18 @@ async function withRetries(
   for (let attempt = 1; attempt <= maxAttempts; attempt += 1) {
     try {
       const result = await run();
-      return { ...result, attempts: attempt };
+      return {
+        ...result,
+        attempts: attempt,
+        ...(result.accounting
+          ? {
+              accounting: {
+                ...result.accounting,
+                incomplete: result.accounting.incomplete || attempt > 1,
+              },
+            }
+          : {}),
+      };
     } catch (error) {
       lastError = error;
       const retryable =
@@ -408,7 +458,18 @@ export function createOpenRouterLlmProvider(options: {
             { ...request, model },
             fetchImpl,
           );
-          return { ...result, attempts: attempt };
+          return {
+            ...result,
+            attempts: attempt,
+            ...(result.accounting
+              ? {
+                  accounting: {
+                    ...result.accounting,
+                    incomplete: result.accounting.incomplete || attempt > 1,
+                  },
+                }
+              : {}),
+          };
         } catch (error) {
           lastError = error;
           if (attempt >= maxAttempts) break;
@@ -469,7 +530,7 @@ function looksLikeJsonObject(content: string): boolean {
 }
 
 /**
- * Explicit OpenRouter model roster first; on failure or invalid JSON, Ollama on Corsair/local.
+ * Explicit OpenRouter model roster first; on failure or invalid JSON, the explicitly configured Ollama endpoint.
  * Records `servedBy` so overnight reports show which lane answered.
  */
 export function createHybridLlmProvider(options: {
@@ -516,7 +577,18 @@ export function createHybridLlmProvider(options: {
           if (!looksLikeJsonObject(fallback.content)) {
             throw new Error('ollama returned non-JSON content', { cause: primaryError });
           }
-          return { ...fallback, provider: 'hybrid', servedBy: 'ollama' };
+          return {
+            ...fallback,
+            provider: 'hybrid',
+            servedBy: 'ollama',
+            accounting: {
+              promptTokens: fallback.usage?.promptTokens ?? null,
+              completionTokens: fallback.usage?.completionTokens ?? null,
+              costUsd: null,
+              source: null,
+              incomplete: true,
+            },
+          };
         } catch (fallbackError) {
           const primaryMsg =
             primaryError instanceof Error ? primaryError.message : String(primaryError);

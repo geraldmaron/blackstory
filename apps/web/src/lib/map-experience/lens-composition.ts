@@ -12,8 +12,8 @@
  *
  * Deliberately not a second rule set: `isSubjectViolenceConstrained` builds the same `RecordLike`
  * shape `isViolenceAdjacent` already scores and delegates to it, so a topic and a record are
- * judged by one vocabulary (repo-92n2.33's own factoring requirement — the predicate must be
- * askable of an arbitrary subject, not hand-written twice for "a record" and "a lens").
+ * judged by one vocabulary. The predicate accepts an arbitrary subject rather than duplicating
+ * the rule for records and lenses.
  */
 
 import { isViolenceAdjacent, type RecordLike } from './camera-dignity';

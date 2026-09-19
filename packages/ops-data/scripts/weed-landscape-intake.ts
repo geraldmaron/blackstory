@@ -1,5 +1,5 @@
 /**
- * Track C — weed obvious noise from bb_research.landscape_candidates before promote passes.
+ * Track C — weed obvious noise from research.landscape_candidates before promote passes.
  * Default dry-run; apply requires DRY_RUN=0 WEED_LANDSCAPE_APPLY=1 DATABASE_URL=…
  *
  * Usage (from repo root):
@@ -53,7 +53,7 @@ const SELECT_CANDIDATES = `
     lc.canonical_url,
     EXISTS (
       SELECT 1
-      FROM bb_public.release_entities p
+      FROM published.release_entities p
       WHERE lc.lat IS NOT NULL
         AND lc.lng IS NOT NULL
         AND p.lat IS NOT NULL
@@ -69,7 +69,7 @@ const SELECT_CANDIDATES = `
         AND abs(lc.lat - p.lat) < 0.01
         AND abs(lc.lng - p.lng) < 0.01
     ) AS catalog_duplicate
-  FROM bb_research.landscape_candidates lc
+  FROM research.landscape_candidates lc
   WHERE lc.status = 'pending'
   ORDER BY lc.lane, lc.id
 `;
@@ -103,7 +103,7 @@ async function applyWeed(
 ): Promise<void> {
   if (classification.action === 'leave' || classification.targetStatus === undefined) return;
   await client.query(
-    `UPDATE bb_research.landscape_candidates
+    `UPDATE research.landscape_candidates
      SET status = $2,
          provenance = provenance || $3::jsonb,
          updated_at = now()
@@ -162,15 +162,12 @@ async function main(): Promise<void> {
     const quarantineCount =
       (
         await client.query<{ n: string }>(
-          `SELECT COUNT(*)::text AS n FROM bb_research.model_output_quarantine`,
+          `SELECT COUNT(*)::text AS n FROM research.model_output_quarantine`,
         )
       ).rows[0]?.n ?? '0';
     const graylistCount =
-      (
-        await client.query<{ n: string }>(
-          `SELECT COUNT(*)::text AS n FROM bb_ops.discovery_graylist`,
-        )
-      ).rows[0]?.n ?? '0';
+      (await client.query<{ n: string }>(`SELECT COUNT(*)::text AS n FROM ops.discovery_graylist`))
+        .rows[0]?.n ?? '0';
 
     const report = {
       generatedAt: new Date().toISOString(),

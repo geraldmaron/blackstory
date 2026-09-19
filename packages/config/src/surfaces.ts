@@ -1,9 +1,6 @@
 /**
- * Typed surface identity and capability matrix for BlackStory deployables (see
- * docs/decisions-carryover.md, "Service surface separation" — ADR-005 does not exist). This matrix
- * is real and tested, but is a code-level contract only: the Cloud Run/IAP network isolation that
- * infra/gcp/surfaces/surface-matrix.json describes has never been deployed (see that section for
- * the evidence) — do not assume this mirror reflects live infrastructure.
+ * Typed capabilities for application surfaces. This is a code contract; deployment manifests
+ * and live network isolation require separate verification.
  */
 
 export const SURFACE_IDS = [
@@ -17,10 +14,13 @@ export const SURFACE_IDS = [
 export type SurfaceId = (typeof SURFACE_IDS)[number];
 
 export type NetworkPosture =
-  'public-cdn' | 'public-read' | 'public-rate-limited' | 'private-network' | 'iap-protected';
+  | 'public-cdn'
+  | 'public-read'
+  | 'public-rate-limited'
+  | 'service-authenticated'
+  | 'staff-authenticated';
 
-export type AuthMode =
-  'anonymous' | 'end-user-token' | 'service-identity' | 'iap-session' | 'app-authorization';
+export type AuthMode = 'anonymous' | 'end-user-token' | 'service-identity' | 'staff-session';
 
 export type OperationId =
   | 'read:public-projections'
@@ -37,8 +37,9 @@ export type OperationId =
 export interface SurfaceDefinition {
   readonly id: SurfaceId;
   readonly appPath: string;
-  readonly runtime: 'app-hosting' | 'cloud-run';
-  readonly serviceAccountId: string;
+  readonly runtime: 'vercel' | 'node-service';
+  /** Logical credential scope; this does not assert an independently deployed identity. */
+  readonly credentialScope: string;
   readonly networkPosture: NetworkPosture;
   readonly allowedOperations: readonly OperationId[];
   readonly acceptedAuth: readonly AuthMode[];
@@ -55,8 +56,8 @@ export const SURFACE_DEFINITIONS: Readonly<Record<SurfaceId, SurfaceDefinition>>
   web: {
     id: 'web',
     appPath: 'apps/web',
-    runtime: 'app-hosting',
-    serviceAccountId: 'web-runtime',
+    runtime: 'vercel',
+    credentialScope: 'web-runtime',
     networkPosture: 'public-cdn',
     allowedOperations: ['read:public-projections', 'read:search', 'read:location'],
     acceptedAuth: ['anonymous', 'end-user-token'],
@@ -65,8 +66,8 @@ export const SURFACE_DEFINITIONS: Readonly<Record<SurfaceId, SurfaceDefinition>>
   'api-public': {
     id: 'api-public',
     appPath: 'apps/api-public',
-    runtime: 'cloud-run',
-    serviceAccountId: 'api-public',
+    runtime: 'vercel',
+    credentialScope: 'api-public',
     networkPosture: 'public-read',
     allowedOperations: ['read:public-projections', 'read:search', 'read:location'],
     acceptedAuth: ['anonymous', 'end-user-token'],
@@ -75,19 +76,19 @@ export const SURFACE_DEFINITIONS: Readonly<Record<SurfaceId, SurfaceDefinition>>
   'api-submissions': {
     id: 'api-submissions',
     appPath: 'apps/api-submissions',
-    runtime: 'cloud-run',
-    serviceAccountId: 'api-submissions',
+    runtime: 'node-service',
+    credentialScope: 'api-submissions',
     networkPosture: 'public-rate-limited',
     allowedOperations: ['write:quarantine', 'write:submission-metadata'],
     acceptedAuth: ['anonymous', 'end-user-token'],
-    mustNotAcceptAuth: ['service-identity', 'iap-session'],
+    mustNotAcceptAuth: ['service-identity', 'staff-session'],
   },
   'api-internal': {
     id: 'api-internal',
     appPath: 'apps/api-internal',
-    runtime: 'cloud-run',
-    serviceAccountId: 'api-internal',
-    networkPosture: 'private-network',
+    runtime: 'node-service',
+    credentialScope: 'api-internal',
+    networkPosture: 'service-authenticated',
     allowedOperations: [
       'write:canonical',
       'publish:projection',
@@ -95,26 +96,22 @@ export const SURFACE_DEFINITIONS: Readonly<Record<SurfaceId, SurfaceDefinition>>
       'read:public-projections',
     ],
     acceptedAuth: ['service-identity'],
-    mustNotAcceptAuth: ['anonymous', 'end-user-token', 'iap-session'],
+    mustNotAcceptAuth: ['anonymous', 'end-user-token', 'staff-session'],
   },
   admin: {
     id: 'admin',
-    // A staff-gated route group inside apps/web (src/admin/**, routes under /admin), not a
-    // separate deployable — see docs/security/service-surfaces.md. serviceAccountId/runtime
-    // below predate that and are already stale (this surface runs on Vercel, not Cloud Run);
-    // left as-is rather than fixed opportunistically here, so this still reads as distinct from
-    // `web` below without claiming an accuracy this migration didn't set out to restore.
+    // Staff authorization is enforced within the shared Vercel web deployment.
     appPath: 'apps/web/src/admin',
-    runtime: 'cloud-run',
-    serviceAccountId: 'admin',
-    networkPosture: 'iap-protected',
+    runtime: 'vercel',
+    credentialScope: 'admin',
+    networkPosture: 'staff-authenticated',
     allowedOperations: [
       'read:public-projections',
       'admin:research-console',
       'admin:publication-review',
     ],
-    acceptedAuth: ['iap-session', 'app-authorization'],
-    mustNotAcceptAuth: ['anonymous'],
+    acceptedAuth: ['staff-session'],
+    mustNotAcceptAuth: ['anonymous', 'end-user-token', 'service-identity'],
   },
 };
 
@@ -178,7 +175,7 @@ export function deniesPublication(surfaceId: SurfaceId): boolean {
   return ALL_PUBLISH_OPS.every((operation) => !isOperationAllowed(surfaceId, operation));
 }
 
-/** True when the surface cannot write canonical Firestore documents. */
+/** True when the surface cannot write canonical records. */
 export function deniesCanonicalWrite(surfaceId: SurfaceId): boolean {
   return ALL_CANONICAL_WRITES.every((operation) => !isOperationAllowed(surfaceId, operation));
 }

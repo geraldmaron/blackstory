@@ -2,13 +2,13 @@
  * Pure planning logic for backfill-canonical-claims-from-release.ts.
  *
  * Input is a snapshot of the rows the planner needs to see (active-release entities that have no
- * bb_canonical.claims rows, plus the evidence library it resolves citations against). Output is
+ * canonical.claims rows, plus the evidence library it resolves citations against). Output is
  * the exact set of rows to insert. Nothing here touches a database, so the resolution rules are
  * testable on their own.
  *
  * Row shapes and id derivations mirror
- * packages/migrate-firestore-postgres/src/canonical-convergence.ts, the writer that produced the
- * roughly 15.7k traced claims already in bb_canonical. Two deliberate differences:
+ * packages/ops-data/src/postgres/canonical-convergence.ts, the writer that produced the
+ * roughly 15.7k traced claims already in canonical. Two deliberate differences:
  *
  *  1. Source resolution does not mint one organization, domain and evidence source per raw
  *     hostname and citation string. It resolves the citation host (lowercase, www-stripped) to an
@@ -26,8 +26,7 @@ export const BACKFILL_METHOD = 'canonical_claims_backfill_from_release';
 export const BACKFILL_ACTOR = 'canonical-claims-backfill';
 
 // --- Stable ids (mirror of canonical-convergence.ts stableJson/stableDigest/stableId) ---------
-// Kept as a copy rather than a cross-package import: ops-data does not depend on
-// @repo/migrate-firestore-postgres. The unit test pins parity against an id that module wrote.
+// Stable identifiers preserve the imported record identity; parity is checked against stored examples.
 
 type JsonRecord = Record<string, unknown>;
 
@@ -103,7 +102,7 @@ export type PlanSnapshot = {
   readonly items: readonly SnapshotItem[];
   /** Only evidence records on the items above. */
   readonly evidence: readonly SnapshotEvidence[];
-  /** Public claim ids already present in bb_canonical.claims (any entity). */
+  /** Public claim ids already present in canonical.claims (any entity). */
   readonly existingClaimIds: ReadonlySet<string>;
   /**
    * Ids the planner would mint that already exist in their table, keyed by table. The script
@@ -394,7 +393,7 @@ export function buildBackfillPlan(snapshot: PlanSnapshot): BackfillPlan {
     .map((entity) => {
       const blocked: string[] = [];
       if (!entity.canonicalEntityExists) {
-        blocked.push('no bb_canonical.entities row (claims.entity_id FK would fail)');
+        blocked.push('no canonical.entities row (claims.entity_id FK would fail)');
       }
       const raw = Array.isArray(entity.claims) ? entity.claims : null;
       if (!raw || raw.length === 0) blocked.push('public claims value is not a non-empty array');
@@ -409,7 +408,7 @@ export function buildBackfillPlan(snapshot: PlanSnapshot): BackfillPlan {
           blocked.push(`${claim.id}: citationHref is not an http(s) URL`);
         }
         if (snapshot.existingClaimIds.has(claim.id)) {
-          blocked.push(`${claim.id}: id already exists in bb_canonical.claims`);
+          blocked.push(`${claim.id}: id already exists in canonical.claims`);
         }
         const owner = seenClaimIds.get(claim.id);
         if (owner !== undefined) {

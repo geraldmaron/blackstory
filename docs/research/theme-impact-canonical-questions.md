@@ -6,8 +6,8 @@
 
 # Theme impact — canonical questions and metric catalog
 
-**Status:** Draft v1 (survey-locked 2026-07-22)  
-**Bead:** catalog workstream (questions → system design → pilot)  
+**Status:** Draft v1 (survey-locked 2026-07-22)
+**Bead:** catalog workstream (questions → system design → pilot)
 **Companions:** [juxtaposition-not-causation.md](../methodology/juxtaposition-not-causation.md), [context-data-source-matrix.md](./context-data-source-matrix.md), [theme-impact-gap-fill-sources.md](./theme-impact-gap-fill-sources.md), `packages/domain/src/statistics/phase1-indicator-catalog.ts`, `theme-impact-questions.ts`
 
 ## 1. Product posture (from survey)
@@ -137,11 +137,11 @@ Used especially for `Q1`, `Q5`, and place narrative `Q4`.
 
 | Artifact class | Examples | Storage lane | Public bar |
 |----------------|----------|--------------|------------|
-| Primary government document | HOLC manuals, FHA underwriting, statutes, declassified memos | `bb_evidence` captures + claims | Prefer primary; uncertainty labels OK |
+| Primary government document | HOLC manuals, FHA underwriting, statutes, declassified memos | `evidence` captures + claims | Prefer primary; uncertainty labels OK |
 | Cartographic grade maps | Mapping Inequality HOLC | Geo + attribution; registry gated | Rights review before commercial surface |
 | Peer-reviewed synthesis | Journal articles on redlining wealth effects; drug-war sentencing | Cite in claims; optional secondary | “Sprinkle” of peer review for contested topics |
 | Investigative / FOIA packages | Documented distribution or enforcement programs | Capture + editorial packet | Show with caveats; do not present rumor as fact |
-| Scholarly partner tables | Licensed aggregates | `bb_reference` if store-approved | Partnership terms |
+| Scholarly partner tables | Licensed aggregates | `reference` if store-approved | Partnership terms |
 
 ## 6. v1 dataset allowlist (recommended)
 
@@ -160,13 +160,13 @@ Ordered for the reusable system + first pilots:
 
 Every public theme-impact packet for `Q1`–`Q9` should carry:
 
-1. **Question id** + theme id  
-2. **Policy era(s)** in scope  
-3. **Geography** (flexible; declare unit + `boundary_version`)  
-4. **Observations / derived** with full provenance quartet + human citation  
-5. **Artifacts / claims** with independence / uncertainty labels where contested  
-6. **Method note:** juxtaposition vs gated causal claim  
-7. **Gap states:** `insufficient_evidence` and/or `modeled` labels when applicable  
+1. **Question id** + theme id
+2. **Policy era(s)** in scope
+3. **Geography** (flexible; declare unit + `boundary_version`)
+4. **Observations / derived** with full provenance quartet + human citation
+5. **Artifacts / claims** with independence / uncertainty labels where contested
+6. **Method note:** juxtaposition vs gated causal claim
+7. **Gap states:** `insufficient_evidence` and/or `modeled` labels when applicable
 
 Entity-bound views add `entity_context_bindings` (purpose: `map_panel` | `story` | `research`). Standalone theme pages use the same packet without requiring a single heritage entity.
 
@@ -181,6 +181,6 @@ Entity-bound views add `entity_context_bindings` (purpose: `map_panel` | `story`
 
 ## 9. Next steps
 
-1. **Pilot** — one metro × `redlining` (`Q1`–`Q4`) end-to-end with citations ([checklist §8](./theme-impact-packet-system.md#8-redlining-pilot-readiness-checklist))  
-2. Schema migration — `bb_canonical.theme_impact_packets` + release projection per design doc  
-3. Open ingestion beads only for allowlisted sources still `disabled` in the registry  
+1. **Pilot** — one metro × `redlining` (`Q1`–`Q4`) end-to-end with citations ([checklist §8](./theme-impact-packet-system.md#8-redlining-pilot-readiness-checklist))
+2. Schema migration — `canonical.theme_impact_packets` + release projection per design doc
+3. Open ingestion beads only for allowlisted sources still `disabled` in the registry

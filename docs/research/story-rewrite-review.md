@@ -9,7 +9,7 @@ explicit owner approval per story.
 **Mock (no secrets, workflow validation):**
 
 ```bash
-node --conditions development --import tsx packages/firebase/scripts/rewrite-seed-stories.ts
+node --conditions development --import tsx packages/ops-data/scripts/rewrite-seed-stories.ts
 ```
 
 **Live OpenRouter (Kimi K2.5 quality roster):**
@@ -17,7 +17,7 @@ node --conditions development --import tsx packages/firebase/scripts/rewrite-see
 ```bash
 run-with-dev-secrets -- \
   STORY_REWRITE_LLM_PROVIDER=openrouter \
-  node --conditions development --import tsx packages/firebase/scripts/rewrite-seed-stories.ts
+  node --conditions development --import tsx packages/ops-data/scripts/rewrite-seed-stories.ts
 ```
 
 Optional flags: `--slug before-the-battle-cry`, `--output .cache/story-rewrites`,
@@ -77,4 +77,4 @@ approved rewrite is a separate, explicit step — not part of this lane.
 - **OpenRouter credentials** — `OPENROUTER_API_KEY` via `run-with-dev-secrets` (1Password).
 - **Model availability** — Roster rotates on failure (`STORY_REWRITE_MODELS` in `.env.example`).
 - **Human publication** — Approved rewrites still require a separate promote/publish path;
-  this lane never writes Firestore or seed files.
+  this lane stages research and does not publish.

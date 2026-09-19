@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * Dry-run loader for state jurisdiction polygons into `bb_reference.jurisdictions`.
+ * Dry-run loader for state jurisdiction polygons into `reference.jurisdictions`.
  * Validates fixture rows, prints the load plan, and can emit operator-reviewed SQL.
  * Never connects to Supabase or writes production data from this script.
  */
@@ -206,7 +206,7 @@ function buildUpsertSql(validated, fixture) {
       const metadataJson = JSON.stringify(row.metadata);
       const geometryJson = JSON.stringify(row.metadata.geometry);
       return [
-        'INSERT INTO bb_reference.jurisdictions (',
+        'INSERT INTO reference.jurisdictions (',
         '  id, kind, name, state_fips, county_fips, parent_id, geohash, metadata, location',
         ') VALUES (',
         `  ${sqlLiteral(row.id)},`,
