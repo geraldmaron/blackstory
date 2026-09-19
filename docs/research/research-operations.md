@@ -449,11 +449,24 @@ node --conditions development --import tsx packages/operator-cli/src/bin.ts enri
   --worker-id researcher --max-tasks 3 --commit
 ```
 
-Committed execution uses `research-work` for search, rights-scoped capture, passage indexing and
-an exact-source inventory. It prioritizes a contradiction query and records needs that exceed the
-available budget. It does not upgrade maturity, approve claims or publish. Missing source rights,
-unavailable providers and unfunded questions remain visible. Resume with `research-work --run-id`
-rather than reconstructing the immutable manifest with another `enrich-entity` invocation.
+Committed execution uses `research-work` for search, rights-scoped capture and an exact-source
+inventory. Index retained text separately with `research-index` before review. The execution plan
+prioritizes a contradiction query and records needs that exceed the available budget. It does not
+approve claims or publish. Missing source rights, unavailable providers and unfunded questions
+remain visible. Resume with `research-work --run-id` rather than reconstructing the immutable
+manifest with another `enrich-entity` invocation.
+
+The reported `maturity` and the plan use canonical reviewed evidence. An assignment counts only
+when it supports the current accepted claim version, has an exact selector into an active indexed
+passage, retains a current public text-retention decision, carries a reviewed lineage cluster, and
+is covered by a later independent artifact approval. The output also reports
+`releasedProjectionMaturity` as the conservative citation-only baseline and lists the assignment
+ids admitted to the reviewed assessment. Acquisition by itself therefore leaves maturity
+unchanged; rerunning this read after a separate authorized review derives the new state without
+writing a hand-set maturity value.
+
+`attach-evidence` remains proposal-only. The operator CLI cannot create accepted assignments or
+call `research.approve_artifact`; authenticated admin/publication review owns that boundary.
 
 **Which path to use when:**
 

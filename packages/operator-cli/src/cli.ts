@@ -79,6 +79,7 @@ import {
   enrichmentExecutionPlan,
 } from './enrichment-plan.js';
 import { runResearchWorker } from './research-worker.js';
+import { assessReviewedMaturity } from './reviewed-maturity.js';
 import { createLlmProvider } from './llm-provider.js';
 import { loadPendingEditorialItems } from './pending-list.js';
 import {
@@ -2194,13 +2195,29 @@ export async function runCli(argv: readonly string[], deps: CliDependencies = {}
           summary: (row.summary as string | null) ?? null,
           claims: (row.claims as ReleasedClaim[]) ?? [],
         };
-        const snapshot = snapshotForReleasedEntity(released);
-        const assessment = assessResearchMaturity({ record: snapshot, identityResolved: true });
+        const releasedSnapshot = snapshotForReleasedEntity(released);
+        const releasedAssessment = assessResearchMaturity({
+          record: releasedSnapshot,
+          identityResolved: true,
+        });
+        const reviewed = await assessReviewedMaturity(pool, released);
+        const assessment = reviewed.assessment;
+        // Review controls the maturity state. Projection-only deficits still fund acquisition:
+        // otherwise a record with zero reviewed assignments would have too little information
+        // to describe the evidence it needs to earn its first reviewed assignment.
+        const planningDeficits = [...assessment.evidenceDeficits];
+        const plannedDeficitKeys = new Set(
+          planningDeficits.map((deficit) => `${deficit.code}:${deficit.claimId ?? ''}`),
+        );
+        for (const deficit of releasedAssessment.evidenceDeficits) {
+          const key = `${deficit.code}:${deficit.claimId ?? ''}`;
+          if (!plannedDeficitKeys.has(key)) planningDeficits.push(deficit);
+        }
         const plan = planEnrichment({
           entityId: released.entityId,
           currentMaturity: assessment.maturity,
           targetMaturity,
-          deficits: assessment.evidenceDeficits,
+          deficits: planningDeficits,
           context: { subjectName: released.displayName },
         });
         const runId = optionalFlag(flags, '--run-id');
@@ -2251,6 +2268,11 @@ export async function runCli(argv: readonly string[], deps: CliDependencies = {}
               entityId: released.entityId,
               displayName: released.displayName,
               maturity: assessment.maturity,
+              releasedProjectionMaturity: releasedAssessment.maturity,
+              reviewedEvidence: {
+                assignmentIds: reviewed.reviewedAssignmentIds,
+                openMandatoryNeeds: reviewed.openMandatoryNeeds,
+              },
               targetMaturity,
               targetIsAbove: targetIsAbove(assessment.maturity, targetMaturity),
               priority: assessment.priority,
@@ -2338,7 +2360,7 @@ export async function runCli(argv: readonly string[], deps: CliDependencies = {}
             'For backfill-entity/prose-run: --entity-id <id> [--title ...] [--summary ...] [--provider mock|openrouter|ollama|hybrid] [--commit]\n' +
             'For capture-backfill: [--commit] [--wayback] [--url CITED_URL | --max-captures N [--after-url URL --inventory-fingerprint SHA256] | --max-entities N]\n' +
             'For expand: --entity-id <id> [--depth N] [--commit] — live Wikidata traversal; stages landscape_candidates, never canonical\n' +
-            'For enrich-entity: --entity-id <id> [--target-maturity seeded|grounded|corroborated|contextualized|deep_research|reference] — PLANS research; it does not execute, and has no --commit\n' +
+            'For enrich-entity: --entity-id <id> [--target-maturity seeded|grounded|corroborated|contextualized|deep_research|reference] [--run-id <id> --preservation-decisions <path> --worker-id <id> --max-tasks <n> --commit]\n' +
             'For research-quality-audit: [--release-id <id>] [--kind <kind>] [--entity-id <id>] [--deficit <code>] [--limit N] — read-only; narrow the query to get per-entity rows; --deficit with --limit returns the next N matching entities in priority order, not a deficit filter over the first N by id\n' +
             'For graylist-read: [--limit N] — Postgres quarantine only, see docs/research/research-operations.md\n',
         );

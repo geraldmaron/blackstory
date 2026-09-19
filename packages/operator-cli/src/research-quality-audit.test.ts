@@ -4,9 +4,11 @@
  * the predicate when the object says something stronger.
  */
 import assert from 'node:assert/strict';
+import { randomUUID } from 'node:crypto';
 import { test } from 'node:test';
 
 import { detectDeficits } from '@repo/domain';
+import { getOpsPostgresPool } from '@repo/data-access';
 
 import {
   type EntityAuditRow,
@@ -17,6 +19,8 @@ import {
   snapshotForReleasedEntity,
   sourceClassForCitation,
 } from './research-quality-audit.ts';
+import { assessReviewedMaturity, assessReviewedMaturityOnClient } from './reviewed-maturity.ts';
+import type { ReviewedMaturityPool } from './reviewed-maturity.ts';
 
 function entity(overrides: Partial<ReleasedEntity> = {}): ReleasedEntity {
   return {
@@ -365,3 +369,377 @@ test('host names do not establish scholarly review, manuscript status or technic
     'institutional_biography',
   );
 });
+
+test('reviewed maturity admits exact, retained, independently reviewed assignments', async () => {
+  const sourceUrl = 'https://www.nps.gov/people/ada-rivers.htm';
+  const db: ReviewedMaturityPool = {
+    async connect() {
+      return {
+        async query<Row extends Record<string, unknown>>(sql: string) {
+          let rows: Record<string, unknown>[];
+          if (sql.includes('assignment.id AS assignment_id')) {
+            rows = [
+              {
+                claim_id: 'claim-ada',
+                claim_version_id: 'claim-ada-v1',
+                predicate: 'served_as',
+                object: 'Principal of Douglass School',
+                assignment_id: 'assignment-ada',
+                source_item_id: 'source-item-ada',
+                source_url: sourceUrl,
+                capture_id: 'capture-ada',
+                lineage_cluster_id: 'lineage-ada',
+                lineage_rationale: 'Reviewed National Park Service biographical record.',
+                exact_text: 'Ada Rivers served as principal of Douglass School.',
+                start_offset: 10,
+                end_offset: 59,
+                preservation_decision: {
+                  sourceUrl,
+                  allowTextRetention: true,
+                  allowArchive: true,
+                  sensitivity: 'public',
+                  reviewedBy: 'rights-reviewer',
+                  reviewedAt: '2026-09-17T00:00:00.000Z',
+                  expiresAt: '2027-09-17T00:00:00.000Z',
+                  basis: 'Public institutional record approved for research retention.',
+                },
+              },
+            ];
+          } else if (sql.includes('SELECT DISTINCT need.description')) {
+            rows = [];
+          } else if (sql.includes('WITH current_claims AS')) {
+            rows = [
+              {
+                reviewer_actor_id: 'reviewer-2',
+                producer_actor_id: 'researcher-1',
+                findings: [],
+              },
+            ];
+          } else if (sql.includes('relationships_without_evidence')) {
+            rows = [{ place_receipt: true, relationships_without_evidence: 0 }];
+          } else if (sql.startsWith('BEGIN') || sql === 'COMMIT' || sql === 'ROLLBACK') {
+            rows = [];
+          } else {
+            rows = [
+              {
+                claim_id: 'claim-ada',
+                claim_version_id: 'claim-ada-v1',
+                predicate: 'served_as',
+                object: 'Principal of Douglass School',
+              },
+            ];
+          }
+          return { rows: rows as Row[] };
+        },
+        release() {},
+      };
+    },
+  };
+  const result = await assessReviewedMaturity(
+    db,
+    {
+      entityId: 'entity-ada',
+      kind: 'person',
+      displayName: 'Ada Rivers',
+      claims: [
+        {
+          id: 'claim-ada',
+          predicate: 'served_as',
+          object: 'Principal of Douglass School',
+          claimRole: 'evidence',
+        },
+      ],
+    },
+    '2026-09-18T12:00:00.000Z',
+  );
+  assert.deepEqual(result.reviewedAssignmentIds, ['assignment-ada']);
+  assert.equal(result.snapshot.claims[0]?.evidence[0]?.hasSelector, true);
+  assert.equal(result.snapshot.claims[0]?.evidence[0]?.captured, true);
+  assert.equal(result.snapshot.claims[0]?.evidence[0]?.lineage.inferred, false);
+  assert.notEqual(result.assessment.maturity, 'seeded');
+});
+
+test('reviewed maturity drops evidence after its rights authorization expires', async () => {
+  const db: ReviewedMaturityPool = {
+    async connect() {
+      return {
+        async query<Row extends Record<string, unknown>>(sql: string) {
+          if (sql.includes('assignment.id AS assignment_id'))
+            return {
+              rows: [
+                {
+                  claim_id: 'claim-1',
+                  claim_version_id: 'claim-1-v1',
+                  predicate: 'served_as',
+                  object: 'Principal',
+                  assignment_id: 'assignment-expired',
+                  source_item_id: 'source-item-1',
+                  source_url: 'https://example.org/record',
+                  capture_id: 'capture-1',
+                  lineage_cluster_id: 'lineage-1',
+                  lineage_rationale: 'Reviewed source lineage.',
+                  exact_text: 'Principal',
+                  start_offset: 0,
+                  end_offset: 9,
+                  preservation_decision: {
+                    sourceUrl: 'https://example.org/record',
+                    allowTextRetention: true,
+                    allowArchive: false,
+                    sensitivity: 'public',
+                    reviewedBy: 'reviewer',
+                    reviewedAt: '2025-01-01T00:00:00.000Z',
+                    expiresAt: '2026-01-01T00:00:00.000Z',
+                    basis: 'Expired fixture.',
+                  },
+                },
+              ] as Row[],
+            };
+          if (sql.includes('relationships_without_evidence'))
+            return {
+              rows: [{ place_receipt: false, relationships_without_evidence: 1 }] as Row[],
+            };
+          if (
+            sql.includes('SELECT DISTINCT need.description') ||
+            sql.includes('WITH current_claims AS') ||
+            sql.startsWith('BEGIN') ||
+            sql === 'COMMIT' ||
+            sql === 'ROLLBACK'
+          )
+            return { rows: [] as Row[] };
+          return {
+            rows: [
+              {
+                claim_id: 'claim-1',
+                claim_version_id: 'claim-1-v1',
+                predicate: 'served_as',
+                object: 'Principal',
+              },
+            ] as Row[],
+          };
+        },
+        release() {},
+      };
+    },
+  };
+  const result = await assessReviewedMaturity(
+    db,
+    { entityId: 'entity-1', kind: 'person', displayName: 'Person', claims: [] },
+    '2026-09-18T12:00:00.000Z',
+  );
+  assert.deepEqual(result.reviewedAssignmentIds, []);
+  assert.deepEqual(result.snapshot.claims[0]?.evidence, []);
+  assert.equal(result.assessment.maturity, 'seeded');
+});
+
+test(
+  'Postgres review changes maturity and later revocation or rejection fails closed',
+  { skip: !process.env.RESEARCH_TEST_DATABASE_URL },
+  async () => {
+    const connectionString = process.env.RESEARCH_TEST_DATABASE_URL!;
+    assert.ok(['127.0.0.1', 'localhost', '[::1]'].includes(new URL(connectionString).hostname));
+    const pool = getOpsPostgresPool({ DATABASE_URL: connectionString });
+    const client = await pool.connect();
+    const prefix = `reviewed-maturity-${randomUUID()}`;
+    const id = (suffix: string) => `${prefix}-${suffix}`;
+    const sourceUrl = `https://www.nps.gov/people/${prefix}.htm`;
+    const exactText = 'Ada Rivers served as principal of Douglass School.';
+    const decision = {
+      sourceUrl,
+      allowTextRetention: true,
+      allowArchive: true,
+      sensitivity: 'public',
+      reviewedBy: 'rights-reviewer',
+      reviewedAt: '2026-09-18T09:00:00.000Z',
+      expiresAt: '2027-09-18T09:00:00.000Z',
+      basis: 'Synthetic local integration fixture.',
+    };
+    const released = {
+      entityId: id('entity'),
+      kind: 'person',
+      displayName: 'Ada Rivers',
+      claims: [
+        {
+          id: id('claim'),
+          predicate: 'served_as',
+          object: 'Principal of Douglass School',
+          claimRole: 'evidence',
+        },
+      ],
+    } as const;
+    try {
+      await client.query('BEGIN');
+      const fixtureWrites: readonly [string, readonly unknown[]][] = [
+        [
+          `INSERT INTO research.research_profiles
+           (id,version,schema_version,checksum,profile,active)
+           VALUES ($1,'1.0.0','1.0.0',repeat('a',64),'{}',false)`,
+          [id('profile')],
+        ],
+        [
+          `INSERT INTO research.cases
+           (id,state,candidate_id,title,profile_id,profile_version,risk_class)
+           VALUES ($1,'candidate',$1,'Reviewed maturity fixture',$2,'1.0.0','standard')`,
+          [id('case'), id('profile')],
+        ],
+        [
+          `INSERT INTO canonical.entities (id,kind,entity_class,display_name)
+           VALUES ($1,'person','person','Ada Rivers')`,
+          [released.entityId],
+        ],
+        [
+          `INSERT INTO canonical.claims (id,entity_id,claim_class,workflow_status)
+           VALUES ($1,$2,'standard','accepted')`,
+          [id('claim'), released.entityId],
+        ],
+        [
+          `INSERT INTO canonical.claim_versions
+           (id,claim_id,predicate,object,workflow_status)
+           VALUES ($1,$2,'served_as',$3::jsonb,'accepted')`,
+          [id('version'), id('claim'), JSON.stringify('Principal of Douglass School')],
+        ],
+        [
+          'UPDATE canonical.claims SET current_version_id=$1 WHERE id=$2',
+          [id('version'), id('claim')],
+        ],
+        [
+          "INSERT INTO evidence.evidence_sources (id,display_name) VALUES ($1,'NPS fixture')",
+          [id('source')],
+        ],
+        [
+          `INSERT INTO evidence.source_items (id,source_id,stable_identifier,url)
+           VALUES ($1,$2,$1,$3)`,
+          [id('item'), id('source'), sourceUrl],
+        ],
+        [
+          `INSERT INTO evidence.source_captures
+           (id,source_item_id,content_hash_algorithm,content_hash_digest,parser_version,snapshot_mode)
+           VALUES ($1,$2,'sha256',repeat('b',64),'fixture-v1','selective')`,
+          [id('capture'), id('item')],
+        ],
+        [
+          `INSERT INTO evidence.capture_origins
+           (capture_id,source_item_id,source_url,final_url,storage_object,observed_at)
+           VALUES ($1,$2,$3,$3,jsonb_build_object('preservationDecision',$4::jsonb),clock_timestamp())`,
+          [id('capture'), id('item'), sourceUrl, JSON.stringify(decision)],
+        ],
+        [
+          `INSERT INTO evidence.evidence_selectors
+           (id,capture_id,source_item_id,selector_type,conforms_to,exact_text,selector_hash)
+           VALUES ($1,$2,$3,'TextQuoteSelector','http://www.w3.org/TR/annotation-model/',
+                   $4,repeat('c',64))`,
+          [id('selector'), id('capture'), id('item'), exactText],
+        ],
+        [
+          `INSERT INTO evidence.lineage_clusters
+           (id,root_capture_id,method_version,confidence,rationale)
+           VALUES ($1,$2,'reviewed-v1',1,'Reviewed institutional source lineage.')`,
+          [id('lineage'), id('capture')],
+        ],
+        [
+          `INSERT INTO canonical.evidence_assignments
+           (id,claim_version_id,selector_id,role,fitness,entailment_probability,
+            entailment_calibration_version,lineage_cluster_id,reviewer_actor_id,status,created_at)
+           VALUES ($1,$2,$3,'supporting','strong',0.9,'fixture-v1',$4,
+                   'evidence-reviewer','accepted','2026-09-18T10:00:00Z')`,
+          [id('assignment'), id('version'), id('selector'), id('lineage')],
+        ],
+        [
+          `INSERT INTO evidence.retrieval_passages
+           (id,capture_id,source_item_id,parser_version,document_text_hash,ordinal,
+            start_offset,end_offset,body,body_hash,retention_decision,retention_expires_at)
+           VALUES ($1,$2,$3,'fixture-v1',repeat('d',64),0,0,char_length($4),$4,
+                   repeat('e',64),$5::jsonb,'2027-09-18T09:00:00Z')`,
+          [id('passage'), id('capture'), id('item'), exactText, JSON.stringify(decision)],
+        ],
+        [
+          `INSERT INTO research.runs
+           (id,case_id,profile_id,profile_version,policy_version,mode,status,started_at)
+           VALUES ($1,$2,$3,'1.0.0','1.0.0','independent-review','succeeded',clock_timestamp())`,
+          [id('run'), id('case'), id('profile')],
+        ],
+        [
+          `INSERT INTO research.agent_activities
+           (id,run_id,actor_id,actor_type,model_family,activity_type,started_at,ended_at)
+           VALUES ($1,$2,'producer-1','human',NULL,'extract',clock_timestamp(),clock_timestamp())`,
+          [id('activity'), id('run')],
+        ],
+        [
+          `INSERT INTO research.artifacts
+           (id,run_id,activity_id,artifact_type,content_hash,schema_id,schema_version,
+            storage_uri,extensions,status,idempotency_key)
+           VALUES ($1,$2,$3,'claim-assessment',repeat('f',64),'ClaimStatement','1.0.0',
+                   'local://fixture','{}','proposed',$1)`,
+          [id('artifact'), id('run'), id('activity')],
+        ],
+        [
+          'INSERT INTO research.artifact_claims (artifact_id,claim_version_id) VALUES ($1,$2)',
+          [id('artifact'), id('version')],
+        ],
+      ];
+      for (const [sql, values] of fixtureWrites) await client.query(sql, [...values]);
+
+      const before = await assessReviewedMaturityOnClient(
+        client,
+        released,
+        '2026-09-18T12:00:00.000Z',
+      );
+      assert.equal(before.assessment.maturity, 'seeded');
+      assert.deepEqual(before.reviewedAssignmentIds, []);
+
+      await client.query(
+        `INSERT INTO research.review_decisions
+          (id,artifact_id,decision,reviewer_actor_id,reviewer_model_family,
+           producer_actor_id,producer_model_family,findings,benchmark_version,decided_at)
+         VALUES ($1,$2,'approve','reviewer-2',NULL,'producer-1',NULL,'[]','fixture-v1',
+                 '2026-09-18T11:00:00Z')`,
+        [id('approval'), id('artifact')],
+      );
+      await client.query("UPDATE research.artifacts SET status='accepted' WHERE id=$1", [
+        id('artifact'),
+      ]);
+      const approved = await assessReviewedMaturityOnClient(
+        client,
+        released,
+        '2026-09-18T12:00:00.000Z',
+      );
+      assert.notEqual(approved.assessment.maturity, 'seeded');
+      assert.deepEqual(approved.reviewedAssignmentIds, [id('assignment')]);
+
+      await client.query(
+        'UPDATE evidence.capture_origins SET retention_revoked_at=clock_timestamp() WHERE capture_id=$1 AND source_item_id=$2',
+        [id('capture'), id('item')],
+      );
+      const revoked = await assessReviewedMaturityOnClient(
+        client,
+        released,
+        '2026-09-18T12:00:00.000Z',
+      );
+      assert.equal(revoked.assessment.maturity, 'seeded');
+      assert.deepEqual(revoked.reviewedAssignmentIds, []);
+
+      await client.query(
+        `UPDATE evidence.capture_origins SET retention_revoked_at=NULL
+         WHERE capture_id=$1 AND source_item_id=$2`,
+        [id('capture'), id('item')],
+      );
+      await client.query(
+        `INSERT INTO research.review_decisions
+          (id,artifact_id,decision,reviewer_actor_id,reviewer_model_family,
+           producer_actor_id,producer_model_family,findings,benchmark_version,decided_at)
+         VALUES ($1,$2,'reject','reviewer-3',NULL,'producer-1',NULL,'[]','fixture-v1',
+                 '2026-09-18T11:30:00Z')`,
+        [id('rejection'), id('artifact')],
+      );
+      const rejected = await assessReviewedMaturityOnClient(
+        client,
+        released,
+        '2026-09-18T12:00:00.000Z',
+      );
+      assert.equal(rejected.assessment.maturity, 'seeded');
+      assert.deepEqual(rejected.reviewedAssignmentIds, []);
+    } finally {
+      await client.query('ROLLBACK');
+      client.release();
+    }
+  },
+);
