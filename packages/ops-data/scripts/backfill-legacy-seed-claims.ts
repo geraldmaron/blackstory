@@ -4,7 +4,7 @@
  * ent_dc_landmark_listing_1975, ent_15th_st_church_001, ent_dunbar_school_001.
  *
  * The cited claim text was authored and already recovered once, in
- * packages/migrate-firestore-postgres/src/canonical-convergence.ts (LEGACY_SEED_CLAIM_SUPPLEMENTS)
+ * packages/ops-data/src/postgres/canonical-convergence.ts (LEGACY_SEED_CLAIM_SUPPLEMENTS)
  * — that recovery path runs at Firestore-import time and was never re-run against the live
  * release. This script applies the same supplements directly to the active release row, in the
  * shape of the precedent backfill-release-related-empty-array.ts.
@@ -35,7 +35,7 @@ type ReleaseClaim = {
   readonly citationLabel: string;
 };
 
-// Mirrors packages/migrate-firestore-postgres/src/canonical-convergence.ts
+// Mirrors packages/ops-data/src/postgres/canonical-convergence.ts
 // LEGACY_SEED_CLAIM_SUPPLEMENTS verbatim (minus the migration-only `recoverySource` field), which
 // is that script's source of truth. Kept as a literal here rather than a cross-package import so
 // this one-off backfill has no new package dependency.

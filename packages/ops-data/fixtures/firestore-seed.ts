@@ -33,7 +33,7 @@ import type {
   SourceItemDoc,
   SourceOrganizationDoc,
   SubmissionInboxDoc,
-} from '../src/firestore/types.js';
+} from '../src/records/types.js';
 
 export type SeedDocument = {
   readonly path: string;

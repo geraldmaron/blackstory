@@ -5,7 +5,7 @@
 import type {
   PublicActiveReleaseDoc,
   PublicEntityProjectionInput,
-} from '../src/firestore/types.js';
+} from '../src/records/types.js';
 import { seedPublicEntity, seedPublicSchoolEntity, type SeedDocument } from './firestore-seed.js';
 
 export type ApiPublicEmulatorScenario = {

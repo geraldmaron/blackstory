@@ -61,7 +61,7 @@
 import pg from 'pg';
 import { mapPostgresSearchIndexRow, type PublicSearchIndexRow } from '@repo/schemas';
 import { sha256Json, type JsonValue } from '@repo/domain';
-import { buildReleaseCatalogArtifacts } from '../src/firestore/release-artifacts.ts';
+import { buildReleaseCatalogArtifacts } from '../src/records/release-artifacts.ts';
 import { normalizePgConnectionString } from './lib/pg-connection.ts';
 import { shouldSkipPublish } from './lib/release-catalog-publish-decision.ts';
 import {

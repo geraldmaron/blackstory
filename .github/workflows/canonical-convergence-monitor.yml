@@ -67,7 +67,7 @@ jobs:
         run: |
           set -euo pipefail
           node --conditions development --import tsx \
-            packages/migrate-firestore-postgres/src/cli/backfill-canonical.ts --json \
+            packages/ops-data/scripts/backfill-canonical.ts --json \
             > convergence-report.json
           cat convergence-report.json
           # assertVerified's own hard-fail counters (backfill-canonical.ts) — missing_planned_claims

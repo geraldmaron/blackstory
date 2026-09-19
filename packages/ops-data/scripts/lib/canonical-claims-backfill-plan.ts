@@ -7,7 +7,7 @@
  * testable on their own.
  *
  * Row shapes and id derivations mirror
- * packages/migrate-firestore-postgres/src/canonical-convergence.ts, the writer that produced the
+ * packages/ops-data/src/postgres/canonical-convergence.ts, the writer that produced the
  * roughly 15.7k traced claims already in bb_canonical. Two deliberate differences:
  *
  *  1. Source resolution does not mint one organization, domain and evidence source per raw
