@@ -12,19 +12,19 @@ proposals, review gates and manual worker entry points are implemented. Black hi
 profile; the same loop has acquired EPA wetland sources. Research cannot publish. No Firebase,
 Firestore or Corsair runtime is required, and no research timer is enabled in the inspected accounts.
 
-The coordinated release remains under production maintenance. The signed Dunbar correction is
-active, Preview database credentials are removed, and the separately deployed API is live against
-the production Postgres surface.
-The authorized production migration has completed all 14 pending files, advancing the ledger from
-61 to 75 versions, removing the `bb_*` responsibility schemas, and moving staff metadata to
-`app_role`. Production currently serves the previously deployed web/API SHA
-`e0a6faf07393f79aeab0629b6b9ac2952d421d6a`; the follow-up static-nonce hydration fixes are not
-deployed. The web maintenance wall remains active pending production deployment, browser login
-verification and the reopening decision. The
-freeze cutoff is `2026-09-19T04:43:09.299Z`; the matched recovery completed at
+The coordinated non-iOS release is live. The signed Dunbar correction is active, Preview database
+credentials are removed, and the web and separately deployed API read production Postgres. The
+authorized migration completed all 14 pending files, advanced the ledger from 61 to 75 versions,
+removed the `bb_*` responsibility schemas, and moved staff metadata to `app_role`. Production web
+deployment `dpl_4U8WcqP5bGJpgp71dfz1YhH4VwMQ` built staging SHA
+`6f96a2b7d7362a22a19c9300502518e2fa325095`, including the nonce hydration and headline clipping
+fixes. It became READY before Cloudflare was purged and maintenance was removed. The anonymous
+reopened canary completed at `2026-09-19T15:08:59.850Z`; real browser checks then verified the
+public theme control, final headline and authenticated production admin surface without runtime
+errors. The freeze cutoff is `2026-09-19T04:43:09.299Z`; matched recovery completed at
 `2026-09-19T05:07:26.655Z` in 1,457.356 seconds, meeting RPO 0 and RTO 14,400 seconds. Native iOS
-Release verification is deferred by the operator. A passing build or preview does not prove
-reviewed graph coverage or research quality.
+Release verification remains deferred by the operator. A passing release does not establish
+representative graph coverage, research quality or preservation completeness.
 
 ## Decisions challenged
 
@@ -201,10 +201,10 @@ PostgREST configured for `public,published,submissions`. It found one admin `app
 424,903 rows, 14 new capture origins, five other new tables, and passed anonymous and privileged
 function denial checks. The API and public canaries passed: four API claims/citations checks and
 HTTP 200 responses for `/`, `/records`, `/explore`, the place surface and the login route. Anonymous
-admin checks returned 401/307 and fresh Auth release checks returned 200. The deployed
-`/admin/login` browser UI remains pending because it still renders “Loading sign-in”. Local work
-then fixed the static-nonce hydration path and passed the local theme/browser checks, but production
-deployment and credential-flow validation remain open.
+admin checks returned 401/307 and fresh Auth release checks returned 200. The deployed static-nonce
+fix now supplies one request-bound nonce to every framework script. Production `/admin/login`
+rendered the credential form, a real staff login reached `/admin` with the `ADMIN` role and
+production Supabase/Postgres runtime, and the session remained valid after maintenance was removed.
 
 Preservation coverage is materially incomplete. The production snapshot has 12,180 cited claims
 across 7,566 distinct entity URLs; packets contribute 202 references
@@ -366,11 +366,11 @@ connection, workflow dispatch or new schedule was made. Unrelated provider resou
 
 ## Verification
 
-### Final local web-fix checks
+### Final web-fix and production checks
 
 The synchronous root layout declares `force-dynamic` so Next renders scripts with the request's
 nonce. The proxy forwards identical request/response CSP values, and `adminAuthGate` preserves
-request overrides. The local production build's `/about` theme control changed dark to light.
+request overrides. The local and deployed `/about` theme controls changed between dark and light.
 The headline passed all five held words on desktop and 390px mobile, with both themes inspected
 and no horizontal document overflow. Fractional measurements include the padded border box;
 the original failure had a 103px extent inside a 99px clip.
@@ -390,10 +390,25 @@ Check: Temporary recovery service cleanup
 Command: fnm exec --using=22 -- node --conditions development --import tsx .cache/private/matched-recovery-cleanup.mts --remove-database
 Result: pass
 Observed: `matched-recovery-cleanup-pass`; recovery containers and proxy were removed while dumps, bundles and proofs were retained.
+
+Check: Reopened production client and artifact canary
+Command: node .cache/research-reconciliation/verify-production-clients.mjs --reopened
+Result: pass
+Observed: six public routes returned 200; anonymous admin checks returned 401/307 and staff APIs returned 200; the missing record returned 404; the API returned the active release with four Dunbar claims and citations; both release artifacts matched their recorded byte counts and SHA-256 hashes; an operator request did not alter the following anonymous response.
+
+Check: Production browser surfaces
+Command: Chrome inspection of https://blackstory.app/, /about and /admin on deployment dpl_4U8WcqP5bGJpgp71dfz1YhH4VwMQ
+Result: pass
+Observed: the Black Story headline retained padded glyph clearance with no horizontal overflow; light and dark theme controls worked; the authenticated admin surface reported ADMIN, production and Supabase/Postgres; browser runtime logs were empty.
+
+Check: Direct-deployment protection
+Command: curl -sS -o /dev/null -D - https://blackstory-h83bb4o41-geraldmarons-projects.vercel.app/
+Result: pass
+Observed: the direct deployment returned 302 to the Vercel SSO endpoint with no-store and noindex headers; blackstory.app remained publicly available.
 ```
 
-These checks cover the local follow-up fixes. They do not prove production deployment or the
-production credential flow because the local build has no `NEXT_PUBLIC_SUPABASE_URL` or anon key.
+The local gates establish the checked tree; the production checks establish the deployed web,
+credential flow, public API and release artifacts. They do not cover native iOS execution.
 
 ```text
 Check: Final complete local CI mirror, Node 22
@@ -537,10 +552,10 @@ Opened during this work; technical references inform decisions without proving c
 - Project inspected: schema, evidence, auth, projections and durable execution are scoped in “Reconciled implementation”.
 - Reuse checked: existing kernel, source clients, capture sink, pgvector and job registry extended; repository, sibling utilities and installed tooling were searched before additions.
 - Validation path run: exact commands and observed exceptions are recorded above; final-tree checks and their limits are recorded in “Verification”.
-- Outcome observed: restored record and staff reads proven locally; unsupported relationship removal and a sourced positive two-hop chain proven in Chrome; one rights-reviewed NARA Archive capture and exact replay proven externally.
-- Surface inspected: both admin and graph themes, restored records, citations and staff redirect observed in Chrome.
+- Outcome observed: restored-data and production reads passed; the public web and staff admin were exercised after reopening; unsupported relationship removal and a sourced positive two-hop chain were proven in Chrome; one rights-reviewed NARA Archive capture and exact replay were proven externally.
+- Surface inspected: production home, About, admin, records, Explore, a cited record, missing-record behavior, both themes, API responses and signed release artifacts were observed.
 - Diff reviewed: targeted independent review and migration equivalence completed; full raw-line review is not claimed.
 - Recovery verification: exact private commands and scope appear above; `fnm exec --using=22 -- ./scripts/ci-local.sh --base HEAD` passed the governance lane for the documentation-only update. Code lanes were correctly gated off.
 - Root-cause debugging: the row-hash comparison failed with local `extra_float_digits=1` and passed with the observed source setting `0`; no row data was changed to make hashes match.
-- Residual risk: production deployment of the follow-up hydration fixes, the `/admin/login` browser credential flow, reopening the web maintenance wall, the unreleased staging-to-main PR, preservation of the remaining 7,912 inventory URLs, the unresolved no-job-id local reservation and representative-scale quality evidence remain explicit.
-- Commit-and-PR: PR254 merged at `2026-09-19T05:23:38Z` as SHA `e0a6faf07393f79aeab0629b6b9ac2952d421d6a`; remote CI checks 35423567775 and 35423567804 passed. Production client canaries passed on API `dpl_693wvmnFYhFzVNgnWWo1AAg6Q6or` and web `dpl_6RrpCJX853CKcUR7VfP9ctHV4JjU`; browser admin login remains unproven.
+- Residual risk: native iOS execution is deferred; preservation of the remaining 7,912 inventory URLs, the unresolved no-job-id local reservation and representative-scale quality evidence remain explicit.
+- Commit-and-PR: PR254 merged at `2026-09-19T05:23:38Z` as SHA `e0a6faf07393f79aeab0629b6b9ac2952d421d6a`; remote CI checks 35423567775 and 35423567804 passed. The final web fixes are on staging SHA `6f96a2b7d7362a22a19c9300502518e2fa325095`; API `dpl_693wvmnFYhFzVNgnWWo1AAg6Q6or` and web `dpl_4U8WcqP5bGJpgp71dfz1YhH4VwMQ` passed their production canaries.

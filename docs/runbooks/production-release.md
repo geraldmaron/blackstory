@@ -7,57 +7,79 @@ into `staging` is separate from the deliberate `staging` to `main` release PR.
 
 ## Current release boundary
 
-The coordinated release remains under maintenance. Production has the signed Dunbar replacement
-release and the authorized database migration is complete: all 14 pending files advanced the
-ledger from 61 to 75 versions, the ten `bb_*` responsibility schemas were replaced by the current
-namespaces, and staff metadata moved to `app_role`. The previously tested web/API clients are
-deployed from SHA `e0a6faf07393f79aeab0629b6b9ac2952d421d6a`; follow-up static-nonce hydration
-fixes are not deployed. The API deployment
-`dpl_693wvmnFYhFzVNgnWWo1AAg6Q6or` is READY against production Postgres; the web deployment
-`dpl_6RrpCJX853CKcUR7VfP9ctHV4JjU` is READY with maintenance still ON. The matched recovery
-proved RPO 0 and RTO 14,400 seconds.
+The coordinated non-iOS release is live. Production has the signed Dunbar replacement release,
+all 75 database migrations, the ten current responsibility schemas, and `app_role` staff metadata.
+No `bb_*` responsibility schema or `bb_role` remains. API deployment
+`dpl_693wvmnFYhFzVNgnWWo1AAg6Q6or` and web deployment
+`dpl_4U8WcqP5bGJpgp71dfz1YhH4VwMQ` are READY against production Postgres. The web build uses
+staging SHA `6f96a2b7d7362a22a19c9300502518e2fa325095`. Maintenance is off, Cloudflare was purged, and
+the anonymous reopened canary completed at `2026-09-19T15:08:59.850Z`.
 
-The frozen cutoff is `2026-09-19T04:43:09.299Z`, with recovery completed at
-`2026-09-19T05:07:26.655Z` in 1,457.356 seconds. Web maintenance remains active; Preview database
-credentials are removed; direct deployment URLs require SSO. Both Vercel cron
-lists are empty and the four scheduled GitHub workflows are disabled. The final transaction check
-found no active or idle-in-transaction client and no prepared transaction. Live execution details
-and private recovery locations are retained in the owner-only cutover record. The
-[framework audit](../research/framework-audit.md) records the sanitized evidence.
+The frozen cutoff was `2026-09-19T04:43:09.299Z`; matched recovery completed at
+`2026-09-19T05:07:26.655Z` in 1,457.356 seconds with RPO 0 against the approved 14,400-second RTO.
+Preview database credentials are removed, direct deployment URLs require Vercel SSO, Vercel cron
+lists are empty, and the four historical scheduled GitHub workflows remain disabled. The final
+transaction check found no active or idle-in-transaction client and no prepared transaction.
+Owner-only records retain recovery locations and execution details; the
+[framework audit](../research/framework-audit.md) contains the sanitized evidence.
 
-Two isolated database paths have been exercised with the final migration files:
+The reopened canary returned 200 for `/`, `/records`, `/explore`, the Dunbar place, `/about` and
+`/admin/login`; anonymous admin checks returned 401/307, staff APIs returned 200, and a missing
+record returned 404. The API reported the active release with four Dunbar claims and citations.
+Both release artifacts matched their recorded byte counts and SHA-256 hashes. Browser checks
+verified the final headline, light/dark controls, a real staff session with `ADMIN` and production
+Supabase/Postgres, and empty runtime logs. Native iOS Release execution remains deferred.
 
-- A clean Supabase-managed database accepted all 75 migration files in one uninterrupted replay.
-- A restored production application dump matched 133 source tables, 412,140 rows and all stored
-  table hashes before upgrade. `supabase db push --include-all` advanced its 61-row ledger to 75
-  rows. All original table counts remained unchanged and all 132 comparable common-column hashes
-  matched. The only shape that could not be compared column-for-column was the empty
-  `model_invocations` table. Six tables were added and 14 source-linked capture origins were
-  backfilled; 55 captures without a source-item relationship were left uninferred.
+### Launch decision
 
-This is historical evidence for the checked-in clean and restored-data migration paths. The application dump
-did not contain Auth, Storage metadata, provider Auth settings or database roles, so it is not a
-complete recovery set. A later authorized private Auth/Storage snapshot was also restored:
-170 tables and 421,166 rows matched, including one staff Auth identity, 301 Storage metadata rows and
-61 migrations. Queried grants, RLS/policies and role memberships matched, and five access probes
-passed. A matching-version local Auth API also verified the restored staff identity/role, token
-issuance, authenticated user lookup and session revocation. See the [audit evidence](../research/framework-audit.md) for exact scope and commands.
-These component proofs did not establish a matched-cutoff Storage/application restore, approved
-recovery time, production credentials, PostgREST cache convergence or a production cutover. The
-later owner-only matched recovery and postcutover verifier closed those gates. The verifier found
-the `20260918154322` frontier, 10 current and zero old responsibility schemas, 11 expected
-generated columns, zero invalid constraints, PostgREST `public,published,submissions`, one admin
-`app_role` and zero `bb_role`, exact mapped counts/full-row hashes for 133 original tables and
-424,903 rows, 14 new capture origins, five other new tables, and passing anonymous and privileged
-function denials. The deployed client canary passed four API claims/citations checks and HTTP 200
-checks for `/`, `/records`, `/explore`, the place surface and the login route. Anonymous admin
-checks returned 401/307 and fresh Auth release checks returned 200. The fresh JWT carried
-`app_role=admin` with no `bb_role`; current-user lookup matched that role, and read-only SQL role
-probes denied missing and `bb_role`-only claims while admitting the `app_role` admin claim. The
-browser `/admin/login` UI still renders “Loading sign-in”. Local follow-up fixes pass theme and
-headline browser checks, but are not deployed; local credential-flow validation is unavailable
-without `NEXT_PUBLIC_SUPABASE_URL` and the anon key. Login UI verification and reopening remain
-pending.
+Tier assignment: research framework and schema cutover
+- Tier:            2
+- Blast radius:    all public web and API users, plus staff administration
+- Reversibility:   maintenance can be restored within minutes; application rollback requires the matched client/database set
+- Irreversible parts: migration history and the active signed release are retained as auditable history
+- Decider:         Gerald Dagher
+- Re-tier trigger: a terms, pricing, market or unrehearsed destructive data change
+
+Kill switch: research framework and schema cutover
+- What flips:      set production `MAINTENANCE_MODE=1` and redeploy; restore the matched database/Auth/Storage set if data rollback is required
+- Who can flip it: Gerald Dagher
+- Time to effect:  minutes for the web wall; the recorded restore completed in 1,457.356 seconds
+- Rehearsed:       yes, 2026-09-19
+- Data cleanup:    none for the web wall; matched recovery owns database/Auth/Storage rollback
+
+Go/no-go record: research framework and schema cutover
+- Tier:       2
+- Decider:    Gerald Dagher
+- Decision:   go with mitigations
+- Criteria:
+  - schema, roles, counts and hashes match the frozen baseline — green — observed via the postcutover verifier — red triggers maintenance and matched rollback
+  - public, staff and denial paths work on the exact production build — green — observed via the reopened canary and Chrome — red triggers maintenance and fix-forward or rollback
+  - signed release artifacts match — green — observed via byte counts and SHA-256 readback — red triggers release rollback
+  - native iOS Release works — deferred by the operator — observed via explicit waiver — red does not block this non-iOS release
+- Skipped workstreams: sales, marketing, pricing, billing and localization — decided by Gerald Dagher — no commercial or localized launch was in scope; legal/privacy — decided by Gerald Dagher — no terms or new personal-data handling changed
+- Kill switch:  rehearsed yes | time to effect minutes
+- Metric registered: the reopened production canary stays green with no release-attributed P0/P1 incident; baseline green at 2026-09-19T15:08:59.850Z; review 2026-09-26
+- Dissent: the strongest objection is a split schema/client contract or nonce regression that breaks all public or staff clients; the exact-build canary, matched recovery and maintenance switch control it
+- Conditions: keep native iOS deferred, keep schedules off, and do not represent the small research evaluation or one archived URL as complete coverage
+
+Pre-mortem: The likely severe failure is an apparently healthy cached home page hiding a broken
+dynamic or staff route after the schema rename. The release therefore purged Cloudflare, tested
+anonymous and authenticated routes separately, checked framework script nonces, and retained the
+rehearsed maintenance switch and matched recovery set.
+
+Readiness record
+- Tier assigned:      answered — see “Tier assignment: research framework and schema cutover” | tier: 2
+- Workstreams:        answered — see “Skipped workstreams: sales, marketing, pricing, billing and localization” | skipped: 6, decided by Gerald Dagher
+- Specialist cover:   answered — see “legal/privacy — decided by Gerald Dagher” | unreviewed: no separate legal/privacy specialist
+- Rollout mechanic:   answered — see “maintenance is off, Cloudflare was purged”
+- Kill switch:        answered — see “set production `MAINTENANCE_MODE=1` and redeploy” | rehearsed: yes
+- Criteria:           answered — see “schema, roles, counts and hashes match” | written before launch week: no, the cutover was already underway
+- Decider:            answered — see “Decider: Gerald Dagher” | Gerald Dagher
+- Metric registered:  answered — see “reopened production canary stays green” | baseline: green at 2026-09-19T15:08:59.850Z
+- Dissent:            answered — see “split schema/client contract or nonce regression”
+- Pre-mortem:         answered — see “cached home page hiding a broken dynamic or staff route”
+- Review scheduled:   answered — see “review 2026-09-26” | owner: Gerald Dagher
+- Implementation verification: answered — exact local commands and production observations are in the framework audit
 
 ## Release prerequisites
 
