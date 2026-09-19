@@ -610,6 +610,7 @@ a.ds-door-open__place:focus-visible {
 .ds-hero-headline-morph {
   --ds-hero-morph-ease: var(--ds-ease-cinematic);
   --ds-hero-roll-pad: 0.14em;
+  --ds-hero-glyph-bleed: 0.08em;
   display: inline-flex;
   align-items: baseline;
   flex-wrap: nowrap;
@@ -619,18 +620,20 @@ a.ds-door-open__place:focus-visible {
   position: relative;
   display: inline-flex;
   align-items: baseline;
-  /* No min-width: the slot width is what MorphingPrefix interpolates between the two words. A
-     max-content floor snapped it to the incoming word before that word had rolled in, which left
-     a gap ("Her    Story") mid-change. The clip hides the word while the slot catches up. */
+  /* MorphingPrefix animates this border-box width to move Story with the changing prefix. The
+     clipped padding preserves display-font ink outside the word's layout box; equal negative
+     margins keep that allowance out of the flex footprint. */
   overflow: clip;
   padding-block: var(--ds-hero-roll-pad);
+  padding-inline: var(--ds-hero-glyph-bleed);
   margin-block: calc(var(--ds-hero-roll-pad) * -1);
+  margin-inline: calc(var(--ds-hero-glyph-bleed) * -1);
 }
 
 .ds-hero-headline-morph__prefix-out {
   position: absolute;
   top: var(--ds-hero-roll-pad);
-  left: 0;
+  left: var(--ds-hero-glyph-bleed);
   white-space: nowrap;
   animation: ds-hero-prefix-out var(--ds-duration-slow) var(--ds-hero-morph-ease) both;
 }

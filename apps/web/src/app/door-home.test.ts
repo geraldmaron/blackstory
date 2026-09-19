@@ -200,6 +200,17 @@ test('immersive CSS uses document snap over a fixed full-bleed plate', () => {
   // Opening masthead is edge-anchored (ds-door-open), not a centered dialog card.
   assert.match(css, /\.ds-door-open\s*\{/);
   assert.match(css, /ds-door-journey__chapter--rest/);
+  // The measured morph slot stays clipped, but display-font ink may paint outside its fractional
+  // layout bounds. Cross-browser padding preserves that ink while its negative margin keeps the
+  // animated slot's footprint unchanged.
+  assert.match(
+    css,
+    /\.ds-hero-headline-morph__prefix\s*\{[^}]*overflow:\s*clip;[^}]*padding-inline:\s*var\(--ds-hero-glyph-bleed\);[^}]*margin-inline:\s*calc\(var\(--ds-hero-glyph-bleed\) \* -1\)/s,
+  );
+  assert.match(
+    css,
+    /\.ds-hero-headline-morph__prefix-out\s*\{[^}]*left:\s*var\(--ds-hero-glyph-bleed\)/s,
+  );
   assert.match(css, /\.ds-door-journey__card[\s\S]*max-height/);
   assert.match(css, /@media \(max-height: 52rem\)/);
   assert.match(css, /\.ds-door__field-chrome[\s\S]*top:\s*var\(--ds-space-4\)/);
@@ -227,7 +238,7 @@ test('immersive CSS uses document snap over a fixed full-bleed plate', () => {
     /@media \(max-width: 899px\)[\s\S]*\.ds-door-journey__chapter--center\s*\{\s*justify-items:\s*center/,
   );
   assert.match(css, /\.ds-door-journey__card[\s\S]*width:\s*min\(36rem/);
-  // The morph slot must not floor its width at max-content, or Story jumps mid-change.
+  // The morph slot stays shrinkable so its animated width directly positions Story.
   assert.doesNotMatch(css, /\.ds-hero-headline-morph__prefix\s*\{[^}]*min-width:\s*max-content/);
   // Opening masthead is edge-anchored low so the map reads as the stage.
   assert.match(css, /\.ds-door-journey__chapter--rest\s*\{[^}]*align-content:\s*end/);
