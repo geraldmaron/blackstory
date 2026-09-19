@@ -53,6 +53,7 @@ export async function submitSpnCapture(
         url: WAYBACK_SPN_SUBMIT_URL,
         method: 'POST',
         headers: {
+          accept: 'application/json',
           authorization,
           'content-type': 'application/x-www-form-urlencoded',
         },
@@ -120,6 +121,7 @@ export async function pollSpnStatus(
         client({
           url: waybackSpnStatusUrl(jobId),
           method: 'GET',
+          headers: { accept: 'application/json' },
           allowedContentTypes: SPN_ALLOWED_CONTENT_TYPES,
         }),
       { retries: 2, baseDelayMs: 250, isRetryable: defaultIsRetryable },

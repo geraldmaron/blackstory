@@ -48,6 +48,7 @@ test('submitSpnCapture sends an authenticated POST and returns the job id', asyn
   assert.equal(requests.length, 1);
   assert.equal(requests[0]?.url, WAYBACK_SPN_SUBMIT_URL);
   assert.equal(requests[0]?.method, 'POST');
+  assert.equal(requests[0]?.headers?.accept, 'application/json');
   assert.equal(requests[0]?.headers?.authorization, 'LOW test-access-key:test-secret-key');
   assert.match(requests[0]?.body ?? '', /url=https%3A%2F%2Fexample\.org%2Farticle/);
 });
@@ -80,6 +81,7 @@ test('pollSpnStatus polls through pending states and returns on success (injecta
   let callIndex = 0;
   const client = async (request: SafeHttpRequest): Promise<SafeHttpResponse> => {
     assert.equal(request.url, waybackSpnStatusUrl('spn2-job-abc123'));
+    assert.equal(request.headers?.accept, 'application/json');
     const response = jsonResponse(responses[callIndex]);
     callIndex += 1;
     return response;
