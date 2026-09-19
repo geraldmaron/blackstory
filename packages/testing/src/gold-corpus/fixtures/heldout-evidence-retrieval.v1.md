@@ -11,6 +11,7 @@ Tracked files:
 - `heldout-identity-edge-freeze.v1.json`: post-hoc byte and canonical-JSON integrity record. It does not claim preregistration.
 - `heldout-quality-measurement.v1.json`: compact measured HNSW, identity, edge, cost, and limitation record.
 - `../artifacts/evidence-retrieval-index-mechanics.json`: current raw controlled-run output, including cleanup receipts.
+- `../artifacts/evidence-retrieval-pilot-2026-09-18.json`: corrected scoped provider run with retrieval, entailment, identity, edge, cost, and cleanup evidence in one artifact.
 
 Frozen prediction hashes are recorded in two distinct forms:
 
@@ -41,6 +42,7 @@ node --conditions development --import tsx scripts/gold-corpus/evidence-retrieva
   --prior-reserved-cost-usd 0 \
   --prior-provider-calls 0 \
   --hnsw-padding-rows-per-partition 1000 \
+  --embedding-cache-out /tmp/evidence-retrieval-embeddings.json \
   --out /tmp/evidence-retrieval-pilot.json
 ```
 
@@ -52,6 +54,13 @@ external billing cap; the provider receipt is authoritative when available. The 
 persist a cross-process budget ledger. Reconfirm the dated provider price before a new paid run;
 the fixed model/price configuration is an evaluation constraint, not a production routing policy.
 Scores are measurements with `qualityAdmission: not_evaluated`, never assertion approval.
+
+`--embedding-cache-out` writes the provider vectors to a new local file with mode `0600`.
+The cache is bound to the requested and response models, vector dimensions, each input text hash,
+and the complete input-text hash set. It must remain private and must never be committed. A later
+run can use `--embedding-cache-in` instead of `--embedding-cache-out`; matching cached vectors are
+reordered to the current input order and the run records zero provider calls. A changed input,
+model, dimension, missing vector, duplicate text hash, or malformed vector fails closed.
 
 When no provider credential is available, `--embedding-provider deterministic-evaluation` with
 `--embedding-model mock-deterministic-embedding` runs the same SQL and plan checks without a
@@ -102,11 +111,23 @@ vectors from deterministic padding and restricts lexical/vector fusion to the in
 The cleanup receipt reports 1,107 passages and all associated temporary rows deleted, with zero
 remaining rows in all six checked tables.
 
+The corrected provider artifact used the same 6 held-out documents, 20 queries, and explicit
+source-item allowlist. It made one provider call for seven passage vectors and 20 query vectors.
+The provider reported a `$0.00004784` charge, and the cumulative receipt plus prior reservation
+was `$0.00260048`, within the `$0.01255264` run cap. Lexical recall at 5 was `0.45`; exact and
+approximate vector recall at 5 were both `1.0`, with identical source-document top-k results on
+all 20 queries. The forbidden-candidate query rate rose from `0.10` for lexical retrieval to
+`0.55` for vector retrieval. These are candidate-level false positives with
+`qualityAdmission: not_evaluated`; retrieval does not authorize a merge or assertion. Exact
+retrieval remains the default. The run-specific cleanup receipt reports zero remaining rows in
+all six checked tables.
+
 The independently labeled categorical slice measured 0 false merges across 4 distinct-identity
 cases and 0 unsupported assertions across 5 unsupported-edge cases. It missed 1 of 9 supported
 edges. The 12 identity pairs and 14 edge cases are a small purposive set. Repeated alias pairs
-overlap and are not independent historical observations. Labels are independent-agent-authored
-and provisional, not human-adjudicated.
+overlap and are not independent historical observations. The independent-agent-authored labels
+are acceptable categorical engineering evidence for this finite acceptance check. They remain
+provisional and do not support a population-quality or probability-calibration claim.
 
 The blind file's `sourceExcerpts.excerpt` values are shortened or paraphrased summaries with local
 paragraph selectors. They are not source-native exact quote selectors or preserved page bytes.
@@ -115,7 +136,7 @@ and no probability claim is supported by this measurement.
 
 ## Provenance and review notes
 
-This is a small pilot corpus, not a human-adjudicated benchmark and not a broad performance claim. The blind file contains six source records, 20 retrieval prompts, and 14 entailment prompts. It intentionally omits relevance labels, forbidden-document labels, expected entailment labels, source URLs for entailment prompts, and rationales. Those curated expectations are recorded below so an evaluator can freeze predictions before opening this file. The frozen blind protocol refers to the original working title `heldout-source-notes.md`; its maintained counterpart is this file and the adjacent gold JSON. Frozen input bytes are retained to preserve pilot hashes.
+This is a small pilot corpus and not a broad performance claim. The blind file contains six source records, 20 retrieval prompts, and 14 entailment prompts. It intentionally omits relevance labels, forbidden-document labels, expected entailment labels, source URLs for entailment prompts, and rationales. Those curated expectations are recorded below so an evaluator can freeze predictions before opening this file. The frozen blind protocol refers to the original working title `heldout-source-notes.md`; its maintained counterpart is this file and the adjacent gold JSON. Frozen input bytes are retained to preserve pilot hashes.
 
 All six pages were read on 2026-09-18. Retrieval time recorded in the blind file is 2026-09-18T15:21:59Z. Four pages are official National Park Service biographical pages. Two portability pages are official U.S. EPA wetlands pages. The text fields are selected passages transcribed from the rendered pages; [P#] markers are local passage labels, not source-native anchors. The original URL is preserved for each document.
 
@@ -183,4 +204,4 @@ The expected labels are claim-relative. insufficient means the quoted evidence i
 - The Nick/Will family material is deliberately a two-hop chain. The source supports Nick to Hannah and Hannah to Will, but no direct son-in-law edge is staged.
 - r09 and r10 are synthetic query OCR perturbations. They are not observations that either source page has OCR defects.
 - The EPA pages are a small second-domain portability slice, not evidence that the full research profile generalizes to environmental history.
-- The categorical measurements use independent-agent-authored provisional labels, not human adjudication, calibrated probabilities, or a population-quality sample.
+- The categorical measurements use independent-agent-authored provisional labels. They support the bounded engineering check, not calibrated probabilities or a population-quality estimate.

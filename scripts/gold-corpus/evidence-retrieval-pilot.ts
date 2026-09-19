@@ -96,6 +96,18 @@ type EntailmentPredictions = {
   readonly predictions: readonly { readonly id: string; readonly label: EntailmentLabel }[];
 };
 
+type EmbeddingReplayCache = {
+  readonly schemaVersion: 'evidence-retrieval-embedding-cache.v2';
+  readonly inputSetSha256: string;
+  readonly requestedModel: string;
+  readonly responseModel: string;
+  readonly dimensions: number;
+  readonly entries: readonly {
+    readonly textSha256: string;
+    readonly vector: readonly number[];
+  }[];
+};
+
 type IndexedPassage = {
   readonly id: string;
   readonly source_item_id: string;
@@ -125,6 +137,23 @@ type SemanticExplainPlan = {
 
 function hash(value: string): string {
   return createHash('sha256').update(value, 'utf8').digest('hex');
+}
+
+const SQL_VECTOR_LITERAL = /'\[[0-9eE+.,\-\s]+\]'::(?:extensions\.)?vector/gu;
+
+/** EXPLAIN embeds parameter values in plan strings; public artifacts retain the plan, not vectors. */
+function redactPlanVectorLiterals(value: unknown): unknown {
+  if (typeof value === 'string') {
+    return value.replace(SQL_VECTOR_LITERAL, "'<redacted-vector>'::vector");
+  }
+  if (Array.isArray(value)) return value.map(redactPlanVectorLiterals);
+  if (!value || typeof value !== 'object') return value;
+  return Object.fromEntries(
+    Object.entries(value as Record<string, unknown>).map(([key, child]) => [
+      key,
+      redactPlanVectorLiterals(child),
+    ]),
+  );
 }
 
 function planDetails(plan: unknown): {
@@ -216,6 +245,43 @@ function requiredOption(args: readonly string[], name: string): string {
 
 function readJson<T>(path: string): T {
   return JSON.parse(readFileSync(path, 'utf8')) as T;
+}
+
+function readEmbeddingReplayCache(
+  path: string,
+  inputs: readonly string[],
+): { readonly cache: EmbeddingReplayCache; readonly vectors: readonly (readonly number[])[] } {
+  const cache = readJson<EmbeddingReplayCache>(path);
+  const inputHashes = inputs.map(hash);
+  if (new Set(inputHashes).size !== inputHashes.length)
+    throw new Error('Embedding replay cache requires distinct frozen input text');
+  const inputSetSha256 = hash(JSON.stringify([...inputHashes].sort()));
+  if (
+    cache.schemaVersion !== 'evidence-retrieval-embedding-cache.v2' ||
+    cache.inputSetSha256 !== inputSetSha256 ||
+    cache.requestedModel !== MODEL ||
+    cache.responseModel !== 'text-embedding-3-small' ||
+    cache.dimensions !== DIMENSIONS ||
+    !Array.isArray(cache.entries) ||
+    cache.entries.length !== inputs.length ||
+    cache.entries.some(
+      ({ textSha256, vector }) =>
+        !/^[a-f0-9]{64}$/u.test(textSha256) ||
+        !Array.isArray(vector) ||
+        vector.length !== DIMENSIONS ||
+        vector.some((value) => !Number.isFinite(value)) ||
+        !vector.some((value) => value !== 0),
+    )
+  ) {
+    throw new Error('Embedding replay cache does not match the frozen inputs and model contract');
+  }
+  const vectorsByTextHash = new Map(cache.entries.map((entry) => [entry.textSha256, entry.vector]));
+  if (vectorsByTextHash.size !== cache.entries.length)
+    throw new Error('Embedding replay cache requires distinct text hashes');
+  const vectors = inputHashes.map((textSha256) => vectorsByTextHash.get(textSha256));
+  if (vectors.some((vector) => !vector))
+    throw new Error('Embedding replay cache does not cover every frozen input');
+  return { cache, vectors: vectors as readonly (readonly number[])[] };
 }
 
 function readGold(path: string): GoldCorpus {
@@ -642,8 +708,14 @@ async function main(): Promise<void> {
   const qualityPredictionsPath = option(args, '--quality-predictions');
   const qualityGoldPath = option(args, '--quality-gold');
   const qualityFreezeManifestPath = option(args, '--quality-freeze-manifest');
+  const embeddingCacheInPath = option(args, '--embedding-cache-in');
+  const embeddingCacheOutPath = option(args, '--embedding-cache-out');
   const outPath = option(args, '--out');
   if (outPath && existsSync(outPath)) throw new Error('The evaluation output path already exists');
+  if (embeddingCacheOutPath && existsSync(embeddingCacheOutPath))
+    throw new Error('The embedding cache output path already exists');
+  if (embeddingCacheInPath && embeddingCacheOutPath)
+    throw new Error('Use either --embedding-cache-in or --embedding-cache-out, not both');
   const embeddingProvider = requiredOption(args, '--embedding-provider');
   const embeddingModel = requiredOption(args, '--embedding-model');
   const maxCostUsd = Number(requiredOption(args, '--max-cost-usd'));
@@ -670,6 +742,8 @@ async function main(): Promise<void> {
     throw new Error('Prior embedding reservation already exceeds the total cost cap');
   if (![PROVIDER, LOCAL_PROVIDER].includes(embeddingProvider))
     throw new Error(`--embedding-provider must be ${PROVIDER} or ${LOCAL_PROVIDER}`);
+  if ((embeddingCacheInPath || embeddingCacheOutPath) && embeddingProvider !== PROVIDER)
+    throw new Error('Embedding cache input and output are available only with OpenRouter');
   if (
     (embeddingProvider === PROVIDER && embeddingModel !== MODEL) ||
     (embeddingProvider === LOCAL_PROVIDER && embeddingModel !== LOCAL_MODEL)
@@ -834,13 +908,15 @@ async function main(): Promise<void> {
     }
     const queryTexts = blind.retrievalCases.map((query) => query.query);
     const inputs = [...passages.map((passage) => passage.body), ...queryTexts];
+    const embeddingInputSetSha256 = hash(JSON.stringify(inputs.map(hash).sort()));
     // The UTF-8 byte count supplies a conservative pre-call expected-rate estimate at the listed
     // text-token price. It does not cap or predict the provider's authoritative receipt.
     const inputUtf8Bytes = inputs.reduce(
       (total, input) => total + Buffer.byteLength(input, 'utf8'),
       0,
     );
-    const expectedRateEstimateTokens = embeddingProvider === PROVIDER ? inputUtf8Bytes : 0;
+    const expectedRateEstimateTokens =
+      embeddingProvider === PROVIDER && !embeddingCacheInPath ? inputUtf8Bytes : 0;
     const currentRunExpectedRateEstimateUsd =
       embeddingProvider === PROVIDER
         ? (expectedRateEstimateTokens / 1_000_000) * PRICE_USD_PER_MILLION_TEXT_TOKENS
@@ -853,8 +929,12 @@ async function main(): Promise<void> {
       );
 
     const providerUsage: { value: OpenRouterEmbeddingUsage | null } = { value: null };
-    const provider =
-      embeddingProvider === PROVIDER
+    const replayCache = embeddingCacheInPath
+      ? readEmbeddingReplayCache(embeddingCacheInPath, inputs)
+      : null;
+    const provider = replayCache
+      ? null
+      : embeddingProvider === PROVIDER
         ? createOpenRouterEvaluationEmbeddingProvider({
             apiKey:
               process.env.OPENROUTER_API_KEY?.trim() ||
@@ -868,7 +948,27 @@ async function main(): Promise<void> {
             },
           })
         : createDeterministicMockEvalProvider(DIMENSIONS);
-    const vectors = await provider.embed(inputs);
+    const vectors = replayCache ? replayCache.vectors : await provider!.embed(inputs);
+    if (embeddingCacheOutPath) {
+      if (embeddingProvider !== PROVIDER || !providerUsage.value)
+        throw new Error('Embedding cache output requires a completed OpenRouter response');
+      const cache: EmbeddingReplayCache = {
+        schemaVersion: 'evidence-retrieval-embedding-cache.v2',
+        inputSetSha256: embeddingInputSetSha256,
+        requestedModel: MODEL,
+        responseModel: providerUsage.value.responseModel,
+        dimensions: DIMENSIONS,
+        entries: inputs.map((input, index) => ({
+          textSha256: hash(input),
+          vector: vectors[index]!,
+        })),
+      };
+      writeFileSync(embeddingCacheOutPath, `${JSON.stringify(cache)}\n`, {
+        encoding: 'utf8',
+        flag: 'wx',
+        mode: 0o600,
+      });
+    }
     const providerReportedCostUsd = providerUsage.value?.costUsd ?? null;
     const budgetGate = evaluateEvidencePilotReceiptBudget({
       priorReservedCostUsd,
@@ -921,11 +1021,14 @@ async function main(): Promise<void> {
       provider: embeddingProvider,
       requestedModel: embeddingModel,
       responseModel:
-        embeddingProvider === PROVIDER ? (providerUsage.value?.responseModel ?? null) : LOCAL_MODEL,
+        embeddingProvider === PROVIDER
+          ? (replayCache?.cache.responseModel ?? providerUsage.value?.responseModel ?? null)
+          : LOCAL_MODEL,
       dimensions: DIMENSIONS,
-      providerCalls: embeddingProvider === PROVIDER ? 1 : 0,
+      providerCalls: embeddingProvider === PROVIDER && !replayCache ? 1 : 0,
       priorProviderCalls,
-      totalProviderCalls: priorProviderCalls + (embeddingProvider === PROVIDER ? 1 : 0),
+      totalProviderCalls:
+        priorProviderCalls + (embeddingProvider === PROVIDER && !replayCache ? 1 : 0),
       embeddedPassageCount: passages.length,
       embeddedQueryCount: queryTexts.length,
       inputUtf8Bytes,
@@ -939,9 +1042,15 @@ async function main(): Promise<void> {
       providerReportedPromptTokens: providerUsage.value?.promptTokens ?? null,
       providerReportedTotalTokens: providerUsage.value?.totalTokens ?? null,
       providerReportedCostUsd,
+      embeddingReplay: replayCache
+        ? { status: 'replayed', inputSetSha256: embeddingInputSetSha256 }
+        : embeddingCacheOutPath
+          ? { status: 'cached_private_local', inputSetSha256: embeddingInputSetSha256 }
+          : { status: 'not_retained', inputSetSha256: embeddingInputSetSha256 },
       budgetGate,
-      accountingLimitation:
-        embeddingProvider === LOCAL_PROVIDER
+      accountingLimitation: replayCache
+        ? 'Private replay cache matched the frozen input hash and model contract; no provider call or new charge occurred.'
+        : embeddingProvider === LOCAL_PROVIDER
           ? 'Local deterministic evaluation provider made no network call and incurred no provider charge.'
           : providerUsage.value?.costUsd === null
             ? 'OpenRouter did not return usage.cost; actual provider charge is unknown.'
@@ -1087,7 +1196,7 @@ async function main(): Promise<void> {
   }
 
   if (!output) throw new Error('Retrieval pilot produced no evaluation artifact');
-  const serialized = `${JSON.stringify(output, null, 2)}\n`;
+  const serialized = `${JSON.stringify(redactPlanVectorLiterals(output), null, 2)}\n`;
   if (outPath) writeFileSync(outPath, serialized, { encoding: 'utf8', flag: 'wx' });
   else process.stdout.write(serialized);
   if (budgetGateFailed) {
