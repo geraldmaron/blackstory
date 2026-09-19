@@ -27,6 +27,9 @@ test('enrichment attaches archiveUrl on found and leaves misses alone', async ()
     ],
     lookup,
   );
-  assert.ok(found?.archiveUrl?.includes('web.archive.org'));
+  assert.equal(
+    found?.archiveUrl,
+    'https://web.archive.org/web/20200101000000/https://example.com/found',
+  );
   assert.equal(miss?.archiveUrl, undefined);
 });

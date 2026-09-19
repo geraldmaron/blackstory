@@ -12,6 +12,7 @@ import { dirname, join } from 'node:path';
 import { test } from 'node:test';
 import { fileURLToPath } from 'node:url';
 import { FAQ_ENTRIES, FAQ_LEDE, FAQ_SECTIONS } from './faq-copy';
+import { MAKER } from '@repo/config';
 import { destinationFor } from '../../lib/nav/destination-registry';
 import { surfaceClassFor } from '../../lib/nav/surface-classes';
 
@@ -113,7 +114,7 @@ test('who makes this points at the stance and the personal site, and does not hi
   assert.ok(entry);
   assert.match(entry.answer.join(' '), /product manager/);
   assert.ok(entry.links?.some((link) => link.href === '/about#stance'));
-  assert.ok(entry.links?.some((link) => /geralddagher\.com/.test(link.href)));
+  assert.ok(entry.links?.some((link) => link.href === MAKER.url));
 });
 
 test('no answer speaks as an institutional "we"', () => {

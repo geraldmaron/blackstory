@@ -152,7 +152,7 @@ test('the stance names how the archive is meant, and does not hide who assembled
   assert.doesNotMatch(stance, /anti-Black/);
   assert.match(stance, /opinion/);
   assert.match(stance, /product manager/);
-  assert.match(stance, /geralddagher\.com/);
+  assert.equal(ABOUT_STANCE.maker.label, 'geralddagher.com');
 });
 
 test('nothing on this page speaks as an institutional "we"', () => {

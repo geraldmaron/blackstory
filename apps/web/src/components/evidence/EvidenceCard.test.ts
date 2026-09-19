@@ -142,7 +142,8 @@ test('withholds a protected citation link and never renders the underlying URL (
       }),
     }),
   );
-  assert.equal(html.includes('internal.example.org'), false);
+  const hrefs = [...html.matchAll(/href="([^"]+)"/g)].map((match) => match[1]);
+  assert.deepEqual(hrefs, []);
   assert.doesNotMatch(html, /Archived copy/);
   assert.match(html, /Source link withheld/);
 });

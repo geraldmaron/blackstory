@@ -27,5 +27,5 @@ test('citationHref prefers the archive pointer when present', () => {
     archiveUrl: 'https://web.archive.org/web/20200101000000/https://example.com/a',
   });
   assert.equal(archived.archived, true);
-  assert.match(archived.href, /web\.archive\.org/);
+  assert.equal(archived.href, 'https://web.archive.org/web/20200101000000/https://example.com/a');
 });

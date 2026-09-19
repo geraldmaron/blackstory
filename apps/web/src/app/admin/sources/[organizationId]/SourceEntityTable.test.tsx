@@ -25,9 +25,13 @@ const rows: readonly SourceEntityListItem[] = [
 
 test('renders each entity as a link to its public record with claim count and sample citation', () => {
   const markup = renderToStaticMarkup(<SourceEntityTable rows={rows} />);
-  assert.match(markup, /href="\/entity\/ent_place_dunbar"/);
+  const hrefs = [...markup.matchAll(/href="([^"]+)"/g)].map((match) => match[1]);
+  assert.deepEqual(hrefs, [
+    '/entity/ent_place_dunbar',
+    'https://npgallery.nps.gov/GetAsset/abc123',
+    '/entity/ent_person_no_sample',
+  ]);
   assert.match(markup, /Dunbar High School/);
-  assert.match(markup, /npgallery\.nps\.gov\/GetAsset\/abc123/);
   // No sample citation: the dash, not a broken link.
   assert.match(markup, /A Record With No Sample Citation/);
 });
