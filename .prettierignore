@@ -17,6 +17,7 @@ docs/bb-001
 .beads/backup
 .beads/export-state.json
 .beads/**/*.darc
+supabase/.temp
 
 # Published GitHub Pages output, committed on purpose. These are exactly the paths
 # scripts/publish-docs-pages.sh rm -rf's and re-copies from apps/docs/out on every publish;

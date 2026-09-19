@@ -10,6 +10,7 @@ import {
   mkdtempSync,
   readFileSync,
   rmSync,
+  symlinkSync,
   writeFileSync,
 } from 'node:fs';
 import { createHash } from 'node:crypto';
@@ -30,18 +31,22 @@ const repoRoot = join(fileURLToPath(new URL('.', import.meta.url)), '..', '..', 
 const fixtureDir = join(repoRoot, 'packages', 'testing', 'src', 'launch-gate', 'fixtures');
 const scriptPath = join(repoRoot, 'scripts', 'launch', 'evaluate-beta-gate.mjs');
 
+function copyEvidenceFixtures(destination: string, excludedRefs = new Set<string>()): void {
+  for (const ref of new Set([
+    ...BETA_LAUNCH_GATES.flatMap((gate) => gate.evidence.map((item) => item.ref)),
+    'packages/config/src/kill-switches.ts',
+  ])) {
+    if (!excludedRefs.has(ref) && existsSync(join(repoRoot, ref))) {
+      mkdirSync(dirname(join(destination, ref)), { recursive: true });
+      cpSync(join(repoRoot, ref), join(destination, ref), { recursive: true });
+    }
+  }
+}
+
 // Unit fixtures live outside the repository and never attest its operational readiness.
 const fixtureRoot = mkdtempSync(join(tmpdir(), 'launch-evidence-'));
 after(() => rmSync(fixtureRoot, { recursive: true, force: true }));
-for (const ref of new Set([
-  ...BETA_LAUNCH_GATES.flatMap((gate) => gate.evidence.map((item) => item.ref)),
-  'packages/config/src/kill-switches.ts',
-])) {
-  if (existsSync(join(repoRoot, ref))) {
-    mkdirSync(dirname(join(fixtureRoot, ref)), { recursive: true });
-    cpSync(join(repoRoot, ref), join(fixtureRoot, ref), { recursive: true });
-  }
-}
+copyEvidenceFixtures(fixtureRoot);
 const log = 'Controlled recovery verification fixture. Not an executed restore.';
 const recoveryReport = {
   schemaVersion: 1,
@@ -161,21 +166,38 @@ test('exitCodeForDecision returns non-zero on NO_GO', () => {
   assert.equal(exitCodeForDecision('NO_GO'), 1);
 });
 
-test('CLI cannot claim readiness from a human fixture without recovery evidence', () => {
+test('CLI cannot claim readiness from a human fixture without recovery evidence', (t) => {
+  const isolatedRoot = mkdtempSync(join(tmpdir(), 'beta-gate-repo-'));
   const outputDir = mkdtempSync(join(tmpdir(), 'beta-gate-'));
+  t.after(() => {
+    rmSync(isolatedRoot, { recursive: true, force: true });
+    rmSync(outputDir, { recursive: true, force: true });
+  });
   const outputPath = join(outputDir, 'decision.json');
 
-  // CLI tests always write outside the repository and use its actual readiness state.
+  copyEvidenceFixtures(isolatedRoot, new Set(['artifacts/recovery/latest.json']));
+  mkdirSync(join(isolatedRoot, 'scripts', 'launch'), { recursive: true });
+  cpSync(scriptPath, join(isolatedRoot, 'scripts', 'launch', 'evaluate-beta-gate.mjs'));
+  mkdirSync(join(isolatedRoot, 'packages', 'testing'), { recursive: true });
+  cpSync(
+    join(repoRoot, 'packages', 'testing', 'src'),
+    join(isolatedRoot, 'packages', 'testing', 'src'),
+    { recursive: true },
+  );
+  symlinkSync(join(repoRoot, 'node_modules'), join(isolatedRoot, 'node_modules'), 'dir');
+  const isolatedScriptPath = join(isolatedRoot, 'scripts', 'launch', 'evaluate-beta-gate.mjs');
+
+  // CLI tests write outside the repository and run against isolated evidence fixtures.
   const noAttest = spawnSync(
     process.execPath,
-    [scriptPath, '--evaluator', 'cli-test', '--output', join(outputDir, 'no-attest.json')],
-    { cwd: repoRoot, encoding: 'utf8' },
+    [isolatedScriptPath, '--evaluator', 'cli-test', '--output', join(outputDir, 'no-attest.json')],
+    { cwd: isolatedRoot, encoding: 'utf8' },
   );
   assert.notEqual(noAttest.status, 0, 'missing attestations must block launch');
   const allPass = spawnSync(
     process.execPath,
     [
-      scriptPath,
+      isolatedScriptPath,
       '--evaluator',
       'cli-test',
       '--attestations',
@@ -183,11 +205,19 @@ test('CLI cannot claim readiness from a human fixture without recovery evidence'
       '--output',
       outputPath,
     ],
-    { cwd: repoRoot, encoding: 'utf8' },
+    { cwd: isolatedRoot, encoding: 'utf8' },
   );
   assert.notEqual(allPass.status, 0, 'human attestations cannot replace missing recovery evidence');
-  const artifact = JSON.parse(readFileSync(outputPath, 'utf8')) as { decision: string };
+  const artifact = JSON.parse(readFileSync(outputPath, 'utf8')) as {
+    decision: string;
+    requiredFailed: number;
+    gates: Array<{ id: string; status: string; message: string }>;
+  };
   assert.equal(artifact.decision, 'NO_GO');
+  assert.equal(artifact.requiredFailed, 1);
+  const recoveryGate = artifact.gates.find((gate) => gate.id === 'restore-rehearsal-complete');
+  assert.equal(recoveryGate?.status, 'fail');
+  assert.equal(recoveryGate?.message, 'Evidence file missing: artifacts/recovery/latest.json');
 });
 
 test('recovery gate rejects simulations, target breaches, failed checks, and changed logs', () => {
