@@ -84,6 +84,16 @@ describe('bar search', () => {
     assert.match(source, /\bsignal,/);
   });
 
+  it('presents the same-origin request-integrity proof required by the search endpoint', () => {
+    const source = code('components/shell/CommandBarSearch.tsx');
+    assert.match(source, /getRequestIntegrityHeaders\(\)/);
+    assert.match(source, /credentials:\s*['"]same-origin['"]/);
+    assert.match(
+      source,
+      /headers:\s*\{\s*accept:\s*['"]application\/json['"],\s*\.\.\.integrityHeaders\s*\}/,
+    );
+  });
+
   it('owns the palette chord off Explore', () => {
     const source = read('components/shell/CommandBarSearch.tsx');
     // The same definition the palette's own opener reads. A second literal `⌘K` check here is
