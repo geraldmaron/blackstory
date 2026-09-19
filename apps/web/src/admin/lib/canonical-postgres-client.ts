@@ -1,12 +1,8 @@
 /**
- * Server-only lazy Postgres pool for the canonical, write-capable admin connection
- * (`canonical`/`ops`/`research`/etc., via the `role_admin_app` Postgres role).
- * Uses `ADMIN_DATABASE_URL` (or `ADMIN_APP_DATABASE_URL`) — deliberately a different name from
- * the public read-only pool's `DATABASE_URL`/`APP_DATABASE_URL` (`../../lib/public-data/postgres-client.ts`).
- * Admin used to run as its own Vercel project specifically so its write-capable credential never
- * lived in the process serving anonymous public traffic; now that `/admin` is a route inside this
- * same app, the credential split has to happen by env-var name instead of by process. Never
- * accepts `NEXT_PUBLIC_*` credentials.
+ * Server-only lazy Postgres pool for staff reads and writes to canonical, ops, research,
+ * and publication data. `ADMIN_DATABASE_URL` (or `ADMIN_APP_DATABASE_URL`) keeps this connection
+ * separate from the public pool's `DATABASE_URL`/`APP_DATABASE_URL`
+ * (`../../lib/public-data/postgres-client.ts`). Never accepts `NEXT_PUBLIC_*` credentials.
  *
  * Supabase URLs often include `sslmode=require`. Recent node-pg treats that as verify-full,
  * which fails on the platform CA chain unless we normalize to `uselibpqcompat=true` and

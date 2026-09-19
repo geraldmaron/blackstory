@@ -35,6 +35,12 @@ const BLACK_INK = '#0A0A0A';
 const openGraphImage = brandOpenGraph('dark');
 
 /**
+ * Nonce CSP requires request rendering so Next can copy the request's nonce onto framework
+ * scripts. Keep the layout component synchronous; data loaders retain their explicit caches.
+ */
+export const dynamic = 'force-dynamic';
+
+/**
  * Theme colors for browser chrome and installed home-screen shell.
  * Light/dark follow prefers-color-scheme; site theme toggle is separate.
  */

@@ -30,7 +30,7 @@ function signInRedirect(request: NextRequest): NextResponse {
 
 export async function adminAuthGate(request: NextRequest): Promise<NextResponse> {
   if (!isAuthGatedPath(request.nextUrl.pathname)) {
-    return NextResponse.next();
+    return NextResponse.next({ request });
   }
 
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL ?? process.env.SUPABASE_URL;

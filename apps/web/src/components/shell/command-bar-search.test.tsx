@@ -152,7 +152,7 @@ describe('the shell above the error boundary', () => {
 
   it('the shell mounts the plate provider without awaiting its base', () => {
     // `loadMapStageBase()` is the specific dependency SP-07 hoisted this provider away from.
-    // Awaiting it here would make every room force-dynamic and give the shell a way to fail.
+    // Awaiting it here would give the root shell a new failure path above every page boundary.
     assert.doesNotMatch(code('components/SiteShell.tsx'), /loadMapStageBase/);
   });
 });

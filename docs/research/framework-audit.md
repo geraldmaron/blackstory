@@ -13,10 +13,14 @@ profile; the same loop has acquired EPA wetland sources. Research cannot publish
 Firestore or Corsair runtime is required, and no research timer is enabled in the inspected accounts.
 
 The coordinated release remains under production maintenance. The signed Dunbar correction is
-active, Preview database credentials are removed, and the separately deployed API is in seed mode.
+active, Preview database credentials are removed, and the separately deployed API is live against
+the production Postgres surface.
 The authorized production migration has completed all 14 pending files, advancing the ledger from
 61 to 75 versions, removing the `bb_*` responsibility schemas, and moving staff metadata to
-`app_role`. Matching web/API clients have not yet been deployed, so traffic remains gated. The
+`app_role`. Production currently serves the previously deployed web/API SHA
+`e0a6faf07393f79aeab0629b6b9ac2952d421d6a`; the follow-up static-nonce hydration fixes are not
+deployed. The web maintenance wall remains active pending production deployment, browser login
+verification and the reopening decision. The
 freeze cutoff is `2026-09-19T04:43:09.299Z`; the matched recovery completed at
 `2026-09-19T05:07:26.655Z` in 1,457.356 seconds, meeting RPO 0 and RTO 14,400 seconds. Native iOS
 Release verification is deferred by the operator. A passing build or preview does not prove
@@ -195,7 +199,12 @@ schemas and no `bb_*` schemas, 11 expected generated columns, zero invalid const
 PostgREST configured for `public,published,submissions`. It found one admin `app_role`, no
 `bb_role`, exact mapped counts and full-row hashes for 133 original application tables and
 424,903 rows, 14 new capture origins, five other new tables, and passed anonymous and privileged
-function denial checks. Matching client deployment and public canary verification remain pending.
+function denial checks. The API and public canaries passed: four API claims/citations checks and
+HTTP 200 responses for `/`, `/records`, `/explore`, the place surface and the login route. Anonymous
+admin checks returned 401/307 and fresh Auth release checks returned 200. The deployed
+`/admin/login` browser UI remains pending because it still renders “Loading sign-in”. Local work
+then fixed the static-nonce hydration path and passed the local theme/browser checks, but production
+deployment and credential-flow validation remain open.
 
 Preservation coverage is materially incomplete. The production snapshot has 12,180 cited claims
 across 7,566 distinct entity URLs; packets contribute 202 references
@@ -357,6 +366,35 @@ connection, workflow dispatch or new schedule was made. Unrelated provider resou
 
 ## Verification
 
+### Final local web-fix checks
+
+The synchronous root layout declares `force-dynamic` so Next renders scripts with the request's
+nonce. The proxy forwards identical request/response CSP values, and `adminAuthGate` preserves
+request overrides. The local production build's `/about` theme control changed dark to light.
+The headline passed all five held words on desktop and 390px mobile, with both themes inspected
+and no horizontal document overflow. Fractional measurements include the padded border box;
+the original failure had a 103px extent inside a 99px clip.
+
+```text
+Check: Applicable final web release lanes
+Command: fnm exec --using=22 -- ./scripts/ci-local.sh --base origin/main --skip mobile
+Result: initial run failed only in validate, package and coverage lanes; the affected fixes were applied.
+Observed: all other selected lanes passed. Formatting scanned generated Supabase metadata; the launch-gate test incorrectly expected recovery evidence to be absent from the real repository. The corrections exclude generated state and isolate the missing-evidence fixture. Unchanged mobile checks retain the separately recorded verification below.
+
+Check: Corrected validation and test isolation
+Command: fnm exec --using=22 -- ./scripts/ci-local.sh --base origin/main --lane validate --lane unit-js-packages --lane coverage
+Result: pass
+Observed: all three rechecked lanes passed. Logs: `/tmp/blackstory-final-web-ci.log` and `/tmp/blackstory-final-web-recheck.log`.
+
+Check: Temporary recovery service cleanup
+Command: fnm exec --using=22 -- node --conditions development --import tsx .cache/private/matched-recovery-cleanup.mts --remove-database
+Result: pass
+Observed: `matched-recovery-cleanup-pass`; recovery containers and proxy were removed while dumps, bundles and proofs were retained.
+```
+
+These checks cover the local follow-up fixes. They do not prove production deployment or the
+production credential flow because the local build has no `NEXT_PUBLIC_SUPABASE_URL` or anon key.
+
 ```text
 Check: Final complete local CI mirror, Node 22
 Command: fnm exec --using=22 -- ./scripts/ci-local.sh --base origin/main
@@ -504,5 +542,5 @@ Opened during this work; technical references inform decisions without proving c
 - Diff reviewed: targeted independent review and migration equivalence completed; full raw-line review is not claimed.
 - Recovery verification: exact private commands and scope appear above; `fnm exec --using=22 -- ./scripts/ci-local.sh --base HEAD` passed the governance lane for the documentation-only update. Code lanes were correctly gated off.
 - Root-cause debugging: the row-hash comparison failed with local `extra_float_digits=1` and passed with the observed source setting `0`; no row data was changed to make hashes match.
-- Residual risk: matching web/API client deployment, public canary verification, preservation of the remaining 7,912 inventory URLs, the unresolved no-job-id local reservation and representative-scale quality evidence remain explicit.
-- Commit-and-PR: scoped signed commits on `codex/research-framework-reconciliation`, one authorized draft PR into staging, reviewed index and staged-file secret scan. No merge or production release follows from local checks. Ordinary remote checks are reported in the PR delivery record.
+- Residual risk: production deployment of the follow-up hydration fixes, the `/admin/login` browser credential flow, reopening the web maintenance wall, the unreleased staging-to-main PR, preservation of the remaining 7,912 inventory URLs, the unresolved no-job-id local reservation and representative-scale quality evidence remain explicit.
+- Commit-and-PR: PR254 merged at `2026-09-19T05:23:38Z` as SHA `e0a6faf07393f79aeab0629b6b9ac2952d421d6a`; remote CI checks 35423567775 and 35423567804 passed. Production client canaries passed on API `dpl_693wvmnFYhFzVNgnWWo1AAg6Q6or` and web `dpl_6RrpCJX853CKcUR7VfP9ctHV4JjU`; browser admin login remains unproven.

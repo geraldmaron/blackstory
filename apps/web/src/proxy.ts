@@ -11,7 +11,7 @@ import { handleMaintenance } from './lib/maintenance/maintenance-gate';
 import { denyExpensiveAiCrawler } from './lib/traffic-class/edge-deny';
 import { handleWebSecurity } from './lib/web-security/edge-security';
 import { CSP_NONCE_HEADER } from './lib/web-security/constants';
-import { applySecurityHeaders } from './lib/web-security/security-headers';
+import { buildGlobalSecurityHeaders } from './lib/web-security/security-headers';
 import { STAND_COOKIE, isPublicPlaceSlug } from './lib/place/public-place-path';
 
 /** Base64 per-request nonce for CSP `script-src 'nonce-<value>'`. Edge-runtime safe: both
@@ -49,7 +49,21 @@ export async function proxy(request: NextRequest): Promise<NextResponse> {
   // re-reads `request` for its own `NextResponse.next({ request })` — `adminAuthGate` already
   // does this for Supabase cookie refresh — picks the nonce up for free.
   const nonce = generateNonce();
+  const authUrl =
+    request.nextUrl.pathname === '/admin' || request.nextUrl.pathname.startsWith('/admin/')
+      ? process.env.NEXT_PUBLIC_SUPABASE_URL
+      : undefined;
+  const securityHeaders = buildGlobalSecurityHeaders({ nonce, ...(authUrl ? { authUrl } : {}) });
+  const contentSecurityPolicy = securityHeaders.find(
+    ({ key }) => key === 'Content-Security-Policy',
+  )?.value;
+  if (!contentSecurityPolicy) {
+    throw new Error('Global security headers must include Content-Security-Policy');
+  }
   request.headers.set(CSP_NONCE_HEADER, nonce);
+  // Next parses the request CSP before rendering and copies its nonce onto framework scripts.
+  // x-nonce remains available to Server Components that render manual scripts.
+  request.headers.set('Content-Security-Policy', contentSecurityPolicy);
 
   const response = await resolveProxyResponse(request);
   // Applied last and unconditionally so CSP (with this request's nonce) reaches every response
@@ -57,11 +71,9 @@ export async function proxy(request: NextRequest): Promise<NextResponse> {
   // branch already set (maintenance-gate.ts, edge-security.ts both call `applySecurityHeaders`
   // without a nonce) is overwritten here with the nonce-bearing value — `Headers.set` replaces,
   // it does not append.
-  const authUrl =
-    request.nextUrl.pathname === '/admin' || request.nextUrl.pathname.startsWith('/admin/')
-      ? process.env.NEXT_PUBLIC_SUPABASE_URL
-      : undefined;
-  applySecurityHeaders(response.headers, { nonce, ...(authUrl ? { authUrl } : {}) });
+  for (const { key, value } of securityHeaders) {
+    response.headers.set(key, value);
+  }
   return attachStandCookie(request, response);
 }
 

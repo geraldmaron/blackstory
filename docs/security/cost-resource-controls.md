@@ -173,26 +173,32 @@ Note the browser still receives `private, no-cache, no-store` on `/` while Cloud
 `HIT`. That is the intended split: `override_origin` caches at the edge, the origin's header passes
 downstream untouched, so no visitor caches a dynamic page locally.
 
-### Second rule: ISR surfaces (added 2026-08-25)
+### Second rule: request-rendered document surfaces (reconciled 2026-09-19)
 
 `/methodology`, `/submit`, `/entity/`, `/books/`, `/law/`, `/stories/`, `/chapters/` — same `rsc`
 bypass — with **`edge_ttl: respect_origin`** rather than the `override_origin` the first rule uses.
 
-The two groups need opposite treatment, which is why they are two rules and not one. `/rooms`
-and `/memorial` are `force-dynamic` and send `no-store`, so the edge must *override* the origin
-or nothing caches. `/` is ISR (`revalidate = 300`) and stays in the same override rule so the
-front door still caches for an hour at Cloudflare. The other ISR surfaces already declare
-exactly the right thing (`public, s-maxage=3600, stale-while-revalidate=86400`), so the edge
-should *respect* it and keep one source of truth in the app.
+The app root is request-rendered because the nonce CSP is request-specific: Next can attach a
+nonce to framework and hydration scripts only while rendering an incoming request. Static HTML
+was not compatible with the per-request CSP; cached `/about` HTML proved the failure by serving
+framework scripts without the nonce and leaving shared controls such as the theme toggle inert.
+This rendering boundary does not remove the explicit data and route-handler caches beneath it.
+
+The two Cloudflare groups still need opposite treatment, which is why they remain separate.
+Surfaces in the first rule send `no-store`, so the edge must *override* the origin or nothing
+caches. The second rule continues to *respect* the document response's cache policy. Do not infer
+ISR or a Vercel prerender from a route-level `revalidate` export: the root nonce requirement
+outranks static page generation.
 
 `respect_origin` also makes the prefix list safe to be generous with: a route that declares
 `no-store` or `max-age=0` simply does not cache. Verified — `/stories/mosaic-credits` sends
 `public, max-age=0, must-revalidate` and stays uncached even though `/stories/` is matched. Adding a
 prefix cannot force-cache something the app said not to.
 
-Verified after deploy: `/methodology`, `/entity/[id]` and `/submit` each go `MISS` then `HIT`; `/`
-and `/rooms` still `HIT` (no regression); an entity page with `rsc: 1` returns `DYNAMIC`;
-`/corrections` and `/records` stay `DYNAMIC`, correctly excluded.
+The 2026-08-25 MISS-to-HIT observations below are historical evidence for the Cloudflare rules,
+not the current Next rendering mode: `/methodology`, `/entity/[id]` and `/submit` each went `MISS`
+then `HIT`; `/` and `/rooms` remained `HIT`; an entity request with `rsc: 1` returned `DYNAMIC`;
+`/corrections` and `/records` stayed excluded.
 
 Before this, every one of 4,107 entity pages was served from Vercel on every request despite the
 origin declaring it cacheable for an hour.

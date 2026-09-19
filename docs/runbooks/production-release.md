@@ -10,12 +10,16 @@ into `staging` is separate from the deliberate `staging` to `main` release PR.
 The coordinated release remains under maintenance. Production has the signed Dunbar replacement
 release and the authorized database migration is complete: all 14 pending files advanced the
 ledger from 61 to 75 versions, the ten `bb_*` responsibility schemas were replaced by the current
-namespaces, and staff metadata moved to `app_role`. Matching web/API clients have not yet been
-deployed, so traffic remains gated. The matched recovery proved RPO 0 and RTO 14,400 seconds.
+namespaces, and staff metadata moved to `app_role`. The previously tested web/API clients are
+deployed from SHA `e0a6faf07393f79aeab0629b6b9ac2952d421d6a`; follow-up static-nonce hydration
+fixes are not deployed. The API deployment
+`dpl_693wvmnFYhFzVNgnWWo1AAg6Q6or` is READY against production Postgres; the web deployment
+`dpl_6RrpCJX853CKcUR7VfP9ctHV4JjU` is READY with maintenance still ON. The matched recovery
+proved RPO 0 and RTO 14,400 seconds.
 
 The frozen cutoff is `2026-09-19T04:43:09.299Z`, with recovery completed at
-`2026-09-19T05:07:26.655Z` in 1,457.356 seconds. Web maintenance and API seed mode are deployed;
-Preview database credentials are removed; direct deployment URLs require SSO. Both Vercel cron
+`2026-09-19T05:07:26.655Z` in 1,457.356 seconds. Web maintenance remains active; Preview database
+credentials are removed; direct deployment URLs require SSO. Both Vercel cron
 lists are empty and the four scheduled GitHub workflows are disabled. The final transaction check
 found no active or idle-in-transaction client and no prepared transaction. Live execution details
 and private recovery locations are retained in the owner-only cutover record. The
@@ -45,7 +49,15 @@ the `20260918154322` frontier, 10 current and zero old responsibility schemas, 1
 generated columns, zero invalid constraints, PostgREST `public,published,submissions`, one admin
 `app_role` and zero `bb_role`, exact mapped counts/full-row hashes for 133 original tables and
 424,903 rows, 14 new capture origins, five other new tables, and passing anonymous and privileged
-function denials. Matching client deployment and public canary checks remain pending.
+function denials. The deployed client canary passed four API claims/citations checks and HTTP 200
+checks for `/`, `/records`, `/explore`, the place surface and the login route. Anonymous admin
+checks returned 401/307 and fresh Auth release checks returned 200. The fresh JWT carried
+`app_role=admin` with no `bb_role`; current-user lookup matched that role, and read-only SQL role
+probes denied missing and `bb_role`-only claims while admitting the `app_role` admin claim. The
+browser `/admin/login` UI still renders “Loading sign-in”. Local follow-up fixes pass theme and
+headline browser checks, but are not deployed; local credential-flow validation is unavailable
+without `NEXT_PUBLIC_SUPABASE_URL` and the anon key. Login UI verification and reopening remain
+pending.
 
 ## Release prerequisites
 
