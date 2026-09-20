@@ -20,6 +20,7 @@ import {
 import { describeLivesCell } from '../../lib/lives/lives-format';
 import { LIVES_ARCHIVE_READINGS } from '../../lib/lives/lives-archive';
 import { ArchiveFigure, RoomHandoff } from '../room';
+import { LivesRuleCard } from './LivesRuleCard';
 import { DestinationIcon } from '../patterns/DestinationIcon';
 
 void React;
@@ -32,6 +33,8 @@ const MILESTONE_ICONS: Record<LivesMilestone['key'], DestinationIconId> = {
   work: 'institution',
   count: 'data',
 };
+/** Rules shown open in an era; the rest stay one tap away so no rule is dropped for length. */
+const LIVES_RULES_OPEN = 4;
 const ERA_TITLES: Record<string, string> = {
   '1870-1890': 'The first generations after emancipation',
   '1900-1930': 'A new century, unequal possibilities',
@@ -175,8 +178,8 @@ function EraPanel({ panel }: { readonly panel: LivesMilestonePanel }) {
     <article className="lives-era" id={`era-${panel.era.id}`} aria-labelledby={titleId}>
       <header className="lives-era__header">
         <p className="lives-era__number">
-          <span>{panel.era.start}</span>
-          <span>–{panel.era.end}</span>
+          <span>{panel.era.start}s</span>
+          <span>–{panel.era.end}s</span>
         </p>
         <div>
           <p className="lives-era__eyebrow">United States · {livesMilestonePeriod(panel)}</p>
@@ -241,15 +244,25 @@ function EraPanel({ panel }: { readonly panel: LivesMilestonePanel }) {
           <p className="lives-era__source-label">
             <DestinationIcon id="law" /> Rules that began in this stretch
           </p>
-          <ul>
-            {panel.rules.map((rule) => (
-              <li key={rule.id}>
-                <span>{rule.inForceFromYear}</span>{' '}
-                {rule.href ? <Link href={rule.href}>{rule.name}</Link> : rule.name}
-                <small>{rule.jurisdictionLabel}</small>
-              </li>
+          <ul className="lives-rules__list">
+            {panel.rules.slice(0, LIVES_RULES_OPEN).map((rule) => (
+              <LivesRuleCard key={rule.id} rule={rule} />
             ))}
           </ul>
+          {panel.rules.length > LIVES_RULES_OPEN ? (
+            <details className="lives-era__more-rules">
+              <summary>
+                {panel.rules.length - LIVES_RULES_OPEN} more{' '}
+                {panel.rules.length - LIVES_RULES_OPEN === 1 ? 'rule' : 'rules'} began in this
+                stretch
+              </summary>
+              <ul className="lives-rules__list">
+                {panel.rules.slice(LIVES_RULES_OPEN).map((rule) => (
+                  <LivesRuleCard key={rule.id} rule={rule} />
+                ))}
+              </ul>
+            </details>
+          ) : null}
         </section>
       ) : null}
     </article>

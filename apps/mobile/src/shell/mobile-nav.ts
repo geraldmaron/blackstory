@@ -91,7 +91,7 @@ type MoreRowPresentation = {
 const MORE_PRESENTATION: Readonly<Record<string, MoreRowPresentation>> = Object.freeze({
   law: { line: 'Statutes and rulings, in plain language', route: '/law', icon: 'law' },
   data: { line: 'National series with their sources attached', route: '/data' },
-  lives: { line: 'Class and conditions, decade by decade' },
+  lives: { line: 'One life question, followed across the decades' },
   books: { line: 'Documented challenges, with the reports cited', route: '/books' },
   memorial: { line: 'Names, held quietly', route: '/memorial' },
 

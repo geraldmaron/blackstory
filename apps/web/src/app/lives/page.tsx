@@ -7,7 +7,11 @@ import { DocumentColophon, ReadingEntry, Room } from '../../components/room';
 import { WalkOffRamp } from '../walk-off-ramp';
 import { emptyLivesAreaBundle, loadLivesAreaBundle } from '../../lib/lives/lives-source';
 import type { RawLivesSearchParams } from '../../lib/lives/lives-url-state';
-import { parseLivesMilestone } from '../../lib/lives/lives-milestones';
+import {
+  buildLivesMilestonePanels,
+  livesMilestoneSpanLabel,
+  parseLivesMilestone,
+} from '../../lib/lives/lives-milestones';
 import { LivesMilestoneExperience } from '../../components/lives/LivesMilestoneExperience';
 import '../reading-room.css';
 import './lives.css';
@@ -41,7 +45,13 @@ export default async function LivesIndexPage({
         lede="Follow one ordinary question through changing counts, rules, and accounts of lived experience. Every visible figure is sourced."
         showCrumb={false}
       />
-      <DocumentColophon facts={['United States', '1870 to 2020', 'Published comparisons only']} />
+      <DocumentColophon
+        facts={[
+          'United States',
+          livesMilestoneSpanLabel(buildLivesMilestonePanels(bundle, milestone)) ?? '1870s to 2020s',
+          'Published comparisons only',
+        ]}
+      />
 
       <LivesMilestoneExperience bundle={bundle} milestone={milestone} />
 

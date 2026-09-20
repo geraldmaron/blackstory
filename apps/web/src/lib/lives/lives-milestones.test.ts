@@ -6,12 +6,15 @@ import type {
   LivesConditionKey,
   LivesDecade,
   LivesDecadeBundle,
+  LivesRule,
 } from '@repo/domain/statistics/lives';
 import {
+  LIVES_ERAS,
   LIVES_MILESTONES,
   buildLivesMilestonePanels,
   parseLivesMilestone,
   livesMilestonePeriod,
+  livesMilestoneSpanLabel,
 } from './lives-milestones';
 import { RACE_ETHNICITY_DEFINITION_LABELS } from '@repo/domain/statistics/lives';
 
@@ -168,4 +171,76 @@ test('a nonwhite historical proxy cannot be presented as a Black-specific compar
     ],
   };
   assert.deepEqual(buildLivesMilestonePanels(bundle([proxy]), LIVES_MILESTONES[2]!), []);
+});
+
+function rule(name: string, year: number, lifeDomains: readonly string[]): LivesRule {
+  return {
+    id: `${name}-us`,
+    entityId: `ent_${name}`,
+    name,
+    href: `/entity/ent_${name}`,
+    scopeLevel: 'federal',
+    jurisdictionLabel: 'Federal',
+    inForceFromYear: year,
+    inForceToYear: null,
+    appliesTo: ['black', 'white', 'hispanic'],
+    groupsNamed: [],
+    lifeDomains,
+    textPosture: 'protective',
+    disputed: false,
+    summary: null,
+    description: `${name} described.`,
+  };
+}
+
+test('every rule that began in an era reaches its panel, not only the first two by date', () => {
+  const housing = [
+    rule('GI Bill', 1944, ['housing', 'credit']),
+    rule('Shelley v. Kraemer', 1948, ['housing']),
+    rule('Jones v. Alfred H. Mayer Co.', 1968, ['housing']),
+    rule('Fair Housing Act of 1968', 1968, ['housing', 'credit']),
+  ];
+  const panels = buildLivesMilestonePanels(
+    bundle([
+      {
+        ...decade(1960, 'homeownership', { black: 38, white: 64 }),
+        rulesInForce: [...housing, rule('Brown v. Board of Education', 1954, ['schooling'])],
+      } as LivesDecadeBundle,
+    ]),
+    LIVES_MILESTONES[0]!,
+  );
+  assert.deepEqual(
+    panels[0]?.rules.map((entry) => entry.name),
+    ['GI Bill', 'Shelley v. Kraemer', 'Fair Housing Act of 1968', 'Jones v. Alfred H. Mayer Co.'],
+  );
+});
+
+test('an era label names decades, so a rule from the last decade sits inside its heading', () => {
+  const panels = buildLivesMilestonePanels(
+    bundle([
+      {
+        ...decade(1880, 'school_attendance', { black: 38, white: 71 }),
+        rulesInForce: [rule('Plessy v. Ferguson', 1896, ['schooling'])],
+      } as LivesDecadeBundle,
+    ]),
+    LIVES_MILESTONES.find((milestone) => milestone.key === 'school')!,
+  );
+  assert.equal(panels[0]?.era.label, '1870s–1890s');
+  assert.deepEqual(
+    panels[0]?.rules.map((entry) => entry.name),
+    ['Plessy v. Ferguson'],
+  );
+  for (const era of LIVES_ERAS) assert.match(era.label, /^\d{4}s–\d{4}s$/);
+});
+
+test('the header span is the visible panels, not a fixed range', () => {
+  const panels = buildLivesMilestonePanels(
+    bundle([
+      decade(1980, 'unemployed', { black: 12, white: 6 }),
+      decade(2020, 'unemployed', { black: 9, white: 4 }),
+    ]),
+    LIVES_MILESTONES.find((milestone) => milestone.key === 'work')!,
+  );
+  assert.equal(livesMilestoneSpanLabel(panels), '1970s to 2020s');
+  assert.equal(livesMilestoneSpanLabel([]), null);
 });

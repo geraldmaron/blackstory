@@ -55,6 +55,7 @@ export type ApplicabilityRow = {
   readonly display_name: string;
   readonly kind: string;
   readonly impact_statement: string | null;
+  readonly entity_summary: string | null;
 };
 
 export const JURISDICTIONS_SQL = `
@@ -83,7 +84,8 @@ export const APPLICABILITY_SQL = `
          a.text_posture, a.disputed,
          e.projection->>'displayName' AS display_name,
          e.projection->>'kind' AS kind,
-         e.projection->>'impactStatement' AS impact_statement
+         e.projection->>'impactStatement' AS impact_statement,
+         e.projection->>'summary' AS entity_summary
   FROM reference.law_applicability a
   JOIN published.release_entities e
     ON e.projection->>'id' = a.entity_id
@@ -197,5 +199,6 @@ export function mapApplicabilityRow(row: ApplicabilityRow): LivesApplicabilityIn
     textPosture: row.text_posture,
     disputed: row.disputed,
     summary: row.impact_statement,
+    description: row.entity_summary,
   };
 }

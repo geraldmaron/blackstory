@@ -78,7 +78,7 @@ const cityReading: LivesArchiveReading = {
     'Made for the 1900 Paris Exposition, this chart describes Black Georgians in 1890. The year of the evidence is not the year of the exhibition.',
   rights: LOC_RIGHTS,
   paragraphs: [
-    'The rural population takes up the page. Du Bois gives it a line so long that it has to curl back on itself. Before reading the national urban percentages below, spend a moment with this different way of making a population visible.',
+    'The rural population takes up the page. W. E. B. Du Bois gives it a line so long that it has to curl back on itself. Before reading the national urban percentages below, spend a moment with this different way of making a population visible.',
     'The Library of Congress identifies the chart as part of Du Bois’s exhibit on African American economic and social progress since emancipation. It is an argument addressed to an international audience, made by a Black scholar, rather than a neutral window into every household.',
   ],
   transcription:
@@ -117,7 +117,7 @@ export const LIVES_ARCHIVE_READINGS: Readonly<Record<LivesMilestoneKey, LivesArc
       'An original hand-drawn exhibit on the value of Black-owned land in Georgia, prepared for the 1900 Paris Exposition.',
     rights: LOC_RIGHTS,
     paragraphs: [
-      'Du Bois chose land ownership as one way to show economic life after emancipation. The historical object keeps the act of making that case visible: lettering, color, and the decision to compare years on one sheet.',
+      'W. E. B. Du Bois chose land ownership as one way to show economic life after emancipation. The historical object keeps the act of making that case visible: lettering, color, and the decision to compare years on one sheet.',
       'The value of land and the share of households owning a home answer different questions. A total value can grow while ownership remains uneven. Neither measure, on its own, tells us about a tenant’s rent, an owner’s debt, or who could inherit the property.',
     ],
     transcription:
@@ -270,7 +270,7 @@ export const LIVES_ARCHIVE_READINGS: Readonly<Record<LivesMilestoneKey, LivesArc
     ...cityReading,
     title: 'Who gets to make the picture?',
     paragraphs: [
-      'The census classifies people. Here, Du Bois uses population figures to make his own argument about Black life. The Library of Congress identifies this hand-drawn chart as part of the exhibit he prepared for the 1900 Paris Exposition.',
+      'The census classifies people. Here, W. E. B. Du Bois uses population figures to make his own argument about Black life. The Library of Congress identifies this hand-drawn chart as part of the exhibit he prepared for the 1900 Paris Exposition.',
       'The choice of scale changes what a viewer notices. A rural population can become a small remainder in a sentence about cities, or the largest visual presence on a page. Examine the exhibit before reading the changing census categories below: being counted and controlling the story of that count are different things.',
     ],
     connections: [

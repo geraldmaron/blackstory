@@ -102,13 +102,18 @@ export type LivesEra = {
   readonly label: string;
 };
 
+/**
+ * `start` and `end` name DECADES, so an era runs through the last year of its end decade: the
+ * first era covers 1870 through 1899. Labels say "1870s–1890s" for that reason. A label of
+ * "1870–1890" put Plessy v. Ferguson (1896) under a heading whose years excluded it.
+ */
 export const LIVES_ERAS: readonly LivesEra[] = [
-  { id: '1870-1890', start: 1870, end: 1890, label: '1870–1890' },
-  { id: '1900-1930', start: 1900, end: 1930, label: '1900–1930' },
-  { id: '1940-1960', start: 1940, end: 1960, label: '1940–1960' },
-  { id: '1970-1980', start: 1970, end: 1980, label: '1970–1980' },
-  { id: '1990-2000', start: 1990, end: 2000, label: '1990–2000' },
-  { id: '2010-2020', start: 2010, end: 2020, label: '2010–2020' },
+  { id: '1870-1890', start: 1870, end: 1890, label: '1870s–1890s' },
+  { id: '1900-1930', start: 1900, end: 1930, label: '1900s–1930s' },
+  { id: '1940-1960', start: 1940, end: 1960, label: '1940s–1960s' },
+  { id: '1970-1980', start: 1970, end: 1980, label: '1970s–1980s' },
+  { id: '1990-2000', start: 1990, end: 2000, label: '1990s–2000s' },
+  { id: '2010-2020', start: 2010, end: 2020, label: '2010s–2020s' },
 ] as const;
 
 export type LivesMilestoneValue = {
@@ -220,9 +225,20 @@ function rulesBeginningInEra(
       rules.set(rule.id, rule);
     }
   }
-  return [...rules.values()]
-    .sort((a, b) => a.inForceFromYear - b.inForceFromYear || a.name.localeCompare(b.name))
-    .slice(0, 2);
+  // Every matching rule, in date order. A cap of "the first two by date" hid the National Housing
+  // Act of 1934 behind two 1910s-20s cases and the Fair Housing Act of 1968 behind two 1940s
+  // entries; the surface decides how many to show open, never this selection.
+  return [...rules.values()].sort(
+    (a, b) => a.inForceFromYear - b.inForceFromYear || a.name.localeCompare(b.name),
+  );
+}
+
+/** The decades a question's visible panels actually span, for the page's own header. */
+export function livesMilestoneSpanLabel(panels: readonly LivesMilestonePanel[]): string | null {
+  const first = panels[0];
+  const last = panels[panels.length - 1];
+  if (!first || !last) return null;
+  return `${first.era.start}s to ${last.era.end}s`;
 }
 
 export function parseLivesMilestone(value: string | readonly string[] | undefined): LivesMilestone {

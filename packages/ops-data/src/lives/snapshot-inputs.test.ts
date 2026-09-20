@@ -101,7 +101,10 @@ test('applicability rows read in-force years from EDTF and keep the href', () =>
     display_name: 'Fair Housing Act of 1968',
     kind: 'law',
     impact_statement: 'Made housing discrimination illegal in nearly every transaction.',
+    entity_summary: 'Title VIII of the Civil Rights Act of 1968.',
   });
+  assert.equal(mapped.summary, 'Made housing discrimination illegal in nearly every transaction.');
+  assert.equal(mapped.description, 'Title VIII of the Civil Rights Act of 1968.');
   assert.equal(mapped.inForceFromYear, 1968);
   assert.equal(mapped.inForceToYear, null);
   assert.equal(mapped.entityHref, '/entity/ent_law_fair_housing_act_1968');

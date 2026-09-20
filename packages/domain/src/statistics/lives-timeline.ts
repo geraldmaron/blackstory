@@ -146,7 +146,10 @@ export type LivesApplicabilityInput = {
   readonly lifeDomains: readonly string[];
   readonly textPosture: 'exclusionary' | 'protective' | 'facially_neutral';
   readonly disputed: boolean;
+  /** What followed: the record's cited impact statement. Null when the record has none. */
   readonly summary: string | null;
+  /** What it did: the record's own summary. Absent on inputs built before the field existed. */
+  readonly description?: string | null;
 };
 
 export type LivesFrameInput = {
@@ -178,7 +181,13 @@ export type LivesRule = {
   readonly lifeDomains: readonly string[];
   readonly textPosture: 'exclusionary' | 'protective' | 'facially_neutral';
   readonly disputed: boolean;
+  /** What followed: the record's cited impact statement. Null when the record has none. */
   readonly summary: string | null;
+  /**
+   * What it did: the record's own summary. Optional so snapshots built before the field existed
+   * still read; surfaces render nothing in its place rather than falling back to `summary`.
+   */
+  readonly description?: string | null;
 };
 
 export type LivesConditionBundle = {
@@ -647,6 +656,7 @@ export function buildLivesAreaBundle(input: BuildLivesAreaBundleInput): LivesAre
         textPosture: row.textPosture,
         disputed: row.disputed,
         summary: row.summary,
+        description: row.description ?? null,
       }))
       .filter((rule) => rule.appliesTo.length > 0)
       .sort(
