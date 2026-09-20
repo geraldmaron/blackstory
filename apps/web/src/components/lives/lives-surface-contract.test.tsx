@@ -335,3 +335,83 @@ test('an in-copyright recording is linked with the archive’s rights line, and 
   assert.match(html, /Watch at the Library of Congress/);
   assert.match(html, /The interviewee retains copyright\./);
 });
+
+test('the era header is one stacked column, and the decades never break mid-range', () => {
+  const css = readFileSync(path.join(here, '../../app/lives/lives.css'), 'utf8');
+  const block = (selector: string) => {
+    const start = css.indexOf(`${selector} {`);
+    assert.ok(start > -1, `${selector} is missing`);
+    return css.slice(start, css.indexOf('}', start));
+  };
+  // "1870s" once sat in an 8rem column at the largest display size and ran into the title.
+  assert.match(block('.lives-era__header'), /flex-direction:\s*column/);
+  assert.doesNotMatch(block('.lives-era__header'), /grid-template-columns/);
+  assert.match(block('.lives-era__years'), /white-space:\s*nowrap/);
+  assert.doesNotMatch(css, /\.lives-era__number/);
+});
+
+test('nothing inside an era panel is pinned to a grid row', () => {
+  const css = readFileSync(path.join(here, '../../app/lives/lives.css'), 'utf8');
+  // Children pinned to fixed rows is how rule cards ended up on top of the count note: anything
+  // new auto-placed into a cell that was already taken. The two flow columns replace it.
+  const rules = [...css.matchAll(/([^{}]+)\{([^{}]*)\}/g)].filter(
+    ([, selector, body]) =>
+      /\.lives-era__|\.lives-milestone__context/.test(selector!) && /grid-row\s*:/.test(body!),
+  );
+  assert.deepEqual(
+    rules.map(([, selector]) => selector!.trim()),
+    [],
+  );
+  const reader = readFileSync(path.join(here, 'LivesMilestoneExperience.tsx'), 'utf8');
+  assert.match(reader, /className="lives-era__main"/);
+  assert.match(reader, /className="lives-era__side"/);
+});
+
+test('without a narrative the decades are the heading, and the measure is named once', async () => {
+  const { LivesMilestoneExperience } = await import('./LivesMilestoneExperience');
+  const { LIVES_MILESTONES } = await import('../../lib/lives/lives-milestones');
+  const cell = (estimate: number) => ({
+    state: 'published',
+    estimate,
+    definitionLabel: 'as the census recorded it',
+    sources: [{ label: 'Census table', url: 'https://www.census.gov/table' }],
+  });
+  const html = renderToStaticMarkup(
+    <LivesMilestoneExperience
+      milestone={LIVES_MILESTONES.find((entry) => entry.key === 'count')!}
+      bundle={
+        {
+          areaId: 'nation:US',
+          areaSlug: 'united-states',
+          areaName: 'United States',
+          areaKind: 'nation',
+          disclaimer: 'x',
+          decades: [
+            {
+              decade: 1890,
+              label: '1890s',
+              conditions: [
+                {
+                  key: 'population_share',
+                  label: 'Share of everyone living in the area',
+                  universe: 'Everyone living in the area',
+                  cells: { black: cell(12), white: cell(88), hispanic: { state: 'pending' } },
+                },
+              ],
+              countNotes: [],
+              worldBeats: [],
+              rulesInForce: [],
+            },
+          ],
+        } as never
+      }
+    />,
+  );
+  const panel = html.slice(html.indexOf('id="era-1870-1890"'));
+  assert.match(
+    panel,
+    /<h3[^>]*class="lives-era__years lives-era__years--heading"[^>]*>1870s–1890s<\/h3>/,
+  );
+  assert.equal((panel.match(/Share of everyone living in the area/g) ?? []).length, 2); // aria-label + the figure's heading
+  assert.doesNotMatch(panel, /<h3[^>]*>Share of everyone living in the area<\/h3>/);
+});

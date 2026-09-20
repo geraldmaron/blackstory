@@ -287,92 +287,117 @@ function EraPanel({
   const turn = livesTurnFor(milestone.key, panel.era.id);
   const titleId = `lives-era-${panel.era.id}`;
   const { narrative, figure } = panel;
-  const title = narrative?.doc.title ?? figure?.condition.label ?? panel.era.label;
+  // Two columns that each flow on their own: the story (account, prose, figure, question) and the
+  // record (rules, count note, sources). Children used to be pinned to fixed grid rows, which put
+  // anything new on top of something else.
+  const hasSide =
+    panel.rules.length > 0 || panel.context !== null || (narrative?.references.length ?? 0) > 0;
   return (
-    <article className="lives-era" id={`era-${panel.era.id}`} aria-labelledby={titleId}>
+    <article
+      className={hasSide ? 'lives-era' : 'lives-era lives-era--single'}
+      id={`era-${panel.era.id}`}
+      aria-labelledby={titleId}
+    >
+      {/*
+        One stacked column, so the decades and the title can never collide at any width. Until an
+        era has a narrative, the decades ARE its heading: the old fallback printed the measure's
+        name as a title, directly above the same words on the figure.
+      */}
       <header className="lives-era__header">
-        <p className="lives-era__number">
-          <span>{panel.era.start}s</span>
-          <span>–{panel.era.end}s</span>
+        <p className="lives-era__eyebrow">
+          {narrative ? narrative.doc.placeLabel : 'United States'}
         </p>
-        <div>
-          <p className="lives-era__eyebrow">
-            {narrative ? narrative.doc.placeLabel : 'United States'} · {panel.era.label}
-          </p>
-          <h3 id={titleId}>{title}</h3>
-        </div>
+        {narrative ? (
+          <>
+            <p className="lives-era__years">{panel.era.label}</p>
+            <h3 id={titleId}>{narrative.doc.title}</h3>
+          </>
+        ) : (
+          <h3 id={titleId} className="lives-era__years lives-era__years--heading">
+            {panel.era.label}
+          </h3>
+        )}
       </header>
 
-      {panel.accounts.length > 0 ? (
-        <section className="lives-era__accounts" aria-label="In their own words">
-          <p className="lives-era__source-label">
-            <DestinationIcon id="person" /> In their own words
-          </p>
-          {panel.accounts.map((beat) => (
-            <LivesAccount key={beat.id} beat={beat} />
-          ))}
-        </section>
-      ) : null}
-
-      {narrative ? (
-        <section className="lives-era__narrative" aria-label="What happened in this stretch">
-          <ArticleBody article={narrative} />
-        </section>
-      ) : null}
-
-      {figure ? (
-        <FigureSection figure={figure} />
-      ) : (
-        <p className="lives-era__no-figure">
-          <strong>No comparison for this stretch.</strong> {panel.figureAbsence}
-        </p>
-      )}
-
-      {turn ? <LivesTurn turn={turn} /> : null}
-
-      {panel.rules.length > 0 ? (
-        <section className="lives-era__rules" aria-label={`Rules beginning in ${panel.era.label}`}>
-          <p className="lives-era__source-label">
-            <DestinationIcon id="law" /> Rules that began in this stretch
-          </p>
-          <ul className="lives-rules__list">
-            {panel.rules.slice(0, LIVES_RULES_OPEN).map((rule) => (
-              <LivesRuleCard key={rule.id} rule={rule} />
+      <div className="lives-era__main">
+        {panel.accounts.length > 0 ? (
+          <section className="lives-era__accounts" aria-label="In their own words">
+            <p className="lives-era__source-label">
+              <DestinationIcon id="person" /> In their own words
+            </p>
+            {panel.accounts.map((beat) => (
+              <LivesAccount key={beat.id} beat={beat} />
             ))}
-          </ul>
-          {panel.rules.length > LIVES_RULES_OPEN ? (
-            <details className="lives-era__more-rules">
-              <summary>
-                {panel.rules.length - LIVES_RULES_OPEN} more{' '}
-                {panel.rules.length - LIVES_RULES_OPEN === 1 ? 'rule' : 'rules'} began in this
-                stretch
-              </summary>
+          </section>
+        ) : null}
+
+        {narrative ? (
+          <section className="lives-era__narrative" aria-label="What happened in this stretch">
+            <ArticleBody article={narrative} />
+          </section>
+        ) : null}
+
+        {figure ? (
+          <FigureSection figure={figure} />
+        ) : (
+          <p className="lives-era__no-figure">
+            <strong>No comparison for this stretch.</strong> {panel.figureAbsence}
+          </p>
+        )}
+
+        {turn ? <LivesTurn turn={turn} /> : null}
+      </div>
+
+      {hasSide ? (
+        <div className="lives-era__side">
+          {panel.rules.length > 0 ? (
+            <section
+              className="lives-era__rules"
+              aria-label={`Rules beginning in ${panel.era.label}`}
+            >
+              <p className="lives-era__source-label">
+                <DestinationIcon id="law" /> Rules that began in this stretch
+              </p>
               <ul className="lives-rules__list">
-                {panel.rules.slice(LIVES_RULES_OPEN).map((rule) => (
+                {panel.rules.slice(0, LIVES_RULES_OPEN).map((rule) => (
                   <LivesRuleCard key={rule.id} rule={rule} />
                 ))}
               </ul>
+              {panel.rules.length > LIVES_RULES_OPEN ? (
+                <details className="lives-era__more-rules">
+                  <summary>
+                    {panel.rules.length - LIVES_RULES_OPEN} more{' '}
+                    {panel.rules.length - LIVES_RULES_OPEN === 1 ? 'rule' : 'rules'} began in this
+                    stretch
+                  </summary>
+                  <ul className="lives-rules__list">
+                    {panel.rules.slice(LIVES_RULES_OPEN).map((rule) => (
+                      <LivesRuleCard key={rule.id} rule={rule} />
+                    ))}
+                  </ul>
+                </details>
+              ) : null}
+            </section>
+          ) : null}
+
+          {panel.context ? (
+            narrative ? (
+              <details className="lives-era__drawer">
+                <summary>How the count worked in these years</summary>
+                <ContextBlock context={panel.context} />
+              </details>
+            ) : (
+              <ContextBlock context={panel.context} />
+            )
+          ) : null}
+
+          {narrative && narrative.references.length > 0 ? (
+            <details className="lives-era__drawer">
+              <summary>Sources for this stretch ({narrative.references.length})</summary>
+              <ArticleReferences references={narrative.references} />
             </details>
           ) : null}
-        </section>
-      ) : null}
-
-      {panel.context ? (
-        narrative ? (
-          <details className="lives-era__drawer">
-            <summary>How the count worked in these years</summary>
-            <ContextBlock context={panel.context} />
-          </details>
-        ) : (
-          <ContextBlock context={panel.context} />
-        )
-      ) : null}
-
-      {narrative && narrative.references.length > 0 ? (
-        <details className="lives-era__drawer">
-          <summary>Sources for this stretch ({narrative.references.length})</summary>
-          <ArticleReferences references={narrative.references} />
-        </details>
+        </div>
       ) : null}
     </article>
   );

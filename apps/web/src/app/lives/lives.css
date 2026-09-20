@@ -1219,27 +1219,28 @@
 }
 
 .lives-era__header {
-  display: grid;
-  grid-template-columns: minmax(8rem, 0.3fr) minmax(0, 1fr);
-  gap: var(--ds-space-6);
-  align-items: start;
+  display: flex;
+  flex-direction: column;
+  gap: var(--ds-space-2);
 }
 
-.lives-era__number {
+/* The era's decades. Never wraps mid-range: "1870s–" on one line and "1890s" on the next. */
+.lives-era__years {
   margin: 0;
   font-family: var(--ds-font-mono);
-  font-size: var(--ds-text-display-1);
+  font-size: var(--ds-text-display-3);
   line-height: 1.1;
-  letter-spacing: -0.06em;
-  color: var(--ds-ink);
-}
-
-.lives-era__number span {
-  display: block;
-}
-
-.lives-era__number span + span {
+  letter-spacing: -0.04em;
+  white-space: nowrap;
   color: var(--ds-ink-muted);
+}
+
+.lives-era__header h3.lives-era__years--heading {
+  max-width: none;
+  font-family: var(--ds-font-mono);
+  font-size: var(--ds-text-display-2);
+  letter-spacing: -0.05em;
+  color: var(--ds-ink);
 }
 
 .lives-era__header h3 {
@@ -1597,30 +1598,22 @@
     grid-column: 1 / -1;
   }
 
-  .lives-era__comparison,
-  .lives-era__evidence {
+  .lives-era__main {
     grid-column: 1;
   }
 
-  .lives-milestone__context,
-  .lives-era__rules {
+  .lives-era__side {
     grid-column: 2;
   }
 
-  .lives-milestone__context {
-    grid-row: 2;
-    align-self: start;
+  .lives-era--single .lives-era__main {
+    grid-column: 1 / -1;
+  }
+
+  .lives-era__side .lives-milestone__context {
     padding-top: 0;
   }
 
-  .lives-era__evidence {
-    grid-row: 3;
-    align-self: start;
-  }
-  .lives-era__rules {
-    grid-row: 3;
-    align-self: start;
-  }
   .lives-archive {
     grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
     column-gap: var(--ds-space-8);
@@ -1638,18 +1631,19 @@
 }
 
 @media (max-width: 31.25rem) {
-  .lives-era__header {
-    grid-template-columns: 1fr;
-    gap: var(--ds-space-4);
-  }
-
-  .lives-era__number span {
-    display: inline;
-  }
-
   .lives-era__value {
     grid-template-columns: minmax(0, 1fr) minmax(4.5rem, auto);
   }
+}
+
+/* ---- The era's two flow columns. Nothing inside is pinned to a row. ---- */
+
+.lives-era__main,
+.lives-era__side {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ds-space-6);
+  min-width: 0;
 }
 
 /* ---- Era narrative, accounts, and the narrative-led era ---- */
