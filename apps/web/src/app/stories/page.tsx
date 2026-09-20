@@ -21,6 +21,7 @@ import { RECORDS_PAGE_SIZE } from '../../lib/records/build-records-index';
 import {
   CardGrid,
   DocumentColophon,
+  FindBar,
   GroupHeading,
   Note,
   OrientationInstrument,
@@ -35,12 +36,12 @@ import {
   buildKindChips,
   computeStoriesFacts,
   filterItems,
-  hasActiveNarrowing,
   paginateStories,
   parseStoriesQuery,
   pickLeadStory,
   showsShelves,
   sortItems,
+  storiesHref,
   storiesNotice,
   uncollectedItems,
   STORY_SORT_KEYS,
@@ -78,6 +79,20 @@ export default async function StoriesIndexPage({ searchParams }: StoriesPageProp
   const filtered = sortItems(filterItems(items, query), query.sort);
   const notice = storiesNotice(source, items.length, filtered.length);
   const kindChips = buildKindChips(items, query);
+  // Kind shows as the current chip. Everything else that narrows the list gets a removable chip,
+  // because a collection or era arrives from the rail or a shared link and was invisible here.
+  const readable = (value: string) => value.replace(/[-_]+/g, ' ');
+  const activeConstraints = (
+    [
+      ['q', query.q, `Search: ${query.q}`],
+      ['collection', query.collection, `Collection: ${readable(query.collection)}`],
+      ['tag', query.tag, `Tag: ${readable(query.tag)}`],
+      ['era', query.era, `Period: ${query.era}`],
+      ['place', query.place, `Place: ${readable(query.place)}`],
+    ] as const
+  )
+    .filter(([, value]) => value.length > 0)
+    .map(([key, , label]) => ({ key, label, href: storiesHref({ ...query, [key]: '', page: 1 }) }));
   const collectionGroups = buildCollectionGroups(items);
 
   // The shelves layout only ever renders in the page's default, unnarrowed browse state (see
@@ -158,78 +173,47 @@ export default async function StoriesIndexPage({ searchParams }: StoriesPageProp
       <DocumentColophon facts={meta} />
 
       {source === 'live' && items.length > 0 ? (
-        <div className="ds-stories-controls">
-          <nav className="ds-stories-chips" aria-label="Filter by kind">
-            {kindChips.map((chip) => (
-              <a
-                key={chip.label}
-                className="ds-room-chip"
-                href={chip.href}
-                {...(chip.active ? { 'aria-current': 'true' as const } : {})}
-              >
-                {chip.label}{' '}
-                <span className="ds-room-num">{chip.count.toLocaleString('en-US')}</span>
-              </a>
-            ))}
-          </nav>
-
-          <form className="ds-stories-form" method="get" action="/stories" role="search">
-            {/* Narrowing already in the URL rides along as hidden fields, so submitting the
-                search box refines the current view instead of silently resetting it. */}
-            {/* '' is every Story and is the default, so it needs no param; a named kind rides
-                along so the search refines the kind in view rather than widening it. */}
-            {query.kind.length > 0 ? <input type="hidden" name="kind" value={query.kind} /> : null}
-            {query.collection.length > 0 ? (
-              <input type="hidden" name="collection" value={query.collection} />
-            ) : null}
-            {query.tag.length > 0 ? <input type="hidden" name="tag" value={query.tag} /> : null}
-            {query.era.length > 0 ? <input type="hidden" name="era" value={query.era} /> : null}
-            {query.place.length > 0 ? (
-              <input type="hidden" name="place" value={query.place} />
-            ) : null}
-
-            <label className="ds-stories-field">
-              <span className="ds-stories-field__label">Search stories</span>
-              <input
-                className="ds-stories-input"
-                type="search"
-                name="q"
-                defaultValue={query.q}
-                placeholder="Search by title, subject or collection"
-                autoComplete="off"
-              />
-            </label>
-
-            <label className="ds-stories-field">
-              <span className="ds-stories-field__label">Sort</span>
-              <select className="ds-stories-select" name="sort" defaultValue={query.sort}>
-                {STORY_SORT_KEYS.map((key) => (
-                  <option key={key} value={key}>
-                    {STORY_SORT_LABELS[key]}
-                  </option>
-                ))}
-              </select>
-            </label>
-
-            <button className="ds-stories-submit" type="submit">
-              Apply
-            </button>
-            {hasActiveNarrowing(query) ? (
-              <a className="ds-stories-clear" href="/stories">
-                Clear
-              </a>
-            ) : null}
-          </form>
-
-          <p className="ds-stories-count" role="status">
-            {formatResultSummary({
-              matched: filtered.length,
-              total: items.length,
-              singular: 'story',
-              plural: 'stories',
-            })}
-          </p>
-        </div>
+        <FindBar
+          id="stories"
+          action="/stories"
+          queryLabel="Search stories"
+          placeholder="Search by title, subject or collection"
+          query={query.q}
+          /* Narrowing already in the URL rides along, so submitting the search box refines the
+             current view instead of silently resetting it. Defaults stay out of the URL. */
+          preserved={{
+            kind: query.kind,
+            collection: query.collection,
+            tag: query.tag,
+            era: query.era,
+            place: query.place,
+            sort: query.sort !== 'collection' ? query.sort : undefined,
+          }}
+          active={activeConstraints}
+          clearHref="/stories"
+          rows={[
+            {
+              label: 'Filter by kind',
+              chips: kindChips.map((chip) => ({
+                label: chip.label,
+                href: chip.href,
+                active: chip.active,
+                count: chip.count,
+              })),
+            },
+          ]}
+          sort={STORY_SORT_KEYS.map((key) => ({
+            label: STORY_SORT_LABELS[key],
+            href: storiesHref({ ...query, sort: key, page: 1 }),
+            active: query.sort === key,
+          }))}
+          summary={formatResultSummary({
+            matched: filtered.length,
+            total: items.length,
+            singular: 'story',
+            plural: 'stories',
+          })}
+        />
       ) : null}
 
       {notice.body.length > 0 ? (
