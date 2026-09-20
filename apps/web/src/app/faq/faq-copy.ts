@@ -54,6 +54,8 @@ export type FaqSection = {
   /** Anchor id, also used by the contents list at the top. */
   readonly id: string;
   readonly heading: string;
+  /** One or two words above the heading, the same slot every other room's chapters fill. */
+  readonly kicker: string;
   readonly icon: DestinationIconId;
   readonly entries: readonly FaqEntry[];
 };
@@ -65,6 +67,7 @@ export const FAQ_SECTIONS: readonly FaqSection[] = [
   {
     id: 'who-runs-this',
     heading: 'Who runs this',
+    kicker: 'Maker',
     icon: 'about',
     entries: [
       {
@@ -108,6 +111,7 @@ export const FAQ_SECTIONS: readonly FaqSection[] = [
   {
     id: 'ai',
     heading: 'AI, and what it is not allowed to touch',
+    kicker: 'Limits',
     icon: 'methodology',
     entries: [
       {
@@ -155,6 +159,7 @@ export const FAQ_SECTIONS: readonly FaqSection[] = [
   {
     id: 'records',
     heading: 'How a record gets in',
+    kicker: 'Admission',
     icon: 'records',
     entries: [
       {
@@ -195,6 +200,7 @@ export const FAQ_SECTIONS: readonly FaqSection[] = [
   {
     id: 'when-it-is-wrong',
     heading: 'When it is wrong',
+    kicker: 'Corrections',
     icon: 'correction',
     entries: [
       {
@@ -240,6 +246,7 @@ export const FAQ_SECTIONS: readonly FaqSection[] = [
   {
     id: 'reading-it',
     heading: 'Reading it, and keeping it',
+    kicker: 'Use',
     icon: 'stories',
     entries: [
       {

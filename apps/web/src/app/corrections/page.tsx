@@ -17,12 +17,15 @@ export const metadata: Metadata = buildStaticPageMetadata({
 
 export default function CorrectionsPage() {
   return (
-    <Room>
+    <Room ledger>
       <ReadingEntry
         pathname="/corrections"
-        title="Tell the archive it is wrong"
+        title={
+          <>
+            Tell the archive it&apos;s <em>wrong</em>.
+          </>
+        }
         lede="You get a receipt code and a tracked outcome. A person reads every correction, and nothing you send publishes on arrival."
-        showCrumb={false}
       />
       <CorrectionsSections />
     </Room>

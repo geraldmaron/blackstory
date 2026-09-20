@@ -102,13 +102,18 @@ export type LivesEra = {
   readonly label: string;
 };
 
+/**
+ * `start` and `end` name DECADES, so an era runs through the last year of its end decade: the
+ * first era covers 1870 through 1899. Labels say "1870s–1890s" for that reason. A label of
+ * "1870–1890" put Plessy v. Ferguson (1896) under a heading whose years excluded it.
+ */
 export const LIVES_ERAS: readonly LivesEra[] = [
-  { id: '1870-1890', start: 1870, end: 1890, label: '1870–1890' },
-  { id: '1900-1930', start: 1900, end: 1930, label: '1900–1930' },
-  { id: '1940-1960', start: 1940, end: 1960, label: '1940–1960' },
-  { id: '1970-1980', start: 1970, end: 1980, label: '1970–1980' },
-  { id: '1990-2000', start: 1990, end: 2000, label: '1990–2000' },
-  { id: '2010-2020', start: 2010, end: 2020, label: '2010–2020' },
+  { id: '1870-1890', start: 1870, end: 1890, label: '1870s–1890s' },
+  { id: '1900-1930', start: 1900, end: 1930, label: '1900s–1930s' },
+  { id: '1940-1960', start: 1940, end: 1960, label: '1940s–1960s' },
+  { id: '1970-1980', start: 1970, end: 1980, label: '1970s–1980s' },
+  { id: '1990-2000', start: 1990, end: 2000, label: '1990s–2000s' },
+  { id: '2010-2020', start: 2010, end: 2020, label: '2010s–2020s' },
 ] as const;
 
 export type LivesMilestoneValue = {
@@ -125,14 +130,33 @@ export type LivesMilestoneContext =
       readonly citations: readonly LivesSourceRef[];
     };
 
-export type LivesMilestonePanel = {
-  readonly era: LivesEra;
+/** The published comparison an era shows: one decade, one condition, each group's cell. */
+export type LivesMilestoneFigure = {
   readonly decade: LivesDecadeBundle;
   readonly condition: LivesConditionBundle;
   readonly values: readonly LivesMilestoneValue[];
   readonly sources: readonly LivesSourceRef[];
+};
+
+/**
+ * One era of one life question. `Narrative` is whatever the caller attaches as the era's authored
+ * prose (the web app attaches a hydrated article); this module only carries it.
+ *
+ * An era normally has a figure. A NARRATIVE-LED era has none: the census published no comparison
+ * for it, or none is transcribed yet. It renders only when it has authored prose plus at least one
+ * account or rule, so history no longer disappears wherever the statistics do, and an era with
+ * nothing to say still does not render (the blank-panel failure of 2026-09-18 cannot recur).
+ */
+export type LivesMilestonePanel<Narrative = unknown> = {
+  readonly era: LivesEra;
+  readonly figure: LivesMilestoneFigure | null;
+  /** Set only when `figure` is null: why this era has no comparison, in plain words. */
+  readonly figureAbsence: string | null;
   readonly context: LivesMilestoneContext | null;
   readonly rules: readonly LivesRule[];
+  /** First-person accounts: beats that carry a speaker and that speaker's own quoted words. */
+  readonly accounts: readonly LivesWorldBeat[];
+  readonly narrative: Narrative | null;
 };
 
 function isPublished(cell: LivesCell): boolean {
@@ -180,6 +204,7 @@ function matchingContext(
     (candidate) =>
       milestone.domains.includes(candidate.domain) &&
       candidate.domain !== 'testimony' &&
+      !candidate.quote &&
       (candidate.appliesTo.includes('all') || candidate.appliesTo.includes('black')),
   );
   if (beat) return { kind: 'beat', beat };
@@ -198,13 +223,13 @@ function matchingContext(
 }
 
 /** The current condition adapters use ACS only for these modern measures. */
-export function livesMilestonePeriod(panel: LivesMilestonePanel): string {
-  const acs = ['homeownership', 'high_school', 'unemployed'].includes(panel.condition.key)
-    ? livesAcsVintage(panel.decade.decade)
+export function livesMilestonePeriod(figure: LivesMilestoneFigure): string {
+  const acs = ['homeownership', 'high_school', 'unemployed'].includes(figure.condition.key)
+    ? livesAcsVintage(figure.decade.decade)
     : null;
   return acs
     ? `${acs.replace('-', '–')} · ACS five-year estimate`
-    : `${panel.decade.decade} · Census snapshot`;
+    : `${figure.decade.decade} · Census snapshot`;
 }
 
 function rulesBeginningInEra(
@@ -220,9 +245,20 @@ function rulesBeginningInEra(
       rules.set(rule.id, rule);
     }
   }
-  return [...rules.values()]
-    .sort((a, b) => a.inForceFromYear - b.inForceFromYear || a.name.localeCompare(b.name))
-    .slice(0, 2);
+  // Every matching rule, in date order. A cap of "the first two by date" hid the National Housing
+  // Act of 1934 behind two 1910s-20s cases and the Fair Housing Act of 1968 behind two 1940s
+  // entries; the surface decides how many to show open, never this selection.
+  return [...rules.values()].sort(
+    (a, b) => a.inForceFromYear - b.inForceFromYear || a.name.localeCompare(b.name),
+  );
+}
+
+/** The decades a question's visible panels actually span, for the page's own header. */
+export function livesMilestoneSpanLabel(panels: readonly LivesMilestonePanel[]): string | null {
+  const first = panels[0];
+  const last = panels[panels.length - 1];
+  if (!first || !last) return null;
+  return `${first.era.start}s to ${last.era.end}s`;
 }
 
 export function parseLivesMilestone(value: string | readonly string[] | undefined): LivesMilestone {
@@ -230,29 +266,108 @@ export function parseLivesMilestone(value: string | readonly string[] | undefine
   return LIVES_MILESTONES.find((milestone) => milestone.key === key) ?? DEFAULT_LIVES_MILESTONE;
 }
 
-export function buildLivesMilestonePanels(
+function eraDecades(bundle: LivesAreaBundle, era: LivesEra): readonly LivesDecadeBundle[] {
+  return bundle.decades
+    .filter((decade) => decade.decade >= era.start && decade.decade <= era.end)
+    .sort((a, b) => b.decade - a.decade);
+}
+
+function figureForEra(
+  bundle: LivesAreaBundle,
+  era: LivesEra,
+  milestone: LivesMilestone,
+): LivesMilestoneFigure | null {
+  for (const decade of eraDecades(bundle, era)) {
+    const condition = conditionFor(decade, milestone.condition);
+    if (!condition) continue;
+    const values = comparableValues(condition);
+    if (values.length < 2) continue;
+    return { decade, condition, values, sources: uniqueSources(values) };
+  }
+  return null;
+}
+
+/**
+ * Accounts are beats that carry a speaker AND that speaker's quoted words, filed under one of the
+ * question's topical domains. The catch-all `testimony` domain is excluded on purpose: it would
+ * put every account under every question.
+ */
+function accountsInEra(
+  bundle: LivesAreaBundle,
+  era: LivesEra,
+  milestone: LivesMilestone,
+): readonly LivesWorldBeat[] {
+  const seen = new Set<string>();
+  return [...eraDecades(bundle, era)]
+    .reverse()
+    .flatMap((decade) => decade.worldBeats)
+    .filter((beat) => {
+      if (!beat.quote || !beat.speaker) return false;
+      if (beat.domain === 'testimony' || !milestone.domains.includes(beat.domain)) return false;
+      if (!(beat.appliesTo.includes('all') || beat.appliesTo.includes('black'))) return false;
+      if (seen.has(beat.id)) return false;
+      seen.add(beat.id);
+      return true;
+    });
+}
+
+/**
+ * Why an era has no comparison. The cell's own reason is used when the data carries one, because
+ * "the census never asked" and "this archive has not transcribed it" are different silences and
+ * must never be worded alike. Without a reason, the line claims only what is true by construction:
+ * that no comparison is on record here.
+ */
+function figureAbsenceForEra(
+  bundle: LivesAreaBundle,
+  era: LivesEra,
+  milestone: LivesMilestone,
+): string {
+  for (const decade of eraDecades(bundle, era)) {
+    const cell = conditionFor(decade, milestone.condition)?.cells.black;
+    if (!cell) continue;
+    if (cell.state === 'not_measured' && cell.reason) return cell.reason;
+    if (cell.state === 'pending') {
+      return 'A comparison for these decades was published, and it hasn’t been transcribed here yet.';
+    }
+    if (cell.state === 'suppressed' && cell.reason) return cell.reason;
+  }
+  return 'No published national comparison is on record here for these decades.';
+}
+
+export function buildLivesMilestonePanels<Narrative = unknown>(
   bundle: LivesAreaBundle,
   milestone: LivesMilestone,
-): readonly LivesMilestonePanel[] {
-  return LIVES_ERAS.flatMap((era) => {
-    const candidates = bundle.decades
-      .filter((decade) => decade.decade >= era.start && decade.decade <= era.end)
-      .sort((a, b) => b.decade - a.decade);
+  narratives: ReadonlyMap<string, Narrative> = new Map(),
+): readonly LivesMilestonePanel<Narrative>[] {
+  return LIVES_ERAS.flatMap((era): LivesMilestonePanel<Narrative>[] => {
+    const figure = figureForEra(bundle, era, milestone);
+    const rules = rulesBeginningInEra(bundle, era, milestone);
+    const accounts = accountsInEra(bundle, era, milestone);
+    const narrative = narratives.get(era.id) ?? null;
 
-    for (const decade of candidates) {
-      const condition = conditionFor(decade, milestone.condition);
-      if (!condition) continue;
-      const values = comparableValues(condition);
-      if (values.length < 2) continue;
+    if (figure) {
       return [
         {
           era,
-          decade,
-          condition,
-          values,
-          sources: uniqueSources(values),
-          context: matchingContext(decade, milestone),
-          rules: rulesBeginningInEra(bundle, era, milestone),
+          figure,
+          figureAbsence: null,
+          context: matchingContext(figure.decade, milestone),
+          rules,
+          accounts,
+          narrative,
+        },
+      ];
+    }
+    if (narrative && (accounts.length > 0 || rules.length > 0)) {
+      return [
+        {
+          era,
+          figure: null,
+          figureAbsence: figureAbsenceForEra(bundle, era, milestone),
+          context: null,
+          rules,
+          accounts,
+          narrative,
         },
       ];
     }

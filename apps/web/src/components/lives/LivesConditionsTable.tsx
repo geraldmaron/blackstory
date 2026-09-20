@@ -47,7 +47,7 @@ export function LivesConditionsTable({ decade, emphasis }: LivesConditionsTableP
             </th>
             {LIVES_LENSES.map((lens) => (
               <td key={lens} data-emphasis={lens === emphasis ? 'true' : undefined}>
-                <LivesCellValue cell={condition.cells[lens]} />
+                <LivesCellValue cell={condition.cells[lens]} unit={condition.unit} />
               </td>
             ))}
           </tr>

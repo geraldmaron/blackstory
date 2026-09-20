@@ -5,7 +5,9 @@ import {
   JUXTAPOSITION_DISCLAIMER,
   LIVES_LENS_LABELS,
   LIVES_WORLD_DOMAIN_LABELS,
+  livesWorldMediationLine,
   type LivesAreaBundle,
+  type LivesConditionGap,
   type LivesSourceRef,
 } from '@repo/domain/statistics/lives';
 import {
@@ -15,11 +17,19 @@ import {
   livesMilestonePeriod,
   type LivesMilestone,
   type LivesMilestoneContext,
+  type LivesMilestoneFigure,
   type LivesMilestonePanel,
 } from '../../lib/lives/lives-milestones';
-import { describeLivesCell } from '../../lib/lives/lives-format';
+import type { HydratedArticle } from '../../lib/articles/hydrate';
+import { ArticleBody } from '../article/ArticleBody';
+import { ArticleReferences } from '../article/ArticleReferences';
+import { LivesAccount } from './LivesAccount';
+import { LivesTurn } from './LivesTurn';
+import { livesTurnFor } from '../../lib/lives/lives-turns';
+import { describeLivesCell, livesBarScaleNote, livesBarShare } from '../../lib/lives/lives-format';
 import { LIVES_ARCHIVE_READINGS } from '../../lib/lives/lives-archive';
 import { ArchiveFigure, RoomHandoff } from '../room';
+import { LivesRuleCard } from './LivesRuleCard';
 import { DestinationIcon } from '../patterns/DestinationIcon';
 
 void React;
@@ -32,14 +42,8 @@ const MILESTONE_ICONS: Record<LivesMilestone['key'], DestinationIconId> = {
   work: 'institution',
   count: 'data',
 };
-const ERA_TITLES: Record<string, string> = {
-  '1870-1890': 'The first generations after emancipation',
-  '1900-1930': 'A new century, unequal possibilities',
-  '1940-1960': 'War, work, and the struggle over rights',
-  '1970-1980': 'Reading the figures after civil rights legislation',
-  '1990-2000': 'At the turn of another century',
-  '2010-2020': 'The recent record',
-};
+/** Rules shown open in an era; the rest stay one tap away so no rule is dropped for length. */
+const LIVES_RULES_OPEN = 4;
 
 function ArchiveReading({ milestone }: { readonly milestone: LivesMilestone }) {
   const reading = LIVES_ARCHIVE_READINGS[milestone.key];
@@ -150,6 +154,8 @@ function ContextBlock({ context }: { readonly context: LivesMilestoneContext }) 
         <p className="lives-milestone__speaker">
           {beat.speaker.name}, {beat.speaker.place}, {beat.speaker.year}
           {beat.speaker.classNote ? ` · ${beat.speaker.classNote}` : ''}
+          {' · '}
+          {livesWorldMediationLine(beat.speaker)}
         </p>
       ) : null}
       <p>{beat.body}</p>
@@ -169,31 +175,60 @@ function ContextBlock({ context }: { readonly context: LivesMilestoneContext }) 
   );
 }
 
-function EraPanel({ panel }: { readonly panel: LivesMilestonePanel }) {
-  const titleId = `lives-era-${panel.era.id}`;
-  return (
-    <article className="lives-era" id={`era-${panel.era.id}`} aria-labelledby={titleId}>
-      <header className="lives-era__header">
-        <p className="lives-era__number">
-          <span>{panel.era.start}</span>
-          <span>–{panel.era.end}</span>
-        </p>
-        <div>
-          <p className="lives-era__eyebrow">United States · {livesMilestonePeriod(panel)}</p>
-          <h3 id={titleId}>{ERA_TITLES[panel.era.id]}</h3>
-          <p className="lives-era__universe">
-            Who this figure describes: {panel.condition.universe}.
-          </p>
-        </div>
-      </header>
+type ReaderPanel = LivesMilestonePanel<HydratedArticle>;
 
-      <section className="lives-era__comparison" aria-label={panel.condition.label}>
+/**
+ * The distance between the Black and white figures, in words. It is a derived measurement with its
+ * formula attached, which docs/methodology/juxtaposition-not-causation.md allows, and it stays
+ * inside one panel: two eras are never subtracted from each other. "Apart" carries no direction,
+ * so it reads the same whether the Black figure is the lower one (owning a home) or the higher one
+ * (looking for work).
+ */
+function GapLine({ gap }: { readonly gap: LivesConditionGap }) {
+  const [first, second] = gap.betweenLenses;
+  const rounded = Math.round(gap.points);
+  const measure =
+    gap.unit === 'years'
+      ? rounded === 1
+        ? 'year'
+        : 'years'
+      : gap.unit === 'per_1000'
+        ? 'per 1,000'
+        : rounded === 1
+          ? 'point'
+          : 'points';
+  return (
+    <p className="lives-era__gap">
+      <strong>
+        About {rounded} {measure} apart
+      </strong>{' '}
+      <span>
+        {LIVES_LENS_LABELS[first]} and {LIVES_LENS_LABELS[second]}.
+        {gap.uncertainty !== undefined && gap.uncertainty >= 0.5
+          ? ` Give or take ${Math.round(gap.uncertainty)}.`
+          : ''}{' '}
+        {gap.formula}
+      </span>
+    </p>
+  );
+}
+
+function FigureSection({ figure }: { readonly figure: LivesMilestoneFigure }) {
+  return (
+    <>
+      <section className="lives-era__comparison" aria-label={figure.condition.label}>
         <h4 className="lives-era__measure">
-          <DestinationIcon id="data" /> {panel.condition.label}
+          <DestinationIcon id="data" /> {figure.condition.label}
         </h4>
+        <p className="lives-era__universe">
+          Who this figure describes: {figure.condition.universe}. {livesMilestonePeriod(figure)}.
+          {livesBarScaleNote(figure.condition.unit)
+            ? ` ${livesBarScaleNote(figure.condition.unit)}`
+            : ''}
+        </p>
         <dl className="lives-era__values">
-          {panel.values.map(({ lens, cell }) => {
-            const display = describeLivesCell(cell);
+          {figure.values.map(({ lens, cell }) => {
+            const display = describeLivesCell(cell, figure.condition.unit);
             return (
               <div key={lens} className="lives-era__value" data-lens={lens}>
                 <dt>
@@ -208,7 +243,7 @@ function EraPanel({ panel }: { readonly panel: LivesMilestonePanel }) {
                   className="lives-era__bar"
                   style={
                     {
-                      '--lives-value': `${Math.max(0, Math.min(cell.estimate ?? 0, 100))}%`,
+                      '--lives-value': `${livesBarShare(cell.estimate ?? 0, figure.condition.unit)}%`,
                     } as React.CSSProperties
                   }
                   aria-hidden="true"
@@ -217,8 +252,9 @@ function EraPanel({ panel }: { readonly panel: LivesMilestonePanel }) {
             );
           })}
         </dl>
-        {panel.decade.decade >= 2010 &&
-        ['homeownership', 'high_school', 'unemployed'].includes(panel.condition.key) ? (
+        {figure.condition.gap ? <GapLine gap={figure.condition.gap} /> : null}
+        {figure.decade.decade >= 2010 &&
+        ['homeownership', 'high_school', 'unemployed'].includes(figure.condition.key) ? (
           <p className="lives-era__definition">
             In this measure, Black includes Hispanic origin; white excludes Hispanic origin.
             Hispanic includes people of any race. These categories overlap. Each percentage uses the
@@ -226,31 +262,142 @@ function EraPanel({ panel }: { readonly panel: LivesMilestonePanel }) {
           </p>
         ) : null}
       </section>
-
       <div className="lives-era__evidence">
         <p className="lives-era__source-label">
           <DestinationIcon id="source" /> Figure sources
         </p>
-        <SourceLinks sources={panel.sources} />
+        <SourceLinks sources={figure.sources} />
+      </div>
+    </>
+  );
+}
+
+/**
+ * One era, in the order a reader should meet it: a person first (docs/content/neo-voice.md, Law 1),
+ * then the history, then the count, then the rules that began. Census method sits one tap away once
+ * there is prose to read, so the page is about lives before it is about the count.
+ */
+function EraPanel({
+  panel,
+  milestone,
+}: {
+  readonly panel: ReaderPanel;
+  readonly milestone: LivesMilestone;
+}) {
+  const turn = livesTurnFor(milestone.key, panel.era.id);
+  const titleId = `lives-era-${panel.era.id}`;
+  const { narrative, figure } = panel;
+  // Two columns that each flow on their own: the story (account, prose, figure, question) and the
+  // record (rules, count note, sources). Children used to be pinned to fixed grid rows, which put
+  // anything new on top of something else.
+  const hasSide =
+    panel.rules.length > 0 || panel.context !== null || (narrative?.references.length ?? 0) > 0;
+  return (
+    <article
+      className={hasSide ? 'lives-era' : 'lives-era lives-era--single'}
+      id={`era-${panel.era.id}`}
+      aria-labelledby={titleId}
+    >
+      {/*
+        One stacked column, so the decades and the title can never collide at any width. Until an
+        era has a narrative, the decades ARE its heading: the old fallback printed the measure's
+        name as a title, directly above the same words on the figure.
+      */}
+      <header className="lives-era__header">
+        <p className="lives-era__eyebrow">
+          {narrative ? narrative.doc.placeLabel : 'United States'}
+        </p>
+        {narrative ? (
+          <>
+            <p className="lives-era__years">{panel.era.label}</p>
+            <h3 id={titleId}>{narrative.doc.title}</h3>
+          </>
+        ) : (
+          <h3 id={titleId} className="lives-era__years lives-era__years--heading">
+            {panel.era.label}
+          </h3>
+        )}
+      </header>
+
+      <div className="lives-era__main">
+        {panel.accounts.length > 0 ? (
+          <section className="lives-era__accounts" aria-label="In their own words">
+            <p className="lives-era__source-label">
+              <DestinationIcon id="person" /> In their own words
+            </p>
+            {panel.accounts.map((beat) => (
+              <LivesAccount key={beat.id} beat={beat} />
+            ))}
+          </section>
+        ) : null}
+
+        {narrative ? (
+          <section className="lives-era__narrative" aria-label="What happened in this stretch">
+            <ArticleBody article={narrative} />
+          </section>
+        ) : null}
+
+        {figure ? (
+          <FigureSection figure={figure} />
+        ) : (
+          <p className="lives-era__no-figure">
+            <strong>No comparison for this stretch.</strong> {panel.figureAbsence}
+          </p>
+        )}
+
+        {turn ? <LivesTurn turn={turn} /> : null}
       </div>
 
-      {panel.context ? <ContextBlock context={panel.context} /> : null}
+      {hasSide ? (
+        <div className="lives-era__side">
+          {panel.rules.length > 0 ? (
+            <section
+              className="lives-era__rules"
+              aria-label={`Rules beginning in ${panel.era.label}`}
+            >
+              <p className="lives-era__source-label">
+                <DestinationIcon id="law" /> Rules that began in this stretch
+              </p>
+              <ul className="lives-rules__list">
+                {panel.rules.slice(0, LIVES_RULES_OPEN).map((rule) => (
+                  <LivesRuleCard key={rule.id} rule={rule} />
+                ))}
+              </ul>
+              {panel.rules.length > LIVES_RULES_OPEN ? (
+                <details className="lives-era__more-rules">
+                  <summary>
+                    {panel.rules.length - LIVES_RULES_OPEN} more{' '}
+                    {panel.rules.length - LIVES_RULES_OPEN === 1 ? 'rule' : 'rules'} began in this
+                    stretch
+                  </summary>
+                  <ul className="lives-rules__list">
+                    {panel.rules.slice(LIVES_RULES_OPEN).map((rule) => (
+                      <LivesRuleCard key={rule.id} rule={rule} />
+                    ))}
+                  </ul>
+                </details>
+              ) : null}
+            </section>
+          ) : null}
 
-      {panel.rules.length > 0 ? (
-        <section className="lives-era__rules" aria-label={`Rules beginning in ${panel.era.label}`}>
-          <p className="lives-era__source-label">
-            <DestinationIcon id="law" /> Rules that began in this stretch
-          </p>
-          <ul>
-            {panel.rules.map((rule) => (
-              <li key={rule.id}>
-                <span>{rule.inForceFromYear}</span>{' '}
-                {rule.href ? <Link href={rule.href}>{rule.name}</Link> : rule.name}
-                <small>{rule.jurisdictionLabel}</small>
-              </li>
-            ))}
-          </ul>
-        </section>
+          {panel.context ? (
+            narrative ? (
+              <details className="lives-era__drawer">
+                <summary>How the count worked in these years</summary>
+                <ContextBlock context={panel.context} />
+              </details>
+            ) : (
+              <ContextBlock context={panel.context} />
+            )
+          ) : null}
+
+          {narrative && narrative.references.length > 0 ? (
+            <details className="lives-era__drawer">
+              <summary>Sources for this stretch ({narrative.references.length})</summary>
+              <ArticleReferences references={narrative.references} />
+            </details>
+          ) : null}
+        </div>
       ) : null}
     </article>
   );
@@ -259,11 +406,14 @@ function EraPanel({ panel }: { readonly panel: LivesMilestonePanel }) {
 export function LivesMilestoneExperience({
   bundle,
   milestone,
+  narratives,
 }: {
   readonly bundle: LivesAreaBundle;
   readonly milestone: LivesMilestone;
+  /** Era narratives by era id, already numbered continuously. Absent until a column is written. */
+  readonly narratives?: ReadonlyMap<string, HydratedArticle>;
 }) {
-  const panels = buildLivesMilestonePanels(bundle, milestone);
+  const panels = buildLivesMilestonePanels(bundle, milestone, narratives);
 
   return (
     <div className="lives-milestone">
@@ -302,8 +452,9 @@ export function LivesMilestoneExperience({
           <div className="lives-milestone__timeline-head">
             <h3>Across the years</h3>
             <p>
-              Each stop contains a sourced national comparison. Years without a publishable
-              comparison are not shown. Definitions and survey periods remain separate.
+              Each stop carries a sourced national comparison where one was published. A stretch
+              with no comparison appears only when there’s sourced history to tell. Definitions and
+              survey periods remain separate.
             </p>
             <nav className="lives-milestone__year-links" aria-label="Jump to a documented era">
               {panels.map((panel) => (
@@ -314,7 +465,7 @@ export function LivesMilestoneExperience({
             </nav>
           </div>
           {panels.map((panel) => (
-            <EraPanel key={panel.era.id} panel={panel} />
+            <EraPanel key={panel.era.id} panel={panel} milestone={milestone} />
           ))}
         </div>
       ) : (

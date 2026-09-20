@@ -156,7 +156,7 @@
   padding-bottom: var(--ds-space-2);
   border-bottom: var(--ds-border-width) solid var(--ds-rule);
   font-family: var(--ds-font-mono);
-  font-size: 10px;
+  font-size: var(--ds-text-micro);
   font-weight: 500;
   letter-spacing: 0.1em;
   text-transform: uppercase;
@@ -176,7 +176,7 @@
   gap: var(--ds-space-3);
   padding: 5px 0;
   color: var(--room-ink-2);
-  font-size: 12.5px;
+  font-size: var(--ds-text-caption);
   text-decoration: none;
 }
 
@@ -214,7 +214,7 @@
      next group's title sits directly under it and reads as part of the same block. */
   margin: var(--ds-space-2) 0 var(--ds-space-4);
   font-family: var(--ds-font-mono);
-  font-size: 10px;
+  font-size: var(--ds-text-micro);
   color: var(--room-ink-4);
 }
 
@@ -226,7 +226,7 @@
   gap: var(--ds-space-2);
   margin-bottom: var(--ds-space-5);
   font-family: var(--ds-font-mono);
-  font-size: 10px;
+  font-size: var(--ds-text-micro);
   letter-spacing: 0.1em;
   text-transform: uppercase;
   color: var(--room-ink-4);
@@ -390,7 +390,7 @@
 .ds-room-header__kicker {
   margin: 0 0 var(--ds-space-3);
   font-family: var(--ds-font-sans);
-  font-size: 12.5px;
+  font-size: var(--ds-text-caption);
   letter-spacing: 0;
   text-transform: none;
   color: var(--room-ink-3);
@@ -399,7 +399,7 @@
 .ds-room-header__title {
   font-family: var(--ds-font-display);
   font-weight: 600;
-  font-size: clamp(44px, 6vw, 86px);
+  font-size: var(--ds-text-display-1);
   line-height: 0.97;
   letter-spacing: -0.042em;
   min-width: 0;
@@ -417,7 +417,7 @@
   margin-top: var(--ds-space-4);
   max-width: 34em;
   font-family: var(--ds-font-editorial);
-  font-size: 22px;
+  font-size: var(--ds-text-editorial-lede);
   line-height: 1.48;
   color: var(--room-ink-2);
 }
@@ -436,7 +436,7 @@
 
 .ds-room-header__meta span {
   font-family: var(--ds-font-mono);
-  font-size: 10px;
+  font-size: var(--ds-text-micro);
   letter-spacing: 0.08em;
   text-transform: uppercase;
   color: var(--room-ink-4);
@@ -468,7 +468,7 @@
   padding-bottom: var(--ds-space-3);
   border-bottom: var(--ds-border-width) solid var(--room-rule-2);
   font-family: var(--ds-font-display);
-  font-size: 24px;
+  font-size: var(--ds-text-display-3);
   font-weight: 600;
   letter-spacing: -0.025em;
   text-transform: none;
@@ -619,14 +619,14 @@
 .ds-room .ds-room-card__title {
   font-family: var(--ds-font-display);
   font-weight: 600;
-  font-size: 24px;
+  font-size: var(--ds-text-title);
   letter-spacing: -0.03em;
   line-height: 1.15;
 }
 
 .ds-room-card__desc {
   font-family: var(--ds-font-editorial);
-  font-size: 16px;
+  font-size: var(--ds-text-body-sm);
   line-height: 1.5;
   color: var(--room-ink-3);
 }
@@ -634,7 +634,7 @@
 .ds-room-card__meta,
 .ds-room-card__tag {
   font-family: var(--ds-font-mono);
-  font-size: 12px;
+  font-size: var(--ds-text-micro);
   letter-spacing: 0.06em;
   color: var(--room-ink-3);
   white-space: normal;
@@ -655,7 +655,7 @@
 .ds-room-cards:not(.ds-room-cards--hub) .ds-room-card__tag {
   grid-column: 3;
   color: var(--room-ink-3);
-  font-size: 10.5px;
+  font-size: var(--ds-text-caption);
 }
 
 .ds-room-cards--hub .ds-room-card__meta {
@@ -701,7 +701,7 @@
   border-top: 1px solid var(--ds-rule);
   margin-top: var(--ds-space-3);
   padding-top: var(--ds-space-3);
-  font-size: 0.85rem;
+  font-size: var(--ds-text-caption);
   line-height: 1.55;
 }
 .ds-archive-figure figcaption p {
@@ -709,7 +709,7 @@
 }
 .ds-archive-figure__credit {
   font-family: var(--ds-font-mono);
-  font-size: 0.75rem;
+  font-size: var(--ds-text-caption);
   color: var(--ds-ink-muted);
 }
 .ds-archive-figure__source {
@@ -728,7 +728,7 @@
 /* —— Prose ————————————————————————————————————————————————————————————————— */
 .ds-room-prose {
   font-family: var(--ds-font-editorial);
-  font-size: 17px;
+  font-size: var(--ds-text-editorial);
   line-height: 1.66;
   color: var(--room-ink-2);
 }
@@ -749,7 +749,7 @@
   border-top: var(--ds-border-width) solid var(--room-rule-2);
   font-family: var(--ds-font-display);
   font-weight: 600;
-  font-size: 25px;
+  font-size: var(--ds-text-display-3);
   line-height: 1.18;
   letter-spacing: -0.025em;
   color: var(--ds-ink);
@@ -759,7 +759,7 @@
   margin-top: var(--ds-space-8);
   font-family: var(--ds-font-display);
   font-weight: 600;
-  font-size: 18px;
+  font-size: var(--ds-text-title);
   letter-spacing: -0.018em;
   color: var(--ds-ink);
 }
@@ -842,7 +842,7 @@
   gap: var(--ds-space-3);
   padding-block: 9px;
   border-bottom: var(--ds-border-width) solid var(--room-rule-2);
-  font-size: 13px;
+  font-size: var(--ds-text-caption);
 }
 
 .ds-room-src:last-child {
@@ -852,7 +852,7 @@
 .ds-room-src__i {
   font-family: var(--ds-font-mono);
   font-variant-numeric: tabular-nums;
-  font-size: 10px;
+  font-size: var(--ds-text-micro);
   color: var(--room-ink-4);
 }
 
@@ -869,7 +869,7 @@
 .ds-room-src__links {
   margin-top: 2px;
   font-family: var(--ds-font-mono);
-  font-size: 10.5px;
+  font-size: var(--ds-text-micro);
   color: var(--room-ink-4);
 }
 
@@ -881,7 +881,7 @@
 .ds-room-src__y {
   font-family: var(--ds-font-mono);
   font-variant-numeric: tabular-nums;
-  font-size: 10.5px;
+  font-size: var(--ds-text-micro);
   color: var(--room-ink-4);
 }
 
@@ -906,13 +906,13 @@
 }
 
 .ds-room-conn__name {
-  font-size: 13px;
+  font-size: var(--ds-text-caption);
   font-weight: 500;
 }
 
 .ds-room-conn__rel {
   font-family: var(--ds-font-mono);
-  font-size: 9.5px;
+  font-size: var(--ds-text-micro);
   letter-spacing: 0.06em;
   color: var(--room-ink-4);
 }
@@ -926,7 +926,7 @@
   border-left: var(--ds-border-width-strong) solid var(--ds-border-strong);
   border-radius: var(--ds-radius-sm);
   font-family: var(--ds-font-mono);
-  font-size: 11.5px;
+  font-size: var(--ds-text-caption);
   line-height: 1.6;
   color: var(--room-ink-3);
 }
@@ -955,7 +955,7 @@
 .ds-room-trust__k {
   display: block;
   font-family: var(--ds-font-mono);
-  font-size: 9.5px;
+  font-size: var(--ds-text-micro);
   letter-spacing: 0.12em;
   text-transform: uppercase;
   color: var(--room-ink-4);
@@ -965,7 +965,7 @@
   display: block;
   margin-top: 4px;
   font-family: var(--ds-font-sans);
-  font-size: 13.5px;
+  font-size: var(--ds-text-caption);
   font-weight: 550;
 }
 
@@ -990,7 +990,7 @@
   align-items: center;
   gap: 5px;
   font-family: var(--ds-font-mono);
-  font-size: 9.5px;
+  font-size: var(--ds-text-micro);
   letter-spacing: 0.12em;
   text-transform: uppercase;
   color: var(--room-ink-4);
@@ -998,7 +998,7 @@
 
 .ds-room-anat__v {
   margin-top: 4px;
-  font-size: 13.5px;
+  font-size: var(--ds-text-caption);
   font-weight: 550;
   letter-spacing: -0.008em;
 }
@@ -1014,7 +1014,7 @@
   border: var(--ds-border-width) solid var(--ds-rule);
   border-radius: var(--ds-radius-full);
   color: var(--room-ink-2);
-  font-size: 12px;
+  font-size: var(--ds-text-caption);
   font-weight: 500;
   white-space: nowrap;
   transition: all var(--ds-duration-fast) var(--ds-easing);
@@ -1040,7 +1040,7 @@ a.ds-room-chip {
 .ds-room-chip .ds-room-num {
   font-family: var(--ds-font-mono);
   font-variant-numeric: tabular-nums;
-  font-size: 10px;
+  font-size: var(--ds-text-micro);
   color: var(--room-ink-4);
 }
 
@@ -1059,7 +1059,7 @@ a.ds-room-chip {
 .ds-room-idx__count {
   margin-bottom: var(--ds-space-2);
   font-family: var(--ds-font-mono);
-  font-size: 10px;
+  font-size: var(--ds-text-micro);
   letter-spacing: 0.1em;
   text-transform: uppercase;
   color: var(--room-ink-4);
@@ -1105,7 +1105,7 @@ a.ds-room-chip {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  font-size: 13.5px;
+  font-size: var(--ds-text-body);
   font-weight: 550;
   letter-spacing: -0.006em;
 }
@@ -1116,7 +1116,7 @@ a.ds-room-chip {
   text-overflow: ellipsis;
   white-space: nowrap;
   font-family: var(--ds-font-mono);
-  font-size: 10px;
+  font-size: var(--ds-text-micro);
   letter-spacing: 0.04em;
   color: var(--room-ink-4);
 }
@@ -1178,7 +1178,7 @@ a.ds-room-chip {
   border-radius: var(--ds-radius-full);
   color: var(--ds-ink);
   font-family: var(--ds-font-ui);
-  font-size: 13px;
+  font-size: var(--ds-text-body);
 }
 
 .ds-records-find__input:focus-visible {
@@ -1196,7 +1196,7 @@ a.ds-room-chip {
   border-radius: var(--ds-radius-full);
   color: var(--ds-ink);
   font-family: var(--ds-font-ui);
-  font-size: 13px;
+  font-size: var(--ds-text-caption);
   cursor: pointer;
 }
 
@@ -1225,7 +1225,7 @@ a.ds-room-chip {
   border: var(--ds-border-width) solid var(--ds-accent-graphic);
   border-radius: var(--ds-radius-full);
   color: var(--ds-accent);
-  font-size: 12px;
+  font-size: var(--ds-text-caption);
   font-weight: 500;
   text-decoration: none;
   white-space: nowrap;
@@ -1233,7 +1233,7 @@ a.ds-room-chip {
 
 .ds-records-active__x {
   margin-left: 6px;
-  font-size: 10px;
+  font-size: var(--ds-text-caption);
 }
 
 .ds-records-active__chip:hover {
@@ -1243,10 +1243,207 @@ a.ds-room-chip {
 
 .ds-records-active__clear {
   font-family: var(--ds-font-mono);
-  font-size: 10px;
+  font-size: var(--ds-text-micro);
   letter-spacing: 0.06em;
   text-transform: uppercase;
   color: var(--room-ink-4);
+}
+
+/* —— FindBar: one find bar for every filtering room ————————————————————————————
+   Composes the find field, the chips and the active constraints above. What it adds is layout:
+   the field at a 44px target, each facet as one row that scrolls sideways instead of wrapping into
+   six rows of chrome on a phone, and the sort on the count line. */
+.ds-find {
+  display: grid;
+  gap: var(--ds-space-3);
+  margin: var(--ds-space-5) 0 var(--ds-space-4);
+  min-width: 0;
+  scroll-margin-top: calc(var(--ds-space-8) + 3rem);
+}
+
+/* The section a shareable filter URL lands on (`/law?topic=voting#browse`) clears the command bar. */
+.ds-find-anchor {
+  scroll-margin-top: calc(var(--ds-space-8) + 3rem);
+}
+
+.ds-find__fields {
+  flex-wrap: wrap;
+  align-items: flex-end;
+}
+
+.ds-find .ds-records-find__input {
+  height: 44px;
+}
+
+.ds-find__fields > .ds-typeahead,
+.ds-find__fields > .ds-pill-select {
+  flex: 1 1 12rem;
+  min-width: 0;
+}
+
+.ds-find__fields > .ds-typeahead {
+  flex-basis: 18rem;
+}
+
+.ds-find .ds-records-active {
+  margin: 0;
+}
+
+.ds-find__chips {
+  display: flex;
+  gap: 6px;
+  min-width: 0;
+  overflow-x: auto;
+  padding-block: 2px;
+  scrollbar-width: thin;
+}
+
+.ds-find__chips .ds-room-chip {
+  flex: none;
+  height: 36px;
+  padding-inline: 14px;
+}
+
+.ds-find__more {
+  min-width: 0;
+}
+
+.ds-find__more-summary {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 36px;
+  padding: 0 14px;
+  border: var(--ds-border-width) solid var(--ds-rule);
+  border-radius: var(--ds-radius-full);
+  font-size: var(--ds-text-caption);
+  font-weight: 500;
+  color: var(--room-ink-2);
+  cursor: pointer;
+  list-style: none;
+}
+
+.ds-find__more-summary::-webkit-details-marker {
+  display: none;
+}
+
+.ds-find__more-summary::after {
+  content: '+';
+  font-family: var(--ds-font-mono);
+  color: var(--room-ink-4);
+}
+
+.ds-find__more[open] > .ds-find__more-summary::after {
+  content: '−';
+}
+
+.ds-find__more-summary:hover {
+  border-color: var(--ds-border-strong);
+}
+
+.ds-find__more-summary .ds-room-num {
+  font-family: var(--ds-font-mono);
+  font-size: var(--ds-text-micro);
+  color: var(--ds-accent);
+}
+
+.ds-find__more-body {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: var(--ds-space-2) var(--ds-space-3);
+  margin-top: var(--ds-space-3);
+  min-width: 0;
+}
+
+.ds-find__more-body > .ds-find__chips {
+  flex: 1 1 100%;
+}
+
+.ds-find__more-body > .ds-pill-select {
+  flex: 1 1 12rem;
+  min-width: 0;
+}
+
+.ds-find__fields > .ds-find__more {
+  flex: 1 1 100%;
+}
+
+.ds-find__count {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--ds-space-2) var(--ds-space-5);
+  padding-top: var(--ds-space-3);
+  border-top: var(--ds-border-width) solid var(--room-rule-2);
+}
+
+.ds-find__count .ds-room-idx__count {
+  margin: 0;
+}
+
+.ds-find__sort {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0 var(--ds-space-4);
+  font-family: var(--ds-font-mono);
+  font-size: var(--ds-text-micro);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.ds-find__sort-label {
+  color: var(--room-ink-4);
+}
+
+.ds-find__sort-link {
+  display: inline-flex;
+  align-items: center;
+  min-height: 32px;
+  color: var(--room-ink-3);
+  text-decoration: none;
+}
+
+.ds-find__sort-link:hover {
+  color: var(--ds-ink);
+}
+
+.ds-find__sort-link[aria-current='true'] {
+  color: var(--ds-accent);
+}
+
+/* Touch targets. A tablet is a touch device too, so this follows the pointer as well as the
+   width: the sweep on 2026-09-20 found 36px chips and 32px sort links at 768. */
+@media (max-width: 64rem), (pointer: coarse) {
+  .ds-room .ds-cta,
+  .ds-room .ds-button {
+    min-height: 44px;
+  }
+
+  /* The radio inside is 1px; the label is the target, and it was 38px. */
+  .ds-room-field__choice {
+    min-height: 44px;
+  }
+
+  /* A chip outside a find bar, such as the errata feed links. */
+  .ds-room .ds-room-chip {
+    height: auto;
+    min-height: 44px;
+    padding-inline: 14px;
+  }
+
+  .ds-find__chips .ds-room-chip,
+  .ds-find__sort-link,
+  .ds-find__more-summary {
+    height: auto;
+    min-height: 44px;
+  }
+
+  .ds-find__chips .ds-room-chip {
+    padding-inline: 16px;
+  }
 }
 
 /* —— DataTable: scrolls inside its own container, never the page ——————————— */
@@ -1259,7 +1456,7 @@ a.ds-room-chip {
   margin-block: var(--ds-space-5);
   border-collapse: collapse;
   font-family: var(--ds-font-sans);
-  font-size: 13.5px;
+  font-size: var(--ds-text-caption);
 }
 
 .ds-room-tbl th {
@@ -1267,7 +1464,7 @@ a.ds-room-chip {
   border-bottom: var(--ds-border-width) solid var(--ds-border-strong);
   text-align: left;
   font-family: var(--ds-font-mono);
-  font-size: 9.5px;
+  font-size: var(--ds-text-micro);
   font-weight: 500;
   letter-spacing: 0.12em;
   text-transform: uppercase;
@@ -1307,7 +1504,7 @@ a.ds-room-chip {
   padding: var(--ds-space-3) var(--ds-space-4);
   cursor: pointer;
   font-family: var(--ds-font-mono);
-  font-size: 10.5px;
+  font-size: var(--ds-text-micro);
   letter-spacing: 0.1em;
   text-transform: uppercase;
   color: var(--room-ink-3);
@@ -1320,7 +1517,7 @@ a.ds-room-chip {
 
 .ds-room-draw__summary::after {
   content: '+';
-  font-size: 13px;
+  font-size: var(--ds-text-caption);
   color: var(--ds-accent);
 }
 
@@ -1362,7 +1559,7 @@ a.ds-room-chip {
 
 .ds-room-field__label {
   font-family: var(--ds-font-sans);
-  font-size: 13.5px;
+  font-size: var(--ds-text-caption);
   font-weight: 600;
   letter-spacing: 0;
   text-transform: none;
@@ -1379,7 +1576,7 @@ a.ds-room-chip {
 /* One line under the control, for the sentence that tells a person how to answer. */
 .ds-room-field__hint {
   margin: 0;
-  font-size: 12.5px;
+  font-size: var(--ds-text-caption);
   line-height: 1.5;
   color: var(--room-ink-3);
 }
@@ -1395,7 +1592,7 @@ a.ds-room-chip {
   border-radius: var(--ds-radius-sm);
   outline: none;
   font-family: var(--ds-font-sans);
-  font-size: 14.5px;
+  font-size: var(--ds-text-body);
   line-height: 1.5;
   color: var(--ds-ink);
 }
@@ -1444,7 +1641,7 @@ a.ds-room-chip {
   padding: 0 var(--ds-space-4);
   border: var(--ds-border-width) solid var(--ds-rule);
   border-radius: var(--ds-radius-full);
-  font-size: 13px;
+  font-size: var(--ds-text-caption);
   cursor: pointer;
 }
 
@@ -1471,7 +1668,7 @@ a.ds-room-chip {
 .ds-room .ds-room-ucard__title {
   font-family: var(--ds-font-display);
   font-weight: 600;
-  font-size: 17px;
+  font-size: var(--ds-text-title);
   letter-spacing: -0.02em;
 }
 
@@ -1479,7 +1676,7 @@ a.ds-room-chip {
   max-width: 36em;
   margin-top: var(--ds-space-3);
   font-family: var(--ds-font-editorial);
-  font-size: 15px;
+  font-size: var(--ds-text-body-sm);
   line-height: 1.58;
   color: var(--room-ink-3);
 }
@@ -1489,7 +1686,7 @@ a.ds-room-chip {
   margin-top: var(--ds-space-3);
   padding-left: var(--ds-space-5);
   font-family: var(--ds-font-editorial);
-  font-size: 15px;
+  font-size: var(--ds-text-body-sm);
   line-height: 1.6;
   color: var(--room-ink-3);
 }
@@ -1527,7 +1724,7 @@ a.ds-room-chip {
   border: var(--ds-border-width) solid var(--ds-border-strong);
   border-radius: 50%;
   font-family: var(--ds-font-mono);
-  font-size: 10px;
+  font-size: var(--ds-text-micro);
   color: var(--room-ink-4);
 }
 
@@ -1538,14 +1735,14 @@ a.ds-room-chip {
 }
 
 .ds-room-ustep__t {
-  font-size: 14px;
+  font-size: var(--ds-text-body-sm);
 }
 
 .ds-room-ustep__t small {
   display: block;
   margin-top: 3px;
   font-family: var(--ds-font-mono);
-  font-size: 10px;
+  font-size: var(--ds-text-micro);
   letter-spacing: 0.05em;
   color: var(--room-ink-4);
 }
@@ -1562,7 +1759,7 @@ a.ds-room-chip {
 .ds-room .ds-room-offramp__title {
   font-family: var(--ds-font-display);
   font-weight: 600;
-  font-size: 19px;
+  font-size: var(--ds-text-title);
   letter-spacing: -0.022em;
 }
 
@@ -1570,7 +1767,7 @@ a.ds-room-chip {
   max-width: 34em;
   margin-top: var(--ds-space-2);
   font-family: var(--ds-font-editorial);
-  font-size: 15.5px;
+  font-size: var(--ds-text-body-sm);
   line-height: 1.55;
   color: var(--room-ink-3);
 }
@@ -1604,7 +1801,7 @@ a.ds-room-chip {
 
 .ds-room-emptylist p {
   margin-top: var(--ds-space-2);
-  font-size: 13px;
+  font-size: var(--ds-text-caption);
   color: var(--room-ink-3);
 }
 
@@ -1666,7 +1863,7 @@ a.ds-room-chip {
   place-content: center;
   padding-inline: var(--ds-space-4);
   font-family: var(--ds-font-mono);
-  font-size: 0.625rem;
+  font-size: var(--ds-text-micro);
   letter-spacing: 0.14em;
   text-transform: uppercase;
   text-align: center;
@@ -1688,7 +1885,7 @@ a.ds-room-chip {
   z-index: 2; /* local: above the borrowed plate within this figure only, never the global ladder */
   padding: 3px 8px;
   font-family: var(--ds-font-mono);
-  font-size: 0.5625rem;
+  font-size: var(--ds-text-micro);
   letter-spacing: 0.12em;
   text-transform: uppercase;
   color: var(--ds-accent);
@@ -1714,7 +1911,7 @@ a.ds-room-chip {
   z-index: 2; /* local: same as the tag, above the borrowed plate within this figure only */
   padding: var(--ds-space-2) var(--ds-space-3);
   font-family: var(--ds-font-mono);
-  font-size: 0.625rem;
+  font-size: var(--ds-text-micro);
   letter-spacing: 0.08em;
   color: var(--ds-ink);
   background: var(--ds-surface);
@@ -1804,7 +2001,7 @@ a.ds-room-chip {
   padding: 0.35rem 0;
   border-bottom: 2px solid transparent;
   font-family: var(--ds-font-mono);
-  font-size: 0.6875rem;
+  font-size: var(--ds-text-micro);
   letter-spacing: 0.08em;
   text-transform: uppercase;
   white-space: nowrap;
@@ -1870,7 +2067,7 @@ a.ds-room-chip {
 .ds-room-section__kicker {
   margin: 0 0 var(--ds-space-1);
   font-family: var(--ds-font-mono);
-  font-size: 0.6875rem;
+  font-size: var(--ds-text-micro);
   letter-spacing: 0.1em;
   text-transform: uppercase;
   color: var(--ds-accent);
@@ -1881,7 +2078,7 @@ a.ds-room-chip {
   padding: 0;
   border: 0;
   font-family: var(--ds-font-display);
-  font-size: clamp(1.375rem, 1.15rem + 0.9vw, 1.875rem);
+  font-size: var(--ds-text-display-3);
   font-weight: 600;
   line-height: 1.15;
   letter-spacing: -0.03em;
@@ -1929,7 +2126,7 @@ a.ds-room-chip {
 .ds-room-fact__kicker {
   margin: 0 0 var(--ds-space-1);
   font-family: var(--ds-font-mono);
-  font-size: 0.6875rem;
+  font-size: var(--ds-text-micro);
   letter-spacing: 0.1em;
   text-transform: uppercase;
   color: var(--ds-accent);
@@ -1938,7 +2135,7 @@ a.ds-room-chip {
 .ds-room-fact__title {
   margin: 0;
   font-family: var(--ds-font-display);
-  font-size: 1.0625rem;
+  font-size: var(--ds-text-title);
   font-weight: 600;
   letter-spacing: -0.02em;
   line-height: 1.25;
@@ -1948,7 +2145,7 @@ a.ds-room-chip {
 .ds-room-fact__body {
   margin: var(--ds-space-2) 0 0;
   font-family: var(--ds-font-sans);
-  font-size: 0.9375rem;
+  font-size: var(--ds-text-body-sm);
   line-height: 1.55;
   color: var(--ds-ink-muted);
 }
@@ -1998,7 +2195,7 @@ a.ds-room-chip {
 .ds-room-handoff__copy strong {
   display: block;
   font-family: var(--ds-font-display);
-  font-size: 1.0625rem;
+  font-size: var(--ds-text-subtitle);
   font-weight: 600;
   letter-spacing: -0.02em;
   color: var(--ds-ink);
@@ -2008,7 +2205,7 @@ a.ds-room-chip {
   display: block;
   margin-top: var(--ds-space-1);
   font-family: var(--ds-font-sans);
-  font-size: 0.875rem;
+  font-size: var(--ds-text-body-sm);
   line-height: 1.5;
   color: var(--ds-ink-muted);
 }
@@ -2042,7 +2239,7 @@ a.ds-room-chip {
   padding-left: var(--ds-space-3);
   border-left: 2px solid var(--ds-rule);
   font-family: var(--ds-font-mono);
-  font-size: 0.65625rem;
+  font-size: var(--ds-text-micro);
   line-height: 1.5;
   color: var(--room-ink-4);
 }
@@ -2057,13 +2254,13 @@ a.ds-room-chip {
   }
 
   .ds-room-header__title {
-    font-size: clamp(1.5rem, 8vw, 2rem);
+    font-size: var(--ds-text-display-3);
     overflow-wrap: break-word;
     min-width: 0;
   }
 
   .ds-room-header__lede {
-    font-size: 1.0625rem;
+    font-size: var(--ds-text-editorial-lede);
     overflow-wrap: break-word;
     min-width: 0;
   }
@@ -2082,5 +2279,459 @@ a.ds-room-chip {
   .ds-room-prose {
     overflow-wrap: break-word;
     min-width: 0;
+  }
+}
+
+/* —— Ledger rooms ————————————————————————————————————————————————————————————
+   docs/ui/design-direction-v10-rooms.md: the standalone rooms, louder. Same material law (flat
+   matte, value steps, copper on strokes and glyphs); what changes is scale contrast. Scoped to
+   `.ds-room--ledger` because Lives, the memorial wall (P-01) and record pages share this kit and
+   are not part of that direction. */
+
+/* Frame and measure. Every ledger room shares one frame (`--room-doc-w`, 900px, plus the rail
+   where a room has one), so mastheads, stat rows and chapter bands line up from room to room.
+   Inside the frame, text keeps a reading measure: at 17px the full column ran about 115
+   characters a line, and 60 to 75 is the range a line can be read back from. Forms are capped
+   for the same reason a long input is hard to scan. Grids, tables, figures and the find bar use
+   the whole frame. */
+.ds-room--ledger {
+  /* In `ch`, so the measure follows the face and size of the text it holds: a 15px sans block and
+     a 17px serif block both land near 70 characters, which a rem width could not do. */
+  --room-measure: 62ch;
+  --room-form-measure: 36rem;
+}
+
+.ds-room--ledger .ds-room-prose,
+.ds-room--ledger .ds-room-section__body > p,
+.ds-room--ledger .ds-room-facts,
+.ds-room--ledger .ds-room-offramp p {
+  max-width: var(--room-measure);
+}
+
+.ds-room--ledger form:not([role='search']),
+.ds-room--ledger .ds-notice {
+  max-width: var(--room-form-measure);
+}
+
+/* One left edge, and it is the centered one. The kit centers a railed room's column-plus-rail
+   pair, which put /law's masthead 166px left of /about's on a laptop. A ledger room keeps its
+   column dead center at every width instead: until 98rem there is no room for a rail beside a
+   centered 900px column, so the rail stacks under the content, the same place it already goes
+   on a tablet; from 98rem it sits in the right margin. */
+@media (min-width: 68rem) and (max-width: 97.99rem) {
+  .ds-room--ledger > .ds-room__body--railed {
+    grid-template-columns: 1fr;
+    column-gap: 0;
+  }
+
+  .ds-room--ledger > .ds-room__body--railed > .ds-room__doc {
+    margin-inline: auto;
+  }
+
+  .ds-room--ledger > .ds-room__body--railed > .ds-room__rail {
+    width: min(100%, var(--room-doc-w, 760px));
+    margin-inline: auto;
+    padding-inline: var(--ds-gutter);
+    padding-block: 0 var(--ds-space-12);
+  }
+}
+
+@media (min-width: 98rem) {
+  .ds-room--ledger > .ds-room__body--railed {
+    grid-template-columns: minmax(0, 1fr) minmax(0, var(--room-doc-w, 760px)) minmax(0, 1fr);
+    justify-content: stretch;
+    column-gap: 0;
+  }
+
+  .ds-room--ledger > .ds-room__body--railed > .ds-room__doc {
+    grid-column: 2;
+  }
+
+  .ds-room--ledger > .ds-room__body--railed > .ds-room__rail {
+    grid-column: 3;
+    justify-self: start;
+    width: var(--room-rail-w, 300px);
+    margin-inline-start: var(--ds-space-8);
+  }
+}
+
+/* Masthead: a sentence at hero scale, the lede pushed right on wide screens, a 2px ink rule. */
+.ds-room--ledger .ds-entry--reading {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  column-gap: var(--ds-space-5);
+  row-gap: var(--ds-space-5);
+  margin-bottom: 0;
+  padding-bottom: var(--ds-space-8);
+  border-bottom: 2px solid var(--ds-ink);
+}
+
+.ds-room--ledger .ds-entry--reading > * {
+  grid-column: 1 / -1;
+  margin-top: 0;
+}
+
+.ds-room--ledger .ds-entry__title {
+  font-size: var(--ds-text-display-hero);
+  line-height: 0.98;
+  letter-spacing: -0.04em;
+  text-wrap: balance;
+}
+
+.ds-room--ledger .ds-entry__lede {
+  max-width: none;
+  color: var(--ds-ink);
+}
+
+/* The lede sits under the headline on its left edge. Pushing it into the right columns left a
+   block of empty canvas beside every long lede on a room with no plate. */
+@media (min-width: 60rem) {
+  .ds-room--ledger .ds-entry__lede {
+    grid-column: 1 / 10;
+    max-width: 44rem;
+  }
+}
+
+/* Stat row. */
+.ds-room-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(9.5rem, 1fr));
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border-bottom: var(--ds-border-width) solid var(--ds-rule);
+}
+
+.ds-room-stats__item,
+.ds-room-stats__link {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ds-space-2);
+  min-width: 0;
+}
+
+.ds-room-stats__item {
+  padding: var(--ds-space-5) var(--ds-space-5) var(--ds-space-5) 0;
+  margin-right: var(--ds-space-5);
+  border-right: var(--ds-border-width) solid var(--ds-rule);
+}
+
+.ds-room-stats__item:last-child {
+  border-right: 0;
+  margin-right: 0;
+}
+
+.ds-room-stats__link {
+  color: inherit;
+  text-decoration: none;
+}
+
+.ds-room-stats__link:focus-visible {
+  outline: var(--ds-focus-width, 2px) solid var(--ds-focus-ring, var(--ds-accent));
+  outline-offset: 4px;
+  border-radius: var(--ds-radius-sm);
+}
+
+.ds-room-stats__value {
+  font-family: var(--ds-font-display);
+  font-size: var(--ds-text-display-1);
+  font-weight: 600;
+  line-height: 1;
+  letter-spacing: -0.04em;
+  font-variant-numeric: tabular-nums;
+  color: var(--ds-ink);
+  transition: color var(--ds-duration-fast) var(--ds-easing);
+}
+
+.ds-room-stats__item:first-child .ds-room-stats__value,
+.ds-room-stats__link:hover .ds-room-stats__value,
+.ds-room-stats__link:focus-visible .ds-room-stats__value {
+  color: var(--ds-accent);
+}
+
+/* A sourced figure carries a decimal and a unit ("25.7 pts"), so it takes the step below and a
+   wider cell: at display-1 in a four-up row the unit ran into the next figure. */
+.ds-room-stats:has(.ds-room-stats__source) {
+  grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr));
+}
+
+.ds-room-stats__item:has(.ds-room-stats__source) .ds-room-stats__value {
+  font-size: var(--ds-text-display-2);
+}
+
+/* A phrase is not a numeral: it takes the step below so it fits its cell. */
+.ds-room-stats__value[data-phrase] {
+  font-size: var(--ds-text-display-3);
+}
+
+.ds-room-stats__unit {
+  margin-left: 0.15em;
+  font-size: 0.5em;
+  font-weight: 500;
+  letter-spacing: 0;
+  color: var(--ds-ink-muted);
+}
+
+.ds-room-stats__label {
+  font-family: var(--ds-font-mono);
+  font-size: var(--ds-text-micro);
+  letter-spacing: 0.08em;
+  line-height: 1.4;
+  text-transform: uppercase;
+  color: var(--ds-ink-muted);
+}
+
+/* A sourced figure's label is a sentence about the number, so it reads as one. */
+.ds-room-stats__label--sentence {
+  font-family: var(--ds-font-sans);
+  font-size: var(--ds-text-body-sm);
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--ds-ink);
+}
+
+.ds-room-stats__source {
+  font-family: var(--ds-font-mono);
+  font-size: var(--ds-text-micro);
+  letter-spacing: 0.02em;
+  color: var(--ds-ink-muted);
+}
+
+.ds-room--ledger .ds-entry-colophon {
+  margin-top: var(--ds-space-5);
+}
+
+/* Jump nav: 44px pills, the current chapter inverse. */
+.ds-room--ledger .ds-room-jump {
+  border-bottom: 0;
+  padding-block: var(--ds-space-3);
+}
+
+/* One row at every width. Nine pills wrapped to three sticky rows and ate a sixth of the screen. */
+.ds-room--ledger .ds-room-jump__list {
+  gap: var(--ds-space-2);
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.ds-room--ledger .ds-room-jump__link {
+  min-height: 2.75rem;
+  padding: 0 var(--ds-space-4);
+  border: var(--ds-border-width) solid var(--ds-rule);
+  border-radius: var(--ds-radius-full);
+  font-family: var(--ds-font-sans);
+  font-size: var(--ds-text-caption);
+  font-weight: 500;
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--ds-ink);
+}
+
+.ds-room--ledger .ds-room-jump__link:hover {
+  border-color: var(--ds-border-strong);
+}
+
+.ds-room--ledger .ds-room-jump__link[aria-current='location'] {
+  border-color: var(--ds-ink);
+  background: var(--ds-ink);
+  color: var(--ds-canvas);
+}
+
+/* Chapters: deeper value bands, an inverse plate, the heading a full step up. */
+/* A band needs room inside its own ground; a chapter on the canvas only needs to be separate
+   from the next one. Giving both the larger step stacked two of them between canvas chapters. */
+.ds-room--ledger .ds-room-section {
+  padding-block: var(--ds-section-sm, var(--ds-space-10));
+}
+
+.ds-room--ledger .ds-room-section--sunk {
+  padding-block: var(--ds-section-md, var(--ds-space-12));
+}
+
+.ds-room--ledger .ds-room-section--sunk {
+  background: var(--ds-surface-sunken);
+}
+
+.ds-room--ledger .ds-room-section__head {
+  gap: var(--ds-space-5);
+  max-width: none;
+  margin-bottom: var(--ds-space-6);
+}
+
+.ds-room--ledger .ds-room-section__head > .ds-room-section__plate {
+  width: 4rem;
+  height: 4rem;
+  border-color: var(--ds-ink);
+  border-radius: var(--ds-radius-md);
+  background: var(--ds-ink);
+  color: var(--ds-canvas);
+  font-size: 1.5em;
+}
+
+.ds-room--ledger .ds-room-section__titles {
+  padding-top: 0;
+}
+
+.ds-room.ds-room--ledger .ds-room-section__title {
+  font-size: var(--ds-text-display-2);
+  line-height: 1.02;
+  letter-spacing: -0.035em;
+  text-wrap: balance;
+}
+
+.ds-room.ds-room--ledger .ds-room-grouphd {
+  font-size: var(--ds-text-display-2);
+  line-height: 1.02;
+  letter-spacing: -0.035em;
+  border-bottom: 2px solid var(--ds-ink);
+}
+
+/* Handoffs: ruled, not boxed. */
+.ds-room--ledger .ds-room-handoff {
+  border-top: 2px solid var(--ds-ink);
+  padding-block: var(--ds-space-5);
+}
+
+.ds-room--ledger .ds-room-handoffs .ds-room-handoff:last-child,
+.ds-room--ledger .ds-room-section__body > .ds-room-handoff {
+  border-bottom: 0;
+}
+
+.ds-room--ledger .ds-room-handoff__copy strong {
+  font-size: var(--ds-text-title);
+}
+
+@media (max-width: 40rem) {
+  .ds-room-stats {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .ds-room-stats__item {
+    margin-right: var(--ds-space-3);
+    padding-right: var(--ds-space-3);
+  }
+
+  .ds-room-stats__item:nth-child(even) {
+    border-right: 0;
+    margin-right: 0;
+  }
+
+  .ds-room--ledger .ds-room-section__head > .ds-room-section__plate {
+    width: 3rem;
+    height: 3rem;
+    font-size: 1.15em;
+  }
+}
+
+/* —— Document plate ————————————————————————————————————————————————————————————
+   A typeset sheet on the raised value. On a wide ledger masthead it turns two degrees and its
+   blank foot slides under the stat row, which is the one place a contact shadow is earned:
+   the sheet really does overlap the band. Everywhere else it is a plain figure in the flow. */
+.ds-room-plate {
+  display: grid;
+  gap: var(--ds-space-4);
+  margin: 0;
+  padding: var(--ds-space-5);
+  background: var(--ds-surface-raised);
+  border: var(--ds-border-width) solid var(--ds-rule);
+}
+
+.ds-room-plate__label {
+  justify-self: start;
+  margin: calc(var(--ds-space-5) * -1 - 0.7rem) 0 0;
+  padding: 0.3rem 0.5rem;
+  background: var(--ds-ink);
+  color: var(--ds-canvas);
+  font-family: var(--ds-font-mono);
+  font-size: var(--ds-text-micro);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.ds-room-plate__text {
+  margin: 0;
+  font-family: var(--ds-font-editorial);
+  font-size: var(--ds-text-title);
+  line-height: 1.34;
+  color: var(--ds-ink);
+}
+
+.ds-room-plate__body {
+  display: grid;
+  gap: var(--ds-space-3);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ds-room-plate__row {
+  display: flex;
+  align-items: baseline;
+  gap: var(--ds-space-3);
+  padding-bottom: var(--ds-space-3);
+  border-bottom: var(--ds-border-width) dashed var(--ds-rule);
+  font-family: var(--ds-font-display);
+  font-size: var(--ds-text-subtitle);
+  font-weight: 600;
+  letter-spacing: -0.012em;
+}
+
+.ds-room-plate__row:last-child {
+  padding-bottom: 0;
+  border-bottom: 0;
+}
+
+.ds-room-plate__step {
+  flex: none;
+  font-family: var(--ds-font-mono);
+  font-size: var(--ds-text-micro);
+  font-weight: 400;
+  letter-spacing: 0.08em;
+  color: var(--ds-ink-muted);
+}
+
+.ds-room-plate__caption {
+  display: grid;
+  gap: var(--ds-space-2);
+  padding-top: var(--ds-space-3);
+  border-top: var(--ds-border-width) solid var(--ds-rule);
+  font-family: var(--ds-font-mono);
+  font-size: var(--ds-text-micro);
+  line-height: 1.5;
+  color: var(--ds-ink-muted);
+}
+
+.ds-room-plate__link {
+  justify-self: start;
+  color: var(--ds-accent);
+}
+
+@media (min-width: 60rem) {
+  .ds-room--ledger .ds-entry--plated .ds-entry__lede {
+    grid-column: 1 / 8;
+    align-self: start;
+  }
+
+  .ds-room--ledger .ds-entry--plated .ds-room-plate {
+    grid-column: 8 / -1;
+    transform: rotate(-2deg);
+  }
+
+  /* The sheet slides under the stat row only where there is one. With no band to go under, it
+     stays inside the masthead instead of hanging over the jump nav. */
+  .ds-room--ledger .ds-entry--plated:has(+ .ds-room-stats) .ds-room-plate {
+    position: relative;
+    z-index: 1; /* local: the sheet sits under the stat row that follows, within this masthead only */
+    margin-bottom: calc(var(--ds-space-8) * -2.25);
+    padding-bottom: calc(var(--ds-space-8) * 1.75);
+    box-shadow: var(--ds-contact-plate);
+  }
+
+  /* The band the sheet slides under. */
+  .ds-room--ledger .ds-entry--plated + .ds-room-stats {
+    position: relative;
+    z-index: 2; /* local: above the sheet it overlaps, within this masthead only */
+    background: var(--ds-canvas);
   }
 }

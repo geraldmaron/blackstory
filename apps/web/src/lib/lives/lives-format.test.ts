@@ -50,3 +50,21 @@ test('in-force years read open-ended or bounded', () => {
   assert.equal(formatInForceYears(1968, null), 'In force from 1968');
   assert.equal(formatInForceYears(1896, 1954), 'In force 1896–1954');
 });
+
+test('a figure is printed and drawn in its own unit, never as a percent it is not', async () => {
+  const { formatLivesValue, livesBarShare, livesBarScaleNote, describeLivesCell } =
+    await import('./lives-format');
+  assert.equal(formatLivesValue(44.4), '44%');
+  assert.equal(formatLivesValue(71.8, 'years'), '71.8 years');
+  assert.equal(formatLivesValue(14.1, 'per_1000'), '14.1 per 1,000');
+  // 14.1 deaths per 1,000 is a short bar on a 200 scale, not a 14% bar.
+  assert.equal(Math.round(livesBarShare(14.1, 'per_1000') * 100) / 100, 7.05);
+  assert.equal(livesBarShare(71.8, 'years'), 71.8);
+  assert.equal(livesBarShare(250, 'per_1000'), 100);
+  assert.equal(livesBarScaleNote('percent'), null);
+  assert.match(livesBarScaleNote('per_1000') ?? '', /200 deaths per 1,000/);
+  assert.equal(
+    describeLivesCell({ state: 'published', estimate: 71.8 }, 'years').text,
+    '71.8 years',
+  );
+});

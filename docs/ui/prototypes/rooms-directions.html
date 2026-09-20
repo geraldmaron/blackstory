@@ -1,0 +1,453 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<!-- Rooms visual directions review, 2026-09-20 (repo-vac3x.1.14.1). Open this file in a browser. Token values are copied from packages/ui/src/styles/tokens.css. -->
+<title>Rooms Directions Review</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400&family=Schibsted+Grotesk:wght@500;600;700&display=swap">
+<style>
+/* Token values copied from packages/ui/src/styles/tokens.css so the baseline is faithful. */
+:root{
+  --sunken:#ede7da;--canvas:#f8f4ec;--surface:#fbf8f2;--raised:#fffdf8;--ink:#0a0a0a;--muted:#6d675f;--rule:#d7d0c4;
+  --accent:#8e4f2a;--accent-g:#b86b2a;--warn-bg:#f3e4c6;--warn-fg:#6b4a17;--warn-bd:#b87a2a;
+  --contact:0 6px 28px rgb(10 10 10 / 12%);--contact-sm:0 2px 10px rgb(10 10 10 / 9%);
+  --slate:#4f6672;--moss:#5d6b2e;
+  --f-disp:"Schibsted Grotesk",system-ui,sans-serif;--f-sans:"Geist",system-ui,sans-serif;
+  --f-serif:"Newsreader",Georgia,serif;--f-mono:"Geist Mono",ui-monospace,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --sunken:#0c0b0a;--canvas:#131110;--surface:#1b1917;--raised:#232019;--ink:#f4efe5;--muted:#bdb5a9;--rule:#2c2823;
+  --accent:#d07a32;--accent-g:#d07a32;--warn-bg:#2a2012;--warn-fg:#ecd3a0;--warn-bd:#b87a2a;
+  --contact:0 6px 28px rgb(0 0 0 / 55%);--contact-sm:0 2px 10px rgb(0 0 0 / 45%);--slate:#8fb0c0;--moss:#aebd6e;}}
+:root[data-theme="dark"]{
+  --sunken:#0c0b0a;--canvas:#131110;--surface:#1b1917;--raised:#232019;--ink:#f4efe5;--muted:#bdb5a9;--rule:#2c2823;
+  --accent:#d07a32;--accent-g:#d07a32;--warn-bg:#2a2012;--warn-fg:#ecd3a0;--warn-bd:#b87a2a;
+  --contact:0 6px 28px rgb(0 0 0 / 55%);--contact-sm:0 2px 10px rgb(0 0 0 / 45%);--slate:#8fb0c0;--moss:#aebd6e;}
+*{box-sizing:border-box}
+body{margin:0;background:var(--sunken);color:var(--ink);font:400 15px/1.5 var(--f-sans);padding-inline:16px;padding-block:20px 56px}
+a{color:inherit}
+:focus-visible{outline:3px solid var(--ink);outline-offset:2px}
+.wrap{max-width:1240px;margin-inline:auto;display:grid;gap:18px}
+
+/* ---------- review chrome ---------- */
+.top h1{font:600 22px/1.2 var(--f-disp);letter-spacing:-.02em;margin:0 0 4px}
+.top p{margin:0;color:var(--muted);max-width:70ch}
+.bar{z-index:20;display:flex;flex-wrap:wrap;gap:10px 18px;padding:10px 12px;background:var(--canvas);border:1px solid var(--rule);border-radius:14px}
+.seg{display:flex;flex-direction:column;gap:4px;min-width:0}
+.seg>span{font:500 10.5px/1 var(--f-mono);letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.seg>div{display:flex;flex-wrap:wrap;gap:4px}
+.seg button{font:500 13px/1 var(--f-sans);min-height:36px;padding:0 12px;border-radius:999px;border:1px solid var(--rule);background:transparent;color:var(--ink);cursor:pointer}
+.seg button[aria-pressed="true"]{background:var(--ink);color:var(--canvas);border-color:var(--ink)}
+@media (min-width:900px){.bar{position:sticky;top:env(safe-area-inset-top,0px)}}
+.brief{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));padding:16px;background:var(--canvas);border:1px solid var(--rule);border-radius:14px}
+.brief h2{font:600 18px/1.2 var(--f-disp);letter-spacing:-.015em;margin:0 0 6px}
+.brief h3{font:500 10.5px/1 var(--f-mono);letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin:0 0 6px}
+.brief p,.brief li{margin:0;font-size:14px;color:var(--ink)}
+.brief ul{margin:0;padding-left:18px;display:grid;gap:3px}
+.frame{display:flex;justify-content:center}
+.notes{display:grid;gap:14px;grid-template-columns:repeat(auto-fit,minmax(300px,1fr))}
+.notes section{padding:16px;background:var(--canvas);border:1px solid var(--rule);border-radius:14px;min-width:0}
+.notes h2{font:600 16px/1.2 var(--f-disp);margin:0 0 10px}
+.notes table{width:100%;border-collapse:collapse;font-size:13.5px}
+.notes td{padding:6px 8px 6px 0;border-top:1px solid var(--rule);vertical-align:top}
+.notes td:first-child{font:400 11px/1.6 var(--f-mono);color:var(--muted);white-space:nowrap}
+.notes em{font-family:var(--f-serif);color:var(--accent);font-size:1.05em}
+.notes ul{margin:0;padding-left:18px;display:grid;gap:4px;font-size:13.5px}
+
+/* ---------- the stage: a BlackStory room ---------- */
+.stage{container-type:inline-size;width:100%;max-width:1180px;background:var(--canvas);border:1px solid var(--rule);border-radius:18px;overflow:hidden;
+  --pad:clamp(16px,4cqw,56px);--fam:var(--accent);--famg:var(--accent-g)}
+.stage[data-w="phone"]{max-width:390px}
+.shell{display:flex;align-items:center;gap:10px;padding:10px var(--pad);border-bottom:1px solid var(--rule);font:500 12px/1 var(--f-sans);color:var(--muted)}
+.shell b{font:600 14px/1 var(--f-disp);color:var(--ink);margin-right:auto}
+.shell span{padding:6px 10px;border:1px solid var(--rule);border-radius:999px}
+.room{padding:clamp(28px,6cqw,72px) var(--pad) 56px;max-width:calc(900px + var(--pad)*2);margin-inline:auto;display:grid;gap:28px}
+.room[data-util]{max-width:calc(760px + var(--pad)*2)}
+.crumb{font:400 10px/1 var(--f-mono);letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.crumb i{color:var(--accent);font-style:normal}
+.mast{display:grid;gap:16px;position:relative}
+.mast h1{font:600 clamp(2.5rem,1.4rem + 4.6cqw,5rem)/1.04 var(--f-disp);letter-spacing:-.024em;margin:0;text-wrap:balance}
+.mast h1 em{font:italic 400 1em/1 var(--f-serif);color:var(--fam)}
+.lede{font:400 clamp(1.125rem,1rem + .55cqw,1.4375rem)/1.68 var(--f-serif);color:var(--muted);max-width:38rem;margin:0}
+.colophon{display:flex;flex-wrap:wrap;gap:4px 18px;font:400 10px/1.6 var(--f-mono);color:var(--muted);margin:0;padding:0;list-style:none}
+.prose{font:400 17px/1.62 var(--f-serif);margin:0;max-width:40rem}
+.small{font:400 15px/1.55 var(--f-serif);color:var(--muted);margin:0;max-width:40rem}
+.notice{border:1px solid var(--warn-bd);background:var(--warn-bg);color:var(--warn-fg);border-radius:14px;padding:14px 16px;display:grid;gap:4px}
+.notice b{font:600 16px/1.3 var(--f-sans)}.notice p{margin:0;font:400 15px/1.5 var(--f-sans)}
+.notice small{font:600 11px/1 var(--f-mono);letter-spacing:.1em;text-transform:uppercase}
+.ico{width:1em;height:1em;stroke:currentColor;fill:none;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round;flex:none}
+
+.jump{display:flex;gap:4px 16px;flex-wrap:wrap;padding:12px 0;border-block:1px solid var(--rule);position:relative}
+.jump a{display:inline-flex;align-items:center;gap:6px;min-height:32px;font:400 11px/1 var(--f-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);text-decoration:none}
+.jump a:hover,.jump a[aria-current]{color:var(--fam)}
+.prog{display:none}
+
+.stats{display:none}
+.chapter{display:grid;gap:18px;padding:24px;border-radius:14px}
+.chapter.sunk{background:color-mix(in srgb,var(--canvas) 94%,var(--ink))}
+.chead{display:flex;gap:14px;align-items:center}
+.plate{width:44px;height:44px;border-radius:10px;border:1px solid var(--famg);color:var(--fam);display:grid;place-items:center;font-size:20px;flex:none}
+.kick{font:400 11px/1 var(--f-mono);letter-spacing:.1em;text-transform:uppercase;color:var(--fam);margin:0 0 6px}
+.chead h2{font:600 27.6px/1.15 var(--f-disp);letter-spacing:-.02em;margin:0}
+.grouphd{font:600 24px/1.2 var(--f-disp);letter-spacing:-.025em;margin:12px 0 0;padding-bottom:12px;border-bottom:1px solid var(--rule)}
+.facts{display:grid;gap:16px;margin:0;padding:0;list-style:none}
+.facts li{display:flex;gap:12px}
+.facts .plate{width:36px;height:36px;font-size:16px}
+.facts b{display:block;font:600 17px/1.3 var(--f-disp)}.facts p{margin:2px 0 0;font:400 15px/1.5 var(--f-sans);color:var(--muted)}
+.hand{display:grid;gap:10px;grid-template-columns:repeat(auto-fit,minmax(200px,1fr))}
+.hand a{display:grid;gap:4px;padding:14px;border:1px solid var(--rule);border-radius:14px;text-decoration:none;background:var(--canvas)}
+.hand a b{font:600 17px/1.2 var(--f-disp);display:flex;align-items:center;gap:8px}
+.hand a span{font:400 15px/1.45 var(--f-serif);color:var(--muted)}
+.hand a:hover{border-color:var(--famg)}
+
+.find{display:flex;gap:8px}
+.find input{flex:1;min-width:0;height:40px;border-radius:999px;border:1px solid var(--rule);background:var(--surface);color:var(--ink);padding:0 16px;font:400 13px/1 var(--f-sans)}
+.find button{height:40px;border-radius:999px;border:1px solid var(--rule);background:transparent;color:var(--ink);padding:0 16px;font:400 13px/1 var(--f-sans)}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{display:inline-flex;align-items:center;gap:6px;height:30px;padding:0 10px;border-radius:999px;border:1px solid var(--rule);font:500 12px/1 var(--f-sans);text-decoration:none}
+.chip i{font:400 10px/1 var(--f-mono);color:var(--muted);font-style:normal}
+.chip[aria-current]{border-color:var(--famg);color:var(--fam);background:color-mix(in oklab,var(--fam) 10%,transparent)}
+.count{font:400 10px/1 var(--f-mono);letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin:6px 0 0;display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
+
+.rows{display:grid}
+.row{display:grid;grid-template-columns:20px minmax(0,1.6fr) 70px 44px minmax(0,1.2fr);gap:4px 12px;padding:12px 0;border-top:1px solid var(--rule);text-decoration:none;align-items:baseline}
+.row .g{color:var(--muted);font:400 13px/1 var(--f-serif)}
+.row .n{font:550 13.5px/1.3 var(--f-sans)}
+.row .p,.row .y,.row .c{font:400 10px/1.5 var(--f-mono);color:var(--muted)}
+.row .c{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.row .gl{grid-column:2/-1;font:400 12.5px/1.5 var(--f-sans);color:var(--muted)}
+.row .k,.row .more,.row .thumb{display:none}
+.row:hover .n{color:var(--fam)}
+
+.pipe{display:grid;grid-template-columns:repeat(4,1fr);gap:18px;margin:0;padding:0;list-style:none}
+.pipe li{border:1px solid var(--ink);border-radius:4px;padding:12px;position:relative;background:var(--canvas)}
+.pipe li:last-child{border-color:var(--famg)}
+.pipe li+li::before{content:"";position:absolute;left:-19px;top:50%;width:18px;height:1px;background:var(--ink);transform-origin:left}
+.pipe small{font:400 10px/1 var(--f-mono);color:var(--muted)}
+.pipe b{display:block;font:600 15px/1.2 var(--f-disp);margin:6px 0 4px}.pipe span{font:400 12.5px/1.4 var(--f-sans);color:var(--muted)}
+.grades{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));margin:0;padding:0;list-style:none}
+.grades li{border-top:1px solid var(--rule);padding-top:12px}
+.grades i{font-style:normal;letter-spacing:.2em;color:var(--fam);font-size:13px}
+.grades b{display:block;font:600 17px/1.3 var(--f-disp)}.grades p{margin:4px 0 0;font:400 15px/1.5 var(--f-sans);color:var(--muted)}
+.cards{display:grid;gap:0}
+.card{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.4fr);gap:8px 20px;padding:16px 0;border-top:1px solid var(--rule);text-decoration:none}
+.card b{font:600 24px/1.15 var(--f-disp);letter-spacing:-.02em;display:flex;gap:10px;align-items:baseline}
+.card span{font:400 16px/1.5 var(--f-serif);color:var(--muted)}
+.mailbox{border:1px solid var(--rule);border-radius:14px;padding:14px 16px;background:var(--surface)}
+.mailbox small{font:500 11px/1 var(--f-mono);letter-spacing:.1em;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:6px}
+.mailbox a{color:var(--fam);font:400 15px/1 var(--f-sans)}
+.offramp{border:1px solid var(--rule);border-radius:18px;padding:20px;display:grid;gap:8px;background:color-mix(in srgb,var(--canvas) 94%,var(--ink))}
+.offramp b{font:600 19px/1.2 var(--f-disp)}.offramp p{margin:0;font:400 15.5px/1.5 var(--f-serif);color:var(--muted)}
+.material,.famtag,.rail{display:none}
+
+@container (max-width:640px){
+  .row{grid-template-columns:20px minmax(0,1fr) auto}.row .p,.row .c{display:none}.row .gl{grid-column:2/-1}
+  .pipe{grid-template-columns:1fr 1fr}.pipe li+li::before{display:none}
+  .card{grid-template-columns:1fr}.chapter{padding:18px 14px}
+  .jump{flex-wrap:nowrap;overflow-x:auto}.jump a{white-space:nowrap}
+}
+
+/* ---------- shared by A, B, C: the new grammar ---------- */
+.stage:not([data-dir="today"]) .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:0;margin:0;padding:0;list-style:none}
+.stage:not([data-dir="today"]) .colophon{display:none}
+.stats li{padding:14px 16px 14px 0;display:grid;gap:6px;align-content:start}
+.stats b{font:600 44px/1 var(--f-disp);letter-spacing:-.03em;font-variant-numeric:tabular-nums}
+.stats span{font:400 11px/1.4 var(--f-mono);letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.stage:not([data-dir="today"]) .row{grid-template-columns:20px minmax(0,1fr) auto auto}
+.stage:not([data-dir="today"]) .row .n{font:600 17px/1.3 var(--f-disp);letter-spacing:-.01em}
+.stage:not([data-dir="today"]) .row .gl{font:400 15px/1.5 var(--f-serif)}
+.stage:not([data-dir="today"]) .row .p,.stage:not([data-dir="today"]) .row .y,.stage:not([data-dir="today"]) .row .c,.stage:not([data-dir="today"]) .count{font-size:11px}
+.stage:not([data-dir="today"]) .row .c{grid-column:2/-1;white-space:normal}
+.stage:not([data-dir="today"]) .find button{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%)}
+.stage:not([data-dir="today"]) .find input{height:44px;font-size:15px}
+.stage:not([data-dir="today"]) .chips{flex-wrap:nowrap;overflow-x:auto;padding-bottom:4px}
+.stage:not([data-dir="today"]) .chip{height:36px;font-size:13px;white-space:nowrap;flex:none}
+@container (max-width:640px){.stage:not([data-dir="today"]) .chip{height:44px;padding:0 14px}}
+
+/* ---------- A. Ledger, louder ---------- */
+.stage[data-dir="a"] .room{max-width:calc(1080px + var(--pad)*2);gap:40px}
+.stage[data-dir="a"] .room[data-util]{max-width:calc(860px + var(--pad)*2)}
+.stage[data-dir="a"] .mast{grid-template-columns:repeat(12,minmax(0,1fr));gap:20px;padding-bottom:28px;border-bottom:2px solid var(--ink)}
+.stage[data-dir="a"] .mast>*{grid-column:1/-1}
+.stage[data-dir="a"] .mast h1{font-size:clamp(2.75rem,1rem + 7cqw,6.75rem);line-height:.98;letter-spacing:-.04em;grid-column:1/12}
+.stage[data-dir="a"] .lede{grid-column:6/-1;color:var(--ink);max-width:none}
+.stage[data-dir="a"] .stats{border-top:1px solid var(--rule)}
+.stage[data-dir="a"] .stats li{border-right:1px solid var(--rule);padding:18px 18px 4px 0;margin-right:18px}
+.stage[data-dir="a"] .stats li:last-child{border-right:0}
+.stage[data-dir="a"] .stats b{font-size:clamp(3rem,1.6rem + 4.4cqw,5.25rem)}
+.stage[data-dir="a"] .stats li:first-child b{color:var(--accent)}
+.stage[data-dir="a"] .jump{border-block:0;padding:0;gap:8px}
+.stage[data-dir="a"] .jump a{min-height:44px;padding:0 16px;border:1px solid var(--rule);border-radius:999px;font:500 13px/1 var(--f-sans);letter-spacing:0;text-transform:none;color:var(--ink)}
+.stage[data-dir="a"] .jump a[aria-current]{border-color:var(--ink);background:var(--ink);color:var(--canvas)}
+.stage[data-dir="a"] .chapter{border-radius:0;margin-inline:calc(var(--pad)*-1);padding:clamp(28px,5cqw,64px) var(--pad);gap:28px}
+.stage[data-dir="a"] .chapter.sunk{background:var(--sunken)}
+.stage[data-dir="a"] .chead{align-items:flex-start;gap:20px}
+.stage[data-dir="a"] .chead .plate{width:64px;height:64px;border-radius:14px;font-size:28px;background:var(--ink);color:var(--canvas);border-color:var(--ink)}
+.stage[data-dir="a"] .chead h2{font-size:clamp(2rem,1.35rem + 2.7cqw,3.25rem);line-height:1.02;letter-spacing:-.03em}
+.stage[data-dir="a"] .row{grid-template-columns:clamp(64px,11cqw,132px) minmax(0,1fr) auto;gap:6px 24px;padding:22px 0;border-top:1px solid var(--ink)}
+.stage[data-dir="a"] .row .g,.stage[data-dir="a"] .row .p{display:none}
+.stage[data-dir="a"] .row .y{grid-row:1/4;font:600 clamp(1.75rem,1rem + 3cqw,3rem)/1 var(--f-disp);letter-spacing:-.04em;color:var(--ink);font-variant-numeric:tabular-nums;order:-1}
+.stage[data-dir="a"] .row .n{font-size:clamp(1.25rem,1rem + 1cqw,1.625rem);grid-column:2}
+.stage[data-dir="a"] .row .k{display:block;font:400 11px/1.6 var(--f-mono);letter-spacing:.06em;text-transform:uppercase;color:var(--accent);grid-column:3;grid-row:1;text-align:right}
+.stage[data-dir="a"] .row .c,.stage[data-dir="a"] .row .gl{grid-column:2/-1}
+.stage[data-dir="a"] .row .gl{font-size:16px;color:var(--ink);max-width:46rem}
+.stage[data-dir="a"] .hand a{border:0;border-top:2px solid var(--ink);border-radius:0;padding:16px 0;background:transparent}
+.stage[data-dir="a"] .hand a b{font-size:22px}
+.stage[data-dir="a"] .card b{font-size:clamp(1.5rem,1.1rem + 1.6cqw,2.25rem)}
+.stage[data-dir="a"] .card{border-top:1px solid var(--ink);padding:22px 0}
+.stage[data-dir="a"] .grades b{font-size:22px}.stage[data-dir="a"] .grades i{font-size:18px}
+.stage[data-dir="a"] .grades li{border-top:2px solid var(--ink)}
+@container (min-width:1000px){
+  .stage[data-dir="a"] .room[data-room="law"] .catalog{display:grid;grid-template-columns:minmax(0,1fr) 250px;gap:48px}
+  .stage[data-dir="a"] .rail{display:grid;gap:10px;align-content:start;position:sticky;top:90px;border-left:1px solid var(--rule);padding-left:20px}
+  .stage[data-dir="a"] .rail small{font:400 11px/1 var(--f-mono);letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+  .stage[data-dir="a"] .rail b{font:600 20px/1.2 var(--f-disp);letter-spacing:-.015em}
+  .stage[data-dir="a"] .rail a{display:flex;justify-content:space-between;gap:8px;padding:10px 0;border-top:1px solid var(--rule);text-decoration:none;font:500 14px/1.3 var(--f-sans)}
+  .stage[data-dir="a"] .rail a i{font:400 11px/1.6 var(--f-mono);color:var(--muted);font-style:normal}
+}
+@container (max-width:640px){.stage[data-dir="a"] .lede{grid-column:1/-1}.stage[data-dir="a"] .stats{grid-template-columns:1fr 1fr}.stage[data-dir="a"] .stats li{margin-right:0}}
+
+/* ---------- B. Archive as material ---------- */
+.stage[data-dir="b"]{background-image:linear-gradient(var(--rule) 1px,transparent 1px),linear-gradient(90deg,var(--rule) 1px,transparent 1px);background-size:48px 48px;background-position:-1px -1px}
+.stage[data-dir="b"] .shell{background:var(--canvas)}
+.stage[data-dir="b"] .room{max-width:calc(1040px + var(--pad)*2);gap:0}
+.stage[data-dir="b"] .room[data-util]{max-width:calc(820px + var(--pad)*2)}
+.stage[data-dir="b"] .mast{grid-template-columns:minmax(0,1.15fr) minmax(0,.85fr);gap:18px 40px;padding-bottom:56px;overflow:hidden;align-items:start}
+.stage[data-dir="b"] .mast>*{grid-column:1}
+.stage[data-dir="b"] .mast h1{font-size:clamp(2.5rem,1.4rem + 4cqw,4.5rem)}
+.stage[data-dir="b"] .material{display:block;grid-column:2;grid-row:1/span 5;margin:0 0 -96px;transform:rotate(-2.2deg) translateY(8px);background:var(--raised);border:1px solid var(--rule);box-shadow:var(--contact);padding:26px 22px 120px;position:relative;display:grid;gap:16px;align-content:start}
+.stage[data-dir="b"] .material blockquote{margin:0;font:400 clamp(1.2rem,.9rem + 1.2cqw,1.7rem)/1.32 var(--f-serif);color:var(--ink)}
+.stage[data-dir="b"] .material mark{background:transparent;color:inherit;box-shadow:inset 0 -.42em 0 color-mix(in oklab,var(--accent-g) 34%,transparent)}
+.stage[data-dir="b"] .material dl{margin:0;display:grid;grid-template-columns:auto 1fr;gap:8px 14px;font:400 13px/1.4 var(--f-mono)}
+.stage[data-dir="b"] .material dt{color:var(--muted);text-transform:uppercase;letter-spacing:.08em;font-size:10.5px;padding-top:2px}
+.stage[data-dir="b"] .material dd{margin:0;border-bottom:1px dashed var(--rule);padding-bottom:8px}
+.stage[data-dir="b"] .material .slot{position:absolute;top:-11px;left:16px;font:500 10.5px/1 var(--f-mono);letter-spacing:.1em;text-transform:uppercase;background:var(--ink);color:var(--canvas);padding:5px 8px}
+.stage[data-dir="b"] .material figcaption{font:400 11px/1.45 var(--f-mono);color:var(--muted);border-top:1px solid var(--rule);padding-top:8px}
+.stage[data-dir="b"] .stats{background:var(--ink);color:var(--canvas);padding:0 20px;position:relative;z-index:2;box-shadow:var(--contact-sm)}
+.stage[data-dir="b"] .stats span{color:color-mix(in srgb,var(--canvas) 72%,var(--ink))}
+.stage[data-dir="b"] .stats b{font-size:38px}
+.stage[data-dir="b"] .jump{background:var(--canvas);border:1px solid var(--rule);border-top:0;padding:10px 20px;position:relative;z-index:2}
+.stage[data-dir="b"] .chapter{background:var(--surface);border:1px solid var(--rule);border-radius:4px;padding:34px 28px 30px;margin-top:34px;position:relative;box-shadow:var(--contact-sm)}
+.stage[data-dir="b"] .chapter.sunk{background:var(--raised)}
+.stage[data-dir="b"] .chapter:nth-of-type(even){margin-left:clamp(0px,3cqw,36px);margin-right:clamp(0px,-1cqw,0px)}
+.stage[data-dir="b"] .chapter:nth-of-type(odd){margin-right:clamp(0px,3cqw,36px)}
+.stage[data-dir="b"] .chead{gap:0}
+.stage[data-dir="b"] .chead .plate{position:absolute;top:-23px;left:24px;width:auto;height:46px;padding:0 14px;border-radius:8px 8px 0 0;border:1px solid var(--rule);border-bottom-color:transparent;background:inherit;background-color:var(--surface);font-size:18px;display:flex;gap:8px;color:var(--accent)}
+.stage[data-dir="b"] .chapter.sunk .chead .plate{background-color:var(--raised)}
+.stage[data-dir="b"] .kick{display:none}
+.stage[data-dir="b"] .chead .plate::after{content:attr(data-k);font:500 11px/1 var(--f-mono);letter-spacing:.1em;text-transform:uppercase}
+.stage[data-dir="b"] .chead h2{font-size:clamp(1.6rem,1.2rem + 1.6cqw,2.3rem);margin-top:6px}
+.stage[data-dir="b"] .row{grid-template-columns:64px minmax(0,1fr) auto auto;gap:4px 16px;padding:16px 0}
+.stage[data-dir="b"] .row .g{display:none}
+.stage[data-dir="b"] .row .thumb{display:grid;grid-row:1/4;width:64px;height:80px;background:var(--canvas);border:1px solid var(--rule);box-shadow:var(--contact-sm);place-items:center;font:italic 400 22px/1 var(--f-serif);color:var(--accent);transform:rotate(-1.5deg);overflow:hidden;text-align:center}
+.stage[data-dir="b"] .row .thumb small{display:block;font:400 8.5px/1.2 var(--f-mono);font-style:normal;color:var(--muted);letter-spacing:.06em;margin-top:4px}
+.stage[data-dir="b"] .row:nth-child(even) .thumb{transform:rotate(1.2deg)}
+.stage[data-dir="b"] .hand a{border-radius:4px;box-shadow:var(--contact-sm);background:var(--canvas)}
+.stage[data-dir="b"] .pipe li{background:var(--canvas);box-shadow:var(--contact-sm);border-color:var(--rule)}
+.stage[data-dir="b"] .offramp{border-radius:4px;margin-top:34px;background:var(--ink);color:var(--canvas);border-color:var(--ink)}
+.stage[data-dir="b"] .offramp p{color:color-mix(in srgb,var(--canvas) 78%,var(--ink))}
+.stage[data-dir="b"] .notice{border-radius:4px;margin-top:24px}
+.stage[data-dir="b"] .mailbox{border-style:dashed;border-radius:4px}
+@container (max-width:760px){
+  .stage[data-dir="b"] .mast{grid-template-columns:1fr;padding-bottom:24px}
+  .stage[data-dir="b"] .material{grid-column:1;grid-row:auto;margin:8px 0 -70px;padding-bottom:96px}
+  .stage[data-dir="b"] .chapter{padding:34px 16px 22px;margin-inline:0!important}
+  .stage[data-dir="b"] .stats{grid-template-columns:1fr 1fr}
+}
+
+/* ---------- C. Living index ---------- */
+.stage[data-dir="c"]{background:color-mix(in oklab,var(--famg) 7%,var(--canvas))}
+.stage[data-dir="c"][data-fam="trust"]{--fam:var(--slate);--famg:var(--slate)}
+.stage[data-dir="c"][data-fam="add"]{--fam:var(--moss);--famg:var(--moss)}
+.stage[data-dir="c"] .room{max-width:calc(980px + var(--pad)*2);gap:22px}
+.stage[data-dir="c"] .room[data-util]{max-width:calc(800px + var(--pad)*2)}
+.stage[data-dir="c"] .famtag{display:inline-flex;align-items:center;gap:8px;justify-self:start;height:32px;padding:0 12px 0 10px;border-radius:999px;background:color-mix(in oklab,var(--fam) 16%,transparent);color:var(--fam);font:500 11px/1 var(--f-mono);letter-spacing:.1em;text-transform:uppercase}
+.stage[data-dir="c"] .famtag::before{content:"";width:8px;height:8px;border-radius:50%;background:currentColor}
+.stage[data-dir="c"] .crumb{display:none}
+.stage[data-dir="c"] .stats{gap:10px}
+.stage[data-dir="c"] .stats li{background:var(--canvas);border-radius:20px;padding:16px 18px;border:1px solid color-mix(in oklab,var(--fam) 22%,var(--rule))}
+.stage[data-dir="c"] .stats b{color:var(--fam)}
+.stage[data-dir="c"] .jump{position:sticky;top:64px;z-index:5;background:var(--canvas);border:1px solid var(--rule);border-radius:999px;padding:4px;gap:2px;flex-wrap:nowrap;overflow-x:auto}
+.stage[data-dir="c"] .jump a{min-height:40px;padding:0 14px;border-radius:999px;white-space:nowrap;position:relative;z-index:1;transition:background .28s cubic-bezier(.16,1,.3,1),color .28s}
+.stage[data-dir="c"] .jump a[aria-current]{background:color-mix(in oklab,var(--fam) 16%,transparent)}
+.stage[data-dir="c"] .prog{display:block;position:absolute;left:18px;right:18px;bottom:2px;height:2px;border-radius:2px;background:var(--fam);transform-origin:left;transform:scaleX(var(--p,0));pointer-events:none}
+.stage[data-dir="c"] .chapter{background:var(--canvas);border-radius:28px;padding:clamp(20px,3.5cqw,36px);border:1px solid var(--rule)}
+.stage[data-dir="c"] .chapter.sunk{background:color-mix(in oklab,var(--fam) 5%,var(--canvas))}
+.stage[data-dir="c"] .chead .plate{border-radius:50%;width:52px;height:52px;font-size:22px;background:color-mix(in oklab,var(--fam) 14%,transparent);border-color:transparent}
+.stage[data-dir="c"] .chead h2{font-size:clamp(1.5rem,1.22rem + 1.2cqw,2.125rem)}
+.stage[data-dir="c"] .row{border-top:0;border-radius:18px;padding:14px;margin-inline:-14px;transition:background .28s cubic-bezier(.16,1,.3,1)}
+.stage[data-dir="c"] .row+.row{box-shadow:0 -1px 0 var(--rule)}
+.stage[data-dir="c"] .row:hover,.stage[data-dir="c"] .row:focus-visible{background:color-mix(in oklab,var(--fam) 9%,transparent);box-shadow:none}
+.stage[data-dir="c"] .row .g{color:var(--fam)}
+.stage[data-dir="c"] .row .more{display:grid;grid-column:2/-1;grid-template-rows:0fr;transition:grid-template-rows .36s cubic-bezier(.16,1,.3,1)}
+.stage[data-dir="c"] .row .more>span{overflow:hidden;font:500 13px/1 var(--f-sans);color:var(--fam);display:flex;gap:6px;align-items:center}
+.stage[data-dir="c"] .row .more>span::before{content:"";display:block;height:26px}
+.stage[data-dir="c"] .row:hover .more,.stage[data-dir="c"] .row:focus-visible .more{grid-template-rows:1fr}
+.stage[data-dir="c"] .hand a{border-radius:20px;transition:transform .28s cubic-bezier(.16,1,.3,1),border-color .28s}
+.stage[data-dir="c"] .hand a:hover{transform:translateY(-2px)}
+.stage[data-dir="c"] .pipe li{border-radius:16px;border-color:var(--rule)}
+.stage[data-dir="c"] .pipe li:last-child{background:color-mix(in oklab,var(--fam) 12%,var(--canvas))}
+.stage[data-dir="c"] .pipe li+li::before{background:var(--fam);height:2px;animation:draw .5s cubic-bezier(.16,1,.3,1) both}
+.stage[data-dir="c"] .pipe li:nth-child(2)::before{animation-delay:.25s}.stage[data-dir="c"] .pipe li:nth-child(3)::before{animation-delay:.6s}.stage[data-dir="c"] .pipe li:nth-child(4)::before{animation-delay:.95s}
+@keyframes draw{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+.stage[data-dir="c"] .grades li{border:1px solid var(--rule);border-radius:20px;padding:16px;background:var(--canvas)}
+.stage[data-dir="c"] .offramp{border-radius:28px;background:color-mix(in oklab,var(--fam) 12%,var(--canvas));border-color:transparent}
+.stage[data-dir="c"] .card{border:1px solid var(--rule);border-radius:20px;padding:18px;margin-top:10px;background:var(--canvas);transition:border-color .28s}
+.stage[data-dir="c"] .card:hover{border-color:var(--fam)}
+@media (prefers-reduced-motion:reduce){.stage *{animation:none!important;transition:none!important}}
+</style>
+
+<div class="wrap">
+  <header class="top">
+    <h1>Rooms directions</h1>
+    <p>Three ways the secondary rooms could look, shown on Law, Methodology and Support with their live copy. Switch direction, room, theme and width. "Today" is the page as it ships now, for comparison.</p>
+  </header>
+
+  <div class="bar" role="toolbar" aria-label="Review controls">
+    <div class="seg"><span>Direction</span><div data-group="dir">
+      <button data-v="today">Today</button><button data-v="a">A. Ledger, louder</button><button data-v="b">B. Archive as material</button><button data-v="c">C. Living index</button></div></div>
+    <div class="seg"><span>Room</span><div data-group="room">
+      <button data-v="law">Law</button><button data-v="methodology">Methodology</button><button data-v="support">Support</button></div></div>
+    <div class="seg"><span>Theme</span><div data-group="theme"><button data-v="dark">Dark</button><button data-v="light">Light</button></div></div>
+    <div class="seg"><span>Width</span><div data-group="w"><button data-v="desktop">Desktop</button><button data-v="phone">Phone 390</button></div></div>
+  </div>
+
+  <section class="brief" id="brief" aria-live="polite"></section>
+  <div class="frame"><div class="stage" id="stage"></div></div>
+
+  <div class="notes">
+    <section>
+      <h2>Headline drafts, every room</h2>
+      <table>
+        <tr><td>Law</td><td>What the law actually <em>said</em>.</td></tr>
+        <tr><td>Data</td><td>What the numbers <em>show</em>, and what they leave out.</td></tr>
+        <tr><td>Banned books</td><td>The books someone asked to <em>remove</em>.</td></tr>
+        <tr><td>Errata</td><td>Every mistake, <em>published</em>.</td></tr>
+        <tr><td>Submit</td><td>Tell the archive what it's <em>missing</em>.</td></tr>
+        <tr><td>Corrections</td><td>Tell the archive it's <em>wrong</em>.</td></tr>
+        <tr><td>Support</td><td>How to get an <em>answer</em>.</td></tr>
+        <tr><td>Privacy</td><td>What this site collects, and what it <em>won't</em>.</td></tr>
+        <tr><td>Terms</td><td>A notice, not a <em>contract</em>.</td></tr>
+        <tr><td>Stories</td><td>Start with a year and a <em>place</em>.</td></tr>
+        <tr><td>Records</td><td>Everything the archive <em>holds</em>.</td></tr>
+      </table>
+    </section>
+    <section>
+      <h2>Fixed in every direction</h2>
+      <ul>
+        <li>Memorial is untouched (P-01). Lives, the Door and Explore are out of scope.</li>
+        <li>The four typefaces, Archive Paper, Black Ink and Copper stay.</li>
+        <li>No stock imagery, no sepia filters, no AI images as documentary. People are always identified.</li>
+        <li>Nothing implies a law is joined to a record (P-02).</li>
+        <li>One find bar: Enter submits, no Apply button, 44px targets on phones, works without JavaScript.</li>
+        <li>Every room gets a jump nav, plated chapters, honest stats and a closing handoff. That part is the same under A, B and C.</li>
+      </ul>
+    </section>
+    <section>
+      <h2>Placeholders in this mockup</h2>
+      <ul>
+        <li>Direction B shows typeset stand-ins where a scanned document would go. Each is tagged "Media slot" or "Example". No real scans are embedded.</li>
+        <li>The "How to read this catalog" facts on Law are new copy drafted from the live lede.</li>
+        <li>Stats on Methodology and Support are drawn from sentences already on those pages.</li>
+      </ul>
+    </section>
+  </div>
+</div>
+
+<script>
+const I={law:"M12 3v18M5 21h14M6 7h12M6 7l-3 7a3 3 0 0 0 6 0zM18 7l-3 7a3 3 0 0 0 6 0z",read:"M3 5h6a3 3 0 0 1 3 3v12a2 2 0 0 0-2-2H3zM21 5h-6a3 3 0 0 0-3 3v12a2 2 0 0 1 2-2h7z",list:"M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01",arrow:"M5 12h14M13 6l6 6-6 6",route:"M6 19a2 2 0 1 0 0-4 2 2 0 0 0 0 4zM18 9a2 2 0 1 0 0-4 2 2 0 0 0 0 4zM8 17h6a4 4 0 0 0 0-8h-4",grade:"M12 3l2.5 2H18v3.5L20 11l-2 2.5V17h-3.5L12 19l-2.5-2H6v-3.5L4 11l2-2.5V5h3.5zM9 11l2 2 4-4",pen:"M4 20h4L19 9l-4-4L4 16zM13 7l4 4",mail:"M3 6h18v12H3zM3 7l9 7 9-7",msg:"M4 5h16v11H9l-5 4z",log:"M6 3h9l4 4v14H6zM14 3v5h5M9 13h7M9 17h7",link:"M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1",chart:"M4 20V6M4 20h16M8 16v-5M12 16V8M16 16v-3",help:"M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18zM9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.7.3-1 .9-1 1.7M12 17h.01"};
+const ico=n=>`<svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="${I[n]}"/></svg>`;
+const BRIEF={
+ today:{t:"Today",th:"The rooms as they ship on 2026-09-20.",ch:["Law opens on a one-word title, a 10px count line, 17 chips and 13.5px rows. No jump nav, no chapters, no handoffs.","Methodology already uses the 2026-09-16 chapter pattern. Support uses half of it."],am:"Nothing. This is the baseline."},
+ a:{t:"A. Ledger, louder",th:"Same law, far more scale contrast. The year becomes the typographic anchor of a legal ledger, and the numbers a room can honestly state are set as large as the headline.",ch:["Headline up to 108px, lede pushed into the right columns, a 2px ink rule under the masthead.","Stats as display numerals. Chapters as full-bleed value bands with inverse 64px plates and display-2 heads.","Law rows lead with the year in display numerals. A real right rail at wide widths."],am:"Nothing in brand.md or v10. This is the control direction."},
+ b:{t:"B. Archive as material",th:"brand.md already says depth comes from stacking, occlusion, crop and value. Rooms barely use it. Here documents are physical: a cropped sheet slides under the masthead, chapters are sheets with folder tabs, and the map grid runs behind everything.",ch:["A captioned document crop in each reading-room masthead, cut off by the stat band.","Chapters as stacked sheets with contact shadows only where they overlap. Folder-tab plates carry the kicker.","Catalog rows gain a small document thumbnail slot. Ink and copper only."],am:"brand.md, Imagery: add a rule for document crops as room material. Caption, repository, date and rights are required, and a slot with no cleared image renders nothing."},
+ c:{t:"C. Living index",th:"Each room family gets a tonal identity built from the existing surface values, and the page responds to reading: progress in the jump nav, figures that count once, diagram strokes that draw, rows that open on hover.",ch:["Family tint: Read is copper, Trust is slate, Add is moss, mixed at under 10% into the canvas.","Sticky pill jump nav with a reading-progress line and a live current chapter.","Softer 20 to 28px radii. Motion runs once, on load or on intent, and stops under reduced motion."],am:"brand.md, Supersessions 1: replace \"no ornamental motion\" with a definition of functional motion (state change, progress, one-time entry) plus a reduced-motion rule. Adds two tint hues beside copper."}
+};
+const LAW=[
+ ["Thirteenth Amendment","Federal","1865","Constitutional amendment","U.S. Const. amend. XIII (proposed Jan. 31, 1865; ratified Dec. 6, 1865)","The Thirteenth Amendment, ratified December 6, 1865, provides that \"Neither slavery nor involuntary servitude, except as a punishment for crime whereof the party shall have been duly convicted, shall exist within the United States, or any place subject to their jurisdiction.\"","XIII"],
+ ["Fourteenth Amendment","Federal","1868","Constitutional amendment","U.S. Const. amend. XIV (passed June 13, 1866; ratified July 9, 1868)","The Fourteenth Amendment, ratified July 9, 1868, makes everyone born or naturalized in the United States a citizen and forbids any State to \"deny to any person within its jurisdiction the equal protection of the laws.\"","XIV"],
+ ["Brown v. Board of Education","Federal","1954","Landmark case","347 U.S. 483 (1954)","Brown v. Board of Education, 347 U.S. 483 (1954), held that racial segregation in public schools violates the Equal Protection Clause of the Fourteenth Amendment.","347 U.S."],
+ ["Civil Rights Act of 1964","Federal","1964","Federal statute","Pub. L. 88-352, 78 Stat. 241 (July 2, 1964)","The Civil Rights Act of 1964 (Pub. L. 88-352) bans discrimination based on race, color, religion, sex, or national origin in public accommodations and employment.","78 Stat."],
+ ["Voting Rights Act of 1965","Federal","1965","Federal statute","Pub. L. 89-110, 79 Stat. 437 (Aug. 6, 1965)","The Voting Rights Act of 1965 (Pub. L. 89-110) outlawed literacy tests and required federal oversight of election changes in places with a history of voting discrimination.","79 Stat."],
+ ["Shelby County v. Holder","Federal","2013","Landmark case","570 U.S. 529 (2013)","Shelby County v. Holder, 570 U.S. 529 (2013), struck down the Voting Rights Act's coverage formula that determined which states needed federal preclearance for election changes.","570 U.S."]
+];
+const rows=()=>`<div class="rows">${LAW.map(r=>`<a class="row" href="#" onclick="return false"><span class="thumb">${r[6]}<small>slot</small></span><span class="g">§</span><span class="n">${r[0]}</span><span class="k">${r[3]}</span><span class="p">${r[1]}</span><span class="y">${r[2]}</span><span class="c">${r[4]}</span><span class="gl">${r[5]}</span><span class="more"><span>Open the entry and its official source ${ico("arrow")}</span></span></a>`).join("")}</div>`;
+const chips=`<div class="chips" role="group" aria-label="Filter by kind"><a class="chip" aria-current="true" href="#" onclick="return false">All kinds <i>12</i></a><a class="chip" href="#" onclick="return false">Constitutional amendment <i>3</i></a><a class="chip" href="#" onclick="return false">Federal statute <i>4</i></a><a class="chip" href="#" onclick="return false">Landmark case <i>3</i></a><a class="chip" href="#" onclick="return false">State law <i>1</i></a><a class="chip" href="#" onclick="return false">Federal regulation <i>1</i></a></div>`;
+const topics=`<div class="chips" role="group" aria-label="Filter by topic"><a class="chip" aria-current="true" href="#" onclick="return false">All topics</a><a class="chip" href="#" onclick="return false">Constitutional <i>7</i></a><a class="chip" href="#" onclick="return false">Voting <i>4</i></a><a class="chip" href="#" onclick="return false">Education <i>3</i></a><a class="chip" href="#" onclick="return false">Employment <i>3</i></a><a class="chip" href="#" onclick="return false">Housing <i>2</i></a><a class="chip" href="#" onclick="return false">Policing <i>2</i></a><a class="chip" href="#" onclick="return false">Criminal justice <i>1</i></a></div>`;
+const find=`<form class="find" role="search" onsubmit="return false"><input id="law-q" type="search" aria-label="Title, citation or topic" placeholder="Brown v. Board, voting, 42 U.S.C…"><button type="submit">Search</button></form>`;
+const notLegal=`<div class="notice" role="note"><small>Warning</small><b>Not legal advice</b><p>BlackStory explains public laws and court decisions in plain language. This is general information, not legal advice. For advice about your specific situation, consult a licensed attorney or a qualified legal aid organization.</p></div>`;
+const stats=a=>`<ul class="stats">${a.map(([n,l])=>`<li><b${/^\d+$/.test(n)?` data-n="${n}"`:""}>${n}</b><span>${l}</span></li>`).join("")}</ul>`;
+const chead=(ic,k,h,id)=>`<header class="chead"><span class="plate" data-k="${k}">${ico(ic)}</span><div><p class="kick">${k}</p><h2 id="${id}">${h}</h2></div></header>`;
+const hand=a=>`<div class="hand">${a.map(([ic,t,d])=>`<a href="#" onclick="return false"><b>${ico(ic)}${t}</b><span>${d}</span></a>`).join("")}</div>`;
+const jump=a=>`<nav class="jump" aria-label="On this page">${a.map(([ic,t,id],i)=>`<a href="#${id}"${i===0?' aria-current="true"':""} data-t="${id}">${ico(ic)}${t}</a>`).join("")}<span class="prog"></span></nav>`;
+
+function law(dir){
+ const lede=`<p class="lede">Statutes, regulations, and court decisions that shaped what could be built, owned, attended and voted for. Each entry is in plain language, quotes the operative text, and links to the official source it was checked against.</p>`;
+ const note=`This catalog loads from a separate legal reference, not from the entity records this archive pins to place. Where a law and a record share a jurisdiction and an era, that is a coincidence of scope, not a documented link.`;
+ if(dir==="today")return `<article class="room" data-room="law"><header class="mast"><h1>Law</h1>${lede}<ul class="colophon"><li>12 law entries</li><li>4 federal statutes</li><li>3 landmark cases</li><li>3 constitutional amendments</li><li>1 state law</li><li>1 federal regulation</li></ul></header><p class="prose">${note} A jurisdiction is not a location. It is the reach of the authority that passed a law, and it carries no address of its own.</p>${notLegal}<h2 class="grouphd">Browse statutes and decisions</h2>${find}${chips}${topics}<div class="chips"><a class="chip" aria-current="true" href="#" onclick="return false">Oldest first</a><a class="chip" href="#" onclick="return false">Newest first</a><a class="chip" href="#" onclick="return false">A to Z</a></div><p class="count"><span>12 law entries</span></p>${rows()}<aside class="offramp"><b>BlackStory</b><p>This catalog is jurisdictional. It does not invent a documented join to a record.</p></aside></article>`;
+ return `<article class="room" data-room="law"><header class="mast"><nav class="crumb" aria-label="Breadcrumb"><i>Rooms</i> / Law</nav><span class="famtag">Read · reading room</span><h1>What the law actually <em>said</em>.</h1>${lede}
+  <figure class="material"><span class="slot">Media slot</span><blockquote>Neither slavery nor involuntary servitude, <mark>except as a punishment for crime</mark> whereof the party shall have been duly convicted, shall exist within the United States, or any place subject to their jurisdiction.</blockquote><figcaption>Operative text, U.S. Const. amend. XIII, ratified Dec. 6, 1865. Typeset stand-in. A cleared scan of the joint resolution would sit here with repository, date and rights.</figcaption></figure></header>
+  ${stats([["12","law entries"],["4","federal statutes"],["3","landmark cases"],["3","constitutional amendments"]])}
+  ${jump([["read","How to read this","law-how"],["list","The catalog","law-cat"],["arrow","Keep going","law-go"]])}
+  <section class="chapter sunk" aria-labelledby="law-how">${chead("read","How to read","How to read this catalog","law-how")}
+   <ul class="facts"><li><span class="plate">${ico("msg")}</span><div><b>Plain language first</b><p>Each entry opens with what the law did, in a sentence you can repeat.</p></div></li><li><span class="plate">${ico("pen")}</span><div><b>The operative text, quoted</b><p>The words that carry the force are quoted exactly, inside quotation marks.</p></div></li><li><span class="plate">${ico("link")}</span><div><b>Checked against the official source</b><p>Every entry links to the official text it was checked against.</p></div></li></ul>
+   <p class="small">${note} A jurisdiction is not a location. It carries no address of its own.</p>${notLegal}</section>
+  <section class="chapter" aria-labelledby="law-cat">${chead("law","Catalog","Browse statutes and decisions","law-cat")}
+   <div class="catalog"><div style="display:grid;gap:12px;min-width:0">${find}${chips}<p class="count"><span>12 law entries</span><span>Sort: oldest first</span></p>${rows()}</div>
+   <aside class="rail" aria-label="Orientation"><small>You are in</small><b>Statutes and rulings, in plain language</b><a href="#" onclick="return false">Constitutional <i>7 entries</i></a><a href="#" onclick="return false">Voting <i>4 entries</i></a><a href="#" onclick="return false">How this catalog is built <i>Methodology</i></a></aside></div></section>
+  <section class="chapter sunk" aria-labelledby="law-go">${chead("arrow","Next","Keep going","law-go")}${hand([["route","Methodology","How a record gets in, and what the evidence grades mean."],["link","Source library","The publishers a public claim traces to."],["chart","Data","National series with their sources attached."]])}</section>
+  <aside class="offramp"><b>BlackStory</b><p>This catalog is jurisdictional. It does not invent a documented join to a record.</p></aside></article>`;
+}
+function methodology(dir){
+ const nt=dir==="today";
+ const notice=`<div class="notice" role="note"><small>Warning</small><b>About this record</b><p>BlackStory presents documented Black history for educational and journalistic purposes. It is not legal advice, not travel advice, and not a real-time safety service. Reviewed 2026-07-17.</p></div>`;
+ const j=jump([["route","How a record gets in","m-in"],["grade","Evidence grades","m-gr"],["pen","Editorial standards","m-in"],["law","How a point is drawn","m-in"],["link","Where the evidence comes from","m-in"],["arrow","Keep going","m-go"]]);
+ return `<article class="room" data-room="methodology"><header class="mast">${nt?"":`<nav class="crumb" aria-label="Breadcrumb"><i>Rooms</i> / Methodology</nav>`}<span class="famtag">Trust · how it decides</span><h1>How the archive <em>works</em>.</h1><p class="lede">This page is the receipt for everything else on the site: how a record gets in, what an evidence grade means, why a map point is never drawn sharper than the source behind it, and what happens when a record touches someone still living.</p>
+  <figure class="material"><span class="slot">Example</span><dl><dt>Publisher</dt><dd>Library of Congress</dd><dt>Captured</dt><dd>Wayback anchor kept with the record</dd><dt>Excerpt</dt><dd>The exact sentence the drafter was handed</dd><dt>Grade</dt><dd>●●● Corroborated</dd></dl><figcaption>What a citation carries on every record. Illustrative card, not a real citation.</figcaption></figure></header>
+  ${nt?notice+j:stats([["4","evidence grades"],["2","independent sources before a high-stakes claim stands alone"],["1","person reads every record before it publishes"]])+j+notice}
+  <section class="chapter sunk" aria-labelledby="m-in">${chead("route","Admission","How a record gets in","m-in")}<p class="prose">Candidates come in from research runs, and every one of them is pinned to somewhere real before it can publish: a state, a city, a campus, a documented site. Nothing reaches a public page on a model's say-so. A person reads it first, and on this project that person is me.</p>
+   <ol class="pipe"><li><small>01</small><b>Candidate</b><span>A research run finds a claim</span></li><li><small>02</small><b>Pinned to place</b><span>State, city, campus or documented site</span></li><li><small>03</small><b>A person reads it</b><span>Before anything reaches a page</span></li><li><small>04</small><b>Published</b><span>Citations and a grade attached</span></li></ol>
+   <ul class="facts"><li><span class="plate">${ico("log")}</span><div><b>Corrections append</b><p>A fix is added to a record rather than swapped in over it. The earlier reading stays readable.</p></div></li><li><span class="plate">${ico("link")}</span><div><b>Nothing is asserted without a source</b><p>Every public claim carries citations you can open.</p></div></li></ul></section>
+  <section class="chapter" aria-labelledby="m-gr">${chead("grade","Grades","What the evidence grades mean","m-gr")}<p class="small">A grade is never a color on its own. Each one carries a mark, a label in words, and the definition printed under it.</p>
+   <ul class="grades"><li><i>●●●</i><b>Established</b><p>Several independent, high-authority sources agree, and there is no serious dispute.</p></li><li><i>●●●</i><b>Corroborated</b><p>Two or more independent sources support the statement.</p></li><li><i>●●○</i><b>Single Source</b><p>One source that meets the citation bar. Not yet checked against another.</p></li><li><i>●○○</i><b>Contested</b><p>Credible sources disagree. The record names the disagreement in plain language.</p></li></ul></section>
+  <section class="chapter sunk" aria-labelledby="m-go">${chead("arrow","Next","Keep going","m-go")}${hand([["link","Source library","The publishers a public claim traces to."],["log","Errata","The mistakes the archive found and fixed."],["help","Questions","Who runs this, and how AI is and is not used."]])}</section>
+  <aside class="offramp"><b>BlackStory</b><p>These rooms are the archive's. They do not invent a join to one place.</p></aside></article>`;
+}
+function support(dir){
+ const nt=dir==="today";
+ return `<article class="room" data-room="support" data-util><header class="mast">${nt?"":`<nav class="crumb" aria-label="Breadcrumb"><i>Rooms</i> / Support</nav>`}<span class="famtag">Add · utility</span><h1>${nt?"Support":"How to get an <em>answer</em>."}</h1><p class="lede">BlackStory is one person's archive of Black history, tied to the places it happened. If something in a record is wrong, corrections is the fastest way in: it is moderated, it gives you a receipt code, and nothing is published as submitted.</p>
+  <figure class="material"><span class="slot">Example</span><dl><dt>Receipt</dt><dd>Your code appears here</dd><dt>Status</dt><dd>Received, in moderated review</dd><dt>Outcome</dt><dd>Accepted, or declined with a reason</dd></dl><figcaption>What you get back after filing a correction. Illustrative stub.</figcaption></figure></header>
+  ${nt?"":stats([["1","person reads everything that comes in"],["A few days","typical reply"]])}
+  <section class="chapter sunk" aria-labelledby="s-in">${chead("msg","Start here","The fastest ways in","s-in")}<p class="small">A question about one specific record is best filed as a correction, because that puts what you wrote next to the published sources when someone reads it.</p>
+   <div class="cards"><a class="card" href="#" onclick="return false"><b>${ico("msg")}Report a correction</b><span>Say a published record is wrong, or point at evidence it is missing. Nothing changes publicly until a person accepts it. You get a receipt code.</span></a><a class="card" href="#" onclick="return false"><b>${ico("route")}Read the methodology</b><span>Definitions, source rules, confidence grades, map dignity limits, and how corrections are handled.</span></a><a class="card" href="#" onclick="return false"><b>${ico("log")}Browse the errata log</b><span>Corrections, clarifications, updates, and editor notes already applied, newest first.</span></a></div></section>
+  <section class="chapter" aria-labelledby="s-me">${chead("mail","Mailbox","Reach me","s-me")}<p class="prose">For anything the corrections form has no field for (how the archive is run, a privacy request, an accessibility barrier that keeps you out of a page), write to me directly.</p><div class="mailbox"><small>Email</small><a href="#" onclick="return false">me@geralddagher.com</a></div><p class="small">One person builds and runs BlackStory, so a reply can take a few days. I read everything that comes in.</p></section>
+  ${nt?"":`<section class="chapter sunk" aria-labelledby="s-go">${chead("arrow","Next","Keep going","s-go")}${hand([["help","Questions","Plain answers to what people actually ask."],["pen","Submit a lead","Point the archive at something it has missed."]])}</section>`}
+  <aside class="offramp"><b>BlackStory</b><p>Saying a record is wrong is the fastest way to change what it says.</p></aside></article>`;
+}
+const ROOMS={law,methodology,support},FAM={law:"read",methodology:"trust",support:"add"};
+const S={dir:"a",room:"law",theme:"dark",w:"desktop"};
+try{Object.assign(S,JSON.parse(localStorage.getItem("rd")||"{}"))}catch(e){}
+const stage=document.getElementById("stage"),brief=document.getElementById("brief");
+const reduce=matchMedia("(prefers-reduced-motion: reduce)").matches;
+function render(){
+ document.documentElement.dataset.theme=S.theme;
+ stage.dataset.dir=S.dir;stage.dataset.w=S.w;stage.dataset.fam=FAM[S.room];
+ stage.innerHTML=`<div class="shell"><b>BlackStory</b><span>Map</span><span>Stories</span><span>Records</span><span>Rooms</span></div>`+ROOMS[S.room](S.dir);
+ const b=BRIEF[S.dir];
+ brief.innerHTML=`<div><h2>${b.t}</h2><p>${b.th}</p></div><div><h3>What you are looking at</h3><ul>${b.ch.map(x=>`<li>${x}</li>`).join("")}</ul></div><div><h3>What it would amend</h3><p>${b.am}</p></div>`;
+ document.querySelectorAll("[data-group] button").forEach(x=>x.setAttribute("aria-pressed",String(S[x.parentElement.dataset.group]===x.dataset.v)));
+ if(S.dir==="c"&&!reduce&&!document.hidden)stage.querySelectorAll("[data-n]").forEach(el=>{const n=+el.dataset.n,t0=performance.now();setTimeout(()=>{el.textContent=n},1000);const f=t=>{const p=Math.min(1,(t-t0)/800);el.textContent=Math.round(n*(1-Math.pow(1-p,3)));if(p<1)requestAnimationFrame(f)};requestAnimationFrame(f)});
+ try{localStorage.setItem("rd",JSON.stringify(S))}catch(e){}
+ onScroll();
+}
+function onScroll(){
+ const room=stage.querySelector(".room"),j=stage.querySelector(".jump");if(!room||!j)return;
+ const r=room.getBoundingClientRect(),p=Math.max(0,Math.min(1,(innerHeight*.5-r.top)/r.height));
+ j.style.setProperty("--p",p.toFixed(3));
+ let cur=null;stage.querySelectorAll(".chapter h2[id]").forEach(h=>{if(h.getBoundingClientRect().top<innerHeight*.45)cur=h.id});
+ if(cur){let done=false;j.querySelectorAll("a").forEach(a=>{const on=!done&&a.dataset.t===cur;if(on)done=true;on?a.setAttribute("aria-current","true"):a.removeAttribute("aria-current")})}
+}
+document.querySelector(".bar").addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;S[b.parentElement.dataset.group]=b.dataset.v;render()});
+addEventListener("scroll",onScroll,{passive:true});
+render();
+</script>

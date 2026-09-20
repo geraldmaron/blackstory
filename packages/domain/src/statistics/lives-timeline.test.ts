@@ -455,3 +455,114 @@ test('only a note written for the group links from a missing figure the census n
   assert.equal(condition(bundle, 1920, 'literacy').cells.hispanic.noteId, undefined);
   assert.equal(decadeOf(bundle, 1950).countNotes.length, 2);
 });
+
+function nchs(
+  metricId: string,
+  year: string,
+  estimate: number,
+  populationLabel: string,
+  populationBasis?: string,
+): LivesObservationInput {
+  return {
+    id: `${metricId}:${year}:nation`,
+    metricId,
+    jurisdictionId: 'nation:US',
+    referencePeriod: year,
+    raceEthnicitySlice: null,
+    estimate,
+    source: 'NCHS, Death rates and life expectancy at birth',
+    sourceUrl: 'https://data.cdc.gov/d/w9j2-ggv5',
+    populationLabel,
+    ...(populationBasis ? { populationBasis } : {}),
+  };
+}
+
+const LE_BLACK = 'nchs-life-expectancy-birth-black-nation';
+const LE_WHITE = 'nchs-life-expectancy-birth-white-nation';
+
+test('an agency value series publishes for the nation in its own unit, with its own population label', () => {
+  const bundle = build({
+    area: LIVES_NATIONAL,
+    observations: [nchs(LE_BLACK, '2000', 71.8, 'Black'), nchs(LE_WHITE, '2000', 77.3, 'White')],
+  });
+  const life = condition(bundle, 2000, 'life_expectancy');
+  assert.equal(life.unit, 'years');
+  assert.equal(life.cells.black.state, 'published');
+  assert.equal(life.cells.black.estimate, 71.8);
+  assert.equal(life.cells.black.definitionLabel, 'Black, all origins, as NCHS reported it');
+  assert.deepEqual(life.cells.black.observationIds, [`${LE_BLACK}:2000:nation`]);
+  // The gap is in years, never in percentage points.
+  assert.equal(life.gap?.points, 5.5);
+  assert.equal(life.gap?.unit, 'years');
+  assert.match(life.gap?.formula ?? '', /in years/);
+  // This series names no Hispanic figure, and says so rather than looking unfinished.
+  assert.equal(life.cells.hispanic.state, 'not_measured');
+});
+
+test('the nonwhite years carry the proxy label, so they are never read as a Black figure', () => {
+  const bundle = build({
+    area: LIVES_NATIONAL,
+    observations: [nchs(LE_BLACK, '1930', 48.1, 'nonwhite'), nchs(LE_WHITE, '1930', 61.4, 'White')],
+  });
+  const life = condition(bundle, 1930, 'life_expectancy');
+  assert.equal(
+    life.cells.black.definitionLabel,
+    'Nonwhite: every group other than white, counted together',
+  );
+  // No Black and white gap is derived from a figure that is not a Black figure.
+  assert.equal(life.gap, undefined);
+});
+
+test('from 2018 the label says non-Hispanic and one race, because NCHS changed the population', () => {
+  const bundle = build({
+    area: LIVES_NATIONAL,
+    observations: [
+      nchs(LE_BLACK, '2020', 71.5, 'non-Hispanic single-race Black'),
+      nchs(LE_WHITE, '2020', 77.4, 'non-Hispanic single-race White'),
+    ],
+  });
+  assert.equal(
+    condition(bundle, 2020, 'life_expectancy').cells.black.definitionLabel,
+    'Black, not Hispanic, one race, as NCHS reported it',
+  );
+});
+
+test('a region never shows a national agency figure as its own', () => {
+  const bundle = build({
+    observations: [nchs(LE_BLACK, '2000', 71.8, 'Black'), nchs(LE_WHITE, '2000', 77.3, 'White')],
+  });
+  const cell = condition(bundle, 2000, 'life_expectancy').cells.black;
+  assert.equal(cell.state, 'not_measured');
+  assert.match(cell.reason ?? '', /whole country, not for regions/);
+});
+
+test('infant mortality says whose race classified the birth, and stops where the series stops', () => {
+  const black = 'nchs-infant-mortality-black-nation';
+  const white = 'nchs-infant-mortality-white-nation';
+  const bundle = build({
+    area: LIVES_NATIONAL,
+    observations: [
+      nchs(black, '1970', 33.3, 'Black', 'race of child'),
+      nchs(white, '1970', 17.6, 'White', 'race of child'),
+      nchs(black, '1980', 22.2, 'Black', 'race of mother'),
+      nchs(white, '1980', 10.9, 'White', 'race of mother'),
+    ],
+  });
+  assert.equal(
+    condition(bundle, 1970, 'infant_mortality').cells.black.definitionLabel,
+    'Black infants, by race of child',
+  );
+  assert.equal(
+    condition(bundle, 1980, 'infant_mortality').cells.black.definitionLabel,
+    'Black infants, by race of mother',
+  );
+  assert.equal(condition(bundle, 1980, 'infant_mortality').unit, 'per_1000');
+  assert.equal(condition(bundle, 1980, 'infant_mortality').gap?.unit, 'per_1000');
+  assert.equal(condition(bundle, 2020, 'infant_mortality').cells.black.state, 'not_measured');
+});
+
+test('an agency value with no stated population is not publishable', () => {
+  const unlabeled = { ...nchs(LE_BLACK, '2000', 71.8, 'Black'), populationLabel: null };
+  const bundle = build({ area: LIVES_NATIONAL, observations: [unlabeled] });
+  assert.equal(condition(bundle, 2000, 'life_expectancy').cells.black.state, 'pending');
+});

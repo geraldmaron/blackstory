@@ -31,7 +31,7 @@
 
 .lives-regions__name {
   font-family: var(--ds-font-display);
-  font-size: 1.25rem;
+  font-size: var(--ds-text-title);
 }
 
 .lives-timeline {
@@ -48,7 +48,7 @@
 .lives-anchors__kicker {
   margin: 0 0 var(--ds-space-2);
   font-family: var(--ds-font-mono);
-  font-size: var(--ds-type-caption-size);
+  font-size: var(--ds-text-caption);
   letter-spacing: 0.04em;
   text-transform: uppercase;
   color: var(--ds-ink-muted);
@@ -57,7 +57,7 @@
 .lives-anchors__note {
   margin: 0 0 var(--ds-space-3);
   max-width: 42rem;
-  font-size: var(--ds-type-body-sm-size);
+  font-size: var(--ds-text-body-sm);
   color: var(--ds-ink-muted);
 }
 
@@ -97,11 +97,11 @@
 
 .lives-anchors__name {
   font-family: var(--ds-font-display);
-  font-size: 1.05rem;
+  font-size: var(--ds-text-subtitle);
 }
 
 .lives-anchors__role {
-  font-size: var(--ds-type-body-sm-size);
+  font-size: var(--ds-text-body-sm);
   color: var(--ds-ink-muted);
 }
 
@@ -130,7 +130,7 @@
   width: 100%;
   margin-bottom: var(--ds-space-2);
   font-family: var(--ds-font-mono);
-  font-size: 0.75rem;
+  font-size: var(--ds-text-caption);
   text-transform: uppercase;
   letter-spacing: 0.06em;
   color: var(--ds-ink-muted);
@@ -187,7 +187,7 @@
   min-height: 2.75rem;
   padding: var(--ds-space-2) var(--ds-space-3);
   font-family: var(--ds-font-mono);
-  font-size: 0.875rem;
+  font-size: var(--ds-text-body-sm);
   color: var(--ds-ink-muted);
   background: none;
   border: var(--ds-border-width) solid transparent;
@@ -241,7 +241,7 @@
 
 .lives-panel__title {
   font-family: var(--ds-font-display);
-  font-size: 1.75rem;
+  font-size: var(--ds-text-display-3);
   margin: 0 0 var(--ds-space-4);
 }
 
@@ -263,7 +263,7 @@
 
 .lives-regime__label {
   font-family: var(--ds-font-mono);
-  font-size: 0.75rem;
+  font-size: var(--ds-text-caption);
   text-transform: uppercase;
   letter-spacing: 0.06em;
   color: var(--ds-ink-muted);
@@ -296,7 +296,7 @@
 .lives-table caption {
   margin-bottom: var(--ds-space-3);
   font-family: var(--ds-font-mono);
-  font-size: 0.8125rem;
+  font-size: var(--ds-text-caption);
   text-align: left;
   color: var(--ds-ink-muted);
 }
@@ -311,7 +311,7 @@
 
 .lives-table thead th {
   font-family: var(--ds-font-mono);
-  font-size: 0.75rem;
+  font-size: var(--ds-text-caption);
   font-weight: 400;
   text-transform: uppercase;
   letter-spacing: 0.06em;
@@ -336,18 +336,18 @@
 
 .lives-cell__value {
   font-family: var(--ds-font-mono);
-  font-size: 1rem;
+  font-size: var(--ds-text-body);
 }
 
 .lives-cell__detail {
-  font-size: 0.75rem;
+  font-size: var(--ds-text-caption);
   font-weight: 400;
   color: var(--ds-ink-muted);
 }
 
 .lives-cell--muted .lives-cell__value {
   font-family: var(--ds-font-sans);
-  font-size: 0.875rem;
+  font-size: var(--ds-text-body-sm);
   color: var(--ds-ink-muted);
 }
 
@@ -383,13 +383,13 @@
 
 .lives-rule__name {
   font-family: var(--ds-font-display);
-  font-size: 1.125rem;
+  font-size: var(--ds-text-subtitle);
 }
 
 .lives-rule__meta,
 .lives-rule__named {
   font-family: var(--ds-font-mono);
-  font-size: 0.8125rem;
+  font-size: var(--ds-text-caption);
   color: var(--ds-ink-muted);
 }
 
@@ -397,11 +397,46 @@
   font-weight: 600;
 }
 
+.lives-rule__part {
+  max-width: 46rem;
+  margin: var(--ds-space-2) 0;
+}
+
+.lives-rule__label {
+  font-family: var(--ds-font-mono);
+  font-size: var(--ds-text-micro);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ds-ink-muted);
+}
+
+.lives-era__rules .lives-rule:last-child {
+  border-bottom: 0;
+}
+
+.lives-era__more-rules {
+  margin-top: var(--ds-space-2);
+  padding-top: var(--ds-space-3);
+  border-top: var(--ds-border-width) solid var(--ds-rule);
+}
+
+.lives-era__more-rules summary {
+  cursor: pointer;
+  font-family: var(--ds-font-mono);
+  font-size: var(--ds-text-caption);
+  color: var(--ds-accent);
+}
+
+.lives-era__more-rules summary:focus-visible {
+  outline: var(--ds-focus-width) solid var(--ds-focus-ring);
+  outline-offset: 2px;
+}
+
 .lives-rules__disclaimer,
 .lives-rules__empty,
 .lives-method {
   margin-top: var(--ds-space-5);
-  font-size: 0.875rem;
+  font-size: var(--ds-text-body-sm);
   color: var(--ds-ink-muted);
 }
 
@@ -459,13 +494,13 @@
 
 .lives-region-map__name {
   font-family: var(--ds-font-display);
-  font-size: 1rem;
+  font-size: var(--ds-text-body);
 }
 
 .lives-region-map__summary {
   margin: 0;
   font-family: var(--ds-font-sans);
-  font-size: 0.75rem;
+  font-size: var(--ds-text-caption);
   line-height: 1.4;
   color: var(--ds-ink-muted);
 }
@@ -497,7 +532,7 @@
 .lives-count h3 {
   margin: 0 0 var(--ds-space-3);
   font-family: var(--ds-font-display);
-  font-size: 1.125rem;
+  font-size: var(--ds-text-subtitle);
 }
 
 .lives-count__list {
@@ -529,7 +564,7 @@
 .lives-count__sources,
 .lives-cell__definition,
 .lives-table__note {
-  font-size: 0.75rem;
+  font-size: var(--ds-text-caption);
   color: var(--ds-ink-muted);
 }
 
@@ -539,12 +574,12 @@
 }
 
 .lives-cell__why {
-  font-size: 0.75rem;
+  font-size: var(--ds-text-caption);
 }
 
 .lives-regions__summary {
   margin: var(--ds-space-1) 0 0;
-  font-size: 0.875rem;
+  font-size: var(--ds-text-body-sm);
   color: var(--ds-ink-muted);
 }
 
@@ -558,7 +593,7 @@
 .lives-sight h3 {
   margin: 0 0 var(--ds-space-3);
   font-family: var(--ds-font-display);
-  font-size: 1.125rem;
+  font-size: var(--ds-text-subtitle);
 }
 
 .lives-sight__reading {
@@ -595,7 +630,7 @@
 
 .lives-figure__title {
   font-family: var(--ds-font-display);
-  font-size: 1.25rem;
+  font-size: var(--ds-text-title);
 }
 
 .lives-figure__reading {
@@ -607,7 +642,7 @@
 .lives-figure__caption {
   margin: var(--ds-space-3) 0 0;
   font-family: var(--ds-font-sans);
-  font-size: 0.8125rem;
+  font-size: var(--ds-text-caption);
   color: var(--ds-ink-muted);
 }
 
@@ -617,7 +652,7 @@
 
 .lives-figure__numbers summary {
   font-family: var(--ds-font-mono);
-  font-size: 0.75rem;
+  font-size: var(--ds-text-caption);
   letter-spacing: 0.06em;
   text-transform: uppercase;
   cursor: pointer;
@@ -650,7 +685,7 @@
 
 .lives-stack__label {
   font-family: var(--ds-font-sans);
-  font-size: 0.875rem;
+  font-size: var(--ds-text-body-sm);
 }
 
 .lives-stack__track {
@@ -667,7 +702,7 @@
   justify-content: center;
   min-width: 0;
   font-family: var(--ds-font-mono);
-  font-size: 0.625rem;
+  font-size: var(--ds-text-micro);
   line-height: 1;
 }
 
@@ -699,7 +734,7 @@
 .lives-stack__empty {
   padding: 0 var(--ds-space-3);
   font-family: var(--ds-font-sans);
-  font-size: 0.75rem;
+  font-size: var(--ds-text-caption);
   color: var(--ds-ink-muted);
 }
 
@@ -711,7 +746,7 @@
   padding: 0;
   list-style: none;
   font-family: var(--ds-font-mono);
-  font-size: 0.6875rem;
+  font-size: var(--ds-text-micro);
   color: var(--ds-ink-muted);
 }
 
@@ -750,12 +785,12 @@
 .lives-condition__label {
   margin: 0 0 var(--ds-space-2);
   font-family: var(--ds-font-sans);
-  font-size: 0.9375rem;
+  font-size: var(--ds-text-body-sm);
 }
 
 .lives-condition__universe {
   display: block;
-  font-size: 0.75rem;
+  font-size: var(--ds-text-caption);
   color: var(--ds-ink-muted);
 }
 
@@ -775,7 +810,7 @@
 
 .lives-condition__group {
   font-family: var(--ds-font-sans);
-  font-size: 0.8125rem;
+  font-size: var(--ds-text-caption);
 }
 
 .lives-condition__track {
@@ -799,13 +834,13 @@
   display: block;
   padding: 0 var(--ds-space-2);
   font-family: var(--ds-font-sans);
-  font-size: 0.6875rem;
+  font-size: var(--ds-text-micro);
   color: var(--ds-ink-muted);
 }
 
 .lives-condition__value {
   font-family: var(--ds-font-mono);
-  font-size: 0.75rem;
+  font-size: var(--ds-text-caption);
   text-align: right;
 }
 
@@ -828,7 +863,7 @@
   gap: 0.4em;
   margin: var(--ds-space-4) 0 0;
   font-family: var(--ds-font-mono);
-  font-size: 0.8125rem;
+  font-size: var(--ds-text-caption);
   letter-spacing: 0.04em;
   color: var(--ds-ink-muted);
 }
@@ -836,7 +871,7 @@
 .lives-unit-kicker {
   margin: var(--ds-space-4) 0 var(--ds-space-2);
   font-family: var(--ds-font-editorial);
-  font-size: 1.05rem;
+  font-size: var(--ds-text-editorial);
   color: var(--ds-ink);
 }
 
@@ -844,7 +879,7 @@
   margin: var(--ds-space-2) 0 0;
   padding: var(--ds-space-3);
   font-family: var(--ds-font-mono);
-  font-size: 0.8125rem;
+  font-size: var(--ds-text-caption);
   line-height: 1.45;
   color: var(--ds-ink-muted);
   border-left: 3px solid var(--ds-rule);
@@ -861,7 +896,7 @@
   margin: 0 0 var(--ds-space-4);
   padding: var(--ds-space-4);
   font-family: var(--ds-font-sans);
-  font-size: 0.9375rem;
+  font-size: var(--ds-text-body-sm);
   line-height: 1.55;
   color: var(--ds-ink);
   border-left: 3px solid var(--ds-accent-graphic);
@@ -925,7 +960,7 @@
 .lives-scene__kicker {
   margin: 0 0 var(--ds-space-2);
   font-family: var(--ds-font-mono);
-  font-size: 0.75rem;
+  font-size: var(--ds-text-caption);
   text-transform: uppercase;
   letter-spacing: 0.06em;
   color: var(--ds-ink-muted);
@@ -944,7 +979,7 @@
   gap: 0.15rem;
   padding: var(--ds-space-2) 0;
   border-bottom: var(--ds-border-width) solid var(--ds-rule);
-  font-size: 0.875rem;
+  font-size: var(--ds-text-body-sm);
 }
 
 .lives-scene__caption-list li[data-emphasis] {
@@ -971,12 +1006,12 @@
 .lives-world__title {
   margin: 0 0 var(--ds-space-2);
   font-family: var(--ds-font-display);
-  font-size: 1.35rem;
+  font-size: var(--ds-text-title);
 }
 
 .lives-world__disclaimer {
   margin: 0 0 var(--ds-space-5);
-  font-size: 0.875rem;
+  font-size: var(--ds-text-body-sm);
   color: var(--ds-ink-muted);
 }
 
@@ -1012,7 +1047,7 @@
 .lives-world__domain {
   margin: 0 0 var(--ds-space-1);
   font-family: var(--ds-font-mono);
-  font-size: 0.7rem;
+  font-size: var(--ds-text-micro);
   text-transform: uppercase;
   letter-spacing: 0.06em;
   color: var(--ds-accent);
@@ -1021,7 +1056,7 @@
 .lives-world__heading {
   margin: 0 0 var(--ds-space-2);
   font-family: var(--ds-font-display);
-  font-size: 1.1rem;
+  font-size: var(--ds-text-subtitle);
 }
 
 .lives-world__speaker,
@@ -1029,14 +1064,14 @@
 .lives-world__gap-state {
   margin: 0 0 var(--ds-space-2);
   font-family: var(--ds-font-mono);
-  font-size: 0.75rem;
+  font-size: var(--ds-text-caption);
   color: var(--ds-ink-muted);
 }
 
 .lives-world__body {
   margin: 0 0 var(--ds-space-3);
   font-family: var(--ds-font-editorial);
-  font-size: 1rem;
+  font-size: var(--ds-text-body);
   line-height: 1.55;
 }
 
@@ -1048,7 +1083,7 @@
   margin: 0;
   padding: 0;
   list-style: none;
-  font-size: 0.8125rem;
+  font-size: var(--ds-text-caption);
 }
 
 .lives-world__citations a,
@@ -1118,7 +1153,7 @@
 
 .lives-milestone__choices small {
   margin-top: 0.15rem;
-  font-size: 0.75rem;
+  font-size: var(--ds-text-caption);
   line-height: 1.25;
   white-space: normal;
 }
@@ -1139,7 +1174,7 @@
 .lives-era__source-label,
 .lives-milestone__context-kicker {
   font-family: var(--ds-font-mono);
-  font-size: 0.75rem;
+  font-size: var(--ds-text-caption);
   letter-spacing: 0.07em;
   text-transform: uppercase;
   color: var(--ds-accent);
@@ -1148,7 +1183,7 @@
 .lives-milestone__opening h2 {
   max-width: 12ch;
   font-family: var(--ds-font-display);
-  font-size: clamp(2.5rem, 8vw, 5.75rem);
+  font-size: var(--ds-text-display-1);
   line-height: 0.94;
   letter-spacing: -0.045em;
 }
@@ -1156,14 +1191,14 @@
 .lives-milestone__opening > p:not([class]) {
   max-width: 38rem;
   font-family: var(--ds-font-editorial);
-  font-size: clamp(1.25rem, 3vw, 1.75rem);
+  font-size: var(--ds-text-editorial-lede);
   line-height: 1.35;
 }
 
 .lives-milestone__orientation {
   max-width: 45rem;
   padding-top: var(--ds-space-4);
-  font-size: 0.9rem;
+  font-size: var(--ds-text-body-sm);
   line-height: 1.55;
   color: var(--ds-ink-muted);
   border-top: var(--ds-border-width) solid var(--ds-rule);
@@ -1184,34 +1219,35 @@
 }
 
 .lives-era__header {
-  display: grid;
-  grid-template-columns: minmax(8rem, 0.3fr) minmax(0, 1fr);
-  gap: var(--ds-space-6);
-  align-items: start;
+  display: flex;
+  flex-direction: column;
+  gap: var(--ds-space-2);
 }
 
-.lives-era__number {
+/* The era's decades. Never wraps mid-range: "1870s–" on one line and "1890s" on the next. */
+.lives-era__years {
   margin: 0;
   font-family: var(--ds-font-mono);
-  font-size: clamp(2.4rem, 5vw, 4.25rem);
+  font-size: var(--ds-text-display-3);
   line-height: 1.1;
-  letter-spacing: -0.06em;
-  color: var(--ds-ink);
-}
-
-.lives-era__number span {
-  display: block;
-}
-
-.lives-era__number span + span {
+  letter-spacing: -0.04em;
+  white-space: nowrap;
   color: var(--ds-ink-muted);
+}
+
+.lives-era__header h3.lives-era__years--heading {
+  max-width: none;
+  font-family: var(--ds-font-mono);
+  font-size: var(--ds-text-display-2);
+  letter-spacing: -0.05em;
+  color: var(--ds-ink);
 }
 
 .lives-era__header h3 {
   max-width: 24ch;
   margin: var(--ds-space-1) 0 var(--ds-space-2);
   font-family: var(--ds-font-display);
-  font-size: clamp(1.75rem, 4vw, 3rem);
+  font-size: var(--ds-text-display-2);
   line-height: 1.02;
 }
 
@@ -1250,7 +1286,7 @@
   gap: var(--ds-space-1);
   min-width: 0;
   font-family: var(--ds-font-display);
-  font-size: 1.05rem;
+  font-size: var(--ds-text-subtitle);
 }
 
 .lives-era__value dt small,
@@ -1258,7 +1294,7 @@
 .lives-era__rules small {
   display: block;
   font-family: var(--ds-font-mono);
-  font-size: 0.7rem;
+  font-size: var(--ds-text-micro);
   font-weight: 400;
   line-height: 1.4;
   color: var(--ds-ink-muted);
@@ -1271,28 +1307,26 @@
 .lives-era__estimate {
   display: block;
   font-family: var(--ds-font-mono);
-  font-size: clamp(1.5rem, 4vw, 2.25rem);
+  font-size: var(--ds-text-display-3);
   font-weight: 600;
   line-height: 1;
 }
 
+/*
+ * Every group's bar carries the same weight: one height, one color, full opacity. A comparison
+ * is only readable when its marks are drawn alike, and each row already names its group and
+ * prints its value in text, so no group depends on color or emphasis to be identified. The
+ * full-width track gives a lone percentage a visible scale.
+ */
 .lives-era__bar {
   grid-column: 1 / -1;
   display: block;
-  width: var(--lives-value);
-  min-width: 2px;
-  height: 0.35rem;
-  background: currentColor;
-}
-
-.lives-era__value[data-lens='white'] .lives-era__bar {
-  height: 0.2rem;
-  opacity: 0.52;
-}
-
-.lives-era__value[data-lens='hispanic'] .lives-era__bar {
-  height: 0.3rem;
-  opacity: 0.72;
+  width: 100%;
+  height: 0.5rem;
+  background:
+    linear-gradient(var(--ds-viz-1), var(--ds-viz-1)) left / max(var(--lives-value), 2px) 100%
+      no-repeat,
+    var(--ds-viz-grid);
 }
 
 .lives-era__evidence,
@@ -1306,14 +1340,13 @@
   margin: 0 0 var(--ds-space-2);
 }
 
-.lives-milestone__sources,
-.lives-era__rules ul {
+.lives-milestone__sources {
   display: grid;
   gap: var(--ds-space-2);
   margin: 0;
   padding: 0;
   list-style: none;
-  font-size: 0.82rem;
+  font-size: var(--ds-text-caption);
 }
 
 .lives-milestone__sources a,
@@ -1332,46 +1365,25 @@
 .lives-milestone__context h4 {
   margin: var(--ds-space-2) 0;
   font-family: var(--ds-font-editorial);
-  font-size: clamp(1.35rem, 3vw, 2rem);
+  font-size: var(--ds-text-display-3);
   line-height: 1.2;
 }
 
 .lives-milestone__context > p:not([class]) {
   font-family: var(--ds-font-editorial);
-  font-size: 1.05rem;
+  font-size: var(--ds-text-editorial);
   line-height: 1.65;
 }
 
 .lives-milestone__speaker {
   margin: 0 0 var(--ds-space-3);
   font-family: var(--ds-font-mono);
-  font-size: 0.75rem;
+  font-size: var(--ds-text-caption);
   color: var(--ds-ink-muted);
 }
 
 .lives-era__rules {
   border-left-color: var(--ds-accent-graphic);
-}
-
-.lives-era__rules li {
-  display: grid;
-  grid-template-columns: 3.5rem minmax(0, 1fr);
-  gap: var(--ds-space-1) var(--ds-space-3);
-  padding-top: var(--ds-space-2);
-  border-top: var(--ds-border-width) solid var(--ds-rule);
-}
-
-.lives-era__rules li > span {
-  grid-row: span 2;
-  font-family: var(--ds-font-mono);
-  color: var(--ds-ink-muted);
-}
-
-.lives-era__rules li > p {
-  grid-column: 2;
-  margin: 0;
-  font-size: 0.9rem;
-  line-height: 1.5;
 }
 
 .lives-era__measure {
@@ -1380,11 +1392,11 @@
   gap: var(--ds-space-2);
   margin: 0 0 var(--ds-space-5);
   font-family: var(--ds-font-display);
-  font-size: 1.2rem;
+  font-size: var(--ds-text-title);
 }
 
 .lives-era__definition {
-  font-size: 0.85rem;
+  font-size: var(--ds-text-caption);
   line-height: 1.55;
   color: var(--ds-ink-muted);
 }
@@ -1396,12 +1408,12 @@
 .lives-milestone__timeline-head h3 {
   margin: 0;
   font-family: var(--ds-font-display);
-  font-size: 1.75rem;
+  font-size: var(--ds-text-display-3);
 }
 
 .lives-milestone__timeline-head > p {
   max-width: 60ch;
-  font-size: 0.9rem;
+  font-size: var(--ds-text-body-sm);
   color: var(--ds-ink-muted);
 }
 
@@ -1422,7 +1434,7 @@
   border: 1px solid var(--ds-rule);
   border-radius: var(--ds-radius-sm);
   font-family: var(--ds-font-mono);
-  font-size: 0.85rem;
+  font-size: var(--ds-text-caption);
   color: var(--ds-ink);
   text-underline-offset: 0.2em;
 }
@@ -1447,61 +1459,61 @@
 }
 .lives-archive__account h4 {
   font-family: var(--ds-font-display);
-  font-size: 1.65rem;
+  font-size: var(--ds-text-display-3);
   margin: var(--ds-space-3) 0;
 }
 .lives-archive__account > p:not([class]),
 .lives-archive__account blockquote {
   max-width: 65ch;
   font-family: var(--ds-font-editorial);
-  font-size: 1.12rem;
+  font-size: var(--ds-text-editorial);
   line-height: 1.65;
 }
 .lives-archive__account blockquote {
   margin: var(--ds-space-5) 0;
   padding-left: var(--ds-space-4);
   border-left: 3px solid var(--ds-accent-graphic);
-  font-size: 1.5rem;
+  font-size: var(--ds-text-editorial-lede);
 }
 .lives-archive__account-scope {
   max-width: 75ch;
-  font-size: 0.85rem;
+  font-size: var(--ds-text-caption);
   color: var(--ds-ink-muted);
 }
 .lives-archive__date {
   font-family: var(--ds-font-mono);
-  font-size: clamp(1.75rem, 4vw, 3rem);
+  font-size: var(--ds-text-display-2);
   letter-spacing: -0.04em;
 }
 .lives-archive__place {
   font-family: var(--ds-font-mono);
-  font-size: 0.85rem;
+  font-size: var(--ds-text-caption);
   color: var(--ds-ink-muted);
 }
 .lives-archive__head h3 {
   margin: var(--ds-space-4) 0 0;
   max-width: 22ch;
   font-family: var(--ds-font-display);
-  font-size: clamp(1.75rem, 4vw, 3rem);
+  font-size: var(--ds-text-display-2);
   line-height: 1.08;
   letter-spacing: -0.035em;
 }
 .lives-archive__reading > p {
   font-family: var(--ds-font-editorial);
-  font-size: 1.12rem;
+  font-size: var(--ds-text-editorial);
   line-height: 1.65;
   margin: 0 0 var(--ds-space-5);
 }
 .lives-archive__reading > .lives-archive__notice {
   font-family: var(--ds-font-sans);
-  font-size: 0.85rem;
+  font-size: var(--ds-text-caption);
   line-height: 1.55;
   border-left: 2px solid var(--ds-rule);
   padding-left: var(--ds-space-3);
 }
 .lives-archive__citation {
   display: block;
-  font-size: 0.85rem;
+  font-size: var(--ds-text-caption);
   color: var(--ds-accent);
   overflow-wrap: anywhere;
   text-underline-offset: 0.2em;
@@ -1517,7 +1529,7 @@
 .lives-archive__question p {
   margin: 0;
   font-family: var(--ds-font-editorial);
-  font-size: 1.15rem;
+  font-size: var(--ds-text-editorial);
 }
 .lives-archive__question > svg {
   flex: 0 0 auto;
@@ -1525,7 +1537,7 @@
 }
 .lives-archive__transcript {
   margin-top: var(--ds-space-3);
-  font-size: 0.85rem;
+  font-size: var(--ds-text-caption);
 }
 .lives-archive__transcript summary {
   min-height: 44px;
@@ -1557,7 +1569,7 @@
 
 .lives-milestone__footer p,
 .lives-explorer__return {
-  font-size: 0.875rem;
+  font-size: var(--ds-text-body-sm);
   line-height: 1.55;
   color: var(--ds-ink-muted);
 }
@@ -1586,30 +1598,22 @@
     grid-column: 1 / -1;
   }
 
-  .lives-era__comparison,
-  .lives-era__evidence {
+  .lives-era__main {
     grid-column: 1;
   }
 
-  .lives-milestone__context,
-  .lives-era__rules {
+  .lives-era__side {
     grid-column: 2;
   }
 
-  .lives-milestone__context {
-    grid-row: 2;
-    align-self: start;
+  .lives-era--single .lives-era__main {
+    grid-column: 1 / -1;
+  }
+
+  .lives-era__side .lives-milestone__context {
     padding-top: 0;
   }
 
-  .lives-era__evidence {
-    grid-row: 3;
-    align-self: start;
-  }
-  .lives-era__rules {
-    grid-row: 3;
-    align-self: start;
-  }
   .lives-archive {
     grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
     column-gap: var(--ds-space-8);
@@ -1627,16 +1631,210 @@
 }
 
 @media (max-width: 31.25rem) {
-  .lives-era__header {
-    grid-template-columns: 1fr;
-    gap: var(--ds-space-4);
-  }
-
-  .lives-era__number span {
-    display: inline;
-  }
-
   .lives-era__value {
     grid-template-columns: minmax(0, 1fr) minmax(4.5rem, auto);
   }
+}
+
+/* ---- The era's two flow columns. Nothing inside is pinned to a row. ---- */
+
+.lives-era__main,
+.lives-era__side {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ds-space-6);
+  min-width: 0;
+}
+
+/* ---- Era narrative, accounts, and the narrative-led era ---- */
+
+.lives-era__accounts,
+.lives-era__narrative {
+  max-width: 46rem;
+  padding: var(--ds-space-4) 0;
+}
+
+.lives-era__narrative .ds-article__body > :first-child {
+  margin-top: 0;
+}
+
+.lives-account {
+  margin: var(--ds-space-3) 0 var(--ds-space-5);
+  padding-left: var(--ds-space-4);
+  border-left: 2px solid var(--ds-accent-graphic);
+}
+
+.lives-account__quote {
+  margin: 0;
+}
+
+.lives-account__quote p {
+  margin: 0 0 var(--ds-space-3);
+  font-family: var(--ds-font-editorial);
+  font-size: var(--ds-text-editorial-lede);
+  line-height: 1.35;
+}
+
+.lives-account__who {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ds-space-1);
+  margin-bottom: var(--ds-space-3);
+}
+
+.lives-account__name {
+  font-family: var(--ds-font-display);
+  font-size: var(--ds-text-subtitle);
+}
+
+.lives-account__meta,
+.lives-account__mediation,
+.lives-account__links,
+.lives-account__credit,
+.lives-account__content-note {
+  font-family: var(--ds-font-mono);
+  font-size: var(--ds-text-caption);
+  line-height: 1.5;
+  color: var(--ds-ink-muted);
+}
+
+.lives-account__mediation {
+  color: var(--ds-ink);
+}
+
+.lives-account__body {
+  margin: 0 0 var(--ds-space-3);
+}
+
+.lives-account__audio {
+  display: block;
+  width: 100%;
+  max-width: 32rem;
+  margin: var(--ds-space-2) 0;
+}
+
+.lives-account__links a,
+.lives-era__drawer a {
+  color: var(--ds-accent);
+  text-underline-offset: 0.2em;
+}
+
+.lives-account__content-note {
+  margin: 0 0 var(--ds-space-2);
+  color: var(--ds-ink);
+}
+
+.lives-era__no-figure {
+  max-width: 46rem;
+  margin: 0;
+  padding: var(--ds-space-4);
+  border: var(--ds-border-width) dashed var(--ds-rule);
+  font-size: var(--ds-text-body-sm);
+}
+
+.lives-era__drawer {
+  max-width: 46rem;
+  margin-top: var(--ds-space-3);
+  padding-top: var(--ds-space-3);
+  border-top: var(--ds-border-width) solid var(--ds-rule);
+}
+
+.lives-era__drawer summary {
+  cursor: pointer;
+  font-family: var(--ds-font-mono);
+  font-size: var(--ds-text-caption);
+  color: var(--ds-accent);
+}
+
+.lives-era__drawer summary:focus-visible,
+.lives-account__audio:focus-visible {
+  outline: var(--ds-focus-width) solid var(--ds-focus-ring);
+  outline-offset: 2px;
+}
+
+.lives-era__gap {
+  max-width: 46rem;
+  margin: var(--ds-space-3) 0 0;
+  font-size: var(--ds-text-caption);
+  line-height: 1.5;
+  color: var(--ds-ink-muted);
+}
+
+.lives-era__gap strong {
+  font-family: var(--ds-font-mono);
+  font-size: var(--ds-text-body-sm);
+  color: var(--ds-ink);
+}
+
+/* ---- The Turn: one question before the record ---- */
+
+.lives-turn {
+  max-width: 46rem;
+  margin: var(--ds-space-5) 0;
+  padding: var(--ds-space-4);
+  border: var(--ds-border-width) solid var(--ds-rule);
+}
+
+.lives-turn__question {
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.lives-turn__question legend {
+  padding: 0;
+  margin-bottom: var(--ds-space-3);
+  font-family: var(--ds-font-editorial);
+  font-size: var(--ds-text-editorial);
+  line-height: 1.45;
+}
+
+.lives-turn__options {
+  display: grid;
+  gap: var(--ds-space-2);
+}
+
+.lives-turn__option {
+  display: flex;
+  align-items: center;
+  gap: var(--ds-space-3);
+  min-height: 2.75rem;
+  padding: var(--ds-space-2) var(--ds-space-3);
+  border: var(--ds-border-width) solid var(--ds-rule);
+  font-size: var(--ds-text-body-sm);
+  cursor: pointer;
+}
+
+.lives-turn__option input {
+  width: 1.5rem;
+  height: 1.5rem;
+  margin: 0;
+  flex: none;
+  accent-color: var(--ds-accent);
+}
+
+.lives-turn__option:has(input:focus-visible) {
+  outline: var(--ds-focus-width) solid var(--ds-focus-ring);
+  outline-offset: 2px;
+}
+
+.lives-turn__option:has(input:checked) {
+  border-color: var(--ds-ink);
+}
+
+.lives-turn__reveal p {
+  margin: var(--ds-space-4) 0 0;
+  font-size: var(--ds-text-body);
+  line-height: 1.55;
+}
+
+.lives-turn__reveal .lives-turn__records {
+  font-family: var(--ds-font-mono);
+  font-size: var(--ds-text-caption);
+  color: var(--ds-ink-muted);
+}
+
+.lives-turn__records a {
+  color: var(--ds-accent);
+  text-underline-offset: 0.2em;
 }

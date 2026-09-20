@@ -116,6 +116,34 @@ export const resolveArticle = cache(
   },
 );
 
+/**
+ * Every article in one series, hydrated, in series order. Lives uses this to read a column's era
+ * narratives. Degrades to an empty list: a Lives page without its prose still has its figures and
+ * rules, while one that throws has nothing.
+ */
+export const resolveArticleSeries = cache(
+  async (seriesId: string): Promise<readonly HydratedArticle[]> => {
+    if (!shouldAttemptLiveReads()) return [];
+    try {
+      const docs = (await listReleaseArticlesCached())
+        .filter((doc) => doc.series?.id === seriesId)
+        .sort((a, b) => (a.series?.position ?? 0) - (b.series?.position ?? 0));
+      return await Promise.all(
+        docs.map(async (doc) => {
+          const [packets, entities] = await Promise.all([
+            loadPacketViews(articlePacketIds(doc)),
+            loadEntities(articleMapEntityIds(doc)),
+          ]);
+          return hydrateArticle(doc, packets, entities);
+        }),
+      );
+    } catch (error) {
+      logReadFailure(`resolveArticleSeries(${seriesId})`, error);
+      return [];
+    }
+  },
+);
+
 async function loadPacketViews(
   packetIds: readonly string[],
 ): Promise<readonly ThemeImpactPacketView[]> {

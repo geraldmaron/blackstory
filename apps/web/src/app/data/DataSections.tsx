@@ -41,6 +41,7 @@ import {
 } from './data-copy';
 import { DataPageNav } from './DataPageNav';
 import { DestinationIcon } from '../../components/patterns/DestinationIcon';
+import { RoomStats } from '../../components/room';
 
 void React;
 
@@ -178,22 +179,18 @@ function groupedReading(series: DataPageGroupedBarSeries): ReactNode {
 }
 
 function OpeningBeat({ items }: { readonly items: readonly DataHeadline[] }) {
-  if (items.length === 0) return null;
   return (
-    <ol className="ds-data-headlines" aria-label="Opening figures">
-      {items.map((item) => (
-        <li key={item.id}>
-          <a className="ds-data-headline" href={item.href}>
-            <span className="ds-data-headline__value">
-              {item.value}
-              {item.unit ? <span className="ds-data-headline__unit">{item.unit}</span> : null}
-            </span>
-            <span className="ds-data-headline__label">{item.label}</span>
-            <span className="ds-data-headline__source">{item.source}</span>
-          </a>
-        </li>
-      ))}
-    </ol>
+    <RoomStats
+      label="Opening figures"
+      stats={items.map((item) => ({
+        id: item.id,
+        value: item.value,
+        unit: item.unit,
+        label: item.label,
+        source: item.source,
+        href: item.href,
+      }))}
+    />
   );
 }
 
@@ -212,15 +209,21 @@ function Section({
   return (
     <section className="ds-data-section" id={id} aria-labelledby={headingId}>
       <header className="ds-data-section__head">
-        <p className="ds-data-section__kicker">
+        {/* The same chapter head as every other room: a plate, a kicker, a heading. An act on
+            /data and a chapter on /methodology are one object, so they read from one rule set. */}
+        <div className="ds-room-section__head">
           {sectionMeta ? (
-            <DestinationIcon id={sectionMeta.icon} className="ds-kicker-glyph" />
+            <span className="ds-room-section__plate" aria-hidden="true">
+              <DestinationIcon id={sectionMeta.icon} size="lg" />
+            </span>
           ) : null}
-          {copy.kicker}
-        </p>
-        <h2 className="ds-data-section__title" id={headingId}>
-          {copy.title}
-        </h2>
+          <div className="ds-room-section__titles">
+            <p className="ds-room-section__kicker">{copy.kicker}</p>
+            <h2 className="ds-room-section__title ds-data-section__title" id={headingId}>
+              {copy.title}
+            </h2>
+          </div>
+        </div>
         <p className="ds-data-section__lede">{copy.lede}</p>
         {meta.length > 0 ? (
           <p className="ds-data-section__meta">

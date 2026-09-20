@@ -11,9 +11,9 @@ import { bannedBookToSuggestCorpusItem } from '../../lib/banned-books/suggest-bo
 import { loadBannedBooksListing } from '../../lib/banned-books/public-source.js';
 import { buildBooksBrowseViewModel, type RawBooksBrowseParams } from './books-view-model';
 import { BooksBrowseSections } from './BooksBrowseSections';
-import { booksCatalogPulseMeta } from './BooksCatalogPulse';
+import { booksCatalogPulseMeta, booksCatalogStats } from './BooksCatalogPulse';
 import { BOOKS_INDEX_LEDE, BOOKS_PAGE_DESCRIPTION } from './books-copy';
-import { DocumentColophon, ReadingEntry, Room } from '../../components/room';
+import { DocumentColophon, ReadingEntry, Room, RoomStats } from '../../components/room';
 import { WalkOffRamp } from '../walk-off-ramp';
 import '../reading-room.css';
 
@@ -35,8 +35,15 @@ export default async function BooksPage({ searchParams }: BooksPageProps) {
 
   if (snapshot.books.length === 0) {
     return (
-      <Room>
-        <ReadingEntry pathname="/books" title="Banned books" showCrumb={false} />
+      <Room ledger>
+        <ReadingEntry
+          pathname="/books"
+          title={
+            <>
+              The books someone asked to <em>remove</em>.
+            </>
+          }
+        />
         <Notice tone="warning" title="The catalog snapshot is unavailable">
           The challenged-books catalog did not load. Nothing documented here is lost. Check back
           shortly, or read the <Link href="/methodology">methodology</Link> for how this catalog is
@@ -51,14 +58,18 @@ export default async function BooksPage({ searchParams }: BooksPageProps) {
   const suggestCorpus = snapshot.books.map(bannedBookToSuggestCorpusItem);
 
   return (
-    <Room>
+    <Room ledger>
       <ReadingEntry
         pathname="/books"
-        title="Banned books"
+        title={
+          <>
+            The books someone asked to <em>remove</em>.
+          </>
+        }
         lede={BOOKS_INDEX_LEDE}
-        showCrumb={false}
       />
-      <DocumentColophon facts={booksCatalogPulseMeta(snapshot)} />
+      <RoomStats label="The catalog at a glance" stats={booksCatalogStats(snapshot)} />
+      <DocumentColophon facts={booksCatalogPulseMeta(snapshot).slice(-1)} />
 
       <BooksBrowseSections view={view} suggestCorpus={suggestCorpus} snapshot={snapshot} />
 

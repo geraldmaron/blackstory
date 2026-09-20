@@ -6,3 +6,4 @@ export * from './prose-links.js';
 export * from './packet.js';
 export * from './validate.js';
 export * from './related-from-vectors.js';
+export * from './prose-voice.js';

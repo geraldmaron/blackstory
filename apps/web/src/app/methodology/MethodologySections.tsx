@@ -8,6 +8,7 @@ import { humanizeToken, mapConfidenceToUiLevel } from '../../components/facts/fo
 import { TrustSiteDisclaimer } from '../../components/trust/TrustSiteDisclaimer';
 import { formatCitation } from '../../lib/citation/format';
 import {
+  DocumentPlate,
   Note,
   Prose,
   ReadingEntry,
@@ -75,15 +76,28 @@ export function MethodologySections({ omitEntry = false }: { readonly omitEntry?
             </>
           }
           lede={METHODOLOGY_INTRO_LEDE}
-          showCrumb={false}
+          plate={
+            <DocumentPlate
+              label="The grade key"
+              citation="The four grades a public statement can carry, as they appear on a record."
+              href="#evidence-grades"
+              hrefLabel="Read the definitions"
+            >
+              {grades.map((grade) => (
+                <div className="ds-room-plate__row" key={grade}>
+                  <Confidence level={mapConfidenceToUiLevel(grade)} label={humanizeToken(grade)} />
+                </div>
+              ))}
+            </DocumentPlate>
+          }
         />
       )}
+
+      <RoomJump sections={METHODOLOGY_JUMP} />
 
       <Prose>
         <TrustSiteDisclaimer />
       </Prose>
-
-      <RoomJump sections={METHODOLOGY_JUMP} />
 
       <RoomSection
         id="how-a-record-gets-in"

@@ -21,7 +21,7 @@
   border-top: var(--ds-border-width) solid var(--ds-rule);
   max-width: 62ch;
   font-family: var(--ds-font-editorial);
-  font-size: 0.9375rem;
+  font-size: var(--ds-text-body-sm);
   line-height: 1.6;
   color: var(--ds-ink-muted);
 }
@@ -35,7 +35,7 @@
   display: block;
   margin-block-end: var(--ds-space-1);
   font-family: var(--ds-font-mono);
-  font-size: 0.6875rem;
+  font-size: var(--ds-text-micro);
   font-weight: 500;
   letter-spacing: 0.12em;
   text-transform: uppercase;
@@ -53,7 +53,7 @@
 .ds-about-page__credit {
   margin: 0;
   font-family: var(--ds-font-mono);
-  font-size: 0.6875rem;
+  font-size: var(--ds-text-micro);
   letter-spacing: 0.04em;
   line-height: 1.55;
   color: var(--ds-ink-muted);

@@ -21,6 +21,7 @@ import {
   Disclosure,
   EmptyList,
   Field,
+  FindBar,
   GroupHeading,
   HairlineIndex,
   MapMoment,
@@ -96,6 +97,47 @@ export function RoomKitGallery() {
           showCrumb={false}
         />
         <DocumentColophon facts={['1,204 titles', '1963 to 2024']} />
+      </Specimen>
+
+      <Specimen
+        name="FindBar"
+        tokens={['--ds-surface', '--ds-rule', '--room-copper-wash', '--ds-accent-graphic']}
+      >
+        <FindBar
+          id="gallery-find"
+          action="/design-system"
+          queryLabel="Title, citation or topic"
+          placeholder="Brown v. Board, voting, 42 U.S.C…"
+          query="voting"
+          preserved={{ kind: 'landmark-case' }}
+          active={[
+            { key: 'q', label: 'Search: voting', href: '/design-system' },
+            { key: 'kind', label: 'Landmark case', href: '/design-system' },
+          ]}
+          clearHref="/design-system"
+          rows={[
+            {
+              label: 'Filter by kind',
+              chips: [
+                { label: 'All kinds', href: '/design-system', active: false, count: 12 },
+                { label: 'Landmark case', href: '/design-system', active: true, count: 3 },
+                { label: 'Federal statute', href: '/design-system', active: false, count: 4 },
+                {
+                  label: 'Constitutional amendment',
+                  href: '/design-system',
+                  active: false,
+                  count: 3,
+                },
+              ],
+            },
+          ]}
+          sort={[
+            { label: 'Oldest first', href: '/design-system', active: true },
+            { label: 'Newest first', href: '/design-system', active: false },
+            { label: 'A to Z', href: '/design-system', active: false },
+          ]}
+          summary="2 of 12 law entries"
+        />
       </Specimen>
 
       <Specimen

@@ -6,6 +6,7 @@ import React from 'react';
 import Link from 'next/link';
 import {
   LIVES_WORLD_DOMAIN_LABELS,
+  livesWorldMediationLine,
   selectLivesWorldBeats,
   type LivesDecade,
   type LivesLens,
@@ -46,6 +47,8 @@ export function LivesWorldBeats({ decade, beats, emphasis }: LivesWorldBeatsProp
                 {beat.speakerPlaceMismatch ? ' (speaking from outside this region)' : ''},{' '}
                 {beat.speaker.place}, {beat.speaker.year}
                 {beat.speaker.classNote ? ` · ${beat.speaker.classNote}` : ''}
+                {' · '}
+                {livesWorldMediationLine(beat.speaker)}
               </p>
             ) : null}
             <p className="lives-world__body">{beat.body}</p>

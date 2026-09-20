@@ -5,7 +5,7 @@
 import type { Metadata } from 'next';
 import { buildStaticPageMetadata } from '../../lib/seo/metadata-builders';
 import { EmptyState, Notice } from '@repo/ui';
-import { Room, ReadingEntry, RoomSection } from '../../components/room';
+import { KeepGoing, Room, ReadingEntry, RoomSection } from '../../components/room';
 import { SUPPORT_CONTACT } from '../../lib/config/contact';
 import { WalkOffRamp } from '../walk-off-ramp';
 import '../utility.css';
@@ -22,10 +22,14 @@ export const metadata: Metadata = buildStaticPageMetadata({
 
 export default function SubmitLeadPage() {
   return (
-    <Room>
+    <Room ledger>
       <ReadingEntry
         pathname="/submit"
-        title="Submit a lead"
+        title={
+          <>
+            Tell the archive what it&apos;s <em>missing</em>.
+          </>
+        }
         lede="Some of the most important sources for this history sit where no compliant automated search can reach them: closed Facebook groups, Discord servers, private forums, family papers in a shoebox, an account nobody ever wrote down. If you know of one, this is where to say so."
       />
 
@@ -48,6 +52,8 @@ export default function SubmitLeadPage() {
           have, write to <a href={`mailto:${SUPPORT_CONTACT}`}>{SUPPORT_CONTACT}</a> instead.
         </EmptyState>
       </RoomSection>
+
+      <KeepGoing paths={['/corrections', '/methodology', '/errata']} />
 
       <WalkOffRamp>Nothing you send here is public on arrival.</WalkOffRamp>
     </Room>

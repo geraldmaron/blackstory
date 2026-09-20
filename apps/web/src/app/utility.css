@@ -14,6 +14,15 @@
   --room-doc-w: 560px;
 }
 
+/* The frame is not the measure. A ledger utility room (Support, Submit, Corrections, Privacy,
+   Terms) opens on the same hero masthead as its siblings, and in a 560px column that headline
+   wrapped to five lines and the page read as a phone layout on a desktop. These rooms take the
+   reading rooms' 900px frame; what stays narrow is the thing that should be narrow, the form and
+   the running text inside it (see the measure rules in room-kit.css). */
+[data-surface='utility'] .ds-room--ledger {
+  --room-doc-w: 900px;
+}
+
 /* Utility titles sit one step down: nothing here is a headline. */
 [data-surface='utility'] .ds-room-header__title {
   font-size: clamp(26px, 3.2vw, 34px);

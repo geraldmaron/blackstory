@@ -64,7 +64,7 @@ export default function RoomsPage() {
   }));
 
   return (
-    <Room>
+    <Room ledger>
       <ReadingEntry
         pathname="/rooms"
         title={

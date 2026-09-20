@@ -57,12 +57,91 @@ export const LIVES_WORLD_GAP_STATES = ['insufficient_evidence', 'modeled'] as co
 
 export type LivesWorldGapState = (typeof LIVES_WORLD_GAP_STATES)[number];
 
+/**
+ * How a speaker's words reached the page. A memoir, an edited as-told-to transcription, a
+ * journalist's report and a recorded interview are different kinds of evidence, and only the first
+ * is a person speaking for themselves. Every speaker carries one, shown beside the name, so a
+ * mediated account never stands in unlabeled for a group's own voice.
+ */
+export const LIVES_WORLD_MEDIATIONS = [
+  'self-authored',
+  'as-told-to',
+  'reported-by-third-party',
+  'recorded-interview',
+] as const;
+export type LivesWorldMediation = (typeof LIVES_WORLD_MEDIATIONS)[number];
+
+export const LIVES_WORLD_MEDIATION_LABELS: Readonly<Record<LivesWorldMediation, string>> = {
+  'self-authored': 'In their own writing',
+  'as-told-to': 'As told to',
+  'reported-by-third-party': 'Reported by an observer',
+  'recorded-interview': 'Recorded interview with',
+};
+
+/** Mediations that name a second person: the writer who took the account down, or the interviewer. */
+const MEDIATIONS_NAMING_A_SECOND_PERSON: readonly LivesWorldMediation[] = [
+  'as-told-to',
+  'recorded-interview',
+];
+
 export type LivesWorldSpeaker = {
   readonly name: string;
   readonly place: string;
   readonly year: string;
   readonly classNote?: string;
+  readonly mediation: LivesWorldMediation;
+  /** Required for as-told-to and recorded-interview: who took the account down or asked the questions. */
+  readonly mediatedBy?: string;
 };
+
+/**
+ * A recording the public can hear, held by an archive. Lives points at it and never stores it: the
+ * oral-history adapter's rule (pointers and short quotes only, never audio or full transcripts)
+ * holds here too. Verified sources and the rights reading are in
+ * docs/research/lives-audio-sources.md.
+ */
+export type LivesWorldRecording = {
+  /** Direct https URL of the archive's own media file. */
+  readonly mediaUrl: string;
+  /** The archive's item page, the fallback when the stream does not play. */
+  readonly itemUrl: string;
+  readonly transcriptUrl?: string;
+  readonly holdingInstitution: string;
+  /** The archive's credit line for the source collection, as the archive asks for it. */
+  readonly creditLine: string;
+  /** The archive's own rights statement, quoted. */
+  readonly rightsNote: string;
+  /** When and where the recording was made, e.g. "June 11, 1949, Baltimore, Maryland". */
+  readonly recordedOn: string;
+  /** Shown before play when the recording carries period language or describes violence. */
+  readonly contentNote?: string;
+};
+
+/**
+ * A recording the public can hear or watch at the archive, which this site may NOT play inline:
+ * the interviewee or the institution keeps copyright (the Civil Rights History Project, the UNC
+ * Southern Oral History Program). The account shows a link and the archive's own rights statement,
+ * and no player. Inline play is reserved for `LivesWorldRecording`, whose rights reading is recorded.
+ */
+export type LivesWorldArchivePointer = {
+  readonly itemUrl: string;
+  readonly holdingInstitution: string;
+  readonly format: 'audio' | 'video';
+  /** The archive's own rights statement, quoted. */
+  readonly rightsNote: string;
+  readonly recordedOn: string;
+};
+
+/** A verbatim quotation may run to 40 words: docs/methodology/chapter-fact-validation.md. */
+export const LIVES_WORLD_QUOTE_MAX_WORDS = 40;
+
+/** "As told to Theodore Rosengarten", "In their own writing": the line shown beside a speaker. */
+export function livesWorldMediationLine(speaker: LivesWorldSpeaker): string {
+  const label = LIVES_WORLD_MEDIATION_LABELS[speaker.mediation];
+  return speaker.mediatedBy && MEDIATIONS_NAMING_A_SECOND_PERSON.includes(speaker.mediation)
+    ? `${label} ${speaker.mediatedBy}`
+    : label;
+}
 
 /** Authored beat before entity hrefs are resolved at snapshot build. */
 export type LivesWorldBeatInput = {
@@ -81,6 +160,12 @@ export type LivesWorldBeatInput = {
   readonly citations: readonly LivesSourceRef[];
   readonly entityIds: readonly string[];
   readonly speaker?: LivesWorldSpeaker;
+  /** The speaker's own words, verbatim from the cited source. Requires a speaker. */
+  readonly quote?: string;
+  /** Requires a speaker whose mediation is `recorded-interview`. */
+  readonly recording?: LivesWorldRecording;
+  /** Link-only. Never together with `recording`. */
+  readonly archivePointer?: LivesWorldArchivePointer;
 };
 
 export type LivesWorldBeat = {
@@ -102,6 +187,9 @@ export type LivesWorldBeat = {
   readonly speaker?: LivesWorldSpeaker;
   /** True when the speaker's place is outside the selected area's story geography. */
   readonly speakerPlaceMismatch?: boolean;
+  readonly quote?: string;
+  readonly recording?: LivesWorldRecording;
+  readonly archivePointer?: LivesWorldArchivePointer;
 };
 
 export type LivesWorldGapCard = {
@@ -210,6 +298,115 @@ export function validateLivesWorldBeats(input: unknown): {
       }
     }
 
+    // Any beat that names a speaker says how the words reached the page, whatever its claim type.
+    if (beat.speaker && typeof beat.speaker === 'object') {
+      const s = beat.speaker as Record<string, unknown>;
+      const mediation = s.mediation;
+      if (
+        typeof mediation !== 'string' ||
+        !(LIVES_WORLD_MEDIATIONS as readonly string[]).includes(mediation)
+      ) {
+        problems.push(
+          'speaker.mediation must be self-authored, as-told-to, reported-by-third-party or recorded-interview',
+        );
+      } else if (
+        MEDIATIONS_NAMING_A_SECOND_PERSON.includes(mediation as LivesWorldMediation) &&
+        (typeof s.mediatedBy !== 'string' || !s.mediatedBy.trim())
+      ) {
+        problems.push(`speaker.mediatedBy is required when mediation is ${mediation}`);
+      }
+    }
+
+    let quote: string | undefined;
+    if (beat.quote !== undefined) {
+      if (typeof beat.quote !== 'string' || beat.quote.trim().length === 0) {
+        problems.push('quote must be a non-empty string');
+      } else if (!beat.speaker || typeof beat.speaker !== 'object') {
+        problems.push('a quote requires a speaker');
+      } else if (beat.quote.trim().split(/\s+/).length > LIVES_WORLD_QUOTE_MAX_WORDS) {
+        problems.push(`quote is longer than ${LIVES_WORLD_QUOTE_MAX_WORDS} words`);
+      } else {
+        quote = beat.quote.trim();
+      }
+    }
+
+    let recording: LivesWorldRecording | undefined;
+    if (beat.recording !== undefined) {
+      const r = beat.recording as Record<string, unknown> | null;
+      if (!r || typeof r !== 'object') {
+        problems.push('recording must be an object');
+      } else {
+        const text = (key: string): string =>
+          typeof r[key] === 'string' ? (r[key] as string).trim() : '';
+        for (const key of ['mediaUrl', 'itemUrl'] as const) {
+          if (!/^https:\/\//.test(text(key)))
+            problems.push(`recording.${key} must be an https URL`);
+        }
+        if (r.transcriptUrl !== undefined && !/^https:\/\//.test(text('transcriptUrl'))) {
+          problems.push('recording.transcriptUrl must be an https URL');
+        }
+        for (const key of [
+          'holdingInstitution',
+          'creditLine',
+          'rightsNote',
+          'recordedOn',
+        ] as const) {
+          if (!text(key)) problems.push(`recording.${key} is required`);
+        }
+        const speaker = beat.speaker as Record<string, unknown> | undefined;
+        if (!speaker || speaker.mediation !== 'recorded-interview') {
+          problems.push('a recording requires a speaker whose mediation is recorded-interview');
+        }
+        // Any problem above aborts the record before this value is read.
+        recording = {
+          mediaUrl: text('mediaUrl'),
+          itemUrl: text('itemUrl'),
+          ...(text('transcriptUrl') ? { transcriptUrl: text('transcriptUrl') } : {}),
+          holdingInstitution: text('holdingInstitution'),
+          creditLine: text('creditLine'),
+          rightsNote: text('rightsNote'),
+          recordedOn: text('recordedOn'),
+          ...(text('contentNote') ? { contentNote: text('contentNote') } : {}),
+        };
+      }
+    }
+
+    let archivePointer: LivesWorldArchivePointer | undefined;
+    if (beat.archivePointer !== undefined) {
+      const a = beat.archivePointer as Record<string, unknown> | null;
+      if (!a || typeof a !== 'object') {
+        problems.push('archivePointer must be an object');
+      } else {
+        const text = (key: string): string =>
+          typeof a[key] === 'string' ? (a[key] as string).trim() : '';
+        if (beat.recording !== undefined) {
+          problems.push('an account is either played inline or linked, never both');
+        }
+        if (!/^https:\/\//.test(text('itemUrl'))) {
+          problems.push('archivePointer.itemUrl must be an https URL');
+        }
+        if (text('format') !== 'audio' && text('format') !== 'video') {
+          problems.push('archivePointer.format must be audio or video');
+        }
+        for (const key of ['holdingInstitution', 'rightsNote', 'recordedOn'] as const) {
+          if (!text(key)) problems.push(`archivePointer.${key} is required`);
+        }
+        const speaker = beat.speaker as Record<string, unknown> | undefined;
+        if (!speaker || speaker.mediation !== 'recorded-interview') {
+          problems.push(
+            'an archive pointer requires a speaker whose mediation is recorded-interview',
+          );
+        }
+        archivePointer = {
+          itemUrl: text('itemUrl'),
+          holdingInstitution: text('holdingInstitution'),
+          format: text('format') as 'audio' | 'video',
+          rightsNote: text('rightsNote'),
+          recordedOn: text('recordedOn'),
+        };
+      }
+    }
+
     const citations = Array.isArray(beat.citations) ? beat.citations : [];
     const validCitations = citations.filter(
       (citation): citation is LivesSourceRef =>
@@ -266,12 +463,19 @@ export function validateLivesWorldBeats(input: unknown): {
               name: String((beat.speaker as LivesWorldSpeaker).name).trim(),
               place: String((beat.speaker as LivesWorldSpeaker).place).trim(),
               year: String((beat.speaker as LivesWorldSpeaker).year).trim(),
+              mediation: (beat.speaker as LivesWorldSpeaker).mediation,
+              ...((beat.speaker as LivesWorldSpeaker).mediatedBy
+                ? { mediatedBy: String((beat.speaker as LivesWorldSpeaker).mediatedBy).trim() }
+                : {}),
               ...((beat.speaker as LivesWorldSpeaker).classNote
                 ? { classNote: String((beat.speaker as LivesWorldSpeaker).classNote).trim() }
                 : {}),
             },
           }
         : {}),
+      ...(quote ? { quote } : {}),
+      ...(recording ? { recording } : {}),
+      ...(archivePointer ? { archivePointer } : {}),
     };
     records.push(record);
   });

@@ -10,91 +10,7 @@
  * files under `app/`.
  */
 
-/* —— the headline band ——————————————————————————————————————————————————————
-   Four numbers, each a link into the figure that carries it. Mono value in the display face at
-   a size the page never reaches again, then a sans label and a mono source line. The band is
-   hairline-ruled like a table: it is the page's own table of contents, in numbers. */
-.ds-data-headlines {
-  display: grid;
-  grid-template-columns: 1fr;
-  margin: var(--ds-space-8) 0 0;
-  padding: 0;
-  list-style: none;
-  border-top: var(--ds-border-width) solid var(--ds-ink);
-}
-
-@media (min-width: 40rem) {
-  .ds-data-headlines {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    column-gap: var(--ds-space-8);
-  }
-}
-
-@media (min-width: 64rem) {
-  .ds-data-headlines {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-    column-gap: var(--ds-space-6);
-  }
-}
-
-.ds-data-headline {
-  display: block;
-  min-width: 0;
-  padding: var(--ds-space-5) 0 var(--ds-space-5);
-  border-bottom: var(--ds-border-width) solid var(--ds-rule);
-  color: inherit;
-  text-decoration: none;
-  transition: background-color var(--ds-duration-fast) var(--ds-easing);
-}
-
-.ds-data-headline:hover .ds-data-headline__value,
-.ds-data-headline:focus-visible .ds-data-headline__value {
-  color: var(--ds-accent);
-}
-
-.ds-data-headline:focus-visible {
-  outline: var(--ds-focus-width, 2px) solid var(--ds-focus-ring, var(--ds-accent));
-  outline-offset: 4px;
-  border-radius: var(--ds-radius-sm);
-}
-
-.ds-data-headline__value {
-  display: block;
-  font-family: var(--ds-font-display);
-  font-size: clamp(2rem, 1.4rem + 2.2vw, 2.75rem);
-  font-weight: 600;
-  line-height: 1;
-  letter-spacing: -0.035em;
-  font-variant-numeric: tabular-nums;
-  color: var(--ds-ink);
-  transition: color var(--ds-duration-fast) var(--ds-easing);
-}
-
-.ds-data-headline__unit {
-  font-size: 0.5em;
-  font-weight: 500;
-  letter-spacing: 0;
-  color: var(--ds-ink-muted);
-  margin-left: 0.15em;
-}
-
-.ds-data-headline__label {
-  display: block;
-  margin-top: var(--ds-space-3);
-  font-family: var(--ds-font-sans);
-  font-size: 0.875rem;
-  line-height: 1.4;
-  color: var(--ds-ink);
-}
-
-.ds-data-headline__source {
-  display: block;
-  margin-top: var(--ds-space-2);
-  font-family: var(--ds-font-mono);
-  font-size: 0.6875rem;
-  letter-spacing: 0.02em;
-  color: var(--ds-ink-muted);
-}
+/* The opening figures are the room kit's RoomStats (components/room/RoomStats.tsx). */
 
 /* —— the section rail ———————————————————————————————————————————————————————
    Sticky under the command bar. A running head, not a menu: mono caps, hairline below, the
@@ -138,7 +54,7 @@
   padding: 12px 0 10px;
   border-bottom: 2px solid transparent;
   font-family: var(--ds-font-mono);
-  font-size: 0.6875rem;
+  font-size: var(--ds-text-micro);
   letter-spacing: 0.1em;
   text-transform: uppercase;
   white-space: nowrap;
@@ -183,7 +99,7 @@
   gap: 0.45em;
   margin: 0;
   font-family: var(--ds-font-mono);
-  font-size: 0.6875rem;
+  font-size: var(--ds-text-micro);
   letter-spacing: 0.1em;
   text-transform: uppercase;
   color: var(--ds-accent);
@@ -198,7 +114,7 @@
   padding: 0;
   border: 0;
   font-family: var(--ds-font-display);
-  font-size: clamp(1.625rem, 1.3rem + 1.2vw, 2.125rem);
+  font-size: var(--ds-text-display-3);
   font-weight: 600;
   line-height: 1.12;
   letter-spacing: -0.03em;
@@ -208,7 +124,7 @@
 .ds-data-section__lede {
   margin: var(--ds-space-1) 0 0;
   font-family: var(--ds-font-editorial);
-  font-size: 1.0625rem;
+  font-size: var(--ds-text-editorial);
   line-height: 1.6;
   color: var(--room-ink-2, var(--ds-ink));
 }
@@ -219,7 +135,7 @@
   gap: var(--ds-space-2) var(--ds-space-4);
   margin: var(--ds-space-2) 0 0;
   font-family: var(--ds-font-mono);
-  font-size: 0.6875rem;
+  font-size: var(--ds-text-micro);
   letter-spacing: 0.02em;
   color: var(--ds-ink-muted);
 }
@@ -264,7 +180,7 @@
 
 .ds-data-delta__label {
   font-family: var(--ds-font-sans);
-  font-size: 0.875rem;
+  font-size: var(--ds-text-body-sm);
   color: var(--ds-ink);
 }
 
@@ -273,7 +189,7 @@
   grid-column: 2;
   align-self: center;
   font-family: var(--ds-font-display);
-  font-size: 1.375rem;
+  font-size: var(--ds-text-title);
   font-weight: 600;
   letter-spacing: -0.02em;
   font-variant-numeric: tabular-nums;
@@ -284,7 +200,7 @@
 .ds-data-delta__note {
   margin: 0;
   font-family: var(--ds-font-mono);
-  font-size: 0.6875rem;
+  font-size: var(--ds-text-micro);
   line-height: 1.5;
   color: var(--ds-ink-muted);
 }
@@ -320,7 +236,7 @@
   gap: 0.45em;
   margin: 0 0 var(--ds-space-2);
   font-family: var(--ds-font-display);
-  font-size: 1rem;
+  font-size: var(--ds-text-body);
   font-weight: 600;
   letter-spacing: -0.01em;
   color: var(--ds-ink);
@@ -329,7 +245,7 @@
 .ds-data-rule__body {
   margin: 0;
   font-family: var(--ds-font-editorial);
-  font-size: 0.9375rem;
+  font-size: var(--ds-text-body-sm);
   line-height: 1.55;
   color: var(--ds-ink-muted);
 }
@@ -351,7 +267,7 @@
   border: var(--ds-border-width) dashed var(--ds-rule);
   border-radius: var(--ds-radius-md);
   font-family: var(--ds-font-sans);
-  font-size: 0.875rem;
+  font-size: var(--ds-text-body-sm);
   line-height: 1.5;
   color: var(--ds-ink-muted);
 }
@@ -359,7 +275,7 @@
 .ds-data-lives-entry {
   margin: 0 0 var(--ds-space-3);
   font-family: var(--ds-font-editorial);
-  font-size: 1.05rem;
+  font-size: var(--ds-text-editorial);
   line-height: 1.5;
 }
 
@@ -374,8 +290,6 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .ds-data-headline,
-  .ds-data-headline__value,
   .ds-data-nav__link {
     transition-duration: 0.01ms;
   }

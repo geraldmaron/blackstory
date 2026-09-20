@@ -5,6 +5,7 @@
  */
 import React from 'react';
 import {
+  DocumentPlate,
   Note,
   Prose,
   ReadingEntry,
@@ -17,7 +18,6 @@ import {
 import { WalkOffRamp } from '../walk-off-ramp';
 import { SourceLineageDiagram } from '../methodology/MethodologyDiagrams';
 import {
-  SOURCE_LIBRARY_LEDE,
   SOURCE_LIBRARY_SURFACES,
   SOURCE_LINEAGE_STAGES,
   SOURCE_PUBLISHER_KINDS,
@@ -45,12 +45,22 @@ export function SourcesSections() {
           </>
         }
         lede={SOURCES_INTRO}
-        showCrumb={false}
+        plate={
+          <DocumentPlate
+            label="The citation chain"
+            citation="The four steps between a URL and a citation on a public record."
+            href="#citation-chain"
+            hrefLabel="Follow the chain"
+          >
+            {SOURCE_LINEAGE_STAGES.map((stage) => (
+              <div className="ds-room-plate__row" key={stage.step}>
+                <span className="ds-room-plate__step">{stage.step}</span>
+                {stage.title}
+              </div>
+            ))}
+          </DocumentPlate>
+        }
       />
-
-      <Prose>
-        <p>{SOURCE_LIBRARY_LEDE}</p>
-      </Prose>
 
       <RoomJump sections={SOURCES_JUMP} />
 

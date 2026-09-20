@@ -18,6 +18,8 @@ import {
   RoomCard,
   RoomSection,
   roomSectionTone,
+  KeepGoing,
+  RoomJump,
 } from '../../components/room';
 import { DestinationIcon } from '../../components/patterns/DestinationIcon';
 import { WalkOffRamp } from '../walk-off-ramp';
@@ -65,12 +67,23 @@ const SUPPORT_PATHS: readonly {
 
 export default function SupportPage() {
   return (
-    <Room>
+    <Room ledger>
       <ReadingEntry
         pathname="/support"
-        title="Support"
+        title={
+          <>
+            How to get an <em>answer</em>.
+          </>
+        }
         lede="BlackStory is one person's archive of Black history, tied to the places it happened. If something in a record is wrong, corrections is the fastest way in: it is moderated, it gives you a receipt code, and nothing is published as submitted."
-        showCrumb={false}
+      />
+
+      <RoomJump
+        sections={[
+          { id: 'paths', label: 'The fastest ways in', icon: 'correction' },
+          { id: 'contact', label: 'Reach me', icon: 'support' },
+          { id: 'keep-going', label: 'Keep going', icon: 'rooms' },
+        ]}
       />
 
       <RoomSection
@@ -134,6 +147,8 @@ export default function SupportPage() {
           running for as long as I can.
         </p>
       </RoomSection>
+
+      <KeepGoing paths={['/faq', '/submit']} />
 
       <WalkOffRamp>Saying a record is wrong is the fastest way to change what it says.</WalkOffRamp>
     </Room>

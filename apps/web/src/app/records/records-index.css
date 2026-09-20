@@ -19,7 +19,8 @@
   flex-wrap: wrap;
   align-items: center;
   gap: var(--ds-space-2);
-  margin: var(--ds-space-6) 0 var(--ds-space-2);
+  /* Sits inside the kit's FindBar, which owns the spacing around the whole bar. */
+  margin: 0;
 }
 
 /* —— facets: one pill each, opening onto its own vocabulary ————————————————————
@@ -43,7 +44,7 @@
   border: var(--ds-border-width) solid var(--ds-rule);
   border-radius: var(--ds-radius-full);
   color: var(--ds-ink);
-  font-size: 13px;
+  font-size: var(--ds-text-caption);
   list-style: none;
   cursor: pointer;
   white-space: nowrap;
@@ -116,7 +117,7 @@
   height: 26px;
   padding: 0 8px;
   gap: 5px;
-  font-size: 11.5px;
+  font-size: var(--ds-text-caption);
 }
 
 /* —— the grade dot ——————————————————————————————————————————————————————————
@@ -133,7 +134,7 @@
   align-items: center;
   gap: 5px;
   font-family: var(--ds-font-mono);
-  font-size: 10.5px;
+  font-size: var(--ds-text-micro);
   letter-spacing: 0.06em;
   color: var(--room-ink-4, var(--ds-ink-subtle));
 }
@@ -174,7 +175,7 @@
 }
 
 .ds-records-pager__link {
-  font-size: 13px;
+  font-size: var(--ds-text-caption);
   font-weight: 550;
   color: var(--ds-ink);
   text-decoration: none;
@@ -186,7 +187,7 @@
 
 .ds-records-pager__at {
   font-family: var(--ds-font-mono);
-  font-size: 10px;
+  font-size: var(--ds-text-micro);
   letter-spacing: 0.08em;
   text-transform: uppercase;
   color: var(--room-ink-4);
@@ -213,4 +214,17 @@
 .ds-records-facet__form .ds-pill-select__control {
   flex: 1 1 auto;
   width: 100%;
+}
+
+/* Facet pills and the chips inside their trays are touch targets on a phone or a tablet. */
+@media (max-width: 64rem), (pointer: coarse) {
+  .ds-records-facet__pill {
+    height: 44px;
+  }
+
+  .ds-records-facet__menu .ds-room-chip {
+    height: auto;
+    min-height: 44px;
+    padding-inline: 14px;
+  }
 }

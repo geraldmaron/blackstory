@@ -206,6 +206,17 @@ A state rule appears in its region with the state's name.
 A facially neutral rule whose racial effect is a live scholarly dispute (for example the agricultural and
 domestic worker exclusions of the Social Security Act of 1935) renders as a dispute.
 
+The reader shows **every** rule that began in an era and matches the question's life domains, in date
+order. Four render open and the rest sit in a drawer on the same panel. An earlier selection kept only
+the first two by date, which hid the National Housing Act of 1934 and the Fair Housing Act of 1968
+behind earlier entries; no rule is dropped for length now. The reader and the evidence appendix render
+rules through one shared card, so a law never reads differently on the two surfaces.
+
+Each card carries two texts, both taken from the law's catalog record:
+
+- **What it did.** The record's summary.
+- **What followed.** The record's impact statement, shown only when the record has one.
+
 ## What the surface may say
 
 The surface follows [juxtaposition-not-causation.md](./juxtaposition-not-causation.md). Every rules panel
@@ -226,3 +237,82 @@ Not allowed:
 
 A causal sentence needs a gated claim citing peer-reviewed work. Narrative frames are validated so every
 number in them matches a published or derived figure.
+
+### Where impact may appear (owner decision, 2026-09-20)
+
+Decision on `repo-0clax.50.6`, which asked whether a gated causal claim may appear inline on a gap
+panel. **It may appear on the rule card, and nowhere else on this surface.**
+
+- A rule's consequences are stated under **What followed** on that rule's card. The text is the law
+  record's impact statement, so the claim lives on the catalog record under that record's citation
+  gate, which is the "causal claim as a heritage claim" shape that
+  [juxtaposition-not-causation.md](./juxtaposition-not-causation.md) already allows.
+- The figure panel stays free of causal language. No sentence beside a Black and white comparison says
+  why the gap exists, and the fixed disclaimer stays on the page.
+- An impact statement follows the claim typing in `docs/content/neo-voice.md` Part V: a consequence is
+  attributed to the source that makes it, a causal verb appears only in a sentence citing that source,
+  and a contested effect renders as a dispute.
+
+The risk this accepts: a reader sees a consequence claim a short scroll from a racial gap and reads
+the two together. The controls are the attribution, the citation, the separation of card from figure,
+and ringer review of every impact statement before it publishes. The alternative that was rejected,
+holding the bar entirely, leaves the gap unexplained on the page, which the structure decision
+(`docs/research/lives-structure-decision.md` §10) flags as inviting a dispositional reading.
+
+## Community review (decision recorded 2026-09-20)
+
+`docs/methodology/scholarship-principles.md` §5 requires a recorded `communityReviewNote` before
+sensitive material is approved, and accepts an explicit "not yet sought" so that the absence of
+community input is visible rather than silent. Lives carries first-person accounts of slavery, its
+aftermath, and segregation, and a perspective mechanic (the Turn), so the rule applies to both.
+
+| Field | Value |
+|---|---|
+| `communityReviewNote` | **Not yet sought.** |
+| Applies to | First-person accounts on Lives (readings, world beats, recordings) and the Turn |
+| Owner | Gerald Dagher |
+| Recorded | 2026-09-20 (decision on `repo-0clax.50.7`, made under the owner's delegated authority) |
+
+What this does and does not permit:
+
+- **Accounts may publish with this note in place.** Every account is the speaker's own words, quoted
+  verbatim from a holding institution, labeled with how the words reached the page, and linked to
+  the original. §5 is explicit that the step "does not block on a formal board".
+- **Only form 3 of the Turn ships.** The structure decision
+  (`docs/research/lives-structure-decision.md` §5) was built almost entirely from studies of white
+  learners, which is the reason this note exists. Until a reviewer has read it, the Turn is limited
+  to form 3: a question about a rule, or about what the census form asked, with no group named in
+  the question or in any answer choice. Each Turn records its answer to the classroom test, and
+  every reveal restates a record already published and cited on the page, so a Turn adds no fact
+  of its own. `apps/web/src/lib/lives/lives-turns.test.tsx` enforces all of it, including that the
+  control stores, sends, scores and logs nothing.
+  Form 2 (one group's figure, then against now) is not placed, for a reason separate from review:
+  `LivesCell` carries no structured universe or source identity, and the pair the structure decision
+  sketched, 2000 against 2020, compares a full census count with a survey estimate. Form 1 needs
+  state-level spread in the bundle. Both also wait for review.
+- **The absence is public.** The Lives section of `/methodology` says in plain words that no
+  community reviewer has read this material yet.
+
+When review is sought, replace the value above with who was asked, when, on what terms, and what
+they said, and keep this entry's history in git.
+
+## Narrative voice and its gates
+
+Lives narrative prose (readings, accounts, world beats, and era narratives) is written under
+`docs/content/neo-voice.md`. Labels and chrome stay under `docs/ui/story.md`. Three gates run in CI
+before any of it ships:
+
+1. **Word-level voice.** `apps/web/src/lib/lives/lives-prose-voice.test.ts` holds every authored
+   Lives string to the shared checks in `@repo/domain/editorial` (`findProseVoiceIssues`): no em dash
+   in narration, no expanded negative contraction, no publisher self-reference, no sentence that
+   points the reader around the page. Quoted testimony is exempt. A person a reading is about is
+   named in full before being named by surname.
+2. **Beat validation.** `apps/web/src/lib/lives/world-beat-fixtures.test.ts` runs
+   `validateLivesWorldBeats` over the whole corpus. Every speaker carries a **mediation** label
+   (in their own writing, as told to, reported by an observer, recorded interview), and an as-told-to
+   or recorded account names who took it down. A mediated account may appear, labeled as what it is;
+   it never stands in unlabeled for a group's own voice.
+3. **Subject position.** `apps/web/src/components/lives/lives-subject-position.test.tsx` reads the
+   reader's rendered output and requires each life question to carry at least one sentence whose
+   subject is a named Black person or institution acting. It is a floor, not an answer. Its known-gap
+   list only shrinks.

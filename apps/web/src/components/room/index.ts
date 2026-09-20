@@ -39,7 +39,20 @@ export {
   type RoomFact,
   type RoomHandoffProps,
 } from './RoomSection';
+export { DocumentPlate, type DocumentPlateProps } from './DocumentPlate';
+export { KeepGoing, type KeepGoingProps } from './KeepGoing';
+export { RoomStats, type RoomStatsProps, type RoomStat } from './RoomStats';
 export { RoomJump, type RoomJumpProps, type RoomJumpSection } from './RoomJump';
+export {
+  FindBar,
+  FindBarChips,
+  FindBarFilters,
+  type FindBarFiltersProps,
+  type FindBarProps,
+  type FindBarChip,
+  type FindBarChipRow,
+  type FindBarConstraint,
+} from './FindBar';
 export { Prose, RecordRef, type ProseProps, type RecordRefProps } from './Prose';
 export { ReadingProgress, type ReadingProgressProps } from './ReadingProgress';
 export {

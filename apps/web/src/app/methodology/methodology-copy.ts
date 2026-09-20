@@ -61,7 +61,7 @@ export const METHODOLOGY_PAGE_SECTIONS: readonly {
 export const METHODOLOGY_SOURCE_LIBRARY_HREF = '/sources';
 
 export const LIVES_METHOD_LEDE =
-  'Lives Across the Decades places published federal statistics beside sourced voices, places, laws, and records. A reader chooses a region, decade, and visual emphasis. Every figure names its universe. Feeling is quoted from a named speaker. Impact is juxtaposition or a gated claim. CPI restates published income into comparison-year dollars from 1913 on; it does not invent a historical sticker price for a modern good.';
+  'Lives Across the Decades places published federal statistics beside sourced voices, places, laws, and records. A reader chooses one life question and follows it across the decades; the full decade and region tables sit in the evidence appendix. Every figure names its universe. Feeling is quoted from a named speaker. Impact is juxtaposition or a gated claim. CPI restates published income into comparison-year dollars from 1913 on; it does not invent a historical sticker price for a modern good.';
 
 export const LIVES_METHOD_RULES = [
   {
@@ -75,6 +75,18 @@ export const LIVES_METHOD_RULES = [
   {
     title: 'Sourced material appears additively',
     body: 'Housing, school, policy, justice, testimony, and war appear only when a sourced beat is ready. Unfinished domain placeholders stay out of the public surface. Authored historical absences name what was searched. Broader series on Data and theme-impact are off-ramps, not Lives region cells. Crime heat is forbidden.',
+  },
+  {
+    title: 'Every group is drawn alike, and every rule is described',
+    body: 'Each group’s bar has the same height and weight, so a gap can be read by eye. Every rule that began in a stretch is listed with what it did. What followed a rule is stated on that rule’s own card, from its record and with its source, and never beside the measured gap.',
+  },
+  {
+    title: 'How a voice reached the page',
+    body: 'Each account says whether the words are the speaker’s own writing, were told to a writer, were reported by an observer, or come from a recorded interview, and names the writer or interviewer. Recordings play from the archive that holds them and are never copied here. A stretch with no published comparison appears only when there is sourced history to tell, and it says why there is no figure.',
+  },
+  {
+    title: 'Community review: not yet sought',
+    body: 'No community reviewer has read the first-person accounts on Lives yet. That review has not been sought as of September 2026. When it is, this entry will name who was asked and what they said.',
   },
 ] as const;
 

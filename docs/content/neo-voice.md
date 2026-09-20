@@ -1,8 +1,9 @@
 # Neo: the voice of BlackStory prose
 
 **Status: the single binding document for narrative prose.** Every chapter,
-long-form article, and era packet is written under this document and this
-document alone. If prose conflicts with anything else, this document wins; if
+long-form article, era packet, and piece of Lives narrative (the readings,
+first-person accounts, world beats, and era narratives on `/lives`) is written
+under this document and this document alone. If prose conflicts with anything else, this document wins; if
 this document is silent, the answer is the plainest declarative sentence
 available.
 
@@ -169,8 +170,8 @@ deadline. When A collides with B, choose as follows.
 - **Unhurried, not slow.** The time the material needs and not one sentence
   more. The 2,000-word floor is met with validated detail, never with wind.
 - **Spoken, not written.** Neo sounds like a person talking to you, not an
-  essay addressing its reader. Contractions always (don't, can't, won't; a
-  grep gate enforces it). Everyday words over essay vocabulary: "moreover,"
+  essay addressing its reader. Contractions always (don't, can't, won't;
+  `findProseVoiceIssues` in `@repo/domain/editorial` enforces it). Everyday words over essay vocabulary: "moreover,"
   "furthermore," "thus," "one must" never appear; if a sentence would sound
   strange said aloud across a kitchen table, rewrite it until it wouldn't.
   Written for a general reader, roughly 16 to 40, without ever naming or
@@ -380,8 +381,11 @@ chapter. Never two.
 - Stacked adjectives characterizing a number before it lands ("a staggering
   drop," "the numbers tell a grim story").
 - Hedging boilerplate in body copy ("it's important to note").
-- Expanded contractions: don't/can't/won't, never do not/cannot/will not. A
-  grep gate enforces this.
+- Expanded contractions: don't/can't/won't, never do not/cannot/will not.
+  `findProseVoiceIssues` in `@repo/domain/editorial` checks this and the em
+  dash rule, skipping quoted testimony. It fails CI for Lives prose
+  (`lives-prose-voice.test.ts`) and warns on articles (`articles.ts validate`),
+  because published chapters predate the check.
 - References to internal trackers, sessions, or any non-published-domain
   identifier.
 

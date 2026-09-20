@@ -62,7 +62,8 @@ test('the browse sections keep kit chips and a state select, not HairlineIndex',
   assert.match(sectionsSource, /from '\.\.\/\.\.\/components\/room'/);
   assert.match(sectionsSource, /ds-books-idx/);
   assert.match(sectionsSource, /sortOptions\.map/);
-  assert.match(sectionsSource, /ds-records-active/);
+  // Chips, active constraints and the sort are the kit's FindBar; the state select rides in its form.
+  assert.match(sectionsSource, /<FindBar/);
   assert.match(sectionsSource, /name="state"/);
   assert.doesNotMatch(sectionsSource, /HairlineIndex/);
   assert.doesNotMatch(sectionsSource, /ds-books-edition/);

@@ -13,6 +13,8 @@ import {
 } from '@repo/domain/statistics/lives';
 
 export type ObservationRow = {
+  /** Optional so rows read before gaps were derived still map. */
+  readonly id?: string;
   readonly metric_id: string;
   readonly jurisdiction_id: string;
   readonly reference_period: string;
@@ -55,16 +57,20 @@ export type ApplicabilityRow = {
   readonly display_name: string;
   readonly kind: string;
   readonly impact_statement: string | null;
+  readonly entity_summary: string | null;
 };
 
 export const JURISDICTIONS_SQL = `
   SELECT id, name FROM reference.jurisdictions WHERE id = ANY($1::text[])`;
 
 export const OBSERVATIONS_SQL = `
-  SELECT metric_id, jurisdiction_id, reference_period, race_ethnicity_slice, estimate, numerator,
+  SELECT id, metric_id, jurisdiction_id, reference_period, race_ethnicity_slice, estimate, numerator,
          denominator, source, source_url, metadata
   FROM reference.statistical_observations
-  WHERE jurisdiction_id = ANY($1::text[]) AND status = 'observed' AND metric_id LIKE 'lives-%'`;
+  WHERE jurisdiction_id = ANY($1::text[]) AND status = 'observed'
+    AND (metric_id LIKE 'lives-%'
+         OR metric_id LIKE 'nchs-life-expectancy-birth-%'
+         OR metric_id LIKE 'nchs-infant-mortality-%')`;
 
 export const COUNT_NOTES_SQL = `
   SELECT id, decade, applies_to, area_ids, heading, body, citations
@@ -83,7 +89,8 @@ export const APPLICABILITY_SQL = `
          a.text_posture, a.disputed,
          e.projection->>'displayName' AS display_name,
          e.projection->>'kind' AS kind,
-         e.projection->>'impactStatement' AS impact_statement
+         e.projection->>'impactStatement' AS impact_statement,
+         e.projection->>'summary' AS entity_summary
   FROM reference.law_applicability a
   JOIN published.release_entities e
     ON e.projection->>'id' = a.entity_id
@@ -99,7 +106,12 @@ function numberOrNull(value: unknown): number | null {
 export function mapObservationRow(row: ObservationRow): LivesObservationInput {
   const numeratorMoe = numberOrNull(row.metadata?.numeratorMoe);
   const denominatorMoe = numberOrNull(row.metadata?.denominatorMoe);
+  const populationLabel = row.metadata?.raceLabel;
+  const populationBasis = row.metadata?.raceBasis;
   return {
+    ...(row.id ? { id: row.id } : {}),
+    ...(typeof populationLabel === 'string' ? { populationLabel } : {}),
+    ...(typeof populationBasis === 'string' ? { populationBasis } : {}),
     metricId: row.metric_id,
     jurisdictionId: row.jurisdiction_id,
     referencePeriod: row.reference_period,
@@ -197,5 +209,6 @@ export function mapApplicabilityRow(row: ApplicabilityRow): LivesApplicabilityIn
     textPosture: row.text_posture,
     disputed: row.disputed,
     summary: row.impact_statement,
+    description: row.entity_summary,
   };
 }

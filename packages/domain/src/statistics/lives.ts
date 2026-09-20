@@ -42,6 +42,7 @@ export type {
 export {
   LIVES_CLASS_BUCKETS,
   LIVES_CONDITIONS,
+  livesConditionUnit,
   LIVES_SERIES,
   LIVES_TIER_KEYS,
   incomeBracketSeriesId,
@@ -55,6 +56,7 @@ export type {
   LivesClassBucket,
   LivesConditionDefinition,
   LivesConditionKey,
+  LivesConditionUnit,
   LivesTierKey,
 } from './lives-metrics.js';
 
@@ -89,6 +91,8 @@ export {
   LIVES_MIN_BASE,
   LIVES_MIN_COVERAGE,
   buildLivesAreaBundle,
+  deriveLivesConditionGap,
+  livesConditionIsGroupRate,
   livesComparableChange,
 } from './lives-timeline.js';
 export type {
@@ -99,6 +103,7 @@ export type {
   LivesCell,
   LivesCellState,
   LivesConditionBundle,
+  LivesConditionGap,
   LivesCountNote,
   LivesCountNoteInput,
   LivesCoverageInput,
@@ -132,6 +137,10 @@ export {
   LIVES_WORLD_CLAIM_TYPES,
   LIVES_WORLD_GAP_STATES,
   LIVES_WORLD_CORE_DOMAINS,
+  LIVES_WORLD_MEDIATIONS,
+  LIVES_WORLD_MEDIATION_LABELS,
+  LIVES_WORLD_QUOTE_MAX_WORDS,
+  livesWorldMediationLine,
   isLivesWorldDomain,
   isLivesWorldClaimType,
   validateLivesWorldBeats,
@@ -142,6 +151,9 @@ export type {
   LivesWorldDomain,
   LivesWorldClaimType,
   LivesWorldGapState,
+  LivesWorldMediation,
+  LivesWorldArchivePointer,
+  LivesWorldRecording,
   LivesWorldSpeaker,
   LivesWorldBeatInput,
   LivesWorldBeat,

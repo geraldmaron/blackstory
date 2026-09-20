@@ -86,7 +86,7 @@
 .ds-errata__row-date {
   color: var(--ds-ink-muted);
   font-family: var(--ds-font-mono);
-  font-size: 0.6875rem;
+  font-size: var(--ds-text-micro);
   font-weight: 500;
   letter-spacing: 0.06em;
   text-transform: uppercase;
@@ -96,7 +96,7 @@
   overflow: hidden;
   color: var(--ds-accent);
   font-family: var(--ds-font-mono);
-  font-size: 0.6875rem;
+  font-size: var(--ds-text-micro);
   font-weight: 500;
   letter-spacing: 0.02em;
   text-overflow: ellipsis;
@@ -112,7 +112,7 @@ a.ds-errata__row-id {
   margin: 0;
   color: var(--ds-ink);
   font-family: var(--ds-font-sans);
-  font-size: 0.875rem;
+  font-size: var(--ds-text-body-sm);
   line-height: 1.5;
 }
 
@@ -123,7 +123,7 @@ a.ds-errata__row-id {
   background: var(--ds-surface-raised);
   color: var(--ds-ink-muted);
   font-family: var(--ds-font-mono);
-  font-size: 0.625rem;
+  font-size: var(--ds-text-micro);
   font-weight: 500;
   letter-spacing: 0.06em;
   text-transform: uppercase;
@@ -139,6 +139,11 @@ a.ds-errata__row-id {
   .ds-errata__row-statement {
     grid-column: 1 / -1;
   }
+
+  /* A grid item stretches to its column, which turned a two-word tag into a wide empty box. */
+  .ds-errata__row-phase {
+    justify-self: start;
+  }
 }
 
 .ds-errata__empty {
@@ -148,7 +153,7 @@ a.ds-errata__row-id {
   border-radius: var(--ds-radius-sm);
   color: var(--ds-ink-muted);
   font-family: var(--ds-font-sans);
-  font-size: 0.875rem;
+  font-size: var(--ds-text-body-sm);
   line-height: 1.5;
 }
 
@@ -168,7 +173,7 @@ a.ds-errata__row-id {
 }
 
 .ds-chapters-pager__link {
-  font-size: 13px;
+  font-size: var(--ds-text-caption);
   font-weight: 550;
   color: var(--ds-ink);
   text-decoration: none;
@@ -180,7 +185,7 @@ a.ds-errata__row-id {
 
 .ds-chapters-pager__at {
   font-family: var(--ds-font-mono);
-  font-size: 10px;
+  font-size: var(--ds-text-micro);
   letter-spacing: 0.08em;
   text-transform: uppercase;
   color: var(--room-ink-4);
@@ -216,7 +221,7 @@ a.ds-errata__row-id {
 .ds-law-toc__link {
   color: var(--ds-ink);
   font-family: var(--ds-font-sans);
-  font-size: 13px;
+  font-size: var(--ds-text-caption);
   font-weight: 550;
   text-decoration: none;
   border-bottom: var(--ds-border-width-strong) solid transparent;
@@ -229,7 +234,7 @@ a.ds-errata__row-id {
 .ds-law-toc__lede {
   margin: var(--ds-space-2) 0 0;
   font-family: var(--ds-font-editorial);
-  font-size: 15px;
+  font-size: var(--ds-text-body-sm);
   color: var(--room-ink-3);
 }
 
@@ -253,7 +258,7 @@ a.ds-errata__row-id {
 
 .ds-law-provenance__row dt {
   font-family: var(--ds-font-mono);
-  font-size: 10px;
+  font-size: var(--ds-text-micro);
   letter-spacing: 0.06em;
   text-transform: uppercase;
   color: var(--room-ink-4);
@@ -261,7 +266,7 @@ a.ds-errata__row-id {
 
 .ds-law-provenance__row dd {
   margin: 0;
-  font-size: 13.5px;
+  font-size: var(--ds-text-caption);
   color: var(--room-ink-2);
 }
 /* —— end /law detail sections —————————————————————————————————————————————— */
@@ -279,7 +284,7 @@ a.ds-errata__row-id {
   background: var(--ds-surface);
   color: var(--ds-ink-muted);
   font-family: var(--ds-font-mono);
-  font-size: 0.625rem;
+  font-size: var(--ds-text-micro);
   font-weight: 500;
   letter-spacing: 0.08em;
   line-height: 1.4;
@@ -322,7 +327,7 @@ a.ds-errata__row-id {
   margin: 0;
   font-family: var(--ds-font-display);
   font-weight: 600;
-  font-size: 1.0625rem;
+  font-size: var(--ds-text-subtitle);
   letter-spacing: -0.02em;
   line-height: 1.25;
 }
@@ -331,7 +336,7 @@ a.ds-errata__row-id {
   margin: var(--ds-space-3) 0 0;
   color: var(--ds-ink);
   font-family: var(--ds-font-editorial);
-  font-size: 0.9375rem;
+  font-size: var(--ds-text-body-sm);
   line-height: 1.55;
 }
 
@@ -347,7 +352,7 @@ a.ds-errata__row-id {
   margin: var(--ds-space-3) 0 0;
   padding-left: var(--ds-space-4);
   font-family: var(--ds-font-editorial);
-  font-size: 0.9375rem;
+  font-size: var(--ds-text-body-sm);
   line-height: 1.55;
 }
 
@@ -365,7 +370,7 @@ a.ds-errata__row-id {
   margin: 0 0 var(--ds-space-2);
   color: var(--ds-accent);
   font-family: var(--ds-font-mono);
-  font-size: 0.6875rem;
+  font-size: var(--ds-text-micro);
   font-weight: 500;
   letter-spacing: 0.08em;
   text-transform: uppercase;
@@ -375,7 +380,7 @@ a.ds-errata__row-id {
   margin: 0;
   color: var(--ds-ink-muted);
   font-family: var(--ds-font-sans);
-  font-size: 0.8125rem;
+  font-size: var(--ds-text-caption);
   line-height: 1.45;
 }
 /* —— end legal explainer sections ——————————————————————————————————————————— */
@@ -410,7 +415,7 @@ a.ds-errata__row-id {
 .ds-books-edition__panel-title {
   margin: 0;
   font-family: var(--ds-font-mono);
-  font-size: 0.6875rem;
+  font-size: var(--ds-text-micro);
   font-weight: 500;
   letter-spacing: 0.12em;
   text-transform: uppercase;
@@ -421,7 +426,7 @@ a.ds-errata__row-id {
   margin: var(--ds-space-2) 0 0;
   font-family: var(--ds-font-display);
   font-weight: 600;
-  font-size: clamp(1.125rem, 1.05rem + 0.35vw, 1.375rem);
+  font-size: var(--ds-text-title);
   letter-spacing: -0.02em;
   line-height: 1.2;
   color: var(--ds-ink);
@@ -431,7 +436,7 @@ a.ds-errata__row-id {
   margin: 0;
   max-width: 54ch;
   font-family: var(--ds-font-editorial);
-  font-size: 1.0625rem;
+  font-size: var(--ds-text-editorial);
   line-height: 1.65;
   color: var(--ds-ink);
 }
@@ -440,7 +445,7 @@ a.ds-errata__row-id {
   margin: var(--ds-space-3) 0 0;
   max-width: 54ch;
   font-family: var(--ds-font-editorial);
-  font-size: clamp(1rem, 0.98rem + 0.15vw, 1.0625rem);
+  font-size: var(--ds-text-editorial);
   line-height: 1.6;
   color: var(--ds-ink-muted);
 }
@@ -448,7 +453,7 @@ a.ds-errata__row-id {
 .ds-books-edition__footnote {
   margin: var(--ds-space-4) 0 0;
   font-family: var(--ds-font-sans);
-  font-size: 0.875rem;
+  font-size: var(--ds-text-body-sm);
   color: var(--ds-ink-muted);
 }
 
@@ -464,7 +469,7 @@ a.ds-errata__row-id {
   margin: var(--ds-space-4) 0 var(--ds-space-2);
   font-family: var(--ds-font-display);
   font-weight: 600;
-  font-size: 1rem;
+  font-size: var(--ds-text-body);
   letter-spacing: -0.015em;
   color: var(--ds-ink);
 }
@@ -490,7 +495,7 @@ a.ds-errata__row-id {
 
 .ds-books-edition__cover-initials {
   font-family: var(--ds-font-display);
-  font-size: 1.125rem;
+  font-size: var(--ds-text-subtitle);
   font-weight: 600;
   letter-spacing: 0.06em;
   color: var(--ds-accent);
@@ -548,7 +553,7 @@ a.ds-errata__row-id {
   border-radius: var(--ds-radius-sm);
   color: var(--ds-ink);
   font-family: var(--ds-font-mono);
-  font-size: 0.75rem;
+  font-size: var(--ds-text-micro);
   letter-spacing: 0.04em;
   text-decoration: none;
   background: var(--ds-canvas);
@@ -582,7 +587,7 @@ a.ds-errata__row-id {
 .ds-books-edition__evidence-lead {
   margin: 0 0 var(--ds-space-1);
   font-family: var(--ds-font-sans);
-  font-size: 0.9375rem;
+  font-size: var(--ds-text-body-sm);
   line-height: 1.45;
   color: var(--ds-ink);
 }
@@ -594,7 +599,7 @@ a.ds-errata__row-id {
 .ds-books-edition__evidence-cite {
   color: var(--ds-accent);
   font-family: var(--ds-font-sans);
-  font-size: 0.875rem;
+  font-size: var(--ds-text-body-sm);
   line-height: 1.4;
   text-decoration: underline;
   text-underline-offset: 0.12em;
@@ -604,7 +609,7 @@ a.ds-errata__row-id {
   margin: var(--ds-space-1) 0 0;
   color: var(--ds-ink-muted);
   font-family: var(--ds-font-sans);
-  font-size: 0.8125rem;
+  font-size: var(--ds-text-caption);
 }
 
 /* —— Meta list (identifiers, provenance) ————————————————————————————————— */
@@ -623,7 +628,7 @@ a.ds-errata__row-id {
 .ds-books-edition__meta-list-row dt {
   margin: 0;
   font-family: var(--ds-font-mono);
-  font-size: 0.6875rem;
+  font-size: var(--ds-text-micro);
   letter-spacing: 0.06em;
   text-transform: uppercase;
   color: var(--ds-ink-muted);
@@ -632,7 +637,7 @@ a.ds-errata__row-id {
 .ds-books-edition__meta-list-row dd {
   margin: 0;
   font-family: var(--ds-font-sans);
-  font-size: 0.875rem;
+  font-size: var(--ds-text-body-sm);
   color: var(--ds-ink);
 }
 
@@ -680,7 +685,7 @@ a.ds-errata__row-id {
 .ds-books-edition__rip-title {
   margin: 0;
   font-family: var(--ds-font-display);
-  font-size: clamp(1rem, 0.95rem + 0.25vw, 1.125rem);
+  font-size: var(--ds-text-subtitle);
   font-weight: 600;
   line-height: 1.3;
   letter-spacing: -0.02em;
@@ -708,7 +713,7 @@ a.ds-errata__row-id {
   margin: 0;
   max-width: 42rem;
   font-family: var(--ds-font-editorial);
-  font-size: 0.875rem;
+  font-size: var(--ds-text-body-sm);
   line-height: 1.45;
   color: var(--ds-ink-muted);
   display: -webkit-box;
@@ -736,7 +741,7 @@ a.ds-errata__row-id {
   gap: var(--ds-space-1);
   margin: 0;
   font-family: var(--ds-font-mono);
-  font-size: 0.625rem;
+  font-size: var(--ds-text-micro);
   font-weight: 500;
   letter-spacing: 0.08em;
   text-transform: uppercase;
@@ -746,7 +751,7 @@ a.ds-errata__row-id {
 .ds-books-edition__rip-fact-value {
   margin: 0;
   font-family: var(--ds-font-sans);
-  font-size: 0.8125rem;
+  font-size: var(--ds-text-caption);
   line-height: 1.35;
   color: var(--ds-ink);
 }
@@ -767,7 +772,7 @@ a.ds-errata__row-id {
 
 .ds-books-edition__rip-buy.ds-cta {
   padding-inline: var(--ds-space-4);
-  font-size: 0.6875rem;
+  font-size: var(--ds-text-caption);
 }
 /* —— end /books detail —————————————————————————————————————————————————————— */
 
@@ -803,7 +808,7 @@ a.ds-errata__row-id {
 
 .ds-article-rail__next-position {
   display: block;
-  font-size: 10px;
+  font-size: var(--ds-text-caption);
   letter-spacing: 0.06em;
   color: var(--room-ink-4);
 }
@@ -813,7 +818,7 @@ a.ds-errata__row-id {
   margin-top: 2px;
   font-family: var(--ds-font-display);
   font-weight: 600;
-  font-size: 15px;
+  font-size: var(--ds-text-body-sm);
   letter-spacing: -0.015em;
   line-height: 1.3;
 }
@@ -854,7 +859,7 @@ a.ds-errata__row-id {
 }
 
 .ds-books-idx .ds-books-edition__cover-initials {
-  font-size: 0.875rem;
+  font-size: var(--ds-text-body-sm);
   letter-spacing: 0.04em;
 }
 
@@ -870,7 +875,7 @@ a.ds-errata__row-id {
   text-overflow: unset;
   white-space: normal;
   font-family: var(--ds-font-display);
-  font-size: 1.125rem;
+  font-size: var(--ds-text-subtitle);
   font-weight: 600;
   letter-spacing: -0.02em;
   line-height: 1.2;
@@ -878,14 +883,14 @@ a.ds-errata__row-id {
 
 .ds-books-idx__byline {
   font-family: var(--ds-font-sans);
-  font-size: 0.875rem;
+  font-size: var(--ds-text-body-sm);
   line-height: 1.4;
   color: var(--ds-ink-muted);
 }
 
 .ds-books-idx__gloss {
   font-family: var(--ds-font-editorial);
-  font-size: 0.9375rem;
+  font-size: var(--ds-text-body-sm);
   line-height: 1.45;
   color: var(--ds-ink-muted);
   display: -webkit-box;
@@ -905,7 +910,7 @@ a.ds-errata__row-id {
 .ds-books-idx .ds-room-idx__grade {
   justify-self: start;
   font-family: var(--ds-font-mono);
-  font-size: 10px;
+  font-size: var(--ds-text-micro);
   letter-spacing: 0.08em;
   line-height: 1.4;
   white-space: normal;
@@ -914,7 +919,7 @@ a.ds-errata__row-id {
 
 .ds-books-idx__cites {
   font-family: var(--ds-font-mono);
-  font-size: 10px;
+  font-size: var(--ds-text-micro);
   letter-spacing: 0.08em;
   color: var(--room-ink-4);
 }
@@ -975,6 +980,11 @@ a.ds-errata__row-id {
 .ds-law-idx .ds-room-idx__name {
   grid-column: 2;
   grid-row: 1;
+  /* A glossed row is a title over a sentence, the same object as a /books row. */
+  font-family: var(--ds-font-display);
+  font-size: var(--ds-text-subtitle);
+  font-weight: 600;
+  letter-spacing: -0.012em;
 }
 
 .ds-law-idx .ds-room-idx__place {
@@ -996,7 +1006,7 @@ a.ds-errata__row-id {
   text-overflow: ellipsis;
   white-space: nowrap;
   font-family: var(--ds-font-mono);
-  font-size: 10px;
+  font-size: var(--ds-text-micro);
   letter-spacing: 0.04em;
   color: var(--room-ink-3);
 }
@@ -1004,7 +1014,8 @@ a.ds-errata__row-id {
 .ds-law-idx .ds-law-idx__gloss {
   grid-column: 2 / -1;
   grid-row: 2;
-  font-size: 12.5px;
+  font-family: var(--ds-font-editorial);
+  font-size: var(--ds-text-body-sm);
   line-height: 1.45;
   color: var(--room-ink-3);
   display: -webkit-box;
@@ -1054,6 +1065,125 @@ a.ds-errata__row-id {
     grid-row: 1 / 4;
   }
 }
+
+/* Ledger row (docs/ui/design-direction-v10-rooms.md): in a legal ledger the year is the anchor, so
+   it leads the row in display numerals; the kind is a copper tag; citation and gloss sit under the
+   title at reading size. */
+.ds-room--ledger .ds-law-idx.ds-room-idx__list {
+  grid-template-columns: clamp(4.5rem, 10vw, 8.5rem) minmax(0, 1fr) auto;
+  column-gap: var(--ds-space-6);
+}
+
+.ds-room--ledger .ds-law-idx .ds-room-idx__row {
+  grid-template-rows: auto auto auto;
+  row-gap: 6px;
+  padding-block: var(--ds-space-5);
+  border-color: var(--ds-ink);
+}
+
+.ds-room--ledger .ds-law-idx .ds-room-idx__glyph {
+  display: none;
+}
+
+.ds-room--ledger .ds-law-idx .ds-room-idx__era {
+  grid-column: 1;
+  grid-row: 1 / 4;
+  text-align: left;
+  font-family: var(--ds-font-display);
+  font-size: var(--ds-text-display-3);
+  font-weight: 600;
+  line-height: 1;
+  letter-spacing: -0.04em;
+  font-variant-numeric: tabular-nums;
+  color: var(--ds-ink);
+}
+
+.ds-room--ledger .ds-law-idx .ds-room-idx__name {
+  grid-column: 2;
+  grid-row: 1;
+  font-size: var(--ds-text-title);
+  white-space: normal;
+}
+
+.ds-law-idx__kind {
+  display: none;
+}
+
+.ds-room--ledger .ds-law-idx__kind {
+  display: block;
+  grid-column: 3;
+  grid-row: 1;
+  text-align: right;
+  font-family: var(--ds-font-mono);
+  font-size: var(--ds-text-micro);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ds-accent);
+}
+
+.ds-room--ledger .ds-law-idx .ds-law-idx__citation {
+  grid-column: 2;
+  grid-row: 2;
+  white-space: normal;
+}
+
+.ds-room--ledger .ds-law-idx .ds-room-idx__place {
+  grid-column: 3;
+  grid-row: 2;
+  text-align: right;
+}
+
+.ds-room--ledger .ds-law-idx .ds-law-idx__gloss {
+  grid-column: 2 / -1;
+  grid-row: 3;
+  max-width: 46rem;
+  font-size: var(--ds-text-body);
+  color: var(--room-ink-2);
+  -webkit-line-clamp: 3;
+}
+
+@media (max-width: 40rem) {
+  .ds-room--ledger .ds-law-idx.ds-room-idx__list {
+    grid-template-columns: 3.75rem minmax(0, 1fr);
+    column-gap: var(--ds-space-3);
+  }
+
+  .ds-room--ledger .ds-law-idx .ds-room-idx__row {
+    grid-template-rows: auto;
+  }
+
+  .ds-room--ledger .ds-law-idx .ds-room-idx__era {
+    grid-row: 1 / 5;
+    font-size: var(--ds-text-title);
+  }
+
+  .ds-room--ledger .ds-law-idx__kind,
+  .ds-room--ledger .ds-law-idx .ds-law-idx__citation,
+  .ds-room--ledger .ds-law-idx .ds-law-idx__gloss {
+    grid-column: 2;
+    text-align: left;
+  }
+
+  .ds-room--ledger .ds-law-idx__kind {
+    grid-row: 2;
+  }
+
+  .ds-room--ledger .ds-law-idx .ds-law-idx__citation {
+    grid-row: 3;
+    display: block;
+    /* The compact row capped the citation at 120px beside the year; here it has the column. */
+    max-width: none;
+  }
+
+  .ds-room--ledger .ds-law-idx .ds-law-idx__gloss {
+    grid-row: 4;
+  }
+
+  .ds-room--ledger .ds-law-idx .ds-room-idx__place {
+    display: none;
+  }
+}
+
 /* —— end /law browse index rows —————————————————————————————————————————————— */
 
 /* —— /methodology hand-drawn figures ————————————————————————————————————————
@@ -1082,7 +1212,7 @@ a.ds-errata__row-id {
 .ds-mdiag__figcaption {
   margin-bottom: var(--ds-space-3);
   font-family: var(--ds-font-mono);
-  font-size: 0.6875rem;
+  font-size: var(--ds-text-micro);
   letter-spacing: 0.06em;
   text-transform: uppercase;
   color: var(--room-ink-4);

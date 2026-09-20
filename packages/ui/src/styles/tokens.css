@@ -239,6 +239,9 @@
    * display-1 is reserved for the one dominant element on a surface (principle 02, one idea per
    * surface at full scale). A room with two display-1s has no hierarchy again.
    */
+  /* The ledger room masthead (docs/ui/design-direction-v10-rooms.md). One per surface, and only
+     where the headline is a sentence; display-1 stays the ceiling everywhere else. */
+  --ds-text-display-hero: clamp(2.75rem, 1.3rem + 6vw, 6rem);
   --ds-text-display-1: clamp(2.5rem, 1.4rem + 4.6vw, 5rem);
   --ds-text-display-2: clamp(2rem, 1.35rem + 2.7vw, 3.25rem);
   --ds-text-display-3: clamp(1.5rem, 1.22rem + 1.2vw, 2.125rem);

@@ -51,8 +51,16 @@ export default async function DataPage({
   const dataModel = await loadDataPageModel();
 
   return (
-    <Room>
-      <ReadingEntry pathname="/data" title="Data" lede={DATA_INTRO.lede} showCrumb={false} />
+    <Room ledger>
+      <ReadingEntry
+        pathname="/data"
+        title={
+          <>
+            What the numbers <em>show</em>, and what they leave out.
+          </>
+        }
+        lede={DATA_INTRO.lede}
+      />
       <DocumentColophon facts={dataModel.colophonFacts} />
 
       <DataSections {...dataModel.sections} />

@@ -23,6 +23,7 @@ import { resolveTrail } from './room-trail';
 import { CardGrid, GroupHeading, RoomCard } from './RoomCards';
 import { RoomSection, RoomHandoff } from './RoomSection';
 import { RoomJump } from './RoomJump';
+import { FindBar, FindBarFilters } from './FindBar';
 import { Prose, RecordRef } from './Prose';
 import { Anatomy, Connections, Note, Precision, SourceList, TrustBlock } from './Evidence';
 import { HairlineIndex } from './HairlineIndex';
@@ -967,5 +968,241 @@ describe('room kit · the reading progress rule is class-wide', () => {
       /transition:\s*width\s+\d/,
       'the duration must come from a token, not a literal value the reduced-motion media query cannot reach',
     );
+  });
+});
+
+/**
+ * `tokens.css` defines the type steps and says a surface may choose which step a thing is, not
+ * what the step measures. On 2026-09-20, 172 of 182 `font-size` declarations in these six files
+ * were literals in about 25 values, which is how one index row rendered at 13.5px on /law and
+ * 18px on /books. A literal size in a room stylesheet is how that drift returns.
+ */
+describe('room kit · room stylesheets size type from the token scale', () => {
+  const ROOM_STYLESHEETS = [
+    '../components/room/room-kit.css',
+    'reading-room.css',
+    'data/data-page.css',
+    'stories/stories.css',
+    'about/about-page.css',
+    'support/support.css',
+    'records/records-index.css',
+  ] as const;
+
+  /** The memorial wall is a protected experience (P-01); its sizes are not this guard's to move. */
+  const EXEMPT_SELECTOR = /\.ds-memorial/;
+
+  it('no literal font-size outside the memorial wall', () => {
+    const offenders: string[] = [];
+    for (const rel of ROOM_STYLESHEETS) {
+      const css = readFileSync(path.join(APP_DIR, rel), 'utf8').replace(/\/\*[\s\S]*?\*\//g, '');
+      for (const [, selector, body] of css.matchAll(/([^{}]+)\{([^{}]*)\}/g)) {
+        if (selector === undefined || body === undefined || EXEMPT_SELECTOR.test(selector))
+          continue;
+        for (const [, value] of body.matchAll(/font-size:\s*([^;]+);/g)) {
+          if (value === undefined) continue;
+          const size = value.trim();
+          // Relative sizes scale with a tokenized parent, so they are not a second scale.
+          if (size.startsWith('var(--ds-text-') || size === 'inherit' || /^[\d.]+em$/.test(size)) {
+            continue;
+          }
+          offenders.push(`${rel}: ${selector.trim().split('\n').pop()} { font-size: ${size} }`);
+        }
+      }
+    }
+    assert.deepEqual(
+      offenders,
+      [],
+      'pick a --ds-text-* step from packages/ui/src/styles/tokens.css',
+    );
+  });
+});
+
+describe('room kit · FindBar', () => {
+  const html = renderToStaticMarkup(
+    <FindBar
+      id="law"
+      action="/law#browse"
+      queryLabel="Title, citation or topic"
+      placeholder="Brown v. Board"
+      query="voting"
+      preserved={{ kind: 'landmark-case', topic: undefined, sort: '' }}
+      active={[{ key: 'q', label: 'Search: voting', href: '/law?kind=landmark-case' }]}
+      clearHref="/law"
+      rows={[
+        {
+          label: 'Filter by kind',
+          chips: [
+            { label: 'All kinds', href: '/law?q=voting', active: false, count: 1200 },
+            { label: 'Landmark case', href: '/law?kind=landmark-case', active: true, count: 3 },
+          ],
+        },
+      ]}
+      sort={[
+        { label: 'Oldest first', href: '/law', active: true },
+        { label: 'A to Z', href: '/law?sort=alphabetical', active: false },
+      ]}
+      summary="1 of 12 law entries"
+    />,
+  );
+
+  it('is a GET search form that works with JavaScript off', () => {
+    const form = /<form[^>]*>/.exec(html)?.[0] ?? '';
+    for (const attr of ['method="get"', 'action="/law#browse"', 'role="search"']) {
+      assert.ok(form.includes(attr), `form is missing ${attr}`);
+    }
+    const field = /<input[^>]*type="search"[^>]*>/.exec(html)?.[0] ?? '';
+    for (const attr of ['name="q"', 'value="voting"', 'id="law-q"']) {
+      assert.ok(field.includes(attr), `search field is missing ${attr}`);
+    }
+  });
+
+  it('carries the narrowing already in the URL, and only that', () => {
+    assert.match(html, /<input type="hidden" name="kind" value="landmark-case"\/>/);
+    assert.doesNotMatch(html, /name="topic"|name="sort"/);
+  });
+
+  it('has no visible submit and no Apply button; Enter submits', () => {
+    assert.doesNotMatch(html, />Apply</);
+    assert.match(
+      html,
+      /<button class="ds-visually-hidden" type="submit" tabindex="-1" aria-hidden="true">/,
+    );
+  });
+
+  it('marks the current chip and sort, and formats counts', () => {
+    assert.match(html, /aria-current="true"[^>]*>Landmark case/);
+    assert.match(html, />1,200</);
+    assert.match(html, /<nav class="ds-find__sort" aria-label="Sort order">/);
+    assert.match(html, /aria-current="true"[^>]*>Oldest first/);
+  });
+
+  it('names the list under it and offers one Clear all', () => {
+    assert.match(html, /id="law-results-heading" role="status">1 of 12 law entries</);
+    assert.equal(html.match(/Clear all/g)?.length, 1);
+  });
+});
+
+/**
+ * repo-vac3x.1.3: on 2026-09-14 the public routes carried 33 control families. The rooms now
+ * share the FindBar. This is a ratchet: the families below exist today, the ones outside the room
+ * kit belong to Explore, the Door and record pages (repo-vac3x.1.5 and .1.6 retire those), and a
+ * new chip, pill or filter family anywhere under app/ fails until it is folded into the kit.
+ */
+describe('room kit · one public control system', () => {
+  const KNOWN_CONTROL_FAMILIES: readonly string[] = [
+    // The room kit's own.
+    'ds-find',
+    'ds-pill-select',
+    'ds-records-active',
+    'ds-records-facet',
+    'ds-room-chip',
+    'ds-typeahead',
+    // Explore, Door and record pages. Out of the rooms pass; do not add to this half.
+    'ds-door',
+    'ds-explore',
+    'ds-explore-place',
+    'ds-lens',
+    'ds-privacy',
+    'ds-rec-pill',
+    'ds-rec-pills',
+    'ds-relation-chip',
+    'ds-sheet',
+    'ds-state-chip',
+    'ds-state-start',
+  ];
+
+  const publicFiles = (extension: string) =>
+    [...walk(APP_DIR), ...walk(path.join(APP_DIR, '../components'))].filter(
+      (file) =>
+        file.endsWith(extension) &&
+        !file.includes(`${path.sep}admin${path.sep}`) &&
+        !/\.test\.tsx?$/.test(file),
+    );
+
+  it('no route grows its own chip, pill or filter class family', () => {
+    const found = new Set<string>();
+    for (const file of publicFiles('.css')) {
+      const css = readFileSync(file, 'utf8').replace(/\/\*[\s\S]*?\*\//g, '');
+      for (const [selector] of css.matchAll(
+        /\.ds-[a-z0-9_-]*(?:chip|pill|filter)s?(?![a-z])[a-z0-9_-]*/g,
+      )) {
+        const family = selector.slice(1).split(/__|--/)[0] as string;
+        if (!KNOWN_CONTROL_FAMILIES.includes(family)) {
+          found.add(`${path.relative(APP_DIR, file)}: .${family}`);
+        }
+      }
+    }
+    assert.deepEqual([...found].sort(), [], 'use FindBar and .ds-room-chip from components/room');
+  });
+
+  it('no public route has an Apply button; controls apply themselves', () => {
+    const offenders = publicFiles('.tsx').filter((file) =>
+      /<button[^>]*>\s*(?:\{['"`])?\s*Apply\b/.test(readFileSync(file, 'utf8')),
+    );
+    assert.deepEqual(
+      offenders.map((file) => path.relative(APP_DIR, file)),
+      [],
+      'a chip is a link, a select uses AutoSubmitSelect, a search field submits on Enter',
+    );
+  });
+});
+
+/**
+ * docs/ui/design-direction-v10-rooms.md: the standalone rooms share one look, and it is opt-in on
+ * `Room` because Lives, the memorial wall and record pages share the kit. An opt-in drifts the
+ * way the chapter pattern did, so the list of rooms that must carry it is pinned here.
+ */
+describe('room kit · every standalone room is a ledger room', () => {
+  const LEDGER_ROOMS = [
+    'about/page.tsx',
+    'books/page.tsx',
+    'corrections/page.tsx',
+    'data/page.tsx',
+    'errata/page.tsx',
+    'faq/page.tsx',
+    'law/page.tsx',
+    'methodology/page.tsx',
+    'privacy/page.tsx',
+    'records/RecordsIndex.tsx',
+    'rooms/page.tsx',
+    'sources/page.tsx',
+    'stories/page.tsx',
+    'submit/page.tsx',
+    'support/page.tsx',
+    'terms/page.tsx',
+  ] as const;
+
+  it('opens with <Room ledger>', () => {
+    const missing = LEDGER_ROOMS.filter((rel) => {
+      const source = readFileSync(path.join(APP_DIR, rel), 'utf8');
+      return /<Room(?=[\s>])(?!\s+ledger)/.test(source);
+    });
+    assert.deepEqual(missing, []);
+  });
+
+  it('the memorial wall and Lives do not', () => {
+    for (const rel of ['memorial/page.tsx', 'lives/page.tsx', 'lives/explorer/page.tsx']) {
+      assert.doesNotMatch(readFileSync(path.join(APP_DIR, rel), 'utf8'), /<Room\s+ledger/);
+    }
+  });
+});
+
+describe('room kit · FindBarFilters', () => {
+  const render = (activeCount: number) =>
+    renderToStaticMarkup(
+      <FindBarFilters label="Filter by topic" activeCount={activeCount}>
+        <a href="/law?topic=voting">Voting</a>
+      </FindBarFilters>,
+    );
+
+  it('is a native disclosure, closed until something inside it narrows the list', () => {
+    assert.match(render(0), /<details class="ds-find__more">/);
+    assert.doesNotMatch(render(0), /ds-room-num/);
+  });
+
+  it('opens and shows the count when a facet inside it is active', () => {
+    const html = render(2);
+    assert.match(html, /<details class="ds-find__more" open="">/);
+    assert.match(html, /<span class="ds-room-num">2<\/span>/);
   });
 });

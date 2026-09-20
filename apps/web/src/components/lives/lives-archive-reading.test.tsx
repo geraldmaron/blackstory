@@ -54,7 +54,7 @@ test('a remembered childhood is distinguished from the photograph and later empl
   assert.match(LIVES_ARCHIVE_READINGS.school.companion!.scope, /not.*Tuskegee/s);
   assert.match(
     LIVES_ARCHIVE_READINGS.work.companion!.scope,
-    /not evidence about defense employment/,
+    /isn’t evidence about defense employment/,
   );
 });
 

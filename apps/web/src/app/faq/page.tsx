@@ -21,6 +21,7 @@ import {
   RoomJump,
   RoomSection,
   roomSectionTone,
+  KeepGoing,
 } from '../../components/room';
 import { FAQ_LEDE, FAQ_SECTIONS } from './faq-copy';
 import '../reading-room.css';
@@ -49,7 +50,7 @@ function FaqLinkRow({ href, label }: { readonly href: string; readonly label: st
 
 export default function FaqPage() {
   return (
-    <Room>
+    <Room ledger>
       <ReadingEntry
         pathname="/faq"
         title={
@@ -58,7 +59,6 @@ export default function FaqPage() {
           </>
         }
         lede={FAQ_LEDE}
-        showCrumb={false}
       />
 
       <RoomJump
@@ -74,6 +74,7 @@ export default function FaqPage() {
           key={section.id}
           id={section.id}
           icon={section.icon}
+          kicker={section.kicker}
           title={section.heading}
           tone={roomSectionTone(index)}
         >
@@ -99,6 +100,8 @@ export default function FaqPage() {
           </Prose>
         </RoomSection>
       ))}
+
+      <KeepGoing paths={['/methodology', '/sources', '/about']} />
 
       <WalkOffRamp
         title="Still stuck"

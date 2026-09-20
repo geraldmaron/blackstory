@@ -18,35 +18,42 @@ const anatomySource = readFileSync(join(here, 'LawAnatomyStrip.tsx'), 'utf8');
 test('law index is the catalog room; /law/browse is a config redirect only', () => {
   assert.match(indexPageSource, /LawBrowseSections/);
   assert.match(indexPageSource, /<ReadingEntry/);
-  assert.match(indexPageSource, /<Room rail=\{rail\}>/);
+  assert.match(indexPageSource, /<Room ledger rail=\{rail\}>/);
   assert.match(indexPageSource, /OrientationInstrument/);
   assert.doesNotMatch(indexPageSource, /how-it-works|LawHubSections/);
   assert.doesNotMatch(indexPageSource, /EditionAtmosphereMosaic|LAW_EDITION_MOSAIC_SEED/);
 });
 
+/**
+ * The params /law submits. `q` is the FindBar's own field; the rest ride along as the hidden
+ * fields it renders from `preserved`, so a search refines the view instead of resetting it.
+ */
+function lawSubmittedParams(): string[] {
+  const preserved = /preserved=\{\{([\s\S]*?)\}\}/.exec(browseSectionsSource)?.[1] ?? '';
+  return ['q', ...[...preserved.matchAll(/^\s*([a-z]+):/gm)].map((m) => m[1] as string)];
+}
+
 test('law browse preserves GET URL contract at /law', () => {
-  assert.match(browseSectionsSource, /method="get"/);
+  // The form itself (method="get", name="q", no Apply button) is the FindBar's, and is asserted
+  // on the rendered component in room-kit.test.tsx.
+  assert.match(browseSectionsSource, /<FindBar/);
   assert.match(browseSectionsSource, /action="\/law#browse"/);
   assert.match(browseSectionsSource, /id="browse"/);
-  assert.match(browseSectionsSource, /name="q"/);
-  assert.match(browseSectionsSource, /name="kind"/);
-  assert.match(browseSectionsSource, /name="topic"/);
-  assert.match(browseSectionsSource, /name="sort"/);
-  assert.match(browseSectionsSource, /aria-label="Sort order"/);
+  assert.deepEqual(lawSubmittedParams(), ['q', 'kind', 'topic', 'sort']);
   assert.match(browseSectionsSource, /sortOptions\.map/);
-  assert.match(browseSectionsSource, /href="\/law"/);
+  assert.match(browseSectionsSource, /clearHref="\/law"/);
 });
 
 test('every rendered browse control is in the edge param allowlist', async () => {
   // A control whose param is missing from the allowlist is stripped by middleware before the
   // page runs, so the filter silently does nothing. `sort` shipped broken exactly that way.
   const { LAW_PAGE_PARAM_ALLOWLIST } = await import('../../lib/runtime-hardening/constants');
-  const rendered = [...browseSectionsSource.matchAll(/name="([a-z]+)"/g)].map((m) => m[1]);
-  assert.ok(rendered.length > 0);
+  const rendered = lawSubmittedParams();
+  assert.ok(rendered.length > 1);
   for (const param of rendered) {
     assert.ok(
-      (LAW_PAGE_PARAM_ALLOWLIST as readonly string[]).includes(param as string),
-      `browse renders name="${param}" but it is not in LAW_PAGE_PARAM_ALLOWLIST`,
+      (LAW_PAGE_PARAM_ALLOWLIST as readonly string[]).includes(param),
+      `browse submits "${param}" but it is not in LAW_PAGE_PARAM_ALLOWLIST`,
     );
   }
 });
@@ -92,7 +99,9 @@ test('law browse lede preserved without em dashes, and the room is not titled ci
   assert.match(indexPageSource, /LAW_EDITION_BROWSE_LEDE/);
   assert.doesNotMatch(LAW_EDITION_BROWSE_LEDE, /—/);
   assert.doesNotMatch(indexPageSource, /Civil rights/);
-  assert.match(indexPageSource, /title="Law"/);
+  // The room keeps the noun where a reader scans for it (tab, nav, crumb); the headline is a sentence.
+  assert.match(indexPageSource, /title: 'Law'/);
+  assert.match(indexPageSource, /What the law actually <em>said<\/em>\./);
   assert.doesNotMatch(LAW_EDITION_BROWSE_LEDE, /civil rights/i);
 });
 

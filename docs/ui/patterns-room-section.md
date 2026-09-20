@@ -39,9 +39,40 @@ Import from `components/room`. CSS arrives with the kit.
 
 ---
 
+## Ledger style (2026-09-20)
+
+[`design-direction-v10-rooms.md`](./design-direction-v10-rooms.md) restyles these blocks for the standalone rooms. It is opt-in on `<Room ledger>` because Lives, the memorial wall and record pages share the kit; `room-kit.test.tsx` pins the sixteen routes that carry it. Under it the plate is 64px and inverse (ink ground, canvas glyph), the heading takes `--ds-text-display-2`, the jump nav is one scrolling row of 44px pills with the current chapter inverse, and handoffs are ruled with 2px ink instead of hairlines. "No copper fill, no radius lift" still holds.
+
+New kit modules that ship with it:
+
+| Module | Role |
+|---|---|
+| `RoomStats.tsx` | Numbers a room can state honestly, as display numerals under the masthead. Never a score, never on Memorial. |
+| `DocumentPlate.tsx` | A typeset sheet in a reading-room masthead, set from words the page already quotes and cites. Not an image; scans go through `ArchiveFigure` at full frame. |
+| `KeepGoing.tsx` | The closing handoff chapter, drawn from the destination registry so no room describes another room in its own words. |
+| `FindBar.tsx` | The one find bar for filtering rooms. See the registry entry. |
+
+## Type roles
+
+Room stylesheets size type from `packages/ui/src/styles/tokens.css` only; a literal `font-size` fails `room-kit.test.tsx` (the memorial wall is exempt).
+
+| Role | Token |
+|---|---|
+| Ledger masthead | `--ds-text-display-hero` |
+| Masthead elsewhere, stat numerals | `--ds-text-display-1` |
+| Chapter heading (ledger) | `--ds-text-display-2` |
+| Chapter heading, group heading, year in a ledger row | `--ds-text-display-3` |
+| Card, fact, handoff and ledger row titles | `--ds-text-title` |
+| Glossed row title | `--ds-text-subtitle` |
+| Room prose | `--ds-text-editorial` |
+| One-line ledger row, inputs | `--ds-text-body` |
+| Secondary prose, gloss, captions | `--ds-text-body-sm` |
+| Chips, small UI | `--ds-text-caption` |
+| Mono labels, kickers, counts | `--ds-text-micro` |
+
 ## Adopters
 
-Methodology, Sources, About, FAQ, Rooms, Privacy, Terms, Errata, Support, Submit, Corrections. Data keeps its own section rail (already a sticky running head). Memorial list uses `MemorialLetterJump` rather than `RoomJump` because the spine is letters, not destinations. `/books` uses the kit around the catalog (how to read, jump, handoffs); catalog rows stay `ds-room-idx` with a cover and gloss, not HairlineIndex, because a title is artwork rather than a 16px kind glyph.
+Methodology, Sources, About, FAQ, Rooms, Law, Privacy, Terms, Errata, Support, Submit, Corrections. Data keeps its own section rail (already a sticky running head) and uses the kit's chapter head for its acts. Memorial list uses `MemorialLetterJump` rather than `RoomJump` because the spine is letters, not destinations. `/books` uses the kit around the catalog (how to read, jump, handoffs); catalog rows stay `ds-room-idx` with a cover and gloss, not HairlineIndex, because a title is artwork rather than a 16px kind glyph.
 
 ---
 

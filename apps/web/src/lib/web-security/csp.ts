@@ -78,6 +78,16 @@ const ARTICLE_MEDIA_IMG_SRC = [
 ];
 
 /**
+ * Archival recordings streamed from the holding archive's own media server, never rehosted.
+ * One exact host, and one the image policy already trusts: every Library of Congress American
+ * Folklife Center recording, transcript and scan sits on tile.loc.gov. With no `media-src` the
+ * policy fell back to `default-src 'self'` and blocked all remote audio. Verification of the host,
+ * range support and rights: docs/research/lives-audio-sources.md. Add a host here only with the
+ * same record for it.
+ */
+export const ARCHIVAL_MEDIA_SRC = ['https://tile.loc.gov'];
+
+/**
  * Banned-books cover thumbnails: Open Library ISBN URLs redirect to archive.org
  * (and ia*.us.archive.org). Each hop must match img-src or the browser blocks the
  * image and BooksCoverArt falls back to initials placeholders.
@@ -183,6 +193,7 @@ export function buildContentSecurityPolicy(options: CspBuildOptions = {}): strin
     'script-src': scriptSrc,
     'style-src': styleSrc,
     'img-src': imgSrc,
+    'media-src': ["'self'", ...ARCHIVAL_MEDIA_SRC],
     'font-src': DEFAULT_FONT_SRC,
     'connect-src': resolvedConnectSrc,
     'frame-src': ["'none'"],
