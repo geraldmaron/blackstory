@@ -21,7 +21,11 @@ export default function PrivacyPage() {
     <Room>
       <ReadingEntry
         pathname="/privacy"
-        title="Privacy policy"
+        title={
+          <>
+            What this site collects, and what it <em>won&apos;t</em>.
+          </>
+        }
         lede="What the BlackStory website processes, and what it deliberately does not. There are no accounts and no advertising, and the map asks for your location only when you press a control that says so."
       />
       <PrivacySections />

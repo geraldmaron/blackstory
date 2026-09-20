@@ -36,7 +36,14 @@ export default async function BooksPage({ searchParams }: BooksPageProps) {
   if (snapshot.books.length === 0) {
     return (
       <Room>
-        <ReadingEntry pathname="/books" title="Banned books" showCrumb={false} />
+        <ReadingEntry
+          pathname="/books"
+          title={
+            <>
+              The books someone asked to <em>remove</em>.
+            </>
+          }
+        />
         <Notice tone="warning" title="The catalog snapshot is unavailable">
           The challenged-books catalog did not load. Nothing documented here is lost. Check back
           shortly, or read the <Link href="/methodology">methodology</Link> for how this catalog is
@@ -54,9 +61,12 @@ export default async function BooksPage({ searchParams }: BooksPageProps) {
     <Room>
       <ReadingEntry
         pathname="/books"
-        title="Banned books"
+        title={
+          <>
+            The books someone asked to <em>remove</em>.
+          </>
+        }
         lede={BOOKS_INDEX_LEDE}
-        showCrumb={false}
       />
       <DocumentColophon facts={booksCatalogPulseMeta(snapshot)} />
 

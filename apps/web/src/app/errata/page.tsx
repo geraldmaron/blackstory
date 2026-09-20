@@ -34,7 +34,11 @@ export default function ErrataPage() {
       <PublishingPrinciplesJsonLdScript pagePath={TRUST_PATHS.errata} pageTitle="Errata" />
       <ReadingEntry
         pathname="/errata"
-        title="Errata log"
+        title={
+          <>
+            Every mistake, <em>published</em>.
+          </>
+        }
         lede="Every correction to a published record lands here, with the date it was made and what it changed. Nothing on this site is edited quietly."
       />
 

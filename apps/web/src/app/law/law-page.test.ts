@@ -92,7 +92,9 @@ test('law browse lede preserved without em dashes, and the room is not titled ci
   assert.match(indexPageSource, /LAW_EDITION_BROWSE_LEDE/);
   assert.doesNotMatch(LAW_EDITION_BROWSE_LEDE, /—/);
   assert.doesNotMatch(indexPageSource, /Civil rights/);
-  assert.match(indexPageSource, /title="Law"/);
+  // The room keeps the noun where a reader scans for it (tab, nav, crumb); the headline is a sentence.
+  assert.match(indexPageSource, /title: 'Law'/);
+  assert.match(indexPageSource, /What the law actually <em>said<\/em>\./);
   assert.doesNotMatch(LAW_EDITION_BROWSE_LEDE, /civil rights/i);
 });
 

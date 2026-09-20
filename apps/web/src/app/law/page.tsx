@@ -72,7 +72,15 @@ export default async function LawPage({ searchParams }: LawPageProps) {
 
   return (
     <Room rail={rail}>
-      <ReadingEntry pathname="/law" title="Law" lede={LAW_EDITION_BROWSE_LEDE} showCrumb={false} />
+      <ReadingEntry
+        pathname="/law"
+        title={
+          <>
+            What the law actually <em>said</em>.
+          </>
+        }
+        lede={LAW_EDITION_BROWSE_LEDE}
+      />
       <DocumentColophon
         facts={[`${catalog.length.toLocaleString('en-US')} law entries`, ...kindMeta]}
       />

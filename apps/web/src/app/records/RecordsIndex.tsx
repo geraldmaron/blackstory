@@ -117,7 +117,11 @@ export function RecordsIndexRoom({ model, releaseLabel }: RecordsIndexProps) {
     <Room rail={rail}>
       <ReadingEntry
         pathname="/records"
-        title="Records"
+        title={
+          <>
+            Everything the archive <em>holds</em>.
+          </>
+        }
         lede="The map shows where a record sits. This list shows what the archive holds."
         showCrumb={false}
       />

@@ -147,7 +147,11 @@ export default async function StoriesIndexPage({ searchParams }: StoriesPageProp
     <Room rail={rail}>
       <ReadingEntry
         pathname="/stories"
-        title="Stories"
+        title={
+          <>
+            Start with a year and a <em>place</em>.
+          </>
+        }
         lede="Long-form chapters that walk from a named year and place through the rules in force, and shorter entries that set out what a given administration actually did. Every story names the records it stands on."
         showCrumb={false}
       />

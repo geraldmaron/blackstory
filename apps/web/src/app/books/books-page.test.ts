@@ -26,7 +26,10 @@ test('books index is the catalog room; /books/browse is a config redirect only',
 
 test('books browse holds the door without shipping a finished Banned books walk room', () => {
   assert.match(indexSource, /WalkOffRamp/);
-  assert.match(indexSource, /showCrumb=\{false\}/);
+  // The crumb was hidden while it repeated a two-word title. The room now opens on a sentence,
+  // so `Rooms / Banned books` is the only place the noun appears above the fold.
+  assert.doesNotMatch(indexSource, /showCrumb=\{false\}/);
+  assert.match(indexSource, /The books someone asked to <em>remove<\/em>\./);
   assert.doesNotMatch(indexSource, /Open the Atlas|ATLAS_INSTRUMENT|label: 'The place'/);
   assert.doesNotMatch(indexSource, /['"`]\/banned-books/);
   assert.doesNotMatch(indexSource, /Archive texture|Mosaic credits|ATMOSPHERE_ATTRIBUTION/);

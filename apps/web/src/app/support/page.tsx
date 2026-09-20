@@ -68,9 +68,12 @@ export default function SupportPage() {
     <Room>
       <ReadingEntry
         pathname="/support"
-        title="Support"
+        title={
+          <>
+            How to get an <em>answer</em>.
+          </>
+        }
         lede="BlackStory is one person's archive of Black history, tied to the places it happened. If something in a record is wrong, corrections is the fastest way in: it is moderated, it gives you a receipt code, and nothing is published as submitted."
-        showCrumb={false}
       />
 
       <RoomSection

@@ -25,7 +25,11 @@ export default function SubmitLeadPage() {
     <Room>
       <ReadingEntry
         pathname="/submit"
-        title="Submit a lead"
+        title={
+          <>
+            Tell the archive what it&apos;s <em>missing</em>.
+          </>
+        }
         lede="Some of the most important sources for this history sit where no compliant automated search can reach them: closed Facebook groups, Discord servers, private forums, family papers in a shoebox, an account nobody ever wrote down. If you know of one, this is where to say so."
       />
 
