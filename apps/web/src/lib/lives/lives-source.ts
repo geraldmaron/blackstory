@@ -44,6 +44,8 @@ function worldBeatsForArea(area: LivesAreaConfig): Map<number, LivesWorldBeat[]>
       })),
       ...(beat.uncertaintyLabel ? { uncertaintyLabel: beat.uncertaintyLabel } : {}),
       ...(beat.gapState ? { gapState: beat.gapState } : {}),
+      ...(beat.quote ? { quote: beat.quote } : {}),
+      ...(beat.recording ? { recording: beat.recording } : {}),
       ...(beat.speaker
         ? {
             speaker: beat.speaker,

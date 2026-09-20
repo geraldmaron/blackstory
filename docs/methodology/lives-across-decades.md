@@ -259,6 +259,37 @@ and ringer review of every impact statement before it publishes. The alternative
 holding the bar entirely, leaves the gap unexplained on the page, which the structure decision
 (`docs/research/lives-structure-decision.md` §10) flags as inviting a dispositional reading.
 
+## Community review (decision recorded 2026-09-20)
+
+`docs/methodology/scholarship-principles.md` §5 requires a recorded `communityReviewNote` before
+sensitive material is approved, and accepts an explicit "not yet sought" so that the absence of
+community input is visible rather than silent. Lives carries first-person accounts of slavery, its
+aftermath, and segregation, and a perspective mechanic (the Turn), so the rule applies to both.
+
+| Field | Value |
+|---|---|
+| `communityReviewNote` | **Not yet sought.** |
+| Applies to | First-person accounts on Lives (readings, world beats, recordings) and the Turn |
+| Owner | Gerald Dagher |
+| Recorded | 2026-09-20 (decision on `repo-0clax.50.7`, made under the owner's delegated authority) |
+
+What this does and does not permit:
+
+- **Accounts may publish with this note in place.** Every account is the speaker's own words, quoted
+  verbatim from a holding institution, labeled with how the words reached the page, and linked to
+  the original. §5 is explicit that the step "does not block on a formal board".
+- **The Turn ships only in the forms that put no group's outcome in the question.** The structure
+  decision (`docs/research/lives-structure-decision.md` §5) was built almost entirely from studies
+  of white learners, which is the reason this note exists. Until a reviewer has read it, the Turn
+  is limited to form 2 (then against now, same group, direction only) and form 3 (a rule or a
+  census question), and each instance passes the classroom test before it ships. Form 1 waits for
+  review as well as for the bundle change it needs.
+- **The absence is public.** The Lives section of `/methodology` says in plain words that no
+  community reviewer has read this material yet.
+
+When review is sought, replace the value above with who was asked, when, on what terms, and what
+they said, and keep this entry's history in git.
+
 ## Narrative voice and its gates
 
 Lives narrative prose (readings, accounts, world beats, and era narratives) is written under

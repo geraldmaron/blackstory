@@ -120,3 +120,80 @@ test('every group’s comparison bar is drawn at the same weight', () => {
   const block = bar.slice(0, bar.indexOf('}'));
   assert.doesNotMatch(block, /opacity/);
 });
+
+test('an account plays from the archive, and is complete without the audio', async () => {
+  const { LivesAccount } = await import('./LivesAccount');
+  const html = renderToStaticMarkup(
+    <LivesAccount
+      beat={{
+        id: '1880-housing-fountain-hughes',
+        domain: 'housing',
+        claimType: 'testimony',
+        heading: 'After freedom, no home to go to',
+        body: 'Fountain Hughes was recorded in Baltimore at 101.',
+        citations: [
+          { label: 'Library of Congress', url: 'https://www.loc.gov/item/afc1950037_afs09990a/' },
+        ],
+        appliesTo: ['black'],
+        unit: 'all',
+        entities: [],
+        speaker: {
+          name: 'Fountain Hughes',
+          place: 'Baltimore, Maryland',
+          year: '1949',
+          mediation: 'recorded-interview',
+          mediatedBy: 'Hermond Norwood',
+        },
+        quote: 'We didn’t have no property. We didn’t have no home.',
+        recording: {
+          mediaUrl: 'https://tile.loc.gov/storage-services/service/afc/x.mp3',
+          itemUrl: 'https://www.loc.gov/item/afc1950037_afs09990a/',
+          transcriptUrl: 'https://tile.loc.gov/storage-services/service/afc/x.pdf',
+          holdingInstitution: 'the Library of Congress',
+          creditLine: 'Cyrus B. Koonce Collection (AFC 1950/037), American Folklife Center',
+          rightsNote: 'The Library is unaware of any copyright or other restrictions.',
+          recordedOn: 'June 11, 1949, Baltimore, Maryland',
+        },
+      }}
+    />,
+  );
+  // No request reaches the archive until the reader presses play, and nothing autoplays.
+  assert.match(html, /<audio[^>]*preload="none"/);
+  assert.doesNotMatch(html, /autoplay/i);
+  assert.match(html, /src="https:\/\/tile\.loc\.gov\//);
+  // The words, who took them down, the transcript and the archive link stand without the audio.
+  assert.match(html, /We didn’t have no property/);
+  assert.match(html, /Recorded interview with Hermond Norwood/);
+  assert.match(html, /Read the transcript/);
+  assert.match(html, /Listen at the Library of Congress/);
+  assert.match(html, /unaware of any copyright/);
+});
+
+test('a beat without the speaker’s own words is not rendered as an account', async () => {
+  const { LivesAccount } = await import('./LivesAccount');
+  const html = renderToStaticMarkup(
+    <LivesAccount
+      beat={{
+        id: 'x',
+        domain: 'housing',
+        claimType: 'factual',
+        heading: 'h',
+        body: 'b',
+        citations: [],
+        appliesTo: ['all'],
+        unit: 'all',
+        entities: [],
+      }}
+    />,
+  );
+  assert.equal(html, '');
+});
+
+test('every Lives text size comes from the design system type scale', () => {
+  const css = readFileSync(path.join(here, '../../app/lives/lives.css'), 'utf8');
+  const sizes = [...css.matchAll(/font-size:\s*([^;]+);/g)].map((match) => match[1]!.trim());
+  assert.ok(sizes.length > 50);
+  const offScale = sizes.filter((size) => !/^var\(--ds-text-[a-z0-9-]+\)$/.test(size));
+  // A one-off rem or clamp() value is how this page reached thirty different text sizes.
+  assert.deepEqual(offScale, []);
+});

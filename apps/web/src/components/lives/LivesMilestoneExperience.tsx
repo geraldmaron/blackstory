@@ -16,8 +16,13 @@ import {
   livesMilestonePeriod,
   type LivesMilestone,
   type LivesMilestoneContext,
+  type LivesMilestoneFigure,
   type LivesMilestonePanel,
 } from '../../lib/lives/lives-milestones';
+import type { HydratedArticle } from '../../lib/articles/hydrate';
+import { ArticleBody } from '../article/ArticleBody';
+import { ArticleReferences } from '../article/ArticleReferences';
+import { LivesAccount } from './LivesAccount';
 import { describeLivesCell } from '../../lib/lives/lives-format';
 import { LIVES_ARCHIVE_READINGS } from '../../lib/lives/lives-archive';
 import { ArchiveFigure, RoomHandoff } from '../room';
@@ -36,14 +41,6 @@ const MILESTONE_ICONS: Record<LivesMilestone['key'], DestinationIconId> = {
 };
 /** Rules shown open in an era; the rest stay one tap away so no rule is dropped for length. */
 const LIVES_RULES_OPEN = 4;
-const ERA_TITLES: Record<string, string> = {
-  '1870-1890': 'The first generations after emancipation',
-  '1900-1930': 'A new century, unequal possibilities',
-  '1940-1960': 'War, work, and the struggle over rights',
-  '1970-1980': 'Reading the figures after civil rights legislation',
-  '1990-2000': 'At the turn of another century',
-  '2010-2020': 'The recent record',
-};
 
 function ArchiveReading({ milestone }: { readonly milestone: LivesMilestone }) {
   const reading = LIVES_ARCHIVE_READINGS[milestone.key];
@@ -175,30 +172,20 @@ function ContextBlock({ context }: { readonly context: LivesMilestoneContext }) 
   );
 }
 
-function EraPanel({ panel }: { readonly panel: LivesMilestonePanel }) {
-  const titleId = `lives-era-${panel.era.id}`;
-  return (
-    <article className="lives-era" id={`era-${panel.era.id}`} aria-labelledby={titleId}>
-      <header className="lives-era__header">
-        <p className="lives-era__number">
-          <span>{panel.era.start}s</span>
-          <span>–{panel.era.end}s</span>
-        </p>
-        <div>
-          <p className="lives-era__eyebrow">United States · {livesMilestonePeriod(panel)}</p>
-          <h3 id={titleId}>{ERA_TITLES[panel.era.id]}</h3>
-          <p className="lives-era__universe">
-            Who this figure describes: {panel.condition.universe}.
-          </p>
-        </div>
-      </header>
+type ReaderPanel = LivesMilestonePanel<HydratedArticle>;
 
-      <section className="lives-era__comparison" aria-label={panel.condition.label}>
+function FigureSection({ figure }: { readonly figure: LivesMilestoneFigure }) {
+  return (
+    <>
+      <section className="lives-era__comparison" aria-label={figure.condition.label}>
         <h4 className="lives-era__measure">
-          <DestinationIcon id="data" /> {panel.condition.label}
+          <DestinationIcon id="data" /> {figure.condition.label}
         </h4>
+        <p className="lives-era__universe">
+          Who this figure describes: {figure.condition.universe}. {livesMilestonePeriod(figure)}.
+        </p>
         <dl className="lives-era__values">
-          {panel.values.map(({ lens, cell }) => {
+          {figure.values.map(({ lens, cell }) => {
             const display = describeLivesCell(cell);
             return (
               <div key={lens} className="lives-era__value" data-lens={lens}>
@@ -223,8 +210,8 @@ function EraPanel({ panel }: { readonly panel: LivesMilestonePanel }) {
             );
           })}
         </dl>
-        {panel.decade.decade >= 2010 &&
-        ['homeownership', 'high_school', 'unemployed'].includes(panel.condition.key) ? (
+        {figure.decade.decade >= 2010 &&
+        ['homeownership', 'high_school', 'unemployed'].includes(figure.condition.key) ? (
           <p className="lives-era__definition">
             In this measure, Black includes Hispanic origin; white excludes Hispanic origin.
             Hispanic includes people of any race. These categories overlap. Each percentage uses the
@@ -232,15 +219,64 @@ function EraPanel({ panel }: { readonly panel: LivesMilestonePanel }) {
           </p>
         ) : null}
       </section>
-
       <div className="lives-era__evidence">
         <p className="lives-era__source-label">
           <DestinationIcon id="source" /> Figure sources
         </p>
-        <SourceLinks sources={panel.sources} />
+        <SourceLinks sources={figure.sources} />
       </div>
+    </>
+  );
+}
 
-      {panel.context ? <ContextBlock context={panel.context} /> : null}
+/**
+ * One era, in the order a reader should meet it: a person first (docs/content/neo-voice.md, Law 1),
+ * then the history, then the count, then the rules that began. Census method sits one tap away once
+ * there is prose to read, so the page is about lives before it is about the count.
+ */
+function EraPanel({ panel }: { readonly panel: ReaderPanel }) {
+  const titleId = `lives-era-${panel.era.id}`;
+  const { narrative, figure } = panel;
+  const title = narrative?.doc.title ?? figure?.condition.label ?? panel.era.label;
+  return (
+    <article className="lives-era" id={`era-${panel.era.id}`} aria-labelledby={titleId}>
+      <header className="lives-era__header">
+        <p className="lives-era__number">
+          <span>{panel.era.start}s</span>
+          <span>–{panel.era.end}s</span>
+        </p>
+        <div>
+          <p className="lives-era__eyebrow">
+            {narrative ? narrative.doc.placeLabel : 'United States'} · {panel.era.label}
+          </p>
+          <h3 id={titleId}>{title}</h3>
+        </div>
+      </header>
+
+      {panel.accounts.length > 0 ? (
+        <section className="lives-era__accounts" aria-label="In their own words">
+          <p className="lives-era__source-label">
+            <DestinationIcon id="person" /> In their own words
+          </p>
+          {panel.accounts.map((beat) => (
+            <LivesAccount key={beat.id} beat={beat} />
+          ))}
+        </section>
+      ) : null}
+
+      {narrative ? (
+        <section className="lives-era__narrative" aria-label="What happened in this stretch">
+          <ArticleBody article={narrative} />
+        </section>
+      ) : null}
+
+      {figure ? (
+        <FigureSection figure={figure} />
+      ) : (
+        <p className="lives-era__no-figure">
+          <strong>No comparison for this stretch.</strong> {panel.figureAbsence}
+        </p>
+      )}
 
       {panel.rules.length > 0 ? (
         <section className="lives-era__rules" aria-label={`Rules beginning in ${panel.era.label}`}>
@@ -268,6 +304,24 @@ function EraPanel({ panel }: { readonly panel: LivesMilestonePanel }) {
           ) : null}
         </section>
       ) : null}
+
+      {panel.context ? (
+        narrative ? (
+          <details className="lives-era__drawer">
+            <summary>How the count worked in these years</summary>
+            <ContextBlock context={panel.context} />
+          </details>
+        ) : (
+          <ContextBlock context={panel.context} />
+        )
+      ) : null}
+
+      {narrative && narrative.references.length > 0 ? (
+        <details className="lives-era__drawer">
+          <summary>Sources for this stretch ({narrative.references.length})</summary>
+          <ArticleReferences references={narrative.references} />
+        </details>
+      ) : null}
     </article>
   );
 }
@@ -275,11 +329,14 @@ function EraPanel({ panel }: { readonly panel: LivesMilestonePanel }) {
 export function LivesMilestoneExperience({
   bundle,
   milestone,
+  narratives,
 }: {
   readonly bundle: LivesAreaBundle;
   readonly milestone: LivesMilestone;
+  /** Era narratives by era id, already numbered continuously. Absent until a column is written. */
+  readonly narratives?: ReadonlyMap<string, HydratedArticle>;
 }) {
-  const panels = buildLivesMilestonePanels(bundle, milestone);
+  const panels = buildLivesMilestonePanels(bundle, milestone, narratives);
 
   return (
     <div className="lives-milestone">
@@ -318,8 +375,9 @@ export function LivesMilestoneExperience({
           <div className="lives-milestone__timeline-head">
             <h3>Across the years</h3>
             <p>
-              Each stop contains a sourced national comparison. Years without a publishable
-              comparison are not shown. Definitions and survey periods remain separate.
+              Each stop carries a sourced national comparison where one was published. A stretch
+              with no comparison appears only when there’s sourced history to tell. Definitions and
+              survey periods remain separate.
             </p>
             <nav className="lives-milestone__year-links" aria-label="Jump to a documented era">
               {panels.map((panel) => (

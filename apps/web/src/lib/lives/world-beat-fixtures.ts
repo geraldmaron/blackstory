@@ -8,6 +8,53 @@ import type { LivesWorldBeatInput } from '@repo/domain/statistics/lives';
 
 export const LIVES_WORLD_BEAT_FIXTURES: readonly LivesWorldBeatInput[] = [
   {
+    id: '1870-housing-fountain-hughes',
+    decade: 1870,
+    areaIds: [],
+    lenses: ['black'],
+    unit: 'all',
+    domain: 'housing',
+    claimType: 'testimony',
+    heading: 'After freedom, no home to go to',
+    body: 'Fountain Hughes was recorded in Baltimore on June 11, 1949, by Hermond Norwood, a Library of Congress engineer. Hughes said he was born in Charlottesville, Virginia, and gave his age as 101. He described the years just after freedom: children bound out to different people, running away from them, and sleeping wherever he and his brother could, one night inside a vehicle in a man’s livery stable yard.',
+    quote: 'We didn’t have no property. We didn’t have no home. We had nowhere or nothing.',
+    citations: [
+      {
+        label:
+          'Interview with Fountain Hughes, Baltimore, Maryland, June 11, 1949. American Folklife Center, Library of Congress (AFC 1950/037: AFS 09990A)',
+        url: 'https://www.loc.gov/item/afc1950037_afs09990a/',
+      },
+      {
+        label:
+          'Library of Congress, Voices Remembering Slavery: Freed People Tell Their Stories, About this Collection',
+        url: 'https://www.loc.gov/collections/voices-remembering-slavery/about-this-collection/',
+      },
+    ],
+    entityIds: [],
+    speaker: {
+      name: 'Fountain Hughes',
+      place: 'Baltimore, Maryland',
+      year: 'recorded 1949, recalling the late 1860s and after',
+      mediation: 'recorded-interview',
+      mediatedBy: 'Hermond Norwood',
+    },
+    recording: {
+      mediaUrl:
+        'https://tile.loc.gov/storage-services/service/afc/afc1950037/afc1950037_afs09990/afc1950037_afs09990a.mp3',
+      itemUrl: 'https://www.loc.gov/item/afc1950037_afs09990a/',
+      transcriptUrl:
+        'https://tile.loc.gov/storage-services/service/afc/afc1950037/afc1950037_afs09990/afc1950037_afs09990a.pdf',
+      holdingInstitution: 'the Library of Congress',
+      creditLine:
+        'Cyrus B. Koonce Collection (AFC 1950/037), American Folklife Center, Library of Congress',
+      rightsNote:
+        'The Library of Congress says it is unaware of any copyright or other restrictions in this collection.',
+      recordedOn: 'June 11, 1949, in Baltimore, Maryland',
+      contentNote:
+        'This recording carries the language of its time, and Hughes describes life in slavery.',
+    },
+  },
+  {
     id: '1870-count-reconstruction',
     decade: 1870,
     areaIds: [],

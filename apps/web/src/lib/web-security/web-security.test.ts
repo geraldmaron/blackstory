@@ -239,3 +239,20 @@ test('CSP grants only the configured auth origin and restricts loopback to devel
     assert.equal(connect(url, false), connect(undefined, false));
   }
 });
+
+test('archival recordings stream from one exact archive host and nothing broader', () => {
+  const directives = new Map(
+    buildContentSecurityPolicy({ isDev: false, nonce: TEST_NONCE })
+      .split(';')
+      .map((directive) => {
+        const [name, ...values] = directive.trim().split(/\s+/u);
+        return [name, new Set(values)] as const;
+      }),
+  );
+  const media = directives.get('media-src');
+  assert.deepEqual([...(media ?? [])].sort(), ["'self'", 'https://tile.loc.gov'].sort());
+  // Playing a recording must not widen what scripts may load or where the page may connect.
+  assert.equal(directives.get('script-src')?.has('https://tile.loc.gov'), false);
+  assert.equal(directives.get('connect-src')?.has('https://tile.loc.gov'), false);
+  for (const wide of ['https:', '*', 'data:', 'blob:']) assert.equal(media?.has(wide), false);
+});

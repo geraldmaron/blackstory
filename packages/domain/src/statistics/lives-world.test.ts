@@ -208,3 +208,62 @@ test('the mediation line names the second person only where there is one', async
     'Reported by an observer',
   );
 });
+
+const HUGHES_RECORDING = {
+  mediaUrl:
+    'https://tile.loc.gov/storage-services/service/afc/afc1950037/afc1950037_afs09990/afc1950037_afs09990a.mp3',
+  itemUrl: 'https://www.loc.gov/item/afc1950037_afs09990a/',
+  transcriptUrl:
+    'https://tile.loc.gov/storage-services/service/afc/afc1950037/afc1950037_afs09990/afc1950037_afs09990a.pdf',
+  holdingInstitution: 'American Folklife Center, Library of Congress',
+  creditLine:
+    'Cyrus B. Koonce Collection (AFC 1950/037), American Folklife Center, Library of Congress',
+  rightsNote:
+    'The Library of Congress is unaware of any copyright or other restrictions in the Voices Remembering Slavery Collection.',
+  recordedOn: 'June 11, 1949, Baltimore, Maryland',
+};
+
+test('a recording must belong to a recorded interview with a named interviewer', () => {
+  const who = { name: 'Fountain Hughes', place: 'Baltimore, Maryland', year: '1949' };
+  const wrongMediation = validateLivesWorldBeats([
+    { ...speakerBeat({ ...who, mediation: 'self-authored' }), recording: HUGHES_RECORDING },
+  ]);
+  assert.match(
+    wrongMediation.errors.join('\n'),
+    /requires a speaker whose mediation is recorded-interview/,
+  );
+
+  const insecure = validateLivesWorldBeats([
+    {
+      ...speakerBeat({ ...who, mediation: 'recorded-interview', mediatedBy: 'Hermond Norwood' }),
+      recording: { ...HUGHES_RECORDING, mediaUrl: 'http://tile.loc.gov/x.mp3' },
+    },
+  ]);
+  assert.match(insecure.errors.join('\n'), /recording\.mediaUrl must be an https URL/);
+
+  const good = validateLivesWorldBeats([
+    {
+      ...speakerBeat({ ...who, mediation: 'recorded-interview', mediatedBy: 'Hermond Norwood' }),
+      quote: 'We didn’t have no property. We didn’t have no home. We had nowhere or nothing.',
+      recording: HUGHES_RECORDING,
+    },
+  ]);
+  assert.deepEqual(good.errors, []);
+  assert.equal(good.records[0]?.recording?.mediaUrl, HUGHES_RECORDING.mediaUrl);
+  assert.match(good.records[0]?.quote ?? '', /nowhere or nothing/);
+});
+
+test('a quote needs a speaker and stays within forty words', () => {
+  const noSpeaker = validateLivesWorldBeats([
+    { ...speakerBeat({}, 'factual'), speaker: undefined, quote: 'Words with nobody attached.' },
+  ]);
+  assert.match(noSpeaker.errors.join('\n'), /a quote requires a speaker/);
+
+  const long = validateLivesWorldBeats([
+    {
+      ...speakerBeat({ name: 'N', place: 'P', year: 'Y', mediation: 'self-authored' }),
+      quote: Array.from({ length: 41 }, () => 'word').join(' '),
+    },
+  ]);
+  assert.match(long.errors.join('\n'), /quote is longer than 40 words/);
+});

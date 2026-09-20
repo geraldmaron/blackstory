@@ -7,6 +7,7 @@ import type {
   LivesDecade,
   LivesDecadeBundle,
   LivesRule,
+  LivesWorldBeat,
 } from '@repo/domain/statistics/lives';
 import {
   LIVES_ERAS,
@@ -88,9 +89,9 @@ test('an era uses its latest cited Black comparison and does not create blank pa
 
   assert.equal(panels.length, 1);
   assert.equal(panels[0]?.era.id, '1900-1930');
-  assert.equal(panels[0]?.decade.decade, 1920);
+  assert.equal(panels[0]?.figure?.decade.decade, 1920);
   assert.deepEqual(
-    panels[0]?.values.map((value) => value.lens),
+    panels[0]?.figure?.values.map((value) => value.lens),
     ['black', 'white'],
   );
 });
@@ -136,7 +137,7 @@ test('distinct tables at one source URL survive deduplication', () => {
     ]),
     LIVES_MILESTONES[0]!,
   );
-  assert.equal(panels[0]?.sources.length, 2);
+  assert.equal(panels[0]?.figure?.sources.length, 2);
 });
 
 test('survey vintages are not mislabeled as a single census year', () => {
@@ -144,12 +145,12 @@ test('survey vintages are not mislabeled as a single census year', () => {
     bundle([decade(2020, 'homeownership', { black: 44, white: 73 })]),
     LIVES_MILESTONES[0]!,
   )[0]!;
-  assert.equal(livesMilestonePeriod(home), '2019–2023 · ACS five-year estimate');
+  assert.equal(livesMilestonePeriod(home.figure!), '2019–2023 · ACS five-year estimate');
   const place = buildLivesMilestonePanels(
     bundle([decade(2020, 'urban', { black: 90, white: 73 })]),
     LIVES_MILESTONES[1]!,
   )[0]!;
-  assert.equal(livesMilestonePeriod(place), '2020 · Census snapshot');
+  assert.equal(livesMilestonePeriod(place.figure!), '2020 · Census snapshot');
 });
 
 test('a nonwhite historical proxy cannot be presented as a Black-specific comparison', () => {
@@ -243,4 +244,114 @@ test('the header span is the visible panels, not a fixed range', () => {
   );
   assert.equal(livesMilestoneSpanLabel(panels), '1970s to 2020s');
   assert.equal(livesMilestoneSpanLabel([]), null);
+});
+
+function account(id: string, domain: LivesWorldBeat['domain']): LivesWorldBeat {
+  return {
+    id,
+    domain,
+    claimType: 'testimony',
+    heading: 'After freedom, no home to go to',
+    body: 'Fountain Hughes described the years just after emancipation.',
+    citations: [{ label: 'Library of Congress', url: 'https://www.loc.gov/item/x/' }],
+    appliesTo: ['black'],
+    unit: 'all',
+    entities: [],
+    speaker: {
+      name: 'Fountain Hughes',
+      place: 'Baltimore, Maryland',
+      year: '1949',
+      mediation: 'recorded-interview',
+      mediatedBy: 'Hermond Norwood',
+    },
+    quote: 'We had nowhere or nothing.',
+  };
+}
+
+function figurelessDecade(
+  year: LivesDecade,
+  extras: Partial<LivesDecadeBundle>,
+): LivesDecadeBundle {
+  return {
+    ...decade(year, 'homeownership', {}),
+    ...extras,
+  } as LivesDecadeBundle;
+}
+
+test('an era with no figure renders only when it has prose plus an account or a rule', () => {
+  const home = LIVES_MILESTONES[0]!;
+  const withAccount = bundle([
+    figurelessDecade(1880, { worldBeats: [account('1880-housing-hughes', 'housing')] }),
+  ]);
+
+  // Prose alone is not enough of a reason to open an era; neither is an account alone.
+  assert.deepEqual(buildLivesMilestonePanels(withAccount, home), []);
+  assert.deepEqual(
+    buildLivesMilestonePanels(
+      bundle([figurelessDecade(1880, {})]),
+      home,
+      new Map([['1870-1890', 'prose']]),
+    ),
+    [],
+  );
+
+  const panels = buildLivesMilestonePanels(withAccount, home, new Map([['1870-1890', 'prose']]));
+  assert.equal(panels.length, 1);
+  assert.equal(panels[0]?.figure, null);
+  assert.equal(panels[0]?.narrative, 'prose');
+  assert.equal(panels[0]?.accounts[0]?.speaker?.name, 'Fountain Hughes');
+  // The pending cell's silence is this archive's, and the line says so.
+  assert.match(panels[0]?.figureAbsence ?? '', /hasn’t been transcribed here yet/);
+});
+
+test('the census’s own reason is used when the census never asked', () => {
+  const home = LIVES_MILESTONES[0]!;
+  const never = figurelessDecade(1880, {
+    worldBeats: [account('1880-housing-hughes', 'housing')],
+  });
+  const condition = never.conditions[0]!;
+  const panels = buildLivesMilestonePanels(
+    bundle([
+      {
+        ...never,
+        conditions: [
+          {
+            ...condition,
+            cells: {
+              ...condition.cells,
+              black: {
+                state: 'not_measured',
+                reason: 'The census first asked about tenure in 1890.',
+              },
+            },
+          },
+        ],
+      } as LivesDecadeBundle,
+    ]),
+    home,
+    new Map([['1870-1890', 'prose']]),
+  );
+  assert.equal(panels[0]?.figureAbsence, 'The census first asked about tenure in 1890.');
+});
+
+test('accounts are filed by topic, and a quoted account is never also the context beat', () => {
+  const home = LIVES_MILESTONES[0]!;
+  const panels = buildLivesMilestonePanels(
+    bundle([
+      {
+        ...decade(1930, 'homeownership', { black: 25, white: 50 }),
+        worldBeats: [
+          account('1930-housing-account', 'housing'),
+          account('1930-catchall-account', 'testimony'),
+          account('1930-school-account', 'schooling'),
+        ],
+      } as LivesDecadeBundle,
+    ]),
+    home,
+  );
+  assert.deepEqual(
+    panels[0]?.accounts.map((beat) => beat.id),
+    ['1930-housing-account'],
+  );
+  assert.equal(panels[0]?.context, null);
 });

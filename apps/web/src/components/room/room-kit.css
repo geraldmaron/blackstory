@@ -701,7 +701,7 @@
   border-top: 1px solid var(--ds-rule);
   margin-top: var(--ds-space-3);
   padding-top: var(--ds-space-3);
-  font-size: 0.85rem;
+  font-size: var(--ds-text-caption);
   line-height: 1.55;
 }
 .ds-archive-figure figcaption p {
@@ -709,7 +709,7 @@
 }
 .ds-archive-figure__credit {
   font-family: var(--ds-font-mono);
-  font-size: 0.75rem;
+  font-size: var(--ds-text-caption);
   color: var(--ds-ink-muted);
 }
 .ds-archive-figure__source {
@@ -2008,7 +2008,7 @@ a.ds-room-chip {
   display: block;
   margin-top: var(--ds-space-1);
   font-family: var(--ds-font-sans);
-  font-size: 0.875rem;
+  font-size: var(--ds-text-body-sm);
   line-height: 1.5;
   color: var(--ds-ink-muted);
 }
