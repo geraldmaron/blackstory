@@ -10,7 +10,7 @@
  *
  * No content, no plate: a caller with nothing to quote renders nothing. There is no placeholder.
  */
-import React from 'react';
+import React, { type ReactNode } from 'react';
 import Link from 'next/link';
 import { cx } from '@repo/ui';
 
@@ -18,8 +18,14 @@ void React;
 
 export type DocumentPlateProps = {
   /** The quoted words, exactly as the record quotes them. No added emphasis (P-02). */
-  readonly quote: string;
-  /** The citation for those words. */
+  readonly quote?: string | undefined;
+  /**
+   * Instead of a quotation: one of the page's own instruments, drawn with the production
+   * component a reader meets on records (the evidence grade key, the citation chain). Never an
+   * invented example.
+   */
+  readonly children?: ReactNode;
+  /** The citation for the quoted words, or one line saying what the instrument is. */
   readonly citation: string;
   /** What the sheet is, in a few words: "Operative text". */
   readonly label: string;
@@ -30,17 +36,22 @@ export type DocumentPlateProps = {
 
 export function DocumentPlate({
   quote,
+  children,
   citation,
   label,
   href,
   hrefLabel = 'Open the entry',
   className,
 }: DocumentPlateProps) {
-  if (quote.trim().length === 0) return null;
+  const text = quote?.trim() ?? '';
+  if (text.length === 0 && (children === undefined || children === null)) return null;
   return (
     <figure className={cx('ds-room-plate', className)}>
       <p className="ds-room-plate__label">{label}</p>
-      <blockquote className="ds-room-plate__text">{quote}</blockquote>
+      {text.length > 0 ? <blockquote className="ds-room-plate__text">{text}</blockquote> : null}
+      {children === undefined || children === null ? null : (
+        <div className="ds-room-plate__body">{children}</div>
+      )}
       <figcaption className="ds-room-plate__caption">
         <span>{citation}</span>
         {href === undefined ? null : (

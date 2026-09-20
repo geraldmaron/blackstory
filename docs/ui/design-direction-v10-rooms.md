@@ -39,7 +39,7 @@ A sheet set into the right of a reading-room masthead, rotated about two degrees
 
 **Reconciled with existing law.** `ArchiveFigure` already states that documentary images keep their complete frame and provenance and are never cropped for decoration. The mockup described the plate as "cropped". That wording is withdrawn. The rules are:
 
-1. **Version one is typeset, not photographic.** The plate sets words the page already quotes and cites: the operative text of a law on Law, the anatomy of a citation on Methodology and Source library. It carries its citation as a caption. It is a pull quote on a sheet, so it needs no media rights and no change to `brand.md`.
+1. **Version one is typeset, not photographic.** The plate sets words the page already quotes and cites (the operative text of a law on Law, from the earliest entry whose explainer quotes it), or one of the page's own instruments drawn with the production component a reader meets on records: the evidence grade key on Methodology, the four-step citation chain on Source library. It carries a one-line caption and a link to where the page explains it. Never an invented example, so it needs no media rights and no change to `brand.md`.
 2. **A scan, when one is cleared, goes through `ArchiveFigure`** with image, alt, credit, rights and a link to the original. The complete frame is shown. The stat band may overlap only the sheet's blank margin, never the document.
 3. **No cleared content, no plate.** The slot renders nothing. There is no placeholder frame, initials tile or "coming soon" state.
 4. People are never plate material unless identified per `brand.md` (person, role, place, year).

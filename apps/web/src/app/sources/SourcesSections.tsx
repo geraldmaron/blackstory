@@ -5,6 +5,7 @@
  */
 import React from 'react';
 import {
+  DocumentPlate,
   Note,
   Prose,
   ReadingEntry,
@@ -44,6 +45,21 @@ export function SourcesSections() {
           </>
         }
         lede={SOURCES_INTRO}
+        plate={
+          <DocumentPlate
+            label="The citation chain"
+            citation="The four steps between a URL and a citation on a public record."
+            href="#citation-chain"
+            hrefLabel="Follow the chain"
+          >
+            {SOURCE_LINEAGE_STAGES.map((stage) => (
+              <div className="ds-room-plate__row" key={stage.step}>
+                <span className="ds-room-plate__step">{stage.step}</span>
+                {stage.title}
+              </div>
+            ))}
+          </DocumentPlate>
+        }
       />
 
       <RoomJump sections={SOURCES_JUMP} />

@@ -2443,6 +2443,40 @@ a.ds-room-chip {
   color: var(--ds-ink);
 }
 
+.ds-room-plate__body {
+  display: grid;
+  gap: var(--ds-space-3);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ds-room-plate__row {
+  display: flex;
+  align-items: baseline;
+  gap: var(--ds-space-3);
+  padding-bottom: var(--ds-space-3);
+  border-bottom: var(--ds-border-width) dashed var(--ds-rule);
+  font-family: var(--ds-font-display);
+  font-size: var(--ds-text-subtitle);
+  font-weight: 600;
+  letter-spacing: -0.012em;
+}
+
+.ds-room-plate__row:last-child {
+  padding-bottom: 0;
+  border-bottom: 0;
+}
+
+.ds-room-plate__step {
+  flex: none;
+  font-family: var(--ds-font-mono);
+  font-size: var(--ds-text-micro);
+  font-weight: 400;
+  letter-spacing: 0.08em;
+  color: var(--ds-ink-muted);
+}
+
 .ds-room-plate__caption {
   display: grid;
   gap: var(--ds-space-2);
@@ -2467,11 +2501,16 @@ a.ds-room-chip {
 
   .ds-room--ledger .ds-entry--plated .ds-room-plate {
     grid-column: 8 / -1;
+    transform: rotate(-2deg);
+  }
+
+  /* The sheet slides under the stat row only where there is one. With no band to go under, it
+     stays inside the masthead instead of hanging over the jump nav. */
+  .ds-room--ledger .ds-entry--plated:has(+ .ds-room-stats) .ds-room-plate {
     position: relative;
     z-index: 1; /* local: the sheet sits under the stat row that follows, within this masthead only */
     margin-bottom: calc(var(--ds-space-8) * -2.25);
     padding-bottom: calc(var(--ds-space-8) * 1.75);
-    transform: rotate(-2deg);
     box-shadow: var(--ds-contact-plate);
   }
 
