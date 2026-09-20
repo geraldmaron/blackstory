@@ -13,6 +13,7 @@ import { bannedBookReportedStates } from '@repo/domain';
 import {
   EmptyList,
   Prose,
+  FindBar,
   RoomFactList,
   RoomHandoff,
   RoomJump,
@@ -37,7 +38,6 @@ import {
   BOOKS_RELATED,
 } from './books-copy';
 import '../typeahead.css';
-import './books-browse.css';
 import { formatResultSummary } from '../../lib/discovery/result-summary';
 
 void React;
@@ -250,89 +250,54 @@ export function BooksBrowseSections({ view, suggestCorpus, snapshot }: BooksBrow
           <p>{BOOKS_CATALOG.lede}</p>
         </Prose>
 
-        <div className="ds-books-browse">
-          <form
+        <div className="ds-find-anchor">
+          <FindBar
+            id="books"
             action="/books#browse"
-            method="get"
-            role="search"
-            className="ds-books-browse__toolbar"
-            aria-labelledby="browse-heading"
-          >
-            <BooksSearchTypeahead defaultValue={view.q} corpus={suggestCorpus} />
-            <AutoSubmitSelect
-              id="state"
-              name="state"
-              label="State"
-              defaultValue={view.state}
-              options={view.stateOptions}
-            />
-            <AutoSubmitSelect
-              id="author"
-              name="author"
-              label="Author"
-              defaultValue={view.author}
-              options={view.authorOptions}
-            />
-            <input type="hidden" name="sort" value={view.sort} />
-            <input type="hidden" name="dir" value={view.dir} />
-            <Link className="ds-cta-link" href="/books#browse">
-              Clear
-            </Link>
-          </form>
-
-          {activeChips.length > 0 ? (
-            <div className="ds-records-active" role="group" aria-label="Active filters">
-              {activeChips.map((chip) => (
-                <Link className="ds-records-active__chip" href={chip.href} key={chip.key}>
-                  {chip.label}
-                  <span className="ds-records-active__x" aria-hidden="true">
-                    ✕
-                  </span>
-                  <span className="ds-visually-hidden">, remove this filter</span>
-                </Link>
-              ))}
-              <Link className="ds-records-active__clear" href="/books#browse">
-                Clear all
-              </Link>
-            </div>
-          ) : null}
-
-          <div className="ds-room-idx__bar" role="group" aria-label="Filter by state">
-            {stateChips.map((chip) => (
-              <Link
-                key={chip.id}
-                className="ds-room-chip"
-                href={chip.href}
-                aria-current={
-                  (view.state === 'all' ? 'all' : view.state) === chip.id ? true : undefined
-                }
-              >
-                {chip.label} <span className="ds-room-num">{chip.count}</span>
-              </Link>
-            ))}
-          </div>
-
-          <nav className="ds-room-idx__bar" aria-label="Sort order">
-            {view.sortOptions.map((option) => (
-              <Link
-                key={option.key}
-                className="ds-room-chip"
-                href={`${option.href}#browse`}
-                aria-current={option.active ? true : undefined}
-              >
-                {option.label}
-                {option.active ? (
-                  <span className="ds-room-num" aria-hidden="true">
-                    {view.dir === 'asc' ? '↑' : '↓'}
-                  </span>
-                ) : null}
-              </Link>
-            ))}
-          </nav>
-
-          <p className="ds-room-idx__count" id="books-results-heading">
-            {countLabel}
-          </p>
+            queryLabel="Search titles, authors and summaries"
+            placeholder="Title, author, or summary…"
+            query={view.q}
+            searchSlot={<BooksSearchTypeahead defaultValue={view.q} corpus={suggestCorpus} />}
+            formFields={
+              <>
+                <AutoSubmitSelect
+                  id="state"
+                  name="state"
+                  label="State"
+                  defaultValue={view.state}
+                  options={view.stateOptions}
+                />
+                <AutoSubmitSelect
+                  id="author"
+                  name="author"
+                  label="Author"
+                  defaultValue={view.author}
+                  options={view.authorOptions}
+                />
+              </>
+            }
+            preserved={{ sort: view.sort, dir: view.dir }}
+            active={activeChips}
+            clearHref="/books#browse"
+            rows={[
+              {
+                label: 'Filter by state',
+                chips: stateChips.map((chip) => ({
+                  label: chip.label,
+                  href: chip.href,
+                  active: (view.state === 'all' ? 'all' : view.state) === chip.id,
+                  count: chip.count,
+                })),
+              },
+            ]}
+            sort={view.sortOptions.map((option) => ({
+              label: option.label,
+              href: `${option.href}#browse`,
+              active: option.active,
+              mark: option.active ? (view.dir === 'asc' ? '↑' : '↓') : undefined,
+            }))}
+            summary={countLabel}
+          />
 
           {view.items.length === 0 ? (
             activeWords.length > 0 ? (

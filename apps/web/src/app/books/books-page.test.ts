@@ -77,22 +77,23 @@ test('books browse renders cover-led kit rows, not the retired rip row or Hairli
 test('books browse facet chips use the room kit chip vocabulary', () => {
   // The drift guard: chips here must be the kit's, never a books-only chip class resurrected
   // from the retired edition sheet.
-  assert.match(browseSectionsSource, /IndexFilter|ds-room-chip/);
+  assert.match(browseSectionsSource, /<FindBar/);
+  assert.doesNotMatch(browseSectionsSource, /ds-books-browse/);
   assert.doesNotMatch(browseSectionsSource, /ds-books-edition__filter-chip/);
 });
 
 test('books browse preserves GET filter and sort URL contract', () => {
-  assert.match(browseSectionsSource, /method="get"/);
+  // method="get", name="q" and the absence of an Apply button are the FindBar's, asserted on the
+  // rendered component in room-kit.test.tsx. This pins what /books hands it.
+  assert.match(browseSectionsSource, /<FindBar/);
   assert.match(browseSectionsSource, /action="\/books#browse"/);
   assert.match(browseSectionsSource, /id="browse"/);
   assert.match(browseSectionsSource, /BooksSearchTypeahead/);
   assert.match(browseSectionsSource, /name="state"/);
   assert.match(browseSectionsSource, /name="author"/);
-  assert.match(browseSectionsSource, /name="sort"/);
-  assert.match(browseSectionsSource, /name="dir"/);
-  assert.match(browseSectionsSource, /aria-label="Sort order"/);
+  assert.match(browseSectionsSource, /preserved=\{\{ sort: view\.sort, dir: view\.dir \}\}/);
   assert.match(browseSectionsSource, /sortOptions\.map/);
-  assert.match(browseSectionsSource, /ds-records-active/);
+  assert.match(browseSectionsSource, /clearHref="\/books#browse"/);
 });
 
 test('books user-facing copy avoids em dashes on touched surfaces', () => {
