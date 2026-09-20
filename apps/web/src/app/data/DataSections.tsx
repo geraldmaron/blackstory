@@ -212,15 +212,21 @@ function Section({
   return (
     <section className="ds-data-section" id={id} aria-labelledby={headingId}>
       <header className="ds-data-section__head">
-        <p className="ds-data-section__kicker">
+        {/* The same chapter head as every other room: a plate, a kicker, a heading. An act on
+            /data and a chapter on /methodology are one object, so they read from one rule set. */}
+        <div className="ds-room-section__head">
           {sectionMeta ? (
-            <DestinationIcon id={sectionMeta.icon} className="ds-kicker-glyph" />
+            <span className="ds-room-section__plate" aria-hidden="true">
+              <DestinationIcon id={sectionMeta.icon} size="lg" />
+            </span>
           ) : null}
-          {copy.kicker}
-        </p>
-        <h2 className="ds-data-section__title" id={headingId}>
-          {copy.title}
-        </h2>
+          <div className="ds-room-section__titles">
+            <p className="ds-room-section__kicker">{copy.kicker}</p>
+            <h2 className="ds-room-section__title ds-data-section__title" id={headingId}>
+              {copy.title}
+            </h2>
+          </div>
+        </div>
         <p className="ds-data-section__lede">{copy.lede}</p>
         {meta.length > 0 ? (
           <p className="ds-data-section__meta">
