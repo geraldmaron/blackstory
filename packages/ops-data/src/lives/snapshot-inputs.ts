@@ -13,6 +13,8 @@ import {
 } from '@repo/domain/statistics/lives';
 
 export type ObservationRow = {
+  /** Optional so rows read before gaps were derived still map. */
+  readonly id?: string;
   readonly metric_id: string;
   readonly jurisdiction_id: string;
   readonly reference_period: string;
@@ -62,7 +64,7 @@ export const JURISDICTIONS_SQL = `
   SELECT id, name FROM reference.jurisdictions WHERE id = ANY($1::text[])`;
 
 export const OBSERVATIONS_SQL = `
-  SELECT metric_id, jurisdiction_id, reference_period, race_ethnicity_slice, estimate, numerator,
+  SELECT id, metric_id, jurisdiction_id, reference_period, race_ethnicity_slice, estimate, numerator,
          denominator, source, source_url, metadata
   FROM reference.statistical_observations
   WHERE jurisdiction_id = ANY($1::text[]) AND status = 'observed' AND metric_id LIKE 'lives-%'`;
@@ -102,6 +104,7 @@ export function mapObservationRow(row: ObservationRow): LivesObservationInput {
   const numeratorMoe = numberOrNull(row.metadata?.numeratorMoe);
   const denominatorMoe = numberOrNull(row.metadata?.denominatorMoe);
   return {
+    ...(row.id ? { id: row.id } : {}),
     metricId: row.metric_id,
     jurisdictionId: row.jurisdiction_id,
     referencePeriod: row.reference_period,

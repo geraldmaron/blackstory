@@ -267,3 +267,46 @@ test('a quote needs a speaker and stays within forty words', () => {
   ]);
   assert.match(long.errors.join('\n'), /quote is longer than 40 words/);
 });
+
+test('a group gap is derived only from two published rates, and claims no cause', async () => {
+  const { deriveLivesConditionGap } = await import('./lives.js');
+  const published = (estimate: number, extra: Record<string, unknown> = {}) => ({
+    state: 'published' as const,
+    estimate,
+    definitionLabel: 'as the census recorded it',
+    ...extra,
+  });
+  const pending = { state: 'pending' as const, reason: 'Not yet loaded' };
+
+  const home = deriveLivesConditionGap({
+    black: published(24.62, { observationIds: ['obs-b'] }),
+    white: published(50.42, { observationIds: ['obs-w'] }),
+    hispanic: pending,
+  });
+  assert.equal(home?.points, 25.8);
+  assert.equal(home?.status, 'derived');
+  assert.deepEqual(home?.inputObservationIds, ['obs-b', 'obs-w']);
+  assert.match(home?.assumptions.join(' ') ?? '', /does not say why/);
+  assert.equal(home?.uncertainty, undefined);
+
+  // The Black figure may be the higher one; the gap is a distance either way.
+  const work = deriveLivesConditionGap({
+    black: published(12, { marginOfError: 0.3 }),
+    white: published(6, { marginOfError: 0.4 }),
+    hispanic: pending,
+  });
+  assert.equal(work?.points, 6);
+  assert.equal(work?.uncertainty, 0.5);
+
+  assert.equal(
+    deriveLivesConditionGap({ black: published(20), white: pending, hispanic: pending }),
+    null,
+  );
+});
+
+test('shares of one total are never reported as a gap between groups', async () => {
+  const { livesConditionIsGroupRate } = await import('./lives.js');
+  assert.equal(livesConditionIsGroupRate('population_share'), false);
+  assert.equal(livesConditionIsGroupRate('homeownership'), true);
+  assert.equal(livesConditionIsGroupRate('unemployed'), true);
+});

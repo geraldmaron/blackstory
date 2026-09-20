@@ -89,6 +89,8 @@ export type LivesCell = {
   /** The count note that explains a missing or limited figure. */
   readonly noteId?: string;
   readonly sources?: readonly LivesSourceRef[];
+  /** `reference.statistical_observations` ids behind a published figure, for derived measures. */
+  readonly observationIds?: readonly string[];
 };
 
 export type LivesJurisdictionInput = {
@@ -97,6 +99,8 @@ export type LivesJurisdictionInput = {
 };
 
 export type LivesObservationInput = {
+  /** `reference.statistical_observations.id`. Absent on inputs built before gaps were derived. */
+  readonly id?: string;
   readonly metricId: string;
   readonly jurisdictionId: string;
   readonly referencePeriod: string;
@@ -190,12 +194,71 @@ export type LivesRule = {
   readonly description?: string | null;
 };
 
+/**
+ * The distance between two groups' published rates, in percentage points. It is the "derived gap"
+ * shape docs/methodology/juxtaposition-not-causation.md allows: plain arithmetic on published
+ * figures, carrying its formula and the observations it was computed from. It is a difference and
+ * claims no cause. It carries no timestamp of its own, so an unchanged figure still hashes the
+ * same and the snapshot is not rewritten; the snapshot's `generatedAt` dates it.
+ */
+export type LivesConditionGap = {
+  readonly methodId: 'lives-group-gap';
+  readonly methodVersion: '1';
+  readonly status: 'derived';
+  readonly betweenLenses: readonly [LivesLens, LivesLens];
+  /** Absolute difference, from the unrounded estimates. */
+  readonly points: number;
+  /** 90% margin on the difference, when both figures carry a survey margin. */
+  readonly uncertainty?: number;
+  readonly formula: string;
+  readonly inputObservationIds: readonly string[];
+  readonly assumptions: readonly string[];
+};
+
 export type LivesConditionBundle = {
   readonly key: LivesConditionKey;
   readonly label: string;
   readonly universe: string;
   readonly cells: Readonly<Record<LivesLens, LivesCell>>;
+  /** Black against white, when both figures are published rates. Optional: older snapshots lack it. */
+  readonly gap?: LivesConditionGap;
 };
+
+/** True when the condition is each group's own rate of an outcome, so two groups can be compared. */
+export function livesConditionIsGroupRate(key: LivesConditionKey): boolean {
+  return key !== 'population_share';
+}
+
+/** Black against white only: the comparison every panel draws. Null unless both are published rates. */
+export function deriveLivesConditionGap(
+  cells: Readonly<Record<LivesLens, LivesCell>>,
+): LivesConditionGap | null {
+  const { black, white } = cells;
+  const usable = (cell: LivesCell): cell is LivesCell & { estimate: number } =>
+    (cell.state === 'published' || cell.state === 'wide_margin') && cell.estimate !== undefined;
+  if (!usable(black) || !usable(white)) return null;
+  const points = Math.round(Math.abs(white.estimate - black.estimate) * 100) / 100;
+  const uncertainty =
+    black.marginOfError !== undefined && white.marginOfError !== undefined
+      ? Math.round(Math.sqrt(black.marginOfError ** 2 + white.marginOfError ** 2) * 100) / 100
+      : undefined;
+  return {
+    methodId: 'lives-group-gap',
+    methodVersion: '1',
+    status: 'derived',
+    betweenLenses: ['black', 'white'],
+    points,
+    ...(uncertainty !== undefined ? { uncertainty } : {}),
+    formula:
+      'The larger of the two published rates minus the smaller, in percentage points, before rounding. Each rate uses its own group’s denominator.',
+    inputObservationIds: [...(black.observationIds ?? []), ...(white.observationIds ?? [])],
+    assumptions: [
+      `Black: ${black.definitionLabel ?? 'definition not recorded'}`,
+      `White: ${white.definitionLabel ?? 'definition not recorded'}`,
+      'A difference between two published figures. It does not say why the figures differ.',
+    ],
+  };
+}
 
 /** How a decade relates to the one before it: same measure, a same-unit method change, or a new measure. */
 export type LivesBoundaryKind = 'none' | 'method_note' | 'different_measure';
@@ -439,6 +502,9 @@ export function buildLivesAreaBundle(input: BuildLivesAreaBundleInput): LivesAre
         ...coverage,
         derived,
         sources: sourcesOf(rows),
+        ...(rows.some((row) => row.id)
+          ? { observationIds: rows.flatMap((row) => (row.id ? [row.id] : [])) }
+          : {}),
       };
     };
 
@@ -583,7 +649,7 @@ export function buildLivesAreaBundle(input: BuildLivesAreaBundleInput): LivesAre
       };
     });
 
-    const conditions = LIVES_CONDITIONS.map((condition): LivesConditionBundle => ({
+    const conditionsWithoutGaps = LIVES_CONDITIONS.map((condition): LivesConditionBundle => ({
       key: condition.key,
       label: livesConditionLabel(condition.key, regime),
       universe: condition.universe,
@@ -591,7 +657,7 @@ export function buildLivesAreaBundle(input: BuildLivesAreaBundleInput): LivesAre
         if (!livesConditionPublishedIn(condition, decade)) {
           return {
             state: 'not_measured',
-            reason: `The census did not publish this by race in the ${decade}s.`,
+            reason: `The census didn’t publish this by race in the ${decade}s.`,
           };
         }
         if (condition.seriesId !== null) {
@@ -627,6 +693,17 @@ export function buildLivesAreaBundle(input: BuildLivesAreaBundleInput): LivesAre
         };
       }),
     }));
+
+    // A gap is derived only where two groups each have a RATE of the same outcome. Two measures
+    // are not that. The income condition is a ratio to the national median built from brackets.
+    // Population share is each group's slice of ONE total, so the distance between the Black and
+    // white slices is not a gap between groups at all ("76 points apart" was the tell).
+    const conditions = conditionsWithoutGaps.map((bundle): LivesConditionBundle => {
+      const spec = LIVES_CONDITIONS.find((condition) => condition.key === bundle.key);
+      if (!spec || spec.seriesId === null || !livesConditionIsGroupRate(bundle.key)) return bundle;
+      const gap = deriveLivesConditionGap(bundle.cells);
+      return gap ? { ...bundle, gap } : bundle;
+    });
 
     const allowed = new Set(area.kind === 'nation' ? [NATION_ID] : [NATION_ID, ...memberIds]);
     const rulesInForce = input.applicability

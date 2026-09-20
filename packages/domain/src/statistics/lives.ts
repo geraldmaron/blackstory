@@ -89,6 +89,8 @@ export {
   LIVES_MIN_BASE,
   LIVES_MIN_COVERAGE,
   buildLivesAreaBundle,
+  deriveLivesConditionGap,
+  livesConditionIsGroupRate,
   livesComparableChange,
 } from './lives-timeline.js';
 export type {
@@ -99,6 +101,7 @@ export type {
   LivesCell,
   LivesCellState,
   LivesConditionBundle,
+  LivesConditionGap,
   LivesCountNote,
   LivesCountNoteInput,
   LivesCoverageInput,

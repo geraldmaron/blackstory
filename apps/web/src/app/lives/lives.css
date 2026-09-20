@@ -1757,3 +1757,17 @@
   outline: var(--ds-focus-width) solid var(--ds-focus-ring);
   outline-offset: 2px;
 }
+
+.lives-era__gap {
+  max-width: 46rem;
+  margin: var(--ds-space-3) 0 0;
+  font-size: var(--ds-text-caption);
+  line-height: 1.5;
+  color: var(--ds-ink-muted);
+}
+
+.lives-era__gap strong {
+  font-family: var(--ds-font-mono);
+  font-size: var(--ds-text-body-sm);
+  color: var(--ds-ink);
+}

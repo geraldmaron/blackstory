@@ -7,6 +7,7 @@ import {
   LIVES_WORLD_DOMAIN_LABELS,
   livesWorldMediationLine,
   type LivesAreaBundle,
+  type LivesConditionGap,
   type LivesSourceRef,
 } from '@repo/domain/statistics/lives';
 import {
@@ -174,6 +175,32 @@ function ContextBlock({ context }: { readonly context: LivesMilestoneContext }) 
 
 type ReaderPanel = LivesMilestonePanel<HydratedArticle>;
 
+/**
+ * The distance between the Black and white figures, in words. It is a derived measurement with its
+ * formula attached, which docs/methodology/juxtaposition-not-causation.md allows, and it stays
+ * inside one panel: two eras are never subtracted from each other. "Apart" carries no direction,
+ * so it reads the same whether the Black figure is the lower one (owning a home) or the higher one
+ * (looking for work).
+ */
+function GapLine({ gap }: { readonly gap: LivesConditionGap }) {
+  const [first, second] = gap.betweenLenses;
+  const rounded = Math.round(gap.points);
+  return (
+    <p className="lives-era__gap">
+      <strong>
+        About {rounded} {rounded === 1 ? 'point' : 'points'} apart
+      </strong>{' '}
+      <span>
+        {LIVES_LENS_LABELS[first]} and {LIVES_LENS_LABELS[second]}.
+        {gap.uncertainty !== undefined && gap.uncertainty >= 0.5
+          ? ` Give or take ${Math.round(gap.uncertainty)}.`
+          : ''}{' '}
+        {gap.formula}
+      </span>
+    </p>
+  );
+}
+
 function FigureSection({ figure }: { readonly figure: LivesMilestoneFigure }) {
   return (
     <>
@@ -210,6 +237,7 @@ function FigureSection({ figure }: { readonly figure: LivesMilestoneFigure }) {
             );
           })}
         </dl>
+        {figure.condition.gap ? <GapLine gap={figure.condition.gap} /> : null}
         {figure.decade.decade >= 2010 &&
         ['homeownership', 'high_school', 'unemployed'].includes(figure.condition.key) ? (
           <p className="lives-era__definition">
