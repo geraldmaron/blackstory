@@ -28,3 +28,26 @@ export function booksCatalogPulseMeta(snapshot: BannedBooksListingSnapshot): rea
     `As of ${retrieved}`,
   ];
 }
+
+/**
+ * The same three counts as figures for the ledger stat row. The retrieval date is not a count, so
+ * it stays in the colophon line.
+ */
+export function booksCatalogStats(
+  snapshot: BannedBooksListingSnapshot,
+): readonly { readonly value: number; readonly label: string }[] {
+  const authors = new Set<string>();
+  const states = new Set<string>();
+  for (const book of snapshot.books) {
+    for (const author of book.authors) {
+      if (author.name.trim()) authors.add(author.name.trim());
+    }
+    for (const code of bannedBookReportedStates(book)) states.add(code);
+  }
+  const titles = snapshot.books.length;
+  return [
+    { value: titles, label: titles === 1 ? 'title' : 'titles' },
+    { value: authors.size, label: authors.size === 1 ? 'author' : 'authors' },
+    { value: states.size, label: states.size === 1 ? 'state cited' : 'states cited' },
+  ];
+}

@@ -40,6 +40,7 @@ export {
   type RoomHandoffProps,
 } from './RoomSection';
 export { DocumentPlate, type DocumentPlateProps } from './DocumentPlate';
+export { KeepGoing, type KeepGoingProps } from './KeepGoing';
 export { RoomStats, type RoomStatsProps, type RoomStat } from './RoomStats';
 export { RoomJump, type RoomJumpProps, type RoomJumpSection } from './RoomJump';
 export {

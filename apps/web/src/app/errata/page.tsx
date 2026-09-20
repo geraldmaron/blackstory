@@ -14,7 +14,7 @@ import {
 import { listErrataEntries } from '../../lib/trust/errata-seed';
 import { TRUST_PATHS } from '../../lib/trust/site-identity';
 import { ErrataSections } from './ErrataSections';
-import { Room, ReadingEntry, RoomHandoff, RoomSection } from '../../components/room';
+import { Room, ReadingEntry, RoomHandoff, RoomSection, RoomStats } from '../../components/room';
 import { WalkOffRamp } from '../walk-off-ramp';
 import '../reading-room.css';
 
@@ -27,6 +27,10 @@ export const metadata: Metadata = buildStaticPageMetadata({
 
 export default function ErrataPage() {
   const entries = listErrataEntries();
+  const latest = entries
+    .map((entry) => entry.timestamp.slice(0, 10))
+    .sort()
+    .at(-1);
 
   return (
     <Room ledger>
@@ -40,6 +44,16 @@ export default function ErrataPage() {
           </>
         }
         lede="Every correction to a published record lands here, with the date it was made and what it changed. Nothing on this site is edited quietly."
+      />
+      <RoomStats
+        label="The log at a glance"
+        stats={[
+          {
+            value: entries.length,
+            label: entries.length === 1 ? 'entry in the log' : 'entries in the log',
+          },
+          ...(latest === undefined ? [] : [{ value: latest, label: 'most recent entry' }]),
+        ]}
       />
 
       <RoomSection id="log" icon="errata" kicker="Log" title="Published corrections" tone="sunk">

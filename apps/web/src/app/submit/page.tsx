@@ -5,7 +5,7 @@
 import type { Metadata } from 'next';
 import { buildStaticPageMetadata } from '../../lib/seo/metadata-builders';
 import { EmptyState, Notice } from '@repo/ui';
-import { Room, ReadingEntry, RoomSection } from '../../components/room';
+import { KeepGoing, Room, ReadingEntry, RoomSection } from '../../components/room';
 import { SUPPORT_CONTACT } from '../../lib/config/contact';
 import { WalkOffRamp } from '../walk-off-ramp';
 import '../utility.css';
@@ -52,6 +52,8 @@ export default function SubmitLeadPage() {
           have, write to <a href={`mailto:${SUPPORT_CONTACT}`}>{SUPPORT_CONTACT}</a> instead.
         </EmptyState>
       </RoomSection>
+
+      <KeepGoing paths={['/corrections', '/methodology', '/errata']} />
 
       <WalkOffRamp>Nothing you send here is public on arrival.</WalkOffRamp>
     </Room>

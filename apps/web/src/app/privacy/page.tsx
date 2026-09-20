@@ -4,7 +4,7 @@
  */
 import type { Metadata } from 'next';
 import { buildStaticPageMetadata } from '../../lib/seo/metadata-builders';
-import { Room, ReadingEntry } from '../../components/room';
+import { Room, ReadingEntry, KeepGoing } from '../../components/room';
 import { WalkOffRamp } from '../walk-off-ramp';
 import '../utility.css';
 import { PrivacySections } from './PrivacySections';
@@ -29,6 +29,8 @@ export default function PrivacyPage() {
         lede="What the BlackStory website processes, and what it deliberately does not. There are no accounts and no advertising, and the map asks for your location only when you press a control that says so."
       />
       <PrivacySections />
+      <KeepGoing paths={['/terms', '/support']} />
+
       <WalkOffRamp>How this site treats what you send it.</WalkOffRamp>
     </Room>
   );

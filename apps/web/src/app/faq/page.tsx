@@ -21,6 +21,7 @@ import {
   RoomJump,
   RoomSection,
   roomSectionTone,
+  KeepGoing,
 } from '../../components/room';
 import { FAQ_LEDE, FAQ_SECTIONS } from './faq-copy';
 import '../reading-room.css';
@@ -99,6 +100,8 @@ export default function FaqPage() {
           </Prose>
         </RoomSection>
       ))}
+
+      <KeepGoing paths={['/methodology', '/sources', '/about']} />
 
       <WalkOffRamp
         title="Still stuck"

@@ -18,6 +18,7 @@ import {
   RoomCard,
   RoomSection,
   roomSectionTone,
+  KeepGoing,
 } from '../../components/room';
 import { DestinationIcon } from '../../components/patterns/DestinationIcon';
 import { WalkOffRamp } from '../walk-off-ramp';
@@ -137,6 +138,8 @@ export default function SupportPage() {
           running for as long as I can.
         </p>
       </RoomSection>
+
+      <KeepGoing paths={['/faq', '/submit']} />
 
       <WalkOffRamp>Saying a record is wrong is the fastest way to change what it says.</WalkOffRamp>
     </Room>

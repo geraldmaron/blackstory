@@ -8,7 +8,7 @@ import React, { Suspense } from 'react';
 import Link from 'next/link';
 import { CorrectionForm } from './CorrectionForm';
 import { CORRECTION_PRIVACY_NOTICE } from './copy';
-import { Disclosure, RoomSection, UtilityStep } from '../../components/room';
+import { Disclosure, RoomSection, UtilityStep, KeepGoing } from '../../components/room';
 import { WalkOffRamp } from '../walk-off-ramp';
 import './corrections.css';
 
@@ -60,6 +60,8 @@ export function CorrectionsSections() {
           </p>
         </Disclosure>
       </RoomSection>
+
+      <KeepGoing paths={['/errata', '/methodology', '/support']} />
 
       <WalkOffRamp
         title={

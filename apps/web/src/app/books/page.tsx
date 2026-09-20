@@ -11,9 +11,9 @@ import { bannedBookToSuggestCorpusItem } from '../../lib/banned-books/suggest-bo
 import { loadBannedBooksListing } from '../../lib/banned-books/public-source.js';
 import { buildBooksBrowseViewModel, type RawBooksBrowseParams } from './books-view-model';
 import { BooksBrowseSections } from './BooksBrowseSections';
-import { booksCatalogPulseMeta } from './BooksCatalogPulse';
+import { booksCatalogPulseMeta, booksCatalogStats } from './BooksCatalogPulse';
 import { BOOKS_INDEX_LEDE, BOOKS_PAGE_DESCRIPTION } from './books-copy';
-import { DocumentColophon, ReadingEntry, Room } from '../../components/room';
+import { DocumentColophon, ReadingEntry, Room, RoomStats } from '../../components/room';
 import { WalkOffRamp } from '../walk-off-ramp';
 import '../reading-room.css';
 
@@ -68,7 +68,8 @@ export default async function BooksPage({ searchParams }: BooksPageProps) {
         }
         lede={BOOKS_INDEX_LEDE}
       />
-      <DocumentColophon facts={booksCatalogPulseMeta(snapshot)} />
+      <RoomStats label="The catalog at a glance" stats={booksCatalogStats(snapshot)} />
+      <DocumentColophon facts={booksCatalogPulseMeta(snapshot).slice(-1)} />
 
       <BooksBrowseSections view={view} suggestCorpus={suggestCorpus} snapshot={snapshot} />
 
