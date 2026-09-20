@@ -278,12 +278,18 @@ What this does and does not permit:
 - **Accounts may publish with this note in place.** Every account is the speaker's own words, quoted
   verbatim from a holding institution, labeled with how the words reached the page, and linked to
   the original. §5 is explicit that the step "does not block on a formal board".
-- **The Turn ships only in the forms that put no group's outcome in the question.** The structure
-  decision (`docs/research/lives-structure-decision.md` §5) was built almost entirely from studies
-  of white learners, which is the reason this note exists. Until a reviewer has read it, the Turn
-  is limited to form 2 (then against now, same group, direction only) and form 3 (a rule or a
-  census question), and each instance passes the classroom test before it ships. Form 1 waits for
-  review as well as for the bundle change it needs.
+- **Only form 3 of the Turn ships.** The structure decision
+  (`docs/research/lives-structure-decision.md` §5) was built almost entirely from studies of white
+  learners, which is the reason this note exists. Until a reviewer has read it, the Turn is limited
+  to form 3: a question about a rule, or about what the census form asked, with no group named in
+  the question or in any answer choice. Each Turn records its answer to the classroom test, and
+  every reveal restates a record already published and cited on the page, so a Turn adds no fact
+  of its own. `apps/web/src/lib/lives/lives-turns.test.tsx` enforces all of it, including that the
+  control stores, sends, scores and logs nothing.
+  Form 2 (one group's figure, then against now) is not placed, for a reason separate from review:
+  `LivesCell` carries no structured universe or source identity, and the pair the structure decision
+  sketched, 2000 against 2020, compares a full census count with a survey estimate. Form 1 needs
+  state-level spread in the bundle. Both also wait for review.
 - **The absence is public.** The Lives section of `/methodology` says in plain words that no
   community reviewer has read this material yet.
 

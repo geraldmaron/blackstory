@@ -1771,3 +1771,76 @@
   font-size: var(--ds-text-body-sm);
   color: var(--ds-ink);
 }
+
+/* ---- The Turn: one question before the record ---- */
+
+.lives-turn {
+  max-width: 46rem;
+  margin: var(--ds-space-5) 0;
+  padding: var(--ds-space-4);
+  border: var(--ds-border-width) solid var(--ds-rule);
+}
+
+.lives-turn__question {
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.lives-turn__question legend {
+  padding: 0;
+  margin-bottom: var(--ds-space-3);
+  font-family: var(--ds-font-editorial);
+  font-size: var(--ds-text-editorial);
+  line-height: 1.45;
+}
+
+.lives-turn__options {
+  display: grid;
+  gap: var(--ds-space-2);
+}
+
+.lives-turn__option {
+  display: flex;
+  align-items: center;
+  gap: var(--ds-space-3);
+  min-height: 2.75rem;
+  padding: var(--ds-space-2) var(--ds-space-3);
+  border: var(--ds-border-width) solid var(--ds-rule);
+  font-size: var(--ds-text-body-sm);
+  cursor: pointer;
+}
+
+.lives-turn__option input {
+  width: 1.5rem;
+  height: 1.5rem;
+  margin: 0;
+  flex: none;
+  accent-color: var(--ds-accent);
+}
+
+.lives-turn__option:has(input:focus-visible) {
+  outline: var(--ds-focus-width) solid var(--ds-focus-ring);
+  outline-offset: 2px;
+}
+
+.lives-turn__option:has(input:checked) {
+  border-color: var(--ds-ink);
+}
+
+.lives-turn__reveal p {
+  margin: var(--ds-space-4) 0 0;
+  font-size: var(--ds-text-body);
+  line-height: 1.55;
+}
+
+.lives-turn__reveal .lives-turn__records {
+  font-family: var(--ds-font-mono);
+  font-size: var(--ds-text-caption);
+  color: var(--ds-ink-muted);
+}
+
+.lives-turn__records a {
+  color: var(--ds-accent);
+  text-underline-offset: 0.2em;
+}

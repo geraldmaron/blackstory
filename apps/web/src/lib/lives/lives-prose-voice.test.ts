@@ -11,6 +11,7 @@ import { test } from 'node:test';
 import { findProseVoiceIssues } from '@repo/domain/editorial';
 import { LIVES_ARCHIVE_READINGS } from './lives-archive';
 import { LIVES_WORLD_BEAT_FIXTURES } from './world-beat-fixtures';
+import { LIVES_TURNS } from './lives-turns';
 
 type Authored = { readonly where: string; readonly text: string };
 
@@ -42,8 +43,16 @@ function beatProse(): Authored[] {
   ]);
 }
 
+function turnProse(): Authored[] {
+  return Object.entries(LIVES_TURNS).flatMap(([key, turn]) => [
+    { where: `turn ${key} prompt`, text: turn.prompt },
+    { where: `turn ${key} reveal`, text: turn.reveal },
+    ...turn.options.map((option) => ({ where: `turn ${key} option`, text: option.label })),
+  ]);
+}
+
 test('Lives readings, accounts and beats pass the word-level voice gate', () => {
-  const failures = [...archiveProse(), ...beatProse()].flatMap(({ where, text }) =>
+  const failures = [...archiveProse(), ...beatProse(), ...turnProse()].flatMap(({ where, text }) =>
     findProseVoiceIssues(text).map((finding) => `${where}: ${finding.label}: …${finding.excerpt}…`),
   );
   assert.deepEqual(failures, []);

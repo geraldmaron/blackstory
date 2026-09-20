@@ -24,6 +24,8 @@ import type { HydratedArticle } from '../../lib/articles/hydrate';
 import { ArticleBody } from '../article/ArticleBody';
 import { ArticleReferences } from '../article/ArticleReferences';
 import { LivesAccount } from './LivesAccount';
+import { LivesTurn } from './LivesTurn';
+import { livesTurnFor } from '../../lib/lives/lives-turns';
 import { describeLivesCell } from '../../lib/lives/lives-format';
 import { LIVES_ARCHIVE_READINGS } from '../../lib/lives/lives-archive';
 import { ArchiveFigure, RoomHandoff } from '../room';
@@ -262,7 +264,14 @@ function FigureSection({ figure }: { readonly figure: LivesMilestoneFigure }) {
  * then the history, then the count, then the rules that began. Census method sits one tap away once
  * there is prose to read, so the page is about lives before it is about the count.
  */
-function EraPanel({ panel }: { readonly panel: ReaderPanel }) {
+function EraPanel({
+  panel,
+  milestone,
+}: {
+  readonly panel: ReaderPanel;
+  readonly milestone: LivesMilestone;
+}) {
+  const turn = livesTurnFor(milestone.key, panel.era.id);
   const titleId = `lives-era-${panel.era.id}`;
   const { narrative, figure } = panel;
   const title = narrative?.doc.title ?? figure?.condition.label ?? panel.era.label;
@@ -305,6 +314,8 @@ function EraPanel({ panel }: { readonly panel: ReaderPanel }) {
           <strong>No comparison for this stretch.</strong> {panel.figureAbsence}
         </p>
       )}
+
+      {turn ? <LivesTurn turn={turn} /> : null}
 
       {panel.rules.length > 0 ? (
         <section className="lives-era__rules" aria-label={`Rules beginning in ${panel.era.label}`}>
@@ -416,7 +427,7 @@ export function LivesMilestoneExperience({
             </nav>
           </div>
           {panels.map((panel) => (
-            <EraPanel key={panel.era.id} panel={panel} />
+            <EraPanel key={panel.era.id} panel={panel} milestone={milestone} />
           ))}
         </div>
       ) : (
