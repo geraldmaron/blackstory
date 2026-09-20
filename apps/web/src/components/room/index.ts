@@ -40,6 +40,13 @@ export {
   type RoomHandoffProps,
 } from './RoomSection';
 export { RoomJump, type RoomJumpProps, type RoomJumpSection } from './RoomJump';
+export {
+  FindBar,
+  type FindBarProps,
+  type FindBarChip,
+  type FindBarChipRow,
+  type FindBarConstraint,
+} from './FindBar';
 export { Prose, RecordRef, type ProseProps, type RecordRefProps } from './Prose';
 export { ReadingProgress, type ReadingProgressProps } from './ReadingProgress';
 export {

@@ -8,7 +8,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { US_STATES } from '@repo/domain';
-import { EmptyList, Prose } from '../../components/room';
+import { EmptyList, FindBar, Prose } from '../../components/room';
 import { LegalDisclaimer, humanizeLegalKind, humanizeLegalTopic } from '../../components/legal';
 import type { LegalSnapshotDocument } from '../../lib/legal/public-source';
 import { formatResultSummary } from '../../lib/discovery/result-summary';
@@ -112,139 +112,90 @@ export function LawBrowseSections({ view, catalog }: LawBrowseSectionsProps) {
 
       <LegalDisclaimer />
 
-      <section id="browse" className="ds-law-browse" aria-labelledby="law-browse-heading">
-        <form
-          className="ds-records-find"
-          method="get"
+      <section id="browse" className="ds-find-anchor" aria-labelledby="law-browse-heading">
+        <h2 id="law-browse-heading" className="ds-room-grouphd">
+          Browse statutes and decisions
+        </h2>
+
+        <FindBar
+          id="law"
           action="/law#browse"
-          role="search"
-          aria-labelledby="law-browse-heading"
-        >
-          <h2 id="law-browse-heading" className="ds-room-grouphd">
-            Browse statutes and decisions
-          </h2>
-          {/* `ds-records-find__label` was never defined in any stylesheet, so this rendered as
-            unstyled stray body text above the field. The identical control in `RecordsIndex`
-            hides its label and lets the placeholder carry the visible prompt; matching it keeps
-            the accessible name without the orphaned class or the duplicated visible text. */}
-          <label className="ds-visually-hidden" htmlFor="law-q">
-            Title, citation or topic
-          </label>
-          <div className="ds-records-find__row">
-            <input
-              className="ds-records-find__input"
-              id="law-q"
-              name="q"
-              type="search"
-              defaultValue={view.q}
-              placeholder="Brown v. Board, voting, 42 U.S.C…"
-              autoComplete="off"
-            />
-            <button className="ds-records-find__go" type="submit">
-              Search
-            </button>
-          </div>
-          {view.kind !== 'all' ? <input type="hidden" name="kind" value={view.kind} /> : null}
-          {view.topic !== 'all' ? <input type="hidden" name="topic" value={view.topic} /> : null}
-          {view.sort !== 'chronological' ? (
-            <input type="hidden" name="sort" value={view.sort} />
-          ) : null}
-        </form>
-
-        {activeChips.length > 0 ? (
-          <div className="ds-records-active" role="group" aria-label="Active filters">
-            {activeChips.map((chip) => (
-              <Link className="ds-records-active__chip" href={chip.href} key={chip.key}>
-                {chip.label}
-                <span className="ds-records-active__x" aria-hidden="true">
-                  ✕
-                </span>
-                <span className="ds-visually-hidden"> — remove this filter</span>
-              </Link>
-            ))}
-            <Link className="ds-records-active__clear" href="/law">
-              Clear all
-            </Link>
-          </div>
-        ) : null}
-
-        <div className="ds-room-idx__bar" role="group" aria-label="Filter by kind">
-          <Link
-            className="ds-room-chip"
-            href={buildLawHref({ q: view.q, kind: 'all', topic: view.topic, sort: view.sort })}
-            aria-current={view.kind === 'all' ? true : undefined}
-          >
-            All kinds <span className="ds-room-num">{catalog.length}</span>
-          </Link>
-          {view.kindOptions
-            .filter((option) => option.value !== 'all')
-            .map((option) => (
-              <Link
-                key={option.value}
-                className="ds-room-chip"
-                href={buildLawHref({
-                  q: view.q,
-                  kind: option.value,
-                  topic: view.topic,
-                  sort: view.sort,
-                })}
-                aria-current={view.kind === option.value ? true : undefined}
-              >
-                {humanizeLegalKind(option.value)}{' '}
-                <span className="ds-room-num">{kindCounts.get(option.value) ?? 0}</span>
-              </Link>
-            ))}
-        </div>
-
-        <div className="ds-room-idx__bar" role="group" aria-label="Filter by topic">
-          <Link
-            className="ds-room-chip"
-            href={buildLawHref({ q: view.q, kind: view.kind, topic: 'all', sort: view.sort })}
-            aria-current={view.topic === 'all' ? true : undefined}
-          >
-            All topics
-          </Link>
-          {view.topicOptions
-            .filter((option) => option.value !== 'all')
-            .map((option) => (
-              <Link
-                key={option.value}
-                className="ds-room-chip"
-                href={buildLawHref({
-                  q: view.q,
-                  kind: view.kind,
-                  topic: option.value,
-                  sort: view.sort,
-                })}
-                aria-current={view.topic === option.value ? true : undefined}
-              >
-                {humanizeLegalTopic(option.value)}{' '}
-                <span className="ds-room-num">{topicCounts.get(option.value) ?? 0}</span>
-              </Link>
-            ))}
-        </div>
-
-        <nav className="ds-room-idx__bar" aria-label="Sort order">
-          {view.sortOptions.map((option) => (
-            <Link
-              key={option.value}
-              className="ds-room-chip"
-              href={buildLawHref({
-                q: view.q,
-                kind: view.kind,
-                topic: view.topic,
-                sort: option.value,
-              })}
-              aria-current={view.sort === option.value ? true : undefined}
-            >
-              {option.label}
-            </Link>
-          ))}
-        </nav>
-
-        <p className="ds-room-idx__count" id="law-results-heading">
-          {countLabel}
-        </p>
+          queryLabel="Title, citation or topic"
+          placeholder="Brown v. Board, voting, 42 U.S.C…"
+          query={view.q}
+          preserved={{
+            kind: view.kind !== 'all' ? view.kind : undefined,
+            topic: view.topic !== 'all' ? view.topic : undefined,
+            sort: view.sort !== 'chronological' ? view.sort : undefined,
+          }}
+          active={activeChips}
+          clearHref="/law"
+          rows={[
+            {
+              label: 'Filter by kind',
+              chips: [
+                {
+                  label: 'All kinds',
+                  href: buildLawHref({
+                    q: view.q,
+                    kind: 'all',
+                    topic: view.topic,
+                    sort: view.sort,
+                  }),
+                  active: view.kind === 'all',
+                  count: catalog.length,
+                },
+                ...view.kindOptions
+                  .filter((option) => option.value !== 'all')
+                  .map((option) => ({
+                    label: humanizeLegalKind(option.value),
+                    href: buildLawHref({
+                      q: view.q,
+                      kind: option.value,
+                      topic: view.topic,
+                      sort: view.sort,
+                    }),
+                    active: view.kind === option.value,
+                    count: kindCounts.get(option.value) ?? 0,
+                  })),
+              ],
+            },
+            {
+              label: 'Filter by topic',
+              chips: [
+                {
+                  label: 'All topics',
+                  href: buildLawHref({ q: view.q, kind: view.kind, topic: 'all', sort: view.sort }),
+                  active: view.topic === 'all',
+                },
+                ...view.topicOptions
+                  .filter((option) => option.value !== 'all')
+                  .map((option) => ({
+                    label: humanizeLegalTopic(option.value),
+                    href: buildLawHref({
+                      q: view.q,
+                      kind: view.kind,
+                      topic: option.value,
+                      sort: view.sort,
+                    }),
+                    active: view.topic === option.value,
+                    count: topicCounts.get(option.value) ?? 0,
+                  })),
+              ],
+            },
+          ]}
+          sort={view.sortOptions.map((option) => ({
+            label: option.label,
+            href: buildLawHref({
+              q: view.q,
+              kind: view.kind,
+              topic: view.topic,
+              sort: option.value,
+            }),
+            active: view.sort === option.value,
+          }))}
+          summary={countLabel}
+        />
 
         {view.items.length === 0 ? (
           <EmptyList title="No law entries matched">

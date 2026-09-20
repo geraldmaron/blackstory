@@ -1249,6 +1249,118 @@ a.ds-room-chip {
   color: var(--room-ink-4);
 }
 
+/* —— FindBar: one find bar for every filtering room ————————————————————————————
+   Composes the find field, the chips and the active constraints above. What it adds is layout:
+   the field at a 44px target, each facet as one row that scrolls sideways instead of wrapping into
+   six rows of chrome on a phone, and the sort on the count line. */
+.ds-find {
+  display: grid;
+  gap: var(--ds-space-3);
+  margin: var(--ds-space-5) 0 var(--ds-space-4);
+  min-width: 0;
+  scroll-margin-top: calc(var(--ds-space-8) + 3rem);
+}
+
+/* The section a shareable filter URL lands on (`/law?topic=voting#browse`) clears the command bar. */
+.ds-find-anchor {
+  scroll-margin-top: calc(var(--ds-space-8) + 3rem);
+}
+
+.ds-find__fields {
+  flex-wrap: wrap;
+  align-items: flex-end;
+}
+
+.ds-find .ds-records-find__input {
+  height: 44px;
+}
+
+.ds-find__fields > .ds-typeahead,
+.ds-find__fields > .ds-pill-select {
+  flex: 1 1 12rem;
+  min-width: 0;
+}
+
+.ds-find__fields > .ds-typeahead {
+  flex-basis: 18rem;
+}
+
+.ds-find .ds-records-active {
+  margin: 0;
+}
+
+.ds-find__chips {
+  display: flex;
+  gap: 6px;
+  min-width: 0;
+  overflow-x: auto;
+  padding-block: 2px;
+  scrollbar-width: thin;
+}
+
+.ds-find__chips .ds-room-chip {
+  flex: none;
+  height: 36px;
+  padding-inline: 14px;
+}
+
+.ds-find__count {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--ds-space-2) var(--ds-space-5);
+  padding-top: var(--ds-space-3);
+  border-top: var(--ds-border-width) solid var(--room-rule-2);
+}
+
+.ds-find__count .ds-room-idx__count {
+  margin: 0;
+}
+
+.ds-find__sort {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0 var(--ds-space-4);
+  font-family: var(--ds-font-mono);
+  font-size: var(--ds-text-micro);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.ds-find__sort-label {
+  color: var(--room-ink-4);
+}
+
+.ds-find__sort-link {
+  display: inline-flex;
+  align-items: center;
+  min-height: 32px;
+  color: var(--room-ink-3);
+  text-decoration: none;
+}
+
+.ds-find__sort-link:hover {
+  color: var(--ds-ink);
+}
+
+.ds-find__sort-link[aria-current='true'] {
+  color: var(--ds-accent);
+}
+
+@media (max-width: 40rem) {
+  .ds-find__chips .ds-room-chip,
+  .ds-find__sort-link {
+    height: auto;
+    min-height: 44px;
+  }
+
+  .ds-find__chips .ds-room-chip {
+    padding-inline: 16px;
+  }
+}
+
 /* —— DataTable: scrolls inside its own container, never the page ——————————— */
 .ds-room-tblwrap {
   overflow-x: auto;

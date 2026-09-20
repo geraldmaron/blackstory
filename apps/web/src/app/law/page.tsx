@@ -11,7 +11,6 @@ import { loadLegalCatalog } from '../../lib/legal/public-source';
 import { LawBrowseSections } from './LawBrowseSections';
 import { humanizeLegalKind, humanizeLegalTopic } from '../../components/legal';
 import { DocumentColophon, OrientationInstrument, ReadingEntry, Room } from '../../components/room';
-import './law-browse.css';
 import '../reading-room.css';
 
 void React;

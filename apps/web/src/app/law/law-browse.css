@@ -1,8 +1,0 @@
-/**
- * `/law` browse surface layout. The shared reading-room sheet owns row subgrid; this file only
- * covers the browse anchor and command-bar clearance for shareable filter URLs.
- */
-
-.ds-law-browse {
-  scroll-margin-top: calc(var(--ds-space-8) + 3rem);
-}

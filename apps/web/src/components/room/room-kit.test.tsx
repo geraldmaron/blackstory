@@ -23,6 +23,7 @@ import { resolveTrail } from './room-trail';
 import { CardGrid, GroupHeading, RoomCard } from './RoomCards';
 import { RoomSection, RoomHandoff } from './RoomSection';
 import { RoomJump } from './RoomJump';
+import { FindBar } from './FindBar';
 import { Prose, RecordRef } from './Prose';
 import { Anatomy, Connections, Note, Precision, SourceList, TrustBlock } from './Evidence';
 import { HairlineIndex } from './HairlineIndex';
@@ -1012,5 +1013,70 @@ describe('room kit · room stylesheets size type from the token scale', () => {
       [],
       'pick a --ds-text-* step from packages/ui/src/styles/tokens.css',
     );
+  });
+});
+
+describe('room kit · FindBar', () => {
+  const html = renderToStaticMarkup(
+    <FindBar
+      id="law"
+      action="/law#browse"
+      queryLabel="Title, citation or topic"
+      placeholder="Brown v. Board"
+      query="voting"
+      preserved={{ kind: 'landmark-case', topic: undefined, sort: '' }}
+      active={[{ key: 'q', label: 'Search: voting', href: '/law?kind=landmark-case' }]}
+      clearHref="/law"
+      rows={[
+        {
+          label: 'Filter by kind',
+          chips: [
+            { label: 'All kinds', href: '/law?q=voting', active: false, count: 1200 },
+            { label: 'Landmark case', href: '/law?kind=landmark-case', active: true, count: 3 },
+          ],
+        },
+      ]}
+      sort={[
+        { label: 'Oldest first', href: '/law', active: true },
+        { label: 'A to Z', href: '/law?sort=alphabetical', active: false },
+      ]}
+      summary="1 of 12 law entries"
+    />,
+  );
+
+  it('is a GET search form that works with JavaScript off', () => {
+    const form = /<form[^>]*>/.exec(html)?.[0] ?? '';
+    for (const attr of ['method="get"', 'action="/law#browse"', 'role="search"']) {
+      assert.ok(form.includes(attr), `form is missing ${attr}`);
+    }
+    const field = /<input[^>]*type="search"[^>]*>/.exec(html)?.[0] ?? '';
+    for (const attr of ['name="q"', 'value="voting"', 'id="law-q"']) {
+      assert.ok(field.includes(attr), `search field is missing ${attr}`);
+    }
+  });
+
+  it('carries the narrowing already in the URL, and only that', () => {
+    assert.match(html, /<input type="hidden" name="kind" value="landmark-case"\/>/);
+    assert.doesNotMatch(html, /name="topic"|name="sort"/);
+  });
+
+  it('has no visible submit and no Apply button; Enter submits', () => {
+    assert.doesNotMatch(html, />Apply</);
+    assert.match(
+      html,
+      /<button class="ds-visually-hidden" type="submit" tabindex="-1" aria-hidden="true">/,
+    );
+  });
+
+  it('marks the current chip and sort, and formats counts', () => {
+    assert.match(html, /aria-current="true"[^>]*>Landmark case/);
+    assert.match(html, />1,200</);
+    assert.match(html, /<nav class="ds-find__sort" aria-label="Sort order">/);
+    assert.match(html, /aria-current="true"[^>]*>Oldest first/);
+  });
+
+  it('names the list under it and offers one Clear all', () => {
+    assert.match(html, /id="law-results-heading" role="status">1 of 12 law entries</);
+    assert.equal(html.match(/Clear all/g)?.length, 1);
   });
 });
