@@ -5,6 +5,7 @@ import {
   JUXTAPOSITION_DISCLAIMER,
   LIVES_LENS_LABELS,
   LIVES_WORLD_DOMAIN_LABELS,
+  livesWorldMediationLine,
   type LivesAreaBundle,
   type LivesSourceRef,
 } from '@repo/domain/statistics/lives';
@@ -153,6 +154,8 @@ function ContextBlock({ context }: { readonly context: LivesMilestoneContext }) 
         <p className="lives-milestone__speaker">
           {beat.speaker.name}, {beat.speaker.place}, {beat.speaker.year}
           {beat.speaker.classNote ? ` · ${beat.speaker.classNote}` : ''}
+          {' · '}
+          {livesWorldMediationLine(beat.speaker)}
         </p>
       ) : null}
       <p>{beat.body}</p>

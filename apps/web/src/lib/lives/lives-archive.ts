@@ -43,7 +43,7 @@ const schoolAndWork = {
   quote: 'Often I began work as early as four o’clock in the morning.',
   body: 'Booker T. Washington remembered working in a salt furnace as a child. His stepfather initially kept him at work when a local school opened. Washington arranged lessons at night, then gained permission to attend by working before and after school. He also described families paying a teacher and taking turns providing meals. The account connects a child’s schooling to household income, adult decisions, and a community’s own institution-building.',
   scope:
-    'Washington’s retrospective autobiography, not a representative childhood or the experience of the Tuskegee students pictured above. The short quotation modernizes only the apostrophe.',
+    'Washington’s retrospective autobiography, not a representative childhood or the experience of the Tuskegee students in Johnston’s photograph. The short quotation modernizes only the apostrophe.',
   source: {
     label:
       'Booker T. Washington, Up from Slavery (1901), chapter II, pp. 26–32. UNC, Documenting the American South',
@@ -55,7 +55,7 @@ const nicodemus = {
   date: '1877–1887 · Nicodemus, Kansas',
   body: 'Settlers from Kentucky began arriving in Nicodemus in 1877. By 1887 the town had stores, a bank, a law firm, a post office, and other businesses. Farming families relied on a town that also served as a social and cultural center. The National Park Service links the railroads’ bypassing the town to lost jobs and population decline. Its annual Homecoming grew out of an Emancipation Celebration begun in 1878: a connection to place that outlasted many residents’ departure.',
   scope:
-    'A documented Kansas example of settlement, local employment, and continuing community. It is not an explanation of the national urban share or a description of every Black farming family.',
+    'A documented Kansas example of settlement, local employment, and continuing community. It isn’t an explanation of the national urban share or a description of every Black farming family.',
   source: {
     label: 'National Park Service, Nicodemus National Historic Site, cultural landscape history',
     url: 'https://www.nps.gov/articles/nicodemus_nhs_landscape_equality.htm',
@@ -75,16 +75,16 @@ const cityReading: LivesArchiveReading = {
     url: 'https://www.loc.gov/item/2013650430/',
   },
   caption:
-    'Made for the 1900 Paris Exposition, this chart describes Black Georgians in 1890. The year of the evidence is not the year of the exhibition.',
+    'Made for the 1900 Paris Exposition, this chart describes Black Georgians in 1890. The year of the evidence isn’t the year of the exhibition.',
   rights: LOC_RIGHTS,
   paragraphs: [
-    'The rural population takes up the page. W. E. B. Du Bois gives it a line so long that it has to curl back on itself. Before reading the national urban percentages below, spend a moment with this different way of making a population visible.',
+    'The rural population takes up the page. W. E. B. Du Bois gives it a line so long that it has to curl back on itself. It’s a different way of making a population visible.',
     'The Library of Congress identifies the chart as part of Du Bois’s exhibit on African American economic and social progress since emancipation. It is an argument addressed to an international audience, made by a Black scholar, rather than a neutral window into every household.',
   ],
   transcription:
     'Chart labels: 78,139 in cities of over 10,000 inhabitants; 8,025 in cities from 5,000 to 10,000; 37,699 in cities from 2,500 to 5,000; 734,952 living in the country and villages. The original uses the historical term “Negroes.” These are the exhibit’s printed figures, not a new national estimate.',
   notice:
-    'Georgia only. Rural residence does not tell us whether a person owned land, rented it, farmed it, or worked for wages.',
+    'Georgia only. Rural residence doesn’t tell us whether a person owned land, rented it, farmed it, or worked for wages.',
   question:
     'What changes when rural life occupies most of the image, rather than being the remainder after a city statistic?',
   connections: [
@@ -151,16 +151,16 @@ export const LIVES_ARCHIVE_READINGS: Readonly<Record<LivesMilestoneKey, LivesArc
       url: 'https://www.loc.gov/pictures/item/98503043/',
     },
     caption:
-      'History students at Tuskegee Institute, Alabama. The catalog identifies the class and institution, but does not name the individual students.',
+      'History students at Tuskegee Institute, Alabama. The catalog identifies the class and institution, but doesn’t name the individual students.',
     rights: LOC_RIGHTS,
     paragraphs: [
       'A school-attendance table compresses many classrooms into one figure. Johnston’s photograph gives one class a setting and a subject: these students were studying history at Tuskegee in 1902.',
-      'The camera records the people present. It cannot show the children who never enrolled, the cost of getting to school, or how long each pupil stayed. Nor is an institute classroom a stand-in for every rural elementary school. Those distinctions matter when comparing it with the age-specific attendance figures below.',
+      'The camera records the people present. It can’t show the children who never enrolled, the cost of getting to school, or how long each pupil stayed. Nor is an institute classroom a stand-in for every rural elementary school. Those distinctions matter when setting it beside age-specific attendance figures.',
     ],
     transcription:
       'Catalog title: “[History class, Tuskegee Institute, Tuskegee, Alabama].” Date: 1902. Photographer: Frances Benjamin Johnston. The item contains no individual student names or first-person testimony.',
     notice:
-      'One institutional photograph. It does not establish a typical classroom, a pupil’s income, or what any student was thinking.',
+      'One institutional photograph. It doesn’t establish a typical classroom, a pupil’s income, or what any student was thinking.',
     question:
       'What can you learn from who is in the room, and what questions can this photograph never answer?',
     connections: [
@@ -172,7 +172,7 @@ export const LIVES_ARCHIVE_READINGS: Readonly<Record<LivesMilestoneKey, LivesArc
       },
       {
         title: 'Finishing school',
-        line: 'Follow the next life question: attendance is not the same as a diploma.',
+        line: 'Follow the next life question: attendance isn’t the same as a diploma.',
         href: '/lives?milestone=education',
         icon: 'publication',
       },
@@ -197,7 +197,7 @@ export const LIVES_ARCHIVE_READINGS: Readonly<Record<LivesMilestoneKey, LivesArc
     rights: 'U.S. federal government judicial opinion. Reproduction: National Archives.',
     paragraphs: [
       'Brown concerned children denied admission to public schools on a nonsegregated basis. The Court held that state-imposed school segregation violated equal protection, even where physical facilities and other tangible factors might be equal.',
-      'The decision did not instantly produce integrated schools. The National Archives account describes the further implementation ruling in 1955 and resistance to desegregation. Adult completion rates also include people whose schooling happened decades earlier. A law’s date and a later census figure are not a before-and-after experiment.',
+      'The decision didn’t instantly produce integrated schools. The National Archives account describes the further implementation ruling in 1955 and resistance to desegregation. Adult completion rates also include people whose schooling happened decades earlier. A law’s date and a later census figure aren’t a before-and-after experiment.',
     ],
     transcription:
       'Excerpt from the opinion: “Separate educational facilities are inherently unequal.” The full opinion and an accessible transcript are available at the National Archives source link.',
@@ -223,7 +223,7 @@ export const LIVES_ARCHIVE_READINGS: Readonly<Record<LivesMilestoneKey, LivesArc
   work: {
     date: '25 June 1941',
     place: 'Washington, D.C. · Defense industries',
-    title: 'When a job opening was not an open door',
+    title: 'When a job opening wasn’t an open door',
     image: {
       url: 'https://www.archives.gov/files/doc-072-big.jpg',
       alt: 'Executive Order 8802, dated June 25, 1941, addressing discrimination in defense employment.',
@@ -237,13 +237,13 @@ export const LIVES_ARCHIVE_READINGS: Readonly<Record<LivesMilestoneKey, LivesArc
       'The original order addresses hiring, vocational training, federal defense contracts, and a committee to investigate discrimination complaints.',
     rights: 'U.S. federal government executive order. Reproduction: National Archives.',
     paragraphs: [
-      'The order itself records that available workers had been barred from defense production because of race, creed, color, or national origin. Labor demand alone did not give every applicant access to those jobs.',
+      'The order itself records that available workers had been barred from defense production because of race, creed, color, or national origin. Labor demand alone didn’t give every applicant access to those jobs.',
       'The National Archives describes A. Philip Randolph’s threatened march on Washington as pressure behind Roosevelt’s action. The order required nondiscrimination clauses in new defense contracts and established a committee to investigate complaints. That is a documented mechanism of exclusion and a policy response, not a complete explanation of national unemployment.',
     ],
     transcription:
       'Excerpt from the order: “available and needed workers have been barred from employment in industries engaged in defense production solely because of considerations of race, creed, color, or national origin.” Read the three numbered provisions in the linked transcript.',
     notice:
-      'Defense employment and government, 1941. This order does not prove enforcement, eliminate other causes of joblessness, or explain later decades.',
+      'Defense employment and government, 1941. This order doesn’t prove enforcement, eliminate other causes of joblessness, or explain later decades.',
     question:
       'If work exists but an employer can refuse you, what does an unemployment rate leave out?',
     connections: [
@@ -263,7 +263,7 @@ export const LIVES_ARCHIVE_READINGS: Readonly<Record<LivesMilestoneKey, LivesArc
     companion: {
       ...schoolAndWork,
       scope:
-        'Washington’s retrospective autobiography about childhood work. It is not evidence about defense employment in 1941 or a population-wide unemployment measure.',
+        'Washington’s retrospective autobiography about childhood work. It isn’t evidence about defense employment in 1941 or a population-wide unemployment measure.',
     },
   },
   count: {
@@ -271,7 +271,7 @@ export const LIVES_ARCHIVE_READINGS: Readonly<Record<LivesMilestoneKey, LivesArc
     title: 'Who gets to make the picture?',
     paragraphs: [
       'The census classifies people. Here, W. E. B. Du Bois uses population figures to make his own argument about Black life. The Library of Congress identifies this hand-drawn chart as part of the exhibit he prepared for the 1900 Paris Exposition.',
-      'The choice of scale changes what a viewer notices. A rural population can become a small remainder in a sentence about cities, or the largest visual presence on a page. Examine the exhibit before reading the changing census categories below: being counted and controlling the story of that count are different things.',
+      'The choice of scale changes what a viewer notices. A rural population can become a small remainder in a sentence about cities, or the largest visual presence on a page. Being counted and controlling the story of that count are different things.',
     ],
     connections: [
       duBois,

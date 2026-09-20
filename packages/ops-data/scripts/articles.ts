@@ -31,6 +31,7 @@ import {
   type SourceTier,
   type SafeHttpClient,
 } from '@repo/domain';
+import { SELF_REFERENCE_PATTERNS, findProseVoiceIssues } from '@repo/domain/editorial';
 import { z } from 'zod';
 import pg from 'pg';
 import { normalizePgConnectionString } from './lib/pg-connection.ts';
@@ -267,31 +268,6 @@ function gateSeriesPositions(articles: readonly ArticleAuthoring[]): void {
  * instructions. Use entity links and relatedEntityIds for related history. Published violations
  * fail; drafts receive warnings. See docs/content/neo-voice.md.
  */
-const SELF_REFERENCE_PATTERNS: readonly { readonly label: string; readonly pattern: RegExp }[] = [
-  { label: 'names the publishing surface', pattern: /\bthis (?:site|website|project|page)\b/i },
-  {
-    label: 'names the publishing surface',
-    pattern: /\b(?:on|across|throughout) (?:the|our) site\b/i,
-  },
-  {
-    label: 'cross-references a sibling chapter',
-    pattern: /\b(?:another|the other|a sibling|the next|the previous) chapters?\b/i,
-  },
-  { label: 'cross-references a sibling chapter', pattern: /\bchapters? (?:here|on this)\b/i },
-  {
-    label: 'cross-references a sibling chapter',
-    pattern: /\bthe (?:wealth|redlining|housing|voting|sentencing) chapter\b/i,
-  },
-  {
-    label: "speaks in the publisher's first person",
-    pattern: /\b(?:we|our) (?:are telling|tell|show|summari[sz]e|built|collected|assembled)\b/i,
-  },
-  {
-    label: "speaks in the publisher's first person",
-    pattern: /\b(?:our summary|needs us in order|we are telling you)\b/i,
-  },
-];
-
 function gateStandaloneProse(article: ArticleAuthoring): { warnings: string[] } {
   const findings: string[] = [];
   article.body.forEach((block, index) => {
@@ -328,8 +304,35 @@ function gateStandaloneProse(article: ArticleAuthoring): { warnings: string[] } 
 }
 
 /**
+ * Word-level voice (docs/content/neo-voice.md never-list item 9): em dashes and expanded
+ * contractions in narration. Warnings only, at every status: published chapters predate this
+ * check, and a gate that turned hard overnight would block unrelated republishes. Quoted
+ * testimony is exempt inside findProseVoiceIssues.
+ */
+function gateProseVoice(article: ArticleAuthoring): { warnings: string[] } {
+  const warnings: string[] = [];
+  article.body.forEach((block, index) => {
+    const texts =
+      block.type === 'paragraph'
+        ? [(block as { text?: string }).text ?? '']
+        : block.type === 'list'
+          ? block.items
+          : [];
+    for (const text of texts) {
+      for (const finding of findProseVoiceIssues(text)) {
+        if (finding.rule !== 'em-dash' && finding.rule !== 'expanded-contraction') continue;
+        warnings.push(
+          `${article.id} / body[${index}] (${block.type}): prose ${finding.label}: …${finding.excerpt}…`,
+        );
+      }
+    }
+  });
+  return { warnings };
+}
+
+/**
  * Offline gates: schema (via loader) + inline-citation integrity + source-tier gate +
- * prose floor + standalone-prose gate.
+ * prose floor + standalone-prose gate + word-level voice warnings.
  */
 function validateArticleOffline(article: ArticleAuthoring): void {
   assertArticleCitationIntegrity(article);
@@ -341,6 +344,8 @@ function validateArticleOffline(article: ArticleAuthoring): void {
   for (const warning of floorWarnings) console.warn(`warning: ${warning}`);
   const { warnings: standaloneWarnings } = gateStandaloneProse(article);
   for (const warning of standaloneWarnings) console.warn(`warning: ${warning}`);
+  const { warnings: voiceWarnings } = gateProseVoice(article);
+  for (const warning of voiceWarnings) console.warn(`warning: ${warning}`);
   const { warnings: calloutWarnings } = gateCalloutCitations(article);
   for (const warning of calloutWarnings) console.warn(`warning: ${warning}`);
 }

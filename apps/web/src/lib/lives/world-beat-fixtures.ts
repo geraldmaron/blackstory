@@ -16,7 +16,7 @@ export const LIVES_WORLD_BEAT_FIXTURES: readonly LivesWorldBeatInput[] = [
     domain: 'count',
     claimType: 'factual',
     heading: 'The first post-war census',
-    body: 'The 1870 census is the first after emancipation. Literacy and school attendance by race enter the printed volumes; class for this decade is still work-based, not income. Hispanic origin is not counted.',
+    body: 'The 1870 census is the first after emancipation. Literacy and school attendance by race enter the printed volumes; class for this decade is still work-based, not income. Hispanic origin isn’t counted.',
     citations: [
       {
         label: 'Census Bureau, Ninth Census volumes (1870)',
@@ -34,7 +34,7 @@ export const LIVES_WORLD_BEAT_FIXTURES: readonly LivesWorldBeatInput[] = [
     domain: 'policy',
     claimType: 'factual',
     heading: 'Reconstruction amendments in force',
-    body: 'The Thirteenth, Fourteenth, and Fifteenth Amendments sit in the catalog beside 1870s figures. Showing them with literacy shares does not prove they caused those shares.',
+    body: 'The Thirteenth, Fourteenth, and Fifteenth Amendments sit in the catalog beside 1870s figures. Showing them with literacy shares doesn’t prove they caused those shares.',
     citations: [
       {
         label: 'National Archives, Reconstruction Amendments',
@@ -53,7 +53,7 @@ export const LIVES_WORLD_BEAT_FIXTURES: readonly LivesWorldBeatInput[] = [
     domain: 'count',
     claimType: 'factual',
     heading: 'Urban shares on the eve of the Great Migration',
-    body: 'Table 42 and the 1918 Negro Population bulletin publish urban and rural Negro and white populations by state for 1890–1910. Those shares are region figures when states sum; they are not a single city’s rate.',
+    body: 'Table 42 and the 1918 Negro Population bulletin publish urban and rural Negro and white populations by state for 1890–1910. Those shares are region figures when states sum; they aren’t a single city’s rate.',
     citations: [
       {
         label: 'Census Bureau, Negro Population 1790–1915 (1918)',
@@ -84,6 +84,7 @@ export const LIVES_WORLD_BEAT_FIXTURES: readonly LivesWorldBeatInput[] = [
       place: 'New York',
       year: '1910s recalled',
       classNote: 'Writer and NAACP organizer',
+      mediation: 'self-authored',
     },
   },
   {
@@ -95,7 +96,7 @@ export const LIVES_WORLD_BEAT_FIXTURES: readonly LivesWorldBeatInput[] = [
     domain: 'testimony',
     claimType: 'testimony',
     heading: 'Migration into the Midwest',
-    body: 'Richard Wright’s Black Boy (1945) and later Chicago writing name the pull of Northern industrial cities. Midwest figures stay state sums; Bronzeville illustrates, it does not replace the region.',
+    body: 'Richard Wright’s Black Boy (1945) and later Chicago writing name the pull of Northern industrial cities. Midwest figures stay state sums; Bronzeville illustrates, it doesn’t replace the region.',
     citations: [
       {
         label: 'Richard Wright, Black Boy (1945)',
@@ -108,6 +109,7 @@ export const LIVES_WORLD_BEAT_FIXTURES: readonly LivesWorldBeatInput[] = [
       place: 'Mississippi and Chicago, Illinois',
       year: '1910s–1920s recalled',
       classNote: 'Childhood South, young adulthood Midwest',
+      mediation: 'self-authored',
     },
   },
   {
@@ -119,7 +121,7 @@ export const LIVES_WORLD_BEAT_FIXTURES: readonly LivesWorldBeatInput[] = [
     domain: 'count',
     claimType: 'factual',
     heading: 'Mexican as a race in 1930',
-    body: 'The 1930 census counted "Mexican" as a race for one decade, then removed the category. Hispanic origin as asked from 1970 on is not the same count. The gap is content, not a missing cell to invent.',
+    body: 'The 1930 census counted "Mexican" as a race for one decade, then removed the category. Hispanic origin as asked from 1970 on isn’t the same count. The gap is content, not a missing cell to invent.',
     citations: [
       {
         label: 'Census Bureau, Fifteenth Census Population volumes (1930)',
@@ -155,7 +157,7 @@ export const LIVES_WORLD_BEAT_FIXTURES: readonly LivesWorldBeatInput[] = [
     domain: 'policy',
     claimType: 'factual',
     heading: 'Labor law arriving at mid-decade',
-    body: 'The National Labor Relations Act (1935) sits in the catalog beside 1930s figures. Showing it with class shares does not prove it caused those shares. Agricultural and domestic exclusions remain a live dispute in the record.',
+    body: 'The National Labor Relations Act (1935) sits in the catalog beside 1930s figures. Showing it with class shares doesn’t prove it caused those shares. Agricultural and domestic exclusions remain a live dispute in the record.',
     citations: [
       {
         label: 'National Labor Relations Act, 49 Stat. 449 (1935)',
@@ -174,7 +176,7 @@ export const LIVES_WORLD_BEAT_FIXTURES: readonly LivesWorldBeatInput[] = [
     domain: 'work',
     claimType: 'interpretive',
     heading: 'Women in gainful occupations',
-    body: 'Occupation volumes from 1900 onward cross sex and color. The woman unit reads those tables; household income is not relabeled as her wage.',
+    body: 'Occupation volumes from 1900 onward cross sex and color. The woman unit reads those tables; household income isn’t relabeled as her wage.',
     citations: [
       {
         label: 'Census Bureau, Occupations at the Twelfth Census (1904)',
@@ -205,6 +207,8 @@ export const LIVES_WORLD_BEAT_FIXTURES: readonly LivesWorldBeatInput[] = [
       place: 'Alabama',
       year: '1930s',
       classNote: 'Tenant farmer',
+      mediation: 'as-told-to',
+      mediatedBy: 'Theodore Rosengarten',
     },
   },
   {
@@ -216,7 +220,7 @@ export const LIVES_WORLD_BEAT_FIXTURES: readonly LivesWorldBeatInput[] = [
     domain: 'world',
     claimType: 'factual',
     heading: 'Depression on the published tables',
-    body: "Unemployment by race appears in the 1930 census. The decade's laws and relief programs open as catalog records; the street does not invent a bread line density from those laws.",
+    body: "Unemployment by race appears in the 1930 census. The decade's laws and relief programs open as catalog records; the street doesn’t invent a bread line density from those laws.",
     citations: [
       {
         label: 'Census Bureau, Fifteenth Census unemployment reports',
@@ -247,6 +251,7 @@ export const LIVES_WORLD_BEAT_FIXTURES: readonly LivesWorldBeatInput[] = [
       place: 'California',
       year: '1930s reported',
       classNote: 'Journalist and advocate',
+      mediation: 'reported-by-third-party',
     },
   },
   {
@@ -295,7 +300,7 @@ export const LIVES_WORLD_BEAT_FIXTURES: readonly LivesWorldBeatInput[] = [
     domain: 'schooling',
     claimType: 'factual',
     heading: 'School after Brown',
-    body: 'High school completion by race enters the printed volumes in mid-century. Brown v. Board (1954) is in force as law for this decade; the attainment bars are not labeled as its effect.',
+    body: 'High school completion by race enters the printed volumes in mid-century. Brown v. Board (1954) is in force as law for this decade; the attainment bars aren’t labeled as its effect.',
     citations: [
       {
         label: 'Brown v. Board of Education, 347 U.S. 483 (1954)',
@@ -331,7 +336,7 @@ export const LIVES_WORLD_BEAT_FIXTURES: readonly LivesWorldBeatInput[] = [
     domain: 'political',
     claimType: 'factual',
     heading: 'Ballot access under literacy tests',
-    body: 'Literacy tests and poll taxes sit in the catalog as voting-domain rules. The Voting Rights Act of 1965 is in force for later years of this decade; turnout is not invented as a Lives region cell.',
+    body: 'Literacy tests and poll taxes sit in the catalog as voting-domain rules. The Voting Rights Act of 1965 is in force for later years of this decade; turnout isn’t invented as a Lives region cell.',
     citations: [
       {
         label: 'Voting Rights Act of 1965, 79 Stat. 437',
@@ -350,7 +355,7 @@ export const LIVES_WORLD_BEAT_FIXTURES: readonly LivesWorldBeatInput[] = [
     claimType: 'factual',
     gapState: 'insufficient_evidence',
     heading: 'No crime heat on this street',
-    body: 'Imprisonment and victimization series open on Data (/data#justice-imprisonment) and theme-impact when published by race. This decade does not hatch a police-stop density from missing tables.',
+    body: 'Imprisonment and victimization series open on Data (/data#justice-imprisonment) and theme-impact when published by race. This decade doesn’t hatch a police-stop density from missing tables.',
     citations: [
       {
         label: 'Data · Justice imprisonment spine',
@@ -373,7 +378,7 @@ export const LIVES_WORLD_BEAT_FIXTURES: readonly LivesWorldBeatInput[] = [
     domain: 'world',
     claimType: 'factual',
     heading: 'War and draft in the catalog',
-    body: 'Vietnam-era service and draft policy open as people, laws, and stories. Draft is not a region rate on the Lives street.',
+    body: 'Vietnam-era service and draft policy open as people, laws, and stories. Draft isn’t a region rate on the Lives street.',
     citations: [
       {
         label: 'National Archives, Vietnam War records',
@@ -404,6 +409,7 @@ export const LIVES_WORLD_BEAT_FIXTURES: readonly LivesWorldBeatInput[] = [
       place: 'Stamps, Arkansas',
       year: '1930s–1940s recalled',
       classNote: 'Childhood in the Upper South / Deep South border',
+      mediation: 'self-authored',
     },
   },
   {
@@ -497,8 +503,8 @@ export const LIVES_WORLD_BEAT_FIXTURES: readonly LivesWorldBeatInput[] = [
     domain: 'affordance',
     claimType: 'factual',
     gapState: 'insufficient_evidence',
-    heading: 'White contract rent is not in HC(1)-A',
-    body: 'HC(1)-A Tables 1 and 6 print Total and Negro-head median contract rent and home value. They do not print a White median. Lives does not residualize White from Total minus Negro, so the white lens keeps derived income and leaves affordance as a gap until another published White table is opened.',
+    heading: 'White contract rent isn’t in HC(1)-A',
+    body: 'HC(1)-A Tables 1 and 6 print Total and Negro-head median contract rent and home value. They don’t print a White median. Lives doesn’t residualize White from Total minus Negro, so the white lens keeps derived income and leaves affordance as a gap until another published White table is opened.',
     citations: [
       {
         label: '1970 HC(1)-A Tables 1 and 6',

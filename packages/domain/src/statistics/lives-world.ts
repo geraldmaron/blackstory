@@ -57,12 +57,50 @@ export const LIVES_WORLD_GAP_STATES = ['insufficient_evidence', 'modeled'] as co
 
 export type LivesWorldGapState = (typeof LIVES_WORLD_GAP_STATES)[number];
 
+/**
+ * How a speaker's words reached the page. A memoir, an edited as-told-to transcription, a
+ * journalist's report and a recorded interview are different kinds of evidence, and only the first
+ * is a person speaking for themselves. Every speaker carries one, shown beside the name, so a
+ * mediated account never stands in unlabeled for a group's own voice.
+ */
+export const LIVES_WORLD_MEDIATIONS = [
+  'self-authored',
+  'as-told-to',
+  'reported-by-third-party',
+  'recorded-interview',
+] as const;
+export type LivesWorldMediation = (typeof LIVES_WORLD_MEDIATIONS)[number];
+
+export const LIVES_WORLD_MEDIATION_LABELS: Readonly<Record<LivesWorldMediation, string>> = {
+  'self-authored': 'In their own writing',
+  'as-told-to': 'As told to',
+  'reported-by-third-party': 'Reported by an observer',
+  'recorded-interview': 'Recorded interview with',
+};
+
+/** Mediations that name a second person: the writer who took the account down, or the interviewer. */
+const MEDIATIONS_NAMING_A_SECOND_PERSON: readonly LivesWorldMediation[] = [
+  'as-told-to',
+  'recorded-interview',
+];
+
 export type LivesWorldSpeaker = {
   readonly name: string;
   readonly place: string;
   readonly year: string;
   readonly classNote?: string;
+  readonly mediation: LivesWorldMediation;
+  /** Required for as-told-to and recorded-interview: who took the account down or asked the questions. */
+  readonly mediatedBy?: string;
 };
+
+/** "As told to Theodore Rosengarten", "In their own writing": the line shown beside a speaker. */
+export function livesWorldMediationLine(speaker: LivesWorldSpeaker): string {
+  const label = LIVES_WORLD_MEDIATION_LABELS[speaker.mediation];
+  return speaker.mediatedBy && MEDIATIONS_NAMING_A_SECOND_PERSON.includes(speaker.mediation)
+    ? `${label} ${speaker.mediatedBy}`
+    : label;
+}
 
 /** Authored beat before entity hrefs are resolved at snapshot build. */
 export type LivesWorldBeatInput = {
@@ -210,6 +248,25 @@ export function validateLivesWorldBeats(input: unknown): {
       }
     }
 
+    // Any beat that names a speaker says how the words reached the page, whatever its claim type.
+    if (beat.speaker && typeof beat.speaker === 'object') {
+      const s = beat.speaker as Record<string, unknown>;
+      const mediation = s.mediation;
+      if (
+        typeof mediation !== 'string' ||
+        !(LIVES_WORLD_MEDIATIONS as readonly string[]).includes(mediation)
+      ) {
+        problems.push(
+          'speaker.mediation must be self-authored, as-told-to, reported-by-third-party or recorded-interview',
+        );
+      } else if (
+        MEDIATIONS_NAMING_A_SECOND_PERSON.includes(mediation as LivesWorldMediation) &&
+        (typeof s.mediatedBy !== 'string' || !s.mediatedBy.trim())
+      ) {
+        problems.push(`speaker.mediatedBy is required when mediation is ${mediation}`);
+      }
+    }
+
     const citations = Array.isArray(beat.citations) ? beat.citations : [];
     const validCitations = citations.filter(
       (citation): citation is LivesSourceRef =>
@@ -266,6 +323,10 @@ export function validateLivesWorldBeats(input: unknown): {
               name: String((beat.speaker as LivesWorldSpeaker).name).trim(),
               place: String((beat.speaker as LivesWorldSpeaker).place).trim(),
               year: String((beat.speaker as LivesWorldSpeaker).year).trim(),
+              mediation: (beat.speaker as LivesWorldSpeaker).mediation,
+              ...((beat.speaker as LivesWorldSpeaker).mediatedBy
+                ? { mediatedBy: String((beat.speaker as LivesWorldSpeaker).mediatedBy).trim() }
+                : {}),
               ...((beat.speaker as LivesWorldSpeaker).classNote
                 ? { classNote: String((beat.speaker as LivesWorldSpeaker).classNote).trim() }
                 : {}),

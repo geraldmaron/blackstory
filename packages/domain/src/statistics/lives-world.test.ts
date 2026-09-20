@@ -144,3 +144,67 @@ test('selectLivesWorldBeats can query every authored unit without a reader unit 
     ['household', 'child', 'woman'],
   );
 });
+
+function speakerBeat(speaker: Record<string, unknown>, claimType = 'testimony') {
+  return {
+    id: 'mediation-check',
+    decade: 1930,
+    areaIds: [],
+    lenses: ['black'],
+    unit: 'all',
+    domain: 'testimony',
+    claimType,
+    heading: 'A tenant farmer’s account',
+    body: 'An Alabama tenant farmer described debt and organizing under tenancy.',
+    citations: [{ label: 'Publisher record', url: 'https://www.loc.gov/item/example/' }],
+    entityIds: [],
+    speaker,
+  };
+}
+
+test('a speaker must say how their words reached the page', () => {
+  const base = { name: 'Nate Shaw (Ned Cobb)', place: 'Alabama', year: '1930s' };
+
+  const unlabeled = validateLivesWorldBeats([speakerBeat(base)]);
+  assert.match(unlabeled.errors.join('\n'), /speaker\.mediation must be/);
+
+  const unnamedWriter = validateLivesWorldBeats([
+    speakerBeat({ ...base, mediation: 'as-told-to' }),
+  ]);
+  assert.match(
+    unnamedWriter.errors.join('\n'),
+    /mediatedBy is required when mediation is as-told-to/,
+  );
+
+  const labeled = validateLivesWorldBeats([
+    speakerBeat({ ...base, mediation: 'as-told-to', mediatedBy: 'Theodore Rosengarten' }),
+  ]);
+  assert.deepEqual(labeled.errors, []);
+  assert.equal(labeled.records[0]?.speaker?.mediation, 'as-told-to');
+  assert.equal(labeled.records[0]?.speaker?.mediatedBy, 'Theodore Rosengarten');
+
+  // The rule follows the speaker, not the claim type.
+  const factualWithSpeaker = validateLivesWorldBeats([speakerBeat(base, 'factual')]);
+  assert.match(factualWithSpeaker.errors.join('\n'), /speaker\.mediation must be/);
+});
+
+test('the mediation line names the second person only where there is one', async () => {
+  const { livesWorldMediationLine } = await import('./lives.js');
+  const who = { name: 'N', place: 'P', year: 'Y' };
+  assert.equal(
+    livesWorldMediationLine({ ...who, mediation: 'self-authored' }),
+    'In their own writing',
+  );
+  assert.equal(
+    livesWorldMediationLine({
+      ...who,
+      mediation: 'as-told-to',
+      mediatedBy: 'Theodore Rosengarten',
+    }),
+    'As told to Theodore Rosengarten',
+  );
+  assert.equal(
+    livesWorldMediationLine({ ...who, mediation: 'reported-by-third-party' }),
+    'Reported by an observer',
+  );
+});
