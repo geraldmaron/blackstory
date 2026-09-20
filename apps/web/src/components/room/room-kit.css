@@ -2308,14 +2308,20 @@ a.ds-room-chip {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(9.5rem, 1fr));
   margin: 0;
+  padding: 0;
+  list-style: none;
   border-bottom: var(--ds-border-width) solid var(--ds-rule);
 }
 
-.ds-room-stats__item {
+.ds-room-stats__item,
+.ds-room-stats__link {
   display: flex;
-  flex-direction: column-reverse;
-  justify-content: flex-end;
+  flex-direction: column;
   gap: var(--ds-space-2);
+  min-width: 0;
+}
+
+.ds-room-stats__item {
   padding: var(--ds-space-5) var(--ds-space-5) var(--ds-space-5) 0;
   margin-right: var(--ds-space-5);
   border-right: var(--ds-border-width) solid var(--ds-rule);
@@ -2326,8 +2332,18 @@ a.ds-room-chip {
   margin-right: 0;
 }
 
+.ds-room-stats__link {
+  color: inherit;
+  text-decoration: none;
+}
+
+.ds-room-stats__link:focus-visible {
+  outline: var(--ds-focus-width, 2px) solid var(--ds-focus-ring, var(--ds-accent));
+  outline-offset: 4px;
+  border-radius: var(--ds-radius-sm);
+}
+
 .ds-room-stats__value {
-  margin: 0;
   font-family: var(--ds-font-display);
   font-size: var(--ds-text-display-1);
   font-weight: 600;
@@ -2335,15 +2351,36 @@ a.ds-room-chip {
   letter-spacing: -0.04em;
   font-variant-numeric: tabular-nums;
   color: var(--ds-ink);
+  transition: color var(--ds-duration-fast) var(--ds-easing);
 }
 
-.ds-room-stats__item:first-child .ds-room-stats__value {
+.ds-room-stats__item:first-child .ds-room-stats__value,
+.ds-room-stats__link:hover .ds-room-stats__value,
+.ds-room-stats__link:focus-visible .ds-room-stats__value {
   color: var(--ds-accent);
+}
+
+/* A sourced figure carries a decimal and a unit ("25.7 pts"), so it takes the step below and a
+   wider cell: at display-1 in a four-up row the unit ran into the next figure. */
+.ds-room-stats:has(.ds-room-stats__source) {
+  grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr));
+}
+
+.ds-room-stats__item:has(.ds-room-stats__source) .ds-room-stats__value {
+  font-size: var(--ds-text-display-2);
 }
 
 /* A phrase is not a numeral: it takes the step below so it fits its cell. */
 .ds-room-stats__value[data-phrase] {
   font-size: var(--ds-text-display-3);
+}
+
+.ds-room-stats__unit {
+  margin-left: 0.15em;
+  font-size: 0.5em;
+  font-weight: 500;
+  letter-spacing: 0;
+  color: var(--ds-ink-muted);
 }
 
 .ds-room-stats__label {
@@ -2352,6 +2389,22 @@ a.ds-room-chip {
   letter-spacing: 0.08em;
   line-height: 1.4;
   text-transform: uppercase;
+  color: var(--ds-ink-muted);
+}
+
+/* A sourced figure's label is a sentence about the number, so it reads as one. */
+.ds-room-stats__label--sentence {
+  font-family: var(--ds-font-sans);
+  font-size: var(--ds-text-body-sm);
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--ds-ink);
+}
+
+.ds-room-stats__source {
+  font-family: var(--ds-font-mono);
+  font-size: var(--ds-text-micro);
+  letter-spacing: 0.02em;
   color: var(--ds-ink-muted);
 }
 

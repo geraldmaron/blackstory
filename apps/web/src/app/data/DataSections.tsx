@@ -41,6 +41,7 @@ import {
 } from './data-copy';
 import { DataPageNav } from './DataPageNav';
 import { DestinationIcon } from '../../components/patterns/DestinationIcon';
+import { RoomStats } from '../../components/room';
 
 void React;
 
@@ -178,22 +179,18 @@ function groupedReading(series: DataPageGroupedBarSeries): ReactNode {
 }
 
 function OpeningBeat({ items }: { readonly items: readonly DataHeadline[] }) {
-  if (items.length === 0) return null;
   return (
-    <ol className="ds-data-headlines" aria-label="Opening figures">
-      {items.map((item) => (
-        <li key={item.id}>
-          <a className="ds-data-headline" href={item.href}>
-            <span className="ds-data-headline__value">
-              {item.value}
-              {item.unit ? <span className="ds-data-headline__unit">{item.unit}</span> : null}
-            </span>
-            <span className="ds-data-headline__label">{item.label}</span>
-            <span className="ds-data-headline__source">{item.source}</span>
-          </a>
-        </li>
-      ))}
-    </ol>
+    <RoomStats
+      label="Opening figures"
+      stats={items.map((item) => ({
+        id: item.id,
+        value: item.value,
+        unit: item.unit,
+        label: item.label,
+        source: item.source,
+        href: item.href,
+      }))}
+    />
   );
 }
 
