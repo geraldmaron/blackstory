@@ -68,7 +68,25 @@ const EM_DASH = /—/;
 
 /** Removes quoted spans so testimony is never held to the narrator's rules. */
 export function stripQuotedSpans(text: string): string {
-  return text.replace(/“[^”]*”/g, ' ').replace(/"[^"]*"/g, ' ');
+  return stripCurlyQuotedSpans(text).replace(/"[^"]*"/g, ' ');
+}
+
+/**
+ * Same result as replacing /“[^”]*”/g, by index scan. The regex rescans to the end of the text from
+ * every unclosed opening mark, which is quadratic on a run of them (CodeQL js/polynomial-redos).
+ * An opening mark still reaches the first closing mark after it, so a quotation that reopens on
+ * each paragraph and closes once is stripped whole.
+ */
+function stripCurlyQuotedSpans(text: string): string {
+  let stripped = '';
+  let cursor = 0;
+  for (;;) {
+    const open = text.indexOf('“', cursor);
+    const close = open === -1 ? -1 : text.indexOf('”', open + 1);
+    if (close === -1) return stripped + text.slice(cursor);
+    stripped += `${text.slice(cursor, open)} `;
+    cursor = close + 1;
+  }
 }
 
 function excerptAround(text: string, index: number, length: number): string {

@@ -30,6 +30,27 @@ test('quoted testimony is never checked', () => {
   assert.equal(stripQuotedSpans('a “b” c').replace(/\s+/g, ' '), 'a c');
 });
 
+test('curly-quote stripping matches the regex it replaced, and stays linear on unclosed marks', () => {
+  const viaRegex = (text: string) => text.replace(/“[^”]*”/g, ' ');
+  const cases = [
+    '',
+    'no quotes here',
+    '“whole”',
+    'a “b” c “d” e',
+    '“one” “two”',
+    'an unclosed “mark runs to the end',
+    'a stray closing” mark, then “a span”',
+    'nested “outer “inner” tail” end',
+    '“Paragraph one reopens.\n\n“Paragraph two closes.” Narration resumes.',
+    '““”“”””',
+  ];
+  for (const text of cases) assert.equal(stripQuotedSpans(text), viaRegex(text), text);
+
+  const started = performance.now();
+  stripQuotedSpans('“'.repeat(200_000));
+  assert.ok(performance.now() - started < 1000, 'a run of opening marks must not rescan the text');
+});
+
 test('publisher self-reference and page pointers are flagged', () => {
   assert.deepEqual(rules('More of this history is on this site.'), ['self-reference']);
   assert.deepEqual(rules('Compare it with the attendance figures below.'), ['page-pointer']);
