@@ -11,6 +11,7 @@
 import React from 'react';
 import {
   EmptyList,
+  FindBar,
   HairlineIndex,
   OffRamp,
   OrientationInstrument,
@@ -134,118 +135,94 @@ export function RecordsIndexRoom({ model, releaseLabel }: RecordsIndexProps) {
         The shared `name` makes them an exclusive accordion: only one at a time, since the
         facets narrow one set together rather than side by side.
       */}
-      <div className="ds-records-controls">
-        <form className="ds-records-find" action="/records" method="get" role="search">
-          <label className="ds-visually-hidden" htmlFor="records-q">
-            Find a record by name or summary
-          </label>
-          <div className="ds-records-find__row">
-            <input
-              className="ds-records-find__input"
-              id="records-q"
-              name="q"
-              type="search"
-              defaultValue={query.q}
-              placeholder="Search names, places"
-              autoComplete="off"
-            />
-            <button className="ds-records-find__go" type="submit">
-              Search
-            </button>
-          </div>
-          {/*
-            The other constraints ride along as hidden fields, so submitting the text field narrows
-            within the current filter rather than silently resetting it. `page` is deliberately not
-            carried: a new term starts at page one.
-          */}
-          {RECORDS_FILTER_KEYS.filter((key) => query[key].length > 0).map((key) => (
-            <input key={key} type="hidden" name={key} value={query[key]} />
-          ))}
-        </form>
-
-        {RECORDS_FILTER_KEYS.map((key) => {
-          const options = facets[key];
-          if (options.length === 0) return null;
-          const active = options.find((option) => option.id === query[key]);
-          return (
-            <details className="ds-records-facet" key={key} name="records-facet">
-              <summary className="ds-records-facet__pill" data-active={active ? 'true' : undefined}>
-                {FILTER_GROUP_LABELS[key]}
-                {active ? <span className="ds-records-facet__value">{active.label}</span> : null}
-              </summary>
-              <div
-                className="ds-records-facet__menu"
-                role="group"
-                aria-label={FILTER_GROUP_LABELS[key]}
-              >
-                {options.length > CHIP_FACET_MAX ? (
-                  /*
+      <FindBar
+        id="records"
+        action="/records"
+        queryLabel="Find a record by name or summary"
+        placeholder="Search names, places"
+        query={query.q}
+        /* The other constraints ride along, so submitting the text field narrows within the
+           current filter rather than silently resetting it. `page` is deliberately not carried:
+           a new term starts at page one. */
+        preserved={Object.fromEntries(RECORDS_FILTER_KEYS.map((key) => [key, query[key]]))}
+        active={constraints.map((constraint) => ({
+          key: constraint.key,
+          label: constraint.label,
+          href: constraint.clearHref,
+        }))}
+        clearHref={clearAllHref}
+      >
+        <div className="ds-records-controls">
+          {RECORDS_FILTER_KEYS.map((key) => {
+            const options = facets[key];
+            if (options.length === 0) return null;
+            const active = options.find((option) => option.id === query[key]);
+            return (
+              <details className="ds-records-facet" key={key} name="records-facet">
+                <summary
+                  className="ds-records-facet__pill"
+                  data-active={active ? 'true' : undefined}
+                >
+                  {FILTER_GROUP_LABELS[key]}
+                  {active ? <span className="ds-records-facet__value">{active.label}</span> : null}
+                </summary>
+                <div
+                  className="ds-records-facet__menu"
+                  role="group"
+                  aria-label={FILTER_GROUP_LABELS[key]}
+                >
+                  {options.length > CHIP_FACET_MAX ? (
+                    /*
                     A long vocabulary (every state, every era, every topic) is a list to pick
                     from, not a wall of chips to scan. A native select gives the whole list with
                     the platform's own picker on a phone, applies on change, and without
                     JavaScript the form still submits through its fallback button. The other
                     narrowings ride along as hidden fields, as in the find form above.
                   */
-                  <form className="ds-records-facet__form" action="/records" method="get">
-                    {query.q.length > 0 ? <input type="hidden" name="q" value={query.q} /> : null}
-                    {RECORDS_FILTER_KEYS.filter(
-                      (other) => other !== key && query[other].length > 0,
-                    ).map((other) => (
-                      <input key={other} type="hidden" name={other} value={query[other]} />
-                    ))}
-                    <AutoSubmitSelect
-                      id={`records-facet-${key}`}
-                      name={key}
-                      label={FILTER_GROUP_LABELS[key]}
-                      defaultValue={active ? active.id : ''}
-                      options={[
-                        { value: '', label: FILTER_ALL_LABELS[key] },
-                        ...options.map((option) => ({
-                          value: option.id,
-                          label: `${option.label} (${option.count.toLocaleString('en-US')})`,
-                        })),
-                      ]}
-                    />
-                    <noscript>
-                      <button className="ds-records-find__go" type="submit">
-                        Show
-                      </button>
-                    </noscript>
-                  </form>
-                ) : (
-                  options.map((option) => (
-                    <a
-                      className="ds-room-chip"
-                      href={option.href}
-                      key={option.id}
-                      aria-current={option.id === query[key] ? true : undefined}
-                    >
-                      {option.label} <span className="ds-room-num">{option.count}</span>
-                    </a>
-                  ))
-                )}
-              </div>
-            </details>
-          );
-        })}
-      </div>
-
-      {constraints.length > 0 ? (
-        <div className="ds-records-active" role="group" aria-label="Active constraints">
-          {constraints.map((constraint) => (
-            <a className="ds-records-active__chip" href={constraint.clearHref} key={constraint.key}>
-              {constraint.label}
-              <span className="ds-records-active__x" aria-hidden="true">
-                ✕
-              </span>
-              <span className="ds-visually-hidden"> — remove this constraint</span>
-            </a>
-          ))}
-          <a className="ds-records-active__clear" href={clearAllHref}>
-            Clear all
-          </a>
+                    <form className="ds-records-facet__form" action="/records" method="get">
+                      {query.q.length > 0 ? <input type="hidden" name="q" value={query.q} /> : null}
+                      {RECORDS_FILTER_KEYS.filter(
+                        (other) => other !== key && query[other].length > 0,
+                      ).map((other) => (
+                        <input key={other} type="hidden" name={other} value={query[other]} />
+                      ))}
+                      <AutoSubmitSelect
+                        id={`records-facet-${key}`}
+                        name={key}
+                        label={FILTER_GROUP_LABELS[key]}
+                        defaultValue={active ? active.id : ''}
+                        options={[
+                          { value: '', label: FILTER_ALL_LABELS[key] },
+                          ...options.map((option) => ({
+                            value: option.id,
+                            label: `${option.label} (${option.count.toLocaleString('en-US')})`,
+                          })),
+                        ]}
+                      />
+                      <noscript>
+                        <button className="ds-records-find__go" type="submit">
+                          Show
+                        </button>
+                      </noscript>
+                    </form>
+                  ) : (
+                    options.map((option) => (
+                      <a
+                        className="ds-room-chip"
+                        href={option.href}
+                        key={option.id}
+                        aria-current={option.id === query[key] ? true : undefined}
+                      >
+                        {option.label} <span className="ds-room-num">{option.count}</span>
+                      </a>
+                    ))
+                  )}
+                </div>
+              </details>
+            );
+          })}
         </div>
-      ) : null}
+      </FindBar>
 
       <HairlineIndex
         countLabel={pageCount > 1 ? `${countLabel} · page ${page} of ${pageCount}` : countLabel}

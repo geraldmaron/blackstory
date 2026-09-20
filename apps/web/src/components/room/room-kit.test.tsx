@@ -985,6 +985,7 @@ describe('room kit · room stylesheets size type from the token scale', () => {
     'stories/stories.css',
     'about/about-page.css',
     'support/support.css',
+    'records/records-index.css',
   ] as const;
 
   /** The memorial wall is a protected experience (P-01); its sizes are not this guard's to move. */
@@ -1078,5 +1079,70 @@ describe('room kit · FindBar', () => {
   it('names the list under it and offers one Clear all', () => {
     assert.match(html, /id="law-results-heading" role="status">1 of 12 law entries</);
     assert.equal(html.match(/Clear all/g)?.length, 1);
+  });
+});
+
+/**
+ * repo-vac3x.1.3: on 2026-09-14 the public routes carried 33 control families. The rooms now
+ * share the FindBar. This is a ratchet: the families below exist today, the ones outside the room
+ * kit belong to Explore, the Door and record pages (repo-vac3x.1.5 and .1.6 retire those), and a
+ * new chip, pill or filter family anywhere under app/ fails until it is folded into the kit.
+ */
+describe('room kit · one public control system', () => {
+  const KNOWN_CONTROL_FAMILIES: readonly string[] = [
+    // The room kit's own.
+    'ds-find',
+    'ds-pill-select',
+    'ds-records-active',
+    'ds-records-facet',
+    'ds-room-chip',
+    'ds-typeahead',
+    // Explore, Door and record pages. Out of the rooms pass; do not add to this half.
+    'ds-door',
+    'ds-explore',
+    'ds-explore-place',
+    'ds-lens',
+    'ds-privacy',
+    'ds-rec-pill',
+    'ds-rec-pills',
+    'ds-relation-chip',
+    'ds-sheet',
+    'ds-state-chip',
+    'ds-state-start',
+  ];
+
+  const publicFiles = (extension: string) =>
+    [...walk(APP_DIR), ...walk(path.join(APP_DIR, '../components'))].filter(
+      (file) =>
+        file.endsWith(extension) &&
+        !file.includes(`${path.sep}admin${path.sep}`) &&
+        !/\.test\.tsx?$/.test(file),
+    );
+
+  it('no route grows its own chip, pill or filter class family', () => {
+    const found = new Set<string>();
+    for (const file of publicFiles('.css')) {
+      const css = readFileSync(file, 'utf8').replace(/\/\*[\s\S]*?\*\//g, '');
+      for (const [selector] of css.matchAll(
+        /\.ds-[a-z0-9_-]*(?:chip|pill|filter)s?(?![a-z])[a-z0-9_-]*/g,
+      )) {
+        const family = selector.slice(1).split(/__|--/)[0] as string;
+        if (!KNOWN_CONTROL_FAMILIES.includes(family)) {
+          found.add(`${path.relative(APP_DIR, file)}: .${family}`);
+        }
+      }
+    }
+    assert.deepEqual([...found].sort(), [], 'use FindBar and .ds-room-chip from components/room');
+  });
+
+  it('no public route has an Apply button; controls apply themselves', () => {
+    const offenders = publicFiles('.tsx').filter((file) =>
+      /<button[^>]*>\s*(?:\{['"`])?\s*Apply\b/.test(readFileSync(file, 'utf8')),
+    );
+    assert.deepEqual(
+      offenders.map((file) => path.relative(APP_DIR, file)),
+      [],
+      'a chip is a link, a select uses AutoSubmitSelect, a search field submits on Enter',
+    );
   });
 });

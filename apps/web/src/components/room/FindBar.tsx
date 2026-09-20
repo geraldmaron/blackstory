@@ -61,7 +61,8 @@ export type FindBarProps = {
   readonly active?: readonly FindBarConstraint[];
   readonly clearHref: string;
   readonly sort?: readonly FindBarChip[];
-  readonly summary: string;
+  /** Omit when the list under the bar prints its own count, as `HairlineIndex` does. */
+  readonly summary?: string | undefined;
   readonly className?: string;
 };
 
@@ -164,29 +165,33 @@ export function FindBar({
 
       {children}
 
-      <div className="ds-find__count">
-        <p className="ds-room-idx__count" id={`${id}-results-heading`} role="status">
-          {summary}
-        </p>
-        {sort === undefined || sort.length === 0 ? null : (
-          <nav className="ds-find__sort" aria-label="Sort order">
-            <span className="ds-find__sort-label" aria-hidden="true">
-              Sort
-            </span>
-            {sort.map((option) => (
-              <Link
-                key={option.href + option.label}
-                className="ds-find__sort-link"
-                href={option.href}
-                aria-current={option.active ? true : undefined}
-              >
-                {option.label}
-                {option.mark === undefined ? null : <span aria-hidden="true"> {option.mark}</span>}
-              </Link>
-            ))}
-          </nav>
-        )}
-      </div>
+      {summary === undefined ? null : (
+        <div className="ds-find__count">
+          <p className="ds-room-idx__count" id={`${id}-results-heading`} role="status">
+            {summary}
+          </p>
+          {sort === undefined || sort.length === 0 ? null : (
+            <nav className="ds-find__sort" aria-label="Sort order">
+              <span className="ds-find__sort-label" aria-hidden="true">
+                Sort
+              </span>
+              {sort.map((option) => (
+                <Link
+                  key={option.href + option.label}
+                  className="ds-find__sort-link"
+                  href={option.href}
+                  aria-current={option.active ? true : undefined}
+                >
+                  {option.label}
+                  {option.mark === undefined ? null : (
+                    <span aria-hidden="true"> {option.mark}</span>
+                  )}
+                </Link>
+              ))}
+            </nav>
+          )}
+        </div>
+      )}
     </div>
   );
 }
