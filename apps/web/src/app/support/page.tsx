@@ -19,6 +19,7 @@ import {
   RoomSection,
   roomSectionTone,
   KeepGoing,
+  RoomJump,
 } from '../../components/room';
 import { DestinationIcon } from '../../components/patterns/DestinationIcon';
 import { WalkOffRamp } from '../walk-off-ramp';
@@ -75,6 +76,14 @@ export default function SupportPage() {
           </>
         }
         lede="BlackStory is one person's archive of Black history, tied to the places it happened. If something in a record is wrong, corrections is the fastest way in: it is moderated, it gives you a receipt code, and nothing is published as submitted."
+      />
+
+      <RoomJump
+        sections={[
+          { id: 'paths', label: 'The fastest ways in', icon: 'correction' },
+          { id: 'contact', label: 'Reach me', icon: 'support' },
+          { id: 'keep-going', label: 'Keep going', icon: 'rooms' },
+        ]}
       />
 
       <RoomSection

@@ -1171,6 +1171,8 @@ a.ds-errata__row-id {
   .ds-room--ledger .ds-law-idx .ds-law-idx__citation {
     grid-row: 3;
     display: block;
+    /* The compact row capped the citation at 120px beside the year; here it has the column. */
+    max-width: none;
   }
 
   .ds-room--ledger .ds-law-idx .ds-law-idx__gloss {
