@@ -117,6 +117,21 @@ export type LivesWorldRecording = {
   readonly contentNote?: string;
 };
 
+/**
+ * A recording the public can hear or watch at the archive, which this site may NOT play inline:
+ * the interviewee or the institution keeps copyright (the Civil Rights History Project, the UNC
+ * Southern Oral History Program). The account shows a link and the archive's own rights statement,
+ * and no player. Inline play is reserved for `LivesWorldRecording`, whose rights reading is recorded.
+ */
+export type LivesWorldArchivePointer = {
+  readonly itemUrl: string;
+  readonly holdingInstitution: string;
+  readonly format: 'audio' | 'video';
+  /** The archive's own rights statement, quoted. */
+  readonly rightsNote: string;
+  readonly recordedOn: string;
+};
+
 /** A verbatim quotation may run to 40 words: docs/methodology/chapter-fact-validation.md. */
 export const LIVES_WORLD_QUOTE_MAX_WORDS = 40;
 
@@ -149,6 +164,8 @@ export type LivesWorldBeatInput = {
   readonly quote?: string;
   /** Requires a speaker whose mediation is `recorded-interview`. */
   readonly recording?: LivesWorldRecording;
+  /** Link-only. Never together with `recording`. */
+  readonly archivePointer?: LivesWorldArchivePointer;
 };
 
 export type LivesWorldBeat = {
@@ -172,6 +189,7 @@ export type LivesWorldBeat = {
   readonly speakerPlaceMismatch?: boolean;
   readonly quote?: string;
   readonly recording?: LivesWorldRecording;
+  readonly archivePointer?: LivesWorldArchivePointer;
 };
 
 export type LivesWorldGapCard = {
@@ -353,6 +371,42 @@ export function validateLivesWorldBeats(input: unknown): {
       }
     }
 
+    let archivePointer: LivesWorldArchivePointer | undefined;
+    if (beat.archivePointer !== undefined) {
+      const a = beat.archivePointer as Record<string, unknown> | null;
+      if (!a || typeof a !== 'object') {
+        problems.push('archivePointer must be an object');
+      } else {
+        const text = (key: string): string =>
+          typeof a[key] === 'string' ? (a[key] as string).trim() : '';
+        if (beat.recording !== undefined) {
+          problems.push('an account is either played inline or linked, never both');
+        }
+        if (!/^https:\/\//.test(text('itemUrl'))) {
+          problems.push('archivePointer.itemUrl must be an https URL');
+        }
+        if (text('format') !== 'audio' && text('format') !== 'video') {
+          problems.push('archivePointer.format must be audio or video');
+        }
+        for (const key of ['holdingInstitution', 'rightsNote', 'recordedOn'] as const) {
+          if (!text(key)) problems.push(`archivePointer.${key} is required`);
+        }
+        const speaker = beat.speaker as Record<string, unknown> | undefined;
+        if (!speaker || speaker.mediation !== 'recorded-interview') {
+          problems.push(
+            'an archive pointer requires a speaker whose mediation is recorded-interview',
+          );
+        }
+        archivePointer = {
+          itemUrl: text('itemUrl'),
+          holdingInstitution: text('holdingInstitution'),
+          format: text('format') as 'audio' | 'video',
+          rightsNote: text('rightsNote'),
+          recordedOn: text('recordedOn'),
+        };
+      }
+    }
+
     const citations = Array.isArray(beat.citations) ? beat.citations : [];
     const validCitations = citations.filter(
       (citation): citation is LivesSourceRef =>
@@ -421,6 +475,7 @@ export function validateLivesWorldBeats(input: unknown): {
         : {}),
       ...(quote ? { quote } : {}),
       ...(recording ? { recording } : {}),
+      ...(archivePointer ? { archivePointer } : {}),
     };
     records.push(record);
   });

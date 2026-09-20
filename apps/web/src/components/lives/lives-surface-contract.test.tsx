@@ -298,3 +298,40 @@ test('an era with prose but no figure renders person first, says why there is no
   assert.match(html, /id="ref-7"/);
   assert.match(html, /Sources for this stretch \(1\)/);
 });
+
+test('an in-copyright recording is linked with the archive’s rights line, and no player renders', async () => {
+  const { LivesAccount } = await import('./LivesAccount');
+  const html = renderToStaticMarkup(
+    <LivesAccount
+      beat={{
+        id: '1960-housing-walter',
+        domain: 'housing',
+        claimType: 'testimony',
+        heading: 'Picketing the tracts',
+        body: 'Mildred Pitts Walter described picketing housing tracts in Los Angeles.',
+        citations: [],
+        appliesTo: ['black'],
+        unit: 'all',
+        entities: [],
+        speaker: {
+          name: 'Mildred Pitts Walter',
+          place: 'Los Angeles, California',
+          year: 'recorded 2013',
+          mediation: 'recorded-interview',
+          mediatedBy: 'David Cline',
+        },
+        quote: 'We picketed every weekend.',
+        archivePointer: {
+          itemUrl: 'https://www.loc.gov/item/2015669178/',
+          holdingInstitution: 'the Library of Congress',
+          format: 'video',
+          rightsNote: 'The interviewee retains copyright.',
+          recordedOn: '2013',
+        },
+      }}
+    />,
+  );
+  assert.doesNotMatch(html, /<audio|<video|<iframe/);
+  assert.match(html, /Watch at the Library of Congress/);
+  assert.match(html, /The interviewee retains copyright\./);
+});

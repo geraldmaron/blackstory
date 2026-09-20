@@ -310,3 +310,33 @@ test('shares of one total are never reported as a gap between groups', async () 
   assert.equal(livesConditionIsGroupRate('homeownership'), true);
   assert.equal(livesConditionIsGroupRate('unemployed'), true);
 });
+
+test('an in-copyright recording is linked, never played, and never both', () => {
+  const who = {
+    name: 'Mildred Pitts Walter',
+    place: 'Los Angeles, California',
+    year: 'recorded 2013',
+    mediation: 'recorded-interview',
+    mediatedBy: 'David Cline',
+  };
+  const pointer = {
+    itemUrl: 'https://www.loc.gov/item/2015669178/',
+    holdingInstitution: 'the Library of Congress',
+    format: 'video',
+    rightsNote: 'The interviewee retains copyright.',
+    recordedOn: '2013',
+  };
+  const linked = validateLivesWorldBeats([{ ...speakerBeat(who), archivePointer: pointer }]);
+  assert.deepEqual(linked.errors, []);
+  assert.equal(linked.records[0]?.archivePointer?.format, 'video');
+
+  const both = validateLivesWorldBeats([
+    { ...speakerBeat(who), archivePointer: pointer, recording: HUGHES_RECORDING },
+  ]);
+  assert.match(both.errors.join('\n'), /either played inline or linked, never both/);
+
+  const noRights = validateLivesWorldBeats([
+    { ...speakerBeat(who), archivePointer: { ...pointer, rightsNote: '' } },
+  ]);
+  assert.match(noRights.errors.join('\n'), /archivePointer\.rightsNote is required/);
+});

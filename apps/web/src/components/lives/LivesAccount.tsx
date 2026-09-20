@@ -14,7 +14,7 @@ void React;
  * Sources and the rights reading: docs/research/lives-audio-sources.md.
  */
 export function LivesAccount({ beat }: { readonly beat: LivesWorldBeat }) {
-  const { speaker, quote, recording } = beat;
+  const { speaker, quote, recording, archivePointer } = beat;
   if (!speaker || !quote) return null;
   return (
     <figure className="lives-account">
@@ -62,6 +62,18 @@ export function LivesAccount({ beat }: { readonly beat: LivesWorldBeat }) {
           <p className="lives-account__credit">
             {recording.creditLine}. {recording.rightsNote}
           </p>
+        </div>
+      ) : null}
+      {archivePointer ? (
+        <div className="lives-account__recording">
+          <p className="lives-account__links">
+            Recorded {archivePointer.recordedOn}.{' '}
+            <a href={archivePointer.itemUrl} rel="noopener noreferrer">
+              {archivePointer.format === 'video' ? 'Watch' : 'Listen'} at{' '}
+              {archivePointer.holdingInstitution}
+            </a>
+          </p>
+          <p className="lives-account__credit">{archivePointer.rightsNote}</p>
         </div>
       ) : null}
       {beat.citations.length > 0 ? (

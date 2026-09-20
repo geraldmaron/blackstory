@@ -152,6 +152,7 @@ export type {
   LivesWorldClaimType,
   LivesWorldGapState,
   LivesWorldMediation,
+  LivesWorldArchivePointer,
   LivesWorldRecording,
   LivesWorldSpeaker,
   LivesWorldBeatInput,
