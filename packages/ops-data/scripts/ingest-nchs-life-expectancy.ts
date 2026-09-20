@@ -1,20 +1,31 @@
 /**
- * NCHS life expectancy at birth by race (1900–present) ingest.
+ * NCHS life expectancy at birth by race, national, selected years 1900 to 2021.
  *
- * Source: NCHS "United States Life Tables" historical series:
- * - 1900–2018: CDC/NCHS "Death rates and life expectancy at birth" dataset
- *   (Socrata API, data.cdc.gov; search "NCHS life expectancy at birth race")
- * - 2019–present: NCHS National Vital Statistics Reports (PDF/table form;
- *   transcribed with source page cited in metadata)
+ * EVERY VALUE IS TRANSCRIBED FROM A NAMED NCHS PUBLICATION, row by row, in the fixture CSV:
+ * - 1900 to 2017: the NCHS open dataset "Death rates and life expectancy at birth"
+ *   (https://data.cdc.gov/d/w9j2-ggv5, public domain). The fixture's values were generated from
+ *   the dataset's own API response, not typed.
+ * - 2018 to 2021: the Results abstract of "United States Life Tables" for each year
+ *   (National Vital Statistics Reports 69-12, 70-19, 71-1, 72-12).
+ *
+ * WHY THIS HEADER IS BLUNT. Until 2026-09-20 the fixture held values typed from memory and the
+ * rows cited a placeholder URL. Eleven of twenty years disagreed with NCHS (Black 1910 was 34.1
+ * against NCHS's 35.6; Black 2000 was 71.3 against 71.8; 2021 held provisional figures). Do not
+ * add a year to the fixture without opening the publication it comes from.
+ *
+ * THREE POPULATIONS SHARE EACH METRIC ID, AND THE SEAMS ARE NOT OPTIONAL CONTEXT:
+ * - 1900 to 1969, the "Black" series is the NONWHITE population. NCHS, United States Life Tables,
+ *   2017 (NVSR 68-7), Table 19, footnote 1: "Before 1970, data for the black population are not
+ *   available. Data shown for 1900–1969 are for the nonwhite population."
+ * - 1970 to 2017, it is the Black population, all origins.
+ * - 2018 on, NCHS reports the NON-HISPANIC SINGLE-RACE Black and White populations. The white
+ *   series changes definition here too.
+ * Each observation carries its own population label in metadata.raceLabel, and any surface that
+ * shows these figures must show the label beside them.
  *
  * Metrics:
- * - nchs-life-expectancy-birth-black-nation: life expectancy at birth, Black population, national
- * - nchs-life-expectancy-birth-white-nation: life expectancy at birth, White population, national
- *
- * Sanity checks (approximate):
- * - 1900: Black ~33, white ~47.6
- * - 2019: Black ~74.8, white ~78.8
- * - 2021 (COVID trough): Black ~70.8
+ * - nchs-life-expectancy-birth-black-nation
+ * - nchs-life-expectancy-birth-white-nation
  *
  * Usage (repo root):
  *   # Dry-run (default) — counts observations without writing
@@ -44,8 +55,11 @@ const DEFAULT_FIXTURE_PATH = join(
 );
 
 const NCHS_HOMEPAGE_URL = 'https://www.cdc.gov/nchs/nvss/life-expectancy.htm';
-const NCHS_VITAL_STATS_REPORTS_URL = 'https://www.cdc.gov/nchs/nvsr/';
-const SOCRATA_DATASET_URL = 'https://data.cdc.gov/resource/';
+const NCHS_DATASET_URL = 'https://data.cdc.gov/d/w9j2-ggv5';
+/** NCHS, United States Life Tables, 2017 (NVSR 68-7), Table 19, footnote 1. Verbatim. */
+const NCHS_NONWHITE_FOOTNOTE =
+  'Before 1970, data for the black population are not available. Data shown for 1900–1969 are for the nonwhite population.';
+const NCHS_NONWHITE_FOOTNOTE_URL = 'https://www.cdc.gov/nchs/data/nvsr/nvsr68/nvsr68_07-508.pdf';
 
 const METRIC_IDS = {
   BLACK: 'nchs-life-expectancy-birth-black-nation',
@@ -61,7 +75,8 @@ type ObservationDraft = {
   readonly sourceUrl: string;
   readonly retrievedAt: string;
   readonly contentHash: string;
-  readonly raceLabel: string; // "Black" or "White" or "nonwhite" (pre-1970)
+  /** The population NCHS actually measured for this row: see the header's three populations. */
+  readonly raceLabel: string;
 };
 
 type FetchResult = {
@@ -81,6 +96,22 @@ function computeContentHash(data: string): string {
   return createHash('sha256').update(data).digest('hex');
 }
 
+/** Splits one CSV line, honoring double-quoted fields (publication titles contain commas). */
+function splitCsvLine(line: string): string[] {
+  const fields: string[] = [];
+  let current = '';
+  let quoted = false;
+  for (const char of line) {
+    if (char === '"') quoted = !quoted;
+    else if (char === ',' && !quoted) {
+      fields.push(current.trim());
+      current = '';
+    } else current += char;
+  }
+  fields.push(current.trim());
+  return fields;
+}
+
 function parseFixtureCsv(csvText: string): FetchResult {
   const lines = csvText.trim().split('\n');
   const headerLine = lines[0];
@@ -88,15 +119,19 @@ function parseFixtureCsv(csvText: string): FetchResult {
     throw new Error('CSV fixture must have at least a header row and one data row');
   }
 
-  const header = headerLine.split(',').map((h) => h.trim());
-  const yearIdx = header.indexOf('Year');
-  const blackIdx = header.indexOf('Black');
-  const whiteIdx = header.indexOf('White');
-  const raceLabelIdx = header.indexOf('RaceLabel');
-
-  if (yearIdx === -1 || (blackIdx === -1 && whiteIdx === -1)) {
-    throw new Error('CSV must have Year column and either Black or White life expectancy columns');
-  }
+  const header = splitCsvLine(headerLine);
+  const column = (name: string): number => {
+    const index = header.indexOf(name);
+    if (index === -1) throw new Error(`CSV fixture is missing the "${name}" column`);
+    return index;
+  };
+  const yearIdx = column('Year');
+  const series = [
+    { metricId: METRIC_IDS.BLACK, valueIdx: column('Black'), labelIdx: column('BlackLabel') },
+    { metricId: METRIC_IDS.WHITE, valueIdx: column('White'), labelIdx: column('WhiteLabel') },
+  ] as const;
+  const sourceIdx = column('Source');
+  const sourceUrlIdx = column('SourceUrl');
 
   const observations: ObservationDraft[] = [];
   const rejected: string[] = [];
@@ -107,79 +142,47 @@ function parseFixtureCsv(csvText: string): FetchResult {
   for (let i = 1; i < lines.length; i++) {
     const line = lines[i]?.trim();
     if (!line) continue;
-
-    const parts = line.split(',').map((p) => p.trim());
-    if (parts.length < Math.max(yearIdx, blackIdx, whiteIdx) + 1) {
-      rejected.push(`Row ${i + 1}: insufficient columns`);
-      continue;
-    }
-
-    const yearStr = parts[yearIdx];
-    const year = Number(yearStr);
+    const parts = splitCsvLine(line);
+    const year = Number(parts[yearIdx]);
     if (!Number.isInteger(year) || year < 1900 || year > 2100) {
-      rejected.push(`Row ${i + 1}: invalid year "${yearStr}"`);
+      rejected.push(`Row ${i + 1}: invalid year "${parts[yearIdx]}"`);
       continue;
     }
-
-    const raceLabel = (raceLabelIdx !== -1 ? parts[raceLabelIdx] : '') ?? '';
-
-    // Black life expectancy
-    if (blackIdx !== -1) {
-      const blackStr = parts[blackIdx];
-      const blackValue = Number(blackStr);
-      if (!isNaN(blackValue) && blackValue > 0) {
-        const id = `${METRIC_IDS.BLACK}:${year}:nation`;
-        observations.push({
-          id,
-          metricId: METRIC_IDS.BLACK,
-          referencePeriod: String(year),
-          estimate: blackValue,
-          source: year <= 2018 ? 'NCHS/Socrata API' : 'NCHS National Vital Statistics Report',
-          sourceUrl:
-            year <= 2018
-              ? `${SOCRATA_DATASET_URL}(dataset-id-search-nchs-life-expectancy-at-birth-race)`
-              : NCHS_VITAL_STATS_REPORTS_URL,
-          retrievedAt,
-          contentHash,
-          raceLabel,
-        });
-        yearsSet.add(year);
-      }
+    const source = parts[sourceIdx] ?? '';
+    const sourceUrl = parts[sourceUrlIdx] ?? '';
+    if (!source || !/^https:\/\//.test(sourceUrl)) {
+      rejected.push(`Row ${i + 1}: every value needs a named publication and an https URL`);
+      continue;
     }
-
-    // White life expectancy
-    if (whiteIdx !== -1) {
-      const whiteStr = parts[whiteIdx];
-      const whiteValue = Number(whiteStr);
-      if (!isNaN(whiteValue) && whiteValue > 0) {
-        const id = `${METRIC_IDS.WHITE}:${year}:nation`;
-        observations.push({
-          id,
-          metricId: METRIC_IDS.WHITE,
-          referencePeriod: String(year),
-          estimate: whiteValue,
-          source: year <= 2018 ? 'NCHS/Socrata API' : 'NCHS National Vital Statistics Report',
-          sourceUrl:
-            year <= 2018
-              ? `${SOCRATA_DATASET_URL}(dataset-id-search-nchs-life-expectancy-at-birth-race)`
-              : NCHS_VITAL_STATS_REPORTS_URL,
-          retrievedAt,
-          contentHash,
-          raceLabel,
-        });
-        yearsSet.add(year);
+    for (const { metricId, valueIdx, labelIdx } of series) {
+      const value = Number(parts[valueIdx]);
+      const raceLabel = parts[labelIdx] ?? '';
+      if (Number.isNaN(value) || value <= 0) continue;
+      if (!raceLabel) {
+        rejected.push(`Row ${i + 1}: ${metricId} has no population label`);
+        continue;
       }
+      observations.push({
+        id: `${metricId}:${year}:nation`,
+        metricId,
+        referencePeriod: String(year),
+        estimate: value,
+        source,
+        sourceUrl,
+        retrievedAt,
+        contentHash,
+        raceLabel,
+      });
+      yearsSet.add(year);
     }
   }
-
-  const yearsIngested = Array.from(yearsSet).sort((a, b) => a - b);
 
   return {
     observations,
     rejected,
-    yearsIngested,
+    yearsIngested: Array.from(yearsSet).sort((a, b) => a - b),
     fixturePath: DEFAULT_FIXTURE_PATH,
-    sourceUrl: NCHS_HOMEPAGE_URL,
+    sourceUrl: NCHS_DATASET_URL,
   };
 }
 
@@ -238,11 +241,14 @@ async function applyObservations(
           'health',
           JSON.stringify({
             methodologyNote:
-              'National Center for Health Statistics (NCHS) life tables. ' +
-              '1900–2018 from CDC/NCHS Socrata API; 2019–present from NCHS National Vital Statistics Reports. ' +
-              'Pre-1970 "Black" is often labeled "nonwhite" in NCHS tables — see metadata.raceLabel for period-specific terminology.',
+              'NCHS life expectancy at birth. 1900 to 2017 from the NCHS open dataset "Death rates and life expectancy at birth"; ' +
+              '2018 on from the United States Life Tables report for each year. Three populations share this metric: ' +
+              'nonwhite (1900 to 1969), Black or White of all origins (1970 to 2017), and non-Hispanic single-race (2018 on). ' +
+              'Each observation names its population in metadata.raceLabel.',
+            nonwhiteFootnote: NCHS_NONWHITE_FOOTNOTE,
+            nonwhiteFootnoteUrl: NCHS_NONWHITE_FOOTNOTE_URL,
             nchsHomepage: NCHS_HOMEPAGE_URL,
-            nchsVitalStatsReports: NCHS_VITAL_STATS_REPORTS_URL,
+            nchsDataset: NCHS_DATASET_URL,
           }),
         ],
       );
@@ -258,6 +264,8 @@ async function applyObservations(
          VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,'observed',$10,$11,$12::timestamptz,$13,$14::jsonb)
          ON CONFLICT (id) DO UPDATE SET
            estimate = EXCLUDED.estimate,
+           source = EXCLUDED.source,
+           source_url = EXCLUDED.source_url,
            content_hash = EXCLUDED.content_hash,
            retrieved_at = EXCLUDED.retrieved_at,
            metadata = EXCLUDED.metadata`,
@@ -276,8 +284,10 @@ async function applyObservations(
           obs.retrievedAt,
           obs.contentHash,
           JSON.stringify({
-            raceLabel: obs.raceLabel || null,
-            note: 'NCHS life expectancy data. Pre-1970 "Black" may be labeled "nonwhite" in source tables.',
+            raceLabel: obs.raceLabel,
+            ...(obs.raceLabel === 'nonwhite'
+              ? { note: NCHS_NONWHITE_FOOTNOTE, noteUrl: NCHS_NONWHITE_FOOTNOTE_URL }
+              : {}),
           }),
         ],
       );

@@ -215,9 +215,9 @@ async function main() {
       raceSlice: 'black',
       unit: 'years',
       definition:
-        'Life expectancy at birth for the Black population, national, from NCHS historical life tables.',
+        'Life expectancy at birth from NCHS life tables, national. The population measured changes twice within the series; see the comparability note.',
       comparabilityNote:
-        'Single NCHS source, but the race label changes over time: "nonwhite" (1900–1940, 1970), "colored" (1950–1960), and true "Black" only from 1980 on. Pre-1980 values are a nonwhite/colored PROXY for Black and should be read as such — this is a within-series definitional seam at 1980, not a source splice. Includes the real 2015–2017 stagnation and the 2020–2021 COVID collapse (74.8→70.8).',
+        'Three populations share this series, by NCHS\'s own account. 1900–1969 is the NONWHITE population: "Before 1970, data for the black population are not available. Data shown for 1900–1969 are for the nonwhite population" (NCHS, United States Life Tables, 2017, NVSR 68-7, Table 19, footnote 1). 1970–2017 is the Black population, all origins. From 2018 NCHS reports the non-Hispanic single-race Black population, so 2018–2021 are not directly comparable with 2017 and earlier. Values through 2017 come from the NCHS open dataset "Death rates and life expectancy at birth" (data.cdc.gov/d/w9j2-ggv5); 2018–2021 come from the United States Life Tables report for each year. NCHS gives 74.8 for 2019, 71.5 for 2020 and 71.2 for 2021.',
       theme: 'health',
       segments: [
         {
@@ -226,11 +226,12 @@ async function main() {
           periodEnd: '2021',
           priority: 1,
           spliceNote:
-            'Single source; race-label proxy seam at 1980 (nonwhite/colored before, Black after) documented in comparability_note.',
+            'Single publisher, three populations: nonwhite to 1969, Black from 1970, non-Hispanic single-race Black from 2018.',
           seamCheck: {
             type: 'definitional',
-            seam_year: '1980',
-            note: 'Label transitions nonwhite/colored -> Black at 1980; pre-1980 is a proxy.',
+            seam_year: '1970',
+            additional_seam_years: ['2018'],
+            note: 'Nonwhite population through 1969 (NCHS Table 19 footnote); Black from 1970; non-Hispanic single-race Black from 2018.',
           },
         },
       ],
@@ -242,9 +243,9 @@ async function main() {
       raceSlice: 'white',
       unit: 'years',
       definition:
-        'Life expectancy at birth for the white population, national, from NCHS historical life tables.',
+        'Life expectancy at birth from NCHS life tables, national. The population measured changes at 2018; see the comparability note.',
       comparabilityNote:
-        'Single NCHS source. White labeling is stable across the span (unlike the Black spine). Includes the 2020–2021 COVID decline (78.8→76.1).',
+        '1900–2017 is the white population, all origins, from the NCHS open dataset "Death rates and life expectancy at birth" (data.cdc.gov/d/w9j2-ggv5). From 2018 NCHS reports the non-Hispanic single-race White population, so 2018–2021 are not directly comparable with 2017 and earlier. NCHS gives 78.8 for 2019, 77.4 for 2020 and 76.7 for 2021.',
       theme: 'health',
       segments: [
         {
@@ -252,8 +253,13 @@ async function main() {
           periodStart: '1900',
           periodEnd: '2021',
           priority: 1,
-          spliceNote: 'Single source, stable white definition.',
-          seamCheck: { type: 'single-source', note: 'No seam.' },
+          spliceNote:
+            'Single publisher, two populations: white of all origins to 2017, non-Hispanic single-race White from 2018.',
+          seamCheck: {
+            type: 'definitional',
+            seam_year: '2018',
+            note: 'White population of all origins through 2017; non-Hispanic single-race White from 2018.',
+          },
         },
       ],
     },
