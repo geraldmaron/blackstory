@@ -197,3 +197,104 @@ test('every Lives text size comes from the design system type scale', () => {
   // A one-off rem or clamp() value is how this page reached thirty different text sizes.
   assert.deepEqual(offScale, []);
 });
+
+test('an era with prose but no figure renders person first, says why there is no figure, and numbers its sources', async () => {
+  const { LivesMilestoneExperience } = await import('./LivesMilestoneExperience');
+  const { LIVES_MILESTONES } = await import('../../lib/lives/lives-milestones');
+  const narrative = {
+    doc: {
+      slug: 'keeping-a-home-1870s-1890s',
+      title: 'Forty acres promised, and taken back',
+      placeLabel: 'Georgia and South Carolina',
+      eraLabel: '1870s–1890s',
+      series: { id: 'lives-home', label: 'Keeping a home', position: 1 },
+      body: [],
+    },
+    blocks: [
+      {
+        type: 'paragraph',
+        text: 'A family on the Sea Islands planted a second season.[ref:nara-field-order]',
+      },
+    ],
+    references: [
+      {
+        number: 7,
+        key: 'nara-field-order',
+        label: 'National Archives',
+        url: 'https://www.archives.gov/',
+      },
+    ],
+    refNumberById: new Map([['nara-field-order', 7]]),
+  };
+  const bundle = {
+    areaId: 'nation:US',
+    areaSlug: 'united-states',
+    areaName: 'United States',
+    areaKind: 'nation',
+    disclaimer: 'Comparison is not causation.',
+    decades: [
+      {
+        decade: 1870,
+        label: '1870s',
+        conditions: [
+          {
+            key: 'homeownership',
+            label: 'Owning their home',
+            universe: 'Occupied homes',
+            cells: {
+              black: {
+                state: 'not_measured',
+                reason: 'The census didn’t publish this by race in the 1870s.',
+              },
+              white: { state: 'not_measured', reason: 'x' },
+              hispanic: { state: 'not_measured', reason: 'x' },
+            },
+          },
+        ],
+        countNotes: [],
+        rulesInForce: [],
+        worldBeats: [
+          {
+            id: '1870-housing-fountain-hughes',
+            domain: 'housing',
+            claimType: 'testimony',
+            heading: 'After freedom, no home to go to',
+            body: 'Fountain Hughes was recorded in Baltimore in 1949.',
+            citations: [],
+            appliesTo: ['black'],
+            unit: 'all',
+            entities: [],
+            speaker: {
+              name: 'Fountain Hughes',
+              place: 'Baltimore, Maryland',
+              year: '1949',
+              mediation: 'recorded-interview',
+              mediatedBy: 'Hermond Norwood',
+            },
+            quote: 'We had nowhere or nothing.',
+          },
+        ],
+      },
+    ],
+  };
+  const html = renderToStaticMarkup(
+    <LivesMilestoneExperience
+      milestone={LIVES_MILESTONES[0]!}
+      bundle={bundle as never}
+      narratives={new Map([['1870-1890', narrative as never]])}
+    />,
+  );
+  // The narrative's own title heads the panel; no era name comes from the product.
+  assert.match(html, /<h3[^>]*>Forty acres promised, and taken back<\/h3>/);
+  // A person first, then the history, then the honest line about the missing figure.
+  const account = html.indexOf('We had nowhere or nothing');
+  const prose = html.indexOf('planted a second season');
+  const absence = html.indexOf('No comparison for this stretch');
+  assert.ok(account > -1 && prose > account && absence > prose, 'order is account, prose, absence');
+  assert.match(html, /The census didn’t publish this by race in the 1870s\./);
+  assert.doesNotMatch(html, /class="lives-era__comparison"/);
+  // The citation keeps the page-wide number it was given, so anchors never collide.
+  assert.match(html, /href="#ref-7"/);
+  assert.match(html, /id="ref-7"/);
+  assert.match(html, /Sources for this stretch \(1\)/);
+});
