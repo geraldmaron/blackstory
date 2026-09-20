@@ -168,7 +168,7 @@ export const LIVES_WORLD_BEAT_FIXTURES: readonly LivesWorldBeatInput[] = [
     domain: 'count',
     claimType: 'factual',
     heading: 'Mexican as a race in 1930',
-    body: 'The 1930 census counted "Mexican" as a race for one decade, then removed the category. Hispanic origin as asked from 1970 on isn’t the same count. The gap is content, not a missing cell to invent.',
+    body: 'The 1930 census counted “Mexican” as a race for that one decade, then dropped the category. The Hispanic origin question that began in 1970 asks something different, so the two counts can’t be read as one series.',
     citations: [
       {
         label: 'Census Bureau, Fifteenth Census Population volumes (1930)',
@@ -382,9 +382,13 @@ export const LIVES_WORLD_BEAT_FIXTURES: readonly LivesWorldBeatInput[] = [
     unit: 'all',
     domain: 'political',
     claimType: 'factual',
-    heading: 'Ballot access under literacy tests',
-    body: 'Literacy tests and poll taxes sit in the catalog as voting-domain rules. The Voting Rights Act of 1965 is in force for later years of this decade; turnout isn’t invented as a Lives region cell.',
+    heading: 'Literacy tests, until 1965',
+    body: 'The Voting Rights Act was signed on August 6, 1965. The National Archives describes it as outlawing the discriminatory voting practices that many Southern states adopted after the Civil War, including literacy tests as a condition of voting. The Act’s own text defines a banned “test or device” to include any requirement that a voter show the ability to read or write.',
     citations: [
+      {
+        label: 'National Archives, Milestone Documents: Voting Rights Act (1965)',
+        url: 'https://www.archives.gov/milestone-documents/voting-rights-act',
+      },
       {
         label: 'Voting Rights Act of 1965, 79 Stat. 437',
         url: 'https://www.govinfo.gov/content/pkg/STATUTE-79/pdf/STATUTE-79-Pg437.pdf',
