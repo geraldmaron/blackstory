@@ -969,3 +969,48 @@ describe('room kit · the reading progress rule is class-wide', () => {
     );
   });
 });
+
+/**
+ * `tokens.css` defines the type steps and says a surface may choose which step a thing is, not
+ * what the step measures. On 2026-09-20, 172 of 182 `font-size` declarations in these six files
+ * were literals in about 25 values, which is how one index row rendered at 13.5px on /law and
+ * 18px on /books. A literal size in a room stylesheet is how that drift returns.
+ */
+describe('room kit · room stylesheets size type from the token scale', () => {
+  const ROOM_STYLESHEETS = [
+    '../components/room/room-kit.css',
+    'reading-room.css',
+    'data/data-page.css',
+    'stories/stories.css',
+    'about/about-page.css',
+    'support/support.css',
+  ] as const;
+
+  /** The memorial wall is a protected experience (P-01); its sizes are not this guard's to move. */
+  const EXEMPT_SELECTOR = /\.ds-memorial/;
+
+  it('no literal font-size outside the memorial wall', () => {
+    const offenders: string[] = [];
+    for (const rel of ROOM_STYLESHEETS) {
+      const css = readFileSync(path.join(APP_DIR, rel), 'utf8').replace(/\/\*[\s\S]*?\*\//g, '');
+      for (const [, selector, body] of css.matchAll(/([^{}]+)\{([^{}]*)\}/g)) {
+        if (selector === undefined || body === undefined || EXEMPT_SELECTOR.test(selector))
+          continue;
+        for (const [, value] of body.matchAll(/font-size:\s*([^;]+);/g)) {
+          if (value === undefined) continue;
+          const size = value.trim();
+          // Relative sizes scale with a tokenized parent, so they are not a second scale.
+          if (size.startsWith('var(--ds-text-') || size === 'inherit' || /^[\d.]+em$/.test(size)) {
+            continue;
+          }
+          offenders.push(`${rel}: ${selector.trim().split('\n').pop()} { font-size: ${size} }`);
+        }
+      }
+    }
+    assert.deepEqual(
+      offenders,
+      [],
+      'pick a --ds-text-* step from packages/ui/src/styles/tokens.css',
+    );
+  });
+});

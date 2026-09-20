@@ -44,7 +44,7 @@
 .ds-stories-field__label {
   color: var(--ds-ink-muted, var(--ds-ink));
   font-family: var(--ds-font-mono);
-  font-size: 0.6875rem;
+  font-size: var(--ds-text-micro);
   letter-spacing: 0.06em;
   text-transform: uppercase;
 }
@@ -59,7 +59,7 @@
   background: var(--ds-surface-raised);
   color: var(--ds-ink);
   font-family: var(--ds-font-sans);
-  font-size: 0.875rem;
+  font-size: var(--ds-text-body);
 }
 
 .ds-stories-input:focus-visible,
@@ -76,7 +76,7 @@
   background: color-mix(in srgb, var(--ds-accent-graphic) 12%, var(--ds-surface-raised));
   color: var(--ds-ink);
   font-family: var(--ds-font-sans);
-  font-size: 0.875rem;
+  font-size: var(--ds-text-body-sm);
   cursor: pointer;
 }
 
@@ -84,14 +84,14 @@
   align-self: center;
   color: var(--ds-ink-muted, var(--ds-ink));
   font-family: var(--ds-font-sans);
-  font-size: 0.8125rem;
+  font-size: var(--ds-text-caption);
 }
 
 .ds-stories-count {
   margin: 0;
   color: var(--ds-ink-muted, var(--ds-ink));
   font-family: var(--ds-font-mono);
-  font-size: 0.75rem;
+  font-size: var(--ds-text-micro);
   font-variant-numeric: tabular-nums;
 }
 
@@ -110,7 +110,7 @@
 .ds-stories-lead__meta {
   margin: 0;
   font-family: var(--ds-font-mono);
-  font-size: 11px;
+  font-size: var(--ds-text-micro);
   letter-spacing: 0.1em;
   text-transform: uppercase;
   color: var(--ds-accent);
@@ -120,7 +120,7 @@
   margin: var(--ds-space-3) 0 0;
   font-family: var(--ds-font-display);
   font-weight: 600;
-  font-size: clamp(34px, 5vw, 68px);
+  font-size: var(--ds-text-display-2);
   line-height: 1;
   letter-spacing: -0.035em;
 }
@@ -138,7 +138,7 @@
   margin: var(--ds-space-4) 0 0;
   max-width: 44em;
   font-family: var(--ds-font-editorial);
-  font-size: 21px;
+  font-size: var(--ds-text-editorial-lede);
   line-height: 1.5;
   color: var(--room-ink-2, var(--ds-ink-muted));
 }
@@ -186,7 +186,7 @@
   margin: 0;
   font-family: var(--ds-font-display);
   font-weight: 600;
-  font-size: 28px;
+  font-size: var(--ds-text-display-3);
   letter-spacing: -0.025em;
   color: var(--ds-ink);
 }
@@ -194,7 +194,7 @@
 .ds-stories-shelf__title .ds-room-num {
   margin-left: var(--ds-space-2);
   font-family: var(--ds-font-mono);
-  font-size: 14px;
+  font-size: var(--ds-text-caption);
   font-weight: 400;
   color: var(--ds-ink-muted);
 }
@@ -203,7 +203,7 @@
   flex: none;
   color: var(--ds-accent);
   font-family: var(--ds-font-sans);
-  font-size: 14px;
+  font-size: var(--ds-text-body-sm);
   font-weight: 600;
   text-decoration: none;
 }
@@ -246,7 +246,7 @@
   margin-top: var(--ds-space-3);
   font-family: var(--ds-font-mono);
   font-variant-numeric: tabular-nums;
-  font-size: 10px;
+  font-size: var(--ds-text-micro);
   letter-spacing: 0.06em;
   color: var(--ds-ink-muted);
 }
@@ -255,7 +255,7 @@
   margin-top: 6px;
   font-family: var(--ds-font-display);
   font-weight: 600;
-  font-size: 20px;
+  font-size: var(--ds-text-title);
   letter-spacing: -0.02em;
   line-height: 1.2;
 }
@@ -267,7 +267,7 @@
 .ds-stories-shelf__entry-summary {
   margin-top: 4px;
   font-family: var(--ds-font-editorial);
-  font-size: 15px;
+  font-size: var(--ds-text-body-sm);
   line-height: 1.5;
   color: var(--ds-ink-muted);
 }
@@ -308,6 +308,6 @@
   border-radius: var(--ds-radius-full);
   background: color-mix(in oklab, var(--ds-accent) 14%, transparent);
   color: var(--ds-accent);
-  font-size: 12px;
+  font-size: var(--ds-text-caption);
   font-weight: 500;
 }

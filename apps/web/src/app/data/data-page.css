@@ -61,7 +61,7 @@
 .ds-data-headline__value {
   display: block;
   font-family: var(--ds-font-display);
-  font-size: clamp(2rem, 1.4rem + 2.2vw, 2.75rem);
+  font-size: var(--ds-text-display-2);
   font-weight: 600;
   line-height: 1;
   letter-spacing: -0.035em;
@@ -82,7 +82,7 @@
   display: block;
   margin-top: var(--ds-space-3);
   font-family: var(--ds-font-sans);
-  font-size: 0.875rem;
+  font-size: var(--ds-text-body-sm);
   line-height: 1.4;
   color: var(--ds-ink);
 }
@@ -91,7 +91,7 @@
   display: block;
   margin-top: var(--ds-space-2);
   font-family: var(--ds-font-mono);
-  font-size: 0.6875rem;
+  font-size: var(--ds-text-micro);
   letter-spacing: 0.02em;
   color: var(--ds-ink-muted);
 }
@@ -138,7 +138,7 @@
   padding: 12px 0 10px;
   border-bottom: 2px solid transparent;
   font-family: var(--ds-font-mono);
-  font-size: 0.6875rem;
+  font-size: var(--ds-text-micro);
   letter-spacing: 0.1em;
   text-transform: uppercase;
   white-space: nowrap;
@@ -183,7 +183,7 @@
   gap: 0.45em;
   margin: 0;
   font-family: var(--ds-font-mono);
-  font-size: 0.6875rem;
+  font-size: var(--ds-text-micro);
   letter-spacing: 0.1em;
   text-transform: uppercase;
   color: var(--ds-accent);
@@ -198,7 +198,7 @@
   padding: 0;
   border: 0;
   font-family: var(--ds-font-display);
-  font-size: clamp(1.625rem, 1.3rem + 1.2vw, 2.125rem);
+  font-size: var(--ds-text-display-3);
   font-weight: 600;
   line-height: 1.12;
   letter-spacing: -0.03em;
@@ -208,7 +208,7 @@
 .ds-data-section__lede {
   margin: var(--ds-space-1) 0 0;
   font-family: var(--ds-font-editorial);
-  font-size: 1.0625rem;
+  font-size: var(--ds-text-editorial);
   line-height: 1.6;
   color: var(--room-ink-2, var(--ds-ink));
 }
@@ -219,7 +219,7 @@
   gap: var(--ds-space-2) var(--ds-space-4);
   margin: var(--ds-space-2) 0 0;
   font-family: var(--ds-font-mono);
-  font-size: 0.6875rem;
+  font-size: var(--ds-text-micro);
   letter-spacing: 0.02em;
   color: var(--ds-ink-muted);
 }
@@ -264,7 +264,7 @@
 
 .ds-data-delta__label {
   font-family: var(--ds-font-sans);
-  font-size: 0.875rem;
+  font-size: var(--ds-text-body-sm);
   color: var(--ds-ink);
 }
 
@@ -273,7 +273,7 @@
   grid-column: 2;
   align-self: center;
   font-family: var(--ds-font-display);
-  font-size: 1.375rem;
+  font-size: var(--ds-text-title);
   font-weight: 600;
   letter-spacing: -0.02em;
   font-variant-numeric: tabular-nums;
@@ -284,7 +284,7 @@
 .ds-data-delta__note {
   margin: 0;
   font-family: var(--ds-font-mono);
-  font-size: 0.6875rem;
+  font-size: var(--ds-text-micro);
   line-height: 1.5;
   color: var(--ds-ink-muted);
 }
@@ -320,7 +320,7 @@
   gap: 0.45em;
   margin: 0 0 var(--ds-space-2);
   font-family: var(--ds-font-display);
-  font-size: 1rem;
+  font-size: var(--ds-text-body);
   font-weight: 600;
   letter-spacing: -0.01em;
   color: var(--ds-ink);
@@ -329,7 +329,7 @@
 .ds-data-rule__body {
   margin: 0;
   font-family: var(--ds-font-editorial);
-  font-size: 0.9375rem;
+  font-size: var(--ds-text-body-sm);
   line-height: 1.55;
   color: var(--ds-ink-muted);
 }
@@ -351,7 +351,7 @@
   border: var(--ds-border-width) dashed var(--ds-rule);
   border-radius: var(--ds-radius-md);
   font-family: var(--ds-font-sans);
-  font-size: 0.875rem;
+  font-size: var(--ds-text-body-sm);
   line-height: 1.5;
   color: var(--ds-ink-muted);
 }
@@ -359,7 +359,7 @@
 .ds-data-lives-entry {
   margin: 0 0 var(--ds-space-3);
   font-family: var(--ds-font-editorial);
-  font-size: 1.05rem;
+  font-size: var(--ds-text-editorial);
   line-height: 1.5;
 }
 

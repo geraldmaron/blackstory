@@ -156,7 +156,7 @@
   padding-bottom: var(--ds-space-2);
   border-bottom: var(--ds-border-width) solid var(--ds-rule);
   font-family: var(--ds-font-mono);
-  font-size: 10px;
+  font-size: var(--ds-text-micro);
   font-weight: 500;
   letter-spacing: 0.1em;
   text-transform: uppercase;
@@ -176,7 +176,7 @@
   gap: var(--ds-space-3);
   padding: 5px 0;
   color: var(--room-ink-2);
-  font-size: 12.5px;
+  font-size: var(--ds-text-caption);
   text-decoration: none;
 }
 
@@ -214,7 +214,7 @@
      next group's title sits directly under it and reads as part of the same block. */
   margin: var(--ds-space-2) 0 var(--ds-space-4);
   font-family: var(--ds-font-mono);
-  font-size: 10px;
+  font-size: var(--ds-text-micro);
   color: var(--room-ink-4);
 }
 
@@ -226,7 +226,7 @@
   gap: var(--ds-space-2);
   margin-bottom: var(--ds-space-5);
   font-family: var(--ds-font-mono);
-  font-size: 10px;
+  font-size: var(--ds-text-micro);
   letter-spacing: 0.1em;
   text-transform: uppercase;
   color: var(--room-ink-4);
@@ -390,7 +390,7 @@
 .ds-room-header__kicker {
   margin: 0 0 var(--ds-space-3);
   font-family: var(--ds-font-sans);
-  font-size: 12.5px;
+  font-size: var(--ds-text-caption);
   letter-spacing: 0;
   text-transform: none;
   color: var(--room-ink-3);
@@ -399,7 +399,7 @@
 .ds-room-header__title {
   font-family: var(--ds-font-display);
   font-weight: 600;
-  font-size: clamp(44px, 6vw, 86px);
+  font-size: var(--ds-text-display-1);
   line-height: 0.97;
   letter-spacing: -0.042em;
   min-width: 0;
@@ -417,7 +417,7 @@
   margin-top: var(--ds-space-4);
   max-width: 34em;
   font-family: var(--ds-font-editorial);
-  font-size: 22px;
+  font-size: var(--ds-text-editorial-lede);
   line-height: 1.48;
   color: var(--room-ink-2);
 }
@@ -436,7 +436,7 @@
 
 .ds-room-header__meta span {
   font-family: var(--ds-font-mono);
-  font-size: 10px;
+  font-size: var(--ds-text-micro);
   letter-spacing: 0.08em;
   text-transform: uppercase;
   color: var(--room-ink-4);
@@ -468,7 +468,7 @@
   padding-bottom: var(--ds-space-3);
   border-bottom: var(--ds-border-width) solid var(--room-rule-2);
   font-family: var(--ds-font-display);
-  font-size: 24px;
+  font-size: var(--ds-text-display-3);
   font-weight: 600;
   letter-spacing: -0.025em;
   text-transform: none;
@@ -619,14 +619,14 @@
 .ds-room .ds-room-card__title {
   font-family: var(--ds-font-display);
   font-weight: 600;
-  font-size: 24px;
+  font-size: var(--ds-text-title);
   letter-spacing: -0.03em;
   line-height: 1.15;
 }
 
 .ds-room-card__desc {
   font-family: var(--ds-font-editorial);
-  font-size: 16px;
+  font-size: var(--ds-text-body-sm);
   line-height: 1.5;
   color: var(--room-ink-3);
 }
@@ -634,7 +634,7 @@
 .ds-room-card__meta,
 .ds-room-card__tag {
   font-family: var(--ds-font-mono);
-  font-size: 12px;
+  font-size: var(--ds-text-micro);
   letter-spacing: 0.06em;
   color: var(--room-ink-3);
   white-space: normal;
@@ -655,7 +655,7 @@
 .ds-room-cards:not(.ds-room-cards--hub) .ds-room-card__tag {
   grid-column: 3;
   color: var(--room-ink-3);
-  font-size: 10.5px;
+  font-size: var(--ds-text-caption);
 }
 
 .ds-room-cards--hub .ds-room-card__meta {
@@ -728,7 +728,7 @@
 /* —— Prose ————————————————————————————————————————————————————————————————— */
 .ds-room-prose {
   font-family: var(--ds-font-editorial);
-  font-size: 17px;
+  font-size: var(--ds-text-editorial);
   line-height: 1.66;
   color: var(--room-ink-2);
 }
@@ -749,7 +749,7 @@
   border-top: var(--ds-border-width) solid var(--room-rule-2);
   font-family: var(--ds-font-display);
   font-weight: 600;
-  font-size: 25px;
+  font-size: var(--ds-text-display-3);
   line-height: 1.18;
   letter-spacing: -0.025em;
   color: var(--ds-ink);
@@ -759,7 +759,7 @@
   margin-top: var(--ds-space-8);
   font-family: var(--ds-font-display);
   font-weight: 600;
-  font-size: 18px;
+  font-size: var(--ds-text-title);
   letter-spacing: -0.018em;
   color: var(--ds-ink);
 }
@@ -842,7 +842,7 @@
   gap: var(--ds-space-3);
   padding-block: 9px;
   border-bottom: var(--ds-border-width) solid var(--room-rule-2);
-  font-size: 13px;
+  font-size: var(--ds-text-caption);
 }
 
 .ds-room-src:last-child {
@@ -852,7 +852,7 @@
 .ds-room-src__i {
   font-family: var(--ds-font-mono);
   font-variant-numeric: tabular-nums;
-  font-size: 10px;
+  font-size: var(--ds-text-micro);
   color: var(--room-ink-4);
 }
 
@@ -869,7 +869,7 @@
 .ds-room-src__links {
   margin-top: 2px;
   font-family: var(--ds-font-mono);
-  font-size: 10.5px;
+  font-size: var(--ds-text-micro);
   color: var(--room-ink-4);
 }
 
@@ -881,7 +881,7 @@
 .ds-room-src__y {
   font-family: var(--ds-font-mono);
   font-variant-numeric: tabular-nums;
-  font-size: 10.5px;
+  font-size: var(--ds-text-micro);
   color: var(--room-ink-4);
 }
 
@@ -906,13 +906,13 @@
 }
 
 .ds-room-conn__name {
-  font-size: 13px;
+  font-size: var(--ds-text-caption);
   font-weight: 500;
 }
 
 .ds-room-conn__rel {
   font-family: var(--ds-font-mono);
-  font-size: 9.5px;
+  font-size: var(--ds-text-micro);
   letter-spacing: 0.06em;
   color: var(--room-ink-4);
 }
@@ -926,7 +926,7 @@
   border-left: var(--ds-border-width-strong) solid var(--ds-border-strong);
   border-radius: var(--ds-radius-sm);
   font-family: var(--ds-font-mono);
-  font-size: 11.5px;
+  font-size: var(--ds-text-caption);
   line-height: 1.6;
   color: var(--room-ink-3);
 }
@@ -955,7 +955,7 @@
 .ds-room-trust__k {
   display: block;
   font-family: var(--ds-font-mono);
-  font-size: 9.5px;
+  font-size: var(--ds-text-micro);
   letter-spacing: 0.12em;
   text-transform: uppercase;
   color: var(--room-ink-4);
@@ -965,7 +965,7 @@
   display: block;
   margin-top: 4px;
   font-family: var(--ds-font-sans);
-  font-size: 13.5px;
+  font-size: var(--ds-text-caption);
   font-weight: 550;
 }
 
@@ -990,7 +990,7 @@
   align-items: center;
   gap: 5px;
   font-family: var(--ds-font-mono);
-  font-size: 9.5px;
+  font-size: var(--ds-text-micro);
   letter-spacing: 0.12em;
   text-transform: uppercase;
   color: var(--room-ink-4);
@@ -998,7 +998,7 @@
 
 .ds-room-anat__v {
   margin-top: 4px;
-  font-size: 13.5px;
+  font-size: var(--ds-text-caption);
   font-weight: 550;
   letter-spacing: -0.008em;
 }
@@ -1014,7 +1014,7 @@
   border: var(--ds-border-width) solid var(--ds-rule);
   border-radius: var(--ds-radius-full);
   color: var(--room-ink-2);
-  font-size: 12px;
+  font-size: var(--ds-text-caption);
   font-weight: 500;
   white-space: nowrap;
   transition: all var(--ds-duration-fast) var(--ds-easing);
@@ -1040,7 +1040,7 @@ a.ds-room-chip {
 .ds-room-chip .ds-room-num {
   font-family: var(--ds-font-mono);
   font-variant-numeric: tabular-nums;
-  font-size: 10px;
+  font-size: var(--ds-text-micro);
   color: var(--room-ink-4);
 }
 
@@ -1059,7 +1059,7 @@ a.ds-room-chip {
 .ds-room-idx__count {
   margin-bottom: var(--ds-space-2);
   font-family: var(--ds-font-mono);
-  font-size: 10px;
+  font-size: var(--ds-text-micro);
   letter-spacing: 0.1em;
   text-transform: uppercase;
   color: var(--room-ink-4);
@@ -1105,7 +1105,7 @@ a.ds-room-chip {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  font-size: 13.5px;
+  font-size: var(--ds-text-body);
   font-weight: 550;
   letter-spacing: -0.006em;
 }
@@ -1116,7 +1116,7 @@ a.ds-room-chip {
   text-overflow: ellipsis;
   white-space: nowrap;
   font-family: var(--ds-font-mono);
-  font-size: 10px;
+  font-size: var(--ds-text-micro);
   letter-spacing: 0.04em;
   color: var(--room-ink-4);
 }
@@ -1178,7 +1178,7 @@ a.ds-room-chip {
   border-radius: var(--ds-radius-full);
   color: var(--ds-ink);
   font-family: var(--ds-font-ui);
-  font-size: 13px;
+  font-size: var(--ds-text-body);
 }
 
 .ds-records-find__input:focus-visible {
@@ -1196,7 +1196,7 @@ a.ds-room-chip {
   border-radius: var(--ds-radius-full);
   color: var(--ds-ink);
   font-family: var(--ds-font-ui);
-  font-size: 13px;
+  font-size: var(--ds-text-caption);
   cursor: pointer;
 }
 
@@ -1225,7 +1225,7 @@ a.ds-room-chip {
   border: var(--ds-border-width) solid var(--ds-accent-graphic);
   border-radius: var(--ds-radius-full);
   color: var(--ds-accent);
-  font-size: 12px;
+  font-size: var(--ds-text-caption);
   font-weight: 500;
   text-decoration: none;
   white-space: nowrap;
@@ -1233,7 +1233,7 @@ a.ds-room-chip {
 
 .ds-records-active__x {
   margin-left: 6px;
-  font-size: 10px;
+  font-size: var(--ds-text-caption);
 }
 
 .ds-records-active__chip:hover {
@@ -1243,7 +1243,7 @@ a.ds-room-chip {
 
 .ds-records-active__clear {
   font-family: var(--ds-font-mono);
-  font-size: 10px;
+  font-size: var(--ds-text-micro);
   letter-spacing: 0.06em;
   text-transform: uppercase;
   color: var(--room-ink-4);
@@ -1259,7 +1259,7 @@ a.ds-room-chip {
   margin-block: var(--ds-space-5);
   border-collapse: collapse;
   font-family: var(--ds-font-sans);
-  font-size: 13.5px;
+  font-size: var(--ds-text-caption);
 }
 
 .ds-room-tbl th {
@@ -1267,7 +1267,7 @@ a.ds-room-chip {
   border-bottom: var(--ds-border-width) solid var(--ds-border-strong);
   text-align: left;
   font-family: var(--ds-font-mono);
-  font-size: 9.5px;
+  font-size: var(--ds-text-micro);
   font-weight: 500;
   letter-spacing: 0.12em;
   text-transform: uppercase;
@@ -1307,7 +1307,7 @@ a.ds-room-chip {
   padding: var(--ds-space-3) var(--ds-space-4);
   cursor: pointer;
   font-family: var(--ds-font-mono);
-  font-size: 10.5px;
+  font-size: var(--ds-text-micro);
   letter-spacing: 0.1em;
   text-transform: uppercase;
   color: var(--room-ink-3);
@@ -1320,7 +1320,7 @@ a.ds-room-chip {
 
 .ds-room-draw__summary::after {
   content: '+';
-  font-size: 13px;
+  font-size: var(--ds-text-caption);
   color: var(--ds-accent);
 }
 
@@ -1362,7 +1362,7 @@ a.ds-room-chip {
 
 .ds-room-field__label {
   font-family: var(--ds-font-sans);
-  font-size: 13.5px;
+  font-size: var(--ds-text-caption);
   font-weight: 600;
   letter-spacing: 0;
   text-transform: none;
@@ -1379,7 +1379,7 @@ a.ds-room-chip {
 /* One line under the control, for the sentence that tells a person how to answer. */
 .ds-room-field__hint {
   margin: 0;
-  font-size: 12.5px;
+  font-size: var(--ds-text-caption);
   line-height: 1.5;
   color: var(--room-ink-3);
 }
@@ -1395,7 +1395,7 @@ a.ds-room-chip {
   border-radius: var(--ds-radius-sm);
   outline: none;
   font-family: var(--ds-font-sans);
-  font-size: 14.5px;
+  font-size: var(--ds-text-body);
   line-height: 1.5;
   color: var(--ds-ink);
 }
@@ -1444,7 +1444,7 @@ a.ds-room-chip {
   padding: 0 var(--ds-space-4);
   border: var(--ds-border-width) solid var(--ds-rule);
   border-radius: var(--ds-radius-full);
-  font-size: 13px;
+  font-size: var(--ds-text-caption);
   cursor: pointer;
 }
 
@@ -1471,7 +1471,7 @@ a.ds-room-chip {
 .ds-room .ds-room-ucard__title {
   font-family: var(--ds-font-display);
   font-weight: 600;
-  font-size: 17px;
+  font-size: var(--ds-text-title);
   letter-spacing: -0.02em;
 }
 
@@ -1479,7 +1479,7 @@ a.ds-room-chip {
   max-width: 36em;
   margin-top: var(--ds-space-3);
   font-family: var(--ds-font-editorial);
-  font-size: 15px;
+  font-size: var(--ds-text-body-sm);
   line-height: 1.58;
   color: var(--room-ink-3);
 }
@@ -1489,7 +1489,7 @@ a.ds-room-chip {
   margin-top: var(--ds-space-3);
   padding-left: var(--ds-space-5);
   font-family: var(--ds-font-editorial);
-  font-size: 15px;
+  font-size: var(--ds-text-body-sm);
   line-height: 1.6;
   color: var(--room-ink-3);
 }
@@ -1527,7 +1527,7 @@ a.ds-room-chip {
   border: var(--ds-border-width) solid var(--ds-border-strong);
   border-radius: 50%;
   font-family: var(--ds-font-mono);
-  font-size: 10px;
+  font-size: var(--ds-text-micro);
   color: var(--room-ink-4);
 }
 
@@ -1538,14 +1538,14 @@ a.ds-room-chip {
 }
 
 .ds-room-ustep__t {
-  font-size: 14px;
+  font-size: var(--ds-text-body-sm);
 }
 
 .ds-room-ustep__t small {
   display: block;
   margin-top: 3px;
   font-family: var(--ds-font-mono);
-  font-size: 10px;
+  font-size: var(--ds-text-micro);
   letter-spacing: 0.05em;
   color: var(--room-ink-4);
 }
@@ -1562,7 +1562,7 @@ a.ds-room-chip {
 .ds-room .ds-room-offramp__title {
   font-family: var(--ds-font-display);
   font-weight: 600;
-  font-size: 19px;
+  font-size: var(--ds-text-title);
   letter-spacing: -0.022em;
 }
 
@@ -1570,7 +1570,7 @@ a.ds-room-chip {
   max-width: 34em;
   margin-top: var(--ds-space-2);
   font-family: var(--ds-font-editorial);
-  font-size: 15.5px;
+  font-size: var(--ds-text-body-sm);
   line-height: 1.55;
   color: var(--room-ink-3);
 }
@@ -1604,7 +1604,7 @@ a.ds-room-chip {
 
 .ds-room-emptylist p {
   margin-top: var(--ds-space-2);
-  font-size: 13px;
+  font-size: var(--ds-text-caption);
   color: var(--room-ink-3);
 }
 
@@ -1666,7 +1666,7 @@ a.ds-room-chip {
   place-content: center;
   padding-inline: var(--ds-space-4);
   font-family: var(--ds-font-mono);
-  font-size: 0.625rem;
+  font-size: var(--ds-text-micro);
   letter-spacing: 0.14em;
   text-transform: uppercase;
   text-align: center;
@@ -1688,7 +1688,7 @@ a.ds-room-chip {
   z-index: 2; /* local: above the borrowed plate within this figure only, never the global ladder */
   padding: 3px 8px;
   font-family: var(--ds-font-mono);
-  font-size: 0.5625rem;
+  font-size: var(--ds-text-micro);
   letter-spacing: 0.12em;
   text-transform: uppercase;
   color: var(--ds-accent);
@@ -1714,7 +1714,7 @@ a.ds-room-chip {
   z-index: 2; /* local: same as the tag, above the borrowed plate within this figure only */
   padding: var(--ds-space-2) var(--ds-space-3);
   font-family: var(--ds-font-mono);
-  font-size: 0.625rem;
+  font-size: var(--ds-text-micro);
   letter-spacing: 0.08em;
   color: var(--ds-ink);
   background: var(--ds-surface);
@@ -1804,7 +1804,7 @@ a.ds-room-chip {
   padding: 0.35rem 0;
   border-bottom: 2px solid transparent;
   font-family: var(--ds-font-mono);
-  font-size: 0.6875rem;
+  font-size: var(--ds-text-micro);
   letter-spacing: 0.08em;
   text-transform: uppercase;
   white-space: nowrap;
@@ -1870,7 +1870,7 @@ a.ds-room-chip {
 .ds-room-section__kicker {
   margin: 0 0 var(--ds-space-1);
   font-family: var(--ds-font-mono);
-  font-size: 0.6875rem;
+  font-size: var(--ds-text-micro);
   letter-spacing: 0.1em;
   text-transform: uppercase;
   color: var(--ds-accent);
@@ -1881,7 +1881,7 @@ a.ds-room-chip {
   padding: 0;
   border: 0;
   font-family: var(--ds-font-display);
-  font-size: clamp(1.375rem, 1.15rem + 0.9vw, 1.875rem);
+  font-size: var(--ds-text-display-3);
   font-weight: 600;
   line-height: 1.15;
   letter-spacing: -0.03em;
@@ -1929,7 +1929,7 @@ a.ds-room-chip {
 .ds-room-fact__kicker {
   margin: 0 0 var(--ds-space-1);
   font-family: var(--ds-font-mono);
-  font-size: 0.6875rem;
+  font-size: var(--ds-text-micro);
   letter-spacing: 0.1em;
   text-transform: uppercase;
   color: var(--ds-accent);
@@ -1938,7 +1938,7 @@ a.ds-room-chip {
 .ds-room-fact__title {
   margin: 0;
   font-family: var(--ds-font-display);
-  font-size: 1.0625rem;
+  font-size: var(--ds-text-title);
   font-weight: 600;
   letter-spacing: -0.02em;
   line-height: 1.25;
@@ -1948,7 +1948,7 @@ a.ds-room-chip {
 .ds-room-fact__body {
   margin: var(--ds-space-2) 0 0;
   font-family: var(--ds-font-sans);
-  font-size: 0.9375rem;
+  font-size: var(--ds-text-body-sm);
   line-height: 1.55;
   color: var(--ds-ink-muted);
 }
@@ -1998,7 +1998,7 @@ a.ds-room-chip {
 .ds-room-handoff__copy strong {
   display: block;
   font-family: var(--ds-font-display);
-  font-size: 1.0625rem;
+  font-size: var(--ds-text-subtitle);
   font-weight: 600;
   letter-spacing: -0.02em;
   color: var(--ds-ink);
@@ -2042,7 +2042,7 @@ a.ds-room-chip {
   padding-left: var(--ds-space-3);
   border-left: 2px solid var(--ds-rule);
   font-family: var(--ds-font-mono);
-  font-size: 0.65625rem;
+  font-size: var(--ds-text-micro);
   line-height: 1.5;
   color: var(--room-ink-4);
 }
@@ -2057,13 +2057,13 @@ a.ds-room-chip {
   }
 
   .ds-room-header__title {
-    font-size: clamp(1.5rem, 8vw, 2rem);
+    font-size: var(--ds-text-display-3);
     overflow-wrap: break-word;
     min-width: 0;
   }
 
   .ds-room-header__lede {
-    font-size: 1.0625rem;
+    font-size: var(--ds-text-editorial-lede);
     overflow-wrap: break-word;
     min-width: 0;
   }
