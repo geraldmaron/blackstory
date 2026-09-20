@@ -19,7 +19,7 @@ export const metadata: Metadata = buildStaticPageMetadata({
 
 export default function TermsPage() {
   return (
-    <Room>
+    <Room ledger>
       <ReadingEntry
         pathname="/terms"
         title={

@@ -22,7 +22,7 @@ export const metadata: Metadata = buildStaticPageMetadata({
 
 export default function SubmitLeadPage() {
   return (
-    <Room>
+    <Room ledger>
       <ReadingEntry
         pathname="/submit"
         title={

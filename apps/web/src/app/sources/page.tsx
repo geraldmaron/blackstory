@@ -22,7 +22,7 @@ export const metadata: Metadata = buildStaticPageMetadata({
 
 export default function SourcesPage() {
   return (
-    <Room>
+    <Room ledger>
       <SourcesSections />
     </Room>
   );

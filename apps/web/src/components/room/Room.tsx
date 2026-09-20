@@ -19,6 +19,13 @@ export type RoomProps = {
   /** Overrides the `<main>` element id. Skip-link target; defaults to the shell's `main`. */
   readonly id?: string;
   /**
+   * The standalone-room look from `docs/ui/design-direction-v10-rooms.md`: sentence masthead at
+   * hero scale, stat row, inverse chapter plates, ruled handoffs. Opt-in because Lives, the
+   * memorial wall (P-01) and record pages share this kit and are not part of that direction.
+   * `room-kit.test.tsx` lists the routes that must carry it.
+   */
+  readonly ledger?: boolean;
+  /**
    * Optional right rail, for the Reading rooms whose design law gives them one (`/records` by
    * era and state, `/stories` by era and place, `/books` and `/law` by jurisdiction). It renders
    * AFTER the column in the document so the rail's grouping links never come before the thing
@@ -43,9 +50,17 @@ export type RoomProps = {
   readonly foot?: ReactNode;
 };
 
-export function Room({ children, className, id = 'main', rail, masthead, foot }: RoomProps) {
+export function Room({
+  children,
+  className,
+  id = 'main',
+  ledger = false,
+  rail,
+  masthead,
+  foot,
+}: RoomProps) {
   return (
-    <main className={cx('ds-room', className)} id={id}>
+    <main className={cx('ds-room', ledger && 'ds-room--ledger', className)} id={id}>
       {masthead === undefined ? null : <div className="ds-room__mast">{masthead}</div>}
       <div className={cx('ds-room__body', rail !== undefined && 'ds-room__body--railed')}>
         <div className="ds-room__doc">{children}</div>

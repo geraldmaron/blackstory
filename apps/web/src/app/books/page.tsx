@@ -35,7 +35,7 @@ export default async function BooksPage({ searchParams }: BooksPageProps) {
 
   if (snapshot.books.length === 0) {
     return (
-      <Room>
+      <Room ledger>
         <ReadingEntry
           pathname="/books"
           title={
@@ -58,7 +58,7 @@ export default async function BooksPage({ searchParams }: BooksPageProps) {
   const suggestCorpus = snapshot.books.map(bannedBookToSuggestCorpusItem);
 
   return (
-    <Room>
+    <Room ledger>
       <ReadingEntry
         pathname="/books"
         title={

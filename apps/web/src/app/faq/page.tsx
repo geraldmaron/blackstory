@@ -49,7 +49,7 @@ function FaqLinkRow({ href, label }: { readonly href: string; readonly label: st
 
 export default function FaqPage() {
   return (
-    <Room>
+    <Room ledger>
       <ReadingEntry
         pathname="/faq"
         title={

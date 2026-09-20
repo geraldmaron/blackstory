@@ -1146,3 +1146,43 @@ describe('room kit · one public control system', () => {
     );
   });
 });
+
+/**
+ * docs/ui/design-direction-v10-rooms.md: the standalone rooms share one look, and it is opt-in on
+ * `Room` because Lives, the memorial wall and record pages share the kit. An opt-in drifts the
+ * way the chapter pattern did, so the list of rooms that must carry it is pinned here.
+ */
+describe('room kit · every standalone room is a ledger room', () => {
+  const LEDGER_ROOMS = [
+    'about/page.tsx',
+    'books/page.tsx',
+    'corrections/page.tsx',
+    'data/page.tsx',
+    'errata/page.tsx',
+    'faq/page.tsx',
+    'law/page.tsx',
+    'methodology/page.tsx',
+    'privacy/page.tsx',
+    'records/RecordsIndex.tsx',
+    'rooms/page.tsx',
+    'sources/page.tsx',
+    'stories/page.tsx',
+    'submit/page.tsx',
+    'support/page.tsx',
+    'terms/page.tsx',
+  ] as const;
+
+  it('opens with <Room ledger>', () => {
+    const missing = LEDGER_ROOMS.filter((rel) => {
+      const source = readFileSync(path.join(APP_DIR, rel), 'utf8');
+      return /<Room(?=[\s>])(?!\s+ledger)/.test(source);
+    });
+    assert.deepEqual(missing, []);
+  });
+
+  it('the memorial wall and Lives do not', () => {
+    for (const rel of ['memorial/page.tsx', 'lives/page.tsx', 'lives/explorer/page.tsx']) {
+      assert.doesNotMatch(readFileSync(path.join(APP_DIR, rel), 'utf8'), /<Room\s+ledger/);
+    }
+  });
+});

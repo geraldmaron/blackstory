@@ -29,7 +29,7 @@ export default function ErrataPage() {
   const entries = listErrataEntries();
 
   return (
-    <Room>
+    <Room ledger>
       <TrustSiteJsonLdScript />
       <PublishingPrinciplesJsonLdScript pagePath={TRUST_PATHS.errata} pageTitle="Errata" />
       <ReadingEntry

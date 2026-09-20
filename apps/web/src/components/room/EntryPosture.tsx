@@ -30,6 +30,8 @@ export type ReadingEntryProps = {
   readonly className?: string;
   /** Show the quiet breadcrumb trail. Off for top-level doors whose crumb equals the title. */
   readonly showCrumb?: boolean;
+  /** A `DocumentPlate` set into the masthead. Ledger reading rooms only; utility rooms have none. */
+  readonly plate?: ReactNode;
 };
 
 /**
@@ -43,12 +45,21 @@ export function ReadingEntry({
   lede,
   className,
   showCrumb = true,
+  plate,
 }: ReadingEntryProps) {
   return (
-    <header className={cx('ds-entry ds-entry--reading', className)} data-posture="reading">
+    <header
+      className={cx(
+        'ds-entry ds-entry--reading',
+        plate !== undefined && plate !== null && 'ds-entry--plated',
+        className,
+      )}
+      data-posture="reading"
+    >
       {showCrumb ? <Breadcrumb pathname={pathname} hereLabel={crumbLabel} /> : null}
       <h1 className="ds-entry__title">{title}</h1>
       {lede ? <p className="ds-entry__lede">{lede}</p> : null}
+      {plate}
     </header>
   );
 }

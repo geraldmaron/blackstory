@@ -1065,6 +1065,123 @@ a.ds-errata__row-id {
     grid-row: 1 / 4;
   }
 }
+
+/* Ledger row (docs/ui/design-direction-v10-rooms.md): in a legal ledger the year is the anchor, so
+   it leads the row in display numerals; the kind is a copper tag; citation and gloss sit under the
+   title at reading size. */
+.ds-room--ledger .ds-law-idx.ds-room-idx__list {
+  grid-template-columns: clamp(4.5rem, 10vw, 8.5rem) minmax(0, 1fr) auto;
+  column-gap: var(--ds-space-6);
+}
+
+.ds-room--ledger .ds-law-idx .ds-room-idx__row {
+  grid-template-rows: auto auto auto;
+  row-gap: 6px;
+  padding-block: var(--ds-space-5);
+  border-color: var(--ds-ink);
+}
+
+.ds-room--ledger .ds-law-idx .ds-room-idx__glyph {
+  display: none;
+}
+
+.ds-room--ledger .ds-law-idx .ds-room-idx__era {
+  grid-column: 1;
+  grid-row: 1 / 4;
+  text-align: left;
+  font-family: var(--ds-font-display);
+  font-size: var(--ds-text-display-3);
+  font-weight: 600;
+  line-height: 1;
+  letter-spacing: -0.04em;
+  font-variant-numeric: tabular-nums;
+  color: var(--ds-ink);
+}
+
+.ds-room--ledger .ds-law-idx .ds-room-idx__name {
+  grid-column: 2;
+  grid-row: 1;
+  font-size: var(--ds-text-title);
+  white-space: normal;
+}
+
+.ds-law-idx__kind {
+  display: none;
+}
+
+.ds-room--ledger .ds-law-idx__kind {
+  display: block;
+  grid-column: 3;
+  grid-row: 1;
+  text-align: right;
+  font-family: var(--ds-font-mono);
+  font-size: var(--ds-text-micro);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ds-accent);
+}
+
+.ds-room--ledger .ds-law-idx .ds-law-idx__citation {
+  grid-column: 2;
+  grid-row: 2;
+  white-space: normal;
+}
+
+.ds-room--ledger .ds-law-idx .ds-room-idx__place {
+  grid-column: 3;
+  grid-row: 2;
+  text-align: right;
+}
+
+.ds-room--ledger .ds-law-idx .ds-law-idx__gloss {
+  grid-column: 2 / -1;
+  grid-row: 3;
+  max-width: 46rem;
+  font-size: var(--ds-text-body);
+  color: var(--room-ink-2);
+  -webkit-line-clamp: 3;
+}
+
+@media (max-width: 40rem) {
+  .ds-room--ledger .ds-law-idx.ds-room-idx__list {
+    grid-template-columns: 3.75rem minmax(0, 1fr);
+    column-gap: var(--ds-space-3);
+  }
+
+  .ds-room--ledger .ds-law-idx .ds-room-idx__row {
+    grid-template-rows: auto;
+  }
+
+  .ds-room--ledger .ds-law-idx .ds-room-idx__era {
+    grid-row: 1 / 5;
+    font-size: var(--ds-text-title);
+  }
+
+  .ds-room--ledger .ds-law-idx__kind,
+  .ds-room--ledger .ds-law-idx .ds-law-idx__citation,
+  .ds-room--ledger .ds-law-idx .ds-law-idx__gloss {
+    grid-column: 2;
+    text-align: left;
+  }
+
+  .ds-room--ledger .ds-law-idx__kind {
+    grid-row: 2;
+  }
+
+  .ds-room--ledger .ds-law-idx .ds-law-idx__citation {
+    grid-row: 3;
+    display: block;
+  }
+
+  .ds-room--ledger .ds-law-idx .ds-law-idx__gloss {
+    grid-row: 4;
+  }
+
+  .ds-room--ledger .ds-law-idx .ds-room-idx__place {
+    display: none;
+  }
+}
+
 /* —— end /law browse index rows —————————————————————————————————————————————— */
 
 /* —— /methodology hand-drawn figures ————————————————————————————————————————

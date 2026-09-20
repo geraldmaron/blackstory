@@ -18,7 +18,7 @@ export const metadata: Metadata = buildStaticPageMetadata({
 
 export default function PrivacyPage() {
   return (
-    <Room>
+    <Room ledger>
       <ReadingEntry
         pathname="/privacy"
         title={

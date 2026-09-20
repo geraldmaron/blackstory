@@ -18,7 +18,7 @@ const anatomySource = readFileSync(join(here, 'LawAnatomyStrip.tsx'), 'utf8');
 test('law index is the catalog room; /law/browse is a config redirect only', () => {
   assert.match(indexPageSource, /LawBrowseSections/);
   assert.match(indexPageSource, /<ReadingEntry/);
-  assert.match(indexPageSource, /<Room rail=\{rail\}>/);
+  assert.match(indexPageSource, /<Room ledger rail=\{rail\}>/);
   assert.match(indexPageSource, /OrientationInstrument/);
   assert.doesNotMatch(indexPageSource, /how-it-works|LawHubSections/);
   assert.doesNotMatch(indexPageSource, /EditionAtmosphereMosaic|LAW_EDITION_MOSAIC_SEED/);

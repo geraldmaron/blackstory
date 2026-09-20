@@ -21,7 +21,7 @@ export const metadata: Metadata = buildStaticPageMetadata({
 
 export default function AboutPage() {
   return (
-    <Room>
+    <Room ledger>
       <ReadingEntry
         pathname="/about"
         title={

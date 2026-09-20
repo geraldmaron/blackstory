@@ -51,7 +51,7 @@ export default async function DataPage({
   const dataModel = await loadDataPageModel();
 
   return (
-    <Room>
+    <Room ledger>
       <ReadingEntry
         pathname="/data"
         title={

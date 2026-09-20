@@ -115,7 +115,7 @@ export function RecordsIndexRoom({ model, releaseLabel }: RecordsIndexProps) {
   );
 
   return (
-    <Room rail={rail}>
+    <Room ledger rail={rail}>
       <ReadingEntry
         pathname="/records"
         title={

@@ -159,7 +159,7 @@ export default async function StoriesIndexPage({ searchParams }: StoriesPageProp
     ) : undefined;
 
   return (
-    <Room rail={rail}>
+    <Room ledger rail={rail}>
       <ReadingEntry
         pathname="/stories"
         title={

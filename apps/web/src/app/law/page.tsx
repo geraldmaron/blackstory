@@ -10,7 +10,13 @@ import { buildLawBrowseViewModel, type RawLawBrowseParams } from './law-view-mod
 import { loadLegalCatalog } from '../../lib/legal/public-source';
 import { LawBrowseSections } from './LawBrowseSections';
 import { humanizeLegalKind, humanizeLegalTopic } from '../../components/legal';
-import { DocumentColophon, OrientationInstrument, ReadingEntry, Room } from '../../components/room';
+import {
+  DocumentPlate,
+  OrientationInstrument,
+  ReadingEntry,
+  Room,
+  RoomStats,
+} from '../../components/room';
 import '../reading-room.css';
 
 void React;
@@ -36,12 +42,31 @@ export default async function LawPage({ searchParams }: LawPageProps) {
   for (const snapshot of catalog) {
     kindCounts.set(snapshot.kind, (kindCounts.get(snapshot.kind) ?? 0) + 1);
   }
-  const kindMeta = [...kindCounts.entries()]
-    .sort(([, a], [, b]) => b - a)
-    .map(
-      ([kind, count]) =>
-        `${count} ${humanizeLegalKind(kind).toLowerCase()}${count === 1 ? '' : 's'}`,
-    );
+  const stats = [
+    { value: catalog.length, label: catalog.length === 1 ? 'law entry' : 'law entries' },
+    ...[...kindCounts.entries()]
+      .sort(([, a], [, b]) => b - a)
+      .slice(0, 3)
+      .map(([kind, count]) => ({
+        value: count,
+        label: `${humanizeLegalKind(kind).toLowerCase()}${count === 1 ? '' : 's'}`,
+      })),
+  ];
+
+  /*
+   * The plate sets words the catalog already quotes: the earliest entry whose plain-language
+   * summary carries the operative text in quotation marks. Nothing is written for the plate, and
+   * with no quoted entry there is no plate.
+   */
+  const plateSource = [...catalog]
+    .sort((a, b) => (a.effectiveYear ?? 9999) - (b.effectiveYear ?? 9999))
+    .flatMap((snapshot) => {
+      const said = source.explainerFor(snapshot.id)?.whatItSays ?? '';
+      const quote = /["“]([^"”]{80,})["”]/.exec(said)?.[1];
+      return quote === undefined
+        ? []
+        : [{ quote, citation: snapshot.citation.canonicalCitation, slug: snapshot.slug }];
+    })[0];
 
   const topicCounts = new Map<string, number>();
   for (const snapshot of catalog) {
@@ -70,7 +95,7 @@ export default async function LawPage({ searchParams }: LawPageProps) {
   );
 
   return (
-    <Room rail={rail}>
+    <Room ledger rail={rail}>
       <ReadingEntry
         pathname="/law"
         title={
@@ -79,10 +104,18 @@ export default async function LawPage({ searchParams }: LawPageProps) {
           </>
         }
         lede={LAW_EDITION_BROWSE_LEDE}
+        plate={
+          plateSource === undefined ? undefined : (
+            <DocumentPlate
+              label="Operative text"
+              quote={plateSource.quote}
+              citation={plateSource.citation}
+              href={`/law/${plateSource.slug}`}
+            />
+          )
+        }
       />
-      <DocumentColophon
-        facts={[`${catalog.length.toLocaleString('en-US')} law entries`, ...kindMeta]}
-      />
+      <RoomStats label="The catalog at a glance" stats={stats} />
 
       <LawBrowseSections view={view} catalog={catalog} />
 

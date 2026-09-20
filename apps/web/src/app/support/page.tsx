@@ -65,7 +65,7 @@ const SUPPORT_PATHS: readonly {
 
 export default function SupportPage() {
   return (
-    <Room>
+    <Room ledger>
       <ReadingEntry
         pathname="/support"
         title={

@@ -17,7 +17,7 @@ export const metadata: Metadata = buildStaticPageMetadata({
 
 export default function CorrectionsPage() {
   return (
-    <Room>
+    <Room ledger>
       <ReadingEntry
         pathname="/corrections"
         title={
