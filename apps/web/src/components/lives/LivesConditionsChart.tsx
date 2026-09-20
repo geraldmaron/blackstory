@@ -8,7 +8,7 @@ import {
   type LivesDecadeBundle,
   type LivesLens,
 } from '@repo/domain/statistics/lives';
-import { describeLivesCell } from '../../lib/lives/lives-format';
+import { describeLivesCell, livesBarScaleNote, livesBarShare } from '../../lib/lives/lives-format';
 import { LivesConditionsTable } from './LivesConditionsTable';
 import { LivesFigure } from './LivesFigure';
 
@@ -18,11 +18,6 @@ export type LivesConditionsChartProps = {
   readonly decade: LivesDecadeBundle;
   readonly emphasis: LivesLens;
 };
-
-function barWidth(estimate: number | undefined): number {
-  if (estimate === undefined || estimate <= 0) return 0;
-  return Math.min(100, estimate);
-}
 
 export function LivesConditionsChart({ decade, emphasis }: LivesConditionsChartProps) {
   const visibleConditions = decade.conditions.filter((condition) =>
@@ -34,7 +29,7 @@ export function LivesConditionsChart({ decade, emphasis }: LivesConditionsChartP
   if (visibleConditions.length === 0) return null;
   const first = visibleConditions[0];
   const firstCell = first?.cells[emphasis];
-  const firstDisplay = firstCell ? describeLivesCell(firstCell) : null;
+  const firstDisplay = firstCell ? describeLivesCell(firstCell, first?.unit) : null;
   const reading =
     first && firstDisplay
       ? `${LIVES_LENS_LABELS[emphasis]} ${first.label.toLowerCase()} in the ${decade.label}: ${firstDisplay.text}.`
@@ -44,7 +39,7 @@ export function LivesConditionsChart({ decade, emphasis }: LivesConditionsChartP
     <LivesFigure
       title={`Conditions, ${decade.label}`}
       reading={reading}
-      caption="Each row is one published measure. Bars are percentages; a missing bar means the census did not publish that cell."
+      caption="Each row is one published measure, drawn on that measure’s own scale. A missing bar means no figure was published for that cell."
       ariaLabel={`Living conditions for Black, white and Hispanic Americans in the ${decade.label}`}
       textAlternative={<LivesConditionsTable decade={decade} emphasis={emphasis} />}
     >
@@ -53,14 +48,18 @@ export function LivesConditionsChart({ decade, emphasis }: LivesConditionsChartP
           <div key={condition.key} className="lives-condition">
             <p className="lives-condition__label">
               {condition.label}
-              <span className="lives-condition__universe">{condition.universe}</span>
+              <span className="lives-condition__universe">
+                {condition.universe}
+                {livesBarScaleNote(condition.unit) ? ` · ${livesBarScaleNote(condition.unit)}` : ''}
+              </span>
             </p>
             {LIVES_LENSES.map((lens) => {
               const cell = condition.cells[lens];
-              const display = describeLivesCell(cell);
+              const display = describeLivesCell(cell, condition.unit);
               const width =
-                cell.state === 'published' || cell.state === 'wide_margin'
-                  ? barWidth(cell.estimate)
+                (cell.state === 'published' || cell.state === 'wide_margin') &&
+                cell.estimate !== undefined
+                  ? livesBarShare(cell.estimate, condition.unit)
                   : 0;
               return (
                 <div

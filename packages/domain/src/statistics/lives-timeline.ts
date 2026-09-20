@@ -38,6 +38,8 @@ import {
   workClassSeriesId,
   type LivesClassBucket,
   type LivesConditionKey,
+  type LivesConditionDefinition,
+  type LivesConditionUnit,
 } from './lives-metrics.js';
 import {
   LIVES_DECADES,
@@ -110,6 +112,12 @@ export type LivesObservationInput = {
   readonly denominator?: number | null;
   readonly source: string;
   readonly sourceUrl: string;
+  /**
+   * For an agency value series: the population the agency says the figure describes ("nonwhite",
+   * "Black", "non-Hispanic single-race Black"), and, for births, whose race classifies the birth.
+   */
+  readonly populationLabel?: string | null;
+  readonly populationBasis?: string | null;
   readonly metadata?: {
     /** ACS 90% margins on the counts, when published. */
     readonly numeratorMoe?: number;
@@ -213,6 +221,8 @@ export type LivesConditionGap = {
   readonly formula: string;
   readonly inputObservationIds: readonly string[];
   readonly assumptions: readonly string[];
+  /** The unit `points` is in. Absent on gaps derived before units existed: percent. */
+  readonly unit?: LivesConditionUnit;
 };
 
 export type LivesConditionBundle = {
@@ -222,6 +232,8 @@ export type LivesConditionBundle = {
   readonly cells: Readonly<Record<LivesLens, LivesCell>>;
   /** Black against white, when both figures are published rates. Optional: older snapshots lack it. */
   readonly gap?: LivesConditionGap;
+  /** Absent means percent, which is every condition a snapshot held before units existed. */
+  readonly unit?: LivesConditionUnit;
 };
 
 /** True when the condition is each group's own rate of an outcome, so two groups can be compared. */
@@ -230,10 +242,22 @@ export function livesConditionIsGroupRate(key: LivesConditionKey): boolean {
 }
 
 /** Black against white only: the comparison every panel draws. Null unless both are published rates. */
+const GAP_FORMULA: Readonly<Record<LivesConditionUnit, string>> = {
+  percent:
+    'The larger of the two published rates minus the smaller, in percentage points, before rounding. Each rate uses its own group’s denominator.',
+  years: 'The larger of the two published figures minus the smaller, in years.',
+  per_1000:
+    'The larger of the two published rates minus the smaller, in deaths per 1,000 live births.',
+};
+
 export function deriveLivesConditionGap(
   cells: Readonly<Record<LivesLens, LivesCell>>,
+  unit: LivesConditionUnit = 'percent',
 ): LivesConditionGap | null {
   const { black, white } = cells;
+  // A figure for "everyone other than white, counted together" is not a Black figure, so the
+  // distance from it to the white figure is not a Black and white gap.
+  if (black.definitionLabel === RACE_ETHNICITY_DEFINITION_LABELS.nonwhite) return null;
   const usable = (cell: LivesCell): cell is LivesCell & { estimate: number } =>
     (cell.state === 'published' || cell.state === 'wide_margin') && cell.estimate !== undefined;
   if (!usable(black) || !usable(white)) return null;
@@ -249,8 +273,8 @@ export function deriveLivesConditionGap(
     betweenLenses: ['black', 'white'],
     points,
     ...(uncertainty !== undefined ? { uncertainty } : {}),
-    formula:
-      'The larger of the two published rates minus the smaller, in percentage points, before rounding. Each rate uses its own group’s denominator.',
+    formula: GAP_FORMULA[unit],
+    ...(unit === 'percent' ? {} : { unit }),
     inputObservationIds: [...(black.observationIds ?? []), ...(white.observationIds ?? [])],
     assumptions: [
       `Black: ${black.definitionLabel ?? 'definition not recorded'}`,
@@ -340,6 +364,19 @@ export function buildLivesAreaBundle(input: BuildLivesAreaBundleInput): LivesAre
   }
   const rowsFor = (metricId: string, decade: LivesDecade) =>
     byMetricDecade.get(`${metricId}|${decade}`) ?? [];
+
+  // Agency value series (NCHS life expectancy, infant mortality) name their group in the metric id
+  // and carry no race slice, so the index above skips them. They are read here by census year.
+  const valueSeriesIds = new Set(
+    LIVES_CONDITIONS.flatMap((condition) => Object.values(condition.valueSeries ?? {})),
+  );
+  const valueByMetricDecade = new Map<string, LivesObservationInput>();
+  for (const observation of input.observations) {
+    if (!valueSeriesIds.has(observation.metricId)) continue;
+    if (observation.jurisdictionId !== NATION_ID) continue;
+    const decade = livesDecadeForReferencePeriod(observation.referencePeriod);
+    if (decade !== null) valueByMetricDecade.set(`${observation.metricId}|${decade}`, observation);
+  }
 
   const coverageIndex = new Map(
     input.coverage.map((entry) => [`${entry.decade}|${entry.key}|${entry.lens}`, entry]),
@@ -508,6 +545,55 @@ export function buildLivesAreaBundle(input: BuildLivesAreaBundleInput): LivesAre
       };
     };
 
+    /** The population label a reader sees beside an agency value, in the agency's own terms. */
+    const valueDefinitionLabel = (
+      condition: LivesConditionDefinition,
+      observation: LivesObservationInput,
+    ): string => {
+      const label = observation.populationLabel?.trim() ?? '';
+      if (label === 'nonwhite') return RACE_ETHNICITY_DEFINITION_LABELS.nonwhite;
+      if (condition.key === 'infant_mortality') {
+        const basis = observation.populationBasis?.trim();
+        return basis ? `${label} infants, by ${basis}` : `${label} infants`;
+      }
+      if (/^non-Hispanic single-race /.test(label)) {
+        return `${label.replace(/^non-Hispanic single-race /, '')}, not Hispanic, one race, as NCHS reported it`;
+      }
+      return `${label}, all origins, as NCHS reported it`;
+    };
+
+    const valueCell = (condition: LivesConditionDefinition, lens: LivesLens): LivesCell => {
+      if (input.area.kind !== 'nation') {
+        return {
+          state: 'not_measured',
+          reason: 'NCHS publishes this for the whole country, not for regions.',
+        };
+      }
+      if (lens === 'hispanic') {
+        return {
+          state: 'not_measured',
+          reason: 'This series has no separate figure for Hispanic Americans.',
+        };
+      }
+      const metricId = condition.valueSeries?.[lens];
+      const observation = metricId ? valueByMetricDecade.get(`${metricId}|${decade}`) : undefined;
+      if (!observation) {
+        return { state: 'pending', reason: 'Not yet loaded for this area and decade.' };
+      }
+      if (!observation.populationLabel?.trim()) {
+        // An agency value with no stated population is not publishable: that label IS the figure's
+        // meaning, and the life expectancy series changes population twice.
+        return { state: 'pending', reason: 'The source’s population label has not been recorded.' };
+      }
+      return {
+        state: 'published',
+        estimate: observation.estimate,
+        definitionLabel: valueDefinitionLabel(condition, observation),
+        sources: [{ label: observation.source, url: observation.sourceUrl }],
+        ...(observation.id ? { observationIds: [observation.id] } : {}),
+      };
+    };
+
     const incomeBrackets = (lens: LivesLens) => {
       const bracketRows: IndexedRow[] = [];
       for (const [key, rows] of byMetricDecade) {
@@ -653,7 +739,17 @@ export function buildLivesAreaBundle(input: BuildLivesAreaBundleInput): LivesAre
       key: condition.key,
       label: livesConditionLabel(condition.key, regime),
       universe: condition.universe,
+      ...(condition.unit && condition.unit !== 'percent' ? { unit: condition.unit } : {}),
       cells: mapLenses((lens) => {
+        if (condition.valueSeries) {
+          if (!livesConditionPublishedIn(condition, decade)) {
+            return {
+              state: 'not_measured',
+              reason: `This NCHS series has no figure for ${decade}.`,
+            };
+          }
+          return valueCell(condition, lens);
+        }
         if (!livesConditionPublishedIn(condition, decade)) {
           return {
             state: 'not_measured',
@@ -700,8 +796,10 @@ export function buildLivesAreaBundle(input: BuildLivesAreaBundleInput): LivesAre
     // white slices is not a gap between groups at all ("76 points apart" was the tell).
     const conditions = conditionsWithoutGaps.map((bundle): LivesConditionBundle => {
       const spec = LIVES_CONDITIONS.find((condition) => condition.key === bundle.key);
-      if (!spec || spec.seriesId === null || !livesConditionIsGroupRate(bundle.key)) return bundle;
-      const gap = deriveLivesConditionGap(bundle.cells);
+      if (!spec || !livesConditionIsGroupRate(bundle.key)) return bundle;
+      // The income condition is the only one with neither a stored rate series nor a value series.
+      if (spec.seriesId === null && !spec.valueSeries) return bundle;
+      const gap = deriveLivesConditionGap(bundle.cells, spec.unit ?? 'percent');
       return gap ? { ...bundle, gap } : bundle;
     });
 

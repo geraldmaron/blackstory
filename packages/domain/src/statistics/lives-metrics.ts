@@ -73,7 +73,16 @@ export type LivesConditionKey =
   | 'high_school'
   | 'unemployed'
   | 'income_to_national_median'
-  | 'farm_tenancy';
+  | 'farm_tenancy'
+  | 'life_expectancy'
+  | 'infant_mortality';
+
+/**
+ * What a condition's figure measures. Every census condition is a percentage of a group. The two
+ * vital-statistics conditions are not: life expectancy is a number of years and infant mortality is
+ * deaths per 1,000 live births, and neither may be formatted, drawn, or compared as a percent.
+ */
+export type LivesConditionUnit = 'percent' | 'years' | 'per_1000';
 
 export type LivesConditionDefinition = {
   readonly key: LivesConditionKey;
@@ -83,7 +92,18 @@ export type LivesConditionDefinition = {
   /** First and last decades the census published this by race. */
   readonly firstDecade: LivesDecade;
   readonly lastDecade: LivesDecade;
+  /** Defaults to percent. */
+  readonly unit?: LivesConditionUnit;
+  /**
+   * A national series an agency publishes as a finished value, one metric per group, with no
+   * counts behind it to sum. It has no regional figure: a region's cell says so.
+   */
+  readonly valueSeries?: Readonly<Record<'black' | 'white', string>>;
 };
+
+export function livesConditionUnit(key: LivesConditionKey): LivesConditionUnit {
+  return LIVES_CONDITIONS.find((condition) => condition.key === key)?.unit ?? 'percent';
+}
 
 /** Conditions in display order. */
 export const LIVES_CONDITIONS: readonly LivesConditionDefinition[] = [
@@ -150,6 +170,33 @@ export const LIVES_CONDITIONS: readonly LivesConditionDefinition[] = [
     firstDecade: 1900,
     lastDecade: 1950,
   },
+  {
+    // NCHS: "the average number of years that a group of infants would live if they were to
+    // experience throughout life the age-specific death rates prevailing" in the year of birth.
+    key: 'life_expectancy',
+    seriesId: null,
+    unit: 'years',
+    valueSeries: {
+      black: 'nchs-life-expectancy-birth-black-nation',
+      white: 'nchs-life-expectancy-birth-white-nation',
+    },
+    universe: 'Babies born that year, if that year’s death rates lasted their whole lives',
+    firstDecade: 1900,
+    lastDecade: 2020,
+  },
+  {
+    // The NCHS series runs 1915 to 2013, so the census years it covers are 1920 through 2010.
+    key: 'infant_mortality',
+    seriesId: null,
+    unit: 'per_1000',
+    valueSeries: {
+      black: 'nchs-infant-mortality-black-nation',
+      white: 'nchs-infant-mortality-white-nation',
+    },
+    universe: 'Babies born alive that year',
+    firstDecade: 1920,
+    lastDecade: 2010,
+  },
 ];
 
 export function livesConditionPublishedIn(
@@ -186,6 +233,10 @@ export function livesConditionLabel(
       return 'Median household income, as a share of the national median';
     case 'farm_tenancy':
       return 'Farm operators who rented or sharecropped';
+    case 'life_expectancy':
+      return 'Years a newborn could expect to live';
+    case 'infant_mortality':
+      return 'Babies who died before their first birthday';
   }
 }
 

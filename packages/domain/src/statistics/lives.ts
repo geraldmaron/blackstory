@@ -42,6 +42,7 @@ export type {
 export {
   LIVES_CLASS_BUCKETS,
   LIVES_CONDITIONS,
+  livesConditionUnit,
   LIVES_SERIES,
   LIVES_TIER_KEYS,
   incomeBracketSeriesId,
@@ -55,6 +56,7 @@ export type {
   LivesClassBucket,
   LivesConditionDefinition,
   LivesConditionKey,
+  LivesConditionUnit,
   LivesTierKey,
 } from './lives-metrics.js';
 

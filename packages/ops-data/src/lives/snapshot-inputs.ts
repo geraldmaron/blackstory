@@ -67,7 +67,10 @@ export const OBSERVATIONS_SQL = `
   SELECT id, metric_id, jurisdiction_id, reference_period, race_ethnicity_slice, estimate, numerator,
          denominator, source, source_url, metadata
   FROM reference.statistical_observations
-  WHERE jurisdiction_id = ANY($1::text[]) AND status = 'observed' AND metric_id LIKE 'lives-%'`;
+  WHERE jurisdiction_id = ANY($1::text[]) AND status = 'observed'
+    AND (metric_id LIKE 'lives-%'
+         OR metric_id LIKE 'nchs-life-expectancy-birth-%'
+         OR metric_id LIKE 'nchs-infant-mortality-%')`;
 
 export const COUNT_NOTES_SQL = `
   SELECT id, decade, applies_to, area_ids, heading, body, citations
@@ -103,8 +106,12 @@ function numberOrNull(value: unknown): number | null {
 export function mapObservationRow(row: ObservationRow): LivesObservationInput {
   const numeratorMoe = numberOrNull(row.metadata?.numeratorMoe);
   const denominatorMoe = numberOrNull(row.metadata?.denominatorMoe);
+  const populationLabel = row.metadata?.raceLabel;
+  const populationBasis = row.metadata?.raceBasis;
   return {
     ...(row.id ? { id: row.id } : {}),
+    ...(typeof populationLabel === 'string' ? { populationLabel } : {}),
+    ...(typeof populationBasis === 'string' ? { populationBasis } : {}),
     metricId: row.metric_id,
     jurisdictionId: row.jurisdiction_id,
     referencePeriod: row.reference_period,

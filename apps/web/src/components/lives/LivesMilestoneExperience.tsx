@@ -26,7 +26,7 @@ import { ArticleReferences } from '../article/ArticleReferences';
 import { LivesAccount } from './LivesAccount';
 import { LivesTurn } from './LivesTurn';
 import { livesTurnFor } from '../../lib/lives/lives-turns';
-import { describeLivesCell } from '../../lib/lives/lives-format';
+import { describeLivesCell, livesBarScaleNote, livesBarShare } from '../../lib/lives/lives-format';
 import { LIVES_ARCHIVE_READINGS } from '../../lib/lives/lives-archive';
 import { ArchiveFigure, RoomHandoff } from '../room';
 import { LivesRuleCard } from './LivesRuleCard';
@@ -187,10 +187,20 @@ type ReaderPanel = LivesMilestonePanel<HydratedArticle>;
 function GapLine({ gap }: { readonly gap: LivesConditionGap }) {
   const [first, second] = gap.betweenLenses;
   const rounded = Math.round(gap.points);
+  const measure =
+    gap.unit === 'years'
+      ? rounded === 1
+        ? 'year'
+        : 'years'
+      : gap.unit === 'per_1000'
+        ? 'per 1,000'
+        : rounded === 1
+          ? 'point'
+          : 'points';
   return (
     <p className="lives-era__gap">
       <strong>
-        About {rounded} {rounded === 1 ? 'point' : 'points'} apart
+        About {rounded} {measure} apart
       </strong>{' '}
       <span>
         {LIVES_LENS_LABELS[first]} and {LIVES_LENS_LABELS[second]}.
@@ -212,10 +222,13 @@ function FigureSection({ figure }: { readonly figure: LivesMilestoneFigure }) {
         </h4>
         <p className="lives-era__universe">
           Who this figure describes: {figure.condition.universe}. {livesMilestonePeriod(figure)}.
+          {livesBarScaleNote(figure.condition.unit)
+            ? ` ${livesBarScaleNote(figure.condition.unit)}`
+            : ''}
         </p>
         <dl className="lives-era__values">
           {figure.values.map(({ lens, cell }) => {
-            const display = describeLivesCell(cell);
+            const display = describeLivesCell(cell, figure.condition.unit);
             return (
               <div key={lens} className="lives-era__value" data-lens={lens}>
                 <dt>
@@ -230,7 +243,7 @@ function FigureSection({ figure }: { readonly figure: LivesMilestoneFigure }) {
                   className="lives-era__bar"
                   style={
                     {
-                      '--lives-value': `${Math.max(0, Math.min(cell.estimate ?? 0, 100))}%`,
+                      '--lives-value': `${livesBarShare(cell.estimate ?? 0, figure.condition.unit)}%`,
                     } as React.CSSProperties
                   }
                   aria-hidden="true"
