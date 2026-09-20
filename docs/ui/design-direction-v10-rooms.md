@@ -21,7 +21,7 @@ Same material law as the rest of the product (flat matte, value steps, copper on
 
 | Element | Rule |
 |---|---|
-| Masthead | Sentence headline with one `<em>` accent word, set larger than `--ds-text-display-1` allows today (target ceiling about 108px at 1440). Lede moves into the right columns on wide screens and takes ink, not muted ink. A 2px ink rule closes the masthead. |
+| Masthead | Sentence headline with one `<em>` accent word, set larger than `--ds-text-display-1` allows today (target ceiling about 108px at 1440). Lede sits under the headline on its left edge, takes ink rather than muted ink, and shares the row with the document plate where a room has one. A 2px ink rule closes the masthead. |
 | Noun | Lives in the `Rooms / X` crumb, the document title and the nav. Never repeated as a kicker over the headline. |
 | Stats | Numbers a room can state honestly are set as display numerals in a ruled row under the masthead (`RoomStats`, promoted out of Data's headline figures). Text-only facts stay in `DocumentColophon`. Never on Memorial. No number that is not already true on the page. |
 | Jump nav | 44px pills, sans, current chapter inverse. Scrolls sideways on phones. |
@@ -43,7 +43,7 @@ The frame is not the measure. Three rules, all in `room-kit.css` under `.ds-room
 
 Grids, tables, figures, the find bar and ledger rows use the whole frame. Gutters come from `--room-doc-pad`, which already narrows under 560px.
 
-Left edge: a railed room centers the column-plus-rail pair until 98rem, where there is room to center the column itself with the rail in the right margin. From there every room's column starts at the same x. Between 68rem and 98rem a railed room still sits left of its unrailed siblings; the alternatives were hiding the rail or pushing every unrailed room off center.
+Left edge: every room's column is centered at every width, so every masthead starts at the same x. A railed room (Law, Stories, Records) puts its rail in the right margin from 98rem, where a 300px rail fits beside a centered 900px column. Below that the rail stacks under the content, the same place it goes on a tablet. The kit's default for other surfaces, centering the column-plus-rail pair, is not used by ledger rooms: it put a railed room's masthead 166px left of its siblings on a laptop.
 
 Touch targets are 44px wherever the pointer is coarse or the viewport is 64rem or less, not only on phones.
 
