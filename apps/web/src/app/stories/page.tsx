@@ -48,6 +48,7 @@ import {
 } from './stories-index';
 import '../reading-room.css';
 import './stories.css';
+import { formatResultSummary } from '../../lib/discovery/result-summary';
 
 export const metadata: Metadata = buildStaticPageMetadata({
   path: '/stories',
@@ -217,7 +218,12 @@ export default async function StoriesIndexPage({ searchParams }: StoriesPageProp
           </form>
 
           <p className="ds-stories-count" role="status">
-            {`${filtered.length.toLocaleString('en-US')} of ${items.length.toLocaleString('en-US')} stories`}
+            {formatResultSummary({
+              matched: filtered.length,
+              total: items.length,
+              singular: 'story',
+              plural: 'stories',
+            })}
           </p>
         </div>
       ) : null}

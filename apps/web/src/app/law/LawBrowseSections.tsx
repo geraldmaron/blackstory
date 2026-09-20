@@ -11,6 +11,7 @@ import { US_STATES } from '@repo/domain';
 import { EmptyList, Prose } from '../../components/room';
 import { LegalDisclaimer, humanizeLegalKind, humanizeLegalTopic } from '../../components/legal';
 import type { LegalSnapshotDocument } from '../../lib/legal/public-source';
+import { formatResultSummary } from '../../lib/discovery/result-summary';
 import type { LawBrowseViewModel } from './law-view-model';
 
 export type LawBrowseSectionsProps = {
@@ -60,10 +61,12 @@ function countBy(values: readonly string[]): Map<string, number> {
 }
 
 export function LawBrowseSections({ view, catalog }: LawBrowseSectionsProps) {
-  const noun = view.totalMatched === 1 ? 'law entry' : 'law entries';
-  const countLabel = view.isFiltered
-    ? `${view.totalMatched} of ${view.totalAvailable} ${noun}`
-    : `${view.totalMatched} ${noun}`;
+  const countLabel = formatResultSummary({
+    matched: view.totalMatched,
+    total: view.isFiltered ? view.totalAvailable : view.totalMatched,
+    singular: 'law entry',
+    plural: 'law entries',
+  });
 
   const jurisdictionById = new Map(
     catalog.map((snapshot) => [snapshot.id, jurisdictionLabel(snapshot.jurisdictionId)] as const),

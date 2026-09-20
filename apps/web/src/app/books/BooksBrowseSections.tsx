@@ -38,6 +38,7 @@ import {
 } from './books-copy';
 import '../typeahead.css';
 import './books-browse.css';
+import { formatResultSummary } from '../../lib/discovery/result-summary';
 
 void React;
 
@@ -203,9 +204,14 @@ function BooksCatalogRow({ item }: { readonly item: BooksBrowseItem }) {
 }
 
 export function BooksBrowseSections({ view, suggestCorpus, snapshot }: BooksBrowseSectionsProps) {
-  const countLabel = `${view.totalMatched.toLocaleString('en-US')} title${
-    view.totalMatched === 1 ? '' : 's'
-  }`;
+  const countLabel = formatResultSummary({
+    matched: view.totalMatched,
+    total: view.totalMatched,
+    singular: 'title',
+    plural: 'titles',
+    page: view.pagination.page,
+    pageCount: view.pagination.totalPages,
+  });
   const activeWords = activeFacetWords(view);
   const activeChips = buildActiveChips(view);
   const stateChips = buildStateChips(snapshot, view);
@@ -325,9 +331,7 @@ export function BooksBrowseSections({ view, suggestCorpus, snapshot }: BooksBrow
           </nav>
 
           <p className="ds-room-idx__count" id="books-results-heading">
-            {view.pagination.totalPages > 1
-              ? `${countLabel} · page ${view.pagination.page} of ${view.pagination.totalPages}`
-              : countLabel}
+            {countLabel}
           </p>
 
           {view.items.length === 0 ? (

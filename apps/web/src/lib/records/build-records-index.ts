@@ -52,6 +52,7 @@ import {
 } from '../map-experience/evidence-grade';
 import { kindFamilyFor, resolveMapTone, type MapKindFamily } from '../map-experience/kind-encoding';
 import { kindFilterLabel, kindMatchesPublicFilter } from '../map-experience/filters';
+import { formatResultSummary } from '../discovery/result-summary';
 
 /** Arrival query Place pages understand (`from=list` + shared DiscoveryState keys). */
 function recordsArrivalQuery(query: RecordsQuery): string {
@@ -652,10 +653,12 @@ export function buildRecordsIndex(
     totalAll: facts.length,
     page,
     pageCount,
-    countLabel:
-      matched.length === facts.length
-        ? `${facts.length.toLocaleString('en-US')} records`
-        : `${matched.length.toLocaleString('en-US')} of ${facts.length.toLocaleString('en-US')} records`,
+    countLabel: formatResultSummary({
+      matched: matched.length,
+      total: facts.length,
+      singular: 'record',
+      plural: 'records',
+    }),
     canonicalPath: recordsHref({ ...query, page }),
     previousHref: page > 1 ? recordsHref({ ...query, page: page - 1 }) : undefined,
     nextHref: page < pageCount ? recordsHref({ ...query, page: page + 1 }) : undefined,
