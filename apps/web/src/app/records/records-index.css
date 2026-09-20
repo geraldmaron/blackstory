@@ -216,8 +216,8 @@
   width: 100%;
 }
 
-/* Facet pills and the chips inside their trays are touch targets on a phone. */
-@media (max-width: 40rem) {
+/* Facet pills and the chips inside their trays are touch targets on a phone or a tablet. */
+@media (max-width: 64rem), (pointer: coarse) {
   .ds-records-facet__pill {
     height: 44px;
   }

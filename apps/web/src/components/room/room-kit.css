@@ -1414,7 +1414,26 @@ a.ds-room-chip {
   color: var(--ds-accent);
 }
 
-@media (max-width: 40rem) {
+/* Touch targets. A tablet is a touch device too, so this follows the pointer as well as the
+   width: the sweep on 2026-09-20 found 36px chips and 32px sort links at 768. */
+@media (max-width: 64rem), (pointer: coarse) {
+  .ds-room .ds-cta,
+  .ds-room .ds-button {
+    min-height: 44px;
+  }
+
+  /* The radio inside is 1px; the label is the target, and it was 38px. */
+  .ds-room-field__choice {
+    min-height: 44px;
+  }
+
+  /* A chip outside a find bar, such as the errata feed links. */
+  .ds-room .ds-room-chip {
+    height: auto;
+    min-height: 44px;
+    padding-inline: 14px;
+  }
+
   .ds-find__chips .ds-room-chip,
   .ds-find__sort-link,
   .ds-find__more-summary {
