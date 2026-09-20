@@ -2288,6 +2288,54 @@ a.ds-room-chip {
    `.ds-room--ledger` because Lives, the memorial wall (P-01) and record pages share this kit and
    are not part of that direction. */
 
+/* Frame and measure. Every ledger room shares one frame (`--room-doc-w`, 900px, plus the rail
+   where a room has one), so mastheads, stat rows and chapter bands line up from room to room.
+   Inside the frame, text keeps a reading measure: at 17px the full column ran about 115
+   characters a line, and 60 to 75 is the range a line can be read back from. Forms are capped
+   for the same reason a long input is hard to scan. Grids, tables, figures and the find bar use
+   the whole frame. */
+.ds-room--ledger {
+  /* In `ch`, so the measure follows the face and size of the text it holds: a 15px sans block and
+     a 17px serif block both land near 70 characters, which a rem width could not do. */
+  --room-measure: 62ch;
+  --room-form-measure: 36rem;
+}
+
+.ds-room--ledger .ds-room-prose,
+.ds-room--ledger .ds-room-section__body > p,
+.ds-room--ledger .ds-room-facts,
+.ds-room--ledger .ds-room-offramp p {
+  max-width: var(--room-measure);
+}
+
+.ds-room--ledger form:not([role='search']),
+.ds-room--ledger .ds-notice {
+  max-width: var(--room-form-measure);
+}
+
+/* One left edge. A railed room centers the column-plus-rail pair, which is right while the
+   screen is too narrow to do anything else, but it put /law's masthead 166px left of /about's.
+   From 98rem there is room for the column to sit where every unrailed room's column sits, dead
+   center, with the rail in the right margin. */
+@media (min-width: 98rem) {
+  .ds-room--ledger > .ds-room__body--railed {
+    grid-template-columns: minmax(0, 1fr) minmax(0, var(--room-doc-w, 760px)) minmax(0, 1fr);
+    justify-content: stretch;
+    column-gap: 0;
+  }
+
+  .ds-room--ledger > .ds-room__body--railed > .ds-room__doc {
+    grid-column: 2;
+  }
+
+  .ds-room--ledger > .ds-room__body--railed > .ds-room__rail {
+    grid-column: 3;
+    justify-self: start;
+    width: var(--room-rail-w, 300px);
+    margin-inline-start: var(--ds-space-8);
+  }
+}
+
 /* Masthead: a sentence at hero scale, the lede pushed right on wide screens, a 2px ink rule. */
 .ds-room--ledger .ds-entry--reading {
   display: grid;
@@ -2469,7 +2517,13 @@ a.ds-room-chip {
 }
 
 /* Chapters: deeper value bands, an inverse plate, the heading a full step up. */
+/* A band needs room inside its own ground; a chapter on the canvas only needs to be separate
+   from the next one. Giving both the larger step stacked two of them between canvas chapters. */
 .ds-room--ledger .ds-room-section {
+  padding-block: var(--ds-section-sm, var(--ds-space-10));
+}
+
+.ds-room--ledger .ds-room-section--sunk {
   padding-block: var(--ds-section-md, var(--ds-space-12));
 }
 

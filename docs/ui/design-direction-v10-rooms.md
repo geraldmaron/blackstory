@@ -29,7 +29,23 @@ Same material law as the rest of the product (flat matte, value steps, copper on
 | Ledger rows | Where a row has a year, the year is the typographic anchor: display numerals in the left column, title beside it, kind as a copper mono tag, citation and gloss under. One-line ledgers (Records) keep the compact row. |
 | Handoffs | Ruled, not boxed: a 2px ink top rule, title, one sentence. |
 | Right rail | Reading rooms with a catalog get a real orientation rail at 1000px and wider. |
-| Utility rooms | Same grammar at the 760px measure. They do not get the document plate. |
+| Utility rooms | Same grammar in the same frame. What stays narrow is the form, not the page. They do not get the document plate. |
+
+## Frame and measure
+
+The frame is not the measure. Three rules, all in `room-kit.css` under `.ds-room--ledger`:
+
+| Rule | Value | Why |
+|---|---|---|
+| One frame | `--room-doc-w: 900px` for every ledger room, reading or utility, plus a 300px rail where a room has one | On 2026-09-20 the utility rooms were still in a 560px column, so a hero headline wrapped to five lines and Support read as a phone layout on a desktop. Mastheads, stat rows and chapter bands now line up from room to room at every width. |
+| Text keeps a measure | `--room-measure: 62ch` on prose, section paragraphs, fact lists and off-ramp text | The full column ran about 115 characters a line. In `ch` the measure follows the face and size of the text it holds. |
+| Forms keep a measure | `--room-form-measure: 36rem` on forms and notices | A long input is hard to scan. Find bars (`role="search"`) are exempt and use the frame. |
+
+Grids, tables, figures, the find bar and ledger rows use the whole frame. Gutters come from `--room-doc-pad`, which already narrows under 560px.
+
+Left edge: a railed room centers the column-plus-rail pair until 98rem, where there is room to center the column itself with the rail in the right margin. From there every room's column starts at the same x. Between 68rem and 98rem a railed room still sits left of its unrailed siblings; the alternatives were hiding the rail or pushing every unrailed room off center.
+
+Touch targets are 44px wherever the pointer is coarse or the viewport is 64rem or less, not only on phones.
 
 Copper stays an accent: the accent word, the first stat, kind tags, the current filter chip. No copper fills.
 
