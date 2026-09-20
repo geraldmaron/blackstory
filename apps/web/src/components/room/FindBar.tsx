@@ -68,6 +68,55 @@ export type FindBarProps = {
 
 const count = (value: number) => value.toLocaleString('en-US');
 
+/** One facet as one row of chip links. Exported for a route that puts a facet inside `FindBarFilters`. */
+export function FindBarChips({ row }: { readonly row: FindBarChipRow }) {
+  return (
+    <div className="ds-find__chips" role="group" aria-label={row.label}>
+      {row.chips.map((chip) => (
+        <Link
+          key={chip.href + chip.label}
+          className="ds-room-chip"
+          href={chip.href}
+          aria-current={chip.active ? true : undefined}
+        >
+          {chip.label}
+          {chip.count === undefined ? null : (
+            <>
+              {' '}
+              <span className="ds-room-num">{count(chip.count)}</span>
+            </>
+          )}
+        </Link>
+      ))}
+    </div>
+  );
+}
+
+export type FindBarFiltersProps = {
+  /** What is behind the disclosure: "Filter by topic", "State and author". */
+  readonly label: string;
+  /** How many of the facets inside are narrowing the list now. Shown, and opens the disclosure. */
+  readonly activeCount: number;
+  readonly children: ReactNode;
+};
+
+/**
+ * The secondary facets, behind a native disclosure so the primary row stays one line on a phone.
+ * `<details>` is markup, so it opens with JavaScript off, and it starts open whenever something
+ * inside it is narrowing the list: a reader never has to hunt for the filter they are under.
+ */
+export function FindBarFilters({ label, activeCount, children }: FindBarFiltersProps) {
+  return (
+    <details className="ds-find__more" open={activeCount > 0}>
+      <summary className="ds-find__more-summary">
+        {label}
+        {activeCount > 0 ? <span className="ds-room-num">{count(activeCount)}</span> : null}
+      </summary>
+      <div className="ds-find__more-body">{children}</div>
+    </details>
+  );
+}
+
 export function FindBar({
   id,
   action,
@@ -143,24 +192,7 @@ export function FindBar({
       ) : null}
 
       {rows.map((row) => (
-        <div className="ds-find__chips" role="group" aria-label={row.label} key={row.label}>
-          {row.chips.map((chip) => (
-            <Link
-              key={chip.href + chip.label}
-              className="ds-room-chip"
-              href={chip.href}
-              aria-current={chip.active ? true : undefined}
-            >
-              {chip.label}
-              {chip.count === undefined ? null : (
-                <>
-                  {' '}
-                  <span className="ds-room-num">{count(chip.count)}</span>
-                </>
-              )}
-            </Link>
-          ))}
-        </div>
+        <FindBarChips key={row.label} row={row} />
       ))}
 
       {children}

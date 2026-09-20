@@ -23,7 +23,7 @@ import { resolveTrail } from './room-trail';
 import { CardGrid, GroupHeading, RoomCard } from './RoomCards';
 import { RoomSection, RoomHandoff } from './RoomSection';
 import { RoomJump } from './RoomJump';
-import { FindBar } from './FindBar';
+import { FindBar, FindBarFilters } from './FindBar';
 import { Prose, RecordRef } from './Prose';
 import { Anatomy, Connections, Note, Precision, SourceList, TrustBlock } from './Evidence';
 import { HairlineIndex } from './HairlineIndex';
@@ -1184,5 +1184,25 @@ describe('room kit · every standalone room is a ledger room', () => {
     for (const rel of ['memorial/page.tsx', 'lives/page.tsx', 'lives/explorer/page.tsx']) {
       assert.doesNotMatch(readFileSync(path.join(APP_DIR, rel), 'utf8'), /<Room\s+ledger/);
     }
+  });
+});
+
+describe('room kit · FindBarFilters', () => {
+  const render = (activeCount: number) =>
+    renderToStaticMarkup(
+      <FindBarFilters label="Filter by topic" activeCount={activeCount}>
+        <a href="/law?topic=voting">Voting</a>
+      </FindBarFilters>,
+    );
+
+  it('is a native disclosure, closed until something inside it narrows the list', () => {
+    assert.match(render(0), /<details class="ds-find__more">/);
+    assert.doesNotMatch(render(0), /ds-room-num/);
+  });
+
+  it('opens and shows the count when a facet inside it is active', () => {
+    const html = render(2);
+    assert.match(html, /<details class="ds-find__more" open="">/);
+    assert.match(html, /<span class="ds-room-num">2<\/span>/);
   });
 });

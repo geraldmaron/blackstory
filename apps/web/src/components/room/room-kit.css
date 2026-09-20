@@ -1304,6 +1304,71 @@ a.ds-room-chip {
   padding-inline: 14px;
 }
 
+.ds-find__more {
+  min-width: 0;
+}
+
+.ds-find__more-summary {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 36px;
+  padding: 0 14px;
+  border: var(--ds-border-width) solid var(--ds-rule);
+  border-radius: var(--ds-radius-full);
+  font-size: var(--ds-text-caption);
+  font-weight: 500;
+  color: var(--room-ink-2);
+  cursor: pointer;
+  list-style: none;
+}
+
+.ds-find__more-summary::-webkit-details-marker {
+  display: none;
+}
+
+.ds-find__more-summary::after {
+  content: '+';
+  font-family: var(--ds-font-mono);
+  color: var(--room-ink-4);
+}
+
+.ds-find__more[open] > .ds-find__more-summary::after {
+  content: '−';
+}
+
+.ds-find__more-summary:hover {
+  border-color: var(--ds-border-strong);
+}
+
+.ds-find__more-summary .ds-room-num {
+  font-family: var(--ds-font-mono);
+  font-size: var(--ds-text-micro);
+  color: var(--ds-accent);
+}
+
+.ds-find__more-body {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: var(--ds-space-2) var(--ds-space-3);
+  margin-top: var(--ds-space-3);
+  min-width: 0;
+}
+
+.ds-find__more-body > .ds-find__chips {
+  flex: 1 1 100%;
+}
+
+.ds-find__more-body > .ds-pill-select {
+  flex: 1 1 12rem;
+  min-width: 0;
+}
+
+.ds-find__fields > .ds-find__more {
+  flex: 1 1 100%;
+}
+
 .ds-find__count {
   display: flex;
   flex-wrap: wrap;
@@ -1351,7 +1416,8 @@ a.ds-room-chip {
 
 @media (max-width: 40rem) {
   .ds-find__chips .ds-room-chip,
-  .ds-find__sort-link {
+  .ds-find__sort-link,
+  .ds-find__more-summary {
     height: auto;
     min-height: 44px;
   }

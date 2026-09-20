@@ -45,6 +45,9 @@ export { RoomStats, type RoomStatsProps, type RoomStat } from './RoomStats';
 export { RoomJump, type RoomJumpProps, type RoomJumpSection } from './RoomJump';
 export {
   FindBar,
+  FindBarChips,
+  FindBarFilters,
+  type FindBarFiltersProps,
   type FindBarProps,
   type FindBarChip,
   type FindBarChipRow,

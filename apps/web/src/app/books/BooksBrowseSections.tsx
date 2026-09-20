@@ -14,6 +14,7 @@ import {
   EmptyList,
   Prose,
   FindBar,
+  FindBarFilters,
   RoomFactList,
   RoomHandoff,
   RoomJump,
@@ -259,7 +260,10 @@ export function BooksBrowseSections({ view, suggestCorpus, snapshot }: BooksBrow
             query={view.q}
             searchSlot={<BooksSearchTypeahead defaultValue={view.q} corpus={suggestCorpus} />}
             formFields={
-              <>
+              <FindBarFilters
+                label="State and author"
+                activeCount={(view.state === 'all' ? 0 : 1) + (view.author === 'all' ? 0 : 1)}
+              >
                 <AutoSubmitSelect
                   id="state"
                   name="state"
@@ -274,7 +278,7 @@ export function BooksBrowseSections({ view, suggestCorpus, snapshot }: BooksBrow
                   defaultValue={view.author}
                   options={view.authorOptions}
                 />
-              </>
+              </FindBarFilters>
             }
             preserved={{ sort: view.sort, dir: view.dir }}
             active={activeChips}

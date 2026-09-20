@@ -11,6 +11,8 @@ import { US_STATES } from '@repo/domain';
 import {
   EmptyList,
   FindBar,
+  FindBarChips,
+  FindBarFilters,
   Prose,
   RoomFactList,
   RoomHandoff,
@@ -207,34 +209,6 @@ export function LawBrowseSections({ view, catalog }: LawBrowseSectionsProps) {
                     })),
                 ],
               },
-              {
-                label: 'Filter by topic',
-                chips: [
-                  {
-                    label: 'All topics',
-                    href: buildLawHref({
-                      q: view.q,
-                      kind: view.kind,
-                      topic: 'all',
-                      sort: view.sort,
-                    }),
-                    active: view.topic === 'all',
-                  },
-                  ...view.topicOptions
-                    .filter((option) => option.value !== 'all')
-                    .map((option) => ({
-                      label: humanizeLegalTopic(option.value),
-                      href: buildLawHref({
-                        q: view.q,
-                        kind: view.kind,
-                        topic: option.value,
-                        sort: view.sort,
-                      }),
-                      active: view.topic === option.value,
-                      count: topicCounts.get(option.value) ?? 0,
-                    })),
-                ],
-              },
             ]}
             sort={view.sortOptions.map((option) => ({
               label: option.label,
@@ -247,7 +221,40 @@ export function LawBrowseSections({ view, catalog }: LawBrowseSectionsProps) {
               active: view.sort === option.value,
             }))}
             summary={countLabel}
-          />
+          >
+            <FindBarFilters label="Filter by topic" activeCount={view.topic === 'all' ? 0 : 1}>
+              <FindBarChips
+                row={{
+                  label: 'Filter by topic',
+                  chips: [
+                    {
+                      label: 'All topics',
+                      href: buildLawHref({
+                        q: view.q,
+                        kind: view.kind,
+                        topic: 'all',
+                        sort: view.sort,
+                      }),
+                      active: view.topic === 'all',
+                    },
+                    ...view.topicOptions
+                      .filter((option) => option.value !== 'all')
+                      .map((option) => ({
+                        label: humanizeLegalTopic(option.value),
+                        href: buildLawHref({
+                          q: view.q,
+                          kind: view.kind,
+                          topic: option.value,
+                          sort: view.sort,
+                        }),
+                        active: view.topic === option.value,
+                        count: topicCounts.get(option.value) ?? 0,
+                      })),
+                  ],
+                }}
+              />
+            </FindBarFilters>
+          </FindBar>
 
           {view.items.length === 0 ? (
             <EmptyList title="No law entries matched">
