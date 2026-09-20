@@ -17,7 +17,6 @@ import {
 import { WalkOffRamp } from '../walk-off-ramp';
 import { SourceLineageDiagram } from '../methodology/MethodologyDiagrams';
 import {
-  SOURCE_LIBRARY_LEDE,
   SOURCE_LIBRARY_SURFACES,
   SOURCE_LINEAGE_STAGES,
   SOURCE_PUBLISHER_KINDS,
@@ -45,12 +44,7 @@ export function SourcesSections() {
           </>
         }
         lede={SOURCES_INTRO}
-        showCrumb={false}
       />
-
-      <Prose>
-        <p>{SOURCE_LIBRARY_LEDE}</p>
-      </Prose>
 
       <RoomJump sections={SOURCES_JUMP} />
 

@@ -22,7 +22,6 @@ export default function CorrectionsPage() {
         pathname="/corrections"
         title="Tell the archive it is wrong"
         lede="You get a receipt code and a tracked outcome. A person reads every correction, and nothing you send publishes on arrival."
-        showCrumb={false}
       />
       <CorrectionsSections />
     </Room>

@@ -139,6 +139,11 @@ a.ds-errata__row-id {
   .ds-errata__row-statement {
     grid-column: 1 / -1;
   }
+
+  /* A grid item stretches to its column, which turned a two-word tag into a wide empty box. */
+  .ds-errata__row-phase {
+    justify-self: start;
+  }
 }
 
 .ds-errata__empty {

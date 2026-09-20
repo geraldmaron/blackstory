@@ -58,7 +58,6 @@ export default function FaqPage() {
           </>
         }
         lede={FAQ_LEDE}
-        showCrumb={false}
       />
 
       <RoomJump
@@ -74,6 +73,7 @@ export default function FaqPage() {
           key={section.id}
           id={section.id}
           icon={section.icon}
+          kicker={section.kicker}
           title={section.heading}
           tone={roomSectionTone(index)}
         >

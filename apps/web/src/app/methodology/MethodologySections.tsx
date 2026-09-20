@@ -75,15 +75,14 @@ export function MethodologySections({ omitEntry = false }: { readonly omitEntry?
             </>
           }
           lede={METHODOLOGY_INTRO_LEDE}
-          showCrumb={false}
         />
       )}
+
+      <RoomJump sections={METHODOLOGY_JUMP} />
 
       <Prose>
         <TrustSiteDisclaimer />
       </Prose>
-
-      <RoomJump sections={METHODOLOGY_JUMP} />
 
       <RoomSection
         id="how-a-record-gets-in"

@@ -30,7 +30,6 @@ export default function AboutPage() {
           </>
         }
         lede={ABOUT_LEDE}
-        showCrumb={false}
       />
       <AboutSections />
     </Room>
