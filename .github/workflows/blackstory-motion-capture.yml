@@ -1,0 +1,38 @@
+name: BlackStory Motion Capture
+on:
+  push:
+    branches: [media/blackstory-love-me-20260920]
+    paths: [.github/workflows/blackstory-motion-capture.yml, creative/blackstory-ad-20260920/**]
+permissions:
+  contents: read
+concurrency:
+  group: blackstory-motion-capture-20260920
+  cancel-in-progress: true
+jobs:
+  capture:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 18
+    steps:
+      - name: Check out media scripts only
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          sparse-checkout: creative/blackstory-ad-20260920
+          persist-credentials: false
+      - name: Install isolated recording dependencies
+        run: |
+          sudo apt-get -qq update
+          sudo apt-get -qq install -y ffmpeg xvfb
+          python3 -m venv /tmp/motion-env
+          /tmp/motion-env/bin/pip -q install playwright==1.55.0 Pillow
+          /tmp/motion-env/bin/python -m playwright install --with-deps chromium
+      - name: Record the live public application
+        run: /tmp/motion-env/bin/python creative/blackstory-ad-20260920/capture.py
+      - name: Preserve screen recordings, QA frames, provenance, and complete source
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: blackstory-motion-sources
+          path: output/
+          retention-days: 7
+          compression-level: 0
+          if-no-files-found: error
