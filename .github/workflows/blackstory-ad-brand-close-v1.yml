@@ -1,0 +1,99 @@
+# Media-only captures on the isolated ad branch. No application writes or deployment.
+name: BlackStory Brand Close v1
+on:
+  push:
+    branches: [media/blackstory-love-me-20260920]
+    paths: [.github/workflows/blackstory-ad-brand-close-v1.yml]
+permissions:
+  contents: read
+jobs:
+  finish:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - name: Install isolated capture tools
+        run: |
+          python3 -m venv /tmp/finish-env
+          /tmp/finish-env/bin/pip -q install playwright==1.55.0 requests beautifulsoup4 pyyaml
+          /tmp/finish-env/bin/python -m playwright install --with-deps chromium
+          sudo apt-get -qq install -y ffmpeg > /tmp/finish-install.log
+      - name: Capture final surfaces
+        run: |
+          mkdir -p output/project output/review output/captures output/assets
+          cat > output/project/finish_capture.py <<'PY'
+          import asyncio,importlib.util,json,os,pathlib,subprocess,traceback
+          import requests,yaml
+          from playwright.async_api import async_playwright
+          ROOT=pathlib.Path('output')
+          url='https://raw.githubusercontent.com/geraldmaron/blackstory/2a3b01c0a156662d65a1dff7200f90883e1a751d/.github/workflows/blackstory-ad-capture.yml'
+          response=requests.get(url,timeout=25);response.raise_for_status()
+          workflow=yaml.safe_load(response.text)
+          step=next(s for s in workflow['jobs']['capture']['steps'] if s['name']=='Write and run capture source')
+          code=step['run'].split("<<'PY'\n",1)[1].split('\nPY\n',1)[0]
+          base=ROOT/'project'/'capture_base.py';base.write_text(code)
+          spec=importlib.util.spec_from_file_location('base',base);c=importlib.util.module_from_spec(spec);spec.loader.exec_module(c)
+          c.manifest['capture_pass']='archival-closeups-and-official-brand'
+          async def main():
+              xvfb=subprocess.Popen(['Xvfb',':99','-screen','0','1080x2240x24','-ac','-nolisten','tcp'],stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL)
+              await asyncio.sleep(.7)
+              try:
+                  async with async_playwright() as p:
+                      browser=await p.chromium.launch(headless=False,env={**os.environ,'DISPLAY':':99'},args=['--disable-dev-shm-usage','--window-position=0,0','--window-size=540,1047','--force-device-scale-factor=2'])
+                      context=await browser.new_context(no_viewport=True,color_scheme='dark',reduced_motion='no-preference')
+                      page=await context.new_page()
+                      async def goto(path):
+                          r=await page.goto(c.SITE+path,wait_until='domcontentloaded',timeout=40000)
+                          if r and r.status>=400:raise RuntimeError(f'HTTP {r.status}: {path}')
+                          await c.wait_ready(page)
+                      for name,path,selector in [('30-constitution-close','/stories/the-count','img[src*="Constitution_of_the_United_States"]'),('31-historical-portrait','/stories/the-count','img[src*="Dred_Scott"]'),('32-dubois-plate-close','/lives','img[src*="33880"]')]:
+                          try:
+                              await goto(path)
+                              image=page.locator(selector).first
+                              await image.scroll_into_view_if_needed(timeout=12000)
+                              await page.wait_for_function('(sel)=>{const i=document.querySelector(sel);return i&&i.complete&&i.naturalWidth>250}',arg=selector,timeout=15000)
+                              await page.evaluate('(sel)=>{const i=document.querySelector(sel);scrollTo(0,scrollY+i.getBoundingClientRect().top-145)}',selector)
+                              await page.wait_for_timeout(1500)
+                              async def move():await c.smooth_scroll(page,120,8)
+                              await c.record(page,name,'closeups',move)
+                          except Exception as exc:c.manifest['errors'].append({'stage':name,'error':str(exc)});c.save()
+                      await goto('/lives')
+                      await page.evaluate('document.fonts.ready')
+                      fonts=await page.evaluate('()=>Array.from(document.fonts).map(f=>({family:f.family,status:f.status}))')
+                      c.manifest['font_families']=fonts
+                      serif=next((f['family'] for f in fonts if 'newsreader' in f['family'].lower() and 'fallback' not in f['family'].lower()),'Georgia')
+                      mono=next((f['family'] for f in fonts if 'mono' in f['family'].lower() and 'fallback' not in f['family'].lower()),'monospace')
+                      await page.evaluate('''async()=>{const i=new Image();i.src='/brand/lockup-dark.png';await i.decode()}''')
+                      await page.evaluate('''({serif,mono})=>{
+                        const css=document.createElement('style');css.textContent=`
+                        #brand-close{position:fixed;inset:0;z-index:2147483647;background:#0A0A0A;color:#F4EFE5;display:flex;align-items:center;justify-content:center;overflow:hidden;cursor:none}
+                        #brand-close .composition{width:450px;text-align:center;transform:translate(-14px,-35px)}
+                        #brand-close img{display:block;width:450px;height:auto;margin:0 auto -29px;opacity:0;transform:translateY(12px)}
+                        #brand-close .tagline{font-size:39px;font-weight:400;line-height:1.13;letter-spacing:-.65px;margin:0 auto;color:#F4EFE5;opacity:0;transform:translateY(10px)}
+                        #brand-close .url{font-size:21px;font-weight:400;line-height:1.2;letter-spacing:.1px;margin:42px auto 0;color:#D07A32;opacity:0;transform:translateY(8px)}
+                        #brand-close.play img{animation:arrive .68s cubic-bezier(.2,.7,.2,1) .03s forwards}
+                        #brand-close.play .tagline{animation:arrive .68s cubic-bezier(.2,.7,.2,1) .18s forwards}
+                        #brand-close.play .url{animation:arrive .6s cubic-bezier(.2,.7,.2,1) .32s forwards}
+                        @keyframes arrive{to{opacity:1;transform:translateY(0)}}
+                        `;document.head.append(css);const layer=document.createElement('section');layer.id='brand-close';layer.innerHTML='<div class="composition"><img src="/brand/lockup-dark.png" alt="BlackStory"><p class="tagline">History,<br>pinned to place.</p><p class="url">blackstory.app</p></div>';document.body.append(layer);layer.querySelector('.tagline').style.fontFamily=serif;layer.querySelector('.url').style.fontFamily=mono;
+                      }''',{'serif':serif,'mono':mono})
+                      async def closing():
+                          await page.evaluate("document.querySelector('#brand-close').classList.add('play')")
+                          await page.wait_for_timeout(4500)
+                      await c.record(page,'33-brand-close','brand',closing)
+                      await page.screenshot(path=str(ROOT/'assets'/'brand-close.png'))
+                      await browser.close()
+              finally:xvfb.terminate()
+          try:asyncio.run(main())
+          except Exception as exc:c.manifest['errors'].append({'stage':'fatal','error':str(exc),'trace':traceback.format_exc()})
+          c.save();print(json.dumps({'clips':len(c.manifest['clips']),'errors':c.manifest['errors']},indent=2))
+          PY
+          /tmp/finish-env/bin/python output/project/finish_capture.py
+      - name: Preserve final captures
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: blackstory-brand-close-v1
+          path: output/
+          compression-level: 0
+          retention-days: 7
+          if-no-files-found: error
