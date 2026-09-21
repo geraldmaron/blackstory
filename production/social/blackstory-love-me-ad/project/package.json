@@ -1,0 +1,15 @@
+{
+  "name": "blackstory-love-me-ad",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Capture + edit pipeline for the BlackStory 'Love Me' TikTok ad",
+  "type": "module",
+  "scripts": {
+    "inspect": "node inspect.mjs",
+    "capture": "node capture.mjs",
+    "build": "node build-edit.mjs"
+  },
+  "dependencies": {
+    "playwright": "^1.49.0"
+  }
+}

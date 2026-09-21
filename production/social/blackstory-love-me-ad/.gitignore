@@ -1,0 +1,21 @@
+# Large generated media stays out of git. The project is reproducible from the
+# scripts, specs and manifests that ARE tracked; see README.md.
+captures/**/*.mp4
+captures/**/*.mov
+captures/_inspect/
+renders/*.mp4
+reference/*.mp4
+audio/*.wav
+project/segments/
+project/node_modules/
+project/package-lock.json
+
+# Tracked deliberately (small, and the project is unreadable without them):
+!captures/manifest.json
+!audio/markers.json
+!audio/analysis.json
+!reference/video-analysis.json
+assets/media/src/
+assets/media/jpg/
+assets/media/thumbs/
+project/segments-v3/

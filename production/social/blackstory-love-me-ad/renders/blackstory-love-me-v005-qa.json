@@ -1,0 +1,308 @@
+{
+  "render": "blackstory-love-me-v005.mp4",
+  "frames": 3264,
+  "duration_s": 54.4544,
+  "blank_frames": [338, 339, 340, 341, 342, 516, 517, 518, 519, 520, 695, 696, 697, 698, 699],
+  "cuts": [
+    {
+      "shot": "c02-wheatley",
+      "intended": 111,
+      "measured": 111,
+      "err_frames": 0,
+      "diff": 0.1413,
+      "nearest_marker": "KICK 1.845s",
+      "marker_offset_frames": 0
+    },
+    {
+      "shot": "c03-wells",
+      "intended": 199,
+      "measured": 199,
+      "err_frames": 0,
+      "diff": 0.1663,
+      "nearest_marker": "KICK 3.317s",
+      "marker_offset_frames": 0
+    },
+    {
+      "shot": "c04-jacobs",
+      "intended": 244,
+      "measured": 244,
+      "err_frames": 0,
+      "diff": 0.1291,
+      "nearest_marker": "KICK 4.064s",
+      "marker_offset_frames": 0
+    },
+    {
+      "shot": "l1-her",
+      "intended": 338,
+      "measured": 338,
+      "err_frames": 0,
+      "diff": 0.2539,
+      "nearest_marker": "VOX 5.6373s",
+      "marker_offset_frames": 0
+    },
+    {
+      "shot": "c06-smalls",
+      "intended": 378,
+      "measured": 378,
+      "err_frames": 0,
+      "diff": 0.2418,
+      "nearest_marker": "KICK 6.309s",
+      "marker_offset_frames": 0
+    },
+    {
+      "shot": "c07-revels",
+      "intended": 433,
+      "measured": 433,
+      "err_frames": 0,
+      "diff": 0.1543,
+      "nearest_marker": "KICK 7.221s",
+      "marker_offset_frames": 0
+    },
+    {
+      "shot": "l2-his",
+      "intended": 516,
+      "measured": 516,
+      "err_frames": 0,
+      "diff": 0.2258,
+      "nearest_marker": "VOX 8.6133s",
+      "marker_offset_frames": 0
+    },
+    {
+      "shot": "c09-seneca",
+      "intended": 557,
+      "measured": 557,
+      "err_frames": 0,
+      "diff": 0.2254,
+      "nearest_marker": "KICK 9.291s",
+      "marker_offset_frames": 0
+    },
+    {
+      "shot": "c10-onajudge",
+      "intended": 612,
+      "measured": 612,
+      "err_frames": 0,
+      "diff": 0.1676,
+      "nearest_marker": "KICK 10.208s",
+      "marker_offset_frames": 0
+    },
+    {
+      "shot": "l3-their",
+      "intended": 695,
+      "measured": 695,
+      "err_frames": 0,
+      "diff": 0.1503,
+      "nearest_marker": "VOX 11.5947s",
+      "marker_offset_frames": 0
+    },
+    {
+      "shot": "map-reveal",
+      "intended": 736,
+      "measured": 736,
+      "err_frames": 0,
+      "diff": 0.1297,
+      "nearest_marker": "KICK 12.277s",
+      "marker_offset_frames": 0
+    },
+    {
+      "shot": "c12-still",
+      "intended": 817,
+      "measured": 817,
+      "err_frames": 0,
+      "diff": 0.2806,
+      "nearest_marker": "KICK 13.624s",
+      "marker_offset_frames": 0
+    },
+    {
+      "shot": "c13-dubois",
+      "intended": 917,
+      "measured": 917,
+      "err_frames": 0,
+      "diff": 0.1978,
+      "nearest_marker": "KICK 15.299s",
+      "marker_offset_frames": 0
+    },
+    {
+      "shot": "c17-cites",
+      "intended": 995,
+      "measured": 995,
+      "err_frames": 0,
+      "diff": 0.2845,
+      "nearest_marker": "KICK 16.6s",
+      "marker_offset_frames": 0
+    },
+    {
+      "shot": "c18-rainey",
+      "intended": 1141,
+      "measured": 1141,
+      "err_frames": 0,
+      "diff": 0.2049,
+      "nearest_marker": "VOX 19.04s",
+      "marker_offset_frames": 0
+    },
+    {
+      "shot": "c16-woods",
+      "intended": 1257,
+      "measured": 1257,
+      "err_frames": 0,
+      "diff": 0.2259,
+      "nearest_marker": "VOX 20.976s",
+      "marker_offset_frames": 0
+    },
+    {
+      "shot": "c19-tulsa",
+      "intended": 1370,
+      "measured": 1370,
+      "err_frames": 0,
+      "diff": 0.1891,
+      "nearest_marker": "VOX 22.848s",
+      "marker_offset_frames": 0
+    },
+    {
+      "shot": "c20-plate",
+      "intended": 1500,
+      "measured": 1500,
+      "err_frames": 0,
+      "diff": 0.1822,
+      "nearest_marker": "VOX 25.024s",
+      "marker_offset_frames": 0
+    },
+    {
+      "shot": "lives",
+      "intended": 1545,
+      "measured": 1545,
+      "err_frames": 0,
+      "diff": 0.2061,
+      "nearest_marker": "VOX 25.776s",
+      "marker_offset_frames": 0
+    },
+    {
+      "shot": "map-wide",
+      "intended": 1631,
+      "measured": 1631,
+      "err_frames": 0,
+      "diff": 0.1294,
+      "nearest_marker": "KICK 27.205s",
+      "marker_offset_frames": 0
+    },
+    {
+      "shot": "memorial-a",
+      "intended": 1681,
+      "measured": 1681,
+      "err_frames": 0,
+      "diff": 0.128,
+      "nearest_marker": "VOX 28.0507s",
+      "marker_offset_frames": 0
+    },
+    {
+      "shot": "memorial-b",
+      "intended": 2123,
+      "measured": 2125,
+      "err_frames": 2,
+      "diff": 0.0124,
+      "nearest_marker": "VOX 35.416s",
+      "marker_offset_frames": 0
+    },
+    {
+      "shot": "c21-coleman",
+      "intended": 2524,
+      "measured": 2524,
+      "err_frames": 0,
+      "diff": 0.2877,
+      "nearest_marker": "KICK 42.109s",
+      "marker_offset_frames": 0
+    },
+    {
+      "shot": "c22-woodson",
+      "intended": 2573,
+      "measured": 2573,
+      "err_frames": 0,
+      "diff": 0.3192,
+      "nearest_marker": "KICK 42.931s",
+      "marker_offset_frames": 0
+    },
+    {
+      "shot": "c23-bruce",
+      "intended": 2695,
+      "measured": 2695,
+      "err_frames": 0,
+      "diff": 0.2517,
+      "nearest_marker": "KICK 44.957s",
+      "marker_offset_frames": 0
+    },
+    {
+      "shot": "c14-drew",
+      "intended": 2751,
+      "measured": 2751,
+      "err_frames": 0,
+      "diff": 0.2105,
+      "nearest_marker": "KICK 45.901s",
+      "marker_offset_frames": 0
+    },
+    {
+      "shot": "c24-turner",
+      "intended": 2823,
+      "measured": 2823,
+      "err_frames": 0,
+      "diff": 0.1581,
+      "nearest_marker": "KICK 47.096s",
+      "marker_offset_frames": 0
+    },
+    {
+      "shot": "map-out3",
+      "intended": 2881,
+      "measured": 2881,
+      "err_frames": 0,
+      "diff": 0.1649,
+      "nearest_marker": "KICK 48.072s",
+      "marker_offset_frames": 0
+    },
+    {
+      "shot": "map-out4",
+      "intended": 2932,
+      "measured": 2932,
+      "err_frames": 0,
+      "diff": 0.0816,
+      "nearest_marker": "KICK 48.912s",
+      "marker_offset_frames": 0
+    },
+    {
+      "shot": "map-out5",
+      "intended": 2973,
+      "measured": 2973,
+      "err_frames": 0,
+      "diff": 0.0812,
+      "nearest_marker": "KICK 49.592s",
+      "marker_offset_frames": 0
+    },
+    {
+      "shot": "map-out6",
+      "intended": 3017,
+      "measured": 3017,
+      "err_frames": 0,
+      "diff": 0.0642,
+      "nearest_marker": "KICK 50.339s",
+      "marker_offset_frames": 0
+    },
+    {
+      "shot": "brand-bg",
+      "intended": 3062,
+      "measured": 3062,
+      "err_frames": 0,
+      "diff": 0.0136,
+      "nearest_marker": "KICK 51.085s",
+      "marker_offset_frames": 0
+    }
+  ],
+  "cut_errors_nonzero": [
+    {
+      "shot": "memorial-b",
+      "intended": 2123,
+      "measured": 2125,
+      "err_frames": 2,
+      "diff": 0.0124,
+      "nearest_marker": "VOX 35.416s",
+      "marker_offset_frames": 0
+    }
+  ],
+  "ebur128_summary": "Summary: Integrated loudness: I: -12.5 LUFS Threshold: -22.7 LUFS Loudness range: LRA: 2.5 LU Threshold: -32.6 LUFS LRA low: -13.7 LUFS LRA high: -11.2 LUFS True peak: Peak: -2.4 dBFS [out#0/null @ 0x7c4c38300] video:1352KiB audio:10208KiB subtitle:0KiB other streams:0KiB global headers:0KiB muxing overhead: unknown frame= 3264 fps=1170 q=-0.0 Lsize=N/A time=00:00:54.44 bitrate=N/A speed=19.5x elapsed=0:00:02.79"
+}
