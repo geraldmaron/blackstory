@@ -1,0 +1,53 @@
+name: BlackStory Final Map Pickups
+on:
+  push:
+    branches: [media/blackstory-love-me-20260920]
+    paths: [.github/workflows/blackstory-ad-final-map-pickups.yml]
+permissions:
+  contents: read
+jobs:
+  map:
+    strategy:
+      fail-fast: false
+      matrix:
+        shot: [national, descent, return-national]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+          sparse-checkout: media/blackstory-ad
+      - name: Install native-browser renderer
+        run: |
+          python3 -m venv /tmp/media-map-env
+          /tmp/media-map-env/bin/pip -q install playwright==1.55.0
+          /tmp/media-map-env/bin/python -m playwright install chromium
+          if ! command -v ffmpeg; then sudo apt-get update -qq && sudo apt-get install -y ffmpeg; fi
+      - name: Optimize serialization and preserve interrupted output
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          p=Path('media/blackstory-ad/map_frames.py')
+          text=p.read_text()
+          text=text.replace("async def main(name):", "SHOTS['national']={'start':[-97.,38.,2.6],'end':[-95.,37.,2.72]}\n\nasync def main(name):")
+          text=text.replace("'p=>window.__adMap.jumpTo({center:p.slice(0,2),zoom:p[2]})'", "'p=>{window.__adMap.jumpTo({center:p.slice(0,2),zoom:p[2]});}'")
+          text=text.replace("'-vcodec','png'", "'-vcodec','mjpeg'")
+          text=text.replace("page.screenshot(type='png',animations='allow')", "page.screenshot(type='jpeg',quality=98,animations='allow',timeout=30000)")
+          text=text.replace("f'-{frame:03}.png'", "f'-{frame:03}.jpg'")
+          text=text.replace("'capture_method':'Native browser-rendered fixed-step", "'capture_method':'Quality-98 JPEG transport of native browser-rendered fixed-step")
+          text=text.replace("'-movflags','+faststart'", "'-movflags','+frag_keyframe+empty_moov+default_base_moof'")
+          text=text.replace("asyncio.run(main(sys.argv[1]))", "asyncio.run(asyncio.wait_for(main(sys.argv[1]),timeout=780))")
+          p.write_text(text)
+          PY
+      - name: Render actual native map camera frames
+        run: /tmp/media-map-env/bin/python media/blackstory-ad/map_frames.py '${{ matrix.shot }}'
+      - name: Preserve geographic take and complete source
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: blackstory-final-map-${{ matrix.shot }}
+          path: output/
+          retention-days: 7
+          compression-level: 0
+          if-no-files-found: warn
