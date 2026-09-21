@@ -1,11 +1,10 @@
-name: BlackStory ad production scout
+name: BlackStory ad production capture
 
 on:
   push:
     branches: [production/blackstory-love-me-ad-20260920]
     paths:
       - .github/workflows/blackstory-love-me-production.yml
-      - production/social/blackstory-love-me-ad/**
 
 permissions:
   contents: read
@@ -15,9 +14,9 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  scout:
+  capture:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 30
     steps:
       - name: Read isolated production branch
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
@@ -26,134 +25,35 @@ jobs:
       - name: Install public capture tools
         run: |
           python3 -m venv /tmp/blackstory-ad-tools
-          /tmp/blackstory-ad-tools/bin/pip install playwright yt-dlp requests
+          /tmp/blackstory-ad-tools/bin/pip install playwright requests
           /tmp/blackstory-ad-tools/bin/python -m playwright install --with-deps chromium
           sudo apt-get update -qq
-          sudo apt-get install -y -qq ffmpeg
-      - name: Inspect actual public product and exact reference
-        run: |
-          mkdir -p _ad_artifacts
-          cat > _ad_artifacts/scout.py <<'PY'
-          import asyncio, json, re, shutil, subprocess, sys, time, traceback
-          from pathlib import Path
-          from datetime import datetime, timezone
-          from urllib.parse import urljoin, urlparse
-          import requests
-          from playwright.async_api import async_playwright
-
-          OUT = Path('_ad_artifacts')
-          for name in ['reference', 'inspection', 'assets', 'provenance']:
-              (OUT / name).mkdir(exist_ok=True)
-          REF = 'https://www.tiktok.com/@ambnt.prod/video/7670347350115634462'
-          VID = '7670347350115634462'
-          report = {'started_utc': datetime.now(timezone.utc).isoformat(), 'reference_url': REF, 'reference_verified': False, 'read_only_public_capture': True, 'surfaces': [], 'errors': []}
-          report['commit'] = subprocess.check_output(['git', 'rev-parse', 'HEAD'], text=True).strip()
-          report['routes'] = [str(p) for p in Path('apps/web/src/app').rglob('page.tsx')]
-          (OUT / 'provenance' / 'routes.json').write_text(json.dumps(report['routes'], indent=2))
-          for f in ['README.md', 'docs/ui/brand.md', 'apps/web/src/app/layout.tsx']:
-              p = Path(f)
-              if p.exists():
-                  (OUT / 'provenance' / f.replace('/', '__')).write_text(p.read_text())
-          for p in Path('apps/web/public/brand').glob('*'):
-              if p.is_file() and p.suffix.lower() in ['.png', '.svg'] and ('lockup' in p.name or 'symbol' in p.name):
-                  shutil.copy2(p, OUT / 'assets' / p.name)
-          def save():
-              (OUT / 'report.json').write_text(json.dumps(report, indent=2))
-          save()
-          try:
-              cmd = [sys.executable, '-m', 'yt_dlp', '--ignore-config', '--no-playlist', '--no-progress', '--retries', '1', '--socket-timeout', '20', '--write-info-json', '-o', str(OUT/'reference'/'tiktok-%(id)s.%(ext)s'), REF]
-              r = subprocess.run(cmd, capture_output=True, text=True, timeout=130)
-              (OUT/'reference'/'yt-dlp.log').write_text(r.stdout + '\n' + r.stderr)
-              report['yt_dlp_returncode'] = r.returncode
-              for p in (OUT/'reference').glob('*.info.json'):
-                  info = json.loads(p.read_text())
-                  report['reference_metadata'] = {k: info.get(k) for k in ['id', 'uploader', 'uploader_id', 'duration', 'fps', 'title', 'webpage_url']}
-                  creator = str(info.get('uploader_id') or info.get('uploader') or '').lower().lstrip('@')
-                  if str(info.get('id')) == VID and creator == 'ambnt.prod':
-                      report['reference_verified'] = True
-              if not report['reference_verified']:
-                  try:
-                      rr = requests.get('https://www.tiktok.com/oembed', params={'url': REF}, timeout=25)
-                      (OUT/'reference'/'oembed-response.txt').write_text(rr.text)
-                      report['oembed_status'] = rr.status_code
-                  except Exception as e:
-                      report['errors'].append('oembed: ' + str(e))
-          except Exception as e:
-              report['errors'].append('reference: ' + str(e))
-          save()
-          async def inspect():
-              async with async_playwright() as p:
-                  browser = await p.chromium.launch(headless=True, args=['--disable-dev-shm-usage', '--enable-webgl', '--use-gl=angle', '--use-angle=swiftshader'])
-                  context = await browser.new_context(viewport={'width': 540, 'height': 960}, device_scale_factor=2, reduced_motion='no-preference')
-                  page = await context.new_page()
-                  errors = []
-                  page.on('pageerror', lambda e: errors.append(str(e)))
-                  links_seen = set()
-                  queue = ['/', '/explore', '/records', '/stories', '/lives', '/data', '/memorial', '/rooms']
-                  for ix in range(14):
-                      if not queue:
-                          break
-                      route = queue.pop(0)
-                      url = urljoin('https://blackstory.app', route)
-                      slug = re.sub(r'[^a-zA-Z0-9]+', '-', route).strip('-') or 'home'
-                      item = {'route': route, 'url': url, 'viewport': [540, 960], 'device_scale_factor': 2}
-                      print('SCOUT', route, flush=True)
-                      try:
-                          resp = await page.goto(url, wait_until='domcontentloaded', timeout=60000)
-                          item['status'] = resp.status if resp else None
-                          await page.wait_for_timeout(6500)
-                          await page.evaluate('document.fonts.ready')
-                          await page.screenshot(path=str(OUT/'inspection'/f'{ix:02d}-{slug}.png'), full_page=False, timeout=20000)
-                          item['title'] = await page.title()
-                          item['text'] = (await page.locator('body').inner_text())[:36000]
-                          item['links'] = await page.locator('a[href]').evaluate_all('(a)=>a.map(x=>({text:x.innerText,href:x.getAttribute("href")}))')
-                          item['images'] = await page.locator('img').evaluate_all('(a)=>a.map(x=>({alt:x.alt,src:x.currentSrc,width:x.naturalWidth,height:x.naturalHeight}))')
-                          item['buttons'] = await page.locator('button').evaluate_all('(a)=>a.map(x=>({text:x.innerText,label:x.getAttribute("aria-label"),title:x.title}))')
-                          item['inputs'] = await page.locator('input').evaluate_all('(a)=>a.map(x=>({type:x.type,placeholder:x.placeholder,label:x.getAttribute("aria-label")}))')
-                          item['canvases'] = await page.locator('canvas').evaluate_all('(a)=>a.map(x=>({width:x.width,height:x.height,class:x.className}))')
-                          item['final_url'] = page.url
-                          item['errors'] = errors[-20:]
-                          (OUT/'inspection'/f'{ix:02d}-{slug}.json').write_text(json.dumps(item, indent=2))
-                          (OUT/'inspection'/f'{ix:02d}-{slug}.html').write_text(await page.content())
-                          for link in item['links']:
-                              h = link['href'] or ''
-                              if h.startswith('https://blackstory.app'):
-                                  h = h[len('https://blackstory.app'):]
-                              if re.match(r'^/(stories|records|entities|lives)/[^?#/]+', h) and h not in links_seen and len(links_seen) < 6:
-                                  links_seen.add(h)
-                                  queue.append(h)
-                          print(json.dumps({'route': route, 'status': item['status'], 'title': item['title'], 'text_start': item['text'][:400], 'links': len(item['links']), 'canvases': item['canvases']}), flush=True)
-                      except Exception as e:
-                          item['error'] = str(e)
-                          report['errors'].append(route + ': ' + str(e))
-                      report['surfaces'].append(item)
-                      save()
-                  try:
-                      await page.goto(REF, wait_until='domcontentloaded', timeout=40000)
-                      await page.wait_for_timeout(4000)
-                      await page.screenshot(path=str(OUT/'reference'/'tiktok-browser.png'))
-                      (OUT/'reference'/'tiktok-browser.html').write_text(await page.content())
-                      report['tiktok_browser_title'] = await page.title()
-                      report['tiktok_browser_text'] = (await page.locator('body').inner_text())[:8000]
-                  except Exception as e:
-                      report['errors'].append('tiktok-browser: ' + str(e))
-                  await browser.close()
-          try:
-              asyncio.run(inspect())
-          except Exception as e:
-              report['errors'].append('browser: '+traceback.format_exc())
-          report['finished_utc'] = datetime.now(timezone.utc).isoformat()
-          save()
-          print('SCOUT_RESULT', json.dumps({'reference_verified': report['reference_verified'], 'surfaces': len(report['surfaces']), 'errors': report['errors']}), flush=True)
-          PY
-          /tmp/blackstory-ad-tools/bin/python _ad_artifacts/scout.py
-          /tmp/blackstory-ad-tools/bin/pip freeze > _ad_artifacts/provenance/python-versions.txt
-          ffmpeg -version > _ad_artifacts/provenance/ffmpeg-version.txt
-      - name: Preserve acquisition and visual inspection artifacts
+          sudo apt-get install -y -qq ffmpeg xvfb
+      - name: Acquire the exact public TikTok post
+        run: /tmp/blackstory-ad-tools/bin/python .github/scripts/blackstory-ad-capture.py --mode reference
+      - name: Preserve exact reference immediately
         if: always()
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
         with:
-          name: blackstory-ad-scout-${{ github.run_number }}
+          name: blackstory-ad-reference-${{ github.run_number }}
+          path: _ad_artifacts/reference/
+          retention-days: 14
+          if-no-files-found: error
+      - name: Capture native BlackStory motion at 1080x1920 and 60fps
+        run: /tmp/blackstory-ad-tools/bin/python .github/scripts/blackstory-ad-capture.py --mode capture
+      - name: Preserve complete production captures and source
+        if: always()
+        run: |
+          mkdir -p _ad_artifacts/provenance _ad_artifacts/scripts
+          cp .github/workflows/blackstory-love-me-production.yml _ad_artifacts/scripts/capture-workflow.yml
+          /tmp/blackstory-ad-tools/bin/pip freeze > _ad_artifacts/provenance/python-versions.txt
+          ffmpeg -version > _ad_artifacts/provenance/ffmpeg-version.txt
+      - name: Upload motion footage and inspection records
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        with:
+          name: blackstory-ad-captures-${{ github.run_number }}
           path: _ad_artifacts/
+          compression-level: 0
           retention-days: 14
           if-no-files-found: error
