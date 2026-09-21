@@ -8,7 +8,7 @@ permissions:
 jobs:
   camera:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 8
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
         with:
@@ -20,7 +20,7 @@ jobs:
           /tmp/camera-tools/bin/python -m playwright install --with-deps chromium
           sudo apt-get update -qq
           sudo apt-get install -y -qq ffmpeg xvfb
-      - name: Record live MapLibre camera motion without modifying product data
+      - name: Record smooth live camera with preloaded tiles
         run: |
           mkdir -p _ad_artifacts/scripts
           /tmp/camera-tools/bin/python - <<'PY'
@@ -47,26 +47,26 @@ jobs:
                   if(d>=4||o instanceof Node)continue;
                   for(const k of ['current','map','_map','value','state','memoizedState','next']){try{if(o[k])queue.push([o[k],d+1]);}catch(e){}}
               }
-              throw new Error('No verified live MapLibre instance found; do not fabricate geographic footage');
+              throw new Error('No verified live MapLibre instance found');
           }""")
           dump(OUT/'provenance'/'camera-discovery.json',found)
           async def camera_state():
               return await page.evaluate('()=>({center:window.__adCaptureMap.getCenter().toArray(),zoom:window.__adCaptureMap.getZoom(),moving:window.__adCaptureMap.isMoving()})')
-          locations=[('boston',[-71.0586,42.3569]),('new-orleans',[-90.0722,29.9646]),('philadelphia',[-75.1514,39.9428])]
-          for name,center in locations:
-              await page.evaluate('()=>window.__adCaptureMap.jumpTo({center:[-97,38],zoom:3.6,bearing:0,pitch:0})')
-              await settle(4)
-              async def inward():
-                  await page.evaluate('(c)=>window.__adCaptureMap.flyTo({center:c,zoom:11.5,duration:6500,essential:true})',center)
+          locations=[('boston',[-71.0586,42.3569],'inward'),('new-orleans',[-90.0722,29.9646],'outward'),('philadelphia',[-75.1514,39.9428],'outward')]
+          for name,center,direction in locations:
+              await page.evaluate('(c)=>{window.__adCaptureMap.jumpTo({center:c,zoom:11.5,bearing:0,pitch:0});}',center)
+              await settle(5)
+              if direction=='inward':
+                  await page.evaluate('()=>{window.__adCaptureMap.jumpTo({center:[-97,38],zoom:3.6,bearing:0,pitch:0});}')
+                  await settle(4)
+              async def flight():
+                  if direction=='inward':
+                      await page.evaluate('(c)=>{window.__adCaptureMap.flyTo({center:c,zoom:11.5,duration:6500,essential:true});}',center)
+                  else:
+                      await page.evaluate('()=>{window.__adCaptureMap.flyTo({center:[-97,38],zoom:3.6,duration:6500,essential:true});}')
                   await asyncio.sleep(7)
-              await record('native-'+name+'-inward','map',inward,10)
-              dump(OUT/'provenance'/(name+'-inward-state.json'),await camera_state())
-              await settle(3)
-              async def outward():
-                  await page.evaluate('()=>window.__adCaptureMap.flyTo({center:[-97,38],zoom:3.6,duration:6500,essential:true})')
-                  await asyncio.sleep(7)
-              await record('native-'+name+'-outward','map',outward,10)
-              dump(OUT/'provenance'/(name+'-outward-state.json'),await camera_state())
+              await record('native-'+name+'-'+direction+'-polished','map',flight,10)
+              dump(OUT/'provenance'/(name+'-'+direction+'-state.json'),await camera_state())
           '''
           replacement=textwrap.indent(textwrap.dedent(replacement).lstrip('\n'),'        ')
           src=src[:start]+replacement+src[end:]
@@ -78,7 +78,7 @@ jobs:
       - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
         if: always()
         with:
-          name: blackstory-ad-native-camera
+          name: blackstory-ad-native-camera-${{ github.run_number }}
           path: _ad_artifacts/
           compression-level: 0
           retention-days: 14
