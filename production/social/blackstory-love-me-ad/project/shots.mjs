@@ -154,6 +154,29 @@ export const SHOTS = [
     step: mapMove(DCREG, OST, E.outQuart, 46),
   },
 
+  {
+    name: 'map-reveal',
+    in: 741,
+    out: 850,
+    url: BASE + '/',
+    needsMap: true,
+    css: HIDE_CHROME,
+    surface: 'Door — national to DC',
+    action: 'Every pin in the country, then a hard sweep down onto Washington',
+    audio: 'HIT 12.368 (0.801)',
+    v3only: true,
+    prewarm: mapPrewarm(
+      { center: [-96.6, 38.8], zoom: 4.24, pitch: 0 },
+      { center: [-77.03, 38.9], zoom: 9.6, pitch: 40 },
+      6,
+    ),
+    step: mapMove(
+      { center: [-96.6, 38.8], zoom: 4.24, pitch: 0, bearing: 0 },
+      { center: [-77.03, 38.9], zoom: 9.6, pitch: 40, bearing: -6 },
+      E.inOutExpo,
+    ),
+  },
+
   // ---- III. the record ----------------------------------------------------
   {
     name: 'place-title',
@@ -321,7 +344,7 @@ export const SHOTS = [
     surface: 'Data',
     action: 'Counted — figures and the decade chart',
     audio: 'VOX 25.776 (1.17s)',
-    ...pageMove('text:counted', 0, 1.02, 1.02, 380, 1500, E.inOutSine),
+    ...pageMove('text:counted', 0, 1.0, 1.0, 380, 1500, E.inOutSine),
   },
 
   // ---- VII. scale ---------------------------------------------------------

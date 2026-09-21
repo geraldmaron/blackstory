@@ -3,7 +3,7 @@
 A ~54-second vertical social video cut to the AMBNT "Love Me" edit-audio, built
 entirely from deterministic captures of the live BlackStory application.
 
-**Current approved render is named in [STATUS.md](STATUS.md).**
+**Current approved render is named in [STATUS.md](STATUS.md).** The current cut (v004) is built from `project/edit-v3.mjs` with `render-v3.mjs` and `build-v3.mjs`; the v002 pipeline (`shots.mjs`, `build-edit.mjs`) still supplies the map, Lives, Data and Memorial captures it reuses. Image provenance: `assets/media/PROVENANCE.md`.
 
 ---
 

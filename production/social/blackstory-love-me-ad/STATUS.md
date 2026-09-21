@@ -1,28 +1,26 @@
 # STATUS
 
-**Production complete.**
+**Production complete — v004 (revision 2) is current.**
 
 ## Final files
 | File | Purpose |
 |---|---|
-| `renders/blackstory-love-me-tiktok-v1.mp4` | **Upload file.** Silent track. Attach the AMBNT "Love Me" sound in TikTok at offset 0. |
-| `renders/blackstory-love-me-tiktok-v1-synccheck.mp4` | Same cut with the reference audio. For review only, not for distribution. |
-| `renders/blackstory-love-me-v002.mp4` | Master (near-all-intra mezzanine, ~60 Mb/s) that the above are encoded from |
-| `renders/cover-frame-0720.png` | Recommended TikTok cover: the DC pin field over the Potomac, held in the 11.6s silence |
+| `renders/blackstory-love-me-tiktok-v2.mp4` | **Upload file.** Silent track; attach the AMBNT "Love Me" sound in TikTok at 0:00. 97 MB, 1080×1920, 59.94fps |
+| `renders/blackstory-love-me-tiktok-v2-synccheck.mp4` | Same cut with the reference audio, for review only |
+| `renders/blackstory-love-me-v004.mp4` | Near-all-intra master |
+| `renders/cover-v2-tubman-0100.png` | Recommended cover: Harriet Tubman, Dorchester County, Maryland, 1822 |
 
-Earlier iteration kept: `v001` (rough cut).
+Superseded: v001 (rough), v002 / tiktok-v1 (screen-recording cut the client rejected
+as map-heavy and repetitive). v003 was rebuilt as v004 after QA and not kept.
 
-## Current source project
-`project/shots.mjs` (edit, as capture specs) → `capture.mjs` → `build-edit.mjs v002`
-→ `scripts/deliver.sh`. Timing: `audio/markers.json`. Timeline: `EDIT-TIMELINE.md` (generated).
+## Source project (v004)
+`project/edit-v3.mjs` (timeline) → `render-v3.mjs` (motion cards + new captures)
+→ `build-v3.mjs v004` → `scripts/deliver.sh`. Card template: `assets/card.html`.
+Image provenance: `assets/media/PROVENANCE.md`.
 
 ## Unresolved
-- A real-time watch of the sync-check file by a person. The review was frame-sampled plus metrics.
-- Large media is gitignored and lives only in this directory (~2 GB). Back it up if it matters.
+- A person should watch the sync-check file once in real time.
+- Captures and media are gitignored and live only in this directory.
 
-## Blockers
-None.
-
-## Next action (if revising)
-Change `in`/`out` or a `step` in `project/shots.mjs`, recapture only that shot
-(`node capture.mjs <name>`), then `node build-edit.mjs v003` and `scripts/deliver.sh`.
+## Next action if revising
+Edit a card in `project/edit-v3.mjs`, then `node render-v3.mjs <name>`, `node build-v3.mjs v005`, deliver.

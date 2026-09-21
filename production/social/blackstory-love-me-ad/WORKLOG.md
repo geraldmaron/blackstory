@@ -151,3 +151,23 @@ Sync copy fixed to keep its last frame (`apad`).
 These were one-off investigation scripts, deleted at close-out. Their findings
 are recorded above and in DECISIONS.md, and every capture decision they informed
 is encoded in `project/shots.mjs`.
+
+**21 — Client review of v002 (2026-09-21).** Rejected: first 11s all map, repetitive
+O Street record, cropped text, too much screen recording. Wanted record images,
+story text as overlays, a brand-video finish.
+
+**22 — Archive image inventory.** Queried `published.release_entities`: 1,645
+image-bearing records in `rel_20260723_authority_net_001`, 515 public-domain and
+not-living. Downloaded 43 curated originals plus the Tulsa postcard and Du Bois plate.
+Thirteen were too small for full frame. **Found:** the Denmark Vesey record shows a
+Frederick Douglass daguerreotype. Filed in beads.
+
+**23 — Motion card system.** `assets/card.html`: full-bleed photo with an authored
+push, grade, per-frame seeded grain; framed-print layout; the product's type
+(Schibsted Grotesk / Newsreader / Geist Mono); line cards; a typeset citation list
+from The Count's real references (`assets/cites-the-count.json`).
+
+**24 — v003 → v004.** 29 cards rendered. QA found the Revels/Carney cut 15 frames off
+any marker (my own split) → moved to HIT 7.592. Also found a 2-frame empty flash
+opening the citation card → it now opens mid-entrance. v004: 38 cuts, all exactly on
+markers. Delivery `tiktok-v2.mp4`, 97 MB.

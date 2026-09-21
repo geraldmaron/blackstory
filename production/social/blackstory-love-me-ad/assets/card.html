@@ -1,0 +1,394 @@
+<!doctype html>
+<meta charset="utf-8" />
+<title>BlackStory motion card</title>
+<!-- Motion-graphics card for the ad. Driven one frame at a time by the capture
+     harness through window.__setup(spec) and window.__frame(i). Nothing here
+     animates on its own clock, so every frame is reproducible.
+     Typography and colour are the product's own: Schibsted Grotesk (display),
+     Newsreader italic (accent), Geist / Geist Mono (metadata);
+     --ds-ink #f4efe5, --ds-accent #d07a32, --ds-surface-sunken #0c0b0a. -->
+<link
+  href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@500;600;700&family=Newsreader:ital,opsz,wght@0,6..72,400;1,6..72,300..500&family=Geist:wght@400;500&family=Geist+Mono:wght@400;500&display=block"
+  rel="stylesheet"
+/>
+<style>
+  :root {
+    --ink: #f4efe5;
+    --muted: #bdb5a9;
+    --accent: #d07a32;
+    --bg: #0c0b0a;
+  }
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+  html,
+  body {
+    width: 1080px;
+    height: 1920px;
+    overflow: hidden;
+    background: var(--bg);
+    -webkit-font-smoothing: antialiased;
+    text-rendering: geometricPrecision;
+  }
+  #stage {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    background: var(--bg);
+  }
+  #photo {
+    position: absolute;
+    inset: 0;
+    background-size: cover;
+    background-repeat: no-repeat;
+    transform-origin: 50% 50%;
+    will-change: transform;
+  }
+  #grade {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background:
+      radial-gradient(ellipse 95% 70% at 50% 42%, rgba(0, 0, 0, 0) 55%, rgba(0, 0, 0, 0.55) 100%),
+      linear-gradient(
+        to bottom,
+        rgba(12, 11, 10, 0.35) 0%,
+        rgba(12, 11, 10, 0) 22%,
+        rgba(12, 11, 10, 0) 48%,
+        rgba(12, 11, 10, 0.72) 74%,
+        rgba(12, 11, 10, 0.9) 100%
+      );
+  }
+  /* Framed print: a document or small original shown near native size on the
+     dark field, like an archival print on a table, instead of blown up. */
+  #print {
+    position: absolute;
+    display: none;
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    box-shadow:
+      0 40px 90px rgba(0, 0, 0, 0.55),
+      0 0 0 1px rgba(244, 239, 229, 0.08);
+    transform-origin: 50% 50%;
+  }
+  #grain {
+    position: absolute;
+    inset: -2px;
+    pointer-events: none;
+    opacity: 0.075;
+    mix-blend-mode: overlay;
+  }
+  /* Type block: left-aligned, bottom edge at y=1440 so TikTok's caption zone
+     (bottom ~480px) and action rail (right ~200px) never cover it. */
+  #type {
+    position: absolute;
+    left: 84px;
+    right: 210px;
+    bottom: 480px;
+    color: var(--ink);
+  }
+  .place {
+    font-family: 'Geist Mono', monospace;
+    font-size: 26px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--ink);
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    opacity: 0.94;
+  }
+  .place::before {
+    content: '';
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: var(--accent);
+    flex: none;
+    box-shadow: 0 0 0 6px rgba(208, 122, 50, 0.22);
+  }
+  .year {
+    font-family: 'Schibsted Grotesk';
+    font-weight: 600;
+    font-size: 176px;
+    line-height: 0.9;
+    letter-spacing: -0.05em;
+    margin-top: 18px;
+  }
+  .name {
+    font-family: Newsreader, serif;
+    font-style: italic;
+    font-weight: 400;
+    font-size: 54px;
+    line-height: 1.1;
+    margin-top: 14px;
+    letter-spacing: -0.01em;
+  }
+  .story {
+    font-family: Newsreader, serif;
+    font-weight: 400;
+    font-size: 46px;
+    line-height: 1.24;
+    letter-spacing: -0.005em;
+    margin-top: 22px;
+    max-width: 780px;
+  }
+  .story span {
+    opacity: 0;
+    display: inline-block;
+    transform: translateY(10px);
+  }
+  .credit {
+    position: absolute;
+    left: 84px;
+    top: 150px;
+    font-family: 'Geist Mono', monospace;
+    font-size: 17px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: rgba(244, 239, 229, 0.55);
+  }
+  /* Line cards (the silences): the Door's own headline treatment. */
+  #line {
+    position: absolute;
+    left: 84px;
+    right: 150px;
+    top: 760px;
+    color: var(--ink);
+    display: none;
+  }
+  #line .a {
+    font-family: 'Schibsted Grotesk';
+    font-weight: 600;
+    font-size: 150px;
+    line-height: 0.92;
+    letter-spacing: -0.05em;
+  }
+  #line .b {
+    font-family: 'Schibsted Grotesk';
+    font-weight: 500;
+    font-size: 74px;
+    line-height: 1.05;
+    letter-spacing: -0.03em;
+    margin-top: 10px;
+  }
+  #line .b em {
+    font-family: Newsreader, serif;
+    font-style: italic;
+    font-weight: 400;
+  }
+  /* Citation card. */
+  #cites {
+    position: absolute;
+    left: 84px;
+    right: 120px;
+    top: 0;
+    display: none;
+    color: var(--ink);
+  }
+  /* Lines leaving the frame dissolve instead of being sliced by its edge. */
+  #fade {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    display: none;
+    background: linear-gradient(
+      to bottom,
+      var(--bg) 0,
+      var(--bg) 150px,
+      rgba(12, 11, 10, 0) 360px,
+      rgba(12, 11, 10, 0) 1380px,
+      var(--bg) 1580px,
+      var(--bg) 100%
+    );
+  }
+  #cites h3 {
+    font-family: 'Geist Mono', monospace;
+    font-weight: 400;
+    font-size: 24px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 40px;
+  }
+  #cites ol {
+    list-style: none;
+  }
+  #cites li {
+    font-family: Newsreader, serif;
+    font-size: 40px;
+    line-height: 1.28;
+    margin-bottom: 30px;
+    display: flex;
+    gap: 26px;
+  }
+  #cites li b {
+    font-family: 'Geist Mono', monospace;
+    font-weight: 500;
+    font-size: 24px;
+    color: var(--accent);
+    padding-top: 12px;
+    min-width: 44px;
+  }
+  #cites li span {
+    text-decoration: underline;
+    text-decoration-color: rgba(208, 122, 50, 0.7);
+    text-underline-offset: 8px;
+    text-decoration-thickness: 2px;
+  }
+</style>
+<div id="stage">
+  <div id="photo"></div>
+  <div id="grade"></div>
+  <div id="print"></div>
+  <div class="credit" id="credit"></div>
+  <div id="type"></div>
+  <div id="line">
+    <div class="a" id="la"></div>
+    <div class="b" id="lb"></div>
+  </div>
+  <div id="cites">
+    <h3 id="ch"></h3>
+    <ol id="cl"></ol>
+  </div>
+  <div id="fade"></div>
+  <svg id="grain" width="1084" height="1924">
+    <filter id="n">
+      <feTurbulence id="turb" type="fractalNoise" baseFrequency=".9" numOctaves="2" seed="1" />
+      <feColorMatrix type="saturate" values="0" />
+    </filter>
+    <rect width="100%" height="100%" filter="url(#n)" />
+  </svg>
+</div>
+<script>
+  const $ = (id) => document.getElementById(id);
+  const clamp = (t) => (t < 0 ? 0 : t > 1 ? 1 : t);
+  const E = {
+    outCubic: (t) => 1 - (1 - t) ** 3,
+    inOutSine: (t) => -(Math.cos(Math.PI * t) - 1) / 2,
+    outQuart: (t) => 1 - (1 - t) ** 4,
+    outExpo: (t) => (t === 1 ? 1 : 1 - 2 ** (-10 * t)),
+    linear: (t) => t,
+  };
+  let S = null;
+
+  window.__setup = async (spec) => {
+    S = spec;
+    const photo = $('photo'),
+      grade = $('grade');
+    const framed = !!spec.frame;
+    photo.style.display = spec.image && !framed ? 'block' : 'none';
+    grade.style.display = spec.image && !framed ? 'block' : 'none';
+    const pr = $('print');
+    pr.style.display = framed ? 'block' : 'none';
+    $('grain').style.display = spec.grain === false ? 'none' : 'block';
+    if (spec.image && framed) {
+      const img = new Image();
+      img.src = spec.image;
+      await img.decode();
+      const a = img.naturalWidth / img.naturalHeight;
+      let w = spec.frame.w || 880,
+        h = w / a;
+      if (h > (spec.frame.maxH || 1000)) {
+        h = spec.frame.maxH || 1000;
+        w = h * a;
+      }
+      Object.assign(pr.style, {
+        width: w + 'px',
+        height: h + 'px',
+        left: (1080 - w) / 2 + 'px',
+        top: (spec.frame.top ?? 250) + (1000 - h) / 2 + 'px',
+        backgroundImage: `url("${spec.image}")`,
+        filter: spec.filter || 'contrast(1.03) saturate(.9)',
+      });
+    } else if (spec.image) {
+      photo.style.backgroundImage = `url("${spec.image}")`;
+      photo.style.backgroundPosition = spec.focus || '50% 30%';
+      photo.style.filter = spec.filter || 'contrast(1.05) saturate(.88) brightness(.96)';
+      const img = new Image();
+      img.src = spec.image;
+      await img.decode();
+    }
+    $('credit').textContent = spec.credit || '';
+    const t = $('type');
+    t.innerHTML = '';
+    if (spec.place)
+      t.insertAdjacentHTML('beforeend', `<div class="place" id="tp">${spec.place}</div>`);
+    if (spec.year)
+      t.insertAdjacentHTML('beforeend', `<div class="year" id="ty">${spec.year}</div>`);
+    if (spec.name)
+      t.insertAdjacentHTML('beforeend', `<div class="name" id="tn">${spec.name}</div>`);
+    if (spec.story)
+      t.insertAdjacentHTML(
+        'beforeend',
+        `<div class="story" id="ts">${spec.story
+          .split(/\s+/)
+          .map((w) => `<span>${w}</span>`)
+          .join(' ')}</div>`,
+      );
+    $('line').style.display = spec.line ? 'block' : 'none';
+    if (spec.line) {
+      $('la').innerHTML = spec.line[0];
+      $('lb').innerHTML = spec.line[1];
+    }
+    $('cites').style.display = spec.cites ? 'block' : 'none';
+    $('fade').style.display = spec.cites ? 'block' : 'none';
+    if (spec.cites) {
+      $('ch').textContent = spec.cites.heading;
+      $('cl').innerHTML = spec.cites.items
+        .map((c, i) => `<li><b>${c.n}</b><span>${c.t}</span></li>`)
+        .join('');
+    }
+    await document.fonts.ready;
+    window.__frame(0);
+  };
+
+  // Per-element entrance: fade + 22px rise over `dur` frames starting at `at`.
+  function enter(el, i, at, dur = 12, rise = 22) {
+    if (!el) return;
+    const k = E.outCubic(clamp((i - at) / dur));
+    el.style.opacity = k;
+    el.style.transform = `translateY(${(1 - k) * rise}px)`;
+  }
+
+  window.__frame = (i) => {
+    const n = S.frames,
+      p = clamp(i / Math.max(1, n - 1));
+    if (S.image) {
+      const m = S.move || {},
+        k = (E[m.ease] || E.linear)(p);
+      const s = (m.s0 ?? 1.04) + ((m.s1 ?? 1.1) - (m.s0 ?? 1.04)) * k;
+      const x = (m.x0 ?? 0) + ((m.x1 ?? 0) - (m.x0 ?? 0)) * k;
+      const y = (m.y0 ?? 0) + ((m.y1 ?? 0) - (m.y0 ?? 0)) * k;
+      $(S.frame ? 'print' : 'photo').style.transform = `translate(${x}px,${y}px) scale(${s})`;
+    }
+    const at = S.typeAt ?? 4,
+      d = S.typeDur ?? 12,
+      g = S.typeGap ?? 3;
+    enter(document.getElementById('tp'), i, at, d, 14);
+    enter(document.getElementById('ty'), i, at + g, d, 26);
+    enter(document.getElementById('tn'), i, at + 2 * g, d, 18);
+    const ts = document.getElementById('ts');
+    if (ts) {
+      const words = ts.children,
+        per = S.wordEvery ?? 3;
+      for (let w = 0; w < words.length; w++) enter(words[w], i, at + 6 + w * per, 8, 10);
+    }
+    if (S.line) {
+      enter($('la'), i, S.lineAt ?? 3, 12, 30);
+      enter($('lb'), i, (S.lineAt ?? 3) + 8, 12, 20);
+    }
+    if (S.cites) {
+      const k = (E[S.cites.ease] || E.inOutSine)(p);
+      $('cites').style.transform = `translateY(${S.cites.y0 + (S.cites.y1 - S.cites.y0) * k}px)`;
+      // Opens mid-entrance so there is never an empty frame at the cut.
+      [...$('cl').children].forEach((li, j) => enter(li, i, j * (S.cites.every ?? 3) - 10, 10, 16));
+      enter($('ch'), i, -12, 10, 10);
+    }
+    $('turb').setAttribute('seed', String((i * 7 + (S.seed || 0)) % 997));
+  };
+  window.__ready = true;
+</script>

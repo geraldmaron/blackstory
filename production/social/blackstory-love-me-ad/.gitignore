@@ -15,3 +15,7 @@ project/package-lock.json
 !audio/markers.json
 !audio/analysis.json
 !reference/video-analysis.json
+assets/media/src/
+assets/media/jpg/
+assets/media/thumbs/
+project/segments-v3/

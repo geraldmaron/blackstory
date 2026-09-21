@@ -212,3 +212,43 @@ resolves every mark to a primary source: the 1790 census return, Art. I §2,
 produces the upload file at CRF 16 / 30 Mb/s cap, 1s GOP.
 **Why.** An all-intra file is right for frame-exact editing and wrong for a phone
 upload (411 MB). Delivery measured SSIM 0.996 against the master at 112 MB.
+
+---
+
+## D15 — Revision 2: records carry the piece, not screen recordings
+
+**Decision.** v004 rebuilds the edit around real record photographs and on-screen
+type, keeping product captures only where the product itself is the picture (the
+map, Lives, Data, Memorial).
+**Why.** Client review of v002: the first 11s were only map zooms, the O Street
+record repeated, and pushed-in captures cut text off. The archive holds 1,645
+image-bearing records in the current release, and v002 used almost none of them.
+**Consequence.** 27 of 38 shots are motion cards rendered from `assets/card.html`.
+No text is ever cropped: type is set, not photographed.
+
+## D16 — The three silences say "Her / His / Their Story happened here."
+
+**Decision.** Line cards in the product's Door headline style. The lockup
+then resolves the pattern as "BlackStory."
+**Why.** This is BlackStory's own copy (the Door cycles His / Her / Their / Your /
+Black Story), so it's owned rather than invented, and it lets the brand arrive
+as the answer to a pattern the viewer has already read three times.
+
+## D17 — Casting rules for faces in an advertisement
+
+**Decision.** Public-domain images only. Persons only if the record is marked
+`deceased`. Figures whose estates actively enforce publicity rights are
+avoided (King, Ali, Robinson, Jackson), as is the LBJ signing photo (it includes Dr. King).
+**Why.** Public domain covers the photograph, not the use of a person's likeness
+to promote a product. Several states protect a likeness for 70–100 years after
+death. Records with no `livingStatus` include living people (e.g. Barack Obama),
+so absence was not treated as safe.
+**Consequence.** The cast is 18th- to early-20th-century figures. Images under
+~700px were excluded from full-frame. Mid-size originals are shown as framed prints.
+
+## D18 — Every caption is the record's own words
+
+**Decision.** Place = the record's `locationLabel` (shortened to city/state) or a
+place named in its story. Year = a year stated in its story. Story lines are verbatim
+clauses. Two drafted captions ("for the Paris Exposition", "Greenwood") were
+replaced with the record's wording because the records don't say them.

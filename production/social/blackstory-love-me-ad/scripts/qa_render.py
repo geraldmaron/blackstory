@@ -18,7 +18,7 @@ diff = np.zeros(n); diff[1:] = np.abs(f[1:] - f[:-1]).mean(axis=(1, 2))
 blank = [int(i) for i in np.where(std < 0.012)[0]]
 # intended cuts come from the shot list
 shots = json.loads(subprocess.run(["node", "-e",
-  "import('./shots.mjs').then(m=>console.log(JSON.stringify(m.SHOTS.filter(s=>s.name!=='brand-fg').map(s=>[s.name,s.in]))))"],
+  'import(process.env.EDIT||"./shots.mjs").then(m=>console.log(JSON.stringify((m.TIMELINE||m.SHOTS).filter(s=>s.name!=="brand-fg").map(s=>[s.name,s.in]))))'],
   cwd=ROOT/"project", capture_output=True, text=True, check=True).stdout)
 markers = json.load(open(ROOT/"audio"/"markers.json"))["markers"]
 cuts = []
