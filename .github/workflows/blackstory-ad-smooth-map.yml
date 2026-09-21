@@ -1,0 +1,37 @@
+name: BlackStory Ad Smooth Map
+on:
+  push:
+    branches: [media/blackstory-love-me-20260920]
+    paths: [.github/workflows/blackstory-ad-smooth-map.yml]
+permissions:
+  contents: read
+jobs:
+  map:
+    strategy:
+      fail-fast: false
+      matrix:
+        shot: [descent, new-orleans, washington, return-national]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+          sparse-checkout: media/blackstory-ad
+      - name: Install native-browser renderer
+        run: |
+          python3 -m venv /tmp/media-map-env
+          /tmp/media-map-env/bin/pip -q install playwright==1.55.0
+          /tmp/media-map-env/bin/python -m playwright install chromium
+          if ! command -v ffmpeg; then sudo apt-get update -qq && sudo apt-get install -y ffmpeg; fi
+      - name: Render the actual map at fixed camera steps
+        run: /tmp/media-map-env/bin/python media/blackstory-ad/map_frames.py '${{ matrix.shot }}'
+      - name: Preserve native map take and provenance
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: blackstory-smooth-map-${{ matrix.shot }}
+          path: output/
+          retention-days: 7
+          compression-level: 0
+          if-no-files-found: warn
