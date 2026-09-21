@@ -1,0 +1,39 @@
+name: BlackStory Ad Archive Assets
+on:
+  push:
+    branches: [media/blackstory-love-me-20260920]
+    paths: [.github/workflows/blackstory-ad-archive-assets.yml]
+permissions:
+  contents: read
+jobs:
+  retrieve:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - name: Retrieve only the documented live-page image assets
+        run: |
+          mkdir -p output/assets
+          python3 - <<'PY'
+          import urllib.request, pathlib, json, hashlib
+          out=pathlib.Path('output/assets')
+          sources=[
+              {'file':'du-bois-1907.jpg','url':'https://commons.wikimedia.org/wiki/Special:FilePath/File%3AW.E.B._Du_Bois_by_James_E._Purdy%2C_1907_(cropped).jpg?width=960','page':'https://blackstory.app/entity/ent_web_du_bois_001','on_page_credit':'W.E.B. Du Bois by James E. Purdy, 1907; National Portrait Gallery. Live page identifies the digital image as CC0.'},
+              {'file':'phillis-wheatley-1773.jpg','url':'https://storage.googleapis.com/black-book-efaaf-public-media/public/entities/ent_phillis_wheatley_001/primary.jpg','page':'https://blackstory.app/entity/ent_phillis_wheatley_001','on_page_credit':'Frontispiece to Poems on various subjects, religious and moral, London, 1773. Artist unidentified; Houghton Library, Harvard University.'}
+          ]
+          for source in sources:
+              try:
+                  request=urllib.request.Request(source['url'],headers={'User-Agent':'BlackStory media preparation/1.0 (public app archival asset)'} )
+                  with urllib.request.urlopen(request, timeout=35) as response:
+                      body=response.read()
+                  (out/source['file']).write_bytes(body)
+                  source.update(status='retrieved',bytes=len(body),sha256=hashlib.sha256(body).hexdigest())
+              except Exception as exc:
+                  source.update(status='failed',error=str(exc))
+          (out/'archival-provenance.json').write_text(json.dumps(sources,indent=2))
+          print(json.dumps(sources,indent=2))
+          PY
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: blackstory-documented-archive-assets
+          path: output/
+          retention-days: 7
