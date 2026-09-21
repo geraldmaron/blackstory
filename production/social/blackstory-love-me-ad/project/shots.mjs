@@ -156,8 +156,8 @@ export const SHOTS = [
 
   {
     name: 'map-reveal',
-    in: 741,
-    out: 850,
+    in: 736,
+    out: 817,
     url: BASE + '/',
     needsMap: true,
     css: HIDE_CHROME,
@@ -350,7 +350,7 @@ export const SHOTS = [
   // ---- VII. scale ---------------------------------------------------------
   {
     name: 'map-wide',
-    in: 1646,
+    in: 1631,
     out: 1681,
     url: BASE + '/',
     needsMap: true,
@@ -367,6 +367,9 @@ export const SHOTS = [
     name: 'memorial-a',
     in: 1681,
     out: 2123,
+    // The wall layer is placed from scroll position; the document camera leaves
+    // scrollY at 0, so it would paint over the list. Excluded from these shots.
+    css: '.ds-memorial-wall{display:none!important}',
     url: BASE + '/memorial',
     surface: 'Memorial',
     action: 'Slow drift down the wall of names. No transition, no push.',
@@ -377,7 +380,10 @@ export const SHOTS = [
   {
     name: 'memorial-b',
     in: 2123,
-    out: 2529,
+    out: 2524,
+    // The wall layer is placed from scroll position; the document camera leaves
+    // scrollY at 0, so it would paint over the list. Excluded from these shots.
+    css: '.ds-memorial-wall{display:none!important}',
     url: BASE + '/memorial',
     surface: 'Memorial',
     action: 'A later stretch of the wall; near-imperceptible push-in',
@@ -487,7 +493,7 @@ export const SHOTS = [
   // ---- X. brand -----------------------------------------------------------
   {
     name: 'brand-bg',
-    in: 3074,
+    in: 3062,
     out: 3264,
     url: BASE + '/',
     needsMap: true,
@@ -533,7 +539,7 @@ export const SHOTS = [
 
   {
     name: 'brand-fg',
-    in: 3074,
+    in: 3062,
     out: 3264,
     url: 'file://' + process.cwd() + '/../assets/brand-card.html',
     surface: 'Brand lockup',

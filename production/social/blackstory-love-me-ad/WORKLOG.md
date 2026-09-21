@@ -171,3 +171,29 @@ from The Count's real references (`assets/cites-the-count.json`).
 any marker (my own split) → moved to HIT 7.592. Also found a 2-frame empty flash
 opening the citation card → it now opens mid-entrance. v004: 38 cuts, all exactly on
 markers. Delivery `tiktok-v2.mp4`, 97 MB.
+
+**25 — Client review of v004 (2026-09-21).** Cuts felt off the bass drops;
+Memorial text visible behind the name list; not every entity had a summary.
+
+**26 — Root cause: cuts late.** A dedicated kick detector (30-130Hz log-flux,
+`scripts/bass_onsets.py` → `audio/bass.json`, `audio/kicks.json`) puts the drops
+at 1.845 / 6.309 / 9.291 / 12.277 / 27.205 / 39.125 / 42.109 / 45.003 / 51.085s.
+The original HIT detector (smoothed sub energy, derivative peak) landed 5-16
+frames after each attack. QA had passed it because it compared cuts to the same
+markers they were built from. `qa_render.py` now checks against the kick
+detector plus vocal entrances; validated by re-running it on v004 (reports
+-26…+42 frames). A single global beat grid was rejected: its residuals ran from
+-75 to +27 frames because the engineered silences shift the phase between
+sections (`scripts/beatgrid.py` kept for the record).
+
+**27 — Memorial overlay: capture bug, not product bug.** `.ds-memorial-wall`
+(the drifting wall and its message) is positioned from scroll position. The
+transform camera leaves scrollY=0, so it painted over the list. On a real scroll,
+production and dev both render correctly. The layer is excluded from the Memorial shots.
+
+**28 — v005.** Every cut re-placed on a measured kick, or on a vocal entrance in
+the 16.6-27s stretch that has no kick attacks. Every entity card carries a
+summary clause from its record. Carney, Coffin, Walker and Washington were dropped
+because they only had room for sub-0.4s shots. Framed prints capped at y=880 after
+review caught years colliding with two prints. Corrected QA: all 31 cuts at offset 0.
+Delivery `tiktok-v3.mp4`, 81 MB.

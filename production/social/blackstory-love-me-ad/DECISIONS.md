@@ -252,3 +252,21 @@ so absence was not treated as safe.
 place named in its story. Year = a year stated in its story. Story lines are verbatim
 clauses. Two drafted captions ("for the Paris Exposition", "Greenwood") were
 replaced with the record's wording because the records don't say them.
+
+---
+
+## D19 — Cuts land on the kick, measured by a kick detector
+
+**Decision.** Cut points come from `audio/kicks.json` (low-band spectral flux
+peaks). Where the bass is sustained and has no attacks (16.6-27s, the Memorial),
+cuts go on vocal phrase entrances instead.
+**Why.** v004's cuts were 5-16 frames behind every drop, a systematic lag in
+the first detector. A viewer feels a cut that trails the kick as "off" even
+when they can't say why.
+**Rejected.** A global bar grid: the section phases don't line up (residuals
+-75…+27 frames).
+
+## D20 — No person appears without a summary
+
+**Decision.** Every entity card carries a clause from its record. Anyone who
+couldn't be given enough screen time to read one was cut, not shown bare.

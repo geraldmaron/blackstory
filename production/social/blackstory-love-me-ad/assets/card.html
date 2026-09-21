@@ -292,15 +292,16 @@
       const a = img.naturalWidth / img.naturalHeight;
       let w = spec.frame.w || 880,
         h = w / a;
-      if (h > (spec.frame.maxH || 1000)) {
-        h = spec.frame.maxH || 1000;
+      // Box ends at y=880, above the tallest type block (~y=1000), so print and type never touch.
+      if (h > 730) {
+        h = 730;
         w = h * a;
       }
       Object.assign(pr.style, {
         width: w + 'px',
         height: h + 'px',
         left: (1080 - w) / 2 + 'px',
-        top: (spec.frame.top ?? 250) + (1000 - h) / 2 + 'px',
+        top: 150 + (730 - h) / 2 + 'px',
         backgroundImage: `url("${spec.image}")`,
         filter: spec.filter || 'contrast(1.03) saturate(.9)',
       });

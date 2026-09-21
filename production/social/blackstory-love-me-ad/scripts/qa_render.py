@@ -20,7 +20,12 @@ blank = [int(i) for i in np.where(std < 0.012)[0]]
 shots = json.loads(subprocess.run(["node", "-e",
   'import(process.env.EDIT||"./shots.mjs").then(m=>console.log(JSON.stringify((m.TIMELINE||m.SHOTS).filter(s=>s.name!=="brand-fg").map(s=>[s.name,s.in]))))'],
   cwd=ROOT/"project", capture_output=True, text=True, check=True).stdout)
-markers = json.load(open(ROOT/"audio"/"markers.json"))["markers"]
+# Ground truth for sync is the independent kick detector plus vocal phrase
+# starts -- NOT the markers the cuts were authored from (checking a cut against
+# its own source can only ever pass; that is how late cuts shipped in v004).
+kicks = [{"kind": "KICK", "t": k["t"], "frame": k["frame"]} for k in json.load(open(ROOT/"audio"/"kicks.json"))]
+vox = [{"kind": "VOX", "t": m["t"], "frame": m["frame"]} for m in json.load(open(ROOT/"audio"/"markers.json"))["markers"] if m["kind"] in ("VOX", "GAP")]
+markers = kicks + vox
 cuts = []
 for name, fin in shots[1:]:
     # the measured cut is the largest frame difference within +-3 of intended
