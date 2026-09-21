@@ -1,0 +1,39 @@
+# Public-site media capture only. Does not deploy or mutate production data.
+name: BlackStory Motion Capture v2
+on:
+  push:
+    branches: [media/blackstory-love-me-20260920]
+    paths: [.github/workflows/blackstory-ad-motion-v2.yml]
+permissions:
+  contents: read
+concurrency:
+  group: blackstory-ad-motion-v2
+  cancel-in-progress: true
+jobs:
+  capture:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - name: Checkout isolated capture source
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          sparse-checkout: media/blackstory-love-me
+          persist-credentials: false
+      - name: Install recording tools
+        run: |
+          sudo apt-get -qq update
+          sudo apt-get -qq install -y ffmpeg xvfb
+          python3 -m venv /tmp/blackstory-media-env
+          /tmp/blackstory-media-env/bin/pip -q install playwright==1.55.0 requests opencv-python-headless numpy
+          /tmp/blackstory-media-env/bin/python -m playwright install --with-deps chromium
+      - name: Record real product interactions
+        run: /tmp/blackstory-media-env/bin/python media/blackstory-love-me/capture.py capture
+      - name: Preserve reusable footage and complete capture source
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: blackstory-ad-motion-v2
+          path: output/
+          retention-days: 7
+          compression-level: 0
+          if-no-files-found: warn
