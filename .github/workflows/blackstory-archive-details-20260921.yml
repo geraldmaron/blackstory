@@ -1,0 +1,43 @@
+# Reads only images already published on public BlackStory records. No app change.
+name: BlackStory Archive Details
+on:
+  push:
+    branches: [media/blackstory-love-me-20260920]
+    paths: [.github/workflows/blackstory-archive-details-20260921.yml]
+permissions:
+  contents: read
+jobs:
+  images:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 4
+    steps:
+      - name: Retrieve original published record images
+        run: |
+          mkdir -p output
+          python3 - <<'PY'
+          import urllib.request,json,hashlib,pathlib
+          root=pathlib.Path('output')
+          assets=[
+            {'file':'du-bois-1907.jpg','record':'https://blackstory.app/entity/ent_web_du_bois_001','url':'https://commons.wikimedia.org/wiki/Special:FilePath/File%3AW.E.B._Du_Bois_by_James_E._Purdy%2C_1907_(cropped).jpg?width=1600','caption':'W. E. B. Du Bois. James E. Purdy, 1907.','source':'https://npg.si.edu/object/npg_NPG.80.25'},
+            {'file':'phillis-wheatley-1773.jpg','record':'https://blackstory.app/entity/ent_phillis_wheatley_001','url':'https://storage.googleapis.com/black-book-efaaf-public-media/public/entities/ent_phillis_wheatley_001/primary.jpg','caption':'Phillis Wheatley. Frontispiece to Poems on Various Subjects, 1773.','source':'Published BlackStory image metadata; Houghton Library, Harvard University'},
+            {'file':'du-bois-exhibit.jpg','record':'https://blackstory.app/lives','url':'https://tile.loc.gov/storage-services/service/pnp/ppmsca/33800/33880v.jpg','caption':'Value of land owned by Georgia Negroes. The exhibit of American Negroes, Paris, 1900.','source':'https://www.loc.gov/item/2013650437/'}
+          ]
+          for a in assets:
+              try:
+                  req=urllib.request.Request(a['url'],headers={'User-Agent':'BlackStoryEditorialCapture/1.0 (public record imagery; blackstory.app)'})
+                  with urllib.request.urlopen(req,timeout=30) as response:
+                      data=response.read(15_000_000)
+                      a['resolved_url']=response.url
+                  (root/a['file']).write_bytes(data)
+                  a.update({'sha256':hashlib.sha256(data).hexdigest(),'bytes':len(data),'status':'retrieved'})
+              except Exception as e:
+                  a.update({'status':'unavailable','error':str(e)})
+          (root/'image-provenance.json').write_text(json.dumps(assets,indent=2))
+          print(json.dumps(assets,indent=2))
+          PY
+      - name: Preserve source artwork and context
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: blackstory-archive-details
+          path: output/
+          retention-days: 7
