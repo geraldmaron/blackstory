@@ -95,6 +95,68 @@ const DCREG = { center: [-77.55, 38.88], zoom: 8.6, pitch: 34, bearing: 3 };
 const DCMET = { center: [-77.2, 38.9], zoom: 9.9, pitch: 38, bearing: 2 };
 const OST = { center: [-77.0216, 38.9086], zoom: 12.6, pitch: 48, bearing: 0 };
 
+// Every located record in the release as its own point: no clustering. The
+// client wanted the closing map to show the sheer volume of the archive, and the
+// product's cluster bubbles ("481") compress 4,206 places into a few dozen
+// numbers. Points use the product's pin ink and accent.
+import fs from 'node:fs';
+const ALL_RECORDS = JSON.parse(
+  fs.readFileSync(new URL('../assets/all-records.geojson', import.meta.url)),
+);
+export async function showEveryRecord({ page }) {
+  await page.evaluate((data) => {
+    const m = window.__bpMapStage;
+    for (const l of m.getStyle().layers)
+      if (
+        /^explore-(clusters|cluster-count|point|point-halo|point-event-glyph)(-incoming)?$/.test(
+          l.id,
+        )
+      )
+        m.setLayoutProperty(l.id, 'visibility', 'none');
+    // Quiet the state shading so the records, not the choropleth, carry the frame.
+    for (const id of [
+      'explore-state-density-fill',
+      'explore-state-density-fill-incoming',
+      'explore-county-choropleth-fill',
+    ])
+      if (m.getLayer(id)) m.setPaintProperty(id, 'fill-opacity', 0.28);
+    if (!m.getSource('bs-all')) m.addSource('bs-all', { type: 'geojson', data, cluster: false });
+    const r = (a, b) => ['interpolate', ['exponential', 1.6], ['zoom'], 4, a, 12, b];
+    m.addLayer({
+      id: 'bs-all-glow',
+      type: 'circle',
+      source: 'bs-all',
+      paint: {
+        'circle-radius': r(7, 18),
+        'circle-color': '#f0a060',
+        'circle-opacity': 0.3,
+        'circle-blur': 1,
+      },
+    });
+    m.addLayer({
+      id: 'bs-all-dot',
+      type: 'circle',
+      source: 'bs-all',
+      paint: {
+        'circle-radius': r(2.2, 6),
+        'circle-color': '#fff1dc',
+        'circle-opacity': 0.95,
+        'circle-stroke-color': '#e08a3c',
+        'circle-stroke-width': r(0.8, 1.6),
+      },
+    });
+  }, ALL_RECORDS);
+  await page.evaluate(
+    () =>
+      new Promise((r) => {
+        const m = window.__bpMapStage;
+        m.once('idle', r);
+        m.triggerRepaint();
+        setTimeout(r, 6000);
+      }),
+  );
+}
+
 export const SHOTS = [
   // ---- I. curiosity: the country, already moving -------------------------
   {
@@ -486,6 +548,7 @@ export const SHOTS = [
     surface: 'Explore — pulling outward',
     action: `Outward cut ${name.slice(-1)} of 6`,
     audio,
+    setup: showEveryRecord,
     prewarm: mapPrewarm(a, b, 3),
     step: mapMove(a, b, E.linear),
   })),

@@ -371,7 +371,7 @@
     "frames": 45,
     "handle": 12,
     "totalFrames": 69,
-    "seconds": 26.2,
+    "seconds": 29.4,
     "url": "http://localhost:3048/",
     "surface": "Explore — pulling outward",
     "action": "Outward cut 3 of 6",
@@ -379,7 +379,7 @@
     "in": 2793,
     "audio": "VOX 46.600",
     "file": "map/map-out3.mp4",
-    "capturedAt": "2026-09-21T03:06:21.910Z"
+    "capturedAt": "2026-09-21T15:27:44.153Z"
   },
   "map-out4": {
     "name": "map-out4",
@@ -387,7 +387,7 @@
     "frames": 94,
     "handle": 12,
     "totalFrames": 118,
-    "seconds": 34.8,
+    "seconds": 40,
     "url": "http://localhost:3048/",
     "surface": "Explore — pulling outward",
     "action": "Outward cut 4 of 6",
@@ -395,7 +395,7 @@
     "in": 2838,
     "audio": "VOX 47.344 (3.35s)",
     "file": "map/map-out4.mp4",
-    "capturedAt": "2026-09-21T03:06:56.784Z"
+    "capturedAt": "2026-09-21T15:28:24.235Z"
   },
   "map-out5": {
     "name": "map-out5",
@@ -403,7 +403,7 @@
     "frames": 89,
     "handle": 12,
     "totalFrames": 113,
-    "seconds": 27,
+    "seconds": 36.6,
     "url": "http://localhost:3048/",
     "surface": "Explore — pulling outward",
     "action": "Outward cut 5 of 6",
@@ -411,7 +411,7 @@
     "in": 2932,
     "audio": "HIT 48.915 (0.720)",
     "file": "map/map-out5.mp4",
-    "capturedAt": "2026-09-21T03:07:23.798Z"
+    "capturedAt": "2026-09-21T15:29:00.948Z"
   },
   "map-out6": {
     "name": "map-out6",
@@ -419,7 +419,7 @@
     "frames": 53,
     "handle": 12,
     "totalFrames": 77,
-    "seconds": 17.9,
+    "seconds": 25.2,
     "url": "http://localhost:3048/",
     "surface": "Explore — pulling outward",
     "action": "Outward cut 6 of 6",
@@ -427,7 +427,7 @@
     "in": 3021,
     "audio": "HIT 50.397 (0.842)",
     "file": "map/map-out6.mp4",
-    "capturedAt": "2026-09-21T03:07:41.713Z"
+    "capturedAt": "2026-09-21T15:29:26.239Z"
   },
   "brand-bg": {
     "name": "brand-bg",
@@ -435,7 +435,7 @@
     "frames": 202,
     "handle": 12,
     "totalFrames": 226,
-    "seconds": 58.8,
+    "seconds": 58.3,
     "url": "http://localhost:3048/",
     "surface": "Door — national",
     "action": "Map keeps settling while a scrim quiets it under the lockup",
@@ -443,7 +443,7 @@
     "in": 3062,
     "audio": "HIT 51.283 (0.886) -> decay to silence at 54.381",
     "file": "map/brand-bg.mp4",
-    "capturedAt": "2026-09-21T13:44:30.683Z"
+    "capturedAt": "2026-09-21T15:30:24.587Z"
   },
   "lbj": {
     "name": "lbj",
@@ -483,13 +483,13 @@
     "frames": 111,
     "handle": 8,
     "totalFrames": 127,
-    "seconds": 169.5,
+    "seconds": 176.8,
     "url": "file:///Users/geralddagher/Developer/Projects/blackstory/production/social/blackstory-love-me-ad/assets/card.html",
     "surface": "Motion card",
     "action": "Harriet Tubman · Dorchester County, Maryland · 1822",
     "errors": [],
     "file": "cards/c01-tubman.mp4",
-    "capturedAt": "2026-09-21T13:49:12.147Z"
+    "capturedAt": "2026-09-21T15:33:21.899Z"
   },
   "l1-her": {
     "name": "l1-her",
@@ -511,13 +511,13 @@
     "frames": 55,
     "handle": 8,
     "totalFrames": 71,
-    "seconds": 33.8,
+    "seconds": 33.7,
     "url": "file:///Users/geralddagher/Developer/Projects/blackstory/production/social/blackstory-love-me-ad/assets/card.html",
     "surface": "Motion card",
     "action": "Seneca Village · Manhattan, New York · 1825",
     "errors": [],
     "file": "cards/c09-seneca.mp4",
-    "capturedAt": "2026-09-21T14:23:25.339Z"
+    "capturedAt": "2026-09-21T15:37:16.673Z"
   },
   "c17-cites": {
     "name": "c17-cites",
@@ -553,13 +553,13 @@
     "frames": 88,
     "handle": 8,
     "totalFrames": 104,
-    "seconds": 125,
+    "seconds": 129.2,
     "url": "file:///Users/geralddagher/Developer/Projects/blackstory/production/social/blackstory-love-me-ad/assets/card.html",
     "surface": "Motion card",
-    "action": "Phillis Wheatley · Boston, Massachusetts · 1761",
+    "action": "Phillis Wheatley · Boston, Massachusetts · 1773",
     "errors": [],
     "file": "cards/c02-wheatley.mp4",
-    "capturedAt": "2026-09-21T13:51:17.182Z"
+    "capturedAt": "2026-09-21T15:35:31.113Z"
   },
   "c03-wells": {
     "name": "c03-wells",
@@ -609,13 +609,13 @@
     "frames": 55,
     "handle": 8,
     "totalFrames": 71,
-    "seconds": 70.5,
+    "seconds": 71.8,
     "url": "file:///Users/geralddagher/Developer/Projects/blackstory/production/social/blackstory-love-me-ad/assets/card.html",
     "surface": "Motion card",
     "action": "Robert Smalls · Beaufort, South Carolina · 1862",
     "errors": [],
     "file": "cards/c06-smalls.mp4",
-    "capturedAt": "2026-09-21T13:56:29.410Z"
+    "capturedAt": "2026-09-21T15:36:42.955Z"
   },
   "c07-revels": {
     "name": "c07-revels",
@@ -665,13 +665,13 @@
     "frames": 83,
     "handle": 8,
     "totalFrames": 99,
-    "seconds": 36.2,
+    "seconds": 36.1,
     "url": "file:///Users/geralddagher/Developer/Projects/blackstory/production/social/blackstory-love-me-ad/assets/card.html",
     "surface": "Motion card",
     "action": "Ona Judge · Philadelphia · 1796",
     "errors": [],
     "file": "cards/c10-onajudge.mp4",
-    "capturedAt": "2026-09-21T14:24:01.615Z"
+    "capturedAt": "2026-09-21T15:37:52.842Z"
   },
   "c11-coffin": {
     "name": "c11-coffin",
@@ -707,13 +707,13 @@
     "frames": 100,
     "handle": 8,
     "totalFrames": 116,
-    "seconds": 128.9,
+    "seconds": 136.8,
     "url": "file:///Users/geralddagher/Developer/Projects/blackstory/production/social/blackstory-love-me-ad/assets/card.html",
     "surface": "Motion card",
     "action": "William Still · Philadelphia · 1872",
     "errors": [],
     "file": "cards/c12-still.mp4",
-    "capturedAt": "2026-09-21T14:01:36.537Z"
+    "capturedAt": "2026-09-21T15:40:09.678Z"
   },
   "c13-dubois": {
     "name": "c13-dubois",
@@ -721,13 +721,13 @@
     "frames": 78,
     "handle": 8,
     "totalFrames": 94,
-    "seconds": 121.5,
+    "seconds": 129.5,
     "url": "file:///Users/geralddagher/Developer/Projects/blackstory/production/social/blackstory-love-me-ad/assets/card.html",
     "surface": "Motion card",
     "action": "W. E. B. Du Bois · Great Barrington, Massachusetts · 1868",
     "errors": [],
     "file": "cards/c13-dubois.mp4",
-    "capturedAt": "2026-09-21T14:03:38.067Z"
+    "capturedAt": "2026-09-21T15:42:19.224Z"
   },
   "c14-drew": {
     "name": "c14-drew",
@@ -735,13 +735,13 @@
     "frames": 72,
     "handle": 8,
     "totalFrames": 88,
-    "seconds": 117,
+    "seconds": 122.8,
     "url": "file:///Users/geralddagher/Developer/Projects/blackstory/production/social/blackstory-love-me-ad/assets/card.html",
     "surface": "Motion card",
-    "action": "Charles Drew · Washington, D.C. · 1940",
+    "action": "Charles Drew · Washington, D.C.",
     "errors": [],
     "file": "cards/c14-drew.mp4",
-    "capturedAt": "2026-09-21T14:14:01.137Z"
+    "capturedAt": "2026-09-21T15:58:02.626Z"
   },
   "c15-btw": {
     "name": "c15-btw",
@@ -763,13 +763,13 @@
     "frames": 113,
     "handle": 8,
     "totalFrames": 129,
-    "seconds": 27.2,
+    "seconds": 27.9,
     "url": "file:///Users/geralddagher/Developer/Projects/blackstory/production/social/blackstory-love-me-ad/assets/card.html",
     "surface": "Motion card",
     "action": "Granville Woods · Cincinnati, Ohio · 1887",
     "errors": [],
     "file": "cards/c16-woods.mp4",
-    "capturedAt": "2026-09-21T14:24:28.867Z"
+    "capturedAt": "2026-09-21T15:42:47.178Z"
   },
   "c19-tulsa": {
     "name": "c19-tulsa",
@@ -777,13 +777,13 @@
     "frames": 130,
     "handle": 8,
     "totalFrames": 146,
-    "seconds": 66.5,
+    "seconds": 69,
     "url": "file:///Users/geralddagher/Developer/Projects/blackstory/production/social/blackstory-love-me-ad/assets/card.html",
     "surface": "Motion card",
     "action": "Tulsa Race Massacre · Tulsa, Oklahoma · 1921",
     "errors": [],
     "file": "cards/c19-tulsa.mp4",
-    "capturedAt": "2026-09-21T14:25:35.384Z"
+    "capturedAt": "2026-09-21T15:43:56.200Z"
   },
   "c20-plate": {
     "name": "c20-plate",
@@ -791,13 +791,13 @@
     "frames": 45,
     "handle": 8,
     "totalFrames": 61,
-    "seconds": 23.9,
+    "seconds": 24,
     "url": "file:///Users/geralddagher/Developer/Projects/blackstory/production/social/blackstory-love-me-ad/assets/card.html",
     "surface": "Motion card",
     "action": "W. E. B. Du Bois · Georgia · c. 1900",
     "errors": [],
     "file": "cards/c20-plate.mp4",
-    "capturedAt": "2026-09-21T14:25:59.308Z"
+    "capturedAt": "2026-09-21T15:44:20.240Z"
   },
   "c21-coleman": {
     "name": "c21-coleman",
@@ -833,13 +833,13 @@
     "frames": 56,
     "handle": 8,
     "totalFrames": 72,
-    "seconds": 75.8,
+    "seconds": 77,
     "url": "file:///Users/geralddagher/Developer/Projects/blackstory/production/social/blackstory-love-me-ad/assets/card.html",
     "surface": "Motion card",
     "action": "Blanche K. Bruce · Mississippi · 1875",
     "errors": [],
     "file": "cards/c23-bruce.mp4",
-    "capturedAt": "2026-09-21T14:12:04.123Z"
+    "capturedAt": "2026-09-21T15:55:59.834Z"
   },
   "c24-turner": {
     "name": "c24-turner",
@@ -847,13 +847,13 @@
     "frames": 58,
     "handle": 8,
     "totalFrames": 74,
-    "seconds": 94.6,
+    "seconds": 97.5,
     "url": "file:///Users/geralddagher/Developer/Projects/blackstory/production/social/blackstory-love-me-ad/assets/card.html",
     "surface": "Motion card",
-    "action": "Charles Henry Turner · St. Louis, Missouri · 1907",
+    "action": "Charles Henry Turner · St. Louis, Missouri",
     "errors": [],
     "file": "cards/c24-turner.mp4",
-    "capturedAt": "2026-09-21T14:15:35.737Z"
+    "capturedAt": "2026-09-21T15:59:40.184Z"
   },
   "map-reveal": {
     "name": "map-reveal",
@@ -868,5 +868,61 @@
     "errors": [],
     "file": "map/map-reveal.mp4",
     "capturedAt": "2026-09-21T13:45:19.216Z"
+  },
+  "c25-douglass": {
+    "name": "c25-douglass",
+    "out": "/Users/geralddagher/Developer/Projects/blackstory/production/social/blackstory-love-me-ad/captures/cards/c25-douglass.mp4",
+    "frames": 91,
+    "handle": 8,
+    "totalFrames": 107,
+    "seconds": 133.7,
+    "url": "file:///Users/geralddagher/Developer/Projects/blackstory/production/social/blackstory-love-me-ad/assets/card.html",
+    "surface": "Motion card",
+    "action": "Frederick Douglass · Washington, D.C. · 1877",
+    "errors": [],
+    "file": "cards/c25-douglass.mp4",
+    "capturedAt": "2026-09-21T15:46:33.949Z"
+  },
+  "c26-cjwalker": {
+    "name": "c26-cjwalker",
+    "out": "/Users/geralddagher/Developer/Projects/blackstory/production/social/blackstory-love-me-ad/captures/cards/c26-cjwalker.mp4",
+    "frames": 175,
+    "handle": 8,
+    "totalFrames": 191,
+    "seconds": 243.3,
+    "url": "file:///Users/geralddagher/Developer/Projects/blackstory/production/social/blackstory-love-me-ad/assets/card.html",
+    "surface": "Motion card",
+    "action": "Madam C. J. Walker · Irvington, New York",
+    "errors": [],
+    "file": "cards/c26-cjwalker.mp4",
+    "capturedAt": "2026-09-21T15:50:37.302Z"
+  },
+  "c27-carney": {
+    "name": "c27-carney",
+    "out": "/Users/geralddagher/Developer/Projects/blackstory/production/social/blackstory-love-me-ad/captures/cards/c27-carney.mp4",
+    "frames": 59,
+    "handle": 8,
+    "totalFrames": 75,
+    "seconds": 102.6,
+    "url": "file:///Users/geralddagher/Developer/Projects/blackstory/production/social/blackstory-love-me-ad/assets/card.html",
+    "surface": "Motion card",
+    "action": "William Harvey Carney · Fort Wagner · 1863",
+    "errors": [],
+    "file": "cards/c27-carney.mp4",
+    "capturedAt": "2026-09-21T15:52:19.958Z"
+  },
+  "c28-btw": {
+    "name": "c28-btw",
+    "out": "/Users/geralddagher/Developer/Projects/blackstory/production/social/blackstory-love-me-ad/captures/cards/c28-btw.mp4",
+    "frames": 120,
+    "handle": 8,
+    "totalFrames": 136,
+    "seconds": 142.8,
+    "url": "file:///Users/geralddagher/Developer/Projects/blackstory/production/social/blackstory-love-me-ad/assets/card.html",
+    "surface": "Motion card",
+    "action": "Booker T. Washington · Tuskegee, Alabama · 1881",
+    "errors": [],
+    "file": "cards/c28-btw.mp4",
+    "capturedAt": "2026-09-21T15:54:42.829Z"
   }
 }

@@ -270,3 +270,19 @@ when they can't say why.
 
 **Decision.** Every entity card carries a clause from its record. Anyone who
 couldn't be given enough screen time to read one was cut, not shown bare.
+
+---
+
+## D21 — Memorial is one phrase, not two
+
+**Decision.** 28.051-34.685s (6.6s), then Douglass on the next vocal entrance.
+**Why.** Client: 14.1s was too long. The first sustained phrase is the emotional
+peak (4.18s steady hold). The second phrase now carries lives instead of more wall.
+
+## D22 — The closing map shows every record, unclustered
+
+**Decision.** Final pull-out and lockup background render all 4,206 located
+records as individual points. The product's cluster layers are hidden, only in these shots.
+**Why.** Clusters compress the archive into a few dozen numbers. The point of the
+close is the sheer volume. This is a presentation choice for the ad, not a change
+to the product. Earlier map shots keep the product's native clustering.

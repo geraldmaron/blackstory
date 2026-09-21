@@ -197,3 +197,20 @@ summary clause from its record. Carney, Coffin, Walker and Washington were dropp
 because they only had room for sub-0.4s shots. Framed prints capped at y=880 after
 review caught years colliding with two prints. Corrected QA: all 31 cuts at offset 0.
 Delivery `tiktok-v3.mp4`, 81 MB.
+
+**29 — Client review of v005 (2026-09-21).** Memorial held too long; wanted every
+summary challenged for community perception; wanted the final map unclustered, to
+show the volume of the archive.
+
+**30 — Ringer review of captions** (`RINGER-REVIEW.md`, all six chairs). 6
+correction-forcing findings and 1 strike: Ona Judge's line omitted her
+enslavement; the only Tulsa words were the souvenir postcard's caption; stamps and
+summaries paired to misread (Du Bois, Smalls, Drew); Bruce's line lost its "first";
+Isaiah Montgomery struck (1890 disenfranchisement vote). All fixed.
+
+**31 — v006.** Memorial cut to one phrase, 6.6s (28.05-34.69s). Freed time holds
+Douglass, C.J. Walker, Carney and B.T. Washington, each with a reviewed summary,
+cut on VOX 34.685 / kick 36.20 / bass return 39.125 / kick 40.10. The final
+pull-out and the lockup background draw all 4,206 located records as individual
+points (`assets/all-records.geojson`), with cluster layers hidden and state
+shading dimmed. QA: 0 cut offset against kicks/vocal entrances.
