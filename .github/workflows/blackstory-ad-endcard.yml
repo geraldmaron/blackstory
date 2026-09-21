@@ -1,0 +1,52 @@
+name: BlackStory ad brand finishing
+on:
+  push:
+    branches: [production/blackstory-love-me-ad-20260920]
+    paths: [.github/workflows/blackstory-ad-endcard.yml]
+permissions:
+  contents: read
+jobs:
+  brand:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+      - name: Install browser
+        run: |
+          python3 -m venv /tmp/brand-tools
+          /tmp/brand-tools/bin/pip install playwright
+          /tmp/brand-tools/bin/python -m playwright install --with-deps chromium
+      - name: Render endcard with live brand fonts and official artwork
+        run: |
+          mkdir -p _brand
+          cat > _brand/render-endcard.py <<'PY'
+          import asyncio, json
+          from pathlib import Path
+          from playwright.async_api import async_playwright
+          async def main():
+              async with async_playwright() as p:
+                  browser = await p.chromium.launch()
+                  ctx = await browser.new_context(viewport={'width':540,'height':960},device_scale_factor=2)
+                  page = await ctx.new_page()
+                  await page.goto('https://blackstory.app/lives',wait_until='domcontentloaded',timeout=60000)
+                  await page.evaluate('document.fonts.ready')
+                  await page.wait_for_timeout(3000)
+                  await page.evaluate('''()=>{const node=document.createElement('div');node.id='ad-endcard';node.setAttribute('style','position:fixed;inset:0;z-index:2147483647;background:#0A0A0A;color:#F4EFE5;overflow:hidden');node.innerHTML=`<div id="brand-content" style="position:absolute;left:5px;top:290px;width:480px;text-align:center"><img alt="BlackStory" src="/brand/lockup-dark.png" style="display:block;width:480px;height:270px;object-fit:contain"><p id="brand-line" style="font-family:var(--ds-font-editorial);font-size:27px;font-weight:400;line-height:1.25;margin:-19px 0 30px;letter-spacing:-.3px">History, pinned to place.</p><p style="font-family:var(--ds-font-mono);font-size:18px;letter-spacing:.2px;color:#D07A32;margin:0">blackstory.app</p></div>`;document.body.appendChild(node);}''')
+                  await page.evaluate('document.fonts.ready')
+                  await page.wait_for_timeout(1500)
+                  await page.screenshot(path='_brand/endcard.png')
+                  info=await page.evaluate('''()=>({editorial:getComputedStyle(document.getElementById('brand-line')).fontFamily,htmlClasses:document.documentElement.className,tagline:document.getElementById('brand-line').textContent,loadedFonts:[...document.fonts].map(f=>({family:f.family,status:f.status})),artwork:'https://blackstory.app/brand/lockup-dark.png'})''')
+                  Path('_brand/provenance.json').write_text(json.dumps(info,indent=2))
+                  await browser.close()
+          asyncio.run(main())
+          PY
+          /tmp/brand-tools/bin/python _brand/render-endcard.py
+          cp .github/workflows/blackstory-ad-endcard.yml _brand/workflow.yml
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        with:
+          name: blackstory-ad-brand
+          path: _brand/
+          retention-days: 14
+          if-no-files-found: error
