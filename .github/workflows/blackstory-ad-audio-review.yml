@@ -1,0 +1,50 @@
+name: BlackStory ad audio review
+on:
+  push:
+    branches: [production/blackstory-love-me-ad-20260920]
+    paths: [.github/workflows/blackstory-ad-audio-review.yml]
+permissions:
+  contents: read
+jobs:
+  audio:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+      - name: Install analysis tools
+        run: |
+          python3 -m venv /tmp/audio-tools
+          /tmp/audio-tools/bin/pip install playwright requests faster-whisper
+          /tmp/audio-tools/bin/python -m playwright install --with-deps chromium
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+      - name: Acquire exact public reference
+        run: /tmp/audio-tools/bin/python .github/scripts/blackstory-ad-capture.py --mode reference
+      - name: Extract machine-assisted vocal timing candidates
+        run: |
+          mkdir -p _audio_review
+          cat > _audio_review/transcribe.py <<'PY'
+          import json
+          from pathlib import Path
+          from faster_whisper import WhisperModel
+          model=WhisperModel('small.en',device='cpu',compute_type='int8',cpu_threads=4)
+          segments,info=model.transcribe('_ad_artifacts/reference/reference-audio.wav',beam_size=5,word_timestamps=True,vad_filter=False,condition_on_previous_text=False)
+          result={'method':'faster-whisper small.en int8, no VAD, no prompt, no previous-text conditioning','warning':'Machine transcription of singing is advisory and may hallucinate; compare waveform and source recording. It does not constitute a human listening review.','language':info.language,'language_probability':info.language_probability,'segments':[]}
+          for segment in segments:
+              result['segments'].append({'start':segment.start,'end':segment.end,'text':segment.text,'avg_logprob':segment.avg_logprob,'no_speech_prob':segment.no_speech_prob,'words':[{'start':w.start,'end':w.end,'word':w.word,'probability':w.probability} for w in (segment.words or [])]})
+          Path('_audio_review/vocal-candidates.json').write_text(json.dumps(result,indent=2))
+          print(json.dumps(result,indent=2))
+          PY
+          /tmp/audio-tools/bin/python _audio_review/transcribe.py
+          cp _ad_artifacts/reference/acquisition.json _audio_review/acquisition.json
+          cp .github/workflows/blackstory-ad-audio-review.yml _audio_review/workflow.yml
+          /tmp/audio-tools/bin/pip freeze > _audio_review/python-versions.txt
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        if: always()
+        with:
+          name: blackstory-ad-audio-review
+          path: _audio_review/
+          retention-days: 14
+          if-no-files-found: warn
