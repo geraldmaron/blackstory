@@ -1,0 +1,155 @@
+# Media-only public reference retrieval; no production access or deployment.
+name: BlackStory Audio Reference
+on:
+  push:
+    branches: [media/blackstory-love-me-20260920]
+    paths: [.github/workflows/blackstory-audio-reference.yml]
+permissions:
+  contents: read
+jobs:
+  reference:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    steps:
+      - name: Install reference tools
+        run: |
+          python3 -m venv /tmp/reference-env
+          /tmp/reference-env/bin/pip -q install 'yt-dlp[default]' curl_cffi requests beautifulsoup4 playwright==1.55.0
+          /tmp/reference-env/bin/python -m playwright install --with-deps chromium
+      - name: Retrieve exact public reference
+        run: |
+          mkdir -p output
+          cat > output/retrieve_reference.py <<'PY'
+          import asyncio, json, pathlib, subprocess, traceback, re
+          import requests
+          from bs4 import BeautifulSoup
+          from playwright.async_api import async_playwright
+          ROOT = pathlib.Path('output')
+          ID = '7670347350115634462'
+          AUTHOR = 'ambnt.prod'
+          URL = 'https://www.tiktok.com/@ambnt.prod/video/' + ID
+          report = {'reference_id': ID, 'reference_url': URL, 'verified': False, 'attempts': []}
+          headers = {'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36', 'Referer': 'https://www.tiktok.com/'}
+          def save():
+              (ROOT/'report.json').write_text(json.dumps(report, indent=2))
+          def record(method, **fields):
+              report['attempts'].append({'method':method, **fields}); save()
+          def probe(path):
+              p=subprocess.run(['ffprobe','-v','error','-show_format','-show_streams','-of','json',str(path)],capture_output=True,text=True)
+              if p.returncode: return None
+              data=json.loads(p.stdout)
+              return data if any(s.get('codec_type')=='audio' for s in data.get('streams',[])) else None
+          def download(url, method, metadata):
+              if not isinstance(url,str) or not url.startswith('https://'): return False
+              try:
+                  with requests.get(url, headers=headers, stream=True, timeout=(15,45)) as r:
+                      r.raise_for_status()
+                      with (ROOT/'reference.mp4').open('wb') as f:
+                          total=0
+                          for chunk in r.iter_content(1024*1024):
+                              total+=len(chunk)
+                              if total>180*1024*1024: raise RuntimeError('Reference exceeds download bound')
+                              f.write(chunk)
+                  media=probe(ROOT/'reference.mp4')
+                  if media:
+                      report.update({'verified':True,'retrieval_method':method,'metadata':metadata,'media':media})
+                      subprocess.run(['ffmpeg','-hide_banner','-loglevel','error','-y','-i',str(ROOT/'reference.mp4'),'-vn','-ar','48000','-ac','2',str(ROOT/'reference.wav')],check=True)
+                      save(); return True
+                  record(method,error='No decodable audio stream')
+              except Exception as e: record(method,error=str(e))
+              return False
+          def find_items(obj):
+              if isinstance(obj,dict):
+                  if str(obj.get('id',''))==ID and isinstance(obj.get('video'),dict): yield obj
+                  for v in obj.values(): yield from find_items(v)
+              elif isinstance(obj,list):
+                  for v in obj: yield from find_items(v)
+          def strings(obj):
+              if isinstance(obj,str): yield obj
+              elif isinstance(obj,dict):
+                  for v in obj.values(): yield from strings(v)
+              elif isinstance(obj,list):
+                  for v in obj: yield from strings(v)
+          def parse_page(html,method):
+              soup=BeautifulSoup(html,'html.parser')
+              for script in soup.find_all('script'):
+                  text=script.string or script.get_text()
+                  if not text or ID not in text: continue
+                  try: data=json.loads(text)
+                  except Exception: continue
+                  for item in find_items(data):
+                      author=item.get('author',{})
+                      unique=author.get('uniqueId') if isinstance(author,dict) else author
+                      if unique != AUTHOR: continue
+                      (ROOT/(method+'-item.json')).write_text(json.dumps(item,indent=2))
+                      meta={k:item.get(k) for k in ['id','desc','createTime','author','music']}
+                      video=item['video']
+                      for key in ['playAddr','downloadAddr','bitrateInfo']:
+                          for address in strings(video.get(key)):
+                              if address.startswith('https://') and download(address,method,meta): return True
+              return False
+          try:
+              cmd=['/tmp/reference-env/bin/yt-dlp','--no-playlist','--socket-timeout','20','--retries','1','--write-info-json','--merge-output-format','mp4','-o',str(ROOT/'reference.%(ext)s'),URL]
+              p=subprocess.run(cmd,capture_output=True,text=True,timeout=150)
+              (ROOT/'yt-dlp.log').write_text(p.stdout+'\n'+p.stderr)
+              record('yt-dlp',returncode=p.returncode)
+              infofile=ROOT/'reference.info.json'
+              if infofile.exists():
+                  info=json.loads(infofile.read_text())
+                  if str(info.get('id'))==ID and info.get('uploader_id')==AUTHOR:
+                      for file in ROOT.glob('reference.*'):
+                          if file.suffix not in ['.mp4','.webm','.mkv']: continue
+                          media=probe(file)
+                          if media:
+                              if file.name!='reference.mp4': subprocess.run(['ffmpeg','-hide_banner','-loglevel','error','-y','-i',str(file),'-c','copy',str(ROOT/'reference.mp4')],check=True)
+                              report.update({'verified':True,'retrieval_method':'yt-dlp','metadata':{k:info.get(k) for k in ['id','title','uploader','uploader_id','duration','webpage_url']},'media':media})
+                              subprocess.run(['ffmpeg','-hide_banner','-loglevel','error','-y','-i',str(ROOT/'reference.mp4'),'-vn','-ar','48000','-ac','2',str(ROOT/'reference.wav')],check=True)
+                              save(); break
+          except Exception as e: record('yt-dlp',error=str(e))
+          if not report['verified']:
+              try:
+                  r=requests.get('https://www.tikwm.com/api/',params={'url':URL,'hd':'1'},timeout=35)
+                  (ROOT/'public-mirror.json').write_text(r.text)
+                  data=r.json().get('data',{})
+                  ident=str(data.get('id') or data.get('aweme_id') or '')
+                  author=data.get('author',{}).get('unique_id')
+                  record('public-mirror',status=r.status_code,returned_id=ident,author=author)
+                  if ident==ID and author==AUTHOR:
+                      for key in ['hdplay','play','wmplay']:
+                          address=data.get(key)
+                          if address and address.startswith('/'): address='https://www.tikwm.com'+address
+                          if download(address,'verified-public-mirror',data): break
+              except Exception as e: record('public-mirror',error=str(e))
+          async def browser():
+              async with async_playwright() as p:
+                  b=await p.chromium.launch()
+                  c=await b.new_context(user_agent=headers['User-Agent'])
+                  page=await c.new_page()
+                  urls=[URL,'https://www.tiktok.com/embed/v2/'+ID,'https://www.tiktok.com/player/v1/'+ID]
+                  for index,url in enumerate(urls):
+                      if report['verified']: break
+                      try:
+                          response=await page.goto(url,wait_until='domcontentloaded',timeout=35000)
+                          await page.wait_for_timeout(6000)
+                          html=await page.content()
+                          name='official-'+str(index)
+                          (ROOT/(name+'.html')).write_text(html)
+                          record(name,status=response.status if response else None,title=await page.title(),body=(await page.locator('body').inner_text())[:6000],videos=await page.locator('video').evaluate_all('(xs)=>xs.map(x=>({src:x.currentSrc,duration:x.duration}))'))
+                          await page.screenshot(path=str(ROOT/(name+'.png')))
+                          parse_page(html,name)
+                      except Exception as e: record('official-'+str(index),error=str(e))
+                  await b.close()
+          if not report['verified']:
+              asyncio.run(browser())
+          save()
+          print(json.dumps(report,indent=2))
+          PY
+          /tmp/reference-env/bin/python output/retrieve_reference.py
+      - name: Preserve exact reference and verification evidence
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: blackstory-exact-reference
+          path: output/
+          retention-days: 7
+          if-no-files-found: warn
