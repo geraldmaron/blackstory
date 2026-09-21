@@ -1,0 +1,81 @@
+# Isolated media-production workflow. Public GETs only; no app deployment or secrets.
+name: BlackStory Ad Capture
+on:
+  push:
+    branches: [media/blackstory-love-me-20260920]
+    paths: [.github/workflows/blackstory-ad-capture.yml, media/blackstory-love-me/**]
+permissions:
+  contents: read
+concurrency:
+  group: blackstory-ad-capture-20260920
+  cancel-in-progress: true
+jobs:
+  inspect:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    steps:
+      - name: Install isolated capture dependencies
+        run: |
+          python3 -m venv /tmp/blackstory-media-env
+          /tmp/blackstory-media-env/bin/pip -q install playwright==1.55.0 yt-dlp requests
+          /tmp/blackstory-media-env/bin/python -m playwright install --with-deps chromium
+      - name: Inspect public product and exact reference
+        run: |
+          mkdir -p output
+          /tmp/blackstory-media-env/bin/python - <<'PY'
+          import asyncio, json, pathlib, subprocess
+          from playwright.async_api import async_playwright
+          out = pathlib.Path('output')
+          reference = 'https://www.tiktok.com/@ambnt.prod/video/7670347350115634462'
+          report = {'reference_url': reference, 'routes': [], 'reference_status': 'unverified'}
+          try:
+              proc = subprocess.run(['/tmp/blackstory-media-env/bin/yt-dlp', '--skip-download', '--dump-single-json', '--no-playlist', '--socket-timeout', '15', '--retries', '1', reference], capture_output=True, text=True, timeout=90)
+              (out / 'reference-retrieval.log').write_text(proc.stderr)
+              if proc.returncode == 0:
+                  info = json.loads(proc.stdout)
+                  report['reference_status'] = 'metadata_retrieved' if str(info.get('id')) == '7670347350115634462' else 'id_mismatch'
+                  report['reference'] = {k: info.get(k) for k in ['id', 'title', 'duration', 'fps', 'uploader', 'uploader_id', 'webpage_url', 'timestamp', 'track', 'artist']}
+                  (out / 'reference-metadata.json').write_text(json.dumps(info, indent=2))
+          except Exception as exc:
+              report['reference_error'] = str(exc)
+          async def inspect():
+              async with async_playwright() as p:
+                  browser = await p.chromium.launch(args=['--disable-dev-shm-usage', '--enable-webgl', '--use-gl=angle', '--use-angle=swiftshader'])
+                  context = await browser.new_context(viewport={'width': 540, 'height': 960}, device_scale_factor=2, color_scheme='dark', reduced_motion='no-preference')
+                  page = await context.new_page()
+                  for path in ['/', '/explore', '/stories', '/lives', '/data', '/records', '/rooms', '/memorial']:
+                      label = path.strip('/') or 'home'
+                      item = {'path': path}
+                      try:
+                          response = await page.goto('https://blackstory.app' + path, wait_until='domcontentloaded', timeout=45000)
+                          await page.wait_for_timeout(6500)
+                          await page.evaluate('document.fonts.ready')
+                          item.update({'status': response.status if response else None, 'url': page.url, 'title': await page.title(), 'body': (await page.locator('body').inner_text())[:45000], 'links': await page.locator('a[href]').evaluate_all('(els) => els.map(e => ({text:e.innerText, href:e.getAttribute("href")}))'), 'buttons': await page.locator('button').evaluate_all('(els) => els.map(e => ({text:e.innerText, label:e.getAttribute("aria-label"), testid:e.getAttribute("data-testid")}))')})
+                          await page.screenshot(path=str(out / (label + '.png')))
+                          (out / (label + '.html')).write_text(await page.content())
+                      except Exception as exc:
+                          item['error'] = str(exc)
+                      report['routes'].append(item)
+                      (out / 'inspection.json').write_text(json.dumps(report, indent=2))
+                  try:
+                      await page.goto(reference, wait_until='domcontentloaded', timeout=30000)
+                      await page.wait_for_timeout(5000)
+                      report['reference_page'] = {'url': page.url, 'title': await page.title(), 'body': (await page.locator('body').inner_text())[:12000], 'videos': await page.locator('video').evaluate_all('(els) => els.map(e => ({src:e.currentSrc,duration:e.duration,readyState:e.readyState}))')}
+                      await page.screenshot(path=str(out / 'reference-page.png'))
+                  except Exception as exc:
+                      report['reference_browser_error'] = str(exc)
+                  await browser.close()
+          asyncio.run(inspect())
+          (out / 'inspection.json').write_text(json.dumps(report, indent=2))
+          print(json.dumps({k: v for k,v in report.items() if k != 'routes'}, indent=2))
+          for route in report['routes']:
+              print(route['path'], route.get('status'), route.get('title'), route.get('error'), len(route.get('body', '')))
+          PY
+      - name: Preserve inspection artifacts
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: blackstory-ad-inspection
+          path: output/
+          retention-days: 7
+          if-no-files-found: warn
