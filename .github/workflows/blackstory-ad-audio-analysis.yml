@@ -1,0 +1,64 @@
+# Isolated analysis of public media for the requested ad. No production writes.
+name: BlackStory Ad Audio Analysis
+on:
+  push:
+    branches: [media/blackstory-love-me-20260920]
+    paths: [.github/workflows/blackstory-ad-audio-analysis.yml]
+permissions:
+  contents: read
+jobs:
+  analyze:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - name: Install isolated analysis tools
+        run: |
+          python3 -m venv /tmp/analyze-env
+          /tmp/analyze-env/bin/pip -q install 'yt-dlp[default]' curl_cffi faster-whisper numpy scipy soundfile requests
+          sudo apt-get -qq install -y ffmpeg > /tmp/ffmpeg-install.log
+      - name: Retrieve and analyze the exact post
+        env:
+          HF_HUB_DISABLE_XET: '1'
+          OMP_NUM_THREADS: '2'
+        run: |
+          mkdir -p output
+          cat > output/analyze_reference.py <<'PY'
+          import hashlib,json,pathlib,subprocess
+          import numpy as np
+          import soundfile as sf
+          from scipy import signal
+          from faster_whisper import WhisperModel
+          ROOT=pathlib.Path('output')
+          URL='https://www.tiktok.com/@ambnt.prod/video/7670347350115634462'
+          subprocess.run(['/tmp/analyze-env/bin/yt-dlp','--no-playlist','--socket-timeout','20','--retries','1','--write-info-json','-o',str(ROOT/'reference.%(ext)s'),URL],check=True,timeout=150)
+          info=json.loads((ROOT/'reference.info.json').read_text())
+          assert str(info['id'])=='7670347350115634462'
+          assert info.get('uploader')=='ambnt.prod' or info.get('uploader_id')=='ambnt.prod'
+          media=next(x for x in ROOT.glob('reference.*') if x.suffix in ['.mp4','.webm','.mkv'])
+          subprocess.run(['ffmpeg','-v','error','-y','-i',str(media),'-vn','-ac','1','-ar','16000',str(ROOT/'analysis.wav')],check=True)
+          model=WhisperModel('small',device='cpu',compute_type='int8',cpu_threads=2,num_workers=1)
+          segments,meta=model.transcribe(str(ROOT/'analysis.wav'),language='en',word_timestamps=True,condition_on_previous_text=False,vad_filter=False,beam_size=5,temperature=0)
+          transcript=[]
+          for segment in segments:
+              transcript.append({'start':segment.start,'end':segment.end,'text':segment.text,'avg_logprob':segment.avg_logprob,'no_speech_prob':segment.no_speech_prob,'words':[{'start':w.start,'end':w.end,'word':w.word,'probability':w.probability} for w in (segment.words or [])]})
+          (ROOT/'vocal-transcript.json').write_text(json.dumps({'method':'faster-whisper small int8; word timings are estimates requiring waveform confirmation','duration':meta.duration,'segments':transcript},indent=2))
+          audio,sr=sf.read(ROOT/'analysis.wav');hop=160;win=640
+          f,t,z=signal.stft(audio,fs=sr,nperseg=win,noverlap=win-hop,boundary=None)
+          magnitude=np.abs(z)
+          flux=np.maximum(0,np.diff(np.log1p(100*magnitude),axis=1)).sum(axis=0)
+          peaks,properties=signal.find_peaks(flux,prominence=np.percentile(flux,68),distance=18)
+          energy=np.sqrt(np.mean(np.lib.stride_tricks.sliding_window_view(audio,win)[::hop]**2,axis=1))
+          report={'id':info['id'],'uploader':info.get('uploader'),'source_url':URL,'sha256':hashlib.sha256(media.read_bytes()).hexdigest(),'duration':len(audio)/sr,'sample_rate':sr,'hop_seconds':hop/sr,'onsets':[{'time':float(t[1:][k]),'strength':float(flux[k])} for k in peaks],'analysis_warning':'ASR may miss or misalign repeated and layered singing. Waveform transients are not automatically vocal syllables.'}
+          (ROOT/'audio-analysis.json').write_text(json.dumps(report,indent=2))
+          np.savez_compressed(ROOT/'waveform-analysis.npz',time=t,frequency=f,magnitude=magnitude,flux=flux,energy=energy)
+          print(json.dumps({'segments':transcript,'strong_onsets':report['onsets']},indent=2))
+          PY
+          /tmp/analyze-env/bin/python output/analyze_reference.py
+      - name: Preserve analysis
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: blackstory-audio-analysis
+          path: output/
+          retention-days: 7
+          if-no-files-found: warn
