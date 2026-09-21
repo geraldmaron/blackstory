@@ -1,0 +1,44 @@
+# Public product capture only. No production credentials, writes, build, or deployment.
+name: BlackStory Production Capture
+on:
+  push:
+    branches: [media/blackstory-love-me-20260920]
+    paths: [.github/workflows/blackstory-production-capture.yml, tools/media/blackstory_capture.py]
+permissions:
+  contents: read
+concurrency:
+  group: blackstory-production-capture-20260920
+  cancel-in-progress: true
+jobs:
+  capture:
+    name: Capture ${{ matrix.group }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 18
+    strategy:
+      fail-fast: false
+      matrix:
+        group: [map, editorial, context]
+    steps:
+      - name: Checkout isolated media source
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+          sparse-checkout: tools/media
+      - name: Install standalone capture dependencies
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg xvfb
+          python3 -m venv /tmp/blackstory-capture-env
+          /tmp/blackstory-capture-env/bin/pip -q install playwright==1.55.0 opencv-python-headless pillow numpy
+          /tmp/blackstory-capture-env/bin/python -m playwright install --with-deps chromium
+      - name: Record native browser motion at 1080 by 1920
+        run: /tmp/blackstory-capture-env/bin/python tools/media/blackstory_capture.py --group '${{ matrix.group }}' --output output
+      - name: Preserve reusable footage and capture source
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: blackstory-footage-${{ matrix.group }}
+          path: output/
+          retention-days: 7
+          if-no-files-found: warn
+          compression-level: 0
