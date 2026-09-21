@@ -1,0 +1,35 @@
+name: BlackStory Archive Closeups
+on:
+  push:
+    branches: [media/blackstory-love-me-20260920]
+    paths: [.github/workflows/blackstory-archive-closeups.yml, creative/blackstory-closeup-20260920/**]
+permissions:
+  contents: read
+jobs:
+  capture:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          sparse-checkout: |
+            creative/blackstory-ad-20260920
+            creative/blackstory-closeup-20260920
+          persist-credentials: false
+      - name: Install capture dependencies
+        run: |
+          sudo apt-get -qq update
+          sudo apt-get -qq install -y ffmpeg xvfb
+          python3 -m venv /tmp/closeups-env
+          /tmp/closeups-env/bin/pip -q install playwright==1.55.0 Pillow
+          /tmp/closeups-env/bin/python -m playwright install --with-deps chromium
+      - name: Capture the archive photographs
+        run: /tmp/closeups-env/bin/python creative/blackstory-closeup-20260920/closeups.py
+      - name: Preserve close-up footage
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: blackstory-archive-closeups
+          path: output/
+          retention-days: 7
+          compression-level: 0
