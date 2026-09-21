@@ -1,0 +1,48 @@
+# Isolated analysis of the user-specified public reference. No production writes.
+name: BlackStory Audio Analysis
+on:
+  push:
+    branches: [media/blackstory-love-me-20260920]
+    paths: [.github/workflows/blackstory-audio-analysis.yml]
+permissions:
+  contents: read
+jobs:
+  analyze:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    steps:
+      - name: Install isolated analysis dependencies
+        run: |
+          python3 -m venv /tmp/audio-env
+          /tmp/audio-env/bin/pip -q install 'yt-dlp[default]' curl_cffi faster-whisper==1.2.0
+      - name: Retrieve and analyze exact public audio
+        run: |
+          mkdir -p output
+          /tmp/audio-env/bin/python - <<'PY'
+          import pathlib, json, subprocess, hashlib
+          from faster_whisper import WhisperModel
+          root = pathlib.Path('output')
+          url = 'https://www.tiktok.com/@ambnt.prod/video/7670347350115634462'
+          result = subprocess.run(['/tmp/audio-env/bin/yt-dlp', '--write-info-json', '--no-playlist', '--socket-timeout', '20', '--retries', '1', '-o', str(root/'reference.%(ext)s'), url], capture_output=True, text=True, timeout=120)
+          (root/'retrieval.log').write_text(result.stdout+'\n'+result.stderr)
+          result.check_returncode()
+          metadata = json.loads((root/'reference.info.json').read_text())
+          assert metadata['id'] == '7670347350115634462'
+          assert metadata['uploader'] == 'ambnt.prod'
+          media = next(p for p in root.glob('reference.*') if p.suffix in ['.mp4','.webm','.mkv'])
+          model = WhisperModel('base.en', device='cpu', compute_type='int8', cpu_threads=4)
+          segments, info = model.transcribe(str(media), language='en', word_timestamps=True, condition_on_previous_text=False, beam_size=3, temperature=0, vad_filter=False)
+          data = {'source_id': metadata['id'], 'creator': metadata['uploader'], 'source_sha256': hashlib.sha256(media.read_bytes()).hexdigest(), 'duration': info.duration, 'method': 'Whisper base.en automated word timestamps; candidates require waveform cross-check; not hand-verified lyrics.', 'segments': []}
+          for segment in segments:
+              data['segments'].append({'start': segment.start, 'end': segment.end, 'text': segment.text, 'no_speech_prob': segment.no_speech_prob, 'words': [{'start': w.start, 'end': w.end, 'word': w.word, 'probability': w.probability} for w in (segment.words or [])]})
+          (root/'vocal-timestamps.json').write_text(json.dumps(data, indent=2))
+          print(json.dumps(data, indent=2))
+          PY
+      - name: Preserve timing analysis
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: blackstory-vocal-analysis
+          path: output/
+          retention-days: 14
+          if-no-files-found: warn
