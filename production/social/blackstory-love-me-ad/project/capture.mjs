@@ -42,7 +42,13 @@ const SURFACE_DIR = {
 };
 const OUT = path.resolve('../captures');
 const manifestPath = path.join(OUT, 'manifest.json');
-const manifest = fs.existsSync(manifestPath) ? JSON.parse(fs.readFileSync(manifestPath)) : {};
+// Read directly and fall back on ENOENT: an exists-then-read check can race.
+let manifest = {};
+try {
+  manifest = JSON.parse(fs.readFileSync(manifestPath));
+} catch (e) {
+  if (e.code !== 'ENOENT') throw e;
+}
 
 console.error(
   `capturing ${list.length} shot(s), ${list.reduce((a, s) => a + s.frames + 2 * (s.handle ?? 12), 0)} frames\n`,
