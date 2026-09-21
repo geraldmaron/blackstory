@@ -7,7 +7,8 @@
  * MOBILE FIRST. Any multi-column rule here has to sit inside a `min-width` query.
  *
  * THE PILLARS ARE KIT FACTS. The refusals stay a hairline list: these are limits, and giving
- * them card weight would present them as features.
+ * them card weight would present them as features. The list takes the kit's centered measure
+ * (`ds-room-measure` in the markup), so its width is not set here.
  */
 
 .ds-about-page__refusals {
@@ -19,7 +20,6 @@
 .ds-about-page__refusal {
   padding-block: var(--ds-space-4);
   border-top: var(--ds-border-width) solid var(--ds-rule);
-  max-width: 62ch;
   font-family: var(--ds-font-editorial);
   font-size: var(--ds-text-body-sm);
   line-height: 1.6;

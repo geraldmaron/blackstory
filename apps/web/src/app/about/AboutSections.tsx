@@ -165,7 +165,7 @@ export function AboutSections() {
         title="What it will not do"
         tone={roomSectionTone(4)}
       >
-        <ul className="ds-about-page__refusals">
+        <ul className="ds-about-page__refusals ds-room-measure">
           {ABOUT_REFUSALS.map((refusal) => (
             <li key={refusal.slice(0, 40)} className="ds-about-page__refusal">
               {refusal}

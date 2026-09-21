@@ -2295,22 +2295,60 @@ a.ds-room-chip {
    for the same reason a long input is hard to scan. Grids, tables, figures and the find bar use
    the whole frame. */
 .ds-room--ledger {
-  /* In `ch`, so the measure follows the face and size of the text it holds: a 15px sans block and
-     a 17px serif block both land near 70 characters, which a rem width could not do. */
-  --room-measure: 62ch;
-  --room-form-measure: 36rem;
+  /* In `rem`, not `ch`. The measure is centered in the frame, so every block that takes it has to
+     be the same width or each one centers on its own left edge: at `62ch` a 17px serif paragraph
+     was 588px and the 15px fact list under it 658px. 37rem is the serif paragraph's old width,
+     about 75 characters a line. */
+  --room-measure: 37rem;
+  --room-form-measure: var(--room-measure);
 }
 
+/* Centered in the frame, not pinned to its left edge. Pinned, a 588px column in an 852px frame
+   left 264px of empty ground on the right of every chapter band and none on the left, so the band
+   read as half filled. `width: 100%` keeps a short block at the full measure inside a flex parent,
+   where auto margins would otherwise shrink it to its text and move its left edge. */
 .ds-room--ledger .ds-room-prose,
 .ds-room--ledger .ds-room-section__body > p,
 .ds-room--ledger .ds-room-facts,
+.ds-room--ledger .ds-room-measure,
 .ds-room--ledger .ds-room-offramp p {
+  width: 100%;
   max-width: var(--room-measure);
+  margin-inline: auto;
 }
 
 .ds-room--ledger form:not([role='search']),
 .ds-room--ledger .ds-notice {
   max-width: var(--room-form-measure);
+}
+
+/* Only a form or notice that is a block of the chapter is centered. /records' facet menu is a flex
+   row of one-button forms, and a full-width centered form there would be a broken menu. */
+.ds-room--ledger
+  :is(.ds-room-section__body, .ds-room__doc)
+  > :is(form:not([role='search']), .ds-notice) {
+  width: 100%;
+  margin-inline: auto;
+}
+
+/* A chapter that opens on running text puts its heading on the same centered column, so plate,
+   heading and first line share one left edge. A chapter that opens on a grid, a table or the find
+   bar keeps its heading on the frame's edge, which is where that content starts. */
+.ds-room--ledger
+  .ds-room-section:has(
+    > .ds-room-section__body
+      > :is(
+        .ds-room-prose,
+        p,
+        .ds-room-facts,
+        .ds-room-measure,
+        .ds-notice,
+        form:not([role='search'])
+      ):first-child
+  )
+  > .ds-room-section__head {
+  max-width: var(--room-measure);
+  margin-inline: auto;
 }
 
 /* One left edge, and it is the centered one. The kit centers a railed room's column-plus-rail
@@ -2507,12 +2545,57 @@ a.ds-room-chip {
   padding-block: var(--ds-space-3);
 }
 
-/* One row at every width. Nine pills wrapped to three sticky rows and ate a sixth of the screen. */
+/* One row at every width. Nine pills wrapped to three sticky rows and ate a sixth of the screen.
+   The row is centered when it fits (`safe` falls back to the start edge when it does not, so the
+   first pill is never pushed out of reach). When it does not fit, RoomJump marks which side has
+   more and that side fades: /about's seven pills ran 1120px in an 852px strip and the fifth was
+   cut through its label with nothing to say the row scrolls. */
 .ds-room--ledger .ds-room-jump__list {
   gap: var(--ds-space-2);
   flex-wrap: nowrap;
+  justify-content: safe center;
   overflow-x: auto;
   scrollbar-width: none;
+  scroll-padding-inline: var(--ds-space-8);
+}
+
+.ds-room--ledger .ds-room-jump__list[data-more='end'] {
+  -webkit-mask-image: linear-gradient(to right, #000 calc(100% - 3.5rem), transparent);
+  mask-image: linear-gradient(to right, #000 calc(100% - 3.5rem), transparent);
+}
+
+.ds-room--ledger .ds-room-jump__list[data-more='start'] {
+  -webkit-mask-image: linear-gradient(to left, #000 calc(100% - 3.5rem), transparent);
+  mask-image: linear-gradient(to left, #000 calc(100% - 3.5rem), transparent);
+}
+
+.ds-room--ledger .ds-room-jump__list[data-more='both'] {
+  -webkit-mask-image: linear-gradient(
+    to right,
+    transparent,
+    #000 3.5rem,
+    #000 calc(100% - 3.5rem),
+    transparent
+  );
+  mask-image: linear-gradient(
+    to right,
+    transparent,
+    #000 3.5rem,
+    #000 calc(100% - 3.5rem),
+    transparent
+  );
+}
+
+/* Where the margins are empty, the row uses them before it scrolls. A railed room keeps the row
+   inside the frame: from 98rem its rail stands in that right margin. */
+@media (min-width: 68rem) {
+  .ds-room--ledger > .ds-room__body:not(.ds-room__body--railed) .ds-room-jump {
+    margin-inline: clamp(
+      -14rem,
+      calc(50% - 50vw + var(--ds-gutter)),
+      calc(var(--room-doc-pad, var(--ds-gutter)) * -1)
+    );
+  }
 }
 
 .ds-room--ledger .ds-room-jump__link {
@@ -2551,6 +2634,15 @@ a.ds-room-chip {
 
 .ds-room--ledger .ds-room-section--sunk {
   background: var(--ds-surface-sunken);
+}
+
+/* reading-room.css gives every `.ds-room-section` a gap and a top rule. It was written for the
+   /books detail page, where chapters sit back to back on the canvas and need one. After a band
+   the band's own bottom edge is already that divider, and the second rule drew 40px under it
+   with nothing in between. */
+.ds-room--ledger .ds-room-section--sunk + .ds-room-section:not(.ds-room-section--sunk) {
+  margin-top: 0;
+  border-top: 0;
 }
 
 .ds-room--ledger .ds-room-section__head {
