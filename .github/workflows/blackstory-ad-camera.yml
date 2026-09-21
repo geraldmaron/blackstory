@@ -1,0 +1,85 @@
+name: BlackStory ad native camera capture
+on:
+  push:
+    branches: [production/blackstory-love-me-ad-20260920]
+    paths: [.github/workflows/blackstory-ad-camera.yml]
+permissions:
+  contents: read
+jobs:
+  camera:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+      - name: Install capture tools
+        run: |
+          python3 -m venv /tmp/camera-tools
+          /tmp/camera-tools/bin/pip install playwright requests
+          /tmp/camera-tools/bin/python -m playwright install --with-deps chromium
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg xvfb
+      - name: Record live MapLibre camera motion without modifying product data
+        run: |
+          mkdir -p _ad_artifacts/scripts
+          /tmp/camera-tools/bin/python - <<'PY'
+          from pathlib import Path
+          import textwrap
+          src=Path('.github/scripts/blackstory-ad-capture.py').read_text()
+          start=src.index("        try:\n            await goto('/explore')")
+          end=src.index('        await browser.close()',start)
+          replacement='''
+          await goto('/explore')
+          await close_filters()
+          await settle(3)
+          found = await page.evaluate("""()=>{
+              const canvas=document.querySelector('canvas.maplibregl-canvas');
+              if(!canvas)throw new Error('Actual MapLibre canvas is absent');
+              const roots=[];
+              for(let el=canvas;el;el=el.parentElement){
+                  const k=Object.keys(el).find(k=>k.startsWith('__reactFiber$'));
+                  if(k){let f=el[k];for(let i=0;f&&i<30;i++,f=f.return){let s=f.memoizedState;for(let j=0;s&&j<80;j++,s=s.next){roots.push(s.memoizedState);}}}
+              }
+              const seen=new Set(),queue=roots.map(x=>[x,0]);let checks=0;
+              while(queue.length&&checks++<15000){const [o,d]=queue.shift();if(!o||(typeof o!=='object'&&typeof o!=='function')||seen.has(o))continue;seen.add(o);
+                  try{if(typeof o.flyTo==='function'&&typeof o.getCanvas==='function'&&o.getCanvas()===canvas){window.__adCaptureMap=o;return {found:true,center:o.getCenter().toArray(),zoom:o.getZoom(),canvas:[canvas.width,canvas.height]};}}catch(e){}
+                  if(d>=4||o instanceof Node)continue;
+                  for(const k of ['current','map','_map','value','state','memoizedState','next']){try{if(o[k])queue.push([o[k],d+1]);}catch(e){}}
+              }
+              throw new Error('No verified live MapLibre instance found; do not fabricate geographic footage');
+          }""")
+          dump(OUT/'provenance'/'camera-discovery.json',found)
+          async def camera_state():
+              return await page.evaluate('()=>({center:window.__adCaptureMap.getCenter().toArray(),zoom:window.__adCaptureMap.getZoom(),moving:window.__adCaptureMap.isMoving()})')
+          locations=[('boston',[-71.0586,42.3569]),('new-orleans',[-90.0722,29.9646]),('philadelphia',[-75.1514,39.9428])]
+          for name,center in locations:
+              await page.evaluate('()=>window.__adCaptureMap.jumpTo({center:[-97,38],zoom:3.6,bearing:0,pitch:0})')
+              await settle(4)
+              async def inward():
+                  await page.evaluate('(c)=>window.__adCaptureMap.flyTo({center:c,zoom:11.5,duration:6500,essential:true})',center)
+                  await asyncio.sleep(7)
+              await record('native-'+name+'-inward','map',inward,10)
+              dump(OUT/'provenance'/(name+'-inward-state.json'),await camera_state())
+              await settle(3)
+              async def outward():
+                  await page.evaluate('()=>window.__adCaptureMap.flyTo({center:[-97,38],zoom:3.6,duration:6500,essential:true})')
+                  await asyncio.sleep(7)
+              await record('native-'+name+'-outward','map',outward,10)
+              dump(OUT/'provenance'/(name+'-outward-state.json'),await camera_state())
+          '''
+          replacement=textwrap.indent(textwrap.dedent(replacement).lstrip('\n'),'        ')
+          src=src[:start]+replacement+src[end:]
+          compile(src,'native-camera-capture.py','exec')
+          Path('_ad_artifacts/scripts/native-camera-capture.py').write_text(src)
+          PY
+          /tmp/camera-tools/bin/python _ad_artifacts/scripts/native-camera-capture.py --mode capture
+          cp .github/workflows/blackstory-ad-camera.yml _ad_artifacts/scripts/camera-workflow.yml
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        if: always()
+        with:
+          name: blackstory-ad-native-camera
+          path: _ad_artifacts/
+          compression-level: 0
+          retention-days: 14
+          if-no-files-found: error
