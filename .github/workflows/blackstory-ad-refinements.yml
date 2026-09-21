@@ -8,7 +8,7 @@ permissions:
 jobs:
   refine:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 12
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
         with:
@@ -20,7 +20,7 @@ jobs:
           /tmp/refine-tools/bin/python -m playwright install --with-deps chromium
           sudo apt-get update -qq
           sudo apt-get install -y -qq ffmpeg xvfb
-      - name: Capture selected city views
+      - name: Capture selected city views in correct UI order
         run: |
           mkdir -p _ad_artifacts/scripts
           /tmp/refine-tools/bin/python - <<'PY'
@@ -37,29 +37,19 @@ jobs:
           for name,route in locations:
               try:
                   await goto(route)
-                  await close_filters()
-                  await settle(4)
+                  await settle(3)
                   dump(OUT/'inspection'/(name+'-controls.json'),await page.locator('button').evaluate_all('(a)=>a.map(x=>({text:x.innerText,label:x.getAttribute("aria-label"),title:x.title}))'))
                   await record('city-'+name+'-selected','map',hold,7)
-                  close = page.get_by_role('button',name=re.compile('close.*record|close.*detail|close.*sheet',re.I))
+                  close = page.get_by_role('button',name='Close record',exact=True)
                   if await close.count():
-                      await close.first.click()
+                      await close.first.click(timeout=5000)
                       await settle(2)
+                  await close_filters()
+                  await settle(2)
                   await record('city-'+name+'-outward','map',map_out,9)
               except Exception as exc:
                   report['errors'].append({'name':name,'error':traceback.format_exc()})
-          try:
-              await goto('/explore?lat=42.3569&lng=-71.0586&zoom=4.00')
-              await close_filters()
-              async def zoom_boston():
-                  await page.mouse.move(260,385)
-                  for i in range(5):
-                      await page.mouse.wheel(0,-650)
-                      await asyncio.sleep(1.5)
-                  await page.mouse.move(2,959)
-              await record('boston-geographic-descent','map',zoom_boston,12)
-          except Exception as exc:
-              report['errors'].append({'name':'boston-geographic-descent','error':traceback.format_exc()})
+                  await save_report()
           '''
           replacement=textwrap.indent(textwrap.dedent(replacement).lstrip('\n'),'        ')
           src=src[:start]+replacement+src[end:]
