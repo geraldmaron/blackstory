@@ -1,0 +1,85 @@
+# Final public-site flow pickup; no application changes or deployment.
+name: BlackStory Record Flow
+on:
+  push:
+    branches: [media/blackstory-love-me-20260920]
+    paths: [.github/workflows/blackstory-ad-record-flow.yml]
+permissions:
+  contents: read
+jobs:
+  flow:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - name: Install capture tools
+        run: |
+          python3 -m venv /tmp/flow-env
+          /tmp/flow-env/bin/pip -q install playwright==1.55.0 requests beautifulsoup4 pillow pyyaml
+          /tmp/flow-env/bin/python -m playwright install --with-deps chromium
+          sudo apt-get -qq install -y ffmpeg > /tmp/ffmpeg-install.log
+      - name: Capture one authentic record journey
+        run: |
+          mkdir -p output/project output/review output/assets output/captures
+          cat > output/project/record_flow.py <<'PY'
+          import asyncio,importlib.util,json,os,pathlib,subprocess,traceback
+          import requests,yaml
+          from playwright.async_api import async_playwright
+          ROOT=pathlib.Path('output')
+          r=requests.get('https://raw.githubusercontent.com/geraldmaron/blackstory/2a3b01c0a156662d65a1dff7200f90883e1a751d/.github/workflows/blackstory-ad-capture.yml',timeout=25);r.raise_for_status()
+          w=yaml.safe_load(r.text);s=next(s for s in w['jobs']['capture']['steps'] if s['name']=='Write and run capture source')
+          path=ROOT/'project'/'capture-base.py';path.write_text(s['run'].split("<<'PY'\n",1)[1].split('\nPY\n',1)[0])
+          spec=importlib.util.spec_from_file_location('base',path);c=importlib.util.module_from_spec(spec);spec.loader.exec_module(c)
+          c.manifest['capture_pass']='coherent-savannah-record-flow'
+          async def main():
+              x=subprocess.Popen(['Xvfb',':99','-screen','0','1080x2200x24','-ac','-nolisten','tcp'],stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL)
+              await asyncio.sleep(.6)
+              try:
+                  async with async_playwright() as p:
+                      b=await p.chromium.launch(headless=False,env={**os.environ,'DISPLAY':':99'},args=['--disable-dev-shm-usage','--window-position=0,0','--window-size=540,1047','--force-device-scale-factor=2','--enable-webgl','--use-gl=angle','--use-angle=swiftshader','--enable-unsafe-swiftshader'])
+                      ctx=await b.new_context(no_viewport=True,color_scheme='dark',reduced_motion='no-preference');page=await ctx.new_page()
+                      await page.goto(c.SITE+'/explore?lat=32.0814&lng=-81.0963&zoom=14.00',wait_until='domcontentloaded',timeout=45000)
+                      await c.wait_ready(page)
+                      hide=page.get_by_role('button',name='Hide filters')
+                      if await hide.count():await hide.click();await page.wait_for_timeout(1000)
+                      assert await page.evaluate(c.MAP_DISCOVERY),'Native map unavailable'
+                      await page.evaluate('()=>{window.__bsCaptureMap.jumpTo({center:[-81.0963,32.0814],zoom:14});return true}')
+                      try:await page.wait_for_function('()=>window.__bsCaptureMap.areTilesLoaded()',timeout=20000)
+                      except Exception:await page.wait_for_timeout(4000)
+                      await page.wait_for_timeout(1500)
+                      async def drift():
+                          await page.evaluate('()=>{window.__bsCaptureMap.easeTo({center:[-81.0953,32.0817],zoom:14,duration:5000,essential:true});return true}')
+                          await page.wait_for_timeout(5200)
+                      await c.record(page,'33-savannah-drift','map',drift)
+                      async def select():
+                          point=await page.evaluate('''()=>{const m=window.__bsCaptureMap;const f=m.queryRenderedFeatures().find(f=>f.geometry?.type==='Point'&&f.properties?.entityId==='ent_first_african_baptist_savannah_001');return f?{xy:m.project(f.geometry.coordinates),properties:f.properties}:null}''')
+                          if not point:raise RuntimeError('Published church pin not found; refusing to simulate selection')
+                          c.manifest['selected_record']=point['properties']
+                          await page.mouse.click(point['xy']['x'],point['xy']['y']);await page.mouse.move(539,959);await page.wait_for_timeout(4500)
+                      await c.record(page,'32-savannah-pin-reveal','map',select)
+                      link=page.get_by_role('link',name='Open record',exact=True)
+                      if not await link.count():link=page.locator('a[href*="/place/first-african-baptist-church"]').first
+                      await link.click();await c.wait_ready(page)
+                      async def record():
+                          await page.wait_for_timeout(1200);await c.smooth_scroll(page,450,6)
+                      await c.record(page,'34-savannah-record','entities',record)
+                      font=await page.evaluate('getComputedStyle(document.body).fontFamily')
+                      await page.evaluate('''(font)=>{document.body.innerHTML='';document.documentElement.style.setProperty('background','transparent','important');document.body.style.cssText='margin:0;background:transparent!important;overflow:hidden';const t=document.createElement('div');t.textContent='Look closer.';t.style.cssText='position:fixed;left:44px;top:638px;color:#F4EFE5;font-size:32px;line-height:1.1;letter-spacing:-1px;font-weight:600';t.style.fontFamily=font;document.body.append(t)}''',font)
+                      await page.evaluate('document.fonts.ready');await page.wait_for_timeout(500)
+                      await page.screenshot(path=str(ROOT/'assets'/'opening-hook.png'),omit_background=True)
+                      (ROOT/'assets'/'hook-provenance.json').write_text(json.dumps({'font_family_from_live_site':font,'copy':'Look closer.','font_files_exported':False},indent=2))
+                      await b.close()
+              finally:x.terminate()
+          try:asyncio.run(main())
+          except Exception as exc:c.manifest['errors'].append({'stage':'fatal','error':str(exc),'trace':traceback.format_exc()})
+          c.save();print(json.dumps(c.manifest,indent=2))
+          PY
+          /tmp/flow-env/bin/python output/project/record_flow.py
+      - name: Preserve actual native record flow
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: blackstory-ad-record-flow
+          path: output/
+          compression-level: 0
+          retention-days: 7
+          if-no-files-found: error
