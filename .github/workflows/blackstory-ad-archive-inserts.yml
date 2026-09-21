@@ -1,0 +1,85 @@
+# Public-site archival inserts and a raster endcard. Font files are not exported.
+name: BlackStory Archive Inserts
+on:
+  push:
+    branches: [media/blackstory-love-me-20260920]
+    paths: [.github/workflows/blackstory-ad-archive-inserts.yml]
+permissions:
+  contents: read
+jobs:
+  archive:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - name: Install capture tools
+        run: |
+          python3 -m venv /tmp/archive-env
+          /tmp/archive-env/bin/pip -q install playwright==1.55.0 requests beautifulsoup4 pillow pyyaml
+          /tmp/archive-env/bin/python -m playwright install --with-deps chromium
+          sudo apt-get -qq install -y ffmpeg > /tmp/ffmpeg-install.log
+      - name: Record actual story imagery and brand endcard
+        run: |
+          mkdir -p output/project output/review output/assets output/captures
+          cat > output/project/archive_inserts.py <<'PY'
+          import asyncio,base64,importlib.util,io,json,os,pathlib,subprocess,traceback
+          import requests,yaml
+          from PIL import Image
+          from playwright.async_api import async_playwright
+          ROOT=pathlib.Path('output')
+          url='https://raw.githubusercontent.com/geraldmaron/blackstory/2a3b01c0a156662d65a1dff7200f90883e1a751d/.github/workflows/blackstory-ad-capture.yml'
+          r=requests.get(url,timeout=25);r.raise_for_status()
+          w=yaml.safe_load(r.text)
+          s=next(s for s in w['jobs']['capture']['steps'] if s['name']=='Write and run capture source')
+          code=s['run'].split("<<'PY'\n",1)[1].split('\nPY\n',1)[0]
+          path=ROOT/'project'/'capture-base.py';path.write_text(code)
+          spec=importlib.util.spec_from_file_location('base',path);c=importlib.util.module_from_spec(spec);spec.loader.exec_module(c)
+          c.manifest['capture_pass']='archival-images-and-native-font-endcard'
+          async def main():
+              x=subprocess.Popen(['Xvfb',':99','-screen','0','1080x2200x24','-ac','-nolisten','tcp'],stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL)
+              await asyncio.sleep(.6)
+              try:
+                  async with async_playwright() as p:
+                      b=await p.chromium.launch(headless=False,env={**os.environ,'DISPLAY':':99'},args=['--disable-dev-shm-usage','--window-position=0,0','--window-size=540,1047','--force-device-scale-factor=2'])
+                      ctx=await b.new_context(no_viewport=True,color_scheme='dark',reduced_motion='no-preference')
+                      page=await ctx.new_page()
+                      await page.goto(c.SITE+'/stories/the-count',wait_until='domcontentloaded',timeout=45000)
+                      await c.wait_ready(page)
+                      for name,match in [('30-constitution-native','Constitution_of_the_United_States'),('31-dred-scott-native','Dred_Scott')]:
+                          try:
+                              selector='img[src*="'+match+'"]'
+                              image=page.locator(selector).first
+                              await image.scroll_into_view_if_needed()
+                              await page.wait_for_function('(sel)=>{const i=document.querySelector(sel);return i&&i.complete&&i.naturalWidth>500}',arg=selector,timeout=20000)
+                              await page.evaluate('(sel)=>{const i=document.querySelector(sel);scrollTo(0,scrollY+i.getBoundingClientRect().top-140)}',selector)
+                              await page.wait_for_timeout(1000)
+                              async def move():await c.smooth_scroll(page,105,8)
+                              await c.record(page,name,'stories',move)
+                          except Exception as exc:c.manifest['errors'].append({'stage':name,'error':str(exc)});c.save()
+                      font=await page.evaluate('getComputedStyle(document.body).fontFamily')
+                      logo=requests.get(c.SITE+'/brand/lockup-dark.png',timeout=20);logo.raise_for_status()
+                      im=Image.open(io.BytesIO(logo.content)).convert('RGBA')
+                      box=im.getbbox();margin=45
+                      im=im.crop((max(0,box[0]-margin),max(0,box[1]-margin),min(im.width,box[2]+margin),min(im.height,box[3]+margin)))
+                      buffer=io.BytesIO();im.save(buffer,format='PNG')
+                      uri='data:image/png;base64,'+base64.b64encode(buffer.getvalue()).decode()
+                      await page.evaluate('''({font,uri})=>{document.body.innerHTML='';document.body.style.margin='0';document.body.style.overflow='hidden';const s=document.createElement('div');s.style.cssText='position:fixed;inset:0;background:#0A0A0A;color:#F4EFE5;z-index:2147483647';s.innerHTML='<div style="position:absolute;left:45px;top:349px;width:405px"><img alt="BlackStory" style="display:block;width:405px;height:auto" src="'+uri+'"></div><div style="position:absolute;left:28px;top:510px;width:440px;text-align:center;font-size:25px;font-weight:400;letter-spacing:-.55px">History, pinned to place.</div><div style="position:absolute;left:28px;top:572px;width:440px;text-align:center;font-size:20px;font-weight:500;letter-spacing:.2px;color:#D07A32">blackstory.app</div>';s.style.fontFamily=font;document.body.append(s)}''',{'font':font,'uri':uri})
+                      await page.evaluate('document.fonts.ready')
+                      await page.wait_for_timeout(800)
+                      await page.screenshot(path=str(ROOT/'assets'/'brand-endcard.png'))
+                      (ROOT/'assets'/'endcard-provenance.json').write_text(json.dumps({'font_family_from_live_site':font,'logo_source':c.SITE+'/brand/lockup-dark.png','size':[1080,1920],'font_files_exported':False},indent=2))
+                      await b.close()
+              finally:x.terminate()
+          try:asyncio.run(main())
+          except Exception as exc:c.manifest['errors'].append({'stage':'fatal','error':str(exc),'trace':traceback.format_exc()})
+          c.save();print(json.dumps(c.manifest,indent=2))
+          PY
+          /tmp/archive-env/bin/python output/project/archive_inserts.py
+      - name: Preserve native archival footage and endcard
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: blackstory-ad-archive-inserts
+          path: output/
+          compression-level: 0
+          retention-days: 7
+          if-no-files-found: error
