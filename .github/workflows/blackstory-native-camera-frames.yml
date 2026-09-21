@@ -1,0 +1,37 @@
+name: BlackStory Native Camera Frames
+on:
+  push:
+    branches: [media/blackstory-love-me-20260920]
+    paths: [.github/workflows/blackstory-native-camera-frames.yml]
+permissions:
+  contents: read
+jobs:
+  capture:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    strategy:
+      fail-fast: false
+      matrix:
+        shot: [lillie-discovery, harlem-drift, return-national]
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+          sparse-checkout: tools/media
+      - name: Install capture tools
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+          python3 -m venv /tmp/native-frames
+          /tmp/native-frames/bin/pip -q install playwright==1.55.0
+          /tmp/native-frames/bin/python -m playwright install --with-deps chromium
+      - name: Capture consecutive actual browser frames
+        run: /tmp/native-frames/bin/python tools/media/capture_map_frames.py --shot '${{ matrix.shot }}'
+      - name: Preserve native motion and reproducible source
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: blackstory-native-${{ matrix.shot }}
+          path: output/
+          retention-days: 7
+          compression-level: 0
