@@ -1,0 +1,93 @@
+name: BlackStory ad capture refinements
+on:
+  push:
+    branches: [production/blackstory-love-me-ad-20260920]
+    paths: [.github/workflows/blackstory-ad-refinements.yml]
+permissions:
+  contents: read
+jobs:
+  refine:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+      - name: Install capture tools
+        run: |
+          python3 -m venv /tmp/refine-tools
+          /tmp/refine-tools/bin/pip install playwright requests pillow
+          /tmp/refine-tools/bin/python -m playwright install --with-deps chromium
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg xvfb
+      - name: Capture actual selected place views and linked original images
+        run: |
+          mkdir -p _ad_artifacts/scripts
+          /tmp/refine-tools/bin/python - <<'PY'
+          from pathlib import Path
+          import json, hashlib
+          import requests
+          from PIL import Image
+          src=Path('.github/scripts/blackstory-ad-capture.py').read_text()
+          start=src.index("        try:\n            await goto('/explore')")
+          end=src.index('        await browser.close()',start)
+          replacement='''        locations = [
+              ('boston', '/explore?lat=42.3569&lng=-71.0586&zoom=11.00&selected=ent_phillis_wheatley_001'),
+              ('new-orleans', '/explore?lat=29.9646&lng=-90.0722&zoom=11.00&selected=ent_treme_001'),
+              ('philadelphia', '/explore?lat=39.9428&lng=-75.1514&zoom=11.00&selected=ent_mother_bethel_ame_001')]
+          for name,route in locations:
+              try:
+                  await goto(route)
+                  await close_filters()
+                  await settle(5)
+                  dump(OUT/'inspection'/(name+'-controls.json'),await page.locator('button').evaluate_all('(a)=>a.map(x=>({text:x.innerText,label:x.getAttribute("aria-label"),title:x.title}))'))
+                  await record('city-'+name+'-selected','map',hold,7)
+                  close = page.get_by_role('button',name=re.compile('close.*record|close.*detail|close.*sheet',re.I))
+                  if await close.count():
+                      await close.first.click()
+                      await settle(2)
+                  await record('city-'+name+'-outward','map',map_out,9)
+              except Exception as exc:
+                  report['errors'].append({'name':name,'error':traceback.format_exc()})
+          try:
+              await goto('/explore?lat=42.3569&lng=-71.0586&zoom=4.00')
+              await close_filters()
+              async def zoom_boston():
+                  await page.mouse.move(260,385)
+                  for i in range(5):
+                      await page.mouse.wheel(0,-650)
+                      await asyncio.sleep(1.5)
+                  await page.mouse.move(2,959)
+              await record('boston-geographic-descent','map',zoom_boston,12)
+          except Exception as exc:
+              report['errors'].append({'name':'boston-geographic-descent','error':traceback.format_exc()})
+          '''
+          src=src[:start]+replacement+src[end:]
+          Path('_ad_artifacts/scripts/refinement-capture.py').write_text(src)
+          media=[
+            ('phillis-wheatley','https://blackstory.app/entity/ent_phillis_wheatley_001','https://storage.googleapis.com/black-book-efaaf-public-media/public/entities/ent_phillis_wheatley_001/primary.jpg'),
+            ('harriet-jacobs','https://blackstory.app/entity/ent_harriet_jacobs_001','https://storage.googleapis.com/black-book-efaaf-public-media/public/entities/ent_harriet_jacobs_001/primary.jpg'),
+            ('treme','https://blackstory.app/place/treme','https://storage.googleapis.com/black-book-efaaf-public-media/public/entities/ent_treme_001/primary.jpg')]
+          dest=Path('_ad_artifacts/assets/history');dest.mkdir(parents=True,exist_ok=True)
+          manifest=[]
+          for name,record,url in media:
+              row={'name':name,'record_url':record,'media_url':url}
+              try:
+                  r=requests.get(url,timeout=30);r.raise_for_status()
+                  path=dest/(name+'.jpg');path.write_bytes(r.content)
+                  with Image.open(path) as im:row['dimensions']=list(im.size)
+                  row['sha256']=hashlib.sha256(r.content).hexdigest();row['file']=str(path)
+              except Exception as exc:row['error']=str(exc)
+              manifest.append(row)
+          (dest/'manifest.json').write_text(json.dumps(manifest,indent=2))
+          PY
+          /tmp/refine-tools/bin/python _ad_artifacts/scripts/refinement-capture.py --mode capture
+          cp .github/workflows/blackstory-ad-refinements.yml _ad_artifacts/scripts/refinement-workflow.yml
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        if: always()
+        with:
+          name: blackstory-ad-refinements
+          path: _ad_artifacts/
+          compression-level: 0
+          retention-days: 14
+          if-no-files-found: error
