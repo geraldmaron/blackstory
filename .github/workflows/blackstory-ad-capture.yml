@@ -1,81 +1,243 @@
-# Isolated media-production workflow. Public GETs only; no app deployment or secrets.
+# Media branch only. Public reads, local recordings, artifact output. No deployment.
 name: BlackStory Ad Capture
 on:
   push:
     branches: [media/blackstory-love-me-20260920]
-    paths: [.github/workflows/blackstory-ad-capture.yml, media/blackstory-love-me/**]
+    paths: [.github/workflows/blackstory-ad-capture.yml]
 permissions:
   contents: read
 concurrency:
   group: blackstory-ad-capture-20260920
   cancel-in-progress: true
 jobs:
-  inspect:
+  capture:
     runs-on: ubuntu-24.04
-    timeout-minutes: 12
+    timeout-minutes: 20
     steps:
-      - name: Install isolated capture dependencies
+      - name: Install isolated tools
         run: |
           python3 -m venv /tmp/blackstory-media-env
-          /tmp/blackstory-media-env/bin/pip -q install playwright==1.55.0 yt-dlp requests
+          /tmp/blackstory-media-env/bin/pip -q install playwright==1.55.0 'yt-dlp[default,curl-cffi]' requests beautifulsoup4 pillow
           /tmp/blackstory-media-env/bin/python -m playwright install --with-deps chromium
-      - name: Inspect public product and exact reference
+          sudo apt-get -qq install -y ffmpeg > /tmp/ffmpeg-install.log
+      - name: Write and run capture source
         run: |
-          mkdir -p output
-          /tmp/blackstory-media-env/bin/python - <<'PY'
-          import asyncio, json, pathlib, subprocess
+          mkdir -p output/project output/reference output/assets output/review output/captures
+          cat > output/project/capture.py <<'PY'
+          from __future__ import annotations
+          import asyncio, json, os, pathlib, re, signal, subprocess, time, traceback
+          import requests
+          from bs4 import BeautifulSoup
           from playwright.async_api import async_playwright
-          out = pathlib.Path('output')
-          reference = 'https://www.tiktok.com/@ambnt.prod/video/7670347350115634462'
-          report = {'reference_url': reference, 'routes': [], 'reference_status': 'unverified'}
-          try:
-              proc = subprocess.run(['/tmp/blackstory-media-env/bin/yt-dlp', '--skip-download', '--dump-single-json', '--no-playlist', '--socket-timeout', '15', '--retries', '1', reference], capture_output=True, text=True, timeout=90)
-              (out / 'reference-retrieval.log').write_text(proc.stderr)
-              if proc.returncode == 0:
-                  info = json.loads(proc.stdout)
-                  report['reference_status'] = 'metadata_retrieved' if str(info.get('id')) == '7670347350115634462' else 'id_mismatch'
-                  report['reference'] = {k: info.get(k) for k in ['id', 'title', 'duration', 'fps', 'uploader', 'uploader_id', 'webpage_url', 'timestamp', 'track', 'artist']}
-                  (out / 'reference-metadata.json').write_text(json.dumps(info, indent=2))
-          except Exception as exc:
-              report['reference_error'] = str(exc)
-          async def inspect():
-              async with async_playwright() as p:
-                  browser = await p.chromium.launch(args=['--disable-dev-shm-usage', '--enable-webgl', '--use-gl=angle', '--use-angle=swiftshader'])
-                  context = await browser.new_context(viewport={'width': 540, 'height': 960}, device_scale_factor=2, color_scheme='dark', reduced_motion='no-preference')
-                  page = await context.new_page()
-                  for path in ['/', '/explore', '/stories', '/lives', '/data', '/records', '/rooms', '/memorial']:
-                      label = path.strip('/') or 'home'
-                      item = {'path': path}
-                      try:
-                          response = await page.goto('https://blackstory.app' + path, wait_until='domcontentloaded', timeout=45000)
-                          await page.wait_for_timeout(6500)
-                          await page.evaluate('document.fonts.ready')
-                          item.update({'status': response.status if response else None, 'url': page.url, 'title': await page.title(), 'body': (await page.locator('body').inner_text())[:45000], 'links': await page.locator('a[href]').evaluate_all('(els) => els.map(e => ({text:e.innerText, href:e.getAttribute("href")}))'), 'buttons': await page.locator('button').evaluate_all('(els) => els.map(e => ({text:e.innerText, label:e.getAttribute("aria-label"), testid:e.getAttribute("data-testid")}))')})
-                          await page.screenshot(path=str(out / (label + '.png')))
-                          (out / (label + '.html')).write_text(await page.content())
-                      except Exception as exc:
-                          item['error'] = str(exc)
-                      report['routes'].append(item)
-                      (out / 'inspection.json').write_text(json.dumps(report, indent=2))
+          ROOT = pathlib.Path('output')
+          SITE = 'https://blackstory.app'
+          VIDEO_ID = '7670347350115634462'
+          REFERENCE = 'https://www.tiktok.com/@ambnt.prod/video/' + VIDEO_ID
+          manifest = {'site': SITE, 'reference_url': REFERENCE, 'reference_status': 'unverified', 'clips': [], 'errors': [], 'capture_fps': 60, 'capture_size': [1080, 1920]}
+          def save():
+              (ROOT / 'manifest.json').write_text(json.dumps(manifest, indent=2))
+          def probe(path):
+              r = subprocess.run(['ffprobe','-v','error','-show_format','-show_streams','-of','json',str(path)],capture_output=True,text=True,timeout=20)
+              return json.loads(r.stdout) if r.returncode == 0 else {}
+          def acquire():
+              target = ROOT / 'reference' / 'reference.%(ext)s'
+              command = ['/tmp/blackstory-media-env/bin/yt-dlp','--no-playlist','--write-info-json','--impersonate','chrome','--socket-timeout','15','--retries','1','--format','bestvideo*+bestaudio/best','--merge-output-format','mp4','-o',str(target),REFERENCE]
+              try:
+                  run = subprocess.run(command,capture_output=True,text=True,timeout=100)
+                  (ROOT/'reference'/'retrieval.log').write_text(run.stdout+'\n'+run.stderr)
+                  meta = ROOT/'reference'/'reference.info.json'
+                  if meta.exists():
+                      info=json.loads(meta.read_text())
+                      manifest['reference_metadata']={k:info.get(k) for k in ['id','title','duration','uploader','uploader_id','webpage_url','fps']}
+                      if str(info.get('id')) == VIDEO_ID:
+                          for file in (ROOT/'reference').glob('reference.*'):
+                              if file.suffix in ['.mp4','.webm','.mkv']:
+                                  detail=probe(file)
+                                  if any(s.get('codec_type')=='audio' for s in detail.get('streams',[])):
+                                      manifest['reference_status']='exact_post_media_retrieved'
+                                      manifest['reference_file']=str(file.relative_to(ROOT))
+                                      manifest['reference_probe']=detail
+                                      return
+              except Exception as exc:
+                  manifest['errors'].append({'stage':'reference-ytdlp','error':str(exc)})
+              # Only official TikTok page/player/embed data are used in this fallback.
+              from curl_cffi import requests as cr
+              seen=set()
+              for index,url in enumerate([REFERENCE,'https://www.tiktok.com/player/v1/'+VIDEO_ID,'https://www.tiktok.com/embed/v2/'+VIDEO_ID]):
                   try:
-                      await page.goto(reference, wait_until='domcontentloaded', timeout=30000)
-                      await page.wait_for_timeout(5000)
-                      report['reference_page'] = {'url': page.url, 'title': await page.title(), 'body': (await page.locator('body').inner_text())[:12000], 'videos': await page.locator('video').evaluate_all('(els) => els.map(e => ({src:e.currentSrc,duration:e.duration,readyState:e.readyState}))')}
-                      await page.screenshot(path=str(out / 'reference-page.png'))
+                      response=cr.get(url,impersonate='chrome',timeout=20)
+                      (ROOT/'reference'/f'official-{index}.html').write_text(response.text)
+                      soup=BeautifulSoup(response.text,'html.parser')
+                      for script in soup.find_all('script'):
+                          try: data=json.loads(script.string or script.get_text())
+                          except Exception: continue
+                          stack=[data]
+                          while stack:
+                              item=stack.pop()
+                              if isinstance(item,list): stack.extend(item); continue
+                              if not isinstance(item,dict): continue
+                              stack.extend(item.values())
+                              if str(item.get('id',item.get('itemId',''))) != VIDEO_ID or not isinstance(item.get('video'),dict): continue
+                              manifest['reference_metadata']={'id':VIDEO_ID,'description':item.get('desc'),'author':item.get('author'),'video':item['video']}
+                              (ROOT/'reference'/'verified-item.json').write_text(json.dumps(item,indent=2))
+                              video=item['video']; candidates=[]
+                              for key in ['playAddr','downloadAddr']:
+                                  value=video.get(key)
+                                  if isinstance(value,str): candidates.append(value)
+                                  elif isinstance(value,dict): candidates.extend(value.get('UrlList',value.get('urlList',[])))
+                              for bitrate in video.get('bitrateInfo',[]):
+                                  candidates.extend(bitrate.get('PlayAddr',{}).get('UrlList',[]))
+                              for candidate in candidates:
+                                  if not candidate.startswith('https://') or candidate in seen: continue
+                                  seen.add(candidate)
+                                  media=cr.get(candidate,impersonate='chrome',headers={'Referer':REFERENCE},timeout=25)
+                                  if media.status_code != 200 or len(media.content)<20000: continue
+                                  file=ROOT/'reference'/'reference.mp4';file.write_bytes(media.content)
+                                  detail=probe(file)
+                                  if any(s.get('codec_type')=='audio' for s in detail.get('streams',[])):
+                                      manifest['reference_status']='exact_post_media_retrieved'
+                                      manifest['reference_file']='reference/reference.mp4'
+                                      manifest['reference_probe']=detail
+                                      return
+                                  file.unlink(missing_ok=True)
                   except Exception as exc:
-                      report['reference_browser_error'] = str(exc)
-                  await browser.close()
-          asyncio.run(inspect())
-          (out / 'inspection.json').write_text(json.dumps(report, indent=2))
-          print(json.dumps({k: v for k,v in report.items() if k != 'routes'}, indent=2))
-          for route in report['routes']:
-              print(route['path'], route.get('status'), route.get('title'), route.get('error'), len(route.get('body', '')))
+                      manifest['errors'].append({'stage':'official-reference','url':url,'error':str(exc)})
+              save()
+          MAP_DISCOVERY = '''() => {
+            const canvas=document.querySelector('.maplibregl-canvas'); if(!canvas)return false;
+            const queue=[];let el=canvas;
+            while(el){for(const key of Object.keys(el)){if(key.startsWith('__reactFiber')){let f=el[key];for(let n=0;f&&n<24;n++,f=f.return){queue.push(f.memoizedState);queue.push(f.memoizedProps);}}}el=el.parentElement;}
+            const seen=new Set();let count=0;
+            while(queue.length&&count++<8000){const v=queue.shift();if(!v||typeof v!=='object'||seen.has(v)||v instanceof Element)continue;seen.add(v);
+              if(typeof v.flyTo==='function'&&typeof v.getCanvas==='function'&&v.getCanvas()===canvas){window.__bsCaptureMap=v;return true;}
+              for(const k of ['current','memoizedState','next','map','mapRef','value','ref']){try{if(v[k]&&typeof v[k]==='object')queue.push(v[k]);}catch(e){}}
+            }return false;
+          }'''
+          async def smooth_scroll(page,amount,seconds):
+              await page.evaluate('''({amount,seconds}) => new Promise(resolve=>{const start=scrollY,t0=performance.now();function frame(t){const u=Math.min(1,(t-t0)/(seconds*1000));const q=u*u*u*(u*(u*6-15)+10);scrollTo(0,start+amount*q);if(u<1)requestAnimationFrame(frame);else resolve();}requestAnimationFrame(frame);})''',{'amount':amount,'seconds':seconds})
+          async def wait_ready(page):
+              await page.evaluate('document.fonts.ready')
+              await page.wait_for_timeout(4500)
+              await page.add_style_tag(content='*{cursor:none!important;scrollbar-width:none!important}*::-webkit-scrollbar{display:none!important}input{caret-color:transparent!important}html{scroll-behavior:auto!important}')
+              await page.mouse.move(539,959)
+          async def inspect(page,label):
+              (ROOT/'review'/f'{label}.json').write_text(json.dumps({'url':page.url,'body':(await page.locator('body').inner_text())[:50000],'links':await page.locator('a[href]').evaluate_all('(els)=>els.map(e=>({text:e.innerText,href:e.getAttribute("href")}))'),'images':await page.locator('img').evaluate_all('(els)=>els.map(e=>({src:e.currentSrc,width:e.naturalWidth,height:e.naturalHeight,alt:e.alt}))')},indent=2))
+              await page.screenshot(path=str(ROOT/'review'/f'{label}.png'))
+          async def record(page,name,surface,action):
+              folder=ROOT/'captures'/surface;folder.mkdir(parents=True,exist_ok=True)
+              file=folder/(name+'.mp4')
+              metrics=await page.evaluate('({innerWidth,innerHeight,outerWidth,outerHeight,devicePixelRatio})')
+              y=int((metrics['outerHeight']-metrics['innerHeight'])*metrics['devicePixelRatio'])
+              if metrics['innerWidth']!=540 or metrics['innerHeight']!=960: raise RuntimeError('Unexpected capture viewport '+str(metrics))
+              log=open(ROOT/'review'/(name+'-capture.log'),'w')
+              command=['ffmpeg','-y','-hide_banner','-loglevel','warning','-thread_queue_size','1024','-f','x11grab','-draw_mouse','0','-framerate','60','-video_size','1080x1920','-i',f':99.0+0,{y}','-an','-c:v','libx264','-preset','ultrafast','-crf','17','-pix_fmt','yuv420p','-threads','2','-movflags','+faststart',str(file)]
+              proc=subprocess.Popen(command,stdin=subprocess.PIPE,stdout=log,stderr=log)
+              began=time.monotonic();error=None
+              try:
+                  await page.wait_for_timeout(650)
+                  await action()
+                  await page.wait_for_timeout(850)
+              except Exception as exc: error=str(exc)
+              finally:
+                  proc.communicate(input=b'q',timeout=30);log.close()
+              info=probe(file)
+              clip={'name':name,'surface':surface,'url':page.url,'file':str(file.relative_to(ROOT)),'duration':float(info.get('format',{}).get('duration',0)),'elapsed':time.monotonic()-began,'probe':info,'error':error}
+              manifest['clips'].append(clip);save();print('CAPTURE',name,clip['duration'],error,flush=True)
+              await inspect(page,name)
+          async def capture():
+              xvfb=subprocess.Popen(['Xvfb',':99','-screen','0','1080x2200x24','-ac','-nolisten','tcp'],stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL)
+              await asyncio.sleep(.6)
+              try:
+                  async with async_playwright() as p:
+                      browser=await p.chromium.launch(headless=False,env={**os.environ,'DISPLAY':':99'},args=['--disable-dev-shm-usage','--window-position=0,0','--window-size=540,1047','--force-device-scale-factor=2','--enable-webgl','--use-gl=angle','--use-angle=swiftshader','--enable-unsafe-swiftshader'])
+                      context=await browser.new_context(no_viewport=True,color_scheme='dark',reduced_motion='no-preference')
+                      page=await context.new_page()
+                      async def goto(path):
+                          response=await page.goto(SITE+path,wait_until='domcontentloaded',timeout=45000)
+                          if response and response.status>=400: raise RuntimeError(f'{path} HTTP {response.status}')
+                          await wait_ready(page)
+                      async def shot(name,surface,fn):
+                          try: await record(page,name,surface,fn)
+                          except Exception as exc: manifest['errors'].append({'stage':name,'error':str(exc)});save()
+                      await goto('/explore')
+                      hide=page.get_by_role('button',name='Hide filters')
+                      if await hide.count(): await hide.click();await page.wait_for_timeout(1200)
+                      mapped=await page.evaluate(MAP_DISCOVERY);manifest['native_map_api_found']=mapped
+                      async def fly(center,zoom,duration):
+                          if mapped:
+                              await page.evaluate('({center,zoom,duration})=>window.__bsCaptureMap.flyTo({center,zoom,duration:duration*1000,essential:true})',{'center':center,'zoom':zoom,'duration':duration})
+                              await page.wait_for_timeout(duration*1000+100)
+                          else:
+                              await page.mouse.move(340,450);await page.mouse.wheel(0,-400);await page.wait_for_timeout(duration*1000)
+                      if mapped:
+                          await page.evaluate('()=>window.__bsCaptureMap.jumpTo({center:[-97.8,38.5],zoom:3.3})');await page.wait_for_timeout(5000)
+                      async def national(): await fly([-95.2,38.5],3.35,8)
+                      await shot('01-national-drift','map',national)
+                      async def northeast(): await fly([-73.96,40.81],11.5,5.5);await page.wait_for_timeout(3500)
+                      await shot('02-national-to-new-york','map',northeast)
+                      async def city(): await fly([-73.949,40.805],12.4,7)
+                      await shot('03-new-york-detail','map',city)
+                      async def capital(): await fly([-77.0369,38.9072],11.8,6);await page.wait_for_timeout(3000)
+                      await shot('04-new-york-to-dc','map',capital)
+                      async def pin():
+                          if not mapped: await page.wait_for_timeout(6000);return
+                          features=await page.evaluate('''()=>{const m=window.__bsCaptureMap;return m.queryRenderedFeatures().filter(f=>f.geometry?.type==='Point'&&!f.properties?.cluster&&f.layer?.id?.toLowerCase().includes('point')).map(f=>({properties:f.properties,xy:m.project(f.geometry.coordinates)})).slice(0,30)}''')
+                          manifest['pin_candidates']=features
+                          good=[f for f in features if 100<f['xy']['x']<440 and 160<f['xy']['y']<800]
+                          if not good: good=features
+                          if good: await page.mouse.click(good[0]['xy']['x'],good[0]['xy']['y'])
+                          await page.mouse.move(539,959);await page.wait_for_timeout(6500)
+                      await shot('05-selected-pin','map',pin)
+                      for name,path,amount in [('06-first-african-baptist','/place/first-african-baptist-church',700),('07-benjamin-banneker','/people/benjamin-banneker',650),('08-school-record','/place/fellowship-rosenwald-school-teachers-home',750)]:
+                          try:
+                              await goto(path)
+                              async def move(a=amount): await smooth_scroll(page,a,8)
+                              await shot(name,'entities',move)
+                              if name=='06-first-african-baptist':
+                                  headings=page.get_by_role('heading').filter(has_text=re.compile('source|evidence',re.I))
+                                  if await headings.count(): await headings.first.scroll_into_view_if_needed();await page.wait_for_timeout(1200)
+                                  async def evidence(): await smooth_scroll(page,360,7)
+                                  await shot('09-evidence','evidence',evidence)
+                          except Exception as exc: manifest['errors'].append({'stage':name,'error':str(exc)});save()
+                      for name,path,start,amount,seconds,surface in [('10-records','/records',380,1000,8,'records'),('11-story','/stories/the-count',0,1050,11,'stories'),('12-lives','/lives',560,1250,11,'lives'),('13-data','/data',850,950,10,'data'),('14-memorial-wall','/memorial',0,0,13,'memorial'),('15-memorial-names','/memorial',0,200,10,'memorial')]:
+                          try:
+                              await goto(path)
+                              if name=='15-memorial-names':
+                                  await page.locator('#memorial-names').scroll_into_view_if_needed();await page.wait_for_timeout(1200)
+                              elif start: await page.evaluate('(y)=>scrollTo(0,y)',start);await page.wait_for_timeout(1200)
+                              async def move(a=amount,s=seconds):
+                                  if a: await smooth_scroll(page,a,s)
+                                  else: await page.wait_for_timeout(s*1000)
+                              await shot(name,surface,move)
+                          except Exception as exc: manifest['errors'].append({'stage':name,'error':str(exc)});save()
+                      await goto('/explore')
+                      hide=page.get_by_role('button',name='Hide filters')
+                      if await hide.count(): await hide.click();await page.wait_for_timeout(1000)
+                      mapped=await page.evaluate(MAP_DISCOVERY)
+                      if mapped:
+                          await page.evaluate('()=>window.__bsCaptureMap.jumpTo({center:[-84.388,33.749],zoom:11.5})');await page.wait_for_timeout(4000)
+                      async def return_map(): await fly([-97.8,38.5],3.3,9)
+                      await shot('16-return-to-national','map',return_map)
+                      await browser.close()
+              finally: xvfb.terminate()
+          if __name__=='__main__':
+              acquire();save()
+              for name in ['lockup-dark.png','lockup-light.png','symbol-dark.png','symbol-light.png']:
+                  try:
+                      response=requests.get(SITE+'/brand/'+name,timeout=20)
+                      if response.status_code==200 and response.headers.get('content-type','').startswith('image/'):(ROOT/'assets'/name).write_bytes(response.content)
+                  except Exception: pass
+              try: asyncio.run(capture())
+              except Exception as exc: manifest['errors'].append({'stage':'capture-fatal','error':str(exc),'trace':traceback.format_exc()})
+              save();print(json.dumps(manifest,indent=2))
           PY
-      - name: Preserve inspection artifacts
+          /tmp/blackstory-media-env/bin/python output/project/capture.py
+      - name: Preserve recordings and complete capture source
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
-          name: blackstory-ad-inspection
+          name: blackstory-ad-source-footage
           path: output/
+          compression-level: 0
           retention-days: 7
-          if-no-files-found: warn
+          if-no-files-found: error
