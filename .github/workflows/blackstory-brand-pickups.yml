@@ -1,0 +1,88 @@
+# Read-only product pickups; PNG end card contains rendered type, not font files.
+name: BlackStory Brand Pickups
+on:
+  push:
+    branches: [media/blackstory-love-me-20260920]
+    paths: [.github/workflows/blackstory-brand-pickups.yml]
+permissions:
+  contents: read
+jobs:
+  capture:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - name: Install capture dependencies
+        run: |
+          python3 -m venv /tmp/pickup-env
+          /tmp/pickup-env/bin/pip -q install playwright==1.55.0 pillow requests
+          /tmp/pickup-env/bin/python -m playwright install --with-deps chromium
+      - name: Capture official brand and additional real product footage
+        run: |
+          mkdir -p output/project output/captures output/review output/assets
+          cat > output/project/pickups.py <<'PY'
+          import asyncio, base64, io, json, pathlib, re, time
+          import requests
+          from PIL import Image
+          from playwright.async_api import async_playwright
+          ROOT=pathlib.Path('output')
+          async def main():
+              report={'takes':[],'errors':[],'capture_method':'Playwright native video, 25 fps; supplementary only. Main recordings use native physical-pixel 60 fps capture.'}
+              async with async_playwright() as p:
+                  browser=await p.chromium.launch(args=['--enable-webgl','--use-gl=angle','--use-angle=swiftshader','--enable-unsafe-swiftshader'])
+                  context=await browser.new_context(viewport={'width':540,'height':960},device_scale_factor=2,color_scheme='dark',record_video_dir=str(ROOT/'captures'),record_video_size={'width':1080,'height':1920})
+                  for name,path,start,amount in [('du-bois','/entity/ent_web_du_bois_001',0,820),('phillis-wheatley','/entity/ent_phillis_wheatley_001',0,950),('lives-exhibit','/lives',850,1000),('memorial-names','/memorial',0,260)]:
+                      page=await context.new_page();began=time.monotonic()
+                      try:
+                          await page.goto('https://blackstory.app'+path,wait_until='domcontentloaded',timeout=45000)
+                          await page.wait_for_timeout(5500);await page.evaluate('document.fonts.ready')
+                          await page.add_style_tag(content='*{cursor:none!important;scrollbar-width:none!important}::-webkit-scrollbar{display:none!important}html{scroll-behavior:auto!important}')
+                          if name=='memorial-names':
+                              link=page.get_by_role('link',name=re.compile('READ EVERY NAME',re.I))
+                              if await link.count():await link.click();await page.wait_for_timeout(2000)
+                          elif start:await page.evaluate('(y)=>scrollTo(0,y)',start)
+                          await page.wait_for_timeout(1000)
+                          in_time=time.monotonic()-began
+                          await page.wait_for_timeout(1000)
+                          await page.evaluate('''({amount})=>new Promise(resolve=>{const y=scrollY,t0=performance.now();function step(t){const u=Math.min(1,(t-t0)/8000);scrollTo(0,y+amount*(3*u*u-2*u*u*u));if(u<1)requestAnimationFrame(step);else resolve();}requestAnimationFrame(step);})''',{'amount':amount})
+                          await page.wait_for_timeout(1600)
+                          out_time=time.monotonic()-began
+                          await page.screenshot(path=str(ROOT/'review'/(name+'.png')))
+                          (ROOT/'review'/(name+'.json')).write_text(json.dumps({'url':page.url,'body':await page.locator('body').inner_text(),'images':await page.locator('img').evaluate_all('(xs)=>xs.map(x=>({src:x.currentSrc,alt:x.alt,w:x.naturalWidth,h:x.naturalHeight}))')},indent=2))
+                          report['takes'].append({'name':name,'source':str((await page.video.path()).relative_to(ROOT)),'in_seconds_estimated':in_time,'out_seconds_estimated':out_time,'url':page.url})
+                      except Exception as exc:report['errors'].append({'name':name,'error':str(exc)})
+                      await page.close()
+                  await context.close()
+                  context=await browser.new_context(viewport={'width':1080,'height':1920},device_scale_factor=1,color_scheme='dark')
+                  page=await context.new_page()
+                  await page.goto('https://blackstory.app/about',wait_until='domcontentloaded',timeout=45000)
+                  await page.wait_for_timeout(4000);await page.evaluate('document.fonts.ready')
+                  fonts=await page.evaluate('''()=>{const s=getComputedStyle(document.documentElement);return{body:getComputedStyle(document.body).fontFamily,newsreader:s.getPropertyValue('--font-newsreader'),geist:s.getPropertyValue('--font-geist-sans'),mono:s.getPropertyValue('--font-geist-mono')}}''')
+                  (ROOT/'assets'/'font-provenance.json').write_text(json.dumps(fonts,indent=2))
+                  r=requests.get('https://blackstory.app/brand/lockup-dark.png',timeout=25);r.raise_for_status()
+                  image=Image.open(io.BytesIO(r.content)).convert('RGBA');image=image.crop(image.getchannel('A').getbbox())
+                  image.save(ROOT/'assets'/'lockup-dark-trimmed.png')
+                  buf=io.BytesIO();image.save(buf,format='PNG');uri='data:image/png;base64,'+base64.b64encode(buf.getvalue()).decode()
+                  await page.evaluate('''({uri,fonts})=>{
+                    document.body.innerHTML='<main id="ad-endcard"><img id="official-lockup" alt="BlackStory"><p id="line">History, pinned to place.</p><p id="url">blackstory.app</p></main>';
+                    document.querySelector('#official-lockup').src=uri;
+                    const style=document.createElement('style');style.textContent='html,body{margin:0!important;width:1080px!important;height:1920px!important;overflow:hidden!important;background:#0A0A0A!important;color:#F4EFE5!important}body:before,body:after{display:none!important}#ad-endcard{position:absolute!important;left:96px;top:700px;width:792px;display:flex;flex-direction:column;align-items:center;text-align:center;background:none!important}#official-lockup{width:720px!important;max-width:none!important;height:auto!important;display:block}#line{margin:52px 0 0!important;font-size:44px!important;line-height:1.2!important;font-weight:400!important;letter-spacing:-0.3px!important}#url{margin:64px 0 0!important;font-size:30px!important;line-height:1.2!important;letter-spacing:1.4px!important;color:#D07A32!important}';document.head.append(style);
+                    document.querySelector('#line').style.fontFamily=fonts.newsreader||fonts.body;
+                    document.querySelector('#url').style.fontFamily=fonts.mono||fonts.body;
+                  }''',{'uri':uri,'fonts':fonts})
+                  await page.locator('#official-lockup').evaluate('(e)=>e.decode()');await page.evaluate('document.fonts.ready');await page.wait_for_timeout(500)
+                  await page.screenshot(path=str(ROOT/'assets'/'endcard-1080x1920.png'))
+                  (ROOT/'project'/'endcard.html').write_text(await page.content())
+                  await browser.close()
+              (ROOT/'pickup-report.json').write_text(json.dumps(report,indent=2));print(json.dumps(report,indent=2))
+          asyncio.run(main())
+          PY
+          /tmp/pickup-env/bin/python output/project/pickups.py
+      - name: Preserve pickup footage and rendered brand card
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: blackstory-brand-pickups
+          path: output/
+          compression-level: 0
+          retention-days: 14
+          if-no-files-found: warn
