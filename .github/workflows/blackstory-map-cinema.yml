@@ -1,0 +1,82 @@
+name: BlackStory Map Cinema
+on:
+  push:
+    branches: [media/blackstory-love-me-20260920]
+    paths: [.github/workflows/blackstory-map-cinema.yml]
+permissions:
+  contents: read
+jobs:
+  map:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          sparse-checkout: creative/blackstory-ad-20260920
+          persist-credentials: false
+      - name: Install isolated map capture tools
+        run: |
+          sudo apt-get -qq update
+          sudo apt-get -qq install -y ffmpeg
+          python3 -m venv /tmp/map-env
+          /tmp/map-env/bin/pip -q install playwright==1.55.0 Pillow
+          /tmp/map-env/bin/python -m playwright install --with-deps chromium
+      - name: Capture native geographic camera motion one fully rendered browser frame at a time
+        run: |
+          mkdir -p output/project output/captures/map-cinema output/review
+          cat > output/project/map_cinema.py <<'PY'
+          import asyncio, importlib.util, json, math, pathlib, subprocess
+          from playwright.async_api import async_playwright
+          spec=importlib.util.spec_from_file_location('capture',pathlib.Path('creative/blackstory-ad-20260920/capture.py'))
+          c=importlib.util.module_from_spec(spec);spec.loader.exec_module(c)
+          ROOT=pathlib.Path('output')
+          async def main():
+              report={'method':'Every video frame is a fresh rendering of the actual public BlackStory MapLibre view at the next native camera position. No geographic imagery generation, optical-flow interpolation, or modification of historical records. 30 sampled native frames/second.', 'takes':[]}
+              async with async_playwright() as p:
+                  browser=await p.chromium.launch(args=['--disable-dev-shm-usage','--enable-webgl','--use-gl=angle','--use-angle=swiftshader','--enable-unsafe-swiftshader'])
+                  ctx=await browser.new_context(viewport={'width':540,'height':960},device_scale_factor=2,color_scheme='dark')
+                  page=await ctx.new_page()
+                  await c.visit(page,'/explore');await page.wait_for_timeout(5000)
+                  button=page.get_by_role('button',name='Hide filters',exact=True)
+                  if await button.count():await button.click()
+                  if not await page.evaluate(c.FIND_MAP):raise RuntimeError('Native map API not found')
+                  await page.evaluate('() => {const m=window.__blackstoryCaptureMap;m.jumpTo({center:[-96,37],zoom:3.25,bearing:0,pitch:0});}')
+                  await page.wait_for_timeout(4000)
+                  async def record(name,start,end,n):
+                      target=ROOT/'captures/map-cinema'/(name+'.mp4')
+                      proc=subprocess.Popen(['ffmpeg','-y','-loglevel','error','-f','image2pipe','-framerate','30','-vcodec','png','-i','pipe:0','-an','-c:v','libx264','-preset','ultrafast','-crf','17','-pix_fmt','yuv420p','-threads','2',str(target)],stdin=subprocess.PIPE)
+                      await page.evaluate('o=>window.__blackstoryCaptureMap.jumpTo({center:o.c,zoom:o.z})',{'c':start[:2],'z':start[2]})
+                      await page.wait_for_timeout(2500)
+                      for i in range(n):
+                          t=i/(n-1);u=t*t*(3-2*t)
+                          # The flight centers geographically early, before most of the zoom, just as an editorial camera move would.
+                          v=1-(1-u)**2 if abs(end[2]-start[2])>2 else u
+                          lng=start[0]+(end[0]-start[0])*v
+                          lat=start[1]+(end[1]-start[1])*v
+                          zoom=start[2]+(end[2]-start[2])*u
+                          await page.evaluate('o=>{const m=window.__blackstoryCaptureMap;m.jumpTo({center:[o.lng,o.lat],zoom:o.zoom});m.triggerRepaint()}',{'lng':lng,'lat':lat,'zoom':zoom})
+                          await page.wait_for_timeout(90)
+                          await page.evaluate('() => new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r)))')
+                          frame=await page.screenshot(type='png')
+                          await asyncio.to_thread(proc.stdin.write,frame)
+                          if i in [0,n//2,n-1]:(ROOT/'review'/f'{name}-{i}.png').write_bytes(frame)
+                      proc.stdin.close();code=await asyncio.to_thread(proc.wait)
+                      if code:raise RuntimeError('FFmpeg failed')
+                      report['takes'].append({'name':name,'file':str(target.relative_to(ROOT)),'native_frames':n,'fps':30,'start_camera':start,'end_camera':end,'url':page.url})
+                      (ROOT/'map-cinema-manifest.json').write_text(json.dumps(report,indent=2))
+                      print('CAPTURED',name,n,flush=True)
+                  await record('country-drift',[-96,37,3.25],[-95,38,3.38],120)
+                  await record('country-to-dc',[-95,38,3.38],[-77.0369,38.9072,10],120)
+                  await record('dc-to-country',[-77.0369,38.9072,10],[-96,37,3.25],120)
+                  await browser.close()
+          asyncio.run(main())
+          PY
+          /tmp/map-env/bin/python output/project/map_cinema.py
+      - name: Preserve smooth native map footage
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: blackstory-map-cinema
+          path: output/
+          retention-days: 7
+          compression-level: 0
