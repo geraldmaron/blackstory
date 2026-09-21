@@ -1,0 +1,317 @@
+{
+  "render": "blackstory-love-me-v002.mp4",
+  "frames": 3264,
+  "duration_s": 54.4544,
+  "blank_frames": [],
+  "cuts": [
+    {
+      "shot": "map-b",
+      "intended": 206,
+      "measured": 207,
+      "err_frames": 1,
+      "diff": 0.0168,
+      "nearest_marker": "HIT 3.44s",
+      "marker_offset_frames": 0
+    },
+    {
+      "shot": "map-c",
+      "intended": 384,
+      "measured": 387,
+      "err_frames": 3,
+      "diff": 0.0367,
+      "nearest_marker": "HIT 6.4053s",
+      "marker_offset_frames": 0
+    },
+    {
+      "shot": "map-d",
+      "intended": 567,
+      "measured": 568,
+      "err_frames": 1,
+      "diff": 0.0208,
+      "nearest_marker": "HIT 9.4587s",
+      "marker_offset_frames": 0
+    },
+    {
+      "shot": "place-title",
+      "intended": 741,
+      "measured": 741,
+      "err_frames": 0,
+      "diff": 0.2371,
+      "nearest_marker": "HIT 12.368s",
+      "marker_offset_frames": 0
+    },
+    {
+      "shot": "place-hist",
+      "intended": 850,
+      "measured": 850,
+      "err_frames": 0,
+      "diff": 0.0478,
+      "nearest_marker": "VOX 14.184s",
+      "marker_offset_frames": 0
+    },
+    {
+      "shot": "punch-ms",
+      "intended": 922,
+      "measured": 922,
+      "err_frames": 0,
+      "diff": 0.2313,
+      "nearest_marker": "HIT 15.3787s",
+      "marker_offset_frames": 0
+    },
+    {
+      "shot": "punch-atl",
+      "intended": 936,
+      "measured": 938,
+      "err_frames": 2,
+      "diff": 0.017,
+      "nearest_marker": "HIT 15.6107s",
+      "marker_offset_frames": 0
+    },
+    {
+      "shot": "punch-tulsa",
+      "intended": 954,
+      "measured": 954,
+      "err_frames": 0,
+      "diff": 0.0207,
+      "nearest_marker": "HIT 15.9147s",
+      "marker_offset_frames": 0
+    },
+    {
+      "shot": "tulsa-1921",
+      "intended": 969,
+      "measured": 969,
+      "err_frames": 0,
+      "diff": 0.2178,
+      "nearest_marker": "HIT 16.1733s",
+      "marker_offset_frames": 0
+    },
+    {
+      "shot": "evidence",
+      "intended": 1010,
+      "measured": 1010,
+      "err_frames": 0,
+      "diff": 0.0934,
+      "nearest_marker": "VOX 16.8533s",
+      "marker_offset_frames": 0
+    },
+    {
+      "shot": "trust",
+      "intended": 1141,
+      "measured": 1141,
+      "err_frames": 0,
+      "diff": 0.0295,
+      "nearest_marker": "VOX 19.04s",
+      "marker_offset_frames": 0
+    },
+    {
+      "shot": "entity",
+      "intended": 1257,
+      "measured": 1257,
+      "err_frames": 0,
+      "diff": 0.0976,
+      "nearest_marker": "VOX 20.976s",
+      "marker_offset_frames": 0
+    },
+    {
+      "shot": "lives",
+      "intended": 1370,
+      "measured": 1370,
+      "err_frames": 0,
+      "diff": 0.0575,
+      "nearest_marker": "VOX 22.848s",
+      "marker_offset_frames": 0
+    },
+    {
+      "shot": "lives-plate",
+      "intended": 1500,
+      "measured": 1500,
+      "err_frames": 0,
+      "diff": 0.1253,
+      "nearest_marker": "VOX 25.024s",
+      "marker_offset_frames": 0
+    },
+    {
+      "shot": "data",
+      "intended": 1545,
+      "measured": 1545,
+      "err_frames": 0,
+      "diff": 0.1396,
+      "nearest_marker": "VOX 25.776s",
+      "marker_offset_frames": 0
+    },
+    {
+      "shot": "map-wide",
+      "intended": 1646,
+      "measured": 1646,
+      "err_frames": 0,
+      "diff": 0.1263,
+      "nearest_marker": "HIT 27.4613s",
+      "marker_offset_frames": 0
+    },
+    {
+      "shot": "memorial-a",
+      "intended": 1681,
+      "measured": 1681,
+      "err_frames": 0,
+      "diff": 0.128,
+      "nearest_marker": "VOX 28.0507s",
+      "marker_offset_frames": 0
+    },
+    {
+      "shot": "memorial-b",
+      "intended": 2123,
+      "measured": 2125,
+      "err_frames": 2,
+      "diff": 0.0129,
+      "nearest_marker": "VOX 35.416s",
+      "marker_offset_frames": 0
+    },
+    {
+      "shot": "lbj",
+      "intended": 2529,
+      "measured": 2529,
+      "err_frames": 0,
+      "diff": 0.1115,
+      "nearest_marker": "HIT 42.184s",
+      "marker_offset_frames": 0
+    },
+    {
+      "shot": "entity-out",
+      "intended": 2573,
+      "measured": 2573,
+      "err_frames": 0,
+      "diff": 0.1107,
+      "nearest_marker": "VOX 42.9253s",
+      "marker_offset_frames": 0
+    },
+    {
+      "shot": "place-out",
+      "intended": 2660,
+      "measured": 2660,
+      "err_frames": 0,
+      "diff": 0.0509,
+      "nearest_marker": "VOX 44.3733s",
+      "marker_offset_frames": 0
+    },
+    {
+      "shot": "map-out1",
+      "intended": 2713,
+      "measured": 2713,
+      "err_frames": 0,
+      "diff": 0.2335,
+      "nearest_marker": "HIT 45.2667s",
+      "marker_offset_frames": 0
+    },
+    {
+      "shot": "map-out2",
+      "intended": 2764,
+      "measured": 2764,
+      "err_frames": 0,
+      "diff": 0.0372,
+      "nearest_marker": "VOX 46.112s",
+      "marker_offset_frames": 0
+    },
+    {
+      "shot": "map-out3",
+      "intended": 2793,
+      "measured": 2793,
+      "err_frames": 0,
+      "diff": 0.0383,
+      "nearest_marker": "VOX 46.6s",
+      "marker_offset_frames": 0
+    },
+    {
+      "shot": "map-out4",
+      "intended": 2838,
+      "measured": 2838,
+      "err_frames": 0,
+      "diff": 0.0817,
+      "nearest_marker": "VOX 47.344s",
+      "marker_offset_frames": 0
+    },
+    {
+      "shot": "map-out5",
+      "intended": 2932,
+      "measured": 2932,
+      "err_frames": 0,
+      "diff": 0.061,
+      "nearest_marker": "HIT 48.9147s",
+      "marker_offset_frames": 0
+    },
+    {
+      "shot": "map-out6",
+      "intended": 3021,
+      "measured": 3021,
+      "err_frames": 0,
+      "diff": 0.0471,
+      "nearest_marker": "HIT 50.3973s",
+      "marker_offset_frames": 0
+    },
+    {
+      "shot": "brand-bg",
+      "intended": 3074,
+      "measured": 3075,
+      "err_frames": 1,
+      "diff": 0.0106,
+      "nearest_marker": "HIT 51.2827s",
+      "marker_offset_frames": 0
+    }
+  ],
+  "cut_errors_nonzero": [
+    {
+      "shot": "map-b",
+      "intended": 206,
+      "measured": 207,
+      "err_frames": 1,
+      "diff": 0.0168,
+      "nearest_marker": "HIT 3.44s",
+      "marker_offset_frames": 0
+    },
+    {
+      "shot": "map-c",
+      "intended": 384,
+      "measured": 387,
+      "err_frames": 3,
+      "diff": 0.0367,
+      "nearest_marker": "HIT 6.4053s",
+      "marker_offset_frames": 0
+    },
+    {
+      "shot": "map-d",
+      "intended": 567,
+      "measured": 568,
+      "err_frames": 1,
+      "diff": 0.0208,
+      "nearest_marker": "HIT 9.4587s",
+      "marker_offset_frames": 0
+    },
+    {
+      "shot": "punch-atl",
+      "intended": 936,
+      "measured": 938,
+      "err_frames": 2,
+      "diff": 0.017,
+      "nearest_marker": "HIT 15.6107s",
+      "marker_offset_frames": 0
+    },
+    {
+      "shot": "memorial-b",
+      "intended": 2123,
+      "measured": 2125,
+      "err_frames": 2,
+      "diff": 0.0129,
+      "nearest_marker": "VOX 35.416s",
+      "marker_offset_frames": 0
+    },
+    {
+      "shot": "brand-bg",
+      "intended": 3074,
+      "measured": 3075,
+      "err_frames": 1,
+      "diff": 0.0106,
+      "nearest_marker": "HIT 51.2827s",
+      "marker_offset_frames": 0
+    }
+  ],
+  "ebur128_summary": "Summary: Integrated loudness: I: -12.5 LUFS Threshold: -22.7 LUFS Loudness range: LRA: 2.5 LU Threshold: -32.6 LUFS LRA low: -13.7 LUFS LRA high: -11.2 LUFS True peak: Peak: -2.4 dBFS [out#0/null @ 0x8b2c38300] video:1352KiB audio:10208KiB subtitle:0KiB other streams:0KiB global headers:0KiB muxing overhead: unknown frame= 3264 fps=1131 q=-0.0 Lsize=N/A time=00:00:54.44 bitrate=N/A speed=18.9x elapsed=0:00:02.88"
+}
