@@ -1,0 +1,41 @@
+# Public images already present in the captured product. No synthetic imagery or fonts.
+name: BlackStory Archive Assets
+on:
+  push:
+    branches: [media/blackstory-love-me-20260920]
+    paths: [.github/workflows/blackstory-archive-assets.yml]
+permissions:
+  contents: read
+jobs:
+  assets:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - name: Preserve original published image assets
+        run: |
+          mkdir -p output
+          python3 - <<'PY'
+          import urllib.request, pathlib, json, hashlib
+          root=pathlib.Path('output')
+          sources=[
+            {'file':'du-bois-original.jpg','url':'https://commons.wikimedia.org/wiki/Special:FilePath/File%3AW.E.B._Du_Bois_by_James_E._Purdy%2C_1907_(cropped).jpg?width=960','product_record':'https://blackstory.app/entity/ent_web_du_bois_001','credit':'James E. Purdy / Adam Cuerden; National Portrait Gallery / Wikimedia Commons; CC0 as credited by product'},
+            {'file':'wheatley-original.jpg','url':'https://storage.googleapis.com/black-book-efaaf-public-media/public/entities/ent_phillis_wheatley_001/primary.jpg','product_record':'https://blackstory.app/entity/ent_phillis_wheatley_001','credit':'1773 frontispiece; Houghton Library, Harvard University; public domain as credited by product'},
+            {'file':'holc-map-original.jpg','url':'https://upload.wikimedia.org/wikipedia/commons/b/bd/Holc_redlining_1937.jpeg','product_record':'https://blackstory.app/stories/buying-a-home','credit':'Home Owners Loan Corporation, 1937; U.S. government work; public domain as credited by product'},
+          ]
+          for item in sources:
+              try:
+                  request=urllib.request.Request(item['url'],headers={'User-Agent':'BlackStory-Media-Production/1.0 (public historical image preservation)'})
+                  with urllib.request.urlopen(request,timeout=35) as response:
+                      content=response.read();item['final_url']=response.url
+                  (root/item['file']).write_bytes(content);item['bytes']=len(content);item['sha256']=hashlib.sha256(content).hexdigest()
+              except Exception as exc:item['error']=str(exc)
+          (root/'archival-image-provenance.json').write_text(json.dumps(sources,indent=2));print(json.dumps(sources,indent=2))
+          PY
+      - name: Preserve original images and provenance
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: blackstory-archive-assets
+          path: output/
+          retention-days: 14
+          if-no-files-found: warn
