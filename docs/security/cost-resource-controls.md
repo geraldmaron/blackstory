@@ -175,7 +175,8 @@ downstream untouched, so no visitor caches a dynamic page locally.
 
 ### Second rule: request-rendered document surfaces (inert; redesigned 2026-09-22)
 
-**Measured 2026-09-22: this rule caches nothing.** `curl -I` on live paths: `/entity/*` and
+**Measured 2026-09-22 (morning): this rule cached nothing; converted the same day, see the
+operator step below.** `curl -I` on live paths at the time: `/entity/*` and
 `/stories/*` answer `cf-cache-status: BYPASS`; `/place/*` (3,690 sitemap URLs), `/invention/*`,
 `/lives`, `/rooms`, `/about`, `/records` and `/explore` answer `DYNAMIC` because no rule matches
 them. Only `/` and `/memorial` hit. The root layout is `force-dynamic` for the nonce CSP, so every
@@ -219,7 +220,18 @@ those directives. After the next production deploy, run the probe table at the b
 section. If `/entity/*` stays `x-vercel-cache: MISS`, read the cache reason in the runtime logs;
 the header costs nothing if ignored.
 
-#### Operator step: convert rule 2 (needs a Cloudflare API token; none is held in-repo)
+#### Operator step: convert rule 2 — DONE 2026-09-22 (dashboard, operator session)
+
+Rule 1 in the zone's cache-rule order (id `8e9ff2ff1aac42008fa3536bdd73ba3e`, renamed "HTML edge
+cache - record and reading surfaces (override origin, 2026-09-22)") now carries the expression
+below with `override_origin`, default 1 h, status-code TTL 200-226 → 1 h and 300-526 → no cache,
+browser TTL respect origin, cache key untouched. Live probe two minutes after save, second
+request of each pair: `/entity/*`, `/place/*`, `/stories/*`, `/invention/*`, `/about`,
+`/records`, `/lives`, `/explore?state=GA` and `/explore?state=AL` all `MISS` → `HIT` (and the two
+Explore bodies differ); `/entity/*` with `rsc: 1` stays `DYNAMIC` with a `text/x-component` body;
+`/corrections/status/*` stays `DYNAMIC`; `/atlas/catalog` unchanged (Vercel `HIT`); `/` still
+`HIT`. The steps are kept for the next zone that needs them.
+
 
 1. `GET /zones/653abe0dbd1b10d22411306cb1f645be/rulesets/fbba310d91a3483f88cc5686b25684e1` and
    copy rule 1's `action_parameters` verbatim (`cache: true`, `edge_ttl.mode: override_origin`,
