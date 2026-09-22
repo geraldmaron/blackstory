@@ -27,7 +27,7 @@ export default async function CorrectionStatusPage({ params }: PageProps) {
   const { receiptCode: rawReceiptCode } = await params;
   const receiptCode = resolveReceiptCodeFromPath(rawReceiptCode);
   const deps = await buildDefaultCorrectionRouteDependencies();
-  const status = lookupPublicStatusByReceipt(receiptCode, deps);
+  const status = await lookupPublicStatusByReceipt(receiptCode, deps);
 
   if (!status) {
     return (

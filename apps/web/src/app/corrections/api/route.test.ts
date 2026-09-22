@@ -37,6 +37,10 @@ async function buildDeps(
       coordinatedActorThreshold: 2,
     }),
     now: () => 0,
+    // Route-level test: substitutes the real Postgres writer the same way `store` above
+    // substitutes the in-memory one for `createPostgresCorrectionSubmissionStore` — persistence
+    // itself is covered separately, not by hitting the network from every route test.
+    saveAbuseReport: async () => {},
     ...overrides,
   };
 }
@@ -118,7 +122,7 @@ test('coordinated duplicate corrections stay quarantined without public brigadin
   assert.equal(second.status, 202);
 
   const secondBody = (await second.json()) as { receiptCode: string };
-  const stored = deps.store.getByReceiptCode(secondBody.receiptCode, PEPPER);
+  const stored = await deps.store.getByReceiptCode(secondBody.receiptCode, PEPPER);
   assert.ok(stored);
   assert.notEqual(stored.record.moderationState, 'pending_review');
 
@@ -166,9 +170,9 @@ test('appeals re-enter review for rejected closures without exposing moderation 
     deps,
   );
   const body = (await accepted.json()) as { receiptCode: string };
-  const stored = deps.store.getByReceiptCode(body.receiptCode, PEPPER);
+  const stored = await deps.store.getByReceiptCode(body.receiptCode, PEPPER);
   assert.ok(stored);
-  deps.store.markClosed(stored.record.id, 'rejected');
+  await deps.store.markClosed(stored.record.id, 'rejected');
 
   const appeal = await handleCorrectionAppealRequest(
     postJson(
@@ -193,9 +197,9 @@ test('a declined correction carries a plain outcomeReason on its public status',
     deps,
   );
   const body = (await accepted.json()) as { receiptCode: string };
-  const stored = deps.store.getByReceiptCode(body.receiptCode, PEPPER);
+  const stored = await deps.store.getByReceiptCode(body.receiptCode, PEPPER);
   assert.ok(stored);
-  deps.store.markClosed(stored.record.id, 'rejected');
+  await deps.store.markClosed(stored.record.id, 'rejected');
 
   const statusResponse = await handleCorrectionStatusRequest(
     new Request(

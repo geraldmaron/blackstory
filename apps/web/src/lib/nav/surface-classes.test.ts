@@ -68,6 +68,7 @@ describe('surface class resolution', () => {
     assert.equal(surfaceClassFor('/stories/redlining'), 'reading');
     assert.equal(surfaceClassFor('/stories/mosaic-credits'), 'utility');
     assert.equal(surfaceClassFor('/corrections'), 'utility');
+    assert.equal(surfaceClassFor('/corrections/status'), 'utility');
     assert.equal(surfaceClassFor('/corrections/status/ABC123'), 'utility');
   });
 
@@ -111,6 +112,7 @@ describe('surface class coverage', () => {
 function isDeclaredUtility(route: string): boolean {
   const declared = [
     '/corrections',
+    '/corrections/status',
     '/corrections/status/[receiptCode]',
     '/submit',
     '/support',

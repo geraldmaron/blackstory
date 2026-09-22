@@ -9,6 +9,14 @@ be deployed together with its application and Auth metadata changes. Applied mig
 must be reconciled against the target project before remote deployment. A fresh local reset
 proves migration syntax and local behavior, not production history or a safe live cutover.
 
+**The migration files' own text can lie about current schema names.** Confirmed 2026-09-22
+(repo-vl155.6): every migration file still says `bb_submissions`, `bb_canonical`, `bb_auth`, etc.,
+but the live blackstory-app project has no `bb_`-prefixed schemas at all — the real, live names
+have no prefix (`submissions`, `canonical`, `access_control`, ...), matching what the application
+code already reads and writes. Before writing SQL against any schema name you found by reading an
+existing migration file, verify it against the live project first (`information_schema.schemata`,
+or `list_tables`/`execute_sql` via the Supabase MCP) — do not trust the file's text alone.
+
 Use an isolated local project for schema rehearsal and `tests/research-kernel.sql` for ledger
 and authorization checks. Do not print `supabase status` keys or credentials into logs.
 
