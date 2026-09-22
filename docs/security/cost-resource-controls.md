@@ -236,8 +236,10 @@ negotiates brotli by default) were very likely compressed as well. The "54 GB/da
 `repo-ogo3j.2` is therefore an upper bound in identity bytes; actual transfer was probably
 5–8× smaller and the Supabase line was a few dollars a month, not tens. The conditional-GET
 refresh still retires it: a 304 carries no body at all. The decisive check is `status = 304`
-rows in `edge_logs` from the `pdx1` addresses once their first 30-minute refresh comes due
-(~15:17 UTC), and `repo-ogo3j.2` records the result.
+rows in `edge_logs` from the `pdx1` addresses once their first 30-minute refresh comes due.
+**Observed 15:22:55–15:22:58 UTC:** instance `44.250.211.113` (first load 14:47) revalidated
+both `search-index.json` and `entities.json` with `304`, no body. New instances still make one
+compressed first load each (`200`), which is the remaining, instance-count-bound cost.
 
 #### Operator step: convert rule 2 — DONE 2026-09-22 (dashboard, operator session)
 
