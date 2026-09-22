@@ -192,6 +192,7 @@ const SCROLL_CUE_AVOID_MARGIN = 14;
 function positionScrollCue(
   root: HTMLElement,
   messageField: HTMLElement | null,
+  viewportHeight: number,
 ): MemorialAvoidBox | null {
   const container = root.parentElement;
   const scrollCue = container?.querySelector<HTMLElement>('.ds-memorial__scroll-cue');
@@ -201,7 +202,19 @@ function positionScrollCue(
     return null;
   }
 
-  const top = fieldBox.bottom - containerBox.top + SCROLL_CUE_GAP;
+  const tentativeTop = fieldBox.bottom - containerBox.top + SCROLL_CUE_GAP;
+  /*
+   * Clamp so the cue's own bottom edge stays on-screen. Nothing previously bounded this against
+   * the viewport: a wrapped held message (a longer message, a larger OS font size, or a short
+   * viewport — landscape mobile, a modest laptop window) pushes `tentativeTop` down with it,
+   * and the cue — the one first-screen path to "Read every name" — can land below the fold.
+   * Height doesn't depend on `top` (absolute positioning doesn't reflow the box), so measuring
+   * before the write is safe; the CSS fallback (`top: 60vh`) already gives it a footprint to read.
+   */
+  const cueHeight = scrollCue.getBoundingClientRect().height;
+  const maxViewportTop = Math.max(0, viewportHeight - cueHeight - SCROLL_CUE_AVOID_MARGIN);
+  const viewportTop = Math.min(containerBox.top + tentativeTop, maxViewportTop);
+  const top = viewportTop - containerBox.top;
   scrollCue.style.top = `${top}px`;
 
   /*
@@ -351,9 +364,20 @@ export function MemorialWallAtmosphere({
   const resolvedFontsRef = useRef<Map<string, string> | null>(null);
   const [placements, setPlacements] = useState<readonly PlacedMemorialName[]>([]);
   const reducedMotion = useReducedMotion();
-  /** Reveal clock and subset rotation freeze on either signal; scroll-linked fade (below) is a
-   * reader-driven interaction, not ambient cycling, and stays keyed on `reducedMotion` alone. */
-  const held = reducedMotion || Boolean(manuallyHeld);
+  /*
+   * Reveal clock and subset rotation freeze on `manuallyHeld` — not a live `reducedMotion ||`
+   * here. `manuallyHeld` already seeds true the moment `reducedMotion` turns on (the effect in
+   * `MemorialWallSection` below) and stays true across renders, so ORing `reducedMotion` back in
+   * was redundant on the way in and actively wrong on the way out: it silently overrode the
+   * reader's own explicit "Let the wall move again" click for as long as the OS preference stayed
+   * on, so the control's label and `aria-pressed` (driven by `manuallyHeld` alone) claimed
+   * "resumed" while the wall stayed frozen underneath — the reported "hold the wall is pointless"
+   * bug (repo-vl155.5). `MemorialWallSection`'s own doc comment already says the click "always
+   * freezes or un-freezes"; this makes that true. Scroll-linked fade (below) is a different,
+   * reader-driven interaction, not ambient cycling, and correctly stays keyed on `reducedMotion`
+   * alone regardless of this — a resumed hold never re-enables scroll-linked motion.
+   */
+  const held = Boolean(manuallyHeld);
   const [reveal, setReveal] = useState<MemorialRevealState>(() =>
     computeMemorialRevealState(0, { reducedMotion: held }),
   );
@@ -456,7 +480,9 @@ export function MemorialWallAtmosphere({
       // control sitting on the same canvas, so its footprint has to be one of
       // the avoid boxes below. Positioning it afterwards left the packer
       // unaware of it, and handwritten names surfaced behind the button.
-      const scrollCueBox = hasMessage ? positionScrollCue(root, messageRef.current) : null;
+      const scrollCueBox = hasMessage
+        ? positionScrollCue(root, messageRef.current, viewportHeight)
+        : null;
 
       const subset = selectWallSubset(
         displayNames,
