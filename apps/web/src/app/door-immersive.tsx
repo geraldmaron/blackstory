@@ -198,32 +198,8 @@ function prefersReducedMotion(): boolean {
   );
 }
 
-/**
- * A Door pin's href is a public `/place/` or `/law` path, or the opaque `/door/pin/pin-N`
- * redirect that resolves an entity page without printing its id. The redirect is a server
- * answer, so it goes through a full navigation; the public paths are ordinary client routes.
- */
-function openDoorPin(
-  href: string,
-  push: (href: string) => void,
-  continuity?: {
-    readonly entityId: string;
-    readonly lng: number;
-    readonly lat: number;
-    readonly label?: string;
-  },
-): void {
-  if (continuity) {
-    savePinContinuity(continuity);
-  }
-  if (href.startsWith('/door/pin/')) {
-    window.location.assign(href);
-    return;
-  }
-  push(href);
-}
-
-/** A link to a Door pin's record, by the same rule `openDoorPin` follows for a marker click. */
+/** A link to a Door pin's record: the opaque `/door/pin/pin-N` redirect needs a real `<a>` (it's
+ * a server answer, not a client route), public `/place/` and `/law` paths take a Next `Link`. */
 function DoorRecordLink({
   href,
   className,
@@ -793,6 +769,18 @@ export function DoorImmersive({
     }
     return byId;
   }, [pins]);
+  /*
+   * Clicking an entity while the cinematic journey is playing means "stop the tour, show me
+   * that one" — the same thing every other pin click on this map already does once Explore owns
+   * it (`useRecordSelection`: "Pin clicks stay on the plate and open the record sheet"), not a
+   * navigation away. Previously this called `openDoorPin`, which not only never toggled journey
+   * mode off but for `/door/pin/*` targets did a hard `window.location.assign` — the most
+   * jarring possible exit, and the reported bug. Save continuity exactly as that navigation
+   * always did, then hand off to the existing smooth browse-mode transition (`enterBrowse`,
+   * door-home.css's `--ds-door-browse-ms` morph) instead. `AtlasExperience`'s own
+   * continuity-restore effect (`pin-continuity.ts`) picks the saved pin up once it mounts and
+   * opens that entity's record sheet — the same map, no page navigation.
+   */
   useEffect(
     () =>
       stage.subscribe('select', (entityId) => {
@@ -800,14 +788,15 @@ export function DoorImmersive({
         const href = hrefByPinId.get(entityId);
         const feature = pins.features.find((row) => row.properties.entityId === entityId);
         if (!href || !feature) return;
-        openDoorPin(href, (next) => router.push(next), {
+        savePinContinuity({
           entityId,
           lng: feature.geometry.coordinates[0]!,
           lat: feature.geometry.coordinates[1]!,
           label: feature.properties.displayName,
         });
+        enterBrowse();
       }),
-    [hrefByPinId, pins.features, router, stage],
+    [enterBrowse, hrefByPinId, pins.features, stage],
   );
 
   /** Pin photos rise from live markers. */
