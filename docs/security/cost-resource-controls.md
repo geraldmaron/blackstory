@@ -227,6 +227,18 @@ Verified in the same probe: `x-vercel-id: iad1::pdx1::…` on function-rendered 
 both projects (the `pdx1` pin is live); `/v1/map` answers `x-vercel-cache: HIT` with `age: 1` on
 the second request, 0.86 s instead of 6.9 s.
 
+**Artifact egress, corrected 2026-09-22 15:00 UTC.** The production runtime log for the new
+fetcher reads `release artifact downloaded in 483–1616ms { encoding: 'br' }` for every first
+load by the `pdx1` instances, while Supabase `edge_logs` records `content_length: 17665068` and
+`8310554` for those same requests. So that log field reports the object's identity size on a
+CDN cache hit even when the body was served brotli-compressed, and the old fetches (undici
+negotiates brotli by default) were very likely compressed as well. The "54 GB/day" in
+`repo-ogo3j.2` is therefore an upper bound in identity bytes; actual transfer was probably
+5–8× smaller and the Supabase line was a few dollars a month, not tens. The conditional-GET
+refresh still retires it: a 304 carries no body at all. The decisive check is `status = 304`
+rows in `edge_logs` from the `pdx1` addresses once their first 30-minute refresh comes due
+(~15:17 UTC), and `repo-ogo3j.2` records the result.
+
 #### Operator step: convert rule 2 — DONE 2026-09-22 (dashboard, operator session)
 
 Rule 1 in the zone's cache-rule order (id `8e9ff2ff1aac42008fa3536bdd73ba3e`, renamed "HTML edge
