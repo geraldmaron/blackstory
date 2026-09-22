@@ -33,8 +33,17 @@ export type ApiResponse = {
  * (`docs/decisions-carryover.md`, "Public projection and immutable publication snapshots");
  * operational metadata (health, compatibility) is never cached so an operator sees live posture. */
 export const CACHE_CONTROL = {
-  /** Released entity/search projections — short edge cache + generous stale-while-revalidate. */
+  /** Released search projections — short edge cache + generous stale-while-revalidate. */
   releasedRead: 'public, max-age=60, stale-while-revalidate=300',
+  /**
+   * Release-coupled catalog reads (`/v1/map`, `/v1/entity/{id}`): the body changes only when a
+   * release is published or an artifact is corrected, and the mobile app fetches the map on
+   * every launch. Measured 2026-09-22: 759 KB gzipped, 6.7 s on a cold function, with a 60 s edge
+   * TTL that made nearly every launch a rebuild (`repo-ogo3j.6`). `max-age` stays short so an
+   * installed client picks up a correction promptly; `s-maxage` keeps Vercel's edge serving it
+   * for an hour and revalidating in the background for a day after that.
+   */
+  releasedCatalog: 'public, max-age=60, s-maxage=3600, stale-while-revalidate=86400',
   /** Release pointer (bootstrap): shorter, because a new release must be picked up promptly. */
   releasePointer: 'public, max-age=30, stale-while-revalidate=120',
   /** Never cache operational/version endpoints. */

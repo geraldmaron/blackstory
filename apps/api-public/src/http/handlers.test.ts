@@ -308,3 +308,29 @@ test('non-GET method is not served', async () => {
   const res = await dispatch(req, makeDeps());
   assert.equal(res.status, 404);
 });
+
+/**
+ * Release-coupled catalog reads carry the long edge TTL (`CACHE_CONTROL.releasedCatalog`), so a
+ * mobile launch after a quiet minute is served by Vercel's edge instead of a cold rebuild
+ * (repo-ogo3j.6). Search stays on the short preset: its body varies by query.
+ */
+test('GET /v1/map and GET /v1/entity/:id are edge-cacheable for an hour', async () => {
+  const deps = makeDeps({
+    dataAccess: createInMemoryPublicDataAccess({
+      pointer: SAMPLE_POINTER,
+      entities: [makeEntity()],
+    }),
+  });
+  const map = await dispatch(makeRequest('/v1/map'), deps);
+  assert.equal(map.status, 200);
+  assert.equal(
+    map.headers['Cache-Control'],
+    'public, max-age=60, s-maxage=3600, stale-while-revalidate=86400',
+  );
+  const entity = await dispatch(makeRequest(`/v1/entity/${makeEntity().id}`), deps);
+  assert.equal(entity.status, 200);
+  assert.equal(
+    entity.headers['Cache-Control'],
+    'public, max-age=60, s-maxage=3600, stale-while-revalidate=86400',
+  );
+});

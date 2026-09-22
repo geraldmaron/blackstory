@@ -274,7 +274,7 @@ export async function handleEntity(
     }
     return jsonRead(parsed.data, {
       requestId: request.requestId,
-      cacheControl: CACHE_CONTROL.releasedRead,
+      cacheControl: CACHE_CONTROL.releasedCatalog,
       ifNoneMatch: request.headers['if-none-match'],
     });
   } finally {
@@ -327,7 +327,7 @@ export async function handleMap(request: ApiRequest, deps: HandlerDeps): Promise
     }
     return jsonRead(parsed.data, {
       requestId: request.requestId,
-      cacheControl: CACHE_CONTROL.releasedRead,
+      cacheControl: CACHE_CONTROL.releasedCatalog,
       ifNoneMatch: request.headers['if-none-match'],
     });
   } finally {
