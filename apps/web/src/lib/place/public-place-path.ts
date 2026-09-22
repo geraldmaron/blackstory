@@ -60,9 +60,6 @@ export function inventionHref(displayName: string): string {
   return `/invention/${publicPlaceSlug(displayName)}`;
 }
 
-/** Cookie set when a reader stands at a named place. Rooms no longer print that name as the site back. */
-export const STAND_COOKIE = 'bs-stand';
-
 export function isPublicPlaceSlug(value: string): boolean {
   const trimmed = value.trim();
   if (trimmed.length === 0) return false;

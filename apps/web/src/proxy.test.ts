@@ -9,7 +9,7 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import { NextRequest } from 'next/server';
-import { proxy } from './proxy';
+import { isPublicDocumentCacheable, proxy, PUBLIC_DOCUMENT_CDN_CACHE_CONTROL } from './proxy';
 import { CSP_NONCE_HEADER } from './lib/web-security/constants';
 
 function requestFor(pathname: string): NextRequest {
@@ -87,4 +87,50 @@ test('request CSP forwarding also reaches public routes without changing their r
     response.headers.get('x-middleware-request-content-security-policy'),
     response.headers.get('Content-Security-Policy'),
   );
+});
+
+/**
+ * Public documents carry `Vercel-CDN-Cache-Control` so Vercel's edge can keep a request-rendered
+ * page that Next itself stamps `no-store`. Endpoints, the staff console and correction receipts
+ * must never carry it. RSC payloads do carry it: Next strips the `rsc` header before the proxy
+ * runs, and the page's `Vary` keys the edge entry on it, so that is both unavoidable and safe.
+ */
+test('public documents get the Vercel CDN cache header', async () => {
+  for (const pathname of [
+    '/',
+    '/entity/ent_x',
+    '/place/archie-edwards',
+    '/stories/some-slug',
+    '/about',
+  ]) {
+    const response = await proxy(requestFor(pathname));
+    assert.equal(
+      response.headers.get('Vercel-CDN-Cache-Control'),
+      PUBLIC_DOCUMENT_CDN_CACHE_CONTROL,
+      pathname,
+    );
+  }
+});
+
+test('endpoints, admin and receipts never get the CDN cache header', async () => {
+  for (const pathname of [
+    '/admin/login',
+    '/corrections/status/abc123',
+    '/atlas/catalog',
+    '/search/api',
+    '/sitemap.xml',
+    '/api/request-integrity',
+  ]) {
+    const response = await proxy(requestFor(pathname));
+    assert.equal(response.headers.get('Vercel-CDN-Cache-Control'), null, pathname);
+  }
+  const post = new NextRequest(new URL('/entity/ent_x', 'https://blackstory.app'), {
+    method: 'POST',
+  });
+  assert.equal(isPublicDocumentCacheable(post), false, 'POST');
+});
+
+test('a place page sets no cookie, so the edge can keep it', async () => {
+  const response = await proxy(requestFor('/place/archie-edwards-alpha-tonsorial-palace'));
+  assert.equal(response.headers.get('set-cookie'), null);
 });

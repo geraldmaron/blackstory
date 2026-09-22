@@ -109,7 +109,11 @@ const nextConfig = {
       // Practical rule: making a route cacheable is a route-segment-config change (ISR), not a
       // header change. The header is what the CDN then honors.
       {
-        // Live: /entity/[id] became ISR (revalidate=3600), so this is now the served header.
+        // INERT. The root layout is `force-dynamic` for the nonce CSP, so every document is
+        // request-rendered and answers `private, no-cache, no-store`; the `revalidate` export on
+        // the entity page does nothing under it. What does cache an entity page is the
+        // `Vercel-CDN-Cache-Control` the proxy attaches to public documents (see proxy.ts) and
+        // the Cloudflare rule for the zone. Measured 2026-09-22: `cf-cache-status: BYPASS`.
         source: '/entity/:id',
         headers: [
           {
@@ -119,8 +123,8 @@ const nextConfig = {
         ],
       },
       {
-        // Live: `/` is ISR (`revalidate = 300`), so this header can reach Vercel. Cloudflare
-        // still overrides the HTML TTL to one hour for the bare path (`override_origin`).
+        // INERT for the same reason. `/` is edge-cached by Cloudflare's override-origin rule
+        // (`cf-cache-status: HIT`), not by anything declared here.
         source: '/',
         headers: [
           {

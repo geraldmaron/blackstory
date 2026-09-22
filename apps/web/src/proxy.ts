@@ -12,7 +12,7 @@ import { denyExpensiveAiCrawler } from './lib/traffic-class/edge-deny';
 import { handleWebSecurity } from './lib/web-security/edge-security';
 import { CSP_NONCE_HEADER } from './lib/web-security/constants';
 import { buildGlobalSecurityHeaders } from './lib/web-security/security-headers';
-import { STAND_COOKIE, isPublicPlaceSlug } from './lib/place/public-place-path';
+import { surfaceClassFor } from './lib/nav/surface-classes';
 
 /** Base64 per-request nonce for CSP `script-src 'nonce-<value>'`. Edge-runtime safe: both
  * `crypto` (Web Crypto, global) and `Buffer` (Next's edge polyfill) are available here. */
@@ -20,25 +20,54 @@ function generateNonce(): string {
   return Buffer.from(crypto.randomUUID()).toString('base64');
 }
 
-function standSlugFromRequest(request: NextRequest): string | undefined {
-  const at = request.nextUrl.searchParams.get('at');
-  if (at && isPublicPlaceSlug(at)) return at;
-  if (request.nextUrl.pathname.startsWith('/place/')) {
-    const slug = request.nextUrl.pathname.slice('/place/'.length).split('/')[0] ?? '';
-    if (isPublicPlaceSlug(slug)) return slug;
-  }
-  return undefined;
+/**
+ * Public documents are the same for every visitor, so Vercel's CDN may keep them. This is the
+ * header that says so, sent from here because a request-rendered page cannot: Next stamps
+ * `private, no-cache, no-store` on every dynamic render and that is what `Cache-Control` from
+ * next.config.mjs loses to (measured 2026-08-09). `Vercel-CDN-Cache-Control` is consumed by
+ * Vercel alone, outranks `Cache-Control` in its cache, and is never forwarded, so the browser
+ * and Cloudflare still see the page's own policy.
+ *
+ * Nonce safety: the CDN stores header and body together, so a cached document carries the CSP
+ * whose nonce is in its own script tags. The same argument already holds for `/` at Cloudflare.
+ *
+ * Five minutes fresh, one hour stale-while-revalidate: an in-place correction reaches readers
+ * within about five minutes without any purge, and a burst never lines up behind one render.
+ *
+ * RSC payloads are cached too, on purpose. Next strips `rsc` and the router headers from the
+ * request before this proxy runs (verified against the dev server: an `rsc: 1` request is not
+ * distinguishable here), but the page's own `Vary: rsc, next-router-state-tree, ...` makes
+ * Vercel key the entry on those request headers, so an RSC navigation and the HTML document
+ * never share an entry and a navigation back to `/` is served from the edge instead of a
+ * 2.5 MB render. Cloudflare cannot vary on headers on the Free plan, which is why its rules
+ * exclude `rsc` requests; this layer does not need to.
+ *
+ * Whether Vercel honors this on a dynamic page whose `Cache-Control` says `no-store` is a
+ * documented precedence, not yet an observed one: after deploy, the second request for an entity
+ * page must answer `x-vercel-cache: HIT` (`repo-ogo3j.3`). If it does not, this header costs
+ * nothing.
+ */
+export const PUBLIC_DOCUMENT_CDN_CACHE_CONTROL =
+  'public, s-maxage=300, stale-while-revalidate=3600';
+
+/**
+ * A response the CDN may keep: a GET or HEAD for a rendered public surface (per the surface
+ * registry, which already excludes endpoints and everything under `/admin`), and never a
+ * correction receipt, whose URL is the only thing protecting it.
+ */
+export function isPublicDocumentCacheable(request: NextRequest): boolean {
+  if (request.method !== 'GET' && request.method !== 'HEAD') return false;
+  const pathname = request.nextUrl.pathname;
+  if (pathname.startsWith('/corrections/status')) return false;
+  return surfaceClassFor(pathname) !== null;
 }
 
-function attachStandCookie(request: NextRequest, response: NextResponse): NextResponse {
-  const slug = standSlugFromRequest(request);
-  if (!slug) return response;
-  response.cookies.set(STAND_COOKIE, slug, {
-    path: '/',
-    maxAge: 60 * 60 * 24 * 30,
-    sameSite: 'lax',
-    httpOnly: true,
-  });
+function applyPublicDocumentCdnCache(request: NextRequest, response: NextResponse): NextResponse {
+  // A maintenance 503 or a crawler 403 decided here is not a document. Vercel would not keep
+  // either status anyway; this just keeps the header off responses that were never candidates.
+  if (response.status >= 400) return response;
+  if (!isPublicDocumentCacheable(request)) return response;
+  response.headers.set('Vercel-CDN-Cache-Control', PUBLIC_DOCUMENT_CDN_CACHE_CONTROL);
   return response;
 }
 
@@ -74,7 +103,7 @@ export async function proxy(request: NextRequest): Promise<NextResponse> {
   for (const { key, value } of securityHeaders) {
     response.headers.set(key, value);
   }
-  return attachStandCookie(request, response);
+  return applyPublicDocumentCdnCache(request, response);
 }
 
 async function resolveProxyResponse(request: NextRequest): Promise<NextResponse> {
@@ -92,8 +121,7 @@ async function resolveProxyResponse(request: NextRequest): Promise<NextResponse>
   }
 
   // `/admin` is a staff-gated console, not a public page: it gets the Supabase-session check
-  // instead of query normalization or a stand cookie, and returns here rather than falling
-  // through. `adminAuthGate` makes its own pass-through decision for `/admin/login` and
+  // instead of query normalization, and returns here rather than falling through. `adminAuthGate` makes its own pass-through decision for `/admin/login` and
   // `/admin/api/**` (bearer-token auth) via `isAuthGatedPath`.
   if (request.nextUrl.pathname === '/admin' || request.nextUrl.pathname.startsWith('/admin/')) {
     return adminAuthGate(request);
