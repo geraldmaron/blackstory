@@ -214,11 +214,18 @@ entries. Cloudflare Free cannot vary on headers, which is why its rules exclude 
 carries `Set-Cookie`, nothing read the cookie, and Cloudflare's handling of `Set-Cookie` under an
 override rule is ambiguous enough not to rely on.
 
-**Not yet observed:** whether Vercel honors the header on a document whose `Cache-Control` says
-`private, no-store`. Its documentation gives the header top priority; its cacheability list names
-those directives. After the next production deploy, run the probe table at the bottom of this
-section. If `/entity/*` stays `x-vercel-cache: MISS`, read the cache reason in the runtime logs;
-the header costs nothing if ignored.
+**Observed 2026-09-22 after the production deploy (`f0c51506`): NOT honored.** With Cloudflare
+bypassed (rule 4's `x-maintenance-bypass` header), three consecutive requests for an entity
+page, two for a place page and two for `/explore?state=GA` all answered `x-vercel-cache: MISS`;
+`/design-system`, which no Cloudflare rule covers, did the same without any bypass. Vercel's
+cacheability list ("no `private`, `no-cache` or `no-store` in `Cache-Control`") wins over the
+targeted header on a Next dynamic page. The header is inert and costs nothing; Cloudflare is the
+only document cache. Follow-up `repo-ogo3j.11`: remove the header, or implement Vercel's own
+recipe for this case (a middleware self-fetch that re-stamps the nonce on cached HTML).
+
+Verified in the same probe: `x-vercel-id: iad1::pdx1::…` on function-rendered responses from
+both projects (the `pdx1` pin is live); `/v1/map` answers `x-vercel-cache: HIT` with `age: 1` on
+the second request, 0.86 s instead of 6.9 s.
 
 #### Operator step: convert rule 2 — DONE 2026-09-22 (dashboard, operator session)
 
@@ -289,9 +296,9 @@ Caching → Purge, or redeploy) if the wall must be immediate.
 
 | path | expect |
 |---|---|
-| `/entity/<id>` | `x-vercel-cache: HIT` (Vercel layer); after rule 2, `cf-cache-status: HIT` |
-| `/place/<slug>` | same, and no `set-cookie` |
-| `/explore?state=GA` | `HIT`, and `/explore?state=AL` a different body |
+| `/entity/<id>` | `cf-cache-status: HIT` (observed 2026-09-22); Vercel layer stays `MISS`, see above |
+| `/place/<slug>` | same, and no `set-cookie` (observed) |
+| `/explore?state=GA` | `HIT`, and `/explore?state=AL` a different body (observed) |
 | `/entity/<id>` with `rsc: 1` | Cloudflare `DYNAMIC`; Vercel may `HIT` on its own Vary-keyed entry, and the body must be `text/x-component`, never the HTML |
 | `/corrections/status/<code>` | no `Vercel-CDN-Cache-Control` reaches Vercel; `MISS` |
 | `/admin/login` | `MISS` |
