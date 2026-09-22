@@ -1,7 +1,25 @@
 # Endpoint rate limits and abuse quotas
 
-**Status:** Policy matrix + in-memory evaluator in-repo. Shared distributed store and live
-middleware wiring are follow-on work (, ).
+**Status:** Policy matrix + in-memory evaluator in-repo; the in-process store is per function
+instance, so on Vercel Fluid it bounds one instance, not a caller. The edge limit that actually
+holds across instances is the Cloudflare rule below (2026-09-22). Shared distributed store and
+live middleware wiring remain follow-on work.
+
+## Edge rate limit (Cloudflare, live 2026-09-22)
+
+Zone `blackstory.app`, Security rules → Rate limiting rules, "Expensive web endpoints - per-IP
+burst limit (2026-09-22)" (the one rule the Free plan allows): expression
+`starts_with(path, "/search/api") or "/explore/api" or "/locate/api" or "/submit/api" or path eq
+"/api/request-integrity" or (starts_with(path, "/corrections/") and ends_with(path, "/api"))`,
+counted per IP, **60 requests per 10 s**, action Block for 10 s (the Free plan's only period and
+mitigation timeout). Verified live: 80 parallel requests to `/api/request-integrity` were served,
+the next request answered `429` with `retry-after: 10`, service resumed 12 s later, and `/about`
+was untouched throughout. The threshold is deliberately generous because carrier-grade NAT puts
+many phones behind one address; it stops scripts, not people. Vercel WAF rate limiting is NOT
+used on the web project: Vercel sees Cloudflare's addresses as the client, so a per-IP rule
+there would throttle every visitor together. `api.blackstory.app` is not behind Cloudflare, so
+a Vercel WAF rule (Log first, then Deny) is the right control there; it is not yet configured
+(`repo-ogo3j.7`).
 **Depends on:** [ ingress / Cloud Armor](./ingress-armor.md), [API protocol](../../apps/api-public/src/http/README.md)
 **Threats:** [T-01](./threat-model.md#t-01-volumetric-and-application-layer-denial-of-service), [T-02](./threat-model.md#t-02-cost-exhaustion-via-search-and-geocoding), [T-05](./threat-model.md#t-05-coordinated-correction-brigading)
 
