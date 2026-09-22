@@ -214,3 +214,23 @@ cut on VOX 34.685 / kick 36.20 / bass return 39.125 / kick 40.10. The final
 pull-out and the lockup background draw all 4,206 located records as individual
 points (`assets/all-records.geojson`), with cluster layers hidden and state
 shading dimmed. QA: 0 cut offset against kicks/vocal entrances.
+
+**32 — v006 closing card had no logo (2026-09-22).** Flagged in review: the card
+set `BlackStory.` as live text, no symbol. Checked against the brand kit's own
+Do/Don't page (`brand/guide/pages/03-usage-rules.png`) — every approved
+treatment pairs the book-and-pin symbol with the wordmark or uses the symbol
+alone; there's no approved wordmark-only lockup, and the product's own rule
+(`apps/web/src/app/layout.tsx`) is that the mark is never retyped in a live
+face. `brand-card.html` now places the kit's dark lockup PNG as provided,
+sized/positioned off its own alpha bounds so clear space is measured on the
+ink, not the canvas (D23). Recaptured `brand-fg` only, rebuilt as v007. Verified
+byte-identical to v006 for frames 0–3061 (`ffmpeg -f framemd5`); `qa_render.py`
+(`EDIT=./edit-v3.mjs`, run against a throwaway venv — numpy wasn't on the
+system Python) passed clean: 0 blank frames beyond the 3 pre-existing silence
+holds, 0/35 cuts off-grid, audio unchanged. Delivered `tiktok-v5.mp4` (73 MB).
+**Found in the process, not fixed:** `project/write-docs.mjs` generates
+EDIT-TIMELINE.md/CAPTURE-MANIFEST.md from `SHOTS` (`shots.mjs`), but the real
+edit is `TIMELINE` (`edit-v3.mjs`); the two have drifted (shots.mjs carries a
+`map-reveal` shot the shipped timeline never uses, among other differences).
+Running it now produces a doc that disagrees with the actual video, so both
+docs were left as-is rather than regenerated wrong. Filed: repo-6hpnc.

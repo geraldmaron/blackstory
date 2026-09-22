@@ -1,9 +1,11 @@
 <!doctype html>
 <meta charset="utf-8" />
 <title>BlackStory lockup</title>
-<!-- Typography matches the running product: Schibsted Grotesk 600 for the mark,
-     Newsreader italic for the accent word, Geist for the URL. Colours are the
-     application's own tokens (--ds-ink #f4efe5, --ds-accent #d07a32). -->
+<!-- The mark is the brand kit's own dark lockup, placed as provided: never retyped in a live
+     face, recolored, stretched or given effects (brand/guide/pages/03-usage-rules.png; the
+     product follows the same rule, see apps/web/src/app/layout.tsx). The line and URL match the
+     running product: Schibsted Grotesk, Newsreader italic for the accent word, Geist for the URL.
+     Colors are the application's own tokens (--ds-ink #f4efe5, --ds-accent #d07a32). -->
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link
@@ -15,6 +17,12 @@
     --ink: #f4efe5;
     --muted: #bdb5a9;
     --accent: #d07a32;
+    /* How wide the lockup looks, measured on its ink rather than its canvas. 540px keeps it
+       inside the 270px margins either side, clear of the action rail. */
+    --mark-w: 540px;
+    /* Clear space around the logo equals the symbol's height (brand guide, Usage Rules). The
+       symbol is the lockup's tallest element, so that is the ink height. */
+    --mark-h: calc(var(--mark-w) * 352 / 1251);
   }
   * {
     margin: 0;
@@ -43,21 +51,29 @@
     text-align: center;
     transform-origin: 50% 50%;
   }
+  /* The kit PNG carries a wide transparent margin (alpha bounds 238,286 to 1489,638 of
+     1672x941, per brand/qa/transparency-report.json). This box is exactly the visible ink, and
+     the image hangs out of it by the measured margins, so centering and clear space are measured
+     from the mark itself. Re-measure these numbers if the artwork is re-exported. */
   .mark {
-    font-size: 104px;
-    font-weight: 600;
-    letter-spacing: -0.042em;
-    color: var(--ink);
-    line-height: 1;
+    position: relative;
+    width: var(--mark-w);
+    height: var(--mark-h);
+    margin: 0 auto;
   }
-  .mark .dot {
-    color: var(--accent);
+  .mark img {
+    position: absolute;
+    left: calc(var(--mark-w) * -238 / 1251);
+    top: calc(var(--mark-w) * -286 / 1251);
+    width: calc(var(--mark-w) * 1672 / 1251);
+    height: auto;
+    max-width: none;
   }
   .rule {
     width: 64px;
     height: 2px;
     background: var(--accent);
-    margin: 46px auto;
+    margin: var(--mark-h) auto 46px;
     opacity: 0.9;
   }
   .line {
@@ -83,7 +99,13 @@
   }
 </style>
 <div class="card" id="card">
-  <div class="mark">BlackStory<span class="dot">.</span></div>
+  <div class="mark">
+    <img
+      id="lockup"
+      src="../../../../brand/logos/dark/BlackStory-primary-lockup-dark-transparent.png"
+      alt="BlackStory"
+    />
+  </div>
   <div class="rule" id="rule"></div>
   <div class="line">History, pinned to <em>place</em>.</div>
   <div class="url">blackstory.app</div>
@@ -98,5 +120,9 @@
     rule.style.transform = 'scaleX(' + ruleScale + ')';
   };
   window.__brand(0, 0, 1, 0);
-  window.__ready = true;
+  // Not ready until the lockup has real pixels and the faces are in. If the artwork path breaks,
+  // the harness times out and the capture fails instead of rendering a card with no logo.
+  Promise.all([document.getElementById('lockup').decode(), document.fonts.ready]).then(() => {
+    window.__ready = true;
+  });
 </script>

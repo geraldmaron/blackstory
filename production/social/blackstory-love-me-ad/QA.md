@@ -4,6 +4,10 @@ Reviewed render: `renders/blackstory-love-me-v002.mp4` (master) and its delivery
 encodes `renders/blackstory-love-me-tiktok-v1.mp4` / `-synccheck.mp4`.
 Programmatic results: `renders/blackstory-love-me-v002-qa.json` (from `scripts/qa_render.py`).
 
+**v007 addendum (2026-09-22).** Closing card only (D23) — see below the original
+pass 1/2 tables, which otherwise still describe v006 and remain accurate for
+frames 0–3061 (proved byte-identical by `ffmpeg -f framemd5`).
+
 Two review passes were made: pass 1 (visual) on v001, which produced the v002
 fine cut; pass 2 (visual + sync) on v002. What was checked by machine and what
 was checked by looking is stated per line.
@@ -88,6 +92,28 @@ the EDL generator was corrected.
 | 11 | EDL called four joins "hard cuts" | generator corrected |
 | 12 | Final file 411 MB all-intra | delivery encode stage added |
 | 13 | Dev server SIGTERM'd mid-capture (code 143, externally) | restarted; the 4 interrupted shots recaptured |
+| 14 | v006 closing card was retyped text, no symbol — off-brand per the kit's own Do/Don't page | v007: `brand-card.html` places the approved lockup PNG as provided (D23) |
+
+## v007 — closing card only
+
+Reviewed: `renders/blackstory-love-me-v007.mp4` against `renders/blackstory-love-me-v006.mp4`.
+
+| Check | Result | How verified |
+|---|---|---|
+| Frames 0–3061 unchanged | **Pass** | `ffmpeg -f framemd5` on both masters: identical for every frame before 3062; the only differing frames are 3062–3263 (the `brand-fg`/`brand-bg` span) |
+| Lockup used as provided | **Pass** | `brand-card.html` renders `brand/logos/dark/BlackStory-primary-lockup-dark-transparent.png` directly; width set, height auto (aspect preserved); no CSS filter or recolor on the image; card-level fade is the same opacity/scale/lift transform v006 already used, unaltered in kind |
+| Clear space ≥ symbol height | **Pass** | `.mark` box sized to the kit's own alpha bounds (`brand/qa/transparency-report.json`); rule sits one mark-height below, both DOM-measured (`getBoundingClientRect`) and confirmed against the rendered frame |
+| Inside TikTok safe areas | **Pass** | mark right edge at x≈810 of 1080 (270px clear, > the ~260px action rail); block spans y≈709–1211, clear of the top ~300px and bottom ~420px caption zone |
+| No clipping at the mark's edges | **Pass** | zoomed crop of the rendered frame at the wordmark's right edge (the tightest-fitting glyph) — full descender visible, no cutoff |
+| No blank/loading frames in the new span | **Pass** | `scripts/qa_render.py` (`EDIT=./edit-v3.mjs`): 0 blank frames beyond the same 3 pre-existing silence holds (338–342, 516–520, 695–699), unchanged from v006 |
+| Cuts still on the grid | **Pass** | same script: 0 of 35 cuts off-grid, incl. the `brand-bg` cut itself |
+| Audio unchanged | **Pass** | same script: −12.5 LUFS integrated, −2.4 dBFS true peak — identical to v006 (audio track untouched) |
+| Delivery encode | **Pass** | `scripts/deliver.sh` → `tiktok-v5.mp4` (73 MB) and `tiktok-v5-synccheck.mp4` (74 MB), same profile as v006 |
+
+**Residual risk (v007, in addition to the below, which still applies).** Not
+reviewed in real-time playback (see below). The clear space needs no caveat: the
+symbol spans the lockup's full ink height (y 287–635 of the kit PNG) and the
+wordmark sits inside it (y 404–604), so the ink height is the symbol's height.
 
 ## Residual risk
 
