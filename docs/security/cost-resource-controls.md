@@ -173,35 +173,128 @@ Note the browser still receives `private, no-cache, no-store` on `/` while Cloud
 `HIT`. That is the intended split: `override_origin` caches at the edge, the origin's header passes
 downstream untouched, so no visitor caches a dynamic page locally.
 
-### Second rule: request-rendered document surfaces (reconciled 2026-09-19)
+### Second rule: request-rendered document surfaces (inert; redesigned 2026-09-22)
 
-`/methodology`, `/submit`, `/entity/`, `/books/`, `/law/`, `/stories/`, `/chapters/` — same `rsc`
-bypass — with **`edge_ttl: respect_origin`** rather than the `override_origin` the first rule uses.
+**Measured 2026-09-22 (morning): this rule cached nothing; converted the same day, see the
+operator step below.** `curl -I` on live paths at the time: `/entity/*` and
+`/stories/*` answer `cf-cache-status: BYPASS`; `/place/*` (3,690 sitemap URLs), `/invention/*`,
+`/lives`, `/rooms`, `/about`, `/records` and `/explore` answer `DYNAMIC` because no rule matches
+them. Only `/` and `/memorial` hit. The root layout is `force-dynamic` for the nonce CSP, so every
+document answers `private, no-cache, no-store`, and `edge_ttl: respect_origin` honors that. The
+2026-09-19 reconciliation that introduced `respect_origin` reasoned from Next's rendering mode
+and never probed the header. Every one of 4,200+ record pages is still served from a Vercel
+function on every request, human or crawler; current-period usage implies ~4.8M invocations in
+four weeks against ~1.8k analytics pageviews, so the origin load is almost entirely crawlers,
+and it becomes human load on announcement. Tracked as `repo-ogo3j.3`.
 
-The app root is request-rendered because the nonce CSP is request-specific: Next can attach a
-nonce to framework and hydration scripts only while rendering an incoming request. Static HTML
-was not compatible with the per-request CSP; cached `/about` HTML proved the failure by serving
-framework scripts without the nonce and leaving shared controls such as the theme toggle inert.
-This rendering boundary does not remove the explicit data and route-handler caches beneath it.
+Override-origin caching of a request-rendered document IS nonce-safe: the cached `/` carries a
+CSP header whose nonce matches the two `nonce=""` attributes in its own HTML, because the edge
+stores header and body together. The 2026-09-19 failure (framework scripts without a nonce) was
+Next *static prerendering*, which cannot know a nonce at build time; edge caching of a rendered
+response is a different thing and does not have that problem.
 
-The two Cloudflare groups still need opposite treatment, which is why they remain separate.
-Surfaces in the first rule send `no-store`, so the edge must *override* the origin or nothing
-caches. The second rule continues to *respect* the document response's cache policy. Do not infer
-ISR or a Vercel prerender from a route-level `revalidate` export: the root nonce requirement
-outranks static page generation.
+#### Target design: three layers, one policy
 
-`respect_origin` also makes the prefix list safe to be generous with: a route that declares
-`no-store` or `max-age=0` simply does not cache. Verified — `/stories/mosaic-credits` sends
-`public, max-age=0, must-revalidate` and stays uncached even though `/stories/` is matched. Adding a
-prefix cannot force-cache something the app said not to.
+| Layer | Scope | TTL | Set by |
+|---|---|---|---|
+| Cloudflare rule 1 (live) | `/`, `/library`, `/memorial` | 1 h edge, browser respects origin | zone cache rule, `override_origin` |
+| Cloudflare rule 2 (operator, pending) | every rendered public surface below | 1 h edge, browser respects origin | zone cache rule, **must become `override_origin`** |
+| Vercel CDN (in code, pending deploy) | every rendered public surface | 5 min fresh, 1 h stale-while-revalidate | `Vercel-CDN-Cache-Control` from `apps/web/src/proxy.ts` |
 
-The 2026-08-25 MISS-to-HIT observations below are historical evidence for the Cloudflare rules,
-not the current Next rendering mode: `/methodology`, `/entity/[id]` and `/submit` each went `MISS`
-then `HIT`; `/` and `/rooms` remained `HIT`; an entity request with `rsc: 1` returned `DYNAMIC`;
-`/corrections` and `/records` stayed excluded.
+The Vercel layer exists because a `Cache-Control` from `next.config.mjs` loses to Next's own
+`no-store` on a dynamic page (measured 2026-08-09), while `Vercel-CDN-Cache-Control` is consumed
+by Vercel alone, outranks `Cache-Control` in its cache, and is never forwarded. It is attached
+only to a GET/HEAD for a path the surface registry (`apps/web/src/lib/nav/surface-classes.ts`)
+classifies as a rendered surface, never to an endpoint, `/admin` or a correction receipt. RSC
+payloads carry it as well: Next strips the `rsc` header before the proxy runs, so they cannot be
+told apart there, and the page's `Vary: rsc, next-router-state-tree, …` makes Vercel key the
+entry on those request headers, which keeps an RSC navigation and the HTML document in separate
+entries. Cloudflare Free cannot vary on headers, which is why its rules exclude `rsc` instead. The dead `bs-stand` cookie the proxy used to set on
+`/place/*` responses was removed in the same change: Vercel does not cache a response that
+carries `Set-Cookie`, nothing read the cookie, and Cloudflare's handling of `Set-Cookie` under an
+override rule is ambiguous enough not to rely on.
 
-Before this, every one of 4,107 entity pages was served from Vercel on every request despite the
-origin declaring it cacheable for an hour.
+**Not yet observed:** whether Vercel honors the header on a document whose `Cache-Control` says
+`private, no-store`. Its documentation gives the header top priority; its cacheability list names
+those directives. After the next production deploy, run the probe table at the bottom of this
+section. If `/entity/*` stays `x-vercel-cache: MISS`, read the cache reason in the runtime logs;
+the header costs nothing if ignored.
+
+#### Operator step: convert rule 2 — DONE 2026-09-22 (dashboard, operator session)
+
+Rule 1 in the zone's cache-rule order (id `8e9ff2ff1aac42008fa3536bdd73ba3e`, renamed "HTML edge
+cache - record and reading surfaces (override origin, 2026-09-22)") now carries the expression
+below with `override_origin`, default 1 h, status-code TTL 200-226 → 1 h and 300-526 → no cache,
+browser TTL respect origin, cache key untouched. Live probe two minutes after save, second
+request of each pair: `/entity/*`, `/place/*`, `/stories/*`, `/invention/*`, `/about`,
+`/records`, `/lives`, `/explore?state=GA` and `/explore?state=AL` all `MISS` → `HIT` (and the two
+Explore bodies differ); `/entity/*` with `rsc: 1` stays `DYNAMIC` with a `text/x-component` body;
+`/corrections/status/*` stays `DYNAMIC`; `/atlas/catalog` unchanged (Vercel `HIT`); `/` still
+`HIT`. The steps are kept for the next zone that needs them.
+
+
+1. `GET /zones/653abe0dbd1b10d22411306cb1f645be/rulesets/fbba310d91a3483f88cc5686b25684e1` and
+   copy rule 1's `action_parameters` verbatim (`cache: true`, `edge_ttl.mode: override_origin`,
+   default 3600, `status_code_ttl` 200-226 → 3600 and 300-526 → 0, `browser_ttl.mode:
+   respect_origin`). Rule 1 is the proven shape; do not retype it.
+2. `PATCH .../rulesets/{ruleset}/rules/{rule-2-id}` with those `action_parameters` and this
+   expression (keep the existing `rsc` exclusion and the maintenance bypass rule ordering):
+
+   ```
+   (http.request.method eq "GET") and not any(http.request.headers.names[*] == "rsc") and (
+     http.request.uri.path eq "/explore" or http.request.uri.path eq "/rooms" or
+     http.request.uri.path eq "/records" or http.request.uri.path eq "/about" or
+     http.request.uri.path eq "/faq" or http.request.uri.path eq "/methodology" or
+     http.request.uri.path eq "/sources" or http.request.uri.path eq "/errata" or
+     http.request.uri.path eq "/data" or http.request.uri.path eq "/lives" or
+     http.request.uri.path eq "/stories" or http.request.uri.path eq "/books" or
+     http.request.uri.path eq "/law" or http.request.uri.path eq "/submit" or
+     http.request.uri.path eq "/privacy" or http.request.uri.path eq "/terms" or
+     http.request.uri.path eq "/support" or
+     starts_with(http.request.uri.path, "/entity/") or
+     starts_with(http.request.uri.path, "/place/") or
+     starts_with(http.request.uri.path, "/invention/") or
+     starts_with(http.request.uri.path, "/stories/") or
+     starts_with(http.request.uri.path, "/books/") or
+     starts_with(http.request.uri.path, "/law/") or
+     starts_with(http.request.uri.path, "/lives/")
+   )
+   ```
+
+   `/explore` keeps its query string in the cache key (the default); do NOT add "ignore query
+   string" here, one state's Atlas would be served to everyone. `/corrections/*` stays out.
+3. Add a third rule for the JSON endpoints that already send `public` cache headers so repeat
+   fetches stop counting as Vercel data transfer: `/atlas/catalog`, `/atlas/photos`,
+   `/door/photos`, `/sitemap.xml`, `/errata/feed.json`, `/errata/feed.xml`, `edge_ttl:
+   respect_origin` (they say 300–3600 s themselves).
+
+#### Control: purge after an in-place correction
+
+A correction written to `published.*` under the same release id reaches Vercel's cache within
+five minutes on its own (`s-maxage=300`) but stays in Cloudflare for up to an hour. After the
+catalog republish in `CLAUDE.md` ("Republishing the CDN catalog after a published write"),
+purge the zone; Free supports purge-everything and single-URL purge only:
+
+```bash
+curl -X POST "https://api.cloudflare.com/client/v4/zones/653abe0dbd1b10d22411306cb1f645be/purge_cache" \
+  -H "Authorization: Bearer $CLOUDFLARE_API_TOKEN" -H "Content-Type: application/json" \
+  --data '{"purge_everything":true}'
+```
+
+Maintenance mode has the same shape: enabling the wall does not evict cached 200s from either
+layer. Purge the zone (already in the maintenance runbook) and Vercel's CDN (Project → Settings →
+Caching → Purge, or redeploy) if the wall must be immediate.
+
+#### Post-deploy probe table (run twice per row; second answer is the one that matters)
+
+| path | expect |
+|---|---|
+| `/entity/<id>` | `x-vercel-cache: HIT` (Vercel layer); after rule 2, `cf-cache-status: HIT` |
+| `/place/<slug>` | same, and no `set-cookie` |
+| `/explore?state=GA` | `HIT`, and `/explore?state=AL` a different body |
+| `/entity/<id>` with `rsc: 1` | Cloudflare `DYNAMIC`; Vercel may `HIT` on its own Vary-keyed entry, and the body must be `text/x-component`, never the HTML |
+| `/corrections/status/<code>` | no `Vercel-CDN-Cache-Control` reaches Vercel; `MISS` |
+| `/admin/login` | `MISS` |
 
 ## Cloudflare zone security posture (blackstory.app)
 

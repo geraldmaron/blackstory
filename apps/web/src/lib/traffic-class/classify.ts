@@ -70,3 +70,16 @@ export function classifyTraffic(signals: TrafficClassSignals): TrafficClass {
 export function buildTrafficEventPayload(trafficClass: TrafficClass): TrafficEventPayload {
   return { class: trafficClass };
 }
+
+/**
+ * Share of navigations that send the `traffic` custom event. Vercel bills every collected event,
+ * pageview or custom, at the same rate with nothing included on Pro, so an event on every
+ * navigation doubled the analytics bill for a ratio that a sample reports just as well. Read the
+ * dashboard's per-class counts as one tenth of the truth; the pageview count stays exact.
+ */
+export const TRAFFIC_EVENT_SAMPLE_RATE = 0.1;
+
+/** Sample decision for one navigation; `random` is injected so the boundary is testable. */
+export function shouldSendTrafficEvent(random: number = Math.random()): boolean {
+  return random < TRAFFIC_EVENT_SAMPLE_RATE;
+}

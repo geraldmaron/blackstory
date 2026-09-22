@@ -26,4 +26,9 @@ export function remindToRepublishCatalogArtifacts(changedRowCount: number): void
     '(Left unrun, the daily forgetting-insurance cron picks it up within ~24h — see that ' +
       "workflow's own header comment.)",
   );
+  console.log(
+    'Then purge the Cloudflare zone: public documents are edge-cached for an hour, so the ' +
+      'corrected record keeps its old HTML at the edge until you do (CLAUDE.md, "Republishing ' +
+      'the CDN catalog"). Vercel\'s own CDN copy refreshes within five minutes by itself.',
+  );
 }

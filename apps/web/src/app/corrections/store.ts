@@ -1,8 +1,13 @@
 /**
- * In-memory correction submission store for the web intake lane. Production wiring
- * persists through Postgres `submissions.intake_items`; this module provides the same quarantine-only
- * contract for App Hosting routes and tests. Deliberately exposes lookup-by-receipt only no
- * list or enumerate API exists for submitters.
+ * In-memory correction submission store — the test double and fallback, not production wiring.
+ * This module's doc comment previously claimed "production wiring persists through Postgres
+ * submissions.intake_items"; that was never true (repo-vl155.1) — nothing ever called out from
+ * this store to Postgres, so every publicly submitted correction was invisible to the admin
+ * console (which reads Postgres) and lost on the next cold start, confirmed empirically 2026-09-21
+ * against the live database (zero `kind='correction'`/`'abuse_report'` rows ever, out of 2,175
+ * submissions of other kinds). The real store is `./postgres-store.ts`; this one still backs
+ * tests, matching the same `CorrectionSubmissionStore` contract. Deliberately exposes
+ * lookup-by-receipt only — no list or enumerate API exists for submitters.
  */
 import type { QuarantinedSubmissionRecord } from '@repo/security';
 import { createReceiptCode, digestReceiptCode } from './receipt-code';
@@ -27,45 +32,55 @@ export type StoredCorrection = {
   readonly updatedAt: string;
 };
 
+/**
+ * Async throughout: the real implementation (`./postgres-store.ts`) is a database, and a
+ * `CorrectionSubmissionStore` local variable must be swappable between that and this in-memory
+ * one without the caller knowing which it has.
+ */
 export type CorrectionSubmissionStore = {
-  save(entry: StoredCorrection): void;
-  getBySubmissionId(id: string): StoredCorrection | undefined;
-  getByReceiptCode(receiptCode: string, pepper: string): StoredCorrection | undefined;
+  save(entry: StoredCorrection): Promise<void>;
+  getBySubmissionId(id: string): Promise<StoredCorrection | undefined>;
+  getByReceiptCode(receiptCode: string, pepper: string): Promise<StoredCorrection | undefined>;
   attachAppeal(
     receiptCode: string,
     pepper: string,
     appeal: StoredAppeal,
-  ): StoredCorrection | undefined;
+  ): Promise<StoredCorrection | undefined>;
   markClosed(
     submissionId: string,
     closureReason: PublicClosureReason,
-  ): StoredCorrection | undefined;
+  ): Promise<StoredCorrection | undefined>;
 };
 
 export function createCorrectionSubmissionStore(): CorrectionSubmissionStore {
   const bySubmissionId = new Map<string, StoredCorrection>();
   const byReceiptDigest = new Map<string, string>();
 
+  async function getByReceiptCode(
+    receiptCode: string,
+    pepper: string,
+  ): Promise<StoredCorrection | undefined> {
+    const digest = digestReceiptCode(receiptCode, pepper);
+    if (!digest) return undefined;
+    const submissionId = byReceiptDigest.get(digest);
+    if (!submissionId) return undefined;
+    return bySubmissionId.get(submissionId);
+  }
+
   return {
-    save(entry) {
+    async save(entry) {
       if (bySubmissionId.has(entry.record.id)) {
         throw new Error('Submission id already exists.');
       }
       bySubmissionId.set(entry.record.id, entry);
       byReceiptDigest.set(entry.receiptDigest, entry.record.id);
     },
-    getBySubmissionId(id) {
+    async getBySubmissionId(id) {
       return bySubmissionId.get(id);
     },
-    getByReceiptCode(receiptCode, pepper) {
-      const digest = digestReceiptCode(receiptCode, pepper);
-      if (!digest) return undefined;
-      const submissionId = byReceiptDigest.get(digest);
-      if (!submissionId) return undefined;
-      return bySubmissionId.get(submissionId);
-    },
-    attachAppeal(receiptCode, pepper, appeal) {
-      const existing = this.getByReceiptCode(receiptCode, pepper);
+    getByReceiptCode,
+    async attachAppeal(receiptCode, pepper, appeal) {
+      const existing = await getByReceiptCode(receiptCode, pepper);
       if (!existing) return undefined;
       const updated: StoredCorrection = {
         ...existing,
@@ -79,7 +94,7 @@ export function createCorrectionSubmissionStore(): CorrectionSubmissionStore {
       bySubmissionId.set(existing.record.id, updated);
       return updated;
     },
-    markClosed(submissionId, closureReason) {
+    async markClosed(submissionId, closureReason) {
       const existing = bySubmissionId.get(submissionId);
       if (!existing) return undefined;
       const updated: StoredCorrection = {

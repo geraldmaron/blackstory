@@ -8,8 +8,10 @@ import { AI_TRAINING_USER_AGENTS } from './agent-lists';
 import {
   buildTrafficEventPayload,
   classifyTraffic,
+  shouldSendTrafficEvent,
   TRAFFIC_CLASSES,
   TRAFFIC_EVENT_NAME,
+  TRAFFIC_EVENT_SAMPLE_RATE,
 } from './classify';
 
 const CHROME_DESKTOP =
@@ -113,4 +115,12 @@ test('the analytics payload is the enum only', () => {
   assert.deepEqual(Object.keys(payload), ['class']);
   assert.ok(TRAFFIC_CLASSES.includes(payload.class));
   assert.equal(TRAFFIC_EVENT_NAME, 'traffic');
+});
+
+test('the traffic event is sampled, not sent on every navigation', () => {
+  assert.ok(TRAFFIC_EVENT_SAMPLE_RATE > 0 && TRAFFIC_EVENT_SAMPLE_RATE < 1);
+  assert.equal(shouldSendTrafficEvent(0), true);
+  assert.equal(shouldSendTrafficEvent(TRAFFIC_EVENT_SAMPLE_RATE - 1e-9), true);
+  assert.equal(shouldSendTrafficEvent(TRAFFIC_EVENT_SAMPLE_RATE), false);
+  assert.equal(shouldSendTrafficEvent(0.999), false);
 });

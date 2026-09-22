@@ -1,5 +1,6 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
+  "regions": ["pdx1"],
   "installCommand": "cd ../.. && node scripts/install-vercel-dependencies.mjs",
   "buildCommand": "cd ../.. && pnpm run build:foundation && pnpm --filter @repo/api-public... run build",
   "outputDirectory": "public",

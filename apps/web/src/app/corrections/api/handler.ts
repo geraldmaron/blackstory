@@ -4,7 +4,11 @@
  */
 import { createHash, randomUUID } from 'node:crypto';
 import { NextResponse } from 'next/server';
-import { createQuarantinedSubmission, createSubmissionCampaignDetector } from '@repo/security';
+import {
+  createQuarantinedSubmission,
+  createSubmissionCampaignDetector,
+  type QuarantinedSubmissionRecord,
+} from '@repo/security';
 import { requirePrivacyPepper } from '@/lib/web-security';
 import { buildPublicCorrectionStatus } from '../public-status';
 import {
@@ -18,10 +22,13 @@ import {
 import { createReceiptCode } from '../receipt-code';
 import {
   buildStoredCorrection,
-  createCorrectionSubmissionStore,
   type CorrectionSubmissionStore,
   type StoredCorrection,
 } from '../store';
+import {
+  createPostgresCorrectionSubmissionStore,
+  saveQuarantinedRecord,
+} from '../../../lib/public-data/corrections-store';
 import type { CorrectionRequestIntegrityGuard } from '../request-integrity-guard';
 import type { createCorrectionRateLimitGuard } from '../rate-limit-guard';
 
@@ -43,6 +50,13 @@ export type CorrectionRouteDependencies = {
   readonly privacyPepper: string;
   readonly campaignDetector?: ReturnType<typeof createSubmissionCampaignDetector>;
   readonly now?: () => number;
+  /**
+   * Persists an accepted abuse report. Abuse reports have no receipt/status scheme (no target
+   * type, category, or code — see `../postgres-store.ts`), so they don't go through `store`.
+   * Defaults to the real Postgres writer; tests override this the same way they substitute
+   * `store` for the in-memory one, rather than reaching the network.
+   */
+  readonly saveAbuseReport?: (record: QuarantinedSubmissionRecord) => Promise<void>;
 };
 
 function jsonError(status: number, error: string, extra?: Record<string, unknown>): Response {
@@ -155,7 +169,7 @@ export async function handleCorrectionSubmitRequest(
       category: validation.metadata.category,
       classificationDispute: validation.metadata.classificationDispute,
     });
-    deps.store.save(stored);
+    await deps.store.save(stored);
 
     return NextResponse.json(
       {
@@ -180,7 +194,7 @@ export async function handleCorrectionStatusRequest(
     return jsonError(400, 'receipt_required');
   }
 
-  const stored = deps.store.getByReceiptCode(receiptCode, deps.privacyPepper);
+  const stored = await deps.store.getByReceiptCode(receiptCode, deps.privacyPepper);
   if (!stored) {
     return jsonError(404, 'not_found');
   }
@@ -204,7 +218,10 @@ export async function handleCorrectionAppealRequest(
     }
 
     const input = body as AppealSubmissionInput & { readonly sourceUrl?: string | undefined };
-    const stored = deps.store.getByReceiptCode(input.receiptCode?.trim() ?? '', deps.privacyPepper);
+    const stored = await deps.store.getByReceiptCode(
+      input.receiptCode?.trim() ?? '',
+      deps.privacyPepper,
+    );
     if (!stored) {
       return jsonError(404, 'not_found');
     }
@@ -224,7 +241,7 @@ export async function handleCorrectionAppealRequest(
       statement: input.statement.trim(),
       submittedAt: new Date(deps.now?.() ?? Date.now()).toISOString(),
     };
-    deps.store.attachAppeal(stored.receiptCode, deps.privacyPepper, appealRecord);
+    await deps.store.attachAppeal(stored.receiptCode, deps.privacyPepper, appealRecord);
 
     const appealIntake = createQuarantinedSubmission(
       validation.payload,
@@ -282,6 +299,12 @@ export async function handleCorrectionAbuseReportRequest(
       });
     }
 
+    // Abuse reports have no receipt/status scheme (nothing for a submitter to check later), so
+    // they skip `deps.store` and go straight into the same table through the lower-level writer
+    // — this is what was missing entirely before repo-vl155.1: `createQuarantinedSubmission`
+    // never touches Postgres itself, so a report that stopped here never reached a moderator.
+    await (deps.saveAbuseReport ?? saveQuarantinedRecord)(result.record);
+
     return NextResponse.json(
       {
         accepted: true,
@@ -298,7 +321,7 @@ let defaultStore: CorrectionSubmissionStore | undefined;
 
 export function getDefaultCorrectionStore(): CorrectionSubmissionStore {
   if (!defaultStore) {
-    defaultStore = createCorrectionSubmissionStore();
+    defaultStore = createPostgresCorrectionSubmissionStore();
   }
   return defaultStore;
 }
@@ -318,11 +341,11 @@ export function resolveReceiptCodeFromPath(receiptCode: string): string {
   return decodeURIComponent(receiptCode).trim();
 }
 
-export function lookupPublicStatusByReceipt(
+export async function lookupPublicStatusByReceipt(
   receiptCode: string,
   deps: Pick<CorrectionRouteDependencies, 'store' | 'privacyPepper'>,
 ) {
-  const stored = deps.store.getByReceiptCode(receiptCode, deps.privacyPepper);
+  const stored = await deps.store.getByReceiptCode(receiptCode, deps.privacyPepper);
   if (!stored) return undefined;
   return toPublicStatus(stored);
 }

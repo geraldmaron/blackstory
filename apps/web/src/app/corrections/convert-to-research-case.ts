@@ -35,16 +35,16 @@ export type CorrectionResearchCaseConversion = {
 export type CorrectionResearchCaseConversionError =
   { readonly error: 'not_found' } | { readonly error: 'not_eligible'; readonly reason: string };
 
-export function prepareCorrectionResearchCaseConversion(
+export async function prepareCorrectionResearchCaseConversion(
   submissionId: string,
   store: CorrectionSubmissionStore,
   context: CorrectionResearchCaseConversionContext,
-): CorrectionResearchCaseConversion | CorrectionResearchCaseConversionError {
+): Promise<CorrectionResearchCaseConversion | CorrectionResearchCaseConversionError> {
   if (context.actor.role !== 'admin' && context.actor.role !== 'moderator') {
     return { error: 'not_eligible', reason: 'Moderator authorization required.' };
   }
 
-  const stored = store.getBySubmissionId(submissionId);
+  const stored = await store.getBySubmissionId(submissionId);
   if (!stored) {
     return { error: 'not_found' };
   }

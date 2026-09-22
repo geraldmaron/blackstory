@@ -286,3 +286,41 @@ records as individual points. The product's cluster layers are hidden, only in t
 **Why.** Clusters compress the archive into a few dozen numbers. The point of the
 close is the sheer volume. This is a presentation choice for the ad, not a change
 to the product. Earlier map shots keep the product's native clustering.
+
+---
+
+## D23 — Revision 5 (v007): the closing card carries the approved lockup, not retyped text
+
+**Decision.** `assets/brand-card.html` now places `brand/logos/dark/BlackStory-primary-lockup-dark-transparent.png`
+(the kit's own dark-background lockup — book-and-pin symbol plus wordmark) as
+provided: undistorted, not recolored, no effects. Previously the card set
+`BlackStory.` as live Schibsted Grotesk text with no symbol at all.
+
+**Why.** Caught in client review of v006: the piece's own brand guide
+(`brand/guide/pages/03-usage-rules.png`, Do/Don't) approves only the lockup as
+shipped or the symbol alone — there is no approved wordmark-only treatment, and
+the product itself never retypes the mark in a live face (`apps/web/src/app/layout.tsx`:
+"The wordmark art is unaffected by any of this: the lockup ships as provided and is
+never retyped in a live face"). The card was a hand-built imitation of the
+wordmark's typography, correct in font and color but missing the mark.
+
+**How.** The kit PNG carries a wide transparent margin (alpha bounds 238,286 to
+1489,638 of 1672×941 — `brand/qa/transparency-report.json`). `.mark` in
+`brand-card.html` is sized to the ink, not the canvas, and the image is
+positioned by negative offsets so the box the rest of the card is laid out
+against (clear space, centering) matches the visible mark — the same technique
+`apps/web/src/components/shell/command-bar.css` uses for the product's own nav
+lockup. Clear space below the mark is set to the mark's own ink height, per the
+guide's "clear space equals the symbol's height" rule. The two are the same
+measurement: the symbol spans the full ink height (y 287–635 of the kit PNG)
+and the wordmark sits inside it (y 404–604).
+
+**Consequence.** Only `brand-fg` (frames 3062–3263, the closing ~3.4s) changed.
+Verified byte-identical against v006 for every frame before 3062
+(`ffmpeg -f framemd5`). `renders/blackstory-love-me-v007.mp4` /
+`-tiktok-v5.mp4` supersede v006 / tiktok-v4. QA: `scripts/qa_render.py`
+(`EDIT=./edit-v3.mjs`) — 0 blank frames beyond the three pre-existing silence
+holds, 0 of 35 cuts off-grid, audio unchanged (−12.5 LUFS, −2.4 dBFS peak).
+**Not done:** a person has not watched the sync-check file in real time (see
+QA.md Residual risk — unchanged from v006 for frames 0–3061, now also applies
+to the new closing card).

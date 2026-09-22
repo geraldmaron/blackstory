@@ -9,7 +9,7 @@ import { buildStoredCorrection, createCorrectionSubmissionStore } from './store'
 
 const PEPPER = 'test-pepper';
 
-function seedCorrection(moderationState?: 'coordinated_campaign') {
+async function seedCorrection(moderationState?: 'coordinated_campaign') {
   const result = createQuarantinedSubmission(
     {
       kind: 'correction',
@@ -32,31 +32,39 @@ function seedCorrection(moderationState?: 'coordinated_campaign') {
     category: 'factual_error',
     classificationDispute: false,
   });
-  store.save(stored);
+  await store.save(stored);
   return { store, stored };
 }
 
-test('converts a quarantined correction into a draft research case for moderators', () => {
-  const seeded = seedCorrection();
+test('converts a quarantined correction into a draft research case for moderators', async () => {
+  const seeded = await seedCorrection();
   assert.ok(seeded);
-  const outcome = prepareCorrectionResearchCaseConversion(seeded.stored.record.id, seeded.store, {
-    actor: { actorId: 'moderator-1', role: 'moderator' },
-    privacyPepper: PEPPER,
-    now: '2026-07-17T12:00:00.000Z',
-  });
+  const outcome = await prepareCorrectionResearchCaseConversion(
+    seeded.stored.record.id,
+    seeded.store,
+    {
+      actor: { actorId: 'moderator-1', role: 'moderator' },
+      privacyPepper: PEPPER,
+      now: '2026-07-17T12:00:00.000Z',
+    },
+  );
   assert.equal('error' in outcome, false);
   if ('error' in outcome) return;
   assert.equal(outcome.researchCase.state, 'candidate');
   assert.equal(outcome.researchCase.candidateId, seeded.stored.record.id);
 });
 
-test('blocks conversion for coordinated campaign submissions', () => {
-  const seeded = seedCorrection('coordinated_campaign');
+test('blocks conversion for coordinated campaign submissions', async () => {
+  const seeded = await seedCorrection('coordinated_campaign');
   assert.ok(seeded);
-  const outcome = prepareCorrectionResearchCaseConversion(seeded.stored.record.id, seeded.store, {
-    actor: { actorId: 'admin-1', role: 'admin' },
-    privacyPepper: PEPPER,
-  });
+  const outcome = await prepareCorrectionResearchCaseConversion(
+    seeded.stored.record.id,
+    seeded.store,
+    {
+      actor: { actorId: 'admin-1', role: 'admin' },
+      privacyPepper: PEPPER,
+    },
+  );
   assert.deepEqual(outcome, {
     error: 'not_eligible',
     reason: 'Coordinated campaign submissions require manual triage before research conversion.',

@@ -84,8 +84,9 @@ async function fetchActiveReleaseMemoized(): Promise<ActiveReleaseResult> {
 /**
  * Cross-request stores for the public release catalogs (never private/research docs). Memory,
  * single-flight, then Next's data cache, keyed on the active release — see
- * release-scoped-cache.ts. The national catalog exceeds Next's 2MB entry limit, so it lives in
- * process memory only; the search index usually fits and is shared across instances.
+ * release-scoped-cache.ts. Both catalogs exceed Next's 2MB entry limit (13.8 MB and 8.3 MB on
+ * 2026-09-22), so each lives in process memory only and every instance loads its own copy; the
+ * shared fetcher in `@repo/domain` makes that reload a conditional GET.
  */
 const liveEntitiesCache = createReleaseScopedCache<readonly PublicEntityView[]>({
   kind: 'public-release-entities',

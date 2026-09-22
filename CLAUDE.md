@@ -126,6 +126,11 @@ an in-place correction does not change. Rebuild the graph, then republish **loca
 cd apps/web && set -a && . ./.env.local && set +a && node --conditions development --import tsx ../../packages/ops-data/scripts/publish-release-catalog-artifacts.ts
 ```
 
+**Then purge the Cloudflare zone** (`docs/security/cost-resource-controls.md`, "purge after an
+in-place correction"): public documents are edge-cached for an hour, so a corrected record keeps
+its old HTML at Cloudflare until purged. Vercel's own CDN copy refreshes within five minutes by
+itself.
+
 **Then stop. Do not run `gh workflow run publish-release-catalog-artifacts.yml` afterwards.** The
 workflow runs that same script against the same watermark
 (`published.release_catalog_publish_watermark`), so once the local run has consumed it the

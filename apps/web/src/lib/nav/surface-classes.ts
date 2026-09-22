@@ -73,7 +73,13 @@ const SURFACE_CLASS_BY_PATH: ReadonlyMap<string, SurfaceClass> = new Map([
  * before `/corrections/…` and `/stories/mosaic-credits` never reaches `/stories/`.
  */
 const SURFACE_CLASS_PREFIXES: readonly (readonly [string, SurfaceClass])[] = [
-  ['/corrections/status/', 'utility'],
+  // No trailing slash: matches the receipt-lookup landing page itself (`/corrections/status`,
+  // repo-vl155.2) as well as its `/corrections/status/[receiptCode]` child, both task
+  // sub-surfaces of `/corrections` rather than rooms of their own — same treatment `[receiptCode]`
+  // already had, kept off the exact-match table (and so out of `CLASSIFIED_PATHS`) on purpose:
+  // the destination registry's coverage test requires every exact-classified route to carry its
+  // own reader-facing card, which neither of these needs any more than the appeal/abuse forms do.
+  ['/corrections/status', 'utility'],
   // `/corrections/appeal` and `/corrections/abuse` are API-only directories. Their forms render
   // inside the receipt status page, so classifying the directory paths would advertise chrome for
   // URLs that return 404.

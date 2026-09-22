@@ -44,7 +44,7 @@ export type ArtifactFetchInit = {
   // not the browser, so that global type isn't ambiently available here.
   readonly cache?:
     'default' | 'force-cache' | 'no-cache' | 'no-store' | 'only-if-cached' | 'reload';
-  readonly next?: { readonly revalidate: number };
+  readonly headers?: Readonly<Record<string, string>>;
 };
 
 export type ArtifactFetchImpl = (url: string, init?: ArtifactFetchInit) => Promise<Response>;
@@ -97,6 +97,53 @@ function warnArtifactMiss(objectPath: string, reason: string): void {
   });
 }
 
+/**
+ * What this process last downloaded per object path, held so the next refresh can be a
+ * conditional GET. Next's data cache refuses bodies over 2 MB and both artifacts exceed it, so
+ * the `force-cache` this module used to pass never cached anything: every 30-minute
+ * release-scoped refresh, on every function instance, re-downloaded 13.8 MB + 8.3 MB. Measured
+ * 2026-09-22 at 4,239 downloads and 54 GB a day from ~30 instances at two requests a second
+ * (`repo-ogo3j.2`). Storage answers `If-None-Match` with a bodiless 304, so a refresh whose
+ * artifact has not changed now costs a round trip and nothing else. A republished artifact
+ * (a new release, or an in-place correction under the same release id) changes the ETag and
+ * comes back as a full 200, which keeps correction staleness bounded by the caller's TTL.
+ *
+ * Bounded to a handful of entries: paths are per release, two per release, and a process only
+ * ever serves the active one plus whatever it saw before a pointer moved.
+ */
+type ArtifactMemoEntry = { readonly etag: string; readonly value: unknown };
+const ARTIFACT_MEMO_MAX_ENTRIES = 4;
+const artifactMemo = new Map<string, ArtifactMemoEntry>();
+
+function rememberArtifact(objectPath: string, entry: ArtifactMemoEntry): void {
+  artifactMemo.delete(objectPath);
+  artifactMemo.set(objectPath, entry);
+  while (artifactMemo.size > ARTIFACT_MEMO_MAX_ENTRIES) {
+    const oldest = artifactMemo.keys().next().value;
+    if (oldest === undefined) break;
+    artifactMemo.delete(oldest);
+  }
+}
+
+/** Test seam: forget every remembered artifact so cases do not see each other's ETags. */
+export function __resetReleaseArtifactMemoForTests(): void {
+  artifactMemo.clear();
+}
+
+/**
+ * Request headers for an artifact GET. Storage serves brotli only when asked, and the 2026-09-22
+ * Supabase edge logs showed the function runtime's fetch arriving with no `accept-encoding`:
+ * every response carried `content-length: 8310554`, the identity size of a search index that is
+ * 1.2 MB compressed. Asking explicitly is what makes undici decompress on the way in.
+ */
+function artifactRequestHeaders(remembered: ArtifactMemoEntry | undefined) {
+  return {
+    accept: 'application/json',
+    'accept-encoding': 'br, gzip',
+    ...(remembered ? { 'if-none-match': remembered.etag } : {}),
+  } as const;
+}
+
 async function fetchJsonArtifact<T>(
   objectPath: string,
   options: FetchReleaseArtifactOptions = {},
@@ -105,8 +152,6 @@ async function fetchJsonArtifact<T>(
   // Cast, not a structural fit: the global `fetch` this defaults to is typed against whatever
   // `RequestInit` its host project ambiently declares (Next.js augments it with `next`; a plain
   // Node project does not), which can differ from our own deliberately narrow `ArtifactFetchInit`.
-  // The extra `next` field this module passes below is a no-op outside Next.js — undici ignores
-  // unrecognized `RequestInit` properties rather than rejecting them.
   const fetchImpl: ArtifactFetchImpl = options.fetchImpl ?? (fetch as unknown as ArtifactFetchImpl);
   // 13.8 MB entities.json timed out at 8s on Vercel and fell back to the 968 ms
   // full-catalog SQL path. 60s covers a cold Storage GET.
@@ -114,22 +159,38 @@ async function fetchJsonArtifact<T>(
   const url = remoteArtifactUrl(objectPath, env);
   // Not a miss worth logging: no origin configured is a deliberate "Postgres only" posture.
   if (!url) return undefined;
+  const remembered = artifactMemo.get(objectPath);
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), timeoutMs);
   const startedAtMs = Date.now();
   try {
     const response = await fetchImpl(url, {
       signal: controller.signal,
-      cache: 'force-cache',
-      next: { revalidate: 3600 },
+      // `no-store`, deliberately: the cross-request cache for these bodies is the caller's
+      // release-scoped memory (apps/web) or this module's memo, never Next's data cache, which
+      // cannot hold them. Passing `force-cache` only produced a per-fetch "over 2MB" warning.
+      cache: 'no-store',
+      headers: artifactRequestHeaders(remembered),
     });
+    if (response.status === 304) {
+      if (remembered) return remembered.value as T;
+      warnArtifactMiss(objectPath, 'http 304 with nothing remembered');
+      return undefined;
+    }
     if (!response.ok) {
       warnArtifactMiss(objectPath, `http ${response.status}`);
       return undefined;
     }
     const parsed = (await response.json()) as T;
-    console.info(`[public-data] release artifact hit in ${Date.now() - startedAtMs}ms`, {
+    const etag = response.headers.get('etag');
+    if (etag) rememberArtifact(objectPath, { etag, value: parsed });
+    // Logged only on a real download, not on a 304: the Vercel log line is the signal that says
+    // whether artifacts are still being re-downloaded, and its `encoding` field is the check
+    // that compression is being negotiated.
+    console.info(`[public-data] release artifact downloaded in ${Date.now() - startedAtMs}ms`, {
       objectPath,
+      encoding: response.headers.get('content-encoding') ?? 'identity',
+      revalidated: remembered !== undefined,
     });
     return parsed;
   } catch (error) {

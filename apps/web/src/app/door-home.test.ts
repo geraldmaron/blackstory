@@ -76,6 +76,22 @@ test('Door browse morphs in place rather than hard-linking Filter CTAs to /explo
   assert.match(css, /z-index:\s*calc\(var\(--ds-z-atlas-instruments\) - 1\)/);
 });
 
+test('clicking a map entity during the journey exits smoothly into browse, not a navigation', () => {
+  // repo-vl155.3: the entity 'select' handler used to call `openDoorPin`, which never toggled
+  // journey mode off and, for `/door/pin/*` targets, did a hard `window.location.assign` — the
+  // most jarring possible exit, and the reported bug ("clicking a map entity should auto toggle
+  // journey mode off, smoothly"). It now hands off to the same smooth transition "Browse the
+  // map" already gets, carrying the clicked pin's continuity so Explore's own restore effect
+  // opens that entity's record sheet once it mounts (see `pin-continuity.ts`), instead of
+  // leaving the Door tree entirely.
+  assert.doesNotMatch(immersive, /function openDoorPin/);
+  assert.doesNotMatch(immersive, /window\.location\.assign\(href\)/);
+  assert.match(
+    immersive,
+    /stage\.subscribe\('select', \(entityId\) => \{[\s\S]*?savePinContinuity\(\{[\s\S]*?enterBrowse\(\);/,
+  );
+});
+
 test('cold `/explore` mounts the same Door browse shell, not a second instrument', () => {
   const explorePage = readFileSync(
     fileURLToPath(new URL('./explore/page.tsx', import.meta.url)),
