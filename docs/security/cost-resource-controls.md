@@ -175,6 +175,18 @@ downstream untouched, so no visitor caches a dynamic page locally.
 
 ### Second rule: request-rendered document surfaces (reconciled 2026-09-19)
 
+**Status 2026-09-22: this rule caches nothing.** Live probe (`curl -I`, `cf-cache-status`):
+`/entity/*` and `/stories/*` answer `BYPASS`; `/place/*` (3,690 sitemap URLs), `/invention/*`,
+`/lives`, `/rooms`, `/about`, `/records` and `/explore` answer `DYNAMIC` (no rule matches them).
+Only `/` and `/memorial` hit. The root layout is `force-dynamic`, so every document sends
+`private, no-cache, no-store`, and `respect_origin` honors that. The paragraphs below describe
+the intent, not the live behavior. Override-origin caching of a request-rendered document IS
+nonce-safe (the cached `/` carries a CSP header whose nonce matches its HTML, because the edge
+stores header and body together); the 2026-09-19 failure was Next static prerendering, not edge
+caching. Fix and probe table: `repo-ogo3j.3`. Related 2026-09-22 findings (Storage artifact
+egress 54 GB/day, Door payload back to 2.5 MB raw, iad1 vs us-west-2, spend cap at 94%): epic
+`repo-ogo3j`.
+
 `/methodology`, `/submit`, `/entity/`, `/books/`, `/law/`, `/stories/`, `/chapters/` — same `rsc`
 bypass — with **`edge_ttl: respect_origin`** rather than the `override_origin` the first rule uses.
 
