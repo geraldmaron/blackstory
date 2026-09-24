@@ -35,7 +35,7 @@
     "@repo/security": "workspace:*",
     "@repo/typescript-config": "workspace:*",
     "@types/node": "^22.20.1",
-    "tsx": "^4.23.1",
+    "tsx": "^4.23.13",
     "typescript": "^5.8.3"
   }
 }
