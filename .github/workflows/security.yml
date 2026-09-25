@@ -236,7 +236,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - name: Scan dependencies and secrets (vuln+secret; misconfig via CodeQL/review)
-        uses: aquasecurity/trivy-action@c07df6fec6fa692e6fd1200d50aaa1fdd66f03c8 # resolved 2026-07-17
+        uses: aquasecurity/trivy-action@d2a0b60797ff03db6132bd4e2b293f9b37081297 # resolved 2026-07-17
         with:
           scan-type: fs
           scan-ref: .
@@ -274,7 +274,7 @@ jobs:
           fi
           printf '%s\n' "$IMAGE_REF" > tested-image-reference.txt
       - name: Scan release image
-        uses: aquasecurity/trivy-action@c07df6fec6fa692e6fd1200d50aaa1fdd66f03c8 # resolved 2026-07-17
+        uses: aquasecurity/trivy-action@d2a0b60797ff03db6132bd4e2b293f9b37081297 # resolved 2026-07-17
         with:
           image-ref: ${{ inputs.image_ref }}
           severity: HIGH,CRITICAL
