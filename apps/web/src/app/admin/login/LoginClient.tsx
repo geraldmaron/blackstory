@@ -6,7 +6,15 @@
  */
 'use client';
 
-import { useCallback, useEffect, useMemo, useState, type FormEvent } from 'react';
+import {
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
+  type FormEvent,
+} from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useAdminAuth } from '../../../admin/auth/AdminAuthProvider';
 import {
@@ -31,6 +39,18 @@ export default function LoginClient() {
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
+  const emailRef = useRef<HTMLInputElement>(null);
+  const passwordRef = useRef<HTMLInputElement>(null);
+
+  // The fields are live in the server HTML, so an operator can type before hydration. React
+  // leaves that text in the DOM but not in state, and the next render would reset it; adopt it
+  // once, before anything re-renders.
+  useLayoutEffect(() => {
+    const typedEmail = emailRef.current?.value;
+    const typedPassword = passwordRef.current?.value;
+    if (typedEmail) setEmail(typedEmail);
+    if (typedPassword) setPassword(typedPassword);
+  }, []);
 
   const nextPath = useMemo(() => safeAdminNextPath(searchParams.get('next')), [searchParams]);
 
@@ -113,6 +133,7 @@ export default function LoginClient() {
             </label>
             <input
               id="admin-email"
+              ref={emailRef}
               className="admin-login__input"
               name="email"
               type="email"
@@ -120,7 +141,7 @@ export default function LoginClient() {
               required
               value={email}
               onChange={(event) => setEmail(event.target.value)}
-              disabled={busy || !ready || Boolean(user)}
+              disabled={busy || Boolean(user)}
             />
           </div>
           <div className="admin-login__field">
@@ -129,6 +150,7 @@ export default function LoginClient() {
             </label>
             <input
               id="admin-password"
+              ref={passwordRef}
               className="admin-login__input"
               name="password"
               type="password"
@@ -137,10 +159,13 @@ export default function LoginClient() {
               minLength={8}
               value={password}
               onChange={(event) => setPassword(event.target.value)}
-              disabled={busy || !ready || Boolean(user)}
+              disabled={busy || Boolean(user)}
             />
           </div>
           <div className="admin-login__actions">
+            {/* Gated on `ready` as well: until the client is live, a disabled default button also
+                stops Enter from natively submitting the form, which would put the password in a
+                GET query string. */}
             <button
               type="submit"
               className="ds-button ds-button--primary"
