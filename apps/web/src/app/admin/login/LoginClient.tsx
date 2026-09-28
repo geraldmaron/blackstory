@@ -126,7 +126,9 @@ export default function LoginClient() {
           </p>
         ) : null}
 
-        <form className="admin-login__form" onSubmit={onSubmit} noValidate>
+        {/* POST, never the default GET: if a native submit ever fires before hydration, the
+            password goes in a request body to this origin, not into a URL, history or logs. */}
+        <form className="admin-login__form" method="post" onSubmit={onSubmit} noValidate>
           <div className="admin-login__field">
             <label className="admin-login__label" htmlFor="admin-email">
               Email
@@ -163,9 +165,8 @@ export default function LoginClient() {
             />
           </div>
           <div className="admin-login__actions">
-            {/* Gated on `ready` as well: until the client is live, a disabled default button also
-                stops Enter from natively submitting the form, which would put the password in a
-                GET query string. */}
+            {/* Gated on `ready` as well: the fields are live before the auth client is, but a
+                sign-in cannot run until it is. */}
             <button
               type="submit"
               className="ds-button ds-button--primary"
