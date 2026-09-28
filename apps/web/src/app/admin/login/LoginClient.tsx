@@ -9,10 +9,19 @@
 import { useCallback, useEffect, useMemo, useState, type FormEvent } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useAdminAuth } from '../../../admin/auth/AdminAuthProvider';
+import {
+  ADMIN_NETWORK_FAILURE_MESSAGE,
+  isNetworkFailureMessage,
+} from '../../../admin/auth/network-error';
 import { safeAdminNextPath } from './safe-admin-next-path';
 
 const NOT_PROVISIONED =
   'This account is not provisioned for admin access. Ask an administrator to set a staff role on it.';
+
+function loginErrorMessage(err: unknown): string {
+  const message = err instanceof Error ? err.message : String(err);
+  return isNetworkFailureMessage(message) ? ADMIN_NETWORK_FAILURE_MESSAGE : message;
+}
 
 export default function LoginClient() {
   const router = useRouter();
@@ -32,12 +41,21 @@ export default function LoginClient() {
    * the destination re-renders on the server with the new session cookie.
    */
   const enterConsole = useCallback(async () => {
-    const token = await getIdToken();
-    const response = token
-      ? await fetch('/admin/api/auth/me', { headers: { Authorization: `Bearer ${token}` } })
-      : null;
+    let response: Response | null;
+    try {
+      const token = await getIdToken();
+      response = token
+        ? await fetch('/admin/api/auth/me', { headers: { Authorization: `Bearer ${token}` } })
+        : null;
+    } catch (err: unknown) {
+      // Unverified is not admin: drop the session so the form re-enables for another attempt.
+      await signOut().catch(() => undefined);
+      setError(loginErrorMessage(err));
+      setBusy(false);
+      return;
+    }
     if (!response?.ok) {
-      await signOut();
+      await signOut().catch(() => undefined);
       setError(NOT_PROVISIONED);
       setBusy(false);
       return;
@@ -60,7 +78,7 @@ export default function LoginClient() {
       await signIn(email, password);
       await enterConsole();
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : String(err));
+      setError(loginErrorMessage(err));
       setBusy(false);
     }
   }
