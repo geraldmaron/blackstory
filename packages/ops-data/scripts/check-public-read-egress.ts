@@ -154,15 +154,11 @@ async function readCurrent(
   client: pg.Client,
   read: WatchedRead,
 ): Promise<EgressReading | undefined> {
+  // A definer function sums pg_stat_statements for us: the CI identity (blackstory_ci) cannot
+  // read other roles' statement text, and should not, so it gets the totals and nothing else.
   const result = await client.query<StatementRow>(
-    `SELECT sum(s.calls)::bigint AS calls,
-            sum(s.rows)::bigint  AS rows,
-            count(*)::bigint     AS statements,
-            i.stats_reset        AS stats_since
-       FROM pg_stat_statements s
-       CROSS JOIN pg_stat_statements_info i
-      WHERE s.query LIKE $1
-      GROUP BY i.stats_reset`,
+    `SELECT calls, rows, statements, stats_since
+       FROM ops.public_read_statement_totals($1)`,
     [read.fingerprint],
   );
   const row = result.rows[0];
