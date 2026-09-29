@@ -6,10 +6,11 @@ project_id = "twykhihqkcldpreuovay"
 
 [api]
 enabled = true
-# Expose only schemas a browser client legitimately reads. `submissions` was removed 2026-09-28
-# (repo-t8h9z): intake is written server-side only. The live value is the authenticator role's
-# pgrst.db_schemas, set by migration 20260928234055_close_public_write_paths.
-schemas = ["public", "published"]
+# The data API serves nothing readable. `submissions` left 2026-09-28 (repo-t8h9z) and
+# `published` + GraphQL 2026-09-29 (repo-4wb0e): no client reads the catalog over PostgREST, and
+# leaving it open let anyone with the bundle's anon key pull it uncached. The live value is the
+# authenticator role's pgrst.db_schemas, set by 20260929011732_close_data_api_catalog_reads.
+schemas = ["public"]
 extra_search_path = ["public", "extensions"]
 max_rows = 1000
 
