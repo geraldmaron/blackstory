@@ -219,11 +219,13 @@ test('the security/normalization surface is unchanged by the widened matcher', (
     '/search/api',
     '/locate/api',
     '/corrections/status/abc',
-    '/records',
     '/atlas',
   ]) {
     assert.equal(isSecurityNormalizedPath(pathname), false, `${pathname} was NOT matched before`);
   }
+  // Added deliberately on 2026-09-29 (repo-4wb0e): unmatched, any query rendered afresh at the
+  // origin and crawlers made /records the largest source of Cloudflare misses.
+  assert.equal(isSecurityNormalizedPath('/records'), true);
   assert.equal(isSecurityNormalizedPath('/explore'), true);
   assert.equal(isSecurityNormalizedPath('/atlas/catalog'), true);
   assert.equal(isSecurityNormalizedPath('/sitemap.xml'), true);

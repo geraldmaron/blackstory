@@ -53,6 +53,12 @@ import {
 import { kindFamilyFor, resolveMapTone, type MapKindFamily } from '../map-experience/kind-encoding';
 import { kindFilterLabel, kindMatchesPublicFilter } from '../map-experience/filters';
 import { formatResultSummary } from '../discovery/result-summary';
+import {
+  RECORDS_FILTER_KEYS,
+  recordsHref,
+  type RecordsFilterKey,
+  type RecordsQuery,
+} from './records-query';
 
 /** Arrival query Place pages understand (`from=list` + shared DiscoveryState keys). */
 function recordsArrivalQuery(query: RecordsQuery): string {
@@ -77,44 +83,18 @@ function withArrivalQuery(href: string, query: string): string {
 /** 100 per page, stated in the design law. Page two is its own URL, never client state. */
 export const RECORDS_PAGE_SIZE = 100;
 
-/**
- * The query vocabulary. These names are the contract `/search` and `/history` redirect into
- * (`mapSearchQueryToRecordsHref`, `mapHistoryQueryToRecordsHref`), so renaming one breaks a
- * previously public URL.
- */
-export type RecordsQuery = {
-  readonly q: string;
-  readonly kind: string;
-  readonly era: string;
-  readonly state: string;
-  readonly topic: string;
-  readonly status: string;
-  readonly evidence: string;
-  readonly page: number;
-};
-
-export const EMPTY_RECORDS_QUERY: RecordsQuery = Object.freeze({
-  q: '',
-  kind: '',
-  era: '',
-  state: '',
-  topic: '',
-  status: '',
-  evidence: '',
-  page: 1,
-});
-
-/** The filter keys, in the order the chip bar renders them. `q` and `page` are not chips. */
-export const RECORDS_FILTER_KEYS = Object.freeze([
-  'kind',
-  'era',
-  'state',
-  'topic',
-  'status',
-  'evidence',
-] as const);
-
-export type RecordsFilterKey = (typeof RECORDS_FILTER_KEYS)[number];
+// The query vocabulary lives in `records-query.ts` so the edge proxy can canonicalize `/records`
+// without importing the catalog modules below. These names are the contract `/search` and
+// `/history` redirect into (`mapSearchQueryToRecordsHref`, `mapHistoryQueryToRecordsHref`), so
+// renaming one breaks a previously public URL.
+export {
+  EMPTY_RECORDS_QUERY,
+  RECORDS_FILTER_KEYS,
+  parseRecordsQuery,
+  recordsHref,
+  type RecordsFilterKey,
+  type RecordsQuery,
+} from './records-query';
 
 export type RecordsRow = {
   readonly id: string;
@@ -184,51 +164,6 @@ function humanize(value: string): string {
     .filter((word) => word.length > 0)
     .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
     .join(' ');
-}
-
-/**
- * Normalizes raw search params. Anything unrecognized collapses to the empty string rather than
- * throwing, because this route is reachable from bookmarks and from three redirect families, and
- * a stale param must narrow nothing rather than 500.
- */
-export function parseRecordsQuery(
-  raw: Record<string, string | readonly string[] | undefined>,
-): RecordsQuery {
-  const one = (key: string): string => {
-    const value = raw[key];
-    const first = Array.isArray(value) ? value[0] : value;
-    return typeof first === 'string' ? first.trim() : '';
-  };
-  const rawPage = Number.parseInt(one('page'), 10);
-  return {
-    q: one('q').slice(0, 120),
-    kind: one('kind').toLowerCase(),
-    era: one('era').toLowerCase(),
-    state: one('state').toUpperCase(),
-    topic: one('topic').toLowerCase(),
-    status: one('status').toLowerCase(),
-    // The floor vocabulary is upper-case letters ('A' | 'B' | 'C'), unlike every other filter.
-    evidence: one('evidence').toUpperCase(),
-    page: Number.isFinite(rawPage) && rawPage > 1 ? rawPage : 1,
-  };
-}
-
-/**
- * Builds a `/records` href. Params are emitted in a fixed order so a given narrowing has exactly
- * one URL, which is what makes the self-referential canonical honest.
- */
-export function recordsHref(query: Partial<RecordsQuery>): string {
-  const merged = { ...EMPTY_RECORDS_QUERY, ...query };
-  const params = new URLSearchParams();
-  if (merged.q.length > 0) params.set('q', merged.q);
-  for (const key of RECORDS_FILTER_KEYS) {
-    if (merged[key].length > 0) params.set(key, merged[key]);
-  }
-  // `page=1` is never emitted: `/records` and `/records?page=1` would otherwise be two URLs for
-  // one page, and each would claim to be canonical.
-  if (merged.page > 1) params.set('page', String(merged.page));
-  const search = params.toString();
-  return search.length > 0 ? `/records?${search}` : '/records';
 }
 
 type RecordFacts = {

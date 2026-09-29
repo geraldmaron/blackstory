@@ -158,6 +158,8 @@ async function resolveProxyResponse(request: NextRequest): Promise<NextResponse>
  * it carries a free-text `q` that has to be sanitised before it is echoed anywhere.
  *
  * `/explore` is the Explore instrument (not a redirect to `/`). It keeps its facet allowlist.
+ * `/records` was unmatched until 2026-09-29, so any query rendered afresh at the origin; crawlers
+ * made it the largest source of Cloudflare misses. It now canonicalizes through records-query.ts.
  * `/` is the Door and has an empty allowlist, so leftover Explore params 308 away instead of
  * fragmenting the Cloudflare HTML cache. `/atlas/catalog` and `/sitemap.xml` take no query:
  * cache-busting `?x=` 308s to the bare path. Search/refine/geocode APIs stay out so their
@@ -167,6 +169,7 @@ const SECURITY_NORMALIZED_EXACT = new Set([
   '/',
   '/search',
   '/explore',
+  '/records',
   '/atlas/catalog',
   '/sitemap.xml',
   '/law',

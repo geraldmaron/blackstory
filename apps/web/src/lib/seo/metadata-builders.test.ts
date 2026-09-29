@@ -5,7 +5,7 @@ import assert from 'node:assert/strict';
 import { readFileSync, readdirSync } from 'node:fs';
 import { join } from 'node:path';
 import { test } from 'node:test';
-import robots from '../../app/robots';
+import robots, { CRAWL_DISALLOWED_QUERY_SHAPES } from '../../app/robots';
 import {
   buildEntityPageMetadata,
   buildPublicMetadataPreview,
@@ -134,13 +134,40 @@ test('robots.txt adds no Disallow for the routes that carry a noindex', () => {
   // Disallow and noindex are opposite instructions: a Disallowed URL is never fetched, so its
   // noindex is never read and the URL can still be indexed from an inbound link alone. SP-19
   // ships the noindex ALONE for exactly this reason, and this is the standing guard.
+  //
+  // Since 2026-09-29 the general crawler is also kept off unbounded filter-combination URLs on
+  // /records and /explore (crawl cost, repo-4wb0e). Those carry no noindex, so the guard still
+  // holds: no Disallow the general crawler sees may reach a noindexed route.
   const rules = [robots().rules].flat();
-  const disallowed = rules.flatMap((rule) => [rule?.disallow ?? []].flat());
-  assert.deepEqual([...new Set(disallowed)], ['/'], 'only the AI-training agents are disallowed');
-
   const wildcard = rules.find((rule) => rule?.userAgent === '*');
-  assert.equal(wildcard?.disallow, undefined, 'the general crawler must not be blocked anywhere');
   assert.equal(wildcard?.allow, '/');
+  const wildcardDisallows = [wildcard?.disallow ?? []].flat();
+  assert.deepEqual(wildcardDisallows, [...CRAWL_DISALLOWED_QUERY_SHAPES]);
+  for (const pattern of wildcardDisallows) {
+    assert.match(
+      pattern,
+      /^\/(records|explore)\?/,
+      `${pattern} must be a query shape, not a route`,
+    );
+    for (const noindexed of ['/design-system', '/corrections/status/abc123']) {
+      assert.ok(!noindexed.startsWith(pattern.split('*')[0]!), `${pattern} reaches ${noindexed}`);
+    }
+  }
+  // Bare pages stay crawlable: a prefix Disallow on `/records?` would not match `/records`.
+  for (const bare of ['/records', '/explore', '/records?kind=school', '/records?page=3']) {
+    const blocked = wildcardDisallows.some((pattern) => {
+      const [head, tail] = pattern.split('*') as [string, string | undefined];
+      return (
+        bare.startsWith(head) && (tail === undefined || bare.slice(head.length).includes(tail))
+      );
+    });
+    assert.equal(blocked, bare.startsWith('/explore?'), `${bare} crawlability changed`);
+  }
+
+  const named = rules.filter((rule) => rule?.userAgent !== '*');
+  for (const rule of named) {
+    assert.equal(rule?.disallow, '/', 'named agents are either fully disallowed or not listed');
+  }
 });
 
 test('a room description survives the protected-pattern filter', () => {

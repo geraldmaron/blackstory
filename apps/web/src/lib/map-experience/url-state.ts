@@ -194,9 +194,36 @@ function parseFiniteNumber(raw: string | undefined): number | undefined {
   return Number.isFinite(value) ? value : undefined;
 }
 
+/*
+ * Value shapes. The edge proxy runs this parser on every `/explore` request, so any value it
+ * accepts unchecked is a cache key a crawler can mint freely (`?theme=<random>` rendered
+ * afresh at the origin until 2026-09-29, repo-4wb0e). Real values are slugs and ids; anything
+ * else falls back to the default and the edge 308s it away.
+ */
+const FILTER_TOKEN = /^[A-Za-z0-9][A-Za-z0-9_.:|~-]{0,63}$/;
+const RECORD_ID = /^[A-Za-z0-9][A-Za-z0-9_.:|~-]{0,159}$/;
+const EDGE_ID = /^[^\s\p{Cc}]{1,256}$/u;
+const STATE_POSTAL = /^[A-Z]{2}$/;
+const DECADE = /^\d{3}0s$/;
+
 function cleanSelectParam(raw: string | undefined): string {
   const trimmed = (raw ?? '').trim();
-  return trimmed === '' ? 'all' : trimmed;
+  return trimmed === '' || !FILTER_TOKEN.test(trimmed) ? 'all' : trimmed;
+}
+
+/** Human-readable labels (`near`, `find`): no control characters, single spaces, bounded length. */
+function cleanLabelParam(raw: string | undefined, maxLength: number): string | undefined {
+  const cleaned = (raw ?? '')
+    .replace(/\p{Cc}/gu, '')
+    .replace(/\s+/g, ' ')
+    .trim()
+    .slice(0, maxLength)
+    .trim();
+  return cleaned ? cleaned : undefined;
+}
+
+function matchOrUndefined(raw: string | undefined, shape: RegExp): string | undefined {
+  return raw && shape.test(raw) ? raw : undefined;
 }
 
 const LAYER_MODES: readonly ExploreLayerMode[] = ['off', 'presence', 'blackShare', 'blackChange'];
@@ -293,8 +320,7 @@ function parseRadius(raw: string | undefined): ExploreRadiusPresetId | undefined
 }
 
 function parseNear(raw: string | undefined): string | undefined {
-  const trimmed = raw?.trim();
-  return trimmed ? trimmed : undefined;
+  return cleanLabelParam(raw, 80);
 }
 
 function parseEvidenceFloor(raw: string | undefined): EvidenceGrade | undefined {
@@ -317,13 +343,14 @@ export function parseExploreSearchParams(raw: RawExploreSearchParams): ExploreVi
   const lng = parseFiniteNumber(firstValue(raw.lng));
   const zoom = parseFiniteNumber(firstValue(raw.zoom));
 
-  const selectedRaw = firstValue(raw.selected)?.trim();
-  const stateRaw = firstValue(raw.state)?.trim().toUpperCase();
+  const selectedRaw = matchOrUndefined(firstValue(raw.selected)?.trim(), RECORD_ID);
+  const stateCandidate = firstValue(raw.state)?.trim().toUpperCase();
+  const stateRaw = matchOrUndefined(stateCandidate, STATE_POSTAL);
   const groupRaw = firstValue(raw.group);
   const satRaw = firstValue(raw.sat);
   const linesRaw = firstValue(raw.lines);
-  const decadeRaw = firstValue(raw.decade)?.trim();
-  const edgeRaw = firstValue(raw.edge)?.trim();
+  const decadeRaw = matchOrUndefined(firstValue(raw.decade)?.trim(), DECADE);
+  const edgeRaw = matchOrUndefined(firstValue(raw.edge)?.trim(), EDGE_ID);
   const floor = parseEvidenceFloor(firstValue(raw.floor));
   const layerMode = parseLayerMode(raw);
   const popGeoRaw = firstValue(raw.popGeo)?.trim();
@@ -332,7 +359,7 @@ export function parseExploreSearchParams(raw: RawExploreSearchParams): ExploreVi
   const popToRaw = firstValue(raw.popTo)?.trim();
   const radiusRaw = firstValue(raw.radius)?.trim();
   const nearRaw = firstValue(raw.near)?.trim();
-  const findRaw = firstValue(raw.find)?.trim();
+  const findRaw = cleanLabelParam(firstValue(raw.find), 120);
 
   const groupOn =
     groupRaw === '0' || groupRaw === 'false'

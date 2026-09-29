@@ -34,6 +34,33 @@ export const AI_TRAINING_USER_AGENTS: readonly string[] = [
   'Ai2Bot',
 ];
 
+/**
+ * SEO-tool crawlers: backlink and keyword indexes that send no readers. Disallowed in robots.txt
+ * and denied on expensive origin paths. SemrushBot alone caused ~6.5k uncached renders in the
+ * 23 h measured on 2026-09-29 (repo-4wb0e).
+ */
+export const SEO_TOOL_USER_AGENTS: readonly string[] = [
+  'SemrushBot',
+  'AhrefsBot',
+  'MJ12bot',
+  'DotBot',
+  'BLEXBot',
+  'DataForSeoBot',
+  'SeekportBot',
+  'serpstatbot',
+  'Barkrowler',
+  'MegaIndex',
+];
+
+/**
+ * AI answer-engine crawlers that can send readers, so they keep the sitemap and every cached
+ * record page. They are denied only on the origin-expensive instruments (/explore, /records,
+ * catalog, APIs), and they are deliberately NOT given their own robots.txt group: a crawler that
+ * finds a group naming it ignores the `*` group, and with it the query-combination Disallows.
+ * Amzn-SearchBot and Claude-SearchBot caused ~13k uncached renders in the same window.
+ */
+export const AI_SEARCH_USER_AGENTS: readonly string[] = ['Amzn-SearchBot', 'Claude-SearchBot'];
+
 /** Conventional search and social preview crawlers that we allow to index. */
 export const SEARCH_CRAWLER_USER_AGENTS: readonly string[] = [
   'Googlebot',

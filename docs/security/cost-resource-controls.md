@@ -317,6 +317,24 @@ Caching → Purge, or redeploy) if the wall must be immediate.
 | `/corrections/status/<code>` | no `Vercel-CDN-Cache-Control` reaches Vercel; `MISS` |
 | `/admin/login` | `MISS` |
 
+## Crawler and cache-busting controls (2026-09-29, repo-4wb0e)
+
+Measured over 23 h: 128,601 of ~192k eyeball requests were Cloudflare misses, and `/records`
+(46,876) and `/explore` (34,147) were most of them. Named crawlers (Amzn-SearchBot, SemrushBot,
+Claude-SearchBot) plus what looks like one scraper rotating nine Chrome UA strings. Each miss is an
+origin render, and origin load drives Fluid instance churn, which drives the ~25 MB per-instance
+catalog download (6,824 full loads that day).
+
+| Layer | Control | Where |
+|---|---|---|
+| Edge canonicalization | `/records` now normalizes like `/explore`: unknown keys, bad facet values (topic vocabulary, `state` postal, `evidence` A–C, slug shape, `page` ≤ 1000, `q` ≤ 120) 308 to one canonical URL. Explore's free-value keys (`theme`, `tone`, `near`, `find`, `selected`, `edge`, `decade`, ...) are shape-checked the same way. | `proxy.ts`, `lib/records/records-query.ts`, `lib/map-experience/url-state.ts` |
+| Crawl policy | `robots.txt` keeps the general crawler off filter combinations (`/records?*&`, `/records?q=`, `/explore?`) and disallows SEO-tool crawlers entirely. Bare pages, single-facet `/records` and pagination stay crawlable. | `app/robots.ts`, `lib/traffic-class/agent-lists.ts` |
+| Named-crawler deny | Uncached 403 on `/explore`, `/records`, catalog, sitemap and the APIs for AI-training and SEO-tool crawlers; AI answer engines keep the sitemap and record pages. The 403 is `private, no-store`: the CDN keys on URL, so a shared-cacheable 403 could reach readers. | `lib/traffic-class/edge-deny.ts` |
+| Per-IP burst | Cloudflare rate-limit rule (below). **Operator step pending:** add `or http.request.uri.path in {"/records" "/explore"}` to its expression. 60 requests / 10 s per IP is far above any reader. | Cloudflare dashboard |
+
+Not yet closed: the origin accepts requests that bypass Cloudflare (`--resolve blackstory.app:443:76.76.21.21`
+answers 200), so a scraper that skips DNS skips the rate limit and cache (`repo-4wb0e.4`).
+
 ## Cloudflare zone security posture (blackstory.app)
 
 Audited and hardened 2026-08-25. Zone `653abe0dbd1b10d22411306cb1f645be`, Free plan.
