@@ -6,9 +6,13 @@
 
 import { getAdminSupabaseClient } from './supabase-browser';
 import type { AdminSessionUser } from './session-user';
+import { ADMIN_NETWORK_FAILURE_MESSAGE, isNetworkFailureMessage } from './network-error';
 
 function formatSupabaseAuthError(error: { readonly message?: string }): Error {
   const message = error.message?.trim() || 'Sign-in failed';
+  if (isNetworkFailureMessage(message)) {
+    return new Error(ADMIN_NETWORK_FAILURE_MESSAGE);
+  }
   if (/invalid login credentials/i.test(message)) {
     return new Error('Email or password is incorrect.');
   }

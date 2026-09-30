@@ -12,6 +12,11 @@
 
 import { buildExploreSearchParams, parseExploreSearchParams } from '../map-experience/url-state';
 import {
+  RECORDS_PAGE_PARAM_ALLOWLIST,
+  parseRecordsQuery,
+  recordsQueryString,
+} from '../records/records-query';
+import {
   CORRECTIONS_PAGE_PARAM_ALLOWLIST,
   STORIES_PAGE_PARAM_ALLOWLIST,
   EXPLORE_PAGE_PARAM_ALLOWLIST,
@@ -31,6 +36,13 @@ export type QueryParamBag = Record<string, string | string[] | undefined>;
  * HTML cache on the front door.
  */
 const EXPLORE_SURFACE_PATHS = new Set(['/explore']);
+
+/**
+ * `/records` renders a fresh page per distinct query, so it goes through its own parse→build:
+ * unknown keys drop, facet values that fail their vocabulary or shape drop, and the survivors
+ * come back in the one canonical order the page's self-referential canonical uses.
+ */
+const RECORDS_PATH = '/records';
 
 function isTrackingKey(key: string): boolean {
   const lower = key.toLowerCase();
@@ -55,6 +67,9 @@ export function getAllowedQueryParamsForPath(pathname: string): readonly string[
   }
   if (EXPLORE_SURFACE_PATHS.has(path)) {
     return EXPLORE_PAGE_PARAM_ALLOWLIST;
+  }
+  if (path === RECORDS_PATH) {
+    return RECORDS_PAGE_PARAM_ALLOWLIST;
   }
   // No `/history` branch: the route is not in the middleware matcher and must not be. See the
   // note where HISTORY_PAGE_PARAM_ALLOWLIST used to live in `constants.ts`.
@@ -116,6 +131,9 @@ export function normalizeQueryString(
 
   if (EXPLORE_SURFACE_PATHS.has(path)) {
     return buildExploreSearchParams(parseExploreSearchParams(bag));
+  }
+  if (path === RECORDS_PATH) {
+    return recordsQueryString(parseRecordsQuery(bag));
   }
 
   const normalized = new URLSearchParams();

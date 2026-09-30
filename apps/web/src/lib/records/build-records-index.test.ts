@@ -21,6 +21,7 @@ import {
   findRecordsNeighbors,
   parseRecordsQuery,
   recordsHref,
+  recordsQueryIndexable,
   searchIndexReadyForRecords,
   EMPTY_RECORDS_QUERY,
 } from './build-records-index';
@@ -455,5 +456,44 @@ describe('/records · place hrefs and map continuity', () => {
     );
     assert.equal(model.rows.find((row) => row.id === 'ent_b')?.href, '/entity/ent_b?from=list');
     assert.equal(model.mappableMatched, 1);
+  });
+});
+
+describe('/records · crawl-trap guard', () => {
+  it('the bare list, single-facet narrowings and plain pagination are indexable', () => {
+    assert.equal(recordsQueryIndexable(EMPTY_RECORDS_QUERY), true);
+    assert.equal(recordsQueryIndexable({ state: 'OK' }), true);
+    assert.equal(recordsQueryIndexable({ page: 3 }), true);
+  });
+
+  it('free text, two facets, or a facet plus a page are not (robots.txt disallows them too)', () => {
+    assert.equal(recordsQueryIndexable({ q: 'tulsa' }), false);
+    assert.equal(recordsQueryIndexable({ state: 'OK', kind: 'place' }), false);
+    assert.equal(recordsQueryIndexable({ era: '1920s', page: 3 }), false);
+  });
+
+  it('the model carries the flag, and facet links into a second facet are nofollow', () => {
+    const entities = [entity({ id: 'a', kind: 'place' }), entity({ id: 'b', kind: 'school' })];
+    const bare = buildRecordsIndex(entities, EMPTY_RECORDS_QUERY);
+    assert.equal(bare.indexable, true);
+    assert.ok(bare.facets.kind.length > 0);
+    assert.ok(bare.facets.kind.every((option) => option.nofollow === false));
+
+    const kindId = bare.facets.kind[0]!.id;
+    const narrowed = buildRecordsIndex(entities, { ...EMPTY_RECORDS_QUERY, kind: kindId });
+    assert.equal(narrowed.indexable, true);
+    const active = narrowed.facets.kind.find((option) => option.id === kindId);
+    // Clearing the one active facet returns to the bare list, which is crawlable.
+    assert.equal(active?.nofollow, false);
+    const other = narrowed.facets.era[0];
+    assert.ok(other !== undefined);
+    assert.equal(other.nofollow, true);
+
+    const both = buildRecordsIndex(entities, {
+      ...EMPTY_RECORDS_QUERY,
+      kind: kindId,
+      era: other.id,
+    });
+    assert.equal(both.indexable, false);
   });
 });

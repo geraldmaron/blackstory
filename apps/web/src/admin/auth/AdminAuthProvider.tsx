@@ -89,9 +89,14 @@ export function AdminAuthProvider({ children }: { readonly children: ReactNode }
     await signInAdminWithEmailPassword(email, password);
   }, []);
 
+  // Clear local state even when the server call fails; otherwise an offline sign-out leaves
+  // the login form disabled behind a session nobody can use.
   const signOut = useCallback(async () => {
-    await signOutAdmin();
-    setUser(null);
+    try {
+      await signOutAdmin();
+    } finally {
+      setUser(null);
+    }
   }, []);
 
   const value = useMemo<AdminAuthContextValue>(

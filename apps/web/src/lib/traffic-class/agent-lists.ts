@@ -4,7 +4,12 @@
  * from the classifier.
  */
 
-/** Crawlers that identify themselves as AI-training or bulk-AI-ingestion agents. */
+/**
+ * AI crawlers we turn away: training and bulk-ingestion agents, and (by owner decision,
+ * 2026-09-30) AI answer/search fetchers too, which cost a function render per page and send
+ * almost no readers. Also compiled into the Cloudflare block rule by
+ * `scripts/cloudflare-bot-rules.mts`, so the edge, robots.txt and /ai.txt share one list.
+ */
 export const AI_TRAINING_USER_AGENTS: readonly string[] = [
   'GPTBot',
   'ChatGPT-User',
@@ -32,6 +37,42 @@ export const AI_TRAINING_USER_AGENTS: readonly string[] = [
   'YouBot',
   'Timpibot',
   'Ai2Bot',
+  // AI answer / search fetchers (blocked by choice, see above). Amzn-SearchBot and
+  // Claude-SearchBot alone caused ~13k uncached renders in the 23 h measured on 2026-09-29
+  // (repo-4wb0e); repo-4wb0e first let them keep the sitemap and record pages, and the owner
+  // chose the more restrictive list on 2026-09-30.
+  'Claude-SearchBot',
+  'Amzn-SearchBot',
+  'Claude-User',
+  'Perplexity-User',
+  'DuckAssistBot',
+  'MistralAI-User',
+  'Meta-ExternalFetcher',
+  // Training crawlers added 2026-09-30.
+  'Kangaroo Bot',
+  'img2dataset',
+  'Webzio-Extended',
+  'FriendlyCrawler',
+  'ICC-Crawler',
+  'PanguBot',
+];
+
+/**
+ * SEO-tool crawlers: backlink and keyword indexes that send no readers. Disallowed in robots.txt
+ * and denied on expensive origin paths. SemrushBot alone caused ~6.5k uncached renders in the
+ * 23 h measured on 2026-09-29 (repo-4wb0e).
+ */
+export const SEO_TOOL_USER_AGENTS: readonly string[] = [
+  'SemrushBot',
+  'AhrefsBot',
+  'MJ12bot',
+  'DotBot',
+  'BLEXBot',
+  'DataForSeoBot',
+  'SeekportBot',
+  'serpstatbot',
+  'Barkrowler',
+  'MegaIndex',
 ];
 
 /** Conventional search and social preview crawlers that we allow to index. */
@@ -50,6 +91,14 @@ export const SEARCH_CRAWLER_USER_AGENTS: readonly string[] = [
   'Twitterbot',
   'Slackbot',
   'Discordbot',
+  'Pinterestbot',
+  'WhatsApp',
+  'TelegramBot',
+  'redditbot',
+  'Embedly',
+  // Archivers: the Wayback Machine keeps a public record of the archive itself.
+  'ia_archiver',
+  'archive.org_bot',
 ];
 
 /**

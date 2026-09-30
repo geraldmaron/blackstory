@@ -53,6 +53,14 @@ import {
 import { kindFamilyFor, resolveMapTone, type MapKindFamily } from '../map-experience/kind-encoding';
 import { kindFilterLabel, kindMatchesPublicFilter } from '../map-experience/filters';
 import { formatResultSummary } from '../discovery/result-summary';
+import {
+  EMPTY_RECORDS_QUERY,
+  RECORDS_FILTER_KEYS,
+  isRecordsCombinationQuery,
+  recordsHref,
+  type RecordsFilterKey,
+  type RecordsQuery,
+} from './records-query';
 
 /** Arrival query Place pages understand (`from=list` + shared DiscoveryState keys). */
 function recordsArrivalQuery(query: RecordsQuery): string {
@@ -77,44 +85,18 @@ function withArrivalQuery(href: string, query: string): string {
 /** 100 per page, stated in the design law. Page two is its own URL, never client state. */
 export const RECORDS_PAGE_SIZE = 100;
 
-/**
- * The query vocabulary. These names are the contract `/search` and `/history` redirect into
- * (`mapSearchQueryToRecordsHref`, `mapHistoryQueryToRecordsHref`), so renaming one breaks a
- * previously public URL.
- */
-export type RecordsQuery = {
-  readonly q: string;
-  readonly kind: string;
-  readonly era: string;
-  readonly state: string;
-  readonly topic: string;
-  readonly status: string;
-  readonly evidence: string;
-  readonly page: number;
-};
-
-export const EMPTY_RECORDS_QUERY: RecordsQuery = Object.freeze({
-  q: '',
-  kind: '',
-  era: '',
-  state: '',
-  topic: '',
-  status: '',
-  evidence: '',
-  page: 1,
-});
-
-/** The filter keys, in the order the chip bar renders them. `q` and `page` are not chips. */
-export const RECORDS_FILTER_KEYS = Object.freeze([
-  'kind',
-  'era',
-  'state',
-  'topic',
-  'status',
-  'evidence',
-] as const);
-
-export type RecordsFilterKey = (typeof RECORDS_FILTER_KEYS)[number];
+// The query vocabulary lives in `records-query.ts` so the edge proxy can canonicalize `/records`
+// without importing the catalog modules below. These names are the contract `/search` and
+// `/history` redirect into (`mapSearchQueryToRecordsHref`, `mapHistoryQueryToRecordsHref`), so
+// renaming one breaks a previously public URL.
+export {
+  EMPTY_RECORDS_QUERY,
+  RECORDS_FILTER_KEYS,
+  parseRecordsQuery,
+  recordsHref,
+  type RecordsFilterKey,
+  type RecordsQuery,
+} from './records-query';
 
 export type RecordsRow = {
   readonly id: string;
@@ -140,6 +122,8 @@ export type RecordsFacet = {
   readonly label: string;
   readonly count: number;
   readonly href: string;
+  /** True when `href` leads to a narrowing crawlers must not follow (see `recordsQueryIndexable`). */
+  readonly nofollow: boolean;
 };
 
 export type RecordsGroup = {
@@ -164,6 +148,8 @@ export type RecordsIndex = {
   readonly pageCount: number;
   readonly countLabel: string;
   readonly canonicalPath: string;
+  /** Whether this narrowing may be indexed and crawled (see `recordsQueryIndexable`). */
+  readonly indexable: boolean;
   readonly previousHref: string | undefined;
   readonly nextHref: string | undefined;
   readonly facets: Readonly<Record<RecordsFilterKey, readonly RecordsFacet[]>>;
@@ -187,48 +173,15 @@ function humanize(value: string): string {
 }
 
 /**
- * Normalizes raw search params. Anything unrecognized collapses to the empty string rather than
- * throwing, because this route is reachable from bookmarks and from three redirect families, and
- * a stale param must narrow nothing rather than 500.
+ * Whether a narrowing is a page search engines should index and crawl through: the inverse of
+ * `isRecordsCombinationQuery`, so the page's `noindex, nofollow`, the facet links' `nofollow` and
+ * robots.txt's `/records?*&` Disallow all cover the same URLs. Free text, two or more facets, and
+ * a facet plus a page number are combinations; the bare list, single-facet narrowings and plain
+ * pagination stay indexable. Readers can still build any combination; only crawlers are turned
+ * away.
  */
-export function parseRecordsQuery(
-  raw: Record<string, string | readonly string[] | undefined>,
-): RecordsQuery {
-  const one = (key: string): string => {
-    const value = raw[key];
-    const first = Array.isArray(value) ? value[0] : value;
-    return typeof first === 'string' ? first.trim() : '';
-  };
-  const rawPage = Number.parseInt(one('page'), 10);
-  return {
-    q: one('q').slice(0, 120),
-    kind: one('kind').toLowerCase(),
-    era: one('era').toLowerCase(),
-    state: one('state').toUpperCase(),
-    topic: one('topic').toLowerCase(),
-    status: one('status').toLowerCase(),
-    // The floor vocabulary is upper-case letters ('A' | 'B' | 'C'), unlike every other filter.
-    evidence: one('evidence').toUpperCase(),
-    page: Number.isFinite(rawPage) && rawPage > 1 ? rawPage : 1,
-  };
-}
-
-/**
- * Builds a `/records` href. Params are emitted in a fixed order so a given narrowing has exactly
- * one URL, which is what makes the self-referential canonical honest.
- */
-export function recordsHref(query: Partial<RecordsQuery>): string {
-  const merged = { ...EMPTY_RECORDS_QUERY, ...query };
-  const params = new URLSearchParams();
-  if (merged.q.length > 0) params.set('q', merged.q);
-  for (const key of RECORDS_FILTER_KEYS) {
-    if (merged[key].length > 0) params.set(key, merged[key]);
-  }
-  // `page=1` is never emitted: `/records` and `/records?page=1` would otherwise be two URLs for
-  // one page, and each would claim to be canonical.
-  if (merged.page > 1) params.set('page', String(merged.page));
-  const search = params.toString();
-  return search.length > 0 ? `/records?${search}` : '/records';
+export function recordsQueryIndexable(query: Partial<RecordsQuery>): boolean {
+  return !isRecordsCombinationQuery({ ...EMPTY_RECORDS_QUERY, ...query });
 }
 
 type RecordFacts = {
@@ -573,14 +526,18 @@ export function buildRecordsIndex(
       }
       const active = query[key];
       const options: RecordsFacet[] = [...counts.entries()]
-        .map(([value, count]) => ({
-          id: value,
-          label: labelFor(key, value, stateNames),
-          count,
+        .map(([value, count]) => {
           // Selecting a filter returns to page one: page 4 of the old set is not page 4 of the
           // new one, and a reader who lands on an empty page reads it as an empty archive.
-          href: recordsHref({ ...query, [key]: active === value ? '' : value, page: 1 }),
-        }))
+          const target = { ...query, [key]: active === value ? '' : value, page: 1 };
+          return {
+            id: value,
+            label: labelFor(key, value, stateNames),
+            count,
+            href: recordsHref(target),
+            nofollow: !recordsQueryIndexable(target),
+          };
+        })
         .sort((a, b) => {
           // A floor is an ordered scale, so it reads in scale order. Sorting it by count puts
           // "A only" between "B and up" and "C and up", which reads as three unrelated chips.
@@ -660,6 +617,7 @@ export function buildRecordsIndex(
       plural: 'records',
     }),
     canonicalPath: recordsHref({ ...query, page }),
+    indexable: recordsQueryIndexable(query),
     previousHref: page > 1 ? recordsHref({ ...query, page: page - 1 }) : undefined,
     nextHref: page < pageCount ? recordsHref({ ...query, page: page + 1 }) : undefined,
     facets,

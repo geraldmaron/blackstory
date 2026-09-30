@@ -1937,6 +1937,19 @@ html:has([data-surface='instrument']) {
   touch-action: none;
 }
 
+/* Only the Instrument's plate tracks the visible viewport (`100dvh`, above), because its chrome
+   sits on the plate's bottom edge and must clear a phone's toolbar. Every other full-viewport
+   plate sits under a document that scrolls, and there `dvh` is wrong: a phone's toolbar collapses
+   and returns as the reader scrolls, so a `dvh` plate is resized mid-gesture. The band the toolbar
+   uncovers shows the page ground under the map until `dvh` catches up, and each resize
+   reallocates the WebGL buffer and fires the Door's camera refit. `lvh` is the viewport with the
+   toolbar collapsed, so the plate is already as tall as the reader can ever see and never changes
+   size on scroll. Browsers without `lvh` drop the declaration and keep `100dvh`. A plate holding a
+   slot is sized by the slot rule below, so it is excluded here rather than left to file order. */
+.ds-map-stage:not([data-plate-posture='live']):not([data-plate-slot]) {
+  height: 100lvh;
+}
+
 /* Ambient (the Door): gestures are locked, so a touch on the map must still scroll the document
    the chapters live in. Clicks and taps that do not move still reach clusters and pins. */
 .ds-map-stage[data-plate-posture='ambient'] {

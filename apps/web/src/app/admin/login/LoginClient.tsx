@@ -6,13 +6,30 @@
  */
 'use client';
 
-import { useCallback, useEffect, useMemo, useState, type FormEvent } from 'react';
+import {
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
+  type FormEvent,
+} from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useAdminAuth } from '../../../admin/auth/AdminAuthProvider';
+import {
+  ADMIN_NETWORK_FAILURE_MESSAGE,
+  isNetworkFailureMessage,
+} from '../../../admin/auth/network-error';
 import { safeAdminNextPath } from './safe-admin-next-path';
 
 const NOT_PROVISIONED =
   'This account is not provisioned for admin access. Ask an administrator to set a staff role on it.';
+
+function loginErrorMessage(err: unknown): string {
+  const message = err instanceof Error ? err.message : String(err);
+  return isNetworkFailureMessage(message) ? ADMIN_NETWORK_FAILURE_MESSAGE : message;
+}
 
 export default function LoginClient() {
   const router = useRouter();
@@ -22,6 +39,18 @@ export default function LoginClient() {
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
+  const emailRef = useRef<HTMLInputElement>(null);
+  const passwordRef = useRef<HTMLInputElement>(null);
+
+  // The fields are live in the server HTML, so an operator can type before hydration. React
+  // leaves that text in the DOM but not in state, and the next render would reset it; adopt it
+  // once, before anything re-renders.
+  useLayoutEffect(() => {
+    const typedEmail = emailRef.current?.value;
+    const typedPassword = passwordRef.current?.value;
+    if (typedEmail) setEmail(typedEmail);
+    if (typedPassword) setPassword(typedPassword);
+  }, []);
 
   const nextPath = useMemo(() => safeAdminNextPath(searchParams.get('next')), [searchParams]);
 
@@ -32,12 +61,21 @@ export default function LoginClient() {
    * the destination re-renders on the server with the new session cookie.
    */
   const enterConsole = useCallback(async () => {
-    const token = await getIdToken();
-    const response = token
-      ? await fetch('/admin/api/auth/me', { headers: { Authorization: `Bearer ${token}` } })
-      : null;
+    let response: Response | null;
+    try {
+      const token = await getIdToken();
+      response = token
+        ? await fetch('/admin/api/auth/me', { headers: { Authorization: `Bearer ${token}` } })
+        : null;
+    } catch (err: unknown) {
+      // Unverified is not admin: drop the session so the form re-enables for another attempt.
+      await signOut().catch(() => undefined);
+      setError(loginErrorMessage(err));
+      setBusy(false);
+      return;
+    }
     if (!response?.ok) {
-      await signOut();
+      await signOut().catch(() => undefined);
       setError(NOT_PROVISIONED);
       setBusy(false);
       return;
@@ -60,7 +98,7 @@ export default function LoginClient() {
       await signIn(email, password);
       await enterConsole();
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : String(err));
+      setError(loginErrorMessage(err));
       setBusy(false);
     }
   }
@@ -88,13 +126,16 @@ export default function LoginClient() {
           </p>
         ) : null}
 
-        <form className="admin-login__form" onSubmit={onSubmit} noValidate>
+        {/* POST, never the default GET: if a native submit ever fires before hydration, the
+            password goes in a request body to this origin, not into a URL, history or logs. */}
+        <form className="admin-login__form" method="post" onSubmit={onSubmit} noValidate>
           <div className="admin-login__field">
             <label className="admin-login__label" htmlFor="admin-email">
               Email
             </label>
             <input
               id="admin-email"
+              ref={emailRef}
               className="admin-login__input"
               name="email"
               type="email"
@@ -102,7 +143,7 @@ export default function LoginClient() {
               required
               value={email}
               onChange={(event) => setEmail(event.target.value)}
-              disabled={busy || !ready || Boolean(user)}
+              disabled={busy || Boolean(user)}
             />
           </div>
           <div className="admin-login__field">
@@ -111,6 +152,7 @@ export default function LoginClient() {
             </label>
             <input
               id="admin-password"
+              ref={passwordRef}
               className="admin-login__input"
               name="password"
               type="password"
@@ -119,10 +161,12 @@ export default function LoginClient() {
               minLength={8}
               value={password}
               onChange={(event) => setPassword(event.target.value)}
-              disabled={busy || !ready || Boolean(user)}
+              disabled={busy || Boolean(user)}
             />
           </div>
           <div className="admin-login__actions">
+            {/* Gated on `ready` as well: the fields are live before the auth client is, but a
+                sign-in cannot run until it is. */}
             <button
               type="submit"
               className="ds-button ds-button--primary"

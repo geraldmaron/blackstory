@@ -93,6 +93,7 @@ import {
   bindMapResizeLifecycle,
   bindWebGlContextRecovery,
   isWebGlAvailable,
+  resizeMapInPlace,
 } from '../../lib/map-experience/map-libre-lifecycle';
 import {
   ENTITY_POINTER_HIT_LAYER_IDS,
@@ -335,6 +336,8 @@ export type AtlasCameraTarget = {
   getCenter(): { lng: number; lat: number };
   /** The element MapLibre draws in — the box a surface frames its camera against. */
   getContainer(): HTMLElement;
+  /** Whether a flight, ease or gesture is in progress — a refit must not cut one short. */
+  isMoving(): boolean;
   stop(): unknown;
 };
 
@@ -1282,7 +1285,8 @@ export function MapStageProvider({
 
   const resize = useCallback(() => {
     try {
-      mapRef.current?.resize();
+      const map = mapRef.current;
+      if (map) resizeMapInPlace(map);
     } catch (error) {
       console.error('[MapStage] resize failed', error);
     }
@@ -1541,7 +1545,7 @@ export function MapStageProvider({
             if (!canceledRef.current) markMapUnavailable();
           },
           () => {
-            if (!canceledRef.current) activeMap.resize();
+            if (!canceledRef.current) resizeMapInPlace(activeMap);
           },
         );
         bindPlateClickListeners(activeMap, {
@@ -1551,7 +1555,7 @@ export function MapStageProvider({
           onEdgeSelect: (edgeId) => notify(listenersRef.current, 'edgeSelect', edgeId),
           onActivate: (viewport) => notify(listenersRef.current, 'activate', viewport),
         });
-        activeMap.resize();
+        resizeMapInPlace(activeMap);
         // Flush camera requested while the canvas was still constructing (e.g. locate → explore
         // deep link with radius bounds). Prefer the pending flight over the constructor CONUS frame.
         const pending = pendingFlyRef.current;
@@ -1594,11 +1598,11 @@ export function MapStageProvider({
       });
 
       resizeLifecycleRef.current = bindMapResizeLifecycle(container, () => {
-        activeMap.resize();
+        resizeMapInPlace(activeMap);
       });
       resizeTimerRef.current = setTimeout(() => {
         syncEntityMarkers();
-        activeMap.resize();
+        resizeMapInPlace(activeMap);
       }, 200);
     })();
     // Deliberately no deps: this builds the app's single MapLibre instance, and the guard above
@@ -1812,7 +1816,7 @@ export function MapStageProvider({
     lockGestures(map);
     // Only a real size change needs the drawing buffer re-measured. A scroll no longer produces
     // one at all, which is the point: MapLibre never resizes mid-gesture.
-    if (resized) map.resize();
+    if (resized) resizeMapInPlace(map);
 
     if (lastFramedMomentRef.current === frame.id) return;
     lastFramedMomentRef.current = frame.id;

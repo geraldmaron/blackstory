@@ -498,3 +498,36 @@ test('preserves lone _vercel_share on / (Preview SSO return)', () => {
   assert.equal(needsQueryNormalizationRedirect(home), false);
   assert.equal(buildNormalizedUrl(home).search, '?_vercel_share=share-token');
 });
+
+test('/records drops unknown keys and canonicalizes values (was an unbounded cache key)', () => {
+  const junk = new URL('https://blackstory.app/records?zz=3009218991');
+  assert.equal(needsQueryNormalizationRedirect(junk), true);
+  assert.equal(buildNormalizedUrl(junk).search, '');
+
+  const variant = new URL('https://blackstory.app/records?state=ga&kind=SCHOOL&utm_source=x');
+  assert.equal(needsQueryNormalizationRedirect(variant), true);
+  assert.equal(buildNormalizedUrl(variant).search, '?kind=school&state=GA');
+
+  const canonical = new URL('https://blackstory.app/records?kind=school&state=GA');
+  assert.equal(needsQueryNormalizationRedirect(canonical), false);
+});
+
+test('/records facet values that fail their shape drop at the edge', () => {
+  const bad = new URL('https://blackstory.app/records?kind=x%20y&topic=zz-not-a-topic&page=0');
+  assert.equal(buildNormalizedUrl(bad).search, '');
+});
+
+test('/explore free-value keys no longer mint cache keys', () => {
+  const randomTheme = new URL('https://blackstory.app/explore?theme=x%20y%3Cscript%3E');
+  assert.equal(needsQueryNormalizationRedirect(randomTheme), true);
+  assert.equal(buildNormalizedUrl(randomTheme).search, '');
+
+  const hugeNear = new URL(`https://blackstory.app/explore?near=${'a'.repeat(400)}`);
+  assert.equal(buildNormalizedUrl(hugeNear).searchParams.get('near')?.length, 80);
+
+  const badState = new URL('https://blackstory.app/explore?state=Georgia&decade=19x0s');
+  assert.equal(buildNormalizedUrl(badState).search, '');
+
+  const real = new URL('https://blackstory.app/explore?state=GA&kind=school&theme=education');
+  assert.equal(needsQueryNormalizationRedirect(real), false);
+});

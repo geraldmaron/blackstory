@@ -92,6 +92,11 @@ test('the Explore page never puts the catalog back in the initial prop', async (
   assert.match(explorePage, /DoorHome/);
   assert.match(explorePage, /initialBrowse/);
   assert.doesNotMatch(explorePage, /AtlasHome/);
+  // A query view is a crawl trap: noindex AND nofollow, not the SP-19 noindex-but-follow.
+  assert.match(
+    explorePage,
+    /isQueryView \? \{ \.\.\.metadata, robots: \{ index: false, follow: false \} \} : metadata/,
+  );
   assert.match(doorHome, /buildAtlasShell/);
   assert.match(immersive, /AtlasLoader/);
   assert.match(immersive, /embedded/);

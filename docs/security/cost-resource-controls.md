@@ -214,11 +214,32 @@ entries. Cloudflare Free cannot vary on headers, which is why its rules exclude 
 carries `Set-Cookie`, nothing read the cookie, and Cloudflare's handling of `Set-Cookie` under an
 override rule is ambiguous enough not to rely on.
 
-**Not yet observed:** whether Vercel honors the header on a document whose `Cache-Control` says
-`private, no-store`. Its documentation gives the header top priority; its cacheability list names
-those directives. After the next production deploy, run the probe table at the bottom of this
-section. If `/entity/*` stays `x-vercel-cache: MISS`, read the cache reason in the runtime logs;
-the header costs nothing if ignored.
+**Observed 2026-09-22 after the production deploy (`f0c51506`): NOT honored.** With Cloudflare
+bypassed (rule 4's `x-maintenance-bypass` header), three consecutive requests for an entity
+page, two for a place page and two for `/explore?state=GA` all answered `x-vercel-cache: MISS`;
+`/design-system`, which no Cloudflare rule covers, did the same without any bypass. Vercel's
+cacheability list ("no `private`, `no-cache` or `no-store` in `Cache-Control`") wins over the
+targeted header on a Next dynamic page. The header is inert and costs nothing; Cloudflare is the
+only document cache. Follow-up `repo-ogo3j.11`: remove the header, or implement Vercel's own
+recipe for this case (a middleware self-fetch that re-stamps the nonce on cached HTML).
+
+Verified in the same probe: `x-vercel-id: iad1::pdx1::…` on function-rendered responses from
+both projects (the `pdx1` pin is live); `/v1/map` answers `x-vercel-cache: HIT` with `age: 1` on
+the second request, 0.86 s instead of 6.9 s.
+
+**Artifact egress, corrected 2026-09-22 15:00 UTC.** The production runtime log for the new
+fetcher reads `release artifact downloaded in 483–1616ms { encoding: 'br' }` for every first
+load by the `pdx1` instances, while Supabase `edge_logs` records `content_length: 17665068` and
+`8310554` for those same requests. So that log field reports the object's identity size on a
+CDN cache hit even when the body was served brotli-compressed, and the old fetches (undici
+negotiates brotli by default) were very likely compressed as well. The "54 GB/day" in
+`repo-ogo3j.2` is therefore an upper bound in identity bytes; actual transfer was probably
+5–8× smaller and the Supabase line was a few dollars a month, not tens. The conditional-GET
+refresh still retires it: a 304 carries no body at all. The decisive check is `status = 304`
+rows in `edge_logs` from the `pdx1` addresses once their first 30-minute refresh comes due.
+**Observed 15:22:55–15:22:58 UTC:** instance `44.250.211.113` (first load 14:47) revalidated
+both `search-index.json` and `entities.json` with `304`, no body. New instances still make one
+compressed first load each (`200`), which is the remaining, instance-count-bound cost.
 
 #### Operator step: convert rule 2 — DONE 2026-09-22 (dashboard, operator session)
 
@@ -289,12 +310,30 @@ Caching → Purge, or redeploy) if the wall must be immediate.
 
 | path | expect |
 |---|---|
-| `/entity/<id>` | `x-vercel-cache: HIT` (Vercel layer); after rule 2, `cf-cache-status: HIT` |
-| `/place/<slug>` | same, and no `set-cookie` |
-| `/explore?state=GA` | `HIT`, and `/explore?state=AL` a different body |
+| `/entity/<id>` | `cf-cache-status: HIT` (observed 2026-09-22); Vercel layer stays `MISS`, see above |
+| `/place/<slug>` | same, and no `set-cookie` (observed) |
+| `/explore?state=GA` | `HIT`, and `/explore?state=AL` a different body (observed) |
 | `/entity/<id>` with `rsc: 1` | Cloudflare `DYNAMIC`; Vercel may `HIT` on its own Vary-keyed entry, and the body must be `text/x-component`, never the HTML |
 | `/corrections/status/<code>` | no `Vercel-CDN-Cache-Control` reaches Vercel; `MISS` |
 | `/admin/login` | `MISS` |
+
+## Crawler and cache-busting controls (2026-09-29, repo-4wb0e)
+
+Measured over 23 h: 128,601 of ~192k eyeball requests were Cloudflare misses, and `/records`
+(46,876) and `/explore` (34,147) were most of them. Named crawlers (Amzn-SearchBot, SemrushBot,
+Claude-SearchBot) plus what looks like one scraper rotating nine Chrome UA strings. Each miss is an
+origin render, and origin load drives Fluid instance churn, which drives the ~25 MB per-instance
+catalog download (6,824 full loads that day).
+
+| Layer | Control | Where |
+|---|---|---|
+| Edge canonicalization | `/records` now normalizes like `/explore`: unknown keys, bad facet values (topic vocabulary, `state` postal, `evidence` A–C, slug shape, `page` ≤ 1000, `q` ≤ 120) 308 to one canonical URL. Explore's free-value keys (`theme`, `tone`, `near`, `find`, `selected`, `edge`, `decade`, ...) are shape-checked the same way. | `proxy.ts`, `lib/records/records-query.ts`, `lib/map-experience/url-state.ts` |
+| Crawl policy | `robots.txt` keeps the general crawler off filter combinations (`/records?*&`, `/records?q=`, `/explore?`) and disallows SEO-tool crawlers entirely. Bare pages, single-facet `/records` and pagination stay crawlable. | `app/robots.ts`, `lib/traffic-class/agent-lists.ts` |
+| Named-crawler deny | Uncached 403 on `/explore`, `/records`, catalog, sitemap and the APIs for AI crawlers (training and, since 2026-09-30, answer/search fetchers) and SEO-tool crawlers. The 403 is `private, no-store`: the CDN keys on URL, so a shared-cacheable 403 could reach readers. | `lib/traffic-class/edge-deny.ts` |
+| Per-IP burst | Cloudflare rate-limit rule (below). **Operator step pending:** add `or http.request.uri.path in {"/records" "/explore"}` to its expression. 60 requests / 10 s per IP is far above any reader. | Cloudflare dashboard |
+
+Not yet closed: the origin accepts requests that bypass Cloudflare (`--resolve blackstory.app:443:76.76.21.21`
+answers 200), so a scraper that skips DNS skips the rate limit and cache (`repo-4wb0e.4`).
 
 ## Cloudflare zone security posture (blackstory.app)
 
@@ -318,6 +357,50 @@ and still carry `min_tls_version: 1.0` and `browser_cache_ttl: 14400` (and `beng
 has `always_use_https: off`). They are separate properties with origins that have not been
 verified here, and `ssl: strict` in particular is an outage if the origin cert does not validate.
 Audit them on their own terms before copying this posture across.
+
+## Bot traffic at the edge
+
+Owner decision 2026-09-30: search engines, link-preview fetchers and archivers are welcome; AI
+crawlers (training **and** answer/search fetchers), SEO-tool crawlers, scanners and scripted
+clients are not. robots.txt and `/ai.txt` ask; the Cloudflare WAF custom rules enforce, before the
+cache, so a refused request never reaches Vercel (the app's own 403 in `apps/web/src/proxy.ts`
+still costs an invocation).
+
+| Rule (`ref`) | Action | Matches |
+|---|---|---|
+| `bs_bot_ai_crawlers` | Block | every token in `AI_TRAINING_USER_AGENTS` (`apps/web/src/lib/traffic-class/agent-lists.ts`) |
+| `bs_bot_seo_crawlers` | Block | every token in `SEO_TOOL_USER_AGENTS` (same file): Semrush, Ahrefs, MJ12, DotBot, BLEX, DataForSEO, Seekport, Serpstat, Barkrowler, MegaIndex |
+| `bs_bot_scanner_paths` | Block | `/.git*`, `/.env*`, `/wp-*`, `*.php`, `/phpmyadmin`, `/cgi-bin` |
+| `bs_bot_crawl_trap` | Managed challenge | `/records` or `/explore` with `&` in the query, not a verified bot |
+| `bs_bot_scripted_clients` | Managed challenge | python-requests, Go-http-client, scrapy, headless browsers, empty UA; not `/api/*`, the maintenance bypass, or verified bots (`curl` deliberately allowed) |
+
+Plus Cloudflare's **AI bot policies** (Security Settings → Configure AI bot policies), which
+replaced the single "Block AI bots" toggle on 2026-09-15: **Training** and **Agent** are blocked
+on all pages; **Search** stays allowed on purpose, because since Cloudflare's July 2026 taxonomy it
+covers conventional search engines (Googlebot, Bingbot) as well as AI search, so blocking it would
+take the site out of search. The AI search crawlers we refuse (OAI-SearchBot, PerplexityBot,
+Claude-SearchBot, Amzn-SearchBot) are blocked by name in `bs_bot_ai_crawlers` instead. Bot Fight
+Mode is left off. Where the two AI lists disagreed (repo-4wb0e kept Claude-SearchBot and
+Amzn-SearchBot on cached record pages), the owner chose the more restrictive list (2026-09-30).
+
+All five custom rules use the Free plan's five.
+
+Applied 2026-09-30 with a token scoped to this zone only (Zone WAF: Edit, Bot Management: Edit;
+1Password "Cloudflare API · BlackStory bot rules (blackstory.app)"). Verified the same day from a
+residential IP: GPTBot, AhrefsBot, Amzn-SearchBot, Claude-SearchBot and Claude-User get 403 on
+`/about`; `/.git/config` gets 403; `python-requests` and an empty user agent are challenged; a
+browser user agent gets 200 on `/`, `/about` and single-parameter `/records`; a two-parameter
+`/records` URL is challenged and a real browser clears it without interaction; Slackbot gets 200;
+`/api/*` is not challenged. A spoofed `Googlebot/2.1` from a non-Google IP still gets 200, since
+nothing here targets it. robots.txt and `/ai.txt` only list the newer agents once this list is
+deployed; the edge enforces them already. Apply or re-apply (idempotent, dry run by default) with
+`scripts/cloudflare-bot-rules.mts`; after editing the agent list, re-run it so the edge matches
+robots.txt. Watch Security → Events for a day after any change: Free has no log-only action.
+
+`api.blackstory.app` is not proxied by Cloudflare, so none of this covers it (`repo-ogo3j.7`), and
+neither does traffic that reaches Vercel directly (`repo-4wb0e.4`). If `api.blackstory.app` is ever
+proxied, exempt it from `bs_bot_scripted_clients` first: that rule only exempts `/api/*` paths, and
+the Android app's default user agent is `okhttp`.
 
 ## Platform spend backstop
 

@@ -74,6 +74,12 @@ describe('instrument shell layout', () => {
       shellCss,
       /\.ds-map-stage\[data-plate-posture='live'\]\s*\{[^}]*touch-action:\s*none/s,
     );
+    // A plate under a scrolling document must not track the phone toolbar: a `dvh` plate resizes
+    // mid-scroll, uncovers a band of page ground and re-fires the Door's camera refit.
+    assert.match(
+      shellCss,
+      /\.ds-map-stage:not\(\[data-plate-posture='live'\]\):not\(\[data-plate-slot\]\)\s*\{[^}]*height:\s*100lvh/s,
+    );
     assert.match(
       shellCss,
       /\.ds-shell:has\(\[data-surface='instrument'\]\)\s*\{[^}]*height:\s*100dvh[^}]*overflow:\s*hidden/s,

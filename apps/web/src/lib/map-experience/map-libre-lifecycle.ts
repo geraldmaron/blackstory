@@ -43,6 +43,48 @@ export type MapResizeLifecycle = {
   readonly disconnect: () => void;
 };
 
+/** The slice of a MapLibre map {@link resizeMapInPlace} touches. */
+export type ResizableMap = {
+  getContainer(): HTMLElement;
+  getCanvas(): HTMLCanvasElement;
+  getPixelRatio(): number;
+  resize(): unknown;
+  redraw(): unknown;
+};
+
+/**
+ * Re-measure the map against its container WITHOUT a blank frame. Returns whether it resized.
+ *
+ * `map.resize()` reassigns `canvas.width`, and any assignment, even of the same value, wipes the
+ * WebGL drawing buffer. MapLibre then repaints on its NEXT animation frame, so a resize called from
+ * a rAF, a scroll or a resize handler leaves one composited frame with an empty canvas, and the
+ * plate's own background flashes through the map. Measured on the Door at 375px: one phone
+ * toolbar collapse cost two such blank frames. MapLibre's own container observer pairs `resize()`
+ * with a synchronous `redraw()` for exactly this reason; every resize the app asks for does too.
+ *
+ * It also skips when the canvas already matches the container (the same `clientWidth`/
+ * `clientHeight` MapLibre measures, at the current pixel ratio). The app has several resize
+ * triggers that fire for one layout change, and a redundant one is a full buffer reallocation and
+ * a synchronous render for nothing.
+ */
+export function resizeMapInPlace(map: ResizableMap): boolean {
+  const container = map.getContainer();
+  const canvas = map.getCanvas();
+  const width = container.clientWidth;
+  const height = container.clientHeight;
+  if (
+    canvas.style.width === `${width}px` &&
+    canvas.style.height === `${height}px` &&
+    canvas.width === Math.floor(map.getPixelRatio() * width) &&
+    canvas.height === Math.floor(map.getPixelRatio() * height)
+  ) {
+    return false;
+  }
+  map.resize();
+  map.redraw();
+  return true;
+}
+
 /**
  * Keeps MapLibre canvas dimensions in sync after layout, rotation, and tab focus
  * returns. Call `disconnect` on unmount.
