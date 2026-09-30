@@ -427,6 +427,13 @@ authentication; nothing sensitive may rely on it. It lives in 1Password (`BlackS
 header`, fields `password` = current and `previous`) and is never printed; the script shows
 sha256 fingerprints.
 
+**Status: deny since 2026-09-30, about 22:20 UTC.** Log mode ran from about 21:05 UTC: 24 requests
+through Cloudflare (IPv4 and IPv6, six paths) matched 0 times while direct no-header and
+wrong-header probes matched, and in 75 minutes of real traffic nothing else matched. After the
+switch: GPTBot and `python-requests` sent to `76.76.21.21` get 403 (they got 200 before), 18 reader
+checks through Cloudflare (nine paths, IPv4 and IPv6) get 200, the admin host still redirects to
+login, and a browser load of `/` and a record page had every same-site request succeed.
+
 **Rollout.** `--apply --mode=log` first, then watch what the rule matches (Vercel dashboard,
 Firewall) for real traffic before `--apply --mode=deny`. A deny apply refuses to run unless
 Cloudflare already sends an accepted secret, and rolls itself back to log if a normal request
