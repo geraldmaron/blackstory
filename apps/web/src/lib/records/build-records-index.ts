@@ -54,7 +54,9 @@ import { kindFamilyFor, resolveMapTone, type MapKindFamily } from '../map-experi
 import { kindFilterLabel, kindMatchesPublicFilter } from '../map-experience/filters';
 import { formatResultSummary } from '../discovery/result-summary';
 import {
+  EMPTY_RECORDS_QUERY,
   RECORDS_FILTER_KEYS,
+  isRecordsCombinationQuery,
   recordsHref,
   type RecordsFilterKey,
   type RecordsQuery,
@@ -120,6 +122,8 @@ export type RecordsFacet = {
   readonly label: string;
   readonly count: number;
   readonly href: string;
+  /** True when `href` leads to a narrowing crawlers must not follow (see `recordsQueryIndexable`). */
+  readonly nofollow: boolean;
 };
 
 export type RecordsGroup = {
@@ -144,6 +148,8 @@ export type RecordsIndex = {
   readonly pageCount: number;
   readonly countLabel: string;
   readonly canonicalPath: string;
+  /** Whether this narrowing may be indexed and crawled (see `recordsQueryIndexable`). */
+  readonly indexable: boolean;
   readonly previousHref: string | undefined;
   readonly nextHref: string | undefined;
   readonly facets: Readonly<Record<RecordsFilterKey, readonly RecordsFacet[]>>;
@@ -164,6 +170,18 @@ function humanize(value: string): string {
     .filter((word) => word.length > 0)
     .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
     .join(' ');
+}
+
+/**
+ * Whether a narrowing is a page search engines should index and crawl through: the inverse of
+ * `isRecordsCombinationQuery`, so the page's `noindex, nofollow`, the facet links' `nofollow` and
+ * robots.txt's `/records?*&` Disallow all cover the same URLs. Free text, two or more facets, and
+ * a facet plus a page number are combinations; the bare list, single-facet narrowings and plain
+ * pagination stay indexable. Readers can still build any combination; only crawlers are turned
+ * away.
+ */
+export function recordsQueryIndexable(query: Partial<RecordsQuery>): boolean {
+  return !isRecordsCombinationQuery({ ...EMPTY_RECORDS_QUERY, ...query });
 }
 
 type RecordFacts = {
@@ -508,14 +526,18 @@ export function buildRecordsIndex(
       }
       const active = query[key];
       const options: RecordsFacet[] = [...counts.entries()]
-        .map(([value, count]) => ({
-          id: value,
-          label: labelFor(key, value, stateNames),
-          count,
+        .map(([value, count]) => {
           // Selecting a filter returns to page one: page 4 of the old set is not page 4 of the
           // new one, and a reader who lands on an empty page reads it as an empty archive.
-          href: recordsHref({ ...query, [key]: active === value ? '' : value, page: 1 }),
-        }))
+          const target = { ...query, [key]: active === value ? '' : value, page: 1 };
+          return {
+            id: value,
+            label: labelFor(key, value, stateNames),
+            count,
+            href: recordsHref(target),
+            nofollow: !recordsQueryIndexable(target),
+          };
+        })
         .sort((a, b) => {
           // A floor is an ordered scale, so it reads in scale order. Sorting it by count puts
           // "A only" between "B and up" and "C and up", which reads as three unrelated chips.
@@ -595,6 +617,7 @@ export function buildRecordsIndex(
       plural: 'records',
     }),
     canonicalPath: recordsHref({ ...query, page }),
+    indexable: recordsQueryIndexable(query),
     previousHref: page > 1 ? recordsHref({ ...query, page: page - 1 }) : undefined,
     nextHref: page < pageCount ? recordsHref({ ...query, page: page + 1 }) : undefined,
     facets,

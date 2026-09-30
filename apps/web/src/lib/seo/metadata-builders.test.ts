@@ -6,6 +6,7 @@ import { readFileSync, readdirSync } from 'node:fs';
 import { join } from 'node:path';
 import { test } from 'node:test';
 import robots, { CRAWL_DISALLOWED_QUERY_SHAPES } from '../../app/robots';
+import { isNoIndexPath } from '../nav/destination-registry';
 import {
   buildEntityPageMetadata,
   buildPublicMetadataPreview,
@@ -136,8 +137,9 @@ test('robots.txt adds no Disallow for the routes that carry a noindex', () => {
   // ships the noindex ALONE for exactly this reason, and this is the standing guard.
   //
   // Since 2026-09-29 the general crawler is also kept off unbounded filter-combination URLs on
-  // /records and /explore (crawl cost, repo-4wb0e). Those carry no noindex, so the guard still
-  // holds: no Disallow the general crawler sees may reach a noindexed route.
+  // /records and /explore (crawl cost, repo-4wb0e). Those query URLs also say noindex for
+  // crawlers that ignore wildcards, but none of them is a registry noindex route, so the guard
+  // still holds: no Disallow the general crawler sees may reach a noindexed route.
   const rules = [robots().rules].flat();
   const wildcard = rules.find((rule) => rule?.userAgent === '*');
   assert.equal(wildcard?.allow, '/');
@@ -152,6 +154,8 @@ test('robots.txt adds no Disallow for the routes that carry a noindex', () => {
     for (const noindexed of ['/design-system', '/corrections/status/abc123']) {
       assert.ok(!noindexed.startsWith(pattern.split('*')[0]!), `${pattern} reaches ${noindexed}`);
     }
+    const bare = pattern.slice(0, pattern.indexOf('?'));
+    assert.equal(isNoIndexPath(bare), false, `${bare} is a noindex route; do not Disallow it`);
   }
   // Bare pages stay crawlable: a prefix Disallow on `/records?` would not match `/records`.
   for (const bare of ['/records', '/explore', '/records?kind=school', '/records?page=3']) {

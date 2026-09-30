@@ -43,6 +43,8 @@ export async function generateMetadata({ searchParams }: RecordsPageProps): Prom
     description:
       'Every record in the active release as a browsable list: kind, place, era and evidence grade, filterable and linkable without opening the map.',
     alternates: { canonical: absolute(model.canonicalPath) },
+    // Multi-facet and free-text narrowings are a crawl trap; see recordsQueryIndexable.
+    ...(model.indexable ? {} : { robots: { index: false, follow: false } }),
     other: {
       ...(model.previousHref !== undefined ? { 'link:prev': absolute(model.previousHref) } : {}),
       ...(model.nextHref !== undefined ? { 'link:next': absolute(model.nextHref) } : {}),

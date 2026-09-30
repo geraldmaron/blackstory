@@ -329,7 +329,7 @@ catalog download (6,824 full loads that day).
 |---|---|---|
 | Edge canonicalization | `/records` now normalizes like `/explore`: unknown keys, bad facet values (topic vocabulary, `state` postal, `evidence` A–C, slug shape, `page` ≤ 1000, `q` ≤ 120) 308 to one canonical URL. Explore's free-value keys (`theme`, `tone`, `near`, `find`, `selected`, `edge`, `decade`, ...) are shape-checked the same way. | `proxy.ts`, `lib/records/records-query.ts`, `lib/map-experience/url-state.ts` |
 | Crawl policy | `robots.txt` keeps the general crawler off filter combinations (`/records?*&`, `/records?q=`, `/explore?`) and disallows SEO-tool crawlers entirely. Bare pages, single-facet `/records` and pagination stay crawlable. | `app/robots.ts`, `lib/traffic-class/agent-lists.ts` |
-| Named-crawler deny | Uncached 403 on `/explore`, `/records`, catalog, sitemap and the APIs for AI-training and SEO-tool crawlers; AI answer engines keep the sitemap and record pages. The 403 is `private, no-store`: the CDN keys on URL, so a shared-cacheable 403 could reach readers. | `lib/traffic-class/edge-deny.ts` |
+| Named-crawler deny | Uncached 403 on `/explore`, `/records`, catalog, sitemap and the APIs for AI crawlers (training and, since 2026-09-30, answer/search fetchers) and SEO-tool crawlers. The 403 is `private, no-store`: the CDN keys on URL, so a shared-cacheable 403 could reach readers. | `lib/traffic-class/edge-deny.ts` |
 | Per-IP burst | Cloudflare rate-limit rule (below). **Operator step pending:** add `or http.request.uri.path in {"/records" "/explore"}` to its expression. 60 requests / 10 s per IP is far above any reader. | Cloudflare dashboard |
 
 Not yet closed: the origin accepts requests that bypass Cloudflare (`--resolve blackstory.app:443:76.76.21.21`
@@ -357,6 +357,50 @@ and still carry `min_tls_version: 1.0` and `browser_cache_ttl: 14400` (and `beng
 has `always_use_https: off`). They are separate properties with origins that have not been
 verified here, and `ssl: strict` in particular is an outage if the origin cert does not validate.
 Audit them on their own terms before copying this posture across.
+
+## Bot traffic at the edge
+
+Owner decision 2026-09-30: search engines, link-preview fetchers and archivers are welcome; AI
+crawlers (training **and** answer/search fetchers), SEO-tool crawlers, scanners and scripted
+clients are not. robots.txt and `/ai.txt` ask; the Cloudflare WAF custom rules enforce, before the
+cache, so a refused request never reaches Vercel (the app's own 403 in `apps/web/src/proxy.ts`
+still costs an invocation).
+
+| Rule (`ref`) | Action | Matches |
+|---|---|---|
+| `bs_bot_ai_crawlers` | Block | every token in `AI_TRAINING_USER_AGENTS` (`apps/web/src/lib/traffic-class/agent-lists.ts`) |
+| `bs_bot_seo_crawlers` | Block | every token in `SEO_TOOL_USER_AGENTS` (same file): Semrush, Ahrefs, MJ12, DotBot, BLEX, DataForSEO, Seekport, Serpstat, Barkrowler, MegaIndex |
+| `bs_bot_scanner_paths` | Block | `/.git*`, `/.env*`, `/wp-*`, `*.php`, `/phpmyadmin`, `/cgi-bin` |
+| `bs_bot_crawl_trap` | Managed challenge | `/records` or `/explore` with `&` in the query, not a verified bot |
+| `bs_bot_scripted_clients` | Managed challenge | python-requests, Go-http-client, scrapy, headless browsers, empty UA; not `/api/*`, the maintenance bypass, or verified bots (`curl` deliberately allowed) |
+
+Plus Cloudflare's **AI bot policies** (Security Settings → Configure AI bot policies), which
+replaced the single "Block AI bots" toggle on 2026-09-15: **Training** and **Agent** are blocked
+on all pages; **Search** stays allowed on purpose, because since Cloudflare's July 2026 taxonomy it
+covers conventional search engines (Googlebot, Bingbot) as well as AI search, so blocking it would
+take the site out of search. The AI search crawlers we refuse (OAI-SearchBot, PerplexityBot,
+Claude-SearchBot, Amzn-SearchBot) are blocked by name in `bs_bot_ai_crawlers` instead. Bot Fight
+Mode is left off. Where the two AI lists disagreed (repo-4wb0e kept Claude-SearchBot and
+Amzn-SearchBot on cached record pages), the owner chose the more restrictive list (2026-09-30).
+
+All five custom rules use the Free plan's five.
+
+Applied 2026-09-30 with a token scoped to this zone only (Zone WAF: Edit, Bot Management: Edit;
+1Password "Cloudflare API · BlackStory bot rules (blackstory.app)"). Verified the same day from a
+residential IP: GPTBot, AhrefsBot, Amzn-SearchBot, Claude-SearchBot and Claude-User get 403 on
+`/about`; `/.git/config` gets 403; `python-requests` and an empty user agent are challenged; a
+browser user agent gets 200 on `/`, `/about` and single-parameter `/records`; a two-parameter
+`/records` URL is challenged and a real browser clears it without interaction; Slackbot gets 200;
+`/api/*` is not challenged. A spoofed `Googlebot/2.1` from a non-Google IP still gets 200, since
+nothing here targets it. robots.txt and `/ai.txt` only list the newer agents once this list is
+deployed; the edge enforces them already. Apply or re-apply (idempotent, dry run by default) with
+`scripts/cloudflare-bot-rules.mts`; after editing the agent list, re-run it so the edge matches
+robots.txt. Watch Security → Events for a day after any change: Free has no log-only action.
+
+`api.blackstory.app` is not proxied by Cloudflare, so none of this covers it (`repo-ogo3j.7`), and
+neither does traffic that reaches Vercel directly (`repo-4wb0e.4`). If `api.blackstory.app` is ever
+proxied, exempt it from `bs_bot_scripted_clients` first: that rule only exempts `/api/*` paths, and
+the Android app's default user agent is `okhttp`.
 
 ## Platform spend backstop
 

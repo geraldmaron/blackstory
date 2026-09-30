@@ -19,8 +19,9 @@ export { AI_TRAINING_USER_AGENTS };
  * Cloudflare misses in a day (repo-4wb0e). Bare /records, single-facet /records pages and plain
  * pagination stay crawlable (a filtered page is a distinct, useful set); Explore is a map
  * instrument whose variants are not reading pages. `*` wildcards are honored by Google, Bing and
- * the other major crawlers; a crawler that ignores them still meets the edge normalization and
- * rate limit.
+ * the other major crawlers; a crawler that ignores them still meets the edge normalization, the
+ * rate limit, the pages' own `noindex, nofollow`, and the Cloudflare crawl-trap challenge
+ * (`scripts/cloudflare-bot-rules.mts`).
  */
 export const CRAWL_DISALLOWED_QUERY_SHAPES: readonly string[] = [
   '/records?*&',
@@ -43,8 +44,10 @@ export default function robots(): MetadataRoute.Robots {
     ],
     // The two routes kept out of the index — /design-system and /corrections/status/* — say so
     // with noindex instead, which a crawler can only read if it is allowed to fetch the page, so
-    // no Disallow above may match them. The query shapes carry no noindex: a Disallowed URL is
-    // never fetched, and crawl cost is the point.
+    // no Disallow above may match them. The /records query shapes also say `noindex, nofollow`
+    // on the page (`recordsQueryIndexable`, the inverse of `isRecordsCombinationQuery`, so both
+    // cover the same URLs) for crawlers that ignore wildcards; a crawler that honors this file
+    // never fetches them, and crawl cost is the point.
     host: siteUrl(),
     // Pointing at the sitemap here is how a crawler finds the registry-derived URL list without
     // having to walk in from Explore.

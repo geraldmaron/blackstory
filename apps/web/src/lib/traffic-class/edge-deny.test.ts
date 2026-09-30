@@ -36,7 +36,7 @@ test('SEO-tool crawlers are denied on every expensive path', () => {
   assert.equal(shouldDenyAiCrawler('/explore', 'Mozilla/5.0 (compatible; AhrefsBot/7.0)'), true);
 });
 
-test('AI answer-engine crawlers keep the sitemap and record pages, not the instruments', () => {
+test('AI answer-engine crawlers are denied like training crawlers, sitemap included', () => {
   const claude =
     'Mozilla/5.0 AppleWebKit/537.36 (KHTML, like Gecko; compatible; Claude-SearchBot/1.0; +searchbot@anthropic.com)';
   const amazon =
@@ -45,7 +45,8 @@ test('AI answer-engine crawlers keep the sitemap and record pages, not the instr
     assert.equal(shouldDenyAiCrawler('/records', ua), true);
     assert.equal(shouldDenyAiCrawler('/explore', ua), true);
     assert.equal(shouldDenyAiCrawler('/search/api', ua), true);
-    assert.equal(shouldDenyAiCrawler('/sitemap.xml', ua), false);
+    assert.equal(shouldDenyAiCrawler('/sitemap.xml', ua), true);
+    // Cheap cached pages are not the origin's to deny; the Cloudflare edge blocks these agents.
     assert.equal(shouldDenyAiCrawler('/entity/civil-rights-leaders-calvin-shirley', ua), false);
   }
 });

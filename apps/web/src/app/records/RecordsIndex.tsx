@@ -210,6 +210,7 @@ export function RecordsIndexRoom({ model, releaseLabel }: RecordsIndexProps) {
                       <a
                         className="ds-room-chip"
                         href={option.href}
+                        rel={option.nofollow ? 'nofollow' : undefined}
                         key={option.id}
                         aria-current={option.id === query[key] ? true : undefined}
                       >

@@ -6,18 +6,17 @@
  * refine/search/geocode APIs, force-dynamic `/explore`, and `/records`, whose filter
  * combinations each render afresh. Search crawlers (Googlebot, Bingbot) are not denied.
  *
- * Who is denied where:
- * - AI-training crawlers and SEO-tool crawlers: every expensive path.
- * - AI answer-engine crawlers (Claude-SearchBot, Amzn-SearchBot): every expensive path except the
- *   sitemap, which is how they reach the cached record pages that can send readers.
+ * Who is denied where: AI crawlers (training and, since 2026-09-30, answer/search fetchers such
+ * as Claude-SearchBot and Amzn-SearchBot) and SEO-tool crawlers, on every expensive path. The
+ * Cloudflare edge blocks the same agents site-wide before they reach the origin
+ * (`scripts/cloudflare-bot-rules.mts`); this deny is the origin's own backstop.
  */
 import { type NextRequest, NextResponse } from 'next/server';
-import { AI_SEARCH_USER_AGENTS, SEO_TOOL_USER_AGENTS } from './agent-lists';
+import { SEO_TOOL_USER_AGENTS } from './agent-lists';
 import { classifyTraffic } from './classify';
 
 const EXPENSIVE_EXACT = new Set(['/explore', '/records', '/atlas/catalog', '/sitemap.xml']);
 const EXPENSIVE_PREFIXES = ['/explore/api', '/search/api', '/locate/api'] as const;
-const SITEMAP_PATH = '/sitemap.xml';
 
 function normalizePath(pathname: string): string {
   return pathname.endsWith('/') && pathname.length > 1 ? pathname.slice(0, -1) : pathname;
@@ -37,8 +36,7 @@ export function isExpensiveOriginPath(pathname: string): boolean {
 export function shouldDenyAiCrawler(pathname: string, userAgent: string): boolean {
   if (!isExpensiveOriginPath(pathname)) return false;
   if (classifyTraffic({ userAgent }) === 'ai_crawler') return true;
-  if (matchesAny(userAgent, SEO_TOOL_USER_AGENTS)) return true;
-  return normalizePath(pathname) !== SITEMAP_PATH && matchesAny(userAgent, AI_SEARCH_USER_AGENTS);
+  return matchesAny(userAgent, SEO_TOOL_USER_AGENTS);
 }
 
 export function denyExpensiveAiCrawler(request: NextRequest): NextResponse | null {
