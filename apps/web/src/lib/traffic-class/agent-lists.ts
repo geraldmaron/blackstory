@@ -39,6 +39,7 @@ export const AI_TRAINING_USER_AGENTS: readonly string[] = [
   'Ai2Bot',
   // AI answer / search fetchers (blocked by choice, see above).
   'Claude-SearchBot',
+  'Amzn-SearchBot',
   'Claude-User',
   'Perplexity-User',
   'DuckAssistBot',

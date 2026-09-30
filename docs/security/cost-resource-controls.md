@@ -356,12 +356,33 @@ still costs an invocation).
 | `bs_bot_crawl_trap` | Managed challenge | `/records` or `/explore` with `&` in the query, not a verified bot |
 | `bs_bot_scripted_clients` | Managed challenge | python-requests, Go-http-client, scrapy, headless browsers, empty UA; not `/api/*`, the maintenance bypass, or verified bots (`curl` deliberately allowed) |
 
-Plus the zone's managed **Block AI bots** setting. All five use the Free plan's five custom
-rules. Apply or re-apply (idempotent, dry run by default) with
+Plus Cloudflare's **AI bot policies** (Security Settings → Configure AI bot policies), which
+replaced the single "Block AI bots" toggle on 2026-09-15: **Training** and **Agent** are blocked
+on all pages; **Search** stays allowed on purpose, because since Cloudflare's July 2026 taxonomy it
+covers conventional search engines (Googlebot, Bingbot) as well as AI search, so blocking it would
+take the site out of search. The AI search crawlers we refuse (OAI-SearchBot, PerplexityBot,
+Claude-SearchBot, Amzn-SearchBot) are blocked by name in `bs_bot_ai_crawlers` instead. Bot Fight
+Mode is left off. Where the two AI lists disagreed (repo-4wb0e kept Claude-SearchBot and
+Amzn-SearchBot on cached record pages), the owner chose the more restrictive list (2026-09-30).
+
+All five custom rules use the Free plan's five.
+
+Applied 2026-09-30 with a token scoped to this zone only (Zone WAF: Edit, Bot Management: Edit;
+1Password "Cloudflare API · BlackStory bot rules (blackstory.app)"). Verified the same day from a
+residential IP: GPTBot, AhrefsBot, Amzn-SearchBot, Claude-SearchBot and Claude-User get 403 on
+`/about`; `/.git/config` gets 403; `python-requests` and an empty user agent are challenged; a
+browser user agent gets 200 on `/`, `/about` and single-parameter `/records`; a two-parameter
+`/records` URL is challenged and a real browser clears it without interaction; Slackbot gets 200;
+`/api/*` is not challenged. A spoofed `Googlebot/2.1` from a non-Google IP still gets 200, since
+nothing here targets it. robots.txt and `/ai.txt` only list the newer agents once this list is
+deployed; the edge enforces them already. Apply or re-apply (idempotent, dry run by default) with
 `scripts/cloudflare-bot-rules.mts`; after editing the agent list, re-run it so the edge matches
 robots.txt. Watch Security → Events for a day after any change: Free has no log-only action.
 
-`api.blackstory.app` is not proxied by Cloudflare, so none of this covers it (`repo-ogo3j.7`).
+`api.blackstory.app` is not proxied by Cloudflare, so none of this covers it (`repo-ogo3j.7`), and
+neither does traffic that reaches Vercel directly (`repo-4wb0e.4`). If `api.blackstory.app` is ever
+proxied, exempt it from `bs_bot_scripted_clients` first: that rule only exempts `/api/*` paths, and
+the Android app's default user agent is `okhttp`.
 
 ## Platform spend backstop
 

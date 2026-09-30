@@ -1,6 +1,6 @@
 /**
- * Applies the blackstory.app bot-traffic WAF custom rules (and Cloudflare's managed "Block AI
- * bots" setting) through the Cloudflare API. Idempotent: each rule carries a stable `ref`, so a
+ * Applies the blackstory.app bot-traffic WAF custom rules (and Cloudflare's AI bot policies)
+ * through the Cloudflare API. Idempotent: each rule carries a stable `ref`, so a
  * re-run updates in place instead of adding duplicates, and rules this script does not own are
  * left untouched.
  *
@@ -9,8 +9,9 @@
  *   CLOUDFLARE_API_TOKEN=… node --conditions development --import tsx scripts/cloudflare-bot-rules.mts
  *   CLOUDFLARE_API_TOKEN=… node --conditions development --import tsx scripts/cloudflare-bot-rules.mts --apply
  *
- * Token scopes: Zone → Zone WAF: Edit, Zone → Bot Management: Edit (for the AI-bots setting),
- * on the blackstory.app zone only.
+ * Token scopes: Zone → Zone WAF: Edit, Zone → Bot Management: Edit (for the AI bot policies),
+ * on the blackstory.app zone only. 1Password: "Cloudflare API · BlackStory bot rules
+ * (blackstory.app)" in the Private vault.
  *
  * Why these rules: docs/security/cost-resource-controls.md, "Bot traffic at the edge". Custom
  * rules run before the cache, so a blocked request never reaches Vercel; the app's own 403 in
@@ -23,6 +24,23 @@ const API = 'https://api.cloudflare.com/client/v4';
 const PHASE = 'http_request_firewall_custom';
 /** Cloudflare Free allows five custom rules per zone. */
 const FREE_PLAN_RULE_LIMIT = 5;
+
+/**
+ * Cloudflare's AI bot policies (Security Settings → Configure AI bot policies), which replaced the
+ * single "Block AI bots" toggle (`ai_bots_protection`, deprecated 2026-09-15). Training and Agent
+ * are blocked zone-wide. Search is pinned to allowed on purpose: since Cloudflare's July 2026
+ * taxonomy it covers conventional search engines too (Googlebot, Bingbot), so blocking it would take
+ * the site out of search. The AI search crawlers we do refuse are blocked by name in
+ * `bs_bot_ai_crawlers`.
+ */
+export const AI_BOT_POLICIES = {
+  ai_training: 'block',
+  ai_user: 'block',
+  ai_search: 'disabled',
+} as const;
+
+/** Response-only fields of the bot_management config; the PUT rejects them. */
+const READ_ONLY_BOT_MANAGEMENT_FIELDS = new Set(['using_latest_model', 'stale_zone_configuration']);
 
 type Rule = {
   readonly ref: string;
@@ -162,7 +180,14 @@ async function main(): Promise<void> {
   }
 
   const botManagement = await cf<Record<string, unknown>>('GET', `${zone}/bot_management`);
-  console.log(`\nbot_management.ai_bots_protection: ${String(botManagement?.ai_bots_protection)}`);
+  const policyChanges = Object.entries(AI_BOT_POLICIES).filter(
+    ([key, value]) => botManagement?.[key] !== value,
+  );
+  console.log(`\nbot_management.fight_mode: ${String(botManagement?.fight_mode)} (left as is)`);
+  for (const [key, value] of Object.entries(AI_BOT_POLICIES)) {
+    const now = String(botManagement?.[key]);
+    console.log(`bot_management.${key}: ${now}${now === value ? '' : ` -> ${value}`}`);
+  }
 
   if (!apply) {
     console.log('\nDry run. Re-run with --apply to write.');
@@ -183,10 +208,21 @@ async function main(): Promise<void> {
     }
   }
 
-  // PUT replaces the whole object, so send back every field read above with only this one changed
-  // (a bare PUT would reset Bot Fight Mode).
-  if (botManagement !== undefined && botManagement.ai_bots_protection !== 'block') {
-    await cf('PUT', `${zone}/bot_management`, { ...botManagement, ai_bots_protection: 'block' });
+  // PUT replaces the whole object, so send back every field read above with only the policies
+  // changed (a bare PUT would reset Bot Fight Mode). Response-only fields are stripped: the API
+  // answers 400 "Bad Request" when `using_latest_model` (readOnly in Cloudflare's OpenAPI schema)
+  // is echoed back.
+  if (botManagement !== undefined && policyChanges.length > 0) {
+    const writable = Object.fromEntries(
+      Object.entries(botManagement).filter(([key]) => !READ_ONLY_BOT_MANAGEMENT_FIELDS.has(key)),
+    );
+    await cf('PUT', `${zone}/bot_management`, { ...writable, ...AI_BOT_POLICIES });
+  }
+  const botAfter = await cf<Record<string, unknown>>('GET', `${zone}/bot_management`);
+  if (botAfter?.fight_mode !== botManagement?.fight_mode) {
+    throw new Error(
+      `fight_mode changed from ${String(botManagement?.fight_mode)} to ${String(botAfter?.fight_mode)}`,
+    );
   }
 
   const after = await cf<CfRuleset>('GET', `${zone}/rulesets/phases/${PHASE}/entrypoint`);
@@ -195,6 +231,10 @@ async function main(): Promise<void> {
     console.log(
       `  ${rule.enabled === false ? 'off' : 'on '} ${rule.action.padEnd(17)} ${rule.description}`,
     );
+  }
+  console.log('AI bot policies now:');
+  for (const key of ['fight_mode', ...Object.keys(AI_BOT_POLICIES)]) {
+    console.log(`  ${key}: ${String(botAfter?.[key])}`);
   }
 }
 
