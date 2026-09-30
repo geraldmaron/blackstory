@@ -340,6 +340,29 @@ has `always_use_https: off`). They are separate properties with origins that hav
 verified here, and `ssl: strict` in particular is an outage if the origin cert does not validate.
 Audit them on their own terms before copying this posture across.
 
+## Bot traffic at the edge
+
+Owner decision 2026-09-30: search engines, link-preview fetchers and archivers are welcome; AI
+crawlers (training **and** answer/search fetchers), SEO-tool crawlers, scanners and scripted
+clients are not. robots.txt and `/ai.txt` ask; the Cloudflare WAF custom rules enforce, before the
+cache, so a refused request never reaches Vercel (the app's own 403 in `apps/web/src/proxy.ts`
+still costs an invocation).
+
+| Rule (`ref`) | Action | Matches |
+|---|---|---|
+| `bs_bot_ai_crawlers` | Block | every token in `AI_TRAINING_USER_AGENTS` (`apps/web/src/lib/traffic-class/agent-lists.ts`) |
+| `bs_bot_seo_crawlers` | Block | Ahrefs, Semrush, MJ12, DotBot, BLEX, DataForSEO, Serpstat, Barkrowler, MegaIndex, Seekport |
+| `bs_bot_scanner_paths` | Block | `/.git*`, `/.env*`, `/wp-*`, `*.php`, `/phpmyadmin`, `/cgi-bin` |
+| `bs_bot_crawl_trap` | Managed challenge | `/records` or `/explore` with `&` in the query, not a verified bot |
+| `bs_bot_scripted_clients` | Managed challenge | python-requests, Go-http-client, scrapy, headless browsers, empty UA; not `/api/*`, the maintenance bypass, or verified bots (`curl` deliberately allowed) |
+
+Plus the zone's managed **Block AI bots** setting. All five use the Free plan's five custom
+rules. Apply or re-apply (idempotent, dry run by default) with
+`scripts/cloudflare-bot-rules.mts`; after editing the agent list, re-run it so the edge matches
+robots.txt. Watch Security → Events for a day after any change: Free has no log-only action.
+
+`api.blackstory.app` is not proxied by Cloudflare, so none of this covers it (`repo-ogo3j.7`).
+
 ## Platform spend backstop
 
 Optional GCP billing budgets do not cover Vercel or Supabase, where the Aug 2026 spend
