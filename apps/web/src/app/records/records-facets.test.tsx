@@ -22,6 +22,7 @@ function facet(prefix: string, ids: readonly string[]): RecordsFacet[] {
     label: `${prefix} ${id}`,
     count: 100 - index,
     href: `/records?${prefix.toLowerCase()}=${id}`,
+    nofollow: false,
   }));
 }
 

@@ -5,7 +5,8 @@ import assert from 'node:assert/strict';
 import { readFileSync, readdirSync } from 'node:fs';
 import { join } from 'node:path';
 import { test } from 'node:test';
-import robots from '../../app/robots';
+import robots, { CRAWL_TRAP_DISALLOWS } from '../../app/robots';
+import { isNoIndexPath } from '../nav/destination-registry';
 import {
   buildEntityPageMetadata,
   buildPublicMetadataPreview,
@@ -134,13 +135,32 @@ test('robots.txt adds no Disallow for the routes that carry a noindex', () => {
   // Disallow and noindex are opposite instructions: a Disallowed URL is never fetched, so its
   // noindex is never read and the URL can still be indexed from an inbound link alone. SP-19
   // ships the noindex ALONE for exactly this reason, and this is the standing guard.
+  //
+  // The one exception is crawl cost, not indexing: `CRAWL_TRAP_DISALLOWS` names query-string
+  // spaces (`/records` multi-facet narrowings, `/explore?…`) that are unbounded for a crawler and
+  // each render in a function. They are whitelisted by value here so nothing else can slip in,
+  // and none of them may cover a registry noindex route.
   const rules = [robots().rules].flat();
-  const disallowed = rules.flatMap((rule) => [rule?.disallow ?? []].flat());
-  assert.deepEqual([...new Set(disallowed)], ['/'], 'only the AI-training agents are disallowed');
+  const aiOnly = rules.filter((rule) => rule?.userAgent !== '*');
+  const aiDisallowed = aiOnly.flatMap((rule) => [rule?.disallow ?? []].flat());
+  assert.deepEqual(
+    [...new Set(aiDisallowed)],
+    ['/'],
+    'only the AI-training agents are fully blocked',
+  );
 
   const wildcard = rules.find((rule) => rule?.userAgent === '*');
-  assert.equal(wildcard?.disallow, undefined, 'the general crawler must not be blocked anywhere');
+  assert.deepEqual(
+    wildcard?.disallow,
+    [...CRAWL_TRAP_DISALLOWS],
+    'the general crawler is blocked only from the query-string crawl traps',
+  );
   assert.equal(wildcard?.allow, '/');
+  for (const pattern of CRAWL_TRAP_DISALLOWS) {
+    assert.ok(pattern.includes('?'), `${pattern} must only match query-string URLs`);
+    const bare = pattern.slice(0, pattern.indexOf('?'));
+    assert.equal(isNoIndexPath(bare), false, `${bare} is a noindex route; do not Disallow it`);
+  }
 });
 
 test('a room description survives the protected-pattern filter', () => {
