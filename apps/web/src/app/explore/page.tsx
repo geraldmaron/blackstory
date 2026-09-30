@@ -26,12 +26,17 @@ type ExplorePageProps = {
  */
 export async function generateMetadata({ searchParams }: ExplorePageProps): Promise<Metadata> {
   const params = await searchParams;
-  return buildStaticPageMetadata({
+  const isQueryView = Object.keys(params).length > 0;
+  const metadata = buildStaticPageMetadata({
     path: '/explore',
     title: 'Map',
     description: 'The map of the archive, focused.',
-    ...(Object.keys(params).length > 0 ? { noIndex: true } : {}),
+    ...(isQueryView ? { noIndex: true } : {}),
   });
+  // The builder keeps `follow: true` on noindexed pages (SP-19): a page dropped from the index is
+  // still part of the link graph. A query view is a crawl trap rather than a dropped page, so it
+  // also says nofollow, like a /records combination.
+  return isQueryView ? { ...metadata, robots: { index: false, follow: false } } : metadata;
 }
 
 export default async function ExplorePage({ searchParams }: ExplorePageProps) {
