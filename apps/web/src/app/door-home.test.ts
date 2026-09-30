@@ -132,11 +132,16 @@ test('the plate is framed against the Door window and re-framed on resize', () =
   // The first frame after mount is a cut, so a warm plate is never seen arriving from elsewhere.
   assert.match(immersive, /firstFrameRef = useRef\(true\)/);
   assert.match(immersive, /applyCamera\(firstFrameRef\.current\)/);
-  // Resize follows the layout: observe the window, one refit per frame, cut not flight.
+  // Resize follows the layout: observe the window, one refit per frame, a cut at rest. A camera
+  // already moving is re-aimed, not cut: a phone's toolbar fires `resize` on the same swipe that
+  // starts a chapter flight, and cutting there jumped the map to the flight's end.
   assert.match(immersive, /new ResizeObserver\(refit\)/);
   assert.match(immersive, /window\.addEventListener\('resize', refit\)/);
   assert.match(immersive, /requestAnimationFrame/);
-  assert.match(immersive, /stage\.resize\(\);\s*applyCamera\(true\)/);
+  assert.match(
+    immersive,
+    /stage\.resize\(\);(?:\s*\/\/[^\n]*)*\s*applyCamera\(!map\.isMoving\(\)\)/,
+  );
   assert.match(immersive, /sameDoorFrameBox/);
   // The observer re-firing for the chapter already in view must not restart its flight.
   assert.match(immersive, /if \(chapter\.id === lastChapterIdRef\.current\) return;/);

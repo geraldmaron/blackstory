@@ -718,9 +718,10 @@ export function DoorImmersive({
 
   /**
    * Re-frame when the map window or the canvas changes: a window resize, the bar wrapping, a
-   * phone's toolbar collapsing (`100dvh`), the strip/full-bleed breakpoint. A cut, not a flight,
-   * one per animation frame however many events a drag produces, and only when a box actually
-   * moved — a sub-pixel jitter is not a resize (`sameDoorFrameBox`).
+   * phone's toolbar collapsing, the strip/full-bleed breakpoint. A cut when the camera is at rest
+   * (a flight re-aimed when it is not), one per animation frame however many events a drag
+   * produces, and only when a box actually moved — a sub-pixel jitter is not a resize
+   * (`sameDoorFrameBox`).
    */
   useEffect(() => {
     if (!plateLive) return;
@@ -737,7 +738,11 @@ export function DoorImmersive({
         // MapLibre re-measures its own container on its own observer; measure first so the fit
         // is computed against the canvas as it is now, not as it was a frame ago.
         stage.resize();
-        applyCamera(true);
+        // Cut only a camera at rest. A phone fires `resize` as its toolbar collapses, which is
+        // the same swipe that starts a chapter's flight, and a cut there stopped the flight
+        // mid-air and jumped to its end (measured: zoom 6.98 to 13.4 in a single cut). A moving
+        // camera is re-aimed at the new frame from where it is instead.
+        applyCamera(!map.isMoving());
       });
     };
     const observer = new ResizeObserver(refit);
