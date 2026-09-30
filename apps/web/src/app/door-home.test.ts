@@ -140,7 +140,9 @@ test('the plate is framed against the Door window and re-framed on resize', () =
   assert.match(immersive, /requestAnimationFrame/);
   assert.match(
     immersive,
-    /stage\.resize\(\);(?:\s*\/\/[^\n]*)*\s*applyCamera\(!map\.isMoving\(\)\)/,
+    // Each skipped comment line must end at its own newline, so the match has one parse
+    // (an open `[^\n]*` repeated would let a run of `//` split exponentially many ways).
+    /stage\.resize\(\);(?:\s*\/\/[^\n]*\n)*\s*applyCamera\(!map\.isMoving\(\)\)/,
   );
   assert.match(immersive, /sameDoorFrameBox/);
   // The observer re-firing for the chapter already in view must not restart its flight.
