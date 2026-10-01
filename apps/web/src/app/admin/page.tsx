@@ -36,6 +36,11 @@ export default async function AdminHomePage() {
     queues.researchCaseSource,
     'Pending research cases',
   );
+  const submissionsMetric = formatQueueMetric(
+    queues.submissionsPending,
+    queues.submissionsSource,
+    'Submissions',
+  );
   const storyMetric = formatQueueMetric(
     queues.storyPacketsPending,
     queues.storyPacketsSource,
@@ -50,10 +55,9 @@ export default async function AdminHomePage() {
           BlackStory Admin
         </h1>
         <p className="admin-ops__lede">
-          Start here after sign-in. Each card is a desk with one job — Inbox for pending research
-          decisions, Story review for packets, Catalog for what already exists, Cases to browse
-          every research state, Releases to publish, Quick add for new URLs. Decisions here do not
-          publish until you activate a release.
+          Review public corrections, appeals, reports, and leads in Submissions. The Inbox holds
+          pending research cases. Staff decisions are recorded for audit; publication is a separate
+          step.
         </p>
 
         <p className="admin-ops__env" aria-label="Runtime environment">
@@ -71,6 +75,15 @@ export default async function AdminHomePage() {
         </p>
 
         <nav className="admin-ops__queues" aria-label="Operations queues">
+          <Link className="admin-ops__card" href="/admin/submissions">
+            <span className="admin-ops__card-label">Submissions</span>
+            <span className="admin-ops__card-metric">
+              {submissionsMetric.unavailable ? 'unavailable' : `${submissionsMetric.text} pending`}
+            </span>
+            <span className="admin-ops__card-detail">
+              Public corrections, appeals, abuse reports, and leads awaiting review
+            </span>
+          </Link>
           <Link className="admin-ops__card" href="/admin/inbox">
             <span className="admin-ops__card-label">Inbox</span>
             {researchMetric.unavailable ? (
@@ -81,7 +94,7 @@ export default async function AdminHomePage() {
               <span className="admin-ops__card-metric">{researchMetric.text} pending</span>
             )}
             <span className="admin-ops__card-detail">
-              Pending research only — triage, confirm, exclude, or request evidence
+              Pending research cases: triage, confirm, exclude, or request evidence
             </span>
           </Link>
 
@@ -103,16 +116,14 @@ export default async function AdminHomePage() {
             <span className="admin-ops__card-label">Catalog</span>
             <span className="admin-ops__card-metric">What exists</span>
             <span className="admin-ops__card-detail">
-              Canonical entities already in the archive — browse, do not triage
+              Canonical entities already in the archive
             </span>
           </Link>
 
           <Link className="admin-ops__card" href="/admin/cases">
             <span className="admin-ops__card-label">All cases</span>
             <span className="admin-ops__card-metric">Every state</span>
-            <span className="admin-ops__card-detail">
-              Full research-case browser — not just the pending inbox
-            </span>
+            <span className="admin-ops__card-detail">Research cases in every state</span>
           </Link>
 
           <Link className="admin-ops__card" href="/admin/releases">
@@ -127,7 +138,7 @@ export default async function AdminHomePage() {
             <span className="admin-ops__card-label">Quick add</span>
             <span className="admin-ops__card-metric">New intake</span>
             <span className="admin-ops__card-detail">
-              Drop a URL into quarantine — it appears in Inbox for triage
+              Submit a source URL with a draft research case for the Inbox
             </span>
           </Link>
         </nav>

@@ -44,7 +44,7 @@ export default function CaseDetailPage() {
     try {
       const token = await getIdToken();
       if (!token) return;
-      const response = await fetch(`/api/research-cases/${caseId}`, {
+      const response = await fetch(`/admin/api/research-cases/${caseId}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       const body = (await response.json()) as {
@@ -85,7 +85,7 @@ export default function CaseDetailPage() {
         setError('Sign in required');
         return;
       }
-      const response = await fetch(`/api/research-cases/${caseId}/transition`, {
+      const response = await fetch(`/admin/api/research-cases/${caseId}/transition`, {
         method: 'POST',
         headers: {
           Authorization: `Bearer ${token}`,
@@ -119,8 +119,8 @@ export default function CaseDetailPage() {
       </p>
       <h1 className="acq__title">{detail?.title ?? caseId}</h1>
       <p className="acq__lede">
-        Full research-case context. Decide with a written reason — audited, private, and not a
-        public publish.
+        Full research-case context. Decide with a written reason. Decisions are audited and remain
+        private until publication.
       </p>
       <ol className="acq__steps" aria-label="How to decide on a case">
         {CASE_TRIAGE_STEPS.map((step) => (
@@ -139,7 +139,7 @@ export default function CaseDetailPage() {
       ) : null}
 
       {!detail ? (
-        <p>Loading…</p>
+        <p>{error ? 'The case could not be loaded.' : 'Loading…'}</p>
       ) : (
         <>
           <p>
@@ -175,7 +175,7 @@ export default function CaseDetailPage() {
                 {detail.checklist.items.map((item) => (
                   <li key={item.key}>
                     {item.complete ? 'Done' : 'Open'} · {item.key}
-                    {item.note ? ` — ${item.note}` : ''}
+                    {item.note ? `: ${item.note}` : ''}
                   </li>
                 ))}
               </ul>

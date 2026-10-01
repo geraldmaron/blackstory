@@ -2,12 +2,15 @@
  * Server-side operations dashboard helpers: queue counts from Postgres stores
  * and non-secret environment posture for the admin home screen.
  */
+import { queryIntakeItemPage } from '../lib/postgres-submissions';
 import { tryCountAdminResearchCases } from '../cases/research-case-store';
 import { listStoryPackets, type StoryPacketListItem } from '../stories/story-packet-store';
 
 export type OpsQueueSource = 'live' | 'unavailable';
 
 export type OpsQueueSummary = {
+  readonly submissionsSource: OpsQueueSource;
+  readonly submissionsPending?: number;
   readonly researchCaseSource: OpsQueueSource;
   readonly storyPacketsSource: OpsQueueSource;
   readonly researchCasePending?: number;
@@ -35,11 +38,14 @@ export function countPendingStoryPackets(items: readonly Pick<StoryPacketListIte
 }
 
 export async function loadOpsQueueSummary(): Promise<OpsQueueSummary> {
-  const [research, story] = await Promise.all([
+  const [research, story, submissions] = await Promise.all([
     loadResearchCaseQueueSummary(),
     loadStoryPacketQueueSummary(),
+    queryIntakeItemPage({ statuses: ['quarantined'], pageSize: 1 }).catch(() => null),
   ]);
   return {
+    submissionsSource: submissions ? 'live' : 'unavailable',
+    ...(submissions ? { submissionsPending: submissions.total } : {}),
     researchCaseSource: research.researchCaseSource,
     storyPacketsSource: story.storyPacketsSource,
     ...(research.researchCasePending !== undefined

@@ -52,7 +52,7 @@ export type CorrectionRouteDependencies = {
   readonly now?: () => number;
   /**
    * Persists an accepted abuse report. Abuse reports have no receipt/status scheme (no target
-   * type, category, or code — see `../postgres-store.ts`), so they don't go through `store`.
+   * type, category, or code), so they don't go through `store`.
    * Defaults to the real Postgres writer; tests override this the same way they substitute
    * `store` for the in-memory one, rather than reaching the network.
    */
@@ -76,6 +76,7 @@ function networkTokenFor(clientIp: string, pepper: string): string {
 function toPublicStatus(stored: StoredCorrection) {
   return buildPublicCorrectionStatus({
     receiptCode: stored.receiptCode,
+    ...(stored.intakeStatus ? { intakeStatus: stored.intakeStatus } : {}),
     moderationState: stored.record.moderationState,
     submittedAt: stored.record.createdAt,
     updatedAt: stored.updatedAt,
@@ -241,7 +242,6 @@ export async function handleCorrectionAppealRequest(
       statement: input.statement.trim(),
       submittedAt: new Date(deps.now?.() ?? Date.now()).toISOString(),
     };
-    await deps.store.attachAppeal(stored.receiptCode, deps.privacyPepper, appealRecord);
 
     const appealIntake = createQuarantinedSubmission(
       validation.payload,
@@ -253,6 +253,12 @@ export async function handleCorrectionAppealRequest(
         issues: appealIntake.rejection.issues.map(({ field, message }) => ({ field, message })),
       });
     }
+
+    const attached = await deps.store.attachAppeal(stored.receiptCode, deps.privacyPepper, {
+      ...appealRecord,
+      record: appealIntake.record,
+    });
+    if (!attached) return jsonError(409, 'appeal_not_available');
 
     return NextResponse.json(
       {
@@ -300,9 +306,7 @@ export async function handleCorrectionAbuseReportRequest(
     }
 
     // Abuse reports have no receipt/status scheme (nothing for a submitter to check later), so
-    // they skip `deps.store` and go straight into the same table through the lower-level writer
-    // — this is what was missing entirely before repo-vl155.1: `createQuarantinedSubmission`
-    // never touches Postgres itself, so a report that stopped here never reached a moderator.
+    // they use the same durable intake writer without receipt metadata.
     await (deps.saveAbuseReport ?? saveQuarantinedRecord)(result.record);
 
     return NextResponse.json(
@@ -326,12 +330,20 @@ export function getDefaultCorrectionStore(): CorrectionSubmissionStore {
   return defaultStore;
 }
 
+let defaultGuards:
+  | Pick<CorrectionRouteDependencies, 'integrityGuard' | 'rateLimitGuard' | 'campaignDetector'>
+  | undefined;
+
 export async function buildDefaultCorrectionRouteDependencies(): Promise<CorrectionRouteDependencies> {
   const { createCorrectionRateLimitGuard } = await import('../rate-limit-guard');
   const { createCorrectionRequestIntegrityGuard } = await import('../request-integrity-guard');
-  return {
+  defaultGuards ??= {
     integrityGuard: createCorrectionRequestIntegrityGuard(),
     rateLimitGuard: createCorrectionRateLimitGuard(),
+    campaignDetector: createSubmissionCampaignDetector(),
+  };
+  return {
+    ...defaultGuards,
     store: getDefaultCorrectionStore(),
     privacyPepper: requirePrivacyPepper(),
   };
