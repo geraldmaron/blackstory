@@ -96,3 +96,17 @@ test('omits outcomeReason for a still-open correction', () => {
   assert.equal(status.phase, 'received');
   assert.equal('outcomeReason' in status, false);
 });
+
+test('promotion means under review, never resolved or published', () => {
+  const status = buildPublicCorrectionStatus({
+    receiptCode: 'BB-COR-0123456789ABCDEF',
+    moderationState: 'pending_review',
+    submittedAt: '2026-07-17T12:00:00.000Z',
+    updatedAt: '2026-07-18T09:00:00.000Z',
+    classificationDispute: false,
+    appealCount: 0,
+    intakeStatus: 'promoted',
+  });
+  assert.equal(status.phase, 'under_review');
+  assert.equal(status.appealAvailable, false);
+});

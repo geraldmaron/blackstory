@@ -1,50 +1,13 @@
 /**
- * Postgres-backed correction submission store (repo-vl155.1) — the real production wiring
- * `../../app/corrections/store.ts`'s own doc comment used to claim already existed. See that
- * file's header for what was actually happening instead (nothing: every publicly submitted
- * correction was invisible to the admin console and lost on the next cold start).
- *
- * Lives here, outside `app/`, on purpose: `runtime-hardening.test.ts` walks every file under
- * `apps/web/src/app/**` (admin excluded) and fails on any import path containing `/postgres` —
- * the enforced rule is that live-Postgres access on the public render path only ever happens
- * through a `lib/`/`data/` module reached by a non-`postgres`-named path, matching how
- * `apps/web/src/data/public-seed.ts` already does this for entity reads. A file living under
- * `app/corrections/` that itself imports `queryPostgres` — even indirectly — trips that guard.
- *
- * Uses `queryPostgres` from `./postgres-client` — the public-tier `DATABASE_URL`/
- * `APP_DATABASE_URL` pool already used for public reads elsewhere in this app — deliberately
- * never `@repo/data-access`'s `getOpsPostgresPool`. That one backs `ADMIN_DATABASE_URL`-adjacent
- * ops/admin code (see `apps/web/src/admin/lib/canonical-postgres-client.ts`, which keeps its
- * connection "separate from the public pool's DATABASE_URL"), and this module's sibling
- * `postgres-client.ts` says why explicitly: "Kept local to apps/web so the public render path
- * never imports @repo/data-access." A public, unauthenticated route reaching for the *admin*
- * credential would be a real privilege escalation; this file only ever touches the same pool
- * public reads already use.
- *
- * RLS on `submissions.intake_items` grants INSERT only to the `authenticated` role with
- * `created_by = auth.uid()` (verified live against the blackstory-app Supabase project,
- * 2026-09-22) — there is no anonymous-insert policy, and there should not be one; a public
- * submitter has no `auth.uid()` to satisfy it. `postgres-client.ts`'s own doc calls this a
- * "service role" connection, which is what lets an anonymous row land at all. The narrowness
- * that matters here is enforced by the application code above this module (validation, rate
- * limiting, request-integrity, and the fixed shape this file ever writes or reads), exactly as
- * it already was for every column this endpoint was already trusted to set.
- *
- * `payload` stores a `StoredCorrection`, flattened, as one JSON blob — matching how this column
- * already holds differently-shaped payloads for other proposer pipelines, per
- * `apps/web/src/admin/lib/postgres-submissions.ts` ("whose shape varies by proposer pipeline").
- * "Flattened" matters: `deriveSubmissionTitle` in that same file (used by the admin submissions
- * list) reads `payload.normalized.title` / `payload.original.payload.title` directly off the
- * payload root — the shape every other pipeline already writes. Nesting the quarantine record
- * under a `record` key (i.e. storing `StoredCorrection` as-is) would make every correction show
- * up as "Untitled submission <id>" in the moderation queue, findable but unreadable. Abuse
- * reports (`saveQuarantinedRecord`) store the bare `QuarantinedSubmissionRecord` and are already
- * flat by construction.
+ * Durable public intake using the scoped public Postgres pool. Flattened quarantine payloads
+ * share submissions.intake_items with the staff queue. The database synchronizes receipt
+ * lifecycle fields on staff decisions and requeues a first eligible appeal atomically.
  */
 import { randomUUID } from 'node:crypto';
 import type { QuarantinedSubmissionRecord } from '@repo/security';
 import { queryPostgres } from './postgres-client';
 import { digestReceiptCode } from '../../app/corrections/receipt-code';
+import { buildPublicCorrectionStatus } from '../../app/corrections/public-status';
 import type { CorrectionSubmissionStore, StoredCorrection } from '../../app/corrections/store';
 
 type IntakeRow = {
@@ -62,6 +25,7 @@ function firstSourceUrl(record: QuarantinedSubmissionRecord): string | null {
  * (a missing key here) instead of silently landing on the wrong side of the split. */
 const STORED_CORRECTION_OWN_KEYS = [
   'receiptCode',
+  'intakeStatus',
   'receiptDigest',
   'targetType',
   'category',
@@ -115,13 +79,7 @@ async function insertIntakeItem(input: {
   );
 }
 
-/**
- * Persists a bare quarantined record with no receipt-code scheme — today only abuse reports,
- * which have no status page for a submitter to check, so nothing needs a `receipt_digest`. Not
- * part of `CorrectionSubmissionStore` (that interface is built around `StoredCorrection`, which
- * abuse reports don't have — no target type, category, or receipt); called directly from the
- * abuse-report route handler.
- */
+/** Persists leads and abuse reports without correction receipt metadata. */
 export async function saveQuarantinedRecord(record: QuarantinedSubmissionRecord): Promise<void> {
   await insertIntakeItem({
     id: record.id,
@@ -176,20 +134,34 @@ export function createPostgresCorrectionSubmissionStore(): CorrectionSubmissionS
     async attachAppeal(receiptCode, pepper, appeal) {
       const found = await getByReceiptCode(receiptCode, pepper);
       if (!found) return undefined;
+      if (
+        !buildPublicCorrectionStatus({
+          ...found.stored,
+          moderationState: found.stored.record.moderationState,
+          submittedAt: found.stored.record.createdAt,
+          appealCount: found.stored.appeals.length,
+        }).appealAvailable
+      )
+        return undefined;
+      const { closureReason: _closureReason, ...reopened } = found.stored;
       const updated: StoredCorrection = {
-        ...found.stored,
+        ...reopened,
+        intakeStatus: 'quarantined',
         appeals: [...found.stored.appeals, appeal],
         updatedAt: appeal.submittedAt,
-        record: {
-          ...found.stored.record,
-          moderationState: 'pending_review',
-        },
+        record: { ...found.stored.record, moderationState: 'pending_review' },
       };
-      await queryPostgres(`UPDATE submissions.intake_items SET payload = $2 WHERE id = $1`, [
-        found.row.id,
-        JSON.stringify(serializeStoredCorrection(updated)),
-      ]);
-      return updated;
+      // Compare-and-swap prevents concurrent appeals or a staff decision from being overwritten.
+      const rows = await queryPostgres<IntakeRow>(
+        `UPDATE submissions.intake_items SET payload = $2
+         WHERE id = $1 AND payload = $3::jsonb RETURNING id, payload`,
+        [
+          found.row.id,
+          JSON.stringify(serializeStoredCorrection(updated)),
+          JSON.stringify(found.row.payload),
+        ],
+      );
+      return rows[0] ? parseStoredCorrection(rows[0]) : undefined;
     },
 
     async markClosed(submissionId, closureReason) {

@@ -236,17 +236,34 @@ export async function findResearchCaseIdForSubmission(
   return rows[0]?.id ?? null;
 }
 
-export const SUBMISSION_DECISIONS = ['promote', 'reject', 'spam'] as const;
+export const SUBMISSION_DECISIONS = ['promote', 'reject', 'spam', 'resolve'] as const;
 export type SubmissionDecision = (typeof SUBMISSION_DECISIONS)[number];
 
 export function isSubmissionDecision(value: unknown): value is SubmissionDecision {
   return typeof value === 'string' && (SUBMISSION_DECISIONS as readonly string[]).includes(value);
 }
 
+/** A promoted correction can be closed after staff verify the outcome of its research. */
+export function submissionDecisionOptions(
+  submission: SubmissionDetail,
+): readonly SubmissionDecision[] {
+  if (submission.status === 'quarantined') return ['promote', 'reject', 'spam'];
+  const payload = asRecord(submission.payload);
+  if (
+    submission.status === 'promoted' &&
+    typeof payload?.receiptDigest === 'string' &&
+    !payload.closureReason
+  ) {
+    return ['resolve', 'reject'];
+  }
+  return [];
+}
+
 const NEXT_STATUS_BY_DECISION: Record<SubmissionDecision, IntakeStatus> = {
   promote: 'promoted',
   reject: 'rejected',
   spam: 'spam',
+  resolve: 'promoted',
 };
 
 /**
@@ -262,6 +279,7 @@ const AUDIT_ACTION_BY_DECISION: Record<
   promote: 'moderation.approved',
   reject: 'moderation.rejected',
   spam: 'moderation.rejected',
+  resolve: 'moderation.approved',
 };
 
 export const SUBMISSION_DECISION_PERMISSION: AdminPermission = 'research:write';
@@ -330,13 +348,15 @@ export function prepareSubmissionDecisionPlan(input: {
   readonly identity: Pick<ServerAdminIdentity, 'uid' | 'email'>;
   readonly nowIso: string;
   readonly newId: () => string;
+  readonly existingResearchCaseId?: string;
 }): SubmissionDecisionPlan {
   const nextStatus = NEXT_STATUS_BY_DECISION[input.decision];
   const action = AUDIT_ACTION_BY_DECISION[input.decision];
   const eventId = input.newId();
   const correlationId = input.newId();
   const idempotencyKey = `intake:${input.decision}:${eventId}`;
-  const researchCaseId = input.decision === 'promote' ? input.newId() : undefined;
+  const researchCaseId =
+    input.decision === 'promote' ? (input.existingResearchCaseId ?? input.newId()) : undefined;
 
   return {
     nextStatus,
@@ -388,6 +408,7 @@ export function prepareSubmissionDecisionPlan(input: {
 export type SubmissionDecisionDependencies = {
   readonly readIdentity: () => Promise<ServerAdminIdentity | null>;
   readonly readCurrent: (id: string) => Promise<SubmissionDetail | null>;
+  readonly readResearchCaseId: (id: string) => Promise<string | null>;
   /**
    * Narrowed to what this module reads back (only `eventId`) rather than the full
    * `PostgresCommitResult`, so a test double does not have to fabricate `committed` and
@@ -410,6 +431,7 @@ const defaultDependencies: SubmissionDecisionDependencies = {
     return readVerifiedAdminIdentity();
   },
   readCurrent: getIntakeItemDetail,
+  readResearchCaseId: findResearchCaseIdForSubmission,
   commit: commitWithAuditPostgres,
   newId: () => randomUUID(),
   now: () => new Date().toISOString(),
@@ -465,10 +487,12 @@ export async function commitSubmissionDecision(
   if (!current) {
     return { status: 'not_found' };
   }
-  if (current.status !== 'quarantined') {
+  if (!submissionDecisionOptions(current).includes(request.decision)) {
     return { status: 'already_processed' };
   }
 
+  const existingResearchCaseId =
+    request.decision === 'promote' ? await deps.readResearchCaseId(intakeItemId) : null;
   const plan = prepareSubmissionDecisionPlan({
     intakeItemId,
     decision: request.decision,
@@ -477,6 +501,7 @@ export async function commitSubmissionDecision(
     identity,
     nowIso: deps.now(),
     newId: deps.newId,
+    ...(existingResearchCaseId ? { existingResearchCaseId } : {}),
   });
 
   try {
@@ -486,17 +511,29 @@ export async function commitSubmissionDecision(
       applyState: async (client: pg.PoolClient) => {
         const updated = await client.query(
           `UPDATE submissions.intake_items
-              SET status = $1
-            WHERE id = $2 AND status = 'quarantined'
+              SET status = $1,
+                  payload = CASE WHEN $5::boolean THEN payload || $6::jsonb ELSE payload END
+            WHERE id = $2 AND status = $3 AND payload = $4::jsonb
           RETURNING id`,
-          [plan.nextStatus, intakeItemId],
+          [
+            plan.nextStatus,
+            intakeItemId,
+            current.status,
+            JSON.stringify(current.payload),
+            request.decision === 'resolve',
+            JSON.stringify({
+              closureReason: 'resolved',
+              moderationState: 'resolved',
+              updatedAt: plan.auditEvent.occurredAt,
+            }),
+          ],
         );
         if (updated.rowCount === 0) {
           // Rolls the whole transaction back — no audit/outbox row for a decision that did not
           // actually happen (someone else's decision, or a resubmitted form, won the race).
           throw new SubmissionAlreadyProcessedError(intakeItemId);
         }
-        if (request.decision === 'promote' && plan.researchCaseId) {
+        if (request.decision === 'promote' && plan.researchCaseId && !existingResearchCaseId) {
           const record = createResearchCase({
             id: plan.researchCaseId,
             candidateId: intakeItemId,
