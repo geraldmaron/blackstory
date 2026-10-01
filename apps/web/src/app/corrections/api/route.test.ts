@@ -10,6 +10,7 @@ import { createCorrectionRequestIntegrityGuard } from '../request-integrity-guar
 import { createCorrectionRateLimitGuard } from '../rate-limit-guard';
 import { createCorrectionSubmissionStore } from '../store';
 import {
+  buildDefaultCorrectionRouteDependencies,
   handleCorrectionAbuseReportRequest,
   handleCorrectionAppealRequest,
   handleCorrectionStatusRequest,
@@ -188,6 +189,21 @@ test('appeals re-enter review for rejected closures without exposing moderation 
     deps,
   );
   assert.equal(appeal.status, 202);
+  const reopened = await deps.store.getByReceiptCode(body.receiptCode, PEPPER);
+  assert.ok(reopened);
+  assert.equal(reopened.closureReason, undefined);
+  assert.equal(reopened.intakeStatus, 'quarantined');
+  assert.deepEqual(reopened.appeals[0]?.record?.normalized.sourceUrls, [
+    'https://example.org/ledger-copy',
+  ]);
+  const statusResponse = await handleCorrectionStatusRequest(
+    new Request(`http://localhost/corrections/status/api?receipt=${body.receiptCode}`),
+    deps,
+  );
+  const status = (await statusResponse.json()).status;
+  assert.equal(status.phase, 'received');
+  assert.equal(status.appealAvailable, false);
+  assert.equal(status.outcomeReason, undefined);
 });
 
 test('a declined correction carries a plain outcomeReason on its public status', async () => {
@@ -230,4 +246,21 @@ test('abuse reports enter quarantine as abuse_report submissions', async () => {
   assert.equal(response.status, 202);
   const body = (await response.json()) as { reportId: string };
   assert.ok(body.reportId);
+});
+
+test('default route dependencies retain quotas across requests', async () => {
+  const statuses: number[] = [];
+  for (let n = 0; n < 3; n += 1) {
+    const defaults = await buildDefaultCorrectionRouteDependencies();
+    const response = await handleCorrectionSubmitRequest(
+      postJson(
+        '/corrections/api',
+        { ...VALID_CORRECTION, targetRecordId: `quota-${n}` },
+        '203.0.113.250',
+      ),
+      { ...defaults, store: createCorrectionSubmissionStore() },
+    );
+    statuses.push(response.status);
+  }
+  assert.deepEqual(statuses, [202, 202, 429]);
 });

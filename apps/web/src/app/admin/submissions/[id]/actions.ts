@@ -24,7 +24,7 @@ export async function decideSubmission(
     return { status: 'error', message: 'Missing submission id.' };
   }
   if (!isSubmissionDecision(decisionRaw)) {
-    return { status: 'error', message: 'Choose promote, reject, or spam.' };
+    return { status: 'error', message: 'Choose a valid submission decision.' };
   }
 
   const result = await commitSubmissionDecision({ intakeItemId, decision: decisionRaw, reason });
@@ -33,14 +33,20 @@ export async function decideSubmission(
     case 'ok':
       revalidatePath(`/admin/submissions/${intakeItemId}`);
       revalidatePath('/admin/submissions');
+      revalidatePath('/admin');
+      revalidatePath('/admin/inbox');
+      revalidatePath('/admin/cases');
+      revalidatePath('/corrections/status', 'layout');
       return {
         status: 'decided',
         message:
           decisionRaw === 'promote'
-            ? 'Promoted. A research case was opened; nothing published.'
-            : decisionRaw === 'reject'
-              ? 'Rejected.'
-              : 'Marked spam.',
+            ? 'Promoted. The linked research case is ready for review; nothing published.'
+            : decisionRaw === 'resolve'
+              ? 'Closed as resolved. The correction receipt now shows closed.'
+              : decisionRaw === 'reject'
+                ? 'Rejected.'
+                : 'Marked spam.',
         eventId: result.eventId,
         ...(result.researchCaseId ? { researchCaseId: result.researchCaseId } : {}),
       };
@@ -51,7 +57,7 @@ export async function decideSubmission(
     case 'already_processed':
       return {
         status: 'error',
-        message: 'This submission was already decided — reload to see the current status.',
+        message: 'This submission was already decided. Reload to see the current status.',
       };
     case 'forbidden':
     case 'invalid':

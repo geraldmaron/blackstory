@@ -26,11 +26,11 @@ type DiscoveredHandler = {
   readonly file: string;
 };
 
-function routeFiles(directory: string): readonly string[] {
+function routeFiles(directory: string, suffix = 'route.ts'): readonly string[] {
   return readdirSync(directory, { withFileTypes: true }).flatMap((entry) => {
     const path = join(directory, entry.name);
-    if (entry.isDirectory()) return routeFiles(path);
-    return entry.name === 'route.ts' ? [path] : [];
+    if (entry.isDirectory()) return routeFiles(path, suffix);
+    return entry.name.endsWith(suffix) ? [path] : [];
   });
 }
 
@@ -57,6 +57,24 @@ function discoverHandlers(): readonly DiscoveredHandler[] {
 }
 
 const handlers = discoverHandlers();
+
+test('admin client fetch paths resolve to existing protected API handlers', () => {
+  const roots = [join(apiDir, '..'), join(apiDir, '../../../admin')];
+  const missing: string[] = [];
+  let checked = 0;
+  for (const file of roots.flatMap((root) => routeFiles(root, '.tsx'))) {
+    const source = readFileSync(file, 'utf8');
+    for (const match of source.matchAll(/fetch\(\s*(['"`])(\/[^'"`]+)\1/g)) {
+      const path = (match[2] ?? '').replace(/\$\{[^}]+\}/g, 'sample-id').split('?')[0]!;
+      checked += 1;
+      if (!handlers.some((handler) => findAdminRouteAccess(handler.method, path))) {
+        missing.push(`${relative(apiDir, file)}: ${path}`);
+      }
+    }
+  }
+  assert.ok(checked > 0, 'no admin client fetch paths were checked');
+  assert.deepEqual(missing, [], 'client calls must reach the protected admin API');
+});
 
 test('every admin API handler has a rule in the route table', () => {
   assert.ok(handlers.length > 0, 'no admin API route handlers were found to check');

@@ -4,25 +4,17 @@
  * Evidence attach form — prepare or commit a source proposal against a research case.
  */
 import Link from 'next/link';
-import { useActionState, useEffect, useState } from 'react';
-import { useAdminAuth } from '../../../admin/auth/AdminAuthProvider';
-import { EVIDENCE_ATTACH_INITIAL, submitEvidenceAttach } from './actions';
+import { useActionState, useState } from 'react';
+import { submitEvidenceAttach } from './actions';
+import { EVIDENCE_ATTACH_INITIAL } from './form-state';
 import { EVIDENCE_ATTACH_STEPS, evidenceSubmitLabel } from './evidence-intake-copy';
 
 export function EvidenceAttachForm() {
-  const { user } = useAdminAuth();
   const [commit, setCommit] = useState(false);
-  const [operatorId, setOperatorId] = useState('');
   const [state, formAction, isPending] = useActionState(
     submitEvidenceAttach,
     EVIDENCE_ATTACH_INITIAL,
   );
-
-  useEffect(() => {
-    if (user?.email && !operatorId) {
-      setOperatorId(user.email);
-    }
-  }, [user?.email, operatorId]);
 
   return (
     <>
@@ -51,21 +43,9 @@ export function EvidenceAttachForm() {
             placeholder="What this source supports and why it matters for the case"
           />
         </div>
-        <div className="quick-add-field">
-          <label htmlFor="ev-op">Operator id</label>
-          <input
-            id="ev-op"
-            name="operatorId"
-            type="text"
-            required
-            autoComplete="off"
-            value={operatorId}
-            onChange={(event) => setOperatorId(event.target.value)}
-          />
-          <p className="acq-sheet__meta">
-            Stamped on the proposal for audit. Pre-filled from your sign-in when available.
-          </p>
-        </div>
+        <p className="acq-sheet__meta">
+          Your signed-in staff identity is recorded with the proposal.
+        </p>
         <div className="quick-add-field">
           <label htmlFor="ev-commit">
             <input
@@ -100,7 +80,7 @@ export function EvidenceAttachForm() {
             Prepared
           </span>
           <div>
-            <p className="ds-notice__title">Evidence proposal prepared — nothing written yet.</p>
+            <p className="ds-notice__title">Evidence proposal prepared. Nothing written yet.</p>
             <div className="ds-notice__body">
               <p>
                 Submission <code>{state.submissionId}</code> for case{' '}

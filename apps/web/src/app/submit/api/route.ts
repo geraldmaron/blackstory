@@ -9,6 +9,7 @@
 import { NextResponse } from 'next/server';
 import { createHash } from 'node:crypto';
 import { createQuarantinedSubmission } from '@repo/security';
+import { saveQuarantinedRecord } from '@/lib/public-data/corrections-store';
 import { requirePrivacyPepper } from '@/lib/web-security';
 import { createSubmitLeadRequestIntegrityGuard } from '../request-integrity-guard';
 import { createSubmitLeadRateLimitGuard } from '../rate-limit-guard';
@@ -82,6 +83,8 @@ export async function POST(request: Request): Promise<Response> {
     if (!result.accepted) {
       return jsonError(400, 'validation_failed', { issues: result.rejection.issues });
     }
+
+    await saveQuarantinedRecord(result.record);
 
     // 202 Accepted: this is a quarantine write, never a confirmation that the lead is public,
     // true, or will ever be researched it only confirms the lead entered the moderated queue.

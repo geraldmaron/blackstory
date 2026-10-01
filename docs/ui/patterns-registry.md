@@ -207,3 +207,5 @@ These live outside the registry folder but share vocabulary with patterns:
 When adding a row here, add or update the matching `patterns-*.md` and a line in [`README.md`](./README.md).
 
 Collection guidance in `/admin/sources` uses [the source-library pattern](./patterns-source-library.md), existing `story-review` primitives and server-rendered `collection-guidance.tsx`.
+
+Admin intake uses the existing operations cards and workbench controls; its behavior contract is [patterns-admin-intake.md](./patterns-admin-intake.md).

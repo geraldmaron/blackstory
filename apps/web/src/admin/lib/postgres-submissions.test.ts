@@ -39,6 +39,7 @@ function fixture(who: ServerAdminIdentity | null, current: SubmissionDetail | nu
   const dependencies: SubmissionDecisionDependencies = {
     readIdentity: async () => who,
     readCurrent: async () => current,
+    readResearchCaseId: async () => null,
     async commit(input) {
       commits.push(input);
       // The row exists and is still 'quarantined' (this fixture's `current`), so the guarded
@@ -297,4 +298,39 @@ test('a failing transaction reports failure rather than throwing into the render
 
   assert.equal(result.status, 'failed');
   assert.match(result.status === 'failed' ? result.message : '', /deadlock/);
+});
+
+test('resolution is allowed only for an open promoted correction', async () => {
+  for (const current of [
+    submission(),
+    submission({ status: 'promoted' }),
+    submission({
+      status: 'promoted',
+      payload: { receiptDigest: 'digest', closureReason: 'resolved' },
+    }),
+  ]) {
+    const { dependencies } = fixture(identity('admin'), current);
+    assert.equal(
+      (
+        await commitSubmissionDecision(
+          { intakeItemId: current.id, decision: 'resolve', reason: 'Verified change.' },
+          dependencies,
+        )
+      ).status,
+      'already_processed',
+    );
+  }
+  const { dependencies } = fixture(
+    identity('admin'),
+    submission({ status: 'promoted', payload: { receiptDigest: 'digest' } }),
+  );
+  assert.equal(
+    (
+      await commitSubmissionDecision(
+        { intakeItemId: 'intake-1', decision: 'resolve', reason: 'Verified change.' },
+        dependencies,
+      )
+    ).status,
+    'ok',
+  );
 });
