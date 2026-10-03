@@ -8,6 +8,7 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { assertNeverClaimReview } from '@repo/domain';
 import { ArticleBody } from '../../../components/article/ArticleBody';
+import { ArticleHeroPhoto } from '../../../components/article/ArticleHeroPhoto';
 import { ArticleReferences } from '../../../components/article/ArticleReferences';
 import type { HydratedArticle } from '../../../lib/articles/hydrate';
 import { extractChapterHeadings } from '../../../lib/articles/heading-anchors';
@@ -174,10 +175,7 @@ export default async function ArticleDetailPage({ params }: ArticlePageProps) {
    */
   const masthead = (
     <figure className="ds-article-mast" data-media={doc.heroImage ? 'photo' : 'none'}>
-      {doc.heroImage ? (
-        // eslint-disable-next-line @next/next/no-img-element
-        <img src={doc.heroImage.url} alt={doc.heroImage.alt} />
-      ) : null}
+      {doc.heroImage ? <ArticleHeroPhoto url={doc.heroImage.url} alt={doc.heroImage.alt} /> : null}
       <figcaption className="ds-article-mast__over">
         <p className="ds-article-mast__facts">
           {doc.series?.label ? (

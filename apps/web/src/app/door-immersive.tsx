@@ -834,6 +834,15 @@ export function DoorImmersive({
       {browseMode ? (
         <div className="ds-door__browse-exit" data-browse-chrome="true">
           <button type="button" className="ds-door__browse-exit-btn" onClick={exitBrowse}>
+            <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+              <path
+                d="M10 3.5 5.5 8l4.5 4.5"
+                stroke="currentColor"
+                strokeWidth="1.6"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
             Back to journey
           </button>
         </div>
@@ -1002,7 +1011,7 @@ export function DoorImmersive({
                       ))}
                     </dl>
                   ) : null}
-                  <p className="ds-door-open__count">{placeCount} places in this release</p>
+                  <p className="ds-door-open__count">{placeCount} records on the map</p>
                   <div className="ds-door-open__actions">
                     <button
                       type="button"

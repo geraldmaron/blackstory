@@ -191,7 +191,18 @@
   }
 }
 
+/* A phone on its side: the open instrument is a left column (atlas.css), so the pill clears it. */
+@media (max-height: 559px) and (orientation: landscape) and (min-width: 560px) {
+  .ds-door__browse-exit {
+    top: calc(var(--ds-island-clearance) + var(--ds-space-2));
+    left: calc(min(360px, 45vw) + var(--ds-space-4));
+  }
+}
+
 .ds-door__browse-exit-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--ds-space-2);
   min-height: 44px;
   padding: var(--ds-space-2) var(--ds-space-4);
   border: var(--ds-border-width) solid var(--ds-border-strong);

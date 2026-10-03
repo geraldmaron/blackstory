@@ -172,3 +172,13 @@ test('primaryImageSourceLine is undefined for legacy images with no pin fields',
     'missing sourcePageUrl must not render a source link',
   );
 });
+
+test('coverHidesTooMuch judges the crop against the real box, not orientation alone', async () => {
+  const { coverHidesTooMuch } = await import('./record-mark');
+  assert.equal(coverHidesTooMuch(1, 2.8), true, 'a square photo in a wide banner loses 64%');
+  assert.equal(coverHidesTooMuch(16 / 9, 2.8), true, '16:9 in a 2.8:1 banner loses over a third');
+  assert.equal(coverHidesTooMuch(2.4, 2.8), false, 'a panorama covers fine');
+  assert.equal(coverHidesTooMuch(4 / 3, 4 / 3), false, 'same shape, nothing lost');
+  assert.equal(coverHidesTooMuch(16 / 9, 0.75), true, 'landscape in a tall phone box loses its sides');
+  assert.equal(coverHidesTooMuch(0, 2), false, 'unknown aspect never forces contain');
+});

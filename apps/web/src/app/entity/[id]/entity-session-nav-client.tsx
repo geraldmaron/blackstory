@@ -1,7 +1,12 @@
 /**
  * Client session navigation for entity detail pages. Shares Back stack and Random
- * toggle with explore spotlight via sessionStorage; navigates via Next router
- * (not browser history for Back).
+ * toggle with explore spotlight via sessionStorage.
+ *
+ * Back honours the browser's history: when the reader got here with Next, the previous record IS
+ * the previous history entry, so Back is `router.back()`. Pushing a new entry instead (as this
+ * used to) made the browser's own Back button then walk the reader *forward* again. When the
+ * previous record is not the previous entry (they arrived from elsewhere), Back replaces the
+ * current entry rather than growing history.
  */
 'use client';
 
@@ -33,6 +38,27 @@ export type EntitySessionNavClientProps = {
   readonly orderedIds: readonly string[];
 };
 
+const ARRIVED_VIA_NEXT_KEY = 'ds-entity-session-arrived-via-next';
+
+function arrivedViaNextFrom(currentId: string): string | null {
+  try {
+    const raw = window.sessionStorage.getItem(ARRIVED_VIA_NEXT_KEY);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw) as { from?: string; to?: string };
+    return parsed.to === currentId && typeof parsed.from === 'string' ? parsed.from : null;
+  } catch {
+    return null;
+  }
+}
+
+function rememberNext(from: string, to: string): void {
+  try {
+    window.sessionStorage.setItem(ARRIVED_VIA_NEXT_KEY, JSON.stringify({ from, to }));
+  } catch {
+    // Storage blocked: Back falls back to replace, which is still correct, just not history-aware.
+  }
+}
+
 export function EntitySessionNavClient({ currentId, orderedIds }: EntitySessionNavClientProps) {
   const router = useRouter();
   const [stack, setStack] = useState<SessionStack>(() => readEntitySessionStack());
@@ -48,8 +74,12 @@ export function EntitySessionNavClient({ currentId, orderedIds }: EntitySessionN
     }
     setStack(result.stack);
     writeEntitySessionStack(result.stack);
-    router.push(`/entity/${result.entityId}`);
-  }, [router, stack]);
+    if (arrivedViaNextFrom(currentId) === result.entityId) {
+      router.back();
+      return;
+    }
+    router.replace(`/entity/${result.entityId}`);
+  }, [currentId, router, stack]);
 
   const handleNext = useCallback(() => {
     const nextId = pickNext({ random: randomEnabled, currentId, orderedIds });
@@ -59,6 +89,7 @@ export function EntitySessionNavClient({ currentId, orderedIds }: EntitySessionN
     const nextStack = push(stack, currentId);
     setStack(nextStack);
     writeEntitySessionStack(nextStack);
+    rememberNext(currentId, nextId);
     router.push(`/entity/${nextId}`);
   }, [currentId, orderedIds, randomEnabled, router, stack]);
 

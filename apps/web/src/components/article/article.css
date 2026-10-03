@@ -480,6 +480,11 @@
   background: var(--ds-surface-raised);
 }
 
+.ds-article-mast__photo {
+  position: absolute;
+  inset: 0;
+}
+
 .ds-article-mast img {
   position: absolute;
   inset: 0;
@@ -487,6 +492,30 @@
   height: 100%;
   object-fit: cover;
   object-position: center;
+}
+
+.ds-article-mast .ds-fit-photo[data-fit='contain'] .ds-fit-photo__main {
+  position: absolute;
+  object-position: 88% center;
+}
+
+/* Phones: the photo gets its own frame and the headline reads below it, as on a record page. */
+@media (max-width: 47.9375rem), (max-height: 34.9375rem) {
+  .ds-article-mast[data-media='photo'] {
+    display: block;
+    min-height: 0;
+    background: var(--ds-canvas);
+  }
+
+  .ds-article-mast__photo {
+    position: relative;
+    aspect-ratio: 4 / 3;
+    max-height: 62svh;
+  }
+
+  .ds-article-mast .ds-fit-photo[data-fit='contain'] .ds-fit-photo__main {
+    object-position: center;
+  }
 }
 
 /* The scrim is sized to the type, not to the plate: over the whole band the opaque end of the
@@ -776,5 +805,12 @@
      where sticky positioning has no meaningful ground to stick to. */
   .ds-article-rail {
     position: static;
+  }
+}
+
+/* Phones: the headline sits below the photo (see the masthead rules above), so it needs no scrim. */
+@media (max-width: 47.9375rem), (max-height: 34.9375rem) {
+  .ds-article-mast[data-media='photo'] .ds-article-mast__over {
+    background: none;
   }
 }

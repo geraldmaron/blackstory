@@ -23,6 +23,8 @@ export type ChromeState = {
 
 /** Below this width the instruments stack over the map instead of flanking it. */
 export const CHROME_NARROW_MAX_WIDTH = 820;
+/** Mirrors `lib/layout/compact-viewport.ts`: a short viewport is compact whatever its width. */
+const COMPACT_MAX_HEIGHT = 559;
 
 /** Panel widths the padding has to clear, including their viewport gutter. */
 const LENS_INSET = 330;
@@ -30,7 +32,10 @@ const RESULTS_INSET = 376;
 const SHEET_INSET = 468;
 const OPEN_EDGE_INSET = 40;
 
-const NARROW_TOP = 88;
+/** The compact command bar is two rows (search under the wordmark), ~110px with its offset. */
+const NARROW_TOP = 120;
+/** Dock + attribution band at the bottom of a phone with no sheet open. */
+const NARROW_DOCK_BOTTOM = 96;
 const NARROW_SIDE = 16;
 const NARROW_BOTTOM_MAX = 280;
 const NARROW_BOTTOM_RATIO = 0.38;
@@ -47,18 +52,31 @@ const VERTICAL_FALLBACK = 40;
 
 export function chromePadding(state: ChromeState): ChromeInset {
   const { viewportWidth, viewportHeight } = state;
-  const narrow = viewportWidth < CHROME_NARROW_MAX_WIDTH;
+  const narrow = viewportWidth < CHROME_NARROW_MAX_WIDTH || viewportHeight <= COMPACT_MAX_HEIGHT;
+  // A phone on its side: compact, but the open instrument docks to the left edge, not the bottom.
+  const sideways = narrow && viewportWidth > viewportHeight && viewportWidth >= CHROME_NARROW_MAX_WIDTH;
 
   let left: number;
   let right: number;
   let top: number;
   let bottom: number;
 
-  if (narrow) {
+  if (sideways) {
+    const anyOpen = state.lensOpen || state.resultsOpen || state.sheetOpen;
+    left = anyOpen ? Math.round(Math.min(360, viewportWidth * 0.45)) + NARROW_SIDE * 2 : NARROW_SIDE;
+    right = NARROW_SIDE + 56;
+    top = 72;
+    bottom = 64;
+  } else if (narrow) {
     left = NARROW_SIDE;
-    right = NARROW_SIDE;
+    // Right edge holds the on-map controls on a phone.
+    right = NARROW_SIDE + 52;
     top = NARROW_TOP;
-    bottom = Math.round(Math.min(NARROW_BOTTOM_MAX, viewportHeight * NARROW_BOTTOM_RATIO));
+    // Reserve the bottom sheet only while one is up; otherwise just the dock.
+    bottom =
+      state.lensOpen || state.resultsOpen || state.sheetOpen
+        ? Math.round(Math.min(NARROW_BOTTOM_MAX, viewportHeight * NARROW_BOTTOM_RATIO))
+        : NARROW_DOCK_BOTTOM;
   } else {
     left = state.lensOpen ? LENS_INSET : OPEN_EDGE_INSET;
     right = state.sheetOpen ? SHEET_INSET : state.resultsOpen ? RESULTS_INSET : OPEN_EDGE_INSET;

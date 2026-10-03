@@ -59,6 +59,15 @@
   border-radius: 0;
 }
 
+/* The masthead photo is full-bleed: the generic photo card's hairline and rounded corners
+   (shell.css `.ds-entity-photo__img`) drew a box inside the banner. */
+.ds-record-mast[data-media='photo'] .ds-entity-photo__img,
+.ds-record-mast[data-media='photo'] .ds-entity-photo__backdrop {
+  aspect-ratio: auto;
+  border: 0;
+  border-radius: 0;
+}
+
 /*
  * A tall source photo (portrait aspect, most person headshots and many press photos) cannot
  * cover-crop into this wide banner without losing the subject: the visible window shrinks to a
@@ -90,6 +99,45 @@
   object-fit: contain;
   object-position: center;
   background: transparent;
+}
+
+/*
+ * Wide screens, contained photo: the whole picture sits toward the right of the banner, so the
+ * name and lede on the left never paint over the subject. Covered (wide) photos keep the
+ * full-bleed treatment with the scrim.
+ */
+@media (min-width: 48rem) and (min-height: 35rem) {
+  .ds-record-mast[data-media='photo'] .ds-entity-photo--contain .ds-entity-photo__img {
+    object-position: 88% center;
+  }
+}
+
+/*
+ * Phones: the photograph gets its own frame above the name instead of sitting under it. Written
+ * over a photo, the title, pills and lede took most of a phone's height and the dark scrim covered
+ * whatever the crop had left — the "cut off" headers. Now the photo is a 4:3 window (whole photo
+ * when it would not fit, over a blurred fill of itself) and the record reads below it on the page.
+ */
+@media (max-width: 47.9375rem), (max-height: 34.9375rem) {
+  .ds-record-mast[data-media='photo'] {
+    display: block;
+    min-height: 0;
+    background: var(--ds-canvas);
+  }
+
+  .ds-record-mast[data-media='photo'] > *:first-child {
+    position: relative;
+    inset: auto;
+    width: 100%;
+    height: auto;
+    aspect-ratio: 4 / 3;
+    max-height: 62svh;
+  }
+
+  .ds-record-mast[data-media='photo'] .ds-record-mast__over {
+    padding-top: var(--ds-space-6);
+    background: none;
+  }
 }
 
 /*

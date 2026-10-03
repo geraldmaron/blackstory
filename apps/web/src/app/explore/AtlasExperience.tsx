@@ -31,6 +31,14 @@ import { CameraConsole } from '../../components/map-experience/CameraConsole';
 import { LensPanel, type LensLayerKey } from '../../components/map-experience/LensPanel';
 import { MapExperienceLegend } from '../../components/map-experience/MapExperienceLegend';
 import { ResultsRail, type ResultsConstraint } from '../../components/map-experience/ResultsRail';
+import { MapControls } from '../../components/map-experience/MapControls';
+import type { PlaceFinderResolvedPayload } from '../../components/map-experience/PlaceFinder';
+import {
+  distanceLabel,
+  nearbyFrame,
+  nearbySummary,
+  type NearbyArea,
+} from '../../lib/map-experience/nearby';
 import { RecordSheet } from '../../components/map-experience/RecordSheet';
 import { usePhotoIndex } from '../../lib/map-experience/use-photo-index';
 import {
@@ -56,6 +64,7 @@ import { useAtlasCamera } from './hooks/use-atlas-camera';
 import { useRecordSelection } from './hooks/use-record-selection';
 import { usePaletteData } from './hooks/use-palette-data';
 import { useReaderActions } from './hooks/use-reader-actions';
+import { useLocateMe } from './hooks/use-locate-me';
 import { useCommandContext } from './hooks/use-command-context';
 import { useExploreUrlSync } from './hooks/use-explore-url-sync';
 import { atlasWalkHref } from '../../lib/place/public-place-path';
@@ -203,6 +212,9 @@ export function AtlasExperience({ initial, embedded = false }: AtlasExperiencePr
     setLayers,
     sort,
     setSort,
+    nearby,
+    setNearby,
+    distances,
     filtered,
     sorted,
     kindCounts,
@@ -394,7 +406,111 @@ export function AtlasExperience({ initial, embedded = false }: AtlasExperiencePr
     }
     clearPinContinuity();
   }, [camera, initial.viewState.selected, selectById, view.allFeatures]);
-  const { copy, citationFor, nearMe } = useReaderActions(toasts, camera);
+  const { copy, citationFor } = useReaderActions(toasts);
+  const { locate: nearMe, status: locateStatus } = useLocateMe(toasts, setNearby);
+
+  /**
+   * A located place on the plate: the marker (a "you are here" dot for the device, a pin for a
+   * searched place), the radius/accuracy circle, the camera frame, and one sentence saying what
+   * the reader is now looking at. Runs when the located place changes — not when other filters
+   * do, so a kind chip does not yank the camera back.
+   */
+  const filteredRef = useRef(filtered);
+  filteredRef.current = filtered;
+  const distancesRef = useRef(distances);
+  distancesRef.current = distances;
+  useEffect(() => {
+    if (!nearby) {
+      stage.clearSearchCenterMarker();
+      stage.setSearchArea(null);
+      return;
+    }
+    const { lat, lng } = nearby.center;
+    stage.setSearchCenterMarker({
+      lat,
+      lng,
+      label: nearby.source === 'device' ? 'Your location' : nearby.label,
+      variant: nearby.source === 'device' ? 'user' : 'place',
+    });
+    stage.setSearchArea({
+      lat,
+      lng,
+      radiusMeters: nearby.radiusMeters,
+      accuracyMeters: nearby.accuracyMeters ?? null,
+    });
+    camera.frameArea(nearbyFrame(nearby, filteredRef.current), { trigger: 'reader' });
+    let nearest: number | undefined;
+    for (const value of distancesRef.current?.values() ?? []) {
+      if (nearest === undefined || value < nearest) nearest = value;
+    }
+    toasts.show({
+      id: 'nearby-summary',
+      message: nearbySummary(nearby, filteredRef.current.length, nearest),
+    });
+    // `toasts` is stable per surface; deliberately keyed on the located place only.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [nearby, stage, camera]);
+  useEffect(
+    () => () => {
+      stage.clearSearchCenterMarker();
+      stage.setSearchArea(null);
+    },
+    [stage],
+  );
+
+  const distanceLabels = useMemo(() => {
+    if (!nearby || !distances) return null;
+    const labels = new Map<string, string>();
+    for (const [id, meters] of distances) {
+      const label = distanceLabel(meters);
+      if (label) labels.set(id, label);
+    }
+    return labels;
+  }, [distances, nearby]);
+
+  /** The place finder resolved an address, a ZIP, or a record from its typeahead. */
+  const onPlaceResolved = useCallback(
+    (payload: PlaceFinderResolvedPayload) => {
+      if (payload.entityId) {
+        selectById(payload.entityId);
+        return;
+      }
+      const { target } = payload;
+      const { lat, lng, zoom } = target.viewport;
+      if (target.preset === 'state' && target.statePostalCode) {
+        setStateCode(target.statePostalCode);
+        camera.frameArea(
+          { kind: 'center', center: [lng, lat], zoom, label: target.label },
+          { trigger: 'reader' },
+        );
+        return;
+      }
+      setNearby({
+        center: { lat, lng },
+        label: target.label,
+        source: 'search',
+        radiusMeters: payload.radiusMeters,
+        ...(payload.radiusMeters !== null ? { radiusLabel: payload.radiusLabel } : {}),
+      });
+    },
+    [camera, selectById, setNearby, setStateCode],
+  );
+
+  const onRadiusChange = useCallback(
+    (radiusMeters: number | null, radiusLabel: string) => {
+      if (!nearby) return;
+      const next: NearbyArea = {
+        center: nearby.center,
+        label: nearby.label,
+        source: nearby.source,
+        ...(nearby.accuracyMeters !== undefined ? { accuracyMeters: nearby.accuracyMeters } : {}),
+        radiusMeters,
+        ...(radiusMeters !== null ? { radiusLabel } : {}),
+      };
+      setNearby(next);
+    },
+    [nearby, setNearby],
+  );
   const { paletteRecords, destinations, paletteStates, featureById } = usePaletteData(
     view,
     stateOptions,
@@ -452,6 +568,29 @@ export function AtlasExperience({ initial, embedded = false }: AtlasExperiencePr
     mode === 'atlas' &&
     (bothColumns || selectedId === undefined);
 
+  /** Compact: is any sheet up? The on-map controls ride above it (map-controls.css). */
+  const compactSheetOpen =
+    narrow &&
+    (showLens ||
+      showResults ||
+      sheetOpen ||
+      (mode === 'atlas' && !chromeHidden && (panels.decade || panels.camera)));
+  /** Wide: the controls sit in the top-right corner of the *free* map, left of any right column. */
+  const controlsRight = (() => {
+    if (narrow) return null;
+    const edge = 16;
+    const gap = 12;
+    if (sheetOpen && showResults) return edge + 344 + gap + 430 + gap;
+    if (sheetOpen) return edge + 430 + gap;
+    if (showResults) return edge + 344 + gap;
+    return edge;
+  })();
+  const zoomBy = (delta: number) => {
+    const map = stage.getMap();
+    if (!map) return;
+    map.easeTo({ zoom: map.getZoom() + delta, duration: 260 } as never);
+  };
+
   return (
     /* `data-key-scope` is what makes the bare camera, time and record keys legal here and nowhere
        else. `handleKeyStroke` walks up from the keystroke's target looking for it, so Explore
@@ -462,6 +601,7 @@ export function AtlasExperience({ initial, embedded = false }: AtlasExperiencePr
       data-chrome={chromeHidden ? 'hidden' : 'shown'}
       data-mode={mode}
       data-embedded={embedded ? 'true' : undefined}
+      data-sheet-open={compactSheetOpen ? 'true' : undefined}
     >
       {embedded ? null : (
         <CommandBar
@@ -509,12 +649,18 @@ export function AtlasExperience({ initial, embedded = false }: AtlasExperiencePr
 
       {showLens ? (
         <LensPanel
-          matched={filtered.length}
+          // The same count the Records dock and rail show — they list `sorted`, which drops
+          // internal placeholder records, and the two numbers used to disagree by that much.
+          matched={sorted.length}
           total={view.allFeatures.length}
           stateOptions={stateOptions}
           state={stateCode}
           onStateChange={setStateCode}
           onNearMe={nearMe}
+          locating={locateStatus === 'locating'}
+          onRadiusChange={onRadiusChange}
+          catalogFeatures={view.allFeatures}
+          onPlaceResolved={onPlaceResolved}
           kindCounts={kindCounts}
           kindFamily={kindFamily}
           onKindFamilyChange={setKindFamily}
@@ -548,6 +694,7 @@ export function AtlasExperience({ initial, embedded = false }: AtlasExperiencePr
           onSelect={select}
           sort={sort}
           onSortChange={setSort}
+          distanceLabels={distanceLabels}
           savedIds={savedSet}
           onToggleSave={toggleSave}
           onHide={() => hidePanel('results')}
@@ -642,6 +789,25 @@ export function AtlasExperience({ initial, embedded = false }: AtlasExperiencePr
             );
           })}
         </div>
+      ) : null}
+
+      {mode === 'atlas' && !chromeHidden && stage.mapAvailable ? (
+        <MapControls
+          onLocate={nearMe}
+          locating={locateStatus === 'locating'}
+          located={nearby?.source === 'device'}
+          onZoomIn={() => zoomBy(1)}
+          onZoomOut={() => zoomBy(-1)}
+          bearing={bearing}
+          onResetBearing={() => camera.resetBearing({ trigger: 'reader' })}
+          {...(controlsRight !== null
+            ? {
+                style: {
+                  '--ds-map-controls-right': `${controlsRight}px`,
+                } as React.CSSProperties,
+              }
+            : {})}
+        />
       ) : null}
 
       {legendOpen ? (
