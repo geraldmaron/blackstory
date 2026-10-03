@@ -382,7 +382,8 @@ export function DoorImmersive({
      */
     const pushedState =
       (window.history.state as { doorBrowse?: number } | null)?.doorBrowse === 1;
-    if (enteredByPushRef.current && pushedState) {
+    const steppingBack = enteredByPushRef.current && pushedState;
+    if (steppingBack) {
       // Entering pushed `/explore` over the journey's own `/` entry; leaving steps back over it
       // rather than stacking a second `/` on top (which made the browser's Back a no-op).
       window.history.back();
@@ -396,21 +397,42 @@ export function DoorImmersive({
       window.history.replaceState(null, '', '/');
     }
     enteredByPushRef.current = false;
-    // Back to the chapter the reader left from, not the top of the journey.
-    window.scrollTo({
-      top: journeyScrollRef.current,
-      behavior: prefersReducedMotion() ? 'auto' : 'smooth',
-    });
+    // Back to the chapter the reader left from, not the top of the journey. The journey is
+    // still collapsed under browse for a few frames (and a history traversal can reset scroll),
+    // so wait until the page is tall enough to hold the old position before scrolling to it.
+    const target = journeyScrollRef.current;
+    const startedAt = performance.now();
+    const restore = () => {
+      const tallEnough =
+        document.documentElement.scrollHeight - window.innerHeight >= target - 1;
+      if (tallEnough || performance.now() - startedAt > 1500) {
+        window.scrollTo({ top: target, behavior: 'auto' });
+        return;
+      }
+      window.requestAnimationFrame(restore);
+    };
+    const scheduleRestore = () => window.setTimeout(() => window.requestAnimationFrame(restore), 60);
+    if (steppingBack) {
+      // The traversal applies the browser's own scroll restoration when it lands, after this
+      // handler; restore once it has, or the journey snaps to the top.
+      window.addEventListener('popstate', () => window.setTimeout(scheduleRestore, 120), {
+        once: true,
+      });
+    } else {
+      scheduleRestore();
+    }
   }, [pathname, router, stage]);
 
   const enterBrowse = useCallback(() => {
     if (browseModeRef.current) return;
+    // Captured first: entering browse announces itself, and listeners of that announcement put
+    // the document back at the top synchronously.
+    journeyScrollRef.current = window.scrollY;
     browseModeRef.current = true;
     setBrowseMode(true);
     stopSweep();
     stage.setDoorBrowseLive(true);
     announceMapBrowseEntered();
-    journeyScrollRef.current = window.scrollY;
     enteredByPushRef.current = true;
     window.history.pushState({ doorBrowse: 1 }, '', '/explore');
     const delay = prefersReducedMotion() ? 0 : DOOR_BROWSE_MORPH_MS;
