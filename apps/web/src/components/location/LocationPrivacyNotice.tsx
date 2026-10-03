@@ -11,7 +11,15 @@ import React from 'react';
 
 void React;
 
-export function LocationPrivacyNotice() {
+export type LocationPrivacyNoticeProps = {
+  /**
+   * The map's own "near me": the device position is used in this browser only (marker, distances)
+   * and is never sent anywhere. Say so — the generic bullets below describe the address lookup.
+   */
+  readonly deviceStaysLocal?: boolean;
+};
+
+export function LocationPrivacyNotice({ deviceStaysLocal = false }: LocationPrivacyNoticeProps = {}) {
   return (
     <details className="ds-location-privacy-notice">
       <summary className="ds-sans ds-location-privacy-notice__summary">
@@ -26,6 +34,12 @@ export function LocationPrivacyNotice() {
             Using your device&rsquo;s location requires you to press the button below. This page
             never requests it automatically.
           </li>
+          {deviceStaysLocal ? (
+            <li>
+              Your device&rsquo;s location is used only in this browser, to mark where you are and
+              sort records by distance. It is not sent to BlackStory, saved, or added to the link.
+            </li>
+          ) : null}
           <li>
             An address, ZIP, or coordinate is sent to the U.S. Census Bureau&rsquo;s public geocoder
             only to resolve the state, county, and (when applicable) city it falls within.

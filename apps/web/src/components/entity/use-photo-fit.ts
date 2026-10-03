@@ -46,7 +46,6 @@ export function usePhotoFit(
       observer.disconnect();
     };
     // `key` re-runs the measurement when the photo source changes.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [key]);
 
   return fit;

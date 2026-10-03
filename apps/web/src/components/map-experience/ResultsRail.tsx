@@ -177,7 +177,7 @@ export function ResultsRail({
   return (
     <section
       className={cx('ds-results', className)}
-      aria-label="Records in view"
+      aria-label="Records"
       onPointerEnter={onIntent}
       onFocus={onIntent}
     >

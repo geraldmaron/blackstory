@@ -110,6 +110,20 @@
   .ds-record-mast[data-media='photo'] .ds-entity-photo--contain .ds-entity-photo__img {
     object-position: 88% center;
   }
+
+  /* The type column gets a floor of its own, left to right, so a long lede that reaches the
+     photo's left edge still reads on canvas rather than on the picture. */
+  .ds-record-mast[data-media='photo']:has(.ds-entity-photo--contain) .ds-record-mast__over {
+    background:
+      linear-gradient(
+        to right,
+        var(--ds-canvas) 0%,
+        color-mix(in srgb, var(--ds-canvas) 88%, transparent) 38%,
+        color-mix(in srgb, var(--ds-canvas) 55%, transparent) 62%,
+        transparent 80%
+      ),
+      linear-gradient(to top, var(--ds-canvas) 0%, transparent 60%);
+  }
 }
 
 /*

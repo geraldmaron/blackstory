@@ -448,7 +448,6 @@ export function AtlasExperience({ initial, embedded = false }: AtlasExperiencePr
       message: nearbySummary(nearby, filteredRef.current.length, nearest),
     });
     // `toasts` is stable per surface; deliberately keyed on the located place only.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [nearby, stage, camera]);
   useEffect(
     () => () => {

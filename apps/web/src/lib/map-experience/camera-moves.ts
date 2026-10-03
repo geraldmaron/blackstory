@@ -266,7 +266,9 @@ export function createCamera(deps: CameraDeps): CameraApi {
         essential: isEssential(options),
       });
     }
-    announce('Wide · continental');
+    // The page-load establishing shot is ambient: nobody asked for it, so it does not print
+    // camera jargon ("Wide · continental") under a map the reader has not touched yet.
+    if (isEssential(options)) announce('Wide · continental');
   }
 
   function push(options?: PushOptions): void {

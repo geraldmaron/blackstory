@@ -441,3 +441,11 @@ test('frameArea fits a bounds frame and degrades instead of throwing', () => {
   });
   assert.equal(broken.calls.at(-1)?.method, 'easeTo');
 });
+
+test('the ambient establishing shot moves the camera without announcing itself', () => {
+  const h = harness();
+  h.camera.wide({ trigger: 'ambient' });
+  assert.equal(h.announcements.length, 0);
+  h.camera.wide();
+  assert.equal(h.announcements.at(-1), 'Wide · continental');
+});

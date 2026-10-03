@@ -2460,3 +2460,19 @@ body:has(.ds-explore-stage[data-results='open']) {
     min-height: 44px;
   }
 }
+
+/*
+ * Dense link lists on touch screens: source links in a record's fact tiles and citations, a book's
+ * challenge and evidence lists, a law's agency and source links. They render 15–19px tall. Inline
+ * padding grows the tap area to ~27px without moving a single line of the layout (padding on an
+ * inline box does not change line height).
+ */
+@media (pointer: coarse) {
+  :where(dd, li, .ds-citation, .ds-room-src__t, .ds-room-anat__v, .ds-empty__body) > a:not([class*='ds-cta']):not(.ds-button),
+  .ds-books-edition__rip-link,
+  .ds-books-edition__rip-fact-link,
+  .ds-books-edition__evidence-cite,
+  .ds-rec-file__correct {
+    padding-block: 6px;
+  }
+}

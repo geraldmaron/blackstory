@@ -98,7 +98,7 @@
   .ds-map-controls {
     top: auto;
     right: calc(var(--ds-space-2) + env(safe-area-inset-right, 0px));
-    bottom: calc(var(--ds-atlas-dock-clearance) + var(--ds-space-2) + env(safe-area-inset-bottom, 0px));
+    bottom: calc(var(--ds-atlas-dock-clearance) + env(safe-area-inset-bottom, 0px));
   }
 
   /* A bottom sheet is open: ride above it rather than under it. */
@@ -112,11 +112,10 @@
 
 /* Landscape phone: the open instrument docks to the left edge, so the controls stay low-right. */
 @media (max-height: 559px) and (orientation: landscape) {
+  /* The dock hugs the bottom edge here (atlas.css), 54px tall; the controls sit just above it. */
+  .ds-map-controls,
   .ds-atlas[data-sheet-open='true'] .ds-map-controls {
-    bottom: calc(var(--ds-atlas-dock-clearance) + var(--ds-space-2) + env(safe-area-inset-bottom, 0px));
-  }
-
-  .ds-map-controls {
+    bottom: calc(var(--ds-space-2) * 2 + 54px + env(safe-area-inset-bottom, 0px));
     flex-direction: row-reverse;
     align-items: flex-end;
   }

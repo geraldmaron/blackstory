@@ -465,7 +465,7 @@
 
   .ds-atlas__dock {
     left: auto;
-    right: calc(var(--ds-space-2) + 56px + env(safe-area-inset-right, 0px));
+    right: calc(var(--ds-space-2) + env(safe-area-inset-right, 0px));
     bottom: calc(var(--ds-space-2) + env(safe-area-inset-bottom, 0px));
     width: auto;
   }
@@ -502,7 +502,10 @@
  * camera readout used to sit on top of its histogram. They ride above it instead whenever it is up.
  */
 @media (min-width: 820px) and (max-width: 1149px) and (min-height: 560px) {
+  /* Right-aligned: the Filters panel runs down the left edge to the same height. */
   .ds-atlas:has(> .ds-time-panel) .ds-atlas__dock {
+    left: auto;
+    right: var(--ds-space-4);
     bottom: calc(var(--ds-space-4) + 139px + var(--ds-space-3));
   }
 

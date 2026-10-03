@@ -41,3 +41,18 @@ test('returns undefined when neither coordinates nor a known state are present',
   });
   assert.equal(target, undefined);
 });
+
+test('place labels read like a person wrote them: no Census legal type, no county beside a city', () => {
+  const target = resolveExploreAddressCamera({
+    match: { placeName: 'Montgomery city', countyName: 'Montgomery County', stateName: 'Alabama' },
+    jurisdictionIds: { stateId: 'us-01' },
+    precision: { lat: 32.37, lng: -86.3, exactCoordinatesRetained: true },
+  });
+  assert.equal(target?.label, 'Montgomery, Alabama');
+  const countyOnly = resolveExploreAddressCamera({
+    match: { countyName: 'Fulton County', stateName: 'Georgia' },
+    jurisdictionIds: { stateId: 'us-13' },
+    precision: { lat: 33.7, lng: -84.4, exactCoordinatesRetained: true },
+  });
+  assert.equal(countyOnly?.label, 'Fulton County, Georgia');
+});

@@ -343,9 +343,9 @@ export function CameraConsole({
   const anyRefused = KEYED_CAMERA_MOVES.some((move) => !isAllowed(move));
 
   return (
-    <section ref={consoleRef} className={cx('ds-camera', className)} aria-label="Camera">
+    <section ref={consoleRef} className={cx('ds-camera', className)} aria-label="View">
       <header className="ds-camera__head">
-        <span className="ds-camera__kicker">Camera</span>
+        <span className="ds-camera__kicker">View</span>
         <ResetView onReset={() => run('wide')} />
         <Compass bearing={bearing} onReset={onResetBearing} />
         <button

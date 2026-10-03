@@ -274,7 +274,7 @@ export function PlaceFinder({
     return (
       <div className="ds-place-finder__form">
         <div className="ds-place-finder__privacy">
-          <LocationPrivacyNotice />
+          <LocationPrivacyNotice deviceStaysLocal={Boolean(onUseMyLocation)} />
         </div>
         {onUseMyLocation ? (
           <div data-locate="shared">
