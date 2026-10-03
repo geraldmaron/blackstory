@@ -9,6 +9,7 @@ import {
   type BooksBrowseItem,
   type BooksDetailViewModel,
 } from './books-view-model';
+import { RoomJump, type RoomJumpSection } from '../../components/room';
 import { BooksRipRow } from './BooksRipRow';
 import { BOOKS_DETAIL } from './books-copy';
 
@@ -18,13 +19,14 @@ const CHALLENGE_STATUS_LABEL: Record<string, string> = {
   restricted: 'restricted',
 };
 
-const DETAIL_SECTIONS = [
-  { id: 'description', label: 'About this title' },
-  { id: 'challenges', label: 'Challenge lists' },
-  { id: 'citations', label: 'Citations' },
-  { id: 'purchase-heading', label: 'Purchase and lookup' },
-  { id: 'related', label: 'Related titles' },
-] as const;
+/** Same jump row every other room uses (`RoomJump`), not a one-off list. */
+const DETAIL_SECTIONS: readonly RoomJumpSection[] = [
+  { id: 'description', label: 'About this title', icon: 'books' },
+  { id: 'challenges', label: 'Challenge lists', icon: 'errata' },
+  { id: 'citations', label: 'Citations', icon: 'source' },
+  { id: 'purchase-heading', label: 'Purchase and lookup', icon: 'external' },
+  { id: 'related', label: 'Related titles', icon: 'collection' },
+];
 
 export type BooksDetailSectionsProps = {
   readonly view: Extract<BooksDetailViewModel, { readonly kind: 'ok' }>;
@@ -43,20 +45,7 @@ export function BooksDetailSections({ view, relatedItems, placePanel }: BooksDet
 
   return (
     <>
-      <nav className="ds-law-toc" aria-labelledby="books-detail-toc-title">
-        <p className="ds-room-grouphd" id="books-detail-toc-title">
-          On this page
-        </p>
-        <ul className="ds-law-toc__list">
-          {tocSections.map((section) => (
-            <li key={section.id}>
-              <a className="ds-law-toc__link" href={`#${section.id}`}>
-                {section.label}
-              </a>
-            </li>
-          ))}
-        </ul>
-      </nav>
+      <RoomJump sections={tocSections} label="On this page" />
 
       <section className="ds-room-section" aria-labelledby="description-heading" id="description">
         <p className="ds-books-edition__panel-title">{BOOKS_DETAIL.contextKicker}</p>

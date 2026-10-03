@@ -82,6 +82,7 @@ function ProviderControl({
     <div className="ds-maps-handoff__provider">
       {provider.placeHref ? (
         <MapsExternalLink
+          platformAware={false}
           className="ds-cta ds-cta--quiet ds-cta--sm ds-maps-handoff__seg ds-maps-handoff__seg--place"
           href={provider.placeHref}
           placeLabel={placeLabel}
@@ -98,6 +99,7 @@ function ProviderControl({
       ) : null}
       {provider.directionsHref ? (
         <MapsExternalLink
+          platformAware={false}
           className="ds-cta ds-cta--quiet ds-cta--sm ds-maps-handoff__seg ds-maps-handoff__seg--directions"
           href={provider.directionsHref}
           placeLabel={placeLabel}

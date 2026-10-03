@@ -207,6 +207,20 @@ export function primaryImageFocalClass(
  * masthead switches from a cropped fill to a letterboxed photo over a blurred fill of itself, so
  * the whole photograph stays visible regardless of where the subject sits in the frame.
  */
+/**
+ * True when cover-fitting an image of `imageAspect` (w/h) into a box of `boxAspect` would hide more
+ * than a quarter of it along the cropped axis. Then the whole photo is shown instead (contain over
+ * a blurred fill). A 16:9 photo in a 2.8:1 banner shows 64% of its height — too much lost; a
+ * 2.4:1 panorama shows 86% — fine to cover.
+ */
+export const COVER_MIN_VISIBLE_SHARE = 0.75;
+
+export function coverHidesTooMuch(imageAspect: number, boxAspect: number): boolean {
+  if (!(imageAspect > 0) || !(boxAspect > 0)) return false;
+  const visible = imageAspect > boxAspect ? boxAspect / imageAspect : imageAspect / boxAspect;
+  return visible < COVER_MIN_VISIBLE_SHARE;
+}
+
 export function isPortraitPrimaryImage(width?: number, height?: number): boolean {
   if (!width || !height) return false;
   return width / height < 0.9;

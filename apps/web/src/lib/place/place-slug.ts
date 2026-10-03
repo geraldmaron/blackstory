@@ -49,6 +49,14 @@ export function parsePlaceAddress(slug: string): PlaceAddress {
   return { base: trimmed };
 }
 
+/** A hyphen-joined run of words with at least one real word in it ("1967-detroit-riot"). */
+function isSlugOfWords(value: string): boolean {
+  // A catalog token with a hyphenated prefix (`rec-a1b2c3`, `disc-q42`) is still a token.
+  if (/^(ent|disc|art|pkg|rec|src|wd)-/.test(value)) return false;
+  const parts = value.split('-');
+  return parts.length >= 2 && parts.some((part) => /^[a-z]{3,}$/.test(part));
+}
+
 /**
  * True when the path segment is a legal place address (base slug, or disambiguated
  * `{slug}--{entityId}`).
@@ -60,7 +68,13 @@ export function isResolvablePlaceSlug(value: string): boolean {
     // Bare catalog ids are never place addresses; disambiguators may contain them after `--`.
     if (!trimmed.includes('--')) return false;
   }
-  if (isInternalRecordLabel(trimmed) && !trimmed.includes('--')) return false;
+  // The internal-token heuristic (one run of letters and digits, e.g. `q768155`) must not catch a
+  // readable slug of words that happens to contain a number: "1967 Detroit riot", "Engine Company
+  // No. 4" and "Freedom Rides (1961)" slugged to exactly that shape, so their own records
+  // redirected to a /place address that then 404'd — 102 standable records in the 2026-09 release.
+  if (isInternalRecordLabel(trimmed) && !trimmed.includes('--') && !isSlugOfWords(trimmed)) {
+    return false;
+  }
   return /^[a-z0-9]+(?:-[a-z0-9]+)*(?:--[A-Za-z0-9_-]+)?$/.test(trimmed);
 }
 

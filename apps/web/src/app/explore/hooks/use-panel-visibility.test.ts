@@ -40,19 +40,20 @@ test('Lens, Results, and Time seed open; Camera stays restored-on-demand', () =>
   assert.match(seed, /camera: false/);
 });
 
-test('the viewport sync keeps the Lens open at every width', () => {
+test('compact viewports open map-first; wider ones open the Lens', () => {
   const sync = viewportSync();
-  assert.match(sync, /lens: true,/, 'Lens must stay open on narrow viewports too');
-  assert.doesNotMatch(sync, /lens: !isNarrow/);
-  assert.doesNotMatch(sync, /lens: false/);
+  assert.match(sync, /lens: !isNarrow,/, 'Lens opens wherever there is room beside the map');
 });
 
-test('the viewport sync opens Results and Time on a wide viewport', () => {
+test('Records open only when both side panels fit; Time opens whenever not compact', () => {
   const sync = viewportSync();
-  for (const panel of ['results', 'decade']) {
-    assert.match(sync, new RegExp(`${panel}: !isNarrow,`), `${panel} must open when wide`);
-  }
+  assert.match(sync, /results: !isNarrow && !isMid,/);
+  assert.match(sync, /decade: !isNarrow,/);
   assert.match(sync, /camera: isNarrow \? false : current\.camera/);
+});
+
+test('compact is narrow OR short, from the one shared definition', () => {
+  assert.match(hook, /window\.matchMedia\(COMPACT_MEDIA_QUERY\)/);
 });
 
 test('the Lens is gated only on its panel flag, hidden chrome, and Atlas mode', () => {

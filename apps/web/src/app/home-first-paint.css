@@ -17,7 +17,14 @@
 }
 
 .ds-home-first-paint .ds-record-mast {
-  min-height: clamp(18rem, 42vh, 30rem);
+  /* Width counts as well as height: on a wide, short window `42vh` alone made a 4:1 strip. */
+  min-height: clamp(18rem, max(42vh, 30vw), 32rem);
+}
+
+@media (max-width: 47.9375rem), (max-height: 34.9375rem) {
+  .ds-home-first-paint .ds-record-mast[data-media='photo'] {
+    min-height: 0;
+  }
 }
 
 .ds-home-first-paint .ds-record-mast[data-media='map'] {

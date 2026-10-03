@@ -34,6 +34,7 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { cx } from '@repo/ui';
 import type { PinPhotoView } from '../../lib/map-experience/entity-photo-index';
+import { usePhotoFit } from '../entity/use-photo-fit';
 import { buildEntityMastImageCandidates } from '../entity/entity-mast-image-candidates';
 import { entityPrimaryImageAlt, primaryImageCreditCaption } from '../entity/record-mark';
 import {
@@ -197,6 +198,9 @@ function SheetMast({
 }) {
   const candidates = React.useMemo(() => buildEntityMastImageCandidates(photo.url), [photo.url]);
   const [urlIndex, setUrlIndex] = useState(0);
+  const frameRef = React.useRef<HTMLDivElement>(null);
+  const imgRef = React.useRef<HTMLImageElement>(null);
+  const fit = usePhotoFit(frameRef, imgRef, `${entityId}:${urlIndex}:${photo.url}`);
 
   useEffect(() => {
     setUrlIndex(0);
@@ -210,15 +214,24 @@ function SheetMast({
 
   return (
     <figure className="ds-sheet__mast">
+      {/* The fit frame wraps the picture only: the figure itself must not clip (see record-sheet.css)
+          and its caption is not part of the picture's aspect. */}
+      <div className="ds-sheet__photo-frame ds-fit-photo" ref={frameRef} data-fit={fit}>
+      {fit === 'contain' ? (
+        // eslint-disable-next-line @next/next/no-img-element -- decorative fill of the same photo
+        <img className="ds-fit-photo__backdrop" src={src} alt="" aria-hidden="true" />
+      ) : null}
       {/* eslint-disable-next-line @next/next/no-img-element -- public CDN URL, the record's own photo */}
       <img
         key={src}
-        className="ds-sheet__photo"
+        ref={imgRef}
+        className="ds-sheet__photo ds-fit-photo__main"
         src={src}
         alt={alt}
         decoding="async"
         onError={() => setUrlIndex((current) => current + 1)}
       />
+      </div>
       {caption.creditText ? (
         <figcaption className="ds-sheet__credit">{caption.creditText}</figcaption>
       ) : null}

@@ -10,6 +10,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import type { PublicEntityPrimaryImageView } from '../../data/public-seed';
 import { buildEntityMastImageCandidates } from './entity-mast-image-candidates';
 import { EntityRecordMark } from './EntityRecordMark';
+import { usePhotoFit } from './use-photo-fit';
 import {
   entityPrimaryImageAlt,
   isPortraitPrimaryImage,
@@ -113,30 +114,30 @@ export function EntityMastMedia({
   hideCredit = false,
 }: EntityMastMediaProps) {
   const [phase, setPhase] = useState<MastPhase>(() => initialPhase(primaryImage));
-  // Known up front whenever the catalog recorded the source dimensions. Pinned Wikimedia
-  // thumbnails (fetched by the reader's own browser) do not carry them ahead of render, so this
-  // starts optimistic (false) and the tracked <img>'s onLoad below corrects it once the real
-  // pixels are known, rather than risk a cover-crop that could cut off the subject.
-  const [portrait, setPortrait] = useState(() =>
-    isPortraitPrimaryImage(primaryImage?.width, primaryImage?.height),
-  );
+  // Whether to keep the whole photograph (contain over a blurred fill of itself) instead of
+  // cover-cropping it. Decided against the figure's *actual* box, not a fixed portrait rule: a
+  // square or 4:3 photo is not portrait, but in a 2.8:1 banner a cover crop still threw away half
+  // of it — usually the top of someone's head. Unknown dimensions start contained (nothing is
+  // ever cut before we know), and the real pixels and box decide after load and on resize.
   const imgRef = useRef<HTMLImageElement>(null);
+  const figureRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
     setPhase(initialPhase(primaryImage));
-    setPortrait(isPortraitPrimaryImage(primaryImage?.width, primaryImage?.height));
   }, [primaryImage]);
 
-  // A cached image can finish loading before this effect (or the onLoad prop below) attaches:
-  // the browser fires its native `load` event on its own schedule, not React's. Checking
-  // `.complete` here catches that race; onLoad below covers the image that is still in flight.
-  useEffect(() => {
-    const el = imgRef.current;
-    if (!el || portrait || !el.complete) return;
-    if (isPortraitPrimaryImage(el.naturalWidth, el.naturalHeight)) {
-      setPortrait(true);
-    }
-  });
+  const fit = usePhotoFit(
+    figureRef,
+    imgRef,
+    phase.kind === 'photo' ? phase.urls[phase.urlIndex] : null,
+    primaryImage?.width && primaryImage?.height
+      ? isPortraitPrimaryImage(primaryImage.width, primaryImage.height)
+        ? 'contain'
+        : 'cover'
+      : 'contain',
+    { width: primaryImage?.width, height: primaryImage?.height },
+  );
+  const contained = fit === 'contain';
 
   useEffect(() => {
     const saveData =
@@ -169,14 +170,18 @@ export function EntityMastMedia({
   const alt = entityPrimaryImageAlt(image.alt, entityName);
   const creditId = photoCreditId(entityId);
   const focalClass = primaryImageFocalClass(kind);
-  const orientationClass = portrait ? ' ds-entity-photo--portrait' : '';
+  // `--portrait` is the long-standing hook for the contain-over-blur treatment; it now means
+  // "contained", whatever the photo's own orientation.
+  const orientationClass = contained ? ' ds-entity-photo--portrait ds-entity-photo--contain' : '';
 
   return (
     <figure
+      ref={figureRef}
+      data-fit={contained ? 'contain' : 'cover'}
       className={`ds-entity-photo ${focalClass}${orientationClass}`}
       {...(hideCredit ? {} : { 'aria-describedby': creditId })}
     >
-      {portrait ? (
+      {contained ? (
         // eslint-disable-next-line @next/next/no-img-element -- decorative blurred fill of the same photo, never the tracked/error-handled one
         <img
           key={`${src}-backdrop`}
@@ -198,13 +203,6 @@ export function EntityMastMedia({
         loading={priority ? 'eager' : 'lazy'}
         decoding="async"
         {...(priority ? { fetchPriority: 'high' as const } : {})}
-        onLoad={(event) => {
-          if (portrait) return;
-          const el = event.currentTarget;
-          if (isPortraitPrimaryImage(el.naturalWidth, el.naturalHeight)) {
-            setPortrait(true);
-          }
-        }}
         onError={() => {
           setPhase((current) => {
             if (current.kind !== 'photo') {

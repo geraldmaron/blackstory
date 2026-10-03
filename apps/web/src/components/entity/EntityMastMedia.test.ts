@@ -130,3 +130,16 @@ test('RecordPhotoCredit keeps the rights line in flow', () => {
   assert.match(html, /Source: Wikimedia Commons · CC-BY-SA-4\.0/);
   assert.doesNotMatch(html, /<figcaption/);
 });
+
+test('EntityMastMedia never cover-crops before it knows the photo: unknown dimensions start contained', () => {
+  const html = renderToStaticMarkup(
+    createElement(EntityMastMedia, {
+      entityId: 'ent_unknown_dims',
+      entityName: 'Unknown Dims',
+      kind: 'person',
+      primaryImage: { ...PINNED_IMAGE },
+    }),
+  );
+  assert.match(html, /data-fit="contain"/);
+  assert.match(html, /ds-entity-photo__backdrop/);
+});

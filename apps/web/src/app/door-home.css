@@ -98,7 +98,11 @@
   align-items: center;
   justify-content: center;
   min-height: 44px;
-  margin-left: auto;
+  /* Beside the field captions on the left, not pinned right. The field chrome's z-index lives
+     inside the field's own stacking context (z 0), so it cannot outrank the journey (z 2): pinned
+     to the right edge, the button sat under every chapter card from chapter 2 on and could not be
+     seen or pressed. The top-left row is never covered by a card. */
+  margin-left: 0;
   padding: var(--ds-space-2) var(--ds-space-4);
   border: var(--ds-border-width) solid var(--ds-border);
   border-radius: var(--ds-radius-full);
@@ -191,7 +195,22 @@
   }
 }
 
+/* A phone on its side: the open instrument is a left column (atlas.css), so the pill clears it. */
+@media (max-height: 559px) and (orientation: landscape) and (min-width: 560px) {
+  .ds-door__browse-exit {
+    top: calc(var(--ds-island-clearance) + var(--ds-space-2));
+    left: var(--ds-space-4);
+  }
+
+  body:has(.ds-atlas[data-sheet-open='true']) .ds-door__browse-exit {
+    left: calc(min(360px, 45vw) + var(--ds-space-4));
+  }
+}
+
 .ds-door__browse-exit-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--ds-space-2);
   min-height: 44px;
   padding: var(--ds-space-2) var(--ds-space-4);
   border: var(--ds-border-width) solid var(--ds-border-strong);

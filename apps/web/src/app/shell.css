@@ -1532,6 +1532,36 @@ html:has([data-surface='instrument']) {
   object-position: center center;
 }
 
+/*
+ * Shared "never chop the subject" frame (use-photo-fit.ts). When a cover crop would lose more than a
+ * quarter of the photo, the whole photo is shown over a blurred, darkened fill of itself.
+ */
+.ds-fit-photo {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+}
+
+.ds-fit-photo__backdrop {
+  position: absolute;
+  z-index: 0; /* local: behind the sharp photo inside this frame only */
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: blur(24px) brightness(0.55) saturate(1.05);
+  transform: scale(1.15);
+  pointer-events: none;
+}
+
+.ds-fit-photo[data-fit='contain'] .ds-fit-photo__main {
+  position: relative;
+  z-index: 1; /* local: above the blurred fill inside this frame only */
+  object-fit: contain;
+  object-position: center;
+  background: transparent;
+}
+
 .ds-entity-photo__credit {
   margin: var(--ds-space-2) 0 0;
   color: var(--ds-ink-muted);
@@ -2350,4 +2380,99 @@ body:has(.ds-explore-stage[data-results='open']) {
   height: 0.625rem;
   margin-top: -1px;
   background: var(--ds-accent-graphic);
+}
+
+/* The reader's own position: a haloed dot with a slow breathing ring. Deliberately not a pin, so it
+   never reads as a record. Sits above entity markers so it is never buried in a cluster. */
+.ds-map-search-center-marker--user {
+  position: relative;
+  width: 1.375rem;
+  height: 1.375rem;
+  z-index: 3; /* local: above sibling entity markers inside the marker pane */
+  display: grid;
+  place-items: center;
+}
+
+.ds-map-search-center-marker__dot {
+  position: relative;
+  box-sizing: border-box;
+  width: 1rem;
+  height: 1rem;
+  border: 3px solid var(--ds-canvas);
+  border-radius: 50%;
+  background: var(--ds-accent-graphic);
+  box-shadow: 0 1px 4px rgb(0 0 0 / 0.35);
+}
+
+.ds-map-search-center-marker__pulse {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: var(--ds-accent-graphic);
+  opacity: 0.35;
+  animation: ds-user-location-pulse 2.4s ease-out infinite;
+}
+
+@keyframes ds-user-location-pulse {
+  0% {
+    transform: scale(0.6);
+    opacity: 0.45;
+  }
+  100% {
+    transform: scale(2.2);
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ds-map-search-center-marker__pulse {
+    animation: none;
+    transform: scale(1.4);
+    opacity: 0.25;
+  }
+}
+
+/*
+ * Target size (WCAG 2.5.8). Standalone text links in page chrome — footer policies, staff sign-in,
+ * the maker credit, a document plate's "Open the entry", the compact wordmark — rendered 17–21px
+ * tall: fine for a mouse, a miss for a thumb. They keep their type; only the hit box grows.
+ */
+.ds-shell-footer__policy a,
+.ds-shell-footer__staff,
+.ds-shell-footer__maker a,
+.ds-room-plate__link {
+  display: inline-flex;
+  align-items: center;
+  min-height: 24px;
+}
+
+.ds-bar__brand {
+  min-height: 32px;
+  min-width: 32px;
+}
+
+@media (pointer: coarse) {
+  .ds-shell-footer__policy a,
+  .ds-shell-footer__staff,
+  .ds-shell-footer__maker a,
+  .ds-room-plate__link,
+  .ds-bar__brand {
+    min-height: 44px;
+  }
+}
+
+/*
+ * Dense link lists on touch screens: source links in a record's fact tiles and citations, a book's
+ * challenge and evidence lists, a law's agency and source links. They render 15–19px tall. Inline
+ * padding grows the tap area to ~27px without moving a single line of the layout (padding on an
+ * inline box does not change line height).
+ */
+@media (pointer: coarse) {
+  :where(dd, li, .ds-citation, .ds-room-src__t, .ds-room-anat__v, .ds-empty__body) > a:not([class*='ds-cta']):not(.ds-button),
+  .ds-books-edition__rip-link,
+  .ds-books-edition__rip-fact-link,
+  .ds-books-edition__evidence-cite,
+  .ds-rec-file__correct {
+    padding-block: 6px;
+  }
 }
