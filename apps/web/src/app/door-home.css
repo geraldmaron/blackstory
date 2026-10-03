@@ -98,7 +98,11 @@
   align-items: center;
   justify-content: center;
   min-height: 44px;
-  margin-left: auto;
+  /* Beside the field captions on the left, not pinned right. The field chrome's z-index lives
+     inside the field's own stacking context (z 0), so it cannot outrank the journey (z 2): pinned
+     to the right edge, the button sat under every chapter card from chapter 2 on and could not be
+     seen or pressed. The top-left row is never covered by a card. */
+  margin-left: 0;
   padding: var(--ds-space-2) var(--ds-space-4);
   border: var(--ds-border-width) solid var(--ds-border);
   border-radius: var(--ds-radius-full);

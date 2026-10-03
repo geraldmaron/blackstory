@@ -51,8 +51,10 @@ export function parsePlaceAddress(slug: string): PlaceAddress {
 
 /** A hyphen-joined run of words with at least one real word in it ("1967-detroit-riot"). */
 function isSlugOfWords(value: string): boolean {
+  // A catalog token with a hyphenated prefix (`rec-a1b2c3`, `disc-q42`) is still a token.
+  if (/^(ent|disc|art|pkg|rec|src|wd)-/.test(value)) return false;
   const parts = value.split('-');
-  return parts.length >= 2 && parts.some((part) => /^[a-z]{2,}$/.test(part));
+  return parts.length >= 2 && parts.some((part) => /^[a-z]{3,}$/.test(part));
 }
 
 /**

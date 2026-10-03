@@ -132,6 +132,14 @@ test('a phone on its side frames the map beside the left-hand panel', () => {
   });
   assert.ok(sideways.left > 300, 'the open instrument is a left column');
   assert.ok(sideways.top + sideways.bottom < 390 / 2);
+  const smallPhone = chromePadding({
+    viewportWidth: 667,
+    viewportHeight: 375,
+    lensOpen: true,
+    resultsOpen: false,
+    sheetOpen: false,
+  });
+  assert.ok(smallPhone.left > 250, 'a 667×375 phone on its side also uses the left column');
 });
 
 test('narrow breakpoint switches exactly at the documented width', () => {

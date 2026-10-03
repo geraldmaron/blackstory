@@ -54,7 +54,9 @@ export function chromePadding(state: ChromeState): ChromeInset {
   const { viewportWidth, viewportHeight } = state;
   const narrow = viewportWidth < CHROME_NARROW_MAX_WIDTH || viewportHeight <= COMPACT_MAX_HEIGHT;
   // A phone on its side: compact, but the open instrument docks to the left edge, not the bottom.
-  const sideways = narrow && viewportWidth > viewportHeight && viewportWidth >= CHROME_NARROW_MAX_WIDTH;
+  // Mirrors atlas.css: `(max-height: 559px) and (orientation: landscape) and (min-width: 560px)`.
+  const sideways =
+    viewportHeight <= COMPACT_MAX_HEIGHT && viewportWidth > viewportHeight && viewportWidth >= 560;
 
   let left: number;
   let right: number;

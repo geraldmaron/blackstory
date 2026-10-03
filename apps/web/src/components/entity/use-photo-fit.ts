@@ -24,6 +24,8 @@ export function usePhotoFit(
   const [fit, setFit] = useState<PhotoFit>(initial);
 
   useEffect(() => {
+    // A new photo starts from the safe default, not from the previous photo's verdict.
+    setFit(initial);
     const frame = frameRef.current;
     const img = imgRef.current;
     if (!frame || !img) return;

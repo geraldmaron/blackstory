@@ -42,6 +42,8 @@ describe('place slug addresses', () => {
     }
     assert.equal(isResolvablePlaceSlug('q768155'), false, 'a bare token is still not an address');
     assert.equal(isResolvablePlaceSlug('abc123'), false);
+    assert.equal(isResolvablePlaceSlug('rec-a1b2c3'), false, 'hyphen-prefixed tokens stay tokens');
+    assert.equal(isResolvablePlaceSlug('wd-q42'), false);
   });
 
   it('disambiguates colliding display names in hrefs', () => {

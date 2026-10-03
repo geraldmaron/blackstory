@@ -143,6 +143,18 @@ export function PlaceFinder({
   const [open, setOpen] = useState(false);
   const [geoStatus, setGeoStatus] = useState<GeoStatus>({ kind: 'idle' });
   const dialogTitleId = useId();
+  const titleRef = useRef<HTMLHeadingElement>(null);
+  const triggerRef = useRef<HTMLButtonElement>(null);
+  const wasOpen = useRef(false);
+
+  // Focus follows the sheet: into its title when it opens, back to the trigger when it closes
+  // (by the close button or by a place resolving), so keyboard and screen-reader users never
+  // land on <body>.
+  useEffect(() => {
+    if (open) titleRef.current?.focus();
+    else if (wasOpen.current) triggerRef.current?.focus();
+    wasOpen.current = open;
+  }, [open]);
 
   const skipFirstStateSync = useRef(true);
   useEffect(() => {
@@ -310,6 +322,7 @@ export function PlaceFinder({
   if (!open) {
     return (
       <button
+        ref={triggerRef}
         type="button"
         className="ds-lens__link ds-place-finder__trigger"
         onClick={() => setOpen(true)}
@@ -330,7 +343,7 @@ export function PlaceFinder({
     <div className="ds-place-sheet" role="dialog" aria-modal="true" aria-labelledby={dialogTitleId}>
       <div className="ds-place-sheet__dialog">
         <div className="ds-place-sheet__head">
-          <h3 className="ds-place-sheet__title" id={dialogTitleId}>
+          <h3 className="ds-place-sheet__title" id={dialogTitleId} ref={titleRef} tabIndex={-1}>
             Find a place
           </h3>
           <button

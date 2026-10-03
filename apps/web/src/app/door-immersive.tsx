@@ -354,6 +354,10 @@ export function DoorImmersive({
     }
   }, [initialBrowse, stage]);
 
+  /** Where the journey was scrolled when the reader went into browse, and whether we pushed. */
+  const journeyScrollRef = useRef(0);
+  const enteredByPushRef = useRef(false);
+
   const exitBrowse = useCallback(() => {
     if (!browseModeRef.current) {
       // Still sync URL if a cold explore left the address bar armed.
@@ -376,15 +380,27 @@ export function DoorImmersive({
      * still be `/` while the address bar reads `/explore`. Cold `/explore` is a real route.
      * Exit must restore the journey URL and, when Next owns the explore page, leave that route.
      */
-    if (pathname.startsWith('/explore') || window.location.pathname.startsWith('/explore')) {
-      router.replace('/');
+    const pushedState =
+      (window.history.state as { doorBrowse?: number } | null)?.doorBrowse === 1;
+    if (enteredByPushRef.current && pushedState) {
+      // Entering pushed `/explore` over the journey's own `/` entry; leaving steps back over it
+      // rather than stacking a second `/` on top (which made the browser's Back a no-op).
+      window.history.back();
     } else if (
-      window.history.state &&
-      (window.history.state as { doorBrowse?: number }).doorBrowse === 1
+      pathname.startsWith('/explore') ||
+      window.location.pathname.startsWith('/explore')
     ) {
+      // Cold `/explore` is a real route Next owns.
+      router.replace('/', { scroll: false });
+    } else if (pushedState) {
       window.history.replaceState(null, '', '/');
     }
-    window.scrollTo({ top: 0, behavior: prefersReducedMotion() ? 'auto' : 'smooth' });
+    enteredByPushRef.current = false;
+    // Back to the chapter the reader left from, not the top of the journey.
+    window.scrollTo({
+      top: journeyScrollRef.current,
+      behavior: prefersReducedMotion() ? 'auto' : 'smooth',
+    });
   }, [pathname, router, stage]);
 
   const enterBrowse = useCallback(() => {
@@ -394,6 +410,8 @@ export function DoorImmersive({
     stopSweep();
     stage.setDoorBrowseLive(true);
     announceMapBrowseEntered();
+    journeyScrollRef.current = window.scrollY;
+    enteredByPushRef.current = true;
     window.history.pushState({ doorBrowse: 1 }, '', '/explore');
     const delay = prefersReducedMotion() ? 0 : DOOR_BROWSE_MORPH_MS;
     if (browseMorphTimerRef.current !== null) {
@@ -421,6 +439,8 @@ export function DoorImmersive({
     const onExit = () => exitBrowseRef.current();
     const onPop = () => {
       if (browseModeRef.current) {
+        // The browser already stepped back over our `/explore` entry; do not step again.
+        enteredByPushRef.current = false;
         exitBrowseRef.current();
       }
     };

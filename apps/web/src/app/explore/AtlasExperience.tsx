@@ -407,7 +407,27 @@ export function AtlasExperience({ initial, embedded = false }: AtlasExperiencePr
     clearPinContinuity();
   }, [camera, initial.viewState.selected, selectById, view.allFeatures]);
   const { copy, citationFor } = useReaderActions(toasts);
-  const { locate: nearMe, status: locateStatus } = useLocateMe(toasts, setNearby);
+  /**
+   * The radius chip the reader last picked, kept even before anything is located: pick "5 mi",
+   * then locate, and the 5 miles applies — the chip and the filter can never disagree.
+   */
+  const radiusRef = useRef<{ meters: number | null; label: string }>({ meters: null, label: '' });
+  const setNearbyWithRadius = useCallback(
+    (area: NearbyArea | null) => {
+      if (!area) {
+        setNearby(null);
+        return;
+      }
+      const { meters, label } = radiusRef.current;
+      setNearby({
+        ...area,
+        radiusMeters: meters,
+        ...(meters !== null ? { radiusLabel: label } : {}),
+      });
+    },
+    [setNearby],
+  );
+  const { locate: nearMe, status: locateStatus } = useLocateMe(toasts, setNearbyWithRadius);
 
   /**
    * A located place on the plate: the marker (a "you are here" dot for the device, a pin for a
@@ -417,9 +437,21 @@ export function AtlasExperience({ initial, embedded = false }: AtlasExperiencePr
    */
   const filteredRef = useRef(filtered);
   filteredRef.current = filtered;
+  const sortedRef = useRef(sorted);
+  sortedRef.current = sorted;
   const distancesRef = useRef(distances);
   distancesRef.current = distances;
+  // Held in refs so the effect below runs when the located place changes and only then — not
+  // when the stage handle re-memoizes or the toast API identity changes.
+  const stageRef = useRef(stage);
+  stageRef.current = stage;
+  const cameraRef = useRef(camera);
+  cameraRef.current = camera;
+  const toastsRef = useRef(toasts);
+  toastsRef.current = toasts;
   useEffect(() => {
+    const stage = stageRef.current;
+    const camera = cameraRef.current;
     if (!nearby) {
       stage.clearSearchCenterMarker();
       stage.setSearchArea(null);
@@ -443,12 +475,12 @@ export function AtlasExperience({ initial, embedded = false }: AtlasExperiencePr
     for (const value of distancesRef.current?.values() ?? []) {
       if (nearest === undefined || value < nearest) nearest = value;
     }
-    toasts.show({
+    toastsRef.current.show({
       id: 'nearby-summary',
-      message: nearbySummary(nearby, filteredRef.current.length, nearest),
+      // `sorted`: the same count the Records rail shows (it drops internal placeholder records).
+      message: nearbySummary(nearby, sortedRef.current.length, nearest),
     });
-    // `toasts` is stable per surface; deliberately keyed on the located place only.
-  }, [nearby, stage, camera]);
+  }, [nearby]);
   useEffect(
     () => () => {
       stage.clearSearchCenterMarker();
@@ -484,6 +516,7 @@ export function AtlasExperience({ initial, embedded = false }: AtlasExperiencePr
         );
         return;
       }
+      radiusRef.current = { meters: payload.radiusMeters, label: payload.radiusLabel };
       setNearby({
         center: { lat, lng },
         label: target.label,
@@ -497,6 +530,7 @@ export function AtlasExperience({ initial, embedded = false }: AtlasExperiencePr
 
   const onRadiusChange = useCallback(
     (radiusMeters: number | null, radiusLabel: string) => {
+      radiusRef.current = { meters: radiusMeters, label: radiusLabel };
       if (!nearby) return;
       const next: NearbyArea = {
         center: nearby.center,

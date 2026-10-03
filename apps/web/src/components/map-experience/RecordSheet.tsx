@@ -198,9 +198,9 @@ function SheetMast({
 }) {
   const candidates = React.useMemo(() => buildEntityMastImageCandidates(photo.url), [photo.url]);
   const [urlIndex, setUrlIndex] = useState(0);
-  const figureRef = React.useRef<HTMLElement>(null);
+  const frameRef = React.useRef<HTMLDivElement>(null);
   const imgRef = React.useRef<HTMLImageElement>(null);
-  const fit = usePhotoFit(figureRef, imgRef, `${entityId}:${urlIndex}:${photo.url}`);
+  const fit = usePhotoFit(frameRef, imgRef, `${entityId}:${urlIndex}:${photo.url}`);
 
   useEffect(() => {
     setUrlIndex(0);
@@ -213,7 +213,10 @@ function SheetMast({
   const caption = primaryImageCreditCaption({ credit: photo.credit, rightsStatus: 'licensed' });
 
   return (
-    <figure className="ds-sheet__mast ds-fit-photo" ref={figureRef} data-fit={fit}>
+    <figure className="ds-sheet__mast">
+      {/* The fit frame wraps the picture only: the figure itself must not clip (see record-sheet.css)
+          and its caption is not part of the picture's aspect. */}
+      <div className="ds-sheet__photo-frame ds-fit-photo" ref={frameRef} data-fit={fit}>
       {fit === 'contain' ? (
         // eslint-disable-next-line @next/next/no-img-element -- decorative fill of the same photo
         <img className="ds-fit-photo__backdrop" src={src} alt="" aria-hidden="true" />
@@ -228,6 +231,7 @@ function SheetMast({
         decoding="async"
         onError={() => setUrlIndex((current) => current + 1)}
       />
+      </div>
       {caption.creditText ? (
         <figcaption className="ds-sheet__credit">{caption.creditText}</figcaption>
       ) : null}
