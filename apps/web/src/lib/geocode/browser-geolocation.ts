@@ -14,6 +14,8 @@
 export type BrowserCoordinates = {
   readonly lat: number;
   readonly lng: number;
+  /** Device-reported 68%-confidence radius in meters, when the browser supplies one. */
+  readonly accuracy?: number;
 };
 
 export type GeolocationDenialReason =
@@ -27,7 +29,11 @@ export type GeolocationOutcome =
 export type GeolocationApi = {
   getCurrentPosition(
     onSuccess: (position: {
-      readonly coords: { readonly latitude: number; readonly longitude: number };
+      readonly coords: {
+        readonly latitude: number;
+        readonly longitude: number;
+        readonly accuracy?: number;
+      };
     }) => void,
     onError: (error: { readonly code: number; readonly message: string }) => void,
     options?: PositionOptionsLike,
@@ -40,10 +46,15 @@ export type PositionOptionsLike = {
   readonly maximumAge?: number;
 };
 
+/**
+ * High accuracy: a reader who asks "where am I" wants their block, not their ISP's city. The
+ * timeout keeps a GPS cold start from hanging the button forever, and a short cache lets a second
+ * press answer instantly.
+ */
 const DEFAULT_OPTIONS: PositionOptionsLike = {
-  enableHighAccuracy: false,
-  timeout: 10_000,
-  maximumAge: 0,
+  enableHighAccuracy: true,
+  timeout: 12_000,
+  maximumAge: 30_000,
 };
 
 /** Standard `GeolocationPositionError.code` values (1=PERMISSION_DENIED, 2=POSITION_UNAVAILABLE, 3=TIMEOUT).  */
@@ -72,7 +83,14 @@ export function requestBrowserLocation(
       (position) => {
         resolve({
           ok: true,
-          position: { lat: position.coords.latitude, lng: position.coords.longitude },
+          position: {
+            lat: position.coords.latitude,
+            lng: position.coords.longitude,
+            ...(typeof position.coords.accuracy === 'number' &&
+            Number.isFinite(position.coords.accuracy)
+              ? { accuracy: position.coords.accuracy }
+              : {}),
+          },
         });
       },
       (error) => {

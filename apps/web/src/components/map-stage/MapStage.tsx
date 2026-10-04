@@ -273,6 +273,59 @@ export type MapStageDataPatchOptions = {
 
 export type { ExploreSearchCenterMarkerInput };
 
+export type SearchAreaInput = {
+  readonly lng: number;
+  readonly lat: number;
+  readonly radiusMeters?: number | null;
+  readonly accuracyMeters?: number | null;
+};
+
+const SEARCH_AREA_SOURCE = 'ds-search-area';
+const SEARCH_AREA_FILL = 'ds-search-area-fill';
+const SEARCH_AREA_LINE = 'ds-search-area-line';
+
+function circlePolygon(lng: number, lat: number, meters: number, steps = 72): number[][] {
+  const ring: number[][] = [];
+  const latRad = (lat * Math.PI) / 180;
+  const dLat = meters / 111_320;
+  const dLng = meters / (111_320 * Math.max(0.01, Math.cos(latRad)));
+  for (let i = 0; i <= steps; i += 1) {
+    const t = (i / steps) * Math.PI * 2;
+    ring.push([lng + dLng * Math.cos(t), lat + dLat * Math.sin(t)]);
+  }
+  return ring;
+}
+
+function searchAreaCollection(area: SearchAreaInput | null) {
+  const features: {
+    type: 'Feature';
+    properties: { role: 'radius' | 'accuracy' };
+    geometry: { type: 'Polygon'; coordinates: number[][][] };
+  }[] = [];
+  if (area?.radiusMeters && area.radiusMeters > 0) {
+    features.push({
+      type: 'Feature',
+      properties: { role: 'radius' },
+      geometry: {
+        type: 'Polygon',
+        coordinates: [circlePolygon(area.lng, area.lat, area.radiusMeters)],
+      },
+    });
+  }
+  // Accuracy under ~25 m is smaller than the dot itself; drawing it only adds noise.
+  if (area?.accuracyMeters && area.accuracyMeters > 25) {
+    features.push({
+      type: 'Feature',
+      properties: { role: 'accuracy' },
+      geometry: {
+        type: 'Polygon',
+        coordinates: [circlePolygon(area.lng, area.lat, Math.min(area.accuracyMeters, 50_000))],
+      },
+    });
+  }
+  return { type: 'FeatureCollection' as const, features };
+}
+
 export type MapStageHandle = {
   /** Patches source data + density/history-edge mode flags; rebuilds the style and reapplies
    * geography layers + entity markers. Pass `{ fade: true }` for decade-flow dual-buffer
@@ -304,6 +357,12 @@ export type MapStageHandle = {
   /** Copper place pin at a geocoded search center — distinct from entity HTML markers. */
   readonly setSearchCenterMarker: (marker: ExploreSearchCenterMarkerInput) => void;
   readonly clearSearchCenterMarker: () => void;
+  /**
+   * Translucent circles around a located point: the search radius the reader chose and/or the
+   * device's accuracy. Real geographic circles (a GeoJSON layer), so they scale with zoom and
+   * lie flat under pitch. `null` clears them.
+   */
+  readonly setSearchArea: (area: SearchAreaInput | null) => void;
   /** Re-read container layout after external geometry changes (hero inset, panel open). */
   readonly resize: () => void;
   /**
@@ -598,6 +657,7 @@ export function MapStageProvider({
   const maplibreglRef = useRef<MaplibreModule['default'] | null>(null);
   const markersRef = useRef<Marker[]>([]);
   const searchCenterMarkerRef = useRef<Marker | null>(null);
+  const searchAreaRef = useRef<SearchAreaInput | null>(null);
   /** Soft opacity pulse on the GL selected ring — canceled when selection clears. */
   const selectedPulseRafRef = useRef<number | null>(null);
   const stateLabelMarkersRef = useRef<
@@ -684,6 +744,8 @@ export function MapStageProvider({
   const mapStyleReadyRef = useRef(false);
   /** Latest apply options waiting for the style to settle — null when nothing is pending. */
   const pendingStyleApplyRef = useRef<Parameters<typeof applyStyleAndData>[0] | null>(null);
+  /** Late-bound: `syncSearchArea` is declared after `applyStyleAndData`. */
+  const syncSearchAreaRef = useRef<(() => void) | null>(null);
   /** True while a one-shot `idle` listener for a deferred apply is registered. */
   const pendingStyleApplyListenerRef = useRef(false);
   /** Stable handle so the deferred `idle` callback always runs the current apply closure. */
@@ -907,6 +969,7 @@ export function MapStageProvider({
         if (!options?.skipEntityMarkers) {
           syncEntityMarkers();
         }
+        syncSearchAreaRef.current?.();
       } catch (error) {
         console.error('[MapStage] style/data apply failed', error);
       }
@@ -1327,8 +1390,11 @@ export function MapStageProvider({
       if (!map || !maplibregl) return;
       clearSearchCenterMarker();
       try {
-        const element = buildExploreSearchCenterMarkerElement(marker.label);
-        searchCenterMarkerRef.current = new maplibregl.Marker({ element, anchor: 'bottom' })
+        const element = buildExploreSearchCenterMarkerElement(marker.label, marker.variant);
+        // The you-are-here dot is centred on the fix (as the accuracy circle is); a place pin
+        // stands on its point.
+        const anchor = marker.variant === 'user' ? 'center' : 'bottom';
+        searchCenterMarkerRef.current = new maplibregl.Marker({ element, anchor })
           .setLngLat([marker.lng, marker.lat])
           .addTo(map);
       } catch (error) {
@@ -1336,6 +1402,68 @@ export function MapStageProvider({
       }
     },
     [clearSearchCenterMarker],
+  );
+
+  /**
+   * Mounts (once) and fills the search-area source. Called on every set and after every style
+   * apply, so a theme flip or style rebuild cannot silently drop the circle.
+   */
+  const syncSearchArea = useCallback(() => {
+    const map = mapRef.current;
+    if (!map || !mapStyleReadyRef.current) return;
+    try {
+      const data = searchAreaCollection(searchAreaRef.current);
+      const source = map.getSource(SEARCH_AREA_SOURCE) as
+        { setData: (data: unknown) => void } | undefined;
+      if (source) {
+        source.setData(data);
+      } else {
+        map.addSource(SEARCH_AREA_SOURCE, { type: 'geojson', data } as never);
+      }
+      const accent =
+        (typeof document !== 'undefined' &&
+          getComputedStyle(document.documentElement)
+            .getPropertyValue('--ds-accent-graphic')
+            .trim()) ||
+        '#C48A4A';
+      if (!map.getLayer(SEARCH_AREA_FILL)) {
+        map.addLayer({
+          id: SEARCH_AREA_FILL,
+          type: 'fill',
+          source: SEARCH_AREA_SOURCE,
+          paint: {
+            'fill-color': accent,
+            'fill-opacity': ['match', ['get', 'role'], 'accuracy', 0.16, 0.07],
+          },
+        } as never);
+      }
+      if (!map.getLayer(SEARCH_AREA_LINE)) {
+        map.addLayer({
+          id: SEARCH_AREA_LINE,
+          type: 'line',
+          source: SEARCH_AREA_SOURCE,
+          filter: ['==', ['get', 'role'], 'radius'],
+          paint: {
+            'line-color': accent,
+            'line-width': 1.5,
+            'line-opacity': 0.7,
+            'line-dasharray': [3, 2],
+          },
+        } as never);
+      }
+    } catch (error) {
+      console.error('[MapStage] search area sync failed', error);
+    }
+  }, []);
+
+  syncSearchAreaRef.current = syncSearchArea;
+
+  const setSearchArea = useCallback(
+    (area: SearchAreaInput | null) => {
+      searchAreaRef.current = area;
+      syncSearchArea();
+    },
+    [syncSearchArea],
   );
 
   /** Stable handle for one-shot map listeners (cluster expand) registered in the mount effect. */
@@ -1576,6 +1704,20 @@ export function MapStageProvider({
           requestCountyPolygonLoad(activeMap, configRef.current);
         },
         publishBearing: (bearing) => notify(listenersRef.current, 'rotate', bearing),
+        onUserInteract: () => {
+          // Steering the map means the reader is done typing: drop the keyboard (and with it any
+          // field's suggestion list) so the map they are moving is not half-covered by it.
+          const active = document.activeElement;
+          if (
+            active instanceof HTMLElement &&
+            (active instanceof HTMLInputElement ||
+              active instanceof HTMLTextAreaElement ||
+              active.isContentEditable)
+          ) {
+            active.blur();
+          }
+          notify(listenersRef.current, 'interact');
+        },
       });
       activeMap.on('zoom', () => {
         updateStateLabelOpacity(activeMap.getZoom());
@@ -1746,11 +1888,16 @@ export function MapStageProvider({
       frame !== null && framedClaimAllowed(surfaceClass) && framedSlotsRef.current.claim(frame.id);
     if (claimGranted && frame !== null) heldSlotRef.current = frame.id;
 
-    const next = resolvePlatePosture({
-      surface: surfaceClass,
-      hasLiveMoment: frame !== null,
-      claimGranted,
-    });
+    // Door browse hands the plate to the reader. This per-frame resolver used to ignore that and
+    // put the Door's `ambient` posture back on every frame — on a touch screen that is a full
+    // gesture lock, so /explore on a phone could not be dragged or pinched at all.
+    const next = doorBrowseLiveRef.current
+      ? 'live'
+      : resolvePlatePosture({
+          surface: surfaceClass,
+          hasLiveMoment: frame !== null,
+          claimGranted,
+        });
 
     if (next !== 'framed') {
       const held = heldSlotRef.current;
@@ -1864,6 +2011,10 @@ export function MapStageProvider({
         setSearchCenterMarker(input);
       },
       clearSearchCenterMarker,
+      setSearchArea: (area) => {
+        ensureMap();
+        setSearchArea(area);
+      },
       resize: () => {
         ensureMap();
         resize();
@@ -1883,6 +2034,7 @@ export function MapStageProvider({
       mapAvailable,
       setSearchCenterMarker,
       clearSearchCenterMarker,
+      setSearchArea,
       resize,
       setDoorBrowseLive,
       getMap,

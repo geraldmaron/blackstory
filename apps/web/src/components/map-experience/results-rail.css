@@ -259,6 +259,13 @@
   flex: none;
 }
 
+/* Distance leads the meta line while a place is located: it is the answer to "what's near me". */
+.ds-results__distance {
+  flex: none;
+  color: var(--ds-accent);
+  font-weight: 500;
+}
+
 /*
  * The grade takes the row's right edge rather than trailing the middot chain, so the marks form
  * one column down the scroller that a reader can read vertically. `margin-left: auto` also keeps
@@ -352,7 +359,7 @@
 }
 
 /* See lens-panel.css: one shared narrow slot, one instrument in it. */
-@media (max-width: 819px) {
+@media (max-width: 819px), (max-height: 559px) {
   .ds-results {
     top: auto;
     left: var(--ds-space-2);

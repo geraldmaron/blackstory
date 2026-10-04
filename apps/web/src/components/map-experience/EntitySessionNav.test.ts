@@ -27,8 +27,8 @@ test('renders labeled back, next, and random toggle with disabled and pressed st
   assert.match(html, /aria-label="Next random record"/);
   assert.match(html, /aria-pressed="true"/);
   assert.match(html, /Random: on/);
-  assert.match(html, />Back</);
-  assert.match(html, />Next</);
+  assert.match(html, /<span>Back<\/span>/);
+  assert.match(html, /<span>Next<\/span>/);
   // Random stays secondary when on — copper plate + copper label fails contrast.
   assert.match(html, /ds-button--secondary[^"]*ds-entity-session-nav__random/);
   assert.doesNotMatch(html, /ds-button--primary[^"]*ds-entity-session-nav__random/);

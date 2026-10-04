@@ -1,14 +1,13 @@
 import { useCallback } from 'react';
 import type { UseToasts } from '../../../components/patterns/Toast';
-import type { CameraApi } from '../../../lib/map-experience/camera-moves';
 import { gradeForConfidence } from '../../../lib/map-experience/evidence-grade';
 import { placeLabelFor } from '../../../lib/map-experience/place-label';
 import type { ExploreMapFeature } from '../../../lib/map-experience/build-explore-map-source';
 import { formatCitation } from '../../../lib/citation/format';
 import { eraFor } from './atlas-feature-helpers';
 
-/** Clipboard copy, citation formatting, and the "near me" geolocation move. */
-export function useReaderActions(toasts: UseToasts, camera: CameraApi) {
+/** Clipboard copy and citation formatting. Locating lives in `use-locate-me.ts`. */
+export function useReaderActions(toasts: UseToasts) {
   const copy = useCallback(
     (text: string, message: string) => {
       void navigator.clipboard
@@ -32,33 +31,12 @@ export function useReaderActions(toasts: UseToasts, camera: CameraApi) {
       era: eraFor(feature),
       grade: grade ?? 'not graded',
       sourceCount: feature.properties.evidenceCount,
-      url: `https://blackstory.org${feature.properties.href || '/'}`,
+      // The page's own origin: the site lives at blackstory.app, and a hard-coded host had drifted
+      // to a domain this site does not serve.
+      url: `${typeof window === 'undefined' ? (process.env.NEXT_PUBLIC_SITE_URL ?? '') : window.location.origin}${feature.properties.href || '/'}`,
       accessed: new Date(),
     });
   }, []);
 
-  const nearMe = useCallback(() => {
-    if (!navigator.geolocation) {
-      toasts.show({
-        id: `near-${Date.now()}`,
-        message: 'This browser cannot share a location. Pick a state in the lens instead.',
-      });
-      return;
-    }
-    navigator.geolocation.getCurrentPosition(
-      (position) => {
-        camera.push({
-          target: [position.coords.longitude, position.coords.latitude],
-          label: 'your location',
-        });
-      },
-      () =>
-        toasts.show({
-          id: `near-denied-${Date.now()}`,
-          message: 'Location was not shared. Pick a state in the lens instead.',
-        }),
-    );
-  }, [camera, toasts]);
-
-  return { copy, citationFor, nearMe } as const;
+  return { copy, citationFor } as const;
 }

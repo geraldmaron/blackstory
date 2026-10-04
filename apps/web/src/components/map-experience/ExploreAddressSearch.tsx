@@ -12,7 +12,7 @@
  * file's own contract is unchanged; the `radiusId`/`onRadiusChange` props below exist so
  * `PlaceFinder` can clear the radius from outside on a state-select disagreement.
  */
-import React, { useDeferredValue, useId, useMemo, useState } from 'react';
+import React, { useDeferredValue, useEffect, useId, useMemo, useRef, useState } from 'react';
 import { Button } from '@repo/ui';
 import { getRequestIntegrityHeaders } from '../../lib/request-integrity/client';
 import { fetchLocateByAddress } from '../../lib/geocode/locate-client';
@@ -108,6 +108,23 @@ export function ExploreAddressSearch({
   const loading = status.kind === 'loading' || disabled;
   const radiusPreset = exploreRadiusPresetById(radiusId);
 
+  /**
+   * Suggestions belong to the moment of typing. They used to show whenever the field held text,
+   * so they stayed open over the map after the reader had moved on to dragging it. Now they open
+   * on focus or typing and close on a pick, a submit, Escape, or any pointer outside this
+   * component — the map included, since every gesture on it starts with a pointerdown.
+   */
+  const [listOpen, setListOpen] = useState(false);
+  const rootRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    if (!listOpen) return;
+    const onPointerDown = (event: PointerEvent) => {
+      if (!rootRef.current?.contains(event.target as Node)) setListOpen(false);
+    };
+    document.addEventListener('pointerdown', onPointerDown);
+    return () => document.removeEventListener('pointerdown', onPointerDown);
+  }, [listOpen]);
+
   const recommendationsQuery = useDeferredValue(query);
   const recommendations = useMemo(
     () => suggestCatalogRecords(recommendationsQuery, catalogFeatures, 6),
@@ -127,6 +144,7 @@ export function ExploreAddressSearch({
   }
 
   function pickRecord(record: CatalogRecordSuggestion) {
+    setListOpen(false);
     setQuery(record.displayName);
     emitResolved(cameraFromCatalogRecord(record), record.entityId);
   }
@@ -134,6 +152,7 @@ export function ExploreAddressSearch({
   async function runSearch(address: string) {
     const trimmed = address.trim();
     if (!trimmed) return;
+    setListOpen(false);
 
     // Exact / strong catalog hit first — grounded in published coords, no geocoder round-trip.
     const catalogHit = suggestCatalogRecords(trimmed, catalogFeatures, 1)[0];
@@ -159,6 +178,8 @@ export function ExploreAddressSearch({
     // Geocoder miss: if catalog still has partial matches, keep them visible and surface error.
     if (result.kind === 'fallback') {
       if (recommendations.length > 0) {
+        // The message points at the archive suggestions, so show them again.
+        setListOpen(true);
         setStatus({
           kind: 'error',
           message:
@@ -184,6 +205,8 @@ export function ExploreAddressSearch({
     setStatus({ kind: 'error', message: ERROR_MESSAGES.network_error });
   }
 
+  const showRecommendations = listOpen && recommendations.length > 0;
+
   const statusMessage =
     status.kind === 'loading'
       ? 'Looking up place…'
@@ -196,7 +219,7 @@ export function ExploreAddressSearch({
           : '';
 
   return (
-    <div className="ds-explore-place">
+    <div className="ds-explore-place" ref={rootRef}>
       <form
         className="ds-explore-place__form"
         onSubmit={(event) => {
@@ -217,10 +240,18 @@ export function ExploreAddressSearch({
             value={query}
             disabled={loading}
             aria-describedby={statusId}
-            aria-controls={recommendations.length > 0 ? listboxId : undefined}
-            aria-expanded={recommendations.length > 0}
+            aria-controls={showRecommendations ? listboxId : undefined}
+            aria-expanded={showRecommendations}
             aria-autocomplete="list"
+            onFocus={() => setListOpen(true)}
+            onKeyDown={(event) => {
+              if (event.key === 'Escape' && listOpen) {
+                event.preventDefault();
+                setListOpen(false);
+              }
+            }}
             onChange={(event) => {
+              setListOpen(true);
               setQuery(event.currentTarget.value);
               if (status.kind === 'error' || status.kind === 'ready') {
                 setStatus({ kind: 'idle' });
@@ -237,7 +268,7 @@ export function ExploreAddressSearch({
         browser. Coarse framing only; living residences stay off the public map.
       </p>
 
-      {recommendations.length > 0 ? (
+      {showRecommendations ? (
         <div className="ds-explore-place__recs">
           <p className="ds-explore-place__label" id={`${listboxId}-label`}>
             From the archive

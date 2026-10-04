@@ -30,6 +30,22 @@ describe('place slug addresses', () => {
     assert.equal(isResolvablePlaceSlug('ent_greenwood_district_001'), false);
   });
 
+  it('accepts readable slugs that contain numbers (they are names, not catalog tokens)', () => {
+    for (const slug of [
+      '1967-detroit-riot',
+      'engine-company-no-4',
+      'freedom-rides-1961',
+      'chicago-race-riot-of-1919',
+      'nation-of-islam-temple-4',
+    ]) {
+      assert.equal(isResolvablePlaceSlug(slug), true, slug);
+    }
+    assert.equal(isResolvablePlaceSlug('q768155'), false, 'a bare token is still not an address');
+    assert.equal(isResolvablePlaceSlug('abc123'), false);
+    assert.equal(isResolvablePlaceSlug('rec-a1b2c3'), false, 'hyphen-prefixed tokens stay tokens');
+    assert.equal(isResolvablePlaceSlug('wd-q42'), false);
+  });
+
   it('disambiguates colliding display names in hrefs', () => {
     const entities = [
       { id: 'ent_a', displayName: 'Union School' },

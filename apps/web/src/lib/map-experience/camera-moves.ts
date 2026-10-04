@@ -24,6 +24,17 @@ import type { ChromeInset } from './chrome-padding';
 
 export type CameraMove = 'wide' | 'push' | 'orbit' | 'tilt' | 'spotlight' | 'trace' | 'flyToRecord';
 
+/** What `frameArea` lands on: an explicit box (a search radius, or "you plus your nearest
+ * records"), or a single point at a zoom. */
+export type AreaFrame =
+  | { readonly kind: 'bounds'; readonly bounds: readonly [LngLat, LngLat]; readonly label: string }
+  | {
+      readonly kind: 'center';
+      readonly center: LngLat;
+      readonly zoom?: number;
+      readonly label: string;
+    };
+
 export type LngLat = readonly [longitude: number, latitude: number];
 
 /** `flyTo`'s zoom curve. Fixed by §4.2 rule 1. */
@@ -62,8 +73,18 @@ const PUSH_ZOOM_STEP = 2.6;
 const PUSH_MIN_ZOOM = 8.4;
 
 const RECORD_ZOOM = 12.6;
-const RECORD_PITCH = 52;
-const RECORD_BEARING = -18;
+/** A record is framed north-up and flat. A tilted, rotated arrival on every pin click turned the
+ * compass "twisted" after each selection and left readers re-orienting the map to read it. Tilt
+ * and orbit stay available as deliberate moves in the camera console. */
+const RECORD_PITCH = 0;
+const RECORD_BEARING = 0;
+/** Never zoom a reader *out* to open a record they clicked while zoomed further in. */
+const RECORD_MAX_ZOOM = 16;
+
+/** Locate framing: neighbourhood scale, north-up, flat — what every maps app does for "you". */
+export const LOCATE_ZOOM = 13.2;
+const LOCATE_MAX_ZOOM = 15;
+const LOCATE_DURATION = 1400;
 
 const SPOTLIGHT_DEFAULT_RADIUS_PERCENT = 20;
 
@@ -80,6 +101,7 @@ export type CameraAnimationOptions = {
   speed?: number;
   easing?: CameraEasing;
   padding?: ChromeInset;
+  maxZoom?: number;
   essential?: boolean;
 };
 
@@ -152,6 +174,11 @@ export type CameraApi = {
   spotlight(options?: SpotlightOptions): void;
   trace(options?: TraceOptions): void;
   flyToRecord(record: RecordTarget, options?: MoveOptions): void;
+  /**
+   * Frames a place the reader asked to see — their own location, a searched address, a radius.
+   * Pure geography, so it is never dignity-gated: it is not about any record.
+   */
+  frameArea(frame: AreaFrame, options?: MoveOptions): void;
   /** Straightens the plate to north, holding center/zoom/pitch. Ungated — never refused by the
    * dignity gate. */
   resetBearing(options?: MoveOptions): void;
@@ -239,7 +266,9 @@ export function createCamera(deps: CameraDeps): CameraApi {
         essential: isEssential(options),
       });
     }
-    announce('Wide · continental');
+    // The page-load establishing shot is ambient: nobody asked for it, so it does not print
+    // camera jargon ("Wide · continental") under a map the reader has not touched yet.
+    if (isEssential(options)) announce('Wide · continental');
   }
 
   function push(options?: PushOptions): void {
@@ -353,11 +382,55 @@ export function createCamera(deps: CameraDeps): CameraApi {
     announce('North · reset');
   }
 
+  function frameArea(frame: AreaFrame, options?: MoveOptions): void {
+    cancel();
+    setSpotlight(null);
+    const duration = durationFor(options?.durationMs, LOCATE_DURATION);
+    const essential = isEssential(options);
+    if (frame.kind === 'bounds') {
+      try {
+        map.fitBounds(frame.bounds, {
+          padding: padding(),
+          duration,
+          pitch: 0,
+          bearing: 0,
+          maxZoom: LOCATE_MAX_ZOOM,
+          easing: CAMERA_EASING_SLOW_OUT,
+          essential,
+        });
+      } catch {
+        const [[west, south], [east, north]] = frame.bounds;
+        map.easeTo({
+          center: [(west + east) / 2, (south + north) / 2],
+          zoom: LOCATE_ZOOM - 2,
+          pitch: 0,
+          bearing: 0,
+          duration,
+          essential,
+        });
+      }
+    } else {
+      map.flyTo({
+        center: frame.center,
+        zoom: frame.zoom ?? LOCATE_ZOOM,
+        pitch: 0,
+        bearing: 0,
+        curve: CAMERA_FLY_CURVE,
+        speed: 1.1,
+        easing: CAMERA_EASING_SLOW_OUT,
+        duration,
+        padding: padding(),
+        essential,
+      });
+    }
+    announce(`Locate · ${frame.label}`);
+  }
+
   function flyToRecord(record: RecordTarget, options?: MoveOptions): void {
     cancel();
     map.flyTo({
       center: record.center,
-      zoom: RECORD_ZOOM,
+      zoom: Math.min(RECORD_MAX_ZOOM, Math.max(RECORD_ZOOM, map.getZoom())),
       pitch: RECORD_PITCH,
       bearing: RECORD_BEARING,
       curve: CAMERA_FLY_CURVE,
@@ -378,6 +451,7 @@ export function createCamera(deps: CameraDeps): CameraApi {
     spotlight,
     trace,
     flyToRecord,
+    frameArea,
     resetBearing,
     cancel,
     isSpotlit: () => spotlit,

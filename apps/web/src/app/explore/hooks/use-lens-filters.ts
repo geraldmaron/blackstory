@@ -27,6 +27,14 @@ import type { ExploreLayerMode } from '../../../lib/map-experience/url-state';
 import type { ExploreViewModel } from '../explore-view-model';
 import { decadeStartYear, eraBucketFor, eraFor } from './atlas-feature-helpers';
 import { isInternalRecordLabel } from '../../../lib/place/public-place-path';
+import {
+  applyNearbyRadius,
+  nearestDistance,
+  nearbyConstraintLabel,
+  nearbyDistances,
+  sortByDistance,
+  type NearbyArea,
+} from '../../../lib/map-experience/nearby';
 
 /** Presence rows shown in the lens. Ten is what fits without the panel becoming a table. */
 const PRESENCE_ROWS = 10;
@@ -35,7 +43,7 @@ const PRESENCE_ROWS = 10;
  * (docs/ui/patterns-lens-handoff.md §3). `selected`, `collection` and `find` are named
  * exclusions there — they address rather than narrow — and none of them is built here. */
 export type LensConstraint = {
-  readonly key: 'state' | 'kind' | 'topic' | 'status' | 'evidenceFloor' | 'decade';
+  readonly key: 'near' | 'state' | 'kind' | 'topic' | 'status' | 'evidenceFloor' | 'decade';
   readonly label: string;
   readonly onClear: () => void;
 };
@@ -80,8 +88,32 @@ export function useLensFilters(view: ExploreViewModel, toasts: UseToasts) {
     satellite: view.viewState.sat,
   });
   const [sort, setSort] = useState<ResultsSort>('oldest');
+  /**
+   * A located point (the reader's device or a searched place). Narrows like any other lens
+   * constraint: a chosen radius filters, and the rail sorts nearest-first while it is set.
+   */
+  const [nearby, setNearbyState] = useState<NearbyArea | null>(null);
+  const setNearby = useCallback((next: NearbyArea | null) => {
+    setNearbyState(next);
+    setSort((current) => (next ? 'nearest' : current === 'nearest' ? 'oldest' : current));
+    // A place-based "where" and a state pick are two answers to one question; the newest wins.
+    if (next) setStateCode('');
+  }, []);
+  /** Picking a state replaces an active "near" — the most recent answer to "where" wins. */
+  const pickState = useCallback((code: string) => {
+    setStateCode(code);
+    if (code) {
+      setNearbyState(null);
+      setSort((current) => (current === 'nearest' ? 'oldest' : current));
+    }
+  }, []);
+  const distances = useMemo<ReadonlyMap<string, number> | null>(
+    () => (nearby ? nearbyDistances(view.allFeatures, nearby.center) : null),
+    [nearby, view.allFeatures],
+  );
 
-  const filtered = useMemo(() => {
+  /** Every lens constraint except the nearby radius: what the reader would see without it. */
+  const lensFiltered = useMemo(() => {
     let features = view.allFeatures;
     if (stateCode) {
       features = features.filter((feature) => feature.properties.statePostalCode === stateCode);
@@ -117,6 +149,27 @@ export function useLensFilters(view: ExploreViewModel, toasts: UseToasts) {
     view.allFeatures,
   ]);
 
+  const filtered = useMemo(
+    () => (nearby && distances ? applyNearbyRadius(lensFiltered, nearby, distances) : lensFiltered),
+    [distances, lensFiltered, nearby],
+  );
+
+  /** Distance to the closest record the lens shows, inside the radius or not — so "nothing within
+   * 5 miles" can still say where the nearest one is. */
+  const nearestMeters = useMemo(
+    () =>
+      distances
+        ? nearestDistance(
+            // The rail's own rows: internal placeholder records never show, so never count.
+            lensFiltered.filter(
+              (feature) => !isInternalRecordLabel(feature.properties.displayName),
+            ),
+            distances,
+          )
+        : undefined,
+    [distances, lensFiltered],
+  );
+
   const topicCounts = useMemo<readonly TopicCount[]>(
     () => buildTopicCounts(view.allFeatures),
     [view.allFeatures],
@@ -148,6 +201,13 @@ export function useLensFilters(view: ExploreViewModel, toasts: UseToasts) {
 
   const constraints = useMemo<readonly LensConstraint[]>(() => {
     const rows: LensConstraint[] = [];
+    if (nearby) {
+      rows.push({
+        key: 'near',
+        label: nearbyConstraintLabel(nearby),
+        onClear: () => setNearby(null),
+      });
+    }
     if (stateCode) {
       const name = findUsStateByPostalCode(stateCode)?.name ?? stateCode;
       rows.push({ key: 'state', label: name, onClear: () => setStateCode('') });
@@ -185,12 +245,23 @@ export function useLensFilters(view: ExploreViewModel, toasts: UseToasts) {
       });
     }
     return rows;
-  }, [decade, evidenceFloor, kindFamily, stateCode, status, topicCounts, topicId]);
+  }, [
+    decade,
+    evidenceFloor,
+    kindFamily,
+    nearby,
+    setNearby,
+    stateCode,
+    status,
+    topicCounts,
+    topicId,
+  ]);
 
   const sorted = useMemo(() => {
     const rows = filtered.filter(
       (feature) => !isInternalRecordLabel(feature.properties.displayName),
     );
+    if (sort === 'nearest' && distances) return sortByDistance(rows, distances);
     rows.sort((a, b) => {
       const left = decadeStartYear(eraFor(a));
       const right = decadeStartYear(eraFor(b));
@@ -198,7 +269,7 @@ export function useLensFilters(view: ExploreViewModel, toasts: UseToasts) {
       return a.properties.displayName.localeCompare(b.properties.displayName);
     });
     return rows;
-  }, [filtered, sort]);
+  }, [distances, filtered, sort]);
 
   const kindCounts = useMemo(() => {
     const counts: Partial<Record<MapKindFamily, number>> = {};
@@ -247,7 +318,8 @@ export function useLensFilters(view: ExploreViewModel, toasts: UseToasts) {
   );
 
   const resetLens = useCallback(() => {
-    const previous = { stateCode, kindFamily, evidenceFloor, decade, topicId, status };
+    const previous = { stateCode, kindFamily, evidenceFloor, decade, topicId, status, nearby };
+    setNearby(null);
     setStateCode('');
     setKindFamily(null);
     setEvidenceFloor('any');
@@ -260,6 +332,7 @@ export function useLensFilters(view: ExploreViewModel, toasts: UseToasts) {
       action: {
         label: 'Undo',
         run: () => {
+          if (previous.nearby) setNearby(previous.nearby);
           setStateCode(previous.stateCode);
           setKindFamily(previous.kindFamily);
           setEvidenceFloor(previous.evidenceFloor);
@@ -269,11 +342,11 @@ export function useLensFilters(view: ExploreViewModel, toasts: UseToasts) {
         },
       },
     });
-  }, [decade, evidenceFloor, kindFamily, stateCode, status, toasts, topicId]);
+  }, [decade, evidenceFloor, kindFamily, nearby, setNearby, stateCode, status, toasts, topicId]);
 
   return {
     stateCode,
-    setStateCode,
+    setStateCode: pickState,
     kindFamily,
     setKindFamily,
     evidenceFloor,
@@ -294,7 +367,11 @@ export function useLensFilters(view: ExploreViewModel, toasts: UseToasts) {
     setLayers,
     sort,
     setSort,
+    nearby,
+    setNearby,
+    distances,
     filtered,
+    nearestMeters,
     sorted,
     kindCounts,
     topicCounts,

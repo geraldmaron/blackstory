@@ -1,5 +1,11 @@
 import { useCallback, useEffect, useState } from 'react';
 import type { AtlasMode } from '../../../components/shell/CommandBar';
+import {
+  COMPACT_MEDIA_QUERY,
+  isCompactViewport,
+  SINGLE_SIDE_PANEL_MAX_WIDTH,
+  SINGLE_SIDE_PANEL_MEDIA_QUERY,
+} from '../../../lib/layout/compact-viewport';
 
 /**
  * Which floating instruments are on screen. Four, not two: `decade` (the time panel) and `camera`
@@ -15,7 +21,7 @@ export type PanelVisibility = {
 };
 
 /** Below this the instruments cannot all coexist; see `narrowLayout` and the panel CSS. */
-const NARROW_BREAKPOINT = 820;
+// (compact = narrow OR short; see lib/layout/compact-viewport.ts)
 
 /**
  * Above this the record sheet and the results rail both fit, so opening a record does not hide
@@ -25,7 +31,16 @@ const NARROW_BREAKPOINT = 820;
 const BOTH_COLUMNS_BREAKPOINT = 1150;
 
 function isNarrowViewport(): boolean {
-  return typeof window !== 'undefined' && window.innerWidth < NARROW_BREAKPOINT;
+  return typeof window !== 'undefined' && isCompactViewport(window.innerWidth, window.innerHeight);
+}
+
+/** 820–1149px: room for the map plus ONE side panel. Filters and Records take turns. */
+function isSingleSidePanelViewport(): boolean {
+  return (
+    typeof window !== 'undefined' &&
+    !isNarrowViewport() &&
+    window.innerWidth <= SINGLE_SIDE_PANEL_MAX_WIDTH
+  );
 }
 
 /**
@@ -70,15 +85,20 @@ export function usePanelVisibility() {
   const [chromeHidden, setChromeHidden] = useState(false);
 
   useEffect(() => {
-    const query = window.matchMedia(`(max-width: ${NARROW_BREAKPOINT - 1}px)`);
+    const query = window.matchMedia(COMPACT_MEDIA_QUERY);
     const wideQuery = window.matchMedia(`(min-width: ${BOTH_COLUMNS_BREAKPOINT}px)`);
+    const midQuery = window.matchMedia(SINGLE_SIDE_PANEL_MEDIA_QUERY);
     const sync = () => {
       const isNarrow = query.matches;
+      const isMid = !isNarrow && midQuery.matches;
       setNarrow(isNarrow);
       setBothColumns(wideQuery.matches);
       setPanels((current) => ({
-        lens: true,
-        results: !isNarrow,
+        // Compact opens map-first: the dock's Filters chip is one tap away, and a sheet covering
+        // 40% of a phone on arrival hid the very map the reader came for.
+        lens: !isNarrow,
+        // Mid widths (tablet portrait) hold one side panel: two left a 140px strip of map.
+        results: !isNarrow && !isMid,
         decade: !isNarrow,
         // Preserve an explicit reader open; otherwise stay closed at rest.
         camera: isNarrow ? false : current.camera,
@@ -87,9 +107,11 @@ export function usePanelVisibility() {
     sync();
     query.addEventListener('change', sync);
     wideQuery.addEventListener('change', sync);
+    midQuery.addEventListener('change', sync);
     return () => {
       query.removeEventListener('change', sync);
       wideQuery.removeEventListener('change', sync);
+      midQuery.removeEventListener('change', sync);
     };
   }, []);
 
@@ -103,7 +125,13 @@ export function usePanelVisibility() {
             decade: panel === 'decade',
             camera: panel === 'camera',
           }
-        : { ...current, [panel]: true },
+        : isSingleSidePanelViewport() && (panel === 'lens' || panel === 'results')
+          ? {
+              ...current,
+              lens: panel === 'lens',
+              results: panel === 'results',
+            }
+          : { ...current, [panel]: true },
     );
   }, []);
 

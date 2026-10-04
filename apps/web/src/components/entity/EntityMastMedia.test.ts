@@ -71,7 +71,7 @@ test('EntityMastMedia letterboxes a known-portrait photo instead of cover-croppi
   assert.match(html, /alt="Rosa Parks, seated, 1955\."/);
 });
 
-test('EntityMastMedia keeps the existing cover crop for a landscape photo', () => {
+test('EntityMastMedia first-paints a 16:9 photo whole, since the wide banner would cut it', () => {
   const html = renderToStaticMarkup(
     createElement(EntityMastMedia, {
       entityId: 'ent_wide_photo',
@@ -80,8 +80,10 @@ test('EntityMastMedia keeps the existing cover crop for a landscape photo', () =
       primaryImage: { ...PINNED_IMAGE, width: 1600, height: 900 },
     }),
   );
-  assert.doesNotMatch(html, /ds-entity-photo--portrait/);
-  assert.doesNotMatch(html, /ds-entity-photo__backdrop/);
+  // Server render: no box measured yet, so nothing is cropped. The client measures the real
+  // frame and switches to cover where cover keeps most of the picture.
+  assert.match(html, /data-fit="contain"/);
+  assert.match(html, /ds-entity-photo__backdrop/);
 });
 
 test('EntityMastMedia omits the source link for a legacy image with no pin fields', () => {
@@ -129,4 +131,17 @@ test('RecordPhotoCredit keeps the rights line in flow', () => {
   assert.match(html, /Wikimedia Commons/);
   assert.match(html, /Source: Wikimedia Commons · CC-BY-SA-4\.0/);
   assert.doesNotMatch(html, /<figcaption/);
+});
+
+test('EntityMastMedia never cover-crops before it knows the photo: unknown dimensions start contained', () => {
+  const html = renderToStaticMarkup(
+    createElement(EntityMastMedia, {
+      entityId: 'ent_unknown_dims',
+      entityName: 'Unknown Dims',
+      kind: 'person',
+      primaryImage: { ...PINNED_IMAGE },
+    }),
+  );
+  assert.match(html, /data-fit="contain"/);
+  assert.match(html, /ds-entity-photo__backdrop/);
 });

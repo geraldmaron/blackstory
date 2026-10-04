@@ -55,6 +55,8 @@ export type PlateCameraWiring = {
    * viewport frame arrives too late for that.
    */
   readonly publishBearing: (bearing: number) => void;
+  /** A gesture from the reader (not a scripted flight) has started. */
+  readonly onUserInteract?: () => void;
 };
 
 /** Pointer affordance for a layer whose features answer a click. */
@@ -91,8 +93,9 @@ export function bindPlateClickListeners(map: MapLibreMap, wiring: PlateClickWiri
 
   function handleBackgroundClick(event: MapMouseEvent) {
     if (wiring.pointerHitAt(event.point)) return;
+    // State fills are the ground, not a target: they cover every inch of U.S. land, so counting
+    // them made a tap on "empty" map anywhere in the country never read as empty.
     const hitLayers = [
-      EXPLORE_STATE_DENSITY_LAYER_ID,
       EXPLORE_HISTORY_EDGES_LAYER_ID,
       EXPLORE_HISTORY_EDGES_SELECTED_LAYER_ID,
     ].filter((id) => map.getLayer(id));
@@ -130,4 +133,16 @@ export function bindPlateCameraListeners(map: MapLibreMap, wiring: PlateCameraWi
   map.on('rotate', () => {
     wiring.publishBearing(map.getBearing());
   });
+  if (wiring.onUserInteract) {
+    const onUserInteract = wiring.onUserInteract;
+    // MapLibre sets `originalEvent` only when a DOM gesture drives the move; `flyTo`/`easeTo`
+    // leave it undefined, so the camera's own choreography never counts as the reader.
+    const fromReader = (event: { originalEvent?: unknown }) => {
+      if (event.originalEvent) onUserInteract();
+    };
+    map.on('dragstart', fromReader);
+    map.on('zoomstart', fromReader);
+    map.on('rotatestart', fromReader);
+    map.on('pitchstart', fromReader);
+  }
 }

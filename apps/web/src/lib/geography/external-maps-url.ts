@@ -1,6 +1,7 @@
 /**
- * Builds external map-app search and directions URLs (Google Maps universal links). On phones
- * these typically open Google Maps, Apple Maps, or the user's default maps handler. When
+ * Builds external map-app search and directions URLs. Google Maps universal links are the
+ * server-rendered default; `MapsExternalLink` swaps in the Apple Maps equivalent on Apple devices
+ * after mount, so "Open in maps" opens the reader's own maps app. When
  * coordinates and a place string are both available, the query combines them so readers see a
  * name in their maps app, not a bare lat/lng pair.
  */
@@ -77,7 +78,8 @@ export function buildAppleMapsDirectionsUrl(input: ExternalMapsSearchInput): str
   // exist the address wins for routing (it is what a driver needs) and `ll` disambiguates.
   params.set('daddr', trimmed && trimmed.length > 0 ? trimmed : `${input.lat},${input.lng}`);
   if (trimmed && hasCoords) params.set('ll', `${input.lat},${input.lng}`);
-  params.set('dirflg', 'd');
+  // No travel mode: Google's link sets none, and the reader picks walking, transit or driving in
+  // the app. Forcing driving (`dirflg=d`) made the two "Directions" exits disagree.
   return `https://maps.apple.com/?${params.toString()}`;
 }
 
@@ -89,4 +91,38 @@ export function externalMapsLinkLabel(placeLabel: string): string {
 /** Accessible name for a directions deep link. */
 export function externalMapsDirectionsLabel(placeLabel: string): string {
   return `Get directions to ${placeLabel}`;
+}
+
+/**
+ * The Apple Maps equivalent of a Google Maps search or directions URL built above, so one link
+ * can open the reader's own maps app: Apple Maps on iPhone, iPad and Mac, Google Maps elsewhere.
+ * Returns undefined for anything that is not one of this module's Google URLs.
+ */
+export function appleMapsUrlFromGoogle(href: string): string | undefined {
+  let url: URL;
+  try {
+    url = new URL(href);
+  } catch {
+    return undefined;
+  }
+  if (url.hostname !== 'www.google.com' || !url.pathname.startsWith('/maps/')) return undefined;
+  const directions = url.pathname.startsWith('/maps/dir');
+  const destination = url.searchParams.get(directions ? 'destination' : 'query');
+  if (!destination) return undefined;
+  const match = /^(?:(.*?) @ )?(-?\d+(?:\.\d+)?),(-?\d+(?:\.\d+)?)$/.exec(destination.trim());
+  const query = match ? match[1] : destination;
+  const lat = match ? Number(match[2]) : undefined;
+  const lng = match ? Number(match[3]) : undefined;
+  const input = {
+    ...(query ? { query } : {}),
+    ...(lat !== undefined && lng !== undefined ? { lat, lng } : {}),
+  };
+  return directions ? buildAppleMapsDirectionsUrl(input) : buildAppleMapsSearchUrl(input);
+}
+
+/** True on platforms whose default maps app is Apple Maps. */
+export function prefersAppleMaps(userAgent: string, platform = ''): boolean {
+  return (
+    /iPhone|iPad|iPod|Macintosh|Mac OS X/i.test(userAgent) || /^(?:Mac|iPhone|iPad)/i.test(platform)
+  );
 }

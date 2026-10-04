@@ -277,7 +277,7 @@
   color: inherit;
 }
 
-@media (max-width: 819px) {
+@media (max-width: 819px), (max-height: 559px) {
   .ds-atlas__readout {
     left: var(--ds-space-2);
     bottom: calc(var(--ds-space-2) + 96px);
@@ -324,7 +324,7 @@
   padding: var(--ds-space-4);
 }
 
-@media (max-width: 819px) {
+@media (max-width: 819px), (max-height: 559px) {
   .ds-atlas__legend-overlay {
     left: var(--ds-space-2);
     right: var(--ds-space-2);
@@ -388,4 +388,179 @@
   transform: translateX(-50%);
   z-index: var(--ds-z-atlas-pill);
   max-width: min(32rem, calc(100vw - 2 * var(--ds-space-4)));
+}
+
+/*
+ * Compact polish, shared by every instrument sheet (Filters, Records, When, View, the record).
+ *
+ * - Sheets rise from the dock, so their dismiss chevrons point down — the direction they leave
+ *   in. They used to keep the desktop's left/right arrows while sliding vertically.
+ * - The dock and the sheets clear the home indicator on notched phones.
+ */
+@media (max-width: 819px), (max-height: 559px) {
+  .ds-lens,
+  .ds-results,
+  .ds-time-panel,
+  .ds-camera,
+  .ds-sheet {
+    /* `backwards`, not `both`: a fill that held `transform: none` after the rise would outrank
+       the inline transform the sheet drag writes, and the sheet would not follow the finger. */
+    animation: ds-compact-sheet-rise var(--ds-duration-base) var(--ds-easing) backwards;
+    box-shadow: 0 -8px 28px rgb(0 0 0 / 0.22);
+  }
+
+  .ds-lens__hide svg {
+    transform: rotate(-90deg);
+  }
+
+  .ds-results__hide svg {
+    transform: rotate(90deg);
+  }
+
+  .ds-atlas__dock {
+    bottom: calc(var(--ds-space-2) + 28px + env(safe-area-inset-bottom, 0px));
+    padding-left: env(safe-area-inset-left, 0px);
+    padding-right: env(safe-area-inset-right, 0px);
+  }
+}
+
+@keyframes ds-compact-sheet-rise {
+  from {
+    transform: translateY(16px);
+    opacity: 0;
+  }
+  to {
+    transform: none;
+    opacity: 1;
+  }
+}
+
+/*
+ * A phone on its side (short and wide). A bottom sheet would leave a sliver of map, so the one
+ * open instrument becomes a left-hand column under the bar instead, the dock stays along the
+ * bottom-right, and the map keeps the right ~55%.
+ */
+@media (max-height: 559px) and (orientation: landscape) and (min-width: 560px) {
+  .ds-lens,
+  .ds-results,
+  .ds-time-panel,
+  .ds-camera,
+  .ds-sheet {
+    top: calc(var(--ds-island-clearance, 72px) + var(--ds-space-2));
+    bottom: var(--ds-space-2);
+    left: calc(var(--ds-space-2) + env(safe-area-inset-left, 0px));
+    right: auto;
+    width: min(360px, 45vw);
+    max-height: none;
+    border-radius: var(--ds-radius-md);
+    transform: none;
+    animation-name: ds-compact-sheet-slide;
+  }
+
+  .ds-lens__hide svg {
+    transform: none;
+  }
+
+  .ds-results__hide svg {
+    transform: rotate(180deg);
+  }
+
+  .ds-atlas__dock {
+    left: auto;
+    right: calc(var(--ds-space-2) + env(safe-area-inset-right, 0px));
+    bottom: calc(var(--ds-space-2) + env(safe-area-inset-bottom, 0px));
+    width: auto;
+  }
+
+  .ds-atlas[data-sheet-open='true'] .ds-atlas__dock {
+    left: calc(min(360px, 45vw) + var(--ds-space-4));
+    right: auto;
+  }
+}
+
+@keyframes ds-compact-sheet-slide {
+  from {
+    transform: translateX(-16px);
+    opacity: 0;
+  }
+  to {
+    transform: none;
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ds-lens,
+  .ds-results,
+  .ds-time-panel,
+  .ds-camera,
+  .ds-sheet {
+    animation: none !important;
+  }
+}
+
+/*
+ * Tablet widths (820–1149px): the time panel spans nearly the whole bottom edge, so the dock and the
+ * camera readout used to sit on top of its histogram. They ride above it instead whenever it is up.
+ */
+@media (min-width: 820px) and (max-width: 1149px) and (min-height: 560px) {
+  /* Right-aligned: the Filters panel runs down the left edge to the same height. */
+  .ds-atlas:has(> .ds-time-panel) .ds-atlas__dock {
+    left: auto;
+    right: var(--ds-space-4);
+    bottom: calc(var(--ds-space-4) + 139px + var(--ds-space-3));
+  }
+
+  .ds-atlas:has(> .ds-time-panel) .ds-atlas__readout {
+    bottom: calc(var(--ds-space-4) + 139px + var(--ds-space-3) + 56px);
+  }
+}
+
+/*
+ * Draggable sheets (use-compact-sheet-drag.ts), compact portrait only: a grab bar on top, the
+ * header is the handle, and a sheet dragged up opens to the full height under the bar.
+ */
+@media (max-width: 819px) and (min-height: 560px) {
+  .ds-lens,
+  .ds-results,
+  .ds-time-panel,
+  .ds-camera,
+  .ds-sheet {
+    padding-top: 14px;
+    transition: max-height var(--ds-duration-base) var(--ds-easing);
+  }
+
+  .ds-lens::before,
+  .ds-results::before,
+  .ds-time-panel::before,
+  .ds-camera::before,
+  .ds-sheet::before {
+    content: '';
+    position: absolute;
+    top: 6px;
+    left: 50%;
+    width: 36px;
+    height: 4px;
+    margin-left: -18px;
+    border-radius: var(--ds-radius-full);
+    background: var(--ds-border-strong);
+    pointer-events: none;
+  }
+
+  .ds-lens__head,
+  .ds-results__head,
+  .ds-time-panel__header,
+  .ds-camera__head,
+  .ds-sheet__top {
+    touch-action: none;
+    cursor: grab;
+  }
+
+  .ds-lens[data-detent='full'],
+  .ds-results[data-detent='full'],
+  .ds-time-panel[data-detent='full'],
+  .ds-camera[data-detent='full'],
+  .ds-sheet[data-detent='full'] {
+    max-height: calc(100dvh - var(--ds-atlas-top) - var(--ds-atlas-dock-clearance) - 32px);
+  }
 }

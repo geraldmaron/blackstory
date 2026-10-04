@@ -19,6 +19,7 @@ import React, { useEffect, useState, type CSSProperties } from 'react';
 import type { PinPhotoView } from '../../lib/map-experience/entity-photo-index';
 import { buildEntityMastImageCandidates } from '../entity/entity-mast-image-candidates';
 import { entityPrimaryImageAlt, primaryImageCreditCaption } from '../entity/record-mark';
+import { usePhotoFit } from '../entity/use-photo-fit';
 import './pin-photo-card.css';
 
 void React;
@@ -46,6 +47,9 @@ export function PinPhotoCard({
   useEffect(() => {
     setUrlIndex(0);
   }, [photo.url]);
+  const figureRef = React.useRef<HTMLElement>(null);
+  const imgRef = React.useRef<HTMLImageElement>(null);
+  const fit = usePhotoFit(figureRef, imgRef, `${urlIndex}:${photo.url}`);
 
   if (candidates.length === 0) {
     return null;
@@ -67,13 +71,23 @@ export function PinPhotoCard({
 
   return (
     <div className="ds-pin-photo-card" style={style} role="group" aria-label={entityName}>
-      <figure className="ds-entity-photo ds-pin-photo-card__figure" aria-describedby={creditId}>
+      <figure
+        ref={figureRef}
+        className="ds-entity-photo ds-pin-photo-card__figure ds-fit-photo"
+        data-fit={fit}
+        aria-describedby={creditId}
+      >
+        {fit === 'contain' ? (
+          // eslint-disable-next-line @next/next/no-img-element -- decorative fill of the same photo
+          <img className="ds-fit-photo__backdrop" src={src} alt="" aria-hidden="true" />
+        ) : null}
         {/* eslint-disable-next-line @next/next/no-img-element -- public CDN URL, anchored to a map pin */}
         <img
           key={src}
+          ref={imgRef}
           src={src}
           alt={alt}
-          className="ds-entity-photo__img ds-pin-photo-card__img"
+          className="ds-entity-photo__img ds-pin-photo-card__img ds-fit-photo__main"
           loading="lazy"
           decoding="async"
           onError={() => {

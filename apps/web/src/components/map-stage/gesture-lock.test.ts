@@ -104,12 +104,34 @@ test('a plate locked then unlocked then locked again ends locked', () => {
   for (const name of GESTURE_NAMES) assert.equal(target.state[name], false);
 });
 
-test('ambient on a coarse (touch) pointer is a full lock: a one-finger drag is the scroll gesture there', () => {
+test('ambient on touch without a cooperative handler is a full lock: one finger is the scroll gesture', () => {
   const target = createFakeTarget();
   lockGesturesAmbient(target, { pointerFine: false });
   for (const name of GESTURE_NAMES) {
     assert.equal(target.state[name], false, `${name} was left enabled on touch ambient`);
   }
+});
+
+test('ambient on touch with cooperative gestures: two-finger pan and pinch, one finger stays the page', () => {
+  const target = createFakeTarget();
+  const cooperative = {
+    on: false,
+    enable() {
+      this.on = true;
+    },
+    disable() {
+      this.on = false;
+    },
+  };
+  const withCoop = Object.assign(target, { cooperativeGestures: cooperative });
+  lockGesturesAmbient(withCoop, { pointerFine: false });
+  assert.equal(cooperative.on, true, 'two-finger mode is on');
+  assert.equal(target.state.dragPan, true, 'pan is handled, but only with two fingers');
+  assert.equal(target.state.touchZoomRotate, true, 'pinch zooms the map');
+  assert.equal(target.state.scrollZoom, false, 'the wheel still reaches the document');
+  assert.equal(target.state.doubleClickZoom, false);
+  applyGesturesForPosture(withCoop, 'live', { pointerFine: false });
+  assert.equal(cooperative.on, false, 'a full-screen map is greedy: one finger pans');
 });
 
 test('ambient on a precise pointer keeps the wheel off but hands drag, pinch, dblclick and keyboard back', () => {

@@ -1,8 +1,13 @@
+'use client';
+
 /**
- * Accessible external link that opens a place in the device maps app (Google Maps universal URL).
+ * Accessible external link that opens a place in the reader's own maps app: Google Maps by
+ * default (server-rendered), Apple Maps on iPhone, iPad and Mac (swapped in after mount so the
+ * server and client markup agree on first paint).
  */
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { cx } from '@repo/ui';
+import { appleMapsUrlFromGoogle, prefersAppleMaps } from '../../lib/geography/external-maps-url';
 
 void React;
 
@@ -19,6 +24,11 @@ export type MapsExternalLinkProps = {
    */
   readonly ariaLabel?: string;
   readonly children: React.ReactNode;
+  /**
+   * Swap a Google Maps link for Apple Maps on Apple devices (default true). `MapsHandoff`, which
+   * names each provider explicitly, turns this off.
+   */
+  readonly platformAware?: boolean;
 };
 
 export function MapsExternalLink({
@@ -28,11 +38,23 @@ export function MapsExternalLink({
   title,
   ariaLabel,
   children,
+  platformAware = true,
 }: MapsExternalLinkProps) {
+  const [resolvedHref, setResolvedHref] = useState(href);
+  useEffect(() => {
+    if (!platformAware || typeof navigator === 'undefined') {
+      setResolvedHref(href);
+      return;
+    }
+    const apple = prefersAppleMaps(navigator.userAgent, navigator.platform)
+      ? appleMapsUrlFromGoogle(href)
+      : undefined;
+    setResolvedHref(apple ?? href);
+  }, [href, platformAware]);
   return (
     <a
       className={cx('ds-maps-external-link', className)}
-      href={href}
+      href={resolvedHref}
       target="_blank"
       rel="noopener noreferrer"
       aria-label={ariaLabel ?? `Open ${placeLabel} in maps`}

@@ -122,6 +122,10 @@
 }
 
 /* The image carries the ratio, not the figure, so the row has an intrinsic height to measure. */
+.ds-sheet__photo-frame {
+  display: block;
+}
+
 .ds-sheet__photo {
   display: block;
   width: 100%;
@@ -502,7 +506,7 @@
   }
 }
 
-@media (max-width: 819px) {
+@media (max-width: 819px), (max-height: 559px) {
   .ds-sheet {
     top: auto;
     left: var(--ds-space-2);
@@ -512,7 +516,8 @@
     max-height: var(--ds-atlas-sheet-peek);
   }
 
-  .ds-sheet__mast {
+  /* The picture carries the ratio (as on wide screens), not the figure that also holds the credit. */
+  .ds-sheet__photo {
     aspect-ratio: 16 / 9;
   }
 }

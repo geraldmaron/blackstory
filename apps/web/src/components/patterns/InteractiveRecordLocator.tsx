@@ -12,6 +12,9 @@ import {
   locatorCanvasTransform,
   neighborhoodLocatorView,
   panLocatorView,
+  cooperativeHint,
+  cooperativeWheelVerdict,
+  twoFingerFrame,
   wheelFactorForDelta,
   zoomLocatorViewAt,
   type LocatorViewState,
@@ -52,7 +55,7 @@ function locatorAriaLabel(
       : neighborhood
         ? 'Neighborhood locator map.'
         : 'Locator map of the United States.';
-  return `${base} Drag to pan. Scroll or pinch to zoom. Plus and minus keys zoom. Escape resets the view.`;
+  return `${base} Drag with a mouse or two fingers to pan. Pinch or Control-scroll to zoom. Plus and minus keys zoom. Escape resets the view.`;
 }
 
 export function InteractiveRecordLocator({
@@ -108,16 +111,42 @@ export function InteractiveRecordLocator({
     setView((current) => zoomLocatorViewAt(current, factor, rect.width / 2, rect.height / 2));
   }, []);
 
-  const onWheel = useCallback((event: WheelEvent) => {
-    const root = rootRef.current;
-    if (!root) return;
-    event.preventDefault();
-    const rect = root.getBoundingClientRect();
-    const anchorX = event.clientX - rect.left;
-    const anchorY = event.clientY - rect.top;
-    const factor = wheelFactorForDelta(event.deltaY);
-    setView((current) => zoomLocatorViewAt(current, factor, anchorX, anchorY));
+  /** The cooperative-gesture hint ("Use two fingers…"), shown briefly when the reader uses the
+   * page's own gesture over the map. */
+  const [hint, setHint] = useState<string | null>(null);
+  const hintTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const showHint = useCallback((kind: 'touch' | 'wheel') => {
+    const isMac = typeof navigator !== 'undefined' && /Mac|iPhone|iPad/.test(navigator.platform);
+    setHint(cooperativeHint(kind, isMac));
+    if (hintTimer.current) clearTimeout(hintTimer.current);
+    hintTimer.current = setTimeout(() => setHint(null), 1600);
   }, []);
+  useEffect(
+    () => () => {
+      if (hintTimer.current) clearTimeout(hintTimer.current);
+    },
+    [],
+  );
+
+  const onWheel = useCallback(
+    (event: WheelEvent) => {
+      const root = rootRef.current;
+      if (!root) return;
+      // Embedded in a scrolling page: a plain wheel is the page's. Zoom only on Ctrl/⌘ + wheel,
+      // which is also how a trackpad pinch arrives.
+      if (cooperativeWheelVerdict(event) === 'page') {
+        showHint('wheel');
+        return;
+      }
+      event.preventDefault();
+      const rect = root.getBoundingClientRect();
+      const anchorX = event.clientX - rect.left;
+      const anchorY = event.clientY - rect.top;
+      const factor = wheelFactorForDelta(event.deltaY);
+      setView((current) => zoomLocatorViewAt(current, factor, anchorX, anchorY));
+    },
+    [showHint],
+  );
 
   useEffect(() => {
     const root = rootRef.current;
@@ -126,7 +155,73 @@ export function InteractiveRecordLocator({
     return () => root.removeEventListener('wheel', onWheel);
   }, [onWheel]);
 
+  /**
+   * Touch, cooperatively: one finger scrolls the page (and earns the hint), two fingers pan by
+   * their centroid and pinch-zoom by their spread. Native, non-passive listeners because only a
+   * non-passive `touchmove` can stop the page scrolling under a two-finger gesture.
+   */
+  useEffect(() => {
+    const root = rootRef.current;
+    if (!root) return;
+    let last: ReturnType<typeof twoFingerFrame> | null = null;
+    let singleStart: { x: number; y: number } | null = null;
+    const point = (touch: Touch) => {
+      const rect = root.getBoundingClientRect();
+      return { x: touch.clientX - rect.left, y: touch.clientY - rect.top };
+    };
+    const onTouchStart = (event: TouchEvent) => {
+      if (event.touches.length >= 2) {
+        last = twoFingerFrame(point(event.touches[0]!), point(event.touches[1]!));
+        singleStart = null;
+        setDragging(true);
+      } else if (event.touches.length === 1) {
+        singleStart = { x: event.touches[0]!.clientX, y: event.touches[0]!.clientY };
+      }
+    };
+    const onTouchMove = (event: TouchEvent) => {
+      if (event.touches.length >= 2 && last) {
+        event.preventDefault();
+        const next = twoFingerFrame(point(event.touches[0]!), point(event.touches[1]!));
+        const prev = last;
+        last = next;
+        setView((current) => {
+          const panned = panLocatorView(current, next.cx - prev.cx, next.cy - prev.cy);
+          return prev.spread > 0
+            ? zoomLocatorViewAt(panned, next.spread / prev.spread, next.cx, next.cy)
+            : panned;
+        });
+        return;
+      }
+      if (event.touches.length === 1 && singleStart) {
+        const touch = event.touches[0]!;
+        if (Math.hypot(touch.clientX - singleStart.x, touch.clientY - singleStart.y) > 12) {
+          showHint('touch');
+          singleStart = null;
+        }
+      }
+    };
+    const onTouchEnd = (event: TouchEvent) => {
+      if (event.touches.length < 2) {
+        last = null;
+        setDragging(false);
+      }
+    };
+    root.addEventListener('touchstart', onTouchStart, { passive: true });
+    root.addEventListener('touchmove', onTouchMove, { passive: false });
+    root.addEventListener('touchend', onTouchEnd);
+    root.addEventListener('touchcancel', onTouchEnd);
+    return () => {
+      root.removeEventListener('touchstart', onTouchStart);
+      root.removeEventListener('touchmove', onTouchMove);
+      root.removeEventListener('touchend', onTouchEnd);
+      root.removeEventListener('touchcancel', onTouchEnd);
+    };
+  }, [showHint]);
+
   const onPointerDown = useCallback((event: React.PointerEvent<HTMLDivElement>) => {
+    // Touch is handled cooperatively above; a captured one-finger drag here would trap the
+    // page's scroll under the map.
+    if (event.pointerType === 'touch') return;
     if (event.button !== 0) return;
     const target = event.target as HTMLElement;
     if (target.closest('a, button')) return;
@@ -259,6 +354,9 @@ export function InteractiveRecordLocator({
           <span className="ds-locator__pin" style={pinStyle} />
         )}
       </div>
+      <p className="ds-locator__hint" data-visible={hint ? 'true' : 'false'} aria-hidden="true">
+        {hint}
+      </p>
       <div className="ds-locator__chrome">
         {/* One map handoff only: the pin carries the atlas link when present. A second
             "See in Explore" chrome link was the surplus affordance the audit named. */}
