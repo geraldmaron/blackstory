@@ -13,7 +13,6 @@ import { EntityRecordMark } from './EntityRecordMark';
 import { usePhotoFit } from './use-photo-fit';
 import {
   entityPrimaryImageAlt,
-  isPortraitPrimaryImage,
   primaryImageCreditCaption,
   primaryImageFocalClass,
   primaryImageSourceLine,
@@ -130,11 +129,9 @@ export function EntityMastMedia({
     figureRef,
     imgRef,
     phase.kind === 'photo' ? phase.urls[phase.urlIndex] : null,
-    primaryImage?.width && primaryImage?.height
-      ? isPortraitPrimaryImage(primaryImage.width, primaryImage.height)
-        ? 'contain'
-        : 'cover'
-      : 'contain',
+    // No box is measured before hydration, and no photo shape is safe to cover-crop in both the
+    // phone's 4:3 window and the 2.8:1 banner, so first paint is always whole.
+    'contain',
     { width: primaryImage?.width, height: primaryImage?.height },
   );
   const contained = fit === 'contain';

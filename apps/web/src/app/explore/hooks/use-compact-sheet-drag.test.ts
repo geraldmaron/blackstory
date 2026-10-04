@@ -1,6 +1,10 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { sheetDragOffset, sheetDragOutcome } from './use-compact-sheet-drag';
+import {
+  SHEET_DRAG_MEDIA_QUERY,
+  sheetDragOffset,
+  sheetDragOutcome,
+} from './use-compact-sheet-drag';
 
 test('a peek sheet: drag down dismisses, drag up opens full, a nudge snaps back', () => {
   assert.equal(sheetDragOutcome('peek', 120, 0.2), 'dismiss');
@@ -23,4 +27,8 @@ test('dragging up past the top rubber-bands instead of tracking the finger', () 
   assert.equal(sheetDragOffset(40), 40);
   assert.ok(sheetDragOffset(-400) >= -60);
   assert.ok(sheetDragOffset(-25) < 0);
+});
+
+test('sheets arm only where the stylesheet draws the grab bar and full detent', () => {
+  assert.equal(SHEET_DRAG_MEDIA_QUERY, '(max-width: 819px) and (min-height: 560px)');
 });

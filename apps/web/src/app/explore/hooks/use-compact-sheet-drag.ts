@@ -1,5 +1,4 @@
 import { useEffect, useRef, type RefObject } from 'react';
-import { COMPACT_MEDIA_QUERY } from '../../../lib/layout/compact-viewport';
 
 /** Which sheet a drag handle belongs to. `record` is the record sheet; the rest are dock panels. */
 export type CompactSheetKey = 'lens' | 'results' | 'decade' | 'camera' | 'record';
@@ -16,6 +15,14 @@ const HANDLES: readonly {
   { handle: '.ds-camera__head', sheet: '.ds-camera', key: 'camera' },
   { handle: '.ds-sheet__top', sheet: '.ds-sheet', key: 'record' },
 ];
+
+/**
+ * Where sheets are draggable. Matches the atlas.css block that draws the grab bar, sets
+ * `touch-action: none` on the handles and sizes the full detent — arming the drag anywhere else
+ * would track the finger without those rules. Short screens (landscape phones) dock the sheet as
+ * a left column, where a vertical drag means nothing.
+ */
+export const SHEET_DRAG_MEDIA_QUERY = '(max-width: 819px) and (min-height: 560px)';
 
 /** Past this, a downward drag dismisses (or drops a full sheet back to its peek). */
 export const SHEET_DISMISS_PX = 80;
@@ -46,13 +53,10 @@ export function sheetDragOffset(dy: number): number {
 }
 
 /**
- * Draggable bottom sheets on compact portrait screens — the Google/Apple Maps sheet: a grab bar
+ * Draggable bottom sheets on phone-shaped screens — the Google/Apple Maps sheet: a grab bar
  * on top, drag down to fold it into the dock, drag up to open it to full height, flick for
  * either. Delegated from the Atlas root, so the five sheet components need no wiring of their
  * own; buttons and fields inside a header still behave as buttons and fields.
- *
- * Landscape phones dock the sheet as a left column (atlas.css), where a vertical drag would mean
- * nothing, so the hook stands down there.
  */
 export function useCompactSheetDrag(
   rootRef: RefObject<HTMLElement | null>,
@@ -64,8 +68,7 @@ export function useCompactSheetDrag(
   useEffect(() => {
     const root = rootRef.current;
     if (!root || typeof window === 'undefined' || typeof window.matchMedia !== 'function') return;
-    const compact = window.matchMedia(COMPACT_MEDIA_QUERY);
-    const landscape = window.matchMedia('(orientation: landscape)');
+    const draggable = window.matchMedia(SHEET_DRAG_MEDIA_QUERY);
     const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
 
     let drag: {
@@ -80,7 +83,7 @@ export function useCompactSheetDrag(
     } | null = null;
 
     const onPointerDown = (event: PointerEvent) => {
-      if (!compact.matches || landscape.matches) return;
+      if (!draggable.matches) return;
       if (event.pointerType === 'mouse' && event.button !== 0) return;
       const target = event.target as HTMLElement | null;
       if (!target || target.closest('button, a, input, select, textarea, [role="slider"]')) return;
@@ -124,10 +127,15 @@ export function useCompactSheetDrag(
       // touch release at (0, 0), which read as a huge upward drag.
       const outcome =
         event.type === 'pointercancel' ? detent : sheetDragOutcome(detent, lastY - startY, speed);
+      // Animate the snap back alongside the stylesheet's own max-height ease (the full detent),
+      // then hand `transition` back to the stylesheet.
       sheet.style.transition = reducedMotion.matches
         ? 'none'
-        : 'transform 220ms cubic-bezier(0.16, 1, 0.3, 1)';
+        : 'transform 220ms cubic-bezier(0.16, 1, 0.3, 1), max-height var(--ds-duration-base) var(--ds-easing)';
       sheet.style.transform = '';
+      window.setTimeout(() => {
+        if (drag?.sheet !== sheet) sheet.style.transition = '';
+      }, 400);
       if (outcome === 'dismiss') {
         delete sheet.dataset.detent;
         onDismissRef.current(key);

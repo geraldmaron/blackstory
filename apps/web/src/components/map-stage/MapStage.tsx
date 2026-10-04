@@ -1391,7 +1391,10 @@ export function MapStageProvider({
       clearSearchCenterMarker();
       try {
         const element = buildExploreSearchCenterMarkerElement(marker.label, marker.variant);
-        searchCenterMarkerRef.current = new maplibregl.Marker({ element, anchor: 'bottom' })
+        // The you-are-here dot is centred on the fix (as the accuracy circle is); a place pin
+        // stands on its point.
+        const anchor = marker.variant === 'user' ? 'center' : 'bottom';
+        searchCenterMarkerRef.current = new maplibregl.Marker({ element, anchor })
           .setLngLat([marker.lng, marker.lat])
           .addTo(map);
       } catch (error) {

@@ -484,22 +484,16 @@ export function AtlasExperience({ initial, embedded = false }: AtlasExperiencePr
   sortedRef.current = sorted;
   const distancesRef = useRef(distances);
   distancesRef.current = distances;
-  // Held in refs so the effect below runs when the located place changes and only then — not
-  // when the stage handle re-memoizes or the toast API identity changes.
-  const stageRef = useRef(stage);
-  stageRef.current = stage;
+  // Held in refs so the camera/summary effect below runs when the located place changes and only
+  // then — not when the camera handle re-memoizes or the toast API identity changes.
   const cameraRef = useRef(camera);
   cameraRef.current = camera;
   const toastsRef = useRef(toasts);
   toastsRef.current = toasts;
+  // The marker and circles belong to the stage they are drawn on: redraw them whenever the
+  // located place or the stage handle changes, and clear them from the old one.
   useEffect(() => {
-    const stage = stageRef.current;
-    const camera = cameraRef.current;
-    if (!nearby) {
-      stage.clearSearchCenterMarker();
-      stage.setSearchArea(null);
-      return;
-    }
+    if (!nearby) return;
     const { lat, lng } = nearby.center;
     stage.setSearchCenterMarker({
       lat,
@@ -513,10 +507,22 @@ export function AtlasExperience({ initial, embedded = false }: AtlasExperiencePr
       radiusMeters: nearby.radiusMeters,
       accuracyMeters: nearby.accuracyMeters ?? null,
     });
-    camera.frameArea(nearbyFrame(nearby, filteredRef.current), { trigger: 'reader' });
+    return () => {
+      stage.clearSearchCenterMarker();
+      stage.setSearchArea(null);
+    };
+  }, [nearby, stage]);
+  // The camera move and the summary happen once per located place.
+  useEffect(() => {
+    if (!nearby) return;
+    cameraRef.current.frameArea(nearbyFrame(nearby, filteredRef.current), { trigger: 'reader' });
+    // Nearest among the records the reader can actually see (the lens-filtered rail), so the
+    // count and the distance in one sentence describe the same set.
+    const distances = distancesRef.current;
     let nearest: number | undefined;
-    for (const value of distancesRef.current?.values() ?? []) {
-      if (nearest === undefined || value < nearest) nearest = value;
+    for (const feature of sortedRef.current) {
+      const value = distances?.get(feature.properties.entityId);
+      if (value !== undefined && (nearest === undefined || value < nearest)) nearest = value;
     }
     toastsRef.current.show({
       id: 'nearby-summary',
@@ -524,13 +530,6 @@ export function AtlasExperience({ initial, embedded = false }: AtlasExperiencePr
       message: nearbySummary(nearby, sortedRef.current.length, nearest),
     });
   }, [nearby]);
-  useEffect(
-    () => () => {
-      stage.clearSearchCenterMarker();
-      stage.setSearchArea(null);
-    },
-    [stage],
-  );
 
   const distanceLabels = useMemo(() => {
     if (!nearby || !distances) return null;
