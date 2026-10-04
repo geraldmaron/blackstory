@@ -259,6 +259,7 @@ export function AtlasExperience({ initial, embedded = false }: AtlasExperiencePr
     setNearby,
     distances,
     filtered,
+    nearestMeters,
     sorted,
     kindCounts,
     topicCounts,
@@ -482,8 +483,8 @@ export function AtlasExperience({ initial, embedded = false }: AtlasExperiencePr
   filteredRef.current = filtered;
   const sortedRef = useRef(sorted);
   sortedRef.current = sorted;
-  const distancesRef = useRef(distances);
-  distancesRef.current = distances;
+  const nearestMetersRef = useRef(nearestMeters);
+  nearestMetersRef.current = nearestMeters;
   // Held in refs so the camera/summary effect below runs when the located place changes and only
   // then — not when the camera handle re-memoizes or the toast API identity changes.
   const cameraRef = useRef(camera);
@@ -516,18 +517,12 @@ export function AtlasExperience({ initial, embedded = false }: AtlasExperiencePr
   useEffect(() => {
     if (!nearby) return;
     cameraRef.current.frameArea(nearbyFrame(nearby, filteredRef.current), { trigger: 'reader' });
-    // Nearest among the records the reader can actually see (the lens-filtered rail), so the
-    // count and the distance in one sentence describe the same set.
-    const distances = distancesRef.current;
-    let nearest: number | undefined;
-    for (const feature of sortedRef.current) {
-      const value = distances?.get(feature.properties.entityId);
-      if (value !== undefined && (nearest === undefined || value < nearest)) nearest = value;
-    }
     toastsRef.current.show({
       id: 'nearby-summary',
       // `sorted`: the same count the Records rail shows (it drops internal placeholder records).
-      message: nearbySummary(nearby, sortedRef.current.length, nearest),
+      // Nearest among the records the lens shows (radius aside), so a radius that matches nothing
+      // can still name the closest one outside it.
+      message: nearbySummary(nearby, sortedRef.current.length, nearestMetersRef.current),
     });
   }, [nearby]);
 

@@ -29,6 +29,7 @@ import { decadeStartYear, eraBucketFor, eraFor } from './atlas-feature-helpers';
 import { isInternalRecordLabel } from '../../../lib/place/public-place-path';
 import {
   applyNearbyRadius,
+  nearestDistance,
   nearbyConstraintLabel,
   nearbyDistances,
   sortByDistance,
@@ -111,7 +112,8 @@ export function useLensFilters(view: ExploreViewModel, toasts: UseToasts) {
     [nearby, view.allFeatures],
   );
 
-  const filtered = useMemo(() => {
+  /** Every lens constraint except the nearby radius: what the reader would see without it. */
+  const lensFiltered = useMemo(() => {
     let features = view.allFeatures;
     if (stateCode) {
       features = features.filter((feature) => feature.properties.statePostalCode === stateCode);
@@ -135,13 +137,8 @@ export function useLensFilters(view: ExploreViewModel, toasts: UseToasts) {
         return earliest !== null && earliest <= sweepDecade;
       });
     }
-    if (nearby && distances) {
-      features = applyNearbyRadius(features, nearby, distances);
-    }
     return applyEvidenceFloor(features, evidenceFloor);
   }, [
-    nearby,
-    distances,
     decade,
     evidenceFloor,
     kindFamily,
@@ -151,6 +148,18 @@ export function useLensFilters(view: ExploreViewModel, toasts: UseToasts) {
     topicId,
     view.allFeatures,
   ]);
+
+  const filtered = useMemo(
+    () => (nearby && distances ? applyNearbyRadius(lensFiltered, nearby, distances) : lensFiltered),
+    [distances, lensFiltered, nearby],
+  );
+
+  /** Distance to the closest record the lens shows, inside the radius or not — so "nothing within
+   * 5 miles" can still say where the nearest one is. */
+  const nearestMeters = useMemo(
+    () => (distances ? nearestDistance(lensFiltered, distances) : undefined),
+    [distances, lensFiltered],
+  );
 
   const topicCounts = useMemo<readonly TopicCount[]>(
     () => buildTopicCounts(view.allFeatures),
@@ -353,6 +362,7 @@ export function useLensFilters(view: ExploreViewModel, toasts: UseToasts) {
     setNearby,
     distances,
     filtered,
+    nearestMeters,
     sorted,
     kindCounts,
     topicCounts,

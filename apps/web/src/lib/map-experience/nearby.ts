@@ -76,6 +76,19 @@ export function applyNearbyRadius(
   });
 }
 
+/** The smallest distance among `features`, or `undefined` when none has one. */
+export function nearestDistance(
+  features: readonly ExploreMapFeature[],
+  distances: ReadonlyMap<string, number>,
+): number | undefined {
+  let nearest: number | undefined;
+  for (const feature of features) {
+    const value = distances.get(feature.properties.entityId);
+    if (value !== undefined && (nearest === undefined || value < nearest)) nearest = value;
+  }
+  return nearest;
+}
+
 /** Nearest first; features with no point sort last, in their existing order. */
 export function sortByDistance(
   features: readonly ExploreMapFeature[],

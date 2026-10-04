@@ -9,6 +9,7 @@ import {
   nearbyDistances,
   nearbyFrame,
   nearbySummary,
+  nearestDistance,
   sortByDistance,
   type NearbyArea,
 } from './nearby';
@@ -112,4 +113,12 @@ test('labels read like a person wrote them', () => {
   assert.match(nearbySummary(device(null), 4, 200_000), /nearest record is 124 mi away/);
   assert.match(nearbySummary(device(null), 4, 3_000), /nearest record is 1\.9 mi away/);
   assert.equal(nearbySummary(device(8047, '5 miles'), 2, 650), '2 records within 5 miles of you.');
+});
+
+test('nearest distance reads only the given features', () => {
+  const distances = nearbyDistances(features, downtown);
+  const far = features.filter((f) => ['macon', 'dc'].includes(f.properties.entityId));
+  const nearest = nearestDistance(far, distances) ?? 0;
+  assert.ok(nearest > 100_000 && nearest < 140_000, `macon ~75mi, got ${nearest}`);
+  assert.equal(nearestDistance([], distances), undefined);
 });
