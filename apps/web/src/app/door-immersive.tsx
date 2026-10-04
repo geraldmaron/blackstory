@@ -357,6 +357,9 @@ export function DoorImmersive({
   /** Where the journey was scrolled when the reader went into browse, and whether we pushed. */
   const journeyScrollRef = useRef(0);
   const enteredByPushRef = useRef(false);
+  /** Bumped on every enter/leave, so a scroll restore still waiting from an earlier exit stands
+   * down instead of scrolling a page the reader has since moved on from. */
+  const browseGenerationRef = useRef(0);
 
   /**
    * Leaves browse. `traversed`: the browser already stepped back over the pushed `/explore` entry
@@ -408,8 +411,10 @@ export function DoorImmersive({
       // still collapsed under browse for a few frames (and a history traversal can reset scroll),
       // so wait until the page is tall enough to hold the old position before scrolling to it.
       const target = journeyScrollRef.current;
+      const generation = ++browseGenerationRef.current;
       const startedAt = performance.now();
       const restore = () => {
+        if (generation !== browseGenerationRef.current) return;
         const tallEnough = document.documentElement.scrollHeight - window.innerHeight >= target - 1;
         if (tallEnough || performance.now() - startedAt > 1500) {
           window.scrollTo({ top: target, behavior: 'auto' });
@@ -443,9 +448,11 @@ export function DoorImmersive({
   const startBrowse = useCallback(
     (push: boolean) => {
       if (browseModeRef.current) return;
+      browseGenerationRef.current += 1;
       // Captured first: entering browse announces itself, and listeners of that announcement put
-      // the document back at the top synchronously.
-      journeyScrollRef.current = window.scrollY;
+      // the document back at the top synchronously. On a browser Forward the journey may still
+      // be collapsed (scrollY 0) from the traversal; keep the chapter we already know then.
+      if (push || window.scrollY > 0) journeyScrollRef.current = window.scrollY;
       browseModeRef.current = true;
       setBrowseMode(true);
       stopSweep();
