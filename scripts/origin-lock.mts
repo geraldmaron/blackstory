@@ -18,7 +18,7 @@
  *
  * Secrets come from 1Password (`OP_ITEM`, fields `password` = current and `previous`), or from
  * ORIGIN_AUTH_SECRET / ORIGIN_AUTH_SECRET_PREVIOUS. They are never printed; output shows a
- * sha256 fingerprint instead. The Cloudflare token needs Zone WAF: Edit (bot rules), Transform
+ * slow (scrypt) fingerprint instead. The Cloudflare token needs Zone WAF: Edit (bot rules), Transform
  * Rules: Edit, on this zone only; the Vercel half uses the logged-in `vercel` CLI.
  *
  *   node --conditions development --import tsx scripts/origin-lock.mts               # dry run
@@ -35,7 +35,7 @@
  * `previous` and apply again.
  */
 import { execFileSync } from 'node:child_process';
-import { createHash } from 'node:crypto';
+import { scryptSync } from 'node:crypto';
 import { request as httpsRequest } from 'node:https';
 import type { LookupFunction } from 'node:net';
 
@@ -72,8 +72,22 @@ export type VercelRule = {
   readonly action: { readonly mitigate: { readonly action: Mode } };
 };
 
-const fingerprint = (secret: string): string =>
-  createHash('sha256').update(secret).digest('hex').slice(0, 8);
+/**
+ * A short, stable label for a secret, so the plan can show which value sits at each edge without
+ * printing it. scrypt rather than a fast hash: a printed prefix of a fast digest is cheap to
+ * brute-force against a guessed token. The fixed salt keeps labels comparable across runs.
+ */
+const fingerprints = new Map<string, string>();
+const fingerprint = (secret: string): string => {
+  let label = fingerprints.get(secret);
+  if (label === undefined) {
+    label = scryptSync(secret, 'blackstory-origin-lock-fingerprint', 16)
+      .toString('hex')
+      .slice(0, 8);
+    fingerprints.set(secret, label);
+  }
+  return label;
+};
 
 /** Every secret this run has read, so no error message can carry one out. */
 const knownSecrets = new Set<string>();
