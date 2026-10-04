@@ -157,7 +157,16 @@ export function useLensFilters(view: ExploreViewModel, toasts: UseToasts) {
   /** Distance to the closest record the lens shows, inside the radius or not — so "nothing within
    * 5 miles" can still say where the nearest one is. */
   const nearestMeters = useMemo(
-    () => (distances ? nearestDistance(lensFiltered, distances) : undefined),
+    () =>
+      distances
+        ? nearestDistance(
+            // The rail's own rows: internal placeholder records never show, so never count.
+            lensFiltered.filter(
+              (feature) => !isInternalRecordLabel(feature.properties.displayName),
+            ),
+            distances,
+          )
+        : undefined,
     [distances, lensFiltered],
   );
 
