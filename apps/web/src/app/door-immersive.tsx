@@ -357,94 +357,131 @@ export function DoorImmersive({
   /** Where the journey was scrolled when the reader went into browse, and whether we pushed. */
   const journeyScrollRef = useRef(0);
   const enteredByPushRef = useRef(false);
+  /** Bumped on every enter/leave, so a scroll restore still waiting from an earlier exit stands
+   * down instead of scrolling a page the reader has since moved on from. */
+  const browseGenerationRef = useRef(0);
 
-  const exitBrowse = useCallback(() => {
-    if (!browseModeRef.current) {
-      // Still sync URL if a cold explore left the address bar armed.
-      if (pathname.startsWith('/explore') || window.location.pathname.startsWith('/explore')) {
-        router.replace('/');
-      }
-      return;
-    }
-    if (browseMorphTimerRef.current !== null) {
-      window.clearTimeout(browseMorphTimerRef.current);
-      browseMorphTimerRef.current = null;
-    }
-    setBrowseMounted(false);
-    setBrowseMode(false);
-    browseModeRef.current = false;
-    stage.setDoorBrowseLive(false);
-    announceMapBrowseExited();
-    /*
-     * Morph enter uses history.pushState so the Door tree stays mounted; Next's pathname can
-     * still be `/` while the address bar reads `/explore`. Cold `/explore` is a real route.
-     * Exit must restore the journey URL and, when Next owns the explore page, leave that route.
-     */
-    const pushedState = (window.history.state as { doorBrowse?: number } | null)?.doorBrowse === 1;
-    const steppingBack = enteredByPushRef.current && pushedState;
-    if (steppingBack) {
-      // Entering pushed `/explore` over the journey's own `/` entry; leaving steps back over it
-      // rather than stacking a second `/` on top (which made the browser's Back a no-op).
-      window.history.back();
-    } else if (pathname.startsWith('/explore') || window.location.pathname.startsWith('/explore')) {
-      // Cold `/explore` is a real route Next owns.
-      router.replace('/', { scroll: false });
-    } else if (pushedState) {
-      window.history.replaceState(null, '', '/');
-    }
-    enteredByPushRef.current = false;
-    // Back to the chapter the reader left from, not the top of the journey. The journey is
-    // still collapsed under browse for a few frames (and a history traversal can reset scroll),
-    // so wait until the page is tall enough to hold the old position before scrolling to it.
-    const target = journeyScrollRef.current;
-    const startedAt = performance.now();
-    const restore = () => {
-      const tallEnough = document.documentElement.scrollHeight - window.innerHeight >= target - 1;
-      if (tallEnough || performance.now() - startedAt > 1500) {
-        window.scrollTo({ top: target, behavior: 'auto' });
+  /**
+   * Leaves browse. `traversed`: the browser already stepped back over the pushed `/explore` entry
+   * (its own Back or a swipe), so the URL is right and only the scroll is left to restore.
+   */
+  const leaveBrowse = useCallback(
+    (traversed: boolean) => {
+      if (!browseModeRef.current) {
+        // Still sync URL if a cold explore left the address bar armed.
+        if (pathname.startsWith('/explore') || window.location.pathname.startsWith('/explore')) {
+          router.replace('/');
+        }
         return;
       }
-      window.requestAnimationFrame(restore);
-    };
-    const scheduleRestore = () =>
-      window.setTimeout(() => window.requestAnimationFrame(restore), 60);
-    if (steppingBack) {
-      // The traversal applies the browser's own scroll restoration when it lands, after this
-      // handler; restore once it has, or the journey snaps to the top.
-      window.addEventListener('popstate', () => window.setTimeout(scheduleRestore, 120), {
-        once: true,
-      });
-    } else {
-      scheduleRestore();
-    }
-  }, [pathname, router, stage]);
+      if (browseMorphTimerRef.current !== null) {
+        window.clearTimeout(browseMorphTimerRef.current);
+        browseMorphTimerRef.current = null;
+      }
+      setBrowseMounted(false);
+      setBrowseMode(false);
+      browseModeRef.current = false;
+      stage.setDoorBrowseLive(false);
+      announceMapBrowseExited();
+      /*
+       * Morph enter uses history.pushState so the Door tree stays mounted; Next's pathname can
+       * still be `/` while the address bar reads `/explore`. Cold `/explore` is a real route.
+       * Exit must restore the journey URL and, when Next owns the explore page, leave that route.
+       */
+      const pushedState =
+        (window.history.state as { doorBrowse?: number } | null)?.doorBrowse === 1;
+      const steppingBack = !traversed && enteredByPushRef.current && pushedState;
+      if (traversed) {
+        // Nothing to do to the URL: the traversal already put the journey's `/` back.
+      } else if (steppingBack) {
+        // Entering pushed `/explore` over the journey's own `/` entry; leaving steps back over it
+        // rather than stacking a second `/` on top (which made the browser's Back a no-op).
+        window.history.back();
+      } else if (
+        pathname.startsWith('/explore') ||
+        window.location.pathname.startsWith('/explore')
+      ) {
+        // Cold `/explore` is a real route Next owns.
+        router.replace('/', { scroll: false });
+      } else if (pushedState) {
+        window.history.replaceState(null, '', '/');
+      }
+      enteredByPushRef.current = false;
+      // Back to the chapter the reader left from, not the top of the journey. The journey is
+      // still collapsed under browse for a few frames (and a history traversal can reset scroll),
+      // so wait until the page is tall enough to hold the old position before scrolling to it.
+      const target = journeyScrollRef.current;
+      const generation = ++browseGenerationRef.current;
+      const startedAt = performance.now();
+      const restore = () => {
+        if (generation !== browseGenerationRef.current) return;
+        const tallEnough = document.documentElement.scrollHeight - window.innerHeight >= target - 1;
+        if (tallEnough || performance.now() - startedAt > 1500) {
+          window.scrollTo({ top: target, behavior: 'auto' });
+          return;
+        }
+        window.requestAnimationFrame(restore);
+      };
+      const scheduleRestore = () =>
+        window.setTimeout(() => window.requestAnimationFrame(restore), 60);
+      if (steppingBack) {
+        // The traversal applies the browser's own scroll restoration when it lands, after this
+        // handler; restore once it has, or the journey snaps to the top.
+        window.addEventListener('popstate', () => window.setTimeout(scheduleRestore, 120), {
+          once: true,
+        });
+      } else if (traversed) {
+        // Called from that same popstate: the browser's restoration lands just after it.
+        window.setTimeout(scheduleRestore, 120);
+      } else {
+        scheduleRestore();
+      }
+    },
+    [pathname, router, stage],
+  );
+  const exitBrowse = useCallback(() => leaveBrowse(false), [leaveBrowse]);
 
-  const enterBrowse = useCallback(() => {
-    if (browseModeRef.current) return;
-    // Captured first: entering browse announces itself, and listeners of that announcement put
-    // the document back at the top synchronously.
-    journeyScrollRef.current = window.scrollY;
-    browseModeRef.current = true;
-    setBrowseMode(true);
-    stopSweep();
-    stage.setDoorBrowseLive(true);
-    announceMapBrowseEntered();
-    enteredByPushRef.current = true;
-    window.history.pushState({ doorBrowse: 1 }, '', '/explore');
-    const delay = prefersReducedMotion() ? 0 : DOOR_BROWSE_MORPH_MS;
-    if (browseMorphTimerRef.current !== null) {
-      window.clearTimeout(browseMorphTimerRef.current);
-    }
-    browseMorphTimerRef.current = window.setTimeout(() => {
-      browseMorphTimerRef.current = null;
-      setBrowseMounted(true);
-    }, delay);
-  }, [stage, stopSweep]);
+  /**
+   * Enters browse. `push`: add the `/explore` history entry. A browser Forward onto that entry
+   * already shows `/explore`, so it re-enters without pushing another.
+   */
+  const startBrowse = useCallback(
+    (push: boolean) => {
+      if (browseModeRef.current) return;
+      browseGenerationRef.current += 1;
+      // Captured first: entering browse announces itself, and listeners of that announcement put
+      // the document back at the top synchronously. On a browser Forward the journey may still
+      // be collapsed (scrollY 0) from the traversal; keep the chapter we already know then.
+      if (push || window.scrollY > 0) journeyScrollRef.current = window.scrollY;
+      browseModeRef.current = true;
+      setBrowseMode(true);
+      stopSweep();
+      stage.setDoorBrowseLive(true);
+      announceMapBrowseEntered();
+      // Either way the journey's `/` entry sits directly behind this one, so leaving steps back.
+      enteredByPushRef.current = true;
+      if (push) window.history.pushState({ doorBrowse: 1 }, '', '/explore');
+      const delay = prefersReducedMotion() ? 0 : DOOR_BROWSE_MORPH_MS;
+      if (browseMorphTimerRef.current !== null) {
+        window.clearTimeout(browseMorphTimerRef.current);
+      }
+      browseMorphTimerRef.current = window.setTimeout(() => {
+        browseMorphTimerRef.current = null;
+        setBrowseMounted(true);
+      }, delay);
+    },
+    [stage, stopSweep],
+  );
+  const enterBrowse = useCallback(() => startBrowse(true), [startBrowse]);
 
   const enterBrowseRef = useRef(enterBrowse);
   const exitBrowseRef = useRef(exitBrowse);
+  const leaveBrowseRef = useRef(leaveBrowse);
+  const startBrowseRef = useRef(startBrowse);
   enterBrowseRef.current = enterBrowse;
   exitBrowseRef.current = exitBrowse;
+  leaveBrowseRef.current = leaveBrowse;
+  startBrowseRef.current = startBrowse;
 
   /*
    * Listeners must not rebind when enter/exit identities change. The previous effect listed those
@@ -455,11 +492,17 @@ export function DoorImmersive({
   useEffect(() => {
     const onEnter = () => enterBrowseRef.current();
     const onExit = () => exitBrowseRef.current();
-    const onPop = () => {
-      if (browseModeRef.current) {
-        // The browser already stepped back over our `/explore` entry; do not step again.
-        enteredByPushRef.current = false;
-        exitBrowseRef.current();
+    const onPop = (event: PopStateEvent) => {
+      const onBrowseEntry =
+        (event.state as { doorBrowse?: number } | null)?.doorBrowse === 1 &&
+        window.location.pathname.startsWith('/explore');
+      if (browseModeRef.current && !onBrowseEntry) {
+        // Back (or swipe-back) already stepped over our `/explore` entry; do not step again, but
+        // still wait for the browser's scroll restoration before returning to the chapter.
+        leaveBrowseRef.current(true);
+      } else if (!browseModeRef.current && onBrowseEntry) {
+        // Forward onto the `/explore` entry: show the map the address bar now names.
+        startBrowseRef.current(false);
       }
     };
     window.addEventListener(MAP_BROWSE_ENTER_EVENT, onEnter);

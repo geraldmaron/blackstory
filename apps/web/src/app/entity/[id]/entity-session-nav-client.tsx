@@ -28,6 +28,11 @@ import {
   writeEntitySessionRandomEnabled,
   writeEntitySessionStack,
 } from '../../../lib/map-experience/entity-session-storage';
+import {
+  appendNextHop,
+  nextHopInto,
+  type NextHop,
+} from '../../../lib/map-experience/next-hop-chain';
 
 export type EntitySessionNavClientProps = {
   readonly currentId: string;
@@ -40,20 +45,27 @@ export type EntitySessionNavClientProps = {
 
 const ARRIVED_VIA_NEXT_KEY = 'ds-entity-session-arrived-via-next';
 
-function arrivedViaNextFrom(currentId: string): string | null {
+function readNextChain(): NextHop[] {
   try {
     const raw = window.sessionStorage.getItem(ARRIVED_VIA_NEXT_KEY);
-    if (!raw) return null;
-    const parsed = JSON.parse(raw) as { from?: string; to?: string };
-    return parsed.to === currentId && typeof parsed.from === 'string' ? parsed.from : null;
+    if (!raw) return [];
+    const parsed: unknown = JSON.parse(raw);
+    const list = Array.isArray(parsed) ? parsed : [parsed];
+    return list.filter(
+      (hop): hop is NextHop =>
+        typeof hop === 'object' &&
+        hop !== null &&
+        typeof (hop as NextHop).from === 'string' &&
+        typeof (hop as NextHop).to === 'string',
+    );
   } catch {
-    return null;
+    return [];
   }
 }
 
-function rememberNext(from: string, to: string): void {
+function writeNextChain(chain: readonly NextHop[]): void {
   try {
-    window.sessionStorage.setItem(ARRIVED_VIA_NEXT_KEY, JSON.stringify({ from, to }));
+    window.sessionStorage.setItem(ARRIVED_VIA_NEXT_KEY, JSON.stringify(chain.slice(-50)));
   } catch {
     // Storage blocked: Back falls back to replace, which is still correct, just not history-aware.
   }
@@ -74,7 +86,9 @@ export function EntitySessionNavClient({ currentId, orderedIds }: EntitySessionN
     }
     setStack(result.stack);
     writeEntitySessionStack(result.stack);
-    if (arrivedViaNextFrom(currentId) === result.entityId) {
+    const chain = readNextChain();
+    if (nextHopInto(chain, currentId) === result.entityId) {
+      writeNextChain(chain.slice(0, -1));
       router.back();
       return;
     }
@@ -89,7 +103,7 @@ export function EntitySessionNavClient({ currentId, orderedIds }: EntitySessionN
     const nextStack = push(stack, currentId);
     setStack(nextStack);
     writeEntitySessionStack(nextStack);
-    rememberNext(currentId, nextId);
+    writeNextChain(appendNextHop(readNextChain(), { from: currentId, to: nextId }));
     router.push(`/entity/${nextId}`);
   }, [currentId, orderedIds, randomEnabled, router, stack]);
 
