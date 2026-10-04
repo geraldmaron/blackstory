@@ -31,6 +31,9 @@ export type GestureTarget = {
   readonly touchZoomRotate: GestureHandle;
   readonly doubleClickZoom: GestureHandle;
   readonly keyboard: GestureHandle;
+  /** MapLibre's two-finger mode for maps inside a scrolling page. Optional so fakes and older
+   * builds without the handler still type-check; absent means "not supported", never "on". */
+  readonly cooperativeGestures?: GestureHandle;
 };
 
 /**
@@ -50,11 +53,14 @@ const GESTURE_KEYS = [
 /** Hand the plate to the document: every gesture off. */
 export function lockGestures(map: GestureTarget): void {
   for (const key of GESTURE_KEYS) map[key].disable();
+  map.cooperativeGestures?.disable();
 }
 
 /** Give the plate back to the reader: every gesture on. */
 export function unlockGestures(map: GestureTarget): void {
   for (const key of GESTURE_KEYS) map[key].enable();
+  // A full-screen map takes every gesture: one finger pans (Google's `greedy`).
+  map.cooperativeGestures?.disable();
 }
 
 /**
@@ -67,16 +73,26 @@ export function unlockGestures(map: GestureTarget): void {
  * defect through a different gesture: on a precise pointer (mouse, trackpad) a drag is not a
  * scroll, so `dragPan`, `dragRotate`, `touchZoomRotate`, `doubleClickZoom` and `keyboard` are safe
  * to release, and a reader can now catch and correct a chapter flight that overshoots. On a coarse
- * (touch) primary pointer this stays a full lock, because a one-finger drag on touch IS the scroll
- * gesture — releasing `dragPan` there would trade the wheel-jack defect for the identical one on
- * touch, just with the finger instead of the wheel.
+ * (touch) primary pointer a one-finger drag IS the scroll gesture, so it stays the page's; the map
+ * takes two-finger pan and pinch through MapLibre's cooperative mode instead of a full lock.
  */
 export function lockGesturesAmbient(
   map: GestureTarget,
   { pointerFine }: { readonly pointerFine: boolean },
 ): void {
   if (!pointerFine) {
+    // Touch: cooperative, the standard for a map inside a scrolling page. One finger still
+    // scrolls the chapters; two fingers pan and pinch the map (MapLibre's touch pan requires two
+    // touches while `cooperativeGestures` is on, and shows its own "use two fingers" hint).
+    // Without the handler, fall back to the full lock rather than release one-finger drag.
+    if (!map.cooperativeGestures) {
+      lockGestures(map);
+      return;
+    }
     lockGestures(map);
+    map.cooperativeGestures.enable();
+    map.dragPan.enable();
+    map.touchZoomRotate.enable();
     return;
   }
   map.scrollZoom.disable();

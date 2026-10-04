@@ -167,13 +167,15 @@ export function TypeaheadCombobox({
   }, [deferredQuery, minChars, remoteDebounceMs, suggestLocal, suggestRemote]);
 
   useEffect(() => {
-    function onPointerDown(event: MouseEvent) {
+    // `pointerdown`, not `mousedown`: a finger that starts dragging the map never produces a
+    // mouse event, so on a phone the suggestion list stayed open over the map being panned.
+    function onPointerDown(event: PointerEvent) {
       if (!rootRef.current?.contains(event.target as Node)) {
         setOpen(false);
       }
     }
-    document.addEventListener('mousedown', onPointerDown);
-    return () => document.removeEventListener('mousedown', onPointerDown);
+    document.addEventListener('pointerdown', onPointerDown);
+    return () => document.removeEventListener('pointerdown', onPointerDown);
   }, []);
 
   const showList = open && suggestions.length > 0;

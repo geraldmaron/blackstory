@@ -2476,3 +2476,17 @@ body:has(.ds-explore-stage[data-results='open']) {
     padding-block: 6px;
   }
 }
+
+/*
+ * Form fields on touch screens are at least 16px. iOS Safari zooms the whole page into any field
+ * set smaller than that on focus and leaves it zoomed after — on the map, that is a page stuck
+ * half-zoomed with the field still hogging the screen. `!important` because this is a platform
+ * guardrail that every component's own (smaller) size must lose to, on touch only.
+ */
+@media (pointer: coarse) {
+  input:not([type='checkbox']):not([type='radio']):not([type='range']):not([type='color']),
+  select,
+  textarea {
+    font-size: max(16px, 1rem) !important;
+  }
+}

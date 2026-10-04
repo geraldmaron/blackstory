@@ -1697,6 +1697,20 @@ export function MapStageProvider({
           requestCountyPolygonLoad(activeMap, configRef.current);
         },
         publishBearing: (bearing) => notify(listenersRef.current, 'rotate', bearing),
+        onUserInteract: () => {
+          // Steering the map means the reader is done typing: drop the keyboard (and with it any
+          // field's suggestion list) so the map they are moving is not half-covered by it.
+          const active = document.activeElement;
+          if (
+            active instanceof HTMLElement &&
+            (active instanceof HTMLInputElement ||
+              active instanceof HTMLTextAreaElement ||
+              active.isContentEditable)
+          ) {
+            active.blur();
+          }
+          notify(listenersRef.current, 'interact');
+        },
       });
       activeMap.on('zoom', () => {
         updateStateLabelOpacity(activeMap.getZoom());
@@ -1867,11 +1881,16 @@ export function MapStageProvider({
       frame !== null && framedClaimAllowed(surfaceClass) && framedSlotsRef.current.claim(frame.id);
     if (claimGranted && frame !== null) heldSlotRef.current = frame.id;
 
-    const next = resolvePlatePosture({
-      surface: surfaceClass,
-      hasLiveMoment: frame !== null,
-      claimGranted,
-    });
+    // Door browse hands the plate to the reader. This per-frame resolver used to ignore that and
+    // put the Door's `ambient` posture back on every frame — on a touch screen that is a full
+    // gesture lock, so /explore on a phone could not be dragged or pinched at all.
+    const next = doorBrowseLiveRef.current
+      ? 'live'
+      : resolvePlatePosture({
+          surface: surfaceClass,
+          hasLiveMoment: frame !== null,
+          claimGranted,
+        });
 
     if (next !== 'framed') {
       const held = heldSlotRef.current;

@@ -65,6 +65,7 @@ import { useRecordSelection } from './hooks/use-record-selection';
 import { usePaletteData } from './hooks/use-palette-data';
 import { useReaderActions } from './hooks/use-reader-actions';
 import { useLocateMe } from './hooks/use-locate-me';
+import { useCompactSheetDrag } from './hooks/use-compact-sheet-drag';
 import { useCommandContext } from './hooks/use-command-context';
 import { useExploreUrlSync } from './hooks/use-explore-url-sync';
 import { atlasWalkHref } from '../../lib/place/public-place-path';
@@ -174,11 +175,52 @@ export function AtlasExperience({ initial, embedded = false }: AtlasExperiencePr
     [showPanel],
   );
 
+  const hidePanelRef = useRef(hidePanel);
+  hidePanelRef.current = hidePanel;
+
   useEffect(() => {
     if (focusAfterPanels === null) return;
     focusLandmark(document.querySelector(focusAfterPanels));
     setFocusAfterPanels(null);
   }, [focusAfterPanels]);
+
+  /**
+   * Hands-on map, out-of-the-way chrome (the pattern every maps app shares). On a phone or a
+   * phone on its side, the moment the reader drags, pinches or twists the map, the open
+   * instrument sheet folds back into the dock; a tap on empty map does the same and also
+   * closes the record sheet. Wide screens keep their side panels — they do not cover the map
+   * being moved. Text fields are blurred by MapStage itself on every surface.
+   */
+  const narrowRef = useRef(narrow);
+  narrowRef.current = narrow;
+  const atlasRootRef = useRef<HTMLDivElement>(null);
+  useCompactSheetDrag(atlasRootRef, (key) => {
+    if (key === 'record') {
+      setSelectedIdRef.current(undefined);
+      return;
+    }
+    hidePanelRef.current(key);
+  });
+  useEffect(() => {
+    const foldSheets = () => {
+      if (!narrowRef.current) return;
+      setPanels((current) =>
+        current.lens || current.results || current.decade || current.camera
+          ? { lens: false, results: false, decade: false, camera: false }
+          : current,
+      );
+    };
+    const offInteract = stage.subscribe('interact', foldSheets);
+    const offActivate = stage.subscribe('activate', () => {
+      if (!narrowRef.current) return;
+      foldSheets();
+      setSelectedIdRef.current(undefined);
+    });
+    return () => {
+      offInteract();
+      offActivate();
+    };
+  }, [setPanels, stage]);
 
   /**
    * The selection.
@@ -189,6 +231,7 @@ export function AtlasExperience({ initial, embedded = false }: AtlasExperiencePr
   const [selectedId, setSelectedId] = useState<string | undefined>(
     () => initial.viewState.selected,
   );
+  const setSelectedIdRef = useRef(setSelectedId);
 
   const { collection, persist, toggleSave, savedSet } = useSavedCollection(toasts);
   const {
@@ -629,6 +672,7 @@ export function AtlasExperience({ initial, embedded = false }: AtlasExperiencePr
        else. `handleKeyStroke` walks up from the keystroke's target looking for it, so Explore
        marking its own root is the entire scope contract — no route check, no second list. */
     <div
+      ref={atlasRootRef}
       className={embedded ? 'ds-atlas ds-atlas--embedded' : 'ds-atlas'}
       data-key-scope="instrument"
       data-chrome={chromeHidden ? 'hidden' : 'shown'}

@@ -11,22 +11,13 @@
  */
 import type { ExploreMapFeature } from './build-explore-map-source';
 import {
-  closestFeatures,
   formatExploreDistance,
   mapBoundsForRadius,
   type ExploreGeoPoint,
 } from './explore-place-radius';
 import type { AreaFrame, LngLat } from './camera-moves';
-import { CAMERA_COUNTY_ZOOM } from './camera-presets';
 
-const METERS_PER_MILE = 1609.344;
 
-/** How far "around you" reaches when framing the nearest records with no radius chosen. */
-export const NEARBY_FRAME_REACH_METERS = 25 * METERS_PER_MILE;
-/** How many of the nearest records the opening frame tries to include. */
-export const NEARBY_FRAME_COUNT = 6;
-/** Smallest box the frame will fit, so one record next door does not zoom to street level. */
-const MIN_FRAME_HALF_SPAN_METERS = 900;
 
 export type NearbySource = 'device' | 'search';
 
@@ -121,18 +112,26 @@ function boxAround(center: ExploreGeoPoint, halfSpanMeters: number): readonly [L
   ];
 }
 
+/** Street level: what MapLibre's own GeolocateControl caps at (`fitBoundsOptions.maxZoom: 15`). */
+export const DEVICE_LOCATE_ZOOM = 15;
+/** A searched town or address: neighbourhood scale, a few streets either side. */
+export const SEARCH_LOCATE_ZOOM = 13;
+/** Accuracy worse than this frames the whole uncertainty circle instead of a street view. */
+const ACCURACY_FRAME_THRESHOLD_METERS = 150;
+
 /**
- * Where the camera goes once a place is located.
+ * Where the camera goes once a place is located — the convention every maps app shares:
  *
- * - A radius: the whole circle.
- * - No radius: the located point plus its nearest records, if any sit within reach — so "near
- *   me" lands on records, not on an empty neighbourhood.
- * - Nothing within reach: the point itself at neighbourhood (device) or locality (search) scale.
+ * - A radius the reader chose: the whole circle.
+ * - The device: centred on you at street level. If the fix is loose (e.g. Wi-Fi/IP-based), the
+ *   accuracy circle instead, so the map does not claim a precision it does not have.
+ * - A searched place: centred on it at neighbourhood scale.
+ *
+ * It no longer zooms out to fit "you plus the nearest records": when those were miles away the
+ * camera landed at county scale, which read as "near me did not zoom in". The Records list
+ * carries the nearest records, sorted by distance, wherever they are.
  */
-export function nearbyFrame(
-  area: NearbyArea,
-  features: readonly ExploreMapFeature[],
-): AreaFrame {
+export function nearbyFrame(area: NearbyArea, _features?: readonly ExploreMapFeature[]): AreaFrame {
   const label =
     area.radiusMeters !== null && area.radiusLabel
       ? `${area.radiusLabel} of ${area.label}`
@@ -140,24 +139,28 @@ export function nearbyFrame(
   if (area.radiusMeters !== null) {
     return { kind: 'bounds', bounds: boxAround(area.center, area.radiusMeters), label };
   }
-  const near = closestFeatures(features, area.center, NEARBY_FRAME_COUNT).filter(
-    (entry) => entry.distanceMeters <= NEARBY_FRAME_REACH_METERS,
-  );
-  if (near.length === 0) {
+  if (area.source === 'device') {
+    const accuracy = area.accuracyMeters;
+    if (accuracy !== undefined && accuracy > ACCURACY_FRAME_THRESHOLD_METERS) {
+      return { kind: 'bounds', bounds: boxAround(area.center, accuracy * 1.1), label };
+    }
     return {
       kind: 'center',
       center: [area.center.lng, area.center.lat],
-      zoom: area.source === 'device' ? 13.2 : CAMERA_COUNTY_ZOOM,
+      zoom: DEVICE_LOCATE_ZOOM,
       label,
     };
   }
-  const farthest = Math.max(...near.map((entry) => entry.distanceMeters));
   return {
-    kind: 'bounds',
-    bounds: boxAround(area.center, Math.max(MIN_FRAME_HALF_SPAN_METERS, farthest * 1.15)),
+    kind: 'center',
+    center: [area.center.lng, area.center.lat],
+    zoom: SEARCH_LOCATE_ZOOM,
     label,
   };
 }
+
+/** Within this, the nearest record is "right here" and needs no distance in the summary. */
+const SUMMARY_CLOSE_METERS = 800;
 
 /** One sentence for the toast/status after locating. */
 export function nearbySummary(
@@ -175,8 +178,8 @@ export function nearbySummary(
       : `Nothing within ${area.radiusLabel} of ${where} yet. The nearest record is ${formatExploreDistance(nearestMeters)}.`;
   }
   if (nearestMeters === undefined) return `Centered on ${where}.`;
-  if (nearestMeters > NEARBY_FRAME_REACH_METERS) {
-    return `The nearest record is ${formatExploreDistance(nearestMeters)}. Records are sorted by distance.`;
+  if (nearestMeters > SUMMARY_CLOSE_METERS) {
+    return `The nearest record is ${formatExploreDistance(nearestMeters)}. Records are listed nearest first.`;
   }
   return `Showing records nearest ${where}.`;
 }

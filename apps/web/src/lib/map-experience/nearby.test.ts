@@ -74,19 +74,23 @@ test('no radius keeps everything; a radius keeps only what is inside it', () => 
   );
 });
 
-test('frame with no radius includes the nearest records within reach', () => {
-  const frame = nearbyFrame(device(null), features);
-  assert.equal(frame.kind, 'bounds');
-  if (frame.kind !== 'bounds') return;
-  const [[west, south], [east, north]] = frame.bounds;
-  assert.ok(west < -84.4143 && east > -84.3797, 'both nearby records are inside the frame');
-  assert.ok(south < 33.7493 && north > 33.7543);
-  assert.ok(east - west < 0.5, 'Macon (75 mi) does not blow the frame out');
+test('locating the device lands at street level on you, not zoomed out to far records', () => {
+  const frame = nearbyFrame({ ...device(null), accuracyMeters: 20 }, features);
+  assert.equal(frame.kind, 'center');
+  if (frame.kind !== 'center') return;
+  assert.deepEqual(frame.center, [downtown.lng, downtown.lat]);
+  assert.equal(frame.zoom, 15);
 });
 
-test('frame with nothing within reach centers on the point', () => {
-  const far = nearbyFrame(device(null), [point('dc', -77.0143, 38.9098)]);
-  assert.equal(far.kind, 'center');
+test('a loose device fix frames its accuracy circle instead of faking street precision', () => {
+  const frame = nearbyFrame({ ...device(null), accuracyMeters: 1200 }, features);
+  assert.equal(frame.kind, 'bounds');
+});
+
+test('a searched place centres at neighbourhood scale', () => {
+  const frame = nearbyFrame({ ...device(null), source: 'search', label: 'Macon, Georgia' }, features);
+  assert.equal(frame.kind, 'center');
+  if (frame.kind === 'center') assert.equal(frame.zoom, 13);
 });
 
 test('frame with a radius fits the circle', () => {
@@ -106,5 +110,6 @@ test('labels read like a person wrote them', () => {
   assert.equal(distanceLabel(undefined), null);
   assert.equal(nearbySummary(device(null), 4, 650), 'Showing records nearest you.');
   assert.match(nearbySummary(device(null), 4, 200_000), /nearest record is 124 mi away/);
+  assert.match(nearbySummary(device(null), 4, 3_000), /nearest record is 1\.9 mi away/);
   assert.equal(nearbySummary(device(8047, '5 miles'), 2, 650), '2 records within 5 miles of you.');
 });

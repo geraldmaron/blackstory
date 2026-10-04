@@ -20,8 +20,40 @@
 }
 
 .ds-locator--interactive {
-  touch-action: none;
+  /* Cooperative: one finger scrolls the page through the map; two-finger gestures are taken by
+     a non-passive touchmove in InteractiveRecordLocator. `pan-x pan-y` (not `none`) is what lets
+     the page keep scrolling, and it also stops the browser pinch-zooming the whole page here. */
+  touch-action: pan-x pan-y;
   cursor: grab;
+}
+
+.ds-locator__hint {
+  position: absolute;
+  inset: 0;
+  z-index: 3; /* local: over the canvas and chrome inside this locator only */
+  display: grid;
+  place-items: center;
+  margin: 0;
+  padding: var(--ds-space-4);
+  background: color-mix(in srgb, #000 55%, transparent);
+  color: #fff;
+  font-family: var(--ds-font-ui);
+  font-size: 0.9375rem;
+  font-weight: 600;
+  text-align: center;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity var(--ds-duration-fast) var(--ds-easing);
+}
+
+.ds-locator__hint[data-visible='true'] {
+  opacity: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ds-locator__hint {
+    transition: none;
+  }
 }
 
 .ds-locator--interactive.is-dragging {
@@ -171,4 +203,12 @@
   font-size: 0.6875rem;
   line-height: 1.45;
   color: var(--ds-ink-muted);
+}
+
+@media (pointer: coarse) {
+  .ds-locator__reset,
+  .ds-locator__zoom {
+    min-height: 40px;
+    min-width: 40px;
+  }
 }

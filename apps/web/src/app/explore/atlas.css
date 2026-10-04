@@ -403,7 +403,9 @@
   .ds-time-panel,
   .ds-camera,
   .ds-sheet {
-    animation: ds-compact-sheet-rise var(--ds-duration-base) var(--ds-easing) both;
+    /* `backwards`, not `both`: a fill that held `transform: none` after the rise would outrank
+       the inline transform the sheet drag writes, and the sheet would not follow the finger. */
+    animation: ds-compact-sheet-rise var(--ds-duration-base) var(--ds-easing) backwards;
     box-shadow: 0 -8px 28px rgb(0 0 0 / 0.22);
   }
 
@@ -511,5 +513,54 @@
 
   .ds-atlas:has(> .ds-time-panel) .ds-atlas__readout {
     bottom: calc(var(--ds-space-4) + 139px + var(--ds-space-3) + 56px);
+  }
+}
+
+/*
+ * Draggable sheets (use-compact-sheet-drag.ts), compact portrait only: a grab bar on top, the
+ * header is the handle, and a sheet dragged up opens to the full height under the bar.
+ */
+@media (max-width: 819px) and (min-height: 560px) {
+  .ds-lens,
+  .ds-results,
+  .ds-time-panel,
+  .ds-camera,
+  .ds-sheet {
+    padding-top: 14px;
+    transition: max-height var(--ds-duration-base) var(--ds-easing);
+  }
+
+  .ds-lens::before,
+  .ds-results::before,
+  .ds-time-panel::before,
+  .ds-camera::before,
+  .ds-sheet::before {
+    content: '';
+    position: absolute;
+    top: 6px;
+    left: 50%;
+    width: 36px;
+    height: 4px;
+    margin-left: -18px;
+    border-radius: var(--ds-radius-full);
+    background: var(--ds-border-strong);
+    pointer-events: none;
+  }
+
+  .ds-lens__head,
+  .ds-results__head,
+  .ds-time-panel__header,
+  .ds-camera__head,
+  .ds-sheet__top {
+    touch-action: none;
+    cursor: grab;
+  }
+
+  .ds-lens[data-detent='full'],
+  .ds-results[data-detent='full'],
+  .ds-time-panel[data-detent='full'],
+  .ds-camera[data-detent='full'],
+  .ds-sheet[data-detent='full'] {
+    max-height: calc(100dvh - var(--ds-atlas-top) - var(--ds-atlas-dock-clearance) - 32px);
   }
 }

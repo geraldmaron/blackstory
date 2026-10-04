@@ -207,6 +207,15 @@
   }
 }
 
+/* A compact sheet dragged to full height reaches the top of the map band. The pill sits in a
+ * different stacking context and would cover the sheet's header and eat the drag-down that
+ * returns it, so it steps aside until the sheet drops back to its peek. */
+@media (max-width: 819px) and (min-height: 560px) {
+  body:has(.ds-atlas [data-detent='full']) .ds-door__browse-exit {
+    visibility: hidden;
+  }
+}
+
 .ds-door__browse-exit-btn {
   display: inline-flex;
   align-items: center;
