@@ -85,9 +85,7 @@ export function LawDetailSections({ snapshot, explainer, previous, next }: LawDe
     <>
       <LegalDisclaimer />
 
-      {explainer ? (
-        <RoomJump sections={DETAIL_SECTIONS} label="On this page" />
-      ) : null}
+      {explainer ? <RoomJump sections={DETAIL_SECTIONS} label="On this page" /> : null}
 
       {explainer ? (
         <section className="ds-law-section" aria-labelledby="explainer-heading">

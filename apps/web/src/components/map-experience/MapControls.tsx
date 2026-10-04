@@ -41,11 +41,17 @@ export function MapControls({
   className,
   style,
 }: MapControlsProps) {
-  const rotated = Math.abs(((bearing % 360) + 360) % 360) > COMPASS_THRESHOLD_DEGREES &&
+  const rotated =
+    Math.abs(((bearing % 360) + 360) % 360) > COMPASS_THRESHOLD_DEGREES &&
     Math.abs(((bearing % 360) + 360) % 360) < 360 - COMPASS_THRESHOLD_DEGREES;
 
   return (
-    <div className={cx('ds-map-controls', className)} style={style} role="group" aria-label="Map controls">
+    <div
+      className={cx('ds-map-controls', className)}
+      style={style}
+      role="group"
+      aria-label="Map controls"
+    >
       <button
         type="button"
         className="ds-map-controls__btn ds-map-controls__locate"
@@ -83,7 +89,12 @@ export function MapControls({
           title="Zoom in"
         >
           <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-            <path d="M8 3v10M3 8h10" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
+            <path
+              d="M8 3v10M3 8h10"
+              stroke="currentColor"
+              strokeWidth="1.6"
+              strokeLinecap="round"
+            />
           </svg>
         </button>
         <button

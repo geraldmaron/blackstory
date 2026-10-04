@@ -184,7 +184,11 @@ export function useLensFilters(view: ExploreViewModel, toasts: UseToasts) {
   const constraints = useMemo<readonly LensConstraint[]>(() => {
     const rows: LensConstraint[] = [];
     if (nearby) {
-      rows.push({ key: 'near', label: nearbyConstraintLabel(nearby), onClear: () => setNearby(null) });
+      rows.push({
+        key: 'near',
+        label: nearbyConstraintLabel(nearby),
+        onClear: () => setNearby(null),
+      });
     }
     if (stateCode) {
       const name = findUsStateByPostalCode(stateCode)?.name ?? stateCode;

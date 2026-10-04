@@ -5,7 +5,11 @@ import { COMPACT_MEDIA_QUERY } from '../../../lib/layout/compact-viewport';
 export type CompactSheetKey = 'lens' | 'results' | 'decade' | 'camera' | 'record';
 
 /** Handle selector → the sheet it moves and the key it reports when dismissed. */
-const HANDLES: readonly { readonly handle: string; readonly sheet: string; readonly key: CompactSheetKey }[] = [
+const HANDLES: readonly {
+  readonly handle: string;
+  readonly sheet: string;
+  readonly key: CompactSheetKey;
+}[] = [
   { handle: '.ds-lens__head', sheet: '.ds-lens', key: 'lens' },
   { handle: '.ds-results__head', sheet: '.ds-results', key: 'results' },
   { handle: '.ds-time-panel__header', sheet: '.ds-time-panel', key: 'decade' },

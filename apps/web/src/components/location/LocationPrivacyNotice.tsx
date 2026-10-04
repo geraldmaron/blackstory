@@ -19,7 +19,9 @@ export type LocationPrivacyNoticeProps = {
   readonly deviceStaysLocal?: boolean;
 };
 
-export function LocationPrivacyNotice({ deviceStaysLocal = false }: LocationPrivacyNoticeProps = {}) {
+export function LocationPrivacyNotice({
+  deviceStaysLocal = false,
+}: LocationPrivacyNoticeProps = {}) {
   return (
     <details className="ds-location-privacy-notice">
       <summary className="ds-sans ds-location-privacy-notice__summary">

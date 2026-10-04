@@ -68,10 +68,7 @@ test('no radius keeps everything; a radius keeps only what is inside it', () => 
   assert.equal(applyNearbyRadius(features, device(null), distances).length, 4);
   assert.equal(applyNearbyRadius(features, null, distances).length, 4);
   const fiveMiles = applyNearbyRadius(features, device(8047, '5 miles'), distances);
-  assert.deepEqual(
-    fiveMiles.map((f) => f.properties.entityId).sort(),
-    ['auburn', 'auc'],
-  );
+  assert.deepEqual(fiveMiles.map((f) => f.properties.entityId).sort(), ['auburn', 'auc']);
 });
 
 test('locating the device lands at street level on you, not zoomed out to far records', () => {
@@ -88,7 +85,10 @@ test('a loose device fix frames its accuracy circle instead of faking street pre
 });
 
 test('a searched place centres at neighbourhood scale', () => {
-  const frame = nearbyFrame({ ...device(null), source: 'search', label: 'Macon, Georgia' }, features);
+  const frame = nearbyFrame(
+    { ...device(null), source: 'search', label: 'Macon, Georgia' },
+    features,
+  );
   assert.equal(frame.kind, 'center');
   if (frame.kind === 'center') assert.equal(frame.zoom, 13);
 });

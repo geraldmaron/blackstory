@@ -380,17 +380,13 @@ export function DoorImmersive({
      * still be `/` while the address bar reads `/explore`. Cold `/explore` is a real route.
      * Exit must restore the journey URL and, when Next owns the explore page, leave that route.
      */
-    const pushedState =
-      (window.history.state as { doorBrowse?: number } | null)?.doorBrowse === 1;
+    const pushedState = (window.history.state as { doorBrowse?: number } | null)?.doorBrowse === 1;
     const steppingBack = enteredByPushRef.current && pushedState;
     if (steppingBack) {
       // Entering pushed `/explore` over the journey's own `/` entry; leaving steps back over it
       // rather than stacking a second `/` on top (which made the browser's Back a no-op).
       window.history.back();
-    } else if (
-      pathname.startsWith('/explore') ||
-      window.location.pathname.startsWith('/explore')
-    ) {
+    } else if (pathname.startsWith('/explore') || window.location.pathname.startsWith('/explore')) {
       // Cold `/explore` is a real route Next owns.
       router.replace('/', { scroll: false });
     } else if (pushedState) {
@@ -403,15 +399,15 @@ export function DoorImmersive({
     const target = journeyScrollRef.current;
     const startedAt = performance.now();
     const restore = () => {
-      const tallEnough =
-        document.documentElement.scrollHeight - window.innerHeight >= target - 1;
+      const tallEnough = document.documentElement.scrollHeight - window.innerHeight >= target - 1;
       if (tallEnough || performance.now() - startedAt > 1500) {
         window.scrollTo({ top: target, behavior: 'auto' });
         return;
       }
       window.requestAnimationFrame(restore);
     };
-    const scheduleRestore = () => window.setTimeout(() => window.requestAnimationFrame(restore), 60);
+    const scheduleRestore = () =>
+      window.setTimeout(() => window.requestAnimationFrame(restore), 60);
     if (steppingBack) {
       // The traversal applies the browser's own scroll restoration when it lands, after this
       // handler; restore once it has, or the journey snaps to the top.

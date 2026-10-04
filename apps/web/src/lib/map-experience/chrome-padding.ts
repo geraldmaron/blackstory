@@ -65,7 +65,9 @@ export function chromePadding(state: ChromeState): ChromeInset {
 
   if (sideways) {
     const anyOpen = state.lensOpen || state.resultsOpen || state.sheetOpen;
-    left = anyOpen ? Math.round(Math.min(360, viewportWidth * 0.45)) + NARROW_SIDE * 2 : NARROW_SIDE;
+    left = anyOpen
+      ? Math.round(Math.min(360, viewportWidth * 0.45)) + NARROW_SIDE * 2
+      : NARROW_SIDE;
     right = NARROW_SIDE + 56;
     top = 72;
     bottom = 64;

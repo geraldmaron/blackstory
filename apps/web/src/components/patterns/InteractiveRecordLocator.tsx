@@ -121,26 +121,32 @@ export function InteractiveRecordLocator({
     if (hintTimer.current) clearTimeout(hintTimer.current);
     hintTimer.current = setTimeout(() => setHint(null), 1600);
   }, []);
-  useEffect(() => () => {
-    if (hintTimer.current) clearTimeout(hintTimer.current);
-  }, []);
+  useEffect(
+    () => () => {
+      if (hintTimer.current) clearTimeout(hintTimer.current);
+    },
+    [],
+  );
 
-  const onWheel = useCallback((event: WheelEvent) => {
-    const root = rootRef.current;
-    if (!root) return;
-    // Embedded in a scrolling page: a plain wheel is the page's. Zoom only on Ctrl/⌘ + wheel,
-    // which is also how a trackpad pinch arrives.
-    if (cooperativeWheelVerdict(event) === 'page') {
-      showHint('wheel');
-      return;
-    }
-    event.preventDefault();
-    const rect = root.getBoundingClientRect();
-    const anchorX = event.clientX - rect.left;
-    const anchorY = event.clientY - rect.top;
-    const factor = wheelFactorForDelta(event.deltaY);
-    setView((current) => zoomLocatorViewAt(current, factor, anchorX, anchorY));
-  }, [showHint]);
+  const onWheel = useCallback(
+    (event: WheelEvent) => {
+      const root = rootRef.current;
+      if (!root) return;
+      // Embedded in a scrolling page: a plain wheel is the page's. Zoom only on Ctrl/⌘ + wheel,
+      // which is also how a trackpad pinch arrives.
+      if (cooperativeWheelVerdict(event) === 'page') {
+        showHint('wheel');
+        return;
+      }
+      event.preventDefault();
+      const rect = root.getBoundingClientRect();
+      const anchorX = event.clientX - rect.left;
+      const anchorY = event.clientY - rect.top;
+      const factor = wheelFactorForDelta(event.deltaY);
+      setView((current) => zoomLocatorViewAt(current, factor, anchorX, anchorY));
+    },
+    [showHint],
+  );
 
   useEffect(() => {
     const root = rootRef.current;

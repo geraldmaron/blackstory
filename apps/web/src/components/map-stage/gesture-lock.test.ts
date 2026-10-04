@@ -114,7 +114,15 @@ test('ambient on touch without a cooperative handler is a full lock: one finger 
 
 test('ambient on touch with cooperative gestures: two-finger pan and pinch, one finger stays the page', () => {
   const target = createFakeTarget();
-  const cooperative = { on: false, enable() { this.on = true; }, disable() { this.on = false; } };
+  const cooperative = {
+    on: false,
+    enable() {
+      this.on = true;
+    },
+    disable() {
+      this.on = false;
+    },
+  };
   const withCoop = Object.assign(target, { cooperativeGestures: cooperative });
   lockGesturesAmbient(withCoop, { pointerFine: false });
   assert.equal(cooperative.on, true, 'two-finger mode is on');

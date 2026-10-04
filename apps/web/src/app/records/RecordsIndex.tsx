@@ -280,7 +280,11 @@ export function RecordsIndexRoom({ model, releaseLabel }: RecordsIndexProps) {
           {previousHref === undefined ? (
             <span className="ds-records-pager__spacer" />
           ) : (
-            <a className="ds-records-pager__link ds-cta ds-cta--quiet ds-cta--sm" href={previousHref} rel="prev">
+            <a
+              className="ds-records-pager__link ds-cta ds-cta--quiet ds-cta--sm"
+              href={previousHref}
+              rel="prev"
+            >
               ← Previous 100
             </a>
           )}
@@ -288,7 +292,11 @@ export function RecordsIndexRoom({ model, releaseLabel }: RecordsIndexProps) {
           {nextHref === undefined ? (
             <span className="ds-records-pager__spacer" />
           ) : (
-            <a className="ds-records-pager__link ds-cta ds-cta--quiet ds-cta--sm" href={nextHref} rel="next">
+            <a
+              className="ds-records-pager__link ds-cta ds-cta--quiet ds-cta--sm"
+              href={nextHref}
+              rel="next"
+            >
               Next 100 →
             </a>
           )}

@@ -103,7 +103,10 @@ export function cooperativeWheelVerdict(event: {
 export type TouchPoint = { readonly x: number; readonly y: number };
 
 /** Centroid and finger spread of a two-finger touch. */
-export function twoFingerFrame(a: TouchPoint, b: TouchPoint): {
+export function twoFingerFrame(
+  a: TouchPoint,
+  b: TouchPoint,
+): {
   readonly cx: number;
   readonly cy: number;
   readonly spread: number;

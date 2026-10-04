@@ -33,7 +33,7 @@ export function useReaderActions(toasts: UseToasts) {
       sourceCount: feature.properties.evidenceCount,
       // The page's own origin: the site lives at blackstory.app, and a hard-coded host had drifted
       // to a domain this site does not serve.
-      url: `${typeof window === 'undefined' ? process.env.NEXT_PUBLIC_SITE_URL ?? '' : window.location.origin}${feature.properties.href || '/'}`,
+      url: `${typeof window === 'undefined' ? (process.env.NEXT_PUBLIC_SITE_URL ?? '') : window.location.origin}${feature.properties.href || '/'}`,
       accessed: new Date(),
     });
   }, []);

@@ -156,7 +156,11 @@ test('presence bars name the state in words, not only as a bar', () => {
 test('the header reports how much of the release matches, not what is "in view"', () => {
   const html = renderToStaticMarkup(createElement(LensPanel, lensProps({ matched: 285 })));
   assert.match(html, /285 of /);
-  assert.equal(html.includes('in view'), false, 'the count is a filter count, not a viewport count');
+  assert.equal(
+    html.includes('in view'),
+    false,
+    'the count is a filter count, not a viewport count',
+  );
 });
 
 test('locating is one shared action: no separate Near me link, the finder button delegates', () => {

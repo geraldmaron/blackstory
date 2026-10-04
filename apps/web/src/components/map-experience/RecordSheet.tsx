@@ -217,20 +217,20 @@ function SheetMast({
       {/* The fit frame wraps the picture only: the figure itself must not clip (see record-sheet.css)
           and its caption is not part of the picture's aspect. */}
       <div className="ds-sheet__photo-frame ds-fit-photo" ref={frameRef} data-fit={fit}>
-      {fit === 'contain' ? (
-        // eslint-disable-next-line @next/next/no-img-element -- decorative fill of the same photo
-        <img className="ds-fit-photo__backdrop" src={src} alt="" aria-hidden="true" />
-      ) : null}
-      {/* eslint-disable-next-line @next/next/no-img-element -- public CDN URL, the record's own photo */}
-      <img
-        key={src}
-        ref={imgRef}
-        className="ds-sheet__photo ds-fit-photo__main"
-        src={src}
-        alt={alt}
-        decoding="async"
-        onError={() => setUrlIndex((current) => current + 1)}
-      />
+        {fit === 'contain' ? (
+          // eslint-disable-next-line @next/next/no-img-element -- decorative fill of the same photo
+          <img className="ds-fit-photo__backdrop" src={src} alt="" aria-hidden="true" />
+        ) : null}
+        {/* eslint-disable-next-line @next/next/no-img-element -- public CDN URL, the record's own photo */}
+        <img
+          key={src}
+          ref={imgRef}
+          className="ds-sheet__photo ds-fit-photo__main"
+          src={src}
+          alt={alt}
+          decoding="async"
+          onError={() => setUrlIndex((current) => current + 1)}
+        />
       </div>
       {caption.creditText ? (
         <figcaption className="ds-sheet__credit">{caption.creditText}</figcaption>

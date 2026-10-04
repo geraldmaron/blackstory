@@ -179,6 +179,10 @@ test('coverHidesTooMuch judges the crop against the real box, not orientation al
   assert.equal(coverHidesTooMuch(16 / 9, 2.8), true, '16:9 in a 2.8:1 banner loses over a third');
   assert.equal(coverHidesTooMuch(2.4, 2.8), false, 'a panorama covers fine');
   assert.equal(coverHidesTooMuch(4 / 3, 4 / 3), false, 'same shape, nothing lost');
-  assert.equal(coverHidesTooMuch(16 / 9, 0.75), true, 'landscape in a tall phone box loses its sides');
+  assert.equal(
+    coverHidesTooMuch(16 / 9, 0.75),
+    true,
+    'landscape in a tall phone box loses its sides',
+  );
   assert.equal(coverHidesTooMuch(0, 2), false, 'unknown aspect never forces contain');
 });

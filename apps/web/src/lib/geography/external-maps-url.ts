@@ -122,5 +122,7 @@ export function appleMapsUrlFromGoogle(href: string): string | undefined {
 
 /** True on platforms whose default maps app is Apple Maps. */
 export function prefersAppleMaps(userAgent: string, platform = ''): boolean {
-  return /iPhone|iPad|iPod|Macintosh|Mac OS X/i.test(userAgent) || /^Mac|iPhone|iPad/i.test(platform);
+  return (
+    /iPhone|iPad|iPod|Macintosh|Mac OS X/i.test(userAgent) || /^(?:Mac|iPhone|iPad)/i.test(platform)
+  );
 }

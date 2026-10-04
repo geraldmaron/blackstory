@@ -17,7 +17,8 @@ export const LOCATE_FAILURE_MESSAGES: Readonly<Record<GeolocationDenialReason, s
   unsupported: 'This browser can’t share a location. Search for a place instead.',
   permission_denied:
     'Location is turned off for this site. Allow it in your browser’s site settings, or search for a place.',
-  position_unavailable: 'Your location couldn’t be found right now. Try again, or search for a place.',
+  position_unavailable:
+    'Your location couldn’t be found right now. Try again, or search for a place.',
   timeout: 'Finding your location took too long. Try again, or search for a place.',
   unknown_error: 'Something went wrong finding your location. Try again, or search for a place.',
 };

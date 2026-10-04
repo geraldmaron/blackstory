@@ -17,8 +17,6 @@ import {
 } from './explore-place-radius';
 import type { AreaFrame, LngLat } from './camera-moves';
 
-
-
 export type NearbySource = 'device' | 'search';
 
 export type NearbyArea = {
@@ -45,7 +43,8 @@ function haversine(a: ExploreGeoPoint, b: ExploreGeoPoint): number {
   const dLat = toRad(b.lat - a.lat);
   const dLng = toRad(b.lng - a.lng);
   const h =
-    Math.sin(dLat / 2) ** 2 + Math.cos(toRad(a.lat)) * Math.cos(toRad(b.lat)) * Math.sin(dLng / 2) ** 2;
+    Math.sin(dLat / 2) ** 2 +
+    Math.cos(toRad(a.lat)) * Math.cos(toRad(b.lat)) * Math.sin(dLng / 2) ** 2;
   return 2 * 6_371_008.8 * Math.asin(Math.min(1, Math.sqrt(h)));
 }
 

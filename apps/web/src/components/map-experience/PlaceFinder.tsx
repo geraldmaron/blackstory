@@ -86,7 +86,6 @@ export type PlaceFinderProps = {
   readonly onRadiusChange?: (radiusMeters: number | null, radiusLabel: string) => void;
 };
 
-
 /**
  * "Radius and state select disagreement resolves to the most recent action, with the other
  * control visibly cleared" (acceptance criterion). These two pure functions are the

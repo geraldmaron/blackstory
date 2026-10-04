@@ -2468,7 +2468,8 @@ body:has(.ds-explore-stage[data-results='open']) {
  * inline box does not change line height).
  */
 @media (pointer: coarse) {
-  :where(dd, li, .ds-citation, .ds-room-src__t, .ds-room-anat__v, .ds-empty__body) > a:not([class*='ds-cta']):not(.ds-button),
+  :where(dd, li, .ds-citation, .ds-room-src__t, .ds-room-anat__v, .ds-empty__body)
+    > a:not([class*='ds-cta']):not(.ds-button),
   .ds-books-edition__rip-link,
   .ds-books-edition__rip-fact-link,
   .ds-books-edition__evidence-cite,

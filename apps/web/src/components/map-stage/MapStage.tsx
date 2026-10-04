@@ -306,7 +306,10 @@ function searchAreaCollection(area: SearchAreaInput | null) {
     features.push({
       type: 'Feature',
       properties: { role: 'radius' },
-      geometry: { type: 'Polygon', coordinates: [circlePolygon(area.lng, area.lat, area.radiusMeters)] },
+      geometry: {
+        type: 'Polygon',
+        coordinates: [circlePolygon(area.lng, area.lat, area.radiusMeters)],
+      },
     });
   }
   // Accuracy under ~25 m is smaller than the dot itself; drawing it only adds noise.
@@ -1408,8 +1411,7 @@ export function MapStageProvider({
     try {
       const data = searchAreaCollection(searchAreaRef.current);
       const source = map.getSource(SEARCH_AREA_SOURCE) as
-        | { setData: (data: unknown) => void }
-        | undefined;
+        { setData: (data: unknown) => void } | undefined;
       if (source) {
         source.setData(data);
       } else {
@@ -1417,7 +1419,9 @@ export function MapStageProvider({
       }
       const accent =
         (typeof document !== 'undefined' &&
-          getComputedStyle(document.documentElement).getPropertyValue('--ds-accent-graphic').trim()) ||
+          getComputedStyle(document.documentElement)
+            .getPropertyValue('--ds-accent-graphic')
+            .trim()) ||
         '#C48A4A';
       if (!map.getLayer(SEARCH_AREA_FILL)) {
         map.addLayer({
