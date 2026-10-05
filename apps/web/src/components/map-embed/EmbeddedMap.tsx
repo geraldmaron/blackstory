@@ -175,6 +175,9 @@ export function EmbeddedMap({
    * WebGL canvas every frame wipes the drawing surface and the motion flickers. One resize runs
    * when the animation settles. */
   const animatingRef = useRef(false);
+  /** Whether THIS map set the page lock, so releasing one map never unlocks the page under
+   * another that is still full screen. */
+  const holdsLockRef = useRef(false);
 
   const cancelTransition = useCallback(() => {
     cancelAnimationFrame(transitionRef.current.raf);
@@ -194,7 +197,10 @@ export function EmbeddedMap({
       frame.style.cssText = '';
       delete frame.dataset.state;
     }
-    document.documentElement.removeAttribute('data-embed-map-open');
+    if (holdsLockRef.current) {
+      holdsLockRef.current = false;
+      document.documentElement.removeAttribute('data-embed-map-open');
+    }
   }, [cancelTransition]);
 
   const expand = useCallback(() => {
@@ -209,6 +215,7 @@ export function EmbeddedMap({
     frame.dataset.state = 'open';
     enterTopLayer(frame);
     document.documentElement.setAttribute('data-embed-map-open', '');
+    holdsLockRef.current = true;
     void frame.getBoundingClientRect();
     const reduce = prefersReducedMotion();
     transitionRef.current.raf = requestAnimationFrame(() => {

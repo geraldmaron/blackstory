@@ -149,18 +149,21 @@ export function PlaceFinder({
   const sheetRef = useRef<HTMLDivElement>(null);
   // It says `aria-modal`, so it behaves like one: Tab stays inside, the page behind is inert, and
   // Escape closes it (stopped here so Explore's own Escape does not also close a sheet beneath).
-  // Only while the sheet actually exists: it renders only in the compact posture, so crossing the
-  // breakpoint with `open` still true must release the trap (and its `inert`) with it.
-  useFocusTrap(sheetRef, open && narrow, { overlayRef: sheetRef });
 
   // Focus follows the sheet: into its title when it opens, back to the trigger when it closes
   // (by the close button or by a place resolving), so keyboard and screen-reader users never
   // land on <body>.
+  // Keyed on the sheet actually being on screen (compact posture), so a reader who crosses back
+  // into compact with the finder still open lands inside the remounted sheet, not behind it.
+  const sheetShown = open && narrow;
   useEffect(() => {
-    if (open) titleRef.current?.focus();
+    if (sheetShown) titleRef.current?.focus();
     else if (wasOpen.current) triggerRef.current?.focus();
-    wasOpen.current = open;
-  }, [open]);
+    wasOpen.current = sheetShown;
+  }, [sheetShown]);
+  // Only while the sheet actually exists: it renders only in the compact posture, so crossing the
+  // breakpoint with `open` still true must release the trap (and its `inert`) with it.
+  useFocusTrap(sheetRef, sheetShown, { overlayRef: sheetRef });
 
   const skipFirstStateSync = useRef(true);
   useEffect(() => {
