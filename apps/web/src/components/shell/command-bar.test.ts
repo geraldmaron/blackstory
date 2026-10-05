@@ -1,5 +1,6 @@
 /**
- * The phone bar must keep Rooms on the first row, not clip or wrap it away.
+ * The command bar: desktop carries the four axes as links; a phone carries one row (brand and
+ * search) and navigates from the tab bar along the bottom edge.
  */
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
@@ -11,21 +12,31 @@ import { primaryNavDestinations } from '../../lib/nav/destination-registry';
 
 const here = dirname(fileURLToPath(import.meta.url));
 
-test('the phone bar keeps Rooms on the first row instead of clipping it', () => {
+test('the phone bar is one row — brand and search — with no nav crammed into it', () => {
   const css = readFileSync(join(here, 'command-bar.css'), 'utf8');
-  const start = css.lastIndexOf('@media (max-width: 819px)');
-  assert.ok(start >= 0, 'phone grid block must exist');
+  const start = css.indexOf('@media (max-width: 819px)');
+  assert.ok(start >= 0, 'phone block must exist');
   const next = css.indexOf('@media', start + 1);
   const block = next === -1 ? css.slice(start) : css.slice(start, next);
-  assert.doesNotMatch(block, /overflow-x:\s*clip/);
-  assert.doesNotMatch(block, /max-width:\s*calc\(100vw/);
-  assert.doesNotMatch(block, /flex-wrap:\s*wrap/);
-  assert.match(block, /grid-template-areas:/);
-  assert.match(block, /brand tools/);
-  assert.match(block, /\.ds-bar__brand[\s\S]*max-width:\s*2rem/);
-  assert.match(block, /\.ds-bar__tools[\s\S]*min-width:\s*0/);
-  assert.match(block, /\.ds-bar__tool[\s\S]*display:\s*none/);
-  assert.match(block, /height:\s*auto/);
+  assert.match(block, /height:\s*56px/);
+  assert.match(block, /grid-template-columns:\s*2rem minmax\(0, 1fr\)/);
+  assert.match(block, /\.ds-bar__tools\s*\{\s*display:\s*none/);
+  // The stacked two-row card and its scaled-down input are gone.
+  assert.doesNotMatch(css, /brand tools/);
+  assert.doesNotMatch(css, /scale\(0\.8125\)/);
+  assert.doesNotMatch(css, /@media \(max-width: 559px\)/);
+});
+
+test('phones navigate from a bottom tab bar with the same four destinations everywhere', () => {
+  const source = readFileSync(join(here, 'PhoneTabBar.tsx'), 'utf8');
+  const bar = readFileSync(join(here, 'CommandBar.tsx'), 'utf8');
+  const css = readFileSync(join(here, 'tab-bar.css'), 'utf8');
+  assert.match(bar, /<PhoneTabBar /);
+  assert.match(source, /primaryNavDestinations\(\)/);
+  assert.doesNotMatch(source, /filter\(/, 'the tab set never changes per page');
+  assert.match(source, /aria-label="Main"/);
+  assert.match(css, /--ds-tabbar-h:\s*calc\(56px \+ env\(safe-area-inset-bottom/);
+  assert.match(css, /pointer-events:\s*auto/);
 });
 
 test('the bar renders the product axes and never a hand-written list', () => {
@@ -34,7 +45,7 @@ test('the bar renders the product axes and never a hand-written list', () => {
   // was Stories — one of the four ways into the product — reachable only through Rooms.
   assert.match(source, /primaryNavDestinations/);
   assert.match(source, /aria-label="Find"/);
-  assert.match(source, /<RoomsMenu overflowFind=\{overflowFind\} \/>/);
+  assert.match(source, /<RoomsMenu \/>/);
   assert.match(source, /DestinationIcon/);
   // Home is the brand lockup, not a nav item beside Explore.
   assert.match(source, /ds-bar__brand[\s\S]*href="\/"/);
@@ -47,9 +58,8 @@ test('the bar renders the product axes and never a hand-written list', () => {
   assert.match(source, /exitMapBrowse/);
   assert.match(source, /pathIsBrowsing/);
   assert.doesNotMatch(source, />\s*Filters\s*</);
-  // Phone map Find folds Stories/Records into Rooms so the bar stays Map + Rooms.
-  assert.match(source, /overflowFind/);
-  assert.match(source, /PHONE_OVERFLOW_AXIS_PATHS/);
+  // No per-page folding of destinations on phones any more (the tab bar replaced it).
+  assert.doesNotMatch(source, /overflowFind|PHONE_OVERFLOW_AXIS_PATHS/);
   // A literal axis href inside the nav is a second registry waiting to drift from the first.
   // Scoped to the nav element: the no-JS search fallback legitimately links `/records` as the
   // place a reader searches when the combobox cannot mount.

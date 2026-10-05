@@ -381,25 +381,53 @@ span.ds-bar__mode-link {
   font-variant-numeric: tabular-nums;
 }
 
-/* ---- narrow -------------------------------------------------------------- */
+/* ---- phone --------------------------------------------------------------- */
 
 /*
- * Below 820px the wordmark drops to the symbol. The modes stay: Explore, Story and Rooms are how
- * a reader moves between the three things this site is, and on a phone the palette shortcut that
- * used to be their only replacement does not exist. They compact instead of disappearing.
+ * Below 820px the bar is one row: the brand symbol and the search field — the shape of every
+ * mobile search bar. Navigation lives in the tab bar along the bottom edge (PhoneTabBar), so the
+ * bar carries no Find links, Rooms disclosure or tools here, and never stacks into two rows.
  *
- * The search trigger never goes either — it is the primary affordance — but below 560px it gives
- * up its label and becomes the glyph alone, which is the space the modes need.
+ * This replaces a layered set of phone overrides (wrap, then a grid that pinned Rooms beside the
+ * brand, then a stacked search row, then a 16px input scaled to look 13px) that together made a
+ * 110px two-row card with the destinations crammed into its top-right corner.
  */
 @media (max-width: 819px) {
-  .ds-bar {
-    height: 56px;
-    gap: var(--ds-space-2);
+  :root:root {
+    --ds-island-height: 3.5rem;
+    --ds-island-gap: var(--ds-space-2);
   }
 
-  /* Symbol alone below 820px: brand.md directs squeezed placements to drop the lockup. */
+  .ds-bar,
+  .ds-bar:has(.ds-bar__search--live) {
+    display: grid;
+    grid-template-columns: 2rem minmax(0, 1fr);
+    grid-template-areas: none;
+    align-items: center;
+    box-sizing: border-box;
+    height: 56px;
+    left: var(--ds-space-3);
+    right: var(--ds-space-3);
+    column-gap: var(--ds-space-2);
+    padding: 0 var(--ds-space-2) 0 var(--ds-space-3);
+  }
+
+  .ds-bar__brand {
+    width: 2rem;
+    max-width: 2rem;
+    min-width: 0;
+    overflow: hidden;
+    --ds-bar-symbol-size: 2rem;
+  }
+
+  /* Symbol alone: brand.md directs squeezed placements to drop the lockup. */
   .ds-bar__brand .ds-shell-wordmark__img--lockup {
     display: none;
+  }
+
+  .ds-bar__brand .ds-shell-wordmark__img--symbol {
+    width: 2rem;
+    max-width: 2rem;
   }
 
   .ds-bar__brand .ds-shell-wordmark__img--symbol.ds-shell-wordmark__img--theme-light {
@@ -418,189 +446,21 @@ span.ds-bar__mode-link {
     display: block;
   }
 
-  .ds-bar__modes button,
-  .ds-bar__mode-link {
-    min-height: 26px;
-    padding: 0 var(--ds-space-2);
-    font-size: 0.75rem;
-  }
-}
-
-@media (max-width: 559px) {
-  .ds-bar {
-    gap: var(--ds-space-2);
-    padding: 0 var(--ds-space-3);
-    left: var(--ds-space-3);
-    right: var(--ds-space-3);
-  }
-
-  /* Glyph alone. The button keeps its full hit area and its aria-label, so the control is the
-     same size to a thumb and the same thing to a screen reader. */
-  .ds-bar__search-text,
-  .ds-bar__search .ds-kbd {
-    display: none;
-  }
-
-  /* The live field keeps its input at every width: hiding it would leave an empty pill. */
-  .ds-bar__search--live {
-    min-width: 0;
-  }
-
-  .ds-bar__search {
-    justify-content: center;
-    min-width: 44px;
-  }
-
-  /*
-   * The live field gets its own row.
-   *
-   * The rules above collapse the *button* variant (Explore) to a glyph, which is what frees the
-   * row for the modes. The live-input variant every other room renders has no label span to
-   * hide, so it stayed a full input in the `minmax(0, 1fr)` middle track while brand and tools
-   * kept their intrinsic widths on either side. At 375px those two take ~300px and the input
-   * was left around 60px: it rendered as "Sea" and could not be typed into usefully.
-   *
-   * Stacking is the fix rather than shrinking the neighbors, because there is no width at
-   * which five controls and a usable text field share one 375px row. Brand and tools keep the
-   * top row; the field spans the full width beneath them, which is the same shape the search
-   * takes on every other mobile site and needs no new markup, so `CommandBarSearch`'s tested
-   * structure and its `id="bar-search"` are untouched.
-   */
-  .ds-bar:has(.ds-bar__search--live) {
-    grid-template-columns: 2.25rem minmax(0, 1fr);
-    height: auto;
-    padding-block: var(--ds-space-2);
-    row-gap: var(--ds-space-2);
-  }
-
-  .ds-bar:has(.ds-bar__search--live) .ds-bar__brand {
-    grid-area: 1 / 1;
-  }
-
-  .ds-bar:has(.ds-bar__search--live) .ds-bar__tools {
-    grid-area: 1 / 2;
-    justify-self: end;
-  }
-
-  .ds-bar:has(.ds-bar__search--live) .ds-bar__search--live {
-    grid-area: 2 / 1 / 3 / -1;
-    max-width: none;
-    justify-content: flex-start;
-  }
-}
-
-/*
- * The stacked bar is taller than the one-row bar, and room content clears the fixed bar using
- * `--ds-island-clearance`, which is derived from `--ds-island-height`. Left at its 4rem
- * one-row value the first block of every page would slide under the bar, so the token moves
- * with the layout that changed. Measured against the rendered bar, not assumed.
- */
-@media (max-width: 559px) {
-  /* `:root:root` rather than `:root`: shell-header.css declares this token at plain `:root`
-     and is imported after this file, so an equal-specificity override here would lose the
-     cascade on source order alone. Doubling the selector wins on specificity instead, which
-     does not depend on which stylesheet the bundler happens to emit last. */
-  :root:root {
-    --ds-island-height: 6.5rem;
-  }
-
-  .ds-bar__modes button,
-  .ds-bar__mode-link {
-    padding: 0 0.4375rem;
-    font-size: 0.75rem;
-  }
-
-  /*
-   * The field keeps a 16px computed size, because iOS zooms the whole page on focus for anything
-   * smaller. At 16px its placeholder was the largest type in the bar, louder than the nav it sits
-   * under, so it renders scaled to 13px: the flex basis and negative margin give back the width
-   * the scale takes away, so the caret still reaches the right edge of the pill.
-   */
-  .ds-bar__search--live .ds-bar__search-input {
-    flex: 0 0 calc(100% / 0.8125);
-    margin-right: calc(100% - 100% / 0.8125);
-    font-size: 16px;
-    transform: scale(0.8125);
-    transform-origin: 0 50%;
-  }
-}
-
-@media (max-width: 819px) {
-  /*
-   * Flex-wrap sent Rooms onto a later row, and html/body overflow-x clip
-   * sheared that row off the door. Named areas keep brand + Rooms on row
-   * 1 and search on row 2, so Rooms cannot leave the island.
-   */
-  :root:root {
-    --ds-island-height: 6.25rem;
-    --ds-island-gap: var(--ds-space-2);
-  }
-
-  .ds-bar,
-  .ds-bar:has(.ds-bar__search--live) {
-    display: grid;
-    grid-template-columns: 2rem minmax(0, 1fr);
-    grid-template-areas:
-      'brand tools'
-      'search search';
-    align-items: center;
-    box-sizing: border-box;
-    min-width: 0;
-    width: auto;
-    max-width: none;
-    height: auto;
-    left: var(--ds-space-3);
-    right: var(--ds-space-3);
-    column-gap: var(--ds-space-2);
-    row-gap: var(--ds-space-1);
-    padding-block: var(--ds-space-1);
-  }
-
-  .ds-bar__brand {
-    grid-area: brand;
-    --ds-bar-symbol-size: 2rem;
-    width: 2rem;
-    max-width: 2rem;
-    min-width: 0;
-    overflow: hidden;
-  }
-
-  .ds-bar__brand .ds-shell-wordmark__img--symbol,
-  .ds-bar__brand .ds-shell-wordmark__img--lockup {
-    width: 2rem;
-    max-width: 2rem;
-  }
-
+  /* Destinations are the tab bar's job on a phone; the desktop tools have no phone use. */
   .ds-bar__tools {
-    grid-area: tools;
-    display: flex;
-    justify-content: flex-end;
-    min-width: 0;
-    max-width: 100%;
-  }
-
-  .ds-bar__tool {
     display: none;
   }
 
   .ds-bar__search,
   .ds-bar__search--live {
-    grid-area: search;
     min-width: 0;
     width: 100%;
     max-width: none;
+    justify-content: flex-start;
   }
 
-  .ds-bar:has(.ds-bar__search--live) .ds-bar__brand {
-    grid-area: brand;
-  }
-
-  .ds-bar:has(.ds-bar__search--live) .ds-bar__tools {
-    grid-area: tools;
-  }
-
-  .ds-bar:has(.ds-bar__search--live) .ds-bar__search--live {
-    grid-area: search;
+  .ds-bar__search .ds-kbd {
+    display: none;
   }
 }
 

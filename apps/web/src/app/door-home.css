@@ -245,6 +245,14 @@
   }
 }
 
+/* On a phone the Map tab is the way back to the journey (pressing the current tab returns to its
+   start), and the chip row owns the space under the search bar, so the pill steps aside. */
+@media (max-width: 819px) and (min-height: 560px) {
+  .ds-door__browse-exit {
+    display: none;
+  }
+}
+
 .ds-door__browse-exit-btn {
   display: inline-flex;
   align-items: center;

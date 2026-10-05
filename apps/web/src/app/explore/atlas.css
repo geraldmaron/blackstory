@@ -564,3 +564,96 @@
     max-height: calc(100dvh - var(--ds-atlas-top) - var(--ds-atlas-dock-clearance) - 32px);
   }
 }
+
+/*
+ * Phone, portrait: the tab bar owns the bottom edge (tab-bar.css, `--ds-tabbar-h`), so Explore's
+ * own controls are laid out the way map apps lay them out around a tab bar (Google Maps):
+ *
+ *   - Filters / When / View are a row of chips under the search bar.
+ *   - Records is a peek bar just above the tabs — the closed results sheet showing its count —
+ *     and pressing or dragging it opens the sheet over the map.
+ *   - Every sheet rises from just above the tabs; the map controls and the attribution sit above
+ *     the peek.
+ *
+ * This replaces a four-way switcher pinned to the bottom edge, which would now sit on top of the
+ * tab bar, with a second row of "Records" meaning something different from the Records tab.
+ */
+@media (max-width: 819px) and (min-height: 560px) {
+  :root:root {
+    --ds-atlas-dock-clearance: calc(var(--ds-tabbar-h) + var(--ds-space-2));
+    --ds-atlas-top: calc(var(--ds-island-clearance, 72px) + 44px);
+  }
+
+  .ds-atlas__dock[data-switcher] {
+    top: var(--ds-island-clearance, 72px);
+    right: 0;
+    bottom: auto;
+    left: 0;
+    display: flex;
+    gap: var(--ds-space-2);
+    padding: 0 var(--ds-space-3);
+    background: none;
+    border: 0;
+    border-radius: 0;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+
+  .ds-atlas__dock[data-switcher]::-webkit-scrollbar {
+    display: none;
+  }
+
+  .ds-atlas__dock[data-switcher] button {
+    flex: 0 0 auto;
+    flex-direction: row;
+    gap: 6px;
+    min-height: 36px;
+    padding: 0 var(--ds-space-3);
+    color: var(--ds-ink);
+    background: var(--ds-surface);
+    border: var(--ds-border-width) solid var(--ds-border);
+    border-radius: var(--ds-radius-full);
+    font-size: 0.8125rem;
+  }
+
+  .ds-atlas__dock[data-switcher] button[aria-pressed='true'] {
+    color: var(--ds-accent);
+    background: var(--ds-surface-raised);
+    border-color: var(--ds-accent-graphic);
+  }
+
+  /* Records: the results sheet's peek, docked above the tabs. Hidden while the sheet is up. */
+  .ds-atlas__dock[data-switcher] button[data-dock='results'] {
+    position: fixed;
+    right: var(--ds-space-2);
+    bottom: calc(var(--ds-tabbar-h) + var(--ds-space-2));
+    left: var(--ds-space-2);
+    justify-content: center;
+    min-height: 44px;
+    border-radius: var(--ds-radius-md);
+  }
+
+  /* Hidden while any sheet is up: a phone shows one instrument at a time, and the peek would sit
+     on top of that sheet's last rows. */
+  .ds-atlas__dock[data-switcher] button[data-dock='results'][aria-pressed='true'],
+  .ds-atlas[data-sheet-open='true'] .ds-atlas__dock[data-switcher] button[data-dock='results'] {
+    display: none;
+  }
+
+  .ds-map-controls {
+    bottom: calc(var(--ds-tabbar-h) + var(--ds-space-2) + 44px + var(--ds-space-3));
+  }
+
+  .ds-atlas[data-sheet-open='true'] .ds-map-controls {
+    bottom: calc(var(--ds-atlas-dock-clearance) + var(--ds-atlas-sheet-peek) + var(--ds-space-2));
+  }
+
+  .ds-atlas__readout {
+    bottom: calc(var(--ds-tabbar-h) + var(--ds-space-2) + 44px + var(--ds-space-3));
+  }
+
+  .ds-map-stage .maplibregl-ctrl-bottom-left,
+  html[data-door-browse='1'] .ds-map-stage .maplibregl-ctrl-bottom-left {
+    bottom: calc(var(--ds-tabbar-h) + var(--ds-space-2) + 44px + var(--ds-space-2));
+  }
+}
