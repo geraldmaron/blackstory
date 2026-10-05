@@ -657,3 +657,48 @@
     bottom: calc(var(--ds-tabbar-h) + var(--ds-space-2) + 44px + var(--ds-space-2));
   }
 }
+
+/*
+ * A short phone (compact height, under the wide breakpoint) also has the tab bar along its bottom
+ * edge (tab-bar.css), slimmed to one row. Everything the compact layouts above anchor to the bottom
+ * edge — the dock, the instrument column, the map controls, the readout, the attribution — moves
+ * up by the bar's height instead of sitting underneath it.
+ */
+@media (max-width: 819px) and (max-height: 559px) {
+  :root:root {
+    --ds-atlas-dock-clearance: calc(var(--ds-tabbar-h) + var(--ds-space-2) * 2 + 28px + 54px);
+  }
+
+  .ds-atlas__dock {
+    bottom: calc(var(--ds-tabbar-h) + var(--ds-space-2) + 28px);
+  }
+
+  .ds-atlas__readout {
+    bottom: calc(var(--ds-tabbar-h) + var(--ds-space-2) + 96px);
+  }
+
+  .ds-map-stage .maplibregl-ctrl-bottom-left,
+  html[data-door-browse='1'] .ds-map-stage .maplibregl-ctrl-bottom-left {
+    bottom: calc(var(--ds-tabbar-h) + 0.35rem);
+  }
+}
+
+@media (max-width: 819px) and (max-height: 559px) and (orientation: landscape) and (min-width: 560px) {
+  .ds-lens,
+  .ds-results,
+  .ds-time-panel,
+  .ds-camera,
+  .ds-sheet {
+    bottom: calc(var(--ds-tabbar-h) + var(--ds-space-2));
+  }
+
+  .ds-atlas__dock {
+    bottom: calc(var(--ds-tabbar-h) + var(--ds-space-2));
+  }
+
+  /* map-controls.css lifts the controls over the dock; this adds the bar under both. */
+  :root .ds-map-controls,
+  :root .ds-atlas[data-sheet-open='true'] .ds-map-controls {
+    bottom: calc(var(--ds-tabbar-h) + var(--ds-space-2) * 2 + 54px);
+  }
+}

@@ -116,6 +116,11 @@ export function PhoneTabBar({ pathname, browsing }: PhoneTabBarProps) {
                   type="button"
                   className="ds-tabbar__tab"
                   aria-current="page"
+                  // The visible name stays "Map" (the name starts with it, WCAG 2.5.3); the
+                  // accessible name says what pressing it does, since the phone has no
+                  // separate "Back to journey" pill.
+                  aria-label={`${axis.label}, back to the journey`}
+                  title="Back to the journey"
                   onClick={() => exitMapBrowse()}
                 >
                   {mark}

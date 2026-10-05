@@ -462,6 +462,13 @@ span.ds-bar__mode-link {
   .ds-bar__search .ds-kbd {
     display: none;
   }
+
+  /* iOS zooms the whole page when a field under 16px takes focus, and does not zoom back out.
+     The search row is full width here, so the field simply is 16px — the size mobile search
+     fields use — rather than being scaled down to look smaller. */
+  .ds-bar__search-input {
+    font-size: 16px;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
