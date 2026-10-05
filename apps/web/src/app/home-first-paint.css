@@ -66,7 +66,8 @@
   margin: 0;
 }
 
-.ds-home-first-paint .ds-record-mast__map .ds-locator {
+.ds-home-first-paint .ds-record-mast__map .ds-embed-map,
+.ds-home-first-paint .ds-record-mast__map .ds-locator:not(.ds-embed-map__standin) {
   position: relative;
   width: 100%;
   height: auto;

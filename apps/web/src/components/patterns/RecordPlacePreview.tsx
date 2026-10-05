@@ -1,26 +1,18 @@
 /**
- * A record's place block: a locator inset, the place in words, and the way out to a real map.
+ * A record's place block: the place on a map, and the place in words.
  *
- * WHY A LOCATOR AND NOT A MAP. The block needs a locator, not a map. The caveat printed directly
- * beneath it holds the record to city precision and refuses exact addresses; an interactive street
- * camera contradicts that in the act of rendering. A static locator costs no GL context, no tiles,
- * no fixed positioning and no plate arbitration. `MapMoment` keeps its job on the reading
- * surfaces, where a moment is full-column, scroll-triggered, and genuinely about a camera
- * arriving — which is what it was designed for. See `RecordLocator` for why a borrowed plate
- * cannot serve a rail-width slot.
+ * Two forms. Where the block sits in a page (the place hero, the record page's Visit block) it is
+ * a live map (`EmbeddedMap`): its own small MapLibre instance in the document flow, so it scrolls
+ * with the page natively — none of the lag, flicker or chrome collisions that ruled out borrowing
+ * the shared fixed plate (see `RecordLocator`) — and it grows to full screen in place. Where the
+ * block floats over the live map already (Explore's record sheet, the narrative card), a second
+ * map would be a map on a map, so it stays the static locator.
  *
- * THE SHARED-SURFACE CASE. `RecordAnatomyPanel` renders on the record page AND inside Explore's
- * record sheet, which floats over the live plate. A sheet cannot borrow the plate it is floating
- * over. A locator has nothing to borrow, so both surfaces render the same thing and neither needs
- * a line explaining that a map is not coming.
- *
- * NO MAPS LINK OF ITS OWN. `RecordAnatomyPanel` wraps its own WHERE fact value in a
- * `MapsExternalLink`, and the record page prints an `Open in maps` CTA directly beneath this
- * block. A third link to the same coordinates here would repeat what both of those already say.
- * Street detail stays one tap away on both surfaces; it is just not offered twice.
+ * The precision caveat is printed by `RecordAnatomyPanel` / the record page; the map opens at city
+ * scale, matching what the archive holds.
  */
 import React from 'react';
-import { RecordLocatorLink } from './RecordLocatorLink';
+import { EmbeddedMap } from '../map-embed/EmbeddedMap';
 import { RecordLocator } from './RecordLocator';
 import './record-locator.css';
 
@@ -40,15 +32,11 @@ export type RecordPlacePreviewProps = {
   readonly lng: number;
   readonly label: string;
   readonly accessibleName?: string;
-  /** Place-page stand: the locator becomes a tap target that opens the live map on this place.
-   * Rail and sheet slots stay a plain picture. */
+  /** A live map that grows to full screen in place (`EmbeddedMap`). Off where the block floats
+   * over the live map already (Explore's record sheet), which keeps the static locator. */
   readonly interactive?: boolean;
-  /** Open zoomed onto the pin (place hero), not the continental thumbnail. */
+  /** Open at city scale (place hero) rather than regional. */
   readonly neighborhood?: boolean;
-  /** Live map handoff when the locator is interactive. */
-  readonly atlasHref?: string;
-  /** Catalog entity id for pin continuity across the map handoff. */
-  readonly entityId?: string;
 };
 
 export function RecordPlacePreview({
@@ -58,8 +46,6 @@ export function RecordPlacePreview({
   accessibleName,
   interactive = false,
   neighborhood = false,
-  atlasHref,
-  entityId,
 }: RecordPlacePreviewProps) {
   const sharedProps = {
     lat,
@@ -71,12 +57,7 @@ export function RecordPlacePreview({
   return (
     <figure className="ds-record-anatomy__place">
       {interactive ? (
-        <RecordLocatorLink
-          {...sharedProps}
-          neighborhood={neighborhood}
-          {...(atlasHref !== undefined ? { atlasHref } : {})}
-          {...(entityId !== undefined ? { entityId } : {})}
-        />
+        <EmbeddedMap {...sharedProps} zoom={neighborhood ? 11 : 9} />
       ) : (
         <RecordLocator {...sharedProps} />
       )}
