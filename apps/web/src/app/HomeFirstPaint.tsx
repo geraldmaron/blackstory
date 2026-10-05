@@ -233,6 +233,7 @@ export function HomeFirstPaint({
       <EntityMastMedia
         entityId={lead.id}
         entityName={lead.displayName}
+        kind={lead.kind}
         {...(lead.primaryImage !== undefined ? { primaryImage: lead.primaryImage } : {})}
         hideCredit
         priority

@@ -4,9 +4,9 @@
  * PlaceFinder is the place-search experience mounted in the Atlas Lens's Where group.
  *
  * One component, two postures:
- *   - Wide (>= `NARROW_BREAKPOINT`): renders inline inside the Lens's Where group, always
+ *   - Wide (not `COMPACT_MEDIA_QUERY`): renders inline inside the Lens's Where group, always
  *     visible, no trigger needed the panel has room.
- *   - Narrow (< `NARROW_BREAKPOINT`, matching `use-panel-visibility.ts`'s own threshold, which
+ *   - Compact (`COMPACT_MEDIA_QUERY` — narrow OR short, shared with `use-panel-visibility.ts`; this file
  *     this file cannot import — it has no access to that hook's composite panel state, only the
  *     raw width test it is built on): the Where group shows a compact "Find a place" trigger, and
  *     the full form opens as a dedicated full-width, single-column sheet overlaying the plate,
@@ -39,6 +39,8 @@
  * clears an active radius.
  */
 import React, { useEffect, useId, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
+import { Button } from '@repo/ui';
 import { getRequestIntegrityHeaders } from '../../lib/request-integrity/client';
 import { fetchLocateByCoordinates, type LocateClientResult } from '../../lib/geocode/locate-client';
 import type { BrowserCoordinates } from '../../lib/geocode/browser-geolocation';
@@ -56,6 +58,7 @@ import {
 } from '../../lib/map-experience/explore-place-radius';
 import { resolveExploreAddressCamera } from '../../lib/map-experience/resolve-explore-address-camera';
 import { ExploreAddressSearch, type ExploreAddressResolvedPayload } from './ExploreAddressSearch';
+import { COMPACT_MEDIA_QUERY } from '../../lib/layout/compact-viewport';
 import './place-finder.css';
 
 void React;
@@ -72,11 +75,16 @@ export type PlaceFinderProps = {
   readonly catalogFeatures?: readonly ExploreMapFeature[];
   readonly onResolved?: (payload: PlaceFinderResolvedPayload) => void;
   readonly disabled?: boolean;
+  /**
+   * The surface's shared locate action. When given, "Use my current location" calls it instead of
+   * running its own lookup, so every locate control in the app behaves identically (marker,
+   * framing, nearest-first records). Without it the finder keeps its standalone flow.
+   */
+  readonly onUseMyLocation?: () => void;
+  readonly locating?: boolean;
+  /** Radius chips changed (applies live to an already-located place). */
+  readonly onRadiusChange?: (radiusMeters: number | null, radiusLabel: string) => void;
 };
-
-/** Matches `use-panel-visibility.ts`'s `NARROW_BREAKPOINT` (`apps/web/src/app/explore/hooks/`):
- * below this the Lens itself shrinks to a docked strip with no room for an inline form. */
-const NARROW_BREAKPOINT = 820;
 
 /**
  * "Radius and state select disagreement resolves to the most recent action, with the other
@@ -125,12 +133,27 @@ export function PlaceFinder({
   catalogFeatures = [],
   onResolved,
   disabled = false,
+  onUseMyLocation,
+  locating = false,
+  onRadiusChange,
 }: PlaceFinderProps) {
   const [radiusId, setRadiusIdState] = useState<ExploreRadiusPresetId>(DEFAULT_EXPLORE_RADIUS_ID);
   const [narrow, setNarrow] = useState(false);
   const [open, setOpen] = useState(false);
   const [geoStatus, setGeoStatus] = useState<GeoStatus>({ kind: 'idle' });
   const dialogTitleId = useId();
+  const titleRef = useRef<HTMLHeadingElement>(null);
+  const triggerRef = useRef<HTMLButtonElement>(null);
+  const wasOpen = useRef(false);
+
+  // Focus follows the sheet: into its title when it opens, back to the trigger when it closes
+  // (by the close button or by a place resolving), so keyboard and screen-reader users never
+  // land on <body>.
+  useEffect(() => {
+    if (open) titleRef.current?.focus();
+    else if (wasOpen.current) triggerRef.current?.focus();
+    wasOpen.current = open;
+  }, [open]);
 
   const skipFirstStateSync = useRef(true);
   useEffect(() => {
@@ -146,7 +169,7 @@ export function PlaceFinder({
 
   useEffect(() => {
     if (typeof window === 'undefined' || typeof window.matchMedia !== 'function') return;
-    const query = window.matchMedia(`(max-width: ${NARROW_BREAKPOINT - 1}px)`);
+    const query = window.matchMedia(COMPACT_MEDIA_QUERY);
     const sync = () => setNarrow(query.matches);
     sync();
     query.addEventListener('change', sync);
@@ -170,10 +193,20 @@ export function PlaceFinder({
     if (radiusPickClearsState(id, state)) {
       onStateChange('');
     }
+    const preset = exploreRadiusPresetById(id);
+    onRadiusChange?.(preset.meters, preset.statusLabel);
   }
 
   function handleResolved(payload: ExploreAddressResolvedPayload) {
     onResolved?.(payload);
+    // On a phone the finder is a full-screen sheet; once a place resolves, the reader wants the
+    // map it just moved, not the form.
+    if (narrow) setOpen(false);
+  }
+
+  function useMyLocation() {
+    onUseMyLocation?.();
+    if (narrow) setOpen(false);
   }
 
   function applyGeoResult(result: LocateClientResult) {
@@ -252,13 +285,21 @@ export function PlaceFinder({
     return (
       <div className="ds-place-finder__form">
         <div className="ds-place-finder__privacy">
-          <LocationPrivacyNotice />
+          <LocationPrivacyNotice deviceStaysLocal={Boolean(onUseMyLocation)} />
         </div>
-        <LocationConsentButton
-          onResolved={(position) => void handleCoordinatesResolved(position)}
-          onDenied={handleGeoDenied}
-          disabled={disabled}
-        />
+        {onUseMyLocation ? (
+          <div data-locate="shared">
+            <Button type="button" onClick={useMyLocation} disabled={disabled || locating}>
+              {locating ? 'Finding your location…' : 'Use my current location'}
+            </Button>
+          </div>
+        ) : (
+          <LocationConsentButton
+            onResolved={(position) => void handleCoordinatesResolved(position)}
+            onDenied={handleGeoDenied}
+            disabled={disabled}
+          />
+        )}
         <p className="ds-sans ds-place-finder__geo-status" role="status" aria-live="polite">
           {geoStatusMessage}
         </p>
@@ -280,6 +321,7 @@ export function PlaceFinder({
   if (!open) {
     return (
       <button
+        ref={triggerRef}
         type="button"
         className="ds-lens__link ds-place-finder__trigger"
         onClick={() => setOpen(true)}
@@ -289,7 +331,7 @@ export function PlaceFinder({
     );
   }
 
-  return (
+  const sheet = (
     // No scrim: this sheet is edge-to-edge full-width by design (the whole point of the narrow
     // posture), so there is no "outside the dialog" region for a click-to-close scrim to ever
     // occupy — one would sit fully hidden behind the dialog and only cost a keyboard user an
@@ -300,7 +342,7 @@ export function PlaceFinder({
     <div className="ds-place-sheet" role="dialog" aria-modal="true" aria-labelledby={dialogTitleId}>
       <div className="ds-place-sheet__dialog">
         <div className="ds-place-sheet__head">
-          <h3 className="ds-place-sheet__title" id={dialogTitleId}>
+          <h3 className="ds-place-sheet__title" id={dialogTitleId} ref={titleRef} tabIndex={-1}>
             Find a place
           </h3>
           <button
@@ -323,4 +365,8 @@ export function PlaceFinder({
       </div>
     </div>
   );
+  // Portaled to <body>: rendered inside the Filters panel, the sheet inherited that panel's
+  // stacking context and drew *under* the command bar and the Door's "Back to journey" pill, which
+  // hid its title and close button and covered "Use my current location".
+  return typeof document === 'undefined' ? sheet : createPortal(sheet, document.body);
 }

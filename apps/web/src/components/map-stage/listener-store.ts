@@ -28,6 +28,10 @@ export type MapStageEvents = {
   pinHover: [
     target: { readonly entityId: string; readonly name: string; readonly rect: DOMRect } | null,
   ];
+  /** The reader started steering the map by hand: a drag, pinch, wheel zoom, twist or tilt.
+   * Scripted camera moves never fire it. Surfaces use it to get out of the way — blur a search
+   * field, close its suggestions, collapse a bottom sheet — as every maps app does. */
+  interact: [];
 };
 
 export type MapStageEventName = keyof MapStageEvents;
@@ -45,6 +49,7 @@ export function makeListenerStore(): {
     ready: new Set(),
     error: new Set(),
     pinHover: new Set(),
+    interact: new Set(),
   };
 }
 

@@ -43,10 +43,18 @@ function postalCodeFromStateId(stateId: string | undefined): string | undefined 
   return US_STATES.find((state) => state.fips === fips)?.postalCode;
 }
 
+/** Census place names carry their legal type ("Montgomery city", "Mableton CDP"). Readers say
+ * "Montgomery". */
+function plainPlaceName(name: string | undefined): string | undefined {
+  return name?.replace(/\s+(city|town|village|borough|CDP|municipality)$/i, '').trim() || undefined;
+}
+
 function buildLabel(resolution: ExploreAddressLocateResolution, statePostalCode?: string): string {
+  const place = plainPlaceName(resolution.match.placeName);
+  // A city already locates the reader; its county only lengthens the chip.
   const parts = [
-    resolution.match.placeName,
-    resolution.match.countyName,
+    place,
+    place ? undefined : resolution.match.countyName,
     resolution.match.stateName,
   ].filter((part): part is string => Boolean(part));
   if (parts.length > 0) return parts.join(', ');

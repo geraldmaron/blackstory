@@ -47,3 +47,18 @@ test('wheel factor respects direction', () => {
   assert.ok(wheelFactorForDelta(-120) > 1);
   assert.equal(wheelFactorForDelta(0), 1);
 });
+
+test('cooperative wheel: plain scroll is the page, Ctrl/⌘ (and trackpad pinch) zoom the map', async () => {
+  const { cooperativeWheelVerdict, cooperativeHint, twoFingerFrame } =
+    await import('./record-locator-view');
+  assert.equal(cooperativeWheelVerdict({ ctrlKey: false, metaKey: false }), 'page');
+  assert.equal(cooperativeWheelVerdict({ ctrlKey: true, metaKey: false }), 'zoom');
+  assert.equal(cooperativeWheelVerdict({ ctrlKey: false, metaKey: true }), 'zoom');
+  assert.equal(cooperativeHint('touch', false), 'Use two fingers to move the map');
+  assert.equal(cooperativeHint('wheel', true), 'Use ⌘ + scroll to zoom the map');
+  assert.deepEqual(twoFingerFrame({ x: 0, y: 0 }, { x: 30, y: 40 }), {
+    cx: 15,
+    cy: 20,
+    spread: 50,
+  });
+});

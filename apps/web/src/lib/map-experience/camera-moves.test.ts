@@ -314,8 +314,8 @@ test('flyToRecord lands at record framing with padding applied once', () => {
   const flight = h.calls[0]?.options;
   assert.equal(h.calls[0]?.method, 'flyTo');
   assert.equal(flight?.zoom, 12.6);
-  assert.equal(flight?.pitch, 52);
-  assert.equal(flight?.bearing, -18);
+  assert.equal(flight?.pitch, 0, 'records open flat');
+  assert.equal(flight?.bearing, 0, 'records open north-up');
   assert.equal(flight?.curve, CAMERA_FLY_CURVE);
   assert.deepEqual(flight?.padding, { top: 96, right: 40, bottom: 160, left: 40 });
   assert.equal(h.announcements[0], 'Fly to · Birmingham, Alabama');
@@ -396,4 +396,56 @@ test('the library never reaches for maplibre-gl at runtime', async () => {
     !/^import\s+(?!type)[^;]*from\s+'maplibre-gl'/m.test(source),
     'camera-moves must stay testable in plain Node',
   );
+});
+
+test('flyToRecord never zooms a reader out from a closer view', () => {
+  const h = harness({ zoom: 14.5 });
+  h.camera.flyToRecord({ center: [-86.81, 33.52], place: 'Birmingham, Alabama' });
+  assert.equal(h.calls[0]?.options.zoom, 14.5);
+});
+
+test('frameArea centers north-up and flat, padded for the chrome, and is never gated', () => {
+  const h = harness({ pitch: 40, bearing: 30 });
+  h.camera.frameArea({ kind: 'center', center: [-84.39, 33.75], label: 'your location' });
+  const flight = h.calls.at(-1);
+  assert.equal(flight?.method, 'flyTo');
+  assert.equal(flight?.options.pitch, 0);
+  assert.equal(flight?.options.bearing, 0);
+  assert.equal(flight?.options.zoom, 13.2);
+  assert.equal(flight?.options.curve, CAMERA_FLY_CURVE);
+  assert.ok(flight?.options.padding, 'locate framing respects the open panels');
+  assert.equal(h.announcements.at(-1), 'Locate · your location');
+});
+
+test('frameArea fits a bounds frame and degrades instead of throwing', () => {
+  const ok = harness();
+  ok.camera.frameArea({
+    kind: 'bounds',
+    bounds: [
+      [-84.5, 33.6],
+      [-84.3, 33.8],
+    ],
+    label: '5 miles of your location',
+  });
+  assert.equal(ok.calls.at(-1)?.method, 'fitBounds');
+  assert.equal(ok.calls.at(-1)?.options.pitch, 0);
+
+  const broken = harness({ fitBoundsThrows: true });
+  broken.camera.frameArea({
+    kind: 'bounds',
+    bounds: [
+      [-84.5, 33.6],
+      [-84.3, 33.8],
+    ],
+    label: 'x',
+  });
+  assert.equal(broken.calls.at(-1)?.method, 'easeTo');
+});
+
+test('the ambient establishing shot moves the camera without announcing itself', () => {
+  const h = harness();
+  h.camera.wide({ trigger: 'ambient' });
+  assert.equal(h.announcements.length, 0);
+  h.camera.wide();
+  assert.equal(h.announcements.at(-1), 'Wide · continental');
 });

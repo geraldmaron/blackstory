@@ -110,14 +110,41 @@ describe('buildAppleMapsDirectionsUrl', () => {
     });
     assert.equal(
       url,
-      'https://maps.apple.com/?daddr=819+West+16th+Street%2C+Indianapolis%2C+IN&ll=39.788%2C-86.164&dirflg=d',
+      'https://maps.apple.com/?daddr=819+West+16th+Street%2C+Indianapolis%2C+IN&ll=39.788%2C-86.164',
     );
   });
 
   it('routes to the point when there is no prose destination', () => {
     assert.equal(
       buildAppleMapsDirectionsUrl({ lat: 39.788, lng: -86.164 }),
-      'https://maps.apple.com/?daddr=39.788%2C-86.164&dirflg=d',
+      'https://maps.apple.com/?daddr=39.788%2C-86.164',
     );
   });
+});
+
+it('appleMapsUrlFromGoogle converts search and directions links, keeping name and point', async () => {
+  const { appleMapsUrlFromGoogle, buildExternalMapsSearchUrl, buildExternalMapsDirectionsUrl } =
+    await import('./external-maps-url');
+  const input = { query: 'Ebenezer Baptist Church', lat: 33.7555, lng: -84.3733 };
+  assert.equal(
+    appleMapsUrlFromGoogle(buildExternalMapsSearchUrl(input)!),
+    'https://maps.apple.com/?q=Ebenezer+Baptist+Church&ll=33.7555%2C-84.3733',
+  );
+  assert.equal(
+    appleMapsUrlFromGoogle(buildExternalMapsDirectionsUrl(input)!),
+    'https://maps.apple.com/?daddr=Ebenezer+Baptist+Church&ll=33.7555%2C-84.3733',
+  );
+  assert.equal(
+    appleMapsUrlFromGoogle(buildExternalMapsSearchUrl({ lat: 1, lng: 2 })!),
+    'https://maps.apple.com/?ll=1%2C2',
+  );
+  assert.equal(appleMapsUrlFromGoogle('https://example.com/maps/x'), undefined);
+});
+
+it('prefersAppleMaps recognises Apple devices only', async () => {
+  const { prefersAppleMaps } = await import('./external-maps-url');
+  assert.equal(prefersAppleMaps('Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X)'), true);
+  assert.equal(prefersAppleMaps('Mozilla/5.0 (Macintosh; Intel Mac OS X 14_5)'), true);
+  assert.equal(prefersAppleMaps('Mozilla/5.0 (Linux; Android 14; Pixel 8)'), false);
+  assert.equal(prefersAppleMaps('Mozilla/5.0 (Windows NT 10.0; Win64; x64)'), false);
 });

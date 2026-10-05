@@ -84,7 +84,13 @@ export type LensPanelProps = {
   readonly stateOptions: readonly StateOption[];
   readonly state: string;
   readonly onStateChange: (postalCode: string) => void;
+  /** The shared locate action (`use-locate-me.ts`). The place finder's "Use my current location"
+   * calls it, so this panel, the on-map button and the palette all locate the same way. */
   readonly onNearMe?: () => void;
+  /** True while the browser is resolving a position. */
+  readonly locating?: boolean;
+  /** Live radius change from the place finder's radius chips (applies to an active "near"). */
+  readonly onRadiusChange?: (radiusMeters: number | null, radiusLabel: string) => void;
   /** Live explore catalog, forwarded to `PlaceFinder`'s typeahead. Omitted until a caller (a
    * future wave — `AtlasExperience.tsx` is outside this bead's file lock) wires the live
    * features through; `PlaceFinder` itself degrades to no recommendations without them. */
@@ -147,6 +153,8 @@ export function LensPanel({
   state,
   onStateChange,
   onNearMe,
+  locating = false,
+  onRadiusChange,
   catalogFeatures,
   onPlaceResolved,
   kindCounts,
@@ -226,8 +234,8 @@ export function LensPanel({
         </h2>
         <span className="ds-lens__count">
           {matched === total
-            ? `${total.toLocaleString('en-US')} in view`
-            : `${matched.toLocaleString('en-US')} in view`}
+            ? `${total.toLocaleString('en-US')} ${total === 1 ? 'record' : 'records'}`
+            : `${matched.toLocaleString('en-US')} of ${total.toLocaleString('en-US')}`}
         </span>
         {onHide ? (
           <button
@@ -253,11 +261,6 @@ export function LensPanel({
         <div className="ds-lens__group">
           <div className="ds-lens__group-head">
             <span className="ds-lens__group-label">Where</span>
-            {onNearMe ? (
-              <button type="button" className="ds-lens__link" onClick={onNearMe}>
-                Near me
-              </button>
-            ) : null}
           </div>
           <label className="ds-lens__field">
             <span className="ds-visually-hidden">State</span>
@@ -279,6 +282,8 @@ export function LensPanel({
             onStateChange={onStateChange}
             {...(catalogFeatures ? { catalogFeatures } : {})}
             {...(onPlaceResolved ? { onResolved: onPlaceResolved } : {})}
+            {...(onNearMe ? { onUseMyLocation: onNearMe, locating } : {})}
+            {...(onRadiusChange ? { onRadiusChange } : {})}
           />
         </div>
 

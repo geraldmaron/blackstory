@@ -153,20 +153,23 @@ test('presence bars name the state in words, not only as a bar', () => {
   assert.match(html, /372/);
 });
 
-test('the header reports how much of the release is in view', () => {
+test('the header reports how much of the release matches, not what is "in view"', () => {
   const html = renderToStaticMarkup(createElement(LensPanel, lensProps({ matched: 285 })));
-  assert.match(html, /285 in view/);
+  assert.match(html, /285 of /);
+  assert.equal(
+    html.includes('in view'),
+    false,
+    'the count is a filter count, not a viewport count',
+  );
 });
 
-test('Near me only renders when the surface can actually geolocate', () => {
-  assert.equal(
-    renderToStaticMarkup(createElement(LensPanel, lensProps())).includes('Near me'),
-    false,
-  );
-  assert.match(
-    renderToStaticMarkup(createElement(LensPanel, lensProps({ onNearMe: () => {} }))),
-    /Near me/,
-  );
+test('locating is one shared action: no separate Near me link, the finder button delegates', () => {
+  const plain = renderToStaticMarkup(createElement(LensPanel, lensProps()));
+  assert.equal(plain.includes('Near me'), false, 'no duplicate text link in the header');
+  const shared = renderToStaticMarkup(createElement(LensPanel, lensProps({ onNearMe: () => {} })));
+  assert.equal(shared.includes('Near me'), false);
+  assert.match(shared, /data-locate="shared"/);
+  assert.match(shared, /Use my current location/);
 });
 
 test('copy carries no em dash', () => {

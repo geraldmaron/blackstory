@@ -105,7 +105,7 @@ test('wide layout reserves room for whichever panels are open', () => {
   assert.equal(sheet.right, 468);
 });
 
-test('narrow layout ignores panel state and uses stacked insets', () => {
+test('narrow layout reserves the bottom sheet only while one is open', () => {
   const narrow = { viewportWidth: 375, viewportHeight: 812 } as const;
   const closed = chromePadding({
     ...narrow,
@@ -113,12 +113,33 @@ test('narrow layout ignores panel state and uses stacked insets', () => {
     resultsOpen: false,
     sheetOpen: false,
   });
-  const open = chromePadding({ ...narrow, lensOpen: true, resultsOpen: true, sheetOpen: true });
+  const open = chromePadding({ ...narrow, lensOpen: true, resultsOpen: false, sheetOpen: false });
 
-  assert.deepEqual(closed, open, 'panels overlay the map below the narrow breakpoint');
+  assert.ok(open.bottom > closed.bottom, 'an open sheet pushes the framing up');
+  assert.equal(closed.left, open.left, 'sides do not depend on panels on a phone');
   assert.equal(closed.left, 16);
-  assert.equal(closed.right, 16);
-  assert.equal(closed.top, 88);
+  assert.equal(closed.right, 68, 'right edge clears the on-map controls');
+  assert.equal(closed.top, 120, 'top clears the two-row compact command bar');
+});
+
+test('a phone on its side frames the map beside the left-hand panel', () => {
+  const sideways = chromePadding({
+    viewportWidth: 844,
+    viewportHeight: 390,
+    lensOpen: true,
+    resultsOpen: false,
+    sheetOpen: false,
+  });
+  assert.ok(sideways.left > 300, 'the open instrument is a left column');
+  assert.ok(sideways.top + sideways.bottom < 390 / 2);
+  const smallPhone = chromePadding({
+    viewportWidth: 667,
+    viewportHeight: 375,
+    lensOpen: true,
+    resultsOpen: false,
+    sheetOpen: false,
+  });
+  assert.ok(smallPhone.left > 250, 'a 667×375 phone on its side also uses the left column');
 });
 
 test('narrow breakpoint switches exactly at the documented width', () => {

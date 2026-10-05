@@ -1,7 +1,12 @@
 /**
  * Client session navigation for entity detail pages. Shares Back stack and Random
- * toggle with explore spotlight via sessionStorage; navigates via Next router
- * (not browser history for Back).
+ * toggle with explore spotlight via sessionStorage.
+ *
+ * Back honours the browser's history: when the reader got here with Next, the previous record IS
+ * the previous history entry, so Back is `router.back()`. Pushing a new entry instead (as this
+ * used to) made the browser's own Back button then walk the reader *forward* again. When the
+ * previous record is not the previous entry (they arrived from elsewhere), Back replaces the
+ * current entry rather than growing history.
  */
 'use client';
 
@@ -23,6 +28,11 @@ import {
   writeEntitySessionRandomEnabled,
   writeEntitySessionStack,
 } from '../../../lib/map-experience/entity-session-storage';
+import {
+  appendNextHop,
+  nextHopInto,
+  type NextHop,
+} from '../../../lib/map-experience/next-hop-chain';
 
 export type EntitySessionNavClientProps = {
   readonly currentId: string;
@@ -32,6 +42,34 @@ export type EntitySessionNavClientProps = {
    */
   readonly orderedIds: readonly string[];
 };
+
+const ARRIVED_VIA_NEXT_KEY = 'ds-entity-session-arrived-via-next';
+
+function readNextChain(): NextHop[] {
+  try {
+    const raw = window.sessionStorage.getItem(ARRIVED_VIA_NEXT_KEY);
+    if (!raw) return [];
+    const parsed: unknown = JSON.parse(raw);
+    const list = Array.isArray(parsed) ? parsed : [parsed];
+    return list.filter(
+      (hop): hop is NextHop =>
+        typeof hop === 'object' &&
+        hop !== null &&
+        typeof (hop as NextHop).from === 'string' &&
+        typeof (hop as NextHop).to === 'string',
+    );
+  } catch {
+    return [];
+  }
+}
+
+function writeNextChain(chain: readonly NextHop[]): void {
+  try {
+    window.sessionStorage.setItem(ARRIVED_VIA_NEXT_KEY, JSON.stringify(chain.slice(-50)));
+  } catch {
+    // Storage blocked: Back falls back to replace, which is still correct, just not history-aware.
+  }
+}
 
 export function EntitySessionNavClient({ currentId, orderedIds }: EntitySessionNavClientProps) {
   const router = useRouter();
@@ -48,8 +86,14 @@ export function EntitySessionNavClient({ currentId, orderedIds }: EntitySessionN
     }
     setStack(result.stack);
     writeEntitySessionStack(result.stack);
-    router.push(`/entity/${result.entityId}`);
-  }, [router, stack]);
+    const chain = readNextChain();
+    if (nextHopInto(chain, currentId) === result.entityId) {
+      writeNextChain(chain.slice(0, -1));
+      router.back();
+      return;
+    }
+    router.replace(`/entity/${result.entityId}`);
+  }, [currentId, router, stack]);
 
   const handleNext = useCallback(() => {
     const nextId = pickNext({ random: randomEnabled, currentId, orderedIds });
@@ -59,6 +103,7 @@ export function EntitySessionNavClient({ currentId, orderedIds }: EntitySessionN
     const nextStack = push(stack, currentId);
     setStack(nextStack);
     writeEntitySessionStack(nextStack);
+    writeNextChain(appendNextHop(readNextChain(), { from: currentId, to: nextId }));
     router.push(`/entity/${nextId}`);
   }, [currentId, orderedIds, randomEnabled, router, stack]);
 

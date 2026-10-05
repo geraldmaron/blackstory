@@ -39,7 +39,22 @@ export const RESULTS_ROW_HEIGHT = 54;
 /** Rows rendered above and below the viewport so a fast scroll does not show blank space. */
 const OVERSCAN = 6;
 
-export type ResultsSort = 'oldest' | 'newest';
+export type ResultsSort = 'oldest' | 'newest' | 'nearest';
+
+const SORT_LABEL: Record<ResultsSort, string> = {
+  oldest: 'oldest first',
+  newest: 'newest first',
+  nearest: 'nearest first',
+};
+
+/** The next sort in the cycle. `nearest` only exists while a place is located. */
+export function nextResultsSort(sort: ResultsSort, canSortByDistance: boolean): ResultsSort {
+  const cycle: readonly ResultsSort[] = canSortByDistance
+    ? ['nearest', 'oldest', 'newest']
+    : ['oldest', 'newest'];
+  const index = cycle.indexOf(sort);
+  return cycle[(index + 1) % cycle.length] ?? 'oldest';
+}
 
 /** One active, clearable narrowing constraint (docs/ui/patterns-lens-handoff.md §3). Rendered as
  * a chip naming what narrowed the set, with a control to clear just that one. */
@@ -56,6 +71,8 @@ export type ResultsRailProps = {
   readonly onSelect: (feature: ExploreMapFeature) => void;
   readonly sort: ResultsSort;
   readonly onSortChange: (sort: ResultsSort) => void;
+  /** Distance text per entity id ("0.4 mi") while a place is located. */
+  readonly distanceLabels?: ReadonlyMap<string, string> | null;
   readonly savedIds?: ReadonlySet<string>;
   readonly onToggleSave?: (feature: ExploreMapFeature) => void;
   readonly onHide?: () => void;
@@ -107,6 +124,7 @@ export function ResultsRail({
   onSelect,
   sort,
   onSortChange,
+  distanceLabels,
   savedIds,
   onToggleSave,
   onHide,
@@ -159,7 +177,7 @@ export function ResultsRail({
   return (
     <section
       className={cx('ds-results', className)}
-      aria-label="Records in view"
+      aria-label="Records"
       onPointerEnter={onIntent}
       onFocus={onIntent}
     >
@@ -171,10 +189,10 @@ export function ResultsRail({
         <button
           type="button"
           className="ds-results__sort"
-          onClick={() => onSortChange(sort === 'oldest' ? 'newest' : 'oldest')}
-          aria-label={`Sort order: ${sort === 'oldest' ? 'oldest first' : 'newest first'}`}
+          onClick={() => onSortChange(nextResultsSort(sort, Boolean(distanceLabels)))}
+          aria-label={`Sort order: ${SORT_LABEL[sort]}. Change sort order`}
         >
-          {sort === 'oldest' ? 'OLDEST' : 'NEWEST'}
+          {sort.toUpperCase()}
         </button>
         {onHide ? (
           <button
@@ -237,6 +255,7 @@ export function ResultsRail({
               const saved = savedIds?.has(id) ?? false;
               const grade = gradeForConfidence(feature.properties.confidenceTier);
               const photo = photos?.[id];
+              const distance = distanceLabels?.get(id);
 
               return (
                 <div
@@ -287,6 +306,14 @@ export function ResultsRail({
                   <span className="ds-results__text">
                     <span className="ds-results__name">{feature.properties.displayName}</span>
                     <span className="ds-results__meta">
+                      {distance ? (
+                        <>
+                          <span className="ds-results__distance">{distance}</span>
+                          <span className="ds-results__sep" aria-hidden="true">
+                            ·
+                          </span>
+                        </>
+                      ) : null}
                       <span className="ds-results__place">{placeLabel(feature)}</span>
                       <span className="ds-results__sep" aria-hidden="true">
                         ·

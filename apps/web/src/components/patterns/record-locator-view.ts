@@ -83,3 +83,44 @@ export function wheelFactorForDelta(deltaY: number): number {
 export function locatorCanvasTransform(state: LocatorViewState): string {
   return `translate(${state.panX}px, ${state.panY}px) scale(${state.scale})`;
 }
+
+/**
+ * Cooperative gestures for a map embedded in a scrolling page (Google Maps' `gestureHandling:
+ * 'cooperative'`, MapLibre's `cooperativeGestures`): the page keeps its own gestures and the map
+ * takes the deliberate ones. One finger and a plain wheel scroll the page; two fingers pan and
+ * pinch the map; Ctrl/⌘ + wheel zooms it — which is also what a trackpad pinch reports. A full-
+ * screen map (the Instrument) takes every gesture instead; that distinction is the whole rule.
+ */
+export type CooperativeWheelVerdict = 'zoom' | 'page';
+
+export function cooperativeWheelVerdict(event: {
+  readonly ctrlKey: boolean;
+  readonly metaKey: boolean;
+}): CooperativeWheelVerdict {
+  return event.ctrlKey || event.metaKey ? 'zoom' : 'page';
+}
+
+export type TouchPoint = { readonly x: number; readonly y: number };
+
+/** Centroid and finger spread of a two-finger touch. */
+export function twoFingerFrame(
+  a: TouchPoint,
+  b: TouchPoint,
+): {
+  readonly cx: number;
+  readonly cy: number;
+  readonly spread: number;
+} {
+  return {
+    cx: (a.x + b.x) / 2,
+    cy: (a.y + b.y) / 2,
+    spread: Math.hypot(b.x - a.x, b.y - a.y),
+  };
+}
+
+/** The hint a reader sees when they used the page's gesture on the map. */
+export function cooperativeHint(kind: 'touch' | 'wheel', isMac: boolean): string {
+  return kind === 'touch'
+    ? 'Use two fingers to move the map'
+    : `Use ${isMac ? '⌘' : 'Ctrl'} + scroll to zoom the map`;
+}

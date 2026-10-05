@@ -398,9 +398,63 @@ deployed; the edge enforces them already. Apply or re-apply (idempotent, dry run
 robots.txt. Watch Security → Events for a day after any change: Free has no log-only action.
 
 `api.blackstory.app` is not proxied by Cloudflare, so none of this covers it (`repo-ogo3j.7`), and
-neither does traffic that reaches Vercel directly (`repo-4wb0e.4`). If `api.blackstory.app` is ever
-proxied, exempt it from `bs_bot_scripted_clients` first: that rule only exempts `/api/*` paths, and
-the Android app's default user agent is `okhttp`.
+neither does traffic that reaches Vercel directly (`repo-4wb0e.4`, see "Origin lock" below). If
+`api.blackstory.app` is ever proxied, exempt it from `bs_bot_scripted_clients` first: that rule
+only exempts `/api/*` paths, and the Android app's default user agent is `okhttp`.
+
+### Origin lock (repo-4wb0e.4)
+
+Vercel serves every domain it hosts from one anycast address, so `Host: blackstory.app` sent to
+`76.76.21.21` skips every rule above. Measured 2026-09-30: GPTBot gets `/about` 200 there (403
+through Cloudflare), and `python-requests` gets a two-parameter `/records` 200 (challenged through
+Cloudflare); `www` behaves the same.
+
+**Design.** Cloudflare stamps a secret request header on every request it proxies (Transform Rule
+`bs_origin_auth`, header `x-bs-origin-auth`); a Vercel firewall custom rule (`bs-origin-auth`)
+matches requests to `blackstory.app` or `www.blackstory.app` whose header is missing or matches no
+accepted secret. Vercel does not bill WAF-denied traffic (no CDN requests or data transfer), so
+bypass traffic stops costing anything. `blackstory-admin.vercel.app` is deliberately out of scope:
+it is how staff reach `/admin` and never passes through Cloudflare. Both halves are code:
+`scripts/origin-lock.mts` (idempotent; dry run by default; `--verify` probes both networks and
+proves which one answered).
+
+**Why this and not something stronger.** Cloudflare rates header validation "moderately secure";
+its "very secure" options do not fit a Vercel origin (no `cloudflared` on Vercel, no
+Authenticated Origin Pulls on Vercel, and JWT validation would mean middleware on every request,
+the invocation this is meant to avoid). An allowlist of Cloudflare IP ranges is weaker: anyone can
+point their own Cloudflare zone at Vercel with our hostname. The secret is a cost control, not
+authentication; nothing sensitive may rely on it. It lives in 1Password (`BlackStory origin auth
+header`, fields `password` = current and `previous`) and is never printed; the script shows
+sha256 fingerprints.
+
+**Status: deny since 2026-09-30, about 22:20 UTC.** Log mode ran from about 21:05 UTC: 24 requests
+through Cloudflare (IPv4 and IPv6, six paths) matched 0 times while direct no-header and
+wrong-header probes matched, and in 75 minutes of real traffic nothing else matched. After the
+switch: GPTBot and `python-requests` sent to `76.76.21.21` get 403 (they got 200 before), 18 reader
+checks through Cloudflare (nine paths, IPv4 and IPv6) get 200, the admin host still redirects to
+login, and a browser load of `/` and a record page had every same-site request succeed.
+
+**Rollout.** `--apply --mode=log` first, then watch what the rule matches (Vercel dashboard,
+Firewall) for real traffic before `--apply --mode=deny`. A deny apply refuses to run unless
+Cloudflare already sends an accepted secret, and rolls itself back to log if a normal request
+through Cloudflare stops returning 200. Rollback by hand: `--apply --mode=log`, or disable the
+rule in the Vercel dashboard (Firewall, Custom rules).
+
+**Rotation, with no gap.** In 1Password copy `password` into `previous` and generate a new
+`password` (48+ characters, letters and digits); `--apply --mode=deny` (Vercel accepts both before
+Cloudflare switches to the new value); once it has propagated, clear `previous` and apply again.
+Rotate if the value may have leaked, and when anyone with Vercel or Cloudflare access leaves.
+
+**Single edge, later.** Vercel recommends against any reverse proxy in front of it (it blinds the
+Vercel firewall and bot detection and adds latency); with no proxy there is no origin to bypass.
+The data from 2026-09-30: Cloudflare served 1.93M requests in the eight days to 2026-09-30, only
+11.5% from cache (8% of bytes), and September's Vercel bill had $0 of CDN requests and data
+transfer (Flat Rate CDN covers them) against $107 billed overall, the largest lines being build
+CPU ($33.80), function CPU ($22.63), observability events ($12.03) and origin transfer ($11.84).
+So Cloudflare's cache saves roughly nothing today; its value is the free rules and rate limit,
+which Vercel's firewall can take over (custom rules free, rate limiting usage-billed). The move is
+a DNS decision for the owner (`repo-4wb0e.7`). The admin alias is a second, smaller bypass
+(`repo-4wb0e.8`).
 
 ## Platform spend backstop
 

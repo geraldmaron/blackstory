@@ -294,7 +294,10 @@
    */
   --ds-atlas-bottom-right: 246px;
   /* Narrow instrument sheets sit above the dock; visible map above them stays hittable. */
-  --ds-atlas-dock-clearance: calc(var(--ds-space-2) + 66px);
+  /* The dock sits 8px + 28px (attribution) off the bottom and is 54px tall (44px chips + 4px
+     padding + hairlines); sheets and the on-map controls stack 8px above it. The old 66px
+     predated the attribution offset, so every compact sheet slid 16px under the dock. */
+  --ds-atlas-dock-clearance: calc(var(--ds-space-2) * 2 + 28px + 54px);
   --ds-atlas-sheet-peek: min(42dvh, 22.5rem);
 
   /* Fixed instrument-panel widths (map-experience lens-panel/results-rail/pin-photo-card).
