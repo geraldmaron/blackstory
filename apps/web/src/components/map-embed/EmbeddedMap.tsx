@@ -77,6 +77,9 @@ function enterTopLayer(element: HTMLElement): void {
 function leaveTopLayer(element: HTMLElement): void {
   if (!supportsTopLayer(element) || !element.hasAttribute('popover')) return;
   if (element.matches(':popover-open')) element.hidePopover();
+  // A closed popover is `display: none` in the UA stylesheet; drop the attribute so the frame is
+  // an ordinary in-page element again, not one that relies on overriding that rule.
+  element.removeAttribute('popover');
 }
 
 function prefersCoarsePointer(): boolean {
@@ -165,11 +168,42 @@ export function EmbeddedMap({
     return () => observer.disconnect();
   }, [wanted]);
 
+  /** One transition at a time: its frame and timer ids, so a reopen mid-close (or an unmount)
+   * cancels the earlier settle instead of letting it strip the new full-screen state. */
+  const transitionRef = useRef<{ raf: number; timer: number }>({ raf: 0, timer: 0 });
+  /** True while the frame's box animates: the resize lifecycle stands down, because resizing the
+   * WebGL canvas every frame wipes the drawing surface and the motion flickers. One resize runs
+   * when the animation settles. */
+  const animatingRef = useRef(false);
+
+  const cancelTransition = useCallback(() => {
+    cancelAnimationFrame(transitionRef.current.raf);
+    window.clearTimeout(transitionRef.current.timer);
+    transitionRef.current = { raf: 0, timer: 0 };
+    animatingRef.current = false;
+  }, []);
+
+  /** Back to an ordinary in-page frame, from wherever it is. Every exit path ends here: close,
+   * a lost WebGL context while full screen, and unmount. */
+  const release = useCallback(() => {
+    cancelTransition();
+    expandedRef.current = false;
+    const frame = frameRef.current;
+    if (frame) {
+      leaveTopLayer(frame);
+      frame.style.cssText = '';
+      delete frame.dataset.state;
+    }
+    document.documentElement.removeAttribute('data-embed-map-open');
+  }, [cancelTransition]);
+
   const expand = useCallback(() => {
     const frame = frameRef.current;
     const map = mapRef.current;
     if (!frame || !map || expandedRef.current) return;
+    cancelTransition();
     expandedRef.current = true;
+    animatingRef.current = true;
     const from = frame.getBoundingClientRect();
     Object.assign(frame.style, { transition: 'none', ...fixedBoxFor(from) });
     frame.dataset.state = 'open';
@@ -177,7 +211,7 @@ export function EmbeddedMap({
     document.documentElement.setAttribute('data-embed-map-open', '');
     void frame.getBoundingClientRect();
     const reduce = prefersReducedMotion();
-    requestAnimationFrame(() => {
+    transitionRef.current.raf = requestAnimationFrame(() => {
       frame.style.transition = reduce
         ? 'none'
         : `top ${EXPAND_MS}ms var(--ds-easing), left ${EXPAND_MS}ms var(--ds-easing), width ${EXPAND_MS}ms var(--ds-easing), height ${EXPAND_MS}ms var(--ds-easing), border-radius ${EXPAND_MS}ms var(--ds-easing)`;
@@ -185,30 +219,40 @@ export function EmbeddedMap({
     });
     applyEmbeddedGestures(map, true);
     setExpanded(true);
-    window.setTimeout(() => resizeMapInPlace(map), reduce ? 0 : EXPAND_MS + 20);
-  }, []);
+    transitionRef.current.timer = window.setTimeout(
+      () => {
+        animatingRef.current = false;
+        if (mapRef.current === map) resizeMapInPlace(map);
+      },
+      reduce ? 0 : EXPAND_MS + 20,
+    );
+  }, [cancelTransition]);
 
   const collapse = useCallback(() => {
     const frame = frameRef.current;
     const slot = slotRef.current;
     const map = mapRef.current;
-    if (!frame || !slot || !map || !expandedRef.current) return;
+    if (!frame || !slot || !map || !expandedRef.current) {
+      release();
+      setExpanded(false);
+      return;
+    }
+    cancelTransition();
     expandedRef.current = false;
+    animatingRef.current = true;
     const reduce = prefersReducedMotion();
-    const to = slot.getBoundingClientRect();
-    Object.assign(frame.style, fixedBoxFor(to));
+    Object.assign(frame.style, fixedBoxFor(slot.getBoundingClientRect()));
     applyEmbeddedGestures(map, false);
     setExpanded(false);
-    const settle = () => {
-      leaveTopLayer(frame);
-      frame.style.cssText = '';
-      delete frame.dataset.state;
-      document.documentElement.removeAttribute('data-embed-map-open');
-      resizeMapInPlace(map);
-      expandButtonRef.current?.focus();
-    };
-    window.setTimeout(settle, reduce ? 0 : EXPAND_MS + 20);
-  }, []);
+    transitionRef.current.timer = window.setTimeout(
+      () => {
+        release();
+        if (mapRef.current === map) resizeMapInPlace(map);
+        expandButtonRef.current?.focus();
+      },
+      reduce ? 0 : EXPAND_MS + 20,
+    );
+  }, [cancelTransition, release]);
 
   // Build the map.
   useEffect(() => {
@@ -254,11 +298,18 @@ export function EmbeddedMap({
         applyEmbeddedGestures(map, false);
         guard = attachSafariPageZoomGuard(container);
         const active = map;
-        resizeLifecycle = bindMapResizeLifecycle(container, () => resizeMapInPlace(active));
+        resizeLifecycle = bindMapResizeLifecycle(container, () => {
+          if (!animatingRef.current) resizeMapInPlace(active);
+        });
         contextRecovery = bindWebGlContextRecovery(
           active.getCanvas(),
           () => {
-            if (!cancelled) setStatus('failed');
+            if (cancelled) return;
+            // The frame unmounts with a failed status; release full screen first so the page is
+            // never left locked under a map that no longer exists.
+            release();
+            setExpanded(false);
+            setStatus('failed');
           },
           () => {
             if (!cancelled) resizeMapInPlace(active);
@@ -292,14 +343,11 @@ export function EmbeddedMap({
       resizeLifecycle?.disconnect();
       contextRecovery?.disconnect();
       guard?.detach();
+      release();
       map?.remove();
       mapRef.current = null;
-      if (expandedRef.current) {
-        expandedRef.current = false;
-        document.documentElement.removeAttribute('data-embed-map-open');
-      }
     };
-  }, [wanted, lat, lng, zoom, expand]);
+  }, [wanted, lat, lng, zoom, expand, release]);
 
   // Escape closes; focus goes to Close when it opens.
   useEffect(() => {
