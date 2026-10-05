@@ -431,8 +431,10 @@ export function DoorImmersive({
           once: true,
         });
       } else if (traversed) {
-        // Called from that same popstate: the browser's restoration lands just after it.
-        window.setTimeout(scheduleRestore, 120);
+        // Called from that same popstate: the browser's restoration lands just after it. Only
+        // when Back landed on the journey: from a cold `/explore`, Back leaves for whatever page
+        // came before, and that page's scroll is the browser's to restore, not ours.
+        if (window.location.pathname === '/') window.setTimeout(scheduleRestore, 120);
       } else {
         scheduleRestore();
       }
@@ -512,6 +514,8 @@ export function DoorImmersive({
       window.removeEventListener(MAP_BROWSE_ENTER_EVENT, onEnter);
       window.removeEventListener(MAP_BROWSE_EXIT_EVENT, onExit);
       window.removeEventListener('popstate', onPop);
+      // A journey scroll restore still waiting must not land on whatever page replaced the Door.
+      browseGenerationRef.current += 1;
       if (browseMorphTimerRef.current !== null) {
         window.clearTimeout(browseMorphTimerRef.current);
         browseMorphTimerRef.current = null;
