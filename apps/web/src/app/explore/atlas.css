@@ -12,7 +12,7 @@
  * `.ds-map-stage` and the Explore locator underlay sit at `--ds-z-map-plate` (0). `.ds-atlas`
  * sits at `--ds-z-content` (1) so Lens / Record sheet / Records / Timeline / Camera always paint
  * above pins (HTML first-paint discs and MapLibre markers alike). Until `.ds-map-stage` carries
- * `data-plate-ready`, the underlay is the map: it captures wheel, drag and pinch. After handoff
+ * `data-plate-ready`, the underlay is the first-paint picture (taps on its pins only). After handoff
  * the underlay is `pointer-events: none` and gaps on this wrapper pass pan/zoom to the plate.
  *
  * `pointer-events` is not inherited. A transparent child still leaves its auto parent as the

@@ -190,8 +190,14 @@ import {
 } from './plate-posture';
 import { createFramedSlotRegistry } from './framed-slot-registry';
 import { boxIsPaintable, plateBoxForSlot, resolvePlatePosture, type PlateBox } from './plate-frame';
-import { applyGesturesForPosture, lockGestures, rotateGestureAllowed } from './gesture-lock';
 import {
+  applyGesturesForPosture,
+  gesturePolicyFor,
+  lockGestures,
+  rotateGestureAllowed,
+} from './gesture-lock';
+import {
+  attachSafariPageZoomGuard,
   attachSafariTwistRotate,
   attachShiftDragRotate,
   attachShiftWheelRotate,
@@ -652,7 +658,9 @@ export function MapStageProvider({
     shift: RotateGestureHandle | null;
     wheel: RotateGestureHandle | null;
     twist: RotateGestureHandle | null;
-  }>({ shift: null, wheel: null, twist: null });
+    /** iOS page-zoom guard (`attachSafariPageZoomGuard`), held while the map is full-screen. */
+    pageZoom: RotateGestureHandle | null;
+  }>({ shift: null, wheel: null, twist: null, pageZoom: null });
   const mapRef = useRef<MapLibreMap | null>(null);
   const maplibreglRef = useRef<MaplibreModule['default'] | null>(null);
   const markersRef = useRef<Marker[]>([]);
@@ -1379,6 +1387,21 @@ export function MapStageProvider({
         current.wheel = null;
         current.twist = null;
       }
+      // A full-screen map owns every two-finger gesture on it; on iOS that includes cancelling
+      // Safari's page zoom, which MapLibre does not do (`attachSafariPageZoomGuard`).
+      const fullScreen =
+        container !== null && gesturePolicyFor(posture, { pointerFine }) === 'reader';
+      if (fullScreen && !current.pageZoom) current.pageZoom = attachSafariPageZoomGuard(container);
+      else if (!fullScreen && current.pageZoom) {
+        current.pageZoom.detach();
+        current.pageZoom = null;
+      }
+      // Pinch is zoom only on a touch screen. This is a north-up history map: a pinch that also
+      // twists the country by a few degrees is the most common accidental gesture on mobile
+      // maps. Rotation stays one deliberate step away in the View panel's compass; desktop keeps
+      // its rotate paths.
+      if (pointerFine) map.touchZoomRotate.enableRotation();
+      else map.touchZoomRotate.disableRotation();
     },
     [],
   );
@@ -1787,7 +1810,8 @@ export function MapStageProvider({
       rotateGesturesRef.current.shift?.detach();
       rotateGesturesRef.current.wheel?.detach();
       rotateGesturesRef.current.twist?.detach();
-      rotateGesturesRef.current = { shift: null, wheel: null, twist: null };
+      rotateGesturesRef.current.pageZoom?.detach();
+      rotateGesturesRef.current = { shift: null, wheel: null, twist: null, pageZoom: null };
       mapRef.current?.remove();
       mapRef.current = null;
       maplibreglRef.current = null;

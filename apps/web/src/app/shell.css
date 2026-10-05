@@ -86,6 +86,14 @@ html:has([data-surface='instrument']) {
   overscroll-behavior: none;
 }
 
+/* Any full-screen map, including the Door's "Browse the map": the page under it must not scroll
+   or rubber-band, or a pan that reaches the edge drags the document (and a phone's toolbar)
+   instead of the map. */
+html:has(.ds-map-stage[data-plate-posture='live']) {
+  overflow: hidden;
+  overscroll-behavior: none;
+}
+
 .ds-shell:has([data-surface='instrument']) {
   height: 100dvh;
   max-height: 100dvh;
@@ -1961,6 +1969,17 @@ html:has([data-surface='instrument']) {
   isolation: isolate;
   /* Pre-style-load flash — dark ocean by default; light theme matches Archive Paper. */
   background: var(--ds-map-water);
+}
+
+/* The map is not text. State names, cluster counts and record markers are DOM over the canvas,
+   and on iPhone a press that lingers on one starts text selection (with its magnifier and
+   callout), which cancels the pan or pinch the finger was starting. Nothing on the plate is
+   meant to be selected or long-press-shared; record names are selectable in the sheet and list. */
+.ds-map-stage {
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .ds-map-stage[data-plate-posture='live'] {

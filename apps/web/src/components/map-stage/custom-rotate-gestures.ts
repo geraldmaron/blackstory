@@ -14,8 +14,8 @@
  *     Shift held arrives as an ordinary `wheel` event in every engine, which is the only form a
  *     trackpad gesture takes outside Safari. Same modifier as the drag on purpose: one key means
  *     rotate, and the reader does not have to know whether they are holding a mouse or not.
- *   - Safari's native `gesturestart`/`gesturechange` events: real per-frame twist rotation,
- *     free correctness on exactly the platform (Mac trackpad + WebKit) that actually reports it.
+ *   - Safari's native `gesturestart`/`gesturechange` events on a Mac trackpad: real per-frame
+ *     twist rotation. Never on a touch screen (see `supportsSafariGestureEvents`).
  *
  * All three are gated by `rotateGestureAllowed` (`gesture-lock.ts`) at every call site — the same
  * posture rule that governs `dragRotate` itself, so a plate that has not handed rotation back to
@@ -164,10 +164,19 @@ export function attachShiftWheelRotate(
 /** WebKit's proprietary gesture events — not in any standard `HTMLElementEventMap`. */
 type SafariGestureEvent = Event & { readonly rotation: number };
 
-/** True only where the browser actually reports these — real feature detection, not a UA
- * sniff: Safari is the only engine that has ever shipped `GestureEvent`. */
+/**
+ * True only for a Mac trackpad in Safari. `GestureEvent` alone is not enough: iPhone and iPad
+ * Safari ship it too and fire it for every two-finger pinch on the screen, where MapLibre's own
+ * `touchZoomRotate` is already zooming and rotating. Reading `rotation` there made every pinch a
+ * fight between two camera writers. A device with touch points never gets this handler.
+ */
 function supportsSafariGestureEvents(): boolean {
-  return typeof window !== 'undefined' && 'ongesturestart' in window;
+  return (
+    typeof window !== 'undefined' &&
+    'ongesturestart' in window &&
+    typeof navigator !== 'undefined' &&
+    (navigator.maxTouchPoints ?? 0) === 0
+  );
 }
 
 /**
@@ -208,6 +217,31 @@ export function attachSafariTwistRotate(
     detach() {
       container.removeEventListener('gesturestart', onGestureStart as EventListener);
       container.removeEventListener('gesturechange', onGestureChange as EventListener);
+    },
+  };
+}
+
+/**
+ * iPhone/iPad Safari: stop a pinch on the full-screen map from also zooming the page.
+ *
+ * WebKit fires its proprietary `gesturestart`/`gesturechange`/`gestureend` for every two-finger
+ * touch, and their default action is page zoom. MapLibre does not cancel them (it handles the
+ * pinch from touch events), so on iOS a pinch that MapLibre is already zooming could scale the
+ * page underneath as well. Cancelling them on the map container — and only there, so the rest of
+ * the page keeps the reader's zoom (WCAG 1.4.4) — is the established fix. It writes nothing to the
+ * camera: MapLibre's own `touchZoomRotate` is the only thing that moves the map.
+ */
+export function attachSafariPageZoomGuard(container: HTMLElement): RotateGestureHandle {
+  if (typeof window === 'undefined' || !('ongesturestart' in window)) return { detach() {} };
+  const cancel = (event: Event) => event.preventDefault();
+  for (const type of ['gesturestart', 'gesturechange', 'gestureend']) {
+    container.addEventListener(type, cancel);
+  }
+  return {
+    detach() {
+      for (const type of ['gesturestart', 'gesturechange', 'gestureend']) {
+        container.removeEventListener(type, cancel);
+      }
     },
   };
 }

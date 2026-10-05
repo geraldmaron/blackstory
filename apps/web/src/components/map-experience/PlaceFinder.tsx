@@ -59,6 +59,7 @@ import {
 import { resolveExploreAddressCamera } from '../../lib/map-experience/resolve-explore-address-camera';
 import { ExploreAddressSearch, type ExploreAddressResolvedPayload } from './ExploreAddressSearch';
 import { COMPACT_MEDIA_QUERY } from '../../lib/layout/compact-viewport';
+import { useFocusTrap } from '../../lib/keyboard/use-focus-trap';
 import './place-finder.css';
 
 void React;
@@ -145,6 +146,10 @@ export function PlaceFinder({
   const titleRef = useRef<HTMLHeadingElement>(null);
   const triggerRef = useRef<HTMLButtonElement>(null);
   const wasOpen = useRef(false);
+  const sheetRef = useRef<HTMLDivElement>(null);
+  // It says `aria-modal`, so it behaves like one: Tab stays inside, the page behind is inert, and
+  // Escape closes it (stopped here so Explore's own Escape does not also close a sheet beneath).
+  useFocusTrap(sheetRef, open, { overlayRef: sheetRef });
 
   // Focus follows the sheet: into its title when it opens, back to the trigger when it closes
   // (by the close button or by a place resolving), so keyboard and screen-reader users never
@@ -335,11 +340,19 @@ export function PlaceFinder({
     // No scrim: this sheet is edge-to-edge full-width by design (the whole point of the narrow
     // posture), so there is no "outside the dialog" region for a click-to-close scrim to ever
     // occupy — one would sit fully hidden behind the dialog and only cost a keyboard user an
-    // extra, invisible Tab stop before reaching the actual content. `Escape`-to-close is not
-    // wired either: `RecordSheet`/`ShortcutSheet` bind it globally at the Explore-instrument
-    // level (`AtlasExperience.tsx`), which is outside this bead's file lock; the visible close
-    // button is the one dismissal this file can own on its own.
-    <div className="ds-place-sheet" role="dialog" aria-modal="true" aria-labelledby={dialogTitleId}>
+    // extra, invisible Tab stop before reaching the actual content.
+    <div
+      ref={sheetRef}
+      className="ds-place-sheet"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby={dialogTitleId}
+      onKeyDown={(event) => {
+        if (event.key !== 'Escape') return;
+        event.stopPropagation();
+        setOpen(false);
+      }}
+    >
       <div className="ds-place-sheet__dialog">
         <div className="ds-place-sheet__head">
           <h3 className="ds-place-sheet__title" id={dialogTitleId} ref={titleRef} tabIndex={-1}>

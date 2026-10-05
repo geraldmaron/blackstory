@@ -1,9 +1,9 @@
 /**
  * Explore first-paint map: the CONUS board in Web Mercator (state hairlines) plus the pin plate,
  * at the exact frame the live plate opens on (explore-map-underlay.css), so the handoff is a
- * crossfade between two identical maps. Geography is server HTML. Pan, wheel, and
- * pinch hydrate on. Hidden once MapLibre has painted live geography (`data-plate-ready` on
- * `.ds-map-stage`).
+ * crossfade between two identical maps. Geography is server HTML. It is a picture, not a second
+ * map: only taps on its pins are answered (explore-map-gestures.tsx). Hidden once MapLibre has
+ * painted live geography (`data-plate-ready` on `.ds-map-stage`).
  */
 import React, { type ReactNode } from 'react';
 import { ExploreMapGestures } from './explore-map-gestures';

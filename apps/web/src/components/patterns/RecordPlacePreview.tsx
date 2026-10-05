@@ -20,7 +20,7 @@
  * Street detail stays one tap away on both surfaces; it is just not offered twice.
  */
 import React from 'react';
-import { InteractiveRecordLocator } from './InteractiveRecordLocator';
+import { RecordLocatorLink } from './RecordLocatorLink';
 import { RecordLocator } from './RecordLocator';
 import './record-locator.css';
 
@@ -40,7 +40,8 @@ export type RecordPlacePreviewProps = {
   readonly lng: number;
   readonly label: string;
   readonly accessibleName?: string;
-  /** Place-page stand: pan/zoom the national locator. Rail and sheet slots stay static. */
+  /** Place-page stand: the locator becomes a tap target that opens the live map on this place.
+   * Rail and sheet slots stay a plain picture. */
   readonly interactive?: boolean;
   /** Open zoomed onto the pin (place hero), not the continental thumbnail. */
   readonly neighborhood?: boolean;
@@ -70,7 +71,7 @@ export function RecordPlacePreview({
   return (
     <figure className="ds-record-anatomy__place">
       {interactive ? (
-        <InteractiveRecordLocator
+        <RecordLocatorLink
           {...sharedProps}
           neighborhood={neighborhood}
           {...(atlasHref !== undefined ? { atlasHref } : {})}

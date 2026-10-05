@@ -1,6 +1,6 @@
 /**
- * Pan and zoom state for the interactive record locator (national SVG inset, not MapLibre).
- * Keeps wheel-zoom anchored to the pointer and clamps scale so the inset stays a locator.
+ * Framing for the record locator (national SVG inset, not MapLibre): the national view, or a
+ * region framed on the pin for a place hero. The locator is a picture; nothing pans or zooms it.
  */
 
 export type LocatorViewState = {
@@ -43,84 +43,6 @@ function clampScale(scale: number): number {
   return Math.min(LOCATOR_MAX_SCALE, Math.max(LOCATOR_MIN_SCALE, scale));
 }
 
-/** Zoom toward a point in container coordinates (pixels from top-left). */
-export function zoomLocatorViewAt(
-  state: LocatorViewState,
-  factor: number,
-  anchorX: number,
-  anchorY: number,
-): LocatorViewState {
-  if (!Number.isFinite(factor) || factor <= 0) return state;
-  const nextScale = clampScale(state.scale * factor);
-  if (nextScale === state.scale) return state;
-  const ratio = nextScale / state.scale;
-  return {
-    scale: nextScale,
-    panX: anchorX - (anchorX - state.panX) * ratio,
-    panY: anchorY - (anchorY - state.panY) * ratio,
-  };
-}
-
-export function panLocatorView(
-  state: LocatorViewState,
-  deltaX: number,
-  deltaY: number,
-): LocatorViewState {
-  if (deltaX === 0 && deltaY === 0) return state;
-  return {
-    ...state,
-    panX: state.panX + deltaX,
-    panY: state.panY + deltaY,
-  };
-}
-
-export function wheelFactorForDelta(deltaY: number): number {
-  if (deltaY === 0) return 1;
-  const step = Math.min(0.25, Math.abs(deltaY) / 400);
-  return deltaY > 0 ? 1 - step : 1 + step;
-}
-
 export function locatorCanvasTransform(state: LocatorViewState): string {
   return `translate(${state.panX}px, ${state.panY}px) scale(${state.scale})`;
-}
-
-/**
- * Cooperative gestures for a map embedded in a scrolling page (Google Maps' `gestureHandling:
- * 'cooperative'`, MapLibre's `cooperativeGestures`): the page keeps its own gestures and the map
- * takes the deliberate ones. One finger and a plain wheel scroll the page; two fingers pan and
- * pinch the map; Ctrl/⌘ + wheel zooms it — which is also what a trackpad pinch reports. A full-
- * screen map (the Instrument) takes every gesture instead; that distinction is the whole rule.
- */
-export type CooperativeWheelVerdict = 'zoom' | 'page';
-
-export function cooperativeWheelVerdict(event: {
-  readonly ctrlKey: boolean;
-  readonly metaKey: boolean;
-}): CooperativeWheelVerdict {
-  return event.ctrlKey || event.metaKey ? 'zoom' : 'page';
-}
-
-export type TouchPoint = { readonly x: number; readonly y: number };
-
-/** Centroid and finger spread of a two-finger touch. */
-export function twoFingerFrame(
-  a: TouchPoint,
-  b: TouchPoint,
-): {
-  readonly cx: number;
-  readonly cy: number;
-  readonly spread: number;
-} {
-  return {
-    cx: (a.x + b.x) / 2,
-    cy: (a.y + b.y) / 2,
-    spread: Math.hypot(b.x - a.x, b.y - a.y),
-  };
-}
-
-/** The hint a reader sees when they used the page's gesture on the map. */
-export function cooperativeHint(kind: 'touch' | 'wheel', isMac: boolean): string {
-  return kind === 'touch'
-    ? 'Use two fingers to move the map'
-    : `Use ${isMac ? '⌘' : 'Ctrl'} + scroll to zoom the map`;
 }

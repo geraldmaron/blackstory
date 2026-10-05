@@ -55,6 +55,35 @@
   pointer-events: none;
 }
 
+/* The cue for tap-to-explore. Only where the map is a backdrop the reader cannot otherwise reach:
+   a phone-width touch screen, once the live plate is showing through the band. Wider screens
+   show the "Browse the map" chip instead. */
+.ds-door__tap-hint {
+  display: none;
+}
+
+@media (pointer: coarse) and (max-width: 819px) {
+  .ds-door__field[data-plate='live'] .ds-door__tap-hint {
+    position: absolute;
+    left: 50%;
+    /* The opening sheet overlaps the window's lower edge by its rule and lip; sit above it. */
+    bottom: calc(var(--ds-space-3) + 20px);
+    display: inline-flex;
+    align-items: center;
+    min-height: 32px;
+    padding: var(--ds-space-1) var(--ds-space-3);
+    transform: translateX(-50%);
+    white-space: nowrap;
+    font-family: var(--ds-font-ui);
+    font-size: 0.8125rem;
+    font-weight: 600;
+    color: var(--ds-ink);
+    background: color-mix(in srgb, var(--ds-surface) 88%, transparent);
+    border: var(--ds-border-width) solid var(--ds-border);
+    border-radius: var(--ds-radius-pill);
+  }
+}
+
 .ds-door__field-chrome {
   /* Fixed above the journey stack so Browse / captions stay hittable (field itself is z-0). */
   position: fixed;

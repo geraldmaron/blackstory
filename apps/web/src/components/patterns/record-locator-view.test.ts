@@ -1,5 +1,5 @@
 /**
- * Pan/zoom math for the interactive record locator.
+ * Framing for the record locator (a picture: nothing pans or zooms it).
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
@@ -8,9 +8,6 @@ import {
   defaultLocatorView,
   locatorCanvasTransform,
   neighborhoodLocatorView,
-  panLocatorView,
-  wheelFactorForDelta,
-  zoomLocatorViewAt,
 } from './record-locator-view';
 
 test('neighborhood opening scale is a region, not a town lot', () => {
@@ -18,47 +15,17 @@ test('neighborhood opening scale is a region, not a town lot', () => {
   assert.equal(view.scale, 2.15);
 });
 
+test('the neighborhood frame puts the pin at the centre of the box', () => {
+  const view = neighborhoodLocatorView(40, 50, 720, 420);
+  assert.equal(view.panX + 0.4 * 720 * view.scale, 360);
+  assert.equal(view.panY + 0.5 * 420 * view.scale, 210);
+});
+
+test('scale is clamped', () => {
+  assert.equal(neighborhoodLocatorView(50, 50, 720, 420, 99).scale, LOCATOR_MAX_SCALE);
+});
+
 test('default view is identity scale at origin', () => {
   assert.deepEqual(defaultLocatorView(), { scale: 1, panX: 0, panY: 0 });
   assert.equal(locatorCanvasTransform(defaultLocatorView()), 'translate(0px, 0px) scale(1)');
-});
-
-test('zoom anchors to a pointer position', () => {
-  const start = { scale: 1, panX: 0, panY: 0 };
-  const zoomed = zoomLocatorViewAt(start, 2, 100, 50);
-  assert.equal(zoomed.scale, 2);
-  assert.equal(zoomed.panX, -100);
-  assert.equal(zoomed.panY, -50);
-});
-
-test('zoom clamps at max scale', () => {
-  const nearMax = { scale: LOCATOR_MAX_SCALE - 0.1, panX: 0, panY: 0 };
-  const zoomed = zoomLocatorViewAt(nearMax, 1.5, 0, 0);
-  assert.equal(zoomed.scale, LOCATOR_MAX_SCALE);
-});
-
-test('pan accumulates deltas', () => {
-  const moved = panLocatorView(defaultLocatorView(), 12, -8);
-  assert.deepEqual(moved, { scale: 1, panX: 12, panY: -8 });
-});
-
-test('wheel factor respects direction', () => {
-  assert.ok(wheelFactorForDelta(120) < 1);
-  assert.ok(wheelFactorForDelta(-120) > 1);
-  assert.equal(wheelFactorForDelta(0), 1);
-});
-
-test('cooperative wheel: plain scroll is the page, Ctrl/⌘ (and trackpad pinch) zoom the map', async () => {
-  const { cooperativeWheelVerdict, cooperativeHint, twoFingerFrame } =
-    await import('./record-locator-view');
-  assert.equal(cooperativeWheelVerdict({ ctrlKey: false, metaKey: false }), 'page');
-  assert.equal(cooperativeWheelVerdict({ ctrlKey: true, metaKey: false }), 'zoom');
-  assert.equal(cooperativeWheelVerdict({ ctrlKey: false, metaKey: true }), 'zoom');
-  assert.equal(cooperativeHint('touch', false), 'Use two fingers to move the map');
-  assert.equal(cooperativeHint('wheel', true), 'Use ⌘ + scroll to zoom the map');
-  assert.deepEqual(twoFingerFrame({ x: 0, y: 0 }, { x: 30, y: 40 }), {
-    cx: 15,
-    cy: 20,
-    spread: 50,
-  });
 });
