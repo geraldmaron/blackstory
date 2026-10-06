@@ -3,19 +3,30 @@
  * by AtlasExperience from which right-hand panels are open, so the group never sits under the
  * records list or the record sheet. Compact (phones, landscape phones): the right edge, just above
  * whatever occupies the bottom (the dock, or the dock plus an open sheet).
+ *
+ * Both moves are a transform, never `right`/`bottom`: the group slides while a sheet slides, and
+ * animating an inset would lay the page out again on every frame of that slide. The resting box
+ * stays put; `--ds-map-controls-right` (wide) and `--ds-map-controls-lift` (compact, applied while
+ * a sheet is open) are offsets from it.
  */
 .ds-map-controls {
   position: fixed;
   top: var(--ds-atlas-top);
-  right: var(--ds-map-controls-right, var(--ds-space-4));
+  right: var(--ds-space-4);
   z-index: var(--ds-z-atlas-instruments);
   display: flex;
   flex-direction: column;
   gap: var(--ds-space-2);
   pointer-events: auto;
-  transition:
-    right var(--ds-duration-base) var(--ds-easing),
-    bottom var(--ds-duration-base) var(--ds-easing);
+  transform: translate(
+    calc(var(--ds-space-4) - var(--ds-map-controls-right, var(--ds-space-4))),
+    calc(-1 * var(--ds-map-controls-lift-now, 0px))
+  );
+  transition: transform var(--ds-duration-base) var(--ds-easing);
+}
+
+.ds-atlas[data-sheet-open='true'] .ds-map-controls {
+  --ds-map-controls-lift-now: var(--ds-map-controls-lift, 0px);
 }
 
 .ds-map-controls__stack {
@@ -99,25 +110,20 @@
     top: auto;
     right: calc(var(--ds-space-2) + env(safe-area-inset-right, 0px));
     bottom: calc(var(--ds-atlas-dock-clearance) + env(safe-area-inset-bottom, 0px));
-  }
-
-  /* A bottom sheet is open: ride above it rather than under it. */
-  .ds-atlas[data-sheet-open='true'] .ds-map-controls {
-    bottom: calc(
-      var(--ds-atlas-dock-clearance) + var(--ds-atlas-sheet-peek) + var(--ds-space-2) +
-        env(safe-area-inset-bottom, 0px)
-    );
+    /* A bottom sheet is open: ride above it rather than under it. */
+    --ds-map-controls-lift: calc(var(--ds-atlas-sheet-peek) + var(--ds-space-2));
   }
 }
 
 /* Landscape phone: the open instrument docks to the left edge, so the controls stay low-right. */
 @media (max-height: 559px) and (orientation: landscape) {
   /* The dock hugs the bottom edge here (atlas.css), 54px tall; the controls sit just above it. */
-  .ds-map-controls,
-  .ds-atlas[data-sheet-open='true'] .ds-map-controls {
+  .ds-map-controls {
     bottom: calc(var(--ds-space-2) * 2 + 54px + env(safe-area-inset-bottom, 0px));
     flex-direction: row-reverse;
     align-items: flex-end;
+    /* The sheet is a left column here, so nothing to ride above. */
+    --ds-map-controls-lift: 0px;
   }
 }
 

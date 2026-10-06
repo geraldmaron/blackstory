@@ -8,6 +8,9 @@
  */
 :root {
   --ds-tabbar-h: 0px;
+  /* The Rooms sheet's motion: the platform sheet curve (fast start, long settle). */
+  --ds-tabbar-sheet-ms: 320ms;
+  --ds-tabbar-sheet-ease: cubic-bezier(0.32, 0.72, 0, 1);
 }
 
 .ds-tabbar,
@@ -87,9 +90,15 @@
     padding-bottom: var(--ds-tabbar-h);
   }
 
-  /* The Rooms sheet: a native modal dialog anchored to the bottom edge. */
+  /*
+   * The Rooms sheet: a native modal dialog anchored to the bottom edge, moving the way platform
+   * sheets move — up from the edge on open, back down on close (`data-closing`, PhoneTabBar's
+   * `dismiss`), following the finger when its header is dragged. Transform and opacity only, so
+   * the motion stays on the compositor.
+   */
   .ds-tabbar-sheet[open] {
-    display: block;
+    display: flex;
+    flex-direction: column;
     pointer-events: auto;
     position: fixed;
     inset: auto 0 0 0;
@@ -104,26 +113,53 @@
     border-bottom: 0;
     border-radius: var(--ds-radius-lg, 16px) var(--ds-radius-lg, 16px) 0 0;
     overflow: hidden;
-    animation: ds-tabbar-sheet-rise var(--ds-duration-base) var(--ds-easing);
+    transition: transform var(--ds-tabbar-sheet-ms) var(--ds-tabbar-sheet-ease);
+    animation: ds-tabbar-sheet-in var(--ds-tabbar-sheet-ms) var(--ds-tabbar-sheet-ease);
+  }
+
+  .ds-tabbar-sheet[open][data-closing] {
+    transform: translateY(100%);
+    animation: none;
   }
 
   .ds-tabbar-sheet::backdrop {
     background: rgb(0 0 0 / 0.4);
+    animation: ds-tabbar-backdrop-in var(--ds-tabbar-sheet-ms) var(--ds-tabbar-sheet-ease);
+  }
+
+  .ds-tabbar-sheet[data-closing]::backdrop {
+    animation: ds-tabbar-backdrop-out var(--ds-tabbar-sheet-ms) var(--ds-tabbar-sheet-ease) forwards;
   }
 
   .ds-tabbar-sheet__body {
-    max-height: min(80dvh, 40rem);
-    padding: var(--ds-space-2) var(--ds-space-4)
-      calc(var(--ds-space-4) + env(safe-area-inset-bottom, 0px));
+    flex: 1 1 auto;
+    min-height: 0;
+    padding: 0 var(--ds-space-4) calc(var(--ds-space-4) + env(safe-area-inset-bottom, 0px));
     overflow-y: auto;
     overscroll-behavior: contain;
   }
 
+  /* The header is the drag handle: grab bar, title, close. */
   .ds-tabbar-sheet__head {
+    position: relative;
+    flex: 0 0 auto;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding-block: var(--ds-space-2);
+    padding: var(--ds-space-3) var(--ds-space-4) var(--ds-space-2);
+    touch-action: none;
+    cursor: grab;
+  }
+
+  .ds-tabbar-sheet__grab {
+    position: absolute;
+    top: 6px;
+    left: 50%;
+    width: 36px;
+    height: 5px;
+    margin-left: -18px;
+    border-radius: var(--ds-radius-full);
+    background: var(--ds-border);
   }
 
   .ds-tabbar-sheet__title {
@@ -166,19 +202,37 @@
   }
 }
 
-@keyframes ds-tabbar-sheet-rise {
+@keyframes ds-tabbar-sheet-in {
   from {
-    transform: translateY(24px);
-    opacity: 0;
+    transform: translateY(100%);
   }
   to {
     transform: none;
+  }
+}
+
+@keyframes ds-tabbar-backdrop-in {
+  from {
+    opacity: 0;
+  }
+  to {
     opacity: 1;
   }
 }
 
+@keyframes ds-tabbar-backdrop-out {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
-  .ds-tabbar-sheet[open] {
+  .ds-tabbar-sheet[open],
+  .ds-tabbar-sheet::backdrop {
     animation: none;
+    transition: none;
   }
 }

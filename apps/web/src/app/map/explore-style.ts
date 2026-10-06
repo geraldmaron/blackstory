@@ -46,12 +46,12 @@ import {
   firstPaintOrKindStrokeWidthExpression,
   firstPaintPointColorExpression,
   firstPaintPointOpacityExpression,
-  EXPLORE_GL_ENTITY_MAX_ZOOM,
   literalPaintNumber,
 } from '../../lib/map-experience/first-paint-map-paint';
 import {
   markerHaloRadiusExpression,
   markerRadiusExpression,
+  MARKER_ZOOM_SCALE_STOPS,
   markerRadiusPlusExpression,
   markerRadiusPlusScaledExpression,
   zoomScaledNumericExpression,
@@ -322,7 +322,7 @@ type KindGlyphPaintSignature = {
 
 /** Unclustered solid-fill disc opacity — translucent enough to read basemap/county
  * hairlines through the marker while kind shade stays readable. HTML hit-targets
- * (`.ds-map-entity-marker`) use the same value via CSS. */
+ * used to repeat this value in CSS; the map draws every zoom itself now. */
 export const ENTITY_POINT_FILL_OPACITY = 0.52;
 /** Soft halo under every unclustered point. */
 export const ENTITY_HALO_OPACITY = 0.16;
@@ -411,14 +411,39 @@ function lerp(from: number, to: number, eased: number): number {
 }
 
 /**
+ * The selection ring's radius as a zoom-only expression, for one record whose marker radius
+ * (`markerRadius()`) is already known. Same stops and scale as `markerRadiusPlusScaledExpression`,
+ * with the record's data term folded in as a number: MapLibre treats a paint value that reads
+ * feature data as data-driven and rebuilds the source's tiles every time it changes, so an
+ * animated ring must not read feature data.
+ */
+export function selectedRingRadiusExpression(
+  dataRadius: number,
+  extraScale: number,
+): ExpressionSpecification {
+  const stops = MARKER_ZOOM_SCALE_STOPS.flatMap(([zoom, scale]) => [
+    zoom,
+    (dataRadius + ENTITY_SELECTED_RADIUS_OFFSET) * scale * extraScale,
+  ]);
+  return ['interpolate', ['linear'], ['zoom'], ...stops] as ExpressionSpecification;
+}
+
+/**
  * Selected pulse ring paint for one animation frame. `progress` is `[0, 1]` within the loop;
  * the caller (`MapStage`'s `startSelectedEntityPulse`) is the only thing that ticks it via
- * `requestAnimationFrame`, so this stays a pure function of one number.
+ * `requestAnimationFrame`, so this stays a pure function of one number. Pass the selected
+ * record's `dataRadius` for the per-frame value: without it the expression reads feature data,
+ * which is only fit for a one-off write (see `selectedRingRadiusExpression`).
  */
-export function entitySelectedPulseRadiusExpression(progress: number): ExpressionSpecification {
+export function entitySelectedPulseRadiusExpression(
+  progress: number,
+  dataRadius?: number,
+): ExpressionSpecification {
   const eased = pulseEaseInOut(progress);
   const scale = lerp(ENTITY_SELECTED_PULSE_SCALE_FROM, ENTITY_SELECTED_PULSE_SCALE_TO, eased);
-  return markerRadiusPlusScaledExpression(ENTITY_SELECTED_RADIUS_OFFSET, scale);
+  return dataRadius === undefined
+    ? markerRadiusPlusScaledExpression(ENTITY_SELECTED_RADIUS_OFFSET, scale)
+    : selectedRingRadiusExpression(dataRadius, scale);
 }
 
 /** Stroke opacity for one animation frame at `progress` — same ease-in-out curve as the radius. */
@@ -428,11 +453,15 @@ export function entitySelectedPulseOpacity(progress: number): number {
 }
 
 /** Reduced-motion static ring radius: no timer, fixed enlarged scale. */
-export function entitySelectedPulseStaticRadiusExpression(): ExpressionSpecification {
-  return markerRadiusPlusScaledExpression(
-    ENTITY_SELECTED_RADIUS_OFFSET,
-    ENTITY_SELECTED_PULSE_STATIC_SCALE,
-  );
+export function entitySelectedPulseStaticRadiusExpression(
+  dataRadius?: number,
+): ExpressionSpecification {
+  return dataRadius === undefined
+    ? markerRadiusPlusScaledExpression(
+        ENTITY_SELECTED_RADIUS_OFFSET,
+        ENTITY_SELECTED_PULSE_STATIC_SCALE,
+      )
+    : selectedRingRadiusExpression(dataRadius, ENTITY_SELECTED_PULSE_STATIC_SCALE);
 }
 
 const GLYPH_PAINT_SIGNATURE: Readonly<Record<string, KindGlyphPaintSignature>> = {
@@ -1184,7 +1213,6 @@ export function buildExploreMapStyle(input: BuildExploreMapStyleInput): StyleSpe
         type: 'circle',
         source: EXPLORE_ENTITIES_SOURCE_ID,
         filter: ['all', ['!', ['has', 'point_count']], ['has', 'radiusMeters']],
-        maxzoom: EXPLORE_GL_ENTITY_MAX_ZOOM,
         paint: {
           // A decade change crossfades rather than snapping (v9 §11 supersedes v6 §4.4).
           ...DECADE_TRANSITION_PAINT,
@@ -1198,7 +1226,6 @@ export function buildExploreMapStyle(input: BuildExploreMapStyleInput): StyleSpe
         type: 'circle',
         source: EXPLORE_ENTITIES_SOURCE_ID,
         filter: ['!', ['has', 'point_count']],
-        maxzoom: EXPLORE_GL_ENTITY_MAX_ZOOM,
         paint: {
           // A decade change crossfades rather than snapping (v9 §11 supersedes v6 §4.4).
           ...DECADE_TRANSITION_PAINT,
@@ -1216,7 +1243,6 @@ export function buildExploreMapStyle(input: BuildExploreMapStyleInput): StyleSpe
         type: 'circle',
         source: EXPLORE_ENTITIES_SOURCE_ID,
         filter: ['!', ['has', 'point_count']],
-        maxzoom: EXPLORE_GL_ENTITY_MAX_ZOOM,
         paint: {
           // A decade change crossfades rather than snapping (v9 §11 supersedes v6 §4.4).
           ...DECADE_TRANSITION_PAINT,
@@ -1237,7 +1263,6 @@ export function buildExploreMapStyle(input: BuildExploreMapStyleInput): StyleSpe
         type: 'circle',
         source: EXPLORE_ENTITIES_SOURCE_ID,
         filter: ['all', ['!', ['has', 'point_count']], ['==', ['get', 'kind'], 'event']],
-        maxzoom: EXPLORE_GL_ENTITY_MAX_ZOOM,
         paint: {
           // A decade change crossfades rather than snapping (v9 §11 supersedes v6 §4.4).
           ...DECADE_TRANSITION_PAINT,
@@ -1447,7 +1472,6 @@ export function buildExploreMapStyle(input: BuildExploreMapStyleInput): StyleSpe
         type: 'circle',
         source: EXPLORE_ENTITIES_SOURCE_ID,
         filter: selectedPointFilterExpression(undefined),
-        maxzoom: EXPLORE_GL_ENTITY_MAX_ZOOM,
         paint: {
           'circle-radius': markerRadiusPlusExpression(ENTITY_SELECTED_RADIUS_OFFSET),
           'circle-color': 'rgba(0,0,0,0)',

@@ -78,8 +78,18 @@
 .ds-atlas > .ds-story,
 .ds-atlas > .ds-palette,
 .ds-atlas > .ds-shortcuts,
-.ds-atlas > .ds-saved {
+.ds-atlas > .ds-saved,
+.ds-atlas > .ds-sheet-presence > .ds-lens,
+.ds-atlas > .ds-sheet-presence > .ds-results,
+.ds-atlas > .ds-sheet-presence > .ds-sheet,
+.ds-atlas > .ds-sheet-presence > .ds-time-panel,
+.ds-atlas > .ds-sheet-presence > .ds-camera {
   pointer-events: auto;
+}
+
+/* `SheetPresence`'s wrapper: no box of its own, so each sheet lays out as a direct child would. */
+.ds-sheet-presence {
+  display: contents;
 }
 
 /*
@@ -424,6 +434,26 @@
   }
 }
 
+/*
+ * Leaving (`SheetPresence`): the sheet goes the way it came, down past the bottom edge, rather than
+ * vanishing in one frame. No `from` keyframe — it starts wherever the sheet is, so a sheet dragged
+ * part-way down carries on from under the finger.
+ */
+@media (max-width: 819px), (max-height: 559px) {
+  .ds-sheet-presence[data-presence='leaving']
+    > :is(.ds-lens, .ds-results, .ds-time-panel, .ds-camera, .ds-sheet) {
+    animation: ds-compact-sheet-leave calc(var(--ds-duration-base) * 0.75)
+      cubic-bezier(0.4, 0, 1, 1) forwards;
+  }
+}
+
+@keyframes ds-compact-sheet-leave {
+  to {
+    transform: translateY(100%);
+    opacity: 0;
+  }
+}
+
 @keyframes ds-compact-sheet-rise {
   from {
     transform: translateY(16px);
@@ -478,6 +508,20 @@
   }
 }
 
+@media (max-height: 559px) and (orientation: landscape) and (min-width: 560px) {
+  .ds-sheet-presence[data-presence='leaving']
+    > :is(.ds-lens, .ds-results, .ds-time-panel, .ds-camera, .ds-sheet) {
+    animation-name: ds-compact-sheet-unslide;
+  }
+}
+
+@keyframes ds-compact-sheet-unslide {
+  to {
+    transform: translateX(-16px);
+    opacity: 0;
+  }
+}
+
 @keyframes ds-compact-sheet-slide {
   from {
     transform: translateX(-16px);
@@ -505,13 +549,15 @@
  */
 @media (min-width: 820px) and (max-width: 1149px) and (min-height: 560px) {
   /* Right-aligned: the Filters panel runs down the left edge to the same height. */
-  .ds-atlas:has(> .ds-time-panel) .ds-atlas__dock {
+  .ds-atlas:has(> .ds-time-panel) .ds-atlas__dock,
+  .ds-atlas:has(> .ds-sheet-presence > .ds-time-panel) .ds-atlas__dock {
     left: auto;
     right: var(--ds-space-4);
     bottom: calc(var(--ds-space-4) + 139px + var(--ds-space-3));
   }
 
-  .ds-atlas:has(> .ds-time-panel) .ds-atlas__readout {
+  .ds-atlas:has(> .ds-time-panel) .ds-atlas__readout,
+  .ds-atlas:has(> .ds-sheet-presence > .ds-time-panel) .ds-atlas__readout {
     bottom: calc(var(--ds-space-4) + 139px + var(--ds-space-3) + 56px);
   }
 }
@@ -642,10 +688,10 @@
 
   .ds-map-controls {
     bottom: calc(var(--ds-tabbar-h) + var(--ds-space-2) + 44px + var(--ds-space-3));
-  }
-
-  .ds-atlas[data-sheet-open='true'] .ds-map-controls {
-    bottom: calc(var(--ds-atlas-dock-clearance) + var(--ds-atlas-sheet-peek) + var(--ds-space-2));
+    /* Open sheet: from above the peek bar to above the sheet's own peek (map-controls.css). */
+    --ds-map-controls-lift: calc(
+      var(--ds-atlas-sheet-peek) + var(--ds-space-2) - 44px - var(--ds-space-3)
+    );
   }
 
   .ds-atlas__readout {
@@ -697,8 +743,7 @@
   }
 
   /* map-controls.css lifts the controls over the dock; this adds the bar under both. */
-  :root .ds-map-controls,
-  :root .ds-atlas[data-sheet-open='true'] .ds-map-controls {
+  :root .ds-map-controls {
     bottom: calc(var(--ds-tabbar-h) + var(--ds-space-2) * 2 + 54px);
   }
 }

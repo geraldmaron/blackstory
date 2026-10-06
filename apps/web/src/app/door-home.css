@@ -718,6 +718,14 @@ a.ds-door-open__place:focus-visible {
   transition: width var(--ds-hero-split-ms, 1200ms) var(--ds-hero-morph-ease);
 }
 
+/* Settled early (the heading left the screen mid-sequence): land on the final words with no
+   transitions left running out of sight. */
+.ds-hero-headline-morph[data-settled='true'],
+.ds-hero-headline-morph[data-settled='true'] * {
+  transition: none;
+  animation: none;
+}
+
 .ds-hero-headline-morph[data-split='true'] .ds-hero-headline-morph__gap {
   width: 0.28em;
 }

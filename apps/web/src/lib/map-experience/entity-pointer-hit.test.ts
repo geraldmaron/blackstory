@@ -102,5 +102,9 @@ test('MapStage drills into clusters instead of opening a leaf record sheet', () 
   assert.doesNotMatch(mapStage, /getClusterLeaves/);
   assert.match(mapStage, /pointerHitBox/);
   assert.match(mapStage, /clickTolerance:\s*MAP_CLICK_TOLERANCE_PX/);
-  assert.match(mapStage, /pointerHitAt\(event\.point\) \? 'pointer'/);
+  // The cursor and the pin hover card both come from the same padded hit as selection.
+  assert.match(
+    mapStage,
+    /const hit = pointerHitAt\(event\.point\);\s*activeMap\.getCanvas\(\)\.style\.cursor = hit \? 'pointer'/,
+  );
 });

@@ -5,11 +5,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { test } from 'node:test';
 import { fileURLToPath } from 'node:url';
-import {
-  FIRST_PAINT_PIN_SIZE_REM,
-  MAP_ENTITY_MARKER_HIT_PX,
-  RECORD_LOCATOR_PIN_PX,
-} from './first-paint-pin-tokens';
+import { FIRST_PAINT_PIN_SIZE_REM, RECORD_LOCATOR_PIN_PX } from './first-paint-pin-tokens';
 
 const pinPlateCss = readFileSync(
   fileURLToPath(new URL('../../app/first-paint-pin-plate.css', import.meta.url)),
@@ -49,8 +45,10 @@ test('door-home carries no pin-plate rules: the Door has no static board', () =>
   assert.doesNotMatch(doorCss, /ds-door__board/);
 });
 
-test('MapStage loads first-paint pin plate CSS for Explore HTML markers', () => {
-  assert.match(mapStage, /first-paint-pin-plate\.css/);
+test('the live map draws its records itself: no HTML entity markers or their styles', () => {
+  assert.doesNotMatch(mapStage, /ds-map-entity-marker/);
+  assert.doesNotMatch(shellCss, /ds-map-entity-marker/);
+  assert.doesNotMatch(pinPlateCss, /ds-map-entity-marker/);
 });
 
 test('Explore first-paint geography is not hidden by an empty MapLibre canvas', () => {
@@ -61,10 +59,6 @@ test('Explore first-paint geography is not hidden by an empty MapLibre canvas', 
 
 test('majority pins use Page Sand on Door, Explore, and every first-paint surface', () => {
   assert.match(pinPlateCss, /:root\s*\{[^}]*--ds-first-paint-pin-ink:\s*var\(--ds-accent-muted\)/s);
-  assert.match(
-    pinPlateCss,
-    /:root\s*\{[^}]*--ds-first-paint-pin-ink-link:\s*var\(--ds-accent-muted\)/s,
-  );
   assert.doesNotMatch(pinPlateCss, /body:has\(\.ds-door\)\s*\{[^}]*--ds-first-paint-pin-ink:/s);
   assert.doesNotMatch(pinPlateCss, /color-mix\(in srgb, var\(--ds-ink\)/);
 });
@@ -79,15 +73,6 @@ test('SSR pin plate sits at map-plate tier under Explore instrument chrome', () 
   );
   assert.match(atlasCss, /\.ds-atlas\s*\{[^}]*z-index:\s*var\(--ds-z-content\)/s);
   assert.match(shellCss, /\.ds-map-stage\s*\{[^}]*isolation:\s*isolate/s);
-});
-
-test('entity marker hit target matches shell.css and first-paint map discs', () => {
-  assert.match(shellCss, /\.ds-map-entity-marker/);
-  assert.match(shellCss, /\.ds-map-entity-marker::after/);
-  assert.match(pinPlateCss, /\.ds-map-entity-marker\.ds-first-paint-pin/);
-  assert.match(pinPlateCss, /\.ds-map-entity-marker\.ds-first-paint-pin--walk/);
-  assert.match(pinPlateCss, /\.ds-map-entity-marker\.ds-first-paint-pin--focus/);
-  assert.equal(MAP_ENTITY_MARKER_HIT_PX, 9);
 });
 
 test('record locator pin uses copper ring without box-shadow', () => {

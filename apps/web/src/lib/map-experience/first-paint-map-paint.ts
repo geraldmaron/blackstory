@@ -10,7 +10,8 @@ import { brandPalette } from '@repo/ui';
 /** Zoom at and below which entity discs match the first-paint national field. */
 export const FIRST_PAINT_MAP_MAX_ZOOM = 12;
 
-/** GL entity discs hide at this zoom; HTML first-paint hit targets mount above cluster max. */
+/** Where the entity discs hand off from the first-paint look to the kind look. The discs keep
+ * drawing past it: the map draws every zoom itself, with no HTML markers above cluster max. */
 export const EXPLORE_GL_ENTITY_MAX_ZOOM = FIRST_PAINT_MAP_MAX_ZOOM + 0.001;
 
 /** CSS `0.4375rem` at 16px root — record disc radius on the national field. */
