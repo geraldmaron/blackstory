@@ -110,6 +110,8 @@ export function RecordVisitBlock({
           lat={input.lat}
           lng={input.lng}
           label={locatorLabel ?? visit.addressLine}
+          // In a page, a live map; in a compact sheet floating over the live map, the locator.
+          interactive={!compact}
         />
       ) : null}
       {contact ? (

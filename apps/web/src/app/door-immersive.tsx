@@ -486,6 +486,38 @@ export function DoorImmersive({
   startBrowseRef.current = startBrowse;
 
   /*
+   * Tap the map to explore it. The journey's chapters sit over the map, so on a phone the map you
+   * can see in the band above the opening sheet never receives a touch: it is a backdrop that a
+   * scroll drives (the scrollytelling convention — interaction off while the story owns the
+   * camera). The way in has to be obvious, so a tap that lands on the map band — on a chapter's
+   * empty area, not its words or buttons, and inside the measured map window — opens the
+   * full-screen map right there. A scroll is not a click, so reading is untouched.
+   */
+  useEffect(() => {
+    const journey = journeyRef.current;
+    if (!journey) return;
+    const onClick = (event: MouseEvent) => {
+      if (browseModeRef.current) return;
+      const target = event.target as HTMLElement | null;
+      if (!target) return;
+      const onEmptyChapter =
+        target === journey || target.classList.contains('ds-door-journey__chapter');
+      if (!onEmptyChapter) return;
+      const frame = windowRef.current?.getBoundingClientRect();
+      if (!frame || frame.width < 1 || frame.height < 1) return;
+      const inside =
+        event.clientX >= frame.left &&
+        event.clientX <= frame.right &&
+        event.clientY >= frame.top &&
+        event.clientY <= frame.bottom;
+      if (!inside) return;
+      enterBrowseRef.current();
+    };
+    journey.addEventListener('click', onClick);
+    return () => journey.removeEventListener('click', onClick);
+  }, []);
+
+  /*
    * Listeners must not rebind when enter/exit identities change. The previous effect listed those
    * callbacks as deps, so every toggle rebuilt the effect and the cleanup called
    * setDoorBrowseLive(false) + announceMapBrowseExited mid-session — journey hidden, atlas
@@ -940,7 +972,14 @@ export function DoorImmersive({
       >
         {/* The map window. Measured for the camera frame (door-field-frame.ts); the plate shows
             through it once this mount has framed it. Nothing is drawn in it. */}
-        <div className="ds-door__window" ref={windowRef} aria-hidden="true" />
+        <div className="ds-door__window" ref={windowRef} aria-hidden="true">
+          {/* Phones only (door-home.css): the band above the opening sheet is the map, and a tap
+              on it opens the full-screen map (the click handler on the journey). Decorative —
+              "Browse the map" is the labelled control for the same action. */}
+          {browseMode || plateUnavailable ? null : (
+            <span className="ds-door__tap-hint">Tap to explore the map</span>
+          )}
+        </div>
         <div className="ds-door__field-chrome" ref={chromeRef}>
           {plateUnavailable ? (
             /* No WebGL: the journey chapters below still carry the visit. The field itself holds

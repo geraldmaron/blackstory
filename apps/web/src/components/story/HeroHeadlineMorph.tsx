@@ -6,6 +6,11 @@
  * Story before holding. The prefix slot width interpolates so Story slides
  * instead of jumping. Trailer stays "happened *here*." Letter spans are
  * aria-hidden; the heading exposes the full accessible label.
+ *
+ * Paced by one timer per phase boundary, not a per-frame loop, and only while the heading is on
+ * screen: Explore mounts the Door with its journey hidden, and a morph nobody can see was still
+ * animating a width (a layout pass every frame) under the map for its first fifteen seconds.
+ * Hidden or scrolled away, the headline settles on its final words at once.
  */
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { prefersReducedMotion } from '../../lib/map-experience/camera-presets';
@@ -158,6 +163,9 @@ export function HeroHeadlineMorph({
   // Reduced-motion jumps to Black Story in useLayoutEffect (before paint).
   const [reducedMotion, setReducedMotion] = useState(false);
   const [phaseIndex, setPhaseIndex] = useState(0);
+  /** The sequence stopped early because the heading left the screen: no more transitions. */
+  const [settled, setSettled] = useState(false);
+  const headingRef = useRef<HTMLHeadingElement>(null);
 
   useLayoutEffect(() => {
     const next = readClientMotionPreference();
@@ -174,38 +182,56 @@ export function HeroHeadlineMorph({
       morphSequenceStartedAt = performance.now();
     }
     const startedAt = morphSequenceStartedAt;
-    let frameId = 0;
-    // Hold rAF until the Black Story entry transition has settled.
-    const holdAfterMs = heroHeadlinePhaseStartMs(FINAL_INDEX) + FINAL_PHASE.transitionMs + 32;
+    let timer = 0;
+    let done = false;
 
-    const tick = (now: number) => {
-      const elapsed = now - startedAt;
-      setPhaseIndex((current) => {
-        const next = resolveHeroHeadlinePhaseIndex(elapsed, false);
-        return next === current ? current : next;
-      });
-      if (elapsed < holdAfterMs) {
-        frameId = window.requestAnimationFrame(tick);
+    const step = () => {
+      const elapsed = performance.now() - startedAt;
+      const next = resolveHeroHeadlinePhaseIndex(elapsed, false);
+      setPhaseIndex(next);
+      if (next >= FINAL_INDEX) {
+        done = true;
+        return;
       }
+      const nextStartMs = heroHeadlinePhaseStartMs(next + 1);
+      timer = window.setTimeout(step, Math.max(0, nextStartMs - elapsed) + 1);
     };
+    step();
 
-    frameId = window.requestAnimationFrame(tick);
-    return () => window.cancelAnimationFrame(frameId);
+    const heading = headingRef.current;
+    let observer: IntersectionObserver | undefined;
+    if (heading && typeof IntersectionObserver !== 'undefined') {
+      observer = new IntersectionObserver((entries) => {
+        if (done || entries.every((entry) => entry.isIntersecting)) return;
+        done = true;
+        window.clearTimeout(timer);
+        setSettled(true);
+        setPhaseIndex(FINAL_INDEX);
+        observer?.disconnect();
+      });
+      observer.observe(heading);
+    }
+
+    return () => {
+      window.clearTimeout(timer);
+      observer?.disconnect();
+    };
   }, [reducedMotion]);
 
   const phase = HERO_HEADLINE_PHASES[phaseIndex] ?? FINAL_PHASE;
   const split = phase.storySplit || reducedMotion;
   const prefix = subjectPrefix(phase);
-  const animatePrefix = !reducedMotion && phase.storySplit && phase.id !== 'his-story';
+  const animatePrefix = !reducedMotion && !settled && phase.storySplit && phase.id !== 'his-story';
   const splitMs = HERO_HEADLINE_PHASES[1]?.transitionMs ?? 1500;
   const prefixMs = phase.transitionMs > 0 ? phase.transitionMs : 700;
 
   return (
-    <h2 className={className} id={id} aria-label={phase.accessibleLabel}>
+    <h2 ref={headingRef} className={className} id={id} aria-label={phase.accessibleLabel}>
       <span
         className="ds-hero-headline-morph"
         aria-hidden="true"
         data-phase={phase.id}
+        data-settled={settled ? 'true' : undefined}
         data-split={split ? 'true' : 'false'}
         style={{
           ['--ds-hero-split-ms' as string]: `${splitMs}ms`,

@@ -18,6 +18,7 @@ import { BRAND_ASSETS } from '@repo/config';
 import { cx, ShellWordmark } from '@repo/ui';
 import { CommandBarSearch } from './CommandBarSearch';
 import { RoomsMenu } from './RoomsMenu';
+import { PhoneTabBar } from './PhoneTabBar';
 import { primaryNavDestinations } from '../../lib/nav/destination-registry';
 import { DestinationIcon } from '../patterns/DestinationIcon';
 import {
@@ -32,17 +33,12 @@ void React;
 /**
  * Explore, Stories, Records — the three axes the bar renders as plain links. Rooms is the fourth
  * and renders as {@link RoomsMenu}, a disclosure whose panel lists the rooms and links the hub;
- * a separate `Rooms` link beside it would be the same destination twice.
+ * a separate `Rooms` link beside it would be the same destination twice. Below 820px this nav is
+ * not shown at all: the phone navigates from {@link PhoneTabBar} along the bottom edge.
  *
  * Computed once at module scope: the registry is static data and this bar mounts on every route.
  */
 const AXES = primaryNavDestinations().filter((axis) => axis.path !== '/rooms');
-
-/** Phone Find nav folds Stories/Records into Rooms on map surfaces (overflowFind). */
-const PHONE_FIND_BREAKPOINT = 820;
-
-/** Axes that leave the phone Find pill on map surfaces and reappear inside Rooms. */
-const PHONE_OVERFLOW_AXIS_PATHS = new Set(['/stories', '/records']);
 
 function pathIsMapSurface(pathname: string): boolean {
   return pathname === '/' || pathname.startsWith('/explore');
@@ -139,16 +135,7 @@ export function CommandBar({
   const pathname = usePathname() || '/';
   const onAtlas = Boolean(mode && onModeChange);
   const barRef = useRef<HTMLElement>(null);
-  const [phoneFind, setPhoneFind] = useState(false);
   const [doorBrowse, setDoorBrowse] = useState(false);
-
-  useEffect(() => {
-    const query = window.matchMedia(`(max-width: ${PHONE_FIND_BREAKPOINT - 1}px)`);
-    const sync = () => setPhoneFind(query.matches);
-    sync();
-    query.addEventListener('change', sync);
-    return () => query.removeEventListener('change', sync);
-  }, []);
 
   useEffect(() => {
     const syncBrowse = () => {
@@ -165,15 +152,6 @@ export function CommandBar({
     };
   }, []);
 
-  /**
-   * On ~375px map surfaces, Map + Stories + Records + Rooms is four crowded chips. Fold Stories
-   * and Records into the Rooms disclosure (overflowFind) so Find stays Map + Rooms.
-   */
-  const overflowFind = phoneFind && pathIsMapSurface(pathname);
-  const findAxes = overflowFind
-    ? AXES.filter((axis) => !PHONE_OVERFLOW_AXIS_PATHS.has(axis.path))
-    : AXES;
-
   useEffect(() => {
     const bar = barRef.current;
     if (!bar) {
@@ -187,157 +165,162 @@ export function CommandBar({
     return () => {
       observer.disconnect();
     };
-  }, [onAtlas, onOpenPalette, overflowFind]);
+  }, [onAtlas, onOpenPalette]);
 
   return (
-    <header ref={barRef} className={cx('ds-bar', className)} data-browse-chrome="true">
-      <Link className="ds-bar__brand ds-shell-wordmark" href="/" aria-label="BlackStory · home">
-        <ShellWordmark lockup={BRAND_ASSETS.lockup} symbol={BRAND_ASSETS.symbol} />
-      </Link>
+    <>
+      <header ref={barRef} className={cx('ds-bar', className)} data-browse-chrome="true">
+        <Link className="ds-bar__brand ds-shell-wordmark" href="/" aria-label="BlackStory · home">
+          <ShellWordmark lockup={BRAND_ASSETS.lockup} symbol={BRAND_ASSETS.symbol} />
+        </Link>
 
-      {onOpenPalette ? (
-        <button
-          type="button"
-          className="ds-bar__search"
-          onClick={onOpenPalette}
-          aria-label="Search records, places and actions"
-        >
-          <SearchGlyph />
-          <span className="ds-bar__search-text">{searchLabel()}</span>
-          <kbd className="ds-kbd">⌘K</kbd>
-        </button>
-      ) : (
-        <>
-          <CommandBarSearch placeholder={searchLabel()} />
-          <noscript>
-            <Link className="ds-bar__search" href="/records" aria-label="Search the record index">
-              <SearchGlyph />
-              <span className="ds-bar__search-text">{searchLabel()}</span>
-            </Link>
-          </noscript>
-        </>
-      )}
-
-      <div className="ds-bar__tools">
-        <nav className="ds-bar__modes" aria-label="Find">
-          {findAxes.map((axis) => {
-            const mapAxis = axis.path === '/explore';
-            const browsing = pathIsBrowsing(pathname, doorBrowse);
-            if (mapAxis) {
-              // Map is one destination with two postures. Off the map surface it is a link home.
-              // On the journey it is current. While browsing, pressing Map restores the journey
-              // (pushState left Next on `/`, so a Link to `/` was a no-op).
-              if (!pathIsMapSurface(pathname)) {
-                return (
-                  <Link key={axis.path} className="ds-bar__mode-link" href="/" prefetch={false}>
-                    <AxisMark icon={axis.icon} label={axis.label} />
-                  </Link>
-                );
-              }
-              if (browsing) {
-                return (
-                  <button
-                    key={axis.path}
-                    type="button"
-                    className="ds-bar__mode-link"
-                    aria-current="page"
-                    onClick={() => exitMapBrowse()}
-                    aria-label="Back to the map journey"
-                  >
-                    <AxisMark icon={axis.icon} label={axis.label} />
-                  </button>
-                );
-              }
-              return (
-                <span key={axis.path} className="ds-bar__mode-link" aria-current="page">
-                  <AxisMark icon={axis.icon} label={axis.label} />
-                </span>
-              );
-            }
-            const current = pathIsCurrent(pathname, axis.path);
-            return (
-              <Link
-                key={axis.path}
-                className="ds-bar__mode-link"
-                href={axis.path}
-                aria-current={current ? 'page' : undefined}
-              >
-                <AxisMark icon={axis.icon} label={axis.label} />
+        {onOpenPalette ? (
+          <button
+            type="button"
+            className="ds-bar__search"
+            onClick={onOpenPalette}
+            aria-label="Search records, places and actions"
+          >
+            <SearchGlyph />
+            <span className="ds-bar__search-text">{searchLabel()}</span>
+            <kbd className="ds-kbd">⌘K</kbd>
+          </button>
+        ) : (
+          <>
+            <CommandBarSearch placeholder={searchLabel()} />
+            <noscript>
+              <Link className="ds-bar__search" href="/records" aria-label="Search the record index">
+                <SearchGlyph />
+                <span className="ds-bar__search-text">{searchLabel()}</span>
               </Link>
-            );
-          })}
-          <RoomsMenu overflowFind={overflowFind} />
-        </nav>
+            </noscript>
+          </>
+        )}
 
-        {onOpenSaved ? (
-          <button
-            type="button"
-            className="ds-bar__tool"
-            onClick={onOpenSaved}
-            aria-label={savedCount === 0 ? 'Saved records' : `Saved records, ${savedCount} saved`}
-          >
-            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-              <path
-                d="M4 2.6h8a.6.6 0 0 1 .6.6v10.2L8 10.6l-4.6 2.8V3.2a.6.6 0 0 1 .6-.6Z"
-                stroke="currentColor"
-                strokeWidth="1.4"
-                strokeLinejoin="round"
-              />
-            </svg>
-            {savedCount > 0 ? (
-              <span className="ds-bar__badge" aria-hidden="true">
-                {savedCount}
-              </span>
-            ) : null}
-          </button>
-        ) : null}
+        <div className="ds-bar__tools">
+          <nav className="ds-bar__modes" aria-label="Find">
+            {AXES.map((axis) => {
+              const mapAxis = axis.path === '/explore';
+              const browsing = pathIsBrowsing(pathname, doorBrowse);
+              if (mapAxis) {
+                // Map is one destination with two postures. Off the map surface it is a link home.
+                // On the journey it is current. While browsing, pressing Map restores the journey
+                // (pushState left Next on `/`, so a Link to `/` was a no-op).
+                if (!pathIsMapSurface(pathname)) {
+                  return (
+                    <Link key={axis.path} className="ds-bar__mode-link" href="/" prefetch={false}>
+                      <AxisMark icon={axis.icon} label={axis.label} />
+                    </Link>
+                  );
+                }
+                if (browsing) {
+                  return (
+                    <button
+                      key={axis.path}
+                      type="button"
+                      className="ds-bar__mode-link"
+                      aria-current="page"
+                      onClick={() => exitMapBrowse()}
+                      aria-label="Back to the map journey"
+                    >
+                      <AxisMark icon={axis.icon} label={axis.label} />
+                    </button>
+                  );
+                }
+                return (
+                  <span key={axis.path} className="ds-bar__mode-link" aria-current="page">
+                    <AxisMark icon={axis.icon} label={axis.label} />
+                  </span>
+                );
+              }
+              const current = pathIsCurrent(pathname, axis.path);
+              return (
+                <Link
+                  key={axis.path}
+                  className="ds-bar__mode-link"
+                  href={axis.path}
+                  aria-current={current ? 'page' : undefined}
+                >
+                  <AxisMark icon={axis.icon} label={axis.label} />
+                </Link>
+              );
+            })}
+            <RoomsMenu />
+          </nav>
 
-        {onOpenShortcuts ? (
-          <button
-            type="button"
-            className="ds-bar__tool"
-            onClick={onOpenShortcuts}
-            aria-label="Keyboard shortcuts"
-          >
-            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-              <rect
-                x="1.4"
-                y="3.6"
-                width="13.2"
-                height="8.8"
-                rx="1.6"
-                stroke="currentColor"
-                strokeWidth="1.3"
-              />
-              <path
-                d="M4 6.4h.01M6.3 6.4h.01M8.6 6.4h.01M10.9 6.4h.01M4.6 9.4h6.8"
-                stroke="currentColor"
-                strokeWidth="1.5"
-                strokeLinecap="round"
-              />
-            </svg>
-          </button>
-        ) : null}
+          {onOpenSaved ? (
+            <button
+              type="button"
+              className="ds-bar__tool"
+              onClick={onOpenSaved}
+              aria-label={savedCount === 0 ? 'Saved records' : `Saved records, ${savedCount} saved`}
+            >
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                <path
+                  d="M4 2.6h8a.6.6 0 0 1 .6.6v10.2L8 10.6l-4.6 2.8V3.2a.6.6 0 0 1 .6-.6Z"
+                  stroke="currentColor"
+                  strokeWidth="1.4"
+                  strokeLinejoin="round"
+                />
+              </svg>
+              {savedCount > 0 ? (
+                <span className="ds-bar__badge" aria-hidden="true">
+                  {savedCount}
+                </span>
+              ) : null}
+            </button>
+          ) : null}
 
-        {onToggleTheme ? (
-          <button
-            type="button"
-            className="ds-bar__tool"
-            onClick={onToggleTheme}
-            aria-label="Switch between light and dark"
-          >
-            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-              <circle cx="8" cy="8" r="3.1" stroke="currentColor" strokeWidth="1.4" />
-              <path
-                d="M8 1.3v1.5M8 13.2v1.5M1.3 8h1.5M13.2 8h1.5M3.4 3.4l1 1M11.6 11.6l1 1M12.6 3.4l-1 1M4.4 11.6l-1 1"
-                stroke="currentColor"
-                strokeWidth="1.3"
-                strokeLinecap="round"
-              />
-            </svg>
-          </button>
-        ) : null}
-      </div>
-    </header>
+          {onOpenShortcuts ? (
+            <button
+              type="button"
+              className="ds-bar__tool"
+              onClick={onOpenShortcuts}
+              aria-label="Keyboard shortcuts"
+            >
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                <rect
+                  x="1.4"
+                  y="3.6"
+                  width="13.2"
+                  height="8.8"
+                  rx="1.6"
+                  stroke="currentColor"
+                  strokeWidth="1.3"
+                />
+                <path
+                  d="M4 6.4h.01M6.3 6.4h.01M8.6 6.4h.01M10.9 6.4h.01M4.6 9.4h6.8"
+                  stroke="currentColor"
+                  strokeWidth="1.5"
+                  strokeLinecap="round"
+                />
+              </svg>
+            </button>
+          ) : null}
+
+          {onToggleTheme ? (
+            <button
+              type="button"
+              className="ds-bar__tool"
+              onClick={onToggleTheme}
+              aria-label="Switch between light and dark"
+            >
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                <circle cx="8" cy="8" r="3.1" stroke="currentColor" strokeWidth="1.4" />
+                <path
+                  d="M8 1.3v1.5M8 13.2v1.5M1.3 8h1.5M13.2 8h1.5M3.4 3.4l1 1M11.6 11.6l1 1M12.6 3.4l-1 1M4.4 11.6l-1 1"
+                  stroke="currentColor"
+                  strokeWidth="1.3"
+                  strokeLinecap="round"
+                />
+              </svg>
+            </button>
+          ) : null}
+        </div>
+      </header>
+      {/* Phones navigate from a bottom tab bar instead of the bar's links (PhoneTabBar). A sibling
+        of the header, not a child: the header's glass backdrop would trap a fixed descendant. */}
+      <PhoneTabBar pathname={pathname} browsing={pathIsBrowsing(pathname, doorBrowse)} />
+    </>
   );
 }

@@ -9,7 +9,10 @@ import { fileURLToPath } from 'node:url';
 import { destinationsInGroup } from '../../lib/nav/destination-registry';
 
 const here = dirname(fileURLToPath(import.meta.url));
-const source = readFileSync(join(here, 'RoomsMenu.tsx'), 'utf8');
+// The list itself lives in RoomsList (shared by the desktop disclosure and the phone sheet).
+const source =
+  readFileSync(join(here, 'RoomsMenu.tsx'), 'utf8') +
+  readFileSync(join(here, 'RoomsList.tsx'), 'utf8');
 
 test('the room menu is the locked about groups, not a second board', () => {
   // The hub link is new and deliberate: the control is named Rooms, and `/rooms` used to be
@@ -34,8 +37,8 @@ test('the Rooms menu rooms come from the same registry groups the hub renders', 
   assert.ok(destinationsInGroup('read').some((destination) => destination.path === '/books'));
   assert.ok(destinationsInGroup('read').some((destination) => destination.path === '/lives'));
   assert.ok(destinationsInGroup('check').some((destination) => destination.path === '/sources'));
-  // Default panel lists rooms, never the product axes — those stay in the Find pill on wide.
-  // Phone map overflow may add Stories/Records via overflowFind; that is gated, not the groups.
+  // The list names rooms, never the product axes — those are the bar's links on desktop and the
+  // tab bar's tabs on a phone.
   for (const axis of ['/explore', '/stories', '/records', '/rooms']) {
     assert.ok(
       !destinationsInGroup('read').some((destination) => destination.path === axis),
@@ -44,11 +47,10 @@ test('the Rooms menu rooms come from the same registry groups the hub renders', 
   }
 });
 
-test('phone map Find overflow can surface Stories and Records inside Rooms', () => {
-  assert.match(source, /overflowFind/);
-  assert.match(source, /OVERFLOW_FIND_PATHS/);
-  assert.match(source, /primaryNavDestinations/);
-  assert.match(source, />Find</);
+test('the rooms list never carries the product axes, on any width', () => {
+  // The old phone fold (overflowFind) put Stories and Records inside Rooms on map pages.
+  assert.doesNotMatch(source, /overflowFind|OVERFLOW_FIND_PATHS/);
+  assert.doesNotMatch(source, /primaryNavDestinations/);
 });
 
 test('the narrow rooms panel clears the stacked bar, not the Explore gutter', () => {
@@ -59,12 +61,10 @@ test('the narrow rooms panel clears the stacked bar, not the Explore gutter', ()
   assert.doesNotMatch(css, /--ds-atlas-top/);
 });
 
-test('on the phone the rooms panel sits below the island and does not cover the trigger', () => {
+test('phones do not render the disclosure at all: the tab bar opens the list in a sheet', () => {
   const css = readFileSync(join(here, 'rooms-menu.css'), 'utf8');
-  assert.match(css, /@media \(max-width: 819px\)/);
-  assert.match(css, /@media \(max-width: 819px\)[\s\S]*--ds-island-clearance/);
-  assert.match(
-    css,
-    /@media \(max-width: 819px\)[\s\S]*max-height:\s*calc\(100dvh - var\(--ds-island-clearance\)/,
-  );
+  assert.doesNotMatch(css, /@media \(max-width: 819px\)/);
+  const tabBar = readFileSync(join(here, 'PhoneTabBar.tsx'), 'utf8');
+  assert.match(tabBar, /<RoomsList/);
+  assert.match(tabBar, /showModal\(\)/);
 });

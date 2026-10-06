@@ -19,127 +19,6 @@
   overflow: hidden;
 }
 
-.ds-locator--interactive {
-  /* Cooperative: one finger scrolls the page through the map; two-finger gestures are taken by
-     a non-passive touchmove in InteractiveRecordLocator. `pan-x pan-y` (not `none`) is what lets
-     the page keep scrolling, and it also stops the browser pinch-zooming the whole page here. */
-  touch-action: pan-x pan-y;
-  cursor: grab;
-}
-
-.ds-locator__hint {
-  position: absolute;
-  inset: 0;
-  z-index: 3; /* local: over the canvas and chrome inside this locator only */
-  display: grid;
-  place-items: center;
-  margin: 0;
-  padding: var(--ds-space-4);
-  background: color-mix(in srgb, #000 55%, transparent);
-  color: #fff;
-  font-family: var(--ds-font-ui);
-  font-size: 0.9375rem;
-  font-weight: 600;
-  text-align: center;
-  pointer-events: none;
-  opacity: 0;
-  transition: opacity var(--ds-duration-fast) var(--ds-easing);
-}
-
-.ds-locator__hint[data-visible='true'] {
-  opacity: 1;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .ds-locator__hint {
-    transition: none;
-  }
-}
-
-.ds-locator--interactive.is-dragging {
-  cursor: grabbing;
-}
-
-.ds-locator--interactive:focus-visible {
-  outline: var(--ds-focus-width) solid var(--ds-focus-ring);
-  outline-offset: var(--ds-focus-offset);
-}
-
-.ds-locator__canvas {
-  position: absolute;
-  inset: 0;
-  transform-origin: 0 0;
-}
-
-.ds-locator__chrome {
-  position: absolute;
-  right: var(--ds-space-3);
-  bottom: var(--ds-space-3);
-  z-index: 2; /* local: controls above the pannable canvas */
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: flex-end;
-  gap: var(--ds-space-2);
-  pointer-events: none;
-}
-
-/*
- * Place-hero locators park chrome at the top so Reset / zoom never sit in the mast overlay
- * where the lede, era pills and pin already compete.
- */
-.ds-record-mast .ds-locator__chrome {
-  top: var(--ds-space-3);
-  bottom: auto;
-}
-
-.ds-locator__atlas,
-.ds-locator__reset,
-.ds-locator__zoom {
-  pointer-events: auto;
-  padding: var(--ds-space-2) var(--ds-space-3);
-  font-family: var(--ds-font-mono);
-  font-size: 0.625rem;
-  letter-spacing: 0.08em;
-  color: var(--ds-ink);
-  background: var(--ds-surface);
-  border: var(--ds-border-width) solid var(--ds-rule);
-  border-radius: var(--ds-radius-pill);
-  text-decoration: none;
-}
-
-.ds-locator__zoom {
-  min-width: 2rem;
-  padding-inline: var(--ds-space-2);
-  font-size: 0.875rem;
-  line-height: 1;
-}
-
-.ds-locator__reset {
-  cursor: pointer;
-}
-
-.ds-locator__atlas:hover,
-.ds-locator__atlas:focus-visible,
-.ds-locator__reset:hover,
-.ds-locator__reset:focus-visible,
-.ds-locator__zoom:hover,
-.ds-locator__zoom:focus-visible {
-  border-color: var(--ds-accent-graphic);
-  color: var(--ds-accent);
-}
-
-.ds-locator__atlas:focus-visible,
-.ds-locator__reset:focus-visible,
-.ds-locator__zoom:focus-visible {
-  outline: var(--ds-focus-width) solid var(--ds-focus-ring);
-  outline-offset: var(--ds-focus-offset);
-}
-
-.ds-locator__pin--link {
-  pointer-events: auto;
-  cursor: pointer;
-}
-
 /*
  * The ground is a mask, not an image: the SVG carries alpha (land at 0.32, state hairlines at 1)
  * and the color comes from here, so the same one asset is correct in both themes instead of
@@ -174,12 +53,6 @@
   background: color-mix(in srgb, var(--ds-accent-graphic) 28%, transparent);
   outline: 2px solid var(--ds-canvas);
   outline-offset: 0;
-  /*
-   * The pin lives on the scaled canvas. Inverse-scale so a neighborhood zoom marks a point
-   * instead of painting a county-sized disc.
-   */
-  transform: scale(calc(1 / var(--locator-scale, 1)));
-  transform-origin: center center;
 }
 
 /*
@@ -203,12 +76,4 @@
   font-size: 0.6875rem;
   line-height: 1.45;
   color: var(--ds-ink-muted);
-}
-
-@media (pointer: coarse) {
-  .ds-locator__reset,
-  .ds-locator__zoom {
-    min-height: 40px;
-    min-width: 40px;
-  }
 }

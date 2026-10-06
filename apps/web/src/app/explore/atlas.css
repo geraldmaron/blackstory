@@ -12,7 +12,7 @@
  * `.ds-map-stage` and the Explore locator underlay sit at `--ds-z-map-plate` (0). `.ds-atlas`
  * sits at `--ds-z-content` (1) so Lens / Record sheet / Records / Timeline / Camera always paint
  * above pins (HTML first-paint discs and MapLibre markers alike). Until `.ds-map-stage` carries
- * `data-plate-ready`, the underlay is the map: it captures wheel, drag and pinch. After handoff
+ * `data-plate-ready`, the underlay is the first-paint picture (taps on its pins only). After handoff
  * the underlay is `pointer-events: none` and gaps on this wrapper pass pan/zoom to the plate.
  *
  * `pointer-events` is not inherited. A transparent child still leaves its auto parent as the
@@ -78,8 +78,18 @@
 .ds-atlas > .ds-story,
 .ds-atlas > .ds-palette,
 .ds-atlas > .ds-shortcuts,
-.ds-atlas > .ds-saved {
+.ds-atlas > .ds-saved,
+.ds-atlas > .ds-sheet-presence > .ds-lens,
+.ds-atlas > .ds-sheet-presence > .ds-results,
+.ds-atlas > .ds-sheet-presence > .ds-sheet,
+.ds-atlas > .ds-sheet-presence > .ds-time-panel,
+.ds-atlas > .ds-sheet-presence > .ds-camera {
   pointer-events: auto;
+}
+
+/* `SheetPresence`'s wrapper: no box of its own, so each sheet lays out as a direct child would. */
+.ds-sheet-presence {
+  display: contents;
 }
 
 /*
@@ -424,6 +434,32 @@
   }
 }
 
+/*
+ * Leaving (`SheetPresence`): the sheet goes the way it came, down past the bottom edge, rather than
+ * vanishing in one frame. No `from` keyframe — it starts wherever the sheet is, so a sheet dragged
+ * part-way down carries on from under the finger.
+ */
+@media (max-width: 819px), (max-height: 559px) {
+  .ds-sheet-presence[data-presence='leaving']
+    > :is(.ds-lens, .ds-results, .ds-time-panel, .ds-camera, .ds-sheet) {
+    animation: ds-compact-sheet-leave calc(var(--ds-duration-base) * 0.75)
+      cubic-bezier(0.4, 0, 1, 1) forwards;
+  }
+}
+
+@keyframes ds-atlas-peek-in {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes ds-compact-sheet-leave {
+  to {
+    transform: translateY(100%);
+    opacity: 0;
+  }
+}
+
 @keyframes ds-compact-sheet-rise {
   from {
     transform: translateY(16px);
@@ -478,6 +514,20 @@
   }
 }
 
+@media (max-height: 559px) and (orientation: landscape) and (min-width: 560px) {
+  .ds-sheet-presence[data-presence='leaving']
+    > :is(.ds-lens, .ds-results, .ds-time-panel, .ds-camera, .ds-sheet) {
+    animation-name: ds-compact-sheet-unslide;
+  }
+}
+
+@keyframes ds-compact-sheet-unslide {
+  to {
+    transform: translateX(-16px);
+    opacity: 0;
+  }
+}
+
 @keyframes ds-compact-sheet-slide {
   from {
     transform: translateX(-16px);
@@ -505,13 +555,15 @@
  */
 @media (min-width: 820px) and (max-width: 1149px) and (min-height: 560px) {
   /* Right-aligned: the Filters panel runs down the left edge to the same height. */
-  .ds-atlas:has(> .ds-time-panel) .ds-atlas__dock {
+  .ds-atlas:has(> .ds-time-panel) .ds-atlas__dock,
+  .ds-atlas:has(> .ds-sheet-presence > .ds-time-panel) .ds-atlas__dock {
     left: auto;
     right: var(--ds-space-4);
     bottom: calc(var(--ds-space-4) + 139px + var(--ds-space-3));
   }
 
-  .ds-atlas:has(> .ds-time-panel) .ds-atlas__readout {
+  .ds-atlas:has(> .ds-time-panel) .ds-atlas__readout,
+  .ds-atlas:has(> .ds-sheet-presence > .ds-time-panel) .ds-atlas__readout {
     bottom: calc(var(--ds-space-4) + 139px + var(--ds-space-3) + 56px);
   }
 }
@@ -562,5 +614,152 @@
   .ds-camera[data-detent='full'],
   .ds-sheet[data-detent='full'] {
     max-height: calc(100dvh - var(--ds-atlas-top) - var(--ds-atlas-dock-clearance) - 32px);
+  }
+}
+
+/*
+ * Phone, portrait: the tab bar owns the bottom edge (tab-bar.css, `--ds-tabbar-h`), so Explore's
+ * own controls are laid out the way map apps lay them out around a tab bar (Google Maps):
+ *
+ *   - Filters / When / View are a row of chips under the search bar.
+ *   - Records is a peek bar just above the tabs — the closed results sheet showing its count —
+ *     and pressing or dragging it opens the sheet over the map.
+ *   - Every sheet rises from just above the tabs; the map controls and the attribution sit above
+ *     the peek.
+ *
+ * This replaces a four-way switcher pinned to the bottom edge, which would now sit on top of the
+ * tab bar, with a second row of "Records" meaning something different from the Records tab.
+ */
+@media (max-width: 819px) and (min-height: 560px) {
+  :root:root {
+    --ds-atlas-dock-clearance: calc(var(--ds-tabbar-h) + var(--ds-space-2));
+    --ds-atlas-top: calc(var(--ds-island-clearance, 72px) + 44px);
+  }
+
+  .ds-atlas__dock[data-switcher] {
+    top: var(--ds-island-clearance, 72px);
+    right: 0;
+    bottom: auto;
+    left: 0;
+    display: flex;
+    gap: var(--ds-space-2);
+    padding: 0 var(--ds-space-3);
+    background: none;
+    border: 0;
+    border-radius: 0;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+
+  .ds-atlas__dock[data-switcher]::-webkit-scrollbar {
+    display: none;
+  }
+
+  .ds-atlas__dock[data-switcher] button {
+    flex: 0 0 auto;
+    flex-direction: row;
+    gap: 6px;
+    min-height: 36px;
+    padding: 0 var(--ds-space-3);
+    color: var(--ds-ink);
+    background: var(--ds-surface);
+    border: var(--ds-border-width) solid var(--ds-border);
+    border-radius: var(--ds-radius-full);
+    font-size: 0.8125rem;
+  }
+
+  .ds-atlas__dock[data-switcher] button[aria-pressed='true'] {
+    color: var(--ds-accent);
+    background: var(--ds-surface-raised);
+    border-color: var(--ds-accent-graphic);
+  }
+
+  /* Records: the results sheet's peek, docked above the tabs. Hidden while the sheet is up. */
+  .ds-atlas__dock[data-switcher] button[data-dock='results'] {
+    position: fixed;
+    right: var(--ds-space-2);
+    bottom: calc(var(--ds-tabbar-h) + var(--ds-space-2));
+    left: var(--ds-space-2);
+    justify-content: center;
+    min-height: 44px;
+    border-radius: var(--ds-radius-md);
+  }
+
+  /* Hidden while any sheet is up: a phone shows one instrument at a time, and the peek would sit
+     on top of that sheet's last rows. */
+  .ds-atlas__dock[data-switcher] button[data-dock='results'][aria-pressed='true'],
+  .ds-atlas[data-sheet-open='true'] .ds-atlas__dock[data-switcher] button[data-dock='results'],
+  .ds-atlas:has(> .ds-sheet-presence[data-presence='leaving'])
+    .ds-atlas__dock[data-switcher]
+    button[data-dock='results'] {
+    display: none;
+  }
+
+  /* …and comes back once the sheet has finished leaving (`SheetPresence`), fading in rather than
+     popping over the space the sheet just left. `data-sheet-open` drops when the sheet starts to
+     leave, so the leaving state above holds the peek back until the sheet is gone. */
+  .ds-atlas__dock[data-switcher] button[data-dock='results'] {
+    animation: ds-atlas-peek-in var(--ds-duration-fast) var(--ds-easing);
+  }
+
+  .ds-map-controls {
+    bottom: calc(var(--ds-tabbar-h) + var(--ds-space-2) + 44px + var(--ds-space-3));
+    /* Open sheet: from above the peek bar to above the sheet's own peek (map-controls.css). */
+    --ds-map-controls-lift: calc(
+      var(--ds-atlas-sheet-peek) + var(--ds-space-2) - 44px - var(--ds-space-3)
+    );
+  }
+
+  .ds-atlas__readout {
+    bottom: calc(var(--ds-tabbar-h) + var(--ds-space-2) + 44px + var(--ds-space-3));
+  }
+
+  .ds-map-stage .maplibregl-ctrl-bottom-left,
+  html[data-door-browse='1'] .ds-map-stage .maplibregl-ctrl-bottom-left {
+    bottom: calc(var(--ds-tabbar-h) + var(--ds-space-2) + 44px + var(--ds-space-2));
+  }
+}
+
+/*
+ * A short phone (compact height, under the wide breakpoint) also has the tab bar along its bottom
+ * edge (tab-bar.css), slimmed to one row. Everything the compact layouts above anchor to the bottom
+ * edge — the dock, the instrument column, the map controls, the readout, the attribution — moves
+ * up by the bar's height instead of sitting underneath it.
+ */
+@media (max-width: 819px) and (max-height: 559px) {
+  :root:root {
+    --ds-atlas-dock-clearance: calc(var(--ds-tabbar-h) + var(--ds-space-2) * 2 + 28px + 54px);
+  }
+
+  .ds-atlas__dock {
+    bottom: calc(var(--ds-tabbar-h) + var(--ds-space-2) + 28px);
+  }
+
+  .ds-atlas__readout {
+    bottom: calc(var(--ds-tabbar-h) + var(--ds-space-2) + 96px);
+  }
+
+  .ds-map-stage .maplibregl-ctrl-bottom-left,
+  html[data-door-browse='1'] .ds-map-stage .maplibregl-ctrl-bottom-left {
+    bottom: calc(var(--ds-tabbar-h) + 0.35rem);
+  }
+}
+
+@media (max-width: 819px) and (max-height: 559px) and (orientation: landscape) and (min-width: 560px) {
+  .ds-lens,
+  .ds-results,
+  .ds-time-panel,
+  .ds-camera,
+  .ds-sheet {
+    bottom: calc(var(--ds-tabbar-h) + var(--ds-space-2));
+  }
+
+  .ds-atlas__dock {
+    bottom: calc(var(--ds-tabbar-h) + var(--ds-space-2));
+  }
+
+  /* map-controls.css lifts the controls over the dock; this adds the bar under both. */
+  :root .ds-map-controls {
+    bottom: calc(var(--ds-tabbar-h) + var(--ds-space-2) * 2 + 54px);
   }
 }

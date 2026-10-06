@@ -86,6 +86,14 @@ html:has([data-surface='instrument']) {
   overscroll-behavior: none;
 }
 
+/* Any full-screen map, including the Door's "Browse the map": the page under it must not scroll
+   or rubber-band, or a pan that reaches the edge drags the document (and a phone's toolbar)
+   instead of the map. */
+html:has(.ds-map-stage[data-plate-posture='live']) {
+  overflow: hidden;
+  overscroll-behavior: none;
+}
+
 .ds-shell:has([data-surface='instrument']) {
   height: 100dvh;
   max-height: 100dvh;
@@ -1963,6 +1971,17 @@ html:has([data-surface='instrument']) {
   background: var(--ds-map-water);
 }
 
+/* The map is not text. State names, cluster counts and record markers are DOM over the canvas,
+   and on iPhone a press that lingers on one starts text selection (with its magnifier and
+   callout), which cancels the pan or pinch the finger was starting. Nothing on the plate is
+   meant to be selected or long-press-shared; record names are selectable in the sheet and list. */
+.ds-map-stage {
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
 .ds-map-stage[data-plate-posture='live'] {
   touch-action: none;
 }
@@ -2309,52 +2328,13 @@ body:has(.ds-explore-stage[data-results='open']) {
   }
 }
 
-/* Explore hit-target buttons reuse first-paint pin discs (see entity-marker-sync.ts). */
-.ds-map-entity-marker {
-  position: relative;
-  padding: 0;
-  border: 0;
-  cursor: pointer;
-}
-
-/* Enlarge invisible hit pad without changing the visible disc (WCAG target size). */
-.ds-map-entity-marker::after {
-  content: '';
-  position: absolute;
-  inset: -0.4375rem;
-  border-radius: 999px;
-}
-
-/* Selected orientation ring — copper pulse; static when reduced-motion is preferred. */
-.ds-map-entity-marker--selected:not(.ds-first-paint-pin--focus)::after {
-  content: '';
-  position: absolute;
-  inset: -0.35rem;
-  border: 2px solid var(--ds-accent);
-  border-radius: 50%;
-  pointer-events: none;
-  animation: ds-map-entity-selected-pulse 1.8s var(--ds-easing, ease-in-out) infinite;
-}
-
-@keyframes ds-map-entity-selected-pulse {
-  0%,
-  100% {
-    opacity: 0.9;
-    transform: scale(1);
-  }
-
-  55% {
-    opacity: 0.15;
-    transform: scale(1.55);
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .ds-map-entity-marker--selected:not(.ds-first-paint-pin--focus)::after {
-    animation: none;
-    opacity: 0.85;
-    transform: scale(1.2);
-  }
+/*
+ * State abbreviations are MapLibre markers whose opacity follows the zoom continuously
+ * (MapStage's `updateStateLabelOpacity`). MapLibre gives every marker a 0.2s opacity transition;
+ * here it only restarted on every zoom frame and made the fade trail the camera.
+ */
+.ds-state-label.maplibregl-marker {
+  transition: none;
 }
 
 /* Place-search orientation pin — copper head + stem; not an entity hit target. */
