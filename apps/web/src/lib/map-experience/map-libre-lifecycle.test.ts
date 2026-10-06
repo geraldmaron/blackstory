@@ -43,11 +43,13 @@ describe('map mount contracts', () => {
     assert.match(mapStageSource, /readonly resize/);
   });
 
-  it('MapStage is the only module that constructs a MapLibre instance', () => {
-    // This replaces the EntityLocationMap case. That component was the second mount these shared
-    // helpers existed to keep consistent; SP-08 deleted it, and consistency-between-two-mounts is
-    // no longer the property worth asserting — "there is only one mount" is stronger and is the
-    // acceptance criterion. Scoped to src so the check cannot be satisfied by deleting a file.
+  it('every MapLibre mount goes through the shared lifecycle guards', () => {
+    // Two mounts exist on purpose: the persistent plate (MapStage), and EmbeddedMap — a map that
+    // lives in the document flow on place and record pages. The plate is position: fixed and is
+    // moved onto a slot a frame late, so it cannot track an in-flow box while the page scrolls
+    // (RecordLocator.tsx documents why), which is why the in-page map is its own instance. The
+    // property worth asserting is that every mount uses the same WebGL probe, resize lifecycle
+    // and context-loss recovery, and that no third mount appears unannounced.
     const mounts = execFileSync('grep', ['-rl', 'new maplibregl.Map', join(here, '../..')], {
       encoding: 'utf8',
     })
@@ -57,7 +59,16 @@ describe('map mount contracts', () => {
       // A test that names the constructor is not a mount — this file matches itself otherwise.
       .filter((path: string) => !/\.test\.[cm]?tsx?$/.test(path))
       .sort();
-    assert.deepEqual(mounts, ['src/components/map-stage/MapStage.tsx']);
+    assert.deepEqual(mounts, [
+      'src/components/map-embed/EmbeddedMap.tsx',
+      'src/components/map-stage/MapStage.tsx',
+    ]);
+    for (const mount of mounts) {
+      const source = readFileSync(join(here, '../..', mount.replace(/^src\//, '')), 'utf8');
+      assert.match(source, /isWebGlAvailable\(/, mount);
+      assert.match(source, /bindMapResizeLifecycle\(/, mount);
+      assert.match(source, /bindWebGlContextRecovery\(/, mount);
+    }
   });
 
   it('rejects a zero-size container before map resize', () => {

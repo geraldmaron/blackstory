@@ -169,9 +169,9 @@ export default async function ArticleDetailPage({ params }: ArticlePageProps) {
   ) : undefined;
 
   /*
-   * The piece opens on its image, with the title written over it, on the same masthead the
-   * record page uses. A piece with no hero keeps the same block on the canvas: the type is the
-   * masthead in that case, and there is nothing to read it over.
+   * The piece opens on its image, in its own centred band with the title below it, on the same
+   * masthead the record page uses. A piece with no hero keeps the same block on the canvas: the
+   * type is the masthead in that case.
    */
   const masthead = (
     <figure className="ds-article-mast" data-media={doc.heroImage ? 'photo' : 'none'}>

@@ -13,7 +13,7 @@
  * unmounts: pages drive it through the imperative API (`patchData` / `applyViewState` /
  * `flyPreset` / `subscribe`) that `useMapStage()` returns. The instance-lifecycle code and every
  * mutation helper below (`applyGeographyStyle`, `setSelectedStateFilter`, `setHistoryEdgeData`,
- * `syncCircularMarkers`, …) sit behind that API; each export's own doc comment states its
+ * `syncEntityHover`, …) sit behind that API; each export's own doc comment states its
  * contract.
  *
  * `maplibre-gl`'s runtime is only ever dynamically imported here, and this is the only module
@@ -67,7 +67,7 @@ import {
   entitySelectedPulseStaticRadiusExpression,
   ENTITY_SELECTED_PULSE_STATIC_OPACITY,
 } from '../../app/map/explore-style';
-import { markerRadiusPlusExpression } from '../../lib/map-experience/marker-size';
+import { markerRadius, markerRadiusPlusExpression } from '../../lib/map-experience/marker-size';
 import {
   applyDensityBlendProgress,
   applyDecadeHoldFeatureState,
@@ -85,10 +85,6 @@ import {
 } from '../../app/map/decade-layer-transition';
 import type { MapColorScheme } from '../../lib/map-experience/dignity-style';
 import { EXPLORE_CLUSTER_CONFIG } from '../../lib/map-experience/dignity-style';
-import {
-  diffEntityMarkerIds,
-  shouldMountEntityMarkers,
-} from '../../lib/map-experience/entity-marker-diff';
 import {
   bindMapResizeLifecycle,
   bindWebGlContextRecovery,
@@ -148,12 +144,6 @@ import {
   setSelectedStateFilter,
 } from './style-application';
 import {
-  applyEntityMarkerElementProps,
-  clearMarkers,
-  markerLabelFor,
-  syncSelectedEntityMarkerClass,
-} from './entity-marker-sync';
-import {
   setHistoryEdgeData,
   setHistoryEdgesVisibility,
   setSelectedEdgeFilter,
@@ -190,8 +180,14 @@ import {
 } from './plate-posture';
 import { createFramedSlotRegistry } from './framed-slot-registry';
 import { boxIsPaintable, plateBoxForSlot, resolvePlatePosture, type PlateBox } from './plate-frame';
-import { applyGesturesForPosture, lockGestures, rotateGestureAllowed } from './gesture-lock';
 import {
+  applyGesturesForPosture,
+  gesturePolicyFor,
+  lockGestures,
+  rotateGestureAllowed,
+} from './gesture-lock';
+import {
+  attachSafariPageZoomGuard,
   attachSafariTwistRotate,
   attachShiftDragRotate,
   attachShiftWheelRotate,
@@ -382,6 +378,13 @@ export type MapStageHandle = {
    * confirmed exception to that norm today. `flyPreset` remains the route for preset framing.
    */
   readonly getMap: () => AtlasCameraTarget | null;
+  /**
+   * Where a record's disc is on screen right now, with its name — the anchor for a photo card.
+   * Null below cluster max zoom (the record is inside a cluster there) or when it is off the map.
+   */
+  readonly entityHoverTarget: (
+    entityId: string,
+  ) => { readonly entityId: string; readonly name: string; readonly rect: DOMRect } | null;
 };
 
 /** What the camera library needs off the map. Structural, so `MapStage` owes it no import. */
@@ -433,124 +436,43 @@ function syncClusterZoomRange(map: MapLibreMap, posture: PlatePosture): void {
   }
 }
 
-/**
- * Keyed sync extends the map's single-feature invariant to DOM hit-target markers. Markers are
- * keyed by `entityId` and reused
- * in place, so a selection change or `zoomend` resync never mass-unmounts and recreates the
- * whole collection (which read as "all entities light up"). Only genuinely new ids mount and
- * only stale ids unmount.
- */
 /** Hover-intent delay before a pin's photo card opens (`PinPhotoCard`'s own doc comment). */
 const PIN_HOVER_INTENT_MS = 120;
 
-function syncCircularMarkers(
-  map: MapLibreMap,
-  maplibregl: MaplibreModule['default'],
+/** The box a hovered or selected record's photo card anchors to: the disc's footprint on screen,
+ * the same 8px square the HTML hit-target disc used to occupy. */
+const ENTITY_ANCHOR_SIZE_PX = 8;
+
+type EntityPoint = {
+  readonly name: string;
+  readonly lng: number;
+  readonly lat: number;
+  readonly evidenceCount: number;
+  readonly confidenceTier: string;
+};
+
+/** Point records by id, so a hover or a selection finds its record without scanning thousands. */
+function indexEntityPoints(
   features: ExploreMapFeatureCollection['features'],
-  markers: Marker[],
-  onSelect: (entityId: string) => void,
-  selectedEntityId: string | undefined,
-  onHover: (
-    target: { readonly entityId: string; readonly name: string; readonly rect: DOMRect } | null,
-  ) => void,
-): void {
-  // Below clusterMaxZoom, MapLibre aggregates points — HTML hit-targets for every feature
-  // sit above clusters and steal clicks. Only mount DOM targets once individuals are visible.
-  if (!shouldMountEntityMarkers(map.getZoom(), EXPLORE_CLUSTER_CONFIG.clusterMaxZoom)) {
-    clearMarkers(markers);
-    return;
-  }
-
-  const mountedById = new Map<string, Marker>();
-  for (const marker of markers) {
-    const id = marker.getElement().dataset.entityId;
-    if (typeof id === 'string') mountedById.set(id, marker);
-  }
-
-  type PointFeature = ExploreMapFeatureCollection['features'][number];
-  const featureById = new Map<string, { feature: PointFeature; lng: number; lat: number }>();
+): ReadonlyMap<string, EntityPoint> {
+  const byId = new Map<string, EntityPoint>();
   for (const feature of features) {
     if (feature.geometry.type !== 'Point') continue;
     const [lng, lat] = feature.geometry.coordinates;
     if (typeof lng !== 'number' || typeof lat !== 'number') continue;
-    const entityId = feature.properties.entityId;
-    if (typeof entityId !== 'string') continue;
-    if (featureById.has(entityId)) continue;
-    featureById.set(entityId, { feature, lng, lat });
-  }
-
-  const diff = diffEntityMarkerIds(mountedById.keys(), featureById.keys());
-
-  for (const entityId of diff.keep) {
-    const mounted = mountedById.get(entityId);
-    const entry = featureById.get(entityId);
-    if (!mounted || !entry) continue;
-    applyEntityMarkerElementProps(
-      mounted.getElement() as HTMLButtonElement,
-      entry.feature,
-      markerLabelFor(entry.feature),
-      selectedEntityId === entityId,
-    );
-    mounted.setLngLat([entry.lng, entry.lat]);
-  }
-
-  for (const entityId of diff.add) {
-    const entry = featureById.get(entityId);
-    if (!entry) continue;
-    const el = document.createElement('button');
-    el.type = 'button';
-    el.className = 'ds-first-paint-pin ds-first-paint-pin--link ds-map-entity-marker';
-    el.dataset.entityId = entityId;
-    applyEntityMarkerElementProps(
-      el,
-      entry.feature,
-      markerLabelFor(entry.feature),
-      selectedEntityId === entityId,
-    );
-    // The map canvas is `aria-hidden` (see `MapStageProvider`'s render) — the synchronized
-    // result list is the accessible-parity surface for the same entities, so these buttons
-    // are deliberately pulled out of the tab order rather than left focusable-but-hidden
-    // (a WAI-ARIA anti-pattern).
-    el.tabIndex = -1;
-    el.addEventListener('click', (event) => {
-      event.preventDefault();
-      event.stopPropagation();
-      onSelect(entityId);
+    const props = feature.properties;
+    const entityId = props.entityId;
+    if (typeof entityId !== 'string' || byId.has(entityId)) continue;
+    const evidence = Number(props.evidenceCount);
+    byId.set(entityId, {
+      name: typeof props.displayName === 'string' ? props.displayName : 'Documented record',
+      lng,
+      lat,
+      evidenceCount: Number.isFinite(evidence) ? evidence : 0,
+      confidenceTier: typeof props.confidenceTier === 'string' ? props.confidenceTier : 'unrated',
     });
-    // Pin-photo hover intent: a short delay on enter (so a cursor passing over the plate does not
-    // flicker cards open), immediate on leave. `PinPhotoCard`'s doc comment has the full contract.
-    let hoverTimer: ReturnType<typeof setTimeout> | null = null;
-    el.addEventListener('mouseenter', () => {
-      if (hoverTimer !== null) clearTimeout(hoverTimer);
-      hoverTimer = setTimeout(() => {
-        hoverTimer = null;
-        onHover({ entityId, name: el.dataset.pinName ?? '', rect: el.getBoundingClientRect() });
-      }, PIN_HOVER_INTENT_MS);
-    });
-    el.addEventListener('mouseleave', () => {
-      if (hoverTimer !== null) {
-        clearTimeout(hoverTimer);
-        hoverTimer = null;
-      }
-      onHover(null);
-    });
-    const marker = new maplibregl.Marker({ element: el, anchor: 'center' })
-      .setLngLat([entry.lng, entry.lat])
-      .addTo(map);
-    mountedById.set(entityId, marker);
   }
-
-  // Unmount only stale ids — never the survivors.
-  for (const entityId of diff.remove) {
-    mountedById.get(entityId)?.remove();
-    mountedById.delete(entityId);
-  }
-
-  markers.length = 0;
-  for (const entityId of featureById.keys()) {
-    const marker = mountedById.get(entityId);
-    if (marker) markers.push(marker);
-  }
+  return byId;
 }
 
 /**
@@ -652,10 +574,16 @@ export function MapStageProvider({
     shift: RotateGestureHandle | null;
     wheel: RotateGestureHandle | null;
     twist: RotateGestureHandle | null;
-  }>({ shift: null, wheel: null, twist: null });
+    /** iOS page-zoom guard (`attachSafariPageZoomGuard`), held while the map is full-screen. */
+    pageZoom: RotateGestureHandle | null;
+  }>({ shift: null, wheel: null, twist: null, pageZoom: null });
   const mapRef = useRef<MapLibreMap | null>(null);
   const maplibreglRef = useRef<MaplibreModule['default'] | null>(null);
-  const markersRef = useRef<Marker[]>([]);
+  /** `indexEntityPoints` of the current feature collection, rebuilt only when it changes. */
+  const entityIndexRef = useRef<{
+    readonly source: ExploreMapFeatureCollection['features'] | null;
+    readonly byId: ReadonlyMap<string, EntityPoint>;
+  }>({ source: null, byId: new Map() });
   const searchCenterMarkerRef = useRef<Marker | null>(null);
   const searchAreaRef = useRef<SearchAreaInput | null>(null);
   /** Soft opacity pulse on the GL selected ring — canceled when selection clears. */
@@ -663,6 +591,9 @@ export function MapStageProvider({
   const stateLabelMarkersRef = useRef<
     Map<string, { readonly marker: Marker; readonly element: HTMLDivElement }>
   >(new Map());
+  /** The opacity last written to the state labels (2dp), and whether they are on the map. */
+  const stateLabelOpacityRef = useRef<string | null>(null);
+  const stateLabelsAttachedRef = useRef(true);
   const listenersRef = useRef(makeListenerStore());
   const lastViewportRef = useRef<ExploreViewportFrame | undefined>(undefined);
   const [mapAvailable, setMapAvailable] = useState(true);
@@ -775,25 +706,43 @@ export function MapStageProvider({
     notify(listenersRef.current, 'ready');
   }, []);
 
-  const syncEntityMarkers = useCallback(() => {
-    const map = mapRef.current;
-    const maplibregl = maplibreglRef.current;
-    if (!map || !maplibregl) return;
-    try {
-      syncCircularMarkers(
-        map,
-        maplibregl,
-        configRef.current.featureCollection.features,
-        markersRef.current,
-        (entityId) => notify(listenersRef.current, 'select', entityId),
-        configRef.current.selectedEntity,
-        (target) => notify(listenersRef.current, 'pinHover', target),
-      );
-    } catch (error) {
-      console.error('[MapStage] marker sync failed', error);
-      markMapUnavailable();
+  const entityPoint = useCallback((entityId: string): EntityPoint | undefined => {
+    const features = configRef.current.featureCollection.features;
+    if (entityIndexRef.current.source !== features) {
+      entityIndexRef.current = { source: features, byId: indexEntityPoints(features) };
     }
-  }, [markMapUnavailable]);
+    return entityIndexRef.current.byId.get(entityId);
+  }, []);
+
+  /**
+   * Where a record's disc is on screen, for a photo card to anchor to. Only past cluster max zoom,
+   * where records draw as individual discs (below it they are inside a cluster), and only when the
+   * disc is inside the map's box.
+   */
+  const entityHoverTarget = useCallback(
+    (entityId: string) => {
+      const map = mapRef.current;
+      if (!map || map.getZoom() <= EXPLORE_CLUSTER_CONFIG.clusterMaxZoom) return null;
+      const point = entityPoint(entityId);
+      if (!point) return null;
+      const { x, y } = map.project([point.lng, point.lat]);
+      const canvas = map.getCanvas();
+      if (x < 0 || y < 0 || x > canvas.clientWidth || y > canvas.clientHeight) return null;
+      const box = canvas.getBoundingClientRect();
+      const half = ENTITY_ANCHOR_SIZE_PX / 2;
+      return {
+        entityId,
+        name: point.name,
+        rect: new DOMRect(
+          box.left + x - half,
+          box.top + y - half,
+          ENTITY_ANCHOR_SIZE_PX,
+          ENTITY_ANCHOR_SIZE_PX,
+        ),
+      };
+    },
+    [entityPoint],
+  );
 
   const updateStateLabelSelection = useCallback((selectedPostalCode: string | undefined) => {
     const scheme = readDocumentColorScheme();
@@ -812,14 +761,30 @@ export function MapStageProvider({
     }
   }, []);
 
+  /**
+   * State labels fade with zoom. Written only when the 2dp value changes, and the 51 markers come
+   * off the map entirely while they are invisible (below 2.4 and above 6.2, which is most of a
+   * city-level pinch), so an invisible label is not repositioned on every camera frame.
+   * The 0.2s opacity transition MapLibre gives every marker is off for these (shell.css): the zoom
+   * drives the value continuously, and restarting a transition on every frame only lagged it.
+   */
   const updateStateLabelOpacity = useCallback((zoom: number) => {
-    const opacity = String(stateLabels.stateLabelOpacityForZoom(zoom));
+    const map = mapRef.current;
+    const value = stateLabels.stateLabelOpacityForZoom(zoom);
+    const opacity = value.toFixed(2);
+    if (opacity === stateLabelOpacityRef.current) return;
+    stateLabelOpacityRef.current = opacity;
+    const show = value > 0;
     for (const [, entry] of stateLabelMarkersRef.current) {
       // Through the marker, never `element.style.opacity`: a MapLibre marker owns its element's
       // inline opacity and rewrites it on every map update (terrain occlusion), so a value written
       // straight to the element would survive for one frame and prevent the fade at every zoom.
-      entry.marker.setOpacity(opacity);
+      if (show) entry.marker.setOpacity(opacity);
+      if (!map) continue;
+      if (show && !stateLabelsAttachedRef.current) entry.marker.addTo(map);
+      else if (!show && stateLabelsAttachedRef.current) entry.marker.remove();
     }
+    if (map) stateLabelsAttachedRef.current = show;
   }, []);
 
   const stopSelectedEntityPulse = useCallback(() => {
@@ -844,13 +809,25 @@ export function MapStageProvider({
       stopSelectedEntityPulse();
       const map = mapRef.current;
       if (!map?.getLayer(EXPLORE_SELECTED_POINT_LAYER_ID)) return;
+      /*
+       * The ring's size as a plain number, not read from the feature. The layer's own radius reads
+       * each record's evidence and confidence (`['get', …]`), and MapLibre rebuilds a source's
+       * tiles whenever a data-driven paint value changes — so pulsing that expression re-tiled
+       * every record on the map on every animation frame. A zoom-only expression is redrawn from
+       * the GPU buffers it already has.
+       */
+      const point = entityPoint(entityId);
+      const dataRadius = markerRadius(
+        point?.evidenceCount ?? 0,
+        point?.confidenceTier ?? 'unrated',
+      );
       if (prefersReducedMotion()) {
         // Reduced motion (patterns-cinematic-map.md §3): no loop — a single static
         // enlarged ring (scale ~1.35, opacity ~0.85).
         map.setPaintProperty(
           EXPLORE_SELECTED_POINT_LAYER_ID,
           'circle-radius',
-          entitySelectedPulseStaticRadiusExpression(),
+          entitySelectedPulseStaticRadiusExpression(dataRadius),
         );
         map.setPaintProperty(
           EXPLORE_SELECTED_POINT_LAYER_ID,
@@ -879,7 +856,7 @@ export function MapStageProvider({
         activeMap.setPaintProperty(
           EXPLORE_SELECTED_POINT_LAYER_ID,
           'circle-radius',
-          entitySelectedPulseRadiusExpression(progress),
+          entitySelectedPulseRadiusExpression(progress, dataRadius),
         );
         activeMap.setPaintProperty(
           EXPLORE_SELECTED_POINT_LAYER_ID,
@@ -890,7 +867,7 @@ export function MapStageProvider({
       };
       selectedPulseRafRef.current = requestAnimationFrame(tick);
     },
-    [stopSelectedEntityPulse],
+    [stopSelectedEntityPulse, entityPoint],
   );
 
   const applyStyleAndData = useCallback(
@@ -903,8 +880,6 @@ export function MapStageProvider({
       readonly preserveDecadeFadeOpacities?: boolean;
       /** Hold primary entities/edges while incoming buffers stage the next frame. */
       readonly deferPrimaryDecadeData?: boolean;
-      /** Skip entity HTML marker sync (defer until promote after crossdissolve). */
-      readonly skipEntityMarkers?: boolean;
       /** Skip primary density load (incoming buffer stages density during dissolve). */
       readonly skipPrimaryDensityLoad?: boolean;
     }) => {
@@ -966,15 +941,12 @@ export function MapStageProvider({
             });
         }
         requestCountyPolygonLoad(map, configRef.current);
-        if (!options?.skipEntityMarkers) {
-          syncEntityMarkers();
-        }
         syncSearchAreaRef.current?.();
       } catch (error) {
         console.error('[MapStage] style/data apply failed', error);
       }
     },
-    [startSelectedEntityPulse, stopSelectedEntityPulse, syncEntityMarkers],
+    [startSelectedEntityPulse, stopSelectedEntityPulse],
   );
   applyStyleAndDataRef.current = applyStyleAndData;
 
@@ -1053,7 +1025,6 @@ export function MapStageProvider({
             ...(applyOptions.deferPrimaryDecadeData
               ? { deferPrimaryDecadeData: true as const }
               : {}),
-            ...(applyOptions.skipEntityMarkers ? { skipEntityMarkers: true as const } : {}),
             ...(applyOptions.skipPrimaryDensityLoad
               ? { skipPrimaryDensityLoad: true as const }
               : {}),
@@ -1139,9 +1110,8 @@ export function MapStageProvider({
       restoreDecadeFadePaintFromStyle(map, cfg.style);
       clearIncomingDecadeBuffers(map);
       setHistoryEdgesVisibility(map, cfg.historyEdgesEnabled);
-      syncEntityMarkers();
     },
-    [clearIncomingDecadeBuffers, syncEntityMarkers],
+    [clearIncomingDecadeBuffers],
   );
 
   const runDecadeMorph = useCallback(
@@ -1307,7 +1277,6 @@ export function MapStageProvider({
         selectedEntity: patch.selectedEntity,
       };
       updateStateLabelSelection(patch.selectedState);
-      syncSelectedEntityMarkerClass(markersRef.current, patch.selectedEntity);
       const map = mapRef.current;
       if (!map || !map.isStyleLoaded()) return;
       setSelectedStateFilter(map, patch.selectedState);
@@ -1379,6 +1348,21 @@ export function MapStageProvider({
         current.wheel = null;
         current.twist = null;
       }
+      // A full-screen map owns every two-finger gesture on it; on iOS that includes cancelling
+      // Safari's page zoom, which MapLibre does not do (`attachSafariPageZoomGuard`).
+      const fullScreen =
+        container !== null && gesturePolicyFor(posture, { pointerFine }) === 'reader';
+      if (fullScreen && !current.pageZoom) current.pageZoom = attachSafariPageZoomGuard(container);
+      else if (!fullScreen && current.pageZoom) {
+        current.pageZoom.detach();
+        current.pageZoom = null;
+      }
+      // Pinch is zoom only on a touch screen. This is a north-up history map: a pinch that also
+      // twists the country by a few degrees is the most common accidental gesture on mobile
+      // maps. Rotation stays one deliberate step away in the View panel's compass; desktop keeps
+      // its rotate paths.
+      if (pointerFine) map.touchZoomRotate.enableRotation();
+      else map.touchZoomRotate.disableRotation();
     },
     [],
   );
@@ -1602,7 +1586,6 @@ export function MapStageProvider({
       syncRotateGestures(activeMap, postureRef.current, prefersFinePointer());
       syncClusterZoomRange(activeMap, postureRef.current);
 
-      syncEntityMarkers();
       lastViewportRef.current = readViewport(activeMap);
       notify(listenersRef.current, 'viewport', lastViewportRef.current);
 
@@ -1700,7 +1683,6 @@ export function MapStageProvider({
         },
         applyZoomOpacity: updateStateLabelOpacity,
         onZoomSettled: () => {
-          syncEntityMarkers();
           requestCountyPolygonLoad(activeMap, configRef.current);
         },
         publishBearing: (bearing) => notify(listenersRef.current, 'rotate', bearing),
@@ -1721,29 +1703,58 @@ export function MapStageProvider({
       });
       activeMap.on('zoom', () => {
         updateStateLabelOpacity(activeMap.getZoom());
-        // DOM hit-target discs are fixed-pixel; a camera ease that crosses the cluster gate
-        // (closing a record card flies point zoom -> national) must unmount them at the
-        // crossing, not at `zoomend` — otherwise every disc rides the whole flight oversized
-        // and the map reads as "all entities light up".
-        if (
-          !shouldMountEntityMarkers(activeMap.getZoom(), EXPLORE_CLUSTER_CONFIG.clusterMaxZoom) &&
-          markersRef.current.length > 0
-        ) {
-          clearMarkers(markersRef.current);
-        }
       });
+
+      /*
+       * Pin hover, from the map's own hit test. Records used to be HTML buttons past cluster max
+       * zoom, each with its own mouseenter/mouseleave; the map draws them now, so hover comes
+       * from the same padded `queryRenderedFeatures` box that selection and the cursor use.
+       * A short intent delay on the way in, none on the way out (`PinPhotoCard`'s contract).
+       */
+      let hoverWanted: string | null = null;
+      let hoverShown = false;
+      let hoverTimer: ReturnType<typeof setTimeout> | null = null;
+      const hoverTo = (entityId: string | null) => {
+        if (entityId === hoverWanted) return;
+        hoverWanted = entityId;
+        if (hoverTimer !== null) {
+          clearTimeout(hoverTimer);
+          hoverTimer = null;
+        }
+        if (hoverShown) {
+          hoverShown = false;
+          notify(listenersRef.current, 'pinHover', null);
+        }
+        if (entityId === null) return;
+        hoverTimer = setTimeout(() => {
+          hoverTimer = null;
+          if (hoverWanted !== entityId) return;
+          const target = entityHoverTarget(entityId);
+          if (!target) return;
+          hoverShown = true;
+          notify(listenersRef.current, 'pinHover', target);
+        }, PIN_HOVER_INTENT_MS);
+      };
 
       // Cursor affordance uses the same padded hit as selection so a near-miss still
       // reads as a pin, not empty plate.
       activeMap.on('mousemove', (event: MapMouseEvent) => {
-        activeMap.getCanvas().style.cursor = pointerHitAt(event.point) ? 'pointer' : '';
+        const hit = pointerHitAt(event.point);
+        activeMap.getCanvas().style.cursor = hit ? 'pointer' : '';
+        hoverTo(
+          hit?.kind === 'entity' && activeMap.getZoom() > EXPLORE_CLUSTER_CONFIG.clusterMaxZoom
+            ? hit.entityId
+            : null,
+        );
       });
+      activeMap.getCanvas().addEventListener('mouseleave', () => hoverTo(null));
+      // The card is placed once, beside the disc; once the camera moves the disc is elsewhere.
+      activeMap.on('movestart', () => hoverTo(null));
 
       resizeLifecycleRef.current = bindMapResizeLifecycle(container, () => {
         resizeMapInPlace(activeMap);
       });
       resizeTimerRef.current = setTimeout(() => {
-        syncEntityMarkers();
         resizeMapInPlace(activeMap);
       }, 200);
     })();
@@ -1780,14 +1791,14 @@ export function MapStageProvider({
       if (resizeTimerRef.current) clearTimeout(resizeTimerRef.current);
       resizeLifecycleRef.current?.disconnect();
       contextRecoveryRef.current?.disconnect();
-      clearMarkers(markersRef.current);
       clearSearchCenterMarker();
       for (const { marker } of stateLabelMarkersRef.current.values()) marker.remove();
       stateLabelMarkersRef.current.clear();
       rotateGesturesRef.current.shift?.detach();
       rotateGesturesRef.current.wheel?.detach();
       rotateGesturesRef.current.twist?.detach();
-      rotateGesturesRef.current = { shift: null, wheel: null, twist: null };
+      rotateGesturesRef.current.pageZoom?.detach();
+      rotateGesturesRef.current = { shift: null, wheel: null, twist: null, pageZoom: null };
       mapRef.current?.remove();
       mapRef.current = null;
       maplibreglRef.current = null;
@@ -2024,6 +2035,7 @@ export function MapStageProvider({
         ensureMap();
         return getMap();
       },
+      entityHoverTarget,
     }),
     [
       ensureMap,
@@ -2038,6 +2050,7 @@ export function MapStageProvider({
       resize,
       setDoorBrowseLive,
       getMap,
+      entityHoverTarget,
     ],
   );
 
@@ -2052,8 +2065,8 @@ export function MapStageProvider({
           `position: relative` on that class, which would silently clobber the plate's
           `position: fixed` (same element, same specificity, later cascade wins) and put the
           canvas back in normal document flow. `aria-hidden` on the plate: the synchronized
-          result list is this map's accessible-parity surface (see `syncCircularMarkers`'s doc
-          comment on marker `tabIndex`), so the canvas itself carries no separate a11y tree. */}
+          result list is this map's accessible-parity surface, so the canvas itself carries no
+          separate a11y tree. */}
       <div className="ds-map-stage" data-plate-posture={posture} ref={plateRef} aria-hidden="true">
         <div ref={containerRef} className="ds-map-stage__canvas" />
       </div>

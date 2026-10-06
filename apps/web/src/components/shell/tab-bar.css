@@ -1,0 +1,238 @@
+/*
+ * The phone tab bar (PhoneTabBar.tsx). Hidden on wide layouts, where the command bar carries the
+ * same four destinations as links.
+ *
+ * `--ds-tabbar-h` is the one number every bottom-anchored thing on a phone clears: page content,
+ * the Explore sheets and their peek, the map controls and the attribution. It is 0 on wide
+ * layouts, so the same `calc()`s are correct everywhere.
+ */
+:root {
+  --ds-tabbar-h: 0px;
+  /* The Rooms sheet's motion: the platform sheet curve (fast start, long settle). */
+  --ds-tabbar-sheet-ms: 320ms;
+  --ds-tabbar-sheet-ease: cubic-bezier(0.32, 0.72, 0, 1);
+}
+
+.ds-tabbar,
+.ds-tabbar-sheet {
+  display: none;
+}
+
+@media (max-width: 819px) {
+  :root:root {
+    --ds-tabbar-h: calc(56px + env(safe-area-inset-bottom, 0px));
+  }
+
+  .ds-tabbar {
+    position: fixed;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    z-index: var(--ds-z-command-bar);
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    height: var(--ds-tabbar-h);
+    padding: 0 env(safe-area-inset-right, 0px) env(safe-area-inset-bottom, 0px)
+      env(safe-area-inset-left, 0px);
+    background: var(--ds-surface);
+    border-top: var(--ds-border-width) solid var(--ds-border);
+    /* On map surfaces the shell wrappers pass pointer events through to the map
+       (atlas.css, `:has(.ds-atlas)`), and `pointer-events` inherits: the bar opts back in, as the
+       command bar does, or the map would take every tap aimed at a tab. */
+    pointer-events: auto;
+  }
+
+  .ds-tabbar__tab {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+    min-width: 44px;
+    min-height: 44px;
+    padding: 0;
+    color: var(--ds-ink-muted);
+    background: none;
+    border: 0;
+    font-family: var(--ds-font-ui, inherit);
+    font-size: 0.6875rem;
+    font-weight: 500;
+    line-height: 1;
+    text-decoration: none;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .ds-tabbar__tab svg {
+    width: 22px;
+    height: 22px;
+  }
+
+  .ds-tabbar__tab[aria-current='page'] {
+    color: var(--ds-accent);
+  }
+
+  .ds-tabbar__tab:focus-visible {
+    outline: var(--ds-focus-width) solid var(--ds-focus-ring);
+    outline-offset: -4px;
+    border-radius: var(--ds-radius-sm);
+  }
+
+  /* While a text field is being typed into, the keyboard is up and the bar would ride on top of
+     it, covering suggestions. Platform apps hide their tab bar then; so does this one. */
+  body:has(:is(input:not([type='checkbox'], [type='radio'], [type='range']), textarea):focus)
+    .ds-tabbar {
+    display: none;
+  }
+
+  /* Pages scroll clear of the bar: the last line, the footer and any end-of-page action. */
+  body {
+    padding-bottom: var(--ds-tabbar-h);
+  }
+
+  /*
+   * The Rooms sheet: a native modal dialog anchored to the bottom edge, moving the way platform
+   * sheets move — up from the edge on open, back down on close (`data-closing`, PhoneTabBar's
+   * `dismiss`), following the finger when its header is dragged. Transform and opacity only, so
+   * the motion stays on the compositor.
+   */
+  .ds-tabbar-sheet[open] {
+    display: flex;
+    flex-direction: column;
+    pointer-events: auto;
+    position: fixed;
+    inset: auto 0 0 0;
+    width: 100%;
+    max-width: none;
+    max-height: min(80dvh, 40rem);
+    margin: 0;
+    padding: 0;
+    color: var(--ds-ink);
+    background: var(--ds-surface);
+    border: var(--ds-border-width) solid var(--ds-border);
+    border-bottom: 0;
+    border-radius: var(--ds-radius-lg, 16px) var(--ds-radius-lg, 16px) 0 0;
+    overflow: hidden;
+    transition: transform var(--ds-tabbar-sheet-ms) var(--ds-tabbar-sheet-ease);
+    animation: ds-tabbar-sheet-in var(--ds-tabbar-sheet-ms) var(--ds-tabbar-sheet-ease);
+  }
+
+  .ds-tabbar-sheet[open][data-closing] {
+    transform: translateY(100%);
+    animation: none;
+  }
+
+  .ds-tabbar-sheet::backdrop {
+    background: rgb(0 0 0 / 0.4);
+    animation: ds-tabbar-backdrop-in var(--ds-tabbar-sheet-ms) var(--ds-tabbar-sheet-ease);
+  }
+
+  .ds-tabbar-sheet[data-closing]::backdrop {
+    animation: ds-tabbar-backdrop-out var(--ds-tabbar-sheet-ms) var(--ds-tabbar-sheet-ease) forwards;
+  }
+
+  .ds-tabbar-sheet__body {
+    flex: 1 1 auto;
+    min-height: 0;
+    padding: 0 var(--ds-space-4) calc(var(--ds-space-4) + env(safe-area-inset-bottom, 0px));
+    overflow-y: auto;
+    overscroll-behavior: contain;
+  }
+
+  /* The header is the drag handle: grab bar, title, close. */
+  .ds-tabbar-sheet__head {
+    position: relative;
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--ds-space-3) var(--ds-space-4) var(--ds-space-2);
+    touch-action: none;
+    cursor: grab;
+  }
+
+  .ds-tabbar-sheet__grab {
+    position: absolute;
+    top: 6px;
+    left: 50%;
+    width: 36px;
+    height: 5px;
+    margin-left: -18px;
+    border-radius: var(--ds-radius-full);
+    background: var(--ds-border);
+  }
+
+  .ds-tabbar-sheet__title {
+    margin: 0;
+    font-size: 1.125rem;
+  }
+
+  .ds-tabbar-sheet__close {
+    display: grid;
+    place-items: center;
+    width: 44px;
+    height: 44px;
+    color: var(--ds-ink);
+    background: none;
+    border: 0;
+    border-radius: var(--ds-radius-full);
+    cursor: pointer;
+  }
+
+  .ds-tabbar-sheet__close:focus-visible {
+    outline: var(--ds-focus-width) solid var(--ds-focus-ring);
+  }
+}
+
+/* A phone on its side (compact height): the bar slims to one 44px row with icon and label side by
+   side, as platform tab bars do in landscape, so the map keeps its height. */
+@media (max-width: 819px) and (max-height: 559px) {
+  :root:root {
+    --ds-tabbar-h: calc(44px + env(safe-area-inset-bottom, 0px));
+  }
+
+  .ds-tabbar__tab {
+    flex-direction: row;
+    gap: 6px;
+  }
+
+  .ds-tabbar__tab svg {
+    width: 20px;
+    height: 20px;
+  }
+}
+
+@keyframes ds-tabbar-sheet-in {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: none;
+  }
+}
+
+@keyframes ds-tabbar-backdrop-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes ds-tabbar-backdrop-out {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ds-tabbar-sheet[open],
+  .ds-tabbar-sheet::backdrop {
+    animation: none;
+    transition: none;
+  }
+}

@@ -247,8 +247,6 @@ export function HomeFirstPaint({
           accessibleName={locatorName}
           interactive
           neighborhood
-          atlasHref={returns.mapHref}
-          entityId={lead.id}
         />
       </div>
     ) : (

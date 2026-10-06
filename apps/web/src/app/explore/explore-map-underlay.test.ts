@@ -90,16 +90,15 @@ describe('explore map underlay', () => {
     );
   });
 
-  it('captures wheel, drag and pinch until the live plate is ready', () => {
+  it('is a picture until the live plate is ready: nothing pans, pinches or wheel-zooms it', () => {
+    // It used to run its own pan/pinch/wheel and was swapped for the real map mid-gesture.
     assert.match(css, /\.ds-explore-underlay\s*\{[^}]*pointer-events:\s*auto/s);
     assert.match(css, /\.ds-explore-underlay\s*\{[^}]*touch-action:\s*none/s);
-    assert.match(gestures, /passive:\s*false/);
-    assert.match(gestures, /preventDefault/);
-    assert.match(gestures, /panLocatorView/);
-    assert.match(gestures, /zoomLocatorViewAt/);
+    assert.doesNotMatch(gestures, /addEventListener\('(pointerdown|pointermove|wheel|touchmove)'/);
+    assert.doesNotMatch(gestures, /panLocatorView|zoomLocatorViewAt/);
   });
 
-  it('lets every pin take a click, with a padded target, until the live plate is ready', () => {
+  it('lets every pin take a tap, with a padded target, until the live plate is ready', () => {
     assert.match(
       css,
       /\.ds-explore-underlay\s+\.ds-first-paint-pin\s*\{[^}]*pointer-events:\s*auto/s,
@@ -107,8 +106,7 @@ describe('explore map underlay', () => {
     assert.match(css, /\.ds-explore-underlay\s+\.ds-first-paint-pin::after/);
     assert.match(gestures, /readExplorePinTarget/);
     assert.match(gestures, /emitExplorePinSelect/);
-    assert.match(gestures, /pointerExceededClickSlop/);
-    assert.doesNotMatch(gestures, /if \(target\?\.closest\('a, button'\)\) return;/);
+    assert.match(gestures, /addEventListener\('click'/);
   });
 
   it('puts geography in server HTML, not only after client hydration', () => {

@@ -29,6 +29,7 @@ import { ToastStack, useToasts } from '../../components/patterns/Toast';
 import { AnnotationOverlay } from '../../components/map-experience/AnnotationOverlay';
 import { CameraConsole } from '../../components/map-experience/CameraConsole';
 import { LensPanel, type LensLayerKey } from '../../components/map-experience/LensPanel';
+import { SheetPresence } from '../../components/map-experience/SheetPresence';
 import { MapExperienceLegend } from '../../components/map-experience/MapExperienceLegend';
 import { ResultsRail, type ResultsConstraint } from '../../components/map-experience/ResultsRail';
 import { MapControls } from '../../components/map-experience/MapControls';
@@ -401,13 +402,11 @@ export function AtlasExperience({ initial, embedded = false }: AtlasExperiencePr
   }, []);
   const atlasPinPhotoTarget = useMemo<PinPhotoHoverTarget | null>(() => {
     if (atlasHoverTarget) return atlasHoverTarget;
-    if (!selectedId || typeof document === 'undefined') return null;
-    const el = document.querySelector<HTMLElement>(
-      `.ds-map-entity-marker[data-entity-id="${CSS.escape(selectedId)}"]`,
-    );
-    if (!el) return null;
-    return { key: selectedId, name: el.dataset.pinName ?? '', rect: el.getBoundingClientRect() };
-  }, [atlasHoverTarget, selectedId]);
+    if (!selectedId) return null;
+    const target = stage.entityHoverTarget(selectedId);
+    if (!target) return null;
+    return { key: selectedId, name: target.name, rect: target.rect };
+  }, [atlasHoverTarget, selectedId, stage]);
 
   const [legendOpen, setLegendOpen] = useState(false);
   const { camera, readout, spotlight, runMove, bearing } = useAtlasCamera(
@@ -625,6 +624,18 @@ export function AtlasExperience({ initial, embedded = false }: AtlasExperiencePr
     sheetOpen || railTouched || atlasPinPhotoTarget !== null,
   );
   const sheetPhoto = sheetOpen && sheetRecord ? (sheetPhotos?.[sheetRecord.id] ?? null) : null;
+  /* The record the sheet last showed, so a closing sheet can animate away still showing it
+     (`SheetPresence`). Derived state, updated during render only when a new record opens. */
+  const [leavingSheet, setLeavingSheet] = useState<{
+    readonly record: typeof sheetRecord;
+    readonly photo: typeof sheetPhoto;
+  }>({ record: null, photo: null });
+  if (
+    sheetRecord !== null &&
+    (sheetRecord !== leavingSheet.record || sheetPhoto !== leavingSheet.photo)
+  ) {
+    setLeavingSheet({ record: sheetRecord, photo: sheetPhoto });
+  }
 
   const showLens = panels.lens && !chromeHidden && mode === 'atlas';
   /*
@@ -718,7 +729,7 @@ export function AtlasExperience({ initial, embedded = false }: AtlasExperiencePr
         />
       ) : null}
 
-      {showLens ? (
+      <SheetPresence show={showLens}>
         <LensPanel
           // The same count the Records dock and rail show — they list `sorted`, which drops
           // internal placeholder records, and the two numbers used to disagree by that much.
@@ -753,9 +764,9 @@ export function AtlasExperience({ initial, embedded = false }: AtlasExperiencePr
           onHide={() => hidePanel('lens')}
           escapeDismiss={narrow}
         />
-      ) : null}
+      </SheetPresence>
 
-      {showResults ? (
+      <SheetPresence show={showResults}>
         <ResultsRail
           photos={sheetPhotos}
           onIntent={() => setRailTouched(true)}
@@ -786,35 +797,31 @@ export function AtlasExperience({ initial, embedded = false }: AtlasExperiencePr
             />
           }
         />
-      ) : null}
+      </SheetPresence>
 
-      {mode === 'atlas' && !chromeHidden ? (
-        <>
-          {panels.decade ? (
-            <TimePanel
-              bars={decadeBars}
-              decade={decade}
-              onDecadeChange={setDecade}
-              totalRecords={view.allFeatures.length}
-            />
-          ) : null}
-          {panels.camera ? (
-            <CameraConsole
-              onMove={runMove}
-              onZoom={(delta) => {
-                const map = stage.getMap();
-                if (!map) return;
-                map.easeTo({ zoom: map.getZoom() + delta, duration: 260 } as never);
-              }}
-              bearing={bearing}
-              onResetBearing={() => camera.resetBearing({ trigger: 'reader' })}
-              activeRecord={selectedFeature?.properties ?? null}
-              lens={{ topicId, topicLabel: activeTopicLabel }}
-              spotlit={camera.isSpotlit()}
-            />
-          ) : null}
-        </>
-      ) : null}
+      <SheetPresence show={mode === 'atlas' && !chromeHidden && panels.decade}>
+        <TimePanel
+          bars={decadeBars}
+          decade={decade}
+          onDecadeChange={setDecade}
+          totalRecords={view.allFeatures.length}
+        />
+      </SheetPresence>
+      <SheetPresence show={mode === 'atlas' && !chromeHidden && panels.camera}>
+        <CameraConsole
+          onMove={runMove}
+          onZoom={(delta) => {
+            const map = stage.getMap();
+            if (!map) return;
+            map.easeTo({ zoom: map.getZoom() + delta, duration: 260 } as never);
+          }}
+          bearing={bearing}
+          onResetBearing={() => camera.resetBearing({ trigger: 'reader' })}
+          activeRecord={selectedFeature?.properties ?? null}
+          lens={{ topicId, topicLabel: activeTopicLabel }}
+          spotlit={camera.isSpotlit()}
+        />
+      </SheetPresence>
 
       {/*
        * The dock. Two different objects sharing one row of chips.
@@ -897,27 +904,29 @@ export function AtlasExperience({ initial, embedded = false }: AtlasExperiencePr
 
       <PinPhotoLayer target={atlasPinPhotoTarget} photosUrl="/atlas/photos" />
 
-      <RecordSheet
-        record={sheetOpen ? sheetRecord : null}
-        photo={sheetPhoto}
-        onClose={() => setSelectedId(undefined)}
-        {...(selectedIndex >= 0
-          ? { position: { index: selectedIndex + 1, total: sorted.length } }
-          : {})}
-        onStep={stepRecord}
-        onSelectConnection={selectById}
-        onFlyToPlace={() => {
-          if (selectedFeature) select(selectedFeature);
-        }}
-        onSave={() => {
-          if (selectedFeature) toggleSave(selectedFeature);
-        }}
-        saved={selectedId ? savedSet.has(selectedId) : false}
-        onCite={() => {
-          if (selectedFeature) copy(citationFor(selectedFeature), 'Citation copied.');
-        }}
-        onShare={commandContext.copyShareLink}
-      />
+      <SheetPresence show={sheetOpen}>
+        <RecordSheet
+          record={sheetRecord ?? leavingSheet.record}
+          photo={sheetOpen ? sheetPhoto : leavingSheet.photo}
+          onClose={() => setSelectedId(undefined)}
+          {...(selectedIndex >= 0
+            ? { position: { index: selectedIndex + 1, total: sorted.length } }
+            : {})}
+          onStep={stepRecord}
+          onSelectConnection={selectById}
+          onFlyToPlace={() => {
+            if (selectedFeature) select(selectedFeature);
+          }}
+          onSave={() => {
+            if (selectedFeature) toggleSave(selectedFeature);
+          }}
+          saved={selectedId ? savedSet.has(selectedId) : false}
+          onCite={() => {
+            if (selectedFeature) copy(citationFor(selectedFeature), 'Citation copied.');
+          }}
+          onShare={commandContext.copyShareLink}
+        />
+      </SheetPresence>
 
       <CommandPalette
         open={paletteOpen}

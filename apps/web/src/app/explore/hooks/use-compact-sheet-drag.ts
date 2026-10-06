@@ -127,6 +127,14 @@ export function useCompactSheetDrag(
       // touch release at (0, 0), which read as a huge upward drag.
       const outcome =
         event.type === 'pointercancel' ? detent : sheetDragOutcome(detent, lastY - startY, speed);
+      if (outcome === 'dismiss') {
+        // Leave the sheet where the finger let go: its exit animation (`SheetPresence`, atlas.css)
+        // carries on down from there instead of springing back up first.
+        sheet.style.transition = '';
+        delete sheet.dataset.detent;
+        onDismissRef.current(key);
+        return;
+      }
       // Animate the snap back alongside the stylesheet's own max-height ease (the full detent),
       // then hand `transition` back to the stylesheet.
       sheet.style.transition = reducedMotion.matches
@@ -136,10 +144,7 @@ export function useCompactSheetDrag(
       window.setTimeout(() => {
         if (drag?.sheet !== sheet) sheet.style.transition = '';
       }, 400);
-      if (outcome === 'dismiss') {
-        delete sheet.dataset.detent;
-        onDismissRef.current(key);
-      } else if (outcome === 'full') {
+      if (outcome === 'full') {
         sheet.dataset.detent = 'full';
       } else {
         delete sheet.dataset.detent;

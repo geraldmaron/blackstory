@@ -16,7 +16,6 @@ import {
   markerRadiusExpression,
 } from '../../lib/map-experience/marker-size';
 import {
-  EXPLORE_GL_ENTITY_MAX_ZOOM,
   FIRST_PAINT_MAP_MAX_ZOOM,
   FIRST_PAINT_RECORD_FILL_OPACITY,
   firstPaintOrKindRadiusExpression,
@@ -42,6 +41,7 @@ import {
   entitySelectedPulseOpacity,
   entitySelectedPulseRadiusExpression,
   entitySelectedPulseStaticRadiusExpression,
+  selectedRingRadiusExpression,
   EXPLORE_CLUSTER_LAYER_ID,
   EXPLORE_COUNTY_CHOROPLETH_LAYER_ID,
   EXPLORE_COUNTY_LABEL_LAYER_ID,
@@ -60,7 +60,10 @@ import {
   PLATE_STATE_FILL_OPACITY,
   selectedPointFilterExpression,
 } from './explore-style';
-import { markerRadiusPlusScaledExpression } from '../../lib/map-experience/marker-size';
+import {
+  MARKER_ZOOM_SCALE_STOPS,
+  markerRadiusPlusScaledExpression,
+} from '../../lib/map-experience/marker-size';
 
 type LayerLike = {
   readonly id: string;
@@ -170,7 +173,10 @@ test('unclustered point fill and halo use first-paint opacity nationally, kind o
   assert.ok(localityOpacityOutputs.includes(ENTITY_POINT_FILL_OPACITY));
 });
 
-test('GL entity discs hide once HTML first-paint markers mount above cluster max zoom', () => {
+test('GL entity discs draw at every zoom: no HTML markers take over past cluster max zoom', () => {
+  // Past zoom 12 every record used to become a DOM marker (thousands of elements repositioned on
+  // every camera frame). The map's own circle layers now draw the individual records at street
+  // level too, so none of them may stop at a max zoom.
   const style = buildStyleFixture('presence');
   for (const layerId of [
     EXPLORE_PRECISION_RADIUS_LAYER_ID,
@@ -180,11 +186,7 @@ test('GL entity discs hide once HTML first-paint markers mount above cluster max
     EXPLORE_SELECTED_POINT_LAYER_ID,
   ] as const) {
     const layer = layerById(style, layerId) as { maxzoom?: number };
-    assert.equal(
-      layer.maxzoom,
-      EXPLORE_GL_ENTITY_MAX_ZOOM,
-      `${layerId} must hand off to HTML markers past cluster max zoom`,
-    );
+    assert.equal(layer.maxzoom, undefined, `${layerId} must keep drawing past cluster max zoom`);
   }
 });
 
@@ -226,6 +228,22 @@ test('entitySelectedPulseRadiusExpression scales the ring from 1x to ~2.1x over 
   const midExpression = entitySelectedPulseRadiusExpression(0.5) as unknown[];
   assert.notDeepEqual(midExpression, entitySelectedPulseRadiusExpression(0));
   assert.notDeepEqual(midExpression, entitySelectedPulseRadiusExpression(1));
+});
+
+test('the animated selection ring reads no feature data, so MapLibre does not re-tile on every frame', () => {
+  // A data-driven paint value (one that `['get', …]`s a feature property) makes MapLibre rebuild
+  // the source's tiles whenever it changes; the pulse changes it every frame. With the selected
+  // record's radius folded in as a number, the per-frame value is zoom-only.
+  for (const expression of [
+    entitySelectedPulseRadiusExpression(0.37, 7),
+    entitySelectedPulseStaticRadiusExpression(7),
+  ]) {
+    assert.doesNotMatch(JSON.stringify(expression), /"get"/);
+    assert.deepEqual((expression as unknown[]).slice(0, 3), ['interpolate', ['linear'], ['zoom']]);
+  }
+  // Same ring as the data-driven form at the loop's start, for a record of that radius.
+  const ring = selectedRingRadiusExpression(7, ENTITY_SELECTED_PULSE_SCALE_FROM) as unknown[];
+  assert.equal(ring[4], (7 + ENTITY_SELECTED_RADIUS_OFFSET) * MARKER_ZOOM_SCALE_STOPS[0]![1]);
 });
 
 test('entitySelectedPulseOpacity fades from 0.9 to 0.12 over the loop (patterns-cinematic-map.md §3)', () => {
@@ -978,7 +996,7 @@ test('precision-radius layer paints under the halo, gated to features with a res
     ['!', ['has', 'point_count']],
     ['has', 'radiusMeters'],
   ]);
-  assert.equal(layerSpec.maxzoom, EXPLORE_GL_ENTITY_MAX_ZOOM);
+  assert.equal(layerSpec.maxzoom, undefined);
 });
 
 test('precision-radius fill shares kind shade with the point, and fades in past national zoom like the halo', () => {
