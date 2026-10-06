@@ -447,6 +447,12 @@
   }
 }
 
+@keyframes ds-atlas-peek-in {
+  from {
+    opacity: 0;
+  }
+}
+
 @keyframes ds-compact-sheet-leave {
   to {
     transform: translateY(100%);
@@ -682,8 +688,18 @@
   /* Hidden while any sheet is up: a phone shows one instrument at a time, and the peek would sit
      on top of that sheet's last rows. */
   .ds-atlas__dock[data-switcher] button[data-dock='results'][aria-pressed='true'],
-  .ds-atlas[data-sheet-open='true'] .ds-atlas__dock[data-switcher] button[data-dock='results'] {
+  .ds-atlas[data-sheet-open='true'] .ds-atlas__dock[data-switcher] button[data-dock='results'],
+  .ds-atlas:has(> .ds-sheet-presence[data-presence='leaving'])
+    .ds-atlas__dock[data-switcher]
+    button[data-dock='results'] {
     display: none;
+  }
+
+  /* …and comes back once the sheet has finished leaving (`SheetPresence`), fading in rather than
+     popping over the space the sheet just left. `data-sheet-open` drops when the sheet starts to
+     leave, so the leaving state above holds the peek back until the sheet is gone. */
+  .ds-atlas__dock[data-switcher] button[data-dock='results'] {
+    animation: ds-atlas-peek-in var(--ds-duration-fast) var(--ds-easing);
   }
 
   .ds-map-controls {
