@@ -420,8 +420,10 @@ span.ds-bar__mode-link {
     --ds-bar-symbol-size: 2rem;
   }
 
-  /* Symbol alone: brand.md directs squeezed placements to drop the lockup. */
-  .ds-bar__brand .ds-shell-wordmark__img--lockup {
+  /* Symbol alone: brand.md directs squeezed placements to drop the lockup. Stronger than the
+     shared header's theme rule (`[data-theme='dark'] .…--lockup.…--theme-dark`, shell-header.css),
+     which otherwise showed the lockup between 640 and 819px, clipped by this 2rem slot to "B". */
+  :root .ds-bar__brand .ds-shell-wordmark__img.ds-shell-wordmark__img--lockup {
     display: none;
   }
 

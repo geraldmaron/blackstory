@@ -475,14 +475,23 @@
   isolation: isolate;
 }
 
+/*
+ * The hero photograph has its own band, centred, and the headline reads below it — at every
+ * width, as on a record page (record-room.css has the full reasoning). Written over the photo, a
+ * picture shown whole had to be pushed to the right edge to make room for the type, and sat
+ * off-centre beside an empty field.
+ */
 .ds-article-mast[data-media='photo'] {
-  min-height: clamp(340px, 48vw, 560px);
-  background: var(--ds-surface-raised);
+  display: block;
+  min-height: 0;
+  background: var(--ds-canvas);
 }
 
 .ds-article-mast__photo {
-  position: absolute;
-  inset: 0;
+  position: relative;
+  height: clamp(260px, 36vw, 500px);
+  max-height: 62svh;
+  background: var(--ds-surface-raised);
 }
 
 .ds-article-mast img {
@@ -496,25 +505,14 @@
 
 .ds-article-mast .ds-fit-photo[data-fit='contain'] .ds-fit-photo__main {
   position: absolute;
-  object-position: 88% center;
+  object-position: center;
 }
 
-/* Phones: the photo gets its own frame and the headline reads below it, as on a record page. */
+/* Phones and short screens: a 4:3 window rather than a fixed-height band. */
 @media (max-width: 47.9375rem), (max-height: 34.9375rem) {
-  .ds-article-mast[data-media='photo'] {
-    display: block;
-    min-height: 0;
-    background: var(--ds-canvas);
-  }
-
   .ds-article-mast__photo {
-    position: relative;
+    height: auto;
     aspect-ratio: 4 / 3;
-    max-height: 62svh;
-  }
-
-  .ds-article-mast .ds-fit-photo[data-fit='contain'] .ds-fit-photo__main {
-    object-position: center;
   }
 }
 
@@ -533,47 +531,9 @@
   padding: var(--ds-space-16) clamp(20px, 4.5vw, 56px) var(--ds-space-10);
 }
 
-/*
- * The scrim has to cover the type, not a fixed fraction of the plate.
- *
- * The old ramp was fully transparent by 45% of the overlay's height, which is fine when the
- * overlay is short. On a phone, where a 44px title and a six-line lede make the overlay taller
- * than the picture, the top half of that text ran out past the ramp and sat as near-white type
- * directly on the brightest part of a parchment scan — effectively unreadable, and worst
- * exactly where the reader starts.
- *
- * This ramp reaches near-opacity by the time it is under the text block and only thins above
- * it, so the picture still reads at the top of the plate while every line of type keeps a dark
- * ground beneath it whatever the image happens to be doing there. The floor is a real color
- * rather than a percentage of one so the guarantee does not depend on the photograph.
- */
+/* Below its own photo band, the headline needs no clearance for a picture above it. */
 .ds-article-mast[data-media='photo'] .ds-article-mast__over {
-  background: linear-gradient(
-    to top,
-    var(--ds-canvas) 0%,
-    color-mix(in srgb, var(--ds-canvas) 94%, transparent) 55%,
-    color-mix(in srgb, var(--ds-canvas) 78%, transparent) 78%,
-    color-mix(in srgb, var(--ds-canvas) 45%, transparent) 92%,
-    transparent 100%
-  );
-}
-
-.ds-article-mast[data-media='photo'] .ds-article-mast__title,
-.ds-article-mast[data-media='photo'] .ds-article-mast__lede,
-.ds-article-mast[data-media='photo'] .ds-article-mast__facts,
-.ds-article-mast[data-media='photo'] .ds-article-mast__byline {
-  text-shadow: 0 1px 16px var(--ds-canvas);
-}
-
-/*
- * The two quiet lines stop being quiet over a photograph. Muted ink is a step down from body
- * copy against the canvas, and against the top of a bright hero (a 1937 security map is mostly
- * yellow and red) it is a step down from nothing. They keep their size and their weight; only
- * the color comes back up, because that is the part the photograph took away.
- */
-.ds-article-mast[data-media='photo'] .ds-article-mast__facts,
-.ds-article-mast[data-media='photo'] .ds-article-mast__byline {
-  color: var(--ds-ink);
+  padding-top: var(--ds-space-8);
 }
 
 .ds-article-mast__facts {
@@ -805,12 +765,5 @@
      where sticky positioning has no meaningful ground to stick to. */
   .ds-article-rail {
     position: static;
-  }
-}
-
-/* Phones: the headline sits below the photo (see the masthead rules above), so it needs no scrim. */
-@media (max-width: 47.9375rem), (max-height: 34.9375rem) {
-  .ds-article-mast[data-media='photo'] .ds-article-mast__over {
-    background: none;
   }
 }

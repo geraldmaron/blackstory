@@ -21,10 +21,10 @@
   min-height: clamp(18rem, max(42vh, 30vw), 32rem);
 }
 
-@media (max-width: 47.9375rem), (max-height: 34.9375rem) {
-  .ds-home-first-paint .ds-record-mast[data-media='photo'] {
-    min-height: 0;
-  }
+/* A photograph has its own band and the type reads below it (record-room.css): the mast is as tall
+   as those two, with no floor of its own to pad out. */
+.ds-home-first-paint .ds-record-mast[data-media='photo'] {
+  min-height: 0;
 }
 
 .ds-home-first-paint .ds-record-mast__map .ds-record-anatomy__place-caption {

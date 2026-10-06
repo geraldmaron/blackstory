@@ -102,55 +102,48 @@
 }
 
 /*
- * Wide screens, contained photo: the whole picture sits toward the right of the banner, so the
- * name and lede on the left never paint over the subject. Covered (wide) photos keep the
- * full-bleed treatment with the scrim.
+ * The photograph has its own band, centred, and the record reads below it on the canvas — at every
+ * width, the way phones already had it.
+ *
+ * Wide screens used to write the name and lede over the photo. Most archive photos (4:3, 3:2) do
+ * not cover a 2.8:1 banner without losing half the picture, so those were shown whole, pushed to
+ * the right edge, with a dark ramp over the left for the type: the photo sat off-centre beside an
+ * empty dark field, and a long lede still ran across it. In its own band the photo is centred
+ * whatever its shape: cover when the crop keeps most of it (`usePhotoFit`), otherwise whole over a
+ * blurred fill of itself. The band's height does not depend on the lede, so that verdict no longer
+ * changes with how much the record has to say.
  */
-@media (min-width: 48rem) and (min-height: 35rem) {
-  .ds-record-mast[data-media='photo'] .ds-entity-photo--contain .ds-entity-photo__img {
-    object-position: 88% center;
-  }
-
-  /* The type column gets a floor of its own, left to right, so a long lede that reaches the
-     photo's left edge still reads on canvas rather than on the picture. */
-  .ds-record-mast[data-media='photo']:has(.ds-entity-photo--contain) .ds-record-mast__over {
-    background:
-      linear-gradient(
-        to right,
-        var(--ds-canvas) 0%,
-        color-mix(in srgb, var(--ds-canvas) 88%, transparent) 38%,
-        color-mix(in srgb, var(--ds-canvas) 55%, transparent) 62%,
-        transparent 80%
-      ),
-      linear-gradient(to top, var(--ds-canvas) 0%, transparent 60%);
-  }
+.ds-record-mast[data-media='photo'] {
+  display: block;
+  min-height: 0;
+  background: var(--ds-canvas);
 }
 
-/*
- * Phones: the photograph gets its own frame above the name instead of sitting under it. Written
- * over a photo, the title, pills and lede took most of a phone's height and the dark scrim covered
- * whatever the crop had left — the "cut off" headers. Now the photo is a 4:3 window (whole photo
- * when it would not fit, over a blurred fill of itself) and the record reads below it on the page.
- */
-@media (max-width: 47.9375rem), (max-height: 34.9375rem) {
-  .ds-record-mast[data-media='photo'] {
-    display: block;
-    min-height: 0;
-    background: var(--ds-canvas);
-  }
+.ds-record-mast[data-media='photo'] > *:first-child {
+  position: relative;
+  inset: auto;
+  width: 100%;
+  height: clamp(260px, 36vw, 500px);
+  max-height: 62svh;
+  /* The blurred fill is scaled up past its box to hide the blur's soft edge; the band clips it,
+     or it bleeds a grey wash under the band into the type. */
+  overflow: hidden;
+}
 
+.ds-record-mast[data-media='photo'] .ds-record-mast__over {
+  padding-top: var(--ds-space-8);
+  background: none;
+}
+
+/* Phones and short screens: a 4:3 window rather than a fixed-height band. */
+@media (max-width: 47.9375rem), (max-height: 34.9375rem) {
   .ds-record-mast[data-media='photo'] > *:first-child {
-    position: relative;
-    inset: auto;
-    width: 100%;
     height: auto;
     aspect-ratio: 4 / 3;
-    max-height: 62svh;
   }
 
   .ds-record-mast[data-media='photo'] .ds-record-mast__over {
     padding-top: var(--ds-space-6);
-    background: none;
   }
 }
 
@@ -286,17 +279,6 @@
   font-size: var(--rec-lede);
   line-height: 1.5;
   color: var(--room-ink-2);
-}
-
-.ds-record-mast[data-media='photo'] .ds-record-mast__title,
-.ds-record-mast[data-media='photo'] .ds-record-mast__lede,
-.ds-record-mast[data-media='photo'] .ds-record-mast__credit,
-.ds-record-mast[data-media='photo'] .ds-record-mast__over .ds-room-crumb {
-  text-shadow: 0 1px 16px var(--ds-canvas);
-}
-
-.ds-record-mast[data-media='photo'] .ds-record-mast__over .ds-room-crumb {
-  color: var(--ds-ink);
 }
 
 .ds-record-mast__over .ds-room-crumb {
