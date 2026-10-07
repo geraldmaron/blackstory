@@ -65,7 +65,7 @@ Work outward from the data. Stop at the first layer that is wrong.
    then serves prebuilt `entities.json` / `search-index.json` from the CDN instead of the
    database. The staleness guard only checks that the artifact's `releaseId` matches the live
    active-release pointer — and an in-place backfill does not change the release id, so a stale
-   artifact passes that check and keeps serving. **Any ops-data backfill must be followed by a
+   artifact passes that check and keeps serving. **Any ops-data backfill must be followed by an
    authorized run of `publish-release-catalog-artifacts.ts` under the current publication
    contract in CLAUDE.md. Do not dispatch a redundant workflow or assume a schedule will
    repair it.** Verify the artifact itself, not just the database:
@@ -75,6 +75,10 @@ Work outward from the data. Stop at the first layer that is wrong.
    an unchanged page for up to half an hour after the artifact republishes. Note this is a
    _second_ layer, not an alternative explanation to the artifact one — reaching for it first is
    how you end up waiting half an hour for a cache that was never the problem.
+   Inspect edge headers as well: Cloudflare may retain an older page for up to an hour.
+   Use the current purge runbook in `docs/security/cost-resource-controls.md`; failed
+   authentication is not a successful purge. Verify every affected redirected page, not one
+   representative record, and report which pages remain stale.
 
 ## Verify below the cache
 
@@ -99,6 +103,16 @@ rebuilds all of it to fix a facet. `backfill-search-facets-projection.ts` takes 
 the job is not finished when the rows are written. Follow the catalog-artifact publication
 path in step 5, then verify the artifact and live surface. Database repair alone is not a
 verified public correction.
+
+For a factual correction, preserve append-only claim history, source quotations and obsolete
+drafts while removing obsolete material from active replay inputs. Update the public revision
+timestamp from the actual correction, then compare it with the rendered Updated field.
+
+Before a graph rebuild, compare the proposed edges with the currently published edges. Check
+what was excluded before the audit's denominator was formed. An empty evidence join can yield
+zero input edges and zero reported drops despite deleting a populated graph. Stop that write;
+if the actual temporal/entity/relationship inputs are unchanged by this correction, document
+that equality and preserve the existing graph pending its separate repair.
 
 Every one of these scripts rests on the drift being **one-directional** — the projection set, the
 facet empty, and nothing set on both sides that disagrees. That is not a formality. Verify it per
