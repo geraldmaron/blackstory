@@ -12,15 +12,19 @@ standing property of the release, and re-measure rather than trust either one. A
 one lane and not the other is not a standard — it just means a record's depth depends on who last
 worked on it.
 
-The code already had the right answer and nobody had written it down.
+Source classification is only one input. Retrieval, claim entailment and public prose review
+remain separate responsibilities.
 
 ## The rule
 
 Wikipedia is a **reputable secondary source**. It may carry a claim. It may never be the thing
 that corroborates one, and it may never be the sole basis for a superlative.
 
-This is what `packages/ops-data/scripts/lib/confidence.ts` and `lib/tier1-sources.ts` already
-implement:
+The source-classification and legacy score helpers in
+`packages/ops-data/scripts/lib/confidence.ts` and `lib/tier1-sources.ts` implement the
+following mechanics. The scores below are heuristic, not calibrated probabilities or
+publication permission; the current incremental path additionally requires exact independent
+claim review. See [the framework](README.md#uncertainty-and-probability).
 
 - `classifySourceForConfidence` maps Wikipedia to `reputable_secondary` — a real classification,
   not a rejection.
@@ -29,7 +33,7 @@ implement:
   patentsview.org, uspto.gov) — the classification is of the document, a government grant, not
   of the host reading it back.
 - `isWikipediaHost` excludes it from every corroboration path in `corroborate-source.ts`.
-  Wikipedia is a *bridge* to Tier-1 references, never returned as evidence itself.
+  Wikipedia is a _bridge_ to Tier-1 references, never returned as evidence itself.
 - A Wikipedia-only claim contributes **no** corroborating lineage, so the formula caps it below
   `standardPublish` (0.75) on its own. It clears only when an independently-fetched source with a
   different `lineageRootId` backs it.
@@ -50,14 +54,15 @@ The rule held; the machinery under it got more honest. Three parts:
   one lineage once the wire id is recorded. Host is metadata again.
 - **A bridge contributes zero lineage and does not dilute real evidence.** Every Wikimedia
   spelling collapses onto one key, `bridge:wikimedia`. When a real source is present the bridge
-  drops out of the quality aggregates entirely, so citing one can no longer *lower* a score. When
+  drops out of the quality aggregates entirely, so citing one can no longer _lower_ a score. When
   the bridge is all there is, it stays in the aggregates: thin, not absent.
 - **The numbers moved.** Wikipedia-only now scores **0.66** with `independentLineageCount: 0`,
   where a lone reputable-secondary host scores **0.72** with one lineage
   (`packages/ops-data/scripts/lib/confidence.test.ts`). Those two used to be the same number,
   which was the tell: a bridge and a heritage-inventory record are not equally good evidence, and
   the old rule could not say so because it counted a hostname as a lineage. Both still sit under
-  0.75; neither publishes alone.
+  the legacy 0.75 score threshold. Actual publication requires the current review gate;
+  these scores alone neither authorize nor prohibit a reviewed narrow assertion.
 
 ## Which hosts count as institutions
 
@@ -76,7 +81,7 @@ workflow, and the drift policy.
 ## Fitness is claim-relative
 
 Whether a citation is good enough is not a property of the source. It is a property of the
-source *and the assertion it is attached to*. `assessSourceFitness(sourceClass, assertionClass)`
+source _and the assertion it is attached to_. `assessSourceFitness(sourceClass, assertionClass)`
 (`packages/domain-core/src/claims/source-fitness.ts`) answers that pair over 24 document kinds
 and 15 assertion kinds, returning `authoritative`, `strong`, `conditional`, `leadOnly` or
 `unfit` with a rationale and the document kind's known limitations.
@@ -100,35 +105,40 @@ readers quote. It gets no Wikipedia-only pass.
 The case that forced this: William F. Penn's summary said he was the first African American to
 graduate from Yale Medical School, in 1897, on Wikipedia's authority. Yale says the first was
 Cortlandt Van Rensselaer Creed, MD 1857 — also the first person of African descent to take a Yale
-degree in any discipline. Penn was thirty years later. Yale's own exhibit on early Black students,
+degree in any discipline. Penn was forty years later. Yale's own exhibit on early Black students,
 which had every reason to say "first" if it were true, does not.
 
-That claim was false for years and cited. A superlative needs the institution that would know:
-the school, the association, the state, the archive holding the record.
+A citation can preserve an error. For a superlative, define the population, credential/role,
+geography and period, seek a fit source explicitly making that exact claim, and search for
+counterexamples. Institutions are important research starting points, not infallible arbiters.
+Neither an official host nor multiple repeating websites is sufficient.
 
-This rule is enforced by an audit, not just this page. `packages/ops-data/scripts/audit-superlative-wikipedia-only.ts`
+The audit detects one class of violation; it does not block publication or establish truth. `packages/ops-data/scripts/audit-superlative-wikipedia-only.ts`
 finds every `first_to_do_x` / `only_or_oldest` notability-basis row whose resolved evidence is
-Wikipedia and nothing else. As of 2026-09-13 on rel_20260723_authority_net_001: 181 such rows
-across 173 entities (147 `first_to_do_x`, 34 `only_or_oldest`); 57 of those entities carry no
-non-Wikipedia claim anywhere at all; 123 carry the unsupported superlative into the published
-summary text itself, not just the notability panel — see repo-z97f. Corroborating, softening or
-withdrawing each one is real per-entity research, not a script's job; the script's job is only to
-say which 173 need it and keep that count honest as the catalog changes.
+Wikipedia and nothing else. The [2026-10-07 audit](skill-audit-2026-10-07.md) measured 181
+finding rows across 173 entities (147 `first_to_do_x`, 34 `only_or_oldest`). Of those rows,
+57 concern entities with no non-Wikipedia claim and 123 concern entities whose summaries
+use superlative language. Those two subtotals count findings, not distinct entities, and
+the summary-language check does not establish that the summary repeats the exact flagged
+assertion. See repo-z97f for the review cohort. Corroborating, qualifying or withdrawing
+an assertion requires per-claim research; the script identifies review candidates, not
+proven falsehoods. Re-measure as the catalog changes.
 
 ## In practice
 
-| Situation | What to do |
-|---|---|
-| Wikipedia is the only source | Write the claim, `confidenceLevel: 'low'`, `independentLineageCount: 0`. Do not put it in the summary. |
-| Wikipedia plus an independent institutional source | Cite the institution. The bridge adds no lineage, so this is one lineage, not two. Summary is fine when the institution is fit for the assertion. |
-| A "first" / "only" / "largest" | Institutional source or the assertion does not ship. |
+| Situation                                                                | What to do                                                                                                                                                            |
+| ------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Wikipedia is the only source                                             | At most stage a narrow claim with `confidenceLevel: 'low'`, `independentLineageCount: 0`. Do not put it in the summary.                                               |
+| Wikipedia plus an independent institutional source                       | Cite the institution. The bridge adds no lineage, so this is one lineage, not two. Summary still needs exact entailment, contradiction search and final-copy review.  |
+| A "first" / "only" / "largest"                                           | Explicit fit evidence for the exact scope plus counterexample search; otherwise qualify or omit.                                                                      |
 | The source is authoritative for a different question than the claim asks | Rewrite the claim to what the document actually settles, or find the document that settles the claim. A patent is not evidence of race, of firstness, or of adoption. |
-| Sources disagree on scope or date | Prefer the reading two independent sources share; record the dissent in the issue tracker rather than averaging it into prose. |
+| Sources disagree on scope or date                                        | Weigh fitness, provenance and scope, not votes. Resolve with evidence or show the material dispute in public wording.                                                 |
 
-`confidenceLevel: 'low'` exists in the contract (`packages/public-contracts/src/v1/claim.ts`) and
-is currently unused across the whole release — 9,043 `high`, 336 `medium`, zero `low`. A register
-nothing is ever filed under is a register that is not being used honestly. Thin evidence should
-look thin on the page, which is a better outcome than the record staying silent.
+`confidenceLevel: 'low'` exists in `packages/public-contracts/src/v1/claim.ts`. Counts of
+high/medium/low change with the release; measure them rather than treating old totals as
+current. Low confidence does not permit a known falsehood. The
+[prose fact protocol](../methodology/chapter-fact-validation.md) applies to every visible
+assertion, including text not covered by the structured-claim publication gate.
 
 ## Citations are not research depth
 

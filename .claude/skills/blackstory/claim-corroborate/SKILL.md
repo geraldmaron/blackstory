@@ -1,106 +1,72 @@
 ---
 name: blackstory-claim-corroborate
-description: Weighs citations, independent lineage, and superlatives so a claim can ship honestly. Use when corroborating a source, asking if a citation is enough, checking a "first African American" claim, walking a source ladder, or setting confidenceLevel.
+description: Test whether evidence supports an exact historical claim, including entity summaries and context. Use for source sufficiency, disputed dates, firstness, independent lineage, or confidence review. Finding a page about the subject is only discovery.
 ---
 
 # Claim corroborate
 
-Judgment playbook. Do not load `docs/research-workflow` recency discipline here. A 1963
-finding aid is not stale.
+Use the [research method](../../../../docs/research/README.md),
+[citation contract](../../../../docs/research/citation-standard.md), and
+[prose fact protocol](../../../../docs/methodology/chapter-fact-validation.md).
+Old archival documents are not stale merely because they are old. Check later
+corrections and document versions when they could change the answer.
 
-Canonical rules:
+## Decision order
 
-- [`docs/research/citation-standard.md`](../../../../docs/research/citation-standard.md)
-- [`docs/research/confidence-lineage.md`](../../../../docs/research/confidence-lineage.md)
-- Code: `packages/ops-data/scripts/lib/corroborate-source.ts`, `confidence.ts`,
-  `tier1-sources.ts`
+1. Write the exact assertion: subject, action or status, object, date kind,
+   place, population and qualifiers. Split compound sentences. Include the
+   summary, historical context, inclusion basis, captions and share text, not
+   only the structured claims.
+2. Open the underlying work and read the passage in context. Record its author,
+   purpose, date, locator, access outcome and allowed excerpt. Distinguish what
+   the source says from what actually happened; a source can be wrong.
+3. Assess fitness for this assertion. A patent can establish a grant and date;
+   it cannot establish the inventor's race or priority across all inventors.
+   Official records, scholarship, community archives, Black press and oral
+   histories have different strengths and omissions. No host settles truth.
+4. Trace independent works. Follow citations, reprints and shared archival roots;
+   copied biographies on different domains remain dependent. Unknown lineage
+   stays unknown. Use `lineageRootId` for the underlying work, not its hostname.
+5. Try to defeat the assertion. Search earlier candidates, corrections, alternative
+   date meanings, namesakes and the strongest contrary account. Resolve a conflict
+   by evidence and scope, never majority vote or averaging. Record the search
+   bounds and any unresolved contradiction.
+6. Decide: supported at stated scope / supported only with qualification or
+   attribution / contradicted / insufficient evidence. Explain what would change
+   the decision. Missing evidence alone is not a falsehood.
+7. Check the final wording again after editing. Any new fact or expanded qualifier
+   reopens review. Stage the assessment; this skill does not publish.
 
-## The Wikipedia rule
+## Firstness, dates and counts
 
-Wikipedia is a reputable secondary source. It may *carry* a claim. It may never
-*corroborate* one, and it may never be the sole basis for a superlative.
+For “first,” “only,” “oldest” or “largest,” define the comparison population,
+geography, credential, measurement and time window. Find an explicit, fit source
+for that exact scope and search for counterexamples. An institution's agreement
+alone is insufficient. If a broader claim fails, retain only the verified narrower
+one; attribution must not launder a known error.
 
-`classifySourceForConfidence` maps Wikipedia to `reputable_secondary`.
-`isWikipediaHost` excludes it from every corroboration path. Wikipedia is a bridge to
-Tier-1 references, never returned as evidence itself.
+Distinguish election, swearing-in, arrival, visiting appointment, tenure, degree
+completion and conferral. Distinguish people trained, graduated, commissioned or
+appointed. Check totals against components without counting overlapping roles twice.
 
-| Situation | What to do |
-|---|---|
-| Wikipedia is the only source | Write the claim, `confidenceLevel: 'low'`, one lineage. Keep it out of the summary. |
-| Wikipedia plus an independent institutional source | Cite the institution. Summary is fine. |
-| A "first" / "only" / "largest" | Institutional source or the assertion does not ship. |
-| Sources disagree on scope or date | Prefer the reading two independent lineages share. Record dissent. Do not average it into prose. |
+## Retrieval is not verification
 
-`confidenceLevel: 'low'` exists on the public claim contract and must be used when evidence
-is thin. Do not silently upgrade to `high`.
+`packages/ops-data/scripts/lib/corroborate-source.ts` retrieves candidate pages
+using citation trails, a Wikipedia bridge and ranked host searches. Its subject-name
+match does not test claim entailment. Read the returned passage before treating it
+as support. Host filters in `tier1-sources.ts` are discovery heuristics; work-level
+lineage and `assessSourceFitness` are separate assessments. Reuse these capabilities,
+not a second host list. Use the project's safe-fetch path for acquisition.
 
-## Claim-relative fitness and uncertainty
+Wikipedia may carry a low-confidence claim under the existing contract, but supplies
+zero corroborating lineages and cannot alone support a summary superlative. Another
+source must itself support the exact words. A low label never licenses a known false
+claim. Numerical model scores are not calibrated probabilities or publication authority.
 
-An institution can be authoritative for its own records and still omit, misidentify or erase a
-subject. Community archives, attributed oral histories and contemporary Black press can be the
-best evidence for a claim. The existing source ladder is a retrieval heuristic, not a universal
-truth hierarchy. Preserve disagreement and search the strongest alternative; do not let a
-host's reputation substitute for what its document establishes.
+## Output
 
-Keep identity, entailment, lineage, source fitness and archival coverage separate. Numeric model
-confidence is uncalibrated unless held-out evaluation establishes otherwise. “Not found” requires
-a record of search terms, collection coverage, period, access and OCR limitations; otherwise it
-says nothing about historical absence. See the [research framework](../../../../docs/research/README.md).
-
-## Source ladder (same subject, different lineage)
-
-`corroborate-source.ts` already tries, in order:
-
-1. Citation-trail on the primary page (outbound links to Tier-1 hosts, reject same-lineage)
-2. Wikipedia bridge to that trail (Wikipedia itself never returned)
-3. SearXNG restricted to Tier-1 (`.gov` / `.mil` / `si.edu`, plus NPS / LoC / archives)
-4. Curated reputable-secondary hosts (for example BlackPast, HMDB)
-5. Same secondary hosts via search, different hostname only
-
-Every fetch goes through the SSRF-safe path. Best-effort: an empty step is "no corroboration
-found", not an error to paper over.
-
-Tier-1 hosts live in `packages/ops-data/scripts/lib/tier1-sources.ts`. Do not invent a second
-list.
-
-Independent lineage is counted by `lineageRootId`, and that id names the underlying **work**,
-not the host serving it (`resolveSourceLineage`,
-`packages/domain-core/src/claims/lineage.ts`). Five syndicated copies with one root are one
-lineage, not five; a patent read at the Patent Office and at a mirror is one lineage, not two;
-every Wikimedia spelling collapses onto one bridge key that counts as zero corroborating
-lineages. A lineage inferred from the host alone is flagged `inferred`, which is a guess rather
-than a finding.
-
-Fitness is claim-relative: `assessSourceFitness(sourceClass, assertionClass)`
-(`packages/domain-core/src/claims/source-fitness.ts`) scores the document kind against the
-assertion kind. Ask what the claim needs the document to prove before deciding the citation is
-enough. A patent is `authoritative` for who filed what and when, and `unfit` as evidence of the
-filer's race, of firstness, or of adoption.
-
-## Superlatives
-
-"First African American to…" is the highest-risk sentence type in this catalog. It needs the
-institution that would know: the school, the association, the state, the archive holding the
-record. Wikipedia-only superlatives have already shipped false claims (William F. Penn / Yale
-Medicine). That class of claim stays unpublished until the institution agrees.
-
-## Case vs claim
-
-Filling a research-case checklist gap is [`blackstory-case-drafting`](../case-drafting/SKILL.md)
-(`attach-evidence`). This skill decides whether the evidence *weighs enough* to support the
-words on the page.
-
-## Do / Never
-
-**Do:** fetch the cited URL before treating it as a receipt; name the lineage count; keep
-contradictions visible; use `low` when only one lineage exists.
-
-**Never:** treat LLM confidence as publication authority; count Wikipedia as the second
-source; fetch URLs with bare `fetch()` (use the operator-cli / safe-fetch path); paste
-unresolved cites into public summaries.
-
-## Eval
-
-Geographic ambiguity, citation entailment, and entity-resolution cases already live in
-[`docs/research/gold-corpus.md`](../../../../docs/research/gold-corpus.md). Score new
-corroboration judgments against those fixtures rather than hoping the prompt is right.
+For each consequential assertion: exact proposed text; evidence and locator;
+fitness and lineage rationale; strongest contrary evidence; verdict and reason;
+allowed wording; unresolved needs. Persist with the case/draft. Reuse the
+[evaluation families](../../../../docs/research/gold-corpus.md); do not describe a
+synthetic policy-label test as a historical accuracy test.

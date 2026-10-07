@@ -44,7 +44,9 @@ use a painting, interview NAID, or sports-player stub as the entity.
 
 ## Place
 
-Source an address or named place from a custodian, then run `locate`. Source ladder, in order:
+Source an address or named place for the relevant activity and period, then run `locate`.
+The following are retrieval starting points, not a truth hierarchy. Local/community
+records or period sources may correct a modern institutional page:
 
 1. The institution or NPS/NRHP site record
 2. State encyclopedia / SHPO / local historic preservation office
@@ -54,33 +56,37 @@ Source an address or named place from a custodian, then run `locate`. Source lad
 Pin kind is part of the fact, and which anchor is correct depends on what kind of record this
 is:
 
-- **Place, event, or any other non-person record:** default to the *site of the history* —
+- **Place, event, or any other non-person record:** default to the _site of the history_ —
   not a birthplace, grave, or modern HQ — unless the record is specifically about that other
   anchor.
-- **`kind:person` record:** default to *birthplace* instead. repo-i55t found dozens of
-  people labeled for one life event (induction, burial, a legislative seat) but pinned at
-  another (birth), or the reverse; the ruling taken there (carried out in repo-x8j6 and
-  repo-a2snv, 2026-09-12) is that jurisdictionLabel and the pin must read from the same
-  anchor. When no birthplace can be sourced to a specific place, keep the pin at the next
-  most specific anchor that *is* sourced (a documented residence or workplace) rather than
-  leaving label and pin disagreeing.
+- **`kind:person` record:** birthplace is the current catalog convention, not a
+  claim that all their history happened there. Name the anchor explicitly. A documented
+  residence or workplace can be used when appropriate and labeled as such; a biography
+  spans places. Keep `jurisdictionLabel`, coordinates and displayed anchor consistent.
+  Do not choose a more precise but less relevant address merely to fill a map.
 
 Whichever anchor applies, never invent one to fill the gap — an unsourced anchor is a missing
 pin, not a guessed one.
 
-Precision (from the locate verb; no LLM, ever):
+Precision must follow the historical evidence as well as the geocoder result. A precise
+match to a modern address does not prove that the historical event occurred there.
+Existing locate precision/drift limits:
 
-| Evidence | Precision | Drift cap |
-|---|---|---|
-| Street number | `institution` | ≤150m |
-| Named campus/place | `campus` | ≤500m |
-| Neighborhood / district | `neighborhood` | ≤1600m |
-| City only | `city` | do not sharpen |
+| Evidence                | Precision      | Drift cap      |
+| ----------------------- | -------------- | -------------- |
+| Street number           | `institution`  | ≤150m          |
+| Named campus/place      | `campus`       | ≤500m          |
+| Neighborhood / district | `neighborhood` | ≤1600m         |
+| City only               | `city`         | do not sharpen |
 
 Dignity: no residential precision on living people; a coarsened point is never labeled as an
 exact address; parent-site snaps cap at 15km, otherwise keep the pin and downgrade precision.
-Never snap to a US state or city centroid — for a site-of-the-history anchor or a birthplace
-anchor alike.
+Never replace a documented site with a centroid to make a jurisdiction check pass.
+A sourced city-only anchor may use a representative city point at `city` precision
+with approximation and anchor meaning visible. It is not an exact birthplace or event
+site. If the surface cannot show that distinction, withhold the point or repair the
+display; do not sharpen the stored precision. A centroid without sourced city membership
+is still a guess.
 
 When you have a sourced address, use [`blackstory-locate`](../locate/SKILL.md).
 For batch proposals, inspect `packages/ops-data/scripts/backfill-location-coordinates.ts`
@@ -96,13 +102,13 @@ refuses to treat a National Register listing year as when the history happened. 
 
 Separate these dates. Do not mash them into one chip:
 
-| Kind | What it is | Public era? |
-|---|---|---|
-| Activity / event window | When the history happened | Yes, via `eraBuckets` |
-| Lifespan | Birth / death | Only if the record is the person |
-| Founding / demolition | Building lifecycle | When attested, not guessed |
-| Period of significance | NRHP significance span | Yes, if the source states it |
-| Designation / listing year | Administrative event | No (keep on the claim) |
+| Kind                       | What it is                | Public era?                      |
+| -------------------------- | ------------------------- | -------------------------------- |
+| Activity / event window    | When the history happened | Yes, via `eraBuckets`            |
+| Lifespan                   | Birth / death             | Only if the record is the person |
+| Founding / demolition      | Building lifecycle        | When attested, not guessed       |
+| Period of significance     | NRHP significance span    | Yes, if the source states it     |
+| Designation / listing year | Administrative event      | No (keep on the claim)           |
 
 A church listed in 2001 with no other dated claim has an undocumented era. That is the honest
 answer until a period of significance is ingested.

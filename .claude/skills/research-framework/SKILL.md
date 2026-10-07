@@ -36,3 +36,9 @@ Retained text and vectors need a current source-specific retention decision. Use
 `capture-retention` inventory and reviewed withdrawal flow when permissions expire or change.
 Use `capture-retention --orphans` to reconcile interrupted uploads. A storage deletion is separate
 from database erasure; report pending disposals and externally copied material that remains.
+
+For public prose, use the [fact protocol](../../../docs/methodology/chapter-fact-validation.md)
+and the BlackStory drafting, prose-review and ringer-review playbooks. Reviewed structured
+claims do not certify every summary or context sentence. Use
+[experience review](../blackstory/experience-review/SKILL.md) when interface presentation
+may lose qualifiers, hide evidence or impede a web/native reader task.

@@ -3,20 +3,20 @@
 Operator and research-facing methodology notes for BlackStory — how records qualify, how evidence
 is preserved, and how this archive compares to aggregation portals and specialized corpora.
 
-*History, pinned to place.*
+_History, pinned to place._
 
 ## Documents
 
-| Document | Summary |
-|---|---|
-| [`empty-quadrant-and-aggregators.md`](./empty-quadrant-and-aggregators.md) | Landscape position: entity-shaped, place-indexed records vs aggregator pointers; Enslaved.org scope contrast; capture posture and quality gates |
-| [`capture-and-aggregators.md`](./capture-and-aggregators.md) | Archived captures, Umbra link-rot, and aggregator comparison in detail |
-| [`national-black-population-timeline.md`](./national-black-population-timeline.md) | Census-sourced national Black population timeline, 1790–2020 — sources, comparability, and lane boundaries |
-| [`juxtaposition-not-causation.md`](./juxtaposition-not-causation.md) | Laws/places beside indicators are context, not automated causal impact claims |
-| [`lives-across-decades.md`](./lives-across-decades.md) | How the Lives timeline turns published census tables into six state-built regions × decade × group figures: groups as each era defined them, class bands by era, suppression and coverage, what the count could see, and what the surface may say |
-| [`notability-rubric.md`](./notability-rubric.md) | Ruling on what `notabilityBasis` may say per entity kind — four new criteria, why `documented_site` stopped being a default, and the sequencing that keeps 21% of the catalog from going dark |
-| [`chapter-fact-validation.md`](./chapter-fact-validation.md) | How narrative facts enter chapter prose: two independent sources per fact, three-layer research/verify/integrate protocol, immersion + 2,000-word floor |
-| [`../research/theme-impact-canonical-questions.md`](../research/theme-impact-canonical-questions.md) | Canonical theme-impact questions, policy eras, and metric/artifact catalog |
+| Document                                                                                             | Summary                                                                                                                                                                                                                                           |
+| ---------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [`empty-quadrant-and-aggregators.md`](./empty-quadrant-and-aggregators.md)                           | Landscape position: entity-shaped, place-indexed records vs aggregator pointers; Enslaved.org scope contrast; capture posture and quality gates                                                                                                   |
+| [`capture-and-aggregators.md`](./capture-and-aggregators.md)                                         | Archived captures, Umbra link-rot, and aggregator comparison in detail                                                                                                                                                                            |
+| [`national-black-population-timeline.md`](./national-black-population-timeline.md)                   | Census-sourced national Black population timeline, 1790–2020 — sources, comparability, and lane boundaries                                                                                                                                        |
+| [`juxtaposition-not-causation.md`](./juxtaposition-not-causation.md)                                 | Laws/places beside indicators are context, not automated causal impact claims                                                                                                                                                                     |
+| [`lives-across-decades.md`](./lives-across-decades.md)                                               | How the Lives timeline turns published census tables into six state-built regions × decade × group figures: groups as each era defined them, class bands by era, suppression and coverage, what the count could see, and what the surface may say |
+| [`notability-rubric.md`](./notability-rubric.md)                                                     | Ruling on what `notabilityBasis` may say per entity kind — four new criteria, why `documented_site` stopped being a default, and the sequencing that keeps 21% of the catalog from going dark                                                     |
+| [`chapter-fact-validation.md`](./chapter-fact-validation.md)                                         | Claim-to-evidence review for all public prose; source criticism, disconfirmation, final-revision checks, correction handling and limits of machine gates                                                                                          |
+| [`../research/theme-impact-canonical-questions.md`](../research/theme-impact-canonical-questions.md) | Canonical theme-impact questions, policy eras, and metric/artifact catalog                                                                                                                                                                        |
 
 ## Public surfaces
 
