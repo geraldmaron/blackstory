@@ -86,7 +86,7 @@ Tiers follow the repo's classifier, not intuition:
   that file.
 - `tier3`: crowd-edited, aggregator, commercial, blog, or a host the classifier does not know.
   Wikipedia is tier3 here because it may carry a claim but never corroborate one
-  (`.claude/skills/blackstory/claim-corroborate/SKILL.md`). An unknown host in tier3 is a gap in
+  (`.agents/skills/blackstory-claim-corroborate/SKILL.md`). An unknown host in tier3 is a gap in
   the classifier, not a quality finding; fix it in `tier1-sources.ts`, not in the profile.
 
 ### Host resolution

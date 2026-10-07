@@ -145,7 +145,10 @@ daily cron is off as of 2026-09-16; a forgotten mutation no longer self-heals.
 
 ## BlackStory research skills
 
-Research playbooks live in `.claude/skills/blackstory/`. CLI pointers load a verb from
+Research playbooks are shared across harnesses in `.agents/skills/<skill-name>/SKILL.md`.
+The flat `.claude/skills/` entries are symlinks to that source. Edit the canonical files;
+do not create a Claude-specific copy. See `docs/research/README.md#skills-and-harness-portability`
+for explicit file loading and capability requirements. CLI pointers load a verb from
 `docs/research/research-operations.md`. Judgment playbooks (`entity-verify`,
 `claim-corroborate`, `entity-complete`, `entity-relate`, `coverage-target`, `publish-preview`,
 `neo-voice`, `prose-review`, `ringer-review`, `surface-triage`, `intake-review`,
