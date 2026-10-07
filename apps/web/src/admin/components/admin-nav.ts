@@ -42,7 +42,7 @@ export const ADMIN_NAV_GROUPS: readonly AdminNavGroup[] = [
       {
         href: '/admin/submissions',
         label: 'Submissions',
-        keywords: ['intake_items', 'quarantine', 'leads', 'raw'],
+        keywords: ['intake', 'quarantine', 'leads', 'corrections', 'appeals', 'abuse'],
       },
       { href: '/admin/cases', label: 'Research cases', keywords: ['queue', 'promote'] },
       { href: '/admin/graylist', label: 'Graylist', keywords: ['blocked', 'held', 'suppressed'] },

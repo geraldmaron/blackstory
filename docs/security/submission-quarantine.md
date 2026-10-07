@@ -64,9 +64,21 @@ shared source sets across bounded actor/network dimensions and time windows. Mod
 can transition records, block an opaque subject token, and submit abuse reports; reports use the same
 quarantine path and cannot publish.
 
-The included repository is an in-memory contract/test adapter. A durable Postgres adapter must
-preserve append-only originals, audit events, restricted access, and quarantine-only destination
-semantics.
+The web routes persist accepted leads, corrections, and abuse reports in `submissions.intake_items`
+before returning 202. The staff Submissions desk reads that table. Promotion opens a research case;
+rejection closes the public receipt with a coarse explanation. Staff may close a promoted correction
+after verifying the resulting change. Every staff decision uses the admin pool and an audited
+transaction. Public receipt responses never expose the staff reason or moderation signals.
+
+The database synchronizes receipt lifecycle fields with intake decisions. A first eligible appeal
+preserves its validated quarantine record, clears the previous closure, and requeues the original
+correction. Compare-and-swap prevents lost updates. The public pool can update only the payload;
+a guarded invoker trigger performs the requeue without granting public status-write permission.
+Quick add and Attach evidence derive the actor from the verified staff session, require
+`research:write`, and use the admin pool.
+
+The separate `api-submissions` HTTP adapter still uses in-memory repositories and is not a durable
+production intake service. Its mobile deployment path must be completed before accepting traffic.
 
 ## Validation
 

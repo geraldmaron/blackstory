@@ -93,7 +93,7 @@ export function EntityWorkbenchTable({
     try {
       const token = await getIdToken();
       if (!token) throw new Error('Sign in required');
-      const response = await fetch(`/api/catalog/entity-ids?${searchQuery}`, {
+      const response = await fetch(`/admin/api/catalog/entity-ids?${searchQuery}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       const body = (await response.json()) as { ids?: string[]; error?: string };

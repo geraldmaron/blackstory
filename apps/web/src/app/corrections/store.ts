@@ -1,28 +1,20 @@
-/**
- * In-memory correction submission store — the test double and fallback, not production wiring.
- * This module's doc comment previously claimed "production wiring persists through Postgres
- * submissions.intake_items"; that was never true (repo-vl155.1) — nothing ever called out from
- * this store to Postgres, so every publicly submitted correction was invisible to the admin
- * console (which reads Postgres) and lost on the next cold start, confirmed empirically 2026-09-21
- * against the live database (zero `kind='correction'`/`'abuse_report'` rows ever, out of 2,175
- * submissions of other kinds). The real store is `./postgres-store.ts`; this one still backs
- * tests, matching the same `CorrectionSubmissionStore` contract. Deliberately exposes
- * lookup-by-receipt only — no list or enumerate API exists for submitters.
- */
+/** In-memory correction store for tests; production uses lib/public-data/corrections-store. */
 import type { QuarantinedSubmissionRecord } from '@repo/security';
 import { createReceiptCode, digestReceiptCode } from './receipt-code';
 import type { CorrectionCategory, CorrectionTargetType } from './categories';
-import type { PublicClosureReason } from './public-status';
+import { buildPublicCorrectionStatus, type PublicClosureReason } from './public-status';
 
 export type StoredAppeal = {
   readonly id: string;
   readonly statement: string;
   readonly submittedAt: string;
+  readonly record?: QuarantinedSubmissionRecord;
 };
 
 export type StoredCorrection = {
   readonly record: QuarantinedSubmissionRecord;
   readonly receiptCode: string;
+  readonly intakeStatus?: string;
   readonly receiptDigest: string;
   readonly targetType: CorrectionTargetType;
   readonly category: CorrectionCategory;
@@ -33,7 +25,7 @@ export type StoredCorrection = {
 };
 
 /**
- * Async throughout: the real implementation (`./postgres-store.ts`) is a database, and a
+ * Async throughout: the production implementation uses Postgres, and a
  * `CorrectionSubmissionStore` local variable must be swappable between that and this in-memory
  * one without the caller knowing which it has.
  */
@@ -82,8 +74,19 @@ export function createCorrectionSubmissionStore(): CorrectionSubmissionStore {
     async attachAppeal(receiptCode, pepper, appeal) {
       const existing = await getByReceiptCode(receiptCode, pepper);
       if (!existing) return undefined;
+      if (
+        !buildPublicCorrectionStatus({
+          ...existing,
+          moderationState: existing.record.moderationState,
+          submittedAt: existing.record.createdAt,
+          appealCount: existing.appeals.length,
+        }).appealAvailable
+      )
+        return undefined;
+      const { closureReason: _closureReason, ...reopened } = existing;
       const updated: StoredCorrection = {
-        ...existing,
+        ...reopened,
+        intakeStatus: 'quarantined',
         appeals: [...existing.appeals, appeal],
         updatedAt: appeal.submittedAt,
         record: {

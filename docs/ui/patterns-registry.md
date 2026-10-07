@@ -204,3 +204,5 @@ These live outside the registry folder but share vocabulary with patterns:
 | Brand assets | `packages/config` `BRAND_ASSETS` | Official artwork only. Never reconstruct the lockup; see [`brand.md`](./brand.md) and [`design-direction-v9-atlas.md`](./design-direction-v9-atlas.md) §5.1 |
 
 When adding a row here, add or update the matching `patterns-*.md` and a line in [`README.md`](./README.md).
+
+Admin intake uses the existing operations cards and workbench controls; its behavior contract is [patterns-admin-intake.md](./patterns-admin-intake.md).

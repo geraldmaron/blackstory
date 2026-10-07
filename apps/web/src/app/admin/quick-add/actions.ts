@@ -11,37 +11,38 @@ import {
   runResearchIntake,
   type OperatorIntakeAccepted,
 } from '@repo/operator-cli';
-import { createLiveAtomicStoreFromEnv } from '@repo/data-access';
+import { createPostgresAtomicStore } from '@repo/data-access';
+import { getPostgresPool } from '../../../admin/lib/canonical-postgres-client';
+import { readVerifiedAdminIdentity } from '../../../admin/auth/supabase-server';
+import { staffRoleHasPermission } from '../../../admin/auth/staff-permissions';
 import type { QuickAddFormState } from './form-state';
-
-function readOperatorIdentity(formData: FormData): { operatorId: string; sessionId: string } {
-  const operatorId = String(formData.get('operatorId') ?? '').trim();
-  return { operatorId, sessionId: randomUUID() };
-}
 
 export async function submitQuickAdd(
   _previous: QuickAddFormState,
   formData: FormData,
 ): Promise<QuickAddFormState> {
+  const identity = await readVerifiedAdminIdentity();
+  if (!identity || !staffRoleHasPermission(identity.role, 'research:write')) {
+    return { status: 'error', error: 'A staff session with research permission is required.' };
+  }
+
   const url = String(formData.get('url') ?? '').trim();
   const description = String(formData.get('description') ?? '').trim();
   const location = String(formData.get('location') ?? '').trim();
   const era = String(formData.get('era') ?? '').trim();
   const shouldCommit = formData.get('commit') === 'on' || formData.get('commit') === '1';
-  const { operatorId, sessionId } = readOperatorIdentity(formData);
+  const operatorId = identity.uid;
+  const sessionId = randomUUID();
 
   if (!url) {
     return { status: 'error', error: 'A URL is required.' };
   }
-  if (!operatorId) {
-    return { status: 'error', error: 'An operator id is required to stamp this proposal.' };
-  }
-  const privacyPepper = process.env.OPERATOR_CLI_PRIVACY_PEPPER;
+  const privacyPepper = process.env.SUBMISSION_PRIVACY_PEPPER;
   if (!privacyPepper) {
     return {
       status: 'error',
       error:
-        'Server is missing OPERATOR_CLI_PRIVACY_PEPPER. Set it (see docs/runbooks/operator-session.md) before using quick-add.',
+        'Server is missing SUBMISSION_PRIVACY_PEPPER. Set it (see docs/runbooks/operator-session.md) before using quick-add.',
     };
   }
 
@@ -61,7 +62,7 @@ export async function submitQuickAdd(
     );
 
     if (shouldCommit && outcome.fetch.ok && outcome.intake && outcome.intake.accepted) {
-      const store = await createLiveAtomicStoreFromEnv(process.env);
+      const store = createPostgresAtomicStore(getPostgresPool());
       const commitResult = await commitOperatorIntake(
         store,
         outcome.intake as OperatorIntakeAccepted,
