@@ -8,8 +8,9 @@ description: Prepares a publication preview and names what still blocks release.
 Requires the BlackStory checkout. See [loading and capabilities](../../../docs/research/README.md#skills-and-harness-portability)
 for tool requirements and use from any harness.
 
-Judgment playbook. Agents prepare a preview. They never promote, approve, or activate a
-release.
+Judgment playbook. For a new release, prepare the preview and preserve the separate
+publication-role approval boundary. Never manufacture approval or activate on the strength
+of the proposing session alone.
 
 Proposer is never approver. `evaluatePromotionGate` refuses when approver id equals proposer
 id. There is no `--publish` / `--approve` / `--promote` anywhere on operator-cli
@@ -38,6 +39,36 @@ Task:
 - [ ] Release preview / claim diff inspected
 - [ ] A *different* publication-role human still has to activate
 ```
+
+## Explicitly authorized corrections to an existing release
+
+A human may authorize a bounded correction to already published records without creating a
+new release. Reuse that authorization; do not request it again. Use the repository's existing
+correction and artifact-publication path. This does not authorize impersonating a reviewer,
+creating a reauthentication token, bypassing an enforced gate, or recertifying untouched fields.
+
+Bind authorization to exact proposed content and compare current rows with the reviewed
+baseline inside a guarded transaction. Append claim versions and correction dispositions;
+retain prior versions, source quotations and superseded drafts as identifiable history. Remove
+superseded drafts from active replay inputs. Keep canonical, release, search and applicable
+landscape copies consistent, including the reader-visible revision timestamp.
+
+Preserve qualitative passage review as qualitative review. If a persistence contract requires
+calibrated probabilities or an established lineage cluster that the review did not produce,
+do not invent those values. Record the locator, review method, limits and missing assignment.
+A metadata-only capture is not retained source text or an accepted evidence assessment. Report
+this limitation separately from a scoped correction; it prevents full-record certification.
+
+Before rebuilding derivatives, compare the existing published graph with the proposed graph.
+An audit against already-filtered input can pass after dropping all relationships upstream.
+Block unexplained loss; never remove unrelated edges or invent evidence to satisfy the build.
+If the correction leaves the actual graph inputs unchanged, record that verified equality and
+preserve the existing graph while tracking the separate defect.
+
+After publication, verify public artifact content against the approved revision, then each
+affected live page, including redirects and cache layers. A successful write, matching release
+ID or one fresh page does not establish that all readers have received the correction. Name
+any stale page, failed purge or unapplied code deployment in the result.
 
 ## Geo
 
