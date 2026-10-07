@@ -3,7 +3,7 @@
 Command reference for the [research framework](./README.md), usable by any model or operator. This is the one place
 the actual command shapes, invocation rules, and guardrails live.
 
-Agent skills live under `.claude/skills/blackstory/`:
+Agent skills live under `.agents/skills/`:
 
 - **CLI pointers** (`research-intake`, `discovery-run`, `editorial-enrichment`, `locate`,
   `case-drafting`, `story-craft`, `theme-study`, `triage-graylist`) exist for skill-matching
@@ -752,15 +752,15 @@ a sourced address, evidence attachment, or campaign is actually ready.
 
 | Skill                                         | When                                                                       |
 | --------------------------------------------- | -------------------------------------------------------------------------- |
-| `.claude/skills/blackstory/entity-verify`     | Confirm identity, source a place, set precision, assign era                |
-| `.claude/skills/blackstory/claim-corroborate` | Independent lineage, Wikipedia rule, superlatives                          |
-| `.claude/skills/blackstory/entity-complete`   | Blank public fields (image, related, historicalContext)                    |
-| `.claude/skills/blackstory/coverage-target`   | Where research should look next                                            |
-| `.claude/skills/blackstory/publish-preview`   | Release preview only; never activate                                       |
-| `.claude/skills/blackstory/intake-review`     | Screen incoming leads, corrections, and mail before they are ordinary work |
-| `.claude/skills/blackstory/entity-relate`     | Relationship-specific evidence and scoped causal language                  |
-| `.claude/skills/blackstory/neo-voice`         | Evidence-led drafting for entity copy and longform                         |
-| `.claude/skills/blackstory/prose-review`      | Clarity, dignity, qualifier preservation and formulaic prose               |
-| `.claude/skills/blackstory/ringer-review`     | Adversarial factual and interpretive review                                |
-| `.claude/skills/blackstory/surface-triage`    | Projection/search/artifact disagreement                                    |
-| `.claude/skills/blackstory/experience-review` | Task-based web/native usability and evidence presentation                  |
+| `.agents/skills/blackstory-entity-verify`     | Confirm identity, source a place, set precision, assign era                |
+| `.agents/skills/blackstory-claim-corroborate` | Independent lineage, Wikipedia rule, superlatives                          |
+| `.agents/skills/blackstory-entity-complete`   | Blank public fields (image, related, historicalContext)                    |
+| `.agents/skills/blackstory-coverage-target`   | Where research should look next                                            |
+| `.agents/skills/blackstory-publish-preview`   | Release preview only; never activate                                       |
+| `.agents/skills/blackstory-intake-review`     | Screen incoming leads, corrections, and mail before they are ordinary work |
+| `.agents/skills/blackstory-entity-relate`     | Relationship-specific evidence and scoped causal language                  |
+| `.agents/skills/blackstory-neo-voice`         | Evidence-led drafting for entity copy and longform                         |
+| `.agents/skills/blackstory-prose-review`      | Clarity, dignity, qualifier preservation and formulaic prose               |
+| `.agents/skills/blackstory-ringer-review`     | Adversarial factual and interpretive review                                |
+| `.agents/skills/blackstory-surface-triage`    | Projection/search/artifact disagreement                                    |
+| `.agents/skills/blackstory-experience-review` | Task-based web/native usability and evidence presentation                  |

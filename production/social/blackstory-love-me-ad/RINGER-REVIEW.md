@@ -1,6 +1,6 @@
 # Ringer review: on-screen captions (v005 → v006)
 
-Run per `.claude/skills/blackstory/ringer-review`. Six chairs, one pass, against
+Run per `.agents/skills/blackstory-ringer-review`. Six chairs, one pass, against
 every caption and every place/year stamp. The client asked specifically for the
 **community-perception** lens, so the Sympathetic Reader chair (the audience we
 actually want) is weighted up alongside the Literalist. Captions in a video are

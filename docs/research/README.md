@@ -163,11 +163,53 @@ captures without an origin link need a custody review; their storage references 
 orphan deletion. Hash-only or excerpt-only rows do not prove full-page recoverability, and
 archiving does not establish truth.
 
-## Skills and comments
+## Skills and harness portability
 
-Judgment playbooks under `.claude/skills/blackstory/` specialize this method. CLI pointer skills
-link to operations rather than duplicating flags. Any model can begin with this document and the
-CLI; no particular chat product is required. Skills describe the decision to make and its evidence
+The canonical skills are plain Agent Skills folders at
+`.agents/skills/<skill-name>/SKILL.md`: `research-framework` and the `blackstory-*` playbooks.
+Each folder matches its frontmatter name. The method, CLI pointers and review rules have
+one maintained source; `.claude/skills/<skill-name>` contains only relative directory
+symlinks to it. Do not fork the content into harness-specific versions.
+
+These are repository skills, not standalone bundles: keep the BlackStory checkout and its
+linked documentation available. Start commands from the checkout root. Markdown links resolve
+relative to the skill file; bare repository paths resolve from the checkout root.
+
+### Loading the same skill in another harness
+
+- A harness that discovers `.agents/skills/` can load these folders directly. Codex documents
+  this repository location. Claude Code discovers the same source through the committed links.
+- For a configurable skill loader, point it at `.agents/skills/` and index each folder's
+  `SKILL.md` name and description. Read the selected body and its relevant references on demand.
+- Without skill discovery, give the harness the file explicitly. For example:
+  “Read `.agents/skills/blackstory-claim-corroborate/SKILL.md` and apply it to this claim.”
+  No slash command, model family, proprietary tool name or orchestration service is required.
+- If a checkout or host cannot follow symlinks, read the real `.agents/skills/` files directly.
+  Folder-only uploads need their referenced repository material too. Copying a single manifest
+  into an isolated sandbox does not make the workflow executable.
+
+### Capabilities and permissions
+
+Map the procedure to the harness's actual capabilities: file access for instructions and
+evidence; source retrieval for fresh verification; a shell with the repository toolchain for
+operator commands; authorized providers/data access for execution; browser or device access
+for live experience checks. Use the existing CLI contracts and safe retrieval boundaries.
+The host supplies tools, secrets and approval enforcement; a skill supplies none of them.
+
+When a capability is missing, perform the supported review, identify the blocked step and
+carry the evidence and unresolved needs forward. Do not fabricate retrieval, bypass a gate,
+substitute model memory for source inspection, or claim a live check passed. A skill name
+does not grant publication authority or authorize external changes, model spend or delegation.
+Discovery equivalence also does not prove equal behavior across models or harnesses; evaluate
+that separately using the documented research and development cases.
+
+Format/discovery references inspected 2026-10-07:
+[Agent Skills specification](https://agentskills.io/specification),
+[OpenAI skill discovery](https://learn.chatgpt.com/docs/build-skills), and
+[Claude Code project skills and symlinks](https://code.claude.com/docs/en/skills#choose-where-skills-load).
+
+Judgment playbooks specialize the research method. CLI pointer skills link to
+operations rather than duplicating flags. Skills describe the decision to make and its evidence
 requirements. They must not silently publish, invent sources, infer approval requirements beyond
 the user's authorization, or turn one failure/example into a universal rule.
 

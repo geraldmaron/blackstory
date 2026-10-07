@@ -206,3 +206,49 @@ Final local checks: 160 relative Markdown links resolved with zero missing targe
 `fnm exec --using=22 -- pnpm exec prettier --check --ignore-path /dev/null` run with
 all 27 changed/new Markdown paths passed after normalization. `git diff --check` passed.
 These outcomes validate the files, not factual accuracy or native behavior.
+
+## Harness portability follow-up
+
+The project skills now have one canonical source at `.agents/skills/<skill-name>/SKILL.md`.
+All 21 folders match their declared names. Claude discovery uses relative symlinks to the
+same files; the old nested source layout is removed. Project instructions and references
+point to the shared source. Research and editorial procedures are unchanged by this move.
+
+The [portability contract](README.md#skills-and-harness-portability) documents explicit
+file loading for hosts without discovery, checkout dependencies, capability mapping and
+missing-tool behavior. Only `name` and `description` are needed in frontmatter. Environment
+requirements live in ordinary Markdown, avoiding an optional field rejected by the installed
+validator even though the open standard allows it.
+
+Verification: the installed Codex app-server's `skills/list` request with `forceReload: true`
+returned all 21 skills enabled with repository scope and no project skill errors. The same
+request passed against a clean snapshot built from staged Git blobs, without the ignored
+local harness configuration. That snapshot contained 21 canonical manifests and 21 discovery
+links; all 172 relative references across those two access paths resolved. The installed
+skill-creator `validate_skill` check passed all 21, and a separate check found no missing
+targets among 146 relative Markdown links in the changed files before this record was added.
+
+Claude's adapter was checked against its documented symlink support and actual file resolution;
+no Claude model session or other-harness behavioral evaluation ran. Discovery and shared content
+are verified; equal factual performance across models is not. Implementation verification's
+code-change procedure was not applied to the mechanical move, comment-path updates and
+formatter file-selection fix described below.
+
+`fnm exec --using=22 -- ./scripts/ci-local.sh --base 5a5f6969` passed validation,
+contract/security/accessibility, coverage, end-to-end, governance and security-policy lanes.
+The sandboxed run failed package tests, app tests and build/typecheck; rerunning those with
+normal local permissions using the same command plus `--lane unit-js-packages --lane
+unit-js-apps --lane build-typecheck` passed all three. The initial install step emitted a
+registry-access warning; this is not evidence of a clean dependency reinstall. Mobile/Python
+lanes were not selected, and GitHub-only security checks were not run locally.
+
+A commit attempt exposed a hook integration defect: explicit symlink paths make Prettier
+error, although its recursive tree check skips them. The existing pre-commit hook now
+excludes links from the formatter's input; modified target files retain their own checks.
+`sh -n .beads/hooks/pre-commit` passed. An isolated Git fixture exercised the actual formatter
+block: a malformed regular JavaScript file was rejected, then the formatted file with its
+staged symlink was accepted. No bypass flag was used.
+
+Commit-and-pr: the staged diff was reviewed as one portability change, with no secrets or
+application runtime behavior changes; it continues on `codex/research-skill-hardening`. No PR was opened.
+The user's project completion instructions authorize commit and push.
