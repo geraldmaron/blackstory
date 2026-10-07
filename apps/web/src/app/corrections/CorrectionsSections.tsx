@@ -6,7 +6,7 @@
  */
 import React, { Suspense } from 'react';
 import Link from 'next/link';
-import { CorrectionForm } from './CorrectionForm';
+import { CorrectionForm, type CorrectionFormProps } from './CorrectionForm';
 import { CORRECTION_PRIVACY_NOTICE } from './copy';
 import { Disclosure, RoomSection, UtilityStep, KeepGoing } from '../../components/room';
 import { WalkOffRamp } from '../walk-off-ramp';
@@ -19,7 +19,7 @@ const INTAKE_STEPS = [
   { title: 'Published or declined, with a reason', detail: 'Accepted changes appear in Errata' },
 ] as const;
 
-export function CorrectionsSections() {
+export function CorrectionsSections(props: CorrectionFormProps) {
   return (
     <div className="ds-corrections">
       <RoomSection
@@ -38,7 +38,7 @@ export function CorrectionsSections() {
         </ol>
 
         <Suspense fallback={<p className="ds-room-field__hint">Loading the correction form…</p>}>
-          <CorrectionForm />
+          <CorrectionForm {...props} />
         </Suspense>
 
         {/*

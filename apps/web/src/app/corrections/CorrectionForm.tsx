@@ -5,7 +5,7 @@
  * public. Supports entity/claim/source/location targets, structured categories, source URL,
  * privacy consent, and returns a receipt code on success.
  */
-import { useId, useState, type FormEvent } from 'react';
+import React, { useId, useState, type FormEvent } from 'react';
 import { Button, Notice } from '@repo/ui';
 import { ChoiceField, Field } from '../../components/room';
 import { ReceiptBlock } from './ReceiptBlock';
@@ -14,6 +14,7 @@ import {
   CORRECTION_CATEGORY_LABELS,
   CORRECTION_TARGET_LABELS,
   CORRECTION_TARGET_TYPES,
+  type CorrectionTargetType,
 } from './categories';
 import { CORRECTION_PRIVACY_NOTICE } from './copy';
 import { getRequestIntegrityHeaders } from '../../lib/request-integrity/client';
@@ -31,7 +32,17 @@ type SubmitState =
 const DEFAULT_ERROR_MESSAGE =
   'Something went wrong submitting this correction. Please try again in a moment.';
 
-export function CorrectionForm() {
+export type CorrectionFormProps = {
+  readonly initialTarget?: string;
+  readonly initialTargetType?: CorrectionTargetType;
+  readonly targetName?: string;
+};
+
+export function CorrectionForm({
+  initialTarget = '',
+  initialTargetType = 'entity',
+  targetName,
+}: CorrectionFormProps) {
   const [state, setState] = useState<SubmitState>({ status: 'idle' });
 
   const targetTypeId = useId();
@@ -124,12 +135,7 @@ export function CorrectionForm() {
   }
 
   return (
-    <form
-      className="ds-stack"
-      onSubmit={handleSubmit}
-      noValidate
-      aria-describedby="corrections-lede"
-    >
+    <form className="ds-stack" onSubmit={handleSubmit} noValidate>
       {state.status === 'error' && !state.fieldIssues ? (
         <Notice tone="error" title="Submission failed">
           {state.message}
@@ -146,7 +152,7 @@ export function CorrectionForm() {
       ) : null}
 
       <Field label="What are you correcting?" htmlFor={targetTypeId}>
-        <select id={targetTypeId} name="targetType" defaultValue="entity" required>
+        <select id={targetTypeId} name="targetType" defaultValue={initialTargetType} required>
           {CORRECTION_TARGET_TYPES.map((targetType) => (
             <option key={targetType} value={targetType}>
               {CORRECTION_TARGET_LABELS[targetType]}
@@ -154,6 +160,13 @@ export function CorrectionForm() {
           ))}
         </select>
       </Field>
+
+      {targetName && initialTargetType === 'entity' ? (
+        <p className="ds-room-field__hint">
+          Opened from <a href={`/entity/${encodeURIComponent(initialTarget)}`}>{targetName}</a>. The
+          record reference is filled in below; you can change it.
+        </p>
+      ) : null}
 
       <Field
         label="Which record is wrong?"
@@ -164,6 +177,8 @@ export function CorrectionForm() {
           id={targetRecordId}
           name="targetRecordId"
           type="text"
+          defaultValue={initialTarget}
+          maxLength={128}
           required
           placeholder="Fifteenth Street Presbyterian Church"
           aria-describedby={fieldIssue('targetRecordId') ? `${targetRecordId}-issue` : undefined}
