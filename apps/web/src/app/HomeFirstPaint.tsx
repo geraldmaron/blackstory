@@ -38,7 +38,13 @@ import { humanizeToken } from '../components/entity/format';
 import { confidenceIconFor } from '../lib/map-experience/confidence-icons';
 import { METHODOLOGY_HOW_RECORD_GETS_IN_HREF } from '../components/evidence/editorial-links';
 import { EntityRoomSections } from './entity/[id]/EntityRoomSections';
-import { toEvidenceClaimInputs, withoutSummaryEchoClaims } from './entity/[id]/adapters';
+import {
+  buildWhyThisAppearsForEntity,
+  toEvidenceClaimInputs,
+  whyAppearsEvidenceById,
+  withoutSummaryEchoClaims,
+} from './entity/[id]/adapters';
+import { WhyThisAppears } from '../components/why-appears';
 import { placeHref } from '../lib/place/public-place-path';
 import { instrumentRecordHref, placeSlugCollisionCounts } from '../lib/place/place-slug';
 import { isInternalRecordLabel, type HomeFirstPaintModel } from './home-first-paint';
@@ -60,11 +66,6 @@ import './entity/[id]/record-room.css';
 import './home-first-paint.css';
 
 void React;
-
-/** Catalog notability strings sometimes carry an em dash; display never does. */
-function displayTrustReason(reason: string): string {
-  return reason.replace(/\u2014/g, ',').replace(/\s+,/g, ',');
-}
 
 function neighborCatalog(entity: PublicEntityView): readonly EntityLinkCatalogEntry[] {
   const seen = new Set<string>();
@@ -174,7 +175,7 @@ export function HomeFirstPaint({
     };
     const displayClaims = withoutSummaryEchoClaims(lead.claims, lead.summary);
     const evidenceClaims = toEvidenceClaimInputs(displayClaims);
-    const inclusionBasis = lead.notabilityLabels ?? [];
+    const whyThisAppears = buildWhyThisAppearsForEntity(lead);
     const sourceCount = citedSourceCount(displayClaims);
     const confidenceTier = recordConfidenceTier(lead.claims);
     const gradeWord = evidenceGradeWord(confidenceTier);
@@ -375,18 +376,16 @@ export function HomeFirstPaint({
 
         <section className="ds-record-beat" id="trust" aria-labelledby="trust-heading">
           <RecordBeatHead id="trust-heading" icon="trust" title="Can I trust this" />
-          {inclusionBasis.length > 0 ? (
-            <>
-              <RecordSmallTitle icon="why" id="why-heading">
-                Why this is here
-              </RecordSmallTitle>
-              <ul className="ds-record-rail-block__reasons" aria-labelledby="why-heading">
-                {inclusionBasis.map((reason) => (
-                  <li key={reason}>{displayTrustReason(reason)}</li>
-                ))}
-              </ul>
-            </>
-          ) : null}
+          <section aria-labelledby="why-heading">
+            <RecordSmallTitle icon="why" id="why-heading">
+              Why this is here
+            </RecordSmallTitle>
+            {whyThisAppears ? (
+              <WhyThisAppears result={whyThisAppears} evidenceById={whyAppearsEvidenceById(lead)} />
+            ) : (
+              <p>An inclusion explanation with linked evidence has not been recorded.</p>
+            )}
+          </section>
           <TrustBlock
             label="How this record stands"
             facts={[

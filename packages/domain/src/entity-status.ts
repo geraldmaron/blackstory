@@ -170,97 +170,55 @@ export function hasRequiredNotabilityBasis(
  */
 export const NOTABILITY_RUBRIC: Readonly<Record<NotabilityCriterion, string>> = {
   first_to_do_x:
-    'The entity is documented as the first Black person, institution, or place to achieve, ' +
-    'hold, found, or integrate something notable (a role, office, degree, business, record) — ' +
-    'not merely an early or contemporaneous participant.',
+    'A documented first by a Black person, institution or place. The record must name the ' +
+    'achievement and the scope in which it was first.',
   major_honor_or_hall_of_fame:
-    'The entity received a major, named national or field-defining honor or hall-of-fame ' +
-    'induction (e.g. Congressional Gold Medal, a national Hall of Fame, a Pulitzer, a National ' +
-    'Medal). Local or purely commercial awards do not qualify alone.',
+    'A major national or field-defining honor or hall-of-fame induction. Local or ' +
+    'purely commercial awards do not qualify on their own.',
   landmark_or_national_register:
-    'The entity (place, school, institution) holds a formal landmark designation — National ' +
-    'Register of Historic Places, National Historic Landmark, or an equivalent state/local ' +
-    'landmark register entry — with documented listing evidence.',
+    'A place or institution with a documented entry in a national, state or local landmark ' +
+    'register. The record must identify the designation.',
   court_precedent:
-    'The entity (case, law, person) is tied to a judicial decision — a ruling, an opinion, or a ' +
-    'trial — that set binding or widely cited precedent affecting Black Americans\u2019 rights ' +
-    'or status, or that was itself a documented turning point in how the law was applied to ' +
-    'Black Americans. The trial of Anthony Burns set no precedent and made the Fugitive Slave ' +
-    'Act visible in Boston; the Amistad and Creole cases are here on the same footing.',
+    'A judicial decision or trial that set binding or widely cited precedent affecting Black ' +
+    "Americans' rights or status, or marked a documented turning point in how the law was applied.",
   movement_significance:
-    'The entity (person, organization, event, place, or a movement-kind entity itself) played a ' +
-    'documented, non-incidental role in a named movement (Civil Rights Movement, Great ' +
-    'Migration, Black Power, Black Arts Movement, etc.) — organizing, leading, hosting, or being ' +
-    'a recognized site or symbol of it.',
+    'A documented, non-incidental role in a named movement, such as organizing, leading, hosting or serving ' +
+    'as a recognized site or symbol of the movement.',
   documented_site:
-    'The entity is a documented site of a historically significant event or practice (a sit-in ' +
-    'lunch counter, a Freedom School, a documented station on the Underground Railroad) with ' +
-    'primary-source evidence tying the site to the event.',
+    'A physical site tied to a historically significant event or practice by primary-source ' +
+    'evidence. An association with a city alone does not establish a specific site.',
   documented_contribution:
-    'The entity is a documented contribution to a field — an invention, process, method, or ' +
-    'design — evidenced either by the grant that records it or, where the patent system was ' +
-    'closed to the person who made it, by contemporary accounts of the work itself. A patent is ' +
-    'a receipt, not the definition: Benjamin Banneker built a striking clock in the 1750s, and ' +
-    'no grant was available to him for it.',
+    'An invention, process, method or design documented by a patent or contemporary accounts ' +
+    'of the work. A contribution can qualify without a patent.',
   community_anchor:
-    'The entity served as a long-standing, evidenced community anchor institution (a ' +
-    'historically Black church, fraternal lodge, HBCU, mutual aid society) with a documented ' +
-    'multi-decade role in a specific community.',
+    'An institution with a documented role over multiple decades in a specific Black ' +
+    'community, such as a church, lodge, college or mutual aid society.',
   documented_racial_terror:
-    'The entity is a person killed in a documented act of racial terror — a lynching or other ' +
-    'extrajudicial racial killing — or the event or place where such a killing is documented. ' +
-    'The basis for inclusion is the killing and its documentation, never an accusation made ' +
-    "against the person killed: the Equal Justice Initiative's Lynching in America research " +
-    'records that nearly every victim was killed without being legally convicted of any ' +
-    'offense, and that such accusations were routinely fabricated and rarely investigated. ' +
-    'The record names the person so the killing is not anonymous.',
+    'A person killed in a documented act of racial terror, or the event or place where the ' +
+    'killing occurred. Inclusion rests on evidence of the killing, never an accusation made ' +
+    'against the person killed.',
   only_or_oldest:
-    'The entity is documented as the only or oldest surviving example of its kind in a defined ' +
-    'scope (oldest Black-owned business in a city, only remaining Rosenwald school in a county) ' +
-    'with evidence supporting the superlative claim.',
+    'The only or oldest surviving example of its kind within a defined area and comparison ' +
+    'group. The evidence must support those limits.',
   documented_racial_killing:
-    'The entity is a person killed in a documented killing in which race is a documented element ' +
-    'of the case \u2014 by police, by someone acting under a claim of authority or self-defense, ' +
-    'or by a private individual \u2014 or the event where such killings are documented. The ' +
-    'killing and the public record it produced are the reason the record exists. It is distinct from documented racial terror, which names the ' +
-    'lynching era and the white-supremacist attack: the two rest on different documentary ' +
-    'records, the Equal Justice Initiative\u2019s Lynching in America research on one side and ' +
-    'investigations, grand jury proceedings, federal findings and consent decrees on the other, ' +
-    'and each record cites its own. As with racial terror, the basis for inclusion is never an ' +
-    'accusation made against the person killed.',
+    'A person killed in a documented case in which race was a documented element, or the ' +
+    'event where the killing occurred. The record must cite evidence establishing that ' +
+    'connection. Inclusion never rests on an accusation against the person killed.',
   enacted_law:
-    'The entity is a statute, constitutional amendment, executive order or ordinance whose ' +
-    'enactment or enforcement materially changed the legal status, rights or conditions of Black ' +
-    'Americans. The criterion is neutral as to direction and the record says which: the ' +
-    'Mississippi Black Codes of 1865, the Fugitive Slave Act of 1850 and the National Housing ' +
-    'Act of 1934 are here for the harm they codified, exactly as the Voting Rights Act of 1965 ' +
-    'is here for what it dismantled. A law is never filed under a criterion that reads as an ' +
-    'achievement.',
+    'A statute, constitutional amendment, executive order or ordinance whose enactment or ' +
+    'enforcement materially changed the rights, legal status or conditions of Black Americans. ' +
+    'The record must explain the change, including harm where documented.',
   elected_or_appointed_office:
-    'The entity is a person documented as holding elected or appointed public office \u2014 ' +
-    'legislative, executive, judicial, or a commission \u2014 where the holding of that office ' +
-    'is itself the documented fact. Eric Foner\u2019s Freedom\u2019s Lawmakers establishes the ' +
-    'more than 1,500 Black officeholders of Reconstruction as a cohort recorded for the office ' +
-    'they held, from United States congressmen to justices of the peace and constables, rather ' +
-    'than for a separate achievement, and this criterion carries that reading forward. A ' +
-    'professional or institutional post is not public office and does not qualify here.',
+    'Documented service in elected or appointed public office, including legislative, ' +
+    'executive, judicial or commission roles. A professional or institutional post alone ' +
+    'does not qualify as public office.',
   black_press_or_archive:
-    'The entity created, preserved or interprets the documentary record of Black life: a ' +
-    'Black-owned or Black-edited newspaper, periodical or guide, or an archive, library, ' +
-    'research center or museum of Black history. These exist because the mainstream record ' +
-    'excluded, distorted or ignored Black Americans \u2014 Freedom\u2019s Journal opened in ' +
-    '1827 with \u201cWe wish to plead our own cause. Too long have others spoken for us.\u201d ' +
-    'The basis is the documented role in making or keeping that record, and it is a role this ' +
-    'catalog depends on: these are among the sources it cites.',
+    'A Black-owned or Black-edited publication, or an archive, library, research center or ' +
+    'museum with a documented role in preserving or interpreting Black history.',
   documented_military_service:
-    'The entity (a person, unit or regiment) has a documented record of military service that ' +
-    'is itself the reason it is here: service in a segregated or newly integrated formation, ' +
-    'a first commission or enlistment that broke a service\u2019s color line, or a unit raised ' +
-    'specifically from Black or Black and Native soldiers. Service alone is not the basis \u2014 ' +
-    'the record has to show the service carried that weight, which is why the 91st United ' +
-    'States Colored Infantry and the Golden Thirteen sit here rather than under ' +
-    '`documented_site`, the honest-but-wrong fallback they inherited before this criterion ' +
-    'existed.',
+    'Military service with documented significance in Black history, such as service in a ' +
+    'segregated or newly integrated formation or breaking a barrier to enlistment or ' +
+    'commissioning. The record must establish that significance; service alone is insufficient.',
 };
 
 /**

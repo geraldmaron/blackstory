@@ -36,10 +36,7 @@ test('an entity already in the mapped set is never duplicated into this corpus',
 });
 
 test('an entity with zero notabilityBasis records is excluded — same gate the search index build enforces', () => {
-  // The bundled seed catalog predates notabilityBasis (see its own doc comment), so CHURCH
-  // already carries none — no override needed to exercise the exclusion.
-  assert.equal(CHURCH.notabilityBasis, undefined);
-  const records = buildUnmappedPaletteRecords([CHURCH], new Set());
+  const records = buildUnmappedPaletteRecords([{ ...CHURCH, notabilityBasis: [] }], new Set());
   assert.equal(records.length, 0);
 });
 

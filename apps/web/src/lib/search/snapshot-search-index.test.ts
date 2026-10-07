@@ -4,9 +4,13 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import { listPublicEntities } from '../../data/public-seed';
-import { getSnapshotSearchIndex, resetSnapshotSearchIndexCache } from './snapshot-search-index';
+import {
+  buildSearchIndexForEntities,
+  getSnapshotSearchIndex,
+  resetSnapshotSearchIndexCache,
+} from './snapshot-search-index';
 
-test('every seed fixture with a notabilityLabel survives the real AC5 gate and lands in the index', () => {
+test('every seed fixture with an explicit inclusion basis survives the real AC5 gate', () => {
   resetSnapshotSearchIndexCache();
   const index = getSnapshotSearchIndex();
   const seedIds = listPublicEntities().map((entity) => entity.id);
@@ -20,11 +24,7 @@ test('the index is memoized across calls', () => {
   assert.equal(first, second);
 });
 
-test('notabilityBasis resolves the real rubric criterion since seed labels now quote NOTABILITY_RUBRIC verbatim', () => {
-  // Unlike the old fictional fixture (which paraphrased NOTABILITY_RUBRIC and always fell back to
-  // documented_site), the real Dunbar cluster's notabilityLabels are verbatim NOTABILITY_RUBRIC
-  // strings (see public-seed.ts), so the adapter's exact-string reverse-lookup now genuinely
-  // resolves each entity's real criterion.
+test('notabilityBasis preserves explicit fixture criteria, notes and evidence gaps', () => {
   resetSnapshotSearchIndexCache();
   const index = getSnapshotSearchIndex();
   const byId = new Map(index.map((doc) => [doc.id, doc]));
@@ -42,13 +42,15 @@ test('notabilityBasis resolves the real rubric criterion since seed labels now q
     'community_anchor',
   );
   for (const doc of index) {
-    assert.ok(
-      (doc.notabilityBasis[0]?.evidenceIds.length ?? 0) > 0,
-      `${doc.id} must attach cited claim ids to inclusion evidence`,
-    );
-    assert.doesNotMatch(doc.notabilityBasis[0]!.note, /Cited from /i);
-    assert.match(doc.notabilityBasis[0]!.note, /^.+\.$/);
+    const entity = listPublicEntities().find((entry) => entry.id === doc.id)!;
+    assert.deepEqual(doc.notabilityBasis, entity.notabilityBasis);
   }
+});
+
+test('supplied catalogs cannot gain an inclusion basis from labels or unrelated citations', () => {
+  const entity = listPublicEntities()[0]!;
+  assert.ok(entity.claims.length > 0);
+  assert.deepEqual(buildSearchIndexForEntities([{ ...entity, notabilityBasis: [] }]), []);
 });
 
 test('relatedCount and claimCount are populated from the seed fixture, never left at a stale default', () => {

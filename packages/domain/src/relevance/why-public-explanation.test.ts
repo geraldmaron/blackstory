@@ -4,6 +4,7 @@
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
+import { NOTABILITY_RUBRIC } from '../entity-status.js';
 import type { RelevanceEvidence } from './types.js';
 import {
   assertReasonNotIdentityAttendanceOrJobAlone,
@@ -111,7 +112,7 @@ test('AC5: rendered notabilityBasis is auditable (criterion, rubric, note, evide
   });
   const [item] = result.notabilityBasis;
   assert.equal(item?.criterion, 'documented_site');
-  assert.ok(item?.rubric.includes('documented site'));
+  assert.equal(item?.rubric, NOTABILITY_RUBRIC.documented_site);
   assert.deepEqual(item?.evidenceIds, ['ev-1']);
   const serialized = JSON.stringify(result);
   assert.doesNotMatch(serialized.toLowerCase(), /score/);

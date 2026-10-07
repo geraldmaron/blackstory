@@ -135,20 +135,32 @@ test('buildWhyThisAppearsForEntity composes a payload from the record own basis'
 });
 
 test('buildWhyThisAppearsForEntity returns undefined when the composer refuses, never throws', () => {
-  // A record with no stored basis AND no cited claim has nothing to synthesize a basis from
-  // (`notabilityBasisFor` returns []) and no non-gate relevance evidence, so the composer
-  // refuses on both counts. This is the thin-record shape the fallback exists for: the room
-  // must still render, on notabilityLabels.
+  // Missing reviewed inclusion evidence must leave an explicit gap while the room renders.
   const refused = whyEntity({ id: 'ent_no_basis_001', notabilityBasis: [], claims: [] });
   assert.doesNotThrow(() => buildWhyThisAppearsForEntity(refused));
   assert.equal(buildWhyThisAppearsForEntity(refused), undefined);
 });
 
-test('buildWhyThisAppearsForEntity still composes when only cited claims back the record', () => {
-  // `notabilityBasisFor` synthesizes one basis row per cited claim when the projection carries
-  // none, so an empty notabilityBasis is NOT by itself a refusal.
-  const synthesized = whyEntity({ id: 'ent_synthesized_001', notabilityBasis: [] });
-  assert.notEqual(buildWhyThisAppearsForEntity(synthesized), undefined);
+test('cited claims and legacy labels cannot invent an inclusion decision', () => {
+  const missing = whyEntity({
+    id: 'ent_no_reviewed_basis_001',
+    notabilityBasis: [],
+    notabilityLabels: ['A legacy inclusion label'],
+  });
+  assert.equal(buildWhyThisAppearsForEntity(missing), undefined);
+});
+
+test('preserves the reviewed inclusion note and leaves missing evidence links missing', () => {
+  const basis = {
+    criterion: 'documented_site' as const,
+    note: 'The society met here from 1881; the linked claim documents only its location.',
+    evidenceIds: [] as string[],
+  };
+  const result = buildWhyThisAppearsForEntity(
+    whyEntity({ id: 'ent_partial_basis_001', notabilityBasis: [basis] }),
+  );
+  assert.equal(result?.notabilityBasis[0]?.note, basis.note);
+  assert.deepEqual(result?.notabilityBasis[0]?.evidenceIds, []);
 });
 
 test('buildWhyThisAppearsForEntity refuses a record whose explanation is too short to be a reason', () => {

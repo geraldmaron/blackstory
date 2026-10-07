@@ -291,34 +291,30 @@ test('first paint is the record, not a manifesto or a schema card', () => {
   );
 });
 
-test('the place room publishes the inclusion basis, not only the measurements', () => {
-  // `/entity/{id}` has always shown "Why this is here" in its apparatus band, and nearly every
-  // visitable record permanently redirects from there to `/place/{slug}`, which is this room. So
-  // the archive's auditable answer to why a record is in the catalog — the whole point of the
-  // notability rubric — reached almost none of the catalog. The Tulsa Race Massacre showed its
-  // research coverage and its cited-source count and never said why it was here.
-  const withBasis = getPublicEntity('ent_dunbar_school_001');
-  assert.ok(withBasis);
-  assert.ok(
-    (withBasis.notabilityLabels ?? []).length > 0,
-    'fixture must carry notabilityLabels for this to prove anything',
-  );
-  const html = renderToStaticMarkup(
-    createElement(HomeFirstPaint, {
-      model: { lead: withBasis, also: [], story: undefined, citing: [], source: 'seed' },
-    }),
-  );
-  assert.match(html, /Why this is here/);
-  for (const label of withBasis.notabilityLabels ?? []) {
-    assert.ok(
-      html.includes(
-        label
-          .slice(0, 40)
-          .replace(/[&<>"]/g, (c) => `&${{ '&': 'amp', '<': 'lt', '>': 'gt', '"': 'quot' }[c]!};`),
-      ) || html.includes(label.slice(0, 40)),
-      `rubric text missing from the page: ${label.slice(0, 60)}`,
+test('the place room distinguishes a stored inclusion decision from generic rubric text', () => {
+  const seed = getPublicEntity('ent_dunbar_school_001');
+  assert.ok(seed);
+  const render = (lead: typeof seed) =>
+    renderToStaticMarkup(
+      createElement(HomeFirstPaint, {
+        model: { lead, also: [], story: undefined, citing: [], source: 'seed' },
+      }),
     );
-  }
+  const missing = render({ ...seed, notabilityBasis: [] });
+  assert.match(missing, /An inclusion explanation with linked evidence has not been recorded/);
+  assert.doesNotMatch(missing, /A documented first by a Black person/);
+  const reviewed = render({
+    ...seed,
+    notabilityBasis: [
+      {
+        criterion: 'first_to_do_x',
+        note: 'Founded in 1870 as a public high school for Black students.',
+        evidenceIds: [seed.claims[0]!.id],
+      },
+    ],
+  });
+  assert.match(reviewed, /Founded in 1870 as a public high school for Black students/);
+  assert.match(reviewed, /Inclusion evidence/);
 });
 
 test('seed Dunbar place record shows sourced claims without catalog chrome', () => {
