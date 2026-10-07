@@ -12,18 +12,18 @@ traceable relationships. Black history is its primary domain profile. Thoroughne
 important questions, alternative explanations, source gaps, and contradictions were examined
 within explicit bounds. It does not mean searching forever or producing more fluent prose.
 
-| Capability | Current implementation | Limit |
-|---|---|---|
-| Portable contracts | `@repo/research-kernel`: JSON Schema, generated TypeScript/Python, profiles | Shared TS/Python malformed-input fixtures enforce the same JSON Schema boundary |
-| Source acquisition | CLI search routing, safe-fetch, adapter inputs, source capture | Provider availability and storage permission must be configured explicitly |
-| Generic harness input | `harness-run --subjects`, `--url`, explicit file-backed adapters | Extracts proposals; durable execution uses `research-run` and `research-work` |
-| Claim/edge extraction | Strict schemas, exact quote and cited-record attachment | Attachment is not entailment; model confidence is uncalibrated; review remains required |
-| Graph discovery | `expand`, catalog traversal, cross-reference/shared-source/adjacency candidate generators | Wikidata statement ranks, qualifiers and references survive staging; cross-source resolution and graph evaluation need work |
-| Research planning | `enrich-entity`, maturity deficits, kernel needs/frontier policy | Plans and executes bounded acquisition; reviewed evidence alone can raise maturity |
-| Preservation | `capture-backfill`, safe fetch, Supabase capture sink, Wayback lookup and resumable SPN2 jobs, explicit retention/disposal | Local metadata is not a full archived page; current release citations have no measured capture overlap or production Wayback pointers |
-| Evidence retrieval | Private capture passages, full text + pgvector/RRF, exact selectors, model/text revision checks | 768 dimensions; small live pilot measured retrieval recall with substantial false positives; representative-scale quality remains unproven |
-| Headless use | Immutable run manifests, scoped leases, dependencies, attempt reservations, accounting and proposal artifacts | Built-in acquisition/model execution and external lease handoff; automatic model admission requires independent evaluation |
-| Scheduling | Job registry, worker entry points, manual Actions dispatch | No research schedule should be active; no Corsair dependency |
+| Capability            | Current implementation                                                                                                     | Limit                                                                                                                                      |
+| --------------------- | -------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
+| Portable contracts    | `@repo/research-kernel`: JSON Schema, generated TypeScript/Python, profiles                                                | Shared TS/Python malformed-input fixtures enforce the same JSON Schema boundary                                                            |
+| Source acquisition    | CLI search routing, safe-fetch, adapter inputs, source capture                                                             | Provider availability and storage permission must be configured explicitly                                                                 |
+| Generic harness input | `harness-run --subjects`, `--url`, explicit file-backed adapters                                                           | Extracts proposals; durable execution uses `research-run` and `research-work`                                                              |
+| Claim/edge extraction | Strict schemas, exact quote and cited-record attachment                                                                    | Attachment is not entailment; model confidence is uncalibrated; review remains required                                                    |
+| Graph discovery       | `expand`, catalog traversal, cross-reference/shared-source/adjacency candidate generators                                  | Wikidata statement ranks, qualifiers and references survive staging; cross-source resolution and graph evaluation need work                |
+| Research planning     | `enrich-entity`, maturity deficits, kernel needs/frontier policy                                                           | Plans and executes bounded acquisition; reviewed evidence alone can raise maturity                                                         |
+| Preservation          | `capture-backfill`, safe fetch, Supabase capture sink, Wayback lookup and resumable SPN2 jobs, explicit retention/disposal | Local metadata is not a full archived page; current release citations have no measured capture overlap or production Wayback pointers      |
+| Evidence retrieval    | Private capture passages, full text + pgvector/RRF, exact selectors, model/text revision checks                            | 768 dimensions; small live pilot measured retrieval recall with substantial false positives; representative-scale quality remains unproven |
+| Headless use          | Immutable run manifests, scoped leases, dependencies, attempt reservations, accounting and proposal artifacts              | Built-in acquisition/model execution and external lease handoff; automatic model admission requires independent evaluation                 |
+| Scheduling            | Job registry, worker entry points, manual Actions dispatch                                                                 | No research schedule should be active; no Corsair dependency                                                                               |
 
 The [audit evidence](./framework-audit.md) records observations and source research. Do not infer
 production readiness from a schema, test fixture, function name, or an old statement of completion.
@@ -47,6 +47,10 @@ production readiness from a schema, test fixture, function name, or an old state
    the exact assertion and whether its scope, dates, participants, and language match.
 8. Review identity and each edge independently. Stage proposals with unresolved blockers.
    Draft prose from accepted evidence only. Publication remains a separate authorized operation.
+   Apply the [prose fact protocol](../methodology/chapter-fact-validation.md) to summaries,
+   context, captions and excerpts as well as structured claims. Bind the editorial review
+   to the exact final wording and recheck factual edits. Current claim-review code does
+   not certify unstructured prose.
 9. Stop on fulfilled needs and measured diminishing information gain, or report a budget/access
    stop with unfinished needs. A cap is not a finding of completeness. Persist the handoff.
 
@@ -166,3 +170,9 @@ link to operations rather than duplicating flags. Any model can begin with this 
 CLI; no particular chat product is required. Skills describe the decision to make and its evidence
 requirements. They must not silently publish, invent sources, infer approval requirements beyond
 the user's authorization, or turn one failure/example into a universal rule.
+
+For factual and editorial skill changes, use the [development review cases](skill-review-cases.md)
+and the [evaluation-family limits](gold-corpus.md). The
+[2026-10-07 audit](skill-audit-2026-10-07.md) records observed errors, scope and remaining controls.
+Interface changes use `blackstory-experience-review` and the UI pattern catalog; a precise
+claim still fails readers if its qualifier or source cannot be reached on mobile.

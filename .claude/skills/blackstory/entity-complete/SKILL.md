@@ -15,20 +15,21 @@ and the view-models: `apps/web/src/app/entity/[id]/entity-anatomy-facts.ts`,
 
 ## What a reader sees
 
-| Field | If blank | Lane |
-|---|---|---|
-| `whereLabel` / geo | Place withheld or missing pin | [`blackstory-entity-verify`](../entity-verify/SKILL.md) |
-| `eraLabel` | Era undocumented | `blackstory-entity-verify` (designation years are not era) |
-| `evidenceLabel` | Unrated / zero sources | [`blackstory-claim-corroborate`](../claim-corroborate/SKILL.md) |
-| `summary` | Should not be blank on a released record | `blackstory-editorial-enrichment` (`backfill-entity` / `prose-run`) |
-| `historicalContext` | Missing era/place paragraph | `prose-run` / `backfill-entity`, citation-gated |
-| `topicTags` / `topicIds` | Topics missing | Canonical classification, then re-publish. Do not invent a parallel taxonomy column. |
-| `primaryImage` | Largest live gap (~95% blank at last audit) | Image lane below |
-| `related` | Related rail empty | `propose-edge` (see below). `expand` finds candidates; it does not make edges. |
+| Field                    | If blank                                                                 | Lane                                                                                 |
+| ------------------------ | ------------------------------------------------------------------------ | ------------------------------------------------------------------------------------ |
+| `whereLabel` / geo       | Place withheld or missing pin                                            | [`blackstory-entity-verify`](../entity-verify/SKILL.md)                              |
+| `eraLabel`               | Era undocumented                                                         | `blackstory-entity-verify` (designation years are not era)                           |
+| `evidenceLabel`          | Unrated / zero sources                                                   | [`blackstory-claim-corroborate`](../claim-corroborate/SKILL.md)                      |
+| `summary`                | Should not be blank on a released record                                 | `blackstory-editorial-enrichment` (`backfill-entity` / `prose-run`)                  |
+| `historicalContext`      | Missing era/place paragraph                                              | `prose-run` / `backfill-entity`, citation-gated                                      |
+| `topicTags` / `topicIds` | Topics missing                                                           | Canonical classification, then re-publish. Do not invent a parallel taxonomy column. |
+| `primaryImage`           | Optional; inspect current coverage rather than reusing an old percentage | Image lane below                                                                     |
+| `related`                | Related rail empty                                                       | `propose-edge` (see below). `expand` finds candidates; it does not make edges.       |
 
-Minimum publishable *case* (identity, relevance, source citation, public summary, rights
+Minimum publishable _case_ (identity, relevance, source citation, public summary, rights
 clearance) is [`blackstory-case-drafting`](../case-drafting/SKILL.md). Geography, dates,
-corroboration, and context are enrichment. The public anatomy still shows Where and Era
+corroboration beyond the support needed for each assertion, and context are enrichment.
+Factual support is never optional. The public anatomy still shows Where and Era
 first, so treat those as verify work even when the case is technically minimum.
 
 ## Images
@@ -71,7 +72,11 @@ and `packages/operator-cli/src/cli.ts` (`propose-edge`).
 Short-form `historicalContext` / summary drafts: `prose-run` or `backfill-entity` under
 [`blackstory-editorial-enrichment`](../editorial-enrichment/SKILL.md). Linked prose uses
 `[[ent_id|Display Name]]`. Citation rules stay `blackstory-claim-corroborate`. Never call
-this ready to publish.
+this ready to publish. Use `blackstory-neo-voice`, `blackstory-prose-review` and the
+proportionate `blackstory-ringer-review` pass for summary/context as well as longform.
+Map every factual clause to reviewed evidence; a bibliography about the person is
+not support for new career totals, date inferences or praise. Completeness is not a
+quota: leave a field absent rather than invent detail or repeat the summary.
 
 ## Output
 

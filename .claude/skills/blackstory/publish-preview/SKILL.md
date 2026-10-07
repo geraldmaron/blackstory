@@ -16,15 +16,20 @@ session never holds that token.
 
 ## Preview checklist
 
-Walk each item. Cite the code or doc that failed. Do not skip a red item with prose.
+Walk each applicable item. Cite the code or doc that failed. Unknown place/era is an
+enrichment gap if honestly absent; an invented or misleading displayed value is a
+blocker. Do not skip a red item with prose. Evidence and final-copy review are
+procedural obligations as well as the machine checks; do not claim code enforces both.
 
 ```
 Task:
 - [ ] Identity matched (not a guessed homonym)
-- [ ] Pin sourced, precision honest, geo-integrity pass
-- [ ] Era is historical evidence, not a designation year
-- [ ] Claims have independent lineage at the stated confidence
-- [ ] Superlatives have an institutional source
+- [ ] Any displayed pin is sourced, honestly labeled and passes geo-integrity
+- [ ] Any displayed era uses historical evidence, not a substituted designation year
+- [ ] Claims have exact reviewed support, with lineage and uncertainty stated honestly
+- [ ] Superlatives retain their tested scope and survive counterexample search
+- [ ] Every summary/context/caption clause has a final-revision evidence review
+- [ ] No open factual or materially misleading prose finding; derivative cards agree
 - [ ] Rights clearance on copy and image
 - [ ] Dignity: no residential living addresses, no alarm-map encoding
 - [ ] Release preview / claim diff inspected
@@ -72,6 +77,7 @@ A preview packet:
 - eligible / blocked
 - blocking failures with file-or-gate names
 - non-blocking enrichment gaps
+- reviewed draft revision and evidence map; distinguish machine checks from editorial review
 - the explicit sentence: this session cannot activate the release
 
 **Never:** call `transitionResearchCase` / `markResearchCasePublished` /

@@ -9,7 +9,8 @@ Agent skills live under `.claude/skills/blackstory/`:
   `case-drafting`, `story-craft`, `theme-study`, `triage-graylist`) exist for skill-matching
   UX. They point here and carry no command detail of their own.
 - **Judgment playbooks** (`entity-verify`, `claim-corroborate`, `entity-complete`,
-  `coverage-target`, `publish-preview`, `intake-review`) are not verbs. Their decision order lives in the
+  `entity-relate`, `coverage-target`, `publish-preview`, `neo-voice`, `prose-review`,
+  `ringer-review`, `surface-triage`, `intake-review`, `experience-review`) are not verbs. Their decision order lives in the
   skill file. They call verbs from this document when a command is needed.
 
 See `AGENTS.md` for the one-line index of every verb with its exact command.
@@ -41,10 +42,10 @@ node --conditions development --import tsx packages/operator-cli/src/bin.ts <ver
   using a local provider. There are no personal-host aliases or Corsair fallback. No research
   schedule is enabled by invoking these commands.
 - **Reaching a search provider.** Two things are true at once and the split between them is the
-  whole design. The operator's SearXNG is *private on purpose* — loopback, or a Tailscale
+  whole design. The operator's SearXNG is _private on purpose_ — loopback, or a Tailscale
   `100.64.0.0/10` address — so `executeSafeFetch` refuses it, correctly: every other caller of
   that function hands it a URL scraped from a web page, and such a URL must never reach an
-  internal service. A *search result*, by contrast, is an untrusted URL and belongs on the full
+  internal service. A _search result_, by contrast, is an untrusted URL and belongs on the full
   safe-fetch path.
 
   So the provider call uses `createOperatorEndpointClient`
@@ -70,6 +71,7 @@ node --conditions development --import tsx packages/operator-cli/src/bin.ts <ver
   the client itself never retries. No web-search query anywhere uses bare `fetch`.
   `packages/operator-cli/src/worker-preflight.ts` also reads `SEARXNG_BASE_URL`, but only to probe
   the instance's health endpoint; it issues no queries.
+
 - **Ledger logging.** `model-routing.ts` and `model-invocation-log.ts` are the existing model
   policy and logging modules. Presence is not integration: the audit found no persisted model
   invocations or frontier tasks in the initial production observation. The durable protocol below
@@ -244,6 +246,7 @@ OPERATOR_CLI_PRIVACY_PEPPER=<pepper> node --conditions development --import tsx 
 ```
 
 `runResearchIntake` (`research-intake.ts`) sequences three real, independently tested steps:
+
 1. `runQuickAddFetch` (`fetch.ts`) — DNS-pinned, SSRF-safe fetch through BB-030
    (`executeSafeFetch`, `packages/security/src/url-safety/`).
 2. `buildCitationPrefill` / `planSelectiveCapture` — citation metadata plus a note that Wayback
@@ -423,7 +426,7 @@ logging: none yet (see "Conventions" above; tracked in the research execution ba
 **When to use:** a lighter-weight prose draft for one subject, instead of a full
 `story-research-run` packet (ten research moves, cite map, pattern cases). Reuses the exact
 same enrichment bridge and output (`enrichment.run.v1`) as `backfill-entity` — the "short form"
-*is* the existing editorial/enrichment draft (`drafts.publicSummary` /
+_is_ the existing editorial/enrichment draft (`drafts.publicSummary` /
 `drafts.historicalContext`), not a new prose engine. Reach for full `story-research-run` when
 you need the oral-methodology structure (start-line relocation, named anchors, mechanism
 layer); reach for `prose-run` for a quick, citation-light summary draft.
@@ -593,7 +596,6 @@ drift); named campus/place → `campus` (≤500m); neighborhood/district → `ne
 [`docs/security/location-precision-standard.md`](../security/location-precision-standard.md)
 for the full NRHP-derived precision tier standard.
 
-
 ---
 
 ## case-drafting
@@ -704,7 +706,7 @@ QID, or the command fails with `Entity <id> has no Wikidata QID in identifiers`
 (`expand-verb.ts`, `loadExpansionSeed`). Traversal is live Wikidata, not a fixture
 (`entity-network-expansion.ts`): forward claims come off the seed's own `Special:EntityData`
 document (P108 employer, P69 educated at → `member_of`, P463 member of, P485 archives at →
-`other`), and the claims Wikidata records only on the *neighbor's* item (P112 founded by, P50
+`other`), and the claims Wikidata records only on the _neighbor's_ item (P112 founded by, P50
 author) come from the public SPARQL service. `--depth 2` expands each first-hop neighbor once,
 applying the person forward-property set to all of them because the neighbor's canonical kind
 isn't resolved at that point; any `--depth` other than `2` is treated as `1`.
@@ -748,11 +750,17 @@ candidate is not a relationship until a reviewer says so.
 These have no operator-cli command. Load the skill, then call verbs from this document when
 a sourced address, evidence attachment, or campaign is actually ready.
 
-| Skill | When |
-|---|---|
-| `.claude/skills/blackstory/entity-verify` | Confirm identity, source a place, set precision, assign era |
-| `.claude/skills/blackstory/claim-corroborate` | Independent lineage, Wikipedia rule, superlatives |
-| `.claude/skills/blackstory/entity-complete` | Blank public fields (image, related, historicalContext) |
-| `.claude/skills/blackstory/coverage-target` | Where research should look next |
-| `.claude/skills/blackstory/publish-preview` | Release preview only; never activate |
-| `.claude/skills/blackstory/intake-review` | Screen incoming leads, corrections, and mail before they are ordinary work |
+| Skill                                         | When                                                                       |
+| --------------------------------------------- | -------------------------------------------------------------------------- |
+| `.claude/skills/blackstory/entity-verify`     | Confirm identity, source a place, set precision, assign era                |
+| `.claude/skills/blackstory/claim-corroborate` | Independent lineage, Wikipedia rule, superlatives                          |
+| `.claude/skills/blackstory/entity-complete`   | Blank public fields (image, related, historicalContext)                    |
+| `.claude/skills/blackstory/coverage-target`   | Where research should look next                                            |
+| `.claude/skills/blackstory/publish-preview`   | Release preview only; never activate                                       |
+| `.claude/skills/blackstory/intake-review`     | Screen incoming leads, corrections, and mail before they are ordinary work |
+| `.claude/skills/blackstory/entity-relate`     | Relationship-specific evidence and scoped causal language                  |
+| `.claude/skills/blackstory/neo-voice`         | Evidence-led drafting for entity copy and longform                         |
+| `.claude/skills/blackstory/prose-review`      | Clarity, dignity, qualifier preservation and formulaic prose               |
+| `.claude/skills/blackstory/ringer-review`     | Adversarial factual and interpretive review                                |
+| `.claude/skills/blackstory/surface-triage`    | Projection/search/artifact disagreement                                    |
+| `.claude/skills/blackstory/experience-review` | Task-based web/native usability and evidence presentation                  |

@@ -1,119 +1,108 @@
-# Chapter fact validation
+# Prose fact validation
 
-**Status:** binding for every article published on the `/chapters` surface.
-Chapters are canonical in `reference.articles` (Supabase), edited via
-`articles.ts pull` into gitignored local drafts and applied back; they do not
-live as fixture files in git. This document defines how facts get
-into chapter prose and how they are validated before publish. It composes
-standards that already exist elsewhere in this repo; where it cites another
-document, that document governs. Nothing here replaces the machine gates in
-`packages/ops-data/scripts/articles.ts` — it defines the human/agent research
-protocol those gates cannot check.
+Applies to public entity summaries, historical context, inclusion explanations, stories,
+chapters, captions and excerpts. The filename is retained for existing references.
+Article-specific machine gates apply only to their article formats. This protocol
+supplies the editorial judgment that citation attachment and schema checks cannot prove.
 
-## Why this document exists
+## 1. Record the exact assertion
 
-The pipeline gates prove *internal traceability*: every figure in prose
-resolves to a published theme-impact-packet observation, every
-`primaryDocument` refId to a packet artifact, every reference URL to a
-T1–T3 source, every load-bearing figure to two independent anchors. What no
-gate can prove is that a *narrative* fact — an arrest date, a headline, a
-named person on a named block — is true. One fabricated detail costs the
-site the trust every validated number earned. This document closes that gap.
+Build a compact evidence map alongside the existing case or draft, not a second database.
+For each factual clause record:
 
-## The two classes of fact
+- The exact proposed words and destination field; stable claim/reference ID where available.
+- Subject, predicate, object, date kind, place, population and decisive qualifiers.
+- Source work, author/custodian, source date, retrieval outcome, exact locator and a
+  supporting excerpt only within the source's applicable quotation/retention limits.
+- Why the document is fit for this question; independent work lineage and dependencies.
+- Strongest contrary evidence, search bounds, resolution or unresolved need.
+- Verdict (supported, qualified/attributed, contradicted, insufficient), allowed wording,
+  reviewer and the exact draft revision reviewed.
 
-| Class | Example | Validated by |
-|---|---|---|
-| **Measured** (numbers, series values) | "about fifty-six times what the average Black person held" | Packet observation binding, enforced by `verifyArticleReferences` + `assertArticleCitationIntegrity`; load-bearing figures additionally by the two-anchor rule (`gateLoadBearingAnchors`) |
-| **Narrative** (events, people, dates, scenes, quotes) | "the Tribune ran the story that afternoon" | The research protocol below — no machine gate can check it |
+Use fetched evidence, not model memory or snippets as substitutes for a document.
+Do not infer a fact's truth merely because a matching quote exists. Check its context,
+source fallibility, later corrections, and competing evidence. Inaccessible sources are
+unverified; retain the access limitation rather than filling the gap.
 
-A fact that is neither class — atmosphere invented for color — does not go
-in a chapter. If a detail cannot be sourced, the scene is written without it.
+## 2. Source criticism and corroboration
 
-## Research protocol for narrative facts
+Prefer the records closest and best suited to the question, read with relevant scholarship
+and context. A primary record can misstate, omit or misclassify; secondary scholarship can
+provide the necessary synthesis. Community archives, Black press and oral testimony may
+be the best available evidence. Evaluate purpose, knowledge, perspective and limitations.
 
-Every narrative fact in chapter prose passes three layers before publish.
-Single-pass research, however careful, is not sufficient; this project has
-been burned by confidently fabricated data before (the BJS precedent).
+For consequential or contested assertions, seek independently derived support and actively
+look for disconfirmation. Trace works, not domains: syndication and biographies copying
+the same error are one evidentiary root. Two citations are neither necessary nor sufficient
+for every ordinary fact. A well-suited single record can support a narrowly stated fact;
+name the source in prose when its testimony, estimate or unusual exclusivity matters.
+A single witness's account must remain attributed. Do not use attribution to retain a
+known falsehood or a confidence grade to license a contradiction.
 
-**Layer 1 — Research pass.** Facts are gathered from fetched sources, never
-from a model's memory. Each fact is recorded with: the fact as one precise
-sentence; at least **two independent sources** (different institutions — a
-reprint or syndication of the same original is one source, the same lens
-`docs/research/citation-independence-review-signal.md` applies to citations);
-the exact URL fetched; and a verbatim supporting quote of at most 40 words.
-At least one source must be primary or official (T1/T2 under
-`lookupSourceTier`). Acceptable institutions follow the tier registry:
-federal archives (LOC, NARA, govinfo), agency history offices, state
-historical societies, university projects and presses, established museums,
-peer-reviewed scholarship. Newspapers enter through the Chronicling America
-and Black-press dignity rules (`docs/research/chronicling-america-adapter.md`,
-`docs/research/black-press-discovery.md`): snippets ≤ 320 chars / 60 words,
-no sensational framing, publication + place + date preserved.
+A firstness claim needs the comparison class, credential/role, geography and period made
+explicit, an explicit fit source, and a search for earlier or competing candidates.
+Differentiate event, election, appointment, swearing-in, visiting/full appointment,
+designation, completion and conferral dates. Verify counts and overlapping roles.
+“Not found” becomes evidence of absence only when collection coverage and the expectation
+of a record make that inference defensible. Document those conditions.
 
-**Layer 2 — Independent verification pass.** A second researcher (or agent)
-who did not do Layer 1 re-fetches every cited URL and confirms, against the
-page text alone, that the fact and quote are supported. Anything not
-confirmed is cut or moved to a dispute. The verifier's job is to refute,
-not to polish.
+## 3. Refutation and integration
 
-*Named-attribution exception.* A fact carried by only one institution may
-still appear when that institution is the primary record holder for it (a
-commission's own report, an agency's own ledger, a memoir for its author's
-words) — but then the prose names the source in the sentence ("the
-commission's report puts the crowd at…"), so the reader sees exactly whose
-record carries the claim. Anonymous single-source facts are cut. Layer 2
-still verifies the fact against the named source.
+A verifier checks the exact draft against the evidence and the strongest alternative.
+Prefer a researcher who did not draft it for consequential claims. If only self-review
+ran, say so and carry unresolved high-risk claims to separate review; a fresh prompt
+alone is not an independent check. Delegation is not automatic authorization for a fan-out.
 
-**Layer 3 — Editorial integration check.** Whoever writes the prose confirms
-each fact appears with its citation (`[ref:id]` to a reference carrying the
-source URL, or a `primaryDocument` block bound to a packet artifact), that
-quotes are verbatim, and that no sentence asserts more than its source does.
-Disputed facts (death tolls, motives, lost documents) are written as
-disputes per `docs/content/neo-voice.md` Part V ("Disputes in prose") — both
-records shown in the prose, never resolved into one number the record
-doesn't support.
+Do not merely check that each reference exists. Read every factual clause, including
+numbers and context not present in structured claims. Check each title, summary, caption,
+card and mobile excerpt independently. Preserve essential qualifiers where users see the
+claim. Method notes may expand limitations but cannot hide a qualification that changes truth.
 
-**Then the machine gates run** (`validate → apply → promote → project`):
-schema, citation integrity, source tiers, anchors, packet binding, DOI
-checks (`CHECK_DOIS=1`), and the 2,000-word prose floor. The gates are the
-fourth check, not the first.
+A source conflict is resolved by evidence and scope, not a vote. State a supported conclusion
+when the record permits one; otherwise attribute the disagreement at its actual size.
+Missing support is **insufficient**, not **false**. A confirmed counterexample may refute a
+universal claim without settling every alternative formulation.
 
-## Immersion requirements
+After integration, compare the final draft to the reviewed version. Any factual alteration
+invalidates the affected assessment until rechecked. Keep the evidence map and findings
+outside public prose; don't publish editing instructions or session history.
 
-A chapter is a place the reader stands, not a summary they receive. The
-binding craft rules are `docs/content/neo-voice.md` (Part III: era structure,
-second-person cold open, the rule in force quoted verbatim, measured odds,
-jump-cut; Part II/IV: specific person, specific hour; prose builds stakes,
-data delivers the verdict; register; disputes in prose; one earned
-flourish). Two additions this document makes binding:
+## 4. What the machine checks do and do not prove
 
-1. **Events get buildup, not verdicts.** An event narrated in a chapter
-   shows its sequence — what was ordinary the day before, what triggered it,
-   what happened hour by hour — using only sourced detail. "Over two days,
-   white rioters burned it down" is a verdict; the trigger, the crowd, and
-   the first fire are the story, and each of those beats must be sourced
-   under the protocol above.
-2. **Minimum 2,000 words of body prose** per published chapter, enforced as
-   a hard gate in `articles.ts` (`gateProseWordFloor`). Depth comes from
-   sourced detail, never from padding; if a chapter cannot reach the floor
-   with validated material, it needs more research, not more adjectives.
+`assessPublicationClaims` in `packages/ops-data/scripts/lib/confidence.ts` matches structured
+claims to exact reviewed assessments. Its input has `id` and `claims`, not summary or
+historical context. It does **not** certify all public prose. Record prose review separately
+with the exact revision; runtime enforcement of that binding remains a distinct engineering
+control, not a capability this document pretends to add.
 
-## Editorial hygiene: the applied draft is the published artifact, not an edit log
+Article validation checks schema, references, source tiers, packet binding and other
+format-specific gates in `packages/ops-data/scripts/articles.ts`. Numerical reference
+integrity is not proof that a sentence uses a number correctly or that the underlying
+measurement is true. Narrative entailment still needs review.
 
-A chapter draft (`articles.ts pull` → `packages/ops-data/drafts/*.article.json`,
-applied back with `articles.ts apply`) becomes the content a reader sees once
-it ships — it is not a private workspace. Do not leave notes narrating what
-changed and why between drafts inside the article document itself. That
-reasoning is genuinely useful during editing, but it belongs in the session's
-record of the change (the review findings, the issue), not in the document
-that is itself the product.
+Chapter-kind content currently has a 2,000-word floor. Do not manufacture scenes, detail
+or conclusions to meet it. Use an appropriate shorter format or review the format constraint.
+Run current gates without bypasses, then prepare the preview for the separate publication role.
 
-## What this document does not change
+## 5. Correction after publication
 
-Causal language stays governed by
-`docs/methodology/juxtaposition-not-causation.md` and the packet
-`method_stance`; naming, agency, and uncertainty vocabulary stay governed by
-`docs/methodology/scholarship-principles.md`; the packet data contract stays
-`packages/domain/src/statistics/theme-impact-packet.ts`. A better-sourced
-scene never licenses a causal claim the packet stance doesn't gate.
+Retain the false wording, field, entity/release ID, counterevidence and proposed correction
+in the review record. Find derivatives: summary/context, claims, inclusion basis, era/place
+provenance, search cards, article references and cached release artifacts. Correct through
+the authorized review/publication path; do not silently rewrite only the visible sentence.
+Use `blackstory-surface-triage` to verify database, artifact and actual rendered output after
+publication. Until then report “correction proposed,” not “fixed.”
+
+## Method foundations
+
+Sources inspected 2026-10-07; these support the method, not a claim that BlackStory has
+been externally certified:
+
+- [American Historical Association, Standards of Professional Conduct](https://www.historians.org/resource/statement-on-standards-of-professional-conduct/): critical scrutiny of primary and secondary evidence, transparent citation and honest limits.
+- [Digital Inquiry Group, lateral-reading research](https://misinforeview.hks.harvard.edu/article/lateral-reading-college-students-learn-to-critically-evaluate-internet-sources-in-an-online-course/): investigate the source and trace information outside the page being evaluated. Its findings do not calibrate this model's accuracy.
+- [Oral History Association, Principles and Best Practices](https://oralhistory.org/principles-and-best-practices-revised-2018/): attend to narrators, communities, power and the conditions in which testimony is produced and used.
+
+Related: [research framework](../research/README.md), [citation standard](../research/citation-standard.md),
+[voice](../content/neo-voice.md), [juxtaposition and causation](./juxtaposition-not-causation.md),
+[scholarship principles](./scholarship-principles.md), and
+[evaluation limits](../research/gold-corpus.md).

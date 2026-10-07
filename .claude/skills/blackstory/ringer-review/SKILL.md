@@ -1,93 +1,64 @@
 ---
 name: blackstory-ringer-review
-description: Adversarial red-team review of a chapter or long-form piece before publication. Use when a draft is ready to ship, when asked to stress-test prose against hostile readings, bad-faith fact-checks, or context-stripped clips, or when deciding whether a contested claim survives contact with credentialed critics.
+description: Challenge BlackStory entity copy, stories and standalone factual artifacts before publication or during an accuracy audit. Use to seek counterevidence, test interpretations and find misleading omissions. Review never grants publication authority.
 ---
 
 # Ringer review
 
-Judgment playbook. The evidence base is
-[`docs/research/ringer-attack-taxonomy.md`](../../../../docs/research/ringer-attack-taxonomy.md):
-which attacks on comparable published work (the 1619 Project, NMAAHC, others) landed,
-which bounced, and why. Read it once before the first review; tag findings with its
-attack codes (A1–A13).
+The aim is to find what would make the work wrong or misleading. A critic's politics,
+sympathy or credentials neither validate nor invalidate their evidence. Read the exact
+draft and its evidence, not only the writer's explanation of it. For contested longform,
+the [attack taxonomy](../../../../docs/research/ringer-attack-taxonomy.md) provides
+historical examples, not a requirement to optimize history for hostile media.
 
-**Authority rule.** The ringer's correction-forcing findings are hard blockers. The
-drafter fixes them or escalates to a human; the drafter never overrules them. The most
-damaging story about comparable work was not the error itself, it was "their own
-fact-checker was ignored" (A3). This skill exists so that story can never be told
-about this project.
+## Challenge all six questions
 
-**Weighting.** Spend roughly 80% of the pass hardening individual factual claims
-against a credentialed skeptic, 20% anticipating the clip. Rhetorical attacks bounce
-off well-sourced work; a single unsupported superlative does not.
+Scale the work to the artifact: a short record gets a compact claim-by-claim pass;
+a chapter also needs structure, statistics and interpretation review. These are
+review lenses, not six required agents or paid model runs.
 
-## The six chairs
+1. **Identity and scope:** wrong namesake, lost qualifier, anachronism, conflated
+   date or credential? Try the strongest plausible counterexample to every superlative.
+2. **Evidence:** does the exact passage support the assertion? Is it independently
+   established, copied, contested or merely mentioned? Check source fallibility and
+   later corrections. A government page can contain an error.
+3. **Alternative account:** what is the strongest evidence against the thesis? What
+   was left out? Does selection of an uplifting ending hide an unresolved outcome?
+4. **Inference:** where did association become cause, testimony become settled fact,
+   archival silence become absence, or a place anchor become a precise historical site?
+5. **Reader and represented people:** who bears the cost of a mistake? Check living
+   people, privacy, dignity, attribution, community evidence and condescension.
+6. **Standalone meaning:** read the title, card, summary, caption, chart and mobile
+   excerpt without the article. Do they still carry the qualifiers needed to be true?
 
-Run all six against the full draft. One pass, tagged findings.
+For each finding record the passage, evidence, strongest defense, verdict and smallest
+fix. Use **correction-forcing** for factual or materially misleading claims; **craft**
+for clarity improvements; **unsupported objection** when the criticism lacks evidence.
+Do not manufacture disagreement or give a weak objection equal weight to strong evidence.
 
-| Chair | Simulates | Core question |
-|---|---|---|
-| The Historian | credentialed specialists in the subfield | Which sentence would a specialist write a public letter about? Which would our own fact-checker flag? (A1, A2, A3) |
-| The Producer | hostile-cable segment booker | What are the three most quotable 12-second extracts, read without their surrounding paragraph? (A11) |
-| The Opposition Researcher | professional label-attacher | What label attaches here? Which phrase gets recodified? Which affiliation or source becomes the story? (A5, A8) |
-| The Literalist | bad-faith fact-check desk | Which word is technically imprecise enough to score "Mostly False"? Every superlative, number, date, and "banned"-class verb. (A4, A10) |
-| The Legislator | divisive-concepts drafter | Which sentence gets read aloud in committee as the reason to restrict this? Does it accuse living individuals, or document systems? (A6) |
-| The Sympathetic Reader | the audience we actually want | Where does the prose ask me to feel something the evidence has not yet earned? Where does it talk down to me? |
+## Release bar
 
-## Scoring
+- No unresolved correction-forcing finding in the proposed public text.
+- All factual clauses mapped to evidence under the
+  [fact protocol](../../../../docs/methodology/chapter-fact-validation.md), including
+  source fitness, lineage, significant contradictions and exact scope.
+- Primary evidence inspected where accessible and relevant; fit scholarship may
+  carry synthesis. A blanket primary-source-only rule can erase valid history.
+- Quotes, statistics and superlatives traced to a work that supports them. Name
+  denominator, period, population and uncertainty where they affect meaning.
+- Interpretations identified and defensible; no forced false balance or attribution
+  used to retain a known error. No correction hidden behind a low confidence grade.
+- Revised text checked again. Approval of the previous version does not transfer
+  automatically to a new date, qualifier, source or narrative assertion.
 
-Every finding carries two labels.
+## Output and independence
 
-**Severity:**
+Return **ready for publication-role review / revise / hold**, findings and dispositions,
+draft revision, evidence inspected and limits. Record whether this was self-review or
+an independent review. Repeating a prompt or changing a model does not establish
+independence of sources or reviewers. Request a separate reviewer for unresolved or
+consequential disputed claims; do not claim one ran when none did.
 
-- `correction-forcing` — would force a public change if found after publication.
-  Hard-fail; the chapter does not ship with one open.
-- `clip-friendly` — survives scrutiny but travels badly out of context. Log it with a
-  prepared one-paragraph response; rewrite only if the fix costs nothing true.
-- `bounces` — hostile framing with no factual purchase. No action. Named so nobody
-  mistakes it for a real finding.
-
-**Fix:** `strike` / `qualify` / `source` / `hold-with-response`.
-
-## The bar
-
-All nine, or the chapter does not ship:
-
-1. Zero `correction-forcing` findings open.
-2. Every factual claim resolves to a primary source, or is explicitly written as
-   contested with the dispute shown in prose (`docs/content/neo-voice.md` Part V).
-3. Every superlative ("first," "only," "largest," "never," "no one") has a source that
-   itself makes the superlative claim, or is cut. Same bar as
-   [`blackstory-claim-corroborate`](../claim-corroborate/SKILL.md).
-4. Every interpretive claim is grammatically marked as a reading; the strongest
-   opposing reading of contested evidence is named (claim typing,
-   `docs/content/neo-voice.md`).
-5. Every quote carries provenance the apparatus can show: repository, record group,
-   page, or the published document itself.
-6. Every statistic is traced past its most recent repeater to its origin (SIFT
-   lateral-reading rule). A number quoted from a book that quoted a paper cites the
-   paper, and the dispute about the paper if one exists (A4).
-7. Every standalone extractable artifact (chart, list, pullquote, image caption) is
-   independently defensible with zero surrounding prose (A7).
-8. The two or three likeliest attacks on this specific chapter are prebunked in the
-   text or its method notes: the counter-document quoted, the counter-reading named
-   and answered first.
-9. Every `clip-friendly` finding is logged with its prepared response.
-
-## The line the ringer does not cross
-
-The ringer hardens evidence; it never softens framing. A6 (divisive), A13
-(grievance-industry), and the recodified label (A5) are unappeasable by design; their
-authors have said so on the record. Chasing their approval costs the work its reason
-to exist and buys nothing. Give up every unsupported adjective without a fight; give
-up nothing on the moral seriousness of the subject or on truthful, sourced claims
-that hostile media will dislike. If a finding's only justification is "this will
-anger people who cannot be satisfied," it is `bounces`, and it closes without a
-change.
-
-## Output
-
-A findings table (chair, attack code, quoted sentence, severity, fix, proposed
-rewrite where fix is not `strike`), the clip log with prepared responses, and an
-explicit verdict: **ship / fix-then-ship / hold**. File the findings with the draft;
-the log is part of the chapter's record.
+Publication-role separation still applies. No research agent can approve its own
+release. Truthful claims need not be weakened to avoid controversy; unsupported claims
+must not survive because they fit the project's purpose.

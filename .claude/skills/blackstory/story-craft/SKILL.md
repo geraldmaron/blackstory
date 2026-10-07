@@ -13,3 +13,7 @@ carries no command detail of its own.
 
 For a lighter-weight prose draft on a single subject, see `prose-run`
 (`blackstory-editorial-enrichment` / same doc, `#editorial-enrichment` section).
+
+Narrative decisions and review use `blackstory-neo-voice`, `blackstory-prose-review`
+and `blackstory-ringer-review`. Packet validation does not verify every sentence or
+license invented scenes and compulsory narrative arcs.

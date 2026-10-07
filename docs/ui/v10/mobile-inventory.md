@@ -1,43 +1,27 @@
-# v10 mobile inventory
+# Mobile inventory: current entry points
 
-**Status:** source-validated (2026-08-31).  
-**Parent:** [`../design-direction-v10.md`](../design-direction-v10.md).  
-**Audit:** [Mobile + filter inventory](4e28c3af-2658-413d-b1c4-b68e77073a8f).
+Source inspection: 2026-10-07. This replaces the old v10 snapshot's History and `/learn`
+tab directions. Read the implementation when changing routes; this file is an orientation
+record, not an independent navigation registry.
 
-## Tabs
+| Question                                              | Maintained source                                                                                                 |
+| ----------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------- |
+| Tabs and More rows                                    | `apps/mobile/src/shell/mobile-nav.ts`                                                                             |
+| Shared destination names, canonical paths and aliases | `packages/public-contracts` destination catalog                                                                   |
+| Registered native screens                             | `apps/mobile/src/app/`                                                                                            |
+| Mobile treatment and sheet guidance                   | [`../design-direction-v6-mobile.md`](../design-direction-v6-mobile.md), subject to the current navigation catalog |
+| Verification                                          | `apps/mobile/README.md`                                                                                           |
 
-| Tab | Route | Web peer | Disposition |
-|---|---|---|---|
-| Explore | `/explore` | Explore `/explore` | Keep; sync DiscoveryState vocabulary |
-| History | `/history` | Records `/records` (+ legacy history redirect) | Keep as find-in-time; expand facets toward Records |
-| Stories | `/learn` | Stories `/stories` | Keep Stories label; optional `/stories` alias later |
-| More | `/more` | Rooms `/rooms` | Keep as overflow; optional Rooms rename |
-| Legacy Search | `/search` → `/history` | `/search` → `/records` | Keep deep-link redirect |
+The inspected primary tabs are Explore, Stories, Records and More. Legacy `/history`
+and `/search` normalize to `/records`; `/learn` normalizes to `/stories`. Web `/rooms`
+lands at native `/more`. A More row without a native route opens its explicit web target.
+Don't reproduce the old History/Stories/More information architecture from a dated mockup.
 
-## Rest / Engaged
+Share discovery vocabulary, record meaning, evidence/precision honesty and public access
+across platforms. Adapt layout and interaction to the platform. A desktop map panel is
+not automatically a usable phone sheet. Filter coverage and current screen behavior need
+inspection and task testing, not inference from a shared type or old inventory.
 
-Mobile still uses cinematic Rest→Invite→Engaged (`cinematic-map-state.ts`). Web Door uses HTML pin plate + reading chrome; web Instrument is `/explore`. Do not shrink desktop map panels onto mobile; keep bottom-sheet patterns.
-
-## Terminology drift to close
-
-| Concept | Web | Mobile | Unify toward |
-|---|---|---|---|
-| Map instrument | Explore | Explore | Explore (copy) |
-| Entity index | Records | History | Records / find-in-time |
-| Topic | `topic` / Explore `theme` | `theme` | DiscoveryState `topic` (URL alias `theme` on Explore) |
-| Evidence | Records `evidence` → Explore `floor` | `confidence` only | Floor + separate exact tier |
-
-## Filters
-
-Mobile Explore mirrors Explore pin filters (kind, era, tone, theme, status, confidence, state). History search is primarily `q` + raw kind. Books/Law/Themes/Memorial use local filters.
-
-## Themes native
-
-Web `/themes` redirects to `/stories`. Mobile `/themes` still ships. Park or fold into Stories collections in P2.
-
-## Shared with web (required)
-
-- DiscoveryState semantics (not literal layouts)
-- Evidence honesty / nearby ≠ related
-- Memorial dignity (names list; no gamification)
-- Public access without account
+Use the [experience review](../README.md#task-based-experience-review) for large text,
+assistive technology, back/restore behavior, network failure and native/web handoffs.
+This source inspection does not assert that those interactions passed device testing.

@@ -30,8 +30,9 @@ search:
 4. **Counter-evidence that narrows it.** Usually: the same record's entity page is correct. That
    one observation converts "data is missing" into "a writer or reader is dropping it" and skips
    an entire research detour.
-5. **Authority and done.** May you change code? Write `published`? Is done the merged fix, the
-   repaired rows, or the live page? Ask once, up front. Finding out mid-task costs a stall.
+5. **Authority and done.** Identify whether authorization covers code, published rows or
+   activation, and whether done means a proposed fix or the verified live page. Reuse explicit
+   session authorization; ask only for a consequential action not already covered.
 
 ## Decision order
 
@@ -39,13 +40,14 @@ Work outward from the data. Stop at the first layer that is wrong.
 
 1. **Is it in the projection?** Query `release_entities.projection` for the field, joined to
    `active_release`. If it is absent here, this is a research or publish-gate problem and the
-   surface is telling the truth. Stop.
+   surface may be faithfully displaying incomplete data. Route the missing fact to research;
+   do not infer historical truth from agreement between database and page.
 2. **Is it in the search doc?** Query `search_index` for the same records. **Measure per kind,
    across the whole release.** A kind sitting at 0% while its neighbors sit near 100% names the
    writer immediately: that cohort published through a path the others did not.
 3. **Which half of the search row?** `search_index` has real columns (name, kind, status, topics,
    aliases, geohash, related_count, claim_count) and a `facets` jsonb blob. A field with no
-   column exists *only* in `facets`, and `upsertSearchIndex` writes `facets = EXCLUDED.facets`,
+   column exists _only_ in `facets`, and `upsertSearchIndex` writes `facets = EXCLUDED.facets`,
    a whole-object replace. A key a writer omits is therefore deleted from every row it touches
    again, silently, because `mapPostgresSearchIndexRow` defaults an absent facet instead of
    rejecting the row.
@@ -61,14 +63,14 @@ Work outward from the data. Stop at the first layer that is wrong.
    database. The staleness guard only checks that the artifact's `releaseId` matches the live
    active-release pointer — and an in-place backfill does not change the release id, so a stale
    artifact passes that check and keeps serving. **Any ops-data backfill must be followed by a
-   local run of `publish-release-catalog-artifacts.ts` (see CLAUDE.md). Do not dispatch the
-   workflow afterwards, and do not wait for a daily tick — that schedule is off as of
-   2026-09-16.** Verify the artifact itself, not just the database:
+   authorized run of `publish-release-catalog-artifacts.ts` under the current publication
+   contract in CLAUDE.md. Do not dispatch a redundant workflow or assume a schedule will
+   repair it.** Verify the artifact itself, not just the database:
    `…/storage/v1/object/public/public-media/public/releases/{releaseId}/search-index.json`.
 6. **Is the page just stale?** Only after the artifact is confirmed current. `release-scoped-cache.ts`
    holds release-wide reads for 30 minutes and does not watch the database, so a correct fix shows
    an unchanged page for up to half an hour after the artifact republishes. Note this is a
-   *second* layer, not an alternative explanation to the artifact one — reaching for it first is
+   _second_ layer, not an alternative explanation to the artifact one — reaching for it first is
    how you end up waiting half an hour for a cache that was never the problem.
 
 ## Verify below the cache
@@ -91,40 +93,26 @@ Prefer a **facet copy from the projection** over a republish. The projection is 
 so a copy needs no builder run and cannot alter prose, claims, status, or geometry; a republish
 rebuilds all of it to fix a facet. `backfill-search-facets-projection.ts` takes `FACET_KEYS` and
 `KIND` and carries the guardrails; the four single-key siblings predate it. Whichever you run,
-the job is not finished when the rows are written — dispatch the catalog-artifact workflow, or
-production keeps serving the pre-backfill snapshot.
+the job is not finished when the rows are written. Follow the catalog-artifact publication
+path in step 5, then verify the artifact and live surface. Database repair alone is not a
+verified public correction.
 
 Every one of these scripts rests on the drift being **one-directional** — the projection set, the
 facet empty, and nothing set on both sides that disagrees. That is not a formality. Verify it per
-key on the population you intend to touch. `notabilityBasis` and `notabilityLabels` each have 52
-rows where both sides are set and disagree, which is 52 records disagreeing about why they are in
-the archive. Picking a winner there is an editorial ruling, not a data sync.
+key on the population you intend to touch. When both sides hold materially different values,
+compare evidence and publication revision before selecting either one. The projection is not
+inherently true merely because it is populated.
 
-## Test containment before calling anything a conflict
+## Distinguish stale subsets from conflicting assertions
 
-A repair script reporting N rows where "both sides are set and disagree" is not N editorial
-decisions, and should not be escalated as one. Sort the pile first, because most of it usually is
-not a disagreement:
-
-1. **Is the facet a strict subset of the projection?** Compare the arrays as sets. A facet
-   contained in the projection is a stale snapshot, not a conflict: the projection gained entries
-   and the facet never got them. Of 52 reviewed on 2026-09-10, 48 label and 45 basis conflicts
-   were pure containment. Nothing to weigh.
-2. **Is each true orphan evidenced?** An inclusion basis carrying `evidenceIds: []` does not get
-   synced forward whatever it says, because publishing an unevidenced basis is what the notability
-   gate exists to stop. Then check whether the projection already covers the same criterion *with*
-   evidence. Four of seven did, which makes them richer prose with no source, not lost substance.
-3. **Research what survives.** Two orphans held substance the projection genuinely lacked, about
-   people whose records were the poorer for it. That is a research task with a source ladder, not
-   a sync flag: restore it through the enrichment ledger with evidence attached, and let the sync
-   do the boring thing.
-4. **Check scope, not only truth.** One orphan was true and still wrong to publish: it stated as
-   fact a causal claim the primary source attributes to activists' own retrospective testimony.
-   That people said it is documented; that the source asserts it is not. Same discipline the
-   invention cohort applies when it declines to say Latimer invented the light bulb.
-
-The residue after that filter is usually one or two records and an afternoon of reading. Escalate
-that, not the raw count.
+1. Compare arrays as sets. A strict subset is a candidate stale snapshot; verify which
+   reviewed revision is current before copying it. A larger set may contain unsupported data.
+2. Check evidence for every added inclusion basis. Empty `evidenceIds` is an evidence gap;
+   do not synchronize it into a new surface merely to eliminate drift.
+3. Research true differences. Distinguish a missing supported assertion from a richer but
+   unsupported formulation, an altered qualifier or testimony presented as settled fact.
+4. Measure the current population and keep the query/result with the repair. Counts from an
+   old incident are examples, not evidence about today's release.
 
 ## Do / Never
 
@@ -140,6 +128,7 @@ that, not the raw count.
 - **Never** write `''` where a value is absent. An empty string satisfies the reader's
   `typeof === 'string'` check and publishes a blank over a value some earlier pass got right.
   Omit the key.
-- **Never** report the live page as proof while the 30-minute TTL is open, and never explain a
-  stale page by that TTL until you have confirmed the CDN artifact is current. The TTL is the
-  explanation that sounds right and is usually second in line.
+- **Never** infer that all readers see a fix from one fresh response. Verify the artifact,
+  release identity and relevant cache behavior; report any cache window still outstanding.
+- For interaction, accessibility or mobile usability defects, use `blackstory-experience-review`;
+  agreement between data layers does not prove an interface is usable.

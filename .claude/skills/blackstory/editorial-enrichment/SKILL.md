@@ -12,3 +12,7 @@ Read that section before running `editorial-run`, `enrichment-run`, `backfill-en
 
 Citation weight, Wikipedia, and superlatives are `blackstory-claim-corroborate`. Filling
 blank public-record fields is `blackstory-entity-complete`.
+
+Drafting and final-copy review use `blackstory-neo-voice`, `blackstory-prose-review` and
+`blackstory-ringer-review`, including short entity copy. A staged packet or attached
+citation is not a factual or editorial pass.
