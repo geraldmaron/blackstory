@@ -66,8 +66,11 @@ If the correction leaves the actual graph inputs unchanged, record that verified
 preserve the existing graph while tracking the separate defect.
 
 After publication, verify public artifact content against the approved revision, then each
-affected live page, including redirects and cache layers. A successful write, matching release
-ID or one fresh page does not establish that all readers have received the correction. Name
+affected live page, including redirects and cache layers. Check the citation the reader can
+actually open: the first source in a review packet may support only part of a compound claim.
+Split assertions when the public contract exposes one citation per claim; preserve the reviewed
+facts and record the presentation change. A successful write, matching release ID or one fresh
+page does not establish that all readers have received the correction. Name
 any stale page, failed purge or unapplied code deployment in the result.
 
 ## Geo

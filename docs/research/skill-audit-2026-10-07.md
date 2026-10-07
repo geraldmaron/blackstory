@@ -38,7 +38,7 @@ and publication-role review alongside the rest of each record.
 | Russell, historical context                  | Playing and coaching careers both spent with Boston | Coaching also included Seattle and Sacramento. Remove the Boston-only career assertion.                                                                                                 | [NBA biography](https://www.nba.com/news/history-nba-legend-bill-russell)                                                                                                              |
 | `ent_autherine_lucy_ua_001`, summary         | 1955 Brown decision outlawed segregation            | The merits decision was May 17, 1954. Distinguish it from Brown II's 1955 remedial ruling.                                                                                              | [National Archives opinion transcript](https://www.archives.gov/milestone-documents/brown-v-board-of-education), decision/date                                                         |
 | Lucy, historical context                     | Expulsion rescinded in 1980                         | Use April 1988.                                                                                                                                                                         | [University of Alabama marker transcription](https://adhc.lib.ua.edu/adhc-omekaS/s/historicalmarkers/item/20), expulsion-reversal passage                                              |
-| `ent_carl_stokes_001`, summary/claim/context | Took office January 1, 1968; same day as Hatcher    | Sworn November 13, 1967. Remove the unsupported same-day comparison.                                                                                                                    | [Congressional Record, September 23, 1997](https://www.govinfo.gov/content/pkg/CREC-1997-09-23/pdf/CREC-1997-09-23.pdf), printed H7588 (PDF page 27)                                   |
+| `ent_carl_stokes_001`, summary/claim/context | Took office January 1, 1968; same day as Hatcher    | Sworn November 13, 1967. Remove the unsupported same-day comparison.                                                                                                                    | [Congressional Record, September 23, 1997](https://www.govinfo.gov/content/pkg/CREC-1997-09-23/pdf/CREC-1997-09-23.pdf), printed H7633 (PDF page 27)                                   |
 | `disc_golden_thirteen_q5579862`, summary     | Thirteen graduates received commissions             | Twelve commissioned ensigns and one warrant officer. Preserve the distinction between officers and commissions.                                                                         | [US Naval Institute oral history](https://www.usni.org/magazines/proceedings/1987/may/oral-history-golden-thirteen), introduction distinguishing twelve and one                        |
 | `ent_bessie_coleman_001`, summary/claim      | First Black American to hold a pilot's license      | False at that broad scope: Bullard was a qualified pilot earlier. Retain the verified Black-woman distinction; investigate international/civil/military credential priority separately. | [US Air Force history of Eugene Bullard](https://www.af.mil/News/Article/111762/first-african-american-pilot-a-war-hero-during-wwi/), license and pre-August-1917 service chronology   |
 | `ent_david_blackwell_001`, summary           | First Black tenured Berkeley professor in 1954      | Conflates arrival/visiting appointment with full appointment. Distinguish visiting in 1954 from full professor in 1955.                                                                 | [Berkeley Statistics history](https://statistics.berkeley.edu/about/history) and [Berkeley obituary](https://news.berkeley.edu/2010/07/15/blackwell/), detailed appointment chronology |
@@ -252,3 +252,247 @@ staged symlink was accepted. No bypass flag was used.
 Commit-and-pr: the staged diff was reviewed as one portability change, with no secrets or
 application runtime behavior changes; it continues on `codex/research-skill-hardening`. No PR was opened.
 The user's project completion instructions authorize commit and push.
+
+## Applying the skills: review and update pass
+
+Status at preview: local code repairs and correction proposals prepared. The authorized
+publication outcome is recorded below.
+This follow-up applies claim corroboration, voice, prose review, ringer review, surface triage,
+experience review and publication preview to the six cases and two observed interface defects.
+It does not recertify the rest of the catalog or unchanged fields on these records.
+
+The [correction packet](entity-corrections-2026-10-07.json) contains exact proposed summaries,
+contexts, targeted claim edits and inclusion bases. It preserves the observed before material,
+SHA-256 revision hashes, fourteen opened source records with passage locators and lineage
+limitations, and character spans covering every sentence of the proposed prose. Inclusion
+notes link to the edited claims. The packet is a review record, not executable operator input,
+a persisted evidence assignment, or approval. Review was performed in this same session;
+there was no independent reviewer or blind evaluation.
+
+Additional findings from the closer pass:
+
+- Russell's firstness needs NBA scope. Fritz Pollard's 1921 coaching is a counterexample to
+  the broader major-professional-league claim. The draft also drops an unsupported ranking
+  of surviving sites.
+- Lucy's canonical context contains an unsupported scholarly-consensus superlative. The
+  proposal removes it. December 1991 completion of degree requirements does not disprove
+  a 1992 conferral. The draft preserves that distinction.
+- The Stokes Congressional Record locator in this audit was wrong: the passage is printed
+  **H7633**, PDF page 27, not H7588. The table above is corrected. The vote-share claim also
+  needs a predicate that describes the election rather than asserting firstness.
+- Coleman died during a practice flight, not a public exhibition. The draft removes the
+  unverified grave-visit ranking and exclusive-funding implication while preserving the
+  narrower woman distinction.
+- Golden Thirteen's released inclusion basis adds site-classification rows absent from the
+  canonical basis. Its status history begins in 1919 with stale claim IDs, and the page treats
+  the group as a visitable, operating place. Blackwell's campus label and coordinates need a
+  separate sourced consistency check. These remain release blockers where applicable;
+  neither was silently repaired in a renderer.
+
+Read-only refresh at 2026-10-07T22:52:28.275Z inspected six canonical rows, fourteen current
+claims, six release rows, six search rows and two landscape payloads. A second read-only
+transaction at 2026-10-07T23:06:50.838Z searched authoring and active-release articles by each
+full name and ID, inspected six enrichment rows and joined current claim evidence. Both read
+`rel_20260918_dunbar_media_correction_001`. No matching article was found; alias-only or unnamed
+mentions are outside that search. All fourteen linked evidence rows had null excerpts and
+metadata reporting no source capture; no current evidence-selector assignment was found.
+This does not rule out separately stored captures. Five enrichment rows had `meets_bar`
+triage outcomes despite the confirmed errors. Lucy's stored enrichment draft repeats the
+wrong Brown and expulsion dates. These records demonstrate why a content-shape check or a
+citation link cannot be treated as factual verification.
+
+The packet preserves those derivative observations. It requires a correction disposition on
+the enrichment ledger, exact persisted evidence and separate review before publication;
+historical drafts and erroneous source quotations must remain identifiable as provenance.
+It also names the release/search/artifact/cache checks that have not yet occurred.
+
+Local interface repairs:
+
+- The corrections page reads and bounds the incoming target, passes the target/type to the
+  form, resolves a recognizable record name and survives lookup errors. Direct entry stays
+  blank; the reference remains editable. The obsolete description reference was removed.
+- Both record renderers preserve the stored inclusion note and evidence assignments. Missing
+  explanations are disclosed, rather than replaced by a general criterion. Snapshot search
+  also stops inventing a criterion or evidence links. Its seed decisions are explicit fixture
+  metadata; two unestablished links remain empty. Those fixtures are not recertified history.
+- Public rubric definitions use reader-facing language and remove implementation history.
+  The existing shared explanation component is reused; no new visual system or dependency
+  was introduced. The record-page pattern documents both behaviors.
+
+Strongest failure mode: correcting a renderer can make an unchanged bad record appear more
+credible. The alternative is to hide every imperfect record until a full review. Decision:
+**accepted with controls** for these code changes. Preserve evidence gaps, keep the incorrect
+stored classification visible to the reviewer, and hold factual publication separately. The
+shared content-warning and coverage heuristics were not independently validated by this pass.
+The test-fixture search corpus now uses explicit metadata; empty evidence links stay empty.
+
+Local browser verification followed the real Golden Thirteen correction link using the
+current released payload. At 390×844 in light and dark themes, the form contained the actual
+record ID and linked name; viewport and scroll widths both measured 390. The focused field
+was visually inspected. Direct entry had a blank target. The place page displayed stored
+inclusion notes and citation links without the internal fallback-history wording. A 1280×900
+viewport was inspected while changing theme; this was not a comprehensive desktop audit.
+The viewport override was reset and the original dark theme restored. No form was submitted.
+Native Release, screen-reader operation, text enlargement, offline recovery and performance
+were not validated. The local browser check does not establish that the fixes are deployed.
+
+Prose review: **pass for the exact proposed prose**, with evidence/lineage limits in the packet.
+Ringer/publication preview: **hold for full-record publication**, because unchanged claims,
+location/status findings, capture assignments and separate review remain outstanding. No
+production record, approval, active release, cloud artifact or cache had changed at that preview.
+The subsequent user authorization and scoped writes are recorded below.
+
+Validation for this follow-up:
+
+- `fnm exec --using=22 -- ./scripts/ci-local.sh` passed install, package tests,
+  contract/security/accessibility, coverage, build/typecheck, end-to-end, governance and
+  security-policy lanes. Validation and app tests initially failed on packet formatting and
+  a fixture assumption after earlier lint/type/test failures were fixed.
+- `fnm exec --using=22 -- ./scripts/ci-local.sh --lane validate --lane unit-js-apps`
+  then passed both remaining lanes. The web suite reported 2,677 passes, zero failures and
+  four skips. Mobile and Python lanes were not selected for this diff; remote ruleset
+  verification was explicitly skipped by the script. The repository's end-to-end lane is
+  not a substitute for the separate browser checks above.
+- JSON verification recomputed all twelve before/proposed hashes, checked source references,
+  and proved that the evidence spans cover the entire proposed summary/context text.
+  These checks prove packet integrity and coverage, not historical truth.
+- Fixed the case-drafting reference's obsolete `@blap/domain` import to the actual
+  `@repo/domain` package and executed the import to verify both named functions resolve.
+- Forced formatting of the touched Markdown and ordinary JSON formatting passed.
+  `git diff --check` passed.
+
+Follow-through: `repo-7aru8` is closed for the locally verified correction handoff.
+`repo-lmhel` retains native/deployment follow-through; `repo-bx2d7` retains publication and
+persisted-evidence work. `repo-mqlvj` records the newly observed status/place questions.
+The existing exact-prose gate and unseen-evaluation work remains in `repo-zg87h`.
+
+Pre-authorization commit record: intended commit scopes were correction handoff, inclusion
+evidence presentation, and the research review record. The research staged diff and remaining
+code diffs were read; no secrets were found. The branch is `codex/research-skill-hardening`;
+commit/push is authorized by the project session-completion instructions. Two commit attempts
+passed pre-commit checks but failed because the configured 1Password SSH signer returned an
+error. No commit was created or pushed in this follow-up. Signing was not disabled. At that point,
+research changes were staged and code changes remained in the working tree for separate commits.
+No pull request had been opened, and publication and deployment were outstanding.
+
+## Authorized factual corrections and publication
+
+The user explicitly approved the reviewed data changes for publication. The six exact
+proposal hashes remain unchanged. This authorized corrections to existing public records;
+it did not certify the whole catalog or the untouched fields. The packet's `publication`
+section preserves the application receipt, source retrieval outcomes and verification results.
+
+The guarded correction transaction committed at 2026-10-07T23:28:04.416Z, after a fresh
+no-drift read and successful write-and-rollback rehearsal. It appended eight claim versions,
+eleven supporting evidence links and eight supersession records; old claim versions remain.
+Canonical prose/bases, release projections/generated columns, search facets and two applicable
+landscape records were reconciled. Lucy's obsolete draft was quarantined and moved into
+superseded-draft history. Quoted source errors were preserved in named history fields rather
+than rewritten as quotations. Reader-visible revision dates were subsequently aligned with the
+canonical correction transaction, after live inspection found they still showed older dates.
+
+Thirteen of fourteen safe-fetch attempts produced metadata-only captures. The Congressional
+Record PDF was rejected as `content_type_not_allowed`; its previously inspected H7633 / PDF page 27
+locator remains recorded. No source text was retained or submitted for external archiving.
+The current assignment schema requires calibrated probabilities and lineage-cluster confidence.
+This manual review did not produce those measurements, so no accepted selector assignment or
+calibration value was invented. Qualitative passage review, final-copy mappings and source
+limitations are stored explicitly. Full-record certification remains unclaimed.
+
+The graph dry-run exposed a new failure: 1,092 accepted, published canonical relationships,
+zero canonical relationship-evidence rows, and a proposed graph with zero edges. The current
+public graph contains 1,092 edges. Its audit passes because the relationships are excluded
+before the audit's denominator is formed. Running the rebuild would therefore remove unrelated
+public relationships. That write was withheld. The actual before/after temporal graph inputs
+were computed with the existing builder and have the same SHA-256 digest; entity IDs and
+relationship rows were not changed. Existing graph data was preserved, without claiming its
+missing evidence is resolved. This is tracked in `repo-6h11u`.
+
+The first catalog upload failed with an EPIPE network error after bounded retries. The existing
+publisher then successfully uploaded both artifacts: 4,210 entities and 4,210 search documents,
+zero dropped rows. After the revision-date correction it uploaded the changed entities artifact
+and skipped the unchanged search artifact by content hash. Independent public downloads matched
+all six approved summaries, contexts, changed claims and inclusion bases; final entity revision
+timestamps also matched. No redundant workflow was dispatched.
+
+Browser verification found corrected prose and claims on Russell, Stokes, Golden Thirteen,
+Coleman and Blackwell. Lucy's redirected place page still served its old prose from Cloudflare;
+an HTTP probe at 23:35 UTC returned `cf-cache-status: HIT` and `age: 2085`. Its database and
+public catalog artifact are corrected. The documented cache purge returned HTTP 401. The old
+configured credential was rejected, and a lookup for the current project credential timed out
+awaiting 1Password authorization. The user was asked to unlock/approve that access. Cache purge
+and a fresh Lucy-page verification remain pending; publication is not claimed uniformly fresh.
+
+The shared publication-preview and surface-triage skills now cover these observed failure modes:
+explicitly authorized scoped corrections, honest qualitative evidence, preserved replay history,
+reader-visible revision time, before/after graph comparison and per-page cache verification.
+Their canonical manifests remain under `.agents/skills`, with unchanged relative Claude
+symlinks. No harness-specific instructions or second copies were introduced.
+
+Follow-through is recorded in Beads: `repo-c08gr` for qualitative evidence/selector persistence,
+`repo-xaems` for the public errata projection (currently static seed entries), `repo-mqlvj` for
+Golden Thirteen status/place semantics and Blackwell's map anchor, and `repo-zg87h` for the exact
+final-prose gate and independent evaluation. The public errata feed was not falsely marked as
+updated. The UI repairs are signed commits `ad5414da` and `71e2da68`; production application
+code and native Release behavior are not claimed as deployed or tested by this publication.
+
+Final publication checks:
+
+- `capture-reviewed.mts` reused `captureCitedUrl` and `persistCapture`: thirteen metadata
+  captures and one recorded PDF content-type refusal.
+- `apply-reviewed.mts --dry-run`, `--rehearse`, then `--apply`: exact hashes and baseline
+  checks passed; rehearsal rolled back; apply committed only the scoped corrections.
+- `verify-publication.mts`: canonical/release/search agreement, preserved historical versions,
+  disabled draft replay and unchanged graph inputs passed after the final metadata update.
+- `verify-artifacts.mjs`: both public artifact downloads passed all six-record comparisons;
+  final revision dates matched the correction transaction.
+- The installed skill-creator `validate_skill` checked all 21 canonical manifests, with zero
+  failures. Each Claude symlink resolved to its canonical manifest. This validates structure
+  and shared files, not independent harness execution or historical accuracy.
+- `fnm exec --using=22 -- ./scripts/ci-local.sh --base HEAD --lane validate --lane governance`
+  passed governance; validation was gated off because the remaining diff was documentation.
+  The earlier application/package/build checks above remain the evidence for the unchanged
+  code. Remote ruleset verification was explicitly skipped.
+- Forced Prettier formatting and `git diff --check` passed. No production code deployment,
+  native smoke test, public errata update or successful Cloudflare purge is claimed.
+
+Live source-link verification prompted one further Blackwell correction. The departmental
+history supports his appointment chronology but not Academy firstness; the Berkeley obituary
+supports the appointments and firstness but does not state the 1965 election year. The original
+compound assertion was therefore split: the career/firstness statement now cites the obituary,
+and an added atomic election-year claim cites the Academy's directory. No historical assertion
+was added. The original approved packet and hashes remain intact; the receipt records the
+presentation adjustment, effective wording/hash, new claim ID and superseded intermediate
+version. This avoids presenting the first URL in a multi-source packet as support for all clauses.
+The step passed a rollback rehearsal before application and is included in final artifact checks.
+
+Including this alignment, the pass appended ten claim versions, thirteen supporting links and
+nine supersession records. The department history remains in the prose review's source mapping;
+it is not mislabeled as whole-claim support for Academy firstness. The publication skill now
+requires checking the source link that a reader can actually open and splitting assertions when
+only one citation can be displayed.
+
+Final live-cache check at 23:48 UTC: Blackwell's public HTML still lacked the newly displayed
+Berkeley biography and Academy-directory links and retained the older Updated date. Its final
+artifact, including each primary citation URL, passed verification. This is a second pending
+HTML refresh alongside Lucy, not a failed database correction. The configured Cloudflare item
+is labeled for BlackStory bot rules; it was rejected for cache purge. No credential permissions
+were expanded, and no authentication check was bypassed.
+
+The cache blocker was resolved at 2026-10-07T23:50:57.712Z. A bounded metadata lookup found an
+existing Cloudflare API credential. Its access to the exact `blackstory.app` zone was verified
+before use, and the purge returned HTTP 200 with `success: true`. No credential or permission
+was changed. The earlier 1Password question no longer requires action.
+
+**Final publication result:** all six live pages now show the reviewed summaries and contexts,
+every corrected claim has its expected wording and source link, and the person-record Updated
+fields show 2026-10-07. The two place layouts do not display that field. Redirected Lucy and
+Golden Thirteen pages were verified at their actual public URLs. Both catalog artifacts and
+the database had already passed exact revision checks. The packet retains the failed purge and
+stale-page observations alongside the successful recovery and final browser checks.
+
+The six-record correction issue can be closed. The graph evidence/rebuild defect, qualitative
+selector contract, public errata, untouched place/status questions, exact prose gate, independent
+evaluation and native/deployed-code follow-through remain explicitly open in their own issues.
+These limitations do not erase the verified scoped factual corrections, and the correction pass
+does not certify those separate areas.

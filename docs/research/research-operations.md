@@ -606,7 +606,7 @@ help assembling its claims/evidence/confidence toward the minimum publishable re
 Evaluation is read-only and pure — call the real functions directly against the case record:
 
 ```ts
-import { evaluateEvidenceChecklist, buildResearchCasePreview } from '@blap/domain';
+import { evaluateEvidenceChecklist, buildResearchCasePreview } from '@repo/domain';
 const evaluation = evaluateEvidenceChecklist(caseRecord.checklist);
 ```
 

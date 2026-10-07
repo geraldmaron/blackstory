@@ -1,0 +1,2691 @@
+{
+  "kind": "entity-correction-review-proposal",
+  "revision": 1,
+  "observedAt": "2026-10-07T22:52:28.275Z",
+  "releaseId": "rel_20260918_dunbar_media_correction_001",
+  "status": "approved scoped factual corrections published; all six live pages and both catalog artifacts verified",
+  "reviewer": "session assistant; self-review only",
+  "independentReviewer": null,
+  "hashFormat": "SHA-256 of UTF-8 JSON, keys sorted recursively, compact separators, unescaped Unicode",
+  "sources": [
+    {
+      "id": "russell-coach",
+      "url": "https://www.hoophall.com/hall-of-famers/bill-russell-1",
+      "authorOrCustodian": "Naismith Basketball Hall of Fame",
+      "locator": "Coach biography, paragraphs 1–2; enshrinement field",
+      "fitnessAndLineage": "Institutional biography; explicitly distinguishes appointment and championship components. Shares institutional lineage with the player biography.",
+      "sourceDate": "undated",
+      "access": "opened in this review pass",
+      "retrievedOn": "2026-10-07"
+    },
+    {
+      "id": "russell-player",
+      "url": "https://www.hoophall.com/hall-of-famers/bill-russell",
+      "authorOrCustodian": "Naismith Basketball Hall of Fame",
+      "locator": "Player biography; Enshrined and By the Numbers",
+      "fitnessAndLineage": "Institutional career record; not an independent lineage from the coach page.",
+      "sourceDate": "undated",
+      "access": "opened in this review pass",
+      "retrievedOn": "2026-10-07"
+    },
+    {
+      "id": "russell-later",
+      "url": "https://www.nba.com/news/history-nba-legend-bill-russell",
+      "authorOrCustodian": "NBA",
+      "locator": "Post-retirement coaching paragraphs on Seattle and Sacramento",
+      "fitnessAndLineage": "League retrospective; used only for the short later-coaching sentence. Source response limit: 25 words.",
+      "sourceDate": "undated in this inspection",
+      "access": "opened in this review pass",
+      "retrievedOn": "2026-10-07"
+    },
+    {
+      "id": "pollard",
+      "url": "https://www.profootballhof.com/players/fritz-pollard",
+      "authorOrCustodian": "Pro Football Hall of Fame",
+      "locator": "Career biography, paragraph beginning In 1921; coaching table",
+      "fitnessAndLineage": "Counterexample in a different sport; distinguishes the APFA name from its later NFL name and co-coaching from sole coaching.",
+      "sourceDate": "undated",
+      "access": "opened in this review pass",
+      "retrievedOn": "2026-10-07"
+    },
+    {
+      "id": "lucy-marker",
+      "url": "https://adhc.lib.ua.edu/adhc-omekaS/s/historicalmarkers/item/20",
+      "authorOrCustodian": "University of Alabama Libraries, Campus Historical Markers",
+      "locator": "Autherine Lucy Foster, Transcription",
+      "fitnessAndLineage": "University marker records its own enrollment, suspension, reversal and degree requirements. Commemorative source, not the contemporaneous board minutes.",
+      "sourceDate": "2017 marker",
+      "access": "opened in this review pass",
+      "retrievedOn": "2026-10-07"
+    },
+    {
+      "id": "brown",
+      "url": "https://www.archives.gov/milestone-documents/brown-v-board-of-education",
+      "authorOrCustodian": "National Archives",
+      "locator": "Opinion citation and transcript; introductory paragraphs on Brown II",
+      "fitnessAndLineage": "Custodian provides the judgment date and implementation distinction directly.",
+      "sourceDate": "1954 opinion; 1955 implementation ruling",
+      "access": "opened in this review pass",
+      "retrievedOn": "2026-10-07"
+    },
+    {
+      "id": "stokes-record",
+      "url": "https://www.govinfo.gov/content/pkg/CREC-1997-09-23/pdf/CREC-1997-09-23.pdf",
+      "authorOrCustodian": "Congressional Record, House",
+      "locator": "H7633, PDF page 27 (zero-based page 26), Jackson-Lee statement, paragraph beginning On November 13",
+      "fitnessAndLineage": "Official legislative record of a retrospective tribute, not the inauguration register. Direct date statement; narrow use.",
+      "sourceDate": "1997-09-23",
+      "access": "opened in this review pass",
+      "retrievedOn": "2026-10-07"
+    },
+    {
+      "id": "stokes-history",
+      "url": "https://case.edu/ech/articles/s/stokes-carl-b",
+      "authorOrCustodian": "Encyclopedia of Cleveland History, Case Western Reserve University",
+      "locator": "Biography paragraphs on 1967 victory, reelection and two terms",
+      "fitnessAndLineage": "Local historical synthesis linked to archival collections. Underlying independence from the congressional tribute is unestablished.",
+      "sourceDate": "undated",
+      "access": "opened in this review pass",
+      "retrievedOn": "2026-10-07"
+    },
+    {
+      "id": "golden-oral",
+      "url": "https://www.usni.org/magazines/proceedings/1987/may/oral-history-golden-thirteen",
+      "authorOrCustodian": "U.S. Naval Institute, Proceedings",
+      "locator": "Editorial introduction, paragraphs 1–3; group-photo caption",
+      "fitnessAndLineage": "Introduction to eight participant interviews, conducted October 1986–January 1987. Published HTML warns of uncorrected OCR; numeric distinction is explicit. Do not count the eight interviews as eight verified lineages for this editorial assertion.",
+      "sourceDate": "1987-05",
+      "access": "opened in this review pass",
+      "retrievedOn": "2026-10-07"
+    },
+    {
+      "id": "coleman-mint",
+      "url": "https://www.usmint.gov/news/inside-the-mint/soaring-life-of-pilot-bessie-coleman",
+      "authorOrCustodian": "Amanda Crastz-Flores, U.S. Mint",
+      "locator": "Opening biography; paragraph on Jacksonville; paragraph beginning After being refused",
+      "fitnessAndLineage": "Retrospective commemoration with museum partners. Supports the narrower woman distinction and credential date; partnership means museum-host agreement is not demonstrated independence.",
+      "sourceDate": "2023-03-09",
+      "access": "opened in this review pass",
+      "retrievedOn": "2026-10-07"
+    },
+    {
+      "id": "coleman-museum",
+      "url": "https://www.womenshistory.org/education-resources/biographies/bessie-coleman",
+      "authorOrCustodian": "Marisa Mathias, National Women’s History Museum",
+      "locator": "Flying Across the U.S.; opening paragraph on death during rehearsal",
+      "fitnessAndLineage": "Secondary synthesis cites Doris Rich. Use for exhibition work and flight-school aim; do not inherit its broader and inconsistent international-license superlatives.",
+      "sourceDate": "undated",
+      "access": "opened in this review pass",
+      "retrievedOn": "2026-10-07"
+    },
+    {
+      "id": "blackwell-department",
+      "url": "https://statistics.berkeley.edu/about/history",
+      "authorOrCustodian": "Terry Speed, Jim Pitman and John Rice, UC Berkeley Statistics",
+      "locator": "Early years, paragraph beginning These six Berkeley graduates",
+      "fitnessAndLineage": "Departmental history distinguishes visiting service in 1954–55 from joining the department in 1955; extract from a 2012 paper. Shared institution with obituary, independence not assumed.",
+      "sourceDate": "2012 underlying paper",
+      "access": "opened in this review pass",
+      "retrievedOn": "2026-10-07"
+    },
+    {
+      "id": "blackwell-obituary",
+      "url": "https://news.berkeley.edu/2010/07/15/blackwell/",
+      "authorOrCustodian": "Robert Sanders, Berkeley News",
+      "locator": "Opening biography; Early years, final paragraph; paragraphs on Howard and Rao-Blackwell",
+      "fitnessAndLineage": "Obituary contains a compressed opening that can be misread; detailed chronology identifies the visiting/full distinction. Test the precise passage, not host reputation.",
+      "sourceDate": "2010-07-15",
+      "access": "opened in this review pass",
+      "retrievedOn": "2026-10-07"
+    },
+    {
+      "id": "blackwell-nas",
+      "url": "https://www.nasonline.org/directory-entry/david-h-blackwell-ik48uf/",
+      "authorOrCustodian": "National Academy of Sciences",
+      "locator": "Election Year field",
+      "fitnessAndLineage": "Membership custodian directly establishes election year; the directory alone does not establish firstness.",
+      "sourceDate": "undated",
+      "access": "opened in this review pass",
+      "retrievedOn": "2026-10-07"
+    }
+  ],
+  "entities": [
+    {
+      "entityId": "ent_bill_russell_001",
+      "displayName": "Bill Russell",
+      "before": {
+        "canonicalEditorial": {
+          "summary": "On April 17, 1966, Bill Russell was named player-coach of the Boston Celtics, becoming the first Black head coach in the history of a major U.S. professional sports league. He won two more championships as player-coach (1968, 1969), on top of the eight he won as a player. He was inducted into the Naismith Basketball Hall of Fame as a player in 1975 and as a coach in 2021.",
+          "extendedNarrative": null,
+          "historicalContext": "Russell's coaching and playing careers were both spent with the Boston Celtics; the Hall of Fame in Springfield, MA is the most concrete surviving site tied to both of his enshrinements."
+        },
+        "canonicalBasis": [
+          {
+            "note": "Became first black head coach major league year April 17, 1966, named player-coach of the Boston Celtics, the first Black head coach in a major U.S. professional sports league.",
+            "criterion": "first_to_do_x",
+            "evidenceIds": ["claim_bill_russell_001_01"]
+          },
+          {
+            "note": "Hall of fame inducted Naismith Memorial Basketball Hall of Fame, as a player in 1975 and as a coach in 2021.",
+            "criterion": "major_honor_or_hall_of_fame",
+            "evidenceIds": ["claim_bill_russell_001_02"]
+          }
+        ],
+        "canonicalClaims": [
+          {
+            "id": "claim_bill_russell_001_01",
+            "current_version_id": "clv_94e65e33212e7187474d97d60a79c337",
+            "predicate": "became_first_black_head_coach_major_league_year",
+            "object": "April 17, 1966, named player-coach of the Boston Celtics, the first Black head coach in a major U.S. professional sports league"
+          },
+          {
+            "id": "claim_bill_russell_001_02",
+            "current_version_id": "clv_517a34b1e418c88ed292b577e3eafe1b",
+            "predicate": "hall_of_fame_inducted",
+            "object": "Naismith Memorial Basketball Hall of Fame, as a player in 1975 and as a coach in 2021"
+          }
+        ],
+        "released": {
+          "summary": "On April 17, 1966, Bill Russell was named player-coach of the Boston Celtics, becoming the first Black head coach in the history of a major U.S. professional sports league. He won two more championships as player-coach (1968, 1969), on top of the eight he won as a player. He was inducted into the Naismith Basketball Hall of Fame as a player in 1975 and as a coach in 2021.",
+          "historicalContext": "Russell's coaching and playing careers were both spent with the Boston Celtics; the Hall of Fame in Springfield, MA is the most concrete surviving site tied to both of his enshrinements.",
+          "claims": [
+            {
+              "id": "claim_bill_russell_001_01",
+              "object": "April 17, 1966, named player-coach of the Boston Celtics, the first Black head coach in a major U.S. professional sports league",
+              "claimRole": "evidence",
+              "predicate": "became_first_black_head_coach_major_league_year",
+              "citationHref": "https://www.history.com/this-day-in-history/april-17/bill-russell-first-black-nba-coach-celtics",
+              "citationLabel": "History.com — Bill Russell becomes the NBA's first Black coach",
+              "citationSource": "history.com",
+              "confidenceLevel": "medium"
+            },
+            {
+              "id": "claim_bill_russell_001_02",
+              "object": "Naismith Memorial Basketball Hall of Fame, as a player in 1975 and as a coach in 2021",
+              "claimRole": "evidence",
+              "predicate": "hall_of_fame_inducted",
+              "citationHref": "https://www.hoophall.com/hall-of-famers/bill-russell-1",
+              "citationLabel": "Naismith Memorial Basketball Hall of Fame — Bill Russell",
+              "citationSource": "hoophall.com",
+              "confidenceLevel": "medium"
+            }
+          ],
+          "notabilityBasis": [
+            {
+              "note": "Became first black head coach major league year April 17, 1966, named player-coach of the Boston Celtics, the first Black head coach in a major U.S. professional sports league.",
+              "criterion": "first_to_do_x",
+              "evidenceIds": ["claim_bill_russell_001_01"]
+            },
+            {
+              "note": "Hall of fame inducted Naismith Memorial Basketball Hall of Fame, as a player in 1975 and as a coach in 2021.",
+              "criterion": "major_honor_or_hall_of_fame",
+              "evidenceIds": ["claim_bill_russell_001_02"]
+            }
+          ],
+          "notabilityLabels": [
+            "The entity is documented as the first Black person, institution, or place to achieve, hold, found, or integrate something notable (a role, office, degree, business, record) — not merely an early or contemporaneous participant.",
+            "The entity received a major, named national or field-defining honor or hall-of-fame induction (e.g. Congressional Gold Medal, a national Hall of Fame, a Pulitzer, a National Medal). Local or purely commercial awards do not qualify alone."
+          ],
+          "statusHistory": null,
+          "eraProvenance": null,
+          "mentionedEntityIds": []
+        },
+        "searchFacets": {
+          "summary": "On April 17, 1966, Bill Russell was named player-coach of the Boston Celtics, becoming the first Black head coach in the history of a major U.S. professional sports league. He won two more championships as player-coach (1968, 1969), on top of the eight he won as a player. He was inducted into the Naismith Basketball Hall of Fame as a player in 1975 and as a coach in 2021.",
+          "notabilityBasis": [
+            {
+              "note": "Became first black head coach major league year April 17, 1966, named player-coach of the Boston Celtics, the first Black head coach in a major U.S. professional sports league.",
+              "criterion": "first_to_do_x",
+              "evidenceIds": ["claim_bill_russell_001_01"]
+            },
+            {
+              "note": "Hall of fame inducted Naismith Memorial Basketball Hall of Fame, as a player in 1975 and as a coach in 2021.",
+              "criterion": "major_honor_or_hall_of_fame",
+              "evidenceIds": ["claim_bill_russell_001_02"]
+            }
+          ],
+          "notabilityLabels": [
+            "The entity is documented as the first Black person, institution, or place to achieve, hold, found, or integrate something notable (a role, office, degree, business, record) — not merely an early or contemporaneous participant.",
+            "The entity received a major, named national or field-defining honor or hall-of-fame induction (e.g. Congressional Gold Medal, a national Hall of Fame, a Pulitzer, a National Medal). Local or purely commercial awards do not qualify alone."
+          ],
+          "evidenceInputs": {
+            "citedLineageKeys": ["history.com", "hoophall.com"],
+            "evidenceLineageKeys": ["history.com", "hoophall.com"],
+            "strongestClaimLevel": "medium"
+          },
+          "mentionedEntityIds": []
+        },
+        "landscapePayloads": []
+      },
+      "beforeSha256": "97de3ead88aae914397e427863aab15ed9a2dcfde3e3ddf95e969140c305b67f",
+      "proposed": {
+        "summary": "Bill Russell became the NBA's first Black head coach as player-coach of the Boston Celtics in 1966. He won nine championships as a Celtics player, then two more as player-coach, in 1968 and 1969.",
+        "historicalContext": "He later coached the Seattle SuperSonics and Sacramento Kings.",
+        "claimEdits": [
+          {
+            "claimId": "claim_bill_russell_001_01",
+            "predicate": "became_first_black_head_coach_in_nba",
+            "object": "Boston Celtics player-coach in 1966",
+            "sourceIds": ["russell-coach"]
+          }
+        ],
+        "notabilityBasis": [
+          {
+            "criterion": "first_to_do_x",
+            "note": "The NBA's first Black head coach, appointed by the Boston Celtics in 1966.",
+            "evidenceIds": ["claim_bill_russell_001_01"]
+          }
+        ]
+      },
+      "proposedSha256": "389c14c26803a04f9b7167bd06e7935c67bfce974b8ac56a13ddcb73839556ec",
+      "fieldEvidence": {
+        "summary": ["russell-coach", "russell-player"],
+        "historicalContext": ["russell-later"]
+      },
+      "findingDisposition": "Correct the count and league scope. Remove the unsupported assertion that one commemorative venue is the most concrete site. Keep the separate Hall of Fame claim pending its own unchanged-claim review.",
+      "strongestChallenge": "Pollard was a head co-coach in the league later named the NFL in 1921. The strongest defense is an unstated modern-league restriction; the released words do not state one. NBA scope survives this counterexample.",
+      "verdict": "correction-forcing",
+      "unchangedClaimsNotRecertified": ["claim_bill_russell_001_02"],
+      "proseEvidenceSpans": [
+        {
+          "field": "summary",
+          "start": 0,
+          "end": 100,
+          "sourceIds": ["russell-coach"],
+          "review": "Full sentence, including its factual clauses, checked against the named source locators; self-review only."
+        },
+        {
+          "field": "summary",
+          "start": 100,
+          "end": 195,
+          "sourceIds": ["russell-coach", "russell-player"],
+          "review": "Full sentence, including its factual clauses, checked against the named source locators; self-review only."
+        },
+        {
+          "field": "historicalContext",
+          "start": 0,
+          "end": 62,
+          "sourceIds": ["russell-later"],
+          "review": "Full sentence, including its factual clauses, checked against the named source locators; self-review only."
+        }
+      ]
+    },
+    {
+      "entityId": "ent_autherine_lucy_ua_001",
+      "displayName": "Autherine Lucy's Enrollment at the University of Alabama",
+      "before": {
+        "canonicalEditorial": {
+          "summary": "Autherine Lucy became the University of Alabama's first Black student on February 3, 1956, but after mobs rioted against her for three days, the university suspended and then expelled her, a wrong it did not formally reverse until 1988, allowing her to complete her degree in 1992.",
+          "extendedNarrative": null,
+          "historicalContext": "The University of Alabama's 1956 mob violence against Lucy remains, by scholarly consensus, the most violent anti-integration response to any post-Brown v. Board college desegregation, foreshadowing the federal confrontation that would return to the same campus in 1963."
+        },
+        "canonicalBasis": [
+          {
+            "note": "Readmitted in 1988, when the university's board voted to lift her expulsion; she returned to complete her degree, graduating in 1992 alongside her daughter.",
+            "criterion": "documented_site",
+            "evidenceIds": ["claim_autherine_lucy_ua_001_02"]
+          },
+          {
+            "note": "Enrolled on February 3, 1956, becoming the first African American student at the University of Alabama, before mobs chased and attacked her over the following days.",
+            "criterion": "first_to_do_x",
+            "evidenceIds": ["claim_autherine_lucy_ua_001_01"]
+          }
+        ],
+        "canonicalClaims": [
+          {
+            "id": "claim_autherine_lucy_ua_001_01",
+            "current_version_id": "clv_179b18cdbf81ea47707b4a81451e0212",
+            "predicate": "enrolled_on",
+            "object": "February 3, 1956, becoming the first African American student at the University of Alabama, before mobs chased and attacked her over the following days"
+          },
+          {
+            "id": "claim_autherine_lucy_ua_001_02",
+            "current_version_id": "clv_07b08bcb6b0f7320ba8745e53b35d901",
+            "predicate": "readmitted_in",
+            "object": "1988, when the university's board voted to lift her expulsion; she returned to complete her degree, graduating in 1992 alongside her daughter"
+          }
+        ],
+        "released": {
+          "summary": "Autherine Lucy's enrollment at the University of Alabama was the first attempt to integrate the institution. In 1956, she enrolled as a graduate student in library sciences after securing a court order against racial exclusion. Violent protests followed, and the university suspended and later expelled her within days, citing its inability to provide a safe learning environment. Her enrollment struggle became a test case after the Supreme Court's 1955 Brown v. Board of Education decision outlawed segregation.",
+          "historicalContext": "The University of Alabama did not integrate until Vivian Malone and James Hood registered for classes in 1963. Lucy's expulsion was rescinded in 1980, and she returned to earn a master's degree in 1992.",
+          "claims": [
+            {
+              "id": "claim_autherine_lucy_ua_001_01",
+              "object": "Autherine Lucy's enrollment at the University of Alabama was the first attempt to integrate the institution. In 1956, she enrolled as a graduate student in library sciences after securing a court order against racial exclusion. Violent protests followed, and the university suspended and later expelled her within days, citing its inability to provide a safe learning environment. Her enrollment struggle became a test case after the Supreme Court's 1955 Brown v. Board of Education decision outlawed segregation.",
+              "claimRole": "record_index",
+              "predicate": "source states",
+              "citationHref": "https://encyclopediaofalabama.org/article/autherine-lucy/",
+              "citationLabel": "encyclopediaofalabama.org",
+              "citationSource": "encyclopediaofalabama.org",
+              "confidenceLevel": "medium"
+            },
+            {
+              "id": "claim_autherine_lucy_ua_001_02",
+              "object": "The first attempt to integrate the university occurred in 1956 when Autherine Lucy successfully enrolled on February 3 as a graduate student in library sciences after she secured a court order preventing the university from rejecting her application on the basis of race.",
+              "claimRole": "evidence",
+              "predicate": "source states",
+              "citationHref": "https://en.wikipedia.org/wiki/University_of_Alabama",
+              "citationLabel": "University of Alabama",
+              "citationSource": "en.wikipedia.org",
+              "confidenceLevel": "low"
+            }
+          ],
+          "notabilityBasis": [
+            {
+              "note": "Autherine Lucy's enrollment at the University of Alabama was the first attempt to integrate the institution. In 1956, she enrolled as a graduate student in library sciences after securing a court order against racial exclusion. Violent protests followed, and the university suspended and later expelled her within days, citing its inability to provide a safe learning environment. Her enrollment struggle became a test case after the Supreme Court's 1955 Brown v. Board of Education decision outlawed segregation.",
+              "criterion": "first_to_do_x",
+              "evidenceIds": ["claim_autherine_lucy_ua_001_01", "claim_autherine_lucy_ua_001_02"]
+            }
+          ],
+          "notabilityLabels": [
+            "The entity is documented as the first Black person, institution, or place to achieve, hold, found, or integrate something notable (a role, office, degree, business, record) — not merely an early or contemporaneous participant."
+          ],
+          "statusHistory": null,
+          "eraProvenance": null,
+          "mentionedEntityIds": []
+        },
+        "searchFacets": {
+          "summary": "Autherine Lucy's enrollment at the University of Alabama was the first attempt to integrate the institution. In 1956, she enrolled as a graduate student in library sciences after securing a court order against racial exclusion. Violent protests followed, and the university suspended and later expelled her within days, citing its inability to provide a safe learning environment. Her enrollment struggle became a test case after the Supreme Court's 1955 Brown v. Board of Education decision outlawed segregation.",
+          "notabilityBasis": [
+            {
+              "note": "Autherine Lucy's enrollment at the University of Alabama was the first attempt to integrate the institution. In 1956, she enrolled as a graduate student in library sciences after securing a court order against racial exclusion. Violent protests followed, and the university suspended and later expelled her within days, citing its inability to provide a safe learning environment. Her enrollment struggle became a test case after the Supreme Court's 1955 Brown v. Board of Education decision outlawed segregation.",
+              "criterion": "first_to_do_x",
+              "evidenceIds": ["claim_autherine_lucy_ua_001_01", "claim_autherine_lucy_ua_001_02"]
+            }
+          ],
+          "notabilityLabels": [
+            "The entity is documented as the first Black person, institution, or place to achieve, hold, found, or integrate something notable (a role, office, degree, business, record) — not merely an early or contemporaneous participant."
+          ],
+          "evidenceInputs": {
+            "citedLineageKeys": ["encyclopediaofalabama.org", "wikipedia"],
+            "evidenceLineageKeys": ["wikipedia"],
+            "strongestClaimLevel": "medium"
+          },
+          "mentionedEntityIds": []
+        },
+        "landscapePayloads": [
+          {
+            "kind": "event",
+            "keywords": [
+              "Autherine Lucy",
+              "University of Alabama",
+              "racial integration",
+              "desegregation",
+              "Brown v. Board of Education",
+              "civil rights"
+            ],
+            "topicIds": [
+              "civil-rights",
+              "desegregation",
+              "education",
+              "school-desegregation",
+              "supreme-court"
+            ],
+            "eraBuckets": ["1950s", "1960s", "1980s", "1990s"],
+            "sourceUrls": [
+              "https://encyclopediaofalabama.org/article/autherine-lucy/",
+              "https://news.ua.edu/2023/03/autherine-lucy-foster-the-life-of-a-legend/"
+            ],
+            "canonicalUrl": "https://encyclopediaofalabama.org/article/autherine-lucy/",
+            "evidenceCitations": [
+              {
+                "quote": "The first attempt to integrate the university occurred in 1956 when Autherine Lucy successfully enrolled on February 3 as a graduate student in library sciences after she secured a court order preventing the university from rejecting her application on the basis of race.",
+                "title": "University of Alabama",
+                "sourceUrl": "https://en.wikipedia.org/wiki/University_of_Alabama",
+                "sourceTier": "tier2"
+              },
+              {
+                "quote": "In 1955, the Brown vs. Board of Education decision outlawing segregation came down from the U.S. Supreme Court, and it became clear to Shores and the NAACP that the Myers/Lucy case would be the first test.",
+                "title": "Autherine Lucy's Enrollment at the University of Alabama",
+                "sourceUrl": "https://encyclopediaofalabama.org/article/autherine-lucy/",
+                "sourceTier": "tier2"
+              }
+            ],
+            "historicalContext": "The University of Alabama did not integrate until Vivian Malone and James Hood registered for classes in 1963. Lucy's expulsion was rescinded in 1980, and she returned to earn a master's degree in 1992."
+          }
+        ]
+      },
+      "beforeSha256": "f00a0ff590e56bf47602cab9d3a1fa630a686aa91999ee9ae863d8b09b44a35f",
+      "proposed": {
+        "summary": "Autherine Lucy became the University of Alabama's first Black student, beginning classes on February 3, 1956 after successful litigation under the 1954 Brown v. Board of Education ruling. Following demonstrations against her enrollment, the university suspended her on February 6 and later expelled her.",
+        "historicalContext": "The university rescinded Lucy's expulsion in April 1988. She returned and completed the requirements for a master's in elementary education in December 1991.",
+        "claimEdits": [
+          {
+            "claimId": "claim_autherine_lucy_ua_001_01",
+            "predicate": "enrolled_on",
+            "object": "February 3, 1956, as the University of Alabama’s first Black student",
+            "sourceIds": ["lucy-marker"]
+          },
+          {
+            "claimId": "claim_autherine_lucy_ua_001_02",
+            "predicate": "expulsion_rescinded_in",
+            "object": "April 1988",
+            "sourceIds": ["lucy-marker"]
+          }
+        ],
+        "notabilityBasis": [
+          {
+            "criterion": "first_to_do_x",
+            "note": "The first Black student to attend the University of Alabama.",
+            "evidenceIds": ["claim_autherine_lucy_ua_001_01"]
+          }
+        ]
+      },
+      "proposedSha256": "004393762d45423d476a3033cb98e9236c0add096abfb1451d88f7e28b685a97",
+      "fieldEvidence": {
+        "summary": ["lucy-marker", "brown"],
+        "historicalContext": ["lucy-marker"]
+      },
+      "findingDisposition": "Replace released summary-echo claims with reviewed atomic versions. Do not copy the canonical historical context: its scholarly-consensus superlative is unverified. Remove the generic site basis from this enrollment event.",
+      "strongestChallenge": "Brown II dates to 1955, but the merits ruling dates to 1954. The degree-requirements completion date does not refute a later commencement or conferral; no such falsity is asserted. First enrolled student does not mean first application or integration attempt.",
+      "verdict": "correction-forcing",
+      "unchangedClaimsNotRecertified": [],
+      "proseEvidenceSpans": [
+        {
+          "field": "summary",
+          "start": 0,
+          "end": 188,
+          "sourceIds": ["lucy-marker", "brown"],
+          "review": "Full sentence, including its factual clauses, checked against the named source locators; self-review only."
+        },
+        {
+          "field": "summary",
+          "start": 188,
+          "end": 303,
+          "sourceIds": ["lucy-marker"],
+          "review": "Full sentence, including its factual clauses, checked against the named source locators; self-review only."
+        },
+        {
+          "field": "historicalContext",
+          "start": 0,
+          "end": 57,
+          "sourceIds": ["lucy-marker"],
+          "review": "Full sentence, including its factual clauses, checked against the named source locators; self-review only."
+        },
+        {
+          "field": "historicalContext",
+          "start": 57,
+          "end": 157,
+          "sourceIds": ["lucy-marker"],
+          "review": "Full sentence, including its factual clauses, checked against the named source locators; self-review only."
+        }
+      ]
+    },
+    {
+      "entityId": "ent_carl_stokes_001",
+      "displayName": "Carl Stokes",
+      "before": {
+        "canonicalEditorial": {
+          "summary": "Carl B. Stokes was elected mayor of Cleveland in November 1967 and took office January 1, 1968, becoming the first African American elected mayor of a major U.S. city. His administration pursued police reform and community investment amid the era's urban unrest.",
+          "extendedNarrative": null,
+          "historicalContext": "Stokes took office the same day as Richard Hatcher of Gary, Indiana, though Stokes was inaugurated first."
+        },
+        "canonicalBasis": [
+          {
+            "note": "First to Stokes defeated Seth Taft, grandson of former President William Howard Taft, with 50.5 percent of the vote.",
+            "criterion": "documented_site",
+            "evidenceIds": ["claim_carl_stokes_001_02"]
+          },
+          {
+            "note": "Elected on Stokes was elected mayor of Cleveland on November 7, 1967, and took office January 1, 1968, becoming the first Black mayor of one of the ten largest U.S. cities.",
+            "criterion": "first_to_do_x",
+            "evidenceIds": ["claim_carl_stokes_001_01"]
+          }
+        ],
+        "canonicalClaims": [
+          {
+            "id": "claim_carl_stokes_001_01",
+            "current_version_id": "clv_1218c5ac931b63fc3db8e6f3533b7503",
+            "predicate": "elected_on",
+            "object": "Stokes was elected mayor of Cleveland on November 7, 1967, and took office January 1, 1968, becoming the first Black mayor of one of the ten largest U.S. cities."
+          },
+          {
+            "id": "claim_carl_stokes_001_02",
+            "current_version_id": "clv_8327f9da47b1188045cb2c46ded7204e",
+            "predicate": "first_to",
+            "object": "Stokes defeated Seth Taft, grandson of former President William Howard Taft, with 50.5 percent of the vote."
+          }
+        ],
+        "released": {
+          "summary": "Carl B. Stokes was elected mayor of Cleveland in November 1967 and took office January 1, 1968, becoming the first African American elected mayor of a major U.S. city. His administration pursued police reform and community investment amid the era's urban unrest.",
+          "historicalContext": "Stokes took office the same day as Richard Hatcher of Gary, Indiana, though Stokes was inaugurated first.",
+          "claims": [
+            {
+              "id": "claim_carl_stokes_001_01",
+              "object": "Stokes was elected mayor of Cleveland on November 7, 1967, and took office January 1, 1968, becoming the first Black mayor of one of the ten largest U.S. cities.",
+              "claimRole": "evidence",
+              "predicate": "elected_on",
+              "citationHref": "https://www.nps.gov/people/carl-b-stokes.htm",
+              "citationLabel": "National Park Service: Carl B. Stokes, Ground-Breaking Cleveland Mayor",
+              "citationSource": "nps.gov",
+              "confidenceLevel": "high"
+            },
+            {
+              "id": "claim_carl_stokes_001_02",
+              "object": "Stokes defeated Seth Taft, grandson of former President William Howard Taft, with 50.5 percent of the vote.",
+              "claimRole": "evidence",
+              "predicate": "first_to",
+              "citationHref": "https://case.edu/ech/articles/s/stokes-carl-b",
+              "citationLabel": "Encyclopedia of Cleveland History: Carl B. Stokes",
+              "citationSource": "case.edu",
+              "confidenceLevel": "medium"
+            }
+          ],
+          "notabilityBasis": [
+            {
+              "note": "Stokes was elected mayor of Cleveland on November 7, 1967, and took office January 1, 1968, becoming the first Black mayor of one of the ten largest U.S. cities.",
+              "criterion": "first_to_do_x",
+              "evidenceIds": ["claim_carl_stokes_001_01"]
+            }
+          ],
+          "notabilityLabels": [
+            "The entity is documented as the first Black person, institution, or place to achieve, hold, found, or integrate something notable (a role, office, degree, business, record) — not merely an early or contemporaneous participant."
+          ],
+          "statusHistory": null,
+          "eraProvenance": null,
+          "mentionedEntityIds": ["ent_richard_hatcher_001"]
+        },
+        "searchFacets": {
+          "summary": "Carl B. Stokes was elected mayor of Cleveland in November 1967 and took office January 1, 1968, becoming the first African American elected mayor of a major U.S. city. His administration pursued police reform and community investment amid the era's urban unrest.",
+          "notabilityBasis": [
+            {
+              "note": "Stokes was elected mayor of Cleveland on November 7, 1967, and took office January 1, 1968, becoming the first Black mayor of one of the ten largest U.S. cities.",
+              "criterion": "first_to_do_x",
+              "evidenceIds": ["claim_carl_stokes_001_01"]
+            }
+          ],
+          "notabilityLabels": [
+            "The entity is documented as the first Black person, institution, or place to achieve, hold, found, or integrate something notable (a role, office, degree, business, record) — not merely an early or contemporaneous participant."
+          ],
+          "evidenceInputs": {
+            "citedLineageKeys": ["nps.gov", "case.edu"],
+            "evidenceLineageKeys": ["nps.gov", "case.edu"],
+            "strongestClaimLevel": "high"
+          },
+          "mentionedEntityIds": ["ent_richard_hatcher_001"]
+        },
+        "landscapePayloads": []
+      },
+      "beforeSha256": "a2ba153b83f8daf28e4efb627184b4ba994717c048f3c347f8f4d8d214962fba",
+      "proposed": {
+        "summary": "Carl Stokes was elected mayor of Cleveland in November 1967 and sworn in on November 13. He became Cleveland's first Black mayor and won reelection in 1969.",
+        "historicalContext": "During his two terms, Stokes opened city hall jobs to Black residents and women and introduced urban revitalization programs. He chose not to seek a third term in 1971.",
+        "claimEdits": [
+          {
+            "claimId": "claim_carl_stokes_001_01",
+            "predicate": "elected_mayor",
+            "object": "Cleveland, November 1967; sworn in November 13, 1967",
+            "sourceIds": ["stokes-record", "stokes-history"]
+          },
+          {
+            "claimId": "claim_carl_stokes_001_02",
+            "predicate": "defeated",
+            "object": "Seth Taft with 50.5 percent of the vote in the 1967 mayoral election",
+            "sourceIds": ["stokes-history"]
+          }
+        ],
+        "notabilityBasis": [
+          {
+            "criterion": "elected_or_appointed_office",
+            "note": "Elected mayor of Cleveland in November 1967 and sworn in on November 13.",
+            "evidenceIds": ["claim_carl_stokes_001_01"]
+          }
+        ]
+      },
+      "proposedSha256": "dd5afa1775620a1e4548d1cf281381a1710a0d38ae283e44f4ca346b0b94f256",
+      "fieldEvidence": {
+        "summary": ["stokes-record", "stokes-history"],
+        "historicalContext": ["stokes-history"]
+      },
+      "findingDisposition": "Remove the Hatcher same-day comparison and its prose-derived mentionedEntityIds entry unless independently supported elsewhere. Replace the misleading first_to vote-share predicate and remove site classification.",
+      "strongestChallenge": "An election date and a swearing-in date are different events. The January date may have been borrowed from Hatcher; that is an inference, not an established origin. Use Cleveland scope instead of an undefined major-city ranking.",
+      "verdict": "correction-forcing",
+      "unchangedClaimsNotRecertified": [],
+      "proseEvidenceSpans": [
+        {
+          "field": "summary",
+          "start": 0,
+          "end": 89,
+          "sourceIds": ["stokes-record", "stokes-history"],
+          "review": "Full sentence, including its factual clauses, checked against the named source locators; self-review only."
+        },
+        {
+          "field": "summary",
+          "start": 89,
+          "end": 156,
+          "sourceIds": ["stokes-history"],
+          "review": "Full sentence, including its factual clauses, checked against the named source locators; self-review only."
+        },
+        {
+          "field": "historicalContext",
+          "start": 0,
+          "end": 126,
+          "sourceIds": ["stokes-history"],
+          "review": "Full sentence, including its factual clauses, checked against the named source locators; self-review only."
+        },
+        {
+          "field": "historicalContext",
+          "start": 126,
+          "end": 168,
+          "sourceIds": ["stokes-history"],
+          "review": "Full sentence, including its factual clauses, checked against the named source locators; self-review only."
+        }
+      ]
+    },
+    {
+      "entityId": "disc_golden_thirteen_q5579862",
+      "displayName": "Golden Thirteen",
+      "before": {
+        "canonicalEditorial": {
+          "summary": "The Golden Thirteen were the first African American commissioned and warrant officers in the U.S. Navy, trained in 1944 amid WWII-era civil rights pressures. Despite systemic barriers, they overcame accelerated training and institutional skepticism to become officers, though only 13 of 16 graduates received commissions.",
+          "extendedNarrative": null,
+          "historicalContext": "The Golden Thirteen emerged during WWII as part of broader civil rights efforts to integrate the U.S. military. Their commissioning followed President Roosevelt’s 1941 Executive Order 8802 banning racial discrimination in defense industries, and preceded Truman’s 1948 desegregation of the armed forces. Their success challenged segregationist policies that had confined Black sailors to menial roles since 1919."
+        },
+        "canonicalBasis": [
+          {
+            "note": "Trained at Great Lakes Naval Training Station.",
+            "criterion": "documented_military_service",
+            "evidenceIds": ["claim_disc_golden_thirteen_q5579862_01"]
+          },
+          {
+            "note": "Commissioned by U.S. Navy.",
+            "criterion": "documented_military_service",
+            "evidenceIds": ["claim_disc_golden_thirteen_q5579862_02"]
+          },
+          {
+            "note": "Occurred in year 1944.",
+            "criterion": "documented_military_service",
+            "evidenceIds": ["claim_disc_golden_thirteen_q5579862_03"]
+          },
+          {
+            "note": "Contextualized by Executive Order 8802.",
+            "criterion": "documented_military_service",
+            "evidenceIds": ["claim_disc_golden_thirteen_q5579862_04"]
+          }
+        ],
+        "canonicalClaims": [
+          {
+            "id": "claim_disc_golden_thirteen_q5579862_01",
+            "current_version_id": "clv_1997946ce34be8507a3329fc4403a97e",
+            "predicate": "trained_at",
+            "object": "Great Lakes Naval Training Station"
+          },
+          {
+            "id": "claim_disc_golden_thirteen_q5579862_02",
+            "current_version_id": "clv_69617a2646b8938b2e4cfe175d37a9da",
+            "predicate": "commissioned_by",
+            "object": "U.S. Navy"
+          },
+          {
+            "id": "claim_disc_golden_thirteen_q5579862_03",
+            "current_version_id": "clv_c79e577400f3b2009afc6a3ef12821cd",
+            "predicate": "occurred_in_year",
+            "object": "1944"
+          },
+          {
+            "id": "claim_disc_golden_thirteen_q5579862_04",
+            "current_version_id": "clv_c99aa0e414c526026cbac235449ad74a",
+            "predicate": "contextualized_by",
+            "object": "Executive Order 8802"
+          }
+        ],
+        "released": {
+          "summary": "The Golden Thirteen were the first African American commissioned and warrant officers in the U.S. Navy, trained in 1944 amid WWII-era civil rights pressures. Despite systemic barriers, they overcame accelerated training and institutional skepticism to become officers, though only 13 of 16 graduates received commissions.",
+          "historicalContext": "The Golden Thirteen emerged during WWII as part of broader civil rights efforts to integrate the U.S. military. Their commissioning followed President Roosevelt’s 1941 Executive Order 8802 banning racial discrimination in defense industries, and preceded Truman’s 1948 desegregation of the armed forces. Their success challenged segregationist policies that had confined Black sailors to menial roles since 1919.",
+          "claims": [
+            {
+              "id": "claim_disc_golden_thirteen_q5579862_01",
+              "object": "Great Lakes Naval Training Station",
+              "claimRole": "evidence",
+              "predicate": "trained_at",
+              "citationHref": "https://en.wikipedia.org/wiki/Golden_Thirteen",
+              "citationLabel": "Wikipedia entry",
+              "citationSource": "wikipedia.org",
+              "confidenceLevel": "low"
+            },
+            {
+              "id": "claim_disc_golden_thirteen_q5579862_02",
+              "object": "U.S. Navy",
+              "claimRole": "evidence",
+              "predicate": "commissioned_by",
+              "citationHref": "https://en.wikipedia.org/wiki/Golden_Thirteen",
+              "citationLabel": "Wikipedia entry",
+              "citationSource": "wikipedia.org",
+              "confidenceLevel": "low"
+            },
+            {
+              "id": "claim_disc_golden_thirteen_q5579862_03",
+              "object": "1944",
+              "claimRole": "evidence",
+              "predicate": "occurred_in_year",
+              "citationHref": "https://en.wikipedia.org/wiki/Golden_Thirteen",
+              "citationLabel": "Wikipedia entry",
+              "citationSource": "wikipedia.org",
+              "confidenceLevel": "low"
+            },
+            {
+              "id": "claim_disc_golden_thirteen_q5579862_04",
+              "object": "Executive Order 8802",
+              "claimRole": "evidence",
+              "predicate": "contextualized_by",
+              "citationHref": "https://en.wikipedia.org/wiki/Golden_Thirteen",
+              "citationLabel": "Wikipedia entry",
+              "citationSource": "wikipedia.org",
+              "confidenceLevel": "low"
+            }
+          ],
+          "notabilityBasis": [
+            {
+              "note": "Trained at Great Lakes Naval Training Station.",
+              "criterion": "documented_military_service",
+              "evidenceIds": ["claim_disc_golden_thirteen_q5579862_01"]
+            },
+            {
+              "note": "Commissioned by U.S. Navy.",
+              "criterion": "documented_military_service",
+              "evidenceIds": ["claim_disc_golden_thirteen_q5579862_02"]
+            },
+            {
+              "note": "Occurred in year 1944.",
+              "criterion": "documented_military_service",
+              "evidenceIds": ["claim_disc_golden_thirteen_q5579862_03"]
+            },
+            {
+              "note": "Contextualized by Executive Order 8802.",
+              "criterion": "documented_military_service",
+              "evidenceIds": ["claim_disc_golden_thirteen_q5579862_04"]
+            },
+            {
+              "note": "Trained at Great Lakes Naval Training Station.",
+              "criterion": "documented_site",
+              "evidenceIds": ["claim_disc_golden_thirteen_q5579862_01"]
+            },
+            {
+              "note": "Commissioned by U.S. Navy.",
+              "criterion": "documented_site",
+              "evidenceIds": ["claim_disc_golden_thirteen_q5579862_02"]
+            },
+            {
+              "note": "Occurred in year 1944.",
+              "criterion": "documented_site",
+              "evidenceIds": ["claim_disc_golden_thirteen_q5579862_03"]
+            },
+            {
+              "note": "Contextualized by Executive Order 8802.",
+              "criterion": "documented_site",
+              "evidenceIds": ["claim_disc_golden_thirteen_q5579862_04"]
+            }
+          ],
+          "notabilityLabels": [
+            "The entity (a person, unit or regiment) has a documented record of military service that is itself the reason it is here: service in a segregated or newly integrated formation, a first commission or enlistment that broke a service’s color line, or a unit raised specifically from Black or Black and Native soldiers. Service alone is not the basis — the record has to show the service carried that weight, which is why the 91st United States Colored Infantry and the Golden Thirteen sit here rather than under `documented_site`, the honest-but-wrong fallback they inherited before this criterion existed.",
+            "The entity is a documented site of a historically significant event or practice (a sit-in lunch counter, a Freedom School, a documented station on the Underground Railroad) with primary-source evidence tying the site to the event."
+          ],
+          "statusHistory": [
+            {
+              "status": "active",
+              "validFrom": "1919",
+              "basisClaimIds": [
+                "disc_golden_thirteen_q5579862_claim_0",
+                "disc_golden_thirteen_q5579862_claim_1",
+                "disc_golden_thirteen_q5579862_claim_2",
+                "disc_golden_thirteen_q5579862_claim_3"
+              ],
+              "datePrecision": "year"
+            }
+          ],
+          "eraProvenance": null,
+          "mentionedEntityIds": []
+        },
+        "searchFacets": {
+          "summary": "The Golden Thirteen were the first African American commissioned and warrant officers in the U.S. Navy, trained in 1944 amid WWII-era civil rights pressures. Despite systemic barriers, they overcame accelerated training and institutional skepticism to become officers, though only 13 of 16 graduates received commissions.",
+          "notabilityBasis": [
+            {
+              "note": "Trained at Great Lakes Naval Training Station.",
+              "criterion": "documented_military_service",
+              "evidenceIds": ["claim_disc_golden_thirteen_q5579862_01"]
+            },
+            {
+              "note": "Commissioned by U.S. Navy.",
+              "criterion": "documented_military_service",
+              "evidenceIds": ["claim_disc_golden_thirteen_q5579862_02"]
+            },
+            {
+              "note": "Occurred in year 1944.",
+              "criterion": "documented_military_service",
+              "evidenceIds": ["claim_disc_golden_thirteen_q5579862_03"]
+            },
+            {
+              "note": "Contextualized by Executive Order 8802.",
+              "criterion": "documented_military_service",
+              "evidenceIds": ["claim_disc_golden_thirteen_q5579862_04"]
+            },
+            {
+              "note": "Trained at Great Lakes Naval Training Station.",
+              "criterion": "documented_site",
+              "evidenceIds": ["claim_disc_golden_thirteen_q5579862_01"]
+            },
+            {
+              "note": "Commissioned by U.S. Navy.",
+              "criterion": "documented_site",
+              "evidenceIds": ["claim_disc_golden_thirteen_q5579862_02"]
+            },
+            {
+              "note": "Occurred in year 1944.",
+              "criterion": "documented_site",
+              "evidenceIds": ["claim_disc_golden_thirteen_q5579862_03"]
+            },
+            {
+              "note": "Contextualized by Executive Order 8802.",
+              "criterion": "documented_site",
+              "evidenceIds": ["claim_disc_golden_thirteen_q5579862_04"]
+            }
+          ],
+          "notabilityLabels": [
+            "The entity (a person, unit or regiment) has a documented record of military service that is itself the reason it is here: service in a segregated or newly integrated formation, a first commission or enlistment that broke a service’s color line, or a unit raised specifically from Black or Black and Native soldiers. Service alone is not the basis — the record has to show the service carried that weight, which is why the 91st United States Colored Infantry and the Golden Thirteen sit here rather than under `documented_site`, the honest-but-wrong fallback they inherited before this criterion existed.",
+            "The entity is a documented site of a historically significant event or practice (a sit-in lunch counter, a Freedom School, a documented station on the Underground Railroad) with primary-source evidence tying the site to the event."
+          ],
+          "evidenceInputs": {
+            "citedLineageKeys": ["wikipedia"],
+            "evidenceLineageKeys": ["wikipedia"],
+            "strongestClaimLevel": "low"
+          },
+          "mentionedEntityIds": []
+        },
+        "landscapePayloads": [
+          {
+            "id": "disc_golden_thirteen_q5579862",
+            "kind": "other",
+            "summary": "military unit",
+            "provenance": {
+              "wikidataId": "Q5579862",
+              "sourceQuery": "Golden Thirteen Navy"
+            },
+            "displayName": "Golden Thirteen",
+            "canonicalUrl": "https://en.wikipedia.org/wiki/Golden_Thirteen",
+            "discoveredAt": "2026-07-22T05:22:55.565Z",
+            "researchLaneOnly": true
+          }
+        ]
+      },
+      "beforeSha256": "403d027af4fa957d6a1d76179498197672d37a9043bc10b4332e86cfabe84b78",
+      "proposed": {
+        "summary": "The Golden Thirteen became the U.S. Navy's first Black officers in 1944: twelve ensigns and one warrant officer. They trained at Great Lakes Naval Training Station in Illinois.",
+        "historicalContext": "Sixteen candidates entered the special officer-training course in January 1944. Thirteen received officer appointments; Charles B. Lear was the warrant officer.",
+        "claimEdits": [
+          {
+            "claimId": "claim_disc_golden_thirteen_q5579862_02",
+            "predicate": "received_officer_appointments",
+            "object": "The U.S. Navy’s first Black officers in 1944: twelve ensigns and one warrant officer",
+            "sourceIds": ["golden-oral"]
+          }
+        ],
+        "notabilityBasis": [
+          {
+            "criterion": "documented_military_service",
+            "note": "The U.S. Navy's first Black officers, appointed in 1944.",
+            "evidenceIds": ["claim_disc_golden_thirteen_q5579862_02"]
+          }
+        ]
+      },
+      "proposedSha256": "35fa20f5ef71611522cd98ab15eb40cf87a87574d38ec5f43852847162b46fe8",
+      "fieldEvidence": {
+        "summary": ["golden-oral"],
+        "historicalContext": ["golden-oral"]
+      },
+      "findingDisposition": "Replace commissioned_by for the whole group. Remove the released documented_site rows, which are absent from the canonical basis already. Hold the broad Executive Order 8802 contextual claim for a precise evidence review; it must not imply that the order integrated the Navy.",
+      "strongestChallenge": "Collective commissioning is common shorthand, but thirteen individual commissions is a false count. Officers includes the warrant appointment. Sources differ on February versus March milestones; the proposal deliberately states the supported year, not an invented exact ceremony date.",
+      "verdict": "correction-forcing",
+      "unchangedClaimsNotRecertified": [
+        "claim_disc_golden_thirteen_q5579862_01",
+        "claim_disc_golden_thirteen_q5579862_03",
+        "claim_disc_golden_thirteen_q5579862_04"
+      ],
+      "proseEvidenceSpans": [
+        {
+          "field": "summary",
+          "start": 0,
+          "end": 113,
+          "sourceIds": ["golden-oral"],
+          "review": "Full sentence, including its factual clauses, checked against the named source locators; self-review only."
+        },
+        {
+          "field": "summary",
+          "start": 113,
+          "end": 176,
+          "sourceIds": ["golden-oral"],
+          "review": "Full sentence, including its factual clauses, checked against the named source locators; self-review only."
+        },
+        {
+          "field": "historicalContext",
+          "start": 0,
+          "end": 80,
+          "sourceIds": ["golden-oral"],
+          "review": "Full sentence, including its factual clauses, checked against the named source locators; self-review only."
+        },
+        {
+          "field": "historicalContext",
+          "start": 80,
+          "end": 160,
+          "sourceIds": ["golden-oral"],
+          "review": "Full sentence, including its factual clauses, checked against the named source locators; self-review only."
+        }
+      ]
+    },
+    {
+      "entityId": "ent_bessie_coleman_001",
+      "displayName": "Bessie Coleman",
+      "before": {
+        "canonicalEditorial": {
+          "summary": "Denied flight training in the United States because of her race and sex, Bessie Coleman traveled to France and, on June 15, 1921, earned an international pilot's license from the Fédération Aéronautique Internationale, becoming the first Black woman and first Black American to hold a pilot's license. She toured the U.S. as a barnstorming exhibition flier until her death in 1926.",
+          "extendedNarrative": null,
+          "historicalContext": "Coleman studied French and self-funded travel to France for flight school since no American school would train a Black woman. She dreamed of opening a flight school for Black aviators but died in a 1926 exhibition-flight accident in Jacksonville, Florida before realizing it; her Chicago grave remains the most visited site tied to her legacy."
+        },
+        "canonicalBasis": [
+          {
+            "note": "Buried at Lincoln Cemetery in Alsip, Illinois, where Black aviators continue a tradition of dropping flowers during flyovers of her grave each year.",
+            "criterion": "documented_site",
+            "evidenceIds": ["claim_bessie_coleman_001_02"]
+          },
+          {
+            "note": "Earned an international aviation pilot's license from the Fédération Aéronautique Internationale on June 15, 1921, becoming the first African American and first Native American to hold a pilot's license.",
+            "criterion": "first_to_do_x",
+            "evidenceIds": ["claim_bessie_coleman_001_01"]
+          }
+        ],
+        "canonicalClaims": [
+          {
+            "id": "claim_bessie_coleman_001_02",
+            "current_version_id": "clv_cf0e872bdad7018213455fb30bb7260c",
+            "predicate": "buried_at",
+            "object": "Lincoln Cemetery in Alsip, Illinois, where Black aviators continue a tradition of dropping flowers during flyovers of her grave each year"
+          },
+          {
+            "id": "claim_bessie_coleman_001_01",
+            "current_version_id": "clv_4328bed5caa84aebdc66717bd1e378cc",
+            "predicate": "earned",
+            "object": "an international aviation pilot's license from the Fédération Aéronautique Internationale on June 15, 1921, becoming the first African American and first Native American to hold a pilot's license"
+          }
+        ],
+        "released": {
+          "summary": "Denied flight training in the United States because of her race and sex, Bessie Coleman traveled to France and, on June 15, 1921, earned an international pilot's license from the Fédération Aéronautique Internationale, becoming the first Black woman and first Black American to hold a pilot's license. She toured the U.S. as a barnstorming exhibition flier until her death in 1926.",
+          "historicalContext": "Coleman studied French and self-funded travel to France for flight school since no American school would train a Black woman. She dreamed of opening a flight school for Black aviators but died in a 1926 exhibition-flight accident in Jacksonville, Florida before realizing it; her Chicago grave remains the most visited site tied to her legacy.",
+          "claims": [
+            {
+              "id": "claim_bessie_coleman_001_01",
+              "object": "an international aviation pilot's license from the Fédération Aéronautique Internationale on June 15, 1921, becoming the first African American and first Native American to hold a pilot's license",
+              "claimRole": "evidence",
+              "predicate": "earned",
+              "citationHref": "https://www.si.edu/collections/snapshot/bessie-coleman-first-african-american-woman-licensed-pilot",
+              "citationLabel": "Smithsonian Institution: Bessie Coleman, First African American Woman Licensed Pilot",
+              "citationSource": "si.edu",
+              "confidenceLevel": "high"
+            },
+            {
+              "id": "claim_bessie_coleman_001_02",
+              "object": "Lincoln Cemetery in Alsip, Illinois, where Black aviators continue a tradition of dropping flowers during flyovers of her grave each year",
+              "claimRole": "evidence",
+              "predicate": "buried_at",
+              "citationHref": "https://blackpast.org/african-american-history/coleman-bessie-1892-1926/",
+              "citationLabel": "BlackPast.org: Bessie Coleman (1892-1926)",
+              "citationSource": "blackpast.org",
+              "confidenceLevel": "medium"
+            }
+          ],
+          "notabilityBasis": [
+            {
+              "note": "Earned an international aviation pilot's license from the Fédération Aéronautique Internationale on June 15, 1921, becoming the first African American and first Native American to hold a pilot's license.",
+              "criterion": "first_to_do_x",
+              "evidenceIds": ["claim_bessie_coleman_001_01"]
+            }
+          ],
+          "notabilityLabels": [
+            "The entity is documented as the first Black person, institution, or place to achieve, hold, found, or integrate something notable (a role, office, degree, business, record) — not merely an early or contemporaneous participant."
+          ],
+          "statusHistory": null,
+          "eraProvenance": null,
+          "mentionedEntityIds": []
+        },
+        "searchFacets": {
+          "summary": "Denied flight training in the United States because of her race and sex, Bessie Coleman traveled to France and, on June 15, 1921, earned an international pilot's license from the Fédération Aéronautique Internationale, becoming the first Black woman and first Black American to hold a pilot's license. She toured the U.S. as a barnstorming exhibition flier until her death in 1926.",
+          "notabilityBasis": [
+            {
+              "note": "Earned an international aviation pilot's license from the Fédération Aéronautique Internationale on June 15, 1921, becoming the first African American and first Native American to hold a pilot's license.",
+              "criterion": "first_to_do_x",
+              "evidenceIds": ["claim_bessie_coleman_001_01"]
+            }
+          ],
+          "notabilityLabels": [
+            "The entity is documented as the first Black person, institution, or place to achieve, hold, found, or integrate something notable (a role, office, degree, business, record) — not merely an early or contemporaneous participant."
+          ],
+          "evidenceInputs": {
+            "citedLineageKeys": ["si.edu", "blackpast.org"],
+            "evidenceLineageKeys": ["si.edu", "blackpast.org"],
+            "strongestClaimLevel": "high"
+          },
+          "mentionedEntityIds": []
+        },
+        "landscapePayloads": []
+      },
+      "beforeSha256": "02fb874c737615e663d8cbd09faf662b8c333b6bfb1ddf7e7ce5f3fa277606ca",
+      "proposed": {
+        "summary": "Bessie Coleman became the first Black woman to earn a pilot's license. After training in France, she received her international license on June 15, 1921, and later performed in air shows in the United States.",
+        "historicalContext": "Coleman raised money toward a school for Black aviators. She died in Jacksonville, Florida, in 1926 while a passenger on a practice flight.",
+        "claimEdits": [
+          {
+            "claimId": "claim_bessie_coleman_001_01",
+            "predicate": "earned",
+            "object": "An international pilot’s license on June 15, 1921; the first Black woman licensed as a pilot",
+            "sourceIds": ["coleman-mint"]
+          }
+        ],
+        "notabilityBasis": [
+          {
+            "criterion": "first_to_do_x",
+            "note": "The first Black woman to earn a pilot’s license.",
+            "evidenceIds": ["claim_bessie_coleman_001_01"]
+          }
+        ]
+      },
+      "proposedSha256": "07517f61b0c6e746830331e038d5d3c6a20bde068916231623498ff16343fc25",
+      "fieldEvidence": {
+        "summary": ["coleman-mint", "coleman-museum"],
+        "historicalContext": ["coleman-museum", "coleman-mint"]
+      },
+      "findingDisposition": "Restore woman in the firstness claim. Remove unverified most-visited language and sole-funding implication. Distinguish practice flight from public exhibition. The cemetery is a separate place; burial alone does not make the person a documented site.",
+      "strongestChallenge": "Bullard is a counterexample to unqualified male-and-female priority, not to the woman distinction. International and military licenses are not interchangeable scopes. The current pass could not freshly retrieve the Air Force Bullard page; its opened evidence belongs to the earlier audit. Do not count snippets as fresh confirmation.",
+      "verdict": "correction-forcing",
+      "unchangedClaimsNotRecertified": ["claim_bessie_coleman_001_02"],
+      "proseEvidenceSpans": [
+        {
+          "field": "summary",
+          "start": 0,
+          "end": 71,
+          "sourceIds": ["coleman-mint"],
+          "review": "Full sentence, including its factual clauses, checked against the named source locators; self-review only."
+        },
+        {
+          "field": "summary",
+          "start": 71,
+          "end": 208,
+          "sourceIds": ["coleman-mint", "coleman-museum"],
+          "review": "Full sentence, including its factual clauses, checked against the named source locators; self-review only."
+        },
+        {
+          "field": "historicalContext",
+          "start": 0,
+          "end": 57,
+          "sourceIds": ["coleman-museum"],
+          "review": "Full sentence, including its factual clauses, checked against the named source locators; self-review only."
+        },
+        {
+          "field": "historicalContext",
+          "start": 57,
+          "end": 139,
+          "sourceIds": ["coleman-mint", "coleman-museum"],
+          "review": "Full sentence, including its factual clauses, checked against the named source locators; self-review only."
+        }
+      ]
+    },
+    {
+      "entityId": "ent_david_blackwell_001",
+      "displayName": "David Blackwell",
+      "before": {
+        "canonicalEditorial": {
+          "summary": "David Blackwell, a statistician who earned his PhD at age 22 from the University of Illinois, became UC Berkeley's first Black tenured professor in 1954 and, in 1965, the first African American elected to the National Academy of Sciences. He co-developed the Rao-Blackwell theorem and mentored more than 60 doctoral students.",
+          "extendedNarrative": null,
+          "historicalContext": "Before Berkeley, Blackwell was repeatedly denied faculty positions at predominantly white universities and taught at Southern University, Clark College, and Howard University, where he chaired the math department; UC Berkeley named a residence hall for him in 2018."
+        },
+        "canonicalBasis": [
+          {
+            "note": "Chaired UC Berkeley's statistics department from 1957 to 1961 and co-developed the Rao-Blackwell theorem, a foundational result in statistical estimation theory.",
+            "criterion": "documented_site",
+            "evidenceIds": ["claim_david_blackwell_001_02"]
+          },
+          {
+            "note": "Became the first African American elected to the National Academy of Sciences, in 1965, and previously UC Berkeley's first Black tenured professor after joining the faculty in 1954.",
+            "criterion": "first_to_do_x",
+            "evidenceIds": ["claim_david_blackwell_001_01"]
+          }
+        ],
+        "canonicalClaims": [
+          {
+            "id": "claim_david_blackwell_001_01",
+            "current_version_id": "clv_1b66348900782bd02e162fb591a23cf2",
+            "predicate": "became",
+            "object": "the first African American elected to the National Academy of Sciences, in 1965, and previously UC Berkeley's first Black tenured professor after joining the faculty in 1954"
+          },
+          {
+            "id": "claim_david_blackwell_001_02",
+            "current_version_id": "clv_c02caca216f82aaf5b9151b44c7d0fb0",
+            "predicate": "chaired",
+            "object": "UC Berkeley's statistics department from 1957 to 1961 and co-developed the Rao-Blackwell theorem, a foundational result in statistical estimation theory"
+          }
+        ],
+        "released": {
+          "summary": "David Blackwell, a statistician who earned his PhD at age 22 from the University of Illinois, became UC Berkeley's first Black tenured professor in 1954 and, in 1965, the first African American elected to the National Academy of Sciences. He co-developed the Rao-Blackwell theorem and mentored more than 60 doctoral students.",
+          "historicalContext": "Before Berkeley, Blackwell was repeatedly denied faculty positions at predominantly white universities and taught at Southern University, Clark College, and Howard University, where he chaired the math department; UC Berkeley named a residence hall for him in 2018.",
+          "claims": [
+            {
+              "id": "claim_david_blackwell_001_01",
+              "object": "the first African American elected to the National Academy of Sciences, in 1965, and previously UC Berkeley's first Black tenured professor after joining the faculty in 1954",
+              "claimRole": "evidence",
+              "predicate": "became",
+              "citationHref": "https://www.britannica.com/biography/David-Blackwell",
+              "citationLabel": "Britannica: David Blackwell",
+              "citationSource": "britannica.com",
+              "confidenceLevel": "medium"
+            },
+            {
+              "id": "claim_david_blackwell_001_02",
+              "object": "UC Berkeley's statistics department from 1957 to 1961 and co-developed the Rao-Blackwell theorem, a foundational result in statistical estimation theory",
+              "claimRole": "evidence",
+              "predicate": "chaired",
+              "citationHref": "https://blackpast.org/african-american-history/blackwell-david-harold-1919-2010/",
+              "citationLabel": "BlackPast.org: David Harold Blackwell (1919-2010)",
+              "citationSource": "blackpast.org",
+              "confidenceLevel": "medium"
+            }
+          ],
+          "notabilityBasis": [
+            {
+              "note": "Became the first African American elected to the National Academy of Sciences, in 1965, and previously UC Berkeley's first Black tenured professor after joining the faculty in 1954.",
+              "criterion": "first_to_do_x",
+              "evidenceIds": ["claim_david_blackwell_001_01"]
+            }
+          ],
+          "notabilityLabels": [
+            "The entity is documented as the first Black person, institution, or place to achieve, hold, found, or integrate something notable (a role, office, degree, business, record) — not merely an early or contemporaneous participant."
+          ],
+          "statusHistory": null,
+          "eraProvenance": null,
+          "mentionedEntityIds": ["ent_howard_university_001", "ent_southern_university_001"]
+        },
+        "searchFacets": {
+          "summary": "David Blackwell, a statistician who earned his PhD at age 22 from the University of Illinois, became UC Berkeley's first Black tenured professor in 1954 and, in 1965, the first African American elected to the National Academy of Sciences. He co-developed the Rao-Blackwell theorem and mentored more than 60 doctoral students.",
+          "notabilityBasis": [
+            {
+              "note": "Became the first African American elected to the National Academy of Sciences, in 1965, and previously UC Berkeley's first Black tenured professor after joining the faculty in 1954.",
+              "criterion": "first_to_do_x",
+              "evidenceIds": ["claim_david_blackwell_001_01"]
+            }
+          ],
+          "notabilityLabels": [
+            "The entity is documented as the first Black person, institution, or place to achieve, hold, found, or integrate something notable (a role, office, degree, business, record) — not merely an early or contemporaneous participant."
+          ],
+          "evidenceInputs": {
+            "citedLineageKeys": ["britannica.com", "blackpast.org"],
+            "evidenceLineageKeys": ["britannica.com", "blackpast.org"],
+            "strongestClaimLevel": "medium"
+          },
+          "mentionedEntityIds": ["ent_howard_university_001", "ent_southern_university_001"]
+        },
+        "landscapePayloads": []
+      },
+      "beforeSha256": "af1261a2823daa6b947e645648cfcc9ba8c453549347b42803fc4a8dcbaec86e",
+      "proposed": {
+        "summary": "Statistician David Blackwell came to UC Berkeley as a visiting professor in 1954 and joined its statistics department as a full professor in 1955. He was Berkeley's first Black tenured professor and became the first Black member of the National Academy of Sciences in 1965.",
+        "historicalContext": "Before Berkeley, Blackwell taught at Southern University, Clark College and Howard University. At Howard, he became head of the mathematics department in 1947.",
+        "claimEdits": [
+          {
+            "claimId": "claim_david_blackwell_001_01",
+            "predicate": "became",
+            "object": "UC Berkeley’s first Black tenured professor after a 1954 visiting appointment and a 1955 full appointment; the first Black NAS member in 1965",
+            "sourceIds": ["blackwell-department", "blackwell-obituary", "blackwell-nas"]
+          }
+        ],
+        "notabilityBasis": [
+          {
+            "criterion": "first_to_do_x",
+            "note": "Berkeley’s first Black tenured professor and the first Black member of the National Academy of Sciences.",
+            "evidenceIds": ["claim_david_blackwell_001_01"]
+          }
+        ]
+      },
+      "proposedSha256": "f9425d469a43721ae5ec7eb5a0a0bcf00d793cf25443dcec047a5d04bb2b58ff",
+      "fieldEvidence": {
+        "summary": ["blackwell-department", "blackwell-obituary", "blackwell-nas"],
+        "historicalContext": ["blackwell-obituary"]
+      },
+      "findingDisposition": "Separate visiting arrival from full appointment. Remove the generic site basis from the person. Omit the unsupported repeated-rejections formulation and unneeded building tribute from the revised context; omission is not a finding that the tribute is false.",
+      "strongestChallenge": "The obituary opening says joined the faculty in 1954, but its detailed chronology and departmental history distinguish visiting from full. Neither the directory alone nor two Berkeley hosts establish independent corroboration of all firstness claims.",
+      "verdict": "correction-forcing",
+      "unchangedClaimsNotRecertified": ["claim_david_blackwell_001_02"],
+      "proseEvidenceSpans": [
+        {
+          "field": "summary",
+          "start": 0,
+          "end": 147,
+          "sourceIds": ["blackwell-department", "blackwell-obituary"],
+          "review": "Full sentence, including its factual clauses, checked against the named source locators; self-review only."
+        },
+        {
+          "field": "summary",
+          "start": 147,
+          "end": 273,
+          "sourceIds": ["blackwell-obituary", "blackwell-nas"],
+          "review": "Full sentence, including its factual clauses, checked against the named source locators; self-review only."
+        },
+        {
+          "field": "historicalContext",
+          "start": 0,
+          "end": 95,
+          "sourceIds": ["blackwell-obituary"],
+          "review": "Full sentence, including its factual clauses, checked against the named source locators; self-review only."
+        },
+        {
+          "field": "historicalContext",
+          "start": 95,
+          "end": 159,
+          "sourceIds": ["blackwell-obituary"],
+          "review": "Full sentence, including its factual clauses, checked against the named source locators; self-review only."
+        }
+      ]
+    }
+  ],
+  "applicationConstraints": [
+    "This is a review record, not an operator-cli input or approval credential. No database write has been executed.",
+    "Refresh every affected row and compare the before material before applying. Preserve unrelated columns and JSON keys; facets upserts replace the whole object.",
+    "Append claim versions and exact evidence assignments through the existing canonical review path. Do not rewrite historical claim versions, source documents or quotations.",
+    "Canonical kind_detail.editorial, canonical notability_basis, applicable research.landscape_candidates payloads, active release projection plus denormalized summary/claims, and search facets must agree with the approved revision.",
+    "Append a correction disposition to research.entity_enrichment notes; prevent the Lucy draft with superseded dates from being replayed. Keep historical drafts and source quotations as provenance.",
+    "Attach reviewed source captures/selectors for changed claims and for every clause of new summary/context; URLs in this packet are inspected references, not persisted captures or machine-approved assessments.",
+    "Existing unchanged claims, geography, status history, images and rights are not recertified by this prose pass. Complete their applicable gates before claiming full-record release readiness.",
+    "Inspect article references, source-derived inclusion notes, provenance and public metadata/cards. Keep quoted source errors as source evidence with correction context, not silently edited quotations.",
+    "Use separate publication-role review. Rebuild release graph, republish the catalog artifacts once through the current contract, purge the authorized edge cache, and verify artifact and rendered page independently."
+  ],
+  "unresolved": [
+    "Golden Thirteen statusHistory begins in 1919 and points to old claim IDs; the group is rendered as a visitable active place. Review identity/status and place-anchor semantics before recertifying the record.",
+    "David Blackwell is labeled UC Berkeley campus with coordinates 37.80222,-122.27139. The coordinate/label consistency needs a separate sourced location check; no coordinate correction is proposed here.",
+    "The publication gate still binds structured claims, not all final prose. This packet hash is a review aid, not runtime enforcement.",
+    "Thirteen metadata-only source captures are persisted. The Congressional Record PDF capture and accepted exact evidence-selector assignments remain absent; qualitative review is not calibrated scoring. Public errata remains pending; all six live pages were verified after the successful cache purge."
+  ],
+  "derivativeAudit": {
+    "observedAt": "2026-10-07T23:06:50.838Z",
+    "method": "Read-only transaction. Full-row ILIKE search for each entity ID and full name in reference.articles and active published.release_articles; entity-ID joins for enrichment and current claim evidence.",
+    "articleMatches": 0,
+    "activeReleaseArticleMatches": 0,
+    "limits": "Does not exclude unnamed, alias-only or paraphrased mentions; external cached artifacts were not searched again in this follow-up.",
+    "currentClaimEvidenceLinks": 14,
+    "currentEvidenceSelectorAssignments": 0,
+    "linksWithNullExcerpt": 14,
+    "evidenceMetadata": "All fourteen linked rows report sourceCapturePresent=false and supportingExcerptPresent=false. This is stored metadata, not a repository-wide search for separately stored captures.",
+    "storedEvidenceLinks": [
+      {
+        "entity_id": "disc_golden_thirteen_q5579862",
+        "claim_id": "claim_disc_golden_thirteen_q5579862_01",
+        "role": "supporting",
+        "claim_version_id": "clv_1997946ce34be8507a3329fc4403a97e",
+        "evidence_id": "ev_web_57c325054ac2e60572e27a97f431807f",
+        "excerpt": null,
+        "metadata": {
+          "citationLabel": "Wikipedia entry",
+          "importedFromRelease": "rel_seed_001",
+          "sourceCapturePresent": false,
+          "supportingExcerptPresent": false
+        },
+        "title": "Wikipedia entry",
+        "url": "https://en.wikipedia.org/wiki/Golden_Thirteen"
+      },
+      {
+        "entity_id": "disc_golden_thirteen_q5579862",
+        "claim_id": "claim_disc_golden_thirteen_q5579862_02",
+        "role": "supporting",
+        "claim_version_id": "clv_69617a2646b8938b2e4cfe175d37a9da",
+        "evidence_id": "ev_web_57c325054ac2e60572e27a97f431807f",
+        "excerpt": null,
+        "metadata": {
+          "citationLabel": "Wikipedia entry",
+          "importedFromRelease": "rel_seed_001",
+          "sourceCapturePresent": false,
+          "supportingExcerptPresent": false
+        },
+        "title": "Wikipedia entry",
+        "url": "https://en.wikipedia.org/wiki/Golden_Thirteen"
+      },
+      {
+        "entity_id": "disc_golden_thirteen_q5579862",
+        "claim_id": "claim_disc_golden_thirteen_q5579862_03",
+        "role": "supporting",
+        "claim_version_id": "clv_c79e577400f3b2009afc6a3ef12821cd",
+        "evidence_id": "ev_web_57c325054ac2e60572e27a97f431807f",
+        "excerpt": null,
+        "metadata": {
+          "citationLabel": "Wikipedia entry",
+          "importedFromRelease": "rel_seed_001",
+          "sourceCapturePresent": false,
+          "supportingExcerptPresent": false
+        },
+        "title": "Wikipedia entry",
+        "url": "https://en.wikipedia.org/wiki/Golden_Thirteen"
+      },
+      {
+        "entity_id": "disc_golden_thirteen_q5579862",
+        "claim_id": "claim_disc_golden_thirteen_q5579862_04",
+        "role": "supporting",
+        "claim_version_id": "clv_c99aa0e414c526026cbac235449ad74a",
+        "evidence_id": "ev_web_57c325054ac2e60572e27a97f431807f",
+        "excerpt": null,
+        "metadata": {
+          "citationLabel": "Wikipedia entry",
+          "importedFromRelease": "rel_seed_001",
+          "sourceCapturePresent": false,
+          "supportingExcerptPresent": false
+        },
+        "title": "Wikipedia entry",
+        "url": "https://en.wikipedia.org/wiki/Golden_Thirteen"
+      },
+      {
+        "entity_id": "ent_autherine_lucy_ua_001",
+        "claim_id": "claim_autherine_lucy_ua_001_01",
+        "role": "supporting",
+        "claim_version_id": "clv_179b18cdbf81ea47707b4a81451e0212",
+        "evidence_id": "ev_web_a9c6bbc155e890fc251e3e1fdfb7d439",
+        "excerpt": null,
+        "metadata": {
+          "citationLabel": "Encyclopedia of Alabama: Autherine Lucy",
+          "importedFromRelease": "rel_seed_001",
+          "sourceCapturePresent": false,
+          "supportingExcerptPresent": false
+        },
+        "title": "Encyclopedia of Alabama: Autherine Lucy",
+        "url": "https://encyclopediaofalabama.org/article/autherine-lucy/"
+      },
+      {
+        "entity_id": "ent_autherine_lucy_ua_001",
+        "claim_id": "claim_autherine_lucy_ua_001_02",
+        "role": "supporting",
+        "claim_version_id": "clv_07b08bcb6b0f7320ba8745e53b35d901",
+        "evidence_id": "ev_web_f17a40e22f4d24e09b2f56fc0d60c9b9",
+        "excerpt": null,
+        "metadata": {
+          "citationLabel": "University of Alabama News: Autherine Lucy Foster - The Life of a Legend",
+          "importedFromRelease": "rel_seed_001",
+          "sourceCapturePresent": false,
+          "supportingExcerptPresent": false
+        },
+        "title": "University of Alabama News: Autherine Lucy Foster - The Life of a Legend",
+        "url": "https://news.ua.edu/2023/03/autherine-lucy-foster-the-life-of-a-legend/"
+      },
+      {
+        "entity_id": "ent_bessie_coleman_001",
+        "claim_id": "claim_bessie_coleman_001_02",
+        "role": "supporting",
+        "claim_version_id": "clv_cf0e872bdad7018213455fb30bb7260c",
+        "evidence_id": "ev_web_35c636cfcf52155a0a2c276fa9d3acae",
+        "excerpt": null,
+        "metadata": {
+          "citationLabel": "BlackPast.org: Bessie Coleman (1892-1926)",
+          "importedFromRelease": "rel_seed_001",
+          "sourceCapturePresent": false,
+          "supportingExcerptPresent": false
+        },
+        "title": "BlackPast.org: Bessie Coleman (1892-1926)",
+        "url": "https://blackpast.org/african-american-history/coleman-bessie-1892-1926/"
+      },
+      {
+        "entity_id": "ent_bessie_coleman_001",
+        "claim_id": "claim_bessie_coleman_001_01",
+        "role": "supporting",
+        "claim_version_id": "clv_4328bed5caa84aebdc66717bd1e378cc",
+        "evidence_id": "ev_web_530d88f6f8d3681f87bd0bfa2e9cc1b5",
+        "excerpt": null,
+        "metadata": {
+          "citationLabel": "Smithsonian Institution: Bessie Coleman, First African American Woman Licensed Pilot",
+          "importedFromRelease": "rel_seed_001",
+          "sourceCapturePresent": false,
+          "supportingExcerptPresent": false
+        },
+        "title": "Smithsonian Institution: Bessie Coleman, First African American Woman Licensed Pilot",
+        "url": "https://www.si.edu/collections/snapshot/bessie-coleman-first-african-american-woman-licensed-pilot"
+      },
+      {
+        "entity_id": "ent_bill_russell_001",
+        "claim_id": "claim_bill_russell_001_01",
+        "role": "supporting",
+        "claim_version_id": "clv_94e65e33212e7187474d97d60a79c337",
+        "evidence_id": "ev_web_1b12a0553d69deb7f0f222ef389b5df5",
+        "excerpt": null,
+        "metadata": {
+          "citationLabel": "History.com — Bill Russell becomes the NBA's first Black coach",
+          "importedFromRelease": "rel_seed_001",
+          "sourceCapturePresent": false,
+          "supportingExcerptPresent": false
+        },
+        "title": "History.com — Bill Russell becomes the NBA's first Black coach",
+        "url": "https://www.history.com/this-day-in-history/april-17/bill-russell-first-black-nba-coach-celtics"
+      },
+      {
+        "entity_id": "ent_bill_russell_001",
+        "claim_id": "claim_bill_russell_001_02",
+        "role": "supporting",
+        "claim_version_id": "clv_517a34b1e418c88ed292b577e3eafe1b",
+        "evidence_id": "ev_web_c1b80616acf8198047c4e8311f9ba6eb",
+        "excerpt": null,
+        "metadata": {
+          "citationLabel": "Naismith Memorial Basketball Hall of Fame — Bill Russell",
+          "importedFromRelease": "rel_seed_001",
+          "sourceCapturePresent": false,
+          "supportingExcerptPresent": false
+        },
+        "title": "Naismith Memorial Basketball Hall of Fame — Bill Russell",
+        "url": "https://www.hoophall.com/hall-of-famers/bill-russell-1"
+      },
+      {
+        "entity_id": "ent_carl_stokes_001",
+        "claim_id": "claim_carl_stokes_001_01",
+        "role": "supporting",
+        "claim_version_id": "clv_1218c5ac931b63fc3db8e6f3533b7503",
+        "evidence_id": "ev_web_0b87f10a632e86475412d5f905f6daf1",
+        "excerpt": null,
+        "metadata": {
+          "citationLabel": "National Park Service: Carl B. Stokes, Ground-Breaking Cleveland Mayor",
+          "importedFromRelease": "rel_seed_001",
+          "sourceCapturePresent": false,
+          "supportingExcerptPresent": false
+        },
+        "title": "National Park Service: Carl B. Stokes, Ground-Breaking Cleveland Mayor",
+        "url": "https://www.nps.gov/people/carl-b-stokes.htm"
+      },
+      {
+        "entity_id": "ent_carl_stokes_001",
+        "claim_id": "claim_carl_stokes_001_02",
+        "role": "supporting",
+        "claim_version_id": "clv_8327f9da47b1188045cb2c46ded7204e",
+        "evidence_id": "ev_web_20c3ede3d36accb309410881741b01b8",
+        "excerpt": null,
+        "metadata": {
+          "citationLabel": "Encyclopedia of Cleveland History: Carl B. Stokes",
+          "importedFromRelease": "rel_seed_001",
+          "sourceCapturePresent": false,
+          "supportingExcerptPresent": false
+        },
+        "title": "Encyclopedia of Cleveland History: Carl B. Stokes",
+        "url": "https://case.edu/ech/articles/s/stokes-carl-b"
+      },
+      {
+        "entity_id": "ent_david_blackwell_001",
+        "claim_id": "claim_david_blackwell_001_01",
+        "role": "supporting",
+        "claim_version_id": "clv_1b66348900782bd02e162fb591a23cf2",
+        "evidence_id": "ev_web_fc6691fe2a68ee7501535869dbf5ed27",
+        "excerpt": null,
+        "metadata": {
+          "citationLabel": "Britannica: David Blackwell",
+          "importedFromRelease": "rel_seed_001",
+          "sourceCapturePresent": false,
+          "supportingExcerptPresent": false
+        },
+        "title": "Britannica: David Blackwell",
+        "url": "https://www.britannica.com/biography/David-Blackwell"
+      },
+      {
+        "entity_id": "ent_david_blackwell_001",
+        "claim_id": "claim_david_blackwell_001_02",
+        "role": "supporting",
+        "claim_version_id": "clv_c02caca216f82aaf5b9151b44c7d0fb0",
+        "evidence_id": "ev_web_5ab54597c6437088fa93cad9d962ec66",
+        "excerpt": null,
+        "metadata": {
+          "citationLabel": "BlackPast.org: David Harold Blackwell (1919-2010)",
+          "importedFromRelease": "rel_seed_001",
+          "sourceCapturePresent": false,
+          "supportingExcerptPresent": false
+        },
+        "title": "BlackPast.org: David Harold Blackwell (1919-2010)",
+        "url": "https://blackpast.org/african-american-history/blackwell-david-harold-1919-2010/"
+      }
+    ],
+    "enrichment": [
+      {
+        "entity_id": "disc_golden_thirteen_q5579862",
+        "status": "skipped",
+        "fields_written": [],
+        "notes": {
+          "triage": {
+            "reason": "meets-content-expectations",
+            "verdict": "meets_bar",
+            "auditedAt": "2026-08-06T17:36:07.849Z",
+            "specVersion": 2,
+            "failedChecks": [],
+            "distinctSourceCount": 1
+          }
+        }
+      },
+      {
+        "entity_id": "ent_autherine_lucy_ua_001",
+        "status": "enriched",
+        "fields_written": ["summary", "historicalContext", "topicIds", "eraBuckets", "keywords"],
+        "notes": {
+          "ws": "repo-n7p6.4",
+          "draft": {
+            "summary": "Autherine Lucy's enrollment at the University of Alabama was the first attempt to integrate the institution. In 1956, she enrolled as a graduate student in library sciences after securing a court order against racial exclusion. Violent protests followed, and the university suspended and later expelled her within days, citing its inability to provide a safe learning environment. Her enrollment struggle became a test case after the Supreme Court's 1955 Brown v. Board of Education decision outlawed segregation.",
+            "keywords": [
+              "Autherine Lucy",
+              "University of Alabama",
+              "racial integration",
+              "desegregation",
+              "Brown v. Board of Education",
+              "civil rights"
+            ],
+            "topicIds": [
+              "civil-rights",
+              "desegregation",
+              "education",
+              "school-desegregation",
+              "supreme-court"
+            ],
+            "eraBuckets": ["1950s", "1960s", "1980s", "1990s"],
+            "summaryCitations": [
+              {
+                "quote": "The first attempt to integrate the university occurred in 1956 when Autherine Lucy successfully enrolled on February 3 as a graduate student in library sciences after she secured a court order preventing the university from rejecting her application on the basis of race.",
+                "evidenceId": "ev_6f2f90f2461fae47fecdb25a"
+              },
+              {
+                "quote": "In the face of violent protests against her attendance, Lucy was suspended (and later outright expelled) three days later by the board of trustees on the basis of being unable to provide a safe learning environment for her.",
+                "evidenceId": "ev_6f2f90f2461fae47fecdb25a"
+              },
+              {
+                "quote": "In 1955, the Brown vs. Board of Education decision outlawing segregation came down from the U.S. Supreme Court, and it became clear to Shores and the NAACP that the Myers/Lucy case would be the first test.",
+                "evidenceId": "ev_d434e12154fed9960f994684"
+              }
+            ],
+            "historicalContext": "The University of Alabama did not integrate until Vivian Malone and James Hood registered for classes in 1963. Lucy's expulsion was rescinded in 1980, and she returned to earn a master's degree in 1992.",
+            "historicalContextCitations": [
+              {
+                "quote": "The university was not integrated until 1963 when Vivian Malone and James Hood registered for classes on June 11.",
+                "evidenceId": "ev_6f2f90f2461fae47fecdb25a"
+              },
+              {
+                "quote": "Autherine Lucy's expulsion was rescinded in 1980, and she re-enrolled and graduated with a master's degree in 1992.",
+                "evidenceId": "ev_6f2f90f2461fae47fecdb25a"
+              }
+            ]
+          },
+          "schemaId": "entity_enrichment_draft.v1",
+          "schemaVersion": "1"
+        }
+      },
+      {
+        "entity_id": "ent_bessie_coleman_001",
+        "status": "skipped",
+        "fields_written": [],
+        "notes": {
+          "triage": {
+            "reason": "meets-content-expectations",
+            "verdict": "meets_bar",
+            "auditedAt": "2026-08-06T17:36:07.849Z",
+            "specVersion": 2,
+            "failedChecks": [],
+            "distinctSourceCount": 2
+          }
+        }
+      },
+      {
+        "entity_id": "ent_bill_russell_001",
+        "status": "skipped",
+        "fields_written": [],
+        "notes": {
+          "triage": {
+            "reason": "meets-content-expectations",
+            "verdict": "meets_bar",
+            "auditedAt": "2026-08-06T17:36:07.849Z",
+            "specVersion": 2,
+            "failedChecks": [],
+            "distinctSourceCount": 2
+          }
+        }
+      },
+      {
+        "entity_id": "ent_carl_stokes_001",
+        "status": "skipped",
+        "fields_written": [],
+        "notes": {
+          "triage": {
+            "reason": "meets-content-expectations",
+            "verdict": "meets_bar",
+            "auditedAt": "2026-08-06T17:36:07.849Z",
+            "specVersion": 2,
+            "failedChecks": [],
+            "distinctSourceCount": 2
+          }
+        }
+      },
+      {
+        "entity_id": "ent_david_blackwell_001",
+        "status": "skipped",
+        "fields_written": [],
+        "notes": {
+          "triage": {
+            "reason": "meets-content-expectations",
+            "verdict": "meets_bar",
+            "auditedAt": "2026-08-06T17:36:07.849Z",
+            "specVersion": 2,
+            "failedChecks": [],
+            "distinctSourceCount": 2
+          }
+        }
+      }
+    ],
+    "disposition": "Append review findings to the enrichment ledger and supersede the Lucy draft before any replay. Preserve erroneous historical quotations with correction context rather than changing the quotations. Five meets_bar triage outcomes measured content shape, not factual truth."
+  },
+  "proseSpanConvention": "Zero-based Unicode character offsets, end exclusive, in proposed summary/historicalContext. Spans cover all draft prose. Claim edits name sourceIds; inclusion notes reference those edited claims. Source locators and lineage limits are in sources.",
+  "authorization": {
+    "kind": "explicit-user-instruction",
+    "text": "I approve the data changes, so those can be pushed / published.",
+    "scope": "Six exact reviewed proposals; no full-record recertification",
+    "proposalHashes": [
+      {
+        "entityId": "ent_bill_russell_001",
+        "sha256": "389c14c26803a04f9b7167bd06e7935c67bfce974b8ac56a13ddcb73839556ec"
+      },
+      {
+        "entityId": "ent_autherine_lucy_ua_001",
+        "sha256": "004393762d45423d476a3033cb98e9236c0add096abfb1451d88f7e28b685a97"
+      },
+      {
+        "entityId": "ent_carl_stokes_001",
+        "sha256": "dd5afa1775620a1e4548d1cf281381a1710a0d38ae283e44f4ca346b0b94f256"
+      },
+      {
+        "entityId": "disc_golden_thirteen_q5579862",
+        "sha256": "35fa20f5ef71611522cd98ab15eb40cf87a87574d38ec5f43852847162b46fe8"
+      },
+      {
+        "entityId": "ent_bessie_coleman_001",
+        "sha256": "07517f61b0c6e746830331e038d5d3c6a20bde068916231623498ff16343fc25"
+      },
+      {
+        "entityId": "ent_david_blackwell_001",
+        "sha256": "f9425d469a43721ae5ec7eb5a0a0bcf00d793cf25443dcec047a5d04bb2b58ff"
+      }
+    ]
+  },
+  "applicationConstraintsStatus": "These constraints record the pre-application preview. The human subsequently authorized scoped correction of already published data. Actual execution and limitations follow in publication; this is not full-record recertification.",
+  "publication": {
+    "receipt": {
+      "mode": "--apply",
+      "startedAt": "2026-10-07T23:27:48.058Z",
+      "releaseId": "rel_20260918_dunbar_media_correction_001",
+      "authorization": {
+        "kind": "explicit-user-instruction",
+        "text": "I approve the data changes, so those can be pushed / published.",
+        "scope": "Six exact reviewed proposals; no full-record recertification",
+        "proposalHashes": [
+          {
+            "entityId": "ent_bill_russell_001",
+            "sha256": "389c14c26803a04f9b7167bd06e7935c67bfce974b8ac56a13ddcb73839556ec"
+          },
+          {
+            "entityId": "ent_autherine_lucy_ua_001",
+            "sha256": "004393762d45423d476a3033cb98e9236c0add096abfb1451d88f7e28b685a97"
+          },
+          {
+            "entityId": "ent_carl_stokes_001",
+            "sha256": "dd5afa1775620a1e4548d1cf281381a1710a0d38ae283e44f4ca346b0b94f256"
+          },
+          {
+            "entityId": "disc_golden_thirteen_q5579862",
+            "sha256": "35fa20f5ef71611522cd98ab15eb40cf87a87574d38ec5f43852847162b46fe8"
+          },
+          {
+            "entityId": "ent_bessie_coleman_001",
+            "sha256": "07517f61b0c6e746830331e038d5d3c6a20bde068916231623498ff16343fc25"
+          },
+          {
+            "entityId": "ent_david_blackwell_001",
+            "sha256": "f9425d469a43721ae5ec7eb5a0a0bcf00d793cf25443dcec047a5d04bb2b58ff"
+          }
+        ]
+      },
+      "entities": [
+        {
+          "entityId": "ent_bill_russell_001",
+          "proposalSha256": "389c14c26803a04f9b7167bd06e7935c67bfce974b8ac56a13ddcb73839556ec",
+          "claimEdits": 1,
+          "versions": [
+            {
+              "claimId": "claim_bill_russell_001_01",
+              "oldVersionId": "clv_94e65e33212e7187474d97d60a79c337",
+              "newVersionId": "clv_0d94924ae844c360c4219e5623fa1660",
+              "evidenceRefs": [
+                {
+                  "evidenceId": "ev_ef4007f11caad92896a0f711d793f698",
+                  "sourceId": "russell-coach",
+                  "captureId": "cap_7749969cd10fc051"
+                }
+              ]
+            }
+          ],
+          "projectionSha256": "c8f53222f4b457b21152e491c4dacd92d4004117cc2834b79dd367898599730e",
+          "facetsSha256": "4e98a498d45574b752506d2bf83b13d895172b23052909360688b486ad1f7aca"
+        },
+        {
+          "entityId": "ent_autherine_lucy_ua_001",
+          "proposalSha256": "004393762d45423d476a3033cb98e9236c0add096abfb1451d88f7e28b685a97",
+          "claimEdits": 2,
+          "versions": [
+            {
+              "claimId": "claim_autherine_lucy_ua_001_01",
+              "oldVersionId": "clv_179b18cdbf81ea47707b4a81451e0212",
+              "newVersionId": "clv_2f6b863fa92f6568d239cca33838e089",
+              "evidenceRefs": [
+                {
+                  "evidenceId": "ev_5ced7c3df0f498485bbd400929373669",
+                  "sourceId": "lucy-marker",
+                  "captureId": "cap_92cf97bbaa3ccd24"
+                }
+              ]
+            },
+            {
+              "claimId": "claim_autherine_lucy_ua_001_02",
+              "oldVersionId": "clv_07b08bcb6b0f7320ba8745e53b35d901",
+              "newVersionId": "clv_acf2431893705a61646ddad40d569707",
+              "evidenceRefs": [
+                {
+                  "evidenceId": "ev_5ced7c3df0f498485bbd400929373669",
+                  "sourceId": "lucy-marker",
+                  "captureId": "cap_92cf97bbaa3ccd24"
+                }
+              ]
+            }
+          ],
+          "projectionSha256": "1500c4027f835fe52ff901450241ab246ce012dda8e2e7cb0d00c9c30f0b0a06",
+          "facetsSha256": "51eb95388877d9e07b9767cf6122001f5094ab3bf89e873a23d6e74bbdf3b164"
+        },
+        {
+          "entityId": "ent_carl_stokes_001",
+          "proposalSha256": "dd5afa1775620a1e4548d1cf281381a1710a0d38ae283e44f4ca346b0b94f256",
+          "claimEdits": 2,
+          "versions": [
+            {
+              "claimId": "claim_carl_stokes_001_01",
+              "oldVersionId": "clv_1218c5ac931b63fc3db8e6f3533b7503",
+              "newVersionId": "clv_267849d2b7d60a3ce8c16393b4061a48",
+              "evidenceRefs": [
+                {
+                  "evidenceId": "ev_302275bf0dde248db97fa238ea0d8f1a",
+                  "sourceId": "stokes-record",
+                  "captureId": null
+                },
+                {
+                  "evidenceId": "ev_0860615a28f3087ba4c404f8d84d99bc",
+                  "sourceId": "stokes-history",
+                  "captureId": "cap_2e1e43e91982cf1a"
+                }
+              ]
+            },
+            {
+              "claimId": "claim_carl_stokes_001_02",
+              "oldVersionId": "clv_8327f9da47b1188045cb2c46ded7204e",
+              "newVersionId": "clv_338a82dc872632d14a691bedc804e581",
+              "evidenceRefs": [
+                {
+                  "evidenceId": "ev_0860615a28f3087ba4c404f8d84d99bc",
+                  "sourceId": "stokes-history",
+                  "captureId": "cap_2e1e43e91982cf1a"
+                }
+              ]
+            }
+          ],
+          "projectionSha256": "c2de807075bb0fbebd98ff7fa6c304330578d47ba784e1ba89fd453bf2b9fd6e",
+          "facetsSha256": "57579995960729e13456506ff251d7617810d6e4e3621c2e5239dbfb186fb276"
+        },
+        {
+          "entityId": "disc_golden_thirteen_q5579862",
+          "proposalSha256": "35fa20f5ef71611522cd98ab15eb40cf87a87574d38ec5f43852847162b46fe8",
+          "claimEdits": 1,
+          "versions": [
+            {
+              "claimId": "claim_disc_golden_thirteen_q5579862_02",
+              "oldVersionId": "clv_69617a2646b8938b2e4cfe175d37a9da",
+              "newVersionId": "clv_2c595335d8658a332a26ac1cfb3d5c85",
+              "evidenceRefs": [
+                {
+                  "evidenceId": "ev_2675b87ad4e08999d3684a46004a9915",
+                  "sourceId": "golden-oral",
+                  "captureId": "cap_78c3984b623a0ef3"
+                }
+              ]
+            }
+          ],
+          "projectionSha256": "8a46163dcfe5d78df1b8117db578803098ba87ed41fbc2c0475a3d859e35813c",
+          "facetsSha256": "dc2d4c545250f7e27ba424bec5a1d3f79387eb46f5d08b9fdbb19598b74ea2d2"
+        },
+        {
+          "entityId": "ent_bessie_coleman_001",
+          "proposalSha256": "07517f61b0c6e746830331e038d5d3c6a20bde068916231623498ff16343fc25",
+          "claimEdits": 1,
+          "versions": [
+            {
+              "claimId": "claim_bessie_coleman_001_01",
+              "oldVersionId": "clv_4328bed5caa84aebdc66717bd1e378cc",
+              "newVersionId": "clv_6de958e436df5da65998aad735837a5b",
+              "evidenceRefs": [
+                {
+                  "evidenceId": "ev_fffead2dbff96ee25ba77b07bb58070a",
+                  "sourceId": "coleman-mint",
+                  "captureId": "cap_f9fa855c9f561b86"
+                }
+              ]
+            }
+          ],
+          "projectionSha256": "e58fb40f309bfbdc87d2f5483583c967dffd2f28aad8417bc08cc5b0ce71c1d6",
+          "facetsSha256": "01f0d355fc5c51030839e87a29d934f8b368b24c3c9e8fa8f1b1909da5e0800c"
+        },
+        {
+          "entityId": "ent_david_blackwell_001",
+          "proposalSha256": "f9425d469a43721ae5ec7eb5a0a0bcf00d793cf25443dcec047a5d04bb2b58ff",
+          "claimEdits": 1,
+          "versions": [
+            {
+              "claimId": "claim_david_blackwell_001_01",
+              "oldVersionId": "clv_057f02f309f636c283beb2524434602f",
+              "newVersionId": "clv_aa233f6fca72ab548f0841cb711c53d6",
+              "evidenceRefs": [
+                {
+                  "evidenceId": "ev_4ec467fae8d4d719471a6861d9e15dab",
+                  "sourceId": "blackwell-obituary",
+                  "captureId": "cap_e5a5404040c209f5"
+                }
+              ]
+            },
+            {
+              "claimId": "claim_david_blackwell_001_03",
+              "oldVersionId": null,
+              "newVersionId": "clv_9d340c8f164d6a01216c6bf7c3dff9c2",
+              "evidenceRefs": [
+                {
+                  "evidenceId": "ev_a958342440293be240f415f01e320269",
+                  "sourceId": "blackwell-nas",
+                  "captureId": "cap_f73c08fa7071560d"
+                }
+              ]
+            }
+          ],
+          "projectionSha256": "225dcf58f7a6f07946adb433d3632893df8f04d060b64577947200a903bf4dbf",
+          "facetsSha256": "499398c98e72344a1005f1e5b94708027648ea855da87c69537832543798560b",
+          "effectiveClaimEdits": [
+            {
+              "claimId": "claim_david_blackwell_001_01",
+              "predicate": "became",
+              "object": "UC Berkeley’s first Black tenured professor after a 1954 visiting appointment and a 1955 full appointment; the first Black member of the National Academy of Sciences",
+              "sourceIds": ["blackwell-obituary"]
+            },
+            {
+              "claimId": "claim_david_blackwell_001_03",
+              "predicate": "elected_in",
+              "object": "1965, to the National Academy of Sciences",
+              "sourceIds": ["blackwell-nas"]
+            }
+          ],
+          "effectiveProposal": {
+            "summary": "Statistician David Blackwell came to UC Berkeley as a visiting professor in 1954 and joined its statistics department as a full professor in 1955. He was Berkeley's first Black tenured professor and became the first Black member of the National Academy of Sciences in 1965.",
+            "historicalContext": "Before Berkeley, Blackwell taught at Southern University, Clark College and Howard University. At Howard, he became head of the mathematics department in 1947.",
+            "claimEdits": [
+              {
+                "claimId": "claim_david_blackwell_001_01",
+                "predicate": "became",
+                "object": "UC Berkeley’s first Black tenured professor after a 1954 visiting appointment and a 1955 full appointment; the first Black member of the National Academy of Sciences",
+                "sourceIds": ["blackwell-obituary"]
+              },
+              {
+                "claimId": "claim_david_blackwell_001_03",
+                "predicate": "elected_in",
+                "object": "1965, to the National Academy of Sciences",
+                "sourceIds": ["blackwell-nas"]
+              }
+            ],
+            "notabilityBasis": [
+              {
+                "criterion": "first_to_do_x",
+                "note": "Berkeley’s first Black tenured professor and the first Black member of the National Academy of Sciences.",
+                "evidenceIds": ["claim_david_blackwell_001_01"]
+              }
+            ]
+          },
+          "effectiveProposalSha256": "f71d39991c86e05360ddc079b54a245c4b8bd3e7839c16f7e0eb290eed757002"
+        }
+      ],
+      "committed": true,
+      "finishedAt": "2026-10-07T23:28:04.416Z",
+      "metadataFollowup": {
+        "at": "2026-10-07T23:36:46.319Z",
+        "reason": "Align the reader-visible Updated field and projection generation time with the canonical correction transaction.",
+        "rows": [
+          {
+            "entityId": "ent_bill_russell_001",
+            "beforeProjectionSha256": "15db5060274c39acfd8d94426dc14afab6c29c18cf6de5158fe045eec26c5f8c",
+            "afterProjectionSha256": "c8f53222f4b457b21152e491c4dacd92d4004117cc2834b79dd367898599730e",
+            "recordUpdatedAt": "2026-10-07T23:27:48.992Z"
+          },
+          {
+            "entityId": "ent_autherine_lucy_ua_001",
+            "beforeProjectionSha256": "60068e33700f92c6f0d37c72954bda96ebcec2c0d8e73155c5401cccceb79dee",
+            "afterProjectionSha256": "1500c4027f835fe52ff901450241ab246ce012dda8e2e7cb0d00c9c30f0b0a06",
+            "recordUpdatedAt": "2026-10-07T23:27:48.992Z"
+          },
+          {
+            "entityId": "ent_carl_stokes_001",
+            "beforeProjectionSha256": "607b9bd4c984058a98c4415e0168840a507df4d6998e94f0d633f1169e58f454",
+            "afterProjectionSha256": "c2de807075bb0fbebd98ff7fa6c304330578d47ba784e1ba89fd453bf2b9fd6e",
+            "recordUpdatedAt": "2026-10-07T23:27:48.992Z"
+          },
+          {
+            "entityId": "disc_golden_thirteen_q5579862",
+            "beforeProjectionSha256": "4383fbd697383b099496c22b6870d77554a45d27fbe01dbd98a024e7f48c578e",
+            "afterProjectionSha256": "8a46163dcfe5d78df1b8117db578803098ba87ed41fbc2c0475a3d859e35813c",
+            "recordUpdatedAt": "2026-10-07T23:27:48.992Z"
+          },
+          {
+            "entityId": "ent_bessie_coleman_001",
+            "beforeProjectionSha256": "e2a9620c8fbb45ee9dcef7b20db6d3d5dacc296a85363c1ffca27838cfa29c33",
+            "afterProjectionSha256": "e58fb40f309bfbdc87d2f5483583c967dffd2f28aad8417bc08cc5b0ce71c1d6",
+            "recordUpdatedAt": "2026-10-07T23:27:48.992Z"
+          },
+          {
+            "entityId": "ent_david_blackwell_001",
+            "beforeProjectionSha256": "5a153281bed6c1b1bdb260c8702a6804de067ac1c41836f5b1143a4b71576ce2",
+            "afterProjectionSha256": "6de8b3e213f42acd2d64083abb89f55505dbbf5b4dd178b1f0553420db4594cf",
+            "recordUpdatedAt": "2026-10-07T23:46:20.506Z"
+          }
+        ]
+      },
+      "presentationAdjustment": {
+        "at": "2026-10-07T23:46:20.506Z",
+        "reason": "Public claim shape supports one citation. Separate the already approved election-year clause and use the reviewed biography for the appointment/firstness statement; no new historical assertion.",
+        "originalApprovedProposalSha256": "f9425d469a43721ae5ec7eb5a0a0bcf00d793cf25443dcec047a5d04bb2b58ff",
+        "effectiveClaimEdits": [
+          {
+            "claimId": "claim_david_blackwell_001_01",
+            "predicate": "became",
+            "object": "UC Berkeley’s first Black tenured professor after a 1954 visiting appointment and a 1955 full appointment; the first Black member of the National Academy of Sciences",
+            "sourceIds": ["blackwell-obituary"]
+          },
+          {
+            "claimId": "claim_david_blackwell_001_03",
+            "predicate": "elected_in",
+            "object": "1965, to the National Academy of Sciences",
+            "sourceIds": ["blackwell-nas"]
+          }
+        ],
+        "sourcePassages": {
+          "blackwell-obituary": "Opening firstness statements and Early years appointment paragraph; does not state the NAS election year.",
+          "blackwell-nas": "Election Year field: 1965."
+        },
+        "beforeProjectionSha256": "6de8b3e213f42acd2d64083abb89f55505dbbf5b4dd178b1f0553420db4594cf",
+        "afterProjectionSha256": "225dcf58f7a6f07946adb433d3632893df8f04d060b64577947200a903bf4dbf",
+        "claimCount": 3,
+        "versions": [
+          {
+            "claimId": "claim_david_blackwell_001_01",
+            "oldVersionId": "clv_057f02f309f636c283beb2524434602f",
+            "newVersionId": "clv_aa233f6fca72ab548f0841cb711c53d6",
+            "evidenceRefs": [
+              {
+                "evidenceId": "ev_4ec467fae8d4d719471a6861d9e15dab",
+                "sourceId": "blackwell-obituary",
+                "captureId": "cap_e5a5404040c209f5"
+              }
+            ]
+          },
+          {
+            "claimId": "claim_david_blackwell_001_03",
+            "oldVersionId": null,
+            "newVersionId": "clv_9d340c8f164d6a01216c6bf7c3dff9c2",
+            "evidenceRefs": [
+              {
+                "evidenceId": "ev_a958342440293be240f415f01e320269",
+                "sourceId": "blackwell-nas",
+                "captureId": "cap_f73c08fa7071560d"
+              }
+            ]
+          }
+        ]
+      },
+      "priorBlackwellReceipt": {
+        "entityId": "ent_david_blackwell_001",
+        "proposalSha256": "f9425d469a43721ae5ec7eb5a0a0bcf00d793cf25443dcec047a5d04bb2b58ff",
+        "claimEdits": 1,
+        "versions": [
+          {
+            "claimId": "claim_david_blackwell_001_01",
+            "oldVersionId": "clv_1b66348900782bd02e162fb591a23cf2",
+            "newVersionId": "clv_057f02f309f636c283beb2524434602f",
+            "evidenceRefs": [
+              {
+                "evidenceId": "ev_44a96b260f5f01f892cfd85865320d3b",
+                "sourceId": "blackwell-department",
+                "captureId": "cap_f4d776d8d72d3b85"
+              },
+              {
+                "evidenceId": "ev_4ec467fae8d4d719471a6861d9e15dab",
+                "sourceId": "blackwell-obituary",
+                "captureId": "cap_e5a5404040c209f5"
+              },
+              {
+                "evidenceId": "ev_a958342440293be240f415f01e320269",
+                "sourceId": "blackwell-nas",
+                "captureId": "cap_f73c08fa7071560d"
+              }
+            ]
+          }
+        ],
+        "projectionSha256": "6de8b3e213f42acd2d64083abb89f55505dbbf5b4dd178b1f0553420db4594cf",
+        "facetsSha256": "bde26acff53e7368fb3b7316cbf8df13806ccb31f7f3d721a80235f23f851369"
+      }
+    },
+    "sourceCaptures": [
+      {
+        "sourceId": "russell-coach",
+        "url": "https://www.hoophall.com/hall-of-famers/bill-russell-1",
+        "status": "success",
+        "captureId": "cap_7749969cd10fc051",
+        "hash": "c32abc2ef9d4a07e1bb5047ba83605cbc4198e3d0a0aa5e88cffaab432c43aca",
+        "representation": "metadata-only; no source text retained",
+        "retrievalEvent": "rev_ad3829a5e4a12a6d",
+        "detail": {
+          "url": "https://www.hoophall.com/hall-of-famers/bill-russell-1",
+          "surface": "entity",
+          "finalUrl": "https://www.hoophall.com/hall-of-famers/bill-russell-1",
+          "byteLength": 75352,
+          "storage": "metadata-only"
+        },
+        "deduped": false
+      },
+      {
+        "sourceId": "russell-player",
+        "url": "https://www.hoophall.com/hall-of-famers/bill-russell",
+        "status": "success",
+        "captureId": "cap_f226af7729f51f81",
+        "hash": "9647162cf8fc219a02ad1879298e58a8bedc0d86abfb9327db5a53c1ee280023",
+        "representation": "metadata-only; no source text retained",
+        "retrievalEvent": "rev_fe45bdbd8d280b30",
+        "detail": {
+          "url": "https://www.hoophall.com/hall-of-famers/bill-russell",
+          "surface": "entity",
+          "finalUrl": "https://www.hoophall.com/hall-of-famers/bill-russell",
+          "byteLength": 84525,
+          "storage": "metadata-only"
+        },
+        "deduped": false
+      },
+      {
+        "sourceId": "russell-later",
+        "url": "https://www.nba.com/news/history-nba-legend-bill-russell",
+        "status": "success",
+        "captureId": "cap_1ef4874da54c2fea",
+        "hash": "3f91ff83d8887af3cee1c7c9ff10173c274ea07169daf436815e9a163cd7a93b",
+        "representation": "metadata-only; no source text retained",
+        "retrievalEvent": "rev_319cc890b3436c6d",
+        "detail": {
+          "url": "https://www.nba.com/news/history-nba-legend-bill-russell",
+          "surface": "entity",
+          "finalUrl": "https://www.nba.com/news/history-nba-legend-bill-russell",
+          "byteLength": 394578,
+          "storage": "metadata-only"
+        },
+        "deduped": false
+      },
+      {
+        "sourceId": "pollard",
+        "url": "https://www.profootballhof.com/players/fritz-pollard",
+        "status": "success",
+        "captureId": "cap_121fc43df5b13908",
+        "hash": "af0727d0bcd2836aa01001fc9bc6b82da9c610d82a645c5383a9e8ab0273204f",
+        "representation": "metadata-only; no source text retained",
+        "retrievalEvent": "rev_69cf9932f5608638",
+        "detail": {
+          "url": "https://www.profootballhof.com/players/fritz-pollard",
+          "surface": "entity",
+          "finalUrl": "https://www.profootballhof.com/players/fritz-pollard",
+          "byteLength": 415108,
+          "storage": "metadata-only"
+        },
+        "deduped": false
+      },
+      {
+        "sourceId": "lucy-marker",
+        "url": "https://adhc.lib.ua.edu/adhc-omekaS/s/historicalmarkers/item/20",
+        "status": "success",
+        "captureId": "cap_92cf97bbaa3ccd24",
+        "hash": "a2fd026e0143c5420eb380b11726c7c32d2738e28bb5c6536bfef65da7f7b22d",
+        "representation": "metadata-only; no source text retained",
+        "retrievalEvent": "rev_8ccdf374932debca",
+        "detail": {
+          "url": "https://adhc.lib.ua.edu/adhc-omekaS/s/historicalmarkers/item/20",
+          "surface": "entity",
+          "finalUrl": "https://adhc.lib.ua.edu/adhc-omekaS/s/historicalmarkers/item/20",
+          "byteLength": 13312,
+          "storage": "metadata-only"
+        },
+        "deduped": false
+      },
+      {
+        "sourceId": "brown",
+        "url": "https://www.archives.gov/milestone-documents/brown-v-board-of-education",
+        "status": "success",
+        "captureId": "cap_5041a029e9243097",
+        "hash": "de8f4346d29df814412d274e78c2d246c2749f9999f0d0307a43160c85523992",
+        "representation": "metadata-only; no source text retained",
+        "retrievalEvent": "rev_0c3d8617dcab097a",
+        "detail": {
+          "url": "https://www.archives.gov/milestone-documents/brown-v-board-of-education",
+          "surface": "entity",
+          "finalUrl": "https://www.archives.gov/milestone-documents/brown-v-board-of-education",
+          "byteLength": 52065,
+          "storage": "metadata-only"
+        },
+        "deduped": false
+      },
+      {
+        "sourceId": "stokes-record",
+        "url": "https://www.govinfo.gov/content/pkg/CREC-1997-09-23/pdf/CREC-1997-09-23.pdf",
+        "status": "failure",
+        "captureId": null,
+        "hash": null,
+        "representation": "metadata-only; no source text retained",
+        "retrievalEvent": "rev_14a07b9769589e6c",
+        "detail": {
+          "url": "https://www.govinfo.gov/content/pkg/CREC-1997-09-23/pdf/CREC-1997-09-23.pdf",
+          "surface": "entity",
+          "reason": "content_type_not_allowed"
+        },
+        "deduped": false
+      },
+      {
+        "sourceId": "stokes-history",
+        "url": "https://case.edu/ech/articles/s/stokes-carl-b",
+        "status": "success",
+        "captureId": "cap_2e1e43e91982cf1a",
+        "hash": "abdda680a6f82389753615f30f70afd1c039db8304bedfc86ae8871c8d1141cf",
+        "representation": "metadata-only; no source text retained",
+        "retrievalEvent": "rev_f3e4ca92af503425",
+        "detail": {
+          "url": "https://case.edu/ech/articles/s/stokes-carl-b",
+          "surface": "entity",
+          "finalUrl": "https://case.edu/ech/articles/s/stokes-carl-b",
+          "byteLength": 43302,
+          "storage": "metadata-only"
+        },
+        "deduped": false
+      },
+      {
+        "sourceId": "golden-oral",
+        "url": "https://www.usni.org/magazines/proceedings/1987/may/oral-history-golden-thirteen",
+        "status": "success",
+        "captureId": "cap_78c3984b623a0ef3",
+        "hash": "428067c11ce61c001f8b1b333a3590c24c2bb1362df4177f4ce63a5a38eb9b40",
+        "representation": "metadata-only; no source text retained",
+        "retrievalEvent": "rev_a309b9a610a7d992",
+        "detail": {
+          "url": "https://www.usni.org/magazines/proceedings/1987/may/oral-history-golden-thirteen",
+          "surface": "entity",
+          "finalUrl": "https://www.usni.org/magazines/proceedings/1987/may/oral-history-golden-thirteen",
+          "byteLength": 5665,
+          "storage": "metadata-only"
+        },
+        "deduped": false
+      },
+      {
+        "sourceId": "coleman-mint",
+        "url": "https://www.usmint.gov/news/inside-the-mint/soaring-life-of-pilot-bessie-coleman",
+        "status": "success",
+        "captureId": "cap_f9fa855c9f561b86",
+        "hash": "3b75e9be00d5e8880f93333537e04ff5c73ab2657f01937942baabd0d84a1d62",
+        "representation": "metadata-only; no source text retained",
+        "retrievalEvent": "rev_b72bc91c08244be9",
+        "detail": {
+          "url": "https://www.usmint.gov/news/inside-the-mint/soaring-life-of-pilot-bessie-coleman",
+          "surface": "entity",
+          "finalUrl": "https://www.usmint.gov/news/inside-the-mint/soaring-life-of-pilot-bessie-coleman",
+          "byteLength": 5661,
+          "storage": "metadata-only"
+        },
+        "deduped": false
+      },
+      {
+        "sourceId": "coleman-museum",
+        "url": "https://www.womenshistory.org/education-resources/biographies/bessie-coleman",
+        "status": "success",
+        "captureId": "cap_49d16f05a7de30c3",
+        "hash": "7bd9091363a0c84da9dccfcc98a56c8595aab0e5c015d55ce8398e5c149946d3",
+        "representation": "metadata-only; no source text retained",
+        "retrievalEvent": "rev_f7149c7eba671955",
+        "detail": {
+          "url": "https://www.womenshistory.org/education-resources/biographies/bessie-coleman",
+          "surface": "entity",
+          "finalUrl": "https://www.womenshistory.org/education-resources/biographies/bessie-coleman",
+          "byteLength": 134338,
+          "storage": "metadata-only"
+        },
+        "deduped": false
+      },
+      {
+        "sourceId": "blackwell-department",
+        "url": "https://statistics.berkeley.edu/about/history",
+        "status": "success",
+        "captureId": "cap_f4d776d8d72d3b85",
+        "hash": "8c35a6123113e912f35e3740b72124393314127c02ae669835b94c35efd470d6",
+        "representation": "metadata-only; no source text retained",
+        "retrievalEvent": "rev_c69b51d6488bc011",
+        "detail": {
+          "url": "https://statistics.berkeley.edu/about/history",
+          "surface": "entity",
+          "finalUrl": "https://statistics.berkeley.edu/about/history",
+          "byteLength": 83972,
+          "storage": "metadata-only"
+        },
+        "deduped": false
+      },
+      {
+        "sourceId": "blackwell-obituary",
+        "url": "https://news.berkeley.edu/2010/07/15/blackwell/",
+        "status": "success",
+        "captureId": "cap_e5a5404040c209f5",
+        "hash": "ee162413f19d9abb9438f4da2b6957c03855893fbc4b4bb1799bcf1a228a4690",
+        "representation": "metadata-only; no source text retained",
+        "retrievalEvent": "rev_5838d7e09b809987",
+        "detail": {
+          "url": "https://news.berkeley.edu/2010/07/15/blackwell/",
+          "surface": "entity",
+          "finalUrl": "https://news.berkeley.edu/2010/07/15/blackwell/",
+          "byteLength": 56363,
+          "storage": "metadata-only"
+        },
+        "deduped": false
+      },
+      {
+        "sourceId": "blackwell-nas",
+        "url": "https://www.nasonline.org/directory-entry/david-h-blackwell-ik48uf/",
+        "status": "success",
+        "captureId": "cap_f73c08fa7071560d",
+        "hash": "45d7041bd7c7476277e7d89019b75445d38c76a91131f0eeb0deb681059284d8",
+        "representation": "metadata-only; no source text retained",
+        "retrievalEvent": "rev_1d3ef3c62f12a262",
+        "detail": {
+          "url": "https://www.nasonline.org/directory-entry/david-h-blackwell-ik48uf/",
+          "surface": "entity",
+          "finalUrl": "https://www.nasonline.org/directory-entry/david-h-blackwell-ik48uf/",
+          "byteLength": 1540,
+          "storage": "metadata-only"
+        },
+        "deduped": false
+      }
+    ],
+    "databaseVerification": {
+      "observedAt": "2026-10-07T23:47:22.216Z",
+      "releaseId": "rel_20260918_dunbar_media_correction_001",
+      "entities": [
+        {
+          "entityId": "ent_bill_russell_001",
+          "projectionSha256": "c8f53222f4b457b21152e491c4dacd92d4004117cc2834b79dd367898599730e",
+          "facetsSha256": "4e98a498d45574b752506d2bf83b13d895172b23052909360688b486ad1f7aca",
+          "canonicalReleaseSearchAgree": true,
+          "historicalVersionsPreserved": true,
+          "enrichmentDraftNotReplayable": true
+        },
+        {
+          "entityId": "ent_autherine_lucy_ua_001",
+          "projectionSha256": "1500c4027f835fe52ff901450241ab246ce012dda8e2e7cb0d00c9c30f0b0a06",
+          "facetsSha256": "51eb95388877d9e07b9767cf6122001f5094ab3bf89e873a23d6e74bbdf3b164",
+          "canonicalReleaseSearchAgree": true,
+          "historicalVersionsPreserved": true,
+          "enrichmentDraftNotReplayable": true
+        },
+        {
+          "entityId": "ent_carl_stokes_001",
+          "projectionSha256": "c2de807075bb0fbebd98ff7fa6c304330578d47ba784e1ba89fd453bf2b9fd6e",
+          "facetsSha256": "57579995960729e13456506ff251d7617810d6e4e3621c2e5239dbfb186fb276",
+          "canonicalReleaseSearchAgree": true,
+          "historicalVersionsPreserved": true,
+          "enrichmentDraftNotReplayable": true
+        },
+        {
+          "entityId": "disc_golden_thirteen_q5579862",
+          "projectionSha256": "8a46163dcfe5d78df1b8117db578803098ba87ed41fbc2c0475a3d859e35813c",
+          "facetsSha256": "dc2d4c545250f7e27ba424bec5a1d3f79387eb46f5d08b9fdbb19598b74ea2d2",
+          "canonicalReleaseSearchAgree": true,
+          "historicalVersionsPreserved": true,
+          "enrichmentDraftNotReplayable": true
+        },
+        {
+          "entityId": "ent_bessie_coleman_001",
+          "projectionSha256": "e58fb40f309bfbdc87d2f5483583c967dffd2f28aad8417bc08cc5b0ce71c1d6",
+          "facetsSha256": "01f0d355fc5c51030839e87a29d934f8b368b24c3c9e8fa8f1b1909da5e0800c",
+          "canonicalReleaseSearchAgree": true,
+          "historicalVersionsPreserved": true,
+          "enrichmentDraftNotReplayable": true
+        },
+        {
+          "entityId": "ent_david_blackwell_001",
+          "projectionSha256": "225dcf58f7a6f07946adb433d3632893df8f04d060b64577947200a903bf4dbf",
+          "facetsSha256": "499398c98e72344a1005f1e5b94708027648ea855da87c69537832543798560b",
+          "canonicalReleaseSearchAgree": true,
+          "historicalVersionsPreserved": true,
+          "enrichmentDraftNotReplayable": true
+        }
+      ],
+      "graph": {
+        "temporalInputsUnchanged": true,
+        "oldTemporalInputsSha256": "35f43f3f04d701a94f18c4d0cbc79f2a1a07f1364d034a622a81c15ad3dd8bd1",
+        "newTemporalInputsSha256": "35f43f3f04d701a94f18c4d0cbc79f2a1a07f1364d034a622a81c15ad3dd8bd1",
+        "storedEdges": 1092,
+        "rebuildEligibleEdges": 0,
+        "rebuild": "withheld: would remove existing edges because canonical relationship evidence is absent",
+        "storedGraphSha256": "a6891206388f616252c8acc75250e40963cff542a6ee7715560b5679db9ddc34"
+      }
+    },
+    "artifactVerification": {
+      "observedAt": "2026-10-07T23:49:02.473Z",
+      "artifacts": [
+        {
+          "url": "https://twykhihqkcldpreuovay.supabase.co/storage/v1/object/public/public-media/public/releases/rel_20260918_dunbar_media_correction_001/entities.json",
+          "status": 200,
+          "generatedAt": "2026-10-07T23:47:10.043Z",
+          "records": 4210,
+          "checks": [
+            {
+              "entityId": "ent_bill_russell_001",
+              "approvedFieldsMatch": true
+            },
+            {
+              "entityId": "ent_autherine_lucy_ua_001",
+              "approvedFieldsMatch": true
+            },
+            {
+              "entityId": "ent_carl_stokes_001",
+              "approvedFieldsMatch": true
+            },
+            {
+              "entityId": "disc_golden_thirteen_q5579862",
+              "approvedFieldsMatch": true
+            },
+            {
+              "entityId": "ent_bessie_coleman_001",
+              "approvedFieldsMatch": true
+            },
+            {
+              "entityId": "ent_david_blackwell_001",
+              "approvedFieldsMatch": true
+            }
+          ],
+          "cache": {
+            "age": null,
+            "cfCacheStatus": "HIT"
+          }
+        },
+        {
+          "url": "https://twykhihqkcldpreuovay.supabase.co/storage/v1/object/public/public-media/public/releases/rel_20260918_dunbar_media_correction_001/search-index.json",
+          "status": 200,
+          "generatedAt": "2026-10-07T23:47:10.043Z",
+          "records": 4210,
+          "checks": [
+            {
+              "entityId": "ent_bill_russell_001",
+              "approvedFieldsMatch": true
+            },
+            {
+              "entityId": "ent_autherine_lucy_ua_001",
+              "approvedFieldsMatch": true
+            },
+            {
+              "entityId": "ent_carl_stokes_001",
+              "approvedFieldsMatch": true
+            },
+            {
+              "entityId": "disc_golden_thirteen_q5579862",
+              "approvedFieldsMatch": true
+            },
+            {
+              "entityId": "ent_bessie_coleman_001",
+              "approvedFieldsMatch": true
+            },
+            {
+              "entityId": "ent_david_blackwell_001",
+              "approvedFieldsMatch": true
+            }
+          ],
+          "cache": {
+            "age": null,
+            "cfCacheStatus": "HIT"
+          }
+        }
+      ]
+    },
+    "liveBrowserVerification": {
+      "observedAt": "2026-10-07T23:51:37.847Z",
+      "checks": [
+        {
+          "entityId": "ent_bill_russell_001",
+          "url": "https://blackstory.app/entity/ent_bill_russell_001",
+          "summary": true,
+          "context": true,
+          "claims": [
+            {
+              "id": "claim_bill_russell_001_01",
+              "objectPresent": true,
+              "sourceLinkPresent": true
+            }
+          ],
+          "updatedDate": true
+        },
+        {
+          "entityId": "ent_autherine_lucy_ua_001",
+          "url": "https://blackstory.app/place/autherine-lucys-enrollment-at-the-university-of-alabama",
+          "summary": true,
+          "context": true,
+          "claims": [
+            {
+              "id": "claim_autherine_lucy_ua_001_01",
+              "objectPresent": true,
+              "sourceLinkPresent": true
+            },
+            {
+              "id": "claim_autherine_lucy_ua_001_02",
+              "objectPresent": true,
+              "sourceLinkPresent": true
+            }
+          ],
+          "updatedDate": "not displayed on place layout"
+        },
+        {
+          "entityId": "ent_carl_stokes_001",
+          "url": "https://blackstory.app/entity/ent_carl_stokes_001",
+          "summary": true,
+          "context": true,
+          "claims": [
+            {
+              "id": "claim_carl_stokes_001_01",
+              "objectPresent": true,
+              "sourceLinkPresent": true
+            },
+            {
+              "id": "claim_carl_stokes_001_02",
+              "objectPresent": true,
+              "sourceLinkPresent": true
+            }
+          ],
+          "updatedDate": true
+        },
+        {
+          "entityId": "disc_golden_thirteen_q5579862",
+          "url": "https://blackstory.app/place/golden-thirteen",
+          "summary": true,
+          "context": true,
+          "claims": [
+            {
+              "id": "claim_disc_golden_thirteen_q5579862_02",
+              "objectPresent": true,
+              "sourceLinkPresent": true
+            }
+          ],
+          "updatedDate": "not displayed on place layout"
+        },
+        {
+          "entityId": "ent_bessie_coleman_001",
+          "url": "https://blackstory.app/entity/ent_bessie_coleman_001",
+          "summary": true,
+          "context": true,
+          "claims": [
+            {
+              "id": "claim_bessie_coleman_001_01",
+              "objectPresent": true,
+              "sourceLinkPresent": true
+            }
+          ],
+          "updatedDate": true
+        },
+        {
+          "entityId": "ent_david_blackwell_001",
+          "url": "https://blackstory.app/entity/ent_david_blackwell_001",
+          "summary": true,
+          "context": true,
+          "claims": [
+            {
+              "id": "claim_david_blackwell_001_01",
+              "objectPresent": true,
+              "sourceLinkPresent": true
+            },
+            {
+              "id": "claim_david_blackwell_001_03",
+              "objectPresent": true,
+              "sourceLinkPresent": true
+            }
+          ],
+          "updatedDate": true
+        }
+      ]
+    },
+    "cachePurge": {
+      "at": "2026-10-07T23:31:36.371Z",
+      "httpStatus": 401,
+      "success": false
+    },
+    "execution": {
+      "method": "Bounded repeatable-read transaction using existing correction/backfill, safe-fetch, capture persistence, evidence-input and artifact-publisher helpers. Full baseline row checks and exact proposal hashes; rollback rehearsal before commit; one-row write assertions and verification of generated summary/claims columns.",
+      "sources": "Fourteen source retrieval attempts using captureCitedUrl and persistCapture. Thirteen successful metadata-only captures; Congressional Record PDF rejected with content_type_not_allowed. No source text retained and no archive submission.",
+      "history": "The initial apply appended eight claim versions, eleven supporting claim-evidence links and eight supersession tombstones. A later source-display alignment appended two versions, two supporting links and one supersession while adding one atomic election-year claim; totals: ten versions, thirteen links, nine supersessions. Old versions and source quotations preserved. Superseded Lucy draft and landscape evidence citations removed from active replay input and retained in named history fields.",
+      "graph": "Full graph rebuild withheld: 1092 published edges would become zero because the canonical relationship-evidence join is empty. Actual before/after temporal inputs compared with buildDecadeEntitiesForGraph and identical; relationship and entity identity inputs were not written.",
+      "catalog": "Initial upload failed after bounded retries with EPIPE. A subsequent publisher run uploaded both artifacts. A metadata correction updated recordUpdatedAt/generatedAt from canonical transaction time. The subsequent Blackwell source-display alignment split the already-reviewed NAS election year into its own atomic claim and republished both artifacts; see presentationAdjustment and effectiveProposalSha256.",
+      "approvalLimits": "Human publication authorization is explicit. There is no independent factual reviewer, fresh reauthentication credential or accepted calibrated evidence-selector assignment created by this pass.",
+      "scopeLimits": "No geography, status-history, unchanged-claim, image or rights recertification. No production application-code deployment or native Release verification. Public errata remains a separate unimplemented projection.",
+      "operationScriptHashes": {
+        "capture-reviewed.mts": "7f274a11c752a22bbf8c99a0520135b63d1c4e766e1572290fd923fab80ce523",
+        "apply-reviewed.mts": "2393a29184a823724581fe3607af342c477dbb9ef9f7ad4ed1ade62ed816a8e7",
+        "update-publication-metadata.mts": "2eab9e80fdcb6d65ff70d9a81330623d6db0a7c7d3b5df4c8cb2f54970333034",
+        "verify-publication.mts": "af7fe36c83907d4094d268d530a8ab7668f444eaceea445be6cc3070bdbacb1e",
+        "verify-artifacts.mjs": "5813ad1ca9dccf279d32bd720ea06496326eb6ccdc2a9b566593ba307c2c1d4d",
+        "align-blackwell-citations.mts": "b99fc9c19366ad3554b936248fb228f50dc0affaffdad944048abdf7511fa5e7"
+      }
+    },
+    "followUpIssues": {
+      "graph": "repo-6h11u",
+      "qualitativeEvidence": "repo-c08gr",
+      "publicErrata": "repo-xaems",
+      "identityPlaceStatus": "repo-mqlvj",
+      "proseGateAndEvaluation": "repo-zg87h",
+      "uiDeploymentNative": "repo-lmhel"
+    },
+    "prePurgeLiveBrowserVerification": {
+      "observedAt": "2026-10-07T23:35:02.793Z",
+      "checks": [
+        {
+          "entityId": "ent_bill_russell_001",
+          "url": "https://blackstory.app/entity/ent_bill_russell_001",
+          "summary": true,
+          "context": true,
+          "claims": [
+            {
+              "id": "claim_bill_russell_001_01",
+              "objectPresent": true
+            }
+          ]
+        },
+        {
+          "entityId": "ent_autherine_lucy_ua_001",
+          "url": "https://blackstory.app/place/autherine-lucys-enrollment-at-the-university-of-alabama",
+          "summary": false,
+          "context": false,
+          "claims": [
+            {
+              "id": "claim_autherine_lucy_ua_001_01",
+              "objectPresent": false
+            },
+            {
+              "id": "claim_autherine_lucy_ua_001_02",
+              "objectPresent": false
+            }
+          ]
+        },
+        {
+          "entityId": "ent_carl_stokes_001",
+          "url": "https://blackstory.app/entity/ent_carl_stokes_001",
+          "summary": true,
+          "context": true,
+          "claims": [
+            {
+              "id": "claim_carl_stokes_001_01",
+              "objectPresent": true
+            },
+            {
+              "id": "claim_carl_stokes_001_02",
+              "objectPresent": true
+            }
+          ]
+        },
+        {
+          "entityId": "disc_golden_thirteen_q5579862",
+          "url": "https://blackstory.app/place/golden-thirteen",
+          "summary": true,
+          "context": true,
+          "claims": [
+            {
+              "id": "claim_disc_golden_thirteen_q5579862_02",
+              "objectPresent": true
+            }
+          ]
+        },
+        {
+          "entityId": "ent_bessie_coleman_001",
+          "url": "https://blackstory.app/entity/ent_bessie_coleman_001",
+          "summary": true,
+          "context": true,
+          "claims": [
+            {
+              "id": "claim_bessie_coleman_001_01",
+              "objectPresent": true
+            }
+          ]
+        },
+        {
+          "entityId": "ent_david_blackwell_001",
+          "url": "https://blackstory.app/entity/ent_david_blackwell_001",
+          "summary": true,
+          "context": true,
+          "claims": [
+            {
+              "id": "claim_david_blackwell_001_01",
+              "objectPresent": true
+            }
+          ]
+        }
+      ]
+    },
+    "prePurgeBlackwellBrowserVerification": {
+      "entityId": "ent_david_blackwell_001",
+      "observedAt": "2026-10-07T23:48:15.353Z",
+      "url": "https://blackstory.app/entity/ent_david_blackwell_001",
+      "biographyCitation": 0,
+      "directoryCitation": 0,
+      "atomicElectionYear": false,
+      "updatedDate": false
+    },
+    "cachePurgeRecovery": {
+      "at": "2026-10-07T23:50:57.712Z",
+      "httpStatus": 200,
+      "success": true,
+      "credentialPurpose": "Existing Cloudflare API item; exact BlackStory zone verified before purge",
+      "permissionsChanged": false
+    }
+  }
+}
