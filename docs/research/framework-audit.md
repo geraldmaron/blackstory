@@ -880,3 +880,40 @@ Result: pass after rerunning outside the filesystem sandbox.
 Observed: every selected lane passed. The first sandboxed attempt could not open local test
 sockets or write tool caches. The E2E harness was invoked but has no configured external base URL;
 actual deployed-surface checks remain a separate release requirement.
+
+### Production web readback, 2026-10-08
+
+The session-first release reached production as `8ab44e3e`. Actual signed-in browser testing
+then exposed a CSP failure on `/admin/work`: a shared contract imported the server-side Ajv
+compiler. PR 286 moved validation into the server work store without relaxing CSP or removing
+proposal checks. Production `bf75081a` was deployed successfully for web and public API.
+The signed-in Requests page loaded to **No requests yet**, with the request form available.
+This proves the empty inbox surface, not a completed research-to-publication transaction.
+
+Check: browser contracts under string-code-generation restriction.
+Command: `fnm exec --using=22 -- node --conditions development --import tsx --test packages/ops-data/src/management/contracts.test.ts`
+Result: pass after the fix; the same regression failed before it.
+Observed: the actual shared contract module imports and parses a request without initializing Ajv.
+
+Check: applicable repository gates.
+Command: `fnm exec --using=22 -- ./scripts/ci-local.sh --base origin/main --skip mobile`
+Result: pass for the inbox fix.
+Observed: all selected lanes passed, including lint, tests, production build and typecheck.
+
+Outcome: an authenticated administrator can open Requests without a browser exception.
+Surface: production Chrome, `/admin/work`, existing signed-in account.
+Data: actual production account and empty work store.
+Observed: request form and **No requests yet**; previous error boundary no longer appears.
+Verdict: proven for inbox loading.
+
+Public `/`, `/records`, `/explore`, `/place/golden-thirteen` and `/admin/login` returned 200;
+anonymous `/admin/api/work` returned 401. The repeated scripted authenticated check stopped
+at a 1Password CLI timeout; the signed-in browser supplied the inbox proof instead. Public
+`/v1/search?q=Dunbar` returned 200 with its documented client-version header. Without that
+header the expected response is 429, not evidence of a search outage.
+
+The authorized management, research-role, source-guidance and retention migrations were
+applied in the preceding pass. Native release remains deferred. Third-party OAuth client
+integration, school publication and cross-interface approval-to-live completion remain
+unverified; they are not implied by this web release. Hosted research is optional and is not
+configured, so accepted session research does not promise to continue after its agent stops.
