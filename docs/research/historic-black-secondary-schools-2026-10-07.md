@@ -222,3 +222,55 @@ diagnostic check before relying on that page in a publication packet
 shortcut to Tuskegee University and a name-only match that could absorb the
 Atlanta school into the Mississippi record. This pass used the live catalog
 identity check instead; matcher repair is tracked in `repo-tqhwr`.
+
+## Final school-record review, 8 October 2026
+
+The two proposed new records were checked against the original nominations and
+current official sites again. This was an assistant self-review, authorized by
+the owner, with no independent second reviewer or archival visit.
+
+| Exact assertion in the final proposal | Evidence inspected and locator | Decision and limit |
+| --- | --- | --- |
+| Atlanta school opened in September 1924 | Georgia DNR nomination, PDF p. 6, historic narrative; Atlanta Public Schools, Our School, About Us | Supported. The nomination distinguishes January building completion from September school opening. No statewide firstness claim is included. |
+| Atlanta school was a public secondary school for Black students at 45 Whitehouse Drive SW | Nomination, PDF pp. 1, 3 and 6 | Supported at the stated institutional and street-address scope. Census coordinates identify the institution approximately; they do not establish an exact historic entrance or parcel survey. |
+| Atlanta school still operates at that address | Current district school page, About Us, school services and footer address, checked 8 October 2026 | Supported as current school operation. No public-access or visiting-hours claim is made. |
+| Howard historic building is at 13th and Poplar Streets | Howard NHL nomination, printed p. 4, site description | Supported. The nomination distinguishes the historic building and annex from the adjacent 1970s vocational building. The current school's 401 East 12th Street mailing address is not substituted for the historic building's location. |
+| Black students from Claymont had to travel to Howard instead of attending the local white high school; their families challenged segregation in Belton v. Gebhart, considered in Brown | Delaware Public Archives, 27 February 2026 account, paragraphs on Claymont parents and Belton; NPS Brown park Partners, Delaware sites section | Supported. The record does not extend this connection to every student or imply Howard was the school the families sought to enter. |
+| The school now operates as Howard High School of Technology | NPS Partners, Howard entry; current Howard official homepage, principal's message, current school calendar and contact address, checked 8 October 2026 | Supported at institution level. Revised from a stronger assertion about continuing use of the specific historic building. |
+
+The Howard state marker says the new building opened in 1928. The NHL nomination's
+interior description refers to opening photographs from 1927 and its historical
+narrative describes a February 1929 dedication. Those may describe different events;
+this review does not resolve a precise opening year. The final proposal therefore
+asserts no opening year, founding year or exact pin. The 1920s era is a broad historical
+bucket, not a hidden assertion of a particular opening date. The marker's Clifford
+Brown Walk address and Census match do not prove a point inside the nominated boundary.
+The nomination's inconsistent ZIP is not ingested.
+
+A fresh live check found the exact proposed canonical IDs absent. Similarly named
+canonical entries have coordinates in Missouri (Howard and Howardville), South Carolina
+(Washington auditorium), Mississippi (Booker T. Washington) and Virginia (Washington
+High School); none identifies the Atlanta or Wilmington site. This supplements the
+previous name, alias and National Register identifier check. No unrelated entity is
+merged or rewritten.
+
+The proposed copy contains no superlatives, invented causal relationship, unsupported
+alumni connection, image, or reconstructed historical quotation. Source hosts are not
+counted as independent works: the district and NPS accounts may share earlier institutional
+histories. Each clause has direct passage support at its stated scope, but this does not
+establish calibrated confidence or research completeness. The proposal JSON is the exact
+proposed input for canonical promotion; draft hashes and authenticated audit IDs are
+recorded in the case history when that operation succeeds.
+
+### Publication limitation
+
+The two prior capture IDs, `cap_7cc823fa3577555b` (Atlanta district) and
+`cap_a7b55c30f9b74cb7` (NPS Partners), were inspected through `capture_origins`.
+Both contain `stored: metadata-only`; neither retains the source text. Citation
+excerpts and this passage review do not turn them into preserved sources or accepted
+selector assignments. The numerical confidence fields required by the current
+publication ledger cannot be truthfully filled from this qualitative review.
+The existing issue `repo-c08gr` tracks an honest qualitative-assessment representation.
+Canonical promotion can preserve the reviewed sparse records while public publication
+remains held. No release activation, search projection or public artifact write is
+justified by a successful canonical insert alone.
