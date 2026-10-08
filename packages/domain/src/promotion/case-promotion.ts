@@ -4,23 +4,25 @@
  * The tracked path from a research case to a canonical entity. This is pure, DB-free logic: two
  * functions a caller (apps/web/src/admin's promote-case.ts) must both pass before writing anything:
  *
- * - `evaluateCasePromotionGate`: the *authority* check. Mirrors `evaluatePromotionGate`
- * (./controls.ts)'s core invariant proposer and approver can never be the same identity
- * plus a case-state eligibility check. This is deliberately NOT reused as-is: that gate
+ * - `evaluateCasePromotionGate`: the *authority* check. Requires an identified approver
+ * and a case-state eligibility check. This is deliberately NOT reused as-is: that gate
  * operates on a `PromotionClaim` shape (contradiction-search records, evidence-lineage
  * reputation) this pipeline has never populated; forcing case data into that shape would
  * fabricate fields no one actually assessed. This is a smaller, honest gate for what this
  * pipeline actually has.
- * - `validateCanonicalPromotionRecord`: the *content* check. Two independent source hosts, US
+ * - `validateCanonicalPromotionRecord`: the *content* check. Substantive cited evidence, US
  * coordinate bounds, well-formed decade buckets, a non-trivial summary — enforced on every
  * promotion rather than left to whoever is running one.
  */
 
-/** Case states the ad hoc script treated as "ready" the enrichment tier is complete. */
-const ELIGIBLE_CASE_STATES = new Set(['substantial_enrichment']);
+/** The minimum checklist is sufficient; enrichment can continue after promotion. */
+const ELIGIBLE_CASE_STATES = new Set([
+  'minimum_record',
+  'partial_enrichment',
+  'substantial_enrichment',
+]);
 
-export type CasePromotionGateReason =
-  'case_not_ready' | 'proposer_approver_conflict' | 'missing_identity';
+export type CasePromotionGateReason = 'case_not_ready' | 'missing_identity';
 
 export type CasePromotionGateResult = {
   readonly approved: boolean;
@@ -29,14 +31,11 @@ export type CasePromotionGateResult = {
 
 export function evaluateCasePromotionGate(input: {
   readonly caseState: string;
-  readonly proposerId: string;
   readonly approverId: string;
 }): CasePromotionGateResult {
   const reasons = new Set<CasePromotionGateReason>();
-  if (!input.proposerId.trim() || !input.approverId.trim()) {
+  if (!input.approverId.trim()) {
     reasons.add('missing_identity');
-  } else if (input.proposerId === input.approverId) {
-    reasons.add('proposer_approver_conflict');
   }
   if (!ELIGIBLE_CASE_STATES.has(input.caseState)) {
     reasons.add('case_not_ready');
@@ -73,7 +72,8 @@ export type CanonicalPromotionRecord = {
   readonly topicTags: readonly string[];
   /** e.g. "1930s" each must match /^(17|18|19|20)\d0s$/. */
   readonly eraBuckets: readonly string[];
-  readonly location: CanonicalPromotionLocation;
+  /** Omit when the historic site cannot yet be pinned honestly. */
+  readonly location?: CanonicalPromotionLocation;
   readonly sources: readonly CanonicalPromotionSource[];
 };
 
@@ -84,8 +84,9 @@ const US_LNG_RANGE = [-180, -60] as const;
 
 export type CanonicalPromotionValidationReason =
   | 'name_or_summary_invalid'
-  | 'insufficient_independent_source_hosts'
+  | 'missing_substantive_source'
   | 'invalid_source'
+  | 'location_only_source_without_location'
   | 'coordinates_outside_us_bounds'
   | 'invalid_decade_bucket';
 
@@ -94,33 +95,18 @@ export type CanonicalPromotionValidation = {
   readonly reasons: readonly CanonicalPromotionValidationReason[];
 };
 
-function sourceHostname(url: string): string | undefined {
-  try {
-    return new URL(url).hostname.toLowerCase();
-  } catch {
-    return undefined;
-  }
-}
-
-/** Pure port of the ad hoc script's per-record validation (validateInputs). */
+/** Structural checks only. Claim-relative source sufficiency is reviewed with exact evidence. */
 export function validateCanonicalPromotionRecord(
   record: CanonicalPromotionRecord,
 ): CanonicalPromotionValidation {
   const reasons = new Set<CanonicalPromotionValidationReason>();
 
-  if (!record.displayName.trim() || record.summary.length < 80 || record.summary.length > 600) {
+  if (!record.displayName.trim() || !record.summary.trim() || record.summary.length > 600) {
     reasons.add('name_or_summary_invalid');
   }
 
   const claimSources = record.sources.filter((source) => !source.locationOnly);
-  const hosts = new Set(
-    claimSources
-      .map((source) => sourceHostname(source.url))
-      .filter((host): host is string => !!host),
-  );
-  if (claimSources.length < 2 || hosts.size < 2) {
-    reasons.add('insufficient_independent_source_hosts');
-  }
+  if (!claimSources.length) reasons.add('missing_substantive_source');
 
   for (const source of record.sources) {
     let isHttps = false;
@@ -129,18 +115,22 @@ export function validateCanonicalPromotionRecord(
     } catch {
       isHttps = false;
     }
-    if (!isHttps || source.excerpt.length < 70) {
+    if (!isHttps || !source.excerpt.trim() || !source.title.trim()) {
       reasons.add('invalid_source');
+    }
+    if (source.locationOnly && !record.location) {
+      reasons.add('location_only_source_without_location');
     }
   }
 
   const [minLat, maxLat] = US_LAT_RANGE;
   const [minLng, maxLng] = US_LNG_RANGE;
   if (
-    record.location.lat < minLat ||
-    record.location.lat > maxLat ||
-    record.location.lng < minLng ||
-    record.location.lng > maxLng
+    record.location &&
+    (record.location.lat < minLat ||
+      record.location.lat > maxLat ||
+      record.location.lng < minLng ||
+      record.location.lng > maxLng)
   ) {
     reasons.add('coordinates_outside_us_bounds');
   }

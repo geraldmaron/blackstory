@@ -121,3 +121,8 @@ Claim counts must be labeled as claims, not sources.
 Without a public coordinate anchor, show “Not pinned” and “No public map location”. Do not
 invent city precision. Missing, unrecognized, withheld or country-only precision cannot create
 a map pin. Non-place records must not receive generic “documented site” copy.
+
+
+Public claim evidence labels are qualitative. The API omits nominal numeric confidence; native
+claim cards show the stored evidence label and citation, never a number invented from that label.
+Old cached scores are ignored by the native normalizer.

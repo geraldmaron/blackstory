@@ -11,7 +11,7 @@ import { dedupeUrlsByPage, lookupSourceTier, urlDedupeKey } from '@repo/domain';
 import { createNodeSafeFetchDependencies, runQuickAddFetch } from './fetch.js';
 import { mapPool } from './map-pool.js';
 
-const MAX_TEXT_CHARS = 4_000;
+const MAX_TEXT_CHARS = 100_000;
 const MIN_USABLE_TEXT_CHARS = 100;
 
 export type GatheredSourceSnippet = {
@@ -43,13 +43,13 @@ function excerptFromText(text: string, maxLength = 500): string {
  * the same registry every surface consults (@repo/domain's lookupSourceTier) — not a parallel
  * enrichment-only classifier.
  */
-export function formatGatheredSourceSnippet(snippet: GatheredSourceSnippet): string {
+export function formatGatheredSourceSnippet(snippet: GatheredSourceSnippet, seeking = ''): string {
   const url = snippet.finalUrl ?? snippet.url;
   const tier = lookupSourceTier(url).tier;
   const header = snippet.fetched
     ? `Source (Tier: ${tier}): ${url}`
     : `Source (prefetched, Tier: ${tier}): ${snippet.url}`;
-  return `${header}\n${snippet.excerpt}`;
+  return `${header}\n${selectSourcePassages(snippet.text, seeking)}`;
 }
 
 function okFetchToSnippet(
@@ -149,5 +149,31 @@ export async function gatherSourceSnippetsFromUrls(
 export function formatGatheredSourceSnippets(
   snippets: readonly GatheredSourceSnippet[],
 ): readonly string[] {
-  return snippets.map(formatGatheredSourceSnippet);
+  return snippets.map((snippet) => formatGatheredSourceSnippet(snippet));
+}
+
+/** Select bounded passages across the document, preserving exact text rather than a navigation prefix. */
+export function selectSourcePassages(text: string, seeking: string, maxChars = 16000): string {
+  if (text.length <= maxChars) return text;
+  const terms = [...new Set(seeking.toLowerCase().match(/[a-z0-9]{4,}/gu) ?? [])];
+  const windows: { start: number; text: string; score: number }[] = [];
+  for (let start = 0; start < text.length; start += 1000) {
+    const passage = text.slice(start, start + 1200);
+    const lower = passage.toLowerCase();
+    windows.push({
+      start,
+      text: passage,
+      score: terms.reduce((score, term) => score + (lower.includes(term) ? 1 : 0), 0),
+    });
+  }
+  const selected = windows
+    .sort((a, b) => b.score - a.score || a.start - b.start)
+    .slice(0, Math.max(1, Math.floor(maxChars / 1250)))
+    .sort((a, b) => a.start - b.start);
+  return selected
+    .map(
+      (window) =>
+        `[Characters ${window.start}-${window.start + window.text.length}]\n${window.text}`,
+    )
+    .join('\n[Passage break]\n');
 }

@@ -105,7 +105,7 @@ export type PromotionGateReason =
   | 'self_approval_by_repetition'
   | 'credible_contradiction_unresolved'
   | 'confidence_below_threshold'
-  | 'proposer_approver_conflict';
+  | 'missing_approver_identity';
 
 export type PromotionGateResult = {
   readonly approved: boolean;

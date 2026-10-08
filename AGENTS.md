@@ -67,7 +67,13 @@ Research is explicit manual/headless work; do not use Corsair or install a sched
 Code comments explain behavior and constraints, not session history or incidental dates.
 
 
-Two skill kinds live under `.claude/skills/blackstory/`:
+Project skills are harness-independent source under `.agents/skills/<skill-name>/SKILL.md`.
+Use the full `blackstory-` skill name; `research-framework` is the shared entry point.
+Read [skill loading and capability requirements](docs/research/README.md#skills-and-harness-portability)
+when the harness does not discover that directory. `.claude/skills/` contains discovery
+links to the same files, not another implementation.
+
+Two BlackStory skill kinds live there:
 
 - **CLI pointers** (`research-intake`, `discovery-run`, `editorial-enrichment`, `locate`,
   `case-drafting`, `story-craft`, `theme-study`, `triage-graylist`) match a verb and then read
@@ -75,7 +81,7 @@ Two skill kinds live under `.claude/skills/blackstory/`:
   duplicate command flags.
 - **Judgment playbooks** (`entity-verify`, `claim-corroborate`, `entity-complete`,
   `entity-relate`, `coverage-target`, `publish-preview`, `neo-voice`, `prose-review`,
-  `ringer-review`, `surface-triage`, `intake-review`) carry decision order, source ladders, and Do/Never. They
+  `ringer-review`, `surface-triage`, `intake-review`, `experience-review`) carry decision order, source ladders, and Do/Never. They
   have no operator-cli verb of their own.
 
 `blackstory-locate` Census-geocodes a sourced address (no LLM). Finding the place, confirming

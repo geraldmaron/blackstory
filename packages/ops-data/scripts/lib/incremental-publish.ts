@@ -1378,7 +1378,7 @@ export function toReleaseEntityRow(
 
 export function toSearchIndexRow(
   searchIndex: ReleaseSearchIndexFields,
-  geohash: string,
+  geohash: string | null,
 ): SearchIndexUpsertRow {
   return {
     // Composite id matches the primary release publisher; a plain entity id here
@@ -1469,7 +1469,7 @@ export function buildArtifactsForEntry(input: {
     return { ok: false, reason: 'status_linter_error', detail, lintReport };
   }
   const entityRow = toReleaseEntityRow(build.projection);
-  const searchRow = toSearchIndexRow(build.searchIndex, build.projection.location.geohash);
+  const searchRow = toSearchIndexRow(build.searchIndex, build.projection.location?.geohash ?? null);
   return { ok: true, entityRow, searchRow, lintReport };
 }
 

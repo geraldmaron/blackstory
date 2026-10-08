@@ -153,7 +153,7 @@ export interface Claim {
   readonly id: string;
   readonly predicate: string;
   readonly object: string;
-  readonly confidenceScore: number;
+  readonly confidenceScore?: number;
   readonly confidenceLevel: ConfidenceLevel;
   /** Required on the wire; kept optional here ONLY because the defensive normalizer must
    * tolerate a malformed/absent citation without throwing (adversarial case: "a claim with no

@@ -171,6 +171,10 @@ export async function sweepCaptureRetention(pool: ExecutionPool, input: Retentio
     if (input.commit)
       await db.query(`UPDATE research.model_output_quarantine SET raw_output='[payload disposed]',validation_errors=ARRAY['payload disposed']
       WHERE retention_until<=clock_timestamp() AND raw_output<>'[payload disposed]'`);
+    const management = await db.query(
+      'SELECT research.dispose_expired_management_proposals($1) AS count',
+      [input.commit],
+    );
     const pending = await db.query(
       `SELECT (SELECT count(*) FROM evidence.capture_disposals WHERE deleted_at IS NULL)+
         (SELECT count(*) FROM evidence.capture_orphan_disposals WHERE deleted_at IS NULL) AS count`,
@@ -181,6 +185,8 @@ export async function sweepCaptureRetention(pool: ExecutionPool, input: Retentio
       selectedOrigins: rows.length,
       deletedPassages,
       disposedResearchPayloads,
+      disposedManagementProposals: input.commit ? Number(management.rows[0]?.count ?? 0) : 0,
+      selectedManagementProposals: Number(management.rows[0]?.count ?? 0),
       selectedResearchPayloads: payloads.rows.length,
       selectedRunManifests: expiredRuns.rows.length,
       pendingStorageDisposals: Number(pending.rows[0]?.count ?? 0),

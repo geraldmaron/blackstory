@@ -94,6 +94,13 @@ export function validateExecutionPlan(value: unknown): ResearchExecutionPlan {
         }
       }
     }
+    if (spec.input.executor === 'management') {
+      if (spec.input.action === 'search') {
+        queries += 5 * spec.maxAttempts;
+        candidateReservations += 12 * spec.maxAttempts;
+      }
+      if (spec.input.action === 'acquire') captures += 11 * spec.maxAttempts;
+    }
     if (task.caseId !== run.caseId || task.status !== 'pending') {
       throw new Error('Tasks must be pending and belong to the run case');
     }

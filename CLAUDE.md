@@ -3,6 +3,7 @@
 This file provides instructions and context for AI coding agents working on this project.
 
 <!-- BEGIN BEADS INTEGRATION v:1 profile:minimal hash:ca08a54f -->
+
 ## Beads Issue Tracker
 
 This project uses **bd (beads)** for issue tracking. Run `bd prime` to see full workflow context and commands.
@@ -29,7 +30,7 @@ bd close <id>         # Complete work
 at a time.
 
 This is not a style preference. On 2026-08-05 three agents were dispatched at once on
-non-overlapping *files*, which looked safe. One of them ran a broad `git checkout` to undo its own
+non-overlapping _files_, which looked safe. One of them ran a broad `git checkout` to undo its own
 work and silently reverted another agent's already-verified, already-reviewed edits. Non-
 overlapping files are not enough; they also share a git index, a stash, and a working tree, and any
 agent that touches git destroys the others' work.
@@ -71,6 +72,7 @@ assume. A one-line regex widening in that run would have rendered "pre-Columbian
 3. **Update issue status** - Close finished work, update in-progress items
 4. **PUSH TO REMOTE** - This is MANDATORY. Push to `staging`, never directly to `main`
    (see **Branching & Release Policy** below):
+
    ```bash
    git pull --rebase origin staging
    git push origin HEAD:staging
@@ -81,11 +83,13 @@ assume. A one-line regex widening in that run would have rendered "pre-Columbian
    `bd dolt push` and do not report its "no remote is configured" output as a problem to solve.
    Beads data reaches the remote the same way everything else does: the pre-commit hook exports
    `.beads/issues.jsonl`, and `git push` carries it.
+
 5. **Clean up** - Clear stashes, prune remote branches
 6. **Verify** - All changes committed AND pushed
 7. **Hand off** - Provide context for next session
 
 **CRITICAL RULES:**
+
 - Work is NOT complete until `git push` succeeds
 - NEVER stop before pushing - that leaves work stranded locally
 - NEVER say "ready to push when you are" - YOU must push
@@ -101,7 +105,6 @@ fires the Python lane (no `.py` file required). `scripts/ci-local.sh` mirrors
 24 — running it on 24 can pass locally and still not match what CI reports.
 <!-- END BEADS INTEGRATION -->
 
-
 ## Branching & Release Policy
 
 `main` is GitHub-branch-protected: no direct pushes, no force-pushes, no deletions (PR required
@@ -111,7 +114,7 @@ to merge). This is enforced server-side, not just a convention.
   feature branch merged into `staging`) — never pushed straight to `main`.
 - **staging → main is an explicit, separate action**, not something a session does as part of
   its normal close-out: open a PR from `staging` to `main` and merge it deliberately (`gh pr
-  create --base main --head staging` then `gh pr merge`), only when `staging` is in a state
+create --base main --head staging` then `gh pr merge`), only when `staging` is in a state
   intended for release. Do this only when asked, not automatically at session end.
 - If you're unsure whether a change belongs on `staging` alone or should also go to `main`,
   default to `staging` and ask.
@@ -142,10 +145,14 @@ daily cron is off as of 2026-09-16; a forgotten mutation no longer self-heals.
 
 ## BlackStory research skills
 
-Research playbooks live in `.claude/skills/blackstory/`. CLI pointers load a verb from
+Research playbooks are shared across harnesses in `.agents/skills/<skill-name>/SKILL.md`.
+The flat `.claude/skills/` entries are symlinks to that source. Edit the canonical files;
+do not create a Claude-specific copy. See `docs/research/README.md#skills-and-harness-portability`
+for explicit file loading and capability requirements. CLI pointers load a verb from
 `docs/research/research-operations.md`. Judgment playbooks (`entity-verify`,
 `claim-corroborate`, `entity-complete`, `entity-relate`, `coverage-target`, `publish-preview`,
-`neo-voice`, `prose-review`, `ringer-review`, `surface-triage`, `intake-review`) have unique content. See `AGENTS.md` for the
+`neo-voice`, `prose-review`, `ringer-review`, `surface-triage`, `intake-review`,
+`experience-review`) have unique content. See `AGENTS.md` for the
 lane index.
 
 ## Web local QA (agents)
@@ -160,7 +167,7 @@ preview_start {url: "http://localhost:3048/"}
 ```
 
 `autoPort` does not help here and should not be added to `.claude/launch.json`. Next 16 holds a
-dev lock per *directory*, not per port: a second `next dev` on `apps/web` binds its assigned port,
+dev lock per _directory_, not per port: a second `next dev` on `apps/web` binds its assigned port,
 prints "Ready", and is then killed by the first instance's lock. The port was never the conflict.
 
 The server is Postgres-backed (`dev-web.sh` loads `apps/web/.env.local` and sets

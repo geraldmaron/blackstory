@@ -25,3 +25,9 @@ export {
 } from './db/pg-reader.js';
 export { lookupSeries, getObservations, getEntityContext, getLawTimeline } from './tools/index.js';
 export { createOperatorMcpServer, registerIndicatorTools, runOperatorMcpServer } from './server.js';
+
+export {
+  registerManagementTools,
+  handleManagementMcp,
+  remoteManagementClient,
+} from './management.js';

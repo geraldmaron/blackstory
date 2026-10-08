@@ -1,13 +1,14 @@
 # Gold corpus and calibration harness
 
- provides a private, versioned evaluation corpus for relevance, publication safety,
+This harness provides a private, versioned evaluation corpus for relevance, publication safety,
 confidence calibration, citation entailment, and entity resolution. It is local-only under
 the [engineering contract](../decisions-carryover.md): evaluation uses fixtures and neither CLI applies cloud changes.
 
 ## Corpus
 
-`packages/testing/src/gold-corpus/fixtures/gold-corpus.v1.json` contains 120 synthetic,
-consensus-adjudicated examples. There are at least ten examples in each required category:
+`packages/testing/src/gold-corpus/fixtures/gold-corpus.v1.json` contains 125 synthetic examples (corpus version 1.1.0, counted 2026-10-07).
+Its metadata describes a synthetic consensus-adjudication protocol; that description alone
+does not establish that independent historical experts reviewed the examples. There are at least ten examples in each required category:
 included and excluded schools, relevant and irrelevant people, disputed and high-impact
 claims, sparse records, living people, private residences, sundown-town candidates,
 geographic ambiguity, and source lineage.
@@ -67,6 +68,27 @@ enabled. The gate requires a passing evaluation whose corpus and algorithm versi
 match the feature configuration. Missing, stale, mismatched, or failed evidence blocks the
 feature. Manual review paths can remain enabled with automatic publication disabled.
 
-The package root should export `./gold-corpus/index.js` from
-`packages/testing/src/index.ts`; that shared barrel is intentionally merged by the parent
-task owner.
+## What each evaluation can establish
+
+The synthetic policy corpus above contains context and expected labels, not source passages
+and historical claim text from which a blind reader could infer entailment. Its supplied
+prediction files exercise metric/gate mechanics. Passing them is not evidence that a model
+can fact-check a live entity, calibrate its confidence or produce good prose.
+
+The separate [held-out retrieval pilot](../../packages/testing/src/gold-corpus/fixtures/heldout-evidence-retrieval.v1.md)
+contains public-source passages, claims, identity/edge tasks and separately frozen predictions.
+Use its existing corpus/prediction/gold schemas for new blind evidence experiments. Preserve
+its stated sample-size, source-selection, provisional-label and portability limits; a small
+retrieval pilot does not certify all historical domains or publication prose.
+
+The [skill review cases](skill-review-cases.md) are transparent development examples based on
+observed failures and controls. They test whether an operator applies the method to concrete
+inputs; they are not held out, and self-review is not independent model evaluation.
+
+For a release-quality study, freeze the exact skill/model versions and blind inputs before
+label inspection; have qualified independent reviewers adjudicate disputed cases; keep work
+lineages split across development and held-out sets. Include official-source errors, minority
+accounts, namesakes, sparse records, qualifier loss and altered prose after claim acceptance.
+Report false acceptance and false rejection separately, with sample sizes, disagreements,
+uncertainty and cost. Do not turn one overall score into permission to publish a contradicted
+claim. Provider calls, budgets and publication authority remain explicit.

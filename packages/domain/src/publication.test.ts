@@ -187,3 +187,35 @@ test('snapshot paths reject traversal and manifest entity ids are unique', () =>
     /Duplicate manifest entity/,
   );
 });
+
+test('release signature binds mobile artifact paths and hashes', () => {
+  const signed = signReleaseManifest(
+    buildReleaseManifest({
+      releaseId: 'release-mobile',
+      generatedAt: NOW,
+      searchIndexVersion: 'search-mobile',
+      artifacts: [],
+      aggregateArtifacts: [
+        {
+          path: 'public/releases/release-mobile/bootstrap.json',
+          hash: sha256Json({ releaseId: 'release-mobile' }),
+        },
+      ],
+    }),
+    { keyId: 'test', privateKey },
+  );
+  assert.equal(verifySignedReleaseManifest(signed, publicKey), true);
+  assert.equal(
+    verifySignedReleaseManifest(
+      {
+        ...signed,
+        manifest: {
+          ...signed.manifest,
+          aggregateArtifacts: [{ path: 'other.json', hash: sha256Json({}) }],
+        },
+      },
+      publicKey,
+    ),
+    false,
+  );
+});

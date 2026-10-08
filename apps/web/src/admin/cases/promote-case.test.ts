@@ -6,7 +6,11 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import type pg from 'pg';
-import type { CanonicalPromotionRecord } from '@repo/domain';
+import {
+  EVIDENCE_CHECKLIST_KEYS,
+  MINIMUM_RECORD_CHECKLIST_KEYS,
+  type CanonicalPromotionRecord,
+} from '@repo/domain';
 import type { AdminCaseDetail } from './research-case-types';
 import {
   CasePromotionRejected,
@@ -16,12 +20,19 @@ import {
 } from './promote-case';
 
 function caseDetail(overrides: Partial<AdminCaseDetail> = {}): AdminCaseDetail {
+  const state = overrides.state ?? 'substantial_enrichment';
+  const checklist = overrides.checklist ?? {
+    items: (state === 'minimum_record'
+      ? MINIMUM_RECORD_CHECKLIST_KEYS
+      : EVIDENCE_CHECKLIST_KEYS
+    ).map((key) => ({ key, complete: true, evidenceIds: [`evidence-${key}`] })),
+  };
   const record = {
     id: 'case-1',
-    state: 'substantial_enrichment' as const,
+    state,
     candidateId: 'candidate-1',
     title: 'Boarded-up mill on Route 9',
-    checklist: { items: [] },
+    checklist,
     history: [],
     createdAt: '2026-08-01T00:00:00.000Z',
     updatedAt: '2026-08-01T00:00:00.000Z',
@@ -29,11 +40,11 @@ function caseDetail(overrides: Partial<AdminCaseDetail> = {}): AdminCaseDetail {
   return {
     id: 'case-1',
     title: 'Boarded-up mill on Route 9',
-    state: 'substantial_enrichment',
+    state,
     candidateId: 'candidate-1',
     createdAt: '2026-08-01T00:00:00.000Z',
     updatedAt: '2026-08-01T00:00:00.000Z',
-    checklist: { items: [] },
+    checklist,
     history: [],
     record,
     ...overrides,
@@ -83,7 +94,6 @@ function promoteInput(overrides: Partial<PromoteCaseInput> = {}): PromoteCaseInp
   return {
     caseId: 'case-1',
     record: promotionRecord(),
-    proposerId: 'user-proposer',
     approverUid: 'user-approver',
     approverEmail: 'approver@example.com',
     reason: 'Two independent sources confirm the closure; ready for canonical.',
@@ -91,7 +101,7 @@ function promoteInput(overrides: Partial<PromoteCaseInput> = {}): PromoteCaseInp
   };
 }
 
-/** A fake client that records every query and answers the duplicate-check SELECT by name. */
+/** A fake client that records every query and answers the duplicate-check SELECT. */
 function fixture(
   options: {
     readonly detail?: AdminCaseDetail | null;
@@ -102,7 +112,7 @@ function fixture(
   const client = {
     query: async (sql: string, params?: readonly unknown[]) => {
       queries.push({ sql, params: params ?? [] });
-      if (sql.includes('FROM canonical.entities') && sql.includes('WHERE id <>')) {
+      if (sql.includes('FROM canonical.entities') && sql.includes('WHERE id = $1')) {
         const rows = options.duplicateRows ?? [];
         return { rows, rowCount: rows.length };
       }
@@ -118,27 +128,23 @@ function fixture(
   return { queries, dependencies };
 }
 
-test('a proposer and approver who are the same identity are rejected with no writes', async () => {
+test('a blank publisher identity is rejected with no writes', async () => {
   const { queries, dependencies } = fixture();
 
   await assert.rejects(
-    () =>
-      promoteCaseToCanonical(
-        promoteInput({ proposerId: 'user-1', approverUid: 'user-1' }),
-        dependencies,
-      ),
+    () => promoteCaseToCanonical(promoteInput({ approverUid: '' }), dependencies),
     (error: unknown) => {
       assert.ok(error instanceof CasePromotionRejected);
-      assert.ok(error.reasons.includes('proposer_approver_conflict'));
+      assert.ok(error.reasons.includes('missing_identity'));
       return true;
     },
   );
   assert.equal(queries.length, 0);
 });
 
-test('a case not yet in substantial_enrichment is rejected with no writes', async () => {
+test('a case without the minimum record is rejected with no writes', async () => {
   const { queries, dependencies } = fixture({
-    detail: caseDetail({ state: 'minimum_record' }),
+    detail: caseDetail({ state: 'relevance_confirmed' }),
   });
 
   await assert.rejects(
@@ -152,13 +158,66 @@ test('a case not yet in substantial_enrichment is rejected with no writes', asyn
   assert.equal(queries.length, 0);
 });
 
+test('a ready state with an incomplete checklist cannot promote', async () => {
+  const { queries, dependencies } = fixture({
+    detail: caseDetail({ state: 'minimum_record', checklist: { items: [] } }),
+  });
+
+  await assert.rejects(
+    () => promoteCaseToCanonical(promoteInput(), dependencies),
+    (error: unknown) => {
+      assert.ok(error instanceof CasePromotionRejected);
+      assert.ok(error.reasons.includes('minimum_record_incomplete'));
+      return true;
+    },
+  );
+  assert.equal(queries.length, 0);
+});
+
+test('a case state inconsistent with its checklist cannot promote', async () => {
+  const minimumChecklist = caseDetail({ state: 'minimum_record' }).checklist;
+  const { queries, dependencies } = fixture({
+    detail: caseDetail({ state: 'substantial_enrichment', checklist: minimumChecklist }),
+  });
+
+  await assert.rejects(
+    () => promoteCaseToCanonical(promoteInput(), dependencies),
+    (error: unknown) => {
+      assert.ok(error instanceof CasePromotionRejected);
+      assert.ok(error.reasons.includes('case_checklist_inconsistent'));
+      return true;
+    },
+  );
+  assert.equal(queries.length, 0);
+});
+
+test('a minimum record without a verified pin creates an entity without a location', async () => {
+  const { queries, dependencies } = fixture({
+    detail: caseDetail({ state: 'minimum_record' }),
+  });
+  const { location: _location, ...record } = promotionRecord();
+
+  const result = await promoteCaseToCanonical(promoteInput({ record }), dependencies);
+
+  assert.equal(result.locationId, undefined);
+  assert.ok(queries.some((query) => query.sql.includes('INSERT INTO canonical.entities')));
+  assert.ok(!queries.some((query) => query.sql.includes('INSERT INTO canonical.entity_locations')));
+  const entityInsert = queries.find((query) =>
+    query.sql.includes('INSERT INTO canonical.entities'),
+  );
+  const kindDetail = JSON.parse(String(entityInsert?.params[5])) as {
+    classification: { researchCoverage: string };
+  };
+  assert.equal(kindDetail.classification.researchCoverage, 'minimal');
+});
+
 test('a record failing content validation is rejected before any query runs', async () => {
   const { queries, dependencies } = fixture();
 
   await assert.rejects(
     () =>
       promoteCaseToCanonical(
-        promoteInput({ record: promotionRecord({ summary: 'too short' }) }),
+        promoteInput({ record: promotionRecord({ summary: '   ' }) }),
         dependencies,
       ),
     (error: unknown) => {
@@ -178,7 +237,16 @@ test('a live catalog duplicate aborts the transaction without inserting the enti
   await assert.rejects(() => promoteCaseToCanonical(promoteInput(), dependencies), /duplicate/i);
 
   // The duplicate check ran, but nothing after it did: no INSERT INTO canonical.entities.
-  assert.ok(queries.some((q) => q.sql.includes('WHERE id <>')));
+  assert.ok(queries.some((q) => q.sql.includes('WHERE id = $1')));
+  assert.ok(!queries.some((q) => q.sql.includes('INSERT INTO canonical.entities')));
+});
+
+test('an existing entity id aborts promotion rather than reusing an unrelated row', async () => {
+  const { queries, dependencies } = fixture({
+    duplicateRows: [{ id: 'entity-1', display_name: 'Existing record' }],
+  });
+
+  await assert.rejects(() => promoteCaseToCanonical(promoteInput(), dependencies), /duplicate/i);
   assert.ok(!queries.some((q) => q.sql.includes('INSERT INTO canonical.entities')));
 });
 
@@ -212,4 +280,9 @@ test('a valid promotion commits the entity, claim, evidence, and case history in
   // reason_code is a SQL literal ('canonical_promotion_approved'), not a bound param.
   assert.ok(historyInsert?.sql.includes("'canonical_promotion_approved'"));
   assert.equal(historyInsert?.params[3], 'user-approver');
+
+  const claimInsert = queries.find((q) => q.sql.includes('INSERT INTO canonical.claims'));
+  const confidence = JSON.parse(String(claimInsert?.params[2])) as Record<string, unknown>;
+  assert.equal(confidence.level, 'unknown');
+  assert.equal(confidence.independentLineageCount, undefined);
 });

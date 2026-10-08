@@ -9,6 +9,7 @@ export type RegisterSourceInput = {
   readonly evidenceSource: SourceRegistryEntry['evidenceSource'];
   readonly registryState?: AdapterRegistryState;
   readonly createdAt: string;
+  readonly researchGuidance?: SourceRegistryEntry['researchGuidance'];
 };
 
 export type ApproveSourcePolicyInput = {
@@ -58,6 +59,7 @@ export function registerSource(
   }
   const entry: SourceRegistryEntry = {
     id: input.id,
+    ...(input.researchGuidance ? { researchGuidance: input.researchGuidance } : {}),
     contract: input.contract,
     evidenceSource: input.evidenceSource,
     registryState: input.registryState ?? 'disabled',

@@ -255,7 +255,28 @@ test(
       assert.ok(second);
       assert.equal(second.dependencies.length, 1);
       assert.deepEqual(second.dependencies[0]?.output, JSON.parse(report));
-      assert.equal((await completeResearchTask(pool, second, report, model)).valid, true);
+      const providerRawResponse = JSON.stringify({ decisions: [] });
+      assert.equal(
+        (
+          await completeResearchTask(pool, second, report, {
+            ...model,
+            providerRawResponse,
+            outputSchemaId: 'ManagementRetentionAssessment',
+          })
+        ).valid,
+        true,
+      );
+      const recordedInvocation = await pool.query(
+        'SELECT raw_response,output_schema_id FROM research.model_invocations WHERE activity_id=$1',
+        [second.activityId],
+      );
+      assert.equal(recordedInvocation.rows[0].raw_response, providerRawResponse);
+      assert.equal(recordedInvocation.rows[0].output_schema_id, 'ManagementRetentionAssessment');
+      const recordedArtifact = await pool.query(
+        "SELECT extensions->'output' AS output FROM research.artifacts WHERE activity_id=$1",
+        [second.activityId],
+      );
+      assert.deepEqual(recordedArtifact.rows[0].output, JSON.parse(report));
       const status = await researchExecutionStatus(pool, successPlan.run.id);
       assert.equal((status.run as { status: string }).status, 'succeeded');
       assert.equal((status.evidenceNeeds as { status: string }[])[0]?.status, 'open');

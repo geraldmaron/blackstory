@@ -1,8 +1,8 @@
 /**
  * PROVES the acceptance-critical invariant for: an operator can PROPOSE (submit a lead,
- * register a source, attach evidence) but publishing always requires a distinct, fresh-auth
- * promotion action never the same call, never the same identity, never something this
- * package's own surface can perform.
+ * register a source, attach evidence) but cannot approve, promote, or activate a release
+ * through this package's own surface. Canonical case promotion is a separate authenticated
+ * action; this test does not prove a different human or fresh reauthentication.
  *
  * This test exercises the domain promotion gate and proves the operator package
  * exposes no acceptance or publication operation.
@@ -48,11 +48,11 @@ function wellSupportedClaim(proposerId: string): PromotionClaim {
   };
 }
 
-test('the domain promotion gate refuses self-approval: same identity as proposer and approver', () => {
+test('the domain promotion gate allows review by the proposer when evidence gates pass', () => {
   const claim = wellSupportedClaim('operator-1');
   const result = evaluatePromotionGate({ claim, approverId: 'operator-1' });
-  assert.equal(result.approved, false);
-  assert.ok(result.reasons.includes('proposer_approver_conflict'));
+  assert.equal(result.approved, true);
+  assert.equal(result.reasons.length, 0);
 });
 
 test('the domain promotion gate approves the same claim once a distinct approver reviews it', () => {

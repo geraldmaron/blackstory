@@ -10,6 +10,7 @@ These carry no folder of their own. They are law about how routes, the shell and
 
 | Pattern | Doc | Modules | Status |
 |---|---|---|---|
+| Management request review | [`patterns-work-review.md`](./patterns-work-review.md) | `admin/work/work-inbox.tsx`, `admin/work/work-inbox.css` | Private request, exact-version review and verified receipt; deployment verification pending |
 | Surface classes | [`patterns-surface-classes.md`](./patterns-surface-classes.md) | `app/layout.tsx`, `app/shell.css`, `components/SiteShell.tsx`, `lib/keyboard/bindings.ts`, `lib/nav/destination-registry.ts` | Binding. `data-surface` emission pending (SP-07) |
 | Plate posture | [`patterns-plate-posture.md`](./patterns-plate-posture.md) | `components/map-stage/MapStage.tsx`, `lib/map-experience/map-libre-lifecycle.ts`, `components/theme-spine/MapInsetMoment.tsx`, `components/patterns/RecordPlacePreview.tsx`; `lib/motion/use-reduced-motion.ts` is new in SP-18 | Binding. Postures pending (SP-07, SP-08) |
 | Reading room | [`patterns-reading-room.md`](./patterns-reading-room.md) | `components/article/*`, `components/SiteFooter.tsx`; `app/reading-room.css` and `components/shell/SiteFooter.tsx` are new in SP-11 and SP-15 | Binding. Stylesheet pending (SP-11) |

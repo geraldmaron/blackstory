@@ -339,6 +339,7 @@ const config: ExpoConfig = {
   },
   plugins: [
     'expo-router',
+    'expo-sqlite',
     // Custom development client (NOT Expo Go). Required so `expo start` /
     // press `i` targets BlackStory (Dev) with MapLibre + other native
     // modules linked. Without this, Metro can open Expo Go, which lacks

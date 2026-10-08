@@ -6,40 +6,37 @@ import {
   type CanonicalPromotionRecord,
 } from './case-promotion.ts';
 
-test('evaluateCasePromotionGate refuses self-approval', () => {
+test('evaluateCasePromotionGate allows an identified publisher to promote a ready case', () => {
   const result = evaluateCasePromotionGate({
     caseState: 'substantial_enrichment',
-    proposerId: 'operator-a',
     approverId: 'operator-a',
   });
-  assert.equal(result.approved, false);
-  assert.ok(result.reasons.includes('proposer_approver_conflict'));
+  assert.deepEqual(result, { approved: true, reasons: [] });
 });
 
-test('evaluateCasePromotionGate refuses a case that is not substantial_enrichment', () => {
+test('evaluateCasePromotionGate refuses a case without the minimum record', () => {
   const result = evaluateCasePromotionGate({
     caseState: 'relevance_confirmed',
-    proposerId: 'operator-a',
     approverId: 'operator-b',
   });
   assert.equal(result.approved, false);
   assert.ok(result.reasons.includes('case_not_ready'));
 });
 
-test('evaluateCasePromotionGate approves a ready case with distinct proposer/approver', () => {
-  const result = evaluateCasePromotionGate({
-    caseState: 'substantial_enrichment',
-    proposerId: 'operator-a',
-    approverId: 'operator-b',
-  });
-  assert.deepEqual(result, { approved: true, reasons: [] });
+test('evaluateCasePromotionGate approves each ready state', () => {
+  for (const caseState of ['minimum_record', 'partial_enrichment', 'substantial_enrichment']) {
+    const result = evaluateCasePromotionGate({
+      caseState,
+      approverId: 'operator-b',
+    });
+    assert.deepEqual(result, { approved: true, reasons: [] });
+  }
 });
 
-test('evaluateCasePromotionGate refuses blank identities', () => {
+test('evaluateCasePromotionGate refuses a blank approver identity', () => {
   const result = evaluateCasePromotionGate({
     caseState: 'substantial_enrichment',
-    proposerId: '',
-    approverId: 'operator-b',
+    approverId: '',
   });
   assert.ok(result.reasons.includes('missing_identity'));
 });
@@ -81,21 +78,21 @@ test('validateCanonicalPromotionRecord accepts a well-formed record', () => {
   assert.deepEqual(result, { valid: true, reasons: [] });
 });
 
-test('validateCanonicalPromotionRecord rejects a too-short summary', () => {
-  const result = validateCanonicalPromotionRecord({ ...VALID_RECORD, summary: 'Too short.' });
+test('validateCanonicalPromotionRecord rejects an empty summary', () => {
+  const result = validateCanonicalPromotionRecord({ ...VALID_RECORD, summary: ' ' });
   assert.equal(result.valid, false);
   assert.ok(result.reasons.includes('name_or_summary_invalid'));
 });
 
-test('validateCanonicalPromotionRecord rejects fewer than two independent source hosts', () => {
+test('validateCanonicalPromotionRecord accepts a sparse record with a substantive source', () => {
   const result = validateCanonicalPromotionRecord({
     ...VALID_RECORD,
     sources: [VALID_RECORD.sources[0]!],
   });
-  assert.ok(result.reasons.includes('insufficient_independent_source_hosts'));
+  assert.equal(result.valid, true);
 });
 
-test('validateCanonicalPromotionRecord rejects two sources from the same host', () => {
+test('validateCanonicalPromotionRecord does not mistake host count for independent lineage', () => {
   const result = validateCanonicalPromotionRecord({
     ...VALID_RECORD,
     sources: [
@@ -103,7 +100,7 @@ test('validateCanonicalPromotionRecord rejects two sources from the same host', 
       { ...VALID_RECORD.sources[0]!, title: 'Source A2', excerpt: 'C'.repeat(80) },
     ],
   });
-  assert.ok(result.reasons.includes('insufficient_independent_source_hosts'));
+  assert.equal(result.valid, true);
 });
 
 test('validateCanonicalPromotionRecord rejects a non-https source', () => {
@@ -117,10 +114,10 @@ test('validateCanonicalPromotionRecord rejects a non-https source', () => {
   assert.ok(result.reasons.includes('invalid_source'));
 });
 
-test('validateCanonicalPromotionRecord rejects a too-short excerpt', () => {
+test('validateCanonicalPromotionRecord rejects an empty excerpt', () => {
   const result = validateCanonicalPromotionRecord({
     ...VALID_RECORD,
-    sources: [{ ...VALID_RECORD.sources[0]!, excerpt: 'short' }, VALID_RECORD.sources[1]!],
+    sources: [{ ...VALID_RECORD.sources[0]!, excerpt: '' }, VALID_RECORD.sources[1]!],
   });
   assert.ok(result.reasons.includes('invalid_source'));
 });
@@ -128,7 +125,7 @@ test('validateCanonicalPromotionRecord rejects a too-short excerpt', () => {
 test('validateCanonicalPromotionRecord rejects coordinates outside US bounds', () => {
   const result = validateCanonicalPromotionRecord({
     ...VALID_RECORD,
-    location: { ...VALID_RECORD.location, lat: 5, lng: 5 },
+    location: { ...VALID_RECORD.location!, lat: 5, lng: 5 },
   });
   assert.ok(result.reasons.includes('coordinates_outside_us_bounds'));
 });
@@ -154,4 +151,18 @@ test('validateCanonicalPromotionRecord ignores location-only sources for the ind
     ],
   });
   assert.deepEqual(result, { valid: true, reasons: [] });
+});
+
+test('validateCanonicalPromotionRecord accepts a sourced record without an invented pin', () => {
+  const { location: _location, ...record } = VALID_RECORD;
+  assert.deepEqual(validateCanonicalPromotionRecord(record), { valid: true, reasons: [] });
+});
+
+test('validateCanonicalPromotionRecord rejects location-only evidence without a location', () => {
+  const { location: _location, ...record } = VALID_RECORD;
+  const result = validateCanonicalPromotionRecord({
+    ...record,
+    sources: [...record.sources, { ...record.sources[0]!, locationOnly: true }],
+  });
+  assert.ok(result.reasons.includes('location_only_source_without_location'));
 });

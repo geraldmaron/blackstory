@@ -1,3 +1,4 @@
+import { parseResearchPdf } from '@repo/ops-data/management/pdf-parser';
 /**
  * Real safe-fetch dependencies (DNS pinning + HTTP transport) plus citation prefill
  * and a capture-plan preview for the admin quick-add surface and the CLI's URL-based intake.
@@ -77,6 +78,7 @@ export async function parseTextOnlyHtml(
   content: Uint8Array,
   contentType: string,
 ): Promise<SafeParserResult> {
+  if (contentType === 'application/pdf') return parseResearchPdf(content);
   const text = new TextDecoder('utf-8', { fatal: false }).decode(content);
   const indicators: SafeParserResult['indicators'][number][] = [];
   if (text.includes('EICAR-STANDARD-ANTIVIRUS-TEST-FILE')) {
@@ -126,7 +128,11 @@ export async function runQuickAddFetch(
   options: SafeFetchOptions = {},
 ): Promise<SafeFetchResult> {
   return executeSafeFetch(url, dependencies, {
-    limits: { ...DEFAULT_SAFE_FETCH_LIMITS, ...options.limits },
+    limits: {
+      ...DEFAULT_SAFE_FETCH_LIMITS,
+      allowedContentTypes: [...DEFAULT_SAFE_FETCH_LIMITS.allowedContentTypes, 'application/pdf'],
+      ...options.limits,
+    },
     ...(options.domainPolicy ? { domainPolicy: options.domainPolicy } : {}),
   });
 }

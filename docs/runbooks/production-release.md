@@ -83,6 +83,13 @@ Readiness record
 
 ## Release prerequisites
 
+Native app release and production web/backend release are separate decisions. The owner has
+deferred native release validation for the current management workflow rollout. An unaccepted
+local Xcode license does not block that web/backend rollout. Run the applicable non-native
+repository lanes with `--skip mobile`; retain the separately observed hosted Mobile Checks
+result and assess public API compatibility. Do not describe a web deployment as a native release
+or use this scope decision to ignore a failing web, database, authorization or publication check.
+
 1. Review the complete diff, current [architecture](../architecture.md), migration history and the
    exact commit to release. Do not treat an old ADR, preview, dry run or local restore as release
    approval.

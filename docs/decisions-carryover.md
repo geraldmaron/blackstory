@@ -14,8 +14,10 @@ old branch, passing mock, or repeated comment is not evidence that a requirement
   release projections have separate purposes and permissions. Files are import/export artifacts;
   they are not a competing live entity store. No new Firestore or Cloud SQL path.
 - Public reads expose approved release projections. Admin edits canonical data under staff
-  authorization and an audit record. Release activation is a distinct operation. A research
-  producer cannot approve its own artifact or activate its release.
+  authorization and an audit record. Release activation is a distinct operation. A case
+  proposer may promote that case after an authenticated review and with publication
+  permission; research-role access cannot activate a release. Research-artifact review has
+  its own evidence and reviewer checks.
 - The constitution in `packages/schemas/constitution/` owns product policy. The research profile
   owns domain vocabulary, fitness, sensitivity, budgets, and stopping policy. Neither substitutes
   for database authorization. Public clients receive no database or model credentials.
