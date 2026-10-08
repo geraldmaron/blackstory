@@ -1,8 +1,8 @@
 /**
  * PROVES the acceptance-critical invariant for: an operator can PROPOSE (submit a lead,
- * register a source, attach evidence) but publishing always requires a distinct, fresh-auth
- * promotion action never the same call, never the same identity, never something this
- * package's own surface can perform.
+ * register a source, attach evidence) but cannot approve, promote, or activate a release
+ * through this package's own surface. Canonical case promotion is a separate authenticated
+ * action; this test does not prove a different human or fresh reauthentication.
  *
  * This test exercises the domain promotion gate and proves the operator package
  * exposes no acceptance or publication operation.
