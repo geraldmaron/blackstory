@@ -1,0 +1,71 @@
+[
+  {
+    "caseId": "72a89557-945e-4385-90b4-05503de94f61",
+    "proposerId": "codex-research",
+    "record": {
+      "entityId": "nrhp-black-heritage-86000437",
+      "displayName": "Booker T. Washington High School (Atlanta)",
+      "aliases": ["Washington High School, Atlanta"],
+      "summary": "Booker T. Washington High School opened at 45 Whitehouse Drive SW in September 1924 as a public secondary school for Black students in Atlanta. It remains an operating high school at that address.",
+      "jurisdiction": "Atlanta, Georgia",
+      "topicIds": ["education"],
+      "topicTags": ["education"],
+      "eraBuckets": ["1920s"],
+      "location": {
+        "lat": 33.754226206663,
+        "lng": -84.419939391463,
+        "label": "45 Whitehouse Drive SW, Atlanta, Georgia",
+        "precision": "institution",
+        "matchMethod": "geocode_census"
+      },
+      "sources": [
+        {
+          "url": "https://npgallery.nps.gov/GetAsset/9814b816-e5bd-4513-8b58-415d397c5297",
+          "title": "Booker T. Washington High School National Register nomination, p. 6",
+          "excerpt": "The building was completed on January 29, 1924 at a cost of $325,300. It opened September 8, 1924.",
+          "fitness": "authoritative"
+        },
+        {
+          "url": "https://washington.atlantapublicschools.us/our-school",
+          "title": "Atlanta Public Schools, Booker T. Washington High School: Our School",
+          "excerpt": "Booker T. Washington High School, named for the famous educator, opened in September 1924 under the auspices of the Atlanta Board of Education",
+          "fitness": "strong"
+        }
+      ]
+    }
+  },
+  {
+    "caseId": "c5a0c071-b48f-4577-8d1a-f7f1fce7f8e3",
+    "proposerId": "codex-research",
+    "record": {
+      "entityId": "nrhp-black-heritage-85000309",
+      "displayName": "Howard High School (Wilmington)",
+      "aliases": ["Howard High School of Technology"],
+      "summary": "Howard High School's historic building stands at 13th and Poplar Streets in Wilmington. Black students from Claymont had to travel there instead of attending their local white high school; their families challenged that segregation in Belton v. Gebhart, one of the cases considered in Brown v. Board of Education. The building remains in school use as Howard High School of Technology.",
+      "jurisdiction": "Wilmington, Delaware",
+      "topicIds": ["education", "school-desegregation"],
+      "topicTags": ["education", "school-desegregation"],
+      "eraBuckets": ["1920s", "1950s"],
+      "sources": [
+        {
+          "url": "https://npgallery.nps.gov/GetAsset/81caf24c-7dae-4316-8ada-a13a4d8647ce",
+          "title": "Howard High School National Historic Landmark nomination, pp. 4 and 12",
+          "excerpt": "The former Howard High School is located at the northeast corner of 13th and Poplar Streets in the Eastside neighborhood of Wilmington.",
+          "fitness": "authoritative"
+        },
+        {
+          "url": "https://archives.delaware.gov/2026/02/27/delawares-fight-for-school-desegregation-part-1/",
+          "title": "Delaware Public Archives, Delaware's Fight for School Desegregation: Part 1",
+          "excerpt": "Their children were forced to ride a public bus to Wilmington to attend Howard High School, the state’s only Black college-preparatory high school.",
+          "fitness": "strong"
+        },
+        {
+          "url": "https://www.nps.gov/brvb/getinvolved/partners.htm",
+          "title": "National Park Service, Brown v. Board of Education National Historical Park partners",
+          "excerpt": "Their experiences helped form the basis of Belton v. Gebhart. The historic school continues to operate as Howard High School of Technology.",
+          "fitness": "strong"
+        }
+      ]
+    }
+  }
+]

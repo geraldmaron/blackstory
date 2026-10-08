@@ -220,9 +220,11 @@ export function prepareOperatorIntake(
 }
 
 function deriveTitle(text: string, maxLength = 80): string {
-  const trimmed = text.trim().replace(/\s+/gu, ' ');
+  // Match quarantine's NFKC normalization before enforcing its title limit.
+  // The Unicode ellipsis expands to three periods under NFKC.
+  const trimmed = text.normalize('NFKC').trim().replace(/\s+/gu, ' ');
   if (trimmed.length <= maxLength) return trimmed || 'Untitled operator proposal';
-  return `${trimmed.slice(0, maxLength - 1).trimEnd()}…`;
+  return `${trimmed.slice(0, maxLength - 3).trimEnd()}...`;
 }
 
 export type LeadInput = {
