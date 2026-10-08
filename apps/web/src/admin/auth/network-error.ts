@@ -10,8 +10,7 @@ const NETWORK_FAILURE_MESSAGES = [
 ];
 
 export const ADMIN_NETWORK_FAILURE_MESSAGE =
-  'Could not reach the sign-in service. Check your connection, and turn off any content ' +
-  'blocker or VPN that might block supabase.co, then try again.';
+  'Could not reach the sign-in service. Please try again in a moment.';
 
 export function isNetworkFailureMessage(message: string | undefined | null): boolean {
   const text = message?.trim();

@@ -4,6 +4,14 @@ The admin console runs under `/admin` in the web application. Supabase Auth veri
 sessions. Server routes resolve the user through `auth.getUser`, require an email, and read
 exactly one role from trusted `app_metadata.app_role`. User-editable metadata never grants access.
 
+The browser Auth client sends password, refresh, user, and logout requests through
+`/api/admin-auth/` on the BlackStory origin because browser content blockers may reject the
+Supabase hostname. That route permits only the token, user, and logout operations used by this
+console, substitutes the configured publishable key, rejects cross-origin posts, strips upstream
+cookies, and returns `no-store`. It never reads a service-role setting or decides staff access.
+Server session verification still contacts Supabase directly, and the browser keeps the same
+project URL for its session cookie key.
+
 `apps/web/src/admin/auth/request-auth.ts` applies the route policy in `route-permissions.ts`.
 Undeclared routes fail closed. Server writes use the shared permissions in `staff-permissions.ts`;
 client-side controls only hide unavailable actions and cannot authorize them.
