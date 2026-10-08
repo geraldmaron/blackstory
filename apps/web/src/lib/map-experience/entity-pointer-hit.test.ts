@@ -108,3 +108,21 @@ test('MapStage drills into clusters instead of opening a leaf record sheet', () 
     /const hit = pointerHitAt\(event\.point\);\s*activeMap\.getCanvas\(\)\.style\.cursor = hit \? 'pointer'/,
   );
 });
+
+test('overlapping pins remain individually reachable without duplicate halo hits', () => {
+  assert.deepEqual(
+    resolveEntityPointerHit([
+      { properties: { entityId: 'school' } },
+      { properties: { entityId: 'school' } },
+      { properties: { entityId: 'namesake' } },
+    ]),
+    { kind: 'overlap', entityIds: ['school', 'namesake'] },
+  );
+  assert.deepEqual(
+    resolveEntityPointerHit([
+      { properties: { entityId: 'school' } },
+      { properties: { entityId: 'school' } },
+    ]),
+    { kind: 'entity', entityId: 'school' },
+  );
+});

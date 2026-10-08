@@ -2,6 +2,7 @@ import type { ExploreViewportFrame } from '../../lib/map-experience/url-state';
 
 export type MapStageEvents = {
   select: [entityId: string];
+  overlap: [entityIds: readonly string[]];
   /** Clears an open record selection when the reader drills into a cluster aggregate. */
   deselect: [];
   stateSelect: [postalCode: string];
@@ -40,6 +41,7 @@ export function makeListenerStore(): {
 } {
   return {
     select: new Set(),
+    overlap: new Set(),
     deselect: new Set(),
     stateSelect: new Set(),
     edgeSelect: new Set(),
