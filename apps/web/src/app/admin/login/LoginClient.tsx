@@ -111,13 +111,7 @@ export default function LoginClient() {
           Sign in
         </h1>
         <p className="admin-login__lede">
-          Private operations desk for research triage, story review, and releases. Nothing here
-          publishes to the public site by itself.
-        </p>
-        <p className="admin-login__meta">
-          After sign-in you land on Home — pick Inbox for pending cases, or open the desk you need
-          from the nav. Use an administrator account provisioned in Supabase Auth. There is no
-          public sign-up on this portal.
+          Use your staff account to review research and manage releases.
         </p>
 
         {error ? (

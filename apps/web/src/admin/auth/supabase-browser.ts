@@ -25,9 +25,34 @@ function readPublicSupabaseConfig() {
 
 let clientSingleton: SupabaseClient | undefined;
 
+const ADMIN_AUTH_ENDPOINTS = new Set(['token', 'user', 'logout']);
+
+/** Keep the configured Supabase URL for its session cookie key, but use a same-origin
+ * transport for the browser Auth calls. Server clients still call Supabase directly. */
+export function adminAuthRequestUrl(input: RequestInfo | URL, supabaseUrl: string): string | null {
+  const requestUrl = new URL(input instanceof Request ? input.url : String(input));
+  const upstream = new URL(supabaseUrl);
+  if (requestUrl.origin !== upstream.origin) return null;
+  const prefix = `${upstream.pathname.replace(/\/$/, '')}/auth/v1/`;
+  if (!requestUrl.pathname.startsWith(prefix)) return null;
+  const endpoint = requestUrl.pathname.slice(prefix.length);
+  if (!ADMIN_AUTH_ENDPOINTS.has(endpoint)) return null;
+  return `/api/admin-auth/${endpoint}${requestUrl.search}`;
+}
+
+function adminAuthFetch(supabaseUrl: string): typeof fetch {
+  return (input, init) => {
+    const proxyUrl = adminAuthRequestUrl(input, supabaseUrl);
+    if (!proxyUrl) return fetch(input, init);
+    const request =
+      input instanceof Request ? new Request(new URL(proxyUrl, location.origin), input) : proxyUrl;
+    return fetch(request, init);
+  };
+}
+
 export function getAdminSupabaseClient(): SupabaseClient {
   if (clientSingleton) return clientSingleton;
   const { url, anonKey } = readPublicSupabaseConfig();
-  clientSingleton = createBrowserClient(url, anonKey);
+  clientSingleton = createBrowserClient(url, anonKey, { global: { fetch: adminAuthFetch(url) } });
   return clientSingleton;
 }
