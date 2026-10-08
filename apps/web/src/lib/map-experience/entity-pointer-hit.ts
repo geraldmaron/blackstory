@@ -39,6 +39,7 @@ export const ENTITY_POINTER_HIT_LAYER_IDS = [
 
 export type EntityPointerHit =
   | { readonly kind: 'entity'; readonly entityId: string }
+  | { readonly kind: 'overlap'; readonly entityIds: readonly string[] }
   | {
       readonly kind: 'cluster';
       readonly clusterId: number;
@@ -105,11 +106,17 @@ function hasPointCount(properties: RenderedPointerFeature['properties']): boolea
 export function resolveEntityPointerHit(
   features: readonly RenderedPointerFeature[],
 ): EntityPointerHit | undefined {
-  for (const feature of features) {
-    if (hasPointCount(feature.properties)) continue;
-    const entityId = entityIdFromProperties(feature.properties);
-    if (entityId) return { kind: 'entity', entityId };
-  }
+  const entityIds = [
+    ...new Set(
+      features.flatMap((feature) => {
+        if (hasPointCount(feature.properties)) return [];
+        const entityId = entityIdFromProperties(feature.properties);
+        return entityId ? [entityId] : [];
+      }),
+    ),
+  ];
+  if (entityIds.length > 1) return { kind: 'overlap', entityIds };
+  if (entityIds[0]) return { kind: 'entity', entityId: entityIds[0] };
   for (const feature of features) {
     const clusterId = clusterIdFromProperties(feature.properties);
     if (clusterId === undefined) continue;

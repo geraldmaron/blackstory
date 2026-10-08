@@ -10,11 +10,14 @@
  */
 import React from 'react';
 import { cx } from '@repo/ui';
+import { GroupingToggle } from './GroupingToggle';
 import './map-controls.css';
 
 void React;
 
 export type MapControlsProps = {
+  readonly grouping?: boolean;
+  readonly onToggleGrouping?: () => void;
   readonly onLocate: () => void;
   readonly locating: boolean;
   /** True while the reader's own position is the active "near" constraint. */
@@ -31,6 +34,8 @@ export type MapControlsProps = {
 export const COMPASS_THRESHOLD_DEGREES = 1;
 
 export function MapControls({
+  grouping,
+  onToggleGrouping,
   onLocate,
   locating,
   located,
@@ -52,6 +57,9 @@ export function MapControls({
       role="group"
       aria-label="Map controls"
     >
+      {onToggleGrouping ? (
+        <GroupingToggle enabled={grouping ?? true} onToggle={onToggleGrouping} />
+      ) : null}
       <button
         type="button"
         className="ds-map-controls__btn ds-map-controls__locate"

@@ -140,3 +140,24 @@ Rem values are exported from `first-paint-pin-tokens.ts` for drift tests.
 | Feature denormalization | `build-explore-map-source.test.ts` |
 | First-paint pin tokens | `first-paint-pin-tokens.test.ts` |
 | First-paint payload | `first-paint-pins.test.ts` |
+
+## Reader control and overlapping pins
+
+The live browse map exposes the existing **Group nearby** toggle beside its map controls.
+Grouping defaults on for broad exploration and is shareable through `group=0` or `group=1`.
+A successful device-location request turns grouping off; denied or failed requests leave it
+unchanged. The reader can turn grouping back on afterward. Device coordinates stay out of URLs.
+
+Clusters expand on tap. With individual pins, a tap that hits several records opens those
+records in the existing Records panel, with a clearable **overlapping pins** constraint.
+Deduplicate halo and crossfade hits by entity identity. Retain names, kinds, dates and place
+labels in the list. Panning or selecting another map target clears the overlap selection.
+The chooser does not alter the map filter or imply that the records share a historical relation.
+Never move stored coordinates to make a stack appear to contain distinct documented sites.
+
+Research checked 2026-10-08: [MapLibre cluster expansion](https://maplibre.org/maplibre-gl-js/docs/examples/create-and-style-clusters/),
+[Google marker clustering](https://developers.google.com/maps/documentation/javascript/marker-clustering),
+and [Leaflet overlap handling](https://leaflet.github.io/Leaflet.markercluster/).
+These establish clustering and overlap disclosure patterns. Turning grouping off after Near me
+is BlackStory's explicit product choice, not a universal platform requirement. A named list
+fits this archive's geographic precision constraints better than displacing markers.
