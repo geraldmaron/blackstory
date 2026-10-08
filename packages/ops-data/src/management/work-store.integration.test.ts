@@ -23,6 +23,7 @@ test(
         request: 'Research one named school',
         sessionId: 'test',
         harness: 'integration',
+        executionMode: 'hosted',
         idempotencyKey: randomUUID(),
       };
       const [one, two] = await Promise.all([

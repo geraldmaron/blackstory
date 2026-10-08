@@ -769,3 +769,80 @@ then aligned using `npx expo install --fix`; its requested SQLite plugin was add
 dynamic configuration. The rerun passed package tests and 20 of 21 Expo Doctor checks. Direct
 `pod --version` identifies the remaining failure as the unaccepted Xcode license, not a missing
 CocoaPods installation. No doctor check or publication gate was bypassed. No promotion PR was opened.
+
+## Session execution correction, 2026-10-08 (deployment pending)
+
+The management path previously treated every request as a hosted job. Its tools could submit and
+approve work but could not contribute research from their own browser/search capabilities. That
+made adapter credentials a false prerequisite for ordinary agent work. This section supersedes
+that requirement in the preceding finishing record; it does not claim the other release gaps are
+resolved. Verdict: **accepted with controls for the execution pattern; deployment needs validation**.
+This is shared-context self-review.
+
+Session execution is now the default across request contracts, HTTP, CLI, MCP and inbox guidance.
+Explicit hosted requests retain the existing adapter. The session entry point reuses the research
+ledger, lease/completion protocol, source library, exact quotation checks and immutable proposal
+store. It does not import hosted search or model execution. Provider-specific preparation was
+extracted into a shared plan module, not duplicated. Repository and sibling-tooling searches found
+no replacement needed for these existing primitives. No dependency or schedule was added.
+
+The strongest failure is trusting session-supplied prose as verified evidence. Controls require
+bounded source passages, actual tool references, source-specific retention assessment, exact
+quotation/hash attachment, an explicit counterevidence plan, and a separate challenge task before
+saving the proposal. Observations and model identity remain session-reported; passage hashes do
+not prove remote origin or entailment. Unknown model usage remains unknown, and shared-context
+review cannot become independent review. The best alternative is independently reacquiring every
+source in a hosted service, but that is an optional executor with different access and credential
+requirements, not a prerequisite for using a session's research tools.
+
+The authenticated session publication command consumes the same saved owner approval and calls
+the existing signed publisher. It checks current account permission and work ownership before
+claiming publication. Research cannot approve itself. Remote-only clients still need an authorized
+publication executor; no mobile or third-party client is advertised as fully integrated. Closing
+chat preserves checkpoints but does not guarantee independent execution. Bounded run expiry is
+reported as incomplete, not hidden by extending budgets or declaring success.
+
+A one-way database membership lets the existing admin service enter the narrower research role.
+The research role does not acquire admin/publication membership. Testing with one pooled connection
+exposed a nested connection acquisition on resume; the pinned plan is now loaded after releasing
+the preparation connection. Profiles are keyed by their model-policy identity so session and
+hosted policies can coexist without rewriting an immutable profile version.
+
+Check: Session evidence-to-approval integration without hosted credentials.
+Command: `python3 /tmp/blackstory-session-test.py`
+Result: pass.
+Observed: the real isolated database, with `session_user=admin_app`, accepted source checkpoints,
+resumed in a second session, rejected an invented quotation, preserved idempotent completions,
+respected retry backoff, saved the corrected proposal, and refused publication before approval.
+Neither submission nor approval dispatched hosted work. Reverse research-to-admin membership was
+false. The committed test is `packages/operator-cli/src/management-session.test.ts`.
+
+Check: Shared publication safeguards.
+Command: `python3 /tmp/blackstory-publication-test.py`
+Result: pass.
+Observed: approval, unrelated-content preservation, signatures, coordinated pointers, rollback,
+stale edits and public-readback failure/retry passed. External storage/public HTTP are simulated;
+this is not a production release.
+
+Check: Fresh schema sequence including the session role.
+Command: `python3 /tmp/blackstory-session-replay.py`
+Result: pass.
+Observed: replay from the isolated schema baseline through all subsequent migrations completed;
+the source-library update correctly changed no rows in the empty fixture. Production is unchanged.
+
+Check: Actual authenticated inbox and session HTTP entry point.
+Command: `python3 /tmp/blackstory-session-ui-auth.py`
+Result: pass after one secret-manager timeout and retry.
+Observed: at 390px both themes had no horizontal overflow, focus was visible, correction sections
+and hold worked, and submission showed saved session continuation with no hosted-dispatch error.
+The actual HTTP endpoint returned a research lease and plan schema. This is local web proof,
+not a physical mobile device or Claude/ChatGPT/Cursor integration test.
+
+Check: Repository validation.
+Command: `fnm exec --using=22 -- ./scripts/ci-local.sh`
+Result: partial.
+Observed: all non-validation/non-mobile lanes passed. A type-only import lint failure was fixed.
+The final rerun with `--lane validate --lane unit-js-packages --lane unit-js-apps --lane build-typecheck`
+passed every selected lane. Mobile formatting,
+typecheck, lint and all 1,272 tests passed, but the native tooling check still stops at the
+unaccepted Xcode license. No production promotion, migration or school publication is claimed.

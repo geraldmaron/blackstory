@@ -1,6 +1,7 @@
 /** On-demand hosted dispatch. A saved request remains retryable when GitHub is unavailable. */
 import { randomUUID } from 'node:crypto';
 import type { ManagementWorkStore } from './work-store.js';
+import { workExecutionMode } from './contracts.js';
 
 export type WorkDispatcher = (workId: string, phase: 'research' | 'publish') => Promise<void>;
 export function githubWorkDispatcher(
@@ -35,11 +36,16 @@ export async function dispatchManagementWork(
   id: string,
   dispatch: WorkDispatcher,
 ): Promise<boolean> {
+  const request = await store.pool.query(
+    'SELECT request FROM research.management_work WHERE id=$1',
+    [id],
+  );
+  if (!request.rows[0] || workExecutionMode(request.rows[0].request) !== 'hosted') return false;
   const token = randomUUID();
   const claim = await store.pool.query(
     `UPDATE research.management_work SET dispatch_attempts=dispatch_attempts+1,
     dispatch_status='dispatching',dispatch_token=$2,dispatched_at=now()
-    WHERE id=$1 AND state IN ('queued','researching','approved','publishing','verification_failed')
+    WHERE id=$1 AND request->>'executionMode'='hosted' AND state IN ('queued','researching','approved','publishing','verification_failed')
       AND (lease_until IS NULL OR lease_until<now())
       AND (dispatch_status IN ('pending','failed') OR (dispatch_status='dispatching' AND dispatched_at<now()-interval '2 minutes'))
     RETURNING state`,

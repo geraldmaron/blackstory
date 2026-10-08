@@ -4,6 +4,7 @@ import { POST as submit, GET as list } from '../../admin/api/work/route';
 import { GET as get } from '../../admin/api/work/[id]/route';
 import { POST as decide } from '../../admin/api/work/[id]/decisions/route';
 import { POST as retry } from '../../admin/api/work/[id]/retry/route';
+import { POST as research } from '../../admin/api/work/[id]/research/route';
 
 export const runtime = 'nodejs';
 export async function POST(request: Request): Promise<Response> {
@@ -44,7 +45,9 @@ export async function POST(request: Request): Promise<Response> {
           ? await decide(forwarded, context)
           : action === 'retry'
             ? await retry(forwarded, context)
-            : await get(forwarded, context);
+            : action === 'research'
+              ? await research(forwarded, context)
+              : await get(forwarded, context);
     }
     const value = await response.json();
     if (!response.ok) throw new Error(value.error || 'Work operation failed');

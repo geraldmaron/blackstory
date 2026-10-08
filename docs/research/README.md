@@ -34,6 +34,11 @@ Manage ordinary owner requests end to end: infer a bounded scope, reuse existing
 sources, research identity and counterevidence, review each factual sentence, then present one
 concise proposal. Approval belongs to the exact displayed changes and includes publication.
 Avoid asking the owner to coordinate internal commands or repeat an existing authorization.
+Session execution is the default: the agent uses its available web and document tools, checkpoints
+results through the shared research ledger, and hands the saved proposal to the same approval and
+publication controls. Brave, OpenRouter and GitHub Actions belong only to the optional hosted
+adapter. Never make their setup a prerequisite for session research or already-approved publication.
+Saved work survives a stopped session; independent execution requires a configured background worker.
 The durable inbox and remote clients are experimental; see [management operations](./research-operations.md#account-owned-management-work)
 for deployment prerequisites and limits. No mobile/client compatibility is implied by the
 presence of an MCP endpoint. Research is not complete until its usable outcome is verified.

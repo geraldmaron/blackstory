@@ -10,6 +10,7 @@ export const workRequestSchema = z
     idempotencyKey: text.max(200),
     sessionId: text.max(200),
     harness: text.max(100),
+    executionMode: z.enum(['session', 'hosted']).optional(),
   })
   .strict();
 export const workProposalSchema = {
@@ -28,6 +29,35 @@ export const workDecisionSchema = z
   })
   .strict();
 export type WorkRequest = z.infer<typeof workRequestSchema>;
+/** Absence means session execution, never permission to launch paid background work. */
+export const workExecutionMode = (request: WorkRequest): 'session' | 'hosted' =>
+  request.executionMode ?? 'session';
+
+export const sessionResearchSchema = z.discriminatedUnion('action', [
+  z
+    .object({
+      action: z.literal('heartbeat'),
+      sessionId: text.max(200),
+      lease: z.string().uuid(),
+      taskLease: z.unknown(),
+    })
+    .strict(),
+  z.object({ action: z.literal('start'), sessionId: text.max(200) }).strict(),
+  z
+    .object({ action: z.literal('next'), sessionId: text.max(200), lease: z.string().uuid() })
+    .strict(),
+  z
+    .object({
+      action: z.literal('complete'),
+      sessionId: text.max(200),
+      lease: z.string().uuid(),
+      taskLease: z.unknown(),
+      output: z.string().max(256000),
+      reportedModel: text.max(200).optional(),
+      taskPromptHash: digest.optional(),
+    })
+    .strict(),
+]);
 export type WorkProposal = ManagementProposal;
 export type RecordChange = WorkProposal['changes'][number];
 export type WorkDecision = z.infer<typeof workDecisionSchema>;

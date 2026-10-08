@@ -57,6 +57,15 @@ contracts and manual workflow dispatch remain so scheduling can be explicitly en
 future authorized change. Remaining optional GCP service-control files describe potential deployments,
 not permission to provision a parallel research platform.
 
+## Execution boundary
+
+Research contracts, evidence, review, approval and publication are shared. Execution belongs to
+an explicit mode. Session mode is the default and uses the agent harness's available web/model
+tools; hosted mode is optional and owns its provider credentials. GitHub Actions and Brave are
+adapter choices, never prerequisites for ordinary session work or approved publication. Closing
+a session preserves checkpoints but does not promise background computation. Clients must report
+the capabilities actually available: research, review, approval and publication execution separately.
+
 ## Data flow
 
 Source or search lead → independently retrieved evidence → versioned capture and selector →

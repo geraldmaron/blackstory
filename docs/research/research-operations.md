@@ -767,55 +767,98 @@ a sourced address, evidence attachment, or campaign is actually ready.
 
 ## Account-owned management work
 
-Implementation status: experimental, not a deployed service. The hosted acceptance run and
-third-party client sign-in have not been demonstrated. Use the existing operator workflows
-until the deployment prerequisites below are satisfied; never report a saved request as running.
+Implementation status: the session and hosted paths share one durable ledger and publisher. The
+management service is not deployed yet; do not claim remote-client or live-release acceptance
+from local tests. Existing approved publication work does not depend on enabling hosted research.
 
 The default instruction is: manage the request end to end, infer a bounded scope, check existing
 records, research and challenge the evidence, and prepare changes. Ask only material blockers.
 Show one concise review. Explicit approval of the exact displayed revision authorizes application
-and publication; verify the public result before reporting completion. This instruction applies
-across harnesses; it does not rely on a particular model's memory or skill loader.
+and publication; verify the public result before reporting completion. The agent handles internal
+steps. The owner should not select sources, maintain checklists or operate commands.
 
-The management store in `packages/ops-data/src/management/` owns requests, immutable proposals,
-decisions, session delegations, leases, and receipts. It reuses the research execution ledger and
-publication services. The HTTP routes at `/admin/api/work` and `/admin/api/work/:id` expose submit,
-list and get. Subroutes `decisions` and `retry` expose decisions and recovery. `/admin/work` is the
-account-owned review inbox. The response's `dispatched` flag and `work.dispatchStatus` distinguish
-successful dispatch from a saved request with a failed launch. The inbox remains the status source
-when a chat cannot receive notifications.
+### Session execution is the default
 
-`blackstory-work` is a remote client, separate from the existing operator CLI. Run
+Submit through `/admin/api/work`, `blackstory-work submit`, or MCP `request_work`. Omit
+`executionMode` or set it to `session`. Use the current harness's search, browser and document
+tools. No Brave, OpenRouter, GitHub Actions or background-model credential is needed. Do not
+interrupt an ordinary session request to provision those services. A request without a mode,
+including an older saved request, is treated as session work; it never implicitly launches a job.
+
+Use `/admin/api/work/:id/research`, `blackstory-work research`, or MCP `research_work` for the
+existing research ledger's execution protocol:
+
+1. `start` with `sessionId` claims the work and returns its lease and run ID. The bounded plan
+   includes current catalog snapshots, source-library guidance and prior review feedback.
+2. `next` with `sessionId` and `lease` returns the task lease, dependency evidence and exact
+   output schema. Work through plan, search, acquisition, draft and challenge review using the
+   session's own tools. These are agent operations, not additional owner questions.
+3. `complete` includes those identifiers, `taskLease`, and `output` as a JSON string. Optional
+   `reportedModel` and `taskPromptHash` record only what the session can actually observe.
+   Use `heartbeat` with both leases during longer steps. Leases last five minutes and remain
+   bounded by the research deadline. After an interrupted lease expires, another authorized
+   session can `start` the same work and continue completed checkpoints.
+4. Repeat `next`/`complete` until `next` returns a saved proposal and review URL. An invalid
+   result remains quarantined; the response reports the failure. Retry only after the task's
+   `available_at`, within the attempt budget. A terminal run is incomplete, never successful
+   research. Do not silently expand its budget.
+
+For acquisition, return `ResearchAcquisitionResult`. Each source has one final URL and at most
+1,000 characters of exact source passage in `description`. `rawRecord` contains only a
+source-specific `preservationDecision` and `sessionObservation` with `tool`, `reference` and
+`retrievedAt`. Record how the source was actually opened, not just a search snippet. The service
+hashes the retained passage, labels observations as session-reported, and returns the normalized
+source in task dependencies. Use that hash in proposal evidence. Existing source restrictions
+cannot be overridden. Retention is private, at most 30 days, and allows no public archiving.
+A passage hash proves integrity of submitted text, not that BlackStory fetched or authenticated
+its origin. Exact quotation checks do not prove entailment; identity, contradiction, source
+fitness and prose review remain required. Session model identity is reported provenance and
+unavailable tokens/costs remain unknown. No numerical confidence or independent review is inferred.
+
+`decide_work` or `/admin/api/work/:id/decisions` records the owner's decision against the exact
+version, proposal hash and selected changes. After approval, an authorized session with the
+checkout and configured publication credentials runs `pnpm work:publish <work-id>` through the
+existing secret launcher. This is an internal agent step, not a second approval. The runner
+verifies `BLACKSTORY_ACCESS_TOKEN` through the current account auth service, checks ownership and
+publication permission, and uses the same approved-content checks, signature, immutable artifacts,
+atomic activation and public readback as hosted publication. It needs publication database,
+Storage and signing access; it does not need a search provider, model provider or GitHub token.
+Read the saved outcome afterward. Failed readback is `verification_failed`, never done.
+
+Remote-only clients can research, review and decide through HTTP/MCP. They still need an authorized
+publication executor to ship. A client without that capability must say approved but not published,
+not start an unconfigured background job or substitute direct SQL. Session work persists when
+chat closes, but computation pauses with its executor. Background continuation requires an
+explicitly configured independent executor. Never promise it from a saved checkpoint.
+
+`blackstory-work` reads `BLACKSTORY_MANAGEMENT_URL` and `BLACKSTORY_ACCESS_TOKEN`. Use the existing
+secret launcher; never put tokens in arguments or files. Run
 `node --conditions development --import tsx packages/operator-cli/src/management-bin.ts --help`
-for its input forms. It reads `BLACKSTORY_MANAGEMENT_URL` and `BLACKSTORY_ACCESS_TOKEN`; use the
-existing secret launcher, never put a token in arguments or a file. Decisions include the current
-version, proposal hash, entity selection, session, reason, and idempotency key. Retry the same
-payload/key after transport failure. Changed content requires a new key and current review.
+for input forms. Retry unchanged requests/decisions with their original idempotency keys.
+Changed content requires a new key and current review. Publication retry reuses the exact approval.
 
-The MCP server's management mode uses that same HTTP client when `BLACKSTORY_MANAGEMENT_URL`
-is set. Remote `/api/mcp` supplies request/list/get/decide/retry operations and a method resource.
-OAuth clients require the server allowlist and an active owner-granted session delegation to relay
-decisions. Delegations are managed through `/admin/api/work/delegations`, using the signed-in
-publishing owner. No client is advertised as integrated until its authentication, mobile tool
-availability, review and approval have actually been exercised. Resource-bound OAuth and consent
-setup remain deployment blockers; protocol-level tool tests alone are insufficient.
+The inbox at `/admin/work` shows saved requests, evidence, exact changes, decisions and verified
+outcomes. It defaults to session research and offers background execution only when dispatch is
+configured. A configured dispatcher is not proof of a successful job. OAuth clients require
+resource-bound tokens, the client allowlist and active owner-granted session delegation to relay
+decisions. No Claude, Codex, Cursor or mobile integration is advertised as tested until exercised.
+Consent setup and direct third-party-client acceptance remain unverified.
 
-### Hosted deployment prerequisites
+### Optional hosted execution
 
-`management-work.yml` is on-demand only. It has research and publication phases and per-work
-concurrency without cancellation. The server needs `BLACKSTORY_WORK_DISPATCH_TOKEN`,
-`BLACKSTORY_WORK_REPOSITORY`, and `BLACKSTORY_WORK_REF`. Use a repository-scoped dispatch
-credential, never a broad personal credential. The workflow must exist on the repository's
-default branch before GitHub accepts workflow dispatch.
+Use `executionMode: hosted` only when the owner requests research that continues independently
+of their session. GitHub Actions is the current adapter, not the management contract. The
+`management-work.yml` workflow is on-demand and uses per-work concurrency without cancellation.
+Only this adapter needs `BLACKSTORY_WORK_DISPATCH_TOKEN`, `BLACKSTORY_WORK_REPOSITORY` and
+`BLACKSTORY_WORK_REF`, and the workflow on the repository default branch.
 
-Research needs `RESEARCH_DATABASE_URL`, `OPENROUTER_API_KEY`, `BRAVE_SEARCH_API_KEY`, and the
-`BLACKSTORY_RESEARCH_MODEL` variable. The worker verifies that its effective database role is
-`research_worker` and cannot write canonical entities or decisions. Its model provider has
-proposal authority only. A consumer chat subscription is not a background inference credential.
-Publication uses separate `PUBLICATION_DATABASE_URL`, Storage credentials, and the existing
-registered P-256 signing identity. The trusted public-key hash must match. Apply and verify the
-management migration before enabling routes or dispatch. Do not provision shared owner-level
-research database credentials and rely only on `SET ROLE` to limit them.
+The existing hosted research adapter needs a separate research-only database login,
+`OPENROUTER_API_KEY`, `BRAVE_SEARCH_API_KEY` and `BLACKSTORY_RESEARCH_MODEL`. Those requirements
+belong to that adapter, not to research performed by a session. Consumer chat subscriptions do
+not supply unattended inference credentials. Hosted publication uses separate publication,
+Storage and registered P-256 signing credentials. Verify the management migrations and configured
+credentials before using either path. Do not give research a database-owner login and rely on
+`SET ROLE` as the access boundary. No schedule or Corsair dependency is introduced.
 
 ### Supported scope and current limits
 

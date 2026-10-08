@@ -393,6 +393,13 @@ export async function completeResearchTask(
       if (model && !policy.modelIds.includes(model.modelId))
         throw new Error('Model is not admitted by this run profile');
       output = assertContract(spec.outputContract, JSON.parse(rawOutput));
+      if (
+        spec.outputContract === 'ManagementResearchPlan' &&
+        !assertContract('ManagementResearchPlan', output).queries.some(
+          (query) => query.counterevidence,
+        )
+      )
+        throw new Error('Research plan requires a counterevidence search');
       if (spec.outputContract === 'ResearchAcquisitionResult') {
         const acquisition = assertContract('ResearchAcquisitionResult', output);
         for (const source of acquisition.sources) {
@@ -672,7 +679,7 @@ export async function researchExecutionStatus(
     );
     if (!run.rows[0]) throw new Error('Unknown research run');
     const tasks = await db.query(
-      `SELECT id,task_type,status,attempt_count,max_attempts,leased_until,last_error,result_artifact_id
+      `SELECT id,task_type,status,attempt_count,max_attempts,available_at,leased_until,last_error,result_artifact_id
       FROM research.frontier_tasks WHERE run_id=$1 ORDER BY id`,
       [runId],
     );

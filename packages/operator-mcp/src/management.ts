@@ -25,15 +25,37 @@ export function registerManagementTools(server: McpServer, call: ManagementClien
     'request_work',
     {
       description:
-        'Save and dispatch a bounded BlackStory research request. Check the returned dispatch status; saved does not mean running. No publication occurs before owner approval.',
+        'Save a bounded BlackStory request. Default session mode uses your own web tools through research_work; it needs no hosted search, model or GitHub credential. Select hosted only when the owner requests independent background execution. Saved does not mean running. Publication requires owner approval.',
       inputSchema: {
         request: z.string().min(1).max(12000),
         idempotencyKey: z.string().min(1),
         sessionId: z.string().min(1),
         harness: z.string().min(1),
+        executionMode: z.enum(['session', 'hosted']).optional(),
       },
     },
     (input) => result('', input),
+  );
+  server.registerTool(
+    'research_work',
+    {
+      description:
+        'Execute session research through the shared evidence ledger. Start returns a work lease; next returns a task and exact output schema; complete records output from your own search/browser/model tools. Repeat next/complete until a saved proposal is returned. Checkpoint frequently. Never invent tool access, evidence, model identity or accounting. This operation cannot approve or publish.',
+      inputSchema: {
+        workId: z.string().uuid(),
+        action: z.enum(['start', 'next', 'complete', 'heartbeat']),
+        sessionId: z.string().min(1),
+        lease: z.string().uuid().optional(),
+        taskLease: z.unknown().optional(),
+        output: z.string().max(256000).optional(),
+        reportedModel: z.string().min(1).max(200).optional(),
+        taskPromptHash: z
+          .string()
+          .regex(/^[a-f0-9]{64}$/u)
+          .optional(),
+      },
+    },
+    ({ workId, ...body }) => result(`/${workId}/research`, body),
   );
   server.registerTool(
     'list_work',
@@ -89,7 +111,7 @@ export function registerManagementTools(server: McpServer, call: ManagementClien
         {
           uri: 'blackstory://management/method',
           mimeType: 'text/plain',
-          text: 'Infer a bounded scope and preserve original requested subjects. Reuse existing entities and evidence. Research source fitness, identity, contradictions and every public sentence. Save proposals before presenting review. Ask only material questions; continue unaffected work. Show a concise proposal with omissions and evidence. Only explicit owner approval of that exact revision authorizes publication. Verify actual live results. Account state is durable; a chat transcript is not the ledger. Report dispatch or verification failures plainly. Client notifications are optional; use the durable review URL to resume.',
+          text: 'Default to session research with your available search/browser tools; no hosted provider or GitHub account is required. Use request_work then research_work start/next/complete to checkpoint evidence and prepare a proposal. Infer bounded scope and preserve named subjects. Reuse entities and source-library guidance. Challenge identity, source fitness, contradictions and every public sentence. Ask only material blockers. Present the saved proposal once. Only explicit owner approval of that exact revision authorizes publication; decide_work records it. A configured session publication runner then applies it through the same signed release and public verification controls. If publication execution is unavailable, report approved but not published. Session research pauses when its executor stops; stored checkpoints permit resumption. Use hosted mode only for explicitly requested background work with verified capability. Never equate saved, approved, dispatched or database-written with verified public delivery.',
         },
       ],
     }),

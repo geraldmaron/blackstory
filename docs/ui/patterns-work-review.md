@@ -2,7 +2,7 @@
 
 The private `/admin/work` inbox uses the admin shell and shared light/dark tokens. It is a reading and decision surface, with one column and no fixed-width evidence tables.
 
-Show the request, execution status, interpretation and exceptions before individual records. A saved request is not a running job. Dispatch failure and failed public verification remain visible, with an idempotent retry action.
+Show the request, execution status, interpretation and exceptions before individual records. A saved request is not a running job. Session research is the default. Explain that work is saved and can resume in another authorized assistant, while computation pauses if its session stops. Offer background research only when the dispatcher is configured. Do not show a background-dispatch error for session work. Approval remains approval to publish the exact changes, but display an approved state until an authorized executor actually publishes and verifies them. Dispatch failure and failed public verification remain visible, with an idempotent retry action.
 
 Each proposed record shows its operation, existing summary when present, proposed summary, jurisdiction, map precision, topics, periods, omissions and blockers. Corrections show the old assertion beside its proposed replacement, the context replacement or removal, and the reason for a changed or withheld map point. Existing coordinates and context remain available in the current-record disclosure. Evidence sits in native disclosures with citations, exact passages, limitations and the basis of review. A self-review must never be presented as a separate reviewer.
 

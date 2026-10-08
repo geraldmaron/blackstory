@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
-import type { WorkItem } from '@repo/ops-data/management/contracts';
+import { workExecutionMode, type WorkItem } from '@repo/ops-data/management/contracts';
 import { useAdminAuth } from '../auth/AdminAuthProvider';
 import { staffRoleHasPermission } from '../auth/staff-permissions';
 import './work-inbox.css';
@@ -29,6 +29,8 @@ export function WorkInbox({ workId }: { workId?: string }) {
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const [loaded, setLoaded] = useState(false);
+  const [executionMode, setExecutionMode] = useState<'session' | 'hosted'>('session');
+  const [hostedAvailable, setHostedAvailable] = useState(false);
   const decisionKey = useRef<{ body: string; key: string } | null>(null);
   const [requestKey, setRequestKey] = useState<string | null>(null);
   const api = useCallback(
@@ -49,6 +51,7 @@ export function WorkInbox({ workId }: { workId?: string }) {
     try {
       const result = await api(workId ? `/${workId}` : '');
       setItems(workId ? [result.work] : result.items);
+      setHostedAvailable(result.capabilities?.hostedDispatchConfigured === true);
       setLoaded(true);
       setError(null);
     } catch (e) {
@@ -94,6 +97,7 @@ export function WorkInbox({ workId }: { workId?: string }) {
         idempotencyKey: key,
         sessionId: 'admin-inbox',
         harness: 'admin_console',
+        executionMode,
       });
       window.location.assign(result.reviewUrl);
     } catch (e) {
@@ -146,6 +150,10 @@ export function WorkInbox({ workId }: { workId?: string }) {
           }}
         >
           <label htmlFor="work-request">What would you like done?</label>
+          <p>
+            Your assistant can research this request using its own web tools. Progress and your
+            review are saved here.
+          </p>
           <textarea
             id="work-request"
             value={request}
@@ -157,6 +165,21 @@ export function WorkInbox({ workId }: { workId?: string }) {
             }}
             required
           />
+          {hostedAvailable && (
+            <label>
+              Research with
+              <select
+                value={executionMode}
+                onChange={(event) => {
+                  setExecutionMode(event.target.value as 'session' | 'hosted');
+                  setRequestKey(null);
+                }}
+              >
+                <option value="session">My assistant</option>
+                <option value="hosted">Background service</option>
+              </select>
+            </label>
+          )}
           <button
             className="ds-button"
             type="submit"
@@ -184,11 +207,22 @@ export function WorkInbox({ workId }: { workId?: string }) {
           <article>
             <h2>{work.request.request}</h2>
             <p role="status">{labels[work.state]}</p>
+            {workExecutionMode(work.request) === 'session' && (
+              <p>
+                {work.state === 'approved'
+                  ? 'Approved. Your assistant can now publish these exact changes and verify the live records.'
+                  : ['queued', 'researching', 'failed'].includes(work.state)
+                    ? 'Continue this saved request in your assistant. Research pauses when that session stops; another authorized session can resume it.'
+                    : 'Research for this request uses your assistant’s tools.'}
+              </p>
+            )}
             {(work.error || interrupted) && (
               <>
                 <p role="alert">
                   {work.error ||
-                    'No worker is currently running this request. You can retry it here.'}
+                    (workExecutionMode(work.request) === 'session'
+                      ? 'Your progress is saved. Resume research or publication in your assistant.'
+                      : 'No worker is currently running this request. You can retry it here.')}
                 </p>
                 <button
                   type="button"

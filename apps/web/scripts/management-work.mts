@@ -1,18 +1,42 @@
-/** On-demand hosted entry point. Only the persisted request id is supplied by the dispatcher. */
+/** Shared publisher and optional hosted researcher. Session publication requires owner authentication. */
 import { executeManagedResearch } from '@repo/operator-cli';
 import { managementCatalog } from '@repo/ops-data/management/catalog';
 import { ManagementWorkStore } from '@repo/ops-data/management';
 import { getPostgresPool } from '../src/admin/lib/canonical-postgres-client.ts';
 import { publishManagementWork } from '../src/admin/work/publish-work.ts';
+import { authorizeAdminRequest } from '../src/admin/auth/request-auth.ts';
+import { workActor } from '../src/admin/work/service.ts';
+import { workExecutionMode } from '@repo/ops-data/management/contracts';
 
-const workId = process.env.BLACKSTORY_WORK_ID;
+const args = process.argv.slice(2);
+const session = args[0] === '--session-work' && args.length === 2;
+if (args.length && !session)
+  throw new Error('Use --session-work <work-id> for approved session publication');
+const workId = session ? args[1] : process.env.BLACKSTORY_WORK_ID;
 if (!workId || !/^[-a-f0-9]{36}$/u.test(workId)) throw new Error('A persisted work id is required');
 const pool = getPostgresPool();
 const store = new ManagementWorkStore(pool);
 try {
-  const phase = process.env.BLACKSTORY_WORK_PHASE;
+  const phase = session ? 'publish' : process.env.BLACKSTORY_WORK_PHASE;
   if (phase !== 'research' && phase !== 'publish')
     throw new Error('A configured worker phase is required');
+  if (session) {
+    const token = process.env.BLACKSTORY_ACCESS_TOKEN;
+    if (!token) throw new Error('A current owner account token is required');
+    const actor = workActor(
+      await authorizeAdminRequest(new Headers({ Authorization: `Bearer ${token}` })),
+    );
+    if (!actor.canPublish) throw new Error('Publication permission required');
+    const work = await store.get(actor, workId);
+    if (!work || workExecutionMode(work.request) !== 'session')
+      throw new Error('Session work is unavailable for this account');
+  } else {
+    const request = await pool.query('SELECT request FROM research.management_work WHERE id=$1', [
+      workId,
+    ]);
+    if (!request.rows[0] || workExecutionMode(request.rows[0].request) !== 'hosted')
+      throw new Error('Hosted execution was not requested for this work');
+  }
   const capability = await pool.query(`SELECT current_user AS role,
     has_table_privilege(current_user,'canonical.entities','UPDATE') AS can_write_catalog,
     has_table_privilege(current_user,'research.management_work_decisions','INSERT') AS can_approve`);
@@ -38,7 +62,7 @@ try {
       await store.fail(
         workId,
         claim.lease,
-        'The background attempt failed. Review the saved work and retry.',
+        'The work attempt failed. Review the saved work and retry.',
       );
       console.error(JSON.stringify({ workId, status: 'attempt_failed' }));
       process.exitCode = 1;

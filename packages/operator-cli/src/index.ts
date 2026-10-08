@@ -247,3 +247,4 @@ export * from './evidence-retrieval.js';
 export * from './research-worker.js';
 
 export { executeManagedResearch, managedResearchPlan } from './management-research.js';
+export { sessionManagementResearch } from './management-session.js';

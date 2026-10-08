@@ -22,6 +22,15 @@ Fresh reauthentication within 10 minutes is a required operating control for act
 but the current admin route authorizer does not enforce it. Do not describe it as an
 implemented gate or activate through an unreviewed direct database call.
 
+## Approved management proposals
+
+The shared management flow has an authenticated session publisher: `pnpm work:publish <work-id>`
+through the existing secret launcher. It consumes the saved exact approval and verifies the live
+result. It is separate from the research-only operator CLI and requires owner authentication,
+publication database, Storage and signing credentials. It needs no Brave, hosted model or GitHub
+Actions setup. Reuse the owner's approval of the exact proposal; do not ask for another publication
+approval. A missing publication executor is a delivery limitation, not permission to use direct SQL.
+
 ## Preview checklist
 
 Walk each applicable item. Cite the code or doc that failed. Unknown place/era is an

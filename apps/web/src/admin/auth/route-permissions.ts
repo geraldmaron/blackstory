@@ -38,6 +38,7 @@ export const ADMIN_ROUTE_RULES: readonly AdminRouteRule[] = [
   { method: 'POST', pattern: '/admin/api/work', access: 'research:write' },
   { method: 'POST', pattern: '/admin/api/work/:id/decisions', access: STAFF_READ },
   { method: 'POST', pattern: '/admin/api/work/:id/retry', access: STAFF_READ },
+  { method: 'POST', pattern: '/admin/api/work/:id/research', access: 'research:write' },
   { method: 'GET', pattern: '/admin/api/audit', access: STAFF_READ },
   { method: 'GET', pattern: '/admin/api/auth/me', access: STAFF_READ },
   { method: 'GET', pattern: '/admin/api/catalog/entity-ids', access: STAFF_READ },

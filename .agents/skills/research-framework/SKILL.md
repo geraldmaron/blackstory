@@ -48,6 +48,20 @@ may lose qualifiers, hide evidence or impede a web/native reader task.
 
 ## End-to-end owner requests
 
+Default to session execution. Use the current harness's available search, browser and document
+tools. Send checkpoints through the shared management research protocol, whose returned schemas
+and source library guide the work. Do not ask the owner for Brave, OpenRouter or GitHub credentials
+for ordinary session research or approved publication. Those belong only to optional independent
+hosted execution, when the owner asks for it. Lack of web access is a capability limitation to
+report or route around; do not assume every harness has the same tools.
+
+After the owner approves the saved proposal, use the configured authenticated session publication
+runner and verify the recorded public outcome. The research session does not gain publication
+authority merely by submitting evidence. Never substitute direct SQL or report approved content as
+published. A remote-only client needs an available publication executor; disclose that limitation
+before promising delivery. Store checkpoints across sessions; do not promise computation after
+chat closes unless a configured background executor has accepted the work.
+
 For an owner request to research, create or correct records, infer a bounded scope and carry it
 through evidence review to one concise proposal. Reuse existing approval rather than asking the
 owner to coordinate internal steps. Approval of the exact displayed changes includes publication;

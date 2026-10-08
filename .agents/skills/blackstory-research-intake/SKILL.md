@@ -22,3 +22,8 @@ For requests spanning research through publication, follow the
 [shared management workflow](../../../docs/research/research-operations.md#account-owned-management-work).
 Infer scope, carry existing authorization forward, and present one concise review. Use the
 remote service only when deployed and verified; its current limits are part of that contract.
+
+Session research uses the active harness's web tools and shared ledger by default. The management
+`research_work` protocol exposes the evidence schemas and checkpoints without a hosted provider.
+Do not turn an intake request into a Brave or GitHub setup task. Use hosted execution only when
+independent background work is requested and configured.

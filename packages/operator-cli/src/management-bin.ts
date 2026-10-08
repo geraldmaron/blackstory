@@ -1,17 +1,20 @@
 #!/usr/bin/env node
-/** Authenticated client of the work service; it never publishes directly from the laptop. */
+/** Harness-independent client of the shared research, review and approval service. */
 import { readFileSync } from 'node:fs';
 import { remoteManagementClient } from '@repo/ops-data/management/client';
 
 const [operation, id, inputFile] = process.argv.slice(2);
 const usage =
-  'blackstory-work list | get <work-id> | submit <request.json> | decide <work-id> <decision.json> | retry <work-id>. Use - to read JSON from stdin. Credentials: BLACKSTORY_ACCESS_TOKEN and BLACKSTORY_MANAGEMENT_URL.';
+  'blackstory-work list | get <work-id> | submit <request.json> | research <work-id> <step.json> | decide <work-id> <decision.json> | retry <work-id>. Use - to read JSON from stdin. Research steps: start, next, complete. Requests default to session execution using your own web tools. Credentials: BLACKSTORY_ACCESS_TOKEN and BLACKSTORY_MANAGEMENT_URL.';
 try {
   if (operation === '--help') console.log(usage);
   else {
-    if (!['list', 'get', 'submit', 'decide', 'retry'].includes(operation ?? ''))
+    if (!['list', 'get', 'submit', 'research', 'decide', 'retry'].includes(operation ?? ''))
       throw new Error(usage);
-    if (['get', 'decide', 'retry'].includes(operation!) && !/^[a-f0-9-]{36}$/u.test(id ?? ''))
+    if (
+      ['get', 'research', 'decide', 'retry'].includes(operation!) &&
+      !/^[a-f0-9-]{36}$/u.test(id ?? '')
+    )
       throw new Error('A work UUID is required');
     const client = remoteManagementClient(
       process.env.BLACKSTORY_MANAGEMENT_URL ?? 'https://blackstory.app',
@@ -32,9 +35,11 @@ try {
           ? await client(`/${id}`)
           : operation === 'submit'
             ? await client('', input(id))
-            : operation === 'decide'
-              ? await client(`/${id}/decisions`, input(inputFile))
-              : await client(`/${id}/retry`, {});
+            : operation === 'research'
+              ? await client(`/${id}/research`, input(inputFile))
+              : operation === 'decide'
+                ? await client(`/${id}/decisions`, input(inputFile))
+                : await client(`/${id}/retry`, {});
     console.log(JSON.stringify(result, null, 2));
   }
 } catch (error) {

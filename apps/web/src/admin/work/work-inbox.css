@@ -16,7 +16,8 @@
 .work-inbox form {
   margin-block: 1.5rem;
 }
-.work-inbox textarea {
+.work-inbox textarea,
+.work-inbox select {
   display: block;
   width: 100%;
   box-sizing: border-box;
@@ -27,6 +28,7 @@
   border: 1px solid var(--ds-border);
   border-radius: var(--ds-radius-sm);
   font: inherit;
+  min-height: 44px;
 }
 .work-inbox button {
   min-height: 44px;

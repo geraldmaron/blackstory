@@ -31,6 +31,7 @@ test('managed research reserves every bounded retry within the standard budget',
   assert.throws(() => validateExecutionPlan(overBudget), /budget/i);
   assert.equal(plan.tasks[0]!.input.request, work.request.request);
   assert.deepEqual(plan.profile.modelPolicies[0]!.authority, ['proposal']);
+  assert.notEqual(plan.profile.id, managedResearchPlan(work, 'session-reported', []).profile.id);
 });
 
 test('new-source retention is exact, private, bounded and fails closed', () => {
