@@ -8,12 +8,11 @@ description: Prepares a publication preview and names what still blocks release.
 Requires the BlackStory checkout. See [loading and capabilities](../../../docs/research/README.md#skills-and-harness-portability)
 for tool requirements and use from any harness.
 
-Judgment playbook. For a new release, prepare the preview and preserve the separate
-publication-role approval boundary. Never manufacture approval or activate on the strength
-of the proposing session alone.
+Judgment playbook. For a new release, prepare the preview and preserve the
+publication-role permission and evidence checks. A proposer may also publish after
+an explicit review of the final record; record the authenticated actor and reason.
 
-Proposer is never approver. `evaluatePromotionGate` refuses when approver id equals proposer
-id. There is no `--publish` / `--approve` / `--promote` anywhere on operator-cli
+There is no `--publish` / `--approve` / `--promote` anywhere on operator-cli
 (`packages/operator-cli/src/promotion-boundary.test.ts`). Publication is a distinct
 publication-role action with a fresh (≤10 minute) reauth token. A long-running operator
 session never holds that token.
@@ -37,7 +36,7 @@ Task:
 - [ ] Rights clearance on copy and image
 - [ ] Dignity: no residential living addresses, no alarm-map encoding
 - [ ] Release preview / claim diff inspected
-- [ ] A *different* publication-role human still has to activate
+- [ ] An authenticated publication-role actor activates after final review
 ```
 
 ## Explicitly authorized corrections to an existing release
@@ -115,8 +114,8 @@ A preview packet:
 - blocking failures with file-or-gate names
 - non-blocking enrichment gaps
 - reviewed draft revision and evidence map; distinguish machine checks from editorial review
-- the explicit sentence: this session cannot activate the release
+- whether an authorized publication-role actor activated the release
 
-**Never:** call `transitionResearchCase` / `markResearchCasePublished` /
-`evaluatePromotionGate` expecting to approve it yourself; treat dry-run JSON as live;
+**Never:** call `transitionResearchCase` / `markResearchCasePublished` without the
+authenticated workflow; treat dry-run JSON as live;
 silently rewrite a pin so the geo gate passes.

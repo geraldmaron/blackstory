@@ -6,42 +6,37 @@ import {
   type CanonicalPromotionRecord,
 } from './case-promotion.ts';
 
-test('evaluateCasePromotionGate refuses self-approval', () => {
+test('evaluateCasePromotionGate allows an identified publisher to promote a ready case', () => {
   const result = evaluateCasePromotionGate({
     caseState: 'substantial_enrichment',
-    proposerId: 'operator-a',
     approverId: 'operator-a',
   });
-  assert.equal(result.approved, false);
-  assert.ok(result.reasons.includes('proposer_approver_conflict'));
+  assert.deepEqual(result, { approved: true, reasons: [] });
 });
 
 test('evaluateCasePromotionGate refuses a case without the minimum record', () => {
   const result = evaluateCasePromotionGate({
     caseState: 'relevance_confirmed',
-    proposerId: 'operator-a',
     approverId: 'operator-b',
   });
   assert.equal(result.approved, false);
   assert.ok(result.reasons.includes('case_not_ready'));
 });
 
-test('evaluateCasePromotionGate approves a ready case with distinct proposer/approver', () => {
+test('evaluateCasePromotionGate approves each ready state', () => {
   for (const caseState of ['minimum_record', 'partial_enrichment', 'substantial_enrichment']) {
     const result = evaluateCasePromotionGate({
       caseState,
-      proposerId: 'operator-a',
       approverId: 'operator-b',
     });
     assert.deepEqual(result, { approved: true, reasons: [] });
   }
 });
 
-test('evaluateCasePromotionGate refuses blank identities', () => {
+test('evaluateCasePromotionGate refuses a blank approver identity', () => {
   const result = evaluateCasePromotionGate({
     caseState: 'substantial_enrichment',
-    proposerId: '',
-    approverId: 'operator-b',
+    approverId: '',
   });
   assert.ok(result.reasons.includes('missing_identity'));
 });

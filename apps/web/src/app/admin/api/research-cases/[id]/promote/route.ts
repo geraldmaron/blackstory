@@ -1,8 +1,7 @@
 /**
  * POST /api/research-cases/[id]/promote — promote a research case's proposed record to a
  * canonical entity. Gated on `publication:publish`, which the role table grants to
- * `admin` and `publication` only; `research` proposes and cannot approve its own proposal (see
- * promote-case.ts's header).
+ * `admin` and `publication` only; `research` cannot promote a case.
  */
 import {
   authorizeAdminRoute,
@@ -17,7 +16,6 @@ import type { CanonicalPromotionRecord } from '@repo/domain';
 
 type Body = {
   readonly record?: CanonicalPromotionRecord;
-  readonly proposerId?: string;
   readonly reason?: string;
 };
 
@@ -32,9 +30,6 @@ export async function POST(
     if (!body.record) {
       return Response.json({ error: 'record is required' }, { status: 400 });
     }
-    if (!body.proposerId?.trim()) {
-      return Response.json({ error: 'proposerId is required' }, { status: 400 });
-    }
     if (!body.reason?.trim()) {
       return Response.json({ error: 'reason is required' }, { status: 400 });
     }
@@ -42,7 +37,6 @@ export async function POST(
     const result = await promoteCaseToCanonical({
       caseId: id,
       record: body.record,
-      proposerId: body.proposerId.trim(),
       approverUid: caller.uid,
       approverEmail: caller.email,
       reason: body.reason.trim(),

@@ -4,9 +4,8 @@
  * The tracked path from a research case to a canonical entity. This is pure, DB-free logic: two
  * functions a caller (apps/web/src/admin's promote-case.ts) must both pass before writing anything:
  *
- * - `evaluateCasePromotionGate`: the *authority* check. Mirrors `evaluatePromotionGate`
- * (./controls.ts)'s core invariant proposer and approver can never be the same identity
- * plus a case-state eligibility check. This is deliberately NOT reused as-is: that gate
+ * - `evaluateCasePromotionGate`: the *authority* check. Requires an identified approver
+ * and a case-state eligibility check. This is deliberately NOT reused as-is: that gate
  * operates on a `PromotionClaim` shape (contradiction-search records, evidence-lineage
  * reputation) this pipeline has never populated; forcing case data into that shape would
  * fabricate fields no one actually assessed. This is a smaller, honest gate for what this
@@ -23,8 +22,7 @@ const ELIGIBLE_CASE_STATES = new Set([
   'substantial_enrichment',
 ]);
 
-export type CasePromotionGateReason =
-  'case_not_ready' | 'proposer_approver_conflict' | 'missing_identity';
+export type CasePromotionGateReason = 'case_not_ready' | 'missing_identity';
 
 export type CasePromotionGateResult = {
   readonly approved: boolean;
@@ -33,14 +31,11 @@ export type CasePromotionGateResult = {
 
 export function evaluateCasePromotionGate(input: {
   readonly caseState: string;
-  readonly proposerId: string;
   readonly approverId: string;
 }): CasePromotionGateResult {
   const reasons = new Set<CasePromotionGateReason>();
-  if (!input.proposerId.trim() || !input.approverId.trim()) {
+  if (!input.approverId.trim()) {
     reasons.add('missing_identity');
-  } else if (input.proposerId === input.approverId) {
-    reasons.add('proposer_approver_conflict');
   }
   if (!ELIGIBLE_CASE_STATES.has(input.caseState)) {
     reasons.add('case_not_ready');

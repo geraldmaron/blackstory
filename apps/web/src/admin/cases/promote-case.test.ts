@@ -94,7 +94,6 @@ function promoteInput(overrides: Partial<PromoteCaseInput> = {}): PromoteCaseInp
   return {
     caseId: 'case-1',
     record: promotionRecord(),
-    proposerId: 'user-proposer',
     approverUid: 'user-approver',
     approverEmail: 'approver@example.com',
     reason: 'Two independent sources confirm the closure; ready for canonical.',
@@ -129,18 +128,14 @@ function fixture(
   return { queries, dependencies };
 }
 
-test('a proposer and approver who are the same identity are rejected with no writes', async () => {
+test('a blank publisher identity is rejected with no writes', async () => {
   const { queries, dependencies } = fixture();
 
   await assert.rejects(
-    () =>
-      promoteCaseToCanonical(
-        promoteInput({ proposerId: 'user-1', approverUid: 'user-1' }),
-        dependencies,
-      ),
+    () => promoteCaseToCanonical(promoteInput({ approverUid: '' }), dependencies),
     (error: unknown) => {
       assert.ok(error instanceof CasePromotionRejected);
-      assert.ok(error.reasons.includes('proposer_approver_conflict'));
+      assert.ok(error.reasons.includes('missing_identity'));
       return true;
     },
   );

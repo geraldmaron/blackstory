@@ -1,5 +1,5 @@
 /**
- * Promotes a reviewed case into canonical and evidence tables under an independent approver
+ * Promotes a reviewed case into canonical and evidence tables under an authenticated publisher
  * identity. Case history records the canonical link. The publication field is reserved for
  * public-release metadata and is not written by canonical promotion. Postgres dependencies are
  * injectable for transaction tests.
@@ -19,8 +19,6 @@ import type { AdminCaseDetail } from './research-case-types';
 export type PromoteCaseInput = {
   readonly caseId: string;
   readonly record: CanonicalPromotionRecord;
-  /** Identity of whoever assembled/proposed this record must differ from the approver. */
-  readonly proposerId: string;
   readonly approverUid: string;
   readonly approverEmail: string;
   readonly reason: string;
@@ -358,7 +356,7 @@ async function recordCaseHistoryAndAudit(
       input.approverUid,
       result.evidenceIds,
       nowIso,
-      JSON.stringify({ proposerId: input.proposerId, targetEntityId: result.entityId }),
+      JSON.stringify({ targetEntityId: result.entityId }),
     ],
   );
 
@@ -379,7 +377,6 @@ async function recordCaseHistoryAndAudit(
       `case-promotion:${input.caseId}:${result.entityId}`,
       nowIso,
       JSON.stringify({
-        proposerId: input.proposerId,
         approverId: input.approverUid,
         caseId: input.caseId,
         entityId: result.entityId,
@@ -407,7 +404,6 @@ export async function promoteCaseToCanonical(
 
   const gate = evaluateCasePromotionGate({
     caseState: detail.state,
-    proposerId: input.proposerId,
     approverId: input.approverUid,
   });
   if (!gate.approved) throw new CasePromotionRejected(gate.reasons);
