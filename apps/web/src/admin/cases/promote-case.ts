@@ -7,6 +7,7 @@
 import { randomUUID, createHash } from 'node:crypto';
 import type pg from 'pg';
 import {
+  evaluateEvidenceChecklist,
   evaluateCasePromotionGate,
   validateCanonicalPromotionRecord,
   type CanonicalPromotionRecord,
@@ -28,7 +29,7 @@ export type PromoteCaseInput = {
 export type PromoteCaseResult = {
   readonly entityId: string;
   readonly claimId: string;
-  readonly locationId: string;
+  readonly locationId?: string;
   readonly evidenceIds: readonly string[];
   readonly auditEventId: string;
 };
@@ -66,15 +67,14 @@ async function ensureNoCatalogDuplicate(
   const result = await client.query(
     `SELECT id, display_name
        FROM canonical.entities
-      WHERE id <> $1
-        AND (
-          lower(display_name) = lower($2)
-          OR EXISTS (
-            SELECT 1 FROM jsonb_array_elements_text(aliases) alias
-            WHERE lower(alias) = lower($2)
-          )
-          OR lower(display_name) = ANY($3::text[])
-        )`,
+      WHERE id = $1
+         OR lower(display_name) = lower($2)
+         OR lower(display_name) = ANY($3::text[])
+         OR EXISTS (
+           SELECT 1 FROM jsonb_array_elements_text(aliases) alias
+           WHERE lower(alias) = lower($2)
+              OR lower(alias) = ANY($3::text[])
+         )`,
     [record.entityId, record.displayName, aliases],
   );
   if ((result.rowCount ?? 0) > 0) {
@@ -115,7 +115,7 @@ async function insertSourceAndEvidence(
   );
   await client.query(
     `INSERT INTO evidence.evidence_records (id, source_item_id, rights_status, excerpt, lineage_root_id, metadata)
-     VALUES ($1, $2, $3, $4, $1, $5::jsonb)
+     VALUES ($1, $2, $3, $4, NULL, $5::jsonb)
      ON CONFLICT (id) DO NOTHING`,
     [
       evidenceId,
@@ -123,7 +123,6 @@ async function insertSourceAndEvidence(
       host.endsWith('.gov') ? 'public_government_citation' : 'citation_only',
       source.excerpt,
       JSON.stringify({
-        sourceLineage: host,
         fitness: source.fitness,
         manualReview: 'accepted',
         validatedAt: nowIso,
@@ -138,6 +137,7 @@ async function insertSourceAndEvidence(
 async function insertCanonicalRecord(
   client: pg.PoolClient,
   input: PromoteCaseInput,
+  caseState: string,
   nowIso: string,
 ): Promise<PromoteCaseResult> {
   const { record, caseId, approverUid } = input;
@@ -153,7 +153,15 @@ async function insertCanonicalRecord(
   const allEvidenceIds = evidence.map((item) => item.evidenceId);
   const claimId = `claim_${record.entityId}_documented_site`;
   const claimVersionId = `clv_canonical_promotion_${shortHash(`${claimId}\n${record.summary}`)}`;
-  const locationId = `loc_canonical_promotion_${shortHash(record.entityId)}`;
+  const locationId = record.location
+    ? `loc_canonical_promotion_${shortHash(record.entityId)}`
+    : undefined;
+  const researchCoverage =
+    caseState === 'substantial_enrichment'
+      ? 'substantial'
+      : caseState === 'partial_enrichment'
+        ? 'partial'
+        : 'minimal';
 
   const kindDetail = {
     editorial: { summary: record.summary, extendedNarrative: null, historicalContext: null },
@@ -165,16 +173,15 @@ async function insertCanonicalRecord(
       topicIds: record.topicIds,
       topicTags: record.topicTags,
       eraBuckets: record.eraBuckets,
-      researchCoverage: 'substantial',
+      researchCoverage,
       mentionedEntityIds: [],
     },
     review: {
       validatedBy: approverUid,
       validatedAt: nowIso,
-      independentLineageCount: supportingEvidence.length,
       exactCatalogDuplicateCheck: 'passed',
       publicReleaseActivated: false,
-      locationAccessNote: record.location.accessNote ?? null,
+      locationAccessNote: record.location?.accessNote ?? null,
     },
   };
 
@@ -201,8 +208,9 @@ async function insertCanonicalRecord(
     ],
   );
 
-  await client.query(
-    `INSERT INTO canonical.entity_locations
+  if (record.location && locationId)
+    await client.query(
+      `INSERT INTO canonical.entity_locations
       (id, entity_id, role, geometry_type, geometry, location, lat, lng,
        geohash, geohash_prefixes, precision, match_method, label, evidence_ids, modern_zip)
      SELECT
@@ -220,18 +228,18 @@ async function insertCanonicalRecord(
        ],
        $5, $6, $7, $8::text[], $9::jsonb
      ON CONFLICT (id) DO NOTHING`,
-    [
-      locationId,
-      record.entityId,
-      record.location.lng,
-      record.location.lat,
-      record.location.precision,
-      record.location.matchMethod,
-      record.location.label,
-      allEvidenceIds,
-      JSON.stringify({ zip: record.location.zip ?? null }),
-    ],
-  );
+      [
+        locationId,
+        record.entityId,
+        record.location.lng,
+        record.location.lat,
+        record.location.precision,
+        record.location.matchMethod,
+        record.location.label,
+        allEvidenceIds,
+        JSON.stringify({ zip: record.location.zip ?? null }),
+      ],
+    );
 
   await client.query(
     `INSERT INTO canonical.claims
@@ -243,17 +251,15 @@ async function insertCanonicalRecord(
       claimId,
       record.entityId,
       JSON.stringify({
-        level: 'high',
-        source: 'manual_two_lineage_validation',
-        independentLineageCount: supportingEvidence.length,
+        level: 'unknown',
+        source: 'pending_lineage_and_confidence_assessment',
       }),
-      JSON.stringify({ level: 'substantial', source: 'manual_review' }),
+      JSON.stringify({ level: researchCoverage, source: 'case_checklist' }),
       JSON.stringify({
         status: 'manually_validated',
         citationReferencePresent: true,
         supportingExcerptPresent: true,
         sourceCapturePresent: false,
-        independentLineageCount: supportingEvidence.length,
         validatedAt: nowIso,
         validatedBy: approverUid,
       }),
@@ -270,9 +276,8 @@ async function insertCanonicalRecord(
       claimId,
       JSON.stringify(record.summary),
       JSON.stringify({
-        level: 'high',
-        source: 'manual_two_lineage_validation',
-        independentLineageCount: supportingEvidence.length,
+        level: 'unknown',
+        source: 'pending_lineage_and_confidence_assessment',
       }),
       JSON.stringify({
         citations: record.sources.map((source) => ({
@@ -307,7 +312,7 @@ async function insertCanonicalRecord(
     await client.query(
       `INSERT INTO canonical.claim_evidence_links
         (id, claim_id, claim_version_id, evidence_id, role, lineage_root_id, quality, asserted_value)
-       VALUES ($1, $2, $3, $4, $5, $4, $6::jsonb, $7::jsonb)
+       VALUES ($1, $2, $3, $4, $5, NULL, $6::jsonb, $7::jsonb)
        ON CONFLICT (id) DO NOTHING`,
       [
         linkId,
@@ -321,7 +326,7 @@ async function insertCanonicalRecord(
           reviewedBy: approverUid,
           fitness: item.source.fitness,
         }),
-        JSON.stringify(item.source.locationOnly ? record.location.label : record.summary),
+        JSON.stringify(item.source.locationOnly ? record.location?.label : record.summary),
       ],
     );
   }
@@ -329,7 +334,7 @@ async function insertCanonicalRecord(
   return {
     entityId: record.entityId,
     claimId,
-    locationId,
+    ...(locationId ? { locationId } : {}),
     evidenceIds: allEvidenceIds,
     auditEventId: '', // filled in by the caller once the audit row is inserted
   };
@@ -407,13 +412,27 @@ export async function promoteCaseToCanonical(
   });
   if (!gate.approved) throw new CasePromotionRejected(gate.reasons);
 
+  const checklist = evaluateEvidenceChecklist(detail.checklist);
+  if (!checklist.meetsMinimumRecord) {
+    throw new CasePromotionRejected(['minimum_record_incomplete']);
+  }
+  const expectedLevel =
+    detail.state === 'substantial_enrichment'
+      ? 'substantial'
+      : detail.state === 'partial_enrichment'
+        ? 'partial'
+        : 'minimum';
+  if (checklist.level !== expectedLevel) {
+    throw new CasePromotionRejected(['case_checklist_inconsistent']);
+  }
+
   const validation = validateCanonicalPromotionRecord(input.record);
   if (!validation.valid) throw new CasePromotionRejected(validation.reasons);
 
   const nowIso = new Date().toISOString();
   return deps.runTransaction(async (client) => {
     await ensureNoCatalogDuplicate(client, input.record);
-    const inserted = await insertCanonicalRecord(client, input, nowIso);
+    const inserted = await insertCanonicalRecord(client, input, detail.state, nowIso);
     const auditEventId = await recordCaseHistoryAndAudit(
       client,
       input,

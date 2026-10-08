@@ -11,13 +11,17 @@
  * reputation) this pipeline has never populated; forcing case data into that shape would
  * fabricate fields no one actually assessed. This is a smaller, honest gate for what this
  * pipeline actually has.
- * - `validateCanonicalPromotionRecord`: the *content* check. Two independent source hosts, US
+ * - `validateCanonicalPromotionRecord`: the *content* check. Two distinct source hosts, US
  * coordinate bounds, well-formed decade buckets, a non-trivial summary — enforced on every
  * promotion rather than left to whoever is running one.
  */
 
-/** Case states the ad hoc script treated as "ready" the enrichment tier is complete. */
-const ELIGIBLE_CASE_STATES = new Set(['substantial_enrichment']);
+/** The minimum checklist is sufficient; enrichment can continue after promotion. */
+const ELIGIBLE_CASE_STATES = new Set([
+  'minimum_record',
+  'partial_enrichment',
+  'substantial_enrichment',
+]);
 
 export type CasePromotionGateReason =
   'case_not_ready' | 'proposer_approver_conflict' | 'missing_identity';
@@ -73,7 +77,8 @@ export type CanonicalPromotionRecord = {
   readonly topicTags: readonly string[];
   /** e.g. "1930s" each must match /^(17|18|19|20)\d0s$/. */
   readonly eraBuckets: readonly string[];
-  readonly location: CanonicalPromotionLocation;
+  /** Omit when the historic site cannot yet be pinned honestly. */
+  readonly location?: CanonicalPromotionLocation;
   readonly sources: readonly CanonicalPromotionSource[];
 };
 
@@ -84,8 +89,9 @@ const US_LNG_RANGE = [-180, -60] as const;
 
 export type CanonicalPromotionValidationReason =
   | 'name_or_summary_invalid'
-  | 'insufficient_independent_source_hosts'
+  | 'insufficient_distinct_source_hosts'
   | 'invalid_source'
+  | 'location_only_source_without_location'
   | 'coordinates_outside_us_bounds'
   | 'invalid_decade_bucket';
 
@@ -119,7 +125,7 @@ export function validateCanonicalPromotionRecord(
       .filter((host): host is string => !!host),
   );
   if (claimSources.length < 2 || hosts.size < 2) {
-    reasons.add('insufficient_independent_source_hosts');
+    reasons.add('insufficient_distinct_source_hosts');
   }
 
   for (const source of record.sources) {
@@ -132,15 +138,19 @@ export function validateCanonicalPromotionRecord(
     if (!isHttps || source.excerpt.length < 70) {
       reasons.add('invalid_source');
     }
+    if (source.locationOnly && !record.location) {
+      reasons.add('location_only_source_without_location');
+    }
   }
 
   const [minLat, maxLat] = US_LAT_RANGE;
   const [minLng, maxLng] = US_LNG_RANGE;
   if (
-    record.location.lat < minLat ||
-    record.location.lat > maxLat ||
-    record.location.lng < minLng ||
-    record.location.lng > maxLng
+    record.location &&
+    (record.location.lat < minLat ||
+      record.location.lat > maxLat ||
+      record.location.lng < minLng ||
+      record.location.lng > maxLng)
   ) {
     reasons.add('coordinates_outside_us_bounds');
   }

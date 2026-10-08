@@ -110,6 +110,27 @@ test('attaching evidence targets the research case id and never opens a second d
   assert.equal(outcome.mutations.length, 1);
 });
 
+test('long evidence descriptions retain a valid title after quarantine normalization', () => {
+  const outcome = prepareEvidenceAttachmentIntake(
+    {
+      researchCaseId: '72a89557-945e-4385-90b4-05503de94f61',
+      description:
+        'National Register nomination identifies the 1924 school site and distinguishes this Atlanta campus from the schools with the same name in other states. '.repeat(
+          3,
+        ),
+      sourceUrls: ['https://npgallery.nps.gov/AssetDetail/NRIS/86000437'],
+    },
+    context(),
+  );
+  assert.equal(outcome.accepted, true);
+  if (!outcome.accepted) return;
+  assert.ok(outcome.submission.normalized.title.length <= 200);
+  assert.equal(
+    outcome.submission.normalized.targetRecordId,
+    '72a89557-945e-4385-90b4-05503de94f61',
+  );
+});
+
 test('prepareOperatorIntake never produces a mutation touching canonical, publication, or promotion state', () => {
   const outcome = prepareOperatorIntake(
     'lead',
