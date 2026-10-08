@@ -4,7 +4,11 @@
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { authErrorResponse, createAdminRouteAuthorizer } from './request-auth';
+import {
+  authErrorResponse,
+  createAdminRouteAuthorizer,
+  managementTokenClaimsAllowed,
+} from './request-auth';
 import { AdminRouteUndeclaredError } from './route-permissions';
 import { StaffPermissionDeniedError } from './staff-permissions';
 import type { StaffRole } from './staff-permissions';
@@ -178,5 +182,33 @@ test('verified agent clients are restricted to management routes even with an ad
   await assert.rejects(
     authorizer.authorize(adminRequest('POST', '/admin/api/catalog/bulk-decision')),
     /restricted to management/,
+  );
+});
+
+test('OAuth resource binding rejects other audiences and unapproved clients', () => {
+  const url = 'https://project.supabase.co';
+  const base = { iss: `${url}/auth/v1`, aud: 'authenticated' };
+  assert.equal(managementTokenClaimsAllowed(base, url, 'client-one'), true);
+  assert.equal(
+    managementTokenClaimsAllowed({ ...base, client_id: 'client-one' }, url, 'client-one'),
+    false,
+  );
+  const oauth = { ...base, aud: 'https://blackstory.app/api/mcp', client_id: 'client-one' };
+  assert.equal(managementTokenClaimsAllowed(oauth, url, 'client-one'), true);
+  assert.equal(
+    managementTokenClaimsAllowed({ ...oauth, client_id: 'client-two' }, url, 'client-one'),
+    false,
+  );
+  assert.equal(
+    managementTokenClaimsAllowed(
+      { ...oauth, iss: 'https://other.supabase.co/auth/v1' },
+      url,
+      'client-one',
+    ),
+    false,
+  );
+  assert.equal(
+    managementTokenClaimsAllowed({ ...oauth, aud: 'https://other.example/api' }, url, 'client-one'),
+    false,
   );
 });

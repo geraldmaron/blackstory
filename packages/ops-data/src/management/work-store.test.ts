@@ -112,3 +112,31 @@ test('version hashing ignores object key order but binds exact content', () => {
   assert.equal(workDigest({ a: 1, b: 2 }), workDigest({ b: 2, a: 1 }));
   assert.notEqual(workDigest(proposal()), workDigest({ ...proposal(), summary: 'Changed' }));
 });
+
+test('context and replacement assertions require exact supported sentence coverage', () => {
+  const value = {
+    ...proposal(),
+    changes: [
+      {
+        ...proposal().changes[0]!,
+        contextRevision: { text: 'Unsupported context.', reason: 'Correction', sentenceClaims: [] },
+      },
+    ],
+  };
+  assert.throws(() => validateWorkProposal(value), /context sentence/);
+  assert.throws(
+    () =>
+      validateWorkProposal({
+        ...proposal(),
+        changes: [
+          {
+            ...proposal().changes[0]!,
+            claimRevisions: [
+              { claimId: 'old', reason: 'Incorrect', replacementAssertionIds: ['absent'] },
+            ],
+          },
+        ],
+      }),
+    /unresolved/,
+  );
+});

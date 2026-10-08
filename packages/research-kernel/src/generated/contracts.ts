@@ -634,7 +634,7 @@ export interface ManagementProposal {
   readonly changes: readonly {
     readonly entityId: string;
     readonly operation: 'create' | 'update';
-    readonly beforeHash: unknown;
+    readonly beforeHash: string | null;
     readonly record: {
       readonly entityId: string;
       readonly displayName: string;
@@ -692,7 +692,37 @@ export interface ManagementProposal {
     readonly producerActorId: string;
     readonly blockers: readonly string[];
     readonly omissions: readonly string[];
-    readonly before?: { readonly displayName: string; readonly summary: string } | null;
+    readonly before?: {
+      readonly displayName: string;
+      readonly summary: string;
+      readonly historicalContext?: string;
+      readonly claims?: readonly { readonly id: string; readonly statement: string }[];
+      readonly locations?: readonly {
+        readonly id: string;
+        readonly label: string;
+        readonly lat: number | null;
+        readonly lng: number | null;
+        readonly precision: string;
+      }[];
+    } | null;
+    readonly claimRevisions?: readonly {
+      readonly claimId: string;
+      readonly reason: string;
+      readonly replacementAssertionIds: readonly string[];
+    }[];
+    readonly contextRevision?: {
+      readonly text: string;
+      readonly reason: string;
+      readonly sentenceClaims: readonly {
+        readonly sentence: string;
+        readonly assertionIds: readonly string[];
+      }[];
+    };
+    readonly locationRevision?: {
+      readonly locationId: string | null;
+      readonly reason: string;
+      readonly assertionIds: readonly string[];
+    };
   }[];
   readonly held: readonly { readonly subject: string; readonly reason: string }[];
   readonly researchRunIds: readonly string[];
@@ -708,6 +738,15 @@ export interface ManagementResearchPlan {
     readonly counterevidence: boolean;
   }[];
   readonly limitations: readonly string[];
+}
+
+export interface ManagementRetentionAssessment {
+  readonly decisions: readonly {
+    readonly sourceUrl: string;
+    readonly allowExcerptRetention: boolean;
+    readonly sensitivity: 'public' | 'restricted' | 'unknown';
+    readonly basis: string;
+  }[];
 }
 
 export interface ResearchContractMap {
@@ -763,6 +802,7 @@ export interface ResearchContractMap {
   readonly ResearchWorkerInput: ResearchWorkerInput;
   readonly ManagementProposal: ManagementProposal;
   readonly ManagementResearchPlan: ManagementResearchPlan;
+  readonly ManagementRetentionAssessment: ManagementRetentionAssessment;
 }
 
 export type ResearchContractName = keyof ResearchContractMap;

@@ -513,6 +513,9 @@ class ManagementResearchPlan(ContractModel):
     queries: list[dict[str, Any]]
     limitations: list[str]
 
+class ManagementRetentionAssessment(ContractModel):
+    decisions: list[dict[str, Any]]
+
 Budget.model_rebuild()
 RiskClassPolicy.model_rebuild()
 SourceFitnessRule.model_rebuild()
@@ -564,6 +567,7 @@ ResearchAcquisitionResult.model_rebuild()
 ResearchWorkerModel.model_rebuild()
 ManagementProposal.model_rebuild()
 ManagementResearchPlan.model_rebuild()
+ManagementRetentionAssessment.model_rebuild()
 
-CONTRACT_MODEL_NAMES = ("Budget", "RiskClassPolicy", "SourceFitnessRule", "ModelPolicy", "RetentionPolicy", "PublicationPolicy", "StoppingPolicy", "ResearchProfile", "SourcePolicy", "SourceItem", "Capture", "EvidenceSelector", "ClaimQualifiers", "ConfidenceAssessment", "ClaimStatement", "EvidenceAssignment", "ResearchCase", "ResearchQuestion", "Hypothesis", "EvidenceNeed", "FrontierTask", "EntityCandidate", "ResolutionDecision", "RelationshipStatement", "ResearchRun", "AgentActivity", "ModelInvocation", "InvalidModelOutput", "Artifact", "ReviewDecision", "ReleaseDecision", "SentenceCitation", "VerificationReport", "StoryResearchPacket", "RoCrateExport", "ResearchQuote", "ExtractedResearchClaim", "SubjectExtraction", "RelationshipHypothesisExtraction", "HarnessSourceRecord", "ResearchTaskSpec", "ResearchExecutionPlan", "ResearchSearchResult", "ResearchTaskReport", "ModelAccounting", "ResearchTaskLease", "PreservationDecision", "ResearchAcquisitionResult", "ResearchWorkerModel", "ManagementProposal", "ManagementResearchPlan",)
+CONTRACT_MODEL_NAMES = ("Budget", "RiskClassPolicy", "SourceFitnessRule", "ModelPolicy", "RetentionPolicy", "PublicationPolicy", "StoppingPolicy", "ResearchProfile", "SourcePolicy", "SourceItem", "Capture", "EvidenceSelector", "ClaimQualifiers", "ConfidenceAssessment", "ClaimStatement", "EvidenceAssignment", "ResearchCase", "ResearchQuestion", "Hypothesis", "EvidenceNeed", "FrontierTask", "EntityCandidate", "ResolutionDecision", "RelationshipStatement", "ResearchRun", "AgentActivity", "ModelInvocation", "InvalidModelOutput", "Artifact", "ReviewDecision", "ReleaseDecision", "SentenceCitation", "VerificationReport", "StoryResearchPacket", "RoCrateExport", "ResearchQuote", "ExtractedResearchClaim", "SubjectExtraction", "RelationshipHypothesisExtraction", "HarnessSourceRecord", "ResearchTaskSpec", "ResearchExecutionPlan", "ResearchSearchResult", "ResearchTaskReport", "ModelAccounting", "ResearchTaskLease", "PreservationDecision", "ResearchAcquisitionResult", "ResearchWorkerModel", "ManagementProposal", "ManagementResearchPlan", "ManagementRetentionAssessment",)
 

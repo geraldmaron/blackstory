@@ -2,6 +2,15 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 import { randomUUID, generateKeyPairSync, createHash } from 'node:crypto';
 import pg from 'pg';
+import { generateReleaseArtifacts, verifySignedReleaseManifest } from '@repo/domain';
+import {
+  createPoolPostgresReleaseStore,
+  activateReleaseAsync,
+  rollbackToAsync,
+} from '@repo/data-access';
+import { redactLocationForPublic } from '@repo/security';
+import { managementEntitySnapshot } from '@repo/ops-data/management/catalog';
+import { workDigest } from '@repo/ops-data/management';
 import { ManagementWorkStore } from '@repo/ops-data/management';
 import { publishManagementWork } from './publish-work';
 
@@ -45,6 +54,7 @@ test(
     const objects = new Map<string, string>();
     let failReadback = true;
     let failUpload = true;
+    let wrongPublicPoint = false;
     try {
       await pool.query(
         'INSERT INTO auth.users(id,raw_app_meta_data) VALUES($1,\'{"app_role":"admin"}\')',
@@ -66,6 +76,35 @@ test(
         'INSERT INTO published.release_entities(release_id,entity_id,projection) VALUES($1,$2,$3)',
         [previous, untouchedId, JSON.stringify(untouched)],
       );
+      const mobileStore = createPoolPostgresReleaseStore(pool);
+      const baseline = generateReleaseArtifacts({
+        releaseId: previous,
+        generatedAt: new Date().toISOString(),
+        mapEntities: [],
+        redactLocation: redactLocationForPublic,
+        contentIndex: [
+          { id: 'existing-story', kind: 'story', title: 'Unrelated story', version: 'original' },
+        ],
+        entitiesList: [],
+        searchIndex: [],
+        bootstrap: {
+          schemaRange: { min: 1, max: 1 },
+          compatibility: {
+            apiVersion: 'v1',
+            minSupportedApiVersion: 'v1',
+            deprecationWindowDays: 90,
+            minSupportedAppBuild: 1,
+          },
+          featureFlags: { map: true },
+          legalVersions: { privacy: 'existing' },
+          cacheDirectives: {
+            bootstrapMaxAgeSeconds: 60,
+            bootstrapStaleWhileRevalidateSeconds: 600,
+            releaseArtifactImmutableMaxAgeSeconds: 31536000,
+          },
+        },
+      });
+      await activateReleaseAsync(mobileStore, baseline);
       const request = await store.submit(actor, {
         request: 'Research two schools',
         sessionId: 'test',
@@ -166,7 +205,26 @@ test(
           const active = await pool.query(
             "SELECT release_id FROM published.active_release WHERE id='active'",
           );
-          return Response.json({ releaseId: active.rows[0].release_id, features: [] });
+          const points = await pool.query(
+            'SELECT projection FROM published.release_entities WHERE release_id=$1',
+            [active.rows[0].release_id],
+          );
+          return Response.json({
+            releaseId: active.rows[0].release_id,
+            features: points.rows
+              .filter(({ projection }) => projection.location?.lat != null)
+              .map(({ projection }) => ({
+                properties: {
+                  entityId: projection.id,
+                  displayName: projection.displayName,
+                  precision: projection.location.precision,
+                },
+                geometry: {
+                  type: 'Point',
+                  coordinates: [projection.location.lng, projection.location.lat],
+                },
+              })),
+          });
         }
         if (url.startsWith('https://api.blackstory.app/v1/search?')) {
           const rows = await pool.query(
@@ -182,6 +240,14 @@ test(
           );
           return Response.json({
             ...row.rows[0]?.projection,
+            ...(row.rows[0]?.projection.location?.lat != null
+              ? {
+                  geoAnchor: {
+                    lat: wrongPublicPoint ? 0 : row.rows[0].projection.location.lat,
+                    lng: row.rows[0].projection.location.lng,
+                  },
+                }
+              : {}),
             revision: { releaseId: row.rows[0]?.release_id },
           });
         }
@@ -245,7 +311,29 @@ test(
         changes[1]!.entityId,
       ]);
       assert.equal(absent.rows.length, 0);
-      assert.equal(objects.size, 6);
+      assert.equal(objects.size, 12);
+      const mobilePointer = await mobileStore.getPointer();
+      assert.equal(mobilePointer!.activeReleaseId, committedRelease);
+      const publishedMobile = await mobileStore.getRelease(String(committedRelease));
+      assert.deepEqual(publishedMobile!.manifest.compatibility, baseline.manifest.compatibility);
+      const signedRow = await pool.query(
+        'SELECT signed_manifest FROM publication.releases WHERE id=$1',
+        [committedRelease],
+      );
+      const signed = signedRow.rows[0].signed_manifest;
+      assert.equal(
+        verifySignedReleaseManifest(
+          { ...signed, manifestHash: { algorithm: 'sha256', digest: signed.manifestHash } },
+          keys.publicKey,
+        ),
+        true,
+      );
+      assert.equal(signed.manifest.aggregateArtifacts.length, 8);
+      assert.equal(signed.mobileBootstrap.activeRelease.releaseId, committedRelease);
+      const content = await mobileStore.getArtifact(
+        publishedMobile!.manifest.artifactHashes['content-index']!.path,
+      );
+      assert.equal(JSON.parse(content!.canonical).entries[0].id, 'existing-story');
       await store.decide(actor, request.id, {
         version: result.version,
         proposalHash: result.proposalHash,
@@ -268,6 +356,167 @@ test(
         [changes[0]!.entityId],
       );
       assert.equal(duplicates.rows[0].count, 2);
+      const correction = await store.submit(actor, {
+        request: 'Correct the first school and remove its unsupported context',
+        sessionId: 'test',
+        harness: 'test',
+        idempotencyKey: randomUUID(),
+      });
+      const oldLocationId = `location_${randomUUID()}`;
+      await pool.query(
+        `INSERT INTO canonical.entity_locations(id,entity_id,role,geometry_type,geometry,location,lat,lng,precision,match_method,label)
+        VALUES($1,$2,'historical','Point','{"type":"Point","coordinates":[-84.4,33.7]}',
+          ST_SetSRID(ST_MakePoint(-84.4,33.7),4326)::geography,33.7,-84.4,'institution','documented','Old point')`,
+        [oldLocationId, changes[0]!.entityId],
+      );
+      const snapshot = await managementEntitySnapshot(pool, changes[0]!.entityId);
+      assert.equal(snapshot.locations[0].lat, 33.7);
+      const correctionLease = await store.claim(correction.id, 'research');
+      await store.saveProposal(correction.id, correctionLease!.lease, {
+        summary: 'Correct the existing account.',
+        interpretation: 'One existing school only.',
+        held: [],
+        researchRunIds: [],
+        changes: [
+          {
+            ...changes[0],
+            operation: 'update',
+            beforeHash: workDigest(snapshot),
+            claimRevisions: snapshot.claims.map((row: { claim: { id: string } }) => ({
+              claimId: row.claim.id,
+              reason: 'Superseded by the reviewed atomic assertion.',
+              replacementAssertionIds: ['school'],
+            })),
+            contextRevision: {
+              text: '',
+              reason: 'Remove unsupported context.',
+              sentenceClaims: [],
+            },
+            locationRevision: {
+              locationId: oldLocationId,
+              reason: 'Withhold an unsupported point.',
+              assertionIds: ['school'],
+            },
+          },
+        ],
+      });
+      const correctionReview = (await store.get(actor, correction.id))!;
+      assert.equal(correctionReview.proposal!.changes[0]!.before!.claims!.length, 2);
+      await store.decide(actor, correction.id, {
+        version: correctionReview.version,
+        proposalHash: correctionReview.proposalHash,
+        entityIds: [changes[0]!.entityId],
+        action: 'approve',
+        reason: 'Publish this correction',
+        sessionId: 'test',
+        idempotencyKey: randomUUID(),
+      });
+      const correctionPublish = await store.claim(correction.id, 'publish');
+      const beforeCorrectionRelease = (await mobileStore.getPointer())!.activeReleaseId;
+      await pool.query('UPDATE canonical.entities SET display_name=$2 WHERE id=$1', [
+        changes[0]!.entityId,
+        'Concurrent editor correction',
+      ]);
+      await assert.rejects(
+        publishManagementWork(store, correctionPublish!.work, correctionPublish!.lease),
+        /canonical record changed after review/,
+      );
+      assert.equal((await mobileStore.getPointer())!.activeReleaseId, beforeCorrectionRelease);
+      assert.equal(
+        (await managementEntitySnapshot(pool, changes[0]!.entityId)).locations[0].lat,
+        33.7,
+      );
+      await pool.query('UPDATE canonical.entities SET display_name=$2 WHERE id=$1', [
+        changes[0]!.entityId,
+        snapshot.entity.display_name,
+      ]);
+      await publishManagementWork(store, correctionPublish!.work, correctionPublish!.lease);
+      const corrected = (await store.get(actor, correction.id))!;
+      assert.equal(corrected.state, 'published');
+      const correctedSnapshot = await managementEntitySnapshot(pool, changes[0]!.entityId);
+      assert.equal(
+        correctedSnapshot.claims.filter(
+          (row: { claim: { publication_status: string } }) =>
+            row.claim.publication_status === 'superseded',
+        ).length,
+        2,
+      );
+      assert.equal(correctedSnapshot.entity.kind_detail.editorial.historicalContext, '');
+      assert.equal(correctedSnapshot.locations.length, 1);
+      assert.equal(correctedSnapshot.locations[0].id, oldLocationId);
+      for (const field of ['lat', 'lng', 'geometry', 'location', 'geohash'])
+        assert.equal(correctedSnapshot.locations[0][field], null, `${field} must be withheld`);
+      const correctedProjection = await pool.query(
+        'SELECT projection FROM published.release_entities WHERE release_id=$1 AND entity_id=$2',
+        [corrected.outcome!.releaseId, changes[0]!.entityId],
+      );
+      assert.equal(correctedProjection.rows[0].projection.claims.length, 1);
+      assert.equal(correctedProjection.rows[0].projection.location, undefined);
+      const replacement = await store.submit(actor, {
+        request: 'Replace the withheld school location with the sourced point',
+        sessionId: 'test',
+        harness: 'test',
+        idempotencyKey: randomUUID(),
+      });
+      const replacementLease = await store.claim(replacement.id, 'research');
+      const newPoint = {
+        lat: 33.75,
+        lng: -84.42,
+        precision: 'institution',
+        matchMethod: 'documented',
+        label: 'Reviewed school site',
+      };
+      await store.saveProposal(replacement.id, replacementLease!.lease, {
+        summary: 'Restore a sourced school point.',
+        interpretation: 'One school only.',
+        held: [],
+        researchRunIds: [],
+        changes: [
+          {
+            ...changes[0],
+            operation: 'update',
+            beforeHash: workDigest(correctedSnapshot),
+            record: { ...changes[0]!.record, location: newPoint },
+            locationRevision: {
+              locationId: oldLocationId,
+              reason: 'Reviewed evidence locates this site.',
+              assertionIds: ['school'],
+            },
+          },
+        ],
+      });
+      const replacementReview = (await store.get(actor, replacement.id))!;
+      await store.decide(actor, replacement.id, {
+        version: replacementReview.version,
+        proposalHash: replacementReview.proposalHash,
+        entityIds: [changes[0]!.entityId],
+        action: 'approve',
+        reason: 'Publish this point',
+        sessionId: 'test',
+        idempotencyKey: randomUUID(),
+      });
+      wrongPublicPoint = true;
+      const replacementPublish = await store.claim(replacement.id, 'publish');
+      await publishManagementWork(store, replacementPublish!.work, replacementPublish!.lease);
+      const wrongReadback = (await store.get(actor, replacement.id))!;
+      assert.equal(wrongReadback.state, 'verification_failed');
+      assert.equal(wrongReadback.outcome!.verified, false);
+      wrongPublicPoint = false;
+      const replacementRetry = await store.claim(replacement.id, 'publish');
+      await publishManagementWork(store, replacementRetry!.work, replacementRetry!.lease);
+      assert.equal((await store.get(actor, replacement.id))!.state, 'published');
+      const replacedLocation = (await managementEntitySnapshot(pool, changes[0]!.entityId))
+        .locations[0];
+      assert.equal(replacedLocation.lat, newPoint.lat);
+      assert.equal(replacedLocation.lng, newPoint.lng);
+      assert.deepEqual(replacedLocation.geometry.coordinates, [newPoint.lng, newPoint.lat]);
+      await rollbackToAsync(mobileStore, String(committedRelease), { platformSchemaVersion: 1 });
+      assert.equal((await mobileStore.getPointer())!.activeReleaseId, committedRelease);
+      assert.equal(
+        (await pool.query("SELECT release_id FROM published.active_release WHERE id='active'"))
+          .rows[0].release_id,
+        committedRelease,
+      );
     } finally {
       globalThis.fetch = originalFetch;
       for (const [key, value] of Object.entries(oldEnv))

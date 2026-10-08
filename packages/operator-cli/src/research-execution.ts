@@ -28,7 +28,10 @@ export type { ResearchTaskLease } from '@repo/research-kernel';
 export type TaskModelMetadata = Omit<
   ModelInvocation,
   'schemaVersion' | 'id' | 'activityId' | 'rawResponse' | 'status' | 'repairOfInvocationId'
->;
+> & {
+  /** A composed task can have a provider response distinct from its final artifact. */
+  providerRawResponse?: string;
+};
 
 const taskTypes: Record<ResearchTaskSpec['frontier']['taskType'], string> = {
   query: 'query',
@@ -496,14 +499,16 @@ export async function completeResearchTask(
       error = cause instanceof Error ? cause.message : String(cause);
     }
     if (model) {
+      const { providerRawResponse, ...metadata } = model;
       const invocation = assertContract('ModelInvocation', {
-        ...model,
+        ...metadata,
         schemaVersion: '1.0.0',
         id: randomUUID(),
         activityId: lease.activityId,
-        outputSchemaId: spec.outputContract,
+        outputSchemaId:
+          providerRawResponse === undefined ? spec.outputContract : model.outputSchemaId,
         outputSchemaVersion: '1.0.0',
-        rawResponse: rawOutput,
+        rawResponse: providerRawResponse ?? rawOutput,
         status: error ? 'invalid' : 'valid',
         repairOfInvocationId: null,
       });

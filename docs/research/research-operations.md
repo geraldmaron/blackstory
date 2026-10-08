@@ -822,23 +822,47 @@ research database credentials and rely only on `SET ROLE` to limit them.
 The initial worker proposes place records and summary/classification changes. It searches at
 most six queries and twelve leads, under the existing standard budget, with at most two attempts
 per task. Scope expansion starts a separately bounded run. Unsupported entity kinds, relationship
-changes, article creation, claim supersession, and location revisions must be held explicitly.
-The publisher preserves existing claims and context; it does not yet correct their contradictions.
-An update requiring those changes cannot be certified as a completed correction.
+changes and article creation must be held explicitly. Corrections identify exact existing claims
+and locations to supersede, replace or withhold, and can replace or remove historical context.
+Unrelated claims, context and locations remain intact; a summary rewrite cannot silently change them.
 
 Source-library guidance extends `evidence.evidence_sources.research_guidance`: collection and
 coverage, suitable claims, search methods, limitations, provenance, preservation conditions.
-This guides discovery, not truth or blanket retention permission. Current acquisition requires
-an unexpired exact-URL preservation decision from `evidence.source_items.metadata`; net-new
-sources without that assessment remain held. Automatic rights assessment, collection seeding,
-and management-proposal excerpt disposal are unfinished. Do not claim unrestricted autonomous
-research or evidence preservation from this path.
+This guides discovery, not truth or blanket retention permission. Acquisition honors unexpired exact-URL decisions from `evidence.source_items.metadata`.
+New sources receive a budgeted, source-specific private-quotation assessment after transient
+safe retrieval. This is a recorded editorial judgment, not a license or public-domain finding.
+It assesses factual nature, necessity, substitution and sensitivity, retains at most 1,000
+characters for 30 days, and never permits public archiving. Missing, duplicated, restricted or
+uncertain decisions are withheld. Existing restrictions and expired explicit decisions cannot
+be overridden automatically. Redirect destinations require their own assessment. Only HTTP 200
+responses become evidence. The reviewed school collections seed guidance on existing source
+records; the library still needs broader coverage.
+
+Management proposals expire after 30 days or earlier when their research evidence expires or
+is withdrawn. Reads withhold expired text; approval and publication refuse it. The existing
+`capture-retention` sweep disposes both proposal copies while retaining version hashes and
+decision records. Published excerpts and third-party archive copies require a separate disposition.
 
 The publisher checks exact reviewed canonical baselines and current owner/delegation authority,
 builds a signed catalog release, uploads immutable artifacts, verifies bytes, and activates in one
 transaction. Public verification checks the entity API, page, search, and map. A failed readback
 is `verification_failed`; retry verifies the committed release without reapplying changes.
-Partial approval retains the rest for review. Existing signed mobile releases currently block
-this publisher until compatible mobile artifacts are integrated. Public API numeric confidence
-and full claim correction remain separate unresolved compatibility work. These limitations block
-production acceptance for Lincoln, Atlanta and Wilmington, even when local tests pass.
+Partial approval retains the rest for review. Existing mobile releases are regenerated using the shared artifact builder, with compatibility,
+legal versions, flags and unrelated content preserved. Mobile aggregate hashes are included in
+the signed manifest; both release pointers activate in the same transaction. Explicit claim,
+context and location corrections are supported and displayed for review. Public evidence labels
+are qualitative; legacy numeric values are accepted but are no longer fabricated or displayed.
+Production-scale artifact preparation, native rendering and the Lincoln/Atlanta/Wilmington
+live acceptance run remain unverified. Do not describe those outcomes as shipped from local tests.
+
+
+Remote OAuth tokens must carry `https://blackstory.app/api/mcp` in their audience as well as an
+allowed `client_id` and the configured Supabase issuer. Ordinary `authenticated` audience alone
+is insufficient for agent clients. Configure a Supabase access-token hook scoped to the registered
+management clients before testing remote access; do not change the audience of first-party admin
+sessions. OAuth consent/delegation setup and direct client acceptance remain unfinished.
+
+Deploy the native qualitative-label change before removing numeric scores from the production API.
+Older installed clients substitute zero for a missing score. The local contract change alone does
+not prove a safe rollout; exercise the supported app builds and enforce the appropriate minimum
+build through the existing bootstrap compatibility controls before the API change goes live.

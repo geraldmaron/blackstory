@@ -42,24 +42,41 @@ function supabaseVerifierFromEnv(
       if (claims.error || !claims.data)
         return { data: { user: null }, error: { message: 'Token claims could not be verified' } };
       const payload = claims.data.claims;
-      const audiences = Array.isArray(payload.aud) ? payload.aud : [payload.aud];
       if (
-        payload.iss !== `${url.replace(/\/$/u, '')}/auth/v1` ||
-        !audiences.includes('authenticated')
+        !managementTokenClaimsAllowed(
+          payload,
+          url,
+          environment.BLACKSTORY_MCP_ALLOWED_CLIENT_IDS ?? '',
+        )
       )
-        return { data: { user: null }, error: { message: 'Token issuer or audience is invalid' } };
+        return {
+          data: { user: null },
+          error: { message: 'Token issuer, resource or client is invalid' },
+        };
       const clientId = payload.client_id;
-      if (
-        typeof clientId === 'string' &&
-        !(environment.BLACKSTORY_MCP_ALLOWED_CLIENT_IDS ?? '')
-          .split(',')
-          .map((id) => id.trim())
-          .includes(clientId)
-      )
-        return { data: { user: null }, error: { message: 'This agent client is not enabled' } };
       return { ...result, ...(typeof clientId === 'string' ? { clientId } : {}) };
     },
   };
+}
+
+/** OAuth tokens must name this resource; a valid token for another API is not authority here. */
+export function managementTokenClaimsAllowed(
+  payload: { iss?: unknown; aud?: unknown; client_id?: unknown },
+  issuerUrl: string,
+  allowedClients: string,
+): boolean {
+  if (payload.iss !== `${issuerUrl.replace(/\/$/u, '')}/auth/v1`) return false;
+  const audiences = Array.isArray(payload.aud) ? payload.aud : [payload.aud];
+  if (payload.client_id === undefined) return audiences.includes('authenticated');
+  return (
+    typeof payload.client_id === 'string' &&
+    payload.client_id.length > 0 &&
+    allowedClients
+      .split(',')
+      .map((id) => id.trim())
+      .includes(payload.client_id) &&
+    audiences.includes('https://blackstory.app/api/mcp')
+  );
 }
 
 /** One line, bounded length: log records must not be forgeable by their own subject. */

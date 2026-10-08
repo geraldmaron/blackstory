@@ -167,7 +167,8 @@ sensitivity before sending a URL to an external archive. Never submit private/si
 credentials, or unpublished sensitive material. Respect retention and source policies. Run the explicit `capture-retention` sweep to erase
 expired or withdrawn source text and passages; retry queued storage disposal until acknowledged.
 The sweep also disposes tracked research-run payloads, including dependent artifacts, raw model
-outputs, quarantined responses, task inputs and execution plans. Copies outside that tracked run,
+outputs, quarantined responses, task inputs, execution plans and expired management proposals.
+Proposal hashes and approval records remain after private text disposal. Copies outside that tracked run,
 published material and external archive takedowns require their own reviewed disposition. Older
 captures without an origin link need a custody review; their storage references prevent accidental
 orphan deletion. Hash-only or excerpt-only rows do not prove full-page recoverability, and

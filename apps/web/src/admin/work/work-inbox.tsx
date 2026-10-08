@@ -241,10 +241,54 @@ export function WorkInbox({ workId }: { workId?: string }) {
                         <summary>Current record</summary>
                         <p>{change.before.displayName}</p>
                         <p>{change.before.summary || 'No summary recorded.'}</p>
+                        {change.before.historicalContext && (
+                          <p>{change.before.historicalContext}</p>
+                        )}
+                        {change.before.locations?.map((location) => (
+                          <p key={location.id}>
+                            {location.label}: {location.lat ?? 'unlocated'},{' '}
+                            {location.lng ?? 'unlocated'} ({location.precision})
+                          </p>
+                        ))}
                       </details>
                     )}
                     <h4>Proposed record</h4>
                     <p className="work-inbox__preview">{change.record.summary}</p>
+                    {change.contextRevision && (
+                      <section>
+                        <h4>Historical context correction</h4>
+                        <p>{change.contextRevision.reason}</p>
+                        <p>
+                          {change.contextRevision.text || 'Remove the current historical context.'}
+                        </p>
+                      </section>
+                    )}
+                    {change.claimRevisions?.map((revision) => (
+                      <section key={revision.claimId}>
+                        <h4>Replace an existing assertion</h4>
+                        <blockquote>
+                          {change.before?.claims?.find((claim) => claim.id === revision.claimId)
+                            ?.statement ?? revision.claimId}
+                        </blockquote>
+                        <p>{revision.reason}</p>
+                        {revision.replacementAssertionIds.map((id) => (
+                          <p key={id}>
+                            {change.assertions.find((claim) => claim.id === id)?.statement}
+                          </p>
+                        ))}
+                      </section>
+                    ))}
+                    {change.locationRevision && (
+                      <section>
+                        <h4>Map location correction</h4>
+                        <p>{change.locationRevision.reason}</p>
+                        <p>
+                          {change.record.location
+                            ? `Replace with ${change.record.location.label} (${change.record.location.precision}).`
+                            : 'Remove the map point until the location can be supported.'}
+                        </p>
+                      </section>
+                    )}
                     <p>
                       {change.record.jurisdiction}.{' '}
                       {change.record.location

@@ -263,6 +263,58 @@ test(
       );
       assert.ok(await store.claim(allHeld.id, 'research'));
 
+      const expired = await store.submit(actor, { ...input, idempotencyKey: randomUUID() });
+      const expiredLease = (await store.claim(expired.id, 'research'))!;
+      await assert.rejects(
+        store.saveProposal(expired.id, expiredLease.lease, {
+          ...proposal,
+          researchRunIds: ['missing-research-run'],
+        }),
+        /expired|unavailable/,
+      );
+      await store.saveProposal(expired.id, expiredLease.lease, proposal);
+      const expiring = (await store.get(actor, expired.id))!;
+      await assert.rejects(
+        pool.query(
+          'UPDATE research.management_work_proposals SET proposal=NULL,payload_disposed_at=now() WHERE work_id=$1',
+          [expired.id],
+        ),
+        /immutable/,
+      );
+      // Insert an expired immutable revision as a historical fixture; ordinary writes cannot age it.
+      await pool.query(
+        `INSERT INTO research.management_work_proposals(work_id,version,proposal_hash,proposal,created_at)
+        SELECT work_id,version+1,proposal_hash,proposal,now()-interval '31 days'
+        FROM research.management_work_proposals WHERE work_id=$1`,
+        [expired.id],
+      );
+      await pool.query('UPDATE research.management_work SET version=version+1 WHERE id=$1', [
+        expired.id,
+      ]);
+      assert.equal((await store.get(actor, expired.id))!.proposal, null);
+      assert.equal((await store.list(actor)).find((w) => w.id === expired.id)!.proposal, null);
+      await assert.rejects(
+        store.decide(actor, expired.id, {
+          ...decision,
+          version: expiring.version + 1,
+          proposalHash: expiring.proposalHash,
+          idempotencyKey: randomUUID(),
+        }),
+        /expired/,
+      );
+      await pool.query('SELECT research.dispose_expired_management_proposals(true)');
+      const disposed = await pool.query(
+        'SELECT proposal,proposal_hash,payload_disposed_at FROM research.management_work_proposals WHERE work_id=$1 AND version=$2',
+        [expired.id, expiring.version + 1],
+      );
+      assert.equal(disposed.rows[0].proposal, null);
+      assert.equal(disposed.rows[0].proposal_hash, expiring.proposalHash);
+      assert.ok(disposed.rows[0].payload_disposed_at);
+      assert.equal((await store.get(actor, expired.id))!.state, 'held');
+      await store.retry(actor, expired.id);
+      assert.equal((await store.get(actor, expired.id))!.state, 'queued');
+      assert.ok(await store.claim(expired.id, 'research'));
+
       const db = await pool.connect();
       try {
         await db.query('BEGIN');

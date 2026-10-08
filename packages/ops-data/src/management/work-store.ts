@@ -38,6 +38,7 @@ type Row = {
   created_at: Date;
   updated_at: Date;
   lease_until: Date | null;
+  retention_current?: boolean;
 };
 function item(row: Row): WorkItem {
   return {
@@ -46,11 +47,14 @@ function item(row: Row): WorkItem {
     request: row.request,
     state: row.state,
     version: row.version,
-    proposal: row.proposal,
+    proposal: row.retention_current === false ? null : row.proposal,
     proposalHash: row.proposal_hash,
     approvedEntityIds: row.approved_entity_ids,
     outcome: row.outcome,
-    error: row.error,
+    error:
+      row.retention_current === false
+        ? 'The supporting research expired. Request fresh research before publication.'
+        : row.error,
     dispatchStatus: row.dispatch_status,
     createdAt: row.created_at.toISOString(),
     updatedAt: row.updated_at.toISOString(),
@@ -93,7 +97,21 @@ export function validateWorkProposal(value: unknown): WorkProposal {
       if (['supported', 'qualified'].includes(assertion.finding) && !assertion.evidence.length)
         throw new WorkConflict('Supported assertions require evidence');
     }
-    for (const sentence of change.sentenceClaims) {
+    const revisionIds = change.claimRevisions?.map((r) => r.claimId) ?? [];
+    if (new Set(revisionIds).size !== revisionIds.length)
+      throw new WorkConflict('Duplicate claim revision');
+    for (const id of [
+      ...(change.locationRevision?.assertionIds ?? []),
+      ...(change.claimRevisions?.flatMap((r) => r.replacementAssertionIds) ?? []),
+    ]) {
+      const assertion = assertions.get(id);
+      if (!assertion || !['supported', 'qualified'].includes(assertion.finding))
+        throw new WorkConflict('Revision depends on unresolved evidence');
+    }
+    for (const sentence of [
+      ...change.sentenceClaims,
+      ...(change.contextRevision?.sentenceClaims ?? []),
+    ]) {
       if (!sentence.assertionIds.length)
         throw new WorkConflict('Public sentences require assertions');
       for (const id of sentence.assertionIds) {
@@ -103,6 +121,12 @@ export function validateWorkProposal(value: unknown): WorkProposal {
       }
     }
     const normalize = (text: string) => text.replace(/\s+/gu, ' ').trim();
+    if (
+      change.contextRevision &&
+      normalize(change.contextRevision.sentenceClaims.map((row) => row.sentence).join(' ')) !==
+        normalize(change.contextRevision.text)
+    )
+      throw new WorkConflict('Every public context sentence must be reviewed exactly');
     if (
       normalize(change.sentenceClaims.map((row) => row.sentence).join(' ')) !==
       normalize(String(change.record.summary))
@@ -150,14 +174,16 @@ export class ManagementWorkStore {
   }
   async get(actor: WorkActor, id: string): Promise<WorkItem | null> {
     const result = await this.pool.query<Row>(
-      'SELECT * FROM research.management_work WHERE id=$1 AND owner_id=$2',
+      `SELECT w.*, CASE WHEN w.proposal IS NULL THEN true ELSE research.management_proposal_retention_current(w.proposal,p.created_at) END AS retention_current
+       FROM research.management_work w LEFT JOIN research.management_work_proposals p ON p.work_id=w.id AND p.version=w.version WHERE w.id=$1 AND w.owner_id=$2`,
       [id, actor.ownerId],
     );
     return result.rows[0] ? item(result.rows[0]) : null;
   }
   async list(actor: WorkActor): Promise<WorkItem[]> {
     const result = await this.pool.query<Row>(
-      'SELECT * FROM research.management_work WHERE owner_id=$1 ORDER BY updated_at DESC LIMIT 50',
+      `SELECT w.*, CASE WHEN w.proposal IS NULL THEN true ELSE research.management_proposal_retention_current(w.proposal,p.created_at) END AS retention_current
+       FROM research.management_work w LEFT JOIN research.management_work_proposals p ON p.work_id=w.id AND p.version=w.version WHERE w.owner_id=$1 ORDER BY w.updated_at DESC LIMIT 50`,
       [actor.ownerId],
     );
     return result.rows.map(item);
@@ -190,20 +216,80 @@ export class ManagementWorkStore {
           (!snapshot || workDigest(snapshot) !== change.beforeHash)
         )
           throw new WorkConflict('Record changed during research');
+        if (
+          change.operation === 'create' &&
+          (change.claimRevisions?.length || change.locationRevision)
+        )
+          throw new WorkConflict('New records cannot revise existing claims or locations');
+        if (
+          change.claimRevisions?.some(
+            (revision) =>
+              !snapshot?.claims.some(
+                (row: { claim: { id: string } }) => row.claim.id === revision.claimId,
+              ),
+          )
+        )
+          throw new WorkConflict('Revised claim does not belong to this record');
+        if (
+          change.locationRevision?.locationId &&
+          !snapshot?.locations.some(
+            (row: { id: string }) => row.id === change.locationRevision!.locationId,
+          )
+        )
+          throw new WorkConflict('Revised location does not belong to this record');
         const before = snapshot
           ? {
               displayName: String(snapshot.entity.display_name),
               summary: String(snapshot.entity.kind_detail?.editorial?.summary ?? ''),
+              historicalContext: String(
+                snapshot.entity.kind_detail?.editorial?.historicalContext ?? '',
+              ),
+              claims: snapshot.claims.map(
+                (row: { claim: { id: string }; version: { object?: unknown } | null }) => ({
+                  id: row.claim.id,
+                  statement:
+                    typeof row.version?.object === 'string'
+                      ? row.version.object
+                      : JSON.stringify(row.version?.object ?? ''),
+                }),
+              ),
+              locations: snapshot.locations.map(
+                (row: {
+                  id: string;
+                  label?: string;
+                  lat: number | null;
+                  lng: number | null;
+                  precision?: string;
+                }) => ({
+                  id: row.id,
+                  label: row.label ?? '',
+                  lat: row.lat,
+                  lng: row.lng,
+                  precision: row.precision ?? 'unknown',
+                }),
+              ),
             }
           : null;
         changes.push({ ...change, before });
       }
       for (const entityId of fixedIds) {
         const fixed = current.proposal?.changes.find((change) => change.entityId === entityId);
+        if (
+          !fixed &&
+          Array.isArray(current.outcome?.publishedEntityIds) &&
+          current.outcome.publishedEntityIds.includes(entityId)
+        )
+          continue;
         if (!fixed) throw new WorkConflict('Previously approved change is missing');
         changes.push(fixed);
       }
       proposal = { ...proposal, changes };
+      const retention = await db.query(
+        'SELECT research.management_proposal_retention_current($1::jsonb,now()) AS current',
+        [JSON.stringify(proposal)],
+      );
+      if (!retention.rows[0]?.current)
+        throw new WorkConflict('Supporting research expired or is unavailable');
       const hash = workDigest(proposal);
       const version = current.version + 1;
       await db.query(
@@ -270,6 +356,14 @@ export class ManagementWorkStore {
         throw new WorkConflict('Proposal changed; review the current changes');
       if (!['awaiting_review', 'held', 'approved'].includes(current.state))
         throw new WorkConflict('Work is not awaiting a decision');
+      if (decision.action === 'approve') {
+        const retention = await db.query(
+          `SELECT research.management_proposal_retention_current(proposal,created_at) AS current FROM research.management_work_proposals WHERE work_id=$1 AND version=$2`,
+          [id, current.version],
+        );
+        if (!retention.rows[0]?.current)
+          throw new WorkConflict('Supporting research expired; request fresh research');
+      }
       const proposal = validateWorkProposal(current.proposal);
       if (!decision.entityIds.length && (decision.action === 'approve' || proposal.changes.length))
         throw new WorkConflict('Select at least one change');
@@ -332,6 +426,10 @@ export class ManagementWorkStore {
     });
   }
   async retry(actor: WorkActor, id: string): Promise<void> {
+    if (!actor.canResearch && !actor.canPublish)
+      throw new WorkConflict('Research permission required');
+    // Disposal is authority-limited to expired payloads; it never edits valid proposal bytes.
+    await this.pool.query('SELECT research.dispose_expired_management_proposals(true)');
     await this.transaction(async (db) => {
       const result = await db.query<Row>(
         'SELECT * FROM research.management_work WHERE id=$1 AND owner_id=$2 FOR UPDATE',
@@ -345,9 +443,9 @@ export class ManagementWorkStore {
         throw new WorkConflict('Research permission required');
       const updated = await db.query(
         `UPDATE research.management_work SET
-        state=CASE WHEN state='failed' THEN CASE WHEN cardinality(approved_entity_ids)>0 THEN 'approved' ELSE 'queued' END ELSE state END,
+        state=CASE WHEN state='held' AND proposal IS NULL THEN 'queued' WHEN state='failed' THEN CASE WHEN cardinality(approved_entity_ids)>0 THEN 'approved' ELSE 'queued' END ELSE state END,
         dispatch_status='pending',dispatch_token=NULL,error=NULL
-        WHERE id=$1 AND state IN ('failed','queued','researching','approved','publishing','verification_failed')
+        WHERE id=$1 AND (state IN ('failed','queued','researching','approved','publishing','verification_failed') OR (state='held' AND proposal IS NULL))
           AND (lease_until IS NULL OR lease_until<now()) AND (dispatched_at IS NULL OR dispatched_at<now()-interval '2 minutes') RETURNING id`,
         [id],
       );

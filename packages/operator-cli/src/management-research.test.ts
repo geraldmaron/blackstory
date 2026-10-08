@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 import { validateExecutionPlan } from '@repo/research-kernel';
 import type { WorkItem } from '@repo/ops-data/management/contracts';
-import { managedResearchPlan } from './management-research.js';
+import { managedResearchPlan, retainedManagementSource } from './management-research.js';
 
 test('managed research reserves every bounded retry within the standard budget', () => {
   const work: WorkItem = {
@@ -31,4 +31,38 @@ test('managed research reserves every bounded retry within the standard budget',
   assert.throws(() => validateExecutionPlan(overBudget), /budget/i);
   assert.equal(plan.tasks[0]!.input.request, work.request.request);
   assert.deepEqual(plan.profile.modelPolicies[0]!.authority, ['proposal']);
+});
+
+test('new-source retention is exact, private, bounded and fails closed', () => {
+  const candidate = {
+    sourceUrl: 'https://records.example.gov/school',
+    excerpt: 'A factual passage.',
+    context: 'Published school history.',
+    contentHash: 'a'.repeat(64),
+    title: 'School record',
+  };
+  const review = {
+    sourceUrl: candidate.sourceUrl,
+    allowExcerptRetention: true,
+    sensitivity: 'public',
+    basis:
+      'Published factual school history; necessary short quotation for private verification, not a substitute for the source; no sensitive personal information in this passage.',
+  };
+  assert.equal(
+    retainedManagementSource(candidate, { ...review, sourceUrl: 'https://other.example/school' }),
+    null,
+  );
+  assert.equal(retainedManagementSource(candidate, { ...review, sensitivity: 'unknown' }), null);
+  assert.equal(
+    retainedManagementSource(candidate, { ...review, allowExcerptRetention: false }),
+    null,
+  );
+  assert.equal(retainedManagementSource(candidate, { ...review, basis: '.gov is trusted' }), null);
+  assert.equal(retainedManagementSource({ ...candidate, excerpt: 'x'.repeat(1001) }, review), null);
+  assert.equal(retainedManagementSource({ ...candidate, excerpt: ' ' }, review), null);
+  const source = retainedManagementSource(candidate, review, new Date('2026-10-08T00:00:00Z'))!;
+  assert.equal(source.rawRecord.preservationDecision.allowArchive, false);
+  assert.equal(source.rawRecord.preservationDecision.expiresAt, '2026-11-07T00:00:00.000Z');
+  assert.equal(source.description, candidate.excerpt);
+  assert.match(source.rawRecord.preservationDecision.basis, /not a license/);
 });

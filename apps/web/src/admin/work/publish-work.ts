@@ -3,13 +3,20 @@ import { createHash, createPrivateKey, createPublicKey } from 'node:crypto';
 import type { PoolClient } from 'pg';
 import {
   buildReleaseEntityArtifacts,
+  buildGeoPointFields,
   buildReleaseManifest,
+  generateReleaseArtifacts,
+  mapWithConcurrency,
+  type MapSourceEntityInput,
+  type ContentIndexEntry,
   signReleaseManifest,
   verifySignedReleaseManifest,
   sha256Json,
   type JsonValue,
   type CanonicalPromotionRecord,
 } from '@repo/domain';
+import { createPoolPostgresReleaseStore, activateReleaseAsync } from '@repo/data-access';
+import { redactLocationForPublic } from '@repo/security';
 import { mapPostgresSearchIndexRow } from '@repo/schemas';
 import { buildReleaseCatalogArtifacts } from '@repo/ops-data';
 import {
@@ -70,6 +77,11 @@ async function copyRelease(db: PoolClient, before: string, after: string): Promi
 
 /** Locks owner and delegations until activation, making revocation serialize with execution. */
 async function assertAuthority(db: PoolClient, work: WorkItem): Promise<void> {
+  // Retention withdrawal locks these same rows before erasing dependent payloads.
+  const runIds = [...(work.proposal?.researchRunIds ?? [])].sort();
+  await db.query('SELECT id FROM research.runs WHERE id=ANY($1::text[]) ORDER BY id FOR SHARE', [
+    runIds,
+  ]);
   const owner = await db.query('SELECT research.management_owner_can_publish($1) AS allowed', [
     work.ownerId,
   ]);
@@ -77,12 +89,14 @@ async function assertAuthority(db: PoolClient, work: WorkItem): Promise<void> {
     throw new WorkConflict('Owner publication permission is no longer active');
   for (const entityId of work.approvedEntityIds) {
     const approval = await db.query(
-      `SELECT d.*,p.proposal FROM research.management_work_decisions d
+      `SELECT d.*,p.proposal,research.management_proposal_retention_current(p.proposal,p.created_at) AS retention_current FROM research.management_work_decisions d
       JOIN research.management_work_proposals p ON p.work_id=d.work_id AND p.version=d.version AND p.proposal_hash=d.proposal_hash
       WHERE d.work_id=$1 AND d.owner_id=$2 AND $3=ANY(d.entity_ids) ORDER BY d.created_at DESC,d.id DESC LIMIT 1`,
       [work.id, work.ownerId, entityId],
     );
     const row = approval.rows[0];
+    if (!row?.retention_current)
+      throw new WorkConflict('Supporting research expired; request fresh research');
     if (!row || row.action !== 'approve')
       throw new WorkConflict('Selected change has no current approval');
     const approved = validateWorkProposal(row.proposal).changes.find(
@@ -130,7 +144,7 @@ async function writeChange(
     if (!snapshot || workDigest(snapshot) !== change.beforeHash)
       throw new WorkConflict('The canonical record changed after review');
     // Locations and existing claims need explicit changes, not replacement as a side effect of copy editing.
-    if (record.location) {
+    if (record.location && !change.locationRevision) {
       const matches = snapshot.locations.some(
         (location: Json) =>
           location.lat === record.location!.lat &&
@@ -150,7 +164,10 @@ async function writeChange(
         record.entityId,
         record.displayName,
         JSON.stringify(record.aliases ?? snapshot.entity.aliases),
-        JSON.stringify({ summary: record.summary }),
+        JSON.stringify({
+          summary: record.summary,
+          ...(change.contextRevision ? { historicalContext: change.contextRevision.text } : {}),
+        }),
         JSON.stringify({
           topicIds: record.topicIds,
           topicTags: record.topicTags,
@@ -160,6 +177,33 @@ async function writeChange(
       ],
     );
   }
+  if (change.contextRevision && change.operation === 'create')
+    await db.query(
+      "UPDATE canonical.entities SET kind_detail=jsonb_set(kind_detail,'{editorial,historicalContext}',to_jsonb($2::text)) WHERE id=$1",
+      [record.entityId, change.contextRevision.text],
+    );
+  for (const revision of change.claimRevisions ?? []) {
+    const revised = await db.query(
+      `UPDATE canonical.claims SET publication_status='superseded',
+      verification=COALESCE(verification,'{}'::jsonb)||$3::jsonb, updated_at=now()
+      WHERE id=$1 AND entity_id=$2 RETURNING id`,
+      [
+        revision.claimId,
+        record.entityId,
+        JSON.stringify({
+          supersession: {
+            workId: work.id,
+            proposalVersion: work.version,
+            reason: revision.reason,
+            replacementAssertionIds: revision.replacementAssertionIds,
+          },
+        }),
+      ],
+    );
+    if (!revised.rows.length)
+      throw new WorkConflict('Revised claim does not belong to this record');
+  }
+  const evidenceIds = new Set<string>();
   for (const assertion of change.assertions.filter((a) =>
     ['supported', 'qualified'].includes(a.finding),
   )) {
@@ -209,6 +253,7 @@ async function writeChange(
         work.ownerId,
         now,
       );
+      evidenceIds.add(evidenceId);
       await db.query(
         `INSERT INTO canonical.claim_evidence_links(id,claim_id,claim_version_id,evidence_id,role,quality,asserted_value)
         VALUES($1,$2,$3,$4,'supporting',$5::jsonb,$6::jsonb) ON CONFLICT(id) DO NOTHING`,
@@ -222,6 +267,44 @@ async function writeChange(
         ],
       );
     }
+  }
+  if (change.locationRevision) {
+    const revision = change.locationRevision;
+    if (
+      revision.locationId &&
+      !snapshot?.locations.some((row: Json) => row.id === revision.locationId)
+    )
+      throw new WorkConflict('Revised location does not belong to this record');
+    const locationId =
+      revision.locationId ??
+      `loc_management_${byteHash(`${work.id}:${record.entityId}`).slice(0, 24)}`;
+    const point = record.location
+      ? buildGeoPointFields(record.location.lat, record.location.lng, 5)
+      : undefined;
+    await db.query(
+      `INSERT INTO canonical.entity_locations(id,entity_id,role,geometry_type,geometry,location,lat,lng,geohash,geohash_prefixes,precision,match_method,label,evidence_ids)
+      VALUES($1,$2,'historical',CASE WHEN $3::float8 IS NULL THEN NULL ELSE 'Point' END,
+        CASE WHEN $3::float8 IS NULL THEN NULL ELSE jsonb_build_object('type','Point','coordinates',jsonb_build_array($4::float8,$3::float8)) END,
+        CASE WHEN $3::float8 IS NULL THEN NULL ELSE ST_SetSRID(ST_MakePoint($4::float8,$3::float8),4326)::geography END,
+        $3,$4,$5,$6,$7,$8,$9,$10)
+      ON CONFLICT(id) DO UPDATE SET geometry_type=EXCLUDED.geometry_type,geometry=EXCLUDED.geometry,
+        location=EXCLUDED.location,lat=EXCLUDED.lat,lng=EXCLUDED.lng,geohash=EXCLUDED.geohash,
+        geohash_prefixes=EXCLUDED.geohash_prefixes,precision=EXCLUDED.precision,match_method=EXCLUDED.match_method,
+        label=EXCLUDED.label,evidence_ids=EXCLUDED.evidence_ids,updated_at=now()
+      WHERE canonical.entity_locations.entity_id=EXCLUDED.entity_id`,
+      [
+        locationId,
+        record.entityId,
+        point?.lat ?? null,
+        point?.lng ?? null,
+        point?.geohash ?? null,
+        point?.geohashPrefixes ?? [],
+        record.location?.precision ?? 'unknown',
+        record.location?.matchMethod ?? 'withheld',
+        record.location?.label ?? record.jurisdiction,
+        [...evidenceIds],
+      ],
+    );
   }
 }
 
@@ -358,6 +441,7 @@ export async function publishManagementWork(
           },
         );
         if (!built.ok) throw new WorkConflict(built.message);
+        const superseded = new Set(change.claimRevisions?.map((r) => r.claimId) ?? []);
         const projection = {
           ...built.projection,
           ...existing,
@@ -372,10 +456,23 @@ export async function publishManagementWork(
           eraBuckets: record.eraBuckets,
           generatedAt: now,
           recordUpdatedAt: now,
-          claims: [...(existing.claims ?? []), ...built.projection.claims],
-          claimIds: [...(existing.claimIds ?? []), ...built.projection.claimIds],
+          claims: [
+            ...(existing.claims ?? []).filter((claim: { id: string }) => !superseded.has(claim.id)),
+            ...built.projection.claims,
+          ],
+          claimIds: [
+            ...(existing.claimIds ?? []).filter((id: string) => !superseded.has(id)),
+            ...built.projection.claimIds,
+          ],
           related: existing.related ?? [],
-          ...(record.location ? {} : existing.location ? { location: existing.location } : {}),
+          ...(change.contextRevision ? { historicalContext: change.contextRevision.text } : {}),
+          ...(change.locationRevision
+            ? {
+                location: built.projection.location,
+                locationLabel: record.location?.label ?? record.jurisdiction,
+                locationPrecision: record.location?.precision ?? 'unknown',
+              }
+            : {}),
         };
         const search = toSearchIndexRow(
           {
@@ -440,11 +537,60 @@ export async function publishManagementWork(
           return mapped as unknown as JsonValue;
         }),
       });
+      const mobileStore = createPoolPostgresReleaseStore(store.pool, db);
+      const mobilePointer = await mobileStore.getPointer();
+      const previousMobile = mobilePointer
+        ? await mobileStore.getRelease(mobilePointer.activeReleaseId)
+        : undefined;
+      if (mobilePointer && (!previousMobile || mobilePointer.activeReleaseId !== previous))
+        throw new WorkConflict('Mobile and public release baselines differ');
+      const contentReference = previousMobile?.manifest.artifactHashes['content-index'];
+      const contentArtifact = contentReference
+        ? await mobileStore.getArtifact(contentReference.path)
+        : undefined;
+      if (
+        contentReference &&
+        (!contentArtifact || contentArtifact.hash.digest !== contentReference.hash.digest)
+      )
+        throw new WorkConflict('Previous mobile content index is unavailable');
+      const mobile = previousMobile
+        ? generateReleaseArtifacts({
+            releaseId,
+            generatedAt: now,
+            mapEntities: rows.rows.map(({ projection }) => {
+              const entity = projection as unknown as MapSourceEntityInput & { id: string };
+              return { ...entity, entityId: entity.id };
+            }),
+            redactLocation: redactLocationForPublic,
+            contentIndex: contentArtifact
+              ? (JSON.parse(contentArtifact.canonical).entries as ContentIndexEntry[])
+              : [],
+            entitiesList: artifacts.entitiesList as unknown as JsonValue,
+            searchIndex: artifacts.searchIndex as unknown as JsonValue,
+            bootstrap: {
+              schemaRange: previousMobile.manifest.schemaRange,
+              compatibility: previousMobile.manifest.compatibility,
+              featureFlags: previousMobile.manifest.featureFlags,
+              legalVersions: previousMobile.manifest.legalVersions,
+              cacheDirectives: previousMobile.manifest.cacheDirectives,
+              ...(previousMobile.manifest.contentVersion
+                ? { contentVersion: previousMobile.manifest.contentVersion }
+                : {}),
+              searchIndexVersion: `search_${releaseId}`,
+            },
+          })
+        : undefined;
       const manifest = signReleaseManifest(
         buildReleaseManifest({
           releaseId,
           generatedAt: now,
           searchIndexVersion: `search_${releaseId}`,
+          aggregateArtifacts: mobile
+            ? mobile.artifacts.map((a) => ({ path: a.path, hash: a.hash }))
+            : [
+                { path: artifacts.entitiesListPath, hash: artifacts.entitiesListHash },
+                { path: artifacts.searchIndexPath, hash: artifacts.searchIndexHash },
+              ],
           artifacts: rows.rows.map(({ projection }) => ({
             entityId: String((projection as Json).id),
             revision: sha256Json(projection).digest,
@@ -456,29 +602,49 @@ export async function publishManagementWork(
       );
       if (!verifySignedReleaseManifest(manifest, publicKey))
         throw new Error('Release signature verification failed');
-      for (const [path, artifact] of [
-        [artifacts.entitiesListPath, artifacts.entitiesList],
-        [artifacts.searchIndexPath, artifacts.searchIndex],
+      const entriesById = new Map(
+        manifest.manifest.entries.map((entry) => [entry.entityId, entry]),
+      );
+      const mobileByPath = new Map(
+        mobile?.artifacts.map((artifact) => [artifact.path, artifact]) ?? [],
+      );
+      const uploads = [
+        ...(mobile
+          ? mobile.artifacts.map((a) => [a.path, a.json] as const)
+          : ([
+              [artifacts.entitiesListPath, artifacts.entitiesList],
+              [artifacts.searchIndexPath, artifacts.searchIndex],
+            ] as const)),
         ...rows.rows.flatMap(({ projection }) => {
-          const entry = manifest.manifest.entries.find(
-            (entry) => entry.entityId === String((projection as Json).id),
-          );
+          const entry = entriesById.get(String((projection as Json).id));
           if (!entry) throw new Error('Entity is missing from the release manifest');
           return [
             [entry.snapshotPath, { schemaVersion: 1, releaseId, entity: projection }],
             [entry.projectionPath, projection],
           ] as const;
         }),
-      ] as const) {
-        const body = `${JSON.stringify(artifact)}\n`;
-        await uploadArtifactJson(path, body, storage);
-        const readback = await fetch(
-          `${storage.supabaseUrl}/storage/v1/object/public/${storage.bucket}/${path}`,
-          { signal: AbortSignal.timeout(60000) },
-        );
-        if (!readback.ok || byteHash(await readback.text()) !== byteHash(body))
-          throw new Error('Release artifact readback failed');
-      }
+      ] as const;
+      let uploadFailure: unknown;
+      const uploadDeadline = Date.now() + 20 * 60 * 1000;
+      await mapWithConcurrency(uploads, 8, async ([path, artifact]) => {
+        if (uploadFailure) return;
+        try {
+          if (Date.now() >= uploadDeadline)
+            throw new Error('Release preparation exceeded its time budget');
+          const body = mobileByPath.get(path)?.canonical ?? `${JSON.stringify(artifact)}\n`;
+          await uploadArtifactJson(path, body, storage);
+          const readback = await fetch(
+            `${storage.supabaseUrl}/storage/v1/object/public/${storage.bucket}/${path}`,
+            { signal: AbortSignal.timeout(60000) },
+          );
+          if (!readback.ok || byteHash(await readback.text()) !== byteHash(body))
+            throw new Error('Release artifact readback failed');
+        } catch (error) {
+          uploadFailure = error;
+        }
+      });
+      // All started uploads settle before a failure rolls the database transaction back.
+      if (uploadFailure) throw uploadFailure;
       await db.query('UPDATE publication.releases SET signed_manifest=$2::jsonb WHERE id=$1', [
         releaseId,
         JSON.stringify({
@@ -488,16 +654,12 @@ export async function publishManagementWork(
           manifestHashAlgorithm: 'sha256',
         }),
       ]);
-      // Never mutate an existing signed manifest to invent a mobile bootstrap.
-      const mobile = await db.query(
-        "SELECT name FROM published.materialized_snapshots WHERE name='mobileReleasePointer'",
-      );
-      if (mobile.rows.length)
-        throw new WorkConflict(
-          'Configured mobile release requires a compatible signed mobile artifact',
-        );
       await assertAuthority(db, work);
       await db.query('SELECT publication.activate_release($1)', [releaseId]);
+      if (mobile)
+        await activateReleaseAsync(mobileStore, mobile, {
+          expectedPointerVersion: mobilePointer!.pointerVersion,
+        });
       await db.query(
         `UPDATE research.management_work SET outcome=$3::jsonb,lease_until=now()+interval '5 minutes'
         WHERE id=$1 AND lease_token=$2`,
@@ -583,6 +745,27 @@ async function verifyPublicResult(
     const body = await api.json();
     if (body.revision?.releaseId !== releaseId || body.summary !== change.record.summary)
       throw new Error('Public API has not served the approved revision');
+    if (change.contextRevision && body.historicalContext !== change.contextRevision.text)
+      throw new Error('Public context does not match the approved revision');
+    if (
+      change.claimRevisions?.some((revision) =>
+        body.claims?.some((claim: { id: string }) => claim.id === revision.claimId),
+      )
+    )
+      throw new Error('A superseded assertion remains public');
+    if (change.locationRevision || change.operation === 'create') {
+      const expectedLocation = change.record.location
+        ? redactLocationForPublic({ ...change.record.location, kind: 'place' })
+        : undefined;
+      if (expectedLocation?.lat !== undefined && expectedLocation.lng !== undefined) {
+        if (
+          body.geoAnchor?.lat !== expectedLocation.lat ||
+          body.geoAnchor?.lng !== expectedLocation.lng ||
+          body.locationPrecision !== expectedLocation.precision
+        )
+          throw new Error('Public location differs from the approved redacted location');
+      } else if (body.geoAnchor) throw new Error('A withheld location remains public');
+    }
     const feature = map.features.find(
       (row: { properties?: { entityId?: string } }) => row.properties?.entityId === change.entityId,
     );

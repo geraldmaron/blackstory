@@ -22,3 +22,9 @@ export type {
   CommitWithAuditResult,
   StateMutation,
 } from './postgres/index.js';
+
+export {
+  createPoolPostgresReleaseStore,
+  activateReleaseAsync,
+  rollbackToAsync,
+} from './postgres/index.js';

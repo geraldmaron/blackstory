@@ -2667,15 +2667,8 @@
                 "enum": ["create", "update"]
               },
               "beforeHash": {
-                "anyOf": [
-                  {
-                    "type": "string",
-                    "pattern": "^[a-f0-9]{64}$"
-                  },
-                  {
-                    "type": "null"
-                  }
-                ]
+                "type": ["string", "null"],
+                "pattern": "^[a-f0-9]{64}$"
               },
               "record": {
                 "type": "object",
@@ -2974,10 +2967,145 @@
                   },
                   "summary": {
                     "type": "string"
+                  },
+                  "historicalContext": {
+                    "type": "string"
+                  },
+                  "claims": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "required": ["id", "statement"],
+                      "properties": {
+                        "id": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "statement": {
+                          "type": "string"
+                        }
+                      }
+                    }
+                  },
+                  "locations": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "required": ["id", "label", "lat", "lng", "precision"],
+                      "properties": {
+                        "id": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "label": {
+                          "type": "string"
+                        },
+                        "lat": {
+                          "type": ["number", "null"]
+                        },
+                        "lng": {
+                          "type": ["number", "null"]
+                        },
+                        "precision": {
+                          "type": "string"
+                        }
+                      }
+                    }
                   }
                 },
                 "required": ["displayName", "summary"],
                 "additionalProperties": false
+              },
+              "claimRevisions": {
+                "type": "array",
+                "maxItems": 100,
+                "items": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": ["claimId", "reason", "replacementAssertionIds"],
+                  "properties": {
+                    "claimId": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "reason": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "replacementAssertionIds": {
+                      "type": "array",
+                      "uniqueItems": true,
+                      "items": {
+                        "type": "string",
+                        "minLength": 1
+                      }
+                    }
+                  }
+                }
+              },
+              "contextRevision": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": ["text", "reason", "sentenceClaims"],
+                "properties": {
+                  "text": {
+                    "type": "string",
+                    "maxLength": 4000
+                  },
+                  "reason": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "sentenceClaims": {
+                    "minItems": 0,
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "sentence": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "assertionIds": {
+                          "minItems": 1,
+                          "type": "array",
+                          "items": {
+                            "type": "string",
+                            "minLength": 1
+                          }
+                        }
+                      },
+                      "required": ["sentence", "assertionIds"],
+                      "additionalProperties": false
+                    }
+                  }
+                }
+              },
+              "locationRevision": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": ["locationId", "reason", "assertionIds"],
+                "properties": {
+                  "locationId": {
+                    "type": ["string", "null"],
+                    "minLength": 1
+                  },
+                  "reason": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "assertionIds": {
+                    "type": "array",
+                    "uniqueItems": true,
+                    "items": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "minItems": 1
+                  }
+                }
               }
             },
             "required": [
@@ -3096,6 +3224,40 @@
           "items": {
             "type": "string",
             "minLength": 1
+          }
+        }
+      }
+    },
+    "ManagementRetentionAssessment": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["decisions"],
+      "properties": {
+        "decisions": {
+          "type": "array",
+          "maxItems": 12,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["sourceUrl", "allowExcerptRetention", "sensitivity", "basis"],
+            "properties": {
+              "sourceUrl": {
+                "type": "string",
+                "format": "uri",
+                "maxLength": 2000
+              },
+              "allowExcerptRetention": {
+                "type": "boolean"
+              },
+              "sensitivity": {
+                "enum": ["public", "restricted", "unknown"]
+              },
+              "basis": {
+                "type": "string",
+                "minLength": 40,
+                "maxLength": 1000
+              }
+            }
           }
         }
       }
