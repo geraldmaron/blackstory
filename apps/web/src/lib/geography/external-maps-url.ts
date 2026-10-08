@@ -40,10 +40,12 @@ export function buildExternalMapsSearchUrl(input: ExternalMapsSearchInput): stri
 
 /** Google Maps directions URL from the user's current location. */
 export function buildExternalMapsDirectionsUrl(input: ExternalMapsSearchInput): string | undefined {
-  const destination = buildMapsHandoffQuery(input);
-  if (!destination) {
-    return undefined;
-  }
+  const destination =
+    input.query?.trim() ||
+    (isFiniteCoord(input.lat) && isFiniteCoord(input.lng)
+      ? `${input.lat},${input.lng}`
+      : undefined);
+  if (!destination) return undefined;
   return `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(destination)}`;
 }
 
@@ -74,10 +76,8 @@ export function buildAppleMapsDirectionsUrl(input: ExternalMapsSearchInput): str
     return undefined;
   }
   const params = new URLSearchParams();
-  // A prose destination routes to the address; coordinates alone route to the point. When both
-  // exist the address wins for routing (it is what a driver needs) and `ll` disambiguates.
-  params.set('daddr', trimmed && trimmed.length > 0 ? trimmed : `${input.lat},${input.lng}`);
-  if (trimmed && hasCoords) params.set('ll', `${input.lat},${input.lng}`);
+  // Use one documented destination. Map framing parameters do not bind a routing destination.
+  params.set('daddr', trimmed || `${input.lat},${input.lng}`);
   // No travel mode: Google's link sets none, and the reader picks walking, transit or driving in
   // the app. Forcing driving (`dirflg=d`) made the two "Directions" exits disagree.
   return `https://maps.apple.com/?${params.toString()}`;
