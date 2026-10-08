@@ -197,10 +197,8 @@ export type WeightChangeApproval = {
 };
 
 /**
- * The explicit, separate human-approval step (mirrors proposer-never-approver pattern
- * for promotion, packages/domain/src/promotion/controls.js's evaluatePromotionGate
- * proposer_approver_conflict check, and packages/operator-cli/src/promotion-boundary.test.ts's
- * proof shape). Throws if:
+ * The separate human-approval step for relevance-weight changes. This control is specific
+ * to tuning the ranking policy; canonical-record promotion has its own authority gate. Throws if:
  * - approvedBy is empty or equal to the proposal's proposedBy (same identity proposing and
  * approving is exactly the conflict this function exists to prevent);
  * - the gold-corpus gate did not pass.

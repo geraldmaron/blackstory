@@ -77,17 +77,16 @@ infra/database/sql-connect/dataconnect/.dataconnect/
 packages/data-access/generated/*/
 !packages/data-access/generated/README.md
 
-# .claude/ — machine-local Claude Code config (hooks, launch config, synced
-# skill libraries). Never source, except the carve-out below.
+# Project skill source lives in .agents/skills. Other .agents state is local.
+.agents/*
+!.agents/skills/
+
+# .claude/ — machine-local config, except links to the shared project skills.
 .claude/*
-# Exception: BlackStory research skills are committed source (CLI pointers and
-# judgment playbooks under `.claude/skills/blackstory/`).
-# (A gitignored parent dir can't be re-included by a child negation, so this
-# un-ignores .claude/ contents one level at a time down to the carve-out.)
 !.claude/skills/
 .claude/skills/*
-!.claude/skills/blackstory/
-!.claude/skills/research-framework/
+!.claude/skills/blackstory-*
+!.claude/skills/research-framework
 .codex/
 .cursor/
 .vscode/
@@ -109,9 +108,8 @@ plan.md
 
 # Construct — generated adapters, launcher, and runtime state.
 # Machine-specific, recreated by `construct sync`; never source (ADR-0027).
-# `.claude/` contents stay ignored by the block above, except the
-# `.claude/skills/blackstory/` carve-out. Do not re-ignore `.claude/` here;
-# a later `.claude/` rule would hide the committed research skills.
+# `.claude/` contents stay ignored by the block above, except project skill
+# discovery links. Do not re-ignore the parent directory here.
 .construct/
 # Anchored to the repo root on purpose. As a bare `inbox/` this rule matched EVERY directory
 # named inbox at any depth, which silently kept `apps/web/src/app/admin/inbox/` — a real admin

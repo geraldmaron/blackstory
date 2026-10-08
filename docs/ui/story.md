@@ -154,7 +154,7 @@ this document continues to govern site chrome and microcopy (and, below, the
 Staged `/stories` articles use the **research linking method** from strong oral
 storytelling — start-line relocation, omitted actors, winner-built tests — without
 importing viral rhetorical costume. Skill reference:
-`.claude/skills/blackstory/story-craft/SKILL.md`. Packets use
+`.agents/skills/blackstory-story-craft/SKILL.md`. Packets use
 `story.research.packet.v1`; human approval maps an approved packet onto
 `packages/domain/src/publication/public-story-seed.ts` (publication is
 Postgres-backed). Nothing auto-publishes. Every published

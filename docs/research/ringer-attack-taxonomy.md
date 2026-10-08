@@ -1,6 +1,6 @@
 # Ringer review: attack taxonomy and case evidence
 
-**Status:** research memo backing `.claude/skills/blackstory/ringer-review/`.
+**Status:** research memo backing `.agents/skills/blackstory-ringer-review/`.
 Not binding on its own; the skill is the binding playbook. This memo records
 the evidence base: which attacks on comparable work landed, which bounced, and
 why. Compiled 2026-08-21 from fetched sources (URLs at bottom).

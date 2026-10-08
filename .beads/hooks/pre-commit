@@ -42,10 +42,17 @@ fi
 # staged files here instead, where it costs a second and the fix is one command.
 # Staged-file scope keeps this fast; `--ignore-unknown` skips anything Prettier can't parse and
 # `.prettierignore` is still honored. Set SKIP_PRETTIER=1 to bypass in an emergency.
+# Match Prettier's tree walk: skip symbolic links, which its explicit-path mode rejects.
+# A changed link target is checked under its own staged path.
 # NOTE: this reads files from the worktree, not the index, so a partially staged file
 # (`git add -p`) is judged on its full contents. ---
 if [ -z "$SKIP_PRETTIER" ]; then
-  _staged_files=$(git diff --cached --name-only --diff-filter=ACMR)
+  _staged_files=$(git diff --cached --name-only --diff-filter=ACMR |
+    while IFS= read -r _staged_file; do
+      if [ ! -L "$_staged_file" ]; then
+        printf '%s\n' "$_staged_file"
+      fi
+    done)
   if [ -n "$_staged_files" ]; then
     if ! printf '%s' "$_staged_files" | tr '\n' '\0' \
       | xargs -0 npx --no-install prettier --check --ignore-unknown; then

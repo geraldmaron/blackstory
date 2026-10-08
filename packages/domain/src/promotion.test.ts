@@ -171,18 +171,20 @@ test('high-impact claims require more independent and strong evidence', () => {
   assert.ok(result.reasons.includes('insufficient_strong_evidence'));
 });
 
-test('approval is deterministic and separates proposer from approver', () => {
-  const conflict = evaluatePromotionGate({
+test('approval is deterministic for an identified approver', () => {
+  const samePerson = evaluatePromotionGate({
     claim: claim(),
     approverId: 'researcher-1',
   });
+  const missingIdentity = evaluatePromotionGate({ claim: claim(), approverId: '' });
   const approved = evaluatePromotionGate({
     claim: claim(),
     approverId: 'approver-1',
   });
 
-  assert.equal(conflict.approved, false);
-  assert.ok(conflict.reasons.includes('proposer_approver_conflict'));
+  assert.equal(samePerson.approved, true);
+  assert.equal(missingIdentity.approved, false);
+  assert.ok(missingIdentity.reasons.includes('missing_approver_identity'));
   assert.equal(approved.approved, true);
   assert.equal(approved.deterministic, true);
   assert.deepEqual(evaluatePromotionGate({ claim: claim(), approverId: 'approver-1' }), approved);

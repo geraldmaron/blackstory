@@ -12,18 +12,18 @@ traceable relationships. Black history is its primary domain profile. Thoroughne
 important questions, alternative explanations, source gaps, and contradictions were examined
 within explicit bounds. It does not mean searching forever or producing more fluent prose.
 
-| Capability | Current implementation | Limit |
-|---|---|---|
-| Portable contracts | `@repo/research-kernel`: JSON Schema, generated TypeScript/Python, profiles | Shared TS/Python malformed-input fixtures enforce the same JSON Schema boundary |
-| Source acquisition | CLI search routing, safe-fetch, adapter inputs, source capture | Provider availability and storage permission must be configured explicitly |
-| Generic harness input | `harness-run --subjects`, `--url`, explicit file-backed adapters | Extracts proposals; durable execution uses `research-run` and `research-work` |
-| Claim/edge extraction | Strict schemas, exact quote and cited-record attachment | Attachment is not entailment; model confidence is uncalibrated; review remains required |
-| Graph discovery | `expand`, catalog traversal, cross-reference/shared-source/adjacency candidate generators | Wikidata statement ranks, qualifiers and references survive staging; cross-source resolution and graph evaluation need work |
-| Research planning | `enrich-entity`, maturity deficits, kernel needs/frontier policy | Plans and executes bounded acquisition; reviewed evidence alone can raise maturity |
-| Preservation | `capture-backfill`, safe fetch, Supabase capture sink, Wayback lookup and resumable SPN2 jobs, explicit retention/disposal | Local metadata is not a full archived page; current release citations have no measured capture overlap or production Wayback pointers |
-| Evidence retrieval | Private capture passages, full text + pgvector/RRF, exact selectors, model/text revision checks | 768 dimensions; small live pilot measured retrieval recall with substantial false positives; representative-scale quality remains unproven |
-| Headless use | Immutable run manifests, scoped leases, dependencies, attempt reservations, accounting and proposal artifacts | Built-in acquisition/model execution and external lease handoff; automatic model admission requires independent evaluation |
-| Scheduling | Job registry, worker entry points, manual Actions dispatch | No research schedule should be active; no Corsair dependency |
+| Capability            | Current implementation                                                                                                     | Limit                                                                                                                                      |
+| --------------------- | -------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
+| Portable contracts    | `@repo/research-kernel`: JSON Schema, generated TypeScript/Python, profiles                                                | Shared TS/Python malformed-input fixtures enforce the same JSON Schema boundary                                                            |
+| Source acquisition    | CLI search routing, safe-fetch, adapter inputs, source capture                                                             | Provider availability and storage permission must be configured explicitly                                                                 |
+| Generic harness input | `harness-run --subjects`, `--url`, explicit file-backed adapters                                                           | Extracts proposals; durable execution uses `research-run` and `research-work`                                                              |
+| Claim/edge extraction | Strict schemas, exact quote and cited-record attachment                                                                    | Attachment is not entailment; model confidence is uncalibrated; review remains required                                                    |
+| Graph discovery       | `expand`, catalog traversal, cross-reference/shared-source/adjacency candidate generators                                  | Wikidata statement ranks, qualifiers and references survive staging; cross-source resolution and graph evaluation need work                |
+| Research planning     | `enrich-entity`, maturity deficits, kernel needs/frontier policy                                                           | Plans and executes bounded acquisition; reviewed evidence alone can raise maturity                                                         |
+| Preservation          | `capture-backfill`, safe fetch, Supabase capture sink, Wayback lookup and resumable SPN2 jobs, explicit retention/disposal | Local metadata is not a full archived page; current release citations have no measured capture overlap or production Wayback pointers      |
+| Evidence retrieval    | Private capture passages, full text + pgvector/RRF, exact selectors, model/text revision checks                            | 768 dimensions; small live pilot measured retrieval recall with substantial false positives; representative-scale quality remains unproven |
+| Headless use          | Immutable run manifests, scoped leases, dependencies, attempt reservations, accounting and proposal artifacts              | Built-in acquisition/model execution and external lease handoff; automatic model admission requires independent evaluation                 |
+| Scheduling            | Job registry, worker entry points, manual Actions dispatch                                                                 | No research schedule should be active; no Corsair dependency                                                                               |
 
 The [audit evidence](./framework-audit.md) records observations and source research. Do not infer
 production readiness from a schema, test fixture, function name, or an old statement of completion.
@@ -47,6 +47,10 @@ production readiness from a schema, test fixture, function name, or an old state
    the exact assertion and whether its scope, dates, participants, and language match.
 8. Review identity and each edge independently. Stage proposals with unresolved blockers.
    Draft prose from accepted evidence only. Publication remains a separate authorized operation.
+   Apply the [prose fact protocol](../methodology/chapter-fact-validation.md) to summaries,
+   context, captions and excerpts as well as structured claims. Bind the editorial review
+   to the exact final wording and recheck factual edits. Current claim-review code does
+   not certify unstructured prose.
 9. Stop on fulfilled needs and measured diminishing information gain, or report a budget/access
    stop with unfinished needs. A cap is not a finding of completeness. Persist the handoff.
 
@@ -159,10 +163,58 @@ captures without an origin link need a custody review; their storage references 
 orphan deletion. Hash-only or excerpt-only rows do not prove full-page recoverability, and
 archiving does not establish truth.
 
-## Skills and comments
+## Skills and harness portability
 
-Judgment playbooks under `.claude/skills/blackstory/` specialize this method. CLI pointer skills
-link to operations rather than duplicating flags. Any model can begin with this document and the
-CLI; no particular chat product is required. Skills describe the decision to make and its evidence
+The canonical skills are plain Agent Skills folders at
+`.agents/skills/<skill-name>/SKILL.md`: `research-framework` and the `blackstory-*` playbooks.
+Each folder matches its frontmatter name. The method, CLI pointers and review rules have
+one maintained source; `.claude/skills/<skill-name>` contains only relative directory
+symlinks to it. Do not fork the content into harness-specific versions.
+
+These are repository skills, not standalone bundles: keep the BlackStory checkout and its
+linked documentation available. Start commands from the checkout root. Markdown links resolve
+relative to the skill file; bare repository paths resolve from the checkout root.
+
+### Loading the same skill in another harness
+
+- A harness that discovers `.agents/skills/` can load these folders directly. Codex documents
+  this repository location. Claude Code discovers the same source through the committed links.
+- For a configurable skill loader, point it at `.agents/skills/` and index each folder's
+  `SKILL.md` name and description. Read the selected body and its relevant references on demand.
+- Without skill discovery, give the harness the file explicitly. For example:
+  “Read `.agents/skills/blackstory-claim-corroborate/SKILL.md` and apply it to this claim.”
+  No slash command, model family, proprietary tool name or orchestration service is required.
+- If a checkout or host cannot follow symlinks, read the real `.agents/skills/` files directly.
+  Folder-only uploads need their referenced repository material too. Copying a single manifest
+  into an isolated sandbox does not make the workflow executable.
+
+### Capabilities and permissions
+
+Map the procedure to the harness's actual capabilities: file access for instructions and
+evidence; source retrieval for fresh verification; a shell with the repository toolchain for
+operator commands; authorized providers/data access for execution; browser or device access
+for live experience checks. Use the existing CLI contracts and safe retrieval boundaries.
+The host supplies tools, secrets and approval enforcement; a skill supplies none of them.
+
+When a capability is missing, perform the supported review, identify the blocked step and
+carry the evidence and unresolved needs forward. Do not fabricate retrieval, bypass a gate,
+substitute model memory for source inspection, or claim a live check passed. A skill name
+does not grant publication authority or authorize external changes, model spend or delegation.
+Discovery equivalence also does not prove equal behavior across models or harnesses; evaluate
+that separately using the documented research and development cases.
+
+Format/discovery references inspected 2026-10-07:
+[Agent Skills specification](https://agentskills.io/specification),
+[OpenAI skill discovery](https://learn.chatgpt.com/docs/build-skills), and
+[Claude Code project skills and symlinks](https://code.claude.com/docs/en/skills#choose-where-skills-load).
+
+Judgment playbooks specialize the research method. CLI pointer skills link to
+operations rather than duplicating flags. Skills describe the decision to make and its evidence
 requirements. They must not silently publish, invent sources, infer approval requirements beyond
 the user's authorization, or turn one failure/example into a universal rule.
+
+For factual and editorial skill changes, use the [development review cases](skill-review-cases.md)
+and the [evaluation-family limits](gold-corpus.md). The
+[2026-10-07 audit](skill-audit-2026-10-07.md) records observed errors, scope and remaining controls.
+Interface changes use `blackstory-experience-review` and the UI pattern catalog; a precise
+claim still fails readers if its qualifier or source cannot be reached on mobile.

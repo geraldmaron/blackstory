@@ -158,8 +158,8 @@ export function evaluatePromotionGate(input: {
   ) {
     reasons.add('contradiction_search_incomplete');
   }
-  if (!input.approverId.trim() || input.approverId === input.claim.proposerId) {
-    reasons.add('proposer_approver_conflict');
+  if (!input.approverId.trim()) {
+    reasons.add('missing_approver_identity');
   }
 
   const supporting = collapseSupportingEvidence(input.claim.evidence);

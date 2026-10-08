@@ -20,6 +20,10 @@ The research kernel supports domain profiles, a durable task ledger, evidence-at
 private passage retrieval, and rights-aware preservation. [Operations](./docs/research/research-operations.md)
 explains headless commands and their verification limits. Scheduling remains available but uninstalled.
 
+Project skills are harness-independent [Agent Skills](https://agentskills.io/specification)
+under `.agents/skills/`. See [loading and requirements](./docs/research/README.md#skills-and-harness-portability)
+to use the same research, prose and experience playbooks from another harness.
+
 ## What we build
 
 - A **public map and catalog** of historical records, with precision and evidence visible
@@ -42,6 +46,7 @@ Public clients read released projections only. Anonymous clients never write can
 | `apps/mobile` | Expo mobile app (isolated npm lockfile) |
 | `workers/*` | Python research, publication, and security workers |
 | `packages/*` | Shared TypeScript libraries |
+| `.agents/skills/` | Canonical project skills shared by agent harnesses |
 | `supabase/` | Postgres migrations and Supabase project config for `blackstory-app` |
 | `infra/*` | GitHub governance and optional service-control configuration |
 | `docs/` | Current architecture, research, security, testing, and runbooks |

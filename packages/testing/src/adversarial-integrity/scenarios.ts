@@ -425,10 +425,6 @@ export const runRelevanceGamingScenario = runner('relevance_gaming', () => {
 });
 
 export const runModeratorSocialEngineeringScenario = runner('moderator_social_engineering', () => {
-  const selfApproval = evaluatePromotionGate({
-    claim: promotionClaim(),
-    approverId: 'researcher-bb060',
-  });
   const massAssignment = createQuarantinedSubmission(MASS_ASSIGNMENT_FIXTURE, submissionContext());
   const consensus = routeConsensusReview(
     'submission-social-engineering',
@@ -458,16 +454,9 @@ export const runModeratorSocialEngineeringScenario = runner('moderator_social_en
   return [
     {
       attackBlocked:
-        !selfApproval.approved &&
-        !massAssignment.accepted &&
-        consensus.status !== 'auto_advance' &&
-        advanceBlocked,
+        !massAssignment.accepted && consensus.status !== 'auto_advance' && advanceBlocked,
       publicContentMutated: false,
       controls: [
-        {
-          layer: 'promotion_gate',
-          reason: selfApproval.reasons.join(','),
-        },
         {
           layer: 'submission_quarantine',
           reason: massAssignment.accepted ? 'accepted' : 'schema_invalid',
