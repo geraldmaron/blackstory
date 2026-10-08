@@ -229,8 +229,6 @@ export function normalizeClaim(value: unknown): Claim | null {
   // Neither has a sane fallback — a claim with no body text isn't renderable as a claim.
   if (!id || !object) return null;
 
-  const score = num(value.confidenceScore);
-  const confidenceScore = score === undefined ? 0 : Math.min(1, Math.max(0, score));
   // Fail toward the LEAST reassuring label on malformed data, never the most.
   const confidenceLevel: ConfidenceLevel = enumOr(value.confidenceLevel, CONFIDENCE_LEVELS, 'low');
 
@@ -250,7 +248,6 @@ export function normalizeClaim(value: unknown): Claim | null {
     id,
     predicate: str(value.predicate, MAX_SHORT_TEXT, 'Claim'),
     object,
-    confidenceScore,
     confidenceLevel,
     ...(normalizeCitation(value.citation) ? { citation: normalizeCitation(value.citation) } : {}),
     ...(lineageCount !== undefined

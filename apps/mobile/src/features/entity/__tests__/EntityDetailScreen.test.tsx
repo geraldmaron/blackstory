@@ -160,8 +160,8 @@ describe('EntityDetailScreen — adversarial content cases', () => {
       <EntityDetailScreen state={readyState(fullEntityFixture('place'))} />,
     );
     expect(getByText('Preserved contradiction')).toBeTruthy();
-    expect(getByText(/1869 — Contradicting/)).toBeTruthy();
-    expect(getByText(/1872 — Alternative \(not independently credible\)/)).toBeTruthy();
+    expect(getByText(/1869: Contradicting/)).toBeTruthy();
+    expect(getByText(/1872: Alternative \(not independently credible\)/)).toBeTruthy();
   });
 
   it('renders a maliciously large narrative promptly, truncated to the contract bound', async () => {

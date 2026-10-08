@@ -79,3 +79,8 @@ test('drops internal-only sourceLineage/reviewer/coverage-notes fields on parse 
     assert.ok(!(forbiddenKey in parsed), `${forbiddenKey} must not survive parsing`);
   }
 });
+
+test('accepts qualitative evidence without a fabricated numerical score', () => {
+  const { confidenceScore: _legacy, ...claim } = VALID_CLAIM;
+  assert.equal(claimV1Schema.parse(claim).confidenceScore, undefined);
+});

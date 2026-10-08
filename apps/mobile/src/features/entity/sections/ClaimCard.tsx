@@ -3,24 +3,16 @@
  * citation (or a "no source" fallback for the adversarial "claim with no citation" case), a
  * preserved-contradiction
  * notice whose alternates are ALWAYS rendered alongside the primary value (never silently
- * resolved — the whole point of `dispute` being part of the public contract), revision history,
+ * resolved: the whole point of `dispute` being part of the public contract), revision history,
  * and a retraction notice. Mirrors web's `EvidenceCard.tsx` section-for-section.
  *
- * The evidence line used to be a large confidence pill next to the sentence "Evidence score: high
- * (0.85 of 1.00)" — the word "high" printed twice, in two type sizes, for one fact. It is now the
- * shared meter with its grade letter, then the number, on one line. The full sentence still goes
- * to assistive tech, where bars say nothing.
+ * Evidence uses the stored qualitative label; legacy numeric scores are not displayed.
  */
 import { StyleSheet, View } from 'react-native';
 import { evidenceLabel } from '@repo/public-contracts/evidence';
 import { Notice, RecordMeter, Text, space } from '@/ui';
 import { CitationLink } from '../CitationLink';
-import {
-  formatEvidenceScoreLabel,
-  formatEvidenceScoreValue,
-  formatIsoDate,
-  humanizeToken,
-} from '../format';
+import { formatEvidenceScoreLabel, formatIsoDate, humanizeToken } from '../format';
 import type { Claim } from '../types';
 import { SectionHeading } from './SectionHeading';
 
@@ -49,9 +41,6 @@ export function ClaimCard({ claim, isOnline }: ClaimCardProps) {
         <Text variant="caption" colorRole="inkMuted">
           {evidenceLabel(claim.confidenceLevel)}
         </Text>
-        <Text variant="code" colorRole="inkSubtle">
-          {formatEvidenceScoreValue(claim.confidenceScore)}
-        </Text>
       </View>
 
       {claim.citation ? (
@@ -76,7 +65,7 @@ export function ClaimCard({ claim, isOnline }: ClaimCardProps) {
         <View style={{ gap: space['1'] }}>
           {claim.dispute.alternates.map((alt, index) => (
             <Text key={`${claim.id}_alt_${index}`} variant="bodySmall" colorRole="inkMuted">
-              {alt.value} — {humanizeToken(alt.kind)}
+              {alt.value}: {humanizeToken(alt.kind)}
               {alt.credible ? '' : ' (not independently credible)'}
             </Text>
           ))}
@@ -90,7 +79,7 @@ export function ClaimCard({ claim, isOnline }: ClaimCardProps) {
           </Text>
           {claim.revisionHistory.map((entry) => (
             <Text key={entry.id} variant="bodySmall" colorRole="inkMuted">
-              {humanizeToken(entry.changeKind)} — {entry.summary} ({formatIsoDate(entry.changedAt)})
+              {humanizeToken(entry.changeKind)}: {entry.summary} ({formatIsoDate(entry.changedAt)})
             </Text>
           ))}
         </View>

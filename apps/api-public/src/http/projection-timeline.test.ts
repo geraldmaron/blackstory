@@ -87,3 +87,22 @@ describe('mapProjectionToEntityV1 timeline', () => {
     assert.equal(entity.timeline[0]?.at, new Date('1977-06-14').toISOString());
   });
 });
+
+it('does not manufacture numeric confidence from a public evidence tier', () => {
+  const entity = mapProjectionToEntityV1(
+    projection({
+      claims: [
+        {
+          id: 'claim-1',
+          predicate: 'documented_site',
+          object: 'Documented in the cited record.',
+          confidenceLevel: 'low',
+          citationSource: 'Archive',
+          citationLabel: 'Record',
+        },
+      ],
+    }),
+  );
+  assert.ok(entity);
+  assert.equal(entity.claims[0]?.confidenceScore, undefined);
+});

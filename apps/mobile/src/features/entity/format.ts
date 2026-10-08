@@ -1,33 +1,13 @@
-/**
- * Presentation-only string helpers for the entity detail screen (MOB-014).
- *
- * `formatEvidenceScoreLabel` and `humanizeToken` are deliberate, wording-exact ports of web's
- * `apps/web/src/lib/evidence/confidence-language.ts` / `apps/web/src/lib/evidence/format.ts` —
- * this bead's brief is explicit that mobile must "check the web's actual label strings and
- * match them, don't invent new wording." Every other function here (date/precision formatting)
- * is new to mobile because the wire shape it formats (`DatePrecision`, `FreshnessSignal`) has no
- * direct web equivalent to copy from.
- */
+import { evidenceLabel } from '@repo/public-contracts/evidence';
+/** Presentation helpers for dates, citations and qualitative evidence labels. */
 import type { ConfidenceLevel, DatePrecision } from './types';
 
-const CONFIDENCE_LEVEL_TEXT: Readonly<Record<ConfidenceLevel, string>> = {
-  high: 'high',
-  medium: 'medium',
-  low: 'low',
-};
-
-/**
- * Ported verbatim from web's `formatEvidenceScoreLabel` (uncalibrated path only — the public
- * contract's `claim.confidenceScore`/`confidenceLevel` are always the deterministic,
- * level-derived nominal score per `claim.ts`'s own doc comment, never a calibrated probability,
- * so the `calibrated: true` branch web supports has no real caller here and is intentionally
- * omitted). Produces e.g. "Evidence score: high (0.78 of 1.00)" — a score, never framed as a
- * probability that the claim is true.
- */
-export function formatEvidenceScoreLabel(score: number, level: ConfidenceLevel): string {
-  const bounded = Number.isFinite(score) ? Math.min(1, Math.max(0, score)) : 0;
-  const rounded = bounded.toFixed(2);
-  return `Evidence score: ${CONFIDENCE_LEVEL_TEXT[level]} (${rounded} of 1.00)`;
+/** The public evidence label is qualitative; legacy scores never imply measurement. */
+export function formatEvidenceScoreLabel(
+  _score: number | undefined,
+  level: ConfidenceLevel,
+): string {
+  return `Evidence: ${evidenceLabel(level)}`;
 }
 
 /** `"reputable_secondary"` -> `"Reputable Secondary"`. Ported verbatim from
@@ -39,18 +19,6 @@ export function humanizeToken(value: string): string {
     .split('_')
     .map((word) => (word.length > 0 ? word.charAt(0).toUpperCase() + word.slice(1) : word))
     .join(' ');
-}
-
-/**
- * The score on its own: `"0.85 of 1.00"`.
- *
- * The full sentence from `formatEvidenceScoreLabel` names the level as well, and a claim row that
- * shows the meter, the grade word AND that sentence says "high" three times. The sentence still
- * goes to assistive tech, where the bars mean nothing; the visible line takes the number only.
- */
-export function formatEvidenceScoreValue(score: number): string {
-  const bounded = Number.isFinite(score) ? Math.min(1, Math.max(0, score)) : 0;
-  return `${bounded.toFixed(2)} of 1.00`;
 }
 
 /**

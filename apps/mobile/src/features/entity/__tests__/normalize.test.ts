@@ -269,3 +269,15 @@ describe('normalizeEntity — evidence inputs and citing stories', () => {
     expect(normalizeEntity(raw)!.citingStories).toBeUndefined();
   });
 });
+
+it('does not create missing scores or display legacy nominal scores', () => {
+  for (const confidenceScore of [undefined, 0.85]) {
+    const claim = normalizeClaim({
+      id: 'claim',
+      object: 'A documented assertion.',
+      confidenceLevel: 'high',
+      confidenceScore,
+    });
+    expect(claim?.confidenceScore).toBeUndefined();
+  }
+});
