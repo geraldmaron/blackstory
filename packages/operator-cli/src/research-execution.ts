@@ -375,8 +375,10 @@ export async function completeResearchTask(
     const workerInput =
       spec.input.executor === 'builtin' ? assertContract('ResearchWorkerInput', spec.input) : null;
     const deterministicStep =
-      workerInput !== null &&
-      (workerInput.operation !== 'synthesize' || workerInput.model === null);
+      (workerInput !== null &&
+        (workerInput.operation !== 'synthesize' || workerInput.model === null)) ||
+      (spec.input.executor === 'management' &&
+        ['search', 'acquire'].includes(String(spec.input.action)));
     if (plan.run.mode !== 'deterministic' && !deterministicStep && !model && !executionFailure)
       throw new Error('Model provenance is required for this execution mode');
     if (model && policy.requiresBenchmark)
@@ -422,7 +424,8 @@ export async function completeResearchTask(
       if (
         spec.outputContract === 'SubjectExtraction' ||
         spec.outputContract === 'RelationshipHypothesisExtraction' ||
-        spec.outputContract === 'ResearchTaskReport'
+        spec.outputContract === 'ResearchTaskReport' ||
+        spec.outputContract === 'ManagementProposal'
       ) {
         const sources: HarnessRawSubject[] = [];
         if (spec.input.source)
@@ -455,7 +458,21 @@ export async function completeResearchTask(
               throw new Error('Source retention permission expired before synthesis');
           }
         }
-        if (spec.outputContract === 'SubjectExtraction') {
+        if (spec.outputContract === 'ManagementProposal') {
+          const proposal = assertContract('ManagementProposal', output);
+          for (const change of proposal.changes) {
+            for (const assertion of change.assertions)
+              for (const evidence of assertion.evidence) {
+                assertQuoteAttached(
+                  { citationUrl: evidence.sourceUrl, quote: evidence.quote },
+                  sources,
+                );
+                const source = sources.find((source) => source.cites.includes(evidence.sourceUrl));
+                if (source?.rawRecord.contentHash !== evidence.contentHash)
+                  throw new Error('Proposal evidence does not match the acquired source revision');
+              }
+          }
+        } else if (spec.outputContract === 'SubjectExtraction') {
           const extraction = assertContract('SubjectExtraction', output);
           for (const claim of extraction.claims) assertQuoteAttached(claim.evidence, sources);
           if (new Set(extraction.claims.map((claim) => claim.id)).size !== extraction.claims.length)

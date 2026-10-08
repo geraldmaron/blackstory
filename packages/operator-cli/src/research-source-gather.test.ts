@@ -149,3 +149,14 @@ test('gatherSourceSnippetsFromUrls drops blanks and non-http URLs without fetchi
   assert.equal(requested.length, 1);
   assert.equal(snippets.length, 1);
 });
+
+test('drafting receives relevant body text beyond the short discovery excerpt', () => {
+  const body =
+    'Navigation '.repeat(80) +
+    'The school opened in September 1924. ' +
+    'Building history '.repeat(30);
+  const source = wrapPrefetchedSourceSnippet('https://example.org/history', body);
+  assert.ok(source);
+  assert.ok(!source.excerpt.includes('September'));
+  assert.match(formatGatheredSourceSnippet(source), /September 1924/);
+});

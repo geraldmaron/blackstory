@@ -2215,7 +2215,9 @@
             "RelationshipHypothesisExtraction",
             "ResearchSearchResult",
             "ResearchTaskReport",
-            "ResearchAcquisitionResult"
+            "ResearchAcquisitionResult",
+            "ManagementProposal",
+            "ManagementResearchPlan"
           ]
         },
         "maxAttempts": {
@@ -2637,6 +2639,466 @@
           }
         }
       ]
+    },
+    "ManagementProposal": {
+      "type": "object",
+      "properties": {
+        "summary": {
+          "type": "string",
+          "minLength": 1
+        },
+        "interpretation": {
+          "type": "string",
+          "minLength": 1
+        },
+        "changes": {
+          "minItems": 0,
+          "maxItems": 25,
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "entityId": {
+                "type": "string",
+                "minLength": 1
+              },
+              "operation": {
+                "type": "string",
+                "enum": ["create", "update"]
+              },
+              "beforeHash": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "pattern": "^[a-f0-9]{64}$"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "record": {
+                "type": "object",
+                "properties": {
+                  "entityId": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "displayName": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "aliases": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "minLength": 1
+                    }
+                  },
+                  "summary": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 600
+                  },
+                  "jurisdiction": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "topicIds": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "minLength": 1
+                    }
+                  },
+                  "topicTags": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "minLength": 1
+                    }
+                  },
+                  "eraBuckets": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "minLength": 1
+                    }
+                  },
+                  "location": {
+                    "type": "object",
+                    "properties": {
+                      "lat": {
+                        "type": "number"
+                      },
+                      "lng": {
+                        "type": "number"
+                      },
+                      "label": {
+                        "type": "string",
+                        "minLength": 1
+                      },
+                      "precision": {
+                        "type": "string",
+                        "minLength": 1
+                      },
+                      "matchMethod": {
+                        "type": "string",
+                        "minLength": 1
+                      },
+                      "zip": {
+                        "type": "string",
+                        "minLength": 1
+                      },
+                      "accessNote": {
+                        "type": "string",
+                        "minLength": 1
+                      }
+                    },
+                    "required": ["lat", "lng", "label", "precision", "matchMethod"],
+                    "additionalProperties": false
+                  },
+                  "sources": {
+                    "minItems": 1,
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "url": {
+                          "type": "string",
+                          "format": "uri"
+                        },
+                        "title": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "excerpt": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "fitness": {
+                          "type": "string",
+                          "enum": ["authoritative", "strong", "weak"]
+                        },
+                        "locationOnly": {
+                          "type": "boolean"
+                        }
+                      },
+                      "required": ["url", "title", "excerpt", "fitness"],
+                      "additionalProperties": false
+                    }
+                  }
+                },
+                "required": [
+                  "entityId",
+                  "displayName",
+                  "summary",
+                  "jurisdiction",
+                  "topicIds",
+                  "topicTags",
+                  "eraBuckets",
+                  "sources"
+                ],
+                "additionalProperties": false
+              },
+              "assertions": {
+                "minItems": 1,
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "statement": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "finding": {
+                      "type": "string",
+                      "enum": ["supported", "qualified", "disputed", "insufficient"]
+                    },
+                    "reasoning": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "evidence": {
+                      "minItems": 1,
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "sourceUrl": {
+                            "type": "string",
+                            "format": "uri"
+                          },
+                          "title": {
+                            "type": "string",
+                            "minLength": 1
+                          },
+                          "locator": {
+                            "type": "string",
+                            "minLength": 1
+                          },
+                          "quote": {
+                            "type": "string",
+                            "minLength": 1
+                          },
+                          "contentHash": {
+                            "type": "string",
+                            "pattern": "^[a-f0-9]{64}$"
+                          },
+                          "retrievedAt": {
+                            "type": "string",
+                            "format": "date-time",
+                            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$"
+                          },
+                          "fitness": {
+                            "type": "string",
+                            "enum": ["authoritative", "strong", "conditional"]
+                          },
+                          "fitnessReason": {
+                            "type": "string",
+                            "minLength": 1
+                          },
+                          "lineage": {
+                            "type": "string",
+                            "minLength": 1
+                          },
+                          "limitations": {
+                            "type": "array",
+                            "items": {
+                              "type": "string",
+                              "minLength": 1
+                            }
+                          }
+                        },
+                        "required": [
+                          "sourceUrl",
+                          "title",
+                          "locator",
+                          "quote",
+                          "contentHash",
+                          "retrievedAt",
+                          "fitness",
+                          "fitnessReason",
+                          "lineage",
+                          "limitations"
+                        ],
+                        "additionalProperties": false
+                      }
+                    },
+                    "counterevidenceSearch": {
+                      "type": "string",
+                      "minLength": 1
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "statement",
+                    "finding",
+                    "reasoning",
+                    "evidence",
+                    "counterevidenceSearch"
+                  ],
+                  "additionalProperties": false
+                }
+              },
+              "sentenceClaims": {
+                "minItems": 1,
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "sentence": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "assertionIds": {
+                      "minItems": 1,
+                      "type": "array",
+                      "items": {
+                        "type": "string",
+                        "minLength": 1
+                      }
+                    }
+                  },
+                  "required": ["sentence", "assertionIds"],
+                  "additionalProperties": false
+                }
+              },
+              "identityReview": {
+                "type": "string",
+                "minLength": 1
+              },
+              "proseReview": {
+                "type": "string",
+                "minLength": 1
+              },
+              "rightsReview": {
+                "type": "string",
+                "minLength": 1
+              },
+              "reviewBasis": {
+                "type": "string",
+                "enum": ["self_review", "independent_review"]
+              },
+              "reviewerActorId": {
+                "type": "string",
+                "minLength": 1
+              },
+              "producerActorId": {
+                "type": "string",
+                "minLength": 1
+              },
+              "blockers": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "omissions": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "before": {
+                "type": ["object", "null"],
+                "properties": {
+                  "displayName": {
+                    "type": "string"
+                  },
+                  "summary": {
+                    "type": "string"
+                  }
+                },
+                "required": ["displayName", "summary"],
+                "additionalProperties": false
+              }
+            },
+            "required": [
+              "entityId",
+              "operation",
+              "beforeHash",
+              "record",
+              "assertions",
+              "sentenceClaims",
+              "identityReview",
+              "proseReview",
+              "rightsReview",
+              "reviewBasis",
+              "reviewerActorId",
+              "producerActorId",
+              "blockers",
+              "omissions"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "held": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "subject": {
+                "type": "string",
+                "minLength": 1
+              },
+              "reason": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "required": ["subject", "reason"],
+            "additionalProperties": false
+          }
+        },
+        "researchRunIds": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      },
+      "required": ["summary", "interpretation", "changes", "held", "researchRunIds"],
+      "additionalProperties": false,
+      "anyOf": [
+        {
+          "properties": {
+            "changes": {
+              "type": "array",
+              "minItems": 1
+            }
+          }
+        },
+        {
+          "properties": {
+            "held": {
+              "type": "array",
+              "minItems": 1
+            }
+          }
+        }
+      ]
+    },
+    "ManagementResearchPlan": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["interpretation", "subjects", "queries", "limitations"],
+      "properties": {
+        "interpretation": {
+          "type": "string",
+          "minLength": 1
+        },
+        "subjects": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 1,
+          "maxItems": 25
+        },
+        "queries": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 6,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["query", "seeking", "sourceFitnessReason", "counterevidence"],
+            "properties": {
+              "query": {
+                "type": "string",
+                "minLength": 1
+              },
+              "seeking": {
+                "type": "string",
+                "minLength": 1
+              },
+              "sourceFitnessReason": {
+                "type": "string",
+                "minLength": 1
+              },
+              "counterevidence": {
+                "type": "boolean"
+              }
+            }
+          }
+        },
+        "limitations": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
     }
   }
 }

@@ -16,6 +16,7 @@ function normalizeAdminEmail(value: string): string {
 
 export type VerifiedSupabaseAdminIdentity = {
   readonly uid: string;
+  readonly clientId?: string;
   readonly email: string;
   readonly app_role: StaffRole;
   readonly app_metadata: {
@@ -33,6 +34,7 @@ export type SupabaseUserVerifier = {
   getUser(accessToken: string): Promise<{
     readonly data: { readonly user: SupabaseAuthUserRecord | null };
     readonly error: { readonly message: string } | null;
+    readonly clientId?: string;
   }>;
 };
 
@@ -94,7 +96,7 @@ export function createSupabaseSessionAuthorizer(verifier: SupabaseUserVerifier) 
       headers: AdminRequestHeaders,
     ): Promise<SupabaseSessionAuthorizedAdmin> {
       const accessToken = requireBearerAccessToken(headers);
-      const { data, error } = await verifier.getUser(accessToken);
+      const { data, error, clientId } = await verifier.getUser(accessToken);
 
       if (error || !data.user) {
         throw new SupabaseSessionAuthorizationError(
@@ -128,6 +130,7 @@ export function createSupabaseSessionAuthorizer(verifier: SupabaseUserVerifier) 
       return {
         admin: {
           uid: data.user.id,
+          ...(clientId ? { clientId } : {}),
           email: normalizedEmail,
           app_role: appRole,
           app_metadata: { app_role: appRole },

@@ -28,6 +28,10 @@ export type PostgresReleaseStoreTransaction = {
   get(key: string): Promise<Readonly<Record<string, unknown>> | undefined>;
   upsert(key: string, payload: Readonly<Record<string, unknown>>): void;
   delete(key: string): void;
+  syncPublicationPointer?(
+    pointer: ActiveReleasePointer,
+    manifest: MobileBootstrapManifest,
+  ): Promise<void>;
 };
 
 export type PostgresReleaseStoreBackend = {
@@ -213,7 +217,15 @@ export async function syncPublicationPointerRow(
   options: SyncPublicationPointerOptions,
 ): Promise<void> {
   const { client, pointer, manifest } = options;
-  const manifestHash = manifestHashFromStamp(manifest.releaseStamp);
+  const existingRelease = await client.query<{ signed_manifest: Record<string, unknown> }>(
+    'SELECT signed_manifest FROM publication.releases WHERE id=$1 FOR UPDATE',
+    [pointer.activeReleaseId],
+  );
+  const signed = existingRelease.rows[0]?.signed_manifest;
+  const manifestHash =
+    typeof signed?.manifestHash === 'string'
+      ? signed.manifestHash
+      : manifestHashFromStamp(manifest.releaseStamp);
   const searchIndexVersion = manifest.searchIndexVersion ?? manifest.activeRelease.releaseId;
 
   await client.query(
@@ -222,7 +234,7 @@ export async function syncPublicationPointerRow(
      VALUES ($1, 'active', $2::jsonb, $3, $4::timestamptz, now())
      ON CONFLICT (id) DO UPDATE SET
        status = 'active',
-       signed_manifest = EXCLUDED.signed_manifest,
+       signed_manifest = publication.releases.signed_manifest || jsonb_build_object('mobileBootstrap',EXCLUDED.signed_manifest->'mobileBootstrap'),
        search_index_version = EXCLUDED.search_index_version,
        activated_at = EXCLUDED.activated_at,
        updated_at = now()`,
@@ -341,6 +353,7 @@ export function createPostgresReleaseStore(
           );
         }
         manifest = parseStoredReleaseDoc(releaseValue).manifest;
+        await transaction.syncPublicationPointer?.(next, manifest);
       });
 
       if (syncPublication && manifest) {
@@ -350,10 +363,14 @@ export function createPostgresReleaseStore(
   };
 }
 
-export function createPoolPostgresReleaseStoreBackend(pool: pg.Pool): PostgresReleaseStoreBackend {
+export function createPoolPostgresReleaseStoreBackend(
+  pool: pg.Pool,
+  transactionClient?: pg.PoolClient,
+): PostgresReleaseStoreBackend {
+  const reader = transactionClient ?? pool;
   return {
     async read(key) {
-      const result = await pool.query<{ payload: unknown }>(
+      const result = await reader.query<{ payload: unknown }>(
         `SELECT payload FROM published.materialized_snapshots WHERE name = $1 LIMIT 1`,
         [key],
       );
@@ -365,7 +382,7 @@ export function createPoolPostgresReleaseStoreBackend(pool: pg.Pool): PostgresRe
     },
 
     async listKeys(prefix) {
-      const result = await pool.query<{ name: string }>(
+      const result = await reader.query<{ name: string }>(
         `SELECT name FROM published.materialized_snapshots WHERE name LIKE $1 ORDER BY name`,
         [`${prefix}%`],
       );
@@ -373,11 +390,11 @@ export function createPoolPostgresReleaseStoreBackend(pool: pg.Pool): PostgresRe
     },
 
     async delete(key) {
-      await pool.query(`DELETE FROM published.materialized_snapshots WHERE name = $1`, [key]);
+      await reader.query(`DELETE FROM published.materialized_snapshots WHERE name = $1`, [key]);
     },
 
     async runTransaction(operation) {
-      const client = await pool.connect();
+      const client = transactionClient ?? (await pool.connect());
       const pending: Array<
         | {
             readonly kind: 'upsert';
@@ -387,8 +404,13 @@ export function createPoolPostgresReleaseStoreBackend(pool: pg.Pool): PostgresRe
         | { readonly kind: 'delete'; readonly key: string }
       > = [];
       try {
-        await client.query('BEGIN');
+        if (!transactionClient) await client.query('BEGIN');
+        await client.query(
+          "SELECT pg_advisory_xact_lock(hashtextextended('publication-release-pointer',0))",
+        );
         const transaction: PostgresReleaseStoreTransaction = {
+          syncPublicationPointer: async (pointer, manifest) =>
+            syncPublicationPointerRow({ client, pointer, manifest }),
           get: async (key) => {
             const result = await client.query<{ payload: unknown }>(
               `SELECT payload FROM published.materialized_snapshots WHERE name = $1 FOR UPDATE`,
@@ -421,42 +443,26 @@ export function createPoolPostgresReleaseStoreBackend(pool: pg.Pool): PostgresRe
             [write.key, JSON.stringify(write.payload)],
           );
         }
-        await client.query('COMMIT');
+        if (!transactionClient) await client.query('COMMIT');
         return result;
       } catch (error) {
         try {
-          await client.query('ROLLBACK');
+          if (!transactionClient) await client.query('ROLLBACK');
         } catch {
           // ignore rollback errors
         }
         throw error;
       } finally {
-        client.release();
+        if (!transactionClient) client.release();
       }
     },
   };
 }
 
 /** Production store: materialized_snapshots + published.active_release sync on pointer flip. */
-export function createPoolPostgresReleaseStore(pool: pg.Pool): PostgresReleaseStore {
-  const backend = createPoolPostgresReleaseStoreBackend(pool);
-  return createPostgresReleaseStore(backend, {
-    async syncPublicationPointer(pointer, manifest) {
-      const client = await pool.connect();
-      try {
-        await client.query('BEGIN');
-        await syncPublicationPointerRow({ client, pointer, manifest });
-        await client.query('COMMIT');
-      } catch (error) {
-        try {
-          await client.query('ROLLBACK');
-        } catch {
-          // ignore rollback errors
-        }
-        throw error;
-      } finally {
-        client.release();
-      }
-    },
-  });
+export function createPoolPostgresReleaseStore(
+  pool: pg.Pool,
+  transactionClient?: pg.PoolClient,
+): PostgresReleaseStore {
+  return createPostgresReleaseStore(createPoolPostgresReleaseStoreBackend(pool, transactionClient));
 }

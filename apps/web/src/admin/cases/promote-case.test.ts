@@ -217,7 +217,7 @@ test('a record failing content validation is rejected before any query runs', as
   await assert.rejects(
     () =>
       promoteCaseToCanonical(
-        promoteInput({ record: promotionRecord({ summary: 'too short' }) }),
+        promoteInput({ record: promotionRecord({ summary: '   ' }) }),
         dependencies,
       ),
     (error: unknown) => {

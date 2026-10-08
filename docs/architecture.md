@@ -41,7 +41,7 @@ or in the owning contract. Update existing authoritative prose instead of adding
 | `packages/research-kernel` | Generic schemas, profiles, validation, priority and stopping rules |
 | `packages/research-harness` | Source adaptation, candidate signals, evidence-attached extraction |
 | `packages/operator-cli` | Explicit research commands, safe retrieval, providers, persistence adapters |
-| `packages/operator-mcp` | Read tools; not a complete research executor |
+| `packages/operator-mcp` | Read tools and experimental account-owned management clients; hosted/client acceptance remains unproven |
 | `packages/domain-core`, `packages/domain` | Identity, claims, lineage, discovery and publication rules |
 | `packages/data-access`, `packages/ops-data` | Postgres access and operator data workflows |
 | `workers/*` | Explicit worker adapters for research, publication and security |

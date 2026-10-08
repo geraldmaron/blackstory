@@ -19,7 +19,7 @@
   "scripts": {
     "build": "tsc -p tsconfig.json",
     "typecheck": "tsc -p tsconfig.json --noEmit",
-    "test": "node --conditions development --import tsx --test src/tools/*.test.ts src/errors.test.ts",
+    "test": "node --conditions development --import tsx --test src/tools/*.test.ts src/errors.test.ts src/management.test.ts",
     "lint": "echo 'lint: use root pnpm lint'",
     "start": "node --conditions development --import tsx src/bin.ts"
   },
@@ -27,7 +27,8 @@
     "@modelcontextprotocol/sdk": "^1.29.0",
     "@repo/domain": "workspace:*",
     "pg": "^8.16.3",
-    "zod": "^3.25.76"
+    "zod": "^3.25.76",
+    "@repo/ops-data": "workspace:*"
   },
   "devDependencies": {
     "@repo/typescript-config": "workspace:^",

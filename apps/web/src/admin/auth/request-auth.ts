@@ -36,7 +36,28 @@ function supabaseVerifierFromEnv(
   });
   return {
     async getUser(accessToken: string) {
-      return client.auth.getUser(accessToken);
+      const result = await client.auth.getUser(accessToken);
+      if (result.error || !result.data.user) return result;
+      const claims = await client.auth.getClaims(accessToken);
+      if (claims.error || !claims.data)
+        return { data: { user: null }, error: { message: 'Token claims could not be verified' } };
+      const payload = claims.data.claims;
+      const audiences = Array.isArray(payload.aud) ? payload.aud : [payload.aud];
+      if (
+        payload.iss !== `${url.replace(/\/$/u, '')}/auth/v1` ||
+        !audiences.includes('authenticated')
+      )
+        return { data: { user: null }, error: { message: 'Token issuer or audience is invalid' } };
+      const clientId = payload.client_id;
+      if (
+        typeof clientId === 'string' &&
+        !(environment.BLACKSTORY_MCP_ALLOWED_CLIENT_IDS ?? '')
+          .split(',')
+          .map((id) => id.trim())
+          .includes(clientId)
+      )
+        return { data: { user: null }, error: { message: 'This agent client is not enabled' } };
+      return { ...result, ...(typeof clientId === 'string' ? { clientId } : {}) };
     },
   };
 }
@@ -60,6 +81,11 @@ export function createAdminRouteAuthorizer(verifier: SupabaseUserVerifier) {
     async authorize(request: Request): Promise<ResolvedAdminCaller> {
       const caller = callerFrom(await sessions.assertAuthenticated(request.headers));
       const { pathname } = new URL(request.url);
+      if (caller.admin.clientId && !pathname.startsWith('/admin/api/work'))
+        throw new SupabaseSessionAuthorizationError(
+          'ADMIN_SESSION_INVALID',
+          'Agent access is restricted to management work',
+        );
       const access = findAdminRouteAccess(request.method, pathname);
       if (!access) {
         throw new AdminRouteUndeclaredError(request.method, pathname);

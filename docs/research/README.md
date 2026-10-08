@@ -28,6 +28,16 @@ within explicit bounds. It does not mean searching forever or producing more flu
 The [audit evidence](./framework-audit.md) records observations and source research. Do not infer
 production readiness from a schema, test fixture, function name, or an old statement of completion.
 
+## One request and one approval
+
+Manage ordinary owner requests end to end: infer a bounded scope, reuse existing records and
+sources, research identity and counterevidence, review each factual sentence, then present one
+concise proposal. Approval belongs to the exact displayed changes and includes publication.
+Avoid asking the owner to coordinate internal commands or repeat an existing authorization.
+The durable inbox and remote clients are experimental; see [management operations](./research-operations.md#account-owned-management-work)
+for deployment prerequisites and limits. No mobile/client compatibility is implied by the
+presence of an MCP endpoint. Research is not complete until its usable outcome is verified.
+
 ## One research loop
 
 1. Define the question, domain profile, scope, sensitivity, and the decision the answer informs.

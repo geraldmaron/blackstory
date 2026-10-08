@@ -559,3 +559,92 @@ Opened during this work; technical references inform decisions without proving c
 - Root-cause debugging: the row-hash comparison failed with local `extra_float_digits=1` and passed with the observed source setting `0`; no row data was changed to make hashes match.
 - Residual risk: native iOS execution is deferred; preservation of the remaining 7,912 inventory URLs, the unresolved no-job-id local reservation and representative-scale quality evidence remain explicit.
 - Commit-and-PR: PR254 merged at `2026-09-19T05:23:38Z` as SHA `e0a6faf07393f79aeab0629b6b9ac2952d421d6a`; remote CI checks 35423567775 and 35423567804 passed. The final web fixes are on staging SHA `6f96a2b7d7362a22a19c9300502518e2fa325095`; API `dpl_693wvmnFYhFzVNgnWWo1AAg6Q6or` and web `dpl_4U8WcqP5bGJpgp71dfz1YhH4VwMQ` passed their production canaries.
+
+## Management implementation verification, 2026-10-08
+
+VERDICT: Needs validation. Shared-context self-review; no independent review is claimed.
+
+The implementation carries account-owned work through bounded research, exact proposals,
+selection approval, immutable artifact upload and public readback. The strongest alternative
+remains a small hosted inbox over the existing ledger; the new HTTP, CLI and MCP paths use the
+same store rather than maintaining separate chat state. The delivery remains a draft.
+
+1. **Strongest failure mode, serious:** a saved request is mistaken for an accepted background
+   job. Dispatch is persisted before the external call, failures stay visible, leases prevent
+   duplicate work, and retry is explicit. Hosted credential configuration and an actual
+   closed-session run remain unverified. No deployed continuation claim is justified.
+2. **Best alternative:** repository-only automation avoids new OAuth and remote authorization
+   boundaries, but cannot satisfy device independence. The hosted inbox remains the recommended
+   direction, conditional on the deployment and client demonstrations.
+3. **Load-bearing claims, serious:** local PostgreSQL tests establish owner isolation, duplicate
+   submission/dispatch, lease exclusion, stale approval denial, immutable decisions, revoked
+   delegation denial, research-role write denial, retained approvals, partial release and
+   verification retry. External storage/read endpoints in publisher tests are simulated.
+   Actual school delivery, mobile release compatibility and resource-bound OAuth remain unproven.
+4. **Assumption inversion, serious:** sources need not already have retention decisions, and a
+   summary correction may require superseding old claims. The current worker holds unreviewed
+   source retention, and the publisher cannot supersede claims or revise locations. These are
+   functional gaps in ordinary research, not evidence that the work is complete.
+5. **Who bears the cost:** the owner still bears unresolved rights assessment and client setup;
+   readers bear unsupported prose or stale projections. Exact sentence/evidence attachment,
+   self-review labels, preserved unrelated data and failed-readback status reduce these risks
+   but do not establish historical entailment or an independently reviewed narrative.
+6. **Hostile expert, serious:** a historian can still challenge model conclusions; an operator
+   can challenge unsigned mobile derivatives, stored excerpt expiry, catalog-size upload time
+   and the lack of a real phone-to-production run. Production enablement stays blocked until
+   these acceptance gaps are resolved and exercised.
+
+Check: Local repository CI across the changed paths.
+Command: `fnm exec --using=22 -- ./scripts/ci-local.sh --base origin/staging`
+Result: pass on the final full run (2026-10-08).
+Observed: all selected lanes passed, including workspace tests, Python, contracts/security/a11y,
+build/typecheck, governance and security policy. This is not a live-client demonstration.
+
+Check: Fresh database migration replay.
+Command: `python3 /tmp/blackstory-management-replay.py`
+Result: pass.
+Observed: schema-only rehearsal baseline through all subsequent repository migrations, including
+the management migration, applied to a new isolated database. No production migration was applied.
+
+Check: Actual database work and publication behavior.
+Command: `python3 /tmp/blackstory-management-test.py` and `python3 /tmp/blackstory-publication-test.py`
+Result: pass.
+Observed: ownership/authorization/revision tests passed; publication preserved unrelated content,
+held an unapproved record, retried failed readback without repeating writes, then published the
+remaining approved record. Additional checks denied publication after owner-role revocation and
+rolled back canonical writes and activation after an artifact upload failure. HTTP storage and
+public boundaries were simulated. All-held proposals require a stated reason, cannot be approved,
+and can be held or returned to research.
+
+Outcome: Send a request from a phone, close the session, review and approve elsewhere, and get
+verified live school records.
+Surface: hosted workflow, remote clients, admin inbox, public web/API/native projections.
+Data: local fixtures only in this implementation pass.
+Observed: local protocol and database behavior verified. After the owner authorized 1Password, the actual local inbox loaded with authenticated
+API reads. Review/hold and request submission persisted in the isolated database; failed dispatch
+was shown honestly. Phone width (390px), desktop (1280px), both themes, focus and evidence
+disclosures were exercised. No horizontal overflow or browser errors were observed. Hosted
+execution and production publishing were not run.
+Verdict: not proven. Do not merge or enable this as the completed management experience.
+
+
+Check: Authenticated inbox against an isolated PostgreSQL database.
+Command: `python3 /tmp/blackstory-management-ui-auth.py` through the existing environment launcher.
+Result: pass.
+Observed: review at 390px in light/dark themes and 1280px desktop, evidence disclosure, visible
+keyboard focus, persisted hold, and actual request submission. Missing dispatch configuration
+returned a saved-request error rather than claiming research started. Reviewed screenshots exposed
+blue dark-theme links and a pale footer label; both were corrected and the flow rerun. Fixtures
+were explicitly labeled test data. This is web UI verification, not native-device verification.
+
+
+Final review follow-up: the inbox now permits selecting blocked records for corrections or hold,
+while keeping their approval disabled. The attempted authenticated UI rerun after this last control
+change failed before sign-in because 1Password returned `promptError`. The earlier authenticated
+UI observations above remain valid for their tested revision; this final control change has static
+validation only. No new production session or data write occurred in the failed rerun.
+
+The final full CI run passed every selected lane. The subsequent publication-test additions passed
+against the isolated database; the touched inbox and test files were checked again with the web
+lint/typecheck commands. This draft still requires the hosted, client and school acceptance work
+above. Schema, security-boundary and publication review was shared-context self-review.

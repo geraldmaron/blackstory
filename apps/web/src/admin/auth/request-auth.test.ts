@@ -161,3 +161,22 @@ test('authErrorResponse does not expose unexpected provider errors', async () =>
   const body = (await response.json()) as { error: string };
   assert.equal(body.error, 'Unauthorized');
 });
+
+test('verified agent clients are restricted to management routes even with an admin owner', async () => {
+  const owner = verifierForRole('admin');
+  const authorizer = createAdminRouteAuthorizer({
+    async getUser(token) {
+      return { ...(await owner.getUser(token)), clientId: 'allowed-client' };
+    },
+  });
+  const caller = await authorizer.authorize(adminRequest('GET', '/admin/api/work'));
+  assert.equal(caller.admin.clientId, 'allowed-client');
+  await assert.rejects(
+    authorizer.authorize(adminRequest('GET', '/admin/api/auth/me')),
+    /restricted to management/,
+  );
+  await assert.rejects(
+    authorizer.authorize(adminRequest('POST', '/admin/api/catalog/bulk-decision')),
+    /restricted to management/,
+  );
+});

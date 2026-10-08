@@ -1,0 +1,87 @@
+/* Admin review follows the shared brand tokens and disclosure patterns. */
+.work-inbox {
+  max-width: 52rem;
+  padding-block: 1.5rem;
+}
+.work-inbox a {
+  color: var(--ds-accent);
+  text-decoration: underline;
+  text-underline-offset: 0.15em;
+}
+.work-inbox > header {
+  margin-block-start: 0;
+}
+.work-inbox header,
+.work-inbox article,
+.work-inbox form {
+  margin-block: 1.5rem;
+}
+.work-inbox textarea {
+  display: block;
+  width: 100%;
+  box-sizing: border-box;
+  margin-block: 0.5rem 1rem;
+  padding: 0.75rem;
+  color: var(--ds-ink);
+  background: var(--ds-surface);
+  border: 1px solid var(--ds-border);
+  border-radius: var(--ds-radius-sm);
+  font: inherit;
+}
+.work-inbox button {
+  min-height: 44px;
+  padding: 0.65rem 1rem;
+  font: inherit;
+  cursor: pointer;
+  color: var(--ds-ink);
+  background: var(--ds-surface);
+  border: 1px solid var(--ds-border);
+  border-radius: var(--ds-radius-sm);
+}
+.work-inbox button:disabled {
+  cursor: default;
+  opacity: 0.6;
+}
+.work-inbox :is(button, textarea, input, summary, a):focus-visible {
+  outline: 2px solid var(--ds-accent);
+  outline-offset: 3px;
+}
+.work-inbox__change {
+  border-block-start: 1px solid var(--ds-border);
+  padding-block: 1.5rem;
+  overflow-wrap: anywhere;
+}
+.work-inbox__change label {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  min-height: 44px;
+}
+.work-inbox__change input {
+  width: 1.25rem;
+  height: 1.25rem;
+  accent-color: var(--ds-accent);
+}
+.work-inbox__preview {
+  font-size: 1.125rem;
+  line-height: 1.7;
+}
+.work-inbox summary {
+  min-height: 44px;
+  align-content: center;
+  cursor: pointer;
+}
+.work-inbox blockquote {
+  margin-inline: 0;
+  border-inline-start: 2px solid var(--ds-border);
+  padding-inline: 1rem;
+}
+.work-inbox__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+.work-inbox pre {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}

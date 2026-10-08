@@ -764,3 +764,81 @@ a sourced address, evidence attachment, or campaign is actually ready.
 | `.agents/skills/blackstory-ringer-review`     | Adversarial factual and interpretive review                                |
 | `.agents/skills/blackstory-surface-triage`    | Projection/search/artifact disagreement                                    |
 | `.agents/skills/blackstory-experience-review` | Task-based web/native usability and evidence presentation                  |
+
+## Account-owned management work
+
+Implementation status: experimental, not a deployed service. The hosted acceptance run and
+third-party client sign-in have not been demonstrated. Use the existing operator workflows
+until the deployment prerequisites below are satisfied; never report a saved request as running.
+
+The default instruction is: manage the request end to end, infer a bounded scope, check existing
+records, research and challenge the evidence, and prepare changes. Ask only material blockers.
+Show one concise review. Explicit approval of the exact displayed revision authorizes application
+and publication; verify the public result before reporting completion. This instruction applies
+across harnesses; it does not rely on a particular model's memory or skill loader.
+
+The management store in `packages/ops-data/src/management/` owns requests, immutable proposals,
+decisions, session delegations, leases, and receipts. It reuses the research execution ledger and
+publication services. The HTTP routes at `/admin/api/work` and `/admin/api/work/:id` expose submit,
+list and get. Subroutes `decisions` and `retry` expose decisions and recovery. `/admin/work` is the
+account-owned review inbox. The response's `dispatched` flag and `work.dispatchStatus` distinguish
+successful dispatch from a saved request with a failed launch. The inbox remains the status source
+when a chat cannot receive notifications.
+
+`blackstory-work` is a remote client, separate from the existing operator CLI. Run
+`node --conditions development --import tsx packages/operator-cli/src/management-bin.ts --help`
+for its input forms. It reads `BLACKSTORY_MANAGEMENT_URL` and `BLACKSTORY_ACCESS_TOKEN`; use the
+existing secret launcher, never put a token in arguments or a file. Decisions include the current
+version, proposal hash, entity selection, session, reason, and idempotency key. Retry the same
+payload/key after transport failure. Changed content requires a new key and current review.
+
+The MCP server's management mode uses that same HTTP client when `BLACKSTORY_MANAGEMENT_URL`
+is set. Remote `/api/mcp` supplies request/list/get/decide/retry operations and a method resource.
+OAuth clients require the server allowlist and an active owner-granted session delegation to relay
+decisions. Delegations are managed through `/admin/api/work/delegations`, using the signed-in
+publishing owner. No client is advertised as integrated until its authentication, mobile tool
+availability, review and approval have actually been exercised. Resource-bound OAuth and consent
+setup remain deployment blockers; protocol-level tool tests alone are insufficient.
+
+### Hosted deployment prerequisites
+
+`management-work.yml` is on-demand only. It has research and publication phases and per-work
+concurrency without cancellation. The server needs `BLACKSTORY_WORK_DISPATCH_TOKEN`,
+`BLACKSTORY_WORK_REPOSITORY`, and `BLACKSTORY_WORK_REF`. Use a repository-scoped dispatch
+credential, never a broad personal credential. The workflow must exist on the repository's
+default branch before GitHub accepts workflow dispatch.
+
+Research needs `RESEARCH_DATABASE_URL`, `OPENROUTER_API_KEY`, `BRAVE_SEARCH_API_KEY`, and the
+`BLACKSTORY_RESEARCH_MODEL` variable. The worker verifies that its effective database role is
+`research_worker` and cannot write canonical entities or decisions. Its model provider has
+proposal authority only. A consumer chat subscription is not a background inference credential.
+Publication uses separate `PUBLICATION_DATABASE_URL`, Storage credentials, and the existing
+registered P-256 signing identity. The trusted public-key hash must match. Apply and verify the
+management migration before enabling routes or dispatch. Do not provision shared owner-level
+research database credentials and rely only on `SET ROLE` to limit them.
+
+### Supported scope and current limits
+
+The initial worker proposes place records and summary/classification changes. It searches at
+most six queries and twelve leads, under the existing standard budget, with at most two attempts
+per task. Scope expansion starts a separately bounded run. Unsupported entity kinds, relationship
+changes, article creation, claim supersession, and location revisions must be held explicitly.
+The publisher preserves existing claims and context; it does not yet correct their contradictions.
+An update requiring those changes cannot be certified as a completed correction.
+
+Source-library guidance extends `evidence.evidence_sources.research_guidance`: collection and
+coverage, suitable claims, search methods, limitations, provenance, preservation conditions.
+This guides discovery, not truth or blanket retention permission. Current acquisition requires
+an unexpired exact-URL preservation decision from `evidence.source_items.metadata`; net-new
+sources without that assessment remain held. Automatic rights assessment, collection seeding,
+and management-proposal excerpt disposal are unfinished. Do not claim unrestricted autonomous
+research or evidence preservation from this path.
+
+The publisher checks exact reviewed canonical baselines and current owner/delegation authority,
+builds a signed catalog release, uploads immutable artifacts, verifies bytes, and activates in one
+transaction. Public verification checks the entity API, page, search, and map. A failed readback
+is `verification_failed`; retry verifies the committed release without reapplying changes.
+Partial approval retains the rest for review. Existing signed mobile releases currently block
+this publisher until compatible mobile artifacts are integrated. Public API numeric confidence
+and full claim correction remain separate unresolved compatibility work. These limitations block
+production acceptance for Lincoln, Atlanta and Wilmington, even when local tests pass.

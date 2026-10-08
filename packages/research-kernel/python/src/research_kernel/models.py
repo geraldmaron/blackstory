@@ -434,7 +434,7 @@ class ResearchTaskSpec(ContractModel):
     evidenceNeedId: str | None
     dependsOn: list[str]
     input: dict[str, Any]
-    outputContract: Literal["HarnessSourceRecord", "SubjectExtraction", "RelationshipHypothesisExtraction", "ResearchSearchResult", "ResearchTaskReport", "ResearchAcquisitionResult"]
+    outputContract: Literal["HarnessSourceRecord", "SubjectExtraction", "RelationshipHypothesisExtraction", "ResearchSearchResult", "ResearchTaskReport", "ResearchAcquisitionResult", "ManagementProposal", "ManagementResearchPlan"]
     maxAttempts: int
     maxCostUsdPerAttempt: float
 
@@ -500,6 +500,19 @@ class ResearchWorkerModel(ContractModel):
 
 ResearchWorkerInput: TypeAlias = dict[str, Any] | dict[str, Any] | dict[str, Any]
 
+class ManagementProposal(ContractModel):
+    summary: str
+    interpretation: str
+    changes: list[dict[str, Any]]
+    held: list[dict[str, Any]]
+    researchRunIds: list[str]
+
+class ManagementResearchPlan(ContractModel):
+    interpretation: str
+    subjects: list[str]
+    queries: list[dict[str, Any]]
+    limitations: list[str]
+
 Budget.model_rebuild()
 RiskClassPolicy.model_rebuild()
 SourceFitnessRule.model_rebuild()
@@ -549,6 +562,8 @@ ResearchTaskLease.model_rebuild()
 PreservationDecision.model_rebuild()
 ResearchAcquisitionResult.model_rebuild()
 ResearchWorkerModel.model_rebuild()
+ManagementProposal.model_rebuild()
+ManagementResearchPlan.model_rebuild()
 
-CONTRACT_MODEL_NAMES = ("Budget", "RiskClassPolicy", "SourceFitnessRule", "ModelPolicy", "RetentionPolicy", "PublicationPolicy", "StoppingPolicy", "ResearchProfile", "SourcePolicy", "SourceItem", "Capture", "EvidenceSelector", "ClaimQualifiers", "ConfidenceAssessment", "ClaimStatement", "EvidenceAssignment", "ResearchCase", "ResearchQuestion", "Hypothesis", "EvidenceNeed", "FrontierTask", "EntityCandidate", "ResolutionDecision", "RelationshipStatement", "ResearchRun", "AgentActivity", "ModelInvocation", "InvalidModelOutput", "Artifact", "ReviewDecision", "ReleaseDecision", "SentenceCitation", "VerificationReport", "StoryResearchPacket", "RoCrateExport", "ResearchQuote", "ExtractedResearchClaim", "SubjectExtraction", "RelationshipHypothesisExtraction", "HarnessSourceRecord", "ResearchTaskSpec", "ResearchExecutionPlan", "ResearchSearchResult", "ResearchTaskReport", "ModelAccounting", "ResearchTaskLease", "PreservationDecision", "ResearchAcquisitionResult", "ResearchWorkerModel",)
+CONTRACT_MODEL_NAMES = ("Budget", "RiskClassPolicy", "SourceFitnessRule", "ModelPolicy", "RetentionPolicy", "PublicationPolicy", "StoppingPolicy", "ResearchProfile", "SourcePolicy", "SourceItem", "Capture", "EvidenceSelector", "ClaimQualifiers", "ConfidenceAssessment", "ClaimStatement", "EvidenceAssignment", "ResearchCase", "ResearchQuestion", "Hypothesis", "EvidenceNeed", "FrontierTask", "EntityCandidate", "ResolutionDecision", "RelationshipStatement", "ResearchRun", "AgentActivity", "ModelInvocation", "InvalidModelOutput", "Artifact", "ReviewDecision", "ReleaseDecision", "SentenceCitation", "VerificationReport", "StoryResearchPacket", "RoCrateExport", "ResearchQuote", "ExtractedResearchClaim", "SubjectExtraction", "RelationshipHypothesisExtraction", "HarnessSourceRecord", "ResearchTaskSpec", "ResearchExecutionPlan", "ResearchSearchResult", "ResearchTaskReport", "ModelAccounting", "ResearchTaskLease", "PreservationDecision", "ResearchAcquisitionResult", "ResearchWorkerModel", "ManagementProposal", "ManagementResearchPlan",)
 
