@@ -846,3 +846,37 @@ The final rerun with `--lane validate --lane unit-js-packages --lane unit-js-app
 passed every selected lane. Mobile formatting,
 typecheck, lint and all 1,272 tests passed, but the native tooling check still stops at the
 unaccepted Xcode license. No production promotion, migration or school publication is claimed.
+
+### Web release scope correction
+
+The owner explicitly deferred native release on 2026-10-08. Xcode license acceptance is not a
+production web/backend release gate. Hosted CI for `b0cbe414` completed successfully, including
+Workspace Checks, Workspace Tests, Mobile Checks, Python, security checks and both Vercel
+previews. Local native execution remains unverified; it does not negate those observed results.
+The web release uses the existing CI lane selection with `--skip mobile`, without changing or
+disabling the native validation commands. Production database and authenticated web checks remain
+required. This supersedes the earlier characterization of Xcode as a production release blocker.
+
+Production preflight still found `rel_20260918_dunbar_media_correction_001` with 4,210 entity
+projections and no management work table. Automatic approval review rejected the proposed inbox
+migration because it expands the existing admin backend's production privileges, including release
+activation. The owner then explicitly approved that privilege expansion and separately approved
+the retention disposal capability. The approved migrations were applied through Supabase and the
+repository filenames now match its recorded versions: `20261008201626`, `20261008201639`,
+`20261008201705` and `20261008201855`. There were no existing proposals to dispose. No alternate
+migration path was attempted during either approval hold.
+
+Check: Production migration permissions and retained catalog.
+Command: Supabase SQL readback of role membership, table/function privileges, management counts,
+active release and `research.dispose_expired_management_proposals(false)`.
+Result: pass.
+Observed: admin can enter research; research cannot enter admin or insert approvals; anonymous
+inbox reads are denied. Work/proposal counts and expired-proposal count were zero. The active
+catalog release was unchanged. Collection guidance populated 11 existing source registry rows.
+
+Check: Web/backend release validation with native release deferred.
+Command: `fnm exec --using=22 -- ./scripts/ci-local.sh --base origin/staging --skip mobile`.
+Result: pass after rerunning outside the filesystem sandbox.
+Observed: every selected lane passed. The first sandboxed attempt could not open local test
+sockets or write tool caches. The E2E harness was invoked but has no configured external base URL;
+actual deployed-surface checks remain a separate release requirement.
