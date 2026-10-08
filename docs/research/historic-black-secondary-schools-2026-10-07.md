@@ -26,7 +26,8 @@ The repository's `research-intake` preview was attempted against the official Li
 school page. Its DNS-pinned safe fetch returned `dns_resolution_failed`; it made no draft
 case or database write. The public sources below were opened through the available web
 research service. No source capture, private text retention, publication, graph change,
-or schedule was made by this run.
+or schedule was made by that initial Lincoln run. The later entity pass below created
+separate draft cases and captures.
 
 ## Kansas City: identity, building, and time
 
@@ -94,8 +95,8 @@ founding-year correction can be final.
 | --- | --- | --- |
 | **Sumner High School**, St. Louis, Missouri, 4248 Cottage Avenue | [NPS](https://home.nps.gov/articles/000/black-life-in-st-louis-during-reconstruction.htm) dates the institution to 1875 and describes earlier sites; the [district](https://sumner.slps.org/) shows the school operating at Cottage Avenue in 2026. Institution age and current building age are distinct. | Existing school `gap_sumner_high_school` and National Register place `nrhp-black-heritage-88000469`; reconcile before creating anything. |
 | **Paul Laurence Dunbar High School**, Little Rock, Arkansas, 1100 Wright Avenue | [NPS](https://www.nps.gov/places/paul-laurence-dunbar-high-school.htm) dates the building to 1929 and the end of high-school use to 1955. The [district](https://www.lrsd.org/o/dunbar/) identifies the current use as Dunbar Magnet Middle School. NPS documents both community achievement and unequal funding. | Existing `nrhp-black-heritage-80000782`; verify its status display against continued school use at a different grade level. Do not merge with D.C. Dunbar schools. |
-| **Booker T. Washington High School**, Atlanta, Georgia, 45 Whitehouse Drive SW | [City preservation record](https://www.atlantaga.gov/government/departments/city-planning/historic-preservation/property-district-information/booker-t-washington-high-school) and [Atlanta Public Schools](https://washington.atlantapublicschools.us/our-school) date opening to 1924. The city supports “first Black public secondary school in Atlanta”; the district makes a wider Georgia claim that needs a separate comparison. | No exact Atlanta school name appeared in the inspected live catalog name scan. Search aliases and location before drafting a new entity. Do not merge with Philadelphia, Mississippi, or Staunton, Virginia schools of the same name. |
-| **Howard High School**, Wilmington, Delaware, 401 East 12th Street | [NPS](https://www.nps.gov/brvb/getinvolved/partners.htm) ties travel to the segregated school to *Belton v. Gebhart* and confirms its present use as Howard High School of Technology. The [current school contact page](https://howard.nccvt.k12.de.us/apps/contact/) confirms the address. | No exact Howard High name appeared in the inspected live name scan; search aliases and NRHP ID before a new record. Keep the school distinct from Howard University. |
+| **Booker T. Washington High School**, Atlanta, Georgia, 45 Whitehouse Drive SW | [City preservation record](https://www.atlantaga.gov/government/departments/city-planning/historic-preservation/property-district-information/booker-t-washington-high-school) and [Atlanta Public Schools](https://washington.atlantapublicschools.us/our-school) date opening to 1924. The city supports “first Black public secondary school in Atlanta”; the district makes a wider Georgia claim that needs a separate comparison. | The later identity check found no matching canonical record; a draft case and record proposal appear below. Do not merge with Philadelphia, Mississippi, or Staunton, Virginia schools of the same name. |
+| **Howard High School**, Wilmington, Delaware, 401 East 12th Street | [NPS](https://www.nps.gov/brvb/getinvolved/partners.htm) ties travel to the segregated school to *Belton v. Gebhart* and confirms its present use as Howard High School of Technology. The [current school contact page](https://howard.nccvt.k12.de.us/apps/contact/) confirms the address. | The later identity check found no matching canonical record; a draft case and record proposal appear below. The historic building site differs from the modern school's mailing address. |
 | **Robert Russa Moton High School**, Farmville, Virginia, 900 Griffin Boulevard | [Virginia DHR](https://www.dhr.virginia.gov/historic-registers/144-0053/) and the [NHL nomination](https://www.dhr.virginia.gov/wp-content/uploads/2023/03/144-0053_RobertRussaMotonHS_1994_Nomination_NHL.pdf) date the building to 1939 and the student strike to 23 April 1951; the site is now a museum. [NPS](https://www.nps.gov/brvb/getinvolved/partners.htm) confirms the 2025 affiliated-area designation. | Existing place `ent_moton_high_school_001` and separate strike event `ent_moton_high_school_student_strike_001`; keep site and event distinct, correct the place context. |
 
 These examples support a repeatable research pattern: record the **institution**, its
@@ -120,12 +121,103 @@ school or a shift between elementary, secondary, public, and privately supported
 education. This selected run did not establish a national priority order. The
 comparison is about documented campuses and different institutional paths.
 
-Self-review verdict: **revise** the identified catalog errors, **hold** any new
+Initial self-review verdict: **revise** the identified catalog errors, **hold** any new
 firstness wording and new entity proposals until duplicate and source checks are
-complete. The current packet is suitable for a scoped correction review. The next
+complete. The later pass below performed those checks. The packet is suitable for a
+scoped correction review. The next
 operator pass should use the existing record IDs, inspect the original claim/source
 rows and site plans, then run the standard publication preview. The research-intake
 DNS failure and absence of durable case IDs must be resolved before claiming an
 operator-ledger research run. Follow-up is tracked in `repo-pl8yw` (catalog
 corrections and release checks) and `repo-lmlid` (source capture, disputed
 founding date, and new-lead identity checks).
+
+## Entity proposal pass, 7 October 2026
+
+A read-only check of the live `canonical.entities` names, aliases, identifiers,
+and the active release found no Atlanta Booker T. Washington or Wilmington
+Howard school entry. National Register identifiers **86000437** and **85000309**
+were also absent. The matching Booker T. Washington High School record in the
+release (`nrhp-black-heritage-100006878`) is in **Philadelphia, Mississippi**;
+its name must not be used to merge the Atlanta site. The four other schools in
+this packet already had records. This is a targeted duplicate check, not proof
+that no differently named related entity exists anywhere in the catalog.
+
+Two draft cases now exist in the operator store: Atlanta
+`72a89557-945e-4385-90b4-05503de94f61` and Wilmington
+`c5a0c071-b48f-4577-8d1a-f7f1fce7f8e3`. The safe-fetch intake captured
+the Atlanta district page (`cap_7cc823fa3577555b`) and the NPS Howard partners
+page (`cap_a7b55c30f9b74cb7`). Five further source attachments were staged
+for review. Their intake status is `pending_review`; the two research cases
+remain `candidate`. The [exact proposed canonical records](./historic-black-school-entity-proposals-2026-10-07.json)
+pass `validateCanonicalPromotionRecord`, which tests shape and host count, not
+historical truth or authorization. No canonical or public entity was inserted.
+
+The Atlanta proposal uses the [1986 National Register nomination](https://npgallery.nps.gov/GetAsset/9814b816-e5bd-4513-8b58-415d397c5297)
+for the 1924 building and the [current school page](https://washington.atlantapublicschools.us/our-school)
+for present operation and address. The city preservation page repeats the
+nomination, so it is not counted as a third independent account. The Census
+address match for 45 Whitehouse Drive SW is `33.754226206663,
+-84.419939391463`; the proposed precision is `institution`.
+
+For Howard, the [National Historic Landmark nomination](https://npgallery.nps.gov/GetAsset/81caf24c-7dae-4316-8ada-a13a4d8647ce)
+places the historic building at the northeast corner of 13th and Poplar
+Streets. The [Delaware Public Archives account](https://archives.delaware.gov/2026/02/27/delawares-fight-for-school-desegregation-part-1/)
+separately documents the Claymont students' journeys and unequal conditions
+in *Belton v. Gebhart*. The nomination describes a **1927** building and a
+**February 1929 dedication**; a [state historical marker](https://archives.delaware.gov/delaware-historical-markers/howard-high-school/)
+says the new building opened in **1928**. The proposed short copy omits an
+opening year until those date types are reconciled. The current school's
+**401 East 12th Street** mailing address is different from the nominated
+building's street-corner description. Census could not match the intersection;
+it matched the state marker's 1301 Clifford Brown Walk address at
+`39.746614569487, -75.542095519286`. A marker point is not proof of a point
+inside the landmark's 0.7-acre building boundary. The proposed entity therefore
+has **no location**. The marker match remains a lead for boundary review, not a
+publishable pin.
+
+The strongest failure mode is letting the machine's two-host count certify
+independent historical works or letting a geocoded modern school address stand
+in for the nominated building. The viable alternative is a sparse record with
+only exact, reviewed claims, and a withheld or coarsened pin. Verdict:
+**accepted with controls** for the Atlanta draft; **accepted without a pin** for
+Howard's draft, with its opening date omitted. The promotion path now allows a
+minimum-record case without a location and records unassessed confidence and
+lineage honestly. The machine's two-host check is still only a host check;
+a reviewer must assess work-level independence. A separate research-role review must advance
+the cases; a different publication-role actor must promote any final record
+and activate a release. The proposing session cannot perform either approval.
+
+### Publication preview for the two new records
+
+| Check | Atlanta | Wilmington |
+| --- | --- | --- |
+| Identity and duplicate scan | Atlanta site distinguished by 45 Whitehouse Drive SW and NRIS 86000437; the same-name Mississippi record is separate. | Wilmington school distinguished by 13th and Poplar Streets and NRIS 85000309; Howard University is separate. |
+| Summary support | The nomination supports the 1924 opening and Black public secondary use; the operating district page supports the current name and address. Their historical accounts may share an underlying source. | The landmark nomination supports the historic building site and *Belton* connection; Delaware Public Archives supports the Claymont bus journey; NPS supports the current school name and continued use. Work-level source independence still needs review. |
+| Place and era | The nomination and district both give 45 Whitehouse Drive SW. Census matched the address at institution precision. The 1920s bucket comes from the school opening, not the 1986 listing. | The 1920s bucket describes the documented historic building; the 1950s bucket describes *Belton*. No coordinate is included until the landmark building boundary is checked. |
+| Release status | Draft case, candidate state; no canonical or public entity. | Draft case, candidate state; no canonical or public entity. |
+
+`validateCanonicalPromotionRecord` passes both proposed shapes. It verifies host
+count, format and broad coordinate bounds when a point exists; it cannot verify
+historical truth, work-level lineage, image/copy rights, or the proposed point's
+parcel. The remaining review must attach accepted evidence to each case's
+checklist, assess contradictions and rights, inspect the final wording, and
+preview the release claim diff. No image is proposed. The nomination's inaccurate
+Wilmington ZIP code is not carried into the draft.
+
+The current promotion route accepts `proposerId` in the request body and compares
+that caller-supplied string to the authenticated approver's UID. This does not
+prove that the approver differs from the actual proposer. The separate human
+review remains a procedural requirement, and publication must wait for a
+trusted-provenance fix (`repo-g19w2`) or an independently verified approval
+path. The source and location checks above do not settle this authority flaw.
+
+The Atlanta city page returned an Access Denied document to the CLI safe
+fetch while reporting `ok: true`. It was read through the web research service
+but was not used as the intake capture or counted as independent from its
+underlying nomination. The safe-fetch success semantics need a separate
+diagnostic check before relying on that page in a publication packet
+(`repo-4plsp`). The catalog lead matcher also has a Booker T. Washington
+shortcut to Tuskegee University and a name-only match that could absorb the
+Atlanta school into the Mississippi record. This pass used the live catalog
+identity check instead; matcher repair is tracked in `repo-tqhwr`.

@@ -16,7 +16,7 @@ test('evaluateCasePromotionGate refuses self-approval', () => {
   assert.ok(result.reasons.includes('proposer_approver_conflict'));
 });
 
-test('evaluateCasePromotionGate refuses a case that is not substantial_enrichment', () => {
+test('evaluateCasePromotionGate refuses a case without the minimum record', () => {
   const result = evaluateCasePromotionGate({
     caseState: 'relevance_confirmed',
     proposerId: 'operator-a',
@@ -27,12 +27,14 @@ test('evaluateCasePromotionGate refuses a case that is not substantial_enrichmen
 });
 
 test('evaluateCasePromotionGate approves a ready case with distinct proposer/approver', () => {
-  const result = evaluateCasePromotionGate({
-    caseState: 'substantial_enrichment',
-    proposerId: 'operator-a',
-    approverId: 'operator-b',
-  });
-  assert.deepEqual(result, { approved: true, reasons: [] });
+  for (const caseState of ['minimum_record', 'partial_enrichment', 'substantial_enrichment']) {
+    const result = evaluateCasePromotionGate({
+      caseState,
+      proposerId: 'operator-a',
+      approverId: 'operator-b',
+    });
+    assert.deepEqual(result, { approved: true, reasons: [] });
+  }
 });
 
 test('evaluateCasePromotionGate refuses blank identities', () => {
@@ -87,12 +89,12 @@ test('validateCanonicalPromotionRecord rejects a too-short summary', () => {
   assert.ok(result.reasons.includes('name_or_summary_invalid'));
 });
 
-test('validateCanonicalPromotionRecord rejects fewer than two independent source hosts', () => {
+test('validateCanonicalPromotionRecord rejects fewer than two distinct source hosts', () => {
   const result = validateCanonicalPromotionRecord({
     ...VALID_RECORD,
     sources: [VALID_RECORD.sources[0]!],
   });
-  assert.ok(result.reasons.includes('insufficient_independent_source_hosts'));
+  assert.ok(result.reasons.includes('insufficient_distinct_source_hosts'));
 });
 
 test('validateCanonicalPromotionRecord rejects two sources from the same host', () => {
@@ -103,7 +105,7 @@ test('validateCanonicalPromotionRecord rejects two sources from the same host', 
       { ...VALID_RECORD.sources[0]!, title: 'Source A2', excerpt: 'C'.repeat(80) },
     ],
   });
-  assert.ok(result.reasons.includes('insufficient_independent_source_hosts'));
+  assert.ok(result.reasons.includes('insufficient_distinct_source_hosts'));
 });
 
 test('validateCanonicalPromotionRecord rejects a non-https source', () => {
@@ -128,7 +130,7 @@ test('validateCanonicalPromotionRecord rejects a too-short excerpt', () => {
 test('validateCanonicalPromotionRecord rejects coordinates outside US bounds', () => {
   const result = validateCanonicalPromotionRecord({
     ...VALID_RECORD,
-    location: { ...VALID_RECORD.location, lat: 5, lng: 5 },
+    location: { ...VALID_RECORD.location!, lat: 5, lng: 5 },
   });
   assert.ok(result.reasons.includes('coordinates_outside_us_bounds'));
 });
@@ -154,4 +156,18 @@ test('validateCanonicalPromotionRecord ignores location-only sources for the ind
     ],
   });
   assert.deepEqual(result, { valid: true, reasons: [] });
+});
+
+test('validateCanonicalPromotionRecord accepts a sourced record without an invented pin', () => {
+  const { location: _location, ...record } = VALID_RECORD;
+  assert.deepEqual(validateCanonicalPromotionRecord(record), { valid: true, reasons: [] });
+});
+
+test('validateCanonicalPromotionRecord rejects location-only evidence without a location', () => {
+  const { location: _location, ...record } = VALID_RECORD;
+  const result = validateCanonicalPromotionRecord({
+    ...record,
+    sources: [...record.sources, { ...record.sources[0]!, locationOnly: true }],
+  });
+  assert.ok(result.reasons.includes('location_only_source_without_location'));
 });
