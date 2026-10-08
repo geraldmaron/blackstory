@@ -7,8 +7,8 @@
  * same one every other proposer (public submitter, adapter) uses.
  *
  * Invariant this module protects: an `OperatorIdentity` is a *proposer* identity only. It is
- * never accepted anywhere a `VerifiedAdminToken` (packages/ops-data/src/admin-auth.ts) or a
- * fresh-reauth approver identity is required see promotion-boundary.test.ts.
+ * not a `VerifiedAdminToken` (packages/ops-data/src/admin-auth.ts) or an authenticated
+ * publication-role identity. It cannot grant approval or activation authority.
  */
 import type { AuditActor } from '@repo/domain';
 

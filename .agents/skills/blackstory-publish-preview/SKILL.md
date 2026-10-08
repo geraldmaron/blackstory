@@ -9,13 +9,18 @@ Requires the BlackStory checkout. See [loading and capabilities](../../../docs/r
 for tool requirements and use from any harness.
 
 Judgment playbook. For a new release, prepare the preview and preserve the
-publication-role permission and evidence checks. A proposer may also publish after
-an explicit review of the final record; record the authenticated actor and reason.
+publication-role permission and evidence checks. A canonical-case proposer with the
+publication role may also promote the reviewed record; record the authenticated actor
+and reason. The separate research-artifact release SQL path still requires its
+reviewer and publisher each to differ from the producer; they may be the same person
+as each other. Do not apply the canonical-case rule to it.
 
 There is no `--publish` / `--approve` / `--promote` anywhere on operator-cli
-(`packages/operator-cli/src/promotion-boundary.test.ts`). Publication is a distinct
-publication-role action with a fresh (≤10 minute) reauth token. A long-running operator
-session never holds that token.
+(`packages/operator-cli/src/promotion-boundary.test.ts`). The web release route only
+stages a decision (`executionAllowed: false`); it does not activate a release.
+Fresh reauthentication within 10 minutes is a required operating control for activation,
+but the current admin route authorizer does not enforce it. Do not describe it as an
+implemented gate or activate through an unreviewed direct database call.
 
 ## Preview checklist
 

@@ -36,9 +36,22 @@ An excerpt match proves attachment, not entailment. Source labels, citation coun
 scores cannot substitute for reviewed evidence or establish calibration.
 
 Postgres persistence lives under `packages/ops-data/src/postgres/`. Canonical changes, audit
-entries and outbox messages commit transactionally. Release activation has a separate authority
-and signed-manifest gate. Verify effective grants and RLS under the actual operator role;
-function-level checks do not compensate for a broadly privileged worker credential.
+entries and outbox messages commit transactionally. Release activation has separate authority.
+The `@repo/data-access` generated-artifact path validates its manifest and artifact hashes before
+flipping the pointer. The direct `publication.activate_release` SQL function checks role and release
+existence but does not revalidate that content; do not use it as proof of a signed-manifest check.
+Verify effective grants and RLS under the actual operator role; function-level checks do not
+compensate for a broadly privileged worker credential.
+
+Canonical case promotion and research-artifact release have different actor rules. A
+publication-role user may promote a case they proposed after final review. The
+`publication.activate_research_release` SQL path still requires its reviewer and
+publisher each to differ from the producer; it does not require the reviewer and
+publisher to differ from each other. The admin release route currently stages a decision
+without activating it; the route authorizer does not enforce recent reauthentication.
+Fresh reauthentication remains an operating requirement for activation, not a verified
+runtime gate. Do not treat a staged response or a direct service-role database call as
+proof that this control ran.
 
 ## Deployment verification
 
