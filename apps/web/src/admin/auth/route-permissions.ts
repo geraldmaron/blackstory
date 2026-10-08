@@ -56,6 +56,7 @@ export const ADMIN_ROUTE_RULES: readonly AdminRouteRule[] = [
   // grants `publication:publish`.
   { method: 'POST', pattern: '/admin/api/releases/stage', access: 'publication:publish' },
   { method: 'POST', pattern: '/admin/api/research-cases/:id/assign', access: 'research:write' },
+  { method: 'POST', pattern: '/admin/api/research-cases/:id/checklist', access: 'research:write' },
   // Promotion turns a proposed record into a canonical one. It is an approver's act, which keeps
   // it away from `research:write` and the proposer who staged the case.
   {
