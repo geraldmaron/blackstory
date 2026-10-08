@@ -66,7 +66,12 @@ export function managementTokenClaimsAllowed(
   allowedClients: string,
 ): boolean {
   if (payload.iss !== `${issuerUrl.replace(/\/$/u, '')}/auth/v1`) return false;
-  const audiences = Array.isArray(payload.aud) ? payload.aud : [payload.aud];
+  if (
+    typeof payload.aud !== 'string' &&
+    !(Array.isArray(payload.aud) && payload.aud.every((audience) => typeof audience === 'string'))
+  )
+    return false;
+  const audiences: string[] = Array.isArray(payload.aud) ? payload.aud : [payload.aud];
   if (payload.client_id === undefined) return audiences.includes('authenticated');
   return (
     typeof payload.client_id === 'string' &&
@@ -75,7 +80,7 @@ export function managementTokenClaimsAllowed(
       .split(',')
       .map((id) => id.trim())
       .includes(payload.client_id) &&
-    audiences.includes('https://blackstory.app/api/mcp')
+    audiences.some((audience) => audience === 'https://blackstory.app/api/mcp')
   );
 }
 

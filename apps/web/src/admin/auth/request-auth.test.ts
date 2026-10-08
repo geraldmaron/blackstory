@@ -196,6 +196,20 @@ test('OAuth resource binding rejects other audiences and unapproved clients', ()
   const oauth = { ...base, aud: 'https://blackstory.app/api/mcp', client_id: 'client-one' };
   assert.equal(managementTokenClaimsAllowed(oauth, url, 'client-one'), true);
   assert.equal(
+    managementTokenClaimsAllowed({ ...oauth, aud: [oauth.aud] }, url, 'client-one'),
+    true,
+  );
+  for (const aud of [
+    `https://attacker.example/?resource=${oauth.aud}`,
+    `${oauth.aud}.attacker.example`,
+    [oauth.aud, null],
+    { includes: () => true },
+    null,
+    42,
+  ]) {
+    assert.equal(managementTokenClaimsAllowed({ ...oauth, aud }, url, 'client-one'), false);
+  }
+  assert.equal(
     managementTokenClaimsAllowed({ ...oauth, client_id: 'client-two' }, url, 'client-one'),
     false,
   );
