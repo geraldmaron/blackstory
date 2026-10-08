@@ -24,7 +24,7 @@ import { evaluateNotabilityGate } from '../relevance/notability-gate.js';
 import { evaluateFactPublishGate } from '../facts/publish-gate.js';
 import type { FactCitation } from '../facts/citation.js';
 import { isValidTopicId } from '../taxonomy/topics.js';
-import { buildGeoPointFields, type GeoPointFields } from '../geography/geohash.js';
+import { buildGeoPointFields } from '../geography/geohash.js';
 import { recordEvidenceInputs, type RecordEvidenceInputs } from '../evidence-inputs.js';
 import { publicVisitForTier, type PublicVisit } from '../geography/visit.js';
 import {
@@ -78,8 +78,8 @@ export type ReleaseSourceEntity = {
   readonly jurisdictionStateCode?: string;
   readonly locationPrecision: string;
   readonly locationLabel: string;
-  readonly lat: number;
-  readonly lng: number;
+  readonly lat?: number;
+  readonly lng?: number;
   readonly claims?: readonly ReleaseSourceClaim[];
   readonly historicalContext?: string;
   readonly impactStatement?: string;
@@ -207,7 +207,7 @@ export type ReleaseEntityProjectionFields = {
   readonly displayName: string;
   readonly nameLower: string;
   readonly summary: string;
-  readonly location: {
+  readonly location?: {
     readonly lat: number;
     readonly lng: number;
     readonly geohash: string;
@@ -1589,7 +1589,12 @@ export function buildReleaseEntityArtifacts(
   const lat = context.locationOverride?.lat ?? entry.lat;
   const lng = context.locationOverride?.lng ?? entry.lng;
 
-  const geoIntegrityGate = evaluateReleaseGeoIntegrityGate(entry, context, lat, lng);
+  const hasPoint = lat !== undefined && lng !== undefined;
+  if ((lat === undefined) !== (lng === undefined))
+    throw new Error('Both coordinates are required for a mapped record');
+  const geoIntegrityGate = hasPoint
+    ? evaluateReleaseGeoIntegrityGate(entry, context, lat, lng)
+    : { ok: true as const };
   if (!geoIntegrityGate.ok) {
     return {
       ok: false,
@@ -1601,7 +1606,7 @@ export function buildReleaseEntityArtifacts(
   const locationPrecision = context.locationOverride?.precision ?? entry.locationPrecision;
   const locationLabel = context.locationOverride?.locationLabel ?? entry.locationLabel;
   const matchMethod = context.locationOverride?.matchMethod ?? 'manual_research';
-  const geo: GeoPointFields = buildGeoPointFields(lat, lng, geohashPrecision);
+  const geo = hasPoint ? buildGeoPointFields(lat, lng, geohashPrecision) : undefined;
   const notabilityLabels = [
     ...new Set(notabilityBasis.map((basis) => NOTABILITY_RUBRIC[basis.criterion])),
   ];
@@ -1643,28 +1648,30 @@ export function buildReleaseEntityArtifacts(
    * A location withheld entirely ('none') keeps only a whole-degree point so the projection
    * still validates while saying nothing sharper than the country.
    */
-  const publicPoint = precisionReduction.reduced
-    ? redactLocationForPublic({
-        precision: locationPrecision,
-        kind: entry.kind,
-        lat: geo.lat,
-        lng: geo.lng,
-        geohash: geo.geohash,
-        ...(resolvedStatus.livingStatus !== undefined
-          ? { livingStatus: resolvedStatus.livingStatus }
-          : {}),
-        ...(entry.sensitivityClass !== undefined
-          ? { sensitivityClass: entry.sensitivityClass }
-          : {}),
-      })
-    : undefined;
-  const publicGeo: GeoPointFields = precisionReduction.reduced
-    ? buildGeoPointFields(
-        publicPoint?.lat ?? Math.round(geo.lat),
-        publicPoint?.lng ?? Math.round(geo.lng),
-        Math.min(geohashPrecision, publicPoint?.geohash?.length ?? 1),
-      )
-    : geo;
+  const publicPoint =
+    geo && precisionReduction.reduced
+      ? redactLocationForPublic({
+          precision: locationPrecision,
+          kind: entry.kind,
+          lat: geo.lat,
+          lng: geo.lng,
+          geohash: geo.geohash,
+          ...(resolvedStatus.livingStatus !== undefined
+            ? { livingStatus: resolvedStatus.livingStatus }
+            : {}),
+          ...(entry.sensitivityClass !== undefined
+            ? { sensitivityClass: entry.sensitivityClass }
+            : {}),
+        })
+      : undefined;
+  const publicGeo =
+    geo && precisionReduction.reduced
+      ? buildGeoPointFields(
+          publicPoint?.lat ?? Math.round(geo.lat),
+          publicPoint?.lng ?? Math.round(geo.lng),
+          Math.min(geohashPrecision, publicPoint?.geohash?.length ?? 1),
+        )
+      : geo;
   /*
    * Derive era once, here, so the entity projection and the search index cannot disagree.
    * Previously both copied `entry.eraBuckets` verbatim; catalog entries that carry only a dated
@@ -1685,17 +1692,21 @@ export function buildReleaseEntityArtifacts(
     displayName: entry.displayName,
     nameLower: entry.displayName.toLowerCase(),
     summary: entry.summary,
-    location: {
-      lat: publicGeo.lat,
-      lng: publicGeo.lng,
-      geohash: publicGeo.geohash,
-      geohashPrefixes: publicGeo.geohashPrefixes,
-      precision: publicLocationPrecision,
-      matchMethod,
-      ...(precisionReduction.reason !== undefined
-        ? { precisionReductionReason: precisionReduction.reason }
-        : {}),
-    },
+    ...(publicGeo
+      ? {
+          location: {
+            lat: publicGeo.lat,
+            lng: publicGeo.lng,
+            geohash: publicGeo.geohash,
+            geohashPrefixes: publicGeo.geohashPrefixes,
+            precision: publicLocationPrecision,
+            matchMethod,
+            ...(precisionReduction.reason !== undefined
+              ? { precisionReductionReason: precisionReduction.reason }
+              : {}),
+          },
+        }
+      : {}),
     claimIds: claims.map((claim) => claim.id),
     claims,
     jurisdictionLabel: entry.jurisdictionLabel,

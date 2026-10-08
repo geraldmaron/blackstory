@@ -38,6 +38,7 @@ export const ADMIN_NAV_GROUPS: readonly AdminNavGroup[] = [
     id: 'triage',
     label: 'Triage',
     destinations: [
+      { href: '/admin/work', label: 'Requests', keywords: ['research', 'review', 'approve'] },
       { href: '/admin/inbox', label: 'Inbox', keywords: ['submissions', 'intake', 'incoming'] },
       {
         href: '/admin/submissions',

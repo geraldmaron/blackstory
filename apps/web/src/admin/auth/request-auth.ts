@@ -36,9 +36,52 @@ function supabaseVerifierFromEnv(
   });
   return {
     async getUser(accessToken: string) {
-      return client.auth.getUser(accessToken);
+      const result = await client.auth.getUser(accessToken);
+      if (result.error || !result.data.user) return result;
+      const claims = await client.auth.getClaims(accessToken);
+      if (claims.error || !claims.data)
+        return { data: { user: null }, error: { message: 'Token claims could not be verified' } };
+      const payload = claims.data.claims;
+      if (
+        !managementTokenClaimsAllowed(
+          payload,
+          url,
+          environment.BLACKSTORY_MCP_ALLOWED_CLIENT_IDS ?? '',
+        )
+      )
+        return {
+          data: { user: null },
+          error: { message: 'Token issuer, resource or client is invalid' },
+        };
+      const clientId = payload.client_id;
+      return { ...result, ...(typeof clientId === 'string' ? { clientId } : {}) };
     },
   };
+}
+
+/** OAuth tokens must name this resource; a valid token for another API is not authority here. */
+export function managementTokenClaimsAllowed(
+  payload: { iss?: unknown; aud?: unknown; client_id?: unknown },
+  issuerUrl: string,
+  allowedClients: string,
+): boolean {
+  if (payload.iss !== `${issuerUrl.replace(/\/$/u, '')}/auth/v1`) return false;
+  if (
+    typeof payload.aud !== 'string' &&
+    !(Array.isArray(payload.aud) && payload.aud.every((audience) => typeof audience === 'string'))
+  )
+    return false;
+  const audiences: string[] = Array.isArray(payload.aud) ? payload.aud : [payload.aud];
+  if (payload.client_id === undefined) return audiences.includes('authenticated');
+  return (
+    typeof payload.client_id === 'string' &&
+    payload.client_id.length > 0 &&
+    allowedClients
+      .split(',')
+      .map((id) => id.trim())
+      .includes(payload.client_id) &&
+    audiences.some((audience) => audience === 'https://blackstory.app/api/mcp')
+  );
 }
 
 /** One line, bounded length: log records must not be forgeable by their own subject. */
@@ -60,6 +103,11 @@ export function createAdminRouteAuthorizer(verifier: SupabaseUserVerifier) {
     async authorize(request: Request): Promise<ResolvedAdminCaller> {
       const caller = callerFrom(await sessions.assertAuthenticated(request.headers));
       const { pathname } = new URL(request.url);
+      if (caller.admin.clientId && !pathname.startsWith('/admin/api/work'))
+        throw new SupabaseSessionAuthorizationError(
+          'ADMIN_SESSION_INVALID',
+          'Agent access is restricted to management work',
+        );
       const access = findAdminRouteAccess(request.method, pathname);
       if (!access) {
         throw new AdminRouteUndeclaredError(request.method, pathname);

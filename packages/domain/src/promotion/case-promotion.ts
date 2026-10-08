@@ -10,7 +10,7 @@
  * reputation) this pipeline has never populated; forcing case data into that shape would
  * fabricate fields no one actually assessed. This is a smaller, honest gate for what this
  * pipeline actually has.
- * - `validateCanonicalPromotionRecord`: the *content* check. Two distinct source hosts, US
+ * - `validateCanonicalPromotionRecord`: the *content* check. Substantive cited evidence, US
  * coordinate bounds, well-formed decade buckets, a non-trivial summary — enforced on every
  * promotion rather than left to whoever is running one.
  */
@@ -84,7 +84,7 @@ const US_LNG_RANGE = [-180, -60] as const;
 
 export type CanonicalPromotionValidationReason =
   | 'name_or_summary_invalid'
-  | 'insufficient_distinct_source_hosts'
+  | 'missing_substantive_source'
   | 'invalid_source'
   | 'location_only_source_without_location'
   | 'coordinates_outside_us_bounds'
@@ -95,33 +95,18 @@ export type CanonicalPromotionValidation = {
   readonly reasons: readonly CanonicalPromotionValidationReason[];
 };
 
-function sourceHostname(url: string): string | undefined {
-  try {
-    return new URL(url).hostname.toLowerCase();
-  } catch {
-    return undefined;
-  }
-}
-
-/** Pure port of the ad hoc script's per-record validation (validateInputs). */
+/** Structural checks only. Claim-relative source sufficiency is reviewed with exact evidence. */
 export function validateCanonicalPromotionRecord(
   record: CanonicalPromotionRecord,
 ): CanonicalPromotionValidation {
   const reasons = new Set<CanonicalPromotionValidationReason>();
 
-  if (!record.displayName.trim() || record.summary.length < 80 || record.summary.length > 600) {
+  if (!record.displayName.trim() || !record.summary.trim() || record.summary.length > 600) {
     reasons.add('name_or_summary_invalid');
   }
 
   const claimSources = record.sources.filter((source) => !source.locationOnly);
-  const hosts = new Set(
-    claimSources
-      .map((source) => sourceHostname(source.url))
-      .filter((host): host is string => !!host),
-  );
-  if (claimSources.length < 2 || hosts.size < 2) {
-    reasons.add('insufficient_distinct_source_hosts');
-  }
+  if (!claimSources.length) reasons.add('missing_substantive_source');
 
   for (const source of record.sources) {
     let isHttps = false;
@@ -130,7 +115,7 @@ export function validateCanonicalPromotionRecord(
     } catch {
       isHttps = false;
     }
-    if (!isHttps || source.excerpt.length < 70) {
+    if (!isHttps || !source.excerpt.trim() || !source.title.trim()) {
       reasons.add('invalid_source');
     }
     if (source.locationOnly && !record.location) {

@@ -97,6 +97,8 @@ export type UploadArtifactConfig = {
   readonly secretKey: string;
   readonly bucket: string;
   readonly cacheControl: string;
+  /** New releases may only reuse identical bytes, never overwrite an artifact. */
+  readonly immutable?: boolean;
   /** Injectable for tests; defaults to the global `fetch`. */
   readonly fetchImpl?: typeof fetch;
 };
@@ -123,9 +125,10 @@ export async function uploadArtifactJson(
         apikey: config.secretKey,
         'content-type': 'application/json; charset=utf-8',
         'cache-control': config.cacheControl,
-        'x-upsert': 'true',
+        'x-upsert': config.immutable ? 'false' : 'true',
       },
       body,
+      signal: AbortSignal.timeout(60000),
     });
   } catch (error) {
     throw new ArtifactUploadError(
@@ -133,6 +136,13 @@ export async function uploadArtifactJson(
       { objectPath, url },
       { cause: error },
     );
+  }
+  if (!response.ok && config.immutable && [400, 409].includes(response.status)) {
+    const existing = await fetchImpl(
+      `${base}/storage/v1/object/public/${config.bucket}/${objectPath}`,
+      { signal: AbortSignal.timeout(30000) },
+    );
+    if (existing.ok && (await existing.text()) === body) return;
   }
   if (!response.ok) {
     const detail = await response.text().catch(() => '');

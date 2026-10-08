@@ -8,11 +8,9 @@
  * transparency features, not internal fields to hide). What is excluded by construction:
  * `sourceLineage`'s full internal rollup is flattened to the single public
  * `independentLineageCount` integer (matching `PublicClaimView`'s existing shape) — no internal
- * `researchCoverage` notes object, no reviewer identity, no moderation metadata. `confidenceScore`
- * here is the existing nominal, level-derived display value already shipped in
- * `PublicEntityView`/`PublicProjectionInput` (`NOMINAL_CONFIDENCE_SCORE` in
- * `apps/web/src/lib/public-data/map-projection.ts`) — a deterministic function of
- * `confidenceLevel`, never a raw internal ranking signal.
+ * `researchCoverage` notes object, no reviewer identity, no moderation metadata.
+ * Legacy numeric scores are accepted for old cached payloads but are optional. Publishers
+ * must not manufacture a number from a qualitative evidence label.
  */
 import { z } from 'zod';
 import { boundedArray, idString, nonEmptyText } from '../internal/primitives.js';
@@ -67,7 +65,7 @@ export const claimV1Schema = z.object({
   id: idString(200),
   predicate: nonEmptyText(300),
   object: nonEmptyText(4000),
-  confidenceScore: z.number().min(0).max(1),
+  confidenceScore: z.number().min(0).max(1).optional(),
   confidenceLevel: confidenceLevelSchema,
   citation: citationV1Schema,
   /** Independent-lineage count only — never the full internal `EvidenceSourceLineageInput`

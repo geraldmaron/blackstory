@@ -5,7 +5,7 @@ description: Prepares a publication preview and names what still blocks release.
 
 # Publish preview
 
-Requires the BlackStory checkout. See [loading and capabilities](../../../docs/research/README.md#skills-and-harness-portability)
+Repository workflows require the BlackStory checkout; configured remote management clients do not. See [loading and capabilities](../../../docs/research/README.md#skills-and-harness-portability)
 for tool requirements and use from any harness.
 
 Judgment playbook. For a new release, prepare the preview and preserve the
@@ -21,6 +21,15 @@ stages a decision (`executionAllowed: false`); it does not activate a release.
 Fresh reauthentication within 10 minutes is a required operating control for activation,
 but the current admin route authorizer does not enforce it. Do not describe it as an
 implemented gate or activate through an unreviewed direct database call.
+
+## Approved management proposals
+
+The shared management flow has an authenticated session publisher: `pnpm work:publish <work-id>`
+through the existing secret launcher. It consumes the saved exact approval and verifies the live
+result. It is separate from the research-only operator CLI and requires owner authentication,
+publication database, Storage and signing credentials. It needs no Brave, hosted model or GitHub
+Actions setup. Reuse the owner's approval of the exact proposal; do not ask for another publication
+approval. A missing publication executor is a delivery limitation, not permission to use direct SQL.
 
 ## Preview checklist
 
@@ -121,3 +130,10 @@ A preview packet:
 **Never:** call `transitionResearchCase` / `markResearchCasePublished` without the
 authenticated workflow; treat dry-run JSON as live;
 silently rewrite a pin so the geo gate passes.
+
+## End-to-end owner requests
+
+For requests spanning research through publication, follow the
+[shared management workflow](../../../docs/research/research-operations.md#account-owned-management-work).
+Infer scope, carry existing authorization forward, and present one concise review. Use the
+remote service only when deployed and verified; its current limits are part of that contract.

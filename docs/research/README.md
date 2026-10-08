@@ -28,6 +28,21 @@ within explicit bounds. It does not mean searching forever or producing more flu
 The [audit evidence](./framework-audit.md) records observations and source research. Do not infer
 production readiness from a schema, test fixture, function name, or an old statement of completion.
 
+## One request and one approval
+
+Manage ordinary owner requests end to end: infer a bounded scope, reuse existing records and
+sources, research identity and counterevidence, review each factual sentence, then present one
+concise proposal. Approval belongs to the exact displayed changes and includes publication.
+Avoid asking the owner to coordinate internal commands or repeat an existing authorization.
+Session execution is the default: the agent uses its available web and document tools, checkpoints
+results through the shared research ledger, and hands the saved proposal to the same approval and
+publication controls. Brave, OpenRouter and GitHub Actions belong only to the optional hosted
+adapter. Never make their setup a prerequisite for session research or already-approved publication.
+Saved work survives a stopped session; independent execution requires a configured background worker.
+The durable inbox and remote clients are experimental; see [management operations](./research-operations.md#account-owned-management-work)
+for deployment prerequisites and limits. No mobile/client compatibility is implied by the
+presence of an MCP endpoint. Research is not complete until its usable outcome is verified.
+
 ## One research loop
 
 1. Define the question, domain profile, scope, sensitivity, and the decision the answer informs.
@@ -157,7 +172,8 @@ sensitivity before sending a URL to an external archive. Never submit private/si
 credentials, or unpublished sensitive material. Respect retention and source policies. Run the explicit `capture-retention` sweep to erase
 expired or withdrawn source text and passages; retry queued storage disposal until acknowledged.
 The sweep also disposes tracked research-run payloads, including dependent artifacts, raw model
-outputs, quarantined responses, task inputs and execution plans. Copies outside that tracked run,
+outputs, quarantined responses, task inputs, execution plans and expired management proposals.
+Proposal hashes and approval records remain after private text disposal. Copies outside that tracked run,
 published material and external archive takedowns require their own reviewed disposition. Older
 captures without an origin link need a custody review; their storage references prevent accidental
 orphan deletion. Hash-only or excerpt-only rows do not prove full-page recoverability, and

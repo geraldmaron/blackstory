@@ -527,7 +527,9 @@ export interface ResearchTaskSpec {
     | 'RelationshipHypothesisExtraction'
     | 'ResearchSearchResult'
     | 'ResearchTaskReport'
-    | 'ResearchAcquisitionResult';
+    | 'ResearchAcquisitionResult'
+    | 'ManagementProposal'
+    | 'ManagementResearchPlan';
   readonly maxAttempts: number;
   readonly maxCostUsdPerAttempt: number;
 }
@@ -626,6 +628,127 @@ export type ResearchWorkerInput =
       readonly model: ResearchWorkerModel | null;
     };
 
+export interface ManagementProposal {
+  readonly summary: string;
+  readonly interpretation: string;
+  readonly changes: readonly {
+    readonly entityId: string;
+    readonly operation: 'create' | 'update';
+    readonly beforeHash: string | null;
+    readonly record: {
+      readonly entityId: string;
+      readonly displayName: string;
+      readonly aliases?: readonly string[];
+      readonly summary: string;
+      readonly jurisdiction: string;
+      readonly topicIds: readonly string[];
+      readonly topicTags: readonly string[];
+      readonly eraBuckets: readonly string[];
+      readonly location?: {
+        readonly lat: number;
+        readonly lng: number;
+        readonly label: string;
+        readonly precision: string;
+        readonly matchMethod: string;
+        readonly zip?: string;
+        readonly accessNote?: string;
+      };
+      readonly sources: readonly {
+        readonly url: string;
+        readonly title: string;
+        readonly excerpt: string;
+        readonly fitness: 'authoritative' | 'strong' | 'weak';
+        readonly locationOnly?: boolean;
+      }[];
+    };
+    readonly assertions: readonly {
+      readonly id: string;
+      readonly statement: string;
+      readonly finding: 'supported' | 'qualified' | 'disputed' | 'insufficient';
+      readonly reasoning: string;
+      readonly evidence: readonly {
+        readonly sourceUrl: string;
+        readonly title: string;
+        readonly locator: string;
+        readonly quote: string;
+        readonly contentHash: string;
+        readonly retrievedAt: string;
+        readonly fitness: 'authoritative' | 'strong' | 'conditional';
+        readonly fitnessReason: string;
+        readonly lineage: string;
+        readonly limitations: readonly string[];
+      }[];
+      readonly counterevidenceSearch: string;
+    }[];
+    readonly sentenceClaims: readonly {
+      readonly sentence: string;
+      readonly assertionIds: readonly string[];
+    }[];
+    readonly identityReview: string;
+    readonly proseReview: string;
+    readonly rightsReview: string;
+    readonly reviewBasis: 'self_review' | 'independent_review';
+    readonly reviewerActorId: string;
+    readonly producerActorId: string;
+    readonly blockers: readonly string[];
+    readonly omissions: readonly string[];
+    readonly before?: {
+      readonly displayName: string;
+      readonly summary: string;
+      readonly historicalContext?: string;
+      readonly claims?: readonly { readonly id: string; readonly statement: string }[];
+      readonly locations?: readonly {
+        readonly id: string;
+        readonly label: string;
+        readonly lat: number | null;
+        readonly lng: number | null;
+        readonly precision: string;
+      }[];
+    } | null;
+    readonly claimRevisions?: readonly {
+      readonly claimId: string;
+      readonly reason: string;
+      readonly replacementAssertionIds: readonly string[];
+    }[];
+    readonly contextRevision?: {
+      readonly text: string;
+      readonly reason: string;
+      readonly sentenceClaims: readonly {
+        readonly sentence: string;
+        readonly assertionIds: readonly string[];
+      }[];
+    };
+    readonly locationRevision?: {
+      readonly locationId: string | null;
+      readonly reason: string;
+      readonly assertionIds: readonly string[];
+    };
+  }[];
+  readonly held: readonly { readonly subject: string; readonly reason: string }[];
+  readonly researchRunIds: readonly string[];
+}
+
+export interface ManagementResearchPlan {
+  readonly interpretation: string;
+  readonly subjects: readonly string[];
+  readonly queries: readonly {
+    readonly query: string;
+    readonly seeking: string;
+    readonly sourceFitnessReason: string;
+    readonly counterevidence: boolean;
+  }[];
+  readonly limitations: readonly string[];
+}
+
+export interface ManagementRetentionAssessment {
+  readonly decisions: readonly {
+    readonly sourceUrl: string;
+    readonly allowExcerptRetention: boolean;
+    readonly sensitivity: 'public' | 'restricted' | 'unknown';
+    readonly basis: string;
+  }[];
+}
+
 export interface ResearchContractMap {
   readonly Budget: Budget;
   readonly RiskClassPolicy: RiskClassPolicy;
@@ -677,6 +800,9 @@ export interface ResearchContractMap {
   readonly ResearchAcquisitionResult: ResearchAcquisitionResult;
   readonly ResearchWorkerModel: ResearchWorkerModel;
   readonly ResearchWorkerInput: ResearchWorkerInput;
+  readonly ManagementProposal: ManagementProposal;
+  readonly ManagementResearchPlan: ManagementResearchPlan;
+  readonly ManagementRetentionAssessment: ManagementRetentionAssessment;
 }
 
 export type ResearchContractName = keyof ResearchContractMap;

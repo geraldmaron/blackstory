@@ -1,7 +1,8 @@
-/** Executes a plan/gather/extract/decide adapter; default gathering fetches seed URLs only. */
+/** Executes a plan/gather/extract/decide adapter; default gathering searches and fetches bounded source URLs. */
+import { runSearchQueries } from './search-routing.js';
 import type { SafeFetchDependencies } from '@repo/security/url-safety';
 import {
-  formatGatheredSourceSnippets,
+  formatGatheredSourceSnippet,
   gatherSourceSnippetsFromUrls,
   type GatheredSourceSnippet,
 } from './research-source-gather.js';
@@ -22,12 +23,15 @@ export type ResearchDirectiveGatherResult = {
   readonly formattedSnippets: readonly string[];
   readonly attemptedUrlCount: number;
   readonly fetchedUrlCount: number;
+  readonly limitations?: readonly string[];
 };
 
 export type ResearchDirectiveContext = {
   readonly dependencies?: SafeFetchDependencies;
   readonly gatherConcurrency?: number;
   readonly nowIso?: string;
+  readonly search?: typeof runSearchQueries;
+  readonly maxSourceUrls?: number;
 };
 
 export type ResearchDirectiveHandlers<TSubject, TExtracted, TDecision> = {
@@ -65,19 +69,39 @@ export type ResearchDirectiveRunResult<TSubject, TExtracted, TDecision> = {
   readonly completedAt: string;
 };
 
-/** Default gather: DNS-pinned fetch of `plan.seedUrls`. */
+/** Bounded search discovery followed by DNS-pinned source retrieval. */
 export async function defaultDirectiveGather(
   plan: ResearchDirectivePlan,
   context: ResearchDirectiveContext = {},
 ): Promise<ResearchDirectiveGatherResult> {
-  const seedUrls = plan.seedUrls ?? [];
+  const seeds = plan.seedUrls ?? [];
+  const queries = (plan.searchQueries ?? []).slice(0, 8);
+  const searched = queries.length
+    ? await (context.search ?? runSearchQueries)({
+        environment: process.env,
+        queries: queries.map((query) => ({ query, seeking: plan.label })),
+        executedAt: context.nowIso ?? new Date().toISOString(),
+        maxLeadsPerQuery: 5,
+      })
+    : undefined;
+  const seedUrls = [
+    ...new Set([...seeds, ...(searched?.available ? searched.leads.map((lead) => lead.url) : [])]),
+  ].slice(0, context.maxSourceUrls ?? 30);
   const sources = await gatherSourceSnippetsFromUrls(seedUrls, {
     ...(context.dependencies ? { dependencies: context.dependencies } : {}),
     ...(context.gatherConcurrency !== undefined ? { concurrency: context.gatherConcurrency } : {}),
   });
   return {
     sources,
-    formattedSnippets: formatGatheredSourceSnippets(sources),
+    limitations: [
+      ...(searched
+        ? searched.available
+          ? searched.skipped.map((item) => `${item.query}: ${item.reason}`)
+          : [searched.reason]
+        : []),
+      ...((plan.searchQueries?.length ?? 0) > 8 ? ['Search query limit reached.'] : []),
+    ],
+    formattedSnippets: sources.map((source) => formatGatheredSourceSnippet(source, plan.label)),
     attemptedUrlCount: seedUrls.length,
     fetchedUrlCount: sources.filter((source) => source.fetched).length,
   };

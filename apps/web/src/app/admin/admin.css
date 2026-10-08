@@ -145,8 +145,8 @@ body {
 
 .admin-footer {
   border-top: 1px solid var(--ds-rule, #d7d0c4);
-  background: var(--ds-ink, #0a0a0a);
-  color: var(--ds-canvas, #f4efe5);
+  background: var(--ds-surface, #fbf8f2);
+  color: var(--ds-ink, #0a0a0a);
 }
 
 .admin-footer__inner {
@@ -165,7 +165,7 @@ body {
   font-family: var(--ds-font-mono), ui-monospace, monospace;
   font-size: 0.75rem;
   letter-spacing: 0.03em;
-  color: #d7d0c4;
+  color: var(--ds-ink, #0a0a0a);
 }
 
 .admin-footer__links {
@@ -183,7 +183,7 @@ body {
   letter-spacing: 0.04em;
   text-transform: uppercase;
   text-decoration: none;
-  color: var(--ds-copper-on-dark, #d07a32);
+  color: var(--ds-accent, #8e4f2a);
 }
 
 .admin-footer__links a:hover {
@@ -191,7 +191,7 @@ body {
 }
 
 .admin-footer__links a:focus-visible {
-  outline: 2px solid var(--ds-copper-on-dark, #d07a32);
+  outline: 2px solid var(--ds-accent, #8e4f2a);
   outline-offset: 3px;
 }
 

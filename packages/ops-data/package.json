@@ -8,6 +8,41 @@
       "development": "./src/index.ts",
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js"
+    },
+    "./management": {
+      "development": "./src/management/work-store.ts",
+      "types": "./dist/management/work-store.d.ts",
+      "import": "./dist/management/work-store.js"
+    },
+    "./management/contracts": {
+      "development": "./src/management/contracts.ts",
+      "types": "./dist/management/contracts.d.ts",
+      "import": "./dist/management/contracts.js"
+    },
+    "./management/dispatch": {
+      "development": "./src/management/dispatch.ts",
+      "types": "./dist/management/dispatch.d.ts",
+      "import": "./dist/management/dispatch.js"
+    },
+    "./management/pdf-parser": {
+      "development": "./src/management/pdf-parser.ts",
+      "types": "./dist/management/pdf-parser.d.ts",
+      "import": "./dist/management/pdf-parser.js"
+    },
+    "./management/catalog": {
+      "development": "./src/management/catalog.ts",
+      "types": "./dist/management/catalog.d.ts",
+      "import": "./dist/management/catalog.js"
+    },
+    "./management/client": {
+      "development": "./src/management/client.ts",
+      "types": "./dist/management/client.d.ts",
+      "import": "./dist/management/client.js"
+    },
+    "./management/delegations": {
+      "development": "./src/management/delegations.ts",
+      "types": "./dist/management/delegations.d.ts",
+      "import": "./dist/management/delegations.js"
     }
   },
   "files": [

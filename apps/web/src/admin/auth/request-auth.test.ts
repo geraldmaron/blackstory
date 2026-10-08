@@ -4,7 +4,11 @@
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { authErrorResponse, createAdminRouteAuthorizer } from './request-auth';
+import {
+  authErrorResponse,
+  createAdminRouteAuthorizer,
+  managementTokenClaimsAllowed,
+} from './request-auth';
 import { AdminRouteUndeclaredError } from './route-permissions';
 import { StaffPermissionDeniedError } from './staff-permissions';
 import type { StaffRole } from './staff-permissions';
@@ -160,4 +164,65 @@ test('authErrorResponse does not expose unexpected provider errors', async () =>
   assert.equal(response.status, 401);
   const body = (await response.json()) as { error: string };
   assert.equal(body.error, 'Unauthorized');
+});
+
+test('verified agent clients are restricted to management routes even with an admin owner', async () => {
+  const owner = verifierForRole('admin');
+  const authorizer = createAdminRouteAuthorizer({
+    async getUser(token) {
+      return { ...(await owner.getUser(token)), clientId: 'allowed-client' };
+    },
+  });
+  const caller = await authorizer.authorize(adminRequest('GET', '/admin/api/work'));
+  assert.equal(caller.admin.clientId, 'allowed-client');
+  await assert.rejects(
+    authorizer.authorize(adminRequest('GET', '/admin/api/auth/me')),
+    /restricted to management/,
+  );
+  await assert.rejects(
+    authorizer.authorize(adminRequest('POST', '/admin/api/catalog/bulk-decision')),
+    /restricted to management/,
+  );
+});
+
+test('OAuth resource binding rejects other audiences and unapproved clients', () => {
+  const url = 'https://project.supabase.co';
+  const base = { iss: `${url}/auth/v1`, aud: 'authenticated' };
+  assert.equal(managementTokenClaimsAllowed(base, url, 'client-one'), true);
+  assert.equal(
+    managementTokenClaimsAllowed({ ...base, client_id: 'client-one' }, url, 'client-one'),
+    false,
+  );
+  const oauth = { ...base, aud: 'https://blackstory.app/api/mcp', client_id: 'client-one' };
+  assert.equal(managementTokenClaimsAllowed(oauth, url, 'client-one'), true);
+  assert.equal(
+    managementTokenClaimsAllowed({ ...oauth, aud: [oauth.aud] }, url, 'client-one'),
+    true,
+  );
+  for (const aud of [
+    `https://attacker.example/?resource=${oauth.aud}`,
+    `${oauth.aud}.attacker.example`,
+    [oauth.aud, null],
+    { includes: () => true },
+    null,
+    42,
+  ]) {
+    assert.equal(managementTokenClaimsAllowed({ ...oauth, aud }, url, 'client-one'), false);
+  }
+  assert.equal(
+    managementTokenClaimsAllowed({ ...oauth, client_id: 'client-two' }, url, 'client-one'),
+    false,
+  );
+  assert.equal(
+    managementTokenClaimsAllowed(
+      { ...oauth, iss: 'https://other.supabase.co/auth/v1' },
+      url,
+      'client-one',
+    ),
+    false,
+  );
+  assert.equal(
+    managementTokenClaimsAllowed({ ...oauth, aud: 'https://other.example/api' }, url, 'client-one'),
+    false,
+  );
 });

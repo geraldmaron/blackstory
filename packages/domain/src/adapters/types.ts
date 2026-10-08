@@ -60,11 +60,24 @@ export type SourceAdapterContract = {
   readonly canarySampleFraction?: number;
 };
 
+/** Collection-specific discovery guidance; it grants neither factual authority nor retention rights. */
+export type SourceResearchGuidance = {
+  readonly collection: string;
+  readonly entryUrl: string;
+  readonly coverage: readonly string[];
+  readonly suitableClaims: readonly string[];
+  readonly searchMethods: readonly string[];
+  readonly limitations: readonly string[];
+  readonly provenance: readonly string[];
+  readonly preservationConditions: readonly string[];
+};
+
 /** Registry entry combining contract, evidence source snapshot, and approval state. */
 export type SourceRegistryEntry = {
   readonly id: string;
   readonly contract: SourceAdapterContract;
   readonly evidenceSource: EvidenceSource;
+  readonly researchGuidance?: SourceResearchGuidance;
   readonly registryState: AdapterRegistryState;
   readonly approvedAt?: string;
   readonly approvedBy?: string;

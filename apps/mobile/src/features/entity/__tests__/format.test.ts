@@ -1,37 +1,19 @@
 import {
   datePrecisionCaption,
   formatEvidenceScoreLabel,
-  formatEvidenceScoreValue,
   formatFetchedAt,
   formatIsoDate,
   formatSourceName,
   humanizeToken,
 } from '../format';
 
-describe('formatEvidenceScoreLabel — matches web wording exactly', () => {
-  it('reads "Evidence score: <level> (<score> of 1.00)", never a probability', () => {
-    expect(formatEvidenceScoreLabel(0.78, 'high')).toBe('Evidence score: high (0.78 of 1.00)');
-    expect(formatEvidenceScoreLabel(0.5, 'medium')).toBe('Evidence score: medium (0.50 of 1.00)');
-    expect(formatEvidenceScoreLabel(0.12, 'low')).toBe('Evidence score: low (0.12 of 1.00)');
-  });
-
-  it('never uses probability language', () => {
-    for (const label of [
-      formatEvidenceScoreLabel(0.9, 'high'),
-      formatEvidenceScoreLabel(0.1, 'low'),
-    ]) {
-      expect(label).not.toMatch(/\bprobability\b/i);
-      expect(label).not.toMatch(/\bchance(?:s)? (?:of|that)\b/i);
-      expect(label).not.toMatch(/\blikely to be true\b/i);
-    }
-  });
-
-  it('clamps an out-of-range or non-finite score rather than throwing/producing NaN', () => {
-    expect(formatEvidenceScoreLabel(5, 'high')).toBe('Evidence score: high (1.00 of 1.00)');
-    expect(formatEvidenceScoreLabel(-3, 'low')).toBe('Evidence score: low (0.00 of 1.00)');
-    expect(formatEvidenceScoreLabel(Number.NaN, 'medium')).toBe(
-      'Evidence score: medium (0.00 of 1.00)',
+describe('formatEvidenceScoreLabel', () => {
+  it('does not display legacy numbers or invent a missing score', () => {
+    expect(formatEvidenceScoreLabel(0.85, 'high')).toBe(
+      formatEvidenceScoreLabel(undefined, 'high'),
     );
+    expect(formatEvidenceScoreLabel(undefined, 'high')).not.toMatch(/\d/);
+    expect(formatEvidenceScoreLabel(undefined, 'high')).toMatch(/^Evidence:/);
   });
 });
 
@@ -70,18 +52,6 @@ describe('formatFetchedAt — deterministic, locale-independent', () => {
 
   it('never throws on a non-finite input', () => {
     expect(formatFetchedAt(Number.NaN)).toBe('an unknown time');
-  });
-});
-
-describe('formatEvidenceScoreValue — the number without the level', () => {
-  it('prints the score alone, so a claim row does not say the level twice', () => {
-    expect(formatEvidenceScoreValue(0.85)).toBe('0.85 of 1.00');
-  });
-
-  it('clamps out-of-range and non-finite scores rather than printing them', () => {
-    expect(formatEvidenceScoreValue(1.4)).toBe('1.00 of 1.00');
-    expect(formatEvidenceScoreValue(-2)).toBe('0.00 of 1.00');
-    expect(formatEvidenceScoreValue(Number.NaN)).toBe('0.00 of 1.00');
   });
 });
 

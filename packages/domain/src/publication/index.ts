@@ -44,6 +44,7 @@ export type ReleaseManifest = {
   readonly generatedAt: string;
   readonly searchIndexVersion: string;
   readonly entries: readonly ReleaseManifestEntry[];
+  readonly aggregateArtifacts?: readonly { readonly path: string; readonly hash: Sha256Hash }[];
 };
 
 export type SignedReleaseManifest = {
@@ -184,6 +185,14 @@ function manifestToJson(manifest: ReleaseManifest): JsonValue {
     releaseId: manifest.releaseId,
     generatedAt: manifest.generatedAt,
     searchIndexVersion: manifest.searchIndexVersion,
+    ...(manifest.aggregateArtifacts
+      ? {
+          aggregateArtifacts: manifest.aggregateArtifacts.map((a) => ({
+            path: a.path,
+            hash: { ...a.hash },
+          })),
+        }
+      : {}),
     entries: manifest.entries.map((entry) => ({
       entityId: entry.entityId,
       revision: entry.revision,
@@ -204,6 +213,7 @@ export function buildReleaseManifest(input: {
   readonly generatedAt: string;
   readonly searchIndexVersion: string;
   readonly artifacts: readonly ReleaseArtifact[];
+  readonly aggregateArtifacts?: readonly { readonly path: string; readonly hash: Sha256Hash }[];
 }): ReleaseManifest {
   assertSafePathSegment(input.releaseId, 'releaseId');
   assertSafePathSegment(input.searchIndexVersion, 'searchIndexVersion');
@@ -236,6 +246,13 @@ export function buildReleaseManifest(input: {
     generatedAt: input.generatedAt,
     searchIndexVersion: input.searchIndexVersion,
     entries: Object.freeze(entries),
+    ...(input.aggregateArtifacts
+      ? {
+          aggregateArtifacts: Object.freeze(
+            [...input.aggregateArtifacts].sort((a, b) => a.path.localeCompare(b.path)),
+          ),
+        }
+      : {}),
   });
 }
 

@@ -764,3 +764,148 @@ a sourced address, evidence attachment, or campaign is actually ready.
 | `.agents/skills/blackstory-ringer-review`     | Adversarial factual and interpretive review                                |
 | `.agents/skills/blackstory-surface-triage`    | Projection/search/artifact disagreement                                    |
 | `.agents/skills/blackstory-experience-review` | Task-based web/native usability and evidence presentation                  |
+
+## Account-owned management work
+
+Implementation status: the session and hosted paths share one durable ledger and publisher. The
+management service is not deployed yet; do not claim remote-client or live-release acceptance
+from local tests. Existing approved publication work does not depend on enabling hosted research.
+
+The default instruction is: manage the request end to end, infer a bounded scope, check existing
+records, research and challenge the evidence, and prepare changes. Ask only material blockers.
+Show one concise review. Explicit approval of the exact displayed revision authorizes application
+and publication; verify the public result before reporting completion. The agent handles internal
+steps. The owner should not select sources, maintain checklists or operate commands.
+
+### Session execution is the default
+
+Submit through `/admin/api/work`, `blackstory-work submit`, or MCP `request_work`. Omit
+`executionMode` or set it to `session`. Use the current harness's search, browser and document
+tools. No Brave, OpenRouter, GitHub Actions or background-model credential is needed. Do not
+interrupt an ordinary session request to provision those services. A request without a mode,
+including an older saved request, is treated as session work; it never implicitly launches a job.
+
+Use `/admin/api/work/:id/research`, `blackstory-work research`, or MCP `research_work` for the
+existing research ledger's execution protocol:
+
+1. `start` with `sessionId` claims the work and returns its lease and run ID. The bounded plan
+   includes current catalog snapshots, source-library guidance and prior review feedback.
+2. `next` with `sessionId` and `lease` returns the task lease, dependency evidence and exact
+   output schema. Work through plan, search, acquisition, draft and challenge review using the
+   session's own tools. These are agent operations, not additional owner questions.
+3. `complete` includes those identifiers, `taskLease`, and `output` as a JSON string. Optional
+   `reportedModel` and `taskPromptHash` record only what the session can actually observe.
+   Use `heartbeat` with both leases during longer steps. Leases last five minutes and remain
+   bounded by the research deadline. After an interrupted lease expires, another authorized
+   session can `start` the same work and continue completed checkpoints.
+4. Repeat `next`/`complete` until `next` returns a saved proposal and review URL. An invalid
+   result remains quarantined; the response reports the failure. Retry only after the task's
+   `available_at`, within the attempt budget. A terminal run is incomplete, never successful
+   research. Do not silently expand its budget.
+
+For acquisition, return `ResearchAcquisitionResult`. Each source has one final URL and at most
+1,000 characters of exact source passage in `description`. `rawRecord` contains only a
+source-specific `preservationDecision` and `sessionObservation` with `tool`, `reference` and
+`retrievedAt`. Record how the source was actually opened, not just a search snippet. The service
+hashes the retained passage, labels observations as session-reported, and returns the normalized
+source in task dependencies. Use that hash in proposal evidence. Existing source restrictions
+cannot be overridden. Retention is private, at most 30 days, and allows no public archiving.
+A passage hash proves integrity of submitted text, not that BlackStory fetched or authenticated
+its origin. Exact quotation checks do not prove entailment; identity, contradiction, source
+fitness and prose review remain required. Session model identity is reported provenance and
+unavailable tokens/costs remain unknown. No numerical confidence or independent review is inferred.
+
+`decide_work` or `/admin/api/work/:id/decisions` records the owner's decision against the exact
+version, proposal hash and selected changes. After approval, an authorized session with the
+checkout and configured publication credentials runs `pnpm work:publish <work-id>` through the
+existing secret launcher. This is an internal agent step, not a second approval. The runner
+verifies `BLACKSTORY_ACCESS_TOKEN` through the current account auth service, checks ownership and
+publication permission, and uses the same approved-content checks, signature, immutable artifacts,
+atomic activation and public readback as hosted publication. It needs publication database,
+Storage and signing access; it does not need a search provider, model provider or GitHub token.
+Read the saved outcome afterward. Failed readback is `verification_failed`, never done.
+
+Remote-only clients can research, review and decide through HTTP/MCP. They still need an authorized
+publication executor to ship. A client without that capability must say approved but not published,
+not start an unconfigured background job or substitute direct SQL. Session work persists when
+chat closes, but computation pauses with its executor. Background continuation requires an
+explicitly configured independent executor. Never promise it from a saved checkpoint.
+
+`blackstory-work` reads `BLACKSTORY_MANAGEMENT_URL` and `BLACKSTORY_ACCESS_TOKEN`. Use the existing
+secret launcher; never put tokens in arguments or files. Run
+`node --conditions development --import tsx packages/operator-cli/src/management-bin.ts --help`
+for input forms. Retry unchanged requests/decisions with their original idempotency keys.
+Changed content requires a new key and current review. Publication retry reuses the exact approval.
+
+The inbox at `/admin/work` shows saved requests, evidence, exact changes, decisions and verified
+outcomes. It defaults to session research and offers background execution only when dispatch is
+configured. A configured dispatcher is not proof of a successful job. OAuth clients require
+resource-bound tokens, the client allowlist and active owner-granted session delegation to relay
+decisions. No Claude, Codex, Cursor or mobile integration is advertised as tested until exercised.
+Consent setup and direct third-party-client acceptance remain unverified.
+
+### Optional hosted execution
+
+Use `executionMode: hosted` only when the owner requests research that continues independently
+of their session. GitHub Actions is the current adapter, not the management contract. The
+`management-work.yml` workflow is on-demand and uses per-work concurrency without cancellation.
+Only this adapter needs `BLACKSTORY_WORK_DISPATCH_TOKEN`, `BLACKSTORY_WORK_REPOSITORY` and
+`BLACKSTORY_WORK_REF`, and the workflow on the repository default branch.
+
+The existing hosted research adapter needs a separate research-only database login,
+`OPENROUTER_API_KEY`, `BRAVE_SEARCH_API_KEY` and `BLACKSTORY_RESEARCH_MODEL`. Those requirements
+belong to that adapter, not to research performed by a session. Consumer chat subscriptions do
+not supply unattended inference credentials. Hosted publication uses separate publication,
+Storage and registered P-256 signing credentials. Verify the management migrations and configured
+credentials before using either path. Do not give research a database-owner login and rely on
+`SET ROLE` as the access boundary. No schedule or Corsair dependency is introduced.
+
+### Supported scope and current limits
+
+The initial worker proposes place records and summary/classification changes. It searches at
+most six queries and twelve leads, under the existing standard budget, with at most two attempts
+per task. Scope expansion starts a separately bounded run. Unsupported entity kinds, relationship
+changes and article creation must be held explicitly. Corrections identify exact existing claims
+and locations to supersede, replace or withhold, and can replace or remove historical context.
+Unrelated claims, context and locations remain intact; a summary rewrite cannot silently change them.
+
+Source-library guidance extends `evidence.evidence_sources.research_guidance`: collection and
+coverage, suitable claims, search methods, limitations, provenance, preservation conditions.
+This guides discovery, not truth or blanket retention permission. Acquisition honors unexpired exact-URL decisions from `evidence.source_items.metadata`.
+New sources receive a budgeted, source-specific private-quotation assessment after transient
+safe retrieval. This is a recorded editorial judgment, not a license or public-domain finding.
+It assesses factual nature, necessity, substitution and sensitivity, retains at most 1,000
+characters for 30 days, and never permits public archiving. Missing, duplicated, restricted or
+uncertain decisions are withheld. Existing restrictions and expired explicit decisions cannot
+be overridden automatically. Redirect destinations require their own assessment. Only HTTP 200
+responses become evidence. The reviewed school collections seed guidance on existing source
+records; the library still needs broader coverage.
+
+Management proposals expire after 30 days or earlier when their research evidence expires or
+is withdrawn. Reads withhold expired text; approval and publication refuse it. The existing
+`capture-retention` sweep disposes both proposal copies while retaining version hashes and
+decision records. Published excerpts and third-party archive copies require a separate disposition.
+
+The publisher checks exact reviewed canonical baselines and current owner/delegation authority,
+builds a signed catalog release, uploads immutable artifacts, verifies bytes, and activates in one
+transaction. Public verification checks the entity API, page, search, and map. A failed readback
+is `verification_failed`; retry verifies the committed release without reapplying changes.
+Partial approval retains the rest for review. Existing mobile releases are regenerated using the shared artifact builder, with compatibility,
+legal versions, flags and unrelated content preserved. Mobile aggregate hashes are included in
+the signed manifest; both release pointers activate in the same transaction. Explicit claim,
+context and location corrections are supported and displayed for review. Public evidence labels
+are qualitative; legacy numeric values are accepted but are no longer fabricated or displayed.
+Production-scale artifact preparation, native rendering and the Lincoln/Atlanta/Wilmington
+live acceptance run remain unverified. Do not describe those outcomes as shipped from local tests.
+
+
+Remote OAuth tokens must carry `https://blackstory.app/api/mcp` in their audience as well as an
+allowed `client_id` and the configured Supabase issuer. Ordinary `authenticated` audience alone
+is insufficient for agent clients. Configure a Supabase access-token hook scoped to the registered
+management clients before testing remote access; do not change the audience of first-party admin
+sessions. OAuth consent/delegation setup and direct client acceptance remain unfinished.
+
+Deploy the native qualitative-label change before removing numeric scores from the production API.
+Older installed clients substitute zero for a missing score. The local contract change alone does
+not prove a safe rollout; exercise the supported app builds and enforce the appropriate minimum
+build through the existing bootstrap compatibility controls before the API change goes live.

@@ -31,6 +31,14 @@ export type AdminRouteRule = {
 };
 
 export const ADMIN_ROUTE_RULES: readonly AdminRouteRule[] = [
+  { method: 'GET', pattern: '/admin/api/work/delegations', access: 'publication:publish' },
+  { method: 'POST', pattern: '/admin/api/work/delegations', access: 'publication:publish' },
+  { method: 'GET', pattern: '/admin/api/work', access: STAFF_READ },
+  { method: 'GET', pattern: '/admin/api/work/:id', access: STAFF_READ },
+  { method: 'POST', pattern: '/admin/api/work', access: 'research:write' },
+  { method: 'POST', pattern: '/admin/api/work/:id/decisions', access: STAFF_READ },
+  { method: 'POST', pattern: '/admin/api/work/:id/retry', access: STAFF_READ },
+  { method: 'POST', pattern: '/admin/api/work/:id/research', access: 'research:write' },
   { method: 'GET', pattern: '/admin/api/audit', access: STAFF_READ },
   { method: 'GET', pattern: '/admin/api/auth/me', access: STAFF_READ },
   { method: 'GET', pattern: '/admin/api/catalog/entity-ids', access: STAFF_READ },
@@ -56,6 +64,7 @@ export const ADMIN_ROUTE_RULES: readonly AdminRouteRule[] = [
   // grants `publication:publish`.
   { method: 'POST', pattern: '/admin/api/releases/stage', access: 'publication:publish' },
   { method: 'POST', pattern: '/admin/api/research-cases/:id/assign', access: 'research:write' },
+  { method: 'POST', pattern: '/admin/api/research-cases/:id/checklist', access: 'research:write' },
   // Promotion turns a proposed record into a canonical one. It is an approver's act, which keeps
   // it away from `research:write` and the proposer who staged the case.
   {

@@ -1,0 +1,74 @@
+name: BlackStory management work
+on:
+  workflow_dispatch:
+    inputs:
+      work_id:
+        description: Persisted BlackStory work request id
+        required: true
+        type: string
+      phase:
+        description: Persisted work phase (worker independently checks state)
+        required: true
+        type: choice
+        options: [research, publish]
+permissions:
+  contents: read
+concurrency:
+  group: management-work-${{ inputs.work_id }}
+  cancel-in-progress: false
+jobs:
+  research:
+    if: inputs.phase == 'research'
+    runs-on: ubuntu-latest
+    timeout-minutes: 65
+    env:
+      BLACKSTORY_WORK_ID: ${{ inputs.work_id }}
+      BLACKSTORY_WORK_PHASE: research
+      PGOPTIONS: -c role=research_worker
+      ADMIN_DATABASE_URL: ${{ secrets.RESEARCH_DATABASE_URL }}
+      DATABASE_URL: ${{ secrets.RESEARCH_DATABASE_URL }}
+      DATABASE_SSL: '1'
+      OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
+      BRAVE_SEARCH_API_KEY: ${{ secrets.BRAVE_SEARCH_API_KEY }}
+      BLACKSTORY_RESEARCH_MODEL: ${{ vars.BLACKSTORY_RESEARCH_MODEL }}
+      TSX_TSCONFIG_PATH: apps/web/tsconfig.json
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+      - uses: pnpm/action-setup@0ebf47130e4866e96fce0953f49152a61190b271
+        with:
+          version: 9.12.3
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: node --conditions development --import tsx apps/web/scripts/management-work.mts
+  publish:
+    needs: research
+    if: always() && (inputs.phase == 'publish' || needs.research.result == 'success')
+    runs-on: ubuntu-latest
+    timeout-minutes: 65
+    env:
+      BLACKSTORY_WORK_ID: ${{ inputs.work_id }}
+      BLACKSTORY_WORK_PHASE: publish
+      ADMIN_DATABASE_URL: ${{ secrets.PUBLICATION_DATABASE_URL }}
+      DATABASE_URL: ${{ secrets.PUBLICATION_DATABASE_URL }}
+      DATABASE_SSL: '1'
+      SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+      SUPABASE_SECRET_KEY: ${{ secrets.SUPABASE_SECRET_KEY }}
+      RELEASE_SIGNING_PRIVATE_KEY: ${{ secrets.RELEASE_SIGNING_PRIVATE_KEY }}
+      RELEASE_SIGNING_PUBLIC_KEY: ${{ vars.RELEASE_SIGNING_PUBLIC_KEY }}
+      RELEASE_SIGNING_KEY_ID: ${{ vars.RELEASE_SIGNING_KEY_ID }}
+      EXPECTED_RELEASE_SIGNING_PUBLIC_KEY_SHA256: ${{ vars.RELEASE_SIGNING_PUBLIC_KEY_SHA256 }}
+      TSX_TSCONFIG_PATH: apps/web/tsconfig.json
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+      - uses: pnpm/action-setup@0ebf47130e4866e96fce0953f49152a61190b271
+        with:
+          version: 9.12.3
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: node --conditions development --import tsx apps/web/scripts/management-work.mts

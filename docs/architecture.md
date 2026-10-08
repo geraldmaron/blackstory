@@ -41,7 +41,7 @@ or in the owning contract. Update existing authoritative prose instead of adding
 | `packages/research-kernel` | Generic schemas, profiles, validation, priority and stopping rules |
 | `packages/research-harness` | Source adaptation, candidate signals, evidence-attached extraction |
 | `packages/operator-cli` | Explicit research commands, safe retrieval, providers, persistence adapters |
-| `packages/operator-mcp` | Read tools; not a complete research executor |
+| `packages/operator-mcp` | Read tools and experimental account-owned management clients; hosted/client acceptance remains unproven |
 | `packages/domain-core`, `packages/domain` | Identity, claims, lineage, discovery and publication rules |
 | `packages/data-access`, `packages/ops-data` | Postgres access and operator data workflows |
 | `workers/*` | Explicit worker adapters for research, publication and security |
@@ -56,6 +56,15 @@ There is no research dependency on Corsair. No research schedule should be insta
 contracts and manual workflow dispatch remain so scheduling can be explicitly enabled in a
 future authorized change. Remaining optional GCP service-control files describe potential deployments,
 not permission to provision a parallel research platform.
+
+## Execution boundary
+
+Research contracts, evidence, review, approval and publication are shared. Execution belongs to
+an explicit mode. Session mode is the default and uses the agent harness's available web/model
+tools; hosted mode is optional and owns its provider credentials. GitHub Actions and Brave are
+adapter choices, never prerequisites for ordinary session work or approved publication. Closing
+a session preserves checkpoints but does not promise background computation. Clients must report
+the capabilities actually available: research, review, approval and publication execution separately.
 
 ## Data flow
 

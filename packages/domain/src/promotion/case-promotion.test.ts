@@ -78,21 +78,21 @@ test('validateCanonicalPromotionRecord accepts a well-formed record', () => {
   assert.deepEqual(result, { valid: true, reasons: [] });
 });
 
-test('validateCanonicalPromotionRecord rejects a too-short summary', () => {
-  const result = validateCanonicalPromotionRecord({ ...VALID_RECORD, summary: 'Too short.' });
+test('validateCanonicalPromotionRecord rejects an empty summary', () => {
+  const result = validateCanonicalPromotionRecord({ ...VALID_RECORD, summary: ' ' });
   assert.equal(result.valid, false);
   assert.ok(result.reasons.includes('name_or_summary_invalid'));
 });
 
-test('validateCanonicalPromotionRecord rejects fewer than two distinct source hosts', () => {
+test('validateCanonicalPromotionRecord accepts a sparse record with a substantive source', () => {
   const result = validateCanonicalPromotionRecord({
     ...VALID_RECORD,
     sources: [VALID_RECORD.sources[0]!],
   });
-  assert.ok(result.reasons.includes('insufficient_distinct_source_hosts'));
+  assert.equal(result.valid, true);
 });
 
-test('validateCanonicalPromotionRecord rejects two sources from the same host', () => {
+test('validateCanonicalPromotionRecord does not mistake host count for independent lineage', () => {
   const result = validateCanonicalPromotionRecord({
     ...VALID_RECORD,
     sources: [
@@ -100,7 +100,7 @@ test('validateCanonicalPromotionRecord rejects two sources from the same host', 
       { ...VALID_RECORD.sources[0]!, title: 'Source A2', excerpt: 'C'.repeat(80) },
     ],
   });
-  assert.ok(result.reasons.includes('insufficient_distinct_source_hosts'));
+  assert.equal(result.valid, true);
 });
 
 test('validateCanonicalPromotionRecord rejects a non-https source', () => {
@@ -114,10 +114,10 @@ test('validateCanonicalPromotionRecord rejects a non-https source', () => {
   assert.ok(result.reasons.includes('invalid_source'));
 });
 
-test('validateCanonicalPromotionRecord rejects a too-short excerpt', () => {
+test('validateCanonicalPromotionRecord rejects an empty excerpt', () => {
   const result = validateCanonicalPromotionRecord({
     ...VALID_RECORD,
-    sources: [{ ...VALID_RECORD.sources[0]!, excerpt: 'short' }, VALID_RECORD.sources[1]!],
+    sources: [{ ...VALID_RECORD.sources[0]!, excerpt: '' }, VALID_RECORD.sources[1]!],
   });
   assert.ok(result.reasons.includes('invalid_source'));
 });

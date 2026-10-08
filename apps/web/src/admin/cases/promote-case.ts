@@ -57,7 +57,7 @@ function evidenceIdFor(url: string, excerpt: string): string {
   return `ev_canonical_promotion_${shortHash(`${url}\n${excerpt}`)}`;
 }
 
-async function ensureNoCatalogDuplicate(
+export async function ensureNoCatalogDuplicate(
   client: pg.PoolClient,
   record: CanonicalPromotionRecord,
 ): Promise<void> {
@@ -82,7 +82,7 @@ async function ensureNoCatalogDuplicate(
   }
 }
 
-async function insertSourceAndEvidence(
+export async function insertSourceAndEvidence(
   client: pg.PoolClient,
   source: CanonicalPromotionRecord['sources'][number],
   approverUid: string,
@@ -132,7 +132,7 @@ async function insertSourceAndEvidence(
   return { evidenceId };
 }
 
-async function insertCanonicalRecord(
+export async function insertCanonicalRecord(
   client: pg.PoolClient,
   input: PromoteCaseInput,
   caseState: string,

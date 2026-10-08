@@ -22,15 +22,6 @@ export const MAX_LIVE_SEARCH_SCAN = 500;
 
 const SUPPORTED_KINDS = new Set<string>(ENTITY_KINDS);
 
-/** View claims render a nominal score alongside the level chip; the projection carries only the
- * level (non-numeric public-payload policy), so the score here is the level's register midpoint —
- * a display value, never a stored ranking. Matches `apps/web`'s `NOMINAL_CONFIDENCE_SCORE`. */
-const NOMINAL_CONFIDENCE_SCORE: Record<'high' | 'medium' | 'low', number> = {
-  high: 0.85,
-  medium: 0.6,
-  low: 0.4,
-};
-
 /** The empty lookup makes every neighbor resolve to its own id — see the module doc: resolving
  * display names would mean reading each related entity's projection per request. */
 const NO_NEIGHBOR_LOOKUP: ReadonlyMap<string, { readonly displayName: string }> = new Map();
@@ -107,7 +98,6 @@ function mapClaims(claims: readonly PublicClaimProjectionDoc[] | undefined): Cla
     id: claim.id,
     predicate: claim.predicate,
     object: claim.object,
-    confidenceScore: NOMINAL_CONFIDENCE_SCORE[claim.confidenceLevel],
     confidenceLevel: claim.confidenceLevel,
     citation: {
       source: claim.citationSource,

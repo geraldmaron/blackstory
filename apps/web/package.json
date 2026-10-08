@@ -33,7 +33,9 @@
     "pg": "^8.16.3",
     "react": "^19.2.7",
     "react-dom": "^19.2.7",
-    "supercluster": "^9.1.0"
+    "supercluster": "^9.1.0",
+    "@repo/ops-data": "workspace:*",
+    "@repo/operator-mcp": "workspace:*"
   },
   "devDependencies": {
     "@maplibre/maplibre-gl-style-spec": "24.10.0",

@@ -20,8 +20,12 @@ REVOKE ALL ON SCHEMA submissions FROM anon, authenticated;
 
 -- The ledger picked up anon SELECT from the `published` default privileges and never had RLS.
 -- Nothing in the application reads it; lock it to server-side connections.
-ALTER TABLE published.tts_usage_ledger ENABLE ROW LEVEL SECURITY;
-REVOKE ALL ON published.tts_usage_ledger FROM anon, authenticated;
+DO $$ BEGIN
+  IF to_regclass('published.tts_usage_ledger') IS NOT NULL THEN
+    ALTER TABLE published.tts_usage_ledger ENABLE ROW LEVEL SECURITY;
+    REVOKE ALL ON published.tts_usage_ledger FROM anon, authenticated;
+  END IF;
+END $$;
 
 COMMIT;
 

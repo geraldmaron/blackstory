@@ -559,3 +559,324 @@ Opened during this work; technical references inform decisions without proving c
 - Root-cause debugging: the row-hash comparison failed with local `extra_float_digits=1` and passed with the observed source setting `0`; no row data was changed to make hashes match.
 - Residual risk: native iOS execution is deferred; preservation of the remaining 7,912 inventory URLs, the unresolved no-job-id local reservation and representative-scale quality evidence remain explicit.
 - Commit-and-PR: PR254 merged at `2026-09-19T05:23:38Z` as SHA `e0a6faf07393f79aeab0629b6b9ac2952d421d6a`; remote CI checks 35423567775 and 35423567804 passed. The final web fixes are on staging SHA `6f96a2b7d7362a22a19c9300502518e2fa325095`; API `dpl_693wvmnFYhFzVNgnWWo1AAg6Q6or` and web `dpl_4U8WcqP5bGJpgp71dfz1YhH4VwMQ` passed their production canaries.
+
+## Management implementation verification, 2026-10-08
+
+VERDICT: Needs validation. Shared-context self-review; no independent review is claimed.
+
+The implementation carries account-owned work through bounded research, exact proposals,
+selection approval, immutable artifact upload and public readback. The strongest alternative
+remains a small hosted inbox over the existing ledger; the new HTTP, CLI and MCP paths use the
+same store rather than maintaining separate chat state. The delivery remains a draft.
+
+1. **Strongest failure mode, serious:** a saved request is mistaken for an accepted background
+   job. Dispatch is persisted before the external call, failures stay visible, leases prevent
+   duplicate work, and retry is explicit. Hosted credential configuration and an actual
+   closed-session run remain unverified. No deployed continuation claim is justified.
+2. **Best alternative:** repository-only automation avoids new OAuth and remote authorization
+   boundaries, but cannot satisfy device independence. The hosted inbox remains the recommended
+   direction, conditional on the deployment and client demonstrations.
+3. **Load-bearing claims, serious:** local PostgreSQL tests establish owner isolation, duplicate
+   submission/dispatch, lease exclusion, stale approval denial, immutable decisions, revoked
+   delegation denial, research-role write denial, retained approvals, partial release and
+   verification retry. External storage/read endpoints in publisher tests are simulated.
+   Actual school delivery, mobile release compatibility and resource-bound OAuth remain unproven.
+4. **Assumption inversion, serious:** sources need not already have retention decisions, and a
+   summary correction may require superseding old claims. The current worker holds unreviewed
+   source retention, and the publisher cannot supersede claims or revise locations. These are
+   functional gaps in ordinary research, not evidence that the work is complete.
+5. **Who bears the cost:** the owner still bears unresolved rights assessment and client setup;
+   readers bear unsupported prose or stale projections. Exact sentence/evidence attachment,
+   self-review labels, preserved unrelated data and failed-readback status reduce these risks
+   but do not establish historical entailment or an independently reviewed narrative.
+6. **Hostile expert, serious:** a historian can still challenge model conclusions; an operator
+   can challenge unsigned mobile derivatives, stored excerpt expiry, catalog-size upload time
+   and the lack of a real phone-to-production run. Production enablement stays blocked until
+   these acceptance gaps are resolved and exercised.
+
+Check: Local repository CI across the changed paths.
+Command: `fnm exec --using=22 -- ./scripts/ci-local.sh --base origin/staging`
+Result: pass on the final full run (2026-10-08).
+Observed: all selected lanes passed, including workspace tests, Python, contracts/security/a11y,
+build/typecheck, governance and security policy. This is not a live-client demonstration.
+
+Check: Fresh database migration replay.
+Command: `python3 /tmp/blackstory-management-replay.py`
+Result: pass.
+Observed: schema-only rehearsal baseline through all subsequent repository migrations, including
+the management migration, applied to a new isolated database. No production migration was applied.
+
+Check: Actual database work and publication behavior.
+Command: `python3 /tmp/blackstory-management-test.py` and `python3 /tmp/blackstory-publication-test.py`
+Result: pass.
+Observed: ownership/authorization/revision tests passed; publication preserved unrelated content,
+held an unapproved record, retried failed readback without repeating writes, then published the
+remaining approved record. Additional checks denied publication after owner-role revocation and
+rolled back canonical writes and activation after an artifact upload failure. HTTP storage and
+public boundaries were simulated. All-held proposals require a stated reason, cannot be approved,
+and can be held or returned to research.
+
+Outcome: Send a request from a phone, close the session, review and approve elsewhere, and get
+verified live school records.
+Surface: hosted workflow, remote clients, admin inbox, public web/API/native projections.
+Data: local fixtures only in this implementation pass.
+Observed: local protocol and database behavior verified. After the owner authorized 1Password, the actual local inbox loaded with authenticated
+API reads. Review/hold and request submission persisted in the isolated database; failed dispatch
+was shown honestly. Phone width (390px), desktop (1280px), both themes, focus and evidence
+disclosures were exercised. No horizontal overflow or browser errors were observed. Hosted
+execution and production publishing were not run.
+Verdict: not proven. Do not merge or enable this as the completed management experience.
+
+
+Check: Authenticated inbox against an isolated PostgreSQL database.
+Command: `python3 /tmp/blackstory-management-ui-auth.py` through the existing environment launcher.
+Result: pass.
+Observed: review at 390px in light/dark themes and 1280px desktop, evidence disclosure, visible
+keyboard focus, persisted hold, and actual request submission. Missing dispatch configuration
+returned a saved-request error rather than claiming research started. Reviewed screenshots exposed
+blue dark-theme links and a pale footer label; both were corrected and the flow rerun. Fixtures
+were explicitly labeled test data. This is web UI verification, not native-device verification.
+
+
+Final review follow-up: the inbox now permits selecting blocked records for corrections or hold,
+while keeping their approval disabled. The attempted authenticated UI rerun after this last control
+change failed before sign-in because 1Password returned `promptError`. The earlier authenticated
+UI observations above remain valid for their tested revision; this final control change has static
+validation only. No new production session or data write occurred in the failed rerun.
+
+The final full CI run passed every selected lane. The subsequent publication-test additions passed
+against the isolated database; the touched inbox and test files were checked again with the web
+lint/typecheck commands. This draft still requires the hosted, client and school acceptance work
+above. Schema, security-boundary and publication review was shared-context self-review.
+
+## Management finishing pass, 2026-10-08 (draft)
+
+This section supersedes the capability limitations and final-control UI caveat in the preceding
+management implementation record. It does not turn those earlier observations into tests of this
+revision. Verdict: **needs validation**. This remains shared-context self-review.
+
+The intended outcome remains one phone request, session-independent research, one exact approval,
+and verified live school records. That complete outcome is not proven and has not been deployed.
+No production migration, school publication, token creation or client integration was completed
+in this finishing pass.
+
+### Implemented and challenged
+
+Explicit revisions now supersede identified claims, replace or remove historical context, and
+replace or withhold a named canonical location. The review shows old assertions and proposed
+replacements. Canonical before-hashes reject intervening edits. Stored geometry, geography,
+coordinates and geohash are cleared together when withholding a location. Public readback checks
+that the API and map reflect the approved point or its absence. Unrelated catalog content stays
+in the release. Rewriting a summary alone still cannot silently correct a contradictory claim.
+
+The publisher reuses the existing mobile artifact generator, release store and activation APIs.
+Aggregate artifact hashes are signed, prior compatibility and legal settings are preserved, and
+both pointers change in one transaction. Uploads use the existing bounded-concurrency utility;
+all started uploads settle before rollback. No parallel release framework or dependency was added.
+Public evidence is qualitative; the API no longer invents numerical confidence from a label.
+The native normalizer ignores legacy scores. Older installed clients still require a deliberate
+compatibility rollout before the API omission is deployed.
+
+New sources receive a bounded private-quotation assessment after safe retrieval. It records
+source-specific reasoning and uncertain rights, prohibits blanket domain-based permission,
+withholds restricted or unknown sensitivity, limits excerpts to 1,000 characters and expires
+private retention after 30 days. Existing restrictions cannot be overridden by the model.
+The raw model response remains separate from the assembled acquisition artifact. This assessment
+is editorial judgment, not a license finding or proof that an excerpt legally qualifies for reuse.
+It still needs a real-provider research demonstration and adversarial review of its decisions.
+
+Expired research prevents approval and publication. The existing retention sweep disposes both
+private proposal copies while preserving hashes and decisions. The SQL checks wall-clock expiry
+again before activation. Published excerpts require their own reviewed disposition. The new
+collection guidance extends existing source records rather than a second registry.
+
+### Finishing verification
+
+Check: Actual PostgreSQL correction, release integrity and public-readback failure behavior.
+Command: `python3 /tmp/blackstory-publication-test.py`
+Result: pass.
+Observed: signed aggregate hashes, preserved unrelated content, partial approval, owner revocation,
+upload rollback, stale canonical edits after approval, existing-point removal, positive point
+replacement, wrong-coordinate readback failure/retry and coordinated pointer rollback passed.
+External storage and public HTTP responses are simulated; this proves transaction behavior, not
+a live production release.
+
+Check: Raw provider-response fidelity for a composed research task.
+Command: `python3 /tmp/blackstory-model-fidelity-test.py`
+Result: pass.
+Observed: the actual provider response and its schema were retained separately from the composed
+artifact; lease recovery, invalid-output quarantine and idempotent completion also passed in the
+isolated database.
+
+Check: Collection guidance on populated source records.
+Command: `python3 /tmp/blackstory-source-guidance-test.py`
+Result: pass.
+Observed: exact source-name and source-item-host matches populated all three school collections;
+previously reviewed guidance stayed intact. Fixtures were rolled back. Production is unchanged.
+
+Check: Fresh schema replay and expired-proposal controls.
+Command: `python3 /tmp/blackstory-management-retention-replay.py` and
+`python3 /tmp/blackstory-management-test.py`
+Result: pass.
+Observed: the full applicable migration sequence replayed in a fresh isolated database. Expired
+proposals were hidden, refused approval, disposed without changing hashes, and queued for fresh
+research on retry. The wall-clock retention function was reapplied in both isolated databases.
+
+Check: Authenticated review at phone width in both themes.
+Command: `python3 /tmp/blackstory-management-ui-auth.py`
+Result: pass.
+Observed: the actual local inbox and isolated database showed claim, context and map corrections;
+blocked approval, hold, saved request and dispatch failure behaved correctly. At 390px there was
+no horizontal overflow, focus was visible, and no page errors were reported. Light and dark
+screenshots were inspected. The previously failed sign-in rerun was resolved after 1Password
+access was authorized. This is responsive web evidence, not a native build or physical-phone test.
+
+### Remaining acceptance boundaries
+
+The strongest failure remains treating a saved request as a hosted job, or a locally tested
+release as live delivery. The best alternative is the existing authenticated inbox until a
+specific remote client is demonstrated. Keep the PR draft and unsupported integrations unclaimed.
+
+Hosted execution still needs scoped search/dispatch credentials, actual separate least-privilege
+research/publication DB logins, signing/model configuration and production migration verification.
+The inspected Brave vault item contains a login only; its API dashboard remains at sign-in. The
+GitHub token dashboard exposed only a Homebrew-purpose token. A website-purpose credential was
+not repurposed. A repository-scoped Actions token requires the pending explicit access approval.
+
+Resource-bound OAuth validation is implemented and tested, but the access-token hook, consent
+and delegation interface, and direct Claude/ChatGPT/Cursor/Dot exercises remain unfinished.
+Native Release validation stopped at the unaccepted Xcode license. The API change must wait for
+verified native compatibility, rather than making old clients display zero as evidence strength.
+
+Catalog-scale uploads still run inside a long serializable transaction and need timing/failure
+proof. Retention sweep and publication lock ordering may produce a safely aborted deadlock that
+needs retry. The stored per-entity snapshot envelope also needs reconciliation with the exported
+response snapshot metadata contract before external consumers rely on it. Direct SQL activation
+can bypass app-level signature/artifact validation; its existing release-control issue remains
+open. These are substantive deployment controls, not documentation-only follow-ups.
+
+Lincoln, Atlanta and Wilmington still require the approved live release and public web, search,
+map and mobile verification. No closed-chat hosted run or cross-interface approval has been
+observed. The delivery remains **not proven** against the user's end-to-end acceptance criteria.
+
+Check: Full repository validation plus final changed-lane rerun.
+Command: `fnm exec --using=22 -- ./scripts/ci-local.sh --base origin/staging`, followed by
+`fnm exec --using=22 -- ./scripts/ci-local.sh --lane mobile --lane unit-js-packages`.
+Result: fail at the mobile native-tooling doctor gate; other selected lanes passed.
+Observed: all 167 mobile test suites / 1,272 tests passed, along with mobile format, lint and
+both typechecks. The full run passed every other selected lane. Expo SDK patch mismatches were
+then aligned using `npx expo install --fix`; its requested SQLite plugin was added to the existing
+dynamic configuration. The rerun passed package tests and 20 of 21 Expo Doctor checks. Direct
+`pod --version` identifies the remaining failure as the unaccepted Xcode license, not a missing
+CocoaPods installation. No doctor check or publication gate was bypassed. No promotion PR was opened.
+
+## Session execution correction, 2026-10-08 (deployment pending)
+
+The management path previously treated every request as a hosted job. Its tools could submit and
+approve work but could not contribute research from their own browser/search capabilities. That
+made adapter credentials a false prerequisite for ordinary agent work. This section supersedes
+that requirement in the preceding finishing record; it does not claim the other release gaps are
+resolved. Verdict: **accepted with controls for the execution pattern; deployment needs validation**.
+This is shared-context self-review.
+
+Session execution is now the default across request contracts, HTTP, CLI, MCP and inbox guidance.
+Explicit hosted requests retain the existing adapter. The session entry point reuses the research
+ledger, lease/completion protocol, source library, exact quotation checks and immutable proposal
+store. It does not import hosted search or model execution. Provider-specific preparation was
+extracted into a shared plan module, not duplicated. Repository and sibling-tooling searches found
+no replacement needed for these existing primitives. No dependency or schedule was added.
+
+The strongest failure is trusting session-supplied prose as verified evidence. Controls require
+bounded source passages, actual tool references, source-specific retention assessment, exact
+quotation/hash attachment, an explicit counterevidence plan, and a separate challenge task before
+saving the proposal. Observations and model identity remain session-reported; passage hashes do
+not prove remote origin or entailment. Unknown model usage remains unknown, and shared-context
+review cannot become independent review. The best alternative is independently reacquiring every
+source in a hosted service, but that is an optional executor with different access and credential
+requirements, not a prerequisite for using a session's research tools.
+
+The authenticated session publication command consumes the same saved owner approval and calls
+the existing signed publisher. It checks current account permission and work ownership before
+claiming publication. Research cannot approve itself. Remote-only clients still need an authorized
+publication executor; no mobile or third-party client is advertised as fully integrated. Closing
+chat preserves checkpoints but does not guarantee independent execution. Bounded run expiry is
+reported as incomplete, not hidden by extending budgets or declaring success.
+
+A one-way database membership lets the existing admin service enter the narrower research role.
+The research role does not acquire admin/publication membership. Testing with one pooled connection
+exposed a nested connection acquisition on resume; the pinned plan is now loaded after releasing
+the preparation connection. Profiles are keyed by their model-policy identity so session and
+hosted policies can coexist without rewriting an immutable profile version.
+
+Check: Session evidence-to-approval integration without hosted credentials.
+Command: `python3 /tmp/blackstory-session-test.py`
+Result: pass.
+Observed: the real isolated database, with `session_user=admin_app`, accepted source checkpoints,
+resumed in a second session, rejected an invented quotation, preserved idempotent completions,
+respected retry backoff, saved the corrected proposal, and refused publication before approval.
+Neither submission nor approval dispatched hosted work. Reverse research-to-admin membership was
+false. The committed test is `packages/operator-cli/src/management-session.test.ts`.
+
+Check: Shared publication safeguards.
+Command: `python3 /tmp/blackstory-publication-test.py`
+Result: pass.
+Observed: approval, unrelated-content preservation, signatures, coordinated pointers, rollback,
+stale edits and public-readback failure/retry passed. External storage/public HTTP are simulated;
+this is not a production release.
+
+Check: Fresh schema sequence including the session role.
+Command: `python3 /tmp/blackstory-session-replay.py`
+Result: pass.
+Observed: replay from the isolated schema baseline through all subsequent migrations completed;
+the source-library update correctly changed no rows in the empty fixture. Production is unchanged.
+
+Check: Actual authenticated inbox and session HTTP entry point.
+Command: `python3 /tmp/blackstory-session-ui-auth.py`
+Result: pass after one secret-manager timeout and retry.
+Observed: at 390px both themes had no horizontal overflow, focus was visible, correction sections
+and hold worked, and submission showed saved session continuation with no hosted-dispatch error.
+The actual HTTP endpoint returned a research lease and plan schema. This is local web proof,
+not a physical mobile device or Claude/ChatGPT/Cursor integration test.
+
+Check: Repository validation.
+Command: `fnm exec --using=22 -- ./scripts/ci-local.sh`
+Result: partial.
+Observed: all non-validation/non-mobile lanes passed. A type-only import lint failure was fixed.
+The final rerun with `--lane validate --lane unit-js-packages --lane unit-js-apps --lane build-typecheck`
+passed every selected lane. Mobile formatting,
+typecheck, lint and all 1,272 tests passed, but the native tooling check still stops at the
+unaccepted Xcode license. No production promotion, migration or school publication is claimed.
+
+### Web release scope correction
+
+The owner explicitly deferred native release on 2026-10-08. Xcode license acceptance is not a
+production web/backend release gate. Hosted CI for `b0cbe414` completed successfully, including
+Workspace Checks, Workspace Tests, Mobile Checks, Python, security checks and both Vercel
+previews. Local native execution remains unverified; it does not negate those observed results.
+The web release uses the existing CI lane selection with `--skip mobile`, without changing or
+disabling the native validation commands. Production database and authenticated web checks remain
+required. This supersedes the earlier characterization of Xcode as a production release blocker.
+
+Production preflight still found `rel_20260918_dunbar_media_correction_001` with 4,210 entity
+projections and no management work table. Automatic approval review rejected the proposed inbox
+migration because it expands the existing admin backend's production privileges, including release
+activation. The owner then explicitly approved that privilege expansion and separately approved
+the retention disposal capability. The approved migrations were applied through Supabase and the
+repository filenames now match its recorded versions: `20261008201626`, `20261008201639`,
+`20261008201705` and `20261008201855`. There were no existing proposals to dispose. No alternate
+migration path was attempted during either approval hold.
+
+Check: Production migration permissions and retained catalog.
+Command: Supabase SQL readback of role membership, table/function privileges, management counts,
+active release and `research.dispose_expired_management_proposals(false)`.
+Result: pass.
+Observed: admin can enter research; research cannot enter admin or insert approvals; anonymous
+inbox reads are denied. Work/proposal counts and expired-proposal count were zero. The active
+catalog release was unchanged. Collection guidance populated 11 existing source registry rows.
+
+Check: Web/backend release validation with native release deferred.
+Command: `fnm exec --using=22 -- ./scripts/ci-local.sh --base origin/staging --skip mobile`.
+Result: pass after rerunning outside the filesystem sandbox.
+Observed: every selected lane passed. The first sandboxed attempt could not open local test
+sockets or write tool caches. The E2E harness was invoked but has no configured external base URL;
+actual deployed-surface checks remain a separate release requirement.

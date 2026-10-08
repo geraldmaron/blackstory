@@ -6,7 +6,10 @@ import { randomUUID } from 'node:crypto';
 import {
   assignResearchCase,
   auditCategoryFor,
+  EVIDENCE_CHECKLIST_KEYS,
+  evaluateEvidenceChecklist,
   transitionResearchCase,
+  type EvidenceChecklist,
   type RelevanceAssessment,
   type ResearchCaseReasonCode,
   type ResearchCaseRecord,
@@ -314,6 +317,92 @@ export async function transitionAdminResearchCase(input: {
     actorEmail: input.actorEmail,
     reason: input.request.reason.trim(),
     action: input.request.action,
+  });
+}
+
+/** Validate untrusted checklist input before deriving maturity through the domain state machine. */
+export function planAdminCaseChecklist(
+  record: ResearchCaseRecord,
+  rawChecklist: unknown,
+  actorId: string,
+  reason: string,
+  now: string,
+): ResearchCaseRecord {
+  if (!rawChecklist || typeof rawChecklist !== 'object' || !('items' in rawChecklist)) {
+    throw new Error('checklist.items is required');
+  }
+  const items = rawChecklist.items;
+  if (!Array.isArray(items) || items.length > EVIDENCE_CHECKLIST_KEYS.length) {
+    throw new Error('checklist.items must be an array of known checklist items');
+  }
+  for (const item of items) {
+    if (
+      !item ||
+      typeof item !== 'object' ||
+      !EVIDENCE_CHECKLIST_KEYS.includes(item.key) ||
+      typeof item.complete !== 'boolean' ||
+      !Array.isArray(item.evidenceIds) ||
+      !item.evidenceIds.every((id: unknown) => typeof id === 'string' && id.trim().length > 0) ||
+      (item.note !== undefined && typeof item.note !== 'string')
+    ) {
+      throw new Error(
+        'Each checklist item requires a known key, boolean complete and nonblank evidence IDs',
+      );
+    }
+  }
+  const checklist: EvidenceChecklist = { items };
+  const evaluation = evaluateEvidenceChecklist(checklist);
+  if (!evaluation.meetsMinimumRecord) throw new Error('Minimum-record checklist is incomplete');
+  const targetState =
+    evaluation.level === 'substantial'
+      ? 'substantial_enrichment'
+      : evaluation.level === 'partial'
+        ? 'partial_enrichment'
+        : 'minimum_record';
+  const reasonCode =
+    targetState === 'substantial_enrichment'
+      ? 'substantial_enrichment_complete'
+      : targetState === 'partial_enrichment'
+        ? 'partial_enrichment_complete'
+        : 'minimum_record_complete';
+  return transitionResearchCase(record, {
+    targetState,
+    reasonCode,
+    checklist,
+    actorId,
+    reason: reason.trim(),
+    now,
+    evidenceIds: [
+      ...new Set(
+        checklist.items.filter((item) => item.complete).flatMap((item) => item.evidenceIds),
+      ),
+    ],
+  });
+}
+
+export async function completeAdminResearchCaseChecklist(input: {
+  readonly caseId: string;
+  readonly checklist: unknown;
+  readonly reason: string;
+  readonly actorUid: string;
+  readonly actorEmail: string;
+}): Promise<{ readonly detail: AdminCaseDetail; readonly auditEventId: string }> {
+  const detail = await getAdminResearchCaseDetail(input.caseId);
+  if (!detail) throw new Error(`Research case not found: ${input.caseId}`);
+  const next = planAdminCaseChecklist(
+    detail.record,
+    input.checklist,
+    input.actorUid,
+    input.reason,
+    new Date().toISOString(),
+  );
+  return commitCaseUpdate({
+    previous: detail.record,
+    next,
+    actorUid: input.actorUid,
+    actorEmail: input.actorEmail,
+    reason: input.reason.trim(),
+    action: 'complete_checklist',
   });
 }
 

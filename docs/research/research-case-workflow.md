@@ -99,3 +99,13 @@ The domain state machine is `packages/domain/src/research-case/`. JSON schemas a
 `packages/schemas/research-case/`. Persistence is under `packages/ops-data/src/postgres/`.
 Backfill jobs describe explicit work; no timer is installed by creating a case or running this
 workflow. Actual scheduling requires a separate authorized operational change.
+
+## Completing a reviewed checklist
+
+`POST /admin/api/research-cases/:id/checklist` accepts `{ checklist: { items }, reason }`.
+It requires `research:write` and obtains the actor from the verified staff session. Each item
+has a known checklist key, a boolean `complete`, nonblank `evidenceIds`, and an optional note.
+Completed items require evidence; all five minimum items must be complete. Maturity is derived
+from the checklist, and the domain state machine prevents skipping relevance review. The
+existing Postgres audit/outbox transaction persists the checklist and transition history.
+This endpoint does not promote a canonical entity, assess its claims, or publish a release.
