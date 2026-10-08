@@ -627,10 +627,10 @@ OPERATOR_CLI_PRIVACY_PEPPER=<pepper> node --conditions development --import tsx 
 checklist key the evidence fills; check `buildResearchCasePreview(...).publishable` before
 calling a case "ready" — `meetsMinimumRecord` alone isn't enough.
 
-**Never:** call `transitionResearchCase`/`markResearchCasePublished` yourself (needs a
-`research:write`-authorized `VerifiedAdminToken`); assemble evidence and call
-`evaluatePromotionGate` expecting to approve it yourself (`proposer_approver_conflict`); mark a
-case ready based on your own read of the evidence.
+**Never:** call `transitionResearchCase`/`markResearchCasePublished` without a
+`research:write`-authorized `VerifiedAdminToken`; treat assembled evidence or a
+promotion gate result as publication; mark a case ready without accepted evidence and a
+completed checklist review.
 
 ---
 

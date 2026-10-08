@@ -184,9 +184,10 @@ only exact, reviewed claims, and a withheld or coarsened pin. Verdict:
 Howard's draft, with its opening date omitted. The promotion path now allows a
 minimum-record case without a location and records unassessed confidence and
 lineage honestly. The machine's two-host check is still only a host check;
-a reviewer must assess work-level independence. A separate research-role review must advance
-the cases; a different publication-role actor must promote any final record
-and activate a release. The proposing session cannot perform either approval.
+a reviewer must assess work-level independence. An authenticated review must advance
+the cases; an actor with publication permission must promote a final record and
+activate a release. The same person may propose and approve, but evidence,
+permission, audit and activation checks still apply.
 
 ### Publication preview for the two new records
 
@@ -205,12 +206,12 @@ checklist, assess contradictions and rights, inspect the final wording, and
 preview the release claim diff. No image is proposed. The nomination's inaccurate
 Wilmington ZIP code is not carried into the draft.
 
-The current promotion route accepts `proposerId` in the request body and compares
-that caller-supplied string to the authenticated approver's UID. This does not
-prove that the approver differs from the actual proposer. The separate human
-review remains a procedural requirement, and publication must wait for a
-trusted-provenance fix (`repo-g19w2`) or an independently verified approval
-path. The source and location checks above do not settle this authority flaw.
+The earlier promotion route compared a caller-supplied `proposerId` with the
+authenticated approver's UID. That comparison could not prove separate actors.
+The revised route removes the caller-supplied proposer field and permits one
+authenticated publication actor to complete the final review. The two hosted
+cases remain `candidate` with no completed checklist items, so this code change
+does not itself make either entity canonical or public.
 
 The Atlanta city page returned an Access Denied document to the CLI safe
 fetch while reporting `ok: true`. It was read through the web research service

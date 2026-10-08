@@ -48,11 +48,11 @@ function wellSupportedClaim(proposerId: string): PromotionClaim {
   };
 }
 
-test('the domain promotion gate refuses self-approval: same identity as proposer and approver', () => {
+test('the domain promotion gate allows review by the proposer when evidence gates pass', () => {
   const claim = wellSupportedClaim('operator-1');
   const result = evaluatePromotionGate({ claim, approverId: 'operator-1' });
-  assert.equal(result.approved, false);
-  assert.ok(result.reasons.includes('proposer_approver_conflict'));
+  assert.equal(result.approved, true);
+  assert.equal(result.reasons.length, 0);
 });
 
 test('the domain promotion gate approves the same claim once a distinct approver reviews it', () => {

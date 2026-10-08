@@ -4,7 +4,7 @@ Publication is a controlled state machine:
 
 `submission/discovery → research case → proposed claim → accepted claim → publication candidate → release`
 
-No intake record can write directly to a canonical claim or release. Each transition is forward-only. Claim approval is deterministic and requires an approver distinct from the proposer; an LLM may assist research but cannot approve a claim.
+No intake record can write directly to a canonical claim or release. Each transition is forward-only. Claim approval is deterministic and requires an authenticated actor, an explicit decision, and the evidence gates below. The proposer may be that actor; an LLM may assist research but cannot hold publication authority.
 
 ## Evidence gates
 
