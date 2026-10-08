@@ -1,12 +1,12 @@
 /** Durable work orchestration. Research and release engines remain responsible for execution. */
 import { createHash, randomUUID } from 'node:crypto';
 import type { Pool, PoolClient } from 'pg';
+import { assertContract } from '@repo/research-kernel';
 import { validateCanonicalPromotionRecord, type CanonicalPromotionRecord } from '@repo/domain';
 import { managementEntitySnapshot } from './catalog.js';
 import { stableJson } from '../postgres/canonical-convergence.js';
 import {
   workRequestSchema,
-  workProposalSchema,
   workDecisionSchema,
   type WorkItem,
   type WorkProposal,
@@ -62,7 +62,7 @@ function item(row: Row): WorkItem {
   };
 }
 export function validateWorkProposal(value: unknown): WorkProposal {
-  const proposal = workProposalSchema.parse(value);
+  const proposal = assertContract('ManagementProposal', value);
   const ids = new Set<string>();
   for (const change of proposal.changes) {
     if (ids.has(change.entityId)) throw new WorkConflict('Duplicate entity in proposal');
