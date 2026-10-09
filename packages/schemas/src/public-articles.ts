@@ -83,12 +83,13 @@ export const articleReferenceSchema = z.object({
 export type ArticleReferenceDoc = z.infer<typeof articleReferenceSchema>;
 
 /**
- * One independent corroborating source for a load-bearing figure (criterion 3:
- * two-anchor corroboration rule). `url` is checked against the shared source-tier
- * registry at validate time (packages/domain's isAnchorTierUrl) — tier is derived,
- * never stored here, so there is one source of truth for what counts as trusted.
+ * A supporting document for an exact assertion. Publication resolves the current
+ * reviewed claim version, selector and assessed work lineage; a URL alone is discovery.
  */
 export const articleAnchorSchema = z.object({
+  claimId: z.string().min(1).optional(),
+  claimVersionId: z.string().min(1).optional(),
+  selectorId: z.string().min(1).optional(),
   url: z.string().url().max(2048),
   label: z.string().min(1).max(240),
 });

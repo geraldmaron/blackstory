@@ -13,10 +13,9 @@
  * that the device sold, mattered, or came first. Same document, same host, same authority score
  * under the old rule; five different answers under this one.
  *
- * Fitness is not a score. It is a statement about what a document can be asked. Callers turn it
- * into a number with `sourceAuthorityForFitness`, and `unfit` is a floor of zero rather than a
- * small number, because a patent contributes nothing at all toward a racial-identity claim and
- * should not be able to accumulate into one alongside other unfit sources.
+ * Fitness states what a document can be asked. `sourceAuthorityForFitness` preserves historical
+ * ranking heuristics for existing callers; its values are not measured reliability, probabilities
+ * or publication authority. Publication needs an exact supported assertion and documented review.
  */
 
 /**
@@ -42,6 +41,7 @@ export const SOURCE_CLASSES = [
   'contemporaneous_trade_press',
   'company_record',
   'court_record',
+  'enacted_legal_record',
   'census_or_vital_record',
   'oral_history',
   'peer_reviewed_scholarship',
@@ -101,8 +101,8 @@ export type AssertionClass = (typeof ASSERTION_CLASSES)[number];
  *
  * Matches the vocabulary the research profile already uses, so a profile rule and a code rule
  * say the same words.
- *  authoritative — the document decides the question.
- *  strong        — good evidence; corroboration is a nicety, not a necessity.
+ *  authoritative — suited to the exact recorded fact; errors and scope still require review.
+ *  strong        — useful direct support; further investigation follows claim risk.
  *  conditional   — usable, but its known failure modes apply and must be weighed.
  *  leadOnly      — tells you where to look. Never acceptance on its own.
  *  unfit         — cannot answer this question at all, however many copies there are.
@@ -124,7 +124,7 @@ export type FitnessAssessment = {
   readonly limitations: readonly string[];
 };
 
-/** The authority component a source contributes for the claim it is actually attached to. */
+/** Historical ranking heuristic, not calibrated reliability or publication authority. */
 export function sourceAuthorityForFitness(fitness: Fitness): number {
   switch (fitness) {
     case 'authoritative':
@@ -170,9 +170,16 @@ const LIMITATIONS: Partial<Record<SourceClass, readonly string[]>> = {
   ],
   historical_compilation: [
     'Compilations inherit the gaps of the moment they were made',
-    'Baker-era lists are known to be incomplete, and the incompleteness is itself evidence',
+    'Trace identity and chronology to the underlying documents; omissions do not establish absence',
   ],
-  oral_history: ['Identity, chronology, coordination and copying require review'],
+  oral_history: [
+    'Preserve speaker, interviewer, recording date, remembered period and consent context',
+    'Memory and interview questions shape testimony; disputed chronology needs separate investigation',
+  ],
+  enacted_legal_record: [
+    'Check jurisdiction, enactment, effective date and amendments',
+    'Legal text does not by itself establish implementation or social effects',
+  ],
   census_or_vital_record: [
     'Enumerator-recorded race reflects the enumerator, and must be handled under the dignity rules',
     'Names, ages and spellings are frequently wrong',
@@ -268,9 +275,9 @@ const FITNESS_TABLE: Readonly<Record<SourceClass, FitnessRow>> = {
     societal_impact: 'conditional',
   },
   archival_finding_aid: {
-    default: 'conditional',
-    record_fact: 'strong',
-    relationship: 'conditional',
+    default: 'leadOnly',
+    record_fact: 'conditional',
+    relationship: 'leadOnly',
     superlative: 'leadOnly',
     technical_scope: 'leadOnly',
   },
@@ -279,8 +286,7 @@ const FITNESS_TABLE: Readonly<Record<SourceClass, FitnessRow>> = {
     community_identity: 'strong',
     biographical_fact: 'strong',
     historical_synthesis: 'strong',
-    // An institution's own researched superlative counts; this is the class the standing rule
-    // means by "institutional support for a superlative".
+    // Firstness depends on inspected comparison scope, not the institution's standing.
     superlative: 'conditional',
     technical_scope: 'conditional',
     record_fact: 'conditional',
@@ -324,6 +330,13 @@ const FITNESS_TABLE: Readonly<Record<SourceClass, FitnessRow>> = {
     superlative: 'unfit',
     community_identity: 'leadOnly',
   },
+  enacted_legal_record: {
+    default: 'unfit',
+    record_fact: 'authoritative',
+    legal_status: 'authoritative',
+    chronology: 'conditional',
+    place: 'conditional',
+  },
   court_record: {
     default: 'strong',
     legal_status: 'authoritative',
@@ -347,7 +360,7 @@ const FITNESS_TABLE: Readonly<Record<SourceClass, FitnessRow>> = {
     lived_experience: 'authoritative',
     community_identity: 'strong',
     relationship: 'conditional',
-    chronology: 'leadOnly',
+    chronology: 'conditional',
     superlative: 'leadOnly',
     technical_scope: 'leadOnly',
   },
@@ -370,7 +383,7 @@ const FITNESS_TABLE: Readonly<Record<SourceClass, FitnessRow>> = {
   },
   historical_compilation: {
     default: 'conditional',
-    // Baker's lists are the reason a person is known to have been a Black inventor at all.
+    // Attributed compilations can support identity after their documentary basis is inspected.
     community_identity: 'strong',
     record_fact: 'conditional',
     technical_scope: 'leadOnly',
@@ -410,9 +423,8 @@ const FITNESS_TABLE: Readonly<Record<SourceClass, FitnessRow>> = {
 };
 
 const RATIONALES: Readonly<Record<Fitness, string>> = {
-  authoritative: 'This kind of document decides this kind of question',
-  strong:
-    'Good evidence for this kind of question; corroboration strengthens rather than rescues it',
+  authoritative: 'Suited to the exact recorded assertion; inspect context, errors and scope',
+  strong: 'Useful support after document-level review; claim risk determines further investigation',
   conditional: 'Usable for this kind of question, with its known failure modes weighed',
   leadOnly: 'Points at where the evidence would be; not acceptance on its own',
   unfit: 'Cannot answer this kind of question at all, however many copies exist',
@@ -471,4 +483,35 @@ export const HIGH_IMPACT_ASSERTION_CLASSES: readonly AssertionClass[] = [
 
 export function isHighImpactAssertion(assertionClass: AssertionClass): boolean {
   return HIGH_IMPACT_ASSERTION_CLASSES.includes(assertionClass);
+}
+
+/** Generate the kernel profile from this maintained policy; no second fitness table. */
+export function blackStorySourceFitnessRules() {
+  return SOURCE_CLASSES.flatMap((sourceClass) =>
+    ASSERTION_CLASSES.map((claimClass) => {
+      const assessment = assessSourceFitness(sourceClass, claimClass);
+      return {
+        sourceClass,
+        claimClass,
+        fitness: assessment.fitness,
+        limitations: assessment.limitations,
+      };
+    }),
+  );
+}
+
+/** Identifies encyclopedia/structured statements, not scans on Wikimedia document properties. */
+export function isDiscoveryStatementUrl(value: string): boolean {
+  try {
+    const url = new URL(value),
+      host = url.hostname.toLowerCase();
+    return (
+      host === 'wikipedia.org' ||
+      host.endsWith('.wikipedia.org') ||
+      host === 'wikidata.org' ||
+      host.endsWith('.wikidata.org')
+    );
+  } catch {
+    return false;
+  }
 }

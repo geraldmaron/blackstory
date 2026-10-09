@@ -1,7 +1,7 @@
 {
   "schemaVersion": "1.0.0",
   "id": "black-history",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "name": "Black history research",
   "scope": {
     "geography": "United States",
@@ -72,95 +72,2689 @@
   ],
   "sourceFitness": [
     {
-      "sourceClass": "official-enacted-text-or-opinion",
-      "claimClass": "legal-status",
-      "fitness": "authoritative",
-      "limitations": ["Does not establish social consequences without additional evidence"]
-    },
-    {
-      "sourceClass": "first-person-or-oral-history",
-      "claimClass": "lived-experience-or-local-memory",
-      "fitness": "strong",
-      "limitations": ["Identity, chronology, coordination, and copying require review"]
-    },
-    {
-      "sourceClass": "scholarly",
-      "claimClass": "historical-synthesis",
-      "fitness": "strong",
-      "limitations": [
-        "Capture cited primary evidence for consequential atomic claims where available"
-      ]
-    },
-    {
-      "sourceClass": "news-index-summary-or-search-result",
-      "claimClass": "historical-assertion",
-      "fitness": "leadOnly",
-      "limitations": ["Capture and assess the underlying evidence before acceptance"]
-    },
-    {
-      "sourceClass": "community-forum",
-      "claimClass": "alias-local-memory-or-lead",
-      "fitness": "conditional",
-      "limitations": [
-        "Evaluate authorship, chronology, coordination, copying, and shared upstream sources"
-      ]
-    },
-    {
-      "sourceClass": "patent-specification",
-      "claimClass": "filing-record-fact",
+      "sourceClass": "patent_specification",
+      "claimClass": "record_fact",
       "fitness": "authoritative",
       "limitations": [
         "Records inventors as filed, which is not always who did the work",
+        "Describes the claimed mechanism only; it does not bound the wider technology",
         "The inventor address is an address at filing, not where invention occurred"
       ]
     },
     {
-      "sourceClass": "patent-specification",
-      "claimClass": "technical-scope",
+      "sourceClass": "patent_specification",
+      "claimClass": "technical_identity",
+      "fitness": "strong",
+      "limitations": [
+        "Records inventors as filed, which is not always who did the work",
+        "Describes the claimed mechanism only; it does not bound the wider technology",
+        "The inventor address is an address at filing, not where invention occurred"
+      ]
+    },
+    {
+      "sourceClass": "patent_specification",
+      "claimClass": "community_identity",
+      "fitness": "unfit",
+      "limitations": [
+        "Records inventors as filed, which is not always who did the work",
+        "Describes the claimed mechanism only; it does not bound the wider technology",
+        "The inventor address is an address at filing, not where invention occurred"
+      ]
+    },
+    {
+      "sourceClass": "patent_specification",
+      "claimClass": "technical_scope",
       "fitness": "authoritative",
-      "limitations": ["Bounds the claimed mechanism only; it does not bound the wider technology"]
-    },
-    {
-      "sourceClass": "patent-specification",
-      "claimClass": "community-identity",
-      "fitness": "unfit",
       "limitations": [
-        "The Patent Office did not record inventor race; a patent cannot answer this at all"
+        "Records inventors as filed, which is not always who did the work",
+        "Describes the claimed mechanism only; it does not bound the wider technology",
+        "The inventor address is an address at filing, not where invention occurred"
       ]
     },
     {
-      "sourceClass": "patent-specification",
-      "claimClass": "superlative",
-      "fitness": "unfit",
-      "limitations": ["A grant is not a finding of priority over a field"]
-    },
-    {
-      "sourceClass": "patent-interference-record",
-      "claimClass": "superlative",
-      "fitness": "strong",
-      "limitations": ["Settles priority only between the parties to the interference"]
-    },
-    {
-      "sourceClass": "historical-compilation",
-      "claimClass": "community-identity",
-      "fitness": "strong",
+      "sourceClass": "patent_specification",
+      "claimClass": "invention_attribution",
+      "fitness": "conditional",
       "limitations": [
-        "Baker-era lists are known to be incomplete, and the incompleteness is itself evidence"
+        "Records inventors as filed, which is not always who did the work",
+        "Describes the claimed mechanism only; it does not bound the wider technology",
+        "The inventor address is an address at filing, not where invention occurred"
       ]
     },
     {
-      "sourceClass": "modern-reputable-secondary",
-      "claimClass": "invention-attribution",
+      "sourceClass": "patent_specification",
+      "claimClass": "superlative",
+      "fitness": "unfit",
+      "limitations": [
+        "Records inventors as filed, which is not always who did the work",
+        "Describes the claimed mechanism only; it does not bound the wider technology",
+        "The inventor address is an address at filing, not where invention occurred"
+      ]
+    },
+    {
+      "sourceClass": "patent_specification",
+      "claimClass": "commercial_impact",
+      "fitness": "unfit",
+      "limitations": [
+        "Records inventors as filed, which is not always who did the work",
+        "Describes the claimed mechanism only; it does not bound the wider technology",
+        "The inventor address is an address at filing, not where invention occurred"
+      ]
+    },
+    {
+      "sourceClass": "patent_specification",
+      "claimClass": "societal_impact",
+      "fitness": "unfit",
+      "limitations": [
+        "Records inventors as filed, which is not always who did the work",
+        "Describes the claimed mechanism only; it does not bound the wider technology",
+        "The inventor address is an address at filing, not where invention occurred"
+      ]
+    },
+    {
+      "sourceClass": "patent_specification",
+      "claimClass": "biographical_fact",
+      "fitness": "conditional",
+      "limitations": [
+        "Records inventors as filed, which is not always who did the work",
+        "Describes the claimed mechanism only; it does not bound the wider technology",
+        "The inventor address is an address at filing, not where invention occurred"
+      ]
+    },
+    {
+      "sourceClass": "patent_specification",
+      "claimClass": "chronology",
+      "fitness": "strong",
+      "limitations": [
+        "Records inventors as filed, which is not always who did the work",
+        "Describes the claimed mechanism only; it does not bound the wider technology",
+        "The inventor address is an address at filing, not where invention occurred"
+      ]
+    },
+    {
+      "sourceClass": "patent_specification",
+      "claimClass": "place",
       "fitness": "leadOnly",
       "limitations": [
-        "The common carrier of invention myths; may raise an attribution, never settle one"
+        "Records inventors as filed, which is not always who did the work",
+        "Describes the claimed mechanism only; it does not bound the wider technology",
+        "The inventor address is an address at filing, not where invention occurred"
       ]
     },
     {
-      "sourceClass": "contemporaneous-trade-press",
-      "claimClass": "commercial-impact",
+      "sourceClass": "patent_specification",
+      "claimClass": "relationship",
+      "fitness": "conditional",
+      "limitations": [
+        "Records inventors as filed, which is not always who did the work",
+        "Describes the claimed mechanism only; it does not bound the wider technology",
+        "The inventor address is an address at filing, not where invention occurred"
+      ]
+    },
+    {
+      "sourceClass": "patent_specification",
+      "claimClass": "legal_status",
+      "fitness": "conditional",
+      "limitations": [
+        "Records inventors as filed, which is not always who did the work",
+        "Describes the claimed mechanism only; it does not bound the wider technology",
+        "The inventor address is an address at filing, not where invention occurred"
+      ]
+    },
+    {
+      "sourceClass": "patent_specification",
+      "claimClass": "lived_experience",
+      "fitness": "conditional",
+      "limitations": [
+        "Records inventors as filed, which is not always who did the work",
+        "Describes the claimed mechanism only; it does not bound the wider technology",
+        "The inventor address is an address at filing, not where invention occurred"
+      ]
+    },
+    {
+      "sourceClass": "patent_specification",
+      "claimClass": "historical_synthesis",
+      "fitness": "conditional",
+      "limitations": [
+        "Records inventors as filed, which is not always who did the work",
+        "Describes the claimed mechanism only; it does not bound the wider technology",
+        "The inventor address is an address at filing, not where invention occurred"
+      ]
+    },
+    {
+      "sourceClass": "patent_application",
+      "claimClass": "record_fact",
       "fitness": "strong",
-      "limitations": ["Advertising and editorial are not always separable"]
+      "limitations": ["An application is not a grant; claims may narrow or be refused"]
+    },
+    {
+      "sourceClass": "patent_application",
+      "claimClass": "technical_identity",
+      "fitness": "conditional",
+      "limitations": ["An application is not a grant; claims may narrow or be refused"]
+    },
+    {
+      "sourceClass": "patent_application",
+      "claimClass": "community_identity",
+      "fitness": "unfit",
+      "limitations": ["An application is not a grant; claims may narrow or be refused"]
+    },
+    {
+      "sourceClass": "patent_application",
+      "claimClass": "technical_scope",
+      "fitness": "strong",
+      "limitations": ["An application is not a grant; claims may narrow or be refused"]
+    },
+    {
+      "sourceClass": "patent_application",
+      "claimClass": "invention_attribution",
+      "fitness": "conditional",
+      "limitations": ["An application is not a grant; claims may narrow or be refused"]
+    },
+    {
+      "sourceClass": "patent_application",
+      "claimClass": "superlative",
+      "fitness": "unfit",
+      "limitations": ["An application is not a grant; claims may narrow or be refused"]
+    },
+    {
+      "sourceClass": "patent_application",
+      "claimClass": "commercial_impact",
+      "fitness": "unfit",
+      "limitations": ["An application is not a grant; claims may narrow or be refused"]
+    },
+    {
+      "sourceClass": "patent_application",
+      "claimClass": "societal_impact",
+      "fitness": "unfit",
+      "limitations": ["An application is not a grant; claims may narrow or be refused"]
+    },
+    {
+      "sourceClass": "patent_application",
+      "claimClass": "biographical_fact",
+      "fitness": "conditional",
+      "limitations": ["An application is not a grant; claims may narrow or be refused"]
+    },
+    {
+      "sourceClass": "patent_application",
+      "claimClass": "chronology",
+      "fitness": "conditional",
+      "limitations": ["An application is not a grant; claims may narrow or be refused"]
+    },
+    {
+      "sourceClass": "patent_application",
+      "claimClass": "place",
+      "fitness": "conditional",
+      "limitations": ["An application is not a grant; claims may narrow or be refused"]
+    },
+    {
+      "sourceClass": "patent_application",
+      "claimClass": "relationship",
+      "fitness": "conditional",
+      "limitations": ["An application is not a grant; claims may narrow or be refused"]
+    },
+    {
+      "sourceClass": "patent_application",
+      "claimClass": "legal_status",
+      "fitness": "conditional",
+      "limitations": ["An application is not a grant; claims may narrow or be refused"]
+    },
+    {
+      "sourceClass": "patent_application",
+      "claimClass": "lived_experience",
+      "fitness": "conditional",
+      "limitations": ["An application is not a grant; claims may narrow or be refused"]
+    },
+    {
+      "sourceClass": "patent_application",
+      "claimClass": "historical_synthesis",
+      "fitness": "conditional",
+      "limitations": ["An application is not a grant; claims may narrow or be refused"]
+    },
+    {
+      "sourceClass": "patent_assignment_record",
+      "claimClass": "record_fact",
+      "fitness": "authoritative",
+      "limitations": []
+    },
+    {
+      "sourceClass": "patent_assignment_record",
+      "claimClass": "technical_identity",
+      "fitness": "conditional",
+      "limitations": []
+    },
+    {
+      "sourceClass": "patent_assignment_record",
+      "claimClass": "community_identity",
+      "fitness": "unfit",
+      "limitations": []
+    },
+    {
+      "sourceClass": "patent_assignment_record",
+      "claimClass": "technical_scope",
+      "fitness": "conditional",
+      "limitations": []
+    },
+    {
+      "sourceClass": "patent_assignment_record",
+      "claimClass": "invention_attribution",
+      "fitness": "conditional",
+      "limitations": []
+    },
+    {
+      "sourceClass": "patent_assignment_record",
+      "claimClass": "superlative",
+      "fitness": "unfit",
+      "limitations": []
+    },
+    {
+      "sourceClass": "patent_assignment_record",
+      "claimClass": "commercial_impact",
+      "fitness": "conditional",
+      "limitations": []
+    },
+    {
+      "sourceClass": "patent_assignment_record",
+      "claimClass": "societal_impact",
+      "fitness": "conditional",
+      "limitations": []
+    },
+    {
+      "sourceClass": "patent_assignment_record",
+      "claimClass": "biographical_fact",
+      "fitness": "conditional",
+      "limitations": []
+    },
+    {
+      "sourceClass": "patent_assignment_record",
+      "claimClass": "chronology",
+      "fitness": "conditional",
+      "limitations": []
+    },
+    {
+      "sourceClass": "patent_assignment_record",
+      "claimClass": "place",
+      "fitness": "conditional",
+      "limitations": []
+    },
+    {
+      "sourceClass": "patent_assignment_record",
+      "claimClass": "relationship",
+      "fitness": "strong",
+      "limitations": []
+    },
+    {
+      "sourceClass": "patent_assignment_record",
+      "claimClass": "legal_status",
+      "fitness": "conditional",
+      "limitations": []
+    },
+    {
+      "sourceClass": "patent_assignment_record",
+      "claimClass": "lived_experience",
+      "fitness": "conditional",
+      "limitations": []
+    },
+    {
+      "sourceClass": "patent_assignment_record",
+      "claimClass": "historical_synthesis",
+      "fitness": "conditional",
+      "limitations": []
+    },
+    {
+      "sourceClass": "patent_file_wrapper",
+      "claimClass": "record_fact",
+      "fitness": "authoritative",
+      "limitations": []
+    },
+    {
+      "sourceClass": "patent_file_wrapper",
+      "claimClass": "technical_identity",
+      "fitness": "strong",
+      "limitations": []
+    },
+    {
+      "sourceClass": "patent_file_wrapper",
+      "claimClass": "community_identity",
+      "fitness": "unfit",
+      "limitations": []
+    },
+    {
+      "sourceClass": "patent_file_wrapper",
+      "claimClass": "technical_scope",
+      "fitness": "authoritative",
+      "limitations": []
+    },
+    {
+      "sourceClass": "patent_file_wrapper",
+      "claimClass": "invention_attribution",
+      "fitness": "strong",
+      "limitations": []
+    },
+    {
+      "sourceClass": "patent_file_wrapper",
+      "claimClass": "superlative",
+      "fitness": "conditional",
+      "limitations": []
+    },
+    {
+      "sourceClass": "patent_file_wrapper",
+      "claimClass": "commercial_impact",
+      "fitness": "strong",
+      "limitations": []
+    },
+    {
+      "sourceClass": "patent_file_wrapper",
+      "claimClass": "societal_impact",
+      "fitness": "strong",
+      "limitations": []
+    },
+    {
+      "sourceClass": "patent_file_wrapper",
+      "claimClass": "biographical_fact",
+      "fitness": "strong",
+      "limitations": []
+    },
+    {
+      "sourceClass": "patent_file_wrapper",
+      "claimClass": "chronology",
+      "fitness": "strong",
+      "limitations": []
+    },
+    {
+      "sourceClass": "patent_file_wrapper",
+      "claimClass": "place",
+      "fitness": "strong",
+      "limitations": []
+    },
+    {
+      "sourceClass": "patent_file_wrapper",
+      "claimClass": "relationship",
+      "fitness": "strong",
+      "limitations": []
+    },
+    {
+      "sourceClass": "patent_file_wrapper",
+      "claimClass": "legal_status",
+      "fitness": "strong",
+      "limitations": []
+    },
+    {
+      "sourceClass": "patent_file_wrapper",
+      "claimClass": "lived_experience",
+      "fitness": "strong",
+      "limitations": []
+    },
+    {
+      "sourceClass": "patent_file_wrapper",
+      "claimClass": "historical_synthesis",
+      "fitness": "strong",
+      "limitations": []
+    },
+    {
+      "sourceClass": "patent_interference_record",
+      "claimClass": "record_fact",
+      "fitness": "authoritative",
+      "limitations": []
+    },
+    {
+      "sourceClass": "patent_interference_record",
+      "claimClass": "technical_identity",
+      "fitness": "strong",
+      "limitations": []
+    },
+    {
+      "sourceClass": "patent_interference_record",
+      "claimClass": "community_identity",
+      "fitness": "unfit",
+      "limitations": []
+    },
+    {
+      "sourceClass": "patent_interference_record",
+      "claimClass": "technical_scope",
+      "fitness": "strong",
+      "limitations": []
+    },
+    {
+      "sourceClass": "patent_interference_record",
+      "claimClass": "invention_attribution",
+      "fitness": "strong",
+      "limitations": []
+    },
+    {
+      "sourceClass": "patent_interference_record",
+      "claimClass": "superlative",
+      "fitness": "strong",
+      "limitations": []
+    },
+    {
+      "sourceClass": "patent_interference_record",
+      "claimClass": "commercial_impact",
+      "fitness": "strong",
+      "limitations": []
+    },
+    {
+      "sourceClass": "patent_interference_record",
+      "claimClass": "societal_impact",
+      "fitness": "strong",
+      "limitations": []
+    },
+    {
+      "sourceClass": "patent_interference_record",
+      "claimClass": "biographical_fact",
+      "fitness": "strong",
+      "limitations": []
+    },
+    {
+      "sourceClass": "patent_interference_record",
+      "claimClass": "chronology",
+      "fitness": "strong",
+      "limitations": []
+    },
+    {
+      "sourceClass": "patent_interference_record",
+      "claimClass": "place",
+      "fitness": "strong",
+      "limitations": []
+    },
+    {
+      "sourceClass": "patent_interference_record",
+      "claimClass": "relationship",
+      "fitness": "strong",
+      "limitations": []
+    },
+    {
+      "sourceClass": "patent_interference_record",
+      "claimClass": "legal_status",
+      "fitness": "strong",
+      "limitations": []
+    },
+    {
+      "sourceClass": "patent_interference_record",
+      "claimClass": "lived_experience",
+      "fitness": "strong",
+      "limitations": []
+    },
+    {
+      "sourceClass": "patent_interference_record",
+      "claimClass": "historical_synthesis",
+      "fitness": "strong",
+      "limitations": []
+    },
+    {
+      "sourceClass": "government_technical_report",
+      "claimClass": "record_fact",
+      "fitness": "authoritative",
+      "limitations": []
+    },
+    {
+      "sourceClass": "government_technical_report",
+      "claimClass": "technical_identity",
+      "fitness": "strong",
+      "limitations": []
+    },
+    {
+      "sourceClass": "government_technical_report",
+      "claimClass": "community_identity",
+      "fitness": "leadOnly",
+      "limitations": []
+    },
+    {
+      "sourceClass": "government_technical_report",
+      "claimClass": "technical_scope",
+      "fitness": "authoritative",
+      "limitations": []
+    },
+    {
+      "sourceClass": "government_technical_report",
+      "claimClass": "invention_attribution",
+      "fitness": "strong",
+      "limitations": []
+    },
+    {
+      "sourceClass": "government_technical_report",
+      "claimClass": "superlative",
+      "fitness": "conditional",
+      "limitations": []
+    },
+    {
+      "sourceClass": "government_technical_report",
+      "claimClass": "commercial_impact",
+      "fitness": "strong",
+      "limitations": []
+    },
+    {
+      "sourceClass": "government_technical_report",
+      "claimClass": "societal_impact",
+      "fitness": "conditional",
+      "limitations": []
+    },
+    {
+      "sourceClass": "government_technical_report",
+      "claimClass": "biographical_fact",
+      "fitness": "strong",
+      "limitations": []
+    },
+    {
+      "sourceClass": "government_technical_report",
+      "claimClass": "chronology",
+      "fitness": "strong",
+      "limitations": []
+    },
+    {
+      "sourceClass": "government_technical_report",
+      "claimClass": "place",
+      "fitness": "strong",
+      "limitations": []
+    },
+    {
+      "sourceClass": "government_technical_report",
+      "claimClass": "relationship",
+      "fitness": "strong",
+      "limitations": []
+    },
+    {
+      "sourceClass": "government_technical_report",
+      "claimClass": "legal_status",
+      "fitness": "strong",
+      "limitations": []
+    },
+    {
+      "sourceClass": "government_technical_report",
+      "claimClass": "lived_experience",
+      "fitness": "strong",
+      "limitations": []
+    },
+    {
+      "sourceClass": "government_technical_report",
+      "claimClass": "historical_synthesis",
+      "fitness": "strong",
+      "limitations": []
+    },
+    {
+      "sourceClass": "archival_manuscript",
+      "claimClass": "record_fact",
+      "fitness": "strong",
+      "limitations": []
+    },
+    {
+      "sourceClass": "archival_manuscript",
+      "claimClass": "technical_identity",
+      "fitness": "strong",
+      "limitations": []
+    },
+    {
+      "sourceClass": "archival_manuscript",
+      "claimClass": "community_identity",
+      "fitness": "strong",
+      "limitations": []
+    },
+    {
+      "sourceClass": "archival_manuscript",
+      "claimClass": "technical_scope",
+      "fitness": "strong",
+      "limitations": []
+    },
+    {
+      "sourceClass": "archival_manuscript",
+      "claimClass": "invention_attribution",
+      "fitness": "strong",
+      "limitations": []
+    },
+    {
+      "sourceClass": "archival_manuscript",
+      "claimClass": "superlative",
+      "fitness": "conditional",
+      "limitations": []
+    },
+    {
+      "sourceClass": "archival_manuscript",
+      "claimClass": "commercial_impact",
+      "fitness": "strong",
+      "limitations": []
+    },
+    {
+      "sourceClass": "archival_manuscript",
+      "claimClass": "societal_impact",
+      "fitness": "conditional",
+      "limitations": []
+    },
+    {
+      "sourceClass": "archival_manuscript",
+      "claimClass": "biographical_fact",
+      "fitness": "strong",
+      "limitations": []
+    },
+    {
+      "sourceClass": "archival_manuscript",
+      "claimClass": "chronology",
+      "fitness": "strong",
+      "limitations": []
+    },
+    {
+      "sourceClass": "archival_manuscript",
+      "claimClass": "place",
+      "fitness": "strong",
+      "limitations": []
+    },
+    {
+      "sourceClass": "archival_manuscript",
+      "claimClass": "relationship",
+      "fitness": "strong",
+      "limitations": []
+    },
+    {
+      "sourceClass": "archival_manuscript",
+      "claimClass": "legal_status",
+      "fitness": "strong",
+      "limitations": []
+    },
+    {
+      "sourceClass": "archival_manuscript",
+      "claimClass": "lived_experience",
+      "fitness": "authoritative",
+      "limitations": []
+    },
+    {
+      "sourceClass": "archival_manuscript",
+      "claimClass": "historical_synthesis",
+      "fitness": "strong",
+      "limitations": []
+    },
+    {
+      "sourceClass": "archival_finding_aid",
+      "claimClass": "record_fact",
+      "fitness": "conditional",
+      "limitations": []
+    },
+    {
+      "sourceClass": "archival_finding_aid",
+      "claimClass": "technical_identity",
+      "fitness": "leadOnly",
+      "limitations": []
+    },
+    {
+      "sourceClass": "archival_finding_aid",
+      "claimClass": "community_identity",
+      "fitness": "leadOnly",
+      "limitations": []
+    },
+    {
+      "sourceClass": "archival_finding_aid",
+      "claimClass": "technical_scope",
+      "fitness": "leadOnly",
+      "limitations": []
+    },
+    {
+      "sourceClass": "archival_finding_aid",
+      "claimClass": "invention_attribution",
+      "fitness": "leadOnly",
+      "limitations": []
+    },
+    {
+      "sourceClass": "archival_finding_aid",
+      "claimClass": "superlative",
+      "fitness": "leadOnly",
+      "limitations": []
+    },
+    {
+      "sourceClass": "archival_finding_aid",
+      "claimClass": "commercial_impact",
+      "fitness": "leadOnly",
+      "limitations": []
+    },
+    {
+      "sourceClass": "archival_finding_aid",
+      "claimClass": "societal_impact",
+      "fitness": "leadOnly",
+      "limitations": []
+    },
+    {
+      "sourceClass": "archival_finding_aid",
+      "claimClass": "biographical_fact",
+      "fitness": "leadOnly",
+      "limitations": []
+    },
+    {
+      "sourceClass": "archival_finding_aid",
+      "claimClass": "chronology",
+      "fitness": "leadOnly",
+      "limitations": []
+    },
+    {
+      "sourceClass": "archival_finding_aid",
+      "claimClass": "place",
+      "fitness": "leadOnly",
+      "limitations": []
+    },
+    {
+      "sourceClass": "archival_finding_aid",
+      "claimClass": "relationship",
+      "fitness": "leadOnly",
+      "limitations": []
+    },
+    {
+      "sourceClass": "archival_finding_aid",
+      "claimClass": "legal_status",
+      "fitness": "leadOnly",
+      "limitations": []
+    },
+    {
+      "sourceClass": "archival_finding_aid",
+      "claimClass": "lived_experience",
+      "fitness": "leadOnly",
+      "limitations": []
+    },
+    {
+      "sourceClass": "archival_finding_aid",
+      "claimClass": "historical_synthesis",
+      "fitness": "leadOnly",
+      "limitations": []
+    },
+    {
+      "sourceClass": "institutional_biography",
+      "claimClass": "record_fact",
+      "fitness": "conditional",
+      "limitations": [
+        "Synthesises rather than documents; the underlying evidence may not be cited",
+        "A superlative here is only as good as the research the institution actually did"
+      ]
+    },
+    {
+      "sourceClass": "institutional_biography",
+      "claimClass": "technical_identity",
+      "fitness": "strong",
+      "limitations": [
+        "Synthesises rather than documents; the underlying evidence may not be cited",
+        "A superlative here is only as good as the research the institution actually did"
+      ]
+    },
+    {
+      "sourceClass": "institutional_biography",
+      "claimClass": "community_identity",
+      "fitness": "strong",
+      "limitations": [
+        "Synthesises rather than documents; the underlying evidence may not be cited",
+        "A superlative here is only as good as the research the institution actually did"
+      ]
+    },
+    {
+      "sourceClass": "institutional_biography",
+      "claimClass": "technical_scope",
+      "fitness": "conditional",
+      "limitations": [
+        "Synthesises rather than documents; the underlying evidence may not be cited",
+        "A superlative here is only as good as the research the institution actually did"
+      ]
+    },
+    {
+      "sourceClass": "institutional_biography",
+      "claimClass": "invention_attribution",
+      "fitness": "strong",
+      "limitations": [
+        "Synthesises rather than documents; the underlying evidence may not be cited",
+        "A superlative here is only as good as the research the institution actually did"
+      ]
+    },
+    {
+      "sourceClass": "institutional_biography",
+      "claimClass": "superlative",
+      "fitness": "conditional",
+      "limitations": [
+        "Synthesises rather than documents; the underlying evidence may not be cited",
+        "A superlative here is only as good as the research the institution actually did"
+      ]
+    },
+    {
+      "sourceClass": "institutional_biography",
+      "claimClass": "commercial_impact",
+      "fitness": "strong",
+      "limitations": [
+        "Synthesises rather than documents; the underlying evidence may not be cited",
+        "A superlative here is only as good as the research the institution actually did"
+      ]
+    },
+    {
+      "sourceClass": "institutional_biography",
+      "claimClass": "societal_impact",
+      "fitness": "strong",
+      "limitations": [
+        "Synthesises rather than documents; the underlying evidence may not be cited",
+        "A superlative here is only as good as the research the institution actually did"
+      ]
+    },
+    {
+      "sourceClass": "institutional_biography",
+      "claimClass": "biographical_fact",
+      "fitness": "strong",
+      "limitations": [
+        "Synthesises rather than documents; the underlying evidence may not be cited",
+        "A superlative here is only as good as the research the institution actually did"
+      ]
+    },
+    {
+      "sourceClass": "institutional_biography",
+      "claimClass": "chronology",
+      "fitness": "strong",
+      "limitations": [
+        "Synthesises rather than documents; the underlying evidence may not be cited",
+        "A superlative here is only as good as the research the institution actually did"
+      ]
+    },
+    {
+      "sourceClass": "institutional_biography",
+      "claimClass": "place",
+      "fitness": "strong",
+      "limitations": [
+        "Synthesises rather than documents; the underlying evidence may not be cited",
+        "A superlative here is only as good as the research the institution actually did"
+      ]
+    },
+    {
+      "sourceClass": "institutional_biography",
+      "claimClass": "relationship",
+      "fitness": "strong",
+      "limitations": [
+        "Synthesises rather than documents; the underlying evidence may not be cited",
+        "A superlative here is only as good as the research the institution actually did"
+      ]
+    },
+    {
+      "sourceClass": "institutional_biography",
+      "claimClass": "legal_status",
+      "fitness": "strong",
+      "limitations": [
+        "Synthesises rather than documents; the underlying evidence may not be cited",
+        "A superlative here is only as good as the research the institution actually did"
+      ]
+    },
+    {
+      "sourceClass": "institutional_biography",
+      "claimClass": "lived_experience",
+      "fitness": "strong",
+      "limitations": [
+        "Synthesises rather than documents; the underlying evidence may not be cited",
+        "A superlative here is only as good as the research the institution actually did"
+      ]
+    },
+    {
+      "sourceClass": "institutional_biography",
+      "claimClass": "historical_synthesis",
+      "fitness": "strong",
+      "limitations": [
+        "Synthesises rather than documents; the underlying evidence may not be cited",
+        "A superlative here is only as good as the research the institution actually did"
+      ]
+    },
+    {
+      "sourceClass": "museum_object_record",
+      "claimClass": "record_fact",
+      "fitness": "authoritative",
+      "limitations": []
+    },
+    {
+      "sourceClass": "museum_object_record",
+      "claimClass": "technical_identity",
+      "fitness": "strong",
+      "limitations": []
+    },
+    {
+      "sourceClass": "museum_object_record",
+      "claimClass": "community_identity",
+      "fitness": "conditional",
+      "limitations": []
+    },
+    {
+      "sourceClass": "museum_object_record",
+      "claimClass": "technical_scope",
+      "fitness": "strong",
+      "limitations": []
+    },
+    {
+      "sourceClass": "museum_object_record",
+      "claimClass": "invention_attribution",
+      "fitness": "strong",
+      "limitations": []
+    },
+    {
+      "sourceClass": "museum_object_record",
+      "claimClass": "superlative",
+      "fitness": "conditional",
+      "limitations": []
+    },
+    {
+      "sourceClass": "museum_object_record",
+      "claimClass": "commercial_impact",
+      "fitness": "strong",
+      "limitations": []
+    },
+    {
+      "sourceClass": "museum_object_record",
+      "claimClass": "societal_impact",
+      "fitness": "strong",
+      "limitations": []
+    },
+    {
+      "sourceClass": "museum_object_record",
+      "claimClass": "biographical_fact",
+      "fitness": "strong",
+      "limitations": []
+    },
+    {
+      "sourceClass": "museum_object_record",
+      "claimClass": "chronology",
+      "fitness": "strong",
+      "limitations": []
+    },
+    {
+      "sourceClass": "museum_object_record",
+      "claimClass": "place",
+      "fitness": "strong",
+      "limitations": []
+    },
+    {
+      "sourceClass": "museum_object_record",
+      "claimClass": "relationship",
+      "fitness": "strong",
+      "limitations": []
+    },
+    {
+      "sourceClass": "museum_object_record",
+      "claimClass": "legal_status",
+      "fitness": "strong",
+      "limitations": []
+    },
+    {
+      "sourceClass": "museum_object_record",
+      "claimClass": "lived_experience",
+      "fitness": "strong",
+      "limitations": []
+    },
+    {
+      "sourceClass": "museum_object_record",
+      "claimClass": "historical_synthesis",
+      "fitness": "strong",
+      "limitations": []
+    },
+    {
+      "sourceClass": "museum_curatorial_history",
+      "claimClass": "record_fact",
+      "fitness": "strong",
+      "limitations": ["Curatorial framing selects for narrative significance"]
+    },
+    {
+      "sourceClass": "museum_curatorial_history",
+      "claimClass": "technical_identity",
+      "fitness": "strong",
+      "limitations": ["Curatorial framing selects for narrative significance"]
+    },
+    {
+      "sourceClass": "museum_curatorial_history",
+      "claimClass": "community_identity",
+      "fitness": "strong",
+      "limitations": ["Curatorial framing selects for narrative significance"]
+    },
+    {
+      "sourceClass": "museum_curatorial_history",
+      "claimClass": "technical_scope",
+      "fitness": "conditional",
+      "limitations": ["Curatorial framing selects for narrative significance"]
+    },
+    {
+      "sourceClass": "museum_curatorial_history",
+      "claimClass": "invention_attribution",
+      "fitness": "strong",
+      "limitations": ["Curatorial framing selects for narrative significance"]
+    },
+    {
+      "sourceClass": "museum_curatorial_history",
+      "claimClass": "superlative",
+      "fitness": "conditional",
+      "limitations": ["Curatorial framing selects for narrative significance"]
+    },
+    {
+      "sourceClass": "museum_curatorial_history",
+      "claimClass": "commercial_impact",
+      "fitness": "strong",
+      "limitations": ["Curatorial framing selects for narrative significance"]
+    },
+    {
+      "sourceClass": "museum_curatorial_history",
+      "claimClass": "societal_impact",
+      "fitness": "strong",
+      "limitations": ["Curatorial framing selects for narrative significance"]
+    },
+    {
+      "sourceClass": "museum_curatorial_history",
+      "claimClass": "biographical_fact",
+      "fitness": "strong",
+      "limitations": ["Curatorial framing selects for narrative significance"]
+    },
+    {
+      "sourceClass": "museum_curatorial_history",
+      "claimClass": "chronology",
+      "fitness": "strong",
+      "limitations": ["Curatorial framing selects for narrative significance"]
+    },
+    {
+      "sourceClass": "museum_curatorial_history",
+      "claimClass": "place",
+      "fitness": "strong",
+      "limitations": ["Curatorial framing selects for narrative significance"]
+    },
+    {
+      "sourceClass": "museum_curatorial_history",
+      "claimClass": "relationship",
+      "fitness": "strong",
+      "limitations": ["Curatorial framing selects for narrative significance"]
+    },
+    {
+      "sourceClass": "museum_curatorial_history",
+      "claimClass": "legal_status",
+      "fitness": "strong",
+      "limitations": ["Curatorial framing selects for narrative significance"]
+    },
+    {
+      "sourceClass": "museum_curatorial_history",
+      "claimClass": "lived_experience",
+      "fitness": "strong",
+      "limitations": ["Curatorial framing selects for narrative significance"]
+    },
+    {
+      "sourceClass": "museum_curatorial_history",
+      "claimClass": "historical_synthesis",
+      "fitness": "strong",
+      "limitations": ["Curatorial framing selects for narrative significance"]
+    },
+    {
+      "sourceClass": "contemporaneous_newspaper",
+      "claimClass": "record_fact",
+      "fitness": "conditional",
+      "limitations": [
+        "Period racial prejudice shapes both coverage and omission",
+        "Promotional copy is often printed as reporting",
+        "Technical detail is frequently misunderstood"
+      ]
+    },
+    {
+      "sourceClass": "contemporaneous_newspaper",
+      "claimClass": "technical_identity",
+      "fitness": "conditional",
+      "limitations": [
+        "Period racial prejudice shapes both coverage and omission",
+        "Promotional copy is often printed as reporting",
+        "Technical detail is frequently misunderstood"
+      ]
+    },
+    {
+      "sourceClass": "contemporaneous_newspaper",
+      "claimClass": "community_identity",
+      "fitness": "conditional",
+      "limitations": [
+        "Period racial prejudice shapes both coverage and omission",
+        "Promotional copy is often printed as reporting",
+        "Technical detail is frequently misunderstood"
+      ]
+    },
+    {
+      "sourceClass": "contemporaneous_newspaper",
+      "claimClass": "technical_scope",
+      "fitness": "leadOnly",
+      "limitations": [
+        "Period racial prejudice shapes both coverage and omission",
+        "Promotional copy is often printed as reporting",
+        "Technical detail is frequently misunderstood"
+      ]
+    },
+    {
+      "sourceClass": "contemporaneous_newspaper",
+      "claimClass": "invention_attribution",
+      "fitness": "conditional",
+      "limitations": [
+        "Period racial prejudice shapes both coverage and omission",
+        "Promotional copy is often printed as reporting",
+        "Technical detail is frequently misunderstood"
+      ]
+    },
+    {
+      "sourceClass": "contemporaneous_newspaper",
+      "claimClass": "superlative",
+      "fitness": "leadOnly",
+      "limitations": [
+        "Period racial prejudice shapes both coverage and omission",
+        "Promotional copy is often printed as reporting",
+        "Technical detail is frequently misunderstood"
+      ]
+    },
+    {
+      "sourceClass": "contemporaneous_newspaper",
+      "claimClass": "commercial_impact",
+      "fitness": "conditional",
+      "limitations": [
+        "Period racial prejudice shapes both coverage and omission",
+        "Promotional copy is often printed as reporting",
+        "Technical detail is frequently misunderstood"
+      ]
+    },
+    {
+      "sourceClass": "contemporaneous_newspaper",
+      "claimClass": "societal_impact",
+      "fitness": "conditional",
+      "limitations": [
+        "Period racial prejudice shapes both coverage and omission",
+        "Promotional copy is often printed as reporting",
+        "Technical detail is frequently misunderstood"
+      ]
+    },
+    {
+      "sourceClass": "contemporaneous_newspaper",
+      "claimClass": "biographical_fact",
+      "fitness": "conditional",
+      "limitations": [
+        "Period racial prejudice shapes both coverage and omission",
+        "Promotional copy is often printed as reporting",
+        "Technical detail is frequently misunderstood"
+      ]
+    },
+    {
+      "sourceClass": "contemporaneous_newspaper",
+      "claimClass": "chronology",
+      "fitness": "strong",
+      "limitations": [
+        "Period racial prejudice shapes both coverage and omission",
+        "Promotional copy is often printed as reporting",
+        "Technical detail is frequently misunderstood"
+      ]
+    },
+    {
+      "sourceClass": "contemporaneous_newspaper",
+      "claimClass": "place",
+      "fitness": "conditional",
+      "limitations": [
+        "Period racial prejudice shapes both coverage and omission",
+        "Promotional copy is often printed as reporting",
+        "Technical detail is frequently misunderstood"
+      ]
+    },
+    {
+      "sourceClass": "contemporaneous_newspaper",
+      "claimClass": "relationship",
+      "fitness": "conditional",
+      "limitations": [
+        "Period racial prejudice shapes both coverage and omission",
+        "Promotional copy is often printed as reporting",
+        "Technical detail is frequently misunderstood"
+      ]
+    },
+    {
+      "sourceClass": "contemporaneous_newspaper",
+      "claimClass": "legal_status",
+      "fitness": "conditional",
+      "limitations": [
+        "Period racial prejudice shapes both coverage and omission",
+        "Promotional copy is often printed as reporting",
+        "Technical detail is frequently misunderstood"
+      ]
+    },
+    {
+      "sourceClass": "contemporaneous_newspaper",
+      "claimClass": "lived_experience",
+      "fitness": "conditional",
+      "limitations": [
+        "Period racial prejudice shapes both coverage and omission",
+        "Promotional copy is often printed as reporting",
+        "Technical detail is frequently misunderstood"
+      ]
+    },
+    {
+      "sourceClass": "contemporaneous_newspaper",
+      "claimClass": "historical_synthesis",
+      "fitness": "conditional",
+      "limitations": [
+        "Period racial prejudice shapes both coverage and omission",
+        "Promotional copy is often printed as reporting",
+        "Technical detail is frequently misunderstood"
+      ]
+    },
+    {
+      "sourceClass": "contemporaneous_trade_press",
+      "claimClass": "record_fact",
+      "fitness": "conditional",
+      "limitations": [
+        "Advertising and editorial are not always separable",
+        "Adoption claims may be a manufacturer restating itself"
+      ]
+    },
+    {
+      "sourceClass": "contemporaneous_trade_press",
+      "claimClass": "technical_identity",
+      "fitness": "conditional",
+      "limitations": [
+        "Advertising and editorial are not always separable",
+        "Adoption claims may be a manufacturer restating itself"
+      ]
+    },
+    {
+      "sourceClass": "contemporaneous_trade_press",
+      "claimClass": "community_identity",
+      "fitness": "leadOnly",
+      "limitations": [
+        "Advertising and editorial are not always separable",
+        "Adoption claims may be a manufacturer restating itself"
+      ]
+    },
+    {
+      "sourceClass": "contemporaneous_trade_press",
+      "claimClass": "technical_scope",
+      "fitness": "conditional",
+      "limitations": [
+        "Advertising and editorial are not always separable",
+        "Adoption claims may be a manufacturer restating itself"
+      ]
+    },
+    {
+      "sourceClass": "contemporaneous_trade_press",
+      "claimClass": "invention_attribution",
+      "fitness": "conditional",
+      "limitations": [
+        "Advertising and editorial are not always separable",
+        "Adoption claims may be a manufacturer restating itself"
+      ]
+    },
+    {
+      "sourceClass": "contemporaneous_trade_press",
+      "claimClass": "superlative",
+      "fitness": "leadOnly",
+      "limitations": [
+        "Advertising and editorial are not always separable",
+        "Adoption claims may be a manufacturer restating itself"
+      ]
+    },
+    {
+      "sourceClass": "contemporaneous_trade_press",
+      "claimClass": "commercial_impact",
+      "fitness": "strong",
+      "limitations": [
+        "Advertising and editorial are not always separable",
+        "Adoption claims may be a manufacturer restating itself"
+      ]
+    },
+    {
+      "sourceClass": "contemporaneous_trade_press",
+      "claimClass": "societal_impact",
+      "fitness": "conditional",
+      "limitations": [
+        "Advertising and editorial are not always separable",
+        "Adoption claims may be a manufacturer restating itself"
+      ]
+    },
+    {
+      "sourceClass": "contemporaneous_trade_press",
+      "claimClass": "biographical_fact",
+      "fitness": "conditional",
+      "limitations": [
+        "Advertising and editorial are not always separable",
+        "Adoption claims may be a manufacturer restating itself"
+      ]
+    },
+    {
+      "sourceClass": "contemporaneous_trade_press",
+      "claimClass": "chronology",
+      "fitness": "strong",
+      "limitations": [
+        "Advertising and editorial are not always separable",
+        "Adoption claims may be a manufacturer restating itself"
+      ]
+    },
+    {
+      "sourceClass": "contemporaneous_trade_press",
+      "claimClass": "place",
+      "fitness": "conditional",
+      "limitations": [
+        "Advertising and editorial are not always separable",
+        "Adoption claims may be a manufacturer restating itself"
+      ]
+    },
+    {
+      "sourceClass": "contemporaneous_trade_press",
+      "claimClass": "relationship",
+      "fitness": "conditional",
+      "limitations": [
+        "Advertising and editorial are not always separable",
+        "Adoption claims may be a manufacturer restating itself"
+      ]
+    },
+    {
+      "sourceClass": "contemporaneous_trade_press",
+      "claimClass": "legal_status",
+      "fitness": "conditional",
+      "limitations": [
+        "Advertising and editorial are not always separable",
+        "Adoption claims may be a manufacturer restating itself"
+      ]
+    },
+    {
+      "sourceClass": "contemporaneous_trade_press",
+      "claimClass": "lived_experience",
+      "fitness": "conditional",
+      "limitations": [
+        "Advertising and editorial are not always separable",
+        "Adoption claims may be a manufacturer restating itself"
+      ]
+    },
+    {
+      "sourceClass": "contemporaneous_trade_press",
+      "claimClass": "historical_synthesis",
+      "fitness": "conditional",
+      "limitations": [
+        "Advertising and editorial are not always separable",
+        "Adoption claims may be a manufacturer restating itself"
+      ]
+    },
+    {
+      "sourceClass": "company_record",
+      "claimClass": "record_fact",
+      "fitness": "strong",
+      "limitations": ["Self-interested on adoption, priority and credit"]
+    },
+    {
+      "sourceClass": "company_record",
+      "claimClass": "technical_identity",
+      "fitness": "conditional",
+      "limitations": ["Self-interested on adoption, priority and credit"]
+    },
+    {
+      "sourceClass": "company_record",
+      "claimClass": "community_identity",
+      "fitness": "leadOnly",
+      "limitations": ["Self-interested on adoption, priority and credit"]
+    },
+    {
+      "sourceClass": "company_record",
+      "claimClass": "technical_scope",
+      "fitness": "conditional",
+      "limitations": ["Self-interested on adoption, priority and credit"]
+    },
+    {
+      "sourceClass": "company_record",
+      "claimClass": "invention_attribution",
+      "fitness": "conditional",
+      "limitations": ["Self-interested on adoption, priority and credit"]
+    },
+    {
+      "sourceClass": "company_record",
+      "claimClass": "superlative",
+      "fitness": "unfit",
+      "limitations": ["Self-interested on adoption, priority and credit"]
+    },
+    {
+      "sourceClass": "company_record",
+      "claimClass": "commercial_impact",
+      "fitness": "conditional",
+      "limitations": ["Self-interested on adoption, priority and credit"]
+    },
+    {
+      "sourceClass": "company_record",
+      "claimClass": "societal_impact",
+      "fitness": "conditional",
+      "limitations": ["Self-interested on adoption, priority and credit"]
+    },
+    {
+      "sourceClass": "company_record",
+      "claimClass": "biographical_fact",
+      "fitness": "conditional",
+      "limitations": ["Self-interested on adoption, priority and credit"]
+    },
+    {
+      "sourceClass": "company_record",
+      "claimClass": "chronology",
+      "fitness": "conditional",
+      "limitations": ["Self-interested on adoption, priority and credit"]
+    },
+    {
+      "sourceClass": "company_record",
+      "claimClass": "place",
+      "fitness": "conditional",
+      "limitations": ["Self-interested on adoption, priority and credit"]
+    },
+    {
+      "sourceClass": "company_record",
+      "claimClass": "relationship",
+      "fitness": "strong",
+      "limitations": ["Self-interested on adoption, priority and credit"]
+    },
+    {
+      "sourceClass": "company_record",
+      "claimClass": "legal_status",
+      "fitness": "conditional",
+      "limitations": ["Self-interested on adoption, priority and credit"]
+    },
+    {
+      "sourceClass": "company_record",
+      "claimClass": "lived_experience",
+      "fitness": "conditional",
+      "limitations": ["Self-interested on adoption, priority and credit"]
+    },
+    {
+      "sourceClass": "company_record",
+      "claimClass": "historical_synthesis",
+      "fitness": "conditional",
+      "limitations": ["Self-interested on adoption, priority and credit"]
+    },
+    {
+      "sourceClass": "court_record",
+      "claimClass": "record_fact",
+      "fitness": "authoritative",
+      "limitations": []
+    },
+    {
+      "sourceClass": "court_record",
+      "claimClass": "technical_identity",
+      "fitness": "strong",
+      "limitations": []
+    },
+    {
+      "sourceClass": "court_record",
+      "claimClass": "community_identity",
+      "fitness": "leadOnly",
+      "limitations": []
+    },
+    {
+      "sourceClass": "court_record",
+      "claimClass": "technical_scope",
+      "fitness": "strong",
+      "limitations": []
+    },
+    {
+      "sourceClass": "court_record",
+      "claimClass": "invention_attribution",
+      "fitness": "strong",
+      "limitations": []
+    },
+    {
+      "sourceClass": "court_record",
+      "claimClass": "superlative",
+      "fitness": "conditional",
+      "limitations": []
+    },
+    {
+      "sourceClass": "court_record",
+      "claimClass": "commercial_impact",
+      "fitness": "strong",
+      "limitations": []
+    },
+    {
+      "sourceClass": "court_record",
+      "claimClass": "societal_impact",
+      "fitness": "strong",
+      "limitations": []
+    },
+    {
+      "sourceClass": "court_record",
+      "claimClass": "biographical_fact",
+      "fitness": "strong",
+      "limitations": []
+    },
+    {
+      "sourceClass": "court_record",
+      "claimClass": "chronology",
+      "fitness": "strong",
+      "limitations": []
+    },
+    {
+      "sourceClass": "court_record",
+      "claimClass": "place",
+      "fitness": "strong",
+      "limitations": []
+    },
+    {
+      "sourceClass": "court_record",
+      "claimClass": "relationship",
+      "fitness": "strong",
+      "limitations": []
+    },
+    {
+      "sourceClass": "court_record",
+      "claimClass": "legal_status",
+      "fitness": "authoritative",
+      "limitations": []
+    },
+    {
+      "sourceClass": "court_record",
+      "claimClass": "lived_experience",
+      "fitness": "strong",
+      "limitations": []
+    },
+    {
+      "sourceClass": "court_record",
+      "claimClass": "historical_synthesis",
+      "fitness": "strong",
+      "limitations": []
+    },
+    {
+      "sourceClass": "enacted_legal_record",
+      "claimClass": "record_fact",
+      "fitness": "authoritative",
+      "limitations": [
+        "Check jurisdiction, enactment, effective date and amendments",
+        "Legal text does not by itself establish implementation or social effects"
+      ]
+    },
+    {
+      "sourceClass": "enacted_legal_record",
+      "claimClass": "technical_identity",
+      "fitness": "unfit",
+      "limitations": [
+        "Check jurisdiction, enactment, effective date and amendments",
+        "Legal text does not by itself establish implementation or social effects"
+      ]
+    },
+    {
+      "sourceClass": "enacted_legal_record",
+      "claimClass": "community_identity",
+      "fitness": "unfit",
+      "limitations": [
+        "Check jurisdiction, enactment, effective date and amendments",
+        "Legal text does not by itself establish implementation or social effects"
+      ]
+    },
+    {
+      "sourceClass": "enacted_legal_record",
+      "claimClass": "technical_scope",
+      "fitness": "unfit",
+      "limitations": [
+        "Check jurisdiction, enactment, effective date and amendments",
+        "Legal text does not by itself establish implementation or social effects"
+      ]
+    },
+    {
+      "sourceClass": "enacted_legal_record",
+      "claimClass": "invention_attribution",
+      "fitness": "unfit",
+      "limitations": [
+        "Check jurisdiction, enactment, effective date and amendments",
+        "Legal text does not by itself establish implementation or social effects"
+      ]
+    },
+    {
+      "sourceClass": "enacted_legal_record",
+      "claimClass": "superlative",
+      "fitness": "unfit",
+      "limitations": [
+        "Check jurisdiction, enactment, effective date and amendments",
+        "Legal text does not by itself establish implementation or social effects"
+      ]
+    },
+    {
+      "sourceClass": "enacted_legal_record",
+      "claimClass": "commercial_impact",
+      "fitness": "unfit",
+      "limitations": [
+        "Check jurisdiction, enactment, effective date and amendments",
+        "Legal text does not by itself establish implementation or social effects"
+      ]
+    },
+    {
+      "sourceClass": "enacted_legal_record",
+      "claimClass": "societal_impact",
+      "fitness": "unfit",
+      "limitations": [
+        "Check jurisdiction, enactment, effective date and amendments",
+        "Legal text does not by itself establish implementation or social effects"
+      ]
+    },
+    {
+      "sourceClass": "enacted_legal_record",
+      "claimClass": "biographical_fact",
+      "fitness": "unfit",
+      "limitations": [
+        "Check jurisdiction, enactment, effective date and amendments",
+        "Legal text does not by itself establish implementation or social effects"
+      ]
+    },
+    {
+      "sourceClass": "enacted_legal_record",
+      "claimClass": "chronology",
+      "fitness": "conditional",
+      "limitations": [
+        "Check jurisdiction, enactment, effective date and amendments",
+        "Legal text does not by itself establish implementation or social effects"
+      ]
+    },
+    {
+      "sourceClass": "enacted_legal_record",
+      "claimClass": "place",
+      "fitness": "conditional",
+      "limitations": [
+        "Check jurisdiction, enactment, effective date and amendments",
+        "Legal text does not by itself establish implementation or social effects"
+      ]
+    },
+    {
+      "sourceClass": "enacted_legal_record",
+      "claimClass": "relationship",
+      "fitness": "unfit",
+      "limitations": [
+        "Check jurisdiction, enactment, effective date and amendments",
+        "Legal text does not by itself establish implementation or social effects"
+      ]
+    },
+    {
+      "sourceClass": "enacted_legal_record",
+      "claimClass": "legal_status",
+      "fitness": "authoritative",
+      "limitations": [
+        "Check jurisdiction, enactment, effective date and amendments",
+        "Legal text does not by itself establish implementation or social effects"
+      ]
+    },
+    {
+      "sourceClass": "enacted_legal_record",
+      "claimClass": "lived_experience",
+      "fitness": "unfit",
+      "limitations": [
+        "Check jurisdiction, enactment, effective date and amendments",
+        "Legal text does not by itself establish implementation or social effects"
+      ]
+    },
+    {
+      "sourceClass": "enacted_legal_record",
+      "claimClass": "historical_synthesis",
+      "fitness": "unfit",
+      "limitations": [
+        "Check jurisdiction, enactment, effective date and amendments",
+        "Legal text does not by itself establish implementation or social effects"
+      ]
+    },
+    {
+      "sourceClass": "census_or_vital_record",
+      "claimClass": "record_fact",
+      "fitness": "conditional",
+      "limitations": [
+        "Enumerator-recorded race reflects the enumerator, and must be handled under the dignity rules",
+        "Names, ages and spellings are frequently wrong"
+      ]
+    },
+    {
+      "sourceClass": "census_or_vital_record",
+      "claimClass": "technical_identity",
+      "fitness": "conditional",
+      "limitations": [
+        "Enumerator-recorded race reflects the enumerator, and must be handled under the dignity rules",
+        "Names, ages and spellings are frequently wrong"
+      ]
+    },
+    {
+      "sourceClass": "census_or_vital_record",
+      "claimClass": "community_identity",
+      "fitness": "conditional",
+      "limitations": [
+        "Enumerator-recorded race reflects the enumerator, and must be handled under the dignity rules",
+        "Names, ages and spellings are frequently wrong"
+      ]
+    },
+    {
+      "sourceClass": "census_or_vital_record",
+      "claimClass": "technical_scope",
+      "fitness": "unfit",
+      "limitations": [
+        "Enumerator-recorded race reflects the enumerator, and must be handled under the dignity rules",
+        "Names, ages and spellings are frequently wrong"
+      ]
+    },
+    {
+      "sourceClass": "census_or_vital_record",
+      "claimClass": "invention_attribution",
+      "fitness": "conditional",
+      "limitations": [
+        "Enumerator-recorded race reflects the enumerator, and must be handled under the dignity rules",
+        "Names, ages and spellings are frequently wrong"
+      ]
+    },
+    {
+      "sourceClass": "census_or_vital_record",
+      "claimClass": "superlative",
+      "fitness": "unfit",
+      "limitations": [
+        "Enumerator-recorded race reflects the enumerator, and must be handled under the dignity rules",
+        "Names, ages and spellings are frequently wrong"
+      ]
+    },
+    {
+      "sourceClass": "census_or_vital_record",
+      "claimClass": "commercial_impact",
+      "fitness": "conditional",
+      "limitations": [
+        "Enumerator-recorded race reflects the enumerator, and must be handled under the dignity rules",
+        "Names, ages and spellings are frequently wrong"
+      ]
+    },
+    {
+      "sourceClass": "census_or_vital_record",
+      "claimClass": "societal_impact",
+      "fitness": "conditional",
+      "limitations": [
+        "Enumerator-recorded race reflects the enumerator, and must be handled under the dignity rules",
+        "Names, ages and spellings are frequently wrong"
+      ]
+    },
+    {
+      "sourceClass": "census_or_vital_record",
+      "claimClass": "biographical_fact",
+      "fitness": "strong",
+      "limitations": [
+        "Enumerator-recorded race reflects the enumerator, and must be handled under the dignity rules",
+        "Names, ages and spellings are frequently wrong"
+      ]
+    },
+    {
+      "sourceClass": "census_or_vital_record",
+      "claimClass": "chronology",
+      "fitness": "strong",
+      "limitations": [
+        "Enumerator-recorded race reflects the enumerator, and must be handled under the dignity rules",
+        "Names, ages and spellings are frequently wrong"
+      ]
+    },
+    {
+      "sourceClass": "census_or_vital_record",
+      "claimClass": "place",
+      "fitness": "strong",
+      "limitations": [
+        "Enumerator-recorded race reflects the enumerator, and must be handled under the dignity rules",
+        "Names, ages and spellings are frequently wrong"
+      ]
+    },
+    {
+      "sourceClass": "census_or_vital_record",
+      "claimClass": "relationship",
+      "fitness": "conditional",
+      "limitations": [
+        "Enumerator-recorded race reflects the enumerator, and must be handled under the dignity rules",
+        "Names, ages and spellings are frequently wrong"
+      ]
+    },
+    {
+      "sourceClass": "census_or_vital_record",
+      "claimClass": "legal_status",
+      "fitness": "conditional",
+      "limitations": [
+        "Enumerator-recorded race reflects the enumerator, and must be handled under the dignity rules",
+        "Names, ages and spellings are frequently wrong"
+      ]
+    },
+    {
+      "sourceClass": "census_or_vital_record",
+      "claimClass": "lived_experience",
+      "fitness": "conditional",
+      "limitations": [
+        "Enumerator-recorded race reflects the enumerator, and must be handled under the dignity rules",
+        "Names, ages and spellings are frequently wrong"
+      ]
+    },
+    {
+      "sourceClass": "census_or_vital_record",
+      "claimClass": "historical_synthesis",
+      "fitness": "conditional",
+      "limitations": [
+        "Enumerator-recorded race reflects the enumerator, and must be handled under the dignity rules",
+        "Names, ages and spellings are frequently wrong"
+      ]
+    },
+    {
+      "sourceClass": "oral_history",
+      "claimClass": "record_fact",
+      "fitness": "conditional",
+      "limitations": [
+        "Preserve speaker, interviewer, recording date, remembered period and consent context",
+        "Memory and interview questions shape testimony; disputed chronology needs separate investigation"
+      ]
+    },
+    {
+      "sourceClass": "oral_history",
+      "claimClass": "technical_identity",
+      "fitness": "conditional",
+      "limitations": [
+        "Preserve speaker, interviewer, recording date, remembered period and consent context",
+        "Memory and interview questions shape testimony; disputed chronology needs separate investigation"
+      ]
+    },
+    {
+      "sourceClass": "oral_history",
+      "claimClass": "community_identity",
+      "fitness": "strong",
+      "limitations": [
+        "Preserve speaker, interviewer, recording date, remembered period and consent context",
+        "Memory and interview questions shape testimony; disputed chronology needs separate investigation"
+      ]
+    },
+    {
+      "sourceClass": "oral_history",
+      "claimClass": "technical_scope",
+      "fitness": "leadOnly",
+      "limitations": [
+        "Preserve speaker, interviewer, recording date, remembered period and consent context",
+        "Memory and interview questions shape testimony; disputed chronology needs separate investigation"
+      ]
+    },
+    {
+      "sourceClass": "oral_history",
+      "claimClass": "invention_attribution",
+      "fitness": "conditional",
+      "limitations": [
+        "Preserve speaker, interviewer, recording date, remembered period and consent context",
+        "Memory and interview questions shape testimony; disputed chronology needs separate investigation"
+      ]
+    },
+    {
+      "sourceClass": "oral_history",
+      "claimClass": "superlative",
+      "fitness": "leadOnly",
+      "limitations": [
+        "Preserve speaker, interviewer, recording date, remembered period and consent context",
+        "Memory and interview questions shape testimony; disputed chronology needs separate investigation"
+      ]
+    },
+    {
+      "sourceClass": "oral_history",
+      "claimClass": "commercial_impact",
+      "fitness": "conditional",
+      "limitations": [
+        "Preserve speaker, interviewer, recording date, remembered period and consent context",
+        "Memory and interview questions shape testimony; disputed chronology needs separate investigation"
+      ]
+    },
+    {
+      "sourceClass": "oral_history",
+      "claimClass": "societal_impact",
+      "fitness": "conditional",
+      "limitations": [
+        "Preserve speaker, interviewer, recording date, remembered period and consent context",
+        "Memory and interview questions shape testimony; disputed chronology needs separate investigation"
+      ]
+    },
+    {
+      "sourceClass": "oral_history",
+      "claimClass": "biographical_fact",
+      "fitness": "conditional",
+      "limitations": [
+        "Preserve speaker, interviewer, recording date, remembered period and consent context",
+        "Memory and interview questions shape testimony; disputed chronology needs separate investigation"
+      ]
+    },
+    {
+      "sourceClass": "oral_history",
+      "claimClass": "chronology",
+      "fitness": "conditional",
+      "limitations": [
+        "Preserve speaker, interviewer, recording date, remembered period and consent context",
+        "Memory and interview questions shape testimony; disputed chronology needs separate investigation"
+      ]
+    },
+    {
+      "sourceClass": "oral_history",
+      "claimClass": "place",
+      "fitness": "conditional",
+      "limitations": [
+        "Preserve speaker, interviewer, recording date, remembered period and consent context",
+        "Memory and interview questions shape testimony; disputed chronology needs separate investigation"
+      ]
+    },
+    {
+      "sourceClass": "oral_history",
+      "claimClass": "relationship",
+      "fitness": "conditional",
+      "limitations": [
+        "Preserve speaker, interviewer, recording date, remembered period and consent context",
+        "Memory and interview questions shape testimony; disputed chronology needs separate investigation"
+      ]
+    },
+    {
+      "sourceClass": "oral_history",
+      "claimClass": "legal_status",
+      "fitness": "conditional",
+      "limitations": [
+        "Preserve speaker, interviewer, recording date, remembered period and consent context",
+        "Memory and interview questions shape testimony; disputed chronology needs separate investigation"
+      ]
+    },
+    {
+      "sourceClass": "oral_history",
+      "claimClass": "lived_experience",
+      "fitness": "authoritative",
+      "limitations": [
+        "Preserve speaker, interviewer, recording date, remembered period and consent context",
+        "Memory and interview questions shape testimony; disputed chronology needs separate investigation"
+      ]
+    },
+    {
+      "sourceClass": "oral_history",
+      "claimClass": "historical_synthesis",
+      "fitness": "conditional",
+      "limitations": [
+        "Preserve speaker, interviewer, recording date, remembered period and consent context",
+        "Memory and interview questions shape testimony; disputed chronology needs separate investigation"
+      ]
+    },
+    {
+      "sourceClass": "peer_reviewed_scholarship",
+      "claimClass": "record_fact",
+      "fitness": "conditional",
+      "limitations": []
+    },
+    {
+      "sourceClass": "peer_reviewed_scholarship",
+      "claimClass": "technical_identity",
+      "fitness": "strong",
+      "limitations": []
+    },
+    {
+      "sourceClass": "peer_reviewed_scholarship",
+      "claimClass": "community_identity",
+      "fitness": "strong",
+      "limitations": []
+    },
+    {
+      "sourceClass": "peer_reviewed_scholarship",
+      "claimClass": "technical_scope",
+      "fitness": "strong",
+      "limitations": []
+    },
+    {
+      "sourceClass": "peer_reviewed_scholarship",
+      "claimClass": "invention_attribution",
+      "fitness": "strong",
+      "limitations": []
+    },
+    {
+      "sourceClass": "peer_reviewed_scholarship",
+      "claimClass": "superlative",
+      "fitness": "strong",
+      "limitations": []
+    },
+    {
+      "sourceClass": "peer_reviewed_scholarship",
+      "claimClass": "commercial_impact",
+      "fitness": "strong",
+      "limitations": []
+    },
+    {
+      "sourceClass": "peer_reviewed_scholarship",
+      "claimClass": "societal_impact",
+      "fitness": "strong",
+      "limitations": []
+    },
+    {
+      "sourceClass": "peer_reviewed_scholarship",
+      "claimClass": "biographical_fact",
+      "fitness": "strong",
+      "limitations": []
+    },
+    {
+      "sourceClass": "peer_reviewed_scholarship",
+      "claimClass": "chronology",
+      "fitness": "strong",
+      "limitations": []
+    },
+    {
+      "sourceClass": "peer_reviewed_scholarship",
+      "claimClass": "place",
+      "fitness": "strong",
+      "limitations": []
+    },
+    {
+      "sourceClass": "peer_reviewed_scholarship",
+      "claimClass": "relationship",
+      "fitness": "strong",
+      "limitations": []
+    },
+    {
+      "sourceClass": "peer_reviewed_scholarship",
+      "claimClass": "legal_status",
+      "fitness": "strong",
+      "limitations": []
+    },
+    {
+      "sourceClass": "peer_reviewed_scholarship",
+      "claimClass": "lived_experience",
+      "fitness": "strong",
+      "limitations": []
+    },
+    {
+      "sourceClass": "peer_reviewed_scholarship",
+      "claimClass": "historical_synthesis",
+      "fitness": "authoritative",
+      "limitations": []
+    },
+    {
+      "sourceClass": "scholarly_book_or_history",
+      "claimClass": "record_fact",
+      "fitness": "conditional",
+      "limitations": []
+    },
+    {
+      "sourceClass": "scholarly_book_or_history",
+      "claimClass": "technical_identity",
+      "fitness": "strong",
+      "limitations": []
+    },
+    {
+      "sourceClass": "scholarly_book_or_history",
+      "claimClass": "community_identity",
+      "fitness": "strong",
+      "limitations": []
+    },
+    {
+      "sourceClass": "scholarly_book_or_history",
+      "claimClass": "technical_scope",
+      "fitness": "strong",
+      "limitations": []
+    },
+    {
+      "sourceClass": "scholarly_book_or_history",
+      "claimClass": "invention_attribution",
+      "fitness": "strong",
+      "limitations": []
+    },
+    {
+      "sourceClass": "scholarly_book_or_history",
+      "claimClass": "superlative",
+      "fitness": "strong",
+      "limitations": []
+    },
+    {
+      "sourceClass": "scholarly_book_or_history",
+      "claimClass": "commercial_impact",
+      "fitness": "strong",
+      "limitations": []
+    },
+    {
+      "sourceClass": "scholarly_book_or_history",
+      "claimClass": "societal_impact",
+      "fitness": "strong",
+      "limitations": []
+    },
+    {
+      "sourceClass": "scholarly_book_or_history",
+      "claimClass": "biographical_fact",
+      "fitness": "strong",
+      "limitations": []
+    },
+    {
+      "sourceClass": "scholarly_book_or_history",
+      "claimClass": "chronology",
+      "fitness": "strong",
+      "limitations": []
+    },
+    {
+      "sourceClass": "scholarly_book_or_history",
+      "claimClass": "place",
+      "fitness": "strong",
+      "limitations": []
+    },
+    {
+      "sourceClass": "scholarly_book_or_history",
+      "claimClass": "relationship",
+      "fitness": "strong",
+      "limitations": []
+    },
+    {
+      "sourceClass": "scholarly_book_or_history",
+      "claimClass": "legal_status",
+      "fitness": "strong",
+      "limitations": []
+    },
+    {
+      "sourceClass": "scholarly_book_or_history",
+      "claimClass": "lived_experience",
+      "fitness": "strong",
+      "limitations": []
+    },
+    {
+      "sourceClass": "scholarly_book_or_history",
+      "claimClass": "historical_synthesis",
+      "fitness": "strong",
+      "limitations": []
+    },
+    {
+      "sourceClass": "historical_compilation",
+      "claimClass": "record_fact",
+      "fitness": "conditional",
+      "limitations": [
+        "Compilations inherit the gaps of the moment they were made",
+        "Trace identity and chronology to the underlying documents; omissions do not establish absence"
+      ]
+    },
+    {
+      "sourceClass": "historical_compilation",
+      "claimClass": "technical_identity",
+      "fitness": "conditional",
+      "limitations": [
+        "Compilations inherit the gaps of the moment they were made",
+        "Trace identity and chronology to the underlying documents; omissions do not establish absence"
+      ]
+    },
+    {
+      "sourceClass": "historical_compilation",
+      "claimClass": "community_identity",
+      "fitness": "strong",
+      "limitations": [
+        "Compilations inherit the gaps of the moment they were made",
+        "Trace identity and chronology to the underlying documents; omissions do not establish absence"
+      ]
+    },
+    {
+      "sourceClass": "historical_compilation",
+      "claimClass": "technical_scope",
+      "fitness": "leadOnly",
+      "limitations": [
+        "Compilations inherit the gaps of the moment they were made",
+        "Trace identity and chronology to the underlying documents; omissions do not establish absence"
+      ]
+    },
+    {
+      "sourceClass": "historical_compilation",
+      "claimClass": "invention_attribution",
+      "fitness": "conditional",
+      "limitations": [
+        "Compilations inherit the gaps of the moment they were made",
+        "Trace identity and chronology to the underlying documents; omissions do not establish absence"
+      ]
+    },
+    {
+      "sourceClass": "historical_compilation",
+      "claimClass": "superlative",
+      "fitness": "leadOnly",
+      "limitations": [
+        "Compilations inherit the gaps of the moment they were made",
+        "Trace identity and chronology to the underlying documents; omissions do not establish absence"
+      ]
+    },
+    {
+      "sourceClass": "historical_compilation",
+      "claimClass": "commercial_impact",
+      "fitness": "leadOnly",
+      "limitations": [
+        "Compilations inherit the gaps of the moment they were made",
+        "Trace identity and chronology to the underlying documents; omissions do not establish absence"
+      ]
+    },
+    {
+      "sourceClass": "historical_compilation",
+      "claimClass": "societal_impact",
+      "fitness": "conditional",
+      "limitations": [
+        "Compilations inherit the gaps of the moment they were made",
+        "Trace identity and chronology to the underlying documents; omissions do not establish absence"
+      ]
+    },
+    {
+      "sourceClass": "historical_compilation",
+      "claimClass": "biographical_fact",
+      "fitness": "conditional",
+      "limitations": [
+        "Compilations inherit the gaps of the moment they were made",
+        "Trace identity and chronology to the underlying documents; omissions do not establish absence"
+      ]
+    },
+    {
+      "sourceClass": "historical_compilation",
+      "claimClass": "chronology",
+      "fitness": "conditional",
+      "limitations": [
+        "Compilations inherit the gaps of the moment they were made",
+        "Trace identity and chronology to the underlying documents; omissions do not establish absence"
+      ]
+    },
+    {
+      "sourceClass": "historical_compilation",
+      "claimClass": "place",
+      "fitness": "conditional",
+      "limitations": [
+        "Compilations inherit the gaps of the moment they were made",
+        "Trace identity and chronology to the underlying documents; omissions do not establish absence"
+      ]
+    },
+    {
+      "sourceClass": "historical_compilation",
+      "claimClass": "relationship",
+      "fitness": "conditional",
+      "limitations": [
+        "Compilations inherit the gaps of the moment they were made",
+        "Trace identity and chronology to the underlying documents; omissions do not establish absence"
+      ]
+    },
+    {
+      "sourceClass": "historical_compilation",
+      "claimClass": "legal_status",
+      "fitness": "conditional",
+      "limitations": [
+        "Compilations inherit the gaps of the moment they were made",
+        "Trace identity and chronology to the underlying documents; omissions do not establish absence"
+      ]
+    },
+    {
+      "sourceClass": "historical_compilation",
+      "claimClass": "lived_experience",
+      "fitness": "conditional",
+      "limitations": [
+        "Compilations inherit the gaps of the moment they were made",
+        "Trace identity and chronology to the underlying documents; omissions do not establish absence"
+      ]
+    },
+    {
+      "sourceClass": "historical_compilation",
+      "claimClass": "historical_synthesis",
+      "fitness": "conditional",
+      "limitations": [
+        "Compilations inherit the gaps of the moment they were made",
+        "Trace identity and chronology to the underlying documents; omissions do not establish absence"
+      ]
+    },
+    {
+      "sourceClass": "modern_reputable_secondary",
+      "claimClass": "record_fact",
+      "fitness": "conditional",
+      "limitations": [
+        "Frequently restates other secondary sources without checking them",
+        "The common carrier of invention myths"
+      ]
+    },
+    {
+      "sourceClass": "modern_reputable_secondary",
+      "claimClass": "technical_identity",
+      "fitness": "conditional",
+      "limitations": [
+        "Frequently restates other secondary sources without checking them",
+        "The common carrier of invention myths"
+      ]
+    },
+    {
+      "sourceClass": "modern_reputable_secondary",
+      "claimClass": "community_identity",
+      "fitness": "conditional",
+      "limitations": [
+        "Frequently restates other secondary sources without checking them",
+        "The common carrier of invention myths"
+      ]
+    },
+    {
+      "sourceClass": "modern_reputable_secondary",
+      "claimClass": "technical_scope",
+      "fitness": "leadOnly",
+      "limitations": [
+        "Frequently restates other secondary sources without checking them",
+        "The common carrier of invention myths"
+      ]
+    },
+    {
+      "sourceClass": "modern_reputable_secondary",
+      "claimClass": "invention_attribution",
+      "fitness": "leadOnly",
+      "limitations": [
+        "Frequently restates other secondary sources without checking them",
+        "The common carrier of invention myths"
+      ]
+    },
+    {
+      "sourceClass": "modern_reputable_secondary",
+      "claimClass": "superlative",
+      "fitness": "leadOnly",
+      "limitations": [
+        "Frequently restates other secondary sources without checking them",
+        "The common carrier of invention myths"
+      ]
+    },
+    {
+      "sourceClass": "modern_reputable_secondary",
+      "claimClass": "commercial_impact",
+      "fitness": "conditional",
+      "limitations": [
+        "Frequently restates other secondary sources without checking them",
+        "The common carrier of invention myths"
+      ]
+    },
+    {
+      "sourceClass": "modern_reputable_secondary",
+      "claimClass": "societal_impact",
+      "fitness": "conditional",
+      "limitations": [
+        "Frequently restates other secondary sources without checking them",
+        "The common carrier of invention myths"
+      ]
+    },
+    {
+      "sourceClass": "modern_reputable_secondary",
+      "claimClass": "biographical_fact",
+      "fitness": "conditional",
+      "limitations": [
+        "Frequently restates other secondary sources without checking them",
+        "The common carrier of invention myths"
+      ]
+    },
+    {
+      "sourceClass": "modern_reputable_secondary",
+      "claimClass": "chronology",
+      "fitness": "conditional",
+      "limitations": [
+        "Frequently restates other secondary sources without checking them",
+        "The common carrier of invention myths"
+      ]
+    },
+    {
+      "sourceClass": "modern_reputable_secondary",
+      "claimClass": "place",
+      "fitness": "conditional",
+      "limitations": [
+        "Frequently restates other secondary sources without checking them",
+        "The common carrier of invention myths"
+      ]
+    },
+    {
+      "sourceClass": "modern_reputable_secondary",
+      "claimClass": "relationship",
+      "fitness": "conditional",
+      "limitations": [
+        "Frequently restates other secondary sources without checking them",
+        "The common carrier of invention myths"
+      ]
+    },
+    {
+      "sourceClass": "modern_reputable_secondary",
+      "claimClass": "legal_status",
+      "fitness": "conditional",
+      "limitations": [
+        "Frequently restates other secondary sources without checking them",
+        "The common carrier of invention myths"
+      ]
+    },
+    {
+      "sourceClass": "modern_reputable_secondary",
+      "claimClass": "lived_experience",
+      "fitness": "conditional",
+      "limitations": [
+        "Frequently restates other secondary sources without checking them",
+        "The common carrier of invention myths"
+      ]
+    },
+    {
+      "sourceClass": "modern_reputable_secondary",
+      "claimClass": "historical_synthesis",
+      "fitness": "conditional",
+      "limitations": [
+        "Frequently restates other secondary sources without checking them",
+        "The common carrier of invention myths"
+      ]
+    },
+    {
+      "sourceClass": "wikipedia_bridge",
+      "claimClass": "record_fact",
+      "fitness": "leadOnly",
+      "limitations": ["A bridge to its own references; never corroboration"]
+    },
+    {
+      "sourceClass": "wikipedia_bridge",
+      "claimClass": "technical_identity",
+      "fitness": "leadOnly",
+      "limitations": ["A bridge to its own references; never corroboration"]
+    },
+    {
+      "sourceClass": "wikipedia_bridge",
+      "claimClass": "community_identity",
+      "fitness": "leadOnly",
+      "limitations": ["A bridge to its own references; never corroboration"]
+    },
+    {
+      "sourceClass": "wikipedia_bridge",
+      "claimClass": "technical_scope",
+      "fitness": "leadOnly",
+      "limitations": ["A bridge to its own references; never corroboration"]
+    },
+    {
+      "sourceClass": "wikipedia_bridge",
+      "claimClass": "invention_attribution",
+      "fitness": "unfit",
+      "limitations": ["A bridge to its own references; never corroboration"]
+    },
+    {
+      "sourceClass": "wikipedia_bridge",
+      "claimClass": "superlative",
+      "fitness": "unfit",
+      "limitations": ["A bridge to its own references; never corroboration"]
+    },
+    {
+      "sourceClass": "wikipedia_bridge",
+      "claimClass": "commercial_impact",
+      "fitness": "leadOnly",
+      "limitations": ["A bridge to its own references; never corroboration"]
+    },
+    {
+      "sourceClass": "wikipedia_bridge",
+      "claimClass": "societal_impact",
+      "fitness": "leadOnly",
+      "limitations": ["A bridge to its own references; never corroboration"]
+    },
+    {
+      "sourceClass": "wikipedia_bridge",
+      "claimClass": "biographical_fact",
+      "fitness": "leadOnly",
+      "limitations": ["A bridge to its own references; never corroboration"]
+    },
+    {
+      "sourceClass": "wikipedia_bridge",
+      "claimClass": "chronology",
+      "fitness": "leadOnly",
+      "limitations": ["A bridge to its own references; never corroboration"]
+    },
+    {
+      "sourceClass": "wikipedia_bridge",
+      "claimClass": "place",
+      "fitness": "leadOnly",
+      "limitations": ["A bridge to its own references; never corroboration"]
+    },
+    {
+      "sourceClass": "wikipedia_bridge",
+      "claimClass": "relationship",
+      "fitness": "leadOnly",
+      "limitations": ["A bridge to its own references; never corroboration"]
+    },
+    {
+      "sourceClass": "wikipedia_bridge",
+      "claimClass": "legal_status",
+      "fitness": "leadOnly",
+      "limitations": ["A bridge to its own references; never corroboration"]
+    },
+    {
+      "sourceClass": "wikipedia_bridge",
+      "claimClass": "lived_experience",
+      "fitness": "leadOnly",
+      "limitations": ["A bridge to its own references; never corroboration"]
+    },
+    {
+      "sourceClass": "wikipedia_bridge",
+      "claimClass": "historical_synthesis",
+      "fitness": "leadOnly",
+      "limitations": ["A bridge to its own references; never corroboration"]
+    },
+    {
+      "sourceClass": "wikidata_bridge",
+      "claimClass": "record_fact",
+      "fitness": "leadOnly",
+      "limitations": ["A discovery graph; an edge is a candidate, not a finding"]
+    },
+    {
+      "sourceClass": "wikidata_bridge",
+      "claimClass": "technical_identity",
+      "fitness": "leadOnly",
+      "limitations": ["A discovery graph; an edge is a candidate, not a finding"]
+    },
+    {
+      "sourceClass": "wikidata_bridge",
+      "claimClass": "community_identity",
+      "fitness": "unfit",
+      "limitations": ["A discovery graph; an edge is a candidate, not a finding"]
+    },
+    {
+      "sourceClass": "wikidata_bridge",
+      "claimClass": "technical_scope",
+      "fitness": "leadOnly",
+      "limitations": ["A discovery graph; an edge is a candidate, not a finding"]
+    },
+    {
+      "sourceClass": "wikidata_bridge",
+      "claimClass": "invention_attribution",
+      "fitness": "unfit",
+      "limitations": ["A discovery graph; an edge is a candidate, not a finding"]
+    },
+    {
+      "sourceClass": "wikidata_bridge",
+      "claimClass": "superlative",
+      "fitness": "unfit",
+      "limitations": ["A discovery graph; an edge is a candidate, not a finding"]
+    },
+    {
+      "sourceClass": "wikidata_bridge",
+      "claimClass": "commercial_impact",
+      "fitness": "leadOnly",
+      "limitations": ["A discovery graph; an edge is a candidate, not a finding"]
+    },
+    {
+      "sourceClass": "wikidata_bridge",
+      "claimClass": "societal_impact",
+      "fitness": "leadOnly",
+      "limitations": ["A discovery graph; an edge is a candidate, not a finding"]
+    },
+    {
+      "sourceClass": "wikidata_bridge",
+      "claimClass": "biographical_fact",
+      "fitness": "leadOnly",
+      "limitations": ["A discovery graph; an edge is a candidate, not a finding"]
+    },
+    {
+      "sourceClass": "wikidata_bridge",
+      "claimClass": "chronology",
+      "fitness": "leadOnly",
+      "limitations": ["A discovery graph; an edge is a candidate, not a finding"]
+    },
+    {
+      "sourceClass": "wikidata_bridge",
+      "claimClass": "place",
+      "fitness": "leadOnly",
+      "limitations": ["A discovery graph; an edge is a candidate, not a finding"]
+    },
+    {
+      "sourceClass": "wikidata_bridge",
+      "claimClass": "relationship",
+      "fitness": "leadOnly",
+      "limitations": ["A discovery graph; an edge is a candidate, not a finding"]
+    },
+    {
+      "sourceClass": "wikidata_bridge",
+      "claimClass": "legal_status",
+      "fitness": "leadOnly",
+      "limitations": ["A discovery graph; an edge is a candidate, not a finding"]
+    },
+    {
+      "sourceClass": "wikidata_bridge",
+      "claimClass": "lived_experience",
+      "fitness": "leadOnly",
+      "limitations": ["A discovery graph; an edge is a candidate, not a finding"]
+    },
+    {
+      "sourceClass": "wikidata_bridge",
+      "claimClass": "historical_synthesis",
+      "fitness": "leadOnly",
+      "limitations": ["A discovery graph; an edge is a candidate, not a finding"]
+    },
+    {
+      "sourceClass": "search_result_lead",
+      "claimClass": "record_fact",
+      "fitness": "unfit",
+      "limitations": ["Tells you where to look and nothing more"]
+    },
+    {
+      "sourceClass": "search_result_lead",
+      "claimClass": "technical_identity",
+      "fitness": "leadOnly",
+      "limitations": ["Tells you where to look and nothing more"]
+    },
+    {
+      "sourceClass": "search_result_lead",
+      "claimClass": "community_identity",
+      "fitness": "unfit",
+      "limitations": ["Tells you where to look and nothing more"]
+    },
+    {
+      "sourceClass": "search_result_lead",
+      "claimClass": "technical_scope",
+      "fitness": "leadOnly",
+      "limitations": ["Tells you where to look and nothing more"]
+    },
+    {
+      "sourceClass": "search_result_lead",
+      "claimClass": "invention_attribution",
+      "fitness": "unfit",
+      "limitations": ["Tells you where to look and nothing more"]
+    },
+    {
+      "sourceClass": "search_result_lead",
+      "claimClass": "superlative",
+      "fitness": "unfit",
+      "limitations": ["Tells you where to look and nothing more"]
+    },
+    {
+      "sourceClass": "search_result_lead",
+      "claimClass": "commercial_impact",
+      "fitness": "leadOnly",
+      "limitations": ["Tells you where to look and nothing more"]
+    },
+    {
+      "sourceClass": "search_result_lead",
+      "claimClass": "societal_impact",
+      "fitness": "leadOnly",
+      "limitations": ["Tells you where to look and nothing more"]
+    },
+    {
+      "sourceClass": "search_result_lead",
+      "claimClass": "biographical_fact",
+      "fitness": "leadOnly",
+      "limitations": ["Tells you where to look and nothing more"]
+    },
+    {
+      "sourceClass": "search_result_lead",
+      "claimClass": "chronology",
+      "fitness": "leadOnly",
+      "limitations": ["Tells you where to look and nothing more"]
+    },
+    {
+      "sourceClass": "search_result_lead",
+      "claimClass": "place",
+      "fitness": "leadOnly",
+      "limitations": ["Tells you where to look and nothing more"]
+    },
+    {
+      "sourceClass": "search_result_lead",
+      "claimClass": "relationship",
+      "fitness": "leadOnly",
+      "limitations": ["Tells you where to look and nothing more"]
+    },
+    {
+      "sourceClass": "search_result_lead",
+      "claimClass": "legal_status",
+      "fitness": "leadOnly",
+      "limitations": ["Tells you where to look and nothing more"]
+    },
+    {
+      "sourceClass": "search_result_lead",
+      "claimClass": "lived_experience",
+      "fitness": "leadOnly",
+      "limitations": ["Tells you where to look and nothing more"]
+    },
+    {
+      "sourceClass": "search_result_lead",
+      "claimClass": "historical_synthesis",
+      "fitness": "leadOnly",
+      "limitations": ["Tells you where to look and nothing more"]
     }
   ],
   "queryPacks": {

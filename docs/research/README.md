@@ -39,7 +39,7 @@ results through the shared research ledger, and hands the saved proposal to the 
 publication controls. Brave, OpenRouter and GitHub Actions belong only to the optional hosted
 adapter. Never make their setup a prerequisite for session research or already-approved publication.
 Saved work survives a stopped session; independent execution requires a configured background worker.
-The durable inbox and remote clients are experimental; see [management operations](./research-operations.md#account-owned-management-work)
+The durable inbox is deployed; remote client acceptance is still unverified; see [management operations](./research-operations.md#account-owned-management-work)
 for deployment prerequisites and limits. No mobile/client compatibility is implied by the
 presence of an MCP endpoint. Research is not complete until its usable outcome is verified.
 
@@ -49,7 +49,7 @@ presence of an MCP endpoint. Research is not complete until its usable outcome i
    Separate the subject's historical dates from document dates and retrieval dates.
 2. Inspect existing entities, sources, captures, claims, and unresolved needs. Reuse evidence
    before paying to rediscover it. Establish alternatives, not only the preferred hypothesis.
-3. Build explicit evidence needs and bounded tasks. Every consequential assertion needs a
+3. Query the [source library](./research-operations.md#source-library) for each evidence need, record why suggested collections should contain the answer, and pin policy versions. Build explicit evidence needs and bounded tasks. Every consequential assertion needs a
    disconfirming search or a recorded reason the search could not be completed.
 4. Retrieve leads by identifiers, exact/variant names, full text, citations, graph neighbors,
    geography/time where appropriate, and semantic similarity. Fetch the underlying work.
@@ -234,3 +234,5 @@ and the [evaluation-family limits](gold-corpus.md). The
 [2026-10-07 audit](skill-audit-2026-10-07.md) records observed errors, scope and remaining controls.
 Interface changes use `blackstory-experience-review` and the UI pattern catalog; a precise
 claim still fails readers if its qualifier or source cannot be reached on mobile.
+
+Collection profiles and citation usage are different. Use [evidence acceptance](./citation-standard.md) for the maintained source policy, including discovery-only Wikipedia/Wikidata, attributed community evidence and document mirrors.

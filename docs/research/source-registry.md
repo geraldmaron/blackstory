@@ -76,18 +76,18 @@ and `20260914130000_source_library_set_based_host_resolution.sql` (faster host r
 | `profile_sources` | The URLs actually opened to write the profile |
 | `profile_reviewed_at`, `profile_reviewed_by` | Set only when every statement in the profile traces to `profile_sources`. A profile written partly from secondhand material stays unreviewed. |
 
-### Tier rule
+### Historical tier labels
 
-Tiers follow the repo's classifier, not intuition:
+These retained labels describe the former host classifier. They are audit and discovery metadata,
+not evidence acceptance or a current ranking of historical truth:
 
 - `tier1`: what `packages/ops-data/scripts/lib/tier1-sources.ts` classes as Tier 1 (government,
   courts, official archives).
 - `tier2`: reputable institutional secondary, including the curated reputable-secondary hosts in
   that file.
 - `tier3`: crowd-edited, aggregator, commercial, blog, or a host the classifier does not know.
-  Wikipedia is tier3 here because it may carry a claim but never corroborate one
-  (`.agents/skills/blackstory-claim-corroborate/SKILL.md`). An unknown host in tier3 is a gap in
-  the classifier, not a quality finding; fix it in `tier1-sources.ts`, not in the profile.
+  Wikipedia articles are discovery only for new public historical assertions. An unknown host
+  is a provenance gap, not a finding about the quality of its documents.
 
 ### Host resolution
 
@@ -109,13 +109,15 @@ state portal instead of appearing in `source_library_unmapped_hosts`. When you a
 a state agency, check that its host has its own row. The same applies to multi-tenant platforms
 (`wordpress.com`, `archive.org` mirrors): give each distinct publisher its own row.
 
-### Relevance by evidence use
+### Historical publisher fitness
 
-`evidence.source_policies.organization_id` ties a policy to a publisher. Its
+`evidence.source_policies.organization_id` ties a policy to a publisher. Older
 `source_policy_claim_fitness` rows use `claim_class` as an evidence use:
 `identity_and_life_dates`, `location_and_address`, `designation_and_listing`,
 `legal_and_court_record`, `event_narrative`, `superlative_or_first`, `direct_quotation`,
-`statistics`. Fitness is `authoritative`, `strong`, `conditional`, `lead_only`, or `unfit`.
+`statistics`. These rows retain `assessment_basis=legacy_heuristic`. Current collection policies
+use the maintained assertion vocabulary and `qualitative_review` with limitations and no required
+numerical prior. Neither table certifies a particular document.
 
 ### Views
 
@@ -150,3 +152,10 @@ shows one publisher's profile, fitness, hosts, and the published records citing 
 3. When writing a profile, state only what opened pages say, list them in `profile_sources`, and
    set the review fields only if that held for every statement.
 4. Never store a count. If a number is needed, query the views.
+
+
+## Collection guidance
+
+The current library uses versioned source policies for collection guidance, schema-validated through the research kernel and checked at the database boundary. Publisher identity describes provenance; historical trust tiers and usage counts cannot authorize a claim. Current profile review status is separate from historical review dates. Guidance includes coverage, document kinds, evidence needs, search methods, limits, access, preservation and provenance. Unreviewed or inaccessible material stays explicit.
+
+The shared query service and client contract are documented in [operations](./research-operations.md#source-library). The canonical document-fitness policy is [evidence acceptance](./citation-standard.md). Legacy copied item guidance is retained as history; consumers use collection policy revisions. No source, capture, citation or claim is deleted for low usage. Correct source-item policy bindings require established collection membership.

@@ -70,7 +70,8 @@ test(
     `);
       assert.deepEqual(await loadReviewedClaimAssessments(client, ['confidence-entity']), []);
       await client.query(`SELECT research.approve_artifact('confidence-review','confidence-artifact',
-      'reviewer','review-model','[]','held-out-v1')`);
+      'reviewer','producer-model','[]','held-out-v1','independent_review',
+      'Separate researcher inspected the original evidence without the producer conclusions.')`);
       const reviewed = await loadReviewedClaimAssessments(client, ['confidence-entity']);
       assert.equal(reviewed.length, 1);
       assert.deepEqual(reviewed[0]!.citationHrefs, ['https://example.org/record']);

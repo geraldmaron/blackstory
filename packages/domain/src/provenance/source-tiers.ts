@@ -1,28 +1,8 @@
-/**
- * Source-quality tier registry.
- *
- * The adapter layer validates shape/volume/drift but not source *quality*. This
- * module classifies a citation URL into a trust tier so gates and the enrichment
- * judge can weight or discard low-quality sources (SEO farms, citation mills,
- * AI-slop laundering) before they create or modify claims.
- *
- * Tiers (highest trust first):
- *   T1 — official statistical agencies + peer-reviewed journals (DOI-resolvable).
- *   T2 — working papers (NBER/Fed), university presses, .edu research centers,
- *        national archives / libraries of record.
- *   T3 — established nonprofits / journalism with a named public methodology.
- *   T4 — everything else (unclassified; treated as untrusted by default).
- *
- * One policy module, consulted by adapter gates, packet/article validate, and
- * the enrichment judge bridge alike — not per-surface copies.
- */
+/** Legacy host categories for discovery diagnostics. They establish neither document fitness nor publication authority. */
 import { normalizeHostname } from './source.js';
 
 export const SOURCE_TIERS = ['T1', 'T2', 'T3', 'T4'] as const;
 export type SourceTier = (typeof SOURCE_TIERS)[number];
-
-/** T1/T2 are the "independent anchor" tiers for the corroboration rule. */
-export const ANCHOR_TIERS: readonly SourceTier[] = ['T1', 'T2'];
 
 export type SourceTierRule = {
   /**
@@ -293,8 +273,8 @@ function ruleMatches(hostname: string, domain: string): boolean {
 }
 
 /**
- * Classify a citation URL into a source-quality tier. Unmatched hosts default to
- * T4 (untrusted). Throws only on an unparseable/empty URL — callers that must
+ * Classify a citation URL into a historical host category. Unmatched hosts default to
+ * T4 (unclassified). Throws only on an unparseable/empty URL — callers that must
  * tolerate junk should catch and treat failures as T4.
  */
 export function lookupSourceTier(url: string): SourceTierResult {
@@ -308,13 +288,4 @@ export function lookupSourceTier(url: string): SourceTierResult {
     return { tier: 'T4', rationale: 'unclassified host', matchedDomain: null, hostname };
   }
   return { tier: best.tier, rationale: best.rationale, matchedDomain: best.domain, hostname };
-}
-
-/** True when the URL resolves to a tier eligible to serve as an independent anchor (T1/T2). */
-export function isAnchorTierUrl(url: string): boolean {
-  try {
-    return ANCHOR_TIERS.includes(lookupSourceTier(url).tier);
-  } catch {
-    return false;
-  }
 }

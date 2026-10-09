@@ -103,7 +103,11 @@ export function createAdminRouteAuthorizer(verifier: SupabaseUserVerifier) {
     async authorize(request: Request): Promise<ResolvedAdminCaller> {
       const caller = callerFrom(await sessions.assertAuthenticated(request.headers));
       const { pathname } = new URL(request.url);
-      if (caller.admin.clientId && !pathname.startsWith('/admin/api/work'))
+      if (
+        caller.admin.clientId &&
+        !pathname.startsWith('/admin/api/work') &&
+        pathname !== '/admin/api/sources/library'
+      )
         throw new SupabaseSessionAuthorizationError(
           'ADMIN_SESSION_INVALID',
           'Agent access is restricted to management work',

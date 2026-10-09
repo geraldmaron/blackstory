@@ -1,7 +1,7 @@
 # Agent local env (enrichment / OpenRouter / Postgres OPS)
 
 Do **not** store OpenRouter, Census, or database credentials in Firebase, Firestore, or client bundles.
-Use gitignored local files only.
+Prefer process injection from the existing secret manager; gitignored local files remain a compatibility path.
 
 | File | Purpose |
 |---|---|
@@ -9,72 +9,43 @@ Use gitignored local files only.
 
 `.gitignore` already covers `.env.*` (except `.env.example` / `.env.1password`).
 
-## One-time local setup (1Password)
+## Credential setup
 
-When signed in to 1Password CLI, seed keys into the gitignored env file (never commit `.env.local`):
+Follow the machine's canonical `~/Developer/Guides/Secrets-1Password.md`. Resolve the existing
+provider, account and purpose before changing a consumer. Use stable vault/item/field IDs and
+process injection through the existing `run-with-dev-secrets` launcher. Do not export values
+into transcripts, arguments or scratch files. Do not create another secret loader or rotate
+credentials to normalize names.
 
-```bash
-cd /path/to/blackstory
-# OPENROUTER — if not already present
-printf 'OPENROUTER_API_KEY=%s\n' "$(op read 'op://Private/OpenRouter/credential')" >> apps/web/.env.local
-# Census Data API — Phase 1 ACS ingest + demographics adapters
-printf 'CENSUS_API_KEY=%s\n' "$(op read 'op://Private/USCensus/credential')" >> apps/web/.env.local
-```
+Session research uses the harness's search and document tools; it does not require a search
+provider or model API key. The authenticated management service supplies database access.
+Optional local CLI adapters require the credentials for the operations they actually perform.
+An optional hosted adapter has separate requirements documented in
+[management operations](research-operations.md#account-owned-management-work).
 
-If a key already exists, edit in place instead of appending duplicates.
+Existing gitignored `apps/web/.env.local` files are a compatibility path, not the recommended
+way to provision new credentials. They have not been removed or rotated. The existing wrapper
+`packages/ops-data/scripts/run-enrichment-with-local-env.sh` reads that file and runs only
+`enrichment-run`; it is not a generic session research launcher. `LOCAL_ENV_FILE` can select an
+existing compatibility file. Never print its contents or assume its database role is suitable
+for every operation.
 
-## Headless agent invocation
-
-```bash
-cd /path/to/blackstory
-set -a && source apps/web/.env.local && set +a
-export OPS_DATA_SOURCE=postgres
-export RESEARCH_PROFILE_ID=black-history
-export RESEARCH_PROFILE_VERSION=1.0.0
-export RESEARCH_SCHEMA_VERSION=1.0.0
-node --conditions development --import tsx packages/operator-cli/src/bin.ts enrichment-run …
-```
-
-Or use the wrapper (same env file):
+## Verify injection without revealing values
 
 ```bash
-packages/ops-data/scripts/run-enrichment-with-local-env.sh …
+run-with-dev-secrets node -e 'process.exit(process.env.INTERNET_ARCHIVE_ACCESS_KEY && process.env.INTERNET_ARCHIVE_SECRET_KEY ? 0 : 1)'
 ```
 
-Override path: `LOCAL_ENV_FILE=/path/to/.env.local`.
+A missing variable requires inspecting reference metadata and the intended consumer. The
+shared launcher does not guarantee that it carries BlackStory database or model credentials.
+Do not infer success from a reference file's existence.
 
-## Verify (no secret output)
+For `capture-backfill --wayback`, reuse the existing Internet Archive reference pair through
+that launcher. Without it, Save Page Now reports `skipped_no_credentials`; local capture can
+still run. Preservation and retention permissions remain source-specific.
 
-```bash
-set -a && source apps/web/.env.local && set +a
-test -n "$OPENROUTER_API_KEY" && test -n "$DATABASE_URL" && echo ok
-test -n "$CENSUS_API_KEY" && echo census-ok
-```
-
-## Internet Archive / Wayback SPN2
-
-S3 access/secret for Save Page Now live in 1Password item **Internet Archive** (vault
-**Personal**), fields `s3_access_key` / `s3_secret_key`. They are referenced from
-`~/.env.1password` as `INTERNET_ARCHIVE_ACCESS_KEY` / `INTERNET_ARCHIVE_SECRET_KEY`.
-Do not copy the values into `apps/web/.env.local`.
-
-```bash
-set -a && source apps/web/.env.local && set +a
-run-with-dev-secrets bash -c 'test -n "$INTERNET_ARCHIVE_ACCESS_KEY" && echo ia-ok'
-run-with-dev-secrets node --conditions development --import tsx \
-  packages/operator-cli/src/bin.ts capture-backfill --wayback --max-captures 5
-```
-
-`--wayback` without those env vars skips SPN (`wayback.status: skipped_no_credentials`) and
-still captures locally.
-
-Optional 1Password path when signed in: `run-with-dev-secrets bash -c 'test -n "$OPENROUTER_API_KEY" && echo ok'`.
-Headless runs use the same explicitly supplied environment as manual CLI runs. No host or schedule is assumed.
-
-**Note:** `run-with-dev-secrets <cmd>` alone will fail with `DATABASE_URL or APP_DATABASE_URL is
-required` — it only wraps `op run --env-file=~/.env.1password`, and that file does not carry
-`DATABASE_URL`/`OPENROUTER_API_KEY`. Source `apps/web/.env.local` as shown above instead; it's
-the default local path for those keys.
+Explicit headless runs use the same supplied environment as CLI runs. No host or schedule is
+assumed. Use the pinned profile in the execution plan, not a copied profile-version example.
 
 ## Phase 1 ACS ingest
 

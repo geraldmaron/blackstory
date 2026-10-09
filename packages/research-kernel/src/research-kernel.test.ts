@@ -197,10 +197,17 @@ test('review approval cannot share actor or model lineage with production', () =
     findings: [],
     decidedAt: '2026-07-21T00:00:00.000Z',
   };
-  assert.doesNotThrow(() => assertIndependentApproval(decision));
+  assert.doesNotThrow(() =>
+    assertIndependentApproval({
+      ...decision,
+      reviewMode: 'independent_review',
+      independenceBasis:
+        'Separate researcher inspected raw evidence without the draft or its conclusions.',
+    }),
+  );
   assert.throws(
     () => assertIndependentApproval({ ...decision, reviewerModelFamily: 'kimi' }),
-    /different model families/,
+    /recorded independence basis/,
   );
 });
 

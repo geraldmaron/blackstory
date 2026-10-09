@@ -95,6 +95,7 @@ export interface SourcePolicy {
   readonly rights: Readonly<Record<string, unknown>>;
   readonly retrieval: Readonly<Record<string, unknown>>;
   readonly claimFitness: readonly SourceFitnessRule[];
+  readonly guidance?: CollectionGuidance;
 }
 
 export interface SourceItem {
@@ -107,6 +108,7 @@ export interface SourceItem {
   readonly publishedAt: string | null;
   readonly upstreamSourceIds: readonly string[];
   readonly metadata?: Readonly<Record<string, unknown>>;
+  readonly sourcePolicyVersion?: string | null;
 }
 
 export interface Capture {
@@ -405,6 +407,8 @@ export interface ReviewDecision {
   readonly producerModelFamily: string | null;
   readonly findings: readonly Readonly<Record<string, unknown>>[];
   readonly decidedAt: string;
+  readonly reviewMode?: 'self_review' | 'independent_review';
+  readonly independenceBasis?: string;
 }
 
 export interface ReleaseDecision {
@@ -514,6 +518,7 @@ export interface HarnessSourceRecord {
   readonly locationName?: string;
   readonly county?: string;
   readonly state?: string;
+  readonly excerpts?: readonly EvidenceExcerpt[];
 }
 
 export interface ResearchTaskSpec {
@@ -723,6 +728,7 @@ export interface ManagementProposal {
       readonly reason: string;
       readonly assertionIds: readonly string[];
     };
+    readonly independenceBasis?: string;
   }[];
   readonly held: readonly { readonly subject: string; readonly reason: string }[];
   readonly researchRunIds: readonly string[];
@@ -736,6 +742,11 @@ export interface ManagementResearchPlan {
     readonly seeking: string;
     readonly sourceFitnessReason: string;
     readonly counterevidence: boolean;
+    readonly collectionPolicies?: readonly {
+      readonly policyId: string;
+      readonly policyVersion: string;
+      readonly expectedEvidence: string;
+    }[];
   }[];
   readonly limitations: readonly string[];
 }
@@ -747,6 +758,61 @@ export interface ManagementRetentionAssessment {
     readonly sensitivity: 'public' | 'restricted' | 'unknown';
     readonly basis: string;
   }[];
+}
+
+export interface CollectionGuidance {
+  readonly schemaVersion: '1.0.0';
+  readonly subjects: readonly string[];
+  readonly geography: readonly string[];
+  readonly periods: readonly string[];
+  readonly documentTypes: readonly string[];
+  readonly searchMethods: readonly string[];
+  readonly suitableEvidenceNeeds: readonly string[];
+  readonly limitations: readonly string[];
+  readonly provenance: readonly string[];
+  readonly accessConditions: string;
+  readonly preservationConditions: string;
+  readonly reviewStatus: 'unreviewed' | 'reviewed' | 'needs_recheck';
+  readonly reviewedAt: string | null;
+  readonly reviewedBy: string | null;
+}
+
+export interface SourceLibraryQuery {
+  readonly question?: string;
+  readonly assertionClass?: string;
+  readonly subject?: string;
+  readonly geography?: string;
+  readonly period?: string;
+  readonly reviewStatus?: 'unreviewed' | 'reviewed' | 'needs_recheck';
+  readonly limit?: number;
+  readonly offset?: number;
+}
+
+export interface SourceLibraryEntry {
+  readonly policyId: string;
+  readonly policyVersion: string;
+  readonly collection: string;
+  readonly organizationId: string | null;
+  readonly publisher: string | null;
+  readonly guidance: CollectionGuidance;
+  readonly matchReasons: readonly string[];
+  readonly claimFitness: readonly SourceFitnessRule[];
+}
+
+export interface SourceLibraryResult {
+  readonly schemaVersion: '1.0.0';
+  readonly query: SourceLibraryQuery;
+  readonly items: readonly SourceLibraryEntry[];
+  readonly total: number;
+  readonly nextOffset: number | null;
+  readonly limitations: readonly string[];
+}
+
+export interface EvidenceExcerpt {
+  readonly exact: string;
+  readonly locator: string;
+  readonly prefix?: string;
+  readonly suffix?: string;
 }
 
 export interface ResearchContractMap {
@@ -803,6 +869,11 @@ export interface ResearchContractMap {
   readonly ManagementProposal: ManagementProposal;
   readonly ManagementResearchPlan: ManagementResearchPlan;
   readonly ManagementRetentionAssessment: ManagementRetentionAssessment;
+  readonly CollectionGuidance: CollectionGuidance;
+  readonly SourceLibraryQuery: SourceLibraryQuery;
+  readonly SourceLibraryEntry: SourceLibraryEntry;
+  readonly SourceLibraryResult: SourceLibraryResult;
+  readonly EvidenceExcerpt: EvidenceExcerpt;
 }
 
 export type ResearchContractName = keyof ResearchContractMap;

@@ -140,3 +140,31 @@ test('context and replacement assertions require exact supported sentence covera
     /unresolved/,
   );
 });
+
+// New assertions need inspected underlying works, while legitimate primary mirrors remain usable.
+test('discovery statements cannot support new claims; inspected Wikimedia documents can', () => {
+  for (const url of ['https://en.wikipedia.org/wiki/School', 'https://www.wikidata.org/wiki/Q1']) {
+    const value = proposal();
+    value.changes[0]!.assertions[0]!.evidence.forEach((e) => (e.sourceUrl = url));
+    value.changes[0]!.record.sources.forEach((e) => (e.url = url));
+    assert.throws(() => validateWorkProposal(value), /underlying/);
+  }
+  const value = proposal();
+  value.changes[0]!.assertions[0]!.evidence.forEach(
+    (e) => (e.sourceUrl = 'https://en.wikisource.org/wiki/School_ledger'),
+  );
+  value.changes[0]!.record.sources.forEach(
+    (e) => (e.url = 'https://en.wikisource.org/wiki/School_ledger'),
+  );
+  assert.equal(validateWorkProposal(value).changes.length, 1);
+});
+
+test('a different actor or model family does not establish independent review', () => {
+  const value = proposal();
+  value.changes[0]!.reviewBasis = 'independent_review';
+  value.changes[0]!.reviewerActorId = 'other-actor';
+  assert.throws(() => validateWorkProposal(value), /documented basis/);
+  value.changes[0]!.independenceBasis =
+    'Another researcher inspected the raw evidence before receiving the conclusions';
+  assert.equal(validateWorkProposal(value).changes.length, 1);
+});

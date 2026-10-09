@@ -80,7 +80,7 @@ format-specific gates in `packages/ops-data/scripts/articles.ts`. Numerical refe
 integrity is not proof that a sentence uses a number correctly or that the underlying
 measurement is true. Narrative entailment still needs review.
 
-Chapter-kind content currently has a 2,000-word floor. Do not manufacture scenes, detail
+There is no mandatory prose-length floor. Do not manufacture scenes, detail
 or conclusions to meet it. Use an appropriate shorter format or review the format constraint.
 Run current gates without bypasses, then prepare the preview for the separate publication role.
 

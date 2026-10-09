@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { lookupSourceTier, isAnchorTierUrl, SOURCE_TIER_RULES } from './source-tiers.js';
+import { lookupSourceTier, SOURCE_TIER_RULES } from './source-tiers.js';
 
 test('classifies official statistical agencies as T1', () => {
   assert.equal(lookupSourceTier('https://www.census.gov/data/tables/x.html').tier, 'T1');
@@ -22,10 +22,9 @@ test('longest matching rule wins over generic .gov fallback', () => {
   assert.equal(someGov.matchedDomain, 'gov');
 });
 
-test('archives and replication repositories are T2 anchors', () => {
+test('archives and replication repositories retain legacy T2 discovery categories', () => {
   assert.equal(lookupSourceTier('https://dataverse.harvard.edu/dataset').tier, 'T2');
   assert.equal(lookupSourceTier('https://www.openicpsr.org/openicpsr/project/127803').tier, 'T2');
-  assert.ok(isAnchorTierUrl('https://www.nber.org/papers/w12345'));
 });
 
 test('state historical societies classify by their registry entries', () => {
@@ -36,21 +35,10 @@ test('state historical societies classify by their registry entries', () => {
   );
 });
 
-test('unclassified hosts default to T4 and are not anchors', () => {
+test('unclassified hosts default to T4 for discovery diagnostics', () => {
   const result = lookupSourceTier('https://some-random-blog.example.com/post');
   assert.equal(result.tier, 'T4');
   assert.equal(result.matchedDomain, null);
-  assert.equal(isAnchorTierUrl('https://some-random-blog.example.com/post'), false);
-});
-
-test('anchor tiers are exactly T1 and T2', () => {
-  assert.equal(isAnchorTierUrl('https://www.census.gov/x'), true); // T1
-  assert.equal(isAnchorTierUrl('https://www.loc.gov/x'), true); // T2
-  assert.equal(isAnchorTierUrl('https://www.propublica.org/x'), false); // T3
-});
-
-test('malformed URL surfaces as non-anchor rather than throwing', () => {
-  assert.equal(isAnchorTierUrl('not a url'), false);
 });
 
 test('registry rules use only the four defined tiers', () => {

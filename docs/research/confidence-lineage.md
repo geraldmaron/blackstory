@@ -22,20 +22,20 @@ Resolution order, most specific first:
 
 1. **Recorded provenance.** An `upstreamWorkId` set by the pipeline always wins. It is the only way to know three unrelated hosts are carrying one wire story, because nothing in the three URLs says so.
 2. **A work identifier read out of the URL.** US patent numbers (normalized across `US252386`, `US-252,386-A`, `0252386`, with the `D`/`RE`/`PP` series prefixes kept), DOIs, Library of Congress item ids, Chronicling America issue pages, National Archives catalog ids, Internet Archive items. This is what collapses mirrors across hosts.
-3. **Bridges.** Wikipedia, Wikidata, Wikimedia and Wikisource hosts all collapse onto the single key `bridge:wikimedia` and come back with `bridge: true`, so ten spellings of one article are one lineage and no lineage at all for corroboration purposes.
+3. **Bridges.** Unresolved Wikipedia/Wikidata references and Wikimedia-hosted documents without an established underlying work conservatively collapse onto the single key `bridge:wikimedia` and come back with `bridge: true`, so ten spellings of one article are one lineage and no lineage at all for corroboration purposes.
 4. **The issuing authority behind the host.** Named families where the registrable domain gets it wrong (uspto.gov and patentsview.org are both the Patent Office; si.edu and smithsonianmag.com are both the Smithsonian; archives.gov and docsteach.org are both the National Archives), otherwise the registrable domain.
 
 Two rules keep this honest. Every inference either lowers the lineage count or leaves it unchanged, never raises it: two documents from one authority group into one lineage rather than being treated as independent corroboration, because two reports by the same agency are usually one agency's account. The only way to split inside an authority is `independentCreation` with a stable document id, which a caller passes when provenance has actually been checked. And anything resolved at step 3 or 4 carries `inferred: true`, which is the flag the `host_based_lineage_suspect` deficit reads. Host stays useful metadata. It stops being the answer.
 
 ### A bridge carries a claim and never corroborates one
 
-Wikipedia and Wikidata may carry a claim (see [citation-standard.md](citation-standard.md)). They contribute no independent lineage, and since the bridge rule landed they also do not dilute real evidence. Both halves matter, and `packages/domain-core/src/claims/confidence.ts` implements them:
+Wikipedia and Wikidata are discovery leads for new historical assertions (see [citation-standard.md](citation-standard.md)). They contribute no independent lineage, and since the bridge rule landed they also do not dilute real evidence. Both halves matter, and `packages/domain-core/src/claims/confidence.ts` implements them:
 
 - Bridges never count toward `independentLineageCount`. A Wikipedia article plus a government record is one corroborating lineage, not two, so a bridge can never be the thing that lifts a claim over the publish threshold.
 - When real evidence is present, bridges drop out of the quality aggregates entirely. Averaging a bridge's authority into a government record's used to make a claim score *lower* for having cited an extra source, which is how "more research made the record less publishable" happened.
 - When a bridge is all there is, it stays in the aggregates. A bridge-carried claim is worth more than no claim, and scoring it zero would misrepresent it as unevidenced rather than as thinly evidenced.
 
-Bridge handling is an input rule for the deterministic confidence engine. It is not a publication shortcut. The incremental publisher requires each public assertion to match exactly one accepted canonical claim version, the claim's reviewed supporting evidence and citation, and an approved research artifact whose reviewer differs from its producer. A Wikipedia or Wikidata bridge can carry a cited assertion, but it contributes no independent corroborating lineage and cannot replace those review records.
+Bridge handling is an input rule for the deterministic confidence engine. It is not a publication shortcut. The incremental publisher requires each public assertion to match exactly one accepted canonical claim version, the claim's reviewed supporting evidence and citation, and an approved research artifact whose reviewer differs from its producer. Legacy bridge citations are preserved for assertion-level review. New public assertions need inspected underlying evidence.
 
 ## Publication boundary
 
@@ -101,3 +101,5 @@ Persist the complete result beside the claim version. A source reclassification,
 `packages/schemas/confidence-engine/confidence-calibration-dataset.v1.schema.json`
 
 The dataset is private calibration material and is not a public projection.
+
+Verified document mirrors must retain explicit underlying work identity. An inferred host grouping is a conservative discovery heuristic, not proof that two works are independently created.

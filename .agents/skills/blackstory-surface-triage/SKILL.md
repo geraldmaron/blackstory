@@ -149,3 +149,15 @@ inherently true merely because it is populated.
   release identity and relevant cache behavior; report any cache window still outstanding.
 - For interaction, accessibility or mobile usability defects, use `blackstory-experience-review`;
   agreement between data layers does not prove an interface is usable.
+
+## Working contract
+
+**Input:** An observed public mismatch and the record’s actual data/revision.
+
+**Output:** A reproduced cause, scoped repair and observed readback on affected projections.
+
+**Boundary and handoff:** Factual disagreements return to evidence review. Do not rewrite correct source data to accommodate a broken projection.
+
+**Capabilities:** Follow [capability and permission limits](../../../docs/research/README.md#capabilities-and-permissions).
+Use the active harness’s available tools and report unsupported steps. Operational flags stay
+in the linked operations contract; no proprietary client or model family is required.

@@ -65,3 +65,15 @@ consequential disputed claims; do not claim one ran when none did.
 Publication-role separation still applies. No research agent can approve its own
 release. Truthful claims need not be weakened to avoid controversy; unsupported claims
 must not survive because they fit the project's purpose.
+
+## Working contract
+
+**Input:** A finished revision, evidence map, search bounds and contrary findings.
+
+**Output:** Concrete attempted disproofs, unresolved risks and a verdict tied to the revision.
+
+**Boundary and handoff:** Declare self-review when sharing author context. A different model family alone is not independent review; review grants no publication authority.
+
+**Capabilities:** Follow [capability and permission limits](../../../docs/research/README.md#capabilities-and-permissions).
+Use the active harness’s available tools and report unsupported steps. Operational flags stay
+in the linked operations contract; no proprietary client or model family is required.

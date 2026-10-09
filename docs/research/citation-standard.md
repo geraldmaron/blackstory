@@ -1,167 +1,34 @@
-# What counts as a citation
+# Evidence acceptance
 
-The editorial question this settles: may a claim in the catalog rest on Wikipedia?
+Evaluate the document against the exact assertion. A publisher profile establishes provenance and helps choose a collection; host reputation, `.gov`/`.edu`, citation volume and a model score cannot establish historical truth.
 
-It kept getting answered two different ways. The research passes have been rejecting Wikipedia
-outright, which is why some records came out thin. Meanwhile the active release already carries a
-large number of Wikipedia-cited claims — about 2,200 across 549 entities when this was first
-written (2026-08-07); re-measured 2026-09-13 against rel_20260723_authority_net_001, the catalog
-had grown to 3,040 such claims across 1,461 of its 4,195 entities. That count moves with the
-catalog and is not worth re-editing on every pass; treat both figures as dated snapshots, not a
-standing property of the release, and re-measure rather than trust either one. A rule applied in
-one lane and not the other is not a standard — it just means a record's depth depends on who last
-worked on it.
+## Evidence needs and document fitness
 
-Source classification is only one input. Retrieval, claim entailment and public prose review
-remain separate responsibilities.
+Use the maintained qualitative policy in `packages/domain-core/src/claims/source-fitness.ts`. The kernel profile is generated from that policy; do not add a competing table. Collection guidance describes likely coverage and limitations. It does not certify an item or override an evidence assignment.
 
-## The rule
+- Legal status: inspect applicable enacted text, decisions and administrative records. Separate allegations, findings, amendments and event dates.
+- Identity, chronology and place: inspect period records, institutional records, maps/directories and researched biographies. Distinguish namesakes, successive buildings and date meanings.
+- Explanation and significance: inspect scholarship's argument, scope, evidence, corrections and alternatives.
+- Lived experience: preserve attributed testimony, interview context, consent and access conditions. A suitable interview can support a narrow account of the speaker's experience. Chronology and broad historical claims need separate assessment.
+- Firstness, exclusivity and causation: define the comparison or causal question; seek explicit evidence, counterexamples and competing explanations.
+- Discovery: use catalogs, finding aids, markers, search results and encyclopedias to locate the underlying work. A catalog describes a work; it does not establish that work's historical assertions.
 
-Wikipedia is a **reputable secondary source**. It may carry a claim. It may never be the thing
-that corroborates one, and it may never be the sole basis for a superlative.
+A single suitable record can support an ordinary narrow fact. Consequential or disputed claims need further investigation and independently derived support where available. Do not enforce an institutional-source quota that excludes community evidence. Hold unresolved central contradictions; retain sparse supported records and attributed testimony.
 
-The source-classification and legacy score helpers in
-`packages/ops-data/scripts/lib/confidence.ts` and `lib/tier1-sources.ts` implement the
-following mechanics. The scores below are heuristic, not calibrated probabilities or
-publication permission; the current incremental path additionally requires exact independent
-claim review. See [the framework](README.md#uncertainty-and-probability).
+## Wikipedia and document mirrors
 
-- `classifySourceForConfidence` maps Wikipedia to `reputable_secondary` — a real classification,
-  not a rejection.
-- A US patent document classifies as `government_record` on any mirror that serves it
-  (patents.google.com, patentimages.storage.googleapis.com, freepatentsonline.com,
-  patentsview.org, uspto.gov) — the classification is of the document, a government grant, not
-  of the host reading it back.
-- `isWikipediaHost` excludes it from every corroboration path in `corroborate-source.ts`.
-  Wikipedia is a _bridge_ to Tier-1 references, never returned as evidence itself.
-- A Wikipedia-only claim contributes **no** corroborating lineage, so the formula caps it below
-  `standardPublish` (0.75) on its own. It clears only when an independently-fetched source with a
-  different `lineageRootId` backs it.
+Wikipedia articles and Wikidata statements are discovery leads. New public historical assertions require inspected underlying sources that themselves support the exact words. Chase references and inspect the works; links and repeated claims are insufficient. Existing citations are preserved and remediation is queued by exact assertion, starting with superlatives and consequential claims. A citation host alone does not prove a legacy claim is false.
 
-So the ban was stricter than the project, and those existing Wikipedia citations are not violations.
-Both halves of the inconsistency were wrong in the same direction: treating the citation as a
-binary permit instead of a weight.
+Wikisource and Commons scans/transcriptions can represent underlying documents. Establish edition, author/creator, provenance, faithful transcription or image comparison, exact locator and work lineage. Evaluate the underlying document. An arbitrary upload or unverified transcription is not evidence merely because it is hosted in an archive.
 
-## What changed underneath the rule
+## Acceptance and publication
 
-The rule held; the machinery under it got more honest. Three parts:
+Preserve atomic assertions, exact passages and locators, source identity, capture revision, fitness reasons, dependencies, contradictions and missing needs. Trace copied or syndicated works across domains; independently produced works in one archive can remain independent. Unknown lineage is unknown.
 
-- **A lineage is a work, not a domain.** `resolveSourceLineage`
-  (`packages/domain-core/src/claims/lineage.ts`) resolves recorded provenance first, then a work
-  identifier read out of the URL (patent number, DOI, LOC item, Chronicling America issue, NARA
-  catalog id), then the bridge key, then the issuing authority behind the host. A patent read at
-  the Patent Office and at a mirror is now one lineage; five papers carrying one wire story are
-  one lineage once the wire id is recorded. Host is metadata again.
-- **A bridge contributes zero lineage and does not dilute real evidence.** Every Wikimedia
-  spelling collapses onto one key, `bridge:wikimedia`. When a real source is present the bridge
-  drops out of the quality aggregates entirely, so citing one can no longer _lower_ a score. When
-  the bridge is all there is, it stays in the aggregates: thin, not absent.
-- **The numbers moved.** Wikipedia-only now scores **0.66** with `independentLineageCount: 0`,
-  where a lone reputable-secondary host scores **0.72** with one lineage
-  (`packages/ops-data/scripts/lib/confidence.test.ts`). Those two used to be the same number,
-  which was the tell: a bridge and a heritage-inventory record are not equally good evidence, and
-  the old rule could not say so because it counted a hostname as a lineage. Both still sit under
-  the legacy 0.75 score threshold. Actual publication requires the current review gate;
-  these scores alone neither authorize nor prohibit a reviewed narrow assertion.
+Management proposals map each public sentence to supported assertions and acquired evidence. Self-review must be labeled; another model family is not proof of independence. Owner approval binds exact proposed changes and grants only the scoped publication authority.
 
-## Which hosts count as institutions
+Article statistics, figures and theme observations cannot opt out by omitting anchors or setting `replicationVerified`. Publication loads current accepted canonical claim versions, evidence selectors/captures, review decisions and assessed lineage from the database. Anchors carry `claimId`, `claimVersionId`, `selectorId` and URL. A `publication_assertion_sha256` claim binds the review to the assertion-bearing content digest produced by `publicationAssertionDigest`; both the semantic passage review and immutable binding are required. Consequential figures require independent work support; a narrow direct quotation may use one suitable reviewed source. Offline shape validation and host discovery tallies do not grant publication authority.
 
-The rule above turns on a source's class, and for most of the web that class came out `unknown`
-— authority 0.2. The only escape was a hand-typed list of host suffixes, so the Academy of
-American Poets and the Schomburg Center scored below a crowd-edited roadside-marker database, and
-adding one of them to a record could push it under the publish floor. That escape hatch is now
-the fallback, not the mechanism: `classifySourceForConfidence` first consults a **source
-register** of hosts backed by an authority-controlled Wikidata item that names the host as its
-own official website and carries an LCNAF, VIAF, ISNI, ROR, GRID or IMLS identifier. The register
-is produced and re-verified by a tool, refuses look-alike domains by construction, and never
-grants government authority off a government TLD. See
-[`source-register.md`](./source-register.md) for the acceptance rule, the propose/apply/verify
-workflow, and the drift policy.
+Numerical legacy priors remain historical heuristics. Qualitative policy assessments require no invented priors or probabilities. An exact quote match proves provenance, not entailment or truth. Revised facts or qualifiers reopen affected review; public readback must establish delivery.
 
-## Fitness is claim-relative
-
-Whether a citation is good enough is not a property of the source. It is a property of the
-source _and the assertion it is attached to_. `assessSourceFitness(sourceClass, assertionClass)`
-(`packages/domain-core/src/claims/source-fitness.ts`) answers that pair over 24 document kinds
-and 15 assertion kinds, returning `authoritative`, `strong`, `conditional`, `leadOnly` or
-`unfit` with a rationale and the document kind's known limitations.
-
-A patent is the clearest case. It is `authoritative` for what was filed, by whom, and when, and
-for the mechanism it claims. It is `unfit` as evidence that the filer was Black: the Patent
-Office did not record inventor race, which is why Henry E. Baker had to identify Black inventors
-through correspondence and professional networks instead. It is also `unfit` for a superlative
-and for commercial or societal impact, and `leadOnly` for place, because the address on a patent
-is where the filer was, not where the work happened. `unfit` scores zero authority rather than a
-small number, so unfit sources cannot pile up into a supported claim.
-
-The practical rule for a citation: name what the claim asks of the document before deciding the
-citation is enough. "Cited to a `.gov`" is not an answer to that question.
-
-## Superlatives are the exception, and here is why
-
-"First African American to…" is the highest-risk sentence type in this catalog and the one
-readers quote. It gets no Wikipedia-only pass.
-
-The case that forced this: William F. Penn's summary said he was the first African American to
-graduate from Yale Medical School, in 1897, on Wikipedia's authority. Yale says the first was
-Cortlandt Van Rensselaer Creed, MD 1857 — also the first person of African descent to take a Yale
-degree in any discipline. Penn was forty years later. Yale's own exhibit on early Black students,
-which had every reason to say "first" if it were true, does not.
-
-A citation can preserve an error. For a superlative, define the population, credential/role,
-geography and period, seek a fit source explicitly making that exact claim, and search for
-counterexamples. Institutions are important research starting points, not infallible arbiters.
-Neither an official host nor multiple repeating websites is sufficient.
-
-The audit detects one class of violation; it does not block publication or establish truth. `packages/ops-data/scripts/audit-superlative-wikipedia-only.ts`
-finds every `first_to_do_x` / `only_or_oldest` notability-basis row whose resolved evidence is
-Wikipedia and nothing else. The [2026-10-07 audit](skill-audit-2026-10-07.md) measured 181
-finding rows across 173 entities (147 `first_to_do_x`, 34 `only_or_oldest`). Of those rows,
-57 concern entities with no non-Wikipedia claim and 123 concern entities whose summaries
-use superlative language. Those two subtotals count findings, not distinct entities, and
-the summary-language check does not establish that the summary repeats the exact flagged
-assertion. See repo-z97f for the review cohort. Corroborating, qualifying or withdrawing
-an assertion requires per-claim research; the script identifies review candidates, not
-proven falsehoods. Re-measure as the catalog changes.
-
-## In practice
-
-| Situation                                                                | What to do                                                                                                                                                            |
-| ------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Wikipedia is the only source                                             | At most stage a narrow claim with `confidenceLevel: 'low'`, `independentLineageCount: 0`. Do not put it in the summary.                                               |
-| Wikipedia plus an independent institutional source                       | Cite the institution. The bridge adds no lineage, so this is one lineage, not two. Summary still needs exact entailment, contradiction search and final-copy review.  |
-| A "first" / "only" / "largest"                                           | Explicit fit evidence for the exact scope plus counterexample search; otherwise qualify or omit.                                                                      |
-| The source is authoritative for a different question than the claim asks | Rewrite the claim to what the document actually settles, or find the document that settles the claim. A patent is not evidence of race, of firstness, or of adoption. |
-| Sources disagree on scope or date                                        | Weigh fitness, provenance and scope, not votes. Resolve with evidence or show the material dispute in public wording.                                                 |
-
-`confidenceLevel: 'low'` exists in `packages/public-contracts/src/v1/claim.ts`. Counts of
-high/medium/low change with the release; measure them rather than treating old totals as
-current. Low confidence does not permit a known falsehood. The
-[prose fact protocol](../methodology/chapter-fact-validation.md) applies to every visible
-assertion, including text not covered by the structured-claim publication gate.
-
-## Citations are not research depth
-
-How well a claim is cited and how well a record is researched are different measurements taken
-with different instruments. `assessResearchMaturity`
-(`packages/domain-core/src/research/maturity.ts`) derives a record's depth as one of six states,
-`seeded` → `grounded` → `corroborated` → `contextualized` → `deep_research` → `reference`, from
-17 gates fed by 29 named deficits (`packages/domain-core/src/research/deficits.ts`). It cannot be
-set by hand, only derived, and `reference` does not mean finished.
-
-The rule that keeps the two from being confused: **adding a source must not clear a deficit by
-itself.** A record can carry a citation on every sentence and still sit at `seeded`, because the
-gates count lineages, fitness and selectors rather than URLs. Display completeness is a third
-measurement again, and a fully populated record can be entirely unresearched. See
-[entity-completeness-audit.md](entity-completeness-audit.md).
-
-## Related
-
-- [confidence-lineage.md](confidence-lineage.md) — how independent lineage is counted and scored,
-  how claim-relative fitness works, and how research maturity is derived.
-- [citation-independence-review-signal.md](citation-independence-review-signal.md)
-- [entity-completeness-audit.md](entity-completeness-audit.md) — display completeness, which is a
-  different question from either of the above.
-- `packages/ops-data/scripts/audit-superlative-wikipedia-only.ts` — the running audit for the
-  superlative carve-out above: which `first_to_do_x`/`only_or_oldest` basis rows rest on Wikipedia
-  alone, right now, not as of whenever this page was last edited.
+Methodological references: [ACRL](https://www.ala.org/acrl/standards/ilframework), [Wikipedia research guidance](https://en.wikipedia.org/wiki/Wikipedia:Researching_with_Wikipedia), [OHA principles](https://oralhistory.org/oha-core-principles/). Provenance concepts follow [W3C PROV](https://www.w3.org/TR/prov-overview/) and locators/selectors follow [Web Annotation](https://www.w3.org/TR/annotation-model/); no RDF infrastructure is required.

@@ -1,3 +1,4 @@
+import { querySourceLibrary } from '@repo/ops-data/source-library';
 import {
   retrieveEvidence,
   parseEvidenceQueryVector,
@@ -526,6 +527,30 @@ export async function runCli(argv: readonly string[], deps: CliDependencies = {}
   try {
     const flags = parseFlags(rest);
     switch (command) {
+      case 'source-library': {
+        const query: Record<string, unknown> = {};
+        for (const [flag, field] of [
+          ['--question', 'question'],
+          ['--assertion-class', 'assertionClass'],
+          ['--subject', 'subject'],
+          ['--geography', 'geography'],
+          ['--period', 'period'],
+          ['--review-status', 'reviewStatus'],
+          ['--limit', 'limit'],
+          ['--offset', 'offset'],
+        ]) {
+          const raw = optionalFlag(flags, flag!);
+          if (raw !== undefined)
+            query[field!] = ['limit', 'offset'].includes(field!) ? Number(raw) : raw;
+        }
+        const db = await (deps.postgresPool ?? getOpsPostgresPool()).connect();
+        try {
+          stdout(JSON.stringify(await querySourceLibrary(db, query)));
+        } finally {
+          db.release();
+        }
+        return 0;
+      }
       case 'capture-retention': {
         if (!deps.postgresPool) assertPostgresOpsDataSource(process.env);
         const pool = deps.postgresPool ?? getOpsPostgresPool();
@@ -2353,7 +2378,7 @@ export async function runCli(argv: readonly string[], deps: CliDependencies = {}
       }
       default: {
         stderr(
-          'Usage: operator-cli <research-run|research-work|research-status|research-claim|research-heartbeat|research-complete|research-index|research-embed|research-retrieve|capture-retention|preflight|model-report|submit-lead|research-intake|register-source|attach-evidence|bulk-import|propose-edge|discovery-run|community-obscurity-run|rss-campaign-run|discovery-dispatch|pending-list|editorial-run|enrichment-run|story-research-run|sundown-town-brief|harness-run|locate|backfill-entity|prose-run|expand|graylist-read|quarantine-triage|capture-backfill|research-quality-audit|enrich-entity> [flags]\n' +
+          'Usage: operator-cli <source-library|research-run|research-work|research-status|research-claim|research-heartbeat|research-complete|research-index|research-embed|research-retrieve|capture-retention|preflight|model-report|submit-lead|research-intake|register-source|attach-evidence|bulk-import|propose-edge|discovery-run|community-obscurity-run|rss-campaign-run|discovery-dispatch|pending-list|editorial-run|enrichment-run|story-research-run|sundown-town-brief|harness-run|locate|backfill-entity|prose-run|expand|graylist-read|quarantine-triage|capture-backfill|research-quality-audit|enrich-entity> [flags]\n' +
             'Every command accepts --json (no-op: output is always JSON) and every id-bearing command uses --entity-id / --case-id for its target.\n' +
             'For model-report: [--since <ISO date>] [--json]\n' +
             'For harness-run: --theme <theme> [--metro <metro>] [--subjects <source-records.json> | --url <url> | --connectors dpla,nps_network_to_freedom,web_search] [--nps-csv <file>] [--dpla-json <file>] [--max-subjects 25] [--max-relations 25] [--enrich] [--provider openrouter|ollama|mock] [--progress-path <file>]\n' +
