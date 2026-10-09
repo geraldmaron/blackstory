@@ -730,12 +730,16 @@ a.ds-door-open__place:focus-visible {
   width: 0.28em;
 }
 
-/* Clip-slot opens; the S glyph itself never scales or reflows off the baseline. The slot opens
-   by max-width and sizes to the glyph, not to a fixed width: a fixed 0.72em was wider than the S
-   in the display face and left a visible gap, "S tory", after the split had settled. */
+/* The reveal slot sizes to the S's advance rather than a fixed letter width. As with the prefix,
+   padding protects ink beyond the tightly tracked advance and short line box. Negative margins
+   preserve the baseline and the joined "Story" spacing, including while the slot is closed. */
 .ds-hero-headline-morph__s-slot {
   display: inline-block;
-  overflow: hidden;
+  overflow: clip;
+  padding-block: var(--ds-hero-roll-pad);
+  padding-inline: var(--ds-hero-glyph-bleed);
+  margin-block: calc(var(--ds-hero-roll-pad) * -1);
+  margin-inline: calc(var(--ds-hero-glyph-bleed) * -1);
   max-width: 0;
   flex: 0 0 auto;
   vertical-align: baseline;

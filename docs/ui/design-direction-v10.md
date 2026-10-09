@@ -113,6 +113,16 @@ v10 does **not** rewind the door tip back to a first-paint WebGL cockpit. Progre
 
 Mobile continues Rest/Engaged bottom-sheet philosophy; do not shrink desktop panels onto phones.
 
+### Door headline
+
+The opening subject moves from History through His, Her, Their and Your Story, then holds on
+Black Story. Reduced motion shows the final words directly. The display type keeps tight
+tracking and leading, but every visible letter must retain its full outline. A reveal mask must
+allow for glyph ink beyond the letter's layout box. Use the existing em-based padding with
+compensating margins so clearance scales with the type without opening a gap inside Story or
+moving its baseline. Check the sequence and final state at desktop and phone widths in both
+themes. The introduction remains a lower-left sheet over the map.
+
 ---
 
 ## 5. Surface class amendments (code-aligned)
