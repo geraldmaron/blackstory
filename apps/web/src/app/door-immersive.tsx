@@ -129,15 +129,13 @@ type DoorFrameBoxes = {
   readonly window: DoorFrameBox | null;
   readonly plate: DoorFrameBox | null;
   readonly chrome: DoorFrameBox | null;
-  readonly bottomChrome: DoorFrameBox | null;
 };
 
 function sameDoorFrameBoxes(a: DoorFrameBoxes, b: DoorFrameBoxes): boolean {
   return (
     sameDoorFrameBox(a.window, b.window) &&
     sameDoorFrameBox(a.plate, b.plate) &&
-    sameDoorFrameBox(a.chrome, b.chrome) &&
-    sameDoorFrameBox(a.bottomChrome, b.bottomChrome)
+    sameDoorFrameBox(a.chrome, b.chrome)
   );
 }
 
@@ -263,8 +261,6 @@ export function DoorImmersive({
   const windowRef = useRef<HTMLDivElement | null>(null);
   /** The field chrome along the window's top edge; the country is framed below it. */
   const chromeRef = useRef<HTMLDivElement | null>(null);
-  /** Opening masthead: national frame lifts the country above this sheet. */
-  const openSheetRef = useRef<HTMLDivElement | null>(null);
 
   const stage = useMapStage();
   const router = useRouter();
@@ -694,21 +690,15 @@ export function DoorImmersive({
     window: null,
     plate: null,
     chrome: null,
-    bottomChrome: null,
   });
-  const measureFrameBoxes = useCallback(
-    (map: { getContainer(): HTMLElement }): DoorFrameBoxes => {
-      const onOpen = !browseModeRef.current && lastChapterIdRef.current === chapters[0]?.id;
-      return {
-        window: boxOf(windowRef.current),
-        // MapLibre's own container: on the Door the whole viewport (posture `ambient`, shell.css).
-        plate: boxOf(map.getContainer()),
-        chrome: boxOf(chromeRef.current),
-        bottomChrome: onOpen ? boxOf(openSheetRef.current) : null,
-      };
-    },
-    [chapters],
-  );
+  const measureFrameBoxes = useCallback((map: { getContainer(): HTMLElement }): DoorFrameBoxes => {
+    return {
+      window: boxOf(windowRef.current),
+      // MapLibre's own container: on the Door the whole viewport (posture `ambient`, shell.css).
+      plate: boxOf(map.getContainer()),
+      chrome: boxOf(chromeRef.current),
+    };
+  }, []);
 
   /**
    * Point the plate at the current frame, framed against the map window.
@@ -734,13 +724,11 @@ export function DoorImmersive({
       const camera = cameraRef.current;
       const boxes = measureFrameBoxes(map);
       lastFrameBoxesRef.current = boxes;
-      const { window: windowBox, plate: plateBox, chrome: chromeBox, bottomChrome } = boxes;
+      const { window: windowBox, plate: plateBox, chrome: chromeBox } = boxes;
       map.stop();
       if (isNationalCamera(camera)) {
         const padding =
-          windowBox && plateBox
-            ? doorFramePadding(windowBox, plateBox, chromeBox, bottomChrome)
-            : null;
+          windowBox && plateBox ? doorFramePadding(windowBox, plateBox, chromeBox) : null;
         stage.flyPreset(
           'national',
           { bounds: US_CONUS_BOUNDS },
@@ -1084,9 +1072,9 @@ export function DoorImmersive({
 
           /*
             Opening masthead (door-home.css): morphing headline, short invite, spotlight place,
-            kind-family ledger, release count, Begin + Browse. Measured as bottomChrome so the
-            national frame sits the country above this sheet. Brand chrome already in the bar
-            stays out of the sheet.
+            kind-family ledger, release count, Begin + Browse. The map remains a continuous
+            backdrop behind the sheet; its national frame uses the full desktop window and the
+            phone's top band. Brand chrome already in the bar stays out of the sheet.
           */
           if (isOpen) {
             return (
@@ -1097,7 +1085,7 @@ export function DoorImmersive({
                 data-chapter={chapter.index}
                 aria-labelledby={`door-journey-heading-${chapter.id}`}
               >
-                <div className="ds-door-open" ref={openSheetRef}>
+                <div className="ds-door-open">
                   <HeroHeadlineMorph
                     className="ds-door-open__headline"
                     id={`door-journey-heading-${chapter.id}`}
