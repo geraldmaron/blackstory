@@ -768,7 +768,7 @@ a sourced address, evidence attachment, or campaign is actually ready.
 ## Account-owned management work
 
 Implementation status: the session and hosted paths share one durable ledger and publisher. The
-management service is not deployed yet; do not claim remote-client or live-release acceptance
+management inbox is deployed and its signed-in surface has been exercised. External OAuth client acceptance and independent hosted continuation remain unverified; do not claim those from deployment alone
 from local tests. Existing approved publication work does not depend on enabling hosted research.
 
 The default instruction is: manage the request end to end, infer a bounded scope, check existing
@@ -869,7 +869,7 @@ changes and article creation must be held explicitly. Corrections identify exact
 and locations to supersede, replace or withhold, and can replace or remove historical context.
 Unrelated claims, context and locations remain intact; a summary rewrite cannot silently change them.
 
-Source-library guidance extends `evidence.evidence_sources.research_guidance`: collection and
+Source-library guidance lives in immutable `evidence.source_policies.collection_guidance`: collection and
 coverage, suitable claims, search methods, limitations, provenance, preservation conditions.
 This guides discovery, not truth or blanket retention permission. Acquisition honors unexpired exact-URL decisions from `evidence.source_items.metadata`.
 New sources receive a budgeted, source-specific private-quotation assessment after transient
@@ -878,8 +878,8 @@ It assesses factual nature, necessity, substitution and sensitivity, retains at 
 characters for 30 days, and never permits public archiving. Missing, duplicated, restricted or
 uncertain decisions are withheld. Existing restrictions and expired explicit decisions cannot
 be overridden automatically. Redirect destinations require their own assessment. Only HTTP 200
-responses become evidence. The reviewed school collections seed guidance on existing source
-records; the library still needs broader coverage.
+responses become evidence. Collection coverage remains incomplete. Legacy item guidance stays
+available for audit and is not current operating policy.
 
 Management proposals expire after 30 days or earlier when their research evidence expires or
 is withdrawn. Reads withhold expired text; approval and publication refuse it. The existing
@@ -909,3 +909,55 @@ Deploy the native qualitative-label change before removing numeric scores from t
 Older installed clients substitute zero for a missing score. The local contract change alone does
 not prove a safe rollout; exercise the supported app builds and enforce the appropriate minimum
 build through the existing bootstrap compatibility controls before the API change goes live.
+
+
+## Source library
+
+Use one shared `SourceLibraryQuery` / `SourceLibraryResult` JSON Schema contract from the research kernel. The operations service lives in `@repo/ops-data/source-library`; all clients use it. Query by question, assertion class, subject, geography, period and review status. Pagination uses a bounded limit and offset; results include matching reasons, collection identifiers, exact policy versions and limitations.
+
+```sh
+node --conditions development --import tsx packages/operator-cli/src/bin.ts source-library --question "historic school buildings" --assertion-class chronology --geography Missouri --limit 20 --offset 0 --json
+```
+
+Remote MCP: `source_library`. Staff/OAuth read endpoint: `GET /admin/api/sources/library` with the same camelCase query fields. Staff UI: `/admin/sources`. Existing `/admin/api/sources` remains the organization list. Authentication and declared staff authority remain required. There is no public anonymous library endpoint or client-specific search provider requirement.
+
+Use the recommendations to plan exact evidence needs and explain why a collection should contain each fact. Search authorized captures, collection catalogs, citation trails and sources outside the library. Pin returned policies and guidance in the execution plan. Record query terms, coverage, access failures, inspected passages, document identity, dependencies, contradictions and unmet needs in task outputs and evidence artifacts. Returned matches are recommendations, never acceptance.
+
+Collection guidance lives on immutable `evidence.source_policies` revisions. Insert a new version for a change. Link `source_items.source_policy_id` and `source_policy_version` only when collection membership is established; unknown legacy bindings remain null. Old item-level guidance is retained for audit and no live planner consumes it. School-specific disputes belong to cases. Legacy fitness rows are labeled `legacy_heuristic`; new qualitative assessments may omit numeric priors.
+
+Session acquisition may include up to five `excerpts`, each with exact text (maximum 1000 characters), a precise `locator` and optional short prefix/suffix. Retained context is bounded to 6000 characters per source. The service hashes the retained context, preserves locators and enforces the same source-specific rights, sensitivity and expiry conditions. An excerpt is not the complete work. Use the returned hash in proposals.
+
+
+### Planning and maintaining versions
+
+For each `ManagementResearchPlan.queries` entry in a new managed run, record
+`collectionPolicies: [{policyId, policyVersion, expectedEvidence}]` from that run's pinned
+recommendations. Explain the exact fact the collection should contain. An empty array is valid
+for discovery outside the library; explain the choice in `sourceFitnessReason`. Saved legacy
+plans remain readable. Later library changes cannot alter a saved run's recommendations.
+
+A collection revision is prepared with `sealed_at` null. Insert its qualitative fitness rows,
+validate the complete guidance through the shared schema, then set `sealed_at` once. Only sealed
+revisions are returned. Guidance, fitness and the seal cannot be edited afterward; corrections
+create a new policy version. Unknown item membership remains unbound.
+
+### Reviewing article and theme assertions
+
+Every article `stat`, `figure` or `pullquote` block and every published theme observation needs
+reviewed anchors. Missing declarations and `replicationVerified` do not grant an exception.
+Compute `publicationAssertionDigest` from `@repo/ops-data`'s existing
+`scripts/lib/reviewed-anchors.ts` over the complete block or observation. Its canonicalization
+excludes only transport fields `anchors` and `replicationVerified`. Save that digest as an exact
+canonical claim with predicate `publication_assertion_sha256`; anchors identify its current
+`claimId`, `claimVersionId` and `selectorId` plus the actual source URL. Accepted source-specific
+assignments must include qualitative fitness/support reasons, precise selectors and assessed
+work lineage. Editorial review must cover the asserted content, not merely the digest.
+
+An authorized reviewer records the exact artifact decision through the eight-argument
+`research.approve_artifact`, including `review_mode` and a concrete `independence_basis` when
+claiming independent review. A different model family is provenance, not that basis. Same-actor
+approval is prohibited. The legacy six-argument form records `legacy_unverified` and cannot
+satisfy the independent publication gate. The latest decision, assignment and lineage revisions
+must be covered by review. Consequential assertions need independently derived work support;
+copied captures and mirrors count together. An attributed pullquote can use one suitable work.
+Existing historical projections remain stored; re-projection must satisfy the current review.

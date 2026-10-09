@@ -68,3 +68,21 @@ underrepresentation.
 
 - Empty-quadrant vision: `docs/methodology/empty-quadrant-and-aggregators.md`
 - Query packs / era terms: `docs/research/query-packs.md`
+
+## Working contract
+
+**Input:** Catalog coverage, scope and the research budget.
+
+**Output:** A bounded set of research targets and reasons, with catalog gaps distinguished from historical absence.
+
+**Boundary and handoff:** Hand targets to research intake or discovery. Citation volume must not crowd out community archives or poorly documented subjects.
+
+Before acquisition, use the [shared collection-library method](../../../docs/research/research-operations.md#source-library)
+for the evidence need, pin returned policy versions and explain why the collection should
+contain the needed evidence. Search authorized captures, citation trails and outside sources;
+the library is a starting point. Record access failures and unknown coverage. Its reviewed
+status describes guidance, not the truth of a historical assertion.
+
+**Capabilities:** Follow [capability and permission limits](../../../docs/research/README.md#capabilities-and-permissions).
+Use the active harness’s available tools and report unsupported steps. Operational flags stay
+in the linked operations contract; no proprietary client or model family is required.

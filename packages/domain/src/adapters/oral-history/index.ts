@@ -22,14 +22,14 @@
  *   this module ships fixture-first and injects the adapter, so it performs no network I/O
  *   itself.
  *
- * Research-kernel alignment: oral testimony is the `first-person-or-oral-history` source class
+ * Research-kernel alignment: oral testimony is the `oral_history` source class
  * (see `packages/research-kernel/profiles/black-history.v1.json` → sourceFitness), fitness
- * `strong` for `lived-experience-or-local-memory` claims — with the kernel's own limitation that
+ * `authoritative` for attributed `lived_experience` claims, subject to the limitation that
  * identity, chronology, coordination, and copying require review. The provenance-layer
  * `EvidenceSource.classification` is a constitution classification; first-person testimony maps
- * to `community_oral`, which is deliberately a LOW-AUTHORITY tier: oral-history mentions can
- * inform research, boost obscurity discovery, and seed authority-harvest follow-ups, but can
- * never publish alone.
+ * to `community_oral`, which is a discovery classification: oral-history mentions can
+ * inform research, boost obscurity discovery, and seed authority-harvest follow-ups. Discovery
+ * mentions do not authorize publication. A suitable attributed interview can support lived experience.
  */
 import { hashUtf8 } from '../../provenance/hashes.js';
 import type { EvidenceSource } from '../../provenance/source.js';
@@ -60,12 +60,12 @@ export const ORAL_HISTORY_PAYLOAD_SCHEMA_VERSION = 'oral-history-payload.v1' as 
  * Research-kernel source class for oral testimony. Distinct from the constitution's
  * provenance classification below.
  */
-export const ORAL_HISTORY_SOURCE_CLASS = 'first-person-or-oral-history' as const;
+export const ORAL_HISTORY_SOURCE_CLASS = 'oral_history' as const;
 
 /**
  * Constitution provenance classification for first-person oral testimony. `community_oral` is a
- * low-authority tier by design: it feeds the obscurity low-authority boost and enables
- * authority-harvest of primary-source links cited in transcripts, and it can never publish alone.
+ * discovery category: it feeds the obscurity boost and enables
+ * authority-harvest of primary-source links cited in transcripts, and does not decide fitness. Attributed lived experience can be supported by a suitable interview; chronology and identity need separate review.
  */
 export const ORAL_HISTORY_DEFAULT_CLASSIFICATION = 'community_oral' as const;
 
@@ -155,7 +155,7 @@ export type OralHistorySource = {
   readonly homepageUrl: string;
   /** Collections this source exposes for the campaign to walk. */
   readonly collections: readonly OralHistoryCollection[];
-  /** Research-kernel source class; always `first-person-or-oral-history` for this methodology. */
+  /** Research-kernel source class; always `oral_history` for this methodology. */
   readonly sourceClass?: typeof ORAL_HISTORY_SOURCE_CLASS;
   /** Constitution provenance classification override (defaults to `community_oral`). */
   readonly classification?: string;
@@ -264,8 +264,8 @@ export function createOralHistoryAdapterContract(
       permittedClaimClasses: ['biographical_fact', 'geographic_fact', 'organizational_fact'],
       refreshSchedule: '0 6 1 * *',
       notes:
-        'Oral History Pipeline harvest. Research-kernel sourceClass=first-person-or-oral-history ' +
-        '(fitness strong for lived-experience-or-local-memory; identity/chronology require ' +
+        'Oral History Pipeline harvest. Research-kernel sourceClass=oral_history ' +
+        '(fitness is claim-relative for lived_experience; identity/chronology require ' +
         'review). Interview metadata + canonical URLs + capped mention snippets only — never ' +
         'full transcripts, audio, or narrator PII. Fixtures-first; do not enable without ' +
         'explicit policy approval and a safe-fetch-backed live adapter.',
@@ -303,7 +303,7 @@ export function createOralHistoryEvidenceSource(
       refreshSchedule: '0 6 1 * *',
       notes:
         `Oral-history source for ${source.displayName} (${source.institution}); research-kernel ` +
-        'sourceClass=first-person-or-oral-history; mention snippets + pointers only; ' +
+        'sourceClass=oral_history; mention snippets + pointers only; ' +
         'fixtures-first; disabled until approval.',
     },
     adapterEnabled: true,
@@ -322,7 +322,7 @@ export type RegisterOralHistorySourceInput = {
 
 /**
  * Registers one oral-history source in `disabled` state. Wraps `registerSource` with
- * research-kernel sourceClass=first-person-or-oral-history mapped onto the constitution
+ * research-kernel sourceClass=oral_history mapped onto the constitution
  * classification `community_oral`. Does NOT approve policy — approval is a separate,
  * human/campaign-time step (`approveSourcePolicy`).
  */

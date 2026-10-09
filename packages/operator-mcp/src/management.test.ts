@@ -25,7 +25,15 @@ test('stateless remote MCP lists tools and passes the exact decision to the shar
   const list = await call('tools/list', {});
   assert.deepEqual(
     list.result.tools.map((tool: { name: string }) => tool.name),
-    ['request_work', 'research_work', 'list_work', 'get_work', 'decide_work', 'retry_work'],
+    [
+      'source_library',
+      'request_work',
+      'research_work',
+      'list_work',
+      'get_work',
+      'decide_work',
+      'retry_work',
+    ],
   );
   const workId = '11111111-1111-4111-8111-111111111111';
   const body = {
@@ -57,5 +65,14 @@ test('stateless remote MCP lists tools and passes the exact decision to the shar
   assert.deepEqual(calls[1], {
     path: `/${workId}/research`,
     body: { action: 'start', sessionId: 'another-harness' },
+  });
+  const library = await call('tools/call', {
+    name: 'source_library',
+    arguments: { question: 'school buildings', assertionClass: 'chronology', offset: 20 },
+  });
+  assert.equal(library.result.isError, undefined);
+  assert.deepEqual(calls[2], {
+    path: '/source-library?question=school+buildings&assertionClass=chronology&offset=20',
+    body: undefined,
   });
 });

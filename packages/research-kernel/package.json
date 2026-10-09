@@ -19,8 +19,8 @@
     "python/src"
   ],
   "scripts": {
-    "generate": "node scripts/generate-contracts.mjs",
-    "generate:check": "node scripts/generate-contracts.mjs --check",
+    "generate": "node scripts/generate-contracts.mjs && node --conditions development --import tsx scripts/generate-fitness-profile.ts",
+    "generate:check": "node scripts/generate-contracts.mjs --check && node --conditions development --import tsx scripts/generate-fitness-profile.ts --check",
     "build": "pnpm run generate:check && tsc -p tsconfig.json",
     "typecheck": "pnpm run generate:check && tsc -p tsconfig.json --noEmit",
     "test": "pnpm run generate:check && node --conditions development --import tsx --test src/*.test.ts",

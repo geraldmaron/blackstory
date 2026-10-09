@@ -6,6 +6,8 @@ import { POST as decide } from '../../admin/api/work/[id]/decisions/route';
 import { POST as retry } from '../../admin/api/work/[id]/retry/route';
 import { POST as research } from '../../admin/api/work/[id]/research/route';
 
+import { GET as sourceLibrary } from '../../admin/api/sources/library/route';
+
 export const runtime = 'nodejs';
 export async function POST(request: Request): Promise<Response> {
   try {
@@ -27,17 +29,24 @@ export async function POST(request: Request): Promise<Response> {
   if (origin && origin !== 'https://blackstory.app')
     return Response.json({ error: 'Origin not allowed' }, { status: 403 });
   return handleManagementMcp(request, async (path, body) => {
-    const forwarded = new Request(`https://blackstory.app/admin/api/work${path}`, {
-      method: body === undefined ? 'GET' : 'POST',
-      headers: {
-        Authorization: request.headers.get('authorization')!,
-        'Content-Type': 'application/json',
+    const libraryRequest = path.startsWith('/source-library?');
+    const forwarded = new Request(
+      libraryRequest
+        ? `https://blackstory.app/admin/api/sources/library${path.slice('/source-library'.length)}`
+        : `https://blackstory.app/admin/api/work${path}`,
+      {
+        method: body === undefined ? 'GET' : 'POST',
+        headers: {
+          Authorization: request.headers.get('authorization')!,
+          'Content-Type': 'application/json',
+        },
+        ...(body === undefined ? {} : { body: JSON.stringify(body) }),
       },
-      ...(body === undefined ? {} : { body: JSON.stringify(body) }),
-    });
+    );
     const [id, action] = path.split('/').filter(Boolean);
     let response: Response;
-    if (!id) response = body === undefined ? await list(forwarded) : await submit(forwarded);
+    if (libraryRequest) response = await sourceLibrary(forwarded);
+    else if (!id) response = body === undefined ? await list(forwarded) : await submit(forwarded);
     else {
       const context = { params: Promise.resolve({ id }) };
       response =

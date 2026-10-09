@@ -1,0 +1,1761 @@
+{
+  "reviewDate": "2026-10-08",
+  "reviewMode": "self_review",
+  "recertifiesHistoricalAssertions": false,
+  "profiles": [
+    {
+      "organizationId": "org_web_e6d118536d06ec99d4c06be21da40cee",
+      "name": "National Library of Medicine",
+      "status": "needs_recheck",
+      "reason": "Existing descriptive claims are not recertified by a collection page. Use document-relative evidence review; old profile dates are historical.",
+      "originalProfile": {
+        "id": "org_web_e6d118536d06ec99d4c06be21da40cee",
+        "name": "National Library of Medicine",
+        "tier": "tier1",
+        "summary": "The National Library of Medicine (NLM) is a federal library founded in 1836, part of the National Institutes of Health under the Department of Health and Human Services, based in Bethesda, Maryland. It describes itself as the world's largest biomedical library and runs PubMed/MEDLINE, MedlinePlus, and ClinicalTrials.gov alongside a History of Medicine division that publishes online exhibitions such as Changing the Face of Medicine and Opening Doors. The NIH parent site separately publishes NIH Research Matters, a weekly research-highlights column edited by NIH's Office of Communications and Public Liaison and reviewed by NIH staff scientists.",
+        "homepage": "https://www.nlm.nih.gov/",
+        "relevance": "BlackStory cites NLM exhibition pages for biographies of Black physicians and surgeons, including Alexa Canady and Jane Cooke Wright, and for institution histories such as Provident Hospital in Chicago and Mercy-Douglass Hospital. It cites the nih.gov Research Matters column for reporting on federally funded research with African American historical subject matter, such as ancestry findings from the Catoctin Furnace burial site, and cites pubmed.ncbi.nlm.nih.gov as a journal-article index for institutions like Good Samaritan Hospital in Selma.",
+        "created_at": "2026-07-23T04:35:40.949071+00:00",
+        "updated_at": "2026-09-15T03:39:46.553209+00:00",
+        "limitations": [
+          "The exhibition biography pages are curatorial summaries written for a general audience, not primary archival documents, and do not always carry footnoted sourcing on the page itself.",
+          "PubMed entries index a journal article's metadata and abstract; the article's own content sits behind the publisher, not on nih.gov.",
+          "NIH Research Matters covers a study's findings as reported by NIH staff, not the underlying peer-reviewed paper itself."
+        ],
+        "publisher_kind": "government_agency",
+        "profile_sources": [
+          "https://cfmedicine.nlm.nih.gov/physicians/biography_53.html",
+          "https://www.nlm.nih.gov/exhibition/changing-the-face-of-medicine/physicians/biography_alexa_canady.html?id=item-54",
+          "https://www.nlm.nih.gov/exhibition/opening-doors/OB21981-sm.html",
+          "https://www.nlm.nih.gov/about/index.html",
+          "https://www.nih.gov/news-events/nih-research-matters/ancestry-descendants-african-americans-buried-catoctin-furnace"
+        ],
+        "profile_reviewed_at": "2026-09-15T03:39:46.593+00:00",
+        "profile_reviewed_by": "agent:source-library-profiles-2026-09-14",
+        "parent_organization_id": null,
+        "merged_into_organization_id": null
+      },
+      "accessOutcomes": [
+        {
+          "url": "https://cfmedicine.nlm.nih.gov/physicians/biography_53.html",
+          "accessOutcome": "opened"
+        },
+        {
+          "url": "https://www.nlm.nih.gov/exhibition/changing-the-face-of-medicine/physicians/biography_alexa_canady.html?id=item-54",
+          "accessOutcome": "opened"
+        },
+        {
+          "url": "https://www.nlm.nih.gov/exhibition/opening-doors/OB21981-sm.html",
+          "accessOutcome": "opened"
+        },
+        {
+          "url": "https://www.nlm.nih.gov/about/index.html",
+          "accessOutcome": "opened"
+        },
+        {
+          "url": "https://www.nih.gov/news-events/nih-research-matters/ancestry-descendants-african-americans-buried-catoctin-furnace",
+          "accessOutcome": "unavailable_or_no_text"
+        }
+      ]
+    },
+    {
+      "organizationId": "org_web_6cecbb9fbc5e891f97476cc7627834f5",
+      "name": "National Register of Historic Places / NPGallery Digital Asset Search (National Park Service)",
+      "status": "needs_recheck",
+      "reason": "Existing descriptive claims are not recertified by a collection page. Use document-relative evidence review; old profile dates are historical.",
+      "originalProfile": {
+        "id": "org_web_6cecbb9fbc5e891f97476cc7627834f5",
+        "name": "National Register of Historic Places / NPGallery Digital Asset Search (National Park Service)",
+        "tier": "tier1",
+        "summary": "NPGallery is the National Park Service's digital asset search platform for the National Register of Historic Places and National Historic Landmarks programs. It is operated by NPS, a division of the U.S. Department of the Interior, and holds the official nomination forms, reference numbers, and designation records for properties the federal government has recognized as historically significant. Records are searchable by resource name, location, and reference number.",
+        "homepage": "https://npgallery.nps.gov/NRHP",
+        "relevance": "BlackStory cites this host overwhelmingly for place records, almost all carrying the predicate designated_national_historic_landmark or a 'listed on [register]' statement drawn from official NRHP nomination data, plus a handful of person, institution, organization and school records.",
+        "created_at": "2026-07-23T04:35:40.949071+00:00",
+        "updated_at": "2026-09-15T03:34:49.653693+00:00",
+        "limitations": [
+          "The site is a search/document-retrieval interface, not an interpretive narrative source; nomination forms vary widely in depth and era of scholarship",
+          "Older nomination forms (pre-1990s) can reflect the historical framing and omissions typical of their period",
+          "PDF nomination forms are sometimes scanned/OCR'd and can have transcription artifacts"
+        ],
+        "publisher_kind": "government_agency",
+        "profile_sources": ["https://npgallery.nps.gov/NRHP"],
+        "profile_reviewed_at": "2026-09-15T03:34:49.82+00:00",
+        "profile_reviewed_by": "agent:source-library-profiles-2026-09-14",
+        "parent_organization_id": null,
+        "merged_into_organization_id": null
+      },
+      "accessOutcomes": [
+        {
+          "url": "https://npgallery.nps.gov/NRHP",
+          "accessOutcome": "opened"
+        }
+      ]
+    },
+    {
+      "organizationId": "org_web_433ecad1d7cd488dc4171b25c6728c02",
+      "name": "Wikipedia (English)",
+      "status": "needs_recheck",
+      "reason": "Existing descriptive claims are not recertified by a collection page. Use document-relative evidence review; old profile dates are historical.",
+      "originalProfile": {
+        "id": "org_web_433ecad1d7cd488dc4171b25c6728c02",
+        "name": "Wikipedia (English)",
+        "tier": "tier3",
+        "summary": "Wikipedia is the free, crowd-edited online encyclopedia operated by the Wikimedia Foundation. Any registered or anonymous user can create or edit an article; quality control comes from community review, citation requirements, and administrator oversight rather than a fixed editorial staff. Coverage depth and sourcing rigor vary widely by article.",
+        "homepage": "https://en.wikipedia.org",
+        "relevance": "Wikipedia is cited broadly as a general-purpose bridge and summary source spread across nearly every entity kind in the catalog: place, person, organization, institution, event, school, case, law, publication, and movement records.",
+        "created_at": "2026-07-23T04:35:40.949071+00:00",
+        "updated_at": "2026-09-15T03:34:49.653693+00:00",
+        "limitations": [
+          "Anyone can edit an article; content can be incomplete, outdated, or vandalized between reviews",
+          "Sourcing quality varies by article and editor community",
+          "Per project rule, must never be the sole basis for a 'first'/'only'/superlative claim (the William F. Penn/Yale Medicine incident is the cautionary case on file)",
+          "Should be treated as a lead to primary/institutional sources, not as corroboration itself"
+        ],
+        "publisher_kind": "wiki_crowd",
+        "profile_sources": ["https://en.wikipedia.org/wiki/Main_Page"],
+        "profile_reviewed_at": "2026-09-15T03:34:50.739+00:00",
+        "profile_reviewed_by": "agent:source-library-profiles-2026-09-14",
+        "parent_organization_id": null,
+        "merged_into_organization_id": null
+      },
+      "accessOutcomes": [
+        {
+          "url": "https://en.wikipedia.org/wiki/Main_Page",
+          "accessOutcome": "opened"
+        }
+      ]
+    },
+    {
+      "organizationId": "org_web_2dfcef37638dda84b6164640e13d095d",
+      "name": "National Park Service (nps.gov)",
+      "status": "needs_recheck",
+      "reason": "Existing descriptive claims are not recertified by a collection page. Use document-relative evidence review; old profile dates are historical.",
+      "originalProfile": {
+        "id": "org_web_2dfcef37638dda84b6164640e13d095d",
+        "name": "National Park Service (nps.gov)",
+        "tier": "tier1",
+        "summary": "The National Park Service is the U.S. Department of the Interior agency established in 1916 to preserve and interpret national parks, monuments, and historic sites. nps.gov publishes park and site pages, 'people' and 'places' interpretive content, and heritage-program materials, produced by NPS staff historians and interpreters with input from partner organizations and volunteers.",
+        "homepage": "https://www.nps.gov",
+        "relevance": "NPS is cited both for park/site documentation and for biographical/interpretive content about people connected to those sites, concentrated on place records (mostly 'documented_site' or 'commemorates') and person records, with smaller counts for event, organization, school, law, movement, institution, and invention.",
+        "created_at": "2026-07-23T04:35:40.949071+00:00",
+        "updated_at": "2026-09-15T03:34:49.653693+00:00",
+        "limitations": [
+          "Interpretive/park pages are written for a visitor audience and vary in citation depth",
+          "Coverage reflects which sites fall under NPS management or partnership programs, not comprehensive national coverage",
+          "Content is updated unevenly across thousands of park unit pages"
+        ],
+        "publisher_kind": "government_agency",
+        "profile_sources": ["https://www.nps.gov/aboutus/index.htm"],
+        "profile_reviewed_at": "2026-09-15T03:34:52.85+00:00",
+        "profile_reviewed_by": "agent:source-library-profiles-2026-09-14",
+        "parent_organization_id": null,
+        "merged_into_organization_id": null
+      },
+      "accessOutcomes": [
+        {
+          "url": "https://www.nps.gov/aboutus/index.htm",
+          "accessOutcome": "opened"
+        }
+      ]
+    },
+    {
+      "organizationId": "org_web_fad3e13afde2f12450845bc0169bcc2f",
+      "name": "National Inventors Hall of Fame (invent.org)",
+      "status": "needs_recheck",
+      "reason": "Existing descriptive claims are not recertified by a collection page. Use document-relative evidence review; old profile dates are historical.",
+      "originalProfile": {
+        "id": "org_web_fad3e13afde2f12450845bc0169bcc2f",
+        "name": "National Inventors Hall of Fame (invent.org)",
+        "tier": "tier2",
+        "summary": "The National Inventors Hall of Fame is a nonprofit organization that inducts and documents inventors judged to have made a lasting contribution to innovation, through an annual nomination and induction process. invent.org publishes inductee profiles, blog content, and an inductee search/list.",
+        "homepage": "https://www.invent.org",
+        "relevance": "Used as a source specifically for inventor biography and invention attribution ('source states', 'inspired'), split between invention and person records.",
+        "created_at": "2026-07-23T04:35:40.949071+00:00",
+        "updated_at": "2026-09-15T03:34:49.653693+00:00",
+        "limitations": [
+          "Selection criteria for induction are not fully documented on the pages reviewed",
+          "Inductee profiles are promotional/biographical in tone, produced with the inductee's cooperation, not independent investigative research"
+        ],
+        "publisher_kind": "museum",
+        "profile_sources": ["https://www.invent.org/about"],
+        "profile_reviewed_at": "2026-09-15T03:34:59.205+00:00",
+        "profile_reviewed_by": "agent:source-library-profiles-2026-09-14",
+        "parent_organization_id": null,
+        "merged_into_organization_id": null
+      },
+      "accessOutcomes": [
+        {
+          "url": "https://www.invent.org/about",
+          "accessOutcome": "unavailable_or_no_text"
+        }
+      ]
+    },
+    {
+      "organizationId": "org_web_fb3a98d03b95e02c57d7aff2a81d5f05",
+      "name": "Alpha Phi Alpha Fraternity, Inc.",
+      "status": "needs_recheck",
+      "reason": "Existing descriptive claims are not recertified by a collection page. Use document-relative evidence review; old profile dates are historical.",
+      "originalProfile": {
+        "id": "org_web_fb3a98d03b95e02c57d7aff2a81d5f05",
+        "name": "Alpha Phi Alpha Fraternity, Inc.",
+        "tier": "tier2",
+        "summary": "This is the official website of Alpha Phi Alpha Fraternity, Inc., the first intercollegiate Greek-letter fraternity founded for African American men, established December 4, 1906 at Cornell University by seven founders known as \"the Jewels.\" The site's own history section documents the founders and the fraternity's civil rights history in its own words.",
+        "homepage": "https://apa1906.net",
+        "relevance": "BlackStory cites apa1906.net for person entities (individual founders, e.g. Charles Henry Chapman, George Biddle Kelley) and the organization entity itself, all citing the same /our-history/ page for founding facts and founder identification.",
+        "created_at": "2026-07-28T18:36:12.712355+00:00",
+        "updated_at": "2026-09-15T03:34:49.653693+00:00",
+        "limitations": [
+          "As the subject organization's own site, it is not an independent source about itself; useful for self-reported founding facts but not for external corroboration of the same claims.",
+          "Biographical detail on individual founders beyond their role in the founding is thin on this page."
+        ],
+        "publisher_kind": "nonprofit_heritage",
+        "profile_sources": ["https://apa1906.net/our-history/"],
+        "profile_reviewed_at": "2026-09-15T03:35:28.504+00:00",
+        "profile_reviewed_by": "agent:source-library-profiles-2026-09-14",
+        "parent_organization_id": null,
+        "merged_into_organization_id": null
+      },
+      "accessOutcomes": [
+        {
+          "url": "https://apa1906.net/our-history/",
+          "accessOutcome": "opened"
+        }
+      ]
+    },
+    {
+      "organizationId": "org_web_70a20ece8da666b291a7ee36a0cf9731",
+      "name": "BlackPast.org",
+      "status": "needs_recheck",
+      "reason": "Existing descriptive claims are not recertified by a collection page. Use document-relative evidence review; old profile dates are historical.",
+      "originalProfile": {
+        "id": "org_web_70a20ece8da666b291a7ee36a0cf9731",
+        "name": "BlackPast.org",
+        "tier": "tier2",
+        "summary": "BlackPast.org is a nonprofit online reference founded in January 2004 by Quintard Taylor, the Scott and Dorothy Bullitt Professor of American History at the University of Washington. It began as a research aid featuring short entries on people, places, and events in African American and global Black history and has grown into one of the largest dedicated Black-history reference resources online.",
+        "homepage": "https://blackpast.org",
+        "relevance": "Used broadly as a biographical and topical reference across nearly every entity kind, dominated by person records under 'source states' or biographical predicates (e.g., 'chaired'), plus place, organization, event, movement, case, law, institution, and publication records.",
+        "created_at": "2026-07-23T04:35:40.949071+00:00",
+        "updated_at": "2026-09-15T03:34:49.653693+00:00",
+        "limitations": [
+          "A single-organization reference project, not a peer-reviewed academic journal; entry depth and citation rigor vary by contributor",
+          "As a reputable secondary source it still needs an independent institutional lineage before anchoring a superlative claim"
+        ],
+        "publisher_kind": "encyclopedia_reference",
+        "profile_sources": ["https://blackpast.org/about-us/mission-statement/"],
+        "profile_reviewed_at": "2026-09-15T03:34:54.676+00:00",
+        "profile_reviewed_by": "agent:source-library-profiles-2026-09-14",
+        "parent_organization_id": null,
+        "merged_into_organization_id": null
+      },
+      "accessOutcomes": [
+        {
+          "url": "https://blackpast.org/about-us/mission-statement/",
+          "accessOutcome": "unavailable_or_no_text"
+        }
+      ]
+    },
+    {
+      "organizationId": "org_web_6f444ea923f70febe7643b3aee06d21b",
+      "name": "The Historical Marker Database (HMdb.org)",
+      "status": "needs_recheck",
+      "reason": "Existing descriptive claims are not recertified by a collection page. Use document-relative evidence review; old profile dates are historical.",
+      "originalProfile": {
+        "id": "org_web_6f444ea923f70febe7643b3aee06d21b",
+        "name": "The Historical Marker Database (HMdb.org)",
+        "tier": "tier2",
+        "summary": "HMdb.org is a volunteer-run, crowd-submitted database transcribing the text of physical historical markers across the U.S. and beyond. Anyone can submit a new marker page or edit an existing one; submissions are queued and reviewed by one of dozens of volunteer editors (drawn from thousands of contributing correspondents over 20+ years) before publication.",
+        "homepage": "https://www.hmdb.org",
+        "relevance": "Used as a source for on-the-ground historical-marker text tied to specific sites, almost entirely place records under the predicate documented_site, with smaller counts for person, event, organization, school, and institution records.",
+        "created_at": "2026-07-23T04:35:40.949071+00:00",
+        "updated_at": "2026-09-15T03:34:49.653693+00:00",
+        "limitations": [
+          "Crowd-submitted: markers are transcribed and photographed by volunteers, not centrally researched by an institution",
+          "Editorial review exists (volunteer editors screen submissions) but is not equivalent to institutional/archival review",
+          "Content quality is the marker text itself, which can repeat errors or dated framing from the original marker's installation era"
+        ],
+        "publisher_kind": "wiki_crowd",
+        "profile_sources": ["https://www.hmdb.org/about.asp"],
+        "profile_reviewed_at": "2026-09-15T03:34:55.598+00:00",
+        "profile_reviewed_by": "agent:source-library-profiles-2026-09-14",
+        "parent_organization_id": null,
+        "merged_into_organization_id": null
+      },
+      "accessOutcomes": [
+        {
+          "url": "https://www.hmdb.org/about.asp",
+          "accessOutcome": "opened"
+        }
+      ]
+    },
+    {
+      "organizationId": "org_web_8be40a25689208b92e16c24e738575d9",
+      "name": "Virginia Department of Historic Resources (DHR)",
+      "status": "needs_recheck",
+      "reason": "Existing descriptive claims are not recertified by a collection page. Use document-relative evidence review; old profile dates are historical.",
+      "originalProfile": {
+        "id": "org_web_8be40a25689208b92e16c24e738575d9",
+        "name": "Virginia Department of Historic Resources (DHR)",
+        "tier": "tier1",
+        "summary": "Virginia DHR is the Commonwealth's State Historic Preservation Office (SHPO), a state agency within the Natural and Historic Resources Secretariat. It administers the Virginia Landmarks Register (over 3,300 individual resources and 600+ historic districts), the state's Historic Highway Marker program (2,500+ markers), and Virginia's National Register of Historic Places nominations, compiled through professional-staff research and quarterly review by the Board of Historic Resources and State Review Board.",
+        "homepage": "https://www.dhr.virginia.gov",
+        "relevance": "Used for Virginia-specific historic designation and marker records, almost entirely place records with smaller organization and person counts.",
+        "created_at": "2026-07-23T04:35:40.949071+00:00",
+        "updated_at": "2026-09-15T03:34:49.653693+00:00",
+        "limitations": [
+          "Coverage limited to Virginia",
+          "Older marker text (some markers date to the mid-20th century) can reflect the historiographical framing of its installation era even when the underlying agency is current"
+        ],
+        "publisher_kind": "government_agency",
+        "profile_sources": ["https://www.dhr.virginia.gov/about-dhr/"],
+        "profile_reviewed_at": "2026-09-15T03:34:56.497+00:00",
+        "profile_reviewed_by": "agent:source-library-profiles-2026-09-14",
+        "parent_organization_id": null,
+        "merged_into_organization_id": null
+      },
+      "accessOutcomes": [
+        {
+          "url": "https://www.dhr.virginia.gov/about-dhr/",
+          "accessOutcome": "opened"
+        }
+      ]
+    },
+    {
+      "organizationId": "org_web_8d35e7010eb84d49d54c1ca54bc98a1c",
+      "name": "Encyclopaedia Britannica (britannica.com)",
+      "status": "needs_recheck",
+      "reason": "Existing descriptive claims are not recertified by a collection page. Use document-relative evidence review; old profile dates are historical.",
+      "originalProfile": {
+        "id": "org_web_8d35e7010eb84d49d54c1ca54bc98a1c",
+        "name": "Encyclopaedia Britannica (britannica.com)",
+        "tier": "tier3",
+        "summary": "Encyclopaedia Britannica is a commercial reference publisher dating to 1768 in Scotland, now operated online by Encyclopaedia Britannica, Inc. Entries are written and updated by subject-area editorial staff and outside contributing specialists, then reviewed by an editorial team and passed through a fact-checking process before publication.",
+        "homepage": "https://www.britannica.com",
+        "relevance": "Used as a general biographical reference source, overwhelmingly for person records (e.g. 'pulitzer_prizes', 'hall_of_fame_induction_year' predicates) with a few event, case, and organization records.",
+        "created_at": "2026-07-23T04:35:40.949071+00:00",
+        "updated_at": "2026-09-15T03:34:49.653693+00:00",
+        "limitations": [
+          "A commercial general encyclopedia, not a specialist Black-history institution",
+          "classifySourceForConfidence currently has no dedicated classification for it (falls to 'unknown'), so it is treated the same as an unclassified host despite its editorial process",
+          "Under the project's rule, 'unknown'/commercial encyclopedic sources should not anchor a superlative alone"
+        ],
+        "publisher_kind": "encyclopedia_reference",
+        "profile_sources": [
+          "https://britannicaeducation.com/editorial-process/",
+          "https://www.britannica.com/editor/The-Editors-of-Encyclopaedia-Britannica/4419"
+        ],
+        "profile_reviewed_at": "2026-09-15T03:34:57.397+00:00",
+        "profile_reviewed_by": "agent:source-library-profiles-2026-09-14",
+        "parent_organization_id": null,
+        "merged_into_organization_id": null
+      },
+      "accessOutcomes": [
+        {
+          "url": "https://britannicaeducation.com/editorial-process/",
+          "accessOutcome": "opened"
+        },
+        {
+          "url": "https://www.britannica.com/editor/The-Editors-of-Encyclopaedia-Britannica/4419",
+          "accessOutcome": "unavailable_or_no_text"
+        }
+      ]
+    },
+    {
+      "organizationId": "org_web_39d99bfbc2f52944eed77cdf11f7dabc",
+      "name": "Library of Congress (loc.gov, guides.loc.gov, blogs.loc.gov)",
+      "status": "needs_recheck",
+      "reason": "Existing descriptive claims are not recertified by a collection page. Use document-relative evidence review; old profile dates are historical.",
+      "originalProfile": {
+        "id": "org_web_39d99bfbc2f52944eed77cdf11f7dabc",
+        "name": "Library of Congress (loc.gov, guides.loc.gov, blogs.loc.gov)",
+        "tier": "tier1",
+        "summary": "The Library of Congress is the research library of the U.S. Congress and the de facto national library, holding digitized primary-source collections (manuscripts, photographs, newspapers), curated research guides, and staff-written blog posts that draw on those collections.",
+        "homepage": "https://www.loc.gov",
+        "relevance": "Used both for biographical documentation ('documented_by', 'source states') and as the source for historic publication entries, split fairly evenly between person and place records, plus publication records (notably historic Black newspapers), and smaller organization, event, law, movement, and invention counts.",
+        "created_at": "2026-07-23T04:35:40.949071+00:00",
+        "updated_at": "2026-09-15T03:34:49.653693+00:00",
+        "limitations": [
+          "Blog posts (blogs.loc.gov) are staff secondary narration, one step removed from the primary digitized record",
+          "Digitized-collection coverage is uneven across eras and subject areas",
+          "Repo note on file: this project already knows the William F. Penn/Yale Medicine superlative error traced through a civil-rights-leaders LOC-linked entity, underscoring that even LOC-hosted pages can carry an unverified secondary claim if the underlying assertion originates elsewhere"
+        ],
+        "publisher_kind": "government_archive",
+        "profile_sources": ["https://www.loc.gov/about/"],
+        "profile_reviewed_at": "2026-09-15T03:34:58.302+00:00",
+        "profile_reviewed_by": "agent:source-library-profiles-2026-09-14",
+        "parent_organization_id": null,
+        "merged_into_organization_id": null
+      },
+      "accessOutcomes": [
+        {
+          "url": "https://www.loc.gov/about/",
+          "accessOutcome": "opened"
+        }
+      ]
+    },
+    {
+      "organizationId": "org_web_e5acaafaf09463e6231c9d0fbfb278db",
+      "name": "Cornell Law School Legal Information Institute (LII)",
+      "status": "needs_recheck",
+      "reason": "Existing descriptive claims are not recertified by a collection page. Use document-relative evidence review; old profile dates are historical.",
+      "originalProfile": {
+        "id": "org_web_e5acaafaf09463e6231c9d0fbfb278db",
+        "name": "Cornell Law School Legal Information Institute (LII)",
+        "tier": "tier2",
+        "summary": "LII is a non-profit public service of Cornell Law School, founded in 1992 by Peter Martin and Tom Bruce, that provides free access to U.S. Code, Supreme Court opinions (all decisions since 1990 plus 600+ historic pre-1992 cases), federal regulations and rules, and Wex, a legal encyclopedia edited by vetted legal experts and Cornell Law students.",
+        "homepage": "https://www.law.cornell.edu",
+        "relevance": "Used as BlackStory's primary source for case-law text and holdings, almost entirely case records under the predicate 'source states' with a handful of law records.",
+        "created_at": "2026-07-23T04:35:40.949071+00:00",
+        "updated_at": "2026-09-15T03:34:49.653693+00:00",
+        "limitations": [
+          "Repo-documented issue: LII's case transcriptions carry known OCR corruption; this project's own rule directs quoting SCOTUS opinions from tile.loc.gov US Reports PDFs instead of LII transcriptions for direct quotation",
+          "A university-hosted convenience republication, not the court's own official reporter"
+        ],
+        "publisher_kind": "academic_library_archive",
+        "profile_sources": ["https://en.wikipedia.org/wiki/Legal_Information_Institute"],
+        "profile_reviewed_at": "2026-09-15T03:35:00.837+00:00",
+        "profile_reviewed_by": "agent:source-library-profiles-2026-09-14",
+        "parent_organization_id": null,
+        "merged_into_organization_id": null
+      },
+      "accessOutcomes": [
+        {
+          "url": "https://en.wikipedia.org/wiki/Legal_Information_Institute",
+          "accessOutcome": "opened"
+        }
+      ]
+    },
+    {
+      "organizationId": "org_web_8b9d8bd4daaf8bc48da7c683adf4766a",
+      "name": "Google Patents (mirroring USPTO records)",
+      "status": "needs_recheck",
+      "reason": "Existing descriptive claims are not recertified by a collection page. Use document-relative evidence review; old profile dates are historical.",
+      "originalProfile": {
+        "id": "org_web_8b9d8bd4daaf8bc48da7c683adf4766a",
+        "name": "Google Patents (mirroring USPTO records)",
+        "tier": "tier1",
+        "summary": "Google Patents is Google's search and full-text interface over patent data, built by crawling and packaging USPTO (and other patent offices') public data; Google formerly mirrored USPTO PAIR bulk data directly, though the USPTO now serves current data itself via its Bulk Data Storage System. For an individual patent document, the text displayed is the same official specification issued by the Patent Office.",
+        "homepage": "https://patents.google.com",
+        "relevance": "Used as the primary source for patent-grant facts (patent number, filing/issue date, inventor of record) for Black inventors profiled in BlackStory, mostly on invention records under the predicate 'source states' with a handful of person records.",
+        "created_at": "2026-09-15T03:29:38.41687+00:00",
+        "updated_at": "2026-09-15T03:34:49.653693+00:00",
+        "limitations": [
+          "Per this project's binding fitness rule: a patent is authoritative for who filed what and when, and unfit as evidence of the filer's race, of firstness, or of adoption/impact",
+          "Only resolvable individual patent-document pages get government_record treatment; a search or listing page on the same host does not",
+          "Patent text reflects legal-filing language, not biographical or historical narrative"
+        ],
+        "publisher_kind": "commercial_database",
+        "profile_sources": ["https://patents.google.com/"],
+        "profile_reviewed_at": "2026-09-15T03:35:01.655+00:00",
+        "profile_reviewed_by": "agent:source-library-profiles-2026-09-14",
+        "parent_organization_id": null,
+        "merged_into_organization_id": null
+      },
+      "accessOutcomes": [
+        {
+          "url": "https://patents.google.com/",
+          "accessOutcome": "unavailable_or_no_text"
+        }
+      ]
+    },
+    {
+      "organizationId": "org_web_8afe26e974daadbf089f3807f6d9ffa6",
+      "name": "History.com (A+E Global Media)",
+      "status": "needs_recheck",
+      "reason": "Existing descriptive claims are not recertified by a collection page. Use document-relative evidence review; old profile dates are historical.",
+      "originalProfile": {
+        "id": "org_web_8afe26e974daadbf089f3807f6d9ffa6",
+        "name": "History.com (A+E Global Media)",
+        "tier": "tier3",
+        "summary": "History.com is the companion website of the HISTORY cable channel, published by A+E Global Media, a joint venture between Hearst Communications and Disney Entertainment Television (part of The Walt Disney Company). It is a commercial media property; some programming involves professional historians, but the site itself is not an academic or archival institution.",
+        "homepage": "https://www.history.com",
+        "relevance": "Used as a general popular-history reference, including for date-specific predicates like became_first_woman_inducted_date and sworn_in_on, mostly on person records with smaller movement, event, place, and organization counts.",
+        "created_at": "2026-07-23T04:35:40.949071+00:00",
+        "updated_at": "2026-09-15T03:34:49.653693+00:00",
+        "limitations": [
+          "Commercial media property, not an archive or academic publisher",
+          "The channel/site has drawn documented criticism from scholars over factual rigor in some of its programming",
+          "classifySourceForConfidence has no dedicated classification for it, so it is currently treated the same as any unclassified host"
+        ],
+        "publisher_kind": "news_media",
+        "profile_sources": ["https://en.wikipedia.org/wiki/History_(American_TV_channel"],
+        "profile_reviewed_at": "2026-09-15T03:35:04.136+00:00",
+        "profile_reviewed_by": "agent:source-library-profiles-2026-09-14",
+        "parent_organization_id": null,
+        "merged_into_organization_id": null
+      },
+      "accessOutcomes": [
+        {
+          "url": "https://en.wikipedia.org/wiki/History_(American_TV_channel",
+          "accessOutcome": "unavailable_or_no_text"
+        }
+      ]
+    },
+    {
+      "organizationId": "org_web_4c79c7b882b875a426e819f8e845b546",
+      "name": "Office of the Historian, U.S. House of Representatives (history.house.gov)",
+      "status": "needs_recheck",
+      "reason": "Existing descriptive claims are not recertified by a collection page. Use document-relative evidence review; old profile dates are historical.",
+      "originalProfile": {
+        "id": "org_web_4c79c7b882b875a426e819f8e845b546",
+        "name": "Office of the Historian, U.S. House of Representatives (history.house.gov)",
+        "tier": "tier1",
+        "summary": "The Office of the Historian, working with the Clerk of the House's Office of Art and Archives, is the legislative-branch office responsible for preserving, collecting, and interpreting the history of the U.S. House of Representatives, including biographical profiles of every member since 1789, oral histories, and thematic histories (e.g., Black Americans in Congress).",
+        "homepage": "https://history.house.gov",
+        "relevance": "Used specifically for congressional-service biographical facts and legislative history, mostly person records (predicates like served_as, first_to, elected_on) plus law, invention, and place records.",
+        "created_at": "2026-07-23T04:35:40.949071+00:00",
+        "updated_at": "2026-09-15T03:34:49.653693+00:00",
+        "limitations": [
+          "Scope limited to matters touching the House of Representatives",
+          "Biographical profiles are official-record summaries, not full independent biographies"
+        ],
+        "publisher_kind": "government_agency",
+        "profile_sources": ["https://history.house.gov/"],
+        "profile_reviewed_at": "2026-09-15T03:35:04.939+00:00",
+        "profile_reviewed_by": "agent:source-library-profiles-2026-09-14",
+        "parent_organization_id": null,
+        "merged_into_organization_id": null
+      },
+      "accessOutcomes": [
+        {
+          "url": "https://history.house.gov/",
+          "accessOutcome": "opened"
+        }
+      ]
+    },
+    {
+      "organizationId": "org_web_3743933614812bc0c796c5e52d9fbef0",
+      "name": "National Center for Education Statistics (nces.ed.gov)",
+      "status": "needs_recheck",
+      "reason": "Existing descriptive claims are not recertified by a collection page. Use document-relative evidence review; old profile dates are historical.",
+      "originalProfile": {
+        "id": "org_web_3743933614812bc0c796c5e52d9fbef0",
+        "name": "National Center for Education Statistics (nces.ed.gov)",
+        "tier": "tier1",
+        "summary": "NCES is the primary statistical agency of the U.S. Department of Education, located within the Institute of Education Sciences, with a Congressional mandate to collect, analyze, and report comprehensive U.S. education statistics under standards of timeliness, credibility, objectivity, and respondent confidentiality.",
+        "homepage": "https://nces.ed.gov",
+        "relevance": "Used specifically as the source for HBCU (Historically Black College/University) institutional records in BlackStory, entirely under the predicate 'source states' on place records.",
+        "created_at": "2026-09-15T03:29:38.41687+00:00",
+        "updated_at": "2026-09-15T03:34:49.653693+00:00",
+        "limitations": [
+          "The about page reviewed did not include HBCU-specific data documentation; general NCES data-quality standards were confirmed, not the specific dataset behind these claims",
+          "Federal statistical data reflects institution self-reporting to NCES surveys, subject to standard survey-response limitations"
+        ],
+        "publisher_kind": "government_agency",
+        "profile_sources": ["https://nces.ed.gov/about/"],
+        "profile_reviewed_at": "2026-09-15T03:35:05.739+00:00",
+        "profile_reviewed_by": "agent:source-library-profiles-2026-09-14",
+        "parent_organization_id": null,
+        "merged_into_organization_id": null
+      },
+      "accessOutcomes": [
+        {
+          "url": "https://nces.ed.gov/about/",
+          "accessOutcome": "unavailable_or_no_text"
+        }
+      ]
+    },
+    {
+      "organizationId": "org_web_0bdc4e54d72b6085b009ba81a2200832",
+      "name": "Smithsonian Magazine",
+      "status": "needs_recheck",
+      "reason": "Existing descriptive claims are not recertified by a collection page. Use document-relative evidence review; old profile dates are historical.",
+      "originalProfile": {
+        "id": "org_web_0bdc4e54d72b6085b009ba81a2200832",
+        "name": "Smithsonian Magazine",
+        "tier": "tier3",
+        "summary": "Smithsonian magazine is published by the Smithsonian Institution but is editorially independent of it. Founded in 1970 by former Life editor Edward K. Thompson at the request of Smithsonian Secretary S. Dillon Ripley, it puts \"a Smithsonian lens on the world\" (science, history, art, popular culture and innovation)for a general readership. It is a staffed magazine with reporters and editors, not a primary archive or museum record.",
+        "homepage": "https://www.smithsonianmag.com",
+        "relevance": "Cited across person biography, event narrative (e.g. the Elaine Massacre), and invention-history claims, split among person, event, and invention records. Sample predicates: source_states, broke_color_line_at, resulted_in, became.",
+        "created_at": "2026-07-23T04:35:40.949071+00:00",
+        "updated_at": "2026-09-15T03:34:49.653693+00:00",
+        "limitations": [
+          "Magazine journalism, not a primary or archival record: it synthesizes and cites other sources rather than being the underlying document.",
+          "Not classified as tier1/tier2 by the repo's confidence code despite institutional Smithsonian ties, because the domain differs from si.edu and carries no source-register entry.",
+          "General-audience feature writing can compress or simplify complex historical disputes."
+        ],
+        "publisher_kind": "news_media",
+        "profile_sources": [
+          "https://www.smithsonianmag.com/about/",
+          "https://www.smithsonianmag.com/smithsonian-institution/smithsonian-magazine-turns-50-180974378/"
+        ],
+        "profile_reviewed_at": "2026-09-15T03:35:06.549+00:00",
+        "profile_reviewed_by": "agent:source-library-profiles-2026-09-14",
+        "parent_organization_id": null,
+        "merged_into_organization_id": null
+      },
+      "accessOutcomes": [
+        {
+          "url": "https://www.smithsonianmag.com/about/",
+          "accessOutcome": "opened"
+        },
+        {
+          "url": "https://www.smithsonianmag.com/smithsonian-institution/smithsonian-magazine-turns-50-180974378/",
+          "accessOutcome": "opened"
+        }
+      ]
+    },
+    {
+      "organizationId": "org_web_236b6e0f822acd5d7bfaaf2f7c239a53",
+      "name": "Smithsonian National Museum of African American History and Culture",
+      "status": "needs_recheck",
+      "reason": "Existing descriptive claims are not recertified by a collection page. Use document-relative evidence review; old profile dates are historical.",
+      "originalProfile": {
+        "id": "org_web_236b6e0f822acd5d7bfaaf2f7c239a53",
+        "name": "Smithsonian National Museum of African American History and Culture",
+        "tier": "tier1",
+        "summary": "NMAAHC is the Smithsonian Institution's museum devoted exclusively to African American life, history and culture, established by Act of Congress in 2003 and opened September 24, 2016 as the Smithsonian's 19th museum. It holds more than 45,000 artifacts and is led by a professional curatorial staff; founding director Lonnie G. Bunch III shaped its mission to \"capture and share the unvarnished truth\" of African American history.",
+        "homepage": "https://nmaahc.si.edu",
+        "relevance": "Cited broadly for person biography and achievement claims, mostly on person records, plus institution, event, place, and publication records. Sample predicates: became, built, organized, honored_with.",
+        "created_at": "2026-07-23T04:35:40.949071+00:00",
+        "updated_at": "2026-09-15T03:34:49.653693+00:00",
+        "limitations": [
+          "A federally chartered museum, not a court or vital-records office: authoritative for its own exhibits/collections and curatorial scholarship, not a substitute for a primary legal or genealogical record.",
+          "Web content (object labels, digital stories) is written for public audiences and may summarize rather than fully cite underlying primary sources."
+        ],
+        "publisher_kind": "museum",
+        "profile_sources": ["https://nmaahc.si.edu/about/about-museum"],
+        "profile_reviewed_at": "2026-09-15T03:35:07.458+00:00",
+        "profile_reviewed_by": "agent:source-library-profiles-2026-09-14",
+        "parent_organization_id": null,
+        "merged_into_organization_id": null
+      },
+      "accessOutcomes": [
+        {
+          "url": "https://nmaahc.si.edu/about/about-museum",
+          "accessOutcome": "unavailable_or_no_text"
+        }
+      ]
+    },
+    {
+      "organizationId": "org_web_70baaa6bfa5aa1241cc8dfc644256df1",
+      "name": "Encyclopedia Virginia",
+      "status": "needs_recheck",
+      "reason": "Existing descriptive claims are not recertified by a collection page. Use document-relative evidence review; old profile dates are historical.",
+      "originalProfile": {
+        "id": "org_web_70baaa6bfa5aa1241cc8dfc644256df1",
+        "name": "Encyclopedia Virginia",
+        "tier": "tier2",
+        "summary": "Encyclopedia Virginia is a project of Virginia Humanities in partnership with the Library of Virginia, and since 2012 has served as the digital publisher of the Library of Virginia's Dictionary of Virginia Biography. Entries are written by scholars and put through developmental editing, fact-checking, section-editor review and separate copy-editing before publication, with especially complex or controversial entries getting multiple scholar reviews.",
+        "homepage": "https://encyclopediavirginia.org",
+        "relevance": "Cited for Virginia case holdings, person life-events, and event narrative, plus a law entity, across case, event, law, person, place, and publication kinds. Sample predicates: held (case), site_of, elected_on, organized.",
+        "created_at": "2026-07-23T04:35:40.949071+00:00",
+        "updated_at": "2026-09-15T03:34:49.653693+00:00",
+        "limitations": [
+          "Editorially reviewed but not traditional academic peer review by the site's own description: it names this a distinct, lighter-weight process.",
+          "State-scoped: authoritative for Virginia subjects, not a general national reference.",
+          "No national-library authority-control record (per tier1-sources.ts commentary), which is why it sits on the curated list rather than in source-register.json."
+        ],
+        "publisher_kind": "encyclopedia_reference",
+        "profile_sources": ["https://encyclopediavirginia.org/about/"],
+        "profile_reviewed_at": "2026-09-15T03:35:08.375+00:00",
+        "profile_reviewed_by": "agent:source-library-profiles-2026-09-14",
+        "parent_organization_id": null,
+        "merged_into_organization_id": null
+      },
+      "accessOutcomes": [
+        {
+          "url": "https://encyclopediavirginia.org/about/",
+          "accessOutcome": "opened"
+        }
+      ]
+    },
+    {
+      "organizationId": "org_web_c6e200ce26eb79cac50372f0323042bf",
+      "name": "Lemelson-MIT Program",
+      "status": "needs_recheck",
+      "reason": "Existing descriptive claims are not recertified by a collection page. Use document-relative evidence review; old profile dates are historical.",
+      "originalProfile": {
+        "id": "org_web_c6e200ce26eb79cac50372f0323042bf",
+        "name": "Lemelson-MIT Program",
+        "tier": "tier2",
+        "summary": "The Lemelson-MIT Program is an invention-education initiative established at MIT in 1994 and administered by MIT's School of Engineering, funded primarily by the Lemelson Foundation. It produces invention-education curricula, an inventor archive and handbook, case studies and research reports rather than functioning as a museum or a formal library archive.",
+        "homepage": "https://lemelson.mit.edu",
+        "relevance": "Cited for invention attribution and inventor-biography claims, split between invention and person kinds, mostly on a 'source_states' predicate: e.g. what a given inventor patented or built.",
+        "created_at": "2026-07-23T04:35:40.949071+00:00",
+        "updated_at": "2026-09-15T03:34:49.653693+00:00",
+        "limitations": [
+          "An education/outreach program, not a patent office or museum registrar: its inventor profiles are secondary retellings, useful as a lead into the underlying patent or archival record.",
+          "Focused on inventors and invention history specifically; not a general biographical source."
+        ],
+        "publisher_kind": "other",
+        "profile_sources": ["https://lemelson.mit.edu/about-us"],
+        "profile_reviewed_at": "2026-09-15T03:35:09.288+00:00",
+        "profile_reviewed_by": "agent:source-library-profiles-2026-09-14",
+        "parent_organization_id": null,
+        "merged_into_organization_id": null
+      },
+      "accessOutcomes": [
+        {
+          "url": "https://lemelson.mit.edu/about-us",
+          "accessOutcome": "unavailable_or_no_text"
+        }
+      ]
+    },
+    {
+      "organizationId": "org_web_0655bab93139c4d714f4e0083852f236",
+      "name": "National Aeronautics and Space Administration (NASA)",
+      "status": "needs_recheck",
+      "reason": "Existing descriptive claims are not recertified by a collection page. Use document-relative evidence review; old profile dates are historical.",
+      "originalProfile": {
+        "id": "org_web_0655bab93139c4d714f4e0083852f236",
+        "name": "National Aeronautics and Space Administration (NASA)",
+        "tier": "tier1",
+        "summary": "NASA is the U.S. federal agency for civil aeronautics and space exploration, founded in 1958 and operating across 20 centers and facilities. nasa.gov publishes astronaut biographies, an 'Astronaut Fact Book,' mission histories and news content produced by internal page editors and public-affairs staff, alongside blogs, videos and podcasts.",
+        "homepage": "https://www.nasa.gov",
+        "relevance": "Cited for astronaut and NASA-employee career and mission-milestone claims, overwhelmingly on person records plus an invention entity. Sample predicates: worked_at, became, flew, piloted.",
+        "created_at": "2026-07-23T04:35:40.949071+00:00",
+        "updated_at": "2026-09-15T03:34:49.653693+00:00",
+        "limitations": [
+          "Public-affairs content, not a personnel archive; useful for career/mission facts NASA itself records, less so for facts outside its own operations.",
+          "Some historical astronaut pages are periodically updated/rewritten, so wording and emphasis can shift over time."
+        ],
+        "publisher_kind": "government_agency",
+        "profile_sources": ["https://www.nasa.gov/about/"],
+        "profile_reviewed_at": "2026-09-15T03:35:10.096+00:00",
+        "profile_reviewed_by": "agent:source-library-profiles-2026-09-14",
+        "parent_organization_id": null,
+        "merged_into_organization_id": null
+      },
+      "accessOutcomes": [
+        {
+          "url": "https://www.nasa.gov/about/",
+          "accessOutcome": "opened"
+        }
+      ]
+    },
+    {
+      "organizationId": "org_web_2bf01a48ef1f3bc746786fdc153c72f6",
+      "name": "Encyclopedia of Alabama",
+      "status": "needs_recheck",
+      "reason": "Existing descriptive claims are not recertified by a collection page. Use document-relative evidence review; old profile dates are historical.",
+      "originalProfile": {
+        "id": "org_web_2bf01a48ef1f3bc746786fdc153c72f6",
+        "name": "Encyclopedia of Alabama",
+        "tier": "tier2",
+        "summary": "The Encyclopedia of Alabama's original content is copyrighted by the Alabama Humanities Alliance; its editorial office is administered by Auburn University's Office of University Outreach with University Libraries. Entries are written by scholars and subject specialists \"from academic institutions to scientists in the field\" and cover Alabama's history, culture, geography and natural environment; it won the Alabama Historical Association's inaugural Digital History Award (2016) and Library Journal's 'Best of Free Reference.'",
+        "homepage": "https://encyclopediaofalabama.org",
+        "relevance": "Cited across person biography, event narrative, invention, organization, and place claims for Alabama subjects, with person records the largest share. Sample predicates: built, source_states, delivered.",
+        "created_at": "2026-07-23T04:35:40.949071+00:00",
+        "updated_at": "2026-09-15T03:34:49.653693+00:00",
+        "limitations": [
+          "The site describes editorial oversight for trustworthiness but does not detail a formal peer-review procedure the way Encyclopedia Virginia does.",
+          "State-scoped to Alabama subjects.",
+          "Corrections require 'verifiable, reliable sources' but the site says it won't revise entries over differing interpretation alone: a caveat on contested claims."
+        ],
+        "publisher_kind": "encyclopedia_reference",
+        "profile_sources": ["https://encyclopediaofalabama.org/about/"],
+        "profile_reviewed_at": "2026-09-15T03:35:11.002+00:00",
+        "profile_reviewed_by": "agent:source-library-profiles-2026-09-14",
+        "parent_organization_id": null,
+        "merged_into_organization_id": null
+      },
+      "accessOutcomes": [
+        {
+          "url": "https://encyclopediaofalabama.org/about/",
+          "accessOutcome": "unavailable_or_no_text"
+        }
+      ]
+    },
+    {
+      "organizationId": "org_web_dda645e9090c925d0c3ce086a04eab29",
+      "name": "Lowcountry Digital History Initiative (College of Charleston Libraries)",
+      "status": "needs_recheck",
+      "reason": "Existing descriptive claims are not recertified by a collection page. Use document-relative evidence review; old profile dates are historical.",
+      "originalProfile": {
+        "id": "org_web_dda645e9090c925d0c3ce086a04eab29",
+        "name": "Lowcountry Digital History Initiative (College of Charleston Libraries)",
+        "tier": "tier2",
+        "summary": "LDHI is a digital public-history platform based at the College of Charleston, a public South Carolina university, that publishes free online exhibitions on South Carolina Lowcountry history, prioritizing narratives underrepresented in mainstream historical discourse. It's built through a collaborative model of academic scholars, public historians, community members, librarians and archivists, with College of Charleston graduate students serving as assistant curators on individual exhibits.",
+        "homepage": "https://ldhi.library.cofc.edu",
+        "relevance": "Cited for South Carolina Lowcountry person-narrative claims, overwhelmingly on person records plus a law entity. Sample predicates: killed, convicted_after, part_of: several tied to the 2015 Emanuel AME Church shooting and its aftermath.",
+        "created_at": "2026-07-23T04:35:40.949071+00:00",
+        "updated_at": "2026-09-15T03:34:49.653693+00:00",
+        "limitations": [
+          "Individual exhibits are curated by graduate-student assistant curators under faculty supervision, so depth and sourcing rigor can vary exhibit to exhibit.",
+          "Regionally scoped to the South Carolina Lowcountry."
+        ],
+        "publisher_kind": "academic_library_archive",
+        "profile_sources": ["https://ldhi.library.cofc.edu/about"],
+        "profile_reviewed_at": "2026-09-15T03:35:11.928+00:00",
+        "profile_reviewed_by": "agent:source-library-profiles-2026-09-14",
+        "parent_organization_id": null,
+        "merged_into_organization_id": null
+      },
+      "accessOutcomes": [
+        {
+          "url": "https://ldhi.library.cofc.edu/about",
+          "accessOutcome": "opened"
+        }
+      ]
+    },
+    {
+      "organizationId": "org_web_e5481f689582540e125542a67392d51f",
+      "name": "Oklahoma Historical Society",
+      "status": "needs_recheck",
+      "reason": "Existing descriptive claims are not recertified by a collection page. Use document-relative evidence review; old profile dates are historical.",
+      "originalProfile": {
+        "id": "org_web_e5481f689582540e125542a67392d51f",
+        "name": "Oklahoma Historical Society",
+        "tier": "tier3",
+        "summary": "The Oklahoma Historical Society is, by its own description, both a state government agency and a private membership organization, founded May 27, 1893 by the Territorial Press Association and governed by a 25-member Board of Directors. It collects, preserves and shares Oklahoma history and culture through a statewide network of museums, historic homes, research centers and military sites, plus publications and a historical-marker program.",
+        "homepage": "https://www.okhistory.org",
+        "relevance": "Cited for Oklahoma place designation/listing and case-history claims, mostly place records with a smaller count of case records. Sample predicates: source_states, decided_on, held, listed_on_national_register.",
+        "created_at": "2026-07-23T04:35:40.949071+00:00",
+        "updated_at": "2026-09-15T03:34:49.653693+00:00",
+        "limitations": [
+          "Not on the .gov TLD, so the repo's confidence code cannot distinguish it from a commercial or unknown host even though it functions as a state agency: the code result (tier3) is more conservative than the organization's actual institutional status.",
+          "Dual government/membership-organization structure means not every page on the site is an official state-agency determination."
+        ],
+        "publisher_kind": "government_agency",
+        "profile_sources": ["https://www.okhistory.org/about/"],
+        "profile_reviewed_at": "2026-09-15T03:35:12.809+00:00",
+        "profile_reviewed_by": "agent:source-library-profiles-2026-09-14",
+        "parent_organization_id": null,
+        "merged_into_organization_id": null
+      },
+      "accessOutcomes": [
+        {
+          "url": "https://www.okhistory.org/about/",
+          "accessOutcome": "opened"
+        }
+      ]
+    },
+    {
+      "organizationId": "org_web_eb701ab8a74998c46f29a112fcedd041",
+      "name": "National Trust for Historic Preservation",
+      "status": "needs_recheck",
+      "reason": "Existing descriptive claims are not recertified by a collection page. Use document-relative evidence review; old profile dates are historical.",
+      "originalProfile": {
+        "id": "org_web_eb701ab8a74998c46f29a112fcedd041",
+        "name": "National Trust for Historic Preservation",
+        "tier": "tier3",
+        "summary": "The National Trust for Historic Preservation is a private 501(c)(3) nonprofit, operating independently for more than 75 years, that leads preservation advocacy for historic sites across the U.S. Its website (savingplaces.org) publishes grant and program information, stories from its Preservation Magazine, guidance on historic sites open to visit, and advocacy/press content; it also operates affiliated entities including Main Street America and the National Trust Community Investment Corporation.",
+        "homepage": "https://savingplaces.org",
+        "relevance": "Cited for place/building history and civil-rights-site significance claims, plus person residence claims, across person, place, and school records. Sample predicates: source_states, civil_rights_role, building_history, resided_at_years.",
+        "created_at": "2026-07-23T04:35:40.949071+00:00",
+        "updated_at": "2026-09-15T03:34:49.653693+00:00",
+        "limitations": [
+          "An advocacy nonprofit, not the federal listing authority (the National Park Service administers the National Register itself); its site content discusses significance but isn't the NRHP nomination document.",
+          "Magazine-style storytelling for a general and donor-facing audience."
+        ],
+        "publisher_kind": "nonprofit_heritage",
+        "profile_sources": ["https://savingplaces.org/about"],
+        "profile_reviewed_at": "2026-09-15T03:35:13.625+00:00",
+        "profile_reviewed_by": "agent:source-library-profiles-2026-09-14",
+        "parent_organization_id": null,
+        "merged_into_organization_id": null
+      },
+      "accessOutcomes": [
+        {
+          "url": "https://savingplaces.org/about",
+          "accessOutcome": "unavailable_or_no_text"
+        }
+      ]
+    },
+    {
+      "organizationId": "org_web_173bf8912ad24ecd373a90fcdfc0ff96",
+      "name": "Martin Luther King, Jr. Research and Education Institute (Stanford University)",
+      "status": "needs_recheck",
+      "reason": "Existing descriptive claims are not recertified by a collection page. Use document-relative evidence review; old profile dates are historical.",
+      "originalProfile": {
+        "id": "org_web_173bf8912ad24ecd373a90fcdfc0ff96",
+        "name": "Martin Luther King, Jr. Research and Education Institute (Stanford University)",
+        "tier": "tier2",
+        "summary": "The King Institute is an academic research center at Stanford University, home to the Martin Luther King, Jr. Papers Project since Coretta Scott King asked Stanford historian Clayborne Carson in 1985 to edit King's papers; the Institute proper was established in 2005. It publishes the multi-volume Papers of Martin Luther King, Jr., a King Encyclopedia of more than 280 articles on civil-rights figures, events and organizations, and a day-to-day King chronology, all built on the Papers Project's original archival research.",
+        "homepage": "https://kinginstitute.stanford.edu",
+        "relevance": "Cited for civil-rights movement and event-narrative claims, across event, movement, organization, person, and place records. Sample predicates: source_states, occurred_in, closed_in, organized_by: Albany Movement, Birmingham Campaign, March on Washington.",
+        "created_at": "2026-07-23T04:35:40.949071+00:00",
+        "updated_at": "2026-09-15T03:34:49.653693+00:00",
+        "limitations": [
+          "Deep on King and the movements/institutions around him; thinner for civil-rights subjects outside that orbit.",
+          "The Institute does not hold reproduction rights to King's own works: a licensing caveat, not a factual-accuracy one."
+        ],
+        "publisher_kind": "academic_library_archive",
+        "profile_sources": ["https://kinginstitute.stanford.edu/"],
+        "profile_reviewed_at": "2026-09-15T03:35:14.442+00:00",
+        "profile_reviewed_by": "agent:source-library-profiles-2026-09-14",
+        "parent_organization_id": null,
+        "merged_into_organization_id": null
+      },
+      "accessOutcomes": [
+        {
+          "url": "https://kinginstitute.stanford.edu/",
+          "accessOutcome": "opened"
+        }
+      ]
+    },
+    {
+      "organizationId": "org_web_8f06c256675a5118144c93e04b7b1052",
+      "name": "United States Senate (Senate Historical Office)",
+      "status": "needs_recheck",
+      "reason": "Existing descriptive claims are not recertified by a collection page. Use document-relative evidence review; old profile dates are historical.",
+      "originalProfile": {
+        "id": "org_web_8f06c256675a5118144c93e04b7b1052",
+        "name": "United States Senate (Senate Historical Office)",
+        "tier": "tier1",
+        "summary": "senate.gov is the official website of the U.S. Senate. Its historical content (origins and development of the Senate, historical highlights from 1787 to present, biographical records of senators, and Senate procedures and traditions)is produced by the Senate Historical Office, which the site credits by name on its history pages and which takes public questions from a named Senate historian.",
+        "homepage": "https://www.senate.gov",
+        "relevance": "Cited for Black U.S. senators' election and swearing-in dates and for law-entity claims, split between person records (elected_on/sworn_in_on predicates) and law records.",
+        "created_at": "2026-07-23T04:35:40.949071+00:00",
+        "updated_at": "2026-09-15T03:34:49.653693+00:00",
+        "limitations": [
+          "Authoritative for the Senate's own institutional history and membership record, not a general source for legislative history outside the Senate's own actions.",
+          "Historical-highlight pages are written for public education and may summarize rather than reproduce full documentary detail."
+        ],
+        "publisher_kind": "government_agency",
+        "profile_sources": ["https://www.senate.gov/about/origins-foundations.htm"],
+        "profile_reviewed_at": "2026-09-15T03:35:16.181+00:00",
+        "profile_reviewed_by": "agent:source-library-profiles-2026-09-14",
+        "parent_organization_id": null,
+        "merged_into_organization_id": null
+      },
+      "accessOutcomes": [
+        {
+          "url": "https://www.senate.gov/about/origins-foundations.htm",
+          "accessOutcome": "opened"
+        }
+      ]
+    },
+    {
+      "organizationId": "org_web_53a082c60f10ebc86da208ea35797967",
+      "name": "Rosenwald Fund Collection, Fisk University (John Hope and Aurelia E. Franklin Library)",
+      "status": "needs_recheck",
+      "reason": "Existing descriptive claims are not recertified by a collection page. Use document-relative evidence review; old profile dates are historical.",
+      "originalProfile": {
+        "id": "org_web_53a082c60f10ebc86da208ea35797967",
+        "name": "Rosenwald Fund Collection, Fisk University (John Hope and Aurelia E. Franklin Library)",
+        "tier": "tier2",
+        "summary": "The Rosenwald Fund Collection is Fisk University's digitized archive of the Julius Rosenwald Fund's records (585 archival boxes and an estimated 674,000 items)documenting Rosenwald's philanthropy and its impact on Black education, maintained by Fisk's Franklin Library and expanded through the Mellon Foundation-funded 'Forging Future Pathways' digitization project. The searchable school-card database draws on the Fund's original school cards, financial records, applications and photographs for the roughly 5,000 Rosenwald schools built across 15 Southern states.",
+        "homepage": "https://rosenwald.fisk.edu",
+        "relevance": "Cited exclusively for Rosenwald-school site documentation and operating-years claims, entirely on school records. Sample predicates: documented_site, active_years.",
+        "created_at": "2026-07-23T04:35:40.949071+00:00",
+        "updated_at": "2026-09-15T03:34:49.653693+00:00",
+        "limitations": [
+          "The card-file data reflects the Fund's own administrative records; a school's actual construction/closure dates can occasionally diverge from what the card recorded.",
+          "The full 674,000-item archive is still being digitized in phases, so coverage of the broader Rosenwald Fund collection beyond the school cards is incomplete."
+        ],
+        "publisher_kind": "academic_library_archive",
+        "profile_sources": [
+          "https://rosenwald.fisk.edu/s/rosenwald-fund-collection/page/about-project"
+        ],
+        "profile_reviewed_at": "2026-09-15T03:35:17.008+00:00",
+        "profile_reviewed_by": "agent:source-library-profiles-2026-09-14",
+        "parent_organization_id": null,
+        "merged_into_organization_id": null
+      },
+      "accessOutcomes": [
+        {
+          "url": "https://rosenwald.fisk.edu/s/rosenwald-fund-collection/page/about-project",
+          "accessOutcome": "opened"
+        }
+      ]
+    },
+    {
+      "organizationId": "org_web_e1a22f1ed3a17509706a4bf736bd5b47",
+      "name": "NPR (National Public Radio)",
+      "status": "needs_recheck",
+      "reason": "Existing descriptive claims are not recertified by a collection page. Use document-relative evidence review; old profile dates are historical.",
+      "originalProfile": {
+        "id": "org_web_e1a22f1ed3a17509706a4bf736bd5b47",
+        "name": "NPR (National Public Radio)",
+        "tier": "tier3",
+        "summary": "NPR is an independent, nonprofit public-media organization founded in 1970 that produces and distributes news and cultural programming to a network of nearly 250 member stations, funded through a mix of listener support, sponsorship and government support. Its editorial operations are governed by a published Ethics Handbook and overseen by an independent Public Editor; NPR states it does not offer or accept money for coverage or interviews.",
+        "homepage": "https://www.npr.org",
+        "relevance": "Cited for person career and civil-rights event-narrative claims, overwhelmingly on person records. Sample predicates: sworn_in_on, beaten_on, chart_record, attacked_at: several tied to civil-rights-movement violence.",
+        "created_at": "2026-07-23T04:35:40.949071+00:00",
+        "updated_at": "2026-09-15T03:34:49.653693+00:00",
+        "limitations": [
+          "Not classified tier1/tier2 by the repo's confidence code: 'npr' contains none of the NEWS_HOST_HINTS substrings ('news','times','post','tribune','gazette','herald') the code checks for, so it falls to 'unknown' despite being a substantial news organization.",
+          "Daily news and feature journalism, not a primary archival record."
+        ],
+        "publisher_kind": "news_media",
+        "profile_sources": ["https://www.npr.org/about"],
+        "profile_reviewed_at": "2026-09-15T03:35:17.886+00:00",
+        "profile_reviewed_by": "agent:source-library-profiles-2026-09-14",
+        "parent_organization_id": null,
+        "merged_into_organization_id": null
+      },
+      "accessOutcomes": [
+        {
+          "url": "https://www.npr.org/about",
+          "accessOutcome": "unavailable_or_no_text"
+        }
+      ]
+    },
+    {
+      "organizationId": "org_web_14834a32f4f2217ff79b072d9e40b10a",
+      "name": "Society for American Baseball Research (SABR)",
+      "status": "needs_recheck",
+      "reason": "Existing descriptive claims are not recertified by a collection page. Use document-relative evidence review; old profile dates are historical.",
+      "originalProfile": {
+        "id": "org_web_14834a32f4f2217ff79b072d9e40b10a",
+        "name": "Society for American Baseball Research (SABR)",
+        "tier": "tier2",
+        "summary": "SABR is a membership-based scholarly research organization founded August 10, 1971 by L. Robert Davids and 15 other researchers at the National Baseball Hall of Fame in Cooperstown; it now has more than 7,500 members. It publishes the Baseball Research Journal, The National Pastime, e-books through its Digital Library, and runs the peer-contributed BioProject that produces player biographies, including its Negro Leagues research.",
+        "homepage": "https://sabr.org",
+        "relevance": "Cited for baseball career-statistics and biography claims, notably Negro Leagues Hall of Famers, entirely on person records. Sample predicates: managerial_debut_date, hall_of_fame_induction_year, source_states.",
+        "created_at": "2026-07-23T04:35:40.949071+00:00",
+        "updated_at": "2026-09-15T03:34:49.653693+00:00",
+        "limitations": [
+          "BioProject entries are member/contributor-written; the site's own about content doesn't detail a formal peer-review process for individual biographies.",
+          "Scope is baseball-specific: not a general biographical or civil-rights source."
+        ],
+        "publisher_kind": "nonprofit_heritage",
+        "profile_sources": ["https://sabr.org/about"],
+        "profile_reviewed_at": "2026-09-15T03:35:18.705+00:00",
+        "profile_reviewed_by": "agent:source-library-profiles-2026-09-14",
+        "parent_organization_id": null,
+        "merged_into_organization_id": null
+      },
+      "accessOutcomes": [
+        {
+          "url": "https://sabr.org/about",
+          "accessOutcome": "opened"
+        }
+      ]
+    },
+    {
+      "organizationId": "org_web_a2ffc306983cdf20eb99a5e0b81437bb",
+      "name": "African American Registry",
+      "status": "needs_recheck",
+      "reason": "Existing descriptive claims are not recertified by a collection page. Use document-relative evidence review; old profile dates are historical.",
+      "originalProfile": {
+        "id": "org_web_a2ffc306983cdf20eb99a5e0b81437bb",
+        "name": "African American Registry",
+        "tier": "tier3",
+        "summary": "The African American Registry is a 501(c)(3) nonprofit education organization, operating since 1999 under Executive Director Benjamin Mchie and a board of educators and community leaders, dedicated to \"increasing understanding through education and raising self-esteem through knowledge.\" Its core product is a daily-in-history 'almanac' of over 7,000 short articles plus video interviews on African American, Latinx, Indigenous, Asian and European history, aimed at classroom and general-audience use.",
+        "homepage": "https://aaregistry.org",
+        "relevance": "Cited across person, place, organization, and case claims, with person records the majority. Sample predicates: founded_organization, served, held.",
+        "created_at": "2026-07-23T04:35:40.949071+00:00",
+        "updated_at": "2026-09-15T03:34:49.653693+00:00",
+        "limitations": [
+          "Short almanac-style entries, not long-form scholarly biography: useful as a lead rather than a deep record.",
+          "No named individual authors/editors are visible on entries; editorial process and sourcing for individual articles is not documented on the site.",
+          "Not classified tier1/tier2 by the repo's confidence code (falls to 'unknown')."
+        ],
+        "publisher_kind": "nonprofit_heritage",
+        "profile_sources": ["https://aaregistry.org"],
+        "profile_reviewed_at": "2026-09-15T03:35:19.551+00:00",
+        "profile_reviewed_by": "agent:source-library-profiles-2026-09-14",
+        "parent_organization_id": null,
+        "merged_into_organization_id": null
+      },
+      "accessOutcomes": [
+        {
+          "url": "https://aaregistry.org",
+          "accessOutcome": "unavailable_or_no_text"
+        }
+      ]
+    },
+    {
+      "organizationId": "org_web_93ebcef014024f054866399d86ebb3ee",
+      "name": "govinfo (U.S. Government Publishing Office)",
+      "status": "needs_recheck",
+      "reason": "Existing descriptive claims are not recertified by a collection page. Use document-relative evidence review; old profile dates are historical.",
+      "originalProfile": {
+        "id": "org_web_93ebcef014024f054866399d86ebb3ee",
+        "name": "govinfo (U.S. Government Publishing Office)",
+        "tier": "tier1",
+        "summary": "govinfo is the official public-access platform for U.S. Government publications, operated by the Government Publishing Office (GPO), a legislative-branch federal agency established in 1861 under Congress's Article I mandate to publish its proceedings. It replaced the earlier FDsys platform in December 2018 and now hosts more than a million federal documents (congressional bills, hearings and reports, the Federal Register, U.S. Code, regulations and White House publications)with digitally signed PDFs and ISO 16363-certified long-term preservation.",
+        "homepage": "https://www.govinfo.gov",
+        "relevance": "Cited chiefly for law-entity statutory text and legislative history (predicates provision, amended_by, impact), plus institution, organization, and person claims.",
+        "created_at": "2026-07-23T04:35:40.949071+00:00",
+        "updated_at": "2026-09-15T03:34:49.653693+00:00",
+        "limitations": [
+          "Covers official federal documents; state and local statutes are outside its scope.",
+          "A statute's text being on govinfo.gov doesn't itself establish a law's real-world impact: that requires a secondary analytical source, which the 'impact' predicate claims should be checked against."
+        ],
+        "publisher_kind": "government_archive",
+        "profile_sources": ["https://www.govinfo.gov/about"],
+        "profile_reviewed_at": "2026-09-15T03:35:20.38+00:00",
+        "profile_reviewed_by": "agent:source-library-profiles-2026-09-14",
+        "parent_organization_id": null,
+        "merged_into_organization_id": null
+      },
+      "accessOutcomes": [
+        {
+          "url": "https://www.govinfo.gov/about",
+          "accessOutcome": "opened"
+        }
+      ]
+    },
+    {
+      "organizationId": "org_web_e281b28ba736a7247a30bfbb82dbe7a9",
+      "name": "Maryland Historical Trust (Maryland Department of Planning)",
+      "status": "needs_recheck",
+      "reason": "Existing descriptive claims are not recertified by a collection page. Use document-relative evidence review; old profile dates are historical.",
+      "originalProfile": {
+        "id": "org_web_e281b28ba736a7247a30bfbb82dbe7a9",
+        "name": "Maryland Historical Trust (Maryland Department of Planning)",
+        "tier": "tier1",
+        "summary": "The Maryland Historical Trust is Maryland's state historic preservation office, a state government agency \"dedicated to preserving and interpreting the legacy of Maryland's past.\" It runs archaeological and architectural surveys, administers National Register of Historic Places nominations for Maryland properties, and operates the Maryland Inventory of Historic Properties (MIHP) searchable database at apps.mht.maryland.gov, the specific host BlackStory cites, plus grant programs and Jefferson Patterson Park & Museum.",
+        "homepage": "https://mht.maryland.gov",
+        "relevance": "Cited exclusively for place claims, entirely on place records drawn from the MIHP/NRHP inventory application. Sample predicates: documented_site, 'source states'.",
+        "created_at": "2026-08-04T15:53:58.979183+00:00",
+        "updated_at": "2026-09-15T03:34:49.653693+00:00",
+        "limitations": [
+          "The apps.mht.maryland.gov inventory application presents survey/nomination-form data; interpretation and narrative context around a listing may be thinner than a museum or encyclopedia entry.",
+          "State-scoped to Maryland properties."
+        ],
+        "publisher_kind": "government_agency",
+        "profile_sources": ["https://mht.maryland.gov/"],
+        "profile_reviewed_at": "2026-09-15T03:35:21.198+00:00",
+        "profile_reviewed_by": "agent:source-library-profiles-2026-09-14",
+        "parent_organization_id": null,
+        "merged_into_organization_id": null
+      },
+      "accessOutcomes": [
+        {
+          "url": "https://mht.maryland.gov/",
+          "accessOutcome": "unavailable_or_no_text"
+        }
+      ]
+    },
+    {
+      "organizationId": "org_web_1a846688bbfae208dc430a9ab91d5ac7",
+      "name": "Smithsonian's National Air and Space Museum",
+      "status": "needs_recheck",
+      "reason": "Existing descriptive claims are not recertified by a collection page. Use document-relative evidence review; old profile dates are historical.",
+      "originalProfile": {
+        "id": "org_web_1a846688bbfae208dc430a9ab91d5ac7",
+        "name": "Smithsonian's National Air and Space Museum",
+        "tier": "tier1",
+        "summary": "The National Air and Space Museum is a Smithsonian Institution museum established by Public Law 722 (signed by President Truman, August 12, 1946) as the National Air Museum, renamed in 1966 after it began collecting NASA-mission artifacts. Its flagship Washington, D.C. building opened July 1976 and its Steven F. Udvar-Hazy Center in Chantilly, VA opened December 2003; together they hold the world's largest collection of historic aircraft and spacecraft (more than 68,000 objects) and the museum is also a research center for aviation and spaceflight history.",
+        "homepage": "https://airandspace.si.edu",
+        "relevance": "Cited for identity and career-milestone claims about aviators and astronauts, plus an invention claim, dominated by person records. Sample predicates: became, first_to, graduated_from.",
+        "created_at": "2026-07-23T04:35:40.949071+00:00",
+        "updated_at": "2026-09-15T03:34:49.653693+00:00",
+        "limitations": [
+          "A museum's public-facing biography pages are curated summaries, not the underlying service or personnel record.",
+          "Some galleries have been closed for a multi-year renovation (since late 2018, phased reopening from 2022), so object-specific pages may reflect a gallery not currently on view."
+        ],
+        "publisher_kind": "museum",
+        "profile_sources": [
+          "https://www.si.edu/newsdesk/factsheets/national-air-and-space-museum",
+          "https://airandspace.si.edu"
+        ],
+        "profile_reviewed_at": "2026-09-15T03:35:22.006+00:00",
+        "profile_reviewed_by": "agent:source-library-profiles-2026-09-14",
+        "parent_organization_id": null,
+        "merged_into_organization_id": null
+      },
+      "accessOutcomes": [
+        {
+          "url": "https://www.si.edu/newsdesk/factsheets/national-air-and-space-museum",
+          "accessOutcome": "unavailable_or_no_text"
+        },
+        {
+          "url": "https://airandspace.si.edu",
+          "accessOutcome": "unavailable_or_no_text"
+        }
+      ]
+    },
+    {
+      "organizationId": "org_web_3a708dc5ef7287c7668267ffe814a44d",
+      "name": "North Carolina Department of Natural and Cultural Resources",
+      "status": "needs_recheck",
+      "reason": "Existing descriptive claims are not recertified by a collection page. Use document-relative evidence review; old profile dates are historical.",
+      "originalProfile": {
+        "id": "org_web_3a708dc5ef7287c7668267ffe814a44d",
+        "name": "North Carolina Department of Natural and Cultural Resources",
+        "tier": "tier1",
+        "summary": "NC DNCR is the North Carolina state cabinet agency that runs the state's historic sites, archives, museums, and libraries. Cited pages are mostly posts from its \"Adventures in North Carolina Culture\" blog, published under the department's own byline about state historic sites and figures. ncdncr.gov is the department's older domain; dncr.nc.gov is its current one, and both resolve to the same publisher.",
+        "homepage": "https://www.dncr.nc.gov",
+        "relevance": "BlackStory cites dncr.nc.gov mostly for site history, founding facts, and biographical detail: place entities (state historic sites such as L. Richardson Memorial Hospital and James City) and person entities (e.g. Harriet Jacobs).",
+        "created_at": "2026-07-23T04:35:40.949071+00:00",
+        "updated_at": "2026-09-15T03:34:49.653693+00:00",
+        "limitations": [
+          "Blog posts are department-published but not always individually bylined or dated with a review cycle.",
+          "Coverage is limited to sites and people the department has chosen to feature; not comprehensive."
+        ],
+        "publisher_kind": "government_agency",
+        "profile_sources": ["https://www.dncr.nc.gov/about"],
+        "profile_reviewed_at": "2026-09-15T03:35:22.852+00:00",
+        "profile_reviewed_by": "agent:source-library-profiles-2026-09-14",
+        "parent_organization_id": null,
+        "merged_into_organization_id": null
+      },
+      "accessOutcomes": [
+        {
+          "url": "https://www.dncr.nc.gov/about",
+          "accessOutcome": "opened"
+        }
+      ]
+    },
+    {
+      "organizationId": "org_web_19ce6fb394366c105eef2cf5c952b4ba",
+      "name": "SNCC Digital Gateway",
+      "status": "needs_recheck",
+      "reason": "Existing descriptive claims are not recertified by a collection page. Use document-relative evidence review; old profile dates are historical.",
+      "originalProfile": {
+        "id": "org_web_19ce6fb394366c105eef2cf5c952b4ba",
+        "name": "SNCC Digital Gateway",
+        "tier": "tier3",
+        "summary": "The SNCC Digital Gateway is a documentary history project on the Student Nonviolent Coordinating Committee, published jointly by the SNCC Legacy Project, Duke University Libraries, and Duke's Center for Documentary Studies, with Mellon Foundation support. It hosts primary documents, photographs, oral history interviews, and activist profiles, and SNCC veterans themselves helped shape the project and serve as Visiting Activist Scholars.",
+        "homepage": "https://snccdigital.org",
+        "relevance": "BlackStory cites snccdigital.org drawing on the site's activist profiles and event/timeline pages: person profiles (e.g. Charles Sherrod, Ella Baker), organization entities (e.g. CORE), and event entities.",
+        "created_at": "2026-07-23T04:35:40.949071+00:00",
+        "updated_at": "2026-09-15T03:34:49.653693+00:00",
+        "limitations": [
+          "Not on a .edu subdomain despite university sponsorship, so the code's conservative host classification treats it the same as an unaffiliated site.",
+          "Content is curated around SNCC's own movement history; not a general-purpose reference for unrelated subjects."
+        ],
+        "publisher_kind": "academic_library_archive",
+        "profile_sources": ["https://snccdigital.org/about/"],
+        "profile_reviewed_at": "2026-09-15T03:35:25.622+00:00",
+        "profile_reviewed_by": "agent:source-library-profiles-2026-09-14",
+        "parent_organization_id": null,
+        "merged_into_organization_id": null
+      },
+      "accessOutcomes": [
+        {
+          "url": "https://snccdigital.org/about/",
+          "accessOutcome": "opened"
+        }
+      ]
+    },
+    {
+      "organizationId": "org_web_2dd5c3a9fbdadac7404e0d34cebff57a",
+      "name": "Texas Historic Sites Atlas (Texas Historical Commission)",
+      "status": "needs_recheck",
+      "reason": "Existing descriptive claims are not recertified by a collection page. Use document-relative evidence review; old profile dates are historical.",
+      "originalProfile": {
+        "id": "org_web_2dd5c3a9fbdadac7404e0d34cebff57a",
+        "name": "Texas Historic Sites Atlas (Texas Historical Commission)",
+        "tier": "tier1",
+        "summary": "The Texas Historical Commission is the state agency for historic preservation, established by the Texas Legislature in 1953. The Historic Sites Atlas is its official online database and mapping tool cataloging state historical markers, National Register listings, and other documented historic properties across Texas.",
+        "homepage": "https://atlas.thc.texas.gov",
+        "relevance": "BlackStory cites atlas.thc.texas.gov for place entities (e.g. Allen Chapel AME Church, Antioch Colony, Hopkinsville Community), used for site identification and location-grounded historical facts drawn directly from the state's own marker/register database.",
+        "created_at": "2026-07-23T04:35:40.949071+00:00",
+        "updated_at": "2026-09-15T03:34:49.653693+00:00",
+        "limitations": [
+          "Atlas entries can be terse marker-text summaries rather than full narrative histories.",
+          "Coverage depends on what has been formally marked or listed; unlisted sites are absent."
+        ],
+        "publisher_kind": "government_agency",
+        "profile_sources": ["https://www.thc.texas.gov/about"],
+        "profile_reviewed_at": "2026-09-15T03:35:26.545+00:00",
+        "profile_reviewed_by": "agent:source-library-profiles-2026-09-14",
+        "parent_organization_id": null,
+        "merged_into_organization_id": null
+      },
+      "accessOutcomes": [
+        {
+          "url": "https://www.thc.texas.gov/about",
+          "accessOutcome": "opened"
+        }
+      ]
+    },
+    {
+      "organizationId": "org_web_02c48401d4cd382e860a2a62cc612dbb",
+      "name": "United States Patent and Trademark Office",
+      "status": "needs_recheck",
+      "reason": "Existing descriptive claims are not recertified by a collection page. Use document-relative evidence review; old profile dates are historical.",
+      "originalProfile": {
+        "id": "org_web_02c48401d4cd382e860a2a62cc612dbb",
+        "name": "United States Patent and Trademark Office",
+        "tier": "tier1",
+        "summary": "The USPTO is a federal agency under the Department of Commerce responsible for granting U.S. patents and registering trademarks, and for driving American innovation policy. Beyond the patent record itself, it publishes historical-stories and blog content on its own site profiling inventors, including Black inventors.",
+        "homepage": "https://www.uspto.gov",
+        "relevance": "BlackStory cites uspto.gov for person entities (Henry E. Baker, Lewis Latimer, Lyda D. Newman, Patricia Bath), an institution entity, and an invention entity, drawing on both the agency's inventor-history blog pages and, for the invention entity, the underlying patent record.",
+        "created_at": "2026-07-23T04:35:40.949071+00:00",
+        "updated_at": "2026-09-15T03:34:49.653693+00:00",
+        "limitations": [
+          "Cited pages mix the agency's own editorial 'historical stories' content with primary patent documents; the two carry different evidentiary weight even though both are on the same authoritative host.",
+          "Historical-stories blog content is public-facing storytelling, not the patent record itself."
+        ],
+        "publisher_kind": "government_agency",
+        "profile_sources": ["https://www.uspto.gov/about-us"],
+        "profile_reviewed_at": "2026-09-15T03:35:27.456+00:00",
+        "profile_reviewed_by": "agent:source-library-profiles-2026-09-14",
+        "parent_organization_id": null,
+        "merged_into_organization_id": null
+      },
+      "accessOutcomes": [
+        {
+          "url": "https://www.uspto.gov/about-us",
+          "accessOutcome": "opened"
+        }
+      ]
+    },
+    {
+      "organizationId": "org_web_58b6f0b56947093544ce8e7037ab7be2",
+      "name": "EBSCO Information Services",
+      "status": "needs_recheck",
+      "reason": "Existing descriptive claims are not recertified by a collection page. Use document-relative evidence review; old profile dates are historical.",
+      "originalProfile": {
+        "id": "org_web_58b6f0b56947093544ce8e7037ab7be2",
+        "name": "EBSCO Information Services",
+        "tier": "tier3",
+        "summary": "EBSCO is a commercial company selling research databases, journals, eBooks, and discovery tools to academic and public libraries, schools, healthcare institutions, and corporations. The pages BlackStory actually cites are EBSCO's \"Research Starters\": free, publicly accessible encyclopedia-style overview articles EBSCO publishes as marketing/reference content on ebsco.com, not the paywalled library-subscription database content the company otherwise sells.",
+        "homepage": "https://www.ebsco.com",
+        "relevance": "BlackStory cites ebsco.com for case entities (Gomillion v. Lightfoot, Terry v. Adams, United States v. Reese) and a law entity, all drawing on EBSCO's free \"research-starters/law\" overview pages summarizing landmark civil-rights-era court cases.",
+        "created_at": "2026-07-23T04:35:40.949071+00:00",
+        "updated_at": "2026-09-15T03:34:49.653693+00:00",
+        "limitations": [
+          "Research Starters are written as accessible overview/reference content by EBSCO's editorial staff, not peer-reviewed legal scholarship or a primary court record.",
+          "As a commercial company's marketing-adjacent content, editorial standards and sourcing are not independently disclosed on the page itself.",
+          "Confusable with EBSCO's paywalled subscription products, which these specific cited pages are not."
+        ],
+        "publisher_kind": "commercial_database",
+        "profile_sources": ["https://about.ebsco.com/about"],
+        "profile_reviewed_at": "2026-09-15T03:35:29.457+00:00",
+        "profile_reviewed_by": "agent:source-library-profiles-2026-09-14",
+        "parent_organization_id": null,
+        "merged_into_organization_id": null
+      },
+      "accessOutcomes": [
+        {
+          "url": "https://about.ebsco.com/about",
+          "accessOutcome": "opened"
+        }
+      ]
+    },
+    {
+      "organizationId": "org_web_dd0cd7bf7a8c95a9b2f264ef60399ddb",
+      "name": "Miller Center (University of Virginia)",
+      "status": "needs_recheck",
+      "reason": "Existing descriptive claims are not recertified by a collection page. Use document-relative evidence review; old profile dates are historical.",
+      "originalProfile": {
+        "id": "org_web_dd0cd7bf7a8c95a9b2f264ef60399ddb",
+        "name": "Miller Center (University of Virginia)",
+        "tier": "tier3",
+        "summary": "The Miller Center is a nonpartisan affiliate of the University of Virginia focused on the presidency and public policy. It publishes presidential-administration essays profiling cabinet officials and staff, oral histories of former presidents and administration figures, and White House recordings.",
+        "homepage": "https://millercenter.org",
+        "relevance": "BlackStory cites millercenter.org for person entities, cabinet-level officials (Eric Holder, Mike Espy, Robert C. Weaver), drawing on the Center's per-administration essay pages for swearing-in facts and role summaries.",
+        "created_at": "2026-07-23T04:35:40.949071+00:00",
+        "updated_at": "2026-09-15T03:34:49.653693+00:00",
+        "limitations": [
+          "Not on a .edu subdomain despite UVA affiliation, so it scores the same as an unaffiliated host under the code's conservative classification.",
+          "Essay pages are written for public accessibility; strong for administration-era officials specifically, not a general biographical source."
+        ],
+        "publisher_kind": "academic_library_archive",
+        "profile_sources": ["https://millercenter.org/about"],
+        "profile_reviewed_at": "2026-09-15T03:35:30.29+00:00",
+        "profile_reviewed_by": "agent:source-library-profiles-2026-09-14",
+        "parent_organization_id": null,
+        "merged_into_organization_id": null
+      },
+      "accessOutcomes": [
+        {
+          "url": "https://millercenter.org/about",
+          "accessOutcome": "opened"
+        }
+      ]
+    },
+    {
+      "organizationId": "org_web_e0e4b5a80cf0791b5951f3ebefa6ee99",
+      "name": "Maryland State Archives",
+      "status": "needs_recheck",
+      "reason": "Existing descriptive claims are not recertified by a collection page. Use document-relative evidence review; old profile dates are historical.",
+      "originalProfile": {
+        "id": "org_web_e0e4b5a80cf0791b5951f3ebefa6ee99",
+        "name": "Maryland State Archives",
+        "tier": "tier1",
+        "summary": "The Maryland State Archives is the state government agency and official repository for Maryland's historical government records, located in Annapolis. It maintains special-collection biographical and documentary series (e.g. the Women's Hall of Fame series, county-level biography files) alongside core government and land records, accessible online and through research consultations.",
+        "homepage": "https://msa.maryland.gov",
+        "relevance": "BlackStory cites msa.maryland.gov for person entities (e.g. Garfield King, a lynching victim biography) and place entities (e.g. Holy Rood Cemetery, the Washington Afro-American Newspaper Office Building), drawing on the archive's special-collection biographical and site-documentation pages.",
+        "created_at": "2026-07-23T04:35:40.949071+00:00",
+        "updated_at": "2026-09-15T03:34:49.653693+00:00",
+        "limitations": [
+          "Special-collection pages (megafile/speccol) can be older, staff-compiled finding aids rather than fully narrated modern scholarship.",
+          "Some cited material concerns Washington, D.C. sites documented within a Maryland-focused special collection, not Maryland proper."
+        ],
+        "publisher_kind": "government_archive",
+        "profile_sources": ["https://msa.maryland.gov"],
+        "profile_reviewed_at": "2026-09-15T03:35:31.254+00:00",
+        "profile_reviewed_by": "agent:source-library-profiles-2026-09-14",
+        "parent_organization_id": null,
+        "merged_into_organization_id": null
+      },
+      "accessOutcomes": [
+        {
+          "url": "https://msa.maryland.gov",
+          "accessOutcome": "opened"
+        }
+      ]
+    },
+    {
+      "organizationId": "org_web_b762d2a1ca024ce9d8bdc7acedb710cf",
+      "name": "Florida Department of State",
+      "status": "needs_recheck",
+      "reason": "Existing descriptive claims are not recertified by a collection page. Use document-relative evidence review; old profile dates are historical.",
+      "originalProfile": {
+        "id": "org_web_b762d2a1ca024ce9d8bdc7acedb710cf",
+        "name": "Florida Department of State",
+        "tier": "tier1",
+        "summary": "The Florida Department of State manages the state's elections, corporations, libraries, and historical/cultural resources, through divisions including Library and Information Services and Historical Resources (which runs the National Register of Historic Places program in Florida). Cited pages come from its Library and Archives history features and its National Register listing announcements.",
+        "homepage": "https://dos.fl.gov",
+        "relevance": "BlackStory cites dos.fl.gov for place entities (e.g. the James W. Wright Building, Old Howard Academy, both National Register listings) and an event entity (the Rosewood Massacre), drawing on the department's own historical-resources and press-release pages.",
+        "created_at": "2026-07-23T04:35:40.949071+00:00",
+        "updated_at": "2026-09-15T03:34:49.653693+00:00",
+        "limitations": [
+          "Press-release-format pages for National Register listings are announcement-style, not full narrative histories.",
+          "The Rosewood Massacre page is a department-curated historical resource, secondary to primary investigative and archival records of the event."
+        ],
+        "publisher_kind": "government_agency",
+        "profile_sources": ["https://dos.fl.gov/"],
+        "profile_reviewed_at": "2026-09-15T03:35:32.378+00:00",
+        "profile_reviewed_by": "agent:source-library-profiles-2026-09-14",
+        "parent_organization_id": null,
+        "merged_into_organization_id": null
+      },
+      "accessOutcomes": [
+        {
+          "url": "https://dos.fl.gov/",
+          "accessOutcome": "opened"
+        }
+      ]
+    },
+    {
+      "organizationId": "org_web_9a9057366daabc09440ea4d1751c5e9b",
+      "name": "U.S. Department of Justice",
+      "status": "needs_recheck",
+      "reason": "Existing descriptive claims are not recertified by a collection page. Use document-relative evidence review; old profile dates are historical.",
+      "originalProfile": {
+        "id": "org_web_9a9057366daabc09440ea4d1751c5e9b",
+        "name": "U.S. Department of Justice",
+        "tier": "tier1",
+        "summary": "The Department of Justice is the federal agency, led by the Attorney General, responsible for enforcing federal law and defending U.S. legal interests. Its Civil Rights Division enforces federal civil rights laws through 12 specialized sections and publishes historical case documentation, including Emmett Till Act cold-case memoranda on unsolved civil-rights-era killings.",
+        "homepage": "https://www.justice.gov",
+        "relevance": "BlackStory cites justice.gov for law entities (Civil Rights Act of 1957, Voting Rights Act of 1965), a place, an institution, and a person (Charles Brown, cited via both a cold-case PDF memorandum and a case summary page), reflecting the Civil Rights Division's own historical case files and legislative-history pages.",
+        "created_at": "2026-07-23T04:35:40.949071+00:00",
+        "updated_at": "2026-09-15T03:34:49.653693+00:00",
+        "limitations": [
+          "Cold-case memoranda are investigative closing reports, useful for outcome and process facts but not full biographical accounts.",
+          "Legislative-history pages summarize DOJ's own enforcement role, not a neutral third-party account of the law's passage."
+        ],
+        "publisher_kind": "government_agency",
+        "profile_sources": [
+          "https://www.justice.gov/about",
+          "https://www.justice.gov/crt/about-division"
+        ],
+        "profile_reviewed_at": "2026-09-15T03:35:34.121+00:00",
+        "profile_reviewed_by": "agent:source-library-profiles-2026-09-14",
+        "parent_organization_id": null,
+        "merged_into_organization_id": null
+      },
+      "accessOutcomes": [
+        {
+          "url": "https://www.justice.gov/about",
+          "accessOutcome": "opened"
+        },
+        {
+          "url": "https://www.justice.gov/crt/about-division",
+          "accessOutcome": "opened"
+        }
+      ]
+    },
+    {
+      "organizationId": "org_web_f65f6b990776a4557fb43ce97f1b0ee9",
+      "name": "Encyclopedia of Cleveland History (Case Western Reserve University)",
+      "status": "needs_recheck",
+      "reason": "Existing descriptive claims are not recertified by a collection page. Use document-relative evidence review; old profile dates are historical.",
+      "originalProfile": {
+        "id": "org_web_f65f6b990776a4557fb43ce97f1b0ee9",
+        "name": "Encyclopedia of Cleveland History (Case Western Reserve University)",
+        "tier": "tier2",
+        "summary": "The Encyclopedia of Cleveland History is a reference work on Greater Cleveland's urban history, originating from Case Western Reserve University's Department of History in collaboration with the Western Reserve Historical Society. Published in print in 1987 and 1996, it continues online, maintained by the university with contributions from academic and local historians.",
+        "homepage": "https://case.edu/ech",
+        "relevance": "BlackStory cites case.edu for invention entities, an event (the Oberlin-Wellington Rescue), an organization, and a person (Carl Stokes), all citing pages within the /ech/articles/ Encyclopedia of Cleveland History project rather than the university generally.",
+        "created_at": "2026-07-23T04:35:40.949071+00:00",
+        "updated_at": "2026-09-15T03:34:49.653693+00:00",
+        "limitations": [
+          "Coverage is limited to Cleveland/Ohio-area subjects; not a general national reference.",
+          "As with any .edu host, the code's classification is conservative (reputable_secondary) rather than crediting the project's specific institutional backing."
+        ],
+        "publisher_kind": "academic_library_archive",
+        "profile_sources": ["https://case.edu/ech/about"],
+        "profile_reviewed_at": "2026-09-15T03:35:35.104+00:00",
+        "profile_reviewed_by": "agent:source-library-profiles-2026-09-14",
+        "parent_organization_id": null,
+        "merged_into_organization_id": null
+      },
+      "accessOutcomes": [
+        {
+          "url": "https://case.edu/ech/about",
+          "accessOutcome": "opened"
+        }
+      ]
+    },
+    {
+      "organizationId": "org_web_1b466f868eb57ef786773d10b2fb8b0b",
+      "name": "Black Enterprise",
+      "status": "needs_recheck",
+      "reason": "Existing descriptive claims are not recertified by a collection page. Use document-relative evidence review; old profile dates are historical.",
+      "originalProfile": {
+        "id": "org_web_1b466f868eb57ef786773d10b2fb8b0b",
+        "name": "Black Enterprise",
+        "tier": "tier3",
+        "summary": "Black Enterprise is a for-profit multimedia company founded in 1970 by Earl G. Graves Sr., publishing business news, entrepreneurship features, and a running 'great moments in Black business' historical feature series. It positions itself as \"The Premier Resource for Black Entrepreneurs and Career, Tech, and Money Content for Black People.\"",
+        "homepage": "https://www.blackenterprise.com",
+        "relevance": "BlackStory cites blackenterprise.com for person entities (Cathy Hughes, Eric Holder, Michelle Howard, etc.), drawing on its Black-history-themed feature articles for founding, career, and 'first' facts.",
+        "created_at": "2026-07-23T04:35:40.949071+00:00",
+        "updated_at": "2026-09-15T03:34:49.653693+00:00",
+        "limitations": [
+          "Commercial magazine journalism, not peer-reviewed or archival; individual feature articles vary in sourcing rigor and are not consistently bylined with citations.",
+          "Content skews toward celebratory business-history framing, which the claim-corroborate skill flags as the highest-risk profile for unverified superlatives."
+        ],
+        "publisher_kind": "news_media",
+        "profile_sources": [
+          "https://www.blackenterprise.com/",
+          "https://en.wikipedia.org/wiki/Black_Enterprise"
+        ],
+        "profile_reviewed_at": "2026-09-15T03:35:36.058+00:00",
+        "profile_reviewed_by": "agent:source-library-profiles-2026-09-14",
+        "parent_organization_id": null,
+        "merged_into_organization_id": null
+      },
+      "accessOutcomes": [
+        {
+          "url": "https://www.blackenterprise.com/",
+          "accessOutcome": "opened"
+        },
+        {
+          "url": "https://en.wikipedia.org/wiki/Black_Enterprise",
+          "accessOutcome": "opened"
+        }
+      ]
+    },
+    {
+      "organizationId": "org_web_8090dfe84f81a7758c48cfa7469a4bf7",
+      "name": "New Georgia Encyclopedia",
+      "status": "needs_recheck",
+      "reason": "Existing descriptive claims are not recertified by a collection page. Use document-relative evidence review; old profile dates are historical.",
+      "originalProfile": {
+        "id": "org_web_8090dfe84f81a7758c48cfa7469a4bf7",
+        "name": "New Georgia Encyclopedia",
+        "tier": "tier3",
+        "summary": "The New Georgia Encyclopedia describes itself as the nation's first born-digital state encyclopedia, online since 2004, published collaboratively by Georgia Humanities, the University of Georgia Press, University of Georgia Libraries, and the University System of Georgia/GALILEO. Entries are written by scholars and reviewed by librarians, with regular updates.",
+        "homepage": "https://www.georgiaencyclopedia.org",
+        "relevance": "BlackStory cites georgiaencyclopedia.org across organization, place, publication, and person kinds, including Big Bethel AME Church, Maynard Jackson, and the Savannah Tribune, drawing on its scholar-authored articles.",
+        "created_at": "2026-07-23T04:35:40.949071+00:00",
+        "updated_at": "2026-09-15T03:34:49.653693+00:00",
+        "limitations": [
+          "Despite comparable editorial process to peer state encyclopedias already in the repo's curated list (e.g. encyclopediaofalabama.org, ncpedia.org), georgia-encyclopedia.org itself is not yet in that list, so it currently scores the same as an unreviewed unknown host.",
+          "Georgia-specific scope; not a source for out-of-state subjects."
+        ],
+        "publisher_kind": "encyclopedia_reference",
+        "profile_sources": ["https://www.georgiaencyclopedia.org/about/"],
+        "profile_reviewed_at": "2026-09-15T03:35:37.022+00:00",
+        "profile_reviewed_by": "agent:source-library-profiles-2026-09-14",
+        "parent_organization_id": null,
+        "merged_into_organization_id": null
+      },
+      "accessOutcomes": [
+        {
+          "url": "https://www.georgiaencyclopedia.org/about/",
+          "accessOutcome": "opened"
+        }
+      ]
+    },
+    {
+      "organizationId": "org_web_e59da447f72c5e76db1fa9d29c757dd5",
+      "name": "American Battlefield Trust",
+      "status": "needs_recheck",
+      "reason": "Existing descriptive claims are not recertified by a collection page. Use document-relative evidence review; old profile dates are historical.",
+      "originalProfile": {
+        "id": "org_web_e59da447f72c5e76db1fa9d29c757dd5",
+        "name": "American Battlefield Trust",
+        "tier": "tier3",
+        "summary": "The American Battlefield Trust is a 501(c)(3) nonprofit that preserves Revolutionary War, War of 1812, and Civil War battlefields and heritage sites, and publishes educational history content including primary-source pages and heritage-site profiles.",
+        "homepage": "https://www.battlefields.org",
+        "relevance": "BlackStory cites battlefields.org for place entities (heritage sites, e.g. Emancipation Oak, John P. Parker House), an event, and a law entity (Fugitive Slave Act of 1850, via its primary-sources page), drawing on its heritage-site and primary-source content.",
+        "created_at": "2026-07-23T04:35:40.949071+00:00",
+        "updated_at": "2026-09-15T03:34:49.653693+00:00",
+        "limitations": [
+          "Nonprofit heritage-preservation focus centered on battlefield-era history; site profiles are educational content, not peer-reviewed scholarship.",
+          "Not in the repo's curated reputable-secondary list despite being a substantial heritage nonprofit, so it currently scores 'medium' the same as an unreviewed host."
+        ],
+        "publisher_kind": "nonprofit_heritage",
+        "profile_sources": ["https://www.battlefields.org/about-us"],
+        "profile_reviewed_at": "2026-09-15T03:35:37.936+00:00",
+        "profile_reviewed_by": "agent:source-library-profiles-2026-09-14",
+        "parent_organization_id": null,
+        "merged_into_organization_id": null
+      },
+      "accessOutcomes": [
+        {
+          "url": "https://www.battlefields.org/about-us",
+          "accessOutcome": "unavailable_or_no_text"
+        }
+      ]
+    },
+    {
+      "organizationId": "org_web_9b9134b7345f65f219f0e22400928fa9",
+      "name": "Obama White House Archives (National Archives)",
+      "status": "needs_recheck",
+      "reason": "Existing descriptive claims are not recertified by a collection page. Use document-relative evidence review; old profile dates are historical.",
+      "originalProfile": {
+        "id": "org_web_9b9134b7345f65f219f0e22400928fa9",
+        "name": "Obama White House Archives (National Archives)",
+        "tier": "tier1",
+        "summary": "This is the official National Archives-preserved snapshot of whitehouse.gov as it existed during the Obama administration, frozen at the end of the term and hosted on the federal archives.gov domain. It retains the full site navigation and content: policy initiatives, blog posts, and biographical pages for administration officials, presented as historical record with an explicit 'frozen in time' notice.",
+        "homepage": "https://obamawhitehouse.archives.gov",
+        "relevance": "BlackStory cites obamawhitehouse.archives.gov for organization entities, person entities (e.g. Susan Rice), and an institution entity, drawing on the archived administration's own blog and biography pages.",
+        "created_at": "2026-07-23T04:35:40.949071+00:00",
+        "updated_at": "2026-09-15T03:34:49.653693+00:00",
+        "limitations": [
+          "Content reflects the administration's own self-presentation at the time, not independent journalism or scholarship.",
+          "As a frozen snapshot, it will never be updated to reflect later corrections or context."
+        ],
+        "publisher_kind": "government_archive",
+        "profile_sources": ["https://obamawhitehouse.archives.gov/"],
+        "profile_reviewed_at": "2026-09-15T03:35:39.022+00:00",
+        "profile_reviewed_by": "agent:source-library-profiles-2026-09-14",
+        "parent_organization_id": "org_web_dfc39141446525eec3ad13eeef27c4ed",
+        "merged_into_organization_id": null
+      },
+      "accessOutcomes": [
+        {
+          "url": "https://obamawhitehouse.archives.gov/",
+          "accessOutcome": "opened"
+        }
+      ]
+    },
+    {
+      "organizationId": "org_web_d65dbc3d0f7090ef95cbe021002accac",
+      "name": "Smithsonian Institution",
+      "status": "needs_recheck",
+      "reason": "Existing descriptive claims are not recertified by a collection page. Use document-relative evidence review; old profile dates are historical.",
+      "originalProfile": {
+        "id": "org_web_d65dbc3d0f7090ef95cbe021002accac",
+        "name": "Smithsonian Institution",
+        "tier": "tier1",
+        "summary": "The Smithsonian Institution was founded in 1846 under James Smithson's bequest and describes itself as the world's largest museum, education, and research complex, encompassing numerous museums and the National Zoo, research centers, cultural centers, education centers, and collections. Its si.edu domain hosts object and collection records from individual museums (such as the Anacostia Community Museum), unit blogs and podcasts (Sidedoor, collections snapshot features), archival finding aids through the Smithsonian Online Virtual Archives (sova.si.edu), and a directory of affiliate museums nationwide.",
+        "homepage": "https://www.si.edu/",
+        "relevance": "BlackStory cites si.edu pages for museum object records with catalog metadata and captions, such as a painting of Bethlehem Baptist Church held by the Anacostia Community Museum, for biographical features on inventors and pioneers like Mary Beatrice Kenner and Bessie Coleman, for a women's history blog post, for an SOVA finding aid describing the United Negro College Fund's records, and for the Smithsonian's affiliate-museum directory listing the African American Museum in Philadelphia.",
+        "created_at": "2026-07-23T04:35:40.949071+00:00",
+        "updated_at": "2026-09-15T03:39:46.553209+00:00",
+        "limitations": [
+          "si.edu spans many separately curated units and content types, from formal museum object catalogs to blog posts and podcast transcripts, with uneven citation practices between them.",
+          "Narrative features like Sidedoor and 'collections snapshot' pages are written for a general audience and summarize history rather than reproducing primary documents.",
+          "The affiliate directory describes an institutional partnership with the Smithsonian, not the affiliate's own history, and should not be read as a primary source for the affiliate itself."
+        ],
+        "publisher_kind": "museum",
+        "profile_sources": [
+          "https://www.si.edu/about",
+          "https://www.si.edu/object/old-bethlehem-church-1879-1960:acm_1990.0033.0111",
+          "https://www.si.edu/sidedoor/many-inventions-beatrice-kenner"
+        ],
+        "profile_reviewed_at": "2026-09-15T03:39:47.704+00:00",
+        "profile_reviewed_by": "agent:source-library-profiles-2026-09-14",
+        "parent_organization_id": null,
+        "merged_into_organization_id": null
+      },
+      "accessOutcomes": [
+        {
+          "url": "https://www.si.edu/about",
+          "accessOutcome": "unavailable_or_no_text"
+        },
+        {
+          "url": "https://www.si.edu/object/old-bethlehem-church-1879-1960:acm_1990.0033.0111",
+          "accessOutcome": "unavailable_or_no_text"
+        },
+        {
+          "url": "https://www.si.edu/sidedoor/many-inventions-beatrice-kenner",
+          "accessOutcome": "unavailable_or_no_text"
+        }
+      ]
+    },
+    {
+      "organizationId": "org_web_dfc39141446525eec3ad13eeef27c4ed",
+      "name": "National Archives and Records Administration",
+      "status": "needs_recheck",
+      "reason": "Existing descriptive claims are not recertified by a collection page. Use document-relative evidence review; old profile dates are historical.",
+      "originalProfile": {
+        "id": "org_web_dfc39141446525eec3ad13eeef27c4ed",
+        "name": "National Archives and Records Administration",
+        "tier": "tier1",
+        "summary": "NARA is the U.S. federal agency and official record-keeper for the federal government, preserving roughly 1-3% of federal records judged to have permanent historical or legal value: military service records, presidential records, founding documents, and more. Its Catalog is the searchable digitized-holdings database; Prologue and the Rediscovering Black History blog are NARA staff-authored posts drawing on and pointing into that holdings record.",
+        "homepage": "https://www.archives.gov",
+        "relevance": "The overwhelming majority of what this host is cited for are place records, i.e., NRHP/heritage-site records ('significant for', 'listing', 'collapsed in', 'purpose' predicates), with smaller counts for law, person (often 'first_to' or biographical predicates), event, movement, organization, case, and invention.",
+        "created_at": "2026-07-23T04:35:40.949071+00:00",
+        "updated_at": "2026-09-15T03:37:05.99727+00:00",
+        "limitations": [
+          "NARA preserves and describes records; blog posts (Prologue, Rediscovering Black History) are staff-written secondary narration, not the archival record itself",
+          "Only a fraction of federal records are retained/digitized; absence from the catalog is not evidence of absence of the underlying record",
+          "Digitization coverage is uneven across collections and eras"
+        ],
+        "publisher_kind": "government_archive",
+        "profile_sources": ["https://www.archives.gov/about"],
+        "profile_reviewed_at": "2026-09-15T03:34:51.762+00:00",
+        "profile_reviewed_by": "agent:source-library-profiles-2026-09-14",
+        "parent_organization_id": null,
+        "merged_into_organization_id": null
+      },
+      "accessOutcomes": [
+        {
+          "url": "https://www.archives.gov/about",
+          "accessOutcome": "opened"
+        }
+      ]
+    },
+    {
+      "organizationId": "org_web_1cf761cfca71889b5c6088ff721a7772",
+      "name": "DC Preservation League: DC Historic Sites",
+      "status": "needs_recheck",
+      "reason": "Existing descriptive claims are not recertified by a collection page. Use document-relative evidence review; old profile dates are historical.",
+      "originalProfile": {
+        "id": "org_web_1cf761cfca71889b5c6088ff721a7772",
+        "name": "DC Preservation League: DC Historic Sites",
+        "tier": "tier2",
+        "summary": "The DC Preservation League is Washington D.C.'s citywide nonprofit historic-preservation advocacy organization. DC Historic Sites, the site cited here, is its digital platform built on the DC Inventory of Historic Sites (the District's official roster of properties recognized for cultural/architectural significance), developed with support from the DC Historic Preservation Office and the National Trust for Historic Preservation.",
+        "homepage": "https://historicsites.dcpreservation.org",
+        "relevance": "Used as BlackStory's primary source for DC-area historic-place entries, almost entirely under the predicate documented_site, plus a handful of person, case, school, and event records.",
+        "created_at": "2026-07-23T04:35:40.949071+00:00",
+        "updated_at": "2026-09-15T03:37:05.99727+00:00",
+        "limitations": [
+          "Content is explicitly described by the publisher as 'a work in progress'",
+          "The site invites public photo submissions, so some supplementary content is community-contributed rather than solely staff-authored",
+          "Coverage is limited to the District of Columbia"
+        ],
+        "publisher_kind": "nonprofit_heritage",
+        "profile_sources": ["https://historicsites.dcpreservation.org/about"],
+        "profile_reviewed_at": "2026-09-15T03:34:53.767+00:00",
+        "profile_reviewed_by": "agent:source-library-profiles-2026-09-14",
+        "parent_organization_id": null,
+        "merged_into_organization_id": null
+      },
+      "accessOutcomes": [
+        {
+          "url": "https://historicsites.dcpreservation.org/about",
+          "accessOutcome": "unavailable_or_no_text"
+        }
+      ]
+    },
+    {
+      "organizationId": "org_web_4de65ab87727fc5a54af84e996060034",
+      "name": "Tougaloo College: History and Social Justice / Sundown Towns Project",
+      "status": "needs_recheck",
+      "reason": "Existing descriptive claims are not recertified by a collection page. Use document-relative evidence review; old profile dates are historical.",
+      "originalProfile": {
+        "id": "org_web_4de65ab87727fc5a54af84e996060034",
+        "name": "Tougaloo College: History and Social Justice / Sundown Towns Project",
+        "tier": "tier2",
+        "summary": "This site is copyrighted by sociologist James W. Loewen (and his heirs) and maintained by Phil Huckelberry and Stephen Berrey; it is hosted by Tougaloo College, a historically Black college in Mississippi. It documents the sundown-towns research project (communities that historically excluded Black residents) alongside broader U.S. history and social-justice material, built by researchers and volunteer contributors over many years.",
+        "homepage": "https://justice.tougaloo.edu",
+        "relevance": "Used specifically as BlackStory's source for individual sundown-town place entries, entirely under the predicate 'source states'.",
+        "created_at": "2026-09-15T03:29:38.41687+00:00",
+        "updated_at": "2026-09-15T03:37:05.99727+00:00",
+        "limitations": [
+          "An independent researcher's project (Loewen et al.), hosted by but not authored as an official Tougaloo College institutional publication",
+          "Underlying sundown-town database compilation methodology (which sources qualify a town for listing) was not detailed on the about page reviewed",
+          "Contributors are described as largely unpaid volunteers"
+        ],
+        "publisher_kind": "academic_library_archive",
+        "profile_sources": ["https://justice.tougaloo.edu/about/"],
+        "profile_reviewed_at": "2026-09-15T03:35:03.322+00:00",
+        "profile_reviewed_by": "agent:source-library-profiles-2026-09-14",
+        "parent_organization_id": null,
+        "merged_into_organization_id": null
+      },
+      "accessOutcomes": [
+        {
+          "url": "https://justice.tougaloo.edu/about/",
+          "accessOutcome": "opened"
+        }
+      ]
+    }
+  ]
+}

@@ -146,3 +146,21 @@ For each entity report:
 - Completeness (images, related, context): [`blackstory-entity-complete`](../blackstory-entity-complete/SKILL.md)
 - Corroboration of claims: [`blackstory-claim-corroborate`](../blackstory-claim-corroborate/SKILL.md)
 - Gold-corpus geographic-ambiguity cases: [`docs/research/gold-corpus.md`](../../../docs/research/gold-corpus.md)
+
+## Working contract
+
+**Input:** A candidate identity, aliases, historical period and place evidence.
+
+**Output:** An identity disposition, period-honest location/precision and explicit unresolved alternatives.
+
+**Boundary and handoff:** Hand a sourced address to locate; ambiguity returns to the case. Keep institution, building, namesake and successor separate.
+
+Before acquisition, use the [shared collection-library method](../../../docs/research/research-operations.md#source-library)
+for the evidence need, pin returned policy versions and explain why the collection should
+contain the needed evidence. Search authorized captures, citation trails and outside sources;
+the library is a starting point. Record access failures and unknown coverage. Its reviewed
+status describes guidance, not the truth of a historical assertion.
+
+**Capabilities:** Follow [capability and permission limits](../../../docs/research/README.md#capabilities-and-permissions).
+Use the active harness’s available tools and report unsupported steps. Operational flags stay
+in the linked operations contract; no proprietary client or model family is required.

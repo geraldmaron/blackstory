@@ -1,3 +1,4 @@
+import { isDiscoveryStatementUrl } from '@repo/domain-core/claims/source-fitness';
 /** Durable work orchestration. Research and release engines remain responsible for execution. */
 import { createHash, randomUUID } from 'node:crypto';
 import type { Pool, PoolClient } from 'pg';
@@ -78,6 +79,8 @@ export function validateWorkProposal(value: unknown): WorkProposal {
       change.reviewerActorId === change.producerActorId
     )
       throw new WorkConflict('Self-review cannot be labeled independent');
+    if (change.reviewBasis === 'independent_review' && !change.independenceBasis?.trim())
+      throw new WorkConflict('Independent review requires a documented basis beyond model family');
     if (change.operation === 'update' && !/^[a-f0-9]{64}$/u.test(String(change.beforeHash)))
       throw new WorkConflict('Updates require a valid record digest');
     for (const source of change.record.sources) {
@@ -96,6 +99,13 @@ export function validateWorkProposal(value: unknown): WorkProposal {
     for (const assertion of change.assertions) {
       if (['supported', 'qualified'].includes(assertion.finding) && !assertion.evidence.length)
         throw new WorkConflict('Supported assertions require evidence');
+      if (
+        ['supported', 'qualified'].includes(assertion.finding) &&
+        assertion.evidence.every((evidence) => isDiscoveryStatementUrl(evidence.sourceUrl))
+      )
+        throw new WorkConflict(
+          'New historical assertions require inspected underlying evidence; encyclopedia and Wikidata statements are discovery only',
+        );
     }
     const revisionIds = change.claimRevisions?.map((r) => r.claimId) ?? [];
     if (new Set(revisionIds).size !== revisionIds.length)

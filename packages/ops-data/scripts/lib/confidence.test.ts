@@ -191,7 +191,7 @@ test('a plausible calibration label without held-out evidence remains inert', ()
     {
       ...reviewed,
       assessment: {
-        ...reviewed.assessment,
+        ...reviewed.assessment!,
         calibrationVersion: 'production-held-out-claims-2026-09-v4',
       },
     },
@@ -258,7 +258,7 @@ test('ambiguous or malformed assessments remain held', () => {
   ]) {
     assert.equal(
       assessPublicationClaims(entry, [
-        { ...reviewed, assessment: { ...reviewed.assessment, ...change } },
+        { ...reviewed, assessment: { ...reviewed.assessment!, ...change } },
       ]).ok,
       false,
     );

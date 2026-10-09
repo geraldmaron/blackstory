@@ -1,3 +1,4 @@
+import { querySourceLibrary } from '@repo/ops-data/source-library';
 /** Shared bounded plan and proposal readback for session and hosted executors. */
 import { createHash } from 'node:crypto';
 import {
@@ -21,7 +22,7 @@ export function managedResearchPlan(
   const profile = {
     ...blackHistoryProfile,
     id: `blackstory-managed-research-${createHash('sha256').update(modelId).digest('hex').slice(0, 16)}`,
-    version: '1.0.0',
+    version: blackHistoryProfile.version,
     modelPolicies: [
       {
         mode: 'trusted-session' as const,
@@ -117,8 +118,15 @@ export function managedResearchPlan(
       input: {
         executor: 'management',
         action: spec.action,
+        ...(index === 0 ? { requiresCollectionPlan: true } : {}),
         request: work.request.request,
-        catalog,
+        catalog:
+          index === 0
+            ? catalog
+            : {
+                recordsFromTaskId: `${runId}-0`,
+                guidanceFromTaskId: `${runId}-0`,
+              },
         modelId,
       },
       outputContract: spec.contract,
@@ -144,9 +152,19 @@ export async function prepareManagedResearch(
     const existing = await dbPlan.query('SELECT execution_plan FROM research.runs WHERE id=$1', [
       `managed-${work.id}-v${work.version + 1}`,
     ]);
-    const library = await dbPlan.query(
-      `SELECT id,display_name,research_guidance FROM evidence.evidence_sources WHERE research_guidance<>'{}'::jsonb ORDER BY id LIMIT 100`,
-    );
+    const library = existing.rows[0]
+      ? null
+      : await querySourceLibrary(dbPlan, { question: work.request.request, limit: 30 });
+    const evidenceNeedLibraries = [];
+    if (!existing.rows[0])
+      for (const assertionClass of ['record_fact', 'chronology', 'place', 'historical_synthesis']) {
+        evidenceNeedLibraries.push({
+          assertionClass,
+          expectedUse:
+            'Starting recommendations; the planning task must narrow the assertion and explain why a collection should contain it.',
+          recommendations: await querySourceLibrary(dbPlan, { assertionClass, limit: 20 }),
+        });
+      }
     const feedback = await dbPlan.query(
       `SELECT action,entity_ids,reason,version FROM research.management_work_decisions
       WHERE work_id=$1 ORDER BY created_at,id`,
@@ -156,7 +174,8 @@ export async function prepareManagedResearch(
       plan = managedResearchPlan(work, modelId, {
         records: catalog,
         feedback: feedback.rows,
-        sourceLibrary: library.rows,
+        sourceLibrary: library,
+        evidenceNeedLibraries,
       });
   } finally {
     dbPlan.release();

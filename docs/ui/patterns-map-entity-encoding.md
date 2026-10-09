@@ -161,3 +161,28 @@ and [Leaflet overlap handling](https://leaflet.github.io/Leaflet.markercluster/)
 These establish clustering and overlap disclosure patterns. Turning grouping off after Near me
 is BlackStory's explicit product choice, not a universal platform requirement. A named list
 fits this archive's geographic precision constraints better than displacing markers.
+
+### Validation of the control change
+
+Checked locally on 2026-10-08 with the published catalog: Chrome at desktop width and
+390 × 844, both themes. Grouping on/off changed the map and URL. Tapping an overlapping area
+opened 24 individually selectable records on desktop and 53 at the compact viewport's current
+scale. These are screen hit groups, not claims that every record occupies one exact address.
+The clearable chooser retains place/date labels and leaves stored coordinates unchanged.
+
+`fnm exec --using=22 -- ./scripts/ci-local.sh --base bcfc457f --skip mobile` passed all selected
+lanes. PR 287 hosted checks passed. Native release and actual device geolocation were not run.
+The existing E2E harness has no external base URL here; manual browser observations supply the
+surface evidence rather than treating that harness's successful invocation as a browser test.
+
+Adversarial disposition: **accepted with controls**. Ungrouping alone leaves hidden pins;
+the named chooser addresses that failure. A spiderfier is a reasonable alternative for precise
+POIs but risks implying distinct historic coordinates here. The chooser uses existing UI and
+no new dependency. External route resolution and verified provider Place IDs remain separate
+from grouping and are not claimed by these checks.
+
+Production verification: PR 287 deployed as `15b9fb9e`. On the actual live `/explore` page,
+turning grouping off wrote `group=0`; tapping an overlapping area opened 24 records. Selecting
+Macedonia Church opened its detail sheet. Its Apple directions `daddr` and Google directions
+`destination` both contained **Macedonia Church, Burlington, Ohio**, without the combined
+coordinate suffix. The public catalog count remained 4,198 displayed records of 4,202 map features.

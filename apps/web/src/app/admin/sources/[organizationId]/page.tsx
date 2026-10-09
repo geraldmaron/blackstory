@@ -147,7 +147,7 @@ export default async function SourceLibraryDetailPage({
             </ul>
           )}
         </DetailField>
-        <DetailField label="Profile reviewed" emptyLabel="No profile yet.">
+        <DetailField label="Historical profile review" emptyLabel="No profile yet.">
           {entry.profileReviewedAt
             ? `${formatWhen(entry.profileReviewedAt)}${
                 entry.profileReviewedBy ? ` by ${entry.profileReviewedBy}` : ''
@@ -183,6 +183,11 @@ export default async function SourceLibraryDetailPage({
       </DetailPanel>
 
       <h2 className="ds-section__title">Fitness by policy</h2>
+      <p className="story-review__notice">
+        Current profile status: {entry.profileReviewStatus?.replaceAll('_', ' ') ?? 'unreviewed'}.
+        Historical publisher ratings are retained for audit. They do not establish document fitness
+        or authorize a historical assertion. Use collection guidance and inspect the exact evidence.
+      </p>
       {fitness.length === 0 ? (
         <p className="ds-sans">No fitness policies recorded for this publisher.</p>
       ) : (

@@ -68,3 +68,15 @@ is not proof of real-device assistive-technology or performance behavior.
 Deliver prioritized findings, smallest supported fix, checks actually run and residual
 risks. A screenshot confirms one state; it does not prove the flow, screen-reader support,
 all screen sizes or cross-platform parity. Do not claim those without observing them.
+
+## Working contract
+
+**Input:** A reader task, destination surface and realistic record data.
+
+**Output:** Observed task results across applicable themes and widths, plus actionable failures and untested capabilities.
+
+**Boundary and handoff:** Hand factual errors to claim review and projection disagreements to surface triage. A screenshot or helper test does not prove the complete task.
+
+**Capabilities:** Follow [capability and permission limits](../../../docs/research/README.md#capabilities-and-permissions).
+Use the active harness’s available tools and report unsupported steps. Operational flags stay
+in the linked operations contract; no proprietary client or model family is required.

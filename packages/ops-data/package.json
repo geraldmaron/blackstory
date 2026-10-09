@@ -43,6 +43,11 @@
       "development": "./src/management/delegations.ts",
       "types": "./dist/management/delegations.d.ts",
       "import": "./dist/management/delegations.js"
+    },
+    "./source-library": {
+      "development": "./src/source-library.ts",
+      "types": "./dist/source-library.d.ts",
+      "import": "./dist/source-library.js"
     }
   },
   "files": [

@@ -137,3 +137,15 @@ For requests spanning research through publication, follow the
 [shared management workflow](../../../docs/research/research-operations.md#account-owned-management-work).
 Infer scope, carry existing authorization forward, and present one concise review. Use the
 remote service only when deployed and verified; its current limits are part of that contract.
+
+## Working contract
+
+**Input:** The saved exact proposal, applicable evidence decisions and existing authorization.
+
+**Output:** A reviewable preview or blockers, followed by verified public receipts only when authorized execution actually succeeds.
+
+**Boundary and handoff:** Owner approval, independent factual review and publication credentials are separate. Reuse existing authorization for its exact scope; do not invent a second approval ceremony.
+
+**Capabilities:** Follow [capability and permission limits](../../../docs/research/README.md#capabilities-and-permissions).
+Use the active harness’s available tools and report unsupported steps. Operational flags stay
+in the linked operations contract; no proprietary client or model family is required.

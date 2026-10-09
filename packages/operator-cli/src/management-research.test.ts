@@ -1,8 +1,9 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { validateExecutionPlan } from '@repo/research-kernel';
+import { blackHistoryProfile, validateExecutionPlan } from '@repo/research-kernel';
 import type { WorkItem } from '@repo/ops-data/management/contracts';
 import { managedResearchPlan, retainedManagementSource } from './management-research.js';
+import { resolveResearchTaskCatalog } from './research-execution.js';
 
 test('managed research reserves every bounded retry within the standard budget', () => {
   const work: WorkItem = {
@@ -31,7 +32,30 @@ test('managed research reserves every bounded retry within the standard budget',
   assert.throws(() => validateExecutionPlan(overBudget), /budget/i);
   assert.equal(plan.tasks[0]!.input.request, work.request.request);
   assert.deepEqual(plan.profile.modelPolicies[0]!.authority, ['proposal']);
+  assert.equal(plan.profile.version, blackHistoryProfile.version);
   assert.notEqual(plan.profile.id, managedResearchPlan(work, 'session-reported', []).profile.id);
+  const records = Array.from({ length: 50 }, (_, index) => ({
+    id: `school-${index}`,
+    beforeHash: 'a'.repeat(64),
+    snapshot: { metadata: 'x'.repeat(7000) },
+  }));
+  const populated = managedResearchPlan(work, 'session-reported', { records });
+  assert.doesNotThrow(() => validateExecutionPlan(populated));
+  for (const task of populated.tasks.slice(1)) {
+    assert.equal(JSON.stringify(task.input).includes('metadata'), false);
+    assert.deepEqual(
+      (resolveResearchTaskCatalog(populated, task).input.catalog as { records: unknown }).records,
+      records,
+    );
+  }
+  assert.throws(
+    () =>
+      resolveResearchTaskCatalog(populated, {
+        ...populated.tasks[1]!,
+        input: { executor: 'management', catalog: { recordsFromTaskId: 'another-run' } },
+      }),
+    /task dependency/,
+  );
 });
 
 test('new-source retention is exact, private, bounded and fails closed', () => {

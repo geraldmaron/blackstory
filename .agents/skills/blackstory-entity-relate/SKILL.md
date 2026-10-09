@@ -63,3 +63,21 @@ expanding through it; log dead ends.
 **Never:** infer relationships from proximity alone; chain unverified hops; let an
 LLM's plausibility judgment stand in for a record; write a causal edge without a
 gated claim; merge same-name entities without disambiguating evidence.
+
+## Working contract
+
+**Input:** Identified endpoints, the exact relation and its time/place qualifiers.
+
+**Output:** Proposed edges with their own passages and every intermediate node retained.
+
+**Boundary and handoff:** Hand new identities to entity verification. Endpoint citations and proximity cannot establish a relationship.
+
+Before acquisition, use the [shared collection-library method](../../../docs/research/research-operations.md#source-library)
+for the evidence need, pin returned policy versions and explain why the collection should
+contain the needed evidence. Search authorized captures, citation trails and outside sources;
+the library is a starting point. Record access failures and unknown coverage. Its reviewed
+status describes guidance, not the truth of a historical assertion.
+
+**Capabilities:** Follow [capability and permission limits](../../../docs/research/README.md#capabilities-and-permissions).
+Use the active harness’s available tools and report unsupported steps. Operational flags stay
+in the linked operations contract; no proprietary client or model family is required.

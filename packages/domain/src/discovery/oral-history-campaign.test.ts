@@ -37,7 +37,7 @@ const INLINE_SOURCES: readonly OralHistorySource[] = [
     displayName: 'Test Civil Rights Oral History Collection',
     institution: 'Test Folklife Center',
     homepageUrl: 'https://example.org/crhp/',
-    sourceClass: 'first-person-or-oral-history',
+    sourceClass: 'oral_history',
     classification: 'community_oral',
     collections: [
       {

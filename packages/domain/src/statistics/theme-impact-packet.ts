@@ -4,7 +4,6 @@
  * provenance, method stance, and gap labels. Juxtaposition is the default;
  * gated causal language requires claim ids. Does not ingest or publish data.
  */
-import { isAnchorTierUrl } from '../provenance/source-tiers.js';
 import type { ThemeImpactThemeId } from './theme-impact-questions.js';
 import type { StatisticalGeographyType } from './types.js';
 
@@ -90,10 +89,13 @@ export type ThemeImpactPacketGeography = {
 };
 
 /**
- * One independent corroborating source for a load-bearing observation (criterion 3). Mirrors ArticleAnchorDoc in @repo/schemas — tier is
- * derived at validate time via isAnchorTierUrl, never stored here.
+ * One supporting document reference. Publication resolves the exact claim revision,
+ * selector and assessed work lineage from the database; a URL alone is discovery.
  */
 export type ThemeImpactAnchor = {
+  readonly claimId?: string;
+  readonly claimVersionId?: string;
+  readonly selectorId?: string;
   readonly url: string;
   readonly label: string;
 };
@@ -109,34 +111,6 @@ export type ThemeImpactPacketObservation = {
   readonly anchors?: readonly ThemeImpactAnchor[];
   readonly replicationVerified?: boolean;
 };
-
-/**
- * Two-anchor corroboration rule (criterion 3), packet-observation form.
- * An observation that declares `anchors` is asserting itself as load-bearing; this then
- * requires two independent-host T1/T2 anchors, or one T1/T2 anchor plus
- * `replicationVerified: true`. An observation with no `anchors` field is not considered
- * load-bearing and is not gated — same opt-in, non-retroactive design as the article-level
- * rule in ops-data/scripts/articles.ts's gateLoadBearingAnchors.
- */
-export function satisfiesTwoAnchorRule(observation: ThemeImpactPacketObservation): boolean {
-  const anchors = observation.anchors;
-  if (anchors === undefined) return true;
-  const anchorTiers = anchors.map((anchor) => isAnchorTierUrl(anchor.url));
-  const independentHosts = new Set(
-    anchors.map((anchor) => {
-      try {
-        return new URL(anchor.url).hostname.toLowerCase();
-      } catch {
-        return anchor.url;
-      }
-    }),
-  );
-  const anchorTierCount = anchorTiers.filter(Boolean).length;
-  const satisfiesTwoAnchors = anchorTierCount >= 2 && independentHosts.size >= 2;
-  const satisfiesReplicationException =
-    anchorTierCount >= 1 && observation.replicationVerified === true;
-  return satisfiesTwoAnchors || satisfiesReplicationException;
-}
 
 export type ThemeImpactPacketDerived = {
   readonly derivedId: string;
@@ -451,12 +425,6 @@ export function assertThemeImpactPacketPublishable(packet: ThemeImpactPacket): v
 
   packet.observations.forEach((row, index) => {
     provenanceComplete(row.provenance, `observations[${index}].provenance`);
-    if (!satisfiesTwoAnchorRule(row)) {
-      throw new Error(
-        `observations[${index}] (${row.observationId}) declares anchors but has neither two ` +
-          'independent T1/T2 anchors nor one T1/T2 anchor + replicationVerified',
-      );
-    }
   });
   packet.derived.forEach((row, index) => {
     provenanceComplete(row.provenance, `derived[${index}].provenance`);

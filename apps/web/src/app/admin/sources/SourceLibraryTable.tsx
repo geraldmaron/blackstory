@@ -21,6 +21,8 @@ function formatWhen(iso: string): string {
 }
 
 function profileStatus(row: SourceLibraryListItem): string {
+  if (row.profileReviewStatus === 'needs_recheck') return 'Needs recheck';
+  if (row.profileReviewStatus === 'unreviewed') return 'Unreviewed';
   return row.profileReviewedAt ? `Reviewed ${formatWhen(row.profileReviewedAt)}` : 'No profile';
 }
 
@@ -56,7 +58,7 @@ export function SourceLibraryTable({
               </a>
             </th>
             <th scope="col">Kind</th>
-            <th scope="col">Tier</th>
+            <th scope="col">Legacy discovery tier</th>
             <th scope="col">
               <a href={sortHrefs.entities} aria-current={sort === 'entities' ? 'true' : undefined}>
                 Published entities
