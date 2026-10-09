@@ -1,8 +1,8 @@
 # Source library implementation and verification
 
 The shared library and acceptance controls are implemented. The four production migrations
-succeeded. Application deployment and production surface checks are recorded in the release
-addendum below when observed. This record is shared-context self-review, not independent
+succeeded. Application deployment and production surface checks passed and are recorded in the
+release addendum below. This record is shared-context self-review, not independent
 historian review or a measured claim of research accuracy.
 
 ## Scope and reuse
@@ -180,11 +180,18 @@ Observed: retained 52 profiles, 11 copied guidance rows and 3 established item b
 the final rerun passed all three integration tests with none failed or skipped. The prior
 four-test replay also passed. Diagnostic logs are local artifacts.
 
-Check: full historical empty-provider installation
-Command: not run from an empty provider cluster
-Result: not run
-Observed: the rehearsal proves a populated upgrade, not every historical provider bootstrap.
-This installation acceptance remains separate from the deployed upgrade.
+Check: full historical application installation
+Command: `python3 /private/tmp/blackstory-library-full-replay.py`, then
+`RESEARCH_REHEARSAL_DB=blackstory_library_full_20261009e python3 /private/tmp/blackstory-source-integration.py`
+Result: pass
+Observed: all 88 application migrations passed in a new database that began with zero
+BlackStory responsibility schemas. Only Supabase Auth, Storage and provider migration-ledger
+schemas were copied without data; public began empty and required provider extensions were
+installed. Ten sealed collections were readable by the research role, and all three integration
+tests passed with zero failures or skips. Existing provider-cluster roles were reused. This is
+an empty application installation on the isolated provider runtime, not a fresh cloud project or
+cluster-role provisioning test. Initial runner attempts exposed default-public, application-view
+and provider-ledger/extension setup assumptions; historical migration SQL was not changed.
 
 Check: skill discovery and links
 Command: `python3 /Users/geralddagher/.codex/skills/.system/skill-creator/scripts/quick_validate.py`
@@ -218,7 +225,73 @@ policy. The populated integration rerun passed three tests with zero failures or
 the managed-profile version fix. These checks establish the tested behavior; they do not
 establish historical accuracy or external-client compatibility.
 
-Deployment, production HTTP/MCP and rendered surface observations are appended after
-execution. Native release, external-client OAuth acceptance, school publication, independent
-expert review, comprehensive profile recertification and held-out library comparison remain
-explicitly unproven outcomes.
+The implementation was merged through [PR 288](https://github.com/geraldmaron/blackstory/pull/288)
+to staging and [PR 289](https://github.com/geraldmaron/blackstory/pull/289) to main. Applicable
+GitHub checks passed, including the automated security review. Bugbot returned neutral after
+its usage limit was reached; it did not review this change. Skipped security/mobile jobs are
+not represented as executed checks.
+
+Both production deployments reached `READY` for commit
+`fec4840fa495cefbc9b186e14affdd8e2585df1f`:
+
+- Web: `dpl_HJSY2tvgfZ9EY5HiaPoqr3rTdX8e`, with `blackstory.app` and
+  `www.blackstory.app` assigned.
+- Public data service: `dpl_68FWqRPLLzUayaYqXc2T6bhku1kZ`.
+
+Check: authenticated production HTTP and MCP protocol, 9 October 2026 UTC
+Command: `fnm exec --using=22 -- node --conditions development --import tsx /private/tmp/blackstory-library-live-check.mts`
+Result: pass
+Observed: existing production sign-in returned 200 with the admin role; anonymous library and
+remote-MCP calls returned 401. Duplicate, negative, unbounded and unknown query parameters
+returned 400. Authenticated results passed the shared contract and carried `private, no-store`.
+The library contained ten collections; adjacent three-item pages were distinct. A Missouri
+school-chronology query returned the Missouri and National Register policies at version 1;
+the legal query returned GovInfo, and an unmatched subject returned zero collections.
+The actual MCP `source_library` protocol handler using the real authenticated production HTTP
+client returned the same policies. This tests protocol-to-service integration, not an external
+OAuth client. An ordinary staff JWT was correctly denied at `/api/mcp` with 401. Both saved
+works returned 200. Only the temporary test session was logged out, with 204. Credentials were
+read from the existing secret manager into process memory and were not printed or persisted.
+Sanitized diagnostic log: `/private/tmp/blackstory-library-live-check.log`.
+
+Check: populated production admin surface in Chrome, 9 October 2026 UTC
+Result: pass within the exercised scope
+Observed: the real form for school buildings, chronology and Missouri returned the two matching
+collections. Opening a disclosure exposed coverage, search methods, source provenance, access
+and preservation conditions. An unmatched question showed zero results and explicitly invited
+external discovery. Both themes rendered at the normal desktop viewport and at 390 × 844;
+phone-width controls wrapped, content remained readable, and the document width was 390 pixels.
+Keyboard navigation reached the evidence selector and submit control with `:focus-visible`
+and a three-pixel outline. Phone and desktop screenshots were saved as local diagnostic
+artifacts. This is responsive Chrome evidence, not a real-device or native-release check.
+
+The admin count of 782 publishers is the surviving organization count: merged rows are excluded
+by `evidence.source_library`. The inventory of 811 includes those historical merged rows.
+The 12,181 citation rows are one row per claim in the active release, which explains the
+displayed published-claim count. Production accounting still reconciled to 12,181 mapped and
+zero unmapped rows; entity/claim-version counts and the public release manifest were unchanged.
+
+The school proposal rendered as ready for review with three existing-record updates. Lincoln
+remained unselected with its pin blocker, and the founding/opening uncertainties remained held.
+The legal proposal rendered its inspected approval-date finding and explicit statute-writer
+limitation; publication remained disabled. No approval or publication control was activated.
+
+Native release, external-client OAuth acceptance, school publication, independent expert review,
+comprehensive profile recertification and held-out library comparison remain unproven outcomes.
+The latter two remain tracked separately as `repo-dw3c7.9` and `repo-dw3c7.8`. The deployed core
+is accepted with controls; effectiveness and complete collection coverage still need validation.
+
+## Commit record
+
+- Diff read: full staged implementation and verification diffs inspected before their commits,
+  including the final record's installation and production observations.
+- Scope single: source-library implementation, obsolete-comment removal and verification record
+  are separate commits; the final commit changes verification documentation and its issue status.
+- No secrets: staged redacted secret scans passed; production test credentials stayed in memory.
+- Branch correct: implementation and record use `codex/source-library-research`, with the
+  implementation reaching main through staging release PRs.
+- Message shaped: imperative summaries and explanatory bodies; no attribution trailers.
+- Pull request shaped: implementation/release PRs state changes, verification, exclusions,
+  risk/rollback and tested limits. The final verification record follows the same review flow.
+- Push authorized: the approved plan explicitly requires committing and pushing the implementation
+  and verification record.
