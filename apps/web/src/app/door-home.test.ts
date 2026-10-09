@@ -115,10 +115,10 @@ test('the Door has one map: no static board, no layout zoom, no pin plate', () =
 
 test('the plate is framed against the Door window and re-framed on resize', () => {
   assert.match(immersive, /ds-door__window/);
-  assert.match(immersive, /doorFramePadding\(windowBox, plateBox, chromeBox, bottomChrome\)/);
+  assert.match(immersive, /doorFramePadding\(windowBox, plateBox, chromeBox\)/);
   assert.match(immersive, /doorFrameOffset\(windowBox, plateBox\)/);
-  assert.match(immersive, /openSheetRef/);
-  assert.match(immersive, /bottomChrome: onOpen \? boxOf\(openSheetRef\.current\) : null/);
+  // The introduction overlays the map, rather than shrinking it into a strip above the copy.
+  assert.doesNotMatch(immersive, /bottomChrome|openSheetRef/);
   // The canvas box comes from MapLibre's own container through the stage handle, never from a
   // class-name query into another component's DOM.
   assert.match(immersive, /boxOf\(map\.getContainer\(\)\)/);
@@ -296,7 +296,6 @@ test('the opening masthead densifies with invite, kind ledger, and morphing head
   assert.match(immersive, /ds-door-open__ledger/);
   assert.match(immersive, /ds-door-open__ledger-row/);
   assert.match(immersive, /openLedger/);
-  assert.match(immersive, /ref=\{openSheetRef\}/);
   assert.match(door, /openLedger=\{openLedger\}/);
   assert.match(door, /KIND_FAMILY_ENTRIES/);
   assert.match(door, /buildOpenLedger/);

@@ -43,12 +43,22 @@ test('without chrome the country only keeps its margin from the bar', () => {
   assert.deepEqual(doorFramePadding(DESKTOP_WINDOW, DESKTOP_PLATE, HIDDEN_CHROME), padding);
 });
 
-test('a bottom masthead lifts the country into the visible band above it', () => {
-  const masthead = { top: 420, left: 0, width: 560, height: 280 };
-  const padding = doorFramePadding(DESKTOP_WINDOW, DESKTOP_PLATE, DESKTOP_CHROME, masthead);
-  assert.ok(padding);
-  // Window bottom is 84+636=720; masthead starts at 420 → 300px of sheet inside the window.
-  assert.equal(padding.bottom, 300 + 32);
+test('wide and laptop desktop openings use the full centered window behind the introduction', () => {
+  for (const [width, height] of [
+    [1728, 906],
+    [1280, 720],
+    [900, 700],
+  ] as const) {
+    const plate = { top: 0, left: 0, width, height };
+    const window = { top: 84, left: 0, width, height: height - 84 };
+    const chrome = { top: 100, left: 20, width: width - 40, height: 44 };
+    const padding = doorFramePadding(window, plate, chrome);
+    assert.ok(padding);
+    assert.equal(padding.left, padding.right, 'the national view stays horizontally centered');
+    assert.equal(padding.bottom, doorFrameMargin(window), 'copy does not reserve a bottom band');
+    assert.equal(padding.top, 144 + doorFrameMargin(window));
+    assert.ok(height - padding.top - padding.bottom > height / 2);
+  }
 });
 
 test('the phone strip fits the whole country inside the strip', () => {

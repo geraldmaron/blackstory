@@ -44,12 +44,30 @@ Theme-impact map strips are metadata panels, not MapLibre mounts.
 
 External maps links remain when geo resolves.
 
+## Landing national frame
+
+The Door's opening fits continental U.S. bounds into its measured map window, below the
+command bar and field controls. On desktop the country fills that window and stays centered
+across the canvas. The introduction intentionally overlays its lower-left portion; it must
+not shrink the map into the strip above the copy or force the country into a side column.
+Browse removes the introduction and reveals the covered geography on the same canvas.
+
+On phones, the measured window is the top band above the scrolling chapters. Fit the full
+country into that band; do not apply the desktop composition to a narrow screen. The slight
+sheet overlap is intentional. Introductory copy length must not change the national camera.
+
+Retain both coasts and a small margin; do not substitute a fixed zoom. Refit when the measured
+window changes. First arrival and resize are cuts, and returning from a record keeps
+the existing pin continuity. Browse continues on the same map canvas.
+
 ## Regression tests
 
 - `hero-map-inset.test.ts` — geometry math, no live `clip-path` on apply
 - `map-libre-lifecycle.test.ts` — shared hooks wired in MapStage / EntityLocationMap / HeroStage
 - `hero-stage.test.ts` — inset + `resize()` + `orientationchange`; **map-under-copy scroll ownership** (copy `pointer-events: auto` / map readout `none`; explore stage pass-through + panel `touch-action: pan-y`)
 - `entity-page.test.ts` — `role="status"` fallback copy
+- `door-field-frame.test.ts` — centered desktop national framing, the phone strip and
+  responsive geometry
 
 ## Related docs
 
