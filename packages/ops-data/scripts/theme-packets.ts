@@ -1,3 +1,4 @@
+import { assertReviewedPublicationAnchors } from './lib/reviewed-anchors.js';
 /**
  * Theme-impact packet lifecycle CLI.
  *
@@ -26,7 +27,6 @@ import {
   deriveDefaultMultiDecadeChecklist,
   lookupSourceTier,
   parseThemeImpactPacketRow,
-  satisfiesTwoAnchorRule,
   type SafeHttpClient,
   type SourceTier,
   type ThemeImpactPacket,
@@ -186,7 +186,6 @@ function gateSourceTiers(packets: readonly ThemeImpactPacket[]): {
 } {
   const tally: Record<SourceTier, number> = { T1: 0, T2: 0, T3: 0, T4: 0 };
   const warnings: string[] = [];
-  const errors: string[] = [];
   for (const packet of packets) {
     for (const observation of packet.observations) {
       const url = observation.provenance.sourceUrl;
@@ -198,32 +197,29 @@ function gateSourceTiers(packets: readonly ThemeImpactPacket[]): {
       }
       tally[tier] += 1;
       if (tier === 'T4') {
-        const message = `${packet.id} / ${observation.observationId}: untrusted (T4) sourceUrl ${JSON.stringify(url)}`;
-        if (packet.status === 'published') errors.push(message);
-        else warnings.push(message);
+        const message = `${packet.id} / ${observation.observationId}: unclassified discovery host ${JSON.stringify(url)}`;
+        warnings.push(message);
       }
     }
-  }
-  if (errors.length > 0) {
-    throw new Error(`source-tier gate failed (published packets):\n  ${errors.join('\n  ')}`);
   }
   return { tally, warnings };
 }
 
 /**
- * Warn on draft/review packets missing two-anchor corroboration. Publication enforces the same
- * satisfiesTwoAnchorRule check through assertThemeImpactPacketPublishable.
+ * Warn on draft/review packets missing reviewed evidence references. Publication loads accepted assignments and assessed work lineage from the database.
  */
 function gatePacketAnchorWarnings(packets: readonly ThemeImpactPacket[]): { warnings: string[] } {
   const warnings: string[] = [];
   for (const packet of packets) {
     if (packet.status === 'published') continue;
     packet.observations.forEach((row, index) => {
-      if (row.anchors === undefined) return;
-      if (!satisfiesTwoAnchorRule(row)) {
+      if (
+        !row.anchors?.length ||
+        row.anchors.some((a) => !a.claimId || !a.claimVersionId || !a.selectorId)
+      ) {
         warnings.push(
           `${packet.id} / observations[${index}] (${row.observationId}): declares anchors but ` +
-            'has neither two independent T1/T2 anchors nor one T1/T2 anchor + replicationVerified',
+            'requires database-reviewed exact assertions and assessed work lineage',
         );
       }
     });
@@ -239,6 +235,11 @@ async function verifyObservationsAgainstCanonical(
   client: pg.PoolClient,
   packets: readonly ThemeImpactPacket[],
 ): Promise<number> {
+  for (const packet of packets) {
+    if (packet.status === 'published')
+      for (const observation of packet.observations)
+        await assertReviewedPublicationAnchors(client, observation, observation.anchors);
+  }
   const allObservations = new Map(
     packets.flatMap((packet) =>
       packet.observations.map((row) => [row.observationId, row] as const),
@@ -350,7 +351,7 @@ async function withDb<T>(run: (ctx: DbContext) => Promise<T>): Promise<T> {
   });
   const client = await pool.connect();
   try {
-    await client.query('BEGIN');
+    await client.query('BEGIN ISOLATION LEVEL SERIALIZABLE');
     await client.query(`SET LOCAL statement_timeout = '60s'`);
     const value = await run({ pool, client, dryRun });
     await client.query(dryRun ? 'ROLLBACK' : 'COMMIT');
@@ -424,7 +425,7 @@ async function commandValidate(paths: readonly string[]): Promise<void> {
   for (const packet of packets) validatePacketShape(packet);
   // Offline gate: hash-format discipline runs on every validate, DB or not.
   lintObservationHashes(packets);
-  // Offline gate: source-quality tiering — T4 hosts fail published packets.
+  // Discovery diagnostics only; host categories cannot reject or accept evidence.
   const { tally: sourceTiers, warnings: sourceTierWarnings } = gateSourceTiers(packets);
   for (const warning of sourceTierWarnings) console.warn(`warning: ${warning}`);
   const { warnings: anchorWarnings } = gatePacketAnchorWarnings(packets);
@@ -573,6 +574,7 @@ async function commandProject(): Promise<void> {
     const unchanged: string[] = [];
     for (const row of rows.rows) {
       const packet = parseThemeImpactPacketRow(row);
+      await verifyObservationsAgainstCanonical(client, [packet]);
       const hash = contentHash(packet);
       const upserted = await client.query<{ packet_id: string; inserted: boolean }>(
         `INSERT INTO published.release_theme_impact_packets (

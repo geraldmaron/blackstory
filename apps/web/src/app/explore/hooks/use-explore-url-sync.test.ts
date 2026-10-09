@@ -84,3 +84,23 @@ describe('exploreHrefFromLens', () => {
     assert.equal(href.includes('lines=1'), false);
   });
 });
+
+it('live grouping overrides the initial URL without adding device location', () => {
+  const href = exploreHrefFromLens(
+    { filters: { ...DEFAULT_EXPLORE_FILTERS }, ...defaultExploreOverlayState(), group: true },
+    {
+      stateCode: '',
+      kindFamily: null,
+      evidenceFloor: 'any',
+      topicId: null,
+      status: null,
+      layerMode: 'off',
+      satellite: false,
+      lines: false,
+      selectedId: undefined,
+      group: false,
+    },
+  );
+  assert.equal(new URL(href, 'https://blackstory.app').searchParams.get('group'), '0');
+  assert.equal(href.includes('lat='), false);
+});

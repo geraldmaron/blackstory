@@ -17,3 +17,15 @@ command detail of its own.
 this is, choosing precision honestly, and assigning era is
 [`blackstory-entity-verify`](../blackstory-entity-verify/SKILL.md). Do not invent an address so this
 verb has something to geocode.
+
+## Working contract
+
+**Input:** An already sourced address, entity identifier and justified precision.
+
+**Output:** A geocoding result with match details and unresolved mismatches.
+
+**Boundary and handoff:** Identity and historical location belong to entity verification. A geocoder cannot establish that the subject occupied the returned address.
+
+**Capabilities:** Follow [capability and permission limits](../../../docs/research/README.md#capabilities-and-permissions).
+Use the active harness’s available tools and report unsupported steps. Operational flags stay
+in the linked operations contract; no proprietary client or model family is required.

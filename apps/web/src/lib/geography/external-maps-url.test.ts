@@ -53,14 +53,16 @@ describe('buildExternalMapsSearchUrl', () => {
 });
 
 describe('buildExternalMapsDirectionsUrl', () => {
-  it('targets the same combined destination string', () => {
+  it('routes to a readable address without an undocumented coordinate suffix', () => {
     const url = buildExternalMapsDirectionsUrl({
       lat: 37.021,
       lng: -98.485,
       query: 'Kiowa, Kansas',
     });
     assert.match(url ?? '', /\/dir\//);
-    assert.match(url ?? '', /Kiowa/);
+    assert.equal(new URL(url!).searchParams.get('destination'), 'Kiowa, Kansas');
+    assert.equal(new URL(url!).searchParams.has('origin'), false);
+    assert.equal(new URL(url!).searchParams.has('travelmode'), false);
   });
 });
 
@@ -102,16 +104,13 @@ describe('buildAppleMapsSearchUrl', () => {
 });
 
 describe('buildAppleMapsDirectionsUrl', () => {
-  it('routes to the address, disambiguated by ll, driving', () => {
+  it('routes to the address without claiming map center disambiguates routing', () => {
     const url = buildAppleMapsDirectionsUrl({
       lat: 39.788,
       lng: -86.164,
       query: '819 West 16th Street, Indianapolis, IN',
     });
-    assert.equal(
-      url,
-      'https://maps.apple.com/?daddr=819+West+16th+Street%2C+Indianapolis%2C+IN&ll=39.788%2C-86.164',
-    );
+    assert.equal(url, 'https://maps.apple.com/?daddr=819+West+16th+Street%2C+Indianapolis%2C+IN');
   });
 
   it('routes to the point when there is no prose destination', () => {
@@ -132,7 +131,7 @@ it('appleMapsUrlFromGoogle converts search and directions links, keeping name an
   );
   assert.equal(
     appleMapsUrlFromGoogle(buildExternalMapsDirectionsUrl(input)!),
-    'https://maps.apple.com/?daddr=Ebenezer+Baptist+Church&ll=33.7555%2C-84.3733',
+    'https://maps.apple.com/?daddr=Ebenezer+Baptist+Church',
   );
   assert.equal(
     appleMapsUrlFromGoogle(buildExternalMapsSearchUrl({ lat: 1, lng: 2 })!),

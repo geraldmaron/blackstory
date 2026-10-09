@@ -47,6 +47,7 @@ Live instrument chrome belongs on `/explore`. See [`v10/design-doc-reconciliatio
 
 | Pattern | Binding doc | Code | Status |
 |---|---|---|---|
+| **Source library** | [`patterns-source-library.md`](./patterns-source-library.md) | `app/admin/sources/collection-guidance.tsx`, existing `story-review` primitives | Staff collection guidance, separate from publisher usage |
 | **Record anatomy layout** | [`patterns-record-anatomy.md`](./patterns-record-anatomy.md) | `RecordAnatomyPanel`, `record-anatomy.css`, mobile `AnatomySection` | Reusable |
 | **Map entity encoding** | [`patterns-map-entity-encoding.md`](./patterns-map-entity-encoding.md) | `kind-encoding.ts`, `MapExperienceLegend.tsx`, `explore-style.ts` | Binding (map surfaces) |
 | **Map canvas lifecycle** | [`patterns-map-canvas.md`](./patterns-map-canvas.md) | `map-libre-lifecycle.ts`, `MapStage.tsx`, `EntityLocationMap.tsx` | Binding (cross-browser WebGL) |

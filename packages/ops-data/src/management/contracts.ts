@@ -1,6 +1,6 @@
 /** Browser-safe contracts shared by the work inbox, API and agent clients. */
 import { z } from 'zod/v4';
-import { assertContract, contractSchema, type ManagementProposal } from '@repo/research-kernel';
+import type { ManagementProposal } from '@repo/research-kernel';
 
 const text = z.string().trim().min(1);
 const digest = z.string().regex(/^[a-f0-9]{64}$/u);
@@ -13,9 +13,6 @@ export const workRequestSchema = z
     executionMode: z.enum(['session', 'hosted']).optional(),
   })
   .strict();
-export const workProposalSchema = {
-  parse: (value: unknown) => assertContract('ManagementProposal', value),
-};
 export const workDecisionSchema = z
   .object({
     version: z.number().int().positive(),
@@ -87,5 +84,3 @@ export type WorkItem = {
   updatedAt: string;
   leaseExpiresAt?: string | null;
 };
-
-export const workProposalJsonSchema = contractSchema('ManagementProposal');

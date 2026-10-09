@@ -88,6 +88,7 @@ test(
             query: 'School archival history contradictory dates',
             seeking: 'School site and counterevidence',
             sourceFitnessReason: 'District and archival records document the site.',
+            collectionPolicies: [],
             counterevidence: true,
           },
         ],
@@ -147,6 +148,10 @@ test(
           connectorKind: 'browser',
           title: 'School record',
           description: quote,
+          excerpts: [
+            { exact: quote, locator: 'Page 2' },
+            { exact: 'The register covers the autumn term.', locator: 'Page 3, heading' },
+          ],
           cites: [url],
           rawRecord: {
             sessionObservation: {
@@ -176,6 +181,13 @@ test(
       const retained = assertContract(
         'ResearchAcquisitionResult',
         step.taskLease.dependencies.find((d) => d.taskId.endsWith('-2'))!.output,
+      );
+      assert.ok(
+        retained.sources.every(
+          (source) =>
+            source.description.includes('[Page 2]') &&
+            source.description.includes('[Page 3, heading]'),
+        ),
       );
       const entityId = `session-test-${randomUUID()}`;
       const proposal = {

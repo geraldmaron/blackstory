@@ -16,6 +16,7 @@
   z-index: var(--ds-z-atlas-instruments);
   display: flex;
   flex-direction: column;
+  align-items: flex-end;
   gap: var(--ds-space-2);
   pointer-events: auto;
   transform: translate(
@@ -138,4 +139,12 @@
     animation: none;
     opacity: 0.6;
   }
+}
+
+.ds-map-controls > .ds-button {
+  min-height: 44px;
+}
+
+.ds-map-controls > .ds-button--secondary {
+  background: var(--ds-surface);
 }

@@ -89,6 +89,7 @@ export type SourceLibraryListItem = {
   readonly publishedEntities: number;
   readonly publishedClaims: number;
   readonly canonicalEntities: number;
+  readonly profileReviewStatus?: 'unreviewed' | 'reviewed' | 'needs_recheck';
   readonly profileReviewedAt?: string;
   readonly profileReviewedBy?: string;
 };
@@ -145,6 +146,7 @@ type SourceLibraryRow = {
   readonly relevance: string | null;
   readonly limitations: readonly string[] | null;
   readonly profile_sources: readonly string[] | null;
+  readonly profile_review_status?: string;
   readonly profile_reviewed_at: Date | string | null;
   readonly profile_reviewed_by: string | null;
   readonly hosts: readonly string[] | null;
@@ -208,6 +210,13 @@ export function mapSourceLibraryListRow(row: SourceLibraryRow): SourceLibraryLis
     canonicalEntities: readCount(row.canonical_entities),
     ...(publisherKind ? { publisherKind } : {}),
     ...(tier ? { tier } : {}),
+    ...(row.profile_review_status &&
+    ['unreviewed', 'reviewed', 'needs_recheck'].includes(row.profile_review_status)
+      ? {
+          profileReviewStatus: row.profile_review_status as
+            'unreviewed' | 'reviewed' | 'needs_recheck',
+        }
+      : {}),
     ...(profileReviewedAt ? { profileReviewedAt } : {}),
     ...(profileReviewedBy ? { profileReviewedBy } : {}),
   };
@@ -237,7 +246,8 @@ export function mapSourceLibraryEntryRow(row: SourceLibraryRow): SourceLibraryEn
 const SOURCE_LIBRARY_COLUMNS = `organization_id, name, homepage, parent_organization_id, publisher_kind,
      tier, summary, relevance, limitations, profile_sources, profile_reviewed_at,
      profile_reviewed_by, hosts, published_entities, published_claims, canonical_entities,
-     evidence_sources, source_items, merged_organization_ids`;
+     evidence_sources, source_items, merged_organization_ids,
+     (SELECT profile_review_status FROM evidence.source_organizations WHERE id=organization_id) AS profile_review_status`;
 
 export type SourceLibrarySort = 'entities' | 'name';
 

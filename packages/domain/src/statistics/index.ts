@@ -145,7 +145,6 @@ export {
   assertThemeImpactPacketMultiDecadeChecklist,
   deriveDefaultMultiDecadeChecklist,
   createRedliningQ3FixturePacket,
-  satisfiesTwoAnchorRule,
 } from './theme-impact-packet.js';
 export type {
   ThemeImpactMethodStance,

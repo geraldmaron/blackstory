@@ -22,6 +22,31 @@ export function registerManagementTools(server: McpServer, call: ManagementClien
     }
   };
   server.registerTool(
+    'source_library',
+    {
+      description:
+        'Find versioned collection guidance for an evidence need. Inspect underlying documents; publisher identity and citation usage do not establish truth. The library is a starting point, not an exclusive list.',
+      inputSchema: {
+        question: z.string().min(1).max(4000).optional(),
+        assertionClass: z.string().min(1).max(200).optional(),
+        subject: z.string().min(1).max(200).optional(),
+        geography: z.string().min(1).max(200).optional(),
+        period: z.string().min(1).max(200).optional(),
+        reviewStatus: z.enum(['reviewed', 'unreviewed', 'needs_recheck']).optional(),
+        limit: z.number().int().min(1).max(100).optional(),
+        offset: z.number().int().min(0).max(100000).optional(),
+      },
+    },
+    (input) =>
+      result(
+        `/source-library?${new URLSearchParams(
+          Object.entries(input)
+            .filter(([, value]) => value !== undefined)
+            .map(([key, value]) => [key, String(value)]),
+        )}`,
+      ),
+  );
+  server.registerTool(
     'request_work',
     {
       description:

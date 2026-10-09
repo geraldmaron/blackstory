@@ -85,3 +85,21 @@ quota: leave a field absent rather than invent detail or repeat the summary.
 
 Per entity: field checklist (present / blank / blocked), proposed fills with source URLs,
 and what must wait for a publication-role human.
+
+## Working contract
+
+**Input:** An identified record and requested missing fields.
+
+**Output:** Supported field proposals with rights, precision and relationship evidence.
+
+**Boundary and handoff:** Identity or central factual uncertainty returns to verification. Optional enrichment is not a compulsory completeness quota.
+
+Before acquisition, use the [shared collection-library method](../../../docs/research/research-operations.md#source-library)
+for the evidence need, pin returned policy versions and explain why the collection should
+contain the needed evidence. Search authorized captures, citation trails and outside sources;
+the library is a starting point. Record access failures and unknown coverage. Its reviewed
+status describes guidance, not the truth of a historical assertion.
+
+**Capabilities:** Follow [capability and permission limits](../../../docs/research/README.md#capabilities-and-permissions).
+Use the active harness’s available tools and report unsupported steps. Operational flags stay
+in the linked operations contract; no proprietary client or model family is required.

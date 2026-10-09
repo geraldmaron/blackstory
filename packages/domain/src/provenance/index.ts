@@ -83,13 +83,7 @@ export type {
   SourceKillSwitchState,
 } from './source.js';
 
-export {
-  SOURCE_TIERS,
-  ANCHOR_TIERS,
-  SOURCE_TIER_RULES,
-  lookupSourceTier,
-  isAnchorTierUrl,
-} from './source-tiers.js';
+export { SOURCE_TIERS, SOURCE_TIER_RULES, lookupSourceTier } from './source-tiers.js';
 export type { SourceTier, SourceTierRule, SourceTierResult } from './source-tiers.js';
 
 export { checkDoiCitation, normalizeDoi } from './doi-resolution.js';

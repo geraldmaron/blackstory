@@ -129,3 +129,20 @@ When `placeAdvisories` is present on the projection, `resolveVisitStandingCopy()
 | Public visit contact | `public-visit-contact.test.ts` |
 | Visit block UI | `RecordVisitBlock.test.ts` |
 | Maps URLs | `external-maps-url.test.ts` |
+
+## Routing destinations
+
+Directions URLs send one address, place string or latitude/longitude pair. They do not append
+an undocumented `name @ coordinates` expression. Prefer the released readable address; use
+coordinates when no readable destination exists. Apple map framing (`ll`) is not proof of
+routing disambiguation. Do not send the reader's location, research metadata or internal IDs.
+Omit origin and travel mode so the selected provider resolves the starting point and mode.
+Keep the public address, precision and visit standing visible before handoff; a historical
+location is not a verified modern entrance or permission to enter private property.
+
+Checked 2026-10-08 against [Google Maps URLs](https://developers.google.com/maps/documentation/urls/get-started)
+and [Apple unified Maps URLs](https://developer.apple.com/documentation/mapkit/unified-map-urls).
+Apple's unified URLs target iOS 18.4/macOS 15.4 and later; the existing `daddr` link remains for
+older-client compatibility. Provider Place IDs can improve identity binding only after the
+current destination has been verified; BlackStory does not manufacture them from entity IDs.
+An installed native maps app's final route is not proven by URL validation alone.

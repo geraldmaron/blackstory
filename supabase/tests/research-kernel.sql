@@ -129,7 +129,8 @@ END;
 $$;
 
 SELECT research.approve_artifact(
-  'review-test', 'artifact-test', 'reviewer-test', 'qwen', '[]'::jsonb, 'review-1'
+  'review-test', 'artifact-test', 'reviewer-test', 'kimi', '[]'::jsonb, 'review-1',
+  'independent_review', 'Reviewer independently inspected evidence before seeing the producer conclusions'
 );
 
 INSERT INTO publication.releases (id, status, signed_manifest, created_by)

@@ -89,12 +89,10 @@ export function assertIndependentApproval(decision: ReviewDecision): void {
   if (decision.reviewerActorId === decision.producerActorId) {
     throw new Error('Producer and reviewer must be different actors');
   }
-  if (
-    decision.reviewerModelFamily !== null &&
-    decision.producerModelFamily !== null &&
-    decision.reviewerModelFamily === decision.producerModelFamily
-  ) {
-    throw new Error('Producer and reviewer must use different model families');
+  if (decision.reviewMode !== 'independent_review' || !decision.independenceBasis?.trim()) {
+    throw new Error(
+      'Independent review requires a recorded independence basis; model family is not proof',
+    );
   }
 }
 

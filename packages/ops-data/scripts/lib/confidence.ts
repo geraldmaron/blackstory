@@ -98,9 +98,9 @@ export type ReviewedClaimAssessment = {
   readonly object: string;
   readonly citationHrefs: readonly string[];
   readonly reviewedEvidenceCaptures: readonly ReviewedEvidenceCapture[];
-  readonly assessmentId: string;
+  readonly assessmentId: string | null;
   readonly reviewDecisionId: string;
-  readonly assessment: ConfidenceAssessment;
+  readonly assessment: ConfidenceAssessment | null;
 };
 
 /** Exact immutable capture revisions present in accepted evidence assignments for this review. */
@@ -119,14 +119,14 @@ export type ReviewedEvidenceCapture = {
 export const REVIEWED_CLAIM_ASSESSMENTS_SQL = `
 SELECT c.entity_id AS "entityId", c.id AS "claimId", v.id AS "claimVersionId",
        v.predicate, v.object, ca.id AS "assessmentId", review.id AS "reviewDecisionId",
-       jsonb_build_object(
+       CASE WHEN ca.id IS NULL THEN NULL ELSE jsonb_build_object(
          'acceptanceProbability', ca.acceptance_probability,
          'intervalLow', ca.interval_low, 'intervalHigh', ca.interval_high,
          'sourceReliability', ca.source_reliability, 'entailment', ca.entailment,
          'independence', ca.independence, 'identityConfidence', ca.identity_confidence,
          'relevance', ca.relevance, 'researchCompleteness', ca.research_completeness,
          'calibrationVersion', ca.calibration_version
-       ) AS assessment,
+       ) END AS assessment,
        ARRAY(
          SELECT DISTINCT si.url
          FROM canonical.evidence_assignments ea
@@ -168,7 +168,7 @@ SELECT c.entity_id AS "entityId", c.id AS "claimId", v.id AS "claimVersionId",
        ), '[]'::jsonb) AS "reviewedEvidenceCaptures"
 FROM canonical.claims c
 JOIN canonical.claim_versions v ON v.id = c.current_version_id AND v.claim_id = c.id
-JOIN LATERAL (
+LEFT JOIN LATERAL (
   SELECT a.* FROM canonical.claim_confidence_assessments a
   WHERE a.claim_version_id = v.id ORDER BY a.created_at DESC, a.id DESC LIMIT 1
 ) ca ON true
@@ -183,15 +183,27 @@ JOIN LATERAL (
 WHERE c.entity_id = ANY($1::text[])
   AND c.workflow_status = 'accepted' AND v.workflow_status = 'accepted'
   AND review.decision = 'approve' AND review.artifact_status = 'accepted'
+  AND review.review_mode = 'independent_review'
+  AND nullif(btrim(review.independence_basis), '') IS NOT NULL
   AND review.reviewer_actor_id <> review.producer_actor_id
   AND nullif(btrim(review.reviewer_actor_id), '') IS NOT NULL
-  AND ca.created_at <= review.decided_at
+  AND (ca.created_at IS NULL OR ca.created_at <= review.decided_at)
+  AND (ca.id IS NOT NULL OR EXISTS (
+    SELECT 1 FROM canonical.evidence_assignments qa WHERE qa.claim_version_id=v.id
+      AND qa.status='accepted' AND qa.role='supporting' AND qa.assessment_basis='qualitative_review'
+      AND nullif(btrim(qa.fitness_reason),'') IS NOT NULL AND nullif(btrim(qa.support_reason),'') IS NOT NULL
+  ))
   AND NOT EXISTS (
     SELECT 1 FROM canonical.claim_tombstones t WHERE t.claim_version_id = v.id
   )
   AND NOT EXISTS (
     SELECT 1 FROM canonical.evidence_assignments ea
     WHERE ea.claim_version_id = v.id AND ea.created_at > review.decided_at
+  )
+  AND NOT EXISTS (
+    SELECT 1 FROM canonical.evidence_assignments ea
+    JOIN evidence.lineage_cluster_members member ON member.cluster_id=ea.lineage_cluster_id
+    WHERE ea.claim_version_id=v.id AND member.detected_at>review.decided_at
   )
 `;
 
@@ -207,14 +219,14 @@ export async function loadReviewedClaimAssessments(
 }
 
 function validReviewedAssessment(row: ReviewedClaimAssessment): boolean {
-  const result = validateContract('ConfidenceAssessment', row.assessment);
-  if (!result.ok) return false;
-  const assessment = result.value;
+  const result =
+    row.assessment === null ? null : validateContract('ConfidenceAssessment', row.assessment);
+  if (result && !result.ok) return false;
+  const assessment = result?.ok ? result.value : null;
   return Boolean(
     row.entityId &&
     row.claimId &&
     row.claimVersionId &&
-    row.assessmentId &&
     row.reviewDecisionId &&
     typeof row.object === 'string' &&
     Array.isArray(row.citationHrefs) &&
@@ -222,8 +234,10 @@ function validReviewedAssessment(row: ReviewedClaimAssessment): boolean {
     Array.isArray(row.reviewedEvidenceCaptures) &&
     row.reviewedEvidenceCaptures.length > 0 &&
     row.reviewedEvidenceCaptures.every(validReviewedEvidenceCapture) &&
-    assessment.intervalLow <= assessment.acceptanceProbability &&
-    assessment.acceptanceProbability <= assessment.intervalHigh,
+    (assessment === null ||
+      (row.assessmentId &&
+        assessment.intervalLow <= assessment.acceptanceProbability &&
+        assessment.acceptanceProbability <= assessment.intervalHigh)),
   );
 }
 

@@ -175,6 +175,12 @@ test('verified agent clients are restricted to management routes even with an ad
   });
   const caller = await authorizer.authorize(adminRequest('GET', '/admin/api/work'));
   assert.equal(caller.admin.clientId, 'allowed-client');
+  const library = await authorizer.authorize(adminRequest('GET', '/admin/api/sources/library'));
+  assert.equal(library.admin.clientId, 'allowed-client');
+  await assert.rejects(
+    authorizer.authorize(adminRequest('POST', '/admin/api/sources/library')),
+    /no declared permission/,
+  );
   await assert.rejects(
     authorizer.authorize(adminRequest('GET', '/admin/api/auth/me')),
     /restricted to management/,

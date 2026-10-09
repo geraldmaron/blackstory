@@ -494,6 +494,9 @@
           "items": {
             "$ref": "#/$defs/SourceFitnessRule"
           }
+        },
+        "guidance": {
+          "$ref": "#/$defs/CollectionGuidance"
         }
       }
     },
@@ -547,6 +550,10 @@
         "metadata": {
           "type": "object",
           "additionalProperties": true
+        },
+        "sourcePolicyVersion": {
+          "type": ["string", "null"],
+          "minLength": 1
         }
       }
     },
@@ -1719,6 +1726,14 @@
         "decidedAt": {
           "type": "string",
           "format": "date-time"
+        },
+        "reviewMode": {
+          "enum": ["self_review", "independent_review"]
+        },
+        "independenceBasis": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 2000
         }
       }
     },
@@ -2172,6 +2187,14 @@
         },
         "state": {
           "type": "string"
+        },
+        "excerpts": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 5,
+          "items": {
+            "$ref": "#/$defs/EvidenceExcerpt"
+          }
         }
       }
     },
@@ -3106,6 +3129,11 @@
                     "minItems": 1
                   }
                 }
+              },
+              "independenceBasis": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 2000
               }
             },
             "required": [
@@ -3215,6 +3243,32 @@
               },
               "counterevidence": {
                 "type": "boolean"
+              },
+              "collectionPolicies": {
+                "type": "array",
+                "maxItems": 10,
+                "items": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": ["policyId", "policyVersion", "expectedEvidence"],
+                  "properties": {
+                    "policyId": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 2000
+                    },
+                    "policyVersion": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 2000
+                    },
+                    "expectedEvidence": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 2000
+                    }
+                  }
+                }
               }
             }
           }
@@ -3259,6 +3313,324 @@
               }
             }
           }
+        }
+      }
+    },
+    "CollectionGuidance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schemaVersion",
+        "subjects",
+        "geography",
+        "periods",
+        "documentTypes",
+        "searchMethods",
+        "suitableEvidenceNeeds",
+        "limitations",
+        "provenance",
+        "accessConditions",
+        "preservationConditions",
+        "reviewStatus",
+        "reviewedAt",
+        "reviewedBy"
+      ],
+      "properties": {
+        "schemaVersion": {
+          "const": "1.0.0"
+        },
+        "subjects": {
+          "type": "array",
+          "maxItems": 30,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 2000
+          }
+        },
+        "geography": {
+          "type": "array",
+          "maxItems": 30,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 2000
+          }
+        },
+        "periods": {
+          "type": "array",
+          "maxItems": 30,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 2000
+          }
+        },
+        "documentTypes": {
+          "type": "array",
+          "maxItems": 30,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 2000
+          }
+        },
+        "searchMethods": {
+          "type": "array",
+          "maxItems": 30,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 2000
+          }
+        },
+        "suitableEvidenceNeeds": {
+          "type": "array",
+          "maxItems": 30,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 2000
+          }
+        },
+        "limitations": {
+          "type": "array",
+          "maxItems": 30,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 2000
+          }
+        },
+        "provenance": {
+          "type": "array",
+          "maxItems": 20,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "format": "uri",
+            "minLength": 1,
+            "maxLength": 2000
+          }
+        },
+        "accessConditions": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 2000
+        },
+        "preservationConditions": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 2000
+        },
+        "reviewStatus": {
+          "enum": ["unreviewed", "reviewed", "needs_recheck"]
+        },
+        "reviewedAt": {
+          "type": ["string", "null"],
+          "format": "date-time"
+        },
+        "reviewedBy": {
+          "type": ["string", "null"],
+          "minLength": 1
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "reviewStatus": {
+                "const": "reviewed"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "provenance": {
+                "minItems": 1,
+                "type": "array"
+              },
+              "reviewedAt": {
+                "type": "string"
+              },
+              "reviewedBy": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      ]
+    },
+    "SourceLibraryQuery": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [],
+      "properties": {
+        "question": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 4000
+        },
+        "assertionClass": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 200
+        },
+        "subject": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 200
+        },
+        "geography": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 200
+        },
+        "period": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 200
+        },
+        "reviewStatus": {
+          "enum": ["unreviewed", "reviewed", "needs_recheck"]
+        },
+        "limit": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 100
+        },
+        "offset": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 100000
+        }
+      }
+    },
+    "SourceLibraryEntry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "policyId",
+        "policyVersion",
+        "collection",
+        "organizationId",
+        "publisher",
+        "guidance",
+        "matchReasons",
+        "claimFitness"
+      ],
+      "properties": {
+        "policyId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 200
+        },
+        "policyVersion": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 100
+        },
+        "collection": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 500
+        },
+        "organizationId": {
+          "type": ["string", "null"]
+        },
+        "publisher": {
+          "type": ["string", "null"]
+        },
+        "guidance": {
+          "$ref": "#/$defs/CollectionGuidance"
+        },
+        "matchReasons": {
+          "type": "array",
+          "maxItems": 30,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 2000
+          }
+        },
+        "claimFitness": {
+          "type": "array",
+          "maxItems": 100,
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/SourceFitnessRule"
+          }
+        }
+      }
+    },
+    "SourceLibraryResult": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["schemaVersion", "query", "items", "total", "nextOffset", "limitations"],
+      "properties": {
+        "schemaVersion": {
+          "const": "1.0.0"
+        },
+        "query": {
+          "$ref": "#/$defs/SourceLibraryQuery"
+        },
+        "items": {
+          "type": "array",
+          "maxItems": 100,
+          "items": {
+            "$ref": "#/$defs/SourceLibraryEntry"
+          }
+        },
+        "total": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "nextOffset": {
+          "type": ["integer", "null"],
+          "minimum": 0
+        },
+        "limitations": {
+          "type": "array",
+          "maxItems": 30,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 2000
+          }
+        }
+      }
+    },
+    "EvidenceExcerpt": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["exact", "locator"],
+      "properties": {
+        "exact": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 1000
+        },
+        "locator": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 500
+        },
+        "prefix": {
+          "type": "string",
+          "maxLength": 200
+        },
+        "suffix": {
+          "type": "string",
+          "maxLength": 200
         }
       }
     }

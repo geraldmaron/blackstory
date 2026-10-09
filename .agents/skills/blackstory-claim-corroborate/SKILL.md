@@ -61,10 +61,10 @@ as support. Host filters in `tier1-sources.ts` are discovery heuristics; work-le
 lineage and `assessSourceFitness` are separate assessments. Reuse these capabilities,
 not a second host list. Use the project's safe-fetch path for acquisition.
 
-Wikipedia may carry a low-confidence claim under the existing contract, but supplies
-zero corroborating lineages and cannot alone support a summary superlative. Another
-source must itself support the exact words. A low label never licenses a known false
-claim. Numerical model scores are not calibrated probabilities or publication authority.
+Wikipedia and Wikidata statements support discovery and reference chasing. New public
+historical assertions require an inspected underlying work. Verified Wikimedia scans or
+transcriptions are evaluated as that work, with its author, edition and provenance checked.
+Neither a low-confidence label nor a numerical model score licenses a false or unsupported claim.
 
 ## Output
 
@@ -73,3 +73,21 @@ fitness and lineage rationale; strongest contrary evidence; verdict and reason;
 allowed wording; unresolved needs. Persist with the case/draft. Reuse the
 [evaluation families](../../../docs/research/gold-corpus.md); do not describe a
 synthetic policy-label test as a historical accuracy test.
+
+## Working contract
+
+**Input:** Exact assertions, entity identity, proposed wording and candidate evidence.
+
+**Output:** Assertion-level decisions with inspected passages, assessed work lineage, counterevidence and permitted wording.
+
+**Boundary and handoff:** Retrieval finds candidates; it cannot adjudicate them. Send accepted assertions to drafting, and central contradictions to a held case.
+
+Before acquisition, use the [shared collection-library method](../../../docs/research/research-operations.md#source-library)
+for the evidence need, pin returned policy versions and explain why the collection should
+contain the needed evidence. Search authorized captures, citation trails and outside sources;
+the library is a starting point. Record access failures and unknown coverage. Its reviewed
+status describes guidance, not the truth of a historical assertion.
+
+**Capabilities:** Follow [capability and permission limits](../../../docs/research/README.md#capabilities-and-permissions).
+Use the active harness’s available tools and report unsupported steps. Operational flags stay
+in the linked operations contract; no proprietary client or model family is required.

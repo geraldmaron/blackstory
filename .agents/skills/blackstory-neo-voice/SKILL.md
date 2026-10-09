@@ -38,3 +38,15 @@ detect a few forms; they do not detect truth, dignity or good writing.
 
 Deliver the draft, its evidence mapping and any unresolved review findings. Do not
 equate fluent prose with publication readiness.
+
+## Working contract
+
+**Input:** Reviewed assertions, their qualifiers and the reader surface.
+
+**Output:** Natural draft prose with a sentence-to-evidence map.
+
+**Boundary and handoff:** Hand copy to prose and ringer review. New factual detail reopens claim review; no mandatory padding or narrative template.
+
+**Capabilities:** Follow [capability and permission limits](../../../docs/research/README.md#capabilities-and-permissions).
+Use the active harness’s available tools and report unsupported steps. Operational flags stay
+in the linked operations contract; no proprietary client or model family is required.

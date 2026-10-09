@@ -1,3 +1,6 @@
+import { querySourceLibrary } from '@repo/ops-data/source-library';
+import { getPostgresPool } from '../../../admin/lib/canonical-postgres-client';
+import { CollectionGuidance } from './collection-guidance';
 /**
  * Staff source library with URL-driven search and sort resolved in SQL before rendering. Reads
  * evidence.source_library; publication belongs to the release workflow.
@@ -42,6 +45,25 @@ export default async function SourcesPage({
   const sortParam = Array.isArray(rawSort) ? rawSort[0] : rawSort;
   const sort: 'entities' | 'name' = sortParam === 'name' ? 'name' : 'entities';
 
+  const collectionQuery: Record<string, unknown> = {};
+  for (const key of [
+    'question',
+    'assertionClass',
+    'subject',
+    'geography',
+    'period',
+    'reviewStatus',
+    'offset',
+  ]) {
+    const raw = params[key];
+    const value = Array.isArray(raw) ? raw[0] : raw;
+    if (value?.trim()) collectionQuery[key] = key === 'offset' ? Number(value) : value.trim();
+  }
+  collectionQuery.limit = 20;
+  const collections = await readPostgresOrDegrade(
+    () => querySourceLibrary(getPostgresPool(), collectionQuery),
+    'collection guidance',
+  );
   const [libraryOutcome, totalsOutcome, unmappedOutcome] = await Promise.all([
     readPostgresOrDegrade(
       () => listSourceLibrary({ sort, limit: 200, ...(q ? { q } : {}) }),
@@ -74,9 +96,8 @@ export default async function SourcesPage({
           <p className="ds-page__eyebrow">Evidence registry</p>
           <h1 className="ds-page__title">Source library</h1>
           <p className="ds-page__lede">
-            Publishers backing the archive's evidence sources: reach into the published catalog,
-            editorial tier, and profile review status. Browse provenance metadata here; entity
-            promotion and publication stay in catalog and release workflows.
+            Find collections suited to your research question, inspect their limits, and trace the
+            publishers behind existing citations.
           </p>
         </div>
       </header>
@@ -89,12 +110,22 @@ export default async function SourcesPage({
 
       {degradedReason ? (
         <p className="story-review__alert" role="alert">
-          The source library is unavailable — the operational database did not answer, so this page
-          shows nothing rather than a partial list. Reload to retry.{' '}
+          The source library is unavailable because the operational database did not answer, so this
+          page shows nothing rather than a partial list. Reload to retry.{' '}
           <span className="ds-mono">{degradedReason}</span>
         </p>
       ) : null}
 
+      {collections.status === 'ok' ? (
+        <CollectionGuidance result={collections.value} />
+      ) : (
+        <p role="alert">Collection guidance is unavailable. Reload to retry.</p>
+      )}
+      <h2>Publishers and citation usage</h2>
+      <p>
+        These counts describe catalog use. They do not measure evidentiary fitness. Legacy tiers are
+        discovery hints.
+      </p>
       <form className="ds-toolbar" action={BASE_PATH} method="get" role="search">
         {sort !== 'entities' ? <input type="hidden" name="sort" value={sort} /> : null}
         <label className="ds-toolbar__field">

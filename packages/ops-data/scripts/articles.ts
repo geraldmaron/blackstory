@@ -1,3 +1,4 @@
+import { assertReviewedPublicationAnchors } from './lib/reviewed-anchors.js';
 /**
  * Article lifecycle CLI — the long-form /articles publication surface.
  *
@@ -26,7 +27,6 @@ import { readFileSync, writeFileSync, mkdirSync } from 'node:fs';
 import { assertArticleCitationIntegrity, publicArticleProjectionSchema } from '@repo/schemas';
 import {
   checkDoiCitation,
-  isAnchorTierUrl,
   lookupSourceTier,
   type SourceTier,
   type SafeHttpClient,
@@ -95,7 +95,6 @@ function gateArticleSourceTiers(article: ArticleAuthoring): {
 } {
   const tally: Record<SourceTier, number> = { T1: 0, T2: 0, T3: 0, T4: 0 };
   const warnings: string[] = [];
-  const errors: string[] = [];
   for (const reference of article.references) {
     let tier: SourceTier = 'T4';
     try {
@@ -105,82 +104,29 @@ function gateArticleSourceTiers(article: ArticleAuthoring): {
     }
     tally[tier] += 1;
     if (tier === 'T4') {
-      const message = `${article.id} / reference ${reference.id}: untrusted (T4) url ${JSON.stringify(reference.url)}`;
-      if (article.status === 'published') errors.push(message);
-      else warnings.push(message);
+      const message = `${article.id} / reference ${reference.id}: unclassified discovery host ${JSON.stringify(reference.url)}`;
+      warnings.push(message);
     }
-  }
-  if (errors.length > 0) {
-    throw new Error(`source-tier gate failed (published articles):\n  ${errors.join('\n  ')}`);
   }
   return { tally, warnings };
 }
 
 const ANCHORABLE_BLOCKS = new Set(['stat', 'figure', 'pullquote']);
 
-/**
- * For blocks declaring load-bearing anchors, publication requires two independent T1/T2 anchors
- * or one T1 anchor with an explicit replicationVerified review. Blocks without anchors are not
- * covered by this gate; declaration coverage requires separate editorial review.
- */
+/** Offline validation cannot establish reviewed support. Publication checks every assertion block. */
 function gateLoadBearingAnchors(article: ArticleAuthoring): { warnings: string[] } {
-  const warnings: string[] = [];
-  const errors: string[] = [];
-  article.body.forEach((block, index) => {
-    if (!ANCHORABLE_BLOCKS.has(block.type)) return;
-    const anchors = (block as { anchors?: readonly { url: string }[] }).anchors;
-    if (anchors === undefined) return;
-    const replicationVerified =
-      (block as { replicationVerified?: boolean }).replicationVerified === true;
-
-    const anchorTiers = anchors.map((anchor) => isAnchorTierUrl(anchor.url));
-    const independentHosts = new Set(
-      anchors.map((anchor) => {
-        try {
-          return new URL(anchor.url).hostname.toLowerCase();
-        } catch {
-          return anchor.url;
-        }
-      }),
-    );
-    const anchorTierCount = anchorTiers.filter(Boolean).length;
-    const satisfiesTwoAnchors = anchorTierCount >= 2 && independentHosts.size >= 2;
-    const satisfiesReplicationException = anchorTierCount >= 1 && replicationVerified;
-
-    if (!satisfiesTwoAnchors && !satisfiesReplicationException) {
-      const message =
-        `${article.id} / body[${index}] (${block.type}): load-bearing figure declares anchors ` +
-        `but has neither two independent T1/T2 anchors nor one T1/T2 anchor + replicationVerified`;
-      if (article.status === 'published') errors.push(message);
-      else warnings.push(message);
-    }
-  });
-  if (errors.length > 0) {
-    throw new Error(
-      `load-bearing anchor gate failed (published articles):\n  ${errors.join('\n  ')}`,
-    );
-  }
-  return { warnings };
+  return {
+    warnings: article.body.flatMap((block, index) =>
+      ANCHORABLE_BLOCKS.has(block.type)
+        ? [
+            `${article.id} / body[${index}]: publication requires database-reviewed exact assertions and assessed independent work lineages`,
+          ]
+        : [],
+    ),
+  };
 }
 
-/**
- * Published chapters require at least 2,000 body-prose words. Remove citation markers and count
- * entity-link labels as visible text. Drafts receive warnings instead of publication errors.
- */
-const MIN_PUBLISHED_PROSE_WORDS = 2000;
-
-/**
- * The floor is per-kind, because the two kinds promise the reader different things.
- * A `chapter` promises immersion and has to earn it with sourced depth. An `article`
- * promises a compact, comparable record entry, and padding one to 2,000 words would be
- * the exact failure the chapter floor exists to prevent, pointed the other way. The
- * article floor is set where a paragraph of real context lives and a stub does not.
- */
-const MIN_PROSE_WORDS_BY_KIND: Record<'chapter' | 'article', number> = {
-  chapter: MIN_PUBLISHED_PROSE_WORDS,
-  article: 120,
-};
-
+/** Word count is diagnostic; evidence and editorial review determine sufficiency. */
 function visibleProse(text: string): string {
   return text
     .replace(/\[ref:[a-z0-9-]+\]/g, ' ')
@@ -196,18 +142,6 @@ function countProseWords(article: ArticleAuthoring): number {
     words += visible.split(/\s+/).filter(Boolean).length;
   }
   return words;
-}
-
-function gateProseWordFloor(article: ArticleAuthoring): { proseWords: number; warnings: string[] } {
-  const proseWords = countProseWords(article);
-  const kind = article.kind ?? 'chapter';
-  const floor = MIN_PROSE_WORDS_BY_KIND[kind];
-  if (proseWords >= floor) return { proseWords, warnings: [] };
-  const message = `${article.id}: body prose is ${proseWords} words, below the ${floor}-word ${kind} floor`;
-  if (article.status === 'published') {
-    throw new Error(`prose word-floor gate failed (published articles):\n  ${message}`);
-  }
-  return { proseWords, warnings: [message] };
 }
 
 /**
@@ -332,7 +266,7 @@ function gateProseVoice(article: ArticleAuthoring): { warnings: string[] } {
 
 /**
  * Offline gates: schema (via loader) + inline-citation integrity + source-tier gate +
- * prose floor + standalone-prose gate + word-level voice warnings.
+ * standalone-prose gate + word-level voice warnings.
  */
 function validateArticleOffline(article: ArticleAuthoring): void {
   assertArticleCitationIntegrity(article);
@@ -340,8 +274,6 @@ function validateArticleOffline(article: ArticleAuthoring): void {
   for (const warning of tierWarnings) console.warn(`warning: ${warning}`);
   const { warnings: anchorWarnings } = gateLoadBearingAnchors(article);
   for (const warning of anchorWarnings) console.warn(`warning: ${warning}`);
-  const { warnings: floorWarnings } = gateProseWordFloor(article);
-  for (const warning of floorWarnings) console.warn(`warning: ${warning}`);
   const { warnings: standaloneWarnings } = gateStandaloneProse(article);
   for (const warning of standaloneWarnings) console.warn(`warning: ${warning}`);
   const { warnings: voiceWarnings } = gateProseVoice(article);
@@ -372,6 +304,15 @@ async function verifyArticleReferences(
   client: pg.PoolClient,
   article: ArticleAuthoring,
 ): Promise<void> {
+  for (const block of article.body) {
+    if (ANCHORABLE_BLOCKS.has(block.type))
+      await assertReviewedPublicationAnchors(
+        client,
+        block,
+        'anchors' in block ? block.anchors : undefined,
+        block.type !== 'pullquote',
+      );
+  }
   const packetIds = new Set<string>();
   const entityIds = new Set<string>();
   for (const block of article.body) {
@@ -563,7 +504,7 @@ async function withDb<T>(run: (ctx: DbContext) => Promise<T>): Promise<T> {
   });
   const client = await pool.connect();
   try {
-    await client.query('BEGIN');
+    await client.query('BEGIN ISOLATION LEVEL SERIALIZABLE');
     await client.query(`SET LOCAL statement_timeout = '60s'`);
     const value = await run({ pool, client, dryRun });
     await client.query(dryRun ? 'ROLLBACK' : 'COMMIT');
@@ -709,7 +650,8 @@ async function commandValidate(paths: readonly string[]): Promise<void> {
   let bound: 'db-verified' | 'offline-skipped' = 'offline-skipped';
   if (process.env.DATABASE_URL?.trim()) {
     await withDb(async ({ client }) => {
-      for (const article of articles) await verifyArticleReferences(client, article);
+      for (const article of articles)
+        if (article.status === 'published') await verifyArticleReferences(client, article);
     });
     bound = 'db-verified';
   }
@@ -876,6 +818,12 @@ async function commandProject(): Promise<void> {
     const projected: string[] = [];
     const unchanged: string[] = [];
     for (const row of rows.rows) {
+      const authoring = articleAuthoringSchema.parse({
+        ...rowToProjectionAuthoring(row),
+        status: 'published',
+      });
+      validateArticleOffline(authoring);
+      await verifyArticleReferences(client, authoring);
       const doc = rowToProjection(row, releaseId);
       const hash = contentHash(doc);
       const upserted = await client.query<{ article_id: string }>(

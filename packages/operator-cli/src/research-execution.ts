@@ -260,7 +260,7 @@ export async function claimResearchTask(
       throw new Error('A completed dependency has no result artifact');
     return {
       runId,
-      task,
+      task: resolveResearchTaskCatalog(plan, task),
       workerId,
       activityId,
       leaseToken: String(row.lease_token),
@@ -272,6 +272,30 @@ export async function claimResearchTask(
       })),
     };
   });
+}
+
+/** Resolve the pinned catalog at dispatch without repeating snapshots in the manifest. */
+export function resolveResearchTaskCatalog(
+  plan: ResearchExecutionPlan,
+  task: ResearchTaskSpec,
+): ResearchTaskSpec {
+  const catalog = task.input.catalog;
+  if (
+    task.input.executor !== 'management' ||
+    !catalog ||
+    typeof catalog !== 'object' ||
+    !('recordsFromTaskId' in catalog)
+  )
+    return task;
+  const reference = catalog.recordsFromTaskId;
+  const source = plan.tasks.find((candidate) => candidate.frontier.id === reference);
+  if (!source || !task.dependsOn.includes(source.frontier.id))
+    throw new Error('Catalog reference must identify a task dependency');
+  const pinned = source.input.catalog;
+  const records =
+    pinned && typeof pinned === 'object' && 'records' in pinned ? pinned.records : pinned;
+  if (!Array.isArray(records)) throw new Error('Referenced task has no pinned catalog records');
+  return { ...task, input: { ...task.input, catalog: { ...catalog, records } } };
 }
 
 async function readPlan(db: ExecutionClient, runId: string): Promise<ResearchExecutionPlan> {
@@ -393,13 +417,37 @@ export async function completeResearchTask(
       if (model && !policy.modelIds.includes(model.modelId))
         throw new Error('Model is not admitted by this run profile');
       output = assertContract(spec.outputContract, JSON.parse(rawOutput));
-      if (
-        spec.outputContract === 'ManagementResearchPlan' &&
-        !assertContract('ManagementResearchPlan', output).queries.some(
-          (query) => query.counterevidence,
-        )
-      )
-        throw new Error('Research plan requires a counterevidence search');
+      if (spec.outputContract === 'ManagementResearchPlan') {
+        const researchPlan = assertContract('ManagementResearchPlan', output);
+        if (!researchPlan.queries.some((query) => query.counterevidence))
+          throw new Error('Research plan requires a counterevidence search');
+        if (spec.input.requiresCollectionPlan === true) {
+          const catalog = spec.input.catalog as {
+            sourceLibrary: unknown;
+            evidenceNeedLibraries: { recommendations: unknown }[];
+          };
+          const pinned = [
+            catalog.sourceLibrary,
+            ...catalog.evidenceNeedLibraries.map((row) => row.recommendations),
+          ].flatMap((result) => assertContract('SourceLibraryResult', result).items);
+          for (const query of researchPlan.queries) {
+            if (!query.collectionPolicies)
+              throw new Error(
+                'Research plan must record collection policies or an explicit outside-library search',
+              );
+            for (const selected of query.collectionPolicies) {
+              if (
+                !pinned.some(
+                  (row) =>
+                    row.policyId === selected.policyId &&
+                    row.policyVersion === selected.policyVersion,
+                )
+              )
+                throw new Error('Collection selection must use an exact pinned policy version');
+            }
+          }
+        }
+      }
       if (spec.outputContract === 'ResearchAcquisitionResult') {
         const acquisition = assertContract('ResearchAcquisitionResult', output);
         for (const source of acquisition.sources) {

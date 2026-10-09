@@ -83,6 +83,7 @@ class SourcePolicy(ContractModel):
     rights: dict[str, Any]
     retrieval: dict[str, Any]
     claimFitness: list[SourceFitnessRule]
+    guidance: CollectionGuidance | None = None
 
 class SourceItem(ContractModel):
     schemaVersion: Literal["1.0.0"]
@@ -94,6 +95,7 @@ class SourceItem(ContractModel):
     publishedAt: str | None
     upstreamSourceIds: list[str]
     metadata: dict[str, Any] | None = None
+    sourcePolicyVersion: str | None | None = None
 
 class Capture(ContractModel):
     schemaVersion: Literal["1.0.0"]
@@ -336,6 +338,8 @@ class ReviewDecision(ContractModel):
     producerModelFamily: str | None
     findings: list[dict[str, Any]]
     decidedAt: str
+    reviewMode: Literal["self_review", "independent_review"] | None = None
+    independenceBasis: str | None = None
 
 class ReleaseDecision(ContractModel):
     schemaVersion: Literal["1.0.0"]
@@ -428,6 +432,7 @@ class HarnessSourceRecord(ContractModel):
     locationName: str | None = None
     county: str | None = None
     state: str | None = None
+    excerpts: list[EvidenceExcerpt] | None = None
 
 class ResearchTaskSpec(ContractModel):
     frontier: FrontierTask
@@ -516,6 +521,56 @@ class ManagementResearchPlan(ContractModel):
 class ManagementRetentionAssessment(ContractModel):
     decisions: list[dict[str, Any]]
 
+class CollectionGuidance(ContractModel):
+    schemaVersion: Literal["1.0.0"]
+    subjects: list[str]
+    geography: list[str]
+    periods: list[str]
+    documentTypes: list[str]
+    searchMethods: list[str]
+    suitableEvidenceNeeds: list[str]
+    limitations: list[str]
+    provenance: list[str]
+    accessConditions: str
+    preservationConditions: str
+    reviewStatus: Literal["unreviewed", "reviewed", "needs_recheck"]
+    reviewedAt: str | None
+    reviewedBy: str | None
+
+class SourceLibraryQuery(ContractModel):
+    question: str | None = None
+    assertionClass: str | None = None
+    subject: str | None = None
+    geography: str | None = None
+    period: str | None = None
+    reviewStatus: Literal["unreviewed", "reviewed", "needs_recheck"] | None = None
+    limit: int | None = None
+    offset: int | None = None
+
+class SourceLibraryEntry(ContractModel):
+    policyId: str
+    policyVersion: str
+    collection: str
+    organizationId: str | None
+    publisher: str | None
+    guidance: CollectionGuidance
+    matchReasons: list[str]
+    claimFitness: list[SourceFitnessRule]
+
+class SourceLibraryResult(ContractModel):
+    schemaVersion: Literal["1.0.0"]
+    query: SourceLibraryQuery
+    items: list[SourceLibraryEntry]
+    total: int
+    nextOffset: int | None
+    limitations: list[str]
+
+class EvidenceExcerpt(ContractModel):
+    exact: str
+    locator: str
+    prefix: str | None = None
+    suffix: str | None = None
+
 Budget.model_rebuild()
 RiskClassPolicy.model_rebuild()
 SourceFitnessRule.model_rebuild()
@@ -568,6 +623,11 @@ ResearchWorkerModel.model_rebuild()
 ManagementProposal.model_rebuild()
 ManagementResearchPlan.model_rebuild()
 ManagementRetentionAssessment.model_rebuild()
+CollectionGuidance.model_rebuild()
+SourceLibraryQuery.model_rebuild()
+SourceLibraryEntry.model_rebuild()
+SourceLibraryResult.model_rebuild()
+EvidenceExcerpt.model_rebuild()
 
-CONTRACT_MODEL_NAMES = ("Budget", "RiskClassPolicy", "SourceFitnessRule", "ModelPolicy", "RetentionPolicy", "PublicationPolicy", "StoppingPolicy", "ResearchProfile", "SourcePolicy", "SourceItem", "Capture", "EvidenceSelector", "ClaimQualifiers", "ConfidenceAssessment", "ClaimStatement", "EvidenceAssignment", "ResearchCase", "ResearchQuestion", "Hypothesis", "EvidenceNeed", "FrontierTask", "EntityCandidate", "ResolutionDecision", "RelationshipStatement", "ResearchRun", "AgentActivity", "ModelInvocation", "InvalidModelOutput", "Artifact", "ReviewDecision", "ReleaseDecision", "SentenceCitation", "VerificationReport", "StoryResearchPacket", "RoCrateExport", "ResearchQuote", "ExtractedResearchClaim", "SubjectExtraction", "RelationshipHypothesisExtraction", "HarnessSourceRecord", "ResearchTaskSpec", "ResearchExecutionPlan", "ResearchSearchResult", "ResearchTaskReport", "ModelAccounting", "ResearchTaskLease", "PreservationDecision", "ResearchAcquisitionResult", "ResearchWorkerModel", "ManagementProposal", "ManagementResearchPlan", "ManagementRetentionAssessment",)
+CONTRACT_MODEL_NAMES = ("Budget", "RiskClassPolicy", "SourceFitnessRule", "ModelPolicy", "RetentionPolicy", "PublicationPolicy", "StoppingPolicy", "ResearchProfile", "SourcePolicy", "SourceItem", "Capture", "EvidenceSelector", "ClaimQualifiers", "ConfidenceAssessment", "ClaimStatement", "EvidenceAssignment", "ResearchCase", "ResearchQuestion", "Hypothesis", "EvidenceNeed", "FrontierTask", "EntityCandidate", "ResolutionDecision", "RelationshipStatement", "ResearchRun", "AgentActivity", "ModelInvocation", "InvalidModelOutput", "Artifact", "ReviewDecision", "ReleaseDecision", "SentenceCitation", "VerificationReport", "StoryResearchPacket", "RoCrateExport", "ResearchQuote", "ExtractedResearchClaim", "SubjectExtraction", "RelationshipHypothesisExtraction", "HarnessSourceRecord", "ResearchTaskSpec", "ResearchExecutionPlan", "ResearchSearchResult", "ResearchTaskReport", "ModelAccounting", "ResearchTaskLease", "PreservationDecision", "ResearchAcquisitionResult", "ResearchWorkerModel", "ManagementProposal", "ManagementResearchPlan", "ManagementRetentionAssessment", "CollectionGuidance", "SourceLibraryQuery", "SourceLibraryEntry", "SourceLibraryResult", "EvidenceExcerpt",)
 

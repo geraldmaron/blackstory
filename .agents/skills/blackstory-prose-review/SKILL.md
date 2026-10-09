@@ -47,3 +47,15 @@ Verdict: **pass / revise / blocked on evidence**. Name the draft revision review
 coverage, uninspected surfaces and open findings. Then use
 [ringer review](../blackstory-ringer-review/SKILL.md) for publication readiness. This is an
 editorial check, not an AI-authorship detector; no phrase blacklist proves quality.
+
+## Working contract
+
+**Input:** The exact draft revision, evidence map and neighboring records.
+
+**Output:** Pass, revise or evidence-blocked findings with precise affected text.
+
+**Boundary and handoff:** Return new assertions to claim corroboration. Editorial review cannot manufacture support or certify uninspected surfaces.
+
+**Capabilities:** Follow [capability and permission limits](../../../docs/research/README.md#capabilities-and-permissions).
+Use the active harness’s available tools and report unsupported steps. Operational flags stay
+in the linked operations contract; no proprietary client or model family is required.

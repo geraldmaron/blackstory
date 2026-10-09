@@ -140,3 +140,49 @@ Rem values are exported from `first-paint-pin-tokens.ts` for drift tests.
 | Feature denormalization | `build-explore-map-source.test.ts` |
 | First-paint pin tokens | `first-paint-pin-tokens.test.ts` |
 | First-paint payload | `first-paint-pins.test.ts` |
+
+## Reader control and overlapping pins
+
+The live browse map exposes the existing **Group nearby** toggle beside its map controls.
+Grouping defaults on for broad exploration and is shareable through `group=0` or `group=1`.
+A successful device-location request turns grouping off; denied or failed requests leave it
+unchanged. The reader can turn grouping back on afterward. Device coordinates stay out of URLs.
+
+Clusters expand on tap. With individual pins, a tap that hits several records opens those
+records in the existing Records panel, with a clearable **overlapping pins** constraint.
+Deduplicate halo and crossfade hits by entity identity. Retain names, kinds, dates and place
+labels in the list. Panning or selecting another map target clears the overlap selection.
+The chooser does not alter the map filter or imply that the records share a historical relation.
+Never move stored coordinates to make a stack appear to contain distinct documented sites.
+
+Research checked 2026-10-08: [MapLibre cluster expansion](https://maplibre.org/maplibre-gl-js/docs/examples/create-and-style-clusters/),
+[Google marker clustering](https://developers.google.com/maps/documentation/javascript/marker-clustering),
+and [Leaflet overlap handling](https://leaflet.github.io/Leaflet.markercluster/).
+These establish clustering and overlap disclosure patterns. Turning grouping off after Near me
+is BlackStory's explicit product choice, not a universal platform requirement. A named list
+fits this archive's geographic precision constraints better than displacing markers.
+
+### Validation of the control change
+
+Checked locally on 2026-10-08 with the published catalog: Chrome at desktop width and
+390 × 844, both themes. Grouping on/off changed the map and URL. Tapping an overlapping area
+opened 24 individually selectable records on desktop and 53 at the compact viewport's current
+scale. These are screen hit groups, not claims that every record occupies one exact address.
+The clearable chooser retains place/date labels and leaves stored coordinates unchanged.
+
+`fnm exec --using=22 -- ./scripts/ci-local.sh --base bcfc457f --skip mobile` passed all selected
+lanes. PR 287 hosted checks passed. Native release and actual device geolocation were not run.
+The existing E2E harness has no external base URL here; manual browser observations supply the
+surface evidence rather than treating that harness's successful invocation as a browser test.
+
+Adversarial disposition: **accepted with controls**. Ungrouping alone leaves hidden pins;
+the named chooser addresses that failure. A spiderfier is a reasonable alternative for precise
+POIs but risks implying distinct historic coordinates here. The chooser uses existing UI and
+no new dependency. External route resolution and verified provider Place IDs remain separate
+from grouping and are not claimed by these checks.
+
+Production verification: PR 287 deployed as `15b9fb9e`. On the actual live `/explore` page,
+turning grouping off wrote `group=0`; tapping an overlapping area opened 24 records. Selecting
+Macedonia Church opened its detail sheet. Its Apple directions `daddr` and Google directions
+`destination` both contained **Macedonia Church, Burlington, Ohio**, without the combined
+coordinate suffix. The public catalog count remained 4,198 displayed records of 4,202 map features.

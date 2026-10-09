@@ -1629,6 +1629,14 @@ export function MapStageProvider({
       }
 
       function handleEntityPointerHit(hit: NonNullable<ReturnType<typeof pointerHitAt>>): void {
+        if (hit.kind === 'overlap') {
+          if (postureRef.current === 'live') {
+            notify(listenersRef.current, 'overlap', hit.entityIds);
+          } else if (hit.entityIds[0]) {
+            notify(listenersRef.current, 'select', hit.entityIds[0]);
+          }
+          return;
+        }
         if (hit.kind === 'entity') {
           notify(listenersRef.current, 'select', hit.entityId);
           return;

@@ -12,12 +12,20 @@ export function remoteManagementClient(
   )
     throw new Error('Management API requires HTTPS');
   return async (path, body) => {
-    const response = await fetcher(new URL(`/admin/api/work${path}`, base), {
-      headers: { Authorization: `Bearer ${await token()}`, 'Content-Type': 'application/json' },
-      ...(body === undefined ? {} : { method: 'POST', body: JSON.stringify(body) }),
-      redirect: 'error',
-      signal: AbortSignal.timeout(30000),
-    });
+    const response = await fetcher(
+      new URL(
+        path.startsWith('/source-library?')
+          ? `/admin/api/sources/library${path.slice('/source-library'.length)}`
+          : `/admin/api/work${path}`,
+        base,
+      ),
+      {
+        headers: { Authorization: `Bearer ${await token()}`, 'Content-Type': 'application/json' },
+        ...(body === undefined ? {} : { method: 'POST', body: JSON.stringify(body) }),
+        redirect: 'error',
+        signal: AbortSignal.timeout(30000),
+      },
+    );
     const value = (await response.json()) as { error?: unknown };
     if (!response.ok)
       throw new Error(

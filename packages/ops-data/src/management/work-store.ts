@@ -1,12 +1,13 @@
+import { isDiscoveryStatementUrl } from '@repo/domain-core/claims/source-fitness';
 /** Durable work orchestration. Research and release engines remain responsible for execution. */
 import { createHash, randomUUID } from 'node:crypto';
 import type { Pool, PoolClient } from 'pg';
+import { assertContract } from '@repo/research-kernel';
 import { validateCanonicalPromotionRecord, type CanonicalPromotionRecord } from '@repo/domain';
 import { managementEntitySnapshot } from './catalog.js';
 import { stableJson } from '../postgres/canonical-convergence.js';
 import {
   workRequestSchema,
-  workProposalSchema,
   workDecisionSchema,
   type WorkItem,
   type WorkProposal,
@@ -62,7 +63,7 @@ function item(row: Row): WorkItem {
   };
 }
 export function validateWorkProposal(value: unknown): WorkProposal {
-  const proposal = workProposalSchema.parse(value);
+  const proposal = assertContract('ManagementProposal', value);
   const ids = new Set<string>();
   for (const change of proposal.changes) {
     if (ids.has(change.entityId)) throw new WorkConflict('Duplicate entity in proposal');
@@ -78,6 +79,8 @@ export function validateWorkProposal(value: unknown): WorkProposal {
       change.reviewerActorId === change.producerActorId
     )
       throw new WorkConflict('Self-review cannot be labeled independent');
+    if (change.reviewBasis === 'independent_review' && !change.independenceBasis?.trim())
+      throw new WorkConflict('Independent review requires a documented basis beyond model family');
     if (change.operation === 'update' && !/^[a-f0-9]{64}$/u.test(String(change.beforeHash)))
       throw new WorkConflict('Updates require a valid record digest');
     for (const source of change.record.sources) {
@@ -96,6 +99,13 @@ export function validateWorkProposal(value: unknown): WorkProposal {
     for (const assertion of change.assertions) {
       if (['supported', 'qualified'].includes(assertion.finding) && !assertion.evidence.length)
         throw new WorkConflict('Supported assertions require evidence');
+      if (
+        ['supported', 'qualified'].includes(assertion.finding) &&
+        assertion.evidence.every((evidence) => isDiscoveryStatementUrl(evidence.sourceUrl))
+      )
+        throw new WorkConflict(
+          'New historical assertions require inspected underlying evidence; encyclopedia and Wikidata statements are discovery only',
+        );
     }
     const revisionIds = change.claimRevisions?.map((r) => r.claimId) ?? [];
     if (new Set(revisionIds).size !== revisionIds.length)

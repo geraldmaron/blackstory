@@ -233,6 +233,8 @@ export function AtlasExperience({ initial, embedded = false }: AtlasExperiencePr
     () => initial.viewState.selected,
   );
   const setSelectedIdRef = useRef(setSelectedId);
+  const [grouping, setGrouping] = useState(() => initial.viewState.group);
+  const [overlapIds, setOverlapIds] = useState<readonly string[] | null>(null);
 
   const { collection, persist, toggleSave, savedSet } = useSavedCollection(toasts);
   const {
@@ -271,6 +273,36 @@ export function AtlasExperience({ initial, embedded = false }: AtlasExperiencePr
     resetLens,
   } = useLensFilters(view, toasts);
 
+  const overlapFeatures = useMemo(
+    () =>
+      overlapIds
+        ? sorted.filter((feature) => overlapIds.includes(feature.properties.entityId))
+        : null,
+    [overlapIds, sorted],
+  );
+  useEffect(
+    () =>
+      stage.subscribe('overlap', (ids) => {
+        setSelectedId(undefined);
+        setOverlapIds(ids);
+        restorePanel('results');
+      }),
+    [stage, restorePanel],
+  );
+  useEffect(() => {
+    const clear = () => setOverlapIds(null);
+    const offSelect = stage.subscribe('select', clear);
+    const offDeselect = stage.subscribe('deselect', clear);
+    const offInteract = stage.subscribe('interact', clear);
+    return () => {
+      offSelect();
+      offDeselect();
+      offInteract();
+    };
+  }, [stage]);
+
+  useEffect(() => setOverlapIds(null), [filtered]);
+
   const holdingPlaceArrival = useMemo(() => {
     return placeArrivalQuery(
       {
@@ -294,6 +326,7 @@ export function AtlasExperience({ initial, embedded = false }: AtlasExperiencePr
     topicId,
     status,
     layerMode,
+    group: grouping,
     satellite: layers.satellite,
     lines: layers.routes,
     selectedId,
@@ -323,6 +356,7 @@ export function AtlasExperience({ initial, embedded = false }: AtlasExperiencePr
     stateCode,
     sweepClearingPlate,
     populationLevels,
+    grouping,
   );
 
   // The Lens's own population-layer choice overrides the URL-seeded `view.viewState.layerMode`
@@ -336,7 +370,7 @@ export function AtlasExperience({ initial, embedded = false }: AtlasExperiencePr
         {
           layerMode,
           densityLevels: view.densityLevels,
-          clusteringEnabled: view.viewState.group,
+          clusteringEnabled: grouping,
           satellite: layers.satellite,
           historyEdgeCollection: view.edgeLineCollection,
           stateChoroplethLevels: populationLevels.stateChoroplethLevels,
@@ -353,7 +387,7 @@ export function AtlasExperience({ initial, embedded = false }: AtlasExperiencePr
     stage,
     view.densityLevels,
     view.edgeLineCollection,
-    view.viewState.group,
+    grouping,
     populationLevels,
   ]);
 
@@ -421,7 +455,7 @@ export function AtlasExperience({ initial, embedded = false }: AtlasExperiencePr
     useRecordSelection(
       stage,
       camera,
-      sorted,
+      overlapFeatures ?? sorted,
       selectedId,
       setSelectedId,
       view.edgeLineCatalog.allTime.edges,
@@ -461,6 +495,7 @@ export function AtlasExperience({ initial, embedded = false }: AtlasExperiencePr
         setNearby(null);
         return;
       }
+      if (area.source === 'device') setGrouping(false);
       const { meters, label } = radiusRef.current;
       setNearby({
         ...area,
@@ -770,7 +805,7 @@ export function AtlasExperience({ initial, embedded = false }: AtlasExperiencePr
         <ResultsRail
           photos={sheetPhotos}
           onIntent={() => setRailTouched(true)}
-          features={sorted}
+          features={overlapFeatures ?? sorted}
           total={view.allFeatures.length}
           selectedId={selectedId}
           onSelect={select}
@@ -780,11 +815,22 @@ export function AtlasExperience({ initial, embedded = false }: AtlasExperiencePr
           savedIds={savedSet}
           onToggleSave={toggleSave}
           onHide={() => hidePanel('results')}
-          constraints={constraints.map((constraint): ResultsConstraint => ({
-            key: constraint.key,
-            label: constraint.label,
-            onClear: constraint.onClear,
-          }))}
+          constraints={[
+            ...(overlapIds
+              ? [
+                  {
+                    key: 'overlap',
+                    label: `${overlapFeatures?.length ?? 0} overlapping pins`,
+                    onClear: () => setOverlapIds(null),
+                  },
+                ]
+              : []),
+            ...constraints.map((constraint): ResultsConstraint => ({
+              key: constraint.key,
+              label: constraint.label,
+              onClear: constraint.onClear,
+            })),
+          ]}
           emptyState={
             <EmptyState
               constraints={{
@@ -871,6 +917,11 @@ export function AtlasExperience({ initial, embedded = false }: AtlasExperiencePr
 
       {mode === 'atlas' && !chromeHidden && stage.mapAvailable ? (
         <MapControls
+          grouping={grouping}
+          onToggleGrouping={() => {
+            setOverlapIds(null);
+            setGrouping((current) => !current);
+          }}
           onLocate={nearMe}
           locating={locateStatus === 'locating'}
           located={nearby?.source === 'device'}
@@ -910,7 +961,7 @@ export function AtlasExperience({ initial, embedded = false }: AtlasExperiencePr
           photo={sheetOpen ? sheetPhoto : leavingSheet.photo}
           onClose={() => setSelectedId(undefined)}
           {...(selectedIndex >= 0
-            ? { position: { index: selectedIndex + 1, total: sorted.length } }
+            ? { position: { index: selectedIndex + 1, total: (overlapFeatures ?? sorted).length } }
             : {})}
           onStep={stepRecord}
           onSelectConnection={selectById}
