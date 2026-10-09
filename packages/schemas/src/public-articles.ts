@@ -113,8 +113,9 @@ const articleParagraphBlockSchema = z.object({
 });
 
 /**
- * A block quotation, optionally attributed. `anchors`/`replicationVerified` back the
- * two-anchor corroboration rule when the quoted figure is load-bearing (criterion 3) — see gateLoadBearingAnchors in ops-data/scripts/articles.ts.
+ * A block quotation, optionally attributed. Publication requires reviewed exact
+ * evidence references. `replicationVerified` is retained for compatibility and
+ * confers no acceptance authority; see reviewed-anchors.ts in ops-data.
  */
 const articlePullQuoteBlockSchema = z.object({
   type: z.literal('pullquote'),
@@ -223,9 +224,9 @@ export type ArticleBodyBlockDoc = z.infer<typeof articleBodyBlockSchema>;
  * and how the piece is presented in the index.
  *
  * - `chapter` — the long-form era-immersion piece (`docs/content/neo-voice.md`).
- *   Carries the 2,000-word prose floor and the second-person era structure.
+ *   Uses reviewed evidence and editorial judgment to determine sufficient depth.
  * - `article` — a short, structured record entry: a paragraph of context plus cited
- *   call-outs. Same citation and source-tier bar, no prose floor, no era structure.
+ *   call-outs. Same evidence review, with no required length or era structure.
  *   Built for series where the reader compares many entries against each other.
  *
  * Defaults to `chapter` so every article authored before this field existed keeps its

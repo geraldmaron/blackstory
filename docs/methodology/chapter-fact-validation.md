@@ -81,7 +81,7 @@ integrity is not proof that a sentence uses a number correctly or that the under
 measurement is true. Narrative entailment still needs review.
 
 There is no mandatory prose-length floor. Do not manufacture scenes, detail
-or conclusions to meet it. Use an appropriate shorter format or review the format constraint.
+or conclusions. Choose a length and format suited to the evidence and reader task.
 Run current gates without bypasses, then prepare the preview for the separate publication role.
 
 ## 5. Correction after publication
