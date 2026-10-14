@@ -65,7 +65,12 @@ test('admin client fetch paths resolve to existing protected API handlers', () =
   for (const file of roots.flatMap((root) => routeFiles(root, '.tsx'))) {
     const source = readFileSync(file, 'utf8');
     for (const match of source.matchAll(/fetch\(\s*(['"`])(\/[^'"`]+)\1/g)) {
-      const path = (match[2] ?? '').replace(/\$\{[^}]+\}/g, 'sample-id').split('?')[0]!;
+      // `${id}` after a slash is one path segment; `/work${path}` is a caller-supplied suffix, so
+      // only its static prefix can be checked here.
+      const path = (match[2] ?? '')
+        .replace(/(?<!\/)\$\{[^}]+\}/g, '')
+        .replace(/\$\{[^}]+\}/g, 'sample-id')
+        .split('?')[0]!;
       checked += 1;
       if (!handlers.some((handler) => findAdminRouteAccess(handler.method, path))) {
         missing.push(`${relative(apiDir, file)}: ${path}`);
