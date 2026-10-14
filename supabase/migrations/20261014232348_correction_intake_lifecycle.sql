@@ -1,5 +1,3 @@
-BEGIN;
-
 -- Keep receipt state consistent for every staff writer, including batch triage. The public
 -- connection retains UPDATE(payload) only; it cannot choose an intake status directly.
 CREATE FUNCTION submissions.synchronize_correction_intake()
@@ -50,5 +48,3 @@ REVOKE ALL ON FUNCTION submissions.synchronize_correction_intake() FROM PUBLIC;
 CREATE TRIGGER synchronize_correction_intake
 BEFORE UPDATE OF status, payload ON submissions.intake_items
 FOR EACH ROW EXECUTE FUNCTION submissions.synchronize_correction_intake();
-
-COMMIT;
