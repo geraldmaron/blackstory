@@ -10,6 +10,7 @@ import {
   findResearchCaseIdForSubmission,
   getIntakeItemDetail,
   SUBMISSION_DECISION_PERMISSION,
+  submissionDecisionOptions,
 } from '../../../../admin/lib/postgres-submissions';
 import { SubmissionDecisionForm } from './SubmissionDecisionForm';
 
@@ -48,6 +49,10 @@ export default async function SubmissionDetailPage({
     ? staffRoleHasPermission(identity.role, SUBMISSION_DECISION_PERMISSION)
     : false;
 
+  const decisions = submissionDecisionOptions(submission);
+  const payload = submission.payload as Record<string, unknown> | null;
+  const closure = payload?.closureReason;
+  const displayStatus = closure === 'resolved' ? 'resolved' : submission.status;
   const linkedCaseId =
     submission.status !== 'quarantined' ? await findResearchCaseIdForSubmission(id) : null;
 
@@ -57,7 +62,7 @@ export default async function SubmissionDetailPage({
         <p className="ds-page__eyebrow">Intake</p>
         <h1 className="ds-page__title">{submission.title}</h1>
         <p className="ds-page__lede">
-          <span className="story-review__badge">{titleCase(submission.status)}</span>
+          <span className="story-review__badge">{titleCase(displayStatus)}</span>
           {' · '}
           {submission.kind ? titleCase(submission.kind) : 'Unspecified kind'}
           {' · '}
@@ -94,10 +99,14 @@ export default async function SubmissionDetailPage({
         </details>
       </section>
 
-      {submission.status === 'quarantined' ? (
+      {decisions.length > 0 ? (
         canDecide ? (
           <section aria-label="Decide this submission">
-            <SubmissionDecisionForm intakeItemId={submission.id} />
+            <SubmissionDecisionForm
+              key={decisions.join(',')}
+              intakeItemId={submission.id}
+              decisions={decisions}
+            />
           </section>
         ) : (
           <p className="story-review__notice" role="status">
@@ -106,7 +115,7 @@ export default async function SubmissionDetailPage({
         )
       ) : (
         <p className="story-review__notice" role="status">
-          Already decided: {titleCase(submission.status)}.
+          Already decided: {titleCase(displayStatus)}.
         </p>
       )}
     </main>

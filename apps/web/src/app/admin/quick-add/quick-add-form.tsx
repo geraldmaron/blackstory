@@ -148,10 +148,7 @@ export function QuickAddForm() {
             <input id="qa-era" name="era" type="text" />
           </div>
         </div>
-        <div className="quick-add-field">
-          <label htmlFor="qa-operator">Operator id</label>
-          <input id="qa-operator" name="operatorId" type="text" required autoComplete="off" />
-        </div>
+        <p>Your signed-in staff identity is recorded with the proposal.</p>
         <div className="quick-add-field">
           <label htmlFor="qa-commit">
             <input id="qa-commit" name="commit" type="checkbox" value="1" /> Commit to quarantine

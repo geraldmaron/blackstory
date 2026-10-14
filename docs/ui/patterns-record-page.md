@@ -94,6 +94,13 @@ A pin on a jurisdiction record is a false claim with a coordinate attached. A bo
 ## 7. Accessibility and dignity
 
 - Every record page carries a correction path. A record with no way to dispute it is an assertion, not evidence.
+- The correction handoff preserves the target and target type. Show the originating record's
+  name when it can be resolved; keep the form usable when lookup fails. Direct entry stays blank.
+- Inclusion explanations preserve the stored decision, note and evidence assignments. Never
+  infer a criterion from a citation or generic rubric label, fill missing links from unrelated
+  claims, or substitute a policy definition for evidence about the record. Report a missing
+  explanation as a research gap. General criterion definitions contain no internal tokens or
+  migration history.
 - Color is never the only signal; confidence stays glyph encoded.
 - A coarsened point is never labeled as an exact address.
 - A refused camera move states its reason in visible text.
@@ -125,26 +132,26 @@ A pin on a jurisdiction record is a false claim with a coordinate attached. A bo
 
 ## 9. Modules
 
-| Concern | Module | Status |
-|---|---|---|
-| Anatomy panel | `components/patterns/RecordAnatomyPanel.tsx`, `record-anatomy.css` | Built |
-| Place frame | `components/patterns/RecordPlacePreview.tsx` | Built |
-| Citation | `lib/citation/format.ts` | Built |
-| Record page stylesheet | `apps/web/src/app/record-page.css` | Pending (SP-12) |
-| Record sheet, shared component | `components/map-experience/RecordSheet.tsx` | Pending (SP-12, SP-20) |
-| Cites edge | `lib/release/build-cites-edge.ts` | Pending (SP-20) |
-| Inline place map | `components/entity/EntityLocationMap.tsx` | Built, but a second MapLibre instance; replaced by the Framed posture in SP-08 |
+| Concern                        | Module                                                             | Status                                                                         |
+| ------------------------------ | ------------------------------------------------------------------ | ------------------------------------------------------------------------------ |
+| Anatomy panel                  | `components/patterns/RecordAnatomyPanel.tsx`, `record-anatomy.css` | Built                                                                          |
+| Place frame                    | `components/patterns/RecordPlacePreview.tsx`                       | Built                                                                          |
+| Citation                       | `lib/citation/format.ts`                                           | Built                                                                          |
+| Record page stylesheet         | `apps/web/src/app/record-page.css`                                 | Pending (SP-12)                                                                |
+| Record sheet, shared component | `components/map-experience/RecordSheet.tsx`                        | Pending (SP-12, SP-20)                                                         |
+| Cites edge                     | `lib/release/build-cites-edge.ts`                                  | Pending (SP-20)                                                                |
+| Inline place map               | `components/entity/EntityLocationMap.tsx`                          | Built, but a second MapLibre instance; replaced by the Framed posture in SP-08 |
 
 ---
 
 ## 10. Tests
 
-| Contract | Assertion |
-|---|---|
-| No fork | The sheet and the page render the same anatomy component |
-| Citation parity | Citation strings from the sheet and the page are byte identical |
-| Skeleton geometry | The skeleton's geometry matches the record, so there is no layout jump |
-| Dignity | A violence-adjacent record shows the dramatising moves disabled with the reason in visible text |
-| One context | Exactly one WebGL context exists on a record page, verified in the browser |
-| Reverse edge | "Chapters that cite this record" renders in both sheet postures and on `/entity/[id]` |
-| Anchors | No deep anchor is emitted as a query param |
+| Contract          | Assertion                                                                                       |
+| ----------------- | ----------------------------------------------------------------------------------------------- |
+| No fork           | The sheet and the page render the same anatomy component                                        |
+| Citation parity   | Citation strings from the sheet and the page are byte identical                                 |
+| Skeleton geometry | The skeleton's geometry matches the record, so there is no layout jump                          |
+| Dignity           | A violence-adjacent record shows the dramatising moves disabled with the reason in visible text |
+| One context       | Exactly one WebGL context exists on a record page, verified in the browser                      |
+| Reverse edge      | "Chapters that cite this record" renders in both sheet postures and on `/entity/[id]`           |
+| Anchors           | No deep anchor is emitted as a query param                                                      |

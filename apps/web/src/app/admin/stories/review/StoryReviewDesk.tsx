@@ -190,7 +190,7 @@ export function StoryReviewDesk({ initialRows = [] }: StoryReviewDeskProps) {
       }
 
       if (submissionIds.length === 1) {
-        const response = await fetch(`/api/stories/packets/${submissionIds[0]}/review`, {
+        const response = await fetch(`/admin/api/stories/packets/${submissionIds[0]}/review`, {
           method: 'POST',
           headers: {
             Authorization: `Bearer ${token}`,

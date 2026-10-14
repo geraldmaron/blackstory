@@ -101,10 +101,9 @@ export default async function SubmissionsPage({
         <p className="ds-page__eyebrow">Intake</p>
         <h1 className="ds-page__title">Submissions</h1>
         <p className="ds-page__lede">
-          Every row in the raw submissions queue — public leads, discovery survivors, and every
-          other proposal shape, not only staged story packets. Deciding here only changes{' '}
-          <code>intake_items.status</code>; promoting opens a research case, it never publishes
-          anything.
+          Review public corrections, appeals, abuse reports, leads, and research proposals. Promote
+          an item to open a research case. Decisions update correction receipt status; they do not
+          publish changes.
         </p>
         <p className="story-review__notice">
           <Link href="/admin/stories/review">Story packet review</Link>

@@ -42,7 +42,7 @@ export function mapModerationToPublicPhase(
 }
 
 /** Plain-language decline reason a submitter sees for a closed correction. Only `rejected`
- * is a decline (`resolved` published the change; `withdrawn` was the submitter's own
+ * is a decline (`resolved` completed staff review; `withdrawn` was the submitter's own
  * action) — a description of the stored closure classification, not the moderator's
  * internal notes, which never leave the moderation state machine. */
 export function describeOutcomeReason(closureReason?: PublicClosureReason): string | undefined {
@@ -69,8 +69,11 @@ export function buildPublicCorrectionStatus(input: {
   readonly classificationDispute: boolean;
   readonly closureReason?: PublicClosureReason;
   readonly appealCount: number;
+  readonly intakeStatus?: string;
 }): PublicCorrectionStatus {
-  const phase = mapModerationToPublicPhase(input.moderationState, input.closureReason);
+  const mappedPhase = mapModerationToPublicPhase(input.moderationState, input.closureReason);
+  const phase =
+    mappedPhase !== 'closed' && input.intakeStatus === 'promoted' ? 'under_review' : mappedPhase;
   const outcomeReason = describeOutcomeReason(input.closureReason);
   const status: PublicCorrectionStatus = {
     phase,

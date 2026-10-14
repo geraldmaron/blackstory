@@ -242,9 +242,8 @@ export type PublicEntityView = {
    * one per notabilityBasis record sourced from @repo/domain's `NOTABILITY_RUBRIC`. */
   readonly notabilityLabels?: readonly string[];
   /**
-   * Structured inclusion basis produced by the release builder. Where it is absent, read
-   * adapters may derive a display fallback from notabilityLabels; that fallback is not new
-   * research evidence.
+   * Structured inclusion basis produced by the release builder. Missing basis records and
+   * evidence links remain missing; read adapters must not infer them from labels or citations.
    */
   readonly notabilityBasis?: readonly NotabilityBasisRecord[];
   /** Sensitivity classification label, when the entity carries one. Presentation is via
@@ -361,6 +360,8 @@ const INSTITUTION_STATUS_HISTORY = statusHistoryFor('ent_dunbar_alumni_federatio
  * so its relationship sentences can resolve neighbor display names across fixtures; `related` is
  * already the real graph-builder output (see `relatedEntriesFor`), not hand-authored.
  */
+// Inclusion choices are explicit fixture metadata, not generated review decisions. Empty
+// evidenceIds mark where existing fixture claims do not establish the full inclusion note.
 const SEED_ENTITY_DRAFTS: readonly Omit<PublicEntityView, 'timeline'>[] = [
   {
     id: 'ent_15th_st_church_001',
@@ -375,6 +376,13 @@ const SEED_ENTITY_DRAFTS: readonly Omit<PublicEntityView, 'timeline'>[] = [
     ...(PLACE_STATUS_HISTORY !== undefined ? { statusHistory: PLACE_STATUS_HISTORY } : {}),
     eraBuckets: ['1840s', '1870s'],
     notabilityLabels: [NOTABILITY_RUBRIC.community_anchor],
+    notabilityBasis: [
+      {
+        criterion: 'community_anchor',
+        note: 'A church founded in 1841 that hosted the school’s founding in 1870.',
+        evidenceIds: ['claim_church_founded_1841', 'claim_church_hosted_dunbar_founding_1870'],
+      },
+    ],
     topicTags: ['church', 'education', 'community'],
     jurisdictionLabel: 'Washington, D.C.',
     locationPrecision: 'neighborhood',
@@ -432,6 +440,13 @@ const SEED_ENTITY_DRAFTS: readonly Omit<PublicEntityView, 'timeline'>[] = [
       : {}),
     eraBuckets: ['1870s', '1890s', '1910s'],
     notabilityLabels: [NOTABILITY_RUBRIC.first_to_do_x],
+    notabilityBasis: [
+      {
+        criterion: 'first_to_do_x',
+        note: 'The first public high school for Black students in the United States, founded in 1870.',
+        evidenceIds: [],
+      },
+    ],
     topicTags: ['education', 'schools', 'preservation'],
     jurisdictionLabel: 'Washington, D.C.',
     locationPrecision: 'institution',
@@ -523,6 +538,13 @@ const SEED_ENTITY_DRAFTS: readonly Omit<PublicEntityView, 'timeline'>[] = [
     },
     eraBuckets: ['1970s'],
     notabilityLabels: [NOTABILITY_RUBRIC.landmark_or_national_register],
+    notabilityBasis: [
+      {
+        criterion: 'landmark_or_national_register',
+        note: 'The school’s listing on the D.C. Inventory of Historic Sites on April 29, 1975.',
+        evidenceIds: ['claim_landmark_listed_1975'],
+      },
+    ],
     topicTags: ['landmark', 'preservation', 'history'],
     jurisdictionLabel: 'Washington, D.C.',
     locationPrecision: 'institution',
@@ -569,6 +591,13 @@ const SEED_ENTITY_DRAFTS: readonly Omit<PublicEntityView, 'timeline'>[] = [
       : {}),
     eraBuckets: ['2000s'],
     notabilityLabels: [NOTABILITY_RUBRIC.community_anchor],
+    notabilityBasis: [
+      {
+        criterion: 'community_anchor',
+        note: 'The alumni federation preserves the school’s history and supports its students.',
+        evidenceIds: [],
+      },
+    ],
     topicTags: ['alumni', 'preservation', 'community'],
     jurisdictionLabel: 'Washington, D.C.',
     locationPrecision: 'institution',

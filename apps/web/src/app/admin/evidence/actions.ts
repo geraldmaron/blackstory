@@ -9,45 +9,35 @@ import {
   prepareEvidenceAttachmentIntake,
   type OperatorIntakeAccepted,
 } from '@repo/operator-cli';
-import { createLiveAtomicStoreFromEnv } from '@repo/data-access';
+import { createPostgresAtomicStore } from '@repo/data-access';
+import { getPostgresPool } from '../../../admin/lib/canonical-postgres-client';
+import { readVerifiedAdminIdentity } from '../../../admin/auth/supabase-server';
+import { staffRoleHasPermission } from '../../../admin/auth/staff-permissions';
 
-export type EvidenceAttachState =
-  | { readonly status: 'idle' }
-  | { readonly status: 'error'; readonly error: string }
-  | {
-      readonly status: 'prepared';
-      readonly submissionId: string;
-      readonly researchCaseId: string;
-    }
-  | {
-      readonly status: 'committed';
-      readonly submissionId: string;
-      readonly researchCaseId: string;
-      readonly auditEventId: string;
-    };
-
-export const EVIDENCE_ATTACH_INITIAL: EvidenceAttachState = { status: 'idle' };
+import type { EvidenceAttachState } from './form-state';
 
 export async function submitEvidenceAttach(
   _previous: EvidenceAttachState,
   formData: FormData,
 ): Promise<EvidenceAttachState> {
+  const identity = await readVerifiedAdminIdentity();
+  if (!identity || !staffRoleHasPermission(identity.role, 'research:write')) {
+    return { status: 'error', error: 'A staff session with research permission is required.' };
+  }
+
   const researchCaseId = String(formData.get('researchCaseId') ?? '').trim();
   const description = String(formData.get('description') ?? '').trim();
   const sourceUrl = String(formData.get('sourceUrl') ?? '').trim();
-  const operatorId = String(formData.get('operatorId') ?? '').trim();
+  const operatorId = identity.uid;
   const shouldCommit = formData.get('commit') === '1';
 
   if (!researchCaseId) return { status: 'error', error: 'Research case id is required.' };
   if (!description) return { status: 'error', error: 'Description is required.' };
   if (!sourceUrl) return { status: 'error', error: 'Source URL is required.' };
-  if (!operatorId) {
-    return { status: 'error', error: 'Operator id is required to stamp this proposal for audit.' };
-  }
 
-  const privacyPepper = process.env.OPERATOR_CLI_PRIVACY_PEPPER;
+  const privacyPepper = process.env.SUBMISSION_PRIVACY_PEPPER;
   if (!privacyPepper) {
-    return { status: 'error', error: 'Server is missing OPERATOR_CLI_PRIVACY_PEPPER.' };
+    return { status: 'error', error: 'Server is missing SUBMISSION_PRIVACY_PEPPER.' };
   }
 
   try {
@@ -78,7 +68,7 @@ export async function submitEvidenceAttach(
     }
 
     if (shouldCommit) {
-      const store = await createLiveAtomicStoreFromEnv(process.env);
+      const store = createPostgresAtomicStore(getPostgresPool());
       const commitResult = await commitOperatorIntake(store, outcome as OperatorIntakeAccepted);
       return {
         status: 'committed',

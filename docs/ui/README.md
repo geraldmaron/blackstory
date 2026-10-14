@@ -45,6 +45,8 @@ Live instrument chrome belongs on `/explore`. See [`v10/design-doc-reconciliatio
 
 ### Reusable component patterns
 
+Staff intake uses [Admin intake](./patterns-admin-intake.md) for queue navigation, receipt lifecycle, and audited decisions.
+
 | Pattern | Binding doc | Code | Status |
 |---|---|---|---|
 | **Source library** | [`patterns-source-library.md`](./patterns-source-library.md) | `app/admin/sources/collection-guidance.tsx`, existing `story-review` primitives | Staff collection guidance, separate from publisher usage |

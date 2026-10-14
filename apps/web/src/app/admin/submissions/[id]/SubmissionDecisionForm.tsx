@@ -5,6 +5,7 @@
  * One shared reason, one shared server action — see actions.ts's decideSubmission.
  */
 import { useActionState, useState } from 'react';
+import type { SubmissionDecision } from '../../../../admin/lib/postgres-submissions';
 import { decideSubmission } from './actions';
 import { SUBMISSION_DECISION_INITIAL, type SubmissionDecisionState } from './decision-state';
 
@@ -12,9 +13,16 @@ const DECISION_LABEL = {
   promote: 'Promote to research case',
   reject: 'Reject',
   spam: 'Mark spam',
+  resolve: 'Close as resolved',
 } as const;
 
-export function SubmissionDecisionForm({ intakeItemId }: { readonly intakeItemId: string }) {
+export function SubmissionDecisionForm({
+  intakeItemId,
+  decisions,
+}: {
+  readonly intakeItemId: string;
+  readonly decisions: readonly SubmissionDecision[];
+}) {
   const [state, formAction, pending] = useActionState<SubmissionDecisionState, FormData>(
     decideSubmission,
     SUBMISSION_DECISION_INITIAL,
@@ -60,37 +68,22 @@ export function SubmissionDecisionForm({ intakeItemId }: { readonly intakeItemId
           required
           value={reason}
           onChange={(event) => setReason(event.target.value)}
-          placeholder="Why this decision — cite what you checked."
+          placeholder="Cite what you checked and the resulting record change."
         />
       </label>
       <div className="entity-edit__actions">
-        <button
-          type="submit"
-          name="decision"
-          value="promote"
-          className="ds-button"
-          disabled={!canSubmit}
-        >
-          {pending ? 'Working…' : DECISION_LABEL.promote}
-        </button>
-        <button
-          type="submit"
-          name="decision"
-          value="reject"
-          className="ds-button ds-button--secondary"
-          disabled={!canSubmit}
-        >
-          {pending ? 'Working…' : DECISION_LABEL.reject}
-        </button>
-        <button
-          type="submit"
-          name="decision"
-          value="spam"
-          className="ds-button ds-button--secondary"
-          disabled={!canSubmit}
-        >
-          {pending ? 'Working…' : DECISION_LABEL.spam}
-        </button>
+        {decisions.map((decision, index) => (
+          <button
+            key={decision}
+            type="submit"
+            name="decision"
+            value={decision}
+            className={index === 0 ? 'ds-button' : 'ds-button ds-button--secondary'}
+            disabled={!canSubmit}
+          >
+            {pending ? 'Working…' : DECISION_LABEL[decision]}
+          </button>
+        ))}
       </div>
     </form>
   );
