@@ -1,6 +1,6 @@
 /** Approved changes are applied with a complete immutable catalog and one atomic activation. */
 import { createHash, createPrivateKey, createPublicKey } from 'node:crypto';
-import type { PoolClient } from 'pg';
+import type { Pool, PoolClient } from 'pg';
 import {
   buildReleaseEntityArtifacts,
   buildGeoPointFields,
@@ -45,7 +45,7 @@ const quoteIdentifier = (value: string) => `"${value.replaceAll('"', '""')}"`;
 const byteHash = (value: string) => createHash('sha256').update(value).digest('hex');
 
 /** SQL identifier inputs come only from pg_catalog, never a research proposal. */
-async function copyRelease(db: PoolClient, before: string, after: string): Promise<void> {
+export async function copyRelease(db: PoolClient, before: string, after: string): Promise<void> {
   const tables = await db.query<{
     table_name: string;
     columns: { name: string; type: string }[];
@@ -61,9 +61,12 @@ async function copyRelease(db: PoolClient, before: string, after: string): Promi
       if (column.name === 'release_id') return '$2::text';
       if (table.table_name === 'search_index' && column.name === 'id')
         return "$2 || ':' || entity_id";
-      // Only the entity projection's release envelope changes. Other JSON may contain
+      // Entity and article release envelopes change. Other JSON may contain
       // historical release references or signed payloads whose bytes must remain intact.
-      if (table.table_name === 'release_entities' && column.name === 'projection')
+      if (
+        (table.table_name === 'release_entities' && column.name === 'projection') ||
+        (table.table_name === 'release_articles' && column.name === 'payload')
+      )
         return `jsonb_set(${name},'{releaseId}',to_jsonb($2::text))`;
       return name;
     });
@@ -73,6 +76,15 @@ async function copyRelease(db: PoolClient, before: string, after: string): Promi
       [before, after],
     );
   }
+  const articles = await db.query(
+    'SELECT article_id,payload FROM published.release_articles WHERE release_id=$1',
+    [after],
+  );
+  for (const row of articles.rows)
+    await db.query(
+      'UPDATE published.release_articles SET content_hash=$3 WHERE release_id=$1 AND article_id=$2',
+      [after, row.article_id, byteHash(JSON.stringify(row.payload))],
+    );
 }
 
 /** Locks owner and delegations until activation, making revocation serialize with execution. */
@@ -324,24 +336,6 @@ export async function publishManagementWork(
   );
   if (changes.some((c) => c.blockers.length) || !changes.length)
     throw new WorkConflict('Approved selection is invalid');
-  // Signing and deployment configuration must be available before making canonical changes.
-  const privateKey = createPrivateKey(required('RELEASE_SIGNING_PRIVATE_KEY'));
-  const publicPem = required('RELEASE_SIGNING_PUBLIC_KEY');
-  const publicKey = createPublicKey(publicPem);
-  if (
-    privateKey.asymmetricKeyDetails?.namedCurve !== 'prime256v1' ||
-    publicKey.asymmetricKeyDetails?.namedCurve !== 'prime256v1' ||
-    byteHash(publicPem) !== required('EXPECTED_RELEASE_SIGNING_PUBLIC_KEY_SHA256')
-  )
-    throw new Error('Release signing identity does not match the trusted registry');
-  const storage = {
-    supabaseUrl: required('SUPABASE_URL'),
-    secretKey: required('SUPABASE_SECRET_KEY'),
-    bucket: 'public-media',
-    cacheControl: '31536000, immutable',
-    immutable: true,
-  };
-  const keyId = required('RELEASE_SIGNING_KEY_ID');
   let releaseId =
     work.outcome?.verified === false && typeof work.outcome.releaseId === 'string'
       ? work.outcome.releaseId
@@ -519,147 +513,9 @@ export async function publishManagementWork(
           ],
         );
       }
-      const rows = await db.query<{ projection: JsonValue }>(
-        'SELECT projection FROM published.release_entities WHERE release_id=$1 ORDER BY entity_id',
-        [releaseId],
+      await finalizeEditorialRelease(db, store.pool, previous, releaseId, now, () =>
+        assertAuthority(db, work),
       );
-      const search = await db.query(
-        'SELECT * FROM published.search_index WHERE release_id=$1 ORDER BY id',
-        [releaseId],
-      );
-      const artifacts = buildReleaseCatalogArtifacts({
-        releaseId,
-        generatedAt: now,
-        projections: rows.rows.map((r) => r.projection),
-        searchDocs: search.rows.map((r) => {
-          const mapped = mapPostgresSearchIndexRow(r);
-          if (!mapped) throw new Error('Invalid search projection');
-          return mapped as unknown as JsonValue;
-        }),
-      });
-      const mobileStore = createPoolPostgresReleaseStore(store.pool, db);
-      const mobilePointer = await mobileStore.getPointer();
-      const previousMobile = mobilePointer
-        ? await mobileStore.getRelease(mobilePointer.activeReleaseId)
-        : undefined;
-      if (mobilePointer && (!previousMobile || mobilePointer.activeReleaseId !== previous))
-        throw new WorkConflict('Mobile and public release baselines differ');
-      const contentReference = previousMobile?.manifest.artifactHashes['content-index'];
-      const contentArtifact = contentReference
-        ? await mobileStore.getArtifact(contentReference.path)
-        : undefined;
-      if (
-        contentReference &&
-        (!contentArtifact || contentArtifact.hash.digest !== contentReference.hash.digest)
-      )
-        throw new WorkConflict('Previous mobile content index is unavailable');
-      const mobile = previousMobile
-        ? generateReleaseArtifacts({
-            releaseId,
-            generatedAt: now,
-            mapEntities: rows.rows.map(({ projection }) => {
-              const entity = projection as unknown as MapSourceEntityInput & { id: string };
-              return { ...entity, entityId: entity.id };
-            }),
-            redactLocation: redactLocationForPublic,
-            contentIndex: contentArtifact
-              ? (JSON.parse(contentArtifact.canonical).entries as ContentIndexEntry[])
-              : [],
-            entitiesList: artifacts.entitiesList as unknown as JsonValue,
-            searchIndex: artifacts.searchIndex as unknown as JsonValue,
-            bootstrap: {
-              schemaRange: previousMobile.manifest.schemaRange,
-              compatibility: previousMobile.manifest.compatibility,
-              featureFlags: previousMobile.manifest.featureFlags,
-              legalVersions: previousMobile.manifest.legalVersions,
-              cacheDirectives: previousMobile.manifest.cacheDirectives,
-              ...(previousMobile.manifest.contentVersion
-                ? { contentVersion: previousMobile.manifest.contentVersion }
-                : {}),
-              searchIndexVersion: `search_${releaseId}`,
-            },
-          })
-        : undefined;
-      const manifest = signReleaseManifest(
-        buildReleaseManifest({
-          releaseId,
-          generatedAt: now,
-          searchIndexVersion: `search_${releaseId}`,
-          aggregateArtifacts: mobile
-            ? mobile.artifacts.map((a) => ({ path: a.path, hash: a.hash }))
-            : [
-                { path: artifacts.entitiesListPath, hash: artifacts.entitiesListHash },
-                { path: artifacts.searchIndexPath, hash: artifacts.searchIndexHash },
-              ],
-          artifacts: rows.rows.map(({ projection }) => ({
-            entityId: String((projection as Json).id),
-            revision: sha256Json(projection).digest,
-            projection,
-            snapshot: { schemaVersion: 1, releaseId, entity: projection },
-          })),
-        }),
-        { privateKey, keyId },
-      );
-      if (!verifySignedReleaseManifest(manifest, publicKey))
-        throw new Error('Release signature verification failed');
-      const entriesById = new Map(
-        manifest.manifest.entries.map((entry) => [entry.entityId, entry]),
-      );
-      const mobileByPath = new Map(
-        mobile?.artifacts.map((artifact) => [artifact.path, artifact]) ?? [],
-      );
-      const uploads = [
-        ...(mobile
-          ? mobile.artifacts.map((a) => [a.path, a.json] as const)
-          : ([
-              [artifacts.entitiesListPath, artifacts.entitiesList],
-              [artifacts.searchIndexPath, artifacts.searchIndex],
-            ] as const)),
-        ...rows.rows.flatMap(({ projection }) => {
-          const entry = entriesById.get(String((projection as Json).id));
-          if (!entry) throw new Error('Entity is missing from the release manifest');
-          return [
-            [entry.snapshotPath, { schemaVersion: 1, releaseId, entity: projection }],
-            [entry.projectionPath, projection],
-          ] as const;
-        }),
-      ] as const;
-      let uploadFailure: unknown;
-      const uploadDeadline = Date.now() + 20 * 60 * 1000;
-      await mapWithConcurrency(uploads, 8, async ([path, artifact]) => {
-        if (uploadFailure) return;
-        try {
-          if (Date.now() >= uploadDeadline)
-            throw new Error('Release preparation exceeded its time budget');
-          const body = mobileByPath.get(path)?.canonical ?? `${JSON.stringify(artifact)}\n`;
-          await uploadArtifactJson(path, body, storage);
-          const readback = await fetch(
-            `${storage.supabaseUrl}/storage/v1/object/public/${storage.bucket}/${path}`,
-            { signal: AbortSignal.timeout(60000) },
-          );
-          if (!readback.ok || byteHash(await readback.text()) !== byteHash(body))
-            throw new Error('Release artifact readback failed');
-        } catch (error) {
-          uploadFailure = error;
-        }
-      });
-      // All started uploads settle before a failure rolls the database transaction back.
-      if (uploadFailure) throw uploadFailure;
-      await db.query('UPDATE publication.releases SET signed_manifest=$2::jsonb WHERE id=$1', [
-        releaseId,
-        JSON.stringify({
-          manifest: manifest.manifest,
-          signature: manifest.signature,
-          manifestHash: manifest.manifestHash.digest,
-          manifestHashAlgorithm: 'sha256',
-        }),
-      ]);
-      await assertAuthority(db, work);
-      await db.query('SELECT publication.activate_release($1)', [releaseId]);
-      if (mobile)
-        await activateReleaseAsync(mobileStore, mobile, {
-          expectedPointerVersion: mobilePointer!.pointerVersion,
-        });
       await db.query(
         `UPDATE research.management_work SET outcome=$3::jsonb,lease_until=now()+interval '5 minutes'
         WHERE id=$1 AND lease_token=$2`,
@@ -813,4 +669,184 @@ async function verifyPublicResult(
     )
       throw new Error('Public page does not contain the record');
   }
+}
+
+/** Shared artifact verification and atomic public/mobile activation boundary. */
+export async function finalizeEditorialRelease(
+  db: PoolClient,
+  pool: Pool,
+  previous: string,
+  releaseId: string,
+  now: string,
+  authority: () => Promise<void>,
+): Promise<void> {
+  // Validate signing identity before emitting artifacts or activating the release.
+  const privateKey = createPrivateKey(required('RELEASE_SIGNING_PRIVATE_KEY'));
+  const publicPem = required('RELEASE_SIGNING_PUBLIC_KEY');
+  const publicKey = createPublicKey(publicPem);
+  if (
+    privateKey.asymmetricKeyDetails?.namedCurve !== 'prime256v1' ||
+    publicKey.asymmetricKeyDetails?.namedCurve !== 'prime256v1' ||
+    byteHash(publicPem) !== required('EXPECTED_RELEASE_SIGNING_PUBLIC_KEY_SHA256')
+  )
+    throw new Error('Release signing identity does not match the trusted registry');
+  const storage = {
+    supabaseUrl: required('SUPABASE_URL'),
+    secretKey: required('SUPABASE_SECRET_KEY'),
+    bucket: 'public-media',
+    cacheControl: '31536000, immutable',
+    immutable: true,
+  };
+  const keyId = required('RELEASE_SIGNING_KEY_ID');
+  const rows = await db.query<{ projection: JsonValue }>(
+    'SELECT projection FROM published.release_entities WHERE release_id=$1 ORDER BY entity_id',
+    [releaseId],
+  );
+  const search = await db.query(
+    'SELECT * FROM published.search_index WHERE release_id=$1 ORDER BY id',
+    [releaseId],
+  );
+  const artifacts = buildReleaseCatalogArtifacts({
+    releaseId,
+    generatedAt: now,
+    projections: rows.rows.map((r) => r.projection),
+    searchDocs: search.rows.map((r) => {
+      const mapped = mapPostgresSearchIndexRow(r);
+      if (!mapped) throw new Error('Invalid search projection');
+      return mapped as unknown as JsonValue;
+    }),
+  });
+  const mobileStore = createPoolPostgresReleaseStore(pool, db);
+  const mobilePointer = await mobileStore.getPointer();
+  const previousMobile = mobilePointer
+    ? await mobileStore.getRelease(mobilePointer.activeReleaseId)
+    : undefined;
+  if (mobilePointer && (!previousMobile || mobilePointer.activeReleaseId !== previous))
+    throw new WorkConflict('Mobile and public release baselines differ');
+  const contentReference = previousMobile?.manifest.artifactHashes['content-index'];
+  const contentArtifact = contentReference
+    ? await mobileStore.getArtifact(contentReference.path)
+    : undefined;
+  if (
+    contentReference &&
+    (!contentArtifact || contentArtifact.hash.digest !== contentReference.hash.digest)
+  )
+    throw new WorkConflict('Previous mobile content index is unavailable');
+  const mobile = previousMobile
+    ? generateReleaseArtifacts({
+        releaseId,
+        generatedAt: now,
+        mapEntities: rows.rows.map(({ projection }) => {
+          const entity = projection as unknown as MapSourceEntityInput & { id: string };
+          return { ...entity, entityId: entity.id };
+        }),
+        redactLocation: redactLocationForPublic,
+        contentIndex: contentArtifact
+          ? (JSON.parse(contentArtifact.canonical).entries as ContentIndexEntry[])
+          : [],
+        entitiesList: artifacts.entitiesList as unknown as JsonValue,
+        searchIndex: artifacts.searchIndex as unknown as JsonValue,
+        bootstrap: {
+          schemaRange: previousMobile.manifest.schemaRange,
+          compatibility: previousMobile.manifest.compatibility,
+          featureFlags: previousMobile.manifest.featureFlags,
+          legalVersions: previousMobile.manifest.legalVersions,
+          cacheDirectives: previousMobile.manifest.cacheDirectives,
+          ...(previousMobile.manifest.contentVersion
+            ? { contentVersion: previousMobile.manifest.contentVersion }
+            : {}),
+          searchIndexVersion: `search_${releaseId}`,
+        },
+      })
+    : undefined;
+  const articleRows = await db.query(
+    'SELECT payload FROM published.release_articles WHERE release_id=$1 ORDER BY article_id',
+    [releaseId],
+  );
+  const articlePath = `releases/${releaseId}/articles.json`;
+  const articlePayload = { releaseId, articles: articleRows.rows.map((r) => r.payload) };
+  const manifest = signReleaseManifest(
+    buildReleaseManifest({
+      releaseId,
+      generatedAt: now,
+      searchIndexVersion: `search_${releaseId}`,
+      aggregateArtifacts: [
+        ...(mobile
+          ? mobile.artifacts.map((a) => ({ path: a.path, hash: a.hash }))
+          : [
+              { path: artifacts.entitiesListPath, hash: artifacts.entitiesListHash },
+              { path: artifacts.searchIndexPath, hash: artifacts.searchIndexHash },
+            ]),
+        { path: articlePath, hash: sha256Json(articlePayload as unknown as JsonValue) },
+      ],
+      artifacts: rows.rows.map(({ projection }) => ({
+        entityId: String((projection as Json).id),
+        revision: sha256Json(projection).digest,
+        projection,
+        snapshot: { schemaVersion: 1, releaseId, entity: projection },
+      })),
+    }),
+    { privateKey, keyId },
+  );
+  if (!verifySignedReleaseManifest(manifest, publicKey))
+    throw new Error('Release signature verification failed');
+  const entriesById = new Map(manifest.manifest.entries.map((entry) => [entry.entityId, entry]));
+  const mobileByPath = new Map(
+    mobile?.artifacts.map((artifact) => [artifact.path, artifact]) ?? [],
+  );
+  const uploads = [
+    [articlePath, articlePayload] as const,
+    ...(mobile
+      ? mobile.artifacts.map((a) => [a.path, a.json] as const)
+      : ([
+          [artifacts.entitiesListPath, artifacts.entitiesList],
+          [artifacts.searchIndexPath, artifacts.searchIndex],
+        ] as const)),
+    ...rows.rows.flatMap(({ projection }) => {
+      const entry = entriesById.get(String((projection as Json).id));
+      if (!entry) throw new Error('Entity is missing from the release manifest');
+      return [
+        [entry.snapshotPath, { schemaVersion: 1, releaseId, entity: projection }],
+        [entry.projectionPath, projection],
+      ] as const;
+    }),
+  ] as const;
+  let uploadFailure: unknown;
+  // Leave time for in-flight upload/readback requests and transaction rollback before
+  // the article routes reach their 800-second hosting limit.
+  const uploadDeadline = Date.now() + 8 * 60 * 1000;
+  await mapWithConcurrency(uploads, 8, async ([path, artifact]) => {
+    if (uploadFailure) return;
+    try {
+      if (Date.now() >= uploadDeadline)
+        throw new Error('Release preparation exceeded its time budget');
+      const body = mobileByPath.get(path)?.canonical ?? `${JSON.stringify(artifact)}\n`;
+      await uploadArtifactJson(path, body, storage);
+      const readback = await fetch(
+        `${storage.supabaseUrl}/storage/v1/object/public/${storage.bucket}/${path}`,
+        { signal: AbortSignal.timeout(60000) },
+      );
+      if (!readback.ok || byteHash(await readback.text()) !== byteHash(body))
+        throw new Error('Release artifact readback failed');
+    } catch (error) {
+      uploadFailure = error;
+    }
+  });
+  // All started uploads settle before a failure rolls the database transaction back.
+  if (uploadFailure) throw uploadFailure;
+  await db.query('UPDATE publication.releases SET signed_manifest=$2::jsonb WHERE id=$1', [
+    releaseId,
+    JSON.stringify({
+      manifest: manifest.manifest,
+      signature: manifest.signature,
+      manifestHash: manifest.manifestHash.digest,
+      manifestHashAlgorithm: 'sha256',
+    }),
+  ]);
+  await authority();
+  await db.query('SELECT publication.activate_release($1)', [releaseId]);
+  if (mobile)
+    await activateReleaseAsync(mobileStore, mobile, {
+      expectedPointerVersion: mobilePointer!.pointerVersion,
+    });
 }

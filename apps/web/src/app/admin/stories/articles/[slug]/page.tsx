@@ -1,48 +1,49 @@
-/**
- * Article cover form for one story. Publish is blocked without a valid package.
- */
-import Link from 'next/link';
-import { notFound } from 'next/navigation';
-import { getCoverArticle } from '../../../../../admin/stories/cover-article-catalog';
-import { COVER_FORM_INTENT } from '../../../../../admin/stories/cover-package-copy';
-import { getStoredCoverArticle } from '../../../../../admin/stories/cover-package-store';
-import { CoverPackageForm } from './cover-form';
+import { randomUUID } from 'node:crypto';
+import { notFound, redirect } from 'next/navigation';
+import { readArticle, listContributors } from '@/admin/editorial/store';
+import { readVerifiedAdminIdentity } from '@/admin/auth/supabase-server';
+import { queryPostgres } from '@/admin/lib/canonical-postgres-client';
+import { ArticleEditor } from '@/admin/editorial/article-editor';
+import type { EditorialArticle } from '@repo/schemas';
 import '../articles.css';
-
-export const metadata = {
-  title: 'Article cover package',
-  description: 'Human brief, recipe, and plate citing the house lock. No brief, no cover.',
-};
-
-type ArticleCoverPageProps = {
-  readonly params: Promise<{ readonly slug: string }>;
-};
-
-export default async function ArticleCoverPage({ params }: ArticleCoverPageProps) {
+export default async function ArticlePage({ params }: { params: Promise<{ slug: string }> }) {
+  if (!(await readVerifiedAdminIdentity())) redirect('/admin/login');
   const { slug } = await params;
-  const article = getCoverArticle(slug);
+  const article: EditorialArticle | null =
+    slug === 'new'
+      ? {
+          draft: {
+            id: randomUUID(),
+            slug: `draft-${randomUUID().slice(0, 8)}`,
+            title: '',
+            summary: '',
+            kind: 'article',
+            publishedAt: new Date().toISOString().slice(0, 10),
+            eraLabel: '',
+            placeLabel: '',
+            body: [],
+            references: [],
+            relatedEntityIds: [],
+            tags: [],
+            contributors: [],
+          },
+          revision: 0,
+          status: 'draft',
+          review: null,
+          history: [],
+        }
+      : await readArticle(slug);
   if (!article) notFound();
-  const stored = getStoredCoverArticle(slug);
-
   return (
-    <main className="cover-articles ds-container ds-page" id="main">
-      <header>
-        <p className="ds-page__eyebrow">Publication</p>
-        <h1 className="ds-page__title">Cover package</h1>
-        <p className="ds-page__lede">{COVER_FORM_INTENT}</p>
-        <p className="cover-articles__meta">
-          {article.title}
-          {article.eraLabel ? ` · ${article.eraLabel}` : ''}
-          {article.placeLabel ? ` · ${article.placeLabel}` : ''}
-          {article.fromSeed ? ' · seed article' : ' · draft slug'}
-        </p>
-      </header>
-      <p className="ds-sans">
-        <Link href="/admin/stories/articles">All article covers</Link>
-        {' · '}
-        <Link href="/admin/stories/review">Story review</Link>
-      </p>
-      <CoverPackageForm article={article} stored={stored} />
+    <main className="ds-container" id="main">
+      <ArticleEditor
+        initial={article}
+        profiles={await listContributors()}
+        relatedRecords={await queryPostgres<{ id: string; display_name: string }>(
+          'SELECT id,display_name FROM canonical.entities WHERE id=ANY($1::text[])',
+          [article.draft.relatedEntityIds],
+        )}
+      />
     </main>
   );
 }

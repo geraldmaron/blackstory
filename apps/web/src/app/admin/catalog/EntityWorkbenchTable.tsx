@@ -7,6 +7,7 @@
  */
 'use client';
 
+import { FormInput, FormButton } from '../../../admin/design-system/fields';
 import Link from 'next/link';
 import { useCallback, useState } from 'react';
 import { useRouter } from 'next/navigation';
@@ -264,7 +265,7 @@ export function EntityWorkbenchTable({
       >
         <label className="story-review__field">
           <span className="ds-visually-hidden">Reason (required, audited)</span>
-          <input
+          <FormInput
             type="text"
             value={reason}
             onChange={(event) => setReason(event.target.value)}
@@ -280,7 +281,7 @@ export function EntityWorkbenchTable({
           </Link>
         ) : null}
         {(Object.keys(ACTION_LABEL) as CatalogDecisionAction[]).map((action) => (
-          <button
+          <FormButton
             key={action}
             type="button"
             className="ds-selection-bar__escalate"
@@ -288,7 +289,7 @@ export function EntityWorkbenchTable({
             onClick={() => void submitDecision(action)}
           >
             {ACTION_LABEL[action]}
-          </button>
+          </FormButton>
         ))}
       </SelectionBar>
 

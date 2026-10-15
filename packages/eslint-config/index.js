@@ -10,6 +10,7 @@ export default tseslint.config(
   {
     ignores: [
       '**/.next/**',
+      '**/.next-validation/**',
       // Next's static export target. `apps/docs` exports here, and linting a build output
       // directory means linting minified webpack chunks: it produced 2,126 errors about
       // `importScripts` being undefined and minified expressions being unused, none of which

@@ -3,14 +3,14 @@
  */
 
 export const STORY_REVIEW_INTENT_COPY =
-  'Review staged story packets from research runs. Record approve, reject, or needs evidence. Nothing here publishes to the public site. Open the article cover form to attach a brief, recipe, and plate before publication.';
+  'Review staged story packets from research runs. Record approve, reject, or needs evidence. Nothing here publishes to the public site. Open an editable article draft to review its prose, sources, media and credits.';
 
 /** Numbered operator steps for the story review queue. */
 export const STORY_REVIEW_STEPS = [
   'Open a story packet (or select rows for bulk).',
   'Check naming, agency framing, and (for sensitive subject matter) community-review status against docs/methodology/scholarship-principles.md before deciding.',
   'Add a decision note if helpful (optional, but stored with your review).',
-  'Choose approve, needs evidence, or reject. Approval prepares a seed handoff; shipping happens separately.',
+  'Choose approve, needs evidence, or reject. Open the article draft after review; publication requires approval of its saved revision.',
 ] as const;
 
 /**
@@ -21,7 +21,7 @@ export const STORY_REVIEW_STEPS = [
  * (redlining, racial violence, forced displacement, family separation).
  */
 export const STORY_REVIEW_COMMUNITY_NOTE_PROMPT =
-  'Community review (sensitive subject matter): who was asked, what they said — or "not yet sought".';
+  'Community review (sensitive subject matter): who was asked, what they said, or "not yet sought".';
 
 export type StoryReviewAction = 'approved' | 'rejected' | 'needs_evidence';
 
@@ -33,7 +33,7 @@ export function storyReviewActionHelp(action: StoryReviewAction): string {
     case 'needs_evidence':
       return 'Send the packet back for stronger sources. Attach evidence on the evidence desk, then re-run story research when ready.';
     case 'rejected':
-      return 'Close the packet without seeding. Use when the draft is off-scope or not worth advancing.';
+      return 'Close the packet without creating an article draft. Use when the draft is off-scope or not worth advancing.';
   }
 }
 

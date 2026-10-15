@@ -134,3 +134,12 @@ test('a place page sets no cookie, so the edge can keep it', async () => {
   const response = await proxy(requestFor('/place/archie-edwards-alpha-tonsorial-palace'));
   assert.equal(response.headers.get('set-cookie'), null);
 });
+
+test('component fixtures require staff authentication and never receive public CDN caching', async () => {
+  for (const path of ['/design-system', '/design-system/', '/design-system/fixture.png']) {
+    const response = await proxy(requestFor(path));
+    assert.equal(response.status, 307);
+    assert.match(new URL(response.headers.get('location')!).pathname, /^\/admin\/login\/?$/);
+    assert.equal(response.headers.get('Vercel-CDN-Cache-Control'), null);
+  }
+});

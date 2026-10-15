@@ -2,6 +2,7 @@
  * Server-rendered queue for all submission kinds, filtered and paginated in SQL. Story-specific
  * review remains available in the story workbench.
  */
+import { FormButton, FormInput } from '../../../admin/design-system/fields';
 import Link from 'next/link';
 import { FacetRail, Pagination, Toolbar, ToolbarField, type FacetGroup } from '@repo/ui';
 import { readPostgresOrDegrade } from '../../../admin/lib/canonical-postgres-client';
@@ -131,9 +132,9 @@ export default async function SubmissionsPage({
             preservedParams={Object.fromEntries(preservedParams.entries())}
             actions={
               <>
-                <button type="submit" className="ds-button ds-button--secondary">
+                <FormButton type="submit" className="ds-button ds-button--secondary">
                   Search
-                </button>
+                </FormButton>
                 {filtersActive ? (
                   <a className="ds-button ds-button--secondary" href={BASE_PATH}>
                     Reset
@@ -143,7 +144,7 @@ export default async function SubmissionsPage({
             }
           >
             <ToolbarField label="Search">
-              <input
+              <FormInput
                 type="search"
                 name="q"
                 defaultValue={query.search ?? ''}
