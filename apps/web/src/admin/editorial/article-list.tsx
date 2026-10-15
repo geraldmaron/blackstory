@@ -8,12 +8,13 @@ import type { listArticles } from './store';
 type Article = Awaited<ReturnType<typeof listArticles>>[number];
 export function ArticleList({ items }: { items: readonly Article[] }) {
   const [query, setQuery] = useState(''),
-    [status, setStatus] = useState('all');
+    [status, setStatus] = useState('active');
   const visible = useMemo(
     () =>
       items.filter(
         (item) =>
-          (status === 'all' || item.status === status) &&
+          (status === 'all' ||
+            (status === 'active' ? item.status !== 'archived' : item.status === status)) &&
           `${item.title} ${item.slug}`.toLowerCase().includes(query.toLowerCase()),
       ),
     [items, query, status],
@@ -44,15 +45,21 @@ export function ArticleList({ items }: { items: readonly Article[] }) {
             label="Publication state"
             value={status}
             onChange={setStatus}
-            options={['all', ...new Set(items.map((item) => item.status))].map((id) => ({
+            options={['active', 'all', ...new Set(items.map((item) => item.status))].map((id) => ({
               id,
-              label: id === 'all' ? 'All states' : id.replaceAll('_', ' '),
+              label:
+                id === 'active'
+                  ? 'Active articles'
+                  : id === 'all'
+                    ? 'All states'
+                    : id.replaceAll('_', ' '),
             }))}
           />
         </div>
       </div>
       <p role="status">
-        {visible.length} of {items.length} articles
+        {visible.length} of {items.length} articles. Archived articles remain available in the state
+        filter.
       </p>
       <div className="admin-base-article-table">
         <TableBuilder

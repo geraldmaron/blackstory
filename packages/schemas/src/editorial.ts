@@ -51,7 +51,9 @@ export type EditorialArticle = {
   draft: ArticleDraft;
   revision: number;
   blockers?: string[];
-  status: 'draft' | 'review' | 'published';
+  status: 'draft' | 'review' | 'published' | 'archived';
+  archivedAt?: string | null;
+  activePublicReleaseId?: string | null;
   publication?: {
     releaseId: string;
     previousReleaseId: string;

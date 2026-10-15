@@ -31,6 +31,8 @@ export type AdminRouteRule = {
 };
 
 export const ADMIN_ROUTE_RULES: readonly AdminRouteRule[] = [
+  { method: 'DELETE', pattern: '/admin/api/articles/:id', access: STAFF_READ },
+  { method: 'POST', pattern: '/admin/api/articles/:id/unarchive', access: 'research:write' },
   { method: 'POST', pattern: '/admin/api/articles/:id/rollback', access: 'publication:retract' },
   { method: 'POST', pattern: '/admin/api/editorial/entities/proposals', access: 'research:write' },
   {

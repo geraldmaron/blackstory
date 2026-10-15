@@ -55,6 +55,8 @@ export function ArticleEditor({
     [checks, setChecks] = useState({ facts: false, rights: false, prose: false });
   const [uploadCredit, setUploadCredit] = useState(''),
     [uploadRights, setUploadRights] = useState('public_domain');
+  const [archiveReason, setArchiveReason] = useState(''),
+    [archiveConfirmed, setArchiveConfirmed] = useState(false);
   const [recordLabels, setRecordLabels] = useState<Record<string, string>>(() =>
     Object.fromEntries(relatedRecords.map((entity) => [entity.id, entity.display_name])),
   );
@@ -73,8 +75,20 @@ export function ArticleEditor({
     setInspectorOpen(true);
   }
   const [selectedBlock, setSelectedBlock] = useState<number | null>(null);
-  const editable = role !== null && staffRoleHasPermission(role, 'research:write'),
-    canReview = role !== null && staffRoleHasPermission(role, 'publication:publish');
+  const inspectorPanel = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    if (inspectorPanel.current) inspectorPanel.current.scrollTop = 0;
+  }, [section]);
+  const editable =
+      !record.archivedAt && role !== null && staffRoleHasPermission(role, 'research:write'),
+    canReview =
+      !record.archivedAt && role !== null && staffRoleHasPermission(role, 'publication:publish');
+  const canManage =
+    role !== null &&
+    staffRoleHasPermission(
+      role,
+      record.activePublicReleaseId ? 'publication:retract' : 'research:write',
+    );
   const serialized = JSON.stringify(draft),
     dirty = serialized !== saved;
   const currentDraft = useRef(draft);
@@ -226,6 +240,48 @@ export function ArticleEditor({
       setBusy(false);
     }
   }
+  async function manageArchive() {
+    const before = currentSerialized.current;
+    setBusy(true);
+    setError('');
+    try {
+      await request(
+        record.archivedAt
+          ? `/admin/api/articles/${draft.id}/unarchive`
+          : `/admin/api/articles/${draft.id}`,
+        record.archivedAt ? 'POST' : 'DELETE',
+        {
+          revision,
+          reason: archiveReason,
+          publicReleaseId: record.activePublicReleaseId ?? null,
+          confirmed: archiveConfirmed,
+        },
+      );
+      const latest = await refreshRecord();
+      if (latest) {
+        setRevision(latest.revision);
+        setSaved(JSON.stringify(latest.draft));
+        if (currentSerialized.current === before) {
+          setDraft(latest.draft);
+          setMessage(
+            latest.archivedAt
+              ? 'Article archived. Its revisions remain available.'
+              : 'Article restored to drafts. Review is required before publication.',
+          );
+        } else {
+          setSuspended(true);
+          setError(
+            'The library state changed. Text you typed during the request remains here; compare it with the saved version.',
+          );
+        }
+      }
+      setArchiveConfirmed(false);
+    } catch (failure) {
+      setError(failure instanceof Error ? failure.message : 'The library change failed.');
+    } finally {
+      setBusy(false);
+    }
+  }
   async function upload(file: File, target?: Extract<ArticleBodyBlockDoc, { type: 'image' }>) {
     setBusy(true);
     setError('');
@@ -357,7 +413,7 @@ export function ArticleEditor({
           </Button>
         ))}
       </nav>
-      <div className="editorial-inspector__panel">
+      <div className="editorial-inspector__panel" ref={inspectorPanel}>
         {section === 'Writing' && (
           <section>
             <h2>Article settings</h2>
@@ -435,6 +491,53 @@ export function ArticleEditor({
               >
                 Add to collection
               </Button>
+            )}
+            {!!revision && (
+              <section className="editorial-inspector__group">
+                <h3>{record.archivedAt ? 'Archived article' : 'Archive article'}</h3>
+                <p>
+                  {record.archivedAt
+                    ? 'Restore this article to edit it. Its history is preserved.'
+                    : record.activePublicReleaseId
+                      ? 'Archiving removes this article from public stories in a new signed release. Saved revisions remain available.'
+                      : 'Remove this draft from the active library. You can restore it from Archived articles.'}
+                </p>
+                {!canManage && (
+                  <p>
+                    Your role cannot change this article’s library state. Removing a public article
+                    requires publication authority.
+                  </p>
+                )}
+                <TextAreaField
+                  label="Reason for library change"
+                  value={archiveReason}
+                  onChange={setArchiveReason}
+                  disabled={busy}
+                  rows={2}
+                />
+                {record.activePublicReleaseId && !record.archivedAt && (
+                  <Checkbox
+                    checked={archiveConfirmed}
+                    onChange={(event) => setArchiveConfirmed(event.currentTarget.checked)}
+                    disabled={busy}
+                  >
+                    Remove the current public article
+                  </Checkbox>
+                )}
+                <Button
+                  kind="secondary"
+                  disabled={
+                    busy ||
+                    dirty ||
+                    !archiveReason.trim() ||
+                    !canManage ||
+                    (!!record.activePublicReleaseId && !archiveConfirmed)
+                  }
+                  onClick={() => void manageArchive()}
+                >
+                  {record.archivedAt ? 'Restore to drafts' : 'Archive article'}
+                </Button>
+              </section>
             )}
           </section>
         )}
@@ -939,11 +1042,15 @@ export function ArticleEditor({
             )}
             {record.publication && (
               <div className="editorial-inspector__group">
-                <h3>Public version</h3>
+                <h3>Publication history</h3>
                 <p>Last published revision {record.publication.revision}</p>
-                <Link href={`/stories/${draft.slug}`} target="_blank">
-                  Open public article
-                </Link>
+                {record.activePublicReleaseId ? (
+                  <Link href={`/stories/${draft.slug}`} target="_blank">
+                    Open public article
+                  </Link>
+                ) : (
+                  <p>No current public article.</p>
+                )}
                 {canReview && record.publication.canRollback && (
                   <Button
                     kind="secondary"
@@ -1009,6 +1116,11 @@ export function ArticleEditor({
           <Button onClick={() => openInspector('Review')}>Review and publish</Button>
         </div>
       </header>
+      {record.archivedAt && (
+        <p role="status" className="editorial-editor__message">
+          Archived article. Restore it from Settings to resume editing.
+        </p>
+      )}
       {ready && !user && (
         <Notification closeable={false}>
           Your session ended.{' '}

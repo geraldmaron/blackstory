@@ -1,5 +1,6 @@
 import { authorizeAdminRoute } from '@/admin/auth/request-auth';
 import { editorialError, editorialBody } from '@/admin/editorial/http';
+import { archiveArticle } from '@/admin/editorial/article-management';
 import { readArticle, saveArticle } from '@/admin/editorial/store';
 type Context = { params: Promise<{ id: string }> };
 export async function GET(request: Request, { params }: Context) {
@@ -23,5 +24,24 @@ export async function PUT(request: Request, { params }: Context) {
     );
   } catch (e) {
     return editorialError(e);
+  }
+}
+
+export async function DELETE(request: Request, { params }: Context) {
+  try {
+    const actor = await authorizeAdminRoute(request),
+      body = await editorialBody(request);
+    return Response.json(
+      await archiveArticle(
+        actor,
+        (await params).id,
+        Number(body.revision),
+        typeof body.publicReleaseId === 'string' ? body.publicReleaseId : null,
+        body.confirmed === true,
+        String(body.reason ?? ''),
+      ),
+    );
+  } catch (error) {
+    return editorialError(error);
   }
 }

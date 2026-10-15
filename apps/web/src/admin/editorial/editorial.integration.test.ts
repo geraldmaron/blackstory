@@ -14,6 +14,7 @@ import {
   saveContributor,
 } from './store';
 import { publishArticle, rollbackArticle } from './publish';
+import { archiveArticle, unarchiveArticle } from './article-management';
 import type { ArticleDraft } from '@repo/schemas';
 const connection = process.env.BLACKSTORY_TEST_DATABASE_URL;
 test(
@@ -254,6 +255,132 @@ test(
       await assert.rejects(
         rollbackArticle(actor, id, correction.releaseId, 'Stale rollback'),
         EditorialConflict,
+      );
+      // Existing canonical rows are editable even when created outside the admin editor.
+      const legacyId = `legacy_${randomUUID()}`;
+      await pool.query(
+        `INSERT INTO reference.articles(id,slug,title,summary,era_label,place_label,published_at,body,"references")
+        VALUES($1,$2,'Existing article','Existing summary','Test period','Test place','2026-10-14','[]','[]')`,
+        [legacyId, `legacy-${randomUUID()}`],
+      );
+      const legacy = (await readArticle(legacyId))!;
+      assert.equal(legacy.revision, 1);
+      assert.deepEqual(legacy.draft.contributors, []);
+      await saveArticle(
+        actor,
+        { ...legacy.draft, title: 'Edited existing article' },
+        1,
+        'Edit existing canonical article',
+      );
+      await archiveArticle(actor, legacyId, 2, null, false, 'Archive private existing article');
+      assert.equal((await readArticle(legacyId))!.status, 'archived');
+      await assert.rejects(
+        saveArticle(actor, legacy.draft, 3, 'Prevent editing archived record'),
+        /Restore this archived/,
+      );
+      await unarchiveArticle(actor, legacyId, 3, 'Return existing article to drafts');
+      assert.equal((await readArticle(legacyId))!.status, 'draft');
+      assert.equal((await readArticle(legacyId))!.revision, 4);
+      await assert.rejects(
+        archiveArticle(
+          { ...actor, role: 'security' },
+          legacyId,
+          4,
+          null,
+          false,
+          'Unauthorized archive',
+        ),
+        /does not have/,
+      );
+
+      const current = (await readArticle(id))!;
+      await assert.rejects(
+        archiveArticle(
+          { ...actor, role: 'research' },
+          id,
+          current.revision,
+          rollback.releaseId,
+          true,
+          'Unauthorized public removal',
+        ),
+        /does not have/,
+      );
+      await assert.rejects(
+        archiveArticle(actor, id, current.revision, rollback.releaseId, false, 'No confirmation'),
+        /Confirm removal/,
+      );
+      await assert.rejects(
+        archiveArticle(actor, id, current.revision, null, true, 'Stale public state'),
+        EditorialConflict,
+      );
+      const trustedArchive = process.env.EXPECTED_RELEASE_SIGNING_PUBLIC_KEY_SHA256;
+      process.env.EXPECTED_RELEASE_SIGNING_PUBLIC_KEY_SHA256 = 'invalid';
+      await assert.rejects(
+        archiveArticle(
+          actor,
+          id,
+          current.revision,
+          rollback.releaseId,
+          true,
+          'Failed archive signing',
+        ),
+        /signing identity/,
+      );
+      process.env.EXPECTED_RELEASE_SIGNING_PUBLIC_KEY_SHA256 = trustedArchive;
+      assert.equal((await readArticle(id))!.archivedAt, null);
+      assert.equal((await readArticle(id))!.activePublicReleaseId, rollback.releaseId);
+      const archived = await archiveArticle(
+        actor,
+        id,
+        current.revision,
+        rollback.releaseId,
+        true,
+        'Remove controlled public fixture',
+      );
+      assert.equal((await readArticle(id))!.status, 'archived');
+      assert.equal((await readArticle(id))!.activePublicReleaseId, null);
+      assert.equal(
+        (
+          await pool.query(
+            'SELECT 1 FROM published.release_articles WHERE release_id=$1 AND article_id=$2',
+            [archived.releaseId, id],
+          )
+        ).rowCount,
+        0,
+      );
+      assert.equal(
+        (
+          await pool.query(
+            'SELECT 1 FROM published.release_entities WHERE release_id=$1 AND entity_id=$2',
+            [archived.releaseId, projection.id],
+          )
+        ).rowCount,
+        1,
+      );
+      assert.equal((await mobileStore.getPointer())!.activeReleaseId, archived.releaseId);
+      await assert.rejects(
+        reviewArticle(actor, id, current.revision + 1, 'approved', 'Archived approval', {
+          facts: true,
+          rights: true,
+          prose: true,
+        }),
+        /Restore this archived/,
+      );
+      await assert.rejects(
+        pool.query("UPDATE reference.articles SET status='published' WHERE id=$1", [id]),
+        /articles_archived_draft/,
+      );
+      await unarchiveArticle(actor, id, current.revision + 1, 'Restore archived fixture');
+      assert.equal((await readArticle(id))!.review, null);
+      assert.equal((await readArticle(id))!.status, 'draft');
+      assert.equal(
+        (
+          await pool.query(
+            'SELECT 1 FROM published.release_articles WHERE release_id=$1 AND article_id=$2',
+            [rollback.releaseId, id],
+          )
+        ).rowCount,
+        1,
       );
       await assert.rejects(
         pool.query('DELETE FROM reference.article_revisions WHERE article_id=$1', [id]),

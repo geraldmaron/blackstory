@@ -338,3 +338,5 @@ See [the UI contract](../ui/patterns-admin-editorial.md) and
 Production migration, deployment and publication of the unfinished historical article have
 not been performed. The bounded theme recommendation and source gaps remain in the project
 tracker; local acceptance data is disposable.
+
+Follow-up: [hydration diagnosis and existing-article CRUD verification](./editorial-hydration-crud-verification.md) records the recovered theme context, canonical article audit and recoverable archive workflow.

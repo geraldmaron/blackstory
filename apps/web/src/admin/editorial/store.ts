@@ -131,12 +131,12 @@ export async function listArticles() {
     revision: number;
     row_updated_at: string;
   }>(
-    'SELECT id,slug,title,status,revision::int,row_updated_at FROM reference.articles ORDER BY row_updated_at DESC',
+    `SELECT id,slug,title,CASE WHEN archived_at IS NOT NULL THEN 'archived' ELSE status END AS status,revision::int,row_updated_at FROM reference.articles ORDER BY row_updated_at DESC`,
   );
 }
 export async function readArticle(slug: string): Promise<EditorialArticle | null> {
-  const rows = await queryPostgres<ArticleRow & { revision: string }>(
-    `SELECT ${REFERENCE_COLUMNS},revision FROM reference.articles WHERE slug=$1 OR id=$1`,
+  const rows = await queryPostgres<ArticleRow & { revision: string; archived_at: string | null }>(
+    `SELECT ${REFERENCE_COLUMNS},revision,archived_at::text FROM reference.articles WHERE slug=$1 OR id=$1`,
     [slug],
   );
   const row = rows[0];
@@ -164,12 +164,18 @@ export async function readArticle(slug: string): Promise<EditorialArticle | null
     FROM reference.article_publications p WHERE article_id=$1 ORDER BY created_at DESC LIMIT 1`,
     [row.id],
   );
+  const publicRows = await queryPostgres<{ release_id: string }>(
+    "SELECT a.release_id FROM published.release_articles a JOIN published.active_release p ON p.release_id=a.release_id AND p.id='active' WHERE a.article_id=$1",
+    [row.id],
+  );
   return {
+    archivedAt: row.archived_at,
+    activePublicReleaseId: publicRows[0]?.release_id ?? null,
     publication: publication[0] ?? null,
     blockers: await articleBlockers(articleDraftSchema.parse(rowToProjectionAuthoring(row))),
     draft: articleDraftSchema.parse(rowToProjectionAuthoring(row)),
     revision: Number(row.revision),
-    status: row.status as EditorialArticle['status'],
+    status: row.archived_at ? 'archived' : (row.status as EditorialArticle['status']),
     review: reviews[0] ?? null,
     history: [...history],
   };
@@ -189,14 +195,15 @@ export async function saveArticle(
       `editorial-article:${draft.id}`,
     ]);
     // The row lock makes the revision comparison and write one operation.
-    const held = await db.query<{ revision: string }>(
-      'SELECT revision FROM reference.articles WHERE id=$1 FOR UPDATE',
+    const held = await db.query<{ revision: string; archived_at: string | null }>(
+      'SELECT revision,archived_at FROM reference.articles WHERE id=$1 FOR UPDATE',
       [draft.id],
     );
     if (Number(held.rows[0]?.revision ?? 0) !== expectedRevision)
       throw new EditorialConflict(
         'A newer revision was saved. Your edits are preserved; compare the latest version before saving.',
       );
+    if (held.rows[0]?.archived_at) throw new Error('Restore this archived article before editing.');
     const contributors = await db.query<EditorialContributor>(
       'SELECT id,name,kind,biography FROM reference.contributors WHERE id=ANY($1::text[])',
       [draft.contributors.map((c) => c.id)],
@@ -286,13 +293,15 @@ export async function reviewArticle(
   if (!['approved', 'needs_evidence', 'rejected'].includes(decision))
     throw new Error('Choose a review decision.');
   return editorialWrite(actor, 'publication:publish', id, 'article.review', reason, async (db) => {
-    const rows = await db.query<ArticleRow & { revision: string }>(
-      `SELECT ${REFERENCE_COLUMNS},revision FROM reference.articles WHERE id=$1 FOR UPDATE`,
+    const rows = await db.query<ArticleRow & { revision: string; archived_at: string | null }>(
+      `SELECT ${REFERENCE_COLUMNS},revision,archived_at FROM reference.articles WHERE id=$1 FOR UPDATE`,
       [id],
     );
     const row = rows.rows[0];
     if (!row || Number(row.revision) !== revision)
       throw new EditorialConflict('The draft changed. Review its current revision.');
+    if (row.archived_at)
+      throw new Error('Restore this archived article before review or publication.');
     if (decision === 'approved') {
       if (checks.facts !== true || checks.rights !== true || checks.prose !== true)
         throw new Error('Confirm evidence, rights and final prose review.');

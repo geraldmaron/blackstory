@@ -67,13 +67,15 @@ export async function publishArticle(actor: Actor, id: string, revision: number,
     await db.query(
       "SELECT pg_advisory_xact_lock(hashtextextended('publication-release-pointer',0))",
     );
-    const selected = await db.query<ArticleRow & { revision: string }>(
-      `SELECT ${REFERENCE_COLUMNS},revision FROM reference.articles WHERE id=$1 FOR UPDATE`,
+    const selected = await db.query<ArticleRow & { revision: string; archived_at: string | null }>(
+      `SELECT ${REFERENCE_COLUMNS},revision,archived_at FROM reference.articles WHERE id=$1 FOR UPDATE`,
       [id],
     );
     const row = selected.rows[0];
     if (!row || Number(row.revision) !== revision)
       throw new EditorialConflict('The article changed. Review its current revision.');
+    if (row.archived_at)
+      throw new Error('Restore this archived article before review or publication.');
     const priorPublication = await db.query(
       `SELECT p.release_id,p.previous_release_id FROM reference.article_publications p
        JOIN published.active_release a ON a.release_id=p.release_id AND a.id='active'

@@ -63,11 +63,18 @@ active release. Rollback verifies the prior signed article artifact, creates a n
 release and preserves unrelated catalog content. Legacy releases without signed article
 artifacts require restoring and reviewing a draft instead. A changed release requires reload.
 
+The library defaults to active articles. Recoverable archive keeps revision history and makes
+prose read-only. Archived records remain searchable through the publication-state filter;
+restore returns them to draft and invalidates approval. Removing a currently public article
+requires retraction authority, explicit confirmation and an unchanged public release baseline.
+It creates a new signed release that excludes only that article and activates public/mobile
+pointers together. Restore never republishes automatically.
+
 Simultaneous live editing and public contributor onboarding are outside this pattern.
 
 ## Design-system integration
 
-The admin-only provider themes Base Web with BlackStory ink, paper, typography and radii.
+Base Web is explicitly transpiled with the application so root-provider and subpath controls share one compiled theme context. The admin-only provider themes Base Web with BlackStory ink, paper, typography and radii.
 It emits incremental server style batches and merges their hydration cache metadata for
 Styletron. Caption IDs use React IDs rather than the library’s process-wide UID counter.
 Checkbox marks use literal brand token values inside embedded SVGs, where CSS variables
