@@ -1,6 +1,7 @@
 'use client';
 import Link from 'next/link';
 import Image from 'next/image';
+import { useRouter } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
 import { Button } from 'baseui/button';
 import { Drawer } from 'baseui/drawer';
@@ -41,6 +42,7 @@ export function ArticleEditor({
   relatedRecords: readonly { id: string; display_name: string }[];
 }) {
   const { getIdToken, user, role, ready } = useAdminAuth();
+  const router = useRouter();
   const [record, setRecord] = useState(initial);
   const [draft, setDraft] = useState(initial.draft),
     [revision, setRevision] = useState(initial.revision),
@@ -119,6 +121,8 @@ export function ArticleEditor({
       if (!response.ok) throw new Error('Status refresh failed');
       const latest: EditorialArticle = await response.json();
       setRecord(latest);
+      // Mutations must also invalidate prefetched library and editor route snapshots.
+      router.refresh();
       return latest;
     } catch {
       setError(
