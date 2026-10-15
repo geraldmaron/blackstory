@@ -1,6 +1,8 @@
 import { authorizeAdminRoute } from '@/admin/auth/request-auth';
 import { editorialBody, editorialError } from '@/admin/editorial/http';
 import { rollbackArticle } from '@/admin/editorial/publish';
+// Publication prepares and verifies the full signed catalog before atomic activation.
+export const maxDuration = 800;
 export async function POST(request: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
     const actor = await authorizeAdminRoute(request),

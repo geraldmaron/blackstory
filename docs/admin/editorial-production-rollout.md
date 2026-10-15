@@ -84,3 +84,14 @@ Production browser CRUD, deployment identity, anonymous route denial and Pages a
 are pending. The browser native upload chooser remains unproven due to extension file access;
 real storage byte upload and public/private readback passed locally. Native iOS and assistive
 technology sessions are outside this web/backend rollout.
+
+## Publication execution budget
+
+The final provider check found a default 300-second request limit and 4,210 active entities.
+Preparing and reading back the full catalog may exceed that default. Article publish, archive
+and rollback routes therefore declare an 800-second platform limit. The shared executor starts
+no further artifact work after eight minutes, leaving time for bounded in-flight upload/readback
+requests and transaction rollback. Existing failure atomicity and concurrency controls remain.
+This is a bounded synchronous release operation; catalog-scale production throughput has not
+been benchmarked. The alternative is a durable publication job, which remains a larger change.
+Decision: accepted with controls; platform termination must not be the intended failure path.

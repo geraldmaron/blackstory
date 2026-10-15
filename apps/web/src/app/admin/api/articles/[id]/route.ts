@@ -3,6 +3,8 @@ import { editorialError, editorialBody } from '@/admin/editorial/http';
 import { archiveArticle } from '@/admin/editorial/article-management';
 import { readArticle, saveArticle } from '@/admin/editorial/store';
 type Context = { params: Promise<{ id: string }> };
+// Publication prepares and verifies the full signed catalog before atomic activation.
+export const maxDuration = 800;
 export async function GET(request: Request, { params }: Context) {
   try {
     await authorizeAdminRoute(request);
