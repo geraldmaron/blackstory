@@ -79,11 +79,16 @@ export const ADMIN_NAV_GROUPS: readonly AdminNavGroup[] = [
     id: 'publish',
     label: 'Publish',
     destinations: [
-      { href: '/admin/stories/review', label: 'Story review', keywords: ['packets', 'drafts'] },
       {
         href: '/admin/stories/articles',
-        label: 'Article covers',
-        keywords: ['cover', 'plate', 'kicker', 'headline', 'phoenix'],
+        label: 'Articles',
+        keywords: ['writing', 'editor', 'drafts'],
+      },
+      { href: '/admin/stories/review', label: 'Story review', keywords: ['packets'] },
+      {
+        href: '/admin/stories/contributors',
+        label: 'Contributors',
+        keywords: ['author', 'profile', 'byline', 'neo'],
       },
       { href: '/admin/releases', label: 'Releases', keywords: ['ship', 'publish'] },
     ],

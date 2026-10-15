@@ -144,7 +144,7 @@ export const resolveArticleSeries = cache(
   },
 );
 
-async function loadPacketViews(
+export async function loadPacketViews(
   packetIds: readonly string[],
 ): Promise<readonly ThemeImpactPacketView[]> {
   if (packetIds.length === 0) return [];
@@ -152,7 +152,9 @@ async function loadPacketViews(
   return packets.map((packet) => themeImpactPacketToView(packet, { dataSource: 'live' }));
 }
 
-async function loadEntities(entityIds: readonly string[]): Promise<readonly PublicEntityView[]> {
+export async function loadEntities(
+  entityIds: readonly string[],
+): Promise<readonly PublicEntityView[]> {
   if (entityIds.length === 0) return [];
   const { data } = await listPublicEntityViewsByIds([...entityIds]);
   return data;

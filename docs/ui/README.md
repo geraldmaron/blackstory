@@ -192,3 +192,7 @@ and every classified route must have a registry entry.
 | The chapter-cites-record edge does not exist, so no record links back to editorial | release build | SP-20 |
 | Live public projections, search API, geocoding and nearby discovery | backend | Backend |
 | Dedicated Storybook or Chromatic visual regression CI | none | If required later |
+
+## Admin editorial management
+
+See [Admin editorial workspace](./patterns-admin-editorial.md) for article writing, credits, evidence, entity proposals and publication.

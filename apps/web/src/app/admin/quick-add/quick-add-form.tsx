@@ -3,6 +3,7 @@
 /**
  * Quick-add form: paste a URL, fetch through safety, prepare a draft case, optionally commit.
  */
+import { FormInput, FormTextarea, FormButton } from '../../../admin/design-system/fields';
 import Link from 'next/link';
 import { useActionState } from 'react';
 import { submitQuickAdd } from './actions';
@@ -132,32 +133,32 @@ export function QuickAddForm() {
       <form action={formAction} className="quick-add-form">
         <div className="quick-add-field">
           <label htmlFor="qa-url">Source URL</label>
-          <input id="qa-url" name="url" type="url" placeholder="https://…" required />
+          <FormInput id="qa-url" name="url" type="url" placeholder="https://…" required />
         </div>
         <div className="quick-add-field">
           <label htmlFor="qa-description">Notes (optional)</label>
-          <textarea id="qa-description" name="description" rows={3} />
+          <FormTextarea id="qa-description" name="description" rows={3} />
         </div>
         <div className="quick-add-row">
           <div className="quick-add-field">
             <label htmlFor="qa-location">Location</label>
-            <input id="qa-location" name="location" type="text" />
+            <FormInput id="qa-location" name="location" type="text" />
           </div>
           <div className="quick-add-field">
             <label htmlFor="qa-era">Era</label>
-            <input id="qa-era" name="era" type="text" />
+            <FormInput id="qa-era" name="era" type="text" />
           </div>
         </div>
         <p>Your signed-in staff identity is recorded with the proposal.</p>
         <div className="quick-add-field">
           <label htmlFor="qa-commit">
-            <input id="qa-commit" name="commit" type="checkbox" value="1" /> Commit to quarantine
-            pipeline (writes submission + draft research case; does not publish)
+            <FormInput id="qa-commit" name="commit" type="checkbox" value="1" /> Commit to
+            quarantine pipeline (writes submission + draft research case; does not publish)
           </label>
         </div>
-        <button className="ds-button ds-button--primary" disabled={isPending} type="submit">
+        <FormButton className="ds-button ds-button--primary" disabled={isPending} type="submit">
           {isPending ? 'Working…' : 'Fetch and prepare draft'}
-        </button>
+        </FormButton>
       </form>
       <ResultPanel state={state} />
     </>

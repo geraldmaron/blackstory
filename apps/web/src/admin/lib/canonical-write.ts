@@ -30,6 +30,7 @@ import { commitWithAuditPostgres, type PostgresCommitInput } from './postgres-co
 /** Canonical write verbs. Adding one here is what makes it exist; there is no ad-hoc path. */
 export const CANONICAL_WRITE_VERBS = [
   'entity.field_edit',
+  'entity.editorial_apply',
   'entity.merge',
   'entity.merge_reverse',
   'entity.bulk_kind_reassign',
@@ -40,6 +41,7 @@ export type CanonicalWriteVerb = (typeof CANONICAL_WRITE_VERBS)[number];
 
 const PERMISSION_BY_VERB: Readonly<Record<CanonicalWriteVerb, AdminPermission>> = {
   'entity.field_edit': 'canonical:write',
+  'entity.editorial_apply': 'publication:publish',
   'entity.merge': 'canonical:merge',
   // Reversing a merge needs the same authority as making one: both rewrite who owns what.
   'entity.merge_reverse': 'canonical:merge',

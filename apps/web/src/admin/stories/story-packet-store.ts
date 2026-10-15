@@ -1,5 +1,5 @@
 /** Postgres access for staged story packets and review decisions. */
-import type { StoryResearchPacket, storyPacketToSeedRecord } from '@repo/domain';
+import type { StoryResearchPacket } from '@repo/domain';
 import {
   getStoryPacketPostgres,
   listStoryPacketsPostgres,
@@ -43,7 +43,6 @@ export async function recordStoryPacketReview(input: {
     readonly reviewedAt: string;
     readonly reviewedByEmail: string;
   };
-  readonly seedHandoff?: ReturnType<typeof storyPacketToSeedRecord>;
 }> {
   const item = await getStoryPacket(input.submissionId);
   if (!item) throw new Error(`Story packet submission not found: ${input.submissionId}`);
@@ -73,7 +72,6 @@ export async function recordStoryPacketReviewsBulk(input: {
       readonly reviewedAt: string;
       readonly reviewedByEmail: string;
     };
-    readonly seedHandoff?: ReturnType<typeof storyPacketToSeedRecord>;
   }[];
 }> {
   const results = [];
@@ -90,7 +88,6 @@ export async function recordStoryPacketReviewsBulk(input: {
         submissionId,
         ok: true,
         review: recorded.review,
-        ...(recorded.seedHandoff ? { seedHandoff: recorded.seedHandoff } : {}),
       });
     } catch (error) {
       results.push({

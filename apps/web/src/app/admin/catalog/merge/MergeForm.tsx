@@ -8,6 +8,7 @@
  * the expensive mistake here, and it is not recoverable by editing afterwards; it needs an
  * un-merge.
  */
+import { FormInput, FormButton } from '../../../../admin/design-system/fields';
 import { useActionState, useState } from 'react';
 import Link from 'next/link';
 import { mergeEntities } from './actions';
@@ -85,7 +86,7 @@ export function MergeForm({
 
       <label className="story-review__field">
         <span>Reason for this merge</span>
-        <input
+        <FormInput
           type="text"
           name="reason"
           value={reason}
@@ -102,9 +103,9 @@ export function MergeForm({
       ) : null}
 
       <div className="entity-edit__actions">
-        <button type="submit" className="ds-button" disabled={pending || !reason.trim()}>
+        <FormButton type="submit" className="ds-button" disabled={pending || !reason.trim()}>
           {pending ? 'Merging…' : `Merge ${candidates.length - 1} into this record`}
-        </button>
+        </FormButton>
         <Link href="/admin/catalog" className="entity-merge__cancel">
           Cancel
         </Link>

@@ -478,24 +478,6 @@
   flex: 1 1 14rem;
 }
 
-.acq__field input,
-.acq__field select,
-.acq__field textarea {
-  min-height: 2.75rem;
-  padding: 0.5rem 0.75rem;
-  border: var(--ds-border-width, 1px) solid var(--ds-border, #d7d0c4);
-  background: var(--ds-surface-raised, #fbf8f2);
-  font: inherit;
-}
-
-.acq__field input:focus-visible,
-.acq__field select:focus-visible,
-.acq__field textarea:focus-visible,
-.acq__button:focus-visible {
-  outline: 2px solid var(--ds-accent-copper, #8e4f2a);
-  outline-offset: 2px;
-}
-
 .acq__alert {
   margin: 0;
   padding: var(--ds-space-3);

@@ -4,6 +4,7 @@
  * The three decision verbs for one quarantined submission: promote, reject, mark spam.
  * One shared reason, one shared server action — see actions.ts's decideSubmission.
  */
+import { FormTextarea, FormButton } from '../../../../admin/design-system/fields';
 import { useActionState, useState } from 'react';
 import type { SubmissionDecision } from '../../../../admin/lib/postgres-submissions';
 import { decideSubmission } from './actions';
@@ -62,7 +63,7 @@ export function SubmissionDecisionForm({
       ) : null}
       <label>
         <span>Reason</span>
-        <textarea
+        <FormTextarea
           name="reason"
           rows={2}
           required
@@ -73,7 +74,7 @@ export function SubmissionDecisionForm({
       </label>
       <div className="entity-edit__actions">
         {decisions.map((decision, index) => (
-          <button
+          <FormButton
             key={decision}
             type="submit"
             name="decision"
@@ -82,7 +83,7 @@ export function SubmissionDecisionForm({
             disabled={!canSubmit}
           >
             {pending ? 'Working…' : DECISION_LABEL[decision]}
-          </button>
+          </FormButton>
         ))}
       </div>
     </form>

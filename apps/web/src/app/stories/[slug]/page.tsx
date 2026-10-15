@@ -58,7 +58,9 @@ function buildArticleJsonLd(article: HydratedArticle) {
     datePublished: doc.publishedAt,
     ...(doc.updatedAt ? { dateModified: doc.updatedAt } : {}),
     '@id': `/stories/${doc.slug}`,
-    author: { '@type': 'Organization', name: 'BlackStory' },
+    author: doc.contributors
+      .filter((c) => c.roles.includes('author'))
+      .map((c) => ({ '@type': c.kind === 'person' ? 'Person' : 'Organization', name: c.name })),
     ...(doc.heroImage ? { image: doc.heroImage.url } : {}),
   };
   assertNeverClaimReview(jsonLd);
@@ -196,7 +198,15 @@ export default async function ArticleDetailPage({ params }: ArticlePageProps) {
         <p className="ds-article-mast__lede">{doc.summary}</p>
         <p className="ds-article-mast__byline">
           <span>
-            Authored by <Link href="/about#neo-heading">Neo</Link>
+            {doc.contributors.length
+              ? doc.contributors.map((credit, index) => (
+                  <span key={credit.id}>
+                    {index > 0 ? '; ' : ''}
+                    {credit.name} ({credit.roles.join(', ')}
+                    {credit.kind === 'editorial' ? ', house editorial identity' : ''})
+                  </span>
+                ))
+              : 'Contributor credits not recorded'}
           </span>
           <span>
             Published <span className="ds-mono">{doc.publishedAt}</span>
@@ -298,7 +308,7 @@ export default async function ArticleDetailPage({ params }: ArticlePageProps) {
     <Room rail={rail} masthead={masthead} {...(apparatus ? { foot: apparatus } : {})}>
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, '\\u003c') }}
       />
       <article className="ds-article">
         <ArticleBody article={article} />

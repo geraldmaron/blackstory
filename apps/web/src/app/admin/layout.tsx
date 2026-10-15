@@ -8,6 +8,7 @@
  * path, so `AdminShellChrome` below is the only chrome `/admin` pages render.
  */
 import type { ReactNode } from 'react';
+import { AdminDesignProvider } from '@/admin/design-system/provider';
 import { AdminAuthProvider } from '../../admin/auth/AdminAuthProvider';
 import { AdminShellChrome } from '../../admin/components/AdminShellChrome';
 import './admin.css';
@@ -23,8 +24,10 @@ export const metadata = {
 
 export default function AdminLayout({ children }: { children: ReactNode }) {
   return (
-    <AdminAuthProvider>
-      <AdminShellChrome>{children}</AdminShellChrome>
-    </AdminAuthProvider>
+    <AdminDesignProvider>
+      <AdminAuthProvider>
+        <AdminShellChrome>{children}</AdminShellChrome>
+      </AdminAuthProvider>
+    </AdminDesignProvider>
   );
 }

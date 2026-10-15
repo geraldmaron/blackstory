@@ -24,7 +24,7 @@ import { z } from 'zod';
  * literal (not imported) so schemas keeps no reverse dependency on @repo/domain
  * — same convention as public-projections.ts. Keep in sync with that file.
  */
-const ARTICLE_THEME_IDS_MIRROR = [
+export const ARTICLE_THEME_IDS = [
   'redlining',
   'drug_policy_state',
   'urban_renewal',
@@ -36,7 +36,7 @@ const ARTICLE_THEME_IDS_MIRROR = [
   'cross_cutting',
 ] as const;
 
-const articleThemeIdSchema = z.enum(ARTICLE_THEME_IDS_MIRROR);
+const articleThemeIdSchema = z.enum(ARTICLE_THEME_IDS);
 
 /** Reusable image shape — mirrors the entity `primaryImage` rights model. */
 export const articleImageSchema = z.object({
@@ -253,6 +253,22 @@ export const articleSeriesSchema = z.object({
 });
 export type ArticleSeriesDoc = z.infer<typeof articleSeriesSchema>;
 
+/** Public credit snapshots contain no authentication or private contact information. */
+export const articleContributorSchema = z.object({
+  id: z
+    .string()
+    .min(1)
+    .max(100)
+    .regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/),
+  name: z.string().trim().min(1).max(120),
+  kind: z.enum(['person', 'editorial']),
+  roles: z
+    .array(z.enum(['author', 'researcher', 'editor']))
+    .min(1)
+    .max(3),
+});
+export type ArticleContributorDoc = z.infer<typeof articleContributorSchema>;
+
 export const publicArticleProjectionSchema = z.object({
   id: z.string().min(1),
   releaseId: z.string().min(1),
@@ -278,6 +294,7 @@ export const publicArticleProjectionSchema = z.object({
   body: z.array(articleBodyBlockSchema).min(1),
   references: z.array(articleReferenceSchema).default([]),
   relatedEntityIds: z.array(z.string().min(1)).default([]),
+  contributors: z.array(articleContributorSchema).max(24).default([]),
 });
 export type PublicArticleProjectionDoc = z.infer<typeof publicArticleProjectionSchema>;
 

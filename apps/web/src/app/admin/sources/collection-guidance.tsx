@@ -1,4 +1,5 @@
 /** Versioned collection profiles follow docs/ui/patterns-source-library.md. Server-only. */
+import { FormInput, FormSelect, FormButton } from '../../../admin/design-system/fields';
 import type { SourceLibraryResult } from '@repo/ops-data/source-library';
 export function CollectionGuidance({ result }: { result: SourceLibraryResult }) {
   const offset = result.query.offset ?? 0,
@@ -25,7 +26,7 @@ export function CollectionGuidance({ result }: { result: SourceLibraryResult }) 
       >
         <label className="ds-toolbar__field">
           <span className="ds-toolbar__field-label">Research question</span>
-          <input
+          <FormInput
             name="question"
             type="search"
             defaultValue={result.query.question ?? ''}
@@ -34,7 +35,11 @@ export function CollectionGuidance({ result }: { result: SourceLibraryResult }) 
         </label>
         <label className="ds-toolbar__field">
           <span className="ds-toolbar__field-label">Evidence need</span>
-          <select name="assertionClass" defaultValue={result.query.assertionClass ?? ''}>
+          <FormSelect
+            name="assertionClass"
+            defaultValue={result.query.assertionClass ?? ''}
+            aria-label="Evidence need"
+          >
             <option value="">Any evidence need</option>
             {[
               'record_fact',
@@ -53,20 +58,20 @@ export function CollectionGuidance({ result }: { result: SourceLibraryResult }) 
                 {value.replaceAll('_', ' ')}
               </option>
             ))}
-          </select>
+          </FormSelect>
         </label>
         <label className="ds-toolbar__field">
           <span className="ds-toolbar__field-label">Geography</span>
-          <input
+          <FormInput
             name="geography"
             defaultValue={result.query.geography ?? ''}
             placeholder="State, city or region"
           />
         </label>
         <div className="ds-toolbar__actions">
-          <button className="ds-button ds-button--secondary" type="submit">
+          <FormButton className="ds-button ds-button--secondary" type="submit">
             Find collections
-          </button>
+          </FormButton>
           <a className="ds-button ds-button--secondary" href="/admin/sources">
             Clear
           </a>

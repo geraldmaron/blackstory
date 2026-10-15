@@ -8,14 +8,17 @@
  */
 'use client';
 
+import {
+  FormButton,
+  FormInput,
+  FormSelect,
+  FormTextarea,
+} from '../../../../admin/design-system/fields';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import type { StoryResearchPacket } from '@repo/domain';
 import { useAdminAuth } from '../../../../admin/auth/AdminAuthProvider';
-import {
-  articleCoverPath,
-  slugifyCoverArticleId,
-} from '../../../../admin/stories/cover-article-catalog';
 import {
   STORY_REVIEW_EMPTY_COPY,
   STORY_REVIEW_INTENT_COPY,
@@ -58,7 +61,7 @@ export type PacketRow = {
 type BulkResult = {
   readonly succeeded: number;
   readonly failed: number;
-  readonly seedHandoffs: readonly { submissionId: string; seedHandoff: unknown }[];
+  readonly articleDrafts: readonly { submissionId: string; slug: string }[];
 };
 
 function reviewLabel(row: PacketRow): string {
@@ -97,7 +100,8 @@ export function StoryReviewDesk({ initialRows = [] }: StoryReviewDeskProps) {
   const [query, setQuery] = useState<StoryReviewQueueQuery>(DEFAULT_STORY_REVIEW_QUERY);
   const [note, setNote] = useState('');
   const [error, setError] = useState<string | null>(null);
-  const [seedHandoff, setSeedHandoff] = useState<string | null>(null);
+  const router = useRouter();
+  const [articleSlug, setArticleSlug] = useState<string | null>(null);
   const [bulkResult, setBulkResult] = useState<BulkResult | null>(null);
   const [loading, setLoading] = useState(false);
   const [busy, setBusy] = useState(false);
@@ -180,7 +184,7 @@ export function StoryReviewDesk({ initialRows = [] }: StoryReviewDeskProps) {
     if (submissionIds.length === 0) return;
     setBusy(true);
     setError(null);
-    setSeedHandoff(null);
+    setArticleSlug(null);
     setBulkResult(null);
     try {
       const token = await getIdToken(true);
@@ -203,14 +207,12 @@ export function StoryReviewDesk({ initialRows = [] }: StoryReviewDeskProps) {
         });
         const body = (await response.json()) as {
           error?: string;
-          seedHandoff?: unknown;
+          articleDraft?: { slug: string };
         };
         if (!response.ok) {
           throw new Error(body.error ?? `Review failed (${response.status})`);
         }
-        if (body.seedHandoff) {
-          setSeedHandoff(JSON.stringify(body.seedHandoff, null, 2));
-        }
+        if (body.articleDraft) setArticleSlug(body.articleDraft.slug);
       } else {
         const response = await fetch('/admin/api/stories/packets/review-bulk', {
           method: 'POST',
@@ -228,7 +230,7 @@ export function StoryReviewDesk({ initialRows = [] }: StoryReviewDeskProps) {
           error?: string;
           succeeded?: number;
           failed?: number;
-          seedHandoffs?: BulkResult['seedHandoffs'];
+          articleDrafts?: BulkResult['articleDrafts'];
         };
         if (!response.ok) {
           throw new Error(body.error ?? `Bulk review failed (${response.status})`);
@@ -236,11 +238,8 @@ export function StoryReviewDesk({ initialRows = [] }: StoryReviewDeskProps) {
         setBulkResult({
           succeeded: body.succeeded ?? 0,
           failed: body.failed ?? 0,
-          seedHandoffs: body.seedHandoffs ?? [],
+          articleDrafts: body.articleDrafts ?? [],
         });
-        if ((body.seedHandoffs?.length ?? 0) === 1 && body.seedHandoffs?.[0]?.seedHandoff) {
-          setSeedHandoff(JSON.stringify(body.seedHandoffs[0].seedHandoff, null, 2));
-        }
       }
 
       setSelectedIds(new Set());
@@ -268,65 +267,65 @@ export function StoryReviewDesk({ initialRows = [] }: StoryReviewDeskProps) {
             ))}
           </ol>
         </div>
-        <button
+        <FormButton
           type="button"
           className="ds-button ds-button--secondary"
           onClick={() => void load()}
           disabled={loading || busy}
         >
           {loading ? 'Refreshing…' : 'Refresh'}
-        </button>
+        </FormButton>
       </header>
 
       <section className="story-review__stats" aria-label="Queue counts">
-        <button
+        <FormButton
           type="button"
           className={query.reviewStatus === 'pending' ? 'is-active' : undefined}
           onClick={() => patchQuery({ reviewStatus: 'pending' })}
         >
           Pending <strong>{counts.pending}</strong>
-        </button>
-        <button
+        </FormButton>
+        <FormButton
           type="button"
           className={query.reviewStatus === 'all' ? 'is-active' : undefined}
           onClick={() => patchQuery({ reviewStatus: 'all' })}
         >
           All <strong>{counts.total}</strong>
-        </button>
-        <button
+        </FormButton>
+        <FormButton
           type="button"
           className={query.reviewStatus === 'approved' ? 'is-active' : undefined}
           onClick={() => patchQuery({ reviewStatus: 'approved' })}
         >
           Approved <strong>{counts.approved}</strong>
-        </button>
-        <button
+        </FormButton>
+        <FormButton
           type="button"
           className={query.reviewStatus === 'needs_evidence' ? 'is-active' : undefined}
           onClick={() => patchQuery({ reviewStatus: 'needs_evidence' })}
         >
           Needs evidence <strong>{counts.needsEvidence}</strong>
-        </button>
-        <button
+        </FormButton>
+        <FormButton
           type="button"
           className={query.reviewStatus === 'rejected' ? 'is-active' : undefined}
           onClick={() => patchQuery({ reviewStatus: 'rejected' })}
         >
           Rejected <strong>{counts.rejected}</strong>
-        </button>
-        <button
+        </FormButton>
+        <FormButton
           type="button"
           className={query.issuesOnly ? 'is-active' : undefined}
           onClick={() => patchQuery({ issuesOnly: !query.issuesOnly })}
         >
           With issues <strong>{counts.withIssues}</strong>
-        </button>
+        </FormButton>
       </section>
 
       <section className="story-review__toolbar" aria-label="Filter and sort">
         <label className="story-review__field">
           <span>Search</span>
-          <input
+          <FormInput
             type="search"
             value={query.search}
             onChange={(event) => patchQuery({ search: event.target.value })}
@@ -335,57 +334,61 @@ export function StoryReviewDesk({ initialRows = [] }: StoryReviewDeskProps) {
         </label>
         <label className="story-review__field">
           <span>Review status</span>
-          <select
+          <FormSelect
             value={query.reviewStatus}
-            onChange={(event) =>
-              patchQuery({ reviewStatus: event.target.value as StoryReviewStatusFilter })
+            onValueChange={(nextValue) =>
+              patchQuery({ reviewStatus: nextValue as StoryReviewStatusFilter })
             }
+            aria-label="Review status"
           >
             <option value="pending">Pending</option>
             <option value="approved">Approved</option>
             <option value="needs_evidence">Needs evidence</option>
             <option value="rejected">Rejected</option>
             <option value="all">All</option>
-          </select>
+          </FormSelect>
         </label>
         <label className="story-review__field">
           <span>Packet decision</span>
-          <select
+          <FormSelect
             value={query.packetDecision}
-            onChange={(event) =>
-              patchQuery({ packetDecision: event.target.value as StoryPacketDecisionFilter })
+            onValueChange={(nextValue) =>
+              patchQuery({ packetDecision: nextValue as StoryPacketDecisionFilter })
             }
+            aria-label="Packet decision"
           >
             <option value="all">All</option>
             <option value="recommend">Recommend</option>
             <option value="needs_evidence">Needs evidence</option>
             <option value="reject">Reject</option>
-          </select>
+          </FormSelect>
         </label>
         <label className="story-review__field">
           <span>Sort</span>
-          <select
+          <FormSelect
             value={query.sortKey}
-            onChange={(event) => patchQuery({ sortKey: event.target.value as StoryReviewSortKey })}
+            onValueChange={(nextValue) => patchQuery({ sortKey: nextValue as StoryReviewSortKey })}
+            aria-label="Sort"
           >
             <option value="createdAt">Created</option>
             <option value="title">Title</option>
             <option value="packetDecision">Packet decision</option>
             <option value="issueCount">Issue count</option>
             <option value="reviewStatus">Review status</option>
-          </select>
+          </FormSelect>
         </label>
         <label className="story-review__field">
           <span>Direction</span>
-          <select
+          <FormSelect
             value={query.sortDirection}
-            onChange={(event) =>
-              patchQuery({ sortDirection: event.target.value as StoryReviewSortDirection })
+            onValueChange={(nextValue) =>
+              patchQuery({ sortDirection: nextValue as StoryReviewSortDirection })
             }
+            aria-label="Direction"
           >
             <option value="desc">Descending</option>
             <option value="asc">Ascending</option>
-          </select>
+          </FormSelect>
         </label>
       </section>
 
@@ -399,8 +402,8 @@ export function StoryReviewDesk({ initialRows = [] }: StoryReviewDeskProps) {
         <p className="story-review__notice" role="status">
           Bulk review finished: {bulkResult.succeeded} succeeded
           {bulkResult.failed > 0 ? `, ${bulkResult.failed} failed` : ''}.
-          {bulkResult.seedHandoffs.length > 0
-            ? ` ${bulkResult.seedHandoffs.length} seed handoff(s) ready below.`
+          {bulkResult.articleDrafts.length > 0
+            ? ` ${bulkResult.articleDrafts.length} editable article draft(s) available.`
             : ''}
         </p>
       ) : null}
@@ -414,7 +417,7 @@ export function StoryReviewDesk({ initialRows = [] }: StoryReviewDeskProps) {
               : ''}
           </p>
           <div className="story-review__bulk-actions">
-            <button
+            <FormButton
               type="button"
               className="ds-button ds-button--primary"
               disabled={busy || selectedIds.size > STORY_REVIEW_BULK_LIMIT}
@@ -422,8 +425,8 @@ export function StoryReviewDesk({ initialRows = [] }: StoryReviewDeskProps) {
               onClick={() => void submitReview('approved', bulkTargets)}
             >
               Approve selected
-            </button>
-            <button
+            </FormButton>
+            <FormButton
               type="button"
               className="ds-button ds-button--secondary"
               disabled={busy || selectedIds.size > STORY_REVIEW_BULK_LIMIT}
@@ -431,8 +434,8 @@ export function StoryReviewDesk({ initialRows = [] }: StoryReviewDeskProps) {
               onClick={() => void submitReview('needs_evidence', bulkTargets)}
             >
               Needs evidence
-            </button>
-            <button
+            </FormButton>
+            <FormButton
               type="button"
               className="ds-button ds-button--secondary"
               disabled={busy || selectedIds.size > STORY_REVIEW_BULK_LIMIT}
@@ -440,15 +443,15 @@ export function StoryReviewDesk({ initialRows = [] }: StoryReviewDeskProps) {
               onClick={() => void submitReview('rejected', bulkTargets)}
             >
               Reject selected
-            </button>
-            <button
+            </FormButton>
+            <FormButton
               type="button"
               className="ds-button ds-button--secondary"
               disabled={busy}
               onClick={() => setSelectedIds(new Set())}
             >
               Clear selection
-            </button>
+            </FormButton>
           </div>
         </section>
       ) : null}
@@ -474,7 +477,7 @@ export function StoryReviewDesk({ initialRows = [] }: StoryReviewDeskProps) {
                 <thead>
                   <tr>
                     <th scope="col">
-                      <input
+                      <FormInput
                         type="checkbox"
                         checked={allVisibleSelected}
                         onChange={toggleAllVisible}
@@ -498,7 +501,7 @@ export function StoryReviewDesk({ initialRows = [] }: StoryReviewDeskProps) {
                         onClick={() => setSelectedId(row.submissionId)}
                       >
                         <td onClick={(event) => event.stopPropagation()}>
-                          <input
+                          <FormInput
                             type="checkbox"
                             checked={selectedIds.has(row.submissionId)}
                             onChange={() => toggleOne(row.submissionId)}
@@ -506,9 +509,9 @@ export function StoryReviewDesk({ initialRows = [] }: StoryReviewDeskProps) {
                           />
                         </td>
                         <td>
-                          <button type="button" className="story-review__row-title">
+                          <FormButton type="button" className="story-review__row-title">
                             {row.title}
-                          </button>
+                          </FormButton>
                           <p className="story-review__row-meta ds-mono">{row.submissionId}</p>
                         </td>
                         <td>
@@ -552,16 +555,32 @@ export function StoryReviewDesk({ initialRows = [] }: StoryReviewDeskProps) {
               </p>
               <p className="ds-sans">{selected.packet.rationale}</p>
               <p className="ds-sans">
-                <Link
-                  href={articleCoverPath(
-                    selected.packet.draft.slug?.trim() ||
-                      slugifyCoverArticleId(selected.topicId || selected.packet.draft.title),
-                  )}
+                <FormButton
+                  onClick={async () => {
+                    try {
+                      const token = await getIdToken();
+                      const response = await fetch('/admin/api/articles/import', {
+                        method: 'POST',
+                        headers: {
+                          Authorization: `Bearer ${token}`,
+                          'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ submissionId: selected.submissionId }),
+                      });
+                      const data = await response.json();
+                      if (!response.ok) throw new Error(data.error);
+                      router.push(`/admin/stories/articles/${data.slug}`);
+                    } catch (error) {
+                      window.alert(
+                        error instanceof Error ? error.message : 'Article import failed.',
+                      );
+                    }
+                  }}
                 >
-                  Open cover package
-                </Link>
-                {' · '}
-                publish stays blocked until brief, recipe, and plate cite the house lock.
+                  Open editable article draft
+                </FormButton>
+                {' · '}The packet remains private research. Review sources and credits in the
+                article editor.
               </p>
 
               {selected.packet.validationIssues.length > 0 ? (
@@ -645,20 +664,20 @@ export function StoryReviewDesk({ initialRows = [] }: StoryReviewDeskProps) {
 
               <label className="story-review__field story-review__note">
                 <span>Decision note (optional)</span>
-                <textarea
+                <FormTextarea
                   value={note}
                   onChange={(event) => setNote(event.target.value)}
                   rows={3}
-                  placeholder="Example: Strong cite map; approve for seed handoff after one more primary source"
+                  placeholder="Example: Strong cite map; approve for research handoff after one more primary source"
                 />
               </label>
 
               <div className="acq-sheet__decide">
                 <h3 className="acq-sheet__decide-title">Decide</h3>
                 <p className="acq-sheet__decide-lede">
-                  Approval records your review and may return a seed handoff — it does not publish.
-                  For missing sources, <Link href="/admin/evidence">attach evidence</Link> before
-                  re-running story research.
+                  Approval records your review and may return a research handoff — it does not
+                  publish. For missing sources, <Link href="/admin/evidence">attach evidence</Link>{' '}
+                  before re-running story research.
                 </p>
                 <ul className="acq-sheet__action-help">
                   {(
@@ -677,7 +696,7 @@ export function StoryReviewDesk({ initialRows = [] }: StoryReviewDeskProps) {
               </div>
 
               <div className="story-review__actions">
-                <button
+                <FormButton
                   type="button"
                   className="ds-button ds-button--primary"
                   disabled={busy}
@@ -685,8 +704,8 @@ export function StoryReviewDesk({ initialRows = [] }: StoryReviewDeskProps) {
                   onClick={() => void submitReview('approved', [selected.submissionId])}
                 >
                   Approve
-                </button>
-                <button
+                </FormButton>
+                <FormButton
                   type="button"
                   className="ds-button ds-button--secondary"
                   disabled={busy}
@@ -694,8 +713,8 @@ export function StoryReviewDesk({ initialRows = [] }: StoryReviewDeskProps) {
                   onClick={() => void submitReview('needs_evidence', [selected.submissionId])}
                 >
                   Needs evidence
-                </button>
-                <button
+                </FormButton>
+                <FormButton
                   type="button"
                   className="ds-button ds-button--secondary"
                   disabled={busy}
@@ -703,26 +722,27 @@ export function StoryReviewDesk({ initialRows = [] }: StoryReviewDeskProps) {
                   onClick={() => void submitReview('rejected', [selected.submissionId])}
                 >
                   Reject
-                </button>
+                </FormButton>
               </div>
 
-              {seedHandoff ? (
-                <div className="story-review__handoff">
-                  <h3 className="ds-section__title">Approved artifact</h3>
-                  <p className="ds-sans">
-                    Approval does not publish. This validated JSON remains available for release
-                    assembly; activation still requires the Releases desk and an independent actor.
-                  </p>
-                  <pre className="ds-mono">{seedHandoff}</pre>
-                </div>
-              ) : null}
-
-              {bulkResult && bulkResult.seedHandoffs.length > 1 ? (
-                <div className="story-review__handoff">
-                  <h3 className="ds-section__title">Bulk approved artifacts</h3>
-                  <pre className="ds-mono">{JSON.stringify(bulkResult.seedHandoffs, null, 2)}</pre>
-                </div>
-              ) : null}
+              {articleSlug && (
+                <p>
+                  <Link href={`/admin/stories/articles/${articleSlug}`}>
+                    Continue editing the article draft
+                  </Link>
+                </p>
+              )}
+              {!!bulkResult?.articleDrafts.length && (
+                <ul>
+                  {bulkResult.articleDrafts.map((article) => (
+                    <li key={article.submissionId}>
+                      <Link href={`/admin/stories/articles/${article.slug}`}>
+                        Edit {article.slug}
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              )}
             </>
           )}
         </section>

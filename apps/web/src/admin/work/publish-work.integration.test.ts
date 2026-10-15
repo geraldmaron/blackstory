@@ -29,7 +29,9 @@ test(
       id: untouchedId,
       kind: 'place',
       displayName: 'Unrelated record',
-      summary: 'Unrelated content stays intact.',
+      nameLower: 'unrelated record',
+      summary:
+        'An unrelated controlled catalog record remains available while editorial changes are published. Its content and public identity must stay intact.',
       releaseId: previous,
       claims: [],
       related: [],
@@ -112,7 +114,7 @@ test(
         idempotencyKey: randomUUID(),
       });
       const quote =
-        'The school served Black students at the documented site during the period covered by this historical record.';
+        'The school served Black students at the documented site during the period covered by this historical record, including the dates and institutional identity specified in the source.';
       const sources = ['https://archive.example.gov/school', 'https://district.example.org/school'];
       const change = (name: string) => {
         const entityId = `school_${randomUUID()}`;
@@ -311,7 +313,7 @@ test(
         changes[1]!.entityId,
       ]);
       assert.equal(absent.rows.length, 0);
-      assert.equal(objects.size, 12);
+      assert.equal(objects.size, 13);
       const mobilePointer = await mobileStore.getPointer();
       assert.equal(mobilePointer!.activeReleaseId, committedRelease);
       const publishedMobile = await mobileStore.getRelease(String(committedRelease));
@@ -328,7 +330,7 @@ test(
         ),
         true,
       );
-      assert.equal(signed.manifest.aggregateArtifacts.length, 8);
+      assert.equal(signed.manifest.aggregateArtifacts.length, 9);
       assert.equal(signed.mobileBootstrap.activeRelease.releaseId, committedRelease);
       const content = await mobileStore.getArtifact(
         publishedMobile!.manifest.artifactHashes['content-index']!.path,

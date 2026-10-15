@@ -10,3 +10,7 @@ export * from './search-index-row.js';
 export * from './public-articles.js';
 export * from './banned-books.js';
 export * from './archive-pointer.js';
+
+export * from './editorial.js';
+
+export { ZodError } from 'zod';

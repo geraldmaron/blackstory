@@ -7,6 +7,7 @@
  * matching this filter" is the one action here where the operator cannot see what they are about
  * to touch. Above `BULK_CONFIRM_THRESHOLD` it takes a second, deliberate click rather than one.
  */
+import { FormButton, FormSelect, FormInput } from '../../../admin/design-system/fields';
 import { useActionState, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { applyBulkEdit } from './bulk-actions';
@@ -62,7 +63,7 @@ export function BulkEditPanel({
         <p className="story-review__notice" role="status">
           {state.message}
         </p>
-        <button
+        <FormButton
           type="button"
           className="ds-button ds-button--secondary"
           onClick={() => {
@@ -72,7 +73,7 @@ export function BulkEditPanel({
           }}
         >
           Done
-        </button>
+        </FormButton>
       </div>
     );
   }
@@ -88,58 +89,61 @@ export function BulkEditPanel({
 
       <label className="story-review__field">
         <span>Change</span>
-        <select
+        <FormSelect
           value={field}
-          onChange={(event) => {
-            const next = event.target.value as Field;
+          onValueChange={(nextValue) => {
+            const next = nextValue as Field;
             setField(next);
             setConfirming(false);
             setValue(
               next === 'kind' ? ENTITY_KINDS[0] : next === 'livingStatus' ? LIVING_STATUSES[0] : '',
             );
           }}
+          aria-label="Change"
         >
           <option value="kind">Kind</option>
           <option value="livingStatus">Living status</option>
           <option value="sensitivity">Sensitivity</option>
-        </select>
+        </FormSelect>
       </label>
 
       {field === 'kind' ? (
         <label className="story-review__field">
           <span>To</span>
-          <select
+          <FormSelect
             value={value}
-            onChange={(event) => {
-              setValue(event.target.value);
+            onValueChange={(nextValue) => {
+              setValue(nextValue);
               setConfirming(false);
             }}
+            aria-label="To"
           >
             {ENTITY_KINDS.map((kind) => (
               <option key={kind} value={kind}>
                 {titleCase(kind)}
               </option>
             ))}
-          </select>
+          </FormSelect>
         </label>
       ) : null}
 
       {field === 'livingStatus' ? (
         <label className="story-review__field">
           <span>To</span>
-          <select
+          <FormSelect
             value={value}
-            onChange={(event) => {
-              setValue(event.target.value);
+            onValueChange={(nextValue) => {
+              setValue(nextValue);
               setConfirming(false);
             }}
+            aria-label="To"
           >
             {LIVING_STATUSES.map((status) => (
               <option key={status} value={status}>
                 {formatLivingStatusLabel(status)}
               </option>
             ))}
-          </select>
+          </FormSelect>
         </label>
       ) : null}
 
@@ -148,7 +152,7 @@ export function BulkEditPanel({
           <legend>To</legend>
           {sensitivityClasses.map((sensitivityClass) => (
             <label key={sensitivityClass} className="entity-edit__check">
-              <input
+              <FormInput
                 type="checkbox"
                 checked={classes.includes(sensitivityClass)}
                 onChange={(event) => {
@@ -168,7 +172,7 @@ export function BulkEditPanel({
 
       <label className="story-review__field">
         <span className="ds-visually-hidden">Reason (required, audited)</span>
-        <input
+        <FormInput
           type="text"
           name="reason"
           value={reason}
@@ -179,20 +183,20 @@ export function BulkEditPanel({
       </label>
 
       {confirming || !needsConfirm ? (
-        <button type="submit" className="ds-button" disabled={pending || !reason.trim()}>
+        <FormButton type="submit" className="ds-button" disabled={pending || !reason.trim()}>
           {pending
             ? 'Applying…'
             : `Set ${preview} on ${count.toLocaleString()} record${count === 1 ? '' : 's'}`}
-        </button>
+        </FormButton>
       ) : (
-        <button
+        <FormButton
           type="button"
           className="ds-button"
           disabled={!reason.trim()}
           onClick={() => setConfirming(true)}
         >
           Review {count.toLocaleString()} records…
-        </button>
+        </FormButton>
       )}
 
       {confirming && needsConfirm ? (

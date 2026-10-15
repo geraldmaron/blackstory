@@ -31,6 +31,25 @@ export type AdminRouteRule = {
 };
 
 export const ADMIN_ROUTE_RULES: readonly AdminRouteRule[] = [
+  { method: 'POST', pattern: '/admin/api/articles/:id/rollback', access: 'publication:retract' },
+  { method: 'POST', pattern: '/admin/api/editorial/entities/proposals', access: 'research:write' },
+  {
+    method: 'POST',
+    pattern: '/admin/api/editorial/entities/proposals/:id/review',
+    access: 'publication:publish',
+  },
+  { method: 'POST', pattern: '/admin/api/articles/import', access: 'research:write' },
+  { method: 'POST', pattern: '/admin/api/articles/:id/publish', access: 'publication:publish' },
+  { method: 'GET', pattern: '/admin/api/editorial/entities', access: STAFF_READ },
+  { method: 'GET', pattern: '/admin/api/articles', access: STAFF_READ },
+  { method: 'POST', pattern: '/admin/api/articles', access: 'research:write' },
+  { method: 'GET', pattern: '/admin/api/articles/:id', access: STAFF_READ },
+  { method: 'PUT', pattern: '/admin/api/articles/:id', access: 'research:write' },
+  { method: 'POST', pattern: '/admin/api/articles/:id/review', access: 'publication:publish' },
+  { method: 'POST', pattern: '/admin/api/articles/:id/restore', access: 'research:write' },
+  { method: 'POST', pattern: '/admin/api/articles/:id/media', access: 'research:write' },
+  { method: 'GET', pattern: '/admin/api/contributors', access: STAFF_READ },
+  { method: 'POST', pattern: '/admin/api/contributors', access: 'roles:change' },
   { method: 'GET', pattern: '/admin/api/work/delegations', access: 'publication:publish' },
   { method: 'POST', pattern: '/admin/api/work/delegations', access: 'publication:publish' },
   { method: 'GET', pattern: '/admin/api/work', access: STAFF_READ },
