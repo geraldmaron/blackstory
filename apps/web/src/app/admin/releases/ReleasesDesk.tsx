@@ -13,6 +13,7 @@
  */
 'use client';
 
+import { FormInput, FormButton } from '../../../admin/design-system/fields';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { useAdminAuth } from '../../../admin/auth/AdminAuthProvider';
@@ -103,7 +104,7 @@ export function ReleasesDesk({ rows, activeRelease }: ReleasesDeskProps) {
       <section className="story-review__bulk" aria-label="Stage release action">
         <label className="story-review__field">
           <span>Selected release</span>
-          <input
+          <FormInput
             type="text"
             value={selectedId ?? ''}
             onChange={(event) => setSelectedId(event.target.value || null)}
@@ -112,7 +113,7 @@ export function ReleasesDesk({ rows, activeRelease }: ReleasesDeskProps) {
         </label>
         <label className="story-review__field">
           <span>Decision reason (required)</span>
-          <input
+          <FormInput
             type="text"
             value={reason}
             onChange={(event) => setReason(event.target.value)}
@@ -121,22 +122,22 @@ export function ReleasesDesk({ rows, activeRelease }: ReleasesDeskProps) {
           />
         </label>
         <div className="story-review__bulk-actions">
-          <button
+          <FormButton
             type="button"
             className="ds-button ds-button--primary"
             disabled={busy}
             onClick={() => void stage('activate')}
           >
             Stage activate
-          </button>
-          <button
+          </FormButton>
+          <FormButton
             type="button"
             className="ds-button ds-button--secondary"
             disabled={busy}
             onClick={() => void stage('rollback')}
           >
             Stage rollback
-          </button>
+          </FormButton>
         </div>
       </section>
 

@@ -12,8 +12,10 @@
  * is a quality upgrade, never a hard dependency of the pipeline.
  */
 import { spawn } from 'node:child_process';
+import { fileURLToPath } from 'node:url';
+import { dirname, resolve } from 'node:path';
 
-const REPO_ROOT = new URL('../../../..', import.meta.url).pathname;
+const REPO_ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '../../../..');
 const EXTRACT_TIMEOUT_MS = 15_000;
 
 export type TrafilaturaResult = { readonly text: string; readonly title?: string };

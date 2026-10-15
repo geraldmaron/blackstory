@@ -2,7 +2,6 @@
  * Postgres reads/writes for story packets in submissions.intake_items and ops.story_packet_reviews.
  */
 import type { StoryResearchPacket } from '@repo/domain';
-import { storyPacketToSeedRecord } from '@repo/domain';
 import { queryPostgres } from './canonical-postgres-client.js';
 
 export type StoryPacketReviewDecision = 'approved' | 'rejected' | 'needs_evidence';
@@ -46,12 +45,6 @@ function toIso(value: Date | string): string {
 
 function readString(value: unknown): string | undefined {
   return typeof value === 'string' && value.length > 0 ? value : undefined;
-}
-
-function storyPacketSeedSources(
-  packet: StoryResearchPacket,
-): readonly { readonly label: string; readonly url: string }[] {
-  return packet.authorityLeadUrls.map((url) => ({ label: url, url }));
 }
 
 function extractPacket(payload: Record<string, unknown> | undefined): StoryResearchPacket | null {
@@ -194,7 +187,6 @@ export async function recordStoryPacketReviewPostgres(input: {
     readonly reviewedAt: string;
     readonly reviewedByEmail: string;
   };
-  readonly seedHandoff?: ReturnType<typeof storyPacketToSeedRecord>;
 }> {
   const reviewedAt = new Date().toISOString();
   const packetWithMeta = {
@@ -233,15 +225,5 @@ export async function recordStoryPacketReviewPostgres(input: {
     reviewedByEmail: input.reviewedByEmail,
   };
 
-  if (input.decision === 'approved') {
-    return {
-      review,
-      seedHandoff: storyPacketToSeedRecord(
-        input.item.packet,
-        reviewedAt.slice(0, 10),
-        storyPacketSeedSources(input.item.packet),
-      ),
-    };
-  }
   return { review };
 }

@@ -16,6 +16,8 @@ import {
   type FormEvent,
 } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
+import { Input } from 'baseui/input';
+import { Button } from 'baseui/button';
 import { useAdminAuth } from '../../../admin/auth/AdminAuthProvider';
 import {
   ADMIN_NETWORK_FAILURE_MESSAGE,
@@ -39,8 +41,8 @@ export default function LoginClient() {
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
-  const emailRef = useRef<HTMLInputElement>(null);
-  const passwordRef = useRef<HTMLInputElement>(null);
+  const emailRef = useRef<HTMLInputElement>(null!);
+  const passwordRef = useRef<HTMLInputElement>(null!);
 
   // The fields are live in the server HTML, so an operator can type before hydration. React
   // leaves that text in the DOM but not in state, and the next render would reset it; adopt it
@@ -127,10 +129,10 @@ export default function LoginClient() {
             <label className="admin-login__label" htmlFor="admin-email">
               Email
             </label>
-            <input
+            <Input
               id="admin-email"
-              ref={emailRef}
-              className="admin-login__input"
+              inputRef={emailRef}
+
               name="email"
               type="email"
               autoComplete="username"
@@ -144,15 +146,15 @@ export default function LoginClient() {
             <label className="admin-login__label" htmlFor="admin-password">
               Password
             </label>
-            <input
+            <Input
               id="admin-password"
-              ref={passwordRef}
-              className="admin-login__input"
+              inputRef={passwordRef}
+
               name="password"
               type="password"
               autoComplete="current-password"
               required
-              minLength={8}
+              overrides={{ Input: { props: { minLength: 8 } } }}
               value={password}
               onChange={(event) => setPassword(event.target.value)}
               disabled={busy || Boolean(user)}
@@ -161,13 +163,13 @@ export default function LoginClient() {
           <div className="admin-login__actions">
             {/* Gated on `ready` as well: the fields are live before the auth client is, but a
                 sign-in cannot run until it is. */}
-            <button
+            <Button
               type="submit"
-              className="ds-button ds-button--primary"
+
               disabled={busy || !ready || Boolean(user) || !email || !password}
             >
               {busy ? 'Signing in…' : 'Sign in'}
-            </button>
+            </Button>
           </div>
         </form>
       </section>

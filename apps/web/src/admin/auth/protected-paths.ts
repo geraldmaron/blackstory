@@ -25,7 +25,12 @@ export function isAuthGatedPath(pathname: string): boolean {
   if (pathname.startsWith(API_PREFIX)) return false;
   if (PUBLIC_FILES.includes(pathname)) return false;
   if (PUBLIC_PREFIXES.some((prefix) => pathname.startsWith(prefix))) return false;
-  if (STATIC_ASSET.test(pathname)) return false;
+  if (
+    !pathname.startsWith('/admin/') &&
+    !pathname.startsWith('/design-system/') &&
+    STATIC_ASSET.test(pathname)
+  )
+    return false;
   // Unknown paths are gated. A new surface is protected before anyone remembers to add it.
   return true;
 }

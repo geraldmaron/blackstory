@@ -155,8 +155,9 @@ namespace cutover or `publication.activate_release(release_id)` afterward. This 
 audit event and rejects research identities. A reviewed one-time operator script may connect these
 existing primitives; a new reusable publishing service is not required for this correction. Load
 an ECDSA private key and nonempty key ID from the configured secret store, and retain the matching
-public key for verification. The repository currently defines no production release-signing env
-name; the current key registry is held privately with its 1Password item references. Record the
+public key for verification. The editorial executor uses server-only `RELEASE_SIGNING_PRIVATE_KEY`, `RELEASE_SIGNING_PUBLIC_KEY`,
+`RELEASE_SIGNING_KEY_ID` and `EXPECTED_RELEASE_SIGNING_PUBLIC_KEY_SHA256`. The key registry is
+held privately with its 1Password item references. Record the
 selected secret reference, key ID and public verifier before the window without logging private
 key material. Purge the release cache and verify the live
 database views, artifacts and public surface. Preserve the old release for rollback.

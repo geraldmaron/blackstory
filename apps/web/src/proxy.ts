@@ -59,6 +59,7 @@ export function isPublicDocumentCacheable(request: NextRequest): boolean {
   if (request.method !== 'GET' && request.method !== 'HEAD') return false;
   const pathname = request.nextUrl.pathname;
   if (pathname.startsWith('/corrections/status')) return false;
+  if (pathname === '/design-system' || pathname.startsWith('/design-system/')) return false;
   return surfaceClassFor(pathname) !== null;
 }
 
@@ -123,7 +124,12 @@ async function resolveProxyResponse(request: NextRequest): Promise<NextResponse>
   // `/admin` is a staff-gated console, not a public page: it gets the Supabase-session check
   // instead of query normalization, and returns here rather than falling through. `adminAuthGate` makes its own pass-through decision for `/admin/login` and
   // `/admin/api/**` (bearer-token auth) via `isAuthGatedPath`.
-  if (request.nextUrl.pathname === '/admin' || request.nextUrl.pathname.startsWith('/admin/')) {
+  if (
+    request.nextUrl.pathname === '/admin' ||
+    request.nextUrl.pathname.startsWith('/admin/') ||
+    request.nextUrl.pathname === '/design-system' ||
+    request.nextUrl.pathname.startsWith('/design-system/')
+  ) {
     return adminAuthGate(request);
   }
 

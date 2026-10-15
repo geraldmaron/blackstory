@@ -3,8 +3,8 @@
 Next.js App Router static site published to GitHub Pages at
 [geraldmaron.github.io/blackstory](https://geraldmaron.github.io/blackstory/).
 
-**Publish source:** repo Settings → Pages → Deploy from a branch → `main` / **`/docs`**.
-The static export is synced into repo-root `docs/` (alongside operating markdown).
+**Publish source:** GitHub Actions, using `.github/workflows/pages.yml`.
+Only `apps/docs/out` is uploaded. Repository `docs/` contains internal operating records and must never be a Pages source.
 
 ## Quick start
 
@@ -20,13 +20,13 @@ Local URL: http://localhost:3050/ (empty `basePath`).
 ## Publish to GitHub Pages
 
 ```bash
-pnpm docs:publish
-# then commit the updated docs/ tree (index.html, _next/, guides/, brand/, .nojekyll)
-# and push to main
+pnpm docs:publish  # build the curated export locally
+# After merging to main:
+gh workflow run pages.yml --ref main
 ```
 
-`pnpm docs:publish` runs `DOCS_BASE_PATH=/blackstory` build and copies the export into
-`docs/` without deleting operating docs (`adr/`, `architecture.md`, …).
+Set the repository's Pages source to GitHub Actions and `PAGES_ENABLED=true`.
+Never copy generated assets into repository `docs/` or publish that directory.
 
 ## Structure
 
@@ -49,4 +49,4 @@ apps/docs/
 
 1. Add `apps/docs/content/<slug>.md` with YAML front matter (`title`, `description`, `nav`, `order`).
 2. Link it from the home page or another guide if needed.
-3. `pnpm docs:publish` and commit the refreshed `docs/` assets.
+3. Build with `pnpm docs:publish`, merge the source, then dispatch the Pages workflow.

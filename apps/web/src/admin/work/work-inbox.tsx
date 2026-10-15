@@ -1,5 +1,6 @@
 'use client';
 
+import { FormTextarea, FormSelect, FormButton, FormInput } from '../design-system/fields';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { workExecutionMode, type WorkItem } from '@repo/ops-data/management/contracts';
@@ -154,7 +155,7 @@ export function WorkInbox({ workId }: { workId?: string }) {
             Your assistant can research this request using its own web tools. Progress and your
             review are saved here.
           </p>
-          <textarea
+          <FormTextarea
             id="work-request"
             value={request}
             maxLength={12000}
@@ -168,25 +169,26 @@ export function WorkInbox({ workId }: { workId?: string }) {
           {hostedAvailable && (
             <label>
               Research with
-              <select
+              <FormSelect
                 value={executionMode}
-                onChange={(event) => {
-                  setExecutionMode(event.target.value as 'session' | 'hosted');
+                onValueChange={(nextValue) => {
+                  setExecutionMode(nextValue as 'session' | 'hosted');
                   setRequestKey(null);
                 }}
+                aria-label="Choose an option"
               >
                 <option value="session">My assistant</option>
                 <option value="hosted">Background service</option>
-              </select>
+              </FormSelect>
             </label>
           )}
-          <button
+          <FormButton
             className="ds-button"
             type="submit"
             disabled={busy || !request.trim() || !canResearch}
           >
             {busy ? 'Saving request…' : 'Send request'}
-          </button>
+          </FormButton>
         </form>
       )}
       {!loaded && !error && <p role="status">Loading requests…</p>}
@@ -224,7 +226,7 @@ export function WorkInbox({ workId }: { workId?: string }) {
                       ? 'Your progress is saved. Resume research or publication in your assistant.'
                       : 'No worker is currently running this request. You can retry it here.')}
                 </p>
-                <button
+                <FormButton
                   type="button"
                   disabled={busy}
                   onClick={() => {
@@ -236,7 +238,7 @@ export function WorkInbox({ workId }: { workId?: string }) {
                   }}
                 >
                   Retry
-                </button>
+                </FormButton>
               </>
             )}
             {work.proposal && (
@@ -251,7 +253,7 @@ export function WorkInbox({ workId }: { workId?: string }) {
                       {work.approvedEntityIds.includes(change.entityId) ? ' · Approved' : ''}
                     </p>
                     <label>
-                      <input
+                      <FormInput
                         type="checkbox"
                         checked={selected.includes(change.entityId)}
                         disabled={
@@ -392,14 +394,14 @@ export function WorkInbox({ workId }: { workId?: string }) {
                 {['awaiting_review', 'held', 'approved'].includes(work.state) && (
                   <div className="work-inbox__decision">
                     <label htmlFor="work-feedback">Changes or review notes</label>
-                    <textarea
+                    <FormTextarea
                       id="work-feedback"
                       rows={3}
                       value={reason}
                       onChange={(e) => setReason(e.target.value)}
                     />
                     <div className="work-inbox__actions">
-                      <button
+                      <FormButton
                         type="button"
                         disabled={
                           busy ||
@@ -413,8 +415,8 @@ export function WorkInbox({ workId }: { workId?: string }) {
                         onClick={() => void decide('approve')}
                       >
                         Approve and publish selected
-                      </button>
-                      <button
+                      </FormButton>
+                      <FormButton
                         type="button"
                         disabled={
                           busy ||
@@ -424,14 +426,14 @@ export function WorkInbox({ workId }: { workId?: string }) {
                         onClick={() => void decide('request_changes')}
                       >
                         Request changes
-                      </button>
-                      <button
+                      </FormButton>
+                      <FormButton
                         type="button"
                         disabled={busy || (!selected.length && !!work.proposal.changes.length)}
                         onClick={() => void decide('hold')}
                       >
                         Hold selected
-                      </button>
+                      </FormButton>
                     </div>
                   </div>
                 )}

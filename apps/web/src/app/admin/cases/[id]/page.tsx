@@ -3,6 +3,12 @@
  */
 'use client';
 
+import {
+  FormTextarea,
+  FormSelect,
+  FormInput,
+  FormButton,
+} from '../../../../admin/design-system/fields';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { useCallback, useEffect, useId, useRef, useState } from 'react';
@@ -219,7 +225,7 @@ export default function CaseDetailPage() {
             </div>
             <label className="acq__field acq__field--grow">
               <span>Decision reason (required)</span>
-              <textarea
+              <FormTextarea
                 ref={reasonRef}
                 rows={3}
                 value={reason}
@@ -232,22 +238,23 @@ export default function CaseDetailPage() {
             {legalActions.includes('exclude') ? (
               <label className="acq__field">
                 <span>Exclude reason code</span>
-                <select
+                <FormSelect
                   value={reasonCode}
-                  onChange={(event) => setReasonCode(event.target.value as ResearchCaseReasonCode)}
+                  onValueChange={(nextValue) => setReasonCode(nextValue as ResearchCaseReasonCode)}
+                  aria-label="Exclude reason code"
                 >
                   {EXCLUSION_REASON_CODES.map((code) => (
                     <option key={code} value={code}>
                       {code}
                     </option>
                   ))}
-                </select>
+                </FormSelect>
               </label>
             ) : null}
             {legalActions.includes('merge') ? (
               <label className="acq__field acq__field--grow">
                 <span>Merge into case id</span>
-                <input
+                <FormInput
                   type="text"
                   value={mergeTarget}
                   onChange={(event) => setMergeTarget(event.target.value)}
@@ -257,7 +264,7 @@ export default function CaseDetailPage() {
             ) : null}
             <div className="acq__bulk-actions">
               {legalActions.map((action) => (
-                <button
+                <FormButton
                   key={action}
                   type="button"
                   className="acq__button acq__button--primary"
@@ -266,7 +273,7 @@ export default function CaseDetailPage() {
                   onClick={() => void runTransition(action)}
                 >
                   {actionLabel(action)}
-                </button>
+                </FormButton>
               ))}
             </div>
           </section>

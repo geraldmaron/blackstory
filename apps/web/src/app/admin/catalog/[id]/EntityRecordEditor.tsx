@@ -7,6 +7,7 @@
  * write requires one — an edit with no stated justification is refused server-side — and asking
  * for it seven times would train operators to type "fix" seven times.
  */
+import { FormInput, FormSelect, FormTextarea } from '../../../../admin/design-system/fields';
 import { useState } from 'react';
 import { ENTITY_KINDS } from '../../../../admin/lib/entity-vocabulary';
 import { LIVING_STATUSES } from '../../../../admin/lib/entity-vocabulary';
@@ -38,7 +39,7 @@ export function EntityRecordEditor({
       <div className="entity-edit__reason">
         <label className="story-review__field" htmlFor="entity-edit-reason">
           <span>Reason for this change</span>
-          <input
+          <FormInput
             id="entity-edit-reason"
             type="text"
             value={reason}
@@ -57,7 +58,7 @@ export function EntityRecordEditor({
       <FieldForm entityId={entity.id} field="displayName" reason={reason} disabled={!reasonGiven}>
         <label className="story-review__field">
           <span>Name</span>
-          <input type="text" name="value" defaultValue={entity.displayName} required />
+          <FormInput type="text" name="value" defaultValue={entity.displayName} required />
         </label>
       </FieldForm>
 
@@ -65,13 +66,13 @@ export function EntityRecordEditor({
       <FieldForm entityId={entity.id} field="kind" reason={reason} disabled={!reasonGiven}>
         <label className="story-review__field">
           <span>Kind</span>
-          <select name="value" defaultValue={entity.kind}>
+          <FormSelect name="value" defaultValue={entity.kind} aria-label="Kind">
             {ENTITY_KINDS.map((kind) => (
               <option key={kind} value={kind}>
                 {titleCase(kind)}
               </option>
             ))}
-          </select>
+          </FormSelect>
         </label>
         <p className="entity-edit__hint ds-sans">
           Class follows kind automatically — changing kind moves this record between the
@@ -83,13 +84,13 @@ export function EntityRecordEditor({
       <FieldForm entityId={entity.id} field="livingStatus" reason={reason} disabled={!reasonGiven}>
         <label className="story-review__field">
           <span>Status</span>
-          <select name="value" defaultValue={entity.livingStatus}>
+          <FormSelect name="value" defaultValue={entity.livingStatus} aria-label="Status">
             {LIVING_STATUSES.map((status) => (
               <option key={status} value={status}>
                 {formatLivingStatusLabel(status)}
               </option>
             ))}
-          </select>
+          </FormSelect>
         </label>
       </FieldForm>
 
@@ -97,7 +98,7 @@ export function EntityRecordEditor({
       <FieldForm entityId={entity.id} field="aliases" reason={reason} disabled={!reasonGiven}>
         <label className="story-review__field">
           <span>One alias per line</span>
-          <textarea name="value" rows={4} defaultValue={entity.aliases.join('\n')} />
+          <FormTextarea name="value" rows={4} defaultValue={entity.aliases.join('\n')} />
         </label>
         <p className="entity-edit__hint ds-sans">
           Commas stay inside a name (&ldquo;Chicago, Illinois&rdquo;), so they are never treated as
@@ -111,7 +112,7 @@ export function EntityRecordEditor({
           <legend>Classes</legend>
           {sensitivityClasses.map((sensitivityClass) => (
             <label key={sensitivityClass} className="entity-edit__check">
-              <input
+              <FormInput
                 type="checkbox"
                 name="sensitivity"
                 value={sensitivityClass}
@@ -162,14 +163,14 @@ export function EntityRecordEditor({
       >
         <label className="story-review__field">
           <span>Namespace</span>
-          <input type="text" name="namespace" placeholder="wikidata, lcnaf, viaf…" />
+          <FormInput type="text" name="namespace" placeholder="wikidata, lcnaf, viaf…" />
         </label>
         <label className="story-review__field">
           <span>Value</span>
-          <input type="text" name="identifierValue" placeholder="Q4547697" />
+          <FormInput type="text" name="identifierValue" placeholder="Q4547697" />
         </label>
         <label className="entity-edit__check">
-          <input type="checkbox" name="trusted" />
+          <FormInput type="checkbox" name="trusted" />
           <span>Trusted</span>
         </label>
         <p className="entity-edit__hint ds-sans">

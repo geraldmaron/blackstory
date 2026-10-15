@@ -108,7 +108,7 @@ export default async function AdminHomePage() {
               <span className="admin-ops__card-metric">{storyMetric.text} pending</span>
             )}
             <span className="admin-ops__card-detail">
-              Staged packets. Approve does not publish. Cover packages live under Article covers.
+              Review research packets, then continue writing in Articles.
             </span>
           </Link>
 
@@ -130,7 +130,7 @@ export default async function AdminHomePage() {
             <span className="admin-ops__card-label">Releases</span>
             <span className="admin-ops__card-metric">Publication desk</span>
             <span className="admin-ops__card-detail">
-              The only place activation publishes a release to the public site
+              Stage release decisions. Activation requires the authorized publication executor
             </span>
           </Link>
 

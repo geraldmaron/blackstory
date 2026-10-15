@@ -1,3 +1,4 @@
+import { FormInput, FormButton } from '../../../admin/design-system/fields';
 import { querySourceLibrary } from '@repo/ops-data/source-library';
 import { getPostgresPool } from '../../../admin/lib/canonical-postgres-client';
 import { CollectionGuidance } from './collection-guidance';
@@ -130,12 +131,12 @@ export default async function SourcesPage({
         {sort !== 'entities' ? <input type="hidden" name="sort" value={sort} /> : null}
         <label className="ds-toolbar__field">
           <span className="ds-toolbar__field-label">Search</span>
-          <input type="search" name="q" defaultValue={q ?? ''} placeholder="Publisher name…" />
+          <FormInput type="search" name="q" defaultValue={q ?? ''} placeholder="Publisher name…" />
         </label>
         <div className="ds-toolbar__actions">
-          <button type="submit" className="ds-button ds-button--secondary">
+          <FormButton type="submit" className="ds-button ds-button--secondary">
             Search
-          </button>
+          </FormButton>
           {q ? (
             <a className="ds-button ds-button--secondary" href={sortHref(sort, undefined)}>
               Clear

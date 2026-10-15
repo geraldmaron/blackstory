@@ -3,6 +3,7 @@
  */
 'use client';
 
+import { FormButton, FormInput, FormSelect, FormTextarea } from '../design-system/fields';
 import Link from 'next/link';
 import { useCallback, useEffect, useId, useMemo, useRef, useState } from 'react';
 import { useAdminAuth } from '../auth/AdminAuthProvider';
@@ -289,60 +290,60 @@ export function CaseQueue({ mode, initialRows = [] }: CaseQueueProps) {
             ))}
           </ol>
         </div>
-        <button
+        <FormButton
           type="button"
           className="acq__button acq__button--ghost"
           onClick={() => void load()}
           disabled={loading || busy}
         >
           {loading ? 'Refreshing…' : 'Refresh'}
-        </button>
+        </FormButton>
       </header>
 
       <section className="acq__stats" aria-label="Queue counts">
-        <button
+        <FormButton
           type="button"
           className={query.state === 'inbox' ? 'is-active' : undefined}
           onClick={() => patchQuery({ state: 'inbox' })}
         >
           Inbox <strong>{counts.inbox}</strong>
-        </button>
-        <button
+        </FormButton>
+        <FormButton
           type="button"
           className={query.state === 'candidate' ? 'is-active' : undefined}
           onClick={() => patchQuery({ state: 'candidate' })}
         >
           {filterChipLabel('candidate')} <strong>{counts.candidate}</strong>
-        </button>
-        <button
+        </FormButton>
+        <FormButton
           type="button"
           className={query.state === 'relevance_review' ? 'is-active' : undefined}
           onClick={() => patchQuery({ state: 'relevance_review' })}
         >
           {filterChipLabel('relevance_review')} <strong>{counts.relevanceReview}</strong>
-        </button>
-        <button
+        </FormButton>
+        <FormButton
           type="button"
           className={query.state === 'insufficient_evidence' ? 'is-active' : undefined}
           onClick={() => patchQuery({ state: 'insufficient_evidence' })}
         >
           {filterChipLabel('insufficient_evidence')} <strong>{counts.needsEvidence}</strong>
-        </button>
+        </FormButton>
         {mode === 'cases' ? (
-          <button
+          <FormButton
             type="button"
             className={query.state === 'all' ? 'is-active' : undefined}
             onClick={() => patchQuery({ state: 'all' })}
           >
             {filterChipLabel('all')} <strong>{counts.total}</strong>
-          </button>
+          </FormButton>
         ) : null}
       </section>
 
       <section className="acq__toolbar" aria-label="Filter and sort">
         <label className="acq__field">
           <span>Search</span>
-          <input
+          <FormInput
             type="search"
             value={query.search}
             onChange={(event) => patchQuery({ search: event.target.value })}
@@ -351,27 +352,29 @@ export function CaseQueue({ mode, initialRows = [] }: CaseQueueProps) {
         </label>
         <label className="acq__field">
           <span>Sort</span>
-          <select
+          <FormSelect
             value={query.sortKey}
-            onChange={(event) => patchQuery({ sortKey: event.target.value as CaseQueueSortKey })}
+            onValueChange={(nextValue) => patchQuery({ sortKey: nextValue as CaseQueueSortKey })}
+            aria-label="Sort"
           >
             <option value="updatedAt">Updated</option>
             <option value="title">Title</option>
             <option value="state">State</option>
             <option value="checklist">Checklist</option>
-          </select>
+          </FormSelect>
         </label>
         <label className="acq__field">
           <span>Direction</span>
-          <select
+          <FormSelect
             value={query.sortDirection}
-            onChange={(event) =>
-              patchQuery({ sortDirection: event.target.value as CaseQueueSortDirection })
+            onValueChange={(nextValue) =>
+              patchQuery({ sortDirection: nextValue as CaseQueueSortDirection })
             }
+            aria-label="Direction"
           >
             <option value="desc">Descending</option>
             <option value="asc">Ascending</option>
-          </select>
+          </FormSelect>
         </label>
       </section>
 
@@ -396,7 +399,7 @@ export function CaseQueue({ mode, initialRows = [] }: CaseQueueProps) {
           </p>
           <label className="acq__field acq__field--grow">
             <span>Decision reason (required)</span>
-            <input
+            <FormInput
               ref={bulkReasonRef}
               type="text"
               value={reason}
@@ -412,7 +415,7 @@ export function CaseQueue({ mode, initialRows = [] }: CaseQueueProps) {
           </p>
           <div className="acq__bulk-actions">
             {bulkActions.map((action) => (
-              <button
+              <FormButton
                 key={action}
                 type="button"
                 className={
@@ -423,15 +426,15 @@ export function CaseQueue({ mode, initialRows = [] }: CaseQueueProps) {
                 onClick={() => void runTransition(action, [...selectedIds])}
               >
                 {actionLabel(action)}
-              </button>
+              </FormButton>
             ))}
-            <button
+            <FormButton
               type="button"
               className="acq__button acq__button--ghost"
               onClick={() => setSelectedIds(new Set())}
             >
               Clear
-            </button>
+            </FormButton>
           </div>
         </section>
       ) : null}
@@ -450,7 +453,7 @@ export function CaseQueue({ mode, initialRows = [] }: CaseQueueProps) {
               <tr>
                 <th scope="col">
                   <label className="acq__checkbox-hit">
-                    <input
+                    <FormInput
                       type="checkbox"
                       checked={allVisibleSelected}
                       onChange={() =>
@@ -492,7 +495,7 @@ export function CaseQueue({ mode, initialRows = [] }: CaseQueueProps) {
                   >
                     <td onClick={(event) => event.stopPropagation()}>
                       <label className="acq__checkbox-hit">
-                        <input
+                        <FormInput
                           type="checkbox"
                           checked={isChecked}
                           onChange={() =>
@@ -540,7 +543,7 @@ export function CaseQueue({ mode, initialRows = [] }: CaseQueueProps) {
       <div className={`acq-sheet-portal${activeId ? ' is-open' : ''}`} aria-hidden={!activeId}>
         {activeId ? (
           <>
-            <button
+            <FormButton
               type="button"
               className="acq-sheet-backdrop"
               aria-label="Close detail panel"
@@ -566,14 +569,14 @@ export function CaseQueue({ mode, initialRows = [] }: CaseQueueProps) {
                   >
                     Open full page
                   </Link>
-                  <button
+                  <FormButton
                     ref={closeRef}
                     type="button"
                     className="acq__button acq__button--ghost"
                     onClick={closeSheet}
                   >
                     Close
-                  </button>
+                  </FormButton>
                 </div>
               </header>
 
@@ -699,7 +702,7 @@ export function CaseQueue({ mode, initialRows = [] }: CaseQueueProps) {
                 </div>
                 <label className="acq__field acq__field--grow">
                   <span>Decision reason (required)</span>
-                  <textarea
+                  <FormTextarea
                     ref={sheetReasonRef}
                     rows={2}
                     value={reason}
@@ -712,24 +715,25 @@ export function CaseQueue({ mode, initialRows = [] }: CaseQueueProps) {
                 {legalActions.includes('exclude') ? (
                   <label className="acq__field">
                     <span>Exclude reason code</span>
-                    <select
+                    <FormSelect
                       value={reasonCode}
-                      onChange={(event) =>
-                        setReasonCode(event.target.value as ResearchCaseReasonCode)
+                      onValueChange={(nextValue) =>
+                        setReasonCode(nextValue as ResearchCaseReasonCode)
                       }
+                      aria-label="Exclude reason code"
                     >
                       {EXCLUSION_REASON_CODES.map((code) => (
                         <option key={code} value={code}>
                           {code}
                         </option>
                       ))}
-                    </select>
+                    </FormSelect>
                   </label>
                 ) : null}
                 {legalActions.includes('merge') ? (
                   <label className="acq__field acq__field--grow">
                     <span>Merge into case id</span>
-                    <input
+                    <FormInput
                       type="text"
                       value={mergeTarget}
                       onChange={(event) => setMergeTarget(event.target.value)}
@@ -739,7 +743,7 @@ export function CaseQueue({ mode, initialRows = [] }: CaseQueueProps) {
                 ) : null}
                 <div className="acq__bulk-actions">
                   {legalActions.map((action) => (
-                    <button
+                    <FormButton
                       key={action}
                       type="button"
                       className={
@@ -752,16 +756,16 @@ export function CaseQueue({ mode, initialRows = [] }: CaseQueueProps) {
                       onClick={() => void runTransition(action, [activeId])}
                     >
                       {actionLabel(action)}
-                    </button>
+                    </FormButton>
                   ))}
-                  <button
+                  <FormButton
                     type="button"
                     className="acq__button acq__button--ghost"
                     disabled={busy}
                     onClick={() => void assignToMe()}
                   >
                     Assign to me
-                  </button>
+                  </FormButton>
                 </div>
               </footer>
             </div>

@@ -312,3 +312,31 @@ remain explicit implementation work. Requirements separate owner decisions, thre
 outcomes, sourced constraints and two assumptions. Acceptance describes observable
 results; priorities and later scope are explicit. No code tests, database changes,
 save/recovery tests, keyboard audit or light-theme audit ran for this read-only assessment.
+
+## Editorial implementation, October 14, 2026
+
+The implementation on `codex/editorial-workspace` replaces the cover-only process-local
+editor with durable article revisions, contributor profiles, exact-revision review,
+private media, public-renderer previews, signed publication and rollback. Gerald Dagher
+and the disclosed Neo identity can share ordered credits. Public bylines and Article
+metadata read those snapshots. Existing article rows keep empty credits until an editor
+assigns them; the migration does not infer authorship.
+
+Uber Base Web now owns the management shell and form controls. The primary editor is a
+Tiptap canvas over the existing typed body contract, with a compact inspector and a mobile
+modal. Entity tabs, the article library and contributor master/detail support the complete
+editing journey. Research packet approval creates a durable article draft, with source and
+credit completion still required. Manual seed handoff is retired from the web workflow.
+
+Entity prose/evidence proposals reuse quarantined intake. Review applies through the
+canonical audit/outbox boundary, records evidence-backed historical relationships and
+rejects stale snapshots. Private editorial rows are excluded from the public corrections
+credential. Article associations and historical relationships remain distinct.
+
+See [the UI contract](../ui/patterns-admin-editorial.md) and
+[the verification record](./editorial-workspace-verification.md) for the checks and limits.
+Production migration, deployment and publication of the unfinished historical article have
+not been performed. The bounded theme recommendation and source gaps remain in the project
+tracker; local acceptance data is disposable.
+
+Follow-up: [hydration diagnosis and existing-article CRUD verification](./editorial-hydration-crud-verification.md) records the recovered theme context, canonical article audit and recoverable archive workflow.

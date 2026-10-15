@@ -4,6 +4,7 @@
  * Undo one merge. Its own reason field: reversing is a decision in its own right, and the log
  * should say why the earlier one was wrong rather than reusing the reason that justified it.
  */
+import { FormInput, FormButton } from '../../../../admin/design-system/fields';
 import { useActionState, useState } from 'react';
 import { reverseMerge } from '../merge/actions';
 import { MERGE_INITIAL } from '../merge/merge-state';
@@ -17,7 +18,7 @@ export function ReverseMergeForm({ mergeId }: { readonly mergeId: string }) {
       <input type="hidden" name="mergeId" value={mergeId} />
       <label className="story-review__field">
         <span>Reason for reversing</span>
-        <input
+        <FormInput
           type="text"
           name="reason"
           value={reason}
@@ -27,13 +28,13 @@ export function ReverseMergeForm({ mergeId }: { readonly mergeId: string }) {
         />
       </label>
       <div className="entity-edit__actions">
-        <button
+        <FormButton
           type="submit"
           className="ds-button ds-button--secondary"
           disabled={pending || !reason.trim()}
         >
           {pending ? 'Reversing…' : 'Reverse this merge'}
-        </button>
+        </FormButton>
         {state.status === 'ok' ? (
           <span className="entity-edit__ok" role="status">
             {state.message}

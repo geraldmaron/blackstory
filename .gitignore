@@ -13,6 +13,7 @@ __pycache__/
 dist/
 build/
 .next/
+.next-validation/
 out/
 *.tsbuildinfo
 coverage/
@@ -143,3 +144,13 @@ apps/web/.tmp-lives-verify/
 
 # Local visual experiments are generated artifacts.
 /.tmp-hero-proof/
+
+# Public documentation is an Actions artifact, never a sibling of internal runbooks.
+/docs/_next/
+/docs/guides/
+/docs/brand/
+/docs/404/
+/docs/_not-found/
+/docs/index.html
+/docs/404.html
+/docs/.nojekyll

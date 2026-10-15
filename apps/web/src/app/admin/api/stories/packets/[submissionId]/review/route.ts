@@ -1,11 +1,10 @@
 /**
  * API: record approve / reject / needs_evidence for a story_packet.
- * Approve returns seed handoff JSON — does not publish to /stories.
+ * Approval creates a durable editable draft; article publication still needs exact-revision review.
  */
-import {
-  authorizeAdminRoute,
-  authErrorResponse,
-} from '../../../../../../../admin/auth/request-auth';
+import { importStoryPacket } from '@/admin/editorial/packet';
+import { editorialError } from '@/admin/editorial/http';
+import { authorizeAdminRoute } from '../../../../../../../admin/auth/request-auth';
 import {
   recordStoryPacketReview,
   type StoryPacketReviewDecision,
@@ -34,6 +33,8 @@ export async function POST(
       );
     }
 
+    const articleDraft =
+      decision === 'approved' ? await importStoryPacket(caller, submissionId) : null;
     const result = await recordStoryPacketReview({
       submissionId,
       decision: decision as StoryPacketReviewDecision,
@@ -46,7 +47,7 @@ export async function POST(
       ok: true,
       submissionId,
       review: result.review,
-      seedHandoff: result.seedHandoff ?? null,
+      articleDraft,
       published: false,
       note: 'Approval records a private review decision only. Release activation remains separate.',
     });
@@ -54,6 +55,6 @@ export async function POST(
     if (error instanceof Error && error.message.includes('not found')) {
       return Response.json({ error: error.message }, { status: 404 });
     }
-    return authErrorResponse(error);
+    return editorialError(error);
   }
 }

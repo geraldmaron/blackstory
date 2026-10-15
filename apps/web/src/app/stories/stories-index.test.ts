@@ -49,6 +49,7 @@ function item(overrides: Partial<PublicArticleListItemDoc>): PublicArticleListIt
     placeLabel: overrides.placeLabel ?? 'Tulsa, Oklahoma',
     tags: overrides.tags ?? [],
     ...overrides,
+    contributors: overrides.contributors ?? [],
   };
 }
 

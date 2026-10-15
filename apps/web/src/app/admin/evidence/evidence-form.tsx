@@ -3,6 +3,7 @@
 /**
  * Evidence attach form — prepare or commit a source proposal against a research case.
  */
+import { FormInput, FormTextarea, FormButton } from '../../../admin/design-system/fields';
 import Link from 'next/link';
 import { useActionState, useState } from 'react';
 import { submitEvidenceAttach } from './actions';
@@ -27,15 +28,15 @@ export function EvidenceAttachForm() {
       <form action={formAction} className="quick-add-form">
         <div className="quick-add-field">
           <label htmlFor="ev-case">Research case id</label>
-          <input id="ev-case" name="researchCaseId" type="text" required autoComplete="off" />
+          <FormInput id="ev-case" name="researchCaseId" type="text" required autoComplete="off" />
         </div>
         <div className="quick-add-field">
           <label htmlFor="ev-url">Source URL</label>
-          <input id="ev-url" name="sourceUrl" type="url" required placeholder="https://…" />
+          <FormInput id="ev-url" name="sourceUrl" type="url" required placeholder="https://…" />
         </div>
         <div className="quick-add-field">
           <label htmlFor="ev-desc">Description</label>
-          <textarea
+          <FormTextarea
             id="ev-desc"
             name="description"
             rows={4}
@@ -48,7 +49,7 @@ export function EvidenceAttachForm() {
         </p>
         <div className="quick-add-field">
           <label htmlFor="ev-commit">
-            <input
+            <FormInput
               id="ev-commit"
               name="commit"
               type="checkbox"
@@ -59,9 +60,9 @@ export function EvidenceAttachForm() {
             Commit to quarantine (writes submission; does not publish)
           </label>
         </div>
-        <button className="ds-button ds-button--primary" type="submit" disabled={isPending}>
+        <FormButton className="ds-button ds-button--primary" type="submit" disabled={isPending}>
           {evidenceSubmitLabel(commit, isPending)}
-        </button>
+        </FormButton>
       </form>
 
       {state.status === 'error' ? (

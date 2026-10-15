@@ -18,6 +18,8 @@ const globalSecurityHeaders = securityHeadersForNextConfig();
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
+  // Isolate validation builds from the running local editor and its recovery state.
+  distDir: process.env.APP_NEXT_DIST_DIR ?? '.next',
   // Allow local verification via 127.0.0.1 as well as localhost.
   allowedDevOrigins: ['127.0.0.1', 'localhost'],
   // Keep `next build` focused on emit; typecheck stays a separate CI gate.
@@ -25,6 +27,8 @@ const nextConfig = {
     ignoreBuildErrors: true,
   },
   transpilePackages: [
+    // Keep the theme provider and subpath controls in one compiled React context graph.
+    'baseui',
     '@repo/config',
     '@repo/domain',
     '@repo/schemas',

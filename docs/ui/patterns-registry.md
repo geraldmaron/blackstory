@@ -10,6 +10,8 @@ These carry no folder of their own. They are law about how routes, the shell and
 
 | Pattern | Doc | Modules | Status |
 |---|---|---|---|
+| Admin editorial workspace | [`patterns-admin-editorial.md`](./patterns-admin-editorial.md) | `admin/editorial/*`, article routes and entity editorial panel | Durable revisions, explicit credits, exact-revision review and signed releases |
+| Admin record picker | [`patterns-admin-editorial.md`](./patterns-admin-editorial.md) | `components/patterns/admin-record-picker.tsx` | Base Web canonical-record search for article links and relationship proposals |
 | Management request review | [`patterns-work-review.md`](./patterns-work-review.md) | `admin/work/work-inbox.tsx`, `admin/work/work-inbox.css` | Private request, exact-version review and verified receipt; deployment verification pending |
 | Surface classes | [`patterns-surface-classes.md`](./patterns-surface-classes.md) | `app/layout.tsx`, `app/shell.css`, `components/SiteShell.tsx`, `lib/keyboard/bindings.ts`, `lib/nav/destination-registry.ts` | Binding. `data-surface` emission pending (SP-07) |
 | Plate posture | [`patterns-plate-posture.md`](./patterns-plate-posture.md) | `components/map-stage/MapStage.tsx`, `lib/map-experience/map-libre-lifecycle.ts`, `components/theme-spine/MapInsetMoment.tsx`, `components/patterns/RecordPlacePreview.tsx`; `lib/motion/use-reduced-motion.ts` is new in SP-18 | Binding. Postures pending (SP-07, SP-08) |

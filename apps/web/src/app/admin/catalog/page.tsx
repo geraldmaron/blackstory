@@ -12,6 +12,7 @@
  * Decisions recorded here still never publish. The next release build reads them, and the
  * signed-manifest privileged-apply flow remains the only thing that makes anything live.
  */
+import { FormButton, FormInput } from '../../../admin/design-system/fields';
 import Link from 'next/link';
 import { SENSITIVITY_CLASSES } from '@repo/domain';
 import { FacetRail, Pagination, Toolbar, ToolbarField, type FacetGroup } from '@repo/ui';
@@ -212,9 +213,9 @@ export default async function CatalogPage({
             preservedParams={Object.fromEntries(preservedParams.entries())}
             actions={
               <>
-                <button type="submit" className="ds-button ds-button--secondary">
+                <FormButton type="submit" className="ds-button ds-button--secondary">
                   Search
-                </button>
+                </FormButton>
                 {filtersActive ? (
                   <a className="ds-button ds-button--secondary" href={BASE_PATH}>
                     Reset
@@ -224,7 +225,7 @@ export default async function CatalogPage({
             }
           >
             <ToolbarField label="Search">
-              <input
+              <FormInput
                 type="search"
                 name="q"
                 defaultValue={query.search ?? ''}

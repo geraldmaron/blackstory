@@ -1,7 +1,8 @@
 /**
  * API: bulk approve / reject / needs_evidence for staged story packets.
- * Cap 50. Does not publish — approve only records reviews (+ seed handoffs).
+ * Cap 50. Does not publish — approved packets continue as durable editable articles.
  */
+import { importStoryPacket } from '@/admin/editorial/packet';
 import { authorizeAdminRoute, authErrorResponse } from '../../../../../../admin/auth/request-auth';
 import {
   assertStoryBulkSelection,
@@ -58,9 +59,19 @@ export async function POST(request: Request): Promise<Response> {
 
     const succeeded = results.filter((row) => row.ok).length;
     const failed = results.length - succeeded;
-    const seedHandoffs = results
-      .filter((row) => row.ok && row.seedHandoff)
-      .map((row) => ({ submissionId: row.submissionId, seedHandoff: row.seedHandoff }));
+    const articleDrafts = [];
+    const importFailures = [];
+    if (decision === 'approved')
+      for (const row of results.filter((r) => r.ok)) {
+        try {
+          articleDrafts.push({
+            submissionId: row.submissionId,
+            ...(await importStoryPacket(caller, row.submissionId)),
+          });
+        } catch {
+          importFailures.push(row.submissionId);
+        }
+      }
 
     return Response.json({
       ok: failed === 0,
@@ -69,7 +80,8 @@ export async function POST(request: Request): Promise<Response> {
       failed,
       limit: STORY_REVIEW_BULK_LIMIT,
       results,
-      seedHandoffs,
+      articleDrafts,
+      importFailures,
       published: false,
       note: 'Bulk review records private decisions only. Release activation remains a separate independently authorized action.',
     });

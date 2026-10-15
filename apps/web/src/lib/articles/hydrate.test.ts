@@ -50,6 +50,7 @@ const doc: PublicArticleProjectionDoc = {
   slug: 'test',
   kind: 'chapter',
   tags: [],
+  contributors: [],
   title: 'Test',
   summary: 'A test article.',
   publishedAt: '2026-07-26',
