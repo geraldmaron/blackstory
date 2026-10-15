@@ -1,6 +1,7 @@
 'use client';
 /** Base Web is scoped to management; the public reading kit keeps its own contract. */
-import { useEffect, useState, type ReactNode } from 'react';
+import React, { useEffect, useState, type ReactNode } from 'react';
+void React;
 import { useServerInsertedHTML } from 'next/navigation';
 import { BaseProvider } from 'baseui';
 import { createTheme, createDarkTheme, LightTheme } from 'baseui/themes';

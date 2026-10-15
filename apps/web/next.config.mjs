@@ -27,6 +27,8 @@ const nextConfig = {
     ignoreBuildErrors: true,
   },
   transpilePackages: [
+    // Keep the theme provider and subpath controls in one compiled React context graph.
+    'baseui',
     '@repo/config',
     '@repo/domain',
     '@repo/schemas',
