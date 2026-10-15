@@ -74,3 +74,13 @@ test('a path outside /admin is never reached by this gate, but stays correct if 
 test('an unknown admin path is gated by default rather than exposed', () => {
   assert.equal(isAuthGatedPath('/admin/some-future-surface'), true);
 });
+
+test('file-like staff slugs cannot bypass authentication', () => {
+  for (const path of [
+    '/admin/catalog/private.png',
+    '/admin/stories/articles/private.txt',
+    '/design-system/fixture.svg',
+  ]) {
+    assert.equal(isAuthGatedPath(path), true);
+  }
+});

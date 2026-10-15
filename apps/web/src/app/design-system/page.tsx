@@ -4,6 +4,8 @@
  */
 
 import type { Metadata } from 'next';
+import { redirect } from 'next/navigation';
+import { readVerifiedAdminIdentity } from '@/admin/auth/supabase-server';
 import { buildStaticPageMetadata } from '../../lib/seo/metadata-builders';
 import Link from 'next/link';
 import {
@@ -32,7 +34,10 @@ export const metadata: Metadata = buildStaticPageMetadata({
   description: 'Component and token fixtures for visual and keyboard review (design-direction-v5)',
 });
 
-export default function DesignSystemPage() {
+export const dynamic = 'force-dynamic';
+
+export default async function DesignSystemPage() {
+  if (!(await readVerifiedAdminIdentity())) redirect('/admin/login?next=%2Fdesign-system');
   return (
     <Room>
       <ReadingEntry

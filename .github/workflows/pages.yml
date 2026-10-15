@@ -1,7 +1,4 @@
-# BlackStory docs → GitHub Pages (optional Actions path).
-# Primary publish path: branch deploy from /docs via `pnpm docs:publish`.
-# This workflow is an alternate if Pages source is switched to GitHub Actions.
-# Permissions stay least-privilege. Actions are SHA-pinned (BB-009).
+# Only the curated apps/docs export is public. Never serve repository docs/ as a Pages source.
 
 name: GitHub Pages
 

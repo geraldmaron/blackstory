@@ -99,3 +99,10 @@ Controls include explicit hydration integration, canonical block round-trip test
 browser journeys, production builds and role/publication tests. Avoid the older virtualized
 and map components pulled transitively by Base Web. The dependency audit found no advisory
 path through these added libraries; existing repository advisories are tracked separately.
+
+## Internal fixtures and documentation
+
+The component gallery at `/design-system` is a staff surface. It uses the same verified-session
+gate as administration and never receives a public CDN cache header. Internal working documents,
+research drafts, review receipts and runbooks must not be copied into public assets or static
+site exports. GitHub Pages publishes only the curated `apps/docs/out` artifact.

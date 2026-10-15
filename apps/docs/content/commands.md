@@ -18,7 +18,7 @@ pnpm build && pnpm typecheck
 
 pnpm dev:web            # public web on :3048
 pnpm --filter @repo/docs dev
-pnpm docs:publish       # static export into repo docs/ for GitHub Pages
+pnpm docs:publish       # build curated public docs export
 
 pnpm --filter @repo/web build
 pnpm --filter @repo/api-public build
