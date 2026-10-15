@@ -812,7 +812,9 @@ export async function finalizeEditorialRelease(
     }),
   ] as const;
   let uploadFailure: unknown;
-  const uploadDeadline = Date.now() + 20 * 60 * 1000;
+  // Leave time for in-flight upload/readback requests and transaction rollback before
+  // the article routes reach their 800-second hosting limit.
+  const uploadDeadline = Date.now() + 8 * 60 * 1000;
   await mapWithConcurrency(uploads, 8, async ([path, artifact]) => {
     if (uploadFailure) return;
     try {
