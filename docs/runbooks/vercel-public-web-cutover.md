@@ -30,7 +30,12 @@ Deployment-protection redirects must preserve Vercel's `_vercel_*` handshake par
 using tokens in shared cache keys. Do not redirect solely to alphabetize query parameters.
 
 Environment changes require a new deployment. Preview must not contain Production database
-credentials. Use an isolated database or leave its data plane unconfigured. Removing variables
+credentials. Use an isolated database or leave its data plane unconfigured. Before deleting an
+environment entry, inspect its complete target list. The CLI can delete an entry shared by
+Preview and Production even when Preview was selected. Preserve or split the
+Production target through provider configuration, then verify that required Production variable
+names remain before deploying. Exercise a dynamic public catalog route as well as staff routes;
+a cached home page cannot prove public database connectivity. Removing variables
 does not revoke credentials embedded in older deployments; protect all deployment URLs with
 `all_except_custom_domains` and include authenticated operators in the maintenance embargo.
 
