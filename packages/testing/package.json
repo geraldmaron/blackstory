@@ -28,9 +28,12 @@
     "test:migration": "node --import tsx ../../scripts/run-testing-layer.mjs migration",
     "test:e2e": "node --import tsx ../../scripts/run-testing-layer.mjs e2e",
     "test:coverage": "node --import tsx ../../scripts/run-testing-layer.mjs coverage",
-    "lint": "echo 'lint: deferred to root eslint'"
+    "lint": "echo 'lint: deferred to root eslint'",
+    "test:visual": "playwright test -c playwright.config.ts",
+    "test:visual:update": "VISUAL_UPDATE=1 playwright test -c playwright.config.ts --update-snapshots"
   },
   "devDependencies": {
+    "@playwright/test": "1.64.1",
     "@repo/domain": "workspace:*",
     "@repo/security": "workspace:*",
     "@repo/typescript-config": "workspace:*",
