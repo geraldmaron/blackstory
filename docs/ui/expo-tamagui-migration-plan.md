@@ -119,12 +119,12 @@ Plus an **SEO parity test**: for every public URL, compare server HTML (title, c
 | Parameter | Proposed rule |
 |---|---|
 | Color | Semantic roles only (`background`, `surface`, `text`, `muted`, `accent`, `border`, `focus`) resolved by theme; no hex in components. Values come from `brand-palette.ts`. |
-| Spacing | 4px grid: 4, 8, 12, 16, 24, 32, 48, 64. Remove 3px and 5px. |
-| Type | One ramp of about 8 steps (e.g. 12, 14, 16, 18, 20, 24, 32, 44). Four families stay. |
+| Spacing | The existing `--ds-space-*` scale (`packages/ui/src/tokens/spacing.ts`, 4px rhythm). Literals other than 0, 1px, 2px are lint violations. |
+| Type | The existing `--ds-text-*` ramp (display-hero to micro). Literal `font-size` is a lint violation. Four families stay. |
 | Radius | none, sm 8, md 16, lg 28, full (existing). |
 | Elevation | Flat; hairline borders (existing rule, keep). |
 | Targets | 44px minimum for every interactive element. |
-| Breakpoints | One set, e.g. 480, 768, 1024, 1280, in Tamagui media tokens. Retire 819 and 47.9375rem. |
+| Breakpoints | The existing `grid.breakpoints`: 40, 48, 64, 80rem (640, 768, 1024, 1280px), as Tamagui media tokens. Retire 819px, 560px, 56rem, 68rem. |
 | Alignment | One content max-width per surface class and a shared gutter token. |
 | Components | Shared kit only; a surface may not define a one-off button, card or input. |
 
@@ -151,3 +151,36 @@ alternative stays available, the first work is a reversible spike.
 Next steps if approved: (1) add the token lint and Playwright visual suite against the current
 site, to lock a baseline before anything moves; (2) run the Gate 1 spike; (3) fix the shell
 tap-target and type-ramp findings in current CSS so the baseline starts clean.
+
+## 9. Baseline suite (built 2026-10-16)
+
+- `pnpm lint:tokens` (`scripts/lint-design-tokens.mjs`, wired into `pnpm validate`): ratchet over
+  CSS. Baseline `scripts/design-token-baseline.json`: hex 151, spacing 365, font-size 541,
+  breakpoint 90. Counts can only fall; `--update` refuses to raise them.
+- `pnpm test:visual` (`packages/testing/src/visual`, Playwright 1.64.1, installed Chrome): 10 routes
+  x 3 viewports x 2 themes = 60 screenshots plus 60 rule checks (overflow, title, canonical,
+  og:title, at most one h1, 44px target ratchet). Two consecutive runs on the live catalog passed
+  120/120. A deliberate CSS change failed the screenshot check.
+- Limits: above-the-fold only; map canvases masked; baselines are macOS (platform-suffixed) and not
+  yet a CI lane; data is the live published catalog, so a catalog change can move a screenshot.
+
+## 10. Gate 1 spike results (Expo SDK 57 + Tamagui 2.7.7, `/methodology` slice)
+
+Scratch project, not in the repo. Port of the page shell and real methodology copy.
+
+| Check | Result |
+|---|---|
+| Server HTML: title, canonical, og:title, one h1, lang | **Pass** (static prerender at build) |
+| JSON-LD | **Pass after a fix**: `<script type="application/ld+json">{json}</script>` as a child; `dangerouslySetInnerHTML` is dropped by `expo-router/head` |
+| Per-request CSP nonce | **Fail.** Middleware (flag `unstable_useServerMiddleware` in SDK 57) can set a fresh nonce header per request, but the HTML is prerendered, so no script carries it. Browser blocked the hydration bundle and the page rendered dead. |
+| Hash-based CSP instead | **Pass**: `script-src 'self' 'sha256-<hash of the one inline script>'` hydrated cleanly. Weaker than a nonce for any future inline script; needs a security-policy decision. |
+| Response headers / cache-control from middleware | Pass |
+| Per-request SSR with data loaders | Exists, but `unstable_useServerRendering` in SDK 55-57; stable only in SDK 58. Not tested. |
+| Tamagui compiler extraction | **Not confirmed.** HTML carries 444 KB of inline CSS (all themes), JS bundle 2 MB (519 KB gzip). A real comparison needs a production Next build for the same page. |
+| TTFB | Not meaningful (static file served locally). |
+
+Version risk: Tamagui 3.0.0 shipped 2026-10-10 and has had 18 patch releases in six days (3.0.18 on
+2026-10-16). The spike pinned 2.7.7 (2026-08-15). A 2.x to 3.x move during the migration is likely.
+
+Gate 1 verdict: **needs validation.** SEO head and hydration are achievable. Two blockers remain:
+nonce CSP (decision needed on hash-based CSP or SDK 58 SSR) and bundle/CSS weight (extraction).
