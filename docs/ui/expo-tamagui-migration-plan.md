@@ -430,3 +430,31 @@ that isolates functions would not share; filed with the hosting decision (`repo-
 **Remaining slices (filed):** entity catalog and record reads; the records full-entity fallback; door-catalog and
 shared-map-data; the five other `cache()` sources; purge reach on the chosen host.
 
+### Entity catalog slice (`repo-v0lfu.6`, `.7`)
+
+**One read model, not two.** The hydration logic (citation retention, learning-link hydration, the bounded 1-3 hop
+neighborhood walk, thin card views) lived inside `source.ts` next to React `cache()`. It is now
+`apps/web/src/lib/public-data/entity-views.ts`, with `source.ts` importing it and re-exporting the two names it used
+to export. The site imports the same file, so there is no second implementation to drift. Checks on that refactor to
+the shipping app: the whole apps/web suite (2,749 tests: 2,741 pass, 0 fail, 8 skipped), its typecheck and lint, and a
+parity test that `source.ts` and the site hold the identical function objects.
+
+**What the site adds** (`entities.ts`): `getEntities`, `getEntity`, `getEntitiesByIds`, `getEntityRedirect` on four
+registered caches. Two differences from the Next path, on purpose: an entity page was an uncached set of up to a dozen
+point reads per request (the CDN was its only cache), and now costs the database once per entity per soft TTL; and
+misses are cached, LRU-bounded, so a storm of made-up ids is not a query each. An id over 200 characters is a miss
+without a query.
+
+**Live check** (real release, 5 sampled entities): the site's hydrated view is deep-equal to the Next path's, thin
+by-ids and the redirect miss are equal, and a second pass is zero queries. `/records` falls back to full entities
+below the evidence floor, built from the same release as the search-index read.
+
+**Codex review (read-only).** No finding on the extraction. Five on the new code, all fixed with tests: refresh-failure
+bookkeeping was unbounded (now capped at 1,000 keys, exposed as `backoffKeys`); a cached 404 could be served as
+stale-if-error after expiry (negative entries opt out); two different id sets could share a by-ids entry through the
+separator character (hash of a JSON array); the records fallback could mix two releases (pinned to one); and
+`(release, scope)` keys could collide through separators (JSON tuple key). Three of those mutations were each caught by
+a test.
+
+**Left in `repo-6obbo`:** door-catalog and shared-map-data, and the five other `cache()` sources.
+

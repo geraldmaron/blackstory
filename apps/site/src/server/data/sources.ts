@@ -25,6 +25,16 @@ export {
   recordsHref,
   type RecordsQuery,
 } from '../../../../web/src/lib/records/records-query';
+export {
+  hydrateEntityLearningLinks,
+  loadEntityNeighborhood,
+  mapProjectionsToHydratedViews,
+  projectionsFromArtifactEntities,
+  retainCitedRelationshipViews,
+  thinViewsFromProjections,
+  type NeighborhoodReaders,
+} from '../../../../web/src/lib/public-data/entity-views';
+export type { PublicEntityView } from '../../../../web/src/data/public-seed';
 
 /**
  * The search-index doc type, derived from a function that already carries it so this file never imports

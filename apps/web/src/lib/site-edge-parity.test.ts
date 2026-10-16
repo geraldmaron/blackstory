@@ -53,7 +53,6 @@ import { buildRecordsIndex, searchIndexReadyForRecords } from './records/build-r
 import { loadRecordsIndexFromKey, recordsQueryCacheKey } from '../app/records/load-records-index';
 import type { PublicEntityView } from '../data/public-seed';
 import { loadRecordsPage } from '../../../site/src/server/data/records';
-import { CatalogUnavailableError } from '../../../site/src/server/data/catalog';
 import { isAuthGatedPath } from '../admin/auth/protected-paths';
 import {
   isRequestWithinLimit,
@@ -661,6 +660,9 @@ test('the site /records read builds the same page model as the Next loader for a
       release: { releaseId: 'rel_1', activatedAt: 't' },
     }),
   };
+  const noEntities = {
+    getEntities: async () => assert.fail('the slim index was ready; entities must not be read'),
+  };
 
   for (const query of [
     '',
@@ -682,20 +684,65 @@ test('the site /records read builds the same page model as the Next loader for a
     const key = recordsQueryCacheKey(record);
     const expected = { query: loadRecordsIndexFromKey(key).query };
     const original = buildRecordsIndex(entities, expected.query);
-    const ported = await loadRecordsPage(searchParams, source, () => true);
+    const ported = await loadRecordsPage(searchParams, source, noEntities, () => true);
     assert.deepEqual(ported.model, original, query);
     assert.deepEqual(ported.query, expected.query, query);
     assert.equal(ported.releaseId, 'rel_1');
   }
 });
 
-test('a search index without evidence inputs is refused, not shown with records silently ungraded', async () => {
-  const docs = [{ id: 'd1' }, { id: 'd2' }] as never;
+test('without evidence coverage the site builds from full entities, like the Next loader', async () => {
+  const entities = Array.from({ length: 120 }, (_, index) => ({
+    id: `e${index}`,
+    kind: 'place',
+    displayName: `Record ${index}`,
+    summary: 'A documented record.',
+    era: '1920s',
+    topicTags: [],
+    jurisdictionLabel: 'Oklahoma',
+    locationPrecision: 'city',
+    locationLabel: 'Tulsa',
+    relevanceExplanation: '',
+    historicalContext: '',
+    recordMaturity: 'stub',
+    researchCoverage: 'minimal',
+    mapPin: { x: 0, y: 0 },
+    claims: [],
+    timeline: [],
+    revision: {},
+    relatedIds: [],
+  })) as unknown as readonly PublicEntityView[];
+  const thinDocs = [{ id: 'd1' }, { id: 'd2' }] as never;
   const source = {
-    getSearchIndex: async () => ({ docs, release: { releaseId: 'rel_1', activatedAt: 't' } }),
+    getSearchIndex: async () => ({
+      docs: thinDocs,
+      release: { releaseId: 'rel_1', activatedAt: 't' },
+    }),
   };
-  await assert.rejects(loadRecordsPage(new URLSearchParams(''), source), CatalogUnavailableError);
-  const withInputs = [{ id: 'd1', evidenceInputs: {} }] as never;
-  assert.equal(searchIndexReadyForRecords(withInputs), true);
-  assert.equal(searchIndexReadyForRecords(docs), false);
+  const entitySource = {
+    getEntities: async () => ({
+      data: entities,
+      release: { releaseId: 'rel_1', activatedAt: 't' },
+    }),
+  };
+  assert.equal(searchIndexReadyForRecords(thinDocs), false);
+  for (const query of ['', '?page=2', '?q=Record+7']) {
+    const params = new URLSearchParams(query);
+    const record: Record<string, string> = Object.fromEntries(params);
+    const expectedQuery = loadRecordsIndexFromKey(recordsQueryCacheKey(record)).query;
+    const ported = await loadRecordsPage(params, source, entitySource);
+    assert.equal(ported.catalogSource, 'entities');
+    assert.deepEqual(ported.model, buildRecordsIndex(entities, expectedQuery), query);
+  }
+});
+
+test('the entity read model is one implementation: source.ts and the site share entity-views.ts', async () => {
+  const views = await import('./public-data/entity-views');
+  const source = await import('./public-data/source');
+  assert.equal(source.hydrateEntityLearningLinks, views.hydrateEntityLearningLinks);
+  assert.equal(source.retainCitedRelationshipViews, views.retainCitedRelationshipViews);
+  const site = await import('../../../site/src/server/data/sources');
+  assert.equal(site.loadEntityNeighborhood, views.loadEntityNeighborhood);
+  assert.equal(site.mapProjectionsToHydratedViews, views.mapProjectionsToHydratedViews);
+  assert.equal(site.thinViewsFromProjections, views.thinViewsFromProjections);
 });

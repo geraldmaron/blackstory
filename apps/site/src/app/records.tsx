@@ -5,7 +5,7 @@ import { XStack, YStack } from '@tamagui/stacks';
 import { H1, H2, Paragraph, SizableText } from '@tamagui/text';
 import { CatalogUnavailableError } from '../server/data/catalog';
 import { loadRecordsPage, type RecordsPageData } from '../server/data/records';
-import { catalog } from '../server/data/wiring';
+import { catalog, entities } from '../server/data/wiring';
 
 const SITE_URL = process.env.EXPO_PUBLIC_SITE_URL ?? 'http://localhost:3060';
 const absolute = (path: string): string => new URL(path, SITE_URL).toString();
@@ -15,6 +15,7 @@ async function read(request: Request | undefined): Promise<RecordsPageData> {
     return await loadRecordsPage(
       new URL(request?.url ?? '/records', SITE_URL).searchParams,
       catalog,
+      entities,
     );
   } catch (error) {
     // The catalog is the page. Say so honestly instead of rendering an empty archive.

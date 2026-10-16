@@ -4,12 +4,14 @@
  * the generateMetadata call and the loader call both land on the process cache, so the index is built
  * from one catalog read either way.
  */
-import { CatalogUnavailableError, type Catalog } from './catalog';
+import type { Catalog } from './catalog';
+import type { EntityCatalog } from './entities';
 import {
   buildRecordsIndex,
   parseRecordsQuery,
   searchIndexReadyForRecords,
   type RecordsIndex,
+  type PublicEntityView,
   type RecordsQuery,
 } from './sources';
 
@@ -17,11 +19,14 @@ export type RecordsPageData = {
   readonly query: RecordsQuery;
   readonly model: RecordsIndex;
   readonly releaseId: string;
+  /** Which read the model was built from: the slim search index, or full entities when it lacked evidence inputs. */
+  readonly catalogSource: 'search_index' | 'entities';
 };
 
 export async function loadRecordsPage(
   searchParams: URLSearchParams,
   source: Pick<Catalog, 'getSearchIndex'>,
+  entitySource: Pick<EntityCatalog<PublicEntityView>, 'getEntities'>,
   ready: (
     docs: Awaited<ReturnType<Catalog['getSearchIndex']>>['docs'],
   ) => boolean = searchIndexReadyForRecords,
@@ -33,13 +38,22 @@ export async function loadRecordsPage(
   }
   const query = parseRecordsQuery(raw);
   const { docs, release } = await source.getSearchIndex();
-  // Evidence honesty: grades come from the inputs on each doc. The Next loader falls back to hydrating
-  // full entities when too few docs carry them; that fallback is not ported (repo-6obbo follow-up), so
-  // an index without coverage is refused rather than shown with records silently ungraded.
-  if (!ready(docs)) {
-    throw new CatalogUnavailableError(
-      `search index for ${release.releaseId} lacks evidence inputs`,
-    );
+  // The slim index carries the grading INPUTS; the shared tier rule is applied at read time. Below the
+  // coverage floor (a release the backfill has not reached) the grades would be wrong, so the index is
+  // built from full entities instead, exactly as the Next loader does.
+  if (ready(docs)) {
+    return {
+      query,
+      model: buildRecordsIndex(docs, query),
+      releaseId: release.releaseId,
+      catalogSource: 'search_index',
+    };
   }
-  return { query, model: buildRecordsIndex(docs, query), releaseId: release.releaseId };
+  const { data } = await entitySource.getEntities(release);
+  return {
+    query,
+    model: buildRecordsIndex(data, query),
+    releaseId: release.releaseId,
+    catalogSource: 'entities',
+  };
 }

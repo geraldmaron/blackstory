@@ -220,7 +220,7 @@ test('stats report the last load', async () => {
   const s = c.stats();
   assert.equal(s.lastLoadMs, 250);
   assert.equal(s.lastLoadedAt, '2026-10-16T12:00:00.250Z');
-  assert.equal(s.lastKey, 'k:rel_1:2026-10-01T00:00:00.000Z');
+  assert.equal(s.lastKey, JSON.stringify(['k', 'rel_1', '2026-10-01T00:00:00.000Z']));
 });
 
 function deferred<T>() {
@@ -436,4 +436,81 @@ test('a refresh that rejects never becomes an unhandled rejection', async () => 
     process.off('unhandledRejection', onUnhandled);
   }
   assert.deepEqual(unhandled, []);
+});
+
+test('different (release, scope) pairs never share a key, whatever separators the ids contain', async () => {
+  const c = createCatalogCache<string>({ kind: 'k', log: quiet });
+  const T = '2026-10-16T00:00:00.000Z';
+  const a = { releaseId: 'r', activatedAt: T };
+  const b = { releaseId: `r:${T}:s`, activatedAt: T };
+  assert.equal(await c.get(a, async () => 'A', `s:${T}:x`), 'A');
+  assert.equal(
+    await c.get(b, async () => 'B', 'x'),
+    'B',
+    "a different release must load, not read the first release's entry",
+  );
+  assert.equal(await c.get(a, async () => 'unused', `s:${T}:x`), 'A');
+});
+
+test('entries that opt out of stale-if-error are not served after an error', async () => {
+  const t = clock();
+  const c = createCatalogCache<{ v: string | null }>({
+    kind: 'k',
+    now: t.now,
+    ttlMs: 1_000,
+    softTtlMs: 1_000,
+    staleIfErrorMs: 600_000,
+    log: quiet,
+    staleEligible: (x) => x.v !== null,
+  });
+  await c.get(REL, async () => ({ v: null }), 'miss');
+  await c.get(REL, async () => ({ v: 'hit' }), 'hit');
+  t.advance(5_000);
+  await assert.rejects(
+    c.get(
+      REL,
+      async () => {
+        throw new Error('db down');
+      },
+      'miss',
+    ),
+    /db down/,
+  );
+  assert.deepEqual(
+    await c.get(
+      REL,
+      async () => {
+        throw new Error('db down');
+      },
+      'hit',
+    ),
+    { v: 'hit' },
+  );
+});
+
+test('refresh-failure bookkeeping stays bounded however many distinct keys fail', async () => {
+  const t = clock();
+  const c = createCatalogCache<string>({
+    kind: 'k',
+    now: t.now,
+    softTtlMs: 1_000,
+    ttlMs: 600_000,
+    maxEntries: 5_000,
+    lastGoodMaxKeys: 0,
+    log: quiet,
+  });
+  for (let i = 0; i < 1_300; i += 1) {
+    await c.get(REL, async () => `v${i}`, `id-${i}`);
+    t.advance(2_000);
+    await c.get(
+      REL,
+      async () => {
+        throw new Error('down');
+      },
+      `id-${i}`,
+    );
+  }
+  await tick();
+  assert.ok(c.stats().backoffKeys <= 1_000, `backoff keys ${c.stats().backoffKeys}`);
+  assert.ok(c.stats().backoffKeys > 900, 'and it does track recent failures');
 });

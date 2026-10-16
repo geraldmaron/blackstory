@@ -3,7 +3,7 @@
  *
  * Model, stated once because every data read goes through it:
  *
- *   key        kind + releaseId + activatedAt. A new release is a new key, so a release change
+ *   key        [kind, releaseId, activatedAt, scope?] as a JSON tuple. A new release is a new key, so a release change
  *              invalidates by construction; nothing has to be told.
  *   fresh      served from process memory. Single-flight: concurrent misses share one load.
  *   soft TTL   past it, the entry is still served and ONE background refresh runs (a failed one backs
@@ -37,6 +37,8 @@ export type CacheStats = {
   readonly staleServed: number;
   /** Loads that finished after a purge and were handed to their caller but not stored. */
   readonly discarded: number;
+  /** Keys currently in a refresh-failure backoff (bounded). */
+  readonly backoffKeys: number;
   readonly lastLoadMs: number | null;
   readonly lastLoadedAt: string | null;
   readonly lastKey: string | null;
@@ -44,17 +46,31 @@ export type CacheStats = {
 
 export type CatalogCache<T> = {
   readonly kind: string;
-  get(release: ReleaseKey, load: () => Promise<T | undefined>): Promise<T | undefined>;
+  /** `scope` narrows the key within a release (an entity id, a hash of requested ids). */
+  get(
+    release: ReleaseKey,
+    load: () => Promise<T | undefined>,
+    scope?: string,
+  ): Promise<T | undefined>;
   /** Drops every entry, including the stale-if-error copy. Returns how many live entries went. */
   invalidate(): number;
   stats(): CacheStats;
 };
 
-export type CatalogCacheOptions = {
+export type CatalogCacheOptions<T = unknown> = {
   readonly kind: string;
   readonly ttlMs?: number;
   readonly softTtlMs?: number;
   readonly staleIfErrorMs?: number;
+  /** Entries held in memory (LRU). The default of 8 suits one-per-release catalogs; per-entity caches raise it. */
+  readonly maxEntries?: number;
+  /** Keys that keep a stale-if-error copy. Default 2: the live release and the one it replaced. */
+  readonly lastGoodMaxKeys?: number;
+  /**
+   * Whether a loaded value may be served later as stale-if-error. Negative entries (a cached "not found")
+   * must say no: after their TTL a database error should surface, not turn into a 404 for six hours.
+   */
+  readonly staleEligible?: (value: T) => boolean;
   readonly now?: () => number;
   readonly log?: (message: string, detail?: Record<string, unknown>) => void;
 };
@@ -65,8 +81,9 @@ export const DEFAULT_STALE_IF_ERROR_MS = 6 * 60 * 60_000;
 
 type Entry<T> = { readonly value: T; readonly loadedAt: number; readonly seq: number };
 
-/** How many releases keep a stale-if-error copy: the live one and the one it replaced. */
-const LAST_GOOD_MAX_KEYS = 2;
+const DEFAULT_LAST_GOOD_MAX_KEYS = 2;
+/** Refresh-failure bookkeeping is bounded independently of the entries it describes. */
+const REFRESH_BACKOFF_MAX_KEYS = 1_000;
 const REFRESH_BACKOFF_START_MS = 10_000;
 const REFRESH_BACKOFF_MAX_MS = 5 * 60_000;
 
@@ -81,7 +98,7 @@ export function resetCacheRegistryForTests(): void {
   registry.clear();
 }
 
-export function createCatalogCache<T>(options: CatalogCacheOptions): CatalogCache<T> {
+export function createCatalogCache<T>(options: CatalogCacheOptions<T>): CatalogCache<T> {
   const ttlMs = options.ttlMs ?? DEFAULT_TTL_MS;
   const softTtlMs = Math.min(options.softTtlMs ?? DEFAULT_SOFT_TTL_MS, ttlMs);
   const staleIfErrorMs = options.staleIfErrorMs ?? DEFAULT_STALE_IF_ERROR_MS;
@@ -89,7 +106,12 @@ export function createCatalogCache<T>(options: CatalogCacheOptions): CatalogCach
   const log =
     options.log ?? ((message, detail) => console.warn(`[site-data] ${message}`, detail ?? {}));
 
-  const memory = createLiveCatalogMemoryCache<Entry<T>>({ defaultTtlMs: ttlMs, now });
+  const lastGoodMaxKeys = options.lastGoodMaxKeys ?? DEFAULT_LAST_GOOD_MAX_KEYS;
+  const memory = createLiveCatalogMemoryCache<Entry<T>>({
+    defaultTtlMs: ttlMs,
+    now,
+    ...(options.maxEntries !== undefined ? { maxEntries: options.maxEntries } : {}),
+  });
   const lastGood = new Map<string, Entry<T>>();
   const singleFlight = createSingleFlight();
   const refreshBackoff = new Map<string, { nextAt: number; delayMs: number }>();
@@ -113,11 +135,12 @@ export function createCatalogCache<T>(options: CatalogCacheOptions): CatalogCach
 
   function remember(key: string, entry: Entry<T>): void {
     lastGood.delete(key);
+    if (options.staleEligible && !options.staleEligible(entry.value)) return;
     lastGood.set(key, entry);
     for (const [other, kept] of lastGood) {
       if (now() - kept.loadedAt > staleIfErrorMs) lastGood.delete(other);
     }
-    while (lastGood.size > LAST_GOOD_MAX_KEYS) {
+    while (lastGood.size > lastGoodMaxKeys) {
       const oldest = lastGood.keys().next().value;
       if (oldest === undefined) break;
       lastGood.delete(oldest);
@@ -171,7 +194,13 @@ export function createCatalogCache<T>(options: CatalogCacheOptions): CatalogCach
         (gate?.delayMs ?? REFRESH_BACKOFF_START_MS / 2) * 2,
         REFRESH_BACKOFF_MAX_MS,
       );
+      refreshBackoff.delete(key);
       refreshBackoff.set(key, { nextAt: now() + delayMs, delayMs });
+      while (refreshBackoff.size > REFRESH_BACKOFF_MAX_KEYS) {
+        const oldest = refreshBackoff.keys().next().value;
+        if (oldest === undefined) break;
+        refreshBackoff.delete(oldest);
+      }
       log(`${options.kind}: background refresh failed, keeping the current value`, {
         retryInMs: delayMs,
         error: error instanceof Error ? error.message : String(error),
@@ -181,8 +210,14 @@ export function createCatalogCache<T>(options: CatalogCacheOptions): CatalogCach
 
   const cache: CatalogCache<T> = {
     kind: options.kind,
-    async get(release, loader) {
-      const key = `${options.kind}:${release.releaseId}:${release.activatedAt}`;
+    async get(release, loader, scope) {
+      // A tuple, not a joined string: ids and scopes may contain any separator, and two different
+      // (release, scope) pairs must never share a key.
+      const key = JSON.stringify(
+        scope === undefined
+          ? [options.kind, release.releaseId, release.activatedAt]
+          : [options.kind, release.releaseId, release.activatedAt, scope],
+      );
       const entry = memory.get(key, now());
       if (entry) {
         counters.hits += 1;
@@ -218,6 +253,7 @@ export function createCatalogCache<T>(options: CatalogCacheOptions): CatalogCach
         kind: options.kind,
         entries: memory.size(),
         ...counters,
+        backoffKeys: refreshBackoff.size,
         lastLoadMs,
         lastLoadedAt,
         lastKey,
