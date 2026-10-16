@@ -458,3 +458,10 @@ a test.
 
 **Left in `repo-6obbo`:** door-catalog and shared-map-data, and the five other `cache()` sources.
 
+
+## Design package and component kit (2026-10-16)
+
+- `apps/site/src/design` generates its Tamagui tokens from the shipped `packages/ui/src/styles/tokens.css`, so the CSS and the native/web kit cannot drift silently.
+- The kit holds Confidence, Button, Card, Notice, EmptyState, Citation, VisuallyHidden, Pagination, ResultList, Timeline and Toolbar. Tests render to static markup under tsx; they cover structure, roles and which token a style uses, not events and not the active theme.
+- Codex worktree findings: batches ported cleanly, but review caught a disabled-looking anchor that stayed a tab stop (Pagination), a hover that faded text below 4.5:1 (Button) and a duplicated visually-hidden pattern (Toolbar). Worktrees are cut from the committed HEAD, so uncommitted foundation work must be committed first.
+- Next: Dialog, DataTable, shell header, tab bar, rooms sheet; a gallery route for in-browser checks; Playwright baselines.
