@@ -8,13 +8,14 @@
     "export": "CI=1 NODE_ENV=production expo export --platform web",
     "serve": "node server/entry.cjs",
     "typecheck": "tsc --noEmit",
-    "test": "node --test test/*.test.cjs",
+    "test": "node --test test/*.test.cjs test/edge/*.test.cjs",
     "test:served": "node --test test/served/*.test.cjs",
     "lint": "eslint . --max-warnings 0",
     "format": "prettier --write .",
     "format:check": "prettier --check ."
   },
   "dependencies": {
+    "@supabase/ssr": "^0.12.7",
     "@tamagui/config": "2.7.7",
     "@tamagui/core": "2.7.7",
     "@tamagui/metro-plugin": "2.7.7",

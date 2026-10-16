@@ -324,3 +324,44 @@ the hosting decision (`repo-34xfk`) is a choice among supported targets, and Ver
 - `expo install --fix` inside a directory covered by `apps/*` rewrote the root `pnpm-lock.yaml` (9,270 lines).
   `apps/site` is now excluded from the workspace (`!apps/site`), as `apps/mobile` is.
 
+## 12. Server-layer parity (2026-10-16, `repo-doplj`)
+
+`apps/web/src/proxy.ts` and its collaborators are ported to `apps/site/server/edge/*.cjs` behind
+`server/entry.cjs`, in the same order: maintenance wall, AI/SEO-crawler deny, staff gate, pass-through; then
+security headers with the request nonce, the nonce on every tag, and the CDN cache header.
+
+| Piece | Port | Checked by |
+|---|---|---|
+| Maintenance wall, bypass cookie/param/header, 503 page | `maintenance.cjs` | 7 unit tests, 3 served tests, parity |
+| AI and SEO-tool crawler deny | `traffic.cjs` + `agent-lists.json` | 4 unit tests, 1 served test, parity |
+| Staff gate (Supabase session, staff role) | `staff-gate.cjs` | 7 unit tests, 2 served tests, parity |
+| CSP and the 8 global headers | `security-headers.cjs` | 4 unit tests, 1 served test, parity |
+| Public-document CDN cache | `surfaces.cjs`, `pipeline.cjs` | 2 unit tests, 2 served tests, parity |
+
+**Drift guard.** `apps/web/src/lib/site-edge-parity.test.ts` imports the originals and the ports and asserts
+equal output over tables of user agents, paths, env settings, CSP options and roles. Mutating the port (a header
+value, an agent-list entry, a retry-after cap) made 4 of its 6 tests fail; restoring it returned all 6 to green.
+It is deleted with `apps/web`.
+
+**One intended difference.** The static build output the wall and the staff gate exempt is `/_expo/static`, where
+Next's was `/_next/static` and `/_next/image`. Both directions are asserted.
+
+**Not ported yet (filed under the epic):** query normalization (the request-size limit is ported); host-specific cache headers after the hosting decision; tightening the inherited site CSP
+(theme-bootstrap hash, Vercel analytics origins). The staff gate is mounted, but `/admin` itself is not ported
+(`repo-a27tc`), so a signed-in staff user gets the app's 404 until that decision lands.
+
+**Cross-review (Codex, read-only) and what it changed.** Seven findings, all reproduced or confirmed by reading,
+all fixed with tests:
+
+| Finding | Fix |
+|---|---|
+| A malformed target (`GET //`) threw outside every catch and could kill the process | Targets are parsed safely; bad ones answer 400; the listener cannot reject |
+| Whole-document nonce rewrite blessed any injected `<script>` (so `strict-dynamic` would run it) | Only renderer output is nonced; JSON-LD escapes `<` so a value cannot end its element |
+| `/_expo/loaders/admin` (loader data alias) skipped the staff gate and got public-cache headers | Gates and cache policy use the normalized effective route |
+| Bypass redirect `//attacker.example/x?maintenance_bypass=...` produced a protocol-relative `Location` | Location always has a single leading slash |
+| Streaming responses were buffered without bound | Only HTML is buffered (16 MiB cap); the rest streams |
+| 413 request-size limit not ported | Ported with the normalized route set; parity-tested |
+| Renderer-error fallback kept stale length/encoding and skipped security headers | One error sender clears entity headers and applies the headers |
+
+Also added unprompted: percent-decoded and case-insensitive staff-gate matching (`/%61dmin`, `/ADMIN`).
+

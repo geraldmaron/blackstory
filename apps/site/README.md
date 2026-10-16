@@ -12,17 +12,34 @@ npm install
 npm run dev            # Metro dev server on :8081
 npm run export         # production build into dist/
 npm run serve          # own server entry on :3060 (PORT to change)
-npm test               # unit tests (nonce helpers)
-npm run test:served    # runs against dist/: SEO head, landmarks, nonce on every tag, isolation
+npm test               # unit tests: nonce helpers and every edge module
+npm run test:served    # runs against dist/: SEO head, nonce, maintenance wall, crawler deny, staff gate, headers
 npm run lint && npm run format:check
 ```
 
 ## How it is put together
 
-- **Server entry** `server/entry.cjs` wraps `expo-server/adapter/http` and adds a per-request CSP
-  nonce to every script, style and script preload, plus the header. No patch to Expo's compiled
-  output: SDK 58 renders the document as one chunk. It is where the `proxy.ts` features move
-  (maintenance gate, staff auth gate, crawler deny; `repo-doplj`).
+- **Server entry** `server/entry.cjs` is the replacement for `apps/web/src/proxy.ts`. It runs the edge
+  pipeline in the same order (`server/edge/pipeline.cjs`): maintenance wall, AI/SEO-crawler deny on
+  expensive paths, staff gate for `/admin` and `/design-system` (Supabase session, `app_role` must be
+  a staff role), then passes to `expo-server/adapter/http`. Every response gets the global security
+  headers with this request's nonce; HTML gets the nonce on every script, style and script preload;
+  cacheable public documents get `Vercel-CDN-Cache-Control`. No patch to Expo's compiled output.
+  Static build output under `/_expo/static` skips the gates, as `/_next/static` did.
+- **Edge modules** (`server/edge/*.cjs`) are ports of the Next originals, with a drift guard:
+  `apps/web/src/lib/site-edge-parity.test.ts` asserts the port equals the original across tables of
+  user agents, paths, env settings, CSP options and roles. The one intended difference is the exempt
+  static path. Delete that test with `apps/web`. `agent-lists.json` also feeds robots/ai.txt later.
+- **Request targets are normalized first** (`server/edge/paths.cjs`): percent-decoding, dot segments and
+  slash collapsing, so `/%61dmin`, `/admin/../admin` and `//host/admin` are all `/admin` for every gate;
+  Expo's loader data endpoint `/_expo/loaders/<route>` is gated as `<route>`; a malformed target is a 400.
+  The staff gate matches case-insensitively. A gate that throws answers 500, never falls through.
+- **Nonce rewrite is narrow** (`server/nonce.cjs`): the finished HTML is rewritten, so only what Expo's
+  renderer emits is marked (scripts and preloads under `/_expo/static/`, one inline `_R_` bootstrap, one
+  inline module flag, styles). Markup an injection added never receives the nonce. JSON-LD goes through
+  `src/lib/json-ld.js`, which escapes `<`, `>`, `&` so a value cannot end the script element.
+- **Responses**: HTML is buffered (16 MiB cap) for the nonce; everything else streams through.
+- **Not ported yet**: query normalization (`handleWebSecurity`'s other half). The 413 request-size limit is in.
 - **Metadata** uses the route's `generateMetadata` (title, description, canonical, Open Graph).
   `expo-router/head` only updates tags after hydration. JSON-LD is a `<script>` in the page tree.
 - **Tokens**: `tamagui.config.ts` builds two themes from `brand/tokens/colors.json` with semantic roles

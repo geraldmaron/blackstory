@@ -46,7 +46,7 @@ test('/methodology: SEO head is server rendered', { skip: !built }, async () => 
 });
 
 test(
-  '/methodology: every script, style and script preload carries the request nonce',
+  '/methodology: every executable script, style and script preload carries the request nonce',
   { skip: !built },
   async () => {
     const { html, csp } = await page('/methodology');
@@ -55,7 +55,10 @@ test(
     const tags =
       html.match(/<script\b[^>]*>|<style\b[^>]*>|<link\b[^>]*\bas="script"[^>]*>/g) ?? [];
     assert.ok(tags.length >= 6, `expected several tags, saw ${tags.length}`);
-    const bad = tags.filter((tag) => !tag.includes(`nonce="${nonce}"`));
+    // JSON-LD is a data block, not executable, so it is the one script that is not nonced.
+    const data = tags.filter((tag) => /type="application\/ld\+json"/.test(tag));
+    assert.equal(data.length, 1);
+    const bad = tags.filter((tag) => !data.includes(tag) && !tag.includes(`nonce="${nonce}"`));
     assert.deepEqual(bad, []);
   },
 );

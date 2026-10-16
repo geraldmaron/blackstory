@@ -1,6 +1,7 @@
 import type { GenerateMetadataFunction } from 'expo-router/server';
 import { XStack, YStack } from '@tamagui/stacks';
 import { H1, H2, Paragraph, SizableText } from '@tamagui/text';
+import { jsonLdString } from '../lib/json-ld';
 // Single source until apps/web is removed; metro.config.js watches this folder.
 import {
   METHODOLOGY_INTRO_LEDE,
@@ -10,7 +11,7 @@ import {
 
 const SITE_URL = process.env.EXPO_PUBLIC_SITE_URL ?? 'http://localhost:3060';
 const URL_PATH = `${SITE_URL}/methodology`;
-const jsonLd = JSON.stringify({
+const jsonLd = jsonLdString({
   '@context': 'https://schema.org',
   '@type': 'WebPage',
   name: 'Methodology',
