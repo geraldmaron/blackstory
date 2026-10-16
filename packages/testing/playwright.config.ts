@@ -10,13 +10,13 @@ const PORT = Number(process.env.PORT ?? 3048);
  * WebGL map paints. Attaches to a server already listening on PORT (the developer's own, per
  * CLAUDE.md "Web local QA") and starts `pnpm run dev:web` only when nothing is there.
  *
- * Snapshots are platform-suffixed by Playwright, so a baseline captured on macOS is not compared
- * against Linux CI output. Data is the live published catalog; see visual.spec.ts for masking.
+ * Snapshot paths include {platform}, so a macOS baseline is never compared against Linux output.
+ * The installed Chrome version is NOT pinned; a Chrome update can move pixels and needs a re-baseline. Data is the live published catalog; see visual.spec.ts for masking.
  */
 export default defineConfig({
   testDir: './src/visual',
   testMatch: '**/*.spec.ts',
-  snapshotPathTemplate: '{testDir}/__screenshots__/{projectName}/{arg}{ext}',
+  snapshotPathTemplate: '{testDir}/__screenshots__/{platform}/{projectName}/{arg}{ext}',
   fullyParallel: false,
   workers: 1,
   retries: 0,

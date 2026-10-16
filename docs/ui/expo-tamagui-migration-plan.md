@@ -166,21 +166,22 @@ tap-target and type-ramp findings in current CSS so the baseline starts clean.
 
 ## 10. Gate 1 spike results (Expo SDK 57 + Tamagui 2.7.7, `/methodology` slice)
 
-Scratch project, not in the repo. Port of the page shell and real methodology copy.
+Source in [`spikes/expo-web-methodology`](./spikes/expo-web-methodology/README.md) (reproduce steps there). Port of the page shell and real methodology copy. Observed in Chrome against `expo serve` on 2026-10-16.
 
 | Check | Result |
 |---|---|
 | Server HTML: title, canonical, og:title, one h1, lang | **Pass** (static prerender at build) |
 | JSON-LD | **Pass after a fix**: `<script type="application/ld+json">{json}</script>` as a child; `dangerouslySetInnerHTML` is dropped by `expo-router/head` |
 | Per-request CSP nonce | **Fail.** Middleware (flag `unstable_useServerMiddleware` in SDK 57) can set a fresh nonce header per request, but the HTML is prerendered, so no script carries it. Browser blocked the hydration bundle and the page rendered dead. |
-| Hash-based CSP instead | **Pass**: `script-src 'self' 'sha256-<hash of the one inline script>'` hydrated cleanly. Weaker than a nonce for any future inline script; needs a security-policy decision. |
+| Hash-based CSP instead | **Pass**: `script-src 'self' 'sha256-<hash of the one inline script>'` hydrated cleanly. Whether this is acceptable versus today's nonce policy is a security decision, not something this spike settled. |
 | Response headers / cache-control from middleware | Pass |
-| Per-request SSR with data loaders | Exists, but `unstable_useServerRendering` in SDK 55-57; stable only in SDK 58. Not tested. |
+| Per-request SSR with data loaders | Per the Expo docs (docs.expo.dev/router/web/server-rendering) it is `unstable_useServerRendering` in SDK 55-57 and stable in SDK 58. Not tested here, and not tested for nonce injection. |
 | Tamagui compiler extraction | **Not confirmed.** HTML carries 444 KB of inline CSS (all themes), JS bundle 2 MB (519 KB gzip). A real comparison needs a production Next build for the same page. |
-| TTFB | Not meaningful (static file served locally). |
+| TTFB, bundle comparison against Next | **Open.** Static file served locally; no production Next build measured for the same page. |
 
-Version risk: Tamagui 3.0.0 shipped 2026-10-10 and has had 18 patch releases in six days (3.0.18 on
+Version risk (dates from the npm registry): Tamagui 3.0.0 shipped 2026-10-10 and has had 18 patch releases in six days (3.0.18 on
 2026-10-16). The spike pinned 2.7.7 (2026-08-15). A 2.x to 3.x move during the migration is likely.
 
-Gate 1 verdict: **needs validation.** SEO head and hydration are achievable. Two blockers remain:
-nonce CSP (decision needed on hash-based CSP or SDK 58 SSR) and bundle/CSS weight (extraction).
+Gate 1 verdict: **needs validation.** SEO head and hydration are achievable. Blockers:
+nonce CSP (hash-based CSP or SDK 58 SSR, decision needed), bundle/CSS weight (extraction unconfirmed),
+and the open TTFB/bundle comparison.

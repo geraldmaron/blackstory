@@ -70,17 +70,20 @@ function scanFile(file, rel) {
     const text = raw.trim();
     if (!text) return;
 
-    const media = text.match(/^@media\b(.*)/);
+    let rest = text;
+    const media = text.match(/^@media\b([^{]*)(\{(.*))?$/);
     if (media) {
       for (const m of media[1].matchAll(/(?:min|max)-width:\s*([\d.]+)(px|rem|em)/g)) {
         const px = toPx(m[1], m[2]);
         if (px !== null && !breakpointOnGrid(px)) found.push({ rule: 'breakpoint', line, text });
       }
-      return;
+      // A compact `@media (...) { .a { ... } }` line carries declarations after the brace.
+      if (media[3] === undefined) return;
+      rest = media[3];
     }
 
     // Split `a{b:c;d:e}` style lines so compact CSS cannot hide a declaration.
-    for (const segment of text.split(/[{};]/)) {
+    for (const segment of rest.split(/[{};]/)) {
       const decl = segment.trim().match(/^([a-z-]+)\s*:\s*(.+)$/i);
       if (!decl) continue;
       const [, property, value] = decl;
@@ -90,7 +93,8 @@ function scanFile(file, rel) {
 
       if (isCustomProperty || isTokenFile) continue;
 
-      if (property === 'font-size' && /^[\d.]+(px|rem|em)\b/.test(value)) {
+      const shorthandSize = property === 'font' && /(^|\s)[\d.]+(px|rem|em)(\/|\s|$)/.test(value);
+      if ((property === 'font-size' && /^[\d.]+(px|rem|em)\b/.test(value)) || shorthandSize) {
         found.push({ rule: 'font-size', line, text });
       }
 

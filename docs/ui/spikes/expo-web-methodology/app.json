@@ -1,0 +1,10 @@
+{
+  "expo": {
+    "name": "bs-spike",
+    "slug": "bs-spike",
+    "scheme": "bsspike",
+    "web": { "bundler": "metro", "output": "server" },
+    "plugins": [["expo-router", { "unstable_useServerMiddleware": true }]],
+    "experiments": { "typedRoutes": false }
+  }
+}

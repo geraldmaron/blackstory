@@ -10,7 +10,10 @@ import { openStable } from './page.ts';
 for (const route of VISUAL_ROUTES) {
   test(`visual ${route.name}`, async ({ page }, testInfo) => {
     await openStable(page, testInfo, route.path);
-    const mask = [page.locator('canvas'), page.locator('.maplibregl-map')];
+    const mask =
+      'maskMap' in route && route.maskMap
+        ? [page.locator('canvas'), page.locator('.maplibregl-map')]
+        : [];
     await expect(page).toHaveScreenshot(`${route.name}.png`, { mask });
   });
 }

@@ -3,7 +3,7 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { expect, test } from '@playwright/test';
 import { MIN_TARGET_PX, VISUAL_ROUTES } from './routes.ts';
-import { openStable } from './page.ts';
+import { collectErrors, openStable } from './page.ts';
 
 /**
  * Rendered-page rules, run in every viewport/theme project:
@@ -21,6 +21,7 @@ const measured: Record<string, number> = {};
 
 for (const route of VISUAL_ROUTES) {
   test(`rules ${route.name}`, async ({ page }, testInfo) => {
+    const errors = collectErrors(page);
     await openStable(page, testInfo, route.path);
 
     const facts = await page.evaluate((min) => {
@@ -43,16 +44,22 @@ for (const route of VISUAL_ROUTES) {
         overflow: document.documentElement.scrollWidth - window.innerWidth,
         h1: document.querySelectorAll('h1').length,
         title: document.title,
-        canonical: Boolean(document.querySelector('link[rel="canonical"]')),
-        ogTitle: Boolean(document.querySelector('meta[property="og:title"]')),
+        canonical: document.querySelector<HTMLLinkElement>('link[rel="canonical"]')?.href ?? '',
+        ogTitle:
+          document.querySelector<HTMLMetaElement>('meta[property="og:title"]')?.content ?? '',
+        canonicalCount: document.querySelectorAll('link[rel="canonical"]').length,
+        titleCount: document.querySelectorAll('head > title').length,
         small: small.length,
       };
     }, MIN_TARGET_PX);
 
     expect(facts.overflow, 'horizontal overflow (px)').toBeLessThanOrEqual(0);
     expect(facts.title, 'document title').not.toBe('');
-    expect(facts.canonical, 'canonical link').toBe(true);
-    expect(facts.ogTitle, 'og:title').toBe(true);
+    expect(facts.canonical, 'canonical href').toMatch(/^https?:\/\//);
+    expect(facts.canonicalCount, 'canonical count').toBe(1);
+    expect(facts.titleCount, 'title count').toBe(1);
+    expect(facts.ogTitle, 'og:title content').not.toBe('');
+    expect(errors, 'uncaught page or console errors').toEqual([]);
     expect(facts.h1, 'h1 count').toBeLessThanOrEqual(1);
 
     const key = `${testInfo.project.name}:${route.name}`;
