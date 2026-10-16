@@ -6,7 +6,7 @@
  * logged and the read goes through the cache and single-flight.
  */
 import { createCatalogCache, type CatalogCache, type ReleaseKey } from './cache';
-import type { PublicSearchIndexDoc } from '@repo/domain/search';
+import type { PublicSearchIndexDoc } from './sources';
 
 export type CatalogDeps = {
   readonly preferArtifacts: () => boolean;

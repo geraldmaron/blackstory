@@ -25,3 +25,12 @@ export {
   recordsHref,
   type RecordsQuery,
 } from '../../../../web/src/lib/records/records-query';
+
+/**
+ * The search-index doc type, derived from a function that already carries it so this file never imports
+ * @repo/domain itself (that import resolves from apps/web but not from here, and apps/web's typecheck
+ * reaches this file through the parity test).
+ */
+type SearchIndexReady =
+  typeof import('../../../../web/src/lib/records/build-records-index').searchIndexReadyForRecords;
+export type PublicSearchIndexDoc = Parameters<SearchIndexReady>[0][number];
