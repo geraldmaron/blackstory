@@ -24,6 +24,31 @@ import { renderMaintenancePage } from './maintenance/maintenance-page';
 import { buildContentSecurityPolicy } from './web-security/csp';
 import { buildGlobalSecurityHeaders } from './web-security/security-headers';
 import { surfaceClassFor, CLASSIFIED_PATHS, ENDPOINT_ROUTES } from './nav/surface-classes';
+import {
+  buildNormalizedUrl,
+  canonicalPathAndSearch,
+  needsQueryNormalizationRedirect,
+  normalizeQueryString,
+} from './runtime-hardening/query-normalization';
+import { handleQueryNormalization } from './runtime-hardening/edge-query-normalization';
+import {
+  CORRECTIONS_PAGE_PARAM_ALLOWLIST,
+  LAW_PAGE_PARAM_ALLOWLIST,
+  PLACE_PAGE_PARAM_ALLOWLIST,
+  SEARCH_PAGE_PARAM_ALLOWLIST,
+  STORIES_PAGE_PARAM_ALLOWLIST,
+  TRACKING_QUERY_KEYS,
+  TRACKING_QUERY_PREFIXES,
+  isPlatformPassthroughQueryKey,
+} from './runtime-hardening/constants';
+import {
+  RECORDS_PAGE_PARAM_ALLOWLIST,
+  isRecordsCombinationQuery,
+  parseRecordsQuery,
+  recordsHref,
+  recordsQueryString,
+} from './records/records-query';
+import { TOPIC_REGISTRY } from '@repo/domain/taxonomy/topics';
 import { isAuthGatedPath } from '../admin/auth/protected-paths';
 import {
   isRequestWithinLimit,
@@ -45,6 +70,9 @@ const securityHeaders = site('security-headers');
 const surfaces = site('surfaces');
 const staffGate = site('staff-gate');
 const limits = site('request-limits');
+const queryNorm = site('query-normalization');
+const recordsQuery = site('records-query');
+const topicIds = require('../../../site/server/edge/topic-ids.json') as string[];
 
 const USER_AGENTS = [
   '',
@@ -312,4 +340,289 @@ test('the staff gate is stricter than the original only by case', () => {
       `original gates the lower-case form of ${path}`,
     );
   }
+});
+
+// ---- query normalization ----------------------------------------------------------------------
+
+const QUERY_PATHS = [
+  '/',
+  '/search',
+  '/records',
+  '/records/',
+  '/law',
+  '/stories',
+  '/corrections',
+  '/place/some-place',
+  '/place/some-place/',
+  '/place/',
+  '/entity/',
+  '/stories/',
+  '/invention/x',
+  '/methodology',
+  '/about',
+  '/data',
+  '/legal',
+  '/errata',
+  '/sitemap.xml',
+  '/atlas/catalog',
+  '/stories/a-chapter',
+  '/entity/e1',
+  '/some-new-page',
+];
+
+const QUERIES = [
+  '',
+  '?',
+  '?x=1',
+  '?utm_source=mail&utm_medium=x',
+  '?fbclid=abc&gclid=1&ref=twitter&_ga=1',
+  '?q=hello',
+  '?q=%20%20hello%20%20world%20',
+  '?q=hello+world',
+  '?q=&kind=',
+  '?q=a&q=b',
+  '?kind=PERSON&era=1930S',
+  '?kind=person&era=1930s&page=2',
+  '?page=0',
+  '?page=1',
+  '?page=-5&q=x',
+  '?page=99999',
+  '?page=abc',
+  '?state=ny',
+  '?state=NYC',
+  '?evidence=a',
+  '?evidence=D',
+  '?topic=abolition',
+  '?topic=ABOLITION',
+  '?topic=no-such-topic',
+  '?kind=not%20a%20slug&era=-bad',
+  '?kind=' + 'a'.repeat(80),
+  '?q=' + 'x'.repeat(300),
+  '?sort=name&q=x&junk=1',
+  '?tag=a&tag=b&collection=c',
+  '?target=p1&targetType=place',
+  '?targetType=place&target=p1',
+  '?from=list&theme=t&selected=s&q=1',
+  '?floor=A&evidence=B&state=ga',
+  '?_vercel_share=tok',
+  '?x=1&_vercel_share=tok&_VERCEL_JWT=a&_vercel_jwt=b',
+  '?kind=PERSON&_vercel_share=%20%20',
+  '?b=2&a=1',
+  '?a=1&b=2',
+  '?q=caf%C3%A9&place=%E2%9C%93',
+  '?q=%zz',
+  '?q=a%26b%3Dc',
+  '?UTM_SOURCE=x&Q=hello',
+  '?era=1930s&era=1940s',
+  '?lat=1&lng=2&zoom=3',
+  '?decade=1930s&era=1930s',
+];
+
+function originalUrl(path: string, query: string): URL {
+  return new URL(`https://blackstory.app${path}${query}`);
+}
+
+test('query canonicalization agrees with the original across paths and queries', () => {
+  let compared = 0;
+  for (const path of QUERY_PATHS) {
+    for (const query of QUERIES) {
+      const label = `${path}${query}`;
+      const url = originalUrl(path, query);
+      const sent = url.pathname;
+      const searchParams = new URLSearchParams(url.search);
+
+      assert.equal(
+        queryNorm.needsQueryNormalizationRedirect({
+          pathname: sent,
+          search: url.search,
+          searchParams,
+        }),
+        needsQueryNormalizationRedirect(url),
+        `needs redirect: ${label}`,
+      );
+
+      const expected = buildNormalizedUrl(url);
+      const actual = queryNorm.buildNormalizedUrl(sent, searchParams);
+      assert.equal(actual.pathname, expected.pathname, `pathname: ${label}`);
+      assert.equal(actual.search, expected.search, `search: ${label}`);
+
+      assert.equal(
+        queryNorm.normalizeQueryString(url.pathname, searchParams),
+        normalizeQueryString(url.pathname, searchParams),
+        `normalizeQueryString: ${label}`,
+      );
+      assert.equal(
+        queryNorm.canonicalPathAndSearch(url.pathname, searchParams),
+        canonicalPathAndSearch(url),
+        `canonicalPathAndSearch: ${label}`,
+      );
+
+      // The decision a request actually gets, end to end.
+      const original = handleQueryNormalization(new NextRequest(url));
+      const redirect = original.headers.get('location');
+      const ported = queryNorm.handleQueryNormalization({
+        pathname: sent === '/' ? '/' : sent.replace(/\/+$/, '') || '/',
+        trailingSlash: sent.length > 1 && sent.endsWith('/'),
+        search: url.search,
+        searchParams,
+      });
+      if (redirect === null) {
+        assert.equal(ported, null, `no redirect: ${label}`);
+      } else {
+        const target = new URL(redirect);
+        assert.equal(original.status, 308, label);
+        assert.equal(ported?.status, 308, `status: ${label}`);
+        assert.equal(
+          ported?.headers.location,
+          `${target.pathname}${target.search}`,
+          `location: ${label}`,
+        );
+        assert.equal(
+          ported?.headers['cache-control'],
+          original.headers.get('cache-control'),
+          label,
+        );
+      }
+      compared += 1;
+    }
+  }
+  assert.ok(compared > 800, `matrix size ${compared}`);
+});
+
+test('/explore is the one documented gap: the original canonicalizes it, the port passes it through', () => {
+  for (const query of ['?utm_source=x', '?junk=1&era=1930s', '?lat=1&lng=2&zoom=3', '?floor=a']) {
+    const url = originalUrl('/explore', query);
+    assert.equal(
+      queryNorm.handleQueryNormalization({
+        pathname: '/explore',
+        trailingSlash: false,
+        search: url.search,
+        searchParams: new URLSearchParams(url.search),
+      }),
+      null,
+      query,
+    );
+  }
+  assert.equal(needsQueryNormalizationRedirect(originalUrl('/explore', '?utm_source=x')), true);
+});
+
+test('allowlists and tracking vocabulary are identical to the originals', () => {
+  assert.deepEqual([...queryNorm.SEARCH_PAGE_PARAM_ALLOWLIST], [...SEARCH_PAGE_PARAM_ALLOWLIST]);
+  assert.deepEqual([...queryNorm.LAW_PAGE_PARAM_ALLOWLIST], [...LAW_PAGE_PARAM_ALLOWLIST]);
+  assert.deepEqual([...queryNorm.STORIES_PAGE_PARAM_ALLOWLIST], [...STORIES_PAGE_PARAM_ALLOWLIST]);
+  assert.deepEqual(
+    [...queryNorm.CORRECTIONS_PAGE_PARAM_ALLOWLIST],
+    [...CORRECTIONS_PAGE_PARAM_ALLOWLIST],
+  );
+  assert.deepEqual([...queryNorm.PLACE_PAGE_PARAM_ALLOWLIST], [...PLACE_PAGE_PARAM_ALLOWLIST]);
+  assert.deepEqual(
+    [...recordsQuery.RECORDS_PAGE_PARAM_ALLOWLIST],
+    [...RECORDS_PAGE_PARAM_ALLOWLIST],
+  );
+  assert.deepEqual([...queryNorm.TRACKING_QUERY_PREFIXES], [...TRACKING_QUERY_PREFIXES]);
+  assert.deepEqual([...queryNorm.TRACKING_QUERY_KEYS].sort(), [...TRACKING_QUERY_KEYS].sort());
+  for (const key of ['_vercel_share', '_VERCEL_JWT', 'vercel', 'x_vercel_', '']) {
+    assert.equal(
+      queryNorm.isPlatformPassthroughQueryKey(key),
+      isPlatformPassthroughQueryKey(key),
+      key,
+    );
+  }
+});
+
+test('topic vocabulary snapshot equals the domain registry', () => {
+  assert.deepEqual(
+    [...topicIds],
+    TOPIC_REGISTRY.map((topic) => topic.id),
+  );
+});
+
+test('records query parsing and printing agree on a deterministic fuzz', () => {
+  let seed = 20261016;
+  const next = () => {
+    seed = (seed * 1664525 + 1013904223) % 4294967296;
+    return seed / 4294967296;
+  };
+  const pick = <T>(items: readonly T[]): T => items[Math.floor(next() * items.length)] as T;
+  const junk = [
+    '',
+    ' ',
+    'a',
+    'A',
+    'person',
+    'PERSON',
+    '1930s',
+    '1930S',
+    'NY',
+    'ny',
+    'nyc',
+    'B',
+    'b',
+    'D',
+    '12',
+    '-3',
+    '99999',
+    'abc',
+    'x'.repeat(200),
+    ' spaced  out ',
+    'caf\u00e9',
+    'abolition',
+    'ABOLITION',
+    'nope',
+  ];
+  const keys = ['q', 'kind', 'era', 'state', 'topic', 'status', 'evidence', 'page'];
+  for (let round = 0; round < 600; round += 1) {
+    const raw: Record<string, string | string[] | undefined> = {};
+    for (const key of keys) {
+      const roll = next();
+      if (roll < 0.25) continue;
+      raw[key] = roll < 0.4 ? [pick(junk), pick(junk)] : pick(junk);
+    }
+    const expected = parseRecordsQuery(raw);
+    assert.deepEqual(recordsQuery.parseRecordsQuery(raw), expected, JSON.stringify(raw));
+    assert.equal(
+      recordsQuery.recordsQueryString(expected),
+      recordsQueryString(expected),
+      JSON.stringify(raw),
+    );
+    assert.equal(recordsQuery.recordsHref(expected), recordsHref(expected), JSON.stringify(raw));
+    assert.equal(
+      recordsQuery.isRecordsCombinationQuery(expected),
+      isRecordsCombinationQuery(expected),
+      JSON.stringify(raw),
+    );
+  }
+});
+
+test('eligibility for public-route handling: everything the original handles, the port handles', () => {
+  const eligible = site('request-limits').isSecurityNormalizedRequest;
+  for (const path of [...QUERY_PATHS, ...PATHS]) {
+    const sent = new URL(`https://blackstory.app${path}`).pathname;
+    const facts = {
+      pathname: sent.length > 1 ? sent.replace(/\/+$/, '') : sent,
+      trailingSlash: sent.length > 1 && sent.endsWith('/'),
+    };
+    if (isSecurityNormalizedPath(sent)) {
+      assert.equal(eligible(facts), true, `original handles ${sent}`);
+    }
+  }
+});
+
+test('eligibility differences are the documented ones: decoded paths and trailing-slash exact routes', () => {
+  const eligible = site('request-limits').isSecurityNormalizedRequest;
+  // Next never redirected `/methodology/` through this predicate (the framework did); Expo has no such step.
+  assert.equal(isSecurityNormalizedPath('/methodology/'), false);
+  assert.equal(eligible({ pathname: '/methodology', trailingSlash: true }), true);
+  // The original tests the encoded pathname, so `/%73earch` escaped canonicalization (and cache keying).
+  assert.equal(isSecurityNormalizedPath('/%73earch'), false);
+  assert.equal(
+    eligible({ pathname: '/search', trailingSlash: false }),
+    true,
+    'the port decodes first',
+  );
+  // Prefix routes behave the same either way.
+  assert.equal(isSecurityNormalizedPath('/place/'), true);
+  assert.equal(eligible({ pathname: '/place', trailingSlash: true }), true);
+  assert.equal(isSecurityNormalizedPath('/placement/'), false);
+  assert.equal(eligible({ pathname: '/placement', trailingSlash: true }), false);
 });

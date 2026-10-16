@@ -39,7 +39,12 @@ npm run lint && npm run format:check
   inline module flag, styles). Markup an injection added never receives the nonce. JSON-LD goes through
   `src/lib/json-ld.js`, which escapes `<`, `>`, `&` so a value cannot end the script element.
 - **Responses**: HTML is buffered (16 MiB cap) for the nonce; everything else streams through.
-- **Not ported yet**: query normalization (`handleWebSecurity`'s other half). The 413 request-size limit is in.
+- **Query canonicalization** (`server/edge/query-normalization.cjs`, `records-query.cjs`): on public routes a
+  query that is not canonical (tracking tags, junk keys, untrimmed or out-of-range values, a trailing slash)
+  gets a 308 to the canonical URL, so `?x=` cannot fragment the CDN's HTML cache. `_vercel_*` params survive.
+  Loader data requests are never canonicalized. The 413 request-size limit uses the same route set.
+- **Not ported yet**: `/explore` canonicalization. It needs the Explore URL-state parser (map port,
+  `repo-5tjl0`), so `/explore` passes through unchanged and a test asserts that gap.
 - **Metadata** uses the route's `generateMetadata` (title, description, canonical, Open Graph).
   `expo-router/head` only updates tags after hydration. JSON-LD is a `<script>` in the page tree.
 - **Tokens**: `tamagui.config.ts` builds two themes from `brand/tokens/colors.json` with semantic roles

@@ -4,7 +4,8 @@
  *   2. AI/SEO-tool crawler deny on expensive paths
  *   3. staff gate for /admin and /design-system
  *   4. request-size limit on state-changing requests to public routes
- *   5. pass through to the app
+ *   5. query canonicalization on public routes (308 to the canonical query)
+ *   6. pass through to the app
  * then, on every response, the security headers (with this request's nonce) and, for cacheable
  * public documents, the CDN cache header. Pure: no sockets, so it is unit tested directly.
  */
@@ -15,7 +16,8 @@ const { buildGlobalSecurityHeaders } = require('./security-headers.cjs');
 const { isPublicDocumentCacheable, PUBLIC_DOCUMENT_CDN_CACHE_CONTROL } = require('./surfaces.cjs');
 const { parseCookieHeader } = require('./cookies.cjs');
 const { normalizeRequestTarget } = require('./paths.cjs');
-const { handleRequestSize } = require('./request-limits.cjs');
+const { handleRequestSize, isSecurityNormalizedRequest } = require('./request-limits.cjs');
+const { handleQueryNormalization } = require('./query-normalization.cjs');
 
 /**
  * Normalize a Node request into the plain facts the gates read. `ok:false` means the target is
@@ -30,6 +32,8 @@ function readRequestFacts(req) {
     ok: true,
     method: req.method ?? 'GET',
     pathname: target.pathname,
+    trailingSlash: target.trailingSlash,
+    isLoader: target.isLoader,
     search: target.search,
     searchParams: target.searchParams,
     headers: req.headers,
@@ -66,6 +70,12 @@ async function runEdge(facts, { env = process.env, nonce, deps = {} } = {}) {
 
   const tooLarge = handleRequestSize(facts);
   if (tooLarge) return { response: tooLarge, setCookies: [], securityHeaders };
+
+  // Public routes only: an endpoint's contract is its query string, so it must never be rewritten.
+  if (!facts.isLoader && isSecurityNormalizedRequest(facts)) {
+    const redirect = handleQueryNormalization(facts);
+    if (redirect) return { response: redirect, setCookies: [], securityHeaders };
+  }
 
   return { response: null, setCookies: [], securityHeaders };
 }

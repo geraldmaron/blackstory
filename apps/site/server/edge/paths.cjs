@@ -3,8 +3,9 @@
  * which route a request is for. Every decision (maintenance wall, crawler deny, staff gate, cache
  * policy) is made on the normalized path:
  *   - percent-encoding is decoded (`/%61dmin` is `/admin`), dot segments resolved, slashes collapsed;
- *   - Expo's loader data endpoint `/_expo/loaders/<route>` is treated as `<route>`, because the
- *     adapter executes that route's loader (a staff route's data must be as gated as its page);
+ *   - Expo's loader data endpoint `/_expo/loaders/<route>` is treated as `<route>` for the gates
+ *     (the adapter executes that route's loader, so a staff route's data must be as gated as its
+ *     page) and flagged `isLoader`, so query canonicalization never redirects a data request to HTML;
  *   - a malformed target is reported, never thrown.
  */
 
@@ -12,7 +13,7 @@ const LOADER_PREFIX = '/_expo/loaders';
 
 /**
  * @param {string|undefined} target the raw request target, e.g. `/records?era=1930s`
- * @returns {{ok:true, pathname:string, search:string, searchParams:URLSearchParams} | {ok:false}}
+ * @returns {{ok:true, pathname:string, trailingSlash:boolean, isLoader:boolean, search:string, searchParams:URLSearchParams} | {ok:false}}
  */
 function normalizeRequestTarget(target) {
   if (typeof target !== 'string' || !target.startsWith('/')) return { ok: false };
@@ -42,10 +43,21 @@ function normalizeRequestTarget(target) {
     segments.push(segment);
   }
   let pathname = `/${segments.join('/')}`;
+  let isLoader = false;
   if (pathname === LOADER_PREFIX || pathname.startsWith(`${LOADER_PREFIX}/`)) {
     pathname = pathname.slice(LOADER_PREFIX.length) || '/';
+    isLoader = true;
   }
-  return { ok: true, pathname, search: url.search, searchParams: url.searchParams };
+  // Whether the client sent a trailing slash (the canonicalizer redirects it away); `/` itself has none.
+  const trailingSlash = url.pathname.length > 1 && url.pathname.endsWith('/') && pathname !== '/';
+  return {
+    ok: true,
+    pathname,
+    trailingSlash,
+    isLoader,
+    search: url.search,
+    searchParams: url.searchParams,
+  };
 }
 
 module.exports = { normalizeRequestTarget };

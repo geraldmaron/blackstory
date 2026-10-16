@@ -346,7 +346,7 @@ It is deleted with `apps/web`.
 **One intended difference.** The static build output the wall and the staff gate exempt is `/_expo/static`, where
 Next's was `/_next/static` and `/_next/image`. Both directions are asserted.
 
-**Not ported yet (filed under the epic):** query normalization (the request-size limit is ported); host-specific cache headers after the hosting decision; tightening the inherited site CSP
+**Not ported yet (filed under the epic):** `/explore` canonicalization (query normalization and the request-size limit are ported; see below); host-specific cache headers after the hosting decision; tightening the inherited site CSP
 (theme-bootstrap hash, Vercel analytics origins). The staff gate is mounted, but `/admin` itself is not ported
 (`repo-a27tc`), so a signed-in staff user gets the app's 404 until that decision lands.
 
@@ -364,4 +364,29 @@ all fixed with tests:
 | Renderer-error fallback kept stale length/encoding and skipped security headers | One error sender clears entity headers and applies the headers |
 
 Also added unprompted: percent-decoded and case-insensitive staff-gate matching (`/%61dmin`, `/ADMIN`).
+
+### Query canonicalization (`repo-v0lfu.3`)
+
+`edge-query-normalization`, `query-normalization`, the relevant `constants`, and `records-query` are ported to
+`server/edge/{query-normalization,records-query}.cjs` and wired in after the size limit. Topic vocabulary is a
+snapshot (`topic-ids.json`) because `@repo/domain` is ESM-only; the parity test fails if it drifts.
+
+Parity (`site-edge-parity.test.ts`, 15 tests): an 880-case matrix (20 paths x 44 queries) compares the redirect
+decision, canonical pathname and query, `canonicalPathAndSearch`, and the full 308 response with the original;
+a 600-round deterministic fuzz compares records-query parsing and printing. Mutating the port (page cap,
+key sort order, tracking prefix list, a topic id) failed 4 tests; restoring it returned all to green.
+
+**Documented differences** (each asserted in the parity file):
+
+1. **`/explore` is not canonicalized.** The original canonicalizes it through the Explore URL-state parser (561
+   lines plus geography and population vocabularies). That belongs with the map port; a partial port would
+   redirect differently and could loop against the real route. Gap filed (`repo-5tjl0`).
+2. **Eligibility is decided on the decoded path.** Next tested the encoded path, so `/%73earch?junk=1` escaped
+   canonicalization (and cache keying). The port treats it as `/search`. A trailing slash on an exact route also
+   redirects, because Next did that in the framework and Expo does not.
+
+**Second Codex review** (read-only) found three defects, all fixed with tests: a loader data request
+(`/_expo/loaders/records?kind=PERSON`) was 308ed to the HTML page (now never canonicalized; the staff gate still
+sees its route); a slash-terminated prefix route (`/place/`) skipped the redirect the original gave; and the
+decoded-path eligibility above, which I kept as stricter and documented.
 

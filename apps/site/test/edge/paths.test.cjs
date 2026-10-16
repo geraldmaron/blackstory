@@ -35,6 +35,14 @@ test('Expo loader data endpoints are gated as the routes they serve', () => {
   );
 });
 
+test('the loader flag and the trailing slash are reported', () => {
+  assert.equal(normalizeRequestTarget('/_expo/loaders/records').isLoader, true);
+  assert.equal(normalizeRequestTarget('/records').isLoader, false);
+  assert.equal(normalizeRequestTarget('/records/').trailingSlash, true);
+  assert.equal(normalizeRequestTarget('/records').trailingSlash, false);
+  assert.equal(normalizeRequestTarget('/').trailingSlash, false);
+});
+
 test('malformed or ambiguous targets are refused rather than guessed at', () => {
   for (const target of [
     '/%zz',

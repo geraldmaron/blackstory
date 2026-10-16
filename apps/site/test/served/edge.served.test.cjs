@@ -253,3 +253,49 @@ test(
     assert.ok(walled.headers.get('x-content-type-options'));
   },
 );
+
+test(
+  'cache-busting and tracking params are 308ed to the canonical URL; canonical ones are served',
+  skip,
+  async () => {
+    const messy = await get('/methodology?utm_source=mail&x=1');
+    assert.equal(messy.status, 308);
+    assert.equal(messy.headers.get('location'), '/methodology');
+    assert.equal(messy.headers.get('cache-control'), 'no-store');
+    assert.equal(messy.headers.get('vercel-cdn-cache-control'), null);
+    assert.ok(messy.headers.get('content-security-policy'));
+    const slash = await get('/methodology/');
+    assert.equal(slash.status, 308);
+    assert.equal(slash.headers.get('location'), '/methodology');
+    assert.equal((await get('/methodology')).status, 200);
+  },
+);
+
+test('the redirect keeps platform params and never leaves the site', skip, async () => {
+  const response = await get('/methodology?x=1&_vercel_share=tok');
+  assert.equal(response.headers.get('location'), '/methodology?_vercel_share=tok');
+  const { request } = require('node:http');
+  const doubled = await new Promise((resolve, reject) => {
+    const req = request(
+      { host: '127.0.0.1', port: server.address().port, path: '//methodology?x=1', method: 'GET' },
+      (res) => {
+        res.resume();
+        res.on('end', () => resolve(res.headers.location));
+      },
+    );
+    req.on('error', reject);
+    req.end();
+  });
+  assert.match(doubled, /^\/[^/]/, 'one leading slash, so never protocol-relative');
+});
+
+test('/explore is not canonicalized yet and does not crash', skip, async () => {
+  const response = await get('/explore?utm_source=x&junk=1');
+  assert.notEqual(response.status, 308);
+  assert.notEqual(response.status, 500);
+});
+
+test('a loader data request is never redirected to the HTML page', skip, async () => {
+  const response = await get('/_expo/loaders/methodology?utm_source=x');
+  assert.notEqual(response.status, 308);
+});

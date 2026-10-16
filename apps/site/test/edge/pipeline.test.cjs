@@ -122,3 +122,70 @@ test('decorate: CDN cache header only for cacheable documents with a non-error s
   assert.deepEqual(decorate(facts({ pathname: '/admin' }), 200), {});
   assert.deepEqual(decorate(facts({ method: 'POST' }), 200), {});
 });
+
+test('query canonicalization runs on public routes only, after the size limit', async () => {
+  const run = (over) => runEdge(facts(over), { nonce: 'N', deps: { maintenanceSettings: off } });
+  const messy = await run({
+    pathname: '/methodology',
+    search: '?x=1',
+    searchParams: new URLSearchParams('x=1'),
+  });
+  assert.equal(messy.response.status, 308);
+  assert.equal(messy.response.headers.location, '/methodology');
+  const endpoint = await run({
+    pathname: '/search/api',
+    search: '?x=1',
+    searchParams: new URLSearchParams('x=1'),
+  });
+  assert.equal(endpoint.response, null, 'an endpoint contract is its query string');
+  const slash = await run({ pathname: '/methodology', trailingSlash: true });
+  assert.equal(slash.response.status, 308);
+  const clean = await run({
+    pathname: '/records',
+    search: '?kind=person',
+    searchParams: new URLSearchParams('kind=person'),
+  });
+  assert.equal(clean.response, null);
+  const big = await run({
+    method: 'POST',
+    pathname: '/methodology',
+    search: '?x=1',
+    searchParams: new URLSearchParams('x=1'),
+    headers: { 'content-length': '70000' },
+  });
+  assert.equal(big.response.status, 413, 'the size limit answers before canonicalization');
+});
+
+test('loader data requests are gated as their route but never canonicalized to HTML', async () => {
+  const run = (over) => runEdge(facts(over), { nonce: 'N', deps: { maintenanceSettings: off } });
+  const loader = await run({
+    pathname: '/records',
+    isLoader: true,
+    search: '?kind=PERSON',
+    searchParams: new URLSearchParams('kind=PERSON'),
+  });
+  assert.equal(loader.response, null);
+  const page = await run({
+    pathname: '/records',
+    search: '?kind=PERSON',
+    searchParams: new URLSearchParams('kind=PERSON'),
+  });
+  assert.equal(page.response.status, 308);
+  const staff = await run({ pathname: '/admin/cases', isLoader: true });
+  assert.equal(staff.response.status, 307, 'the staff gate still sees the effective route');
+});
+
+test('eligibility follows the path as sent: /place/ redirects away, /placement does not', async () => {
+  const run = (over) => runEdge(facts(over), { nonce: 'N', deps: { maintenanceSettings: off } });
+  const slashPrefix = await run({ pathname: '/place', trailingSlash: true });
+  assert.equal(slashPrefix.response.status, 308);
+  assert.equal(slashPrefix.response.headers.location, '/place');
+  assert.equal((await run({ pathname: '/placement', trailingSlash: true })).response, null);
+  const bigSlash = await run({
+    method: 'POST',
+    pathname: '/place',
+    trailingSlash: true,
+    headers: { 'content-length': '70000' },
+  });
+  assert.equal(bigSlash.response.status, 413, 'the size limit covers the same set');
+});
