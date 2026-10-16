@@ -49,3 +49,11 @@ test('only GET/HEAD for rendered public surfaces are CDN-cacheable', () => {
     'public, s-maxage=300, stale-while-revalidate=3600',
   );
 });
+
+test('operator endpoints under /internal are never a document and never cacheable', () => {
+  for (const path of ['/internal', '/internal/purge', '/internal/anything/else']) {
+    assert.equal(surfaceClassFor(path), null, path);
+    assert.equal(isPublicDocumentCacheable({ method: 'GET', pathname: path }), false, path);
+  }
+  assert.equal(surfaceClassFor('/internals'), 'utility', 'only the /internal prefix is special');
+});

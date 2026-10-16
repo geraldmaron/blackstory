@@ -49,6 +49,11 @@ import {
   recordsQueryString,
 } from './records/records-query';
 import { TOPIC_REGISTRY } from '@repo/domain/taxonomy/topics';
+import { buildRecordsIndex, searchIndexReadyForRecords } from './records/build-records-index';
+import { loadRecordsIndexFromKey, recordsQueryCacheKey } from '../app/records/load-records-index';
+import type { PublicEntityView } from '../data/public-seed';
+import { loadRecordsPage } from '../../../site/src/server/data/records';
+import { CatalogUnavailableError } from '../../../site/src/server/data/catalog';
 import { isAuthGatedPath } from '../admin/auth/protected-paths';
 import {
   isRequestWithinLimit,
@@ -625,4 +630,72 @@ test('eligibility differences are the documented ones: decoded paths and trailin
   assert.equal(eligible({ pathname: '/place', trailingSlash: true }), true);
   assert.equal(isSecurityNormalizedPath('/placement/'), false);
   assert.equal(eligible({ pathname: '/placement', trailingSlash: true }), false);
+});
+
+// ---- data layer ----------------------------------------------------------------------------------
+
+test('the site /records read builds the same page model as the Next loader for any query', async () => {
+  const entities = Array.from({ length: 260 }, (_, index) => ({
+    id: `e${index}`,
+    kind: index % 3 === 0 ? 'person' : 'place',
+    displayName: `Record ${index}`,
+    summary: 'A documented record.',
+    era: index % 2 === 0 ? '1920s' : '1930s',
+    topicTags: index % 5 === 0 ? ['abolition'] : [],
+    jurisdictionLabel: 'Oklahoma',
+    locationPrecision: 'city',
+    locationLabel: 'Tulsa',
+    relevanceExplanation: '',
+    historicalContext: '',
+    recordMaturity: 'stub',
+    researchCoverage: 'minimal',
+    mapPin: { x: 0, y: 0 },
+    claims: [],
+    timeline: [],
+    revision: {},
+    relatedIds: [],
+  })) as unknown as readonly PublicEntityView[];
+  const source = {
+    getSearchIndex: async () => ({
+      docs: entities as never,
+      release: { releaseId: 'rel_1', activatedAt: 't' },
+    }),
+  };
+
+  for (const query of [
+    '',
+    '?page=2',
+    '?page=3&kind=person',
+    '?kind=place&era=1920s',
+    '?q=Record+12',
+    '?topic=abolition',
+    '?page=99999',
+    '?kind=PERSON&page=-1',
+    '?q=a&q=b&page=2',
+  ]) {
+    const searchParams = new URLSearchParams(query);
+    const record: Record<string, string | string[]> = {};
+    for (const key of new Set(searchParams.keys())) {
+      const all = searchParams.getAll(key);
+      record[key] = all.length > 1 ? all : (all[0] ?? '');
+    }
+    const key = recordsQueryCacheKey(record);
+    const expected = { query: loadRecordsIndexFromKey(key).query };
+    const original = buildRecordsIndex(entities, expected.query);
+    const ported = await loadRecordsPage(searchParams, source, () => true);
+    assert.deepEqual(ported.model, original, query);
+    assert.deepEqual(ported.query, expected.query, query);
+    assert.equal(ported.releaseId, 'rel_1');
+  }
+});
+
+test('a search index without evidence inputs is refused, not shown with records silently ungraded', async () => {
+  const docs = [{ id: 'd1' }, { id: 'd2' }] as never;
+  const source = {
+    getSearchIndex: async () => ({ docs, release: { releaseId: 'rel_1', activatedAt: 't' } }),
+  };
+  await assert.rejects(loadRecordsPage(new URLSearchParams(''), source), CatalogUnavailableError);
+  const withInputs = [{ id: 'd1', evidenceInputs: {} }] as never;
+  assert.equal(searchIndexReadyForRecords(withInputs), true);
+  assert.equal(searchIndexReadyForRecords(docs), false);
 });

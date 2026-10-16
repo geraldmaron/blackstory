@@ -390,3 +390,43 @@ key sort order, tracking prefix list, a topic id) failed 4 tests; restoring it r
 sees its route); a slash-terminated prefix route (`/place/`) skipped the redirect the original gave; and the
 decoded-path eligibility above, which I kept as stricter and documented.
 
+## 13. Data layer, first slice (`repo-6obbo`)
+
+**What the Next app does today.** Two `unstable_cache` users (`release-scoped-cache.ts`, `door-catalog.ts`) and nine
+React `cache()` users (records, articles, theme-impact, lives, legal, shared-map-data, door-catalog, public-data
+`source.ts`, materialized snapshots). The Next Data Cache only holds values under about 1.8 MB, so the catalogs (the
+big reads) already fell through to process memory with a 30-minute TTL; what Next added was cross-instance caching of
+small values. The shared layer for the big reads has always been the release artifact on the CDN, with Postgres
+behind it.
+
+**What replaces it** (`apps/site/src/server/data`, documented in the site README):
+
+| Concern | Model |
+|---|---|
+| Key | kind + releaseId + activatedAt; a new release is a new key |
+| Fresh / soft / hard | memory, then one background ETag refresh after 5 min (backoff 10 s to 5 min on failure), gone after 30 min |
+| Cold read | single-flight, so a burst is one load; artifact first, Postgres second, each full Postgres pull logged (the 2026-08 egress incident) |
+| Outage | stale-if-error up to 6 h for the two most recent releases |
+| In-place correction | republish artifact + purge Cloudflare (runbook), then `POST /internal/purge`; otherwise convergence within the soft TTL |
+| Purge semantics | drops entries and the stale copy, fences loads already running, and a post-purge reader never joins one |
+| Per-request memo | not needed: `generateMetadata` and the loader both hit the process cache |
+
+**Done:** the search-index path and `/records` as a real loader (live catalog: 4,210 records, cold 1 to 4 s, warm
+about 85 ms; page 2, canonicalization and purge verified live). 45 cache/release/catalog/purge unit tests (five
+mutations of the fencing, eviction and backoff logic each failed a test), 6 served tests, and a parity test that the
+site's page model equals the Next loader's for nine query shapes.
+
+**Codex review (read-only), six defects, all fixed with tests:** a purge could be undone by an in-flight load and a
+post-purge reader could join it (generation fence); the same for the release pointer; a late refresh could overwrite a
+newer load (one flight per key shared by refresh and foreground); an older release finishing cleared the live
+release's stale-if-error copy (per-release, bounded); failed refreshes retried at request rate (backoff); and
+`/records` lost the evidence-coverage fallback (now refused with a 503 until the entity catalog slice ports it,
+rather than showing records ungraded).
+
+**Observed, not guaranteed.** Under expo-server's Node adapter the purge route and the records loader share one cache
+instance (a report after a `/records` request shows the loader's hits). Bundles are separate files, so a host adapter
+that isolates functions would not share; filed with the hosting decision (`repo-34xfk`).
+
+**Remaining slices (filed):** entity catalog and record reads; the records full-entity fallback; door-catalog and
+shared-map-data; the five other `cache()` sources; purge reach on the chosen host.
+

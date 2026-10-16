@@ -78,6 +78,8 @@ function normalizePath(pathname) {
 function surfaceClassFor(pathname) {
   const path = normalizePath(pathname);
   if (path === '/admin' || path.startsWith('/admin/')) return null;
+  // Operator endpoints (purge, cache report) are not documents and never cacheable. Site-only.
+  if (path === '/internal' || path.startsWith('/internal/')) return null;
   if (ENDPOINT_ROUTES.has(path)) return null;
   const exact = SURFACE_CLASS_BY_PATH.get(path);
   if (exact) return exact;

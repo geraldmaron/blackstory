@@ -60,3 +60,32 @@ npm run lint && npm run format:check
   stock Tamagui config. Tracked in beads; runtime is unaffected.
 - `/methodology` imports its copy from `apps/web/src/app/methodology` (watched in `metro.config.js`)
   until the Next app is removed.
+
+## Data layer (`src/server/data`)
+
+Replaces `unstable_cache` and React `cache()`. Plain TypeScript bundled by Metro into the server (the client
+chunk for `/records` is 2 KB; no database or domain code ships to the browser).
+
+| Module                                       | Job                                                                                                                                                                                                                                                                         |
+| -------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `cache.ts`                                   | The cache primitive. Process memory keyed by kind + release; single-flight; soft TTL (5 min) with one background refresh and exponential backoff on failure; hard TTL (30 min); stale-if-error (6 h, the two most recent releases); purge that also fences in-flight loads. |
+| `release.ts`                                 | The active-release pointer, memoized 30 s, same purge fence. A new release is a new cache key, so it invalidates by construction.                                                                                                                                           |
+| `catalog.ts`                                 | Search-index read: release artifact on the CDN first (ETag-revalidated), Postgres second, every full Postgres pull logged. Port of `source.ts`.                                                                                                                             |
+| `records.ts`                                 | The `/records` read: query parse, catalog read, page model. Refuses an index without evidence inputs (503) rather than show records ungraded.                                                                                                                               |
+| `purge.ts`                                   | Purge scopes, cache report, bearer-token check.                                                                                                                                                                                                                             |
+| `wiring.ts`                                  | The only module that connects the above to Postgres, the domain package and the artifact fetcher. Tests use the factories with fakes.                                                                                                                                       |
+| `sources.ts`, `primitives.ts`, `artifact.ts` | The only imports into `apps/web/src` / `@repo/domain`. Moving those files here when Next is removed is a `git mv` and an edit to these three.                                                                                                                               |
+
+**Purge model.** `POST /internal/purge` (`{"scope":"all"|"catalog"|"release-pointer"}`) and `GET /internal/purge`
+(report) are off unless `SITE_PURGE_TOKEN` (16+ chars) is set, then need `Authorization: Bearer <token>`, answer
+`no-store`, and are never CDN-cacheable. After an in-place correction: republish the catalog artifact and purge
+Cloudflare (existing runbook), then call purge so this instance drops its copy at once. A missed purge costs at most
+the soft TTL, because the refresh is an ETag conditional GET and picks up the republished artifact. The endpoint
+reaches one instance per call.
+
+**Run locally against the real catalog** (reads `published.*` once, about 1 to 4 s cold, then memory):
+
+```bash
+npm run export
+set -a && . ../web/.env.local && set +a && PUBLIC_DATA_SOURCE=postgres NODE_ENV=production PORT=3061 npm run serve
+```

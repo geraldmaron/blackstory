@@ -20,6 +20,12 @@ const ENV_KEYS = [
   'SUPABASE_URL',
   'NEXT_PUBLIC_SUPABASE_ANON_KEY',
   'SUPABASE_ANON_KEY',
+  // Never let a served test reach a real database or accept a real purge token.
+  'PUBLIC_DATA_SOURCE',
+  'DATABASE_URL',
+  'APP_DATABASE_URL',
+  'APP_PUBLIC_RELEASE_ARTIFACT_BASE_URL',
+  'SITE_PURGE_TOKEN',
 ];
 test.before(async () => {
   if (!built) return;
@@ -298,4 +304,76 @@ test('/explore is not canonicalized yet and does not crash', skip, async () => {
 test('a loader data request is never redirected to the HTML page', skip, async () => {
   const response = await get('/_expo/loaders/methodology?utm_source=x');
   assert.notEqual(response.status, 308);
+});
+
+test(
+  '/records without a configured catalog is an honest 503, not an empty archive or a crash',
+  skip,
+  async () => {
+    const response = await get('/records');
+    assert.equal(response.status, 503);
+    assert.ok(response.headers.get('content-security-policy'));
+    assert.equal(
+      response.headers.get('vercel-cdn-cache-control'),
+      null,
+      'an error is never a cacheable document',
+    );
+    assert.equal(
+      (await get('/methodology')).status,
+      200,
+      'and the server keeps serving other pages',
+    );
+  },
+);
+
+test('the purge endpoints are invisible until a token is configured', skip, async () => {
+  assert.equal((await get('/internal/purge')).status, 404);
+  assert.equal((await get('/internal/purge', { method: 'POST', body: '{}' })).status, 404);
+  process.env.SITE_PURGE_TOKEN = 'short';
+  assert.equal(
+    (await get('/internal/purge')).status,
+    404,
+    'a token under 16 characters does not enable it',
+  );
+});
+
+test('purge: auth, report, scopes, and never cacheable', skip, async () => {
+  const token = 'local-test-token-0123456789';
+  process.env.SITE_PURGE_TOKEN = token;
+  const auth = { authorization: `Bearer ${token}` };
+  assert.equal((await get('/internal/purge')).status, 401);
+  assert.equal(
+    (await get('/internal/purge', { headers: { authorization: 'Bearer wrong' } })).status,
+    401,
+  );
+
+  const report = await get('/internal/purge', { headers: auth });
+  assert.equal(report.status, 200);
+  assert.equal(report.headers.get('cache-control'), 'private, no-store');
+  assert.equal(
+    report.headers.get('vercel-cdn-cache-control'),
+    null,
+    '/internal is not a cacheable document',
+  );
+  assert.ok(report.headers.get('content-security-policy'));
+  const body = await report.json();
+  assert.ok(body.releasePointer && Array.isArray(body.caches));
+
+  const purged = await get('/internal/purge', {
+    method: 'POST',
+    headers: auth,
+    body: '{"scope":"catalog"}',
+  });
+  assert.equal(purged.status, 200);
+  assert.equal((await purged.json()).scope, 'catalog');
+  const all = await get('/internal/purge', { method: 'POST', headers: auth });
+  assert.equal((await all.json()).scope, 'all', 'an empty body means all');
+  assert.equal(
+    (await get('/internal/purge', { method: 'POST', headers: auth, body: '{"scope":"x"}' })).status,
+    400,
+  );
+  assert.equal(
+    (await get('/internal/purge', { method: 'POST', headers: auth, body: 'not json' })).status,
+    400,
+  );
 });
