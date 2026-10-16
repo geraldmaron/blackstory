@@ -8,11 +8,13 @@
     "export": "CI=1 NODE_ENV=production expo export --platform web",
     "serve": "node server/entry.cjs",
     "typecheck": "tsc --noEmit",
-    "test": "node --test test/*.test.cjs test/edge/*.test.cjs && node --import tsx --test test/data/*.test.ts",
+    "test": "node --test test/*.test.cjs test/edge/*.test.cjs && TSX_TSCONFIG_PATH=tsconfig.test.json node --import tsx --test test/data/*.test.ts test/design/*.test.ts test/design/*.test.tsx",
     "test:served": "node --test test/served/*.test.cjs",
-    "lint": "eslint . --max-warnings 0",
+    "lint": "eslint . --max-warnings 0 && node scripts/lint-design.mjs",
     "format": "prettier --write .",
-    "format:check": "prettier --check ."
+    "format:check": "prettier --check .",
+    "design:tokens": "node scripts/generate-design-tokens.mjs",
+    "lint:design": "node scripts/lint-design.mjs"
   },
   "dependencies": {
     "@supabase/ssr": "^0.12.7",

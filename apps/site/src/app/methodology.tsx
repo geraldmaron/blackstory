@@ -39,7 +39,7 @@ export default function Methodology() {
           <H1 color="$color" fontSize={44}>
             How a record gets in.
           </H1>
-          <Paragraph color="$colorMuted" fontSize={17}>
+          <Paragraph color="$inkMuted" fontSize={17}>
             {METHODOLOGY_INTRO_LEDE}
           </Paragraph>
           {METHODOLOGY_PUBLISH_RULES.map((rule) => (

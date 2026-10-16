@@ -16,7 +16,7 @@ export function CommandBar() {
   return (
     <XStack
       render="header"
-      backgroundColor="$backgroundRaised"
+      backgroundColor="$surface"
       borderBottomWidth={1}
       borderBottomColor="$borderColor"
       paddingHorizontal="$4"
@@ -26,7 +26,7 @@ export function CommandBar() {
     >
       <Link href="/" aria-label="BlackStory · home">
         <XStack alignItems="center" gap="$2" minHeight={44}>
-          <YStack width={14} height={22} backgroundColor="$accentFill" borderRadius={3} />
+          <YStack width={14} height={22} backgroundColor="$accentGraphic" borderRadius={3} />
           <SizableText color="$color" fontWeight="700" fontSize={18}>
             BlackStory
           </SizableText>

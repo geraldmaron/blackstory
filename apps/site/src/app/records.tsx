@@ -53,10 +53,10 @@ export default function Records() {
         <H1 color="$color" fontSize={44}>
           Everything the archive holds.
         </H1>
-        <Paragraph color="$colorMuted" fontSize={17}>
+        <Paragraph color="$inkMuted" fontSize={17}>
           The map shows where a record sits. This list shows what the archive holds.
         </Paragraph>
-        <SizableText color="$colorMuted" fontSize={12}>
+        <SizableText color="$inkMuted" fontSize={12}>
           {model.pageCount > 1
             ? `${model.countLabel} · page ${model.page} of ${model.pageCount}`
             : model.countLabel}
@@ -78,10 +78,10 @@ export default function Records() {
                   </SizableText>
                 </Link>
                 <XStack justifyContent="space-between">
-                  <SizableText color="$colorMuted" fontSize={13}>
+                  <SizableText color="$inkMuted" fontSize={13}>
                     {row.place}
                   </SizableText>
-                  <SizableText color="$colorMuted" fontSize={13}>
+                  <SizableText color="$inkMuted" fontSize={13}>
                     {row.era}
                   </SizableText>
                 </XStack>
@@ -115,7 +115,7 @@ export default function Records() {
           <Link href={model.atlasHref as never}>
             <SizableText color="$accent">Open this selection on the map</SizableText>
           </Link>
-          <Paragraph color="$colorMuted" fontSize={13}>
+          <Paragraph color="$inkMuted" fontSize={13}>
             {model.atlasReason}
           </Paragraph>
         </YStack>
