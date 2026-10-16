@@ -21,6 +21,9 @@ import {
   tracking,
 } from './generated/tokens';
 
+/** Reading widths. `space` is a 4px scale for padding and gaps, not a width: 36rem is `.ds-empty__body`'s max-width. */
+export const measure = { body: 576 } as const;
+
 export { border, duration, focus, fonts, leading, radius, space, text, themes, tracking };
 
 /**

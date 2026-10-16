@@ -156,3 +156,8 @@ test('Citation supports long content, an empty label and empty optional href', (
   assert.equal(view.tags('a').length, 0);
   assert.equal(view.text(), `${source} Additional evidence`);
 });
+
+test('plain-text children are wrapped in a Text, since a View cannot hold a text node', () => {
+  const view = render(<Citation source="Archive">Quoted passage.</Citation>);
+  assert.match(view.html, /<p[^>]*>Quoted passage\.<\/p>/);
+});

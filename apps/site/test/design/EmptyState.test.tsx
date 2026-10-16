@@ -36,3 +36,9 @@ test('EmptyState uses theme roles and a dashed border in light and dark', () => 
     assert.doesNotMatch(view.html, /#[0-9a-f]{3,8}\b|rgba?\(/i);
   }
 });
+
+test('the body measure is a reading width, not a 4px space token', () => {
+  const view = render(<EmptyState title="None">Nothing matches those filters.</EmptyState>);
+  assert.match(view.raw, /max-width:576px/);
+  assert.doesNotMatch(view.raw, /max-width:var\(--c-space-48\)/);
+});

@@ -6,6 +6,7 @@ import type { ReactNode } from 'react';
 import { styled } from '@tamagui/core';
 import { YStack } from '@tamagui/stacks';
 import { SizableText } from '@tamagui/text';
+import { measure } from '../tokens';
 
 export type EmptyStateProps = {
   readonly title: string;
@@ -45,7 +46,7 @@ export function EmptyState({ title, children, action, className }: EmptyStatePro
       </SizableText>
       <SizableText
         render="div"
-        maxWidth="$48"
+        maxWidth={measure.body}
         fontFamily="$body"
         fontSize="$body"
         color="$inkMuted"

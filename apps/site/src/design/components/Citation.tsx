@@ -79,13 +79,22 @@ export function Citation({
         {label}
       </SizableText>
       {href ? (
-        <Link render={<a href={href} rel="noopener noreferrer" />}>{source}</Link>
+        <Link render="a" href={href} rel="noopener noreferrer">
+          {source}
+        </Link>
       ) : (
         <SizableText render="span" fontFamily="$body" fontSize="$bodySm" color="$ink">
           {source}
         </SizableText>
       )}
-      {children}
+      {typeof children === 'string' || typeof children === 'number' ? (
+        // A View cannot hold a bare text node (Tamagui warns, native throws), so plain text gets a Text.
+        <SizableText render="p" margin={0} fontFamily="$body" fontSize="$bodySm" color="$ink">
+          {children}
+        </SizableText>
+      ) : (
+        children
+      )}
       {linkStatus === 'dead' ? (
         <Notice
           tone="warning"
@@ -103,7 +112,7 @@ export function Citation({
               fontSize="$bodySm"
               color="$warningFg"
             >
-              <Link render={<a href={archivedHref} rel="noopener noreferrer" />}>
+              <Link render="a" href={archivedHref} rel="noopener noreferrer">
                 View archived copy
               </Link>
               {deadAsOfDate ? (

@@ -40,7 +40,11 @@ const Frame = styled(YStack, {
   borderTopColor: '$border',
 });
 const Item = styled(YStack, { render: 'li', borderBottomWidth: 1, borderBottomColor: '$border' });
-const LinkFrame = styled(YStack, {
+// A text primitive, not a View: only a Text carries textDecorationLine to the <a>, and the UA underline
+// on an anchor cannot be cancelled by its descendants.
+const LinkFrame = styled(SizableText, {
+  display: 'flex',
+  flexDirection: 'column',
   gap: '$2',
   paddingVertical: '$5',
   minHeight: '$touch',
