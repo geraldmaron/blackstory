@@ -1,5 +1,5 @@
 import { defaultConfig } from '@tamagui/config/v5';
-import { createTamagui } from 'tamagui';
+import { createTamagui } from '@tamagui/core';
 
 // Brand swatches copied from packages/ui/src/tokens/brand-palette.ts
 const brand = {
@@ -14,12 +14,14 @@ const brand = {
   copperTextLight: '#8E4F2A',
   copperDark: '#D07A32',
 };
+const { light, dark } = defaultConfig.themes as any;
 export const config = createTamagui({
   ...defaultConfig,
-  tokens: { ...defaultConfig.tokens, color: { ...defaultConfig.tokens.color, ...brand } },
+  themes: { light, dark } as any,
+  tokens: { ...defaultConfig.tokens, color: brand as any },
 });
 export default config;
 export type AppConfig = typeof config;
-declare module 'tamagui' {
+declare module '@tamagui/core' {
   interface TamaguiCustomConfig extends AppConfig {}
 }

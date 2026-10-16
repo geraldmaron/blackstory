@@ -176,12 +176,49 @@ Source in [`spikes/expo-web-methodology`](./spikes/expo-web-methodology/README.m
 | Hash-based CSP instead | **Pass**: `script-src 'self' 'sha256-<hash of the one inline script>'` hydrated cleanly. Whether this is acceptable versus today's nonce policy is a security decision, not something this spike settled. |
 | Response headers / cache-control from middleware | Pass |
 | Per-request SSR with data loaders | Per the Expo docs (docs.expo.dev/router/web/server-rendering) it is `unstable_useServerRendering` in SDK 55-57 and stable in SDK 58. Not tested here, and not tested for nonce injection. |
-| Tamagui compiler extraction | **Not confirmed.** HTML carries 444 KB of inline CSS (all themes), JS bundle 2 MB (519 KB gzip). A real comparison needs a production Next build for the same page. |
-| TTFB, bundle comparison against Next | **Open.** Static file served locally; no production Next build measured for the same page. |
+| Tamagui compiler extraction | **Fail as configured.** Compiler runs only with `@tamagui/babel-plugin` and then breaks server HTML; no size benefit either. Size is driven by theme config and import path (see measurement below). |
+| Bundle and TTFB vs Next | **Measured**, but the comparison is a floor (see table below). TTFB not comparable. |
+
+### Production measurement, `/methodology` (2026-10-16, same script, `spikes/expo-web-methodology/weigh.mjs`)
+
+Next: `next build --webpack` then `next start`, as built from this repo. Expo: `expo export` then
+`expo serve`. Sizes are bytes in the first load for the one page. **Not like for like:** the Next
+page includes the real site shell and 1,077 lines of methodology content; the Expo page is the
+heading plus three cards with no shell, so the Expo figures are a floor, not a forecast.
+
+| First load | Next (prod) | Expo as first built | Expo, best working variant |
+|---|---|---|---|
+| HTML document, gz | 50 KB | 36 KB | 14 KB |
+| Inline CSS, gz | 0 KB (11 CSS files, 40 KB gz) | 34 KB (all themes) | 12 KB |
+| JS, gz | 272 KB (23 chunks) | 505 KB (1 bundle) | 379 KB (1 bundle) |
+| Total, gz / brotli | 376 / 305 KB | 541 / 400 KB | 393 / 301 KB |
+| TTFB median (local) | 12.5 ms (dynamic render, `ƒ`) | 2.1 ms (static file) | 2.2 ms (static file) |
+
+What moved the Expo numbers, each measured by rebuilding:
+
+- **Config, not compiler, drives CSS.** `@tamagui/config/v5` emits every theme and color token:
+  457 KB inline CSS. Two themes plus brand tokens: 52 KB. Cuts HTML from 459 KB to 54 KB.
+- **Import path drives JS.** The umbrella `tamagui` import: 517 KB gz. `@tamagui/stacks` + `@tamagui/text`
+  only: 387 KB gz. Expo Router + React Native Web with no Tamagui at all: 292 KB gz, which is already
+  more than the whole Next JS for this page.
+- **Extraction (Tamagui compiler on Metro) is not usable as configured.** `@tamagui/metro-plugin`
+  only records options and registers `.css`; on its own it extracts nothing. Adding
+  `@tamagui/babel-plugin` runs the compiler and flattens elements, and bundle size did not change,
+  but the server HTML body came out empty (Suspense error marker, no h1, no content). With the plugin
+  removed or `disableExtraction: true`, server HTML is complete. Cause not isolated (unverified):
+  could be this version pair or our config. Extraction is therefore off in the best variant.
+- **TTFB is not comparable.** Next renders on demand against the database; Expo served a prerendered file.
+  `/methodology` is dynamic (`ƒ`) in the Next build despite `revalidate = 3600`, because of the proxy.
+
+Unverified, needs a test before it matters: Expo web ships one entry bundle for all routes
+("web bundles (1)"), so each added surface may grow first load unless route-level async loading is
+enabled. Next splits per route.
 
 Version risk (dates from the npm registry): Tamagui 3.0.0 shipped 2026-10-10 and has had 18 patch releases in six days (3.0.18 on
 2026-10-16). The spike pinned 2.7.7 (2026-08-15). A 2.x to 3.x move during the migration is likely.
 
-Gate 1 verdict: **needs validation.** SEO head and hydration are achievable. Blockers:
-nonce CSP (hash-based CSP or SDK 58 SSR, decision needed), bundle/CSS weight (extraction unconfirmed),
-and the open TTFB/bundle comparison.
+Gate 1 verdict: **not passed; needs validation.** SEO head, JSON-LD and hydration are achievable.
+Open blockers: (1) nonce CSP: hash-based CSP or SDK 58 SSR, a security decision; (2) Tamagui extraction
+breaks server HTML as configured, so size must come from a trimmed config and slim imports, which land
+at parity with Next for a bare page but not yet for a real one; (3) single-bundle growth per route
+is untested. Next measurable step: port the real site shell and one data-backed route and re-weigh.

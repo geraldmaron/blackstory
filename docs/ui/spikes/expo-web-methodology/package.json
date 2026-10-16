@@ -8,8 +8,12 @@
     "export": "expo export --platform web"
   },
   "dependencies": {
+    "@tamagui/babel-plugin": "2.7.7",
     "@tamagui/config": "2.7.7",
+    "@tamagui/core": "2.7.7",
     "@tamagui/metro-plugin": "2.7.7",
+    "@tamagui/stacks": "2.7.7",
+    "@tamagui/text": "2.7.7",
     "expo": "~57.0.29",
     "expo-constants": "~57.0.19",
     "expo-linking": "~57.0.13",

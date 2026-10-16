@@ -1,5 +1,7 @@
+// debug
 import Head from 'expo-router/head';
-import { H1, H2, Paragraph, XStack, YStack, Text } from 'tamagui';
+import { XStack, YStack } from '@tamagui/stacks';
+import { H1, H2, Paragraph, SizableText as Text } from '@tamagui/text';
 import {
   METHODOLOGY_INTRO_LEDE,
   METHODOLOGY_PUBLISH_RULES,

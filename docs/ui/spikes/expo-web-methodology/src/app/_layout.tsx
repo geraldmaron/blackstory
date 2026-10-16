@@ -1,5 +1,5 @@
 import { Slot } from 'expo-router';
-import { TamaguiProvider } from 'tamagui';
+import { TamaguiProvider } from '@tamagui/core';
 import { config } from '../../tamagui.config';
 
 export default function RootLayout() {
