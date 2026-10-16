@@ -23,6 +23,15 @@ import {
 
 export { border, duration, focus, fonts, leading, radius, space, text, themes, tracking };
 
+/**
+ * Roles the shipped CSS refers to but never defines. `--ds-fixed-ink` is used in seven places
+ * (shell.css, atmosphere.css, record-sheet.css) and declared nowhere, so those rules fall back to the inherited
+ * text color. The intent, written in components.css ("copper plate carries dark ink text in BOTH themes"), is
+ * Black Ink, which is what the kit uses. Defined here, not in the generated file, because the generated file
+ * only holds what the CSS declares; test/design/tokens.test.ts asserts the pair stays above 4.5:1.
+ */
+export const DESIGN_ONLY_ROLES = { fixedInk: '#0a0a0a' } as const; // design-lint-allow: the one literal, see above
+
 export type ThemeName = keyof typeof themes;
 export type ColorRole = keyof (typeof themes)['light'];
 export type SpaceStep = keyof typeof space;

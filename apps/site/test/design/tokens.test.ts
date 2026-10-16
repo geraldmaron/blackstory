@@ -11,7 +11,7 @@ import {
 import { contrastRatio } from '../../../../packages/ui/src/tokens/contrast';
 import { borders } from '../../../../packages/ui/src/tokens/foundation';
 import { grid } from '../../../../packages/ui/src/tokens/spacing';
-import { breakpoints, themes } from '../../src/design/tokens';
+import { DESIGN_ONLY_ROLES, breakpoints, themes } from '../../src/design/tokens';
 
 test('generated tokens match the shipped CSS (run `npm run design:tokens` if this fails)', () => {
   const { meta, ...fresh } = readDesignTokens();
@@ -145,4 +145,16 @@ test('shipped text pairs meet 4.5:1, except the documented ones', () => {
     }
   }
   assert.deepEqual(below, KNOWN_BELOW_AA);
+});
+
+test('fixedInk (referenced by the CSS, never defined there) is readable on the copper plate in both themes', () => {
+  for (const theme of ['light', 'dark'] as const) {
+    const ratio = contrastRatio(
+      DESIGN_ONLY_ROLES.fixedInk,
+      (themes[theme] as Record<string, string>).accentGraphic!,
+    );
+    assert.ok(ratio >= 4.5, `${theme} fixedInk on accentGraphic is ${ratio.toFixed(2)}`);
+  }
+  // What ships when the variable is undefined: the inherited text color on the dark copper plate.
+  assert.ok(contrastRatio(themes.dark.ink, themes.dark.accentGraphic) < 4.5);
 });

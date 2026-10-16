@@ -11,6 +11,7 @@ import { defaultConfig } from '@tamagui/config/v5';
 import { createFont, createTamagui } from '@tamagui/core';
 import brand from '../../../../brand/tokens/colors.json';
 import {
+  DESIGN_ONLY_ROLES,
   TOUCH_TARGET,
   breakpoints,
   leading,
@@ -29,6 +30,7 @@ type ThemeValues = Record<string, string>;
 function themeWithAliases(colors: Record<string, string>): ThemeValues {
   return {
     ...colors,
+    ...DESIGN_ONLY_ROLES,
     background: colors.canvas ?? '',
     color: colors.ink ?? '',
     borderColor: colors.border ?? '',
