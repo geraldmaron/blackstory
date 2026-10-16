@@ -1,0 +1,6 @@
+node_modules/
+.expo/
+dist/
+expo-env.d.ts
+# Stand-in data for loaders until the data-layer task lands (repo-6obbo); entity data never goes in git.
+.local/

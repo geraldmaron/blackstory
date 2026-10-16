@@ -27,7 +27,7 @@
     "test:visual:update": "pnpm --filter @repo/testing test:visual:update",
     "test:coverage": "pnpm test:preflight && pnpm --filter @repo/testing test:coverage",
     "typecheck": "pnpm -r --filter './packages/**' --filter './apps/**' run --if-present typecheck",
-    "lint": "eslint apps packages scripts eslint.config.mjs --max-warnings 0 --ignore-pattern 'apps/mobile/**'",
+    "lint": "eslint apps packages scripts eslint.config.mjs --max-warnings 0 --ignore-pattern 'apps/mobile/**' --ignore-pattern 'apps/site/**'",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "docs:dev": "pnpm --filter @repo/docs dev",

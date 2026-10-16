@@ -285,3 +285,42 @@ Open blockers: (1) nonce CSP: achievable under SDK 57 SSR only with a post-expor
 breaks server HTML as configured, so size must come from a trimmed config and slim imports, which land
 at parity with Next for a bare page but not yet for a real one; (3) per-route splitting needs `asyncRoutes`, which under SSR streams content into a hidden segment; (4) loader data needs per-page CSP
 hashes. Measured gap on a shell-plus-data route: about +13% gz vs Next, from the framework floor.
+
+## 11. Decision (2026-10-16): proceed with Expo web, on SDK 58
+
+The owner chose to replace Next.js with Expo web now. The go/no-go review recommended staging through
+Tamagui on Next; that was set aside by the owner, so this section records the decision and the controls
+that make it safer. Epic: `repo-v0lfu`.
+
+**Re-run on SDK 58** (released 2026-09-29; `expo@58.0.13`, `expo-router@58.0.22`, React 19.3, RN 0.88).
+SDK 58 removes most of the blockers found on 57:
+
+| Blocker on SDK 57 | On SDK 58 |
+|---|---|
+| Three `unstable_` flags for middleware, loaders, server rendering | None needed; stable |
+| Per-route splitting only with `asyncRoutes`, and then content streamed into a hidden segment | Route chunks by default; renderer sends one chunk (`progressiveChunkSize` max), no hidden segment |
+| Nonce needed a patch to the compiled renderer | **No patch.** An owned server entry wraps the supported `expo-server/adapter/http` and adds the nonce to scripts, styles and script preloads. 200 concurrent requests: 200 distinct nonces, no cross-request nonce. |
+| `expo-router/head` tags in server HTML | Changed: `<Head>` only updates after hydration. Use the route `generateMetadata` (title, description, `alternates.canonical`, `openGraph`, robots). JSON-LD goes in the page tree. |
+| Weight | `/records`: 418 KB gz (br 325 KB) vs Next 367 KB (br 304 KB), about +14%; unchanged from SDK 57. Median TTFB 23.7 ms with per-request SSR. |
+
+`expo-server` ships adapters for EAS Hosting, Node/Express, Vercel, Netlify, workerd (Cloudflare) and Bun, so
+the hosting decision (`repo-34xfk`) is a choice among supported targets, and Vercel stays possible.
+
+**Controls on the decision**
+
+1. Single cutover after parity gates; Next stays deployable until a soak ends (`repo-3ix4m`).
+2. Gates that block cutover: SEO HTML parity for every public URL (`repo-r54nc`), visual parity (`repo-djqss`),
+   token lint at or below baseline, no-JS parity for crawlable rooms (`repo-3db6c`), nonce on every response.
+3. Tamagui pinned at 2.7.7 with extraction off; slim `@tamagui/*` imports; two-theme config from brand tokens.
+4. Protected experiences override aesthetics (memorial, evidence honesty, precision).
+5. Mobile stays on SDK 57 for now; moving it to 58 is part of unifying the design package.
+
+**Findings while scaffolding `apps/site` (new, not in the earlier spikes)**
+
+- Tamagui 2 uses `render="header"`. `tag="header"` (used in the earlier spikes) renders a `<div tag="header">`, so
+  those spikes had no real landmarks. The served tests now assert `<header>` and `<nav>`.
+- Style props (alignItems, padding, maxWidth) do not type check under Expo's tsconfig, even with the stock Tamagui
+  config, on TypeScript 5.9 and 6.0. Runtime is fine. Tracked as a bug in the epic.
+- `expo install --fix` inside a directory covered by `apps/*` rewrote the root `pnpm-lock.yaml` (9,270 lines).
+  `apps/site` is now excluded from the workspace (`!apps/site`), as `apps/mobile` is.
+
