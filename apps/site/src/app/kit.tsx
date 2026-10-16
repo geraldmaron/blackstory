@@ -16,7 +16,8 @@ import {
   ToolbarField,
 } from '../design';
 
-/** Developer-only: every kit component in both themes. Off unless EXPO_PUBLIC_SITE_KIT_PREVIEW=1 at build time. */
+/** Developer-only: every kit component in both themes. Off unless EXPO_PUBLIC_SITE_KIT_PREVIEW=1. Set it for BOTH the export (the client bundle inlines it)
+ * and the server process (it reads it at runtime); if they disagree, hydration fails with React #418. */
 const ENABLED = process.env.EXPO_PUBLIC_SITE_KIT_PREVIEW === '1';
 
 export const generateMetadata: GenerateMetadataFunction = () => ({

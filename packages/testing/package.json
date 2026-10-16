@@ -30,6 +30,8 @@
     "test:coverage": "node --import tsx ../../scripts/run-testing-layer.mjs coverage",
     "lint": "echo 'lint: deferred to root eslint'",
     "test:visual": "playwright test -c playwright.config.ts",
+    "test:visual:kit": "playwright test -c playwright.kit.config.ts",
+    "test:visual:kit:update": "playwright test -c playwright.kit.config.ts --update-snapshots",
     "test:visual:update": "VISUAL_UPDATE=1 playwright test -c playwright.config.ts --update-snapshots"
   },
   "devDependencies": {

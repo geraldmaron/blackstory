@@ -65,12 +65,17 @@ function fontFor(family: string, options: { mono?: boolean } = {}) {
     letterSpacing[step] = Math.round(em * px * 100) / 100;
     weight[step] = '400';
   }
+  // Tamagui looks up `true` as the default size when a Text has no size token; without it, it logs a
+  // warning on every render (thousands per page load in dev). Body is the default step.
+  size.true = size.body ?? 16;
+  lineHeight.true = lineHeight.body ?? 24;
+  letterSpacing.true = letterSpacing.body ?? 0;
   return createFont({
     family: resolveFontFamily(family),
     size,
     lineHeight,
     letterSpacing,
-    weight: { ...weight, regular: '400', medium: '500', semibold: '600', bold: '700' },
+    weight: { ...weight, true: '400', regular: '400', medium: '500', semibold: '600', bold: '700' },
   });
 }
 
