@@ -21,3 +21,12 @@ two-theme config with brand tokens only, extraction off. Turning extraction on (
 `@tamagui/babel-plugin` in `babel.config.js` with `disableExtraction: false`) compiled and flattened
 elements but produced an empty server body (a Suspense error marker, no h1). See section 10 of
 `../../expo-tamagui-migration-plan.md`.
+
+## Shell + data-backed route port (2026-10-16)
+
+`src/components/Shell.tsx` ports the header (wordmark, search, nav) and the phone tab bar.
+`src/app/records.tsx` ports `/records` over a `loader` that reads `data/records-model.json`, the real
+page-1 model from `export-records.mts` (gitignored; generate it with the command in that file). Needs
+`unstable_useServerDataLoaders` and `asyncRoutes: { web: true }` in `app.json`. `explore.tsx` imports
+`maplibre-gl` only to test bundle splitting. Parity gaps in the port: no no-JS forms or `<details>`
+facets, no fonts, no icons, no Rooms sheet, no palette, no map glyphs.

@@ -4,7 +4,16 @@
     "slug": "bs-spike",
     "scheme": "bsspike",
     "web": { "bundler": "metro", "output": "server" },
-    "plugins": [["expo-router", { "unstable_useServerMiddleware": true }]],
+    "plugins": [
+      [
+        "expo-router",
+        {
+          "unstable_useServerMiddleware": true,
+          "unstable_useServerDataLoaders": true,
+          "asyncRoutes": { "web": true, "default": false }
+        }
+      ]
+    ],
     "experiments": { "typedRoutes": false }
   }
 }

@@ -217,8 +217,44 @@ enabled. Next splits per route.
 Version risk (dates from the npm registry): Tamagui 3.0.0 shipped 2026-10-10 and has had 18 patch releases in six days (3.0.18 on
 2026-10-16). The spike pinned 2.7.7 (2026-08-15). A 2.x to 3.x move during the migration is likely.
 
+### Shell + data-backed route port (`/records`), same day
+
+Ported the header and phone tab bar and the real `/records` page-1 model (100 rows, 43 pages, exported
+from `loadRecordsIndex` with the live catalog; the JSON is gitignored). Source and parity gaps:
+`spikes/expo-web-methodology/README.md`. Not ported: no-JS GET forms and `<details>` facets (an
+acceptance criterion of the real page), fonts, icons, the Rooms sheet, the palette, map glyphs.
+
+| First load, gz (br) | Next prod | Expo, async routes |
+|---|---|---|
+| `/records` | 367 KB (304) | 414 KB (322) |
+| `/methodology` | 376 KB (305) | 398 KB (311) |
+| `/records` HTML | 39 KB gz (388 KB raw) | 32 KB gz (294 KB raw) |
+| `/records` JS | 272 KB in 23 chunks | 380 KB in 5 chunks |
+| `/records` median TTFB, local | 44.8 ms (dynamic render) | 2.4 ms (prerendered) |
+
+So after the shell and a 100-row data route, Expo is about 13% heavier gzipped (6% brotli) than Next on
+`/records` and about 6% heavier on `/methodology`. Adding the shell and the route cost only about 1 KB
+of JS; the gap is the fixed React Native Web + Expo Router floor, not app code. Next's page also
+carries 41 KB gz of external CSS that Expo inlines (13 KB gz), so the real gap is in JS.
+
+**One bundle for all routes: yes by default, and it matters.** Default export produced one entry
+bundle (`web bundles (1)`). Adding a route that imports `maplibre-gl` (the version `apps/web` pins)
+grew that one bundle from 380 KB to 663 KB gz, and every route, including `/methodology`, would have
+downloaded it. Setting `asyncRoutes: { web: true }` in the `expo-router` plugin splits per route (7
+files): the map code moved to a 274 KB gz `explore` chunk that `/methodology` and `/records` do not
+load, and server HTML stayed complete (h1 present, no error marker). The default must be changed on
+day one.
+
+**Data loaders and CSP.** Loaders need `unstable_useServerDataLoaders` in SDK 57. The loader embeds
+its data as an inline executable script (`globalThis.__EXPO_ROUTER_LOADER_DATA__ = ...`, 75 KB on
+`/records`) whose hash differs per page. The single-hash CSP that hydrated `/methodology` blocked it on
+`/records` (`loaderData` undefined; the page still hydrated and showed 100 rows, so the client
+recovered some other way, which I did not trace). A hash-based CSP would need a hash per prerendered
+page computed after export. Per-request SSR (`unstable_useServerRendering`) is still untested, so
+the nonce question is still open.
+
 Gate 1 verdict: **not passed; needs validation.** SEO head, JSON-LD and hydration are achievable.
 Open blockers: (1) nonce CSP: hash-based CSP or SDK 58 SSR, a security decision; (2) Tamagui extraction
 breaks server HTML as configured, so size must come from a trimmed config and slim imports, which land
-at parity with Next for a bare page but not yet for a real one; (3) single-bundle growth per route
-is untested. Next measurable step: port the real site shell and one data-backed route and re-weigh.
+at parity with Next for a bare page but not yet for a real one; (3) per-route splitting works but only with `asyncRoutes` turned on; (4) loader data needs per-page CSP
+hashes. Measured gap on a shell-plus-data route: about +13% gz vs Next, from the framework floor.
