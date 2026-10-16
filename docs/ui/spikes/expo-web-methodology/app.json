@@ -10,7 +10,7 @@
         {
           "unstable_useServerMiddleware": true,
           "unstable_useServerDataLoaders": true,
-          "asyncRoutes": { "web": true, "default": false }
+          "unstable_useServerRendering": true
         }
       ]
     ],

@@ -253,8 +253,35 @@ recovered some other way, which I did not trace). A hash-based CSP would need a 
 page computed after export. Per-request SSR (`unstable_useServerRendering`) is still untested, so
 the nonce question is still open.
 
+### Per-request CSP nonce with `unstable_useServerRendering` (SDK 57), same day
+
+Question: can Expo inject a per-request nonce, including into the loader data script? Source and the
+patch: `spikes/expo-web-methodology` (README, `+html.tsx`, `patch-render.py`). Target policy is the
+site's current shape, `script-src 'self' 'nonce-X' 'strict-dynamic'` (`csp.ts`; `style-src` already allows
+inline styles, so Tamagui and RN Web styles are not a CSP problem).
+
+| Step | Result |
+|---|---|
+| Per-request SSR on SDK 57 | **Works.** Output is a server renderer (`_expo/server/render.js`), no prerendered HTML; loaders receive the request. |
+| Nonce header per request, using only supported APIs | **Works.** `+html.tsx` runs per request, so it can make a nonce and call `setResponseHeaders`. |
+| Nonce on Expo's 5 external `<script>` tags | **Works** (clone `nonce` onto `bodyNodes`/`headNodes`). |
+| Nonce on the 3 inline scripts (hydrate flag + loader data, React streaming runtime) | **Does not work with supported APIs.** Expo calls `renderToReadableStream({progressiveChunkSize, bootstrapScriptContent, signal, onError})` with no `nonce`; React emits those scripts without one. Browser blocked them. |
+| Same, with a post-export patch that passes `nonce` to React (`patch-render.py`, AsyncLocalStorage shared with `+html.tsx`) | **Works.** All 8 scripts, including the 77 KB loader data script, carried the request's nonce. Under the real policy shape, `/records` hydrated, loader data was an object, no loader refetch, 100 rows, one h1, client navigation to `/methodology` loaded its route chunk under `strict-dynamic`, and no CSP errors for the current nonce appeared. 200 concurrent requests: 200 distinct nonces, every script carried only its own request's nonce. |
+
+Costs and caveats:
+
+- **The inline-script fix is a patch to a compiled Expo bundle**, not an API. It asserts two anchor
+  strings and breaks loudly on an Expo upgrade; it needs re-doing per SDK or an upstream change. SDK 58
+  makes server rendering stable but I did not test whether it adds a nonce option.
+- **`asyncRoutes` and SSR interact badly.** With both on, the route body arrives as a streamed
+  `<div hidden id="S:0">` segment revealed by an inline script; the first paint holds a fallback, and the
+  hydrated DOM kept an orphaned hidden copy (200 row anchors, two h1). With SSR and `asyncRoutes` off, content is in the
+  initial shell, no hidden segments, one h1, clean hydration. So the per-route splitting that fixed
+  bundle size (section above) costs crawlable first-shell content under SSR. Not resolved.
+- **Hash-based CSP is no longer the only path**, but the nonce path rests on the patch above.
+
 Gate 1 verdict: **not passed; needs validation.** SEO head, JSON-LD and hydration are achievable.
-Open blockers: (1) nonce CSP: hash-based CSP or SDK 58 SSR, a security decision; (2) Tamagui extraction
+Open blockers: (1) nonce CSP: achievable under SDK 57 SSR only with a post-export patch of Expo's renderer; (2) Tamagui extraction
 breaks server HTML as configured, so size must come from a trimmed config and slim imports, which land
-at parity with Next for a bare page but not yet for a real one; (3) per-route splitting works but only with `asyncRoutes` turned on; (4) loader data needs per-page CSP
+at parity with Next for a bare page but not yet for a real one; (3) per-route splitting needs `asyncRoutes`, which under SSR streams content into a hidden segment; (4) loader data needs per-page CSP
 hashes. Measured gap on a shell-plus-data route: about +13% gz vs Next, from the framework floor.

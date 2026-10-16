@@ -30,3 +30,13 @@ page-1 model from `export-records.mts` (gitignored; generate it with the command
 `unstable_useServerDataLoaders` and `asyncRoutes: { web: true }` in `app.json`. `explore.tsx` imports
 `maplibre-gl` only to test bundle splitting. Parity gaps in the port: no no-JS forms or `<details>`
 facets, no fonts, no icons, no Rooms sheet, no palette, no map glyphs.
+
+## Per-request CSP nonce (2026-10-16)
+
+`app.json` enables `unstable_useServerRendering` (SDK 57). `src/app/+html.tsx` makes a per-request
+nonce, sets `Content-Security-Policy` with `setResponseHeaders`, and clones the nonce onto every
+script/style/link node. Expo's own renderer passes no `nonce` to React, so `patch-render.py` patches
+`dist/server/_expo/server/render.js` after `expo export` (anchors are asserted, so an Expo upgrade
+fails loudly). Run: `CI=1 expo export --platform web && python3 patch-render.py dist/server/_expo/server/render.js
+&& expo serve`. `app.async-routes.json` is the same config plus `asyncRoutes`; see the plan doc for why
+it is not the default.
