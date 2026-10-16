@@ -16,13 +16,11 @@ test('the config carries both themes with every role plus the Tamagui aliases', 
   }
 });
 
-test('the emitted CSS carries every shipped role value, and the provider marks the theme', () => {
+test('the emitted CSS carries every shipped role value', () => {
   for (const name of ['light', 'dark'] as const) {
     for (const [role, value] of Object.entries(themes[name]))
       assert.ok(emitsCssValue(value), `${name}.${role} ${value}`);
   }
-  assert.match(render(<YStack />, 'light').raw, /\bt_light\b/);
-  assert.match(render(<YStack />, 'dark').raw, /\bt_dark\b/);
 });
 
 test('tokens: space, radius and the touch size', () => {

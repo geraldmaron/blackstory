@@ -8,7 +8,15 @@ test('a badge is a status with the tier, a hidden glyph and the label as its tex
   assert.equal(view.attr('span', 'role'), 'status');
   assert.equal(view.attr('span', 'data-tier'), 'medium');
   assert.equal(view.text(), '●●○ Medium confidence');
-  assert.ok(view.html.includes('aria-hidden="true"'), 'the glyph is hidden from assistive tech');
+  // Exactly one element is hidden from assistive tech and it is the glyph; the frame and the label are exposed.
+  const hidden = view.html.match(/<span\b[^>]*aria-hidden="true"[^>]*>([^<]*)</g) ?? [];
+  assert.equal(hidden.length, 1);
+  assert.match(hidden[0]!, />●○?●?/);
+  assert.doesNotMatch(
+    view.tags('span').find((t) => t.includes('role="status"'))!,
+    /aria-hidden/,
+  );
+  assert.doesNotMatch(view.html, /aria-hidden="true"[^>]*>Medium confidence/);
 });
 
 test('default labels, a custom label, and the three marks', () => {

@@ -1,8 +1,10 @@
 /**
  * Test helpers for kit components: render to static markup inside the design system's provider and
  * read the result as plain data. No DOM, no browser: Tamagui renders to HTML under Node, and the
- * assertions that matter (landmarks, roles, text, which theme role a style resolves to) are all
- * visible in that markup. Visual correctness is the Playwright baseline's job, not this file's.
+ * assertions that matter (landmarks, roles, text, which theme ROLE a style uses) are all visible in that
+ * markup. What markup cannot show is which theme is active: Tamagui applies the theme class after mount, so
+ * light and dark renders are identical strings. Theme values are therefore verified at the token level
+ * (config and contrast tests) and visually (Playwright), never by reading a theme class here. Visual correctness is the Playwright baseline's job, not this file's.
  */
 import type { ReactElement } from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
