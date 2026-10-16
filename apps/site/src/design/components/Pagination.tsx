@@ -44,6 +44,11 @@ const Frame = styled(XStack, {
 });
 const Pages = styled(XStack, {
   render: 'ul',
+  // A View defaults to flex-shrink 0, so without these the list keeps its one-line width and runs past
+  // the card at 375px instead of wrapping.
+  flexShrink: 1,
+  minWidth: 0,
+  maxWidth: '100%',
   alignItems: 'center',
   flexWrap: 'wrap',
   gap: '$1',

@@ -89,3 +89,17 @@ test('pagination uses theme roles and token focus in both themes', () => {
     assert.doesNotMatch(view.html, /#[0-9a-f]{3,8}\b|rgba?\(/i);
   }
 });
+
+test('the page list can shrink and wrap, so a long window does not overflow a narrow card', () => {
+  const view = render(
+    <Pagination
+      page={6}
+      pageCount={12}
+      pageSize={20}
+      total={230}
+      hrefForPage={(p) => `/r?page=${p}`}
+    />,
+  );
+  assert.match(view.raw, /max-width:100%/);
+  assert.match(view.raw, /flex-shrink:1/);
+});
