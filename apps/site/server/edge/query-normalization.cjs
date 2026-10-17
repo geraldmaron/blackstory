@@ -35,7 +35,7 @@ const SEARCH_PAGE_PARAM_ALLOWLIST = [
 const LAW_PAGE_PARAM_ALLOWLIST = ['q', 'kind', 'topic', 'sort'];
 const STORIES_PAGE_PARAM_ALLOWLIST = [
   'q',
-  'kind',
+  'format',
   'collection',
   'tag',
   'era',
