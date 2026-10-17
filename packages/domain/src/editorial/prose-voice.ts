@@ -1,6 +1,6 @@
 /**
  * Word-level voice checks for narrative prose, shared by every surface written under
- * docs/content/neo-voice.md (chapters, articles, Lives readings and accounts).
+ * docs/content/neo-voice.md (chapters, entries, Lives readings and accounts).
  *
  * The voice document has long said "a grep gate enforces" contractions and em dashes. This module
  * is that gate. It checks only what a pattern can decide without judgment: the never-list's
@@ -20,8 +20,8 @@ export type ProseVoiceFinding = {
 };
 
 /**
- * Publisher self-reference and sibling-chapter navigation. Moved here unchanged from the article
- * gate so articles and Lives answer to one list.
+ * Publisher self-reference and sibling-chapter navigation. Moved here unchanged from the story
+ * gate so stories and Lives answer to one list.
  */
 export const SELF_REFERENCE_PATTERNS: readonly {
   readonly label: string;

@@ -1,10 +1,10 @@
 /**
  * Stories index at `/stories`: the single long-form publication surface. A story is one
- * published piece, and `kind` says under which editorial contract — `chapter` for the
- * era-immersion long-forms, `article` for short entries (a paragraph of context plus
+ * published piece, and `format` says under which editorial contract — `chapter` for the
+ * era-immersion long-forms, `entry` for short entries (a paragraph of context plus
  * individually cited call-outs, published in ordered collections).
  *
- * Both kinds share this index on purpose. A reader looking for what the archive says
+ * Both formats share this index on purpose. A reader looking for what the archive says
  * about a subject should not have to know which contract the answer was written under.
  * Bare `/stories` shows every published Story.
  *
@@ -16,7 +16,7 @@
 import type { Metadata } from 'next';
 import { buildStaticPageMetadata } from '../../lib/seo/metadata-builders';
 import { WalkOffRamp } from '../walk-off-ramp';
-import { listPublicArticleListItems } from '../../lib/articles/source';
+import { listPublicStoryListItems } from '../../lib/stories/source';
 import { RECORDS_PAGE_SIZE } from '../../lib/records/build-records-index';
 import {
   CardGrid,
@@ -63,7 +63,7 @@ type StoriesPageProps = {
 };
 
 /** Not "Record": `/records` is the unrelated whole-archive entity index. See stories-index.ts. */
-const KIND_LABELS: Record<string, string> = { chapter: 'Chapter', article: 'Entry' };
+const FORMAT_LABELS: Record<string, string> = { chapter: 'Chapter', entry: 'Entry' };
 
 /**
  * The lead only renders in the default browse state — `showsShelves` requires the collection
@@ -74,11 +74,11 @@ const LEAD_FLAG = 'Start here';
 
 export default async function StoriesIndexPage({ searchParams }: StoriesPageProps) {
   const query = parseStoriesQuery(await searchParams);
-  const { items, source } = await listPublicArticleListItems();
+  const { items, source } = await listPublicStoryListItems();
   const { publishedCount, eraSpanLabel, placeLabel } = computeStoriesFacts(items);
   const filtered = sortItems(filterItems(items, query), query.sort);
   const notice = storiesNotice(source, items.length, filtered.length);
-  const kindChips = buildKindChips(items, query);
+  const formatChips = buildKindChips(items, query);
   // Kind shows as the current chip. Everything else that narrows the list gets a removable chip,
   // because a collection or era arrives from the rail or a shared link and was invisible here.
   const readable = (value: string) => value.replace(/[-_]+/g, ' ');
@@ -182,7 +182,7 @@ export default async function StoriesIndexPage({ searchParams }: StoriesPageProp
           /* Narrowing already in the URL rides along, so submitting the search box refines the
              current view instead of silently resetting it. Defaults stay out of the URL. */
           preserved={{
-            kind: query.kind,
+            format: query.format,
             collection: query.collection,
             tag: query.tag,
             era: query.era,
@@ -193,8 +193,8 @@ export default async function StoriesIndexPage({ searchParams }: StoriesPageProp
           clearHref="/stories"
           rows={[
             {
-              label: 'Filter by kind',
-              chips: kindChips.map((chip) => ({
+              label: 'Filter by format',
+              chips: formatChips.map((chip) => ({
                 label: chip.label,
                 href: chip.href,
                 active: chip.active,
@@ -230,9 +230,9 @@ export default async function StoriesIndexPage({ searchParams }: StoriesPageProp
                   {/* The collection leads, because it is the thing a reader can follow from
                       here; the kind and the era are what the row already is. */}
                   {[
-                    lead.series?.label,
-                    lead.series?.positionLabel,
-                    KIND_LABELS[lead.kind ?? 'chapter'] ?? 'Story',
+                    lead.collection?.label,
+                    lead.collection?.positionLabel,
+                    FORMAT_LABELS[lead.format ?? 'chapter'] ?? 'Story',
                     lead.eraLabel,
                   ]
                     .filter((fact): fact is string => Boolean(fact))
@@ -243,7 +243,7 @@ export default async function StoriesIndexPage({ searchParams }: StoriesPageProp
                 </h2>
                 <p className="ds-stories-lead__summary">{lead.summary}</p>
                 <a className="ds-cta ds-cta--copper" href={`/stories/${lead.slug}`}>
-                  {lead.kind === 'article' ? 'Read the entry' : 'Read the chapter'}
+                  {lead.format === 'entry' ? 'Read the entry' : 'Read the chapter'}
                 </a>
               </div>
               {lead.heroImage ? (
@@ -289,8 +289,8 @@ export default async function StoriesIndexPage({ searchParams }: StoriesPageProp
                         four of nine, and a row index is a fraction of the row rather than of the
                         collection the reader is being offered. */}
                     <span className="ds-stories-shelf__index">
-                      {item.series?.positionLabel ??
-                        `${KIND_LABELS[item.kind ?? 'chapter'] ?? 'Entry'} ${index + 1}`}
+                      {item.collection?.positionLabel ??
+                        `${FORMAT_LABELS[item.format ?? 'chapter'] ?? 'Entry'} ${index + 1}`}
                     </span>
                     <span className="ds-stories-shelf__entry-title">{item.title}</span>
                     <span className="ds-stories-shelf__entry-summary">{item.summary}</span>
@@ -308,7 +308,7 @@ export default async function StoriesIndexPage({ searchParams }: StoriesPageProp
                   <RoomCard
                     key={item.slug}
                     href={`/stories/${item.slug}`}
-                    kind={KIND_LABELS[item.kind ?? 'chapter'] ?? 'Story'}
+                    kind={FORMAT_LABELS[item.format ?? 'chapter'] ?? 'Story'}
                     icon="stories"
                     {...(item.heroImage
                       ? { media: { ...item.heroImage, fit: 'contain' as const } }
@@ -332,7 +332,7 @@ export default async function StoriesIndexPage({ searchParams }: StoriesPageProp
             <RoomCard
               key={item.slug}
               href={`/stories/${item.slug}`}
-              kind={KIND_LABELS[item.kind ?? 'chapter'] ?? 'Story'}
+              kind={FORMAT_LABELS[item.format ?? 'chapter'] ?? 'Story'}
               icon="stories"
               {...(item.heroImage ? { media: { ...item.heroImage, fit: 'contain' as const } } : {})}
               title={item.title}

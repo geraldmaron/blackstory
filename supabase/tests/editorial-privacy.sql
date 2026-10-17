@@ -23,7 +23,7 @@ BEGIN
  EXCEPTION WHEN insufficient_privilege THEN NULL;
  END;
  BEGIN
-   PERFORM id FROM reference.articles;
+   PERFORM id FROM reference.stories;
    RAISE EXCEPTION 'Public credential read private article drafts';
  EXCEPTION WHEN insufficient_privilege THEN NULL;
  END;

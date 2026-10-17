@@ -20,9 +20,9 @@ import {
   type LivesMilestoneFigure,
   type LivesMilestonePanel,
 } from '../../lib/lives/lives-milestones';
-import type { HydratedArticle } from '../../lib/articles/hydrate';
-import { ArticleBody } from '../article/ArticleBody';
-import { ArticleReferences } from '../article/ArticleReferences';
+import type { HydratedStory } from '../../lib/stories/hydrate';
+import { StoryBody } from '../story/StoryBody';
+import { StoryReferences } from '../story/StoryReferences';
 import { LivesAccount } from './LivesAccount';
 import { LivesTurn } from './LivesTurn';
 import { livesTurnFor } from '../../lib/lives/lives-turns';
@@ -175,7 +175,7 @@ function ContextBlock({ context }: { readonly context: LivesMilestoneContext }) 
   );
 }
 
-type ReaderPanel = LivesMilestonePanel<HydratedArticle>;
+type ReaderPanel = LivesMilestonePanel<HydratedStory>;
 
 /**
  * The distance between the Black and white figures, in words. It is a derived measurement with its
@@ -333,7 +333,7 @@ function EraPanel({
 
         {narrative ? (
           <section className="lives-era__narrative" aria-label="What happened in this stretch">
-            <ArticleBody article={narrative} />
+            <StoryBody story={narrative} />
           </section>
         ) : null}
 
@@ -394,7 +394,7 @@ function EraPanel({
           {narrative && narrative.references.length > 0 ? (
             <details className="lives-era__drawer">
               <summary>Sources for this stretch ({narrative.references.length})</summary>
-              <ArticleReferences references={narrative.references} />
+              <StoryReferences references={narrative.references} />
             </details>
           ) : null}
         </div>
@@ -411,7 +411,7 @@ export function LivesMilestoneExperience({
   readonly bundle: LivesAreaBundle;
   readonly milestone: LivesMilestone;
   /** Era narratives by era id, already numbered continuously. Absent until a column is written. */
-  readonly narratives?: ReadonlyMap<string, HydratedArticle>;
+  readonly narratives?: ReadonlyMap<string, HydratedStory>;
 }) {
   const panels = buildLivesMilestonePanels(bundle, milestone, narratives);
 

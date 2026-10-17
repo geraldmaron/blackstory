@@ -299,7 +299,7 @@ const doiHttpClient: SafeHttpClient = async (request) => {
 
 /**
  * DOI resolution gate: live network call against
- * Crossref/OpenAlex, gated behind CHECK_DOIS=1 (mirrors articles.ts's and
+ * Crossref/OpenAlex, gated behind CHECK_DOIS=1 (mirrors stories.ts's and
  * theme-packets.ts's gateDoiCitations). Unlike those CLI-validate gates — which throw
  * to hard-fail a fixture batch — this returns issue strings instead of throwing, since
  * runEditorialJudge processes many subjects concurrently and a single bad DOI must not
@@ -459,7 +459,7 @@ async function judgeOneSubject(input: {
     );
     const validation = validateEditorialDrafts(drafts, { allowedCitationHrefs });
     // Live network call so gated behind CHECK_DOIS=1 rather
-    // than run unconditionally like the offline checks above — mirrors articles.ts/
+    // than run unconditionally like the offline checks above — mirrors stories.ts/
     // theme-packets.ts's CHECK_DOIS gating for scholarly citations.
     const doiIssues =
       process.env.CHECK_DOIS === '1' && drafts.claims

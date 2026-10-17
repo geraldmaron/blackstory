@@ -5,7 +5,7 @@ import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import { ENTITY_KINDS } from '../entity-kinds.js';
 import {
-  ARTICLE_CONTENT_EXPECTATIONS,
+  STORY_CONTENT_EXPECTATIONS,
   CONTENT_EXPECTATIONS,
   CONTENT_EXPECTATIONS_SPEC_VERSION,
   countNarrativeParagraphs,
@@ -19,8 +19,8 @@ test('every entity kind has a spec', () => {
   for (const kind of ENTITY_KINDS) {
     assert.equal(CONTENT_EXPECTATIONS[kind].appliesTo, kind);
   }
-  assert.equal(ARTICLE_CONTENT_EXPECTATIONS.appliesTo, 'article');
-  assert.equal(specForKind('article'), ARTICLE_CONTENT_EXPECTATIONS);
+  assert.equal(STORY_CONTENT_EXPECTATIONS.appliesTo, 'story');
+  assert.equal(specForKind('story'), STORY_CONTENT_EXPECTATIONS);
 });
 
 test('paragraph counting splits on blank lines and ignores fragments', () => {

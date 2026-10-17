@@ -115,8 +115,8 @@ in ownership, decision-making, and content — not consulted after the fact.
 **Binding rule, mapped onto this repo's existing staged-review pattern
 (`research-operations.md`):** story packets already pass through a human approval gate
 (`story-research-run --commit` → quarantine `story_packet` → **Story review** desk,
-`apps/web/src/admin/stories/story-review-queue.ts` / `story-review-copy.ts`) before a seed handoff
-is ever pasted into `public-story-seed.ts`. v1 community review is a **named advisory reader
+`apps/web/src/admin/stories/story-review-queue.ts` / `story-review-copy.ts`) before an approved
+packet becomes an editable story draft. v1 community review is a **named advisory reader
 step inserted into that same lane**, not a parallel workflow: before a packet with sensitive
 subject matter (redlining, racial violence, forced displacement, family separation) moves from
 `needs_evidence`/draft to `approved`, the review desk records a `communityReviewNote` (who was

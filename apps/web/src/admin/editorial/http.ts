@@ -42,7 +42,7 @@ export async function editorialBody(request: Request): Promise<Record<string, un
         length += part.value.byteLength;
         if (length > 1000000) {
           await reader.cancel();
-          throw new Error('This article is too large to save.');
+          throw new Error('This story is too large to save.');
         }
         text += decoder.decode(part.value, { stream: true });
       }
@@ -53,6 +53,6 @@ export async function editorialBody(request: Request): Promise<Record<string, un
   }
   const value: unknown = JSON.parse(text);
   if (!value || typeof value !== 'object' || Array.isArray(value))
-    throw new Error('Invalid article request.');
+    throw new Error('Invalid story request.');
   return value as Record<string, unknown>;
 }

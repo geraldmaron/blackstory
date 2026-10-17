@@ -1,29 +1,29 @@
 /** Entity editorial proposals use the existing quarantined intake and canonical audit boundary. */
 import { randomUUID } from 'node:crypto';
 import { entityEditorialProposalSchema, type EntityEditorialProposal } from '@repo/schemas';
-import { articleCitedEntities } from '@repo/domain/publication/cites-edge';
+import { storyCitedEntities } from '@repo/domain/publication/cites-edge';
 import { workDigest } from '@repo/ops-data/management';
 import { managementEntitySnapshot } from '@repo/ops-data/management/catalog';
 import { getPostgresPool, queryPostgres } from '../lib/canonical-postgres-client';
 import { editorialWrite, EditorialConflict, type Actor } from './store';
 import { commitCanonicalWrite } from '../lib/canonical-write';
 import { insertSourceAndEvidence } from '../cases/promote-case';
-import { articleDraftSchema } from '@repo/schemas';
+import { storyDraftSchema } from '@repo/schemas';
 import {
   rowToProjectionAuthoring,
-  type ArticleRow,
+  type StoryRow,
   REFERENCE_COLUMNS,
-} from '../../../../../packages/ops-data/scripts/lib/article-lifecycle';
+} from '../../../../../packages/ops-data/scripts/lib/story-lifecycle';
 export async function readEntityEditorial(id: string) {
   const snapshot = await managementEntitySnapshot(getPostgresPool(), id);
   if (!snapshot) return null;
-  const [articles, published, proposals, relationships] = await Promise.all([
-    queryPostgres<ArticleRow>(
-      `SELECT ${REFERENCE_COLUMNS} FROM reference.articles WHERE $1=ANY(related_entity_ids) OR body @> $2::jsonb`,
+  const [stories, published, proposals, relationships] = await Promise.all([
+    queryPostgres<StoryRow>(
+      `SELECT ${REFERENCE_COLUMNS} FROM reference.stories WHERE $1=ANY(related_entity_ids) OR body @> $2::jsonb`,
       [id, JSON.stringify([{ type: 'mapInset', entityId: id }])],
     ),
     queryPostgres(
-      "SELECT payload FROM published.release_articles a JOIN published.active_release r ON r.release_id=a.release_id AND r.id='active' WHERE payload->'relatedEntityIds' ? $1 OR payload->'body' @> $2::jsonb",
+      "SELECT payload FROM published.release_stories a JOIN published.active_release r ON r.release_id=a.release_id AND r.id='active' WHERE payload->'relatedEntityIds' ? $1 OR payload->'body' @> $2::jsonb",
       [id, JSON.stringify([{ type: 'mapInset', entityId: id }])],
     ),
     queryPostgres<{ id: string; payload: { proposal: EntityEditorialProposal }; status: string }>(
@@ -40,12 +40,12 @@ export async function readEntityEditorial(id: string) {
     beforeHash: workDigest(snapshot),
     summary: String(editorial.summary ?? ''),
     historicalContext: String(editorial.historicalContext ?? ''),
-    articles: articles.map((row) => {
-      const draft = articleDraftSchema.parse(rowToProjectionAuthoring(row));
+    stories: stories.map((row) => {
+      const draft = storyDraftSchema.parse(rowToProjectionAuthoring(row));
       return {
         slug: row.slug,
         title: row.title,
-        relation: articleCitedEntities({ ...draft, releaseId: 'draft' }).get(id),
+        relation: storyCitedEntities({ ...draft, releaseId: 'draft' }).get(id),
       };
     }),
     published: published.map((row) => ({ slug: row.payload.slug, title: row.payload.title })),

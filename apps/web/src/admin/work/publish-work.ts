@@ -61,11 +61,11 @@ export async function copyRelease(db: PoolClient, before: string, after: string)
       if (column.name === 'release_id') return '$2::text';
       if (table.table_name === 'search_index' && column.name === 'id')
         return "$2 || ':' || entity_id";
-      // Entity and article release envelopes change. Other JSON may contain
+      // Entity and story release envelopes change. Other JSON may contain
       // historical release references or signed payloads whose bytes must remain intact.
       if (
         (table.table_name === 'release_entities' && column.name === 'projection') ||
-        (table.table_name === 'release_articles' && column.name === 'payload')
+        (table.table_name === 'release_stories' && column.name === 'payload')
       )
         return `jsonb_set(${name},'{releaseId}',to_jsonb($2::text))`;
       return name;
@@ -76,14 +76,14 @@ export async function copyRelease(db: PoolClient, before: string, after: string)
       [before, after],
     );
   }
-  const articles = await db.query(
-    'SELECT article_id,payload FROM published.release_articles WHERE release_id=$1',
+  const stories = await db.query(
+    'SELECT story_id,payload FROM published.release_stories WHERE release_id=$1',
     [after],
   );
-  for (const row of articles.rows)
+  for (const row of stories.rows)
     await db.query(
-      'UPDATE published.release_articles SET content_hash=$3 WHERE release_id=$1 AND article_id=$2',
-      [after, row.article_id, byteHash(JSON.stringify(row.payload))],
+      'UPDATE published.release_stories SET content_hash=$3 WHERE release_id=$1 AND story_id=$2',
+      [after, row.story_id, byteHash(JSON.stringify(row.payload))],
     );
 }
 
@@ -759,12 +759,12 @@ export async function finalizeEditorialRelease(
         },
       })
     : undefined;
-  const articleRows = await db.query(
-    'SELECT payload FROM published.release_articles WHERE release_id=$1 ORDER BY article_id',
+  const storyRows = await db.query(
+    'SELECT payload FROM published.release_stories WHERE release_id=$1 ORDER BY story_id',
     [releaseId],
   );
-  const articlePath = `releases/${releaseId}/articles.json`;
-  const articlePayload = { releaseId, articles: articleRows.rows.map((r) => r.payload) };
+  const storyPath = `releases/${releaseId}/stories.json`;
+  const storyPayload = { releaseId, stories: storyRows.rows.map((r) => r.payload) };
   const manifest = signReleaseManifest(
     buildReleaseManifest({
       releaseId,
@@ -777,7 +777,7 @@ export async function finalizeEditorialRelease(
               { path: artifacts.entitiesListPath, hash: artifacts.entitiesListHash },
               { path: artifacts.searchIndexPath, hash: artifacts.searchIndexHash },
             ]),
-        { path: articlePath, hash: sha256Json(articlePayload as unknown as JsonValue) },
+        { path: storyPath, hash: sha256Json(storyPayload as unknown as JsonValue) },
       ],
       artifacts: rows.rows.map(({ projection }) => ({
         entityId: String((projection as Json).id),
@@ -795,7 +795,7 @@ export async function finalizeEditorialRelease(
     mobile?.artifacts.map((artifact) => [artifact.path, artifact]) ?? [],
   );
   const uploads = [
-    [articlePath, articlePayload] as const,
+    [storyPath, storyPayload] as const,
     ...(mobile
       ? mobile.artifacts.map((a) => [a.path, a.json] as const)
       : ([
@@ -813,7 +813,7 @@ export async function finalizeEditorialRelease(
   ] as const;
   let uploadFailure: unknown;
   // Leave time for in-flight upload/readback requests and transaction rollback before
-  // the article routes reach their 800-second hosting limit.
+  // the story routes reach their 800-second hosting limit.
   const uploadDeadline = Date.now() + 8 * 60 * 1000;
   await mapWithConcurrency(uploads, 8, async ([path, artifact]) => {
     if (uploadFailure) return;

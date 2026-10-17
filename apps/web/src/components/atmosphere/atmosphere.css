@@ -123,21 +123,21 @@
   color: var(--ds-fixed-paper);
 }
 
-.ds-story-article__body {
+.ds-story-reading__body {
   max-width: var(--ds-content-max);
 }
 
-.ds-story-article__body > section {
+.ds-story-reading__body > section {
   padding-top: var(--ds-space-6);
   border-top: var(--ds-border-width) solid var(--ds-rule);
 }
 
-.ds-story-article__body > section:first-child {
+.ds-story-reading__body > section:first-child {
   border-top: none;
   padding-top: 0;
 }
 
-.ds-story-article__footer {
+.ds-story-reading__footer {
   margin-top: var(--ds-space-8);
 }
 

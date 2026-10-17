@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { articleDraftSchema, editorialContributorMutationSchema } from './editorial.js';
-import { publicArticleProjectionSchema } from './public-articles.js';
+import { storyDraftSchema, editorialContributorMutationSchema } from './editorial.js';
+import { publicStoryProjectionSchema } from './public-stories.js';
 const base = {
   id: 'draft',
   slug: 'working-draft',
@@ -10,7 +10,7 @@ const base = {
   eraLabel: '',
   placeLabel: '',
   publishedAt: '2026-10-14',
-  kind: 'article',
+  kind: 'story',
   tags: [],
   relatedEntityIds: [],
   contributors: [],
@@ -35,15 +35,15 @@ test('unfinished typed fields survive draft persistence but fail publication', (
     },
     { type: 'image', image: { url: '', alt: '', credit: '', rightsStatus: 'public_domain' } },
   ];
-  const draft = articleDraftSchema.parse({ ...base, body: blocks });
+  const draft = storyDraftSchema.parse({ ...base, body: blocks });
   assert.deepEqual(draft.body, blocks);
   assert.equal(draft.references[0]!.url, 'unfinished');
   assert.equal(
-    publicArticleProjectionSchema.safeParse({ ...draft, releaseId: 'preview' }).success,
+    publicStoryProjectionSchema.safeParse({ ...draft, releaseId: 'preview' }).success,
     false,
   );
   assert.equal(
-    articleDraftSchema.safeParse({
+    storyDraftSchema.safeParse({
       ...base,
       body: [{ type: 'html', html: '<script>alert(1)</script>' }],
     }).success,
@@ -51,7 +51,7 @@ test('unfinished typed fields survive draft persistence but fail publication', (
   );
 });
 test('public contributor snapshots contain roles and no account identifiers', () => {
-  const parsed = publicArticleProjectionSchema.parse({
+  const parsed = publicStoryProjectionSchema.parse({
     ...base,
     releaseId: 'test',
     title: 'A title',

@@ -1,8 +1,8 @@
 /**
  * Model routing policy. Codifies, in one reviewed module, which model tier
  * each research lane uses instead of leaving it to scattered `EDITORIAL_LLM_PROVIDER` /
- * `OPENROUTER_MODELS` / `STORY_REWRITE_MODEL(S)` env defaults (see `llm-provider.ts` and
- * `story-rewrite.ts`, which remain the actual HTTP clients this module wraps).
+ * `OPENROUTER_MODELS` env defaults (see `llm-provider.ts`, which remains the actual HTTP client this
+ * module wraps).
  *
  * Tier names mirror `research.runs.mode` (`supabase/migrations/20260721041950_research_kernel_ledger.sql`)
  * so a run's mode and its model tier are the same vocabulary end to end:
@@ -152,7 +152,7 @@ export function rosterForTier(
 
 /**
  * Builds the provider for a lane per the routing table. `paidRoster`/`freeRoster` let callers
- * pass the actual current env-configured rosters (e.g. `DEFAULT_STORY_REWRITE_MODELS`) instead
+ * pass the actual current env-configured rosters (e.g. `DEFAULT_OPENROUTER_MODELS`) instead
  * of this module guessing; it never invents model names.
  */
 export function createLaneProvider(

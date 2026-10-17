@@ -1,12 +1,12 @@
 /**
- * Codified per-kind content expectations — the minimum bar an entity record (or article) must
+ * Codified per-kind content expectations — the minimum bar an entity record (or story) must
  * meet before it reads as "covered" rather than a stub. This is the data-driven counterpart to
  * the structural publish gates (`../citations/completeness-gate.ts`, `../relevance/notability-gate.ts`):
  * those gate *integrity* (every claim cited, inclusion basis recorded); this gates *depth*.
  *
  * Design rules:
  * - Specs are data, not prose: one `ContentExpectationSpec` per entity kind plus one for
- *   articles, versioned via `CONTENT_EXPECTATIONS_SPEC_VERSION` so audit rows recorded against
+ *   stories, versioned via `CONTENT_EXPECTATIONS_SPEC_VERSION` so audit rows recorded against
  *   an older spec remain interpretable.
  * - Evaluation is deterministic and serializable: `evaluateContentExpectations` returns a
  *   `ContentAuditResult` with one reasoned pass/fail per check, suitable for appending to an
@@ -31,8 +31,8 @@ const COVERAGE_RANK: Record<ResearchCoverageTier, number> = {
 };
 
 export interface ContentExpectationSpec {
-  /** Kind this spec applies to, or 'article' for the chapters/articles spine. */
-  readonly appliesTo: EntityKind | 'article';
+  /** Kind this spec applies to, or 'story' for the chapters and entries spine. */
+  readonly appliesTo: EntityKind | 'story';
   /** Minimum paragraphs of narrative prose (historicalContext + extendedNarrative, blank-line separated). */
   readonly minNarrativeParagraphs: number;
   /** Whether an explicit impact-on-Black-Americans statement is required. */
@@ -110,9 +110,9 @@ export const CONTENT_EXPECTATIONS: Record<EntityKind, ContentExpectationSpec> = 
   other: { appliesTo: 'other', ...BASELINE, minResearchCoverage: 'minimal' },
 };
 
-/** Articles/chapters: long-form by definition. */
-export const ARTICLE_CONTENT_EXPECTATIONS: ContentExpectationSpec = {
-  appliesTo: 'article',
+/** Stories (chapters and entries); long-form by definition. */
+export const STORY_CONTENT_EXPECTATIONS: ContentExpectationSpec = {
+  appliesTo: 'story',
   minNarrativeParagraphs: 6,
   requiresImpactStatement: true,
   minDistinctSources: 2,
@@ -122,7 +122,7 @@ export const ARTICLE_CONTENT_EXPECTATIONS: ContentExpectationSpec = {
 /** Neutral input shape so callers can evaluate canonical rows, projections, or drafts. */
 export interface ContentExpectationInput {
   readonly id: string;
-  readonly kind: EntityKind | 'article';
+  readonly kind: EntityKind | 'story';
   /** Narrative prose blocks; paragraphs are blank-line separated within each block. */
   readonly narrativeBlocks: readonly (string | undefined)[];
   /** An explicit impact-on-Black-Americans statement, when authored. */
@@ -152,7 +152,7 @@ export interface ContentExpectationCheck {
 
 export interface ContentAuditResult {
   readonly subjectId: string;
-  readonly appliesTo: EntityKind | 'article';
+  readonly appliesTo: EntityKind | 'story';
   readonly specVersion: number;
   readonly passed: boolean;
   readonly checks: readonly ContentExpectationCheck[];
@@ -171,8 +171,8 @@ export function countNarrativeParagraphs(blocks: readonly (string | undefined)[]
   return count;
 }
 
-export function specForKind(kind: EntityKind | 'article'): ContentExpectationSpec {
-  return kind === 'article' ? ARTICLE_CONTENT_EXPECTATIONS : CONTENT_EXPECTATIONS[kind];
+export function specForKind(kind: EntityKind | 'story'): ContentExpectationSpec {
+  return kind === 'story' ? STORY_CONTENT_EXPECTATIONS : CONTENT_EXPECTATIONS[kind];
 }
 
 /** Evaluate a record against its kind's spec. Deterministic; safe to persist as an audit row. */

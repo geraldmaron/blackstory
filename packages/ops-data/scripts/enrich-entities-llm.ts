@@ -21,7 +21,7 @@ import {
   createOpenRouterLlmProvider,
   type LlmProvider,
 } from '../../operator-cli/src/llm-provider.ts';
-import { DEFAULT_STORY_REWRITE_MODELS } from '../../operator-cli/src/story-rewrite.ts';
+import { DEFAULT_OPENROUTER_MODELS } from '../../operator-cli/src/llm-provider.ts';
 import { logModelInvocation } from '../../operator-cli/src/model-invocation-log.ts';
 import { normalizePgConnectionString } from './lib/pg-connection.ts';
 import {
@@ -143,7 +143,7 @@ function resolveMeteredRetryProvider(): LlmProvider | null {
   if (PROVIDER_NAME !== 'tiered') return null;
   return createOpenRouterLlmProvider({
     fetchImpl: fetch,
-    models: [...DEFAULT_STORY_REWRITE_MODELS],
+    models: [...DEFAULT_OPENROUTER_MODELS],
     maxAttempts: 2,
   });
 }

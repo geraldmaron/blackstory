@@ -60,7 +60,7 @@ function validateClaimDraft(claim: EditorialClaimDraft, index: number, issues: s
   }
   // A claim's only source is its citationHref, so "forbid T4-only claims" (repo-k2q3 crit 4)
   // reduces to: that one URL must not classify as untrusted (T4). Same registry every
-  // surface consults (theme-packets.ts gateSourceTiers, articles.ts, this validator) —
+  // surface consults (theme-packets.ts gateSourceTiers, stories.ts, this validator) —
   // one policy module, not a parallel per-surface tier list.
   if (lookupSourceTier(claim.citationHref).tier === 'T4') {
     issues.push(

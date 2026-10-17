@@ -74,7 +74,7 @@ class CaptureBackfillDb implements CaptureDb {
     let rows: Record<string, unknown>[] = [];
     if (sql.includes('theme_impact_packets')) {
       rows = [{ ref_id: 'obs-1', url: 'https://census.gov/a' }];
-    } else if (sql.includes('reference.articles')) {
+    } else if (sql.includes('reference.stories')) {
       rows = [{ ref_id: 'article-1', url: 'https://loc.gov/b' }];
     } else if (sql.includes('release_entities')) {
       rows = [{ ref_id: 'entity-1', url: 'https://nps.gov/c' }];

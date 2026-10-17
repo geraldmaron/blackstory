@@ -8,7 +8,7 @@ import { createElement } from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
 import { test } from 'node:test';
 import { fileURLToPath } from 'node:url';
-import type { PublicArticleListItemDoc } from '@repo/schemas';
+import type { PublicStoryListItemDoc } from '@repo/schemas';
 import { FEATURED_SEED_IDS, getPublicEntity, listPublicEntities } from '../data/public-seed';
 import { buildExploreMapSource } from '../lib/map-experience/build-explore-map-source';
 import { isTulsaPlace, placeHref } from '../lib/place/public-place-path';
@@ -21,7 +21,7 @@ import {
   pickHomeStory,
 } from './home-first-paint';
 
-function storyDoc(overrides: Partial<PublicArticleListItemDoc> = {}): PublicArticleListItemDoc {
+function storyDoc(overrides: Partial<PublicStoryListItemDoc> = {}): PublicStoryListItemDoc {
   return {
     slug: 'the-count',
     title: 'Chapter: The Count',
@@ -34,7 +34,7 @@ function storyDoc(overrides: Partial<PublicArticleListItemDoc> = {}): PublicArti
     id: 'art_count',
     tags: [],
     ...overrides,
-  } as PublicArticleListItemDoc;
+  } as PublicStoryListItemDoc;
 }
 
 test('the featured set prefers non-Tulsa places; Greenwood is last-resort', () => {

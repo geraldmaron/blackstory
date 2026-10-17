@@ -11,7 +11,7 @@ import { fileURLToPath } from 'node:url';
 
 const read = (path: string) => readFileSync(fileURLToPath(new URL(path, import.meta.url)), 'utf8');
 const recordCss = read('./record-room.css');
-const articleCss = read('../../../components/article/article.css');
+const articleCss = read('../../../components/story/story.css');
 const placeCss = read('../../home-first-paint.css');
 const commandBarCss = read('../../../components/shell/command-bar.css');
 
@@ -42,11 +42,11 @@ test('a record photo sits in its own band, clipped, with the type below on the c
 test('a story hero sits in its own band with the headline below, no scrim or text shadow', () => {
   assert.match(
     articleCss,
-    /\.ds-article-mast__photo \{[^}]*position:\s*relative;[^}]*height:\s*clamp/s,
+    /\.ds-reading-mast__photo \{[^}]*position:\s*relative;[^}]*height:\s*clamp/s,
   );
   assert.doesNotMatch(
     articleCss,
-    /\.ds-article-mast\[data-media='photo'\] \.ds-article-mast__title[^{]*\{[^}]*text-shadow/s,
+    /\.ds-reading-mast\[data-media='photo'\] \.ds-reading-mast__title[^{]*\{[^}]*text-shadow/s,
   );
 });
 

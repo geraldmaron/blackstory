@@ -12,7 +12,7 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import { confidenceTierFromEvidenceInputs } from '@repo/public-contracts/evidence';
-import type { PublicArticleProjectionDoc, PublicEntityProjectionDoc } from '@repo/schemas';
+import type { PublicStoryProjectionDoc, PublicEntityProjectionDoc } from '@repo/schemas';
 import { createPostgresDataAccessReaders } from './postgres-data-access.js';
 import type { PostgresQueryFn } from './postgres-readers.js';
 
@@ -38,7 +38,7 @@ function projection(over: Partial<PublicEntityProjectionDoc>): PublicEntityProje
   } as PublicEntityProjectionDoc;
 }
 
-function article(over: Partial<PublicArticleProjectionDoc>): PublicArticleProjectionDoc {
+function article(over: Partial<PublicStoryProjectionDoc>): PublicStoryProjectionDoc {
   return {
     id: 'art_1',
     releaseId: RELEASE_ID,
@@ -52,12 +52,12 @@ function article(over: Partial<PublicArticleProjectionDoc>): PublicArticleProjec
     references: [],
     relatedEntityIds: [],
     ...over,
-  } as PublicArticleProjectionDoc;
+  } as PublicStoryProjectionDoc;
 }
 
 type FakeState = {
   readonly entities?: ReadonlyMap<string, PublicEntityProjectionDoc>;
-  readonly articles?: readonly PublicArticleProjectionDoc[];
+  readonly articles?: readonly PublicStoryProjectionDoc[];
   /** Incremented every time the article table is read, so the memo is observable. */
   readonly counts: { articleReads: number };
 };
@@ -74,7 +74,7 @@ function createFakeQuery(state: FakeState): PostgresQueryFn {
         },
       ];
     }
-    if (sql.includes('published.release_articles')) {
+    if (sql.includes('published.release_stories')) {
       state.counts.articleReads += 1;
       return (state.articles ?? []).map((payload) => ({ payload }));
     }
@@ -162,7 +162,7 @@ test('the article fold happens once per release, not once per record open', asyn
 
 test('an unreadable article table costs story links, never the record', async () => {
   const failing: PostgresQueryFn = async (sql, params = []) => {
-    if (sql.includes('published.release_articles')) throw new Error('relation does not exist');
+    if (sql.includes('published.release_stories')) throw new Error('relation does not exist');
     return createFakeQuery({
       counts: { articleReads: 0 },
       entities: new Map([['ent_a', projection({})]]),

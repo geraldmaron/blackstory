@@ -2,7 +2,7 @@
 
 Applies to public entity summaries, historical context, inclusion explanations, stories,
 chapters, captions and excerpts. The filename is retained for existing references.
-Article-specific machine gates apply only to their article formats. This protocol
+Story-specific machine gates apply only to their story formats. This protocol
 supplies the editorial judgment that citation attachment and schema checks cannot prove.
 
 ## 1. Record the exact assertion
@@ -75,8 +75,8 @@ historical context. It does **not** certify all public prose. Record prose revie
 with the exact revision; runtime enforcement of that binding remains a distinct engineering
 control, not a capability this document pretends to add.
 
-Article validation checks schema, references, source tiers, packet binding and other
-format-specific gates in `packages/ops-data/scripts/articles.ts`. Numerical reference
+Story validation checks schema, references, source tiers, packet binding and other
+format-specific gates in `packages/ops-data/scripts/stories.ts`. Numerical reference
 integrity is not proof that a sentence uses a number correctly or that the underlying
 measurement is true. Narrative entailment still needs review.
 
@@ -88,7 +88,7 @@ Run current gates without bypasses, then prepare the preview for the separate pu
 
 Retain the false wording, field, entity/release ID, counterevidence and proposed correction
 in the review record. Find derivatives: summary/context, claims, inclusion basis, era/place
-provenance, search cards, article references and cached release artifacts. Correct through
+provenance, search cards, story references and cached release artifacts. Correct through
 the authorized review/publication path; do not silently rewrite only the visible sentence.
 Use `blackstory-surface-triage` to verify database, artifact and actual rendered output after
 publication. Until then report “correction proposed,” not “fixed.”
@@ -99,7 +99,7 @@ Sources inspected 2026-10-07; these support the method, not a claim that BlackSt
 been externally certified:
 
 - [American Historical Association, Standards of Professional Conduct](https://www.historians.org/resource/statement-on-standards-of-professional-conduct/): critical scrutiny of primary and secondary evidence, transparent citation and honest limits.
-- [Digital Inquiry Group, lateral-reading research](https://misinforeview.hks.harvard.edu/article/lateral-reading-college-students-learn-to-critically-evaluate-internet-sources-in-an-online-course/): investigate the source and trace information outside the page being evaluated. Its findings do not calibrate this model's accuracy.
+- [Digital Inquiry Group, lateral-reading research](https://misinforeview.hks.harvard.edu/story/lateral-reading-college-students-learn-to-critically-evaluate-internet-sources-in-an-online-course/): investigate the source and trace information outside the page being evaluated. Its findings do not calibrate this model's accuracy.
 - [Oral History Association, Principles and Best Practices](https://oralhistory.org/principles-and-best-practices-revised-2018/): attend to narrators, communities, power and the conditions in which testimony is produced and used.
 
 Related: [research framework](../research/README.md), [citation standard](../research/citation-standard.md),

@@ -1,33 +1,33 @@
-"""Build packages/ops-data/fixtures/articles/presidents.ts from the verified research JSON.
+"""Build packages/ops-data/fixtures/stories/presidents.ts from the verified research JSON.
 
     python3 packages/ops-data/scripts/build-presidents-fixture.py \
-      packages/ops-data/fixtures/articles/presidents.ts
+      packages/ops-data/fixtures/stories/presidents.ts
 
 Entries are emitted at status `published`, which is what they are. Emitting `review` here
-would mean every rebuild silently demoted the whole live series: `apply` writes the
+would mean every rebuild silently demoted the whole live collection: `apply` writes the
 fixture's declared status over whatever is in the table, and `project` then drops anything
 not published out of the release. Publishing from the fixture also means each rebuild
 re-runs the strict published gates (T4 sources, the prose floor and uncited call-outs are
 hard errors there, warnings below), so a regression cannot reach the release quietly.
 
-Reads every group-*.json in ../fixtures/articles/presidents-research/. Those files are the
+Reads every group-*.json in ../fixtures/stories/presidents-research/. Those files are the
 Layer-1 research record: each fact with the URL actually fetched for it and a verbatim
 quote, per docs/methodology/chapter-fact-validation.md. They are kept in the repo because
 the fixture is generated from them — without them a sentence in a published entry has no
 traceable provenance, and there would be no way to rebuild after a correction.
 
-Reference discipline: the article schema's citation-integrity check requires every
+Reference discipline: the story schema's citation-integrity check requires every
 reference to be *used* and every inline marker to *resolve*, so this only emits a
 reference when something actually cites it. Call-out sources are cited in their bullet;
 president-level sources are cited on the context paragraph. Nothing is emitted that the
 research did not carry a fetched source for.
 
-The series indexes PEOPLE, not presidencies, and `number` is the number of that person's
+The collection indexes PEOPLE, not presidencies, and `number` is the number of that person's
 FIRST presidency. Two people have held non-consecutive presidencies: Cleveland (22nd and
 24th) and Trump (45th and 47th). Each gets one entry, at 22 and 45, whose `termLabel`
 carries both date ranges; 24 and 47 are deliberately vacant. That is forced rather than
 chosen. `position` is the collection's ordering key and has to be unique (gateSeriesPositions
-in scripts/articles.ts, and articles_series_position_unique on reference.articles), so a
+in scripts/stories.ts, and stories_collection_position_unique on reference.stories), so a
 second entry for the same person would have to invent a slug and a portrait for a record
 that is one person's. `ordinalLabel` is the escape hatch the two-presidency case needs:
 without it the display label is derived from `number` alone and reads "45th president" on a
@@ -37,7 +37,7 @@ import json, re, sys, glob, os
 
 # Hosts the shared source-tier registry (packages/domain/src/provenance/source-tiers.ts)
 # does not classify at T3 or better: user-editable transcriptions, a personal academic
-# site, a student paper, and a wire story. A published article cannot cite T4, so these
+# site, a student paper, and a wire story. A published entry cannot cite T4, so these
 # are dropped rather than laundered into the registry to make the build pass. A call-out
 # left with no source at all is dropped with them.
 UNTRUSTED_HOSTS = (
@@ -178,16 +178,16 @@ def build(president: dict) -> str:
     ordinal = president.get("ordinalLabel") or f"{number}{ORDINAL_SUFFIX(number)} president"
 
     return f"""  {{
-    id: 'article_potus_{number:02d}_{slug.replace('-', '_')}',
+    id: 'story_potus_{number:02d}_{slug.replace('-', '_')}',
     slug: '{slug}',
-    kind: 'article' as const,
-    title: 'President: {esc(name)}',
+    format: 'entry' as const,
+    title: '{esc(name)}',
     summary: '{esc(president['summary'])}',
     eraLabel: '{esc(president['termLabel'])}',
     placeLabel: 'United States',
     publishedAt: '2026-08-07',
     status: 'published' as const,
-    series: {{
+    collection: {{
       id: 'presidents',
       label: 'The presidents on the record',
       position: {number},
@@ -208,7 +208,7 @@ def main() -> None:
     out_dir = sys.argv[1]
     presidents = []
     research_dir = os.path.join(
-        os.path.dirname(__file__), "..", "fixtures", "articles", "presidents-research"
+        os.path.dirname(__file__), "..", "fixtures", "stories", "presidents-research"
     )
     for path in sorted(glob.glob(os.path.join(research_dir, "group-*.json"))):
         with open(path) as handle:
@@ -220,12 +220,12 @@ def main() -> None:
  * "The presidents on the record" — one record entry per presidency, covering what the
  * documented federal record shows about that administration and Black Americans.
  *
- * Kind is `article`, not `chapter`: each entry is a paragraph of context plus call-outs,
+ * Format is `entry`, not `chapter`: each entry is a paragraph of context plus call-outs,
  * where a call-out is one dated, documented act (a signature, a veto, an executive order,
  * an appointment, a refusal) carrying its own citation. That shape is deliberate. These
  * entries are read against each other, so they have to be comparable, and a bullet lifted
  * out of the page has to arrive with its receipt attached — `gateCalloutCitations` in
- * packages/ops-data/scripts/articles.ts enforces exactly that.
+ * packages/ops-data/scripts/stories.ts enforces exactly that.
  *
  * Sourcing follows docs/methodology/chapter-fact-validation.md: every fact was gathered
  * from fetched pages, never from model memory, with two independent sources from different
@@ -238,9 +238,9 @@ def main() -> None:
  * a hand edit here would silently detach a sentence from the source that was fetched for it.
  */
 
-export const presidentArticles = [
+export const presidentStories = [
 '''
-    footer = "\n];\n\nexport default presidentArticles;\n"
+    footer = "\n];\n\nexport default presidentStories;\n"
     with open(out_dir, "w") as handle:
         handle.write(header + entries + footer)
     print(f"wrote {len(presidents)} presidents")

@@ -21,35 +21,35 @@ import {
   faRotateRight,
 } from '@fortawesome/free-solid-svg-icons';
 import { Select } from 'baseui/select';
-import type { ArticleBodyBlockDoc, ArticleReferenceDoc } from '@repo/schemas';
-import { articleToDocument, documentToArticle } from './document-adapter';
+import type { StoryBodyBlockDoc, StoryReferenceDoc } from '@repo/schemas';
+import { storyToDocument, documentToStory } from './document-adapter';
 const Citation = Node.create({
   name: 'citation',
   inline: true,
   group: 'inline',
   atom: true,
   addAttributes: () => ({ refId: { default: '' } }),
-  parseHTML: () => [{ tag: 'span[data-article-citation]' }],
+  parseHTML: () => [{ tag: 'span[data-story-citation]' }],
   renderHTML: ({ node, HTMLAttributes }) => [
     'span',
     mergeAttributes(HTMLAttributes, {
-      'data-article-citation': node.attrs.refId,
+      'data-story-citation': node.attrs.refId,
       class: 'editorial-citation-token',
     }),
     `[${node.attrs.refId}]`,
   ],
 });
 const PreserveBlock = Extension.create({
-  name: 'preserveArticleBlock',
+  name: 'preserveStoryBlock',
   addGlobalAttributes: () => [
     {
       types: ['paragraph', 'heading', 'blockquote', 'bulletList', 'orderedList'],
-      attributes: { articleBlock: { default: null, renderHTML: () => ({}) } },
+      attributes: { storyBlock: { default: null, renderHTML: () => ({}) } },
     },
   ],
 });
 function EvidenceCard({ node, selected, extension, getPos, editor }: NodeViewProps) {
-  const block = node.attrs.articleBlock as ArticleBodyBlockDoc;
+  const block = node.attrs.storyBlock as StoryBodyBlockDoc;
   const label =
     block.type === 'image'
       ? block.image.alt || 'Image description needed'
@@ -91,7 +91,7 @@ const EvidenceBlock = Node.create({
   atom: true,
   draggable: true,
   addOptions: () => ({ onEdit: (_index: number) => {} }),
-  addAttributes: () => ({ articleBlock: { default: null, renderHTML: () => ({}) } }),
+  addAttributes: () => ({ storyBlock: { default: null, renderHTML: () => ({}) } }),
   parseHTML: () => [],
   renderHTML: () => ['div', { 'data-editorial-block': '' }],
   addNodeView: () => ReactNodeViewRenderer(EvidenceCard),
@@ -105,10 +105,10 @@ export function RichDocument({
   onEditBlock,
   onError,
 }: {
-  body: ArticleBodyBlockDoc[];
-  onChange: (body: ArticleBodyBlockDoc[]) => void;
+  body: StoryBodyBlockDoc[];
+  onChange: (body: StoryBodyBlockDoc[]) => void;
   editable: boolean;
-  references: ArticleReferenceDoc[];
+  references: StoryReferenceDoc[];
   onEditBlock: (index: number) => void;
   onError: (message: string) => void;
 }) {
@@ -136,21 +136,21 @@ export function RichDocument({
       PreserveBlock,
       EvidenceBlock.configure({ onEdit: (index: number) => callbacks.current.onEditBlock(index) }),
     ],
-    content: articleToDocument(body),
+    content: storyToDocument(body),
     editorProps: {
       attributes: {
         class: 'editorial-document__prose',
         role: 'textbox',
-        'aria-label': 'Article body',
+        'aria-label': 'Story body',
         'aria-multiline': 'true',
       },
     },
     onUpdate: ({ editor }) => {
       try {
-        callbacks.current.onChange(documentToArticle(editor.getJSON()));
+        callbacks.current.onChange(documentToStory(editor.getJSON()));
       } catch (error) {
         callbacks.current.onError(
-          error instanceof Error ? error.message : 'The article could not be saved.',
+          error instanceof Error ? error.message : 'The story could not be saved.',
         );
       }
     },
@@ -158,14 +158,14 @@ export function RichDocument({
   useEffect(() => {
     if (!editor) return;
     try {
-      if (JSON.stringify(documentToArticle(editor.getJSON())) !== JSON.stringify(body)) {
+      if (JSON.stringify(documentToStory(editor.getJSON())) !== JSON.stringify(body)) {
         const position = editor.state.selection.from;
-        editor.commands.setContent(articleToDocument(body), { emitUpdate: false });
+        editor.commands.setContent(storyToDocument(body), { emitUpdate: false });
         editor.commands.setTextSelection(Math.min(position, editor.state.doc.content.size));
       }
     } catch (error) {
       callbacks.current.onError(
-        error instanceof Error ? error.message : 'The article could not be restored.',
+        error instanceof Error ? error.message : 'The story could not be restored.',
       );
     }
   }, [body, editor]);
@@ -179,7 +179,7 @@ export function RichDocument({
       : 'paragraph';
   return (
     <div className="editorial-document">
-      <div className="editorial-document__toolbar" role="toolbar" aria-label="Article formatting">
+      <div className="editorial-document__toolbar" role="toolbar" aria-label="Story formatting">
         <div className="editorial-document__format">
           <Select
             size="compact"
@@ -289,7 +289,7 @@ export function RichDocument({
           />
         </div>
       </div>
-      {!editor && <p role="status">Loading article editor…</p>}
+      {!editor && <p role="status">Loading story editor…</p>}
       <EditorContent editor={editor} />
       <p className="editorial-document__help">
         Write in paragraphs, headings, lists and quotations. Insert source citations from the

@@ -28,7 +28,7 @@ function fakeDb(
       if (sql.includes('theme_impact_packets')) {
         return { rows: [{ ref_id: 'obs1', url: 'https://census.gov/a' }] as unknown as T[] };
       }
-      if (sql.includes('reference.articles')) {
+      if (sql.includes('reference.stories')) {
         return { rows: [{ ref_id: 'art1', url: 'https://census.gov/a' }] as unknown as T[] };
       }
       if (sql.includes('release_entities')) {

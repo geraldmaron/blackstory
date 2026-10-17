@@ -74,7 +74,7 @@ export async function collectCitedUrls(
   if (!allowed || allowed.has('article')) {
     const articles = await db.query<{ ref_id: string; url: string }>(
       `SELECT a.id AS ref_id, ref->>'url' AS url
-       FROM reference.articles a
+       FROM reference.stories a
        CROSS JOIN LATERAL jsonb_array_elements(a."references") ref
        WHERE jsonb_typeof(a."references") = 'array' AND ref->>'url' IS NOT NULL
        ORDER BY url ASC, ref_id ASC`,

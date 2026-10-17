@@ -142,7 +142,7 @@ export function buildMapSourceV1(
           : {}),
         ...(feature.properties.stateName ? { stateName: feature.properties.stateName } : {}),
         // Carried through from the entity, not re-derived: `readEntities` already folded the
-        // release's articles once. Absent when no story cites the record, which is most of them.
+        // release's stories once. Absent when no story cites the record, which is most of them.
         ...(entity.citingStories && entity.citingStories.length > 0
           ? { citingStories: entity.citingStories }
           : {}),

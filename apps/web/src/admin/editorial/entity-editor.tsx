@@ -349,12 +349,12 @@ export function EntityEditorialEditor({
       ) : (
         <p>No outgoing relationships recorded.</p>
       )}
-      <h3>Articles affected by this record</h3>
+      <h3>Stories affected by this record</h3>
       <p>Draft associations</p>
       <ul>
-        {details.articles.map((a) => (
+        {details.stories.map((a) => (
           <li key={a.slug}>
-            <Link href={`/admin/stories/articles/${a.slug}`}>{a.title}</Link> · {a.relation}
+            <Link href={`/admin/stories/${a.slug}`}>{a.title}</Link> · {a.relation}
           </li>
         ))}
       </ul>
@@ -366,7 +366,7 @@ export function EntityEditorialEditor({
           </li>
         ))}
       </ul>
-      <p>Article associations do not establish a historical relationship.</p>
+      <p>Story associations do not establish a historical relationship.</p>
     </section>
   );
 }

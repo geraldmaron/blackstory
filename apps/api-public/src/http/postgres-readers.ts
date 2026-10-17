@@ -3,8 +3,8 @@
  * Mirrors `apps/web/src/lib/public-data/postgres-readers.ts` for the mobile `/v1` API surface.
  */
 import {
-  publicArticleProjectionSchema,
-  type PublicArticleProjectionDoc,
+  publicStoryProjectionSchema,
+  type PublicStoryProjectionDoc,
   type PublicSearchProjectionDoc,
 } from '@repo/schemas';
 import { mapPostgresSearchIndexRow } from './postgres-search-index.js';
@@ -153,31 +153,31 @@ export async function listPublicSearchIndexDocs(
 }
 
 /**
- * Every article in the active release, as published projections.
+ * Every story in the active release, as published projections.
  *
- * The API surface has never read articles before — the phone got records and the map, and the
+ * The API surface has never read stories before — the phone got records and the map, and the
  * writing lived only on the site. It reads them now for one derived answer: which stories cite a
  * record (`@repo/domain/publication/cites-edge`). Mirrors
- * `apps/web/src/lib/articles/postgres-readers.ts`'s reader of the same name, including its
+ * `apps/web/src/lib/stories/postgres-readers.ts`'s reader of the same name, including its
  * `payload`-column shape and its ordering, so both surfaces fold the same list.
  *
- * A payload that fails the envelope schema is skipped rather than thrown: one malformed article
+ * A payload that fails the envelope schema is skipped rather than thrown: one malformed story
  * must not cost every record its story links.
  */
-export async function listPublicReleaseArticles(
+export async function listPublicReleaseStories(
   releaseId: string,
   query: PostgresQueryFn = queryPostgres,
-): Promise<readonly PublicArticleProjectionDoc[]> {
+): Promise<readonly PublicStoryProjectionDoc[]> {
   const rows = (await query(
     `SELECT payload
-     FROM published.release_articles
+     FROM published.release_stories
      WHERE release_id = $1
      ORDER BY published_at DESC, slug`,
     [releaseId],
   )) as { readonly payload: unknown }[];
-  const docs: PublicArticleProjectionDoc[] = [];
+  const docs: PublicStoryProjectionDoc[] = [];
   for (const row of rows) {
-    const parsed = publicArticleProjectionSchema.safeParse(row.payload);
+    const parsed = publicStoryProjectionSchema.safeParse(row.payload);
     if (parsed.success) docs.push(parsed.data);
   }
   return docs;

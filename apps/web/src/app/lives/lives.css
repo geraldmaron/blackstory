@@ -1654,7 +1654,7 @@
   padding: var(--ds-space-4) 0;
 }
 
-.lives-era__narrative .ds-article__body > :first-child {
+.lives-era__narrative .ds-reading__body > :first-child {
   margin-top: 0;
 }
 

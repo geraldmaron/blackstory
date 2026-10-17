@@ -12,7 +12,7 @@ export function editorialStorage(): ReturnType<typeof createClient>['storage'] {
 }
 export async function uploadEditorialMedia(
   actor: Actor,
-  articleId: string,
+  storyId: string,
   file: File,
   credit: string,
   rights: string,
@@ -38,15 +38,15 @@ export async function uploadEditorialMedia(
   return editorialWrite(
     actor,
     'research:write',
-    articleId,
-    'article.media',
+    storyId,
+    'story.media',
     'Attach image with recorded credit and rights',
     async (db) => {
-      const row = await db.query('SELECT id FROM reference.articles WHERE id=$1 FOR SHARE', [
-        articleId,
+      const row = await db.query('SELECT id FROM reference.stories WHERE id=$1 FOR SHARE', [
+        storyId,
       ]);
-      if (!row.rows.length) throw new Error('Save the article before uploading an image.');
-      const path = `${articleId}/${hash}/${id}`;
+      if (!row.rows.length) throw new Error('Save the story before uploading an image.');
+      const path = `${storyId}/${hash}/${id}`;
       const result = await editorialStorage()
         .from('editorial-media')
         .upload(path, bytes, { contentType: file.type, upsert: false });
@@ -57,9 +57,9 @@ export async function uploadEditorialMedia(
       )
         throw new Error('Image storage failed. Please retry.');
       const saved = await db.query<{ id: string }>(
-        `INSERT INTO reference.editorial_media(id,article_id,content_type,object_path,content_hash,byte_length,credit,rights_status,created_by)
+        `INSERT INTO reference.editorial_media(id,story_id,content_type,object_path,content_hash,byte_length,credit,rights_status,created_by)
       VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9) ON CONFLICT(object_path) DO UPDATE SET object_path=EXCLUDED.object_path RETURNING id`,
-        [id, articleId, file.type, path, hash, bytes.length, credit, rights, actor.uid],
+        [id, storyId, file.type, path, hash, bytes.length, credit, rights, actor.uid],
       );
       return {
         url: `${process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3048'}/admin/stories/media/${saved.rows[0]!.id}`,
