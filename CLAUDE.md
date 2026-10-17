@@ -218,3 +218,10 @@ _Add a brief overview of your project architecture_
 ## Conventions & Patterns
 
 _Add your project-specific conventions here_
+
+## Agent coordination (Claude Code ↔ Codex)
+
+Cross-agent roles, rules, and handoff protocol for this repo are the single source of
+truth in `COORDINATION.md` (imported below). Read `HANDOFF.md` for live session state.
+
+@COORDINATION.md
