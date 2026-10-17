@@ -356,3 +356,24 @@
     max-width: none;
   }
 }
+
+/* Sidebar queue badges: the work waiting behind a destination, at a glance. */
+.admin-base-nav-label {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  width: 100%;
+}
+.admin-base-nav-count {
+  min-width: 22px;
+  padding: 1px 7px;
+  border-radius: 999px;
+  border: 1px solid var(--ds-border);
+  background: var(--ds-surface);
+  font:
+    600 11px/18px var(--ds-font-mono),
+    monospace;
+  text-align: center;
+  color: var(--ds-ink);
+}

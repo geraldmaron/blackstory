@@ -6,7 +6,7 @@ import { EVIDENCE_ATTACH_INTENT_COPY } from './evidence-intake-copy';
 import '../../../admin/cases/case-queue.css';
 
 export const metadata = {
-  title: 'Attach evidence — BlackStory Admin',
+  title: 'Attach evidence',
   description: 'Propose evidence against a research case. Commit writes to quarantine only.',
 };
 

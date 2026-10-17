@@ -65,6 +65,7 @@ export const ADMIN_ROUTE_RULES: readonly AdminRouteRule[] = [
   { method: 'GET', pattern: '/admin/api/catalog/entity-ids', access: STAFF_READ },
   { method: 'GET', pattern: '/admin/api/discovery/runs', access: STAFF_READ },
   { method: 'GET', pattern: '/admin/api/graylist', access: STAFF_READ },
+  { method: 'GET', pattern: '/admin/api/queue-counts', access: STAFF_READ },
   { method: 'GET', pattern: '/admin/api/releases', access: STAFF_READ },
   { method: 'GET', pattern: '/admin/api/research-cases', access: STAFF_READ },
   { method: 'GET', pattern: '/admin/api/research-cases/:id', access: STAFF_READ },

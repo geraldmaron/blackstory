@@ -20,7 +20,7 @@ import { ledgerPaths } from '@repo/data-access';
 import { commitWithAuditPostgres } from '@/admin/lib/postgres-commit';
 import {
   countCasesByStatePostgres,
-  listCaseIdsPostgres,
+  listResearchCaseDocumentsPostgres,
   loadResearchCaseDocument,
   writeResearchCasePostgres,
 } from '@/admin/lib/postgres-research-cases';
@@ -76,16 +76,14 @@ export async function listAdminResearchCases(options?: {
   const limit = Math.min(200, Math.max(1, options?.limit ?? 100));
   const states = options?.states ?? INBOX_CASE_STATES;
 
-  const caseIds = await listCaseIdsPostgres({ states, limit });
+  const docs = await listResearchCaseDocumentsPostgres({ states, limit });
   const items: AdminCaseListItem[] = [];
-  for (const caseId of caseIds) {
-    const doc = await loadResearchCaseDocument(caseId);
-    if (!doc) continue;
-    const parsed = parseResearchCaseRecord(caseId, doc);
+  for (const doc of docs) {
+    const parsed = parseResearchCaseRecord(String(doc.id), doc);
     if (!parsed) continue;
     items.push(toListItem(parsed.record, parsed.placeHint));
   }
-  return [...items].sort((a, b) => b.updatedAt.localeCompare(a.updatedAt));
+  return items;
 }
 
 export async function getAdminResearchCaseDetail(id: string): Promise<AdminCaseDetail | null> {

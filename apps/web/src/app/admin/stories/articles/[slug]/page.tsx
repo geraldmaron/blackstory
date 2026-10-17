@@ -9,6 +9,8 @@ import '../articles.css';
 export default async function ArticlePage({ params }: { params: Promise<{ slug: string }> }) {
   if (!(await readVerifiedAdminIdentity())) redirect('/admin/login');
   const { slug } = await params;
+  // The contributor list does not depend on the article, so it loads alongside it.
+  const contributors = listContributors();
   const article: EditorialArticle | null =
     slug === 'new'
       ? {
@@ -34,16 +36,16 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
         }
       : await readArticle(slug);
   if (!article) notFound();
+  const [profiles, relatedRecords] = await Promise.all([
+    contributors,
+    queryPostgres<{ id: string; display_name: string }>(
+      'SELECT id,display_name FROM canonical.entities WHERE id=ANY($1::text[])',
+      [article.draft.relatedEntityIds],
+    ),
+  ]);
   return (
     <main className="ds-container" id="main">
-      <ArticleEditor
-        initial={article}
-        profiles={await listContributors()}
-        relatedRecords={await queryPostgres<{ id: string; display_name: string }>(
-          'SELECT id,display_name FROM canonical.entities WHERE id=ANY($1::text[])',
-          [article.draft.relatedEntityIds],
-        )}
-      />
+      <ArticleEditor initial={article} profiles={profiles} relatedRecords={relatedRecords} />
     </main>
   );
 }

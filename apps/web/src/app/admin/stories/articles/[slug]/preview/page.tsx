@@ -34,14 +34,16 @@ export default async function Preview({
   if (!rows[0]) notFound();
   const raw = rowToProjectionAuthoring(rows[0].snapshot),
     parsed = publicArticleProjectionSchema.safeParse({ ...raw, releaseId: 'preview' });
-  const blockers = await articleBlockers(articleDraftSchema.parse(raw));
-  const article = parsed.success
-    ? hydrateArticle(
-        parsed.data,
-        await loadPacketViews(articlePacketIds(parsed.data)),
-        await loadEntities(articleMapEntityIds(parsed.data)),
-      )
-    : null;
+  // Blockers, packet views and entities are independent of each other once the snapshot parses.
+  const [blockers, packetViews, entities] = await Promise.all([
+    articleBlockers(articleDraftSchema.parse(raw)),
+    parsed.success ? loadPacketViews(articlePacketIds(parsed.data)) : null,
+    parsed.success ? loadEntities(articleMapEntityIds(parsed.data)) : null,
+  ]);
+  const article =
+    parsed.success && packetViews && entities
+      ? hydrateArticle(parsed.data, packetViews, entities)
+      : null;
   return (
     <main className="ds-container ds-page" id="main">
       <p>Private preview · revision {revision} · publication requires approval</p>

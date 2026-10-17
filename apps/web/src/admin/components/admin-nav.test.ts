@@ -1,54 +1,32 @@
 /**
- * Guards the shell IA: the bar stays short, nothing is reachable twice through the chrome,
- * every surface stays reachable through the palette, and the retired console stays retired.
+ * Guards the shell IA: groups stay few and small, nothing is listed twice, every surface stays
+ * reachable through the palette, and the retired console stays retired.
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import { isAuthGatedPath } from '../auth/protected-paths';
-import {
-  ADMIN_HOME,
-  ADMIN_NAV_GROUPS,
-  adminOverflowNav,
-  adminPaletteItems,
-  adminPrimaryNav,
-} from './admin-nav';
+import { ADMIN_HOME, ADMIN_NAV_GROUPS, adminPaletteItems, type AdminQueueKey } from './admin-nav';
 
 const ALL_DESTINATIONS = [ADMIN_HOME, ...ADMIN_NAV_GROUPS.flatMap((group) => group.destinations)];
 
-test('the bar stays short enough to scan — regression on the seven-item shell', () => {
-  const primary = adminPrimaryNav();
-  assert.ok(primary.length <= 5, `primary nav grew to ${primary.length} items`);
-  assert.equal(primary[0]?.href, ADMIN_HOME.href);
-});
-
-test('every bar item is the entry point of a task group', () => {
-  const entryPoints = new Set(ADMIN_NAV_GROUPS.map((group) => group.destinations[0].href));
-  for (const item of adminPrimaryNav().slice(1)) {
-    assert.ok(entryPoints.has(item.href), `${item.href} is on the bar but leads no group`);
+test('the sidebar stays short enough to scan: few groups, each a real task', () => {
+  assert.ok(ADMIN_NAV_GROUPS.length <= 6, `grew to ${ADMIN_NAV_GROUPS.length} groups`);
+  for (const group of ADMIN_NAV_GROUPS) {
+    assert.ok(group.destinations.length >= 1, `${group.id} is empty`);
+    assert.ok(group.destinations.length <= 5, `${group.id} has too many destinations`);
   }
 });
 
-test('nothing on the bar is repeated in More — Inbox was reachable three ways', () => {
-  const onBar = new Set(adminPrimaryNav().map((item) => item.href));
-  for (const item of adminOverflowNav()) {
-    assert.equal(onBar.has(item.href), false, `${item.href} appears in both the bar and More`);
+test('no destination is listed twice, by path or by label within a group', () => {
+  const hrefs = ALL_DESTINATIONS.map((destination) => destination.href);
+  assert.deepEqual([...hrefs].sort(), [...new Set(hrefs)].sort(), 'a destination is duplicated');
+  for (const group of ADMIN_NAV_GROUPS) {
+    const labels = group.destinations.map((destination) => destination.label);
+    assert.equal(new Set(labels).size, labels.length, `${group.id} repeats a label`);
   }
 });
 
-test('the bar plus More covers every admin destination exactly once', () => {
-  const chrome = [...adminPrimaryNav(), ...adminOverflowNav()].map((item) => item.href);
-  assert.deepEqual(
-    [...chrome].sort(),
-    [...new Set(chrome)].sort(),
-    'a destination is duplicated across the chrome',
-  );
-  assert.deepEqual(
-    [...chrome].sort(),
-    ALL_DESTINATIONS.map((destination) => destination.href).sort(),
-  );
-});
-
-test('the palette reaches every destination, including the ones on the bar', () => {
+test('the palette reaches every destination', () => {
   const palette = adminPaletteItems();
   assert.deepEqual(
     palette.map((item) => item.id).sort(),
@@ -59,16 +37,19 @@ test('the palette reaches every destination, including the ones on the bar', () 
   }
 });
 
-test('caller-supplied public handoffs reach More and the palette, but never the bar', () => {
+test('caller-supplied public handoffs reach the palette', () => {
   const extra = { href: 'https://example.org/stories', label: 'Public stories' };
-  assert.ok(adminOverflowNav([extra]).some((item) => item.href === extra.href));
   assert.ok(
     adminPaletteItems([{ ...extra, group: 'Public site' }]).some((item) => item.id === extra.href),
   );
-  assert.equal(
-    adminPrimaryNav().some((item) => item.href === extra.href),
-    false,
+});
+
+test('each queue badge is claimed by exactly one destination', () => {
+  const keys = ALL_DESTINATIONS.flatMap((destination) =>
+    destination.queue ? [destination.queue] : [],
   );
+  const known: readonly AdminQueueKey[] = ['submissions', 'inbox', 'storyReview'];
+  assert.deepEqual([...keys].sort(), [...known].sort());
 });
 
 test('every navigable admin destination is behind the edge auth gate', () => {
@@ -78,9 +59,10 @@ test('every navigable admin destination is behind the edge auth gate', () => {
 });
 
 test('the legacy console is gone from the IA', () => {
-  const everything = [...adminPrimaryNav(), ...adminOverflowNav()].map((item) => item.href);
   assert.equal(
-    everything.some((href) => href === '/console' || href.startsWith('/console/')),
+    ALL_DESTINATIONS.some(
+      (destination) => destination.href === '/console' || destination.href.startsWith('/console/'),
+    ),
     false,
   );
 });

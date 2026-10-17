@@ -5,28 +5,32 @@
 
 import { FormButton, FormInput, FormSelect, FormTextarea } from '../design-system/fields';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { useCallback, useEffect, useId, useMemo, useRef, useState } from 'react';
+import { Pagination } from '@repo/ui';
 import { useAdminAuth } from '../auth/AdminAuthProvider';
+import type { CaseQuery, CaseStateBucket } from './case-query-types';
 import {
   RESEARCH_CASE_BULK_LIMIT,
   actionLabel,
-  applyCaseQueue,
   commonActionsForSelection,
-  countCaseQueue,
-  DEFAULT_CASE_QUEUE_QUERY,
   formatWhen,
   toggleAllCaseSelection,
   toggleCaseSelection,
-  type CaseQueueQuery,
-  type CaseQueueSortDirection,
-  type CaseQueueSortKey,
 } from './case-queue';
+import {
+  caseQueryHref,
+  defaultCaseStates,
+  hasActiveCaseFilters,
+  serializeCaseQuery,
+  type CaseQueueMode,
+} from './case-query-params';
 import {
   CASE_QUEUE_INTENT_COPY,
   CASE_TRIAGE_STEPS,
   EXCLUSION_REASON_CODES,
+  INBOX_CASE_STATES,
   actionHelp,
-  filterChipLabel,
   legalActionsForState,
   missingDecisionReasonMessage,
   stateLabel,
@@ -34,28 +38,36 @@ import {
   type AdminCaseListItem,
   type AdminCaseTransitionAction,
 } from './research-case-types';
-import type { ResearchCaseReasonCode } from '@repo/domain';
+import type { ResearchCaseReasonCode, ResearchCaseState } from '@repo/domain';
 import './case-queue.css';
 
 export type CaseQueueProps = {
-  readonly mode: 'inbox' | 'cases';
-  readonly initialRows?: readonly AdminCaseListItem[];
+  readonly mode: CaseQueueMode;
+  /** One server-filtered, server-sorted page; the client never re-filters it. */
+  readonly rows: readonly AdminCaseListItem[];
+  readonly total: number;
+  readonly page: number;
+  readonly pageCount: number;
+  readonly pageSize: number;
+  readonly query: CaseQuery;
+  /** State counts under the active search and assignee filter, so chips show real totals. */
+  readonly stateFacets: readonly CaseStateBucket[];
 };
 
-export function CaseQueue({ mode, initialRows = [] }: CaseQueueProps) {
-  const { getIdToken, user } = useAdminAuth();
-  const [rows, setRows] = useState<readonly AdminCaseListItem[]>(initialRows);
-  /*
-   * Server-rendered rows are authoritative for the initial paint, so the client must not replace
-   * them with an identical mount-time fetch. A ref, not state: it must not re-arm on a re-render,
-   * and it is deliberately not reset by a later `load()` because subsequent refreshes are reads
-   * the operator requested.
-   */
-  const servedFromServer = useRef(initialRows.length > 0);
-  const [query, setQuery] = useState<CaseQueueQuery>({
-    ...DEFAULT_CASE_QUEUE_QUERY,
-    state: mode === 'inbox' ? 'inbox' : 'all',
-  });
+export function CaseQueue({
+  mode,
+  rows,
+  total,
+  page,
+  pageCount,
+  pageSize,
+  query,
+  stateFacets,
+}: CaseQueueProps) {
+  const router = useRouter();
+  const { getIdToken } = useAdminAuth();
+  const basePath = mode === 'inbox' ? '/admin/inbox' : '/admin/cases';
+  const filterForm = useRef<HTMLFormElement>(null);
   const [selectedIds, setSelectedIds] = useState<ReadonlySet<string>>(() => new Set());
   const [activeId, setActiveId] = useState<string | null>(null);
   const [detail, setDetail] = useState<AdminCaseDetail | null>(null);
@@ -67,7 +79,6 @@ export function CaseQueue({ mode, initialRows = [] }: CaseQueueProps) {
   const [mergeTarget, setMergeTarget] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [status, setStatus] = useState<string | null>(null);
-  const [loading, setLoading] = useState(false);
   const [busy, setBusy] = useState(false);
   const closeRef = useRef<HTMLButtonElement>(null);
   const bulkReasonRef = useRef<HTMLInputElement>(null);
@@ -79,43 +90,65 @@ export function CaseQueue({ mode, initialRows = [] }: CaseQueueProps) {
     (sheetReasonRef.current ?? bulkReasonRef.current)?.focus();
   }
 
+  /** Rows are server-rendered, so a refresh is a re-render of the route, not a client fetch. */
   const load = useCallback(async () => {
-    setLoading(true);
-    setError(null);
-    try {
-      const token = await getIdToken();
-      if (!token) {
-        setRows([]);
-        return;
-      }
-      const states = mode === 'inbox' ? 'inbox' : 'all';
-      const response = await fetch(`/admin/api/research-cases?states=${states}&limit=200`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      const body = (await response.json()) as { items?: AdminCaseListItem[]; error?: string };
-      if (!response.ok) throw new Error(body.error ?? `Load failed (${response.status})`);
-      setRows(body.items ?? []);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : String(err));
-    } finally {
-      setLoading(false);
-    }
-  }, [getIdToken, mode]);
+    router.refresh();
+  }, [router]);
 
+  // A new page or filter is a new set of rows; a selection from the old one must not carry over.
+  const viewKey = serializeCaseQuery(query, mode);
   useEffect(() => {
-    if (servedFromServer.current) {
-      servedFromServer.current = false;
-      return;
-    }
-    if (user) void load();
-  }, [user, load]);
+    setSelectedIds(new Set());
+  }, [viewKey]);
 
-  const counts = useMemo(() => countCaseQueue(rows), [rows]);
-  const visible = useMemo(() => applyCaseQueue(rows, query), [rows, query]);
+  const visible = rows;
+  const stateCount = useMemo(
+    () => new Map(stateFacets.map((bucket) => [bucket.value, bucket.count])),
+    [stateFacets],
+  );
+  const inboxCount = INBOX_CASE_STATES.reduce(
+    (sum, state) => sum + (stateCount.get(state) ?? 0),
+    0,
+  );
+  const allCount = stateFacets.reduce((sum, bucket) => sum + bucket.count, 0);
   const bulkActions = useMemo(
     () => commonActionsForSelection(rows, selectedIds),
     [rows, selectedIds],
   );
+  const filtersActive = hasActiveCaseFilters(query, mode);
+  const defaultStates = defaultCaseStates(mode);
+  const activeStates = query.states ?? [];
+  const isInboxView =
+    activeStates.length === INBOX_CASE_STATES.length &&
+    INBOX_CASE_STATES.every((state) => activeStates.includes(state));
+  const sortHref = (key: NonNullable<CaseQuery['sort']>): string => {
+    const natural = key === 'title' || key === 'state' ? 'asc' : 'desc';
+    const direction = query.sort === key ? (query.direction === 'asc' ? 'desc' : 'asc') : natural;
+    return caseQueryHref(basePath, mode, query, { sort: key, direction });
+  };
+  const sortMark = (key: NonNullable<CaseQuery['sort']>): string =>
+    query.sort === key ? (query.direction === 'asc' ? ' ↑' : ' ↓') : '';
+  const ariaSort = (key: NonNullable<CaseQuery['sort']>): 'ascending' | 'descending' | 'none' =>
+    query.sort === key ? (query.direction === 'asc' ? 'ascending' : 'descending') : 'none';
+  const stateChips: readonly {
+    readonly id: string;
+    readonly label: string;
+    readonly count: number;
+    readonly states: readonly string[];
+  }[] = [
+    ...(mode === 'cases'
+      ? [{ id: 'all', label: 'All states', count: allCount, states: [] as readonly string[] }]
+      : []),
+    { id: 'inbox', label: 'Inbox', count: inboxCount, states: INBOX_CASE_STATES },
+    ...(mode === 'inbox' ? INBOX_CASE_STATES : stateFacets.map((b) => b.value as ResearchCaseState))
+      .filter((state, index, all) => all.indexOf(state) === index)
+      .map((state) => ({
+        id: state,
+        label: stateLabel(state as ResearchCaseState),
+        count: stateCount.get(state) ?? 0,
+        states: [state] as readonly string[],
+      })),
+  ];
 
   const openDetail = useCallback(
     async (caseId: string) => {
@@ -162,10 +195,6 @@ export function CaseQueue({ mode, initialRows = [] }: CaseQueueProps) {
     document.addEventListener('keydown', onKeyDown);
     return () => document.removeEventListener('keydown', onKeyDown);
   }, [activeId, closeSheet]);
-
-  function patchQuery(partial: Partial<CaseQueueQuery>) {
-    setQuery((current) => ({ ...current, ...partial }));
-  }
 
   async function runTransition(action: AdminCaseTransitionAction, caseIds: readonly string[]) {
     if (caseIds.length === 0) return;
@@ -275,7 +304,6 @@ export function CaseQueue({ mode, initialRows = [] }: CaseQueueProps) {
   const allVisibleSelected = visible.length > 0 && visible.every((row) => selectedIds.has(row.id));
 
   const showChecklistColumn = visible.some((row) => row.checklistTotal > 0);
-  const showPlaceColumn = visible.some((row) => Boolean(row.placeHint?.trim()));
 
   return (
     <div className="acq" data-mode={mode}>
@@ -294,70 +322,77 @@ export function CaseQueue({ mode, initialRows = [] }: CaseQueueProps) {
           type="button"
           className="acq__button acq__button--ghost"
           onClick={() => void load()}
-          disabled={loading || busy}
+          disabled={busy}
         >
-          {loading ? 'Refreshing…' : 'Refresh'}
+          Refresh
         </FormButton>
       </header>
 
-      <section className="acq__stats" aria-label="Queue counts">
-        <FormButton
-          type="button"
-          className={query.state === 'inbox' ? 'is-active' : undefined}
-          onClick={() => patchQuery({ state: 'inbox' })}
-        >
-          Inbox <strong>{counts.inbox}</strong>
-        </FormButton>
-        <FormButton
-          type="button"
-          className={query.state === 'candidate' ? 'is-active' : undefined}
-          onClick={() => patchQuery({ state: 'candidate' })}
-        >
-          {filterChipLabel('candidate')} <strong>{counts.candidate}</strong>
-        </FormButton>
-        <FormButton
-          type="button"
-          className={query.state === 'relevance_review' ? 'is-active' : undefined}
-          onClick={() => patchQuery({ state: 'relevance_review' })}
-        >
-          {filterChipLabel('relevance_review')} <strong>{counts.relevanceReview}</strong>
-        </FormButton>
-        <FormButton
-          type="button"
-          className={query.state === 'insufficient_evidence' ? 'is-active' : undefined}
-          onClick={() => patchQuery({ state: 'insufficient_evidence' })}
-        >
-          {filterChipLabel('insufficient_evidence')} <strong>{counts.needsEvidence}</strong>
-        </FormButton>
-        {mode === 'cases' ? (
-          <FormButton
-            type="button"
-            className={query.state === 'all' ? 'is-active' : undefined}
-            onClick={() => patchQuery({ state: 'all' })}
-          >
-            {filterChipLabel('all')} <strong>{counts.total}</strong>
-          </FormButton>
-        ) : null}
-      </section>
+      <nav className="acq__stats" aria-label="Filter by state">
+        {stateChips.map((chip) => {
+          const active =
+            chip.id === 'all'
+              ? activeStates.length === 0
+              : chip.id === 'inbox'
+                ? isInboxView
+                : activeStates.length === 1 && activeStates[0] === chip.id;
+          return (
+            <Link
+              key={chip.id}
+              href={caseQueryHref(basePath, mode, query, { states: chip.states })}
+              className={active ? 'is-active' : undefined}
+              aria-current={active ? 'true' : undefined}
+            >
+              {chip.label} <strong>{chip.count.toLocaleString()}</strong>
+            </Link>
+          );
+        })}
+      </nav>
 
-      <section className="acq__toolbar" aria-label="Filter and sort">
-        <label className="acq__field">
+      {/* A plain GET form: search survives with JS off and leaves a shareable URL. The state
+          filter rides along as a hidden input so searching never silently drops it. */}
+      <form
+        ref={filterForm}
+        className="acq__toolbar"
+        method="get"
+        action={basePath}
+        role="search"
+        aria-label="Search, filter and sort"
+      >
+        {activeStates.length > 0 && activeStates.join(',') !== defaultStates.join(',') ? (
+          <input type="hidden" name="state" value={activeStates.join(',')} />
+        ) : null}
+        <label className="acq__field acq__field--grow">
           <span>Search</span>
           <FormInput
             type="search"
-            value={query.search}
-            onChange={(event) => patchQuery({ search: event.target.value })}
-            placeholder="Title, id, place…"
+            name="q"
+            defaultValue={query.search ?? ''}
+            placeholder="Title, id, candidate or reviewer…"
           />
+        </label>
+        <label className="acq__field">
+          <span>Assignee</span>
+          <FormSelect
+            name="assignee"
+            defaultValue={query.assignee ?? 'any'}
+            aria-label="Assignee"
+            onValueChange={() => filterForm.current?.requestSubmit()}
+          >
+            <option value="any">Anyone</option>
+            <option value="assigned">Assigned</option>
+            <option value="unassigned">Unassigned</option>
+          </FormSelect>
         </label>
         <label className="acq__field">
           <span>Sort</span>
           <FormSelect
-            value={query.sortKey}
-            onValueChange={(nextValue) => patchQuery({ sortKey: nextValue as CaseQueueSortKey })}
+            name="sort"
+            defaultValue={query.sort ?? 'updated'}
             aria-label="Sort"
+            onValueChange={() => filterForm.current?.requestSubmit()}
           >
-            <option value="updatedAt">Updated</option>
+            <option value="updated">Updated</option>
             <option value="title">Title</option>
             <option value="state">State</option>
             <option value="checklist">Checklist</option>
@@ -366,17 +401,24 @@ export function CaseQueue({ mode, initialRows = [] }: CaseQueueProps) {
         <label className="acq__field">
           <span>Direction</span>
           <FormSelect
-            value={query.sortDirection}
-            onValueChange={(nextValue) =>
-              patchQuery({ sortDirection: nextValue as CaseQueueSortDirection })
-            }
+            name="dir"
+            defaultValue={query.direction ?? 'desc'}
             aria-label="Direction"
+            onValueChange={() => filterForm.current?.requestSubmit()}
           >
             <option value="desc">Descending</option>
             <option value="asc">Ascending</option>
           </FormSelect>
         </label>
-      </section>
+        <FormButton type="submit" className="acq__button">
+          Apply
+        </FormButton>
+        {filtersActive ? (
+          <Link className="acq__button acq__button--ghost" href={basePath}>
+            Reset
+          </Link>
+        ) : null}
+      </form>
 
       {error ? (
         <p className="acq__alert" role="alert">
@@ -440,14 +482,12 @@ export function CaseQueue({ mode, initialRows = [] }: CaseQueueProps) {
       ) : null}
 
       {visible.length === 0 ? (
-        <p className="acq__empty">
-          {loading ? 'Loading research cases…' : 'No research cases match this filter.'}
-        </p>
+        <p className="acq__empty">No research cases match this filter.</p>
       ) : (
         <div className="acq__table-wrap">
           <table className="acq__table">
             <caption className="ds-visually-hidden">
-              Research cases: {visible.length} visible
+              Research cases: showing {visible.length} of {total.toLocaleString()}
             </caption>
             <thead>
               <tr>
@@ -469,11 +509,21 @@ export function CaseQueue({ mode, initialRows = [] }: CaseQueueProps) {
                     />
                   </label>
                 </th>
-                <th scope="col">Title</th>
-                <th scope="col">State</th>
-                {showChecklistColumn ? <th scope="col">Checklist</th> : null}
-                {showPlaceColumn ? <th scope="col">Place</th> : null}
-                <th scope="col">Updated</th>
+                <th scope="col" aria-sort={ariaSort('title')}>
+                  <Link href={sortHref('title')}>Title{sortMark('title')}</Link>
+                </th>
+                <th scope="col" aria-sort={ariaSort('state')}>
+                  <Link href={sortHref('state')}>State{sortMark('state')}</Link>
+                </th>
+                {showChecklistColumn ? (
+                  <th scope="col" aria-sort={ariaSort('checklist')}>
+                    <Link href={sortHref('checklist')}>Checklist{sortMark('checklist')}</Link>
+                  </th>
+                ) : null}
+                <th scope="col">Assignee</th>
+                <th scope="col" aria-sort={ariaSort('updated')}>
+                  <Link href={sortHref('updated')}>Updated{sortMark('updated')}</Link>
+                </th>
               </tr>
             </thead>
             <tbody>
@@ -522,15 +572,13 @@ export function CaseQueue({ mode, initialRows = [] }: CaseQueueProps) {
                         )}
                       </td>
                     ) : null}
-                    {showPlaceColumn ? (
-                      <td>
-                        {row.placeHint?.trim() ? (
-                          row.placeHint
-                        ) : (
-                          <span className="acq__not-set">Not set</span>
-                        )}
-                      </td>
-                    ) : null}
+                    <td className="acq__mono">
+                      {row.assigneeId ? (
+                        row.assigneeId
+                      ) : (
+                        <span className="acq__not-set">Unassigned</span>
+                      )}
+                    </td>
                     <td className="acq__updated">{formatWhen(row.updatedAt)}</td>
                   </tr>
                 );
@@ -539,6 +587,15 @@ export function CaseQueue({ mode, initialRows = [] }: CaseQueueProps) {
           </table>
         </div>
       )}
+
+      <Pagination
+        page={page}
+        pageCount={pageCount}
+        pageSize={pageSize}
+        total={total}
+        itemLabel="cases"
+        hrefForPage={(target: number) => caseQueryHref(basePath, mode, query, { page: target })}
+      />
 
       <div className={`acq-sheet-portal${activeId ? ' is-open' : ''}`} aria-hidden={!activeId}>
         {activeId ? (

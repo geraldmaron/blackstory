@@ -1,7 +1,8 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import type { ArticleBodyBlockDoc } from '@repo/schemas';
-import { articleToDocument, documentToArticle } from './document-adapter';
+import { ENTITY_PROSE_LINK_RE } from '@repo/domain/editorial';
+import { ENTITY_LINK_SOURCE, articleToDocument, documentToArticle } from './document-adapter';
 test('the article editor round-trips every body type with exact citation and evidence attributes', () => {
   const body: ArticleBodyBlockDoc[] = [
     { type: 'paragraph', text: 'Named work [ref:source-1]\n[[entity-id|A person]]' },
@@ -67,4 +68,29 @@ test('new paragraphs preserve citation tokens and unsupported document structure
     /Unsupported/,
   );
   assert.deepEqual(documentToArticle({ type: 'doc', content: [{ type: 'paragraph' }] }), []);
+});
+test('entity links become inline atoms and serialize back to the stored markup', () => {
+  const text = 'Born in [[ent_ada|Ada Lovelace]] and raised near [[ent_place]] [ref:one].';
+  const doc = articleToDocument([{ type: 'paragraph', text }]);
+  const nodes = doc.content![0]!.content!;
+  assert.deepEqual(
+    nodes.filter((node) => node.type === 'entityLink').map((node) => node.attrs),
+    [
+      { entityId: 'ent_ada', label: 'Ada Lovelace' },
+      { entityId: 'ent_place', label: '' },
+    ],
+  );
+  assert.equal((documentToArticle(doc)[0] as { text: string }).text, text);
+});
+test('half-typed or nested brackets stay plain text and never become links', () => {
+  const text = 'A [[unfinished link and [[[nested]]] brackets';
+  const doc = articleToDocument([{ type: 'paragraph', text }]);
+  assert.equal(
+    doc.content![0]!.content!.some((node) => node.type === 'entityLink' && !node.attrs?.entityId),
+    false,
+  );
+  assert.equal((documentToArticle(doc)[0] as { text: string }).text, text);
+});
+test('the client entity-link pattern is the domain pattern, not a drifted copy', () => {
+  assert.equal(ENTITY_LINK_SOURCE, ENTITY_PROSE_LINK_RE.source);
 });
