@@ -4,7 +4,8 @@
  */
 import { queryIntakeItemPage } from '../lib/postgres-submissions';
 import { tryCountAdminResearchCases } from '../cases/research-case-store';
-import { listStoryPackets, type StoryPacketListItem } from '../stories/story-packet-store';
+import type { StoryPacketListItem } from '../stories/story-packet-store';
+import { countStoryPacketsPostgres } from '../lib/postgres-story-packets';
 
 export type OpsQueueSource = 'live' | 'unavailable';
 
@@ -81,8 +82,7 @@ async function loadStoryPacketQueueSummary(): Promise<
   Pick<OpsQueueSummary, 'storyPacketsPending' | 'storyPacketsTotal' | 'storyPacketsSource'>
 > {
   try {
-    const items = await listStoryPackets(200);
-    const { pending, total } = countPendingStoryPackets(items);
+    const { pending, total } = await countStoryPacketsPostgres();
     return {
       storyPacketsPending: pending,
       storyPacketsTotal: total,

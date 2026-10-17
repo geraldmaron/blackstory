@@ -11,7 +11,7 @@ import { CITATION_HEALTH_FIXTURES } from './fixtures';
 import './citation-health.css';
 
 export const metadata = {
-  title: 'Citation health — BlackStory Admin',
+  title: 'Citation health',
   description: 'Rot rate by source class and the reader-facing degraded-citation treatment.',
 };
 

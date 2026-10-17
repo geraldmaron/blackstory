@@ -9,7 +9,9 @@
 import {
   DEFAULT_PAGE_SIZE,
   INTAKE_STATUSES,
+  SUBMISSION_SORT_KEYS,
   normalizePageSize,
+  type SubmissionSortKey,
   type SubmissionQuery,
 } from './postgres-submissions.js';
 
@@ -54,6 +56,9 @@ export function parseSubmissionQuery(input: QueryParamInput): SubmissionQuery {
   const statuses = statusesRaw.length > 0 ? statusesRaw : DEFAULT_STATUSES;
   const kinds = readMany(input, 'kind');
 
+  const sortRaw = readOne(input, 'sort') as SubmissionSortKey | undefined;
+  const sort: SubmissionSortKey =
+    sortRaw && SUBMISSION_SORT_KEYS.includes(sortRaw) ? sortRaw : 'created';
   const directionRaw = readOne(input, 'dir');
   const direction: 'asc' | 'desc' = directionRaw === 'asc' ? 'asc' : 'desc';
 
@@ -61,6 +66,7 @@ export function parseSubmissionQuery(input: QueryParamInput): SubmissionQuery {
     ...(search ? { search } : {}),
     statuses,
     ...(kinds.length ? { kinds } : {}),
+    sort,
     direction,
     page: readPositiveInt(input, 'page') ?? 1,
     pageSize: normalizePageSize(readPositiveInt(input, 'size')),
@@ -81,6 +87,7 @@ export function serializeSubmissionQuery(query: SubmissionQuery): string {
     params.set('status', query.statuses.join(','));
   }
   if (query.kinds?.length) params.set('kind', query.kinds.join(','));
+  if (query.sort && query.sort !== 'created') params.set('sort', query.sort);
   if (query.direction && query.direction !== 'desc') params.set('dir', query.direction);
   if (query.page && query.page > 1) params.set('page', String(query.page));
   if (query.pageSize && query.pageSize !== DEFAULT_PAGE_SIZE) {

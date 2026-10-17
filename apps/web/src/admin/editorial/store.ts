@@ -141,7 +141,8 @@ export async function readStory(slug: string): Promise<EditorialStory | null> {
   );
   const row = rows[0];
   if (!row) return null;
-  const [reviews, history] = await Promise.all([
+  // Four independent reads: one round trip of latency instead of four in series.
+  const [reviews, history, publication, publicRows] = await Promise.all([
     queryPostgres<{ decision: string; reason: string; reviewerId: string }>(
       `SELECT decision,reason,reviewer_id::text AS "reviewerId"
       FROM reference.story_reviews WHERE story_id=$1 AND revision=$2 ORDER BY created_at DESC,id DESC LIMIT 1`,
@@ -152,28 +153,29 @@ export async function readStory(slug: string): Promise<EditorialStory | null> {
       FROM reference.story_revisions WHERE story_id=$1 ORDER BY revision DESC LIMIT 100`,
       [row.id],
     ),
-  ]);
-  const publication = await queryPostgres<{
-    releaseId: string;
-    previousReleaseId: string;
-    revision: number;
-    canRollback: boolean;
-  }>(
-    `SELECT p.release_id AS "releaseId",p.previous_release_id AS "previousReleaseId",p.revision::int,
+    queryPostgres<{
+      releaseId: string;
+      previousReleaseId: string;
+      revision: number;
+      canRollback: boolean;
+    }>(
+      `SELECT p.release_id AS "releaseId",p.previous_release_id AS "previousReleaseId",p.revision::int,
     EXISTS(SELECT 1 FROM published.active_release a WHERE a.id='active' AND a.release_id=p.release_id) AS "canRollback"
     FROM reference.story_publications p WHERE story_id=$1 ORDER BY created_at DESC LIMIT 1`,
-    [row.id],
-  );
-  const publicRows = await queryPostgres<{ release_id: string }>(
-    "SELECT a.release_id FROM published.release_stories a JOIN published.active_release p ON p.release_id=a.release_id AND p.id='active' WHERE a.story_id=$1",
-    [row.id],
-  );
+      [row.id],
+    ),
+    queryPostgres<{ release_id: string }>(
+      "SELECT a.release_id FROM published.release_stories a JOIN published.active_release p ON p.release_id=a.release_id AND p.id='active' WHERE a.story_id=$1",
+      [row.id],
+    ),
+  ]);
+  const draft = storyDraftSchema.parse(rowToProjectionAuthoring(row));
   return {
     archivedAt: row.archived_at,
     activePublicReleaseId: publicRows[0]?.release_id ?? null,
     publication: publication[0] ?? null,
-    blockers: await storyBlockers(storyDraftSchema.parse(rowToProjectionAuthoring(row))),
-    draft: storyDraftSchema.parse(rowToProjectionAuthoring(row)),
+    blockers: await storyBlockers(draft),
+    draft,
     revision: Number(row.revision),
     status: row.archived_at ? 'archived' : (row.status as EditorialStory['status']),
     review: reviews[0] ?? null,

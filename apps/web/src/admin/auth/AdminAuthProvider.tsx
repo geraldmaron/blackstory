@@ -34,15 +34,29 @@ export type AdminAuthContextValue = {
 
 const AdminAuthContext = createContext<AdminAuthContextValue | null>(null);
 
-export function AdminAuthProvider({ children }: { readonly children: ReactNode }) {
+export function AdminAuthProvider({
+  children,
+  initialRole = null,
+}: {
+  readonly children: ReactNode;
+  /**
+   * The role the server already verified while rendering the layout. When present the client
+   * skips its own `/admin/api/auth/me` round trip, which otherwise sits between first paint and
+   * every role-gated control (and made the role label flip after load).
+   */
+  readonly initialRole?: StaffRole | null;
+}) {
   const [ready, setReady] = useState(false);
   const [user, setUser] = useState<AdminSessionUser | null>(null);
-  const [role, setRole] = useState<StaffRole | null>(null);
+  const [role, setRole] = useState<StaffRole | null>(initialRole);
 
   // The role is only trustworthy from the server, which reads app_metadata.app_role off a
   // verified token. Never read it from the client session object, which the browser holds.
   useEffect(() => {
     let canceled = false;
+    // Server-verified at render: nothing to fetch. Signing out navigates away, so the stale value
+    // never outlives the session it described.
+    if (initialRole) return;
     if (!user) {
       setRole(null);
       return;
@@ -60,7 +74,7 @@ export function AdminAuthProvider({ children }: { readonly children: ReactNode }
     return () => {
       canceled = true;
     };
-  }, [user]);
+  }, [user, initialRole]);
 
   useEffect(() => {
     let canceled = false;

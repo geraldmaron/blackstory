@@ -1,8 +1,12 @@
 /**
  * Next.js config for the public web surface.
  * Static entity routes prefer CDN caching; middleware strips unknown query params.
- * Next 16 defaults to Turbopack; this app keeps Webpack for NodeNext `.js`→`.ts`
- * remapping under transpilePackages until Turbopack supports extensionAlias.
+ * Dev and production both build with Turbopack. The workspace packages use NodeNext `.js`
+ * specifiers for `.ts` files, which Turbopack cannot map (vercel/next.js#82945), so
+ * `scripts/turbopack-ts-specifier-loader.cjs` rewrites them in memory while compiling.
+ *
+ * Building locally: `.env.local` sets NODE_ENV=development, which makes `next build` fail while
+ * prerendering `/_global-error`. Run builds with NODE_ENV unset.
  */
 
 import path from 'node:path';
@@ -43,30 +47,27 @@ const nextConfig = {
     // Globs resolve relative to the app dir (apps/web), so monorepo files need ../../.
     '/*': ['./packages/schemas/constitution/**/*', '../../packages/schemas/constitution/**/*'],
   },
-  webpack: (config, { isServer }) => {
-    // NodeNext packages emit `.js` specifiers that map to `.ts`/`.tsx` sources.
-    config.resolve.extensionAlias = {
-      ...config.resolve.extensionAlias,
-      '.js': ['.ts', '.tsx', '.js', '.jsx'],
-    };
-    // Belt-and-suspenders: if a client graph still touches a Node builtin via a
-    // mis-imported barrel, fail closed with an empty shim instead of UnhandledSchemeError.
-    if (!isServer) {
-      config.resolve.fallback = {
-        ...config.resolve.fallback,
-        child_process: false,
-        crypto: false,
-        dns: false,
-        fs: false,
-        http: false,
-        https: false,
-        net: false,
-        path: false,
-        tls: false,
-        url: false,
-      };
-    }
-    return config;
+  turbopack: {
+    root: monorepoRoot,
+    rules: {
+      '*.{ts,tsx}': {
+        condition: {
+          all: [
+            { not: 'foreign' },
+            { path: /(^|\/)(packages\/[^/]+|apps\/web)\// },
+            { content: /\.js["']/ },
+          ],
+        },
+        loaders: [path.join(appDir, 'scripts/turbopack-ts-specifier-loader.cjs')],
+      },
+    },
+    // Node builtins a client graph names but never calls resolve to an empty module instead of
+    // failing the client bundle.
+    resolveAlias: Object.fromEntries(
+      ['child_process', 'crypto', 'dns', 'fs', 'http', 'https', 'net', 'path', 'tls', 'url'].map(
+        (name) => [name, { browser: './scripts/empty-module.cjs' }],
+      ),
+    ),
   },
   experimental: {
     // Prefer cached static segments; avoid eager dynamic revalidation on public pages.

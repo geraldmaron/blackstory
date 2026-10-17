@@ -60,3 +60,4 @@ brand/qa
 packages/ops-data/drafts
 
 .playwright-mcp/
+/apps/site

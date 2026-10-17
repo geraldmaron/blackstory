@@ -1,0 +1,42 @@
+# Gate 1 spike: Expo web + Tamagui, `/methodology` slice
+
+Throwaway, not part of the workspace (no pnpm entry, not built by CI). Reproduce:
+
+```bash
+cd docs/ui/spikes/expo-web-methodology
+npm install
+CI=1 npx expo export --platform web
+npx expo serve --port 8101   # then curl -i http://localhost:8101/methodology
+```
+
+`src/app/+middleware.ts` holds the hash-based CSP that hydrated. The per-request-nonce variant
+that blocked hydration is described in section 10 of `../../expo-tamagui-migration-plan.md`.
+Results were observed on 2026-10-16 with Expo SDK 57 and Tamagui 2.7.7.
+
+## Measuring and the extraction finding
+
+`node weigh.mjs <base-url> <path>` prints HTML, inline CSS, JS and CSS sizes (raw, gzip, brotli) and
+median TTFB. The committed config is the best working variant: slim `@tamagui/*` imports, a
+two-theme config with brand tokens only, extraction off. Turning extraction on (add
+`@tamagui/babel-plugin` in `babel.config.js` with `disableExtraction: false`) compiled and flattened
+elements but produced an empty server body (a Suspense error marker, no h1). See section 10 of
+`../../expo-tamagui-migration-plan.md`.
+
+## Shell + data-backed route port (2026-10-16)
+
+`src/components/Shell.tsx` ports the header (wordmark, search, nav) and the phone tab bar.
+`src/app/records.tsx` ports `/records` over a `loader` that reads `data/records-model.json`, the real
+page-1 model from `export-records.mts` (gitignored; generate it with the command in that file). Needs
+`unstable_useServerDataLoaders` and `asyncRoutes: { web: true }` in `app.json`. `explore.tsx` imports
+`maplibre-gl` only to test bundle splitting. Parity gaps in the port: no no-JS forms or `<details>`
+facets, no fonts, no icons, no Rooms sheet, no palette, no map glyphs.
+
+## Per-request CSP nonce (2026-10-16)
+
+`app.json` enables `unstable_useServerRendering` (SDK 57). `src/app/+html.tsx` makes a per-request
+nonce, sets `Content-Security-Policy` with `setResponseHeaders`, and clones the nonce onto every
+script/style/link node. Expo's own renderer passes no `nonce` to React, so `patch-render.py` patches
+`dist/server/_expo/server/render.js` after `expo export` (anchors are asserted, so an Expo upgrade
+fails loudly). Run: `CI=1 expo export --platform web && python3 patch-render.py dist/server/_expo/server/render.js
+&& expo serve`. `app.async-routes.json` is the same config plus `asyncRoutes`; see the plan doc for why
+it is not the default.

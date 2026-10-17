@@ -1,0 +1,51 @@
+{
+  "name": "@repo/site",
+  "private": true,
+  "version": "0.0.0",
+  "main": "expo-router/entry",
+  "scripts": {
+    "dev": "expo start --web --port 8081",
+    "build": "CI=1 NODE_ENV=production expo export --platform web",
+    "start": "node server/entry.cjs",
+    "export": "CI=1 NODE_ENV=production expo export --platform web",
+    "serve": "node server/entry.cjs",
+    "typecheck": "tsc --noEmit",
+    "test": "node --test test/*.test.cjs test/edge/*.test.cjs && TSX_TSCONFIG_PATH=tsconfig.test.json node --import tsx --test test/data/*.test.ts test/design/*.test.ts test/design/*.test.tsx",
+    "test:served": "node --test test/served/*.test.cjs",
+    "lint": "eslint . --max-warnings 0 && node scripts/lint-design.mjs",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "design:tokens": "node scripts/generate-design-tokens.mjs",
+    "lint:design": "node scripts/lint-design.mjs"
+  },
+  "dependencies": {
+    "@supabase/ssr": "^0.12.7",
+    "@tamagui/config": "2.7.7",
+    "@tamagui/core": "2.7.7",
+    "@tamagui/metro-plugin": "2.7.7",
+    "@tamagui/stacks": "2.7.7",
+    "@tamagui/text": "2.7.7",
+    "@tamagui/web": "^2.7.7",
+    "expo": "~58.0.13",
+    "expo-constants": "*",
+    "expo-linking": "*",
+    "expo-router": "~58.0.22",
+    "expo-server": "~58.0.5",
+    "expo-status-bar": "*",
+    "react": "^19.3.0",
+    "react-dom": "^19.3.0",
+    "react-native": "*",
+    "react-native-safe-area-context": "*",
+    "react-native-screens": "*",
+    "react-native-web": "*",
+    "tamagui": "2.7.7"
+  },
+  "devDependencies": {
+    "@types/react": "*",
+    "eslint": "^9.39.5",
+    "eslint-config-expo": "~58.0.4",
+    "prettier": "^3.9.10",
+    "tsx": "^4.23.15",
+    "typescript": "^6.0.3"
+  }
+}

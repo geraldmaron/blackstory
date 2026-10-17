@@ -7,7 +7,7 @@ import Link from 'next/link';
 import { useAdminAuth } from '../auth/AdminAuthProvider';
 
 export function AdminHomeSessionCta() {
-  const { ready, user } = useAdminAuth();
+  const { ready, user, email, role } = useAdminAuth();
 
   if (!ready) {
     return (
@@ -18,7 +18,12 @@ export function AdminHomeSessionCta() {
   }
 
   if (user) {
-    return null;
+    return (
+      <p className="admin-base-session-line">
+        <strong>{email}</strong>
+        <span>{role ?? 'Staff'}</span>
+      </p>
+    );
   }
 
   return (

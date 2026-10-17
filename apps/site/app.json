@@ -1,0 +1,10 @@
+{
+  "expo": {
+    "name": "BlackStory",
+    "slug": "blackstory-site",
+    "scheme": "blackstory",
+    "web": { "bundler": "metro", "output": "server" },
+    "plugins": ["expo-router"],
+    "experiments": { "typedRoutes": false }
+  }
+}

@@ -20,12 +20,9 @@ import { MemorialWallSection } from '../../components/patterns/memorial-wall/Mem
 import { Room } from '../../components/room';
 import { WalkOffRamp } from '../walk-off-ramp';
 import { MemorialSections } from './MemorialSections';
-import { MemorialScrollCue } from './MemorialScrollCue';
 import {
   MEMORIAL_HELD_MESSAGE_LINES,
   MEMORIAL_PAGE_DESCRIPTION,
-  MEMORIAL_QUIET_LIST_LINK_A11Y_LABEL,
-  MEMORIAL_QUIET_LIST_LINK_LABEL,
   MEMORIAL_WALL_SEED,
 } from './memorial-copy';
 import '../reading-room.css';
@@ -47,17 +44,6 @@ export default function MemorialPage() {
         seedKey={MEMORIAL_WALL_SEED}
         messageLines={MEMORIAL_HELD_MESSAGE_LINES}
         entityLinksByName={{}}
-      />
-      {/* Positioned by MemorialWallAtmosphere at runtime, anchored to the held
-          message's actual measured bottom edge — a sibling of the wall (not
-          nested in the opening column) so it shares the wall's coordinate
-          frame. Kept as a real, keyboard-reachable link; the wall itself
-          stays aria-hidden. */}
-      <MemorialScrollCue
-        targetId="memorial-names"
-        label={MEMORIAL_QUIET_LIST_LINK_LABEL}
-        accessibleLabel={MEMORIAL_QUIET_LIST_LINK_A11Y_LABEL}
-        className="ds-memorial__scroll-cue"
       />
       <Room>
         <div className="ds-memorial__opening" />

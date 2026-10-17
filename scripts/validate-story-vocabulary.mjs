@@ -47,6 +47,10 @@ const BANNED = [
     /\b(?:lib\/articles|components\/article)\//,
     'legacy module path (use lib/stories, components/story)',
   ],
+  [
+    /\b(?:lint|build|documentTo|toDocument)Article\w*|\barticleToDocument\b/,
+    'Article* editor function (use Story*)',
+  ],
   [/\.article\.json\b/, '.article.json draft files (use .story.json)'],
   [
     /\bds-(?:story-)?article\b|\badmin-base-article\b/,

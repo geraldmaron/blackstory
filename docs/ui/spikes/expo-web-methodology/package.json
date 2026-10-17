@@ -1,0 +1,33 @@
+{
+  "name": "expo-web-spike",
+  "private": true,
+  "version": "0.0.0",
+  "main": "expo-router/entry",
+  "scripts": {
+    "web": "expo start --web --port 8099",
+    "export": "expo export --platform web"
+  },
+  "dependencies": {
+    "@tamagui/babel-plugin": "^2.7.7",
+    "@tamagui/config": "2.7.7",
+    "@tamagui/metro-plugin": "2.7.7",
+    "expo": "~57.0.29",
+    "expo-constants": "~57.0.19",
+    "expo-linking": "~57.0.13",
+    "expo-router": "~57.0.27",
+    "expo-server": "*",
+    "expo-status-bar": "~57.0.1",
+    "maplibre-gl": "^5.24.0",
+    "react": "19.2.3",
+    "react-dom": "19.2.3",
+    "react-native": "0.86.3",
+    "react-native-safe-area-context": "~5.9.1",
+    "react-native-screens": "4.27.0",
+    "react-native-web": "~0.21.0",
+    "tamagui": "2.7.7"
+  },
+  "devDependencies": {
+    "@types/react": "~19.2.2",
+    "typescript": "~6.0.3"
+  }
+}

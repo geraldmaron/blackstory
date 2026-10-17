@@ -1,52 +1,68 @@
 /**
  * Single source of truth for admin information architecture.
  *
- * Surfaces are grouped by the task an operator is doing: one entry point per task is promoted to
- * the bar, and the command palette is the way to reach everything else. A bar that lists every
- * surface, with the same destination reachable several ways, is the shape this replaces. Adding a
- * surface means adding it to a group here; it lands in More and in the palette automatically, and
- * nothing else needs editing.
+ * Surfaces are grouped by where they sit in the work an operator does, in pipeline order: material
+ * arrives (Intake), is researched (Research), lands in the Catalog, is backed by Sources, and is
+ * published (Publish); System holds the audit trail and kill switches. The sidebar, the mobile
+ * drawer and the command palette all render from this list, so adding a surface means adding it to
+ * a group here and nothing else.
  */
 
-import type { CommandPaletteItem, ShellNavItem } from '@repo/ui';
+import type { CommandPaletteItem } from '@repo/ui';
+
+/** Queue sizes a destination can badge; the values come from `/admin/api/queue-counts`. */
+export type AdminQueueKey = 'submissions' | 'inbox' | 'storyReview';
 
 export type AdminNavDestination = {
   readonly href: string;
   readonly label: string;
   /** Extra palette match terms for names operators use that are not in the label. */
   readonly keywords?: readonly string[];
+  /** When set, the sidebar shows this queue's size beside the label. */
+  readonly queue?: AdminQueueKey;
 };
 
 export type AdminNavGroup = {
   readonly id: string;
   readonly label: string;
-  /**
-   * The first destination is the group's entry point and is the one promoted to the shell bar.
-   * The rest live in More and in the palette.
-   */
   readonly destinations: readonly [AdminNavDestination, ...AdminNavDestination[]];
 };
 
 export const ADMIN_HOME: AdminNavDestination = {
   href: '/admin',
   label: 'Work',
-  keywords: ['ops', 'home', 'queue', 'dashboard'],
+  keywords: ['ops', 'home', 'queue', 'dashboard', 'overview'],
 };
 
 export const ADMIN_NAV_GROUPS: readonly AdminNavGroup[] = [
   {
-    id: 'triage',
-    label: 'Triage',
+    id: 'intake',
+    label: 'Intake',
     destinations: [
-      { href: '/admin/work', label: 'Requests', keywords: ['research', 'review', 'approve'] },
-      { href: '/admin/inbox', label: 'Inbox', keywords: ['submissions', 'intake', 'incoming'] },
       {
         href: '/admin/submissions',
         label: 'Submissions',
+        queue: 'submissions',
         keywords: ['intake', 'quarantine', 'leads', 'corrections', 'appeals', 'abuse'],
       },
-      { href: '/admin/cases', label: 'Research cases', keywords: ['queue', 'promote'] },
       { href: '/admin/graylist', label: 'Graylist', keywords: ['blocked', 'held', 'suppressed'] },
+      { href: '/admin/discovery', label: 'Discovery runs', keywords: ['crawl', 'harvest'] },
+    ],
+  },
+  {
+    id: 'research',
+    label: 'Research',
+    destinations: [
+      {
+        href: '/admin/inbox',
+        label: 'Inbox',
+        queue: 'inbox',
+        keywords: ['triage', 'pending', 'incoming', 'cases'],
+      },
+      { href: '/admin/cases', label: 'Research cases', keywords: ['queue', 'promote', 'all'] },
+      { href: '/admin/work', label: 'Requests', keywords: ['research', 'review', 'approve'] },
+      { href: '/admin/evidence', label: 'Attach evidence', keywords: ['citation', 'proof'] },
+      { href: '/admin/quick-add', label: 'Quick add', keywords: ['create', 'new entity'] },
     ],
   },
   {
@@ -58,8 +74,6 @@ export const ADMIN_NAV_GROUPS: readonly AdminNavGroup[] = [
         label: 'Entities',
         keywords: ['catalog', 'people', 'places', 'merge'],
       },
-      { href: '/admin/quick-add', label: 'Quick add', keywords: ['create', 'new entity'] },
-      { href: '/admin/evidence', label: 'Attach evidence', keywords: ['citation', 'proof'] },
     ],
   },
   {
@@ -67,7 +81,6 @@ export const ADMIN_NAV_GROUPS: readonly AdminNavGroup[] = [
     label: 'Sources',
     destinations: [
       { href: '/admin/sources', label: 'Sources', keywords: ['feeds', 'publishers'] },
-      { href: '/admin/discovery', label: 'Discovery runs', keywords: ['crawl', 'harvest'] },
       {
         href: '/admin/citation-health',
         label: 'Citation health',
@@ -84,7 +97,12 @@ export const ADMIN_NAV_GROUPS: readonly AdminNavGroup[] = [
         label: 'Stories',
         keywords: ['writing', 'editor', 'drafts'],
       },
-      { href: '/admin/stories/review', label: 'Story review', keywords: ['packets'] },
+      {
+        href: '/admin/stories/review',
+        label: 'Story review',
+        queue: 'storyReview',
+        keywords: ['packets'],
+      },
       {
         href: '/admin/stories/contributors',
         label: 'Contributors',
@@ -94,8 +112,8 @@ export const ADMIN_NAV_GROUPS: readonly AdminNavGroup[] = [
     ],
   },
   {
-    id: 'admin',
-    label: 'Admin',
+    id: 'system',
+    label: 'System',
     destinations: [
       { href: '/admin/audit', label: 'Audit log', keywords: ['history', 'who did'] },
       { href: '/admin/switches', label: 'Switches', keywords: ['flags', 'toggles', 'kill switch'] },
@@ -103,41 +121,9 @@ export const ADMIN_NAV_GROUPS: readonly AdminNavGroup[] = [
   },
 ];
 
-/** Groups whose entry point earns a slot in the shell bar. Admin is palette- and More-only. */
-const BAR_GROUP_IDS: readonly string[] = ['triage', 'catalog', 'sources', 'publish'];
-
-function entryPoint(group: AdminNavGroup): AdminNavDestination {
-  return group.destinations[0];
-}
-
-/** Work, plus one entry point per task group. Everything else is More or the palette. */
-export function adminPrimaryNav(): readonly ShellNavItem[] {
-  return [
-    { href: ADMIN_HOME.href, label: ADMIN_HOME.label },
-    ...ADMIN_NAV_GROUPS.filter((group) => BAR_GROUP_IDS.includes(group.id)).map((group) => {
-      const lead = entryPoint(group);
-      return { href: lead.href, label: lead.label };
-    }),
-  ];
-}
-
-/** Every destination not already on the bar, in group order, followed by caller-supplied extras. */
-export function adminOverflowNav(extras: readonly ShellNavItem[] = []): readonly ShellNavItem[] {
-  const onBar = new Set(adminPrimaryNav().map((item) => item.href));
-  return [
-    ...ADMIN_NAV_GROUPS.flatMap((group) =>
-      group.destinations
-        .filter((destination) => !onBar.has(destination.href))
-        .map((destination) => ({ href: destination.href, label: destination.label })),
-    ),
-    ...extras,
-  ];
-}
-
 /**
- * Every admin destination as a palette command — including the ones on the bar, because the
- * palette is the navigator, and having to remember which links are also in the chrome would
- * defeat the point.
+ * Every admin destination as a palette command. The palette is the navigator, so nothing is left
+ * out for being visible in the sidebar.
  */
 export function adminPaletteItems(
   extras: readonly { readonly href: string; readonly label: string; readonly group: string }[] = [],

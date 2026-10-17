@@ -13,7 +13,7 @@ import { readPostgresOrDegrade } from '../../../../admin/lib/canonical-postgres-
 import { StoryReviewDesk, type PacketRow } from './StoryReviewDesk';
 
 export const metadata: Metadata = {
-  title: 'Story review — BlackStory Admin',
+  title: 'Story review',
   description: 'Review story packets before anything publishes.',
 };
 

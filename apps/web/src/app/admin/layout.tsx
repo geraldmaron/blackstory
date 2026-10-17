@@ -10,6 +10,7 @@
 import type { ReactNode } from 'react';
 import { AdminDesignProvider } from '@/admin/design-system/provider';
 import { AdminAuthProvider } from '../../admin/auth/AdminAuthProvider';
+import { readVerifiedAdminIdentity } from '../../admin/auth/supabase-server';
 import { AdminShellChrome } from '../../admin/components/AdminShellChrome';
 import './admin.css';
 
@@ -22,10 +23,12 @@ export const metadata = {
   robots: { index: false, follow: false },
 };
 
-export default function AdminLayout({ children }: { children: ReactNode }) {
+export default async function AdminLayout({ children }: { children: ReactNode }) {
+  // Cached per request, so the pages and nested layouts that also ask share this one check.
+  const identity = await readVerifiedAdminIdentity();
   return (
     <AdminDesignProvider>
-      <AdminAuthProvider>
+      <AdminAuthProvider initialRole={identity?.role ?? null}>
         <AdminShellChrome>{children}</AdminShellChrome>
       </AdminAuthProvider>
     </AdminDesignProvider>

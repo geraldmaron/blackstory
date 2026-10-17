@@ -154,3 +154,7 @@ apps/web/.tmp-lives-verify/
 /docs/index.html
 /docs/404.html
 /docs/.nojekyll
+
+# Playwright run output (baselines in packages/testing/src/visual/__screenshots__ ARE tracked)
+packages/testing/test-results/
+packages/testing/playwright-report/

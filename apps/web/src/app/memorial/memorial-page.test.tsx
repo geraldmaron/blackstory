@@ -2,7 +2,7 @@
  * Contract tests for the /memorial edition page wiring.
  */
 import assert from 'node:assert/strict';
-import { readFileSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { test } from 'node:test';
@@ -102,10 +102,15 @@ test('memorial sections render full list anchor and no em dashes in copy', () =>
   assert.doesNotMatch(copy, /Written by hand, one at a time/);
 });
 
-test('memorial scroll cue does not auto-scroll on load', () => {
-  const scrollCue = readFileSync(join(here, 'MemorialScrollCue.tsx'), 'utf8');
-  assert.doesNotMatch(scrollCue, /MutationObserver/);
-  assert.doesNotMatch(scrollCue, /data-anchored === 'true'/);
+test('the memorial opening has no scroll cue and no hold toggle', () => {
+  const page = readFileSync(join(here, 'page.tsx'), 'utf8');
+  const wall = readFileSync(
+    join(here, '../../components/patterns/memorial-wall/MemorialWallAtmosphere.tsx'),
+    'utf8',
+  );
+  assert.doesNotMatch(page, /ScrollCue|Read every name/);
+  assert.doesNotMatch(wall, /<button|Hold the wall still|hold-wall/);
+  assert.equal(existsSync(join(here, 'MemorialScrollCue.tsx')), false);
 });
 
 /*

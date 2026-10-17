@@ -119,21 +119,26 @@ export async function listStoryPacketsPostgres(
   limit: number,
 ): Promise<readonly StoryPacketListItem[]> {
   const capped = Math.min(200, Math.max(1, limit));
-  const [intakeRows, reviewRows] = await Promise.all([
-    queryPostgres<IntakeRow>(
-      `SELECT id, created_by, payload, created_at
-       FROM submissions.intake_items
-       WHERE payload->>'proposalKind' = 'story_packet'
-          OR payload->'storyPacket' IS NOT NULL
-       ORDER BY created_at DESC
-       LIMIT $1`,
-      [capped],
-    ),
-    queryPostgres<ReviewRow>(
-      `SELECT submission_id, decision, reviewer_id, notes, packet, updated_at
-       FROM ops.story_packet_reviews`,
-    ),
-  ]);
+  const intakeRows = await queryPostgres<IntakeRow>(
+    `SELECT id, created_by, payload, created_at
+     FROM submissions.intake_items
+     WHERE payload->>'proposalKind' = 'story_packet'
+        OR payload->'storyPacket' IS NOT NULL
+     ORDER BY created_at DESC
+     LIMIT $1`,
+    [capped],
+  );
+  // Only the reviews for the packets just read, not every review ever recorded: each row carries
+  // the full packet JSON, so the unfiltered read grew with history rather than with the page.
+  const reviewRows =
+    intakeRows.length === 0
+      ? []
+      : await queryPostgres<ReviewRow>(
+          `SELECT submission_id, decision, reviewer_id, notes, packet, updated_at
+           FROM ops.story_packet_reviews
+           WHERE submission_id = ANY($1::text[])`,
+          [intakeRows.map((row) => row.id)],
+        );
 
   const reviewsById = new Map<string, StoryPacketListItem['review']>();
   for (const row of reviewRows) {
@@ -148,6 +153,25 @@ export async function listStoryPacketsPostgres(
     items.push(buildListItem(row, packet, reviewsById.get(row.id)));
   }
   return Object.freeze(items);
+}
+
+/**
+ * Pending and total story packets without reading any packet bodies. The dashboard only needs the
+ * two numbers; building 200 full list items to count them cost a second or more per home load.
+ */
+export async function countStoryPacketsPostgres(): Promise<{
+  readonly pending: number;
+  readonly total: number;
+}> {
+  const rows = await queryPostgres<{ readonly total: string; readonly pending: string }>(
+    `SELECT count(*)::text AS total,
+            count(*) FILTER (WHERE r.submission_id IS NULL)::text AS pending
+     FROM submissions.intake_items i
+     LEFT JOIN ops.story_packet_reviews r ON r.submission_id = i.id
+     WHERE i.payload->>'proposalKind' = 'story_packet'
+        OR i.payload->'storyPacket' IS NOT NULL`,
+  );
+  return { pending: Number(rows[0]?.pending ?? 0), total: Number(rows[0]?.total ?? 0) };
 }
 
 export async function getStoryPacketPostgres(

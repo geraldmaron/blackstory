@@ -100,7 +100,7 @@ All commands: `node --conditions development --import tsx packages/operator-cli/
 | editorial-run / enrichment-run | Check pending leads, run LLM editorial/enrichment, stage packets (never publish) | `editorial-run --subjects <subjects.json> --provider mock --operator-id "$USER" --session-id "<id>"` |
 | backfill-entity | Re-run enrichment/backfill for one known entity id | `backfill-entity --entity-id <id> --provider mock --operator-id "$USER" --session-id "<id>"` |
 | prose-run | Short-form prose draft for one subject (lighter than story-research-run) | `prose-run --entity-id <id> --provider mock --operator-id "$USER" --session-id "<id>"` |
-| story-research-run | Draft/recommend longform `/stories` articles via citation-gated story packets | `story-research-run --topics <topics.json> --provider mock --operator-id "$USER" --session-id "<id>"` |
+| story-research-run | Draft/recommend longform `/stories` chapters and entries via citation-gated story packets | `story-research-run --topics <topics.json> --provider mock --operator-id "$USER" --session-id "<id>"` |
 | harness-run | Run a thematic study (redlining, urban renewal) and draft ThemeImpactPackets | `harness-run --theme <question> --subjects <source-records.json> --max-subjects 25 --max-relations 25` |
 | locate | Census-geocode a sourced address to lat/lng (no LLM). Finding the place is `blackstory-entity-verify`. | `locate --entity-id <id> --address "<address>" --precision institution --operator-id "$USER" --session-id "<id>"` |
 | capture-backfill | Snapshot cited URLs into `source_captures`; looks up existing Wayback captures when a fetch fails, and `--wayback` secondary-anchors the rest at Save Page Now | `capture-backfill [--commit] [--wayback] [--max-captures 25]` |
@@ -286,3 +286,9 @@ fires the Python lane (no `.py` file required). `scripts/ci-local.sh` mirrors
 (the repo's `.nvmrc`) because `node:test`'s reporter output format differs between Node 22 and
 24 — running it on 24 can pass locally and still not match what CI reports.
 <!-- END BEADS INTEGRATION -->
+
+## Agent coordination (Claude Code ↔ Codex)
+
+The cross-agent coordination model and handoff protocol for this repo live in
+`COORDINATION.md` — the single source of truth (do not duplicate it here). Read
+`COORDINATION.md` at session start, and `HANDOFF.md` for live session state.

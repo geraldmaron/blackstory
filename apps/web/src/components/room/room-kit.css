@@ -2393,10 +2393,9 @@ a.ds-room-chip {
   }
 }
 
-/* Masthead: a sentence at hero scale, centered over the column it introduces, a 2px ink rule.
-   Set on the frame's left edge, a three-line headline and a 44rem lede filled the left two
-   thirds of the frame and left the rest empty, above chapters whose text is centered. The
-   headline, the lede and the crumb now share the chapters' axis, and the lede their measure. */
+/* Masthead: a sentence at hero scale over a 2px ink rule. Text is start-aligned like every chapter
+   under it; the frame is what is centered on the page, never the lines inside it. Centered headings
+   and ledes make ragged left edges on both sides, which is harder to scan than one hard left edge. */
 .ds-room--ledger .ds-entry--reading {
   display: grid;
   grid-template-columns: repeat(12, minmax(0, 1fr));
@@ -2405,7 +2404,7 @@ a.ds-room-chip {
   margin-bottom: 0;
   padding-bottom: var(--ds-space-8);
   border-bottom: 2px solid var(--ds-ink);
-  text-align: center;
+  text-align: start;
 }
 
 .ds-room--ledger .ds-entry--reading > * {
@@ -2414,7 +2413,7 @@ a.ds-room-chip {
 }
 
 .ds-room--ledger .ds-entry--reading > .ds-room-crumb {
-  justify-content: center;
+  justify-content: flex-start;
 }
 
 .ds-room--ledger .ds-entry__title {
@@ -2425,34 +2424,18 @@ a.ds-room-chip {
 }
 
 .ds-room--ledger .ds-entry__lede {
-  justify-self: center;
-  max-width: var(--room-measure);
+  justify-self: stretch;
+  /* The lede fills the masthead, the same width as the rule and stat row under it. The line length is
+     bounded by the frame (--room-doc-w), not by a measure: a narrower lede left a short block with
+     empty ground beside it above a full-width rule. */
+  max-width: none;
   color: var(--ds-ink);
-  text-wrap: balance;
+  text-wrap: pretty;
 }
 
 /* The sheet is a typeset document with its own alignment, whatever the masthead around it does. */
 .ds-room--ledger .ds-room-plate {
   text-align: start;
-}
-
-/* A plated masthead on a wide screen is already a full composition: headline and lede on the left,
-   the sheet on the right. It keeps its left edge; stacked on a narrow screen it centers like the
-   rest. */
-@media (min-width: 60rem) {
-  .ds-room--ledger .ds-entry--plated {
-    text-align: start;
-  }
-
-  .ds-room--ledger .ds-entry--plated > .ds-room-crumb {
-    justify-content: flex-start;
-  }
-
-  .ds-room--ledger .ds-entry--plated .ds-entry__lede {
-    justify-self: start;
-    max-width: none;
-    text-wrap: wrap;
-  }
 }
 
 /* Stat row. */

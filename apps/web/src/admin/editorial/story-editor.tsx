@@ -1197,48 +1197,21 @@ export function StoryEditor({
               setSelectedBlock(index);
               openInspector('Sources');
             }}
+            onInsertBlock={(type, index) => {
+              // Placed after the block the cursor was in; appended when the cursor never was.
+              const at = index === null ? draft.body.length : index;
+              const next = [...draft.body];
+              next.splice(at, 0, newBlock(type));
+              setSelectedBlock(at);
+              patch('body', next);
+              openInspector('Sources');
+            }}
             onError={(message) => {
               setError(message);
               setSuspended(true);
             }}
           />
           <div className="editorial-compose__insert">
-            <Select
-              aria-label="Add evidence block"
-              placeholder="Add an evidence block"
-              value={[]}
-              clearable={false}
-              searchable={true}
-              disabled={!editable}
-              options={[
-                'image',
-                'mapInset',
-                'figure',
-                'stat',
-                'primaryDocument',
-                'timeline',
-                'dispute',
-              ].map((id) => ({
-                id,
-                label: {
-                  image: 'Image',
-                  mapInset: 'Record map',
-                  figure: 'Figure',
-                  stat: 'Statistic',
-                  primaryDocument: 'Primary document',
-                  timeline: 'Timeline',
-                  dispute: 'Disputed account',
-                }[id],
-              }))}
-              onChange={({ value }) => {
-                const type = value[0]?.id;
-                if (type) {
-                  setSelectedBlock(draft.body.length);
-                  patch('body', [...draft.body, newBlock(type as StoryBodyBlockDoc['type'])]);
-                  openInspector('Sources');
-                }
-              }}
-            />
             <p>
               {wordCount} {wordCount === 1 ? 'word' : 'words'} · {draft.references.length}{' '}
               {draft.references.length === 1 ? 'source' : 'sources'} ·{' '}

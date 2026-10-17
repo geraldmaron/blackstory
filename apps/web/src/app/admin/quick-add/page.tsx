@@ -7,7 +7,7 @@ import { QuickAddForm } from './quick-add-form';
 import './quick-add.css';
 
 export const metadata = {
-  title: 'Quick add — BlackStory Admin',
+  title: 'Quick add',
   description: 'Paste a URL and open a draft research case through the operator proposal lane.',
 };
 

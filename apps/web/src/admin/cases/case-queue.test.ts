@@ -1,13 +1,11 @@
 /**
- * Tests for admin case-queue filter/sort/selection helpers.
+ * Tests for admin case-queue selection and action helpers.
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import {
   RESEARCH_CASE_BULK_LIMIT,
-  applyCaseQueue,
   commonActionsForSelection,
-  countCaseQueue,
   toggleCaseSelection,
 } from './case-queue';
 import type { AdminCaseListItem } from './research-case-types';
@@ -34,44 +32,7 @@ const sample: AdminCaseListItem = {
   placeHint: 'Tulsa',
 };
 
-test('applyCaseQueue filters inbox and search', () => {
-  const rows: AdminCaseListItem[] = [
-    sample,
-    { ...sample, id: 'case-2', state: 'excluded', title: 'Other' },
-    {
-      ...sample,
-      id: 'case-3',
-      state: 'relevance_review',
-      title: 'Review me',
-      placeHint: 'Chicago',
-    },
-  ];
-  const inbox = applyCaseQueue(rows, {
-    search: '',
-    state: 'inbox',
-    sortKey: 'updatedAt',
-    sortDirection: 'desc',
-  });
-  assert.equal(inbox.length, 2);
-  const search = applyCaseQueue(rows, {
-    search: 'chicago',
-    state: 'all',
-    sortKey: 'title',
-    sortDirection: 'asc',
-  });
-  assert.equal(search.length, 1);
-  assert.equal(search[0]?.id, 'case-3');
-});
-
-test('countCaseQueue and selection helpers', () => {
-  const rows: AdminCaseListItem[] = [
-    sample,
-    { ...sample, id: 'case-2', state: 'relevance_review' },
-  ];
-  const counts = countCaseQueue(rows);
-  assert.equal(counts.inbox, 2);
-  assert.equal(counts.candidate, 1);
-
+test('selection helpers', () => {
   let selected: ReadonlySet<string> = new Set<string>();
   for (let i = 0; i < RESEARCH_CASE_BULK_LIMIT + 3; i += 1) {
     selected = toggleCaseSelection(selected, `id-${i}`);

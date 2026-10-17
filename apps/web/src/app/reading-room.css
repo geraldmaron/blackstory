@@ -1245,136 +1245,13 @@ a.ds-errata__row-id {
    (MEMORIAL_OPENING_SCREENS); the 7rem subtraction is the room's offset from
    the top of the viewport. */
 .ds-memorial__opening {
-  /* The scroll cue renders as a sibling of the wall (see page.tsx and
-     MemorialWallAtmosphere.tsx). This block only reserves the opening
-     viewport. */
+  /* This block only reserves the opening viewport; the wall is behind it. */
   min-block-size: calc(100vh - 7rem);
   min-block-size: calc(100svh - 7rem);
   /* The remaining quarter screen of wall (MEMORIAL_OPENING_SCREENS = 1.25):
-     open field past the cue before the list. Kept as margin rather than
-     min-height so the cue still lands on the first screen. */
+     open field before the list. */
   margin-block-end: 25vh;
   margin-block-end: 25svh;
-}
-
-/* Positioned via inline style (top, in px) set by MemorialWallAtmosphere
-   once it measures the held message's actual rendered footprint; the 60vh
-   fallback below only covers the brief window before that measurement runs.
-   A sibling of the wall rather than a flex child of `__opening` so both
-   share the same coordinate frame (see page.tsx). Left-aligned to the same
-   `--memorial-content-left` the header and held message use, so all three
-   share one left edge. Row layout with `nowrap` — icon and label never
-   stack or break mid-label, per usual button convention; the icon renders
-   after the label in markup so it sits to the label's right. */
-.ds-memorial__scroll-cue {
-  position: absolute;
-  left: var(--memorial-content-left, 3vw);
-  top: 60vh;
-  top: 60svh;
-  z-index: var(--ds-z-content);
-  display: inline-flex;
-  flex-direction: row;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.625rem 1.125rem;
-  border: var(--ds-border-width) solid var(--ds-rule);
-  border-radius: 999px;
-  /* Fully opaque, not a tint: the packer already keeps handwritten names out
-     of the cue's footprint, and this is the second guarantee that none ever
-     shows through the button — a translucent fill let a name sitting behind
-     it read faintly through the pill. */
-  background: var(--ds-canvas);
-  font-family: var(--ds-font-mono);
-  font-size: 0.6875rem;
-  letter-spacing: 0.03em;
-  text-transform: uppercase;
-  white-space: nowrap;
-  color: var(--ds-ink-muted);
-  text-decoration: none;
-  cursor: pointer;
-  transition:
-    border-color var(--ds-duration-fast, 0.15s) var(--ds-easing, ease),
-    background var(--ds-duration-fast, 0.15s) var(--ds-easing, ease),
-    color var(--ds-duration-fast, 0.15s) var(--ds-easing, ease);
-}
-
-.ds-memorial__scroll-cue:hover {
-  color: var(--ds-ink);
-  border-color: var(--ds-accent-graphic);
-  background: var(--ds-surface-raised);
-}
-
-.ds-memorial__scroll-cue:focus-visible {
-  outline: 2px solid var(--ds-focus-ring, var(--ds-accent-graphic));
-  outline-offset: 2px;
-}
-
-/* "Hold the wall still." Fixed to the viewport rather than positioned within the
-   wall's own document flow: the packer's avoid-boxes only know about the header, the held
-   message and the scroll cue, and a name drawn through this control is exactly the "canvas
-   packed around real chrome" defect those boxes exist to prevent. Fixed positioning keeps it out
-   of that flow entirely rather than teaching the packer a fourth box. */
-.ds-memorial__hold-wall {
-  position: fixed;
-  right: 1rem;
-  bottom: 1rem;
-  z-index: var(--ds-z-content);
-  padding: 0.625rem 1.125rem;
-  border: var(--ds-border-width) solid var(--ds-rule);
-  border-radius: 999px;
-  background: var(--ds-canvas);
-  font-family: var(--ds-font-mono);
-  font-size: 0.6875rem;
-  letter-spacing: 0.03em;
-  text-transform: uppercase;
-  white-space: nowrap;
-  color: var(--ds-ink-muted);
-  cursor: pointer;
-  transition:
-    border-color var(--ds-duration-fast, 0.15s) var(--ds-easing, ease),
-    background var(--ds-duration-fast, 0.15s) var(--ds-easing, ease),
-    color var(--ds-duration-fast, 0.15s) var(--ds-easing, ease);
-}
-
-.ds-memorial__hold-wall:hover {
-  color: var(--ds-ink);
-  border-color: var(--ds-accent-graphic);
-  background: var(--ds-surface-raised);
-}
-
-.ds-memorial__hold-wall:focus-visible {
-  outline: 2px solid var(--ds-focus-ring, var(--ds-accent-graphic));
-  outline-offset: 2px;
-}
-
-.ds-memorial__hold-wall[aria-pressed='true'] {
-  color: var(--ds-ink);
-  border-color: var(--ds-accent-graphic);
-}
-
-.ds-memorial__scroll-cue-icon {
-  flex-shrink: 0;
-  width: 1rem;
-  height: 1rem;
-  animation: ds-memorial-scroll-cue-bounce 1.6s ease-in-out infinite;
-}
-
-@keyframes ds-memorial-scroll-cue-bounce {
-  0%,
-  100% {
-    transform: translateY(0);
-    opacity: 0.55;
-  }
-  50% {
-    transform: translateY(5px);
-    opacity: 1;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .ds-memorial__scroll-cue-icon {
-    animation: none;
-  }
 }
 
 /* The list is the page here, not a card on it: no border, no raised ground, no inset. */
@@ -1659,10 +1536,9 @@ a.ds-errata__row-id {
   scroll-margin-top: var(--ds-island-clearance);
 }
 
-/* The scroll cue moves focus here itself after scrolling (see
-   MemorialScrollCue.tsx) so keyboard/AT users land where the click just
-   took them; `tabindex="-1"` makes that possible without adding it to the
-   normal tab order, so no visible focus ring is needed for it. */
+/* A link to #memorial-names moves focus here so keyboard/AT users land where the link took them;
+   `tabindex="-1"` makes that possible without adding it to the normal tab order, so no visible
+   focus ring is needed for it. */
 #memorial-names:focus {
   outline: none;
 }

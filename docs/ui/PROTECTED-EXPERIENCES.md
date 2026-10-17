@@ -15,7 +15,6 @@ These constraints are non-negotiable for BlackStory v10 and later. Implementatio
 
 - `apps/web/src/app/memorial/page.tsx`
 - `apps/web/src/components/patterns/memorial-wall/MemorialWallAtmosphere.tsx`
-- `apps/web/src/app/memorial/MemorialScrollCue.tsx`
 - `apps/web/src/app/memorial/MemorialSections.tsx`
 - `apps/web/src/app/memorial/MemorialListContrastZone.tsx`
 
@@ -26,7 +25,7 @@ These constraints are non-negotiable for BlackStory v10 and later. Implementatio
 | Handwritten names wall | Must remain the opening atmosphere |
 | `MemorialWallAtmosphere` | Must remain the background layer |
 | Quiet opening composition | Bare kicker/title; no stacked lede/prose cluttering the wall |
-| Scroll invitation/cue | Keyboard-reachable quiet link into the accessible list |
+| Opening controls | None. The "Read every name" scroll cue and the "Hold the wall still" toggle were removed on 2026-10-16 by owner decision; the wall freezes only for `prefers-reduced-motion`, and the accessible list is reached by scrolling |
 | Accessible names list | Must remain below the fold as the non-canvas path |
 | Dignity framing | Names stay names; national memorial, not a join from a place record |
 | No gamification | No scores, streaks, unlocks |

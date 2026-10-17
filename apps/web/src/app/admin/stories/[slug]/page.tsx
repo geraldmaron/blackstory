@@ -9,6 +9,8 @@ import '../stories.css';
 export default async function StoryPage({ params }: { params: Promise<{ slug: string }> }) {
   if (!(await readVerifiedAdminIdentity())) redirect('/admin/login');
   const { slug } = await params;
+  // The contributor list does not depend on the story, so it loads alongside it.
+  const contributors = listContributors();
   const story: EditorialStory | null =
     slug === 'new'
       ? {
@@ -34,16 +36,16 @@ export default async function StoryPage({ params }: { params: Promise<{ slug: st
         }
       : await readStory(slug);
   if (!story) notFound();
+  const [profiles, relatedRecords] = await Promise.all([
+    contributors,
+    queryPostgres<{ id: string; display_name: string }>(
+      'SELECT id,display_name FROM canonical.entities WHERE id=ANY($1::text[])',
+      [story.draft.relatedEntityIds],
+    ),
+  ]);
   return (
     <main className="ds-container" id="main">
-      <StoryEditor
-        initial={story}
-        profiles={await listContributors()}
-        relatedRecords={await queryPostgres<{ id: string; display_name: string }>(
-          'SELECT id,display_name FROM canonical.entities WHERE id=ANY($1::text[])',
-          [story.draft.relatedEntityIds],
-        )}
-      />
+      <StoryEditor initial={story} profiles={profiles} relatedRecords={relatedRecords} />
     </main>
   );
 }

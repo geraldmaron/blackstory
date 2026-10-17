@@ -95,3 +95,10 @@ test('hasActiveSubmissionFilters ignores defaults but sees every real narrowing'
   assert.equal(hasActiveSubmissionFilters(parseSubmissionQuery({ status: 'promoted' })), true);
   assert.equal(hasActiveSubmissionFilters(parseSubmissionQuery({ kind: 'lead' })), true);
 });
+
+test('sort keys are whitelisted and round-trip; the default sort stays out of the URL', () => {
+  assert.equal(parseSubmissionQuery({ sort: 'kind', dir: 'asc' }).sort, 'kind');
+  assert.equal(parseSubmissionQuery({ sort: 'payload; DROP TABLE' }).sort, 'created');
+  assert.equal(serializeSubmissionQuery(parseSubmissionQuery({})), '');
+  assert.match(serializeSubmissionQuery(parseSubmissionQuery({ sort: 'status' })), /sort=status/);
+});

@@ -1,0 +1,7 @@
+# Scoped to apps/site, excluded from the root pnpm workspace like apps/mobile; formats itself.
+node_modules/
+dist/
+.expo/
+.local/
+package-lock.json
+expo-env.d.ts

@@ -29,6 +29,20 @@ test('the room menu is the locked about groups, not a second board', () => {
   assert.doesNotMatch(source, /DIRECT_PATHS/);
 });
 
+test('the Rooms menu and phone sheet carry the staff sign-in, quietly and without crawler follow', () => {
+  assert.match(source, /href="\/admin\/login"/);
+  assert.match(source, /Staff sign-in/);
+  // The link is `nofollow`, and it is not a registry destination: the console is not part of the archive.
+  assert.match(source, /href="\/admin\/login"\s+rel="nofollow"/);
+  assert.ok(
+    !['find', 'read', 'check', 'take-part'].some((group) =>
+      destinationsInGroup(group as Parameters<typeof destinationsInGroup>[0]).some((destination) =>
+        destination.path.startsWith('/admin'),
+      ),
+    ),
+  );
+});
+
 test('the Rooms menu rooms come from the same registry groups the hub renders', () => {
   assert.match(source, /ROOMS_CARD_GROUPS/);
   assert.match(source, /destinationsInGroup/);
