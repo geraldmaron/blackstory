@@ -25,11 +25,6 @@ export const MEMORIAL_HELD_MESSAGE_LINES = [
 export const MEMORIAL_LIST_NOTE =
   'This list is incomplete and always will be. If a name belongs here and is missing, send the evidence through Submit, or write to me@geralddagher.com.';
 
-export const MEMORIAL_QUIET_LIST_LINK_LABEL = 'Read every name';
-
-/** Spoken name for the cue above, which is deliberately terse on screen. */
-export const MEMORIAL_QUIET_LIST_LINK_A11Y_LABEL = 'Read every name held here';
-
 /**
  * Deterministic seed for the wall's handwriting layout. The value still reads `v6` and is
  * deliberately unchanged: it is a seed, not a label, and rewriting the string would reshuffle

@@ -85,13 +85,10 @@ export type MemorialWallAtmosphereProps = {
   /** Memorial name -> public entity id, for the small subset with a real entity page. */
   readonly entityLinksByName?: Readonly<Record<string, string>>;
   /**
-   * The reader's own "Hold the wall still" choice, ORed with the live
-   * `prefers-reduced-motion` read below to decide whether the reveal clock and the subset
-   * rotation actually run. `MemorialWallSection` (bottom of this file) owns this state and
-   * renders the real, keyboard-reachable control — this component's own root stays
-   * `aria-hidden`, so the control cannot live inside it.
+   * Freezes the reveal clock and the subset rotation. `MemorialWallSection` passes the live
+   * `prefers-reduced-motion` read; nothing on the page toggles it.
    */
-  readonly manuallyHeld?: boolean;
+  readonly held?: boolean;
 };
 
 function hashSeed(seedKey: string, width: number, height: number): number {
@@ -168,76 +165,6 @@ const HEADER_AVOID_MARGIN = 16;
  * butting straight up against the title.
  */
 const MESSAGE_TOP_GAP = 112;
-
-/** Gap kept between the held message's bottom edge and the scroll cue below it, in px. */
-const SCROLL_CUE_GAP = 40;
-
-/** Breathing room kept clear around the scroll cue button, in px. */
-const SCROLL_CUE_AVOID_MARGIN = 14;
-
-/**
- * Anchors the scroll cue below the held message's measured bottom edge and
- * returns its resulting footprint in the wall's local coordinate space, so the
- * packer can treat the button as occupied ground.
- *
- * The cue lives outside this component's tree — a sibling of the wall under
- * `.ds-memorial` (see page.tsx) — but the wall's left edge is flush
- * with that shared root's, so a box measured against the root converts to wall
- * coordinates by the same top-only shift used everywhere else here.
- *
- * Returns null when there is nothing to anchor to (no cue in the DOM, or the
- * message has not been laid out yet); the caller simply packs without the box
- * that pass and picks it up on the next rebuild.
- */
-function positionScrollCue(
-  root: HTMLElement,
-  messageField: HTMLElement | null,
-  viewportHeight: number,
-): MemorialAvoidBox | null {
-  const container = root.parentElement;
-  const scrollCue = container?.querySelector<HTMLElement>('.ds-memorial__scroll-cue');
-  const fieldBox = messageField?.getBoundingClientRect();
-  const containerBox = container?.getBoundingClientRect();
-  if (!scrollCue || !fieldBox || !containerBox || fieldBox.height === 0) {
-    return null;
-  }
-
-  const tentativeTop = fieldBox.bottom - containerBox.top + SCROLL_CUE_GAP;
-  /*
-   * Clamp so the cue's own bottom edge stays on-screen. Nothing previously bounded this against
-   * the viewport: a wrapped held message (a longer message, a larger OS font size, or a short
-   * viewport — landscape mobile, a modest laptop window) pushes `tentativeTop` down with it,
-   * and the cue — the one first-screen path to "Read every name" — can land below the fold.
-   * Height doesn't depend on `top` (absolute positioning doesn't reflow the box), so measuring
-   * before the write is safe; the CSS fallback (`top: 60vh`) already gives it a footprint to read.
-   */
-  const cueHeight = scrollCue.getBoundingClientRect().height;
-  const maxViewportTop = Math.max(0, viewportHeight - cueHeight - SCROLL_CUE_AVOID_MARGIN);
-  const viewportTop = Math.min(containerBox.top + tentativeTop, maxViewportTop);
-  const top = viewportTop - containerBox.top;
-  scrollCue.style.top = `${top}px`;
-
-  /*
-   * The cue is now at its real resting place rather than the 60vh CSS fallback.
-   * Setting it is idempotent; the packer rebuilds on resize.
-   */
-  scrollCue.dataset.anchored = 'true';
-
-  // Read back after the write so the box reflects the position just applied,
-  // and so the cue's own size comes from the rendered pill rather than a guess
-  // at its padding and label width.
-  const rootBox = root.getBoundingClientRect();
-  const cueBox = scrollCue.getBoundingClientRect();
-  if (cueBox.width === 0 || cueBox.height === 0) {
-    return null;
-  }
-  return {
-    left: cueBox.left - rootBox.left - SCROLL_CUE_AVOID_MARGIN,
-    right: cueBox.right - rootBox.left + SCROLL_CUE_AVOID_MARGIN,
-    top: cueBox.top - rootBox.top - SCROLL_CUE_AVOID_MARGIN,
-    bottom: cueBox.bottom - rootBox.top + SCROLL_CUE_AVOID_MARGIN,
-  };
-}
 
 /**
  * Left and bottom edges of a page header, when one exists, in the wall's local
@@ -355,7 +282,7 @@ export function MemorialWallAtmosphere({
   names = MEMORIAL_NAMES,
   messageLines,
   entityLinksByName,
-  manuallyHeld,
+  held: heldProp,
 }: MemorialWallAtmosphereProps) {
   const rootRef = useRef<HTMLDivElement | null>(null);
   const measureRef = useRef<HTMLSpanElement | null>(null);
@@ -364,20 +291,9 @@ export function MemorialWallAtmosphere({
   const resolvedFontsRef = useRef<Map<string, string> | null>(null);
   const [placements, setPlacements] = useState<readonly PlacedMemorialName[]>([]);
   const reducedMotion = useReducedMotion();
-  /*
-   * Reveal clock and subset rotation freeze on `manuallyHeld` — not a live `reducedMotion ||`
-   * here. `manuallyHeld` already seeds true the moment `reducedMotion` turns on (the effect in
-   * `MemorialWallSection` below) and stays true across renders, so ORing `reducedMotion` back in
-   * was redundant on the way in and actively wrong on the way out: it silently overrode the
-   * reader's own explicit "Let the wall move again" click for as long as the OS preference stayed
-   * on, so the control's label and `aria-pressed` (driven by `manuallyHeld` alone) claimed
-   * "resumed" while the wall stayed frozen underneath — the reported "hold the wall is pointless"
-   * bug (repo-vl155.5). `MemorialWallSection`'s own doc comment already says the click "always
-   * freezes or un-freezes"; this makes that true. Scroll-linked fade (below) is a different,
-   * reader-driven interaction, not ambient cycling, and correctly stays keyed on `reducedMotion`
-   * alone regardless of this — a resumed hold never re-enables scroll-linked motion.
-   */
-  const held = Boolean(manuallyHeld);
+  // Reveal clock and subset rotation freeze when held. Scroll-linked fade (below) is a reader-driven
+  // interaction, not ambient cycling, and stays keyed on `reducedMotion` alone.
+  const held = Boolean(heldProp);
   const [reveal, setReveal] = useState<MemorialRevealState>(() =>
     computeMemorialRevealState(0, { reducedMotion: held }),
   );
@@ -461,28 +377,14 @@ export function MemorialWallAtmosphere({
       const contentLeft = headerBox?.left ?? Math.max(16, width * 0.03);
       root.style.setProperty('--memorial-message-top', `${messageTopEdge}px`);
       // Set on the shared `.ds-memorial` ancestor (not `root`, the
-      // wall itself) so the scroll cue — a sibling of the wall, not a
-      // descendant — inherits it too. The wall's own left edge is flush
+      // wall itself) so siblings of the wall, not only its
+      // descendants, inherit it. The wall's own left edge is flush
       // with `.ds-memorial`'s (only the top is pulled up), so this
       // one value lines up both elements.
       const editionRoot = root.parentElement;
       if (editionRoot instanceof HTMLElement) {
         editionRoot.style.setProperty('--memorial-content-left', `${contentLeft}px`);
       }
-
-      // The real, keyboard-reachable scroll cue renders outside this
-      // component's tree as another sibling under `.ds-memorial`
-      // (see page.tsx). Anchor it below the message's actual measured
-      // footprint rather than pinning it to the bottom of the viewport, so
-      // it reads as "the end of the paragraph" instead of a fixed dead zone.
-      //
-      // Placed *before* the names are packed, not after: the cue is an opaque
-      // control sitting on the same canvas, so its footprint has to be one of
-      // the avoid boxes below. Positioning it afterwards left the packer
-      // unaware of it, and handwritten names surfaced behind the button.
-      const scrollCueBox = hasMessage
-        ? positionScrollCue(root, messageRef.current, viewportHeight)
-        : null;
 
       const subset = selectWallSubset(
         displayNames,
@@ -516,7 +418,6 @@ export function MemorialWallAtmosphere({
             ? (measureMessageAvoidBox(root, messageRef.current) ??
               estimateMessageAvoidBox(width, viewportHeight, messageTopEdge))
             : null,
-          scrollCueBox,
         ].filter((box): box is MemorialAvoidBox => box !== null),
         measure: (name, fontFamily, fontSizePx) => {
           ctx.font = `${fontSizePx}px ${resolveFontFamily(fontFamily)}`;
@@ -547,7 +448,7 @@ export function MemorialWallAtmosphere({
     window.addEventListener('resize', scheduleResize);
 
     // Full pool cycles: periodically rotate which capped subset is on screen.
-    // Reduced motion, or the reader's own "Hold the wall still", skips this so the field stays
+    // Reduced motion skips this so the field stays
     // still, per wall spec.
     let rotateTimer: number | null = null;
     if (!held && displayNames.length > DENSITY_CAP) {
@@ -684,41 +585,12 @@ export function MemorialWallAtmosphere({
 }
 
 /**
- * `MemorialWallAtmosphere`'s own root is `aria-hidden` (it is decorative canvas), so a real,
- * keyboard-reachable "Hold the wall still" control cannot live inside its returned tree — the
- * same reason `MemorialScrollCue` renders as a sibling from `page.tsx` rather than nested here.
- * This wrapper owns the one piece of state both need to share (the reader's manual hold, ORed
- * with the live `prefers-reduced-motion` read) and renders the atmosphere plus the control as
- * siblings in a fragment, so `page.tsx` can mount one component in place of the bare atmosphere
- * without changing the DOM structure `positionScrollCue` depends on (no extra wrapping element).
- *
- * The control's own pressed state seeds from, and stays true once, the OS preference — turning
- * reduced motion on mid-session also marks the wall held, matching "live" reduced motion
- * elsewhere in this epic. Turning it back off does not auto-resume a wall the reader may be
- * looking at; resuming is the reader's own separate, explicit click. Whether or not any OS
- * preference is set, the control stays present and functional — its own click always freezes or
- * un-freezes the reader's own hold.
+ * Mounts the atmosphere frozen whenever the OS asks for reduced motion. There is no on-page control:
+ * the wall is decorative, so the reader's only switch is the system preference, read live.
  */
 export function MemorialWallSection(
-  props: Omit<MemorialWallAtmosphereProps, 'manuallyHeld'>,
+  props: Omit<MemorialWallAtmosphereProps, 'held'>,
 ): React.ReactElement {
   const reducedMotion = useReducedMotion();
-  const [manuallyHeld, setManuallyHeld] = useState(reducedMotion);
-  useEffect(() => {
-    if (reducedMotion) setManuallyHeld(true);
-  }, [reducedMotion]);
-
-  return (
-    <>
-      <MemorialWallAtmosphere {...props} manuallyHeld={manuallyHeld} />
-      <button
-        type="button"
-        className="ds-memorial__hold-wall"
-        aria-pressed={manuallyHeld}
-        onClick={() => setManuallyHeld((held) => !held)}
-      >
-        {manuallyHeld ? 'Let the wall move again' : 'Hold the wall still'}
-      </button>
-    </>
-  );
+  return <MemorialWallAtmosphere {...props} held={reducedMotion} />;
 }
