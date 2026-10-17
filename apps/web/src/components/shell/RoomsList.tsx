@@ -49,17 +49,30 @@ export function RoomsList({ onNavigate }: RoomsListProps) {
           </div>
         ))}
       </div>
-      {/* The hub itself. Without it `/rooms` was reachable from the footer and the breadcrumb
-          chain but from nothing in the bar, even though the control is named after it. */}
-      <Link
-        className="ds-roomsmenu__hub"
-        href="/rooms"
-        prefetch={false}
-        onClick={() => onNavigate?.()}
-      >
-        <DestinationIcon id="rooms" />
-        All rooms
-      </Link>
+      <div className="ds-roomsmenu__foot">
+        {/* The hub itself. Without it `/rooms` was reachable from the footer and the breadcrumb
+            chain but from nothing in the bar, even though the control is named after it. */}
+        <Link
+          className="ds-roomsmenu__hub"
+          href="/rooms"
+          prefetch={false}
+          onClick={() => onNavigate?.()}
+        >
+          <DestinationIcon id="rooms" />
+          All rooms
+        </Link>
+        {/* Staff reach the console from the menu, not only the footer. A quiet text link, not a
+            room: it is not part of the archive, and `nofollow` keeps crawlers out of the console. */}
+        <Link
+          className="ds-roomsmenu__staff"
+          href="/admin/login"
+          rel="nofollow"
+          prefetch={false}
+          onClick={() => onNavigate?.()}
+        >
+          Staff sign-in
+        </Link>
+      </div>
     </>
   );
 }

@@ -120,23 +120,42 @@
   color: var(--ds-ink-muted);
 }
 
-.ds-roomsmenu__hub {
+.ds-roomsmenu__foot {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
-  gap: 0.55rem;
+  justify-content: space-between;
+  gap: var(--ds-space-2) var(--ds-space-4);
   margin-top: var(--ds-space-5);
   padding-top: var(--ds-space-4);
   border-top: var(--ds-border-width) solid color-mix(in srgb, var(--ds-rule) 72%, transparent);
+}
+
+.ds-roomsmenu__hub,
+.ds-roomsmenu__staff {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
   color: var(--ds-ink);
   font-size: 13.5px;
   text-decoration: none;
 }
 
-.ds-roomsmenu__hub:hover {
+/* Quieter than the hub: it is a utility for staff, not a way to read the archive. */
+.ds-roomsmenu__staff {
+  color: var(--ds-ink-muted);
+  font-family: var(--ds-font-mono);
+  font-size: 0.75rem;
+  letter-spacing: 0.03em;
+}
+
+.ds-roomsmenu__hub:hover,
+.ds-roomsmenu__staff:hover {
   color: var(--ds-accent);
 }
 
-.ds-roomsmenu__hub:focus-visible {
+.ds-roomsmenu__hub:focus-visible,
+.ds-roomsmenu__staff:focus-visible {
   outline: 2px solid var(--ds-accent-graphic);
   outline-offset: 2px;
 }
@@ -146,7 +165,9 @@
    --ds-island-height; the Explore gutter token does not, so the sheet would sit under the bar. */
 @media (max-width: 60rem) {
   .ds-roomsmenu__trigger,
-  .ds-roomsmenu__item {
+  .ds-roomsmenu__item,
+  .ds-roomsmenu__hub,
+  .ds-roomsmenu__staff {
     min-height: 44px;
   }
 
