@@ -24,7 +24,9 @@ test('the ledger masthead, crumb and lede are start-aligned', () => {
     rule(css, '.ds-room--ledger .ds-entry--reading > .ds-room-crumb'),
     /justify-content:\s*flex-start/,
   );
-  assert.match(rule(css, '.ds-room--ledger .ds-entry__lede'), /justify-self:\s*start/);
+  const lede = rule(css, '.ds-room--ledger .ds-entry__lede');
+  assert.match(lede, /justify-self:\s*stretch/);
+  assert.match(lede, /max-width:\s*none/);
 });
 
 test('door journey cards place themselves centered but do not center their text', () => {

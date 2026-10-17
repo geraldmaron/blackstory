@@ -2424,8 +2424,11 @@ a.ds-room-chip {
 }
 
 .ds-room--ledger .ds-entry__lede {
-  justify-self: start;
-  max-width: var(--room-measure);
+  justify-self: stretch;
+  /* The lede fills the masthead, the same width as the rule and stat row under it. The line length is
+     bounded by the frame (--room-doc-w), not by a measure: a narrower lede left a short block with
+     empty ground beside it above a full-width rule. */
+  max-width: none;
   color: var(--ds-ink);
   text-wrap: pretty;
 }
@@ -2433,15 +2436,6 @@ a.ds-room-chip {
 /* The sheet is a typeset document with its own alignment, whatever the masthead around it does. */
 .ds-room--ledger .ds-room-plate {
   text-align: start;
-}
-
-/* A plated masthead on a wide screen is already a full composition: headline and lede on the left,
-   the sheet on the right, so its lede takes the whole column instead of the reading measure. */
-@media (min-width: 60rem) {
-  .ds-room--ledger .ds-entry--plated .ds-entry__lede {
-    max-width: none;
-    text-wrap: wrap;
-  }
 }
 
 /* Stat row. */
