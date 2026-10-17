@@ -158,3 +158,65 @@ rendered "… — BlackStory Admin — BlackStory Admin" because the layout temp
   mode, paste handling, the block-card move and remove buttons, the lint highlights and
   missing-citation marks (covered by unit tests only), drag-and-drop, and the editor on a long article
   (typing latency was not measured).
+
+## Follow-up: why navigation is slow, and the UI pass
+
+### Where the time goes on one navigation
+
+Measured against the running app, first visit versus repeat visit of the same route:
+
+| Route | First visit | Repeat |
+|---|---|---|
+| Switches | 8.1 s | 0.40 s |
+| Graylist | 6.7 s | 0.43 s |
+| Audit | 3.9 s | 0.55 s |
+| Catalog | 8.1 s | 0.49 s |
+
+Three separate causes, in order of size:
+
+1. **First visits compile (dev only).** `next dev --webpack` compiles each route on demand, so the
+   first click on any desk takes 3 to 8 s and the old page stays on screen the whole time (measured:
+   the next route's loading state appeared 1.6 s after the click). A production build does not do
+   this. Untested option: drop `--webpack` from the `dev` script and use Turbopack; the flag was set
+   deliberately, so that needs a decision and a check that Base Web and the CSS stubs still work.
+2. **No loading state existed.** There was no `loading.tsx` under `/admin`, so every server render,
+   warm or cold, left the old content frozen. Added `app/admin/loading.tsx` (a skeleton) and hover
+   and focus prefetch on the sidebar, which `router.push` navigation never did.
+3. **Repeated auth round trips.** Each navigation called Supabase `getUser` in the proxy, again in
+   each nested layout and page (two to three more, 150 to 250 ms apiece), and the browser then called
+   `/admin/api/auth/me` for the role. Now: the proxy still validates the session with Supabase; the
+   layout and pages verify the signed token locally with `getClaims` (the project signs with ES256,
+   so no network) and share one result per request through `cache()`; the layout passes the verified
+   role to the client, which no longer fetches it. Warm navigations improved by 60 to 140 ms
+   (Switches 397 to 260 ms, Audit 553 to 476 ms).
+
+What remains in a warm navigation is the proxy's `getUser` (about 150 ms) plus the page's own
+Postgres reads (100 to 250 ms per round trip to the remote pooler). Cutting further means a Supabase
+region closer to the Vercel region, or caching reads that tolerate staleness; neither was changed.
+
+Security note on the change in item 3: the second auth layer no longer detects a session revoked
+server-side in the last hour; the proxy layer still does, on every request. The API routes still call
+`getUser`.
+
+### UI pass
+
+- Controls follow operator density on desktop (`pointer: fine`): 32 px buttons, inputs and selects
+  with 6 px corners, replacing the public site's 40 to 44 px pills. Touch devices keep large targets.
+- New shared pieces in `admin/design-system`: `DeskTitleBar` (title, count, short description,
+  actions), `Panel` (bordered, shadowed section container), `StatTile` and `StatGrid`,
+  `ActiveFilters` (removable filter chips with clear-all), `DeskToolbar` (search, filters, sort
+  select and direction toggle, count), and `PageSkeleton`.
+- Applied to the dashboard (stat tiles and panels instead of paragraphs), Catalog, Submissions,
+  Inbox, Research cases, Audit and Graylist. All five list desks now share one search, sort and
+  filter control, chips for every active filter, and a count. Submissions gained sort keys (submitted,
+  kind, status) and moved onto `DataTable`.
+- Long guidance moved out of headers (the Inbox's three-step list is a disclosure); long case titles
+  clamp to two lines; audit rows show a short actor id instead of a 36-character account id.
+- Sidebar rows are shorter and less indented so the full menu fits a laptop screen.
+
+Not changed: Sources, Discovery runs, Releases, Switches, Articles, Story review, Contributors, the
+forms (Quick add, Attach evidence), the detail pages, and Citation health still use the earlier
+headers and tables. Filter controls on Sources, Releases, Discovery runs and Articles are the
+remaining gap in the "consistent filtering" request. The catalog table still scrolls sideways at
+1440 px with the rail open (the Updated column); the Base Web buttons inside the editor and forms
+follow the new density but were not re-checked one by one.

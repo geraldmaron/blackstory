@@ -33,8 +33,19 @@ export type SubmissionDetail = SubmissionListItem & {
   readonly payload: unknown;
 };
 
+export const SUBMISSION_SORT_KEYS = ['created', 'kind', 'status'] as const;
+export type SubmissionSortKey = (typeof SUBMISSION_SORT_KEYS)[number];
+
+/** Whitelisted ORDER BY expressions; the sort key never reaches SQL as text from the caller. */
+const SUBMISSION_SORT_SQL: Record<SubmissionSortKey, string> = {
+  created: 'created_at',
+  kind: "coalesce(kind, 'unspecified')",
+  status: 'status',
+};
+
 export type SubmissionQuery = {
   readonly search?: string;
+  readonly sort?: SubmissionSortKey;
   readonly statuses?: readonly string[];
   readonly kinds?: readonly string[];
   readonly direction?: 'asc' | 'desc';
@@ -160,6 +171,7 @@ export async function queryIntakeItemPage(query: SubmissionQuery): Promise<Submi
   const pageSize = normalizePageSize(query.pageSize);
   const where = buildWhere(query);
   const direction = query.direction === 'asc' ? 'ASC' : 'DESC';
+  const sort = SUBMISSION_SORT_SQL[query.sort ?? 'created'];
 
   const countRows = await queryPostgres<{ readonly total: string }>(
     `SELECT count(*)::text AS total FROM submissions.intake_items ${where.sql}`,
@@ -175,7 +187,7 @@ export async function queryIntakeItemPage(query: SubmissionQuery): Promise<Submi
     `SELECT ${LIST_COLUMNS}
      FROM submissions.intake_items
      ${where.sql}
-     ORDER BY created_at ${direction}, id ASC
+     ORDER BY ${sort} ${direction}, created_at DESC, id ASC
      LIMIT $${where.params.length + 1} OFFSET $${where.params.length + 2}`,
     [...where.params, pageSize, offset],
   );

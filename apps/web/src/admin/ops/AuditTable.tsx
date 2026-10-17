@@ -8,6 +8,11 @@ import { DataTable, type DataTableColumn } from '@repo/ui';
 import { formatWhen } from '../lib/format-when';
 import type { AuditEventListItem } from './audit-store';
 
+/** A 36-character account id is noise in a row; the full value stays in the tooltip. */
+function shorten(id: string): string {
+  return id.length > 14 ? `${id.slice(0, 8)}…` : id;
+}
+
 export function AuditTable({
   rows,
   sortHref,
@@ -46,10 +51,10 @@ export function AuditTable({
       id: 'actor',
       header: 'Actor',
       cell: (row) => (
-        <span className="ds-mono">
-          {row.actorDisplayName ?? row.actorId}
+        <span className="ds-mono" title={row.actorId}>
+          {row.actorDisplayName ?? shorten(row.actorId)}
           <br />
-          {row.actorType}
+          <span className="story-review__row-meta">{row.actorType}</span>
         </span>
       ),
     },

@@ -8,6 +8,8 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useCallback, useEffect, useId, useMemo, useRef, useState } from 'react';
 import { Pagination } from '@repo/ui';
+import { DeskToolbar } from '../design-system/DeskToolbar';
+import { ActiveFilters, DeskTitleBar, Panel, type ActiveFilter } from '../design-system/ui';
 import { useAdminAuth } from '../auth/AdminAuthProvider';
 import type { CaseQuery, CaseStateBucket } from './case-query-types';
 import {
@@ -21,7 +23,6 @@ import {
 import {
   caseQueryHref,
   defaultCaseStates,
-  hasActiveCaseFilters,
   serializeCaseQuery,
   type CaseQueueMode,
 } from './case-query-params';
@@ -67,7 +68,6 @@ export function CaseQueue({
   const router = useRouter();
   const { getIdToken } = useAdminAuth();
   const basePath = mode === 'inbox' ? '/admin/inbox' : '/admin/cases';
-  const filterForm = useRef<HTMLFormElement>(null);
   const [selectedIds, setSelectedIds] = useState<ReadonlySet<string>>(() => new Set());
   const [activeId, setActiveId] = useState<string | null>(null);
   const [detail, setDetail] = useState<AdminCaseDetail | null>(null);
@@ -115,7 +115,6 @@ export function CaseQueue({
     () => commonActionsForSelection(rows, selectedIds),
     [rows, selectedIds],
   );
-  const filtersActive = hasActiveCaseFilters(query, mode);
   const defaultStates = defaultCaseStates(mode);
   const activeStates = query.states ?? [];
   const isInboxView =
@@ -130,6 +129,24 @@ export function CaseQueue({
     query.sort === key ? (query.direction === 'asc' ? ' ↑' : ' ↓') : '';
   const ariaSort = (key: NonNullable<CaseQuery['sort']>): 'ascending' | 'descending' | 'none' =>
     query.sort === key ? (query.direction === 'asc' ? 'ascending' : 'descending') : 'none';
+  const activeFilters: ActiveFilter[] = [
+    ...(query.search
+      ? [
+          {
+            label: `“${query.search}”`,
+            removeHref: caseQueryHref(basePath, mode, query, { search: '' }),
+          },
+        ]
+      : []),
+    ...(query.assignee && query.assignee !== 'any'
+      ? [
+          {
+            label: query.assignee === 'assigned' ? 'Assigned' : 'Unassigned',
+            removeHref: caseQueryHref(basePath, mode, query, { assignee: 'any' }),
+          },
+        ]
+      : []),
+  ];
   const stateChips: readonly {
     readonly id: string;
     readonly label: string;
@@ -307,26 +324,30 @@ export function CaseQueue({
 
   return (
     <div className="acq" data-mode={mode}>
-      <header className="acq__header">
-        <div>
-          <p className="acq__eyebrow">{mode === 'inbox' ? 'Work queue' : 'All cases'}</p>
-          <h1 className="acq__title">{mode === 'inbox' ? 'Inbox' : 'Research cases'}</h1>
-          <p className="acq__lede">{CASE_QUEUE_INTENT_COPY[mode]}</p>
-          <ol className="acq__steps" aria-label="How to decide on a case">
-            {CASE_TRIAGE_STEPS.map((step) => (
-              <li key={step}>{step}</li>
-            ))}
-          </ol>
-        </div>
-        <FormButton
-          type="button"
-          className="acq__button acq__button--ghost"
-          onClick={() => void load()}
-          disabled={busy}
-        >
-          Refresh
-        </FormButton>
-      </header>
+      <DeskTitleBar
+        eyebrow={mode === 'inbox' ? 'Research' : 'Research / all states'}
+        title={mode === 'inbox' ? 'Inbox' : 'Research cases'}
+        meta={<span>{total.toLocaleString()} in this view</span>}
+        description={CASE_QUEUE_INTENT_COPY[mode]}
+        actions={
+          <FormButton
+            type="button"
+            className="acq__button acq__button--ghost"
+            onClick={() => void load()}
+            disabled={busy}
+          >
+            Refresh
+          </FormButton>
+        }
+      />
+      <details className="acq__howto">
+        <summary>How to decide on a case</summary>
+        <ol className="acq__steps" aria-label="How to decide on a case">
+          {CASE_TRIAGE_STEPS.map((step) => (
+            <li key={step}>{step}</li>
+          ))}
+        </ol>
+      </details>
 
       <nav className="acq__stats" aria-label="Filter by state">
         {stateChips.map((chip) => {
@@ -349,76 +370,44 @@ export function CaseQueue({
         })}
       </nav>
 
-      {/* A plain GET form: search survives with JS off and leaves a shareable URL. The state
-          filter rides along as a hidden input so searching never silently drops it. */}
-      <form
-        ref={filterForm}
-        className="acq__toolbar"
-        method="get"
+      <DeskToolbar
+        label="Search, filter and sort"
         action={basePath}
-        role="search"
-        aria-label="Search, filter and sort"
-      >
-        {activeStates.length > 0 && activeStates.join(',') !== defaultStates.join(',') ? (
-          <input type="hidden" name="state" value={activeStates.join(',')} />
-        ) : null}
-        <label className="acq__field acq__field--grow">
-          <span>Search</span>
-          <FormInput
-            type="search"
-            name="q"
-            defaultValue={query.search ?? ''}
-            placeholder="Title, id, candidate or reviewer…"
-          />
-        </label>
-        <label className="acq__field">
-          <span>Assignee</span>
-          <FormSelect
-            name="assignee"
-            defaultValue={query.assignee ?? 'any'}
-            aria-label="Assignee"
-            onValueChange={() => filterForm.current?.requestSubmit()}
-          >
-            <option value="any">Anyone</option>
-            <option value="assigned">Assigned</option>
-            <option value="unassigned">Unassigned</option>
-          </FormSelect>
-        </label>
-        <label className="acq__field">
-          <span>Sort</span>
-          <FormSelect
-            name="sort"
-            defaultValue={query.sort ?? 'updated'}
-            aria-label="Sort"
-            onValueChange={() => filterForm.current?.requestSubmit()}
-          >
-            <option value="updated">Updated</option>
-            <option value="title">Title</option>
-            <option value="state">State</option>
-            <option value="checklist">Checklist</option>
-          </FormSelect>
-        </label>
-        <label className="acq__field">
-          <span>Direction</span>
-          <FormSelect
-            name="dir"
-            defaultValue={query.direction ?? 'desc'}
-            aria-label="Direction"
-            onValueChange={() => filterForm.current?.requestSubmit()}
-          >
-            <option value="desc">Descending</option>
-            <option value="asc">Ascending</option>
-          </FormSelect>
-        </label>
-        <FormButton type="submit" className="acq__button">
-          Apply
-        </FormButton>
-        {filtersActive ? (
-          <Link className="acq__button acq__button--ghost" href={basePath}>
-            Reset
-          </Link>
-        ) : null}
-      </form>
+        preserved={
+          activeStates.length > 0 && activeStates.join(',') !== defaultStates.join(',')
+            ? { state: activeStates.join(',') }
+            : {}
+        }
+        search={{
+          value: query.search ?? '',
+          placeholder: 'Title, id, candidate or reviewer…',
+        }}
+        filters={[
+          {
+            name: 'assignee',
+            label: 'Assignee',
+            value: query.assignee ?? 'any',
+            options: [
+              { value: 'any', label: 'Anyone' },
+              { value: 'assigned', label: 'Assigned' },
+              { value: 'unassigned', label: 'Unassigned' },
+            ],
+          },
+        ]}
+        sort={{
+          value: query.sort ?? 'updated',
+          direction: query.direction ?? 'desc',
+          options: [
+            { value: 'updated', label: 'Updated' },
+            { value: 'created', label: 'Created' },
+            { value: 'title', label: 'Title' },
+            { value: 'state', label: 'State' },
+            { value: 'checklist', label: 'Checklist' },
+          ],
+        }}
+        summary={`${total.toLocaleString()} cases`}
+      />
+      <ActiveFilters filters={activeFilters} clearHref={basePath} />
 
       {error ? (
         <p className="acq__alert" role="alert">
@@ -484,108 +473,112 @@ export function CaseQueue({
       {visible.length === 0 ? (
         <p className="acq__empty">No research cases match this filter.</p>
       ) : (
-        <div className="acq__table-wrap">
-          <table className="acq__table">
-            <caption className="ds-visually-hidden">
-              Research cases: showing {visible.length} of {total.toLocaleString()}
-            </caption>
-            <thead>
-              <tr>
-                <th scope="col">
-                  <label className="acq__checkbox-hit">
-                    <FormInput
-                      type="checkbox"
-                      checked={allVisibleSelected}
-                      onChange={() =>
-                        setSelectedIds((current) =>
-                          toggleAllCaseSelection(
-                            current,
-                            visible.map((row) => row.id),
-                            !allVisibleSelected,
-                          ),
-                        )
-                      }
-                      aria-label="Select all visible cases"
-                    />
-                  </label>
-                </th>
-                <th scope="col" aria-sort={ariaSort('title')}>
-                  <Link href={sortHref('title')}>Title{sortMark('title')}</Link>
-                </th>
-                <th scope="col" aria-sort={ariaSort('state')}>
-                  <Link href={sortHref('state')}>State{sortMark('state')}</Link>
-                </th>
-                {showChecklistColumn ? (
-                  <th scope="col" aria-sort={ariaSort('checklist')}>
-                    <Link href={sortHref('checklist')}>Checklist{sortMark('checklist')}</Link>
+        <Panel flush label="Research cases">
+          <div className="acq__table-wrap">
+            <table className="acq__table">
+              <caption className="ds-visually-hidden">
+                Research cases: showing {visible.length} of {total.toLocaleString()}
+              </caption>
+              <thead>
+                <tr>
+                  <th scope="col">
+                    <label className="acq__checkbox-hit">
+                      <FormInput
+                        type="checkbox"
+                        checked={allVisibleSelected}
+                        onChange={() =>
+                          setSelectedIds((current) =>
+                            toggleAllCaseSelection(
+                              current,
+                              visible.map((row) => row.id),
+                              !allVisibleSelected,
+                            ),
+                          )
+                        }
+                        aria-label="Select all visible cases"
+                      />
+                    </label>
                   </th>
-                ) : null}
-                <th scope="col">Assignee</th>
-                <th scope="col" aria-sort={ariaSort('updated')}>
-                  <Link href={sortHref('updated')}>Updated{sortMark('updated')}</Link>
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              {visible.map((row) => {
-                const isActive = activeId === row.id;
-                const isChecked = selectedIds.has(row.id);
-                return (
-                  <tr
-                    key={row.id}
-                    className={[
-                      'acq__row',
-                      isActive ? 'is-selected' : '',
-                      isChecked ? 'is-checked' : '',
-                    ]
-                      .filter(Boolean)
-                      .join(' ')}
-                    onClick={() => void openDetail(row.id)}
-                    aria-selected={isActive}
-                  >
-                    <td onClick={(event) => event.stopPropagation()}>
-                      <label className="acq__checkbox-hit">
-                        <FormInput
-                          type="checkbox"
-                          checked={isChecked}
-                          onChange={() =>
-                            setSelectedIds((current) => toggleCaseSelection(current, row.id))
-                          }
-                          aria-label={`Select ${row.title}`}
-                          disabled={!isChecked && selectedIds.size >= RESEARCH_CASE_BULK_LIMIT}
-                        />
-                      </label>
-                    </td>
-                    <td>
-                      <span className="acq__row-title">{row.title}</span>
-                      <span className="acq__row-id">{row.id}</span>
-                    </td>
-                    <td>
-                      <span className="acq__badge">{stateLabel(row.state)}</span>
-                    </td>
-                    {showChecklistColumn ? (
+                  <th scope="col" aria-sort={ariaSort('title')}>
+                    <Link href={sortHref('title')}>Title{sortMark('title')}</Link>
+                  </th>
+                  <th scope="col" aria-sort={ariaSort('state')}>
+                    <Link href={sortHref('state')}>State{sortMark('state')}</Link>
+                  </th>
+                  {showChecklistColumn ? (
+                    <th scope="col" aria-sort={ariaSort('checklist')}>
+                      <Link href={sortHref('checklist')}>Checklist{sortMark('checklist')}</Link>
+                    </th>
+                  ) : null}
+                  <th scope="col">Assignee</th>
+                  <th scope="col" aria-sort={ariaSort('updated')}>
+                    <Link href={sortHref('updated')}>Updated{sortMark('updated')}</Link>
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                {visible.map((row) => {
+                  const isActive = activeId === row.id;
+                  const isChecked = selectedIds.has(row.id);
+                  return (
+                    <tr
+                      key={row.id}
+                      className={[
+                        'acq__row',
+                        isActive ? 'is-selected' : '',
+                        isChecked ? 'is-checked' : '',
+                      ]
+                        .filter(Boolean)
+                        .join(' ')}
+                      onClick={() => void openDetail(row.id)}
+                      aria-selected={isActive}
+                    >
+                      <td onClick={(event) => event.stopPropagation()}>
+                        <label className="acq__checkbox-hit">
+                          <FormInput
+                            type="checkbox"
+                            checked={isChecked}
+                            onChange={() =>
+                              setSelectedIds((current) => toggleCaseSelection(current, row.id))
+                            }
+                            aria-label={`Select ${row.title}`}
+                            disabled={!isChecked && selectedIds.size >= RESEARCH_CASE_BULK_LIMIT}
+                          />
+                        </label>
+                      </td>
+                      <td>
+                        <span className="acq__row-title" title={row.title}>
+                          {row.title}
+                        </span>
+                        <span className="acq__row-id">{row.id}</span>
+                      </td>
+                      <td>
+                        <span className="acq__badge">{stateLabel(row.state)}</span>
+                      </td>
+                      {showChecklistColumn ? (
+                        <td className="acq__mono">
+                          {row.checklistTotal === 0 ? (
+                            <span className="acq__not-set">Not set</span>
+                          ) : (
+                            `${row.checklistComplete}/${row.checklistTotal}`
+                          )}
+                        </td>
+                      ) : null}
                       <td className="acq__mono">
-                        {row.checklistTotal === 0 ? (
-                          <span className="acq__not-set">Not set</span>
+                        {row.assigneeId ? (
+                          row.assigneeId
                         ) : (
-                          `${row.checklistComplete}/${row.checklistTotal}`
+                          <span className="acq__not-set">Unassigned</span>
                         )}
                       </td>
-                    ) : null}
-                    <td className="acq__mono">
-                      {row.assigneeId ? (
-                        row.assigneeId
-                      ) : (
-                        <span className="acq__not-set">Unassigned</span>
-                      )}
-                    </td>
-                    <td className="acq__updated">{formatWhen(row.updatedAt)}</td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        </div>
+                      <td className="acq__updated">{formatWhen(row.updatedAt)}</td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        </Panel>
       )}
 
       <Pagination

@@ -2,6 +2,7 @@
  * Admin home — operations desk with actionable queue cards and env posture.
  */
 import Link from 'next/link';
+import { DeskTitleBar, Panel, StatGrid, StatTile } from '../../admin/design-system/ui';
 import { redirect } from 'next/navigation';
 import { readVerifiedAdminIdentity } from '../../admin/auth/supabase-server';
 import { AdminHomeSessionCta } from '../../admin/ops/AdminHomeSessionCta';
@@ -47,104 +48,84 @@ export default async function AdminHomePage() {
     'Pending story packets',
   );
 
+  const count = (metric: { text: string; unavailable: boolean }) =>
+    metric.unavailable ? 'Unavailable' : metric.text;
+  const tone = (metric: { unavailable: boolean }, value: string) =>
+    metric.unavailable ? 'muted' : Number(value) > 0 ? 'attention' : 'default';
+
   return (
-    <main className="admin-home admin-ops" id="main">
-      <section className="admin-ops__panel" aria-labelledby="admin-home-title">
-        <p className="admin-ops__eyebrow">Operations desk</p>
-        <h1 className="admin-ops__title" id="admin-home-title">
-          BlackStory Admin
-        </h1>
-        <p className="admin-ops__lede">
-          Review public corrections, appeals, reports, and leads in Submissions. The Inbox holds
-          pending research cases. Staff decisions are recorded for audit; publication is a separate
-          step.
-        </p>
+    <main className="ds-container ds-page" id="main">
+      <DeskTitleBar
+        eyebrow="Operations"
+        title="Work"
+        meta={
+          <>
+            <span>{env.appEnv}</span>
+            <span aria-hidden="true">·</span>
+            <span>{env.dataSource}</span>
+            {env.productionBreakGlass ? (
+              <>
+                <span aria-hidden="true">·</span>
+                <span>production break-glass</span>
+              </>
+            ) : null}
+          </>
+        }
+        description="What is waiting for a decision. Staff decisions are audited; publication is a separate step."
+      />
 
-        <p className="admin-ops__env" aria-label="Runtime environment">
-          <span>{env.appEnv}</span>
-          <span aria-hidden="true"> · </span>
-          <span>{env.dataSource}</span>
-          <span aria-hidden="true"> · </span>
-          <span>{env.authMode}</span>
-          {env.productionBreakGlass ? (
-            <>
-              <span aria-hidden="true"> · </span>
-              <span>production break-glass</span>
-            </>
-          ) : null}
-        </p>
+      <StatGrid label="Queues waiting for review">
+        <StatTile
+          label="Submissions"
+          value={count(submissionsMetric)}
+          tone={tone(submissionsMetric, submissionsMetric.text)}
+          hint="Corrections, appeals, reports and leads"
+          href="/admin/submissions"
+        />
+        <StatTile
+          label="Inbox"
+          value={count(researchMetric)}
+          tone={tone(researchMetric, researchMetric.text)}
+          hint="Research cases to triage"
+          href="/admin/inbox"
+        />
+        <StatTile
+          label="Story review"
+          value={count(storyMetric)}
+          tone={tone(storyMetric, storyMetric.text)}
+          hint="Packets before they become articles"
+          href="/admin/stories/review"
+        />
+      </StatGrid>
 
-        <nav className="admin-ops__queues" aria-label="Operations queues">
-          <Link className="admin-ops__card" href="/admin/submissions">
-            <span className="admin-ops__card-label">Submissions</span>
-            <span className="admin-ops__card-metric">
-              {submissionsMetric.unavailable ? 'unavailable' : `${submissionsMetric.text} pending`}
-            </span>
-            <span className="admin-ops__card-detail">
-              Public corrections, appeals, abuse reports, and leads awaiting review
-            </span>
-          </Link>
-          <Link className="admin-ops__card" href="/admin/inbox">
-            <span className="admin-ops__card-label">Inbox</span>
-            {researchMetric.unavailable ? (
-              <span className="admin-ops__card-metric" role="status">
-                unavailable
-              </span>
-            ) : (
-              <span className="admin-ops__card-metric">{researchMetric.text} pending</span>
-            )}
-            <span className="admin-ops__card-detail">
-              Pending research cases: triage, confirm, exclude, or request evidence
-            </span>
-          </Link>
-
-          <Link className="admin-ops__card" href="/admin/stories/review">
-            <span className="admin-ops__card-label">Story review</span>
-            {storyMetric.unavailable ? (
-              <span className="admin-ops__card-metric" role="status">
-                unavailable
-              </span>
-            ) : (
-              <span className="admin-ops__card-metric">{storyMetric.text} pending</span>
-            )}
-            <span className="admin-ops__card-detail">
-              Review research packets, then continue writing in Articles.
-            </span>
-          </Link>
-
-          <Link className="admin-ops__card" href="/admin/catalog">
-            <span className="admin-ops__card-label">Catalog</span>
-            <span className="admin-ops__card-metric">What exists</span>
-            <span className="admin-ops__card-detail">
-              Canonical entities already in the archive
-            </span>
-          </Link>
-
-          <Link className="admin-ops__card" href="/admin/cases">
-            <span className="admin-ops__card-label">All cases</span>
-            <span className="admin-ops__card-metric">Every state</span>
-            <span className="admin-ops__card-detail">Research cases in every state</span>
-          </Link>
-
-          <Link className="admin-ops__card" href="/admin/releases">
-            <span className="admin-ops__card-label">Releases</span>
-            <span className="admin-ops__card-metric">Publication desk</span>
-            <span className="admin-ops__card-detail">
-              Stage release decisions. Activation requires the authorized publication executor
-            </span>
-          </Link>
-
-          <Link className="admin-ops__card" href="/admin/quick-add">
-            <span className="admin-ops__card-label">Quick add</span>
-            <span className="admin-ops__card-metric">New intake</span>
-            <span className="admin-ops__card-detail">
-              Submit a source URL with a draft research case for the Inbox
-            </span>
-          </Link>
-        </nav>
-
-        <AdminHomeSessionCta />
-      </section>
+      <div className="admin-base-two-col">
+        <Panel
+          title="Jump to"
+          description="The desks used most, in the order work flows through them."
+        >
+          <ul className="admin-base-linklist">
+            <li>
+              <Link href="/admin/quick-add">Quick add</Link>
+              <span>Submit a source URL with a draft case</span>
+            </li>
+            <li>
+              <Link href="/admin/cases">All research cases</Link>
+              <span>Every state, not only the inbox</span>
+            </li>
+            <li>
+              <Link href="/admin/catalog">Entities</Link>
+              <span>Canonical records already in the archive</span>
+            </li>
+            <li>
+              <Link href="/admin/releases">Releases</Link>
+              <span>Stage decisions; activation needs the publication executor</span>
+            </li>
+          </ul>
+        </Panel>
+        <Panel title="Session" description="Who you are signed in as.">
+          <AdminHomeSessionCta />
+        </Panel>
+      </div>
     </main>
   );
 }

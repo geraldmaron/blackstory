@@ -2,15 +2,22 @@
  * Server-rendered queue for all submission kinds, filtered and paginated in SQL. Story-specific
  * review remains available in the story workbench.
  */
-import { FormButton, FormInput } from '../../../admin/design-system/fields';
-import Link from 'next/link';
-import { FacetRail, Pagination, Toolbar, ToolbarField, type FacetGroup } from '@repo/ui';
+import { FacetRail, Pagination, type FacetGroup } from '@repo/ui';
+import { DeskToolbar } from '../../../admin/design-system/DeskToolbar';
+import {
+  ActiveFilters,
+  DeskTitleBar,
+  Panel,
+  type ActiveFilter,
+} from '../../../admin/design-system/ui';
+import { SubmissionsTable } from './SubmissionsTable';
 import { readPostgresOrDegrade } from '../../../admin/lib/canonical-postgres-client';
 import {
   queryIntakeItemFacets,
   queryIntakeItemPage,
   type FacetBucket,
   type SubmissionQuery,
+  type SubmissionSortKey,
 } from '../../../admin/lib/postgres-submissions';
 import {
   hasActiveSubmissionFilters,
@@ -47,18 +54,6 @@ function toFacetGroup(
   };
 }
 
-function formatWhen(iso: string): string {
-  const date = new Date(iso);
-  if (Number.isNaN(date.getTime())) return iso;
-  return date.toLocaleString(undefined, {
-    year: 'numeric',
-    month: 'short',
-    day: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit',
-  });
-}
-
 export default async function SubmissionsPage({
   searchParams,
 }: {
@@ -91,27 +86,64 @@ export default async function SubmissionsPage({
 
   const filtersActive = hasActiveSubmissionFilters(query);
 
-  const { search: _omitSearch, ...queryWithoutSearch } = query;
-  const preservedParams = new URLSearchParams(
-    serializeSubmissionQuery({ ...queryWithoutSearch, page: 1 }),
+  const {
+    search: _omitSearch,
+    sort: _omitSort,
+    direction: _omitDir,
+    ...queryWithoutSearch
+  } = query;
+  const preserved = Object.fromEntries(
+    new URLSearchParams(serializeSubmissionQuery({ ...queryWithoutSearch, page: 1 })),
   );
+  const isDefaultStatus = query.statuses?.length === 1 && query.statuses[0] === 'quarantined';
+  const active: ActiveFilter[] = [
+    ...(query.search
+      ? [
+          {
+            label: `“${query.search}”`,
+            removeHref: submissionQueryHref(BASE_PATH, query, { search: '' }),
+          },
+        ]
+      : []),
+    ...(isDefaultStatus ? [] : (query.statuses ?? [])).map((value) => ({
+      label: `Status: ${titleCase(value)}`,
+      removeHref: toggleSubmissionFacetHref(BASE_PATH, query, 'statuses', value),
+    })),
+    ...(query.kinds ?? []).map((value) => ({
+      label: `Kind: ${titleCase(value)}`,
+      removeHref: toggleSubmissionFacetHref(BASE_PATH, query, 'kinds', value),
+    })),
+  ];
+  const sortHref = (key: SubmissionSortKey): string => {
+    const direction =
+      query.sort === key
+        ? query.direction === 'asc'
+          ? 'desc'
+          : 'asc'
+        : key === 'created'
+          ? 'desc'
+          : 'asc';
+    return submissionQueryHref(BASE_PATH, query, { sort: key, direction });
+  };
 
   return (
     <main className="ds-container ds-page" id="main">
-      <header className="ds-page__header">
-        <p className="ds-page__eyebrow">Intake</p>
-        <h1 className="ds-page__title">Submissions</h1>
-        <p className="ds-page__lede">
-          Review public corrections, appeals, abuse reports, leads, and research proposals. Promote
-          an item to open a research case. Decisions update correction receipt status; they do not
-          publish changes.
-        </p>
-        <p className="story-review__notice">
-          <Link href="/admin/stories/review">Story packet review</Link>
-          {' · '}
-          <Link href="/admin/cases">Research cases</Link>
-        </p>
-      </header>
+      <DeskTitleBar
+        eyebrow="Intake"
+        title="Submissions"
+        meta={<span>{page.total.toLocaleString()} in this view</span>}
+        description="Public corrections, appeals, abuse reports, leads and research proposals. Promote an item to open a research case. Decisions update receipt status; they never publish."
+        actions={
+          <>
+            <a className="ds-button ds-button--secondary" href="/admin/stories/review">
+              Story packets
+            </a>
+            <a className="ds-button ds-button--secondary" href="/admin/cases">
+              Research cases
+            </a>
+          </>
+        }
+      />
 
       {degradedReason ? (
         <p className="story-review__alert" role="alert">
@@ -126,80 +158,42 @@ export default async function SubmissionsPage({
         </div>
 
         <div className="ds-workbench__main">
-          <Toolbar
+          <DeskToolbar
             label="Search submissions"
             action={BASE_PATH}
-            preservedParams={Object.fromEntries(preservedParams.entries())}
-            actions={
-              <>
-                <FormButton type="submit" className="ds-button ds-button--secondary">
-                  Search
-                </FormButton>
-                {filtersActive ? (
-                  <a className="ds-button ds-button--secondary" href={BASE_PATH}>
-                    Reset
-                  </a>
-                ) : null}
-              </>
-            }
-          >
-            <ToolbarField label="Search">
-              <FormInput
-                type="search"
-                name="q"
-                defaultValue={query.search ?? ''}
-                placeholder="Id, source URL, or payload text…"
-              />
-            </ToolbarField>
-          </Toolbar>
+            preserved={preserved}
+            search={{ value: query.search ?? '', placeholder: 'Id, source URL, or payload text…' }}
+            sort={{
+              value: query.sort ?? 'created',
+              direction: query.direction ?? 'desc',
+              options: [
+                { value: 'created', label: 'Submitted' },
+                { value: 'kind', label: 'Kind' },
+                { value: 'status', label: 'Status' },
+              ],
+            }}
+            summary={`${page.total.toLocaleString()} submissions`}
+          />
+          <ActiveFilters filters={active} clearHref={BASE_PATH} />
 
-          <section className="story-review__queue" aria-label="Submissions">
-            {page.rows.length === 0 ? (
-              <p className="ds-sans">
-                No submissions match this view.{' '}
-                {query.statuses?.length === 1 && query.statuses[0] === 'quarantined'
+          <Panel flush label="Submissions">
+            <SubmissionsTable
+              rows={page.rows}
+              basePath={BASE_PATH}
+              sortKey={query.sort ?? 'created'}
+              sortDirection={query.direction ?? 'desc'}
+              sortHrefs={{
+                created: sortHref('created'),
+                kind: sortHref('kind'),
+                status: sortHref('status'),
+              }}
+              emptyHint={
+                isDefaultStatus
                   ? 'The quarantined queue is empty right now.'
-                  : 'Try clearing a filter.'}
-              </p>
-            ) : (
-              <div className="story-review__table-wrap">
-                <table className="story-review__table">
-                  <caption className="ds-visually-hidden">
-                    Submissions with status, kind, source, and intake time
-                  </caption>
-                  <thead>
-                    <tr>
-                      <th scope="col">Submission</th>
-                      <th scope="col">Kind</th>
-                      <th scope="col">Status</th>
-                      <th scope="col">Submitted</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {page.rows.map((row) => (
-                      <tr key={row.id}>
-                        <td>
-                          <Link className="story-review__row-title" href={`${BASE_PATH}/${row.id}`}>
-                            {row.title}
-                          </Link>
-                          <p className="story-review__row-meta ds-mono">
-                            {row.id}
-                            {row.sourceUrl ? ` · ${row.sourceUrl}` : ''}
-                          </p>
-                        </td>
-                        <td>{row.kind ? titleCase(row.kind) : 'Unspecified'}</td>
-                        <td>
-                          <span className="story-review__badge">{titleCase(row.status)}</span>
-                        </td>
-                        <td className="ds-mono">{formatWhen(row.createdAt)}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-                <p className="story-review__queue-foot ds-mono">{page.total} total</p>
-              </div>
-            )}
-          </section>
+                  : 'Try clearing a filter.'
+              }
+            />
+          </Panel>
 
           <Pagination
             page={page.page}

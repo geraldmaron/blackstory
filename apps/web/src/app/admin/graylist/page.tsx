@@ -5,9 +5,14 @@
  * default view is the parked queue; promoted and archived entries are one facet click away.
  */
 import type { Metadata } from 'next';
-import Link from 'next/link';
-import { FacetRail, Pagination, Toolbar, ToolbarField, type FacetGroup } from '@repo/ui';
-import { FormButton, FormInput } from '../../../admin/design-system/fields';
+import { FacetRail, Pagination, type FacetGroup } from '@repo/ui';
+import { DeskToolbar } from '../../../admin/design-system/DeskToolbar';
+import {
+  ActiveFilters,
+  DeskTitleBar,
+  Panel,
+  type ActiveFilter,
+} from '../../../admin/design-system/ui';
 import { readPostgresOrDegrade } from '../../../admin/lib/canonical-postgres-client';
 import {
   graylistQueryHref,
@@ -89,8 +94,30 @@ export default async function GraylistPage({
       formatGraylistDisposition,
     ),
   ];
-  const { search: _s, ...rest } = query;
-  const preservedParams = new URLSearchParams(serializeGraylistQuery({ ...rest, page: 1 }));
+  const { search: _s, sort: _o, direction: _d, ...rest } = query;
+  const preserved = Object.fromEntries(
+    new URLSearchParams(serializeGraylistQuery({ ...rest, page: 1 })),
+  );
+  const active: ActiveFilter[] = [
+    ...(query.search
+      ? [
+          {
+            label: `“${query.search}”`,
+            removeHref: graylistQueryHref(BASE_PATH, query, { search: '' }),
+          },
+        ]
+      : []),
+    ...(query.statuses ?? [])
+      .filter(() => !(query.statuses?.length === 1 && query.statuses[0] === 'parked'))
+      .map((value) => ({
+        label: `Status: ${formatGraylistStatus(value)}`,
+        removeHref: toggleGraylistFacetHref(BASE_PATH, query, 'statuses', value),
+      })),
+    ...(query.dispositions ?? []).map((value) => ({
+      label: formatGraylistDisposition(value),
+      removeHref: toggleGraylistFacetHref(BASE_PATH, query, 'dispositions', value),
+    })),
+  ];
 
   const sortHref = (key: GraylistSortKey): string => {
     const direction = query.sort === key ? (query.direction === 'asc' ? 'desc' : 'asc') : 'desc';
@@ -99,20 +126,22 @@ export default async function GraylistPage({
 
   return (
     <main className="ds-container ds-page" id="main">
-      <header className="ds-page__header">
-        <p className="ds-page__eyebrow">Discovery</p>
-        <h1 className="ds-page__title">Graylist</h1>
-        <p className="ds-page__lede">
-          Below-threshold discovery candidates parked for corroboration, not silently dropped.
-          Review scores and reasons here; promoting to the Inbox or publishing stays in the triage
-          and release desks.
-        </p>
-        <p className="story-review__notice">
-          Next: <Link href="/admin/inbox">Open inbox</Link>
-          {' · '}
-          <Link href="/admin/discovery">Campaign runs</Link>
-        </p>
-      </header>
+      <DeskTitleBar
+        eyebrow="Intake"
+        title="Graylist"
+        meta={<span>{page.total.toLocaleString()} entries</span>}
+        description="Discovery candidates parked below the relevance bar for corroboration. Promoting to the Inbox and publishing stay in the triage and release desks."
+        actions={
+          <>
+            <a className="ds-button ds-button--secondary" href="/admin/inbox">
+              Open inbox
+            </a>
+            <a className="ds-button ds-button--secondary" href="/admin/discovery">
+              Campaign runs
+            </a>
+          </>
+        }
+      />
 
       {degradedReason ? (
         <p className="story-review__alert" role="alert">
@@ -127,44 +156,37 @@ export default async function GraylistPage({
           <FacetRail groups={facetGroups} clearHref={BASE_PATH} hasActiveFilters={filtersActive} />
         </div>
         <div className="ds-workbench__main">
-          <Toolbar
+          <DeskToolbar
             label="Search graylist"
             action={BASE_PATH}
-            preservedParams={Object.fromEntries(preservedParams.entries())}
-            actions={
-              <>
-                <FormButton type="submit" className="ds-button ds-button--secondary">
-                  Search
-                </FormButton>
-                {filtersActive ? (
-                  <Link className="ds-button ds-button--secondary" href={BASE_PATH}>
-                    Reset
-                  </Link>
-                ) : null}
-              </>
-            }
-          >
-            <ToolbarField label="Search">
-              <FormInput
-                type="search"
-                name="q"
-                defaultValue={query.search ?? ''}
-                placeholder="Candidate, id, reason or adapter…"
-              />
-            </ToolbarField>
-          </Toolbar>
-
-          <GraylistTable
-            rows={page.rows}
-            sortKey={query.sort ?? 'parked'}
-            sortDirection={query.direction ?? 'desc'}
-            sortHrefs={{
-              parked: sortHref('parked'),
-              score: sortHref('score'),
-              updated: sortHref('updated'),
+            preserved={preserved}
+            search={{ value: query.search ?? '', placeholder: 'Candidate, id, reason or adapter…' }}
+            sort={{
+              value: query.sort ?? 'parked',
+              direction: query.direction ?? 'desc',
+              options: [
+                { value: 'parked', label: 'Parked' },
+                { value: 'score', label: 'Score' },
+                { value: 'updated', label: 'Updated' },
+              ],
             }}
-            resetHref={BASE_PATH}
+            summary={`${page.total.toLocaleString()} entries`}
           />
+          <ActiveFilters filters={active} clearHref={BASE_PATH} />
+
+          <Panel flush label="Graylist entries">
+            <GraylistTable
+              rows={page.rows}
+              sortKey={query.sort ?? 'parked'}
+              sortDirection={query.direction ?? 'desc'}
+              sortHrefs={{
+                parked: sortHref('parked'),
+                score: sortHref('score'),
+                updated: sortHref('updated'),
+              }}
+              resetHref={BASE_PATH}
+            />
+          </Panel>
 
           <Pagination
             page={page.page}

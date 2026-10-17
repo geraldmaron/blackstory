@@ -78,6 +78,14 @@ export function AdminShellChrome({ children }: { readonly children: React.ReactN
   const [paletteOpen, setPaletteOpen] = useState(false),
     [navigationOpen, setNavigationOpen] = useState(false);
   const openPalette = useCallback(() => setPaletteOpen(true), []);
+  const prefetchFromEvent = useCallback(
+    (event: React.SyntheticEvent) => {
+      const anchor = (event.target as HTMLElement).closest('a[href^="/admin"]');
+      const href = anchor?.getAttribute('href');
+      if (href) router.prefetch(href);
+    },
+    [router],
+  );
   useCommandPaletteHotkey(openPalette);
   const login = pathname.startsWith('/admin/login');
   const badge = (label: string, queue: AdminQueueKey | undefined) => {
@@ -111,7 +119,14 @@ export function AdminShellChrome({ children }: { readonly children: React.ReactN
   }));
   const paletteItems = adminPaletteItems(extras);
   const navigation = (
-    <nav aria-label="Management">
+    <nav
+      aria-label="Management"
+      // The sidebar navigates with router.push, which never prefetches. Warming the route on
+      // hover or keyboard focus lets the loading shell (and, in production, the route's static
+      // part) arrive before the click.
+      onMouseOver={prefetchFromEvent}
+      onFocus={prefetchFromEvent}
+    >
       <Navigation
         items={items}
         activeItemId={pathname}
@@ -140,9 +155,10 @@ export function AdminShellChrome({ children }: { readonly children: React.ReactN
             style: ({ $active, $selectable }: { $active: boolean; $selectable: boolean }) => ({
               fontSize: '13px',
               lineHeight: '20px',
-              minHeight: $selectable ? '34px' : '24px',
-              paddingTop: $selectable ? '6px' : '14px',
-              paddingBottom: $selectable ? '6px' : '4px',
+              minHeight: $selectable ? '28px' : '22px',
+              paddingLeft: $selectable ? '24px' : '12px',
+              paddingTop: $selectable ? '4px' : '12px',
+              paddingBottom: $selectable ? '4px' : '2px',
               ...($selectable
                 ? {}
                 : {

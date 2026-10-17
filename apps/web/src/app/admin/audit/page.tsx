@@ -8,9 +8,14 @@
  * `/admin/api/audit` stays for callers outside this page.
  */
 import type { Metadata } from 'next';
-import Link from 'next/link';
-import { FacetRail, Pagination, Toolbar, ToolbarField, type FacetGroup } from '@repo/ui';
-import { FormButton, FormInput } from '../../../admin/design-system/fields';
+import { FacetRail, Pagination, type FacetGroup } from '@repo/ui';
+import { DeskToolbar } from '../../../admin/design-system/DeskToolbar';
+import {
+  ActiveFilters,
+  DeskTitleBar,
+  Panel,
+  type ActiveFilter,
+} from '../../../admin/design-system/ui';
 import { readPostgresOrDegrade } from '../../../admin/lib/canonical-postgres-client';
 import {
   auditQueryHref,
@@ -87,23 +92,50 @@ export default async function AuditPage({
     facetGroup('actor', 'Actor type', 'actorTypes', facets.actorType, query),
   ];
   // Everything except the fields this form owns rides along as hidden inputs, so searching never
-  // silently drops the facets, sort or page the operator already chose.
-  const { search: _s, from: _f, to: _t, ...rest } = query;
-  const preservedParams = new URLSearchParams(serializeAuditQuery({ ...rest, page: 1 }));
+  // silently drops the facets or page size the operator already chose.
+  const { search: _s, from: _f, to: _t, direction: _d, ...rest } = query;
+  const preserved = Object.fromEntries(
+    new URLSearchParams(serializeAuditQuery({ ...rest, page: 1 })),
+  );
+  const active: ActiveFilter[] = [
+    ...(query.search
+      ? [
+          {
+            label: `“${query.search}”`,
+            removeHref: auditQueryHref(BASE_PATH, query, { search: '' }),
+          },
+        ]
+      : []),
+    ...(query.categories ?? []).map((value) => ({
+      label: `Category: ${titleCase(value)}`,
+      removeHref: toggleAuditFacetHref(BASE_PATH, query, 'categories', value),
+    })),
+    ...(query.actorTypes ?? []).map((value) => ({
+      label: `Actor: ${titleCase(value)}`,
+      removeHref: toggleAuditFacetHref(BASE_PATH, query, 'actorTypes', value),
+    })),
+    ...(query.from
+      ? [
+          {
+            label: `From ${query.from}`,
+            removeHref: auditQueryHref(BASE_PATH, query, { from: '' }),
+          },
+        ]
+      : []),
+    ...(query.to
+      ? [{ label: `To ${query.to}`, removeHref: auditQueryHref(BASE_PATH, query, { to: '' }) }]
+      : []),
+  ];
   const nextDirection = query.direction === 'asc' ? 'desc' : 'asc';
 
   return (
     <main className="ds-container ds-page" id="main">
-      <header className="ds-page__header">
-        <p className="ds-page__eyebrow">Operations</p>
-        <h1 className="ds-page__title">Audit log</h1>
-        <p className="ds-page__lede">
-          Append-only audit trail of operator and system actions across intake, triage, and
-          publication. Read-only history; this desk does not replay, undo, or mutate underlying
-          records. The Reason column holds the operator note behind each transition, release and
-          kill-switch change.
-        </p>
-      </header>
+      <DeskTitleBar
+        eyebrow="System"
+        title="Audit log"
+        meta={<span>{page.total.toLocaleString()} events</span>}
+        description="Append-only record of operator and system actions. Read-only: nothing here replays or undoes a change. The Reason column holds the note behind each transition, release and kill-switch change."
+      />
 
       {degradedReason ? (
         <p className="story-review__alert" role="alert">
@@ -118,45 +150,43 @@ export default async function AuditPage({
           <FacetRail groups={facetGroups} clearHref={BASE_PATH} hasActiveFilters={filtersActive} />
         </div>
         <div className="ds-workbench__main">
-          <Toolbar
+          <DeskToolbar
             label="Search audit events"
             action={BASE_PATH}
-            preservedParams={Object.fromEntries(preservedParams.entries())}
-            actions={
+            preserved={preserved}
+            search={{
+              value: query.search ?? '',
+              placeholder: 'Action, reason, actor, subject, entity or release…',
+            }}
+            extra={
               <>
-                <FormButton type="submit" className="ds-button ds-button--secondary">
-                  Apply
-                </FormButton>
-                {filtersActive ? (
-                  <Link className="ds-button ds-button--secondary" href={BASE_PATH}>
-                    Reset
-                  </Link>
-                ) : null}
+                <label className="admin-base-controls__field">
+                  <span>From</span>
+                  <input type="date" name="from" defaultValue={query.from ?? ''} />
+                </label>
+                <label className="admin-base-controls__field">
+                  <span>To</span>
+                  <input type="date" name="to" defaultValue={query.to ?? ''} />
+                </label>
               </>
             }
-          >
-            <ToolbarField label="Search">
-              <FormInput
-                type="search"
-                name="q"
-                defaultValue={query.search ?? ''}
-                placeholder="Action, reason, actor, subject, entity or release…"
-              />
-            </ToolbarField>
-            <ToolbarField label="From">
-              <FormInput type="date" name="from" defaultValue={query.from ?? ''} />
-            </ToolbarField>
-            <ToolbarField label="To">
-              <FormInput type="date" name="to" defaultValue={query.to ?? ''} />
-            </ToolbarField>
-          </Toolbar>
-
-          <AuditTable
-            rows={page.rows}
-            sortHref={auditQueryHref(BASE_PATH, query, { direction: nextDirection })}
-            sortDirection={query.direction ?? 'desc'}
-            resetHref={BASE_PATH}
+            sort={{
+              value: 'time',
+              direction: query.direction ?? 'desc',
+              options: [{ value: 'time', label: 'Time' }],
+            }}
+            summary={`${page.total.toLocaleString()} events`}
           />
+          <ActiveFilters filters={active} clearHref={BASE_PATH} />
+
+          <Panel flush label="Audit events">
+            <AuditTable
+              rows={page.rows}
+              sortHref={auditQueryHref(BASE_PATH, query, { direction: nextDirection })}
+              sortDirection={query.direction ?? 'desc'}
+              resetHref={BASE_PATH}
+            />
+          </Panel>
 
           <Pagination
             page={page.page}

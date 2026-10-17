@@ -12,10 +12,10 @@
  * Decisions recorded here still never publish. The next release build reads them, and the
  * signed-manifest privileged-apply flow remains the only thing that makes anything live.
  */
-import { FormButton, FormInput } from '../../../admin/design-system/fields';
-import Link from 'next/link';
+import { DeskToolbar } from '../../../admin/design-system/DeskToolbar';
+import { ActiveFilters, DeskTitleBar, type ActiveFilter } from '../../../admin/design-system/ui';
 import { SENSITIVITY_CLASSES } from '@repo/domain';
-import { FacetRail, Pagination, Toolbar, ToolbarField, type FacetGroup } from '@repo/ui';
+import { FacetRail, Pagination, type FacetGroup } from '@repo/ui';
 import {
   entityQueryHref,
   hasActiveFilters,
@@ -136,27 +136,75 @@ export default async function CatalogPage({
   const filtersActive = hasActiveFilters(query);
 
   // Carried as hidden inputs so submitting the search box keeps the rest of the view intact.
-  const { search: _omitSearch, ...queryWithoutSearch } = query;
+  const {
+    search: _omitSearch,
+    sort: _omitSort,
+    direction: _omitDir,
+    ...queryWithoutSearch
+  } = query;
   const preservedParams = new URLSearchParams(
     serializeEntityQuery({ ...queryWithoutSearch, page: 1 }),
   );
 
+  const facetValue = (key: FacetKey, value: string, label: string): ActiveFilter => ({
+    label,
+    removeHref: toggleFacetHref(BASE_PATH, query, key, value),
+  });
+  const activeFilters: ActiveFilter[] = [
+    ...(query.search
+      ? [
+          {
+            label: `“${query.search}”`,
+            removeHref: entityQueryHref(BASE_PATH, query, { search: '' }),
+          },
+        ]
+      : []),
+    ...(query.entityClasses ?? []).map((v) =>
+      facetValue('entityClasses', v, `Class: ${titleCase(v)}`),
+    ),
+    ...(query.kinds ?? []).map((v) => facetValue('kinds', v, `Kind: ${titleCase(v)}`)),
+    ...(query.livingStatuses ?? []).map((v) =>
+      facetValue('livingStatuses', v, `Living: ${formatLivingStatusLabel(v)}`),
+    ),
+    ...(query.sensitivityClasses ?? []).map((v) =>
+      facetValue('sensitivityClasses', v, `Sensitivity: ${titleCase(v)}`),
+    ),
+    ...(query.withoutClaims
+      ? [
+          {
+            label: 'No claims yet',
+            removeHref: entityQueryHref(BASE_PATH, query, { withoutClaims: false }),
+          },
+        ]
+      : []),
+    ...(query.mergeState === 'absorbed'
+      ? [
+          {
+            label: 'Merged away',
+            removeHref: entityQueryHref(BASE_PATH, query, { mergeState: 'active' }),
+          },
+        ]
+      : []),
+  ];
+
   return (
     <main className="ds-container ds-page" id="main">
-      <header className="ds-page__header">
-        <p className="ds-page__eyebrow">Canonical catalog</p>
-        <h1 className="ds-page__title">Entities</h1>
-        <p className="ds-page__lede">
-          Every canonical entity in the archive — filter, sort, and act in bulk. Nothing here
-          publishes on its own; the next release build reads these decisions, and the signed
-          manifest is still what makes anything live.
-        </p>
-        <p className="story-review__notice">
-          <Link href="/admin/inbox">Pending research</Link>
-          {' · '}
-          <Link href="/admin/cases">All cases</Link>
-        </p>
-      </header>
+      <DeskTitleBar
+        eyebrow="Catalog"
+        title="Entities"
+        meta={<span>{page.total.toLocaleString()} matching</span>}
+        description="Every canonical entity in the archive: filter, sort and act in bulk. Decisions here never publish; the next release build reads them."
+        actions={
+          <>
+            <a className="ds-button ds-button--secondary" href="/admin/inbox">
+              Pending research
+            </a>
+            <a className="ds-button ds-button--secondary" href="/admin/catalog/merge">
+              Merge records
+            </a>
+          </>
+        }
+      />
 
       {degradedReason ? (
         <p className="story-review__alert" role="alert">
@@ -204,35 +252,28 @@ export default async function CatalogPage({
         </div>
 
         <div className="ds-workbench__main">
-          {/* A plain GET form: search survives with JS off and leaves a shareable URL. The
-              preserved params are what keep a search from silently discarding the facets, sort,
-              and page the operator already chose. */}
-          <Toolbar
+          <DeskToolbar
             label="Search entities"
             action={BASE_PATH}
-            preservedParams={Object.fromEntries(preservedParams.entries())}
-            actions={
-              <>
-                <FormButton type="submit" className="ds-button ds-button--secondary">
-                  Search
-                </FormButton>
-                {filtersActive ? (
-                  <a className="ds-button ds-button--secondary" href={BASE_PATH}>
-                    Reset
-                  </a>
-                ) : null}
-              </>
-            }
-          >
-            <ToolbarField label="Search">
-              <FormInput
-                type="search"
-                name="q"
-                defaultValue={query.search ?? ''}
-                placeholder="Name, id, alias, or identifier…"
-              />
-            </ToolbarField>
-          </Toolbar>
+            preserved={Object.fromEntries(preservedParams.entries())}
+            search={{
+              value: query.search ?? '',
+              placeholder: 'Name, id, alias, or identifier…',
+            }}
+            sort={{
+              value: query.sort ?? 'updated',
+              direction: query.direction ?? 'desc',
+              options: [
+                { value: 'updated', label: 'Updated' },
+                { value: 'created', label: 'Created' },
+                { value: 'name', label: 'Name' },
+                { value: 'kind', label: 'Kind' },
+                { value: 'claims', label: 'Claims' },
+              ],
+            }}
+            summary={`${page.total.toLocaleString()} entities`}
+          />
+          <ActiveFilters filters={activeFilters} clearHref={BASE_PATH} />
 
           <EntityWorkbenchTable
             rows={page.rows}
