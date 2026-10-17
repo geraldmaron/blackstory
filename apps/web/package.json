@@ -3,9 +3,9 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "dev": "next dev --webpack -p ${PORT:-3048}",
+    "dev": "next dev --turbopack -p ${PORT:-3048}",
     "prebuild": "pnpm -w --filter @repo/web^... --filter '!blackstory' --workspace-concurrency=1 run build",
-    "build": "next build --webpack",
+    "build": "next build --turbopack",
     "start": "next start --port 3048",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "test": "node --conditions development --import tsx --import ./test/css-stub.mjs --test 'src/**/*.test.ts' 'src/**/*.test.tsx'",

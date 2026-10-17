@@ -16,26 +16,26 @@ reworked the editor and the sidebar. It did not touch every surface; the remaind
 
 ### 1. Speed
 
-| Surface | Finding | Measured | Fix |
-|---|---|---|---|
-| Inbox, Cases | `listAdminResearchCases` loaded each case with its own 3 queries, sequentially: 200 cases was about 600 round trips to a remote pooler. | 47 s, twice | Two batched queries (`listResearchCaseDocumentsPostgres`). Both desks now page in SQL. 0.6 s. |
-| Article editor page | Eight sequential reads (article, reviews, history, publication, public release, contributors, related records). | 8.4 s | Independent reads run with `Promise.all`; the contributor list loads alongside the article. |
-| Article preview | Packet views, entities and blockers awaited in series; one request hit a 10 s read timeout. | 6.7 s | Parallel. |
-| Home dashboard | Loaded 200 full story packets (plus every review row, each carrying its packet JSON) to compute two counts. | about 2 s | `countStoryPacketsPostgres`: one `count(*)` join. The packet list now reads only the review rows it needs. |
-| Every page | The role check (`/admin/api/auth/me`) and the shell run client-side after paint. | 150 to 450 ms | Not changed. See remaining work. |
+| Surface             | Finding                                                                                                                                 | Measured      | Fix                                                                                                        |
+| ------------------- | --------------------------------------------------------------------------------------------------------------------------------------- | ------------- | ---------------------------------------------------------------------------------------------------------- |
+| Inbox, Cases        | `listAdminResearchCases` loaded each case with its own 3 queries, sequentially: 200 cases was about 600 round trips to a remote pooler. | 47 s, twice   | Two batched queries (`listResearchCaseDocumentsPostgres`). Both desks now page in SQL. 0.6 s.              |
+| Article editor page | Eight sequential reads (article, reviews, history, publication, public release, contributors, related records).                         | 8.4 s         | Independent reads run with `Promise.all`; the contributor list loads alongside the article.                |
+| Article preview     | Packet views, entities and blockers awaited in series; one request hit a 10 s read timeout.                                             | 6.7 s         | Parallel.                                                                                                  |
+| Home dashboard      | Loaded 200 full story packets (plus every review row, each carrying its packet JSON) to compute two counts.                             | about 2 s     | `countStoryPacketsPostgres`: one `count(*)` join. The packet list now reads only the review rows it needs. |
+| Every page          | The role check (`/admin/api/auth/me`) and the shell run client-side after paint.                                                        | 150 to 450 ms | Not changed. See remaining work.                                                                           |
 
 Caveat: timings are from the dev server, so first hits include compile time. The 47 s and the N+1
 shape are not compile artifacts; the 0.6 s after is the same route, warm pool.
 
 ### 2. Filtering and sorting
 
-| Surface | Before | After |
-|---|---|---|
-| Inbox, Cases | Filter and sort ran in the browser over the latest 200 rows. The Inbox held 475, so 275 were unreachable and the header counts read "200". | Search, state, assignee, sort and page are URL params resolved in SQL. State chips show true totals (Inbox 475). Sortable headers, pagination. |
-| Audit log | Latest 100 events, no controls. About 5,100 events exist. Rows with a malformed actor or subject were silently dropped. | Search, category and actor-type facets, date range, sort, pagination. Malformed rows are shown with a placeholder. |
-| Graylist | Latest 100, no controls. | Search, status and disposition facets, sort by parked, score or updated, pagination. Defaults to the parked queue. |
-| Catalog, Submissions | Already server-side. | Unchanged. Submissions still sorts by time only. |
-| Discovery runs (50), Releases (50), Sources (200 slice), Articles (client filter, no sort) | Capped, little or no sorting. | Not changed. |
+| Surface                                                                                    | Before                                                                                                                                     | After                                                                                                                                          |
+| ------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------- |
+| Inbox, Cases                                                                               | Filter and sort ran in the browser over the latest 200 rows. The Inbox held 475, so 275 were unreachable and the header counts read "200". | Search, state, assignee, sort and page are URL params resolved in SQL. State chips show true totals (Inbox 475). Sortable headers, pagination. |
+| Audit log                                                                                  | Latest 100 events, no controls. About 5,100 events exist. Rows with a malformed actor or subject were silently dropped.                    | Search, category and actor-type facets, date range, sort, pagination. Malformed rows are shown with a placeholder.                             |
+| Graylist                                                                                   | Latest 100, no controls.                                                                                                                   | Search, status and disposition facets, sort by parked, score or updated, pagination. Defaults to the parked queue.                             |
+| Catalog, Submissions                                                                       | Already server-side.                                                                                                                       | Unchanged. Submissions still sorts by time only.                                                                                               |
+| Discovery runs (50), Releases (50), Sources (200 slice), Articles (client filter, no sort) | Capped, little or no sorting.                                                                                                              | Not changed.                                                                                                                                   |
 
 New code uses `admin/lib/desk-query.ts`. The entity, submission and case codecs carry their own copies
 of the same readers; folding them together is a cleanup, not a fix.
@@ -96,28 +96,28 @@ names. Converging on `ds-page__header` and `DataTable` is mechanical but touches
 
 ## Route-by-route
 
-| Route | Data source | Controls | State after this pass |
-|---|---|---|---|
-| `/admin` | counts only | none | Faster. Cards still duplicate the sidebar. |
-| `/admin/work`, `/work/[id]` | client fetch, polls every 15 s | none | Unchanged. Client waterfall: auth, then role, then data. |
-| `/admin/inbox`, `/admin/cases` | SQL, paged | search, state, assignee, sort | Done. |
-| `/admin/cases/[id]` | read | n/a | Unchanged. |
-| `/admin/submissions`, `/[id]` | SQL, paged | search, status, kind, direction | Unchanged. Add sort keys. |
-| `/admin/graylist` | SQL, paged | search, status, disposition, sort | Done. |
-| `/admin/catalog`, `/[id]`, `/merge` | SQL, paged | facets, search, sort, bulk | Unchanged (reference implementation). Table clips at 1440 px with the rail open. |
-| `/admin/quick-add`, `/evidence` | forms | n/a | Unchanged. |
-| `/admin/sources`, `/[organizationId]` | SQL, 200-row slice | search, 2 sorts | Unchanged. |
-| `/admin/discovery` | latest 50 | none | Unchanged. |
-| `/admin/citation-health` | **fixture data only** | none | Unchanged. See decision 2. |
-| `/admin/stories/articles` | all articles, client filter | search, state | Unchanged. No sort; Base Web table. |
-| `/admin/stories/articles/[slug]` | SQL | n/a | Faster; editor reworked. |
-| `/admin/stories/articles/[slug]/preview` | SQL | n/a | Faster. |
-| `/admin/stories/review` | SSR, then 200-row client desk | client filter and sort | Unchanged. Only 6 pending today. |
-| `/admin/stories/contributors` | all rows | n/a | Unchanged. |
-| `/admin/releases` | latest 50 | none | Unchanged. |
-| `/admin/audit` | SQL, paged | search, category, actor, dates, sort | Done. |
-| `/admin/switches` | all rows | none | Unchanged (small table). |
-| `/admin/login` | n/a | n/a | Not reviewed. |
+| Route                                    | Data source                    | Controls                             | State after this pass                                                            |
+| ---------------------------------------- | ------------------------------ | ------------------------------------ | -------------------------------------------------------------------------------- |
+| `/admin`                                 | counts only                    | none                                 | Faster. Cards still duplicate the sidebar.                                       |
+| `/admin/work`, `/work/[id]`              | client fetch, polls every 15 s | none                                 | Unchanged. Client waterfall: auth, then role, then data.                         |
+| `/admin/inbox`, `/admin/cases`           | SQL, paged                     | search, state, assignee, sort        | Done.                                                                            |
+| `/admin/cases/[id]`                      | read                           | n/a                                  | Unchanged.                                                                       |
+| `/admin/submissions`, `/[id]`            | SQL, paged                     | search, status, kind, direction      | Unchanged. Add sort keys.                                                        |
+| `/admin/graylist`                        | SQL, paged                     | search, status, disposition, sort    | Done.                                                                            |
+| `/admin/catalog`, `/[id]`, `/merge`      | SQL, paged                     | facets, search, sort, bulk           | Unchanged (reference implementation). Table clips at 1440 px with the rail open. |
+| `/admin/quick-add`, `/evidence`          | forms                          | n/a                                  | Unchanged.                                                                       |
+| `/admin/sources`, `/[organizationId]`    | SQL, 200-row slice             | search, 2 sorts                      | Unchanged.                                                                       |
+| `/admin/discovery`                       | latest 50                      | none                                 | Unchanged.                                                                       |
+| `/admin/citation-health`                 | **fixture data only**          | none                                 | Unchanged. See decision 2.                                                       |
+| `/admin/stories/articles`                | all articles, client filter    | search, state                        | Unchanged. No sort; Base Web table.                                              |
+| `/admin/stories/articles/[slug]`         | SQL                            | n/a                                  | Faster; editor reworked.                                                         |
+| `/admin/stories/articles/[slug]/preview` | SQL                            | n/a                                  | Faster.                                                                          |
+| `/admin/stories/review`                  | SSR, then 200-row client desk  | client filter and sort               | Unchanged. Only 6 pending today.                                                 |
+| `/admin/stories/contributors`            | all rows                       | n/a                                  | Unchanged.                                                                       |
+| `/admin/releases`                        | latest 50                      | none                                 | Unchanged.                                                                       |
+| `/admin/audit`                           | SQL, paged                     | search, category, actor, dates, sort | Done.                                                                            |
+| `/admin/switches`                        | all rows                       | none                                 | Unchanged (small table).                                                         |
+| `/admin/login`                           | n/a                            | n/a                                  | Not reviewed.                                                                    |
 
 Also fixed: page titles for Inbox, Cases, Story review, Attach evidence, Citation health and Quick add
 rendered "… — BlackStory Admin — BlackStory Admin" because the layout template already adds the suffix.
@@ -154,7 +154,7 @@ rendered "… — BlackStory Admin — BlackStory Admin" because the layout temp
 - Running app, signed in: Inbox, Audit, sidebar badges and the editor exercised. Editor testing used a
   blank draft with article writes blocked in the page, so nothing was saved. Exercised there: typing, Alt+Up block move, live word
   count, and inserting a record link (the stored text came out as `[[ent_david_blackwell_001|David
-  Blackwell]]`). Not exercised in a browser: Graylist (the table is empty), the mobile drawer, dark
+Blackwell]]`). Not exercised in a browser: Graylist (the table is empty), the mobile drawer, dark
   mode, paste handling, the block-card move and remove buttons, the lint highlights and
   missing-citation marks (covered by unit tests only), drag-and-drop, and the editor on a long article
   (typing latency was not measured).
@@ -165,20 +165,18 @@ rendered "… — BlackStory Admin — BlackStory Admin" because the layout temp
 
 Measured against the running app, first visit versus repeat visit of the same route:
 
-| Route | First visit | Repeat |
-|---|---|---|
-| Switches | 8.1 s | 0.40 s |
-| Graylist | 6.7 s | 0.43 s |
-| Audit | 3.9 s | 0.55 s |
-| Catalog | 8.1 s | 0.49 s |
+| Route    | First visit | Repeat |
+| -------- | ----------- | ------ |
+| Switches | 8.1 s       | 0.40 s |
+| Graylist | 6.7 s       | 0.43 s |
+| Audit    | 3.9 s       | 0.55 s |
+| Catalog  | 8.1 s       | 0.49 s |
 
 Three separate causes, in order of size:
 
-1. **First visits compile (dev only).** `next dev --webpack` compiles each route on demand, so the
-   first click on any desk takes 3 to 8 s and the old page stays on screen the whole time (measured:
-   the next route's loading state appeared 1.6 s after the click). A production build does not do
-   this. Untested option: drop `--webpack` from the `dev` script and use Turbopack; the flag was set
-   deliberately, so that needs a decision and a check that Base Web and the CSS stubs still work.
+1. **First visits compiled (dev only), now fixed.** `next dev --webpack` compiled each route on
+   demand, so the first click on any desk took 3 to 8 s. Dev and production now build with Turbopack
+   (see the migration note below): cold first visits measured 0.2 to 1.7 s (Sources 4.2 s).
 2. **No loading state existed.** There was no `loading.tsx` under `/admin`, so every server render,
    warm or cold, left the old content frozen. Added `app/admin/loading.tsx` (a skeleton) and hover
    and focus prefetch on the sidebar, which `router.push` navigation never did.
@@ -220,3 +218,18 @@ headers and tables. Filter controls on Sources, Releases, Discovery runs and Art
 remaining gap in the "consistent filtering" request. The catalog table still scrolls sideways at
 1440 px with the rail open (the Updated column); the Base Web buttons inside the editor and forms
 follow the new density but were not re-checked one by one.
+
+### Turbopack migration (2026-10-17)
+
+- Dev (`next dev --turbopack`) and production (`next build --turbopack`) both run on Turbopack;
+  the `webpack` block is gone from `next.config.mjs`.
+- Blocker: the workspace packages import `./x.js` for `x.ts` (NodeNext, required by their Node-run
+  `dist` builds), and Turbopack cannot map that (vercel/next.js#82945). Rewriting about 1,000 package
+  files would break those builds, so `apps/web/scripts/turbopack-ts-specifier-loader.cjs` rewrites
+  relative `.js` specifiers in memory while Turbopack compiles. The Node-builtin client fallbacks
+  became `turbopack.resolveAlias` entries.
+- Cold first-visit times, webpack then Turbopack: Switches 8.1 s then 0.42 s, Graylist 6.7 s then
+  1.0 s, Audit 3.9 s then 0.74 s, Catalog 8.1 s then 1.7 s. 25 routes (20 admin, 5 public) returned
+  200; the production build compiled in 5.6 s and the built app served the public pages.
+- Trap: `apps/web/.env.local` sets `NODE_ENV=development`. Building with it exported fails on
+  `/_global-error` ("useContext of null"). Build with `NODE_ENV` unset.
