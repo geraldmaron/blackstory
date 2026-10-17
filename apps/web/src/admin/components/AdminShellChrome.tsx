@@ -43,9 +43,13 @@ function useQueueCounts(enabled: boolean, getIdToken: () => Promise<string | nul
     }
     void refresh();
     const timer = setInterval(() => void refresh(), COUNT_REFRESH_MS);
+    // A tab that loaded in the background skipped its first refresh; catch up on return.
+    const onVisible = () => void refresh();
+    document.addEventListener('visibilitychange', onVisible);
     return () => {
       canceled = true;
       clearInterval(timer);
+      document.removeEventListener('visibilitychange', onVisible);
     };
   }, [enabled, getIdToken]);
   return counts;
