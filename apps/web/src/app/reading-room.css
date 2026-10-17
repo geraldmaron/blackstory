@@ -779,7 +779,7 @@ a.ds-errata__row-id {
 /* —— /stories/[slug] rail — "Records cited" stays in view while the reader scrolls the
    chapter, the same way a printed margin note tracks the page it annotates. —————————— */
 @media (min-width: 68rem) {
-  .ds-article-rail {
+  .ds-reading-rail {
     position: sticky;
     top: 24px;
   }
@@ -787,7 +787,7 @@ a.ds-errata__row-id {
 
 /* "Next in this collection" — panel ground behind a copper left rule, per Ink spec §4:
    the one rail block that reaches forward rather than describing the current chapter. */
-.ds-article-rail__next {
+.ds-reading-rail__next {
   margin-top: var(--ds-space-7);
   padding: var(--ds-space-4);
   background: var(--room-note-wash);
@@ -795,25 +795,25 @@ a.ds-errata__row-id {
   border-radius: var(--ds-radius-sm);
 }
 
-.ds-article-rail__next-link {
+.ds-reading-rail__next-link {
   display: block;
   margin-top: var(--ds-space-2);
   color: var(--ds-ink);
   text-decoration: none;
 }
 
-.ds-article-rail__next-link:hover {
+.ds-reading-rail__next-link:hover {
   color: var(--ds-accent);
 }
 
-.ds-article-rail__next-position {
+.ds-reading-rail__next-position {
   display: block;
   font-size: var(--ds-text-caption);
   letter-spacing: 0.06em;
   color: var(--room-ink-4);
 }
 
-.ds-article-rail__next-title {
+.ds-reading-rail__next-title {
   display: block;
   margin-top: 2px;
   font-family: var(--ds-font-display);

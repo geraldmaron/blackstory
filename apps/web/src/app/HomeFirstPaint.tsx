@@ -461,7 +461,7 @@ export function HomeFirstPaint({
           <p className="ds-record-mast__lede">{story.summary}</p>
           <p>
             <Link className="ds-cta ds-cta--copper" href={`/stories/${story.slug}`}>
-              {story.kind === 'article' ? 'Read the entry' : 'Read the chapter'}
+              {story.format === 'entry' ? 'Read the entry' : 'Read the chapter'}
             </Link>
           </p>
         </>

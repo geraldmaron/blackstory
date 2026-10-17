@@ -67,7 +67,7 @@ import { entityEvidenceHref, exploreHrefForKind } from '../../../lib/map-experie
 import { getPublicSearchIndex } from '../../../lib/public-data/source';
 import type { resolvePublicEntityView } from '../../../lib/public-data/source';
 import { resolveEntityCrossReferences } from '../../../lib/theme-impact/source';
-import { resolveCitesEdgeIndex } from '../../../lib/articles/source';
+import { resolveCitesEdgeIndex } from '../../../lib/stories/source';
 import { storiesCiting } from '../../../lib/release/build-cites-edge';
 import { isDisplayableJurisdictionLabel } from '../../../lib/public-data/map-projection';
 import { WhyThisAppears } from '../../../components/why-appears';

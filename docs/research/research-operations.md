@@ -498,7 +498,7 @@ call `research.approve_artifact`; authenticated admin/publication review owns th
 
 ## story-craft (`story-research-run`)
 
-**When to use:** draft or recommend longform `/stories` articles from archive evidence using
+**When to use:** draft or recommend longform `/stories` stories from archive evidence using
 citation-gated story research packets. LLM drafts stay proposals; human approval maps an
 approved packet onto `publicStoryProjection`. There is no auto-publish.
 
@@ -524,12 +524,11 @@ OPERATOR_CLI_PRIVACY_PEPPER=dev node --conditions development --import tsx \
 
 `--commit` stages quarantine `story_packet` proposals only. Human approval:
 `http://localhost:3048/admin/login` → **Story review** (`/admin/stories/review`) → approve
-returns seed handoff JSON to paste into
-`packages/domain/src/publication/public-story-seed.ts`. Nothing auto-publishes from the CLI or
+creates an editable story draft in `/admin/stories`. Nothing auto-publishes from the CLI or
 the portal.
 
-**Never:** call promotion gates or release activation; paste unresolved/unpublished cites into
-seed stories; lead with graphic violence; invent market figures, continental claims, or family
+**Never:** call promotion gates or release activation; attach unresolved/unpublished cites to
+story drafts; lead with graphic violence; invent market figures, continental claims, or family
 proof.
 
 ---
@@ -865,7 +864,7 @@ credentials before using either path. Do not give research a database-owner logi
 The initial worker proposes place records and summary/classification changes. It searches at
 most six queries and twelve leads, under the existing standard budget, with at most two attempts
 per task. Scope expansion starts a separately bounded run. Unsupported entity kinds, relationship
-changes and article creation must be held explicitly. Corrections identify exact existing claims
+changes and story creation must be held explicitly. Corrections identify exact existing claims
 and locations to supersede, replace or withhold, and can replace or remove historical context.
 Unrelated claims, context and locations remain intact; a summary rewrite cannot silently change them.
 
@@ -941,9 +940,9 @@ validate the complete guidance through the shared schema, then set `sealed_at` o
 revisions are returned. Guidance, fitness and the seal cannot be edited afterward; corrections
 create a new policy version. Unknown item membership remains unbound.
 
-### Reviewing article and theme assertions
+### Reviewing story and theme assertions
 
-Every article `stat`, `figure` or `pullquote` block and every published theme observation needs
+Every story `stat`, `figure` or `pullquote` block and every published theme observation needs
 reviewed anchors. Missing declarations and `replicationVerified` do not grant an exception.
 Compute `publicationAssertionDigest` from `@repo/ops-data`'s existing
 `scripts/lib/reviewed-anchors.ts` over the complete block or observation. Its canonicalization

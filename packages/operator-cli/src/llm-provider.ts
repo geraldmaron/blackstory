@@ -644,3 +644,11 @@ export function createLlmProvider(options: CreateLlmProviderOptions = {}): LlmPr
       return createMockLlmProvider(options.model ?? DEFAULT_MOCK_MODEL);
   }
 }
+
+/** Default OpenRouter roster for metered paid retries; callers may pass their own. */
+export const DEFAULT_OPENROUTER_MODELS = Object.freeze([
+  'moonshotai/kimi-k2.5',
+  'qwen/qwen3.5-122b-a10b',
+  'deepseek/deepseek-v3.2',
+  'mistralai/mistral-medium-3.1',
+]);

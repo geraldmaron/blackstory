@@ -30,7 +30,7 @@ Live instrument chrome belongs on `/explore`. See [`v10/design-doc-reconciliatio
 | **Surface classes** (`data-surface`) | [`patterns-surface-classes.md`](./patterns-surface-classes.md) | `app/layout.tsx`, `app/shell.css` | Binding. Pending in code (SP-07) |
 | **Plate posture** (Live / Framed / Parked) | [`patterns-plate-posture.md`](./patterns-plate-posture.md) | `components/map-stage/MapStage.tsx`, `components/theme-spine/MapInsetMoment.tsx`, `lib/map-experience/*` | Binding. Pending in code (SP-07, SP-08) |
 | **Atlas instrument** | [`patterns-atlas-instrument.md`](./patterns-atlas-instrument.md) | `components/shell/CommandBar.tsx`, `map-experience/{TimePanel,LensPanel,ResultsRail,CameraConsole,RecordSheet}.tsx`, `lib/map-experience/{camera-moves,camera-dignity,chrome-padding,decade-density}.ts`, `lib/{citation,share}/*` | In build (v9). Mutually exclusive with the cinematic backdrop |
-| **Reading room** | [`patterns-reading-room.md`](./patterns-reading-room.md) | `app/reading-room.css`, `components/article/*` | Binding. Pending in code (SP-09, SP-11) |
+| **Reading room** | [`patterns-reading-room.md`](./patterns-reading-room.md) | `app/reading-room.css`, `components/story/*` | Binding. Pending in code (SP-09, SP-11) |
 | **Record page** | [`patterns-record-page.md`](./patterns-record-page.md) | `components/patterns/{RecordAnatomyPanel,RecordPlacePreview}.tsx`, `lib/citation/format.ts` | Binding. Pending in code (SP-12) |
 | **Lens handoff** | [`patterns-lens-handoff.md`](./patterns-lens-handoff.md) | `lib/map-experience/url-state.ts`, `lib/share/deep-link.ts`, `lib/runtime-hardening/*` | Binding. Typed builder pending (SP-15, SP-16) |
 
@@ -39,7 +39,7 @@ Live instrument chrome belongs on `/explore`. See [`v10/design-doc-reconciliatio
 | Surface | Binding doc | Code | Status |
 |---|---|---|---|
 | **Door** (`/`) and **Explore** (`/explore`) | [`design-direction-v10.md`](./design-direction-v10.md) | `app/page.tsx`, `app/explore/*` | Binding. v9's "Atlas on `/`" is superseded: `/` is the Door, `/explore` is the instrument |
-| **Stories** (`/stories`, `/stories/[slug]`) | [`design-direction-v9-chapters.md`](./design-direction-v9-chapters.md) | `app/stories/*`, `components/article/*`, `lib/articles/*` | Binding for the reading treatment ONLY. Its route names (`/chapters`) and its "chapters are the index" premise are retired: `/stories` is the one publication surface and a chapter is one editorial kind within it |
+| **Stories** (`/stories`, `/stories/[slug]`) | [`design-direction-v9-chapters.md`](./design-direction-v9-chapters.md) | `app/stories/*`, `components/story/*`, `lib/stories/*` | Binding for the reading treatment ONLY. Its route names (`/chapters`) and its "chapters are the index" premise are retired: `/stories` is the one publication surface and a chapter is one editorial kind within it |
 | **Every other public route** | [`design-direction-v9-surfaces.md`](./design-direction-v9-surfaces.md) | see its section 4 resolution map | Proposed, binding on owner approval |
 | **Mobile shell** (`@repo/mobile`) | [`design-direction-v6-mobile.md`](./design-direction-v6-mobile.md) | `apps/mobile/src/app/(tabs)/*`, `apps/mobile/src/shell/*`, `apps/mobile/src/ui/*` | Binding for **Ledger Line** treatment (see [`mobile-polish-mockups.html`](./mobile-polish-mockups.html)). Its IA is retired: the tabs are Explore / Stories / Records / More, composed from the destination catalog, not History / Stories(`/learn`) / More |
 
@@ -184,7 +184,7 @@ and every classified route must have a registry entry.
 
 | Gap | Where | Owner |
 |---|---|---|
-| `/chapters` and `/chapters/[slug]` have no page chrome tests | `apps/web/package.json` test list carries `ArticleProse.test.ts` only | SP-11 |
+| `/chapters` and `/chapters/[slug]` have no page chrome tests | `apps/web/package.json` test list carries `StoryProse.test.ts` only | SP-11 |
 | `/chapters/mosaic-credits` still renders v6 stories chrome under a `/chapters` path | `app/chapters/mosaic-credits/stories-edition.css`, `stories-panel-chrome.ts` | SP-13 |
 | `/errata`, `/support`, `/privacy`, `/design-system` still on the v5 mast (`ds-page__eyebrow`) | those page files | SP-11, SP-13 |
 | Chapter slugs are absent from the sitemap; `/history` appears in it twice | `lib/seo/sitemap-builders.ts` | SP-19 |

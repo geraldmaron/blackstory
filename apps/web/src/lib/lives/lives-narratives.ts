@@ -1,16 +1,16 @@
 /**
- * Era narratives for Lives. A column's prose is an ordinary article SERIES in the existing article
- * pipeline (`reference.articles`, `kind: 'article'`), so it is drafted, reviewed and gated exactly
+ * Era narratives for Lives. A column's prose is an ordinary collection of entries in the existing story
+ * pipeline (`reference.stories`, `format: 'entry'`), so it is drafted, reviewed and gated exactly
  * like a chapter: citation integrity, source tiers, the standalone-prose gate, the Neo ship loop.
  * Nothing about storage or publishing is new.
  *
- *   series.id        `lives-<question key>`, e.g. `lives-home`
- *   series.position  1-based index into LIVES_ERAS: 1 is the 1870s-1890s, 6 is the 2010s-2020s
+ *   collection.id       `lives-<question key>`, e.g. `lives-home`
+ *   collection.position  1-based index into LIVES_ERAS: 1 is the 1870s-1890s, 6 is the 2010s-2020s
  *
  * Position is the join key on purpose. A title or an era label can be reworded by an editor; a
  * position cannot drift into pointing at a different era without the mismatch being reported.
  */
-import type { HydratedArticle } from '../articles/hydrate';
+import type { HydratedStory } from '../stories/hydrate';
 import { LIVES_ERAS, type LivesMilestoneKey } from './lives-milestones';
 
 export const LIVES_NARRATIVE_TAG = 'Lives';
@@ -27,23 +27,21 @@ export function livesNarrativeSeriesId(key: LivesMilestoneKey): string {
 export const LIVES_NARRATIVE_BLOCK_TYPES = ['paragraph', 'pullquote', 'image', 'list'] as const;
 
 export type LivesNarrativeMapping = {
-  readonly byEraId: ReadonlyMap<string, HydratedArticle>;
+  readonly byEraId: ReadonlyMap<string, HydratedStory>;
   /** Anything that would make a panel lie about which era its prose belongs to. */
   readonly problems: readonly string[];
 };
 
-export function mapLivesNarrativesToEras(
-  articles: readonly HydratedArticle[],
-): LivesNarrativeMapping {
-  const byEraId = new Map<string, HydratedArticle>();
+export function mapLivesNarrativesToEras(stories: readonly HydratedStory[]): LivesNarrativeMapping {
+  const byEraId = new Map<string, HydratedStory>();
   const problems: string[] = [];
-  for (const article of articles) {
-    const { doc } = article;
-    const position = doc.series?.position;
+  for (const story of stories) {
+    const { doc } = story;
+    const position = doc.collection?.position;
     const era = position === undefined ? undefined : LIVES_ERAS[position - 1];
     if (!era) {
       problems.push(
-        `${doc.slug}: series position ${position} is not an era (1 to ${LIVES_ERAS.length})`,
+        `${doc.slug}: collection position ${position} is not an era (1 to ${LIVES_ERAS.length})`,
       );
       continue;
     }
@@ -59,7 +57,7 @@ export function mapLivesNarrativesToEras(
         problems.push(`${doc.slug}: a Lives narrative cannot carry a "${block.type}" block`);
       }
     }
-    byEraId.set(era.id, article);
+    byEraId.set(era.id, story);
   }
   return { byEraId, problems };
 }
@@ -70,22 +68,22 @@ export function mapLivesNarrativesToEras(
  * reference follows the first era's last.
  */
 export function renumberLivesNarrativeReferences(
-  byEraId: ReadonlyMap<string, HydratedArticle>,
-): ReadonlyMap<string, HydratedArticle> {
-  const out = new Map<string, HydratedArticle>();
+  byEraId: ReadonlyMap<string, HydratedStory>,
+): ReadonlyMap<string, HydratedStory> {
+  const out = new Map<string, HydratedStory>();
   let offset = 0;
   for (const era of LIVES_ERAS) {
-    const article = byEraId.get(era.id);
-    if (!article) continue;
+    const story = byEraId.get(era.id);
+    if (!story) continue;
     const shift = offset;
     out.set(era.id, {
-      ...article,
-      references: article.references.map((ref) => ({ ...ref, number: ref.number + shift })),
+      ...story,
+      references: story.references.map((ref) => ({ ...ref, number: ref.number + shift })),
       refNumberById: new Map(
-        [...article.refNumberById].map(([id, number]) => [id, number + shift] as const),
+        [...story.refNumberById].map(([id, number]) => [id, number + shift] as const),
       ),
     });
-    offset += article.references.length;
+    offset += story.references.length;
   }
   return out;
 }

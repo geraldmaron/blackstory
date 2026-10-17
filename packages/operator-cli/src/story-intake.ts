@@ -1,6 +1,6 @@
 /**
  * Stages a story research packet into quarantine as a contribution proposal.
- * Never opens promotion and never writes public projections or seed stories.
+ * Never opens promotion and never writes public projections or story drafts.
  *
  * Full packet is stored on `payload.storyPacket` (statement stays under size limits).
  */

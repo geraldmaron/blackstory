@@ -6,19 +6,19 @@ import { redactLocationForPublic } from '@repo/security';
 import { createPoolPostgresReleaseStore, activateReleaseAsync } from '@repo/data-access';
 import { getPostgresPool, __resetPostgresPoolForTests } from '../lib/canonical-postgres-client';
 import {
-  saveArticle,
-  readArticle,
-  reviewArticle,
-  restoreArticle,
+  saveStory,
+  readStory,
+  reviewStory,
+  restoreStory,
   EditorialConflict,
   saveContributor,
 } from './store';
-import { publishArticle, rollbackArticle } from './publish';
-import { archiveArticle, unarchiveArticle } from './article-management';
-import type { ArticleDraft } from '@repo/schemas';
+import { publishStory, rollbackStory } from './publish';
+import { archiveStory, unarchiveStory } from './story-management';
+import type { StoryDraft } from '@repo/schemas';
 const connection = process.env.BLACKSTORY_TEST_DATABASE_URL;
 test(
-  'durable drafts, credits, stale edits, review invalidation and signed article release',
+  'durable drafts, credits, stale edits, review invalidation and signed story release',
   { skip: !connection },
   async () => {
     const pool = getPostgresPool(),
@@ -41,19 +41,19 @@ test(
         },
         'Verify contributor binding',
       );
-      const draft: ArticleDraft = {
+      const draft: StoryDraft = {
         id,
         slug: `test-${randomUUID()}`,
         title: 'Editorial acceptance fixture',
         summary: 'A controlled editorial acceptance fixture.',
-        kind: 'article',
+        format: 'entry',
         publishedAt: '2026-10-14',
         eraLabel: 'Acceptance test',
         placeLabel: 'Isolated environment',
         body: [
           {
             type: 'paragraph',
-            text: 'This controlled fixture checks article persistence. [ref:loc]',
+            text: 'This controlled fixture checks story persistence. [ref:loc]',
           },
         ],
         references: [{ id: 'loc', label: 'Library of Congress', url: 'https://www.loc.gov/' }],
@@ -69,12 +69,12 @@ test(
           { id: 'neo', name: 'Neo', kind: 'editorial', roles: ['editor'] },
         ],
       };
-      const saved = await saveArticle(actor, draft, 0, 'Create test draft');
+      const saved = await saveStory(actor, draft, 0, 'Create test draft');
       assert.equal(saved.revision, 1);
       const firstInsert = { ...draft, id: `race_${randomUUID()}`, slug: `race-${randomUUID()}` };
       const competing = await Promise.allSettled([
-        saveArticle(actor, firstInsert, 0, 'First concurrent create'),
-        saveArticle(actor, { ...firstInsert, title: 'Competing create' }, 0, 'Competing create'),
+        saveStory(actor, firstInsert, 0, 'First concurrent create'),
+        saveStory(actor, { ...firstInsert, title: 'Competing create' }, 0, 'Competing create'),
       ]);
       assert.equal(competing.filter((result) => result.status === 'fulfilled').length, 1);
       assert.equal(
@@ -84,38 +84,38 @@ test(
         1,
       );
       await assert.rejects(
-        saveArticle(actor, { ...draft, slug: 'new' }, 1, 'Reserved URL'),
+        saveStory(actor, { ...draft, slug: 'new' }, 1, 'Reserved URL'),
         /reserved/,
       );
 
-      const reopened = (await readArticle(id))!;
+      const reopened = (await readStory(id))!;
       assert.equal(reopened.draft.contributors[0]!.name, 'Gerald Dagher');
       assert.equal(reopened.draft.contributors[0]!.kind, 'person');
       await assert.rejects(
-        saveArticle({ ...actor, role: 'security' }, draft, 1, 'Unauthorized draft'),
+        saveStory({ ...actor, role: 'security' }, draft, 1, 'Unauthorized draft'),
         /does not have/,
       );
       await assert.rejects(
-        saveArticle(actor, { ...draft, title: 'Concurrent edit' }, 0, 'Stale edit'),
+        saveStory(actor, { ...draft, title: 'Concurrent edit' }, 0, 'Stale edit'),
         EditorialConflict,
       );
-      await reviewArticle(actor, id, 1, 'approved', 'Evidence, rights and prose checked', {
+      await reviewStory(actor, id, 1, 'approved', 'Evidence, rights and prose checked', {
         facts: true,
         rights: true,
         prose: true,
       });
-      const changed = await saveArticle(
+      const changed = await saveStory(
         actor,
         { ...reopened.draft, title: 'Updated acceptance fixture' },
         1,
         'Edit after approval',
       );
       assert.equal(changed.revision, 2);
-      assert.equal((await readArticle(id))!.review, null);
-      await assert.rejects(publishArticle(actor, id, 2, 'Reject stale approval'), /needs approval/);
-      await restoreArticle(actor, id, 1, 2, 'Recover revision');
-      assert.equal((await readArticle(id))!.revision, 3);
-      await reviewArticle(actor, id, 3, 'approved', 'Review restored fixture', {
+      assert.equal((await readStory(id))!.review, null);
+      await assert.rejects(publishStory(actor, id, 2, 'Reject stale approval'), /needs approval/);
+      await restoreStory(actor, id, 1, 2, 'Recover revision');
+      assert.equal((await readStory(id))!.revision, 3);
+      await reviewStory(actor, id, 3, 'approved', 'Review restored fixture', {
         facts: true,
         rights: true,
         prose: true,
@@ -139,7 +139,7 @@ test(
         displayName: 'Released editorial test record',
         nameLower: 'released editorial test record',
         summary:
-          'A controlled record for editorial acceptance, including article associations, citations, revision changes and public reading. This fixture makes no historical claim.',
+          'A controlled record for editorial acceptance, including story associations, citations, revision changes and public reading. This fixture makes no historical claim.',
         claims: [],
         related: [],
       };
@@ -196,9 +196,9 @@ test(
           },
         }),
       );
-      const result = await publishArticle(actor, id, 3, 'Publish controlled test fixture');
+      const result = await publishStory(actor, id, 3, 'Publish controlled test fixture');
       const row = await pool.query(
-        'SELECT payload FROM published.release_articles WHERE release_id=$1 AND article_id=$2',
+        'SELECT payload FROM published.release_stories WHERE release_id=$1 AND story_id=$2',
         [result.releaseId, id],
       );
       assert.equal(row.rows[0].payload.title, draft.title);
@@ -209,17 +209,17 @@ test(
       );
       assert.ok(
         manifest.rows[0].signed_manifest.manifest.aggregateArtifacts.some((a: { path: string }) =>
-          a.path.endsWith('/articles.json'),
+          a.path.endsWith('/stories.json'),
         ),
       );
 
-      const version = await saveArticle(
+      const version = await saveStory(
         actor,
         { ...reopened.draft, title: 'Corrected acceptance fixture' },
         3,
         'Correct the fixture',
       );
-      await reviewArticle(actor, id, version.revision, 'approved', 'Review correction', {
+      await reviewStory(actor, id, version.revision, 'approved', 'Review correction', {
         facts: true,
         rights: true,
         prose: true,
@@ -227,7 +227,7 @@ test(
       const trusted = process.env.EXPECTED_RELEASE_SIGNING_PUBLIC_KEY_SHA256;
       process.env.EXPECTED_RELEASE_SIGNING_PUBLIC_KEY_SHA256 = 'invalid';
       await assert.rejects(
-        publishArticle(actor, id, version.revision, 'Fail closed on signing identity'),
+        publishStory(actor, id, version.revision, 'Fail closed on signing identity'),
         /signing identity/,
       );
       process.env.EXPECTED_RELEASE_SIGNING_PUBLIC_KEY_SHA256 = trusted;
@@ -236,53 +236,53 @@ test(
           .rows[0].release_id,
         result.releaseId,
       );
-      const correction = await publishArticle(actor, id, version.revision, 'Publish correction');
-      const rollback = await rollbackArticle(
+      const correction = await publishStory(actor, id, version.revision, 'Publish correction');
+      const rollback = await rollbackStory(
         actor,
         id,
         correction.releaseId,
-        'Restore preceding article',
+        'Restore preceding story',
       );
       assert.equal(
         (
           await pool.query(
-            'SELECT payload FROM published.release_articles WHERE release_id=$1 AND article_id=$2',
+            'SELECT payload FROM published.release_stories WHERE release_id=$1 AND story_id=$2',
             [rollback.releaseId, id],
           )
         ).rows[0].payload.title,
         draft.title,
       );
       await assert.rejects(
-        rollbackArticle(actor, id, correction.releaseId, 'Stale rollback'),
+        rollbackStory(actor, id, correction.releaseId, 'Stale rollback'),
         EditorialConflict,
       );
       // Existing canonical rows are editable even when created outside the admin editor.
       const legacyId = `legacy_${randomUUID()}`;
       await pool.query(
-        `INSERT INTO reference.articles(id,slug,title,summary,era_label,place_label,published_at,body,"references")
-        VALUES($1,$2,'Existing article','Existing summary','Test period','Test place','2026-10-14','[]','[]')`,
+        `INSERT INTO reference.stories(id,slug,title,summary,era_label,place_label,published_at,body,"references")
+        VALUES($1,$2,'Existing story','Existing summary','Test period','Test place','2026-10-14','[]','[]')`,
         [legacyId, `legacy-${randomUUID()}`],
       );
-      const legacy = (await readArticle(legacyId))!;
+      const legacy = (await readStory(legacyId))!;
       assert.equal(legacy.revision, 1);
       assert.deepEqual(legacy.draft.contributors, []);
-      await saveArticle(
+      await saveStory(
         actor,
-        { ...legacy.draft, title: 'Edited existing article' },
+        { ...legacy.draft, title: 'Edited existing story' },
         1,
-        'Edit existing canonical article',
+        'Edit existing canonical story',
       );
-      await archiveArticle(actor, legacyId, 2, null, false, 'Archive private existing article');
-      assert.equal((await readArticle(legacyId))!.status, 'archived');
+      await archiveStory(actor, legacyId, 2, null, false, 'Archive private existing story');
+      assert.equal((await readStory(legacyId))!.status, 'archived');
       await assert.rejects(
-        saveArticle(actor, legacy.draft, 3, 'Prevent editing archived record'),
+        saveStory(actor, legacy.draft, 3, 'Prevent editing archived record'),
         /Restore this archived/,
       );
-      await unarchiveArticle(actor, legacyId, 3, 'Return existing article to drafts');
-      assert.equal((await readArticle(legacyId))!.status, 'draft');
-      assert.equal((await readArticle(legacyId))!.revision, 4);
+      await unarchiveStory(actor, legacyId, 3, 'Return existing story to drafts');
+      assert.equal((await readStory(legacyId))!.status, 'draft');
+      assert.equal((await readStory(legacyId))!.revision, 4);
       await assert.rejects(
-        archiveArticle(
+        archiveStory(
           { ...actor, role: 'security' },
           legacyId,
           4,
@@ -293,9 +293,9 @@ test(
         /does not have/,
       );
 
-      const current = (await readArticle(id))!;
+      const current = (await readStory(id))!;
       await assert.rejects(
-        archiveArticle(
+        archiveStory(
           { ...actor, role: 'research' },
           id,
           current.revision,
@@ -306,17 +306,17 @@ test(
         /does not have/,
       );
       await assert.rejects(
-        archiveArticle(actor, id, current.revision, rollback.releaseId, false, 'No confirmation'),
+        archiveStory(actor, id, current.revision, rollback.releaseId, false, 'No confirmation'),
         /Confirm removal/,
       );
       await assert.rejects(
-        archiveArticle(actor, id, current.revision, null, true, 'Stale public state'),
+        archiveStory(actor, id, current.revision, null, true, 'Stale public state'),
         EditorialConflict,
       );
       const trustedArchive = process.env.EXPECTED_RELEASE_SIGNING_PUBLIC_KEY_SHA256;
       process.env.EXPECTED_RELEASE_SIGNING_PUBLIC_KEY_SHA256 = 'invalid';
       await assert.rejects(
-        archiveArticle(
+        archiveStory(
           actor,
           id,
           current.revision,
@@ -327,9 +327,9 @@ test(
         /signing identity/,
       );
       process.env.EXPECTED_RELEASE_SIGNING_PUBLIC_KEY_SHA256 = trustedArchive;
-      assert.equal((await readArticle(id))!.archivedAt, null);
-      assert.equal((await readArticle(id))!.activePublicReleaseId, rollback.releaseId);
-      const archived = await archiveArticle(
+      assert.equal((await readStory(id))!.archivedAt, null);
+      assert.equal((await readStory(id))!.activePublicReleaseId, rollback.releaseId);
+      const archived = await archiveStory(
         actor,
         id,
         current.revision,
@@ -337,12 +337,12 @@ test(
         true,
         'Remove controlled public fixture',
       );
-      assert.equal((await readArticle(id))!.status, 'archived');
-      assert.equal((await readArticle(id))!.activePublicReleaseId, null);
+      assert.equal((await readStory(id))!.status, 'archived');
+      assert.equal((await readStory(id))!.activePublicReleaseId, null);
       assert.equal(
         (
           await pool.query(
-            'SELECT 1 FROM published.release_articles WHERE release_id=$1 AND article_id=$2',
+            'SELECT 1 FROM published.release_stories WHERE release_id=$1 AND story_id=$2',
             [archived.releaseId, id],
           )
         ).rowCount,
@@ -359,7 +359,7 @@ test(
       );
       assert.equal((await mobileStore.getPointer())!.activeReleaseId, archived.releaseId);
       await assert.rejects(
-        reviewArticle(actor, id, current.revision + 1, 'approved', 'Archived approval', {
+        reviewStory(actor, id, current.revision + 1, 'approved', 'Archived approval', {
           facts: true,
           rights: true,
           prose: true,
@@ -367,23 +367,23 @@ test(
         /Restore this archived/,
       );
       await assert.rejects(
-        pool.query("UPDATE reference.articles SET status='published' WHERE id=$1", [id]),
-        /articles_archived_draft/,
+        pool.query("UPDATE reference.stories SET status='published' WHERE id=$1", [id]),
+        /stories_archived_draft/,
       );
-      await unarchiveArticle(actor, id, current.revision + 1, 'Restore archived fixture');
-      assert.equal((await readArticle(id))!.review, null);
-      assert.equal((await readArticle(id))!.status, 'draft');
+      await unarchiveStory(actor, id, current.revision + 1, 'Restore archived fixture');
+      assert.equal((await readStory(id))!.review, null);
+      assert.equal((await readStory(id))!.status, 'draft');
       assert.equal(
         (
           await pool.query(
-            'SELECT 1 FROM published.release_articles WHERE release_id=$1 AND article_id=$2',
+            'SELECT 1 FROM published.release_stories WHERE release_id=$1 AND story_id=$2',
             [rollback.releaseId, id],
           )
         ).rowCount,
         1,
       );
       await assert.rejects(
-        pool.query('DELETE FROM reference.article_revisions WHERE article_id=$1', [id]),
+        pool.query('DELETE FROM reference.story_revisions WHERE story_id=$1', [id]),
         /append only/,
       );
       const client = await pool.connect();
@@ -391,7 +391,7 @@ test(
         await client.query('BEGIN');
         await client.query('SET LOCAL ROLE anon');
         await assert.rejects(
-          client.query('SELECT * FROM reference.article_revisions'),
+          client.query('SELECT * FROM reference.story_revisions'),
           /permission denied/,
         );
         await client.query('ROLLBACK');
@@ -470,7 +470,7 @@ test(
           await client.query('BEGIN');
           await client.query(`SET LOCAL ROLE ${dbRole}`);
           await assert.rejects(
-            client.query('SELECT * FROM reference.articles'),
+            client.query('SELECT * FROM reference.stories'),
             /permission denied/,
           );
           await client.query('ROLLBACK');
@@ -560,12 +560,12 @@ test(
         'INSERT INTO auth.users(id,raw_app_meta_data) VALUES($1,\'{"app_role":"admin"}\')',
         [uid],
       );
-      const draft: ArticleDraft = {
+      const draft: StoryDraft = {
         id,
         slug: `media-${randomUUID()}`,
         title: 'Controlled media fixture',
         summary: 'Controlled media acceptance test.',
-        kind: 'article',
+        format: 'entry',
         publishedAt: '2026-10-14',
         eraLabel: 'Test',
         placeLabel: 'Isolated environment',
@@ -577,7 +577,7 @@ test(
           { id: 'gerald-dagher', name: 'Gerald Dagher', kind: 'person', roles: ['author'] },
         ],
       };
-      await saveArticle(actor, draft, 0, 'Create media test');
+      await saveStory(actor, draft, 0, 'Create media test');
       const bytes = Buffer.from(
         'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+jRZkAAAAASUVORK5CYII=',
         'base64',
@@ -603,13 +603,13 @@ test(
         rightsStatus: 'public_domain' as const,
         alt: 'Controlled one-pixel image fixture',
       };
-      const next = await saveArticle(
+      const next = await saveStory(
         actor,
         { ...draft, heroImage: image, body: [...draft.body, { type: 'image', image }] },
         1,
         'Attach image and rights',
       );
-      await reviewArticle(
+      await reviewStory(
         actor,
         id,
         next.revision,
@@ -617,10 +617,10 @@ test(
         'Rights, evidence and prose reviewed',
         { facts: true, rights: true, prose: true },
       );
-      const result = await publishArticle(actor, id, next.revision, 'Publish media fixture');
+      const result = await publishStory(actor, id, next.revision, 'Publish media fixture');
       const doc = (
         await pool.query(
-          'SELECT payload FROM published.release_articles WHERE release_id=$1 AND article_id=$2',
+          'SELECT payload FROM published.release_stories WHERE release_id=$1 AND story_id=$2',
           [result.releaseId, id],
         )
       ).rows[0].payload;

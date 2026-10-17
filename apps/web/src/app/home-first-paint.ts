@@ -5,7 +5,7 @@
  * cluster. Door Rest fallback still prefers stand candidates (Greenwood last-resort).
  * Internal ids never title. Collision addresses use `{slug}--{entityId}`.
  */
-import { listPublicArticleListItems, resolveCitesEdgeIndex } from '../lib/articles/source';
+import { listPublicStoryListItems, resolveCitesEdgeIndex } from '../lib/stories/source';
 import { shouldUseLivePublicProjections } from '../lib/public-data/live-policy';
 import { getPublicSearchIndex, resolvePublicEntityView } from '../lib/public-data/source';
 import { getPublicEntity, listPublicEntities, type PublicEntityView } from '../data/public-seed';
@@ -23,7 +23,7 @@ import {
 } from '../lib/place/place-slug';
 import { storiesCiting, type StoryCitation } from '../lib/release/build-cites-edge';
 import { pickLeadStory } from './stories/stories-index';
-import type { PublicArticleListItemDoc } from '@repo/schemas';
+import type { PublicStoryListItemDoc } from '@repo/schemas';
 
 export { isInternalRecordLabel } from '../lib/place/public-place-path';
 
@@ -38,7 +38,7 @@ export type HomeFirstPaintSource = 'live' | 'seed' | 'none';
 export type HomeFirstPaintModel = {
   readonly lead: PublicEntityView | undefined;
   readonly also: readonly PublicEntityView[];
-  readonly story: PublicArticleListItemDoc | undefined;
+  readonly story: PublicStoryListItemDoc | undefined;
   readonly citing: readonly StoryCitation[];
   readonly source: HomeFirstPaintSource;
 };
@@ -155,8 +155,8 @@ function alsoFromStands(
 }
 
 export function pickHomeStory(
-  items: readonly PublicArticleListItemDoc[],
-): PublicArticleListItemDoc | undefined {
+  items: readonly PublicStoryListItemDoc[],
+): PublicStoryListItemDoc | undefined {
   const publishable = items.filter((item) => !isInternalRecordLabel(item.title));
   return pickLeadStory(publishable);
 }
@@ -164,8 +164,8 @@ export function pickHomeStory(
 export async function loadHomeFirstPaint(
   options: LoadHomeFirstPaintOptions = {},
 ): Promise<HomeFirstPaintModel> {
-  const [articles, cites, standRows] = await Promise.all([
-    listPublicArticleListItems(),
+  const [stories, cites, standRows] = await Promise.all([
+    listPublicStoryListItems(),
     resolveCitesEdgeIndex(),
     readStandablePlaces(),
   ]);
@@ -210,8 +210,8 @@ export async function loadHomeFirstPaint(
   }
 
   const story =
-    articles.source === 'live' && articles.items.length > 0
-      ? pickHomeStory(articles.items)
+    stories.source === 'live' && stories.items.length > 0
+      ? pickHomeStory(stories.items)
       : undefined;
   const citing = lead ? storiesCiting(cites, lead.id) : [];
   return {

@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import { Schema } from '@tiptap/pm/model';
-import { lintArticleDocument, type LintNode } from './editor-lint';
+import { lintStoryDocument, type LintNode } from './editor-lint';
 
 const schema = new Schema({
   nodes: {
@@ -28,12 +28,12 @@ const p = (...content: unknown[]) => ({ type: 'paragraph', content });
 const t = (text: string) => ({ type: 'text', text });
 const none = new Set<string>();
 
-test('a clean article has no issues, and the trailing empty paragraph is ignored', () => {
-  assert.deepEqual(lintArticleDocument(doc(p(t('Hello')), p()), none), []);
+test('a clean story has no issues, and the trailing empty paragraph is ignored', () => {
+  assert.deepEqual(lintStoryDocument(doc(p(t('Hello')), p()), none), []);
 });
 
 test('empty blocks mid-document are flagged', () => {
-  const issues = lintArticleDocument(doc(p(), p(t('x'))), none);
+  const issues = lintStoryDocument(doc(p(), p(t('x'))), none);
   assert.deepEqual(
     issues.map((i) => [i.index, i.kind]),
     [[0, 'empty-block']],
@@ -42,7 +42,7 @@ test('empty blocks mid-document are flagged', () => {
 
 test('heading and quotation limits are measured on the stored string', () => {
   const long = 'x'.repeat(241);
-  const issues = lintArticleDocument(
+  const issues = lintStoryDocument(
     doc(
       { type: 'heading', attrs: { level: 2 }, content: [t(long)] },
       { type: 'blockquote', content: [p(t('y'.repeat(601)))] },
@@ -57,7 +57,7 @@ test('heading and quotation limits are measured on the stored string', () => {
 
 test('a citation counts as its stored markup toward the limit', () => {
   // 235 text characters + "[ref:abcd]" (10) = 245 > 240.
-  const issues = lintArticleDocument(
+  const issues = lintStoryDocument(
     doc({
       type: 'heading',
       attrs: { level: 2 },
@@ -74,7 +74,7 @@ test('a citation counts as its stored markup toward the limit', () => {
 test('lists are limited to 24 items and 600 characters per item', () => {
   const items = Array.from({ length: 25 }, () => ({ type: 'listItem', content: [p(t('a'))] }));
   const big = { type: 'listItem', content: [p(t('b'.repeat(601)))] };
-  const issues = lintArticleDocument(
+  const issues = lintStoryDocument(
     doc({ type: 'bulletList', content: items }, { type: 'bulletList', content: [big] }),
     none,
   );
@@ -88,7 +88,7 @@ test('lists are limited to 24 items and 600 characters per item', () => {
 });
 
 test('citations must name an attached source', () => {
-  const issues = lintArticleDocument(
+  const issues = lintStoryDocument(
     doc(p(t('Claim '), { type: 'citation', attrs: { refId: 'gone' } }), p(t('end'))),
     new Set(['other']),
   );

@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import type { HydratedArticle } from '../articles/hydrate';
+import type { HydratedStory } from '../stories/hydrate';
 import {
   livesNarrativeSeriesId,
   mapLivesNarrativesToEras,
@@ -13,12 +13,12 @@ function narrative(
   eraLabel: string,
   refs: number,
   blockType = 'paragraph',
-): HydratedArticle {
+): HydratedStory {
   return {
     doc: {
       slug,
       eraLabel,
-      series: { id: 'lives-home', label: 'Keeping a home', position },
+      collection: { id: 'lives-home', label: 'Keeping a home', position },
       body: [{ type: blockType, text: 'Prose.' }],
     },
     blocks: [],
@@ -31,14 +31,14 @@ function narrative(
     refNumberById: new Map(
       Array.from({ length: refs }, (_, index) => [`${slug}-r${index + 1}`, index + 1] as const),
     ),
-  } as unknown as HydratedArticle;
+  } as unknown as HydratedStory;
 }
 
-test('a column is the series named for its question', () => {
+test('a column is the collection named for its question', () => {
   assert.equal(livesNarrativeSeriesId('home'), 'lives-home');
 });
 
-test('series position is the join to an era, and every mismatch is reported', () => {
+test('collection position is the join to an era, and every mismatch is reported', () => {
   const { byEraId, problems } = mapLivesNarrativesToEras([
     narrative('home-1900', 2, '1900s–1930s', 2),
     narrative('home-1900-again', 2, '1900s–1930s', 1),

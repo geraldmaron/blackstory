@@ -12,7 +12,7 @@
  */
 import { resolveHistoryGraphReleaseArtifact } from '../../data/history-graph-seed';
 import { listPublicEntities, type PublicEntityView } from '../../data/public-seed';
-import { resolveCitesEdgeIndex } from '../../lib/articles/source';
+import { resolveCitesEdgeIndex } from '../../lib/stories/source';
 import type { PublicReadSource } from '../../lib/public-data/source';
 import type { CitesEdgeIndex } from '../../lib/release/build-cites-edge';
 import { exploreMapSourceFor } from '../../lib/map-experience/build-explore-map-source';

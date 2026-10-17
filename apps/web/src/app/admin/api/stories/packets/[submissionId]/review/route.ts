@@ -1,6 +1,6 @@
 /**
  * API: record approve / reject / needs_evidence for a story_packet.
- * Approval creates a durable editable draft; article publication still needs exact-revision review.
+ * Approval creates a durable editable draft; story publication still needs exact-revision review.
  */
 import { importStoryPacket } from '@/admin/editorial/packet';
 import { editorialError } from '@/admin/editorial/http';
@@ -33,7 +33,7 @@ export async function POST(
       );
     }
 
-    const articleDraft =
+    const storyDraft =
       decision === 'approved' ? await importStoryPacket(caller, submissionId) : null;
     const result = await recordStoryPacketReview({
       submissionId,
@@ -47,7 +47,7 @@ export async function POST(
       ok: true,
       submissionId,
       review: result.review,
-      articleDraft,
+      storyDraft,
       published: false,
       note: 'Approval records a private review decision only. Release activation remains separate.',
     });

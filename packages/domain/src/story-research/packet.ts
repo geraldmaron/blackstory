@@ -12,10 +12,7 @@ export const STORY_RESEARCH_PACKET_KIND = 'story.research.packet.v1' as const;
 
 export type StoryResearchDecision = 'recommend' | 'needs_evidence' | 'reject';
 
-/**
- * Mirrors publicStorySectionMomentSchema in packages/schemas/src/public-projections.ts.
- * Anchors a theme-impact packet's data moment to a point within a body section.
- */
+/** Anchors a theme-impact packet's data moment to a point within a body section. */
 export type StoryDraftSectionMoment = {
   readonly packetId: string;
   readonly kind: 'observation' | 'artifact' | 'derived' | 'timeline' | 'map';
@@ -23,7 +20,6 @@ export type StoryDraftSectionMoment = {
   readonly placement: 'after';
 };
 
-/** Mirrors publicStorySectionDisputeSchema in packages/schemas/src/public-projections.ts. */
 export type StoryDraftSectionDisputeSide = {
   readonly sourceLabel: string;
   readonly claim: string;
@@ -43,7 +39,6 @@ export type StoryDraftSection = {
   readonly disputes?: readonly StoryDraftSectionDispute[];
 };
 
-/** Mirrors publicStoryThemeBindingSchema in packages/schemas/src/public-projections.ts. */
 export type StoryDraftThemeBinding = {
   readonly themeId: ThemeImpactThemeId;
   readonly chapterIndex: number;

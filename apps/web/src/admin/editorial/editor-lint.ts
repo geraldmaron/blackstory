@@ -1,6 +1,6 @@
 /**
- * Live checks of the article editor's document against the limits the article contract enforces
- * at publication (`public-articles.ts`): heading 240, pullquote 600, list item 600, list 24 items,
+ * Live checks of the story editor's document against the limits the story contract enforces
+ * at publication (`public-stories.ts`): heading 240, pullquote 600, list item 600, list 24 items,
  * no empty text blocks, and every `[ref:id]` pointing at an attached source.
  *
  * Lengths are measured on the stored string, not the rendered text: a citation costs
@@ -60,7 +60,7 @@ export function storedLength(node: LintNode): number {
   }
 }
 
-export function lintArticleDocument(
+export function lintStoryDocument(
   doc: LintNode,
   referenceIds: ReadonlySet<string>,
 ): readonly EditorLintIssue[] {
@@ -124,7 +124,7 @@ export function lintArticleDocument(
         issues.push({
           index,
           kind: 'missing-citation',
-          message: `“${String(child.attrs.refId)}” is not attached to this article. Attach the source or remove the citation.`,
+          message: `“${String(child.attrs.refId)}” is not attached to this story. Attach the source or remove the citation.`,
         });
       }
     });

@@ -1,10 +1,10 @@
 /** Private drafts retain the public block format while allowing unfinished prose. */
 import { z } from 'zod';
 import {
-  articleBodyBlockSchema,
-  articleContributorSchema,
-  publicArticleProjectionSchema,
-} from './public-articles.js';
+  storyBodyBlockSchema,
+  storyContributorSchema,
+  publicStoryProjectionSchema,
+} from './public-stories.js';
 
 // Draft text remains bounded while publication enforces completed field formats.
 // Recursion preserves the exact supported object keys and discriminators.
@@ -29,26 +29,26 @@ function unfinished(schema: z.ZodTypeAny): z.ZodTypeAny {
     );
   return schema;
 }
-const draftBlocks = articleBodyBlockSchema.options.map((schema) => unfinished(schema));
-export const articleDraftSchema = publicArticleProjectionSchema.omit({ releaseId: true }).extend({
+const draftBlocks = storyBodyBlockSchema.options.map((schema) => unfinished(schema));
+export const storyDraftSchema = publicStoryProjectionSchema.omit({ releaseId: true }).extend({
   title: z.string().max(160),
   summary: z.string().max(600),
   eraLabel: z.string().max(80),
   placeLabel: z.string().max(120),
-  heroImage: unfinished(publicArticleProjectionSchema.shape.heroImage),
-  references: unfinished(publicArticleProjectionSchema.shape.references),
+  heroImage: unfinished(publicStoryProjectionSchema.shape.heroImage),
+  references: unfinished(publicStoryProjectionSchema.shape.references),
   body: z.array(z.union(draftBlocks as [z.ZodTypeAny, z.ZodTypeAny, ...z.ZodTypeAny[]])).max(500),
-}) as unknown as z.ZodType<Omit<z.infer<typeof publicArticleProjectionSchema>, 'releaseId'>>;
-export type ArticleDraft = z.infer<typeof articleDraftSchema>;
-export const editorialContributorSchema = articleContributorSchema
+}) as unknown as z.ZodType<Omit<z.infer<typeof publicStoryProjectionSchema>, 'releaseId'>>;
+export type StoryDraft = z.infer<typeof storyDraftSchema>;
+export const editorialContributorSchema = storyContributorSchema
   .omit({ roles: true })
   .extend({ biography: z.string().max(2000) });
 export const editorialContributorMutationSchema = editorialContributorSchema.extend({
   linkToMe: z.boolean().optional(),
 });
 export type EditorialContributor = z.infer<typeof editorialContributorSchema>;
-export type EditorialArticle = {
-  draft: ArticleDraft;
+export type EditorialStory = {
+  draft: StoryDraft;
   revision: number;
   blockers?: string[];
   status: 'draft' | 'review' | 'published' | 'archived';

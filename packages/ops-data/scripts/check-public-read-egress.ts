@@ -72,12 +72,12 @@ const WATCHED_READS: readonly WatchedRead[] = [
   // Small pointer/policy reads are monitored for excessive call volume even when their byte
   // totals are small.
   {
-    label: 'release_articles_full',
+    label: 'release_stories_full',
     description: 'Full article list pull (article index, cites edge, story lead)',
     // Anchored on the ORDER BY so the by-slug point read (`WHERE articles.slug = $1`) is not
     // counted as a full pull.
     fingerprint:
-      'SELECT articles.payload%FROM published.release_articles%ORDER BY articles.published_at%',
+      'SELECT articles.payload%FROM published.release_stories%ORDER BY articles.published_at%',
     // 222,633 bytes across 48 rows.
     bytesPerRow: 4_638,
     // Healthy is one pull per instance per 30m (the release-scoped cache TTL); 1GB/day is

@@ -86,8 +86,8 @@ const listLivePacketsByTheme = cache(
 );
 
 /**
- * Packets by id, for article data blocks. Throws on read failure so the article reader can
- * render its own unavailable state (an article with silently missing data blocks would be
+ * Packets by id, for story data blocks. Throws on read failure so the story reader can
+ * render its own unavailable state (a story with silently missing data blocks would be
  * a falsehood, not a degraded page).
  */
 export async function listThemeImpactPacketsByIds(

@@ -21,9 +21,8 @@
  *     Screening is not a publish gate. Agent sessions use `blackstory-intake-review`.
  *   - the writing pipeline: `docs/content/neo-voice.md` Part VIII,
  *     `docs/methodology/chapter-fact-validation.md`, the `blackstory-prose-review` and
- *     `blackstory-ringer-review` skills, and the gates in `packages/ops-data/scripts/articles.ts`
- *   - cover plates: `brand/cover-lock/v1/README.md` and
- *     `packages/domain/src/publication/cover-package.ts`
+ *     `blackstory-ringer-review` skills, and the gates in `packages/ops-data/scripts/stories.ts`
+ *   - cover plates: `brand/cover-lock/v1/README.md`
  *   - the citation command: `components/patterns/command-palette/command-registry.ts`
  * If an answer here ever outruns those files, the answer is wrong, not the files.
  *

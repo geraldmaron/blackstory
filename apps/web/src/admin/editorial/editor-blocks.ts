@@ -1,4 +1,4 @@
-/** Top-level block moves for the article editor: toolbar buttons, card actions and Alt+Arrow. */
+/** Top-level block moves for the story editor: toolbar buttons, card actions and Alt+Arrow. */
 import type { Editor } from '@tiptap/core';
 import { NodeSelection, Selection } from '@tiptap/pm/state';
 

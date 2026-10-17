@@ -22,8 +22,8 @@ const ADMIN_PATHS = [
   '/admin/releases',
   '/admin/sources',
   '/admin/stories/review',
-  '/admin/stories/articles',
-  '/admin/stories/articles/before-the-battle-cry',
+  '/admin/stories',
+  '/admin/stories/before-the-battle-cry',
   '/admin/submissions',
   '/admin/submissions/abc-123',
   '/admin/switches',
@@ -78,7 +78,7 @@ test('an unknown admin path is gated by default rather than exposed', () => {
 test('file-like staff slugs cannot bypass authentication', () => {
   for (const path of [
     '/admin/catalog/private.png',
-    '/admin/stories/articles/private.txt',
+    '/admin/stories/private.txt',
     '/design-system/fixture.svg',
   ]) {
     assert.equal(isAuthGatedPath(path), true);

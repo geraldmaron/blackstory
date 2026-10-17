@@ -2,45 +2,45 @@
  * Story detail page at `/stories/[slug]` (chapters and short entries alike). The publication
  * layout: title → hero image → summary → body (prose with inline citations, figures, stat
  * callouts, primary documents, timelines, map insets, disputes) → numbered
- * references. Emits schema.org Article JSON-LD only.
+ * references. Emits schema.org Story JSON-LD only.
  */
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { assertNeverClaimReview } from '@repo/domain';
-import { ArticleBody } from '../../../components/article/ArticleBody';
-import { ArticleHeroPhoto } from '../../../components/article/ArticleHeroPhoto';
-import { ArticleReferences } from '../../../components/article/ArticleReferences';
-import type { HydratedArticle } from '../../../lib/articles/hydrate';
-import { extractChapterHeadings } from '../../../lib/articles/heading-anchors';
+import { StoryBody } from '../../../components/story/StoryBody';
+import { StoryHeroPhoto } from '../../../components/story/StoryHeroPhoto';
+import { StoryReferences } from '../../../components/story/StoryReferences';
+import type { HydratedStory } from '../../../lib/stories/hydrate';
+import { extractChapterHeadings } from '../../../lib/stories/heading-anchors';
 import {
-  resolveArticle,
-  listPublishedArticleSlugs,
-  listPublicArticleListItems,
-} from '../../../lib/articles/source';
+  resolveStory,
+  listPublishedStorySlugs,
+  listPublicStoryListItems,
+} from '../../../lib/stories/source';
 import { nextInCollection, prevInCollection } from '../stories-index';
 import { Note, RecordNav, Room } from '../../../components/room';
 import type { RecordNavTarget } from '../../../components/room';
-import { articleCitedEntities } from '../../../lib/release/build-cites-edge';
+import { storyCitedEntities } from '../../../lib/release/build-cites-edge';
 import { listPublicEntityViewsByIds } from '../../../lib/public-data/source';
 import '../../reading-room.css';
-import '../../../components/article/article.css';
+import '../../../components/story/story.css';
 import '../../../components/theme-spine/theme-spine.css';
 import '../../../components/theme-impact/theme-impact.css';
 
-type ArticlePageProps = {
+type StoryPageProps = {
   readonly params: Promise<{ readonly slug: string }>;
 };
 
 export async function generateStaticParams() {
-  const slugs = await listPublishedArticleSlugs();
+  const slugs = await listPublishedStorySlugs();
   return slugs.map((slug) => ({ slug }));
 }
 
-export async function generateMetadata({ params }: ArticlePageProps) {
+export async function generateMetadata({ params }: StoryPageProps) {
   const { slug } = await params;
-  const result = await resolveArticle(slug);
-  if (!result.article) return { title: 'Article not found' };
-  const { doc } = result.article;
+  const result = await resolveStory(slug);
+  if (!result.story) return { title: 'Story not found' };
+  const { doc } = result.story;
   return {
     title: doc.title,
     description: doc.summary,
@@ -48,8 +48,8 @@ export async function generateMetadata({ params }: ArticlePageProps) {
   };
 }
 
-function buildArticleJsonLd(article: HydratedArticle) {
-  const { doc } = article;
+function buildStoryJsonLd(story: HydratedStory) {
+  const { doc } = story;
   const jsonLd = {
     '@context': 'https://schema.org',
     '@type': 'Article',
@@ -67,9 +67,9 @@ function buildArticleJsonLd(article: HydratedArticle) {
   return jsonLd;
 }
 
-export default async function ArticleDetailPage({ params }: ArticlePageProps) {
+export default async function StoryDetailPage({ params }: StoryPageProps) {
   const { slug } = await params;
-  const result = await resolveArticle(slug);
+  const result = await resolveStory(slug);
 
   if (result.source === 'unavailable') {
     return (
@@ -82,10 +82,10 @@ export default async function ArticleDetailPage({ params }: ArticlePageProps) {
     );
   }
 
-  if (!result.article) notFound();
-  const article = result.article;
-  const { doc } = article;
-  const jsonLd = buildArticleJsonLd(article);
+  if (!result.story) notFound();
+  const story = result.story;
+  const { doc } = story;
+  const jsonLd = buildStoryJsonLd(story);
   // No nonce on JSON-LD: CSP script-src governs script EXECUTION, and a <script> with a
   // non-JavaScript type is never executed, so it is not a script block the policy applies to.
   // These tags must carry the request nonce to render under the nonce-gated CSP.
@@ -97,26 +97,26 @@ export default async function ArticleDetailPage({ params }: ArticlePageProps) {
   // short one is an "entry" — never "record" (that collides with the unrelated `/records`
   // archive index) and never "chapter" for both (that collides with `/stories`' own kind
   // filter, which uses "Chapter" to mean this kind specifically). See stories-index.ts.
-  const noun = doc.kind === 'article' ? 'entry' : 'chapter';
+  const noun = doc.format === 'entry' ? 'entry' : 'chapter';
 
-  const chapterHeadings = extractChapterHeadings(article.blocks);
+  const chapterHeadings = extractChapterHeadings(story.blocks);
 
   // "Next in this collection" only needs the rest of the release's list items — the same
   // read `/stories` already does, cached per request, not a new query.
   // One read of the release's list items serves both directions; `/stories` already does it and
   // it is cached per request.
-  const collectionItems = doc.series ? (await listPublicArticleListItems()).items : [];
-  const next = doc.series
-    ? nextInCollection(collectionItems, doc.series.id, doc.series.position)
+  const collectionItems = doc.collection ? (await listPublicStoryListItems()).items : [];
+  const next = doc.collection
+    ? nextInCollection(collectionItems, doc.collection.id, doc.collection.position)
     : undefined;
-  const previous = doc.series
-    ? prevInCollection(collectionItems, doc.series.id, doc.series.position)
+  const previous = doc.collection
+    ? prevInCollection(collectionItems, doc.collection.id, doc.collection.position)
     : undefined;
 
   /*
    * "The records behind this <noun>" — the story side of the story-cites-record edge (SP-20).
    *
-   * The ids come from `articleCitedEntities`, the same derivation the record side reads in
+   * The ids come from `storyCitedEntities`, the same derivation the record side reads in
    * reverse, so a record that lists this story and a story that lists this record can never
    * disagree. Names are resolved through `listPublicEntityViewsByIds`, which fetches exactly
    * these ids rather than loading the catalog to read a handful of display names.
@@ -127,19 +127,19 @@ export default async function ArticleDetailPage({ params }: ArticlePageProps) {
    * not representable in an Explore URL today. A list of real record links is the same handoff
    * the reader needs and states nothing the URL vocabulary cannot back.
    */
-  const citedIds = [...articleCitedEntities(doc).keys()];
+  const citedIds = [...storyCitedEntities(doc).keys()];
   const citedRecords = citedIds.length > 0 ? (await listPublicEntityViewsByIds(citedIds)).data : [];
 
   // Ink spec §4 (/stories/[slug]): the sticky right rail carries "In this chapter/entry", the
   // reference list and "Next in this collection". The references list itself, its numbering and
-  // its `#ref-N` anchor ids are unchanged (ArticleProse's citation superscripts link to those ids
+  // its `#ref-N` anchor ids are unchanged (StoryProse's citation superscripts link to those ids
   // regardless of where in the document the list renders) — only its position moves.
   const hasRailContent = chapterHeadings.length > 0 || next;
   const rail = hasRailContent ? (
-    <div className="ds-article-rail">
+    <div className="ds-reading-rail">
       {chapterHeadings.length > 0 ? (
-        <nav className="ds-room-rail-group" aria-labelledby="article-toc">
-          <p className="ds-room-rail-group__title" id="article-toc">
+        <nav className="ds-room-rail-group" aria-labelledby="story-toc">
+          <p className="ds-room-rail-group__title" id="story-toc">
             In this {noun}
           </p>
           <ul className="ds-room-rail-group__list">
@@ -155,15 +155,15 @@ export default async function ArticleDetailPage({ params }: ArticlePageProps) {
       ) : null}
 
       {next ? (
-        <div className="ds-article-rail__next">
+        <div className="ds-reading-rail__next">
           <p className="ds-room-rail-group__title">Next in this collection</p>
-          <a className="ds-article-rail__next-link" href={`/stories/${next.slug}`}>
-            {next.series?.positionLabel ? (
-              <span className="ds-mono ds-article-rail__next-position">
-                {next.series.positionLabel}
+          <a className="ds-reading-rail__next-link" href={`/stories/${next.slug}`}>
+            {next.collection?.positionLabel ? (
+              <span className="ds-mono ds-reading-rail__next-position">
+                {next.collection.positionLabel}
               </span>
             ) : null}
-            <span className="ds-article-rail__next-title">{next.title}</span>
+            <span className="ds-reading-rail__next-title">{next.title}</span>
           </a>
         </div>
       ) : null}
@@ -176,27 +176,27 @@ export default async function ArticleDetailPage({ params }: ArticlePageProps) {
    * type is the masthead in that case.
    */
   const masthead = (
-    <figure className="ds-article-mast" data-media={doc.heroImage ? 'photo' : 'none'}>
-      {doc.heroImage ? <ArticleHeroPhoto url={doc.heroImage.url} alt={doc.heroImage.alt} /> : null}
-      <figcaption className="ds-article-mast__over">
-        <p className="ds-article-mast__facts">
-          {doc.series?.label ? (
+    <figure className="ds-reading-mast" data-media={doc.heroImage ? 'photo' : 'none'}>
+      {doc.heroImage ? <StoryHeroPhoto url={doc.heroImage.url} alt={doc.heroImage.alt} /> : null}
+      <figcaption className="ds-reading-mast__over">
+        <p className="ds-reading-mast__facts">
+          {doc.collection?.label ? (
             <Link
-              className="ds-article-mast__series"
-              href={`/stories?collection=${encodeURIComponent(doc.series.id)}`}
+              className="ds-reading-mast__series"
+              href={`/stories?collection=${encodeURIComponent(doc.collection.id)}`}
             >
-              {doc.series.label}
+              {doc.collection.label}
             </Link>
           ) : null}
-          {doc.series?.positionLabel ? (
-            <span className="ds-mono">{doc.series.positionLabel}</span>
+          {doc.collection?.positionLabel ? (
+            <span className="ds-mono">{doc.collection.positionLabel}</span>
           ) : null}
           <span className="ds-mono">{doc.eraLabel}</span>
           <span>{doc.placeLabel}</span>
         </p>
-        <h1 className="ds-article-mast__title">{doc.title}</h1>
-        <p className="ds-article-mast__lede">{doc.summary}</p>
-        <p className="ds-article-mast__byline">
+        <h1 className="ds-reading-mast__title">{doc.title}</h1>
+        <p className="ds-reading-mast__lede">{doc.summary}</p>
+        <p className="ds-reading-mast__byline">
           <span>
             {doc.contributors.length
               ? doc.contributors.map((credit, index) => (
@@ -216,9 +216,9 @@ export default async function ArticleDetailPage({ params }: ArticlePageProps) {
               Updated <span className="ds-mono">{doc.updatedAt}</span>
             </span>
           ) : null}
-          {article.references.length > 0 ? (
+          {story.references.length > 0 ? (
             <span>
-              Cites <a href="#about-this-chapter">{article.references.length} records</a>
+              Cites <a href="#about-this-chapter">{story.references.length} records</a>
             </span>
           ) : null}
         </p>
@@ -227,7 +227,7 @@ export default async function ArticleDetailPage({ params }: ArticlePageProps) {
             parchment scan, and a strip of un-dimmed image below the byline. It is hero text like
             the rest and belongs on the same ground. */}
         {doc.heroImage?.credit ? (
-          <span className="ds-article-mast__credit ds-mono">{doc.heroImage.credit}</span>
+          <span className="ds-reading-mast__credit ds-mono">{doc.heroImage.credit}</span>
         ) : null}
       </figcaption>
     </figure>
@@ -247,13 +247,13 @@ export default async function ArticleDetailPage({ params }: ArticlePageProps) {
 
   const recordsBehind =
     citedRecords.length > 0 ? (
-      <section className="ds-article-appx__records" aria-labelledby="records-behind">
+      <section className="ds-reading-appx__records" aria-labelledby="records-behind">
         <h3 id="records-behind">The records behind this {noun}</h3>
         <p>
           Every record this {noun} draws on, as the archive holds it. Open one to read its evidence,
           or find it on the Atlas from there.
         </p>
-        <ul className="ds-article-appx__record-list">
+        <ul className="ds-reading-appx__record-list">
           {citedRecords.map((record) => (
             <li key={record.id}>
               <Link href={`/entity/${record.id}`}>{record.displayName}</Link>
@@ -264,20 +264,20 @@ export default async function ArticleDetailPage({ params }: ArticlePageProps) {
     ) : null;
 
   const apparatus =
-    article.references.length > 0 || recordsBehind || navPrevious || navNext ? (
-      <div className="ds-article-appx" id="about-this-chapter">
-        <div className="ds-article-appx__head">
+    story.references.length > 0 || recordsBehind || navPrevious || navNext ? (
+      <div className="ds-reading-appx" id="about-this-chapter">
+        <div className="ds-reading-appx__head">
           <h2>About this {noun}</h2>
           <span>Every numbered mark in the text resolves here.</span>
         </div>
-        <div className="ds-article-appx__cols">
+        <div className="ds-reading-appx__cols">
           <div>
-            {article.references.length > 0 ? (
-              <ArticleReferences references={article.references} headingId="about-this-chapter" />
+            {story.references.length > 0 ? (
+              <StoryReferences references={story.references} headingId="about-this-chapter" />
             ) : null}
             {recordsBehind}
           </div>
-          <div className="ds-article-appx__notes">
+          <div className="ds-reading-appx__notes">
             <section>
               <h3>How this {noun} was made</h3>
               <p>
@@ -310,10 +310,10 @@ export default async function ArticleDetailPage({ params }: ArticlePageProps) {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, '\\u003c') }}
       />
-      <article className="ds-article">
-        <ArticleBody article={article} />
+      <article className="ds-reading">
+        <StoryBody story={story} />
 
-        <p className="ds-article__footer">
+        <p className="ds-reading__footer">
           <Link href="/stories">All stories</Link>
         </p>
       </article>

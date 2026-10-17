@@ -2,7 +2,7 @@
  * The story-cites-record edge, on the wire.
  *
  * A record's surfaces link back to the writing about it: "Cited in — Blockbusting, mapped in".
- * The site derives this from the article projection at render time; the phone cannot, so the
+ * The site derives this from the story projection at render time; the phone cannot, so the
  * derived answer travels on `/v1/entity/:id` and on each `/v1/map` feature.
  *
  * `relation` is bounded free text rather than an enum ON PURPOSE. It is a phrase written for a
@@ -31,7 +31,7 @@ export type StoryCitationV1 = z.infer<typeof storyCitationV1Schema>;
 
 /**
  * Cap on how many stories one record advertises. Well above the observed maximum (a record the
- * archive has written about repeatedly), and low enough that a crafted article set cannot turn
+ * archive has written about repeatedly), and low enough that a crafted story set cannot turn
  * one map feature into an unbounded list.
  */
 export const MAX_CITING_STORIES = 25;

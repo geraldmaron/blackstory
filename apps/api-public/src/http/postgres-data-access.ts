@@ -23,7 +23,7 @@ import {
   fetchPublicEntityProjection,
   fetchPublicEntityRedirect,
   listPublicEntityProjections,
-  listPublicReleaseArticles,
+  listPublicReleaseStories,
   listPublicSearchIndexDocs,
   type PostgresQueryFn,
 } from './postgres-readers.js';
@@ -142,11 +142,11 @@ export function createPostgresDataAccessReaders(
     { readonly value: SearchIndexList; readonly expiresAtMs: number }
   >();
   /*
-   * The story-cites-record edge is a fold over EVERY article in the release. Recomputing it per
-   * request would make each record open cost a full article scan, which is exactly the shape of
+   * The story-cites-record edge is a fold over EVERY story in the release. Recomputing it per
+   * request would make each record open cost a full story scan, which is exactly the shape of
    * read this cache exists to stop — so it is memoized on the same release key, TTL and
    * single-flight as the entity catalog above. `apps/web` reaches the same conclusion with
-   * `cache()` over its release-scoped article cache.
+   * `cache()` over its release-scoped story cache.
    */
   const citesEdgeCache = new Map<
     string,
@@ -220,7 +220,7 @@ export function createPostgresDataAccessReaders(
 
   /**
    * The cites edge for a release. Degrades to an empty index rather than throwing: a record
-   * missing its story links is worse than ideal, a record that 500s because the article table is
+   * missing its story links is worse than ideal, a record that 500s because the story table is
    * unreachable is unacceptable — the same posture web's `resolveCitesEdgeIndex` takes.
    */
   async function citesEdgeCached(releaseId: string): Promise<CitesEdgeIndex> {
@@ -231,11 +231,11 @@ export function createPostgresDataAccessReaders(
       if (raced) return raced;
       let value: CitesEdgeIndex = {};
       try {
-        value = buildCitesEdge(await listPublicReleaseArticles(releaseId, runQuery));
+        value = buildCitesEdge(await listPublicReleaseStories(releaseId, runQuery));
       } catch (error) {
         const message = error instanceof Error ? error.message : String(error);
         console.warn(
-          `[api-public] article read failed for ${releaseId}; serving records without story links: ${message}`,
+          `[api-public] story read failed for ${releaseId}; serving records without story links: ${message}`,
         );
         return value;
       }

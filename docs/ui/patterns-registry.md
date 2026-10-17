@@ -10,13 +10,13 @@ These carry no folder of their own. They are law about how routes, the shell and
 
 | Pattern | Doc | Modules | Status |
 |---|---|---|---|
-| Admin editorial workspace | [`patterns-admin-editorial.md`](./patterns-admin-editorial.md) | `admin/editorial/*`, article routes and entity editorial panel | Durable revisions, explicit credits, exact-revision review and signed releases |
-| Admin record picker | [`patterns-admin-editorial.md`](./patterns-admin-editorial.md) | `components/patterns/admin-record-picker.tsx` | Base Web canonical-record search for article links and relationship proposals |
+| Admin editorial workspace | [`patterns-admin-editorial.md`](./patterns-admin-editorial.md) | `admin/editorial/*`, story routes and entity editorial panel | Durable revisions, explicit credits, exact-revision review and signed releases |
+| Admin record picker | [`patterns-admin-editorial.md`](./patterns-admin-editorial.md) | `components/patterns/admin-record-picker.tsx` | Base Web canonical-record search for story links and relationship proposals |
 | Management request review | [`patterns-work-review.md`](./patterns-work-review.md) | `admin/work/work-inbox.tsx`, `admin/work/work-inbox.css` | Private request, exact-version review and verified receipt; deployment verification pending |
 | Surface classes | [`patterns-surface-classes.md`](./patterns-surface-classes.md) | `app/layout.tsx`, `app/shell.css`, `components/SiteShell.tsx`, `lib/keyboard/bindings.ts`, `lib/nav/destination-registry.ts` | Binding. `data-surface` emission pending (SP-07) |
 | Plate posture | [`patterns-plate-posture.md`](./patterns-plate-posture.md) | `components/map-stage/MapStage.tsx`, `lib/map-experience/map-libre-lifecycle.ts`, `components/theme-spine/MapInsetMoment.tsx`, `components/patterns/RecordPlacePreview.tsx`; `lib/motion/use-reduced-motion.ts` is new in SP-18 | Binding. Postures pending (SP-07, SP-08) |
-| Reading room | [`patterns-reading-room.md`](./patterns-reading-room.md) | `components/article/*`, `components/SiteFooter.tsx`; `app/reading-room.css` and `components/shell/SiteFooter.tsx` are new in SP-11 and SP-15 | Binding. Stylesheet pending (SP-11) |
-| Documentary figure | [`patterns-reading-room.md`](./patterns-reading-room.md) | `components/room/Evidence.tsx` (`ArchiveFigure`), `room-kit.css` | Shared by Lives and article image blocks; full frame, caption, credit, optional rights/source and verbal reading |
+| Reading room | [`patterns-reading-room.md`](./patterns-reading-room.md) | `components/story/*`, `components/SiteFooter.tsx`; `app/reading-room.css` and `components/shell/SiteFooter.tsx` are new in SP-11 and SP-15 | Binding. Stylesheet pending (SP-11) |
+| Documentary figure | [`patterns-reading-room.md`](./patterns-reading-room.md) | `components/room/Evidence.tsx` (`ArchiveFigure`), `room-kit.css` | Shared by Lives and story image blocks; full frame, caption, credit, optional rights/source and verbal reading |
 | Ledger rooms | [`design-direction-v10-rooms.md`](./design-direction-v10-rooms.md), [`patterns-room-section.md`](./patterns-room-section.md) | `components/room/{Room,EntryPosture,RoomStats,DocumentPlate,KeepGoing,RoomSection,RoomJump}.tsx`, `room-kit.css` (`.ds-room--ledger`) | Binding (2026-09-20). Opt-in on `<Room ledger>`; the sixteen routes are pinned in `room-kit.test.tsx`. Not Lives, Memorial or record pages |
 | Find bar | bead repo-vac3x.1.3 | `components/room/FindBar.tsx`, `components/forms/AutoSubmitSelect.tsx`, `lib/discovery/result-summary.ts` | One search, chip rows, active constraints and count line for `/law`, `/books`, `/stories`, `/records`. GET forms and links only; no Apply button. Ratchet on new chip, pill or filter families in `room-kit.test.tsx`. Phone Filters sheet not built |
 | Record page | [`patterns-record-page.md`](./patterns-record-page.md) | `components/patterns/RecordAnatomyPanel.tsx`, `RecordPlacePreview.tsx`, `lib/citation/format.ts`; `app/record-page.css` is new in SP-12 | Binding. Page class pending (SP-12) |
@@ -74,10 +74,10 @@ import { RecordPlacePreview } from '@/components/patterns/RecordPlacePreview';
 import { formatCitation } from '@/lib/citation/format';
 
 // Reading room: chapter prose blocks, inline citations and numbered references
-import { ArticleBody } from '@/components/article/ArticleBody';
-import { ArticleProse } from '@/components/article/ArticleProse';
-import { ArticleReferences } from '@/components/article/ArticleReferences';
-import '@/components/article/article.css';
+import { StoryBody } from '@/components/story/StoryBody';
+import { StoryProse } from '@/components/story/StoryProse';
+import { StoryReferences } from '@/components/story/StoryReferences';
+import '@/components/story/story.css';
 
 // Plate posture: the map moment a reading room frames (import theme-spine.css once)
 import { MapInsetMoment } from '@/components/theme-spine/MapInsetMoment';
@@ -175,7 +175,7 @@ Helper: `apps/web/src/lib/map-experience/icon-fallback.ts` (`iconWithFallback`).
 | Atlas URL state | `apps/web/src/lib/map-experience/url-state.test.ts` |
 | Camera vocabulary, dignity, padding clamp | `apps/web/src/lib/map-experience/{camera-moves,camera-dignity,chrome-padding}.test.ts` |
 | Map plate contrast, both themes | `packages/ui/src/tokens/map-contrast.test.ts` |
-| Chapter inline prose and citations | `apps/web/src/components/article/ArticleProse.test.ts` |
+| Chapter inline prose and citations | `apps/web/src/components/story/StoryProse.test.ts` |
 | Chapter map moment | `apps/web/src/components/theme-spine/MapInsetMoment.test.tsx` |
 | Mosaic credits chrome | `apps/web/src/app/chapters/mosaic-credits/stories-panel-chrome.test.ts` |
 | History v6 panel chrome | `apps/web/src/app/history/history-panel-chrome.test.ts` |
@@ -200,7 +200,7 @@ These live outside the registry folder but share vocabulary with patterns:
 | Module | Path | Notes |
 |---|---|---|
 | Kind / confidence icons | `apps/web/src/lib/map-experience/{kind-icons,confidence-icons,kind-encoding,icon-fallback}.ts` | Used by map, legend and `EditionFactIcon`. Do not duplicate glyphs |
-| Chapter article renderers | `apps/web/src/components/article/*` | The Reading room's prose layer |
+| Chapter story renderers | `apps/web/src/components/story/*` | The Reading room's prose layer |
 | Chapter artifacts | `apps/web/src/components/theme-spine/*` | `MapInsetMoment`, `EraTimeline`, `DisputeBlock` |
 | Command bar and palette | `apps/web/src/components/shell/CommandBar.tsx`, `components/patterns/command-palette/*` | Mounted above every route under v9 |
 | `@repo/ui` kit | `packages/ui` | Cards, buttons, tokens. Prefer over bespoke controls |

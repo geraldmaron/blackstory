@@ -124,8 +124,7 @@ export const ABOUT_ROOMS_HANDOFF = {
  * checkable in the repository: `docs/content/neo-voice.md` (the voice document and the
  * evidence-gate rule), `docs/methodology/chapter-fact-validation.md` (facts from fetched sources,
  * never from a model's memory), the two review skills under `.agents/skills/`, the
- * gates in `packages/ops-data/scripts/articles.ts`, and `brand/cover-lock/v1/README.md` with
- * `packages/domain/src/publication/cover-package.ts` for the cover plates. No step is described
+ * gates in `packages/ops-data/scripts/stories.ts`, and `brand/cover-lock/v1/README.md` for the cover plates. No step is described
  * here that those files do not describe.
  */
 export const ABOUT_NEO = {

@@ -4,7 +4,7 @@
  * The thesis of v9 is that every record links back to the writing about it. The record side of
  * that link had no implementation: an entity could be pinned on Explore, opened, and read in
  * full without ever learning which story put it there. This module derives that edge from the
- * article projection the release already publishes, so it costs one pass over documents the
+ * story projection the release already publishes, so it costs one pass over documents the
  * server is loading anyway rather than a new pipeline stage.
  *
  * It lives in the shared domain package rather than in one app because both clients need the
@@ -36,7 +36,7 @@
  * Type-only import of the projection doc on purpose: this module compiles away to plain data
  * shuffling, so a browser bundle that reaches it pulls in nothing but the functions below.
  */
-import type { PublicArticleProjectionDoc } from '@repo/schemas';
+import type { PublicStoryProjectionDoc } from '@repo/schemas';
 
 /** How a story attends to a record. Ordered weakest to strongest; the order is load-bearing. */
 export const CITES_RELATIONS = ['referenced in', 'mapped in'] as const;
@@ -59,9 +59,9 @@ function strength(relation: CitesRelation): number {
   return CITES_RELATIONS.indexOf(relation);
 }
 
-/** Entity ids a single article cites, each with the strongest relation that article supports. */
-export function articleCitedEntities(
-  doc: PublicArticleProjectionDoc,
+/** Entity ids a single story cites, each with the strongest relation that story supports. */
+export function storyCitedEntities(
+  doc: PublicStoryProjectionDoc,
 ): ReadonlyMap<string, CitesRelation> {
   const cited = new Map<string, CitesRelation>();
   const claim = (entityId: string, relation: CitesRelation): void => {
@@ -79,16 +79,16 @@ export function articleCitedEntities(
 }
 
 /**
- * Inverts the article set into the record-side index.
+ * Inverts the story set into the record-side index.
  *
  * Sorted by title within each record so the list a reader sees is stable across releases —
  * publish order would reshuffle a record's story list every time an unrelated story shipped.
  */
-export function buildCitesEdge(docs: readonly PublicArticleProjectionDoc[]): CitesEdgeIndex {
+export function buildCitesEdge(docs: readonly PublicStoryProjectionDoc[]): CitesEdgeIndex {
   const byEntity = new Map<string, StoryCitation[]>();
 
   for (const doc of docs) {
-    for (const [entityId, relation] of articleCitedEntities(doc)) {
+    for (const [entityId, relation] of storyCitedEntities(doc)) {
       const citations = byEntity.get(entityId) ?? [];
       citations.push({
         slug: doc.slug,

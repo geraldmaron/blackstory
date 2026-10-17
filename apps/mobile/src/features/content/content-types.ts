@@ -31,7 +31,7 @@ export interface ContentSectionV1 {
 
 /**
  * `contentPageV1Schema` — the public supporting-content (Learn surface) page shape. Extracted
- * from `apps/web/src/data/stories-seed.ts`'s `StoryRecord`, the longform editorial article shape
+ * from `apps/web/src/data/stories-seed.ts`'s `StoryRecord`, the longform editorial story shape
  * backing `/stories`, `/history`, `/myths` on web. This is the ONLY allowlisted content-page wire
  * shape this renderer supports — no headings/callouts/tables/media block-type union exists in
  * production today, so this feature does not invent one for the page body.

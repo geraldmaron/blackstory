@@ -1,6 +1,6 @@
 ---
 name: blackstory-story-craft
-description: Use when drafting or recommending longform /stories articles from archive evidence using citation-gated story research packets. Triggers on "story research", "draft a story", "recommend stories", "story craft", "story packet".
+description: Use when drafting or recommending longform /stories chapters and entries from archive evidence using citation-gated story research packets. Triggers on "story research", "draft a story", "recommend stories", "story craft", "story packet".
 ---
 
 # Story craft (citation-gated, staging only)
@@ -25,9 +25,9 @@ license invented scenes and compulsory narrative arcs.
 
 **Input:** A bounded story question and inspected evidence or packet.
 
-**Output:** A staged article with sentence-level support, preserved qualifiers and explicit gaps.
+**Output:** A staged story with sentence-level support, preserved qualifiers and explicit gaps.
 
-**Boundary and handoff:** Hand copy to voice/prose/ringer review. A packet or article validator does not certify every sentence.
+**Boundary and handoff:** Hand copy to voice/prose/ringer review. A packet or story validator does not certify every sentence.
 
 Before acquisition, use the [shared collection-library method](../../../docs/research/research-operations.md#source-library)
 for the evidence need, pin returned policy versions and explain why the collection should

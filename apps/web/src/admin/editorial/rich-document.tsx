@@ -30,15 +30,15 @@ import {
   faTrashCan,
 } from '@fortawesome/free-solid-svg-icons';
 import { Select } from 'baseui/select';
-import type { ArticleBodyBlockDoc, ArticleReferenceDoc } from '@repo/schemas';
+import type { StoryBodyBlockDoc, StoryReferenceDoc } from '@repo/schemas';
 import { AdminRecordPicker } from '@/components/patterns/admin-record-picker';
-import { articleToDocument, documentToArticle } from './document-adapter';
-import { lintArticleDocument, type EditorLintIssue } from './editor-lint';
+import { storyToDocument, documentToStory } from './document-adapter';
+import { lintStoryDocument, type EditorLintIssue } from './editor-lint';
 import { moveTopLevelBlock, removeTopLevelBlock } from './editor-blocks';
 
 /** Evidence blocks a writer can place; the label is what the toolbar shows. */
 export const INSERTABLE_BLOCKS: readonly {
-  readonly id: ArticleBodyBlockDoc['type'];
+  readonly id: StoryBodyBlockDoc['type'];
   readonly label: string;
 }[] = [
   { id: 'image', label: 'Image' },
@@ -58,11 +58,11 @@ const Citation = Node.create({
   group: 'inline',
   atom: true,
   addAttributes: () => ({ refId: { default: '' } }),
-  parseHTML: () => [{ tag: 'span[data-article-citation]' }],
+  parseHTML: () => [{ tag: 'span[data-story-citation]' }],
   renderHTML: ({ node, HTMLAttributes }) => [
     'span',
     mergeAttributes(HTMLAttributes, {
-      'data-article-citation': node.attrs.refId,
+      'data-story-citation': node.attrs.refId,
       class: 'editorial-citation-token',
     }),
     `[${node.attrs.refId}]`,
@@ -101,17 +101,17 @@ const EntityLink = Node.create({
 });
 
 const PreserveBlock = Extension.create({
-  name: 'preserveArticleBlock',
+  name: 'preserveStoryBlock',
   addGlobalAttributes: () => [
     {
       types: ['paragraph', 'heading', 'blockquote', 'bulletList', 'orderedList'],
-      attributes: { articleBlock: { default: null, renderHTML: () => ({}) } },
+      attributes: { storyBlock: { default: null, renderHTML: () => ({}) } },
     },
   ],
 });
 
 /**
- * Live checks against the article contract's limits, drawn on the blocks that break them. The
+ * Live checks against the story contract's limits, drawn on the blocks that break them. The
  * same rules gate publication, so a writer sees the problem where it is instead of in a blocker
  * list after saving.
  */
@@ -127,7 +127,7 @@ const EditorialLint = Extension.create<{ getReferenceIds: () => ReadonlySet<stri
           decorations(state) {
             const decorations: Decoration[] = [];
             const doc = state.doc;
-            const issues = lintArticleDocument(doc, getReferenceIds());
+            const issues = lintStoryDocument(doc, getReferenceIds());
             const flagged = new Map<number, string[]>();
             for (const issue of issues) {
               if (issue.kind === 'missing-citation') continue;
@@ -150,7 +150,7 @@ const EditorialLint = Extension.create<{ getReferenceIds: () => ReadonlySet<stri
                 decorations.push(
                   Decoration.node(pos, pos + node.nodeSize, {
                     class: 'editorial-citation-token--missing',
-                    title: `No source named “${node.attrs.refId}” is attached to this article.`,
+                    title: `No source named “${node.attrs.refId}” is attached to this story.`,
                   }),
                 );
               }
@@ -191,7 +191,7 @@ const BlockMove = Extension.create({
 });
 
 function EvidenceCard({ node, selected, extension, getPos, editor }: NodeViewProps) {
-  const block = node.attrs.articleBlock as ArticleBodyBlockDoc;
+  const block = node.attrs.storyBlock as StoryBodyBlockDoc;
   const label =
     block.type === 'image'
       ? block.image.alt || 'Image description needed'
@@ -279,7 +279,7 @@ const EvidenceBlock = Node.create({
   atom: true,
   draggable: true,
   addOptions: () => ({ onEdit: (_index: number) => {} }),
-  addAttributes: () => ({ articleBlock: { default: null, renderHTML: () => ({}) } }),
+  addAttributes: () => ({ storyBlock: { default: null, renderHTML: () => ({}) } }),
   parseHTML: () => [],
   renderHTML: () => ['div', { 'data-editorial-block': '' }],
   addNodeView: () => ReactNodeViewRenderer(EvidenceCard),
@@ -323,7 +323,7 @@ function readToolbarState(editor: Editor | null, references: ReadonlySet<string>
     canUndo: editor.can().undo(),
     canRedo: editor.can().redo(),
     words: text ? text.split(/\s+/).length : 0,
-    issues: lintArticleDocument(editor.state.doc as PMNode, references),
+    issues: lintStoryDocument(editor.state.doc as PMNode, references),
   };
 }
 
@@ -338,13 +338,13 @@ export function RichDocument({
   onInsertBlock,
   onError,
 }: {
-  body: ArticleBodyBlockDoc[];
-  onChange: (body: ArticleBodyBlockDoc[]) => void;
+  body: StoryBodyBlockDoc[];
+  onChange: (body: StoryBodyBlockDoc[]) => void;
   editable: boolean;
-  references: ArticleReferenceDoc[];
+  references: StoryReferenceDoc[];
   onEditBlock: (index: number) => void;
   /** Insert a new evidence block at this body index, or at the end when null. */
-  onInsertBlock: (type: ArticleBodyBlockDoc['type'], index: number | null) => void;
+  onInsertBlock: (type: StoryBodyBlockDoc['type'], index: number | null) => void;
   onError: (message: string) => void;
 }) {
   const callbacks = useRef({ onChange, onEditBlock, onError });
@@ -353,7 +353,7 @@ export function RichDocument({
   referenceIds.current = new Set(references.map((ref) => ref.id));
   // The body this editor last reported. When the parent hands the same array straight back there
   // is nothing to reconcile, so the per-keystroke full-document compare is skipped.
-  const lastEmitted = useRef<ArticleBodyBlockDoc[] | null>(null);
+  const lastEmitted = useRef<StoryBodyBlockDoc[] | null>(null);
   // Index of the block the writer last had the cursor in, for inserting "here" from the toolbar.
   const lastBlockIndex = useRef<number | null>(null);
   const [linkOpen, setLinkOpen] = useState(false);
@@ -361,7 +361,7 @@ export function RichDocument({
   const editor = useEditor({
     immediatelyRender: false,
     // Toolbar state is read through useEditorState below; re-rendering this whole component (and
-    // its Base Web controls) on every transaction made typing in a long article lag.
+    // its Base Web controls) on every transaction made typing in a long story lag.
     shouldRerenderOnTransaction: false,
     editable,
     extensions: [
@@ -385,19 +385,19 @@ export function RichDocument({
       EditorialLint.configure({ getReferenceIds: () => referenceIds.current }),
       EvidenceBlock.configure({ onEdit: (index: number) => callbacks.current.onEditBlock(index) }),
     ],
-    content: articleToDocument(body),
+    content: storyToDocument(body),
     editorProps: {
       attributes: {
         class: 'editorial-document__prose',
         role: 'textbox',
-        'aria-label': 'Article body',
+        'aria-label': 'Story body',
         'aria-multiline': 'true',
       },
-      // Formatting is outside the article contract, so pasted HTML is reduced to its text rather
+      // Formatting is outside the story contract, so pasted HTML is reduced to its text rather
       // than being rejected (or worse, silently dropped) block by block.
       transformPastedHTML: (html) =>
         html.replace(/<(\/?)(b|strong|i|em|u|s|strike|font|span)\b[^>]*>/gi, (tag) =>
-          /data-(article-citation|entity-link)/.test(tag) ? tag : '',
+          /data-(story-citation|entity-link)/.test(tag) ? tag : '',
         ),
     },
     onSelectionUpdate: ({ editor: current }) => {
@@ -405,13 +405,13 @@ export function RichDocument({
     },
     onUpdate: ({ editor: current }) => {
       try {
-        const next = documentToArticle(current.getJSON());
+        const next = documentToStory(current.getJSON());
         lastEmitted.current = next;
         if (current.isFocused) lastBlockIndex.current = current.state.selection.$from.index(0);
         callbacks.current.onChange(next);
       } catch (error) {
         callbacks.current.onError(
-          error instanceof Error ? error.message : 'The article could not be saved.',
+          error instanceof Error ? error.message : 'The story could not be saved.',
         );
       }
     },
@@ -420,14 +420,14 @@ export function RichDocument({
   useEffect(() => {
     if (!editor || body === lastEmitted.current) return;
     try {
-      if (JSON.stringify(documentToArticle(editor.getJSON())) !== JSON.stringify(body)) {
+      if (JSON.stringify(documentToStory(editor.getJSON())) !== JSON.stringify(body)) {
         const position = editor.state.selection.from;
-        editor.commands.setContent(articleToDocument(body), { emitUpdate: false });
+        editor.commands.setContent(storyToDocument(body), { emitUpdate: false });
         editor.commands.setTextSelection(Math.min(position, editor.state.doc.content.size));
       }
     } catch (error) {
       callbacks.current.onError(
-        error instanceof Error ? error.message : 'The article could not be restored.',
+        error instanceof Error ? error.message : 'The story could not be restored.',
       );
     }
   }, [body, editor]);
@@ -466,7 +466,7 @@ export function RichDocument({
 
   return (
     <div className="editorial-document">
-      <div className="editorial-document__toolbar" role="toolbar" aria-label="Article formatting">
+      <div className="editorial-document__toolbar" role="toolbar" aria-label="Story formatting">
         <div className="editorial-document__format">
           <Select
             size="compact"
@@ -583,7 +583,7 @@ export function RichDocument({
             disabled={disabled}
             options={INSERTABLE_BLOCKS.map(({ id, label }) => ({ id, label }))}
             onChange={({ value }) => {
-              const type = value[0]?.id as ArticleBodyBlockDoc['type'] | undefined;
+              const type = value[0]?.id as StoryBodyBlockDoc['type'] | undefined;
               if (!type) return;
               const here = lastBlockIndex.current;
               onInsertBlock(type, here === null ? null : Math.min(here + 1, body.length));
@@ -626,7 +626,7 @@ export function RichDocument({
           <FontAwesomeIcon icon={faRotateRight} aria-hidden="true" />
         </Button>
       </div>
-      {!editor && <p role="status">Loading article editor…</p>}
+      {!editor && <p role="status">Loading story editor…</p>}
       <EditorContent editor={editor} />
       <div className="editorial-document__status">
         <p>
@@ -652,7 +652,7 @@ export function RichDocument({
         )}
         <p className="editorial-document__help">
           Headings Ctrl/⌘ Alt 2 or 3 · Lists Ctrl/⌘ Shift 7 or 8 · Quote Ctrl/⌘ Shift B · Move a
-          block Alt ↑ or ↓. Formatting such as bold and italics is not part of the article contract,
+          block Alt ↑ or ↓. Formatting such as bold and italics is not part of the story contract,
           so pasted text arrives plain. Evidence blocks keep their reviewed bindings.
         </p>
       </div>

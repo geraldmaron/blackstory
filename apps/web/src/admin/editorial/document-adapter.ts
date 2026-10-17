@@ -1,6 +1,6 @@
-/** The editor document is a view of article blocks; persistence keeps the article contract. */
+/** The editor document is a view of story blocks; persistence keeps the story contract. */
 import type { JSONContent } from '@tiptap/core';
-import type { ArticleBodyBlockDoc } from '@repo/schemas';
+import type { StoryBodyBlockDoc } from '@repo/schemas';
 /**
  * The entity-link half of the pattern, character for character the domain's
  * `ENTITY_PROSE_LINK_RE` (the one the public renderer uses). It is restated here because that
@@ -9,7 +9,7 @@ import type { ArticleBodyBlockDoc } from '@repo/schemas';
  */
 export const ENTITY_LINK_SOURCE = String.raw`\[\[([^|\][]+)(?:\|([^\][]+))?\]\]`;
 /**
- * Inline markup the article contract stores inside plain text: `[ref:id]` citations, entity links
+ * Inline markup the story contract stores inside plain text: `[ref:id]` citations, entity links
  * (`[[entityId]]` / `[[entityId|Label]]`) and newlines. Capture groups: 1 citation id, 2 entity
  * id, 3 entity label.
  */
@@ -37,7 +37,7 @@ function inline(text: string): JSONContent[] {
 function text(node: JSONContent): string {
   if (node.type === 'text') {
     if (node.marks?.length)
-      throw new Error('This formatting is not supported by the article contract.');
+      throw new Error('This formatting is not supported by the story contract.');
     return node.text ?? '';
   }
   if (node.type === 'citation') return `[ref:${node.attrs?.refId}]`;
@@ -48,12 +48,12 @@ function text(node: JSONContent): string {
   if (node.type === 'hardBreak') return '\n';
   return (node.content ?? []).map(text).join('');
 }
-export function articleToDocument(body: readonly ArticleBodyBlockDoc[]): JSONContent {
+export function storyToDocument(body: readonly StoryBodyBlockDoc[]): JSONContent {
   return {
     type: 'doc',
     content: body.length
       ? body.map((block) => {
-          const attrs = { articleBlock: block };
+          const attrs = { storyBlock: block };
           switch (block.type) {
             case 'paragraph':
               return { type: 'paragraph', attrs, content: inline(block.text) };
@@ -79,23 +79,23 @@ export function articleToDocument(body: readonly ArticleBodyBlockDoc[]): JSONCon
                 content: [{ type: 'paragraph', content: inline(block.text) }],
               };
             default:
-              return { type: 'editorialBlock', attrs: { articleBlock: block } };
+              return { type: 'editorialBlock', attrs: { storyBlock: block } };
           }
         })
       : [{ type: 'paragraph', content: [] }],
   };
 }
-export function documentToArticle(doc: JSONContent): ArticleBodyBlockDoc[] {
-  return (doc.content ?? []).flatMap((node, index): ArticleBodyBlockDoc[] => {
-    const original = node.attrs?.articleBlock as ArticleBodyBlockDoc | undefined;
-    const prior = (type: ArticleBodyBlockDoc['type']) => (original?.type === type ? original : {});
+export function documentToStory(doc: JSONContent): StoryBodyBlockDoc[] {
+  return (doc.content ?? []).flatMap((node, index): StoryBodyBlockDoc[] => {
+    const original = node.attrs?.storyBlock as StoryBodyBlockDoc | undefined;
+    const prior = (type: StoryBodyBlockDoc['type']) => (original?.type === type ? original : {});
     switch (node.type) {
       case 'paragraph':
         if (!original && !text(node) && index === (doc.content?.length ?? 0) - 1) return [];
         return [{ ...prior('paragraph'), type: 'paragraph', text: text(node) }];
       case 'heading':
         if (![2, 3].includes(node.attrs?.level))
-          throw new Error('Article headings use section or subsection levels.');
+          throw new Error('Story headings use section or subsection levels.');
         return [
           { ...prior('heading'), type: 'heading', level: node.attrs!.level, text: text(node) },
         ];
@@ -135,7 +135,7 @@ export function documentToArticle(doc: JSONContent): ArticleBodyBlockDoc[] {
         if (!original) throw new Error('The evidence block could not be recovered.');
         return [original];
       default:
-        throw new Error(`Unsupported article block: ${node.type ?? 'unknown'}.`);
+        throw new Error(`Unsupported story block: ${node.type ?? 'unknown'}.`);
     }
   });
 }
