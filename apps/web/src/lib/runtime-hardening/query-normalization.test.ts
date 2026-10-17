@@ -14,7 +14,8 @@ import {
   type RawExploreSearchParams,
 } from '../map-experience/url-state';
 import { buildEntityCacheKey, buildPublicPageCacheKey, buildSearchCacheKey } from './cache-keys';
-import { EXPLORE_PAGE_PARAM_ALLOWLIST } from './constants';
+import { storiesHref } from '../../app/stories/stories-index';
+import { EXPLORE_PAGE_PARAM_ALLOWLIST, STORIES_PAGE_PARAM_ALLOWLIST } from './constants';
 import {
   buildNormalizedUrl,
   getAllowedQueryParamsForPath,
@@ -530,4 +531,21 @@ test('/explore free-value keys no longer mint cache keys', () => {
 
   const real = new URL('https://blackstory.app/explore?state=GA&kind=school&theme=education');
   assert.equal(needsQueryNormalizationRedirect(real), false);
+});
+
+test('the /stories edge allowlist names every param the stories index writes', () => {
+  // The proxy 308s any param missing from the allowlist to the bare index, so a control whose
+  // param is not named here is dead on arrival. This binds the href builder to the allowlist.
+  const href = storiesHref({
+    q: 'lincoln',
+    format: 'entry',
+    collection: 'presidents',
+    tag: 'law',
+    era: 'reconstruction',
+    place: 'illinois',
+    sort: 'newest',
+    page: 2,
+  });
+  const written = [...new URL(href, 'https://blackstory.app').searchParams.keys()].sort();
+  assert.deepEqual(written, [...STORIES_PAGE_PARAM_ALLOWLIST].sort());
 });
