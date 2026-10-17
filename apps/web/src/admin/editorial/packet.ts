@@ -1,16 +1,16 @@
-/** Preserve the research packet; import its supported sections into the existing article store. */
+/** Preserve the research packet; import its supported sections into the existing story store. */
 import { createHash } from 'node:crypto';
-import { type ArticleBodyBlockDoc, type ArticleDraft } from '@repo/schemas';
+import { type StoryBodyBlockDoc, type StoryDraft } from '@repo/schemas';
 import { getStoryPacket } from '../stories/story-packet-store';
-import { readArticle, saveArticle, type Actor } from './store';
+import { readStory, saveStory, type Actor } from './store';
 export async function importStoryPacket(actor: Actor, submissionId: string) {
-  const id = `article_packet_${createHash('sha256').update(submissionId).digest('hex').slice(0, 24)}`;
-  const existing = await readArticle(id);
+  const id = `story_packet_${createHash('sha256').update(submissionId).digest('hex').slice(0, 24)}`;
+  const existing = await readStory(id);
   if (existing) return { id, slug: existing.draft.slug, revision: existing.revision };
   const item = await getStoryPacket(submissionId);
   if (!item) throw new Error('Story packet not found.');
   const packet = item.packet,
-    body: ArticleBodyBlockDoc[] = [];
+    body: StoryBodyBlockDoc[] = [];
   for (const section of packet.draft.body) {
     if (section.heading) body.push({ type: 'heading', level: 2, text: section.heading });
     body.push(...section.paragraphs.map((text) => ({ type: 'paragraph' as const, text })));
@@ -34,12 +34,12 @@ export async function importStoryPacket(actor: Actor, submissionId: string) {
       ...(section.disputes ?? []).map((dispute) => ({ type: 'dispute' as const, ...dispute })),
     );
   }
-  const draft: ArticleDraft = {
+  const draft: StoryDraft = {
     id,
     slug: packet.draft.slug || `research-${id.slice(-12)}`,
     title: packet.draft.title,
     summary: packet.draft.dek,
-    kind: 'chapter',
+    format: 'chapter',
     eraLabel: packet.draft.eraLabel,
     placeLabel: packet.draft.placeLabel,
     publishedAt: new Date().toISOString().slice(0, 10),
@@ -54,7 +54,7 @@ export async function importStoryPacket(actor: Actor, submissionId: string) {
     contributors: [],
   };
   // Imported sources are discovery leads, not fabricated sentence-level citations or credits.
-  return saveArticle(
+  return saveStory(
     actor,
     draft,
     0,

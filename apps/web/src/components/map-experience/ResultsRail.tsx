@@ -379,7 +379,7 @@ export function ResultsRail({
                      * onKeyDown above) opens the record sheet, and this glyph is what tells a
                      * sighted reader the row leads somewhere before they act on it. A plain
                      * character, not a rotating icon — the same text-glyph idiom the drawer
-                     * disclosures already use (article.css's "+ / –" cue, room-kit.css's
+                     * disclosures already use (story.css's "+ / –" cue, room-kit.css's
                      * .ds-room-draw__summary::after), just pointing right instead of toggling.
                      * Decorative: role="option" plus aria-selected already state the row's
                      * status to assistive tech, so this carries no label of its own.

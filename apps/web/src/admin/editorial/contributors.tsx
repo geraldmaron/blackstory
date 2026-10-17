@@ -30,7 +30,7 @@ export function Contributors({ profiles }: { profiles: EditorialContributor[] })
       });
       const data = await r.json();
       if (!r.ok) throw new Error(data.error);
-      setMessage('Contributor saved. Reopen the article contributor list to select it.');
+      setMessage('Contributor saved. Reopen the story contributor list to select it.');
       router.refresh();
     } catch (e) {
       setMessage(e instanceof Error ? e.message : 'Could not save contributor.');
@@ -75,7 +75,7 @@ export function Contributors({ profiles }: { profiles: EditorialContributor[] })
             value={profile.id}
             onChange={(id) => setProfile({ ...profile, id })}
             disabled={role !== 'admin' || busy || profiles.some((p) => p.id === profile.id)}
-            caption="A stable identifier used in article credits."
+            caption="A stable identifier used in story credits."
           />
           <TextField
             label="Name"

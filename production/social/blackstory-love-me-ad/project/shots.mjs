@@ -339,7 +339,7 @@ export const SHOTS = [
     surface: 'Story — The Count, reference list',
     action: '"Every numbered mark in the text resolves here" — primary-source citations moving up',
     audio: 'VOX 16.853 (1.73s, sustain 0.88)',
-    ...pageMove('ol.ds-article-references', 0, 1.3, 1.3, -150, 420, E.inOutSine, 0, {
+    ...pageMove('ol.ds-reading-references', 0, 1.3, 1.3, -150, 420, E.inOutSine, 0, {
       anchor: 'top',
       dx0: 38,
       dx1: 38,
@@ -354,7 +354,7 @@ export const SHOTS = [
     surface: 'Story — The Count, reference list',
     action: 'Closer on the citations: census, Constitution, Supreme Court',
     audio: 'VOX 19.040 + 19.744',
-    ...pageMove('ol.ds-article-references', 0, 1.52, 1.64, 560, 700, E.inOutSine, 0, {
+    ...pageMove('ol.ds-reading-references', 0, 1.52, 1.64, 560, 700, E.inOutSine, 0, {
       anchor: 'top',
       dx0: 60,
       dx1: 64,

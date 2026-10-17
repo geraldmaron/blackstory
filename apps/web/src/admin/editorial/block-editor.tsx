@@ -1,5 +1,5 @@
 'use client';
-import type { ArticleBodyBlockDoc } from '@repo/schemas';
+import type { StoryBodyBlockDoc } from '@repo/schemas';
 import { Button } from 'baseui/button';
 import { TextField, TextAreaField, ChoiceField } from '../design-system/fields';
 type Value = string | number | boolean | null | Value[] | { [key: string]: Value | undefined };
@@ -168,8 +168,8 @@ function Fields({
     </>
   );
 }
-export const newBlock = (type: ArticleBodyBlockDoc['type']): ArticleBodyBlockDoc => {
-  const blocks: Record<ArticleBodyBlockDoc['type'], unknown> = {
+export const newBlock = (type: StoryBodyBlockDoc['type']): StoryBodyBlockDoc => {
+  const blocks: Record<StoryBodyBlockDoc['type'], unknown> = {
     paragraph: { type, text: '' },
     heading: { type, level: 2, text: '' },
     list: { type, style: 'bullet', items: [] },
@@ -191,9 +191,9 @@ export const newBlock = (type: ArticleBodyBlockDoc['type']): ArticleBodyBlockDoc
       caption: '',
     },
   };
-  return blocks[type] as ArticleBodyBlockDoc;
+  return blocks[type] as StoryBodyBlockDoc;
 };
-const optionalFields: Partial<Record<ArticleBodyBlockDoc['type'], Record<string, Value>>> = {
+const optionalFields: Partial<Record<StoryBodyBlockDoc['type'], Record<string, Value>>> = {
   pullquote: { attribution: '', anchors: [] },
   figure: { metricIds: [], anchors: [] },
   stat: { caption: '', anchors: [] },
@@ -209,10 +209,10 @@ export function BlockEditor({
   move,
   remove,
 }: {
-  block: ArticleBodyBlockDoc;
+  block: StoryBodyBlockDoc;
   disabled?: boolean;
   index: number;
-  onChange: (b: ArticleBodyBlockDoc) => void;
+  onChange: (b: StoryBodyBlockDoc) => void;
   move: (d: number) => void;
   remove: () => void;
 }) {
@@ -225,7 +225,7 @@ export function BlockEditor({
         disabled={disabled}
         value={{ ...newBlock(block.type), ...block } as unknown as Record<string, Value>}
         path={`block-${index}`}
-        onChange={(v) => onChange(v as unknown as ArticleBodyBlockDoc)}
+        onChange={(v) => onChange(v as unknown as StoryBodyBlockDoc)}
       />
       {Object.keys(optionalFields[block.type] ?? {}).some((key) => !(key in block)) && (
         <ChoiceField
@@ -243,7 +243,7 @@ export function BlockEditor({
               onChange({
                 ...block,
                 [key]: optionalFields[block.type]![key],
-              } as ArticleBodyBlockDoc);
+              } as StoryBodyBlockDoc);
           }}
         />
       )}

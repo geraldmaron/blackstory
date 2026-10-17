@@ -61,7 +61,7 @@ export type PacketRow = {
 type BulkResult = {
   readonly succeeded: number;
   readonly failed: number;
-  readonly articleDrafts: readonly { submissionId: string; slug: string }[];
+  readonly storyDrafts: readonly { submissionId: string; slug: string }[];
 };
 
 function reviewLabel(row: PacketRow): string {
@@ -101,7 +101,7 @@ export function StoryReviewDesk({ initialRows = [] }: StoryReviewDeskProps) {
   const [note, setNote] = useState('');
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
-  const [articleSlug, setArticleSlug] = useState<string | null>(null);
+  const [storySlug, setStorySlug] = useState<string | null>(null);
   const [bulkResult, setBulkResult] = useState<BulkResult | null>(null);
   const [loading, setLoading] = useState(false);
   const [busy, setBusy] = useState(false);
@@ -184,7 +184,7 @@ export function StoryReviewDesk({ initialRows = [] }: StoryReviewDeskProps) {
     if (submissionIds.length === 0) return;
     setBusy(true);
     setError(null);
-    setArticleSlug(null);
+    setStorySlug(null);
     setBulkResult(null);
     try {
       const token = await getIdToken(true);
@@ -207,12 +207,12 @@ export function StoryReviewDesk({ initialRows = [] }: StoryReviewDeskProps) {
         });
         const body = (await response.json()) as {
           error?: string;
-          articleDraft?: { slug: string };
+          storyDraft?: { slug: string };
         };
         if (!response.ok) {
           throw new Error(body.error ?? `Review failed (${response.status})`);
         }
-        if (body.articleDraft) setArticleSlug(body.articleDraft.slug);
+        if (body.storyDraft) setStorySlug(body.storyDraft.slug);
       } else {
         const response = await fetch('/admin/api/stories/packets/review-bulk', {
           method: 'POST',
@@ -230,7 +230,7 @@ export function StoryReviewDesk({ initialRows = [] }: StoryReviewDeskProps) {
           error?: string;
           succeeded?: number;
           failed?: number;
-          articleDrafts?: BulkResult['articleDrafts'];
+          storyDrafts?: BulkResult['storyDrafts'];
         };
         if (!response.ok) {
           throw new Error(body.error ?? `Bulk review failed (${response.status})`);
@@ -238,7 +238,7 @@ export function StoryReviewDesk({ initialRows = [] }: StoryReviewDeskProps) {
         setBulkResult({
           succeeded: body.succeeded ?? 0,
           failed: body.failed ?? 0,
-          articleDrafts: body.articleDrafts ?? [],
+          storyDrafts: body.storyDrafts ?? [],
         });
       }
 
@@ -402,8 +402,8 @@ export function StoryReviewDesk({ initialRows = [] }: StoryReviewDeskProps) {
         <p className="story-review__notice" role="status">
           Bulk review finished: {bulkResult.succeeded} succeeded
           {bulkResult.failed > 0 ? `, ${bulkResult.failed} failed` : ''}.
-          {bulkResult.articleDrafts.length > 0
-            ? ` ${bulkResult.articleDrafts.length} editable article draft(s) available.`
+          {bulkResult.storyDrafts.length > 0
+            ? ` ${bulkResult.storyDrafts.length} editable story draft(s) available.`
             : ''}
         </p>
       ) : null}
@@ -559,7 +559,7 @@ export function StoryReviewDesk({ initialRows = [] }: StoryReviewDeskProps) {
                   onClick={async () => {
                     try {
                       const token = await getIdToken();
-                      const response = await fetch('/admin/api/articles/import', {
+                      const response = await fetch('/admin/api/stories/import', {
                         method: 'POST',
                         headers: {
                           Authorization: `Bearer ${token}`,
@@ -569,7 +569,7 @@ export function StoryReviewDesk({ initialRows = [] }: StoryReviewDeskProps) {
                       });
                       const data = await response.json();
                       if (!response.ok) throw new Error(data.error);
-                      router.push(`/admin/stories/articles/${data.slug}`);
+                      router.push(`/admin/stories/${data.slug}`);
                     } catch (error) {
                       window.alert(
                         error instanceof Error ? error.message : 'Article import failed.',
@@ -577,10 +577,10 @@ export function StoryReviewDesk({ initialRows = [] }: StoryReviewDeskProps) {
                     }
                   }}
                 >
-                  Open editable article draft
+                  Open editable story draft
                 </FormButton>
-                {' · '}The packet remains private research. Review sources and credits in the
-                article editor.
+                {' · '}The packet remains private research. Review sources and credits in the story
+                editor.
               </p>
 
               {selected.packet.validationIssues.length > 0 ? (
@@ -725,20 +725,16 @@ export function StoryReviewDesk({ initialRows = [] }: StoryReviewDeskProps) {
                 </FormButton>
               </div>
 
-              {articleSlug && (
+              {storySlug && (
                 <p>
-                  <Link href={`/admin/stories/articles/${articleSlug}`}>
-                    Continue editing the article draft
-                  </Link>
+                  <Link href={`/admin/stories/${storySlug}`}>Continue editing the story draft</Link>
                 </p>
               )}
-              {!!bulkResult?.articleDrafts.length && (
+              {!!bulkResult?.storyDrafts.length && (
                 <ul>
-                  {bulkResult.articleDrafts.map((article) => (
-                    <li key={article.submissionId}>
-                      <Link href={`/admin/stories/articles/${article.slug}`}>
-                        Edit {article.slug}
-                      </Link>
+                  {bulkResult.storyDrafts.map((story) => (
+                    <li key={story.submissionId}>
+                      <Link href={`/admin/stories/${story.slug}`}>Edit {story.slug}</Link>
                     </li>
                   ))}
                 </ul>

@@ -1,9 +1,9 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import type { ArticleBodyBlockDoc } from '@repo/schemas';
-import { articleToDocument, documentToArticle } from './document-adapter';
-test('the article editor round-trips every body type with exact citation and evidence attributes', () => {
-  const body: ArticleBodyBlockDoc[] = [
+import type { StoryBodyBlockDoc } from '@repo/schemas';
+import { storyToDocument, documentToStory } from './document-adapter';
+test('the story editor round-trips every body type with exact citation and evidence attributes', () => {
+  const body: StoryBodyBlockDoc[] = [
     { type: 'paragraph', text: 'Named work [ref:source-1]\n[[entity-id|A person]]' },
     { type: 'heading', level: 2, text: 'Section' },
     { type: 'list', style: 'number', items: ['First [ref:one]', 'Second\ncontinued'] },
@@ -53,18 +53,18 @@ test('the article editor round-trips every body type with exact citation and evi
       caption: 'Image caption',
     },
   ];
-  assert.deepEqual(documentToArticle(articleToDocument(body)), body);
+  assert.deepEqual(documentToStory(storyToDocument(body)), body);
 });
 test('new paragraphs preserve citation tokens and unsupported document structures fail visibly', () => {
-  const doc = articleToDocument([{ type: 'paragraph', text: 'Before [ref:source] after' }]);
+  const doc = storyToDocument([{ type: 'paragraph', text: 'Before [ref:source] after' }]);
   doc.content![0]!.content!.push({ type: 'text', text: ' more' });
   assert.equal(
-    (documentToArticle(doc)[0] as { text: string }).text,
+    (documentToStory(doc)[0] as { text: string }).text,
     'Before [ref:source] after more',
   );
   assert.throws(
-    () => documentToArticle({ type: 'doc', content: [{ type: 'table' }] }),
+    () => documentToStory({ type: 'doc', content: [{ type: 'table' }] }),
     /Unsupported/,
   );
-  assert.deepEqual(documentToArticle({ type: 'doc', content: [{ type: 'paragraph' }] }), []);
+  assert.deepEqual(documentToStory({ type: 'doc', content: [{ type: 'paragraph' }] }), []);
 });

@@ -10,7 +10,7 @@ import {
   resolveHistoryGraphReleaseArtifact,
 } from '../../data/history-graph-seed';
 import { listPublicEntities, type PublicEntityView } from '../../data/public-seed';
-import { resolveCitesEdgeIndex } from '../../lib/articles/source';
+import { resolveCitesEdgeIndex } from '../../lib/stories/source';
 import {
   buildHistoryEdges,
   buildHistoryGraphContext,

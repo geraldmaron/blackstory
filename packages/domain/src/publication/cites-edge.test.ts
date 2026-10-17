@@ -5,10 +5,10 @@
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import type { PublicArticleProjectionDoc } from '@repo/schemas';
-import { articleCitedEntities, buildCitesEdge, storiesCiting } from './cites-edge.js';
+import type { PublicStoryProjectionDoc } from '@repo/schemas';
+import { storyCitedEntities, buildCitesEdge, storiesCiting } from './cites-edge.js';
 
-function doc(over: Partial<PublicArticleProjectionDoc>): PublicArticleProjectionDoc {
+function doc(over: Partial<PublicStoryProjectionDoc>): PublicStoryProjectionDoc {
   return {
     id: 'art_1',
     releaseId: 'rel_1',
@@ -22,27 +22,27 @@ function doc(over: Partial<PublicArticleProjectionDoc>): PublicArticleProjection
     references: [],
     relatedEntityIds: [],
     ...over,
-  } as PublicArticleProjectionDoc;
+  } as PublicStoryProjectionDoc;
 }
 
 test('a mapInset block cites its entity as "mapped in"', () => {
-  const cited = articleCitedEntities(doc({ body: [{ type: 'mapInset', entityId: 'ent_a' }] }));
+  const cited = storyCitedEntities(doc({ body: [{ type: 'mapInset', entityId: 'ent_a' }] }));
   assert.equal(cited.get('ent_a'), 'mapped in');
 });
 
 test('relatedEntityIds cite as the weaker "referenced in"', () => {
-  const cited = articleCitedEntities(doc({ relatedEntityIds: ['ent_a'] }));
+  const cited = storyCitedEntities(doc({ relatedEntityIds: ['ent_a'] }));
   assert.equal(cited.get('ent_a'), 'referenced in');
 });
 
 test('mapping a record outranks merely relating it, in either declaration order', () => {
-  const mapped = articleCitedEntities(
+  const mapped = storyCitedEntities(
     doc({ relatedEntityIds: ['ent_a'], body: [{ type: 'mapInset', entityId: 'ent_a' }] }),
   );
   assert.equal(mapped.get('ent_a'), 'mapped in');
 });
 
-test('the index inverts articles onto records, sorted by story title', () => {
+test('the index inverts stories onto records, sorted by story title', () => {
   const index = buildCitesEdge([
     doc({ slug: 'zoning', title: 'Zoning', relatedEntityIds: ['ent_a'] }),
     doc({

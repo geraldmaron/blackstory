@@ -13,7 +13,7 @@ import Link from 'next/link';
 import { ManagementTabs } from '@/admin/design-system/management-tabs';
 import { readEntityEditorial } from '@/admin/editorial/entities';
 import { EntityEditorialEditor } from '@/admin/editorial/entity-editor';
-import '../../stories/articles/articles.css';
+import '../../stories/stories.css';
 import { notFound } from 'next/navigation';
 import { SENSITIVITY_CLASSES } from '@repo/domain';
 import { DetailField, DetailPanel } from '@repo/ui';

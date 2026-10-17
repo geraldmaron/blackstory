@@ -5,13 +5,13 @@
 **Status:** binding layout pattern for `/stories` and `/stories/*` (2026-07-23).  
 **Parent:** `design-direction-v6-home.md` (shared edition vocabulary + atmosphere).  
 **Supersedes:** `design-direction-v5.md` § stories index mast and fixed-ink story mast only.  
-**Unchanged:** story data/routing contract, `renderStoryTitle` accents, Article JSON-LD, Sources footnote.
+**Unchanged:** story data/routing contract, `renderStoryTitle` accents, Story JSON-LD, Sources footnote.
 
 ---
 
 ## 1. Intent
 
-Stories is the **longform reading room** inside the same archive edition as `/`, `/explore`, and `/history`. Readers browse a compact catalog, open place-first articles, and follow evidence off-ramps to records and the map.
+Stories is the **longform reading room** inside the same archive edition as `/`, `/explore`, and `/history`. Readers browse a compact catalog, open place-first stories, and follow evidence off-ramps to records and the map.
 
 Design goals:
 
@@ -41,9 +41,9 @@ Chrome is **opaque Surface**, theme-aware, flat matte. Atmosphere lives in **pag
 2. Optional scattered archive mosaic in left/right gutter bands only; center Surface stack stays opaque (WCAG floor).
 3. `prefers-reduced-motion` hides live mosaic tiles.
 
-**Banned on stories:** fixed-ink mast bands (`--ds-fixed-*`), full-bleed `AtmospherePlane` mast on article pages, crumpled continental silhouettes, shadows, gradients, glows, bevels, blur.
+**Banned on stories:** fixed-ink mast bands (`--ds-fixed-*`), full-bleed `AtmospherePlane` mast on story pages, crumpled continental silhouettes, shadows, gradients, glows, bevels, blur.
 
-Article pages use **per-slug mosaic seed** (`stories-edition-v6:{slug}`) for variety; index and credits use route-level seeds.
+Story pages use **per-slug mosaic seed** (`stories-edition-v6:{slug}`) for variety; index and credits use route-level seeds.
 
 ---
 
@@ -62,21 +62,21 @@ Article pages use **per-slug mosaic seed** (`stories-edition-v6:{slug}`) for var
      ↑ archive texture + scattered mosaic in outer gutters only ↑
 ```
 
-### 3.2 Article (`/stories/[slug]`)
+### 3.2 Story (`/stories/[slug]`)
 
-Single-column edition stack only. Article body is the primary reading beat; related entities never sit beside or above the longform.
+Single-column edition stack only. Story body is the primary reading beat; related entities never sit beside or above the longform.
 
 ```
 ┌─ ds-stories-edition + atmosphere canvas ────────────────────────┐
 │  [ Beat 00 — Intro: kicker, era·place, title, dek, map CTA ]   │
-│  [ Beat 01 — Article body (editorial serif sections) ]          │
+│  [ Beat 01 — Story body (editorial serif sections) ]          │
 │  [ Beat 02 — Records panel (when related entities exist) ]      │
 │  [ Beat 03 — Evidence: Sources footnote ]                       │
 │  [ Quiet footer links ]                                         │
 └─────────────────────────────────────────────────────────────────┘
 ```
 
-**Reading order (DOM + a11y):** intro mast → article → related entities → sources → footer. Map CTA stays in intro when geo exists; mosaic credit stays in intro footnote.
+**Reading order (DOM + a11y):** intro mast → story → related entities → sources → footer. Map CTA stays in intro when geo exists; mosaic credit stays in intro footnote.
 
 ### 3.3 Mosaic credits (`/stories/mosaic-credits`)
 
@@ -102,10 +102,10 @@ Same canvas + intro panel + credits ledger panel. About page living mosaic is **
 | Element | Spec |
 |---|---|
 | Index | Mono copper numeral `00` (decorative; page `h1` remains in title) |
-| Kicker | IBM Plex Mono uppercase copper slug: `Longform` (index) or `Story` (article) |
-| Title | Sora SemiBold; warm word in Source Serif 4 italic copper (`<em>place</em>` on index; per-slug accent on articles via `renderStoryTitle`) |
+| Kicker | IBM Plex Mono uppercase copper slug: `Longform` (index) or `Story` (story) |
+| Title | Sora SemiBold; warm word in Source Serif 4 italic copper (`<em>place</em>` on index; per-slug accent on stories via `renderStoryTitle`) |
 | Lede | Source Serif 4, Stone, max ~54ch |
-| Meta | Mono era · place row + published date on articles |
+| Meta | Mono era · place row + published date on stories |
 | Primary action | **One copper CTA** when related entity has geo: "View on map" |
 | Mosaic credit | Mono footnote with link to `/stories/mosaic-credits` |
 
@@ -127,15 +127,15 @@ Reuse shared `.ds-story-link` / `.ds-story-rail` from shell; stories edition CSS
 
 ---
 
-## 7. Article body, related records, evidence
+## 7. Story body, related records, evidence
 
 | Zone | Spec |
 |---|---|
-| Body panel kicker | `Article` |
+| Body panel kicker | `Story` |
 | Sections | Source Serif 4 paragraphs; optional Sora section titles |
 | Section dividers | Rule hairline between sections |
 | Max measure | ~42rem for body copy |
-| Related entities | Optional **secondary** Records panel **after** article body; compact Surface density, hairline story-link rows, same register as catalog; never a competing column or above-fold rail |
+| Related entities | Optional **secondary** Records panel **after** story body; compact Surface density, hairline story-link rows, same register as catalog; never a competing column or above-fold rail |
 | Sources panel | `Evidence` kicker + `SourceFootnote` group density; follows related entities when present |
 
 ---
@@ -164,8 +164,8 @@ Import `edition-atmosphere.css` once per route bundle that renders the canvas cl
 - [ ] `prefers-reduced-motion`: mosaic hidden; content readable without tiles.
 - [ ] Copper reserved for kickers, index numerals, and single map CTA.
 - [ ] No em dashes in touched copy.
-- [ ] Article JSON-LD unchanged; Sources footnote present.
-- [ ] Tests: `stories-panel-chrome.test.ts`, `story-article-page.test.ts`, `compute-scattered-mosaic-layout.test.ts`.
+- [ ] Story JSON-LD unchanged; Sources footnote present.
+- [ ] Tests: `stories-panel-chrome.test.ts`, `story-story-page.test.ts`, `compute-scattered-mosaic-layout.test.ts`.
 
 ---
 

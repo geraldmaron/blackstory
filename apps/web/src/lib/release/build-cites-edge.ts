@@ -12,7 +12,7 @@
  */
 export {
   CITES_RELATIONS,
-  articleCitedEntities,
+  storyCitedEntities,
   buildCitesEdge,
   storiesCiting,
 } from '@repo/domain/publication/cites-edge';

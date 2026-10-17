@@ -108,29 +108,10 @@ export {
   createOllamaLlmProvider,
   createHybridLlmProvider,
   extractMessageContent,
+  DEFAULT_OPENROUTER_MODELS,
   type LlmProvider,
   type CreateLlmProviderOptions,
 } from './llm-provider.js';
-export {
-  DEFAULT_STORY_REWRITE_MODEL,
-  DEFAULT_STORY_REWRITE_MODELS,
-  STORY_REWRITE_MIN_WORDS,
-  rewriteStory,
-  validateStoryRewrite,
-  type StoryRewriteDraft,
-  type StoryRewriteResult,
-  type StoryProjection,
-  type PublicStorySection,
-} from './story-rewrite.js';
-export {
-  STORY_REWRITE_ARTIFACT_DIR,
-  buildMockStoryRewriteBody,
-  createMockStoryRewriteProvider,
-  hasOpenRouterCredentials,
-  resolveStoryRewriteProvider,
-  writeStoryRewriteArtifact,
-  type StoryRewriteLaneInput,
-} from './story-rewrite-lane.js';
 
 export { mapPool } from './map-pool.js';
 

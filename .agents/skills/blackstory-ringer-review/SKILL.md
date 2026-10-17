@@ -32,7 +32,7 @@ review lenses, not six required agents or paid model runs.
 5. **Reader and represented people:** who bears the cost of a mistake? Check living
    people, privacy, dignity, attribution, community evidence and condescension.
 6. **Standalone meaning:** read the title, card, summary, caption, chart and mobile
-   excerpt without the article. Do they still carry the qualifiers needed to be true?
+   excerpt without the story. Do they still carry the qualifiers needed to be true?
 
 For each finding record the passage, evidence, strongest defense, verdict and smallest
 fix. Use **correction-forcing** for factual or materially misleading claims; **craft**

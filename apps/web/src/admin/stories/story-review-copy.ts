@@ -3,14 +3,14 @@
  */
 
 export const STORY_REVIEW_INTENT_COPY =
-  'Review staged story packets from research runs. Record approve, reject, or needs evidence. Nothing here publishes to the public site. Open an editable article draft to review its prose, sources, media and credits.';
+  'Review staged story packets from research runs. Record approve, reject, or needs evidence. Nothing here publishes to the public site. Open an editable story draft to review its prose, sources, media and credits.';
 
 /** Numbered operator steps for the story review queue. */
 export const STORY_REVIEW_STEPS = [
   'Open a story packet (or select rows for bulk).',
   'Check naming, agency framing, and (for sensitive subject matter) community-review status against docs/methodology/scholarship-principles.md before deciding.',
   'Add a decision note if helpful (optional, but stored with your review).',
-  'Choose approve, needs evidence, or reject. Open the article draft after review; publication requires approval of its saved revision.',
+  'Choose approve, needs evidence, or reject. Open the story draft after review; publication requires approval of its saved revision.',
 ] as const;
 
 /**
@@ -33,7 +33,7 @@ export function storyReviewActionHelp(action: StoryReviewAction): string {
     case 'needs_evidence':
       return 'Send the packet back for stronger sources. Attach evidence on the evidence desk, then re-run story research when ready.';
     case 'rejected':
-      return 'Close the packet without creating an article draft. Use when the draft is off-scope or not worth advancing.';
+      return 'Close the packet without creating an story draft. Use when the draft is off-scope or not worth advancing.';
   }
 }
 

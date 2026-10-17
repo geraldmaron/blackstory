@@ -29,7 +29,7 @@ narrative arc overrides evidence.
    sentence-length pattern. Short, accurate prose is preferable to padding.
 6. Apply [prose review](../blackstory-prose-review/SKILL.md), then the proportionate
    [adversarial review](../blackstory-ringer-review/SKILL.md). A factual change returns to
-   evidence review. Run the actual surface's gates, not article commands for an entity.
+   evidence review. Run the actual surface's gates, not story commands for an entity.
 
 Preserve verbatim quotations, including their grammar; identify the speaker. Do not
 invent interiority, dialogue or weather. No em dashes in authored public prose.

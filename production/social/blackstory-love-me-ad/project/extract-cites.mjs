@@ -10,7 +10,7 @@ await page.goto('http://localhost:3048/stories/the-count', {
 });
 await settle(page, { extra: 3000 });
 const r = await page.evaluate(() => {
-  const ol = document.querySelector('ol.ds-article-references');
+  const ol = document.querySelector('ol.ds-reading-references');
   const head = [...document.querySelectorAll('h2,h3,p')].find((e) =>
     /numbered mark/i.test(e.textContent),
   );

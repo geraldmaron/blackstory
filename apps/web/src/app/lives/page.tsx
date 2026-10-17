@@ -13,13 +13,13 @@ import {
   parseLivesMilestone,
 } from '../../lib/lives/lives-milestones';
 import { LivesMilestoneExperience } from '../../components/lives/LivesMilestoneExperience';
-import { resolveArticleSeries } from '../../lib/articles/source';
+import { resolveStoryCollection } from '../../lib/stories/source';
 import {
   livesNarrativeSeriesId,
   mapLivesNarrativesToEras,
   renumberLivesNarrativeReferences,
 } from '../../lib/lives/lives-narratives';
-import '../../components/article/article.css';
+import '../../components/story/story.css';
 import '../reading-room.css';
 import './lives.css';
 
@@ -44,7 +44,7 @@ export default async function LivesIndexPage({
   const loaded = await loadLivesAreaBundle(LIVES_NATIONAL.slug);
   const bundle = loaded ?? emptyLivesAreaBundle(LIVES_NATIONAL);
   const mapping = mapLivesNarrativesToEras(
-    await resolveArticleSeries(livesNarrativeSeriesId(milestone.key)),
+    await resolveStoryCollection(livesNarrativeSeriesId(milestone.key)),
   );
   for (const problem of mapping.problems) console.warn(`[lives] narrative: ${problem}`);
   const narratives = renumberLivesNarrativeReferences(mapping.byEraId);

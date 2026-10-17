@@ -129,7 +129,7 @@ export type ThemeImpactPacketDerived = {
  * paper (criterion 2). When present, `doi` is checked against Crossref/OpenAlex at
  * validate time (gated behind CHECK_DOIS=1 — see checkDoiCitation and the validate wiring
  * in ops-data/scripts/theme-packets.ts) so a citation can't silently drift or be fabricated
- * with a plausible-looking DOI attached. Mirrors ArticleScholarlyCitationDoc in
+ * with a plausible-looking DOI attached. Mirrors StoryScholarlyCitationDoc in
  * @repo/schemas — same shape, kept local here since this file has no schemas dependency.
  */
 export type ThemeImpactScholarlyCitation = {

@@ -1,0 +1,769 @@
+/**
+ * Article publication layout: header, hero, editorial body with inline
+ * citations, evidence blocks, and the numbered references section. Shares the
+ * design-system tokens with the theme-spine and theme-impact surfaces.
+ */
+
+/*
+ * One measure governs the whole chapter column: header, hero, body prose,
+ * evidence blocks, and references all share `--ds-content-max` so every left
+ * and right edge lines up down the page. The body carries `.ds-prose`, which
+ * caps at the same token — keep these in step rather than reintroducing a
+ * wider shell around a narrower reading column.
+ */
+/*
+ * One measure, declared once.
+ *
+ * The chapter had two competing widths: the room's doc track at `--room-doc-w: 900px` and the
+ * article's own `--ds-content-max` (38rem = 608px). The prose therefore rendered 608px wide,
+ * centered inside a 900px track, while the masthead ran full-bleed and the rail sat off past the
+ * track's end — so nothing on the page shared a left edge and the whole column read as though it
+ * had been dropped in at random. The redesign comp names this exact defect and specifies one
+ * 680px measure, which is what both variables are set to here.
+ *
+ * `--room-doc-w` is set via `:has()` on the room rather than globally because 900px is correct
+ * for the index rooms that render tables and card grids; it is only a reading column of running
+ * prose that needs the narrower measure. `story.css` is imported by `/stories/[slug]` alone,
+ * so these rules cannot reach another surface.
+ */
+/* The measure is declared on the room, not on the article: custom properties inherit down, so
+   a value set on `.ds-reading` would be invisible to the ancestor track that has to match it. */
+.ds-room:has(.ds-reading) {
+  --ds-chapter-measure: 680px;
+  --room-doc-w: var(--ds-chapter-measure);
+}
+
+.ds-reading {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ds-space-8);
+  max-width: var(--ds-chapter-measure, var(--ds-content-max));
+  margin-inline: auto;
+}
+
+/*
+ * The chapter's own header, hero and byline are gone: it opens on `.ds-reading-mast`, which
+ * carries all three over the image. What is left in this block is the inline figure vocabulary
+ * `StoryBody` still renders inside the prose.
+ */
+.ds-reading__image,
+.ds-reading__figure,
+.ds-reading__document {
+  margin: 0;
+}
+
+/*
+ * An inline figure is never cropped. This used to force `aspect-ratio: 3/2` with
+ * `object-fit: cover` so a grid of mixed-aspect images shared one footprint, but these are not
+ * in a grid: each is one image in one column, and the cover crop cut the head off every
+ * full-length portrait in the presidential series (the subject of the picture, removed to keep
+ * a ratio nothing depended on).
+ *
+ * Natural aspect with a height cap instead, in `rem` rather than `vh` so a short window does
+ * not shrink the image to a strip.
+ */
+.ds-reading__image img {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-height: 34rem;
+  object-fit: contain;
+  object-position: center;
+  border-radius: var(--ds-radius-md);
+  border: var(--ds-border-width) solid var(--ds-border);
+  background: var(--ds-surface-raised);
+}
+
+.ds-reading__figcaption {
+  margin-top: var(--ds-space-2);
+  font-family: var(--ds-font-mono);
+  font-size: 0.75rem;
+  color: var(--ds-ink-muted);
+  line-height: 1.5;
+}
+
+.ds-reading__credit {
+  color: var(--ds-ink-subtle);
+  font-style: italic;
+}
+
+/* Editorial body — same centered column as the header */
+.ds-reading__body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ds-space-5);
+  width: 100%;
+}
+
+/* Clears the fixed 64px command bar on an anchor jump — from a reference link, or from the
+   sticky rail's "In this chapter" list. */
+.ds-reading__heading {
+  scroll-margin-top: 88px;
+}
+
+.ds-reading__heading--2 {
+  font-family: var(--ds-font-display);
+  font-size: 30px;
+  line-height: 1.15;
+  margin: var(--ds-space-6) 0 0;
+  padding-top: 24px;
+  border-top: var(--ds-border-width) solid var(--ds-rule);
+  color: var(--ds-ink);
+}
+
+.ds-reading__heading--3 {
+  font-family: var(--ds-font-display);
+  font-size: 1.3rem;
+  margin: var(--ds-space-4) 0 0;
+  color: var(--ds-ink);
+}
+
+.ds-reading__p {
+  font-family: var(--ds-font-editorial);
+  font-size: 19.5px;
+  line-height: 1.68;
+  color: var(--ds-ink);
+  margin: 0;
+}
+
+/* Inline citation superscript */
+.ds-reading-cite {
+  font-family: var(--ds-font-sans);
+  font-size: 0.65em;
+  line-height: 0;
+  margin-left: 0.1em;
+  white-space: nowrap;
+}
+
+.ds-reading-cite a {
+  color: var(--ds-accent);
+  text-decoration: none;
+  font-weight: 600;
+  padding: 0 0.08em;
+}
+
+.ds-reading-cite a:hover,
+.ds-reading-cite a:focus-visible {
+  text-decoration: underline;
+}
+
+.ds-reading__pullquote {
+  margin: var(--ds-space-2) 0;
+  padding-left: var(--ds-space-5);
+  border-left: var(--ds-border-width-strong) solid var(--ds-accent);
+}
+
+.ds-reading__pullquote p {
+  font-family: var(--ds-font-editorial);
+  font-style: italic;
+  font-size: 24px;
+  line-height: 1.3;
+  color: var(--ds-ink);
+  margin: 0;
+}
+
+.ds-reading__pullquote-cite {
+  display: block;
+  margin-top: var(--ds-space-2);
+  font-family: var(--ds-font-sans);
+  font-size: 0.85rem;
+  font-style: normal;
+  color: var(--ds-ink-muted);
+}
+
+/* Evidence blocks sit slightly wider than the prose measure */
+.ds-reading__figure,
+.ds-reading__document,
+.ds-reading__timeline,
+.ds-reading__map,
+.ds-reading__dispute,
+.ds-reading__image {
+  margin-block: var(--ds-space-2);
+}
+
+/* ----------------------------------------------------------------------------
+ * Evidence drawers. Primary documents begin open; other context remains collapsible.
+ * Native <details>; charts are never wrapped here.
+ * ------------------------------------------------------------------------- */
+/* Ink direction: a drawer is a hairline row, not a box — the border/radius/background come
+   off, same move RoomCard makes. A live map moment inside still needs a transparent ground
+   to show the borrowed plate through; that rule below no longer has anything to override. */
+.ds-reading__drawer {
+  margin-block: var(--ds-space-3);
+  border-top: var(--ds-border-width) solid var(--ds-rule);
+  border-bottom: var(--ds-border-width) solid var(--ds-rule);
+}
+
+.ds-reading__drawer + .ds-reading__drawer {
+  margin-top: calc(-1 * var(--ds-space-3));
+  border-top: 0;
+}
+
+.ds-reading__drawer-summary {
+  display: flex;
+  align-items: baseline;
+  gap: var(--ds-space-3);
+  padding: var(--ds-space-3) var(--ds-space-4);
+  cursor: pointer;
+  list-style: none;
+  user-select: none;
+  transition: background 120ms ease;
+}
+
+.ds-reading__drawer-summary::-webkit-details-marker {
+  display: none;
+}
+
+.ds-reading__drawer-summary:hover {
+  background: color-mix(in srgb, var(--ds-accent) 6%, transparent);
+}
+
+.ds-reading__drawer-summary:focus-visible {
+  outline: 2px solid var(--ds-accent);
+  outline-offset: -2px;
+}
+
+.ds-reading__drawer-kind {
+  flex: none;
+  font-family: var(--ds-font-mono);
+  font-size: 10.5px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ds-accent);
+}
+
+.ds-reading__drawer-lead {
+  flex: 1 1 auto;
+  font-family: var(--ds-font-editorial);
+  font-size: 0.95rem;
+  color: var(--ds-ink);
+}
+
+/* `+` / `–` text cue, not a rotating chevron — same disclosure idiom room-kit.css's
+   .ds-room-draw__summary uses. */
+.ds-reading__drawer-cue {
+  flex: none;
+  align-self: center;
+  font-family: var(--ds-font-sans);
+  font-size: 13px;
+  color: var(--ds-accent);
+}
+
+.ds-reading__drawer-cue::before {
+  content: '+';
+}
+
+.ds-reading__drawer[open] .ds-reading__drawer-cue::before {
+  content: '\2013'; /* – */
+}
+
+/*
+ * Narrow widths: the label takes its own line and the title takes the full measure.
+ *
+ * The summary is a flex row in which `__drawer-kind` is `flex: none` and `__drawer-lead` is
+ * `flex: 1 1 auto`, so every pixel the row is short comes out of the title and none out of the
+ * label. A kind label like "PRIMARY DOCUMENT · 2001-02-28" is around 250px of mono caps that
+ * will not shrink, which on a 375px screen left the title roughly 90px and set a document name
+ * one or two words per line down a dozen lines. The label is the shorter, more compressible
+ * string and the title is the thing being named, so the title gets the width.
+ */
+@media (max-width: 40rem) {
+  .ds-reading__drawer-summary {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: start;
+    row-gap: var(--ds-space-1);
+  }
+
+  .ds-reading__drawer-kind {
+    grid-area: 1 / 1;
+  }
+
+  /* Stays on the first row beside the label: a disclosure cue belongs next to the thing that
+     opens, not stranded below a title it does not describe. */
+  .ds-reading__drawer-cue {
+    grid-area: 1 / 2;
+    align-self: start;
+  }
+
+  .ds-reading__drawer-lead {
+    grid-area: 2 / 1 / 3 / -1;
+  }
+}
+
+.ds-reading__drawer-body {
+  padding: 0 var(--ds-space-4) var(--ds-space-4);
+}
+
+/* The wrapped artifact loses its own outer card chrome inside the drawer. The drawer itself
+   carries no background any more (see .ds-reading__drawer above), so a live map moment's
+   borrowed plate — position: fixed below the document's stacking context — already shows
+   through without a transparency override; this only strips the document figure's own box. */
+.ds-reading__drawer-body .ds-reading__document {
+  border: 0;
+  background: transparent;
+  padding: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ds-reading__drawer-cue,
+  .ds-reading__drawer-summary {
+    transition: none;
+  }
+}
+
+/* ----------------------------------------------------------------------------
+ * Stat rail — consecutive figures as one compact comparison strip, not a wall
+ * of stacked cards. Two-up when the run is a pair; auto-fit otherwise.
+ * ------------------------------------------------------------------------- */
+/* Three-up, 1px-gap grid on panel ground — same technique as the kit's TrustBlock/Anatomy:
+   the gap is the background color showing through as hairlines between cells. */
+.ds-reading__statrail {
+  margin-block: var(--ds-space-4);
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr));
+  gap: 1px;
+  background: var(--ds-rule);
+  border: var(--ds-border-width) solid var(--ds-rule);
+  border-radius: var(--ds-radius-md);
+  overflow: hidden;
+}
+
+.ds-reading__statrail[data-count='2'] {
+  grid-template-columns: repeat(2, 1fr);
+}
+
+.ds-reading__statcell {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ds-space-1);
+  padding: var(--ds-space-4);
+  background: var(--ds-surface);
+}
+
+.ds-reading__statfigure {
+  font-family: var(--ds-font-display);
+  font-size: 38px;
+  line-height: 1.05;
+  color: var(--ds-accent);
+  font-variant-numeric: tabular-nums;
+}
+
+.ds-reading__statlabel {
+  font-family: var(--ds-font-editorial);
+  font-size: 15.5px;
+  line-height: 1.4;
+  color: var(--ds-ink-muted);
+}
+
+.ds-reading__statcell .ds-reading-source-line {
+  margin-top: auto;
+}
+
+@media (max-width: 30rem) {
+  .ds-reading__statrail,
+  .ds-reading__statrail[data-count='2'] {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Matches the className StoryBody.tsx actually renders (`ds-reading-source-line`, no
+   double underscore) — this rule previously used the BEM spelling and never matched. */
+.ds-reading-source-line {
+  margin: var(--ds-space-1) 0 0;
+  font-family: var(--ds-font-mono);
+  font-size: 10.5px;
+  color: var(--ds-ink-subtle);
+}
+
+.ds-reading__document {
+  border: var(--ds-border-width) solid var(--ds-border);
+  border-radius: var(--ds-radius-md);
+  background: var(--ds-surface-raised);
+  padding: var(--ds-space-4);
+}
+
+.ds-reading__document-quote {
+  margin: var(--ds-space-3) 0 0;
+  font-family: var(--ds-font-editorial);
+  font-size: 1.05rem;
+  line-height: 1.6;
+  color: var(--ds-ink);
+  font-style: italic;
+}
+
+.ds-reading__document-summary {
+  margin-top: var(--ds-space-3);
+  font-family: var(--ds-font-sans);
+  font-size: 0.9rem;
+  color: var(--ds-ink-muted);
+}
+
+/* References — the reader-column heading class stays defined for other article surfaces
+   that still render an inline references section; this route's own list now lives in the
+   sticky rail (see `.ds-reading-rail` in reading-room.css) and no longer wraps in this. */
+
+.ds-reading-references {
+  list-style: none;
+  margin: var(--ds-space-4) 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--ds-space-3);
+  counter-reset: none;
+}
+
+.ds-reading-references__item {
+  display: grid;
+  grid-template-columns: 2.25rem 1fr;
+  gap: var(--ds-space-2);
+  padding-bottom: var(--ds-space-3);
+  border-bottom: var(--ds-border-width) solid var(--ds-rule);
+  font-family: var(--ds-font-sans);
+  font-size: 0.9rem;
+  line-height: 1.5;
+  scroll-margin-top: var(--ds-space-8);
+}
+
+.ds-reading-references__item:last-child {
+  border-bottom: 0;
+  padding-bottom: 0;
+}
+
+.ds-reading-references__item:target {
+  background: var(--ds-surface-raised);
+  border-radius: var(--ds-radius-sm);
+  outline: 2px solid var(--ds-accent);
+  outline-offset: 2px;
+}
+
+.ds-reading-references__num {
+  color: var(--ds-ink-subtle);
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.ds-reading-references__body a {
+  color: var(--ds-accent);
+}
+
+.ds-reading-references__locator {
+  color: var(--ds-ink-subtle);
+}
+
+.ds-reading__footer {
+  margin-top: var(--ds-space-6);
+  font-family: var(--ds-font-sans);
+  font-size: 0.9rem;
+}
+
+.ds-reading__footer a {
+  color: var(--ds-accent);
+}
+
+/* —— the chapter masthead ————————————————————————————————————————————————————
+   The same block the record page opens on, for the same reason: a chapter that leads with its
+   image is a piece of writing, and a chapter that leads with a text header and then shows the
+   image underneath the summary is a document with a picture attached. */
+.ds-reading-mast {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  margin: 0;
+  overflow: hidden;
+  isolation: isolate;
+}
+
+/*
+ * The hero photograph has its own band, centred, and the headline reads below it — at every
+ * width, as on a record page (record-room.css has the full reasoning). Written over the photo, a
+ * picture shown whole had to be pushed to the right edge to make room for the type, and sat
+ * off-centre beside an empty field.
+ */
+.ds-reading-mast[data-media='photo'] {
+  display: block;
+  min-height: 0;
+  background: var(--ds-canvas);
+}
+
+.ds-reading-mast__photo {
+  position: relative;
+  height: clamp(260px, 36vw, 500px);
+  max-height: 62svh;
+  background: var(--ds-surface-raised);
+}
+
+.ds-reading-mast img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+}
+
+.ds-reading-mast .ds-fit-photo[data-fit='contain'] .ds-fit-photo__main {
+  position: absolute;
+  object-position: center;
+}
+
+/* Phones and short screens: a 4:3 window rather than a fixed-height band. */
+@media (max-width: 47.9375rem), (max-height: 34.9375rem) {
+  .ds-reading-mast__photo {
+    height: auto;
+    aspect-ratio: 4 / 3;
+  }
+}
+
+/* The scrim is sized to the type, not to the plate: over the whole band the opaque end of the
+   ramp lands under the middle of the picture and the picture never arrives. */
+.ds-reading-mast__over {
+  position: relative;
+  z-index: 1; /* local: over the hero image, inside the masthead figure. */
+  display: flex;
+  flex-direction: column;
+  /* The inline padding was `--ds-gutter` (16px), which put a 44px display title sixteen pixels
+     from the edge of the screen and made the whole masthead read as though the text had fallen
+     off the layout. The masthead is deliberately full-bleed and does not share the body's left
+     edge, so the margin has to do the work of framing it; the comps set 56px. Clamped so the
+     same rule still gives a phone a sane 20px. */
+  padding: var(--ds-space-16) clamp(20px, 4.5vw, 56px) var(--ds-space-10);
+}
+
+/* Below its own photo band, the headline needs no clearance for a picture above it. */
+.ds-reading-mast[data-media='photo'] .ds-reading-mast__over {
+  padding-top: var(--ds-space-8);
+}
+
+.ds-reading-mast__facts {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--ds-space-2) var(--ds-space-3);
+  margin: 0 0 var(--ds-space-4);
+  font-size: 12.5px;
+  color: var(--ds-ink-muted);
+}
+
+/* The collection is the one thing in this row a reader can act on, so it is the one thing drawn
+   as a control. */
+.ds-reading-mast__series {
+  display: inline-flex;
+  align-items: center;
+  height: 26px;
+  padding: 0 11px;
+  border: var(--ds-border-width) solid color-mix(in oklab, var(--ds-accent) 55%, transparent);
+  border-radius: var(--ds-radius-full);
+  background: color-mix(in oklab, var(--ds-accent) 14%, transparent);
+  color: var(--ds-accent);
+  font-size: 12px;
+  font-weight: 500;
+  text-decoration: none;
+}
+
+.ds-reading-mast__title {
+  margin: 0;
+  max-width: 22ch;
+  font-family: var(--ds-font-display);
+  font-weight: 600;
+  font-size: clamp(36px, 5vw, 64px);
+  line-height: 1;
+  letter-spacing: -0.038em;
+}
+
+.ds-reading-mast__lede {
+  margin: var(--ds-space-5) 0 0;
+  max-width: 56ch;
+  font-family: var(--ds-font-editorial);
+  font-size: clamp(17px, 1.5vw, 21px);
+  line-height: 1.5;
+  color: color-mix(in srgb, var(--ds-ink) 88%, var(--ds-canvas));
+}
+
+.ds-reading-mast__byline {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--ds-space-2) var(--ds-space-4);
+  margin: var(--ds-space-5) 0 0;
+  font-size: 12.5px;
+  color: var(--ds-ink-muted);
+}
+
+/* The credit runs in flow, under the byline.
+ *
+ * It was absolutely positioned — first bottom-right, where a four-line source note sat directly
+ * beside the lede and won on contrast because it landed on the brightest part of the picture;
+ * then top-left, which collided with the title outright once the plate was shorter than its own
+ * text. Both failures are the same mistake: this figure's height is driven by a title and lede
+ * of unknown length, so anything taken out of flow inside it is positioned against a box whose
+ * size is not known in advance. In flow it cannot overlap anything, at any measure, ever. */
+.ds-reading-mast__credit {
+  margin-top: var(--ds-space-4);
+  max-width: 66ch;
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  line-height: 1.5;
+  text-transform: uppercase;
+  color: var(--ds-ink-subtle);
+}
+
+/* —— the chapter's apparatus band ——————————————————————————————————————————— */
+.ds-reading-appx {
+  width: min(100%, 1180px);
+  margin-inline: auto;
+}
+
+.ds-reading-appx__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--ds-space-2) var(--ds-space-4);
+  margin-bottom: var(--ds-space-7);
+}
+
+.ds-reading-appx__head h2 {
+  margin: 0;
+  font-family: var(--ds-font-display);
+  font-size: 19px;
+  font-weight: 600;
+  letter-spacing: -0.015em;
+}
+
+.ds-reading-appx__head span {
+  font-size: 13px;
+  color: var(--ds-ink-muted);
+}
+
+.ds-reading-appx__cols {
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
+  column-gap: var(--ds-space-12);
+  row-gap: var(--ds-space-7);
+  align-items: start;
+}
+
+@media (max-width: 60rem) {
+  .ds-reading-appx__cols {
+    grid-template-columns: 1fr;
+  }
+}
+
+.ds-reading-appx__notes {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ds-space-5);
+}
+
+.ds-reading-appx__notes h3 {
+  margin: 0 0 var(--ds-space-2);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ds-ink-muted);
+}
+
+.ds-reading-appx__notes p {
+  margin: 0;
+  font-size: 13.5px;
+  line-height: 1.55;
+  color: color-mix(in srgb, var(--ds-ink) 88%, var(--ds-canvas));
+}
+/* ----------------------------------------------------------------------------
+ * "The records behind this chapter" — the story side of the story-cites-record
+ * edge, rendered in the apparatus under the numbered sources.
+ * Matches the notes column's type scale: this is apparatus, not body prose.
+ * ------------------------------------------------------------------------- */
+.ds-reading-appx__records {
+  margin-top: var(--ds-space-5);
+}
+
+.ds-reading-appx__records h3 {
+  margin: 0 0 var(--ds-space-2);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ds-ink-muted);
+}
+
+.ds-reading-appx__records p {
+  margin: 0 0 var(--ds-space-3);
+  font-size: 13.5px;
+  line-height: 1.55;
+  color: color-mix(in srgb, var(--ds-ink) 88%, var(--ds-canvas));
+}
+
+/* Names, one per line. A record is a destination, not a chip in a row: the list
+   reads as the chapter's evidence rather than as a filter bar. */
+.ds-reading-appx__record-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: var(--ds-space-2);
+}
+
+.ds-reading-appx__record-list a {
+  font-size: 14px;
+  line-height: 1.45;
+  color: var(--ds-ink);
+  text-decoration-color: color-mix(in srgb, var(--ds-ink) 35%, transparent);
+  text-underline-offset: 3px;
+}
+
+.ds-reading-appx__record-list a:hover {
+  text-decoration-color: currentColor;
+}
+
+/* ----------------------------------------------------------------------------
+ * Sticky evidence rail — Ink direction. "In this chapter" and "Records cited" are
+ * RailGroup, styled by room-kit.css; only the wrapper's stickiness and the one-off
+ * "Next in this collection" block belong to this sheet.
+ * ------------------------------------------------------------------------- */
+.ds-reading-rail {
+  position: sticky;
+  top: 24px;
+}
+
+.ds-reading-rail__next {
+  margin-top: var(--ds-space-7);
+  padding: var(--ds-space-4);
+  background: var(--ds-surface);
+  border-left: var(--ds-border-width-strong) solid var(--ds-accent);
+}
+
+/* The heading above this block is the kit's rail-group title; the link itself carried no rule at
+   all, so it took the global prose underline across both of its lines. */
+.ds-reading-rail__next-link {
+  display: block;
+  text-decoration: none;
+}
+
+.ds-reading-rail__next-position {
+  margin: var(--ds-space-1) 0 0;
+  font-family: var(--ds-font-mono);
+  font-size: 10.5px;
+  color: var(--ds-accent);
+}
+
+.ds-reading-rail__next-title {
+  display: block;
+  margin-top: 4px;
+  font-family: var(--ds-font-display);
+  font-weight: 600;
+  font-size: 15.5px;
+  letter-spacing: -0.015em;
+  color: var(--ds-ink);
+  text-decoration: none;
+}
+
+.ds-reading-rail__next-title:hover {
+  color: var(--ds-accent);
+}
+
+@media (max-width: 68rem) {
+  /* Below .ds-room__body--railed's breakpoint the rail stacks under the column (Room.tsx),
+     where sticky positioning has no meaningful ground to stick to. */
+  .ds-reading-rail {
+    position: static;
+  }
+}

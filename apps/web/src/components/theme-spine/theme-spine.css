@@ -1,6 +1,6 @@
 /**
  * Theme-spine evidence-moment styles (EraTimeline, MapInsetMoment) embedded in
- * /chapters article bodies via ArticleBody. Sits on the shared Surface panel
+ * /chapters article bodies via StoryBody. Sits on the shared Surface panel
  * convention with a copper accent border/wash — see
  * `apps/web/src/components/patterns/utility-edition` for the panel pattern.
  */

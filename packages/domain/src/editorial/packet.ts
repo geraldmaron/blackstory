@@ -13,7 +13,7 @@ export type EditorialDecision = 'keep' | 'reject' | 'needs_evidence';
  * When present, `doi` is checked against Crossref/OpenAlex
  * at judge time (gated behind CHECK_DOIS=1 — see checkDoiCitation in @repo/domain and the
  * gate in operator-cli/editorial-run.ts) so a claim can't cite a paper under a fabricated or
- * drifted DOI. Mirrors `ArticleScholarlyCitationDoc` in @repo/schemas — same shape, kept
+ * drifted DOI. Mirrors `StoryScholarlyCitationDoc` in @repo/schemas — same shape, kept
  * local here since this file has no schemas dependency (same convention as
  * `ThemeImpactScholarlyCitation` in @repo/domain's theme-impact-packet.ts).
  */

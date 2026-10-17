@@ -162,8 +162,8 @@ The three working playbooks are `blackstory-neo-voice`, `blackstory-prose-review
 [skill review cases](../research/skill-review-cases.md) to challenge changes to this
 contract; those are transparent development cases, not a held-out quality estimate.
 
-Articles are stored in `reference.articles`; the article CLI's existing schema,
-citation, packet and word-floor gates still apply where implemented. Chapter-kind
+Stories are stored in `reference.stories`; the story CLI's existing schema,
+citation, packet and word-floor gates still apply where implemented. Chapter-format
 content currently has a 2,000-word floor. That is a format constraint, not a research
 method or proof of depth: choose an appropriate shorter format or propose a reviewed
 gate change when evidence is insufficient, never pad prose to pass. Entity summaries

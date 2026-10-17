@@ -1,0 +1,221 @@
+# Project Instructions for AI Agents
+
+This file provides instructions and context for AI coding agents working on this project.
+
+<!-- BEGIN BEADS INTEGRATION v:1 profile:minimal hash:ca08a54f -->
+
+## Beads Issue Tracker
+
+This project uses **bd (beads)** for issue tracking. Run `bd prime` to see full workflow context and commands.
+
+### Quick Reference
+
+```bash
+bd ready              # Find available work
+bd show <id>          # View issue details
+bd update <id> --claim  # Claim work
+bd close <id>         # Complete work
+```
+
+### Rules
+
+- Use `bd` for ALL task tracking — do NOT use TodoWrite, TaskCreate, or markdown TODO lists
+- Run `bd prime` for detailed command reference and session close protocol
+- Use `bd remember` for persistent knowledge — do NOT use MEMORY.md files
+
+## Running subagents that edit files
+
+**Concurrent agents must not share one git working tree.** Spawn them with
+`isolation: "worktree"` (the Agent tool's own flag) so each gets its own checkout, or run them one
+at a time.
+
+This is not a style preference. On 2026-08-05 three agents were dispatched at once on
+non-overlapping _files_, which looked safe. One of them ran a broad `git checkout` to undo its own
+work and silently reverted another agent's already-verified, already-reviewed edits. Non-
+overlapping files are not enough; they also share a git index, a stash, and a working tree, and any
+agent that touches git destroys the others' work.
+
+Rules for any file-editing subagent:
+
+- Give it `isolation: "worktree"`, or run it alone.
+- Worktrees are cut from `main`, not the working branch (170+ commits behind `staging` today). Make
+  the agent's first command `git reset --hard <staging tip sha>` or its whole analysis runs on stale code.
+- Tell it explicitly not to run `git add`, `commit`, `push`, `stash`, `checkout`, or `restore` —
+  the orchestrator owns version control.
+- Tell it not to run `bd` — the orchestrator owns issue bookkeeping, and concurrent writers churn
+  `.beads/issues.jsonl`.
+- Review the actual `git diff` before believing the report. In that same run, one agent reported
+  "no non-comment modifications" while having edited a test assertion, and another reported success
+  on an edit that introduced a user-visible regression.
+- Check `git status` for files nobody was asked to touch (generated files like `next-env.d.ts`
+  reappear this way).
+
+Small models are fine for genuinely mechanical work, but "mechanical" is a claim to verify, not
+assume. A one-line regex widening in that run would have rendered "pre-Columbian" as
+"pre to Columbian" in production.
+
+## Session Completion
+
+**When ending a work session**, you MUST complete ALL steps below. Work is NOT complete until `git push` succeeds.
+
+**MANDATORY WORKFLOW:**
+
+1. **File issues for remaining work** - Create issues for anything that needs follow-up
+   1a. **Then work the follow-ups you just filed.** A follow-up that is bounded data or
+   validation work inside the session's own epic (a second source, a dead link, a stale
+   facet, a floor that now passes, a record the pass could not reach) is the next step of
+   the same job, not a hand-off. Fan out and finish it in this session, measured the same
+   way, before closing out. File-and-stop only when the follow-up needs a human decision
+   (policy, scope, an irreversible change) or lies outside the epic, and say which. The
+   operator should never have to reply "now do the follow-ups".
+2. **Run quality gates** (if code changed) - Tests, linters, builds
+3. **Update issue status** - Close finished work, update in-progress items
+4. **PUSH TO REMOTE** - This is MANDATORY. Push to `staging`, never directly to `main`
+   (see **Branching & Release Policy** below):
+
+   ```bash
+   git pull --rebase origin staging
+   git push origin HEAD:staging
+   git status  # MUST show local branch is up to date with what you pushed
+   ```
+
+   There is **no Dolt remote on this project and there is not going to be one.** Do not run
+   `bd dolt push` and do not report its "no remote is configured" output as a problem to solve.
+   Beads data reaches the remote the same way everything else does: the pre-commit hook exports
+   `.beads/issues.jsonl`, and `git push` carries it.
+
+5. **Clean up** - Clear stashes, prune remote branches
+6. **Verify** - All changes committed AND pushed
+7. **Hand off** - Provide context for next session
+
+**CRITICAL RULES:**
+
+- Work is NOT complete until `git push` succeeds
+- NEVER stop before pushing - that leaves work stranded locally
+- NEVER say "ready to push when you are" - YOU must push
+- If push fails, resolve and retry until it succeeds
+
+**Before opening a staging → main PR**, run `fnm exec --using=22 -- ./scripts/ci-local.sh`.
+`pnpm test` is not equivalent: CI decides which lanes run from the changed paths, and two of
+those predicates are easy to miss by inspection — touching `packages/public-contracts` fires
+the whole mobile lane (it is the mobile token source), and touching `packages/research-kernel`
+fires the Python lane (no `.py` file required). `scripts/ci-local.sh` mirrors
+`.github/workflows/ci.yml` lane-for-lane instead of guessing. The script requires Node 22
+(the repo's `.nvmrc`) because `node:test`'s reporter output format differs between Node 22 and
+24 — running it on 24 can pass locally and still not match what CI reports.
+<!-- END BEADS INTEGRATION -->
+
+## Branching & Release Policy
+
+`main` is GitHub-branch-protected: no direct pushes, no force-pushes, no deletions (PR required
+to merge). This is enforced server-side, not just a convention.
+
+- **Day-to-day work** (agent sessions, exploratory commits, WIP) lands on `staging` (or a
+  feature branch merged into `staging`) — never pushed straight to `main`.
+- **staging → main is an explicit, separate action**, not something a session does as part of
+  its normal close-out: open a PR from `staging` to `main` and merge it deliberately (`gh pr
+create --base main --head staging` then `gh pr merge`), only when `staging` is in a state
+  intended for release. Do this only when asked, not automatically at session end.
+- If you're unsure whether a change belongs on `staging` alone or should also go to `main`,
+  default to `staging` and ask.
+
+## Republishing the CDN catalog after a published write
+
+A direct write to `published.release_entities` / `published.search_index` leaves the published
+`entities.json` / `search-index.json` stale — the read-side guard only compares `releaseId`, which
+an in-place correction does not change. Rebuild the graph, then republish **locally**:
+
+```bash
+cd apps/web && set -a && . ./.env.local && set +a && node --conditions development --import tsx ../../packages/ops-data/scripts/publish-release-catalog-artifacts.ts
+```
+
+**Then purge the Cloudflare zone** (`docs/security/cost-resource-controls.md`, "purge after an
+in-place correction"): public documents are edge-cached for an hour, so a corrected record keeps
+its old HTML at Cloudflare until purged. Vercel's own CDN copy refreshes within five minutes by
+itself.
+
+**Then stop. Do not run `gh workflow run publish-release-catalog-artifacts.yml` afterwards.** The
+workflow runs that same script against the same watermark
+(`published.release_catalog_publish_watermark`), so once the local run has consumed it the
+dispatch reports `up to date — skipping`: CI minutes spent to reach a no-op. On 2026-09-12 there
+were eight such dispatches in one day, several of them no-ops.
+
+The workflow is the right entry point only when there is no local environment to run it from. Its
+daily cron is off as of 2026-09-16; a forgotten mutation no longer self-heals.
+
+## BlackStory research skills
+
+Research playbooks are shared across harnesses in `.agents/skills/<skill-name>/SKILL.md`.
+The flat `.claude/skills/` entries are symlinks to that source. Edit the canonical files;
+do not create a Claude-specific copy. See `docs/research/README.md#skills-and-harness-portability`
+for explicit file loading and capability requirements. CLI pointers load a verb from
+`docs/research/research-operations.md`. Judgment playbooks (`entity-verify`,
+`claim-corroborate`, `entity-complete`, `entity-relate`, `coverage-target`, `publish-preview`,
+`neo-voice`, `prose-review`, `ringer-review`, `surface-triage`, `intake-review`,
+`experience-review`) have unique content. See `AGENTS.md` for the
+lane index.
+
+## Web local QA (agents)
+
+The web dev server is `preview_start {name: "web"}` on port 3048.
+
+**If something is already listening on 3048, attach to it — do not start a second one and do not
+kill the running process.** It is probably the developer's own server.
+
+```
+preview_start {url: "http://localhost:3048/"}
+```
+
+`autoPort` does not help here and should not be added to `.claude/launch.json`. Next 16 holds a
+dev lock per _directory_, not per port: a second `next dev` on `apps/web` binds its assigned port,
+prints "Ready", and is then killed by the first instance's lock. The port was never the conflict.
+
+The server is Postgres-backed (`dev-web.sh` loads `apps/web/.env.local` and sets
+`PUBLIC_DATA_SOURCE=postgres`), so a preview reflects live `published` data, not seed.
+
+**A running server does not see a record you RENAME under it.** Entity routes resolve through
+`record-first-paint.tsx`'s slug path, which reads process-cached shared sources, so after an
+in-place `display_name` change the record's own page returns "Place not found" until the server
+restarts — even with the column, `projection.displayName`, `projection.nameLower` and
+`search_index.name` all correct and `parseEntityProjection` accepting the row. On 2026-09-12 that
+cost a long diagnosis before a restart proved the data had been right the whole time
+(repo-iejg8). Other edits do not behave this way: a republish through the incremental publisher,
+and a direct summary or topic write, were all picked up live in the same session. So a 404 on a
+just-renamed record is the cache, not your write — verify the row, then restart before hunting
+further.
+
+To run a one-off script against the same data, source the env and use the dev export condition —
+without `--conditions development` the workspace packages fail to resolve:
+
+```bash
+cd apps/web && set -a && . ./.env.local && set +a && node --conditions development --import tsx <script>.mts
+```
+
+## Mobile local QA (agents)
+
+**Default:** `pnpm mobile:ios:verify` (Path A, prod-like). Checks api-public + Release app on Simulator; **does not** use Metro.
+
+- Launch/rebuild: `pnpm mobile:ios:release`
+- Hot reload only: `pnpm dev:mobile` (Path B)
+- Never claim mobile healthy from `127.0.0.1:8081` alone if the dev client may target another port
+
+Details: `AGENTS.md` and `apps/mobile/README.md`.
+
+## Build & Test
+
+_Add your build and test commands here_
+
+```bash
+# Example:
+# npm install
+# npm test
+```
+
+## Architecture Overview
+
+_Add a brief overview of your project architecture_
+
+## Conventions & Patterns
+
+_Add your project-specific conventions here_
+

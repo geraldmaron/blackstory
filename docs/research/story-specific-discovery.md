@@ -12,7 +12,7 @@
 **Status:** Draft v1 (2026-07-24)
 **Module:** `packages/operator-cli/src/story-gap-discovery.ts`
 **Tests:** `packages/operator-cli/src/story-gap-discovery.test.ts`
-**Companions:** [research-directive-framework.md](./research-directive-framework.md), [theme-impact-canonical-questions.md](./theme-impact-canonical-questions.md), [story-rewrite-review.md](./story-rewrite-review.md), `packages/domain/src/discovery/obscurity.ts`
+**Companions:** [research-directive-framework.md](./research-directive-framework.md), [theme-impact-canonical-questions.md](./theme-impact-canonical-questions.md), `packages/domain/src/discovery/obscurity.ts`
 
 ## 1. Purpose
 

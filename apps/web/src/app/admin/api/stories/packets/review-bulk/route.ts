@@ -1,6 +1,6 @@
 /**
  * API: bulk approve / reject / needs_evidence for staged story packets.
- * Cap 50. Does not publish — approved packets continue as durable editable articles.
+ * Cap 50. Does not publish — approved packets continue as durable editable stories.
  */
 import { importStoryPacket } from '@/admin/editorial/packet';
 import { authorizeAdminRoute, authErrorResponse } from '../../../../../../admin/auth/request-auth';
@@ -59,12 +59,12 @@ export async function POST(request: Request): Promise<Response> {
 
     const succeeded = results.filter((row) => row.ok).length;
     const failed = results.length - succeeded;
-    const articleDrafts = [];
+    const storyDrafts = [];
     const importFailures = [];
     if (decision === 'approved')
       for (const row of results.filter((r) => r.ok)) {
         try {
-          articleDrafts.push({
+          storyDrafts.push({
             submissionId: row.submissionId,
             ...(await importStoryPacket(caller, row.submissionId)),
           });
@@ -80,7 +80,7 @@ export async function POST(request: Request): Promise<Response> {
       failed,
       limit: STORY_REVIEW_BULK_LIMIT,
       results,
-      articleDrafts,
+      storyDrafts,
       importFailures,
       published: false,
       note: 'Bulk review records private decisions only. Release activation remains a separate independently authorized action.',

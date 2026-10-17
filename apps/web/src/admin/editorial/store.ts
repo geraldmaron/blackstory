@@ -1,12 +1,12 @@
-/** One audited persistence boundary for article drafts, credits and exact-revision reviews. */
+/** One audited persistence boundary for story drafts, credits and exact-revision reviews. */
 import { randomUUID } from 'node:crypto';
 import type pg from 'pg';
 import {
-  articleDraftSchema,
+  storyDraftSchema,
   editorialContributorMutationSchema,
-  publicArticleProjectionSchema,
-  type ArticleDraft,
-  type EditorialArticle,
+  publicStoryProjectionSchema,
+  type StoryDraft,
+  type EditorialStory,
   type EditorialContributor,
 } from '@repo/schemas';
 import { assertStaffPermission } from '../auth/staff-permissions';
@@ -19,12 +19,12 @@ import {
   upsertParams,
   rowToProjectionAuthoring,
   REFERENCE_COLUMNS,
-  validateArticleOffline,
-  verifyArticleReferences,
+  validateStoryOffline,
+  verifyStoryReferences,
   gateDoiCitations,
   gateReferenceUrls,
-  type ArticleRow,
-} from '../../../../../packages/ops-data/scripts/lib/article-lifecycle';
+  type StoryRow,
+} from '../../../../../packages/ops-data/scripts/lib/story-lifecycle';
 
 export class EditorialConflict extends Error {}
 export type Actor = ServerAdminIdentity;
@@ -44,7 +44,7 @@ export async function editorialWrite<T>(
     ? 'entity'
     : action.startsWith('contributor.')
       ? 'contributor'
-      : 'article';
+      : 'story';
   let value!: T;
   await commitWithAuditPostgres({
     auditEvent: {
@@ -122,7 +122,7 @@ export async function saveContributor(
     },
   );
 }
-export async function listArticles() {
+export async function listStories() {
   return queryPostgres<{
     id: string;
     slug: string;
@@ -131,12 +131,12 @@ export async function listArticles() {
     revision: number;
     row_updated_at: string;
   }>(
-    `SELECT id,slug,title,CASE WHEN archived_at IS NOT NULL THEN 'archived' ELSE status END AS status,revision::int,row_updated_at FROM reference.articles ORDER BY row_updated_at DESC`,
+    `SELECT id,slug,title,CASE WHEN archived_at IS NOT NULL THEN 'archived' ELSE status END AS status,revision::int,row_updated_at FROM reference.stories ORDER BY row_updated_at DESC`,
   );
 }
-export async function readArticle(slug: string): Promise<EditorialArticle | null> {
-  const rows = await queryPostgres<ArticleRow & { revision: string; archived_at: string | null }>(
-    `SELECT ${REFERENCE_COLUMNS},revision,archived_at::text FROM reference.articles WHERE slug=$1 OR id=$1`,
+export async function readStory(slug: string): Promise<EditorialStory | null> {
+  const rows = await queryPostgres<StoryRow & { revision: string; archived_at: string | null }>(
+    `SELECT ${REFERENCE_COLUMNS},revision,archived_at::text FROM reference.stories WHERE slug=$1 OR id=$1`,
     [slug],
   );
   const row = rows[0];
@@ -144,12 +144,12 @@ export async function readArticle(slug: string): Promise<EditorialArticle | null
   const [reviews, history] = await Promise.all([
     queryPostgres<{ decision: string; reason: string; reviewerId: string }>(
       `SELECT decision,reason,reviewer_id::text AS "reviewerId"
-      FROM reference.article_reviews WHERE article_id=$1 AND revision=$2 ORDER BY created_at DESC,id DESC LIMIT 1`,
+      FROM reference.story_reviews WHERE story_id=$1 AND revision=$2 ORDER BY created_at DESC,id DESC LIMIT 1`,
       [row.id, row.revision],
     ),
     queryPostgres<{ revision: number; actorId: string; reason: string; createdAt: string }>(
       `SELECT revision::int,actor_id AS "actorId",reason,created_at::text AS "createdAt"
-      FROM reference.article_revisions WHERE article_id=$1 ORDER BY revision DESC LIMIT 100`,
+      FROM reference.story_revisions WHERE story_id=$1 ORDER BY revision DESC LIMIT 100`,
       [row.id],
     ),
   ]);
@@ -161,49 +161,49 @@ export async function readArticle(slug: string): Promise<EditorialArticle | null
   }>(
     `SELECT p.release_id AS "releaseId",p.previous_release_id AS "previousReleaseId",p.revision::int,
     EXISTS(SELECT 1 FROM published.active_release a WHERE a.id='active' AND a.release_id=p.release_id) AS "canRollback"
-    FROM reference.article_publications p WHERE article_id=$1 ORDER BY created_at DESC LIMIT 1`,
+    FROM reference.story_publications p WHERE story_id=$1 ORDER BY created_at DESC LIMIT 1`,
     [row.id],
   );
   const publicRows = await queryPostgres<{ release_id: string }>(
-    "SELECT a.release_id FROM published.release_articles a JOIN published.active_release p ON p.release_id=a.release_id AND p.id='active' WHERE a.article_id=$1",
+    "SELECT a.release_id FROM published.release_stories a JOIN published.active_release p ON p.release_id=a.release_id AND p.id='active' WHERE a.story_id=$1",
     [row.id],
   );
   return {
     archivedAt: row.archived_at,
     activePublicReleaseId: publicRows[0]?.release_id ?? null,
     publication: publication[0] ?? null,
-    blockers: await articleBlockers(articleDraftSchema.parse(rowToProjectionAuthoring(row))),
-    draft: articleDraftSchema.parse(rowToProjectionAuthoring(row)),
+    blockers: await storyBlockers(storyDraftSchema.parse(rowToProjectionAuthoring(row))),
+    draft: storyDraftSchema.parse(rowToProjectionAuthoring(row)),
     revision: Number(row.revision),
-    status: row.archived_at ? 'archived' : (row.status as EditorialArticle['status']),
+    status: row.archived_at ? 'archived' : (row.status as EditorialStory['status']),
     review: reviews[0] ?? null,
     history: [...history],
   };
 }
-export async function saveArticle(
+export async function saveStory(
   actor: Actor,
   raw: unknown,
   expectedRevision: number,
   reason: string,
 ) {
-  const draft = articleDraftSchema.parse(raw);
+  const draft = storyDraftSchema.parse(raw);
   if (draft.slug === 'new')
-    throw new Error('Choose a different URL slug. "new" is reserved for creating articles.');
-  return editorialWrite(actor, 'research:write', draft.id, 'article.save', reason, async (db) => {
+    throw new Error('Choose a different URL slug. "new" is reserved for creating stories.');
+  return editorialWrite(actor, 'research:write', draft.id, 'story.save', reason, async (db) => {
     // Also serialize the first insert, before there is a row to lock.
     await db.query('SELECT pg_advisory_xact_lock(hashtextextended($1,0))', [
-      `editorial-article:${draft.id}`,
+      `editorial-story:${draft.id}`,
     ]);
     // The row lock makes the revision comparison and write one operation.
     const held = await db.query<{ revision: string; archived_at: string | null }>(
-      'SELECT revision,archived_at FROM reference.articles WHERE id=$1 FOR UPDATE',
+      'SELECT revision,archived_at FROM reference.stories WHERE id=$1 FOR UPDATE',
       [draft.id],
     );
     if (Number(held.rows[0]?.revision ?? 0) !== expectedRevision)
       throw new EditorialConflict(
         'A newer revision was saved. Your edits are preserved; compare the latest version before saving.',
       );
-    if (held.rows[0]?.archived_at) throw new Error('Restore this archived article before editing.');
+    if (held.rows[0]?.archived_at) throw new Error('Restore this archived story before editing.');
     const contributors = await db.query<EditorialContributor>(
       'SELECT id,name,kind,biography FROM reference.contributors WHERE id=ANY($1::text[])',
       [draft.contributors.map((c) => c.id)],
@@ -235,44 +235,44 @@ export async function saveArticle(
     );
     if (entities.rows.length !== entityIds.length)
       throw new Error('A linked record is missing or merged. Choose its surviving record.');
-    if (draft.series) {
+    if (draft.collection) {
       await db.query('SELECT pg_advisory_xact_lock(hashtextextended($1,0))', [
-        `editorial-series:${draft.series.id}`,
+        `editorial-collection:${draft.collection.id}`,
       ]);
       const conflict = await db.query(
-        "SELECT id FROM reference.articles WHERE series->>'id'=$1 AND (series->>'position')::numeric=$2 AND id<>$3",
-        [draft.series.id, draft.series.position, draft.id],
+        "SELECT id FROM reference.stories WHERE collection->>'id'=$1 AND (collection->>'position')::numeric=$2 AND id<>$3",
+        [draft.collection.id, draft.collection.position, draft.id],
       );
       if (conflict.rows.length)
-        throw new Error('Another article already occupies this collection position.');
+        throw new Error('Another story already occupies this collection position.');
     }
     await db.query(UPSERT_SQL, [...upsertParams({ ...draft, status: 'draft' })]);
     const saved = await db.query<{ revision: string }>(
-      'SELECT revision FROM reference.articles WHERE id=$1',
+      'SELECT revision FROM reference.stories WHERE id=$1',
       [draft.id],
     );
     return { id: draft.id, slug: draft.slug, revision: Number(saved.rows[0]!.revision) };
   });
 }
-export async function articleBlockers(draft: ArticleDraft, db?: pg.PoolClient): Promise<string[]> {
+export async function storyBlockers(draft: StoryDraft, db?: pg.PoolClient): Promise<string[]> {
   const issues: string[] = [];
-  const parsed = publicArticleProjectionSchema.safeParse({ ...draft, releaseId: 'preview' });
+  const parsed = publicStoryProjectionSchema.safeParse({ ...draft, releaseId: 'preview' });
   if (!parsed.success)
     issues.push(...parsed.error.issues.map((i) => `${i.path.join('.')}: ${i.message}`));
   if (!draft.contributors.some((c) => c.kind === 'person' && c.roles.includes('author')))
-    issues.push('Select a human author responsible for the article.');
+    issues.push('Select a human author responsible for the story.');
   if (new Set(draft.references.map((ref) => ref.id)).size !== draft.references.length)
     issues.push('Each reference needs a unique citation ID.');
-  if (!draft.references.length) issues.push('Attach the sources supporting the article.');
+  if (!draft.references.length) issues.push('Attach the sources supporting the story.');
   if (parsed.success) {
     try {
-      validateArticleOffline({ ...draft, status: 'published' });
+      validateStoryOffline({ ...draft, status: 'published' });
     } catch (e) {
-      issues.push(e instanceof Error ? e.message : 'Article validation failed.');
+      issues.push(e instanceof Error ? e.message : 'Story validation failed.');
     }
     if (db) {
       try {
-        await verifyArticleReferences(db, { ...draft, status: 'published' });
+        await verifyStoryReferences(db, { ...draft, status: 'published' });
         await gateDoiCitations({ ...draft, status: 'published' });
         await gateReferenceUrls({ ...draft, status: 'published' });
       } catch (e) {
@@ -282,7 +282,7 @@ export async function articleBlockers(draft: ArticleDraft, db?: pg.PoolClient): 
   }
   return issues;
 }
-export async function reviewArticle(
+export async function reviewStory(
   actor: Actor,
   id: string,
   revision: number,
@@ -292,44 +292,44 @@ export async function reviewArticle(
 ) {
   if (!['approved', 'needs_evidence', 'rejected'].includes(decision))
     throw new Error('Choose a review decision.');
-  return editorialWrite(actor, 'publication:publish', id, 'article.review', reason, async (db) => {
-    const rows = await db.query<ArticleRow & { revision: string; archived_at: string | null }>(
-      `SELECT ${REFERENCE_COLUMNS},revision,archived_at FROM reference.articles WHERE id=$1 FOR UPDATE`,
+  return editorialWrite(actor, 'publication:publish', id, 'story.review', reason, async (db) => {
+    const rows = await db.query<StoryRow & { revision: string; archived_at: string | null }>(
+      `SELECT ${REFERENCE_COLUMNS},revision,archived_at FROM reference.stories WHERE id=$1 FOR UPDATE`,
       [id],
     );
     const row = rows.rows[0];
     if (!row || Number(row.revision) !== revision)
       throw new EditorialConflict('The draft changed. Review its current revision.');
     if (row.archived_at)
-      throw new Error('Restore this archived article before review or publication.');
+      throw new Error('Restore this archived story before review or publication.');
     if (decision === 'approved') {
       if (checks.facts !== true || checks.rights !== true || checks.prose !== true)
         throw new Error('Confirm evidence, rights and final prose review.');
-      const blockers = await articleBlockers(
-        articleDraftSchema.parse(rowToProjectionAuthoring(row)),
+      const blockers = await storyBlockers(
+        storyDraftSchema.parse(rowToProjectionAuthoring(row)),
         db,
       );
       if (blockers.length) throw new Error(blockers.join('\n'));
     }
     await db.query(
-      'INSERT INTO reference.article_reviews(article_id,revision,reviewer_id,decision,reason) VALUES($1,$2,$3,$4,$5)',
+      'INSERT INTO reference.story_reviews(story_id,revision,reviewer_id,decision,reason) VALUES($1,$2,$3,$4,$5)',
       [id, revision, actor.uid, decision, reason],
     );
-    await db.query("UPDATE reference.articles SET status='review' WHERE id=$1", [id]);
+    await db.query("UPDATE reference.stories SET status='review' WHERE id=$1", [id]);
     return { revision, decision };
   });
 }
-export async function restoreArticle(
+export async function restoreStory(
   actor: Actor,
   id: string,
   revision: number,
   expectedRevision: number,
   reason: string,
 ) {
-  const rows = await queryPostgres<{ snapshot: ArticleRow }>(
-    'SELECT snapshot FROM reference.article_revisions WHERE article_id=$1 AND revision=$2',
+  const rows = await queryPostgres<{ snapshot: StoryRow }>(
+    'SELECT snapshot FROM reference.story_revisions WHERE story_id=$1 AND revision=$2',
     [id, revision],
   );
   if (!rows[0]) throw new Error('Revision not found.');
-  return saveArticle(actor, rowToProjectionAuthoring(rows[0].snapshot), expectedRevision, reason);
+  return saveStory(actor, rowToProjectionAuthoring(rows[0].snapshot), expectedRevision, reason);
 }

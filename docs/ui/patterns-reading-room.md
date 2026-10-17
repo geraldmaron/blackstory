@@ -128,7 +128,7 @@ Catalog entries use the existing optional `DestinationIcon` for typed wayfinding
 |---|---|---|
 | Reading room stylesheet | `apps/web/src/app/reading-room.css` | Pending (SP-11) |
 | Records index | `app/records/page.tsx`, `RecordsIndex.tsx`, `lib/records/build-records-index.ts` | Pending (SP-09) |
-| Chapter prose blocks | `components/article/ArticleBody.tsx`, `ArticleProse.tsx`, `ArticleReferences.tsx` | Built |
+| Chapter prose blocks | `components/story/StoryBody.tsx`, `StoryProse.tsx`, `StoryReferences.tsx` | Built |
 | Map moment | `components/theme-spine/MapInsetMoment.tsx` | Built, converted to the Framed posture in SP-08 |
 | Record sheet, in-document posture | `components/map-experience/RecordSheet.tsx` | Pending (SP-12, SP-20) |
 | Site footer | `components/SiteFooter.tsx` | Built. Moves to `components/shell/SiteFooter.tsx` and is rewritten from the destination registry in SP-15 |
