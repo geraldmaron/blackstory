@@ -266,6 +266,8 @@ export function DoorImmersive({
   const chromeRef = useRef<HTMLDivElement | null>(null);
 
   const stage = useMapStage();
+  const stageRef = useRef(stage);
+  stageRef.current = stage;
   const router = useRouter();
   const pathname = usePathname() || '/';
 
@@ -521,8 +523,17 @@ export function DoorImmersive({
    * callbacks as deps, so every toggle rebuilt the effect and the cleanup called
    * setDoorBrowseLive(false) + announceMapBrowseExited mid-session — journey hidden, atlas
    * disarmed, morph timer cancelled. Toggle once and the map was unusable.
+   *
+   * The stage handle is read through a ref for the same reason: its identity changes when the map
+   * finishes loading (`mapAvailable` is in the provider's memo), and a cold `/explore` that re-ran
+   * this cleanup then sat in the Door's ambient posture with every gesture off. A remount (Strict
+   * Mode's in development) puts browse back, because the cold-start arm above runs only once.
    */
   useEffect(() => {
+    if (browseModeRef.current) {
+      stageRef.current.setDoorBrowseLive(true);
+      announceMapBrowseEntered();
+    }
     const onEnter = () => enterBrowseRef.current();
     const onExit = () => exitBrowseRef.current();
     const onPop = (event: PopStateEvent) => {
@@ -551,13 +562,13 @@ export function DoorImmersive({
         window.clearTimeout(browseMorphTimerRef.current);
         browseMorphTimerRef.current = null;
       }
+      // The ref is left as it is: a real unmount discards it, and a remount needs it to re-arm.
       if (browseModeRef.current) {
-        stage.setDoorBrowseLive(false);
+        stageRef.current.setDoorBrowseLive(false);
         announceMapBrowseExited();
-        browseModeRef.current = false;
       }
     };
-  }, [stage]);
+  }, []);
 
   /**
    * The chapter the plate is currently framing. The observer fires for the chapter already in
