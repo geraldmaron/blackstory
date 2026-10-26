@@ -9,8 +9,11 @@
 /* ---------------------------------------------------------------- DataTable */
 
 .ds-datatable {
-  /* The table, not the page, scrolls sideways — the shell must never shift under it. */
-  overflow-x: auto;
+  /* The table, not the page, scrolls — sideways so the shell never shifts under it, and
+     downward inside a bounded viewport (max-height set inline from `viewportHeight`). Any
+     sideways scroller is also the scrollport its sticky head pins to, so a head meant to pin
+     to the page could never pin at all; scrolling both axes here is what keeps it in view. */
+  overflow: auto;
   border: var(--ds-border-width) solid var(--ds-border);
   border-radius: var(--ds-radius-md);
   background: var(--ds-surface-raised);
@@ -32,16 +35,6 @@
   white-space: nowrap;
 }
 
-/* Virtualized tables scroll in their own viewport, so their sticky head anchors to the top of
-   that box rather than to the page's shell header. */
-.ds-datatable--virtual {
-  overflow-y: auto;
-}
-
-.ds-datatable--virtual .ds-datatable__head th {
-  top: 0;
-}
-
 .ds-datatable__spacer td {
   padding: 0;
   border: 0;
@@ -49,7 +42,7 @@
 
 .ds-datatable__head th {
   position: sticky;
-  top: var(--ds-shell-header-height, 0px);
+  top: 0;
   z-index: 1; /* local: lifts the sticky header row above its own scrolling rows, not above the page */
   background: var(--ds-surface);
   border-bottom: var(--ds-border-width) solid var(--ds-border-strong);
@@ -137,6 +130,15 @@
 @media (max-width: 60rem) {
   .ds-datatable__cell--secondary {
     display: none;
+  }
+}
+
+/* Paper has no scroll viewport: a bounded box would print only its first screenful of rows.
+   `!important` because the bound is an inline style. */
+@media print {
+  .ds-datatable {
+    max-height: none !important;
+    overflow: visible;
   }
 }
 
