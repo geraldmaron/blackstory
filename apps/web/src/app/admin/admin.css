@@ -667,8 +667,8 @@ body {
 }
 
 .entity-merge__record {
-  border-left: 3px solid var(--ds-color-border, #d8d2c8);
-  padding-left: var(--ds-space-4, 1rem);
+  border: 1px solid var(--ds-color-border, #d8d2c8);
+  padding: var(--ds-space-3, 0.75rem) var(--ds-space-4, 1rem);
   margin-block: var(--ds-space-4, 1rem);
 }
 

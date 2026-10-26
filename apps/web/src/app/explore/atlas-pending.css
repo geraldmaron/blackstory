@@ -1,0 +1,55 @@
+/* Placeholder panels for the atlas chunk. Geometry mirrors lens-panel.css, results-rail.css and
+   time-panel.css (same tokens, same narrow breakpoint) so the real instruments land on top of
+   these without a jump. Fixed like them: `.ds-door__browse` is a pass-through shell. */
+
+.ds-atlas-pending__panel {
+  position: fixed;
+  z-index: var(--ds-z-atlas-instruments);
+  display: grid;
+  gap: var(--ds-space-2);
+  align-content: start;
+  overflow: hidden;
+  padding: var(--ds-space-3);
+  background: var(--ds-surface);
+  border: var(--ds-border-width) solid var(--ds-border);
+  border-radius: var(--ds-radius-md);
+}
+
+.ds-atlas-pending__panel--lens {
+  top: var(--ds-atlas-top);
+  left: var(--ds-space-4);
+  width: var(--ds-rail-w);
+  height: min(22rem, calc(100dvh - var(--ds-atlas-top) - var(--ds-atlas-bottom)));
+}
+
+.ds-atlas-pending__panel--results {
+  top: var(--ds-atlas-top);
+  right: var(--ds-space-4);
+  width: var(--ds-results-w);
+  height: min(26rem, calc(100dvh - var(--ds-atlas-top) - var(--ds-atlas-bottom-right)));
+}
+
+.ds-atlas-pending__panel--time {
+  left: 50%;
+  bottom: var(--ds-space-4);
+  transform: translateX(-50%);
+  width: min(760px, calc(100vw - 24px));
+}
+
+/* Narrow: one peek sheet above the tab bar, like the real single-instrument slot. */
+@media (max-width: 819px), (max-height: 559px) {
+  .ds-atlas-pending__panel--lens {
+    top: auto;
+    left: var(--ds-space-2);
+    right: var(--ds-space-2);
+    bottom: var(--ds-atlas-dock-clearance);
+    width: auto;
+    height: min(var(--ds-atlas-sheet-peek), 12rem);
+    border-radius: var(--ds-radius-md) var(--ds-radius-md) 0 0;
+  }
+
+  .ds-atlas-pending__panel--results,
+  .ds-atlas-pending__panel--time {
+    display: none;
+  }
+}

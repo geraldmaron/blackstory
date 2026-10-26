@@ -182,9 +182,22 @@
   gap: var(--ds-space-3);
 }
 
+/* Kind color arrives as an inline border-color; it is drawn as a leading dot, not a side stripe. */
 .ds-nc__kind-rule {
-  padding-left: var(--ds-space-3);
-  border-left: 3px solid transparent;
+  display: flex;
+  align-items: center;
+  gap: var(--ds-space-2);
+  border: 0 solid transparent;
+}
+
+.ds-nc__kind-rule::before {
+  content: '';
+  flex-shrink: 0;
+  width: 0;
+  height: 0;
+  border: 0.25rem solid;
+  border-color: inherit;
+  border-radius: 50%;
 }
 
 .ds-kind-badge {
@@ -800,7 +813,7 @@
 .ds-explore-place__label {
   margin: 0;
   font-family: var(--ds-font-mono);
-  font-size: 0.625rem;
+  font-size: 0.75rem;
   font-weight: 500;
   letter-spacing: 0.08em;
   text-transform: uppercase;
@@ -1274,7 +1287,6 @@
   overscroll-behavior: contain;
   touch-action: pan-y;
   border: var(--ds-border-width) solid var(--ds-border);
-  border-left: 3px solid var(--ds-accent);
   border-radius: var(--ds-radius-lg);
   background: var(--ds-surface);
   pointer-events: auto;
@@ -1300,9 +1312,7 @@
 .ds-explore-stage__results .ds-result-list__link {
   gap: var(--ds-space-1);
   padding: var(--ds-space-3) 0 var(--ds-space-3) var(--ds-space-2);
-  border-left: 3px solid transparent;
   margin-left: calc(-1 * var(--ds-space-2));
-  padding-left: calc(var(--ds-space-2) - 3px);
 }
 
 .ds-explore-stage__results .ds-result-list__link:hover {
@@ -1310,13 +1320,12 @@
 }
 
 .ds-explore-stage__results .ds-result-list__item--selected .ds-result-list__link {
-  border-left-color: var(--ds-accent);
-  background: color-mix(in srgb, var(--ds-accent) 7%, transparent);
+  background: color-mix(in srgb, var(--ds-accent) 10%, transparent);
   color: var(--ds-ink);
 }
 
 .ds-explore-stage__results .ds-result-list__item--selected .ds-result-list__link:hover {
-  background: color-mix(in srgb, var(--ds-accent) 9%, transparent);
+  background: color-mix(in srgb, var(--ds-accent) 13%, transparent);
 }
 
 .ds-explore-stage__results .ds-result-list__item--selected .ds-result-list__title {
@@ -1454,7 +1463,6 @@
     max-width: none;
     max-height: min(72svh, 36rem);
     border-radius: var(--ds-radius-lg);
-    border-left-width: var(--ds-border-width);
     border-top: 3px solid var(--ds-accent);
   }
 }

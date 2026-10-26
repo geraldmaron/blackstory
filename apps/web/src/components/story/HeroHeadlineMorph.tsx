@@ -226,7 +226,7 @@ export function HeroHeadlineMorph({
   const prefixMs = phase.transitionMs > 0 ? phase.transitionMs : 700;
 
   return (
-    <h2 ref={headingRef} className={className} id={id} aria-label={phase.accessibleLabel}>
+    <h1 ref={headingRef} className={className} id={id} aria-label={phase.accessibleLabel}>
       <span
         className="ds-hero-headline-morph"
         aria-hidden="true"
@@ -251,6 +251,6 @@ export function HeroHeadlineMorph({
         {' '}
         happened <em>here</em>.
       </span>
-    </h2>
+    </h1>
   );
 }

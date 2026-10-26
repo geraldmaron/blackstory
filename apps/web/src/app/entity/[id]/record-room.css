@@ -953,6 +953,7 @@
 .ds-rec-file__correct {
   display: inline-flex;
   align-items: center;
+  min-height: 24px;
   margin-top: var(--ds-space-4);
   font-family: var(--ds-font-sans);
   font-size: var(--rec-meta);

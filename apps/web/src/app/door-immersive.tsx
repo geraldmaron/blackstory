@@ -69,6 +69,7 @@ import {
   MAP_BROWSE_ENTER_EVENT,
   MAP_BROWSE_EXIT_EVENT,
 } from '../lib/nav/map-browse';
+import { AtlasPending } from './explore/AtlasPending';
 import type { AtlasShellModel } from './explore/explore-view-model-wire';
 import { resolveDoorFocus, type DoorFocusCamera, type DoorFocusFrame } from './door-focus';
 import {
@@ -82,6 +83,8 @@ void React;
 
 const AtlasLoader = dynamic(() => import('./explore/AtlasLoader').then((mod) => mod.AtlasLoader), {
   ssr: false,
+  // Without this the chunk's download/compile window renders nothing (see AtlasPending.tsx).
+  loading: () => <AtlasPending />,
 });
 
 /** Morph duration before instruments mount; matches `--ds-door-browse-ms` in door-home.css. */
@@ -1220,6 +1223,8 @@ export function DoorImmersive({
           aria-label="Map browse"
           data-cold={initialBrowse ? 'true' : undefined}
         >
+          {/* The journey's h1 is hidden while browse is armed; this keeps one h1 on the page. */}
+          <h1 className="ds-visually-hidden">Explore the map</h1>
           <AtlasLoader shell={browseShell} pins={pins} embedded />
         </div>
       ) : null}

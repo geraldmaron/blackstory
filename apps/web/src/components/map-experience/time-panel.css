@@ -29,7 +29,7 @@
 
 .ds-time-panel__kicker {
   font-family: var(--ds-font-mono);
-  font-size: 0.625rem;
+  font-size: 0.75rem;
   letter-spacing: 0.16em;
   text-transform: uppercase;
   color: var(--ds-accent);
@@ -45,7 +45,7 @@
 
 .ds-time-panel__sub {
   font-family: var(--ds-font-mono);
-  font-size: 0.625rem;
+  font-size: var(--ds-text-micro);
   color: var(--ds-ink-muted);
 }
 
@@ -63,7 +63,7 @@
   border: var(--ds-border-width) solid var(--ds-border);
   border-radius: var(--ds-radius-sm);
   font-family: var(--ds-font-mono);
-  font-size: 0.625rem;
+  font-size: 0.75rem;
   letter-spacing: 0.1em;
   text-transform: uppercase;
   color: var(--ds-accent);

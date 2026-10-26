@@ -246,7 +246,7 @@
    counts, so the chip is a live instrument reading, not just a label that remembers a name. */
 .ds-atlas__dock-detail {
   font-family: var(--ds-font-mono);
-  font-size: 0.625rem;
+  font-size: var(--ds-text-micro);
   line-height: 1;
   color: var(--ds-ink-muted);
 }

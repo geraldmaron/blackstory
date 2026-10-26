@@ -359,6 +359,7 @@
 }
 
 .ds-evidence-legend__summary {
+  min-height: 24px;
   cursor: pointer;
   font-family: var(--ds-font-sans);
   font-size: 0.9375rem;

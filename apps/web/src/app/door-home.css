@@ -655,15 +655,12 @@ a.ds-door-open__place:focus-visible {
   color: var(--ds-ink);
   border: var(--ds-border-width) solid var(--ds-rule);
   border-radius: var(--ds-radius-sm);
-  border-left: 4px solid var(--ds-accent-graphic);
   box-shadow: var(--ds-contact-hairline);
   pointer-events: auto;
 }
 
 .ds-door-journey__chapter--center .ds-door-journey__card {
   width: min(32rem, 100%);
-  border-left-width: var(--ds-border-width);
-  border-left-color: var(--ds-rule);
 }
 
 /* Cold-open subject morph — History → His Story → … → Black Story.
@@ -896,7 +893,7 @@ a.ds-door-open__place:focus-visible {
 .ds-door-journey__cite {
   margin: 0;
   font-family: var(--ds-font-mono);
-  font-size: 0.6875rem;
+  font-size: 0.75rem;
   letter-spacing: 0.02em;
   line-height: 1.5;
   color: var(--ds-ink-muted);

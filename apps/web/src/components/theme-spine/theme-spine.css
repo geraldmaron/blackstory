@@ -13,8 +13,7 @@
   position: relative;
   margin: var(--ds-space-5) 0;
   padding: var(--ds-space-4) var(--ds-space-5);
-  border: var(--ds-border-width) solid var(--ds-rule);
-  border-left: 2px solid var(--ds-accent-graphic);
+  border: var(--ds-border-width) solid color-mix(in srgb, var(--ds-accent-graphic) 35%, var(--ds-rule));
   border-radius: var(--ds-radius-md);
   background: color-mix(in srgb, var(--ds-accent-graphic) 7%, var(--ds-surface-raised));
 }
@@ -25,13 +24,11 @@
 
 /* Chapter belongs to one of the packet's own policy eras: the rail's accent line steps up
    from a thin marker to a solid one, so "you are here" reads at a glance and not only from
-   the low-alpha era-band wash underneath the rows. overflow: hidden keeps that wash's inherited
-   corners clipped to the card even though the card's own border is thicker on the left edge
-   than the other three, which would otherwise let a square corner show past the radius there. */
+   the low-alpha era-band wash underneath the rows. The whole border turns solid accent (no side
+   stripe); overflow: hidden keeps the wash's inherited corners clipped to the card radius. */
 .ds-era-timeline--banded {
   overflow: hidden;
-  border-left-width: 4px;
-  border-left-color: var(--ds-accent);
+  border-color: var(--ds-accent);
 }
 
 /* Chapter's era band — brand `sand` token (pageSand #D8A178) at low alpha. */
@@ -143,8 +140,7 @@
 .ds-map-inset-moment {
   margin: var(--ds-space-5) 0;
   padding: var(--ds-space-4);
-  border: var(--ds-border-width) solid var(--ds-rule);
-  border-left: 2px solid var(--ds-accent-graphic);
+  border: var(--ds-border-width) solid color-mix(in srgb, var(--ds-accent-graphic) 35%, var(--ds-rule));
   border-radius: var(--ds-radius-md);
   background: color-mix(in srgb, var(--ds-accent-graphic) 7%, var(--ds-surface-raised));
 }

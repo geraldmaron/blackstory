@@ -135,6 +135,7 @@
 .ds-roomsmenu__staff {
   display: flex;
   align-items: center;
+  min-height: 24px;
   gap: 0.55rem;
   color: var(--ds-ink);
   font-size: 13.5px;
