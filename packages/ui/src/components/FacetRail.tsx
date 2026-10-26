@@ -9,6 +9,7 @@
 
 import React, { type ReactNode } from 'react';
 import { cx } from '../utils/cx.js';
+import { headingTag, subheadingLevel, type HeadingLevel } from '../utils/heading.js';
 
 // Defensive: apps/web SSR tests may classic-transform this package's TSX source.
 void React;
@@ -34,6 +35,8 @@ export type FacetRailProps = {
   readonly clearHref?: string;
   readonly hasActiveFilters?: boolean;
   readonly footer?: ReactNode;
+  /** Level of the rail's "Filters" heading; group headings sit one level below. Defaults to h2. */
+  readonly headingLevel?: HeadingLevel;
   readonly className?: string;
 };
 
@@ -57,12 +60,16 @@ export function FacetRail({
   clearHref,
   hasActiveFilters = false,
   footer,
+  headingLevel = 2,
   className,
 }: FacetRailProps) {
+  const Heading = headingTag(headingLevel);
+  const GroupHeading = headingTag(subheadingLevel(headingLevel));
+
   return (
     <aside className={cx('ds-facet-rail', className)} aria-label="Filters">
       <div className="ds-facet-rail__header">
-        <h2 className="ds-facet-rail__title">Filters</h2>
+        <Heading className="ds-facet-rail__title">Filters</Heading>
         {hasActiveFilters && clearHref ? (
           <a className="ds-facet-rail__clear" href={clearHref}>
             Clear all
@@ -76,9 +83,9 @@ export function FacetRail({
         const overflow = group.options.slice(limit);
         return (
           <section className="ds-facet" key={group.id} aria-labelledby={`facet-${group.id}`}>
-            <h3 className="ds-facet__title" id={`facet-${group.id}`}>
+            <GroupHeading className="ds-facet__title" id={`facet-${group.id}`}>
               {group.label}
-            </h3>
+            </GroupHeading>
             {group.options.length === 0 ? (
               <p className="ds-facet__empty">No values in this result set.</p>
             ) : (

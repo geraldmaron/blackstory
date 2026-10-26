@@ -20,6 +20,7 @@ import React, { type ReactNode } from 'react';
 // Defensive: apps/web SSR tests may classic-transform this package's TSX source.
 void React;
 import { cx } from '../utils/cx.js';
+import { headingTag, subheadingLevel, type HeadingLevel } from '../utils/heading.js';
 
 export type MapExplorerFeature = {
   readonly id: string;
@@ -45,6 +46,8 @@ export type MapExplorerProps = {
   readonly height?: number | string;
   /** Interactive map canvas, supplied by the app (e.g. a MapLibre wrapper). */
   readonly children?: ReactNode;
+  /** Level of the legend title; "State presence" sits one level below. Defaults to h3. */
+  readonly headingLevel?: HeadingLevel;
 };
 
 export function MapExplorer({
@@ -55,7 +58,10 @@ export function MapExplorer({
   className,
   height = 480,
   children,
+  headingLevel = 3,
 }: MapExplorerProps) {
+  const Heading = headingTag(headingLevel);
+  const Subheading = headingTag(subheadingLevel(headingLevel));
   const heightStyle = typeof height === 'number' ? `${height}px` : height;
 
   return (
@@ -71,7 +77,7 @@ export function MapExplorer({
         {children}
       </div>
       <div className="ds-map-explorer__legend">
-        <h3 className="ds-map-explorer__legend-title">{title}</h3>
+        <Heading className="ds-map-explorer__legend-title">{title}</Heading>
         {caption ? <p className="ds-map-explorer__caption">{caption}</p> : null}
         <p className="ds-map-explorer__summary">
           {features.length} location{features.length === 1 ? '' : 's'} shown at public precision.
@@ -89,7 +95,7 @@ export function MapExplorer({
         </ul>
         {stateAggregates.length > 0 ? (
           <>
-            <h4 className="ds-map-explorer__legend-subtitle">State presence</h4>
+            <Subheading className="ds-map-explorer__legend-subtitle">State presence</Subheading>
             <ul className="ds-map-explorer__state-list">
               {stateAggregates.map((state) => (
                 <li key={state.statePostalCode}>

@@ -16,6 +16,7 @@
 
 import React, { type ReactNode } from 'react';
 import { cx } from '../utils/cx.js';
+import { headingTag, type HeadingLevel } from '../utils/heading.js';
 
 // Defensive: apps/web SSR tests may classic-transform this package's TSX source.
 void React;
@@ -29,7 +30,7 @@ export type DetailPanelProps = {
   readonly actions?: ReactNode;
   readonly footer?: ReactNode;
   /** Renders the title as a heading at this level. Defaults to h2. */
-  readonly headingLevel?: 2 | 3 | 4;
+  readonly headingLevel?: HeadingLevel;
   readonly className?: string;
 };
 
@@ -42,7 +43,7 @@ export function DetailPanel({
   headingLevel = 2,
   className,
 }: DetailPanelProps) {
-  const Heading = `h${headingLevel}` as 'h2' | 'h3' | 'h4';
+  const Heading = headingTag(headingLevel);
 
   return (
     <section className={cx('ds-detail', className)} aria-label={title}>

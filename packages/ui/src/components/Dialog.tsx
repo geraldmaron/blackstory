@@ -9,6 +9,7 @@ import React, { useEffect, useId, useRef, type ReactNode } from 'react';
 // Defensive: apps/web SSR tests may classic-transform this package's TSX source.
 void React;
 import { cx } from '../utils/cx.js';
+import { headingTag, type HeadingLevel } from '../utils/heading.js';
 
 export type DialogProps = {
   readonly open: boolean;
@@ -16,10 +17,21 @@ export type DialogProps = {
   readonly children: ReactNode;
   readonly onClose: () => void;
   readonly footer?: ReactNode;
+  /** Renders the title as a heading at this level. Defaults to h2. */
+  readonly headingLevel?: HeadingLevel;
   readonly className?: string;
 };
 
-export function Dialog({ open, title, children, onClose, footer, className }: DialogProps) {
+export function Dialog({
+  open,
+  title,
+  children,
+  onClose,
+  footer,
+  headingLevel = 2,
+  className,
+}: DialogProps) {
+  const Heading = headingTag(headingLevel);
   const dialogRef = useRef<HTMLDialogElement>(null);
   const titleId = useId();
 
@@ -47,9 +59,9 @@ export function Dialog({ open, title, children, onClose, footer, className }: Di
       }}
     >
       <div className="ds-dialog__header">
-        <h2 className="ds-dialog__title" id={titleId}>
+        <Heading className="ds-dialog__title" id={titleId}>
           {title}
-        </h2>
+        </Heading>
         <button
           type="button"
           className="ds-dialog__close"
