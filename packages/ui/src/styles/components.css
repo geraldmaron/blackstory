@@ -423,8 +423,10 @@
 
 /* Action vocabulary (design-direction-v5 §5): `.ds-button` (form buttons)
    and shell.css's `.ds-cta` (links) share ONE recipe — sans 13px, no caps,
-   PILL radius, 40px target. Weights: --primary = copper (THE orientation
-   action, max one per view), --secondary = quiet hairline.
+   PILL radius. Weights: --primary = copper (THE orientation action, max one
+   per view), --secondary = quiet hairline. Height is the one exception:
+   `.ds-button` is 44px, the WCAG 2.5.5 target size, while apps/web's
+   `.ds-cta` still holds the comps' 40px.
 
    Both comments here and in shell.css have claimed "ONE recipe" for several
    cycles while the two rules actually diverged: `.ds-cta` dropped the caps
@@ -437,7 +439,7 @@
   align-items: center;
   justify-content: center;
   gap: var(--ds-space-2);
-  min-height: 2.5rem;
+  min-height: 2.75rem;
   padding: 0 var(--ds-space-5);
   border: var(--ds-border-width) solid transparent;
   border-radius: var(--ds-radius-full);

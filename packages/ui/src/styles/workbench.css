@@ -254,6 +254,8 @@
 
 .ds-selection-bar__escalate,
 .ds-selection-bar__clear {
+  /* 44px is the WCAG 2.5.5 target size; the label stays centered in it. */
+  min-height: 2.75rem;
   border: var(--ds-border-width) solid currentColor;
   border-radius: var(--ds-radius-sm);
   background: transparent;
@@ -296,8 +298,13 @@
 
 .ds-pagination__page,
 .ds-pagination__step {
-  display: inline-block;
-  min-width: 2rem;
+  /* 44px square at minimum, the WCAG 2.5.5 target size, with the label centered in it. */
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 2.75rem;
+  min-height: 2.75rem;
+  box-sizing: border-box;
   padding: var(--ds-space-1) var(--ds-space-2);
   border: var(--ds-border-width) solid transparent;
   border-radius: var(--ds-radius-sm);
