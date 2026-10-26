@@ -48,10 +48,14 @@ describe('surface class is the only shell switch', () => {
     assert.doesNotMatch(shellCss, /data-surface='map'/);
   });
 
-  it('never strips the desktop nav, mobile menu, or CTA on a document surface', () => {
-    assert.doesNotMatch(shellCss, /\[data-surface='reading'\][^{]*\.ds-shell-nav--desktop/);
-    assert.doesNotMatch(shellCss, /\[data-surface='reading'\][^{]*\.ds-shell-menu\b/);
-    assert.doesNotMatch(shellCss, /\[data-surface='reading'\][^{]*\.ds-shell-header__cta/);
+  it('never strips the command bar or its wordmark on a document surface', () => {
+    // SiteShellHeader mounts CommandBar on every reading surface; a surface-keyed rule in any
+    // stylesheet that styles the bar could still hide it, which no render-gate test would see.
+    const commandBarCss = readFileSync(join(here, '../components/shell/command-bar.css'), 'utf8');
+    for (const css of [shellCss, commandBarCss, uiShellHeaderCss]) {
+      assert.doesNotMatch(css, /\[data-surface='reading'\][^{]*\.ds-bar\b/);
+      assert.doesNotMatch(css, /\[data-surface='reading'\][^{]*\.ds-shell-wordmark\b/);
+    }
   });
 
   it('scopes shell-level surface rules from .ds-shell so the sibling header can match', () => {
