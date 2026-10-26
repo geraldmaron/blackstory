@@ -34,8 +34,8 @@ const OPEN_EDGE_INSET = 40;
 
 /** The compact command bar is two rows (search under the wordmark), ~110px with its offset. */
 const NARROW_TOP = 120;
-/** Dock + attribution band at the bottom of a phone with no sheet open. */
-const NARROW_DOCK_BOTTOM = 96;
+/** Tab bar (56px) + the Records bar + attribution band at the bottom of a phone with no sheet open. */
+const NARROW_DOCK_BOTTOM = 120;
 const NARROW_SIDE = 16;
 const NARROW_BOTTOM_MAX = 280;
 const NARROW_BOTTOM_RATIO = 0.38;

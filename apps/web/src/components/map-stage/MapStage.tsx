@@ -392,6 +392,8 @@ export type AtlasCameraTarget = {
   flyTo(options: never): unknown;
   easeTo(options: never): unknown;
   fitBounds(bounds: never, options: never): unknown;
+  cameraForBounds(bounds: never, options: never): { zoom?: number } | undefined;
+  setMinZoom(zoom: number): unknown;
   getZoom(): number;
   getBearing(): number;
   getPitch(): number;
@@ -1871,8 +1873,12 @@ export function MapStageProvider({
     syncRotateGestures(map, posture, prefersFinePointer());
     syncClusterZoomRange(map, posture);
     // The Door's phone strip may have sunk the zoom floor below the Instrument's national floor
-    // (camera.ts, `zoomFloor: 'fit'`); every other posture gets the floor back.
-    if (posture !== 'ambient') map.setMinZoom(MAP_MIN_ZOOM);
+    // (camera.ts, `zoomFloor: 'fit'`); every other posture gets the floor back. Live keeps a floor
+    // no higher than the zoom it inherits: browse entered from the Door on a phone starts from the
+    // whole-country fit, and clamping that to the national floor around the same center crops
+    // both coasts.
+    if (posture === 'live') map.setMinZoom(Math.min(MAP_MIN_ZOOM, map.getZoom()));
+    else if (posture !== 'ambient') map.setMinZoom(MAP_MIN_ZOOM);
   }, [posture, syncRotateGestures]);
 
   /** A live read of the reduced-motion preference for the camera path below. */

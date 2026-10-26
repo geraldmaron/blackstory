@@ -66,6 +66,9 @@ export function useAtlasCamera(
           easeTo: (options) => stage.getMap()?.easeTo(options as never),
           fitBounds: (bounds, options) =>
             stage.getMap()?.fitBounds(bounds as never, options as never),
+          cameraForBounds: (bounds, options) =>
+            stage.getMap()?.cameraForBounds(bounds as never, options as never) as never,
+          setMinZoom: (zoom) => stage.getMap()?.setMinZoom(zoom),
           getZoom: () => stage.getMap()?.getZoom() ?? 3.6,
           getBearing: () => stage.getMap()?.getBearing() ?? 0,
           getPitch: () => stage.getMap()?.getPitch() ?? 0,

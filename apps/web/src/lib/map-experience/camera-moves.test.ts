@@ -32,6 +32,7 @@ type Harness = {
   readonly announcements: string[];
   readonly spotlights: SpotlightTarget[];
   readonly routes: boolean[];
+  readonly floors: number[];
   readonly map: MapLike;
   runPending(): void;
   stopped(): number;
@@ -41,6 +42,8 @@ function harness(
   overrides: {
     reducedMotion?: boolean;
     fitBoundsThrows?: boolean;
+    /** What `cameraForBounds` reports: the unclamped zoom of the national fit. */
+    fitZoom?: number;
     zoom?: number;
     pitch?: number;
     bearing?: number;
@@ -50,6 +53,8 @@ function harness(
   const announcements: string[] = [];
   const spotlights: SpotlightTarget[] = [];
   const routes: boolean[] = [];
+  const floors: number[] = [];
+  const fitZoom = overrides.fitZoom;
   let stops = 0;
   let scheduled: (() => void) | null = null;
 
@@ -68,6 +73,14 @@ function harness(
       }
       calls.push({ method: 'fitBounds', options });
     },
+    ...(fitZoom === undefined
+      ? {}
+      : {
+          cameraForBounds: () => ({ zoom: fitZoom }),
+          setMinZoom: (zoom: number) => {
+            floors.push(zoom);
+          },
+        }),
     getZoom: () => overrides.zoom ?? 4,
     getBearing: () => overrides.bearing ?? 0,
     getPitch: () => overrides.pitch ?? 0,
@@ -99,6 +112,7 @@ function harness(
     announcements,
     spotlights,
     routes,
+    floors,
     map,
     runPending: () => {
       const run = scheduled;
@@ -204,6 +218,16 @@ test('wide is the establishing shot and clears any spotlight', () => {
   assert.ok(fit);
   assert.equal(fit.options.pitch, 0, 'the establishing shot is flat');
   assert.equal(fit.options.bearing, 0, 'and north-up');
+});
+
+test('wide sinks the zoom floor when the national fit is below it, so a phone shows both coasts', () => {
+  const phone = harness({ fitZoom: 1.9 });
+  phone.camera.wide();
+  assert.deepEqual(phone.floors, [1.9]);
+
+  const desktop = harness({ fitZoom: 3.6 });
+  desktop.camera.wide();
+  assert.deepEqual(desktop.floors, [], 'a fit above the floor leaves it alone');
 });
 
 test('push respects the zoom floor and keeps the current bearing', () => {

@@ -18,7 +18,7 @@
  */
 
 import { US_CONUS_BOUNDS } from '@repo/domain/map/geography';
-import { CAMERA_EASING_SLOW_OUT, type CameraEasing } from './camera-presets';
+import { CAMERA_EASING_SLOW_OUT, MAP_MIN_ZOOM, type CameraEasing } from './camera-presets';
 import { isMoveAllowed, type RecordLike as DignityRecord } from './camera-dignity';
 import type { ChromeInset } from './chrome-padding';
 
@@ -116,6 +116,12 @@ export type MapLike = {
   getCenter(): LngLat | { lng: number; lat: number };
   /** Cancels an in-flight camera animation. */
   stop?(): unknown;
+  /** Fitted camera for a box, unclamped by the zoom floor. Absent on a bare fake. */
+  cameraForBounds?(
+    bounds: readonly [LngLat, LngLat],
+    options: { padding: ChromeInset },
+  ): { zoom?: number } | undefined;
+  setMinZoom?(zoom: number): unknown;
 };
 
 export type SpotlightTarget = { center: LngLat; radiusPercent: number } | null;
@@ -245,9 +251,20 @@ export function createCamera(deps: CameraDeps): CameraApi {
       [east, north],
     ];
 
+    const inset = padding();
+    // On a phone the country is narrower than the national floor (`MAP_MIN_ZOOM`) allows, and
+    // fitBounds clamps to the floor, which crops the west coast. Sink the floor to the fit, the
+    // way the Door's strip does (`zoomFloor: 'fit'`, map-stage/camera.ts).
+    try {
+      const fitted = map.cameraForBounds?.(bounds, { padding: inset })?.zoom;
+      if (typeof fitted === 'number' && fitted < MAP_MIN_ZOOM) map.setMinZoom?.(fitted);
+    } catch {
+      // Same throw as fitBounds below; that call owns the fallback.
+    }
+
     try {
       map.fitBounds(bounds, {
-        padding: padding(),
+        padding: inset,
         duration,
         pitch: 0,
         bearing: 0,
