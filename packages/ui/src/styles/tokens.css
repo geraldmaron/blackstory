@@ -55,7 +55,7 @@
   --ds-confidence-medium-border: #8b8a2e;
   --ds-confidence-low-fg: #8e4f2a;
   --ds-confidence-low-bg: #f3e4c6;
-  --ds-confidence-low-border: #d07a32;
+  --ds-confidence-low-border: #b86b2a;
 
   /*
    * Contact, not elevation. A contact shadow is the dark line a sheet of paper casts where it
@@ -151,7 +151,7 @@
   --ds-confidence-medium-fg: #d4d48e;
   --ds-confidence-medium-bg: #2a2a0e;
   --ds-confidence-medium-border: #c4c04a;
-  --ds-confidence-low-fg: #d07a32;
+  --ds-confidence-low-fg: #d98540;
   --ds-confidence-low-bg: #3a2a0e;
   --ds-confidence-low-border: #b86b2a;
 
