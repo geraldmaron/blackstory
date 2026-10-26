@@ -1686,7 +1686,6 @@ html:has(.ds-map-stage[data-plate-posture='live']) {
   /* The page-root wrapper has no animation to suppress any more — it was deleted outright
      because its fill-mode left a transform that trapped the fixed plate. */
 
-  .ds-shell-nav--drawer,
   .ds-loading__bar {
     animation: none;
   }

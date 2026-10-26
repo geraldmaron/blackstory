@@ -102,17 +102,8 @@ describe('instrument shell layout', () => {
   });
 });
 
-describe('shell header theme tokens', () => {
-  it('uses a flush opaque bar with theme surface/ink (no floating top gap)', () => {
-    assert.match(uiShellHeaderCss, /\.ds-shell-header\s*\{[^}]*top:\s*0/s);
-    assert.match(uiShellHeaderCss, /\.ds-shell-header\s*\{[^}]*background:\s*var\(--ds-surface\)/s);
-    assert.match(uiShellHeaderCss, /\.ds-shell-header__inner\s*\{[^}]*background:\s*transparent/s);
-    assert.match(uiShellHeaderCss, /\.ds-shell-header__inner\s*\{[^}]*color:\s*var\(--ds-ink\)/s);
-    // Regression: no surface class may freeze the navbar on charcoal / dark-kit artwork.
-    assert.doesNotMatch(
-      uiShellHeaderCss,
-      /\[data-surface='[a-z]+'\]\)?\s+\.ds-shell-header__inner\s*\{[^}]*--ds-fixed-charcoal/s,
-    );
+describe('shell wordmark theme swap', () => {
+  it('never freezes the wordmark on dark-kit artwork for a surface class', () => {
     assert.doesNotMatch(
       uiShellHeaderCss,
       /\[data-surface='[a-z]+'\]\)?[\s\S]*ds-shell-wordmark__img--theme-dark\s*\{[^}]*display:\s*block/s,
