@@ -390,13 +390,10 @@
                                  hovered pin's photo card is never trapped under it */
   --ds-z-command-bar: 50;
   --ds-z-command-overlay: 60; /* command bar's own dropdown and the command palette */
-  --ds-z-shell-header: 80;
-  --ds-z-header-menu: 90; /* shell header's "more" overflow panel */
   --ds-z-modal-sheet: 90; /* shortcut sheet and saved/collections drawer: one overlay layer,
                               confirmed mutually exclusive by the shared Escape handler */
-  --ds-z-scrim: 95; /* shell drawer scrim */
-  --ds-z-toast: 96; /* toast stack; must always outrank the scrim (a toast can fire while the
-                        shell drawer is open) */
+  --ds-z-toast: 96; /* toast stack; must outrank the modal sheet (a toast can fire while the
+                        shortcut sheet or collections drawer is open) */
   --ds-z-nav-drawer: 100;
   --ds-z-a11y-escape: 1000; /* skip-link and visually-hidden focus escape hatches */
 }
