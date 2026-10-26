@@ -58,7 +58,7 @@ export function Citation({
       )}
       {children}
       {linkStatus === 'dead' ? (
-        <div className="ds-notice ds-notice--warning" role="status">
+        <div className="ds-notice ds-notice--warning" role="note">
           <span className="ds-notice__cue" aria-hidden="true">
             Warning
           </span>
@@ -83,7 +83,7 @@ export function Citation({
         </div>
       ) : null}
       {linkStatus === 'drifted' ? (
-        <div className="ds-notice ds-notice--dispute" role="status">
+        <div className="ds-notice ds-notice--dispute" role="note">
           <span className="ds-notice__cue" aria-hidden="true">
             Disputed
           </span>

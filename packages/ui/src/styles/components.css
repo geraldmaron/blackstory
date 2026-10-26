@@ -685,6 +685,16 @@
   height: var(--ds-icon-md);
 }
 
+/* Dark is the default theme, so the moon only shows once <html> says light. */
+.ds-theme-toggle__icon--to-dark,
+[data-theme='light'] .ds-theme-toggle__icon--to-light {
+  display: none;
+}
+
+[data-theme='light'] .ds-theme-toggle__icon--to-dark {
+  display: block;
+}
+
 .ds-gallery-section {
   display: grid;
   gap: var(--ds-space-4);

@@ -35,7 +35,6 @@ export function Confidence({ level, label, className }: ConfidenceProps) {
     <span
       className={cx('ds-confidence', `ds-confidence--${level}`, className)}
       data-tier={level}
-      role="status"
     >
       <span className="ds-confidence__mark" aria-hidden="true">
         {MARKS[level]}

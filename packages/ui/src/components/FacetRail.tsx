@@ -43,7 +43,7 @@ function FacetOptionRow({ option }: { readonly option: FacetOption }) {
       <a
         className={cx('ds-facet__option', option.active && 'ds-facet__option--active')}
         href={option.href}
-        aria-pressed={option.active}
+        aria-current={option.active ? 'true' : undefined}
       >
         <span className="ds-facet__option-label">{option.label}</span>
         <span className="ds-facet__option-count ds-mono">{option.count.toLocaleString()}</span>

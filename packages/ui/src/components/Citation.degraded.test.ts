@@ -25,7 +25,7 @@ test('linkStatus dead with no archived copy renders "Link dead as of <date>"', (
       deadAsOfDate: '2026-07-17',
     }),
   );
-  assert.match(html, /role="status"/);
+  assert.match(html, /role="note"/);
   assert.match(html, /Link dead as of 2026-07-17/);
 });
 
