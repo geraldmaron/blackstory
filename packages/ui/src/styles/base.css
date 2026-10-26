@@ -74,6 +74,14 @@ svg {
   outline-offset: var(--ds-focus-offset);
 }
 
+/* Without this, fields that set no placeholder color fall back to the browser's #757575, which is
+   under 4:1 on the dark surfaces. Firefox also dims placeholders with opacity; reset it so the
+   token is the color that ships. */
+::placeholder {
+  color: var(--ds-ink-subtle);
+  opacity: 1;
+}
+
 .ds-visually-hidden {
   position: absolute;
   width: 1px;
