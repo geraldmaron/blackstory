@@ -75,3 +75,15 @@ test('named AI-training crawlers are denied on those paths only', () => {
   assert.equal(shouldDenyAiCrawler('/atlas/catalog', 'curl/8.7.1'), false);
   assert.equal(shouldDenyAiCrawler('/atlas/catalog', ''), false);
 });
+
+test('crawlers that went unlisted until 2026-10-26 are denied, Meta disguised as Chrome included', () => {
+  // The exact string behind ~20k uncached renders in three hours on 2026-10-26.
+  const metaWebIndexer =
+    'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36 (compatible; meta-webindexer/1.1 (+https://developers.facebook.com/docs/sharing/webmasters/crawler))';
+  assert.equal(shouldDenyAiCrawler('/records', metaWebIndexer), true);
+  assert.equal(shouldDenyAiCrawler('/explore', metaWebIndexer), true);
+  assert.equal(
+    shouldDenyAiCrawler('/records', 'Mozilla/5.0 (compatible; SERankingBacklinksBot/1.0)'),
+    true,
+  );
+});

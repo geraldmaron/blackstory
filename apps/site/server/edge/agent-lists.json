@@ -33,6 +33,7 @@
     "DuckAssistBot",
     "MistralAI-User",
     "Meta-ExternalFetcher",
+    "meta-webindexer",
     "Kangaroo Bot",
     "img2dataset",
     "Webzio-Extended",
@@ -50,7 +51,8 @@
     "SeekportBot",
     "serpstatbot",
     "Barkrowler",
-    "MegaIndex"
+    "MegaIndex",
+    "SERankingBacklinksBot"
   ],
   "SEARCH_CRAWLER_USER_AGENTS": [
     "Googlebot",

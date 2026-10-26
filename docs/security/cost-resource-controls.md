@@ -369,7 +369,7 @@ still costs an invocation).
 | Rule (`ref`) | Action | Matches |
 |---|---|---|
 | `bs_bot_ai_crawlers` | Block | every token in `AI_TRAINING_USER_AGENTS` (`apps/web/src/lib/traffic-class/agent-lists.ts`) |
-| `bs_bot_seo_crawlers` | Block | every token in `SEO_TOOL_USER_AGENTS` (same file): Semrush, Ahrefs, MJ12, DotBot, BLEX, DataForSEO, Seekport, Serpstat, Barkrowler, MegaIndex |
+| `bs_bot_seo_crawlers` | Block | every token in `SEO_TOOL_USER_AGENTS` (same file): Semrush, Ahrefs, MJ12, DotBot, BLEX, DataForSEO, Seekport, Serpstat, Barkrowler, MegaIndex, SE Ranking |
 | `bs_bot_scanner_paths` | Block | `/.git*`, `/.env*`, `/wp-*`, `*.php`, `/phpmyadmin`, `/cgi-bin` |
 | `bs_bot_crawl_trap` | Managed challenge | `/records` or `/explore` with `&` in the query, not a verified bot |
 | `bs_bot_scripted_clients` | Managed challenge | python-requests, Go-http-client, scrapy, headless browsers, empty UA; not `/api/*`, the maintenance bypass, or verified bots (`curl` deliberately allowed) |
