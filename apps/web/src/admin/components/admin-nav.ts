@@ -34,6 +34,19 @@ export const ADMIN_HOME: AdminNavDestination = {
   keywords: ['ops', 'home', 'queue', 'dashboard', 'overview'],
 };
 
+/**
+ * Every open item across intake, research, story review and requests. It sits beside Work rather
+ * than in a group because it spans all of them, and the groups stay short enough to scan.
+ */
+export const ADMIN_QUEUE: AdminNavDestination = {
+  href: '/admin/queue',
+  label: 'Queue',
+  keywords: ['open work', 'todo', 'pending', 'oldest', 'triage'],
+};
+
+/** Destinations shown above the groups, in order. */
+export const ADMIN_TOP_LEVEL: readonly AdminNavDestination[] = [ADMIN_HOME, ADMIN_QUEUE];
+
 export const ADMIN_NAV_GROUPS: readonly AdminNavGroup[] = [
   {
     id: 'intake',
@@ -134,12 +147,12 @@ export function adminPaletteItems(
   extras: readonly { readonly href: string; readonly label: string; readonly group: string }[] = [],
 ): readonly CommandPaletteItem[] {
   return [
-    {
-      id: ADMIN_HOME.href,
-      label: ADMIN_HOME.label,
-      hint: ADMIN_HOME.href,
-      ...keywordsOf(ADMIN_HOME),
-    },
+    ...ADMIN_TOP_LEVEL.map((destination) => ({
+      id: destination.href,
+      label: destination.label,
+      hint: destination.href,
+      ...keywordsOf(destination),
+    })),
     ...ADMIN_NAV_GROUPS.flatMap((group) =>
       group.destinations.map((destination) => ({
         id: destination.href,

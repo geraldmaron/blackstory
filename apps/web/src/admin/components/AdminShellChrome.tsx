@@ -11,7 +11,12 @@ import { Navigation } from 'baseui/side-navigation';
 import { Drawer } from 'baseui/drawer';
 import { Menu, Search, ArrowLeft } from 'baseui/icon';
 import { useAdminAuth } from '../auth/AdminAuthProvider';
-import { ADMIN_HOME, ADMIN_NAV_GROUPS, adminPaletteItems, type AdminQueueKey } from './admin-nav';
+import {
+  ADMIN_NAV_GROUPS,
+  ADMIN_TOP_LEVEL,
+  adminPaletteItems,
+  type AdminQueueKey,
+} from './admin-nav';
 import '../design-system/management.css';
 
 type QueueCounts = Readonly<Partial<Record<AdminQueueKey, number | null>>>;
@@ -66,7 +71,7 @@ function currentLocation(pathname: string): string | null {
     if (matches && (!best || href.length > best.length))
       best = { group, label, length: href.length };
   };
-  consider(null, ADMIN_HOME.href, ADMIN_HOME.label);
+  for (const destination of ADMIN_TOP_LEVEL) consider(null, destination.href, destination.label);
   for (const group of ADMIN_NAV_GROUPS) {
     for (const destination of group.destinations)
       consider(group.label, destination.href, destination.label);
@@ -106,7 +111,10 @@ export function AdminShellChrome({ children }: { readonly children: React.ReactN
     );
   };
   const items = [
-    { title: ADMIN_HOME.label, itemId: ADMIN_HOME.href },
+    ...ADMIN_TOP_LEVEL.map((destination) => ({
+      title: destination.label,
+      itemId: destination.href,
+    })),
     ...ADMIN_NAV_GROUPS.map((group) => ({
       title: group.label,
       subNav: group.destinations.map((item) => ({
