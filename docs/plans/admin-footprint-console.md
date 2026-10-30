@@ -130,8 +130,8 @@ database on 2026-10-29.
 
 ### What the current queues actually hold
 
-The nav badges add up to 2,549 (Submissions 2,068, Inbox 475, Story review 6). This Queue's workload is 466
-rows (453 candidates with open cases, 5 leads, 6 packets, 2 requests). Three overlaps account for the difference:
+The nav badges add up to 2,549 (Submissions 2,068, Inbox 475, Story review 6). This Queue's workload is 467
+rows (453 candidates with open cases, 6 leads, 6 packets, 2 requests). Three overlaps account for the difference:
 
 1. **Submissions are mostly research cases already.** 2,062 of the 2,067 quarantined intake items
    have a research case (`research.cases.candidate_id = intake_items.id`). Those cases are mostly
@@ -168,14 +168,15 @@ Four row types. A unit of work appears once.
 | Type | A row when | Not a row when | Today |
 |---|---|---|---|
 | `case` | One row per **candidate** that has at least one case in `candidate`, `relevance_review`, `relevance_confirmed` or `insufficient_evidence`. The row names the most recently updated open case and shows "N open cases" when there are several | every open case for the candidate is suppressed (managed work, story packet) | 453 candidates (473 open cases; 14 candidates have 2 to 4 open cases each) |
-| `lead` | intake item is `quarantined`, is not a story packet, and has no case with `candidate_id` = its id | it has a case (shown as that case's source) | 5 |
+| `lead` | intake item is `quarantined`, is not a story packet, and has no case with `candidate_id` = its id | it has a case (shown as that case's source) | 6 (5 evidence attachments, 1 public correction) |
 | `packet` | story packet with no review, a review whose decision is null or `needs_evidence`, or an approved review whose import did not complete | approved and imported, or rejected | 6 |
 | `request` | owned by the viewer, and state is `awaiting_review`, `held`, `failed` or `verification_failed`, or `dispatch_status = 'failed'`, or the state is one the Requests page already treats as interrupted (`work-inbox.tsx:71`) | any other state, or another owner | 2 |
 
 Identity is `<type>:<id>`, where a case row's id is its candidate id.
 
 Exact predicates the build must use, one definition each, shared by membership, exclusions and
-counts:
+counts. Every JSON comparison is null-safe (`coalesce`): a missing key makes `=` NULL, and
+`NOT (NULL OR false)` silently drops the row. A first count missed a public correction this way.
 
 - **Story packet:** the same recognition as `extractPacket` in `postgres-story-packets.ts`,
   including the legacy `statement` with `packetJson=` form. A payload that matches the SQL filter
@@ -290,7 +291,7 @@ count when the backfill (decision 1) lands.
    work id). Managed cases therefore stay at `candidate` forever and inflate the Inbox. The Queue
    hides them, and their case page should name the request it belongs to.
 
-### Submission status backfill (awaiting approval)
+### Submission status backfill (approved and run 2026-10-29)
 
 Measured read-only on 2026-10-29. Scope: quarantined intake items that have research cases, none of
 them open, excluding story packets (their status follows the packet review).
@@ -314,3 +315,8 @@ not the observer.
 
 Going forward, deciding a case advances its submission by the same mapping. That is a code change
 in the case transition path, built after the backfill is approved.
+
+Result: 1,816 decisions written (a 5-row canary, then 1,811), all `ok`. The audit log holds 1,316
+`moderation.approved` and 500 `moderation.rejected` events under the system actor. 252 remain
+quarantined: 240 with an open case, 6 leads, 6 story packets. A null-safe recount found no
+submission with all cases decided left behind.
