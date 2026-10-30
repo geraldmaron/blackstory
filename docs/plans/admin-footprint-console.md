@@ -265,6 +265,9 @@ desk is retired only after a route-by-route parity table shows the Queue covers 
 there, and only with the operator's go-ahead. The Submissions nav badge switches to the `lead`
 count when the backfill (decision 1) lands.
 
+Shipped 2026-10-30 as an added entry point. The operator chose to keep Inbox and the other desks
+as they are while using the Queue; no desk is retired until they ask.
+
 ### Acceptance checks
 
 - The total equals the sum of the four membership counts, against fixtures and once live.
