@@ -13,6 +13,7 @@
 import { createServerClient } from '@supabase/ssr';
 import { NextResponse, type NextRequest } from 'next/server';
 import { isAuthGatedPath } from './auth/protected-paths';
+import { isReadMethod, isReadOnlyStaffRole } from './auth/staff-permissions';
 import { readSupabaseRoleFromAppMetadata } from './auth/supabase-session-authorizer';
 
 const SIGN_IN_PATH = '/admin/login';
@@ -67,8 +68,17 @@ export async function adminAuthGate(request: NextRequest): Promise<NextResponse>
   }
 
   // A signed-in Supabase user is not an administrator. Staff role is the actual gate.
-  if (!readSupabaseRoleFromAppMetadata(data.user.app_metadata)) {
+  const role = readSupabaseRoleFromAppMetadata(data.user.app_metadata);
+  if (!role) {
     return signInRedirect(request);
+  }
+
+  // Server actions post to the page's own path, so this is the one place they all pass through.
+  if (isReadOnlyStaffRole(role) && !isReadMethod(request.method)) {
+    return NextResponse.json(
+      { error: 'This account is read-only.', code: 'ADMIN_READ_ONLY_ROLE' },
+      { status: 403 },
+    );
   }
 
   return response;

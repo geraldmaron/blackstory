@@ -44,7 +44,7 @@ export type SupabaseSessionAuthorizedAdmin = {
   readonly role: StaffRole;
 };
 
-const STAFF_ROLES: readonly StaffRole[] = ['admin', 'research', 'publication', 'security'];
+const STAFF_ROLES: readonly StaffRole[] = ['admin', 'research', 'publication', 'security', 'observer'];
 
 function isStaffRole(value: unknown): value is StaffRole {
   return typeof value === 'string' && (STAFF_ROLES as readonly string[]).includes(value);

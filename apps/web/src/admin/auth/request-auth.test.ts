@@ -94,9 +94,21 @@ test('promotion and release staging are closed to research and security', async 
 });
 
 test('read routes admit every staff role', async () => {
-  for (const role of ['admin', 'research', 'publication', 'security'] as const) {
+  for (const role of ['admin', 'research', 'publication', 'security', 'observer'] as const) {
     assert.equal((await authorize(role, 'GET', '/admin/api/audit')).role, role);
     assert.equal((await authorize(role, 'GET', '/admin/api/auth/me')).role, role);
+  }
+});
+
+test('observer is refused every non-GET, including routes any staff role may call', async () => {
+  // These three only require STAFF_READ in the table; the fence must hold regardless.
+  for (const [method, path] of [
+    ['DELETE', '/admin/api/stories/s1'],
+    ['POST', '/admin/api/work/w1/decisions'],
+    ['POST', '/admin/api/work/w1/retry'],
+    ['POST', '/admin/api/stories'],
+  ] as const) {
+    await assert.rejects(() => authorize('observer', method, path), StaffPermissionDeniedError);
   }
 });
 

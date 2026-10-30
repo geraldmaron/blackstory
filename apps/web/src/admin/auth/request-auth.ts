@@ -10,7 +10,12 @@ import { createClient } from '@supabase/supabase-js';
 import type { StaffRole } from './staff-permissions';
 import { AdminRouteUndeclaredError, STAFF_READ, findAdminRouteAccess } from './route-permissions';
 import { ServerAdminAuthorizationError, type AdminRequestHeaders } from './server-authorization';
-import { StaffPermissionDeniedError, assertStaffPermission } from './staff-permissions';
+import {
+  StaffPermissionDeniedError,
+  assertStaffPermission,
+  isReadMethod,
+  isReadOnlyStaffRole,
+} from './staff-permissions';
 import {
   SupabaseSessionAuthorizationError,
   createSupabaseSessionAuthorizer,
@@ -112,6 +117,9 @@ export function createAdminRouteAuthorizer(verifier: SupabaseUserVerifier) {
           'ADMIN_SESSION_INVALID',
           'Agent access is restricted to management work',
         );
+      if (isReadOnlyStaffRole(caller.role) && !isReadMethod(request.method)) {
+        throw new StaffPermissionDeniedError(caller.role, 'research:write');
+      }
       const access = findAdminRouteAccess(request.method, pathname);
       if (!access) {
         throw new AdminRouteUndeclaredError(request.method, pathname);
