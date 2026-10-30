@@ -70,6 +70,11 @@ export const ADMIN_NAV_GROUPS: readonly AdminNavGroup[] = [
     label: 'Catalog',
     destinations: [
       {
+        href: '/admin/footprint',
+        label: 'Footprint',
+        keywords: ['map', 'coverage', 'states', 'gaps', 'geography'],
+      },
+      {
         href: '/admin/catalog',
         label: 'Entities',
         keywords: ['catalog', 'people', 'places', 'merge'],

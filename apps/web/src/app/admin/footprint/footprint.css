@@ -1,0 +1,109 @@
+/*
+ * Footprint view. The map reuses the record locator's technique: the us-locator.svg mask for the
+ * ground, in a box whose aspect ratio matches the SVG, with bins positioned in percent of that
+ * same canvas. Tokens only; the page never scrolls sideways, the table scrolls inside its card.
+ */
+.footprint {
+  min-width: 0;
+}
+
+.footprint > * {
+  min-width: 0;
+}
+
+.footprint__map {
+  position: relative;
+  width: 100%;
+  /* 960 x 500, the viewBox of apps/web/public/geo/us-locator.svg. */
+  aspect-ratio: 960 / 500;
+  border: var(--ds-border-width) solid var(--ds-rule);
+  border-radius: var(--ds-radius-sm);
+  background: var(--ds-first-paint-ground);
+  overflow: hidden;
+}
+
+.footprint__ground {
+  position: absolute;
+  inset: 0;
+  background-color: var(--ds-first-paint-ground-ink);
+  -webkit-mask-image: url('/geo/us-locator.svg');
+  mask-image: url('/geo/us-locator.svg');
+  -webkit-mask-size: contain;
+  mask-size: contain;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-position: center;
+  mask-position: center;
+}
+
+.footprint__bins {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.footprint__bin {
+  fill: color-mix(in srgb, var(--ds-accent-graphic) 45%, transparent);
+  stroke: var(--ds-accent-graphic);
+  stroke-width: 0.15;
+}
+
+.footprint__caption {
+  margin: var(--ds-space-3) 0 0;
+  font-size: var(--ds-text-caption);
+  color: var(--ds-ink-muted);
+}
+
+.footprint__table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.footprint__table :where(th, td) {
+  padding: var(--ds-space-2) var(--ds-space-4);
+  text-align: left;
+  white-space: nowrap;
+  border-top: var(--ds-border-width) solid var(--ds-rule);
+}
+
+.footprint__table thead th {
+  font-size: var(--ds-text-caption);
+  color: var(--ds-ink-muted);
+}
+
+.footprint__table tbody th {
+  font-weight: inherit;
+}
+
+.footprint__table :where(th, td).footprint__num {
+  text-align: right;
+}
+
+.footprint__num {
+  font-variant-numeric: tabular-nums;
+}
+
+.footprint__chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--ds-space-2) var(--ds-space-4);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.footprint__kinds {
+  display: grid;
+  gap: var(--ds-space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.footprint__kinds li {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--ds-space-4);
+  max-width: 24rem;
+}
