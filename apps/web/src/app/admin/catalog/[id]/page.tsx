@@ -11,6 +11,7 @@
  */
 import Link from 'next/link';
 import { ManagementTabs } from '@/admin/design-system/management-tabs';
+import { DeskTitleBar, Panel } from '@/admin/design-system/ui';
 import { readEntityEditorial } from '@/admin/editorial/entities';
 import { EntityEditorialEditor } from '@/admin/editorial/entity-editor';
 import '../../stories/stories.css';
@@ -21,6 +22,11 @@ import { readVerifiedAdminIdentity } from '../../../../admin/auth/supabase-serve
 import { staffRoleHasPermission } from '../../../../admin/auth/staff-permissions';
 import { readEntityDetail } from '../../../../admin/lib/entity-detail';
 import { readActiveMergesFor } from '../../../../admin/lib/entity-merge';
+import {
+  formatEnumLabel,
+  readEntityPublicationSummary,
+  type EntityPublicationSummary,
+} from '../../../../admin/lib/entity-publication-summary';
 import { readPostgresOrDegrade } from '../../../../admin/lib/canonical-postgres-client';
 import { formatLivingStatusLabel } from '../living-status-label';
 import { EntityRecordEditor } from './EntityRecordEditor';
@@ -39,6 +45,71 @@ function formatWhen(iso: string): string {
   });
 }
 
+/** The public record route; the public app builds `/entity/{id}` the same way. */
+function publicEntityHref(entityId: string): string {
+  return `/entity/${encodeURIComponent(entityId)}`;
+}
+
+function PublicStatePanel({
+  summary,
+  displayName,
+  entityId,
+}: {
+  readonly summary: EntityPublicationSummary | null;
+  readonly displayName: string;
+  readonly entityId: string;
+}) {
+  if (!summary) {
+    return (
+      <Panel title="Public state">
+        <p className="ds-sans">Publication state could not be loaded.</p>
+      </Panel>
+    );
+  }
+  if (summary.status === 'not_published') {
+    return (
+      <Panel title="Public state">
+        <dl className="admin-base-facts">
+          <div>
+            <dt>Status</dt>
+            <dd>Not in the active release{summary.releaseId ? ` (${summary.releaseId})` : ''}</dd>
+          </div>
+        </dl>
+      </Panel>
+    );
+  }
+  const rows: ReadonlyArray<readonly [string, string]> = [
+    ['Status', `Published in ${summary.releaseId}`],
+    ...(summary.publicName !== displayName
+      ? ([['Public name', summary.publicName || 'Not recorded']] as const)
+      : []),
+    ['Record maturity', formatEnumLabel(summary.recordMaturity)],
+    ['Research coverage', formatEnumLabel(summary.researchCoverage)],
+    ['Strongest claim level', formatEnumLabel(summary.strongestClaimLevel)],
+    ['Evidence sources', String(summary.evidenceSourceCount)],
+    ['Location', summary.jurisdictionState ?? 'Not assigned'],
+    ['Eras', summary.eraBuckets.length > 0 ? summary.eraBuckets.join(', ') : 'None recorded'],
+    ['Claims', String(summary.claimCount)],
+    ['Related records', String(summary.relatedCount)],
+    ['Map position', summary.hasCoordinates ? 'On the map' : 'No coordinates'],
+  ];
+  return (
+    <Panel
+      title="Public state"
+      actions={<Link href={publicEntityHref(entityId)}>View public page</Link>}
+    >
+      <dl className="admin-base-facts">
+        {rows.map(([label, value]) => (
+          <div key={label}>
+            <dt>{label}</dt>
+            <dd>{value}</dd>
+          </div>
+        ))}
+      </dl>
+    </Panel>
+  );
+}
+
 export default async function CatalogEntityDetailPage({
   params,
 }: {
@@ -47,10 +118,11 @@ export default async function CatalogEntityDetailPage({
   const { id } = await params;
   const entityId = decodeURIComponent(id);
 
-  const [identity, outcome, mergesOutcome] = await Promise.all([
+  const [identity, outcome, mergesOutcome, summaryOutcome] = await Promise.all([
     readVerifiedAdminIdentity(),
     readPostgresOrDegrade(() => readEntityDetail(entityId), 'entity detail'),
     readPostgresOrDegrade(() => readActiveMergesFor(entityId), 'entity merges'),
+    readPostgresOrDegrade(() => readEntityPublicationSummary(entityId), 'entity publication'),
   ]);
 
   if (outcome.status === 'degraded') {
@@ -74,26 +146,25 @@ export default async function CatalogEntityDetailPage({
   const canEdit = identity ? staffRoleHasPermission(identity.role, 'canonical:write') : false;
   const canMerge = identity ? staffRoleHasPermission(identity.role, 'canonical:merge') : false;
   const merges = mergesOutcome.status === 'ok' ? mergesOutcome.value : [];
+  const summary = summaryOutcome.status === 'ok' ? summaryOutcome.value : null;
 
   const editorial = identity ? await readEntityEditorial(entityId) : null;
   return (
     <main className="story-review ds-container ds-page" id="main">
-      <header className="admin-base-page-header">
-        <div>
-          <p className="ds-page__eyebrow">Canonical catalog</p>
-          <h1 className="admin-base-title">{entity.displayName}</h1>
-          <p className="ds-page__lede">
-            Manage identity, prose and evidence. Canonical changes enter the next reviewed release.
-          </p>
-          <p className="story-review__notice">
+      <DeskTitleBar
+        eyebrow="Catalog"
+        title={entity.displayName}
+        description="Canonical record. Edits here enter the next reviewed release; the public page changes only when it is published."
+        actions={
+          <>
             <Link href="/admin/catalog">← Back to catalog</Link>
-            {' · '}
             <Link href="/admin/inbox">Open inbox</Link>
-            {' · '}
             <Link href="/admin/audit">Audit log</Link>
-          </p>
-        </div>
-      </header>
+          </>
+        }
+      />
+
+      <PublicStatePanel summary={summary} displayName={entity.displayName} entityId={entityId} />
 
       {entity.mergedIntoId ? (
         <p className="story-review__alert" role="alert">

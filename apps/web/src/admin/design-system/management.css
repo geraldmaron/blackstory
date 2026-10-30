@@ -459,7 +459,7 @@
   display: flex;
   gap: 8px;
   flex-wrap: wrap;
-  font-size: 12px;
+  font-size: var(--ds-text-caption);
   color: var(--ds-ink-subtle);
 }
 .admin-base-page-header .admin-base-page-header__lede {
@@ -506,6 +506,34 @@
 }
 .admin-base-card__body--flush table {
   margin: 0;
+}
+/* Label/value facts: one column on a phone, two then three as the card widens. */
+.admin-base-facts {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--ds-space-3) var(--ds-space-6);
+  margin: 0;
+}
+.admin-base-facts > div {
+  min-width: 0;
+}
+.admin-base-facts dt {
+  font-size: 12px;
+  color: var(--ds-ink-subtle);
+}
+.admin-base-facts dd {
+  margin: var(--ds-space-1) 0 0;
+  overflow-wrap: anywhere;
+}
+@media (min-width: 640px) {
+  .admin-base-facts {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+@media (min-width: 1280px) {
+  .admin-base-facts {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
 }
 
 /* Stat tiles ----------------------------------------------------------------------------------- */
