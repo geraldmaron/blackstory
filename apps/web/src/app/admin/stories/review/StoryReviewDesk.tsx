@@ -38,7 +38,13 @@ import {
   type StoryReviewSortKey,
   type StoryReviewStatusFilter,
 } from '../../../../admin/stories/story-review-queue';
+import { DeskTitleBar } from '../../../../admin/design-system/ui';
 import '../../../../admin/cases/case-queue.css';
+
+/** The header carries the first two sentences of the intent copy; the rest sits directly below. */
+const INTENT_SENTENCES = STORY_REVIEW_INTENT_COPY.split(/(?<=\.)\s+/);
+const INTENT_LEAD = INTENT_SENTENCES.slice(0, 2).join(' ');
+const INTENT_REST = INTENT_SENTENCES.slice(2).join(' ');
 
 type ReviewState = {
   readonly decision: string;
@@ -256,26 +262,27 @@ export function StoryReviewDesk({ initialRows = [] }: StoryReviewDeskProps) {
 
   return (
     <main className="story-review ds-container ds-page" id="main">
-      <header className="story-review__header">
-        <div>
-          <p className="ds-page__eyebrow">From quarantine</p>
-          <h1 className="ds-page__title">Story review</h1>
-          <p className="ds-page__lede">{STORY_REVIEW_INTENT_COPY}</p>
-          <ol className="acq__steps" aria-label="How to review a story packet">
-            {STORY_REVIEW_STEPS.map((step) => (
-              <li key={step}>{step}</li>
-            ))}
-          </ol>
-        </div>
-        <FormButton
-          type="button"
-          className="ds-button ds-button--secondary"
-          onClick={() => void load()}
-          disabled={loading || busy}
-        >
-          {loading ? 'Refreshing…' : 'Refresh'}
-        </FormButton>
-      </header>
+      <DeskTitleBar
+        eyebrow="From quarantine"
+        title="Story review"
+        description={INTENT_LEAD}
+        actions={
+          <FormButton
+            type="button"
+            className="ds-button ds-button--secondary"
+            onClick={() => void load()}
+            disabled={loading || busy}
+          >
+            {loading ? 'Refreshing…' : 'Refresh'}
+          </FormButton>
+        }
+      />
+      {INTENT_REST ? <p>{INTENT_REST}</p> : null}
+      <ol className="acq__steps" aria-label="How to review a story packet">
+        {STORY_REVIEW_STEPS.map((step) => (
+          <li key={step}>{step}</li>
+        ))}
+      </ol>
 
       <section className="story-review__stats" aria-label="Queue counts">
         <FormButton

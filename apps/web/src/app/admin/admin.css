@@ -259,6 +259,23 @@ body {
   background: var(--ds-surface, #fbf8f2);
 }
 
+/* Catalog entity table: the card scrolls sideways on its own, so a wide table is reached by
+   scrolling inside it rather than by the page growing or the last column being cut off. */
+.catalog-table {
+  max-width: 100%;
+  overflow-x: auto;
+}
+
+.catalog-table .ds-datatable__table {
+  min-width: 46rem;
+}
+
+/* The Entity column wraps long names and ids instead of stretching the table. */
+.catalog-table__entity {
+  max-width: 26rem;
+  overflow-wrap: anywhere;
+}
+
 .story-review__table {
   width: 100%;
   border-collapse: collapse;

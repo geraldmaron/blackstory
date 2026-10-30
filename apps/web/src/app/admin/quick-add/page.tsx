@@ -3,6 +3,7 @@
  * through the same operator-cli package functions as `submit-lead`/`research-intake`.
  */
 import Link from 'next/link';
+import { DeskTitleBar } from '../../../admin/design-system/ui';
 import { QuickAddForm } from './quick-add-form';
 import './quick-add.css';
 
@@ -14,13 +15,11 @@ export const metadata = {
 export default function QuickAddPage() {
   return (
     <main className="ds-container ds-prose ds-page quick-add-page" id="main">
-      <p className="ds-page__eyebrow">Intake</p>
-      <h1 className="ds-page__title">Quick add</h1>
-      <p className="ds-page__lede">
-        Paste a source URL to fetch through the safe-fetch policy, pre-fill citation metadata, and
-        prepare a draft research case in the quarantine pipeline. This desk proposes intake only —
-        it does not publish, activate releases, or edit canonical catalog records.
-      </p>
+      <DeskTitleBar
+        eyebrow="Intake"
+        title="Quick add"
+        description="Paste a source URL to fetch through the safe-fetch policy, pre-fill citation metadata, and prepare a draft research case in the quarantine pipeline. This desk proposes intake only — it does not publish, activate releases, or edit canonical catalog records."
+      />
       <QuickAddForm />
       <p className="quick-add-footer">
         <Link href="/admin">Back to operations</Link>

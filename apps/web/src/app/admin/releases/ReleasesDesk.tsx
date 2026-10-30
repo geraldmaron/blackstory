@@ -1,22 +1,11 @@
 /**
- * The interactive half of /admin/releases: row selection, the decision reason, and the two stage
- * verbs.
+ * The release table of /admin/releases: a read-only record of manifests and which one is live.
  *
- * The list is read in the server request and arrives as props; this component never fetches it.
- * Client state is limited to the selected row, the decision reason, and the POST to
- * `/admin/api/releases/stage`.
- *
- * Staging records intent for review. It does not move the public pointer, and nothing here does:
- * privileged apply with signed-manifest verification is a separate path. `router.refresh()` after
- * a successful stage re-runs the server read so the table reflects the new manifest state rather
- * than the state the page was built with.
+ * The list is read in the server request and arrives as props; this component fetches nothing and
+ * holds no state. Nothing here changes a release or the public pointer. Published records are
+ * updated in place by the incremental publisher, so the active release can change content without
+ * a new release appearing in this table.
  */
-'use client';
-
-import { FormInput, FormButton } from '../../../admin/design-system/fields';
-import { useRouter } from 'next/navigation';
-import { useState } from 'react';
-import { useAdminAuth } from '../../../admin/auth/AdminAuthProvider';
 import type {
   ActiveReleasePointer,
   PublicationReleaseListItem,
@@ -41,106 +30,8 @@ export type ReleasesDeskProps = {
 };
 
 export function ReleasesDesk({ rows, activeRelease }: ReleasesDeskProps) {
-  const { getIdToken } = useAdminAuth();
-  const router = useRouter();
-  const [error, setError] = useState<string | null>(null);
-  const [status, setStatus] = useState<string | null>(null);
-  const [busy, setBusy] = useState(false);
-  const [selectedId, setSelectedId] = useState<string | null>(null);
-  const [reason, setReason] = useState('');
-
-  async function stage(mode: 'activate' | 'rollback') {
-    if (!selectedId || !reason.trim()) {
-      setError('Select a release and add a decision reason.');
-      return;
-    }
-    setBusy(true);
-    setError(null);
-    setStatus(null);
-    try {
-      const token = await getIdToken(true);
-      if (!token) {
-        setError('Sign in required');
-        return;
-      }
-      const response = await fetch('/admin/api/releases/stage', {
-        method: 'POST',
-        headers: {
-          Authorization: `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          releaseId: selectedId,
-          mode,
-          reason: reason.trim(),
-        }),
-      });
-      const body = (await response.json()) as { error?: string; note?: string };
-      if (!response.ok) throw new Error(body.error ?? `Stage failed (${response.status})`);
-      setStatus(body.note ?? 'Staged for review — public pointer unchanged');
-      setReason('');
-      // Re-read on the server: the manifest list the operator is looking at is now one decision old.
-      router.refresh();
-    } catch (err) {
-      setError(err instanceof Error ? err.message : String(err));
-    } finally {
-      setBusy(false);
-    }
-  }
-
   return (
     <>
-      {error ? (
-        <p className="story-review__alert" role="alert">
-          {error}
-        </p>
-      ) : null}
-      {status ? (
-        <p className="story-review__notice" role="status">
-          {status}
-        </p>
-      ) : null}
-
-      <section className="story-review__bulk" aria-label="Stage release action">
-        <label className="story-review__field">
-          <span>Selected release</span>
-          <FormInput
-            type="text"
-            value={selectedId ?? ''}
-            onChange={(event) => setSelectedId(event.target.value || null)}
-            placeholder="Click a row or paste release id"
-          />
-        </label>
-        <label className="story-review__field">
-          <span>Decision reason (required)</span>
-          <FormInput
-            type="text"
-            value={reason}
-            onChange={(event) => setReason(event.target.value)}
-            placeholder="Example: Manifest digest verified against catalog diff"
-            aria-describedby="release-stage-steps"
-          />
-        </label>
-        <div className="story-review__bulk-actions">
-          <FormButton
-            type="button"
-            className="ds-button ds-button--primary"
-            disabled={busy}
-            onClick={() => void stage('activate')}
-          >
-            Stage activate
-          </FormButton>
-          <FormButton
-            type="button"
-            className="ds-button ds-button--secondary"
-            disabled={busy}
-            onClick={() => void stage('rollback')}
-          >
-            Stage rollback
-          </FormButton>
-        </div>
-      </section>
-
       <section className="story-review__queue" aria-label="Publication releases">
         {rows.length === 0 ? (
           <p className="ds-sans">No publication releases found.</p>
@@ -158,13 +49,8 @@ export function ReleasesDesk({ rows, activeRelease }: ReleasesDeskProps) {
               <tbody>
                 {rows.map((row) => {
                   const isActive = activeRelease?.releaseId === row.id;
-                  const isSelected = selectedId === row.id;
                   return (
-                    <tr
-                      key={row.id}
-                      className={isSelected || isActive ? 'is-selected' : undefined}
-                      onClick={() => setSelectedId(row.id)}
-                    >
+                    <tr key={row.id} className={isActive ? 'is-selected' : undefined}>
                       <td>
                         <span className="story-review__row-title">{row.id}</span>
                         <p className="story-review__row-meta ds-mono">

@@ -1,4 +1,5 @@
 import { FormInput, FormButton } from '../../../admin/design-system/fields';
+import { DeskTitleBar } from '../../../admin/design-system/ui';
 import { querySourceLibrary } from '@repo/ops-data/source-library';
 import { getPostgresPool } from '../../../admin/lib/canonical-postgres-client';
 import { CollectionGuidance } from './collection-guidance';
@@ -92,16 +93,11 @@ export default async function SourcesPage({
 
   return (
     <main className="story-review ds-container ds-page" id="main">
-      <header className="story-review__header">
-        <div>
-          <p className="ds-page__eyebrow">Evidence registry</p>
-          <h1 className="ds-page__title">Source library</h1>
-          <p className="ds-page__lede">
-            Find collections suited to your research question, inspect their limits, and trace the
-            publishers behind existing citations.
-          </p>
-        </div>
-      </header>
+      <DeskTitleBar
+        eyebrow="Evidence registry"
+        title="Source library"
+        description="Find collections suited to your research question, inspect their limits, and trace the publishers behind existing citations."
+      />
 
       <p className="story-review__notice" role="status">
         {totals.publisherCount.toLocaleString()} publishers ·{' '}

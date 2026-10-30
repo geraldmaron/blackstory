@@ -4,6 +4,7 @@ import { useMemo, useState } from 'react';
 import { Button } from 'baseui/button';
 import { TableBuilder, TableBuilderColumn } from 'baseui/table-semantic';
 import { ChoiceField, TextField } from '../design-system/fields';
+import { DeskTitleBar } from '../design-system/ui';
 import type { listStories } from './store';
 type Story = Awaited<ReturnType<typeof listStories>>[number];
 export function StoryList({ items }: { items: readonly Story[] }) {
@@ -21,21 +22,22 @@ export function StoryList({ items }: { items: readonly Story[] }) {
   );
   return (
     <main id="main" className="ds-container">
-      <header className="admin-base-page-header">
-        <div>
-          <h1>Stories</h1>
-          <p>Write, review and manage stories in the archive.</p>
-        </div>
-        <div className="admin-base-actions">
-          <Button href="/admin/stories/new">New story</Button>
-          <Button kind="secondary" href="/admin/stories/review">
-            Research packets
-          </Button>
-          <Button kind="tertiary" href="/admin/stories/contributors">
-            Contributors
-          </Button>
-        </div>
-      </header>
+      <DeskTitleBar
+        eyebrow="Publish"
+        title="Stories"
+        description="Write, review and manage stories in the archive."
+        actions={
+          <>
+            <Button href="/admin/stories/new">New story</Button>
+            <Button kind="secondary" href="/admin/stories/review">
+              Research packets
+            </Button>
+            <Button kind="tertiary" href="/admin/stories/contributors">
+              Contributors
+            </Button>
+          </>
+        }
+      />
       <div className="admin-base-toolbar">
         <div className="admin-base-search">
           <TextField label="Search stories" value={query} onChange={setQuery} />

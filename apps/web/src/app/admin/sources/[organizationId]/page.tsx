@@ -8,6 +8,7 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { DetailField, DetailPanel, Pagination } from '@repo/ui';
+import { DeskTitleBar } from '../../../../admin/design-system/ui';
 import { readPostgresOrDegrade } from '../../../../admin/lib/canonical-postgres-client';
 import { getSourceLibraryEntry, listSourceEntities } from '../../../../admin/sources/sources-store';
 import { formatFitness, formatPublisherKind, formatTier } from '../source-library-labels';
@@ -80,18 +81,14 @@ export default async function SourceLibraryDetailPage({
 
   return (
     <main className="story-review ds-container ds-page" id="main">
-      <header className="story-review__header">
-        <div>
-          <p className="ds-page__eyebrow">Source library</p>
-          <h1 className="ds-page__title">{entry.name}</h1>
-          <p className="ds-page__lede">
-            {formatPublisherKind(entry.publisherKind)} · {formatTier(entry.tier)}
-          </p>
-          <p className="story-review__notice">
-            <Link href="/admin/sources">← Back to source library</Link>
-          </p>
-        </div>
-      </header>
+      <DeskTitleBar
+        eyebrow="Source library"
+        title={entry.name}
+        description={`${formatPublisherKind(entry.publisherKind)} · ${formatTier(entry.tier)}`}
+      />
+      <p className="story-review__notice">
+        <Link href="/admin/sources">← Back to source library</Link>
+      </p>
 
       <DetailPanel title="Profile" meta={<span className="ds-mono">{entry.organizationId}</span>}>
         <DetailField label="Homepage">

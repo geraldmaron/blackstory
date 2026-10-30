@@ -4,14 +4,14 @@
  * This server component reads the manifest list and active pointer in the request, so the initial
  * response identifies the live release before client hydration.
  *
- * Unlike the other surfaces in this pass, this one has a genuine mutation, so it splits rather
- * than converts: the read is here, and {@link ReleasesDesk} keeps the client boundary for row
- * selection, the decision reason, and the stage POST. `/admin/api/releases/stage` is the client
- * mutation API; this page does not call `/admin/api/releases` for its initial data.
+ * The page is a read-only record: it offers no release action. The read is here, and
+ * {@link ReleasesDesk} renders the table. This page does not call `/admin/api/releases` for its
+ * initial data.
  */
 import type { Metadata } from 'next';
 import { readPostgresOrDegrade } from '../../../admin/lib/canonical-postgres-client';
 import { listPublicationReleases } from '../../../admin/releases/releases-store';
+import { DeskTitleBar } from '../../../admin/design-system/ui';
 import { ReleasesDesk } from './ReleasesDesk';
 
 export const metadata: Metadata = {
@@ -21,12 +21,6 @@ export const metadata: Metadata = {
 
 /** Which release is live is never a cached answer. */
 export const dynamic = 'force-dynamic';
-
-const RELEASE_STAGE_STEPS = [
-  'Select a release — click a row in the table or paste a release id.',
-  'Write a decision reason — every stage action is audited.',
-  'Stage activate or rollback. This records intent for review only; the live public pointer does not change until privileged apply with signed-manifest verification.',
-] as const;
 
 function formatWhen(iso: string): string {
   if (!iso) return '—';
@@ -49,22 +43,11 @@ export default async function ReleasesPage() {
 
   return (
     <main className="story-review ds-container ds-page" id="main">
-      <header className="story-review__header">
-        <div>
-          <p className="ds-page__eyebrow">Publication</p>
-          <h1 className="ds-page__title">Releases</h1>
-          <p className="ds-page__lede">
-            Signed release manifests and the live public pointer (
-            <span className="ds-mono">publicMeta/activeRelease</span>) for operator review. Staging
-            here never edits the active pointer in place — privileged apply does that later.
-          </p>
-          <ol id="release-stage-steps" aria-label="How to stage a release change">
-            {RELEASE_STAGE_STEPS.map((step) => (
-              <li key={step}>{step}</li>
-            ))}
-          </ol>
-        </div>
-      </header>
+      <DeskTitleBar
+        eyebrow="Publish"
+        title="Releases"
+        description="A read-only record of release manifests and which one is live. Published records are updated in place by the incremental publisher, so the active release can change content without a new release appearing here."
+      />
 
       {degradedReason ? (
         <p className="story-review__alert" role="alert">

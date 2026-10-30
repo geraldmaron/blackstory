@@ -164,7 +164,7 @@ export function EntityWorkbenchTable({
       sortHref: sortHrefs.name,
       ...(sortKey === 'name' ? { sortDirection } : {}),
       cell: (row) => (
-        <>
+        <div className="catalog-table__entity">
           <Link href={`/admin/catalog/${row.id}`} className="story-review__row-title">
             {row.displayName}
           </Link>
@@ -172,7 +172,7 @@ export function EntityWorkbenchTable({
           {row.aliases.length > 0 ? (
             <p className="story-review__row-meta">also {row.aliases.slice(0, 2).join(', ')}</p>
           ) : null}
-        </>
+        </div>
       ),
     },
     {
@@ -237,6 +237,7 @@ export function EntityWorkbenchTable({
       ) : null}
 
       <DataTable
+        className="catalog-table"
         caption="Canonical entities with kind, living status, sensitivity, claim count, and last update"
         rows={rows}
         columns={columns}

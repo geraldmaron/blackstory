@@ -3,6 +3,7 @@
  * the promote/reject/spam decision.
  */
 import Link from 'next/link';
+import { DeskTitleBar } from '../../../../admin/design-system/ui';
 import { notFound } from 'next/navigation';
 import { readVerifiedAdminIdentity } from '../../../../admin/auth/supabase-server';
 import { staffRoleHasPermission } from '../../../../admin/auth/staff-permissions';
@@ -58,20 +59,22 @@ export default async function SubmissionDetailPage({
 
   return (
     <main className="ds-container ds-page" id="main">
-      <header className="ds-page__header">
-        <p className="ds-page__eyebrow">Intake</p>
-        <h1 className="ds-page__title">{submission.title}</h1>
-        <p className="ds-page__lede">
-          <span className="story-review__badge">{titleCase(displayStatus)}</span>
-          {' · '}
-          {submission.kind ? titleCase(submission.kind) : 'Unspecified kind'}
-          {' · '}
-          Submitted {formatWhen(submission.createdAt)}
-        </p>
-        <p className="story-review__notice">
-          <Link href="/admin/submissions">Back to submissions</Link>
-        </p>
-      </header>
+      <DeskTitleBar
+        eyebrow="Intake"
+        title={submission.title}
+        description={
+          <>
+            <span className="story-review__badge">{titleCase(displayStatus)}</span>
+            {' · '}
+            {submission.kind ? titleCase(submission.kind) : 'Unspecified kind'}
+            {' · '}
+            Submitted {formatWhen(submission.createdAt)}
+          </>
+        }
+      />
+      <p className="story-review__notice">
+        <Link href="/admin/submissions">Back to submissions</Link>
+      </p>
 
       <section className="story-review__detail" aria-label="Submission detail">
         <p className="story-review__detail-meta ds-mono">

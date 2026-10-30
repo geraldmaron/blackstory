@@ -6,6 +6,7 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { readPostgresOrDegrade } from '../../../admin/lib/canonical-postgres-client';
 import { listKillSwitches } from '../../../admin/ops/switches-store';
+import { DeskTitleBar } from '../../../admin/design-system/ui';
 
 export const metadata: Metadata = {
   title: 'Kill switches',
@@ -36,24 +37,19 @@ export default async function SwitchesPage() {
 
   return (
     <main className="story-review ds-container ds-page" id="main">
-      <header className="story-review__header">
-        <div>
-          <p className="ds-page__eyebrow">Operations</p>
-          <h1 className="ds-page__title">Kill switches</h1>
-          <p className="ds-page__lede">
-            Operational circuit breakers for discovery campaigns, source adapters, and public
-            surfaces. Engaged switches halt the work controlled by each switch.
-          </p>
-          <p className="story-review__notice">
-            This page displays switch state. Platform administrators change{' '}
-            <span className="ds-mono">ops.kill_switches</span> through the privileged operations
-            database. Record a reason and an audit event for each change. Review{' '}
-            <Link href="/admin/audit">Audit</Link> and{' '}
-            <span className="ds-mono">docs/runbooks/incident-response.md</span> for the response
-            procedure.
-          </p>
-        </div>
-      </header>
+      <DeskTitleBar
+        eyebrow="Operations"
+        title="Kill switches"
+        description="Operational circuit breakers for discovery campaigns, source adapters, and public surfaces. Engaged switches halt the work controlled by each switch."
+      />
+      <p className="story-review__notice">
+        This page displays switch state. Platform administrators change{' '}
+        <span className="ds-mono">ops.kill_switches</span> through the privileged operations
+        database. Record a reason and an audit event for each change. Review{' '}
+        <Link href="/admin/audit">Audit</Link> and{' '}
+        <span className="ds-mono">docs/runbooks/incident-response.md</span> for the response
+        procedure.
+      </p>
 
       {degradedReason ? (
         <p className="story-review__alert" role="alert">
