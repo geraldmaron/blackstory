@@ -289,3 +289,28 @@ count when the backfill (decision 1) lands.
    never reads or moves it (`apps/web/src/admin/work/publish-work.ts:146` publishes under the
    work id). Managed cases therefore stay at `candidate` forever and inflate the Inbox. The Queue
    hides them, and their case page should name the request it belongs to.
+
+### Submission status backfill (awaiting approval)
+
+Measured read-only on 2026-10-29. Scope: quarantined intake items that have research cases, none of
+them open, excluding story packets (their status follows the packet review).
+
+| Cases | Submission becomes | Rows |
+|---|---|---|
+| any case reached minimum, partial or substantial enrichment | `promoted` | 301 |
+| otherwise any case merged into an existing record | `promoted` | 1,015 |
+| every case excluded | `rejected` | 500 (506 less the 6 story packets) |
+| any case still open | unchanged | 240 |
+
+Total changed: 1,816 = 301 + 1,015 + 500 (1,610 leads, 206 editorial packets). No row has more than one case, none is
+anonymous, and none carries a public receipt, so `/corrections/status` shows no change to anyone.
+
+How it runs: through the same plan as a console decision (`prepareSubmissionDecisionPlan` and
+`commitSubmissionDecision` in `postgres-submissions.ts`), one transaction per row, so each change
+gets the usual audit event and the compare-and-set on current status. The outbox message is
+written as for any decision; nothing consumes that topic today. A dry run prints the counts by
+target status first, and the write needs an explicit flag. The actor is a named operator account,
+not the observer.
+
+Going forward, deciding a case advances its submission by the same mapping. That is a code change
+in the case transition path, built after the backfill is approved.
