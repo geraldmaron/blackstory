@@ -121,3 +121,171 @@ The Footprint view at `/admin/footprint` (additive; the Work home is unchanged):
 
 Maturity cells do not link anywhere, because the catalog has no maturity filter. The nav gains
 "Footprint" as the first destination in the Catalog group.
+
+## Phase 4: Queue contract (draft for review, 2026-10-29)
+
+No code. This defines what one unified Queue at `/admin/queue` would contain, who sees what, how
+it pages, and which actions it offers. Every number below was measured read-only against the live
+database on 2026-10-29.
+
+### What the current queues actually hold
+
+The nav badges add up to 2,549 (Submissions 2,068, Inbox 475, Story review 6). This Queue's workload is 466
+rows (453 candidates with open cases, 5 leads, 6 packets, 2 requests). Three overlaps account for the difference:
+
+1. **Submissions are mostly research cases already.** 2,062 of the 2,067 quarantined intake items
+   have a research case (`research.cases.candidate_id = intake_items.id`). Those cases are mostly
+   finished: 1,015 merged, 506 excluded, 301 at minimum, partial or substantial enrichment, and
+   only 240 still open. The submission's own status stays `quarantined` after its case is
+   decided, so the Submissions badge counts finished work as waiting.
+2. **Requests appear twice.** Each management request creates a case with id
+   `managed-<work id>-v<version>-case`. The 2 open requests (both `awaiting_review` since Oct 9)
+   show both on Requests and as `candidate` cases in the Inbox.
+3. **Story packets are intake items.** The 7 packets are rows in `submissions.intake_items`, and
+   each has a research case (all 7 are `excluded` today, so no double count yet).
+
+### Revision after adversarial review
+
+Sol 6.1 rejected the first draft (1 blocker, 8 major, 2 minor). Checked against code and live data
+before revising:
+
+| Finding | Verified | Change |
+|---|---|---|
+| Story review cannot open a given packet: it loads 200 and selection is local state | Yes (`stories/review/page.tsx:24`, `StoryReviewDesk.tsx:104`) | A packet detail route by submission id is a prerequisite (P1 below) |
+| Case detail offers only triage transitions; no assign, checklist editing or promote | Yes | Destination parity is a prerequisite (P2); the Queue promises only what the page does |
+| One candidate can have several open cases | Yes: 14 candidates have more than one open case, 64 have more than one case | The case work unit is the candidate (below) |
+| `managed-` prefix is a convention, not a link | Accepted | Suppression requires a matching `management_work` row (below) |
+| Interrupted and dispatch-failed requests would vanish | Accepted (none live today) | Included under Stuck |
+| `needs_evidence` packets and failed bulk imports would vanish | Accepted (none live today) | Included |
+| Age: promotion writes `from_state = to_state`; request `updated_at` is last activity | Accepted | Self-transitions excluded; requests labeled "last activity" |
+| Redirects lose filters, sorts and history views | Accepted | No redirects. The Queue is an added entry point; desks stay |
+| The 348 eligible cases may not all be published | Not adopted | The operator answered this from knowledge of the data; recorded as their decision |
+
+### Membership
+
+Four row types. A unit of work appears once.
+
+| Type | A row when | Not a row when | Today |
+|---|---|---|---|
+| `case` | One row per **candidate** that has at least one case in `candidate`, `relevance_review`, `relevance_confirmed` or `insufficient_evidence`. The row names the most recently updated open case and shows "N open cases" when there are several | every open case for the candidate is suppressed (managed work, story packet) | 453 candidates (473 open cases; 14 candidates have 2 to 4 open cases each) |
+| `lead` | intake item is `quarantined`, is not a story packet, and has no case with `candidate_id` = its id | it has a case (shown as that case's source) | 5 |
+| `packet` | story packet with no review, a review whose decision is null or `needs_evidence`, or an approved review whose import did not complete | approved and imported, or rejected | 6 |
+| `request` | owned by the viewer, and state is `awaiting_review`, `held`, `failed` or `verification_failed`, or `dispatch_status = 'failed'`, or the state is one the Requests page already treats as interrupted (`work-inbox.tsx:71`) | any other state, or another owner | 2 |
+
+Identity is `<type>:<id>`, where a case row's id is its candidate id.
+
+Exact predicates the build must use, one definition each, shared by membership, exclusions and
+counts:
+
+- **Story packet:** the same recognition as `extractPacket` in `postgres-story-packets.ts`,
+  including the legacy `statement` with `packetJson=` form. A payload that matches the SQL filter
+  but fails extraction is not a packet row; it is counted under "Unreadable packets" so it is never
+  silently dropped.
+- **Managed case:** a case is suppressed only when its id parses as `managed-<uuid>-v<n>-case` and a
+  `research.management_work` row with that uuid exists, for any version. An unmatched case with that
+  prefix is an ordinary case row. Suppression applies for every viewer, so another owner's request
+  can never surface as a case.
+- **Packet case:** a case whose candidate is a story packet is suppressed while the packet has its
+  own row. If the packet is finished and the case is reopened, the case shows as an ordinary case.
+- **Import completed:** needs a marker the bulk review path does not write today
+  (`review-bulk/route.ts:52` records the review before importing). Until it exists, approved
+  packets with no story linked to their submission id count as pending.
+
+Promotion-eligible cases (348) and retracted cases (0 today) are out of scope by operator
+decision; see below.
+
+### Visibility
+
+- `case`, `lead`, `packet`: any staff role, including `observer`.
+- `request`: rows where `owner_id` equals the verified Supabase user id (`caller.uid`, the same value
+  `/admin/api/work` uses), never an email and never a parameter from the URL. The owner predicate
+  sits inside the request branch of the query, so it governs rows, totals, search, and every facet,
+  including when a facet drops its own filter to compute its counts.
+- Approving a request also needs `publication:publish` (`work-store.ts:325`); the Queue shows the
+  row to its owner either way and the request page explains the missing permission.
+
+### Ordering, age and pagination
+
+- **Cases:** waiting since the latest history event whose `to_state` is the current state and whose
+  `from_state` differs from it. With no such event, `created_at`, shown as "since import". Check the
+  query plan against the `(case_id, occurred_at)` index before adding another.
+- **Leads and packets:** `created_at`.
+- **Requests:** `updated_at`, labeled "last activity", not "waiting since".
+- Default sort: oldest first, then type, then id. One `UNION ALL` read projection with one
+  `ORDER BY`, `LIMIT/OFFSET` and `count(*)`, not merged store calls. No schema change.
+
+### Stage
+
+| Stage | Native states |
+|---|---|
+| Triage | case `candidate`, case `relevance_review`, every `lead` |
+| Needs evidence | case `insufficient_evidence`, packet `needs_evidence` |
+| In research | case `relevance_confirmed`: the next step is enrichment by the research lane, and the console offers no action for it (`research-case-types.ts:169`) |
+| Ready to decide | packet with no review, request `awaiting_review` |
+| Stuck | request `held`, `failed`, `verification_failed`, dispatch failed or interrupted; packet approved but not imported |
+
+Native state is shown on every row.
+
+### Facets and filters
+
+Type, stage, age band (under 7 days, 7 to 30, 30 to 90, over 90), assignee, and text search.
+Assignee applies to cases only; other types read "Not assignable". Search covers title and native
+id for every type, plus candidate id and reviewer id for cases and source URL for leads, matching
+what each desk searches today.
+
+### Actions
+
+The Queue lists and routes. Decisions stay on each type's page, and the Queue promises only what
+that page actually does.
+
+Prerequisites before the Queue ships:
+
+- **P1. Packet detail by id:** `/admin/stories/review/<submissionId>` reads one packet directly
+  (`getStoryPacketPostgres` already exists) and offers the same review decision as the desk.
+- **P2. Case detail parity:** add assignment to `/admin/cases/<id>` (it lives only in the queue
+  sheet today). Promotion and checklist editing are not added; they are out of the Queue's scope.
+
+| Type | Opens | Decisions there | Permission |
+|---|---|---|---|
+| `case` | `/admin/cases/<case id>`, and lists the other open cases when there are several | triage transitions, assign (after P2) | `research:write` |
+| `lead` | `/admin/submissions/<id>` | promote, reject, spam | `research:write` |
+| `packet` | `/admin/stories/review/<submissionId>` (after P1) | approve, reject, needs evidence | `research:write` |
+| `request` | `/admin/work/<id>` | approve, decline, retry | owner, plus `publication:publish` to approve, plus delegation for agent clients |
+
+Keyboard: j and k move, Enter opens, off while typing. Bulk: one type at a time through the existing
+endpoints (both `research:write`, 50 items, partial failures reported per item). Bulk packet
+approval must list each import failure, and failed items stay in the Queue under Stuck.
+
+### Rollout
+
+The Queue is added at `/admin/queue` and linked from the Work home. Inbox, Research cases,
+Submissions, Story review and Requests all stay, with their filters, sorts and history views. A
+desk is retired only after a route-by-route parity table shows the Queue covers what operators use
+there, and only with the operator's go-ahead. The Submissions nav badge switches to the `lead`
+count when the backfill (decision 1) lands.
+
+### Acceptance checks
+
+- The total equals the sum of the four membership counts, against fixtures and once live.
+- No candidate appears in two rows, checked across types, not only by row id.
+- Two owners with distinguishable request titles and ages: adding the second owner's requests
+  changes no row, total, search result or facet count for the first.
+- An observer sees no request rows except any they own.
+- Page 1's oldest item is older than or equal to every item on later pages.
+- The 14 duplicate candidates each render once with their open-case count.
+
+### Operator decisions (2026-10-29)
+
+1. **Submission status follows its case, including a backfill.** Going forward, deciding a case
+   advances its linked submission. The roughly 1,820 submissions whose cases are already decided
+   get corrected once. Both are live data writes: the mapping (which case state sets which
+   submission status) and exact counts go to the operator for approval before anything runs.
+   Until then, the Queue and the nav badge ignore submission status for anything that has a case.
+2. **Promotion-eligible cases are published.** The 348 cases at minimum, partial or substantial
+   enrichment went out through the landscape lane. They are done and stay out of the Queue.
+3. **Managed cases are decided only through their request.** The operator was unsure, so this
+   was settled from the code: the case is the research run's container
+   (`packages/operator-cli/src/management-plan.ts:36`), and approving or publishing a request
+   never reads or moves it (`apps/web/src/admin/work/publish-work.ts:146` publishes under the
+   work id). Managed cases therefore stay at `candidate` forever and inflate the Inbox. The Queue
+   hides them, and their case page should name the request it belongs to.
