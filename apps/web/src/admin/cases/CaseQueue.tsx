@@ -11,6 +11,7 @@ import { Pagination } from '@repo/ui';
 import { DeskToolbar } from '../design-system/DeskToolbar';
 import { ActiveFilters, DeskTitleBar, Panel, type ActiveFilter } from '../design-system/ui';
 import { useAdminAuth } from '../auth/AdminAuthProvider';
+import { assignCaseToMe } from './case-assign-client';
 import type { CaseQuery, CaseStateBucket } from './case-query-types';
 import {
   RESEARCH_CASE_BULK_LIMIT,
@@ -298,16 +299,7 @@ export function CaseQueue({
         setError('Sign in required');
         return;
       }
-      const response = await fetch(`/admin/api/research-cases/${activeId}/assign`, {
-        method: 'POST',
-        headers: {
-          Authorization: `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ reason: reason.trim() || 'Assigned to self' }),
-      });
-      const body = (await response.json()) as { error?: string };
-      if (!response.ok) throw new Error(body.error ?? `Assign failed (${response.status})`);
+      await assignCaseToMe(token, activeId, reason);
       setStatus('Assigned to you');
       await load();
       await openDetail(activeId);

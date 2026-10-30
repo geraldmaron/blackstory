@@ -4,7 +4,9 @@
 import type { StoryResearchPacket } from '@repo/domain';
 import { queryPostgres } from './canonical-postgres-client.js';
 
-export type StoryPacketReviewDecision = 'approved' | 'rejected' | 'needs_evidence';
+import type { StoryPacketReviewDecision } from '../stories/story-packet-review-decision.js';
+
+export type { StoryPacketReviewDecision };
 
 export type StoryPacketListItem = {
   readonly submissionId: string;

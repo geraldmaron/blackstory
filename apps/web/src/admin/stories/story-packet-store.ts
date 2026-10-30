@@ -6,7 +6,9 @@ import {
   recordStoryPacketReviewPostgres,
 } from '@/admin/lib/postgres-story-packets';
 
-export type StoryPacketReviewDecision = 'approved' | 'rejected' | 'needs_evidence';
+import type { StoryPacketReviewDecision } from './story-packet-review-decision.js';
+
+export type { StoryPacketReviewDecision };
 export type StoryPacketListItem = {
   readonly submissionId: string;
   readonly createdAt: string;
