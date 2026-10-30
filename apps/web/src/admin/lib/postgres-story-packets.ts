@@ -49,6 +49,16 @@ function readString(value: unknown): string | undefined {
   return typeof value === 'string' && value.length > 0 ? value : undefined;
 }
 
+/** The packet's draft title, or null when the payload is not a readable story packet. */
+export function storyPacketTitle(payload: unknown): string | null {
+  const record =
+    payload && typeof payload === 'object' && !Array.isArray(payload)
+      ? (payload as Record<string, unknown>)
+      : undefined;
+  const title = extractPacket(record)?.draft?.title;
+  return typeof title === 'string' && title.trim() ? title : null;
+}
+
 function extractPacket(payload: Record<string, unknown> | undefined): StoryResearchPacket | null {
   if (!payload) return null;
   const proposalKind = payload.proposalKind;
