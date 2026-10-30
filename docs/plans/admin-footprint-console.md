@@ -94,3 +94,30 @@ Agents start a session with `apps/web/scripts/admin-dev-session.mts` and end it 
 2. Releases: relabel it as a record-only review page, or remove the staging buttons until a real
    staging decision is persisted.
 3. Go-ahead to dispatch Phases 1 and 2.
+
+## Phase 3 contract (written 2026-10-29)
+
+Built first, by Opus: the catalog `state` filter and its attribution (`f5f5604b`).
+
+- **Attribution:** `apps/web/src/admin/lib/footprint-attribution.ts`. A record's state is
+  `findUsStateFromJurisdictionLabel(facets.jurisdictionState)` from `@repo/domain/map/geography`.
+  There is no coordinate fallback. Anything else is `unassigned`. Scope is 50 states plus D.C.
+- **Rows:** `readPublishedJurisdictions()` in `published-jurisdictions.ts` returns one row per
+  record in the active release, with label, kind, record maturity and lat/lng.
+- **Reconciliation, checked live:** 4,210 rows land in exactly one bucket (17 unassigned).
+  `/admin/catalog?state=AL` totals 219, the same as the attribution. No published record is
+  missing from canonical or merged away, so links can use the catalog's default view.
+
+The Footprint view at `/admin/footprint` (additive; the Work home is unchanged):
+
+| Element | Source | Link |
+|---|---|---|
+| Published records, total | rows | none |
+| Canonical records not in the active release | count of merge-active `canonical.entities` with no `search_index` row in the active release | none (no catalog filter exists for it yet) |
+| Per state: records, minimum record, partial enrichment, other/unknown maturity, share at minimum record | rows grouped by attribution | `/admin/catalog?state=XX` |
+| States with no published records | `FOOTPRINT_STATES` minus the states that have rows | `/admin/catalog?state=XX` |
+| No state assigned | rows that resolve to `unassigned` | `/admin/catalog?state=unassigned` |
+| Map | lat/lng projected with `locatorPinPercent`, binned, drawn over the `us-locator.svg` mask | none; decorative, with the table as the accessible content |
+
+Maturity cells do not link anywhere, because the catalog has no maturity filter. The nav gains
+"Footprint" as the first destination in the Catalog group.
