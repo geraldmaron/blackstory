@@ -701,11 +701,6 @@ export function AtlasExperience({ initial, embedded = false }: AtlasExperiencePr
     if (showResults) return edge + 344 + gap;
     return edge;
   })();
-  const zoomBy = (delta: number) => {
-    const map = stage.getMap();
-    if (!map) return;
-    map.easeTo({ zoom: map.getZoom() + delta, duration: 260 } as never);
-  };
 
   return (
     /* `data-key-scope` is what makes the bare camera, time and record keys legal here and nowhere
@@ -925,8 +920,6 @@ export function AtlasExperience({ initial, embedded = false }: AtlasExperiencePr
           onLocate={nearMe}
           locating={locateStatus === 'locating'}
           located={nearby?.source === 'device'}
-          onZoomIn={() => zoomBy(1)}
-          onZoomOut={() => zoomBy(-1)}
           bearing={bearing}
           onResetBearing={() => camera.resetBearing({ trigger: 'reader' })}
           {...(controlsRight !== null
