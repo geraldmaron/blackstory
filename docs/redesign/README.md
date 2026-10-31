@@ -155,7 +155,9 @@ addressable set is the reconception.
 
 ---
 
-## 4. The decision that changed under attack: scroll-as-time
+## 4. The two decisions that changed under adversarial attack
+
+### 4.1 Scroll-as-time
 
 The first version of this spine bound **vertical scroll to the decade axis**. It demos
 beautifully. It was rejected before being built, for reasons that are not aesthetic:
@@ -182,10 +184,11 @@ synchronized with narrative** — scrollytelling, which `chapters.ts` already im
   entrance to the universal narrative primitive: the entry experience, a story chapter, a
   record's "this place over time", and a census explainer are all threads. The effect now
   appears everywhere in the product instead of once.
-- **Time is the DECADE SPINE**, a real control: click, arrow keys, Home/End, URL-addressable at
-  `?year=`. And it doubles as the honesty display — each decade's tick length shows how much the
-  archive actually holds, so you can *see* that the archive is thin in 1830 before you form a
-  belief about 1830.
+- **Time is the DECADE SPINE**, a real control: click to set the range end, shift-click to set
+  its start, arrow keys, Home/End, and URL-addressable as `?from=&to=`. It doubles as the
+  honesty display — each decade's tick length shows how much the archive actually holds, so you
+  can *see* that the archive is thin in 1830 before you form a belief about 1830. Canonical
+  select controls sit beside it in the Register for keyboard and assistive tech.
 
 This is the one place where the beloved thing and the correct thing diverged, and the resolution
 gave more of the beloved thing, not less.
@@ -291,8 +294,9 @@ From a constraints audit of the live app. These are promises already made to the
 3. **26 permanent redirects must keep resolving**, with no chains (`redirect-table.test.ts`).
 4. **`/explore` must not become a redirect to `/`** — a documented rejection at
    `next-config-redirects.mjs:60-63`.
-5. **The edge allowlist strips unknown params.** `?year=` must be added to the parser or it is
-   308-stripped. It must be quantized to 24 decade values, not a free integer.
+5. **The edge allowlist strips unknown params.** `?from=`, `?to=`, `?kind=`, `?state=`, `?floor=`
+   and `?sort=` must be added to the parser or they are 308-stripped. The decade params must be
+   quantized to the 24 census decades, not free integers.
 6. **Crawl-cost guard.** `/explore?` and `/records?q=` are disallowed in robots.txt because
    variants were 81k of 128k Cloudflare misses in one day. Any new param space needs the same
    canonicalization or it recreates that storm.
@@ -301,6 +305,11 @@ From a constraints audit of the live app. These are promises already made to the
    evidence.** That is a real gap, and it is why §7 starts with instrumentation.
 
 ### Two conflicts that need an explicit owner decision
+
+> **Status note.** The owner greenlit the GROUND *direction* on 2026-10-31. That greenlight does
+> not resolve the two items below: both amend binding dignity and surface law, and the register
+> requires a deliberate amendment by its own terms. They remain open and block Phase 2, not
+> Phase 1.
 
 - **Plate-behind-prose.** `docs/ui/patterns-plate-posture.md` states "The plate is never behind
   body text outside the Instrument… A full bleed plate says nothing and asserts everything." A
