@@ -20,6 +20,18 @@
         ],
         "createdAt": "2026-10-31T20:54:12.441Z",
         "reason": "Claude: rule's own editorial/magazine carve-out applies -- archival history product, and the italic-serif hero is the shipping app's existing treatment ('BlackStory happened *here.*'), observed live at localhost:3048."
+      },
+      {
+        "rule": "overused-font",
+        "value": "geist",
+        "createdAt": "2026-10-31T21:43:25.297Z",
+        "reason": "Claude: Geist is the project's shipping UI face, declared as --ds-font-sans in packages/ui/src/styles/tokens.css and loaded via next/font in apps/web. The user's instruction for this pass was explicitly to stop inventing a theme and use the real brand."
+      },
+      {
+        "rule": "overused-font",
+        "value": "geist mono",
+        "createdAt": "2026-10-31T21:43:25.311Z",
+        "reason": "Claude: Geist Mono is the project's shipping data/evidence face (--ds-font-mono, tokens.css). Same reason as geist: this prototype must match the real design system, not substitute a more distinctive face."
       }
     ]
   }

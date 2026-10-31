@@ -291,11 +291,18 @@ body[data-mode="record"] #spine,body[data-mode="register"] #spine{opacity:0;poin
   transition:width var(--d-move) var(--e-out),background var(--d-quick) linear}
 .dec[aria-current="true"] .bar{background:var(--ds-accent-graphic)}
 .dec[aria-current="true"][data-regime="unnamed"] .bar{background:var(--cold-line)}
-/* the in-range band, so the RANGE is obvious rather than inferred */
-.dec[aria-current="true"]::before{content:"";position:absolute;left:0;top:0;bottom:0;
-  width:3px;background:var(--ds-accent);border-radius:0 2px 2px 0}
-.dec[aria-current="true"][data-regime="unnamed"]::before{background:var(--cold-line)}
-.dec.edge::before{width:5px}
+/* The in-range span is a continuous fill, not a side accent on each row:
+   the range reads as one block rather than 24 separately decorated cards. */
+.dec[aria-current="true"]{background:color-mix(in srgb,var(--ds-accent) 12%,transparent)}
+.dec[aria-current="true"][data-regime="unnamed"]{
+  background:color-mix(in srgb,var(--cold-line) 12%,transparent)}
+.dec[aria-current="true"]:hover{background:color-mix(in srgb,var(--ds-accent) 20%,transparent)}
+/* only the two endpoints are marked, which is what makes the span legible */
+.dec.edge{background:color-mix(in srgb,var(--ds-accent) 22%,transparent)}
+.dec.edge[data-regime="unnamed"]{background:color-mix(in srgb,var(--cold-line) 22%,transparent)}
+.dec.edge .yr::after{content:"";display:inline-block;width:4px;height:4px;margin-left:5px;
+  border-radius:var(--r-pill);background:var(--ds-accent);vertical-align:middle}
+.dec.edge[data-regime="unnamed"] .yr::after{background:var(--cold-line)}
 
 .spine-ft{padding:var(--ds-space-2);border-top:var(--ds-border-width) solid var(--ds-border);
   margin-top:var(--ds-space-1);font-family:var(--f-mono);font-size:var(--ds-text-micro);
@@ -563,9 +570,7 @@ body[data-tags="on"] #tagbtn{background:#1c3448;border-color:#2e6187;color:#9fd3
     background:var(--ds-surface);padding:2px 6px;border-radius:var(--r-pill);
     border:var(--ds-border-width) solid var(--ds-border)}
   .dec .bar{width:3px !important;min-height:5px;border-radius:2px}
-  .dec[aria-current="true"]::before{left:0;right:0;top:auto;bottom:0;
-    width:auto;height:3px;border-radius:2px 2px 0 0}
-  .dec.edge::before{height:5px}
+  .dec.edge .yr::after{display:none}
 
   /* conditions: two readings, stacked, never colliding */
   #cond{left:var(--s3);right:var(--s3);bottom:134px;width:auto;padding:var(--s3);
