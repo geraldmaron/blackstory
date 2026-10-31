@@ -484,3 +484,47 @@ content all compete for one viewport. That is an accepted open risk, not a solve
 
 The `codex` **MCP server** failed to connect this session (`CONNECTION_CLOSED`); the cross-model
 work went through the `codex` **CLI** via Bash. Worth fixing that config separately.
+
+---
+
+## Brand application (polish pass, 2026-10-31)
+
+The first prototype used an invented palette. It has been replaced with the project's own
+tokens and artwork. Nothing below is invented.
+
+**Source of truth:** `packages/ui/src/styles/tokens.css` (`[data-theme='dark']` + shared `:root`),
+`docs/ui/brand.md`, `apps/web/public/brand/`, and `apps/web/src/components/shell/command-bar.css`
+for the lockup's measured alpha-trim ratios.
+
+| Token group | Applied |
+|---|---|
+| Surfaces | `--ds-surface-sunken #0c0b0a`, `--ds-canvas #131110`, `--ds-surface #1b1917`, `--ds-surface-raised #232019` |
+| Ink | `--ds-ink #f4efe5`, `--ds-ink-muted #bdb5a9`, `--ds-border/rule #2c2823` |
+| Accent | `--ds-accent #d07a32`, `--ds-accent-muted #d8a178` |
+| **Map plate roles** | `--ds-map-land #38332b` (a value step *above* the canvas), `--ds-map-water #0a0a0c`, `--ds-map-line #665e4f`. Separation is a contract asserted by `map-contrast.test.ts` |
+| Confidence | `high #a9d9b4`, `medium #d4d48e`, `low #d98540` — and the filled-pip count stays the glyph, so colour is never the only signal |
+| Type | Schibsted Grotesk (display), Newsreader (editorial), Geist (sans), Geist Mono (data only) |
+| Scale | `--ds-text-*`, `--ds-space-*`, `--ds-radius-sm/md/lg/full`, `--ds-tracking-*`, `--ds-leading-*` |
+| Motion | `--ds-duration-fast/base/slow/chapter`, `--ds-ease-entrance/standard/cinematic` |
+| Depth | `--ds-contact-hairline/overlap/plate` — contact, not an elevation ramp |
+| Artwork | `brand/lockup-dark.png`, `brand/symbol-dark.png`, used as provided |
+
+**Brand rule previously broken:** `brand.md` lists "Reconstruct the lockup by typing the wordmark
+beside a symbol render" under *Misuse (never)*. The first prototype did exactly that. It now uses
+the official lockup artwork, with the symbol alone below 820px per the same document's direction
+for squeezed placements.
+
+### Defects fixed
+
+| # | Defect | Fix |
+|---|---|---|
+| 1 | Diagonal stripes blanketing the viewport, reading as a broken shimmer | Full-screen overlay deleted. The pre-1870 coverage limit is now scoped to the landmass (land cools toward the olive confidence hue), the spine ticks go cold, and the panel states it in words |
+| 2 | Wordmark rendering as hyperlink-blue "Black" + white "Story"; placeholder "B" tile | Official lockup PNG, positioned with the app's own measured trim ratios |
+| 3 | "Follow a thread" and "Leave the thread" overlapping and clipped | One toggle whose label and `aria-pressed` are driven by mode |
+| 4 | Prose and a progress bar bleeding behind the header | Mast is its own opaque surface with a hairline at `--mast-h 65px`; every panel clears it from that one token; progress bar sits on the mast's bottom edge |
+| 5 | Thread text bleeding around the bottom-left panel | The collection panel withdraws in thread mode; the thread column is width-capped so it never wraps the panel |
+| 6 | Time control with mixed orange/grey ticks at irregular spacing | Rebuilt as an instrument on its own surface: fixed pitch per decade, visible in-range band, labelled endpoints, bars encoding archive density, and a stated interaction |
+| 7 | Crude jagged geometry with muddy fills | Real map plate roles, state boundaries on `--ds-map-line`, round joins, `geometricPrecision` |
+| 8 | Placeholder feel, inconsistent radii and spacing | One control shape (38px, pill), radii only from `--ds-radius-*`, spacing only from `--ds-space-*` |
+
+Screenshots of the corrected state: [`screens/`](screens/).
