@@ -5,7 +5,7 @@
  * public. Supports entity/claim/source/location targets, structured categories, source URL,
  * privacy consent, and returns a receipt code on success.
  */
-import React, { useId, useState, type FormEvent } from 'react';
+import React, { useEffect, useId, useRef, useState, type FormEvent } from 'react';
 import { Button, Notice } from '@repo/ui';
 import { ChoiceField, Field } from '../../components/room';
 import { ReceiptBlock } from './ReceiptBlock';
@@ -117,9 +117,26 @@ export function CorrectionForm({
       ? state.fieldIssues?.find((issue) => issue.field === field)
       : undefined;
 
+  const receiptRef = useRef<HTMLDivElement | null>(null);
+  useEffect(() => {
+    if (state.status === 'success') receiptRef.current?.focus();
+  }, [state.status]);
+
   if (state.status === 'success') {
     return (
-      <div className="ds-corrections__received">
+      <div
+        className="ds-corrections__received"
+        /*
+         * The receipt code is the only credential for looking up what happened to a report,
+         * and this panel replaces the whole form. Without moving focus here, a screen-reader
+         * user was left on a submit button that no longer exists and never heard the code.
+         * Focus lands on the panel, which carries the heading and the receipt; that is the
+         * confirmation-panel pattern, and it avoids the double announcement a live region
+         * would cause on a node that has just been inserted.
+         */
+        ref={receiptRef}
+        tabIndex={-1}
+      >
         <h2>It arrived. Here is your receipt.</h2>
         <ReceiptBlock receiptCode={state.receiptCode} />
         <p className="ds-room-field__hint">

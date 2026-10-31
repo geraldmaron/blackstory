@@ -239,15 +239,26 @@ function FigureSection({ figure }: { readonly figure: LivesMilestoneFigure }) {
                   <span className="lives-era__estimate">{display.text}</span>
                   {display.detail ? <small>{display.detail}</small> : null}
                 </dd>
-                <span
-                  className="lives-era__bar"
-                  style={
-                    {
-                      '--lives-value': `${livesBarShare(cell.estimate ?? 0, figure.condition.unit)}%`,
-                    } as React.CSSProperties
-                  }
-                  aria-hidden="true"
-                />
+                {/*
+                 * A missing estimate is NOT zero. Coercing it with `?? 0` and drawing the
+                 * track's 2px minimum fill made a cell with no measurement render as a
+                 * near-zero one. The bar is drawn only when there is a value to draw;
+                 * absence gets its own empty track, and describeLivesCell already states
+                 * the reason in words beside it.
+                 */}
+                {cell.estimate === undefined ? (
+                  <span className="lives-era__bar lives-era__bar--absent" aria-hidden="true" />
+                ) : (
+                  <span
+                    className="lives-era__bar"
+                    style={
+                      {
+                        '--lives-value': `${livesBarShare(cell.estimate, figure.condition.unit)}%`,
+                      } as React.CSSProperties
+                    }
+                    aria-hidden="true"
+                  />
+                )}
               </div>
             );
           })}

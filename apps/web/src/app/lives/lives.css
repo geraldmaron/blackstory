@@ -1328,6 +1328,19 @@
     var(--ds-viz-grid);
 }
 
+/*
+ * No estimate: an empty track, not a short bar. The 2px minimum fill above exists so a tiny
+ * real percentage stays visible, which is exactly why it must never be applied to a value
+ * that does not exist — "Withheld" and "Not published" were rendering as near-zero
+ * measurements. The reason itself is already stated in words next to this track.
+ */
+.lives-era__bar--absent {
+  background: none;
+  border-top: 1px dashed var(--ds-viz-grid);
+  height: 0;
+  align-self: center;
+}
+
 .lives-era__evidence,
 .lives-era__rules {
   padding: var(--ds-space-4);
