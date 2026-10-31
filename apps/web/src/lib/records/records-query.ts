@@ -16,6 +16,7 @@ export type RecordsQuery = {
   readonly topic: string;
   readonly status: string;
   readonly evidence: string;
+  readonly sort: RecordsSort;
   readonly page: number;
 };
 
@@ -27,8 +28,17 @@ export const EMPTY_RECORDS_QUERY: RecordsQuery = Object.freeze({
   topic: '',
   status: '',
   evidence: '',
+  sort: 'discovery',
   page: 1,
 });
+
+/**
+ * Orderings `/records` understands. `discovery` is the long-standing default — best evidence
+ * first, then earliest era — and stays the one the bare URL means. The index had no sort
+ * control at all, so 4,210 records could only ever be read in that one order.
+ */
+export const RECORDS_SORTS = Object.freeze(['discovery', 'era', 'name', 'evidence'] as const);
+export type RecordsSort = (typeof RECORDS_SORTS)[number];
 
 /** The filter keys, in the order the chip bar renders them. `q` and `page` are not chips. */
 export const RECORDS_FILTER_KEYS = Object.freeze([
@@ -46,6 +56,7 @@ export type RecordsFilterKey = (typeof RECORDS_FILTER_KEYS)[number];
 export const RECORDS_PAGE_PARAM_ALLOWLIST: readonly string[] = Object.freeze([
   'q',
   ...RECORDS_FILTER_KEYS,
+  'sort',
   'page',
 ]);
 
@@ -86,6 +97,9 @@ export function parseRecordsQuery(
     state: STATE_POSTAL.test(state) ? state : '',
     topic: topic.length > 0 && isValidTopicId(topic) ? topic : '',
     status: slugOrEmpty(one('status').toLowerCase()),
+    sort: (RECORDS_SORTS as readonly string[]).includes(one('sort').toLowerCase())
+      ? (one('sort').toLowerCase() as RecordsSort)
+      : 'discovery',
     evidence: EVIDENCE_GRADES.has(evidence) ? evidence : '',
     page: Number.isFinite(rawPage) && rawPage > 1 ? Math.min(rawPage, MAX_PAGE) : 1,
   };
@@ -99,6 +113,9 @@ export function recordsQueryString(query: Partial<RecordsQuery>): string {
   for (const key of RECORDS_FILTER_KEYS) {
     if (merged[key].length > 0) params.set(key, merged[key]);
   }
+  // The default sort is never emitted, for the same reason `page=1` is not: it would give one
+  // ordering two URLs, and both would claim to be canonical.
+  if (merged.sort !== 'discovery') params.set('sort', merged.sort);
   // `page=1` is never emitted: `/records` and `/records?page=1` would otherwise be two URLs for
   // one page, and each would claim to be canonical.
   if (merged.page > 1) params.set('page', String(merged.page));
@@ -123,5 +140,9 @@ export function recordsHref(query: Partial<RecordsQuery>): string {
 export function isRecordsCombinationQuery(query: RecordsQuery): boolean {
   if (query.q.length > 0) return true;
   const constraints = RECORDS_FILTER_KEYS.filter((key) => query[key].length > 0).length;
-  return constraints + (query.page > 1 ? 1 : 0) > 1;
+  // A re-ordering counts as a dimension. Every sort multiplies the crawlable combinations of
+  // the same rows, which is the crawl trap robots.txt already exists to stop; the default
+  // ordering is the one a crawler sees.
+  const reordered = query.sort !== 'discovery' ? 1 : 0;
+  return constraints + reordered + (query.page > 1 ? 1 : 0) > 1;
 }

@@ -197,11 +197,19 @@ export function FindBar({
 
       {children}
 
-      {summary === undefined ? null : (
+      {/*
+       * Sort was nested inside the summary block, so a list that prints its own count — which
+       * is what `HairlineIndex` does, and why `summary` is documented as omittable — could not
+       * offer an ordering at all. That is how /records ended up with 4,210 records and no sort
+       * control. The row now renders whenever there are options, with or without a summary.
+       */}
+      {summary === undefined && (sort === undefined || sort.length === 0) ? null : (
         <div className="ds-find__count">
-          <p className="ds-room-idx__count" id={`${id}-results-heading`} role="status">
-            {summary}
-          </p>
+          {summary === undefined ? null : (
+            <p className="ds-room-idx__count" id={`${id}-results-heading`} role="status">
+              {summary}
+            </p>
+          )}
           {sort === undefined || sort.length === 0 ? null : (
             <nav className="ds-find__sort" aria-label="Sort order">
               <span className="ds-find__sort-label" aria-hidden="true">

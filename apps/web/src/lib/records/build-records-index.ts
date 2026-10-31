@@ -60,6 +60,7 @@ import {
   recordsHref,
   type RecordsFilterKey,
   type RecordsQuery,
+  type RecordsSort,
 } from './records-query';
 
 /** Arrival query Place pages understand (`from=list` + shared DiscoveryState keys). */
@@ -96,6 +97,7 @@ export {
   recordsHref,
   type RecordsFilterKey,
   type RecordsQuery,
+  type RecordsSort,
 } from './records-query';
 
 export type RecordsRow = {
@@ -473,6 +475,36 @@ function earliestEraYear(facts: RecordFacts): number {
   return earliest;
 }
 
+/**
+ * The orderings behind the sort control. Every one of them puts internal-looking labels last
+ * and falls back to the record name, so a sort never produces an unstable order for rows that
+ * tie on the key being sorted.
+ */
+function internalLast(a: RecordFacts, b: RecordFacts): number {
+  const internalA = isInternalRecordLabel(a.row.name) ? 1 : 0;
+  const internalB = isInternalRecordLabel(b.row.name) ? 1 : 0;
+  return internalA - internalB;
+}
+
+function comparatorFor(sort: RecordsSort): (a: RecordFacts, b: RecordFacts) => number {
+  if (sort === 'discovery') return compareDiscoveryOrder;
+  return (a, b) => {
+    const internal = internalLast(a, b);
+    if (internal !== 0) return internal;
+    if (sort === 'name') return a.row.name.localeCompare(b.row.name);
+    if (sort === 'era') {
+      const eraA = earliestEraYear(a);
+      const eraB = earliestEraYear(b);
+      if (eraA !== eraB) return eraA - eraB;
+      return a.row.name.localeCompare(b.row.name);
+    }
+    const tierA = TIER_RANK[a.confidenceTier] ?? 3;
+    const tierB = TIER_RANK[b.confidenceTier] ?? 3;
+    if (tierA !== tierB) return tierA - tierB;
+    return a.row.name.localeCompare(b.row.name);
+  };
+}
+
 function compareDiscoveryOrder(a: RecordFacts, b: RecordFacts): number {
   const internalA = isInternalRecordLabel(a.row.name) ? 1 : 0;
   const internalB = isInternalRecordLabel(b.row.name) ? 1 : 0;
@@ -512,7 +544,7 @@ export function buildRecordsIndex(
 
   const matched = facts
     .filter((record) => matchesExcept(record, query, 'none'))
-    .sort(compareDiscoveryOrder);
+    .sort(comparatorFor(query.sort));
   const mappableMatched = matched.filter((record) => record.mappable).length;
 
   const facets = Object.fromEntries(

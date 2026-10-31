@@ -23,11 +23,19 @@ import { meterLevelForTier, RecordMeter } from '../../components/entity/RecordCh
 import { KindGlyph } from '../../components/map-experience/KindGlyph';
 import { AutoSubmitSelect } from '../../components/forms/AutoSubmitSelect';
 import type { RecordsIndex as RecordsIndexModel } from '../../lib/records/build-records-index';
-import { RECORDS_FILTER_KEYS } from '../../lib/records/build-records-index';
+import { RECORDS_FILTER_KEYS, recordsHref } from '../../lib/records/build-records-index';
 
 void React;
 
 type FilterKey = (typeof RECORDS_FILTER_KEYS)[number];
+
+/** Plain-language names for the orderings; `discovery` is what the bare URL means. */
+const SORTS = Object.freeze([
+  { id: 'discovery', label: 'Best evidence' },
+  { id: 'era', label: 'Earliest' },
+  { id: 'name', label: 'Name' },
+  { id: 'evidence', label: 'Evidence' },
+] as const);
 
 const FILTER_GROUP_LABELS: Readonly<Record<FilterKey, string>> = Object.freeze({
   kind: 'Kind',
@@ -144,7 +152,24 @@ export function RecordsIndexRoom({ model, releaseLabel }: RecordsIndexProps) {
         /* The other constraints ride along, so submitting the text field narrows within the
            current filter rather than silently resetting it. `page` is deliberately not carried:
            a new term starts at page one. */
-        preserved={Object.fromEntries(RECORDS_FILTER_KEYS.map((key) => [key, query[key]]))}
+        preserved={{
+          ...Object.fromEntries(RECORDS_FILTER_KEYS.map((key) => [key, query[key]])),
+          ...(query.sort !== 'discovery' ? { sort: query.sort } : {}),
+        }}
+        /*
+         * The index had no sort at all: 4,210 records could only be read best-evidence-first,
+         * then earliest era. FindBar already renders a sort row — /law and /books both use it
+         * — so this is the existing control, not a new one.
+         */
+        sort={SORTS.map((option) => ({
+          label: option.label,
+          href: recordsHref({
+            ...Object.fromEntries(RECORDS_FILTER_KEYS.map((key) => [key, query[key]])),
+            q: query.q,
+            sort: option.id,
+          }),
+          active: query.sort === option.id,
+        }))}
         active={constraints.map((constraint) => ({
           key: constraint.key,
           label: constraint.label,
