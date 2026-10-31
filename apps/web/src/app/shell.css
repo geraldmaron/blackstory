@@ -2470,3 +2470,18 @@ body:has(.ds-explore-stage[data-results='open']) {
     font-size: max(16px, 1rem) !important;
   }
 }
+
+/*
+ * `main` takes a programmatic-only tab stop so RouteFocus can land on it after a navigation
+ * (components/shell/RouteFocus.tsx). It is never in the tab order, so it must not draw a ring
+ * when it receives that focus; `:focus-visible` still applies if a browser decides the move
+ * was keyboard-initiated, which is the behaviour we want for the skip link.
+ */
+main[tabindex='-1']:focus {
+  outline: none;
+}
+
+main[tabindex='-1']:focus-visible {
+  outline: var(--ds-focus-width) solid var(--ds-focus-ring);
+  outline-offset: calc(var(--ds-focus-offset) * -1);
+}

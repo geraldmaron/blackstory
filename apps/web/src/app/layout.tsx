@@ -25,6 +25,7 @@ import '@fortawesome/fontawesome-svg-core/styles.css';
 import '../lib/fontawesome';
 import { WebAnalytics } from '../components/analytics/WebAnalytics';
 import { SiteShell } from '../components/SiteShell';
+import { RouteFocus } from '../components/shell/RouteFocus';
 import './shell.css';
 
 /** Archive Paper — light canvas / default splash + theme-color. */
@@ -182,6 +183,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         <script dangerouslySetInnerHTML={{ __html: THEME_BOOTSTRAP_SCRIPT }} />
       </head>
       <body>
+        <RouteFocus />
         <a className="ds-skip-link" href="#main">
           Skip to main content
         </a>
