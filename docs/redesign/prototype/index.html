@@ -3,1222 +3,1156 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>BlackStory — One Field</title>
+<title>BlackStory: Ground</title>
 <style>
 /* ============================================================
-   ONE FIELD — design language
-   Deliberately small. Every value below is the whole system.
-   Today's app ships 134 font sizes, 350 spacing values,
-   39 breakpoints. This is the counter-proposal.
+   GROUND — one surface addressed by PLACE x TIME.
+   There are no destinations. There is where, when, and what
+   the archive holds there.
+
+   Design system, stated in full. The shipping app has 134 font
+   sizes, 350 spacing values and 39 breakpoints; this is the
+   counter-proposal and it is the whole thing.
    ============================================================ */
 :root{
-  /* --- canvas: 4 steps, not 17 near-blacks --- */
-  --c-void:#0b0a09;
-  --c-canvas:#131110;
-  --c-raised:#1c1916;
-  --c-lifted:#272220;
+  --void:#0a0908; --canvas:#121110; --raised:#1b1917; --lifted:#262220;
+  --ink:#f3eee4; --ink-2:#b5aca0; --ink-3:#9a9186;      /* ink-3 = 5.0:1 on canvas */
+  --a:#d07a32; --a-hi:#eb9850; --a-lo:#8e4f2a;
+  --cold:#6f8ca3;                                        /* "not recorded" — never warm */
+  --edge:rgba(243,238,228,.13); --edge-hi:rgba(243,238,228,.24);
 
-  /* --- ink: 3 steps --- */
-  --i-high:#f4efe5;
-  --i-mid:#b7ada0;
-  --i-low:#9a9186;   /* 5.0:1 on --c-canvas. the audit flagged 1.3:1 hairlines and
-                        3.4:1 muted ink in the real app; this must not repeat them. */
+  --t-micro:12px; --t-sm:14px; --t-body:17px; --t-lead:21px;
+  --t-title:32px; --t-hero:clamp(40px,6.4vw,78px);
 
-  /* --- one accent, 3 steps --- */
-  --a:#d07a32;
-  --a-bright:#eb9850;
-  --a-dim:#8e4f2a;
+  --s1:4px; --s2:8px; --s3:16px; --s4:28px; --s5:48px; --s6:76px;
+  --d-quick:150ms; --d-move:420ms; --d-fly:1150ms;
+  --e-out:cubic-bezier(.22,.9,.3,1); --e-soft:cubic-bezier(.4,0,.2,1);
+  --r-sm:8px; --r-md:14px; --r-lg:24px; --r-pill:999px;
 
-  /* --- edges: the fix for 1.3:1 hairlines --- */
-  --edge:rgba(244,239,229,.12);
-  --edge-strong:rgba(244,239,229,.22);
-
-  /* --- type: 6 sizes. one ladder. --- */
-  --t-micro:12px;   /* the floor. nothing in this system is smaller. the real app
-                       ships 85 uses of 11px and 27 of 10px — that is the "everything
-                       is a label" texture the audit named. */
-  --t-small:14px;
-  --t-body:17px;
-  --t-lead:21px;
-  --t-title:34px;
-  --t-hero:clamp(44px,7vw,92px);
-
-  /* --- space: 6 steps, 4pt grid --- */
-  --s1:4px; --s2:8px; --s3:16px; --s4:28px; --s5:48px; --s6:80px;
-
-  /* --- motion: 3 durations, 2 curves. that's all. --- */
-  --d-quick:160ms;
-  --d-move:480ms;
-  --d-fly:1200ms;
-  --e-out:cubic-bezier(.22,.9,.3,1);
-  --e-soft:cubic-bezier(.4,0,.2,1);
-
-  --r-sm:8px; --r-md:14px; --r-lg:26px; --r-pill:999px;
-
-  /* three faces with three jobs. mono is for evidence ONLY. */
+  /* three faces, three jobs. mono is EVIDENCE ONLY. */
   --f-display:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,serif;
   --f-ui:ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;
   --f-mono:ui-monospace,SFMono-Regular,Menlo,monospace;
 }
 *,*::before,*::after{box-sizing:border-box}
-html,body{margin:0;height:100%}
-body{
-  background:var(--c-canvas); color:var(--i-high);
-  font-family:var(--f-ui); font-size:var(--t-body); line-height:1.6;
-  -webkit-font-smoothing:antialiased; overscroll-behavior-y:none;
-}
+html,body{margin:0;height:100%;overflow:hidden}
+body{background:var(--canvas);color:var(--ink);font-family:var(--f-ui);
+  font-size:var(--t-body);line-height:1.6;-webkit-font-smoothing:antialiased}
 button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
-a{color:inherit}
-:focus-visible{outline:2px solid var(--a-bright);outline-offset:3px;border-radius:4px}
-
-/* ============================================================
-   THE FIELD — one persistent plate. Never destroyed.
-   ============================================================ */
-#field{position:fixed;inset:0;overflow:hidden;background:
-   radial-gradient(130% 90% at 50% 10%,#1a1512 0%,var(--c-void) 70%);
-   z-index:0;}
-#plate{position:absolute;top:0;left:0;width:960px;height:526.29px;
-  transform-origin:0 0;
-  transition:transform var(--d-fly) var(--e-out);
-  will-change:transform;}
-#plate svg{display:block;width:960px;height:526.29px;overflow:visible}
-#plate svg g{fill:#4a3a2c !important;fill-opacity:1 !important}
-#plate svg path{stroke:rgba(244,239,229,.10);stroke-width:.4;vector-effect:non-scaling-stroke}
-
-/* pins live in the same coordinate space as the geometry */
-.pin{position:absolute;width:0;height:0;}
-.pin i{
-  position:absolute;left:0;top:0;display:block;
-  width:var(--pw,9px);height:var(--pw,9px);margin:calc(var(--pw,9px)/-2);
-  border-radius:var(--r-pill);
-  background:var(--a);
-  /* a dark keyline, not a halo: pins must read against terrain without glowing. */
-  box-shadow:0 0 0 1px rgba(11,10,9,.78);
-  transform:scale(calc(1/var(--z,1)));
-  transform-origin:50% 50%;
-  transition:opacity var(--d-move) var(--e-soft), background var(--d-quick) linear;
-  opacity:.82; cursor:pointer;
-}
-.pin.is-dim i{opacity:.14}
-.pin.is-lit i{opacity:1;background:var(--a-bright)}
-.pin.is-ringed i{
-  opacity:1;background:var(--a-bright);
-  /* the one selected pin gets a concentric ring — a map beacon, which is a real
-     cartographic convention for "this is the one", not decorative chrome. */
-  box-shadow:0 0 0 1px var(--c-void),0 0 0 calc(6px * (1/var(--z,1))) rgba(235,152,80,.26);
-}
-.pin.is-hidden{display:none}
-@keyframes ringpulse{0%{box-shadow:0 0 0 1px var(--c-void),0 0 0 calc(5px*(1/var(--z,1))) rgba(235,152,80,.4)}
- 100%{box-shadow:0 0 0 1px var(--c-void),0 0 0 calc(14px*(1/var(--z,1))) rgba(235,152,80,0)}}
-.pin.is-ringed i::after{content:"";position:absolute;inset:0;border-radius:var(--r-pill);
-  animation:ringpulse 2.2s var(--e-soft) infinite}
-
-/* a soft vignette keeps text legible over any part of the field */
-#veil{position:fixed;inset:0;z-index:1;pointer-events:none;
-  transition:opacity var(--d-fly) var(--e-soft),background var(--d-fly) var(--e-soft);}
-body[data-view="journey"] #veil{background:linear-gradient(100deg,rgba(11,10,9,.86) 0%,rgba(11,10,9,.42) 42%,rgba(11,10,9,.08) 70%)}
-body[data-view="field"]   #veil{background:linear-gradient(180deg,rgba(11,10,9,.72) 0%,rgba(11,10,9,0) 22%,rgba(11,10,9,0) 74%,rgba(11,10,9,.78) 100%)}
-body[data-view="record"]  #veil{background:linear-gradient(90deg,rgba(11,10,9,.2) 0%,rgba(11,10,9,.55) 46%,rgba(11,10,9,.9) 72%)}
-body[data-view="story"]   #veil{background:linear-gradient(180deg,rgba(11,10,9,.55) 0%,rgba(11,10,9,.93) 30%)}
-body[data-side="right"][data-view="journey"] #veil{background:linear-gradient(260deg,rgba(11,10,9,.86) 0%,rgba(11,10,9,.42) 42%,rgba(11,10,9,.08) 70%)}
-
-/* ============================================================
-   MAST — one bar. Four words. No instruction pills.
-   ============================================================ */
-#mast{position:fixed;top:0;left:0;right:0;z-index:40;
-  display:flex;align-items:center;gap:var(--s3);
-  padding:var(--s3) var(--s4);
-  background:linear-gradient(180deg,rgba(11,10,9,.9),rgba(11,10,9,0));
-  pointer-events:none;}
-#mast>*{pointer-events:auto}
-.brand{display:flex;align-items:center;gap:10px;font-family:var(--f-display);
-  font-size:19px;letter-spacing:-.01em;text-decoration:none}
-.brand b{font-weight:600}
-.brand span{color:var(--a)}
-.mark{width:22px;height:22px;border-radius:5px;background:linear-gradient(145deg,var(--a),var(--a-dim));
-  display:grid;place-items:center;font-family:var(--f-mono);font-size:var(--t-micro);color:#1a0f07;font-weight:700}
-#seek{margin-left:auto;display:flex;align-items:center;gap:var(--s2);
-  background:rgba(28,25,22,.82);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
-  border:1px solid var(--edge);border-radius:var(--r-pill);
-  padding:9px var(--s3);width:min(380px,42vw);
-  transition:border-color var(--d-quick) linear,width var(--d-move) var(--e-out)}
-#seek:focus-within{border-color:var(--a);width:min(460px,52vw)}
-#seek input{flex:1;background:none;border:0;outline:none;color:var(--i-high);font-size:var(--t-small)}
-#seek input::placeholder{color:var(--i-low)}
-.navset{display:flex;gap:2px;background:rgba(28,25,22,.82);
-  backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
-  border:1px solid var(--edge);border-radius:var(--r-pill);padding:3px}
-.navset button{padding:7px 15px;border-radius:var(--r-pill);font-size:var(--t-small);
-  color:var(--i-mid);transition:background var(--d-quick) linear,color var(--d-quick) linear}
-.navset button:hover{color:var(--i-high)}
-.navset button[aria-current="true"]{background:var(--a);color:#1a0f07;font-weight:600}
-
-/* ============================================================
-   THE THREAD — the persistent investigation.
-   This is the whole thesis of the redesign in one component.
-   ============================================================ */
-#thread{position:fixed;left:var(--s4);bottom:var(--s4);z-index:38;
-  display:flex;align-items:stretch;gap:0;
-  background:rgba(19,17,16,.88);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);
-  border:1px solid var(--edge);border-radius:var(--r-md);
-  box-shadow:0 18px 50px -18px rgba(0,0,0,.85);
-  overflow:hidden;max-width:min(640px,calc(100vw - var(--s4)*2));
-  transition:transform var(--d-move) var(--e-out),opacity var(--d-move) var(--e-soft)}
-#thread.is-away{transform:translateY(140%);opacity:0;pointer-events:none}
-.th-seg{padding:10px var(--s3);border-right:1px solid var(--edge);min-width:0}
-.th-seg:last-child{border-right:0}
-.th-k{font-family:var(--f-mono);font-size:var(--t-micro);letter-spacing:.14em;text-transform:uppercase;
-  color:var(--i-low);display:block;margin-bottom:3px}
-.th-v{font-size:var(--t-small);color:var(--i-high);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block}
-.th-act{padding:10px var(--s3);background:rgba(208,122,50,.14);color:var(--a-bright);
-  font-size:var(--t-small);font-weight:600;white-space:nowrap;
-  transition:background var(--d-quick) linear}
-.th-act:hover{background:rgba(208,122,50,.26)}
-.th-count{display:inline-flex;align-items:center;justify-content:center;min-width:20px;height:20px;
-  padding:0 6px;border-radius:var(--r-pill);background:var(--a);color:#1a0f07;
-  font-family:var(--f-mono);font-size:var(--t-micro);font-weight:700;margin-right:6px}
-
-/* ============================================================
-   JOURNEY — the loved scroll. Kept, with real transitions.
-   ============================================================ */
-#journey{position:relative;z-index:10}
-body[data-view="journey"] #journey{display:block}
-body:not([data-view="journey"]) #journey{display:none}
-.chapter{min-height:100svh;display:flex;align-items:center;padding:0 var(--s6);
-  scroll-snap-align:start}
-.chapter[data-side="end"]{justify-content:flex-end}
-.card{
-  width:min(440px,100%);
-  padding:var(--s4);
-  border-radius:var(--r-lg);
-  /* the fix for "flat opaque rectangle": real depth, real edge */
-  background:linear-gradient(165deg,rgba(28,25,22,.93),rgba(19,17,16,.88));
-  backdrop-filter:blur(22px) saturate(1.2);-webkit-backdrop-filter:blur(22px) saturate(1.2);
-  border:1px solid var(--edge);
-  box-shadow:0 30px 80px -28px rgba(0,0,0,.9), inset 0 1px 0 rgba(244,239,229,.07);
-  /* enter/exit transition — today's chapters hard-cut */
-  opacity:0;transform:translateY(34px) scale(.985);
-  transition:opacity var(--d-move) var(--e-soft),transform var(--d-move) var(--e-out);
-}
-.chapter.is-live .card{opacity:1;transform:none}
-/* the opening card must not depend on JS to be readable at first paint */
-.chapter[data-ch="0"] .card{opacity:1;transform:none}
-.ch-num{font-family:var(--f-mono);font-size:var(--t-micro);color:var(--a);
-  letter-spacing:.2em;display:flex;align-items:center;gap:10px;margin-bottom:var(--s3)}
-.ch-num::after{content:"";flex:1;height:1px;background:linear-gradient(90deg,var(--a-dim),transparent)}
-.ch-kicker{font-family:var(--f-mono);font-size:var(--t-micro);letter-spacing:.2em;text-transform:uppercase;
-  color:var(--i-low);display:block;margin-bottom:var(--s2)}
-.ch-h{font-family:var(--f-display);font-size:var(--t-title);line-height:1.12;
-  letter-spacing:-.02em;margin:0 0 var(--s3)}
-.ch-h em{font-style:italic;color:var(--a-bright)}
-.ch-p{font-size:var(--t-body);color:var(--i-mid);margin:0 0 var(--s3)}
-.ch-cta{display:inline-flex;align-items:center;gap:8px;padding:11px var(--s3);
-  border-radius:var(--r-pill);background:var(--a);color:#1a0f07;font-weight:600;font-size:var(--t-small);
-  transition:background var(--d-quick) linear,transform var(--d-quick) var(--e-out)}
-.ch-cta:hover{background:var(--a-bright);transform:translateY(-1px)}
-.ch-ghost{display:inline-flex;align-items:center;gap:8px;padding:11px var(--s3);
-  border-radius:var(--r-pill);border:1px solid var(--edge-strong);font-size:var(--t-small);color:var(--i-mid);
-  transition:border-color var(--d-quick) linear,color var(--d-quick) linear}
-.ch-ghost:hover{border-color:var(--a);color:var(--i-high)}
-.ch-stat{display:flex;gap:var(--s4);margin:var(--s3) 0;padding-top:var(--s3);border-top:1px solid var(--edge)}
-.ch-stat div{min-width:0}
-.ch-stat b{display:block;font-family:var(--f-mono);font-size:var(--t-lead);color:var(--i-high);font-weight:600}
-.ch-stat span{font-size:var(--t-micro);color:var(--i-low);text-transform:uppercase;letter-spacing:.1em;font-family:var(--f-mono)}
-
-/* opening */
-#open-card .ch-h{font-size:var(--t-hero);line-height:.92;margin-bottom:var(--s3)}
-#open-card{width:min(620px,100%)}
-
-/* progress spine — replaces the aria-hidden decorative bar */
-#spine{position:fixed;right:var(--s4);top:50%;transform:translateY(-50%);z-index:36;
-  display:flex;flex-direction:column;gap:10px;align-items:center}
-body:not([data-view="journey"]) #spine{display:none}
-#spine button{width:26px;height:26px;display:grid;place-items:center;border-radius:var(--r-pill);
-  font-family:var(--f-mono);font-size:var(--t-micro);color:var(--i-low);
-  transition:color var(--d-quick) linear}
-#spine button::before{content:"";width:6px;height:6px;border-radius:var(--r-pill);
-  border:1px solid var(--i-low);transition:all var(--d-move) var(--e-out)}
-#spine button[aria-current="true"]{color:var(--a)}
-#spine button[aria-current="true"]::before{background:var(--a);border-color:var(--a);
-  width:8px;height:8px;box-shadow:0 0 0 4px rgba(208,122,50,.18)}
-#spine button:hover::before{border-color:var(--a)}
-
-/* ============================================================
-   FIELD POSTURE — browse. Same plate, different posture.
-   ============================================================ */
-#fieldui{position:fixed;inset:0;z-index:20;pointer-events:none;
-  opacity:0;transition:opacity var(--d-move) var(--e-soft)}
-body[data-view="field"] #fieldui,body[data-view="record"] #fieldui{opacity:1}
-body:not([data-view="field"]):not([data-view="record"]) #fieldui{display:none}
-#fieldui>*{pointer-events:auto}
-#lens{position:absolute;top:84px;left:var(--s4);display:flex;gap:var(--s2);flex-wrap:wrap;
-  max-width:calc(100vw - var(--s4)*2)}
-.lens-g{display:flex;gap:2px;background:rgba(19,17,16,.88);backdrop-filter:blur(16px);
-  -webkit-backdrop-filter:blur(16px);border:1px solid var(--edge);border-radius:var(--r-pill);padding:3px}
-.lens-g button{padding:6px 13px;border-radius:var(--r-pill);font-size:var(--t-micro);color:var(--i-mid);
-  font-family:var(--f-ui);transition:background var(--d-quick) linear,color var(--d-quick) linear}
-.lens-g button[aria-pressed="true"]{background:var(--a);color:#1a0f07;font-weight:600}
-.lens-g button:hover:not([aria-pressed="true"]){color:var(--i-high)}
-
-/* era scrubber — the only instrument, and it reads like one */
-#era{position:absolute;bottom:var(--s4);right:var(--s4);width:min(360px,calc(100vw - var(--s4)*2));
-  background:rgba(19,17,16,.88);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);
-  border:1px solid var(--edge);border-radius:var(--r-md);padding:var(--s3);
-  box-shadow:0 18px 50px -18px rgba(0,0,0,.85)}
-#era header{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:10px}
-#era h3{margin:0;font-family:var(--f-mono);font-size:var(--t-micro);letter-spacing:.14em;
-  text-transform:uppercase;color:var(--i-low);font-weight:400}
-#era output{font-family:var(--f-mono);font-size:var(--t-small);color:var(--a-bright)}
-#era input{width:100%;accent-color:var(--a);background:none}
-.era-ticks{display:flex;justify-content:space-between;font-family:var(--f-mono);
-  font-size:var(--t-micro);color:var(--i-low);margin-top:6px}
-#era .note{margin:8px 0 0;font-size:var(--t-micro);color:var(--i-low);line-height:1.45}
-
-/* result rail — keyboard parity for pins */
-#rail{position:absolute;top:140px;left:var(--s4);width:300px;max-height:52vh;overflow-y:auto;
-  background:rgba(19,17,16,.9);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);
-  border:1px solid var(--edge);border-radius:var(--r-md);padding:var(--s2);
-  box-shadow:0 18px 50px -18px rgba(0,0,0,.85);scrollbar-width:thin}
-#rail h3{margin:var(--s2);font-family:var(--f-mono);font-size:var(--t-micro);letter-spacing:.14em;
-  text-transform:uppercase;color:var(--i-low);font-weight:400}
-.rrow{display:block;width:100%;text-align:left;padding:9px var(--s2);border-radius:var(--r-sm);
-  transition:background var(--d-quick) linear}
-.rrow:hover,.rrow:focus-visible{background:rgba(244,239,229,.06)}
-.rrow b{display:block;font-size:var(--t-small);font-weight:500}
-.rrow span{display:block;font-family:var(--f-mono);font-size:var(--t-micro);color:var(--i-low);margin-top:2px}
-
-/* ============================================================
-   RECORD — a sheet over the LIVE map. Not a page load.
-   ============================================================ */
-/* sits below the mast so its sticky back-control is never occluded by it */
-#sheet{position:fixed;top:58px;right:0;bottom:0;width:min(620px,100vw);z-index:30;
-  background:linear-gradient(180deg,rgba(28,25,22,.97),rgba(19,17,16,.98));
-  backdrop-filter:blur(26px);-webkit-backdrop-filter:blur(26px);
-  border-left:1px solid var(--edge-strong);
-  box-shadow:-40px 0 90px -30px rgba(0,0,0,.92);
-  overflow-y:auto;overscroll-behavior:contain;
-  transform:translateX(100%);transition:transform var(--d-move) var(--e-out);}
-body[data-view="record"] #sheet{transform:none}
-.sh-top{position:sticky;top:0;z-index:2;display:flex;align-items:center;gap:var(--s2);
-  padding:var(--s3) var(--s4);
-  background:linear-gradient(180deg,rgba(28,25,22,.98),rgba(28,25,22,.72));
-  backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
-  border-bottom:1px solid var(--edge)}
-.sh-back{display:inline-flex;align-items:center;gap:8px;font-size:var(--t-small);color:var(--i-mid);
-  padding:7px 13px;border-radius:var(--r-pill);border:1px solid var(--edge);
-  transition:border-color var(--d-quick) linear,color var(--d-quick) linear}
-.sh-back:hover{border-color:var(--a);color:var(--i-high)}
-.sh-body{padding:var(--s4) var(--s4) var(--s6)}
-.sh-kind{font-family:var(--f-mono);font-size:var(--t-micro);letter-spacing:.18em;text-transform:uppercase;
-  color:var(--a);display:block;margin-bottom:var(--s2)}
-.sh-h{font-family:var(--f-display);font-size:var(--t-title);line-height:1.1;margin:0 0 var(--s2);
-  letter-spacing:-.02em}
-.sh-place{font-size:var(--t-small);color:var(--i-mid);margin:0 0 var(--s4)}
-.sh-fig{height:170px;border-radius:var(--r-md);margin-bottom:var(--s4);border:1px solid var(--edge);
-  background:
-    repeating-linear-gradient(42deg,rgba(208,122,50,.07) 0 12px,transparent 12px 26px),
-    linear-gradient(145deg,#2b2320,#17140f);
-  display:grid;place-items:center;position:relative;overflow:hidden}
-.sh-fig span{font-family:var(--f-mono);font-size:var(--t-micro);color:var(--i-low);letter-spacing:.12em;
-  text-transform:uppercase}
-
-/* evidence — ONE vocabulary, stated in plain words */
-.ev{border:1px solid var(--edge);border-radius:var(--r-md);padding:var(--s3);margin-bottom:var(--s4);
-  background:rgba(11,10,9,.42)}
-.ev-top{display:flex;align-items:center;gap:10px;margin-bottom:10px}
-.ev-dots{display:flex;gap:3px}
-.ev-dots i{width:7px;height:7px;border-radius:var(--r-pill);background:var(--edge-strong)}
-.ev-dots i.on{background:var(--a)}
-.ev-label{font-size:var(--t-small);font-weight:600}
-.ev-plain{margin:0;font-size:var(--t-small);color:var(--i-mid);line-height:1.5}
-.ev-src{margin:10px 0 0;padding-top:10px;border-top:1px solid var(--edge);
-  font-family:var(--f-mono);font-size:var(--t-micro);color:var(--i-low);line-height:1.6}
-.ev-src a{color:var(--a);text-decoration:none;border-bottom:1px solid var(--a-dim)}
-
-.sh-sec{margin-bottom:var(--s4)}
-.sh-sec h3{font-family:var(--f-mono);font-size:var(--t-micro);letter-spacing:.16em;text-transform:uppercase;
-  color:var(--i-low);font-weight:400;margin:0 0 10px;padding-bottom:8px;border-bottom:1px solid var(--edge)}
-.sh-sec p{margin:0 0 var(--s2);color:var(--i-mid);font-size:var(--t-body)}
-.sh-sec p a{color:var(--a-bright);text-decoration:none;border-bottom:1px solid rgba(208,122,50,.4)}
-.sh-sec p a:hover{border-bottom-color:var(--a-bright)}
-.chips{display:flex;flex-wrap:wrap;gap:var(--s2)}
-.chip{display:inline-flex;align-items:center;gap:7px;padding:8px 13px;border-radius:var(--r-pill);
-  border:1px solid var(--edge);font-size:var(--t-small);color:var(--i-mid);
-  transition:border-color var(--d-quick) linear,color var(--d-quick) linear}
-.chip:hover{border-color:var(--a);color:var(--i-high)}
-.chip i{width:6px;height:6px;border-radius:var(--r-pill);background:var(--a);flex:none}
-
-/* ============================================================
-   STORY — reading posture. The map docks, it does not vanish.
-   ============================================================ */
-#story{position:fixed;inset:0;z-index:25;overflow-y:auto;overscroll-behavior:contain;
-  opacity:0;pointer-events:none;transition:opacity var(--d-move) var(--e-soft)}
-body[data-view="story"] #story{opacity:1;pointer-events:auto}
-.st-wrap{max-width:720px;margin:0 auto;padding:120px var(--s4) var(--s6)}
-.st-kicker{font-family:var(--f-mono);font-size:var(--t-micro);letter-spacing:.2em;text-transform:uppercase;
-  color:var(--a);display:block;margin-bottom:var(--s3)}
-.st-h{font-family:var(--f-display);font-size:clamp(36px,5.5vw,58px);line-height:1.04;
-  letter-spacing:-.025em;margin:0 0 var(--s3)}
-.st-meta{font-family:var(--f-mono);font-size:var(--t-micro);color:var(--i-low);margin:0 0 var(--s5);
-  padding-bottom:var(--s3);border-bottom:1px solid var(--edge)}
-.st-wrap p{font-family:var(--f-display);font-size:var(--t-lead);line-height:1.72;
-  color:#e6ded2;margin:0 0 var(--s4);max-width:66ch}
-.st-wrap p.lead{font-size:25px;color:var(--i-high)}
-/* entity links are visible by default — today they are 5 in 8,661 words */
-.elink{color:var(--i-high);text-decoration:none;
-  background:linear-gradient(transparent 62%,rgba(208,122,50,.3) 62%);
-  border-bottom:1px solid var(--a-dim);padding-bottom:1px;
-  transition:background var(--d-quick) linear}
-.elink:hover{background:linear-gradient(transparent 0%,rgba(208,122,50,.3) 0%)}
-.cite{font-family:var(--f-mono);font-size:var(--t-micro);color:var(--a);vertical-align:super;
-  text-decoration:none;padding:0 2px}
-
-/* MAP MOMENT — the loved effect, inside the prose */
-.moment{margin:var(--s5) 0;border-radius:var(--r-lg);border:1px solid var(--edge);overflow:hidden;
-  background:rgba(11,10,9,.5);
-  opacity:0;transform:translateY(26px);
-  transition:opacity var(--d-move) var(--e-soft),transform var(--d-move) var(--e-out)}
-.moment.is-live{opacity:1;transform:none}
-.moment .win{height:320px;position:relative;
-  background:linear-gradient(180deg,rgba(11,10,9,.25),rgba(11,10,9,.65))}
-.moment .lbl{position:absolute;left:var(--s3);bottom:var(--s3);
-  font-family:var(--f-mono);font-size:var(--t-micro);letter-spacing:.14em;text-transform:uppercase;
-  color:var(--i-high);background:rgba(11,10,9,.72);padding:7px 12px;border-radius:var(--r-pill);
-  border:1px solid var(--edge)}
-.moment figcaption{padding:var(--s3);font-size:var(--t-small);color:var(--i-mid);
-  border-top:1px solid var(--edge);font-family:var(--f-ui)}
-
-/* the handoff today's URL vocabulary cannot express */
-.setbox{margin:var(--s5) 0;padding:var(--s4);border-radius:var(--r-lg);
-  border:1px solid rgba(208,122,50,.32);background:rgba(208,122,50,.07)}
-.setbox h3{margin:0 0 var(--s2);font-family:var(--f-display);font-size:var(--t-lead);letter-spacing:-.01em}
-.setbox p{font-family:var(--f-ui);font-size:var(--t-small);color:var(--i-mid);margin:0 0 var(--s3);line-height:1.55}
-
-#stclose{position:fixed;top:var(--s3);right:var(--s4);z-index:41;
-  padding:9px 15px;border-radius:var(--r-pill);font-size:var(--t-small);
-  background:rgba(19,17,16,.9);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
-  border:1px solid var(--edge);color:var(--i-mid);display:none}
-body[data-view="story"] #stclose{display:block}
-#stclose:hover{border-color:var(--a);color:var(--i-high)}
-
-/* reading progress — real, announced, not aria-hidden decoration */
-#stbar{position:fixed;top:0;left:0;height:2px;background:var(--a);z-index:42;width:0;
-  transition:width 90ms linear;display:none}
-body[data-view="story"] #stbar{display:block}
-
-/* ============================================================
-   FIX ANNOTATIONS — toggled overlay tying demo to audit
-   ============================================================ */
-.fixtag{position:fixed;z-index:60;max-width:270px;padding:11px var(--s3);border-radius:var(--r-md);
-  background:#141d26;border:1px solid #2f6187;color:#cfe4f5;font-size:var(--t-micro);line-height:1.5;
-  box-shadow:0 16px 40px -14px rgba(0,0,0,.9);display:none}
-body[data-fixes="on"] .fixtag{display:block}
-.fixtag b{display:block;color:#7fc3f5;font-family:var(--f-mono);font-size:var(--t-micro);
-  letter-spacing:.1em;text-transform:uppercase;margin-bottom:5px}
-#fixbtn{position:fixed;right:var(--s4);bottom:var(--s4);z-index:45;
-  padding:10px var(--s3);border-radius:var(--r-pill);font-size:var(--t-micro);
-  background:rgba(19,17,16,.9);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
-  border:1px solid var(--edge);color:var(--i-mid)}
-#fixbtn:hover{border-color:var(--a);color:var(--i-high)}
-body[data-fixes="on"] #fixbtn{background:#1d3448;border-color:#2f6187;color:#9fd3f8}
-/* clears the era panel (bottom-right) and the thread (bottom-left) */
-body[data-view="field"] #fixbtn{bottom:calc(var(--s4) + 158px)}
-body[data-view="record"] #fixbtn{left:var(--s4);right:auto;bottom:calc(var(--s4) + 68px)}
-
-/* live region */
+:focus-visible{outline:2px solid var(--a-hi);outline-offset:3px;border-radius:4px}
 .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
 
 /* ============================================================
-   PHONE — the map is NOT a dead band. One breakpoint.
+   THE GROUND
+   ============================================================ */
+#ground{position:fixed;inset:0;overflow:hidden;z-index:0;
+  background:radial-gradient(130% 95% at 48% 8%,#191411 0%,var(--void) 72%)}
+#plate{position:absolute;top:0;left:0;width:960px;height:526.29px;transform-origin:0 0;
+  transition:transform var(--d-fly) var(--e-out);will-change:transform}
+#plate svg{display:block;width:960px;height:526.29px;overflow:visible}
+#plate svg g{fill:#43362a !important;fill-opacity:1 !important}
+#plate svg path{stroke:rgba(243,238,228,.09);stroke-width:.4;vector-effect:non-scaling-stroke}
+
+/* --- ABSENCE, RENDERED ---------------------------------------
+   The ground states its own epistemic condition. A cold hatch
+   means "the record-keeping of this era did not name these
+   people". It is never the same colour as a record. ---------- */
+#unrecorded{position:absolute;inset:0;pointer-events:none;opacity:0;
+  transition:opacity var(--d-move) var(--e-soft);
+  background:repeating-linear-gradient(135deg,
+    rgba(111,140,163,.22) 0 2px, transparent 2px 9px);
+  mix-blend-mode:screen}
+body[data-regime="unnamed"] #unrecorded{opacity:1}
+
+/* marks */
+.mark{position:absolute;width:0;height:0}
+.mark i{position:absolute;left:0;top:0;display:block;
+  width:var(--w,9px);height:var(--w,9px);margin:calc(var(--w,9px)/-2);
+  border-radius:var(--r-pill);background:var(--a);
+  box-shadow:0 0 0 1px rgba(10,9,8,.8);
+  transform:scale(calc(1/var(--z,1)));transform-origin:50% 50%;
+  opacity:var(--conf,.85);cursor:pointer;
+  transition:opacity var(--d-move) var(--e-soft)}
+.mark.ctx i{cursor:default}
+.mark.off{display:none}
+.mark.dim i{opacity:.1}
+.mark.sel i{background:var(--a-hi);opacity:1;
+  box-shadow:0 0 0 1px var(--void),0 0 0 calc(6px*(1/var(--z,1))) rgba(235,152,80,.26)}
+/* evidence is visible ON the ground, not only in a panel */
+.mark.g1 i{width:var(--w,7px);height:var(--w,7px);
+  background:transparent;border:1.5px dashed var(--a-lo);box-shadow:none}
+
+#scrim{position:fixed;inset:0;z-index:1;pointer-events:none;
+  transition:background var(--d-fly) var(--e-soft)}
+body[data-mode="ground"] #scrim{background:linear-gradient(180deg,rgba(10,9,8,.82) 0%,rgba(10,9,8,0) 20%,rgba(10,9,8,0) 62%,rgba(10,9,8,.86) 100%)}
+body[data-mode="thread"] #scrim{background:linear-gradient(97deg,rgba(10,9,8,.9) 0%,rgba(10,9,8,.5) 44%,rgba(10,9,8,.1) 72%)}
+body[data-mode="record"] #scrim{background:linear-gradient(90deg,rgba(10,9,8,.25) 0%,rgba(10,9,8,.6) 42%,rgba(10,9,8,.92) 68%)}
+body[data-mode="register"] #scrim{background:rgba(10,9,8,.72)}
+
+/* ============================================================
+   MAST — where + what. No destinations.
+   ============================================================ */
+#mast{position:fixed;top:0;left:0;right:0;z-index:40;display:flex;align-items:center;
+  gap:var(--s3);padding:var(--s3) var(--s4);pointer-events:none;
+  background:linear-gradient(180deg,rgba(10,9,8,.92),rgba(10,9,8,0))}
+#mast>*{pointer-events:auto}
+.brand{display:flex;align-items:center;gap:9px;font-family:var(--f-display);font-size:19px}
+.brand b{font-weight:600}.brand span{color:var(--a)}
+.glyph{width:21px;height:21px;border-radius:5px;background:linear-gradient(145deg,var(--a),var(--a-lo));
+  display:grid;place-items:center;font-family:var(--f-mono);font-size:var(--t-micro);color:#190e06;font-weight:700}
+#where{margin-left:auto;display:flex;align-items:center;gap:var(--s2);
+  background:rgba(27,25,23,.86);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
+  border:1px solid var(--edge);border-radius:var(--r-pill);padding:9px var(--s3);width:min(360px,40vw);
+  transition:border-color var(--d-quick) linear}
+#where:focus-within{border-color:var(--a)}
+#where input{flex:1;background:none;border:0;outline:none;color:var(--ink);font-size:var(--t-sm)}
+#where input::placeholder{color:var(--ink-3)}
+.mbtn{padding:9px var(--s3);border-radius:var(--r-pill);font-size:var(--t-sm);
+  background:rgba(27,25,23,.86);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
+  border:1px solid var(--edge);color:var(--ink-2);white-space:nowrap;
+  transition:border-color var(--d-quick) linear,color var(--d-quick) linear}
+.mbtn:hover{border-color:var(--a);color:var(--ink)}
+.mbtn[aria-pressed="true"]{background:var(--a);color:#190e06;border-color:var(--a);font-weight:600}
+
+/* ============================================================
+   THE DECADE SPINE — time as a real control.
+   Replaces scroll-as-time. Tick length = how much the archive
+   holds here, so the control is also the honesty display.
+   ============================================================ */
+#spine{position:fixed;right:0;top:0;bottom:0;width:132px;z-index:35;
+  display:flex;flex-direction:column;justify-content:center;gap:0;
+  padding:var(--s6) var(--s3) var(--s6) 0;pointer-events:auto}
+body[data-mode="record"] #spine,body[data-mode="register"] #spine{opacity:.25;pointer-events:none}
+#spine{transition:opacity var(--d-move) var(--e-soft)}
+.dec{position:relative;flex:1;display:flex;align-items:center;justify-content:flex-end;
+  gap:9px;padding-right:var(--s2);cursor:pointer;min-height:0}
+.dec .yr{font-family:var(--f-mono);font-size:var(--t-micro);color:var(--ink-3);
+  opacity:0;transition:opacity var(--d-quick) linear;white-space:nowrap}
+.dec:hover .yr,.dec.edge .yr{opacity:1}
+.dec.edge .yr{color:var(--a-hi)}
+.dec .bar{height:2px;border-radius:2px;background:var(--a);opacity:.5;
+  transition:width var(--d-move) var(--e-out),opacity var(--d-quick) linear,background var(--d-quick) linear}
+.dec:hover .bar{opacity:.85}
+.dec[aria-current="true"] .bar{opacity:1;background:var(--a-hi);height:3px}
+/* an era the census did not name is marked cold, never as "zero" */
+.dec[data-regime="unnamed"] .bar{background:var(--cold);opacity:.4}
+.dec[data-regime="unnamed"][aria-current="true"] .bar{background:var(--cold);opacity:1}
+#spinelbl{position:fixed;right:var(--s3);top:var(--s4);z-index:36;
+  font-family:var(--f-mono);font-size:var(--t-micro);letter-spacing:.14em;
+  text-transform:uppercase;color:var(--ink-3)}
+body[data-mode="record"] #spinelbl,body[data-mode="register"] #spinelbl{opacity:.25}
+
+/* ============================================================
+   CONDITIONS — census as the ambient state of the ground,
+   not a page you visit.
+   ============================================================ */
+#cond{position:fixed;left:var(--s4);bottom:var(--s4);z-index:34;width:min(430px,46vw);
+  background:rgba(18,17,16,.9);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+  border:1px solid var(--edge);border-radius:var(--r-lg);padding:var(--s3) var(--s4) var(--s4);
+  box-shadow:0 24px 64px -24px rgba(0,0,0,.9);
+  transition:transform var(--d-move) var(--e-out),opacity var(--d-move) var(--e-soft)}
+body[data-mode="record"] #cond,body[data-mode="register"] #cond{transform:translateY(130%);opacity:0;pointer-events:none}
+.cond-h{display:flex;align-items:baseline;gap:var(--s2);margin-bottom:var(--s3);
+  padding-bottom:10px;border-bottom:1px solid var(--edge)}
+.cond-place{font-family:var(--f-display);font-size:var(--t-lead);letter-spacing:-.01em}
+.cond-yr{font-family:var(--f-mono);font-size:var(--t-sm);color:var(--a-hi);margin-left:auto}
+.cond-row{display:flex;gap:var(--s4);margin-bottom:var(--s3)}
+.cond-row>div{min-width:0}
+.cond-row b{display:block;font-family:var(--f-mono);font-size:var(--t-lead);font-weight:600;
+  line-height:1.2;transition:color var(--d-move) linear}
+.cond-row span{font-family:var(--f-mono);font-size:var(--t-micro);color:var(--ink-3);
+  letter-spacing:.1em;text-transform:uppercase}
+/* the regime note is not a disclaimer in a drawer. it is the headline fact. */
+.regime{display:flex;gap:10px;padding:11px var(--s3);border-radius:var(--r-md);
+  font-size:var(--t-sm);line-height:1.5;color:var(--ink-2);
+  background:rgba(111,140,163,.1);border:1px solid rgba(111,140,163,.3)}
+.regime.named{background:rgba(208,122,50,.08);border-color:rgba(208,122,50,.26)}
+.regime i{flex:none;width:7px;height:7px;border-radius:var(--r-pill);background:var(--cold);margin-top:7px}
+.regime.named i{background:var(--a)}
+.regime+.regime{margin-top:var(--s2)}
+.coll-basis{font-family:var(--f-mono);font-size:var(--t-micro);color:var(--a-hi);
+  letter-spacing:.06em;margin:0 0 var(--s3);line-height:1.5}
+.unmap{font-family:var(--f-mono);font-size:var(--t-micro);color:var(--cold);
+  line-height:1.55;margin:0 0 var(--s3)}
+.censusbtn{margin-top:var(--s3);width:100%;min-height:44px;padding:10px;border-radius:var(--r-md);
+  border:1px solid var(--edge);color:var(--ink-2);font-size:var(--t-sm);
+  transition:border-color var(--d-quick) linear,color var(--d-quick) linear}
+.censusbtn:hover{border-color:var(--a);color:var(--ink)}
+.censusbtn[aria-pressed="true"]{border-color:var(--a);color:var(--ink)}
+#censusbox{margin-top:var(--s3);padding-top:var(--s3);border-top:1px solid var(--edge)}
+.censusnote{display:flex;flex-direction:column;gap:7px;margin:var(--s2) 0 0;
+  font-family:var(--f-mono);font-size:var(--t-micro);color:var(--ink-3);line-height:1.55}
+.dec.edge .bar{box-shadow:0 0 0 1px var(--a-hi)}
+
+/* ============================================================
+   THREADS — scroll-driven narrative. The loved effect, now the
+   universal storytelling primitive instead of a door you leave.
+   ============================================================ */
+#thread{position:fixed;inset:0;z-index:20;overflow-y:auto;overscroll-behavior:contain;
+  opacity:0;pointer-events:none;transition:opacity var(--d-move) var(--e-soft)}
+body[data-mode="thread"] #thread{opacity:1;pointer-events:auto}
+.step{min-height:100svh;display:flex;align-items:center;padding:0 var(--s6)}
+.step-card{width:min(440px,100%);padding:var(--s4);border-radius:var(--r-lg);
+  background:linear-gradient(165deg,rgba(27,25,23,.94),rgba(18,17,16,.9));
+  backdrop-filter:blur(22px) saturate(1.15);-webkit-backdrop-filter:blur(22px) saturate(1.15);
+  border:1px solid var(--edge);
+  box-shadow:0 30px 78px -26px rgba(0,0,0,.92),inset 0 1px 0 rgba(243,238,228,.07);
+  opacity:0;transform:translateY(30px) scale(.987);
+  transition:opacity var(--d-move) var(--e-soft),transform var(--d-move) var(--e-out)}
+.step.live .step-card{opacity:1;transform:none}
+.step:first-child .step-card{opacity:1;transform:none}
+.step-at{font-family:var(--f-mono);font-size:var(--t-micro);color:var(--a);
+  letter-spacing:.16em;display:flex;align-items:center;gap:10px;margin-bottom:var(--s3)}
+.step-at::after{content:"";flex:1;height:1px;background:linear-gradient(90deg,var(--a-lo),transparent)}
+.step-h{font-family:var(--f-display);font-size:var(--t-title);line-height:1.14;
+  letter-spacing:-.02em;margin:0 0 var(--s3)}
+.step-h em{font-style:italic;color:var(--a-hi)}
+.step-p{font-size:var(--t-body);color:var(--ink-2);margin:0 0 var(--s3)}
+.step-p a{color:var(--ink);text-decoration:none;
+  background:linear-gradient(transparent 62%,rgba(208,122,50,.3) 62%);
+  border-bottom:1px solid var(--a-lo)}
+.srcline{font-family:var(--f-mono);font-size:var(--t-micro);color:var(--ink-3);
+  line-height:1.6;padding-top:10px;border-top:1px solid var(--edge);margin:var(--s3) 0 0}
+
+/* DIGNITY: at a site of violence the camera does not perform. */
+.step.still .step-card{border-color:rgba(111,140,163,.4)}
+.still-note{display:flex;gap:9px;align-items:flex-start;margin:0 0 var(--s3);
+  font-family:var(--f-mono);font-size:var(--t-micro);line-height:1.6;color:#9db4c6}
+.still-note i{flex:none;width:7px;height:7px;border-radius:var(--r-pill);
+  background:var(--cold);margin-top:6px}
+
+/* a link that is juxtaposition, not documented causation, says so */
+.adj{border-bottom:1px dotted var(--ink-3) !important;background:none !important;color:var(--ink-2) !important}
+
+#tprog{position:fixed;top:0;left:0;height:2px;background:var(--a);z-index:42;width:0;display:none}
+body[data-mode="thread"] #tprog{display:block}
+#texit{position:fixed;top:var(--s3);right:var(--s3);z-index:41;display:none}
+body[data-mode="thread"] #texit{display:block}
+
+/* ============================================================
+   THE REGISTER — the same state, projected as a list.
+   A lens over the ground, not a different place.
+   ============================================================ */
+#reg{position:fixed;left:0;right:0;bottom:0;top:84px;z-index:30;
+  background:linear-gradient(180deg,rgba(18,17,16,.97),rgba(10,9,8,.99));
+  backdrop-filter:blur(26px);-webkit-backdrop-filter:blur(26px);
+  border-top:1px solid var(--edge-hi);border-radius:var(--r-lg) var(--r-lg) 0 0;
+  transform:translateY(101%);transition:transform var(--d-move) var(--e-out);
+  display:flex;flex-direction:column}
+body[data-mode="register"] #reg{transform:none}
+.reg-top{display:flex;align-items:center;gap:var(--s3);padding:var(--s3) var(--s4);
+  border-bottom:1px solid var(--edge);flex-wrap:wrap}
+.reg-ttl{font-family:var(--f-display);font-size:var(--t-lead)}
+.reg-sub{font-family:var(--f-mono);font-size:var(--t-micro);color:var(--ink-3);
+  letter-spacing:.1em;text-transform:uppercase}
+.reg-sort{display:flex;gap:2px;background:rgba(10,9,8,.6);border:1px solid var(--edge);
+  border-radius:var(--r-pill);padding:3px;margin-left:auto}
+.reg-sort button{padding:6px 13px;border-radius:var(--r-pill);font-size:var(--t-micro);color:var(--ink-2)}
+.reg-sort button[aria-pressed="true"]{background:var(--a);color:#190e06;font-weight:600}
+/* the query controls: canonical, keyboard-reachable, independent of the camera */
+.reg-q{display:flex;flex-wrap:wrap;gap:var(--s3);align-items:flex-end;
+  padding:var(--s3) var(--s4);border-bottom:1px solid var(--edge);background:rgba(10,9,8,.4)}
+.reg-q label{display:flex;flex-direction:column;gap:5px;font-family:var(--f-mono);
+  font-size:var(--t-micro);letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3)}
+.reg-q select{min-height:38px;padding:7px 10px;border-radius:var(--r-sm);
+  background:var(--raised);color:var(--ink);border:1px solid var(--edge);
+  font-family:var(--f-ui);font-size:var(--t-sm);text-transform:none;letter-spacing:0}
+.reg-q select:focus-visible{border-color:var(--a)}
+.nomap{font-family:var(--f-mono);font-size:var(--t-micro);color:var(--cold);
+  font-weight:400;letter-spacing:.06em}
+.reg-body{flex:1;overflow-y:auto;padding:var(--s2) var(--s4) var(--s6)}
+.reg-row{display:grid;grid-template-columns:1fr 150px 74px 108px;gap:var(--s3);align-items:center;
+  width:100%;text-align:left;padding:13px var(--s3);border-radius:var(--r-sm);
+  border-bottom:1px solid var(--edge);transition:background var(--d-quick) linear}
+.reg-row:hover{background:rgba(243,238,228,.05)}
+.reg-row b{font-weight:500;font-size:var(--t-body)}
+.reg-row .m{font-family:var(--f-mono);font-size:var(--t-micro);color:var(--ink-3)}
+.reg-head{display:grid;grid-template-columns:1fr 150px 74px 108px;gap:var(--s3);
+  padding:0 var(--s3) 10px;font-family:var(--f-mono);font-size:var(--t-micro);
+  color:var(--ink-3);letter-spacing:.1em;text-transform:uppercase;border-bottom:1px solid var(--edge-hi)}
+.ev-pips{display:inline-flex;gap:3px}
+.ev-pips i{width:6px;height:6px;border-radius:var(--r-pill);background:var(--edge-hi)}
+.ev-pips i.on{background:var(--a)}
+
+/* ============================================================
+   THE RECORD — the one true document. Citable terminus.
+   ============================================================ */
+#rec{position:fixed;top:0;right:0;bottom:0;width:min(640px,100vw);z-index:32;
+  background:linear-gradient(180deg,rgba(27,25,23,.98),rgba(18,17,16,.99));
+  backdrop-filter:blur(26px);-webkit-backdrop-filter:blur(26px);
+  border-left:1px solid var(--edge-hi);box-shadow:-44px 0 96px -32px rgba(0,0,0,.94);
+  overflow-y:auto;overscroll-behavior:contain;
+  transform:translateX(101%);transition:transform var(--d-move) var(--e-out)}
+body[data-mode="record"] #rec{transform:none}
+.rec-top{position:sticky;top:0;z-index:2;display:flex;align-items:center;gap:var(--s2);
+  padding:var(--s3) var(--s4);border-bottom:1px solid var(--edge);
+  background:linear-gradient(180deg,rgba(27,25,23,.99),rgba(27,25,23,.8));
+  backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px)}
+.tbtn{display:inline-flex;align-items:center;gap:8px;font-size:var(--t-sm);color:var(--ink-2);
+  padding:7px 13px;border-radius:var(--r-pill);border:1px solid var(--edge);
+  transition:border-color var(--d-quick) linear,color var(--d-quick) linear}
+.tbtn:hover{border-color:var(--a);color:var(--ink)}
+.rec-body{padding:var(--s4) var(--s4) var(--s6)}
+.rec-kind{font-family:var(--f-mono);font-size:var(--t-micro);letter-spacing:.18em;
+  text-transform:uppercase;color:var(--a);display:block;margin-bottom:var(--s2)}
+.rec-h{font-family:var(--f-display);font-size:var(--t-title);line-height:1.1;
+  margin:0 0 var(--s2);letter-spacing:-.02em}
+.rec-sub{font-size:var(--t-sm);color:var(--ink-2);margin:0 0 var(--s4)}
+.rec-fig{height:178px;border-radius:var(--r-md);margin-bottom:var(--s4);border:1px solid var(--edge);
+  background:repeating-linear-gradient(42deg,rgba(208,122,50,.06) 0 12px,transparent 12px 26px),
+    linear-gradient(145deg,#2a2220,#15120e);display:grid;place-items:center}
+.rec-fig span{font-family:var(--f-mono);font-size:var(--t-micro);color:var(--ink-3);
+  letter-spacing:.12em;text-transform:uppercase}
+
+/* ONE confidence vocabulary, in plain words, never a grade letter */
+.conf{border:1px solid var(--edge);border-radius:var(--r-md);padding:var(--s3);
+  margin-bottom:var(--s4);background:rgba(10,9,8,.45)}
+.conf-top{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.conf-w{font-size:var(--t-sm);font-weight:600}
+.conf p{margin:0;font-size:var(--t-sm);color:var(--ink-2);line-height:1.55}
+.conf .src{margin:10px 0 0;padding-top:10px;border-top:1px solid var(--edge);
+  font-family:var(--f-mono);font-size:var(--t-micro);color:var(--ink-3);line-height:1.65}
+
+/* the citation block — this product's URLs ARE citations */
+.cite-box{border:1px solid rgba(208,122,50,.3);background:rgba(208,122,50,.06);
+  border-radius:var(--r-md);padding:var(--s3);margin-bottom:var(--s4)}
+.cite-box h3{margin:0 0 9px;font-family:var(--f-mono);font-size:var(--t-micro);
+  letter-spacing:.14em;text-transform:uppercase;color:var(--a);font-weight:400}
+.cite-box code{display:block;font-family:var(--f-mono);font-size:var(--t-micro);
+  color:var(--ink);background:rgba(10,9,8,.6);padding:10px;border-radius:var(--r-sm);
+  word-break:break-all;line-height:1.6;margin-bottom:9px}
+.cite-box p{margin:0;font-size:var(--t-micro);color:var(--ink-3);line-height:1.55}
+
+.rec-sec{margin-bottom:var(--s4)}
+.rec-sec h3{font-family:var(--f-mono);font-size:var(--t-micro);letter-spacing:.16em;
+  text-transform:uppercase;color:var(--ink-3);font-weight:400;margin:0 0 10px;
+  padding-bottom:8px;border-bottom:1px solid var(--edge)}
+.rec-sec p{margin:0 0 var(--s2);color:var(--ink-2)}
+.chips{display:flex;flex-wrap:wrap;gap:var(--s2)}
+.chip{display:inline-flex;align-items:center;gap:7px;padding:8px 13px;border-radius:var(--r-pill);
+  border:1px solid var(--edge);font-size:var(--t-sm);color:var(--ink-2);
+  transition:border-color var(--d-quick) linear,color var(--d-quick) linear}
+.chip:hover{border-color:var(--a);color:var(--ink)}
+.chip i{width:6px;height:6px;border-radius:var(--r-pill);background:var(--a);flex:none}
+.chip.adjc i{background:var(--ink-3)}
+.relnote{font-family:var(--f-mono);font-size:var(--t-micro);color:var(--ink-3);
+  margin:10px 0 0;line-height:1.55}
+
+/* sensitivity: stated before the content, never a surprise */
+.sens{display:flex;gap:10px;padding:12px var(--s3);border-radius:var(--r-md);
+  background:rgba(111,140,163,.1);border:1px solid rgba(111,140,163,.32);
+  font-size:var(--t-sm);line-height:1.5;color:#b9cbd8;margin-bottom:var(--s4)}
+.sens i{flex:none;width:7px;height:7px;border-radius:var(--r-pill);background:var(--cold);margin-top:7px}
+
+/* ============================================================
+   ANNOTATIONS
+   ============================================================ */
+.tag{position:fixed;z-index:60;max-width:262px;padding:11px var(--s3);border-radius:var(--r-md);
+  background:#131d26;border:1px solid #2e6187;color:#cfe4f5;font-size:var(--t-micro);
+  line-height:1.5;box-shadow:0 16px 42px -14px rgba(0,0,0,.9);display:none}
+body[data-tags="on"] .tag{display:block}
+.tag b{display:block;color:#7fc3f5;font-family:var(--f-mono);font-size:var(--t-micro);
+  letter-spacing:.1em;text-transform:uppercase;margin-bottom:5px}
+#tagbtn{position:fixed;left:var(--s4);top:76px;z-index:45;padding:9px var(--s3);
+  border-radius:var(--r-pill);font-size:var(--t-micro);background:rgba(18,17,16,.9);
+  backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
+  border:1px solid var(--edge);color:var(--ink-3)}
+#tagbtn:hover{border-color:var(--a);color:var(--ink)}
+body[data-tags="on"] #tagbtn{background:#1c3448;border-color:#2e6187;color:#9fd3f8}
+
+/* ============================================================
+   PHONE — the ground is live here too. One breakpoint.
    ============================================================ */
 @media (max-width:820px){
-  :root{--s4:18px;--s5:32px;--s6:26px}
-  #mast{padding:12px var(--s3);gap:10px}
-  .navset{display:none}
-  #seek{width:auto;flex:1}
-  .chapter{padding:0 var(--s3);min-height:100svh;align-items:flex-end;padding-bottom:132px}
-  .chapter[data-side="end"]{justify-content:flex-start}
-  .card{width:100%;padding:var(--s3)}
-  #open-card .ch-h{font-size:clamp(40px,13vw,62px)}
-  .ch-h{font-size:27px}
-  #spine{right:10px;gap:8px}
-  #thread{left:var(--s3);right:var(--s3);bottom:76px;max-width:none}
-  .th-seg{padding:8px 11px}
-  .th-seg.opt{display:none}
-  #sheet{width:100vw;top:auto;height:88svh;border-left:0;border-top:1px solid var(--edge-strong);
-    border-radius:var(--r-lg) var(--r-lg) 0 0;transform:translateY(100%)}
-  body[data-view="record"] #sheet{transform:none}
-  #rail{display:none}
-  #lens{top:70px;left:var(--s3);right:var(--s3);max-width:none}
-  .lens-g{overflow-x:auto}
-  #era{left:var(--s3);right:var(--s3);width:auto;bottom:76px}
-  .st-wrap{padding:96px var(--s3) var(--s6)}
-  .st-wrap p{font-size:19px}
-  .st-wrap p.lead{font-size:21px}
-  .moment .win{height:240px}
-  /* clears the phone tab bar */
-  #fixbtn{bottom:72px;right:12px;left:auto}
-  body[data-view="field"] #fixbtn{bottom:calc(72px + 150px)}
-  body[data-view="record"] #fixbtn{bottom:72px;left:auto;right:12px}
-  .fixtag{max-width:min(270px,calc(100vw - 24px))}
-}
-#tabs{display:none;position:fixed;left:0;right:0;bottom:0;z-index:39;
-  background:rgba(11,10,9,.95);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);
-  border-top:1px solid var(--edge);padding:6px 0 calc(6px + env(safe-area-inset-bottom))}
-#tabs button{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:6px 0;
-  font-family:var(--f-mono);font-size:var(--t-micro);letter-spacing:.1em;text-transform:uppercase;color:var(--i-low)}
-#tabs button b{width:17px;height:17px;border-radius:5px;border:1.5px solid currentColor;display:block}
-#tabs button[aria-current="true"]{color:var(--a)}
-#tabs button[aria-current="true"] b{background:rgba(208,122,50,.22)}
+  :root{--s4:16px;--s5:28px;--s6:22px}
+  /* the mast carries only identity and place. actions live in the thumb zone. */
+  #mast{padding:10px var(--s3);gap:9px}
+  .brand span,.brand b,#openreg,#startthread,#memorial{display:none}
+  #where{width:auto;flex:1;margin-left:0}
 
-/* declared after the base rule above so it actually wins */
-@media (max-width:820px){ #tabs{display:flex} }
+  /* the spine lies down, with 44px touch targets */
+  #spine{right:0;left:0;top:auto;bottom:0;width:auto;height:62px;flex-direction:row;
+    align-items:stretch;padding:0 6px calc(6px + env(safe-area-inset-bottom));gap:0;
+    background:linear-gradient(0deg,rgba(10,9,8,.96) 62%,rgba(10,9,8,0))}
+  .dec{flex:1;flex-direction:column;align-items:center;justify-content:flex-end;
+    padding:0 0 10px;min-width:0;min-height:44px}
+  .dec .yr{display:none}
+  .dec[aria-current="true"] .yr{display:block;position:absolute;bottom:36px;opacity:1;
+    background:rgba(10,9,8,.9);padding:2px 7px;border-radius:var(--r-pill)}
+  .dec .bar{width:3px !important;border-radius:2px;min-height:4px}
+  #spinelbl{display:none}
+
+  /* conditions: two readings, stacked, never colliding */
+  #cond{left:var(--s3);right:var(--s3);bottom:122px;width:auto;padding:var(--s3);
+    max-height:46svh;overflow-y:auto}
+  .cond-h{margin-bottom:var(--s2);padding-bottom:8px}
+  .cond-place{font-size:var(--t-body)}
+  .cond-row{display:grid;grid-template-columns:1fr 1fr;gap:var(--s2) var(--s3);margin-bottom:var(--s2)}
+  .cond-row>div:nth-child(3){grid-column:1 / -1}
+  .cond-row b{font-size:var(--t-body);overflow-wrap:anywhere}
+  .regime{font-size:var(--t-micro);padding:9px 11px}
+
+  .step{padding:0 var(--s3) 190px;align-items:flex-end;min-height:100svh}
+  .step-card{width:100%;padding:var(--s3)}
+  .step-h{font-size:24px}
+  #rec{width:100vw;top:auto;height:90svh;border-left:0;border-top:1px solid var(--edge-hi);
+    border-radius:var(--r-lg) var(--r-lg) 0 0;transform:translateY(101%)}
+  body[data-mode="record"] #rec{transform:none}
+  #reg{top:58px}
+  .reg-top{padding:var(--s3)}
+  .reg-sort{margin-left:0;width:100%;overflow-x:auto}
+  .reg-row,.reg-head{grid-template-columns:1fr 64px;gap:var(--s2)}
+  .reg-row .hide-s,.reg-head .hide-s{display:none}
+  .reg-row{padding:14px var(--s2);min-height:44px}
+  #tagbtn{top:62px;bottom:auto;right:var(--s3);left:auto}
+  #texit{top:auto;bottom:126px;left:var(--s3);right:auto}
+  .tag{max-width:min(262px,calc(100vw - 22px))}
+}
+#mobnav{display:none;position:fixed;left:var(--s3);right:var(--s3);bottom:70px;z-index:34;gap:var(--s2)}
+#mobnav button{flex:1;min-height:44px;padding:11px;border-radius:var(--r-pill);font-size:var(--t-sm);
+  background:rgba(27,25,23,.94);border:1px solid var(--edge);color:var(--ink);
+  backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px)}
+@media (max-width:820px){
+  #mobnav{display:flex}
+  body[data-mode="record"] #mobnav,body[data-mode="register"] #mobnav,
+  body[data-mode="thread"] #mobnav{display:none}
+}
 
 @media (prefers-reduced-motion:reduce){
   *{animation-duration:.01ms !important;animation-iteration-count:1 !important}
-  #plate{transition-duration:.01ms}
-  .card,.moment{transition-duration:.01ms}
-  .pin.is-ringed i::after{animation:none}
+  #plate,.step-card,#rec,#reg{transition-duration:.01ms !important}
 }
 </style>
 </head>
-<body data-view="journey" data-side="start" data-fixes="off">
+<body data-mode="ground" data-regime="named" data-tags="off">
 
-<div id="field" aria-hidden="true">
+<div id="ground" aria-hidden="true">
   <div id="plate">
     <svg viewBox="0 0 960 526.29" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><g fill="#000" fill-opacity="0.32" fill-rule="evenodd"><path d="M207.1 282.2L264.2 282.2L264.1 394.3L230.6 394.2L169.9 371.9L170 369.5L175.6 364L174.8 361.7L171.6 360.3L171.4 354.4L174.4 351L176.1 340.8L181 337.4L172.8 325.2L173.9 319L170.8 300.8L176.9 299.7L179 302.2L180.7 302L182.4 298.6L182.3 282.2L207.1 282.2ZM509.6 361.7L509.5 351.3L504.4 351.5L502.3 349.6L503.2 314.8L500.2 292.4L573.2 292.5L574.6 296.4L569.6 302.7L580 302.6L580.8 304.7L579.4 305.3L580.6 306L576.4 307.9L577.1 311.9L575.1 311.6L575.1 313.3L572.9 314.2L574.1 314.8L572.9 317L574.6 319.9L570.8 321.9L571.7 323.9L570.6 325.7L568.1 325.5L567.8 327.3L566.9 327L566.3 334.3L563.2 335.3L560.8 338.1L561.2 341.9L557.9 343L558.7 344.2L556.2 349.3L557.1 350.5L555.5 351.3L557.4 353.3L556.3 353.9L557.9 357.8L557.3 361.4L509.6 361.7ZM81 342.5L84.3 341.8L85.5 343.6L83.1 344.6L81 342.5ZM88.5 341.4L92.9 341.8L89 343.3L86.3 341.1L88.5 341.4ZM109.2 364.2L108.3 361.5L112 365.6L110.8 366L109.2 364.2ZM109.6 353.3L112.8 356.1L110.1 355.7L107.9 352.8L109.6 353.3ZM18.6 187.9L17.2 182.4L15.4 180.9L16.2 176.2L85.1 176.3L85 240.7L172.8 322.6L172.8 325.3L181 337.4L176.1 340.8L174.4 351L171.4 354.4L171.6 360.3L175.5 362.7L175.1 365.6L173.1 367.4L132.1 371.2L131.3 368.5L130.1 368.5L128.9 360.3L126.4 356.3L115.6 347.4L111 347.6L109.3 342L104.6 342.5L99.3 340.5L92.2 334.3L77.3 333.6L74.6 331.3L74.5 319.9L71 318.5L70.6 314L64 309.1L60.5 302.6L54.2 296.4L52.7 290.8L55.4 288.7L54.6 283.6L50.6 283.1L45.7 278.2L43.9 266.2L45.8 265.6L46.1 269.8L50.5 271.8L49.7 268.5L46.9 266.1L47.3 263.8L45.3 262.4L47.9 260.1L45.9 258.5L44.3 259.3L45.2 264.1L44.1 265.3L37.9 261.1L35.6 261.7L36.4 256L24.1 242.4L22.1 223.1L13.7 213.9L12.9 210.1L17.4 199.6L16.9 195.2L18.6 187.9ZM292.5 197.9L378.6 198L378.7 282.4L264.2 282.2L264.1 198L292.5 197.9ZM863.6 175.4L873.3 175.7L872.7 190.7L861.1 192.6L855.1 191.9L851.9 194.7L842.9 198.3L841.8 195.8L845.8 193.4L844.7 191.6L845.7 175.1L856.7 176.2L863.6 175.4ZM787.7 244.1L786.3 242.1L787.6 240.8L789.8 243L787.7 244.1ZM660.5 322.9L688.4 322.6L684.4 328.6L689.6 332.9L692.2 333.2L697.3 343.4L705.8 351.1L708.9 357.3L714.7 361.9L716 369.3L719.6 372.5L720.9 379.2L725.4 381L719.5 386.9L720.7 388.8L718.6 390.2L720 390.8L718.1 396.7L714.8 401.1L716.3 401.5L715.6 406.2L708 404.1L706.1 404.8L705.7 412.8L703.4 412.6L703 408.9L659.1 405.4L655.7 397.1L656.8 390.3L655.1 384.6L656.7 378.8L658.9 376.4L657.3 375.2L657.4 371.6L654.4 364.6L647.5 323L660.5 322.9ZM586 165.1L611.6 165.3L611.2 170.2L616.2 182.2L616 233.4L614 237.8L616.4 241.7L616.2 247.1L607.7 260.6L607.9 265.8L605.8 268.7L607.4 272.2L600.7 274.1L600.9 280.7L592.3 277.5L589.3 280.7L589.2 282.8L585.8 281.4L583.6 276.4L585.1 274.3L583.6 268.4L578.2 263.6L576.5 264.1L569.9 257.2L569.6 254.7L573.8 243.9L568.3 241.4L566.8 243.3L565.4 243.1L563.7 235.3L553.3 225.3L550.9 215.6L553.2 210.9L552.7 207.6L557.3 205.1L557.8 201.9L559.9 199.6L560.2 195.9L557.5 192.8L558.5 189.1L568.1 186.6L572.7 180.4L573 173.6L569.3 171.2L565.2 164.9L586 165.1ZM660.6 212L660.4 238.5L659.1 239.5L660.5 244.9L654.6 247.3L650.3 246.4L650.5 250.5L647.5 252.5L646.3 255.5L643.9 255.9L641.9 261.5L638.2 261.4L636 258.6L632.6 260.7L630.7 264.8L627.8 261.6L624.2 263.5L622.9 266.1L615 262.1L614.7 265.1L613.7 263.6L610 263.1L609.9 265.6L607.9 265.8L607.2 263.8L608.2 263.8L608.2 259.5L609.8 258.2L609.2 256.6L616.6 245.3L616.4 241.7L614 237.8L616 233.4L616.2 182.6L620.2 184.5L627.6 181.4L660.4 181.4L660.6 212ZM594.2 424.3L592.9 426L594.8 422L594 418.7L595 420.9L594.2 424.3ZM509.6 368.1L509.6 361.7L556.6 362L556.5 364.1L557.8 362.4L558.3 364L556.6 366.3L558.4 367.5L556.8 369.1L557.4 372.2L561 375.1L559.2 377.3L556.6 377.7L556.6 378.9L558.9 379.3L553.8 384.4L551.6 388.8L552.5 389.9L550.8 390.7L550.2 399.7L548.9 400.7L580.1 400.6L578.2 407L583.4 416.3L580.3 419.2L578.6 418.9L578.2 420.5L582 422.1L584.1 418.2L585.9 418.6L584.9 419.8L586 421.3L588.5 420.2L586.8 421.8L588.2 422L585.8 422.7L587.6 424.3L585.7 423.7L585.1 425.4L581.4 424.4L584.1 426.7L581.4 425.8L580.6 428.8L583.7 431.2L589.1 432.1L592 435.1L591 437.1L589.3 438.3L587.9 436.9L585.3 439.9L586.2 437.1L584.1 434.4L578.1 432.6L578.1 429.5L575.5 429.8L575.5 432.9L574.1 434L576.5 433.6L572.8 436.5L570 437.4L571.8 436.4L571.2 434.6L570.2 433.3L567.9 434.9L567.3 433L565.1 436.1L562.6 436.9L565.2 437.2L561.9 437.7L560 435.1L554.8 433.8L553.9 432.7L556.1 431.5L555.7 430.3L550.6 428.5L550.3 426.6L548.7 426.6L549 424.5L544.9 425.1L544.8 422.8L540.5 425.4L541.1 426.8L547.7 427.9L545.9 429.6L542.2 427.5L537.9 428.5L532.9 427.6L522.9 423.9L512.9 425.5L512 422.6L515 418.4L514.5 409.5L517.4 404.1L517.9 397.2L516.8 397.4L516.1 393.6L513 389.5L512.9 385.3L509.6 381.5L509.6 368.1ZM539.8 69.2L538.2 69.5L538.2 83.4L531.4 87.6L528.7 91.8L528.5 95.1L531.1 96.2L532.1 99.4L530.5 102L529.8 114.4L534 118.3L537.4 118.8L539.1 121.3L543.6 123.2L545 126.9L552.2 131.5L554.7 134.9L555.8 142.7L470.1 142.8L470.1 101.6L466.2 98.8L463.5 94.4L468 89.4L468.5 83.2L464.7 70.3L463.6 47L458.8 33L458.5 23.8L459.7 20.4L457.4 12.6L491.4 12.6L491.4 2.9L494.6 3.3L496.8 4.8L499 18L501.5 20L512.9 21.8L513.6 24.5L519 23.8L519 22.7L522.4 21.4L526.9 21.8L532.6 23.9L531.3 25.8L535.5 27L536.7 31.3L538.7 28.5L542.1 28.4L543.3 31.2L547.6 32.3L547.7 34.4L551.3 35.5L555 35.3L561.2 31.2L563.4 35L573.4 34.5L577.4 37.5L584 36.9L563.6 46.4L541.6 66.3L542.7 68.4L541.1 67.4L539.8 69.2ZM588.8 322.8L605.1 322.7L606.8 324.8L600.7 382.8L601.9 413.1L596.5 413.2L594.6 411.9L587.4 413.9L586.5 412.6L584.4 416.4L582.1 415.6L578.2 407L580 400.6L548.9 400.7L550.2 399.7L550.8 390.7L552.5 389.9L551.6 388.8L553.8 384.4L558.9 379.3L556.6 378.9L556.6 377.7L559.2 377.3L561 375.1L557.4 372.2L556.8 369.1L558.4 367.5L556.6 366.3L557.9 362.6L555.8 363.5L557.9 359.3L556.3 353.9L557.3 352.9L555.5 351.3L557.1 350.5L556.2 349.3L558.7 344.2L557.9 343L561.2 341.9L560.8 338.1L563.2 335.3L566.3 334.3L566.7 327.4L567.9 325.6L570.6 325.7L571.7 323.9L570.6 322.7L588.8 322.8ZM231.5 108.5L231.4 120.6L225.8 114.2L222.4 118.8L219 119.7L218 118.6L211.4 118.6L209.5 120.9L204.1 119.9L201.6 122.9L199.5 121.2L197.3 114L195.5 112.6L193.9 113.5L192.1 111.6L192.2 107.5L187.4 100.9L186.2 94.5L183.4 92.1L178.1 97.6L174 95.4L175.1 92.1L173.9 90.5L176.7 87.7L175.1 84.1L177.8 70.3L173.1 70L168.1 65.5L161.6 55.3L155 51.2L155 44.6L149.7 37.8L149.7 12.5L345.9 12.5L346.1 108.5L231.5 108.5ZM314 381.5L304.2 381.5L303.7 384.2L305.4 385.7L277.9 385.7L277.9 394.3L264.1 394.3L264.2 282.2L363 282.2L362 381.5L314 381.5ZM403.8 86.5L346 86.5L345.9 12.5L457.4 12.5L459.7 20.4L458.5 23.8L458.8 33L463.6 47L464.7 70.3L467.8 77.8L468.3 86.7L403.8 86.5ZM412.1 327.7L412.1 292.4L363 292.4L363 282.2L500.1 282.3L500.2 292.4L503.2 314.8L502.2 349.9L496 347.5L490.3 343.3L489.2 345L484.1 343.8L481.4 345.5L475.1 345.7L474.6 347.3L471.5 348.1L466.8 344.5L465.9 345.8L463.5 345.5L462.5 343.3L459.2 348.1L457.7 344.2L454.2 346.1L453.7 344.4L451.6 344.4L450.2 342.7L446.8 345.5L445.2 344.7L445.7 342.7L443.4 342.4L442.1 340.2L438.9 339.4L437.1 341.2L435 339.3L425.4 338.2L425 335.8L422.7 333.8L421.8 335.1L417.1 335L413.4 331.1L412.1 331.4L412.1 327.7ZM747.8 225.5L730.7 225.5L730.7 176.7L737.3 172.5L743.1 170.2L743.1 176.2L815.1 176.2L819.1 179.6L821.2 187L826 190L818.9 198.2L820.2 200.9L817.7 204.7L820 210.6L825.5 216.2L817.1 222.6L814.2 223.7L810.6 223.1L808.1 225.4L747.8 225.5ZM682.4 290.4L712.3 290.1L711 295.7L708 296.5L706.1 299.9L700.8 300.2L697.4 303.5L695.3 301.6L691.8 303.7L690.4 307L687.5 307.4L682 311.4L675.8 312.3L672.9 317.3L669.1 318.1L668.5 322.9L570.6 322.7L574.6 319.9L572.9 317L574.1 314.8L572.7 314.9L575.1 313.3L575.1 311.6L577.1 311.9L576.4 307.9L580.5 306.2L579.4 305.2L580.8 304.7L580 302.6L582.4 299.7L580.6 297.5L583.3 297.5L581.9 296L583.6 295.3L583.2 292.5L607.5 292.5L607.2 288.8L682.4 290.4ZM817 261L815.1 264.4L812.6 265.8L807.9 278.2L805.1 279.8L804.3 275.7L807.6 265.9L809.7 264.5L808.6 263.6L810.8 261.7L817 261ZM757.7 245.7L765.1 237.4L766.2 230.9L774.7 237.9L776.5 233.9L780.8 235.9L779.8 238.2L784 240.1L787.8 243.9L786.2 248.4L784.2 248.4L783 252.3L783.7 254.5L787.6 253.3L788.9 257.2L794.6 258.5L800.8 263.9L799.1 268.7L800 269.6L798.7 269.7L796.3 269L795.1 266.4L791.8 264.3L795.8 269.5L799.7 270.7L798.7 271.6L800.3 272.3L800.1 275.9L797.8 274L798.9 276.6L796.4 277.4L799.9 279.6L799.7 282.2L797.6 282.8L794 277.7L791.5 278.2L792.7 279.2L793.4 278.1L793.8 281.3L796.9 284.6L799.8 282.9L804.7 283.8L806.8 291.4L679.1 290.4L687.9 287.5L689 285.2L691.6 284.8L694.7 280.1L707 271.2L707.7 274.9L711.8 278.1L716.9 275.3L719.2 277.4L724.5 275.8L725.2 273.4L726.6 274.6L730.9 272.3L731.6 273.5L735.6 269.4L734.4 268L742.7 256L745 249.3L750.5 253L755.6 243.9L757.7 245.7ZM811.3 223L814.2 223.7L811 227.6L811.3 231L814.4 235.3L816 242.5L819.5 245L820.2 252.2L809.6 252L808.1 225.4L811.3 223ZM762.6 240L757.7 245.7L755.6 243.9L750.7 252.9L745 249.3L742.7 256L735 266.7L734.4 268L735.6 269.3L734.1 271.9L726.6 274.6L725.2 273.4L725.3 275.1L723.7 276.2L719.2 277.4L716.9 275.3L711.8 278.1L707.7 274.9L706.6 272.4L707.7 271.7L701.7 268.1L696.1 258.7L696.8 252.8L701.1 252.4L701.7 249.5L703.6 249L702.9 245.2L705.9 240.2L707.6 240.9L708 243.3L710.4 242.3L709.5 239.2L711.5 235.6L715.4 232.1L716.7 233.5L719.3 232.5L724.8 227.6L729.4 212.7L728.3 207L729.4 206.1L730.7 205.8L730.7 225.5L747.8 225.5L747.6 236.4L754.2 230.8L756.1 231.4L759 227.4L762.7 229.7L769 226L773.5 228.3L776.5 233.9L774.7 237.9L766.2 230.9L765.1 237.4L762.6 240ZM565.3 64.7L566.4 65.1L562.8 67.3L565.3 64.7ZM566.2 63.4L565.3 62.8L567.3 62.3L566.2 63.4ZM625.6 99L627.9 98.9L626.4 101.7L625.6 99ZM612.3 109.3L608.7 115L607.7 118.5L609.3 119.3L614.8 112.2L618.4 111.6L620.8 104.6L622.8 104.1L623.8 101.7L625.2 102.1L617.1 118.8L616.3 127.1L614.2 129.1L612.7 134.2L613.2 138.5L609.8 148.4L610.1 153.6L612.2 158.8L611.6 165.3L565.2 164.9L564.1 162.1L558.4 159.8L556.9 156L556.4 151.2L558.4 148.3L555.9 145.6L554.7 134.9L552.2 131.4L545 126.9L543.6 123.2L539.1 121.3L537.4 118.8L534 118.3L529.8 114.4L530.5 102L532.1 99.4L531.1 96.2L528.5 95.1L528.7 91.8L531.4 87.6L538.2 83.4L538.2 69.5L539.6 69.7L541.1 67.4L543.6 69L546.4 68.7L561.7 62.3L563.4 64.1L560.3 71.3L563.6 68.8L572.3 73.9L573.7 77.2L590 81.8L597.5 85.5L600.1 84.7L606.7 87.3L606.2 89.6L612 92.7L610.2 100.3L614.1 100.4L612.6 103.9L615.1 106.5L614.4 109L612.3 109.3ZM345.8 132.9L345.8 198L231.5 198.1L231.5 108.5L345.8 108.6L345.8 132.9ZM606.3 414.3L607.1 415L603.3 415.3L606.3 414.3ZM628.3 322.8L647.5 323L654.4 364.6L657.4 371.6L657.3 375.2L658.9 376.4L656.7 378.8L655.1 384.6L656.8 390.3L655.7 397.1L657.4 400.7L614.9 400.7L614.5 403.6L618.3 407.5L617.3 414L607.9 415.5L612.4 414.4L609.9 411.8L609.4 407.2L607.4 407.4L606.2 413.6L601.9 412.7L600.7 384.4L606.8 324.8L605.1 322.7L628.3 322.8ZM735.1 505.7L728.4 513.8L732.7 509.2L736.3 502.5L735.1 505.7ZM713.3 518.1L715.9 516.4L718 518.1L714.7 517.9L709.6 520.1L713.3 518.1ZM702.3 480.9L703.8 484.9L706.3 485.5L703.6 485.2L702.3 480.9ZM661.1 425.2L656.9 427.4L655.9 426.7L661.1 425.2ZM685.1 407.6L703 408.9L703.8 412.9L705.7 412.8L706.1 404.8L708 404.1L715.9 406.4L715.5 410.1L718.9 424.6L723.4 435.7L729.8 446.2L730 455.3L738.7 479.2L736.7 499.9L735.3 498.8L734.1 505.2L731.1 508.3L721.3 509.6L720 507.9L720.9 505.5L717.1 497L711 495.5L708.7 486.9L706.1 484.4L704.8 485L703.5 481.3L705 481.6L705.5 476.4L703.6 477L704.1 479.4L702.3 480.7L694.3 465.6L695.9 465.9L699.9 459.2L698.7 458.4L698.5 460.4L697.4 457.7L694.7 457.9L697.2 459.7L694.5 464.2L692.7 459.8L695.6 448.1L696 440.5L693.3 435.7L689.3 436L688.9 433.7L683.6 428.8L683.4 425.9L678.9 421.1L673.8 417.9L669.6 417.7L667.9 418.6L668.1 421.6L665.4 421.2L659.3 424.9L659 423.7L651.8 426.2L650.6 422.6L651.7 425.6L652.5 423.3L650.8 420.8L637.4 413.2L628.8 412.3L616.3 414.4L617.3 414L618.3 407.5L614.5 403.6L614.9 400.7L657.4 400.7L659.7 406.2L685.1 407.6ZM231.4 120.6L231.5 176.1L133.7 176.2L133.7 135.8L135.8 127.8L134.5 125.9L131 125.2L130.6 120.8L133.1 114.8L136.5 111.1L136.6 108.1L142.9 94.2L141.5 91L136.4 87.4L133.1 76.5L133.6 12.5L149.7 12.5L149.7 37.8L155 44.6L155 51.2L161.6 55.3L168.1 65.5L173.1 70L177.8 70.3L175.1 84.1L176.7 87.7L173.9 90.5L175.1 92.1L174 95.4L178.1 97.6L183.4 92.1L186.2 94.5L187.4 100.9L192.2 107.5L192.1 111.6L193.9 113.5L195.5 112.6L197.3 114L199.5 121.2L201.6 122.9L204.1 119.9L209.5 120.9L211.4 118.6L218 118.6L219 119.7L222.4 118.8L225.8 114.2L231.4 120.6ZM419.6 282.2L378.7 282.4L378.6 219.4L488.9 219.5L492.5 222.5L494.9 221.8L495.6 224.6L492.1 229.3L496.6 235.9L500.6 237.8L500.1 282.3L419.6 282.2ZM797.5 239.6L798.2 240.5L795.5 246.1L799.4 260.9L795 257.2L789.6 255.5L788 252.3L784.2 253.6L784.4 250.1L789.8 243L787.6 240.8L786.3 242.1L780.8 239.2L779.7 237.6L780.8 235.9L775.9 233.7L773.5 228.3L769 226L762.7 229.7L759 227.4L756.1 231.4L754.2 230.8L747.6 236.4L747.8 225.5L808.1 225.4L809.6 252L820.2 252.2L817 261L806.5 263.4L807.5 258.8L805.3 258.8L807.1 256.9L805.1 256.8L804.6 253.8L804.1 257.1L802.8 255.6L802.2 256.7L799.2 251.7L800.6 250.7L800.1 248.9L802.2 248.3L800.7 246.3L798.9 247.3L799.7 244.4L801.5 244.5L801.3 242.2L798.5 243.9L799.5 240L802 240.7L802.3 238.8L800.8 240.3L800.1 237.2L801.8 233.7L804.6 233L805.1 228.9L803.1 229.4L803.6 231.3L800 234.3L799.1 233.2L797.7 236.4L795.9 236.2L797.5 239.6ZM822.6 217.9L825.5 216.1L820 210.6L819.9 207.9L817.9 206.9L817.8 203.4L820.2 200.9L818.9 198.2L826 190.2L839.1 198.1L836.9 204.3L834.2 205.7L832.9 209.1L837.2 210.7L837.4 209.5L837.7 213.1L835 226.1L823.2 242L821.4 242L822.8 237.4L820.4 236.2L818.7 236.9L812.2 231L811.8 227.4L814.2 223.7L822.6 217.9ZM808.7 318.7L812.3 316.9L812.3 307.1L813.5 310.7L812.4 318L804.4 321.4L808.7 318.7ZM796.6 291.4L806.8 291.4L812.2 307L809.2 302.5L806.1 292.7L804.1 292.8L805.9 293.9L808 301.1L804.1 298.7L796.2 302.5L793.9 301.9L793.7 303.9L801.7 302.7L803.6 302.7L805 304.6L806.3 303L808.2 303.9L809.1 310.1L806.4 311.2L803.5 315.2L794.4 315.3L797 317.1L794.4 322.8L797.1 321.1L798.2 323.2L799.3 323.1L798.7 322L799.9 322.5L798 326.5L804 321.5L795.9 330.8L793.6 328.8L788.4 329.2L779.2 334.3L774.7 339.3L772.4 345.6L769 344.2L763.1 345.4L744.3 326.5L726.5 326.3L726.4 323.9L723.9 320.5L722.2 321.8L722.2 319.7L700.2 318.4L688.4 322.6L668.5 322.9L669.1 318.1L672.9 317.3L675.8 312.3L682 311.4L687.5 307.4L690.4 307L691.8 303.7L696.1 301.2L697.4 303.5L700.8 300.2L706.1 299.9L708 296.5L711 295.7L711.8 290.6L796.6 291.4ZM703 318.7L722.2 319.7L722.2 321.8L723.9 320.5L726.4 323.9L726.5 326.3L744.3 326.5L763.1 345.4L756.6 349.6L749.7 362L746.5 361.7L746.2 363.9L739.2 369.7L733.8 372.3L731.5 371.9L731.8 375.2L728.4 376.7L724.7 380.8L720.9 379.2L719.6 372.5L716 369.3L714.7 361.9L708.9 357.3L705.8 351.1L697.3 343.4L692.2 333.2L689.6 332.9L684.4 328.6L688.4 322.6L700.2 318.4L703 318.7ZM45.8 39.3L44.6 37.5L43.4 38L42.4 33.5L39.7 31.7L41.5 27.4L44 29.6L41.4 31.7L43.4 35.9L43.9 34.8L46.2 36.4L45.8 39.3ZM41.7 22.7L43 24.2L41.7 24.2L41.7 22.7ZM39.2 22.4L39.2 26.7L38 26.9L34 25.1L32.7 22.6L34.2 21.9L36.2 23.4L35.2 21.9L37.7 19.6L40.2 20.9L39.2 22.4ZM45.5 53.7L47 53L45.4 47.5L46.8 47L45.3 45.5L45.9 42L48.7 36.8L45.9 31.6L44.5 32.9L46.5 35.8L44 33.9L43.6 31.1L46.3 30.2L43.2 26.3L41.7 27.2L40.7 25.8L42.4 24.4L44.6 25.7L43.6 23.1L45.4 22.5L43.6 18.1L42.3 20.1L41.3 19.2L41.8 17.9L39.4 15.2L40.1 14.3L38.9 14L39.9 12.5L133.6 12.5L133.1 76.5L135.5 85.3L101.6 85.2L99.3 86.8L91.6 87.1L81.6 91.6L77.2 92.4L74.7 91.1L70.1 93.6L65.5 93.9L60 91.6L54.5 92.4L48 95.9L41.8 94.3L39.8 93.2L37.9 83.8L34.1 80.8L29.9 81.7L28.2 78.9L24.5 78L21.7 79.5L19.6 77.8L18.3 78.8L18.5 70.1L19.2 74.2L20.5 73.9L21.4 72.5L20.3 70.1L22.1 68.2L18.1 67.6L17.4 63.7L18.4 64.7L21.9 62.6L17.6 60.4L16.7 63.2L16.6 58.2L12.7 43.6L8.6 38.1L7.6 33.2L8.8 29.1L7.7 27.9L19.9 33.2L30.5 34.4L33.8 32.9L35.3 35.2L38 36.1L38 34.5L39.9 33.7L39.2 35.1L39.8 36.1L41.1 34.7L40.6 37.5L42.4 40L39.9 43.4L43 40.7L42.2 38.7L43.7 39.5L44.6 43.1L43.3 43.4L44.5 47.3L43.4 48.8L46.2 52.1L42.9 53.6L45.1 55L45.5 53.7ZM862.6 160.1L849.2 159.7L849.7 142L848.7 139.9L846.6 140.8L848 136.6L846.5 130.4L848.9 121.4L847.3 117.3L848.1 108.3L878.8 108.2L877.6 108.6L878.3 110.7L876.1 114.3L877.6 118L876.9 119.9L869.1 124.9L868.3 132.6L863.6 142.3L862.8 153.8L861 157L862.6 160.1ZM231.5 176.1L231.5 198.1L264.1 198L264.2 282.2L182.3 282.2L182.5 176.3L231.5 176.1ZM556.7 154.3L558.4 159.8L564.1 162.1L565 165.6L568.8 168.9L569.3 171.2L572.9 173.5L573.4 176.3L572.7 180.4L568.1 186.6L558.5 189.1L557.5 192.8L560.2 195.9L560.1 199L557.8 201.9L557.3 205.1L552.7 207.6L553 211.3L550.7 210.7L547.4 206.4L481.4 207L479.5 204.1L480 194.4L478.8 193.8L478.7 188.6L476 186.3L475.4 176.8L473.1 175.1L470.7 168.4L471.2 165.7L467.1 159.9L470.4 151.3L468 148L469 145.3L467.8 142.7L555.8 142.7L555.9 145.6L558.4 148.3L556.5 151L556.7 154.3ZM583.2 292.5L582.8 291.1L584.1 291L583.2 292.5ZM696.6 256.5L696.1 258.7L701.7 268.1L707 271.2L694.7 280.1L691.6 284.8L689 285.2L687.9 287.5L678.9 290.7L607.2 288.8L607.5 292.5L585.2 292.4L586 289.9L588.2 291.1L589.2 289.4L590.4 283.4L589.1 281.3L590.6 278.8L593 277.5L600.9 280.7L600.6 274.3L607.4 272.2L605.8 268.6L607.9 265.8L609.9 265.6L609.9 263.2L613.7 263.6L614.2 265.2L615.2 262.1L622.9 266.1L624.2 263.5L627.6 261.6L630.7 264.8L632.6 260.7L636 258.6L638.2 261.4L641.9 261.5L643.9 255.9L646.3 255.5L647.5 252.5L650.5 250.5L650.3 246.4L654.6 247.3L660.5 244.9L659.1 239.5L661.5 237.6L663.7 239.2L666.7 238.7L670.3 244.8L675.9 245.7L679 248.5L681.6 246.9L685.5 249L687.6 248.7L692 245.8L692.8 249.4L696.8 252.8L696.6 256.5ZM922.6 130.2L921.2 130.9L920 128.9L921.6 127.3L922.6 130.2ZM928.1 127.1L929.2 127.9L928.3 128.8L927.3 128L928.1 127.1ZM924.3 125.1L925.6 126.2L924.4 128.3L924.3 125.1ZM918.6 125.8L917.5 129.1L918.6 129.6L915.6 132.9L912.3 132L910.9 135.1L910.2 134.1L908.4 136.2L907.6 135.5L905.4 138.1L904.9 136.5L902.1 137.4L902.6 134.6L899.7 136.6L898.6 138.8L899.5 141.3L896.9 142.1L897 144.1L893.7 146.8L891.8 152.4L889.2 151.1L889.4 148.7L886.6 145.2L885 101.4L887.2 100.8L888.7 103.2L889.7 98.7L892.4 99.6L891 96.5L898.5 87.8L898 80.7L901.8 75.3L902.8 68.7L915.4 50.3L918.4 51.1L918.3 55.2L920.7 57.1L930.8 52.7L938.9 59.8L938.4 92.4L944.9 95L944.9 96.8L943.6 97.2L944.9 99.7L943.8 102L946.2 105.6L947.2 104.1L949.2 104.7L952.6 112.7L947 117.7L946.8 115.3L945.2 117.9L942.8 117.2L942.5 119.3L939.8 120.1L938.1 118.7L937.8 121.9L935.4 122.1L934.7 123.9L933.5 120.6L931.2 120.4L930.6 121.4L932.6 124L930.3 126.3L928.6 125.2L929.6 122.3L928.1 121.2L927.9 122.8L927.5 121.5L926.2 122.3L926.9 126.3L923.5 124L921.9 124.3L922.7 120.6L919.4 121.7L918.6 125.8ZM893 187.7L894.6 189.7L895.4 188.9L895.4 190.4L889.4 190.9L893 187.7ZM901.3 191.5L902 189.5L903.2 192.6L898.3 191.3L901.3 191.5ZM866.8 175.5L856.7 176.2L845.6 175.1L849.4 159.7L881.6 160.7L883.7 158.3L888 156.5L889.4 156.8L890 160.8L893.1 162L888.5 164.1L889.1 165.3L886.7 166.8L886.5 170.2L888.3 169.4L890.9 171.6L892.3 174.4L891.1 176.2L893.7 177.7L894 180.5L896 181.8L898.5 182.5L902.6 180.6L901.2 175.4L898.7 174.8L901.4 175L903.3 178.1L903.9 183.4L902.8 186.2L902.6 183.4L897 184.2L887.2 189.1L892 186.2L892.5 182.5L890.9 182L888.8 185.2L887.6 184.7L887.5 186.3L884.4 187.2L884.2 183.6L881 181L880.2 175.8L866.8 175.5ZM648.2 90.8L649.2 90.9L649.5 94.1L648.3 95.2L647.1 94.6L648.2 90.8ZM597.2 34.4L601.5 33L597.4 36.9L592.6 39.1L593.5 39.9L588.2 40.8L589.1 38.8L597.2 34.4ZM664.1 89.5L663.3 87.9L668 90.6L665.9 91.5L664.1 89.5ZM684.1 178.9L682.7 182L660.6 182.8L660.4 181.4L627.6 181.4L631 178.5L635.3 170.6L637.4 163L637.3 153.6L632.2 139.8L634 135.6L632.7 130.1L636.7 123.6L636.9 115.6L639.6 114.5L640 110.7L642.2 109.2L644.2 109.7L648.4 103.6L646.8 112L647.7 113.8L649.7 108.7L648.8 114.3L651 110.1L651.4 102.2L654.2 100.1L658.8 99.4L655.6 96L658.4 92L657.3 90.7L661.8 90.2L666.2 93.3L670.3 93.7L672.2 97L682.2 100.3L683.9 102.3L685.8 107.9L683.6 106.9L682.7 107.8L685.7 115.1L684.7 123.7L681.4 125.8L680.6 130.2L675.8 132.4L674.5 136.9L675.3 138.9L679.3 140.7L685.9 132L690.7 129.9L694.3 131.5L696.1 135.3L699.7 153.9L698.2 162.1L695.3 164.7L696.2 161.3L693.2 162L691.9 167.6L688.8 169.4L687.1 176L684.1 178.9ZM593.1 83.4L573.7 77.2L572.3 73.9L568.8 71.8L575.2 69.2L579.1 65.8L585.2 65.2L589.9 61.6L592.5 61.4L601.5 52.5L609.6 49.9L612.4 50.3L613.1 51.8L609.1 52.1L609.3 53.3L604.6 56.6L601.1 62.1L600.8 66.5L606 62.2L605.5 63.7L610 63.6L613.6 65.2L619 73.3L624.6 72.6L627.2 74.9L628.5 73.8L629.7 74.8L630 71.9L631.5 74.2L638.4 69.3L649.1 69.2L658.2 66.9L657 73.8L660.2 74.7L663.5 73.7L664.8 75.3L666.9 73.3L671.7 72.6L672 79.5L669.7 81L673.4 82.1L672.6 83L675.4 85.2L677.6 84.7L676.8 82.6L679.8 82.7L682.4 85.5L681 87.2L672 85.7L667.6 86.8L663.1 83.9L661.6 89L657.2 84.9L649.3 82.9L646.2 86.1L636.5 86.5L635.3 89.9L631.6 91.9L631 94.4L629.3 92.8L632.2 87.8L630.5 89.1L628.3 88.5L627.4 91.7L625.3 92.9L624.2 89L623.8 92L621.5 93.7L615.1 106.3L612.6 103.9L614 100L610.2 100.3L611.8 96.9L611.5 92L606.8 90.2L607.2 88.1L605.5 86.5L599.7 84.7L597.5 85.5L593.1 83.4ZM583.1 295.7L581.9 296L583.2 297.5L580.6 297.5L582.4 299.7L580.5 302.5L569.6 302.7L574.6 296.4L573.2 292.5L500.2 292.4L500.6 237.4L496.6 235.9L492.1 229.3L495.6 224.6L495.1 221.9L492.5 222.5L489 219.9L481.4 207L547.4 206.4L552.5 211.4L551 216.8L553.3 225.3L563.7 235.3L564.9 242.4L566.4 243.5L569 241.5L573.9 244L569.6 254.7L569.9 257.2L576.5 264.1L578.2 263.6L583.6 268.4L585.1 274.3L583.6 276.4L585.7 281.3L590.4 283.4L588.5 290.8L586 289.9L584.3 293.3L584.2 291L582.8 291.1L583.1 295.7ZM345.8 182.8L345.8 154L436.7 154L444.3 159.3L447.4 156.9L457 157.3L465.7 161.4L467.5 165L471.2 165.7L471.8 172.4L475.4 176.8L474.9 178.3L476.5 180.6L476 186.3L478.7 188.6L478.8 193.8L480 194.4L479.5 204.1L481.7 206.6L481.4 208.1L483.1 208.4L483.7 212.2L488.9 219.5L378.6 219.4L378.6 198L345.8 198L345.8 182.8ZM182.4 217L182.4 298.6L180.6 302.1L179 302.2L176.9 299.7L170.8 300.8L173.9 319L172.8 322.6L85 240.7L85.1 176.3L182.5 176.3L182.4 217ZM889.4 151.2L891.2 152.7L889.4 156.8L884 158.1L881.6 160.7L862.6 160.1L861 157.2L862.8 153.8L863.6 142.3L868.3 132.6L869 125.1L876.9 119.9L877.6 118L876.1 114.3L878.3 110.7L877.6 108.6L878.8 108.2L879.2 103.1L881.8 101.5L884.1 102.9L885 101.4L886.6 145.2L889.4 148.7L889.4 151.2ZM835 208L833.2 208.8L834.1 206L836.1 205.6L835 208ZM847.1 128L848 136.6L846.6 140.8L848.7 139.9L849.7 142L849.4 159.7L845.4 174.3L844.7 191.6L845.8 193.4L841.8 195.8L843 198.4L840.4 201.7L841 202.4L845.8 199.2L849.9 200.1L851.9 198.6L860.5 198.1L866 194.5L864.6 195.7L868.4 198.2L872.4 196.5L863.6 200.9L849.8 206.1L837.2 207.2L839.1 198.1L821.2 187L819.1 179.6L815.1 176.2L743.1 176.2L743.1 170.2L753.1 163.9L758 158.8L754.5 152L754.4 148.1L765.9 145.5L775.8 146.3L779.3 148.7L789 147.9L797.8 142.3L800.8 142.1L801.3 137.8L800 134.7L802.6 133.4L798.7 129.8L799.5 126.9L806.1 123L816 112.3L821.1 109L848.1 108.3L847.3 117.3L848.9 121.4L847.1 128ZM710.6 236.9L709.5 239.2L710.4 242.3L708 243.3L707.6 240.9L705.9 240.2L702.9 245.2L703.6 249L701.7 249.5L701.1 252.4L697.3 253.2L692.8 249.4L692 245.8L687.6 248.7L685.5 249L681.6 246.9L679 248.5L675.9 245.7L670.3 244.8L666.7 238.7L663.7 239.2L661.6 237.6L660.4 238.5L660.6 182.8L682.7 182L691.2 186.8L692.9 185.2L698.6 189.7L706.3 186.8L710.8 187.4L718.2 181.4L730.7 176.7L730.7 205.8L728.3 207L729.4 212.7L725.6 225.8L719.3 232.5L716.7 233.5L715.4 232.1L710.6 236.9ZM53.8 93.3L60 91.6L65.5 93.9L70.1 93.6L74.7 91.1L78.4 92.2L90.4 88.5L91.6 87.1L99.3 86.8L101.6 85.2L135.5 85.3L137.6 88.8L141.5 91L142.9 94.5L136.6 108.1L136.5 111.1L133.1 114.8L130.6 120.8L131 125.2L134.5 125.9L135.8 127.8L133.7 135.8L133.7 176.2L18 176.2L14.7 175L12.6 168.9L13.1 162.3L10.6 157.5L15.8 141.5L18.5 121.7L20.6 93.1L19.7 86.4L20.8 85L19.2 79.8L22 81.5L28.1 78.8L29.9 81.7L34.1 80.8L37.9 83.8L39.8 93.2L41.3 94.1L48 95.9L53.8 93.3ZM879.7 183.8L878.5 189.9L872.3 191.3L873.4 188.9L873.3 176L880.2 175.8L881 181L882.7 182.5L882.2 184L880.8 182.1L880.2 183.5L879.1 183L879.7 183.8ZM884.4 187.2L883.2 188L882.9 184.4L882.5 187.7L880.5 188L883.2 183.3L884.4 187.2ZM345.8 134.8L346 86.5L468.3 86.7L468 89.4L463.5 94.4L466.2 98.8L470.1 101.6L470.1 142.8L467.8 142.7L467.7 143.9L469 145.3L468 148L470.4 151.3L467.1 159.9L469.8 165.6L467.3 164.8L465.7 161.4L457 157.3L447.4 156.9L444.3 159.3L436.7 154L345.8 154L345.8 134.8ZM464 455L467.9 451.6L471 450.7L461.7 458L455.9 469.1L455.1 477.2L458.6 492.6L454.9 478.8L455.2 469.4L459 460.3L464 455ZM412.1 327.7L412.1 331.4L413.4 331.1L417.1 335L421.8 335.1L422.7 333.8L425 335.8L425.4 338.2L435 339.3L437.1 341.2L438.9 339.4L442.1 340.2L443.4 342.4L445.7 342.7L445.2 344.7L446.8 345.5L450.2 342.7L451.6 344.4L453.7 344.4L454.2 346.1L457.7 344.2L459.2 348.1L462.5 343.3L463.5 345.5L465.9 345.8L466.8 344.5L471.5 348.1L474.6 347.3L475.1 345.7L481.4 345.5L484.1 343.8L489.2 345L490.3 343.3L504.4 351.5L509.5 351.3L509.6 381.5L512.9 385.3L513 389.5L516.1 393.6L516.8 397.4L517.9 397.2L517.4 404.1L514.5 409.5L515 418.4L512 422.6L512.9 425.5L508.1 426.3L497.5 431.7L502.2 428.6L497.5 428.5L498.9 425.4L498.1 423.7L495.6 426.1L494.5 425.3L493.6 428.1L495.4 429.1L495.8 432.9L498.4 432.3L487.6 441L471.4 449.9L477.9 445L473.8 446.3L473.9 444.1L469.6 446.5L468 443.6L466.7 444.1L470.9 448.9L466.5 450.8L464.9 449.5L464.5 452.9L460.7 454.8L458.1 460.3L456.7 459.3L455 460.1L455.2 461.8L457 462.7L454.6 469.3L452.5 470.4L453 468.8L450.7 470.5L454.3 470.7L452 478.4L453.5 479.9L456.4 491.8L457.9 492.4L457.6 493.9L458.7 492.7L458.8 494.3L454.5 496.4L450.2 493.2L440.9 492.4L431.6 487L426.8 485.8L424.1 478.4L421.2 475.1L420 465L414.7 461.2L410.8 454.4L407.4 452L406.7 447.8L403.9 444.8L401.1 436.6L394.8 429.9L391.9 428.6L389.2 424.2L377.5 423.6L374.1 422L373.1 424.2L368.1 424.9L365.2 434.2L361.2 438.7L356.8 438L346.3 432.6L338.3 426.4L335.6 421.2L335.1 415.2L331.5 408.3L323.9 403.4L314.3 393.5L310.6 391.7L307.8 386.7L303.7 384.2L304.2 381.5L362 381.5L363 292.4L412.1 292.4L412.1 327.7Z"/></g><g fill="none" stroke="#000" stroke-opacity="1" stroke-width="1.1" stroke-linejoin="round"><path d="M207.1 282.2L264.2 282.2L264.1 394.3L230.6 394.2L169.9 371.9L170 369.5L175.6 364L174.8 361.7L171.6 360.3L171.4 354.4L174.4 351L176.1 340.8L181 337.4L172.8 325.2L173.9 319L170.8 300.8L176.9 299.7L179 302.2L180.7 302L182.4 298.6L182.3 282.2L207.1 282.2ZM509.6 361.7L509.5 351.3L504.4 351.5L502.3 349.6L503.2 314.8L500.2 292.4L573.2 292.5L574.6 296.4L569.6 302.7L580 302.6L580.8 304.7L579.4 305.3L580.6 306L576.4 307.9L577.1 311.9L575.1 311.6L575.1 313.3L572.9 314.2L574.1 314.8L572.9 317L574.6 319.9L570.8 321.9L571.7 323.9L570.6 325.7L568.1 325.5L567.8 327.3L566.9 327L566.3 334.3L563.2 335.3L560.8 338.1L561.2 341.9L557.9 343L558.7 344.2L556.2 349.3L557.1 350.5L555.5 351.3L557.4 353.3L556.3 353.9L557.9 357.8L557.3 361.4L509.6 361.7ZM81 342.5L84.3 341.8L85.5 343.6L83.1 344.6L81 342.5ZM88.5 341.4L92.9 341.8L89 343.3L86.3 341.1L88.5 341.4ZM109.2 364.2L108.3 361.5L112 365.6L110.8 366L109.2 364.2ZM109.6 353.3L112.8 356.1L110.1 355.7L107.9 352.8L109.6 353.3ZM18.6 187.9L17.2 182.4L15.4 180.9L16.2 176.2L85.1 176.3L85 240.7L172.8 322.6L172.8 325.3L181 337.4L176.1 340.8L174.4 351L171.4 354.4L171.6 360.3L175.5 362.7L175.1 365.6L173.1 367.4L132.1 371.2L131.3 368.5L130.1 368.5L128.9 360.3L126.4 356.3L115.6 347.4L111 347.6L109.3 342L104.6 342.5L99.3 340.5L92.2 334.3L77.3 333.6L74.6 331.3L74.5 319.9L71 318.5L70.6 314L64 309.1L60.5 302.6L54.2 296.4L52.7 290.8L55.4 288.7L54.6 283.6L50.6 283.1L45.7 278.2L43.9 266.2L45.8 265.6L46.1 269.8L50.5 271.8L49.7 268.5L46.9 266.1L47.3 263.8L45.3 262.4L47.9 260.1L45.9 258.5L44.3 259.3L45.2 264.1L44.1 265.3L37.9 261.1L35.6 261.7L36.4 256L24.1 242.4L22.1 223.1L13.7 213.9L12.9 210.1L17.4 199.6L16.9 195.2L18.6 187.9ZM292.5 197.9L378.6 198L378.7 282.4L264.2 282.2L264.1 198L292.5 197.9ZM863.6 175.4L873.3 175.7L872.7 190.7L861.1 192.6L855.1 191.9L851.9 194.7L842.9 198.3L841.8 195.8L845.8 193.4L844.7 191.6L845.7 175.1L856.7 176.2L863.6 175.4ZM787.7 244.1L786.3 242.1L787.6 240.8L789.8 243L787.7 244.1ZM660.5 322.9L688.4 322.6L684.4 328.6L689.6 332.9L692.2 333.2L697.3 343.4L705.8 351.1L708.9 357.3L714.7 361.9L716 369.3L719.6 372.5L720.9 379.2L725.4 381L719.5 386.9L720.7 388.8L718.6 390.2L720 390.8L718.1 396.7L714.8 401.1L716.3 401.5L715.6 406.2L708 404.1L706.1 404.8L705.7 412.8L703.4 412.6L703 408.9L659.1 405.4L655.7 397.1L656.8 390.3L655.1 384.6L656.7 378.8L658.9 376.4L657.3 375.2L657.4 371.6L654.4 364.6L647.5 323L660.5 322.9ZM586 165.1L611.6 165.3L611.2 170.2L616.2 182.2L616 233.4L614 237.8L616.4 241.7L616.2 247.1L607.7 260.6L607.9 265.8L605.8 268.7L607.4 272.2L600.7 274.1L600.9 280.7L592.3 277.5L589.3 280.7L589.2 282.8L585.8 281.4L583.6 276.4L585.1 274.3L583.6 268.4L578.2 263.6L576.5 264.1L569.9 257.2L569.6 254.7L573.8 243.9L568.3 241.4L566.8 243.3L565.4 243.1L563.7 235.3L553.3 225.3L550.9 215.6L553.2 210.9L552.7 207.6L557.3 205.1L557.8 201.9L559.9 199.6L560.2 195.9L557.5 192.8L558.5 189.1L568.1 186.6L572.7 180.4L573 173.6L569.3 171.2L565.2 164.9L586 165.1ZM660.6 212L660.4 238.5L659.1 239.5L660.5 244.9L654.6 247.3L650.3 246.4L650.5 250.5L647.5 252.5L646.3 255.5L643.9 255.9L641.9 261.5L638.2 261.4L636 258.6L632.6 260.7L630.7 264.8L627.8 261.6L624.2 263.5L622.9 266.1L615 262.1L614.7 265.1L613.7 263.6L610 263.1L609.9 265.6L607.9 265.8L607.2 263.8L608.2 263.8L608.2 259.5L609.8 258.2L609.2 256.6L616.6 245.3L616.4 241.7L614 237.8L616 233.4L616.2 182.6L620.2 184.5L627.6 181.4L660.4 181.4L660.6 212ZM594.2 424.3L592.9 426L594.8 422L594 418.7L595 420.9L594.2 424.3ZM509.6 368.1L509.6 361.7L556.6 362L556.5 364.1L557.8 362.4L558.3 364L556.6 366.3L558.4 367.5L556.8 369.1L557.4 372.2L561 375.1L559.2 377.3L556.6 377.7L556.6 378.9L558.9 379.3L553.8 384.4L551.6 388.8L552.5 389.9L550.8 390.7L550.2 399.7L548.9 400.7L580.1 400.6L578.2 407L583.4 416.3L580.3 419.2L578.6 418.9L578.2 420.5L582 422.1L584.1 418.2L585.9 418.6L584.9 419.8L586 421.3L588.5 420.2L586.8 421.8L588.2 422L585.8 422.7L587.6 424.3L585.7 423.7L585.1 425.4L581.4 424.4L584.1 426.7L581.4 425.8L580.6 428.8L583.7 431.2L589.1 432.1L592 435.1L591 437.1L589.3 438.3L587.9 436.9L585.3 439.9L586.2 437.1L584.1 434.4L578.1 432.6L578.1 429.5L575.5 429.8L575.5 432.9L574.1 434L576.5 433.6L572.8 436.5L570 437.4L571.8 436.4L571.2 434.6L570.2 433.3L567.9 434.9L567.3 433L565.1 436.1L562.6 436.9L565.2 437.2L561.9 437.7L560 435.1L554.8 433.8L553.9 432.7L556.1 431.5L555.7 430.3L550.6 428.5L550.3 426.6L548.7 426.6L549 424.5L544.9 425.1L544.8 422.8L540.5 425.4L541.1 426.8L547.7 427.9L545.9 429.6L542.2 427.5L537.9 428.5L532.9 427.6L522.9 423.9L512.9 425.5L512 422.6L515 418.4L514.5 409.5L517.4 404.1L517.9 397.2L516.8 397.4L516.1 393.6L513 389.5L512.9 385.3L509.6 381.5L509.6 368.1ZM539.8 69.2L538.2 69.5L538.2 83.4L531.4 87.6L528.7 91.8L528.5 95.1L531.1 96.2L532.1 99.4L530.5 102L529.8 114.4L534 118.3L537.4 118.8L539.1 121.3L543.6 123.2L545 126.9L552.2 131.5L554.7 134.9L555.8 142.7L470.1 142.8L470.1 101.6L466.2 98.8L463.5 94.4L468 89.4L468.5 83.2L464.7 70.3L463.6 47L458.8 33L458.5 23.8L459.7 20.4L457.4 12.6L491.4 12.6L491.4 2.9L494.6 3.3L496.8 4.8L499 18L501.5 20L512.9 21.8L513.6 24.5L519 23.8L519 22.7L522.4 21.4L526.9 21.8L532.6 23.9L531.3 25.8L535.5 27L536.7 31.3L538.7 28.5L542.1 28.4L543.3 31.2L547.6 32.3L547.7 34.4L551.3 35.5L555 35.3L561.2 31.2L563.4 35L573.4 34.5L577.4 37.5L584 36.9L563.6 46.4L541.6 66.3L542.7 68.4L541.1 67.4L539.8 69.2ZM588.8 322.8L605.1 322.7L606.8 324.8L600.7 382.8L601.9 413.1L596.5 413.2L594.6 411.9L587.4 413.9L586.5 412.6L584.4 416.4L582.1 415.6L578.2 407L580 400.6L548.9 400.7L550.2 399.7L550.8 390.7L552.5 389.9L551.6 388.8L553.8 384.4L558.9 379.3L556.6 378.9L556.6 377.7L559.2 377.3L561 375.1L557.4 372.2L556.8 369.1L558.4 367.5L556.6 366.3L557.9 362.6L555.8 363.5L557.9 359.3L556.3 353.9L557.3 352.9L555.5 351.3L557.1 350.5L556.2 349.3L558.7 344.2L557.9 343L561.2 341.9L560.8 338.1L563.2 335.3L566.3 334.3L566.7 327.4L567.9 325.6L570.6 325.7L571.7 323.9L570.6 322.7L588.8 322.8ZM231.5 108.5L231.4 120.6L225.8 114.2L222.4 118.8L219 119.7L218 118.6L211.4 118.6L209.5 120.9L204.1 119.9L201.6 122.9L199.5 121.2L197.3 114L195.5 112.6L193.9 113.5L192.1 111.6L192.2 107.5L187.4 100.9L186.2 94.5L183.4 92.1L178.1 97.6L174 95.4L175.1 92.1L173.9 90.5L176.7 87.7L175.1 84.1L177.8 70.3L173.1 70L168.1 65.5L161.6 55.3L155 51.2L155 44.6L149.7 37.8L149.7 12.5L345.9 12.5L346.1 108.5L231.5 108.5ZM314 381.5L304.2 381.5L303.7 384.2L305.4 385.7L277.9 385.7L277.9 394.3L264.1 394.3L264.2 282.2L363 282.2L362 381.5L314 381.5ZM403.8 86.5L346 86.5L345.9 12.5L457.4 12.5L459.7 20.4L458.5 23.8L458.8 33L463.6 47L464.7 70.3L467.8 77.8L468.3 86.7L403.8 86.5ZM412.1 327.7L412.1 292.4L363 292.4L363 282.2L500.1 282.3L500.2 292.4L503.2 314.8L502.2 349.9L496 347.5L490.3 343.3L489.2 345L484.1 343.8L481.4 345.5L475.1 345.7L474.6 347.3L471.5 348.1L466.8 344.5L465.9 345.8L463.5 345.5L462.5 343.3L459.2 348.1L457.7 344.2L454.2 346.1L453.7 344.4L451.6 344.4L450.2 342.7L446.8 345.5L445.2 344.7L445.7 342.7L443.4 342.4L442.1 340.2L438.9 339.4L437.1 341.2L435 339.3L425.4 338.2L425 335.8L422.7 333.8L421.8 335.1L417.1 335L413.4 331.1L412.1 331.4L412.1 327.7ZM747.8 225.5L730.7 225.5L730.7 176.7L737.3 172.5L743.1 170.2L743.1 176.2L815.1 176.2L819.1 179.6L821.2 187L826 190L818.9 198.2L820.2 200.9L817.7 204.7L820 210.6L825.5 216.2L817.1 222.6L814.2 223.7L810.6 223.1L808.1 225.4L747.8 225.5ZM682.4 290.4L712.3 290.1L711 295.7L708 296.5L706.1 299.9L700.8 300.2L697.4 303.5L695.3 301.6L691.8 303.7L690.4 307L687.5 307.4L682 311.4L675.8 312.3L672.9 317.3L669.1 318.1L668.5 322.9L570.6 322.7L574.6 319.9L572.9 317L574.1 314.8L572.7 314.9L575.1 313.3L575.1 311.6L577.1 311.9L576.4 307.9L580.5 306.2L579.4 305.2L580.8 304.7L580 302.6L582.4 299.7L580.6 297.5L583.3 297.5L581.9 296L583.6 295.3L583.2 292.5L607.5 292.5L607.2 288.8L682.4 290.4ZM817 261L815.1 264.4L812.6 265.8L807.9 278.2L805.1 279.8L804.3 275.7L807.6 265.9L809.7 264.5L808.6 263.6L810.8 261.7L817 261ZM757.7 245.7L765.1 237.4L766.2 230.9L774.7 237.9L776.5 233.9L780.8 235.9L779.8 238.2L784 240.1L787.8 243.9L786.2 248.4L784.2 248.4L783 252.3L783.7 254.5L787.6 253.3L788.9 257.2L794.6 258.5L800.8 263.9L799.1 268.7L800 269.6L798.7 269.7L796.3 269L795.1 266.4L791.8 264.3L795.8 269.5L799.7 270.7L798.7 271.6L800.3 272.3L800.1 275.9L797.8 274L798.9 276.6L796.4 277.4L799.9 279.6L799.7 282.2L797.6 282.8L794 277.7L791.5 278.2L792.7 279.2L793.4 278.1L793.8 281.3L796.9 284.6L799.8 282.9L804.7 283.8L806.8 291.4L679.1 290.4L687.9 287.5L689 285.2L691.6 284.8L694.7 280.1L707 271.2L707.7 274.9L711.8 278.1L716.9 275.3L719.2 277.4L724.5 275.8L725.2 273.4L726.6 274.6L730.9 272.3L731.6 273.5L735.6 269.4L734.4 268L742.7 256L745 249.3L750.5 253L755.6 243.9L757.7 245.7ZM811.3 223L814.2 223.7L811 227.6L811.3 231L814.4 235.3L816 242.5L819.5 245L820.2 252.2L809.6 252L808.1 225.4L811.3 223ZM762.6 240L757.7 245.7L755.6 243.9L750.7 252.9L745 249.3L742.7 256L735 266.7L734.4 268L735.6 269.3L734.1 271.9L726.6 274.6L725.2 273.4L725.3 275.1L723.7 276.2L719.2 277.4L716.9 275.3L711.8 278.1L707.7 274.9L706.6 272.4L707.7 271.7L701.7 268.1L696.1 258.7L696.8 252.8L701.1 252.4L701.7 249.5L703.6 249L702.9 245.2L705.9 240.2L707.6 240.9L708 243.3L710.4 242.3L709.5 239.2L711.5 235.6L715.4 232.1L716.7 233.5L719.3 232.5L724.8 227.6L729.4 212.7L728.3 207L729.4 206.1L730.7 205.8L730.7 225.5L747.8 225.5L747.6 236.4L754.2 230.8L756.1 231.4L759 227.4L762.7 229.7L769 226L773.5 228.3L776.5 233.9L774.7 237.9L766.2 230.9L765.1 237.4L762.6 240ZM565.3 64.7L566.4 65.1L562.8 67.3L565.3 64.7ZM566.2 63.4L565.3 62.8L567.3 62.3L566.2 63.4ZM625.6 99L627.9 98.9L626.4 101.7L625.6 99ZM612.3 109.3L608.7 115L607.7 118.5L609.3 119.3L614.8 112.2L618.4 111.6L620.8 104.6L622.8 104.1L623.8 101.7L625.2 102.1L617.1 118.8L616.3 127.1L614.2 129.1L612.7 134.2L613.2 138.5L609.8 148.4L610.1 153.6L612.2 158.8L611.6 165.3L565.2 164.9L564.1 162.1L558.4 159.8L556.9 156L556.4 151.2L558.4 148.3L555.9 145.6L554.7 134.9L552.2 131.4L545 126.9L543.6 123.2L539.1 121.3L537.4 118.8L534 118.3L529.8 114.4L530.5 102L532.1 99.4L531.1 96.2L528.5 95.1L528.7 91.8L531.4 87.6L538.2 83.4L538.2 69.5L539.6 69.7L541.1 67.4L543.6 69L546.4 68.7L561.7 62.3L563.4 64.1L560.3 71.3L563.6 68.8L572.3 73.9L573.7 77.2L590 81.8L597.5 85.5L600.1 84.7L606.7 87.3L606.2 89.6L612 92.7L610.2 100.3L614.1 100.4L612.6 103.9L615.1 106.5L614.4 109L612.3 109.3ZM345.8 132.9L345.8 198L231.5 198.1L231.5 108.5L345.8 108.6L345.8 132.9ZM606.3 414.3L607.1 415L603.3 415.3L606.3 414.3ZM628.3 322.8L647.5 323L654.4 364.6L657.4 371.6L657.3 375.2L658.9 376.4L656.7 378.8L655.1 384.6L656.8 390.3L655.7 397.1L657.4 400.7L614.9 400.7L614.5 403.6L618.3 407.5L617.3 414L607.9 415.5L612.4 414.4L609.9 411.8L609.4 407.2L607.4 407.4L606.2 413.6L601.9 412.7L600.7 384.4L606.8 324.8L605.1 322.7L628.3 322.8ZM735.1 505.7L728.4 513.8L732.7 509.2L736.3 502.5L735.1 505.7ZM713.3 518.1L715.9 516.4L718 518.1L714.7 517.9L709.6 520.1L713.3 518.1ZM702.3 480.9L703.8 484.9L706.3 485.5L703.6 485.2L702.3 480.9ZM661.1 425.2L656.9 427.4L655.9 426.7L661.1 425.2ZM685.1 407.6L703 408.9L703.8 412.9L705.7 412.8L706.1 404.8L708 404.1L715.9 406.4L715.5 410.1L718.9 424.6L723.4 435.7L729.8 446.2L730 455.3L738.7 479.2L736.7 499.9L735.3 498.8L734.1 505.2L731.1 508.3L721.3 509.6L720 507.9L720.9 505.5L717.1 497L711 495.5L708.7 486.9L706.1 484.4L704.8 485L703.5 481.3L705 481.6L705.5 476.4L703.6 477L704.1 479.4L702.3 480.7L694.3 465.6L695.9 465.9L699.9 459.2L698.7 458.4L698.5 460.4L697.4 457.7L694.7 457.9L697.2 459.7L694.5 464.2L692.7 459.8L695.6 448.1L696 440.5L693.3 435.7L689.3 436L688.9 433.7L683.6 428.8L683.4 425.9L678.9 421.1L673.8 417.9L669.6 417.7L667.9 418.6L668.1 421.6L665.4 421.2L659.3 424.9L659 423.7L651.8 426.2L650.6 422.6L651.7 425.6L652.5 423.3L650.8 420.8L637.4 413.2L628.8 412.3L616.3 414.4L617.3 414L618.3 407.5L614.5 403.6L614.9 400.7L657.4 400.7L659.7 406.2L685.1 407.6ZM231.4 120.6L231.5 176.1L133.7 176.2L133.7 135.8L135.8 127.8L134.5 125.9L131 125.2L130.6 120.8L133.1 114.8L136.5 111.1L136.6 108.1L142.9 94.2L141.5 91L136.4 87.4L133.1 76.5L133.6 12.5L149.7 12.5L149.7 37.8L155 44.6L155 51.2L161.6 55.3L168.1 65.5L173.1 70L177.8 70.3L175.1 84.1L176.7 87.7L173.9 90.5L175.1 92.1L174 95.4L178.1 97.6L183.4 92.1L186.2 94.5L187.4 100.9L192.2 107.5L192.1 111.6L193.9 113.5L195.5 112.6L197.3 114L199.5 121.2L201.6 122.9L204.1 119.9L209.5 120.9L211.4 118.6L218 118.6L219 119.7L222.4 118.8L225.8 114.2L231.4 120.6ZM419.6 282.2L378.7 282.4L378.6 219.4L488.9 219.5L492.5 222.5L494.9 221.8L495.6 224.6L492.1 229.3L496.6 235.9L500.6 237.8L500.1 282.3L419.6 282.2ZM797.5 239.6L798.2 240.5L795.5 246.1L799.4 260.9L795 257.2L789.6 255.5L788 252.3L784.2 253.6L784.4 250.1L789.8 243L787.6 240.8L786.3 242.1L780.8 239.2L779.7 237.6L780.8 235.9L775.9 233.7L773.5 228.3L769 226L762.7 229.7L759 227.4L756.1 231.4L754.2 230.8L747.6 236.4L747.8 225.5L808.1 225.4L809.6 252L820.2 252.2L817 261L806.5 263.4L807.5 258.8L805.3 258.8L807.1 256.9L805.1 256.8L804.6 253.8L804.1 257.1L802.8 255.6L802.2 256.7L799.2 251.7L800.6 250.7L800.1 248.9L802.2 248.3L800.7 246.3L798.9 247.3L799.7 244.4L801.5 244.5L801.3 242.2L798.5 243.9L799.5 240L802 240.7L802.3 238.8L800.8 240.3L800.1 237.2L801.8 233.7L804.6 233L805.1 228.9L803.1 229.4L803.6 231.3L800 234.3L799.1 233.2L797.7 236.4L795.9 236.2L797.5 239.6ZM822.6 217.9L825.5 216.1L820 210.6L819.9 207.9L817.9 206.9L817.8 203.4L820.2 200.9L818.9 198.2L826 190.2L839.1 198.1L836.9 204.3L834.2 205.7L832.9 209.1L837.2 210.7L837.4 209.5L837.7 213.1L835 226.1L823.2 242L821.4 242L822.8 237.4L820.4 236.2L818.7 236.9L812.2 231L811.8 227.4L814.2 223.7L822.6 217.9ZM808.7 318.7L812.3 316.9L812.3 307.1L813.5 310.7L812.4 318L804.4 321.4L808.7 318.7ZM796.6 291.4L806.8 291.4L812.2 307L809.2 302.5L806.1 292.7L804.1 292.8L805.9 293.9L808 301.1L804.1 298.7L796.2 302.5L793.9 301.9L793.7 303.9L801.7 302.7L803.6 302.7L805 304.6L806.3 303L808.2 303.9L809.1 310.1L806.4 311.2L803.5 315.2L794.4 315.3L797 317.1L794.4 322.8L797.1 321.1L798.2 323.2L799.3 323.1L798.7 322L799.9 322.5L798 326.5L804 321.5L795.9 330.8L793.6 328.8L788.4 329.2L779.2 334.3L774.7 339.3L772.4 345.6L769 344.2L763.1 345.4L744.3 326.5L726.5 326.3L726.4 323.9L723.9 320.5L722.2 321.8L722.2 319.7L700.2 318.4L688.4 322.6L668.5 322.9L669.1 318.1L672.9 317.3L675.8 312.3L682 311.4L687.5 307.4L690.4 307L691.8 303.7L696.1 301.2L697.4 303.5L700.8 300.2L706.1 299.9L708 296.5L711 295.7L711.8 290.6L796.6 291.4ZM703 318.7L722.2 319.7L722.2 321.8L723.9 320.5L726.4 323.9L726.5 326.3L744.3 326.5L763.1 345.4L756.6 349.6L749.7 362L746.5 361.7L746.2 363.9L739.2 369.7L733.8 372.3L731.5 371.9L731.8 375.2L728.4 376.7L724.7 380.8L720.9 379.2L719.6 372.5L716 369.3L714.7 361.9L708.9 357.3L705.8 351.1L697.3 343.4L692.2 333.2L689.6 332.9L684.4 328.6L688.4 322.6L700.2 318.4L703 318.7ZM45.8 39.3L44.6 37.5L43.4 38L42.4 33.5L39.7 31.7L41.5 27.4L44 29.6L41.4 31.7L43.4 35.9L43.9 34.8L46.2 36.4L45.8 39.3ZM41.7 22.7L43 24.2L41.7 24.2L41.7 22.7ZM39.2 22.4L39.2 26.7L38 26.9L34 25.1L32.7 22.6L34.2 21.9L36.2 23.4L35.2 21.9L37.7 19.6L40.2 20.9L39.2 22.4ZM45.5 53.7L47 53L45.4 47.5L46.8 47L45.3 45.5L45.9 42L48.7 36.8L45.9 31.6L44.5 32.9L46.5 35.8L44 33.9L43.6 31.1L46.3 30.2L43.2 26.3L41.7 27.2L40.7 25.8L42.4 24.4L44.6 25.7L43.6 23.1L45.4 22.5L43.6 18.1L42.3 20.1L41.3 19.2L41.8 17.9L39.4 15.2L40.1 14.3L38.9 14L39.9 12.5L133.6 12.5L133.1 76.5L135.5 85.3L101.6 85.2L99.3 86.8L91.6 87.1L81.6 91.6L77.2 92.4L74.7 91.1L70.1 93.6L65.5 93.9L60 91.6L54.5 92.4L48 95.9L41.8 94.3L39.8 93.2L37.9 83.8L34.1 80.8L29.9 81.7L28.2 78.9L24.5 78L21.7 79.5L19.6 77.8L18.3 78.8L18.5 70.1L19.2 74.2L20.5 73.9L21.4 72.5L20.3 70.1L22.1 68.2L18.1 67.6L17.4 63.7L18.4 64.7L21.9 62.6L17.6 60.4L16.7 63.2L16.6 58.2L12.7 43.6L8.6 38.1L7.6 33.2L8.8 29.1L7.7 27.9L19.9 33.2L30.5 34.4L33.8 32.9L35.3 35.2L38 36.1L38 34.5L39.9 33.7L39.2 35.1L39.8 36.1L41.1 34.7L40.6 37.5L42.4 40L39.9 43.4L43 40.7L42.2 38.7L43.7 39.5L44.6 43.1L43.3 43.4L44.5 47.3L43.4 48.8L46.2 52.1L42.9 53.6L45.1 55L45.5 53.7ZM862.6 160.1L849.2 159.7L849.7 142L848.7 139.9L846.6 140.8L848 136.6L846.5 130.4L848.9 121.4L847.3 117.3L848.1 108.3L878.8 108.2L877.6 108.6L878.3 110.7L876.1 114.3L877.6 118L876.9 119.9L869.1 124.9L868.3 132.6L863.6 142.3L862.8 153.8L861 157L862.6 160.1ZM231.5 176.1L231.5 198.1L264.1 198L264.2 282.2L182.3 282.2L182.5 176.3L231.5 176.1ZM556.7 154.3L558.4 159.8L564.1 162.1L565 165.6L568.8 168.9L569.3 171.2L572.9 173.5L573.4 176.3L572.7 180.4L568.1 186.6L558.5 189.1L557.5 192.8L560.2 195.9L560.1 199L557.8 201.9L557.3 205.1L552.7 207.6L553 211.3L550.7 210.7L547.4 206.4L481.4 207L479.5 204.1L480 194.4L478.8 193.8L478.7 188.6L476 186.3L475.4 176.8L473.1 175.1L470.7 168.4L471.2 165.7L467.1 159.9L470.4 151.3L468 148L469 145.3L467.8 142.7L555.8 142.7L555.9 145.6L558.4 148.3L556.5 151L556.7 154.3ZM583.2 292.5L582.8 291.1L584.1 291L583.2 292.5ZM696.6 256.5L696.1 258.7L701.7 268.1L707 271.2L694.7 280.1L691.6 284.8L689 285.2L687.9 287.5L678.9 290.7L607.2 288.8L607.5 292.5L585.2 292.4L586 289.9L588.2 291.1L589.2 289.4L590.4 283.4L589.1 281.3L590.6 278.8L593 277.5L600.9 280.7L600.6 274.3L607.4 272.2L605.8 268.6L607.9 265.8L609.9 265.6L609.9 263.2L613.7 263.6L614.2 265.2L615.2 262.1L622.9 266.1L624.2 263.5L627.6 261.6L630.7 264.8L632.6 260.7L636 258.6L638.2 261.4L641.9 261.5L643.9 255.9L646.3 255.5L647.5 252.5L650.5 250.5L650.3 246.4L654.6 247.3L660.5 244.9L659.1 239.5L661.5 237.6L663.7 239.2L666.7 238.7L670.3 244.8L675.9 245.7L679 248.5L681.6 246.9L685.5 249L687.6 248.7L692 245.8L692.8 249.4L696.8 252.8L696.6 256.5ZM922.6 130.2L921.2 130.9L920 128.9L921.6 127.3L922.6 130.2ZM928.1 127.1L929.2 127.9L928.3 128.8L927.3 128L928.1 127.1ZM924.3 125.1L925.6 126.2L924.4 128.3L924.3 125.1ZM918.6 125.8L917.5 129.1L918.6 129.6L915.6 132.9L912.3 132L910.9 135.1L910.2 134.1L908.4 136.2L907.6 135.5L905.4 138.1L904.9 136.5L902.1 137.4L902.6 134.6L899.7 136.6L898.6 138.8L899.5 141.3L896.9 142.1L897 144.1L893.7 146.8L891.8 152.4L889.2 151.1L889.4 148.7L886.6 145.2L885 101.4L887.2 100.8L888.7 103.2L889.7 98.7L892.4 99.6L891 96.5L898.5 87.8L898 80.7L901.8 75.3L902.8 68.7L915.4 50.3L918.4 51.1L918.3 55.2L920.7 57.1L930.8 52.7L938.9 59.8L938.4 92.4L944.9 95L944.9 96.8L943.6 97.2L944.9 99.7L943.8 102L946.2 105.6L947.2 104.1L949.2 104.7L952.6 112.7L947 117.7L946.8 115.3L945.2 117.9L942.8 117.2L942.5 119.3L939.8 120.1L938.1 118.7L937.8 121.9L935.4 122.1L934.7 123.9L933.5 120.6L931.2 120.4L930.6 121.4L932.6 124L930.3 126.3L928.6 125.2L929.6 122.3L928.1 121.2L927.9 122.8L927.5 121.5L926.2 122.3L926.9 126.3L923.5 124L921.9 124.3L922.7 120.6L919.4 121.7L918.6 125.8ZM893 187.7L894.6 189.7L895.4 188.9L895.4 190.4L889.4 190.9L893 187.7ZM901.3 191.5L902 189.5L903.2 192.6L898.3 191.3L901.3 191.5ZM866.8 175.5L856.7 176.2L845.6 175.1L849.4 159.7L881.6 160.7L883.7 158.3L888 156.5L889.4 156.8L890 160.8L893.1 162L888.5 164.1L889.1 165.3L886.7 166.8L886.5 170.2L888.3 169.4L890.9 171.6L892.3 174.4L891.1 176.2L893.7 177.7L894 180.5L896 181.8L898.5 182.5L902.6 180.6L901.2 175.4L898.7 174.8L901.4 175L903.3 178.1L903.9 183.4L902.8 186.2L902.6 183.4L897 184.2L887.2 189.1L892 186.2L892.5 182.5L890.9 182L888.8 185.2L887.6 184.7L887.5 186.3L884.4 187.2L884.2 183.6L881 181L880.2 175.8L866.8 175.5ZM648.2 90.8L649.2 90.9L649.5 94.1L648.3 95.2L647.1 94.6L648.2 90.8ZM597.2 34.4L601.5 33L597.4 36.9L592.6 39.1L593.5 39.9L588.2 40.8L589.1 38.8L597.2 34.4ZM664.1 89.5L663.3 87.9L668 90.6L665.9 91.5L664.1 89.5ZM684.1 178.9L682.7 182L660.6 182.8L660.4 181.4L627.6 181.4L631 178.5L635.3 170.6L637.4 163L637.3 153.6L632.2 139.8L634 135.6L632.7 130.1L636.7 123.6L636.9 115.6L639.6 114.5L640 110.7L642.2 109.2L644.2 109.7L648.4 103.6L646.8 112L647.7 113.8L649.7 108.7L648.8 114.3L651 110.1L651.4 102.2L654.2 100.1L658.8 99.4L655.6 96L658.4 92L657.3 90.7L661.8 90.2L666.2 93.3L670.3 93.7L672.2 97L682.2 100.3L683.9 102.3L685.8 107.9L683.6 106.9L682.7 107.8L685.7 115.1L684.7 123.7L681.4 125.8L680.6 130.2L675.8 132.4L674.5 136.9L675.3 138.9L679.3 140.7L685.9 132L690.7 129.9L694.3 131.5L696.1 135.3L699.7 153.9L698.2 162.1L695.3 164.7L696.2 161.3L693.2 162L691.9 167.6L688.8 169.4L687.1 176L684.1 178.9ZM593.1 83.4L573.7 77.2L572.3 73.9L568.8 71.8L575.2 69.2L579.1 65.8L585.2 65.2L589.9 61.6L592.5 61.4L601.5 52.5L609.6 49.9L612.4 50.3L613.1 51.8L609.1 52.1L609.3 53.3L604.6 56.6L601.1 62.1L600.8 66.5L606 62.2L605.5 63.7L610 63.6L613.6 65.2L619 73.3L624.6 72.6L627.2 74.9L628.5 73.8L629.7 74.8L630 71.9L631.5 74.2L638.4 69.3L649.1 69.2L658.2 66.9L657 73.8L660.2 74.7L663.5 73.7L664.8 75.3L666.9 73.3L671.7 72.6L672 79.5L669.7 81L673.4 82.1L672.6 83L675.4 85.2L677.6 84.7L676.8 82.6L679.8 82.7L682.4 85.5L681 87.2L672 85.7L667.6 86.8L663.1 83.9L661.6 89L657.2 84.9L649.3 82.9L646.2 86.1L636.5 86.5L635.3 89.9L631.6 91.9L631 94.4L629.3 92.8L632.2 87.8L630.5 89.1L628.3 88.5L627.4 91.7L625.3 92.9L624.2 89L623.8 92L621.5 93.7L615.1 106.3L612.6 103.9L614 100L610.2 100.3L611.8 96.9L611.5 92L606.8 90.2L607.2 88.1L605.5 86.5L599.7 84.7L597.5 85.5L593.1 83.4ZM583.1 295.7L581.9 296L583.2 297.5L580.6 297.5L582.4 299.7L580.5 302.5L569.6 302.7L574.6 296.4L573.2 292.5L500.2 292.4L500.6 237.4L496.6 235.9L492.1 229.3L495.6 224.6L495.1 221.9L492.5 222.5L489 219.9L481.4 207L547.4 206.4L552.5 211.4L551 216.8L553.3 225.3L563.7 235.3L564.9 242.4L566.4 243.5L569 241.5L573.9 244L569.6 254.7L569.9 257.2L576.5 264.1L578.2 263.6L583.6 268.4L585.1 274.3L583.6 276.4L585.7 281.3L590.4 283.4L588.5 290.8L586 289.9L584.3 293.3L584.2 291L582.8 291.1L583.1 295.7ZM345.8 182.8L345.8 154L436.7 154L444.3 159.3L447.4 156.9L457 157.3L465.7 161.4L467.5 165L471.2 165.7L471.8 172.4L475.4 176.8L474.9 178.3L476.5 180.6L476 186.3L478.7 188.6L478.8 193.8L480 194.4L479.5 204.1L481.7 206.6L481.4 208.1L483.1 208.4L483.7 212.2L488.9 219.5L378.6 219.4L378.6 198L345.8 198L345.8 182.8ZM182.4 217L182.4 298.6L180.6 302.1L179 302.2L176.9 299.7L170.8 300.8L173.9 319L172.8 322.6L85 240.7L85.1 176.3L182.5 176.3L182.4 217ZM889.4 151.2L891.2 152.7L889.4 156.8L884 158.1L881.6 160.7L862.6 160.1L861 157.2L862.8 153.8L863.6 142.3L868.3 132.6L869 125.1L876.9 119.9L877.6 118L876.1 114.3L878.3 110.7L877.6 108.6L878.8 108.2L879.2 103.1L881.8 101.5L884.1 102.9L885 101.4L886.6 145.2L889.4 148.7L889.4 151.2ZM835 208L833.2 208.8L834.1 206L836.1 205.6L835 208ZM847.1 128L848 136.6L846.6 140.8L848.7 139.9L849.7 142L849.4 159.7L845.4 174.3L844.7 191.6L845.8 193.4L841.8 195.8L843 198.4L840.4 201.7L841 202.4L845.8 199.2L849.9 200.1L851.9 198.6L860.5 198.1L866 194.5L864.6 195.7L868.4 198.2L872.4 196.5L863.6 200.9L849.8 206.1L837.2 207.2L839.1 198.1L821.2 187L819.1 179.6L815.1 176.2L743.1 176.2L743.1 170.2L753.1 163.9L758 158.8L754.5 152L754.4 148.1L765.9 145.5L775.8 146.3L779.3 148.7L789 147.9L797.8 142.3L800.8 142.1L801.3 137.8L800 134.7L802.6 133.4L798.7 129.8L799.5 126.9L806.1 123L816 112.3L821.1 109L848.1 108.3L847.3 117.3L848.9 121.4L847.1 128ZM710.6 236.9L709.5 239.2L710.4 242.3L708 243.3L707.6 240.9L705.9 240.2L702.9 245.2L703.6 249L701.7 249.5L701.1 252.4L697.3 253.2L692.8 249.4L692 245.8L687.6 248.7L685.5 249L681.6 246.9L679 248.5L675.9 245.7L670.3 244.8L666.7 238.7L663.7 239.2L661.6 237.6L660.4 238.5L660.6 182.8L682.7 182L691.2 186.8L692.9 185.2L698.6 189.7L706.3 186.8L710.8 187.4L718.2 181.4L730.7 176.7L730.7 205.8L728.3 207L729.4 212.7L725.6 225.8L719.3 232.5L716.7 233.5L715.4 232.1L710.6 236.9ZM53.8 93.3L60 91.6L65.5 93.9L70.1 93.6L74.7 91.1L78.4 92.2L90.4 88.5L91.6 87.1L99.3 86.8L101.6 85.2L135.5 85.3L137.6 88.8L141.5 91L142.9 94.5L136.6 108.1L136.5 111.1L133.1 114.8L130.6 120.8L131 125.2L134.5 125.9L135.8 127.8L133.7 135.8L133.7 176.2L18 176.2L14.7 175L12.6 168.9L13.1 162.3L10.6 157.5L15.8 141.5L18.5 121.7L20.6 93.1L19.7 86.4L20.8 85L19.2 79.8L22 81.5L28.1 78.8L29.9 81.7L34.1 80.8L37.9 83.8L39.8 93.2L41.3 94.1L48 95.9L53.8 93.3ZM879.7 183.8L878.5 189.9L872.3 191.3L873.4 188.9L873.3 176L880.2 175.8L881 181L882.7 182.5L882.2 184L880.8 182.1L880.2 183.5L879.1 183L879.7 183.8ZM884.4 187.2L883.2 188L882.9 184.4L882.5 187.7L880.5 188L883.2 183.3L884.4 187.2ZM345.8 134.8L346 86.5L468.3 86.7L468 89.4L463.5 94.4L466.2 98.8L470.1 101.6L470.1 142.8L467.8 142.7L467.7 143.9L469 145.3L468 148L470.4 151.3L467.1 159.9L469.8 165.6L467.3 164.8L465.7 161.4L457 157.3L447.4 156.9L444.3 159.3L436.7 154L345.8 154L345.8 134.8ZM464 455L467.9 451.6L471 450.7L461.7 458L455.9 469.1L455.1 477.2L458.6 492.6L454.9 478.8L455.2 469.4L459 460.3L464 455ZM412.1 327.7L412.1 331.4L413.4 331.1L417.1 335L421.8 335.1L422.7 333.8L425 335.8L425.4 338.2L435 339.3L437.1 341.2L438.9 339.4L442.1 340.2L443.4 342.4L445.7 342.7L445.2 344.7L446.8 345.5L450.2 342.7L451.6 344.4L453.7 344.4L454.2 346.1L457.7 344.2L459.2 348.1L462.5 343.3L463.5 345.5L465.9 345.8L466.8 344.5L471.5 348.1L474.6 347.3L475.1 345.7L481.4 345.5L484.1 343.8L489.2 345L490.3 343.3L504.4 351.5L509.5 351.3L509.6 381.5L512.9 385.3L513 389.5L516.1 393.6L516.8 397.4L517.9 397.2L517.4 404.1L514.5 409.5L515 418.4L512 422.6L512.9 425.5L508.1 426.3L497.5 431.7L502.2 428.6L497.5 428.5L498.9 425.4L498.1 423.7L495.6 426.1L494.5 425.3L493.6 428.1L495.4 429.1L495.8 432.9L498.4 432.3L487.6 441L471.4 449.9L477.9 445L473.8 446.3L473.9 444.1L469.6 446.5L468 443.6L466.7 444.1L470.9 448.9L466.5 450.8L464.9 449.5L464.5 452.9L460.7 454.8L458.1 460.3L456.7 459.3L455 460.1L455.2 461.8L457 462.7L454.6 469.3L452.5 470.4L453 468.8L450.7 470.5L454.3 470.7L452 478.4L453.5 479.9L456.4 491.8L457.9 492.4L457.6 493.9L458.7 492.7L458.8 494.3L454.5 496.4L450.2 493.2L440.9 492.4L431.6 487L426.8 485.8L424.1 478.4L421.2 475.1L420 465L414.7 461.2L410.8 454.4L407.4 452L406.7 447.8L403.9 444.8L401.1 436.6L394.8 429.9L391.9 428.6L389.2 424.2L377.5 423.6L374.1 422L373.1 424.2L368.1 424.9L365.2 434.2L361.2 438.7L356.8 438L346.3 432.6L338.3 426.4L335.6 421.2L335.1 415.2L331.5 408.3L323.9 403.4L314.3 393.5L310.6 391.7L307.8 386.7L303.7 384.2L304.2 381.5L362 381.5L363 292.4L412.1 292.4L412.1 327.7Z"/></g></svg>
-    <div id="pins"></div>
+    <div id="unrecorded"></div>
+    <div id="marks"></div>
   </div>
 </div>
-<div id="veil" aria-hidden="true"></div>
-<div id="stbar" aria-hidden="true"></div>
+<div id="scrim" aria-hidden="true"></div>
+<div id="tprog" aria-hidden="true"></div>
 
 <header id="mast">
-  <a class="brand" href="#" id="home"><span class="mark">B</span><b>Black</b><span>Story</span></a>
-  <div id="seek" role="search">
+  <a class="brand" href="#" id="home"><span class="glyph">B</span><b>Black</b><span>Story</span></a>
+  <div id="where" role="search">
     <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true"><circle cx="7" cy="7" r="5" stroke="currentColor" stroke-width="1.5"/><path d="M11 11l3 3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
-    <input id="q" type="search" placeholder="Search a place, a person, a year" aria-label="Search the archive">
+    <input id="q" type="search" placeholder="Go to a place" aria-label="Go to a place">
   </div>
-  <nav class="navset" aria-label="Views">
-    <button data-go="journey" aria-current="true">Journey</button>
-    <button data-go="field">Field</button>
-    <button data-go="story">Reading</button>
-  </nav>
+  <button class="mbtn" id="openreg" aria-pressed="false">Register</button>
+  <button class="mbtn" id="startthread">Follow a thread</button>
+  <!-- P-01: the Memorial is deliberately NOT a posture of the ground. Names are not
+       map pins. It stays a separate, still, non-spatial surface. -->
+  <a class="mbtn" id="memorial" href="/memorial">Memorial</a>
 </header>
 
-<!-- ================= JOURNEY ================= -->
-<main id="journey">
-  <section class="chapter" data-ch="0" data-side="start">
-    <div class="card" id="open-card">
-      <h1 class="ch-h">History happened <em>here.</em></h1>
-      <p class="ch-p">Four thousand two hundred and two records, each one pinned to the ground it happened on. Scroll to walk the field, or go straight to it.</p>
-      <div class="ch-stat">
-        <div><b>4,202</b><span>Records</span></div>
-        <div><b>3,302</b><span>Places</span></div>
-        <div><b>481</b><span>People</span></div>
-        <div><b>81</b><span>Sources</span></div>
-      </div>
-      <div style="display:flex;gap:10px;flex-wrap:wrap">
-        <button class="ch-cta" data-go="field">Open the field
-          <svg width="13" height="13" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        </button>
-        <button class="ch-ghost" id="scrolldown">Walk it with me</button>
-      </div>
-    </div>
-  </section>
+<!-- ================= TIME ================= -->
+<p id="spinelbl">Decade</p>
+<nav id="spine" aria-label="Decade"></nav>
 
-  <section class="chapter" data-ch="1" data-side="end">
-    <div class="card">
-      <div class="ch-num">01</div>
-      <span class="ch-kicker">Reading the gaps</span>
-      <h2 class="ch-h">The archive is not <em>evenly spread.</em></h2>
-      <p class="ch-p">The map reflects surviving sources, and what has been digitized. A cluster can mean concentrated cataloging as much as concentrated history.</p>
-      <p class="ch-p" style="font-family:var(--f-mono);font-size:var(--t-micro);color:var(--i-low);line-height:1.6">A blank area does not establish that nothing happened there.</p>
-    </div>
-  </section>
-
-  <section class="chapter" data-ch="2" data-side="start">
-    <div class="card">
-      <div class="ch-num">02</div>
-      <span class="ch-kicker">Philadelphia, 1787</span>
-      <h2 class="ch-h">Some records are a <em>whole street.</em></h2>
-      <p class="ch-p">Mother Bethel A.M.E. sits on the oldest parcel of land continuously owned by Black Americans. The pin is drawn to the parcel, not to the city — because the source supports that precision.</p>
-      <button class="ch-cta" data-rec="bethel">Open this record</button>
-    </div>
-  </section>
-
-  <section class="chapter" data-ch="3" data-side="end">
-    <div class="card">
-      <div class="ch-num">03</div>
-      <span class="ch-kicker">1870 → 2020</span>
-      <h2 class="ch-h">Watch the field <em>fill in.</em></h2>
-      <p class="ch-p">Each decade adds what was recorded in it. The early decades are thin because the records are thin, not because the lives were.</p>
-      <button class="ch-ghost" id="sweepbtn">Play the decades</button>
-    </div>
-  </section>
-
-  <section class="chapter" data-ch="4" data-side="start">
-    <div class="card">
-      <div class="ch-num">04</div>
-      <span class="ch-kicker">Where this goes next</span>
-      <h2 class="ch-h">One field, <em>many ways in.</em></h2>
-      <p class="ch-p">The map, the records, the census and the writing are one surface. Pick up a thread anywhere and it follows you.</p>
-      <div style="display:flex;gap:10px;flex-wrap:wrap">
-        <button class="ch-cta" data-go="field">Open the field</button>
-        <button class="ch-ghost" data-story="1">Read “The Count”</button>
-      </div>
-    </div>
-  </section>
-</main>
-
-<nav id="spine" aria-label="Chapters"></nav>
-
-<!-- ================= FIELD UI ================= -->
-<div id="fieldui">
-  <div id="lens">
-    <div class="lens-g" role="group" aria-label="Record kind">
-      <button data-kind="all" aria-pressed="true">All</button>
-      <button data-kind="place" aria-pressed="false">Places</button>
-      <button data-kind="person" aria-pressed="false">People</button>
-      <button data-kind="event" aria-pressed="false">Events</button>
-      <button data-kind="invention" aria-pressed="false">Inventions</button>
-    </div>
+<!-- ================= CONDITIONS ================= -->
+<section id="cond" aria-labelledby="condplace">
+  <div class="cond-h">
+    <span class="cond-place" id="condplace">Everything in the archive</span>
+    <span class="cond-yr" id="condyr">1790 to 2020</span>
   </div>
-
-  <div id="rail">
-    <h3 id="railh">On the field</h3>
-    <div id="raillist" role="list" aria-labelledby="railh"></div>
+  <!-- The collection is the addressable object. The ground is a VIEW of it. -->
+  <p class="coll-basis" id="collbasis"></p>
+  <div class="cond-row">
+    <div><b id="cmatch">0</b><span>Records match</span></div>
+    <div><b id="cmap">0</b><span>On the ground</span></div>
   </div>
-
-  <div id="era">
-    <header>
-      <h3>Era</h3>
-      <output id="eraout">1790 — 2020</output>
-    </header>
-    <input id="erarange" type="range" min="1790" max="2020" step="10" value="2020" aria-label="Show records up to this decade">
-    <div class="era-ticks"><span>1790</span><span>1900</span><span>2020</span></div>
-    <p class="note" id="eranote">Showing every decade.</p>
+  <p class="unmap" id="unmap" hidden></p>
+  <div id="absence"></div>
+  <button class="censusbtn" id="censustoggle" aria-pressed="false" aria-controls="censusbox">
+    Show the census reading
+  </button>
+  <div id="censusbox" hidden>
+    <div class="cond-row">
+      <div><b id="cpop">Not surveyed</b><span>Black population</span></div>
+      <div><b id="cshare">Not surveyed</b><span>Share of place</span></div>
+    </div>
+    <p class="censusnote" id="censusnote"></p>
   </div>
+</section>
+
+<div id="mobnav">
+  <button id="mreg">Register</button>
+  <button id="mthread">Thread</button>
 </div>
-
-<!-- ================= RECORD SHEET ================= -->
-<aside id="sheet" aria-label="Record" tabindex="-1">
-  <div class="sh-top">
-    <button class="sh-back" id="shback">
-      <svg width="13" height="13" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M10 3.5L5.5 8l4.5 4.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
-      <span id="shbacklbl">Back to the field</span>
-    </button>
-    <button class="sh-back" id="shadd" style="margin-left:auto">+ Add to thread</button>
-  </div>
-  <div class="sh-body" id="shbody"></div>
-</aside>
-
-<!-- ================= STORY ================= -->
-<article id="story">
-  <div class="st-wrap">
-    <span class="st-kicker">Chapter 01 · The Count</span>
-    <h1 class="st-h">A ledger open on his knee</h1>
-    <p class="st-meta">1790 — 1870 · 14 min · 126 citations · 9 records behind this chapter</p>
-
-    <p class="lead">In the summer of 1790, a man walked up to a door in <a class="elink" href="#" data-rec="bethel">Philadelphia</a> with a ledger open on his knee, and wrote down how many people lived behind it. He did not write down their names.<a class="cite" href="#">1</a></p>
-
-    <p>The first federal census counted enslaved people as a number in a column beside the head of household. Free Black households got a line of their own, and a name — which is why, two centuries later, a researcher can stand on a sidewalk in <a class="elink" href="#" data-rec="bethel">the Seventh Ward</a> and say who was there, and cannot do the same two streets over.<a class="cite" href="#">2</a></p>
-
-    <figure class="moment" id="m1" data-lon="-75.1514" data-lat="39.9428" data-zoom="7.5">
-      <div class="win"><span class="lbl">Philadelphia · 1790</span></div>
-      <figcaption>The same field you were just on, held still at the parcel this paragraph is about. The map does not reload — it leans in.</figcaption>
-    </figure>
-
-    <p>By 1870 the column had a name in it. That is the year the census first recorded every Black American by name, and it is the reason <a class="elink" href="#" data-rec="greenwood">Greenwood</a> and a thousand places like it can be reconstructed household by household.<a class="cite" href="#">3</a></p>
-
-    <p>What the ledger could not hold is the part this archive keeps trying to give back: that a number in a column was a person with a street, a trade, a church, and a reason to be standing where they stood.<a class="cite" href="#">4</a></p>
-
-    <div class="setbox">
-      <h3>The nine records behind this chapter</h3>
-      <p>A story is an argument built on evidence. Handing you one record at a time breaks the argument. This hands you the whole set, on the field, framed to fit — the handoff today's URL vocabulary cannot express.</p>
-      <button class="ch-cta" id="showset">Show all nine on the field
-        <svg width="13" height="13" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
-      </button>
-    </div>
-
-    <p>The count is not the history. It is the shadow the history cast on a government form, and it is most of what survived.<a class="cite" href="#">5</a></p>
-  </div>
-</article>
-<button id="stclose">Close reading</button>
 
 <!-- ================= THREAD ================= -->
-<div id="thread" class="is-away" aria-label="Your thread">
-  <div class="th-seg"><span class="th-k">Place</span><span class="th-v" id="thplace">The whole field</span></div>
-  <div class="th-seg opt"><span class="th-k">Period</span><span class="th-v" id="thera">1790 — 2020</span></div>
-  <div class="th-seg opt"><span class="th-k">Came from</span><span class="th-v" id="thfrom">—</span></div>
-  <button class="th-act" id="thact"><span class="th-count" id="thcount">0</span>Collected</button>
-</div>
+<article id="thread" aria-label="Thread"></article>
+<button class="mbtn" id="texit">Leave the thread</button>
 
-<!-- ================= PHONE TABS ================= -->
-<nav id="tabs" aria-label="Main">
-  <button data-go="journey" aria-current="true"><b></b>Journey</button>
-  <button data-go="field"><b></b>Field</button>
-  <button data-go="story"><b></b>Reading</button>
-</nav>
+<!-- ================= REGISTER ================= -->
+<section id="reg" aria-label="Register">
+  <div class="reg-top">
+    <div>
+      <div class="reg-ttl" id="regttl">The register</div>
+      <div class="reg-sub" id="regsub"></div>
+    </div>
+    <button class="tbtn" id="regclose" style="margin-left:auto">Close</button>
+  </div>
+  <!-- The QUERY is authoritative. The ground draws whatever subset of it has
+       coordinates. A camera rectangle must never silently narrow a bibliography. -->
+  <div class="reg-q">
+    <label>Kind
+      <select id="fkind"><option value="">Any</option><option>place</option><option>person</option>
+      <option>event</option><option>invention</option></select></label>
+    <label>Place
+      <select id="fstate"><option value="">Anywhere</option></select></label>
+    <label>From
+      <select id="ffrom"></select></label>
+    <label>To
+      <select id="fto"></select></label>
+    <label>Evidence at least
+      <select id="ffloor"><option value="1">Thin</option><option value="2">Partial</option>
+      <option value="3">Well evidenced</option></select></label>
+    <label>Sort
+      <select id="fsort"><option value="year">Date</option><option value="name">Name</option>
+      <option value="conf">Evidence</option><option value="place">Place</option></select></label>
+    <button class="tbtn" id="freset">Reset</button>
+  </div>
+  <div class="reg-body">
+    <div class="reg-head"><span>Record</span><span class="hide-s">Place</span><span>Date</span><span class="hide-s">Evidence</span></div>
+    <div id="regrows"></div>
+  </div>
+</section>
 
-<button id="fixbtn">Show what changed</button>
+<!-- ================= RECORD ================= -->
+<aside id="rec" aria-label="Record" tabindex="-1">
+  <div class="rec-top">
+    <button class="tbtn" id="recback">
+      <svg width="13" height="13" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M10 3.5L5.5 8l4.5 4.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <span id="recbacklbl">Back to the ground</span>
+    </button>
+  </div>
+  <div class="rec-body" id="recbody"></div>
+</aside>
+
+<button id="tagbtn">Show what changed</button>
 <p class="sr" id="live" role="status" aria-live="polite"></p>
 
 <script>
-/* ============================================================
-   ONE FIELD — prototype behaviour
-   The thesis: the INVESTIGATION is the persistent object, and
-   map / list / record / story are postures of one surface.
-   ============================================================ */
+/* ===========================================================
+   GROUND
+   State is exactly: place x time (+ what is selected).
+   Every state is a URL. There are no destinations.
+   =========================================================== */
+const MAP_W=960, MAP_H=526.29;
+const LON0=-124.848974, LON1=-66.885444, LAT0=24.396308, LAT1=49.384358;
+const mY=d=>Math.log(Math.tan(Math.PI/4+(d*Math.PI/180)/2));
+const MY0=mY(LAT0), MY1=mY(LAT1);
+const px=l=>(l-LON0)/(LON1-LON0)*MAP_W;
+const py=l=>(MY1-mY(l))/(MY1-MY0)*MAP_H;
 
-/* ---------- projection: lon/lat -> the CONUS mercator artboard ---------- */
-const MAP_W = 960, MAP_H = 526.29;
-const LON0 = -124.848974, LON1 = -66.885444, LAT0 = 24.396308, LAT1 = 49.384358;
-const mercY = d => Math.log(Math.tan(Math.PI/4 + (d*Math.PI/180)/2));
-const MY0 = mercY(LAT0), MY1 = mercY(LAT1);
-const px = lon => (lon - LON0) / (LON1 - LON0) * MAP_W;
-const py = lat => (MY1 - mercY(lat)) / (MY1 - MY0) * MAP_H;
+const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
+const body=document.body, plate=$('#plate');
+const reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;
+const say=m=>{$('#live').textContent=m};
 
-/* ---------- the archive (sample) ---------- */
-const RECORDS = [
-  {id:'bethel', name:'Mother Bethel A.M.E. Church', kind:'place', lon:-75.1514, lat:39.9428,
-   place:'Philadelphia, Pennsylvania', year:1794, grade:3,
-   plain:'Three independent sources agree on the address and the founding year.',
-   src:'Pennsylvania Historical &amp; Museum Commission, marker file 1991; HABS PA-1683; Philadelphia deed book D-42, 1792.',
-   blurb:'The oldest parcel of land in the United States continuously owned by Black Americans. Richard Allen bought it in 1791 and the congregation has never left it.',
-   related:['greenwood','allen']},
-  {id:'greenwood', name:'Greenwood District', kind:'place', lon:-95.9875, lat:36.1622,
-   place:'Tulsa, Oklahoma', year:1906, grade:3,
-   plain:'Boundaries are well documented; the 1921 destruction is covered by a state commission report.',
-   src:'Oklahoma Commission to Study the Tulsa Race Riot of 1921, final report, 2001; Sanborn fire insurance maps, 1920.',
-   blurb:'Thirty-five square blocks of Black-owned business and housing, destroyed over sixteen hours in 1921 and rebuilt by the people who survived it.',
-   related:['bethel']},
-  {id:'allen', name:'Richard Allen', kind:'person', lon:-75.1520, lat:39.9430,
-   place:'Philadelphia, Pennsylvania', year:1760, grade:3,
-   plain:'Birth year and biography are corroborated across three independent published sources.',
-   src:'Allen, R., <em>The Life Experience and Gospel Labours</em>, 1833; Newman, R., <em>Freedom’s Prophet</em>, 2008.',
-   blurb:'Bought his own freedom, founded the African Methodist Episcopal Church, and became its first bishop.',
-   related:['bethel']},
-  {id:'mccoy', name:'Elijah McCoy', kind:'person', lon:-83.0458, lat:42.3314,
-   place:'Detroit, Michigan', year:1872, grade:3,
-   plain:'Patent record is primary and unambiguous.',
-   src:'US Patent 129,843, filed 1872; Canadian census, 1861.',
-   blurb:'Held 57 patents. His automatic lubricator let engines run without stopping, and the phrase "the real McCoy" is commonly, if not certainly, traced to it.',
-   related:['striking']},
-  {id:'striking', name:'Automatic Lubricator', kind:'invention', lon:-83.0458, lat:42.3300,
-   place:'Detroit, Michigan', year:1872, grade:3,
-   plain:'The patent itself is the source. Nothing is inferred.',
-   src:'US Patent 129,843, "Improvement in Lubricators for Steam-Engines", granted 23 July 1872.',
-   blurb:'A cup that drips oil into a moving engine on its own, so the train need not stop to be oiled.',
-   related:['mccoy']},
-  {id:'brown', name:'Brown v. Board of Education', kind:'event', lon:-95.6890, lat:39.0558,
-   place:'Topeka, Kansas', year:1954, grade:3,
-   plain:'A published Supreme Court opinion. Quoted from the official US Reports.',
-   src:'<em>Brown v. Board of Education</em>, 347 U.S. 483 (1954), US Reports, Library of Congress.',
-   blurb:'Held that separate educational facilities are inherently unequal, overturning the doctrine the Court itself had set in 1896.',
-   related:['sumner']},
-  {id:'sumner', name:'Sumner Elementary School', kind:'place', lon:-95.7000, lat:39.0490,
-   place:'Topeka, Kansas', year:1936, grade:2,
-   plain:'The building and its role are documented; the exact enrollment figures for 1951 are not published.',
-   src:'National Register of Historic Places, ref. 87001283; Topeka Board of Education minutes, 1951.',
-   blurb:'The all-white school that refused to enroll Linda Brown, seven blocks from her house.',
-   related:['brown']},
-  {id:'sweet', name:'Ossian Sweet House', kind:'place', lon:-83.0100, lat:42.3700,
-   place:'Detroit, Michigan', year:1925, grade:3,
-   plain:'Address, trial record and outcome are all documented primary sources.',
-   src:'Michigan State Historic Site, 1975; <em>People v. Sweet</em>, Wayne County Circuit Court, 1925.',
-   blurb:'A doctor bought a house in a white neighborhood, a mob came, and the resulting trial was argued by Clarence Darrow.',
-   related:['mccoy']},
-  {id:'bronze', name:'Bronzeville', kind:'place', lon:-87.6180, lat:41.8100,
-   place:'Chicago, Illinois', year:1920, grade:2,
-   plain:'The district is well documented, but its boundaries shifted and sources disagree on the southern edge.',
-   src:'Drake &amp; Cayton, <em>Black Metropolis</em>, 1945; Chicago Landmark district designation, 1998.',
-   blurb:'Where the Great Migration landed in Chicago, and where it built a city inside a city.',
-   related:['greenwood']},
-  {id:'16th', name:'16th Street Baptist Church', kind:'place', lon:-86.8150, lat:33.5150,
-   place:'Birmingham, Alabama', year:1911, grade:3,
-   plain:'Address, construction date and the 1963 bombing are all primary-sourced.',
-   src:'National Historic Landmark nomination, 2006; FBI case file BAPBOMB, 1963.',
-   blurb:'Four girls were killed here on a Sunday morning in September 1963.',
-   related:['brown']},
-  {id:'congo', name:'Congo Square', kind:'place', lon:-90.0700, lat:29.9640,
-   place:'New Orleans, Louisiana', year:1817, grade:2,
-   plain:'The gatherings are documented by several contemporary observers; specific dates are not recorded.',
-   src:'Latrobe, B., journals, 1819; New Orleans municipal ordinance, 1817.',
-   blurb:'Where enslaved and free Black people were permitted to gather on Sundays, and where a great deal of American music starts.',
-   related:['bronze']},
-  {id:'hayti', name:'Hayti District', kind:'place', lon:-78.9000, lat:35.9870,
-   place:'Durham, North Carolina', year:1880, grade:2,
-   plain:'The district is documented; much of it was demolished and parcel-level records are incomplete.',
-   src:'Durham County deed records; NC Highway Historical Marker G-125.',
-   blurb:'A self-contained Black business district, most of it cleared by urban renewal in the 1960s.',
-   related:['bronze']}
+const DECADES=[];for(let y=1790;y<=2020;y+=10)DECADES.push(y);
+
+/* Census regimes. The archive's epistemic condition is DATA,
+   not a footnote: before 1870 most Black people were tallied,
+   not named, so the ground must not imply absence of life. */
+const REGIME=y=> y<1870
+  ? {k:'unnamed', t:'In '+y+' the census counted most Black people as tallies in a column, not by name. Thin ground here is a record-keeping fact, not an absence of people.'}
+  : {k:'named',   t:'From 1870 the census recorded Black Americans by name, which is why places can be reconstructed household by household from here on.'};
+
+/* ---- the archive (sample) ---- */
+const R=[
+ {id:'bethel',n:'Mother Bethel A.M.E. Church',k:'place',lon:-75.1514,lat:39.9428,p:'Philadelphia, Pennsylvania',y:1794,c:3,
+  w:'Three independent sources agree on the address and the founding year.',
+  s:'Pennsylvania Historical &amp; Museum Commission marker file, 1991; HABS PA-1683; Philadelphia deed book D-42, 1792.',
+  b:'The oldest parcel of land in the United States continuously owned by Black Americans. Richard Allen bought it in 1791 and the congregation has never left it.',
+  rel:[['allen','doc']]},
+ {id:'allen',n:'Richard Allen',k:'person',lon:-75.1520,lat:39.9430,p:'Philadelphia, Pennsylvania',y:1794,c:3,
+  w:'Birth year and biography corroborated across three independent published sources.',
+  s:'Allen, R., <em>The Life Experience and Gospel Labours</em>, 1833; Newman, R., <em>Freedom&rsquo;s Prophet</em>, 2008.',
+  b:'Bought his own freedom, founded the African Methodist Episcopal Church and became its first bishop.',
+  rel:[['bethel','doc']]},
+ {id:'congo',n:'Congo Square',k:'place',lon:-90.0700,lat:29.9640,p:'New Orleans, Louisiana',y:1817,c:2,
+  w:'Several contemporary observers describe the gatherings. Specific dates were never recorded.',
+  s:'Latrobe, B., journals, 1819; New Orleans municipal ordinance, 1817.',
+  b:'Where enslaved and free Black people were permitted to gather on Sundays, and where a great deal of American music begins.',
+  rel:[]},
+ {id:'mccoy',n:'Elijah McCoy',k:'person',lon:-83.0458,lat:42.3314,p:'Detroit, Michigan',y:1872,c:3,
+  w:'The patent record is primary and unambiguous.',
+  s:'US Patent 129,843, filed 1872; Canadian census, 1861.',
+  b:'Held 57 patents. His automatic lubricator let engines run without stopping to be oiled.',
+  rel:[['lubricator','doc']]},
+ {id:'lubricator',n:'Automatic Lubricator',k:'invention',lon:-83.0458,lat:42.3300,p:'Detroit, Michigan',y:1872,c:3,
+  w:'The patent itself is the source. Nothing is inferred.',
+  s:'US Patent 129,843, &ldquo;Improvement in Lubricators for Steam-Engines&rdquo;, granted 23 July 1872.',
+  b:'A cup that drips oil into a moving engine on its own, so the train need not stop.',
+  rel:[['mccoy','doc']]},
+ {id:'hayti',n:'Hayti District',k:'place',lon:-78.9000,lat:35.9870,p:'Durham, North Carolina',y:1880,c:2,
+  w:'The district is documented. Much of it was demolished and parcel-level records are incomplete.',
+  s:'Durham County deed records; NC Highway Historical Marker G-125.',
+  b:'A self-contained Black business district, most of it cleared by urban renewal in the 1960s.',
+  rel:[['bronze','adj']]},
+ {id:'greenwood',n:'Greenwood District',k:'place',lon:-95.9875,lat:36.1622,p:'Tulsa, Oklahoma',y:1906,c:3,sens:true,
+  w:'Boundaries are well documented and the 1921 destruction is covered by a state commission report.',
+  s:'Oklahoma Commission to Study the Tulsa Race Riot of 1921, final report, 2001; Sanborn fire insurance maps, 1920.',
+  b:'Thirty-five square blocks of Black-owned business and housing, destroyed over sixteen hours in 1921, and rebuilt afterwards by the people who survived it.',
+  sensnote:'This record concerns a massacre. It is presented without camera movement or flourish.',
+  rel:[['bronze','adj']]},
+ {id:'16th',n:'16th Street Baptist Church',k:'place',lon:-86.8150,lat:33.5150,p:'Birmingham, Alabama',y:1911,c:3,sens:true,
+  w:'Address, construction date and the 1963 bombing are all primary-sourced.',
+  s:'National Historic Landmark nomination, 2006; FBI case file BAPBOMB, 1963.',
+  b:'Four girls were killed here on a Sunday morning in September 1963. The congregation was founded in 1873 and still meets.',
+  sensnote:'This record concerns the killing of children. It is presented without camera movement or flourish.',
+  rel:[]},
+ {id:'bronze',n:'Bronzeville',k:'place',lon:-87.6180,lat:41.8100,p:'Chicago, Illinois',y:1920,c:2,
+  w:'Well documented, but the boundaries shifted and sources disagree on the southern edge.',
+  s:'Drake &amp; Cayton, <em>Black Metropolis</em>, 1945; Chicago Landmark district designation, 1998.',
+  b:'Where the Great Migration landed in Chicago, and where it built a city inside a city.',
+  rel:[['hayti','adj'],['greenwood','adj']]},
+ {id:'sweet',n:'Ossian Sweet House',k:'place',lon:-83.0100,lat:42.3700,p:'Detroit, Michigan',y:1925,c:3,
+  w:'Address, trial record and outcome are all documented primary sources.',
+  s:'Michigan State Historic Site, 1975; <em>People v. Sweet</em>, Wayne County Circuit Court, 1925.',
+  b:'A doctor bought a house in a white neighborhood, a mob came, and the trial that followed was argued by Clarence Darrow.',
+  rel:[]},
+ {id:'sumner',n:'Sumner Elementary School',k:'place',lon:-95.7000,lat:39.0490,p:'Topeka, Kansas',y:1936,c:2,
+  w:'The building and its role are documented. Exact 1951 enrollment figures were never published.',
+  s:'National Register of Historic Places, ref. 87001283; Topeka Board of Education minutes, 1951.',
+  b:'The all-white school that refused to enroll Linda Brown, seven blocks from her house.',
+  rel:[['brown','doc']]},
+ /* Records that cannot be drawn. They are the whole point of making the QUERY
+    authoritative: a camera-driven list would delete them silently and the
+    researcher would never know the bibliography was short. */
+ {id:'roll',n:'Freedmen\u2019s Bureau teacher roll, Virginia',k:'event',p:'Virginia',y:1867,c:2,
+  w:'The roll survives and is legible. It names teachers but not the schoolhouses, so no point can be placed.',
+  s:'Bureau of Refugees, Freedmen and Abandoned Lands, Virginia superintendent of education records, 1867; NARA M1053.',
+  b:'A list of teachers hired to run schools for freedpeople across Virginia in a single year.',
+  rel:[]},
+ {id:'withheld',n:'Oral history: a Hayti household',k:'person',p:'Durham, North Carolina',y:1968,c:2,
+  withheld:true,
+  w:'The interview is catalogued and quotable. The family asked that the address not be published.',
+  s:'BlackStory oral history collection, interview 221, recorded 1968; release on file.',
+  b:'A household account of the months before the Hayti clearances, recorded with the family\u2019s consent.',
+  rel:[['hayti','doc']]},
+ {id:'brown',n:'Brown v. Board of Education',k:'event',lon:-95.6890,lat:39.0558,p:'Topeka, Kansas',y:1954,c:3,
+  w:'A published Supreme Court opinion, quoted from the official US Reports.',
+  s:'<em>Brown v. Board of Education</em>, 347 U.S. 483 (1954), US Reports, Library of Congress.',
+  b:'Held that separate educational facilities are inherently unequal, overturning the doctrine the Court set in 1896.',
+  rel:[['sumner','doc']]}
 ];
-/* the nine records "The Count" cites — a SET, which is the point */
-const STORY_SET = ['bethel','allen','greenwood','bronze','hayti','congo','16th','sumner','brown'];
-
-/* chapter camera specs — kept as DATA, like chapters.ts does today */
-const CHAPTERS = [
-  {lon:-96.5, lat:38.5, zoom:1.00, side:'start'},
-  {lon:-96.5, lat:38.5, zoom:1.08, side:'end'},
-  {lon:-75.1514, lat:39.9428, zoom:5.60, side:'start', ring:'bethel'},
-  {lon:-93.0, lat:38.0, zoom:1.25, side:'end', sweep:true},
-  {lon:-88.0, lat:36.5, zoom:1.60, side:'start'}
-];
-
-/* ---------- THE THREAD: the persistent investigation ---------- */
-const thread = {
-  place:'The whole field',
-  eraMax:2020,
-  from:null,
-  collected:[],
-  returnTo:null       /* camera + scroll we can actually come back to */
-};
-
-const $ = s => document.querySelector(s);
-const $$ = s => [...document.querySelectorAll(s)];
-const body = document.body;
-const plate = $('#plate');
-const live = $('#live');
-const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
-
-function say(msg){ live.textContent = msg; }
-
-/* ---------- camera ---------- */
-let cam = {lon:-96.5, lat:38.5, zoom:1};
-function fitScale(){
-  const vw = innerWidth, vh = innerHeight;
-  return Math.min(vw / MAP_W, vh / MAP_H) * (vw < 820 ? 1.18 : 1.02);
-}
-function applyCamera(c, opts){
-  opts = opts || {};
-  cam = Object.assign({}, cam, c);
-  const s = fitScale() * cam.zoom;
-  const vw = innerWidth, vh = innerHeight;
-  /* in journey/record the content occupies one side, so bias the focal point */
-  let fx = 0.5, fy = 0.5;
-  const view = body.dataset.view;
-  if (vw >= 820){
-    if (view === 'journey') fx = body.dataset.side === 'end' ? 0.33 : 0.67;
-    if (view === 'record')  fx = 0.30;
-    if (view === 'field')   fx = 0.56;
-  } else {
-    if (view === 'journey') fy = 0.34;
-    if (view === 'record')  fy = 0.26;
-  }
-  const tx = vw * fx - px(cam.lon) * s;
-  const ty = vh * fy - py(cam.lat) * s;
-  plate.style.transitionDuration = (opts.instant || reduced) ? '0ms' : 'var(--d-fly)';
-  plate.style.transform = `translate(${tx}px, ${ty}px) scale(${s})`;
-  plate.style.setProperty('--z', s);
-}
-
-/* ---------- pins ---------- */
-const pinEls = {};
-function buildPins(){
-  const frag = document.createDocumentFragment();
-  RECORDS.forEach(r => {
-    const el = document.createElement('button');
-    el.className = 'pin';
-    el.style.left = px(r.lon) + 'px';
-    el.style.top = py(r.lat) + 'px';
-    el.style.setProperty('--pw', (r.kind === 'place' ? 10 : 8) + 'px');
-    el.setAttribute('aria-label', r.name + ', ' + r.place);
-    el.innerHTML = '<i></i>';
-    el.addEventListener('click', e => { e.stopPropagation(); openRecord(r.id, 'the field'); });
-    pinEls[r.id] = el;
-    frag.appendChild(el);
-  });
-  /* a scatter of context pins so the field reads as 4,202 records, not 12 */
-  for (let i = 0; i < 300; i++){
-    const lon = LON0 + Math.random() * (LON1 - LON0);
-    const lat = LAT0 + Math.random() * (LAT1 - LAT0);
-    const el = document.createElement('div');
-    el.className = 'pin is-ctx';
-    el.style.left = px(lon) + 'px';
-    el.style.top = py(lat) + 'px';
-    el.style.setProperty('--pw', (3 + Math.random() * 5).toFixed(1) + 'px');
-    el.dataset.decade = 1790 + Math.floor(Math.random() * 24) * 10;
-    el.innerHTML = '<i style="opacity:.3"></i>';
-    frag.appendChild(el);
-  }
-  $('#pins').appendChild(frag);
-}
-
-let ringed = null;
-function ring(id){
-  if (ringed && pinEls[ringed]) pinEls[ringed].classList.remove('is-ringed');
-  ringed = id;
-  if (id && pinEls[id]) pinEls[id].classList.add('is-ringed');
-}
-function litSet(ids){
-  Object.entries(pinEls).forEach(([id, el]) => {
-    el.classList.toggle('is-lit', ids ? ids.includes(id) : false);
-    el.classList.toggle('is-dim', ids ? !ids.includes(id) : false);
-  });
-}
-
-/* ---------- filters ---------- */
-let kindFilter = 'all';
-function applyFilters(){
-  RECORDS.forEach(r => {
-    const okKind = kindFilter === 'all' || r.kind === kindFilter;
-    const okEra = r.year <= thread.eraMax;
-    pinEls[r.id].classList.toggle('is-hidden', !(okKind && okEra));
-  });
-  $$('.pin.is-ctx').forEach(el => {
-    el.classList.toggle('is-hidden', +el.dataset.decade > thread.eraMax);
-  });
-  renderRail();
-  renderThread();
-}
-function visibleRecords(){
-  return RECORDS.filter(r => (kindFilter === 'all' || r.kind === kindFilter) && r.year <= thread.eraMax);
-}
-function renderRail(){
-  const list = visibleRecords();
-  $('#railh').textContent = list.length + ' on the field';
-  $('#raillist').innerHTML = list.map(r =>
-    `<button class="rrow" role="listitem" data-rec="${r.id}">
-       <b>${r.name}</b><span>${r.place.toUpperCase()} · ${r.year}</span>
-     </button>`).join('') || '<p style="padding:10px;color:var(--i-low);font-size:13px">Nothing in this period yet.</p>';
-}
-
-/* ---------- THREAD rendering ---------- */
-function renderThread(){
-  $('#thplace').textContent = thread.place;
-  $('#thera').textContent = thread.eraMax >= 2020 ? '1790 — 2020' : '1790 — ' + thread.eraMax;
-  $('#thfrom').textContent = thread.from || '—';
-  $('#thcount').textContent = thread.collected.length;
-  $('#thact').style.opacity = thread.collected.length ? '1' : '.55';
-}
-$('#thact').addEventListener('click', () => {
-  if (!thread.collected.length){ say('Your thread is empty. Open a record and add it.'); return; }
-  go('field');
-  frameSet(thread.collected);
-  say('Showing your ' + thread.collected.length + ' collected records on the field.');
+const byId=i=>R.find(r=>r.id===i);
+/* slugs and source counts, so the citation block can render the REAL format:
+   lib/citation/format.ts -- it must not be re-punctuated. */
+R.forEach(r=>{
+  r.slug=r.n.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');
+  r.nsrc=(r.s.match(/;/g)||[]).length+1;
 });
+const era=y=>Math.floor(y/10)*10+'s';
+/* P-03 precision honesty: every mark declares how sharply its source places it. */
+const PREC={bethel:'exact',allen:'exact',congo:'square',mccoy:'city',lubricator:'city',
+  hayti:'district',greenwood:'district','16th':'exact',bronze:'district',sweet:'exact',
+  sumner:'exact',brown:'city',roll:'none',withheld:'withheld'};
+R.forEach(r=>{ r.prec=PREC[r.id]||'city'; });
+const TODAY=new Date().toISOString().slice(0,10);
 
-/* ---------- framing a SET (the capability today's URLs lack) ---------- */
-function frameSet(ids){
-  const rs = RECORDS.filter(r => ids.includes(r.id));
-  if (!rs.length) return;
-  const lons = rs.map(r => r.lon), lats = rs.map(r => r.lat);
-  const lon = (Math.min(...lons) + Math.max(...lons)) / 2;
-  const lat = (Math.min(...lats) + Math.max(...lats)) / 2;
-  const spanX = Math.max(.6, Math.max(...lons) - Math.min(...lons));
-  const spanY = Math.max(.4, Math.max(...lats) - Math.min(...lats));
-  const zoom = Math.min(5, Math.max(1, 34 / Math.max(spanX, spanY * 1.6)));
-  litSet(ids);
-  ring(null);
-  applyCamera({lon, lat, zoom});
+/* census conditions, sampled. share is of the named place. */
+const COND={
+ 'Everything in the archive':{1790:[757208,19.3],1800:[1002037,18.9],1810:[1377808,19.0],1820:[1771656,18.4],
+   1830:[2328642,18.1],1840:[2873648,16.8],1850:[3638808,15.7],1860:[4441830,14.1],1870:[4880009,12.7],
+   1880:[6580793,13.1],1890:[7488788,11.9],1900:[8833994,11.6],1910:[9827763,10.7],1920:[10463131,9.9],
+   1930:[11891143,9.7],1940:[12865518,9.8],1950:[15042286,10.0],1960:[18871831,10.5],1970:[22580289,11.1],
+   1980:[26495025,11.7],1990:[29986060,12.1],2000:[34658190,12.3],2010:[38929319,12.6],2020:[41104200,12.4]},
+ 'Philadelphia, Pennsylvania':{1790:[2489,4.8],1800:[6880,8.9],1810:[9653,9.9],1820:[11891,8.8],
+   1830:[14563,8.6],1840:[19833,7.4],1850:[19761,4.8],1860:[22185,3.9],1870:[22147,3.3],1880:[31699,3.7],
+   1890:[39371,3.8],1900:[62613,4.8],1910:[84459,5.5],1920:[134229,7.4],1930:[219599,11.3],1940:[250880,13.0],
+   1950:[376041,18.2],1960:[529240,26.4],1970:[653791,33.6],1980:[638878,37.8],1990:[631936,39.9],
+   2000:[655824,43.2],2010:[661839,43.4],2020:[droppable=>0,0]},
+ 'Tulsa, Oklahoma':{1910:[1959,10.9],1920:[8878,12.3],1930:[15203,11.3],1940:[15300,10.5],1950:[16600,9.4],
+   1960:[22000,9.5],1970:[28000,10.6],1980:[36000,10.0],1990:[48000,13.0],2000:[51000,13.0],2010:[53000,13.5],2020:[54000,14.0]},
+ 'Chicago, Illinois':{1890:[14271,1.3],1900:[30150,1.8],1910:[44103,2.0],1920:[109458,4.1],1930:[233903,6.9],
+   1940:[277731,8.2],1950:[492265,13.6],1960:[812637,22.9],1970:[1102620,32.7],1980:[1197000,39.8],
+   1990:[1087711,39.1],2000:[1065009,36.8],2010:[887608,32.9],2020:[787551,29.2]}
+};
+Object.values(COND).forEach(o=>{for(const k in o){ if(typeof o[k][0]==='function') delete o[k]; }});
+
+/* ---- THE COLLECTION is the state. The ground is a VIEW of it. -----------
+   Codex's fatal objection to an earlier draft: a viewport-plus-decade register
+   silently drops records outside the camera and records with no coordinates,
+   producing "an incomplete bibliography that looks complete". So the QUERY is
+   authoritative and the map draws whatever subset of it can be drawn. --------- */
+const Q={ kind:'', state:'', from:1790, to:2020, floor:1, sort:'year' };
+const S={ placeLabel:'Everything in the archive', lon:-96.5, lat:38.5, zoom:1,
+          sel:null, census:false, ret:null };
+
+/* matching() is the bibliography. mappable() is only what can be drawn. */
+function matching(){
+  return R.filter(r=>
+    (!Q.kind || r.k===Q.kind) &&
+    (!Q.state || r.p.endsWith(Q.state)) &&
+    r.y>=Q.from && r.y<=Q.to &&
+    r.c>=Q.floor);
+}
+const hasCoords=r=>typeof r.lon==='number' && typeof r.lat==='number';
+function mappable(){ return matching().filter(hasCoords); }
+function sorted(list){
+  return list.slice().sort((a,b)=>
+    Q.sort==='year'?a.y-b.y:
+    Q.sort==='name'?a.n.localeCompare(b.n):
+    Q.sort==='conf'?b.c-a.c||a.n.localeCompare(b.n):
+    a.p.localeCompare(b.p));
+}
+/* a plain-language statement of what produced this collection */
+function basis(){
+  const bits=[];
+  bits.push(Q.kind?Q.kind+'s':'All records');
+  if(Q.state)bits.push('in '+Q.state);
+  bits.push(Q.from===1790&&Q.to===2020?'1790 to 2020':Q.from+' to '+Q.to);
+  if(Q.floor>1)bits.push(({2:'partly',3:'well'})[Q.floor]+' evidenced or better');
+  return bits.join(' · ');
 }
 
-/* ---------- VIEWS ---------- */
-function go(view, opts){
-  opts = opts || {};
-  const prev = body.dataset.view;
-  if (prev === view) return;
-  body.dataset.view = view;
-  $$('[data-go]').forEach(b => b.setAttribute('aria-current', String(b.dataset.go === view)));
-  $('#thread').classList.toggle('is-away', view === 'journey' && !thread.collected.length);
-
-  if (view === 'journey'){
-    litSet(null);
-    document.documentElement.style.overflow = '';
-    syncChapter(true);
-    say('Journey. Scroll to walk the field.');
-  }
-  if (view === 'field'){
-    document.documentElement.style.overflow = 'hidden';
-    if (!opts.keepCamera){ litSet(null); applyCamera({lon:-96.5, lat:38.5, zoom:1.15}); }
-    thread.place = thread.place === 'The whole field' ? 'The whole field' : thread.place;
-    say('The field. ' + visibleRecords().length + ' records shown.');
-  }
-  if (view === 'story'){
-    document.documentElement.style.overflow = 'hidden';
-    litSet(STORY_SET);
-    applyCamera({lon:-85, lat:37.5, zoom:1.2});
-    $('#story').scrollTop = 0;
-    liveMoment = null;
-    thread.from = 'The Count';
-    say('Reading: The Count. The field stays behind the page.');
-    requestAnimationFrame(() => updateStory());
-  }
-  if (view === 'record'){ document.documentElement.style.overflow = 'hidden'; }
-  renderThread();
-  applyCamera({});
+/* ---- camera ---- */
+let cam={lon:-96.5,lat:38.5,zoom:1};
+const fit=()=>Math.min(innerWidth/MAP_W,innerHeight/MAP_H)*(innerWidth<820?1.16:1.0);
+function camera(c,o){
+  o=o||{}; cam=Object.assign({},cam,c);
+  const s=fit()*cam.zoom, vw=innerWidth, vh=innerHeight, m=body.dataset.mode;
+  let fx=.5, fy=.5;
+  if(vw>=820){ if(m==='thread')fx=.66; if(m==='record')fx=.3; if(m==='ground')fx=.56; }
+  else { fy = m==='record'?.26 : m==='thread'?.3 : .4; }
+  plate.style.transitionDuration=(o.now||reduced)?'0ms':'var(--d-fly)';
+  plate.style.transform=`translate(${vw*fx-px(cam.lon)*s}px, ${vh*fy-py(cam.lat)*s}px) scale(${s})`;
+  plate.style.setProperty('--z',s);
 }
-$$('[data-go]').forEach(b => b.addEventListener('click', () => go(b.dataset.go)));
-$('#home').addEventListener('click', e => { e.preventDefault(); go('journey'); scrollTo({top:0, behavior: reduced ? 'auto' : 'smooth'}); });
 
-/* ---------- RECORD: a sheet over the LIVE field, not a page load ---------- */
-function openRecord(id, origin){
-  const r = RECORDS.find(x => x.id === id);
-  if (!r) return;
-  /* remember exactly where we were — today this is hard-coded to "/" */
-  if (body.dataset.view !== 'record'){
-    thread.returnTo = {view: body.dataset.view, cam: Object.assign({}, cam), scroll: scrollY,
-                       storyScroll: $('#story').scrollTop};
+/* ---- marks ---- */
+const markEl={};
+function buildMarks(){
+  const f=document.createDocumentFragment();
+  R.filter(hasCoords).forEach(r=>{
+    const b=document.createElement('button');
+    b.className='mark g'+r.c;
+    b.style.left=px(r.lon)+'px'; b.style.top=py(r.lat)+'px';
+    b.style.setProperty('--w',(r.k==='place'?10:8)+'px');
+    b.style.setProperty('--conf', r.c===3?'.95':r.c===2?'.7':'.5');
+    b.setAttribute('aria-label',r.n+', '+r.p+', '+r.y);
+    b.innerHTML='<i></i>';
+    b.addEventListener('click',e=>{e.stopPropagation();openRecord(r.id,'the ground')});
+    markEl[r.id]=b; f.appendChild(b);
+  });
+  /* context marks so the ground reads as a real archive */
+  for(let i=0;i<280;i++){
+    const lon=LON0+Math.random()*(LON1-LON0), lat=LAT0+Math.random()*(LAT1-LAT0);
+    const d=document.createElement('div');
+    d.className='mark ctx';
+    d.style.left=px(lon)+'px'; d.style.top=py(lat)+'px';
+    d.style.setProperty('--w',(3+Math.random()*4).toFixed(1)+'px');
+    d.style.setProperty('--conf',(.2+Math.random()*.35).toFixed(2));
+    /* weighted later so early decades really are thinner */
+    d.dataset.y = 1790 + Math.floor(Math.pow(Math.random(),.55)*24)*10;
+    d.innerHTML='<i></i>'; f.appendChild(d);
   }
-  thread.place = r.place;
-  thread.from = origin || thread.from;
-  /* the back label names where you actually were. today this target is hard-coded
-     to "/" in walk-back-place.ts, so every record sends you to the homepage. */
-  const whence = {story:'the chapter', journey:'the walk', field:'the field'};
-  $('#shbacklbl').textContent = 'Back to ' + (whence[thread.returnTo && thread.returnTo.view] || 'the field');
+  $('#marks').appendChild(f);
+}
+function paintMarks(){
+  const show=new Set(mappable().map(r=>r.id));
+  R.forEach(r=>{const el=markEl[r.id]; if(el) el.classList.toggle('off',!show.has(r.id))});
+  /* context marks follow the collection's date range too */
+  $$('.mark.ctx').forEach(d=>{const y=+d.dataset.y;d.classList.toggle('off',y<Q.from||y>Q.to)});
+  Object.entries(markEl).forEach(([id,el])=>el.classList.toggle('sel',id===S.sel));
+}
 
-  const dots = n => '<i class="' + (n >= 1 ? 'on' : '') + '"></i><i class="' + (n >= 2 ? 'on' : '') + '"></i><i class="' + (n >= 3 ? 'on' : '') + '"></i>';
-  const word = {3:'Well evidenced', 2:'Partly evidenced', 1:'Thinly evidenced'}[r.grade];
-  const rel = (r.related || []).map(rid => {
-    const o = RECORDS.find(x => x.id === rid);
-    return o ? `<button class="chip" data-rec="${o.id}"><i></i>${o.name}</button>` : '';
+/* ---- the decade spine: a RANGE control, and the honesty display ---- */
+function decadeCount(y){
+  return R.filter(r=>r.y===y||(r.y<y&&y===Q.to)).length
+    + $$('.mark.ctx').filter(d=>+d.dataset.y===y).length;
+}
+function buildSpine(){
+  $('#spine').innerHTML=DECADES.map(y=>{
+    const g=REGIME(y);
+    return `<button class="dec" data-y="${y}" data-regime="${g.k}"
+      aria-label="${y}. Set the end of the range. Hold shift to set the start."
+      ><span class="yr">${y}</span><span class="bar"></span></button>`;
   }).join('');
+  $$('.dec').forEach(d=>{
+    const y=+d.dataset.y;
+    d.addEventListener('click',e=>{ e.shiftKey?setFrom(y):setTo(y); });
+    d.addEventListener('keydown',e=>{
+      const i=DECADES.indexOf(y);
+      const go=j=>{e.preventDefault();const t=DECADES[Math.max(0,Math.min(DECADES.length-1,j))];
+        e.shiftKey?setFrom(t):setTo(t);$(`.dec[data-y="${t}"]`).focus()};
+      if(e.key==='ArrowUp'||e.key==='ArrowLeft')go(i-1);
+      if(e.key==='ArrowDown'||e.key==='ArrowRight')go(i+1);
+      if(e.key==='Home')go(0);
+      if(e.key==='End')go(DECADES.length-1);
+    });
+  });
+}
+function paintSpine(){
+  const max=Math.max(1,...DECADES.map(decadeCount));
+  $$('.dec').forEach(d=>{
+    const y=+d.dataset.y;
+    d.querySelector('.bar').style.width=(6+Math.round((decadeCount(y)/max)*80))+'px';
+    const inRange=y>=Q.from&&y<=Q.to;
+    d.setAttribute('aria-current',String(inRange));
+    d.classList.toggle('edge', y===Q.from||y===Q.to);
+  });
+}
+function setFrom(y){ Q.from=Math.min(y,Q.to); repaint(); say('Range starts '+Q.from+'.'); }
+function setTo(y){ Q.to=Math.max(y,Q.from); repaint(); say('Range ends '+Q.to+'. '+matching().length+' records match.'); }
 
-  $('#shbody').innerHTML = `
-    <span class="sh-kind">${r.kind}</span>
-    <h2 class="sh-h">${r.name}</h2>
-    <p class="sh-place">${r.place} · ${r.year}</p>
-    <div class="sh-fig"><span>Archival image — not shown in prototype</span></div>
-    <div class="ev">
-      <div class="ev-top"><span class="ev-dots">${dots(r.grade)}</span><span class="ev-label">${word}</span></div>
-      <p class="ev-plain">${r.plain}</p>
-      <p class="ev-src">${r.src}</p>
+/* ---- census: a SOURCED READING you ask for, never ambient atmosphere ----
+   Codex: a population wash under a violence mark composes a causal argument
+   nobody wrote. So it is off by default, labelled, and carries its own
+   comparability break rather than animating smoothly across one. */
+function condFor(place,year){
+  const t=COND[place]||COND['Everything in the archive'];
+  if(!t)return null;
+  const ys=Object.keys(t).map(Number).filter(y=>y<=year).sort((a,b)=>b-a);
+  return ys.length?{y:ys[0],v:t[ys[0]]}:null;
+}
+const fmt=n=>n.toLocaleString('en-US');
+function paintCensus(){
+  const box=$('#censusbox');
+  box.hidden=!S.census;
+  $('#censustoggle').setAttribute('aria-pressed',String(S.census));
+  $('#censustoggle').textContent=S.census?'Hide the census reading':'Show the census reading';
+  if(!S.census)return;
+  const key=S.placeLabel in COND?S.placeLabel:'Everything in the archive';
+  const c=condFor(key,Q.to);
+  if(c){
+    $('#cpop').textContent=fmt(c.v[0]);
+    $('#cshare').textContent=c.v[1].toFixed(1)+'%';
+  } else { $('#cpop').textContent='Not surveyed'; $('#cshare').textContent='Not surveyed'; }
+  const notes=[];
+  notes.push('Decennial census'+(c?', '+c.y:'')+(c&&c.y!==Q.to?' (the nearest survey to '+Q.to+'; the census does not observe between its dates)':'')+'.');
+  if(Q.from<1870&&Q.to>=1870)
+    notes.push('This range crosses 1870. Before it most Black people were counted as tallies without names, so figures either side are not one continuous series.');
+  if(Q.from<2000&&Q.to>=2000)
+    notes.push('This range crosses 2000, when respondents could first select more than one race. The definition changes here.');
+  notes.push('Population counts do not explain any individual record on this ground.');
+  $('#censusnote').innerHTML=notes.map(n=>'<span>'+n+'</span>').join('');
+}
+
+/* ---- absence: four different things, never collapsed into one ---- */
+function paintAbsence(){
+  const m=matching().length, box=$('#absence'), out=[];
+  if(m===0){
+    out.push(['cold','No record in the archive matches this collection. That is a statement '
+      +'about this query and about what has been catalogued, not about what happened.']);
+  }
+  if(Q.from<1870){
+    out.push(['cold','Documented coverage limit: before 1870 the federal census counted most '
+      +'Black people as tallies in a column, not by name. Thin ground here is a record-keeping '
+      +'fact. It is not evidence that fewer people lived here.']);
+  }
+  box.innerHTML=out.map(([k,t])=>`<p class="regime"><i></i><span>${t}</span></p>`).join('');
+  body.dataset.regime=Q.to<1870?'unnamed':'named';
+}
+
+function paintCollection(){
+  $('#condplace').textContent=S.placeLabel;
+  $('#condyr').textContent=Q.from===Q.to?String(Q.to):Q.from+' to '+Q.to;
+  $('#collbasis').textContent=basis();
+  const m=matching(), g=mappable();
+  $('#cmatch').textContent=fmt(m.length);
+  $('#cmap').textContent=fmt(g.length);
+  const miss=m.length-g.length;
+  const u=$('#unmap');
+  u.hidden=miss===0;
+  if(miss) u.textContent=miss+' of these '+m.length+' have no coordinates precise enough to draw. '
+    +'They are in the register and in any citation of this collection.';
+}
+
+function paintReg(){
+  const list=sorted(matching());
+  $('#regsub').textContent=basis()+' · '+list.length+' records';
+  const pips=n=>[1,2,3].map(i=>'<i class="'+(n>=i?'on':'')+'"></i>').join('');
+  $('#regrows').innerHTML=list.map(r=>`
+    <button class="reg-row" data-rec="${r.id}">
+      <b>${r.n}${hasCoords(r)?'':' <span class="nomap">not on the ground</span>'}</b>
+      <span class="m hide-s">${r.p}</span>
+      <span class="m">${r.y}</span>
+      <span class="hide-s"><span class="ev-pips">${pips(r.c)}</span></span>
+    </button>`).join('')||`<p style="padding:var(--s4);color:var(--ink-3)">
+      No record matches this collection. Widen the range or lower the evidence floor.</p>`;
+}
+
+/* one repaint for every state change. */
+function repaint(){ paintSpine(); paintMarks(); paintCollection(); paintAbsence();
+  paintCensus(); paintReg(); url(); }
+
+/* ---- place ---- */
+function setPlace(label,lon,lat,zoom,postal){
+  S.placeLabel=label; S.lon=lon; S.lat=lat; S.zoom=zoom;
+  if(postal!==undefined){Q.state=postal; $('#fstate').value=postal;}
+  camera({lon,lat,zoom}); repaint(); say(label+'.');
+}
+$('#q').addEventListener('keydown',e=>{
+  if(e.key!=='Enter')return;
+  const t=e.target.value.trim().toLowerCase(); if(!t)return;
+  /* ENTRY FROM ANY AXIS: a person, an institution, a place. The collection
+     forms around whatever you arrived with; it never demands a place first. */
+  const hit=R.find(r=>(r.n+' '+r.p+' '+r.k).toLowerCase().includes(t));
+  if(hit){
+    if(hit.y<Q.from||hit.y>Q.to){Q.from=1790;Q.to=2020;}
+    S.placeLabel=hit.p; repaint(); openRecord(hit.id,'search'); return;
+  }
+  const place=Object.keys(COND).find(p=>p.toLowerCase().includes(t));
+  if(place){ const r=R.find(x=>x.p===place);
+    setPlace(place, r?r.lon:-96.5, r?r.lat:38.5, r?4.2:1); return; }
+  say('Nothing matches '+t+'. A gap in the archive is not the same as an absence of history.');
+});
+$('#home').addEventListener('click',e=>{e.preventDefault();
+  Q.kind='';Q.state='';Q.from=1790;Q.to=2020;Q.floor=1;syncFilters();
+  setPlace('Everything in the archive',-96.5,38.5,1,'');mode('ground')});
+
+/* ---- URL: the COLLECTION is the address. Named place and decades only,
+   never raw coordinates (url-state.ts:168-183 keeps camera out of links). ---- */
+function url(){
+  const p=new URLSearchParams();
+  if(Q.kind)p.set('kind',Q.kind);
+  if(Q.state)p.set('state',Q.state);
+  if(Q.from!==1790)p.set('from',Q.from);
+  if(Q.to!==2020)p.set('to',Q.to);
+  if(Q.floor>1)p.set('floor','CBA'[Q.floor-1]);
+  if(Q.sort!=='year')p.set('sort',Q.sort);
+  if(S.sel)p.set('record',S.sel);
+  history.replaceState(null,'',p.toString()?'?'+p:location.pathname);
+}
+
+/* ---- filters: the canonical, keyboard-reachable controls ---- */
+function syncFilters(){
+  $('#fkind').value=Q.kind; $('#fstate').value=Q.state;
+  $('#ffrom').value=Q.from; $('#fto').value=Q.to;
+  $('#ffloor').value=Q.floor; $('#fsort').value=Q.sort;
+}
+function buildFilters(){
+  const states=[...new Set(R.map(r=>r.p.split(', ').pop()))].sort();
+  $('#fstate').innerHTML='<option value="">Anywhere</option>'
+    +states.map(s=>`<option>${s}</option>`).join('');
+  const opts=DECADES.map(y=>`<option value="${y}">${y}</option>`).join('');
+  $('#ffrom').innerHTML=opts; $('#fto').innerHTML=opts;
+  syncFilters();
+  $('#fkind').onchange=e=>{Q.kind=e.target.value;repaint()};
+  $('#fstate').onchange=e=>{Q.state=e.target.value;repaint()};
+  $('#ffrom').onchange=e=>{Q.from=Math.min(+e.target.value,Q.to);syncFilters();repaint()};
+  $('#fto').onchange=e=>{Q.to=Math.max(+e.target.value,Q.from);syncFilters();repaint()};
+  $('#ffloor').onchange=e=>{Q.floor=+e.target.value;repaint()};
+  $('#fsort').onchange=e=>{Q.sort=e.target.value;repaint()};
+  $('#freset').onclick=()=>{Q.kind='';Q.state='';Q.from=1790;Q.to=2020;Q.floor=1;Q.sort='year';
+    syncFilters();repaint();say('Collection reset.')};
+}
+$('#censustoggle').addEventListener('click',()=>{S.census=!S.census;paintCensus();
+  say(S.census?'Census reading shown, with its sources and its breaks.':'Census reading hidden.')});
+
+/* ---- modes: postures of ONE surface. No navigation happens. ---- */
+function mode(m){
+  body.dataset.mode=m;
+  $('#openreg').setAttribute('aria-pressed',String(m==='register'));
+  camera({});
+}
+
+/* ---- THE RECORD: a document. The panel is an enhancement over the real,
+   server-rendered /place/{slug} page, never a replacement for it. ---- */
+function openRecord(id,from){
+  const r=byId(id); if(!r)return;
+  if(body.dataset.mode!=='record'){
+    S.ret={mode:body.dataset.mode,cam:Object.assign({},cam),scroll:$('#thread').scrollTop};
+  }
+  S.sel=id; S.from=from||S.from;
+  const whence={thread:'the thread',register:'the register',ground:'the ground'};
+  $('#recbacklbl').textContent='Back to '+(whence[S.ret&&S.ret.mode]||'the ground');
+
+  const pips=n=>[1,2,3].map(i=>'<i class="'+(n>=i?'on':'')+'"></i>').join('');
+  const word={3:'Well evidenced',2:'Partly evidenced',1:'Thinly evidenced'}[r.c];
+  const rel=(r.rel||[]).map(([rid,kind])=>{
+    const o=byId(rid); if(!o)return '';
+    return `<button class="chip ${kind==='adj'?'adjc':''}" data-rec="${o.id}"><i></i>${o.n}</button>`;
+  }).join('');
+  const hasAdj=(r.rel||[]).some(x=>x[1]==='adj');
+
+  $('#recbody').innerHTML=`
+    ${r.sens?`<p class="sens"><i></i><span>${r.sensnote}</span></p>`:''}
+    <span class="rec-kind">${r.k}</span>
+    <h2 class="rec-h">${r.n}</h2>
+    <p class="rec-sub">${r.p} &middot; ${r.y}</p>
+    <div class="rec-fig"><span>Archival image not shown in prototype</span></div>
+    <div class="conf">
+      <div class="conf-top"><span class="ev-pips">${pips(r.c)}</span><span class="conf-w">${word}</span></div>
+      <p>${r.w}</p>
+      <p class="src">${r.s}</p>
     </div>
-    <div class="sh-sec"><h3>What this is</h3><p>${r.blurb}</p></div>
-    ${rel ? `<div class="sh-sec"><h3>Connected records</h3><div class="chips">${rel}</div></div>` : ''}
-    <div class="sh-sec"><h3>Keep the thread</h3>
-      <p>This record is cited in <a href="#" data-story="1">The Count</a>, and sits inside the ${r.place.split(',')[1] || ''} census series.</p>
+    <div class="cite-box">
+      <h3>Cite this record</h3>
+      <code>&ldquo;${r.n}.&rdquo; BlackStory Archive, ${r.p}, ${era(r.y)}. Evidence grade ${'ABC'[3-r.c]}, ${r.nsrc} sources. Accessed ${TODAY}. https://blackstory.org/place/${r.slug}</code>
+      <p>The existing citation format, unchanged. The address is the record&rsquo;s own
+         server-rendered page, not a view of the ground: it does not depend on your collection,
+         your decade or JavaScript.</p>
+    </div>
+    <div class="rec-sec"><h3>What this is</h3><p>${r.b}</p></div>
+    <div class="rec-sec"><h3>Where the point sits</h3>
+      <p>${
+        r.prec==='exact' ? 'Drawn to the parcel. The source supports that precision.' :
+        r.prec==='none' ? 'Not drawn on the ground. The source names people but no location, so there is nothing to place. It stays in the register and in any citation of this collection.' :
+        r.prec==='withheld' ? 'Not drawn on the ground. The location is documented but withheld at the family’s request. The withholding is recorded here rather than hidden.' :
+        'Drawn to the '+r.prec+'. The sources place it no more sharply than that, and the mark is never drawn sharper than its source.'}</p>
+    </div>
+    ${rel?`<div class="rec-sec"><h3>Connected records</h3><div class="chips">${rel}</div>
+      ${hasAdj?`<p class="relnote">Dotted links are near in place or period. The sources do not
+         state a connection, and this archive will not imply one.</p>`:''}</div>`:''}
+    <div class="rec-sec"><h3>This place over time</h3>
+      <p>Widen the collection to watch ${r.p.split(',')[0]} change, or
+         <button class="chip" data-goyear="${Math.min(2020,Math.ceil((r.y+40)/10)*10)}"><i></i>run it on forty years</button></p>
     </div>`;
 
-  go('record');
-  ring(id);
-  litSet(null);
-  applyCamera({lon:r.lon, lat:r.lat, zoom:6.2});
-  $('#sheet').focus();
-  say('Record open: ' + r.name + '. The field stayed where it was.');
-  renderThread();
+  mode('record');
+  paintMarks();
+  /* P-04: a sensitive record is CUT to, never flown to. An undrawable record
+     moves the camera not at all, because there is nowhere honest to point it. */
+  if(hasCoords(r)) camera({lon:r.lon,lat:r.lat,zoom:6.1},{now:!!r.sens});
+  $('#rec').focus();
+  url();
+  say('Record: '+r.n+'. '+(r.sens?'Presented without camera movement.'
+      :hasCoords(r)?'The ground stayed where it was.':'This record has no point on the ground.'));
 }
-
-function closeRecord(){
-  const rt = thread.returnTo;
-  ring(null);
-  if (!rt){ go('field'); return; }
-  body.dataset.view = rt.view;
-  $$('[data-go]').forEach(b => b.setAttribute('aria-current', String(b.dataset.go === rt.view)));
-  if (rt.view === 'journey'){
-    document.documentElement.style.overflow = '';
-    scrollTo({top: rt.scroll, behavior:'auto'});
-  } else if (rt.view === 'story'){
-    litSet(STORY_SET);
-    $('#story').scrollTop = rt.storyScroll;
-  }
-  applyCamera(rt.cam);
-  $('#thread').classList.toggle('is-away', rt.view === 'journey' && !thread.collected.length);
-  say('Back where you were.');
-  renderThread();
-}
-$('#shback').addEventListener('click', closeRecord);
-$('#shadd').addEventListener('click', () => {
-  const h = $('#shbody .sh-h');
-  if (!h) return;
-  const r = RECORDS.find(x => x.name === h.textContent);
-  if (r && !thread.collected.includes(r.id)){
-    thread.collected.push(r.id);
-    renderThread();
-    $('#thread').classList.remove('is-away');
-    say(r.name + ' added to your thread. ' + thread.collected.length + ' collected.');
-  }
+$('#recback').addEventListener('click',()=>{
+  const rt=S.ret; S.sel=null; paintMarks();
+  if(!rt){mode('ground');url();return}
+  mode(rt.mode);
+  if(rt.mode==='thread')$('#thread').scrollTop=rt.scroll;
+  camera(rt.cam); url(); say('Back where you were.');
 });
 
-/* delegate every data-rec in the document */
-document.addEventListener('click', e => {
-  const t = e.target.closest('[data-rec]');
-  if (t){ e.preventDefault(); openRecord(t.dataset.rec, body.dataset.view === 'story' ? 'the chapter' : 'the field'); }
-  const s = e.target.closest('[data-story]');
-  if (s){ e.preventDefault(); go('story'); }
-});
+$('#openreg').addEventListener('click',()=>mode(body.dataset.mode==='register'?'ground':'register'));
+$('#regclose').addEventListener('click',()=>mode('ground'));
+$('#mreg').addEventListener('click',()=>mode('register'));
 
-/* ---------- JOURNEY: IntersectionObserver, winner-takes-all, settle ---------- */
-/* this mirrors use-chapter-observer.ts: 0.42 threshold, 140ms settle */
-const chapters = $$('.chapter');
-let settle = null, current = -1;
-const io = new IntersectionObserver(entries => {
-  let best = null;
-  entries.forEach(en => { if (en.isIntersecting && (!best || en.intersectionRatio > best.intersectionRatio)) best = en; });
-  if (!best) return;
-  const idx = +best.target.dataset.ch;
-  clearTimeout(settle);
-  settle = setTimeout(() => setChapter(idx), 140);
-}, {threshold:[0.42, 0.6]});
-chapters.forEach(c => io.observe(c));
-
-function setChapter(idx){
-  if (idx === current || body.dataset.view !== 'journey') return;
-  current = idx;
-  const spec = CHAPTERS[idx];
-  chapters.forEach(c => c.classList.toggle('is-live', +c.dataset.ch === idx));
-  $$('#spine button').forEach((b, i) => b.setAttribute('aria-current', String(i === idx)));
-  body.dataset.side = spec.side;
-  ring(spec.ring || null);
-  applyCamera({lon:spec.lon, lat:spec.lat, zoom:spec.zoom});
-  if (spec.ring){
-    const r = RECORDS.find(x => x.id === spec.ring);
-    if (r) thread.place = r.place;
-  } else if (idx === 0){ thread.place = 'The whole field'; }
-  renderThread();
-  const h = chapters[idx].querySelector('.ch-h');
-  if (h) say('Chapter ' + idx + ': ' + h.textContent.trim());
-}
-function syncChapter(force){
-  const mid = innerHeight / 2;
-  let idx = 0;
-  chapters.forEach(c => { const b = c.getBoundingClientRect(); if (b.top <= mid && b.bottom >= mid) idx = +c.dataset.ch; });
-  if (force) current = -1;
-  setChapter(idx);
-}
-
-/* spine */
-$('#spine').innerHTML = CHAPTERS.map((c, i) =>
-  `<button aria-label="Chapter ${i}"${i === 0 ? ' aria-current="true"' : ''}></button>`).join('');
-$$('#spine button').forEach((b, i) => b.addEventListener('click', () => {
-  chapters[i].scrollIntoView({behavior: reduced ? 'auto' : 'smooth'});
-}));
-$('#scrolldown').addEventListener('click', () => chapters[1].scrollIntoView({behavior: reduced ? 'auto' : 'smooth'}));
-
-/* decade sweep */
-$('#sweepbtn').addEventListener('click', function(){
-  let d = 1790;
-  this.disabled = true;
-  this.textContent = 'Playing…';
-  const step = () => {
-    thread.eraMax = d;
-    $('#erarange').value = d;
-    $('#eraout').textContent = '1790 — ' + d;
-    applyFilters();
-    d += 10;
-    if (d <= 2020) setTimeout(step, reduced ? 10 : 190);
-    else { this.disabled = false; this.textContent = 'Play the decades again'; say('Swept 1790 to 2020.'); }
-  };
-  step();
-});
-
-/* ---------- FIELD controls ---------- */
-$$('.lens-g button').forEach(b => b.addEventListener('click', () => {
-  $$('.lens-g button').forEach(o => o.setAttribute('aria-pressed', String(o === b)));
-  kindFilter = b.dataset.kind;
-  applyFilters();
-  say(visibleRecords().length + ' records shown.');
-}));
-$('#erarange').addEventListener('input', e => {
-  thread.eraMax = +e.target.value;
-  $('#eraout').textContent = '1790 — ' + thread.eraMax;
-  $('#eranote').textContent = thread.eraMax >= 2020
-    ? 'Showing every decade.'
-    : 'Earlier decades are thinner because the records are thinner, not because the lives were.';
-  applyFilters();
-});
-$('#raillist').addEventListener('click', e => {
-  const b = e.target.closest('.rrow');
-  if (b) openRecord(b.dataset.rec, 'the field');
-});
-
-/* ---------- STORY: map moments + progress + the SET handoff ---------- */
-const story = $('#story');
-const moments = $$('.moment');
-let liveMoment = null;
-
-/* One pure-ish function drives both the progress bar and the map moments, so the
-   behaviour can be exercised directly (and tested) without depending on scroll-event
-   or IntersectionObserver delivery. The scroll listener and the observer below are
-   just two ways of calling it. */
-function updateStory(){
-  if (body.dataset.view !== 'story') return;
-  const max = story.scrollHeight - story.clientHeight;
-  $('#stbar').style.width = (max > 0 ? (story.scrollTop / max) * 100 : 0) + '%';
-
-  /* the moment nearest the middle of the reading column wins, same
-     "winner takes all" rule the journey uses */
-  const mid = story.clientHeight / 2;
-  let win = null, best = Infinity;
-  moments.forEach(m => {
-    const r = m.getBoundingClientRect();
-    if (r.bottom < 0 || r.top > story.clientHeight) return;
-    const d = Math.abs((r.top + r.height / 2) - mid);
-    if (d < best){ best = d; win = m; }
-  });
-  moments.forEach(m => m.classList.toggle('is-live', m === win));
-  if (win && win !== liveMoment){
-    liveMoment = win;
-    applyCamera({lon:+win.dataset.lon, lat:+win.dataset.lat, zoom:+win.dataset.zoom});
-    say('The field moved to ' + win.querySelector('.lbl').textContent + '.');
-  }
-  if (!win) liveMoment = null;
-}
-story.addEventListener('scroll', updateStory, {passive:true});
-/* belt and braces: an observer too, for browsers that coalesce scroll events */
-const mio = new IntersectionObserver(() => updateStory(), {root:story, threshold:[0, .5, 1]});
-moments.forEach(m => mio.observe(m));
-$('#stclose').addEventListener('click', () => { go('field'); });
-$('#showset').addEventListener('click', () => {
-  thread.collected = [...new Set([...thread.collected, ...STORY_SET])];
-  thread.from = 'The Count';
-  thread.place = 'Nine places in this chapter';
-  go('field');
-  frameSet(STORY_SET);
-  $('#thread').classList.remove('is-away');
-  renderThread();
-  say('All nine cited records are on the field, framed together.');
-});
-
-/* ---------- search ---------- */
-$('#q').addEventListener('keydown', e => {
-  if (e.key !== 'Enter') return;
-  const term = e.target.value.trim().toLowerCase();
-  if (!term) return;
-  const hit = RECORDS.find(r => (r.name + ' ' + r.place).toLowerCase().includes(term));
-  if (hit) openRecord(hit.id, 'search');
-  else say('Nothing found for ' + term + '. The archive has gaps; that is not the same as absence.');
-});
-
-/* ---------- keyboard ---------- */
-addEventListener('keydown', e => {
-  if (e.key === 'Escape'){
-    if (body.dataset.view === 'record') closeRecord();
-    else if (body.dataset.view === 'story') go('field');
-  }
-  if (e.key === '?' ) body.dataset.fixes = body.dataset.fixes === 'on' ? 'off' : 'on';
-});
-
-/* ---------- annotations ---------- */
-const FIXES = [
-  {t:'Nav → one surface', b:'Today "Map" in the nav goes to <code>/</code>, not to the map. Explore is never in the nav. Here, Journey / Field / Reading are postures of one field — no page ever loads.', css:'top:72px;right:24px'},
-  {t:'The Thread', b:'The investigation is the persistent object: place, period, what you collected, where you came from. Today nothing survives a route change — no sessionStorage, no return position.', css:'left:24px;bottom:120px'},
-  {t:'No instruction pill', b:'Today a permanent row reads "click a pin · walk · shift + drag or swipe to turn the map" — and it is hidden on phones, where it is needed most. Affordances replace it.', css:'top:150px;left:50%;transform:translateX(-50%)'},
-  {t:'Record = sheet, not reload', b:'Today "Open record" is a plain &lt;a href&gt; (RecordSheet.tsx:428). It destroys the WebGL context and builds a second map (EmbeddedMap.tsx:288). Here the field stays live and flies to the pin.', css:'bottom:24px;left:50%;transform:translateX(-50%);max-width:340px'}
+/* ---- THREADS: the loved scroll effect, now the universal primitive ---- */
+const THREAD=[
+ {at:'1790 · Philadelphia',h:'A ledger open on <em>his knee</em>',
+  lon:-75.1514,lat:39.9428,zoom:5.4,from:1790,to:1790,state:'Pennsylvania',place:'Philadelphia, Pennsylvania',
+  p:'In the summer of 1790 a man walked up to a door with a ledger open on his knee and wrote down how many people lived behind it. For most Black households he did not write a name.',
+  src:'First Census of the United States, 1790, Pennsylvania schedules.'},
+ {at:'1794 · Sixth and Lombard',h:'A deed is a kind of <em>evidence</em>',
+  lon:-75.1514,lat:39.9428,zoom:7.4,from:1790,to:1800,state:'Pennsylvania',place:'Philadelphia, Pennsylvania',sel:'bethel',
+  p:'What the census would not hold, a deed did. <a href="#" data-rec="bethel">Mother Bethel</a> can be placed to the parcel because the purchase was written down and the paper survived.',
+  src:'Philadelphia deed book D-42, 1792; HABS PA-1683.'},
+ {at:'1870 · The whole field',h:'The column gets a <em>name</em>',
+  lon:-93,lat:38.5,zoom:1.25,from:1790,to:1870,place:'Everything in the archive',
+  p:'From 1870 the census recorded Black Americans by name. The ground thickens from here, and the thickening is a change in record-keeping as much as a change in life.',
+  src:'Ninth Census of the United States, 1870.'},
+ {at:'1921 · Greenwood',h:'Thirty-five blocks, <em>sixteen hours</em>',
+  lon:-95.9875,lat:36.1622,zoom:6.3,from:1900,to:1920,state:'Oklahoma',place:'Tulsa, Oklahoma',sel:'greenwood',still:true,
+  p:'<a href="#" data-rec="greenwood">Greenwood</a> was destroyed in 1921 and rebuilt by the people who survived it. The archive holds both facts and this thread will not animate between them.',
+  src:'Oklahoma Commission to Study the Tulsa Race Riot of 1921, final report, 2001.'},
+ {at:'Now',h:'The count is not the <em>history</em>',
+  lon:-88,lat:37,zoom:1.5,from:1790,to:2020,place:'Everything in the archive',
+  p:'It is the shadow the history cast on a government form, and it is most of what survived. Step off anywhere: the ground keeps your place and your decade.',
+  src:'See the register for every record behind this thread.'}
 ];
-const ftags = FIXES.map(f => {
-  const el = document.createElement('div');
-  el.className = 'fixtag';
-  el.style.cssText = f.css;
-  el.innerHTML = '<b>' + f.t + '</b>' + f.b;
-  document.body.appendChild(el);
-  return el;
+function buildThread(){
+  $('#thread').innerHTML=THREAD.map((s,i)=>`
+    <section class="step${s.still?' still':''}" data-i="${i}">
+      <div class="step-card">
+        <div class="step-at">${s.at}</div>
+        ${s.still?`<p class="still-note"><i></i><span>A site of mass violence. The ground
+           cuts here rather than flying, and holds still.</span></p>`:''}
+        <h2 class="step-h">${s.h}</h2>
+        <p class="step-p">${s.p}</p>
+        <p class="srcline">${s.src}</p>
+      </div>
+    </section>`).join('');
+}
+let liveStep=-1;
+function updateThread(){
+  if(body.dataset.mode!=='thread')return;
+  const el=$('#thread');
+  const max=el.scrollHeight-el.clientHeight;
+  $('#tprog').style.width=(max>0?(el.scrollTop/max)*100:0)+'%';
+  const mid=el.clientHeight/2;
+  let win=null,best=Infinity;
+  $$('.step').forEach(s=>{
+    const r=s.getBoundingClientRect();
+    if(r.bottom<0||r.top>el.clientHeight)return;
+    const d=Math.abs((r.top+r.height/2)-mid);
+    if(d<best){best=d;win=s}
+  });
+  $$('.step').forEach(s=>s.classList.toggle('live',s===win));
+  if(!win)return;
+  const i=+win.dataset.i;
+  if(i===liveStep)return;
+  liveStep=i;
+  const s=THREAD[i];
+  /* a thread step sets the COLLECTION it is arguing about, so stepping off it
+     leaves you holding exactly the evidence the paragraph was built on. */
+  Q.from=s.from; Q.to=s.to; Q.kind=''; Q.state=s.state||'';
+  S.placeLabel=s.place; S.lon=s.lon; S.lat=s.lat; S.zoom=s.zoom; S.sel=s.sel||null;
+  syncFilters(); repaint();
+  /* DIGNITY: a still step cuts. it does not glide. */
+  camera({lon:s.lon,lat:s.lat,zoom:s.zoom},{now:!!s.still});
+  say(s.at+'. '+win.querySelector('.step-h').textContent);
+}
+$('#thread').addEventListener('scroll',updateThread,{passive:true});
+function startThread(){
+  mode('thread'); liveStep=-1; $('#thread').scrollTop=0;
+  requestAnimationFrame(()=>{requestAnimationFrame(updateThread)});
+  say('Thread started. Scroll to move through it. The ground follows.');
+}
+$('#startthread').addEventListener('click',startThread);
+$('#mthread').addEventListener('click',startThread);
+$('#texit').addEventListener('click',()=>{mode('ground');say('Left the thread. Your place and decade are kept.')});
+
+/* ---- delegated actions ---- */
+document.addEventListener('click',e=>{
+  const r=e.target.closest('[data-rec]');
+  if(r){e.preventDefault();openRecord(r.dataset.rec,body.dataset.mode);return}
+  const y=e.target.closest('[data-goyear]');
+  if(y){e.preventDefault();mode('ground');Q.to=Math.min(2020,+y.dataset.goyear);
+     if(Q.from>Q.to)Q.from=Q.to;syncFilters();repaint()}
 });
-$('#fixbtn').addEventListener('click', () => {
-  const on = body.dataset.fixes === 'on';
-  body.dataset.fixes = on ? 'off' : 'on';
-  $('#fixbtn').textContent = on ? 'Show what changed' : 'Hide annotations';
+addEventListener('keydown',e=>{
+  if(e.key==='Escape'){
+    if(body.dataset.mode==='record')$('#recback').click();
+    else if(body.dataset.mode!=='ground')mode('ground');
+  }
+  if(e.key==='?')body.dataset.tags=body.dataset.tags==='on'?'off':'on';
 });
 
-/* ---------- boot ---------- */
-buildPins();
-applyFilters();
-renderThread();
-applyCamera({lon:-96.5, lat:38.5, zoom:1}, {instant:true});
-setChapter(0);
-chapters[0].classList.add('is-live');
-addEventListener('resize', () => applyCamera({}, {instant:true}));
+/* ---- annotations ---- */
+[
+ {t:'The query is authoritative',b:'A viewport-driven list silently drops records outside the camera and records with no coordinates, giving a researcher an incomplete bibliography that looks complete. Here the collection is the state and the map is one view of it: pan anywhere, the bibliography does not move.',c:'top:120px;left:50%;transform:translateX(-50%);max-width:330px'},
+ {t:'Time is a control, not a scroll',b:'Scroll-as-time was rejected: it breaks find-in-page, PageDown, the scrollbar as position, and the screen-reader cursor. The spine is a keyboard-addressable range (arrows, shift, Home/End) and its tick lengths show how much the archive actually holds.',c:'top:120px;right:150px'},
+ {t:'Census is a reading, not atmosphere',b:'A population wash under a violence-related mark composes a causal argument nobody wrote. So it is off by default, sourced, carries its definition breaks, and states that population counts do not explain any individual record.',c:'left:24px;bottom:210px'},
+ {t:'Dignity is a mechanic',b:'At a site of mass violence the camera cuts instead of flying, and says so. Undrawable and withheld records stay in the register and in the citation rather than disappearing off a map.',c:'right:24px;bottom:120px'}
+].forEach(f=>{
+  const el=document.createElement('div'); el.className='tag'; el.style.cssText=f.c;
+  el.innerHTML='<b>'+f.t+'</b>'+f.b; document.body.appendChild(el);
+});
+$('#tagbtn').addEventListener('click',()=>{
+  const on=body.dataset.tags==='on';
+  body.dataset.tags=on?'off':'on';
+  $('#tagbtn').textContent=on?'Show what changed':'Hide annotations';
+});
+
+/* ---- boot ---- */
+buildMarks(); buildSpine(); buildThread();
+(function(){
+  const p=new URLSearchParams(location.search);
+  if(p.get('kind'))Q.kind=p.get('kind');
+  if(p.get('state'))Q.state=p.get('state');
+  if(p.get('from'))Q.from=+p.get('from');
+  if(p.get('to'))Q.to=+p.get('to');
+  if(p.get('floor'))Q.floor='CBA'.indexOf(p.get('floor'))+1||1;
+  if(p.get('sort'))Q.sort=p.get('sort');
+})();
+buildFilters(); repaint();
+camera({lon:S.lon,lat:S.lat,zoom:S.zoom},{now:true});
+url();
+addEventListener('resize',()=>camera({},{now:true}));
 </script>
 </body>
 </html>

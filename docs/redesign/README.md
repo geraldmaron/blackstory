@@ -1,401 +1,401 @@
-# BlackStory redesign: One Field
+# GROUND: a ground-up reconception of the BlackStory experience
 
-**Status:** proposal + working prototype. Nothing in the production app is changed by this directory.
-**Date:** 2026-10-31
-**Branch:** `redesign/ux-audit-2026-10`
+**Status:** proposal + working prototype. No production behavior is changed by this directory.
+**Date:** 2026-10-31 · **Branch:** `redesign/ux-audit-2026-10`
+**Prototype:** [`prototype/index.html`](prototype/index.html) — see [how to open it](#how-to-open-the-prototype)
 
-- Audit and plan: this file
-- Working prototype: [`prototype/index.html`](prototype/index.html) — see [How to open the prototype](#how-to-open-the-prototype)
+This supersedes an earlier draft in this directory that proposed "One Field". That draft was a
+reskin: it renamed Map/Stories/Records to Journey/Field/Reading, bolted a state object onto the
+existing page structure, and led with a "stop the bleeding" patch list. It has been deleted
+rather than kept, because the point of this document is not to proliferate the patterns that
+made the product feel disjointed.
 
 ---
 
-## The short version
+## 1. The diagnosis: three structural failures, not a styling problem
 
-The owner's complaint was "I love the map effect when scrolling but much more of the site
-feels clunky and disjointed." The audit found that the disjointedness is not a styling
-problem. It is a **data-model problem with a visible surface**.
+### Failure 1 — The taxonomy asks the reader to file their curiosity
 
-The codebase states the root cause itself, in a comment at
+Top-level navigation is Map / Stories / Records / Rooms. Those are four different *kinds of
+thing*: Map and Records are **representations**, Stories is a **format**, Rooms is a **metaphor
+for leftovers** holding 15 destinations. Law and Books are **content categories** one level
+down; Data and Lives are **experiences** hidden behind Rooms.
+
+Somebody investigating a neighborhood has to decide whether their question is a map question, a
+records question, a story question or a census question *before* they are allowed to ask it.
+The publishing system is the interface.
+
+The nav does not even describe itself accurately: `CommandBar.tsx:211` points the "Map" tab at
+`/`, a scroll-narrative door. The actual map is `/explore`, which appears nowhere in the nav.
+
+### Failure 2 — State cannot travel, so nothing connects
+
+This is the mechanical cause of "disjointed", and the codebase states it plainly at
 `apps/web/src/app/stories/[slug]/page.tsx:124`:
 
 > The design law calls this "handing a named collection to the Atlas", but
-> `EXPLORE_URL_PARAM_KEYS` has no multi-id or collection param — `selected` carries one
-> id — so a named collection is not representable in an Explore URL today.
+> `EXPLORE_URL_PARAM_KEYS` has no multi-id or collection param — `selected` carries one id — so
+> a named collection is not representable in an Explore URL today.
 
-A reader's investigation is a **set**: a place, a period, a question, several records, and
-the thing they came from. The only vocabulary the site has for carrying state between
-surfaces is a URL that holds **one** id. So every handoff degrades to a single link, and
-every page starts cold. `exploreViewFromDiscovery()` in
-`apps/web/src/lib/discovery/discovery-state.ts:116` even drops the text query on the way
-across, because Explore has no text pin filter.
+A reader's investigation is a **set**: a place, a period, a question, several records, and where
+they came from. The vocabulary can express exactly one id. So:
 
-That is why stories link 5 records out of 8,661 words, why `/data` never links to the map,
-and why a record's back button goes to the homepage. You cannot fix that with transitions.
-
-**The proposal:** make the investigation the persistent object, and make map, list, record
-and narrative into *postures of one surface* rather than separate destinations. Keep the
-scroll-driven map exactly as it is architecturally — it is already the best thing in the
-codebase — and extend its continuity model to everything else.
-
----
-
-## How the audit was run
-
-Five parallel read-only audits (Sonnet) over the live dev server and source, plus an
-independent adversarial pass from a **non-Claude model** (Codex CLI, `gpt-5.1-codex-max`)
-so the critique was not one model grading its own homework. Verified findings carry
-`file:line`. Claims marked INFERRED in the source reports were either verified by the
-orchestrator before use here, or are labelled below.
-
-The Codex pass corrected two of the Claude agents' findings, and those corrections are
-reflected below rather than quietly dropped:
-
-- "Five competing map implementations" was overstated. `MapInsetMoment` wraps `MapMoment`;
-  `explore-map-underlay` is first-paint markup. There are **three** real map instances, and
-  the problem is competing *interaction contracts*, not file count.
-- The route-sprawl count was inflated by redirects. `/map`, `/how-it-works` and `/apparatus`
-  are already 308s. The surviving overlap is real but smaller than 34.
-
-One earlier orchestrator claim is also corrected here: the "nine rival `:root` palettes"
-reading was wrong. The real token source is `packages/ui/src/styles/tokens.css` (472 lines),
-imported once from `app/layout.tsx:23`. The nine blocks are small local layout vars. The
-palette is sound; the *vocabulary* around it is not (see Area 5).
-
----
-
-## The five areas
-
-### Area 1 — Navigation, IA, and cross-site continuity
-
-**Sharpest finding: the nav lies about where it goes.** `CommandBar.tsx:211` points the
-"Map" tab at `/` (the scroll door), not at the map. `/explore` — the actual map — is never
-in the nav at all; it is reachable from the footer and from "See it on the map" links.
-
-**Continuity is one-directional.** `/place/[slug]` hands off correctly, with
-`?lat=&lng=&zoom=&selected=`. Nothing comes back: `walk-back-place.ts` hard-codes a
-record's back target to `/`. So the map hands you to a record, and the record hands you to
-the homepage.
-
-| Symptom | Evidence |
+| Consequence | Evidence |
 |---|---|
-| Stories index links to zero records | `/stories` rendered HTML |
-| `/data` and `/lives` never link to the map | rendered HTML, both routes |
-| No session state at all | no `sessionStorage` use in the shell |
-| Era, filter, scroll lost on every route change | no persistence layer found |
+| A record's "back" goes to the homepage | `walk-back-place.ts` hard-codes `/` |
+| The flagship 8,661-word chapter links 5 records | `/stories/the-count` rendered HTML |
+| The stories index links zero records | `/stories` rendered HTML |
+| `/data` and `/lives` never link to the map | both rendered HTML |
+| The text query is dropped crossing to the map | `discovery-state.ts:116` |
+| Era, filter and scroll die on every navigation | no `sessionStorage` in the shell |
 
-**"Rooms" is a junk drawer.** Fifteen destinations behind one menu, four of them policy
-pages, and it hides Lives and Data — the content that makes this more than a map. Codex's
-verdict: "a top-level destination whose job is explaining the other destinations. That is
-navigation debt presented as architecture."
+`MapInsetMoment` — a map moment *inside* prose, the thing that would connect reading to the
+ground — exists, works, and is summoned **zero** times in any sampled chapter.
 
-**Taxonomy mixes three kinds of thing.** Map and Records are *representations*. Stories is
-a *format*. Law and Books are *content categories*. Rooms is a *metaphor for leftovers*.
-A reader must classify their curiosity according to the publishing system before they can
-pursue it.
+### Failure 3 — Time is a filter, not an axis
+
+For a product whose material is 230 years of census and record-keeping, time is expressed as
+discrete slugs: `era=1950s`, `popDecade`. There is no time range, no continuous axis, and no way
+to *watch* a place change. Census lives on its own pages (`/data`, `/lives`, `/lives/explorer`)
+as a destination you visit, rather than as a property of wherever you are standing.
+
+### Supporting damage (symptoms, not causes)
+
+- Records are three templates (place / entity+invention / law) with different section names for
+  the same facts.
+- Two confidence vocabularies on one page: a "Grade A" tile and "Evidence grade: high" per claim.
+- Internal strings leak publicly: `Maturity: Partial Enrichment`, `rel_20260918_..._001`.
+- `/records` holds 4,210 records across 43 pages with four native selects and **no sort control**.
+- 30 CSS tokens are referenced that do not exist, including `--ds-space-7` used 12 times, so
+  those paddings silently resolve to zero. 134 font sizes, 350 spacing values, 39 breakpoints.
+- On phones the map is explicitly decorative (`door-immersive.tsx:979`) and the scroll narrative
+  does not run at all.
 
 ---
 
-### Area 2 — The map and scroll experience (the part to keep)
+## 2. ABANDON vs REFINE
 
-This is the best-engineered thing in the app and the redesign is built on it, not over it.
+The brief was explicit that broken patterns must not be carried forward. This is the line.
 
-**How the loved effect actually works — the preservation spec:**
+### Abandon outright
 
-| Mechanism | Where |
+| Pattern | Why it is broken, not rough |
 |---|---|
-| IntersectionObserver, 0.42 threshold, most-visible-wins | `lib/story/use-chapter-observer.ts`, `lib/story/chapters.ts` |
-| 140 ms settle timer that collapses fast scrolls into one destination | `CHAPTER_SETTLE_MS` |
-| Chapters as **data** (center, zoom, pitch, bearing + flags) | `STORY_CHAPTERS`, `chapters.ts:105-160` |
-| Camera flight: 1600 ms, fixed curve, `essential:false` | `door-immersive.tsx` `applyCamera` |
-| Camera framed against the window box, not the canvas | `door-field-frame.ts` |
-| **One** persistent MapLibre instance in the root shell | `MapStage.tsx` `MapStageProvider` |
-| Pointer-events pass-through so the wheel still scrolls the document | `door-home.css:~1090` |
-| Browse is an **in-place `pushState` morph**, not a navigation | `startBrowse`, `door-immersive.tsx:~360` |
+| **Destinations as the navigation model** | Forces curiosity to be filed by publishing format. |
+| **`/rooms`** | A destination whose job is explaining the other destinations. |
+| **`/data`, `/lives`, `/lives/explorer` as places you go** | Census is a property of a place at a time, not a page. |
+| **The door-as-intro** | Quarantines the best thing in the product in an entrance you leave once. |
+| **Story-as-separate-format** | A story is a path across the material, not a different page type. |
+| **`/search`, `/history` as routes** | Return bytes identical to `/records`. |
+| **Three record templates** | Not a layout bug: a document was being treated as a screen. |
+| **Grade letters in the interface** | Two vocabularies, neither legible to a non-researcher. |
+| **The gesture pill row** | The UI explaining its own affordances, hidden on phones where it is most needed. |
+| **`EmbeddedMap`'s separate gesture contract** | A third cartography on the same visual object. |
+| **Dead code** | `explore-map-underlay`, `first-paint-pin-plate`, `.ds-door__walk-rail`. |
 
-That last row matters enormously: **the continuity architecture already exists.** The app
-already knows how to change surface without destroying the map.
+### Keep and elevate
 
-**Sharpest finding: it is persistent except when you click the thing it exists for.**
-"Open record" is a plain `<a href>` (`RecordSheet.tsx:387`, `:428`). That is a full document
-load. It destroys the WebGL context, the tiles and the camera, and the record page then
-builds a *second* MapLibre instance (`EmbeddedMap.tsx:288`). The comment at
-`MapStage.tsx:1-12` claims the canvas survives "by construction" — true only for
-`next/link` navigation, which this is not.
+- **The scroll-driven camera mechanic.** `use-chapter-observer.ts` (IntersectionObserver @0.42,
+  140ms settle, winner-takes-all), chapters as data with camera specs, the single persistent
+  MapLibre instance, and the in-place `pushState` morph in `startBrowse`. This is the best
+  engineering in the app and the whole redesign is built on it.
+- **Per-claim citation blocks** with "Source states" quotations. Excellent evidence design.
+- **Honest discontinuity marks** already in the decade rail ("No census records", "Class
+  measured differently").
+- **The fixed citation format** (`lib/citation/format.ts`). Not re-punctuated.
+- **Every record's server-rendered address.** Non-negotiable; see §5.
 
-**Instruction debt.** A permanent pill row reads "click a pin · walk · shift + drag or
-swipe to turn the map". "walk" is a copper dot that is never defined anywhere in the UI.
-`.ds-door__walk-rail` CSS exists with no TSX consumer — orphaned from a removed feature.
-The row is hidden below 899px, i.e. hidden exactly where gestures are least discoverable.
-The code comment beside the rotation hint says "Naming the modifier is the whole fix",
-which is the design failure in one sentence.
+### Refine (symptoms that resolve once the structure is right)
 
-**Three gesture contracts on one visual object.** Ambient plate (drag on fine pointer, off
-on touch), Live (full), EmbeddedMap (`cooperativeGestures:true`), framed moments (locked).
-The reader must discover whether *this particular* map is scenery, navigation, an
-illustration, or an instrument.
-
-**Mobile: the signature experience does not exist.** Verified firsthand at 375px: the map
-is a decorative band with a "Tap to explore the map" hint, and the scroll narrative does
-not run. `door-immersive.tsx:979` says so outright — "Decorative". The headline copy also
-changes between breakpoints ("BlackStory happened here" → "History happened here").
-
-**Chapters hard-cut.** Cards are fully opaque rectangles with no enter/exit animation and
-no blur, shadow or edge treatment, occluding up to 28rem of the map. All smoothness comes
-from the camera lagging the scroll.
+Record anatomy, the token vocabulary, breakpoints, chart skins, the four overlapping trust pages.
 
 ---
 
-### Area 3 — Record and archive surfaces
+## 3. The new spine: the COLLECTION
 
-**A record is three templates wearing one name.**
+> **A collection is a reproducible query or an explicit named set. It has a durable, citable
+> address. The Ground, the Register, the Chronology and a Thread are all VIEWS of one.**
 
-| Type | Renders via | Has breadcrumb / TOC |
+An earlier version of this spine made **place × time the address itself** and treated the
+Register as a lens over the camera. A cross-model adversarial pass rejected that, correctly, on
+three counts (§4.2). The collection replaces it.
+
+| Primitive | What it is | Replaces |
 |---|---|---|
-| Place | `HomeFirstPaint.tsx` | No |
-| Entity, Invention | `EntityRecordRoom.tsx` | Yes |
-| Law | bespoke `ds-entry__title` | No, and no confidence block, no map |
+| **The Collection** | The state and the address. A query (kind, place, date range, evidence floor, sort) or a named set. Citable. | nothing — this object does not exist today |
+| **The Ground** | A view: the persistent map, drawing the **drawable subset** and saying how much it could not draw. | `/`, `/explore`, `/map`, `/atlas` |
+| **The Register** | A view: the authoritative, sortable, filterable index of the whole collection. | `/records`, `/search`, `/history` |
+| **Conditions** | A *sourced reading* you ask for, with its own breaks. Never ambient. | `/data`, `/lives`, `/lives/explorer` |
+| **Marks** | Records that have coordinates. Evidence visible *on* the mark. | map pins |
+| **Documents** | Records, stories, census reference, methodology, sources, errata, memorial. Server-rendered, canonical, citable. Keep their own URLs and authority. | unchanged |
+| **Threads** | An authored, ordered path *over* a collection. Scroll-driven. | `/stories` chapters, the door, `MapInsetMoment` |
 
-The same fact lives in different places under different names — "Can I trust this" on a
-place, "About this record" on an entity.
+**The mental model the brief asked for:**
 
-**Two confidence vocabularies on one page.** The tile says "Grade A". Each claim says
-"Evidence grade: high" with ●●● dots. The explainer is in a collapsed drawer and reads
-"not a calibrated probability". A lay reader cannot tell whether A equals high.
+- A **collection** is the question you are holding.
+- The **ground** is where its records are, when they can be placed.
+- The **register** is all of them, including the ones that cannot be placed.
+- **Census** is a reading you ask for about a place and a period, with its definitions attached.
+- A **story** is an argument over a collection, and stepping off it leaves you holding that exact
+  collection.
+- **Evidence** is how solid a mark is drawn, and it is never color alone.
 
-**Internal vocabulary leaks to the public.** Public record pages print
-`Maturity: Partial Enrichment` and release IDs like
-`rel_20260918_dunbar_media_correction_001`. This is the database-dump feel named in the
-complaint, on a product whose premise is dignity.
+**Entry is from any axis.** A person, an institution, a quotation, a source, a place or a date
+range all form a collection. The interface never demands a place and a date before it will let
+you ask a question. That was the deepest flaw in the place × time version.
 
-**The archive index is weak at its own scale.** 4,210 records, 43 pages, four native
-`<select>`s — one with ~250 topics — and **no sort control at all**.
+### Why this is not the departments renamed
 
-**What already works and must be kept:** the per-claim citation block with "Source states"
-quotations is genuinely excellent evidence design. The place hero (map or photo + three
-evidence numbers) is the best template in the app; it just only exists for one record type.
-
----
-
-### Area 4 — Reading and data surfaces
-
-**Sharpest finding, and the one closest to the owner's complaint: the map effect stops at
-the chapter door.** `MapInsetMoment` exists and works — it borrows the persistent plate
-when a `mapInset` block scrolls into view, handled at `StoryBody.tsx:215`. Sampled
-chapters summon it **zero times**.
-
-**Prose barely links to the archive:**
-
-| Chapter | Words | Record links | Citations |
-|---|---|---|---|
-| `/stories/the-count` | 8,661 | **5** | 126 |
-| `/stories/buying-a-home` | 7,305 | **1** | — |
-| `/stories/george-washington` | 1,250 | **0** | — |
-
-**Three chart skins** (`data-charts.css`, the lives figure, `ds-theme-impact-chart`) share
-`chart-utils` underneath but have different frames and caption conventions, so charts look
-*related* rather than identical.
-
-**The headline share chart is not zero-based** (`BlackPopulationShareChart.tsx:51`,
-`domainMin = floor(min-1)`), which exaggerates swings on a 1790–2020 series. Mitigated by
-tick labels and a numbers table, but it is the most-seen chart on the site.
-
-**Credit where due:** chart accessibility is above average — every chart ships a `<details>`
-numbers table with a caption, and the decade rail marks real discontinuities ("No census
-records", "Class measured differently"). The honesty work is already done; the presentation
-is inconsistent.
-
-**The trust story is told four times** — `/about`, `/methodology`, `/rooms`, `/data` —
-with headings duplicated verbatim ("How a record gets in" appears on two pages).
+The fair charge against both the first draft and the place × time draft is that
+Ground/Register/Record/Thread maps onto Map/Records/Record/Stories. The difference is not the
+nouns, it is that **a new first-class object exists that the product has never had**: a
+collection you can name, cite, hand to someone, hand to a story, and come back to. Today
+`selected` carries one id and nothing else survives a navigation. The views are secondary; the
+addressable set is the reconception.
 
 ---
 
-### Area 5 — Visual system and CSS architecture
+## 4. The decision that changed under attack: scroll-as-time
 
-The palette is fine. The **vocabulary** is the problem.
+The first version of this spine bound **vertical scroll to the decade axis**. It demos
+beautifully. It was rejected before being built, for reasons that are not aesthetic:
 
-| Axis | Real number |
-|---|---|
-| Tokens defined | 271 (105 web + 172 ui) |
-| **Tokens referenced but defined nowhere** | **30, with 113 uses** |
-| `font-size` declarations / distinct values | 968 / **134** |
-| Spacing declarations / distinct values | 2,442 / **350** |
-| Distinct media-query widths | **39** |
-| Distinct literal colors | 74 |
-| Mono vs sans declarations | 259 vs 137 |
+1. **It breaks the browser contract.** Find-in-page, PageDown/Home/End, the scrollbar as a
+   position indicator, and the screen-reader virtual cursor all assume scroll means "move
+   through this document".
+2. **It makes reading impossible.** Any readable content needs its own scroll context, which
+   creates the nested-scroll trap — the exact defect the audit already found in
+   `.ds-door__field` (`overflow-y:auto` + `overscroll-behavior:contain` on short viewports).
+3. **It cannot be scanned.** This is a research archive. "Take me to 1920" must be one action,
+   not a controlled-velocity gesture.
+4. **230 years of continuous camera motion is a vestibular trigger**, and the project already
+   forbids motion that dramatizes (P-04).
+5. **Scroll position is not an address.** Deep-linking a continuous scroll axis means writing
+   the URL constantly and still landing approximately.
 
-**The most damaging single finding: `--ds-space-7` does not exist and is used 12 times**
-(`reading-room.css:791`, `record-room.css:556/855/906/987/1008`, `home-first-paint.css:106`).
-The scale in `tokens.css:210-229` skips 7. Invalid `var()` fails silently, so those
-paddings and margins resolve to zero and section rhythm collapses. Also undefined:
-`--ds-font-ui` (14 uses), `--ds-accent-text` (10), `--ds-radius-pill` (3 — so the Door's
-pills are square).
+**What replaced it — and why the loved effect got *bigger*, not smaller:**
 
-Nothing caught this because `/design-system` is **login-gated** (`page.tsx:40`) and shows
-components, not a token ramp.
+What is actually loved is not "scroll moves a variable". It is **scroll-driven camera movement
+synchronized with narrative** — scrollytelling, which `chapters.ts` already implements well.
 
-**Near-off-by-one breakpoints** (`48rem` *and* `47.9375rem` *and* `47.99rem`; `560px` *and*
-`559px`) mean layouts flip at slightly different widths per surface. That is, mechanically,
-what "disjointed between screens" feels like.
+- **Scroll drives THREADS.** The mechanic is preserved exactly, and promoted from a one-time
+  entrance to the universal narrative primitive: the entry experience, a story chapter, a
+  record's "this place over time", and a census explainer are all threads. The effect now
+  appears everywhere in the product instead of once.
+- **Time is the DECADE SPINE**, a real control: click, arrow keys, Home/End, URL-addressable at
+  `?year=`. And it doubles as the honesty display — each decade's tick length shows how much the
+  archive actually holds, so you can *see* that the archive is thin in 1830 before you form a
+  belief about 1830.
 
-**Contrast.** Tokenized pairs pass AA. The risks are `--ds-accent-muted` at **2.06:1**
-(must never carry text) and borders at **1.29–1.40:1**, so panel edges nearly vanish in
-dark — half the interface is 10–11px mono labels sitting on hairlines that barely render.
+This is the one place where the beloved thing and the correct thing diverged, and the resolution
+gave more of the beloved thing, not less.
 
----
+### 4.2 What the cross-model pass killed, and what replaced it
 
-## The redesign direction: One Field
+The place × time concept was submitted to an independent non-Claude critic (Codex CLI) with a
+brief instructing it to destroy the idea. Verdict: **rejected**. Four findings were accepted
+without argument, because they are right.
 
-### The one idea
+| Objection | Why it lands | What changed |
+|---|---|---|
+| **A viewport-plus-decade Register is fatal.** "All Alabama churches, 1900–1920, grade A or better, sorted by date" cannot be expressed by a camera rectangle. Worse, it silently drops records outside the camera and records with no coordinates, giving the researcher "an incomplete bibliography that looks complete." | For a citation surface, silent omission is the worst possible failure. | **The query became authoritative and the map became one projection of it.** The Register has independent filters. The ground draws the drawable subset and states the count it could not draw. Verified: moving the camera does not change the bibliography. |
+| **"The record is the only document" misunderstands publication.** Stories already carry authorship, publication dates and `Article` JSON-LD. Census reference, methodology, sources and errata are citable too. | Demoting them to "threads" is a regression in publication identity. | **Documents are plural and keep their own URLs and authority.** A thread interprets a collection; it does not replace the published page. |
+| **The composition can assert an argument nobody wrote.** A population wash beneath a violence-related mark, then a flight to a church, reads as causation even with no source. | This is the dignity risk, and the first draft only typed explicit record-to-record links. | **Census became an opt-in, sourced reading** with its comparability breaks stated, plus an explicit line: *"Population counts do not explain any individual record on this ground."* It is off by default and never a backdrop. |
+| **"Nothing happened here" is unearnable.** Missing records establish neither inactivity nor missing documentation: material may exist elsewhere, be uncatalogued, or fall outside the current filter. | Collapsing four different silences into one is a false claim. | **Four absence states, never merged:** no record matches *this collection*; a documented coverage limit; not surveyed; and (in production) retrieval failure. |
 
-> **The investigation is the persistent object. Map, list, record and story are postures of
-> one surface, not four destinations.**
+Two further objections were **partly** accepted. The charge of "renamed departments" is answered
+in §3 by making the collection a genuinely new object rather than by renaming anything. The
+charge that phones cannot host map, timeline, register, evidence and reading at once is accepted
+as an unresolved risk and is why §7 ends with a task-based validation gate rather than a claim.
 
-Everything below follows from that sentence.
-
-### What carries across every surface — "the Thread"
-
-Extend the existing `DiscoveryState` into a first-class object that survives every handoff:
-
-```
-Thread {
-  place          where you are looking
-  period         the decade range in play
-  question       the text query (which must survive, unlike today)
-  selected       the record in focus
-  collected[]    the SET — the capability the current URL vocabulary lacks
-  origin         the story or list you came from
-  returnTo       camera + scroll position, so "back" means back
-}
-```
-
-This requires a URL/state vocabulary that can carry a **set** plus an origin plus a return
-position. That is the single highest-leverage change in this document, and nothing else in
-the redesign works without it.
-
-**One guardrail, non-negotiable:** persistence must never manufacture historical
-relationships. Proximity and shared dates stay visibly distinct from documented connections.
-A thread is a reader's path, not a claim.
-
-### Design language
-
-**Motion.** Three durations, two curves, and nothing else: `160ms` (state), `480ms`
-(surface change), `1200ms` (camera flight). Chapters gain real enter/exit transitions
-instead of hard cuts. Reduced-motion cuts camera moves and disables snap.
-
-**Depth.** Cards get a genuine edge: layered gradient, `blur(22px)`, hairline at ~0.12
-alpha, and a deep ambient shadow. The current "flat matte only: no shadow, glow, or glass"
-rule in `door-home.css` is what makes the narrative card read as an occluding rectangle
-rather than something resting on the field.
-
-**Type.** Six sizes, one ladder, **12px floor**. Three faces with three jobs: display
-serif for narrative, sans for interface, and **mono reserved for evidence only** — source
-strings, citations, counts, coordinates. Today mono is the dominant face (259 declarations),
-which is why everything reads as a label and nothing reads as important.
-
-**Color.** Four canvas steps, three ink steps, one accent in three steps. Borders raised
-from 1.3:1 to a visible ~0.12–0.22 alpha.
-
-**Space.** Six steps on a 4pt grid. **One** breakpoint at 820px.
-
-**Cartography.** One map contract, one gesture model, one pin language. Pins get a dark
-keyline rather than a glow; the single selected pin gets a concentric beacon ring.
-
-### What goes away
-
-| Cut | Why |
-|---|---|
-| The gesture pill row | Affordances replace instructions. "walk" was never defined. |
-| Duplicate "Browse the map" CTAs (4 places) | One primary action per screen. |
-| `/rooms` as a destination | A destination explaining other destinations. |
-| `EmbeddedMap`'s separate interaction model | One map contract after migrating consumers. |
-| Generic `KeepGoing` | Replaced by context-preserving continuations. |
-| `/search`, `/history` as separate routes | They return bytes identical to `/records`. |
-| Dead code: `explore-map-underlay`, `first-paint-pin-plate`, `.ds-door__walk-rail` | No consumers. |
-
-Retained deliberately: redirect compatibility, citations, source access, precision
-disclosures, and the Memorial's distinct treatment.
+One objection is **rejected**: that the scroll-map should remain only "an authored invitation."
+Threads over a collection are more than an invitation — they are how an argument and its evidence
+stay attached. The constraint that matters is the one already accepted: a thread must never be
+the navigation.
 
 ---
 
-## Phased roadmap
+## 5. Dignity as a mechanic, not a disclaimer
 
-Ordered so that each phase is shippable alone and the risky work comes after the cheap work
-has de-risked it.
+BlackStory already has binding design law. This proposal is an **amendment to it**, not a
+greenfield invention. The relevant rules are in `docs/ui/PROTECTED-EXPERIENCES.md` (P-01…P-06),
+`docs/ui/brand.md`, `docs/ui/story.md` and `docs/ui/design-direction-v10.md`.
 
-### Phase 0 — Stop the bleeding (days, no redesign required)
+### Where GROUND implements existing law in code
 
-These are standalone bugs. Ship them regardless of whether the rest proceeds.
+| Law | Quoted | How GROUND implements it |
+|---|---|---|
+| **P-04** | "Motion may explain geography, sequence, context, and scale. It **may not dramatize harm**." | A thread step or record flagged sensitive **cuts instead of flying**: camera transition duration is `0ms`, and the card says so in words. Verified: Greenwood step `transitionDuration === "0ms"` while ordinary steps use the 1150ms flight. |
+| **P-02** | "Never visually imply a relationship the source material does not establish." | Connected records are typed `doc` or `adj`. Documented links are solid; proximity links are dotted and carry "the sources do not state a connection, and this archive will not imply one." |
+| **P-03** | Coarsened points "must not render as an artificial street-level point… If visualization coarsens or approximates, say so in the UI." | Every record carries a precision tier and a "Where the point sits" section stating it. |
+| **story.md** | "'unknown' is a legitimate, stated answer, not a gap papered over." | See *absence*, below. |
+| **README.md** | "No em dashes and no en dashes on touched surfaces." | Applied throughout the prototype copy. |
+| **README.md** | "WCAG 2.2 AA… 44px touch targets on controls." | Spine, register rows and thumb-zone actions are ≥44px on phones. |
 
-1. Define the 30 orphan tokens, starting with `--ds-space-7`, `--ds-font-ui`,
-   `--ds-radius-pill`. Add a CI check that fails on a `var(--ds-*)` with no definition.
-2. Un-gate `/design-system` and give it a real token ramp (color, type, space, motion).
-   Without this, finding 1 recurs.
-3. Point the "Map" nav tab at the map.
-4. Stop `Maturity:` and `rel_*` IDs rendering on public pages.
-5. Add a sort control to `/records`.
-6. Fix the breakpoint off-by-ones to a single 820px.
+### Absence, rendered — in four kinds, never one
 
-### Phase 1 — The Thread (the load-bearing phase)
+The current site handles absence with a sentence of apology: *"A blank area does not establish
+that nothing happened."* This design makes it a property of the display, and distinguishes
+silences that are not the same thing:
 
-7. Extend `DiscoveryState` into the Thread object above; persist it across navigations.
-8. Extend the URL vocabulary to carry a **set**, an origin, and a return position.
-   `EXPLORE_URL_PARAM_KEYS` gaining a collection param is the specific unblock.
-9. Replace `walk-back-place.ts`'s hard-coded `/` with the real return position.
+1. **No record matches this collection** — a statement about the query and about what has been
+   catalogued, not about the past.
+2. **A documented coverage limit** — before 1870 the federal census counted most Black people as
+   tallies without names. The ground goes **cold-hatched** when the whole range sits in that era,
+   the spine ticks turn **blue rather than amber**, and the panel leads with it as a headline
+   rather than hiding it in a drawer.
+3. **Not surveyed** — the census did not observe this place at this time, and it does not
+   interpolate between its own dates.
+4. **Retrieval failure** — in production, a load error must never render as an empty map.
 
-*Checkpoint: if Phase 1 does not land, stop. Phases 2–4 are cosmetic without it.*
+The most honest screen in the design: **1830 shows 2,328,642 Black people, 18.1% of the country,
+and 3 records.** The archive's own failure is visible rather than excused, and "not recorded" is
+never drawn in the colour of a record.
 
-### Phase 2 — One surface
+### Records that cannot be drawn
 
-10. Make "Open record" an in-place morph over the live plate, reusing the `startBrowse`
-    `pushState` pattern that already works. Retire `EmbeddedMap` for consumers it covers.
-11. Unify the three record templates onto the place template's anatomy (hero, three
-    evidence numbers, one confidence vocabulary).
-12. Collapse the two confidence vocabularies into one, stated in plain language, with the
-    source visible without a click.
+Two sample records exist specifically to exercise this: a Freedmen's Bureau teacher roll that
+names people but no place, and an oral history whose address is **withheld at the family's
+request**. They match collections, appear in the Register flagged "not on the ground", are
+included in any citation of the collection, and state on their own page why no point is drawn.
+Withholding is recorded rather than hidden. A map-shaped product must not make undrawable
+evidence disappear.
 
-### Phase 3 — The story connects
+### The anti-glide guarantee
 
-13. Author `mapInset` moments into chapters — the component already works.
-14. Link entities in prose by default; make the 5-links-in-8,661-words number a lint.
-15. Ship "the N records behind this chapter" as a set handoff to the field.
+The serious objection to a continuous immersive surface is that it turns an archive of Black
+trauma into scenery you slide across. The specific defenses:
 
-### Phase 4 — Polish and parity
+1. **Sensitive records stop the camera.** No flight, no flourish, stated plainly.
+2. **No heat, no density ranking, no alarm hues.** `brand.md:144` forbids them; the palette has
+   one accent and one cold, and confidence is never color-only (it is also size and fill).
+3. **The Memorial is deliberately NOT a posture of the ground.** P-01 forbids "turning names
+   into map pins". It stays a separate, still, non-spatial surface, linked but never absorbed.
+4. **Threads lead with presence, not incident** (`story.md`: "Presence over incident"). The
+   Greenwood step states destruction *and* rebuilding in the same breath.
+5. **The camera is still not in the URL.** `url-state.ts:168-183` excludes lat/lng/zoom because
+   "a tight zoom on one county reads as an editorial claim about that county". GROUND shares
+   **named place + decade**, never raw coordinates. That decision is upheld, not reversed.
 
-16. The design language above: motion scale, card depth, type ladder, mono-for-evidence.
-17. **Make the map real on mobile.** This is the largest single uplift for the most users
-    and it is currently a deliberate non-feature.
-18. One chart skin across `/data`, `/lives` and stories; zero-base the share chart or
-    annotate the axis break on the chart itself.
-19. Merge the four trust pages into one, and move answers beside the actions they concern.
+---
+
+## 6. Hard constraints this design must not break
+
+From a constraints audit of the live app. These are promises already made to the outside world.
+
+1. **4,231 sitemap URLs stay server-rendered.** `/place/{slug}`, `/entity/{id}`,
+   `/invention/{slug}` return real content in raw HTML today, verified by curl. **The Record is
+   a page, not a panel.** The ground's record view is an enhancement layered over that page; it
+   never replaces it. If JavaScript fails, the record still exists.
+2. **`/entity/{id}` → `/place/{slug}` addressing is KEEP AS IS** (`design-direction-v10.md:150`).
+3. **26 permanent redirects must keep resolving**, with no chains (`redirect-table.test.ts`).
+4. **`/explore` must not become a redirect to `/`** — a documented rejection at
+   `next-config-redirects.mjs:60-63`.
+5. **The edge allowlist strips unknown params.** `?year=` must be added to the parser or it is
+   308-stripped. It must be quantized to 24 decade values, not a free integer.
+6. **Crawl-cost guard.** `/explore?` and `/records?q=` are disallowed in robots.txt because
+   variants were 81k of 128k Cloudflare misses in one day. Any new param space needs the same
+   canonicalization or it recreates that storm.
+7. **No usage telemetry exists in-repo** (analytics is pageviews plus a 10%-sampled
+   human/bot class). **Deleting destination pages cannot be justified or refuted from in-repo
+   evidence.** That is a real gap, and it is why §7 starts with instrumentation.
+
+### Two conflicts that need an explicit owner decision
+
+- **Plate-behind-prose.** `docs/ui/patterns-plate-posture.md` states "The plate is never behind
+  body text outside the Instrument… A full bleed plate says nothing and asserts everything." A
+  thread scrolling over a live ground is exactly that. The doc's status is *proposed*, and the
+  current `/` door already violates it. **GROUND requires either amending this rule or confining
+  threads to a framed plate.** This cannot be decided by an agent.
+- **Amending the Protected Experiences register** requires "an explicit owner decision" by its
+  own terms. Items P-01 and P-04 are touched by this design, in the direction of *more*
+  protection, but the amendment still has to be made deliberately.
+
+---
+
+## 7. Roadmap
+
+Sequenced so the irreversible decisions come after the evidence, and each phase is independently
+defensible.
+
+### Phase 0 — Earn the right to delete things (2–3 weeks)
+
+0.1 **Instrument the current product.** Per-surface and per-control usage events. Without this,
+every deletion in §2 is an assertion. This is first for a reason.
+0.2 Take the owner decisions in §6: plate posture, and the P-01/P-04 amendments.
+0.3 Fix the 30 orphan tokens (`--ds-space-7` first) and add CI that fails on an undefined
+`var(--ds-*)`. Un-gate `/design-system` and give it a real token ramp, or finding 0.3 recurs.
+
+*Gate: if 0.2 does not get an owner decision, GROUND does not proceed. Stop here and ship 0.3.*
+
+### Phase 1 — Make the collection exist (the load-bearing phase)
+
+1.1 Define the **collection** as a first-class object: a reproducible query (kind, place, date
+range, evidence floor, sort) or an explicit named set, with a durable address and a citation.
+1.2 Extend the URL vocabulary to carry it, plus an origin and a return position. The
+`EXPLORE_URL_PARAM_KEYS` collection param is the specific unblock, and `from`/`to` must be
+quantized decades passed through the edge allowlist with 308 canonicalization.
+1.3 Make the **query authoritative**: `matching()` is the bibliography, `mappable()` is only what
+can be drawn, and the difference is always stated. Preserve the existing `DiscoveryState`
+distinction between matching and mappable records rather than collapsing it.
+1.4 Replace `walk-back-place.ts`'s hard-coded `/` with the real return position.
+
+*Gate: if Phase 1 does not land, stop. Everything after it is cosmetic without it.*
+
+### Phase 2 — The views
+
+2.1 Promote the persistent plate to the ground view; retire `EmbeddedMap`'s gesture contract.
+2.2 Build the decade spine as a **range** control with the density/honesty rendering, alongside
+canonical select-based date controls for keyboard and assistive tech.
+2.3 Rebuild `/records` as the Register view of a collection: independent filters, sorting, and an
+explicit count of records that cannot be drawn.
+2.4 Move census into an **opt-in sourced reading** with comparability breaks. Keep `/data` and
+`/lives` as published reference documents; they stop being the only way in, not the only copy.
+2.5 Implement the four absence states.
+
+### Phase 3 — Threads everywhere
+
+3.1 Generalize the chapter mechanic into a Thread primitive usable on any surface.
+3.2 Re-author `/stories` chapters as threads; make `MapInsetMoment` the default, not the unused
+exception. Lint the record-link density so "5 links in 8,661 words" fails review.
+3.3 Ship the set handoff ("the nine records behind this chapter").
+
+### Phase 4 — The record and the register
+
+4.1 Unify the three record templates onto one anatomy; one confidence vocabulary in plain
+language, with the grade letter surviving only inside the citation string.
+4.2 Stop internal strings rendering publicly.
+4.3 The Register: sortable, same state as the ground.
+
+### Phase 5 — Parity and polish
+
+5.1 **Make the ground real on mobile.** Largest uplift for the most users; currently a
+deliberate non-feature.
+5.2 One chart skin; zero-base the headline share chart or annotate its axis break on the chart.
+5.3 Merge the four trust pages; move answers beside the actions they concern.
 
 ### Risks, stated plainly
 
-- **Phase 1 is a data-model change, not a UI change.** It will take longer than it looks and
-  it is where the schedule risk lives.
-- **An in-place record morph changes URL and SEO behavior.** Record pages must remain
-  server-rendered and directly linkable; the morph is an enhancement over that, never a
-  replacement.
-- **Mobile map performance is unproven.** The current mobile degradation may be a
-  deliberate response to a real device constraint. Measure before committing to Phase 4.17.
-- **"One field" can reduce agency.** Immersion is not the same as intelligibility. The
-  posture switcher must stay explicit and reversible, and keyboard/screen-reader parity has
-  to be designed in Phase 2, not retrofitted in Phase 4.
+- **Phase 1 is a data-model change.** It will take longer than it looks; that is where schedule
+  risk lives.
+- **Mobile ground performance is unproven at 4,202 pins.** The current degradation may be a
+  considered response to a real device constraint. Measure before committing to 5.1.
+- **A continuous surface can reduce agency.** Immersion is not intelligibility. Mode switching
+  stays explicit and reversible, and keyboard/SR parity is designed in Phase 2, not retrofitted.
+- **Deleting routes without usage data is a guess.** Phase 0.1 exists to remove that excuse.
 
 ---
 
 ## How to open the prototype
 
-The prototype is a single self-contained HTML file with no build step and no network
-dependency. The map geometry is the project's own `public/geo/us-conus-mercator.svg`,
-inlined.
-
-**Easiest — open the file directly:**
+Self-contained single HTML file. No build, no network. Map geometry is the project's own
+`apps/web/public/geo/us-conus-mercator.svg`, inlined.
 
 ```bash
 open /Users/geralddagher/Developer/Projects/blackstory/docs/redesign/prototype/index.html
 ```
 
-**Or serve it** (useful if your browser restricts `file://`):
+Or serve it, if your browser restricts `file://`:
 
 ```bash
 cd /Users/geralddagher/Developer/Projects/blackstory/docs/redesign/prototype && python3 -m http.server 4199 --bind 127.0.0.1
@@ -407,56 +407,71 @@ Then open <http://127.0.0.1:4199/>.
 
 | Do this | It demonstrates |
 |---|---|
-| Scroll the opening | The loved effect, with real card enter/exit and a lagging camera |
-| Click **Open the field** | Posture change with no page load |
-| Click any pin, or a row in the left rail | A record opens **over the live map** — same map node, camera flies to the pin |
-| Click **Back to the walk** | Scroll position *and* camera restored exactly |
-| **+ Add to thread**, then the Thread bar | The investigation persisting across surfaces |
-| **Reading** → scroll to the map moment | The map effect *inside* prose |
-| **Show all nine on the field** | The set handoff today's URL vocabulary cannot express |
-| Drag the Era scrubber, or **Play the decades** | Honest absence: thin decades are thin records |
-| Resize to phone width | A live, full-screen map — not a dead band |
-| **Show what changed** (or press `?`) | Annotations tying each fix to its audit finding |
+| **Register** → set Kind `place`, From `1900`, To `1930`, Evidence `Partial` | A real research query. The URL becomes `?kind=place&from=1900&to=1930&floor=B` |
+| …then pan the map far away | **The bibliography does not change.** The query is authoritative; the camera is a view |
+| Set From `1860`, To `1980` and read the panel | "2 of these 11 have no coordinates precise enough to draw" — undrawable evidence is never silently dropped |
+| Open **Oral history: a Hayti household** | A withheld location, recorded rather than hidden (P-03) |
+| **Set the range entirely before 1870** (shift-click the spine to set the start) | Absence rendered: cold ground, blue ticks, the coverage limit as a headline |
+| Arrow keys / Home / End on the spine | Time as a real control, not a hijacked scroll. Shift sets the range start |
+| Watch the tick lengths | The control *is* the honesty display |
+| **Show the census reading** | Opt-in, sourced, with both comparability breaks and "population counts do not explain any individual record" |
+| **Follow a thread**, then scroll | The loved scroll-camera effect, now a view over a collection |
+| Reach the **Greenwood** step | The camera cuts instead of flying. Dignity as a mechanic (P-04) |
+| …then leave the thread | You are holding that step's collection: `?state=Oklahoma&from=1900&to=1920` |
+| Click any mark | The record, with the project's exact citation format and a precision statement |
+| Look at a record's dotted connection | Juxtaposition that refuses to imply causation (P-02) |
+| Search a person, e.g. `McCoy` | Entry from a non-place axis. It never demands a place and a date first |
+| Watch the address bar throughout | Named place, kind, decades and evidence floor. Never raw coordinates |
+| Resize to phone width | A live ground, 44px targets, no dead band |
+| **Show what changed** (or `?`) | Annotations tying each decision to its finding |
 
-### What the prototype is not
+### What this prototype is not
 
-It is a **design prototype**, not a technical spike. The field is an SVG with a CSS
-transform camera, not MapLibre — the point is the interaction model and the continuity, and
-those are real and clickable. Record content is twelve hand-written samples. Nothing talks
-to Postgres. Performance here says nothing about MapLibre performance at 4,202 pins.
+A **design** prototype, not a technical spike. The ground is an SVG with a CSS-transform camera,
+not MapLibre; the point is the interaction model, and that is real and clickable. Twelve
+hand-written records, four census places, five thread steps. Nothing talks to Postgres.
+Performance here says nothing about MapLibre at 4,202 pins.
 
 ---
 
 ## Verification performed
 
-Checked in the browser against the running prototype:
-
-| Claim | How it was checked | Result |
+| Claim | Check | Result |
 |---|---|---|
-| Record opens without destroying the map | Compared the `#plate svg` DOM node identity across the transition | `sameMapNodeStillInDOM: true` |
-| Camera flies to the record | Read `plate.style.transform` before/after | `scale(1.25)` → `scale(6.75)` |
-| Back restores exactly | Compared scroll offset and transform | both byte-identical |
-| Map moment fires in prose | Scrolled the moment to center, read transform | `scale(1.3)` → `scale(8.16)` on Philadelphia |
-| Set handoff frames nine records | Counted `.pin.is-lit`, read the Thread | 9 lit, thread shows 9 / "The Count" |
-| Mobile keeps a live map | 375px viewport screenshot | live field + tab bar, no dead band |
-| No console errors | `read_console_messages` | none |
+| **The camera cannot narrow a bibliography** | Ran `kind=place, 1900–1930, floor B`; captured rows; moved the camera to Boston; re-captured | identical rows. `bibliographyUnchangedByCamera: true` |
+| A real research query is expressible and addressable | Set the filters, read the URL | `?kind=place&from=1900&to=1930&floor=B`, sub-line "places · 1900 to 1930 · partly evidenced or better · 4 records" |
+| Undrawable records are never dropped | Range 1860–1980; read the counts and the register | 11 matched, 9 on the ground, notice naming the 2, both rows flagged "not on the ground" |
+| A withheld location is stated, not hidden | Opened the oral-history record | "Not drawn on the ground. The location is documented but withheld at the family's request." |
+| Absence rendering fires for a pre-1870 range | Set the range; read regime, hatch, ticks | `regime="unnamed"`, hatch opacity 1, 8 cold ticks, 2,328,642 people / 3 records |
+| Census is opt-in and carries its breaks | Toggled the reading | hidden by default; 4 notes incl. both the 1870 and 2000 definition breaks and the no-explanation line |
+| Dignity cut at sensitive records | Read `plate.style.transitionDuration` at the Greenwood step vs an ordinary step | `0ms` vs `var(--d-fly)` |
+| A thread step hands you its collection | Read state + URL while stepping | `?state=Oklahoma&from=1900&to=1920&record=greenwood` |
+| Citation uses the project's fixed format | Read the rendered citation | `"Mother Bethel A.M.E. Church." BlackStory Archive, Philadelphia, Pennsylvania, 1790s. Evidence grade A, 4 sources. Accessed 2026-10-31. https://blackstory.org/place/…` |
+| Mobile is usable | 375px screenshot after layout fix | No collisions; 44px targets; live ground |
+| No console errors | `read_console_messages` on a clean load | none |
 
-**Not verified:** sustained native scroll behavior end-to-end. The Browser pane in this
-session runs hidden, which throttles scroll events, CSS transitions and
-IntersectionObserver delivery. Scroll-driven behavior was therefore verified by driving the
-same functions the listeners call, with real geometry. Anyone opening the file on a normal
-desktop will exercise the native path; if something is off there, that is the first place
-to look.
+**Not verified:** sustained *native* scrolling, and CSS transition end-states in situ. The
+Browser pane in this session runs hidden, which throttles scroll events, CSS transitions and
+IntersectionObserver delivery — observed directly as an opacity transition stuck at
+`currentTime: 0` and a panel transform frozen at its start value. Thread behavior was therefore
+exercised by driving the same function the scroll listener calls, and panel states were
+confirmed by forcing the frozen animations to finish (`transform` settles to `none`, i.e. the
+CSS is correct and the clock was the problem). On a normal desktop the native path runs; if
+anything is off there, that is the first place to look.
+
+**Also not verified, and it matters:** whether this interaction model survives a realistic
+research task on a phone, where ground, time control, register, evidence qualifiers and reading
+content all compete for one viewport. That is an accepted open risk, not a solved problem.
 
 ---
 
 ## Sources
 
 - Five parallel read-only audits over `apps/web` and the dev server on `:3048`
-- Independent adversarial pass: Codex CLI (`gpt-5.1-codex-max`), read-only sandbox
-- Orchestrator's own firsthand checks: homepage at desktop and 375px, mobile map gate at
-  `door-immersive.tsx:979`, `discovery-state.ts:116`, `stories/[slug]/page.tsx:124`
+- A constraints audit of the URL, SEO, citation, a11y and dignity contracts
+- Independent adversarial passes: Codex CLI (`gpt-5.1-codex-max`), read-only sandbox — one on
+  the current product, one attacking this concept
+- Firsthand checks by the orchestrator at desktop and 375px
 
-Note: the `codex` **MCP server** failed to connect this session (`CONNECTION_CLOSED`). The
-cross-model pass went through the `codex` **CLI** via Bash instead. The MCP config is worth
-fixing separately.
+The `codex` **MCP server** failed to connect this session (`CONNECTION_CLOSED`); the cross-model
+work went through the `codex` **CLI** via Bash. Worth fixing that config separately.
