@@ -38,21 +38,68 @@ export type FieldProps = {
   readonly htmlFor: string;
   /**
    * One line under the control saying how to answer — "Plain language is fine. You do not need
-   * to write like a citation." Distinct from an error, which the caller renders itself.
+   * to write like a citation."
    */
   readonly hint?: ReactNode;
+  /**
+   * The reason this answer was rejected. The field owns how an error is drawn, announced and
+   * linked; it used to say "the caller renders itself", and every caller then wired a different
+   * subset — some linked `aria-describedby`, none ever set `aria-invalid`, and a field whose
+   * control it did not own (the radios) could not show an error at all.
+   */
+  readonly error?: ReactNode;
   readonly children: ReactNode;
   readonly className?: string;
 };
 
-export function Field({ label, htmlFor, hint, children, className }: FieldProps) {
+/** Stable ids for the two things a control can be described by. */
+export const fieldHintId = (htmlFor: string) => `${htmlFor}-hint`;
+export const fieldErrorId = (htmlFor: string) => `${htmlFor}-error`;
+
+/**
+ * The accessibility wiring for a control inside a `Field`, as one spread.
+ *
+ * Callers own their own `<input>`/`<select>`/`<textarea>` because the markup varies, so the
+ * link between control, hint and error has to be handed to them rather than cloned onto their
+ * element. Spreading this is the whole contract: correct `id`, both descriptions in the right
+ * order, and `aria-invalid` whenever there is an error.
+ */
+export function fieldControlProps({
+  htmlFor,
+  hint,
+  error,
+}: {
+  readonly htmlFor: string;
+  readonly hint?: unknown;
+  readonly error?: unknown;
+}) {
+  const describedBy = [hint ? fieldHintId(htmlFor) : null, error ? fieldErrorId(htmlFor) : null]
+    .filter(Boolean)
+    .join(' ');
+  return {
+    id: htmlFor,
+    ...(describedBy ? { 'aria-describedby': describedBy } : {}),
+    ...(error ? { 'aria-invalid': true as const } : {}),
+  };
+}
+
+export function Field({ label, htmlFor, hint, error, children, className }: FieldProps) {
   return (
-    <div className={cx('ds-room-field', className)}>
+    <div className={cx('ds-room-field', className)} data-invalid={error ? 'true' : undefined}>
       <label className="ds-room-field__label" htmlFor={htmlFor}>
         {label}
       </label>
       {children}
-      {hint ? <p className="ds-room-field__hint">{hint}</p> : null}
+      {hint ? (
+        <p className="ds-room-field__hint" id={fieldHintId(htmlFor)}>
+          {hint}
+        </p>
+      ) : null}
+      {error ? (
+        <p className="ds-room-field__error" id={fieldErrorId(htmlFor)} role="alert">
+          {error}
+        </p>
+      ) : null}
     </div>
   );
 }
@@ -72,6 +119,14 @@ export type ChoiceFieldProps = {
   readonly defaultValue?: string;
   readonly required?: boolean;
   readonly hint?: ReactNode;
+  /**
+   * Same contract as `Field`. This set owns its own inputs, so unlike `Field` it can wire the
+   * group itself. Before this existed the corrections form passed its category error in as a
+   * `hint`, which rendered as ordinary help text and was never announced.
+   */
+  readonly error?: ReactNode;
+  /** Needed to link the hint and error to the group; defaults to the field name. */
+  readonly id?: string;
   readonly className?: string;
 };
 
@@ -89,13 +144,28 @@ export function ChoiceField({
   defaultValue,
   required,
   hint,
+  error,
+  id,
   className,
 }: ChoiceFieldProps) {
+  const groupId = id ?? name;
+  const describedBy = [hint ? fieldHintId(groupId) : null, error ? fieldErrorId(groupId) : null]
+    .filter(Boolean)
+    .join(' ');
   return (
-    <fieldset className={cx('ds-room-field', className)}>
+    <fieldset
+      className={cx('ds-room-field', className)}
+      data-invalid={error ? 'true' : undefined}
+      {...(describedBy ? { 'aria-describedby': describedBy } : {})}
+    >
       <legend className="ds-room-field__label">{legend}</legend>
       <div className="ds-room-field__choices">
-        {choices.map((choice) => (
+        {/*
+         * The group reads as one control, so only the first radio carries the invalid state
+         * and the id the form focuses. Marking every radio would announce the error once per
+         * choice.
+         */}
+        {choices.map((choice, index) => (
           <label className="ds-room-field__choice" key={choice.value}>
             <input
               type="radio"
@@ -103,12 +173,24 @@ export function ChoiceField({
               value={choice.value}
               defaultChecked={defaultValue === choice.value}
               {...(required ? { required: true } : {})}
+              {...(error && index === 0
+                ? { 'aria-invalid': true as const, id: groupId }
+                : {})}
             />
             <span>{choice.label}</span>
           </label>
         ))}
       </div>
-      {hint ? <p className="ds-room-field__hint">{hint}</p> : null}
+      {hint ? (
+        <p className="ds-room-field__hint" id={fieldHintId(groupId)}>
+          {hint}
+        </p>
+      ) : null}
+      {error ? (
+        <p className="ds-room-field__error" id={fieldErrorId(groupId)} role="alert">
+          {error}
+        </p>
+      ) : null}
     </fieldset>
   );
 }
