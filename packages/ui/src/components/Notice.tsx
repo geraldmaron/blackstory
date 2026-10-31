@@ -11,7 +11,12 @@ import { cx } from '../utils/cx.js';
 // compiles to `React.createElement(...)` calls that need `React` in scope.
 void React;
 
-export type NoticeTone = 'warning' | 'dispute' | 'error';
+/**
+ * `success` exists because a confirmation was being drawn as a warning: the submit lead form
+ * announced "Lead received" with `tone="warning"`, so a receipt was cued as a problem. It
+ * announces politely like the other non-error tones.
+ */
+export type NoticeTone = 'warning' | 'dispute' | 'error' | 'success';
 
 export type NoticeProps = {
   readonly tone: NoticeTone;
@@ -24,6 +29,7 @@ const CUES: Record<NoticeTone, string> = {
   warning: 'Warning',
   dispute: 'Disputed',
   error: 'Error',
+  success: 'Done',
 };
 
 export function Notice({ tone, title, children, className }: NoticeProps) {

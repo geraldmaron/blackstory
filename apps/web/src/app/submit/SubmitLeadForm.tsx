@@ -7,8 +7,9 @@
  * (`packages/domain/src/consensus-review/`) and, after that, the standard research
  * pipeline.
  */
-import { useId, useState, type FormEvent } from 'react';
+import { useEffect, useId, useRef, useState, type FormEvent } from 'react';
 import { Button, Notice } from '@repo/ui';
+import { Field, fieldControlProps } from '../../components/room';
 import { getRequestIntegrityHeaders } from '../../lib/request-integrity/client';
 
 type SubmitState =
@@ -93,13 +94,32 @@ export function SubmitLeadForm() {
     }
   }
 
+  const successRef = useRef<HTMLDivElement | null>(null);
+  const formRef = useRef<HTMLFormElement | null>(null);
+  useEffect(() => {
+    if (state.status === 'success') {
+      successRef.current?.focus();
+      return;
+    }
+    if (state.status !== 'error') return;
+    /* Submit-wide: only the form knows which field failed first in reading order. */
+    formRef.current?.querySelector<HTMLElement>('[aria-invalid="true"]')?.focus();
+  }, [state]);
+
   if (state.status === 'success') {
     return (
-      <Notice tone="warning" title="Lead received">
+      /*
+       * Success, not a warning: `tone="warning"` announced this as an alert and coloured a
+       * receipt like a problem. The panel also replaces the whole form, so focus moves to it
+       * for the same reason the correction receipt does.
+       */
+      <div ref={successRef} tabIndex={-1}>
+        <Notice tone="success" title="Lead received">
         Thank you. This lead (reference <code>{state.submissionId}</code>) has entered a moderated
         review queue. It is not public, and it seeds research only after independent reviewers agree
-        it is worth pursuing. Nobody but the people doing that review sees what you sent.
-      </Notice>
+          it is worth pursuing. Nobody but the people doing that review sees what you sent.
+        </Notice>
+      </div>
     );
   }
 
@@ -109,7 +129,7 @@ export function SubmitLeadForm() {
       : undefined;
 
   return (
-    <form className="ds-stack" onSubmit={handleSubmit} noValidate>
+    <form className="ds-stack" onSubmit={handleSubmit} ref={formRef} noValidate>
       {state.status === 'error' && !state.fieldIssues ? (
         <Notice tone="error" title="Submission failed">
           {state.message}
@@ -125,81 +145,88 @@ export function SubmitLeadForm() {
         </Notice>
       ) : null}
 
-      <div className="ds-stack" style={{ gap: 'var(--ds-space-2)' }}>
-        <label className="ds-filters__label" htmlFor={urlId}>
-          Link (article, archived post, group page, or anywhere this lives online)
-        </label>
+      <Field
+        label="Link (article, archived post, group page, or anywhere this lives online)"
+        htmlFor={urlId}
+        {...(fieldIssue('url') ? { error: fieldIssue('url')!.message } : {})}
+      >
         <input
-          className="ds-filters__control"
-          id={urlId}
+          {...fieldControlProps({ htmlFor: urlId, error: fieldIssue('url') })}
           name="url"
           type="url"
           placeholder="https://…"
-          aria-describedby={fieldIssue('url') ? `${urlId}-issue` : undefined}
         />
-        {fieldIssue('url') ? (
-          <p id={`${urlId}-issue`} className="ds-sans" role="alert">
-            {fieldIssue('url')!.message}
-          </p>
-        ) : null}
-      </div>
+      </Field>
 
-      <div className="ds-stack" style={{ gap: 'var(--ds-space-2)' }}>
-        <label className="ds-filters__label" htmlFor={descriptionId}>
-          Description (for something you know firsthand, or anything with no single link)
-        </label>
+      <Field
+        label="Description (for something you know firsthand, or anything with no single link)"
+        htmlFor={descriptionId}
+        {...(fieldIssue('description') ? { error: fieldIssue('description')!.message } : {})}
+      >
         <textarea
-          className="ds-filters__control"
-          id={descriptionId}
+          {...fieldControlProps({ htmlFor: descriptionId, error: fieldIssue('description') })}
           name="description"
           rows={4}
           placeholder="What is this lead? Where does it come from?"
         />
-      </div>
+      </Field>
 
-      <div className="ds-stack" style={{ gap: 'var(--ds-space-2)' }}>
-        <label className="ds-filters__label" htmlFor={whyId}>
-          Why it matters <span aria-hidden="true">*</span>
-          <span className="ds-visually-hidden">required</span>
-        </label>
+      <Field
+        label={
+          <>
+            Why it matters <span aria-hidden="true">*</span>
+            <span className="ds-visually-hidden">required</span>
+          </>
+        }
+        htmlFor={whyId}
+        {...(fieldIssue('whyItMatters') ? { error: fieldIssue('whyItMatters')!.message } : {})}
+      >
         <textarea
-          className="ds-filters__control"
-          id={whyId}
+          {...fieldControlProps({ htmlFor: whyId, error: fieldIssue('whyItMatters') })}
           name="whyItMatters"
           rows={3}
           required
           minLength={10}
           placeholder="Why should this be researched? What would it help document?"
-          aria-describedby={fieldIssue('whyItMatters') ? `${whyId}-issue` : undefined}
         />
-        {fieldIssue('whyItMatters') ? (
-          <p id={`${whyId}-issue`} className="ds-sans" role="alert">
-            {fieldIssue('whyItMatters')!.message}
-          </p>
-        ) : null}
+      </Field>
+
+      <div className="ds-room-field-pair">
+        <Field
+          label="Location (optional)"
+          htmlFor={locationId}
+          {...(fieldIssue('location') ? { error: fieldIssue('location')!.message } : {})}
+        >
+          <input
+            {...fieldControlProps({ htmlFor: locationId, error: fieldIssue('location') })}
+            name="location"
+            type="text"
+          />
+        </Field>
+        <Field
+          label="Era (optional)"
+          htmlFor={eraId}
+          {...(fieldIssue('era') ? { error: fieldIssue('era')!.message } : {})}
+        >
+          <input
+            {...fieldControlProps({ htmlFor: eraId, error: fieldIssue('era') })}
+            name="era"
+            type="text"
+          />
+        </Field>
       </div>
 
-      <div className="ds-row">
-        <div className="ds-stack" style={{ gap: 'var(--ds-space-2)', flex: '1 1 12rem' }}>
-          <label className="ds-filters__label" htmlFor={locationId}>
-            Location (optional)
-          </label>
-          <input className="ds-filters__control" id={locationId} name="location" type="text" />
-        </div>
-        <div className="ds-stack" style={{ gap: 'var(--ds-space-2)', flex: '1 1 12rem' }}>
-          <label className="ds-filters__label" htmlFor={eraId}>
-            Era (optional)
-          </label>
-          <input className="ds-filters__control" id={eraId} name="era" type="text" />
-        </div>
-      </div>
-
-      <div className="ds-stack" style={{ gap: 'var(--ds-space-2)' }}>
-        <label className="ds-filters__label" htmlFor={contactId}>
-          Contact (optional, reaches the reviewers only, never shown publicly)
-        </label>
-        <input className="ds-filters__control" id={contactId} name="contact" type="text" />
-      </div>
+      <Field
+        label="Contact (optional, reaches the reviewers only, never shown publicly)"
+        htmlFor={contactId}
+        {...(fieldIssue('contact') ? { error: fieldIssue('contact')!.message } : {})}
+      >
+        <input
+          {...fieldControlProps({ htmlFor: contactId, error: fieldIssue('contact') })}
+          name="contact"
+          type="email"
+        />
+      </Field>
 
       <div className="ds-row" style={{ alignItems: 'flex-start' }}>
         <input id={attestationId} name="attestation" type="checkbox" />

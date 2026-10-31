@@ -581,6 +581,14 @@
   border-color: var(--ds-error-border);
 }
 
+/* Success reuses the confidence-high family: the palette already carries a settled green in
+   both themes, so a confirmation does not need a new colour pair invented for it. */
+.ds-notice--success {
+  color: var(--ds-confidence-high-fg);
+  background: var(--ds-confidence-high-bg);
+  border-color: var(--ds-confidence-high-border);
+}
+
 .ds-notice__cue {
   font-family: var(--ds-font-mono);
   font-size: 0.75rem;

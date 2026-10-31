@@ -27,12 +27,18 @@ export function ReceiptBlock({ receiptCode, phase, submittedAt, updatedAt }: Rec
 
   return (
     <div className="ds-receipt">
+      {/*
+       * The code is a `<code>` and the sentence after it is a `<p>`, not two adjacent spans.
+       * As spans they ran together in the flat text — "BB-COR-…Keep this." — so anything
+       * reading the page as text, including some assistive-tech reading modes and anyone
+       * copying the code, got the next word stuck to the one thing a person has to keep.
+       */}
       <div className="ds-receipt__code">
         <span className="ds-receipt__label">Receipt code</span>
-        <span className="ds-receipt__value">{receiptCode}</span>
-        <span className="ds-receipt__keep">
+        <code className="ds-receipt__value">{receiptCode}</code>
+        <p className="ds-receipt__keep">
           Keep this. Without an email address on file, it is the only way to check the outcome.
-        </span>
+        </p>
       </div>
 
       <ol className="ds-receipt__steps" aria-label="Where this correction has got to">

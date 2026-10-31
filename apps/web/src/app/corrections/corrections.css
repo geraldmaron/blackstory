@@ -114,6 +114,7 @@
 }
 
 .ds-receipt__value {
+  display: block;
   margin-top: var(--ds-space-2);
   font-family: var(--ds-font-mono);
   font-size: 30px;
@@ -123,7 +124,7 @@
 }
 
 .ds-receipt__keep {
-  margin-top: 10px;
+  margin: 10px 0 0;
   font-size: 13px;
   line-height: 1.55;
   color: var(--ds-ink-muted);
@@ -151,21 +152,4 @@
 
 .ds-corrections__received-actions {
   margin-top: var(--ds-space-5);
-}
-
-/*
- * A field error is not a hint. Before Field owned errors, every caller rendered one with
- * `ds-room-field__hint`, so a rejection looked exactly like help text.
- */
-.ds-room-field__error {
-  margin: var(--ds-space-2) 0 0;
-  color: var(--ds-error-fg);
-  font-size: var(--ds-text-caption);
-  line-height: var(--ds-leading-body);
-}
-
-.ds-room-field[data-invalid='true'] input,
-.ds-room-field[data-invalid='true'] select,
-.ds-room-field[data-invalid='true'] textarea {
-  border-color: var(--ds-error-border);
 }
