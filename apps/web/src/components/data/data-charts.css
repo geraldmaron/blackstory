@@ -283,6 +283,36 @@
     grid-template-columns: 1fr;
     gap: var(--ds-space-1);
   }
+
+  /*
+   * Axis labels are 11px inside the viewBox, so they scale with the SVG: a 960-wide spine on a
+   * 343px screen drew them at about four pixels. The comment on `--spine` above already said
+   * the labels must stay legible "instead of downscaling to six pixels", but `max-width: 100%`
+   * with no floor could not hold that.
+   *
+   * Below this width the chart keeps a legible size and its frame scrolls sideways instead,
+   * which is the same answer the numbers table already uses. The table remains the non-scrolling
+   * route to every value, so nothing is only reachable by dragging.
+   */
+  .ds-datafig__viz {
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+  }
+
+  .ds-data-chart__svg {
+    min-width: 30rem;
+  }
+
+  .ds-data-chart__svg--spine {
+    min-width: 45rem;
+  }
+
+  /* The pair bars and the sight figures are CSS, not a viewBox, so they reflow and must not
+     be given a floor that would make them scroll for no reason. */
+  .ds-data-chart__pair-row,
+  .ds-data-chart__sight {
+    min-width: 0;
+  }
 }
 
 .ds-data-chart__pair-label {
