@@ -34,6 +34,7 @@ import {
   RecordGradePill,
   recordSectionIcon,
 } from '../components/entity/RecordChrome';
+import { confidenceTierPhrase } from '../lib/evidence/confidence-language';
 import { humanizeToken } from '../components/entity/format';
 import { confidenceIconFor } from '../lib/map-experience/confidence-icons';
 import { METHODOLOGY_HOW_RECORD_GETS_IN_HREF } from '../components/evidence/editorial-links';
@@ -211,8 +212,22 @@ export function HomeFirstPaint({
             className={`ds-rec-tile--evidence ds-rec-tile--evidence-${confidenceTier}`}
             icon={confidenceIconFor(confidenceTier)}
             label="Confidence"
-            value={<RecordGradePill tier={confidenceTier}>{gradeWord}</RecordGradePill>}
-            support={gradeWord === 'Unrated' ? 'Not graded on this page' : 'Evidence grade'}
+            /*
+             * Plain words, not a bare letter. The reader met "Grade A" here and "Evidence
+             * grade: high" a few hundred pixels below, two vocabularies for one idea. The
+             * letter still exists where it is load-bearing: the citation string carries it,
+             * and the native app shares it through public-contracts.
+             */
+            value={
+              <RecordGradePill tier={confidenceTier}>
+                {confidenceTierPhrase(confidenceTier)}
+              </RecordGradePill>
+            }
+            support={
+              gradeWord === 'Unrated'
+                ? 'Not graded on this page'
+                : `Evidence grade ${gradeWord.replace(/^Grade /, '')}`
+            }
           />
           <RecordFactTile
             icon={recordSectionIcon('where')}

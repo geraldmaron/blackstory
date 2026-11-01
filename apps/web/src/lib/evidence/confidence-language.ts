@@ -70,3 +70,28 @@ export const RECORD_MATURITY_COPY: Readonly<Record<string, string>> = {
 export function recordMaturityLabel(token: string): string {
   return RECORD_MATURITY_COPY[token] ?? 'Research in progress';
 }
+
+/**
+ * Plain-word phrasing for a confidence tier.
+ *
+ * The record's first screen led with a bare letter — "Grade A" — which means nothing to a
+ * reader who has not read the methodology, and sat next to a second vocabulary ("Evidence
+ * grade: high") saying the same thing differently. The letter is not dropped: it is what the
+ * fixed citation string carries, and it is the vocabulary the native app shares through
+ * `@repo/public-contracts/evidence`. It simply stops being the first thing a reader meets.
+ *
+ * Web-only on purpose. Adding this to public-contracts would change the native app's
+ * vocabulary too, and that package is the mobile token source.
+ */
+export function confidenceTierPhrase(tier: string): string {
+  switch (tier) {
+    case 'high':
+      return 'Well evidenced';
+    case 'medium':
+      return 'Partly evidenced';
+    case 'low':
+      return 'Thinly evidenced';
+    default:
+      return 'Not graded';
+  }
+}

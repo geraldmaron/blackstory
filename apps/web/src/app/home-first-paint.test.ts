@@ -272,7 +272,15 @@ test('first paint is the record, not a manifesto or a schema card', () => {
   assert.match(html, />Confidence</);
   assert.match(html, />Precision</);
   assert.match(html, />Sources</);
-  assert.match(html, /Grade A|Grade B|Grade C|Unrated/);
+  /*
+   * First paint states confidence in plain words, not a bare letter. The letter is not gone:
+   * it is what the fixed citation string carries and what the native app shares through
+   * public-contracts. It simply is not the first thing a reader meets, and it no longer sits
+   * next to a second vocabulary saying the same thing differently.
+   */
+  assert.match(html, /Well evidenced|Partly evidenced|Thinly evidenced|Not graded/);
+  assert.match(html, /Evidence grade [ABC]/, 'the grade is still stated, as support text');
+  assert.doesNotMatch(html, />Grade [ABC]</, 'no bare letter as the headline value');
   assert.doesNotMatch(html, />Kind<|>Where<|>Era<|>Evidence</);
   assert.doesNotMatch(html, /radius affordance|Shown at locality/i);
   assert.doesNotMatch(html, /Journey|42Cb1758|4,101|Orbit|Tilt|Trace/);

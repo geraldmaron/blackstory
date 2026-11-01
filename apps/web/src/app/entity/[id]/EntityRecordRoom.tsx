@@ -51,6 +51,7 @@ import {
 import { humanizeToken } from '../../../components/entity/format';
 import {
   EVIDENCE_DIMENSION_COPY,
+  confidenceTierPhrase,
   recordMaturityLabel,
 } from '../../../lib/evidence/confidence-language';
 import { confidenceIconFor } from '../../../lib/map-experience/confidence-icons';
@@ -514,8 +515,9 @@ export async function EntityRecordRoom({ entity }: { readonly entity: PublicEnti
                 >
                   {anatomyInputs.eraLabel}
                 </RecordPill>
+                {/* Plain words here too, so the two record templates say one thing. */}
                 <RecordGradePill tier={anatomyInputs.evidenceTier} href={evidenceHref}>
-                  {gradeWord}
+                  {confidenceTierPhrase(anatomyInputs.evidenceTier)}
                 </RecordGradePill>
               </div>
               <h1 className="ds-record-mast__title">{entity.displayName}</h1>
@@ -597,10 +599,10 @@ export async function EntityRecordRoom({ entity }: { readonly entity: PublicEnti
               <RecordFactTile
                 className={`ds-rec-tile--evidence ds-rec-tile--evidence-${anatomyInputs.evidenceTier}`}
                 icon={confidenceIconFor(anatomyInputs.evidenceTier)}
-                label="Evidence"
+                label="Confidence"
                 value={
                   <Link href={evidenceHref} prefetch={false}>
-                    {gradeWord}
+                    {confidenceTierPhrase(anatomyInputs.evidenceTier)}
                   </Link>
                 }
                 meter={{
