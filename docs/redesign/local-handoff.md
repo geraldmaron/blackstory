@@ -119,3 +119,34 @@ canonical branch reconciliation/pruning, not isolated source work.
 
 This clone's `origin` is a local path, not GitHub. No push, deployment, published-data write,
 original branch deletion or original working-tree change occurred.
+
+## Latest candidate — 6ae2b4a4
+
+The broader source slice is saved and serving at **http://127.0.0.1:3103/**. See
+[rendered-acceptance.md](./rendered-acceptance.md) for exact revision, tasks, screenshots, payload
+measurement, test evidence and explicit unfinished scope. Original checkout rechecked at
+`c65df582`, branch `redesign/ux-audit-2026-10`, only untracked old HANDOFF.md.
+
+New commits: `c996f398` shared released membership and reading improvements; `b27bd688` coherent
+collection entry/workbench/place composition; `6ae2b4a4` shared record-family return, preserved
+redirect narrowing, safe actual map eligibility, unmapped row notes and lossless bounded v4
+transport. No push, deployment or original branch/worktree mutation.
+
+Two additional Sonnet5.5 tasks genuinely completed (exit0):
+- composition: session `1bb5017b-e4dd-4a90-adc4-52bf5d7628d0`, isolated ground-composition clone;
+- record continuity: session `76d8e145-21e8-4fed-b990-d1e8ca4fc6f3`, isolated record-continuity clone.
+Codex performed integration, defined-risk delta review and rendered checks. One focused Codex
+transport lane completed in `/tmp/blackstory-transport-20261101`; its exact roundtrip/gzip proof
+is in `/tmp/blackstory-transport-handoff-20261101.txt`. No new Claude implementation task remains
+running; original Claude ownership is still unknown, not inferred from process liveness.
+
+The candidate was restarted once after newly exported functions stayed stale in Next's dev
+module graph. The real person-record retry then rendered correctly. Current owned Next PID9740,
+terminal session71058, port3103, loopback-only/read-only Postgres. Keep it running for the user.
+No original server was restarted.
+
+Exact unresolved integration action: merge/reconcile this isolated candidate into the original
+checkout and prune original branches/worktrees. **Not attempted; pending original-owner handoff.**
+Parent explicitly barred canonical merges/pruning while that ownership remains unresolved.
+Native discovery exposed no contactable owner; private session scraping/resume was not used.
+This is a verified core candidate, not a claim that the full redesign is finished.

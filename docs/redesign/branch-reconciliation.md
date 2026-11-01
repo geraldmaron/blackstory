@@ -23,8 +23,15 @@ Native `claude agents --json --cwd <primary-repo>` returned `[]`; `lsof` still s
 process working directories in BlackStory. Neither observation identifies a current writer.
 The supported CLI exposes no noninteractive message command in its help. Resuming, attaching
 or stopping a process would not establish a safe ownership handshake. No such action was
-attempted. A new read-only Sonnet reviewer exited because this shell is not logged in.
+attempted. The initial read-only Sonnet attempt exited before authentication. Later scoped Sonnet implementation tasks succeeded through the existing Max CLI login; see local-handoff.md. That does not identify the original owner.
 
 Until ownership is resolved, new work uses isolated local clones. The integration clone's
 `origin` is the local primary checkout, not GitHub. Any later fetch/pull/push command must
 account for that distinction. No push or deployment is authorized in this task.
+
+
+At source candidate `6ae2b4a4`, the primary checkout remains `c65df582` with only its old
+untracked HANDOFF.md. The isolated candidate has recoverable local commits and a read-only
+preview on3103. Canonical integration and original branch deletion remain unattempted pending
+owner handoff, as directed by the coordinator's parent. No force reset, branch deletion, push
+or deployment occurred.

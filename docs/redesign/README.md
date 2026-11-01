@@ -16,6 +16,9 @@ made the product feel disjointed.
 
 ---
 
+Latest local implementation evidence: [rendered acceptance and remaining scope](./rendered-acceptance.md).
+The actual candidate is http://127.0.0.1:3103/; the prototype below is not the implemented app.
+
 ## 1. The diagnosis: three structural failures, not a styling problem
 
 ### Failure 1 — The taxonomy asks the reader to file their curiosity
