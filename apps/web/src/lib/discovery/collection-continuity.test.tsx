@@ -251,3 +251,10 @@ test('Records and Map use the same slim release projection and map eligibility',
     assert.equal(view.filteredFeatures.length, 1);
   }
 });
+
+test('Records counts only eligible matches emitted by the current map plate', () => {
+  const query = parseRecordsQuery({ q: 'needle' });
+  const index = buildRecordsIndex(entities, query, new Set());
+  assert.ok(index.totalMatched > 0);
+  assert.equal(index.mappableMatched, 0);
+});

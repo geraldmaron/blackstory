@@ -33,7 +33,7 @@ redesign. Original checkout and servers remain unchanged at `c65df582`.
 The slice reuses `DiscoveryState` and Records matching. Opaque first-paint pins use actual
 cached-plate ordering; controls stay inert with explicit loading until matching facts arrive.
 Map-only display order remains separate from bibliography order. Existing clients still accept
-schema version 1; new clients request finite `v=2` and reject incomplete payloads. No new state
+schema version 1; new clients request finite `v=3` and reject incomplete payloads. No new state
 store, data service or dependency was added.
 
 ## Verification
@@ -76,17 +76,46 @@ Claude authentication and the implementation lane succeeded. Current original-ow
 remains unavailable; shared-checkout integration and original branch pruning still await a
 handoff rather than competing with an unidentified writer.
 
-Automatic approval review denied an attempt to link the original `.env.local` and start a
-Postgres-backed candidate on 127.0.0.1:3102. Reason: credential/shared-data reuse was not explicitly
-authorized and a fixture preview sufficed for the bounded UI task. The denied command did not
-execute; no environment link was created. The static fixture server was separately approved
-and uses no credentials or database. No retry or indirect secret access occurred.
+The initial environment-reuse attempt was denied and did not execute. The owner subsequently
+explicitly approved the exact bounded read-only reuse. The reviewed retry succeeded: only this
+clone has an ignored `.env.local` link to the original BlackStory environment. Non-secret
+backend metadata matched the repository's Supabase project. The full candidate is running at
+**http://127.0.0.1:3103/**, loopback only, with Postgres `default_transaction_read_only=on`.
+Original port 3048 remains untouched. Existing installed dependencies were materialized inside
+the clone with APFS copy-on-write; no package installation or shared configuration change.
 
-To validate full live-data flows, obtain explicit approval for that specific configuration and
-read-only data access. After ownership is resolved, preserve these commits, integrate through one owner,
-run rendered acceptance and continue `execution-plan.md`. Range, editorial/layout and remaining
-surface migrations are unfinished. Published-data changes and actual protected-experience
-amendments remain separate decisions when needed.
+At `c996f398`, the candidate integrates the second Claude Sonnet 5.5 reading slice (session
+`0aa6b48d-912b-4f80-ba0e-90fdf53b5730`, exit 0): native narrow-screen contents, unchanged numbered
+references, and source-derived linked records with typed relations. Focused Codex review fixed
+the breakpoint seam and distinguished retrieval errors from unresolved public links. A true
+retrieval failure now retains the story and offers retry for its linked-record appendix.
+
+Live rendering exposed search-projection drift: Records used the released slim index while Map
+used full entities. Both now share the released index/fallback, start independent reads together,
+and retain unavailable-index fallback to the real entity release. Actual map-feature IDs bound
+the Records map count; anchor eligibility alone is insufficient. This introduces a cold Records
+request dependency on the existing cached pin plate; no additional data is sent to the client.
+Live `/records?q=school&sort=name` and `/explore?q=school&sort=name` agree on 1,095 matches and
+963 mapped records. This is UI/read-adapter work, not a stored projection correction.
+
+At c996f398, 43 focused integration/reading/catalog tests pass, web TypeScript and changed-source
+ESLint pass. A subsequent actual-feature count regression passes all nine continuity tests.
+Earlier full-suite evidence above remains historical for its exact revision. Narrow story
+contents were operated in the full app: one contents placement is visible, native disclosure
+opens, 375px document width has no horizontal overflow. Screenshot:
+`/tmp/blackstory-redesign-proof-20261101/chapter-contents-mobile.jpg`.
+
+The broader composition lane has actually started on Claude Sonnet 5.5, session
+`1bb5017b-e4dd-4a90-adc4-52bf5d7628d0`, in
+`/tmp/blackstory-claude-ground-composition-20261101`: home collection entry, map/index workbench,
+and place-record mast. File tools only, bounded source lease, no environment/database access.
+The coordinator owns integration and rendered acceptance. This is in progress, not acceptance.
+
+Owner gate: any schema or stored-record change requires an exact proposed diff, adversarial
+review, isolated/synthetic validation, impact and rollback plan, then **final user sign-off
+before application**. No such changes have been applied. Range semantics, remaining family
+migrations and all-route rendered acceptance remain open; original ownership still blocks
+canonical branch reconciliation/pruning, not isolated source work.
 
 This clone's `origin` is a local path, not GitHub. No push, deployment, published-data write,
 original branch deletion or original working-tree change occurred.
