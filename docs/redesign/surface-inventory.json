@@ -2301,9 +2301,13 @@
           "evidence": ["apps/web/src/app/explore/page.tsx", "docs/redesign/SURFACES.md"]
         },
         "selected": {
-          "status": "pending",
-          "reason": "The map surface has filter and camera selection; selected/cleared and empty-map states remain redesign work.",
-          "evidence": ["apps/web/src/app/explore/page.tsx", "docs/redesign/SURFACES.md"]
+          "status": "partial",
+          "reason": "Query, supported bibliography sort and shared narrowing now cross map/list/record adapters and authoritative matching, including unlocated records. Targeted contract tests pass; rendered Back, theme and mobile acceptance remain pending.",
+          "evidence": [
+            "apps/web/src/lib/discovery/collection-continuity.test.tsx",
+            "apps/web/src/lib/discovery/discovery-state.test.ts",
+            "apps/web/src/lib/records/records-matching.ts"
+          ]
         },
         "auth": {
           "status": "not-applicable",
@@ -2889,6 +2893,14 @@
           "status": "not-applicable",
           "reason": "This route is public and does not have an authentication state in its surface flow.",
           "evidence": ["apps/web/src/app/place/[slug]/page.tsx"]
+        },
+        "returnContext": {
+          "status": "partial",
+          "reason": "Arrival parsing and return links retain normalized text query and bibliography sort in the shared adapter contract; rendered navigation acceptance remains pending.",
+          "evidence": [
+            "apps/web/src/lib/discovery/discovery-state.ts",
+            "apps/web/src/lib/discovery/collection-continuity.test.tsx"
+          ]
         }
       },
       "componentRefs": [
@@ -2979,9 +2991,13 @@
           "evidence": ["apps/web/src/app/records/page.tsx", "docs/redesign/SURFACES.md"]
         },
         "selected": {
-          "status": "pending",
-          "reason": "This browse surface has selected query, filter, or page state that remains part of the redesign work.",
-          "evidence": ["apps/web/src/app/records/page.tsx", "docs/redesign/SURFACES.md"]
+          "status": "partial",
+          "reason": "Query, supported bibliography sort and shared narrowing now cross map/list/record adapters and authoritative matching, including unlocated records. Targeted contract tests pass; rendered Back, theme and mobile acceptance remain pending.",
+          "evidence": [
+            "apps/web/src/lib/discovery/collection-continuity.test.tsx",
+            "apps/web/src/lib/discovery/discovery-state.test.ts",
+            "apps/web/src/lib/records/records-matching.ts"
+          ]
         },
         "auth": {
           "status": "not-applicable",

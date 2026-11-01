@@ -176,7 +176,8 @@ test('first paint no longer boots the full catalog: `/` is the Door, Explore sta
   assert.doesNotMatch(page, /buildAtlasShell/);
   assert.doesNotMatch(page, /AtlasLoader/);
   assert.match(page, /DoorHome/);
-  assert.match(shell, /totalMatched: filteredFeatures\.length/);
+  // Unlocated records remain collection matches; drawable points are only one projection.
+  assert.match(shell, /totalMatched: matches\.length/);
   assert.match(catalogRoute, /ATLAS_CATALOG_CACHE_CONTROL/);
   assert.match(catalog, /s-maxage=3600/);
 });

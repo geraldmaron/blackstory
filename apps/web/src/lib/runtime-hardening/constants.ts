@@ -121,6 +121,7 @@ export type CorrectionsPageParam = (typeof CORRECTIONS_PAGE_PARAM_ALLOWLIST)[num
  */
 export const PLACE_PAGE_PARAM_ALLOWLIST = [
   'from',
+  'sort',
   'q',
   'kind',
   'era',

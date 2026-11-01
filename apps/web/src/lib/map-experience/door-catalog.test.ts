@@ -56,7 +56,8 @@ test('door redirect table fits Next data cache; full pin plate does not ride uns
 test('door home and pin route share the cached pin plate loader', () => {
   assert.match(doorHome, /loadDoorPinPlate/);
   assert.doesNotMatch(doorHome, /toDoorLinkPins/);
-  assert.match(doorHome, /buildAtlasShell\(params, entities, dataSource\)/);
+  // The shell resolves filtered opaque pins against the same cached plate ordering.
+  assert.match(doorHome, /buildAtlasShell\(params, entities, dataSource, features\)/);
   assert.doesNotMatch(catalogSource, /return \{ data: listPublicEntities\(\)/);
   assert.match(pinRoute, /resolveDoorPinRedirect/);
   assert.doesNotMatch(pinRoute, /getSharedPublicEntities|buildExploreMapSource/);

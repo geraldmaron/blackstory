@@ -1,3 +1,4 @@
+import { buildCollectionFacts } from '../../lib/records/build-records-index';
 /**
  * The Explore catalog: the release-wide, reader-independent half of the Explore view model, served
  * by `GET /atlas/catalog` and fetched once by the client.
@@ -44,6 +45,7 @@ export function buildAtlasCatalogPayload(
     source.featureCollection.features.map((feature) => feature.properties.entityId),
   );
   return {
+    collectionFacts: buildCollectionFacts(entities),
     schemaVersion: 1,
     releaseId: source.releaseId,
     generatedAt: source.generatedAt,

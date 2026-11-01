@@ -1,3 +1,6 @@
+import { buildCollectionFacts } from '../../lib/records/build-records-index';
+import type { CollectionFacts } from '../../lib/records/records-matching';
+import { matchExploreCollection, drawableCollection } from '../../lib/discovery/explore-collection';
 /**
  * Pure server-side view-model builder for the `/explore` page. Parses URL search params,
  * builds the explore map source from the active release snapshot, applies filters, and shapes
@@ -18,7 +21,6 @@ import {
   type HistoryEdgeView,
 } from '../../lib/history/build-history-graph';
 import {
-  applyExploreFilters,
   buildEntityDecadeCounts,
   buildExploreFacetOptions,
   buildHistoryEdgeLineCollection,
@@ -52,6 +54,8 @@ export { pickExploreEdgeSlice } from './explore-edge-catalog';
 
 export type ExploreViewModel = {
   readonly viewState: ExploreViewState;
+  readonly collectionFacts?: readonly CollectionFacts[];
+  readonly initialMatchIndexes?: readonly number[];
   readonly source: ExploreMapSource;
   readonly allFeatures: readonly ExploreMapFeature[];
   readonly filteredFeatures: readonly ExploreMapFeature[];
@@ -152,6 +156,17 @@ export function buildEdgeLineCatalog(
   };
 }
 
+function drawableMatchIndexes(
+  matches: readonly CollectionFacts[],
+  features: readonly ExploreMapFeature[],
+): readonly number[] {
+  const indexes = new Map(features.map((feature, index) => [feature.properties.entityId, index]));
+  return matches.flatMap((match) => {
+    const index = indexes.get(match.row.id);
+    return index === undefined ? [] : [index];
+  });
+}
+
 export function buildExploreViewModel(
   raw: RawExploreSearchParams,
   entities: readonly PublicEntityView[] = listPublicEntities(),
@@ -162,7 +177,9 @@ export function buildExploreViewModel(
   const viewState = parseExploreSearchParams(raw);
   const source = exploreMapSourceFor(entities);
   const allFeatures = source.featureCollection.features;
-  const filteredFeatures = applyExploreFilters(allFeatures, viewState.filters, viewState.state);
+  const collectionFacts = buildCollectionFacts(entities);
+  const matches = matchExploreCollection(collectionFacts, viewState);
+  const filteredFeatures = drawableCollection(allFeatures, matches);
   const densityLevels = buildStateDensityLevels(source.stateAggregates);
 
   const { edgeLineCatalog, availableDecades } = buildEdgeLineCatalog(
@@ -177,12 +194,14 @@ export function buildExploreViewModel(
 
   return {
     viewState,
+    collectionFacts,
+    initialMatchIndexes: drawableMatchIndexes(matches, allFeatures),
     source,
     allFeatures,
     filteredFeatures,
     densityLevels,
     facetOptions: buildExploreFacetOptions(allFeatures),
-    totalMatched: filteredFeatures.length,
+    totalMatched: matches.length,
     dataSource,
     availableDecades,
     entityDecades: buildEntityDecadeCounts(allFeatures),
@@ -207,6 +226,7 @@ export function buildAtlasShell(
   raw: RawExploreSearchParams,
   entities: readonly PublicEntityView[] = listPublicEntities(),
   dataSource: PublicReadSource = 'none',
+  firstPaintFeatures?: readonly ExploreMapFeature[],
 ): {
   readonly shell: AtlasShellModel;
   readonly noscriptFeatures: readonly ExploreMapFeature[];
@@ -214,13 +234,16 @@ export function buildAtlasShell(
   const viewState = parseExploreSearchParams(raw);
   const source = exploreMapSourceFor(entities);
   const allFeatures = source.featureCollection.features;
-  const filteredFeatures = applyExploreFilters(allFeatures, viewState.filters, viewState.state);
+  const collectionFacts = buildCollectionFacts(entities);
+  const matches = matchExploreCollection(collectionFacts, viewState);
+  const filteredFeatures = drawableCollection(allFeatures, matches);
   return {
     shell: {
       viewState,
+      initialMatchIndexes: drawableMatchIndexes(matches, firstPaintFeatures ?? allFeatures),
       densityLevels: buildStateDensityLevels(source.stateAggregates),
       facetOptions: buildExploreFacetOptions(allFeatures),
-      totalMatched: filteredFeatures.length,
+      totalMatched: matches.length,
       dataSource,
       entityDecades: buildEntityDecadeCounts(allFeatures),
     },

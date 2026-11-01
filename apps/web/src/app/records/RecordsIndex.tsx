@@ -349,9 +349,6 @@ export function RecordsIndexRoom({ model, releaseLabel }: RecordsIndexProps) {
         ]}
       >
         {atlasReason}
-        {query.q.length > 0 ? (
-          <> The map has no text search, so that part of this narrowing stays here.</>
-        ) : null}
       </OffRamp>
     </Room>
   );

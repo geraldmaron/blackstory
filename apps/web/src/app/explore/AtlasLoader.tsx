@@ -44,7 +44,11 @@ async function fetchAtlasCatalog(url: string, signal: AbortSignal): Promise<Atla
     throw new Error(`atlas catalog ${response.status}`);
   }
   const payload = (await response.json()) as AtlasCatalogPayload;
-  if (payload.schemaVersion !== 1 || !payload.source?.featureCollection) {
+  if (
+    payload.schemaVersion !== 1 ||
+    !payload.source?.featureCollection ||
+    !Array.isArray(payload.collectionFacts)
+  ) {
     throw new Error('atlas catalog: unexpected shape');
   }
   lastCatalog = { url, payload };
@@ -107,9 +111,8 @@ export function AtlasLoader({
   }, [catalogUrl, attempt]);
 
   const active = catalog ?? firstPaint;
-  const hasPins = pins.features.length > 0 || catalog !== undefined;
 
-  if (error && !hasPins) {
+  if (error && !catalog?.collectionFacts) {
     return (
       <div className="ds-atlas ds-atlas--pending" data-atlas-catalog="error">
         <Notice
@@ -132,5 +135,10 @@ export function AtlasLoader({
     );
   }
 
-  return <AtlasExperience initial={assembleExploreViewModel(shell, active)} embedded={embedded} />;
+  return (
+    <>
+      {!catalog?.collectionFacts ? <div role="status">Loading collection controls.</div> : null}
+      <AtlasExperience initial={assembleExploreViewModel(shell, active)} embedded={embedded} />
+    </>
+  );
 }

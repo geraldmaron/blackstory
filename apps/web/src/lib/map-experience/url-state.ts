@@ -21,6 +21,7 @@
  * exact-match `confidence=`. Records→Explore handoff writes `floor`; without this key in the
  * parser/allowlist, middleware stripped it and silently widened the set.
  */
+import { parseRecordsQuery, type RecordsSort } from '../records/records-query';
 import { isPopulationDecade } from '@repo/domain/demographics/population-decades';
 import { findUsStateByPostalCode, US_CONUS_BOUNDS } from '@repo/domain/map/geography';
 import { DEFAULT_EXPLORE_FILTERS, type ExploreFilterState } from './filters';
@@ -60,6 +61,8 @@ export type ExploreLayerMode = 'off' | 'presence' | 'blackShare' | 'blackChange'
 
 export type ExploreViewState = {
   readonly filters: ExploreFilterState;
+  readonly query?: string;
+  readonly sort?: RecordsSort;
   readonly viewport?: ExploreViewport;
   readonly selected?: string;
   /** USPS state DC postal code when a state shape is selected on the map.  */
@@ -133,6 +136,8 @@ export type RawExploreSearchParams = Readonly<
  * reads a key this list lacks, and when the serializer writes one.
  */
 export const EXPLORE_URL_PARAM_KEYS = [
+  'q',
+  'sort',
   'era',
   'kind',
   'tone',
@@ -330,6 +335,7 @@ function parseEvidenceFloor(raw: string | undefined): EvidenceGrade | undefined 
 }
 
 export function parseExploreSearchParams(raw: RawExploreSearchParams): ExploreViewState {
+  const collection = parseRecordsQuery({ q: raw.q, sort: raw.sort });
   const filters: ExploreFilterState = {
     era: cleanSelectParam(firstValue(raw.era)),
     kind: cleanSelectParam(firstValue(raw.kind)),
@@ -405,6 +411,8 @@ export function parseExploreSearchParams(raw: RawExploreSearchParams): ExploreVi
 
   return {
     filters,
+    ...(collection.q ? { query: collection.q } : {}),
+    ...(collection.sort !== 'discovery' ? { sort: collection.sort } : {}),
     ...(lat !== undefined && lng !== undefined && zoom !== undefined
       ? { viewport: { lat, lng, zoom } }
       : {}),
@@ -434,6 +442,8 @@ export function parseExploreSearchParams(raw: RawExploreSearchParams): ExploreVi
  * or push it via `history.replaceState` without a full navigation. */
 export function buildExploreSearchParams(state: ExploreViewState): string {
   const params = new URLSearchParams();
+  if (state.query) params.set('q', state.query);
+  if (state.sort && state.sort !== 'discovery') params.set('sort', state.sort);
   if (state.filters.era !== DEFAULT_EXPLORE_FILTERS.era) params.set('era', state.filters.era);
   if (state.filters.kind !== DEFAULT_EXPLORE_FILTERS.kind) params.set('kind', state.filters.kind);
   if (state.filters.tone !== DEFAULT_EXPLORE_FILTERS.tone) params.set('tone', state.filters.tone);

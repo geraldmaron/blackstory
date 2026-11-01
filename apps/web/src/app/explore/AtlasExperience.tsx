@@ -17,6 +17,10 @@
  */
 'use client';
 
+import { recordsHref } from '../../lib/records/records-query';
+import { recordsQueryFromExplore } from '../../lib/discovery/explore-collection';
+import { mapListContinuityLabel } from '../../lib/discovery/continuity-label';
+
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Notice } from '@repo/ui';
 import { focusLandmark } from '../../lib/keyboard/use-focus-trap';
@@ -238,6 +242,11 @@ export function AtlasExperience({ initial, embedded = false }: AtlasExperiencePr
 
   const { collection, persist, toggleSave, savedSet } = useSavedCollection(toasts);
   const {
+    query,
+    era,
+    exactKind,
+    collectionState,
+    collectionMatched,
     stateCode,
     setStateCode,
     kindFamily,
@@ -306,8 +315,10 @@ export function AtlasExperience({ initial, embedded = false }: AtlasExperiencePr
   const holdingPlaceArrival = useMemo(() => {
     return placeArrivalQuery(
       {
-        ...(kindFamily ? { kind: kindFamily } : {}),
-        ...(decade !== null ? { era: eraBucketFor(decade) } : {}),
+        ...(query ? { query } : {}),
+        sort: collectionState.sort,
+        ...((exactKind ?? kindFamily) ? { kind: exactKind ?? kindFamily! } : {}),
+        ...(era !== 'all' ? { era } : {}),
         ...(stateCode ? { state: stateCode } : {}),
         ...(topicId ? { topic: topicId } : {}),
         ...(status ? { status } : {}),
@@ -317,9 +328,20 @@ export function AtlasExperience({ initial, embedded = false }: AtlasExperiencePr
       },
       'map',
     );
-  }, [decade, evidenceFloor, kindFamily, stateCode, status, topicId]);
+  }, [
+    query,
+    era,
+    exactKind,
+    collectionState.sort,
+    evidenceFloor,
+    kindFamily,
+    stateCode,
+    status,
+    topicId,
+  ]);
 
   useExploreUrlSync(view.viewState, {
+    collectionState,
     stateCode,
     kindFamily,
     evidenceFloor,
@@ -708,6 +730,8 @@ export function AtlasExperience({ initial, embedded = false }: AtlasExperiencePr
        marking its own root is the entire scope contract — no route check, no second list. */
     <div
       ref={atlasRootRef}
+      inert={!view.collectionFacts}
+      aria-busy={!view.collectionFacts}
       className={embedded ? 'ds-atlas ds-atlas--embedded' : 'ds-atlas'}
       data-key-scope="instrument"
       data-chrome={chromeHidden ? 'hidden' : 'shown'}
@@ -802,6 +826,12 @@ export function AtlasExperience({ initial, embedded = false }: AtlasExperiencePr
           onIntent={() => setRailTouched(true)}
           features={overlapFeatures ?? sorted}
           total={view.allFeatures.length}
+          collectionLabel={
+            nearby || sweepDecade !== null
+              ? `${collectionMatched.toLocaleString('en-US')} records in collection. ${filtered.length.toLocaleString('en-US')} shown with map constraints.`
+              : mapListContinuityLabel(collectionMatched, filtered.length)
+          }
+          collectionHref={recordsHref(recordsQueryFromExplore(collectionState))}
           selectedId={selectedId}
           onSelect={select}
           sort={sort}

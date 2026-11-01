@@ -54,7 +54,7 @@ export type DoorHomeProps = {
 export async function DoorHome({ params = {}, initialBrowse = false }: DoorHomeProps = {}) {
   const { pins, features, densityLevels } = await loadDoorPinPlate();
   const { data: entities, source: dataSource } = await getSharedPublicEntities();
-  const { shell, noscriptFeatures } = buildAtlasShell(params, entities, dataSource);
+  const { shell, noscriptFeatures } = buildAtlasShell(params, entities, dataSource, features);
   const placeCount = pins.features.length.toLocaleString('en-US');
   const openLedger = buildOpenLedger(features);
 

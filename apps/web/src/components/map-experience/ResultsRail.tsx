@@ -39,9 +39,14 @@ export const RESULTS_ROW_HEIGHT = 54;
 /** Rows rendered above and below the viewport so a fast scroll does not show blank space. */
 const OVERSCAN = 6;
 
-export type ResultsSort = 'oldest' | 'newest' | 'nearest';
+export type ResultsSort =
+  'oldest' | 'newest' | 'nearest' | 'discovery' | 'era' | 'name' | 'evidence';
 
 const SORT_LABEL: Record<ResultsSort, string> = {
+  discovery: 'discovery order',
+  era: 'earliest era first',
+  name: 'name order',
+  evidence: 'evidence first',
   oldest: 'oldest first',
   newest: 'newest first',
   nearest: 'nearest first',
@@ -50,8 +55,8 @@ const SORT_LABEL: Record<ResultsSort, string> = {
 /** The next sort in the cycle. `nearest` only exists while a place is located. */
 export function nextResultsSort(sort: ResultsSort, canSortByDistance: boolean): ResultsSort {
   const cycle: readonly ResultsSort[] = canSortByDistance
-    ? ['nearest', 'oldest', 'newest']
-    : ['oldest', 'newest'];
+    ? ['nearest', 'oldest', 'newest', 'discovery', 'era', 'name', 'evidence']
+    : ['oldest', 'newest', 'discovery', 'era', 'name', 'evidence'];
   const index = cycle.indexOf(sort);
   return cycle[(index + 1) % cycle.length] ?? 'oldest';
 }
@@ -67,6 +72,8 @@ export type ResultsConstraint = {
 export type ResultsRailProps = {
   readonly features: readonly ExploreMapFeature[];
   readonly total: number;
+  readonly collectionLabel?: string;
+  readonly collectionHref?: string;
   readonly selectedId?: string | undefined;
   readonly onSelect: (feature: ExploreMapFeature) => void;
   readonly sort: ResultsSort;
@@ -120,6 +127,8 @@ export function resultsWindow(
 export function ResultsRail({
   features,
   total,
+  collectionLabel,
+  collectionHref,
   selectedId,
   onSelect,
   sort,
@@ -184,7 +193,14 @@ export function ResultsRail({
       <header className="ds-results__head">
         <h2 className="ds-results__title">Records</h2>
         <span className="ds-results__count">
-          {features.length.toLocaleString('en-US')} of {total.toLocaleString('en-US')}
+          {collectionLabel ??
+            `${features.length.toLocaleString('en-US')} of ${total.toLocaleString('en-US')}`}
+          {collectionHref ? (
+            <>
+              {' '}
+              <a href={collectionHref}>Open record list</a>
+            </>
+          ) : null}
         </span>
         <button
           type="button"

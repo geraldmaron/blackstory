@@ -20,6 +20,7 @@ import type { MapKindFamily } from '../../../lib/map-experience/kind-encoding';
 
 export type ExploreUrlSyncLens = {
   readonly stateCode: string;
+  readonly collectionState?: ExploreViewState;
   readonly kindFamily: MapKindFamily | null;
   readonly evidenceFloor: EvidenceFloor;
   readonly topicId: string | null;
@@ -36,15 +37,20 @@ export type ExploreUrlSyncLens = {
  * Pure so tests can assert floor/state/kind round-trip without a browser.
  */
 export function exploreHrefFromLens(base: ExploreViewState, lens: ExploreUrlSyncLens): string {
+  const collection = lens.collectionState ?? base;
   const next: ExploreViewState = {
+    ...(collection.query ? { query: collection.query } : {}),
+    ...(collection.sort ? { sort: collection.sort } : {}),
     filters: {
       ...DEFAULT_EXPLORE_FILTERS,
-      kind: lens.kindFamily ?? DEFAULT_EXPLORE_FILTERS.kind,
+      kind: lens.collectionState
+        ? collection.filters.kind
+        : (lens.kindFamily ?? DEFAULT_EXPLORE_FILTERS.kind),
       theme: lens.topicId ?? DEFAULT_EXPLORE_FILTERS.theme,
       status: lens.status ?? DEFAULT_EXPLORE_FILTERS.status,
       // Keep exact confidence / tone / era from the URL seed when Lens does not own them.
       tone: base.filters.tone,
-      era: base.filters.era,
+      era: collection.filters.era,
       confidence: base.filters.confidence,
     },
     ...defaultExploreOverlayState(),

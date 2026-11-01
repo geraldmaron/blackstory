@@ -13,6 +13,7 @@ export function withQuery(href: string, query: string): string {
 
 export type PlaceArrivalFields = {
   readonly query?: string;
+  readonly sort?: string;
   readonly kind?: string;
   readonly era?: string;
   readonly state?: string;
@@ -30,6 +31,7 @@ export function placeArrivalQuery(fields: PlaceArrivalFields, from: 'map' | 'lis
   const params = new URLSearchParams();
   params.set('from', from);
   if (fields.query) params.set('q', fields.query);
+  if (fields.sort && fields.sort !== 'discovery') params.set('sort', fields.sort);
   if (fields.kind) params.set('kind', fields.kind);
   if (fields.era) params.set('era', fields.era);
   if (fields.state) params.set('state', fields.state);

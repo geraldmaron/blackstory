@@ -209,13 +209,13 @@ describe('/records · the Explore handoff', () => {
     );
   });
 
-  it('never sends q, because Explore has no text constraint at all', () => {
+  it('hands the text narrowing to the same collection matcher on Explore', () => {
     const href = buildAtlasHref({
       ...EMPTY_RECORDS_QUERY,
       q: 'tulsa',
       state: 'OK',
     });
-    assert.equal(href, '/explore?state=OK');
+    assert.equal(href, '/explore?q=tulsa&state=OK');
   });
 
   it('sends the evidence floor as `floor`, now that SP-16 landed it on the Lens', () => {

@@ -18,6 +18,7 @@ import {
   recordsHref,
   type RecordsQuery,
 } from '../records/build-records-index';
+import { parseRecordsQuery } from '../records/records-query';
 import { placeArrivalQuery as placeArrivalQueryFields } from './discovery-arrival';
 
 export { mapListContinuityLabel } from './continuity-label';
@@ -66,6 +67,8 @@ export function discoveryFromExplore(state: ExploreViewState): DiscoveryState {
   const topic = asSingleton(state.filters.theme);
   const status = asSingleton(state.filters.status);
   return {
+    ...(state.query ? { query: state.query } : {}),
+    ...(state.sort ? { sort: state.sort } : {}),
     ...(kind ? { kind } : {}),
     ...(era ? { era } : {}),
     ...(state.state ? { state: [state.state] } : {}),
@@ -85,6 +88,7 @@ export function discoveryFromRecords(query: RecordsQuery): DiscoveryState {
   const status = asSingleton(query.status);
   return {
     ...(query.q.length > 0 ? { query: query.q } : {}),
+    sort: query.sort,
     ...(kind ? { kind } : {}),
     ...(era ? { era } : {}),
     ...(postal ? { state: postal } : {}),
@@ -101,7 +105,8 @@ export function recordsQueryFromDiscovery(state: DiscoveryState): RecordsQuery {
   const evidence = state.evidence;
   return {
     ...EMPTY_RECORDS_QUERY,
-    q: state.query?.trim() ?? '',
+    q: parseRecordsQuery({ q: state.query }).q,
+    sort: parseRecordsQuery({ sort: state.sort }).sort,
     kind: (firstOf(state.kind) ?? '').toLowerCase(),
     era: (firstOf(state.era) ?? '').toLowerCase(),
     state: (firstOf(state.state) ?? '').toUpperCase(),
@@ -113,8 +118,7 @@ export function recordsQueryFromDiscovery(state: DiscoveryState): RecordsQuery {
 }
 
 /**
- * Builds an Explore view state for handoff. Text search (`query`) does not cross: Explore has
- * no text pin filter. Callers must disclose that in off-ramp copy (Records already does).
+ * Builds an Explore view state carrying the same collection narrowing and bibliography order.
  */
 export function exploreViewFromDiscovery(state: DiscoveryState): ExploreViewState {
   const kind = firstOf(state.kind) ?? DEFAULT_EXPLORE_FILTERS.kind;
@@ -124,6 +128,8 @@ export function exploreViewFromDiscovery(state: DiscoveryState): ExploreViewStat
   const postal = firstOf(state.state)?.toUpperCase();
 
   return {
+    ...(state.query ? { query: parseRecordsQuery({ q: state.query }).q } : {}),
+    sort: parseRecordsQuery({ sort: state.sort }).sort,
     filters: {
       ...DEFAULT_EXPLORE_FILTERS,
       kind,
@@ -175,7 +181,8 @@ export function discoveryFromSearchParams(
   const evidenceRaw = paramOne(params.evidence) ?? paramOne(params.floor);
   const evidence =
     evidenceRaw === 'A' || evidenceRaw === 'B' || evidenceRaw === 'C' ? evidenceRaw : undefined;
-  const query = paramOne(params.q);
+  const normalized = parseRecordsQuery({ q: params.q, sort: params.sort });
+  const query = normalized.q;
   const selected = paramOne(params.selected);
   const from = paramOne(params.from);
   const view: DiscoveryView | undefined =
@@ -187,6 +194,7 @@ export function discoveryFromSearchParams(
 
   return {
     ...(query ? { query } : {}),
+    sort: normalized.sort,
     ...(kind ? { kind } : {}),
     ...(era ? { era } : {}),
     ...(state ? { state } : {}),
@@ -220,6 +228,7 @@ export function placeArrivalQuery(state: DiscoveryState, from: 'map' | 'list'): 
   return placeArrivalQueryFields(
     {
       ...(state.query ? { query: state.query } : {}),
+      ...(state.sort ? { sort: state.sort } : {}),
       ...(kind !== undefined ? { kind } : {}),
       ...(era !== undefined ? { era } : {}),
       ...(stateCode !== undefined ? { state: stateCode } : {}),

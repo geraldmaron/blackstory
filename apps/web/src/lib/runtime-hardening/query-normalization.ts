@@ -62,6 +62,7 @@ function normalizePathname(pathname: string): string {
 /** Routes that may carry user-facing filters; all other paths ignore query strings for caching.  */
 export function getAllowedQueryParamsForPath(pathname: string): readonly string[] {
   const path = normalizePathname(pathname);
+  if (path === '/atlas/catalog') return ['v'];
   if (path === '/search') {
     return SEARCH_PAGE_PARAM_ALLOWLIST;
   }
@@ -128,6 +129,7 @@ export function normalizeQueryString(
 ): string {
   const path = normalizePathname(pathname);
   const bag = allowlistedBag(path, readParamBag(input));
+  if (path === '/atlas/catalog') return firstString(bag.v) === '2' ? 'v=2' : '';
 
   if (EXPLORE_SURFACE_PATHS.has(path)) {
     return buildExploreSearchParams(parseExploreSearchParams(bag));

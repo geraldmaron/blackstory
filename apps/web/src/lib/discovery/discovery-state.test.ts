@@ -82,10 +82,10 @@ describe('DiscoveryState map/list continuity', () => {
     assert.equal(href.includes('group='), false);
   });
 
-  it('does not claim text query crosses to the map', () => {
+  it('preserves text query crossing to the map', () => {
     const discovery = discoveryFromRecords({ ...EMPTY_RECORDS_QUERY, q: 'greenwood', state: 'OK' });
     const mapHref = mapHrefFromDiscovery(discovery);
-    assert.equal(mapHref.includes('q='), false);
+    assert.equal(mapHref.includes('q=greenwood'), true);
     assert.equal(mapHref.includes('state=OK'), true);
     const listHref = listHrefFromDiscovery(discovery);
     assert.equal(listHref.includes('q=greenwood'), true);

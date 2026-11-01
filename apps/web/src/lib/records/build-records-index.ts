@@ -24,6 +24,12 @@
  * `kindFamilyEncodingFor`, `resolveEntityEraBuckets`, `recordConfidenceTier`, `getTopicLabel` — never
  * by a local copy of the list. `build-records-index.test.ts` asserts that on drift.
  */
+import {
+  matchesExcept,
+  comparatorFor,
+  type RecordFacts,
+  type CollectionFacts,
+} from './records-matching';
 import { getTopicLabel, isValidTopicId } from '@repo/domain/taxonomy/topics';
 import {
   findUsStateByPostalCode,
@@ -39,7 +45,7 @@ import {
 import { resolveEntityEraBuckets } from '../map-experience/entity-era-facts';
 import { geoAnchorFor } from '../map-experience/entity-geo';
 import { mapListContinuityLabel } from '../discovery/continuity-label';
-import { canStandHere, staysOffPublicMap, isInternalRecordLabel } from '../place/public-place-path';
+import { canStandHere, staysOffPublicMap } from '../place/public-place-path';
 import { publicRecordHref, placeSlugCollisionCounts } from '../place/place-slug';
 import {
   EVIDENCE_FLOORS,
@@ -51,7 +57,7 @@ import {
   type EvidenceGrade,
 } from '../map-experience/evidence-grade';
 import { kindFamilyFor, resolveMapTone, type MapKindFamily } from '../map-experience/kind-encoding';
-import { kindFilterLabel, kindMatchesPublicFilter } from '../map-experience/filters';
+import { kindFilterLabel } from '../map-experience/filters';
 import { formatResultSummary } from '../discovery/result-summary';
 import {
   EMPTY_RECORDS_QUERY,
@@ -60,7 +66,6 @@ import {
   recordsHref,
   type RecordsFilterKey,
   type RecordsQuery,
-  type RecordsSort,
 } from './records-query';
 
 /** Arrival query Place pages understand (`from=list` + shared DiscoveryState keys). */
@@ -68,6 +73,7 @@ function recordsArrivalQuery(query: RecordsQuery): string {
   const params = new URLSearchParams();
   params.set('from', 'list');
   if (query.q.length > 0) params.set('q', query.q);
+  if (query.sort !== 'discovery') params.set('sort', query.sort);
   if (query.kind.length > 0) params.set('kind', query.kind);
   if (query.era.length > 0) params.set('era', query.era);
   if (query.state.length > 0) params.set('state', query.state);
@@ -185,18 +191,6 @@ function humanize(value: string): string {
 export function recordsQueryIndexable(query: Partial<RecordsQuery>): boolean {
   return !isRecordsCombinationQuery({ ...EMPTY_RECORDS_QUERY, ...query });
 }
-
-type RecordFacts = {
-  readonly row: RecordsRow;
-  readonly eraBuckets: readonly string[];
-  readonly topicIds: readonly string[];
-  readonly confidenceTier: ConfidenceTier;
-  readonly statePostal: string | undefined;
-  readonly stateName: string | undefined;
-  readonly status: string;
-  readonly haystack: string;
-  readonly mappable: boolean;
-};
 
 /**
  * Minimal catalog row for Records. Full entities and search_index docs both adapt into this.
@@ -387,34 +381,6 @@ function toRecordsCatalog(
   return (catalog as readonly PublicEntityView[]).map(recordsCatalogFromEntity);
 }
 
-function matchesExcept(
-  facts: RecordFacts,
-  query: RecordsQuery,
-  skip: RecordsFilterKey | 'none',
-): boolean {
-  if (query.q.length > 0 && !facts.haystack.includes(query.q.toLowerCase())) return false;
-  if (
-    skip !== 'kind' &&
-    query.kind.length > 0 &&
-    !kindMatchesPublicFilter(facts.row.kind, query.kind)
-  )
-    return false;
-  if (skip !== 'era' && query.era.length > 0 && !facts.eraBuckets.includes(query.era)) return false;
-  if (skip !== 'state' && query.state.length > 0 && facts.statePostal !== query.state) return false;
-  if (skip !== 'topic' && query.topic.length > 0 && !facts.topicIds.includes(query.topic))
-    return false;
-  if (skip !== 'status' && query.status.length > 0 && facts.status !== query.status) return false;
-  // A floor, not an equality match. Routing "B and up" through an exact match would drop every
-  // grade A record — the opposite of what the reader asked for (see `applyEvidenceFloor`).
-  if (
-    skip !== 'evidence' &&
-    query.evidence.length > 0 &&
-    !meetsEvidenceFloor(facts.confidenceTier, query.evidence as EvidenceFloor)
-  )
-    return false;
-  return true;
-}
-
 /** Values a facet key takes on one record, so counting is one shared loop. */
 function valuesFor(facts: RecordFacts, key: RecordsFilterKey): readonly string[] {
   switch (key) {
@@ -458,66 +424,6 @@ function compareGroups(a: RecordsGroup, b: RecordsGroup): number {
   return b.count - a.count || a.label.localeCompare(b.label);
 }
 
-/** Sequenced discovery: authored, graded, dated records before opaque site codes and undated rows. */
-const TIER_RANK: Readonly<Record<string, number>> = {
-  high: 0,
-  medium: 1,
-  low: 2,
-  unrated: 3,
-};
-
-function earliestEraYear(facts: RecordFacts): number {
-  let earliest = Number.POSITIVE_INFINITY;
-  for (const bucket of facts.eraBuckets) {
-    const year = Number.parseInt(bucket, 10);
-    if (Number.isFinite(year) && year < earliest) earliest = year;
-  }
-  return earliest;
-}
-
-/**
- * The orderings behind the sort control. Every one of them puts internal-looking labels last
- * and falls back to the record name, so a sort never produces an unstable order for rows that
- * tie on the key being sorted.
- */
-function internalLast(a: RecordFacts, b: RecordFacts): number {
-  const internalA = isInternalRecordLabel(a.row.name) ? 1 : 0;
-  const internalB = isInternalRecordLabel(b.row.name) ? 1 : 0;
-  return internalA - internalB;
-}
-
-function comparatorFor(sort: RecordsSort): (a: RecordFacts, b: RecordFacts) => number {
-  if (sort === 'discovery') return compareDiscoveryOrder;
-  return (a, b) => {
-    const internal = internalLast(a, b);
-    if (internal !== 0) return internal;
-    if (sort === 'name') return a.row.name.localeCompare(b.row.name);
-    if (sort === 'era') {
-      const eraA = earliestEraYear(a);
-      const eraB = earliestEraYear(b);
-      if (eraA !== eraB) return eraA - eraB;
-      return a.row.name.localeCompare(b.row.name);
-    }
-    const tierA = TIER_RANK[a.confidenceTier] ?? 3;
-    const tierB = TIER_RANK[b.confidenceTier] ?? 3;
-    if (tierA !== tierB) return tierA - tierB;
-    return a.row.name.localeCompare(b.row.name);
-  };
-}
-
-function compareDiscoveryOrder(a: RecordFacts, b: RecordFacts): number {
-  const internalA = isInternalRecordLabel(a.row.name) ? 1 : 0;
-  const internalB = isInternalRecordLabel(b.row.name) ? 1 : 0;
-  if (internalA !== internalB) return internalA - internalB;
-  const tierA = TIER_RANK[a.confidenceTier] ?? 3;
-  const tierB = TIER_RANK[b.confidenceTier] ?? 3;
-  if (tierA !== tierB) return tierA - tierB;
-  const eraA = earliestEraYear(a);
-  const eraB = earliestEraYear(b);
-  if (eraA !== eraB) return eraA - eraB;
-  return a.row.name.localeCompare(b.row.name);
-}
-
 /**
  * Builds everything `/records` renders for one request.
  *
@@ -527,6 +433,28 @@ function compareDiscoveryOrder(a: RecordFacts, b: RecordFacts): number {
  *
  * Accepts either full entities (tests + pre-backfill fallback) or slim search_index docs.
  */
+export function buildRecordFacts(catalog: readonly PublicEntityView[]): readonly RecordFacts[] {
+  const entries = toRecordsCatalog(catalog);
+  const collisions = placeSlugCollisionCounts(entries);
+  return entries.map((entry) => toFacts(entry, collisions));
+}
+
+export function buildCollectionFacts(
+  catalog: readonly PublicEntityView[],
+): readonly CollectionFacts[] {
+  return buildRecordFacts(catalog).map(
+    ({ row, eraBuckets, topicIds, confidenceTier, statePostal, status, haystack }) => ({
+      row: { id: row.id, name: row.name, kind: row.kind, mapTone: row.mapTone },
+      eraBuckets,
+      topicIds,
+      confidenceTier,
+      statePostal,
+      status,
+      haystack,
+    }),
+  );
+}
+
 export function buildRecordsIndex(
   catalog:
     readonly PublicEntityView[] | readonly PublicSearchIndexDoc[] | readonly RecordsCatalogEntry[],
@@ -691,7 +619,8 @@ export function findRecordsNeighbors(
   const collisions = placeSlugCollisionCounts(entries);
   const matched = entries
     .map((entry) => toFacts(entry, collisions))
-    .filter((record) => matchesExcept(record, query, 'none'));
+    .filter((record) => matchesExcept(record, query, 'none'))
+    .sort(comparatorFor(query.sort));
   const index = matched.findIndex((record) => record.row.id === entityId);
   if (index < 0 || matched.length === 0) return undefined;
 
@@ -721,14 +650,13 @@ export function findRecordsNeighbors(
  * `EXPLORE_URL_PARAM_KEYS` / the edge allowlist — a param this function invents is stripped by
  * middleware before Explore ever sees it, silently widening the set.
  *
- * One constraint does NOT cross, and the off-ramp copy says so rather than pretending: `q`,
- * because Explore has no text pin filter.
- *
  * `topic` becomes `theme` (Lens name for the same controlled topic id).
  * `evidence` becomes `floor` (and-up grade predicate; not exact-match `confidence`).
  */
 export function buildAtlasHref(query: RecordsQuery): string {
   const params = new URLSearchParams();
+  if (query.q) params.set('q', query.q);
+  if (query.sort !== 'discovery') params.set('sort', query.sort);
   if (query.kind.length > 0) params.set('kind', query.kind);
   if (query.era.length > 0) params.set('era', query.era);
   if (query.state.length > 0) params.set('state', query.state);
