@@ -369,3 +369,46 @@ Record-template consolidation (deliberately last, per the adversarial pass), rea
 frame consolidation, admin task defects, dead-code removal. Dead-code removal was dropped on
 purpose: low user value against real deletion risk on 296 grep-dead classes that may be built
 dynamically.
+
+---
+
+## 9. Record templates: state after the owner decisions
+
+Four decisions were taken: record-room anatomy wins and gains the hero; three evidence axes with
+the grade letter only in citations; provenance reworded for readers; statutes routed by kind with
+the URL kept.
+
+**Done**
+
+- Provenance reworded (`54dd56d9`). `Maturity: Partial Enrichment` → `How far researched`,
+  `Coverage` → `Research coverage`, `Release` → `Published in` plus a line saying what a release
+  id is. Nothing removed.
+- Statutes stop posing as places (`54dd56d9`). No nearest-place neighbours, no "Place at a
+  glance". Deny-list of non-spatial kinds, after an allow-list silently demoted a school.
+- One confidence vocabulary (`dda516ea`). Both templates lead with plain words and the meter;
+  the grade letter stays in the citation string, as support text, and in the contract the native
+  app shares.
+
+**Blocked, with the reason established**
+
+- **Re-typing statutes into the legal catalog.** `/law` is backed by
+  `published.release_legal_snapshots` with a seed fallback — a *separate dataset* from entities,
+  not a `kind` column. The Civil Rights Act of 1866 appears in the legal seed only as prose
+  inside another snapshot. The entity does carry the sourced facts (enactment date, the veto,
+  U.S.C. §§1981/1982), so this is a data move rather than authoring, but it is a `published.*`
+  mutation needing the operator republish and Cloudflare purge, not a UI change. The
+  `/place → /law` redirect cannot land first: it would 308 into a 404.
+
+**Attempted and reverted, deliberately**
+
+- **Place pages gaining "Status and history".** The sections are already shared; a `firstPaint`
+  flag suppressed status. Turning it on works, and two tests then fail by design: the place first
+  paint must not match `Active|Current status|In effect from|Status and history`, because it is
+  meant to be the record, not a schema card. Those guards are correct — the status section still
+  renders raw enum chrome, which is the same leakage removed elsewhere in this slice. The right
+  order is to give status a reader vocabulary first, then enable it on place. Reverted rather
+  than overriding the guard.
+
+**Not started**
+
+The full place↔record-room anatomy merge beyond the above, and the hero for entity records.
