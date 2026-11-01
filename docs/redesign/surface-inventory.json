@@ -131,9 +131,14 @@
           "evidence": ["apps/web/src/app/admin/loading.tsx", "docs/redesign/SURFACES.md"]
         },
         "error": {
-          "status": "pending",
-          "reason": "The redesign spec identifies an error state or the admin section lacks a route-level error treatment.",
-          "evidence": ["apps/web/src/app/admin/page.tsx", "docs/redesign/SURFACES.md"]
+          "status": "partial",
+          "reason": "Staff desks share one boundary with staff copy, retry and a way back to the operations desk; detail is sanitized. Synthetic-error component test only; no authenticated session or populated desk data, not rendered in a browser.",
+          "evidence": [
+            "apps/web/src/app/admin/error.tsx",
+            "apps/web/src/app/admin/error.test.tsx",
+            "apps/web/src/app/admin/page.tsx",
+            "docs/redesign/SURFACES.md"
+          ]
         },
         "empty": {
           "status": "not-applicable",
@@ -185,9 +190,14 @@
           "evidence": ["apps/web/src/app/admin/loading.tsx", "docs/redesign/SURFACES.md"]
         },
         "error": {
-          "status": "pending",
-          "reason": "The redesign spec identifies an error state or the admin section lacks a route-level error treatment.",
-          "evidence": ["apps/web/src/app/admin/audit/page.tsx", "docs/redesign/SURFACES.md"]
+          "status": "partial",
+          "reason": "Staff desks share one boundary with staff copy, retry and a way back to the operations desk; detail is sanitized. Synthetic-error component test only; no authenticated session or populated desk data, not rendered in a browser.",
+          "evidence": [
+            "apps/web/src/app/admin/error.tsx",
+            "apps/web/src/app/admin/error.test.tsx",
+            "apps/web/src/app/admin/audit/page.tsx",
+            "docs/redesign/SURFACES.md"
+          ]
         },
         "empty": {
           "status": "not-applicable",
@@ -239,9 +249,14 @@
           "evidence": ["apps/web/src/app/admin/loading.tsx", "docs/redesign/SURFACES.md"]
         },
         "error": {
-          "status": "pending",
-          "reason": "The redesign spec identifies an error state or the admin section lacks a route-level error treatment.",
-          "evidence": ["apps/web/src/app/admin/cases/page.tsx", "docs/redesign/SURFACES.md"]
+          "status": "partial",
+          "reason": "Staff desks share one boundary with staff copy, retry and a way back to the operations desk; detail is sanitized. Synthetic-error component test only; no authenticated session or populated desk data, not rendered in a browser.",
+          "evidence": [
+            "apps/web/src/app/admin/error.tsx",
+            "apps/web/src/app/admin/error.test.tsx",
+            "apps/web/src/app/admin/cases/page.tsx",
+            "docs/redesign/SURFACES.md"
+          ]
         },
         "empty": {
           "status": "not-applicable",
@@ -293,9 +308,14 @@
           "evidence": ["apps/web/src/app/admin/loading.tsx", "docs/redesign/SURFACES.md"]
         },
         "error": {
-          "status": "pending",
-          "reason": "The redesign spec identifies an error state or the admin section lacks a route-level error treatment.",
-          "evidence": ["apps/web/src/app/admin/cases/[id]/page.tsx", "docs/redesign/SURFACES.md"]
+          "status": "partial",
+          "reason": "Staff desks share one boundary with staff copy, retry and a way back to the operations desk; detail is sanitized. Synthetic-error component test only; no authenticated session or populated desk data, not rendered in a browser.",
+          "evidence": [
+            "apps/web/src/app/admin/error.tsx",
+            "apps/web/src/app/admin/error.test.tsx",
+            "apps/web/src/app/admin/cases/[id]/page.tsx",
+            "docs/redesign/SURFACES.md"
+          ]
         },
         "empty": {
           "status": "not-applicable",
@@ -347,9 +367,14 @@
           "evidence": ["apps/web/src/app/admin/loading.tsx", "docs/redesign/SURFACES.md"]
         },
         "error": {
-          "status": "pending",
-          "reason": "The redesign spec identifies an error state or the admin section lacks a route-level error treatment.",
-          "evidence": ["apps/web/src/app/admin/catalog/page.tsx", "docs/redesign/SURFACES.md"]
+          "status": "partial",
+          "reason": "Staff desks share one boundary with staff copy, retry and a way back to the operations desk; detail is sanitized. Synthetic-error component test only; no authenticated session or populated desk data, not rendered in a browser.",
+          "evidence": [
+            "apps/web/src/app/admin/error.tsx",
+            "apps/web/src/app/admin/error.test.tsx",
+            "apps/web/src/app/admin/catalog/page.tsx",
+            "docs/redesign/SURFACES.md"
+          ]
         },
         "empty": {
           "status": "not-applicable",
@@ -401,9 +426,14 @@
           "evidence": ["apps/web/src/app/admin/loading.tsx", "docs/redesign/SURFACES.md"]
         },
         "error": {
-          "status": "pending",
-          "reason": "The redesign spec identifies an error state or the admin section lacks a route-level error treatment.",
-          "evidence": ["apps/web/src/app/admin/catalog/[id]/page.tsx", "docs/redesign/SURFACES.md"]
+          "status": "partial",
+          "reason": "Staff desks share one boundary with staff copy, retry and a way back to the operations desk; detail is sanitized. Synthetic-error component test only; no authenticated session or populated desk data, not rendered in a browser.",
+          "evidence": [
+            "apps/web/src/app/admin/error.tsx",
+            "apps/web/src/app/admin/error.test.tsx",
+            "apps/web/src/app/admin/catalog/[id]/page.tsx",
+            "docs/redesign/SURFACES.md"
+          ]
         },
         "empty": {
           "status": "not-applicable",
@@ -455,9 +485,14 @@
           "evidence": ["apps/web/src/app/admin/loading.tsx", "docs/redesign/SURFACES.md"]
         },
         "error": {
-          "status": "pending",
-          "reason": "The redesign spec identifies an error state or the admin section lacks a route-level error treatment.",
-          "evidence": ["apps/web/src/app/admin/catalog/merge/page.tsx", "docs/redesign/SURFACES.md"]
+          "status": "partial",
+          "reason": "Staff desks share one boundary with staff copy, retry and a way back to the operations desk; detail is sanitized. Synthetic-error component test only; no authenticated session or populated desk data, not rendered in a browser.",
+          "evidence": [
+            "apps/web/src/app/admin/error.tsx",
+            "apps/web/src/app/admin/error.test.tsx",
+            "apps/web/src/app/admin/catalog/merge/page.tsx",
+            "docs/redesign/SURFACES.md"
+          ]
         },
         "empty": {
           "status": "not-applicable",
@@ -509,9 +544,11 @@
           "evidence": ["apps/web/src/app/admin/loading.tsx", "docs/redesign/SURFACES.md"]
         },
         "error": {
-          "status": "pending",
-          "reason": "The redesign spec identifies an error state or the admin section lacks a route-level error treatment.",
+          "status": "partial",
+          "reason": "Staff desks share one boundary with staff copy, retry and a way back to the operations desk; detail is sanitized. Synthetic-error component test only; no authenticated session or populated desk data, not rendered in a browser.",
           "evidence": [
+            "apps/web/src/app/admin/error.tsx",
+            "apps/web/src/app/admin/error.test.tsx",
             "apps/web/src/app/admin/citation-health/page.tsx",
             "docs/redesign/SURFACES.md"
           ]
@@ -566,9 +603,14 @@
           "evidence": ["apps/web/src/app/admin/loading.tsx", "docs/redesign/SURFACES.md"]
         },
         "error": {
-          "status": "pending",
-          "reason": "The redesign spec identifies an error state or the admin section lacks a route-level error treatment.",
-          "evidence": ["apps/web/src/app/admin/discovery/page.tsx", "docs/redesign/SURFACES.md"]
+          "status": "partial",
+          "reason": "Staff desks share one boundary with staff copy, retry and a way back to the operations desk; detail is sanitized. Synthetic-error component test only; no authenticated session or populated desk data, not rendered in a browser.",
+          "evidence": [
+            "apps/web/src/app/admin/error.tsx",
+            "apps/web/src/app/admin/error.test.tsx",
+            "apps/web/src/app/admin/discovery/page.tsx",
+            "docs/redesign/SURFACES.md"
+          ]
         },
         "empty": {
           "status": "not-applicable",
@@ -620,9 +662,14 @@
           "evidence": ["apps/web/src/app/admin/loading.tsx", "docs/redesign/SURFACES.md"]
         },
         "error": {
-          "status": "pending",
-          "reason": "The redesign spec identifies an error state or the admin section lacks a route-level error treatment.",
-          "evidence": ["apps/web/src/app/admin/evidence/page.tsx", "docs/redesign/SURFACES.md"]
+          "status": "partial",
+          "reason": "Staff desks share one boundary with staff copy, retry and a way back to the operations desk; detail is sanitized. Synthetic-error component test only; no authenticated session or populated desk data, not rendered in a browser.",
+          "evidence": [
+            "apps/web/src/app/admin/error.tsx",
+            "apps/web/src/app/admin/error.test.tsx",
+            "apps/web/src/app/admin/evidence/page.tsx",
+            "docs/redesign/SURFACES.md"
+          ]
         },
         "empty": {
           "status": "not-applicable",
@@ -674,9 +721,14 @@
           "evidence": ["apps/web/src/app/admin/loading.tsx", "docs/redesign/SURFACES.md"]
         },
         "error": {
-          "status": "pending",
-          "reason": "The redesign spec identifies an error state or the admin section lacks a route-level error treatment.",
-          "evidence": ["apps/web/src/app/admin/footprint/page.tsx", "docs/redesign/SURFACES.md"]
+          "status": "partial",
+          "reason": "Staff desks share one boundary with staff copy, retry and a way back to the operations desk; detail is sanitized. Synthetic-error component test only; no authenticated session or populated desk data, not rendered in a browser.",
+          "evidence": [
+            "apps/web/src/app/admin/error.tsx",
+            "apps/web/src/app/admin/error.test.tsx",
+            "apps/web/src/app/admin/footprint/page.tsx",
+            "docs/redesign/SURFACES.md"
+          ]
         },
         "empty": {
           "status": "not-applicable",
@@ -728,9 +780,14 @@
           "evidence": ["apps/web/src/app/admin/loading.tsx", "docs/redesign/SURFACES.md"]
         },
         "error": {
-          "status": "pending",
-          "reason": "The redesign spec identifies an error state or the admin section lacks a route-level error treatment.",
-          "evidence": ["apps/web/src/app/admin/graylist/page.tsx", "docs/redesign/SURFACES.md"]
+          "status": "partial",
+          "reason": "Staff desks share one boundary with staff copy, retry and a way back to the operations desk; detail is sanitized. Synthetic-error component test only; no authenticated session or populated desk data, not rendered in a browser.",
+          "evidence": [
+            "apps/web/src/app/admin/error.tsx",
+            "apps/web/src/app/admin/error.test.tsx",
+            "apps/web/src/app/admin/graylist/page.tsx",
+            "docs/redesign/SURFACES.md"
+          ]
         },
         "empty": {
           "status": "not-applicable",
@@ -782,9 +839,14 @@
           "evidence": ["apps/web/src/app/admin/loading.tsx", "docs/redesign/SURFACES.md"]
         },
         "error": {
-          "status": "pending",
-          "reason": "The redesign spec identifies an error state or the admin section lacks a route-level error treatment.",
-          "evidence": ["apps/web/src/app/admin/inbox/page.tsx", "docs/redesign/SURFACES.md"]
+          "status": "partial",
+          "reason": "Staff desks share one boundary with staff copy, retry and a way back to the operations desk; detail is sanitized. Synthetic-error component test only; no authenticated session or populated desk data, not rendered in a browser.",
+          "evidence": [
+            "apps/web/src/app/admin/error.tsx",
+            "apps/web/src/app/admin/error.test.tsx",
+            "apps/web/src/app/admin/inbox/page.tsx",
+            "docs/redesign/SURFACES.md"
+          ]
         },
         "empty": {
           "status": "not-applicable",
@@ -831,14 +893,21 @@
           "evidence": ["apps/web/src/app/admin/login/page.tsx"]
         },
         "loading": {
-          "status": "baseline",
-          "reason": "A route-segment loading component exists and is the current loading-state baseline.",
-          "evidence": ["apps/web/src/app/admin/loading.tsx", "docs/redesign/SURFACES.md"]
+          "status": "partial",
+          "reason": "The sign-in wait and the auth-not-ready, signing-in and verifying states are rendered from synthetic props with one polite status line. Component tests only; no real session, not rendered in a browser.",
+          "evidence": [
+            "apps/web/src/app/admin/login/login-panel.tsx",
+            "apps/web/src/app/admin/login/login-panel.test.tsx",
+            "apps/web/src/app/admin/login/page.tsx"
+          ]
         },
         "error": {
-          "status": "pending",
-          "reason": "The redesign spec identifies an error state or the admin section lacks a route-level error treatment.",
-          "evidence": ["apps/web/src/app/admin/login/page.tsx", "docs/redesign/SURFACES.md"]
+          "status": "partial",
+          "reason": "A failed sign-in renders one alert linked to both fields with the form re-enabled, from synthetic props. Handlers and auth checks are unchanged and not exercised. Not rendered in a browser.",
+          "evidence": [
+            "apps/web/src/app/admin/login/login-panel.tsx",
+            "apps/web/src/app/admin/login/login-panel.test.tsx"
+          ]
         },
         "empty": {
           "status": "not-applicable",
@@ -891,9 +960,14 @@
           "evidence": ["apps/web/src/app/admin/loading.tsx", "docs/redesign/SURFACES.md"]
         },
         "error": {
-          "status": "pending",
-          "reason": "The redesign spec identifies an error state or the admin section lacks a route-level error treatment.",
-          "evidence": ["apps/web/src/app/admin/queue/page.tsx", "docs/redesign/SURFACES.md"]
+          "status": "partial",
+          "reason": "Staff desks share one boundary with staff copy, retry and a way back to the operations desk; detail is sanitized. Synthetic-error component test only; no authenticated session or populated desk data, not rendered in a browser.",
+          "evidence": [
+            "apps/web/src/app/admin/error.tsx",
+            "apps/web/src/app/admin/error.test.tsx",
+            "apps/web/src/app/admin/queue/page.tsx",
+            "docs/redesign/SURFACES.md"
+          ]
         },
         "empty": {
           "status": "not-applicable",
@@ -945,9 +1019,14 @@
           "evidence": ["apps/web/src/app/admin/loading.tsx", "docs/redesign/SURFACES.md"]
         },
         "error": {
-          "status": "pending",
-          "reason": "The redesign spec identifies an error state or the admin section lacks a route-level error treatment.",
-          "evidence": ["apps/web/src/app/admin/quick-add/page.tsx", "docs/redesign/SURFACES.md"]
+          "status": "partial",
+          "reason": "Staff desks share one boundary with staff copy, retry and a way back to the operations desk; detail is sanitized. Synthetic-error component test only; no authenticated session or populated desk data, not rendered in a browser.",
+          "evidence": [
+            "apps/web/src/app/admin/error.tsx",
+            "apps/web/src/app/admin/error.test.tsx",
+            "apps/web/src/app/admin/quick-add/page.tsx",
+            "docs/redesign/SURFACES.md"
+          ]
         },
         "empty": {
           "status": "not-applicable",
@@ -999,9 +1078,14 @@
           "evidence": ["apps/web/src/app/admin/loading.tsx", "docs/redesign/SURFACES.md"]
         },
         "error": {
-          "status": "pending",
-          "reason": "The redesign spec identifies an error state or the admin section lacks a route-level error treatment.",
-          "evidence": ["apps/web/src/app/admin/releases/page.tsx", "docs/redesign/SURFACES.md"]
+          "status": "partial",
+          "reason": "Staff desks share one boundary with staff copy, retry and a way back to the operations desk; detail is sanitized. Synthetic-error component test only; no authenticated session or populated desk data, not rendered in a browser.",
+          "evidence": [
+            "apps/web/src/app/admin/error.tsx",
+            "apps/web/src/app/admin/error.test.tsx",
+            "apps/web/src/app/admin/releases/page.tsx",
+            "docs/redesign/SURFACES.md"
+          ]
         },
         "empty": {
           "status": "not-applicable",
@@ -1053,9 +1137,14 @@
           "evidence": ["apps/web/src/app/admin/loading.tsx", "docs/redesign/SURFACES.md"]
         },
         "error": {
-          "status": "pending",
-          "reason": "The redesign spec identifies an error state or the admin section lacks a route-level error treatment.",
-          "evidence": ["apps/web/src/app/admin/sources/page.tsx", "docs/redesign/SURFACES.md"]
+          "status": "partial",
+          "reason": "Staff desks share one boundary with staff copy, retry and a way back to the operations desk; detail is sanitized. Synthetic-error component test only; no authenticated session or populated desk data, not rendered in a browser.",
+          "evidence": [
+            "apps/web/src/app/admin/error.tsx",
+            "apps/web/src/app/admin/error.test.tsx",
+            "apps/web/src/app/admin/sources/page.tsx",
+            "docs/redesign/SURFACES.md"
+          ]
         },
         "empty": {
           "status": "not-applicable",
@@ -1107,9 +1196,11 @@
           "evidence": ["apps/web/src/app/admin/loading.tsx", "docs/redesign/SURFACES.md"]
         },
         "error": {
-          "status": "pending",
-          "reason": "The redesign spec identifies an error state or the admin section lacks a route-level error treatment.",
+          "status": "partial",
+          "reason": "Staff desks share one boundary with staff copy, retry and a way back to the operations desk; detail is sanitized. Synthetic-error component test only; no authenticated session or populated desk data, not rendered in a browser.",
           "evidence": [
+            "apps/web/src/app/admin/error.tsx",
+            "apps/web/src/app/admin/error.test.tsx",
             "apps/web/src/app/admin/sources/[organizationId]/page.tsx",
             "docs/redesign/SURFACES.md"
           ]
@@ -1164,9 +1255,14 @@
           "evidence": ["apps/web/src/app/admin/loading.tsx", "docs/redesign/SURFACES.md"]
         },
         "error": {
-          "status": "pending",
-          "reason": "The redesign spec identifies an error state or the admin section lacks a route-level error treatment.",
-          "evidence": ["apps/web/src/app/admin/stories/page.tsx", "docs/redesign/SURFACES.md"]
+          "status": "partial",
+          "reason": "Staff desks share one boundary with staff copy, retry and a way back to the operations desk; detail is sanitized. Synthetic-error component test only; no authenticated session or populated desk data, not rendered in a browser.",
+          "evidence": [
+            "apps/web/src/app/admin/error.tsx",
+            "apps/web/src/app/admin/error.test.tsx",
+            "apps/web/src/app/admin/stories/page.tsx",
+            "docs/redesign/SURFACES.md"
+          ]
         },
         "empty": {
           "status": "not-applicable",
@@ -1218,9 +1314,11 @@
           "evidence": ["apps/web/src/app/admin/loading.tsx", "docs/redesign/SURFACES.md"]
         },
         "error": {
-          "status": "pending",
-          "reason": "The redesign spec identifies an error state or the admin section lacks a route-level error treatment.",
+          "status": "partial",
+          "reason": "Staff desks share one boundary with staff copy, retry and a way back to the operations desk; detail is sanitized. Synthetic-error component test only; no authenticated session or populated desk data, not rendered in a browser.",
           "evidence": [
+            "apps/web/src/app/admin/error.tsx",
+            "apps/web/src/app/admin/error.test.tsx",
             "apps/web/src/app/admin/stories/[slug]/page.tsx",
             "docs/redesign/SURFACES.md"
           ]
@@ -1278,9 +1376,11 @@
           "evidence": ["apps/web/src/app/admin/loading.tsx", "docs/redesign/SURFACES.md"]
         },
         "error": {
-          "status": "pending",
-          "reason": "The redesign spec identifies an error state or the admin section lacks a route-level error treatment.",
+          "status": "partial",
+          "reason": "Staff desks share one boundary with staff copy, retry and a way back to the operations desk; detail is sanitized. Synthetic-error component test only; no authenticated session or populated desk data, not rendered in a browser.",
           "evidence": [
+            "apps/web/src/app/admin/error.tsx",
+            "apps/web/src/app/admin/error.test.tsx",
             "apps/web/src/app/admin/stories/[slug]/preview/page.tsx",
             "docs/redesign/SURFACES.md"
           ]
@@ -1338,9 +1438,11 @@
           "evidence": ["apps/web/src/app/admin/loading.tsx", "docs/redesign/SURFACES.md"]
         },
         "error": {
-          "status": "pending",
-          "reason": "The redesign spec identifies an error state or the admin section lacks a route-level error treatment.",
+          "status": "partial",
+          "reason": "Staff desks share one boundary with staff copy, retry and a way back to the operations desk; detail is sanitized. Synthetic-error component test only; no authenticated session or populated desk data, not rendered in a browser.",
           "evidence": [
+            "apps/web/src/app/admin/error.tsx",
+            "apps/web/src/app/admin/error.test.tsx",
             "apps/web/src/app/admin/stories/contributors/page.tsx",
             "docs/redesign/SURFACES.md"
           ]
@@ -1398,9 +1500,11 @@
           "evidence": ["apps/web/src/app/admin/loading.tsx", "docs/redesign/SURFACES.md"]
         },
         "error": {
-          "status": "pending",
-          "reason": "The redesign spec identifies an error state or the admin section lacks a route-level error treatment.",
+          "status": "partial",
+          "reason": "Staff desks share one boundary with staff copy, retry and a way back to the operations desk; detail is sanitized. Synthetic-error component test only; no authenticated session or populated desk data, not rendered in a browser.",
           "evidence": [
+            "apps/web/src/app/admin/error.tsx",
+            "apps/web/src/app/admin/error.test.tsx",
             "apps/web/src/app/admin/stories/review/page.tsx",
             "docs/redesign/SURFACES.md"
           ]
@@ -1458,9 +1562,11 @@
           "evidence": ["apps/web/src/app/admin/loading.tsx", "docs/redesign/SURFACES.md"]
         },
         "error": {
-          "status": "pending",
-          "reason": "The redesign spec identifies an error state or the admin section lacks a route-level error treatment.",
+          "status": "partial",
+          "reason": "Staff desks share one boundary with staff copy, retry and a way back to the operations desk; detail is sanitized. Synthetic-error component test only; no authenticated session or populated desk data, not rendered in a browser.",
           "evidence": [
+            "apps/web/src/app/admin/error.tsx",
+            "apps/web/src/app/admin/error.test.tsx",
             "apps/web/src/app/admin/stories/review/[submissionId]/page.tsx",
             "docs/redesign/SURFACES.md"
           ]
@@ -1518,9 +1624,14 @@
           "evidence": ["apps/web/src/app/admin/loading.tsx", "docs/redesign/SURFACES.md"]
         },
         "error": {
-          "status": "pending",
-          "reason": "The redesign spec identifies an error state or the admin section lacks a route-level error treatment.",
-          "evidence": ["apps/web/src/app/admin/submissions/page.tsx", "docs/redesign/SURFACES.md"]
+          "status": "partial",
+          "reason": "Staff desks share one boundary with staff copy, retry and a way back to the operations desk; detail is sanitized. Synthetic-error component test only; no authenticated session or populated desk data, not rendered in a browser.",
+          "evidence": [
+            "apps/web/src/app/admin/error.tsx",
+            "apps/web/src/app/admin/error.test.tsx",
+            "apps/web/src/app/admin/submissions/page.tsx",
+            "docs/redesign/SURFACES.md"
+          ]
         },
         "empty": {
           "status": "not-applicable",
@@ -1572,9 +1683,11 @@
           "evidence": ["apps/web/src/app/admin/loading.tsx", "docs/redesign/SURFACES.md"]
         },
         "error": {
-          "status": "pending",
-          "reason": "The redesign spec identifies an error state or the admin section lacks a route-level error treatment.",
+          "status": "partial",
+          "reason": "Staff desks share one boundary with staff copy, retry and a way back to the operations desk; detail is sanitized. Synthetic-error component test only; no authenticated session or populated desk data, not rendered in a browser.",
           "evidence": [
+            "apps/web/src/app/admin/error.tsx",
+            "apps/web/src/app/admin/error.test.tsx",
             "apps/web/src/app/admin/submissions/[id]/page.tsx",
             "docs/redesign/SURFACES.md"
           ]
@@ -1632,9 +1745,14 @@
           "evidence": ["apps/web/src/app/admin/loading.tsx", "docs/redesign/SURFACES.md"]
         },
         "error": {
-          "status": "pending",
-          "reason": "The redesign spec identifies an error state or the admin section lacks a route-level error treatment.",
-          "evidence": ["apps/web/src/app/admin/switches/page.tsx", "docs/redesign/SURFACES.md"]
+          "status": "partial",
+          "reason": "Staff desks share one boundary with staff copy, retry and a way back to the operations desk; detail is sanitized. Synthetic-error component test only; no authenticated session or populated desk data, not rendered in a browser.",
+          "evidence": [
+            "apps/web/src/app/admin/error.tsx",
+            "apps/web/src/app/admin/error.test.tsx",
+            "apps/web/src/app/admin/switches/page.tsx",
+            "docs/redesign/SURFACES.md"
+          ]
         },
         "empty": {
           "status": "not-applicable",
@@ -1686,9 +1804,14 @@
           "evidence": ["apps/web/src/app/admin/loading.tsx", "docs/redesign/SURFACES.md"]
         },
         "error": {
-          "status": "pending",
-          "reason": "The redesign spec identifies an error state or the admin section lacks a route-level error treatment.",
-          "evidence": ["apps/web/src/app/admin/work/page.tsx", "docs/redesign/SURFACES.md"]
+          "status": "partial",
+          "reason": "Staff desks share one boundary with staff copy, retry and a way back to the operations desk; detail is sanitized. Synthetic-error component test only; no authenticated session or populated desk data, not rendered in a browser.",
+          "evidence": [
+            "apps/web/src/app/admin/error.tsx",
+            "apps/web/src/app/admin/error.test.tsx",
+            "apps/web/src/app/admin/work/page.tsx",
+            "docs/redesign/SURFACES.md"
+          ]
         },
         "empty": {
           "status": "not-applicable",
@@ -1740,9 +1863,14 @@
           "evidence": ["apps/web/src/app/admin/loading.tsx", "docs/redesign/SURFACES.md"]
         },
         "error": {
-          "status": "pending",
-          "reason": "The redesign spec identifies an error state or the admin section lacks a route-level error treatment.",
-          "evidence": ["apps/web/src/app/admin/work/[id]/page.tsx", "docs/redesign/SURFACES.md"]
+          "status": "partial",
+          "reason": "Staff desks share one boundary with staff copy, retry and a way back to the operations desk; detail is sanitized. Synthetic-error component test only; no authenticated session or populated desk data, not rendered in a browser.",
+          "evidence": [
+            "apps/web/src/app/admin/error.tsx",
+            "apps/web/src/app/admin/error.test.tsx",
+            "apps/web/src/app/admin/work/[id]/page.tsx",
+            "docs/redesign/SURFACES.md"
+          ]
         },
         "empty": {
           "status": "not-applicable",
@@ -2236,9 +2364,13 @@
           "evidence": ["apps/web/src/app/entity/[id]/loading.tsx", "docs/redesign/SURFACES.md"]
         },
         "error": {
-          "status": "pending",
-          "reason": "The redesign spec identifies an error state or the admin section lacks a route-level error treatment.",
-          "evidence": ["apps/web/src/app/entity/[id]/page.tsx", "docs/redesign/SURFACES.md"]
+          "status": "partial",
+          "reason": "Unknown ids call notFound and merged ids forward to the survivor; other failures inherit the tested public boundary with sanitized detail. Not rendered or visually accepted.",
+          "evidence": [
+            "apps/web/src/app/entity/[id]/page.tsx",
+            "apps/web/src/app/error.tsx",
+            "apps/web/src/app/error.test.ts"
+          ]
         },
         "empty": {
           "status": "not-applicable",
@@ -2555,14 +2687,18 @@
           ]
         },
         "loading": {
-          "status": "pending",
-          "reason": "The redesign surface spec calls for route loading treatment; no matching route-segment loading component is present.",
-          "evidence": ["apps/web/src/app/invention/[slug]/page.tsx", "docs/redesign/SURFACES.md"]
+          "status": "baseline",
+          "reason": "The page is dynamic and awaits the record; a route-segment loading boundary reuses the record skeleton and announces the wait once. Not rendered or visually accepted.",
+          "evidence": [
+            "apps/web/src/app/invention/[slug]/loading.tsx",
+            "apps/web/src/app/entity/[id]/loading.tsx",
+            "apps/web/src/app/public-route-loading.test.tsx"
+          ]
         },
         "error": {
-          "status": "pending",
-          "reason": "The redesign spec identifies an error state or the admin section lacks a route-level error treatment.",
-          "evidence": ["apps/web/src/app/invention/[slug]/page.tsx", "docs/redesign/SURFACES.md"]
+          "status": "partial",
+          "reason": "No route-level error file; the route inherits the tested public boundary with sanitized detail. Not rendered or visually accepted.",
+          "evidence": ["apps/web/src/app/error.tsx", "apps/web/src/app/error.test.ts"]
         },
         "empty": {
           "status": "not-applicable",
@@ -2989,14 +3125,18 @@
           ]
         },
         "loading": {
-          "status": "pending",
-          "reason": "The redesign surface spec calls for route loading treatment; no matching route-segment loading component is present.",
-          "evidence": ["apps/web/src/app/place/[slug]/page.tsx", "docs/redesign/SURFACES.md"]
+          "status": "baseline",
+          "reason": "The page is dynamic and awaits the record; a route-segment loading boundary reuses the record skeleton and announces the wait once. Not rendered or visually accepted.",
+          "evidence": [
+            "apps/web/src/app/place/[slug]/loading.tsx",
+            "apps/web/src/app/entity/[id]/loading.tsx",
+            "apps/web/src/app/public-route-loading.test.tsx"
+          ]
         },
         "error": {
-          "status": "pending",
-          "reason": "The redesign spec identifies an error state or the admin section lacks a route-level error treatment.",
-          "evidence": ["apps/web/src/app/place/[slug]/page.tsx", "docs/redesign/SURFACES.md"]
+          "status": "partial",
+          "reason": "No route-level error file; the route inherits the tested public boundary with sanitized detail. Not rendered or visually accepted.",
+          "evidence": ["apps/web/src/app/error.tsx", "apps/web/src/app/error.test.ts"]
         },
         "empty": {
           "status": "not-applicable",
@@ -3104,19 +3244,27 @@
           ]
         },
         "loading": {
-          "status": "pending",
-          "reason": "The redesign surface spec calls for route loading treatment; no matching route-segment loading component is present.",
-          "evidence": ["apps/web/src/app/records/page.tsx", "docs/redesign/SURFACES.md"]
+          "status": "baseline",
+          "reason": "The page awaits the catalog read; a route-segment loading boundary now announces the wait once with hidden placeholders and no invented count. Not rendered or visually accepted.",
+          "evidence": [
+            "apps/web/src/app/records/loading.tsx",
+            "apps/web/src/app/public-route-loading.test.tsx",
+            "apps/web/src/components/room/catalog-loading.tsx"
+          ]
         },
         "error": {
-          "status": "pending",
-          "reason": "The redesign spec identifies an error state or the admin section lacks a route-level error treatment.",
-          "evidence": ["apps/web/src/app/records/page.tsx", "docs/redesign/SURFACES.md"]
+          "status": "partial",
+          "reason": "No route-level error file; the route inherits the tested public boundary with sanitized detail. Unresolved collections and unreadable ranges are stated in-page. Not rendered or visually accepted.",
+          "evidence": [
+            "apps/web/src/app/error.tsx",
+            "apps/web/src/app/error.test.ts",
+            "apps/web/src/app/records/RecordsIndex.tsx"
+          ]
         },
         "empty": {
-          "status": "pending",
-          "reason": "The redesign spec identifies absent chapter, offline catalog, empty result, or no-data treatment for this surface.",
-          "evidence": ["apps/web/src/app/records/page.tsx", "docs/redesign/SURFACES.md"]
+          "status": "partial",
+          "reason": "The shared EmptyList states no match for a narrowing, a story with no linked records, and an empty release as our fault, never as absent history. Not rendered or visually accepted.",
+          "evidence": ["apps/web/src/app/records/RecordsIndex.tsx"]
         },
         "selected": {
           "status": "partial",

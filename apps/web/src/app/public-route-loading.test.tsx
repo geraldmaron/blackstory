@@ -18,6 +18,9 @@ import LawEntryLoading from './law/[slug]/loading';
 import StoriesLoading from './stories/loading';
 import StoryLoading from './stories/[slug]/loading';
 import MosaicCreditsLoading from './stories/mosaic-credits/loading';
+import RecordsLoading from './records/loading';
+import PlaceLoading from './place/[slug]/loading';
+import InventionLoading from './invention/[slug]/loading';
 
 void React;
 
@@ -40,6 +43,15 @@ const LOADING_BOUNDARIES = [
     dir: 'stories/mosaic-credits',
     Loading: MosaicCreditsLoading,
     label: 'Opening image credits…',
+  },
+  { route: '/records', dir: 'records', Loading: RecordsLoading, label: 'Opening records…' },
+  // Place and invention render the shared record room, so they reuse the record skeleton.
+  { route: '/place/[slug]', dir: 'place/[slug]', Loading: PlaceLoading, label: 'Opening record' },
+  {
+    route: '/invention/[slug]',
+    dir: 'invention/[slug]',
+    Loading: InventionLoading,
+    label: 'Opening record',
   },
 ] as const;
 

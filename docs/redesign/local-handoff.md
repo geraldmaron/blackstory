@@ -298,6 +298,25 @@ is a leftover with no tests; root should delete it.
 - Gates unchanged: mosaic manifest author and licence data; stored schema or records need final
   sign-off; original-owner canonical merge and prune; 31 staff surfaces protected.
 
+### Remaining-state slice (Claude Sonnet 5.5, isolated clone, base 50060223)
+
+Classification with per-route acceptance is in `.task-tools/migration-classification.md`. Real public gaps
+found and fixed: `/records`, `/place/[slug]` and `/invention/[slug]` awaited data with no `loading.tsx`.
+Staff gap fixed: all 29 staff desks inherited the public error boundary (public copy, "Back to home");
+`app/admin/error.tsx` now serves them. Auth entry: `admin/login/login-panel.tsx` extracts presentation only
+(live status, alert linked to fields, busy and verifying states, suspense fallback announced); `LoginClient`
+handlers, `enterConsole`, `/admin/api/auth/me` check and the POST form are unchanged. Inventory moves the
+touched states to baseline or partial (records error/empty and entity error as inherited or in-page evidence);
+the guard passes at 66 routes / 6 shared surfaces. Checks through the wrapper: `staff` 12/12, `public` 125/125
+(was 122; the three new loading cases), `types` and `inventory` pass. `ui.tsx` and `login-panel.tsx` gained the
+repo's `import React` plus `void React` after a first `staff` run failed 3 of 12. Root's 32px touch-target
+finding is addressed in CSS only (`admin.css` login scope, `management.css` coarse-pointer inputs); it is the
+dense `pointer: fine` rule, so it is not measured in a browser. Nothing rendered.
+
+Still open: `/lives/explorer` and `/data` loading and error, `/`, `/explore` error and empty states, a shared
+staff list empty state (two ad hoc empties today), per-desk staff selected/focus. Populated protected
+acceptance needs a real staff session and data. Owner release is still needed only for canonical merge and prune.
+
 ### Final integration checkpoint
 
 The independent public implementation pass is integrated and verified. Frozen web aggregate: 2,929 tests, 2,921 pass, eight skipped, zero failures. TypeScript, scoped ESLint, eight inventory guard tests, and the 66-route/six-shared-surface manifest check pass. Final source and log evidence is in rendered-acceptance.md. Root removed an empty task-owned test stub, corrected the global fallback's canvas token, and removed raw client error logging. The new global and inherited boundaries keep error details out of rendered output.
@@ -305,3 +324,11 @@ The independent public implementation pass is integrated and verified. Frozen we
 The mobile When-drawer collision is browser-verified fixed at 375px light: controls hide while the compact collection drawer is open and restore on close. The invalid-period recovery also returns to the same five-record story collection. Static public pages retain inherited error-boundary coverage; only their catalog loading state is not applicable. Inventory route totals are 19 partial, 16 baseline and 31 pending; all pending routes are staff or authentication-entry surfaces. Partial/baseline are implementation dispositions and supporting evidence, not blanket visual acceptance.
 
 Next required coordination action: identify or obtain release from the original Claude owner of `/Users/geralddagher/Developer/Projects/blackstory`, branch `redesign/ux-audit-2026-10`, before canonical reconciliation or branch pruning. Supported discovery did not establish an owner; no private session access or takeover occurred. The isolated candidate remains reviewable on port3103. No push, deploy, canonical merge, branch deletion or stored data change has been attempted. Exact immutable copied-tile author/licence metadata remains unavailable; any schema or stored-record remedy requires a scoped proposal, adversarial review, isolated validation, impact/rollback, then final user sign-off before application.
+
+### Remaining UI slice A — integration checkpoint
+
+Claude execution receipt: session1473cad3-638d-4b6b-8d53-727ea3c1d752, verified claude-sonnet-5-5, exit0. Added Records/place/invention loading, staff-specific error recovery, and a presentational sign-in panel with synthetic idle/not-ready/busy/verifying/error coverage. Auth handlers and checks were reviewed unchanged; form method remains POST. Twelve staff/auth tests,125public tests, types and inventory passed in the isolated worker; scoped auth ESLint and12staff/auth tests passed after integration.
+
+Actual browser found the extracted BaseUI panel needed an explicit client boundary when imported by the server Suspense fallback; coordinator added it and verified successful live rendering. At375px light, password, reveal and submit targets now measure44px; email's inner input is still40px despite its44px wrapper, so that remaining target needs correction. No credentials were entered and no sign-in was submitted. The existing zero-match named map collection also renders honest scope with Filters/one-filter recovery; do not infer missing empty UI from stale pending labels.
+
+Migration classification is saved in migration-classification.md. Remaining public failure/empty cases need focused source confirmation, then genuine fixes; staff empty/selected patterns need representative assessment. No aggregate was repeated during this slice. Populated protected acceptance, copied-tile credit data and canonical owner release remain distinct gates.

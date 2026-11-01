@@ -16,13 +16,12 @@ import {
   type FormEvent,
 } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { Input } from 'baseui/input';
-import { Button } from 'baseui/button';
 import { useAdminAuth } from '../../../admin/auth/AdminAuthProvider';
 import {
   ADMIN_NETWORK_FAILURE_MESSAGE,
   isNetworkFailureMessage,
 } from '../../../admin/auth/network-error';
+import { LoginPanel } from './login-panel';
 import { safeAdminNextPath } from './safe-admin-next-path';
 
 const NOT_PROVISIONED =
@@ -106,73 +105,18 @@ export default function LoginClient() {
   }
 
   return (
-    <main className="admin-login" id="main">
-      <section className="admin-login__panel" aria-labelledby="admin-login-title">
-        <p className="admin-login__eyebrow">Administration</p>
-        <h1 className="admin-login__title" id="admin-login-title">
-          Sign in
-        </h1>
-        <p className="admin-login__lede">
-          Use your staff account to review research and manage releases.
-        </p>
-
-        {error ? (
-          <p className="admin-login__alert" role="alert">
-            {error}
-          </p>
-        ) : null}
-
-        {/* POST, never the default GET: if a native submit ever fires before hydration, the
-            password goes in a request body to this origin, not into a URL, history or logs. */}
-        <form className="admin-login__form" method="post" onSubmit={onSubmit} noValidate>
-          <div className="admin-login__field">
-            <label className="admin-login__label" htmlFor="admin-email">
-              Email
-            </label>
-            <Input
-              id="admin-email"
-              inputRef={emailRef}
-
-              name="email"
-              type="email"
-              autoComplete="username"
-              required
-              value={email}
-              onChange={(event) => setEmail(event.target.value)}
-              disabled={busy || Boolean(user)}
-            />
-          </div>
-          <div className="admin-login__field">
-            <label className="admin-login__label" htmlFor="admin-password">
-              Password
-            </label>
-            <Input
-              id="admin-password"
-              inputRef={passwordRef}
-
-              name="password"
-              type="password"
-              autoComplete="current-password"
-              required
-              overrides={{ Input: { props: { minLength: 8 } } }}
-              value={password}
-              onChange={(event) => setPassword(event.target.value)}
-              disabled={busy || Boolean(user)}
-            />
-          </div>
-          <div className="admin-login__actions">
-            {/* Gated on `ready` as well: the fields are live before the auth client is, but a
-                sign-in cannot run until it is. */}
-            <Button
-              type="submit"
-
-              disabled={busy || !ready || Boolean(user) || !email || !password}
-            >
-              {busy ? 'Signing in…' : 'Sign in'}
-            </Button>
-          </div>
-        </form>
-      </section>
-    </main>
+    <LoginPanel
+      email={email}
+      password={password}
+      error={error}
+      busy={busy}
+      ready={ready}
+      signedIn={Boolean(user)}
+      emailRef={emailRef}
+      passwordRef={passwordRef}
+      onEmailChange={setEmail}
+      onPasswordChange={setPassword}
+      onSubmit={onSubmit}
+    />
   );
 }

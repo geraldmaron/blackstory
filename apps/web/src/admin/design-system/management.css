@@ -244,6 +244,10 @@
   .admin-base-shell [data-baseweb='checkbox'] {
     min-height: 44px;
   }
+  .admin-base-shell [data-baseweb='input'],
+  .admin-base-shell [data-baseweb='select'] > div {
+    min-height: 44px;
+  }
 }
 .admin-base-title {
   margin: 4px 0 8px;
