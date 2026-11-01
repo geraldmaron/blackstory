@@ -167,6 +167,7 @@ test('a slash-terminated prefix route and a slash on an exact route both redirec
 test('record arrival retains collection query and bibliography order; catalog cache version survives', () => {
   assert.equal(q.normalizeQueryString('/place/zulu-school', sp('from=map&q=Shared+needle&kind=school&sort=name')), 'from=map&kind=school&q=Shared+needle&sort=name');
   assert.equal(q.normalizeQueryString('/atlas/catalog', sp('v=3&utm_source=test')), 'v=3');
+  assert.equal(q.normalizeQueryString('/atlas/catalog', sp('v=4&utm_source=test')), 'v=4');
   assert.equal(q.normalizeQueryString('/atlas/catalog', sp('v=arbitrary')), '');
 });
 

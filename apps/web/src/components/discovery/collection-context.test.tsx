@@ -115,7 +115,22 @@ describe('CollectionContext integrations', () => {
   it('renders in the Records room with its own model hrefs and counts', () => {
     const model = {
       query: { ...EMPTY_RECORDS_QUERY, q: 'school', sort: 'era', page: 2 },
-      rows: [],
+      rows: [
+        {
+          id: 'unmapped-school',
+          href: '/entity/unmapped-school',
+          name: 'Unmapped School',
+          place: 'Place not recorded',
+          era: '1920s',
+          kind: 'school',
+          kindFamily: 'place',
+          mapTone: undefined,
+          grade: null,
+          gradeDescription: 'Unrated',
+          confidenceTier: 'unrated',
+          mappable: false,
+        },
+      ],
       totalAll: 4000,
       totalMatched: 30,
       mappableMatched: 25,
@@ -137,6 +152,7 @@ describe('CollectionContext integrations', () => {
     );
     assert.match(markup, /class="ds-collection ds-collection--flat"/);
     assert.match(markup, /30 records in this collection/);
+    assert.match(markup, /Not on the map/);
     assert.match(markup, /25 can be placed on the map; 5 have no mapped location/);
     // The active Records link keeps the current page of the same collection.
     assert.match(

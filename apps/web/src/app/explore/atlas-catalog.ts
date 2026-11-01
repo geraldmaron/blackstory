@@ -1,4 +1,8 @@
-import { buildCollectionFacts, type RecordsCatalogInput } from '../../lib/records/build-records-index';
+import { encodeCollectionCatalog } from '../../lib/discovery/collection-catalog-wire';
+import {
+  buildCollectionFacts,
+  type RecordsCatalogInput,
+} from '../../lib/records/build-records-index';
 /**
  * The Explore catalog: the release-wide, reader-independent half of the Explore view model, served
  * by `GET /atlas/catalog` and fetched once by the client.
@@ -46,7 +50,7 @@ export function buildAtlasCatalogPayload(
     source.featureCollection.features.map((feature) => feature.properties.entityId),
   );
   return {
-    collectionFacts: buildCollectionFacts(collectionCatalog),
+    collectionFacts: buildCollectionFacts(collectionCatalog, mappedEntityIds),
     schemaVersion: 1,
     releaseId: source.releaseId,
     generatedAt: source.generatedAt,
@@ -65,26 +69,45 @@ export function buildAtlasCatalogPayload(
  * CDN misses across regions builds and stringifies the 6 MB once per instance per TTL, not once
  * per miss. A WeakMap so a retired catalog takes its payload with it.
  */
-const payloadByCatalog = new WeakMap<readonly PublicEntityView[], WeakMap<RecordsCatalogInput, Promise<string>>>();
+export type AtlasCatalogTransport = 'raw' | 'story-references';
+
+const payloadByCatalog = new WeakMap<
+  readonly PublicEntityView[],
+  WeakMap<RecordsCatalogInput, Map<AtlasCatalogTransport, Promise<string>>>
+>();
 
 export async function buildAtlasCatalogJson(
   entities: readonly PublicEntityView[] = listPublicEntities(),
   dataSource: PublicReadSource = 'none',
   collectionCatalog: RecordsCatalogInput = entities,
+  transport: AtlasCatalogTransport = 'raw',
 ): Promise<string> {
   const existing = payloadByCatalog.get(entities);
-  const byBibliography = existing ?? new WeakMap<RecordsCatalogInput, Promise<string>>();
+  const byBibliography =
+    existing ?? new WeakMap<RecordsCatalogInput, Map<AtlasCatalogTransport, Promise<string>>>();
   if (!existing) payloadByCatalog.set(entities, byBibliography);
-  const cached = byBibliography.get(collectionCatalog);
+  const variants =
+    byBibliography.get(collectionCatalog) ?? new Map<AtlasCatalogTransport, Promise<string>>();
+  byBibliography.set(collectionCatalog, variants);
+  const cached = variants.get(transport);
   if (cached) return cached;
   const pending = (async () => {
     const [artifact, citesEdge] = await Promise.all([
       resolveHistoryGraphReleaseArtifact(entities),
       resolveCitesEdgeIndex(),
     ]);
-    return JSON.stringify(buildAtlasCatalogPayload(entities, artifact, citesEdge, dataSource, collectionCatalog));
+    const payload = buildAtlasCatalogPayload(
+      entities,
+      artifact,
+      citesEdge,
+      dataSource,
+      collectionCatalog,
+    );
+    return JSON.stringify(
+      transport === 'story-references' ? encodeCollectionCatalog(payload) : payload,
+    );
   })();
-  byBibliography.set(collectionCatalog, pending);
-  pending.catch(() => byBibliography.delete(collectionCatalog));
+  variants.set(transport, pending);
+  pending.catch(() => variants.delete(transport));
   return pending;
 }

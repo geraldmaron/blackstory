@@ -1110,6 +1110,16 @@ a.ds-room-chip {
   letter-spacing: -0.006em;
 }
 
+/* Availability belongs to the row: a match remains readable even without a public pin. */
+.ds-room-idx__note {
+  display: block;
+  margin-top: var(--ds-space-1);
+  color: var(--ds-ink-muted);
+  font-size: var(--ds-text-caption);
+  font-weight: 400;
+  letter-spacing: 0;
+}
+
 .ds-room-idx__place,
 .ds-room-idx__era {
   overflow: hidden;

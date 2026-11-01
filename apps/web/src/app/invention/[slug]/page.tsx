@@ -19,6 +19,11 @@ import { notFound, permanentRedirect } from 'next/navigation';
 import { EntityRecordRoom } from '../../entity/[id]/EntityRecordRoom';
 import { familyForKind } from '../../record-first-paint';
 import {
+  discoveryFromSearchParams,
+  recordArrivalQuery,
+  withQuery,
+} from '../../../lib/discovery/discovery-state';
+import {
   isResolvablePlaceSlug,
   resolvePlaceSlugFromSearchIndex,
 } from '../../../lib/place/place-slug';
@@ -28,6 +33,7 @@ export const dynamic = 'force-dynamic';
 
 type InventionPageProps = {
   readonly params: Promise<{ slug: string }>;
+  readonly searchParams?: Promise<Record<string, string | string[] | undefined>>;
 };
 
 /** Resolve a public invention slug to its release entity, or nothing. */
@@ -48,14 +54,15 @@ export async function generateMetadata({ params }: InventionPageProps): Promise<
   return { title: entity.displayName, description: entity.summary };
 }
 
-export default async function InventionPage({ params }: InventionPageProps) {
+export default async function InventionPage({ params, searchParams }: InventionPageProps) {
   const { slug } = await params;
+  const rawArrival = (await searchParams) ?? {};
   const entity = await resolveInventionSlug(slug);
   if (!entity) {
     notFound();
   }
   if (familyForKind(entity.kind) !== 'invention') {
-    permanentRedirect(`/place/${slug}`);
+    permanentRedirect(withQuery(`/place/${slug}`, recordArrivalQuery(rawArrival)));
   }
-  return EntityRecordRoom({ entity });
+  return EntityRecordRoom({ entity, arrival: discoveryFromSearchParams(rawArrival) });
 }

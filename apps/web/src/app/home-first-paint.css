@@ -16,59 +16,6 @@
   --record-shell-w: calc(var(--room-doc-w) - 2 * var(--ds-gutter));
 }
 
-/*
- * The investigation return. The reader may have arrived from a narrowed map or list; this bar is
- * the way back into that work, with its narrowing, and it is the only place on the page that says
- * so. It sits above the identity block and apart from the archive navigation (the bar's home,
- * the rooms and the off-ramp at the foot), which leave the investigation rather than resume it.
- */
-.ds-record-return {
-  box-sizing: border-box;
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: var(--ds-space-1) var(--ds-space-5);
-  padding: var(--ds-space-2) var(--record-shell-pad);
-  background: var(--ds-canvas);
-  border-bottom: var(--ds-border-width) solid var(--ds-rule);
-}
-
-.ds-record-return__label {
-  font-family: var(--ds-font-mono);
-  font-size: var(--ds-text-micro);
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: var(--ds-ink-muted);
-}
-
-.ds-record-return__link {
-  display: inline-flex;
-  align-items: center;
-  min-height: 44px;
-  color: var(--ds-accent-text);
-  font-family: var(--ds-font-sans);
-  font-size: var(--ds-text-body-sm);
-  font-weight: 550;
-  text-decoration: underline;
-  text-underline-offset: 0.18em;
-}
-
-.ds-record-return__link:hover {
-  color: var(--ds-ink);
-}
-
-.ds-record-return__link:focus-visible {
-  outline: var(--ds-focus-width) solid var(--ds-focus-ring);
-  outline-offset: var(--ds-focus-offset);
-}
-
-.ds-record-return__position {
-  font-family: var(--ds-font-mono);
-  font-size: var(--ds-text-caption);
-  letter-spacing: 0.02em;
-  color: var(--ds-ink-muted);
-}
-
 /* The record's own place strings, set under the name as the first fact about it. */
 .ds-record-mast__where {
   margin: var(--ds-space-3) 0 0;
@@ -160,7 +107,7 @@
   position: relative;
   width: 100%;
   height: auto;
-  aspect-ratio: 960 / 500;
+  aspect-ratio: 1;
   margin: 0;
   border: 0;
   border-radius: 0;
@@ -174,6 +121,11 @@
 }
 
 @media (max-width: 47.9375rem), (max-height: 34.9375rem) {
+  .ds-home-first-paint .ds-record-mast__map .ds-embed-map,
+  .ds-home-first-paint .ds-record-mast__map .ds-locator:not(.ds-embed-map__standin) {
+    aspect-ratio: 960 / 500;
+  }
+
   .ds-home-first-paint .ds-record-mast[data-media='map'] {
     grid-template-columns: minmax(0, 1fr);
     row-gap: var(--ds-space-6);

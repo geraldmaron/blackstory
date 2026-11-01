@@ -14,6 +14,7 @@
 import { decadeParamToEra } from '@repo/public-contracts/discovery';
 
 import { historyKindToRecordsKind } from '../history/filters';
+import { parseRecordsQuery } from '../records/records-query';
 
 export type RawHistoryRedirectParams = Readonly<
   Record<string, string | readonly string[] | undefined>
@@ -57,6 +58,12 @@ export function mapHistoryQueryToRecordsHref(raw: RawHistoryRedirectParams): str
   const era =
     explicitEra && explicitEra !== 'all' ? explicitEra : decadeParamToEra(firstValue(raw.decade));
   if (era) params.set('era', era);
+
+  // Preserve supported collection constraints and bibliography order across old addresses.
+  const collection = parseRecordsQuery(raw);
+  if (collection.state) params.set('state', collection.state);
+  if (collection.evidence) params.set('evidence', collection.evidence);
+  if (collection.sort !== 'discovery') params.set('sort', collection.sort);
 
   const qs = params.toString();
   return qs ? `/records?${qs}` : '/records';

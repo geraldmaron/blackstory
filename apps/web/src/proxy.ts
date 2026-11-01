@@ -167,7 +167,7 @@ async function resolveProxyResponse(request: NextRequest): Promise<NextResponse>
  * `/records` was unmatched until 2026-09-29, so any query rendered afresh at the origin; crawlers
  * made it the largest source of Cloudflare misses. It now canonicalizes through records-query.ts.
  * `/` is the Door and has an empty allowlist, so leftover Explore params 308 away instead of
- * fragmenting the Cloudflare HTML cache. `/atlas/catalog` accepts only the finite `v=3`
+ * fragmenting the Cloudflare HTML cache. `/atlas/catalog` accepts only the finite `v=3`/`v=4`
  * cache version; `/sitemap.xml` takes no query. Cache-busting `?x=` drops on both.
  * Search/refine/geocode APIs stay out so their
  * contracts are not stripped.

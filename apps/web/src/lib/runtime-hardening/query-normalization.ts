@@ -85,7 +85,7 @@ export function getAllowedQueryParamsForPath(pathname: string): readonly string[
   }
   // `/invention/` is the same reading room as `/place/` and carries the same DiscoveryState,
   // so it must keep the same arrival keys or the edge strips return state before the page runs.
-  if (path.startsWith('/place/') || path.startsWith('/invention/')) {
+  if (path.startsWith('/place/') || path.startsWith('/invention/') || path.startsWith('/entity/')) {
     return PLACE_PAGE_PARAM_ALLOWLIST;
   }
   return [];
@@ -129,7 +129,10 @@ export function normalizeQueryString(
 ): string {
   const path = normalizePathname(pathname);
   const bag = allowlistedBag(path, readParamBag(input));
-  if (path === '/atlas/catalog') return firstString(bag.v) === '3' ? 'v=3' : '';
+  if (path === '/atlas/catalog') {
+    const version = firstString(bag.v);
+    return version === '3' || version === '4' ? `v=${version}` : '';
+  }
 
   if (EXPLORE_SURFACE_PATHS.has(path)) {
     return buildExploreSearchParams(parseExploreSearchParams(bag));

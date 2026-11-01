@@ -35,6 +35,8 @@ export type IndexFilter = {
 export type IndexRow = {
   readonly href: string;
   readonly name: string;
+  /** A source-backed availability note, such as an unmapped record. */
+  readonly note?: string;
   readonly place: string;
   readonly era: string;
   /** Kind glyph, drawn by the caller so the index does not own an icon registry. */
@@ -111,7 +113,10 @@ export function HairlineIndex({
               <span className="ds-room-idx__glyph" aria-hidden="true">
                 {row.glyph}
               </span>
-              <span className="ds-room-idx__name">{row.name}</span>
+              <span className="ds-room-idx__name" title={row.name}>
+                {row.name}
+                {row.note ? <span className="ds-room-idx__note">{row.note}</span> : null}
+              </span>
               {/* The place column clips with an ellipsis at this measure, and the clipped part is
                   usually the part that identifies the site ("Broward Health Medical Center (for..."),
                   so the full string is available on hover and to assistive tech. */}

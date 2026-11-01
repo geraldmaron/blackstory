@@ -1,4 +1,7 @@
-import { buildCollectionFacts, type RecordsCatalogInput } from '../../lib/records/build-records-index';
+import {
+  buildCollectionFacts,
+  type RecordsCatalogInput,
+} from '../../lib/records/build-records-index';
 import type { CollectionFacts } from '../../lib/records/records-matching';
 import { matchExploreCollection, drawableCollection } from '../../lib/discovery/explore-collection';
 /**
@@ -178,7 +181,10 @@ export function buildExploreViewModel(
   const viewState = parseExploreSearchParams(raw);
   const source = exploreMapSourceFor(entities);
   const allFeatures = source.featureCollection.features;
-  const collectionFacts = buildCollectionFacts(entities);
+  const collectionFacts = buildCollectionFacts(
+    entities,
+    new Set(allFeatures.map((feature) => feature.properties.entityId)),
+  );
   const matches = matchExploreCollection(collectionFacts, viewState);
   const filteredFeatures = drawableCollection(allFeatures, matches);
   const densityLevels = buildStateDensityLevels(source.stateAggregates);
@@ -236,7 +242,10 @@ export function buildAtlasShell(
   const viewState = parseExploreSearchParams(raw);
   const source = exploreMapSourceFor(entities);
   const allFeatures = source.featureCollection.features;
-  const collectionFacts = buildCollectionFacts(collectionCatalog);
+  const collectionFacts = buildCollectionFacts(
+    collectionCatalog,
+    new Set((firstPaintFeatures ?? allFeatures).map((feature) => feature.properties.entityId)),
+  );
   const matches = matchExploreCollection(collectionFacts, viewState);
   const filteredFeatures = drawableCollection(allFeatures, matches);
   return {

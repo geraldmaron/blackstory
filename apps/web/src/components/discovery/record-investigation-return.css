@@ -1,0 +1,55 @@
+/*
+ * The investigation return. The reader may have arrived from a narrowed map or list; this bar is
+ * the way back into that work, with its narrowing, and it is the only place on the page that says
+ * so. It sits above the identity block and apart from the archive navigation (the bar's home,
+ * the rooms and the off-ramp at the foot), which leave the investigation rather than resume it.
+ *
+ * Shared by every public record family (place, person, invention). `--record-shell-pad` comes
+ * from the record shell in `app/record-page.css`.
+ */
+.ds-record-return {
+  box-sizing: border-box;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--ds-space-1) var(--ds-space-5);
+  padding: var(--ds-space-2) var(--record-shell-pad);
+  background: var(--ds-canvas);
+  border-bottom: var(--ds-border-width) solid var(--ds-rule);
+}
+
+.ds-record-return__label {
+  font-family: var(--ds-font-mono);
+  font-size: var(--ds-text-micro);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ds-ink-muted);
+}
+
+.ds-record-return__link {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  color: var(--ds-accent-text);
+  font-family: var(--ds-font-sans);
+  font-size: var(--ds-text-body-sm);
+  font-weight: 550;
+  text-decoration: underline;
+  text-underline-offset: 0.18em;
+}
+
+.ds-record-return__link:hover {
+  color: var(--ds-ink);
+}
+
+.ds-record-return__link:focus-visible {
+  outline: var(--ds-focus-width) solid var(--ds-focus-ring);
+  outline-offset: var(--ds-focus-offset);
+}
+
+.ds-record-return__position {
+  font-family: var(--ds-font-mono);
+  font-size: var(--ds-text-caption);
+  letter-spacing: 0.02em;
+  color: var(--ds-ink-muted);
+}

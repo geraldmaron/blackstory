@@ -15,6 +15,7 @@
  */
 'use client';
 
+import { decodeCollectionCatalog } from '../../lib/discovery/collection-catalog-wire';
 import React, { useEffect, useMemo, useState } from 'react';
 import { Notice } from '@repo/ui';
 import { hasMaintenanceBypassHint } from '../../lib/maintenance/maintenance-bypass-hint';
@@ -45,15 +46,7 @@ async function fetchAtlasCatalog(url: string, signal: AbortSignal): Promise<Atla
   if (!response.ok) {
     throw new Error(`atlas catalog ${response.status}`);
   }
-  const payload = (await response.json()) as AtlasCatalogPayload;
-  if (
-    payload.schemaVersion !== 1 ||
-    !payload.source?.featureCollection ||
-    !Array.isArray(payload.collectionFacts) ||
-    payload.collectionFacts.some((fact) => typeof fact.mappable !== 'boolean')
-  ) {
-    throw new Error('atlas catalog: unexpected shape');
-  }
+  const payload = decodeCollectionCatalog(await response.json());
   lastCatalog = { url, payload };
   return payload;
 }

@@ -2195,9 +2195,13 @@
       "status": "partial",
       "states": {
         "default": {
-          "status": "baseline",
-          "reason": "The route source is the current rendering or redirect anchor; this status records a baseline and does not assert visual verification.",
-          "evidence": ["apps/web/src/app/entity/[id]/page.tsx"]
+          "status": "partial",
+          "reason": "Shared investigation return, query-preserving record family redirects and existing evidence/identity templates are integrated. Rendered sample flows verified; other lifecycle and family variants remain tracked.",
+          "evidence": [
+            "apps/web/src/components/discovery/record-investigation-return.tsx",
+            "apps/web/src/components/discovery/record-investigation-return.css",
+            "apps/web/src/lib/discovery/discovery-state.test.ts"
+          ]
         },
         "loading": {
           "status": "baseline",
@@ -2227,7 +2231,9 @@
       },
       "componentRefs": [
         "apps/web/src/app/entity/[id]/page.tsx",
-        "apps/web/src/components/SiteShell.tsx"
+        "apps/web/src/components/SiteShell.tsx",
+        "apps/web/src/components/discovery/record-investigation-return.tsx",
+        "apps/web/src/components/discovery/record-investigation-return.css"
       ],
       "evidence": [
         "apps/web/src/app/entity/[id]/page.tsx",
@@ -2502,9 +2508,13 @@
       "status": "partial",
       "states": {
         "default": {
-          "status": "baseline",
-          "reason": "The route source is the current rendering or redirect anchor; this status records a baseline and does not assert visual verification.",
-          "evidence": ["apps/web/src/app/invention/[slug]/page.tsx"]
+          "status": "partial",
+          "reason": "Shared investigation return, query-preserving record family redirects and existing evidence/identity templates are integrated. Rendered sample flows verified; other lifecycle and family variants remain tracked.",
+          "evidence": [
+            "apps/web/src/components/discovery/record-investigation-return.tsx",
+            "apps/web/src/components/discovery/record-investigation-return.css",
+            "apps/web/src/lib/discovery/discovery-state.test.ts"
+          ]
         },
         "loading": {
           "status": "pending",
@@ -2534,7 +2544,9 @@
       },
       "componentRefs": [
         "apps/web/src/app/invention/[slug]/page.tsx",
-        "apps/web/src/components/SiteShell.tsx"
+        "apps/web/src/components/SiteShell.tsx",
+        "apps/web/src/components/discovery/record-investigation-return.tsx",
+        "apps/web/src/components/discovery/record-investigation-return.css"
       ],
       "evidence": [
         "apps/web/src/app/invention/[slug]/page.tsx",
@@ -2889,10 +2901,11 @@
       "states": {
         "default": {
           "status": "partial",
-          "reason": "Collection entry, shared map/index workbench, reading and place-mast slices are implemented; remaining route/state acceptance is tracked separately. This is not all-route visual sign-off.",
+          "reason": "Shared investigation return, query-preserving record family redirects and existing evidence/identity templates are integrated. Rendered sample flows verified; other lifecycle and family variants remain tracked.",
           "evidence": [
-            "apps/web/src/app/HomeFirstPaint.tsx",
-            "apps/web/src/app/home-first-paint.css"
+            "apps/web/src/components/discovery/record-investigation-return.tsx",
+            "apps/web/src/components/discovery/record-investigation-return.css",
+            "apps/web/src/lib/discovery/discovery-state.test.ts"
           ]
         },
         "loading": {
@@ -2933,7 +2946,9 @@
         "apps/web/src/app/place/[slug]/page.tsx",
         "apps/web/src/components/SiteShell.tsx",
         "apps/web/src/app/HomeFirstPaint.tsx",
-        "apps/web/src/app/home-first-paint.css"
+        "apps/web/src/app/home-first-paint.css",
+        "apps/web/src/components/discovery/record-investigation-return.tsx",
+        "apps/web/src/components/discovery/record-investigation-return.css"
       ],
       "evidence": [
         "apps/web/src/app/place/[slug]/page.tsx",
@@ -3046,7 +3061,8 @@
         "apps/web/src/components/SiteShell.tsx",
         "apps/web/src/app/records/RecordsIndex.tsx",
         "apps/web/src/components/discovery/collection-context.tsx",
-        "apps/web/src/lib/records/records-catalog.ts"
+        "apps/web/src/lib/records/records-catalog.ts",
+        "apps/web/src/components/room/HairlineIndex.tsx"
       ],
       "evidence": [
         "apps/web/src/app/records/page.tsx",
@@ -3545,7 +3561,10 @@
         "apps/web/src/components/SiteShellHeader.tsx",
         "apps/web/src/components/SiteShellFooter.tsx",
         "apps/web/src/components/ShellPageTransition.tsx",
-        "apps/web/src/components/shell/RouteFocus.tsx"
+        "apps/web/src/components/shell/RouteFocus.tsx",
+        "apps/web/src/components/discovery/record-investigation-return.tsx",
+        "apps/web/src/components/discovery/record-investigation-return.css",
+        "apps/web/src/components/discovery/collection-context.tsx"
       ],
       "evidence": [
         "apps/web/src/components/SiteShell.test.ts",
@@ -3716,7 +3735,9 @@
       "componentRefs": [
         "apps/web/src/components/map-stage/MapStage.tsx",
         "apps/web/src/components/map-experience/CameraConsole.tsx",
-        "apps/web/src/components/map-experience/MapControls.tsx"
+        "apps/web/src/components/map-experience/MapControls.tsx",
+        "apps/web/src/lib/discovery/collection-catalog-wire.ts",
+        "apps/web/src/app/explore/AtlasLoader.tsx"
       ],
       "evidence": [
         "apps/web/src/components/map-experience/CameraConsole.test.ts",

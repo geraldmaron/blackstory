@@ -19,6 +19,11 @@
 import { notFound, permanentRedirect } from 'next/navigation';
 import { buildEntityPageMetadata } from '../../../lib/seo/metadata-builders';
 import {
+  discoveryFromSearchParams,
+  recordArrivalQuery,
+  withQuery,
+} from '../../../lib/discovery/discovery-state';
+import {
   getPublicSearchIndex,
   resolvePublicEntityRedirect,
   resolvePublicEntityView,
@@ -38,6 +43,7 @@ export const dynamicParams = true;
 
 type EntityPageProps = {
   readonly params: Promise<{ id: string }>;
+  readonly searchParams?: Promise<Record<string, string | string[] | undefined>>;
 };
 
 export async function generateStaticParams() {
@@ -90,8 +96,16 @@ async function publicAddressOf(entity: PublicEntityView): Promise<string | undef
   return publicRecordHref(entity, collisions);
 }
 
-export default async function EntityPage({ params }: EntityPageProps) {
+/*
+ * Reading `searchParams` makes this route render per request, so the page-level `revalidate`
+ * no longer caches the HTML. That is the price of per-arrival investigation context: the
+ * release catalog reads underneath stay cached, and `generateMetadata` never reads the query,
+ * so canonical metadata is identity-only.
+ */
+export default async function EntityPage({ params, searchParams }: EntityPageProps) {
   const { id } = await params;
+  const rawArrival = (await searchParams) ?? {};
+  const arrivalQuery = recordArrivalQuery(rawArrival);
   const resolved = await resolvePublicEntityView(id);
   const entity = resolved.data;
   if (!entity) {
@@ -104,7 +118,12 @@ export default async function EntityPage({ params }: EntityPageProps) {
       // have given, rather than 308ing readers onto a dead address. The `/entity/{id}` fallback
       // is for a published survivor that simply has no standable address of its own.
       if (survivor.data) {
-        permanentRedirect((await publicAddressOf(survivor.data)) ?? `/entity/${survivorId}`);
+        permanentRedirect(
+          withQuery(
+            (await publicAddressOf(survivor.data)) ?? `/entity/${survivorId}`,
+            arrivalQuery,
+          ),
+        );
       }
     }
     notFound();
@@ -112,8 +131,8 @@ export default async function EntityPage({ params }: EntityPageProps) {
 
   const address = await publicAddressOf(entity);
   if (address !== undefined) {
-    permanentRedirect(address);
+    permanentRedirect(withQuery(address, arrivalQuery));
   }
 
-  return EntityRecordRoom({ entity });
+  return EntityRecordRoom({ entity, arrival: discoveryFromSearchParams(rawArrival) });
 }

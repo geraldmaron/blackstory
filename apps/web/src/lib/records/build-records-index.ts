@@ -123,6 +123,8 @@ export type RecordsRow = {
   /** The stored tier behind the letter, so the row can draw the same evidence meter the Explore
    *  results rail, the record sheet and the record page draw. */
   readonly confidenceTier: ConfidenceTier;
+  /** Known map availability for this released plate; omitted by legacy callers. */
+  readonly mappable?: boolean;
 };
 
 export type RecordsFacet = {
@@ -439,7 +441,10 @@ export function buildRecordFacts(catalog: RecordsCatalogInput): readonly RecordF
   return entries.map((entry) => toFacts(entry, collisions));
 }
 
-export function buildCollectionFacts(catalog: RecordsCatalogInput): readonly CollectionFacts[] {
+export function buildCollectionFacts(
+  catalog: RecordsCatalogInput,
+  drawableIds?: ReadonlySet<string>,
+): readonly CollectionFacts[] {
   return buildRecordFacts(catalog).map(
     ({ row, eraBuckets, topicIds, confidenceTier, statePostal, status, haystack, mappable }) => ({
       row: { id: row.id, name: row.name, kind: row.kind, mapTone: row.mapTone },
@@ -449,7 +454,7 @@ export function buildCollectionFacts(catalog: RecordsCatalogInput): readonly Col
       statePostal,
       status,
       haystack,
-      mappable,
+      mappable: drawableIds === undefined ? mappable : drawableIds.has(row.id),
     }),
   );
 }
@@ -473,8 +478,8 @@ export function buildRecordsIndex(
   const matched = facts
     .filter((record) => matchesExcept(record, query, 'none'))
     .sort(comparatorFor(query.sort));
-  const mappableMatched = matched.filter(
-    (record) => record.mappable && (drawableIds === undefined || drawableIds.has(record.row.id)),
+  const mappableMatched = matched.filter((record) =>
+    drawableIds === undefined ? record.mappable : drawableIds.has(record.row.id),
   ).length;
 
   const facets = Object.fromEntries(
@@ -527,6 +532,7 @@ export function buildRecordsIndex(
   const rows = matched.slice(start, start + RECORDS_PAGE_SIZE).map((record) => ({
     ...record.row,
     href: withArrivalQuery(record.row.href, discoveryQuery),
+    mappable: drawableIds === undefined ? record.mappable : drawableIds.has(record.row.id),
   }));
 
   const constraints: RecordsConstraint[] = [];

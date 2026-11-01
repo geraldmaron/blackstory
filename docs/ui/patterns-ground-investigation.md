@@ -16,7 +16,7 @@ Builds on, and does not replace: [`patterns-collection-context.md`](./patterns-c
 | Home opening (`/`) | Collection entry: search, map, list, or the guided walk | `app/door-immersive.tsx`, `app/door-home.css` |
 | Records (`/records`) | The list view of the collection, with the workbench above the rows | `app/records/RecordsIndex.tsx`, `records-index.css` |
 | Map (`/explore`, embedded in Home browse) | The map view of the same collection | `app/explore/AtlasExperience.tsx`, `explore.css` |
-| Place record (`/place/*`, `/entity/*`) | One record, with the way back | `app/HomeFirstPaint.tsx`, `home-first-paint.css` |
+| Record (`/place/*`, `/entity/*`, `/invention/*`) | One record, with the way back | `app/HomeFirstPaint.tsx`, `app/entity/[id]/EntityRecordRoom.tsx`, `components/discovery/record-investigation-return.tsx` |
 
 The collection strip (`CollectionContext`) is the shared heading for the middle two. It never
 changes membership: temporary map limits are stated separately and the collection is unchanged.
@@ -59,6 +59,36 @@ changes membership: temporary map limits are stated separately and the collectio
 - Geography: when there is no photograph and a stored anchor, the framed place preview sits beside
   the text (above it on a phone) with a precision line under it. No live map behind text.
 - Evidence: the glance band follows the mast, unchanged in content, citation strings and anchors.
+
+## 5a. Investigation return across record families
+
+One component, `components/discovery/record-investigation-return.tsx` (styles beside it), renders
+the bar for every public record family: Place (`/place/*`), people and other non-standable records
+(`/entity/*`), and inventions (`/invention/*`). Hrefs, the position label and narrowing wording
+come from `placeDiscoveryReturn`; the component reads nothing.
+
+- **Arrival.** Each route reads its own `searchParams` and normalizes through
+  `discoveryFromSearchParams`. Supported: `q`, `sort`, `kind`, `era`, `state`, `topic`/`theme`,
+  `status`, `evidence`/`floor`, and the `from` origin (legacy `explore`/`records` spellings fold to
+  `map`/`list`). Nothing else is read.
+- **Redirects.** `/entity` to a record's public address, an absorbed id to its survivor, and a
+  wrong-family `/place` or `/invention` request all carry the arrival via `recordArrivalQuery`
+  (re-serialized through `placeArrivalQuery`, never raw concatenation). Unknown, auth, token,
+  `returnTo`, external params and `selected` are dropped. A bare URL gains no `?from=`. Status,
+  paths and slugs are unchanged.
+- **Map link.** The record room's map CTA is `returns.mapHref`, so it keeps the narrowing. The pin
+  viewport is added only when a stored anchor exists.
+- **Copy.** Place keeps its place wording. Other families use neutral wording when the arrival is
+  not narrowed ("See this record on the map" when pinned, "Browse the map" when not), so a person
+  or unmapped record never promises a pin. Narrowed arrivals use the builder's narrowing labels.
+- **List position.** Previous/next and "n of N" come from the released records catalog
+  (`loadRecordsCatalog`) for any family arriving with `from=list`. Random and catalog-order
+  stepping ("Keep reading") is separate and unchanged.
+- **Caching.** Reading `searchParams` makes `/entity/[id]` render per request, so its hourly page
+  cache no longer holds the HTML. Catalog reads stay cached. `/place` and `/invention` were already
+  dynamic. Metadata and canonical URLs never read the query.
+- **Edge.** `/entity/*` query params must be allowed by the edge normalizer
+  (`PLACE_PAGE_PARAM_ALLOWLIST` semantics) or they are stripped before the page runs.
 
 ## 6. Do / Don't
 

@@ -21,6 +21,7 @@ export const SEARCH_PAGE_PARAM_ALLOWLIST = [
   'q',
   'kind',
   'state',
+  'evidence',
   'precision',
   'releaseId',
   'status',
@@ -111,7 +112,7 @@ export const CORRECTIONS_PAGE_PARAM_ALLOWLIST = ['target', 'targetType'] as cons
 export type CorrectionsPageParam = (typeof CORRECTIONS_PAGE_PARAM_ALLOWLIST)[number];
 
 /**
- * Allowed arrival keys on `/place/{slug}`.
+ * Allowed arrival keys on public place, invention and entity record URLs.
  *
  * Place is a reading room that must preserve DiscoveryState when the reader arrives from
  * Records (`from=list`) or Explore (`from=map`). Matched with an empty allowlist, the edge

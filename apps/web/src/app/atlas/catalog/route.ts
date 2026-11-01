@@ -14,12 +14,14 @@ import { ATLAS_CATALOG_CACHE_CONTROL, buildAtlasCatalogJson } from '../../explor
 
 export const dynamic = 'force-dynamic';
 
-export async function GET(): Promise<Response> {
+export async function GET(request: Request): Promise<Response> {
   const [{ data: entities, source }, { data: collectionCatalog }] = await Promise.all([
     getSharedPublicEntities(),
     loadRecordsCatalog(),
   ]);
-  const body = await buildAtlasCatalogJson(entities, source, collectionCatalog);
+  // Legacy URLs retain ordinary string haystacks. Only the new loader opts into references.
+  const transport = new URL(request.url).searchParams.get('v') === '4' ? 'story-references' : 'raw';
+  const body = await buildAtlasCatalogJson(entities, source, collectionCatalog, transport);
   return new Response(body, {
     status: 200,
     headers: {

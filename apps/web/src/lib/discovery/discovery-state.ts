@@ -206,6 +206,40 @@ export function discoveryFromSearchParams(
   };
 }
 
+/**
+ * True when the state carries an origin or a narrowing a reader would want back: a map/list
+ * origin, a search, a facet, an evidence floor, or a non-default bibliography order.
+ * `selected` alone is not narrowing.
+ */
+export function discoveryHasNarrowing(state: DiscoveryState): boolean {
+  return (
+    Boolean(state.query) ||
+    Boolean(state.kind) ||
+    Boolean(state.era) ||
+    Boolean(state.state) ||
+    Boolean(state.topic) ||
+    Boolean(state.evidence) ||
+    Boolean(state.status) ||
+    (state.sort !== undefined && state.sort !== 'discovery')
+  );
+}
+
+/**
+ * Query string (no leading `?`) that carries a record arrival through a redirect.
+ * Re-serialized from DiscoveryState, never concatenated from the raw request, so unknown,
+ * auth, token, `returnTo` and external params cannot ride along. Empty for a bare direct URL
+ * (no origin, no narrowing) so canonical addresses do not acquire a gratuitous `from=`.
+ * Legacy origin spellings (`explore`, `records`) canonicalize to `map` / `list`.
+ */
+export function recordArrivalQuery(
+  params: Readonly<Record<string, string | readonly string[] | undefined>>,
+): string {
+  const { selected, ...carried } = discoveryFromSearchParams(params);
+  void selected;
+  if (carried.view === undefined && !discoveryHasNarrowing(carried)) return '';
+  return placeArrivalQuery(carried, carried.view ?? 'map');
+}
+
 export type PlaceDiscoveryReturn = {
   readonly mapHref: string;
   readonly listHref: string;
@@ -255,17 +289,19 @@ export function placeDiscoveryReturn(
     readonly index: number;
     readonly total: number;
   },
+  mapped = true,
 ): PlaceDiscoveryReturn {
+  const { selected: _arrivalSelection, ...withoutSelection } = arrival;
   const withSelection: DiscoveryState = {
-    ...arrival,
-    selected: entityId,
+    ...withoutSelection,
+    ...(mapped ? { selected: entityId } : {}),
     view: arrival.view ?? 'map',
   };
   const exploreBase = exploreViewFromDiscovery(withSelection);
   const mapHref = buildExploreHref({
     ...exploreBase,
-    selected: entityId,
-    ...(geo ? { viewport: { lat: geo.lat, lng: geo.lng, zoom: 11 } } : {}),
+    ...(mapped ? { selected: entityId } : {}),
+    ...(geo && mapped ? { viewport: { lat: geo.lat, lng: geo.lng, zoom: 11 } } : {}),
   });
   const hasListNarrowing =
     Boolean(arrival.query) ||
@@ -281,7 +317,9 @@ export function placeDiscoveryReturn(
     listHref: listHrefFromDiscovery(arrival),
     mapLabel: hasListNarrowing
       ? 'Return to the map with this narrowing'
-      : 'See this place on the map',
+      : mapped
+        ? 'See this place on the map'
+        : 'Browse the map',
     listLabel: hasListNarrowing
       ? 'Return to the record list with this narrowing'
       : 'Browse the record list',

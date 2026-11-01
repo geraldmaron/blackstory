@@ -20,6 +20,7 @@ const SEARCH_PAGE_PARAM_ALLOWLIST = [
   'q',
   'kind',
   'state',
+  'evidence',
   'precision',
   'releaseId',
   'status',
@@ -103,7 +104,7 @@ function getAllowedQueryParamsForPath(pathname) {
   if (path === '/law') return LAW_PAGE_PARAM_ALLOWLIST;
   if (path === '/stories') return STORIES_PAGE_PARAM_ALLOWLIST;
   if (path === '/corrections') return CORRECTIONS_PAGE_PARAM_ALLOWLIST;
-  if (path.startsWith('/place/') || path.startsWith('/invention/'))
+  if (path.startsWith('/place/') || path.startsWith('/invention/') || path.startsWith('/entity/'))
     return PLACE_PAGE_PARAM_ALLOWLIST;
   return [];
 }
@@ -138,7 +139,10 @@ function normalizeQueryString(pathname, input) {
   if (path === EXPLORE_PATH)
     throw new Error('/explore query normalization is not ported (repo-5tjl0)');
   const bag = allowlistedBag(path, readParamBag(input));
-  if (path === '/atlas/catalog') return firstString(bag.v) === '3' ? 'v=3' : '';
+  if (path === '/atlas/catalog') {
+    const version = firstString(bag.v);
+    return version === '3' || version === '4' ? `v=${version}` : '';
+  }
   if (path === RECORDS_PATH) return recordsQueryString(parseRecordsQuery(bag));
   const normalized = new URLSearchParams();
   for (const key of Object.keys(bag).sort()) {

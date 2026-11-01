@@ -304,3 +304,33 @@ test('the value-transform routes still resolve to Records', () => {
   assert.equal(canonicalPathForLegacy('/history'), '/records');
   assert.equal(canonicalPathForLegacy('/search'), '/records');
 });
+
+test('legacy search and history retain supported collection narrowing and bibliography order', () => {
+  for (const href of [
+    mapSearchQueryToRecordsHref({
+      q: 'school',
+      state: 'dc',
+      evidence: 'b',
+      sort: 'name',
+      token: 'drop',
+    }),
+    mapHistoryQueryToRecordsHref({
+      q: 'school',
+      state: 'dc',
+      evidence: 'b',
+      sort: 'name',
+      token: 'drop',
+    }),
+  ]) {
+    const params = new URL(href, 'https://example.test').searchParams;
+    assert.equal(params.get('q'), 'school');
+    assert.equal(params.get('state'), 'DC');
+    assert.equal(params.get('evidence'), 'B');
+    assert.equal(params.get('sort'), 'name');
+    assert.equal(params.has('token'), false);
+  }
+  assert.equal(
+    mapSearchQueryToRecordsHref({ sort: 'invalid', evidence: 'invalid', state: 'invalid' }),
+    '/records',
+  );
+});

@@ -280,6 +280,7 @@ export function RecordsIndexRoom({ model, releaseLabel }: RecordsIndexProps) {
         rows={rows.map((row) => ({
           href: row.href,
           name: row.name,
+          ...(row.mappable === false ? { note: 'Not on the map' } : {}),
           place: row.place,
           era: row.era,
           glyph: (

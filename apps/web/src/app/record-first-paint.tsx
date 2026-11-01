@@ -18,16 +18,16 @@ import {
   discoveryFromSearchParams,
   placeArrivalQuery,
   placeDiscoveryReturn,
+  recordArrivalQuery,
   recordsQueryFromDiscovery,
+  withQuery,
+  type DiscoveryState,
+  type PlaceDiscoveryReturn,
 } from '../lib/discovery/discovery-state';
 import { isResolvablePlaceSlug } from '../lib/place/place-slug';
-import { geoAnchorFor } from '../lib/map-experience/entity-geo';
-import { getSharedPublicEntities } from '../lib/map-experience/shared-map-data';
-import { getPublicSearchIndex } from '../lib/public-data/source';
-import {
-  findRecordsNeighbors,
-  searchIndexReadyForRecords,
-} from '../lib/records/build-records-index';
+import { buildExploreMapSource } from '../lib/map-experience/build-explore-map-source';
+import { findRecordsNeighbors } from '../lib/records/build-records-index';
+import { loadRecordsCatalog } from '../lib/records/records-catalog';
 
 /** The public families a released record can address. */
 export type RecordFamily = 'place' | 'invention';
@@ -65,6 +65,47 @@ export async function recordFirstPaintMetadata(
   };
 }
 
+type ListNeighbors = Parameters<typeof placeDiscoveryReturn>[3];
+
+/**
+ * Previous/next within the list the reader came from, for any record family. Only a list origin
+ * has an order to step through; a map or direct arrival yields nothing. Reads the one released
+ * bibliography (`loadRecordsCatalog`), already cached per request.
+ */
+export async function loadRecordListNeighbors(
+  arrival: DiscoveryState,
+  entityId: string,
+): Promise<ListNeighbors> {
+  if (arrival.view !== 'list') return undefined;
+  const { data: catalog } = await loadRecordsCatalog();
+  const found = findRecordsNeighbors(
+    catalog,
+    recordsQueryFromDiscovery(arrival),
+    entityId,
+    placeArrivalQuery(arrival, 'list'),
+  );
+  if (!found) return undefined;
+  return {
+    ...(found.previous
+      ? { previous: { href: found.previous.href, name: found.previous.name } }
+      : {}),
+    ...(found.next ? { next: { href: found.next.href, name: found.next.name } } : {}),
+    index: found.index,
+    total: found.total,
+  };
+}
+
+/** Shared return builder so every family derives its map/list paths from the same arrival. */
+export async function recordDiscoveryReturn(
+  entityId: string,
+  arrival: DiscoveryState,
+  geo: { readonly lat: number; readonly lng: number } | undefined,
+  mapped = true,
+): Promise<PlaceDiscoveryReturn> {
+  const neighbors = await loadRecordListNeighbors(arrival, entityId);
+  return placeDiscoveryReturn(entityId, arrival, geo, neighbors, mapped);
+}
+
 export async function RecordFirstPaint({ family, slug, searchParams }: RecordFirstPaintProps) {
   if (!isResolvablePlaceSlug(slug)) {
     notFound();
@@ -76,48 +117,15 @@ export async function RecordFirstPaint({ family, slug, searchParams }: RecordFir
 
   const owner = familyForKind(model.lead.kind);
   if (owner !== family) {
-    permanentRedirect(`/${owner}/${slug}`);
+    // Same status, same slug; only the normalized investigation context rides along.
+    permanentRedirect(withQuery(`/${owner}/${slug}`, recordArrivalQuery(searchParams)));
   }
 
   const arrival = discoveryFromSearchParams(searchParams);
-  const geo = model.lead.geoAnchor ?? geoAnchorFor(model.lead.id);
-
-  let neighbors:
-    | {
-        readonly previous?: { readonly href: string; readonly name: string };
-        readonly next?: { readonly href: string; readonly name: string };
-        readonly index: number;
-        readonly total: number;
-      }
-    | undefined;
-  if (arrival.view === 'list') {
-    const { data: searchDocs } = await getPublicSearchIndex();
-    const catalog = searchIndexReadyForRecords(searchDocs)
-      ? searchDocs
-      : (await getSharedPublicEntities()).data;
-    const found = findRecordsNeighbors(
-      catalog,
-      recordsQueryFromDiscovery(arrival),
-      model.lead.id,
-      placeArrivalQuery(arrival, 'list'),
-    );
-    if (found) {
-      neighbors = {
-        ...(found.previous
-          ? { previous: { href: found.previous.href, name: found.previous.name } }
-          : {}),
-        ...(found.next ? { next: { href: found.next.href, name: found.next.name } } : {}),
-        index: found.index,
-        total: found.total,
-      };
-    }
-  }
-
-  const discovery = placeDiscoveryReturn(
-    model.lead.id,
-    arrival,
-    geo ? { lat: geo.lat, lng: geo.lng } : undefined,
-    neighbors,
-  );
+  const feature = buildExploreMapSource([model.lead]).featureCollection.features[0];
+  const geo = feature
+    ? { lng: feature.geometry.coordinates[0], lat: feature.geometry.coordinates[1] }
+    : undefined;
+  const discovery = await recordDiscoveryReturn(model.lead.id, arrival, geo, feature !== undefined);
   return <HomeFirstPaint model={model} discovery={discovery} />;
 }

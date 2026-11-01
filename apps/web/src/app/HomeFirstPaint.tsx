@@ -16,6 +16,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { EntityMastMedia, RecordPhotoCredit } from '../components/entity/EntityMastMedia';
 import { EntitySensitivityBanner } from '../components/entity/EntitySensitivityBanner';
 import { LinkedProse, type EntityLinkCatalogEntry } from '../components/entity/LinkedProse';
+import { RecordInvestigationReturn } from '../components/discovery/record-investigation-return';
 import { RecordPlacePreview } from '../components/patterns/RecordPlacePreview';
 import { RecordVisitBlock } from '../components/patterns/RecordVisitBlock';
 import { shouldShowVisitBlock } from '../lib/geography/visit-handoff';
@@ -270,20 +271,7 @@ export function HomeFirstPaint({
 
     /* The way back into the investigation that sent the reader here: the map and the list, with
        the narrowing they carried. Kept apart from the archive navigation (home, rooms) below. */
-    const investigationReturn = (
-      <nav className="ds-record-return" aria-label="Return to your investigation">
-        <span className="ds-record-return__label">Your investigation</span>
-        <Link className="ds-record-return__link" href={returns.mapHref} scroll={false}>
-          {returns.mapLabel}
-        </Link>
-        <Link className="ds-record-return__link" href={returns.listHref}>
-          {returns.listLabel}
-        </Link>
-        {returns.positionLabel ? (
-          <span className="ds-record-return__position">{returns.positionLabel}</span>
-        ) : null}
-      </nav>
-    );
+    const investigationReturn = <RecordInvestigationReturn returns={returns} family="place" />;
 
     const mastMedia = hasPhoto ? (
       <EntityMastMedia
