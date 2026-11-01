@@ -42,7 +42,7 @@
   },
   "devDependencies": {
     "@types/react": "*",
-    "eslint": "^9.39.5",
+    "eslint": "^10.13.0",
     "eslint-config-expo": "~58.0.4",
     "prettier": "^3.9.10",
     "tsx": "^4.23.15",
