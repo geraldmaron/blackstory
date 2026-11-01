@@ -327,3 +327,45 @@ Not agent-decidable. Flagged, not violated.
 - **Record pages are citations.** Any change to them is gated on server-rendered output and the
   existing URL contract.
 - **Mobile is unverified at scale.** Most responsive findings here are CSS-derived, not rendered.
+
+---
+
+## 8. Execution log
+
+Shipped on `redesign/ux-audit-2026-10`. Nothing pushed.
+
+| Commit | What | Verified |
+|---|---|---|
+| `eb919775` | Absent census data no longer drawn as a value; share chart zero-based; correction receipt focused | Regression test proven to fail on old source; ticks `0.0/10.5/21.0%`; `activeElement === receipt panel` |
+| `ec16fff4` | `Field`/`ChoiceField` own errors; `CorrectionForm` migrated, hand-rolled wiring deleted | 0 → 5 controls `aria-invalid`; category error announced for the first time |
+| `f79ab22c` | `/submit` off its third dialect; receipt lookup errors on empty; receipt code is its own element | 0 of the old dialect left; error styled from the kit on a route that never loads `corrections.css` |
+| `b12dea27` | Route focus after client-side navigation | Lands on `main[tabindex=-1]`; no steal on first load; query-only change holds focus in the instrument |
+| `fc9074dd` | Duplicate zoom controls removed | `MapControls` 0 zoom labels, console 2 |
+| `ad870d40` | `/records` sort | Four orderings, four different first rows; facet+sort is `noindex` |
+| `52b0a788` | Chart axis labels legible on a phone | 3.9–5.9px → 8.25–11px at 375px, no page-level sideways scroll |
+| `59d90b8b` | Non-colour encoding on the free series | Hatch on 8 bars + legend; limit recorded in the commit |
+| `69c01700` | Sort ported to the `apps/site` edge | 18 parity assertions pass |
+
+**Totals:** 2,526 tests passing, 0 failing.
+
+### Corrections made during execution
+
+- Removed the duplicate zoom from the wrong component; `CameraConsole.test.ts` states the rule
+  ("zoom lives in the console") and caught it.
+- Broke `lives-surface-contract.test.tsx` with a code *comment*: the repo asserts on source text,
+  so the missing-state phrases must not appear in that component.
+- Mounted `RouteFocus` in the remounting template first, which reset its ref so the effect never
+  fired. It belongs in the persistent layout.
+- Put field-error styles in `corrections.css`, which `/corrections/status` never loads — the trap
+  that route's own comment documents. Moved to the kit.
+- `--ds-viz-4` remains 2.06:1. The hatch satisfies "colour is never the only signal" and fixes the
+  legend, but the free segments are a few pixels tall at this data scale, so it does little in the
+  plot area. Darkening the token is what would actually fix it, and that was declined in favour of
+  encoding.
+
+### Not started
+
+Record-template consolidation (deliberately last, per the adversarial pass), reading/data chart
+frame consolidation, admin task defects, dead-code removal. Dead-code removal was dropped on
+purpose: low user value against real deletion risk on 296 grep-dead classes that may be built
+dynamically.
