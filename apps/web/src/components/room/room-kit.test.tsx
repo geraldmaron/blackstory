@@ -29,7 +29,7 @@ import { Prose, RecordRef } from './Prose';
 import { Anatomy, Connections, Note, Precision, SourceList, TrustBlock } from './Evidence';
 import { HairlineIndex } from './HairlineIndex';
 import { DataTable } from './DataTable';
-import { Disclosure, Field, UtilityCard, UtilityStep } from './Utility';
+import { Disclosure, UtilityCard, UtilityStep } from './Utility';
 import { EmptyList, OffRamp, RecordNav } from './RoomFoot';
 import {
   MapMoment,

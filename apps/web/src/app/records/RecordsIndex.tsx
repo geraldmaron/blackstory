@@ -24,6 +24,7 @@ import { KindGlyph } from '../../components/map-experience/KindGlyph';
 import { AutoSubmitSelect } from '../../components/forms/AutoSubmitSelect';
 import type { RecordsIndex as RecordsIndexModel } from '../../lib/records/build-records-index';
 import { RECORDS_FILTER_KEYS, recordsHref } from '../../lib/records/build-records-index';
+import { CollectionContext } from '../../components/discovery/collection-context';
 
 void React;
 
@@ -73,6 +74,8 @@ export function RecordsIndexRoom({ model, releaseLabel }: RecordsIndexProps) {
     query,
     rows,
     totalAll,
+    totalMatched,
+    mappableMatched,
     page,
     pageCount,
     countLabel,
@@ -133,6 +136,16 @@ export function RecordsIndexRoom({ model, releaseLabel }: RecordsIndexProps) {
         }
         lede="The map shows where a record sits. This list shows what the archive holds."
         showCrumb={false}
+      />
+
+      {/* Server-rendered: the view choice and honest counts need no JavaScript. The page is
+          already the list, so Records is the current view and Map carries the same narrowing. */}
+      <CollectionContext
+        activeView="records"
+        mapHref={atlasHref}
+        recordsHref={recordsHref(query)}
+        matched={typeof totalMatched === 'number' ? totalMatched : null}
+        drawable={typeof mappableMatched === 'number' ? mappableMatched : null}
       />
 
       {/*

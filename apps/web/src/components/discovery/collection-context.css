@@ -1,0 +1,114 @@
+/*
+ * Collection context strip (docs/ui/patterns-collection-context.md). Opaque matte surface, one
+ * hairline, kit tokens only; light and dark come from the tokens. Copper marks the active view.
+ */
+.ds-collection {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--ds-space-2) var(--ds-space-4);
+  min-width: 0;
+  margin-block: var(--ds-space-4);
+  padding: var(--ds-space-2) var(--ds-space-3);
+  background: var(--ds-surface);
+  border: var(--ds-border-width) solid var(--ds-border);
+  border-radius: var(--ds-radius-md);
+  color: var(--ds-ink);
+}
+
+.ds-collection__views {
+  display: inline-flex;
+  flex: none;
+  gap: var(--ds-space-1);
+}
+
+.ds-collection__view {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  min-width: 44px;
+  padding: 0 var(--ds-space-3);
+  border: var(--ds-border-width) solid var(--ds-border);
+  border-radius: var(--ds-radius-full);
+  background: var(--ds-surface);
+  color: var(--ds-ink);
+  font-family: var(--ds-font-sans);
+  font-size: var(--ds-text-caption);
+  text-decoration: none;
+}
+
+a.ds-collection__view:hover {
+  border-color: var(--ds-border-strong);
+}
+
+a.ds-collection__view:focus-visible {
+  outline: var(--ds-focus-width) solid var(--ds-focus-ring);
+  outline-offset: var(--ds-focus-offset);
+}
+
+.ds-collection__view[aria-current='page'] {
+  background: var(--ds-surface-raised);
+  border-color: var(--ds-accent-graphic);
+  color: var(--ds-accent);
+}
+
+.ds-collection__view[aria-disabled='true'] {
+  color: var(--ds-ink-muted);
+}
+
+.ds-collection__facts {
+  display: grid;
+  flex: 1 1 14rem;
+  gap: 2px;
+  min-width: 0;
+}
+
+.ds-collection__count,
+.ds-collection__note {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.ds-collection__count {
+  font-family: var(--ds-font-mono);
+  font-size: var(--ds-text-caption);
+  font-variant-numeric: tabular-nums;
+  color: var(--ds-ink);
+}
+
+.ds-collection__note {
+  font-size: var(--ds-text-caption);
+  line-height: 1.35;
+  color: var(--ds-ink-muted);
+}
+
+/* Embedded in the map: a fixed strip between the Lens and Results columns. */
+.ds-atlas > .ds-collection--atlas {
+  position: fixed;
+  top: var(--ds-atlas-top);
+  left: calc(var(--ds-space-4) + var(--ds-rail-w) + var(--ds-space-3));
+  right: calc(var(--ds-space-4) + var(--ds-results-w) + var(--ds-space-3));
+  z-index: var(--ds-z-atlas-instruments);
+  margin: 0;
+  width: fit-content;
+  max-width: 34rem;
+  pointer-events: auto;
+}
+
+@media (max-width: 64rem) {
+  .ds-atlas > .ds-collection--atlas {
+    left: var(--ds-space-3);
+    right: var(--ds-space-3);
+    width: auto;
+    max-width: none;
+    /* Under the narrow switcher row that --ds-atlas-top already clears. */
+    top: calc(var(--ds-atlas-top) + var(--ds-space-2));
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .ds-collection__view {
+    transition: border-color var(--ds-duration-fast) var(--ds-easing);
+  }
+}

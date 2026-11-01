@@ -20,6 +20,8 @@ import { Notice } from '@repo/ui';
 import { hasMaintenanceBypassHint } from '../../lib/maintenance/maintenance-bypass-hint';
 import type { ExploreMapFeatureCollection } from '../../lib/map-experience/build-explore-map-source';
 import { AtlasExperience } from './AtlasExperience';
+import { recordsHref } from '../../lib/records/records-query';
+import { recordsQueryFromExplore } from '../../lib/discovery/explore-collection';
 import {
   ATLAS_CATALOG_PATH,
   assembleExploreViewModel,
@@ -111,6 +113,7 @@ export function AtlasLoader({
   }, [catalogUrl, attempt]);
 
   const active = catalog ?? firstPaint;
+  const matchingRecordsHref = recordsHref(recordsQueryFromExplore(shell.viewState));
 
   if (error && !catalog?.collectionFacts) {
     return (
@@ -128,7 +131,8 @@ export function AtlasLoader({
               onClick={() => setAttempt((n) => n + 1)}
             >
               Try again
-            </button>
+            </button>{' '}
+            <a href={matchingRecordsHref}>Open matching records</a>
           </p>
         </Notice>
       </div>
@@ -137,7 +141,17 @@ export function AtlasLoader({
 
   return (
     <>
-      {!catalog?.collectionFacts ? <div role="status">Loading collection controls.</div> : null}
+      {!catalog?.collectionFacts ? (
+        <div role="status" className="ds-atlas__notice ds-collection">
+          <span>Loading map records.</span>
+          <a
+            className="ds-button ds-button--secondary ds-button--compact"
+            href={matchingRecordsHref}
+          >
+            Open matching records
+          </a>
+        </div>
+      ) : null}
       <AtlasExperience initial={assembleExploreViewModel(shell, active)} embedded={embedded} />
     </>
   );

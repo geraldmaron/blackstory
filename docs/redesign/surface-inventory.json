@@ -2302,11 +2302,14 @@
         },
         "selected": {
           "status": "partial",
-          "reason": "Query, supported bibliography sort and shared narrowing now cross map/list/record adapters and authoritative matching, including unlocated records. Targeted contract tests pass; rendered Back, theme and mobile acceptance remain pending.",
+          "reason": "Query, supported bibliography sort and shared narrowing now cross map/list/record adapters and authoritative matching, including unlocated records. A CollectionContext Map/Records view switch with collection, placeable and map-limit counts is wired into the embedded AtlasExperience; its tests are written but not yet run, and rendered Back, theme and mobile acceptance remain pending.",
           "evidence": [
             "apps/web/src/lib/discovery/collection-continuity.test.tsx",
             "apps/web/src/lib/discovery/discovery-state.test.ts",
-            "apps/web/src/lib/records/records-matching.ts"
+            "apps/web/src/lib/records/records-matching.ts",
+            "apps/web/src/components/discovery/collection-context.tsx",
+            "apps/web/src/components/discovery/collection-context.test.tsx",
+            "docs/ui/patterns-collection-context.md"
           ]
         },
         "auth": {
@@ -2992,11 +2995,14 @@
         },
         "selected": {
           "status": "partial",
-          "reason": "Query, supported bibliography sort and shared narrowing now cross map/list/record adapters and authoritative matching, including unlocated records. Targeted contract tests pass; rendered Back, theme and mobile acceptance remain pending.",
+          "reason": "Query, supported bibliography sort and shared narrowing now cross map/list/record adapters and authoritative matching, including unlocated records. A CollectionContext Map/Records view switch with collection and placeable counts is implemented on the Records room; its component tests are written but not yet run, and rendered Back, theme and mobile acceptance remain pending.",
           "evidence": [
             "apps/web/src/lib/discovery/collection-continuity.test.tsx",
             "apps/web/src/lib/discovery/discovery-state.test.ts",
-            "apps/web/src/lib/records/records-matching.ts"
+            "apps/web/src/lib/records/records-matching.ts",
+            "apps/web/src/components/discovery/collection-context.tsx",
+            "apps/web/src/components/discovery/collection-context.test.tsx",
+            "docs/ui/patterns-collection-context.md"
           ]
         },
         "auth": {

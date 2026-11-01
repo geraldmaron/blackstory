@@ -18,8 +18,14 @@
 'use client';
 
 import { recordsHref } from '../../lib/records/records-query';
-import { recordsQueryFromExplore } from '../../lib/discovery/explore-collection';
+import {
+  drawableCollection,
+  matchExploreCollection,
+  recordsQueryFromExplore,
+} from '../../lib/discovery/explore-collection';
 import { mapListContinuityLabel } from '../../lib/discovery/continuity-label';
+import { buildExploreHref } from '../../lib/map-experience/url-state';
+import { CollectionContext } from '../../components/discovery/collection-context';
 
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Notice } from '@repo/ui';
@@ -706,6 +712,36 @@ export function AtlasExperience({ initial, embedded = false }: AtlasExperiencePr
     mode === 'atlas' &&
     (bothColumns || selectedId === undefined);
 
+  /**
+   * The collection strip rides with the instruments: gone when chrome is hidden, and gone while a
+   * record sheet is open (the sheet takes the column the strip's right edge would cross). While it
+   * is not visible the rail keeps its own "Open record list" return link, so the list is never
+   * unreachable.
+   */
+  const showCollection =
+    mode === 'atlas' && !chromeHidden && !sheetOpen && Boolean(view.collectionFacts);
+  const collectionHrefs = {
+    map: buildExploreHref(collectionState),
+    records: recordsHref(recordsQueryFromExplore(collectionState)),
+  };
+  /** Collection members with a public map anchor, before any temporary map constraint. */
+  const collectionDrawable = useMemo(
+    () =>
+      view.collectionFacts
+        ? drawableCollection(
+            view.allFeatures,
+            matchExploreCollection(view.collectionFacts, collectionState),
+          ).length
+        : null,
+    [view.collectionFacts, view.allFeatures, collectionState],
+  );
+  /** Temporary map constraints. They limit what is drawn, never what is in the collection. */
+  const mapLimits = [
+    ...(nearby ? ['nearby'] : []),
+    ...(sweepDecade !== null ? ['the time sweep'] : []),
+    ...(overlapIds ? ['overlapping pins'] : []),
+  ];
+
   /** Compact: is any sheet up? The on-map controls ride above it (map-controls.css). */
   const compactSheetOpen =
     narrow &&
@@ -820,18 +856,38 @@ export function AtlasExperience({ initial, embedded = false }: AtlasExperiencePr
         />
       </SheetPresence>
 
+      {showCollection ? (
+        <CollectionContext
+          className="ds-collection--atlas"
+          activeView="map"
+          mapHref={collectionHrefs.map}
+          recordsHref={collectionHrefs.records}
+          ready={Boolean(view.collectionFacts)}
+          matched={view.collectionFacts ? collectionMatched : null}
+          drawable={collectionDrawable}
+          onMap={overlapFeatures?.length ?? filtered.length}
+          mapLimits={mapLimits}
+          announce
+        />
+      ) : null}
+
       <SheetPresence show={showResults}>
         <ResultsRail
           photos={sheetPhotos}
           onIntent={() => setRailTouched(true)}
           features={overlapFeatures ?? sorted}
           total={view.allFeatures.length}
-          collectionLabel={
-            nearby || sweepDecade !== null
-              ? `${collectionMatched.toLocaleString('en-US')} records in collection. ${filtered.length.toLocaleString('en-US')} shown with map constraints.`
-              : mapListContinuityLabel(collectionMatched, filtered.length)
-          }
-          collectionHref={recordsHref(recordsQueryFromExplore(collectionState))}
+          /* The strip above owns the collection count and the list link while it is visible; the
+             rail keeps both only as the return path when the strip is hidden. */
+          {...(showCollection
+            ? {}
+            : {
+                collectionLabel:
+                  nearby || sweepDecade !== null
+                    ? `${collectionMatched.toLocaleString('en-US')} records in collection. ${filtered.length.toLocaleString('en-US')} shown with map constraints.`
+                    : mapListContinuityLabel(collectionMatched, filtered.length),
+                collectionHref: collectionHrefs.records,
+              })}
           selectedId={selectedId}
           onSelect={select}
           sort={sort}
