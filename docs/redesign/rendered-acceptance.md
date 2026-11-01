@@ -105,3 +105,16 @@ blocks canonical integration and deletion of original worktrees/branches.
 Schema or stored-record proposals require scoped diff, adversarial review, isolated validation,
 impact/rollback and **final owner sign-off before application**. This candidate does not include
 such a proposal.
+
+## Story collection and chronology integration — 2026-11-01
+
+Source candidate: d9b9604f plus the two bounded Sonnet finishing tasks (2e6f1cea and 774230de); the following polish commit freezes this delta. Live read-only preview remains http://127.0.0.1:3103 .
+
+- Actual published story `the-count` resolves five explicit linked records. Native documented-range GET1860..1900 plus undated resolves two: Freedmen's Bureau Act of1865 and Greenwood District. Chronology→record→return retained collection, bounds, undated flag and chronology; switching to Map settled to the same two records, with1860s/1900s labels. These are archive buckets, not exact occurrence dates.
+- New native period disclosure opens with Enter/focus on SUMMARY; range GET works after polish, zero nestedforms. Invalidrange fail-closed behavior remains covered by focused tests.375px and1280px chronology have zero horizontaloverflow. Wide view renders a144px decade margin; narrow view stacks. At375px the first row remains below the initial viewport (top802px), so do not claim all rows abovefold; the large expanded form is removed from initialflow.
+- Map status explicitly distinguishes the narrowed collection/range from the archive-wide slider; actual rendered scope says two records and the matching1860..1900 range. Wholearchive subline is qualified. Desktop screenshot confirms wrap/readability; this is not a claim of exhaustive map QA.
+- Law375px: live12entries, nohorizontaloverflow/nestedanchors.24-row pagination boundary uses synthetic focused evidence, because liveentrycount is belowthreshold. Its loadingboundary was observed duringnavigation.
+- Mosaiccredits375px: recordednames and images load; Next?page=2 exists; nohorizontaloverflow. Missing immutable copied-tile author/licence metadata is stated honestly; currentrecordcredits are not substituted.
+- Screenshots in /tmp/blackstory-redesign-proof-20261101: story-chronology-desktop.jpg, story-chronology-mobile.jpg, story-range-map-desktop.jpg, law-room-mobile.jpg, mosaic-credits-mobile.jpg. Screenshots record the stated viewport/state, not acceptance of everyroute/state.
+
+Frozen integration checks: web aggregate2916tests,2908pass,8skip,0fail (`/tmp/blackstory-final-candidate-web.log`); targeted door-loader+decade-density16pass; Claude focused125pass, typespass, edge59pass, inventory66routes/6sharedsurfacespass. The earlier one aggregatefailure was a stale five-argument source assertion, fixed without removing cached-loader guards. No database writes, publishing or canonical merge occurred.

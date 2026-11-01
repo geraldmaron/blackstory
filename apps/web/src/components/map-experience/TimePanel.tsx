@@ -28,6 +28,11 @@ export type TimePanelProps = {
   readonly decade: number | null;
   readonly onDecadeChange: (decade: number | null) => void;
   readonly totalRecords: number;
+  /**
+   * Current collection or documented-range status, stated apart from the slider. The slider's
+   * "All time" still means the whole archive; this line says what is narrowed outside it.
+   */
+  readonly scope?: string | undefined;
   readonly playing?: boolean;
   readonly onTogglePlay?: () => void;
   readonly className?: string;
@@ -49,6 +54,7 @@ export function TimePanel({
   decade,
   onDecadeChange,
   totalRecords,
+  scope,
   playing = false,
   onTogglePlay,
   className,
@@ -144,7 +150,9 @@ export function TimePanel({
       <header className="ds-time-panel__header">
         <span className="ds-time-panel__kicker">When</span>
         <span className="ds-time-panel__current">{activeBar ? activeBar.label : 'All time'}</span>
-        <span className="ds-time-panel__sub">{decadeSubLine(activeBar, totalRecords)}</span>
+        <span className="ds-time-panel__sub">
+          {decadeSubLine(activeBar, totalRecords, scope !== undefined)}
+        </span>
 
         <div className="ds-time-panel__controls">
           {onTogglePlay ? (
@@ -168,6 +176,8 @@ export function TimePanel({
         </div>
       </header>
 
+      {scope !== undefined ? <p className="ds-time-panel__scope">{scope}</p> : null}
+
       <div
         ref={trackRef}
         className="ds-time-panel__track"
@@ -179,7 +189,7 @@ export function TimePanel({
         aria-valuetext={
           activeBar
             ? `${activeBar.label}, ${decadeSubLine(activeBar, totalRecords)}`
-            : `All time, ${totalRecords.toLocaleString('en-US')} records`
+            : `All time, ${decadeSubLine(null, totalRecords, scope !== undefined)}`
         }
         onPointerDown={onPointerDown}
         onPointerMove={onPointerMove}

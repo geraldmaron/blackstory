@@ -27,7 +27,7 @@ import { RECORDS_FILTER_KEYS, recordsHref } from '../../lib/records/build-record
 import { CollectionContext } from '../../components/discovery/collection-context';
 import { CollectionPeriodControls } from '../../components/discovery/collection-period-controls';
 import { RecordsChronology } from '../../components/discovery/records-chronology';
-import { documentedCoverageLabel } from '../../lib/discovery/collection-period';
+import { documentedCoverageLabel, periodLabel } from '../../lib/discovery/collection-period';
 import type { RecordsRow } from '../../lib/records/build-records-index';
 import type { RecordsQuery } from '../../lib/records/records-query';
 
@@ -374,6 +374,20 @@ export function RecordsIndexRoom({ model, releaseLabel }: RecordsIndexProps) {
           includeUndated={query.includeUndated}
           clearHref={periodClearHref}
           undatedExcluded={undatedExcluded}
+          disclosure={{
+            summary:
+              query.periodStart === '' && query.periodEnd === ''
+                ? 'Any decade'
+                : `${periodLabel({
+                    start: query.periodStart,
+                    end: query.periodEnd,
+                    includeUndated: query.includeUndated,
+                  })}${
+                    !query.includeUndated && undatedExcluded > 0
+                      ? ` · ${undatedExcluded.toLocaleString('en-US')} undated left out`
+                      : ''
+                  }`,
+          }}
         />
       </div>
 

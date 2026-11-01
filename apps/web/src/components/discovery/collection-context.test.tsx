@@ -13,6 +13,7 @@ import {
   type RecordsIndex as RecordsIndexModel,
 } from '../../lib/records/build-records-index';
 import { RecordsIndexRoom } from '../../app/records/RecordsIndex';
+import { CollectionPeriodControls } from './collection-period-controls';
 import {
   CollectionContext,
   collectionCountText,
@@ -177,5 +178,37 @@ describe('CollectionContext integrations', () => {
     assert.match(source, /recordsQueryFromExplore\(collectionState\)/);
     // The rail only keeps its own count and list link when the strip is hidden.
     assert.match(source, /showCollection\s*\?\s*\{\}/);
+  });
+});
+
+describe('CollectionPeriodControls disclosure', () => {
+  const base = {
+    action: '/records',
+    preserved: { q: 'school' },
+    decades: [{ decade: 1880, count: 3 }],
+    includeUndated: false,
+    clearHref: '/records?q=school',
+    disclosure: { summary: 'Documented in the 1880s or later' },
+  } as const;
+
+  it('stays closed with the current range as its summary and the clear link outside it', () => {
+    const html = renderToStaticMarkup(
+      <CollectionPeriodControls {...base} start="1880" end="" />,
+    );
+    assert.doesNotMatch(html, /<details[^>]*\sopen/);
+    assert.match(html, /<summary[\s\S]*Documented in the 1880s or later[\s\S]*<\/summary>/);
+    assert.doesNotMatch(html, /<summary[\s\S]*<a [\s\S]*<\/summary>/);
+    assert.match(html, /<\/details><a [^>]*href="\/records\?q=school"[^>]*>Clear range/);
+    // The form keeps GET semantics and every other param.
+    assert.match(html, /<form[^>]*method="get"/);
+    assert.match(html, /name="q" value="school"/);
+  });
+
+  it('opens by itself and says no records are shown for an unreadable range', () => {
+    const html = renderToStaticMarkup(
+      <CollectionPeriodControls {...base} start="invalid" end="" />,
+    );
+    assert.match(html, /<details[^>]*\sopen/);
+    assert.match(html, /Unreadable range\. No records shown/);
   });
 });

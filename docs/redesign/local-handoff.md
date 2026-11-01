@@ -120,6 +120,75 @@ canonical branch reconciliation/pruning, not isolated source work.
 This clone's `origin` is a local path, not GitHub. No push, deployment, published-data write,
 original branch deletion or original working-tree change occurred.
 
+## Finish polish on d9b9604f (Claude Sonnet 5.5, isolated clone, 2026-11-01)
+
+Changed: `collection-period-controls.{tsx,css}`, `records-chronology.css`, `RecordsIndex.tsx`,
+`collection-context.test.tsx` (two new disclosure tests), `collection-contract.md`, this file.
+Nothing rendered or browsed; the root owns 375/1280 and light/dark comparison. No data, schema,
+manifest, dependency or protected-route change.
+
+Wrapper results at this revision: focused 125/125, types pass, edge 59/59, inventory ok
+(66 routes, six shared surfaces). The first aggregate had two failures; one was the room-kit guard
+"no public route has an Apply button", fixed by relabelling the period submit "Show records"
+(guard untouched).
+
+**Remaining aggregate failure, identified and fixed.** `door-catalog.test.ts` ("door home and pin
+route share the cached pin plate loader") matched a five-argument `buildAtlasShell(...)` call.
+`door-home.tsx` now passes the resolved story collection descriptor as a sixth argument on
+purpose, so the stale assertion was updated to require `collectionCatalog, collection`. The
+guards that `door-home.tsx` uses `loadDoorPinPlate`, does not use `toDoorLinkPins`, and that the
+pin route stays off `getSharedPublicEntities` are unchanged. Fixed wrapper `regression`: 5/5
+pass. Only a source-regex assertion changed, so the full aggregate was not repeated; the delta
+from 2,906 pass / 1 fail is expected to be 2,907 pass / 0 fail, which the root should confirm.
+
+**Map status fix (found in the real browser).** With a named collection and a documented range
+active, the bottom time panel still said "All time / 4,202 records" and the Filters chip said "no
+filters", contradicting the collection strip (2 records, Documented 1860s through 1900s). The
+slider keeps its meaning (its "All time" is still the whole archive, and no handler or value
+moved). Changes: `AtlasExperience.tsx` builds a `scopeStatus` line only when the scope is
+countable (`Collection narrowed: N records, Documented 1860s through 1900s`, or `Documented
+range: N records, ...` with no named collection); `TimePanel.tsx` shows it on its own line and
+its all-time sub-line becomes "4,202 records in the whole archive" while a scope is set;
+`decade-density.ts` `decadeSubLine` takes an optional `scoped` flag; `time-panel.css` styles the
+line; the Filters chip reads "no map filters" instead of "no filters" while scoped. An
+unresolved or unreadable scope still shows no count. Added a `decade-density.test.ts` case for
+the scoped and unscoped sub-line. Fixed wrapper `focused` 125/125 and `types` pass after the
+change. The new test file and the rendered panel (375/1280, light/dark, line wrapping inside the
+narrow panel) are not browser-verified here; the root owns that.
+
+Secondary public routes, read from source in this pass (`sources/page.tsx`,
+`SourcesSections.tsx`, `rooms/page.tsx`, `law/page.tsx`, `law/LawBrowseSections.tsx`):
+
+| Route | What the source shows | Classification |
+|---|---|---|
+| `/sources` | Shared Room kit with an entry plate, three jump sections (citation chain, publisher kinds, where sources appear). It states that counts live on the operator desk and lists no individual source. | Retained distinct reading-room layout. Reader-facing copy now; the old "pipeline words" finding is stale. Not merged into methodology. |
+| `/rooms` | Wayfinding hub whose cards, groups and copy derive from the destination registry; no second index or immersion surface. | Retained as orientation. The "Retire `/rooms`" proposal in `SURFACES.md` is an open IA and redirect decision, not an implementation gap. |
+| `/law` | Browse with entry plate built from an already quoted catalog entry, stats, orientation rail, search/sort view model and the shared `Pagination`. It declares no documented join to a record. | Retained distinct browse layout. The old "no pagination" finding is stale. |
+
+Detail views (`/law/[slug]`, books, errata, Stories index, mosaic credits, Memorial) were not
+re-read in this pass; an earlier pass recorded books browse and errata as retained reading rooms
+from source, which is not re-verified here. None of these is rendered-complete.
+`surface-inventory.json` statuses are left unchanged: the vocabulary only allows complete with
+explicit verification metadata, none exists for these routes, and their route-level `pending`
+means acceptance is not recorded, not that the page is broken. Source and test references are
+planning evidence, not visual QA.
+
+**Remaining gaps, split by kind.**
+- Independent implementation or verification (no owner decision needed): rendered acceptance at
+  375/1280 in light and dark for the ten public routes the inventory still counts pending (books
+  browse/detail, errata, law browse/detail, Memorial, Rooms, Sources, Stories index, mosaic
+  credits); Records cold-load budget with the cached pin plate; browser check of the map status
+  line above.
+- Data gate: the mosaic manifest has no immutable tile author or licence metadata, so
+  `/stories/mosaic-credits` names sources but invents no per-tile credit. Real credits need the
+  manifest data from its owner. No law dataset is manufactured to fill a layout.
+- Owner or product decision: exact date-bound semantics for uncertain or undated records (census
+  decades are not event intervals); whether to retire `/rooms` or merge `/sources`; any schema or
+  stored-record change, which needs final sign-off before application.
+- Authorization and integration gates: Memorial's protected access rules stay untouched; staff
+  surfaces (31 pending in the inventory) are behind authentication and were not inspected;
+  canonical merge and original branch pruning wait on the original owner.
+
 ## Latest candidate — 6ae2b4a4
 
 The broader source slice is saved and serving at **http://127.0.0.1:3103/**. See
@@ -150,3 +219,6 @@ checkout and prune original branches/worktrees. **Not attempted; pending origina
 Parent explicitly barred canonical merges/pruning while that ownership remains unresolved.
 Native discovery exposed no contactable owner; private session scraping/resume was not used.
 This is a verified core candidate, not a claim that the full redesign is finished.
+
+### Coordinator integration receipt (2026-11-01)
+Sonnet finishing execution and routine checks are integrated. Follow-up session774230de-a0bf-42cf-bd3c-9340eff366d5 verified modelclaude-sonnet-5-5, exit0. Final frozen aggregate is2916tests/2908pass/8skip/0fail, not an expected projection; newdecade test ran in targeted16pass. Root standardized the new chronology breakpoint to existing48rem (no behaviorlogicchange). Actualbrowser evidence is recorded in rendered-acceptance.md. Canonicaloriginalowner remainsunknown; no merge/prune/push/deploy. Read-only database guard unchanged. Storedschema/records still require reviewedproposal+syntheticvalidation+impact/rollback+finalusersignoff.

@@ -93,6 +93,15 @@ layout param. `lib/discovery/collection-chronology.ts`:
 - `CollectionPeriodControls`: one native GET form (From and Through decade selects, include-undated
   checkbox, Apply, Clear). Hidden fields carry every other param. It is a sibling of the find form
   on Records and sits in a native disclosure in the map strip, so no forms nest.
+- On Records the period form is wrapped in a native `<details>` (`disclosure` prop) that stays
+  closed by default so rows are not pushed below a phone viewport. The summary states the current
+  range ("Any decade", "Documented 1880s through 1920s, plus undated") and, when a range leaves
+  undated records out, how many. An unreadable range opens the disclosure and states that no
+  records are shown. The Clear link sits beside the summary, never inside it. The GET form and
+  hidden fields are unchanged. The submit is labelled "Show records" because the room kit forbids
+  an "Apply" button (`room-kit.test.tsx`, no public route has an Apply button).
+- Chronology: from 56rem the decade stands in a left ledger column beside its rows; narrower it
+  stacks. Each section keeps its own shown/total count and the undated section stays last.
 - `RecordsChronology` reuses `HairlineIndex` rows (native record links, evidence meter, kind glyph).
 - The story page appendix adds Records, Map and Chronology links for exactly the linked set, with
   copy that it is not every source. Author text, citations, `#ref` and heading ids are untouched.

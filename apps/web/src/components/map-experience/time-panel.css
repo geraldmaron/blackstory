@@ -49,6 +49,13 @@
   color: var(--ds-ink-muted);
 }
 
+.ds-time-panel__scope {
+  margin: 0 0 var(--ds-space-2);
+  font-family: var(--ds-font-mono);
+  font-size: var(--ds-text-micro);
+  color: var(--ds-accent);
+}
+
 .ds-time-panel__controls {
   display: flex;
   align-items: center;

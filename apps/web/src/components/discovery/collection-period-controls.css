@@ -110,6 +110,87 @@
   color: var(--ds-ink);
 }
 
+/* —— disclosure form (Records) ————————————————————————————————————————————
+   One quiet line while closed: the label and the current range, with Clear beside it. */
+.ds-period-disclosure {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: 0 var(--ds-space-3);
+  min-width: 0;
+  border-bottom: var(--ds-border-width) solid var(--ds-rule);
+}
+
+.ds-period-disclosure__details {
+  flex: 1 1 16rem;
+  min-width: 0;
+}
+
+.ds-period-disclosure__summary {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0 var(--ds-space-3);
+  min-height: 44px;
+  cursor: pointer;
+  list-style: none;
+  font-size: var(--ds-text-body-sm);
+}
+
+.ds-period-disclosure__summary::-webkit-details-marker {
+  display: none;
+}
+
+.ds-period-disclosure__summary::after {
+  content: '+';
+  margin-left: auto;
+  font-family: var(--ds-font-mono);
+  color: var(--ds-ink-muted);
+}
+
+.ds-period-disclosure__details[open] > .ds-period-disclosure__summary::after {
+  content: '\2212';
+}
+
+.ds-period-disclosure__title {
+  font-family: var(--ds-font-mono);
+  font-size: var(--ds-text-caption);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--ds-ink-muted);
+}
+
+.ds-period-disclosure__value {
+  color: var(--ds-ink-muted);
+}
+
+.ds-period-disclosure__value[data-state='active'] {
+  color: var(--ds-ink);
+  font-weight: 550;
+}
+
+/* Stated in words and a rule, not by hue alone. */
+.ds-period-disclosure__value[data-state='error'] {
+  padding-left: var(--ds-space-2);
+  border-left: 3px solid var(--ds-ink);
+  color: var(--ds-ink);
+}
+
+.ds-period-disclosure > .ds-period__clear {
+  align-self: flex-start;
+}
+
+.ds-period-disclosure__summary:focus-visible {
+  outline: var(--ds-focus-width) solid var(--ds-focus-ring);
+  outline-offset: 2px;
+}
+
+/* Inside the panel the disclosure supplies the frame, so the form drops its own rule. */
+.ds-period--panel {
+  padding-top: 0;
+  border-bottom: 0;
+}
+
 @media (max-width: 40rem) {
   .ds-period__select {
     width: 100%;

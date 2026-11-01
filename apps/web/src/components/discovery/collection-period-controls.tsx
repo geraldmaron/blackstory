@@ -32,6 +32,12 @@ export type CollectionPeriodControlsProps = {
   /** Records without a documented decade that the active range leaves out. */
   readonly undatedExcluded?: number;
   readonly className?: string;
+  /**
+   * Wrap the form in a native `<details>` whose summary states the current range, for pages that
+   * have no disclosure of their own (Records). The map strip already supplies one, so it omits
+   * this. A summary line the caller computed from the same period (`periodLabel`).
+   */
+  readonly disclosure?: { readonly summary: string };
 };
 
 type Option = { readonly value: string; readonly label: string };
@@ -63,15 +69,16 @@ export function CollectionPeriodControls({
   clearHref,
   undatedExcluded = 0,
   className,
+  disclosure,
 }: CollectionPeriodControlsProps) {
   const active = start !== '' || end !== '';
   const invalid = start === 'invalid' || end === 'invalid';
   const startOptions = optionsFor(decades, start);
   const endOptions = optionsFor(decades, end);
 
-  return (
+  const form = (
     <form
-      className={cx('ds-period', className)}
+      className={cx('ds-period', disclosure ? 'ds-period--panel' : undefined, className)}
       action={action}
       method="get"
       aria-label="Limit by documented decade"
@@ -79,7 +86,7 @@ export function CollectionPeriodControls({
       {Object.entries(preserved).map(([name, value]) => (
         <input key={name} type="hidden" name={name} value={value} />
       ))}
-      <p className="ds-period__title">Documented decade</p>
+      {disclosure ? null : <p className="ds-period__title">Documented decade</p>}
       <div className="ds-period__fields">
         <label className="ds-period__field">
           <span className="ds-period__label">From</span>
@@ -122,9 +129,9 @@ export function CollectionPeriodControls({
         </label>
         <div className="ds-period__actions">
           <button className="ds-cta ds-cta--quiet ds-cta--sm ds-period__apply" type="submit">
-            Apply
+            Show records
           </button>
-          {active ? (
+          {active && !disclosure ? (
             <a className="ds-period__clear" href={clearHref}>
               Clear range
             </a>
@@ -150,5 +157,34 @@ export function CollectionPeriodControls({
         </p>
       ) : null}
     </form>
+  );
+
+  if (!disclosure) return form;
+
+  /*
+   * A closed disclosure keeps the rows near the top of a phone. It opens by itself for an
+   * unreadable range so the error is never hidden, and the clear link sits beside the summary,
+   * not inside it, so no interactive content is nested in a `<summary>`.
+   */
+  return (
+    <div className="ds-period-disclosure" data-active={active ? 'true' : undefined}>
+      <details className="ds-period-disclosure__details" open={invalid ? true : undefined}>
+        <summary className="ds-period-disclosure__summary">
+          <span className="ds-period-disclosure__title">Documented decade</span>
+          <span
+            className="ds-period-disclosure__value"
+            data-state={invalid ? 'error' : active ? 'active' : 'idle'}
+          >
+            {invalid ? 'Unreadable range. No records shown' : disclosure.summary}
+          </span>
+        </summary>
+        {form}
+      </details>
+      {active ? (
+        <a className="ds-period__clear" href={clearHref}>
+          Clear range
+        </a>
+      ) : null}
+    </div>
   );
 }

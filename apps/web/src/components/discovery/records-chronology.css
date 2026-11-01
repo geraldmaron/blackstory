@@ -42,6 +42,34 @@
   color: var(--ds-ink-muted);
 }
 
+/* The section's own count sits under its decade; the shared index's loose margin is tightened. */
+.ds-chronology .ds-room-idx__count {
+  margin-block: 0 var(--ds-space-1);
+  font-size: var(--ds-text-caption);
+  color: var(--ds-ink-muted);
+}
+
+/*
+ * Wide: the decade stands in a left column like a ledger margin and its rows run beside it, so
+ * the page reads as a chronology rather than a list of repeated headers. Narrow keeps the stack.
+ */
+@media (min-width: 48rem) {
+  .ds-chronology__section {
+    display: grid;
+    grid-template-columns: 9rem minmax(0, 1fr);
+    column-gap: var(--ds-space-5);
+    align-items: start;
+  }
+
+  .ds-chronology__heading {
+    margin: 0;
+    padding-bottom: 0;
+    border-bottom: 0;
+    border-top: var(--ds-border-width) solid var(--ds-border-strong);
+    padding-top: var(--ds-space-2);
+  }
+}
+
 /* Coverage is real bucket metadata; keep the sparse values readable on touch screens. */
 .ds-chronology .ds-room-idx__note {
   white-space: normal;

@@ -813,6 +813,22 @@ export function AtlasExperience({ initial, embedded = false }: AtlasExperiencePr
   const periodPreserved = Object.fromEntries(
     new URLSearchParams(buildExploreSearchParams(periodBase)).entries(),
   );
+  /**
+   * Current collection and documented-range status for the instruments that otherwise speak for
+   * the whole archive (the time slider, the Filters chip). Undefined when nothing is narrowed or
+   * the scope cannot be counted, so the archive-wide wording stays true.
+   */
+  const scopeStatus =
+    view.collectionFacts &&
+    unresolvedScope === undefined &&
+    (namedCollection !== '' || periodIsActive(period))
+      ? [
+          namedCollection !== ''
+            ? `Collection narrowed: ${collectionMatched.toLocaleString('en-US')} ${collectionMatched === 1 ? 'record' : 'records'}`
+            : `Documented range: ${collectionMatched.toLocaleString('en-US')} ${collectionMatched === 1 ? 'record' : 'records'}`,
+          ...(periodIsActive(period) ? [periodLabel(period)] : []),
+        ].join(', ')
+      : undefined;
   /** Temporary map constraints. They limit what is drawn, never what is in the collection. */
   const mapLimits = [
     ...(nearby ? ['nearby'] : []),
@@ -1040,6 +1056,7 @@ export function AtlasExperience({ initial, embedded = false }: AtlasExperiencePr
           decade={decade}
           onDecadeChange={setDecade}
           totalRecords={view.allFeatures.length}
+          scope={scopeStatus}
         />
       </SheetPresence>
       <SheetPresence show={mode === 'atlas' && !chromeHidden && panels.camera}>
@@ -1083,7 +1100,9 @@ export function AtlasExperience({ initial, embedded = false }: AtlasExperiencePr
             const detail =
               key === 'lens'
                 ? constraints.length === 0
-                  ? 'no filters'
+                  ? scopeStatus !== undefined
+                    ? 'no map filters'
+                    : 'no filters'
                   : `${constraints.length} filter${constraints.length === 1 ? '' : 's'}`
                 : key === 'results'
                   ? `${sorted.length} of ${view.allFeatures.length}`
