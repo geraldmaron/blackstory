@@ -1,8 +1,12 @@
 # BlackStory surface spec
 
-**Status:** living inventory + redesign spec. No application code has been changed.
+**Status:** living inventory + redesign spec; incremental implementation is recorded in §§8–9.
 **Date:** 2026-10-31 · **Branch:** `redesign/ux-audit-2026-10`
 **Companion:** [`README.md`](README.md) (the GROUND direction and prototype)
+
+**Execution authority:** [`execution-plan.md`](execution-plan.md) refines the dependency order,
+acceptance criteria and ownership after the 2026-11-01 adversarial pass. The inventory below
+describes the audit baseline; it is not a claim that every listed defect still exists.
 
 Every claim here was read out of the running app or the source. Six parallel read-only audits
 covered the router, layouts, shared components and CSS; anything the auditors inferred rather

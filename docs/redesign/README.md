@@ -4,6 +4,10 @@
 **Date:** 2026-10-31 · **Branch:** `redesign/ux-audit-2026-10`
 **Prototype:** [`prototype/index.html`](prototype/index.html) — see [how to open it](#how-to-open-the-prototype)
 
+**Current execution contract:** [`execution-plan.md`](execution-plan.md) supersedes the roadmap
+below after the 2026-11-01 adversarial pass. It preserves published routes and protected
+experiences, starts with collection continuity, and records ownership and verification gates.
+
 This supersedes an earlier draft in this directory that proposed "One Field". That draft was a
 reskin: it renamed Map/Stories/Records to Journey/Field/Reading, bolted a state object onto the
 existing page structure, and led with a "stop the bleeding" patch list. It has been deleted
@@ -304,12 +308,12 @@ From a constraints audit of the live app. These are promises already made to the
    human/bot class). **Deleting destination pages cannot be justified or refuted from in-repo
    evidence.** That is a real gap, and it is why §7 starts with instrumentation.
 
-### Two conflicts that need an explicit owner decision
+### Policy boundaries
 
-> **Status note.** The owner greenlit the GROUND *direction* on 2026-10-31. That greenlight does
-> not resolve the two items below: both amend binding dignity and surface law, and the register
-> requires a deliberate amendment by its own terms. They remain open and block Phase 2, not
-> Phase 1.
+The owner greenlit the GROUND direction on 2026-10-31. The refined execution contract uses
+framed maps alongside prose, preserves Memorial and follows the existing sensitive-record
+motion rules. Those choices need no policy amendment. A different visual treatment that
+actually changes a protected experience still requires an explicit owner decision.
 
 - **Plate-behind-prose.** `docs/ui/patterns-plate-posture.md` states "The plate is never behind
   body text outside the Instrument… A full bleed plate says nothing and asserts everything." A
@@ -317,12 +321,16 @@ From a constraints audit of the live app. These are promises already made to the
   current `/` door already violates it. **GROUND requires either amending this rule or confining
   threads to a framed plate.** This cannot be decided by an agent.
 - **Amending the Protected Experiences register** requires "an explicit owner decision" by its
-  own terms. Items P-01 and P-04 are touched by this design, in the direction of *more*
-  protection, but the amendment still has to be made deliberately.
+  own terms. Keeping Memorial separate and using sensitive-record cuts conform to P-01/P-04;
+  they do not themselves require changing the register.
 
 ---
 
 ## 7. Roadmap
+
+Historical sequencing, superseded by [`execution-plan.md`](execution-plan.md). Kept here to
+explain the original proposal; its instrumentation prerequisite and blanket policy gate no
+longer control implementation.
 
 Sequenced so the irreversible decisions come after the evidence, and each phase is independently
 defensible.
