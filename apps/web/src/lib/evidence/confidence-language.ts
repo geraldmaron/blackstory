@@ -52,3 +52,21 @@ export const EVIDENCE_DIMENSION_COPY: Readonly<
       'completeness, not about the certainty of any individual claim already found.',
   },
 } as const;
+
+/**
+ * Reader wording for the pipeline's record-maturity tokens.
+ *
+ * The Record file printed these raw through `humanizeToken`, so a public page said
+ * "Maturity: Partial Enrichment" — a pipeline state, in pipeline words, to someone who has
+ * never seen the pipeline. The facts are kept; only the wording changes. Anything unmapped
+ * falls back to a neutral phrase rather than exposing a new token the day one is added.
+ */
+export const RECORD_MATURITY_COPY: Readonly<Record<string, string>> = {
+  projection_stub: 'Listed, not yet researched',
+  partial_enrichment: 'Partly researched',
+  full_enrichment: 'Fully researched',
+} as const;
+
+export function recordMaturityLabel(token: string): string {
+  return RECORD_MATURITY_COPY[token] ?? 'Research in progress';
+}

@@ -100,6 +100,9 @@ function DoorRooms({ rooms }: { readonly rooms: ReturnType<typeof selectDoorRoom
   );
 }
 
+/** Kinds that land in the place family but have no meaningful geographic neighbours. */
+const NON_SPATIAL_PLACE_FAMILY_KINDS: ReadonlySet<string> = new Set(['law']);
+
 function WalkOnPlaces({
   places,
   collisions,
@@ -157,6 +160,19 @@ export function HomeFirstPaint({
     const rooms = selectDoorRooms(lead, citing);
     const eraLink = firstPaintEraLink(lead);
     const nextPlaces = walkOnPlaces(lead, model.also);
+    /*
+     * This family is a catch-all: `familyForKind` routes everything that is not an invention
+     * here, so most kinds arriving are genuinely spatial (place, school, church, district) and
+     * a few are not. A statute was being described as a place and offered a church and a
+     * cemetery as neighbours purely because they sit near its enactment point, which reads as
+     * a relationship the sources do not state (P-02).
+     *
+     * A deny-list, not an allow-list: the spatial kinds are open-ended and an allow-list
+     * silently demoted every one it had not heard of. Add a kind here only when nearest-place
+     * neighbours would be misleading for it.
+     */
+    const isPlaceLike = !NON_SPATIAL_PLACE_FAMILY_KINDS.has(lead.kind ?? '');
+    const glanceLabel = isPlaceLike ? 'Place at a glance' : 'Record at a glance';
     const collisions = placeSlugCollisionCounts([lead, ...model.also]);
     const locatorName = firstPaintLocatorName(lead);
     const visitInput = {
@@ -265,7 +281,7 @@ export function HomeFirstPaint({
             >
               {mastMedia}
               <figcaption className="ds-record-mast__over">
-                <div className="ds-rec-pills" aria-label="Place at a glance">
+                <div className="ds-rec-pills" aria-label={glanceLabel}>
                   <RecordKindPill kind={lead.kind} />
                   {eraLink ? (
                     <RecordPill
@@ -422,7 +438,13 @@ export function HomeFirstPaint({
           />
         </section>
 
-        <WalkOnPlaces places={nextPlaces} collisions={collisions} />
+        {/*
+         * Nearest places are only a meaningful "what next" for a record that is itself a
+         * place. A statute catalogued in this family was being offered a church and a cemetery
+         * as its neighbours purely because they are near its enactment point, which reads as a
+         * relationship the sources do not state (P-02).
+         */}
+        {isPlaceLike ? <WalkOnPlaces places={nextPlaces} collisions={collisions} /> : null}
 
         <DoorRooms rooms={rooms} />
 

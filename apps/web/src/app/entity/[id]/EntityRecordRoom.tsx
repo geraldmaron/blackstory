@@ -49,6 +49,10 @@ import {
   type RecordGapKind,
 } from '../../../components/entity/copy';
 import { humanizeToken } from '../../../components/entity/format';
+import {
+  EVIDENCE_DIMENSION_COPY,
+  recordMaturityLabel,
+} from '../../../lib/evidence/confidence-language';
 import { confidenceIconFor } from '../../../lib/map-experience/confidence-icons';
 import { geoAnchorFor } from '../../../lib/map-experience/entity-geo';
 import { buildExternalMapsSearchUrl } from '../../../lib/geography/external-maps-url';
@@ -317,24 +321,35 @@ export async function EntityRecordRoom({ entity }: { readonly entity: PublicEnti
         <RecordSmallTitle id="record-file-heading" icon="provenance">
           Record file
         </RecordSmallTitle>
+        {/*
+         * Same facts, reader wording. This block printed the pipeline's own tokens —
+         * "Maturity: Partial Enrichment" — to people who have never seen the pipeline. Nothing
+         * is removed: the release id is what a correction or an errata entry is traced
+         * through, so it stays, with a line saying what it is rather than leaving a bare
+         * identifier on a public page.
+         */}
         <dl className="ds-rec-file__rows">
           <div className="ds-rec-file__row">
-            <dt>Maturity</dt>
-            <dd>{humanizeToken(entity.recordMaturity)}</dd>
+            <dt>How far researched</dt>
+            <dd>{recordMaturityLabel(entity.recordMaturity)}</dd>
           </div>
           <div className="ds-rec-file__row">
-            <dt>Coverage</dt>
+            <dt>{EVIDENCE_DIMENSION_COPY.researchCoverage.label}</dt>
             <dd>{humanizeToken(entity.researchCoverage)}</dd>
           </div>
           <div className="ds-rec-file__row">
-            <dt>Updated</dt>
+            <dt>Last updated</dt>
             <dd className="ds-mono">{formatRecordDate(entity.revision.recordUpdatedAt)}</dd>
           </div>
           <div className="ds-rec-file__row">
-            <dt>Release</dt>
+            <dt>Published in</dt>
             <dd className="ds-mono ds-rec-file__release">{entity.revision.releaseId}</dd>
           </div>
         </dl>
+        <p className="ds-rec-file__note">
+          The release is the batch this version of the record was published in. Quote it in a
+          correction and the exact text you read can be traced.
+        </p>
         <Link className="ds-rec-file__correct" href={correctionsHref} prefetch={false}>
           <FontAwesomeIcon icon={faPenToSquare} className="ds-rec-inline-icon" aria-hidden="true" />
           Submit a correction
