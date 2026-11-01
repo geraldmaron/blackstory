@@ -36,6 +36,10 @@ bounded implementation lanes below were assigned. The attempted Claude review di
 - **Accepted with controls: pruning.** Delete only superseded reachable code after its
   replacement passes the same tasks. Preserve document content, anchors, citations and URL
   redirects. Never delete unexplained branches or work owned by a live session.
+- **Rejected: porting the prototype paint unchanged.** The existing preview on port 4199
+  uses gradients, shadows and backdrop blur despite P-06's brand constraints. Treat it as a collection
+  interaction sketch with fixture records, not visual acceptance or production source data.
+  Opaque matte surfaces and clear layer ownership must replace that treatment.
 
 ## Dependencies and acceptance
 

@@ -1,0 +1,3698 @@
+{
+  "schemaVersion": 1,
+  "purpose": "Machine-checked source route and shared-surface inventory for the redesign.",
+  "statusMeaning": "baseline means the current implementation is the recorded starting point; partial means a relevant execution-log slice shipped but the surface work remains incomplete; pending means the redesign spec identifies work with no completion recorded. Complete may be used only with explicit verification metadata. State statuses and source/test references are not visual QA, accessibility sign-off, or screenshot evidence.",
+  "familyAuthority": "Families are work-planning sections from docs/redesign/SURFACES.md. Public shell surface-class decisions remain owned by surfaceClassFor in apps/web/src/lib/nav/surface-classes.ts and its exhaustive coverage test; this manifest does not reimplement that resolver.",
+  "visualBaseline": "The screenshot matrix remains the small stable list in packages/testing/src/visual/routes.ts; this inventory does not add screenshot targets.",
+  "routes": [
+    {
+      "route": "/",
+      "source": "apps/web/src/app/page.tsx",
+      "family": "ground-map",
+      "access": "public",
+      "status": "partial",
+      "states": {
+        "default": {
+          "status": "baseline",
+          "reason": "The route source is the current rendering or redirect anchor; this status records a baseline and does not assert visual verification.",
+          "evidence": ["apps/web/src/app/page.tsx"]
+        },
+        "loading": {
+          "status": "not-applicable",
+          "reason": "The route is a static or redirect surface and the redesign spec does not call for a route-specific loading state.",
+          "evidence": ["apps/web/src/app/page.tsx"]
+        },
+        "error": {
+          "status": "pending",
+          "reason": "The redesign spec identifies an error state or the admin section lacks a route-level error treatment.",
+          "evidence": ["apps/web/src/app/page.tsx", "docs/redesign/SURFACES.md"]
+        },
+        "empty": {
+          "status": "pending",
+          "reason": "The redesign spec identifies absent chapter, offline catalog, empty result, or no-data treatment for this surface.",
+          "evidence": ["apps/web/src/app/page.tsx", "docs/redesign/SURFACES.md"]
+        },
+        "selected": {
+          "status": "pending",
+          "reason": "The map surface has filter and camera selection; selected/cleared and empty-map states remain redesign work.",
+          "evidence": ["apps/web/src/app/page.tsx", "docs/redesign/SURFACES.md"]
+        },
+        "auth": {
+          "status": "not-applicable",
+          "reason": "This route is public and does not have an authentication state in its surface flow.",
+          "evidence": ["apps/web/src/app/page.tsx"]
+        }
+      },
+      "componentRefs": [
+        "apps/web/src/app/page.tsx",
+        "apps/web/src/components/SiteShell.tsx",
+        "apps/web/src/components/map-stage/MapStage.tsx"
+      ],
+      "evidence": [
+        "apps/web/src/app/page.tsx",
+        "docs/redesign/SURFACES.md",
+        "apps/web/src/lib/nav/surface-classes.ts",
+        "apps/web/src/lib/nav/surface-classes.test.ts"
+      ]
+    },
+    {
+      "route": "/about",
+      "source": "apps/web/src/app/about/page.tsx",
+      "family": "trust-policy",
+      "access": "public",
+      "status": "baseline",
+      "states": {
+        "default": {
+          "status": "baseline",
+          "reason": "The route source is the current rendering or redirect anchor; this status records a baseline and does not assert visual verification.",
+          "evidence": ["apps/web/src/app/about/page.tsx"]
+        },
+        "loading": {
+          "status": "pending",
+          "reason": "The redesign surface spec calls for route loading treatment; no matching route-segment loading component is present.",
+          "evidence": ["apps/web/src/app/about/page.tsx", "docs/redesign/SURFACES.md"]
+        },
+        "error": {
+          "status": "pending",
+          "reason": "The redesign spec identifies an error state or the admin section lacks a route-level error treatment.",
+          "evidence": ["apps/web/src/app/about/page.tsx", "docs/redesign/SURFACES.md"]
+        },
+        "empty": {
+          "status": "not-applicable",
+          "reason": "This route is not an empty-result or data-absence surface in the redesign inventory.",
+          "evidence": ["apps/web/src/app/about/page.tsx"]
+        },
+        "selected": {
+          "status": "not-applicable",
+          "reason": "The route has no meaningful selected-item or selected-filter state in the redesign scope.",
+          "evidence": ["apps/web/src/app/about/page.tsx"]
+        },
+        "auth": {
+          "status": "not-applicable",
+          "reason": "This route is public and does not have an authentication state in its surface flow.",
+          "evidence": ["apps/web/src/app/about/page.tsx"]
+        }
+      },
+      "componentRefs": ["apps/web/src/app/about/page.tsx", "apps/web/src/components/SiteShell.tsx"],
+      "evidence": [
+        "apps/web/src/app/about/page.tsx",
+        "docs/redesign/SURFACES.md",
+        "apps/web/src/lib/nav/surface-classes.ts",
+        "apps/web/src/lib/nav/surface-classes.test.ts"
+      ]
+    },
+    {
+      "route": "/admin",
+      "source": "apps/web/src/app/admin/page.tsx",
+      "family": "admin",
+      "access": "staff",
+      "status": "pending",
+      "states": {
+        "default": {
+          "status": "baseline",
+          "reason": "The route source is the current rendering or redirect anchor; this status records a baseline and does not assert visual verification.",
+          "evidence": ["apps/web/src/app/admin/page.tsx"]
+        },
+        "loading": {
+          "status": "baseline",
+          "reason": "A route-segment loading component exists and is the current loading-state baseline.",
+          "evidence": ["apps/web/src/app/admin/loading.tsx", "docs/redesign/SURFACES.md"]
+        },
+        "error": {
+          "status": "pending",
+          "reason": "The redesign spec identifies an error state or the admin section lacks a route-level error treatment.",
+          "evidence": ["apps/web/src/app/admin/page.tsx", "docs/redesign/SURFACES.md"]
+        },
+        "empty": {
+          "status": "not-applicable",
+          "reason": "This route is not an empty-result or data-absence surface in the redesign inventory.",
+          "evidence": ["apps/web/src/app/admin/page.tsx"]
+        },
+        "selected": {
+          "status": "not-applicable",
+          "reason": "The route has no meaningful selected-item or selected-filter state in the redesign scope.",
+          "evidence": ["apps/web/src/app/admin/page.tsx"]
+        },
+        "auth": {
+          "status": "baseline",
+          "reason": "The route is protected by the existing staff identity gate; redesign status does not change or re-verify authorization.",
+          "evidence": [
+            "apps/web/src/proxy.ts",
+            "apps/web/src/proxy.test.ts",
+            "apps/web/src/admin/auth/protected-paths.test.ts",
+            "apps/web/src/app/admin/page.tsx"
+          ]
+        }
+      },
+      "componentRefs": [
+        "apps/web/src/app/admin/page.tsx",
+        "apps/web/src/admin/components/AdminShellChrome.tsx"
+      ],
+      "evidence": [
+        "apps/web/src/app/admin/page.tsx",
+        "docs/redesign/SURFACES.md",
+        "apps/web/src/lib/nav/surface-classes.ts",
+        "apps/web/src/lib/nav/surface-classes.test.ts"
+      ]
+    },
+    {
+      "route": "/admin/audit",
+      "source": "apps/web/src/app/admin/audit/page.tsx",
+      "family": "admin",
+      "access": "staff",
+      "status": "pending",
+      "states": {
+        "default": {
+          "status": "baseline",
+          "reason": "The route source is the current rendering or redirect anchor; this status records a baseline and does not assert visual verification.",
+          "evidence": ["apps/web/src/app/admin/audit/page.tsx"]
+        },
+        "loading": {
+          "status": "baseline",
+          "reason": "A route-segment loading component exists and is the current loading-state baseline.",
+          "evidence": ["apps/web/src/app/admin/loading.tsx", "docs/redesign/SURFACES.md"]
+        },
+        "error": {
+          "status": "pending",
+          "reason": "The redesign spec identifies an error state or the admin section lacks a route-level error treatment.",
+          "evidence": ["apps/web/src/app/admin/audit/page.tsx", "docs/redesign/SURFACES.md"]
+        },
+        "empty": {
+          "status": "not-applicable",
+          "reason": "This route is not an empty-result or data-absence surface in the redesign inventory.",
+          "evidence": ["apps/web/src/app/admin/audit/page.tsx"]
+        },
+        "selected": {
+          "status": "not-applicable",
+          "reason": "The route has no meaningful selected-item or selected-filter state in the redesign scope.",
+          "evidence": ["apps/web/src/app/admin/audit/page.tsx"]
+        },
+        "auth": {
+          "status": "baseline",
+          "reason": "The route is protected by the existing staff identity gate; redesign status does not change or re-verify authorization.",
+          "evidence": [
+            "apps/web/src/proxy.ts",
+            "apps/web/src/proxy.test.ts",
+            "apps/web/src/admin/auth/protected-paths.test.ts",
+            "apps/web/src/app/admin/audit/page.tsx"
+          ]
+        }
+      },
+      "componentRefs": [
+        "apps/web/src/app/admin/audit/page.tsx",
+        "apps/web/src/admin/components/AdminShellChrome.tsx"
+      ],
+      "evidence": [
+        "apps/web/src/app/admin/audit/page.tsx",
+        "docs/redesign/SURFACES.md",
+        "apps/web/src/lib/nav/surface-classes.ts",
+        "apps/web/src/lib/nav/surface-classes.test.ts"
+      ]
+    },
+    {
+      "route": "/admin/cases",
+      "source": "apps/web/src/app/admin/cases/page.tsx",
+      "family": "admin",
+      "access": "staff",
+      "status": "pending",
+      "states": {
+        "default": {
+          "status": "baseline",
+          "reason": "The route source is the current rendering or redirect anchor; this status records a baseline and does not assert visual verification.",
+          "evidence": ["apps/web/src/app/admin/cases/page.tsx"]
+        },
+        "loading": {
+          "status": "baseline",
+          "reason": "A route-segment loading component exists and is the current loading-state baseline.",
+          "evidence": ["apps/web/src/app/admin/loading.tsx", "docs/redesign/SURFACES.md"]
+        },
+        "error": {
+          "status": "pending",
+          "reason": "The redesign spec identifies an error state or the admin section lacks a route-level error treatment.",
+          "evidence": ["apps/web/src/app/admin/cases/page.tsx", "docs/redesign/SURFACES.md"]
+        },
+        "empty": {
+          "status": "not-applicable",
+          "reason": "This route is not an empty-result or data-absence surface in the redesign inventory.",
+          "evidence": ["apps/web/src/app/admin/cases/page.tsx"]
+        },
+        "selected": {
+          "status": "pending",
+          "reason": "This admin workflow has route or row selection; the admin task-state redesign is pending.",
+          "evidence": ["apps/web/src/app/admin/cases/page.tsx", "docs/redesign/SURFACES.md"]
+        },
+        "auth": {
+          "status": "baseline",
+          "reason": "The route is protected by the existing staff identity gate; redesign status does not change or re-verify authorization.",
+          "evidence": [
+            "apps/web/src/proxy.ts",
+            "apps/web/src/proxy.test.ts",
+            "apps/web/src/admin/auth/protected-paths.test.ts",
+            "apps/web/src/app/admin/cases/page.tsx"
+          ]
+        }
+      },
+      "componentRefs": [
+        "apps/web/src/app/admin/cases/page.tsx",
+        "apps/web/src/admin/components/AdminShellChrome.tsx"
+      ],
+      "evidence": [
+        "apps/web/src/app/admin/cases/page.tsx",
+        "docs/redesign/SURFACES.md",
+        "apps/web/src/lib/nav/surface-classes.ts",
+        "apps/web/src/lib/nav/surface-classes.test.ts"
+      ]
+    },
+    {
+      "route": "/admin/cases/[id]",
+      "source": "apps/web/src/app/admin/cases/[id]/page.tsx",
+      "family": "admin",
+      "access": "staff",
+      "status": "pending",
+      "states": {
+        "default": {
+          "status": "baseline",
+          "reason": "The route source is the current rendering or redirect anchor; this status records a baseline and does not assert visual verification.",
+          "evidence": ["apps/web/src/app/admin/cases/[id]/page.tsx"]
+        },
+        "loading": {
+          "status": "baseline",
+          "reason": "A route-segment loading component exists and is the current loading-state baseline.",
+          "evidence": ["apps/web/src/app/admin/loading.tsx", "docs/redesign/SURFACES.md"]
+        },
+        "error": {
+          "status": "pending",
+          "reason": "The redesign spec identifies an error state or the admin section lacks a route-level error treatment.",
+          "evidence": ["apps/web/src/app/admin/cases/[id]/page.tsx", "docs/redesign/SURFACES.md"]
+        },
+        "empty": {
+          "status": "not-applicable",
+          "reason": "This route is not an empty-result or data-absence surface in the redesign inventory.",
+          "evidence": ["apps/web/src/app/admin/cases/[id]/page.tsx"]
+        },
+        "selected": {
+          "status": "pending",
+          "reason": "This admin workflow has route or row selection; the admin task-state redesign is pending.",
+          "evidence": ["apps/web/src/app/admin/cases/[id]/page.tsx", "docs/redesign/SURFACES.md"]
+        },
+        "auth": {
+          "status": "baseline",
+          "reason": "The route is protected by the existing staff identity gate; redesign status does not change or re-verify authorization.",
+          "evidence": [
+            "apps/web/src/proxy.ts",
+            "apps/web/src/proxy.test.ts",
+            "apps/web/src/admin/auth/protected-paths.test.ts",
+            "apps/web/src/app/admin/cases/[id]/page.tsx"
+          ]
+        }
+      },
+      "componentRefs": [
+        "apps/web/src/app/admin/cases/[id]/page.tsx",
+        "apps/web/src/admin/components/AdminShellChrome.tsx"
+      ],
+      "evidence": [
+        "apps/web/src/app/admin/cases/[id]/page.tsx",
+        "docs/redesign/SURFACES.md",
+        "apps/web/src/lib/nav/surface-classes.ts",
+        "apps/web/src/lib/nav/surface-classes.test.ts"
+      ]
+    },
+    {
+      "route": "/admin/catalog",
+      "source": "apps/web/src/app/admin/catalog/page.tsx",
+      "family": "admin",
+      "access": "staff",
+      "status": "pending",
+      "states": {
+        "default": {
+          "status": "baseline",
+          "reason": "The route source is the current rendering or redirect anchor; this status records a baseline and does not assert visual verification.",
+          "evidence": ["apps/web/src/app/admin/catalog/page.tsx"]
+        },
+        "loading": {
+          "status": "baseline",
+          "reason": "A route-segment loading component exists and is the current loading-state baseline.",
+          "evidence": ["apps/web/src/app/admin/loading.tsx", "docs/redesign/SURFACES.md"]
+        },
+        "error": {
+          "status": "pending",
+          "reason": "The redesign spec identifies an error state or the admin section lacks a route-level error treatment.",
+          "evidence": ["apps/web/src/app/admin/catalog/page.tsx", "docs/redesign/SURFACES.md"]
+        },
+        "empty": {
+          "status": "not-applicable",
+          "reason": "This route is not an empty-result or data-absence surface in the redesign inventory.",
+          "evidence": ["apps/web/src/app/admin/catalog/page.tsx"]
+        },
+        "selected": {
+          "status": "pending",
+          "reason": "This admin workflow has route or row selection; the admin task-state redesign is pending.",
+          "evidence": ["apps/web/src/app/admin/catalog/page.tsx", "docs/redesign/SURFACES.md"]
+        },
+        "auth": {
+          "status": "baseline",
+          "reason": "The route is protected by the existing staff identity gate; redesign status does not change or re-verify authorization.",
+          "evidence": [
+            "apps/web/src/proxy.ts",
+            "apps/web/src/proxy.test.ts",
+            "apps/web/src/admin/auth/protected-paths.test.ts",
+            "apps/web/src/app/admin/catalog/page.tsx"
+          ]
+        }
+      },
+      "componentRefs": [
+        "apps/web/src/app/admin/catalog/page.tsx",
+        "apps/web/src/admin/components/AdminShellChrome.tsx"
+      ],
+      "evidence": [
+        "apps/web/src/app/admin/catalog/page.tsx",
+        "docs/redesign/SURFACES.md",
+        "apps/web/src/lib/nav/surface-classes.ts",
+        "apps/web/src/lib/nav/surface-classes.test.ts"
+      ]
+    },
+    {
+      "route": "/admin/catalog/[id]",
+      "source": "apps/web/src/app/admin/catalog/[id]/page.tsx",
+      "family": "admin",
+      "access": "staff",
+      "status": "pending",
+      "states": {
+        "default": {
+          "status": "baseline",
+          "reason": "The route source is the current rendering or redirect anchor; this status records a baseline and does not assert visual verification.",
+          "evidence": ["apps/web/src/app/admin/catalog/[id]/page.tsx"]
+        },
+        "loading": {
+          "status": "baseline",
+          "reason": "A route-segment loading component exists and is the current loading-state baseline.",
+          "evidence": ["apps/web/src/app/admin/loading.tsx", "docs/redesign/SURFACES.md"]
+        },
+        "error": {
+          "status": "pending",
+          "reason": "The redesign spec identifies an error state or the admin section lacks a route-level error treatment.",
+          "evidence": ["apps/web/src/app/admin/catalog/[id]/page.tsx", "docs/redesign/SURFACES.md"]
+        },
+        "empty": {
+          "status": "not-applicable",
+          "reason": "This route is not an empty-result or data-absence surface in the redesign inventory.",
+          "evidence": ["apps/web/src/app/admin/catalog/[id]/page.tsx"]
+        },
+        "selected": {
+          "status": "pending",
+          "reason": "This admin workflow has route or row selection; the admin task-state redesign is pending.",
+          "evidence": ["apps/web/src/app/admin/catalog/[id]/page.tsx", "docs/redesign/SURFACES.md"]
+        },
+        "auth": {
+          "status": "baseline",
+          "reason": "The route is protected by the existing staff identity gate; redesign status does not change or re-verify authorization.",
+          "evidence": [
+            "apps/web/src/proxy.ts",
+            "apps/web/src/proxy.test.ts",
+            "apps/web/src/admin/auth/protected-paths.test.ts",
+            "apps/web/src/app/admin/catalog/[id]/page.tsx"
+          ]
+        }
+      },
+      "componentRefs": [
+        "apps/web/src/app/admin/catalog/[id]/page.tsx",
+        "apps/web/src/admin/components/AdminShellChrome.tsx"
+      ],
+      "evidence": [
+        "apps/web/src/app/admin/catalog/[id]/page.tsx",
+        "docs/redesign/SURFACES.md",
+        "apps/web/src/lib/nav/surface-classes.ts",
+        "apps/web/src/lib/nav/surface-classes.test.ts"
+      ]
+    },
+    {
+      "route": "/admin/catalog/merge",
+      "source": "apps/web/src/app/admin/catalog/merge/page.tsx",
+      "family": "admin",
+      "access": "staff",
+      "status": "pending",
+      "states": {
+        "default": {
+          "status": "baseline",
+          "reason": "The route source is the current rendering or redirect anchor; this status records a baseline and does not assert visual verification.",
+          "evidence": ["apps/web/src/app/admin/catalog/merge/page.tsx"]
+        },
+        "loading": {
+          "status": "baseline",
+          "reason": "A route-segment loading component exists and is the current loading-state baseline.",
+          "evidence": ["apps/web/src/app/admin/loading.tsx", "docs/redesign/SURFACES.md"]
+        },
+        "error": {
+          "status": "pending",
+          "reason": "The redesign spec identifies an error state or the admin section lacks a route-level error treatment.",
+          "evidence": ["apps/web/src/app/admin/catalog/merge/page.tsx", "docs/redesign/SURFACES.md"]
+        },
+        "empty": {
+          "status": "not-applicable",
+          "reason": "This route is not an empty-result or data-absence surface in the redesign inventory.",
+          "evidence": ["apps/web/src/app/admin/catalog/merge/page.tsx"]
+        },
+        "selected": {
+          "status": "pending",
+          "reason": "This admin workflow has route or row selection; the admin task-state redesign is pending.",
+          "evidence": ["apps/web/src/app/admin/catalog/merge/page.tsx", "docs/redesign/SURFACES.md"]
+        },
+        "auth": {
+          "status": "baseline",
+          "reason": "The route is protected by the existing staff identity gate; redesign status does not change or re-verify authorization.",
+          "evidence": [
+            "apps/web/src/proxy.ts",
+            "apps/web/src/proxy.test.ts",
+            "apps/web/src/admin/auth/protected-paths.test.ts",
+            "apps/web/src/app/admin/catalog/merge/page.tsx"
+          ]
+        }
+      },
+      "componentRefs": [
+        "apps/web/src/app/admin/catalog/merge/page.tsx",
+        "apps/web/src/admin/components/AdminShellChrome.tsx"
+      ],
+      "evidence": [
+        "apps/web/src/app/admin/catalog/merge/page.tsx",
+        "docs/redesign/SURFACES.md",
+        "apps/web/src/lib/nav/surface-classes.ts",
+        "apps/web/src/lib/nav/surface-classes.test.ts"
+      ]
+    },
+    {
+      "route": "/admin/citation-health",
+      "source": "apps/web/src/app/admin/citation-health/page.tsx",
+      "family": "admin",
+      "access": "staff",
+      "status": "pending",
+      "states": {
+        "default": {
+          "status": "baseline",
+          "reason": "The route source is the current rendering or redirect anchor; this status records a baseline and does not assert visual verification.",
+          "evidence": ["apps/web/src/app/admin/citation-health/page.tsx"]
+        },
+        "loading": {
+          "status": "baseline",
+          "reason": "A route-segment loading component exists and is the current loading-state baseline.",
+          "evidence": ["apps/web/src/app/admin/loading.tsx", "docs/redesign/SURFACES.md"]
+        },
+        "error": {
+          "status": "pending",
+          "reason": "The redesign spec identifies an error state or the admin section lacks a route-level error treatment.",
+          "evidence": [
+            "apps/web/src/app/admin/citation-health/page.tsx",
+            "docs/redesign/SURFACES.md"
+          ]
+        },
+        "empty": {
+          "status": "not-applicable",
+          "reason": "This route is not an empty-result or data-absence surface in the redesign inventory.",
+          "evidence": ["apps/web/src/app/admin/citation-health/page.tsx"]
+        },
+        "selected": {
+          "status": "not-applicable",
+          "reason": "The route has no meaningful selected-item or selected-filter state in the redesign scope.",
+          "evidence": ["apps/web/src/app/admin/citation-health/page.tsx"]
+        },
+        "auth": {
+          "status": "baseline",
+          "reason": "The route is protected by the existing staff identity gate; redesign status does not change or re-verify authorization.",
+          "evidence": [
+            "apps/web/src/proxy.ts",
+            "apps/web/src/proxy.test.ts",
+            "apps/web/src/admin/auth/protected-paths.test.ts",
+            "apps/web/src/app/admin/citation-health/page.tsx"
+          ]
+        }
+      },
+      "componentRefs": [
+        "apps/web/src/app/admin/citation-health/page.tsx",
+        "apps/web/src/admin/components/AdminShellChrome.tsx"
+      ],
+      "evidence": [
+        "apps/web/src/app/admin/citation-health/page.tsx",
+        "docs/redesign/SURFACES.md",
+        "apps/web/src/lib/nav/surface-classes.ts",
+        "apps/web/src/lib/nav/surface-classes.test.ts"
+      ]
+    },
+    {
+      "route": "/admin/discovery",
+      "source": "apps/web/src/app/admin/discovery/page.tsx",
+      "family": "admin",
+      "access": "staff",
+      "status": "pending",
+      "states": {
+        "default": {
+          "status": "baseline",
+          "reason": "The route source is the current rendering or redirect anchor; this status records a baseline and does not assert visual verification.",
+          "evidence": ["apps/web/src/app/admin/discovery/page.tsx"]
+        },
+        "loading": {
+          "status": "baseline",
+          "reason": "A route-segment loading component exists and is the current loading-state baseline.",
+          "evidence": ["apps/web/src/app/admin/loading.tsx", "docs/redesign/SURFACES.md"]
+        },
+        "error": {
+          "status": "pending",
+          "reason": "The redesign spec identifies an error state or the admin section lacks a route-level error treatment.",
+          "evidence": ["apps/web/src/app/admin/discovery/page.tsx", "docs/redesign/SURFACES.md"]
+        },
+        "empty": {
+          "status": "not-applicable",
+          "reason": "This route is not an empty-result or data-absence surface in the redesign inventory.",
+          "evidence": ["apps/web/src/app/admin/discovery/page.tsx"]
+        },
+        "selected": {
+          "status": "not-applicable",
+          "reason": "The route has no meaningful selected-item or selected-filter state in the redesign scope.",
+          "evidence": ["apps/web/src/app/admin/discovery/page.tsx"]
+        },
+        "auth": {
+          "status": "baseline",
+          "reason": "The route is protected by the existing staff identity gate; redesign status does not change or re-verify authorization.",
+          "evidence": [
+            "apps/web/src/proxy.ts",
+            "apps/web/src/proxy.test.ts",
+            "apps/web/src/admin/auth/protected-paths.test.ts",
+            "apps/web/src/app/admin/discovery/page.tsx"
+          ]
+        }
+      },
+      "componentRefs": [
+        "apps/web/src/app/admin/discovery/page.tsx",
+        "apps/web/src/admin/components/AdminShellChrome.tsx"
+      ],
+      "evidence": [
+        "apps/web/src/app/admin/discovery/page.tsx",
+        "docs/redesign/SURFACES.md",
+        "apps/web/src/lib/nav/surface-classes.ts",
+        "apps/web/src/lib/nav/surface-classes.test.ts"
+      ]
+    },
+    {
+      "route": "/admin/evidence",
+      "source": "apps/web/src/app/admin/evidence/page.tsx",
+      "family": "admin",
+      "access": "staff",
+      "status": "pending",
+      "states": {
+        "default": {
+          "status": "baseline",
+          "reason": "The route source is the current rendering or redirect anchor; this status records a baseline and does not assert visual verification.",
+          "evidence": ["apps/web/src/app/admin/evidence/page.tsx"]
+        },
+        "loading": {
+          "status": "baseline",
+          "reason": "A route-segment loading component exists and is the current loading-state baseline.",
+          "evidence": ["apps/web/src/app/admin/loading.tsx", "docs/redesign/SURFACES.md"]
+        },
+        "error": {
+          "status": "pending",
+          "reason": "The redesign spec identifies an error state or the admin section lacks a route-level error treatment.",
+          "evidence": ["apps/web/src/app/admin/evidence/page.tsx", "docs/redesign/SURFACES.md"]
+        },
+        "empty": {
+          "status": "not-applicable",
+          "reason": "This route is not an empty-result or data-absence surface in the redesign inventory.",
+          "evidence": ["apps/web/src/app/admin/evidence/page.tsx"]
+        },
+        "selected": {
+          "status": "pending",
+          "reason": "This admin workflow has route or row selection; the admin task-state redesign is pending.",
+          "evidence": ["apps/web/src/app/admin/evidence/page.tsx", "docs/redesign/SURFACES.md"]
+        },
+        "auth": {
+          "status": "baseline",
+          "reason": "The route is protected by the existing staff identity gate; redesign status does not change or re-verify authorization.",
+          "evidence": [
+            "apps/web/src/proxy.ts",
+            "apps/web/src/proxy.test.ts",
+            "apps/web/src/admin/auth/protected-paths.test.ts",
+            "apps/web/src/app/admin/evidence/page.tsx"
+          ]
+        }
+      },
+      "componentRefs": [
+        "apps/web/src/app/admin/evidence/page.tsx",
+        "apps/web/src/admin/components/AdminShellChrome.tsx"
+      ],
+      "evidence": [
+        "apps/web/src/app/admin/evidence/page.tsx",
+        "docs/redesign/SURFACES.md",
+        "apps/web/src/lib/nav/surface-classes.ts",
+        "apps/web/src/lib/nav/surface-classes.test.ts"
+      ]
+    },
+    {
+      "route": "/admin/footprint",
+      "source": "apps/web/src/app/admin/footprint/page.tsx",
+      "family": "admin",
+      "access": "staff",
+      "status": "pending",
+      "states": {
+        "default": {
+          "status": "baseline",
+          "reason": "The route source is the current rendering or redirect anchor; this status records a baseline and does not assert visual verification.",
+          "evidence": ["apps/web/src/app/admin/footprint/page.tsx"]
+        },
+        "loading": {
+          "status": "baseline",
+          "reason": "A route-segment loading component exists and is the current loading-state baseline.",
+          "evidence": ["apps/web/src/app/admin/loading.tsx", "docs/redesign/SURFACES.md"]
+        },
+        "error": {
+          "status": "pending",
+          "reason": "The redesign spec identifies an error state or the admin section lacks a route-level error treatment.",
+          "evidence": ["apps/web/src/app/admin/footprint/page.tsx", "docs/redesign/SURFACES.md"]
+        },
+        "empty": {
+          "status": "not-applicable",
+          "reason": "This route is not an empty-result or data-absence surface in the redesign inventory.",
+          "evidence": ["apps/web/src/app/admin/footprint/page.tsx"]
+        },
+        "selected": {
+          "status": "not-applicable",
+          "reason": "The route has no meaningful selected-item or selected-filter state in the redesign scope.",
+          "evidence": ["apps/web/src/app/admin/footprint/page.tsx"]
+        },
+        "auth": {
+          "status": "baseline",
+          "reason": "The route is protected by the existing staff identity gate; redesign status does not change or re-verify authorization.",
+          "evidence": [
+            "apps/web/src/proxy.ts",
+            "apps/web/src/proxy.test.ts",
+            "apps/web/src/admin/auth/protected-paths.test.ts",
+            "apps/web/src/app/admin/footprint/page.tsx"
+          ]
+        }
+      },
+      "componentRefs": [
+        "apps/web/src/app/admin/footprint/page.tsx",
+        "apps/web/src/admin/components/AdminShellChrome.tsx"
+      ],
+      "evidence": [
+        "apps/web/src/app/admin/footprint/page.tsx",
+        "docs/redesign/SURFACES.md",
+        "apps/web/src/lib/nav/surface-classes.ts",
+        "apps/web/src/lib/nav/surface-classes.test.ts"
+      ]
+    },
+    {
+      "route": "/admin/graylist",
+      "source": "apps/web/src/app/admin/graylist/page.tsx",
+      "family": "admin",
+      "access": "staff",
+      "status": "pending",
+      "states": {
+        "default": {
+          "status": "baseline",
+          "reason": "The route source is the current rendering or redirect anchor; this status records a baseline and does not assert visual verification.",
+          "evidence": ["apps/web/src/app/admin/graylist/page.tsx"]
+        },
+        "loading": {
+          "status": "baseline",
+          "reason": "A route-segment loading component exists and is the current loading-state baseline.",
+          "evidence": ["apps/web/src/app/admin/loading.tsx", "docs/redesign/SURFACES.md"]
+        },
+        "error": {
+          "status": "pending",
+          "reason": "The redesign spec identifies an error state or the admin section lacks a route-level error treatment.",
+          "evidence": ["apps/web/src/app/admin/graylist/page.tsx", "docs/redesign/SURFACES.md"]
+        },
+        "empty": {
+          "status": "not-applicable",
+          "reason": "This route is not an empty-result or data-absence surface in the redesign inventory.",
+          "evidence": ["apps/web/src/app/admin/graylist/page.tsx"]
+        },
+        "selected": {
+          "status": "not-applicable",
+          "reason": "The route has no meaningful selected-item or selected-filter state in the redesign scope.",
+          "evidence": ["apps/web/src/app/admin/graylist/page.tsx"]
+        },
+        "auth": {
+          "status": "baseline",
+          "reason": "The route is protected by the existing staff identity gate; redesign status does not change or re-verify authorization.",
+          "evidence": [
+            "apps/web/src/proxy.ts",
+            "apps/web/src/proxy.test.ts",
+            "apps/web/src/admin/auth/protected-paths.test.ts",
+            "apps/web/src/app/admin/graylist/page.tsx"
+          ]
+        }
+      },
+      "componentRefs": [
+        "apps/web/src/app/admin/graylist/page.tsx",
+        "apps/web/src/admin/components/AdminShellChrome.tsx"
+      ],
+      "evidence": [
+        "apps/web/src/app/admin/graylist/page.tsx",
+        "docs/redesign/SURFACES.md",
+        "apps/web/src/lib/nav/surface-classes.ts",
+        "apps/web/src/lib/nav/surface-classes.test.ts"
+      ]
+    },
+    {
+      "route": "/admin/inbox",
+      "source": "apps/web/src/app/admin/inbox/page.tsx",
+      "family": "admin",
+      "access": "staff",
+      "status": "pending",
+      "states": {
+        "default": {
+          "status": "baseline",
+          "reason": "The route source is the current rendering or redirect anchor; this status records a baseline and does not assert visual verification.",
+          "evidence": ["apps/web/src/app/admin/inbox/page.tsx"]
+        },
+        "loading": {
+          "status": "baseline",
+          "reason": "A route-segment loading component exists and is the current loading-state baseline.",
+          "evidence": ["apps/web/src/app/admin/loading.tsx", "docs/redesign/SURFACES.md"]
+        },
+        "error": {
+          "status": "pending",
+          "reason": "The redesign spec identifies an error state or the admin section lacks a route-level error treatment.",
+          "evidence": ["apps/web/src/app/admin/inbox/page.tsx", "docs/redesign/SURFACES.md"]
+        },
+        "empty": {
+          "status": "not-applicable",
+          "reason": "This route is not an empty-result or data-absence surface in the redesign inventory.",
+          "evidence": ["apps/web/src/app/admin/inbox/page.tsx"]
+        },
+        "selected": {
+          "status": "not-applicable",
+          "reason": "The route has no meaningful selected-item or selected-filter state in the redesign scope.",
+          "evidence": ["apps/web/src/app/admin/inbox/page.tsx"]
+        },
+        "auth": {
+          "status": "baseline",
+          "reason": "The route is protected by the existing staff identity gate; redesign status does not change or re-verify authorization.",
+          "evidence": [
+            "apps/web/src/proxy.ts",
+            "apps/web/src/proxy.test.ts",
+            "apps/web/src/admin/auth/protected-paths.test.ts",
+            "apps/web/src/app/admin/inbox/page.tsx"
+          ]
+        }
+      },
+      "componentRefs": [
+        "apps/web/src/app/admin/inbox/page.tsx",
+        "apps/web/src/admin/components/AdminShellChrome.tsx"
+      ],
+      "evidence": [
+        "apps/web/src/app/admin/inbox/page.tsx",
+        "docs/redesign/SURFACES.md",
+        "apps/web/src/lib/nav/surface-classes.ts",
+        "apps/web/src/lib/nav/surface-classes.test.ts"
+      ]
+    },
+    {
+      "route": "/admin/login",
+      "source": "apps/web/src/app/admin/login/page.tsx",
+      "family": "admin",
+      "access": "auth-entry",
+      "status": "pending",
+      "states": {
+        "default": {
+          "status": "baseline",
+          "reason": "The route source is the current rendering or redirect anchor; this status records a baseline and does not assert visual verification.",
+          "evidence": ["apps/web/src/app/admin/login/page.tsx"]
+        },
+        "loading": {
+          "status": "baseline",
+          "reason": "A route-segment loading component exists and is the current loading-state baseline.",
+          "evidence": ["apps/web/src/app/admin/loading.tsx", "docs/redesign/SURFACES.md"]
+        },
+        "error": {
+          "status": "pending",
+          "reason": "The redesign spec identifies an error state or the admin section lacks a route-level error treatment.",
+          "evidence": ["apps/web/src/app/admin/login/page.tsx", "docs/redesign/SURFACES.md"]
+        },
+        "empty": {
+          "status": "not-applicable",
+          "reason": "This route is not an empty-result or data-absence surface in the redesign inventory.",
+          "evidence": ["apps/web/src/app/admin/login/page.tsx"]
+        },
+        "selected": {
+          "status": "not-applicable",
+          "reason": "The route has no meaningful selected-item or selected-filter state in the redesign scope.",
+          "evidence": ["apps/web/src/app/admin/login/page.tsx"]
+        },
+        "auth": {
+          "status": "baseline",
+          "reason": "The sign-in route is the existing unauthenticated entry to staff access.",
+          "evidence": [
+            "apps/web/src/proxy.ts",
+            "apps/web/src/proxy.test.ts",
+            "apps/web/src/admin/auth/protected-paths.test.ts",
+            "apps/web/src/app/admin/login/page.tsx",
+            "apps/web/src/app/admin/login/safe-admin-next-path.test.ts"
+          ]
+        }
+      },
+      "componentRefs": [
+        "apps/web/src/app/admin/login/page.tsx",
+        "apps/web/src/admin/components/AdminShellChrome.tsx"
+      ],
+      "evidence": [
+        "apps/web/src/app/admin/login/page.tsx",
+        "docs/redesign/SURFACES.md",
+        "apps/web/src/lib/nav/surface-classes.ts",
+        "apps/web/src/lib/nav/surface-classes.test.ts"
+      ]
+    },
+    {
+      "route": "/admin/queue",
+      "source": "apps/web/src/app/admin/queue/page.tsx",
+      "family": "admin",
+      "access": "staff",
+      "status": "pending",
+      "states": {
+        "default": {
+          "status": "baseline",
+          "reason": "The route source is the current rendering or redirect anchor; this status records a baseline and does not assert visual verification.",
+          "evidence": ["apps/web/src/app/admin/queue/page.tsx"]
+        },
+        "loading": {
+          "status": "baseline",
+          "reason": "A route-segment loading component exists and is the current loading-state baseline.",
+          "evidence": ["apps/web/src/app/admin/loading.tsx", "docs/redesign/SURFACES.md"]
+        },
+        "error": {
+          "status": "pending",
+          "reason": "The redesign spec identifies an error state or the admin section lacks a route-level error treatment.",
+          "evidence": ["apps/web/src/app/admin/queue/page.tsx", "docs/redesign/SURFACES.md"]
+        },
+        "empty": {
+          "status": "not-applicable",
+          "reason": "This route is not an empty-result or data-absence surface in the redesign inventory.",
+          "evidence": ["apps/web/src/app/admin/queue/page.tsx"]
+        },
+        "selected": {
+          "status": "pending",
+          "reason": "This admin workflow has route or row selection; the admin task-state redesign is pending.",
+          "evidence": ["apps/web/src/app/admin/queue/page.tsx", "docs/redesign/SURFACES.md"]
+        },
+        "auth": {
+          "status": "baseline",
+          "reason": "The route is protected by the existing staff identity gate; redesign status does not change or re-verify authorization.",
+          "evidence": [
+            "apps/web/src/proxy.ts",
+            "apps/web/src/proxy.test.ts",
+            "apps/web/src/admin/auth/protected-paths.test.ts",
+            "apps/web/src/app/admin/queue/page.tsx"
+          ]
+        }
+      },
+      "componentRefs": [
+        "apps/web/src/app/admin/queue/page.tsx",
+        "apps/web/src/admin/components/AdminShellChrome.tsx"
+      ],
+      "evidence": [
+        "apps/web/src/app/admin/queue/page.tsx",
+        "docs/redesign/SURFACES.md",
+        "apps/web/src/lib/nav/surface-classes.ts",
+        "apps/web/src/lib/nav/surface-classes.test.ts"
+      ]
+    },
+    {
+      "route": "/admin/quick-add",
+      "source": "apps/web/src/app/admin/quick-add/page.tsx",
+      "family": "admin",
+      "access": "staff",
+      "status": "pending",
+      "states": {
+        "default": {
+          "status": "baseline",
+          "reason": "The route source is the current rendering or redirect anchor; this status records a baseline and does not assert visual verification.",
+          "evidence": ["apps/web/src/app/admin/quick-add/page.tsx"]
+        },
+        "loading": {
+          "status": "baseline",
+          "reason": "A route-segment loading component exists and is the current loading-state baseline.",
+          "evidence": ["apps/web/src/app/admin/loading.tsx", "docs/redesign/SURFACES.md"]
+        },
+        "error": {
+          "status": "pending",
+          "reason": "The redesign spec identifies an error state or the admin section lacks a route-level error treatment.",
+          "evidence": ["apps/web/src/app/admin/quick-add/page.tsx", "docs/redesign/SURFACES.md"]
+        },
+        "empty": {
+          "status": "not-applicable",
+          "reason": "This route is not an empty-result or data-absence surface in the redesign inventory.",
+          "evidence": ["apps/web/src/app/admin/quick-add/page.tsx"]
+        },
+        "selected": {
+          "status": "not-applicable",
+          "reason": "The route has no meaningful selected-item or selected-filter state in the redesign scope.",
+          "evidence": ["apps/web/src/app/admin/quick-add/page.tsx"]
+        },
+        "auth": {
+          "status": "baseline",
+          "reason": "The route is protected by the existing staff identity gate; redesign status does not change or re-verify authorization.",
+          "evidence": [
+            "apps/web/src/proxy.ts",
+            "apps/web/src/proxy.test.ts",
+            "apps/web/src/admin/auth/protected-paths.test.ts",
+            "apps/web/src/app/admin/quick-add/page.tsx"
+          ]
+        }
+      },
+      "componentRefs": [
+        "apps/web/src/app/admin/quick-add/page.tsx",
+        "apps/web/src/admin/components/AdminShellChrome.tsx"
+      ],
+      "evidence": [
+        "apps/web/src/app/admin/quick-add/page.tsx",
+        "docs/redesign/SURFACES.md",
+        "apps/web/src/lib/nav/surface-classes.ts",
+        "apps/web/src/lib/nav/surface-classes.test.ts"
+      ]
+    },
+    {
+      "route": "/admin/releases",
+      "source": "apps/web/src/app/admin/releases/page.tsx",
+      "family": "admin",
+      "access": "staff",
+      "status": "pending",
+      "states": {
+        "default": {
+          "status": "baseline",
+          "reason": "The route source is the current rendering or redirect anchor; this status records a baseline and does not assert visual verification.",
+          "evidence": ["apps/web/src/app/admin/releases/page.tsx"]
+        },
+        "loading": {
+          "status": "baseline",
+          "reason": "A route-segment loading component exists and is the current loading-state baseline.",
+          "evidence": ["apps/web/src/app/admin/loading.tsx", "docs/redesign/SURFACES.md"]
+        },
+        "error": {
+          "status": "pending",
+          "reason": "The redesign spec identifies an error state or the admin section lacks a route-level error treatment.",
+          "evidence": ["apps/web/src/app/admin/releases/page.tsx", "docs/redesign/SURFACES.md"]
+        },
+        "empty": {
+          "status": "not-applicable",
+          "reason": "This route is not an empty-result or data-absence surface in the redesign inventory.",
+          "evidence": ["apps/web/src/app/admin/releases/page.tsx"]
+        },
+        "selected": {
+          "status": "not-applicable",
+          "reason": "The route has no meaningful selected-item or selected-filter state in the redesign scope.",
+          "evidence": ["apps/web/src/app/admin/releases/page.tsx"]
+        },
+        "auth": {
+          "status": "baseline",
+          "reason": "The route is protected by the existing staff identity gate; redesign status does not change or re-verify authorization.",
+          "evidence": [
+            "apps/web/src/proxy.ts",
+            "apps/web/src/proxy.test.ts",
+            "apps/web/src/admin/auth/protected-paths.test.ts",
+            "apps/web/src/app/admin/releases/page.tsx"
+          ]
+        }
+      },
+      "componentRefs": [
+        "apps/web/src/app/admin/releases/page.tsx",
+        "apps/web/src/admin/components/AdminShellChrome.tsx"
+      ],
+      "evidence": [
+        "apps/web/src/app/admin/releases/page.tsx",
+        "docs/redesign/SURFACES.md",
+        "apps/web/src/lib/nav/surface-classes.ts",
+        "apps/web/src/lib/nav/surface-classes.test.ts"
+      ]
+    },
+    {
+      "route": "/admin/sources",
+      "source": "apps/web/src/app/admin/sources/page.tsx",
+      "family": "admin",
+      "access": "staff",
+      "status": "pending",
+      "states": {
+        "default": {
+          "status": "baseline",
+          "reason": "The route source is the current rendering or redirect anchor; this status records a baseline and does not assert visual verification.",
+          "evidence": ["apps/web/src/app/admin/sources/page.tsx"]
+        },
+        "loading": {
+          "status": "baseline",
+          "reason": "A route-segment loading component exists and is the current loading-state baseline.",
+          "evidence": ["apps/web/src/app/admin/loading.tsx", "docs/redesign/SURFACES.md"]
+        },
+        "error": {
+          "status": "pending",
+          "reason": "The redesign spec identifies an error state or the admin section lacks a route-level error treatment.",
+          "evidence": ["apps/web/src/app/admin/sources/page.tsx", "docs/redesign/SURFACES.md"]
+        },
+        "empty": {
+          "status": "not-applicable",
+          "reason": "This route is not an empty-result or data-absence surface in the redesign inventory.",
+          "evidence": ["apps/web/src/app/admin/sources/page.tsx"]
+        },
+        "selected": {
+          "status": "not-applicable",
+          "reason": "The route has no meaningful selected-item or selected-filter state in the redesign scope.",
+          "evidence": ["apps/web/src/app/admin/sources/page.tsx"]
+        },
+        "auth": {
+          "status": "baseline",
+          "reason": "The route is protected by the existing staff identity gate; redesign status does not change or re-verify authorization.",
+          "evidence": [
+            "apps/web/src/proxy.ts",
+            "apps/web/src/proxy.test.ts",
+            "apps/web/src/admin/auth/protected-paths.test.ts",
+            "apps/web/src/app/admin/sources/page.tsx"
+          ]
+        }
+      },
+      "componentRefs": [
+        "apps/web/src/app/admin/sources/page.tsx",
+        "apps/web/src/admin/components/AdminShellChrome.tsx"
+      ],
+      "evidence": [
+        "apps/web/src/app/admin/sources/page.tsx",
+        "docs/redesign/SURFACES.md",
+        "apps/web/src/lib/nav/surface-classes.ts",
+        "apps/web/src/lib/nav/surface-classes.test.ts"
+      ]
+    },
+    {
+      "route": "/admin/sources/[organizationId]",
+      "source": "apps/web/src/app/admin/sources/[organizationId]/page.tsx",
+      "family": "admin",
+      "access": "staff",
+      "status": "pending",
+      "states": {
+        "default": {
+          "status": "baseline",
+          "reason": "The route source is the current rendering or redirect anchor; this status records a baseline and does not assert visual verification.",
+          "evidence": ["apps/web/src/app/admin/sources/[organizationId]/page.tsx"]
+        },
+        "loading": {
+          "status": "baseline",
+          "reason": "A route-segment loading component exists and is the current loading-state baseline.",
+          "evidence": ["apps/web/src/app/admin/loading.tsx", "docs/redesign/SURFACES.md"]
+        },
+        "error": {
+          "status": "pending",
+          "reason": "The redesign spec identifies an error state or the admin section lacks a route-level error treatment.",
+          "evidence": [
+            "apps/web/src/app/admin/sources/[organizationId]/page.tsx",
+            "docs/redesign/SURFACES.md"
+          ]
+        },
+        "empty": {
+          "status": "not-applicable",
+          "reason": "This route is not an empty-result or data-absence surface in the redesign inventory.",
+          "evidence": ["apps/web/src/app/admin/sources/[organizationId]/page.tsx"]
+        },
+        "selected": {
+          "status": "not-applicable",
+          "reason": "The route has no meaningful selected-item or selected-filter state in the redesign scope.",
+          "evidence": ["apps/web/src/app/admin/sources/[organizationId]/page.tsx"]
+        },
+        "auth": {
+          "status": "baseline",
+          "reason": "The route is protected by the existing staff identity gate; redesign status does not change or re-verify authorization.",
+          "evidence": [
+            "apps/web/src/proxy.ts",
+            "apps/web/src/proxy.test.ts",
+            "apps/web/src/admin/auth/protected-paths.test.ts",
+            "apps/web/src/app/admin/sources/[organizationId]/page.tsx"
+          ]
+        }
+      },
+      "componentRefs": [
+        "apps/web/src/app/admin/sources/[organizationId]/page.tsx",
+        "apps/web/src/admin/components/AdminShellChrome.tsx"
+      ],
+      "evidence": [
+        "apps/web/src/app/admin/sources/[organizationId]/page.tsx",
+        "docs/redesign/SURFACES.md",
+        "apps/web/src/lib/nav/surface-classes.ts",
+        "apps/web/src/lib/nav/surface-classes.test.ts"
+      ]
+    },
+    {
+      "route": "/admin/stories",
+      "source": "apps/web/src/app/admin/stories/page.tsx",
+      "family": "admin",
+      "access": "staff",
+      "status": "pending",
+      "states": {
+        "default": {
+          "status": "baseline",
+          "reason": "The route source is the current rendering or redirect anchor; this status records a baseline and does not assert visual verification.",
+          "evidence": ["apps/web/src/app/admin/stories/page.tsx"]
+        },
+        "loading": {
+          "status": "baseline",
+          "reason": "A route-segment loading component exists and is the current loading-state baseline.",
+          "evidence": ["apps/web/src/app/admin/loading.tsx", "docs/redesign/SURFACES.md"]
+        },
+        "error": {
+          "status": "pending",
+          "reason": "The redesign spec identifies an error state or the admin section lacks a route-level error treatment.",
+          "evidence": ["apps/web/src/app/admin/stories/page.tsx", "docs/redesign/SURFACES.md"]
+        },
+        "empty": {
+          "status": "not-applicable",
+          "reason": "This route is not an empty-result or data-absence surface in the redesign inventory.",
+          "evidence": ["apps/web/src/app/admin/stories/page.tsx"]
+        },
+        "selected": {
+          "status": "pending",
+          "reason": "This admin workflow has route or row selection; the admin task-state redesign is pending.",
+          "evidence": ["apps/web/src/app/admin/stories/page.tsx", "docs/redesign/SURFACES.md"]
+        },
+        "auth": {
+          "status": "baseline",
+          "reason": "The route is protected by the existing staff identity gate; redesign status does not change or re-verify authorization.",
+          "evidence": [
+            "apps/web/src/proxy.ts",
+            "apps/web/src/proxy.test.ts",
+            "apps/web/src/admin/auth/protected-paths.test.ts",
+            "apps/web/src/app/admin/stories/page.tsx"
+          ]
+        }
+      },
+      "componentRefs": [
+        "apps/web/src/app/admin/stories/page.tsx",
+        "apps/web/src/admin/components/AdminShellChrome.tsx"
+      ],
+      "evidence": [
+        "apps/web/src/app/admin/stories/page.tsx",
+        "docs/redesign/SURFACES.md",
+        "apps/web/src/lib/nav/surface-classes.ts",
+        "apps/web/src/lib/nav/surface-classes.test.ts"
+      ]
+    },
+    {
+      "route": "/admin/stories/[slug]",
+      "source": "apps/web/src/app/admin/stories/[slug]/page.tsx",
+      "family": "admin",
+      "access": "staff",
+      "status": "pending",
+      "states": {
+        "default": {
+          "status": "baseline",
+          "reason": "The route source is the current rendering or redirect anchor; this status records a baseline and does not assert visual verification.",
+          "evidence": ["apps/web/src/app/admin/stories/[slug]/page.tsx"]
+        },
+        "loading": {
+          "status": "baseline",
+          "reason": "A route-segment loading component exists and is the current loading-state baseline.",
+          "evidence": ["apps/web/src/app/admin/loading.tsx", "docs/redesign/SURFACES.md"]
+        },
+        "error": {
+          "status": "pending",
+          "reason": "The redesign spec identifies an error state or the admin section lacks a route-level error treatment.",
+          "evidence": [
+            "apps/web/src/app/admin/stories/[slug]/page.tsx",
+            "docs/redesign/SURFACES.md"
+          ]
+        },
+        "empty": {
+          "status": "not-applicable",
+          "reason": "This route is not an empty-result or data-absence surface in the redesign inventory.",
+          "evidence": ["apps/web/src/app/admin/stories/[slug]/page.tsx"]
+        },
+        "selected": {
+          "status": "pending",
+          "reason": "This admin workflow has route or row selection; the admin task-state redesign is pending.",
+          "evidence": [
+            "apps/web/src/app/admin/stories/[slug]/page.tsx",
+            "docs/redesign/SURFACES.md"
+          ]
+        },
+        "auth": {
+          "status": "baseline",
+          "reason": "The route is protected by the existing staff identity gate; redesign status does not change or re-verify authorization.",
+          "evidence": [
+            "apps/web/src/proxy.ts",
+            "apps/web/src/proxy.test.ts",
+            "apps/web/src/admin/auth/protected-paths.test.ts",
+            "apps/web/src/app/admin/stories/[slug]/page.tsx"
+          ]
+        }
+      },
+      "componentRefs": [
+        "apps/web/src/app/admin/stories/[slug]/page.tsx",
+        "apps/web/src/admin/components/AdminShellChrome.tsx"
+      ],
+      "evidence": [
+        "apps/web/src/app/admin/stories/[slug]/page.tsx",
+        "docs/redesign/SURFACES.md",
+        "apps/web/src/lib/nav/surface-classes.ts",
+        "apps/web/src/lib/nav/surface-classes.test.ts"
+      ]
+    },
+    {
+      "route": "/admin/stories/[slug]/preview",
+      "source": "apps/web/src/app/admin/stories/[slug]/preview/page.tsx",
+      "family": "admin",
+      "access": "staff",
+      "status": "pending",
+      "states": {
+        "default": {
+          "status": "baseline",
+          "reason": "The route source is the current rendering or redirect anchor; this status records a baseline and does not assert visual verification.",
+          "evidence": ["apps/web/src/app/admin/stories/[slug]/preview/page.tsx"]
+        },
+        "loading": {
+          "status": "baseline",
+          "reason": "A route-segment loading component exists and is the current loading-state baseline.",
+          "evidence": ["apps/web/src/app/admin/loading.tsx", "docs/redesign/SURFACES.md"]
+        },
+        "error": {
+          "status": "pending",
+          "reason": "The redesign spec identifies an error state or the admin section lacks a route-level error treatment.",
+          "evidence": [
+            "apps/web/src/app/admin/stories/[slug]/preview/page.tsx",
+            "docs/redesign/SURFACES.md"
+          ]
+        },
+        "empty": {
+          "status": "not-applicable",
+          "reason": "This route is not an empty-result or data-absence surface in the redesign inventory.",
+          "evidence": ["apps/web/src/app/admin/stories/[slug]/preview/page.tsx"]
+        },
+        "selected": {
+          "status": "pending",
+          "reason": "This admin workflow has route or row selection; the admin task-state redesign is pending.",
+          "evidence": [
+            "apps/web/src/app/admin/stories/[slug]/preview/page.tsx",
+            "docs/redesign/SURFACES.md"
+          ]
+        },
+        "auth": {
+          "status": "baseline",
+          "reason": "The route is protected by the existing staff identity gate; redesign status does not change or re-verify authorization.",
+          "evidence": [
+            "apps/web/src/proxy.ts",
+            "apps/web/src/proxy.test.ts",
+            "apps/web/src/admin/auth/protected-paths.test.ts",
+            "apps/web/src/app/admin/stories/[slug]/preview/page.tsx"
+          ]
+        }
+      },
+      "componentRefs": [
+        "apps/web/src/app/admin/stories/[slug]/preview/page.tsx",
+        "apps/web/src/admin/components/AdminShellChrome.tsx"
+      ],
+      "evidence": [
+        "apps/web/src/app/admin/stories/[slug]/preview/page.tsx",
+        "docs/redesign/SURFACES.md",
+        "apps/web/src/lib/nav/surface-classes.ts",
+        "apps/web/src/lib/nav/surface-classes.test.ts"
+      ]
+    },
+    {
+      "route": "/admin/stories/contributors",
+      "source": "apps/web/src/app/admin/stories/contributors/page.tsx",
+      "family": "admin",
+      "access": "staff",
+      "status": "pending",
+      "states": {
+        "default": {
+          "status": "baseline",
+          "reason": "The route source is the current rendering or redirect anchor; this status records a baseline and does not assert visual verification.",
+          "evidence": ["apps/web/src/app/admin/stories/contributors/page.tsx"]
+        },
+        "loading": {
+          "status": "baseline",
+          "reason": "A route-segment loading component exists and is the current loading-state baseline.",
+          "evidence": ["apps/web/src/app/admin/loading.tsx", "docs/redesign/SURFACES.md"]
+        },
+        "error": {
+          "status": "pending",
+          "reason": "The redesign spec identifies an error state or the admin section lacks a route-level error treatment.",
+          "evidence": [
+            "apps/web/src/app/admin/stories/contributors/page.tsx",
+            "docs/redesign/SURFACES.md"
+          ]
+        },
+        "empty": {
+          "status": "not-applicable",
+          "reason": "This route is not an empty-result or data-absence surface in the redesign inventory.",
+          "evidence": ["apps/web/src/app/admin/stories/contributors/page.tsx"]
+        },
+        "selected": {
+          "status": "pending",
+          "reason": "This admin workflow has route or row selection; the admin task-state redesign is pending.",
+          "evidence": [
+            "apps/web/src/app/admin/stories/contributors/page.tsx",
+            "docs/redesign/SURFACES.md"
+          ]
+        },
+        "auth": {
+          "status": "baseline",
+          "reason": "The route is protected by the existing staff identity gate; redesign status does not change or re-verify authorization.",
+          "evidence": [
+            "apps/web/src/proxy.ts",
+            "apps/web/src/proxy.test.ts",
+            "apps/web/src/admin/auth/protected-paths.test.ts",
+            "apps/web/src/app/admin/stories/contributors/page.tsx"
+          ]
+        }
+      },
+      "componentRefs": [
+        "apps/web/src/app/admin/stories/contributors/page.tsx",
+        "apps/web/src/admin/components/AdminShellChrome.tsx"
+      ],
+      "evidence": [
+        "apps/web/src/app/admin/stories/contributors/page.tsx",
+        "docs/redesign/SURFACES.md",
+        "apps/web/src/lib/nav/surface-classes.ts",
+        "apps/web/src/lib/nav/surface-classes.test.ts"
+      ]
+    },
+    {
+      "route": "/admin/stories/review",
+      "source": "apps/web/src/app/admin/stories/review/page.tsx",
+      "family": "admin",
+      "access": "staff",
+      "status": "pending",
+      "states": {
+        "default": {
+          "status": "baseline",
+          "reason": "The route source is the current rendering or redirect anchor; this status records a baseline and does not assert visual verification.",
+          "evidence": ["apps/web/src/app/admin/stories/review/page.tsx"]
+        },
+        "loading": {
+          "status": "baseline",
+          "reason": "A route-segment loading component exists and is the current loading-state baseline.",
+          "evidence": ["apps/web/src/app/admin/loading.tsx", "docs/redesign/SURFACES.md"]
+        },
+        "error": {
+          "status": "pending",
+          "reason": "The redesign spec identifies an error state or the admin section lacks a route-level error treatment.",
+          "evidence": [
+            "apps/web/src/app/admin/stories/review/page.tsx",
+            "docs/redesign/SURFACES.md"
+          ]
+        },
+        "empty": {
+          "status": "not-applicable",
+          "reason": "This route is not an empty-result or data-absence surface in the redesign inventory.",
+          "evidence": ["apps/web/src/app/admin/stories/review/page.tsx"]
+        },
+        "selected": {
+          "status": "pending",
+          "reason": "This admin workflow has route or row selection; the admin task-state redesign is pending.",
+          "evidence": [
+            "apps/web/src/app/admin/stories/review/page.tsx",
+            "docs/redesign/SURFACES.md"
+          ]
+        },
+        "auth": {
+          "status": "baseline",
+          "reason": "The route is protected by the existing staff identity gate; redesign status does not change or re-verify authorization.",
+          "evidence": [
+            "apps/web/src/proxy.ts",
+            "apps/web/src/proxy.test.ts",
+            "apps/web/src/admin/auth/protected-paths.test.ts",
+            "apps/web/src/app/admin/stories/review/page.tsx"
+          ]
+        }
+      },
+      "componentRefs": [
+        "apps/web/src/app/admin/stories/review/page.tsx",
+        "apps/web/src/admin/components/AdminShellChrome.tsx"
+      ],
+      "evidence": [
+        "apps/web/src/app/admin/stories/review/page.tsx",
+        "docs/redesign/SURFACES.md",
+        "apps/web/src/lib/nav/surface-classes.ts",
+        "apps/web/src/lib/nav/surface-classes.test.ts"
+      ]
+    },
+    {
+      "route": "/admin/stories/review/[submissionId]",
+      "source": "apps/web/src/app/admin/stories/review/[submissionId]/page.tsx",
+      "family": "admin",
+      "access": "staff",
+      "status": "pending",
+      "states": {
+        "default": {
+          "status": "baseline",
+          "reason": "The route source is the current rendering or redirect anchor; this status records a baseline and does not assert visual verification.",
+          "evidence": ["apps/web/src/app/admin/stories/review/[submissionId]/page.tsx"]
+        },
+        "loading": {
+          "status": "baseline",
+          "reason": "A route-segment loading component exists and is the current loading-state baseline.",
+          "evidence": ["apps/web/src/app/admin/loading.tsx", "docs/redesign/SURFACES.md"]
+        },
+        "error": {
+          "status": "pending",
+          "reason": "The redesign spec identifies an error state or the admin section lacks a route-level error treatment.",
+          "evidence": [
+            "apps/web/src/app/admin/stories/review/[submissionId]/page.tsx",
+            "docs/redesign/SURFACES.md"
+          ]
+        },
+        "empty": {
+          "status": "not-applicable",
+          "reason": "This route is not an empty-result or data-absence surface in the redesign inventory.",
+          "evidence": ["apps/web/src/app/admin/stories/review/[submissionId]/page.tsx"]
+        },
+        "selected": {
+          "status": "pending",
+          "reason": "This admin workflow has route or row selection; the admin task-state redesign is pending.",
+          "evidence": [
+            "apps/web/src/app/admin/stories/review/[submissionId]/page.tsx",
+            "docs/redesign/SURFACES.md"
+          ]
+        },
+        "auth": {
+          "status": "baseline",
+          "reason": "The route is protected by the existing staff identity gate; redesign status does not change or re-verify authorization.",
+          "evidence": [
+            "apps/web/src/proxy.ts",
+            "apps/web/src/proxy.test.ts",
+            "apps/web/src/admin/auth/protected-paths.test.ts",
+            "apps/web/src/app/admin/stories/review/[submissionId]/page.tsx"
+          ]
+        }
+      },
+      "componentRefs": [
+        "apps/web/src/app/admin/stories/review/[submissionId]/page.tsx",
+        "apps/web/src/admin/components/AdminShellChrome.tsx"
+      ],
+      "evidence": [
+        "apps/web/src/app/admin/stories/review/[submissionId]/page.tsx",
+        "docs/redesign/SURFACES.md",
+        "apps/web/src/lib/nav/surface-classes.ts",
+        "apps/web/src/lib/nav/surface-classes.test.ts"
+      ]
+    },
+    {
+      "route": "/admin/submissions",
+      "source": "apps/web/src/app/admin/submissions/page.tsx",
+      "family": "admin",
+      "access": "staff",
+      "status": "pending",
+      "states": {
+        "default": {
+          "status": "baseline",
+          "reason": "The route source is the current rendering or redirect anchor; this status records a baseline and does not assert visual verification.",
+          "evidence": ["apps/web/src/app/admin/submissions/page.tsx"]
+        },
+        "loading": {
+          "status": "baseline",
+          "reason": "A route-segment loading component exists and is the current loading-state baseline.",
+          "evidence": ["apps/web/src/app/admin/loading.tsx", "docs/redesign/SURFACES.md"]
+        },
+        "error": {
+          "status": "pending",
+          "reason": "The redesign spec identifies an error state or the admin section lacks a route-level error treatment.",
+          "evidence": ["apps/web/src/app/admin/submissions/page.tsx", "docs/redesign/SURFACES.md"]
+        },
+        "empty": {
+          "status": "not-applicable",
+          "reason": "This route is not an empty-result or data-absence surface in the redesign inventory.",
+          "evidence": ["apps/web/src/app/admin/submissions/page.tsx"]
+        },
+        "selected": {
+          "status": "pending",
+          "reason": "This admin workflow has route or row selection; the admin task-state redesign is pending.",
+          "evidence": ["apps/web/src/app/admin/submissions/page.tsx", "docs/redesign/SURFACES.md"]
+        },
+        "auth": {
+          "status": "baseline",
+          "reason": "The route is protected by the existing staff identity gate; redesign status does not change or re-verify authorization.",
+          "evidence": [
+            "apps/web/src/proxy.ts",
+            "apps/web/src/proxy.test.ts",
+            "apps/web/src/admin/auth/protected-paths.test.ts",
+            "apps/web/src/app/admin/submissions/page.tsx"
+          ]
+        }
+      },
+      "componentRefs": [
+        "apps/web/src/app/admin/submissions/page.tsx",
+        "apps/web/src/admin/components/AdminShellChrome.tsx"
+      ],
+      "evidence": [
+        "apps/web/src/app/admin/submissions/page.tsx",
+        "docs/redesign/SURFACES.md",
+        "apps/web/src/lib/nav/surface-classes.ts",
+        "apps/web/src/lib/nav/surface-classes.test.ts"
+      ]
+    },
+    {
+      "route": "/admin/submissions/[id]",
+      "source": "apps/web/src/app/admin/submissions/[id]/page.tsx",
+      "family": "admin",
+      "access": "staff",
+      "status": "pending",
+      "states": {
+        "default": {
+          "status": "baseline",
+          "reason": "The route source is the current rendering or redirect anchor; this status records a baseline and does not assert visual verification.",
+          "evidence": ["apps/web/src/app/admin/submissions/[id]/page.tsx"]
+        },
+        "loading": {
+          "status": "baseline",
+          "reason": "A route-segment loading component exists and is the current loading-state baseline.",
+          "evidence": ["apps/web/src/app/admin/loading.tsx", "docs/redesign/SURFACES.md"]
+        },
+        "error": {
+          "status": "pending",
+          "reason": "The redesign spec identifies an error state or the admin section lacks a route-level error treatment.",
+          "evidence": [
+            "apps/web/src/app/admin/submissions/[id]/page.tsx",
+            "docs/redesign/SURFACES.md"
+          ]
+        },
+        "empty": {
+          "status": "not-applicable",
+          "reason": "This route is not an empty-result or data-absence surface in the redesign inventory.",
+          "evidence": ["apps/web/src/app/admin/submissions/[id]/page.tsx"]
+        },
+        "selected": {
+          "status": "pending",
+          "reason": "This admin workflow has route or row selection; the admin task-state redesign is pending.",
+          "evidence": [
+            "apps/web/src/app/admin/submissions/[id]/page.tsx",
+            "docs/redesign/SURFACES.md"
+          ]
+        },
+        "auth": {
+          "status": "baseline",
+          "reason": "The route is protected by the existing staff identity gate; redesign status does not change or re-verify authorization.",
+          "evidence": [
+            "apps/web/src/proxy.ts",
+            "apps/web/src/proxy.test.ts",
+            "apps/web/src/admin/auth/protected-paths.test.ts",
+            "apps/web/src/app/admin/submissions/[id]/page.tsx"
+          ]
+        }
+      },
+      "componentRefs": [
+        "apps/web/src/app/admin/submissions/[id]/page.tsx",
+        "apps/web/src/admin/components/AdminShellChrome.tsx"
+      ],
+      "evidence": [
+        "apps/web/src/app/admin/submissions/[id]/page.tsx",
+        "docs/redesign/SURFACES.md",
+        "apps/web/src/lib/nav/surface-classes.ts",
+        "apps/web/src/lib/nav/surface-classes.test.ts"
+      ]
+    },
+    {
+      "route": "/admin/switches",
+      "source": "apps/web/src/app/admin/switches/page.tsx",
+      "family": "admin",
+      "access": "staff",
+      "status": "pending",
+      "states": {
+        "default": {
+          "status": "baseline",
+          "reason": "The route source is the current rendering or redirect anchor; this status records a baseline and does not assert visual verification.",
+          "evidence": ["apps/web/src/app/admin/switches/page.tsx"]
+        },
+        "loading": {
+          "status": "baseline",
+          "reason": "A route-segment loading component exists and is the current loading-state baseline.",
+          "evidence": ["apps/web/src/app/admin/loading.tsx", "docs/redesign/SURFACES.md"]
+        },
+        "error": {
+          "status": "pending",
+          "reason": "The redesign spec identifies an error state or the admin section lacks a route-level error treatment.",
+          "evidence": ["apps/web/src/app/admin/switches/page.tsx", "docs/redesign/SURFACES.md"]
+        },
+        "empty": {
+          "status": "not-applicable",
+          "reason": "This route is not an empty-result or data-absence surface in the redesign inventory.",
+          "evidence": ["apps/web/src/app/admin/switches/page.tsx"]
+        },
+        "selected": {
+          "status": "not-applicable",
+          "reason": "The route has no meaningful selected-item or selected-filter state in the redesign scope.",
+          "evidence": ["apps/web/src/app/admin/switches/page.tsx"]
+        },
+        "auth": {
+          "status": "baseline",
+          "reason": "The route is protected by the existing staff identity gate; redesign status does not change or re-verify authorization.",
+          "evidence": [
+            "apps/web/src/proxy.ts",
+            "apps/web/src/proxy.test.ts",
+            "apps/web/src/admin/auth/protected-paths.test.ts",
+            "apps/web/src/app/admin/switches/page.tsx"
+          ]
+        }
+      },
+      "componentRefs": [
+        "apps/web/src/app/admin/switches/page.tsx",
+        "apps/web/src/admin/components/AdminShellChrome.tsx"
+      ],
+      "evidence": [
+        "apps/web/src/app/admin/switches/page.tsx",
+        "docs/redesign/SURFACES.md",
+        "apps/web/src/lib/nav/surface-classes.ts",
+        "apps/web/src/lib/nav/surface-classes.test.ts"
+      ]
+    },
+    {
+      "route": "/admin/work",
+      "source": "apps/web/src/app/admin/work/page.tsx",
+      "family": "admin",
+      "access": "staff",
+      "status": "pending",
+      "states": {
+        "default": {
+          "status": "baseline",
+          "reason": "The route source is the current rendering or redirect anchor; this status records a baseline and does not assert visual verification.",
+          "evidence": ["apps/web/src/app/admin/work/page.tsx"]
+        },
+        "loading": {
+          "status": "baseline",
+          "reason": "A route-segment loading component exists and is the current loading-state baseline.",
+          "evidence": ["apps/web/src/app/admin/loading.tsx", "docs/redesign/SURFACES.md"]
+        },
+        "error": {
+          "status": "pending",
+          "reason": "The redesign spec identifies an error state or the admin section lacks a route-level error treatment.",
+          "evidence": ["apps/web/src/app/admin/work/page.tsx", "docs/redesign/SURFACES.md"]
+        },
+        "empty": {
+          "status": "not-applicable",
+          "reason": "This route is not an empty-result or data-absence surface in the redesign inventory.",
+          "evidence": ["apps/web/src/app/admin/work/page.tsx"]
+        },
+        "selected": {
+          "status": "pending",
+          "reason": "This admin workflow has route or row selection; the admin task-state redesign is pending.",
+          "evidence": ["apps/web/src/app/admin/work/page.tsx", "docs/redesign/SURFACES.md"]
+        },
+        "auth": {
+          "status": "baseline",
+          "reason": "The route is protected by the existing staff identity gate; redesign status does not change or re-verify authorization.",
+          "evidence": [
+            "apps/web/src/proxy.ts",
+            "apps/web/src/proxy.test.ts",
+            "apps/web/src/admin/auth/protected-paths.test.ts",
+            "apps/web/src/app/admin/work/page.tsx"
+          ]
+        }
+      },
+      "componentRefs": [
+        "apps/web/src/app/admin/work/page.tsx",
+        "apps/web/src/admin/components/AdminShellChrome.tsx"
+      ],
+      "evidence": [
+        "apps/web/src/app/admin/work/page.tsx",
+        "docs/redesign/SURFACES.md",
+        "apps/web/src/lib/nav/surface-classes.ts",
+        "apps/web/src/lib/nav/surface-classes.test.ts"
+      ]
+    },
+    {
+      "route": "/admin/work/[id]",
+      "source": "apps/web/src/app/admin/work/[id]/page.tsx",
+      "family": "admin",
+      "access": "staff",
+      "status": "pending",
+      "states": {
+        "default": {
+          "status": "baseline",
+          "reason": "The route source is the current rendering or redirect anchor; this status records a baseline and does not assert visual verification.",
+          "evidence": ["apps/web/src/app/admin/work/[id]/page.tsx"]
+        },
+        "loading": {
+          "status": "baseline",
+          "reason": "A route-segment loading component exists and is the current loading-state baseline.",
+          "evidence": ["apps/web/src/app/admin/loading.tsx", "docs/redesign/SURFACES.md"]
+        },
+        "error": {
+          "status": "pending",
+          "reason": "The redesign spec identifies an error state or the admin section lacks a route-level error treatment.",
+          "evidence": ["apps/web/src/app/admin/work/[id]/page.tsx", "docs/redesign/SURFACES.md"]
+        },
+        "empty": {
+          "status": "not-applicable",
+          "reason": "This route is not an empty-result or data-absence surface in the redesign inventory.",
+          "evidence": ["apps/web/src/app/admin/work/[id]/page.tsx"]
+        },
+        "selected": {
+          "status": "pending",
+          "reason": "This admin workflow has route or row selection; the admin task-state redesign is pending.",
+          "evidence": ["apps/web/src/app/admin/work/[id]/page.tsx", "docs/redesign/SURFACES.md"]
+        },
+        "auth": {
+          "status": "baseline",
+          "reason": "The route is protected by the existing staff identity gate; redesign status does not change or re-verify authorization.",
+          "evidence": [
+            "apps/web/src/proxy.ts",
+            "apps/web/src/proxy.test.ts",
+            "apps/web/src/admin/auth/protected-paths.test.ts",
+            "apps/web/src/app/admin/work/[id]/page.tsx"
+          ]
+        }
+      },
+      "componentRefs": [
+        "apps/web/src/app/admin/work/[id]/page.tsx",
+        "apps/web/src/admin/components/AdminShellChrome.tsx"
+      ],
+      "evidence": [
+        "apps/web/src/app/admin/work/[id]/page.tsx",
+        "docs/redesign/SURFACES.md",
+        "apps/web/src/lib/nav/surface-classes.ts",
+        "apps/web/src/lib/nav/surface-classes.test.ts"
+      ]
+    },
+    {
+      "route": "/apparatus",
+      "source": "apps/web/src/app/apparatus/page.tsx",
+      "family": "redirect",
+      "access": "public-redirect",
+      "status": "baseline",
+      "states": {
+        "default": {
+          "status": "baseline",
+          "reason": "The route source is the current rendering or redirect anchor; this status records a baseline and does not assert visual verification.",
+          "evidence": ["apps/web/src/app/apparatus/page.tsx"]
+        },
+        "loading": {
+          "status": "not-applicable",
+          "reason": "The route is a static or redirect surface and the redesign spec does not call for a route-specific loading state.",
+          "evidence": ["apps/web/src/app/apparatus/page.tsx"]
+        },
+        "error": {
+          "status": "not-applicable",
+          "reason": "This route is static or redirect-only and has no route-specific data error state in the redesign spec.",
+          "evidence": ["apps/web/src/app/apparatus/page.tsx"]
+        },
+        "empty": {
+          "status": "not-applicable",
+          "reason": "This route is not an empty-result or data-absence surface in the redesign inventory.",
+          "evidence": ["apps/web/src/app/apparatus/page.tsx"]
+        },
+        "selected": {
+          "status": "not-applicable",
+          "reason": "The route has no meaningful selected-item or selected-filter state in the redesign scope.",
+          "evidence": ["apps/web/src/app/apparatus/page.tsx"]
+        },
+        "auth": {
+          "status": "not-applicable",
+          "reason": "This route is public and does not have an authentication state in its surface flow.",
+          "evidence": ["apps/web/src/app/apparatus/page.tsx"]
+        }
+      },
+      "componentRefs": [
+        "apps/web/src/app/apparatus/page.tsx",
+        "apps/web/src/components/SiteShell.tsx"
+      ],
+      "evidence": [
+        "apps/web/src/app/apparatus/page.tsx",
+        "docs/redesign/SURFACES.md",
+        "apps/web/src/lib/nav/surface-classes.ts",
+        "apps/web/src/lib/nav/surface-classes.test.ts"
+      ]
+    },
+    {
+      "route": "/books",
+      "source": "apps/web/src/app/books/page.tsx",
+      "family": "records-archive",
+      "access": "public",
+      "status": "pending",
+      "states": {
+        "default": {
+          "status": "baseline",
+          "reason": "The route source is the current rendering or redirect anchor; this status records a baseline and does not assert visual verification.",
+          "evidence": ["apps/web/src/app/books/page.tsx"]
+        },
+        "loading": {
+          "status": "pending",
+          "reason": "The redesign surface spec calls for route loading treatment; no matching route-segment loading component is present.",
+          "evidence": ["apps/web/src/app/books/page.tsx", "docs/redesign/SURFACES.md"]
+        },
+        "error": {
+          "status": "pending",
+          "reason": "The redesign spec identifies an error state or the admin section lacks a route-level error treatment.",
+          "evidence": ["apps/web/src/app/books/page.tsx", "docs/redesign/SURFACES.md"]
+        },
+        "empty": {
+          "status": "not-applicable",
+          "reason": "This route is not an empty-result or data-absence surface in the redesign inventory.",
+          "evidence": ["apps/web/src/app/books/page.tsx"]
+        },
+        "selected": {
+          "status": "pending",
+          "reason": "This browse surface has selected query, filter, or page state that remains part of the redesign work.",
+          "evidence": ["apps/web/src/app/books/page.tsx", "docs/redesign/SURFACES.md"]
+        },
+        "auth": {
+          "status": "not-applicable",
+          "reason": "This route is public and does not have an authentication state in its surface flow.",
+          "evidence": ["apps/web/src/app/books/page.tsx"]
+        }
+      },
+      "componentRefs": ["apps/web/src/app/books/page.tsx", "apps/web/src/components/SiteShell.tsx"],
+      "evidence": [
+        "apps/web/src/app/books/page.tsx",
+        "docs/redesign/SURFACES.md",
+        "apps/web/src/lib/nav/surface-classes.ts",
+        "apps/web/src/lib/nav/surface-classes.test.ts"
+      ]
+    },
+    {
+      "route": "/books/[slug]",
+      "source": "apps/web/src/app/books/[slug]/page.tsx",
+      "family": "records-archive",
+      "access": "public",
+      "status": "pending",
+      "states": {
+        "default": {
+          "status": "baseline",
+          "reason": "The route source is the current rendering or redirect anchor; this status records a baseline and does not assert visual verification.",
+          "evidence": ["apps/web/src/app/books/[slug]/page.tsx"]
+        },
+        "loading": {
+          "status": "pending",
+          "reason": "The redesign surface spec calls for route loading treatment; no matching route-segment loading component is present.",
+          "evidence": ["apps/web/src/app/books/[slug]/page.tsx", "docs/redesign/SURFACES.md"]
+        },
+        "error": {
+          "status": "pending",
+          "reason": "The redesign spec identifies an error state or the admin section lacks a route-level error treatment.",
+          "evidence": ["apps/web/src/app/books/[slug]/page.tsx", "docs/redesign/SURFACES.md"]
+        },
+        "empty": {
+          "status": "not-applicable",
+          "reason": "This route is not an empty-result or data-absence surface in the redesign inventory.",
+          "evidence": ["apps/web/src/app/books/[slug]/page.tsx"]
+        },
+        "selected": {
+          "status": "not-applicable",
+          "reason": "The route has no meaningful selected-item or selected-filter state in the redesign scope.",
+          "evidence": ["apps/web/src/app/books/[slug]/page.tsx"]
+        },
+        "auth": {
+          "status": "not-applicable",
+          "reason": "This route is public and does not have an authentication state in its surface flow.",
+          "evidence": ["apps/web/src/app/books/[slug]/page.tsx"]
+        }
+      },
+      "componentRefs": [
+        "apps/web/src/app/books/[slug]/page.tsx",
+        "apps/web/src/components/SiteShell.tsx"
+      ],
+      "evidence": [
+        "apps/web/src/app/books/[slug]/page.tsx",
+        "docs/redesign/SURFACES.md",
+        "apps/web/src/lib/nav/surface-classes.ts",
+        "apps/web/src/lib/nav/surface-classes.test.ts"
+      ]
+    },
+    {
+      "route": "/corrections",
+      "source": "apps/web/src/app/corrections/page.tsx",
+      "family": "forms",
+      "access": "public",
+      "status": "partial",
+      "states": {
+        "default": {
+          "status": "baseline",
+          "reason": "The route source is the current rendering or redirect anchor; this status records a baseline and does not assert visual verification.",
+          "evidence": ["apps/web/src/app/corrections/page.tsx"]
+        },
+        "loading": {
+          "status": "not-applicable",
+          "reason": "The route is a static or redirect surface and the redesign spec does not call for a route-specific loading state.",
+          "evidence": ["apps/web/src/app/corrections/page.tsx"]
+        },
+        "error": {
+          "status": "partial",
+          "reason": "Field-level validation and submit errors have shipped, while the broader flow still has redesign work.",
+          "evidence": [
+            "apps/web/src/app/corrections/correction-form.test.tsx",
+            "apps/web/src/app/corrections/page.tsx",
+            "docs/redesign/SURFACES.md"
+          ]
+        },
+        "empty": {
+          "status": "not-applicable",
+          "reason": "This route is not an empty-result or data-absence surface in the redesign inventory.",
+          "evidence": ["apps/web/src/app/corrections/page.tsx"]
+        },
+        "selected": {
+          "status": "not-applicable",
+          "reason": "The route has no meaningful selected-item or selected-filter state in the redesign scope.",
+          "evidence": ["apps/web/src/app/corrections/page.tsx"]
+        },
+        "auth": {
+          "status": "not-applicable",
+          "reason": "This route is public and does not have an authentication state in its surface flow.",
+          "evidence": ["apps/web/src/app/corrections/page.tsx"]
+        }
+      },
+      "componentRefs": [
+        "apps/web/src/app/corrections/page.tsx",
+        "apps/web/src/components/SiteShell.tsx",
+        "apps/web/src/app/corrections/CorrectionForm.tsx",
+        "apps/web/src/components/room/Utility.tsx"
+      ],
+      "evidence": [
+        "apps/web/src/app/corrections/page.tsx",
+        "docs/redesign/SURFACES.md",
+        "apps/web/src/lib/nav/surface-classes.ts",
+        "apps/web/src/lib/nav/surface-classes.test.ts"
+      ]
+    },
+    {
+      "route": "/corrections/status",
+      "source": "apps/web/src/app/corrections/status/page.tsx",
+      "family": "forms",
+      "access": "public",
+      "status": "partial",
+      "states": {
+        "default": {
+          "status": "baseline",
+          "reason": "The route source is the current rendering or redirect anchor; this status records a baseline and does not assert visual verification.",
+          "evidence": ["apps/web/src/app/corrections/status/page.tsx"]
+        },
+        "loading": {
+          "status": "pending",
+          "reason": "The redesign surface spec calls for route loading treatment; no matching route-segment loading component is present.",
+          "evidence": ["apps/web/src/app/corrections/status/page.tsx", "docs/redesign/SURFACES.md"]
+        },
+        "error": {
+          "status": "pending",
+          "reason": "The redesign spec identifies an error state or the admin section lacks a route-level error treatment.",
+          "evidence": ["apps/web/src/app/corrections/status/page.tsx", "docs/redesign/SURFACES.md"]
+        },
+        "empty": {
+          "status": "partial",
+          "reason": "The empty receipt lookup now returns a visible error; the route still has separate status and unknown-receipt work.",
+          "evidence": [
+            "apps/web/src/app/corrections/CorrectionStatusPanel.test.tsx",
+            "apps/web/src/app/corrections/status/ReceiptLookupForm.tsx",
+            "docs/redesign/SURFACES.md"
+          ]
+        },
+        "selected": {
+          "status": "not-applicable",
+          "reason": "The route has no meaningful selected-item or selected-filter state in the redesign scope.",
+          "evidence": ["apps/web/src/app/corrections/status/page.tsx"]
+        },
+        "auth": {
+          "status": "not-applicable",
+          "reason": "This route is public and does not have an authentication state in its surface flow.",
+          "evidence": ["apps/web/src/app/corrections/status/page.tsx"]
+        }
+      },
+      "componentRefs": [
+        "apps/web/src/app/corrections/status/page.tsx",
+        "apps/web/src/components/SiteShell.tsx"
+      ],
+      "evidence": [
+        "apps/web/src/app/corrections/status/page.tsx",
+        "docs/redesign/SURFACES.md",
+        "apps/web/src/lib/nav/surface-classes.ts",
+        "apps/web/src/lib/nav/surface-classes.test.ts"
+      ]
+    },
+    {
+      "route": "/corrections/status/[receiptCode]",
+      "source": "apps/web/src/app/corrections/status/[receiptCode]/page.tsx",
+      "family": "forms",
+      "access": "public",
+      "status": "partial",
+      "states": {
+        "default": {
+          "status": "baseline",
+          "reason": "The route source is the current rendering or redirect anchor; this status records a baseline and does not assert visual verification.",
+          "evidence": ["apps/web/src/app/corrections/status/[receiptCode]/page.tsx"]
+        },
+        "loading": {
+          "status": "pending",
+          "reason": "The redesign surface spec calls for route loading treatment; no matching route-segment loading component is present.",
+          "evidence": [
+            "apps/web/src/app/corrections/status/[receiptCode]/page.tsx",
+            "docs/redesign/SURFACES.md"
+          ]
+        },
+        "error": {
+          "status": "pending",
+          "reason": "The redesign spec identifies an error state or the admin section lacks a route-level error treatment.",
+          "evidence": [
+            "apps/web/src/app/corrections/status/[receiptCode]/page.tsx",
+            "docs/redesign/SURFACES.md"
+          ]
+        },
+        "empty": {
+          "status": "not-applicable",
+          "reason": "This route is not an empty-result or data-absence surface in the redesign inventory.",
+          "evidence": ["apps/web/src/app/corrections/status/[receiptCode]/page.tsx"]
+        },
+        "selected": {
+          "status": "not-applicable",
+          "reason": "The route has no meaningful selected-item or selected-filter state in the redesign scope.",
+          "evidence": ["apps/web/src/app/corrections/status/[receiptCode]/page.tsx"]
+        },
+        "auth": {
+          "status": "not-applicable",
+          "reason": "This route is public and does not have an authentication state in its surface flow.",
+          "evidence": ["apps/web/src/app/corrections/status/[receiptCode]/page.tsx"]
+        }
+      },
+      "componentRefs": [
+        "apps/web/src/app/corrections/status/[receiptCode]/page.tsx",
+        "apps/web/src/components/SiteShell.tsx"
+      ],
+      "evidence": [
+        "apps/web/src/app/corrections/status/[receiptCode]/page.tsx",
+        "docs/redesign/SURFACES.md",
+        "apps/web/src/lib/nav/surface-classes.ts",
+        "apps/web/src/lib/nav/surface-classes.test.ts"
+      ]
+    },
+    {
+      "route": "/data",
+      "source": "apps/web/src/app/data/page.tsx",
+      "family": "reading-data",
+      "access": "public",
+      "status": "partial",
+      "states": {
+        "default": {
+          "status": "baseline",
+          "reason": "The route source is the current rendering or redirect anchor; this status records a baseline and does not assert visual verification.",
+          "evidence": ["apps/web/src/app/data/page.tsx"]
+        },
+        "loading": {
+          "status": "pending",
+          "reason": "The redesign surface spec calls for route loading treatment; no matching route-segment loading component is present.",
+          "evidence": ["apps/web/src/app/data/page.tsx", "docs/redesign/SURFACES.md"]
+        },
+        "error": {
+          "status": "pending",
+          "reason": "The redesign spec identifies an error state or the admin section lacks a route-level error treatment.",
+          "evidence": ["apps/web/src/app/data/page.tsx", "docs/redesign/SURFACES.md"]
+        },
+        "empty": {
+          "status": "not-applicable",
+          "reason": "This route is not an empty-result or data-absence surface in the redesign inventory.",
+          "evidence": ["apps/web/src/app/data/page.tsx"]
+        },
+        "selected": {
+          "status": "not-applicable",
+          "reason": "The route has no meaningful selected-item or selected-filter state in the redesign scope.",
+          "evidence": ["apps/web/src/app/data/page.tsx"]
+        },
+        "auth": {
+          "status": "not-applicable",
+          "reason": "This route is public and does not have an authentication state in its surface flow.",
+          "evidence": ["apps/web/src/app/data/page.tsx"]
+        }
+      },
+      "componentRefs": [
+        "apps/web/src/app/data/page.tsx",
+        "apps/web/src/components/SiteShell.tsx",
+        "apps/web/src/components/data/DataChartFrame.tsx"
+      ],
+      "evidence": [
+        "apps/web/src/app/data/page.tsx",
+        "docs/redesign/SURFACES.md",
+        "apps/web/src/lib/nav/surface-classes.ts",
+        "apps/web/src/lib/nav/surface-classes.test.ts"
+      ]
+    },
+    {
+      "route": "/design-system",
+      "source": "apps/web/src/app/design-system/page.tsx",
+      "family": "utility",
+      "access": "staff",
+      "status": "pending",
+      "states": {
+        "default": {
+          "status": "baseline",
+          "reason": "The route source is the current rendering or redirect anchor; this status records a baseline and does not assert visual verification.",
+          "evidence": ["apps/web/src/app/design-system/page.tsx"]
+        },
+        "loading": {
+          "status": "not-applicable",
+          "reason": "The route is a static or redirect surface and the redesign spec does not call for a route-specific loading state.",
+          "evidence": ["apps/web/src/app/design-system/page.tsx"]
+        },
+        "error": {
+          "status": "not-applicable",
+          "reason": "This route is static or redirect-only and has no route-specific data error state in the redesign spec.",
+          "evidence": ["apps/web/src/app/design-system/page.tsx"]
+        },
+        "empty": {
+          "status": "not-applicable",
+          "reason": "This route is not an empty-result or data-absence surface in the redesign inventory.",
+          "evidence": ["apps/web/src/app/design-system/page.tsx"]
+        },
+        "selected": {
+          "status": "not-applicable",
+          "reason": "The route has no meaningful selected-item or selected-filter state in the redesign scope.",
+          "evidence": ["apps/web/src/app/design-system/page.tsx"]
+        },
+        "auth": {
+          "status": "baseline",
+          "reason": "The route is protected by the existing staff identity gate; redesign status does not change or re-verify authorization.",
+          "evidence": [
+            "apps/web/src/proxy.ts",
+            "apps/web/src/proxy.test.ts",
+            "apps/web/src/admin/auth/protected-paths.test.ts",
+            "apps/web/src/app/design-system/page.tsx"
+          ]
+        }
+      },
+      "componentRefs": [
+        "apps/web/src/app/design-system/page.tsx",
+        "apps/web/src/components/SiteShell.tsx"
+      ],
+      "evidence": [
+        "apps/web/src/app/design-system/page.tsx",
+        "docs/redesign/SURFACES.md",
+        "apps/web/src/lib/nav/surface-classes.ts",
+        "apps/web/src/lib/nav/surface-classes.test.ts"
+      ]
+    },
+    {
+      "route": "/entity/[id]",
+      "source": "apps/web/src/app/entity/[id]/page.tsx",
+      "family": "records-archive",
+      "access": "public",
+      "status": "partial",
+      "states": {
+        "default": {
+          "status": "baseline",
+          "reason": "The route source is the current rendering or redirect anchor; this status records a baseline and does not assert visual verification.",
+          "evidence": ["apps/web/src/app/entity/[id]/page.tsx"]
+        },
+        "loading": {
+          "status": "baseline",
+          "reason": "A route-segment loading component exists and is the current loading-state baseline.",
+          "evidence": ["apps/web/src/app/entity/[id]/loading.tsx", "docs/redesign/SURFACES.md"]
+        },
+        "error": {
+          "status": "pending",
+          "reason": "The redesign spec identifies an error state or the admin section lacks a route-level error treatment.",
+          "evidence": ["apps/web/src/app/entity/[id]/page.tsx", "docs/redesign/SURFACES.md"]
+        },
+        "empty": {
+          "status": "not-applicable",
+          "reason": "This route is not an empty-result or data-absence surface in the redesign inventory.",
+          "evidence": ["apps/web/src/app/entity/[id]/page.tsx"]
+        },
+        "selected": {
+          "status": "not-applicable",
+          "reason": "The route has no meaningful selected-item or selected-filter state in the redesign scope.",
+          "evidence": ["apps/web/src/app/entity/[id]/page.tsx"]
+        },
+        "auth": {
+          "status": "not-applicable",
+          "reason": "This route is public and does not have an authentication state in its surface flow.",
+          "evidence": ["apps/web/src/app/entity/[id]/page.tsx"]
+        }
+      },
+      "componentRefs": [
+        "apps/web/src/app/entity/[id]/page.tsx",
+        "apps/web/src/components/SiteShell.tsx"
+      ],
+      "evidence": [
+        "apps/web/src/app/entity/[id]/page.tsx",
+        "docs/redesign/SURFACES.md",
+        "apps/web/src/lib/nav/surface-classes.ts",
+        "apps/web/src/lib/nav/surface-classes.test.ts"
+      ]
+    },
+    {
+      "route": "/errata",
+      "source": "apps/web/src/app/errata/page.tsx",
+      "family": "records-archive",
+      "access": "public",
+      "status": "pending",
+      "states": {
+        "default": {
+          "status": "baseline",
+          "reason": "The route source is the current rendering or redirect anchor; this status records a baseline and does not assert visual verification.",
+          "evidence": ["apps/web/src/app/errata/page.tsx"]
+        },
+        "loading": {
+          "status": "pending",
+          "reason": "The redesign surface spec calls for route loading treatment; no matching route-segment loading component is present.",
+          "evidence": ["apps/web/src/app/errata/page.tsx", "docs/redesign/SURFACES.md"]
+        },
+        "error": {
+          "status": "pending",
+          "reason": "The redesign spec identifies an error state or the admin section lacks a route-level error treatment.",
+          "evidence": ["apps/web/src/app/errata/page.tsx", "docs/redesign/SURFACES.md"]
+        },
+        "empty": {
+          "status": "not-applicable",
+          "reason": "This route is not an empty-result or data-absence surface in the redesign inventory.",
+          "evidence": ["apps/web/src/app/errata/page.tsx"]
+        },
+        "selected": {
+          "status": "pending",
+          "reason": "This browse surface has selected query, filter, or page state that remains part of the redesign work.",
+          "evidence": ["apps/web/src/app/errata/page.tsx", "docs/redesign/SURFACES.md"]
+        },
+        "auth": {
+          "status": "not-applicable",
+          "reason": "This route is public and does not have an authentication state in its surface flow.",
+          "evidence": ["apps/web/src/app/errata/page.tsx"]
+        }
+      },
+      "componentRefs": [
+        "apps/web/src/app/errata/page.tsx",
+        "apps/web/src/components/SiteShell.tsx"
+      ],
+      "evidence": [
+        "apps/web/src/app/errata/page.tsx",
+        "docs/redesign/SURFACES.md",
+        "apps/web/src/lib/nav/surface-classes.ts",
+        "apps/web/src/lib/nav/surface-classes.test.ts"
+      ]
+    },
+    {
+      "route": "/explore",
+      "source": "apps/web/src/app/explore/page.tsx",
+      "family": "ground-map",
+      "access": "public",
+      "status": "partial",
+      "states": {
+        "default": {
+          "status": "baseline",
+          "reason": "The route source is the current rendering or redirect anchor; this status records a baseline and does not assert visual verification.",
+          "evidence": ["apps/web/src/app/explore/page.tsx"]
+        },
+        "loading": {
+          "status": "baseline",
+          "reason": "A route-segment loading component exists and is the current loading-state baseline.",
+          "evidence": ["apps/web/src/app/explore/loading.tsx", "docs/redesign/SURFACES.md"]
+        },
+        "error": {
+          "status": "pending",
+          "reason": "The redesign spec identifies an error state or the admin section lacks a route-level error treatment.",
+          "evidence": ["apps/web/src/app/explore/page.tsx", "docs/redesign/SURFACES.md"]
+        },
+        "empty": {
+          "status": "pending",
+          "reason": "The redesign spec identifies absent chapter, offline catalog, empty result, or no-data treatment for this surface.",
+          "evidence": ["apps/web/src/app/explore/page.tsx", "docs/redesign/SURFACES.md"]
+        },
+        "selected": {
+          "status": "pending",
+          "reason": "The map surface has filter and camera selection; selected/cleared and empty-map states remain redesign work.",
+          "evidence": ["apps/web/src/app/explore/page.tsx", "docs/redesign/SURFACES.md"]
+        },
+        "auth": {
+          "status": "not-applicable",
+          "reason": "This route is public and does not have an authentication state in its surface flow.",
+          "evidence": ["apps/web/src/app/explore/page.tsx"]
+        }
+      },
+      "componentRefs": [
+        "apps/web/src/app/explore/page.tsx",
+        "apps/web/src/components/SiteShell.tsx",
+        "apps/web/src/components/map-stage/MapStage.tsx"
+      ],
+      "evidence": [
+        "apps/web/src/app/explore/page.tsx",
+        "docs/redesign/SURFACES.md",
+        "apps/web/src/lib/nav/surface-classes.ts",
+        "apps/web/src/lib/nav/surface-classes.test.ts"
+      ]
+    },
+    {
+      "route": "/faq",
+      "source": "apps/web/src/app/faq/page.tsx",
+      "family": "trust-policy",
+      "access": "public",
+      "status": "baseline",
+      "states": {
+        "default": {
+          "status": "baseline",
+          "reason": "The route source is the current rendering or redirect anchor; this status records a baseline and does not assert visual verification.",
+          "evidence": ["apps/web/src/app/faq/page.tsx"]
+        },
+        "loading": {
+          "status": "pending",
+          "reason": "The redesign surface spec calls for route loading treatment; no matching route-segment loading component is present.",
+          "evidence": ["apps/web/src/app/faq/page.tsx", "docs/redesign/SURFACES.md"]
+        },
+        "error": {
+          "status": "pending",
+          "reason": "The redesign spec identifies an error state or the admin section lacks a route-level error treatment.",
+          "evidence": ["apps/web/src/app/faq/page.tsx", "docs/redesign/SURFACES.md"]
+        },
+        "empty": {
+          "status": "not-applicable",
+          "reason": "This route is not an empty-result or data-absence surface in the redesign inventory.",
+          "evidence": ["apps/web/src/app/faq/page.tsx"]
+        },
+        "selected": {
+          "status": "not-applicable",
+          "reason": "The route has no meaningful selected-item or selected-filter state in the redesign scope.",
+          "evidence": ["apps/web/src/app/faq/page.tsx"]
+        },
+        "auth": {
+          "status": "not-applicable",
+          "reason": "This route is public and does not have an authentication state in its surface flow.",
+          "evidence": ["apps/web/src/app/faq/page.tsx"]
+        }
+      },
+      "componentRefs": ["apps/web/src/app/faq/page.tsx", "apps/web/src/components/SiteShell.tsx"],
+      "evidence": [
+        "apps/web/src/app/faq/page.tsx",
+        "docs/redesign/SURFACES.md",
+        "apps/web/src/lib/nav/surface-classes.ts",
+        "apps/web/src/lib/nav/surface-classes.test.ts"
+      ]
+    },
+    {
+      "route": "/history",
+      "source": "apps/web/src/app/history/page.tsx",
+      "family": "redirect",
+      "access": "public-redirect",
+      "status": "baseline",
+      "states": {
+        "default": {
+          "status": "baseline",
+          "reason": "The route source is the current rendering or redirect anchor; this status records a baseline and does not assert visual verification.",
+          "evidence": ["apps/web/src/app/history/page.tsx"]
+        },
+        "loading": {
+          "status": "not-applicable",
+          "reason": "The route is a static or redirect surface and the redesign spec does not call for a route-specific loading state.",
+          "evidence": ["apps/web/src/app/history/page.tsx"]
+        },
+        "error": {
+          "status": "not-applicable",
+          "reason": "This route is static or redirect-only and has no route-specific data error state in the redesign spec.",
+          "evidence": ["apps/web/src/app/history/page.tsx"]
+        },
+        "empty": {
+          "status": "not-applicable",
+          "reason": "This route is not an empty-result or data-absence surface in the redesign inventory.",
+          "evidence": ["apps/web/src/app/history/page.tsx"]
+        },
+        "selected": {
+          "status": "not-applicable",
+          "reason": "The route has no meaningful selected-item or selected-filter state in the redesign scope.",
+          "evidence": ["apps/web/src/app/history/page.tsx"]
+        },
+        "auth": {
+          "status": "not-applicable",
+          "reason": "This route is public and does not have an authentication state in its surface flow.",
+          "evidence": ["apps/web/src/app/history/page.tsx"]
+        }
+      },
+      "componentRefs": [
+        "apps/web/src/app/history/page.tsx",
+        "apps/web/src/components/SiteShell.tsx"
+      ],
+      "evidence": [
+        "apps/web/src/app/history/page.tsx",
+        "docs/redesign/SURFACES.md",
+        "apps/web/src/lib/nav/surface-classes.ts",
+        "apps/web/src/lib/nav/surface-classes.test.ts"
+      ]
+    },
+    {
+      "route": "/how-it-works",
+      "source": "apps/web/src/app/how-it-works/page.tsx",
+      "family": "redirect",
+      "access": "public-redirect",
+      "status": "baseline",
+      "states": {
+        "default": {
+          "status": "baseline",
+          "reason": "The route source is the current rendering or redirect anchor; this status records a baseline and does not assert visual verification.",
+          "evidence": ["apps/web/src/app/how-it-works/page.tsx"]
+        },
+        "loading": {
+          "status": "not-applicable",
+          "reason": "The route is a static or redirect surface and the redesign spec does not call for a route-specific loading state.",
+          "evidence": ["apps/web/src/app/how-it-works/page.tsx"]
+        },
+        "error": {
+          "status": "not-applicable",
+          "reason": "This route is static or redirect-only and has no route-specific data error state in the redesign spec.",
+          "evidence": ["apps/web/src/app/how-it-works/page.tsx"]
+        },
+        "empty": {
+          "status": "not-applicable",
+          "reason": "This route is not an empty-result or data-absence surface in the redesign inventory.",
+          "evidence": ["apps/web/src/app/how-it-works/page.tsx"]
+        },
+        "selected": {
+          "status": "not-applicable",
+          "reason": "The route has no meaningful selected-item or selected-filter state in the redesign scope.",
+          "evidence": ["apps/web/src/app/how-it-works/page.tsx"]
+        },
+        "auth": {
+          "status": "not-applicable",
+          "reason": "This route is public and does not have an authentication state in its surface flow.",
+          "evidence": ["apps/web/src/app/how-it-works/page.tsx"]
+        }
+      },
+      "componentRefs": [
+        "apps/web/src/app/how-it-works/page.tsx",
+        "apps/web/src/components/SiteShell.tsx"
+      ],
+      "evidence": [
+        "apps/web/src/app/how-it-works/page.tsx",
+        "docs/redesign/SURFACES.md",
+        "apps/web/src/lib/nav/surface-classes.ts",
+        "apps/web/src/lib/nav/surface-classes.test.ts"
+      ]
+    },
+    {
+      "route": "/invention/[slug]",
+      "source": "apps/web/src/app/invention/[slug]/page.tsx",
+      "family": "records-archive",
+      "access": "public",
+      "status": "partial",
+      "states": {
+        "default": {
+          "status": "baseline",
+          "reason": "The route source is the current rendering or redirect anchor; this status records a baseline and does not assert visual verification.",
+          "evidence": ["apps/web/src/app/invention/[slug]/page.tsx"]
+        },
+        "loading": {
+          "status": "pending",
+          "reason": "The redesign surface spec calls for route loading treatment; no matching route-segment loading component is present.",
+          "evidence": ["apps/web/src/app/invention/[slug]/page.tsx", "docs/redesign/SURFACES.md"]
+        },
+        "error": {
+          "status": "pending",
+          "reason": "The redesign spec identifies an error state or the admin section lacks a route-level error treatment.",
+          "evidence": ["apps/web/src/app/invention/[slug]/page.tsx", "docs/redesign/SURFACES.md"]
+        },
+        "empty": {
+          "status": "not-applicable",
+          "reason": "This route is not an empty-result or data-absence surface in the redesign inventory.",
+          "evidence": ["apps/web/src/app/invention/[slug]/page.tsx"]
+        },
+        "selected": {
+          "status": "not-applicable",
+          "reason": "The route has no meaningful selected-item or selected-filter state in the redesign scope.",
+          "evidence": ["apps/web/src/app/invention/[slug]/page.tsx"]
+        },
+        "auth": {
+          "status": "not-applicable",
+          "reason": "This route is public and does not have an authentication state in its surface flow.",
+          "evidence": ["apps/web/src/app/invention/[slug]/page.tsx"]
+        }
+      },
+      "componentRefs": [
+        "apps/web/src/app/invention/[slug]/page.tsx",
+        "apps/web/src/components/SiteShell.tsx"
+      ],
+      "evidence": [
+        "apps/web/src/app/invention/[slug]/page.tsx",
+        "docs/redesign/SURFACES.md",
+        "apps/web/src/lib/nav/surface-classes.ts",
+        "apps/web/src/lib/nav/surface-classes.test.ts"
+      ]
+    },
+    {
+      "route": "/law",
+      "source": "apps/web/src/app/law/page.tsx",
+      "family": "records-archive",
+      "access": "public",
+      "status": "pending",
+      "states": {
+        "default": {
+          "status": "baseline",
+          "reason": "The route source is the current rendering or redirect anchor; this status records a baseline and does not assert visual verification.",
+          "evidence": ["apps/web/src/app/law/page.tsx"]
+        },
+        "loading": {
+          "status": "pending",
+          "reason": "The redesign surface spec calls for route loading treatment; no matching route-segment loading component is present.",
+          "evidence": ["apps/web/src/app/law/page.tsx", "docs/redesign/SURFACES.md"]
+        },
+        "error": {
+          "status": "pending",
+          "reason": "The redesign spec identifies an error state or the admin section lacks a route-level error treatment.",
+          "evidence": ["apps/web/src/app/law/page.tsx", "docs/redesign/SURFACES.md"]
+        },
+        "empty": {
+          "status": "not-applicable",
+          "reason": "This route is not an empty-result or data-absence surface in the redesign inventory.",
+          "evidence": ["apps/web/src/app/law/page.tsx"]
+        },
+        "selected": {
+          "status": "pending",
+          "reason": "This browse surface has selected query, filter, or page state that remains part of the redesign work.",
+          "evidence": ["apps/web/src/app/law/page.tsx", "docs/redesign/SURFACES.md"]
+        },
+        "auth": {
+          "status": "not-applicable",
+          "reason": "This route is public and does not have an authentication state in its surface flow.",
+          "evidence": ["apps/web/src/app/law/page.tsx"]
+        }
+      },
+      "componentRefs": ["apps/web/src/app/law/page.tsx", "apps/web/src/components/SiteShell.tsx"],
+      "evidence": [
+        "apps/web/src/app/law/page.tsx",
+        "docs/redesign/SURFACES.md",
+        "apps/web/src/lib/nav/surface-classes.ts",
+        "apps/web/src/lib/nav/surface-classes.test.ts"
+      ]
+    },
+    {
+      "route": "/law/[slug]",
+      "source": "apps/web/src/app/law/[slug]/page.tsx",
+      "family": "records-archive",
+      "access": "public",
+      "status": "pending",
+      "states": {
+        "default": {
+          "status": "baseline",
+          "reason": "The route source is the current rendering or redirect anchor; this status records a baseline and does not assert visual verification.",
+          "evidence": ["apps/web/src/app/law/[slug]/page.tsx"]
+        },
+        "loading": {
+          "status": "pending",
+          "reason": "The redesign surface spec calls for route loading treatment; no matching route-segment loading component is present.",
+          "evidence": ["apps/web/src/app/law/[slug]/page.tsx", "docs/redesign/SURFACES.md"]
+        },
+        "error": {
+          "status": "pending",
+          "reason": "The redesign spec identifies an error state or the admin section lacks a route-level error treatment.",
+          "evidence": ["apps/web/src/app/law/[slug]/page.tsx", "docs/redesign/SURFACES.md"]
+        },
+        "empty": {
+          "status": "not-applicable",
+          "reason": "This route is not an empty-result or data-absence surface in the redesign inventory.",
+          "evidence": ["apps/web/src/app/law/[slug]/page.tsx"]
+        },
+        "selected": {
+          "status": "not-applicable",
+          "reason": "The route has no meaningful selected-item or selected-filter state in the redesign scope.",
+          "evidence": ["apps/web/src/app/law/[slug]/page.tsx"]
+        },
+        "auth": {
+          "status": "not-applicable",
+          "reason": "This route is public and does not have an authentication state in its surface flow.",
+          "evidence": ["apps/web/src/app/law/[slug]/page.tsx"]
+        }
+      },
+      "componentRefs": [
+        "apps/web/src/app/law/[slug]/page.tsx",
+        "apps/web/src/components/SiteShell.tsx"
+      ],
+      "evidence": [
+        "apps/web/src/app/law/[slug]/page.tsx",
+        "docs/redesign/SURFACES.md",
+        "apps/web/src/lib/nav/surface-classes.ts",
+        "apps/web/src/lib/nav/surface-classes.test.ts"
+      ]
+    },
+    {
+      "route": "/lives",
+      "source": "apps/web/src/app/lives/page.tsx",
+      "family": "reading-data",
+      "access": "public",
+      "status": "partial",
+      "states": {
+        "default": {
+          "status": "baseline",
+          "reason": "The route source is the current rendering or redirect anchor; this status records a baseline and does not assert visual verification.",
+          "evidence": ["apps/web/src/app/lives/page.tsx"]
+        },
+        "loading": {
+          "status": "not-applicable",
+          "reason": "The route is a static or redirect surface and the redesign spec does not call for a route-specific loading state.",
+          "evidence": ["apps/web/src/app/lives/page.tsx"]
+        },
+        "error": {
+          "status": "not-applicable",
+          "reason": "This route is static or redirect-only and has no route-specific data error state in the redesign spec.",
+          "evidence": ["apps/web/src/app/lives/page.tsx"]
+        },
+        "empty": {
+          "status": "pending",
+          "reason": "The redesign spec identifies absent chapter, offline catalog, empty result, or no-data treatment for this surface.",
+          "evidence": ["apps/web/src/app/lives/page.tsx", "docs/redesign/SURFACES.md"]
+        },
+        "selected": {
+          "status": "not-applicable",
+          "reason": "The route has no meaningful selected-item or selected-filter state in the redesign scope.",
+          "evidence": ["apps/web/src/app/lives/page.tsx"]
+        },
+        "auth": {
+          "status": "not-applicable",
+          "reason": "This route is public and does not have an authentication state in its surface flow.",
+          "evidence": ["apps/web/src/app/lives/page.tsx"]
+        }
+      },
+      "componentRefs": ["apps/web/src/app/lives/page.tsx", "apps/web/src/components/SiteShell.tsx"],
+      "evidence": [
+        "apps/web/src/app/lives/page.tsx",
+        "docs/redesign/SURFACES.md",
+        "apps/web/src/lib/nav/surface-classes.ts",
+        "apps/web/src/lib/nav/surface-classes.test.ts"
+      ]
+    },
+    {
+      "route": "/lives/[region]",
+      "source": "apps/web/src/app/lives/[region]/page.tsx",
+      "family": "redirect",
+      "access": "public-redirect",
+      "status": "baseline",
+      "states": {
+        "default": {
+          "status": "baseline",
+          "reason": "The route source is the current rendering or redirect anchor; this status records a baseline and does not assert visual verification.",
+          "evidence": ["apps/web/src/app/lives/[region]/page.tsx"]
+        },
+        "loading": {
+          "status": "not-applicable",
+          "reason": "The route is a static or redirect surface and the redesign spec does not call for a route-specific loading state.",
+          "evidence": ["apps/web/src/app/lives/[region]/page.tsx"]
+        },
+        "error": {
+          "status": "not-applicable",
+          "reason": "This route is static or redirect-only and has no route-specific data error state in the redesign spec.",
+          "evidence": ["apps/web/src/app/lives/[region]/page.tsx"]
+        },
+        "empty": {
+          "status": "not-applicable",
+          "reason": "This route is not an empty-result or data-absence surface in the redesign inventory.",
+          "evidence": ["apps/web/src/app/lives/[region]/page.tsx"]
+        },
+        "selected": {
+          "status": "not-applicable",
+          "reason": "The route has no meaningful selected-item or selected-filter state in the redesign scope.",
+          "evidence": ["apps/web/src/app/lives/[region]/page.tsx"]
+        },
+        "auth": {
+          "status": "not-applicable",
+          "reason": "This route is public and does not have an authentication state in its surface flow.",
+          "evidence": ["apps/web/src/app/lives/[region]/page.tsx"]
+        }
+      },
+      "componentRefs": [
+        "apps/web/src/app/lives/[region]/page.tsx",
+        "apps/web/src/components/SiteShell.tsx"
+      ],
+      "evidence": [
+        "apps/web/src/app/lives/[region]/page.tsx",
+        "docs/redesign/SURFACES.md",
+        "apps/web/src/lib/nav/surface-classes.ts",
+        "apps/web/src/lib/nav/surface-classes.test.ts"
+      ]
+    },
+    {
+      "route": "/lives/explorer",
+      "source": "apps/web/src/app/lives/explorer/page.tsx",
+      "family": "reading-data",
+      "access": "public",
+      "status": "baseline",
+      "states": {
+        "default": {
+          "status": "baseline",
+          "reason": "The route source is the current rendering or redirect anchor; this status records a baseline and does not assert visual verification.",
+          "evidence": ["apps/web/src/app/lives/explorer/page.tsx"]
+        },
+        "loading": {
+          "status": "pending",
+          "reason": "The redesign surface spec calls for route loading treatment; no matching route-segment loading component is present.",
+          "evidence": ["apps/web/src/app/lives/explorer/page.tsx", "docs/redesign/SURFACES.md"]
+        },
+        "error": {
+          "status": "pending",
+          "reason": "The redesign spec identifies an error state or the admin section lacks a route-level error treatment.",
+          "evidence": ["apps/web/src/app/lives/explorer/page.tsx", "docs/redesign/SURFACES.md"]
+        },
+        "empty": {
+          "status": "not-applicable",
+          "reason": "This route is not an empty-result or data-absence surface in the redesign inventory.",
+          "evidence": ["apps/web/src/app/lives/explorer/page.tsx"]
+        },
+        "selected": {
+          "status": "pending",
+          "reason": "This browse surface has selected query, filter, or page state that remains part of the redesign work.",
+          "evidence": ["apps/web/src/app/lives/explorer/page.tsx", "docs/redesign/SURFACES.md"]
+        },
+        "auth": {
+          "status": "not-applicable",
+          "reason": "This route is public and does not have an authentication state in its surface flow.",
+          "evidence": ["apps/web/src/app/lives/explorer/page.tsx"]
+        }
+      },
+      "componentRefs": [
+        "apps/web/src/app/lives/explorer/page.tsx",
+        "apps/web/src/components/SiteShell.tsx"
+      ],
+      "evidence": [
+        "apps/web/src/app/lives/explorer/page.tsx",
+        "docs/redesign/SURFACES.md",
+        "apps/web/src/lib/nav/surface-classes.ts",
+        "apps/web/src/lib/nav/surface-classes.test.ts"
+      ]
+    },
+    {
+      "route": "/memorial",
+      "source": "apps/web/src/app/memorial/page.tsx",
+      "family": "records-archive",
+      "access": "public",
+      "status": "pending",
+      "states": {
+        "default": {
+          "status": "baseline",
+          "reason": "The route source is the current rendering or redirect anchor; this status records a baseline and does not assert visual verification.",
+          "evidence": ["apps/web/src/app/memorial/page.tsx"]
+        },
+        "loading": {
+          "status": "not-applicable",
+          "reason": "The route is a static or redirect surface and the redesign spec does not call for a route-specific loading state.",
+          "evidence": ["apps/web/src/app/memorial/page.tsx"]
+        },
+        "error": {
+          "status": "pending",
+          "reason": "The redesign spec identifies an error state or the admin section lacks a route-level error treatment.",
+          "evidence": ["apps/web/src/app/memorial/page.tsx", "docs/redesign/SURFACES.md"]
+        },
+        "empty": {
+          "status": "pending",
+          "reason": "The redesign spec identifies absent chapter, offline catalog, empty result, or no-data treatment for this surface.",
+          "evidence": ["apps/web/src/app/memorial/page.tsx", "docs/redesign/SURFACES.md"]
+        },
+        "selected": {
+          "status": "not-applicable",
+          "reason": "The route has no meaningful selected-item or selected-filter state in the redesign scope.",
+          "evidence": ["apps/web/src/app/memorial/page.tsx"]
+        },
+        "auth": {
+          "status": "not-applicable",
+          "reason": "This route is public and does not have an authentication state in its surface flow.",
+          "evidence": ["apps/web/src/app/memorial/page.tsx"]
+        }
+      },
+      "componentRefs": [
+        "apps/web/src/app/memorial/page.tsx",
+        "apps/web/src/components/SiteShell.tsx"
+      ],
+      "evidence": [
+        "apps/web/src/app/memorial/page.tsx",
+        "docs/redesign/SURFACES.md",
+        "apps/web/src/lib/nav/surface-classes.ts",
+        "apps/web/src/lib/nav/surface-classes.test.ts"
+      ]
+    },
+    {
+      "route": "/methodology",
+      "source": "apps/web/src/app/methodology/page.tsx",
+      "family": "trust-policy",
+      "access": "public",
+      "status": "baseline",
+      "states": {
+        "default": {
+          "status": "baseline",
+          "reason": "The route source is the current rendering or redirect anchor; this status records a baseline and does not assert visual verification.",
+          "evidence": ["apps/web/src/app/methodology/page.tsx"]
+        },
+        "loading": {
+          "status": "pending",
+          "reason": "The redesign surface spec calls for route loading treatment; no matching route-segment loading component is present.",
+          "evidence": ["apps/web/src/app/methodology/page.tsx", "docs/redesign/SURFACES.md"]
+        },
+        "error": {
+          "status": "pending",
+          "reason": "The redesign spec identifies an error state or the admin section lacks a route-level error treatment.",
+          "evidence": ["apps/web/src/app/methodology/page.tsx", "docs/redesign/SURFACES.md"]
+        },
+        "empty": {
+          "status": "not-applicable",
+          "reason": "This route is not an empty-result or data-absence surface in the redesign inventory.",
+          "evidence": ["apps/web/src/app/methodology/page.tsx"]
+        },
+        "selected": {
+          "status": "not-applicable",
+          "reason": "The route has no meaningful selected-item or selected-filter state in the redesign scope.",
+          "evidence": ["apps/web/src/app/methodology/page.tsx"]
+        },
+        "auth": {
+          "status": "not-applicable",
+          "reason": "This route is public and does not have an authentication state in its surface flow.",
+          "evidence": ["apps/web/src/app/methodology/page.tsx"]
+        }
+      },
+      "componentRefs": [
+        "apps/web/src/app/methodology/page.tsx",
+        "apps/web/src/components/SiteShell.tsx"
+      ],
+      "evidence": [
+        "apps/web/src/app/methodology/page.tsx",
+        "docs/redesign/SURFACES.md",
+        "apps/web/src/lib/nav/surface-classes.ts",
+        "apps/web/src/lib/nav/surface-classes.test.ts"
+      ]
+    },
+    {
+      "route": "/place/[slug]",
+      "source": "apps/web/src/app/place/[slug]/page.tsx",
+      "family": "records-archive",
+      "access": "public",
+      "status": "partial",
+      "states": {
+        "default": {
+          "status": "baseline",
+          "reason": "The route source is the current rendering or redirect anchor; this status records a baseline and does not assert visual verification.",
+          "evidence": ["apps/web/src/app/place/[slug]/page.tsx"]
+        },
+        "loading": {
+          "status": "pending",
+          "reason": "The redesign surface spec calls for route loading treatment; no matching route-segment loading component is present.",
+          "evidence": ["apps/web/src/app/place/[slug]/page.tsx", "docs/redesign/SURFACES.md"]
+        },
+        "error": {
+          "status": "pending",
+          "reason": "The redesign spec identifies an error state or the admin section lacks a route-level error treatment.",
+          "evidence": ["apps/web/src/app/place/[slug]/page.tsx", "docs/redesign/SURFACES.md"]
+        },
+        "empty": {
+          "status": "not-applicable",
+          "reason": "This route is not an empty-result or data-absence surface in the redesign inventory.",
+          "evidence": ["apps/web/src/app/place/[slug]/page.tsx"]
+        },
+        "selected": {
+          "status": "not-applicable",
+          "reason": "The route has no meaningful selected-item or selected-filter state in the redesign scope.",
+          "evidence": ["apps/web/src/app/place/[slug]/page.tsx"]
+        },
+        "auth": {
+          "status": "not-applicable",
+          "reason": "This route is public and does not have an authentication state in its surface flow.",
+          "evidence": ["apps/web/src/app/place/[slug]/page.tsx"]
+        }
+      },
+      "componentRefs": [
+        "apps/web/src/app/place/[slug]/page.tsx",
+        "apps/web/src/components/SiteShell.tsx"
+      ],
+      "evidence": [
+        "apps/web/src/app/place/[slug]/page.tsx",
+        "docs/redesign/SURFACES.md",
+        "apps/web/src/lib/nav/surface-classes.ts",
+        "apps/web/src/lib/nav/surface-classes.test.ts"
+      ]
+    },
+    {
+      "route": "/privacy",
+      "source": "apps/web/src/app/privacy/page.tsx",
+      "family": "trust-policy",
+      "access": "public",
+      "status": "baseline",
+      "states": {
+        "default": {
+          "status": "baseline",
+          "reason": "The route source is the current rendering or redirect anchor; this status records a baseline and does not assert visual verification.",
+          "evidence": ["apps/web/src/app/privacy/page.tsx"]
+        },
+        "loading": {
+          "status": "not-applicable",
+          "reason": "The route is a static or redirect surface and the redesign spec does not call for a route-specific loading state.",
+          "evidence": ["apps/web/src/app/privacy/page.tsx"]
+        },
+        "error": {
+          "status": "not-applicable",
+          "reason": "This route is static or redirect-only and has no route-specific data error state in the redesign spec.",
+          "evidence": ["apps/web/src/app/privacy/page.tsx"]
+        },
+        "empty": {
+          "status": "not-applicable",
+          "reason": "This route is not an empty-result or data-absence surface in the redesign inventory.",
+          "evidence": ["apps/web/src/app/privacy/page.tsx"]
+        },
+        "selected": {
+          "status": "not-applicable",
+          "reason": "The route has no meaningful selected-item or selected-filter state in the redesign scope.",
+          "evidence": ["apps/web/src/app/privacy/page.tsx"]
+        },
+        "auth": {
+          "status": "not-applicable",
+          "reason": "This route is public and does not have an authentication state in its surface flow.",
+          "evidence": ["apps/web/src/app/privacy/page.tsx"]
+        }
+      },
+      "componentRefs": [
+        "apps/web/src/app/privacy/page.tsx",
+        "apps/web/src/components/SiteShell.tsx"
+      ],
+      "evidence": [
+        "apps/web/src/app/privacy/page.tsx",
+        "docs/redesign/SURFACES.md",
+        "apps/web/src/lib/nav/surface-classes.ts",
+        "apps/web/src/lib/nav/surface-classes.test.ts"
+      ]
+    },
+    {
+      "route": "/records",
+      "source": "apps/web/src/app/records/page.tsx",
+      "family": "records-archive",
+      "access": "public",
+      "status": "partial",
+      "states": {
+        "default": {
+          "status": "baseline",
+          "reason": "The route source is the current rendering or redirect anchor; this status records a baseline and does not assert visual verification.",
+          "evidence": ["apps/web/src/app/records/page.tsx"]
+        },
+        "loading": {
+          "status": "pending",
+          "reason": "The redesign surface spec calls for route loading treatment; no matching route-segment loading component is present.",
+          "evidence": ["apps/web/src/app/records/page.tsx", "docs/redesign/SURFACES.md"]
+        },
+        "error": {
+          "status": "pending",
+          "reason": "The redesign spec identifies an error state or the admin section lacks a route-level error treatment.",
+          "evidence": ["apps/web/src/app/records/page.tsx", "docs/redesign/SURFACES.md"]
+        },
+        "empty": {
+          "status": "pending",
+          "reason": "The redesign spec identifies absent chapter, offline catalog, empty result, or no-data treatment for this surface.",
+          "evidence": ["apps/web/src/app/records/page.tsx", "docs/redesign/SURFACES.md"]
+        },
+        "selected": {
+          "status": "pending",
+          "reason": "This browse surface has selected query, filter, or page state that remains part of the redesign work.",
+          "evidence": ["apps/web/src/app/records/page.tsx", "docs/redesign/SURFACES.md"]
+        },
+        "auth": {
+          "status": "not-applicable",
+          "reason": "This route is public and does not have an authentication state in its surface flow.",
+          "evidence": ["apps/web/src/app/records/page.tsx"]
+        }
+      },
+      "componentRefs": [
+        "apps/web/src/app/records/page.tsx",
+        "apps/web/src/components/SiteShell.tsx"
+      ],
+      "evidence": [
+        "apps/web/src/app/records/page.tsx",
+        "docs/redesign/SURFACES.md",
+        "apps/web/src/lib/nav/surface-classes.ts",
+        "apps/web/src/lib/nav/surface-classes.test.ts"
+      ]
+    },
+    {
+      "route": "/rooms",
+      "source": "apps/web/src/app/rooms/page.tsx",
+      "family": "utility",
+      "access": "public",
+      "status": "pending",
+      "states": {
+        "default": {
+          "status": "baseline",
+          "reason": "The route source is the current rendering or redirect anchor; this status records a baseline and does not assert visual verification.",
+          "evidence": ["apps/web/src/app/rooms/page.tsx"]
+        },
+        "loading": {
+          "status": "not-applicable",
+          "reason": "The route is a static or redirect surface and the redesign spec does not call for a route-specific loading state.",
+          "evidence": ["apps/web/src/app/rooms/page.tsx"]
+        },
+        "error": {
+          "status": "not-applicable",
+          "reason": "This route is static or redirect-only and has no route-specific data error state in the redesign spec.",
+          "evidence": ["apps/web/src/app/rooms/page.tsx"]
+        },
+        "empty": {
+          "status": "not-applicable",
+          "reason": "This route is not an empty-result or data-absence surface in the redesign inventory.",
+          "evidence": ["apps/web/src/app/rooms/page.tsx"]
+        },
+        "selected": {
+          "status": "not-applicable",
+          "reason": "The route has no meaningful selected-item or selected-filter state in the redesign scope.",
+          "evidence": ["apps/web/src/app/rooms/page.tsx"]
+        },
+        "auth": {
+          "status": "not-applicable",
+          "reason": "This route is public and does not have an authentication state in its surface flow.",
+          "evidence": ["apps/web/src/app/rooms/page.tsx"]
+        }
+      },
+      "componentRefs": ["apps/web/src/app/rooms/page.tsx", "apps/web/src/components/SiteShell.tsx"],
+      "evidence": [
+        "apps/web/src/app/rooms/page.tsx",
+        "docs/redesign/SURFACES.md",
+        "apps/web/src/lib/nav/surface-classes.ts",
+        "apps/web/src/lib/nav/surface-classes.test.ts"
+      ]
+    },
+    {
+      "route": "/search",
+      "source": "apps/web/src/app/search/page.tsx",
+      "family": "redirect",
+      "access": "public-redirect",
+      "status": "baseline",
+      "states": {
+        "default": {
+          "status": "baseline",
+          "reason": "The route source is the current rendering or redirect anchor; this status records a baseline and does not assert visual verification.",
+          "evidence": ["apps/web/src/app/search/page.tsx"]
+        },
+        "loading": {
+          "status": "not-applicable",
+          "reason": "The route is a static or redirect surface and the redesign spec does not call for a route-specific loading state.",
+          "evidence": ["apps/web/src/app/search/page.tsx"]
+        },
+        "error": {
+          "status": "not-applicable",
+          "reason": "This route is static or redirect-only and has no route-specific data error state in the redesign spec.",
+          "evidence": ["apps/web/src/app/search/page.tsx"]
+        },
+        "empty": {
+          "status": "not-applicable",
+          "reason": "This route is not an empty-result or data-absence surface in the redesign inventory.",
+          "evidence": ["apps/web/src/app/search/page.tsx"]
+        },
+        "selected": {
+          "status": "not-applicable",
+          "reason": "The route has no meaningful selected-item or selected-filter state in the redesign scope.",
+          "evidence": ["apps/web/src/app/search/page.tsx"]
+        },
+        "auth": {
+          "status": "not-applicable",
+          "reason": "This route is public and does not have an authentication state in its surface flow.",
+          "evidence": ["apps/web/src/app/search/page.tsx"]
+        }
+      },
+      "componentRefs": [
+        "apps/web/src/app/search/page.tsx",
+        "apps/web/src/components/SiteShell.tsx"
+      ],
+      "evidence": [
+        "apps/web/src/app/search/page.tsx",
+        "docs/redesign/SURFACES.md",
+        "apps/web/src/lib/nav/surface-classes.ts",
+        "apps/web/src/lib/nav/surface-classes.test.ts"
+      ]
+    },
+    {
+      "route": "/sources",
+      "source": "apps/web/src/app/sources/page.tsx",
+      "family": "records-archive",
+      "access": "public",
+      "status": "pending",
+      "states": {
+        "default": {
+          "status": "baseline",
+          "reason": "The route source is the current rendering or redirect anchor; this status records a baseline and does not assert visual verification.",
+          "evidence": ["apps/web/src/app/sources/page.tsx"]
+        },
+        "loading": {
+          "status": "not-applicable",
+          "reason": "The route is a static or redirect surface and the redesign spec does not call for a route-specific loading state.",
+          "evidence": ["apps/web/src/app/sources/page.tsx"]
+        },
+        "error": {
+          "status": "not-applicable",
+          "reason": "This route is static or redirect-only and has no route-specific data error state in the redesign spec.",
+          "evidence": ["apps/web/src/app/sources/page.tsx"]
+        },
+        "empty": {
+          "status": "not-applicable",
+          "reason": "This route is not an empty-result or data-absence surface in the redesign inventory.",
+          "evidence": ["apps/web/src/app/sources/page.tsx"]
+        },
+        "selected": {
+          "status": "not-applicable",
+          "reason": "The route has no meaningful selected-item or selected-filter state in the redesign scope.",
+          "evidence": ["apps/web/src/app/sources/page.tsx"]
+        },
+        "auth": {
+          "status": "not-applicable",
+          "reason": "This route is public and does not have an authentication state in its surface flow.",
+          "evidence": ["apps/web/src/app/sources/page.tsx"]
+        }
+      },
+      "componentRefs": [
+        "apps/web/src/app/sources/page.tsx",
+        "apps/web/src/components/SiteShell.tsx"
+      ],
+      "evidence": [
+        "apps/web/src/app/sources/page.tsx",
+        "docs/redesign/SURFACES.md",
+        "apps/web/src/lib/nav/surface-classes.ts",
+        "apps/web/src/lib/nav/surface-classes.test.ts"
+      ]
+    },
+    {
+      "route": "/stories",
+      "source": "apps/web/src/app/stories/page.tsx",
+      "family": "reading-data",
+      "access": "public",
+      "status": "pending",
+      "states": {
+        "default": {
+          "status": "baseline",
+          "reason": "The route source is the current rendering or redirect anchor; this status records a baseline and does not assert visual verification.",
+          "evidence": ["apps/web/src/app/stories/page.tsx"]
+        },
+        "loading": {
+          "status": "pending",
+          "reason": "The redesign surface spec calls for route loading treatment; no matching route-segment loading component is present.",
+          "evidence": ["apps/web/src/app/stories/page.tsx", "docs/redesign/SURFACES.md"]
+        },
+        "error": {
+          "status": "pending",
+          "reason": "The redesign spec identifies an error state or the admin section lacks a route-level error treatment.",
+          "evidence": ["apps/web/src/app/stories/page.tsx", "docs/redesign/SURFACES.md"]
+        },
+        "empty": {
+          "status": "not-applicable",
+          "reason": "This route is not an empty-result or data-absence surface in the redesign inventory.",
+          "evidence": ["apps/web/src/app/stories/page.tsx"]
+        },
+        "selected": {
+          "status": "pending",
+          "reason": "This browse surface has selected query, filter, or page state that remains part of the redesign work.",
+          "evidence": ["apps/web/src/app/stories/page.tsx", "docs/redesign/SURFACES.md"]
+        },
+        "auth": {
+          "status": "not-applicable",
+          "reason": "This route is public and does not have an authentication state in its surface flow.",
+          "evidence": ["apps/web/src/app/stories/page.tsx"]
+        }
+      },
+      "componentRefs": [
+        "apps/web/src/app/stories/page.tsx",
+        "apps/web/src/components/SiteShell.tsx"
+      ],
+      "evidence": [
+        "apps/web/src/app/stories/page.tsx",
+        "docs/redesign/SURFACES.md",
+        "apps/web/src/lib/nav/surface-classes.ts",
+        "apps/web/src/lib/nav/surface-classes.test.ts"
+      ]
+    },
+    {
+      "route": "/stories/[slug]",
+      "source": "apps/web/src/app/stories/[slug]/page.tsx",
+      "family": "reading-data",
+      "access": "public",
+      "status": "pending",
+      "states": {
+        "default": {
+          "status": "baseline",
+          "reason": "The route source is the current rendering or redirect anchor; this status records a baseline and does not assert visual verification.",
+          "evidence": ["apps/web/src/app/stories/[slug]/page.tsx"]
+        },
+        "loading": {
+          "status": "pending",
+          "reason": "The redesign surface spec calls for route loading treatment; no matching route-segment loading component is present.",
+          "evidence": ["apps/web/src/app/stories/[slug]/page.tsx", "docs/redesign/SURFACES.md"]
+        },
+        "error": {
+          "status": "pending",
+          "reason": "The redesign spec identifies an error state or the admin section lacks a route-level error treatment.",
+          "evidence": ["apps/web/src/app/stories/[slug]/page.tsx", "docs/redesign/SURFACES.md"]
+        },
+        "empty": {
+          "status": "not-applicable",
+          "reason": "This route is not an empty-result or data-absence surface in the redesign inventory.",
+          "evidence": ["apps/web/src/app/stories/[slug]/page.tsx"]
+        },
+        "selected": {
+          "status": "not-applicable",
+          "reason": "The route has no meaningful selected-item or selected-filter state in the redesign scope.",
+          "evidence": ["apps/web/src/app/stories/[slug]/page.tsx"]
+        },
+        "auth": {
+          "status": "not-applicable",
+          "reason": "This route is public and does not have an authentication state in its surface flow.",
+          "evidence": ["apps/web/src/app/stories/[slug]/page.tsx"]
+        }
+      },
+      "componentRefs": [
+        "apps/web/src/app/stories/[slug]/page.tsx",
+        "apps/web/src/components/SiteShell.tsx",
+        "apps/web/src/components/story/StoryBody.tsx"
+      ],
+      "evidence": [
+        "apps/web/src/app/stories/[slug]/page.tsx",
+        "docs/redesign/SURFACES.md",
+        "apps/web/src/lib/nav/surface-classes.ts",
+        "apps/web/src/lib/nav/surface-classes.test.ts"
+      ]
+    },
+    {
+      "route": "/stories/mosaic-credits",
+      "source": "apps/web/src/app/stories/mosaic-credits/page.tsx",
+      "family": "reading-data",
+      "access": "public",
+      "status": "pending",
+      "states": {
+        "default": {
+          "status": "baseline",
+          "reason": "The route source is the current rendering or redirect anchor; this status records a baseline and does not assert visual verification.",
+          "evidence": ["apps/web/src/app/stories/mosaic-credits/page.tsx"]
+        },
+        "loading": {
+          "status": "not-applicable",
+          "reason": "The route is a static or redirect surface and the redesign spec does not call for a route-specific loading state.",
+          "evidence": ["apps/web/src/app/stories/mosaic-credits/page.tsx"]
+        },
+        "error": {
+          "status": "not-applicable",
+          "reason": "This route is static or redirect-only and has no route-specific data error state in the redesign spec.",
+          "evidence": ["apps/web/src/app/stories/mosaic-credits/page.tsx"]
+        },
+        "empty": {
+          "status": "not-applicable",
+          "reason": "This route is not an empty-result or data-absence surface in the redesign inventory.",
+          "evidence": ["apps/web/src/app/stories/mosaic-credits/page.tsx"]
+        },
+        "selected": {
+          "status": "not-applicable",
+          "reason": "The route has no meaningful selected-item or selected-filter state in the redesign scope.",
+          "evidence": ["apps/web/src/app/stories/mosaic-credits/page.tsx"]
+        },
+        "auth": {
+          "status": "not-applicable",
+          "reason": "This route is public and does not have an authentication state in its surface flow.",
+          "evidence": ["apps/web/src/app/stories/mosaic-credits/page.tsx"]
+        }
+      },
+      "componentRefs": [
+        "apps/web/src/app/stories/mosaic-credits/page.tsx",
+        "apps/web/src/components/SiteShell.tsx",
+        "apps/web/src/components/story/StoryBody.tsx"
+      ],
+      "evidence": [
+        "apps/web/src/app/stories/mosaic-credits/page.tsx",
+        "docs/redesign/SURFACES.md",
+        "apps/web/src/lib/nav/surface-classes.ts",
+        "apps/web/src/lib/nav/surface-classes.test.ts"
+      ]
+    },
+    {
+      "route": "/submit",
+      "source": "apps/web/src/app/submit/page.tsx",
+      "family": "forms",
+      "access": "public",
+      "status": "partial",
+      "states": {
+        "default": {
+          "status": "baseline",
+          "reason": "The route source is the current rendering or redirect anchor; this status records a baseline and does not assert visual verification.",
+          "evidence": ["apps/web/src/app/submit/page.tsx"]
+        },
+        "loading": {
+          "status": "not-applicable",
+          "reason": "The route is a static or redirect surface and the redesign spec does not call for a route-specific loading state.",
+          "evidence": ["apps/web/src/app/submit/page.tsx"]
+        },
+        "error": {
+          "status": "partial",
+          "reason": "Field-level validation and submit errors have shipped, while the broader flow still has redesign work.",
+          "evidence": [
+            "apps/web/src/app/submit/lead-intake.test.ts",
+            "apps/web/src/app/submit/page.tsx",
+            "docs/redesign/SURFACES.md"
+          ]
+        },
+        "empty": {
+          "status": "not-applicable",
+          "reason": "This route is not an empty-result or data-absence surface in the redesign inventory.",
+          "evidence": ["apps/web/src/app/submit/page.tsx"]
+        },
+        "selected": {
+          "status": "not-applicable",
+          "reason": "The route has no meaningful selected-item or selected-filter state in the redesign scope.",
+          "evidence": ["apps/web/src/app/submit/page.tsx"]
+        },
+        "auth": {
+          "status": "not-applicable",
+          "reason": "This route is public and does not have an authentication state in its surface flow.",
+          "evidence": ["apps/web/src/app/submit/page.tsx"]
+        }
+      },
+      "componentRefs": [
+        "apps/web/src/app/submit/page.tsx",
+        "apps/web/src/components/SiteShell.tsx",
+        "apps/web/src/app/submit/SubmitLeadForm.tsx"
+      ],
+      "evidence": [
+        "apps/web/src/app/submit/page.tsx",
+        "docs/redesign/SURFACES.md",
+        "apps/web/src/lib/nav/surface-classes.ts",
+        "apps/web/src/lib/nav/surface-classes.test.ts"
+      ]
+    },
+    {
+      "route": "/support",
+      "source": "apps/web/src/app/support/page.tsx",
+      "family": "trust-policy",
+      "access": "public",
+      "status": "baseline",
+      "states": {
+        "default": {
+          "status": "baseline",
+          "reason": "The route source is the current rendering or redirect anchor; this status records a baseline and does not assert visual verification.",
+          "evidence": ["apps/web/src/app/support/page.tsx"]
+        },
+        "loading": {
+          "status": "not-applicable",
+          "reason": "The route is a static or redirect surface and the redesign spec does not call for a route-specific loading state.",
+          "evidence": ["apps/web/src/app/support/page.tsx"]
+        },
+        "error": {
+          "status": "not-applicable",
+          "reason": "This route is static or redirect-only and has no route-specific data error state in the redesign spec.",
+          "evidence": ["apps/web/src/app/support/page.tsx"]
+        },
+        "empty": {
+          "status": "not-applicable",
+          "reason": "This route is not an empty-result or data-absence surface in the redesign inventory.",
+          "evidence": ["apps/web/src/app/support/page.tsx"]
+        },
+        "selected": {
+          "status": "not-applicable",
+          "reason": "The route has no meaningful selected-item or selected-filter state in the redesign scope.",
+          "evidence": ["apps/web/src/app/support/page.tsx"]
+        },
+        "auth": {
+          "status": "not-applicable",
+          "reason": "This route is public and does not have an authentication state in its surface flow.",
+          "evidence": ["apps/web/src/app/support/page.tsx"]
+        }
+      },
+      "componentRefs": [
+        "apps/web/src/app/support/page.tsx",
+        "apps/web/src/components/SiteShell.tsx"
+      ],
+      "evidence": [
+        "apps/web/src/app/support/page.tsx",
+        "docs/redesign/SURFACES.md",
+        "apps/web/src/lib/nav/surface-classes.ts",
+        "apps/web/src/lib/nav/surface-classes.test.ts"
+      ]
+    },
+    {
+      "route": "/terms",
+      "source": "apps/web/src/app/terms/page.tsx",
+      "family": "trust-policy",
+      "access": "public",
+      "status": "baseline",
+      "states": {
+        "default": {
+          "status": "baseline",
+          "reason": "The route source is the current rendering or redirect anchor; this status records a baseline and does not assert visual verification.",
+          "evidence": ["apps/web/src/app/terms/page.tsx"]
+        },
+        "loading": {
+          "status": "not-applicable",
+          "reason": "The route is a static or redirect surface and the redesign spec does not call for a route-specific loading state.",
+          "evidence": ["apps/web/src/app/terms/page.tsx"]
+        },
+        "error": {
+          "status": "not-applicable",
+          "reason": "This route is static or redirect-only and has no route-specific data error state in the redesign spec.",
+          "evidence": ["apps/web/src/app/terms/page.tsx"]
+        },
+        "empty": {
+          "status": "not-applicable",
+          "reason": "This route is not an empty-result or data-absence surface in the redesign inventory.",
+          "evidence": ["apps/web/src/app/terms/page.tsx"]
+        },
+        "selected": {
+          "status": "not-applicable",
+          "reason": "The route has no meaningful selected-item or selected-filter state in the redesign scope.",
+          "evidence": ["apps/web/src/app/terms/page.tsx"]
+        },
+        "auth": {
+          "status": "not-applicable",
+          "reason": "This route is public and does not have an authentication state in its surface flow.",
+          "evidence": ["apps/web/src/app/terms/page.tsx"]
+        }
+      },
+      "componentRefs": ["apps/web/src/app/terms/page.tsx", "apps/web/src/components/SiteShell.tsx"],
+      "evidence": [
+        "apps/web/src/app/terms/page.tsx",
+        "docs/redesign/SURFACES.md",
+        "apps/web/src/lib/nav/surface-classes.ts",
+        "apps/web/src/lib/nav/surface-classes.test.ts"
+      ]
+    }
+  ],
+  "sharedSurfaces": [
+    {
+      "id": "global-chrome",
+      "name": "Public shell and route transition",
+      "status": "partial",
+      "states": {
+        "navigation": {
+          "status": "partial",
+          "reason": "Client-side route focus handling shipped; other shell navigation issues remain.",
+          "evidence": [
+            "apps/web/src/components/shell/RouteFocus.tsx",
+            "apps/web/src/components/shell/route-focus.test.ts",
+            "docs/redesign/SURFACES.md"
+          ]
+        },
+        "theme": {
+          "status": "pending",
+          "reason": "Theme control semantics and shell adoption remain open in the surface spec.",
+          "evidence": ["apps/web/src/components/SiteShellHeader.tsx", "docs/redesign/SURFACES.md"]
+        },
+        "skipLink": {
+          "status": "pending",
+          "reason": "The surface spec records the missing shell skip-link treatment.",
+          "evidence": ["apps/web/src/components/SiteShell.tsx", "docs/redesign/SURFACES.md"]
+        }
+      },
+      "componentRefs": [
+        "apps/web/src/components/SiteShell.tsx",
+        "apps/web/src/components/SiteShellHeader.tsx",
+        "apps/web/src/components/SiteShellFooter.tsx",
+        "apps/web/src/components/ShellPageTransition.tsx",
+        "apps/web/src/components/shell/RouteFocus.tsx"
+      ],
+      "evidence": [
+        "apps/web/src/components/SiteShell.test.ts",
+        "docs/redesign/SURFACES.md",
+        "apps/web/src/lib/nav/surface-classes.ts",
+        "apps/web/src/lib/nav/surface-classes.test.ts"
+      ]
+    },
+    {
+      "id": "forms",
+      "name": "Correction and lead intake flows",
+      "status": "partial",
+      "states": {
+        "validation": {
+          "status": "partial",
+          "reason": "Field-level validation moved to shared field controls for the correction flow.",
+          "evidence": [
+            "apps/web/src/components/room/room-kit.test.tsx",
+            "apps/web/src/app/corrections/correction-form.test.tsx",
+            "docs/redesign/SURFACES.md"
+          ]
+        },
+        "success": {
+          "status": "partial",
+          "reason": "The correction receipt is focused after success; the submit flow has separate remaining work.",
+          "evidence": [
+            "apps/web/src/app/corrections/correction-form.test.tsx",
+            "docs/redesign/SURFACES.md"
+          ]
+        },
+        "focusAndAnnouncement": {
+          "status": "partial",
+          "reason": "Correction receipt focus and field error announcement have execution-log coverage.",
+          "evidence": [
+            "apps/web/src/app/corrections/correction-form.test.tsx",
+            "apps/web/src/components/room/room-kit.test.tsx",
+            "docs/redesign/SURFACES.md"
+          ]
+        }
+      },
+      "componentRefs": [
+        "apps/web/src/app/corrections/CorrectionForm.tsx",
+        "apps/web/src/app/submit/SubmitLeadForm.tsx",
+        "apps/web/src/components/room/Utility.tsx",
+        "apps/web/src/components/PageField.tsx"
+      ],
+      "evidence": ["apps/web/src/components/room/room-kit.test.tsx", "docs/redesign/SURFACES.md"]
+    },
+    {
+      "id": "dialogs",
+      "name": "Shared dialog and command palette",
+      "status": "baseline",
+      "states": {
+        "closed": {
+          "status": "baseline",
+          "reason": "The shared dialog implementation defines the current closed state; no redesign completion is claimed.",
+          "evidence": ["packages/ui/src/components/Dialog.tsx"]
+        },
+        "open": {
+          "status": "baseline",
+          "reason": "The shared dialog implementation defines the current open state; no redesign completion is claimed.",
+          "evidence": ["packages/ui/src/components/Dialog.tsx"]
+        },
+        "keyboard": {
+          "status": "baseline",
+          "reason": "The dialog and command-palette components are the current keyboard behavior sources.",
+          "evidence": [
+            "packages/ui/src/components/Dialog.tsx",
+            "packages/ui/src/components/CommandPalette.test.ts"
+          ]
+        }
+      },
+      "componentRefs": [
+        "packages/ui/src/components/Dialog.tsx",
+        "packages/ui/src/components/CommandPalette.tsx"
+      ],
+      "evidence": ["packages/ui/src/components/CommandPalette.test.ts", "docs/redesign/SURFACES.md"]
+    },
+    {
+      "id": "system-states",
+      "name": "Loading, error, and not-found boundaries",
+      "status": "partial",
+      "states": {
+        "loading": {
+          "status": "baseline",
+          "reason": "Three route-segment loading components exist in the inspected source tree.",
+          "evidence": [
+            "apps/web/src/app/admin/loading.tsx",
+            "apps/web/src/app/entity/[id]/loading.tsx",
+            "apps/web/src/app/explore/loading.tsx"
+          ]
+        },
+        "error": {
+          "status": "pending",
+          "reason": "The redesign spec records sparse route error boundaries and no root-layout global error boundary.",
+          "evidence": [
+            "apps/web/src/app/error.tsx",
+            "apps/web/src/app/error.test.ts",
+            "docs/redesign/SURFACES.md"
+          ]
+        },
+        "notFound": {
+          "status": "baseline",
+          "reason": "A shared not-found page exists as the current route fallback.",
+          "evidence": ["apps/web/src/app/not-found.tsx"]
+        },
+        "routeFocus": {
+          "status": "partial",
+          "reason": "Route focus after client navigation shipped and has a focused unit test.",
+          "evidence": [
+            "apps/web/src/components/shell/RouteFocus.tsx",
+            "apps/web/src/components/shell/route-focus.test.ts",
+            "docs/redesign/SURFACES.md"
+          ]
+        }
+      },
+      "componentRefs": [
+        "apps/web/src/app/error.tsx",
+        "apps/web/src/app/not-found.tsx",
+        "apps/web/src/app/explore/loading.tsx",
+        "apps/web/src/app/entity/[id]/loading.tsx",
+        "apps/web/src/app/admin/loading.tsx"
+      ],
+      "evidence": [
+        "apps/web/src/app/error.test.ts",
+        "apps/web/src/app/entity/[id]/loading.test.tsx",
+        "docs/redesign/SURFACES.md"
+      ]
+    },
+    {
+      "id": "map-experience",
+      "name": "Map stage, camera, and no-WebGL state",
+      "status": "partial",
+      "states": {
+        "cameraControls": {
+          "status": "partial",
+          "reason": "The duplicate zoom-control fix is covered by the camera console test.",
+          "evidence": [
+            "apps/web/src/components/map-experience/CameraConsole.test.ts",
+            "docs/redesign/SURFACES.md"
+          ]
+        },
+        "selected": {
+          "status": "pending",
+          "reason": "Map filter and camera selection remain part of the unresolved map interaction treatment.",
+          "evidence": [
+            "apps/web/src/components/map-experience/CameraConsole.tsx",
+            "docs/redesign/SURFACES.md"
+          ]
+        },
+        "unavailable": {
+          "status": "pending",
+          "reason": "A single no-WebGL contract remains an identified treatment in the surface spec.",
+          "evidence": [
+            "apps/web/src/components/map-stage/MapStage.tsx",
+            "docs/redesign/SURFACES.md"
+          ]
+        },
+        "empty": {
+          "status": "pending",
+          "reason": "The empty-map state remains explicitly identified in the surface spec.",
+          "evidence": [
+            "apps/web/src/components/map-stage/MapStage.tsx",
+            "docs/redesign/SURFACES.md"
+          ]
+        }
+      },
+      "componentRefs": [
+        "apps/web/src/components/map-stage/MapStage.tsx",
+        "apps/web/src/components/map-experience/CameraConsole.tsx",
+        "apps/web/src/components/map-experience/MapControls.tsx"
+      ],
+      "evidence": [
+        "apps/web/src/components/map-experience/CameraConsole.test.ts",
+        "docs/redesign/SURFACES.md"
+      ]
+    },
+    {
+      "id": "admin-shell",
+      "name": "Staff shell and route family",
+      "status": "pending",
+      "states": {
+        "auth": {
+          "status": "baseline",
+          "reason": "Existing staff auth gate and protected-path checks are the authorization baseline.",
+          "evidence": [
+            "apps/web/src/proxy.ts",
+            "apps/web/src/proxy.test.ts",
+            "apps/web/src/admin/auth/protected-paths.test.ts"
+          ]
+        },
+        "loading": {
+          "status": "baseline",
+          "reason": "The admin route tree has a shared loading boundary.",
+          "evidence": ["apps/web/src/app/admin/loading.tsx", "docs/redesign/SURFACES.md"]
+        },
+        "error": {
+          "status": "pending",
+          "reason": "The surface spec records that the admin route tree has no route-level error boundary.",
+          "evidence": ["apps/web/src/app/admin/layout.tsx", "docs/redesign/SURFACES.md"]
+        },
+        "empty": {
+          "status": "pending",
+          "reason": "The surface spec records admin empty-state gaps across the task console.",
+          "evidence": ["apps/web/src/app/admin/page.tsx", "docs/redesign/SURFACES.md"]
+        },
+        "selected": {
+          "status": "pending",
+          "reason": "Admin table and catalog selection work is listed as pending task-focused redesign.",
+          "evidence": ["apps/web/src/app/admin/catalog/page.tsx", "docs/redesign/SURFACES.md"]
+        }
+      },
+      "componentRefs": [
+        "apps/web/src/admin/components/AdminShellChrome.tsx",
+        "apps/web/src/app/admin/layout.tsx"
+      ],
+      "evidence": ["apps/web/src/app/admin/loading.tsx", "docs/redesign/SURFACES.md"]
+    }
+  ],
+  "stateModel": "default is the route output; loading is route wait; error is request or form failure; empty is no results or data absence; selected is map, query, row, or item selection; auth is access posture. Each state carries an explanation and existing source/spec/test paths. not-applicable always has a reason. complete is reserved for future verified work and requires verification.revision plus existing verification.evidence. No current entry is complete."
+}
