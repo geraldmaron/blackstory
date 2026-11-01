@@ -1,4 +1,4 @@
-import { buildCollectionFacts } from '../../lib/records/build-records-index';
+import { buildCollectionFacts, type RecordsCatalogInput } from '../../lib/records/build-records-index';
 import type { CollectionFacts } from '../../lib/records/records-matching';
 import { matchExploreCollection, drawableCollection } from '../../lib/discovery/explore-collection';
 /**
@@ -162,6 +162,7 @@ function drawableMatchIndexes(
 ): readonly number[] {
   const indexes = new Map(features.map((feature, index) => [feature.properties.entityId, index]));
   return matches.flatMap((match) => {
+    if (!match.mappable) return [];
     const index = indexes.get(match.row.id);
     return index === undefined ? [] : [index];
   });
@@ -227,6 +228,7 @@ export function buildAtlasShell(
   entities: readonly PublicEntityView[] = listPublicEntities(),
   dataSource: PublicReadSource = 'none',
   firstPaintFeatures?: readonly ExploreMapFeature[],
+  collectionCatalog: RecordsCatalogInput = entities,
 ): {
   readonly shell: AtlasShellModel;
   readonly noscriptFeatures: readonly ExploreMapFeature[];
@@ -234,7 +236,7 @@ export function buildAtlasShell(
   const viewState = parseExploreSearchParams(raw);
   const source = exploreMapSourceFor(entities);
   const allFeatures = source.featureCollection.features;
-  const collectionFacts = buildCollectionFacts(entities);
+  const collectionFacts = buildCollectionFacts(collectionCatalog);
   const matches = matchExploreCollection(collectionFacts, viewState);
   const filteredFeatures = drawableCollection(allFeatures, matches);
   return {

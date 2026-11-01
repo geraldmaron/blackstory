@@ -166,13 +166,13 @@ test('a slash-terminated prefix route and a slash on an exact route both redirec
 
 test('record arrival retains collection query and bibliography order; catalog cache version survives', () => {
   assert.equal(q.normalizeQueryString('/place/zulu-school', sp('from=map&q=Shared+needle&kind=school&sort=name')), 'from=map&kind=school&q=Shared+needle&sort=name');
-  assert.equal(q.normalizeQueryString('/atlas/catalog', sp('v=2&utm_source=test')), 'v=2');
+  assert.equal(q.normalizeQueryString('/atlas/catalog', sp('v=3&utm_source=test')), 'v=3');
   assert.equal(q.normalizeQueryString('/atlas/catalog', sp('v=arbitrary')), '');
 });
 
 test('catalog cache version is bounded and repeated versions use first value', () => {
   assert.equal(q.normalizeQueryString('/atlas/catalog', sp('v=garbage')), '');
   assert.equal(q.normalizeQueryString('/atlas/catalog', sp('v=999')), '');
-  assert.equal(q.normalizeQueryString('/atlas/catalog', sp('v=2&v=999')), 'v=2');
-  assert.equal(q.normalizeQueryString('/atlas/catalog', sp('v=999&v=2')), '');
+  assert.equal(q.normalizeQueryString('/atlas/catalog', sp('v=3&v=999')), 'v=3');
+  assert.equal(q.normalizeQueryString('/atlas/catalog', sp('v=999&v=3')), '');
 });

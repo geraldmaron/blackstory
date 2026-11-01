@@ -366,10 +366,10 @@ function isSearchIndexDoc(value: unknown): value is PublicSearchIndexDoc {
   );
 }
 
-function toRecordsCatalog(
-  catalog:
-    readonly PublicEntityView[] | readonly PublicSearchIndexDoc[] | readonly RecordsCatalogEntry[],
-): readonly RecordsCatalogEntry[] {
+export type RecordsCatalogInput =
+  readonly PublicEntityView[] | readonly PublicSearchIndexDoc[] | readonly RecordsCatalogEntry[];
+
+function toRecordsCatalog(catalog: RecordsCatalogInput): readonly RecordsCatalogEntry[] {
   if (catalog.length === 0) return [];
   const first = catalog[0];
   if (isRecordsCatalogEntry(first)) {
@@ -433,17 +433,15 @@ function compareGroups(a: RecordsGroup, b: RecordsGroup): number {
  *
  * Accepts either full entities (tests + pre-backfill fallback) or slim search_index docs.
  */
-export function buildRecordFacts(catalog: readonly PublicEntityView[]): readonly RecordFacts[] {
+export function buildRecordFacts(catalog: RecordsCatalogInput): readonly RecordFacts[] {
   const entries = toRecordsCatalog(catalog);
   const collisions = placeSlugCollisionCounts(entries);
   return entries.map((entry) => toFacts(entry, collisions));
 }
 
-export function buildCollectionFacts(
-  catalog: readonly PublicEntityView[],
-): readonly CollectionFacts[] {
+export function buildCollectionFacts(catalog: RecordsCatalogInput): readonly CollectionFacts[] {
   return buildRecordFacts(catalog).map(
-    ({ row, eraBuckets, topicIds, confidenceTier, statePostal, status, haystack }) => ({
+    ({ row, eraBuckets, topicIds, confidenceTier, statePostal, status, haystack, mappable }) => ({
       row: { id: row.id, name: row.name, kind: row.kind, mapTone: row.mapTone },
       eraBuckets,
       topicIds,
@@ -451,6 +449,7 @@ export function buildCollectionFacts(
       statePostal,
       status,
       haystack,
+      mappable,
     }),
   );
 }
@@ -459,6 +458,7 @@ export function buildRecordsIndex(
   catalog:
     readonly PublicEntityView[] | readonly PublicSearchIndexDoc[] | readonly RecordsCatalogEntry[],
   query: RecordsQuery,
+  drawableIds?: ReadonlySet<string>,
 ): RecordsIndex {
   const entries = toRecordsCatalog(catalog);
   const collisions = placeSlugCollisionCounts(entries);
@@ -473,7 +473,9 @@ export function buildRecordsIndex(
   const matched = facts
     .filter((record) => matchesExcept(record, query, 'none'))
     .sort(comparatorFor(query.sort));
-  const mappableMatched = matched.filter((record) => record.mappable).length;
+  const mappableMatched = matched.filter(
+    (record) => record.mappable && (drawableIds === undefined || drawableIds.has(record.row.id)),
+  ).length;
 
   const facets = Object.fromEntries(
     RECORDS_FILTER_KEYS.map((key) => {

@@ -109,9 +109,15 @@ the active checkout or its running preview. Existing preview: http://localhost:3
 
 ## Current blockers
 
-- Full candidate live-data preview awaits explicit approval to reuse the original environment
-  and Postgres connection. Automatic approval review denied that action; static component
-  fixtures are available without credentials. Do not configure billing or tokens.
+Stored-record or schema changes require a separate final owner sign-off. Before requesting
+that sign-off, prepare the exact scoped diff, adversarial findings, isolated/synthetic
+validation evidence, impact and rollback plan. Broad redesign permission and read-only preview
+permission do not authorize applying a migration, changing records or publishing. Source UI
+edits and local fixtures remain separate from stored data.
+
+- The owner explicitly approved read-only reuse of the existing BlackStory environment. The
+  isolated full candidate runs at http://127.0.0.1:3103/ with Postgres transaction read-only
+  enforced. No migrations, submissions, publishing or stored-record writes are authorized.
 - Existing Claude ownership cannot be identified or messaged through the available native
   discovery interface; shared-checkout integration and branch pruning wait for ownership.
 - A legal-dataset migration needs separate operator authorization; preserve statute URLs.

@@ -714,6 +714,128 @@
   text-decoration-color: currentColor;
 }
 
+/* Each record is a 44px row: the link on the left, how the chapter links it beneath. */
+.ds-reading-appx__record-list li {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-height: var(--ds-reading-target);
+}
+
+.ds-reading-appx__record-relation {
+  font-size: var(--ds-text-caption);
+  color: var(--ds-ink-muted);
+}
+
+.ds-reading-appx__records-note {
+  color: var(--ds-ink-muted);
+}
+
+.ds-reading-appx__record-list a:focus-visible,
+.ds-reading-toc__link:focus-visible {
+  outline: 2px solid var(--ds-accent);
+  outline-offset: 2px;
+}
+
+/* ----------------------------------------------------------------------------
+ * "In this chapter" contents. One component, two placements (story-contents.tsx):
+ * the inline details above the prose below the room's 68rem rail breakpoint, the sticky rail
+ * group from 68rem up. Exactly one is displayed per viewport; the other is display:none so it
+ * is neither visible nor announced. 44px is the minimum standalone target.
+ * ------------------------------------------------------------------------- */
+.ds-room:has(.ds-reading) {
+  --ds-reading-target: 2.75rem;
+}
+
+.ds-reading-toc {
+  border-top: var(--ds-border-width) solid var(--ds-rule);
+  border-bottom: var(--ds-border-width) solid var(--ds-rule);
+}
+
+.ds-reading-toc__summary {
+  display: flex;
+  align-items: center;
+  gap: var(--ds-space-3);
+  min-height: var(--ds-reading-target);
+  cursor: pointer;
+  list-style: none;
+  user-select: none;
+}
+
+.ds-reading-toc__summary::-webkit-details-marker {
+  display: none;
+}
+
+.ds-reading-toc__summary:focus-visible {
+  outline: 2px solid var(--ds-accent);
+  outline-offset: -2px;
+}
+
+.ds-reading-toc__title {
+  flex: 1 1 auto;
+  font-family: var(--ds-font-display);
+  font-weight: 600;
+  color: var(--ds-ink);
+}
+
+.ds-reading-toc__count {
+  flex: none;
+  font-size: var(--ds-text-caption);
+  color: var(--ds-ink-muted);
+}
+
+/* Same `+` / `–` text cue the evidence drawers use. */
+.ds-reading-toc__cue {
+  flex: none;
+  color: var(--ds-accent);
+}
+
+.ds-reading-toc__cue::before {
+  content: '+';
+}
+
+.ds-reading-toc[open] .ds-reading-toc__cue::before {
+  content: '\2013'; /* – */
+}
+
+.ds-reading-toc__list {
+  margin: 0;
+  padding: 0 0 var(--ds-space-2);
+  list-style: none;
+}
+
+.ds-reading-toc__link {
+  display: flex;
+  align-items: center;
+  min-height: var(--ds-reading-target);
+  font-size: var(--ds-text-body-sm);
+  line-height: 1.35;
+  color: var(--ds-ink);
+  text-decoration: none;
+  overflow-wrap: anywhere;
+}
+
+.ds-reading-toc__link:hover {
+  color: var(--ds-accent);
+}
+
+.ds-reading-toc {
+  display: none;
+}
+
+/* The rail stacks under the column below 68rem (room-kit.css), so its list would be read after
+   the chapter; the inline contents above replaces it there. Its "Next in this collection"
+   sibling stays. */
+@media (max-width: 68rem) {
+  .ds-reading-toc {
+    display: block;
+  }
+
+  .ds-room-rail-group.ds-reading-toc-rail {
+    display: none;
+  }
+}
+
 /* ----------------------------------------------------------------------------
  * Sticky evidence rail — Ink direction. "In this chapter" and "Records cited" are
  * RailGroup, styled by room-kit.css; only the wrapper's stickiness and the one-off

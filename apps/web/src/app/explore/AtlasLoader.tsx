@@ -49,7 +49,8 @@ async function fetchAtlasCatalog(url: string, signal: AbortSignal): Promise<Atla
   if (
     payload.schemaVersion !== 1 ||
     !payload.source?.featureCollection ||
-    !Array.isArray(payload.collectionFacts)
+    !Array.isArray(payload.collectionFacts) ||
+    payload.collectionFacts.some((fact) => typeof fact.mappable !== 'boolean')
   ) {
     throw new Error('atlas catalog: unexpected shape');
   }

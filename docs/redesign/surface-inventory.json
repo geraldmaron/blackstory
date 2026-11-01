@@ -3225,7 +3225,14 @@
         "default": {
           "status": "baseline",
           "reason": "The route source is the current rendering or redirect anchor; this status records a baseline and does not assert visual verification.",
-          "evidence": ["apps/web/src/app/stories/[slug]/page.tsx"]
+          "evidence": [
+            "apps/web/src/app/stories/[slug]/page.tsx",
+            "apps/web/src/components/story/story-contents.tsx",
+            "apps/web/src/components/story/story-contents.test.tsx",
+            "apps/web/src/components/story/story-records.tsx",
+            "apps/web/src/components/story/story-records.test.tsx",
+            "docs/ui/patterns-story-reading.md"
+          ]
         },
         "loading": {
           "status": "pending",
@@ -3234,13 +3241,21 @@
         },
         "error": {
           "status": "pending",
-          "reason": "The redesign spec identifies an error state or the admin section lacks a route-level error treatment.",
-          "evidence": ["apps/web/src/app/stories/[slug]/page.tsx", "docs/redesign/SURFACES.md"]
+          "reason": "The redesign spec identifies an error state or the admin section lacks a route-level error treatment. The linked-records region states partial and unavailable reads in source; a thrown read and browser acceptance remain pending.",
+          "evidence": [
+            "apps/web/src/app/stories/[slug]/page.tsx",
+            "apps/web/src/components/story/story-records.tsx",
+            "apps/web/src/components/story/story-records.test.tsx",
+            "docs/redesign/SURFACES.md"
+          ]
         },
         "empty": {
           "status": "not-applicable",
-          "reason": "This route is not an empty-result or data-absence surface in the redesign inventory.",
-          "evidence": ["apps/web/src/app/stories/[slug]/page.tsx"]
+          "reason": "This route is not an empty-result or data-absence surface in the redesign inventory. The linked-records region keeps an explicit no-links note that makes no claim about source material.",
+          "evidence": [
+            "apps/web/src/app/stories/[slug]/page.tsx",
+            "apps/web/src/components/story/story-records.tsx"
+          ]
         },
         "selected": {
           "status": "not-applicable",
@@ -3256,13 +3271,16 @@
       "componentRefs": [
         "apps/web/src/app/stories/[slug]/page.tsx",
         "apps/web/src/components/SiteShell.tsx",
-        "apps/web/src/components/story/StoryBody.tsx"
+        "apps/web/src/components/story/StoryBody.tsx",
+        "apps/web/src/components/story/story-contents.tsx",
+        "apps/web/src/components/story/story-records.tsx"
       ],
       "evidence": [
         "apps/web/src/app/stories/[slug]/page.tsx",
         "docs/redesign/SURFACES.md",
         "apps/web/src/lib/nav/surface-classes.ts",
-        "apps/web/src/lib/nav/surface-classes.test.ts"
+        "apps/web/src/lib/nav/surface-classes.test.ts",
+        "docs/ui/patterns-story-reading.md"
       ]
     },
     {

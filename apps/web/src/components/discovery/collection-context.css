@@ -86,7 +86,7 @@ a.ds-collection__view:focus-visible {
 /* Embedded in the map: a fixed strip between the Lens and Results columns. */
 .ds-atlas > .ds-collection--atlas {
   position: fixed;
-  top: var(--ds-atlas-top);
+  top: calc(var(--ds-atlas-top) + var(--ds-space-12));
   left: calc(var(--ds-space-4) + var(--ds-rail-w) + var(--ds-space-3));
   right: calc(var(--ds-space-4) + var(--ds-results-w) + var(--ds-space-3));
   z-index: var(--ds-z-atlas-instruments);
@@ -102,8 +102,7 @@ a.ds-collection__view:focus-visible {
     right: var(--ds-space-3);
     width: auto;
     max-width: none;
-    /* Under the narrow switcher row that --ds-atlas-top already clears. */
-    top: calc(var(--ds-atlas-top) + var(--ds-space-2));
+    /* The shared top offset clears the journey and map-control row at every width. */
   }
 }
 

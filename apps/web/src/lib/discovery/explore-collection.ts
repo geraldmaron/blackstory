@@ -40,6 +40,7 @@ export function drawableCollection(
 ): readonly ExploreMapFeature[] {
   const byId = new Map(features.map((feature) => [feature.properties.entityId, feature]));
   return matches.flatMap((match) => {
+    if (!match.mappable) return [];
     const feature = byId.get(match.row.id);
     return feature ? [feature] : [];
   });

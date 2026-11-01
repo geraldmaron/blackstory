@@ -11,6 +11,7 @@ import { loadDoorPinPlate } from '../lib/map-experience/door-catalog';
 import { resolveDoorFocusPinId } from '../lib/map-experience/first-paint-pins';
 import { KIND_FAMILY_ENTRIES, kindFamilyFor } from '../lib/map-experience/kind-encoding';
 import { getSharedPublicEntities } from '../lib/map-experience/shared-map-data';
+import { loadRecordsCatalog } from '../lib/records/records-catalog';
 import { pickStoryChapters } from '../lib/story/pick-story-chapters';
 import { pickStoryRecord } from '../lib/story/pick-story-record';
 import { buildAtlasShell } from './explore/explore-view-model';
@@ -52,9 +53,18 @@ export type DoorHomeProps = {
 };
 
 export async function DoorHome({ params = {}, initialBrowse = false }: DoorHomeProps = {}) {
-  const { pins, features, densityLevels } = await loadDoorPinPlate();
-  const { data: entities, source: dataSource } = await getSharedPublicEntities();
-  const { shell, noscriptFeatures } = buildAtlasShell(params, entities, dataSource, features);
+  const [
+    { pins, features, densityLevels },
+    { data: entities, source: dataSource },
+    { data: collectionCatalog },
+  ] = await Promise.all([loadDoorPinPlate(), getSharedPublicEntities(), loadRecordsCatalog()]);
+  const { shell, noscriptFeatures } = buildAtlasShell(
+    params,
+    entities,
+    dataSource,
+    features,
+    collectionCatalog,
+  );
   const placeCount = pins.features.length.toLocaleString('en-US');
   const openLedger = buildOpenLedger(features);
 

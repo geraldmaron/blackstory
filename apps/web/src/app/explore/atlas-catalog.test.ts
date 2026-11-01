@@ -66,7 +66,7 @@ test('map features do not carry notabilityLabels (rubric sentences repeated per 
 });
 
 test('the catalog is CDN-cacheable and served from a fixed path', () => {
-  assert.equal(ATLAS_CATALOG_PATH, '/atlas/catalog?v=2');
+  assert.equal(ATLAS_CATALOG_PATH, '/atlas/catalog?v=3');
   assert.match(ATLAS_CATALOG_CACHE_CONTROL, /\bpublic\b/);
   assert.match(ATLAS_CATALOG_CACHE_CONTROL, /s-maxage=\d+/);
   assert.match(ATLAS_CATALOG_CACHE_CONTROL, /stale-while-revalidate=\d+/);

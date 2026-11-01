@@ -138,7 +138,7 @@ function normalizeQueryString(pathname, input) {
   if (path === EXPLORE_PATH)
     throw new Error('/explore query normalization is not ported (repo-5tjl0)');
   const bag = allowlistedBag(path, readParamBag(input));
-  if (path === '/atlas/catalog') return firstString(bag.v) === '2' ? 'v=2' : '';
+  if (path === '/atlas/catalog') return firstString(bag.v) === '3' ? 'v=3' : '';
   if (path === RECORDS_PATH) return recordsQueryString(parseRecordsQuery(bag));
   const normalized = new URLSearchParams();
   for (const key of Object.keys(bag).sort()) {

@@ -129,7 +129,7 @@ export function normalizeQueryString(
 ): string {
   const path = normalizePathname(pathname);
   const bag = allowlistedBag(path, readParamBag(input));
-  if (path === '/atlas/catalog') return firstString(bag.v) === '2' ? 'v=2' : '';
+  if (path === '/atlas/catalog') return firstString(bag.v) === '3' ? 'v=3' : '';
 
   if (EXPLORE_SURFACE_PATHS.has(path)) {
     return buildExploreSearchParams(parseExploreSearchParams(bag));

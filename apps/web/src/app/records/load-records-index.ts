@@ -11,13 +11,12 @@
  * floors stay honest before the backfill lands.
  */
 import { cache } from 'react';
-import { getSharedPublicEntities } from '../../lib/map-experience/shared-map-data';
-import { getPublicSearchIndex } from '../../lib/public-data/source';
+import { loadDoorPinPlate } from '../../lib/map-experience/door-catalog';
+import { loadRecordsCatalog } from '../../lib/records/records-catalog';
 import {
   buildRecordsIndex,
   parseRecordsQuery,
   recordsHref,
-  searchIndexReadyForRecords,
   type RecordsIndex,
   type RecordsQuery,
 } from '../../lib/records/build-records-index';
@@ -46,18 +45,14 @@ export const loadRecordsIndex = cache(async function loadRecordsIndex(
   queryKey: string,
 ): Promise<RecordsPageModel> {
   const { query } = loadRecordsIndexFromKey(queryKey);
-  const { data: searchDocs } = await getPublicSearchIndex();
-  if (searchIndexReadyForRecords(searchDocs)) {
-    return {
-      query,
-      model: buildRecordsIndex(searchDocs, query),
-      catalogSource: 'search_index',
-    };
-  }
-  const { data: entities } = await getSharedPublicEntities();
+  const [{ data, catalogSource }, { features }] = await Promise.all([
+    loadRecordsCatalog(),
+    loadDoorPinPlate(),
+  ]);
+  const drawableIds = new Set(features.map((feature) => feature.properties.entityId));
   return {
     query,
-    model: buildRecordsIndex(entities, query),
-    catalogSource: 'entities',
+    model: buildRecordsIndex(data, query, drawableIds),
+    catalogSource,
   };
 });

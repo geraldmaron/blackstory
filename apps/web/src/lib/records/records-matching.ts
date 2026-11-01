@@ -19,7 +19,7 @@ export type RecordFacts = {
 };
 
 /** Only the fields needed for collection membership and bibliography order cross the wire. */
-export type CollectionFacts = Omit<RecordFacts, 'row' | 'stateName' | 'mappable'> & {
+export type CollectionFacts = Omit<RecordFacts, 'row' | 'stateName'> & {
   readonly row: Pick<RecordsRow, 'id' | 'name' | 'kind' | 'mapTone'>;
 };
 

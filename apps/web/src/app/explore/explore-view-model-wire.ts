@@ -35,7 +35,7 @@ import type { ExploreViewModel } from './explore-view-model';
 import type { PaletteRecord } from '../../components/patterns/command-palette/CommandPalette';
 
 /** Where the client fetches the catalog from. One path, one cache key. */
-export const ATLAS_CATALOG_PATH = '/atlas/catalog?v=2';
+export const ATLAS_CATALOG_PATH = '/atlas/catalog?v=3';
 
 const EMPTY_EDGE_CATALOG: ExploreEdgeLineCatalog = {
   allTime: { edges: [], lineCollection: { type: 'FeatureCollection', features: [] } },

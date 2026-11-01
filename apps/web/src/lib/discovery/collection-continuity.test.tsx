@@ -3,6 +3,7 @@ import { test } from 'node:test';
 import React from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
 import type { PublicEntityView } from '../../data/public-seed';
+import type { PublicSearchIndexDoc } from '@repo/domain/search';
 import { toDoorLinkPins } from '../map-experience/first-paint-pins';
 import { listPublicEntities } from '../../data/public-seed';
 import { getHistoryGraphReleaseArtifact } from '../../data/history-graph-seed';
@@ -215,9 +216,38 @@ test('first-paint match indexes use the cached Door plate ordering', () => {
 });
 
 test('catalog cache version is bounded and uses the first value', () => {
-  assert.equal(normalizeQueryString('/atlas/catalog', { v: '2' }), 'v=2');
+  assert.equal(normalizeQueryString('/atlas/catalog', { v: '3' }), 'v=3');
   assert.equal(normalizeQueryString('/atlas/catalog', { v: 'garbage' }), '');
   assert.equal(normalizeQueryString('/atlas/catalog', { v: '999' }), '');
-  assert.equal(normalizeQueryString('/atlas/catalog', { v: ['2', '999'] }), 'v=2');
-  assert.equal(normalizeQueryString('/atlas/catalog', { v: ['999', '2'] }), '');
+  assert.equal(normalizeQueryString('/atlas/catalog', { v: ['3', '999'] }), 'v=3');
+  assert.equal(normalizeQueryString('/atlas/catalog', { v: ['999', '3'] }), '');
+});
+
+test('Records and Map use the same slim release projection and map eligibility', () => {
+  const projections = entities.slice(0, 2).map((entity, index) => ({
+    ...entity,
+    summary: 'Different full-entity wording.',
+    geoAnchor: { lat: 36.15 + index, lng: -95.99, geohash: '9y7', matchMethod: 'release_projection' },
+  }));
+  const docs = projections.map((entity, index) => ({
+    id: entity.id, releaseId: 'rel_fixture', kind: entity.kind,
+    displayName: entity.displayName, nameLower: entity.displayName.toLowerCase(), aliases: [],
+    summary: 'Needle in the released search projection.', topicTags: [], eraBuckets: ['1920s'],
+    notabilityBasis: [], notabilityLabels: [], recordMaturity: 'partial_enrichment',
+    researchCoverage: 'partial', relatedCount: 0, claimCount: 1,
+    evidenceInputs: { strongestClaimLevel: 'high', citedLineageKeys: [], evidenceLineageKeys: [] },
+    jurisdictionState: 'Oklahoma', ...(index === 0 ? { geohash: '9y7' } : {}),
+  } satisfies PublicSearchIndexDoc));
+  const query = parseRecordsQuery({ q: 'needle', sort: 'name' });
+  const records = buildRecordsIndex(docs, query);
+  assert.equal(buildRecordsIndex(projections, query).totalMatched, 0);
+  const catalog = buildAtlasCatalogPayload(projections, getHistoryGraphReleaseArtifact(projections), {}, 'none', docs);
+  const { shell } = buildAtlasShell(bag(records.atlasHref), projections, 'none', catalog.source.featureCollection.features, docs);
+  for (const payload of [firstPaintCatalog(toDoorLinkPins(catalog.source.featureCollection.features), 'none'), catalog]) {
+    const view = hydrateExploreViewModel(assembleExploreViewModel(shell, payload));
+    assert.equal(view.totalMatched, records.totalMatched);
+    assert.equal(view.filteredFeatures.length, records.mappableMatched);
+    assert.equal(view.totalMatched, 2);
+    assert.equal(view.filteredFeatures.length, 1);
+  }
 });
