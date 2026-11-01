@@ -21,6 +21,9 @@ import MosaicCreditsLoading from './stories/mosaic-credits/loading';
 import RecordsLoading from './records/loading';
 import PlaceLoading from './place/[slug]/loading';
 import InventionLoading from './invention/[slug]/loading';
+import DataLoading from './data/loading';
+import LivesLoading from './lives/loading';
+import ReceiptLoading from './corrections/status/[receiptCode]/loading';
 
 void React;
 
@@ -52,6 +55,15 @@ const LOADING_BOUNDARIES = [
     dir: 'invention/[slug]',
     Loading: InventionLoading,
     label: 'Opening record',
+  },
+  { route: '/data', dir: 'data', Loading: DataLoading, label: 'Opening data…' },
+  // Also the wait for /lives/explorer, which awaits the same snapshot read.
+  { route: '/lives', dir: 'lives', Loading: LivesLoading, label: 'Opening lives…' },
+  {
+    route: '/corrections/status/[receiptCode]',
+    dir: 'corrections/status/[receiptCode]',
+    Loading: ReceiptLoading,
+    label: 'Looking up your receipt…',
   },
 ] as const;
 

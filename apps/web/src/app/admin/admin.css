@@ -119,6 +119,15 @@ body {
   min-height: 44px;
 }
 
+/* The wrapper alone is not the target: BaseUI sizes the native input to its own padding and line
+   height (40px), and only the password field grows past that because of its toggle button. The
+   native email input, which is what a finger lands on, takes the 44px floor itself. */
+.admin-base-shell .admin-login [data-baseweb='base-input'],
+.admin-base-shell .admin-login [data-baseweb='input'] input {
+  min-height: 44px;
+  box-sizing: border-box;
+}
+
 .admin-base-shell .admin-login [data-baseweb='input'] button {
   min-width: 44px;
   min-height: 44px;

@@ -31,14 +31,22 @@
           ]
         },
         "error": {
-          "status": "pending",
-          "reason": "The redesign spec identifies an error state or the admin section lacks a route-level error treatment.",
-          "evidence": ["apps/web/src/app/page.tsx", "docs/redesign/SURFACES.md"]
+          "status": "partial",
+          "reason": "A failed catalog fetch in the map shows an error notice with a native Try again button and a link to matching records, not an empty map. A server read failure reaches the inherited public boundary. Source read; not rendered.",
+          "evidence": [
+            "apps/web/src/app/explore/AtlasLoader.tsx",
+            "apps/web/src/app/explore/atlas-catalog.test.ts",
+            "apps/web/src/app/error.tsx"
+          ]
         },
         "empty": {
-          "status": "pending",
-          "reason": "The redesign spec identifies absent chapter, offline catalog, empty result, or no-data treatment for this surface.",
-          "evidence": ["apps/web/src/app/page.tsx", "docs/redesign/SURFACES.md"]
+          "status": "partial",
+          "reason": "A zero-match named collection renders scope-aware copy ('No records match this collection') with the Filters one-filter recovery, confirmed in the browser at 375px with no overflow. Unknown, unavailable and empty collections stay distinct.",
+          "evidence": [
+            "apps/web/src/components/discovery/collection-context.tsx",
+            "apps/web/src/components/discovery/collection-context.test.tsx",
+            "docs/redesign/collection-contract.md"
+          ]
         },
         "selected": {
           "status": "pending",
@@ -118,12 +126,16 @@
       "source": "apps/web/src/app/admin/page.tsx",
       "family": "admin",
       "access": "staff",
-      "status": "pending",
+      "status": "partial",
       "states": {
         "default": {
           "status": "baseline",
-          "reason": "The route source is the current rendering or redirect anchor; this status records a baseline and does not assert visual verification.",
-          "evidence": ["apps/web/src/app/admin/page.tsx"]
+          "reason": "Retains the recorded protected desk layout with shared shell, loading and staff-specific error recovery. This records inherited implementation, not a per-desk visual or populated-data acceptance claim. Existing mutation behavior is unchanged; a real staff session is required for populated/selected acceptance.",
+          "evidence": [
+            "apps/web/src/app/admin/page.tsx",
+            "apps/web/src/app/admin/error.tsx",
+            "apps/web/src/app/admin/error.test.tsx"
+          ]
         },
         "loading": {
           "status": "baseline",
@@ -177,12 +189,16 @@
       "source": "apps/web/src/app/admin/audit/page.tsx",
       "family": "admin",
       "access": "staff",
-      "status": "pending",
+      "status": "partial",
       "states": {
         "default": {
           "status": "baseline",
-          "reason": "The route source is the current rendering or redirect anchor; this status records a baseline and does not assert visual verification.",
-          "evidence": ["apps/web/src/app/admin/audit/page.tsx"]
+          "reason": "Retains the recorded protected desk layout with shared shell, loading and staff-specific error recovery. This records inherited implementation, not a per-desk visual or populated-data acceptance claim. Existing mutation behavior is unchanged; a real staff session is required for populated/selected acceptance.",
+          "evidence": [
+            "apps/web/src/app/admin/audit/page.tsx",
+            "apps/web/src/app/admin/error.tsx",
+            "apps/web/src/app/admin/error.test.tsx"
+          ]
         },
         "loading": {
           "status": "baseline",
@@ -236,12 +252,16 @@
       "source": "apps/web/src/app/admin/cases/page.tsx",
       "family": "admin",
       "access": "staff",
-      "status": "pending",
+      "status": "partial",
       "states": {
         "default": {
           "status": "baseline",
-          "reason": "The route source is the current rendering or redirect anchor; this status records a baseline and does not assert visual verification.",
-          "evidence": ["apps/web/src/app/admin/cases/page.tsx"]
+          "reason": "Retains the recorded protected desk layout with shared shell, loading and staff-specific error recovery. This records inherited implementation, not a per-desk visual or populated-data acceptance claim. Existing mutation behavior is unchanged; a real staff session is required for populated/selected acceptance.",
+          "evidence": [
+            "apps/web/src/app/admin/cases/page.tsx",
+            "apps/web/src/app/admin/error.tsx",
+            "apps/web/src/app/admin/error.test.tsx"
+          ]
         },
         "loading": {
           "status": "baseline",
@@ -259,14 +279,20 @@
           ]
         },
         "empty": {
-          "status": "not-applicable",
-          "reason": "This route is not an empty-result or data-absence surface in the redesign inventory.",
-          "evidence": ["apps/web/src/app/admin/cases/page.tsx"]
+          "status": "partial",
+          "reason": "The research case list separates a filtered zero (with a native Clear filters link) from a desk with nothing in it, using the shared EmptyState. SSR component test only; no authenticated session or populated data.",
+          "evidence": [
+            "apps/web/src/admin/cases/case-queue-empty.tsx",
+            "apps/web/src/admin/cases/case-queue-empty.test.tsx"
+          ]
         },
         "selected": {
-          "status": "pending",
-          "reason": "This admin workflow has route or row selection; the admin task-state redesign is pending.",
-          "evidence": ["apps/web/src/app/admin/cases/page.tsx", "docs/redesign/SURFACES.md"]
+          "status": "partial",
+          "reason": "Rows now open the detail sheet from a native button, so keyboard users can select a case, and closing the sheet returns focus to that button. The sheet itself, populated rows and the transition actions are retained and need a real staff session to accept.",
+          "evidence": [
+            "apps/web/src/admin/cases/CaseQueue.tsx",
+            "apps/web/src/admin/cases/case-queue-empty.test.tsx"
+          ]
         },
         "auth": {
           "status": "baseline",
@@ -295,12 +321,16 @@
       "source": "apps/web/src/app/admin/cases/[id]/page.tsx",
       "family": "admin",
       "access": "staff",
-      "status": "pending",
+      "status": "partial",
       "states": {
         "default": {
           "status": "baseline",
-          "reason": "The route source is the current rendering or redirect anchor; this status records a baseline and does not assert visual verification.",
-          "evidence": ["apps/web/src/app/admin/cases/[id]/page.tsx"]
+          "reason": "Retains the recorded protected desk layout with shared shell, loading and staff-specific error recovery. This records inherited implementation, not a per-desk visual or populated-data acceptance claim. Existing mutation behavior is unchanged; a real staff session is required for populated/selected acceptance.",
+          "evidence": [
+            "apps/web/src/app/admin/cases/[id]/page.tsx",
+            "apps/web/src/app/admin/error.tsx",
+            "apps/web/src/app/admin/error.test.tsx"
+          ]
         },
         "loading": {
           "status": "baseline",
@@ -354,12 +384,16 @@
       "source": "apps/web/src/app/admin/catalog/page.tsx",
       "family": "admin",
       "access": "staff",
-      "status": "pending",
+      "status": "partial",
       "states": {
         "default": {
           "status": "baseline",
-          "reason": "The route source is the current rendering or redirect anchor; this status records a baseline and does not assert visual verification.",
-          "evidence": ["apps/web/src/app/admin/catalog/page.tsx"]
+          "reason": "Retains the recorded protected desk layout with shared shell, loading and staff-specific error recovery. This records inherited implementation, not a per-desk visual or populated-data acceptance claim. Existing mutation behavior is unchanged; a real staff session is required for populated/selected acceptance.",
+          "evidence": [
+            "apps/web/src/app/admin/catalog/page.tsx",
+            "apps/web/src/app/admin/error.tsx",
+            "apps/web/src/app/admin/error.test.tsx"
+          ]
         },
         "loading": {
           "status": "baseline",
@@ -413,12 +447,16 @@
       "source": "apps/web/src/app/admin/catalog/[id]/page.tsx",
       "family": "admin",
       "access": "staff",
-      "status": "pending",
+      "status": "partial",
       "states": {
         "default": {
           "status": "baseline",
-          "reason": "The route source is the current rendering or redirect anchor; this status records a baseline and does not assert visual verification.",
-          "evidence": ["apps/web/src/app/admin/catalog/[id]/page.tsx"]
+          "reason": "Retains the recorded protected desk layout with shared shell, loading and staff-specific error recovery. This records inherited implementation, not a per-desk visual or populated-data acceptance claim. Existing mutation behavior is unchanged; a real staff session is required for populated/selected acceptance.",
+          "evidence": [
+            "apps/web/src/app/admin/catalog/[id]/page.tsx",
+            "apps/web/src/app/admin/error.tsx",
+            "apps/web/src/app/admin/error.test.tsx"
+          ]
         },
         "loading": {
           "status": "baseline",
@@ -472,12 +510,16 @@
       "source": "apps/web/src/app/admin/catalog/merge/page.tsx",
       "family": "admin",
       "access": "staff",
-      "status": "pending",
+      "status": "partial",
       "states": {
         "default": {
           "status": "baseline",
-          "reason": "The route source is the current rendering or redirect anchor; this status records a baseline and does not assert visual verification.",
-          "evidence": ["apps/web/src/app/admin/catalog/merge/page.tsx"]
+          "reason": "Retains the recorded protected desk layout with shared shell, loading and staff-specific error recovery. This records inherited implementation, not a per-desk visual or populated-data acceptance claim. Existing mutation behavior is unchanged; a real staff session is required for populated/selected acceptance.",
+          "evidence": [
+            "apps/web/src/app/admin/catalog/merge/page.tsx",
+            "apps/web/src/app/admin/error.tsx",
+            "apps/web/src/app/admin/error.test.tsx"
+          ]
         },
         "loading": {
           "status": "baseline",
@@ -531,12 +573,16 @@
       "source": "apps/web/src/app/admin/citation-health/page.tsx",
       "family": "admin",
       "access": "staff",
-      "status": "pending",
+      "status": "partial",
       "states": {
         "default": {
           "status": "baseline",
-          "reason": "The route source is the current rendering or redirect anchor; this status records a baseline and does not assert visual verification.",
-          "evidence": ["apps/web/src/app/admin/citation-health/page.tsx"]
+          "reason": "Retains the recorded protected desk layout with shared shell, loading and staff-specific error recovery. This records inherited implementation, not a per-desk visual or populated-data acceptance claim. Existing mutation behavior is unchanged; a real staff session is required for populated/selected acceptance.",
+          "evidence": [
+            "apps/web/src/app/admin/citation-health/page.tsx",
+            "apps/web/src/app/admin/error.tsx",
+            "apps/web/src/app/admin/error.test.tsx"
+          ]
         },
         "loading": {
           "status": "baseline",
@@ -590,12 +636,16 @@
       "source": "apps/web/src/app/admin/discovery/page.tsx",
       "family": "admin",
       "access": "staff",
-      "status": "pending",
+      "status": "partial",
       "states": {
         "default": {
           "status": "baseline",
-          "reason": "The route source is the current rendering or redirect anchor; this status records a baseline and does not assert visual verification.",
-          "evidence": ["apps/web/src/app/admin/discovery/page.tsx"]
+          "reason": "Retains the recorded protected desk layout with shared shell, loading and staff-specific error recovery. This records inherited implementation, not a per-desk visual or populated-data acceptance claim. Existing mutation behavior is unchanged; a real staff session is required for populated/selected acceptance.",
+          "evidence": [
+            "apps/web/src/app/admin/discovery/page.tsx",
+            "apps/web/src/app/admin/error.tsx",
+            "apps/web/src/app/admin/error.test.tsx"
+          ]
         },
         "loading": {
           "status": "baseline",
@@ -649,12 +699,16 @@
       "source": "apps/web/src/app/admin/evidence/page.tsx",
       "family": "admin",
       "access": "staff",
-      "status": "pending",
+      "status": "partial",
       "states": {
         "default": {
           "status": "baseline",
-          "reason": "The route source is the current rendering or redirect anchor; this status records a baseline and does not assert visual verification.",
-          "evidence": ["apps/web/src/app/admin/evidence/page.tsx"]
+          "reason": "Retains the recorded protected desk layout with shared shell, loading and staff-specific error recovery. This records inherited implementation, not a per-desk visual or populated-data acceptance claim. Existing mutation behavior is unchanged; a real staff session is required for populated/selected acceptance.",
+          "evidence": [
+            "apps/web/src/app/admin/evidence/page.tsx",
+            "apps/web/src/app/admin/error.tsx",
+            "apps/web/src/app/admin/error.test.tsx"
+          ]
         },
         "loading": {
           "status": "baseline",
@@ -708,12 +762,16 @@
       "source": "apps/web/src/app/admin/footprint/page.tsx",
       "family": "admin",
       "access": "staff",
-      "status": "pending",
+      "status": "partial",
       "states": {
         "default": {
           "status": "baseline",
-          "reason": "The route source is the current rendering or redirect anchor; this status records a baseline and does not assert visual verification.",
-          "evidence": ["apps/web/src/app/admin/footprint/page.tsx"]
+          "reason": "Retains the recorded protected desk layout with shared shell, loading and staff-specific error recovery. This records inherited implementation, not a per-desk visual or populated-data acceptance claim. Existing mutation behavior is unchanged; a real staff session is required for populated/selected acceptance.",
+          "evidence": [
+            "apps/web/src/app/admin/footprint/page.tsx",
+            "apps/web/src/app/admin/error.tsx",
+            "apps/web/src/app/admin/error.test.tsx"
+          ]
         },
         "loading": {
           "status": "baseline",
@@ -767,12 +825,16 @@
       "source": "apps/web/src/app/admin/graylist/page.tsx",
       "family": "admin",
       "access": "staff",
-      "status": "pending",
+      "status": "partial",
       "states": {
         "default": {
           "status": "baseline",
-          "reason": "The route source is the current rendering or redirect anchor; this status records a baseline and does not assert visual verification.",
-          "evidence": ["apps/web/src/app/admin/graylist/page.tsx"]
+          "reason": "Retains the recorded protected desk layout with shared shell, loading and staff-specific error recovery. This records inherited implementation, not a per-desk visual or populated-data acceptance claim. Existing mutation behavior is unchanged; a real staff session is required for populated/selected acceptance.",
+          "evidence": [
+            "apps/web/src/app/admin/graylist/page.tsx",
+            "apps/web/src/app/admin/error.tsx",
+            "apps/web/src/app/admin/error.test.tsx"
+          ]
         },
         "loading": {
           "status": "baseline",
@@ -826,12 +888,16 @@
       "source": "apps/web/src/app/admin/inbox/page.tsx",
       "family": "admin",
       "access": "staff",
-      "status": "pending",
+      "status": "partial",
       "states": {
         "default": {
           "status": "baseline",
-          "reason": "The route source is the current rendering or redirect anchor; this status records a baseline and does not assert visual verification.",
-          "evidence": ["apps/web/src/app/admin/inbox/page.tsx"]
+          "reason": "Retains the recorded protected desk layout with shared shell, loading and staff-specific error recovery. This records inherited implementation, not a per-desk visual or populated-data acceptance claim. Existing mutation behavior is unchanged; a real staff session is required for populated/selected acceptance.",
+          "evidence": [
+            "apps/web/src/app/admin/inbox/page.tsx",
+            "apps/web/src/app/admin/error.tsx",
+            "apps/web/src/app/admin/error.test.tsx"
+          ]
         },
         "loading": {
           "status": "baseline",
@@ -849,14 +915,17 @@
           ]
         },
         "empty": {
-          "status": "not-applicable",
-          "reason": "This route is not an empty-result or data-absence surface in the redesign inventory.",
-          "evidence": ["apps/web/src/app/admin/inbox/page.tsx"]
+          "status": "partial",
+          "reason": "The inbox renders the shared case list, which separates a filtered zero (Clear filters link) from an empty inbox. SSR component test only; no authenticated session or populated data.",
+          "evidence": [
+            "apps/web/src/admin/cases/case-queue-empty.tsx",
+            "apps/web/src/admin/cases/case-queue-empty.test.tsx"
+          ]
         },
         "selected": {
-          "status": "not-applicable",
-          "reason": "The route has no meaningful selected-item or selected-filter state in the redesign scope.",
-          "evidence": ["apps/web/src/app/admin/inbox/page.tsx"]
+          "status": "partial",
+          "reason": "Shares the case list: native row button opens the detail sheet and focus returns on close. Populated acceptance needs a real staff session.",
+          "evidence": ["apps/web/src/admin/cases/CaseQueue.tsx"]
         },
         "auth": {
           "status": "baseline",
@@ -885,12 +954,19 @@
       "source": "apps/web/src/app/admin/login/page.tsx",
       "family": "admin",
       "access": "auth-entry",
-      "status": "pending",
+      "status": "partial",
       "states": {
         "default": {
-          "status": "baseline",
-          "reason": "The route source is the current rendering or redirect anchor; this status records a baseline and does not assert visual verification.",
-          "evidence": ["apps/web/src/app/admin/login/page.tsx"]
+          "status": "partial",
+          "reason": "Presentational sign-in states are fixture-tested and unauthenticated mobile light/dark rendering is verified, including native 44px controls. Auth handlers remain unchanged; real sign-in acceptance is not claimed.",
+          "evidence": [
+            "apps/web/src/app/admin/login/page.tsx",
+            "apps/web/src/app/admin/error.tsx",
+            "apps/web/src/app/admin/error.test.tsx",
+            "apps/web/src/app/admin/login/login-panel.tsx",
+            "apps/web/src/app/admin/login/login-panel.test.tsx",
+            "docs/redesign/rendered-acceptance.md"
+          ]
         },
         "loading": {
           "status": "partial",
@@ -947,12 +1023,16 @@
       "source": "apps/web/src/app/admin/queue/page.tsx",
       "family": "admin",
       "access": "staff",
-      "status": "pending",
+      "status": "partial",
       "states": {
         "default": {
           "status": "baseline",
-          "reason": "The route source is the current rendering or redirect anchor; this status records a baseline and does not assert visual verification.",
-          "evidence": ["apps/web/src/app/admin/queue/page.tsx"]
+          "reason": "Retains the recorded protected desk layout with shared shell, loading and staff-specific error recovery. This records inherited implementation, not a per-desk visual or populated-data acceptance claim. Existing mutation behavior is unchanged; a real staff session is required for populated/selected acceptance.",
+          "evidence": [
+            "apps/web/src/app/admin/queue/page.tsx",
+            "apps/web/src/app/admin/error.tsx",
+            "apps/web/src/app/admin/error.test.tsx"
+          ]
         },
         "loading": {
           "status": "baseline",
@@ -970,14 +1050,17 @@
           ]
         },
         "empty": {
-          "status": "not-applicable",
-          "reason": "This route is not an empty-result or data-absence surface in the redesign inventory.",
+          "status": "partial",
+          "reason": "Retained working pattern: a filtered zero offers a native Clear filters link, an unfiltered zero says nothing is waiting, and a degraded read shows an alert instead of an empty claim. Source read; not migrated to EmptyState because the three cases are already distinct.",
           "evidence": ["apps/web/src/app/admin/queue/page.tsx"]
         },
         "selected": {
-          "status": "pending",
-          "reason": "This admin workflow has route or row selection; the admin task-state redesign is pending.",
-          "evidence": ["apps/web/src/app/admin/queue/page.tsx", "docs/redesign/SURFACES.md"]
+          "status": "partial",
+          "reason": "Retained: each row title is a server-rendered link and j/k plus Enter move through rows without a detail sheet. Populated acceptance needs a real staff session.",
+          "evidence": [
+            "apps/web/src/app/admin/queue/page.tsx",
+            "apps/web/src/app/admin/queue/QueueKeyboard.tsx"
+          ]
         },
         "auth": {
           "status": "baseline",
@@ -1006,12 +1089,16 @@
       "source": "apps/web/src/app/admin/quick-add/page.tsx",
       "family": "admin",
       "access": "staff",
-      "status": "pending",
+      "status": "partial",
       "states": {
         "default": {
           "status": "baseline",
-          "reason": "The route source is the current rendering or redirect anchor; this status records a baseline and does not assert visual verification.",
-          "evidence": ["apps/web/src/app/admin/quick-add/page.tsx"]
+          "reason": "Retains the recorded protected desk layout with shared shell, loading and staff-specific error recovery. This records inherited implementation, not a per-desk visual or populated-data acceptance claim. Existing mutation behavior is unchanged; a real staff session is required for populated/selected acceptance.",
+          "evidence": [
+            "apps/web/src/app/admin/quick-add/page.tsx",
+            "apps/web/src/app/admin/error.tsx",
+            "apps/web/src/app/admin/error.test.tsx"
+          ]
         },
         "loading": {
           "status": "baseline",
@@ -1065,12 +1152,16 @@
       "source": "apps/web/src/app/admin/releases/page.tsx",
       "family": "admin",
       "access": "staff",
-      "status": "pending",
+      "status": "partial",
       "states": {
         "default": {
           "status": "baseline",
-          "reason": "The route source is the current rendering or redirect anchor; this status records a baseline and does not assert visual verification.",
-          "evidence": ["apps/web/src/app/admin/releases/page.tsx"]
+          "reason": "Retains the recorded protected desk layout with shared shell, loading and staff-specific error recovery. This records inherited implementation, not a per-desk visual or populated-data acceptance claim. Existing mutation behavior is unchanged; a real staff session is required for populated/selected acceptance.",
+          "evidence": [
+            "apps/web/src/app/admin/releases/page.tsx",
+            "apps/web/src/app/admin/error.tsx",
+            "apps/web/src/app/admin/error.test.tsx"
+          ]
         },
         "loading": {
           "status": "baseline",
@@ -1124,12 +1215,16 @@
       "source": "apps/web/src/app/admin/sources/page.tsx",
       "family": "admin",
       "access": "staff",
-      "status": "pending",
+      "status": "partial",
       "states": {
         "default": {
           "status": "baseline",
-          "reason": "The route source is the current rendering or redirect anchor; this status records a baseline and does not assert visual verification.",
-          "evidence": ["apps/web/src/app/admin/sources/page.tsx"]
+          "reason": "Retains the recorded protected desk layout with shared shell, loading and staff-specific error recovery. This records inherited implementation, not a per-desk visual or populated-data acceptance claim. Existing mutation behavior is unchanged; a real staff session is required for populated/selected acceptance.",
+          "evidence": [
+            "apps/web/src/app/admin/sources/page.tsx",
+            "apps/web/src/app/admin/error.tsx",
+            "apps/web/src/app/admin/error.test.tsx"
+          ]
         },
         "loading": {
           "status": "baseline",
@@ -1183,12 +1278,16 @@
       "source": "apps/web/src/app/admin/sources/[organizationId]/page.tsx",
       "family": "admin",
       "access": "staff",
-      "status": "pending",
+      "status": "partial",
       "states": {
         "default": {
           "status": "baseline",
-          "reason": "The route source is the current rendering or redirect anchor; this status records a baseline and does not assert visual verification.",
-          "evidence": ["apps/web/src/app/admin/sources/[organizationId]/page.tsx"]
+          "reason": "Retains the recorded protected desk layout with shared shell, loading and staff-specific error recovery. This records inherited implementation, not a per-desk visual or populated-data acceptance claim. Existing mutation behavior is unchanged; a real staff session is required for populated/selected acceptance.",
+          "evidence": [
+            "apps/web/src/app/admin/sources/[organizationId]/page.tsx",
+            "apps/web/src/app/admin/error.tsx",
+            "apps/web/src/app/admin/error.test.tsx"
+          ]
         },
         "loading": {
           "status": "baseline",
@@ -1242,12 +1341,16 @@
       "source": "apps/web/src/app/admin/stories/page.tsx",
       "family": "admin",
       "access": "staff",
-      "status": "pending",
+      "status": "partial",
       "states": {
         "default": {
           "status": "baseline",
-          "reason": "The route source is the current rendering or redirect anchor; this status records a baseline and does not assert visual verification.",
-          "evidence": ["apps/web/src/app/admin/stories/page.tsx"]
+          "reason": "Retains the recorded protected desk layout with shared shell, loading and staff-specific error recovery. This records inherited implementation, not a per-desk visual or populated-data acceptance claim. Existing mutation behavior is unchanged; a real staff session is required for populated/selected acceptance.",
+          "evidence": [
+            "apps/web/src/app/admin/stories/page.tsx",
+            "apps/web/src/app/admin/error.tsx",
+            "apps/web/src/app/admin/error.test.tsx"
+          ]
         },
         "loading": {
           "status": "baseline",
@@ -1301,12 +1404,16 @@
       "source": "apps/web/src/app/admin/stories/[slug]/page.tsx",
       "family": "admin",
       "access": "staff",
-      "status": "pending",
+      "status": "partial",
       "states": {
         "default": {
           "status": "baseline",
-          "reason": "The route source is the current rendering or redirect anchor; this status records a baseline and does not assert visual verification.",
-          "evidence": ["apps/web/src/app/admin/stories/[slug]/page.tsx"]
+          "reason": "Retains the recorded protected desk layout with shared shell, loading and staff-specific error recovery. This records inherited implementation, not a per-desk visual or populated-data acceptance claim. Existing mutation behavior is unchanged; a real staff session is required for populated/selected acceptance.",
+          "evidence": [
+            "apps/web/src/app/admin/stories/[slug]/page.tsx",
+            "apps/web/src/app/admin/error.tsx",
+            "apps/web/src/app/admin/error.test.tsx"
+          ]
         },
         "loading": {
           "status": "baseline",
@@ -1363,12 +1470,16 @@
       "source": "apps/web/src/app/admin/stories/[slug]/preview/page.tsx",
       "family": "admin",
       "access": "staff",
-      "status": "pending",
+      "status": "partial",
       "states": {
         "default": {
           "status": "baseline",
-          "reason": "The route source is the current rendering or redirect anchor; this status records a baseline and does not assert visual verification.",
-          "evidence": ["apps/web/src/app/admin/stories/[slug]/preview/page.tsx"]
+          "reason": "Retains the recorded protected desk layout with shared shell, loading and staff-specific error recovery. This records inherited implementation, not a per-desk visual or populated-data acceptance claim. Existing mutation behavior is unchanged; a real staff session is required for populated/selected acceptance.",
+          "evidence": [
+            "apps/web/src/app/admin/stories/[slug]/preview/page.tsx",
+            "apps/web/src/app/admin/error.tsx",
+            "apps/web/src/app/admin/error.test.tsx"
+          ]
         },
         "loading": {
           "status": "baseline",
@@ -1425,12 +1536,16 @@
       "source": "apps/web/src/app/admin/stories/contributors/page.tsx",
       "family": "admin",
       "access": "staff",
-      "status": "pending",
+      "status": "partial",
       "states": {
         "default": {
           "status": "baseline",
-          "reason": "The route source is the current rendering or redirect anchor; this status records a baseline and does not assert visual verification.",
-          "evidence": ["apps/web/src/app/admin/stories/contributors/page.tsx"]
+          "reason": "Retains the recorded protected desk layout with shared shell, loading and staff-specific error recovery. This records inherited implementation, not a per-desk visual or populated-data acceptance claim. Existing mutation behavior is unchanged; a real staff session is required for populated/selected acceptance.",
+          "evidence": [
+            "apps/web/src/app/admin/stories/contributors/page.tsx",
+            "apps/web/src/app/admin/error.tsx",
+            "apps/web/src/app/admin/error.test.tsx"
+          ]
         },
         "loading": {
           "status": "baseline",
@@ -1487,12 +1602,16 @@
       "source": "apps/web/src/app/admin/stories/review/page.tsx",
       "family": "admin",
       "access": "staff",
-      "status": "pending",
+      "status": "partial",
       "states": {
         "default": {
           "status": "baseline",
-          "reason": "The route source is the current rendering or redirect anchor; this status records a baseline and does not assert visual verification.",
-          "evidence": ["apps/web/src/app/admin/stories/review/page.tsx"]
+          "reason": "Retains the recorded protected desk layout with shared shell, loading and staff-specific error recovery. This records inherited implementation, not a per-desk visual or populated-data acceptance claim. Existing mutation behavior is unchanged; a real staff session is required for populated/selected acceptance.",
+          "evidence": [
+            "apps/web/src/app/admin/stories/review/page.tsx",
+            "apps/web/src/app/admin/error.tsx",
+            "apps/web/src/app/admin/error.test.tsx"
+          ]
         },
         "loading": {
           "status": "baseline",
@@ -1549,12 +1668,16 @@
       "source": "apps/web/src/app/admin/stories/review/[submissionId]/page.tsx",
       "family": "admin",
       "access": "staff",
-      "status": "pending",
+      "status": "partial",
       "states": {
         "default": {
           "status": "baseline",
-          "reason": "The route source is the current rendering or redirect anchor; this status records a baseline and does not assert visual verification.",
-          "evidence": ["apps/web/src/app/admin/stories/review/[submissionId]/page.tsx"]
+          "reason": "Retains the recorded protected desk layout with shared shell, loading and staff-specific error recovery. This records inherited implementation, not a per-desk visual or populated-data acceptance claim. Existing mutation behavior is unchanged; a real staff session is required for populated/selected acceptance.",
+          "evidence": [
+            "apps/web/src/app/admin/stories/review/[submissionId]/page.tsx",
+            "apps/web/src/app/admin/error.tsx",
+            "apps/web/src/app/admin/error.test.tsx"
+          ]
         },
         "loading": {
           "status": "baseline",
@@ -1611,12 +1734,16 @@
       "source": "apps/web/src/app/admin/submissions/page.tsx",
       "family": "admin",
       "access": "staff",
-      "status": "pending",
+      "status": "partial",
       "states": {
         "default": {
           "status": "baseline",
-          "reason": "The route source is the current rendering or redirect anchor; this status records a baseline and does not assert visual verification.",
-          "evidence": ["apps/web/src/app/admin/submissions/page.tsx"]
+          "reason": "Retains the recorded protected desk layout with shared shell, loading and staff-specific error recovery. This records inherited implementation, not a per-desk visual or populated-data acceptance claim. Existing mutation behavior is unchanged; a real staff session is required for populated/selected acceptance.",
+          "evidence": [
+            "apps/web/src/app/admin/submissions/page.tsx",
+            "apps/web/src/app/admin/error.tsx",
+            "apps/web/src/app/admin/error.test.tsx"
+          ]
         },
         "loading": {
           "status": "baseline",
@@ -1670,12 +1797,16 @@
       "source": "apps/web/src/app/admin/submissions/[id]/page.tsx",
       "family": "admin",
       "access": "staff",
-      "status": "pending",
+      "status": "partial",
       "states": {
         "default": {
           "status": "baseline",
-          "reason": "The route source is the current rendering or redirect anchor; this status records a baseline and does not assert visual verification.",
-          "evidence": ["apps/web/src/app/admin/submissions/[id]/page.tsx"]
+          "reason": "Retains the recorded protected desk layout with shared shell, loading and staff-specific error recovery. This records inherited implementation, not a per-desk visual or populated-data acceptance claim. Existing mutation behavior is unchanged; a real staff session is required for populated/selected acceptance.",
+          "evidence": [
+            "apps/web/src/app/admin/submissions/[id]/page.tsx",
+            "apps/web/src/app/admin/error.tsx",
+            "apps/web/src/app/admin/error.test.tsx"
+          ]
         },
         "loading": {
           "status": "baseline",
@@ -1732,12 +1863,16 @@
       "source": "apps/web/src/app/admin/switches/page.tsx",
       "family": "admin",
       "access": "staff",
-      "status": "pending",
+      "status": "partial",
       "states": {
         "default": {
           "status": "baseline",
-          "reason": "The route source is the current rendering or redirect anchor; this status records a baseline and does not assert visual verification.",
-          "evidence": ["apps/web/src/app/admin/switches/page.tsx"]
+          "reason": "Retains the recorded protected desk layout with shared shell, loading and staff-specific error recovery. This records inherited implementation, not a per-desk visual or populated-data acceptance claim. Existing mutation behavior is unchanged; a real staff session is required for populated/selected acceptance.",
+          "evidence": [
+            "apps/web/src/app/admin/switches/page.tsx",
+            "apps/web/src/app/admin/error.tsx",
+            "apps/web/src/app/admin/error.test.tsx"
+          ]
         },
         "loading": {
           "status": "baseline",
@@ -1791,12 +1926,16 @@
       "source": "apps/web/src/app/admin/work/page.tsx",
       "family": "admin",
       "access": "staff",
-      "status": "pending",
+      "status": "partial",
       "states": {
         "default": {
           "status": "baseline",
-          "reason": "The route source is the current rendering or redirect anchor; this status records a baseline and does not assert visual verification.",
-          "evidence": ["apps/web/src/app/admin/work/page.tsx"]
+          "reason": "Retains the recorded protected desk layout with shared shell, loading and staff-specific error recovery. This records inherited implementation, not a per-desk visual or populated-data acceptance claim. Existing mutation behavior is unchanged; a real staff session is required for populated/selected acceptance.",
+          "evidence": [
+            "apps/web/src/app/admin/work/page.tsx",
+            "apps/web/src/app/admin/error.tsx",
+            "apps/web/src/app/admin/error.test.tsx"
+          ]
         },
         "loading": {
           "status": "baseline",
@@ -1850,12 +1989,16 @@
       "source": "apps/web/src/app/admin/work/[id]/page.tsx",
       "family": "admin",
       "access": "staff",
-      "status": "pending",
+      "status": "partial",
       "states": {
         "default": {
           "status": "baseline",
-          "reason": "The route source is the current rendering or redirect anchor; this status records a baseline and does not assert visual verification.",
-          "evidence": ["apps/web/src/app/admin/work/[id]/page.tsx"]
+          "reason": "Retains the recorded protected desk layout with shared shell, loading and staff-specific error recovery. This records inherited implementation, not a per-desk visual or populated-data acceptance claim. Existing mutation behavior is unchanged; a real staff session is required for populated/selected acceptance.",
+          "evidence": [
+            "apps/web/src/app/admin/work/[id]/page.tsx",
+            "apps/web/src/app/admin/error.tsx",
+            "apps/web/src/app/admin/error.test.tsx"
+          ]
         },
         "loading": {
           "status": "baseline",
@@ -2143,14 +2286,14 @@
           "evidence": ["apps/web/src/app/corrections/status/page.tsx"]
         },
         "loading": {
-          "status": "pending",
-          "reason": "The redesign surface spec calls for route loading treatment; no matching route-segment loading component is present.",
-          "evidence": ["apps/web/src/app/corrections/status/page.tsx", "docs/redesign/SURFACES.md"]
+          "status": "not-applicable",
+          "reason": "The page is a synchronous receipt-code form that awaits no read, so there is no wait to represent.",
+          "evidence": ["apps/web/src/app/corrections/status/page.tsx"]
         },
         "error": {
-          "status": "pending",
-          "reason": "The redesign spec identifies an error state or the admin section lacks a route-level error treatment.",
-          "evidence": ["apps/web/src/app/corrections/status/page.tsx", "docs/redesign/SURFACES.md"]
+          "status": "partial",
+          "reason": "Awaits nothing, so only the inherited public boundary applies to a render failure; lookup failures belong to the receipt route.",
+          "evidence": ["apps/web/src/app/corrections/status/page.tsx", "apps/web/src/app/error.tsx"]
         },
         "empty": {
           "status": "partial",
@@ -2196,19 +2339,19 @@
           "evidence": ["apps/web/src/app/corrections/status/[receiptCode]/page.tsx"]
         },
         "loading": {
-          "status": "pending",
-          "reason": "The redesign surface spec calls for route loading treatment; no matching route-segment loading component is present.",
+          "status": "baseline",
+          "reason": "The lookup awaits the intake store; a segment loading component announces once.",
           "evidence": [
-            "apps/web/src/app/corrections/status/[receiptCode]/page.tsx",
-            "docs/redesign/SURFACES.md"
+            "apps/web/src/app/corrections/status/[receiptCode]/loading.tsx",
+            "apps/web/src/app/public-route-loading.test.tsx"
           ]
         },
         "error": {
-          "status": "pending",
-          "reason": "The redesign spec identifies an error state or the admin section lacks a route-level error treatment.",
+          "status": "partial",
+          "reason": "An unknown receipt renders its own not-found notice with a way back. A store failure throws to the inherited public boundary, so it is never shown as not found. The dev in-memory store makes not found expected locally.",
           "evidence": [
             "apps/web/src/app/corrections/status/[receiptCode]/page.tsx",
-            "docs/redesign/SURFACES.md"
+            "apps/web/src/app/error.tsx"
           ]
         },
         "empty": {
@@ -2251,14 +2394,17 @@
           "evidence": ["apps/web/src/app/data/page.tsx"]
         },
         "loading": {
-          "status": "pending",
-          "reason": "The redesign surface spec calls for route loading treatment; no matching route-segment loading component is present.",
-          "evidence": ["apps/web/src/app/data/page.tsx", "docs/redesign/SURFACES.md"]
+          "status": "baseline",
+          "reason": "The page awaits the indicator and census reads; a segment loading component announces once and hides placeholders.",
+          "evidence": ["apps/web/src/app/data/loading.tsx", "apps/web/src/app/public-route-loading.test.tsx"]
         },
         "error": {
-          "status": "pending",
-          "reason": "The redesign spec identifies an error state or the admin section lacks a route-level error treatment.",
-          "evidence": ["apps/web/src/app/data/page.tsx", "docs/redesign/SURFACES.md"]
+          "status": "partial",
+          "reason": "The loader throws when the indicator bundle is unavailable, so the inherited public boundary shows a retry rather than empty figures. A missing census timeline drops its own headline instead of inventing one. Source read; not rendered.",
+          "evidence": [
+            "apps/web/src/app/data/load-data-page-model.ts",
+            "apps/web/src/app/error.tsx"
+          ]
         },
         "empty": {
           "status": "not-applicable",
@@ -2293,12 +2439,16 @@
       "source": "apps/web/src/app/design-system/page.tsx",
       "family": "utility",
       "access": "staff",
-      "status": "pending",
+      "status": "partial",
       "states": {
         "default": {
           "status": "baseline",
-          "reason": "The route source is the current rendering or redirect anchor; this status records a baseline and does not assert visual verification.",
-          "evidence": ["apps/web/src/app/design-system/page.tsx"]
+          "reason": "Retains the recorded protected desk layout with shared shell, loading and staff-specific error recovery. This records inherited implementation, not a per-desk visual or populated-data acceptance claim. Existing mutation behavior is unchanged; a real staff session is required for populated/selected acceptance.",
+          "evidence": [
+            "apps/web/src/app/design-system/page.tsx",
+            "apps/web/src/app/admin/error.tsx",
+            "apps/web/src/app/admin/error.test.tsx"
+          ]
         },
         "loading": {
           "status": "not-applicable",
@@ -2483,14 +2633,22 @@
           "evidence": ["apps/web/src/app/explore/loading.tsx", "docs/redesign/SURFACES.md"]
         },
         "error": {
-          "status": "pending",
-          "reason": "The redesign spec identifies an error state or the admin section lacks a route-level error treatment.",
-          "evidence": ["apps/web/src/app/explore/page.tsx", "docs/redesign/SURFACES.md"]
+          "status": "partial",
+          "reason": "Same map catalog failure path as the home route: an error notice with Try again and a records link, never an empty map. Source read; not rendered.",
+          "evidence": [
+            "apps/web/src/app/explore/AtlasLoader.tsx",
+            "apps/web/src/app/explore/atlas-catalog.test.ts",
+            "apps/web/src/app/error.tsx"
+          ]
         },
         "empty": {
-          "status": "pending",
-          "reason": "The redesign spec identifies absent chapter, offline catalog, empty result, or no-data treatment for this surface.",
-          "evidence": ["apps/web/src/app/explore/page.tsx", "docs/redesign/SURFACES.md"]
+          "status": "partial",
+          "reason": "Zero-match narrowing keeps the collection strip and a Filters recovery path; copy states scope, not absence of history.",
+          "evidence": [
+            "apps/web/src/components/discovery/collection-context.tsx",
+            "apps/web/src/components/discovery/collection-context.test.tsx",
+            "docs/redesign/collection-contract.md"
+          ]
         },
         "selected": {
           "status": "partial",
@@ -2864,19 +3022,27 @@
           "evidence": ["apps/web/src/app/lives/page.tsx"]
         },
         "loading": {
-          "status": "not-applicable",
-          "reason": "The route is a static or redirect surface and the redesign spec does not call for a route-specific loading state.",
-          "evidence": ["apps/web/src/app/lives/page.tsx"]
+          "status": "baseline",
+          "reason": "The page awaits the snapshot and story reads; a segment loading component announces once and hides placeholders.",
+          "evidence": ["apps/web/src/app/lives/loading.tsx", "apps/web/src/app/public-route-loading.test.tsx"]
         },
         "error": {
-          "status": "not-applicable",
-          "reason": "This route is static or redirect-only and has no route-specific data error state in the redesign spec.",
-          "evidence": ["apps/web/src/app/lives/page.tsx"]
+          "status": "partial",
+          "reason": "A failed snapshot query throws to the inherited public boundary. An unreadable snapshot shows an alert with a native retry link and never presents pending figures as zero. The existing evidence-reader-unavailable section stays. Component test only.",
+          "evidence": [
+            "apps/web/src/lib/lives/lives-source.ts",
+            "apps/web/src/components/lives/LivesSourceNotice.tsx",
+            "apps/web/src/components/lives/lives-source-notice.test.tsx",
+            "apps/web/src/app/error.tsx"
+          ]
         },
         "empty": {
-          "status": "pending",
-          "reason": "The redesign spec identifies absent chapter, offline catalog, empty result, or no-data treatment for this surface.",
-          "evidence": ["apps/web/src/app/lives/page.tsx", "docs/redesign/SURFACES.md"]
+          "status": "partial",
+          "reason": "A release with no published national snapshot says so instead of rendering an unexplained empty experience. Stored data and schema are untouched.",
+          "evidence": [
+            "apps/web/src/components/lives/LivesSourceNotice.tsx",
+            "apps/web/src/app/lives/page.tsx"
+          ]
         },
         "selected": {
           "status": "not-applicable",
@@ -2959,24 +3125,35 @@
           "evidence": ["apps/web/src/app/lives/explorer/page.tsx"]
         },
         "loading": {
-          "status": "pending",
-          "reason": "The redesign surface spec calls for route loading treatment; no matching route-segment loading component is present.",
-          "evidence": ["apps/web/src/app/lives/explorer/page.tsx", "docs/redesign/SURFACES.md"]
+          "status": "baseline",
+          "reason": "The page awaits the area snapshot and inherits the Lives segment wait, which announces once and hides placeholders.",
+          "evidence": ["apps/web/src/app/lives/loading.tsx", "apps/web/src/app/public-route-loading.test.tsx"]
         },
         "error": {
-          "status": "pending",
-          "reason": "The redesign spec identifies an error state or the admin section lacks a route-level error treatment.",
-          "evidence": ["apps/web/src/app/lives/explorer/page.tsx", "docs/redesign/SURFACES.md"]
+          "status": "partial",
+          "reason": "A failed snapshot query throws to the inherited public boundary. A missing or unusable snapshot no longer reads as a silent grid of pending figures: a notice says nothing is published, or that the counts could not be read, with a native retry link. Component test only; not rendered in a browser.",
+          "evidence": [
+            "apps/web/src/lib/lives/lives-source.ts",
+            "apps/web/src/components/lives/LivesSourceNotice.tsx",
+            "apps/web/src/components/lives/lives-source-notice.test.tsx",
+            "apps/web/src/app/error.tsx"
+          ]
         },
         "empty": {
-          "status": "not-applicable",
-          "reason": "This route is not an empty-result or data-absence surface in the redesign inventory.",
-          "evidence": ["apps/web/src/app/lives/explorer/page.tsx"]
+          "status": "partial",
+          "reason": "An area with no published snapshot states that its figures are not yet counted, which is different from zero. Pending cells keep their existing not-counted wording.",
+          "evidence": [
+            "apps/web/src/components/lives/LivesSourceNotice.tsx",
+            "apps/web/src/lib/lives/lives-source.test.ts"
+          ]
         },
         "selected": {
-          "status": "pending",
-          "reason": "This browse surface has selected query, filter, or page state that remains part of the redesign work.",
-          "evidence": ["apps/web/src/app/lives/explorer/page.tsx", "docs/redesign/SURFACES.md"]
+          "status": "partial",
+          "reason": "The selected area and decade are URL state; the static rail marks the current decade with aria-current. The interactive timeline selection is retained and not browser-verified here.",
+          "evidence": [
+            "apps/web/src/components/lives/LivesTimelineStatic.tsx",
+            "apps/web/src/app/lives/explorer/page.tsx"
+          ]
         },
         "auth": {
           "status": "not-applicable",

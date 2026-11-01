@@ -117,14 +117,40 @@ export async function linkLivesRules(
   return area ? mergeWorldBeats(withRules, area) : withRules;
 }
 
-/** The area's bundle, or null when the slug is not the national baseline or a modeled region. */
-export const loadLivesAreaBundle = cache(async (slug: string): Promise<LivesAreaBundle | null> => {
+/**
+ * Where an area's bundle came from. Only `snapshot` carries counted figures; the others render the
+ * same every-figure-pending bundle but mean different things to a reader: nothing published yet
+ * versus a store or snapshot that could not be used.
+ */
+export type LivesAreaSource = 'snapshot' | 'unpublished' | 'unreadable';
+
+export type LivesAreaView = {
+  readonly bundle: LivesAreaBundle;
+  readonly source: LivesAreaSource;
+};
+
+/**
+ * The area's bundle with the reason it is or is not counted, or null when the slug is not the
+ * national baseline or a modeled region. A failed database query still throws to the route error
+ * boundary; this only separates an empty release from an unusable snapshot.
+ */
+export const loadLivesAreaView = cache(async (slug: string): Promise<LivesAreaView | null> => {
   const area = livesAreaBySlug(slug);
   if (!area) return null;
-  if (!resolvePostgresConnectionString()) return emptyLivesAreaBundle(area);
-  const snapshot = await fetchMaterializedSnapshot(livesSnapshotName(area.slug));
-  if (!isLivesAreaSnapshot(snapshot) || snapshot.areaSlug !== area.slug) {
-    return emptyLivesAreaBundle(area);
+  if (!resolvePostgresConnectionString()) {
+    return { bundle: emptyLivesAreaBundle(area), source: 'unreadable' };
   }
-  return linkLivesRules(snapshot, resolveLawCaseHref);
+  const snapshot = await fetchMaterializedSnapshot(livesSnapshotName(area.slug));
+  if (snapshot === undefined || snapshot === null) {
+    return { bundle: emptyLivesAreaBundle(area), source: 'unpublished' };
+  }
+  if (!isLivesAreaSnapshot(snapshot) || snapshot.areaSlug !== area.slug) {
+    return { bundle: emptyLivesAreaBundle(area), source: 'unreadable' };
+  }
+  return { bundle: await linkLivesRules(snapshot, resolveLawCaseHref), source: 'snapshot' };
+});
+
+/** The area's bundle, or null when the slug is not the national baseline or a modeled region. */
+export const loadLivesAreaBundle = cache(async (slug: string): Promise<LivesAreaBundle | null> => {
+  return (await loadLivesAreaView(slug))?.bundle ?? null;
 });

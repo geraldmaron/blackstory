@@ -133,6 +133,21 @@ Old findings corrected from source: `/law` is paginated, `/books` has a working 
 is reader-facing copy, `/errata` has an empty state. See `SURFACES.md` section 3.2 and
 `local-handoff.md`.
 
+## Completion pass (base 59c1667f)
+
+**Real remaining implementation, none known open in this scope.** Done: `/data`, `/lives` and the receipt
+page have loading boundaries; Lives separates an unpublished area from an unreadable snapshot with a native
+retry (read-only view state, no stored data or schema change); `CaseQueue` has a filtered-versus-empty
+state and keyboard-reachable rows with focus return; the sign-in email input has a 44px floor. Retained,
+not migrated: `/admin/queue` empty and selection, the other staff desks, `/lives` interactive timeline.
+
+**Real access or product gates (not implementation):** populated protected acceptance (staff session and
+data); mosaic per-tile credit data from its owner; canonical merge and prune (original owner unknown);
+stored schema or record changes (proposal and sign-off). Retiring `/rooms` or merging `/sources` is optional.
+
+**Verification owed by the root:** one frozen aggregate (the two new test files already pass 6/6 through the `states` wrapper argument), 375px email target measurement, and rendered checks of the new
+waits and Lives notices.
+
 ## Current blockers
 
 Stored-record or schema changes require a separate final owner sign-off. Before requesting
@@ -148,3 +163,14 @@ edits and local fixtures remain separate from stored data.
   discovery interface; shared-checkout integration and branch pruning wait for ownership.
 - A legal-dataset migration needs separate operator authorization; preserve statute URLs.
 - No permission is implied to amend protected experiences or change production access.
+
+## Remaining release and acceptance gates
+
+Independent source work is complete to the current migrated/retained classification. Future authorized work must start with a coherent visible/interactive slice on the live candidate, publish its verified preview URL early, and label any synthetic fixture separately. Browser evidence is a milestone criterion, not a last-step decoration. Reuse unchanged checks, then freeze the aggregate once the candidate is stable.
+
+1. **Original-owner release, pending and not attempted:** the owner of the original `redesign/ux-audit-2026-10` session must confirm it has stopped writing and released that branch for reconciliation. This is the minimal next step. Then the integrator can recheck both heads, reconcile and prune only integrated/recoverable/unowned branches. No takeover, canonical merge or pruning occurred.
+2. **Protected populated acceptance, pending access:** use an existing authorized staff session to check real list/detail/dialog keyboard behavior and populated views. The synthetic captures do not substitute for that check. No role changes, credential creation or mutation-path validation is authorized by this UI pass.
+3. **Copied-tile credits, pending data-owner decision:** retain the honest missing-credit notice or supply the captured author/licence/source metadata for a separately reviewed repair. No metadata was invented and no historical content was deleted.
+4. **Conditional data/signoff gate:** any proposed schema or stored-record remedy requires an exact scoped diff, adversarial review, isolated validation, impact/rollback plan and final user sign-off before application. No such mutation was needed or performed here.
+
+Push/deploy remain unrequested and unattempted. Optional Rooms retirement, Sources merge or pagination unification do not block the current candidate.

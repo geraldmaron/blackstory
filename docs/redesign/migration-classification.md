@@ -1,4 +1,50 @@
-# Migration classification (base 50060223)
+# Current implementation disposition
+
+This table supersedes the initial phase-one suggestions below. It records intentional migration versus retention, not blanket visual acceptance. No independent implementation gap remains identified after the two finishing slices and focused review.
+
+| Family | Final disposition | Concrete acceptance / remaining limit |
+|---|---|---|
+| Home, Explore, Records and record families | Collection-based map/index/chronology and contextual record navigation migrated; distinct entry and reading compositions retained | Same collection/query/range survives mode, record and return; empty, unavailable and unmapped stay distinct; loading and recovery are source-mapped and tested. Representative rendered flows passed. |
+| Stories and chapters | Reading layout, contents, collection links and loading migrated | Existing prose, anchors and evidence identity preserved; linked collections use explicit published links. Copied-tile credit provenance remains a data-owner question. |
+| Books and Law | Distinct catalogs and readers intentionally retained; paging, semantics and waits completed | Source-backed entries, filtered-empty/unavailable distinctions, compatible URLs and paging boundaries; no invented catalog content. |
+| Lives and Data | Editorial/statistical layouts retained; waits and source-aware failure treatment completed | Unpublished and unreadable snapshots never assert zero. Notices have native recovery. Live defaults and synthetic notice variants were rendered. |
+| Memorial, Errata, Sources and Rooms | Intentional distinct publication layouts retained | Names/order and Memorial protection preserved; source lineage readable; no route retirement or forced merge. |
+| Static information, Submit and Corrections | Existing publication/intake UI retained; receipt wait added | Labels and existing validation remain; lookup failure differs from not-found. No submission or stored-record write was performed. |
+| Legacy redirects and internal design-system route | Retained compatible routing and existing access posture | Historical URLs keep supported context; no fixture or staff data was exposed through an application route. |
+| Staff/auth entry | Protected desk layouts retained; shared recovery, sign-in status/touch states and representative case selection/empty states migrated | Auth logic unchanged; sign-in targets measured44px; synthetic state fixtures and SSR checks pass. Populated staff workflows and real dialog keyboard interaction require an existing staff session; fixtures do not prove them. |
+
+There are no requested schema or stored-record changes needed for these UI slices. Canonical integration/pruning awaits owner release; exact copied-tile credit data remains unavailable. Retiring Rooms or merging Sources is optional, not a blocker.
+
+---
+
+# Migration classification (base 59c1667f, completion pass)
+
+**Delta from the earlier pass (source-first; the rows below are corrected where they changed).**
+Read from source this pass: `data/page.tsx`, `load-data-page-model.ts`, `lives/page.tsx`,
+`lives/explorer/page.tsx`, `lib/lives/lives-source.ts`, `corrections/status/page.tsx`,
+`corrections/status/[receiptCode]/page.tsx`, `explore/AtlasLoader.tsx`, `admin/queue/page.tsx`,
+`admin/cases/CaseQueue.tsx`, `QueueKeyboard.tsx`, `admin/login/login-panel.tsx`, `admin.css`.
+
+- **Real failure conflated with empty (fixed):** `loadLivesAreaBundle` returned the same every-figure-pending
+  bundle for no database, a missing snapshot and an invalid snapshot. `loadLivesAreaView` now reports
+  `snapshot`, `unpublished` or `unreadable` beside the unchanged bundle; `/lives` and `/lives/explorer` show a
+  warning (nothing published) or an alert with a native retry link (unreadable). Stored data and schema are
+  untouched. A thrown database query was never swallowed; it already reached `app/error.tsx`.
+- **Not a gap:** `/data` throws when the indicator bundle is missing (inherited retry, never empty figures);
+  the receipt page shows "not found" only when the store answers with nothing, and a store failure throws;
+  home and Explore already show an error notice with Try again when the map catalog fetch fails, and the
+  zero-match named collection already renders scope-aware recovery (browser-verified at 375px by the root).
+- **Loading added (awaits data, had none):** `/data`, `/lives` (also covers `/lives/explorer`),
+  `/corrections/status/[receiptCode]`. `/corrections/status` is a synchronous form: loading not applicable.
+- **Staff:** `CaseQueue` used one sentence for a filtered zero and an empty desk, and case rows opened the
+  detail sheet only from a mouse click on the row, with no focus return. Fixed: shared `EmptyState` with
+  Clear filters, a native row button, focus returns on close. `/admin/queue` already separates filtered zero,
+  empty and degraded and keeps server-rendered row links plus j/k: retained, no migration.
+- **Auth entry:** the email target is the native input (the wrapper was already 44px, the input 40px). The
+  login scope now floors `base-input` and the inner input at 44px. Handlers, POST, autocomplete and
+  validation are unchanged. Not measured here; the root owns the 375px check.
+
+## Earlier pass (base 50060223)
 
 Phase 1 deliverable, written before implementation. Method: inventory state statuses (all 66 routes,
 read from `docs/redesign/surface-inventory.json`) crossed with page signatures (async or static,
@@ -35,7 +81,13 @@ is intentional; no migration owed), **needs work** (a real, source-evidenced gap
 | `/design-system` | retained, internal | pending; auth state baseline | none | inventory | none |
 | System: `app/error.tsx`, `global-error.tsx`, `not-found.tsx` | migrated | none | tested | `app/error.test.ts`, `global-error.test.tsx` | none |
 
-Public conclusion: public surfaces are **not** genuinely complete. Three dynamic record/index routes await data
+**Superseded for `/lives`, `/lives/explorer`, `/data`, `/corrections/status*`, `/` and `/explore`:** see the
+delta above. Their error and empty states are partial with component or source evidence; none is visually
+accepted. Remaining public acceptance per family: rendered 375/1280 light and dark for the loading waits and
+the two Lives notices (force `unpublished` and `unreadable` with a synthetic view only in a test, never by
+editing data); `/methodology` and `/faq` loading still needs a confirmed no-await read.
+
+Earlier public conclusion (historical): public surfaces are **not** genuinely complete. Three dynamic record/index routes await data
 with no loading boundary. They are the highest-value public gap and are fixed first (small, reuse existing kit).
 `/lives/explorer`, `/data`, `/explore` and `/` error/empty states are real remaining public gaps needing source reads.
 
@@ -54,6 +106,10 @@ actions are **not** touched. No sign-in, submission or record write is needed fo
 | Staff `selected` (12 desks) | needs work, per desk, not this slice | Row/detail selection and focus return are per-desk | Needs per-desk reads | inventory | none |
 | Staff forms | retained shared adapters | `FormInput`/`FormTextarea`/`FormSelect` wrap existing audited actions | Must not change submit semantics | `fields.tsx` | Any form write or server action change is out of scope |
 | Staff mobile | retained | Drawer nav in `AdminShellChrome` with dialog label | rendered check belongs to root | `AdminShellChrome.tsx` | root browser |
+
+Update: the staff empty row above is now done for `CaseQueue` (inbox and cases) and retained for `/admin/queue`.
+Selected is partial for those three desks. The other ~9 desks with selection are **retained, not
+migrated**: no finding justifies touching them, and populated acceptance needs a real staff session.
 
 Staff conclusion: no product or access gate blocks isolated source work. What remains gated is **populated protected
 acceptance**: real staff session, real queue data, real mutation paths. Fixtures can show state composition only.

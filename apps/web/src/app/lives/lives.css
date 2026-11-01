@@ -1586,6 +1586,23 @@
   color: var(--ds-ink-muted);
 }
 
+.lives-source-notice {
+  margin: var(--ds-space-6) 0;
+}
+
+.lives-source-notice__retry {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  color: var(--ds-accent);
+  text-underline-offset: 0.2em;
+}
+
+.lives-source-notice__retry:focus-visible {
+  outline: var(--ds-focus-width) solid var(--ds-focus-ring);
+  outline-offset: 3px;
+}
+
 @media (min-width: 40rem) {
   .lives-milestone__choices {
     grid-template-columns: repeat(3, minmax(0, 1fr));

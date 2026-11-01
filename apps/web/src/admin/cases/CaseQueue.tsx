@@ -11,7 +11,9 @@ import { Pagination } from '@repo/ui';
 import { DeskToolbar } from '../design-system/DeskToolbar';
 import { ActiveFilters, DeskTitleBar, Panel, type ActiveFilter } from '../design-system/ui';
 import { useAdminAuth } from '../auth/AdminAuthProvider';
+import { useFocusTrap } from '../../lib/keyboard/use-focus-trap';
 import { assignCaseToMe } from './case-assign-client';
+import { CaseQueueEmpty } from './case-queue-empty';
 import type { CaseQuery, CaseStateBucket } from './case-query-types';
 import {
   RESEARCH_CASE_BULK_LIMIT,
@@ -82,6 +84,8 @@ export function CaseQueue({
   const [status, setStatus] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const closeRef = useRef<HTMLButtonElement>(null);
+  const dialogRef = useRef<HTMLDivElement>(null);
+  const overlayRef = useRef<HTMLDivElement>(null);
   const bulkReasonRef = useRef<HTMLInputElement>(null);
   const sheetReasonRef = useRef<HTMLTextAreaElement>(null);
   const sheetTitleId = useId();
@@ -170,6 +174,7 @@ export function CaseQueue({
 
   const openDetail = useCallback(
     async (caseId: string) => {
+      openedIdRef.current = caseId;
       setActiveId(caseId);
       setDetail(null);
       setError(null);
@@ -196,13 +201,28 @@ export function CaseQueue({
     [getIdToken],
   );
 
+  const openedIdRef = useRef<string | null>(null);
+
   const closeSheet = useCallback(() => {
     setActiveId(null);
     setDetail(null);
   }, []);
 
+  // The page behind the sheet is inert while it is open, so focus can only go back to the opener
+  // once the trap has released it. Effect cleanups run before effect bodies in the same commit.
+  useFocusTrap(dialogRef, activeId !== null, { overlayRef });
+
   useEffect(() => {
-    if (!activeId) return;
+    if (!activeId) {
+      // Return focus to the control that opened the sheet; the row button is outside the portal.
+      const openedId = openedIdRef.current;
+      openedIdRef.current = null;
+      if (!openedId) return;
+      document
+        .querySelector<HTMLElement>(`[data-case-open="${CSS.escape(openedId)}"]`)
+        ?.focus();
+      return;
+    }
     closeRef.current?.focus();
     function onKeyDown(event: KeyboardEvent) {
       if (event.key === 'Escape') {
@@ -463,7 +483,15 @@ export function CaseQueue({
       ) : null}
 
       {visible.length === 0 ? (
-        <p className="acq__empty">No research cases match this filter.</p>
+        <CaseQueueEmpty
+          mode={mode}
+          filtered={
+            Boolean(query.search) ||
+            (query.assignee !== undefined && query.assignee !== 'any') ||
+            (activeStates.length > 0 && activeStates.join(',') !== defaultStates.join(','))
+          }
+          clearHref={basePath}
+        />
       ) : (
         <Panel flush label="Research cases">
           <div className="acq__table-wrap">
@@ -539,9 +567,20 @@ export function CaseQueue({
                         </label>
                       </td>
                       <td>
-                        <span className="acq__row-title" title={row.title}>
-                          {row.title}
-                        </span>
+                        <button
+                          type="button"
+                          className="acq__row-open"
+                          data-case-open={row.id}
+                          aria-haspopup="dialog"
+                          onClick={(event) => {
+                            event.stopPropagation();
+                            void openDetail(row.id);
+                          }}
+                        >
+                          <span className="acq__row-title" title={row.title}>
+                            {row.title}
+                          </span>
+                        </button>
                         <span className="acq__row-id">{row.id}</span>
                       </td>
                       <td>
@@ -584,7 +623,7 @@ export function CaseQueue({
 
       <div className={`acq-sheet-portal${activeId ? ' is-open' : ''}`} aria-hidden={!activeId}>
         {activeId ? (
-          <>
+          <div ref={overlayRef} className="acq-sheet-overlay">
             <FormButton
               type="button"
               className="acq-sheet-backdrop"
@@ -592,6 +631,8 @@ export function CaseQueue({
               onClick={closeSheet}
             />
             <div
+              ref={dialogRef}
+              tabIndex={-1}
               role="dialog"
               aria-modal="true"
               aria-labelledby={sheetTitleId}
@@ -811,7 +852,7 @@ export function CaseQueue({
                 </div>
               </footer>
             </div>
-          </>
+          </div>
         ) : null}
       </div>
     </div>

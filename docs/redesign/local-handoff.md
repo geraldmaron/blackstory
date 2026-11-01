@@ -325,10 +325,48 @@ The mobile When-drawer collision is browser-verified fixed at 375px light: contr
 
 Next required coordination action: identify or obtain release from the original Claude owner of `/Users/geralddagher/Developer/Projects/blackstory`, branch `redesign/ux-audit-2026-10`, before canonical reconciliation or branch pruning. Supported discovery did not establish an owner; no private session access or takeover occurred. The isolated candidate remains reviewable on port3103. No push, deploy, canonical merge, branch deletion or stored data change has been attempted. Exact immutable copied-tile author/licence metadata remains unavailable; any schema or stored-record remedy requires a scoped proposal, adversarial review, isolated validation, impact/rollback, then final user sign-off before application.
 
+### Completion pass (Claude Sonnet 5.5, isolated clone, base 59c1667f)
+
+Details and per-route dispositions: `migration-classification.md` (delta at top) and the inventory.
+
+**Real gaps fixed.** (1) `/lives` and `/lives/explorer` showed the same pending-figure bundle for a missing
+snapshot, an unusable one and no database. `loadLivesAreaView` now returns the bundle plus a source
+(`snapshot`, `unpublished`, `unreadable`); `LivesSourceNotice` says nothing is published, or shows an alert
+with a native retry link. `loadLivesAreaBundle` keeps its signature. No stored data, schema or content moved.
+(2) Loading boundaries for `/data`, `/lives` (covers the explorer) and the receipt page. (3) `CaseQueue`
+(inbox and cases): filtered zero versus empty desk via `EmptyState` and a Clear filters link; rows open the
+detail sheet from a native button and focus returns on close. (4) Sign-in: the native email input, not its
+wrapper, is the 40px target; the login scope now floors `base-input` and the inner input at 44px. Handlers,
+POST, autocomplete and validation untouched.
+
+**Checked and not a gap.** `/data` throws on a missing indicator bundle (inherited retry); the receipt page
+reports not found only when the store answers empty; home and Explore show an error notice with Try again on
+a failed catalog fetch; the zero-match named collection already has scope-aware recovery. `/admin/queue`
+keeps its own working empty, degraded and keyboard pattern. Other staff desks are retained, not migrated.
+
+**Wrapper results:** `public` 128/128, `focused` 125/125, `staff` 12/12, `guard` 8/8, `types` pass,
+`inventory` ok (66 routes, six shared surfaces), `states` 6/6 (the two new test files, requested in
+`.task-tools/requested-test-targets.txt`). No aggregate, browser or server run.
+
+**Remaining.** Implementation: none known in this scope. Root verification: one frozen aggregate, 375px email
+height, rendered Lives notices and staff empty state. Access or product gates: populated protected
+acceptance, mosaic copied-tile credit data (owner), canonical merge and prune (original owner unknown),
+schema or record changes (sign-off). Retiring `/rooms` or merging `/sources` is optional.
+
 ### Remaining UI slice A — integration checkpoint
 
 Claude execution receipt: session1473cad3-638d-4b6b-8d53-727ea3c1d752, verified claude-sonnet-5-5, exit0. Added Records/place/invention loading, staff-specific error recovery, and a presentational sign-in panel with synthetic idle/not-ready/busy/verifying/error coverage. Auth handlers and checks were reviewed unchanged; form method remains POST. Twelve staff/auth tests,125public tests, types and inventory passed in the isolated worker; scoped auth ESLint and12staff/auth tests passed after integration.
 
 Actual browser found the extracted BaseUI panel needed an explicit client boundary when imported by the server Suspense fallback; coordinator added it and verified successful live rendering. At375px light, password, reveal and submit targets now measure44px; email's inner input is still40px despite its44px wrapper, so that remaining target needs correction. No credentials were entered and no sign-in was submitted. The existing zero-match named map collection also renders honest scope with Filters/one-filter recovery; do not infer missing empty UI from stale pending labels.
 
+Root-review fixes: the filtered `CaseQueueEmpty` copy no longer claims "The cases are still there" (a filter with zero rows does not prove unfiltered cases exist); it now says to clear the filters to return to the unfiltered list. The `CaseQueue` detail sheet reuses `lib/keyboard/use-focus-trap` (dialog container ref, overlay ref wrapping backdrop and dialog) so `aria-modal` now has Tab containment and an inert background. Because the page is inert while open, row focus is restored from the `activeId` null branch after the trap releases, using the retained `openedIdRef`. Handlers, routing, case ids, actions and the native row button are unchanged. Wrapper: `focus` 6/6 (shared hook tests), `states` 6/6, `types` pass. Those hook tests do not exercise CaseQueue itself, so protected keyboard QA is not claimed. `.task-tools/render-state-fixtures.tsx` renders synthetic Lives notice and case-empty fixtures to `state-fixtures-light.html` and `-dark.html` (wrapper `fixtures` exit 0); screenshots are not yet taken.
+
 Migration classification is saved in migration-classification.md. Remaining public failure/empty cases need focused source confirmation, then genuine fixes; staff empty/selected patterns need representative assessment. No aggregate was repeated during this slice. Populated protected acceptance, copied-tile credit data and canonical owner release remain distinct gates.
+
+### Consolidated completion checkpoint
+
+The source migration/retention table at the top of migration-classification.md is authoritative over the initial unread/pending suggestions below it. Public implementation gaps identified in this pass are closed. Protected desk defaults are recorded as retained baselines with shared migrated recovery, rather than stale claims of absent implementation. Overall partial statuses still do not mean visual sign-off or populated staff acceptance.
+
+Final source checks after obsolete CSS removal:2,953 tests,2,945 pass,eight skipped,zero failures; TypeScript, scoped ESLint and inventory pass. Actual sign-in targets are44px, Data/Lives defaults render, and labelled synthetic source/empty-state captures were inspected. See rendered-acceptance.md for precise scope and durable artifact paths. No schema/data mutation, sign-in submission, push/deploy, original checkout write, canonical merge or branch deletion occurred.
+
+Only genuine remaining gates are consolidated in execution-plan.md: original-owner release for canonical reconciliation, a real staff session for protected populated acceptance, and the copied-tile credit owner's decision/data. Any later stored-record/schema change needs reviewed validation and final user sign-off. The full app remains on3103;3102 is explicitly synthetic. Preview-first visible milestones are the standing preference for subsequent work.
