@@ -12,6 +12,11 @@
  * `aria-current="page"` on the active one, so it works with JavaScript off and needs no
  * roving-focus keyboard model. Labels are the nav destinations, Map and Records.
  *
+ * Composition: the count reads as the heading of the collection and the Map / Records anchors are
+ * one segmented control opposite it. DOM order stays views first, then facts; CSS places the
+ * facts first visually. Callers choose the placement through `className`: `ds-collection--atlas`
+ * (boxed, over the map) or `ds-collection--flat` (inside the Records workbench, no box of its own).
+ *
  * Docs: docs/ui/patterns-collection-context.md.
  */
 import React from 'react';

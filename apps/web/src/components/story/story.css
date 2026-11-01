@@ -826,15 +826,6 @@
 /* The rail stacks under the column below 68rem (room-kit.css), so its list would be read after
    the chapter; the inline contents above replaces it there. Its "Next in this collection"
    sibling stays. */
-@media (max-width: 68rem) {
-  .ds-reading-toc {
-    display: block;
-  }
-
-  .ds-room-rail-group.ds-reading-toc-rail {
-    display: none;
-  }
-}
 
 /* ----------------------------------------------------------------------------
  * Sticky evidence rail — Ink direction. "In this chapter" and "Records cited" are
@@ -883,6 +874,14 @@
 }
 
 @media (max-width: 68rem) {
+  .ds-reading-toc {
+    display: block;
+  }
+
+  .ds-room-rail-group.ds-reading-toc-rail {
+    display: none;
+  }
+
   /* Below .ds-room__body--railed's breakpoint the rail stacks under the column (Room.tsx),
      where sticky positioning has no meaningful ground to stick to. */
   .ds-reading-rail {

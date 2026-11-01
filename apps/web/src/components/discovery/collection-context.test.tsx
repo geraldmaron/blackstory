@@ -135,7 +135,7 @@ describe('CollectionContext integrations', () => {
     const markup = renderToStaticMarkup(
       <RecordsIndexRoom model={model} releaseLabel="Active release" />,
     );
-    assert.match(markup, /class="ds-collection"/);
+    assert.match(markup, /class="ds-collection ds-collection--flat"/);
     assert.match(markup, /30 records in this collection/);
     assert.match(markup, /25 can be placed on the map; 5 have no mapped location/);
     // The active Records link keeps the current page of the same collection.

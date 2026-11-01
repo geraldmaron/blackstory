@@ -13,14 +13,22 @@
       "status": "partial",
       "states": {
         "default": {
-          "status": "baseline",
-          "reason": "The route source is the current rendering or redirect anchor; this status records a baseline and does not assert visual verification.",
-          "evidence": ["apps/web/src/app/page.tsx"]
+          "status": "partial",
+          "reason": "Collection entry, shared map/index workbench, reading and place-mast slices are implemented; remaining route/state acceptance is tracked separately. This is not all-route visual sign-off.",
+          "evidence": [
+            "apps/web/src/app/door-home.tsx",
+            "apps/web/src/app/door-immersive.tsx",
+            "apps/web/src/app/door-home.css"
+          ]
         },
         "loading": {
-          "status": "not-applicable",
-          "reason": "The route is a static or redirect surface and the redesign spec does not call for a route-specific loading state.",
-          "evidence": ["apps/web/src/app/page.tsx"]
+          "status": "partial",
+          "reason": "Dynamic published catalog entry retains shared route loading and map plate pending/fallback states; cold and failed retrieval acceptance remains separate.",
+          "evidence": [
+            "apps/web/src/app/door-home.tsx",
+            "apps/web/src/app/door-immersive.tsx",
+            "apps/web/src/app/explore/AtlasLoader.tsx"
+          ]
         },
         "error": {
           "status": "pending",
@@ -46,13 +54,17 @@
       "componentRefs": [
         "apps/web/src/app/page.tsx",
         "apps/web/src/components/SiteShell.tsx",
-        "apps/web/src/components/map-stage/MapStage.tsx"
+        "apps/web/src/components/map-stage/MapStage.tsx",
+        "apps/web/src/app/door-home.tsx",
+        "apps/web/src/app/door-immersive.tsx",
+        "apps/web/src/app/door-home.css"
       ],
       "evidence": [
         "apps/web/src/app/page.tsx",
         "docs/redesign/SURFACES.md",
         "apps/web/src/lib/nav/surface-classes.ts",
-        "apps/web/src/lib/nav/surface-classes.test.ts"
+        "apps/web/src/lib/nav/surface-classes.test.ts",
+        "docs/ui/patterns-ground-investigation.md"
       ]
     },
     {
@@ -2281,9 +2293,13 @@
       "status": "partial",
       "states": {
         "default": {
-          "status": "baseline",
-          "reason": "The route source is the current rendering or redirect anchor; this status records a baseline and does not assert visual verification.",
-          "evidence": ["apps/web/src/app/explore/page.tsx"]
+          "status": "partial",
+          "reason": "Collection entry, shared map/index workbench, reading and place-mast slices are implemented; remaining route/state acceptance is tracked separately. This is not all-route visual sign-off.",
+          "evidence": [
+            "apps/web/src/app/door-home.tsx",
+            "apps/web/src/app/explore/AtlasExperience.tsx",
+            "apps/web/src/components/discovery/collection-context.tsx"
+          ]
         },
         "loading": {
           "status": "baseline",
@@ -2321,13 +2337,17 @@
       "componentRefs": [
         "apps/web/src/app/explore/page.tsx",
         "apps/web/src/components/SiteShell.tsx",
-        "apps/web/src/components/map-stage/MapStage.tsx"
+        "apps/web/src/components/map-stage/MapStage.tsx",
+        "apps/web/src/app/door-home.tsx",
+        "apps/web/src/app/explore/AtlasExperience.tsx",
+        "apps/web/src/components/discovery/collection-context.tsx"
       ],
       "evidence": [
         "apps/web/src/app/explore/page.tsx",
         "docs/redesign/SURFACES.md",
         "apps/web/src/lib/nav/surface-classes.ts",
-        "apps/web/src/lib/nav/surface-classes.test.ts"
+        "apps/web/src/lib/nav/surface-classes.test.ts",
+        "docs/ui/patterns-ground-investigation.md"
       ]
     },
     {
@@ -2868,9 +2888,12 @@
       "status": "partial",
       "states": {
         "default": {
-          "status": "baseline",
-          "reason": "The route source is the current rendering or redirect anchor; this status records a baseline and does not assert visual verification.",
-          "evidence": ["apps/web/src/app/place/[slug]/page.tsx"]
+          "status": "partial",
+          "reason": "Collection entry, shared map/index workbench, reading and place-mast slices are implemented; remaining route/state acceptance is tracked separately. This is not all-route visual sign-off.",
+          "evidence": [
+            "apps/web/src/app/HomeFirstPaint.tsx",
+            "apps/web/src/app/home-first-paint.css"
+          ]
         },
         "loading": {
           "status": "pending",
@@ -2908,13 +2931,16 @@
       },
       "componentRefs": [
         "apps/web/src/app/place/[slug]/page.tsx",
-        "apps/web/src/components/SiteShell.tsx"
+        "apps/web/src/components/SiteShell.tsx",
+        "apps/web/src/app/HomeFirstPaint.tsx",
+        "apps/web/src/app/home-first-paint.css"
       ],
       "evidence": [
         "apps/web/src/app/place/[slug]/page.tsx",
         "docs/redesign/SURFACES.md",
         "apps/web/src/lib/nav/surface-classes.ts",
-        "apps/web/src/lib/nav/surface-classes.test.ts"
+        "apps/web/src/lib/nav/surface-classes.test.ts",
+        "docs/ui/patterns-ground-investigation.md"
       ]
     },
     {
@@ -2974,9 +3000,13 @@
       "status": "partial",
       "states": {
         "default": {
-          "status": "baseline",
-          "reason": "The route source is the current rendering or redirect anchor; this status records a baseline and does not assert visual verification.",
-          "evidence": ["apps/web/src/app/records/page.tsx"]
+          "status": "partial",
+          "reason": "Collection entry, shared map/index workbench, reading and place-mast slices are implemented; remaining route/state acceptance is tracked separately. This is not all-route visual sign-off.",
+          "evidence": [
+            "apps/web/src/app/records/RecordsIndex.tsx",
+            "apps/web/src/components/discovery/collection-context.tsx",
+            "apps/web/src/lib/records/records-catalog.ts"
+          ]
         },
         "loading": {
           "status": "pending",
@@ -3013,13 +3043,17 @@
       },
       "componentRefs": [
         "apps/web/src/app/records/page.tsx",
-        "apps/web/src/components/SiteShell.tsx"
+        "apps/web/src/components/SiteShell.tsx",
+        "apps/web/src/app/records/RecordsIndex.tsx",
+        "apps/web/src/components/discovery/collection-context.tsx",
+        "apps/web/src/lib/records/records-catalog.ts"
       ],
       "evidence": [
         "apps/web/src/app/records/page.tsx",
         "docs/redesign/SURFACES.md",
         "apps/web/src/lib/nav/surface-classes.ts",
-        "apps/web/src/lib/nav/surface-classes.test.ts"
+        "apps/web/src/lib/nav/surface-classes.test.ts",
+        "docs/ui/patterns-ground-investigation.md"
       ]
     },
     {
@@ -3220,18 +3254,14 @@
       "source": "apps/web/src/app/stories/[slug]/page.tsx",
       "family": "reading-data",
       "access": "public",
-      "status": "pending",
+      "status": "partial",
       "states": {
         "default": {
-          "status": "baseline",
-          "reason": "The route source is the current rendering or redirect anchor; this status records a baseline and does not assert visual verification.",
+          "status": "partial",
+          "reason": "Collection entry, shared map/index workbench, reading and place-mast slices are implemented; remaining route/state acceptance is tracked separately. This is not all-route visual sign-off.",
           "evidence": [
-            "apps/web/src/app/stories/[slug]/page.tsx",
             "apps/web/src/components/story/story-contents.tsx",
-            "apps/web/src/components/story/story-contents.test.tsx",
-            "apps/web/src/components/story/story-records.tsx",
-            "apps/web/src/components/story/story-records.test.tsx",
-            "docs/ui/patterns-story-reading.md"
+            "apps/web/src/components/story/story-records.tsx"
           ]
         },
         "loading": {
@@ -3280,7 +3310,8 @@
         "docs/redesign/SURFACES.md",
         "apps/web/src/lib/nav/surface-classes.ts",
         "apps/web/src/lib/nav/surface-classes.test.ts",
-        "docs/ui/patterns-story-reading.md"
+        "docs/ui/patterns-story-reading.md",
+        "docs/ui/patterns-ground-investigation.md"
       ]
     },
     {

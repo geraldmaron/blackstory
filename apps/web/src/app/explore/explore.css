@@ -1487,3 +1487,20 @@
     width: auto;
   }
 }
+
+/* —— Map investigation rails ——————————————————————————————————————————————————
+   With the collection strip in the center band (`data-collection='shown'`, AtlasExperience), the
+   three instruments read as one workbench: Lens on the left, the collection heading and view
+   choice in the middle, Results on the right. They share one edge weight and one surface; the
+   strip's geometry and the rails' hit areas are owned by their own stylesheets and unchanged. */
+.ds-atlas[data-collection='shown'] .ds-lens,
+.ds-atlas[data-collection='shown'] .ds-results,
+.ds-atlas[data-collection='shown'] > .ds-collection--atlas {
+  background: var(--ds-surface);
+  border-color: var(--ds-border-strong);
+}
+
+.ds-atlas[data-collection='shown'] .ds-lens__head,
+.ds-atlas[data-collection='shown'] .ds-results__head {
+  background: var(--ds-surface-raised);
+}

@@ -8,6 +8,45 @@
  * into the kit. Anything a second room renders moves there the same way rather than being copied.
  */
 
+/* —— the compact header ——————————————————————————————————————————————————————
+   The ledger masthead is built for a reading room: hero-scale title, wide lede, a 2px rule under
+   a tall block. Here the reader came to narrow a collection, so the header is a short editorial
+   line and the workbench sits in the first viewport. Scoped by `ds-records-entry`; the shared
+   Reading posture is untouched. */
+.ds-room--ledger .ds-entry--reading.ds-records-entry {
+  row-gap: var(--ds-space-2);
+  padding-bottom: var(--ds-space-4);
+}
+
+.ds-room--ledger .ds-records-entry .ds-entry__title {
+  margin: 0;
+  font-size: var(--ds-text-display-3);
+  line-height: 1.02;
+}
+
+.ds-room--ledger .ds-records-entry .ds-entry__lede {
+  margin: 0;
+  font-size: var(--ds-text-body-sm);
+  line-height: 1.45;
+  color: var(--ds-ink-muted);
+}
+
+/* —— the workbench ————————————————————————————————————————————————————————————
+   Collection heading and view choice, then find and facets, as one unit under the header. The
+   collection strip drops its own box here (`ds-collection--flat`) so there is one panel edge, not
+   a card inside a card. */
+.ds-records-workbench {
+  display: grid;
+  gap: var(--ds-space-3);
+  margin-block: var(--ds-space-4) var(--ds-space-5);
+  padding-bottom: var(--ds-space-4);
+  border-bottom: var(--ds-border-width) solid var(--ds-rule);
+}
+
+.ds-records-workbench > .ds-find {
+  margin: 0;
+}
+
 /* —— the control line: find field and facets, side by side ————————————————————
    The room used to open on a panel of six labeled chip rows, which cost most of a screen before
    the first record. One line instead: a GET search field that takes the spare width, then one
@@ -96,9 +135,8 @@
   gap: 5px;
   padding: var(--ds-space-3);
   background: var(--ds-surface);
-  border: var(--ds-border-width) solid var(--ds-border);
+  border: var(--ds-border-width) solid var(--ds-border-strong);
   border-radius: var(--ds-radius-md);
-  box-shadow: var(--ds-shadow-raised, 0 10px 28px rgb(0 0 0 / 35%));
 }
 
 /*

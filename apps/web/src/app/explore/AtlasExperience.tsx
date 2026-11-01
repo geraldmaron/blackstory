@@ -774,6 +774,7 @@ export function AtlasExperience({ initial, embedded = false }: AtlasExperiencePr
       data-mode={mode}
       data-embedded={embedded ? 'true' : undefined}
       data-sheet-open={compactSheetOpen ? 'true' : undefined}
+      data-collection={showCollection ? 'shown' : undefined}
     >
       {embedded ? null : (
         <CommandBar

@@ -16,6 +16,71 @@
   --record-shell-w: calc(var(--room-doc-w) - 2 * var(--ds-gutter));
 }
 
+/*
+ * The investigation return. The reader may have arrived from a narrowed map or list; this bar is
+ * the way back into that work, with its narrowing, and it is the only place on the page that says
+ * so. It sits above the identity block and apart from the archive navigation (the bar's home,
+ * the rooms and the off-ramp at the foot), which leave the investigation rather than resume it.
+ */
+.ds-record-return {
+  box-sizing: border-box;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--ds-space-1) var(--ds-space-5);
+  padding: var(--ds-space-2) var(--record-shell-pad);
+  background: var(--ds-canvas);
+  border-bottom: var(--ds-border-width) solid var(--ds-rule);
+}
+
+.ds-record-return__label {
+  font-family: var(--ds-font-mono);
+  font-size: var(--ds-text-micro);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ds-ink-muted);
+}
+
+.ds-record-return__link {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  color: var(--ds-accent-text);
+  font-family: var(--ds-font-sans);
+  font-size: var(--ds-text-body-sm);
+  font-weight: 550;
+  text-decoration: underline;
+  text-underline-offset: 0.18em;
+}
+
+.ds-record-return__link:hover {
+  color: var(--ds-ink);
+}
+
+.ds-record-return__link:focus-visible {
+  outline: var(--ds-focus-width) solid var(--ds-focus-ring);
+  outline-offset: var(--ds-focus-offset);
+}
+
+.ds-record-return__position {
+  font-family: var(--ds-font-mono);
+  font-size: var(--ds-text-caption);
+  letter-spacing: 0.02em;
+  color: var(--ds-ink-muted);
+}
+
+/* The record's own place strings, set under the name as the first fact about it. */
+.ds-record-mast__where {
+  margin: var(--ds-space-3) 0 0;
+  max-width: 54ch;
+  font-family: var(--ds-font-mono);
+  font-size: var(--ds-text-caption);
+  letter-spacing: 0.04em;
+  line-height: 1.5;
+  text-transform: uppercase;
+  color: var(--ds-ink-muted);
+}
+
 .ds-home-first-paint .ds-record-mast {
   /* Width counts as well as height: on a wide, short window `42vh` alone made a 4:1 strip. */
   min-height: clamp(18rem, max(42vh, 30vw), 32rem);
@@ -41,11 +106,11 @@
  */
 .ds-home-first-paint .ds-record-mast[data-media='map'] {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(18rem, 42%);
-  align-items: center;
+  grid-template-columns: minmax(0, 1fr) minmax(12rem, 34%);
+  align-items: start;
   column-gap: var(--ds-space-8);
   min-height: 0;
-  padding: var(--ds-space-10) var(--record-shell-pad) var(--ds-space-8);
+  padding: var(--ds-space-8) var(--record-shell-pad) var(--ds-space-8);
   background: none;
 }
 
@@ -64,6 +129,30 @@
 .ds-home-first-paint .ds-record-mast__map .ds-record-anatomy__place {
   position: relative;
   margin: 0;
+}
+
+/* The frame states its precision in words under the map, so a coarse pin is never read as exact. */
+.ds-record-mast__map-note {
+  margin: 0;
+  padding: var(--ds-space-2) var(--ds-space-3);
+  background: var(--ds-surface);
+  border-top: var(--ds-border-width) solid var(--ds-rule);
+  font-family: var(--ds-font-mono);
+  font-size: var(--ds-text-micro);
+  letter-spacing: 0.03em;
+  line-height: 1.45;
+  color: var(--ds-ink-muted);
+}
+
+/* The evidence band reads as the second beat of the mast: values at name-adjacent weight. */
+.ds-home-first-paint .ds-record-evidence-strip {
+  border-top: 2px solid var(--ds-ink);
+}
+
+.ds-home-first-paint .ds-record-evidence-strip .ds-rec-tile__value {
+  font-family: var(--ds-font-display);
+  font-size: var(--ds-text-title);
+  letter-spacing: -0.02em;
 }
 
 .ds-home-first-paint .ds-record-mast__map .ds-embed-map,
@@ -136,7 +225,6 @@
   font-family: var(--ds-font-sans);
   font-size: var(--ds-text-body-sm);
   text-decoration: none;
-  box-shadow: var(--ds-contact-hairline);
 }
 
 .ds-relation-chip:hover,

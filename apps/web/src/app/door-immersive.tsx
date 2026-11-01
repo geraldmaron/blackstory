@@ -146,7 +146,7 @@ const DOOR_COLD_OPEN_PROSE =
   'Every record in this archive is tied to a place you can stand in. Scroll to move the field. Grouped pins split as you get closer; any pin you can reach opens a record.';
 
 const DOOR_OPEN_INVITE =
-  'People, places, events, and sources on one field. Begin for a short guided walk, or browse the map yourself.';
+  'People, places, events, and sources on one field. Search the records, open the map, or read the list. Begin takes a short guided walk.';
 
 export type DoorOpenLedgerRow = {
   readonly family: string;
@@ -260,6 +260,9 @@ export function DoorImmersive({
   initialBrowse = false,
 }: DoorImmersiveProps) {
   const journeyRef = useRef<HTMLDivElement | null>(null);
+  const browseExitRef = useRef<HTMLButtonElement | null>(null);
+  const browseReturnFocusRef = useRef<HTMLElement | null>(null);
+  const browseFocusPendingRef = useRef(false);
   /** The map window: the part of the plate the reader sees on this surface (door-home.css). */
   const windowRef = useRef<HTMLDivElement | null>(null);
   /** The field chrome along the window's top edge; the country is framed below it. */
@@ -277,6 +280,22 @@ export function DoorImmersive({
   browseModeRef.current = browseMode;
   const browseMorphTimerRef = useRef<number | null>(null);
   const initialBrowseArmedRef = useRef(false);
+
+  // The hidden journey is inert. Move focus only for an actual mode transition,
+  // never steal it on a cold page load, and preserve the original entry control.
+  useEffect(() => {
+    if (!browseFocusPendingRef.current) return;
+    browseFocusPendingRef.current = false;
+    if (browseMode) {
+      browseExitRef.current?.focus({ preventScroll: true });
+    } else {
+      const origin = browseReturnFocusRef.current;
+      const target =
+        origin?.isConnected && !origin.closest('[inert]') ? origin : journeyRef.current;
+      target?.focus({ preventScroll: true });
+    }
+  }, [browseMode]);
+
   const initialFocus = useMemo(
     () =>
       resolveDoorFocus({
@@ -379,6 +398,7 @@ export function DoorImmersive({
         window.clearTimeout(browseMorphTimerRef.current);
         browseMorphTimerRef.current = null;
       }
+      browseFocusPendingRef.current = true;
       setBrowseMounted(false);
       setBrowseMode(false);
       browseModeRef.current = false;
@@ -456,6 +476,9 @@ export function DoorImmersive({
       // the document back at the top synchronously. On a browser Forward the journey may still
       // be collapsed (scrollY 0) from the traversal; keep the chapter we already know then.
       if (push || window.scrollY > 0) journeyScrollRef.current = window.scrollY;
+      browseReturnFocusRef.current =
+        document.activeElement instanceof HTMLElement ? document.activeElement : null;
+      browseFocusPendingRef.current = true;
       browseModeRef.current = true;
       setBrowseMode(true);
       stopSweep();
@@ -952,7 +975,12 @@ export function DoorImmersive({
     <>
       {browseMode ? (
         <div className="ds-door__browse-exit" data-browse-chrome="true">
-          <button type="button" className="ds-door__browse-exit-btn" onClick={exitBrowse}>
+          <button
+            ref={browseExitRef}
+            type="button"
+            className="ds-door__browse-exit-btn"
+            onClick={exitBrowse}
+          >
             <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true">
               <path
                 d="M10 3.5 5.5 8l4.5 4.5"
@@ -1061,6 +1089,8 @@ export function DoorImmersive({
         className={`ds-door-journey${browseMode ? ' ds-door-journey--browse' : ''}`}
         id="door-journey"
         ref={journeyRef}
+        tabIndex={-1}
+        inert={browseMode}
         aria-hidden={browseMode ? true : undefined}
       >
         {' '}
@@ -1100,55 +1130,92 @@ export function DoorImmersive({
                 aria-labelledby={`door-journey-heading-${chapter.id}`}
               >
                 <div className="ds-door-open">
-                  <HeroHeadlineMorph
-                    className="ds-door-open__headline"
-                    id={`door-journey-heading-${chapter.id}`}
-                  />
-                  <p className="ds-door-open__invite">{DOOR_OPEN_INVITE}</p>
-                  {spotlight ? (
-                    <p className="ds-door-open__strip">
-                      <span className="ds-door-open__where">
-                        <span className="ds-door-open__pin" aria-hidden="true" />
-                        {spotlightPublicHref ? (
-                          <DoorRecordLink
-                            className="ds-door-open__place"
-                            href={spotlightPublicHref}
-                          >
-                            {spotlight.name}
-                          </DoorRecordLink>
-                        ) : (
-                          <span className="ds-door-open__place">{spotlight.name}</span>
-                        )}
-                        {spotlightLocality ? (
-                          <span className="ds-door-open__locality">{spotlightLocality}</span>
-                        ) : null}
-                      </span>
-                    </p>
-                  ) : null}
-                  {openLedger.length > 0 ? (
-                    <dl className="ds-door-open__ledger" aria-label="Kinds on this field">
-                      {openLedger.map((row) => (
-                        <div key={row.family} className="ds-door-open__ledger-row">
-                          <dt className="ds-door-open__ledger-label">{row.label}</dt>
-                          <dd className="ds-door-open__ledger-count">
-                            {row.count.toLocaleString('en-US')}
-                          </dd>
-                        </div>
-                      ))}
-                    </dl>
-                  ) : null}
-                  <p className="ds-door-open__count">{placeCount} records on the map</p>
-                  <div className="ds-door-open__actions">
-                    <button
-                      type="button"
-                      className="ds-cta ds-cta--copper"
-                      onClick={() => scrollToChapter(1)}
+                  {/* Action first: the headline, a real GET search into /records, and the three
+                      ways in. Orientation (spotlight, census) sits beside it, not above it. */}
+                  <div className="ds-door-open__primary">
+                    <HeroHeadlineMorph
+                      className="ds-door-open__headline"
+                      id={`door-journey-heading-${chapter.id}`}
+                    />
+                    <p className="ds-door-open__invite">{DOOR_OPEN_INVITE}</p>
+                    <form
+                      className="ds-door-open__search"
+                      method="get"
+                      action="/records"
+                      role="search"
+                      aria-label="Search the archive"
                     >
-                      Begin
-                    </button>
-                    <button type="button" className="ds-cta ds-cta--ink" onClick={enterBrowse}>
-                      Browse the map
-                    </button>
+                      <label className="ds-visually-hidden" htmlFor="door-open-q">
+                        Search records by name or place
+                      </label>
+                      <input
+                        className="ds-door-open__search-input"
+                        id="door-open-q"
+                        name="q"
+                        type="search"
+                        placeholder="Search names, places"
+                        autoComplete="off"
+                        enterKeyHint="search"
+                      />
+                      <button type="submit" className="ds-cta ds-cta--ink ds-door-open__search-go">
+                        Search records
+                      </button>
+                    </form>
+                    <div className="ds-door-open__actions">
+                      <button
+                        type="button"
+                        className="ds-cta ds-cta--copper"
+                        onClick={() => scrollToChapter(1)}
+                      >
+                        Begin
+                      </button>
+                      <button type="button" className="ds-cta ds-cta--ink" onClick={enterBrowse}>
+                        Browse the map
+                      </button>
+                      <Link className="ds-cta ds-cta--quiet" href="/records">
+                        Browse the list
+                      </Link>
+                    </div>
+                  </div>
+                  <div className="ds-door-open__orient">
+                    {spotlight ? (
+                      <div className="ds-door-open__feature">
+                        <p className="ds-door-open__eyebrow">A place to start</p>
+                        <p className="ds-door-open__strip">
+                          <span className="ds-door-open__where">
+                            <span className="ds-door-open__pin" aria-hidden="true" />
+                            {spotlightPublicHref ? (
+                              <DoorRecordLink
+                                className="ds-door-open__place"
+                                href={spotlightPublicHref}
+                              >
+                                {spotlight.name}
+                              </DoorRecordLink>
+                            ) : (
+                              <span className="ds-door-open__place">{spotlight.name}</span>
+                            )}
+                            {spotlightLocality ? (
+                              <span className="ds-door-open__locality">{spotlightLocality}</span>
+                            ) : null}
+                          </span>
+                        </p>
+                      </div>
+                    ) : null}
+                    <div className="ds-door-open__census">
+                      <p className="ds-door-open__count">{placeCount} records on the map</p>
+                      {openLedger.length > 0 ? (
+                        <dl className="ds-door-open__ledger" aria-label="Kinds on this field">
+                          {openLedger.map((row) => (
+                            <div key={row.family} className="ds-door-open__ledger-row">
+                              <dt className="ds-door-open__ledger-label">{row.label}</dt>
+                              <dd className="ds-door-open__ledger-count">
+                                {row.count.toLocaleString('en-US')}
+                              </dd>
+                            </div>
+                          ))}
+                        </dl>
+                      ) : null}
+                    </div>
                   </div>
                 </div>
               </section>
@@ -1232,6 +1299,8 @@ export function DoorImmersive({
         <div
           className="ds-door__browse"
           aria-label="Map browse"
+          inert={!browseMode}
+          aria-hidden={!browseMode ? true : undefined}
           data-cold={initialBrowse ? 'true' : undefined}
         >
           {/* The journey's h1 is hidden while browse is armed; this keeps one h1 on the page. */}

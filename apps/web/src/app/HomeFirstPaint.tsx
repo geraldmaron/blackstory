@@ -55,6 +55,7 @@ import {
   firstPaintEraLink,
   firstPaintLocatorName,
   firstPaintRecord,
+  humanPlaceLine,
   publishableCitingStories,
   selectDoorRooms,
   walkOnPlaces,
@@ -261,6 +262,29 @@ export function HomeFirstPaint({
       </div>
     );
 
+    const placeLine = humanPlaceLine(lead);
+    const geographyLine =
+      placeLine?.toLocaleLowerCase() === lead.displayName.toLocaleLowerCase()
+        ? humanPlaceLine({ ...lead, locationLabel: '' })
+        : placeLine;
+
+    /* The way back into the investigation that sent the reader here: the map and the list, with
+       the narrowing they carried. Kept apart from the archive navigation (home, rooms) below. */
+    const investigationReturn = (
+      <nav className="ds-record-return" aria-label="Return to your investigation">
+        <span className="ds-record-return__label">Your investigation</span>
+        <Link className="ds-record-return__link" href={returns.mapHref} scroll={false}>
+          {returns.mapLabel}
+        </Link>
+        <Link className="ds-record-return__link" href={returns.listHref}>
+          {returns.listLabel}
+        </Link>
+        {returns.positionLabel ? (
+          <span className="ds-record-return__position">{returns.positionLabel}</span>
+        ) : null}
+      </nav>
+    );
+
     const mastMedia = hasPhoto ? (
       <EntityMastMedia
         entityId={lead.id}
@@ -280,6 +304,7 @@ export function HomeFirstPaint({
           interactive
           neighborhood
         />
+        <p className="ds-record-mast__map-note">Published location precision: {precisionValue}.</p>
       </div>
     ) : (
       <EntityMastMedia entityId={lead.id} entityName={lead.displayName} hideCredit priority />
@@ -290,6 +315,7 @@ export function HomeFirstPaint({
         className="ds-home-first-paint"
         masthead={
           <>
+            {investigationReturn}
             <figure
               className="ds-record-mast"
               data-media={hasPhoto ? 'photo' : geo ? 'map' : 'mark'}
@@ -309,6 +335,7 @@ export function HomeFirstPaint({
                   ) : null}
                 </div>
                 <h1 className="ds-record-mast__title">{lead.displayName}</h1>
+                {geographyLine ? <p className="ds-record-mast__where">{geographyLine}</p> : null}
                 <p className="ds-record-mast__lede">
                   <LinkedProse
                     as="span"
