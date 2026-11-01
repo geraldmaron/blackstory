@@ -256,6 +256,18 @@ function validateInventory({ root, appDir, manifest }) {
     }
 
     validateStates(root, entry.states, `${label}.states`, errors, ROUTE_STATES);
+    if (typeof entry.source === 'string') {
+      // A loading.tsx beside the page is implemented work; a pending or not-applicable loading
+      // state would be a stale claim that the route has none.
+      const loadingStatus = entry.states?.loading?.status;
+      const loadingFile = path.join(path.dirname(entry.source), 'loading.tsx');
+      const claimsNone = loadingStatus === 'pending' || loadingStatus === 'not-applicable';
+      if (claimsNone && statExists(path.resolve(root, loadingFile))) {
+        errors.push(
+          `${label}.states.loading: status is ${loadingStatus} but ${loadingFile} exists; record it as baseline or partial with that file as evidence`,
+        );
+      }
+    }
     validateRefs(root, entry.componentRefs, `${label}.componentRefs`, errors);
     validateRefs(root, entry.evidence, `${label}.evidence`, errors);
   }

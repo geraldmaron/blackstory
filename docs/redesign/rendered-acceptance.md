@@ -118,3 +118,13 @@ Source candidate: d9b9604f plus the two bounded Sonnet finishing tasks (2e6f1cea
 - Screenshots in /tmp/blackstory-redesign-proof-20261101: story-chronology-desktop.jpg, story-chronology-mobile.jpg, story-range-map-desktop.jpg, law-room-mobile.jpg, mosaic-credits-mobile.jpg. Screenshots record the stated viewport/state, not acceptance of everyroute/state.
 
 Frozen integration checks: web aggregate2916tests,2908pass,8skip,0fail (`/tmp/blackstory-final-candidate-web.log`); targeted door-loader+decade-density16pass; Claude focused125pass, typespass, edge59pass, inventory66routes/6sharedsurfacespass. The earlier one aggregatefailure was a stale five-argument source assertion, fixed without removing cached-loader guards. No database writes, publishing or canonical merge occurred.
+
+## Public-state finishing receipt — 2026-11-01
+
+Candidate based on9f62798f plus Claude public finishing sessions b3a29fc4 and b6ac52d6 (both verified claude-sonnet-5-5, exit0). Missing Stories list/detail loading boundaries, inherited-boundary tests, a standalone root-layout fallback and a loading/inventory drift guard are integrated. The fallback uses the actual `--ds-canvas` token with a plain CSS fallback; raw error logging was removed at integration. No authored content or stored records changed.
+
+Actual375px light rendering confirms the map's When drawer no longer overlays the collection caption with Group nearby. The floating controls are hidden while this compact collection drawer is open, then visibly restore when it closes. The two-record range and qualified whole-archive status remain readable, without horizontal overflow. Screenshot: /tmp/blackstory-redesign-proof-20261101/story-range-time-mobile-final.jpg.
+
+The invalid-range recovery was also exercised: explanatory unresolved collection state, zero rows, automatically opened period disclosure and Clear range returning to the same five-record story chronology. This is rendered recovery evidence, not an induced database failure. Existing retained secondary layouts use source/component-test evidence; no exhaustive375/1280 light/dark acceptance of every route is claimed.
+
+Final frozen checks: web2929tests,2921pass,8skip,0fail (/tmp/blackstory-public-final-web.log); TypeScript pass; scoped ESLint pass; inventory guard8pass; manifest check66routes/6sharedsurfaces. Earlier9 aggregate failures were confirmed as ReferenceError in the new JSX render tests and corrected with the repository's explicit React import convention. The passing final aggregate includes those tests. No further aggregate is required for documentation-only evidence updates.

@@ -221,4 +221,87 @@ Native discovery exposed no contactable owner; private session scraping/resume w
 This is a verified core candidate, not a claim that the full redesign is finished.
 
 ### Coordinator integration receipt (2026-11-01)
-Sonnet finishing execution and routine checks are integrated. Follow-up session774230de-a0bf-42cf-bd3c-9340eff366d5 verified modelclaude-sonnet-5-5, exit0. Final frozen aggregate is2916tests/2908pass/8skip/0fail, not an expected projection; newdecade test ran in targeted16pass. Root standardized the new chronology breakpoint to existing48rem (no behaviorlogicchange). Actualbrowser evidence is recorded in rendered-acceptance.md. Canonicaloriginalowner remainsunknown; no merge/prune/push/deploy. Read-only database guard unchanged. Storedschema/records still require reviewedproposal+syntheticvalidation+impact/rollback+finalusersignoff.
+Sonnet finishing execution and routine checks are integrated. Follow-up session
+`774230de-a0bf-42cf-bd3c-9340eff366d5` verified model `claude-sonnet-5-5`, exit 0. The final frozen
+aggregate is 2,916 tests, 2,908 pass, 8 skip, 0 fail (measured, not projected); the new decade
+test ran in a targeted 16 pass. Root standardized the new chronology breakpoint to the existing
+48rem with no behavior-logic change. Actual browser evidence is in `rendered-acceptance.md`. The
+canonical original owner remains unknown: no merge, prune, push or deploy. The read-only database
+guard is unchanged. Stored schema or records still need a reviewed proposal, synthetic validation,
+impact and rollback plan, and final user sign-off.
+
+## Public state closeout (Claude Sonnet 5.5, isolated clone, base 9f62798f)
+
+**Ten public routes were pending in the inventory:** `/books`, `/books/[slug]`, `/errata`, `/law`,
+`/law/[slug]`, `/memorial`, `/rooms`, `/sources`, `/stories`, `/stories/mosaic-credits`. Each was
+read from source against the shared loading, error, empty and not-found components. Most "pending"
+reasons were generic text, not findings.
+
+**Real gaps fixed (source and tests):**
+- `/stories` awaits the story list but had no `loading.tsx`; added it, plus `/stories/[slug]/loading.tsx`
+  (before, the detail route inherited the parent wait). Both use the shared `CatalogLoading`.
+- `app/error.test.ts` imported a legacy `UtilityEditionErrorView`, never the live `app/error.tsx`
+  that every public route inherits. Two tests now render the real boundary: retry plus way home,
+  and no raw message or stack in production.
+- New `app/public-route-loading.test.tsx` renders all seven public loading boundaries (one polite
+  announcement, hidden placeholders, no invented counts) and asserts the static rooms (`/errata`,
+  `/memorial`, `/rooms`, `/sources`) have none because they await nothing.
+- `scripts/check-surface-inventory.mjs` gained a drift guard: a route cannot record loading as
+  pending or not-applicable while a `loading.tsx` sits beside its page. Existing route, source,
+  state and verification guards are unchanged. Case added to `check-surface-inventory.test.mjs`.
+
+**Inventory dispositions (statuses are not visual verification; nothing is marked complete):**
+loading baseline for books, books detail, law, law detail, stories, story detail and mosaic credits;
+error partial for books, law, stories, mosaic credits (stated unavailable notes plus the inherited
+boundary); empty partial for books, law, stories and errata; selected partial for books, law,
+stories and mosaic credits. Memorial, errata, rooms and sources are `baseline` retained layouts with
+loading recorded as not-applicable because they await no read; inherited route errors remain applicable to synchronous rendering and are recorded separately. Route-level `partial` for
+the seven data-backed routes, `baseline` for those four. Shared `system-states` error moved to
+`partial`, still naming the missing `global-error.tsx`.
+
+**Corrected old findings (source evidence):** `/law` is paginated (24 per page via shared
+`Pagination`, `LawBrowseSections.tsx`); `/books` has a working 12-per-page pager with
+`rel=prev/next` in its own view model; `/sources` is reader-facing copy, not pipeline words;
+`/errata` has an empty state and is intentionally unpaged at 7 entries. `SURFACES.md` rows updated.
+
+**Not changed:** published identities, author prose, Memorial (no pins, access rules, wall), auth
+gates, any public URL, manifest, schema or data. Mosaic credits still invents no per-tile credit.
+
+**Checks run through the wrapper:** `focused` 125/125 (its target list does not include the new
+test files), `types` pass, `inventory` ok (66 routes, six shared surfaces), both before and after
+the fix below.
+
+**The one aggregate failed: 2,926 tests, 2,909 pass, 9 fail, 8 skip.** The wrapper prints only the
+tail, so the failing names were not visible. The count was 10 above the 2,916 baseline, so the new
+tests did run. Nine failures match the 7 loading renders plus the 2 `app/error.tsx` renders in the
+new tests: those files used JSX without `import React`, which the test loader needs (the repo's
+pages and `entity/[id]/loading.tsx` use `import React` plus `void React`). That is a diagnosis by
+inference, not a read failure log. The fix added that import to the seven `loading.tsx` files and
+`error.tsx`; no behavior changed. **The fix has not been re-run through the aggregate**, so the
+root should rerun it and expect 2,926 tests with 0 fail; treat any other failure as unexplained.
+
+**Follow-up fixes:** (1) map-controls.css hides the on-map control group at compact sizes while a
+sheet is open over a collection strip (`.ds-atlas[data-sheet-open][data-collection=shown]`), restoring
+on close; landscape phones (no lift) and desktop are unchanged; guard test
+`app/map-controls-collision.test.ts`. (2) `app/global-error.tsx` with `app/global-error.test.tsx`.
+(3) 404 keeps its visible Find in the archive and Read the chapters links; no change. Wrapper
+`public` 122/122 pass after (1) and (2) were added. The stub `components/map-experience/map-controls-collision.test.ts`
+is a leftover with no tests; root should delete it.
+
+**Remaining, by kind:**
+- Implementation: none open in this pass's scope.
+- Verification (root): rerun the aggregate at root integration; rendered acceptance at 375/1280 light and dark for
+  the ten routes, including the new loading waits and unavailable notes; map status line and
+  Records cold-load budget from the earlier pass.
+- Optional decisions, not blockers: retire `/rooms`, merge `/sources`, adopt the shared
+  `Pagination` in `/books`, window `/errata` if it grows.
+- Gates unchanged: mosaic manifest author and licence data; stored schema or records need final
+  sign-off; original-owner canonical merge and prune; 31 staff surfaces protected.
+
+### Final integration checkpoint
+
+The independent public implementation pass is integrated and verified. Frozen web aggregate: 2,929 tests, 2,921 pass, eight skipped, zero failures. TypeScript, scoped ESLint, eight inventory guard tests, and the 66-route/six-shared-surface manifest check pass. Final source and log evidence is in rendered-acceptance.md. Root removed an empty task-owned test stub, corrected the global fallback's canvas token, and removed raw client error logging. The new global and inherited boundaries keep error details out of rendered output.
+
+The mobile When-drawer collision is browser-verified fixed at 375px light: controls hide while the compact collection drawer is open and restore on close. The invalid-period recovery also returns to the same five-record story collection. Static public pages retain inherited error-boundary coverage; only their catalog loading state is not applicable. Inventory route totals are 19 partial, 16 baseline and 31 pending; all pending routes are staff or authentication-entry surfaces. Partial/baseline are implementation dispositions and supporting evidence, not blanket visual acceptance.
+
+Next required coordination action: identify or obtain release from the original Claude owner of `/Users/geralddagher/Developer/Projects/blackstory`, branch `redesign/ux-audit-2026-10`, before canonical reconciliation or branch pruning. Supported discovery did not establish an owner; no private session access or takeover occurred. The isolated candidate remains reviewable on port3103. No push, deploy, canonical merge, branch deletion or stored data change has been attempted. Exact immutable copied-tile author/licence metadata remains unavailable; any schema or stored-record remedy requires a scoped proposal, adversarial review, isolated validation, impact/rollback, then final user sign-off before application.

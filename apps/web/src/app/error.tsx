@@ -4,12 +4,14 @@
 
 'use client';
 
-import { useEffect } from 'react';
+import React, { useEffect } from 'react';
 import Link from 'next/link';
 import { Notice } from '@repo/ui';
 import { sanitizeClientErrorDisplay } from '../lib/runtime-hardening/error-surface';
 import { Room, ReadingEntry } from '../components/room';
 import './utility.css';
+
+void React;
 
 export default function Error({
   error,

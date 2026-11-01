@@ -149,6 +149,21 @@ describe('inventory integrity', () => {
     assert.deepEqual(validateInventory({ root, appDir, manifest: validManifest([route]) }), []);
   });
 
+  it('rejects a pending or not-applicable loading state when a loading.tsx sits beside the page', () => {
+    const { root, appDir } = tempRepo();
+    writeFile(root, 'apps/web/src/app/books/page.tsx');
+    writeFile(root, 'apps/web/src/app/books/loading.tsx');
+    const route = entry(root, '/books', 'apps/web/src/app/books/page.tsx');
+    const stale = validateInventory({ root, appDir, manifest: validManifest([route]) });
+    assert.ok(
+      stale.some((error) => error.includes('states.loading') && error.includes('loading.tsx exists')),
+    );
+
+    route.states.loading.status = 'baseline';
+    route.states.loading.evidence = ['apps/web/src/app/books/loading.tsx'];
+    assert.deepEqual(validateInventory({ root, appDir, manifest: validManifest([route]) }), []);
+  });
+
   it('catches new and removed routes, bad refs, duplicate mappings, and invalid or missing state statuses', () => {
     const { root, appDir } = tempRepo();
     writeFile(root, 'apps/web/src/app/current/page.tsx');

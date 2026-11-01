@@ -116,6 +116,18 @@
   }
 }
 
+/*
+ * Compact, collection strip up, sheet open: the lift would carry the group onto the strip's
+ * caption, so the group steps aside until the sheet closes. Hidden (not just faded) so it also
+ * leaves the tab order; the map itself stays keyboard and touch operable.
+ */
+@media (max-width: 819px), (max-height: 559px) {
+  .ds-atlas[data-sheet-open='true'][data-collection='shown'] .ds-map-controls {
+    visibility: hidden;
+    pointer-events: none;
+  }
+}
+
 /* Landscape phone: the open instrument docks to the left edge, so the controls stay low-right. */
 @media (max-height: 559px) and (orientation: landscape) {
   /* The dock hugs the bottom edge here (atlas.css), 54px tall; the controls sit just above it. */
@@ -125,6 +137,12 @@
     align-items: flex-end;
     /* The sheet is a left column here, so nothing to ride above. */
     --ds-map-controls-lift: 0px;
+  }
+
+  /* No lift here, so no collision with the collection strip: keep the group. */
+  .ds-atlas[data-sheet-open='true'][data-collection='shown'] .ds-map-controls {
+    visibility: visible;
+    pointer-events: auto;
   }
 }
 

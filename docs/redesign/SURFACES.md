@@ -156,11 +156,11 @@ consistency failure in the product.
 | `/entity/[id]` | Person / non-standable record room | Duplicate "Visit" blocks; sensitivity banner buried inside "Why this is here"; leaks `rel_2026…`, "Maturity: Partial Enrichment", raw enums | error | One record anatomy; one evidence vocabulary; internals never public |
 | `/place/[slug]` | Map-led record | No status, timeline or record file; a **statute** renders here and gets unrelated nearest-place neighbours | loading, error | Same anatomy; route statutes to the law template |
 | `/invention/[slug]` | Record room + "What it changed" | Inherits the above | loading, error | Same anatomy |
-| `/law`, `/law/[slug]` | Statute browse + detail | **No pagination** on browse; no grades; results `div` has `aria-labelledby` without a landmark role | loading, error | Shared browse pattern + `Pagination` |
-| `/books`, `/books/[slug]` | Banned-books catalogue | **Third pager implementation** (12/page) | loading, error | Adopt `Pagination` |
-| `/memorial` | Names wall | Letter `h2` accessible name merges letter+count ("A124") | empty, error | **P-01: names are never pins.** Keep non-spatial. Fix heading name |
-| `/sources` | Pipeline explainer | Shows pipeline words ("Research run → Capture") as reader copy; lists no actual sources | — | Rewrite as reader-facing, or merge into `/methodology` |
-| `/errata` | Correction log + RSS/JSON | No pagination or filter; fine at 3 entries, not at 300 | empty, error | Shared browse pattern |
+| `/law`, `/law/[slug]` | Statute browse + detail | ~~No pagination~~ **Stale:** browse windows at 24 per page through the shared `Pagination` (`LawBrowseSections.tsx`, `LAW_PAGE_SIZE`); no grades; the law dataset is separate and none is manufactured | loading and not-found shipped; error is the inherited boundary | Retained layout; rendered acceptance open |
+| `/books`, `/books/[slug]` | Banned-books catalogue | 12 per page with working prev/next relations in the books view model (not the shared `Pagination`; adopting it is optional consolidation) | loading shipped; unavailable and no-match states shipped | Retained layout; rendered acceptance open |
+| `/memorial` | Names wall | Letter `h2` accessible name now states letter and count as words (tested) | none applicable: fixed name list, no read | **P-01: names are never pins.** Keep non-spatial; access rules untouched |
+| `/sources` | Reading room, three jump sections | ~~Pipeline words as reader copy~~ **Stale:** reader-facing copy now; it states that counts live on the operator desk and lists no individual source | none applicable | Retained layout; merging into `/methodology` is an optional IA decision |
+| `/errata` | Correction log + RSS/JSON | No paging or filter by design (7 entries, full list also in both feeds); empty state shipped | none applicable | Retained ledger; add windowing only if the log outgrows one reading |
 | `/search` | — | 308 → `/records` | n/a | Keep redirect |
 
 ### 3.3 Reading and data
@@ -169,13 +169,13 @@ consistency failure in the product.
 
 | Route | Purpose | Key problems | Missing states | Treatment |
 |---|---|---|---|---|
-| `/stories` | Chapter index | Links zero records | loading, error | Shared browse pattern |
-| `/stories/[slug]` | Long-form chapter | **the-count: 5,850 words, 3 in-prose entity links.** buying-a-home: 4,625 words, 0. No reading progress exists at all. Rail is static below 68rem so phones get no TOC before the text | loading, error | Thread pattern; `MapInsetMoment` as default (2 of 7 chapters use it); link density lint |
+| `/stories` | Chapter index | Audit-time finding "links zero records" is not re-verified. Windowing, filters, unavailable and empty notes already exist; the missing `loading.tsx` now exists (`loading.tsx`, asserted by `public-route-loading.test.tsx`) | error is the inherited boundary | Retained single publication index; rendered acceptance open |
+| `/stories/[slug]` | Long-form chapter | **the-count: 5,850 words, 3 in-prose entity links.** buying-a-home: 4,625 words, 0. No reading progress exists at all. Rail is static below 68rem so phones get no TOC before the text | loading shipped; thrown-read error is the inherited boundary | Thread pattern; `MapInsetMoment` as default (2 of 7 chapters use it); link density lint |
 | `/data` | Census reference | 16 figures, 558 KB; **truncated y-axis undisclosed** (`BlackPopulationShareChart.tsx:51`); figure titles are `<span>` not headings so heading-nav skips all 16 | partial series, loading, error | One chart frame; disclose axis breaks on the chart |
 | `/lives` | Guided census narrative | **Missing estimate coerced to 0** (`LivesMilestoneExperience.tsx:246`) and drawn as a 2px bar (`lives.css:1320`): missing data looks like near-zero data | per-decade no-data treatment | **Data-honesty fix, not styling.** Render absence as absence |
 | `/lives/explorer` | Evidence appendix | 1.29 MB; probable duplicate render (INFERRED) | loading | Virtualize / paginate |
 | `/lives/[region]` | — | 308 → `/lives/explorer` | n/a | Keep redirect |
-| `/rooms` | Hub of hubs | 251 words, 14 headings, explains other destinations | — | **Retire** as a destination |
+| `/rooms` | Hub of hubs | 251 words, 14 headings, explains other destinations | — | Audit proposal to retire. Current source is a registry-driven wayfinding hub; retirement is an open owner IA and redirect decision, not a blocker, and the route is retained |
 | `/history` | — | 308 → `/records` | n/a | Keep redirect |
 
 Charts, cross-cutting: axis text is 11px inside a fixed viewBox, so it renders **~4–6px on a
@@ -189,7 +189,7 @@ data series.
 |---|---|---|---|---|
 | Global chrome | Bar, phone tabs, footer, skip link | "Map" tab points at `/` not the map; `Find` nav contains Rooms (mislabelled landmark); theme toggle has no `aria-pressed`; shell ignores the `ThemeToggle` in `packages/ui` | — | One nav taxonomy; adopt `ThemeToggle` |
 | **Route change** | — | **No focus management anywhere.** Focus stays on the clicked link; keyboard users re-tab the bar every navigation | route announcement | App-wide focus + announce on navigation |
-| System states | error / 404 / loading | **3 `loading.tsx` and 1 `error.tsx` for 66 routes.** No `global-error.tsx`, so an error in the root layout has no boundary. 404 shows "Press ⌘K" with no touch equivalent | per-route loading + error | `Skeleton` per route family; route-level error boundaries |
+| System states | error / 404 / loading | Audit-time count was 3 `loading.tsx` and 1 `error.tsx` for 66 routes. Public catalog and story routes now have their own `loading.tsx` through the shared `CatalogLoading`, and `app/error.tsx` is unit-tested directly. **Still open:** no `global-error.tsx`, so a root-layout failure has no boundary; 404 shows "Press ⌘K" with no touch equivalent (not re-read here) | per-route loading shipped for public catalogs; route-level error boundaries beyond the shared one are not needed by any current route | Add `global-error.tsx`; browser-verify the shared boundary |
 | `/about`, `/methodology`, `/faq` | Trust rooms | Conceptual overlap (sourcing, corrections, definitions told 3–4 times) | loading, error | Merge; answers beside the action |
 | `/privacy`, `/terms`, `/support` | Policy | Long-form on phones with no mobile rules in their own CSS | — | Reading-room pattern |
 | `/design-system` | Fixture gallery | Admin-gated, but the registry lists it as a public noindex route | — | Make it the real token+primitive gallery; un-gate |

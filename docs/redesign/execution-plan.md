@@ -107,6 +107,32 @@ the active checkout or its running preview. Existing preview: http://localhost:3
 - [Playwright visual comparisons](https://playwright.dev/docs/test-snapshots): compare on a
   consistent host/browser; review baseline changes instead of accepting them automatically.
 
+## Public route state status (2026-11-01, base 9f62798f)
+
+The ten public routes that the inventory counted pending were read from source. `/stories` and
+`/stories/[slug]` lacked a `loading.tsx` and now have one; the live `app/error.tsx` boundary is now
+tested directly. The inventory records per-state dispositions with real component and test
+references, and its checker now rejects a loading state recorded as pending or not-applicable when
+a `loading.tsx` exists. Statuses stay `baseline` or `partial`; none is `complete`, because none has
+verification metadata.
+
+- **Implementation:** `global-error.tsx` now exists. The 404 page keeps visible Find in the archive
+  and Read the chapters links as the touch alternative to the Cmd K hint. At 375x812 light, the
+  collection `story:the-count` chronology with the When sheet open had the Group nearby control
+  lifted onto the collection caption; the controls now step aside while a sheet is open over a
+  collection strip on compact screens (not landscape, not desktop).
+- **Verification still open:** root aggregate rerun after the React-import fix (the first aggregate
+  showed 9 failures, explicit React imports added; wrapper `public` now passes 122/122); root
+  visual re-check of the collision fix; rendered acceptance at 375/1280
+  in light and dark for the ten routes.
+- **Owner decisions, optional:** retire `/rooms`, merge `/sources`, adopt shared `Pagination` in
+  `/books`, window `/errata` if it grows. These do not block anything and the routes are retained.
+- **Data gate:** mosaic tile author and licence are absent from the manifest; no credit is invented.
+
+Old findings corrected from source: `/law` is paginated, `/books` has a working pager, `/sources`
+is reader-facing copy, `/errata` has an empty state. See `SURFACES.md` section 3.2 and
+`local-handoff.md`.
+
 ## Current blockers
 
 Stored-record or schema changes require a separate final owner sign-off. Before requesting
