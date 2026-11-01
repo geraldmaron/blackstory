@@ -13,10 +13,17 @@ const EMPTY_RECORDS_QUERY = Object.freeze({
   topic: '',
   status: '',
   evidence: '',
+  sort: 'discovery',
   page: 1,
 });
 const RECORDS_FILTER_KEYS = Object.freeze(['kind', 'era', 'state', 'topic', 'status', 'evidence']);
-const RECORDS_PAGE_PARAM_ALLOWLIST = Object.freeze(['q', ...RECORDS_FILTER_KEYS, 'page']);
+const RECORDS_SORTS = Object.freeze(['discovery', 'era', 'name', 'evidence']);
+const RECORDS_PAGE_PARAM_ALLOWLIST = Object.freeze([
+  'q',
+  ...RECORDS_FILTER_KEYS,
+  'sort',
+  'page',
+]);
 
 const FACET_SLUG = /^[a-z0-9][a-z0-9_-]{0,63}$/;
 const STATE_POSTAL = /^[A-Z]{2}$/;
@@ -47,6 +54,7 @@ function parseRecordsQuery(raw) {
     topic: topic.length > 0 && TOPIC_IDS.has(topic) ? topic : '',
     status: slugOrEmpty(one('status').toLowerCase()),
     evidence: EVIDENCE_GRADES.has(evidence) ? evidence : '',
+    sort: RECORDS_SORTS.includes(one('sort').toLowerCase()) ? one('sort').toLowerCase() : 'discovery',
     page: Number.isFinite(rawPage) && rawPage > 1 ? Math.min(rawPage, MAX_PAGE) : 1,
   };
 }
@@ -58,6 +66,7 @@ function recordsQueryString(query) {
   for (const key of RECORDS_FILTER_KEYS) {
     if (merged[key].length > 0) params.set(key, merged[key]);
   }
+  if (merged.sort !== 'discovery') params.set('sort', merged.sort);
   if (merged.page > 1) params.set('page', String(merged.page));
   return params.toString();
 }
@@ -71,7 +80,8 @@ function recordsHref(query) {
 function isRecordsCombinationQuery(query) {
   if (query.q.length > 0) return true;
   const constraints = RECORDS_FILTER_KEYS.filter((key) => query[key].length > 0).length;
-  return constraints + (query.page > 1 ? 1 : 0) > 1;
+  const reordered = query.sort !== 'discovery' ? 1 : 0;
+  return constraints + reordered + (query.page > 1 ? 1 : 0) > 1;
 }
 
 module.exports = {
